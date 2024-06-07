@@ -183,12 +183,7 @@ void CParticleGroup::SItem::Clear()
     VisualVec visuals;
     GetVisuals(visuals);
     for (auto& visual : visuals)
-    {
-        // GEnv.Render->model_Delete(*it);
-        IRenderVisual* pVisual = smart_cast<IRenderVisual*>(visual);
-        GEnv.Render->model_Delete(pVisual);
-        visual = nullptr;
-    }
+        RImplementation.model_Delete((IRenderVisual*&)visual, false);
 
     //	Igor: zero all pointers! Previous code didn't zero _source_ pointers,
     //	just temporary ones.
@@ -281,20 +276,11 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
     // and delete if !deffered
     if (!def_stop)
     {
-        for (auto& p : _children_related)
-        {
-            // GEnv.Render->model_Delete(*it);
-            IRenderVisual* pVisual = smart_cast<IRenderVisual*>(p);
-            GEnv.Render->model_Delete(pVisual);
-            p = nullptr;
-        }
-        for (auto& p : _children_free)
-        {
-            // GEnv.Render->model_Delete(*it);
-            IRenderVisual* pVisual = smart_cast<IRenderVisual*>(p);
-            GEnv.Render->model_Delete(pVisual);
-            p = nullptr;
-        }
+        for (auto& child : _children_related)
+            RImplementation.model_Delete((IRenderVisual*&)child, false);
+
+        for (auto& child : _children_free)
+            RImplementation.model_Delete((IRenderVisual*&)child, false);
 
         _children_related.clear();
         _children_free.clear();
@@ -418,26 +404,23 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
     if (!_children_free.empty())
     {
         u32 rem_cnt = 0;
-        for (auto& p : _children_free)
+        for (auto& child : _children_free)
         {
-            CParticleEffect* E = static_cast<CParticleEffect*>(p);
-            if (E)
+            CParticleEffect* E = static_cast<CParticleEffect*>(child);
+            if (!E)
+                continue;
+
+            E->OnFrame(u_dt);
+            if (E->IsPlaying())
             {
-                E->OnFrame(u_dt);
-                if (E->IsPlaying())
-                {
-                    bPlaying = true;
-                    if (E->vis.box.is_valid())
-                        box.merge(E->vis.box);
-                }
-                else
-                {
-                    rem_cnt++;
-                    // GEnv.Render->model_Delete(*it);
-                    IRenderVisual* pVisual = smart_cast<IRenderVisual*>(p);
-                    GEnv.Render->model_Delete(pVisual);
-                    p = nullptr;
-                }
+                bPlaying = true;
+                if (E->vis.box.is_valid())
+                    box.merge(E->vis.box);
+            }
+            else
+            {
+                rem_cnt++;
+                RImplementation.model_Delete((IRenderVisual*&)child, false);
             }
         }
         // remove if stopped

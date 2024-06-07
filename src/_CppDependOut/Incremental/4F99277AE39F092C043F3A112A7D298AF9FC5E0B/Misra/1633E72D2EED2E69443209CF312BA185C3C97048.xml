@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\utils\xrlc_light\mu_light_net.h"><violation beginline="5" endline="5" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\utils\xrlc_light\mu_model_light.h"><violation beginline="7" endline="7" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\utils\xrlc_light\mu_model_light_threads.h"><violation beginline="4" endline="4" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="5" endline="5" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

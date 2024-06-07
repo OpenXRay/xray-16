@@ -347,6 +347,9 @@ protected:
     void cam_UnsetLadder();
     float currentFOV();
 
+    void UpdateVisorRainDrops();
+    void UpdateVisor();
+
     // Cameras
     CCameraBase* cameras[eacMaxCam];
     EActorCameras cam_active;
@@ -426,6 +429,9 @@ public:
     bool AnyMove() { return (mstate_real & mcAnyMove) != 0; };
     bool is_jump();
     u32 MovingState() const { return mstate_real; }
+    float m_dropsIntensity{};
+    float m_dropsAnimIncrementor{};
+
 protected:
     u32 mstate_wishful;
     u32 mstate_old;
@@ -454,7 +460,7 @@ public:
 public:
     void OnAxisMove(float x, float y, float scale, bool invert);
     virtual void IR_OnMouseMove(int x, int y);
-    virtual void IR_OnMouseWheel(int x, int y);
+    virtual void IR_OnMouseWheel(float x, float y);
 
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);

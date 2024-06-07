@@ -56,15 +56,12 @@ CInventoryItem::CInventoryItem()
     m_flags.set(FUsingCondition, FALSE);
     m_fCondition = 1.0f;
 
-    m_name = m_nameShort = NULL;
-
     m_ItemCurrPlace.value = 0;
     m_ItemCurrPlace.type = eItemPlaceUndefined;
     m_ItemCurrPlace.base_slot_id = NO_ACTIVE_SLOT;
     m_ItemCurrPlace.slot_id = NO_ACTIVE_SLOT;
 
     m_Description = "";
-    m_section_id = 0;
     m_flags.set(FIsHelperItem, FALSE);
 }
 

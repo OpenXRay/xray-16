@@ -89,8 +89,9 @@ private:
 public:
     xrDebug() = delete;
     static void Initialize(pcstr commandLine);
-    static void Destroy();
+    static void Finalize();
     static void OnThreadSpawn();
+    static void OnThreadExit();
     static void OnFilesystemInitialized();
 
     static bool DebuggerIsPresent();
@@ -102,7 +103,7 @@ public:
     static void SetUserConfigHandler(IUserConfigHandler* handler) { userConfigHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
-    static const char* ErrorToString(long code);
+    static pcstr ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,
                            const char* desc, const char* arg1 = nullptr, const char* arg2 = nullptr);
@@ -113,6 +114,7 @@ public:
                      const char* desc = "assertion failed", const char* arg1 = nullptr, const char* arg2 = nullptr);
     static AssertionResult Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
+    [[noreturn]]
     static void DoExit(const std::string& message);
 
     static AssertionResult ShowMessage(pcstr title, pcstr message, bool simpleMode = true);
@@ -139,7 +141,7 @@ private:
 
 // forward declaration
 // Definition is in xrCore/_std_extensions.h
-inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...);
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...);
 
 // for debug purposes only
 template<typename... Args>

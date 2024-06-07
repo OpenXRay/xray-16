@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\zlib\trees.c"><violation beginline="132" endline="132" rule="Rule4-10-2" ruleset="Expressions">
-</violation></file></cppdepend-plugin>

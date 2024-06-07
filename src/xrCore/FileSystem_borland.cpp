@@ -19,14 +19,14 @@ int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
     return 0;
 }
 
-bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCSTR offset, int start_flt_ext)
+bool EFS_Utils::GetOpenName(pcstr initial, xr_string& buffer, bool bMulti, pcstr offset, int start_flt_ext)
 {
     char buf[255 * 255]; // max files to select
     xr_strcpy(buf, buffer.c_str());
 
     /*
     char* g_SHBF_Folder =("C:\\Program Files");
-    TCHAR path[_MAX_PATH];
+    TCHAR path[MAX_PATH];
     BROWSEINFO info={NULL,NULL,path,"title",BIF_USENEWUI,BrowseCallbackProc, (LPARAM)g_SHBF_Folder };
     SHBrowseForFolder (&info);
     */
@@ -50,7 +50,7 @@ bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCS
     return bRes;
 }
 
-bool EFS_Utils::GetSaveName(LPCSTR initial, xr_string& buffer, LPCSTR offset, int start_flt_ext)
+bool EFS_Utils::GetSaveName(pcstr initial, xr_string& buffer, pcstr offset, int start_flt_ext)
 {
     string_path buf;
     xr_strcpy(buf, sizeof(buf), buffer.c_str());
@@ -62,7 +62,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, xr_string& buffer, LPCSTR offset, in
 }
 //----------------------------------------------------
 
-void EFS_Utils::MarkFile(LPCSTR fn, bool bDeleteSource)
+void EFS_Utils::MarkFile(pcstr fn, bool bDeleteSource)
 {
     xr_string ext = strext(fn);
     ext.insert(1, "~");

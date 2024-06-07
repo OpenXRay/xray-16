@@ -6,17 +6,17 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "Level.h"
 #include "game_cl_base.h"
-#include "xrEngine/x_ray.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "xrPhysics/PhysicsCommon.h"
 #include "level_sounds.h"
 #include "GamePersistent.h"
 
 bool CLevel::Load_GameSpecific_Before()
 {
+    ZoneScoped;
+
     // AI space
-    g_pGamePersistent->SetLoadStageTitle("st_loading_ai_objects");
-    g_pGamePersistent->LoadTitle();
+    g_pGamePersistent->LoadTitle("st_loading_ai_objects");
     string_path fn_game;
 
     if (GamePersistent().GameType() == eGameIDSingle && !ai().get_alife() && FS.exist(fn_game, "$level$", "level.ai") &&
@@ -35,11 +35,15 @@ bool CLevel::Load_GameSpecific_Before()
 
 bool CLevel::Load_GameSpecific_After()
 {
+    ZoneScoped;
+
     R_ASSERT(m_StaticParticles.empty());
     // loading static particles
     string_path fn_game;
     if (FS.exist(fn_game, "$level$", "level.ps_static"))
     {
+        ZoneScopedN("Load static particles");
+
         IReader* F = FS.r_open(fn_game);
         CParticlesObject* pStaticParticles;
         u32 chunk = 0;
@@ -90,26 +94,27 @@ bool CLevel::Load_GameSpecific_After()
         if (FS.exist(fn_game, "$level$", "level.snd_env"))
         {
             IReader* F = FS.r_open(fn_game);
-            GEnv.Sound->set_geometry_env(F);
+            Sound->set_geometry_env(F);
             FS.r_close(F);
         }
         // loading SOM
         if (FS.exist(fn_game, "$level$", "level.som"))
         {
             IReader* F = FS.r_open(fn_game);
-            GEnv.Sound->set_geometry_som(F);
+            Sound->set_geometry_som(F);
             FS.r_close(F);
         }
 
         // loading random (around player) sounds
         if (pSettings->section_exist("sounds_random"))
         {
+            ZoneScopedN("Load random sounds");
+
             CInifile::Sect& S = pSettings->r_section("sounds_random");
             Sounds_Random.reserve(S.Data.size());
-            for (auto I = S.Data.cbegin(); S.Data.cend() != I; ++I)
+            for (const auto& I : S.Data)
             {
-                Sounds_Random.push_back(ref_sound());
-                GEnv.Sound->create(Sounds_Random.back(), *I->first, st_Effect, sg_SourceType);
+                Sounds_Random.emplace_back().create(I.first.c_str(), st_Effect, sg_SourceType);
             }
             Sounds_Random_dwNextTime = Device.TimerAsync() + 50000;
             Sounds_Random_Enabled = FALSE;
@@ -117,6 +122,7 @@ bool CLevel::Load_GameSpecific_After()
 
         if (FS.exist(fn_game, "$level$", "level.fog_vol"))
         {
+            ZoneScopedN("Load fog volume");
             IReader* F = FS.r_open(fn_game);
             u16 version = F->r_u16();
             if (version == 2)
@@ -188,21 +194,23 @@ bool CLevel::Load_GameSpecific_CFORM_Deserialize(IReader& reader)
 
 void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
 {
+    ZoneScoped;
+
     typedef xr_vector<translation_pair> ID_INDEX_PAIRS;
     ID_INDEX_PAIRS translator;
     translator.reserve(GMLib.CountMaterial());
     u16 default_id = (u16)GMLib.GetMaterialIdx("default");
-    translator.push_back(translation_pair(u32(-1), default_id));
+    translator.emplace_back(u32(-1), default_id);
 
     u16 index = 0, static_mtl_count = 1;
     int max_ID = 0;
     int max_static_ID = 0;
-    for (GameMtlIt I = GMLib.FirstMaterial(); GMLib.LastMaterial() != I; ++I, ++index)
+    for (auto I = GMLib.FirstMaterial(); GMLib.LastMaterial() != I; ++I, ++index)
     {
         if (!(*I)->Flags.test(SGameMtl::flDynamic))
         {
             ++static_mtl_count;
-            translator.push_back(translation_pair((*I)->GetID(), index));
+            translator.emplace_back((*I)->GetID(), index);
             if ((*I)->GetID() > max_static_ID)
                 max_static_ID = (*I)->GetID();
         }
@@ -218,11 +226,11 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         CDB::TRI* E = tris + count;
         for (; I != E; ++I)
         {
-            ID_INDEX_PAIRS::iterator i = std::find(translator.begin(), translator.end(), (u16)(*I).material);
+            const auto i = std::find(translator.cbegin(), translator.cend(), (u16)(*I).material);
             if (i != translator.end())
             {
                 (*I).material = (*i).m_index;
-                SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
+                const SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
                 (*I).suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
                 (*I).suppress_wm = mtl->Flags.is(SGameMtl::flSuppressWallmarks);
                 continue;
@@ -239,11 +247,11 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         CDB::TRI* E = tris + count;
         for (; I != E; ++I)
         {
-            ID_INDEX_PAIRS::iterator i = std::lower_bound(translator.begin(), translator.end(), (u16)(*I).material);
-            if ((i != translator.end()) && ((*i).m_id == (*I).material))
+            const auto i = std::lower_bound(translator.cbegin(), translator.cend(), (u16)(*I).material);
+            if ((i != translator.cend()) && ((*i).m_id == (*I).material))
             {
                 (*I).material = (*i).m_index;
-                SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
+                const SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
                 (*I).suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
                 (*I).suppress_wm = mtl->Flags.is(SGameMtl::flSuppressWallmarks);
                 continue;

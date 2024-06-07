@@ -212,7 +212,7 @@ UIArtefactParamItem::InitResult UIArtefactParamItem::Init(CUIXml& xml, pcstr sec
     xml.SetLocalRoot(xml.NavigateToNode(section));
 
     m_caption = UIHelper::CreateStatic(xml, "caption", this);
-    m_value = UIHelper::CreateTextWnd(xml, "value", this);
+    m_value = UIHelper::CreateStatic(xml, "value", this);
     m_magnitude = xml.ReadAttribFlt("value", 0, "magnitude", 1.0f);
     m_sign_inverse = (xml.ReadAttribInt("value", 0, "sign_inverse", 0) == 1);
 
@@ -244,7 +244,7 @@ UIArtefactParamItem::InitResult UIArtefactParamItem::InitPlain(CUIXml& xml, pcst
     AttachChild(m_caption);
     m_caption->Show(false); // hack
 
-    m_value = xr_new<CUITextWnd>();
+    m_value = xr_new<CUIStatic>("Value");
     m_value->SetAutoDelete(true);
     AttachChild(m_value);
     m_value->Show(false); // hack

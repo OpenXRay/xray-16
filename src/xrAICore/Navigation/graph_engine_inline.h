@@ -37,6 +37,12 @@ template <typename _Graph, typename _Parameters>
 inline bool CGraphEngine::search(const _Graph& graph, const _index_type& start_node, const _index_type& dest_node,
     xr_vector<_index_type>* node_path, const _Parameters& parameters)
 {
+    const auto& level_graph = GEnv.AISpace->level_graph();
+    const bool vertices_valid = level_graph.valid_vertex_id(start_node) && level_graph.valid_vertex_id(dest_node);
+    VERIFY2(vertices_valid, make_string("start_node: %u, dest_node: %u", start_node, dest_node));
+    if (!vertices_valid)
+        return false;
+
     //ScopeLock scope(&m_lock);
     START_PROFILE("graph_engine")
     START_PROFILE("graph_engine/search")

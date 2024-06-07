@@ -69,7 +69,7 @@ void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
     }
     else
     {
-        m_blenders.insert(std::make_pair(xr_strdup(Name), data));
+        m_blenders.emplace(xr_strdup(Name), data);
     }
 }
 
@@ -122,9 +122,9 @@ ShaderElement* CResourceManager::_CreateElement(ShaderElement&& S)
         return nullptr;
 
     // Search equal in shaders array
-    for (u32 it = 0; it < v_elements.size(); it++)
-        if (S.equal(*(v_elements[it])))
-            return v_elements[it];
+    for (ShaderElement* elem : v_elements)
+        if (S.equal(*elem))
+            return elem;
 
     // Create _new_ entry
     ShaderElement* N = v_elements.emplace_back(xr_new<ShaderElement>(std::move(S)));
@@ -154,6 +154,8 @@ Shader* CResourceManager::_cpp_Create(
     C.BT = B;
     C.bFFP = RImplementation.o.ffp;
     C.bDetail = FALSE;
+    C.HudElement = false;
+
 #ifdef _EDITOR
     if (!C.BT)
     {
@@ -169,6 +171,13 @@ Shader* CResourceManager::_cpp_Create(
     _ParseList(C.L_textures, s_textures);
     _ParseList(C.L_constants, s_constants);
     _ParseList(C.L_matrices, s_matrices);
+
+#if defined(USE_DX11)
+    if (RImplementation.hud_loading && RImplementation.o.new_shader_support)
+    {
+        C.HudElement = true;
+    }
+#endif
 
     // Compile element	(LOD0 - HQ)
     {
@@ -251,7 +260,7 @@ IReader* open_shader(pcstr shader)
 {
     string_path shaderPath;
 
-    FS.update_path(shaderPath, "$game_shaders$", GEnv.Render->getShaderPath());
+    FS.update_path(shaderPath, "$game_shaders$", RImplementation.getShaderPath());
     xr_strcat(shaderPath, shader);
 
     return FS.r_open(shaderPath);
@@ -259,6 +268,8 @@ IReader* open_shader(pcstr shader)
 
 void CResourceManager::CompatibilityCheck()
 {
+    ZoneScoped;
+
     // Check Shoker HQ Geometry Fix support
     {
         IReader* skinh = open_shader("skin.h");
@@ -355,7 +366,9 @@ void CResourceManager::DeferredUpload()
     if (!Device.b_is_Ready)
         return;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+    ZoneScoped;
+
+#if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
@@ -370,7 +383,9 @@ void CResourceManager::DeferredUnload()
     if (!Device.b_is_Ready)
         return;
 
-#if defined(USE_DX9) || defined(USE_DX11)
+    ZoneScoped;
+
+#if defined(USE_DX11)
     xr_parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Unload(); });
 #elif defined(USE_OGL) // XXX: OGL: Set additional contexts for all worker threads?
     for (auto& texture : m_textures)
@@ -437,7 +452,7 @@ void CResourceManager::_DumpMemoryUsage()
         {
             u32 m = I->second->flags.MemoryUsage;
             shared_str n = I->second->cName;
-            mtex.insert(std::make_pair(m, std::make_pair(I->second->ref_count.load(), n)));
+            mtex.emplace(m, std::make_pair(I->second->ref_count.load(), n));
         }
     }
 
@@ -453,9 +468,6 @@ void CResourceManager::_DumpMemoryUsage()
 void CResourceManager::Evict()
 {
     // TODO: DX11: check if we really need this method
-#ifdef USE_DX9
-    CHK_DX(HW.pDevice->EvictManagedResources());
-#endif
 }
 /*
 BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup* &CS)

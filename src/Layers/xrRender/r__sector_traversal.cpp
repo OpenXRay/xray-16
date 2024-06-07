@@ -10,6 +10,8 @@ xr_vector<IRender_Sector*> dbg_sectors;
 
 void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBase, Fmatrix& mXFORM, u32 options)
 {
+    ZoneScoped;
+
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
 
@@ -81,7 +83,7 @@ void CPortalTraverser::fade_render()
     for (u32 _it = 0; _it < f_portals.size(); _it++)
     {
         std::pair<CPortal*, float>& fp = f_portals[_it];
-        CPortal* _P = fp.first;
+        CPortal* portal = fp.first;
         float _ssa = fp.second;
         float ssaDiff = _ssa - r_ssaLOD_B;
         float ssaScale = ssaDiff / ssaRange;
@@ -90,14 +92,14 @@ void CPortalTraverser::fade_render()
         u32 _clr = subst_alpha(_ambient, u32(iA));
 
         // fill polys
-        u32 _polys = _P->getPoly().size() - 2;
+        u32 _polys = portal->getPoly().size() - 2;
         for (u32 _pit = 0; _pit < _polys; _pit++)
         {
-            _v->set(_P->getPoly()[0], _clr);
+            _v->set(portal->getPoly()[0], _clr);
             _v++;
-            _v->set(_P->getPoly()[_pit + 1], _clr);
+            _v->set(portal->getPoly()[_pit + 1], _clr);
             _v++;
-            _v->set(_P->getPoly()[_pit + 2], _clr);
+            _v->set(portal->getPoly()[_pit + 2], _clr);
             _v++;
         }
     }

@@ -1,19 +1,16 @@
 #pragma once
-#ifndef _PLANE2
-#define _PLANE2
 
-template <class T>
-class _plane2
+class Fplane2
 {
 public:
-    typedef T TYPE;
-    typedef _plane2<T> Self;
-    typedef Self& SelfRef;
-    typedef const Self& SelfCRef;
+    using TYPE = float;
+    using Self = Fplane2;
+    using SelfRef = Self&;
+    using SelfCRef = const Self&;
 
 public:
-    _vector2<T> n;
-    T d;
+    Fvector2 n;
+    float d;
 
 public:
     IC SelfRef set(Self& P)
@@ -22,33 +19,33 @@ public:
         d = P.d;
         return *this;
     }
-    IC BOOL similar(Self& P, T eps_n = EPS, T eps_d = EPS)
+    IC BOOL similar(Self& P, float eps_n = EPS, float eps_d = EPS)
     {
         return (n.similar(P.n, eps_n) && (_abs(d - P.d) < eps_d));
     }
-    IC SelfRef build(const _vector2<T>& _p, const _vector2<T>& _n)
+    IC SelfRef build(const Fvector2& _p, const Fvector2& _n)
     {
         d = -n.normalize(_n).dotproduct(_p);
         return *this;
     }
-    IC SelfRef project(_vector2<T>& pdest, _vector2<T>& psrc)
+    IC SelfRef project(Fvector2& pdest, Fvector2& psrc)
     {
         pdest.mad(psrc, n, -classify(psrc));
         return *this;
     }
-    IC T classify(const _vector2<T>& v) const { return n.dotproduct(v) + d; }
+    IC float classify(const Fvector2& v) const { return n.dotproduct(v) + d; }
     IC SelfRef normalize()
     {
-        T denom = 1.f / n.magnitude();
+        float denom = 1.f / n.magnitude();
         n.mul(denom);
         d *= denom;
         return *this;
     }
-    IC T distance(const _vector2<T>& v) { return _abs(classify(v)); }
-    IC BOOL intersectRayDist(const _vector2<T>& P, const _vector2<T>& D, T& dist)
+    IC float distance(const Fvector2& v) { return _abs(classify(v)); }
+    IC BOOL intersectRayDist(const Fvector2& P, const Fvector2& D, float& dist)
     {
-        T numer = classify(P);
-        T denom = n.dotproduct(D);
+        float numer = classify(P);
+        float denom = n.dotproduct(D);
 
         if (_abs(denom) < EPS_S) // normal is orthogonal to vector3, cant intersect
             return FALSE;
@@ -56,10 +53,10 @@ public:
         dist = -(numer / denom);
         return ((dist > 0.f) || fis_zero(dist));
     }
-    IC BOOL intersectRayPoint(const _vector2<T>& P, const _vector2<T>& D, _vector2<T>& dest)
+    IC BOOL intersectRayPoint(const Fvector2& P, const Fvector2& D, Fvector2& dest)
     {
-        T numer = classify(P);
-        T denom = n.dotproduct(D);
+        float numer = classify(P);
+        float denom = n.dotproduct(D);
 
         if (_abs(denom) < EPS_S)
             return FALSE; // normal is orthogonal to vector3, cant intersect
@@ -70,11 +67,11 @@ public:
             return ((dist > 0.f) || fis_zero(dist));
         }
     }
-    IC BOOL intersect(const _vector2<T>& u, const _vector2<T>& v, // segment
-        _vector2<T>& isect) // intersection point
+    IC BOOL intersect(const Fvector2& u, const Fvector2& v, // segment
+        Fvector2& isect) // intersection point
     {
-        T denom, dist;
-        _vector2<T> t;
+        float denom, dist;
+        Fvector2 t;
 
         t.sub(v, u);
         denom = n.dotproduct(t);
@@ -88,11 +85,11 @@ public:
         return true;
     }
 
-    IC BOOL intersect_2(const _vector2<T>& u, const _vector2<T>& v, // segment
-        _vector2<T>& isect) // intersection point
+    IC BOOL intersect_2(const Fvector2& u, const Fvector2& v, // segment
+        Fvector2& isect) // intersection point
     {
-        T dist1, dist2;
-        _vector2<T> t;
+        float dist1, dist2;
+        Fvector2 t;
 
         dist1 = n.dotproduct(u) + d;
         dist2 = n.dotproduct(v) + d;
@@ -107,13 +104,7 @@ public:
     }
 };
 
-typedef _plane2<float> Fplane2;
-typedef _plane2<double> Dplane2;
-
-template <class T>
-bool _valid(const _plane2<T>& s)
+inline bool _valid(const Fplane2& s)
 {
     return _valid(s.n) && _valid(s.d);
 }
-
-#endif

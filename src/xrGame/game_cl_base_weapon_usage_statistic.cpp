@@ -47,21 +47,7 @@ void HitData::net_load(NET_Packet* P, victims_table const& vt, bone_table const&
     Completed = true;
 };
 
-Weapon_Statistic::Weapon_Statistic(LPCSTR Name)
-{
-    WName = Name;
-    InvName = NULL;
-    NumBought = 0;
-
-    m_dwRoundsFired = m_dwRoundsFired_d = 0;
-    m_dwBulletsFired = m_dwBulletsFired_d = 0;
-    m_dwHitsScored = m_dwHitsScored_d = 0;
-    m_dwKillsScored = m_dwKillsScored_d = 0;
-    m_explosion_kills = 0;
-    m_bleed_kills = 0;
-
-    ZeroMemory(m_Basket, sizeof(m_Basket));
-};
+Weapon_Statistic::Weapon_Statistic(pcstr name) : WName(name) {}
 
 Weapon_Statistic::~Weapon_Statistic(){};
 
@@ -845,7 +831,6 @@ void WeaponUsageStatistic::OnExplosionKill(game_PlayerState* ps, const SHit& hit
     NewHit.Pos0 = killer->Position();
     NewHit.Pos1 = weapon_object->Position();
     NewHit.TargetName = ps->getName();
-    NewHit.BoneName = 0;
     NewHit.count = 1;
     //---------------------------
     WeaponIt->add_hit(NewHit);
@@ -877,7 +862,6 @@ void WeaponUsageStatistic::OnBleedKill(game_PlayerState* killer_ps, game_PlayerS
     NewHit.Pos0 = Fvector3();
     NewHit.Pos1 = Fvector3();
     NewHit.TargetName = victim_ps->getName();
-    NewHit.BoneName = 0;
     NewHit.count = 1;
     //---------------------------
     WeaponIt->add_hit(NewHit);

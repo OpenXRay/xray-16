@@ -5,7 +5,7 @@
 #include "xrPhysics/PHCharacter.h"
 #include "xrPhysics/MathUtils.h"
 #include "xrPhysics/ExtendedGeom.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #ifdef DEBUG
 #include "debug_renderer.h"
 #include "Level.h"

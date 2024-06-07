@@ -209,7 +209,7 @@ void CUILines::ParseText(bool force)
         float curr_width = 0.0f;
         // XXX: use 'bnew_line' or remove it
         [[maybe_unused]] bool bnew_line = false;
-        float __eps = get_str_width(m_pFont, 'o'); // hack -(
+        float eps = get_str_width(m_pFont, 'o'); // hack -(
         for (u32 sbl_idx = 0; sbl_idx < sbl_cnt; ++sbl_idx)
         {
             bool b_last_subl = (sbl_idx == sbl_cnt - 1);
@@ -226,7 +226,7 @@ void CUILines::ParseText(bool force)
                     last_space_idx = idx;
 
                 float w1 = get_str_width(m_pFont, sbl.m_text[idx]);
-                bool bOver = (curr_width + w1 + __eps > max_width);
+                bool bOver = (curr_width + w1 + eps > max_width);
 
                 if (bOver || b_last_ch)
                 {
@@ -354,10 +354,8 @@ void CUILines::Draw(float x, float y)
         text_pos.set(0, 0);
 
         text_pos.x = x + GetIndentByAlign();
-        //		text_pos.y = y + GetVIndentByAlign();
-        text_pos.y = y;
+        text_pos.y = y + GetVIndentByAlign();
         UI().ClientToScreenScaled(text_pos);
-        text_pos.y += GetVIndentByAlign();
 
         if (uFlags.test(flPasswordMode))
         {

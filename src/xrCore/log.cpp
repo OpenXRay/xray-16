@@ -6,10 +6,10 @@
 #include "log.h"
 #include "xrCore/Threading/Lock.hpp"
 
-BOOL LogExecCB = TRUE;
+bool LogExecCB = true;
 string_path logFName = "engine.log";
 string_path log_file_name = "engine.log";
-BOOL no_log = TRUE;
+bool no_log = true;
 #ifdef CONFIG_PROFILE_LOCKS
 Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
@@ -20,23 +20,20 @@ LogCallback LogCB = nullptr;
 
 bool ForceFlushLog = false;
 IWriter* LogWriter = nullptr;
-//size_t CachedLog = 0;
 
 void FlushLog()
 {
-    if (!no_log)
-    {
-        logCS.Enter();
-        if (LogWriter)
-            LogWriter->flush();
-        //CachedLog = 0;
-        logCS.Leave();
-    }
+    if (no_log)
+        return;
+
+    ScopeLock scope{ &logCS };
+    if (LogWriter)
+        LogWriter->flush();
 }
 
-void AddOne(const char* split)
+void AddOne(pcstr split)
 {
-    logCS.Enter();
+    ScopeLock scope{ &logCS };
 
     OutputDebugString(split);
     OutputDebugString("\n");
@@ -49,35 +46,14 @@ void AddOne(const char* split)
 
     if (LogWriter)
     {
-#ifdef USE_LOG_TIMING
-        char buf[64];
-        char curTime[64];
-
-        auto now = std::chrono::system_clock::now();
-        auto time = std::chrono::system_clock::to_time_t(now);
-        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) -
-            std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
-
-        std::strftime(buf, sizeof(buf), "%H:%M:%S", std::localtime(&time));
-        int len = xr_sprintf(curTime, 64, "[%s.%03lld] ", buf, ms.count());
-
-        LogWriter->w_printf("%s%s\r\n", curTime, split);
-        CachedLog += len;
-#else
         LogWriter->w_printf("%s\r\n", split);
-#endif
-        //CachedLog += xr_strlen(split) + 2;
 
-        if (ForceFlushLog /*|| CachedLog >= 32768*/)
+        if (ForceFlushLog)
             FlushLog();
-
-        //-RvP
     }
-
-    logCS.Leave();
 }
 
-void Log(const char* s)
+void Log(pcstr s)
 {
     int i, j;
 
@@ -105,7 +81,7 @@ void Log(const char* s)
     AddOne(split);
 }
 
-void __cdecl Msg(const char* format, ...)
+void __cdecl Msg(pcstr format, ...)
 {
     va_list mark;
     string2048 buf;
@@ -117,7 +93,7 @@ void __cdecl Msg(const char* format, ...)
         Log(buf);
 }
 
-void Log(const char* msg, const char* dop)
+void Log(pcstr msg, pcstr dop)
 {
     if (!dop)
     {
@@ -131,25 +107,7 @@ void Log(const char* msg, const char* dop)
     Log(buf);
 }
 
-void Log(const char* msg, u32 dop)
-{
-    const u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
-    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
-
-    xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
-    Log(buf);
-}
-
-void Log(const char* msg, u64 dop)
-{
-    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
-    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
-
-    xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
-    Log(buf);
-}
-
-void Log(const char* msg, int dop)
+void Log(pcstr msg, int dop)
 {
     const u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);
     pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
@@ -158,7 +116,52 @@ void Log(const char* msg, int dop)
     Log(buf);
 }
 
-void Log(const char* msg, float dop)
+void Log(pcstr msg, unsigned int dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 10 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %u", msg, dop);
+    Log(buf);
+}
+
+void Log(pcstr msg, long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %li", msg, dop);
+    Log(buf);
+}
+
+void Log(pcstr msg, unsigned long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %lu", msg, dop);
+    Log(buf);
+}
+
+void Log(pcstr msg, long long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %lli", msg, dop);
+    Log(buf);
+}
+
+void Log(pcstr msg, unsigned long long dop)
+{
+    const u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
+
+    xr_sprintf(buf, buffer_size, "%s %llu", msg, dop);
+    Log(buf);
+}
+
+void Log(pcstr msg, float dop)
 {
     // actually, float string representation should be no more, than 40 characters,
     // but we will count with slight overhead
@@ -169,7 +172,7 @@ void Log(const char* msg, float dop)
     Log(buf);
 }
 
-void Log(const char* msg, const Fvector& dop)
+void Log(pcstr msg, const Fvector& dop)
 {
     const u32 buffer_size = (xr_strlen(msg) + 2 + 3 * (64 + 1) + 1) * sizeof(char);
     pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
@@ -178,7 +181,7 @@ void Log(const char* msg, const Fvector& dop)
     Log(buf);
 }
 
-void Log(const char* msg, const Fmatrix& dop)
+void Log(pcstr msg, const Fmatrix& dop)
 {
     const u32 buffer_size = (xr_strlen(msg) + 2 + 4 * (4 * (64 + 1) + 1) + 1) * sizeof(char);
     pstr buf = static_cast<pstr>(xr_alloca(buffer_size));
@@ -189,57 +192,46 @@ void Log(const char* msg, const Fmatrix& dop)
     Log(buf);
 }
 
-void LogWinErr(const char* msg, long err_code) { Msg("%s: %s", msg, xrDebug::ErrorToString(err_code)); }
+void LogWinErr(pcstr msg, long err_code) { Msg("%s: %s", msg, xrDebug::ErrorToString(err_code)); }
 LogCallback SetLogCB(const LogCallback& cb)
 {
+    ScopeLock scope{ &logCS };
     const LogCallback result = LogCB;
     LogCB = cb;
     return (result);
 }
 
-LPCSTR log_name() { return (log_file_name); }
+pcstr log_name() { return (log_file_name); }
 
-void CreateLog(BOOL nl)
+void CreateLog(bool nl)
 {
+    ZoneScoped;
     LogFile.reserve(1000);
 
     no_log = nl;
     strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
     if (FS.path_exist("$logs$"))
         FS.update_path(logFName, "$logs$", log_file_name);
-    if (!no_log)
+
+    if (no_log)
+        return;
+
+    // Alun: Backup existing log
+    const xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
+    FS.file_rename(logFName, backup_logFName.c_str(), true);
+    //-Alun
+
+    if (const auto w = FS.w_open(logFName))
     {
-        // Alun: Backup existing log
-        const xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
-        FS.file_rename(logFName, backup_logFName.c_str(), true);
-        //-Alun
-
-        LogWriter = FS.w_open(logFName);
-        if (LogWriter == nullptr)
-        {
-#if defined(XR_PLATFORM_WINDOWS)
-            MessageBox(nullptr, "Can't create log file.", "Error", MB_ICONERROR);
-#endif
-            abort();
-        }
-
-#ifdef USE_LOG_TIMING
-        time_t t = time(nullptr);
-        tm* ti = localtime(&t);
-        char buf[64];
-        strftime(buf, 64, "[%x %X]\t", ti);
-#endif
-
         for (u32 it = 0; it < LogFile.size(); it++)
         {
-            LPCSTR s = LogFile[it].c_str();
-#ifdef USE_LOG_TIMING
-            LogWriter->w_printf("%s%s\r\n", buf, s ? s : "");
-#else
-            LogWriter->w_printf("%s\r\n", s ? s : "");
-#endif
+            cpcstr s = LogFile[it].c_str();
+            w->w_printf("%s\r\n", s ? s : "");
         }
-        LogWriter->flush();
+        w->flush();
+
+        ScopeLock scope{ &logCS };
+        LogWriter = w;
     }
 
     if (strstr(Core.Params, "-force_flushlog"))
@@ -248,7 +240,10 @@ void CreateLog(BOOL nl)
 
 void CloseLog(void)
 {
+    ZoneScoped;
     FlushLog();
+
+    ScopeLock scope{ &logCS };
     if (LogWriter)
         FS.w_close(LogWriter);
 

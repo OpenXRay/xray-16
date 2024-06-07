@@ -15,7 +15,7 @@ CUIListItemEx::CUIListItemEx() : m_dwSelectionColor(color_argb(200, 95, 82, 74))
 {
     //.	InitTexture("ui\\hud_map_point");
     //.	SetStretchTexture(true);
-    CUIStatic::SetColor(color_argb(0, 0, 0, 0));
+    inherited::SetColor(color_argb(0, 0, 0, 0));
 }
 
 CUIListItemEx::~CUIListItemEx()

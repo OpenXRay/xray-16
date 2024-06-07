@@ -4,7 +4,6 @@
 
 class CUIXml;
 class CUIStatic;
-class CUITextWnd;
 class UIBoosterInfoItem;
 
 class CUIBoosterInfo final : public CUIWindow
@@ -42,7 +41,7 @@ public:
 
 private:
     CUIStatic* m_caption{};
-    CUITextWnd* m_value{};
+    CUIStatic* m_value{};
     float m_magnitude;
     bool m_show_sign;
     shared_str m_unit_str;

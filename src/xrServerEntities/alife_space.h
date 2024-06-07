@@ -53,31 +53,28 @@ struct SSumStackCell
     int iCurrentSum;
 };
 
-enum ECombatResult
+enum ECombatResult : u32
 {
-    eCombatResultRetreat1 = u32(0),
+    eCombatResultRetreat1,
     eCombatResultRetreat2,
     eCombatResultRetreat12,
     eCombatResult1Kill2,
     eCombatResult2Kill1,
     eCombatResultBothKilled,
-    eCombatDummy = u32(-1),
 };
 
-enum ECombatAction
+enum ECombatAction : u32
 {
-    eCombatActionAttack = u32(0),
+    eCombatActionAttack,
     eCombatActionRetreat,
-    eCombatActionDummy = u32(-1),
 };
 
-enum EMeetActionType
+enum EMeetActionType : u32
 {
-    eMeetActionTypeAttack = u32(0),
+    eMeetActionTypeAttack,
     eMeetActionTypeInteract,
     eMeetActionTypeIgnore,
     eMeetActionSmartTerrain,
-    eMeetActionTypeDummy = u32(-1),
 };
 
 enum ERelationType : u32
@@ -134,29 +131,28 @@ enum ETakeType
     eTakeTypeRest,
 };
 
-enum EWeaponPriorityType
+enum EWeaponPriorityType : u32
 {
-    eWeaponPriorityTypeKnife = u32(0),
+    eWeaponPriorityTypeKnife,
     eWeaponPriorityTypeSecondary,
     eWeaponPriorityTypePrimary,
     eWeaponPriorityTypeGrenade,
-    eWeaponPriorityTypeDummy = u32(-1),
 };
 
-enum ECombatType
+enum ECombatType : u32
 {
-    eCombatTypeMonsterMonster = u32(0),
+    eCombatTypeMonsterMonster,
     eCombatTypeMonsterAnomaly,
     eCombatTypeAnomalyMonster,
     eCombatTypeSmartTerrain,
-    eCombatTypeDummy = u32(-1),
 };
 
+// ability to attach addons
 enum EWeaponAddonStatus
 {
-    eAddonDisabled = 0,
-    eAddonPermanent = 1,
-    eAddonAttachable = 2
+    eAddonDisabled = 0,   // can't attach
+    eAddonPermanent = 1,  // always attached, already
+    eAddonAttachable = 2, // can attach/detach
 };
 
 EHitType g_tfString2HitType(LPCSTR caHitType);

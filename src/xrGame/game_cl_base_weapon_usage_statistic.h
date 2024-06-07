@@ -101,16 +101,16 @@ struct Weapon_Statistic
     static u32 const net_packet_size;
     shared_str WName;
     shared_str InvName;
-    u32 NumBought;
+    u32 NumBought{};
     //---------------------------
-    u32 m_dwRoundsFired, m_dwRoundsFired_d;
-    u32 m_dwBulletsFired, m_dwBulletsFired_d;
-    u32 m_dwHitsScored, m_dwHitsScored_d;
-    u32 m_dwKillsScored, m_dwKillsScored_d;
-    u16 m_explosion_kills;
-    u16 m_bleed_kills;
+    u32 m_dwRoundsFired{}, m_dwRoundsFired_d{};
+    u32 m_dwBulletsFired{}, m_dwBulletsFired_d{};
+    u32 m_dwHitsScored{}, m_dwHitsScored_d{};
+    u32 m_dwKillsScored{}, m_dwKillsScored_d{};
+    u16 m_explosion_kills{};
+    u16 m_bleed_kills{};
     //---------------------------
-    u32 m_Basket[STAT_TEAM_COUNT][MAX_BASKET];
+    u32 m_Basket[STAT_TEAM_COUNT][MAX_BASKET]{};
 
     // u32				m_dwNumCompleted;
     HITS_VEC m_Hits;

@@ -338,6 +338,9 @@ void CMovementManager::on_frame(CPHMovementControl* movement_control, Fvector& d
         update_path();
 
     move_along_path(movement_control, dest_position, object().client_update_fdelta());
+
+    // Update Grass benders
+    g_pGamePersistent->GrassBendersUpdate(object().ID(), grassbender_id, grassbender_frame, object().Position(), -1.0f, 1.0f, true);
 }
 
 void CMovementManager::on_travel_point_change(const u32& previous_travel_point_index)

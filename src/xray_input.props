@@ -11,6 +11,7 @@
         $(xrExternals)luajit\src;
         $(xrExternals)luabind;
         $(xrExternals)imgui;
+        $(xrExternals)tracy\public;
         %(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>

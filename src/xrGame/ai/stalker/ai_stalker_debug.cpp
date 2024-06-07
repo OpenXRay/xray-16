@@ -73,7 +73,7 @@ void try_change_current_entity()
 
     typedef xr_vector<ISpatial*> OBJECTS;
     OBJECTS ISpatialResult;
-    g_SpatialSpace->q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
+    g_pGamePersistent->SpatialSpace.q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
 
     float maxlen = 1000.0f;
     CCustomMonster* nearest_agent = 0;
@@ -1593,11 +1593,6 @@ static void draw_animation_bones(
         Fidentity, g_stalker_skeleton[weapon_bone_id0].c, g_stalker_skeleton[weapon_bone_id1].c, color_xrgb(255, 0, 0));
 #endif // #ifdef DEBUG_RENDER
 }
-
-Fvector g_debug_position_0 = Fvector().set(0.f, 0.f, 0.f);
-Fvector g_debug_position_1 = Fvector().set(0.f, 0.f, 0.f);
-Fvector g_debug_position_2 = Fvector().set(0.f, 0.f, 0.f);
-Fvector g_debug_position_3 = Fvector().set(0.f, 0.f, 0.f);
 
 void CAI_Stalker::OnRender()
 {

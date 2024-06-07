@@ -25,18 +25,21 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrSdkDir)include\DirectXMesh;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrExternals)gl\include;$(xrExternals)glew\include;$(xrExternals)gli;$(xrExternals)gli\external;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrSdkDir)include\DirectXMesh;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrExternals)gli;$(xrExternals)gli\external;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glew32s.lib;glu32.lib;oalib.lib;nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nvapi$(PlatformArchitecture).lib;amd_ags_$(PlatformShortName).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\sdk\include\glad\gl.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
     <ClCompile Include="..\xrRenderGL\glResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRenderGL\glResourceManager_Scripting.cpp" />
@@ -95,7 +98,6 @@
     <ClCompile Include="..\xrRender\ResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRender\R_DStreams.cpp" />
     <ClCompile Include="..\xrRender\r__pixel_calculator.cpp" />
-    <ClCompile Include="..\xrRender\r__screenshot.cpp" />
     <ClCompile Include="..\xrRender\r__sector_detect.cpp" />
     <ClCompile Include="..\xrRender\r__sync_point.cpp" />
     <ClCompile Include="..\xrRender\Shader.cpp" />
@@ -218,6 +220,8 @@
     <ClCompile Include="xrRender_GL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\sdk\include\glad\gl.h" />
+    <ClInclude Include="..\..\..\sdk\include\KHR\khrplatform.h" />
     <ClInclude Include="..\..\Include\xrRender\DebugRender.h" />
     <ClInclude Include="..\..\Include\xrRender\DebugShader.h" />
     <ClInclude Include="..\..\include\xrRender\DrawUtils.h" />
@@ -240,6 +244,7 @@
     <ClInclude Include="..\..\Include\xrRender\UISequenceVideoItem.h" />
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
+    <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
     <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h" />
@@ -379,9 +384,6 @@
     <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)oalib.vcxproj">
-      <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
@@ -403,6 +405,9 @@
     <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
@@ -415,14 +420,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

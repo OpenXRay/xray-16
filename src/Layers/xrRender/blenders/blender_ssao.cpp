@@ -95,9 +95,9 @@ void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GEnv.Render->m_MSAASample = atoi(Definition);
+        RImplementation.m_MSAASample = atoi(Definition);
     else
-        GEnv.Render->m_MSAASample = -1;
+        RImplementation.m_MSAASample = -1;
 
     switch (C.iElement)
     {
@@ -125,6 +125,6 @@ void CBlender_SSAO_MSAA::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     }
-    GEnv.Render->m_MSAASample = -1;
+    RImplementation.m_MSAASample = -1;
 }
 #endif

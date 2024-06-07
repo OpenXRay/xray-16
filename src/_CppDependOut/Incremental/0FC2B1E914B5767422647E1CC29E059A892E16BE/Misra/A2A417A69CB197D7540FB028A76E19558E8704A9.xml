@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\numerics\mgclinearsystem.h"><violation beginline="32" endline="32" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="86" endline="86" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="33" endline="33" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="h:\programs\codergears\cppdepend\defaulttoolchain\include\string.h"><violation beginline="74" endline="74" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

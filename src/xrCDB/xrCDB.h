@@ -101,7 +101,6 @@ public:
             syncronize_impl();
     }
 
-    static void build_thread(void*);
     void build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
     void build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
     u32 memory();
@@ -215,7 +214,7 @@ private:
 public:
     CollectorPacked(const Fbox& bb, int apx_vertices = 5000, int apx_faces = 5000);
 
-    //		__declspec(noinline) CollectorPacked &operator=	(const CollectorPacked &object)
+    //		ICN CollectorPacked &operator=	(const CollectorPacked &object)
     //		{
     //			verts
     //		}

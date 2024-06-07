@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\core\mgcmttriangle.cpp"><violation beginline="69" endline="69" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="83" endline="83" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="97" endline="97" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="110" endline="110" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

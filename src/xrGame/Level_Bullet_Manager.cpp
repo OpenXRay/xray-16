@@ -80,11 +80,11 @@ CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
     : m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-        ,m_thread_id(Threading::GetCurrThreadId())
+        ,m_thread_id(std::this_thread::get_id())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-    : m_thread_id(Threading::GetCurrThreadId())
+    : m_thread_id(std::this_thread::get_id())
 #endif // #ifdef DEBUG
 #endif // #ifdef CONFIG_PROFILE_LOCKS
 {
@@ -101,6 +101,8 @@ CBulletManager::~CBulletManager()
 
 void CBulletManager::Load()
 {
+    ZoneScoped;
+
     char const* bullet_manager_sect = "bullet_manager";
     if (!IsGameTypeSingle())
     {
@@ -179,7 +181,9 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
-    VERIFY(Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+#ifdef DEBUG
+    VERIFY(m_thread_id == std::this_thread::get_id());
+#endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
@@ -200,7 +204,11 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
 
 void CBulletManager::UpdateWorkload()
 {
-    VERIFY(g_mt_config.test(mtBullets) || Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+    ZoneScoped;
+
+#ifdef DEBUG
+    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == std::this_thread::get_id());
+#endif
 
     rq_storage.r_clear();
 
@@ -786,6 +794,8 @@ float SqrDistancePointToSegment(const Fvector& pt, const Fvector& orig, const Fv
 
 void CBulletManager::Render()
 {
+    ZoneScoped;
+
 #ifdef DEBUG
     if (g_bDrawBulletHit && !m_bullet_points.empty())
     {
@@ -908,6 +918,8 @@ void CBulletManager::CommitRenderSet() // @ the end of frame
 }
 void CBulletManager::CommitEvents() // @ the start of frame
 {
+    ZoneScoped;
+
     if (m_Events.size() > 1000)
         Msg("! too many bullets during single frame: %d", m_Events.size());
 

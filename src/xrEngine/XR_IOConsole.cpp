@@ -8,7 +8,6 @@
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
 
-#include "x_ray.h"
 #include "xr_input.h"
 #include "xr_ioc_cmd.h"
 #include "GameFont.h"
@@ -101,14 +100,7 @@ CConsole::CConsole()
 
 void CConsole::Initialize()
 {
-    scroll_delta = 0;
-    bVisible = false;
-    pFont = NULL;
-    pFont2 = NULL;
-
-    m_mouse_pos.x = 0;
-    m_mouse_pos.y = 0;
-    m_last_cmd = NULL;
+    ZoneScoped;
 
     m_cmd_history.reserve(m_cmd_history_max + 2);
     m_cmd_history.clear();
@@ -119,10 +111,9 @@ void CConsole::Initialize()
     m_temp_tips.reserve(MAX_TIPS_COUNT + 1);
     m_temp_tips.clear();
 
-    m_tips_mode = 0;
-    m_prev_length_str = 0;
-    m_cur_cmd = NULL;
     reset_selected_tip();
+
+    eConsole = Engine.Event.Handler_Attach("KERNEL:console", this);
 
     // Commands
     extern void CCC_Register();
@@ -139,9 +130,12 @@ CConsole::~CConsole()
 
 void CConsole::Destroy()
 {
+    ZoneScoped;
+
     xr_delete(pFont);
     xr_delete(pFont2);
     Commands.clear();
+    Engine.Event.Handler_Detach(eConsole, this);
 }
 
 void CConsole::AddCommand(IConsole_Command* cc) { Commands[cc->Name()] = cc; }
@@ -156,12 +150,21 @@ void CConsole::RemoveCommand(IConsole_Command* cc)
 
 void CConsole::OnFrame()
 {
+    ZoneScoped;
+
     m_editor->on_frame();
 
     if (Device.dwFrame % 10 == 0)
     {
         update_tips();
     }
+}
+
+void CConsole::OnEvent(EVENT E, u64 P1, u64 P2)
+{
+    pstr command = (pstr)P1;
+    ExecuteCommand(command, false);
+    xr_free(command);
 }
 
 void CConsole::OutFont(pcstr text, float& pos_y)
@@ -212,6 +215,8 @@ void CConsole::OnUIReset()
 
 void CConsole::OnRender()
 {
+    ZoneScoped;
+
     if (!bVisible)
     {
         return;
@@ -606,8 +611,6 @@ void CConsole::Show()
     }
     bVisible = true;
 
-    SDL_GetGlobalMouseState((int *) &m_mouse_pos.x, (int *) &m_mouse_pos.y); // Replace with SDL_GetMouseState in case retrieve window-relative coordinates
-
     ec().clear_states();
     scroll_delta = 0;
     reset_cmd_history_idx();
@@ -637,11 +640,6 @@ void CConsole::Hide()
 
     // if ( g_pGameLevel ||
     // ( g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive() ))
-
-    if (pInput->IsExclusiveMode())
-    {
-        SDL_WarpMouseGlobal(m_mouse_pos.x, m_mouse_pos.y); // Replace with SDL_WarpMouseInWindow in case set window-relative coordinates
-    }
 
     bVisible = false;
     reset_selected_tip();
@@ -828,7 +826,7 @@ void CConsole::update_tips()
     m_temp_tips.clear();
     m_tips.clear();
 
-    m_cur_cmd = NULL;
+    m_cur_cmd = nullptr;
     if (!bVisible)
     {
         return;

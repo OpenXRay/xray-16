@@ -18,6 +18,8 @@ float pvUVAdjustment[0x2000];
 
 void pvInitializeStatics(void)
 {
+    ZoneScoped;
+
     for (int idx = 0; idx < 0x2000; idx++)
     {
         long xbits = idx >> 7;

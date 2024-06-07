@@ -3,6 +3,7 @@
 #pragma once
 
 #include "xrEngine/IGame_Persistent.h"
+#include "player_hud_tune.h"
 
 class Task;
 class CMainMenu;
@@ -12,33 +13,36 @@ class CUISequencer;
 class UICore;
 class AnselManager;
 
-class CGamePersistent : public IGame_Persistent, public IEventReceiver
+class CGamePersistent : public IGame_Persistent
 {
 protected:
     using inherited = IGame_Persistent;
 
 private:
     // ambient particles
-    CParticlesObject* ambient_particles;
+    CParticlesObject* ambient_particles{};
     AssociativeVector<size_t, u32> ambient_sound_next_time; // max snd channels
-    u32 ambient_effect_next_time;
-    u32 ambient_effect_stop_time;
+    u32 ambient_effect_next_time{};
+    u32 ambient_effect_stop_time{};
 
-    float ambient_effect_wind_start;
-    float ambient_effect_wind_in_time;
-    float ambient_effect_wind_end;
-    float ambient_effect_wind_out_time;
-    bool ambient_effect_wind_on;
+    float ambient_effect_wind_start{};
+    float ambient_effect_wind_in_time{};
+    float ambient_effect_wind_end{};
+    float ambient_effect_wind_out_time{};
+    bool ambient_effect_wind_on{};
 
-    bool m_bPickableDOF;
+    bool m_bPickableDOF{};
 
-    AnselManager* ansel;
+    AnselManager* ansel{};
 
-    CUISequencer* m_intro;
+    CUISequencer* m_intro{};
     EVENT eQuickLoad;
     Fvector m_dof[4]; // 0-dest 1-current 2-from 3-original
 
     fastdelegate::FastDelegate0<> m_intro_event;
+
+    // hud tuner
+    CHudTuner m_hudTuner;
 
     void start_logo_intro();
     void update_logo_intro();
@@ -50,20 +54,23 @@ private:
     void update_game_intro();
 
 #ifdef DEBUG
-    u32 m_frame_counter;
-    u32 m_last_stats_frame;
+    u32 m_frame_counter{};
+    u32 m_last_stats_frame{ u32(-2) };
 #endif
 
     void WeathersUpdate();
     void UpdateDof();
 
 public:
-    IReader* pDemoFile;
-    u32 uTime2Change;
-    EVENT eDemoStart;
+    IReader* pDemoFile{};
+    u32 uTime2Change{};
+    EVENT eDemoStart{};
 
     CGamePersistent();
-    virtual ~CGamePersistent();
+    ~CGamePersistent() override;
+
+    IGame_Level* CreateLevel() override;
+    void         DestroyLevel(IGame_Level*& lvl) override;
 
     void PreStart(LPCSTR op) override;
     virtual void Start(LPCSTR op);
@@ -82,15 +89,11 @@ public:
 
     virtual void UpdateGameType();
 
-    virtual void RegisterModel(IRenderVisual* V);
-    virtual float MtlTransparent(u32 mtl_idx);
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
     virtual bool OnRenderPPUI_query();
     virtual void OnRenderPPUI_main();
     virtual void OnRenderPPUI_PP();
-    virtual void LoadTitle(bool change_tip = false, shared_str map_name = "");
-    void SetLoadStageTitle(pcstr ls_title = nullptr) override;
 
     virtual bool CanBePaused();
 
@@ -102,6 +105,8 @@ public:
     virtual void SetBaseDof(const Fvector3& dof);
     virtual void OnSectorChanged(IRender_Sector::sector_id_t sector);
     virtual void OnAssetsChanged();
+
+    CHudTuner GetHudTuner() { return m_hudTuner; }
 };
 
 IC CGamePersistent& GamePersistent() { return *((CGamePersistent*)g_pGamePersistent); }

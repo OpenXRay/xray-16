@@ -111,7 +111,7 @@ constexpr D3DVERTEXELEMENT9 mu_model_decl_unpacked[] = // 12+4+4+8 = 28
 struct x_vert
 {
     Fvector3 P;
-    x_vert(Fvector3 _P) { P = _P; }
+    x_vert(Fvector3 p) { P = p; }
 };
 
 struct r1v_lmap
@@ -124,17 +124,17 @@ struct r1v_lmap
     _vector2<s16> tc1;
 
 #ifdef LEVEL_COMPILER
-    r1v_lmap(Fvector3 _P, Fvector _N, base_basis _T, base_basis _B, base_color _CC, Fvector2 tc_base, Fvector2 tc_lmap)
+    r1v_lmap(Fvector3 position, Fvector normal, base_basis tangent, base_basis binormal, base_color CC_, Fvector2 tc_base, Fvector2 tc_lmap)
     {
-        base_color_c _C;
-        _CC._get(_C);
-        _N.normalize();
+        base_color_c C_;
+        CC_._get(C_);
+        normal.normalize();
         std::pair<s16, u8> tc_u = s24_tc_base(tc_base.x);
         std::pair<s16, u8> tc_v = s24_tc_base(tc_base.y);
-        P = _P;
-        N = u8_vec4(_N, u8_clr(_C.hemi));
-        T = u8_vec4(_T, tc_u.second);
-        B = u8_vec4(_B, tc_v.second);
+        P = position;
+        N = u8_vec4(normal, u8_clr(C_.hemi));
+        T = u8_vec4(tangent, tc_u.second);
+        B = u8_vec4(binormal, tc_v.second);
         tc0.x = tc_u.first;
         tc0.y = tc_v.first;
         tc1.x = s16_tc_lmap(tc_lmap.x);
@@ -182,18 +182,18 @@ struct r1v_vert
     _vector2<s16> tc;
 
 #ifdef LEVEL_COMPILER
-    r1v_vert(Fvector3 _P, Fvector _N, base_basis _T, base_basis _B, base_color _CC, Fvector2 tc_base)
+    r1v_vert(Fvector3 position, Fvector normal, base_basis tangent, base_basis binormal, base_color CC_, Fvector2 tc_base)
     {
-        base_color_c _C;
-        _CC._get(_C);
-        _N.normalize();
+        base_color_c C_;
+        CC_._get(C_);
+        normal.normalize();
         std::pair<s16, u8> tc_u = s24_tc_base(tc_base.x);
         std::pair<s16, u8> tc_v = s24_tc_base(tc_base.y);
-        P = _P;
-        N = u8_vec4(_N, u8_clr(_C.hemi));
-        T = u8_vec4(_T, tc_u.second);
-        B = u8_vec4(_B, tc_v.second);
-        C = color_rgba(u8_clr(_C.rgb.x), u8_clr(_C.rgb.y), u8_clr(_C.rgb.z), u8_clr(_C.sun));
+        P = position;
+        N = u8_vec4(normal, u8_clr(C_.hemi));
+        T = u8_vec4(tangent, tc_u.second);
+        B = u8_vec4(binormal, tc_v.second);
+        C = color_rgba(u8_clr(C_.rgb.x), u8_clr(C_.rgb.y), u8_clr(C_.rgb.z), u8_clr(C_.sun));
         tc.x = tc_u.first;
         tc.y = tc_v.first;
     }

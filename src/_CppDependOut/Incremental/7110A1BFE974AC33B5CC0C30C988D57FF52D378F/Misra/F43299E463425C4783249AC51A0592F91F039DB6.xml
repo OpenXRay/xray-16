@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\editors\xrweathereditor\ide_impl.cpp"><violation beginline="83" endline="83" rule="Rule4-10-2" ruleset="Expressions">
-</violation></file><file path="c:\openxray\src\include\editor\engine.hpp"><violation beginline="38" endline="38" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

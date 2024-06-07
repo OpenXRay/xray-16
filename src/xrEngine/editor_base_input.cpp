@@ -3,23 +3,46 @@
 #include "editor_base.h"
 #include "editor_helper.h"
 
+namespace
+{
+bool mouse_can_use_global_state()
+{
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE && defined(IMGUI_ENABLE_VIEWPORTS)
+    cpcstr sdl_backend = SDL_GetCurrentVideoDriver();
+
+    // Check and store if we are on a SDL backend that supports global mouse position
+    // ("wayland" and "rpi" don't support it, but we chose to use a white-list instead of a black-list)
+    for (cpcstr driver : { "windows", "cocoa", "x11", "DIVE", "VMAN" })
+    {
+        if (strncmp(sdl_backend, driver, strlen(driver)) == 0)
+        {
+            // We can create multi-viewports on the Platform side (optional)
+            return true;
+        }
+    }
+#endif
+    return false;
+}
+}
+
 namespace xray::editor
 {
 using namespace imgui;
 
-struct ide_backend
-{
-    char* clipboard_text_data;
-};
-
 void ide::InitBackend()
 {
-    m_backend_data = xr_new<ide_backend>();
-
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
-    io.BackendFlags |= ImGuiBackendFlags_HasGamepad | ImGuiBackendFlags_HasMouseCursors;
-    io.BackendPlatformName = "imgui_impl_xray";
+
+    io.BackendFlags |= ImGuiBackendFlags_HasGamepad | ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos;
+
+    if (mouse_can_use_global_state())
+    {
+        // We can create multi-viewports on the Platform side (optional)
+        io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
+#ifndef XR_PLATFORM_APPLE
+        m_imgui_backend.mouse_can_report_hovered_viewport = true;
+#endif
+    }
 
     // Clipboard functionality
     io.SetClipboardTextFn = [](void*, const char* text)
@@ -28,26 +51,178 @@ void ide::InitBackend()
     };
     io.GetClipboardTextFn = [](void* user_data) -> const char*
     {
-        ide_backend& bd = *(ide_backend*)user_data;
+        auto& bd = *static_cast<ImGuiBackend*>(user_data);
+
         if (bd.clipboard_text_data)
             SDL_free(bd.clipboard_text_data);
+
         bd.clipboard_text_data = SDL_GetClipboardText();
+
         return bd.clipboard_text_data;
     };
-    io.ClipboardUserData = m_backend_data;
+    io.ClipboardUserData = &m_imgui_backend;
+
+    auto& bd = m_imgui_backend;
+
+    bd.mouse_cursors[ImGuiMouseCursor_Arrow]      = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+    bd.mouse_cursors[ImGuiMouseCursor_TextInput]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+    bd.mouse_cursors[ImGuiMouseCursor_ResizeAll]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+    bd.mouse_cursors[ImGuiMouseCursor_ResizeNS]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+    bd.mouse_cursors[ImGuiMouseCursor_ResizeEW]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+    bd.mouse_cursors[ImGuiMouseCursor_ResizeNESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+    bd.mouse_cursors[ImGuiMouseCursor_ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+    bd.mouse_cursors[ImGuiMouseCursor_Hand]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+    bd.mouse_cursors[ImGuiMouseCursor_NotAllowed] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
 }
 
 void ide::ShutdownBackend()
 {
-    ide_backend& bd = *m_backend_data;
+    auto& backend = m_imgui_backend;
 
-    if (bd.clipboard_text_data)
+    if (backend.clipboard_text_data)
     {
-        SDL_free(bd.clipboard_text_data);
-        bd.clipboard_text_data = nullptr;
+        SDL_free(backend.clipboard_text_data);
+        backend.clipboard_text_data = nullptr;
     }
 
-    xr_delete(m_backend_data);
+    for (auto& cursor : backend.mouse_cursors)
+    {
+        SDL_FreeCursor(cursor);
+        cursor = nullptr;
+    }
+    backend.last_cursor = nullptr;
+}
+
+void ide::ProcessEvent(const SDL_Event& event)
+{
+    if (m_state != visible_state::full)
+        return;
+
+    auto& bd = m_imgui_backend;
+
+    switch (event.type)
+    {
+    case SDL_WINDOWEVENT:
+    {
+        const auto window = SDL_GetWindowFromID(event.window.windowID);
+        if (!window)
+            break;
+        const ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(window);
+        if (!viewport)
+            break;
+
+        switch (event.window.event)
+        {
+        case SDL_WINDOWEVENT_ENTER:
+            bd.mouse_window_id = event.window.windowID;
+            bd.mouse_last_leave_frame = 0;
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            bd.mouse_last_leave_frame = ImGui::GetFrameCount() + 1;
+            break;
+        } // switch (event.window.event)
+    }
+    } // switch (event.type)
+}
+
+void ide::UpdateMouseData()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    auto& bd = m_imgui_backend;
+    const bool anyMouseButtonPressed = pInput->iAnyMouseButtonDown();
+
+    if (bd.mouse_last_leave_frame && bd.mouse_last_leave_frame >= ImGui::GetFrameCount() && anyMouseButtonPressed)
+    {
+        bd.mouse_window_id = 0;
+        bd.mouse_last_leave_frame = 0;
+        io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+    }
+
+    // Our io.AddMouseViewportEvent() calls will only be valid when not capturing.
+    // Technically speaking testing for 'anyMouseButtonPressed' would be more rygorous, but testing for payload reduces noise and potential side-effects.
+    if (bd.mouse_can_report_hovered_viewport && ImGui::GetDragDropPayload() == nullptr)
+        io.BackendFlags |= ImGuiBackendFlags_HasMouseHoveredViewport;
+    else
+        io.BackendFlags &= ~ImGuiBackendFlags_HasMouseHoveredViewport;
+
+    // We forward mouse input when hovered or captured (via SDL_MOUSEMOTION) or when focused (below)
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE && defined(IMGUI_ENABLE_VIEWPORTS)
+    SDL_CaptureMouse(anyMouseButtonPressed ? SDL_TRUE : SDL_FALSE);
+    SDL_Window* focused_window = SDL_GetKeyboardFocus();
+    const bool is_app_focused = focused_window && (Device.m_sdlWnd == focused_window || ImGui::FindViewportByPlatformHandle(focused_window));
+#else
+    const bool is_app_focused = (SDL_GetWindowFlags(Device.m_sdlWnd) & SDL_WINDOW_INPUT_FOCUS) != 0;
+#endif
+
+    if (is_app_focused)
+    {
+        if (io.WantSetMousePos)
+        {
+            pInput->iSetMousePos({ (int)io.MousePos.x, (int)io.MousePos.y }, io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable);
+        }
+    }
+
+    if (io.BackendFlags & ImGuiBackendFlags_HasMouseHoveredViewport)
+    {
+        ImGuiID view_id = 0;
+        if (SDL_Window* window = SDL_GetWindowFromID(bd.mouse_window_id))
+            if (const ImGuiViewport* view = ImGui::FindViewportByPlatformHandle(window))
+                view_id = view->ID;
+        io.AddMouseViewportEvent(view_id);
+    }
+}
+
+void ide::UpdateMouseCursor()
+{
+    const ImGuiIO& io = ImGui::GetIO();
+
+    if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
+        return;
+
+    auto& bd = m_imgui_backend;
+    const ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+
+    if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
+    {
+        // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
+        SDL_ShowCursor(SDL_FALSE);
+    }
+    else
+    {
+        // Show OS mouse cursor
+        SDL_Cursor* expected_cursor = bd.mouse_cursors[imgui_cursor] ? bd.mouse_cursors[imgui_cursor] : bd.mouse_cursors[ImGuiMouseCursor_Arrow];
+        if (bd.last_cursor != expected_cursor)
+        {
+            SDL_SetCursor(expected_cursor); // SDL function doesn't have an early out (see #6113)
+            bd.last_cursor = expected_cursor;
+        }
+        SDL_ShowCursor(SDL_TRUE);
+    }
+}
+
+void ide::UpdateTextInput(bool force_disable /*= false*/)
+{
+    if (force_disable)
+    {
+        if (m_text_input_enabled)
+        {
+            pInput->DisableTextInput();
+            m_text_input_enabled = false;
+        }
+        return;
+    }
+
+    const ImGuiIO& io = ImGui::GetIO();
+
+    if (m_text_input_enabled != io.WantTextInput)
+    {
+        m_text_input_enabled = io.WantTextInput;
+
+        if (m_text_input_enabled)
+            pInput->EnableTextInput();
+        else
+            pInput->DisableTextInput();
+    }
 }
 
 void ide::OnAppActivate()
@@ -64,16 +239,21 @@ void ide::OnAppDeactivate()
 
 void ide::IR_OnActivate()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDrawCursor = true;
+    pInput->GrabInput(false);
+
+#ifdef SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH
+    SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+#endif
 }
 
 void ide::IR_OnDeactivate()
 {
     UpdateTextInput(true);
+    pInput->GrabInput(true);
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDrawCursor = false;
+#ifdef SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH
+    SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "0");
+#endif
 }
 
 void ide::IR_OnMousePress(int key)
@@ -95,18 +275,18 @@ void ide::IR_OnMouseHold(int /*key*/)
     // ImGui handles hold state on its own
 }
 
-void ide::IR_OnMouseWheel(int x, int y)
+void ide::IR_OnMouseWheel(float x, float y)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddMouseWheelEvent(static_cast<float>(x), static_cast<float>(y));
+    io.AddMouseWheelEvent(x, y);
 }
 
 void ide::IR_OnMouseMove(int /*x*/, int /*y*/)
 {
-    // x and y are relative
-    // ImGui accepts absolute coordinates
+    // x and y are relative to previous mouse position
+    // ImGui accepts absolute coordinates (that are relative to window or monitor)
     Ivector2 p;
-    pInput->iGetAsyncMousePos(p);
+    pInput->iGetAsyncMousePos(p, ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable);
 
     ImGuiIO& io = ImGui::GetIO();
     io.AddMousePosEvent(static_cast<float>(p.x), static_cast<float>(p.y));

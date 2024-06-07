@@ -494,8 +494,10 @@ void CIKLimb::SetNewGoal(const SIKCollideData& cld, SCalculateData& cd)
     cd.state.foot_step =
         m_foot.GetFootStepMatrix(cd.state.goal, cd, cld, true, !!ik_allign_free_foot) && cd.state.foot_step;
 
+#ifdef DEBUG
     VERIFY2(fsimilar(1.f, DET(cd.state.goal.get()), det_tolerance),
         dump_string("cd.state.goal", cd.state.goal.get()).c_str());
+#endif
 
     cd.state.blend_to = cd.state.goal;
     sv_state.get_calculate_state(cd.state);
@@ -671,27 +673,36 @@ void CIKLimb::Blending(SCalculateData& cd)
     {
         blend_speed_accel(cd);
         ik_goal_matrix m;
+
+#ifdef DEBUG
         VERIFY(fsimilar(1.f, DET(sv_state.goal(m).get()), det_tolerance));
         VERIFY(fsimilar(1.f, DET(sv_state.blend_to(m).get()), det_tolerance));
+#endif
 
         Fmatrix diff;
         diff.mul_43(Fmatrix().invert(sv_state.blend_to(m).get()), Fmatrix(sv_state.goal(m).get()));
 
+#ifdef DEBUG
         VERIFY(fsimilar(1.f, DET(diff), det_tolerance));
+#endif
 
         Fmatrix blend = Fidentity; // cd.state.blend_to;
         cd.state.blending =
             !clamp_change(blend, diff, cd.l, cd.a, linear_tolerance, angualar_tolerance); // 0.01f //0.005f
 
+#ifdef DEBUG
         VERIFY(fsimilar(1.f, DET(blend), det_tolerance));
         VERIFY(fsimilar(1.f, DET(cd.state.blend_to.get()), det_tolerance));
+#endif
 
         Fmatrix fm = Fmatrix().mul_43(cd.state.blend_to.get(), blend);
         if (ik_collide_blend)
             m_foot.GetFootStepMatrix(cd.state.goal, fm, collide_data, true, true);
         else
             cd.state.goal.set(fm, cd.state.blend_to.collide_state());
+#ifdef DEBUG
         VERIFY(fsimilar(DET(cd.state.goal.get()), 1.f, det_tolerance));
+#endif
     }
     else
     {

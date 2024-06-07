@@ -53,8 +53,10 @@ CEffect_Rain::~CEffect_Rain()
 }
 
 // Born
-void CEffect_Rain::Born(Item& dest, float radius)
+void CEffect_Rain::Born(Item& dest, float radius, float speed)
 {
+    ZoneScoped;
+
     Fvector axis;
     axis.set(0, -1, 0);
     float gust = g_pGamePersistent->Environment().wind_strength_factor / 10.f;
@@ -72,7 +74,7 @@ void CEffect_Rain::Born(Item& dest, float radius)
     dest.D.random_dir(axis, deg2rad(drop_angle));
     dest.P.set(x + view.x - dest.D.x * source_offset, source_offset + view.y, z + view.z - dest.D.z * source_offset);
     // dest.P.set (x+view.x,height+view.y,z+view.z);
-    dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max);
+    dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max) * speed;
 
     float height = max_distance;
     RenewItem(dest, height, RayPick(dest.P, dest.D, height, collide::rqtBoth));
@@ -80,6 +82,8 @@ void CEffect_Rain::Born(Item& dest, float radius)
 
 bool CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt)
 {
+    ZoneScoped;
+
     bool bRes = true;
 #ifdef _EDITOR
     Tools->RayPick(s, d, range);
@@ -112,6 +116,8 @@ void CEffect_Rain::RenewItem(Item& dest, float height, bool bHit)
 
 void CEffect_Rain::OnFrame()
 {
+    ZoneScoped;
+
 #ifndef _EDITOR
     if (!g_pGameLevel)
         return;
@@ -139,6 +145,7 @@ void CEffect_Rain::OnFrame()
         float t = Device.fTimeDelta;
         clamp(t, 0.001f, 1.0f);
         hemi_factor = hemi_factor * (1.0f - t) + f * t;
+        rain_hemi = hemi_val;
     }
 #endif
 

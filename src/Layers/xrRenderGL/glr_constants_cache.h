@@ -15,7 +15,7 @@ private:
         case RC_2x4:
             it[0].set(A._11, A._21, A._31, A._41);
             it[1].set(A._12, A._22, A._32, A._42);
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniformMatrix4x2fv(L.program, L.location, 1, GL_TRUE, (float*)&it));
             else
                 CHK_GL(glUniformMatrix4x2fv(L.location, 1, GL_TRUE, (float*)&it));
@@ -25,7 +25,7 @@ private:
             it[0].set(A._11, A._21, A._31, A._41);
             it[1].set(A._12, A._22, A._32, A._42);
             it[2].set(A._13, A._23, A._33, A._43);
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniformMatrix4x3fv(L.program, L.location, 1, GL_TRUE, (float*)&it));
             else
                 CHK_GL(glUniformMatrix4x3fv(L.location, 1, GL_TRUE, (float*)&it));
@@ -36,7 +36,7 @@ private:
             it[1].set(A._12, A._22, A._32, A._42);
             it[2].set(A._13, A._23, A._33, A._43);
             it[3].set(A._14, A._24, A._34, A._44);
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniformMatrix4fv(L.program, L.location, 1, GL_TRUE, (float*)&it));
             else
                 CHK_GL(glUniformMatrix4fv(L.location, 1, GL_TRUE, (float*)&it));
@@ -57,21 +57,21 @@ private:
         switch (L.cls)
         {
         case RC_1x2:
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniform2fv(L.program, L.location, 1, (float*)&A));
             else
                 CHK_GL(glUniform2fv(L.location, 1, (float*)&A));
             break;
 
         case RC_1x3:
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniform3fv(L.program, L.location, 1, (float*)&A));
             else
                 CHK_GL(glUniform3fv(L.location, 1, (float*)&A));
             break;
 
         case RC_1x4:
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniform4fv(L.program, L.location, 1, (float*)&A));
             else
                 CHK_GL(glUniform4fv(L.location, 1, (float*)&A));
@@ -92,21 +92,21 @@ private:
         switch (L.cls)
         {
         case RC_1x2:
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniform2f(L.program, L.location, x, y));
             else
                 CHK_GL(glUniform2f(L.location, x, y));
             break;
 
         case RC_1x3:
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniform3f(L.program, L.location, x, y, z));
             else
                 CHK_GL(glUniform3f(L.location, x, y, z));
             break;
 
         case RC_1x4:
-            if (HW.SeparateShaderObjectsSupported)
+            if (GLAD_GL_ARB_separate_shader_objects)
                 CHK_GL(glProgramUniform4f(L.program, L.location, x, y, z, w));
             else
                 CHK_GL(glUniform4f(L.location, x, y, z, w));
@@ -126,7 +126,7 @@ private:
     {
         VERIFY(RC_float == C->type);
         VERIFY(RC_1x1 == L.cls);
-        if (HW.SeparateShaderObjectsSupported)
+        if (GLAD_GL_ARB_separate_shader_objects)
             CHK_GL(glProgramUniform1f(L.program, L.location, A));
         else
             CHK_GL(glUniform1f(L.location, A));
@@ -136,7 +136,7 @@ private:
     {
         VERIFY(RC_int == C->type);
         VERIFY(RC_1x1 == L.cls);
-        if (HW.SeparateShaderObjectsSupported)
+        if (GLAD_GL_ARB_separate_shader_objects)
             CHK_GL(glProgramUniform1i(L.program, L.location, A));
         else
             CHK_GL(glUniform1i(L.location, A));

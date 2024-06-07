@@ -16,6 +16,8 @@ void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLe
         Log(message, id);
 }
 
+static_assert(std::is_same_v<decltype(&OnDebugCallback), GLDEBUGPROC>);
+
 void UpdateVSync()
 {
     if (psDeviceFlags.test(rsVSync))
@@ -70,6 +72,8 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateDevice(SDL_Window* hWnd)
 {
+    ZoneScoped;
+
     m_window = hWnd;
 
     R_ASSERT(m_window);
@@ -117,22 +121,10 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
-    // Initialize OpenGL Extension Wrangler
-#ifdef XR_PLATFORM_APPLE
-    // This is essential for complete OpenGL 4.1 load on mac
-    glewExperimental = GL_TRUE;
-#endif
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        Log("! Could not initialize glew:", (pcstr)glewGetErrorString(err));
-        return;
-    }
-
     UpdateVSync();
 
 #ifdef DEBUG
-    if (GLEW_KHR_debug)  // NOTE: this extension is only available starting with OpenGL 4.3
+    if (glDebugMessageCallback)
     {
         CHK_GL(glEnable(GL_DEBUG_OUTPUT));
         CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
@@ -143,9 +135,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &iMaxVTFUnits);
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &iMaxCTIUnits);
 
-    glGetIntegerv(GL_MAJOR_VERSION, &(std::get<0>(OpenGLVersion)));
-    glGetIntegerv(GL_MINOR_VERSION, &(std::get<1>(OpenGLVersion)));
-
     AdapterName = reinterpret_cast<pcstr>(glGetString(GL_RENDERER));
     OpenGLVersionString = reinterpret_cast<pcstr>(glGetString(GL_VERSION));
     ShadingVersion = reinterpret_cast<pcstr>(glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -155,8 +144,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     Msg("* GPU OpenGL shading language version: %s", ShadingVersion);
     Msg("* GPU OpenGL VTF units: [%d] CTI units: [%d]", iMaxVTFUnits, iMaxCTIUnits);
 
-    SeparateShaderObjectsSupported = GLEW_ARB_separate_shader_objects;
-    ShaderBinarySupported = GLEW_ARB_get_program_binary;
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
     Caps.fTarget = D3DFMT_A8R8G8B8;
@@ -182,6 +169,8 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
+    ZoneScoped;
+
     CHK_GL(glDeleteFramebuffers(1, &pFB));
     UpdateViews();
     UpdateVSync();
@@ -289,12 +278,12 @@ bool CHW::ThisInstanceIsGlobal() const
 
 void CHW::BeginPixEvent(pcstr name) const
 {
-    if (GLEW_KHR_debug)
+    if (glPushDebugGroup)
         glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name);
 }
 
 void CHW::EndPixEvent() const
 {
-    if (GLEW_KHR_debug)
+    if (glPushDebugGroup)
         glPopDebugGroup();
 }

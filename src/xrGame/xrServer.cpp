@@ -193,12 +193,16 @@ bool g_sv_SendUpdate = false;
 
 void xrServer::Update()
 {
+    ZoneScoped;
+
     if (Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished())
         return; // diabling server when demo is playing
     stats.Update.Begin();
     NET_Packet Packet;
 
+#ifdef DEBUG
     VERIFY(verify_entities());
+#endif
 
     ProceedDelayedPackets();
     // game update
@@ -229,7 +233,9 @@ void xrServer::Update()
     if (game->sv_force_sync)
         Perform_game_export();
 
+#ifdef DEBUG
     VERIFY(verify_entities());
+#endif
     //-----------------------------------------------------
 
     PerformCheckClientsForMaxPing();
@@ -331,6 +337,8 @@ void xrServer::SendUpdatePacketsToAll()
 
 void xrServer::SendUpdatesToAll()
 {
+    ZoneScoped;
+
     if (IsGameTypeSingle())
         return;
 
@@ -351,7 +359,9 @@ void xrServer::SendUpdatesToAll()
 #endif
         if (game->sv_force_sync)
             Perform_game_export();
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
         m_last_update_time = Device.dwTimeGlobal;
     }
     if (m_file_transfers)
@@ -370,7 +380,9 @@ u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender) // Non-Zero means
 
     // csPlayers.Enter			();
 
+#ifdef DEBUG
     VERIFY(verify_entities());
+#endif
     xrClientData* CL = ID_to_client(sender);
     // R_ASSERT2						(CL, make_string("packet type [%d]",type).c_str());
 
@@ -421,7 +433,9 @@ u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender) // Non-Zero means
     }
     break;
     }
+#ifdef DEBUG
     VERIFY(verify_entities());
+#endif
 
     // csPlayers.Leave					();
     return 0;
@@ -441,7 +455,9 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
     u16 type;
     P.r_begin(type);
 
+#ifdef DEBUG
     VERIFY(verify_entities());
+#endif
     xrClientData* CL = ID_to_client(sender);
 
     switch (type)
@@ -449,7 +465,9 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
     case M_UPDATE:
     {
         Process_update(P, sender); // No broadcast
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_SPAWN:
@@ -457,13 +475,17 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
         if (CL->flags.bLocal)
             Process_spawn(P, sender);
 
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_EVENT:
     {
         Process_event(P, sender);
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_EVENT_PACK:
@@ -493,7 +515,9 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
         //-------------------------------------------------------------------
         if (SV_Client)
             SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_MOVE_PLAYERS_RESPOND:
@@ -513,26 +537,34 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
             CL->net_Ready = TRUE;
         if (SV_Client)
             SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_GAMEMESSAGE:
     {
         SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_CLIENTREADY:
     {
         game->OnPlayerConnectFinished(sender);
         // game->signal_Syncronize	();
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_SWITCH_DISTANCE:
     {
         game->switch_distance(P, sender);
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_CHANGE_LEVEL:
@@ -541,32 +573,42 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
         {
             SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
         }
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_SAVE_GAME:
     {
         game->save_game(P, sender);
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_LOAD_GAME:
     {
         game->load_game(P, sender);
         SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_RELOAD_GAME:
     {
         SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_SAVE_PACKET:
     {
         Process_save(P, sender);
+#ifdef DEBUG
         VERIFY(verify_entities());
+#endif
     }
     break;
     case M_CLIENT_REQUEST_CONNECTION_DATA: { AddDelayedPacket(P, sender);
@@ -694,7 +736,9 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadc
     break;
     }
 
+#ifdef DEBUG
     VERIFY(verify_entities());
+#endif
 
     return IPureServer::OnMessage(P, sender);
 }
@@ -983,6 +1027,7 @@ void xrServer::create_direct_client()
 
 void xrServer::ProceedDelayedPackets()
 {
+    ZoneScoped;
     DelayedPackestCS.Enter();
     while (!m_aDelayedPackets.empty())
     {
@@ -1012,6 +1057,8 @@ u8 g_sv_maxPingWarningsCount = 5;
 
 void xrServer::PerformCheckClientsForMaxPing()
 {
+    ZoneScoped;
+
     struct MaxPingClientDisconnector
     {
         xrServer* m_owner;
@@ -1155,6 +1202,8 @@ void xrServer::KickCheaters()
 
 void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_id)
 {
+    Log("~ Server screenshot request is not supported.");
+    return;
     if ((cheater_id == SV_Client->ID) && GEnv.isDedicatedServer)
     {
         return;

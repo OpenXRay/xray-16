@@ -85,6 +85,21 @@ public:
     ref_texture t_noise[TEX_jitter_count];
     ref_texture t_noise_mipped;
 
+    // Anomaly
+    //Rendertargets
+    ref_rt rt_Generic_temp;
+
+    ref_rt rt_dof;
+
+    ref_rt rt_blur_h_2;
+    ref_rt rt_blur_2;
+
+    ref_rt rt_blur_h_4;
+    ref_rt rt_blur_4;
+
+    ref_rt rt_blur_h_8;
+    ref_rt rt_blur_8;
+
 private:
     // OCCq
     ref_shader s_occq;
@@ -105,6 +120,13 @@ private:
     ref_shader s_accum_reflected_msaa[8];
     ref_shader s_accum_volume;
     ref_shader s_accum_volume_msaa[8];
+
+    //Anomaly
+    ref_shader s_blur;
+    ref_shader s_dof;
+    ref_shader s_gasmask_drops;
+    ref_shader s_gasmask_dudv;
+    ref_shader s_nightvision;
 
     //	generate min/max
     ref_shader s_create_minmax_sm;
@@ -265,6 +287,13 @@ public:
     void phase_accumulator(CBackend& cmd_list);
     void phase_vol_accumulator(CBackend& cmd_list);
 
+    //Anomaly renderphases
+    void phase_blur();
+    void phase_dof();
+    void phase_gasmask_drops();
+    void phase_gasmask_dudv();
+    void phase_nightvision();
+
     //	Generates min/max sm
     void create_minmax_SM(CBackend& cmd_list);
 
@@ -327,8 +356,6 @@ public:
     //	Don't clear when render for the first time
     void reset_light_marker(CBackend& cmd_list, bool bResetStencil = false);
     void increment_light_marker(CBackend& cmd_list);
-
-    void DoAsyncScreenshot();
 
 #ifdef DEBUG
     void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)

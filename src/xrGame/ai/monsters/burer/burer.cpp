@@ -88,9 +88,9 @@ void CBurer::Load(LPCSTR section)
     particle_gravi_prepare = pSettings->r_string(section, "Particle_Gravi_Prepare");
     particle_tele_object = pSettings->r_string(section, "Particle_Tele_Object");
 
-    GEnv.Sound->create(sound_gravi_wave, pSettings->r_string(section, "sound_gravi_wave"), st_Effect, SOUND_TYPE_WORLD);
-    GEnv.Sound->create(sound_tele_hold, pSettings->r_string(section, "sound_tele_hold"), st_Effect, SOUND_TYPE_WORLD);
-    GEnv.Sound->create(sound_tele_throw, pSettings->r_string(section, "sound_tele_throw"), st_Effect, SOUND_TYPE_WORLD);
+    sound_gravi_wave.create(pSettings->r_string(section, "sound_gravi_wave"), st_Effect, SOUND_TYPE_WORLD);
+    sound_tele_hold.create(pSettings->r_string(section, "sound_tele_hold"), st_Effect, SOUND_TYPE_WORLD);
+    sound_tele_throw.create(pSettings->r_string(section, "sound_tele_throw"), st_Effect, SOUND_TYPE_WORLD);
 
     m_gravi.cooldown = pSettings->r_u32(section, "Gravi_Cooldown");
     m_gravi.min_dist = pSettings->r_float(section, "Gravi_MinDist");
@@ -395,7 +395,7 @@ void CBurer::UpdateGraviObject()
         sound_gravi_wave.set_position(snd_pos);
     }
     else
-        GEnv.Sound->play_at_pos(sound_gravi_wave, 0, snd_pos);
+        sound_gravi_wave.play_at_pos(0, snd_pos);
 }
 
 void CBurer::UpdateCL()

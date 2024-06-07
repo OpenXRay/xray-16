@@ -22,7 +22,7 @@ u16 CPartition::part_id(const shared_str& name) const
     return u16(-1);
 }
 
-void CPartition::load(IKinematics* V, LPCSTR model_name)
+void CPartition::load(IKinematics* V, pcstr model_name)
 {
     string_path fn, fn_full;
     xr_strcpy(fn, sizeof(fn), model_name);
@@ -74,7 +74,7 @@ u16 find_bone_id(vecBones* bones, shared_str nm)
 }
 
 //-----------------------------------------------------------------------
-BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
+BOOL motions_value::load(pcstr N, IReader* data, vecBones* bones)
 {
     m_id = N;
 
@@ -332,7 +332,7 @@ void motions_container::dump()
         sz += it->second->mem_usage();
         Msg("#%3d: [%3d/%5d Kb] - %s", k, it->second->m_dwReference, it->second->mem_usage() / 1024, it->first.c_str());
     }
-    Msg("--- items: %d, mem usage: %d Kb ", container.size(), sz / 1024);
+    Msg("--- items: %zu, mem usage: %zu Kb ", container.size(), sz / 1024);
     Log("--- motion container --- end.");
 }
 

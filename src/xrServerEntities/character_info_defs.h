@@ -10,7 +10,7 @@ typedef int CHARACTER_GOODWILL;
 #define NEUTRAL_GOODWILL CHARACTER_GOODWILL(0)
 
 typedef shared_str CHARACTER_CLASS;
-#define NO_CHARACTER_CLASS NULL
+#define NO_CHARACTER_CLASS nullptr
 
 //репутация персонажа - величина от -100 (очень плохой, беспредельщик)
 //до 100 (очень хороший, благородный)

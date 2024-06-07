@@ -41,8 +41,8 @@ protected:
     static LPCSTR tag_name;
 
 public:
-    CXML_IdToIndex();
-    virtual ~CXML_IdToIndex();
+    CXML_IdToIndex() = default;
+    virtual ~CXML_IdToIndex() = default;
 
     static void InitInternal(bool crashOnFail = true, bool ignoreMissingEndTagError = false);
 
@@ -74,10 +74,6 @@ TEMPLATE_SPECIALIZATION
 LPCSTR CSXML_IdToIndex::tag_name = NULL;
 
 TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::CXML_IdToIndex() {}
-TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::~CXML_IdToIndex() {}
-TEMPLATE_SPECIALIZATION
 const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
 {
     T_INIT::InitXmlIdToIndex();
@@ -90,7 +86,7 @@ const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_asse
 
     if (it == m_pItemDataVector->end())
     {
-#ifndef MASTER_GOLD
+#if 0 // ndef MASTER_GOLD
         int i = 0;
         for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; ++it, i++)
             Msg("[%d]=[%s]", i, *(*it).id);

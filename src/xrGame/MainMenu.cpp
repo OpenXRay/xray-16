@@ -74,13 +74,21 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 
 CMainMenu::CMainMenu()
 {
+    ZoneScoped;
+
     class CResetEventCb : public CEventNotifierCallbackWithCid
     {
         CMainMenu* m_mainmenu;
 
     public:
         CResetEventCb(CID cid, CMainMenu* mm) : CEventNotifierCallbackWithCid(cid), m_mainmenu(mm) {}
-        void ProcessEvent() override { m_mainmenu->DestroyInternal(true); }
+        void ProcessEvent() override
+        {
+            if (m_mainmenu->IsActive())
+                m_mainmenu->ReloadUI();
+            else
+                m_mainmenu->DestroyInternal(true);
+        }
     };
 
     m_script_reset_event_cid = ai().template Subscribe<CResetEventCb>(CAI_Space::EVENT_SCRIPT_ENGINE_RESET, this);
@@ -310,7 +318,7 @@ void CMainMenu::Activate(bool bActivate)
             Device.Reset();
 #else
             // Do only a precache for Debug and Mixed
-            Device.PreCache(20, true, false);
+            Device.PreCache(20, false);
 #endif
         }
     }
@@ -437,7 +445,7 @@ void CMainMenu::IR_OnTextInput(pcstr text)
     CDialogHolder::IR_UIOnTextInput(text);
 }
 
-void CMainMenu::IR_OnMouseWheel(int x, int y)
+void CMainMenu::IR_OnMouseWheel(float x, float y)
 {
     if (!IsActive())
         return;
@@ -488,6 +496,8 @@ bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGame
 
 void CMainMenu::OnRender()
 {
+    ZoneScoped;
+
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
@@ -543,6 +553,8 @@ void CMainMenu::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 // pureFrame
 void CMainMenu::OnFrame()
 {
+    ZoneScoped;
+
     if (m_Flags.test(flNeedChangeCapture))
     {
         m_Flags.set(flNeedChangeCapture, FALSE);
@@ -671,7 +683,10 @@ void CMainMenu::SwitchToMultiplayerMenu() { m_startDialog->Dispatch(2, 1); };
 void CMainMenu::DestroyInternal(bool bForce)
 {
     if (m_startDialog && ((m_deactivated_frame < Device.dwFrame + 4) || bForce))
+    {
+        m_startDialog->HideDialog();
         xr_delete(m_startDialog);
+    }
 }
 
 void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)

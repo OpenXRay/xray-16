@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\bugtrap\source\client\inputstream.h"><violation beginline="26" endline="26" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

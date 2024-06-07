@@ -15,28 +15,28 @@ jobs:
     steps:
     - name: on new pull request
       if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.opened == true || github.event.pull_request.reopened == true }}
-      uses: actions/labeler@v4.0.2
+      uses: actions/labeler@v5.0.0
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_new_pr.yml
 
     - name: on any pull request
       if: ${{ github.event_name == 'pull_request_target' }}
-      uses: actions/labeler@v4.0.2
+      uses: actions/labeler@v5.0.0
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler.yml
 
     - name: on pull request approval
       if: ${{ github.event_name == 'pull_request_review' && github.event.review.state == 'approved' }}
-      uses: actions/labeler@v4.0.2
+      uses: actions/labeler@v5.0.0
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_pr_approved.yml
 
     - name: on pull request merged
       if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.merged == true }}
-      uses: actions/labeler@v4.0.2
+      uses: actions/labeler@v5.0.0
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         configuration-path: .github/labeler_on_pr_merged.yml

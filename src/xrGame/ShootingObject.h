@@ -29,15 +29,15 @@ protected:
     void reload(LPCSTR section){};
     void Load(LPCSTR section);
 
-    Fvector m_vCurrentShootDir;
-    Fvector m_vCurrentShootPos;
+    Fvector m_vCurrentShootDir{};
+    Fvector m_vCurrentShootPos{};
 
 private:
     float m_air_resistance_factor;
 
 protected:
     // ID персонажа который иницировал действие
-    u16 m_iCurrentParentID;
+    u16 m_iCurrentParentID{ 0xFFFF };
 
     //////////////////////////////////////////////////////////////////////////
     // Fire Params
@@ -58,13 +58,13 @@ public:
     virtual BOOL ParentIsActor() { return FALSE; }
 protected:
     // Weapon fires now
-    bool bWorking;
+    bool bWorking{};
 
-    float fOneShotTime;
+    float fOneShotTime{};
     float modeShotTime;
     bool cycleDown;
-    Fvector4 fvHitPower;
-    Fvector4 fvHitPowerCritical;
+    Fvector4 fvHitPower{};
+    Fvector4 fvHitPowerCritical{};
     float fHitImpulse;
 
     //скорость вылета пули из ствола
@@ -76,7 +76,7 @@ protected:
     float fireDispersionBase;
 
     //счетчик времени, затрачиваемого на выстрел
-    float fShotTimeCounter;
+    float fShotTimeCounter{};
 
     struct SilencerKoeffs // value *= koef;
     {
@@ -170,9 +170,9 @@ protected:
 
 public:
     Fvector vLoadedShellPoint;
-    float m_fPredBulletTime;
-    float m_fTimeToAim;
-    bool m_bUseAimBullet;
+    float m_fPredBulletTime{};
+    float m_fTimeToAim{};
+    bool m_bUseAimBullet{};
 
 protected:
     //имя пратиклов для огня

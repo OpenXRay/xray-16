@@ -6,7 +6,40 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
 u32 ps_Preset = 2;
-const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
+u32 ps_ShaderPreset = 0;
+u32 ps_ColorGradingPreset = 0;
+
+const xr_token qpreset_token[] =
+{
+    { "Minimum", 0 },
+    { "Low", 1 },
+    { "Default", 2 },
+    { "High", 3 },
+    { "Extreme", 4 },
+    { nullptr, 0 }
+};
+
+const xr_token qshader_preset_token[] =
+{
+    { "ui_mm_shader_preset_vanilla", 0 },
+    { "ui_mm_shader_preset_enhanced_default", 1 },
+    { "ui_mm_shader_preset_enhanced_high", 2 },
+    { nullptr, 0 }
+};
+
+const xr_token qcolorgrading_preset_token[] =
+{
+    { "ui_mm_color_grading_default", 0 },
+    { "ui_mm_color_grading_cold", 1 },
+    { "ui_mm_color_grading_filmic_01", 2 },
+    { "ui_mm_color_grading_filmic_02", 3 },
+    { "ui_mm_color_grading_filmic_03", 4 },
+    { "ui_mm_color_grading_hollywood", 5 },
+    { "ui_mm_color_grading_vanilla", 6 },
+    { "ui_mm_color_grading_vibrant", 7 },
+    { "ui_mm_color_grading_warm", 8 },
+    { nullptr, 0 }
+};
 
 u32 ps_r2_smapsize = 2048;
 const xr_token qsmapsize_token[] =
@@ -22,8 +55,7 @@ const xr_token qsmapsize_token[] =
     { "2560", 2560 },
     { "3072", 3072 },
     { "3584", 3584 },
-    { "4096", 4096 },
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
+    { "4096", 4096 }, // XXX: runtime check for maximum smap-size on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
@@ -36,7 +68,6 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
-#endif // !USE_DX9
     { nullptr, 0 }
 };
 
@@ -48,16 +79,14 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#if defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
-#endif
-    {nullptr, 0}};
+{nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
 #if defined(USE_DX11) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
-#endif // !USE_DX9
+#endif // USE_DX11
     {nullptr, 0}};
 
 u32 ps_r_water_reflection = 3;
@@ -210,14 +239,59 @@ int ps_r2_wait_timeout = 500;
 float ps_r2_lt_smooth = 1.f; // 1.f
 float ps_r2_slight_fade = 0.5f; // 1.f
 
+// Anomaly
+extern ENGINE_API float ps_r2_img_exposure; // r2-only
+extern ENGINE_API float ps_r2_img_gamma; // r2-only
+extern ENGINE_API float ps_r2_img_saturation; // r2-only
+extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
+extern ENGINE_API Fvector4 ps_r2_mask_control; // r2-only
+extern ENGINE_API Fvector ps_r2_drops_control; // r2-only
+extern ENGINE_API int ps_r2_nightvision;
+
+//debug
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
+
+// Ascii1457's Screen Space Shaders
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1_cfg;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2_cfg;
+extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
+extern ENGINE_API Fvector4 ps_ssfx_rain_1;
+extern ENGINE_API Fvector4 ps_ssfx_rain_2;
+extern ENGINE_API Fvector4 ps_ssfx_rain_3;
+extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
+extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
+extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API int ps_ssfx_is_underground;
+extern ENGINE_API int ps_ssfx_gloss_method;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
+
 //  x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
 
-float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
-float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
-int ps_r3_dyn_wet_surf_sm_res = 256; // 256
+extern ENGINE_API float ps_r3_dyn_wet_surf_near;
+extern ENGINE_API float ps_r3_dyn_wet_surf_far;
+extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res;
 
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;
@@ -245,6 +319,7 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
 
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
+float ps_r2_gloss_min = 0.0f;
 //- Mad Max
 #ifndef _EDITOR
 #include "xrEngine/XR_IOConsole.h"
@@ -289,16 +364,13 @@ class CCC_tf_Aniso : public CCC_Integer
 public:
     void apply()
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
 #endif
         int val = *value;
         clamp(val, 1, 16);
-#if defined(USE_DX9)
-        for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
         SSManager.SetMaxAnisotropy(val);
 #elif defined(USE_OGL)
         // OGL: don't set aniso here because it will be updated after vid restart
@@ -323,15 +395,10 @@ class CCC_tf_MipBias : public CCC_Float
 public:
     void apply()
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
-#endif
 
-#if defined(USE_DX9)
-        for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
-#elif defined(USE_DX11)
         SSManager.SetMipLODBias(*value);
 #endif
     }
@@ -390,7 +457,7 @@ public:
         name[0] = 0;
         sscanf(args, "%s", name);
         LPCSTR image = xr_strlen(name) ? name : 0;
-        GEnv.Render->Screenshot(IRender::SM_NORMAL, image);
+        RImplementation.Screenshot(IRender::SM_NORMAL, image);
     }
 };
 
@@ -483,6 +550,58 @@ public:
     }
 };
 
+class CCC_Shader_Preset : public CCC_Token
+{
+public:
+    CCC_Shader_Preset(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T) {};
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Token::Execute(args);
+        string_path _cfg;
+        string_path cmd;
+
+        switch (*value)
+        {
+        case 0: xr_strcpy(_cfg, "shaders_vanilla.ltx"); break;
+        case 1: xr_strcpy(_cfg, "shaders_new_default.ltx"); break;
+        case 2: xr_strcpy(_cfg, "shaders_new_high.ltx"); break;
+        }
+        FS.update_path(_cfg, "$game_config$", _cfg);
+        strconcat(sizeof(cmd), cmd, "cfg_load", " ", _cfg);
+        Console->Execute(cmd);
+    }
+};
+
+class CCC_ColorGrading_Preset : public CCC_Token
+{
+public:
+    CCC_ColorGrading_Preset(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T) {};
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Token::Execute(args);
+        string_path _cfg;
+        string_path cmd;
+
+        switch (*value)
+        {
+        case 0: xr_strcpy(_cfg, "grading_default.ltx"); break;
+        case 1: xr_strcpy(_cfg, "grading_cold.ltx"); break;
+        case 2: xr_strcpy(_cfg, "grading_filmic01.ltx"); break;
+        case 3: xr_strcpy(_cfg, "grading_filmic02.ltx"); break;
+        case 4: xr_strcpy(_cfg, "grading_filmic03.ltx"); break;
+        case 5: xr_strcpy(_cfg, "grading_hollywood.ltx"); break;
+        case 6: xr_strcpy(_cfg, "grading_vanilla.ltx"); break;
+        case 7: xr_strcpy(_cfg, "grading_vibrant.ltx"); break;
+        case 8: xr_strcpy(_cfg, "grading_warm.ltx"); break;
+        }
+        FS.update_path(_cfg, "$game_config$", _cfg);
+        strconcat(sizeof(cmd), cmd, "cfg_load", " ", _cfg);
+        Console->Execute(cmd);
+    }
+};
+
 class CCC_memory_stats : public IConsole_Command
 {
 public:
@@ -490,7 +609,7 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
         // TODO: OGL: Implement memory usage statistics.
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         u32 m_base = 0;
         u32 c_base = 0;
         u32 m_lmaps = 0;
@@ -724,7 +843,11 @@ public:
 //-----------------------------------------------------------------------
 void xrRender_initconsole()
 {
+    ZoneScoped;
+
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
+    CMD3(CCC_Shader_Preset, "_shader_preset", &ps_ShaderPreset, qshader_preset_token);
+    CMD3(CCC_ColorGrading_Preset, "_colorgrading_preset", &ps_ColorGradingPreset, qcolorgrading_preset_token);
 
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
 #ifndef MASTER_GOLD
@@ -752,6 +875,11 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
+
+    // Anomaly
+    CMD4(CCC_Float, "r__exposure", &ps_r2_img_exposure, 0.5f, 4.0f);
+    CMD4(CCC_Float, "r__gamma", &ps_r2_img_gamma, 0.5f, 2.2f);
+    CMD4(CCC_Float, "r__saturation", &ps_r2_img_saturation, 0.0f, 2.0f);
 
     Fvector tw_min, tw_max;
 
@@ -834,7 +962,8 @@ void xrRender_initconsole()
 
     //- Mad Max
     CMD4(CCC_Float, "r2_gloss_factor", &ps_r2_gloss_factor, .0f, 10.f);
-//- Mad Max
+    CMD4(CCC_Float, "r2_gloss_min", &ps_r2_gloss_min, .0f, 1.f);
+    //- Mad Max
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "r2_use_nvdbt", &ps_r2_ls_flags, R2FLAG_USE_NVDBT);
@@ -950,6 +1079,7 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r3_water_refl", &ps_r_water_reflection, qwater_reflection_quality_token);
     CMD3(CCC_Mask, "r3_water_refl_half_depth", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_HALF_DEPTH);
     CMD3(CCC_Mask, "r3_water_refl_jitter", &ps_r2_ls_flags_ext, R3FLAGEXT_SSR_JITTER);
+    CMD3(CCC_Mask, "r4_new_shader_support", &ps_r2_ls_flags_ext, R4FLAGEXT_NEW_SHADER_SUPPORT);
 
     //CMD3(CCC_Mask, "r3_msaa", &ps_r2_ls_flags, R3FLAG_MSAA);
     CMD3(CCC_Token, "r3_msaa", &ps_r3_msaa, qmsaa_token);
@@ -982,6 +1112,57 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
+
+    // Anomaly
+    Fvector4 tw2_min = { 0.f, 0.f, 0.f, 0.f };
+    Fvector4 tw2_max = { 10.f, 3.f, 1.f, 1.f };
+    tw_min.set(0.f, 0.f, 0.f);
+    tw_max.set(1.f, 2.f, 1.f);
+    CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
+    CMD4(CCC_Vector4, "r2_mask_control", &ps_r2_mask_control, tw2_min, tw2_max);
+    CMD4(CCC_Vector3, "r2_drops_control", &ps_r2_drops_control, tw_min, tw_max);
+
+    tw2_max.set(-100.f, -100.f, -100.f, -100.f);
+    tw2_max.set(100.f, 100.f, 100.f, 100.f);
+    CMD4(CCC_Vector4, "shader_param_1", &ps_dev_param_1, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_2", &ps_dev_param_2, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_3", &ps_dev_param_3, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_4", &ps_dev_param_4, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_5", &ps_dev_param_5, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_6", &ps_dev_param_6, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_7", &ps_dev_param_7, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "shader_param_8", &ps_dev_param_8, tw2_min, tw2_max);
+
+    // Ascii's Screen Space Shaders
+    CMD4(CCC_Vector4, "ssfx_hud_drops_1", &ps_ssfx_hud_drops_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(100000, 100, 100, 100));
+    CMD4(CCC_Vector4, "ssfx_hud_drops_2", &ps_ssfx_hud_drops_2, Fvector4().set(0, 0, 0, 0), tw2_max);
+    CMD4(CCC_Vector4, "ssfx_hud_drops_params_1", &ps_ssfx_hud_drops_1_cfg, Fvector4().set(0, 0, 0, 0), Fvector4().set(100.f, 100.f, 100.f, 100.f));
+    CMD4(CCC_Vector4, "ssfx_hud_drops_params_2", &ps_ssfx_hud_drops_2_cfg, Fvector4().set(0, 0, 0, 0), Fvector4().set(100.f, 100.f, 100.f, 100.f));
+    CMD4(CCC_Vector4, "ssfx_blood_decals", &ps_ssfx_blood_decals, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 5, 0, 0));
+    CMD4(CCC_Vector4, "ssfx_rain_1", &ps_ssfx_rain_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(10, 5, 5, 2));
+    CMD4(CCC_Vector4, "ssfx_rain_2", &ps_ssfx_rain_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 10, 10, 10));
+    CMD4(CCC_Vector4, "ssfx_rain_3", &ps_ssfx_rain_3, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 10, 10, 10));
+    CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4().set(0, 0, 0, 0), Fvector4().set(3, 1, 100, 100));
+    CMD4(CCC_Vector3, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, Fvector3().set(1.0f, 1.0f, 1.0f), Fvector3().set(300, 300, 300));
+    CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 15, 5000, 1));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 5, 5, 60));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 20, 1, 5));
+    CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
+    CMD4(CCC_Vector4, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, tw2_min, tw2_max);
+
+    CMD4(CCC_Vector4, "ssfx_florafixes_1", &ps_ssfx_florafixes_1, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(1.0, 1.0, 1.0, 1.0));
+    CMD4(CCC_Vector4, "ssfx_florafixes_2", &ps_ssfx_florafixes_2, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(10.0, 1.0, 1.0, 1.0));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_1", &ps_ssfx_wetsurfaces_1, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_2", &ps_ssfx_wetsurfaces_2, Fvector4().set(0.01, 0.01, 0.01, 0.01), Fvector4().set(2.0, 2.0, 2.0, 2.0));
+    CMD4(CCC_Integer, "ssfx_is_underground", &ps_ssfx_is_underground, 0, 1);
+    CMD4(CCC_Integer, "ssfx_gloss_method", &ps_ssfx_gloss_method, 0, 1);
+    CMD4(CCC_Vector3, "ssfx_gloss_minmax", &ps_ssfx_gloss_minmax, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 1.0, 1.0));
+    CMD4(CCC_Float, "ssfx_gloss_factor", &ps_ssfx_gloss_factor, 0.0f, 1.0f);
+    CMD4(CCC_Vector4, "ssfx_lightsetup_1", &ps_ssfx_lightsetup_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(1.0, 1.0, 1.0, 1.0));
+
+    tw_min.set(0, 0, 0);
+    tw_max.set(1, 1, 1);
+    CMD4(CCC_Vector3, "r__color_grading", &ps_r2_img_cg, tw_min, tw_max);
 }
 
 #endif

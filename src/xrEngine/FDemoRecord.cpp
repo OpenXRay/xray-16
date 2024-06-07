@@ -456,7 +456,7 @@ bool CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
 void CDemoRecord::IR_OnKeyboardPress(int dik)
 {
-    if (dik == SDL_SCANCODE_KP_MULTIPLY)
+    if (dik == SDL_SCANCODE_PERIOD)
         m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
 
     if (m_b_redirect_input_to_level)

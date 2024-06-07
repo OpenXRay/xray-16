@@ -2,12 +2,13 @@
 
 class sdl_window_test_helper
 {
-    SDL_Window* m_window = nullptr;
-    SDL_GLContext m_context = nullptr;
+    SDL_Window* m_window{};
+    SDL_GLContext m_context{};
 
 public:
     sdl_window_test_helper()
     {
+        ZoneScoped;
         u32 flags{};
         HW.SetPrimaryAttributes(flags);
         m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | flags);
@@ -25,6 +26,7 @@ public:
         }
     }
 
+    [[nodiscard]]
     bool successful() const
     {
         return m_window && m_context;
@@ -37,24 +39,27 @@ public:
     }
 };
 
-bool TestOpenGLSupport()
+BOOL xrRender_test_hw()
 {
+    ZoneScoped;
+
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
     if (!windowTest.successful())
-        return false;
+        return FALSE;
 
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
+    int version;
     {
-         Log("~ Could not initialize glew:", (pcstr)glewGetErrorString(err));
-         return false;
+        ZoneScopedN("gladLoadGL");
+        version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
+    }
+    if (version == 0)
+    {
+        Log("~ Could not initialize GLAD.");
+        if (auto err = SDL_GetError())
+            Log("SDL Error:", err);
+        return FALSE;
     }
 
-    return true;
-}
-
-BOOL xrRender_test_hw()
-{
-    return TestOpenGLSupport() ? TRUE : FALSE;
+    return TRUE;
 }

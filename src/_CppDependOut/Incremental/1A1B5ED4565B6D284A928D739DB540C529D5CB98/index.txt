@@ -1,1 +1,0 @@
-{"a":"Mixed|x64","b":{"c:\\openxray\\externals\\luajit\\src\\host\\minilua.c":{"Timestamp":1636091372.0,"Reparse":false,"Includes":["c:\\openxray\\externals\\luajit\\src\\host\\minilua.c"],"IsSource":true,"Errors":[]}}}

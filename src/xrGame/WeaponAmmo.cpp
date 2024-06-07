@@ -7,7 +7,7 @@
 #include "Weapon.h"
 #include "Level_Bullet_Manager.h"
 #include "ai_space.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "Level.h"
 
 #define BULLET_MANAGER_SECTION "bullet_manager"
@@ -15,7 +15,6 @@
 CCartridge::CCartridge()
 {
     m_flags.assign(cfTracer | cfRicochet);
-    m_ammoSect = NULL;
     param_s.Init();
     bullet_material_idx = u16(-1);
 }

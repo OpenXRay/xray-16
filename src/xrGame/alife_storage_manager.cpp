@@ -17,11 +17,9 @@
 #include "alife_registry_container.h"
 #include "xrServer.h"
 #include "Level.h"
-#include "xrEngine/x_ray.h"
 #include "saved_game_wrapper.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "autosave_manager.h"
-XRCORE_API string_path g_bug_report_file;
 
 using namespace ALife;
 
@@ -185,11 +183,10 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
     }
 
     string512 temp;
-    strconcat(sizeof(temp), temp, StringTable().translate("st_loading_saved_game").c_str(),
+    strconcat(temp, StringTable().translate("st_loading_saved_game").c_str(),
         " \"", save_name, gameSaveExtension, "\"");
 
-    g_pGamePersistent->SetLoadStageTitle(temp);
-    g_pGamePersistent->LoadTitle();
+    g_pGamePersistent->LoadTitle(temp);
 
     unload();
     reload(m_section);

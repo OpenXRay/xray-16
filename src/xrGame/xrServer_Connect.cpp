@@ -8,7 +8,6 @@
 #include "game_cl_artefacthunt.h"
 #include "game_cl_single.h"
 #include "MainMenu.h"
-#include "xrEngine/x_ray.h"
 #include "file_transfer.h"
 #include "screenshot_server.h"
 #include "xrNetServer/NET_AuthCheck.h"
@@ -18,7 +17,7 @@ LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
 {
     R_ASSERT(level_name && level_version);
     LPCSTR ret_url = "";
-    CInifile* level_ini = pApp->GetArchiveHeader(level_name, level_version);
+    CInifile* level_ini = g_pGamePersistent->GetArchiveHeader(level_name, level_version);
     if (!level_ini)
     {
         if (!IsGameTypeSingle())
@@ -165,15 +164,15 @@ void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
     {
         R_ASSERT2(tmp_client != GetServerClient(), "can't disconnect server client");
         Msg("--- Client [%s] tried to connect - rejecting connection (he is banned by %s) ...",
-            tmp_client->m_cAddress.to_string().c_str(), admin_name.size() ? admin_name.c_str() : "Server");
-        pstr message_to_user;
-        if (admin_name.size())
+            tmp_client->m_cAddress.to_string().c_str(), admin_name.empty() ? "Server" : admin_name.c_str());
+        pcstr message_to_user;
+        if (admin_name.empty())
         {
-            STRCONCAT(message_to_user, "mp_you_have_been_banned_by ", admin_name.c_str());
+            message_to_user = StringTable().translate("mp_you_have_been_banned_by_server").c_str();
         }
         else
         {
-            STRCONCAT(message_to_user, "");
+            STRCONCAT(message_to_user, StringTable().translate("mp_you_have_been_banned_by").c_str(), " ", admin_name.c_str());
         }
         SendConnectResult(tmp_client, 0, ecr_have_been_banned, message_to_user);
         return;

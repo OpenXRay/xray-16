@@ -5,17 +5,7 @@
 #include "xr_types.h"
 #include "xrMemory.h"
 
-#define BREAK_AT_STRCMP
-#ifndef DEBUG
-#undef BREAK_AT_STRCMP
-#endif
-#ifdef _EDITOR
-#undef BREAK_AT_STRCMP
-#endif
-
-#ifndef BREAK_AT_STRCMP
-#include <string.h>
-#endif
+#include <cstring>
 
 #pragma pack(push, 4)
 #pragma warning(push)
@@ -68,73 +58,92 @@ XRCORE_API extern str_container* g_pStringContainer;
 //////////////////////////////////////////////////////////////////////////
 class shared_str
 {
-    str_value* p_;
+    str_value* p_{};
 
 protected:
     // ref-counting
-    void _dec()
+    void _dec() noexcept
     {
-        if (0 == p_)
+        if (nullptr == p_)
             return;
         p_->dwReference--;
         if (0 == p_->dwReference)
-            p_ = 0;
+            p_ = nullptr;
     }
 
 public:
     void _set(pcstr rhs)
     {
         str_value* v = g_pStringContainer->dock(rhs);
-        if (0 != v)
+        if (nullptr != v)
             v->dwReference++;
         _dec();
         p_ = v;
     }
-    void _set(shared_str const& rhs)
+    void _set(shared_str const& rhs) noexcept
     {
         str_value* v = rhs.p_;
-        if (0 != v)
+        if (nullptr != v)
             v->dwReference++;
         _dec();
         p_ = v;
     }
-    // void _set (shared_str const &rhs) { str_value* v = g_pStringContainer->dock(rhs.c_str()); if (0!=v)
-    // v->dwReference++; _dec(); p_ = v; }
+    void _set(std::nullptr_t) noexcept
+    {
+        _dec();
+        p_ = nullptr;
+    }
 
     [[nodiscard]]
     const str_value* _get() const { return p_; }
 
 public:
     // construction
-    shared_str() { p_ = 0; }
+    shared_str() = default;
     shared_str(pcstr rhs)
     {
-        p_ = 0;
+        p_ = nullptr;
         _set(rhs);
     }
-    shared_str(shared_str const& rhs)
+    shared_str(shared_str const& rhs) noexcept
     {
-        p_ = 0;
+        p_ = nullptr;
         _set(rhs);
+    }
+    shared_str(shared_str&& rhs) noexcept
+        : p_(rhs.p_)
+    {
+        rhs.p_ = nullptr;
     }
     ~shared_str() { _dec(); }
     // assignment & accessors
     shared_str& operator=(pcstr rhs)
     {
         _set(rhs);
-        return (shared_str&)*this;
+        return *this;
     }
-    shared_str& operator=(shared_str const& rhs)
+    shared_str& operator=(shared_str const& rhs) noexcept
     {
         _set(rhs);
-        return (shared_str&)*this;
+        return *this;
+    }
+    shared_str& operator=(shared_str&& rhs) noexcept
+    {
+        p_ = rhs.p_;
+        rhs.p_ = nullptr;
+        return *this;
+    }
+    shared_str& operator=(std::nullptr_t) noexcept
+    {
+        _set(nullptr);
+        return *this;
     }
     // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use
     [[nodiscard]]
-    pcstr operator*() const { return p_ ? p_->value : 0; }
+    pcstr operator*() const { return p_ ? p_->value : nullptr; }
 
     [[nodiscard]]
-    bool operator!() const { return p_ == 0; }
+    bool operator!() const { return p_ == nullptr; }
 
     [[nodiscard]]
     char operator[](size_t id) { return p_->value[id]; }
@@ -142,7 +151,7 @@ public:
     char operator[](size_t id) const { return p_->value[id]; }
 
     [[nodiscard]]
-    pcstr c_str() const { return p_ ? p_->value : 0; }
+    pcstr c_str() const { return p_ ? p_->value : nullptr; }
 
     // misc func
     [[nodiscard]]
@@ -184,14 +193,6 @@ public:
     }
 };
 
-#ifdef BREAK_AT_STRCMP
-XRCORE_API int xr_strcmp(const char* S1, const char* S2);
-#else
-inline int xr_strcmp(const char* S1, const char* S2)
-{
-    return (int)strcmp(S1, S2);
-}
-#endif
 
 template<>
 struct std::hash<shared_str>
@@ -218,6 +219,12 @@ IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > 
 // externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) noexcept { lhs.swap(rhs); }
 IC size_t xr_strlen(const shared_str& a) noexcept { return a.size(); }
+
+ICF int xr_strcmp(const char* S1, const char* S2)
+{
+    return strcmp(S1, S2);
+}
+
 IC int xr_strcmp(const shared_str& a, const char* b) noexcept { return xr_strcmp(*a, b); }
 IC int xr_strcmp(const char* a, const shared_str& b) noexcept { return xr_strcmp(a, *b); }
 IC int xr_strcmp(const shared_str& a, const shared_str& b) noexcept

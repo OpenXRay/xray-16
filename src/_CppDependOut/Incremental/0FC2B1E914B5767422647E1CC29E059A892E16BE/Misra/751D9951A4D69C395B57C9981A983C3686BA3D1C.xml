@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\core3d\mgctorus.cpp"><violation beginline="71" endline="71" rule="Rule5-14-1" ruleset="Statements">
-</violation></file><file path="c:\openxray\externals\freemagic\source\core3d\mgcvector3.h"><violation beginline="70" endline="70" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="h:\programs\codergears\cppdepend\defaulttoolchain\include\assert.h"><violation beginline="38" endline="38" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

@@ -56,15 +56,7 @@ void CGammaControl::GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA
 
 void CGammaControl::Update() const
 {
-#if defined(USE_DX9)
-    if (HW.pDevice)
-    {
-        D3DGAMMARAMP G;
-        GenLUT(G.red, G.green, G.blue, 256);
-        HW.pDevice->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &G);
-        return;
-    }
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
     if (HW.pDevice)
     {
         DXGI_GAMMA_CONTROL_CAPABILITIES GC;

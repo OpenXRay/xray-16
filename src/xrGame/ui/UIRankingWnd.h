@@ -23,34 +23,16 @@ class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
 {
     using inherited = CUIWindow;
 
-    CUIFrameWindow* m_background;
-    CUIFrameLineWnd* m_background2;
-    CUIStatic* m_center_background;
-    CUIFrameWindow* m_down_background;
-    CUIFrameWindow* m_icon_overlay;
+    CUICharacterInfo* m_actor_ch_info{};
 
-    CUICharacterInfo* m_actor_ch_info;
+    CUIStatic* m_money_value{};
 
-    CUITextWnd* m_money_caption;
-    CUITextWnd* m_money_value;
+    CUIScrollView* m_factions_list{};
 
-    CUITextWnd* m_center_caption;
-    CUIStatic* m_faction_static;
-    CUIFrameLineWnd* m_faction_line1;
-    CUIFrameLineWnd* m_faction_line2;
-
-    CUIScrollView* m_factions_list;
-
-    CUIScrollView* m_achievements;
-    CUIFrameWindow* m_achievements_background;
-    CUIFrameWindow* m_monster_background;
-    CUIFrameWindow* m_monster_over;
-    CUIFrameWindow* m_favorite_weapon_ramka;
-    CUIFrameWindow* m_favorite_weapon_over;
-    CUIStatic* m_monster_icon_back;
-    CUIStatic* m_monster_icon;
-    CUIStatic* m_favorite_weapon_bckgrnd;
-    CUIStatic* m_favorite_weapon_icon;
+    CUIScrollView* m_achievements{};
+    CUIStatic* m_monster_icon_back{};
+    CUIStatic* m_monster_icon{};
+    CUIStatic* m_favorite_weapon_icon{};
 
     using ACHIEVES_VEC = xr_vector<CUIAchievements*>;
     ACHIEVES_VEC m_achieves_vec;
@@ -59,8 +41,8 @@ class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
     {
         max_stat_info = 15
     };
-    CUITextWnd* m_stat_caption[max_stat_info];
-    CUITextWnd* m_stat_info[max_stat_info];
+    CUIStatic* m_stat_caption[max_stat_info]{};
+    CUIStatic* m_stat_info[max_stat_info]{};
 
     u32 m_delay;
     u32 m_previous_time;

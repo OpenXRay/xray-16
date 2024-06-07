@@ -1,7 +1,7 @@
 #pragma once
 #include "UIWindow.h"
 
-class XRUICORE_API CUIFrameLineWnd : public CUIWindow
+class XRUICORE_API CUIFrameLineWnd : public CUIWindow, public ITextureOwner
 {
     typedef CUIWindow inherited;
 
@@ -16,26 +16,44 @@ public:
 
     CUIFrameLineWnd(pcstr window_name);
 
-    bool InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal = true, bool fatal = true);
+    bool InitFrameLineWnd(pcstr base_name, Fvector2 pos, Fvector2 size, bool horizontal = true, bool fatal = true);
     void InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal = true);
-    bool InitTexture(pcstr texture, bool fatal = true);
-    bool InitTexture(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true);
+    bool InitTexture(pcstr texture, bool fatal = true) override;
+    bool InitTextureEx(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true) override;
 
-    virtual void Draw();
+    void Draw() override;
 
-    float GetTextureHeight() const { return m_tex_rect[0].height(); }
-    float GetTextureWidth() const { return m_tex_rect[0].width(); }
-    void SetTextureColor(u32 cl) { m_texture_color = cl; }
-    bool IsHorizontal() { return bHorizontal; }
-    void SetHorizontal(bool horiz) { bHorizontal = horiz; }
-
-    void SetTextureVisible(bool value) { m_bTextureVisible = value; }
-    void SetShader(ui_shader sh) { m_shader = sh; }
-    void SetTextureRect(Frect rect, RectSegment idx)
+    void SetTextureRect(const Frect rect, RectSegment idx)
     {
-        R_ASSERT(idx >= flFirst && idx <= flSecond);
+        VERIFY(idx >= flFirst && idx < flMax);
+        if (idx >= flMax)
+            return;
         m_tex_rect[idx] = rect;
     }
+
+    void SetTextureRect(const Frect& r) override
+    {
+        VERIFY2(false, "This overload is not supposed to be called!!!");
+        m_tex_rect[flBack] = r;
+    }
+
+    const Frect& GetTextureRect() const override
+    {
+        VERIFY2(false, "This overload is not supposed to be called!!!");
+        return m_tex_rect[flBack];
+    }
+
+    void SetTextureColor(u32 cl) override { m_texture_color = cl; }
+    u32 GetTextureColor() const override { return m_texture_color; }
+
+    void SetStretchTexture(bool /*stretch*/) override {}
+    bool GetStretchTexture() override { return false; }
+
+    void SetTextureVisible(bool value) { m_bTextureVisible = value; }
+    void SetShader(const ui_shader& sh) { m_shader = sh; }
+
+    bool IsHorizontal() const { return bHorizontal; }
+    void SetHorizontal(bool horiz) { bHorizontal = horiz; }
 
     pcstr GetDebugType() override { return "CUIFrameLineWnd"; }
 

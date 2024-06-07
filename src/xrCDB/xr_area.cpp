@@ -20,28 +20,19 @@ using namespace collide;
 // Class	: CObjectSpace
 // Purpose	: stores space slots
 //----------------------------------------------------------------------
-CObjectSpace::CObjectSpace()
-#ifdef DEBUG
-      : m_pRender(nullptr)
-#endif
+CObjectSpace::CObjectSpace(ISpatial_DB* spatialSpace)
+    : SpatialSpace(spatialSpace)
 {
 #ifdef DEBUG
     if (GEnv.RenderFactory)
         m_pRender = xr_new<FactoryPtr<IObjectSpaceRender>>();
-
-// sh_debug.create				("debug\\wireframe","$null");
 #endif
     m_BoundingVolume.invalidate();
 }
 //----------------------------------------------------------------------
 CObjectSpace::~CObjectSpace()
 {
-// moved to ~IGameLevel
-//	GEnv.Sound->set_geometry_occ		(NULL);
-//	GEnv.Sound->set_handler			(NULL);
-//
 #ifdef DEBUG
-    // sh_debug.destroy			();
     xr_delete(m_pRender);
 #endif
 }
@@ -51,6 +42,8 @@ CObjectSpace::~CObjectSpace()
 int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObject*>& q_nearest, const Fvector& point,
     float range, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     q_spatial.clear();
     // Query objects
     q_nearest.clear();
@@ -58,7 +51,7 @@ int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObj
     Q.set(point, range);
     Fvector B;
     B.set(range, range, range);
-    g_SpatialSpace->q_box(q_spatial, 0, STYPE_COLLIDEABLE, point, B);
+    SpatialSpace->q_box(q_spatial, 0, STYPE_COLLIDEABLE, point, B);
 
     // Iterate
     for (auto& it : q_spatial)
@@ -114,6 +107,8 @@ void CObjectSpace::Load(IReader* F,
     CDB::serialize_callback serialize_callback,
     CDB::deserialize_callback deserialize_callback)
 {
+    ZoneScoped;
+
     hdrCFORM H;
     F->r(&H, sizeof(hdrCFORM));
     Fvector* verts = (Fvector*)F->pointer();
@@ -128,6 +123,8 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
     CDB::serialize_callback serialize_callback,
     CDB::deserialize_callback deserialize_callback)
 {
+    ZoneScoped;
+
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
 
     string_path fName;
@@ -154,10 +151,6 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
     }
 
     m_BoundingVolume.set(H.aabb);
-    g_SpatialSpace->initialize(m_BoundingVolume);
-    g_SpatialSpacePhysic->initialize(m_BoundingVolume);
-    // GEnv.Sound->set_geometry_occ				( &Static );
-    // GEnv.Sound->set_handler					( _sound_event );
 }
 
 //----------------------------------------------------------------------

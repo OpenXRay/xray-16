@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\utils\xrlc_light\xrimage_filter.cpp"><violation beginline="17" endline="17" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="20" endline="20" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="32" endline="32" rule="Rule6-3-1" ruleset="Statements">
-</violation></file><file path="c:\openxray\src\xrcore\_vector3d.h"><violation beginline="11" endline="11" rule="Rule11-0-1" ruleset="Classes">
-</violation></file></cppdepend-plugin>

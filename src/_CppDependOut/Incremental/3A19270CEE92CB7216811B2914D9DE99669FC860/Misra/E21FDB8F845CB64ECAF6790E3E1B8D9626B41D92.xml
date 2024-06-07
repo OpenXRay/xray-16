@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\libtheora\lib\x86_vc\mmxencfrag.c"><violation beginline="471" endline="471" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="580" endline="580" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="471" endline="471" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="580" endline="580" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

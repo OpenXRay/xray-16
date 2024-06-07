@@ -74,6 +74,7 @@ public:
 
 void ISpatial_DB::q_box(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvector& _center, const Fvector& _size)
 {
+    ZoneScoped;
     ScopeLock scope(&cs);
     Stats.Query.Begin();
     q_result = &R;
@@ -93,6 +94,7 @@ void ISpatial_DB::q_box(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvecto
 
 void ISpatial_DB::q_sphere(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvector& _center, const float _radius)
 {
+    ZoneScoped;
     Fvector _size = {_radius, _radius, _radius};
     q_box(R, _o, _mask, _center, _size);
 }

@@ -49,7 +49,6 @@ UIUpgrade::UIUpgrade(CUIInventoryUpgradeWnd* parent_wnd, bool cellBorder)
         m_ink = nullptr;
     }
 
-    m_upgrade_id = NULL;
     Reset();
 }
 

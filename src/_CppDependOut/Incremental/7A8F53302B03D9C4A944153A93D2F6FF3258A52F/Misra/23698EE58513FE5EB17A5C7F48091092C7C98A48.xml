@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\utils\xrlc\nv_library\vertexcache.cpp"><violation beginline="11" endline="11" rule="Rule6-3-1" ruleset="Statements">
-</violation></file></cppdepend-plugin>

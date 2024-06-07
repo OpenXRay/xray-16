@@ -194,6 +194,7 @@ void CDrawUtilities::UpdateGrid(int number_of_cell, float square_size, int subdi
 
 void CDrawUtilities::OnDeviceCreate()
 {
+    ZoneScoped;
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 
     m_SolidBox.CreateFromData(D3DPT_TRIANGLELIST, DU_BOX_NUMFACES, D3DFVF_XYZ | D3DFVF_DIFFUSE, du_box_vertices,

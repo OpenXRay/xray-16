@@ -2,28 +2,87 @@
 
 #include "SoundRender_CoreA.h"
 
-XRSOUND_API xr_token* snd_devices_token = nullptr;
 XRSOUND_API u32 snd_device_id = u32(-1);
 
-void ISoundManager::_create_devices_list()
+ISoundScene* DefaultSoundScene{};
+
+void CSoundManager::CreateDevicesList()
 {
-    SoundRenderA = xr_new<CSoundRender_CoreA>();
-    SoundRender = SoundRenderA;
+    ZoneScoped;
+
+    static bool noSound = strstr(Core.Params, "-nosound");
+
+    SoundRender = xr_new<CSoundRender_CoreA>(*this);
+
+    if (!noSound)
+        SoundRender->_initialize_devices_list();
+
+    if (!SoundRender->bPresent)
+        soundDevices.emplace_back(nullptr, -1);
+
     GEnv.Sound = SoundRender;
-    SoundRender->bPresent = strstr(Core.Params, "-nosound") == nullptr;
-    if (SoundRender->bPresent)
-        GEnv.Sound->_initialize_devices_list();
 }
 
-void ISoundManager::_create()
+void CSoundManager::Create()
 {
+    ZoneScoped;
+
     if (SoundRender->bPresent)
-        GEnv.Sound->_initialize();
+    {
+        env_load();
+        SoundRender->_initialize();
+    }
 }
 
-void ISoundManager::_destroy()
+void CSoundManager::Destroy()
 {
-    GEnv.Sound->_clear();
-    xr_delete(SoundRender);
+    ZoneScoped;
+
     GEnv.Sound = nullptr;
+
+    SoundRender->_clear();
+    xr_delete(SoundRender);
+
+    env_unload();
+
+    for (auto& token : soundDevices)
+    {
+        pstr tokenName = const_cast<pstr>(token.name);
+        xr_free(tokenName);
+    }
+    soundDevices.clear();
+}
+
+bool CSoundManager::IsSoundEnabled() const
+{
+    return SoundRender && SoundRender->bPresent;
+}
+
+void CSoundManager::env_load()
+{
+    string_path fn;
+    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME))
+    {
+        soundEnvironment = xr_new<SoundEnvironment_LIB>();
+        soundEnvironment->Load(fn);
+    }
+}
+
+void CSoundManager::env_unload()
+{
+    if (soundEnvironment)
+        soundEnvironment->Unload();
+    xr_delete(soundEnvironment);
+}
+
+SoundEnvironment_LIB* CSoundManager::get_env_library() const
+{
+    return soundEnvironment;
+}
+
+void CSoundManager::refresh_env_library()
+{
+    env_unload();
+    env_load();
+    SoundRender->env_apply();
 }

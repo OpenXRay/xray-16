@@ -95,9 +95,8 @@ IC void Reduce(int& w, int& h, int& l, int& skip)
         h = 1;
 }
 
-IC void Reduce(size_t& w, size_t& h, size_t& l, int skip, bool compressed)
+IC void Reduce(size_t& w, size_t& h, size_t& l, int skip)
 {
-    const size_t min_size = compressed ? 4 : 1;
     while ((l > 1) && skip)
     {
         w /= 2;
@@ -106,10 +105,10 @@ IC void Reduce(size_t& w, size_t& h, size_t& l, int skip, bool compressed)
 
         skip--;
     }
-    if (w < min_size)
-        w = min_size;
-    if (h < min_size)
-        h = min_size;
+    if (w < 1)
+        w = 1;
+    if (h < 1)
+        h = 1;
 }
 
 /*
@@ -275,6 +274,9 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
 */
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
+    ret_msize = 0;
+    R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });
+
     DirectX::TexMetadata IMG;
     DirectX::ScratchImage texture;
     ID3DBaseTexture* pTexture2D = NULL;
@@ -283,10 +285,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     int img_loaded_lod = 0;
     u32 mip_cnt = u32(-1);
     bool dummyTextureExist;
-
-    // validation
-    R_ASSERT(fRName);
-    R_ASSERT(fRName[0]);
 
     // make file name
     string_path fname;
@@ -306,17 +304,12 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     ELog.Msg(mtError, "Can't find texture '%s'", fname);
     return 0;
 #else
-
     Msg("! Can't find texture '%s'", fname);
     dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
     if (!ShadowOfChernobylMode)
         R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
     if (!dummyTextureExist)
         return nullptr;
-    goto _DDS;
-
-//  xrDebug::Fatal(DEBUG_INFO,"Can't find texture '%s'",fname);
-
 #endif
 
 _DDS:
@@ -329,51 +322,39 @@ _DDS:
 #endif // DEBUG
     R_ASSERT(S);
 
-    R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_NONE, &IMG, texture), fn);
+    R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_PERMISSIVE, &IMG, texture), fn);
 
-    if (IMG.IsCubemap())
-        goto _DDS_CUBE;
-    else
-        goto _DDS_2D;
-
-_DDS_CUBE:
-{
-    R_CHK(CreateTextureEx(HW.pDevice, texture.GetImages(), texture.GetImageCount(), IMG, D3D_USAGE_IMMUTABLE,
-        D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT, &pTexture2D));
-    FS.r_close(S);
-
-    // OK
-    mip_cnt = IMG.mipLevels;
-    ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-    return pTexture2D;
-}
-_DDS_2D:
-{
     // Check for LMAP and compress if needed
     xr_strlwr(fn);
 
     img_loaded_lod = get_texture_load_lod(fn);
 
     size_t mip_lod = 0;
-    if (img_loaded_lod)
+    if (img_loaded_lod && !IMG.IsCubemap())
     {
         const auto old_mipmap_cnt = IMG.mipLevels;
-        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod, DirectX::IsCompressed(IMG.format));
+        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod);
         mip_lod = old_mipmap_cnt - IMG.mipLevels;
     }
 
-    R_CHK(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
+    // DirectX requires compressed texture size to be
+    // a multiple of 4. Make sure to meet this requirement.
+    if (DirectX::IsCompressed(IMG.format))
+    {
+        IMG.width = (IMG.width + 3u) & ~0x3u;
+        IMG.height = (IMG.height + 3u) & ~0x3u;
+    }
+
+    R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
         D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
-        &pTexture2D)
+        &pTexture2D), fn
     );
-
-
     FS.r_close(S);
-    mip_cnt = IMG.mipLevels;
+
     // OK
+    mip_cnt = IMG.mipLevels;
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture2D;
-}
 }
 
 _BUMP_from_base:
@@ -386,8 +367,7 @@ _BUMP_from_base:
         R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
         S = FS.r_open(fn);
         R_ASSERT2(S, fn);
-        img_size = S->length();
-        goto _DDS_2D;
+        goto _DDS;
     }
     if (strstr(fname, "_bump"))
     {
@@ -395,12 +375,10 @@ _BUMP_from_base:
         S = FS.r_open(fn);
 
         R_ASSERT2(S, fn);
-
-        img_size = S->length();
-        goto _DDS_2D;
+        goto _DDS;
     }
     //////////////////
 }
 
-    return 0;
+    return nullptr;
 }

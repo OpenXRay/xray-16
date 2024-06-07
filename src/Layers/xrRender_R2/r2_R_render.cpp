@@ -10,6 +10,9 @@
 
 void CRender::RenderMenu()
 {
+#if defined(USE_DX11)
+    TracyD3D11Zone(HW.profiler_ctx, "render_menu");
+#endif
     PIX_EVENT(render_menu);
     //	Globals
     RCache.set_CullMode(CULL_CCW);
@@ -44,7 +47,7 @@ void CRender::RenderMenu()
     p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
     FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, Target->g_menu->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
     pv++;
     pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -72,13 +75,15 @@ void CRender::RenderMenu()
 extern u32 g_r;
 void CRender::Render()
 {
+    ZoneScoped;
+#if defined(USE_DX11)
+    TracyD3D11Zone(HW.profiler_ctx, "Render");
+#endif
     PIX_EVENT(CRender_Render);
 
     g_r = 1;
 
-#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal(RCache);
-#endif
 
     IMainMenu* pMainMenu = g_pGamePersistent ? g_pGamePersistent->m_pMainMenu : 0;
     bool bMenu = pMainMenu ? pMainMenu->CanSkipSceneRendering() : false;
@@ -87,9 +92,7 @@ void CRender::Render()
     // if (!(g_pGameLevel && g_hud) || bMenu)
     if (!g_pGameLevel || bMenu)
     {
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: probably we can just enable this on DX9 too
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
-#endif
         return;
     }
 
@@ -316,7 +319,6 @@ void CRender::Render()
         Lights_LastFrame.clear();
     }
 
-#if defined(USE_DX11) || defined(USE_OGL)
     // full screen pass to mark msaa-edge pixels in highest stencil bit
     if (o.msaa)
     {
@@ -325,7 +327,6 @@ void CRender::Render()
     }
 
     r_rain.sync();
-#endif // !USE_DX9
 
     // Directional light - fucking sun
     {
@@ -345,10 +346,6 @@ void CRender::Render()
         dsgraph.cmd_list.set_xform_project(Device.mProject);
         dsgraph.cmd_list.set_xform_view(Device.mView);
         // Stencil - write 0x1 at pixel pos -
-#if defined(USE_DX9)
-        RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
-            D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
-#elif defined(USE_DX11) || defined(USE_OGL)
         if (!o.msaa)
         {
             dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
@@ -359,7 +356,6 @@ void CRender::Render()
             dsgraph.cmd_list.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0x7f,
                 D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         }
-#endif // USE_DX9
         dsgraph.cmd_list.set_CullMode(CULL_CCW);
         dsgraph.cmd_list.set_ColorWriteEnable();
         dsgraph.render_emissive();
@@ -383,11 +379,15 @@ void CRender::Render()
         Target->phase_combine();
     }
 
+    if (Details)
+        Details->details_clear();
+
     VERIFY(dsgraph.mapDistort.empty());
 }
 
 void CRender::render_forward()
 {
+    ZoneScoped;
     auto& dsgraph = get_imm_context();
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)

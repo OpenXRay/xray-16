@@ -7,7 +7,6 @@
 #include "ExtendedGeom.h"
 #include "dRayMotions.h"
 #include "PHCollideValidator.h"
-#include "xrEngine/GameMtlLib.h"
 #include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
@@ -45,6 +44,7 @@ IPHWorld* physics_world() { return ph_world; }
 void create_physics_world(
     bool mt, CObjectSpace* os, CObjectList* lo) // IPHWorldUpdateCallbck &commander,
 {
+    ZoneScoped;
     ph_world = xr_new<CPHWorld>(); //&commander
     VERIFY(os);
     //		VERIFY( lo );
@@ -53,30 +53,11 @@ void create_physics_world(
 
 void destroy_physics_world()
 {
+    ZoneScoped;
     ph_world->Destroy();
     xr_delete(ph_world);
 }
 
-CObjectSpace* create_object_space()
-{
-    // CFileReader* fr =	new CFileReader("D:/STALKER/resources/gamedata/levels/stohe_selo/level.cform");
-    CFileReader* fr = xr_new<CFileReader>("ActorEditorLevel.cform");
-    CObjectSpace* os = xr_new<CObjectSpace>();
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    os->Load(fr, nullptr, nullptr, nullptr);
-    // xr_delete(fr);
-    return os;
-}
-CObjectSpace* mesh_create_object_space(
-    Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB::build_callback build_callback)
-{
-    CObjectSpace* os = xr_new<CObjectSpace>();
-    g_SpatialSpace = xr_new<ISpatial_DB>("Spatial obj");
-    g_SpatialSpacePhysic = xr_new<ISpatial_DB>("Spatial phys");
-    os->Create(verts, tris, H, build_callback, nullptr, nullptr);
-    return os;
-}
 void destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
 void CPHMesh::Create(dSpaceID space, dWorldID world)
 {
@@ -152,6 +133,8 @@ void CPHWorld::SetStep(float s)
 }
 void CPHWorld::Create(bool mt, CObjectSpace* os, CObjectList* lo)
 {
+    ZoneScoped;
+
     LoadParams();
     dWorldID phWorld = 0;
     m_object_space = os;
@@ -205,6 +188,8 @@ dVector3 center			=	{level_center.x,0.f,level_center.z};
 
 void CPHWorld::Destroy()
 {
+    ZoneScoped;
+
     r_spatial.clear();
     // xr_delete(m_commander);
     Mesh.Destroy();
@@ -234,6 +219,7 @@ void CPHWorld::SetGravity(float g)
 
 void CPHWorld::OnFrame()
 {
+    ZoneScoped;
     stats.FrameStart();
 // Msg									("------------- physics: %d / %d",u32(Device.dwFrame),u32(m_steps_num));
 //calculate the flight of bullets

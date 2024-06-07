@@ -287,6 +287,8 @@ void CActor::cam_Update(float dt, float fFOV)
     if (m_holder)
         return;
 
+    ZoneScoped;
+
     if ((mstate_real & mcClimb) && (cam_active != eacFreeLook))
         camUpdateLadder(dt);
     on_weapon_shot_update();
@@ -321,7 +323,7 @@ void CActor::cam_Update(float dt, float fFOV)
     }
 
     Fvector point = { 0, CurrentHeight + current_ik_cam_shift, 0 };
-    Fvector dangle = {0, 0, 0};
+    Fvector dangle = { 0, 0, 0 };
     Fmatrix xform;
     xform.setXYZ(0, r_torso.yaw, 0);
     xform.translate_over(XFORM().c);
@@ -380,7 +382,7 @@ void CActor::cam_Update(float dt, float fFOV)
         cameras[eacFirstEye]->Update(point, dangle);
         cameras[eacFirstEye]->f_fov = fFOV;
     }
-    
+
     if (FirstPersonBodyActive() && !g_Alive()) // override camera position / direction for first person body on death
     {
         float timeScalar = Device.dwTimeGlobal > m_fpDeathCamOfffsetTime ? 1.0f : (float)(1000 - (m_fpDeathCamOfffsetTime - Device.dwTimeGlobal)) / 1000.f;
@@ -393,16 +395,10 @@ void CActor::cam_Update(float dt, float fFOV)
         cameras[eacFirstEye]->vPosition.lerp(cameras[eacFirstEye]->vPosition, fpDeathPos, timeScalar);
     }
     if (!FirstPersonBodyActive() && Level().CurrentEntity() == this)
+    {
         collide_camera(*cameras[eacFirstEye], _viewport_near, this);
-
-    if (psActorFlags.test(AF_PSP))
-    {
-        Cameras().UpdateFromCamera(C);
     }
-    else
-    {
-        Cameras().UpdateFromCamera(cameras[eacFirstEye]);
-    }
+    Cameras().UpdateFromCamera(C);
 
     fCurAVelocity = vPrevCamDir.sub(cameras[eacFirstEye]->vDirection).magnitude() / Device.fTimeDelta;
     vPrevCamDir = cameras[eacFirstEye]->vDirection;
@@ -417,7 +413,6 @@ void CActor::cam_Update(float dt, float fFOV)
 
     if (Level().CurrentEntity() == this)
     {
-        Level().Cameras().UpdateFromCamera(C);
         const bool allow = !Level().Cameras().GetCamEffector(cefDemo) && !Level().Cameras().GetCamEffector(cefAnsel);
         if (eacFirstEye == cam_active && allow)
         {

@@ -98,6 +98,11 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_Sampler("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_Sampler("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
 
+        C.r_Sampler("s_puddles_normal", "fx\\water_normal");
+        C.r_Sampler("s_puddles_perlin", "fx\\puddles_perlin");
+        C.r_Sampler("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
+        C.r_Sampler("s_rainsplash", "fx\\water_sbumpvolume");
+
         if (C.bUseSteepParallax)
         {
             C.r_Sampler("s_dn_rX", strconcat(sizeof(mask), mask, oR_Name, "_bump#"));
@@ -224,6 +229,11 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
         C.r_dx11Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_dx11Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
+
+        C.r_dx11Texture("s_puddles_normal", "fx\\water_normal");
+        C.r_dx11Texture("s_puddles_perlin", "fx\\puddles_perlin");
+        C.r_dx11Texture("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
+        C.r_dx11Texture("s_rainsplash", "fx\\water_sbumpvolume");
 
         if (C.bUseSteepParallax)
         {

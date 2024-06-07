@@ -12,14 +12,11 @@
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
 
-ISpatial_DB* g_SpatialSpace = NULL;
-ISpatial_DB* g_SpatialSpacePhysic = NULL;
-
 Fvector c_spatial_offset[8] = {
     {-1, -1, -1}, {1, -1, -1}, {-1, 1, -1}, {1, 1, -1}, {-1, -1, 1}, {1, -1, 1}, {-1, 1, 1}, {1, 1, 1}};
 
 //////////////////////////////////////////////////////////////////////////
-SpatialBase::SpatialBase(ISpatial_DB* space)
+SpatialBase::SpatialBase(ISpatial_DB& space)
 {
     spatial.sphere.P.set(0, 0, 0);
     spatial.sphere.R = 0;
@@ -27,7 +24,7 @@ SpatialBase::SpatialBase(ISpatial_DB* space)
     spatial.node_radius = 0;
     spatial.node_ptr = NULL;
     spatial.sector_id = IRender_Sector::INVALID_SECTOR_ID;
-    spatial.space = space;
+    spatial.space = &space;
 }
 SpatialBase::~SpatialBase(void) { spatial_unregister(); }
 bool SpatialBase::spatial_inside()
@@ -99,6 +96,7 @@ void SpatialBase::spatial_unregister()
 
 void SpatialBase::spatial_move()
 {
+    ZoneScoped;
     if (spatial.node_ptr)
     {
         //*** somehow it was determined that object has been moved
@@ -119,6 +117,7 @@ void SpatialBase::spatial_move()
 
 void SpatialBase::spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id)
 {
+    ZoneScoped;
     spatial.type &= ~STYPEFLAG_INVALIDSECTOR;
     if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         spatial.sector_id = sector_id;
@@ -151,12 +150,11 @@ void ISpatial_NODE::_remove(ISpatial* S)
 
 //////////////////////////////////////////////////////////////////////////
 
-ISpatial_DB::ISpatial_DB(const char* name) :
+ISpatial_DB::ISpatial_DB(pcstr name)
 #ifdef CONFIG_PROFILE_LOCKS
-    cs(MUTEX_PROFILE_ID(ISpatial_DB)),
+    : cs(MUTEX_PROFILE_ID(ISpatial_DB)),
 #endif // CONFIG_PROFILE_LOCKS
-    rt_insert_object(nullptr), m_root(nullptr),
-    m_bounds(0), q_result(nullptr)
+
 {
     xr_strcpy(Name, name);
 }
@@ -175,8 +173,10 @@ ISpatial_DB::~ISpatial_DB()
     }
 }
 
-void ISpatial_DB::initialize(Fbox& BB)
+void ISpatial_DB::initialize(const Fbox& BB)
 {
+    ZoneScoped;
+
     // initialize
     Fvector bbc, bbd;
     BB.get_CD(bbc, bbd);

@@ -2,11 +2,9 @@
 #define _FVF_H_
 #pragma once
 
-#if defined(USE_DX9)
-#   define FVF_COLOR(c) (c)
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
 #   define FVF_COLOR(c) ((c & 0xff00ff00) | ((c >> 16) & 0xff) | ((c & 0xff) << 16u))
-#elif defined(USE_OGL) //the compiler should know to dedup this, defined explicitly for organization
+#elif defined(USE_OGL)
 #   define FVF_COLOR(c) (c)
 #else
 #   error No graphics API selected or enabled!

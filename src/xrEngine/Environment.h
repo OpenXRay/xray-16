@@ -1,6 +1,4 @@
 #pragma once
-#ifndef EnvironmentH
-#define EnvironmentH
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/EnvironmentRender.h"
@@ -254,32 +252,34 @@ public:
 protected:
     CPerlinNoise1D* PerlinNoise1D;
 
-    float fGameTime;
+    float fGameTime{};
 
 public:
     FactoryPtr<IEnvironmentRender> m_pRender;
 
-    float wind_strength_factor;
-    float wind_gust_factor;
+    float wind_strength_factor{};
+    float wind_gust_factor{};
+
+    float wetness_factor{};
 
     // wind blast params
-    float wind_blast_strength;
-    Fvector wind_blast_direction;
+    float wind_blast_strength{};
+    Fvector wind_blast_direction{};
     Fquaternion wind_blast_start_time;
     Fquaternion wind_blast_stop_time;
-    float wind_blast_strength_start_value;
-    float wind_blast_strength_stop_value;
+    float wind_blast_strength_start_value{};
+    float wind_blast_strength_stop_value{};
     Fquaternion wind_blast_current;
 
     // Environments
     CEnvDescriptorMixer CurrentEnv;
-    CEnvDescriptor* Current[2];
+    CEnvDescriptor* Current[2]{};
 
-    bool bWFX;
+    bool bWFX{};
     float wfx_time;
     CEnvDescriptor* WFX_end_desc[2];
 
-    EnvVec* CurrentWeather;
+    EnvVec* CurrentWeather{};
     shared_str CurrentWeatherName;
     shared_str CurrentCycleName;
 
@@ -288,9 +288,9 @@ public:
     xr_vector<CEnvModifier> Modifiers;
     EnvAmbVec Ambients;
 
-    CEffect_Rain* eff_Rain;
-    CLensFlare* eff_LensFlare;
-    CEffect_Thunderbolt* eff_Thunderbolt;
+    CEffect_Rain* eff_Rain{};
+    CLensFlare* eff_LensFlare{};
+    CEffect_Thunderbolt* eff_Thunderbolt{};
 
     float fTimeFactor;
 
@@ -345,9 +345,9 @@ public:
     // editor-related
     void ED_Reload();
 
-    CInifile* m_ambients_config;
-    CInifile* m_sound_channels_config;
-    CInifile* m_effects_config;
+    CInifile* m_ambients_config{};
+    CInifile* m_sound_channels_config{};
+    CInifile* m_effects_config{};
 
 protected:
     virtual CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile const* config, pcstr section = nullptr);
@@ -363,5 +363,3 @@ protected:
 ENGINE_API extern Flags32 psEnvFlags;
 ENGINE_API extern float psVisDistance;
 ENGINE_API extern float SunshaftsIntensity;
-
-#endif // EnvironmentH

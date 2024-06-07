@@ -21,7 +21,7 @@ void CUIGameAHunt::Init(int stage)
     if (stage == 0)
     { // shared
         inherited::Init(stage);
-        m_buy_msg_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_ah_buy", Window);
+        m_buy_msg_caption = UIHelper::CreateStatic(*MsgConfig, "mp_ah_buy", Window);
     }
     if (stage == 1)
     { // unique
@@ -31,16 +31,16 @@ void CUIGameAHunt::Init(int stage)
         uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_ahunt.xml");
 
         CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
-        CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
+        CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
 
-        m_pReinforcementInidcator = xr_new<CUITextWnd>();
+        m_pReinforcementInidcator = xr_new<CUIStatic>("Reinforcement indicator");
         m_pReinforcementInidcator->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
+        CUIXmlInit::InitStatic(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
 
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
-        CUIXmlInit::InitTextWnd(uiXml, "team1_score", 0, m_team1_score);
-        CUIXmlInit::InitTextWnd(uiXml, "team2_score", 0, m_team2_score);
+        CUIXmlInit::InitStatic(uiXml, "team1_score", 0, m_team1_score);
+        CUIXmlInit::InitStatic(uiXml, "team2_score", 0, m_team2_score);
 
         m_pMoneyIndicator->InitFromXML(uiXml);
         m_pRankIndicator->InitFromXml(uiXml);

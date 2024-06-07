@@ -66,19 +66,7 @@ class cl_texgen : public R_constant_setup
     {
         Fmatrix mTexgen;
 
-#if defined(USE_DX9)
-        float _w = float(Device.dwWidth);
-        float _h = float(Device.dwHeight);
-        float o_w = (.5f / _w);
-        float o_h = (.5f / _h);
-        Fmatrix mTexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-        };
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
         Fmatrix mTexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -110,19 +98,7 @@ class cl_VPtexgen : public R_constant_setup
     {
         Fmatrix mTexgen;
 
-#if defined(USE_DX9)
-        float _w = float(Device.dwWidth);
-        float _h = float(Device.dwHeight);
-        float o_w = (.5f / _w);
-        float o_h = (.5f / _h);
-        Fmatrix mTexelAdjust =
-        {
-            0.5f, 0.0f, 0.0f, 0.0f,
-            0.0f, -0.5f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f
-        };
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
         Fmatrix mTexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -191,7 +167,7 @@ class cl_fog_params : public R_constant_setup
             float n = g_pGamePersistent->Environment().CurrentEnv.fog_near;
             float f = g_pGamePersistent->Environment().CurrentEnv.fog_far;
             float r = 1 / (f - n);
-            result.set(-n * r, r, r, r);
+            result.set(-n * r, n, f, r);
         }
         cmd_list.set_c(C, result);
     }
@@ -208,7 +184,7 @@ class cl_fog_color : public R_constant_setup
         if (marker != Device.dwFrame)
         {
             const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
-            result.set(desc.fog_color.x, desc.fog_color.y, desc.fog_color.z, 0);
+            result.set(desc.fog_color.x, desc.fog_color.y, desc.fog_color.z, desc.fog_density);
         }
         cmd_list.set_c(C, result);
     }
@@ -387,6 +363,260 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
 };
 static cl_entity_data binder_entity_data;
 
+// Ascii1457's Screen Space Shaders
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
+extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API int ps_ssfx_is_underground;
+extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
+
+class cl_inv_v : public R_constant_setup
+{
+    Fmatrix result;
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        result.invert(Device.mView);
+        cmd_list.set_c(C, result);
+    }
+};
+static cl_inv_v binder_inv_v;
+
+class cl_rain_params : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        float rainDensity = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+        float rainWetness = g_pGamePersistent->Environment().wetness_factor;
+        cmd_list.set_c(C, rainDensity, rainWetness, 0.0f, 0.0f);
+    }
+};
+static cl_rain_params binder_rain_params;
+
+class pp_image_corrections : public R_constant_setup
+{
+    virtual void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_r2_img_exposure, ps_r2_img_gamma, ps_r2_img_saturation, 1.f);
+    }
+};
+static pp_image_corrections binder_image_corrections;
+
+class pp_color_grading : public R_constant_setup
+{
+    virtual void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_r2_img_cg.x, ps_r2_img_cg.y, ps_r2_img_cg.z, 1.f);
+    }
+};
+static pp_color_grading binder_color_grading;
+
+class cl_sky_color : public R_constant_setup
+{
+    u32 marker;
+    Fvector4 result;
+
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        if (marker != Device.dwFrame)
+        {
+            CEnvDescriptor& desc = g_pGamePersistent->Environment().CurrentEnv;
+            result.set(desc.sky_color.x, desc.sky_color.y, desc.sky_color.z, desc.sky_rotation);
+        }
+        cmd_list.set_c(C, result);
+    }
+};
+static cl_sky_color binder_sky_color;
+
+//Sneaky debug stuff
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
+
+static class dev_param_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_1.x, ps_dev_param_1.y, ps_dev_param_1.z, ps_dev_param_1.w);
+    }
+} dev_param_1;
+
+static class dev_param_2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_2.x, ps_dev_param_2.y, ps_dev_param_2.z, ps_dev_param_2.w);
+    }
+} dev_param_2;
+
+static class dev_param_3 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_3.x, ps_dev_param_3.y, ps_dev_param_3.z, ps_dev_param_3.w);
+    }
+} dev_param_3;
+
+static class dev_param_4 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_4.x, ps_dev_param_4.y, ps_dev_param_4.z, ps_dev_param_4.w);
+    }
+} dev_param_4;
+
+static class dev_param_5 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_5.x, ps_dev_param_5.y, ps_dev_param_5.z, ps_dev_param_5.w);
+    }
+} dev_param_5;
+
+static class dev_param_6 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_6.x, ps_dev_param_6.y, ps_dev_param_6.z, ps_dev_param_6.w);
+    }
+} dev_param_6;
+
+static class dev_param_7 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_7.x, ps_dev_param_7.y, ps_dev_param_7.z, ps_dev_param_7.w);
+    }
+} dev_param_7;
+
+static class dev_param_8 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_dev_param_8.x, ps_dev_param_8.y, ps_dev_param_8.z, ps_dev_param_8.w);
+    }
+} dev_param_8;
+
+class ssfx_wpn_dof_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_wpn_dof_1.x, ps_ssfx_wpn_dof_1.y, ps_ssfx_wpn_dof_1.z, ps_ssfx_wpn_dof_1.w);
+    }
+};
+static ssfx_wpn_dof_1 binder_ssfx_wpn_dof_1;
+
+class ssfx_wpn_dof_2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_wpn_dof_2.x, ps_ssfx_wpn_dof_2.y, ps_ssfx_wpn_dof_2.z, ps_ssfx_wpn_dof_2.w);
+    }
+};
+static ssfx_wpn_dof_2 binder_ssfx_wpn_dof_2;
+
+class ssfx_blood_decals : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_blood_decals);
+    }
+};
+static ssfx_blood_decals binder_ssfx_blood_decals;
+
+class ssfx_hud_drops_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_hud_drops_1);
+    }
+};
+static ssfx_hud_drops_1 binder_ssfx_hud_drops_1;
+
+class ssfx_hud_drops_2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_hud_drops_2);
+    }
+};
+static ssfx_hud_drops_2 binder_ssfx_hud_drops_2;
+
+class ssfx_lightsetup_1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_lightsetup_1);
+	}
+};
+static ssfx_lightsetup_1 binder_ssfx_lightsetup_1;
+
+class ssfx_is_underground : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, (float)ps_ssfx_is_underground, 0.f, 0.f, 0.f);
+	}
+};
+static ssfx_is_underground binder_ssfx_is_underground;
+
+class ssfx_wetsurfaces_1 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_wetsurfaces_1);
+	}
+};
+static ssfx_wetsurfaces_1 binder_ssfx_wetsurfaces_1;
+
+class ssfx_wetsurfaces_2 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_wetsurfaces_2);
+	}
+};
+static ssfx_wetsurfaces_2 binder_ssfx_wetsurfaces_2;
+
+class ssfx_gloss : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_gloss_minmax.x, ps_ssfx_gloss_minmax.y, ps_ssfx_gloss_factor, 0.f);
+	}
+};
+static ssfx_gloss binder_ssfx_gloss;
+
+class ssfx_florafixes_1 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_florafixes_1);
+	}
+};
+static ssfx_florafixes_1 binder_ssfx_florafixes_1;
+
+class ssfx_florafixes_2 : public R_constant_setup
+{
+	void setup(CBackend& cmd_list, R_constant* C) override
+	{
+		cmd_list.set_c(C, ps_ssfx_florafixes_2);
+	}
+};
+static ssfx_florafixes_2 binder_ssfx_florafixes_2;
+
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
@@ -466,4 +696,34 @@ void CBlender_Compile::SetMapping()
         std::pair<shared_str, R_constant_setup*> cs = RImplementation.Resources->v_constant_setup[it];
         r_Constant(*cs.first, cs.second);
     }
+
+    // Anomaly
+    r_Constant("rain_params", &binder_rain_params);
+    r_Constant("pp_img_corrections", &binder_image_corrections);
+    r_Constant("pp_img_cg", &binder_color_grading);
+    r_Constant("m_inv_V", &binder_inv_v);
+
+    r_Constant("shader_param_1", &dev_param_1);
+    r_Constant("shader_param_2", &dev_param_2);
+    r_Constant("shader_param_3", &dev_param_3);
+    r_Constant("shader_param_4", &dev_param_4);
+    r_Constant("shader_param_5", &dev_param_5);
+    r_Constant("shader_param_6", &dev_param_6);
+    r_Constant("shader_param_7", &dev_param_7);
+    r_Constant("shader_param_8", &dev_param_8);
+
+    // Ascii1457's Screen Space Shaders
+    r_Constant("sky_color", &binder_sky_color);
+    r_Constant("ssfx_wpn_dof_1", &binder_ssfx_wpn_dof_1);
+    r_Constant("ssfx_wpn_dof_2", &binder_ssfx_wpn_dof_2);
+    r_Constant("ssfx_blood_decals", &binder_ssfx_blood_decals);
+    r_Constant("ssfx_hud_drops_1", &binder_ssfx_hud_drops_1);
+    r_Constant("ssfx_hud_drops_2", &binder_ssfx_hud_drops_2);
+	r_Constant("ssfx_lightsetup_1", &binder_ssfx_lightsetup_1);
+	r_Constant("ssfx_is_underground", &binder_ssfx_is_underground);
+	r_Constant("ssfx_wetsurfaces_1", &binder_ssfx_wetsurfaces_1);
+	r_Constant("ssfx_wetsurfaces_2", &binder_ssfx_wetsurfaces_2);
+	r_Constant("ssfx_gloss", &binder_ssfx_gloss);
+	r_Constant("ssfx_florafixes_1", &binder_ssfx_florafixes_1);
+	r_Constant("ssfx_florafixes_2", &binder_ssfx_florafixes_2);
 }

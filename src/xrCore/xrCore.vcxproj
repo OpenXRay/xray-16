@@ -23,7 +23,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)lzo\include;$(xrSdkDir)include\mimalloc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID=$(APPVEYOR_BUILD_ID);APPVEYOR_BUILD_VERSION=$(APPVEYOR_BUILD_VERSION);APPVEYOR_ACCOUNT_NAME=$(APPVEYOR_ACCOUNT_NAME);GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID=$(GITHUB_RUN_ID);GITHUB_RUN_NUMBER=$(GITHUB_RUN_NUMBER);GITHUB_REPOSITORY=$(GITHUB_REPOSITORY);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";TRACY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>DbgHelp.lib;FaultRep.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -41,6 +41,9 @@ call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Externals\tracy\public\TracyClient.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Animation\Bone.cpp" />
     <ClCompile Include="Animation\BoneEditor.cpp" />
     <ClCompile Include="Animation\Envelope.cpp" />
@@ -55,6 +58,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Compression\ppmd_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor.cpp" />
     <ClCompile Include="Compression\rt_compressor9.cpp" />
+    <ClCompile Include="Math\fast_lc16.cpp" />
     <ClCompile Include="Media\ImageJPEG.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="Crypto\trivial_encryptor.cpp" />
@@ -91,7 +95,6 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Threading\Event.cpp" />
     <ClCompile Include="Threading\ScopeLock.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
-    <ClCompile Include="Threading\Task.cpp" />
     <ClCompile Include="Threading\TaskManager.cpp" />
     <ClCompile Include="Threading\ThreadUtil.cpp" />
     <ClCompile Include="XML\tinystr.cpp" />
@@ -177,6 +180,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
+    <ClInclude Include="Math\fast_lc16.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
@@ -278,14 +282,14 @@ call .GitInfo.cmd</Command>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

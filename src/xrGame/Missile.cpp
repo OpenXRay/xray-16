@@ -24,6 +24,7 @@
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "ui/UIXmlInit.h"
 #include "PhysicsShellHolder.h"
+#include "GamePersistent.h"
 
 CUIProgressShape* g_MissileForceShape = NULL;
 
@@ -188,8 +189,6 @@ void CMissile::OnH_B_Independent(bool just_before_destroy)
     }
 }
 
-extern u32 hud_adj_mode;
-
 void CMissile::UpdateCL()
 {
     m_dwStateTime += Device.dwTimeDelta;
@@ -199,7 +198,7 @@ void CMissile::UpdateCL()
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (pActor && !pActor->AnyMove() && this == pActor->inventory().ActiveItem())
     {
-        if (hud_adj_mode == 0 && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000))
+        if (!GamePersistent().GetHudTuner().is_active() && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000))
         {
             SwitchState(eBore);
             ResetSubStateTime();

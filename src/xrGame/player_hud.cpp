@@ -7,8 +7,8 @@
 #include "static_cast_checked.hpp"
 #include "ActorEffector.h"
 #include "WeaponMagazinedWGrenade.h" // XXX: move somewhere
+#include "GamePersistent.h"
 
-extern u32 hud_adj_mode;
 player_hud* g_player_hud = nullptr;
 extern ENGINE_API shared_str current_player_hud_sect;
 // clang-format off
@@ -131,7 +131,7 @@ void attachable_hud_item::update(bool bForce)
         reload_measures();
     }
 
-    if (hud_adj_mode > 0)
+    if (GamePersistent().GetHudTuner().is_active())
         m_measures.update(m_attach_offset);
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
@@ -199,7 +199,6 @@ bool attachable_hud_item::need_renderable() const { return m_parent_hud_item->ne
 void attachable_hud_item::render(u32 context_id, IRenderable* root)
 {
     GEnv.Render->add_Visual(context_id, root, m_model->dcast_RenderVisual(), m_item_transform);
-    debug_draw_firedeps();
     m_parent_hud_item->render_hud_mode();
 }
 
@@ -387,9 +386,9 @@ attachable_hud_item::attachable_hud_item(player_hud* parent, const shared_str& s
         m_visual_name = pSettings->r_string(m_sect_name, "visual");
     }
     R_ASSERT3(!m_visual_name.empty(), "Missing 'item_visual' from weapon hud section.", m_sect_name.c_str());
-
+    GEnv.Render->hud_loading = true;
     m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(m_visual_name.c_str()));
-
+    GEnv.Render->hud_loading = false;
     m_attach_place_idx = pSettings->read_if_exists<u16>(m_sect_name, "attach_place_idx", 0);
 
     IKinematicsAnimated* animatedHudItem;
@@ -539,7 +538,9 @@ void player_hud::load(const shared_str& player_hud_sect)
     }
 
     const shared_str& model_name = pSettings->r_string(m_sect_name, "visual");
+    GEnv.Render->hud_loading = true;
     m_model = smart_cast<IKinematicsAnimated*>(GEnv.Render->model_Create(model_name.c_str()));
+    GEnv.Render->hud_loading = false;
     load_ancors();
     // Msg("hands visual changed to [%s] [%s] [%s]", model_name.c_str(), b_reload ? "R" : "", m_attached_items[0] ? "Y" : "");
 

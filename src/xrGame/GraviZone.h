@@ -18,7 +18,6 @@ class CBaseGraviZone : public CCustomZone
 
 public:
     CBaseGraviZone(void);
-    virtual ~CBaseGraviZone(void);
 
     virtual void Load(LPCSTR section);
 
@@ -56,7 +55,7 @@ protected:
     float m_fTeleHeight;
     u32 m_dwTimeToTele;
     u32 m_dwTelePause;
-    u32 m_dwTeleTime;
+    u32 m_dwTeleTime{};
 
     //имя партиклов телекинеза
     void PlayTeleParticles(CGameObject* pObject);

@@ -36,6 +36,8 @@ void CLevelDebug::debug_info_up()
 void CLevelDebug::debug_info_down() { m_texttree_offs++; }
 void CLevelDebug::draw_debug_text()
 {
+    ZoneScoped;
+
     int column_size = 1024 / 3;
     int y_start = 50;
     int x_start = 5;

@@ -459,16 +459,16 @@ void CUIActorMenu::InitSounds(CUIXml& uiXml)
 {
     XML_NODE stored_root = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
-    GEnv.Sound->create(sounds[eSndOpen], uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eSndClose], uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemToSlot], uiXml.Read("snd_item_to_slot", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemToBelt], uiXml.Read("snd_item_to_belt", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemToRuck], uiXml.Read("snd_item_to_ruck", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eProperties], uiXml.Read("snd_properties", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eDropItem], uiXml.Read("snd_drop_item", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eAttachAddon], uiXml.Read("snd_attach_addon", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eDetachAddon], uiXml.Read("snd_detach_addon", 0, NULL), st_Effect, sg_SourceType);
-    GEnv.Sound->create(sounds[eItemUse], uiXml.Read("snd_item_use", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eSndOpen].create(uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eSndClose].create(uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eItemToSlot].create(uiXml.Read("snd_item_to_slot", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eItemToBelt].create(uiXml.Read("snd_item_to_belt", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eItemToRuck].create(uiXml.Read("snd_item_to_ruck", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eProperties].create(uiXml.Read("snd_properties", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eDropItem].create(uiXml.Read("snd_drop_item", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eAttachAddon].create(uiXml.Read("snd_attach_addon", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eDetachAddon].create(uiXml.Read("snd_detach_addon", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eItemUse].create(uiXml.Read("snd_item_use", 0, NULL), st_Effect, sg_SourceType);
     uiXml.SetLocalRoot(stored_root);
 }
 

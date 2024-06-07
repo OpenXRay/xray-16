@@ -24,7 +24,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -967,6 +967,7 @@
     <ClInclude Include="physic_item_inline.h" />
     <ClInclude Include="player_account.h" />
     <ClInclude Include="player_hud.h" />
+    <ClInclude Include="player_hud_tune.h" />
     <ClInclude Include="player_name_modifyer.h" />
     <ClInclude Include="player_spot_params.h" />
     <ClInclude Include="player_state_achilles_heel.h" />
@@ -1038,9 +1039,6 @@
     <ClInclude Include="saved_game_wrapper_inline.h" />
     <ClInclude Include="ScientificOutfit.h" />
     <ClInclude Include="Scope.h" />
-    <ClInclude Include="screenshots_common.h" />
-    <ClInclude Include="screenshots_writer.h" />
-    <ClInclude Include="screenshot_manager.h" />
     <ClInclude Include="screenshot_server.h" />
     <ClInclude Include="ScriptXMLInit.h" />
     <ClInclude Include="script_abstract_action.h" />
@@ -1443,6 +1441,7 @@
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
     <ClInclude Include="xrClientsPool.h" />
+    <ClInclude Include="xrGame.h" />
     <ClInclude Include="xrGameSpyServer.h" />
     <ClInclude Include="xrGameSpyServer_callbacks.h" />
     <ClInclude Include="xrServer.h" />
@@ -2719,9 +2718,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="screenshots_common.cpp" />
-    <ClCompile Include="screenshots_writer.cpp" />
-    <ClCompile Include="screenshot_manager.cpp" />
     <ClCompile Include="screenshot_server.cpp" />
     <ClCompile Include="ScriptXMLInit.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3492,9 +3488,6 @@
     <ProjectReference Include="$(SolutionDir)xrNetServer\xrNetServer.vcxproj">
       <Project>{435bac9a-b225-457d-ab40-c9bd0cc8838c}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)cximage\cximage.vcxproj">
-      <Project>{880cd250-ba77-4daf-a8d4-552f12dd3ae4}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrAICore\xrAICore.vcxproj">
       <Project>{5cb057d8-4464-40a6-af10-c26b826d1d90}</Project>
     </ProjectReference>
@@ -3531,6 +3524,9 @@
     <ProjectReference Include="..\..\Externals\imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
@@ -3540,14 +3536,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.28.4\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.28.4\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.28.5\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.28.5\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

@@ -74,27 +74,25 @@ void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, LPCSTR section
 {
     result.clear();
 
-    CInifile* Ini = pGameIni;
+    const CInifile* Ini = pGameIni;
 
     LPCSTR N, V;
-    u32 k;
-    shared_str temp;
-    LPCSTR section = section_name;
-    R_ASSERT(Ini->section_exist(section));
+    u32 k = 0;
+    R_ASSERT(Ini->section_exist(section_name));
 
-    for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
+    result.reserve(Ini->line_count(section_name) + 1);
+    while (Ini->r_line(section_name, k, &N, &V))
     {
-        temp = Ini->r_string_wb(section, N);
+        const shared_str& temp = Ini->r_string_wb(section_name, N);
 
         R_ASSERT3(!strchr(*temp, ' '), invalid_id_description, *temp);
         R_ASSERT2(xr_strcmp(*temp, INVALID_ID_STRING), invalid_id_redefinition);
 
-        STORY_PAIRS::const_iterator I = result.begin();
-        STORY_PAIRS::const_iterator E = result.end();
-        for (; I != E; ++I)
-            R_ASSERT3((*I).first != temp, duplicated_id_description, *temp);
+        for (const auto& story : result)
+            R_ASSERT3(story.first != temp, duplicated_id_description, *temp);
 
         result.emplace_back(*temp, atoi(N));
+        ++k;
     }
 
     result.emplace_back(INVALID_ID_STRING, INVALID_ID);

@@ -56,4 +56,7 @@ public:
 
     void ResetStorage() { m_gametasks = NULL; };
     void DumpTasks();
+
+public:
+    inline static CUIXml m_gameTaskXml;
 };

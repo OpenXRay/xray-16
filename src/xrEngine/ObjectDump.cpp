@@ -18,10 +18,10 @@ ENGINE_API std::string dbg_object_base_dump_string(const IGameObject* obj)
 ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 {
     if (!obj)
-        return std::string();
+        return {};
 
     u32 ps_size = obj->ps_Size();
-    std::string buf("");
+    std::string buf;
     for (u32 i = 0; i < ps_size; ++i)
     {
         const GameObjectSavedPosition& svp = obj->ps_Element(i);
@@ -34,13 +34,20 @@ ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj)
 {
     if (!obj || !obj->Visual())
-        return std::string();
-    const Fbox& box = obj->BoundingBox();
+        return {};
+
+    const auto visual_box = get_string(obj->BoundingBox());
+
     Fvector c;
     obj->Center(c);
 
-    return make_string("\n visual box: %s \n visual center: %s \n visual radius: %f ", get_string(box).c_str(),
-        get_string(c).c_str(), obj->Radius());
+    return make_string("\n"
+        " visual box: %s \n"
+        " visual center: %s \n"
+        " visual radius: %f ",
+        visual_box.c_str(),
+        get_string(c).c_str(),
+        obj->Radius());
 }
 
 /*
@@ -65,7 +72,7 @@ ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj
 ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
 {
     if (!obj)
-        return std::string();
+        return {};
     GameObjectProperties props;
     obj->DBGGetProps(props);
     const char* format =

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\core2d\mgcvector2.h"><violation beginline="67" endline="67" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="54" endline="54" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="67" endline="67" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\externals\freemagic\source\distance2d\mgcdist2dvecelp.cpp"><violation beginline="34" endline="34" rule="Rule5-14-1" ruleset="Statements">
-</violation><violation beginline="48" endline="48" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="55" endline="55" rule="Rule5-14-1" ruleset="Statements">
-</violation></file></cppdepend-plugin>

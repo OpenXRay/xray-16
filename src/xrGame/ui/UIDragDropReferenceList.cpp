@@ -51,7 +51,7 @@ void CUIDragDropReferenceList::Initialize(pcstr labelSection /*= nullptr*/, pcst
             {
                 string32 temp;
                 xr_sprintf(temp, labelSection, i + j + 1);
-                CUITextWnd* label = UIHelper::CreateTextWnd(*uiXml, temp, this, false);
+                auto* label = UIHelper::CreateStatic(*uiXml, temp, this, false);
                 if (label)
                 {
                     if (true /*!label->WndPosIsProbablyRelative()*/) // Without this, UI Frustum will cull our label

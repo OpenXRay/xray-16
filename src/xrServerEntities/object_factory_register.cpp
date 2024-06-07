@@ -18,9 +18,6 @@
 
 // client entities includes
 #ifndef NO_XR_GAME
-#include "xrEngine/std_classes.h"
-#include "Level.h"
-#include "GamePersistent.h"
 #include "Actor.h"
 #include "Spectator.h"
 
@@ -189,10 +186,9 @@
 
 void CObjectFactory::register_classes()
 {
+    ZoneScoped;
+
 #ifndef NO_XR_GAME
-    // client entities
-    add<CLevel>(CLSID_GAME_LEVEL, "level");
-    add<CGamePersistent>(CLSID_GAME_PERSISTANT, "game");
     // Server Game type
     add<game_sv_Single>(CLSID_SV_GAME_SINGLE, "game_sv_single");
     add<game_sv_Deathmatch>(CLSID_SV_GAME_DEATHMATCH, "game_sv_deathmatch");

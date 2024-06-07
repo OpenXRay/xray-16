@@ -194,9 +194,8 @@ public:
     }
 };
 
-typedef _rect<float> Frect;
-typedef _rect<double> Drect;
-typedef _rect<int> Irect;
+using Frect = _rect<float>;
+using Irect = _rect<int>;
 
 template <class T>
 bool _valid(const _rect<T>& m)

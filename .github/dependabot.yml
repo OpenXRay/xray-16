@@ -7,3 +7,10 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - External (3rd party)
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  labels:
+  - External (3rd party)

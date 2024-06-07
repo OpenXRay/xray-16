@@ -1,5 +1,0 @@
-c:\openxray\src\utils\xrcompress\stdafx.h
-c:\openxray\src\utils\xrcompress\xrcompress.h
-c:\openxray\src\utils\xrcompress\main.cpp
-c:\openxray\src\utils\xrcompress\xrcompress.cpp
-c:\openxray\src\utils\xrcompress\xrcompressdifference.cpp

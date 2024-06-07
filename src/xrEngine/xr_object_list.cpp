@@ -4,7 +4,6 @@
 
 #include "xrSheduler.h"
 #include "xr_object_list.h"
-#include "std_classes.h"
 
 #include "xr_object.h"
 #include "xrCore/net_utils.h"
@@ -12,6 +11,8 @@
 #include "CustomHUD.h"
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
+
+#include <xrCore/Threading/TaskManager.hpp>
 
 class fClassEQ
 {
@@ -38,10 +39,11 @@ void CObjectList::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
         alert->Print(font, "UpdateCL  > 3ms:  %3.1f", stats.Update.result);
 }
 
-CObjectList::CObjectList() : m_owner_thread_id(Threading::GetCurrThreadId())
+CObjectList::CObjectList()
 {
     statsFrame = u32(-1);
     ZeroMemory(map_NETID, 0xffff * sizeof(IGameObject*));
+    m_secondary_crows.resize(TaskScheduler->GetWorkersCount());
 }
 
 CObjectList::~CObjectList()
@@ -141,7 +143,9 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     O->UpdateCL();
 
+#ifdef DEBUG
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", *O->cName());
+#endif
 #if 0 // ndef DEBUG
     __try
     {
@@ -211,11 +215,20 @@ void CObjectList::clear_crow_vec(Objects& o)
 
 void CObjectList::Update(bool bForce)
 {
+    ZoneScoped;
+
     if (statsFrame != Device.dwFrame)
     {
         statsFrame = Device.dwFrame;
         stats.FrameStart();
     }
+
+    for (auto& crows_list : m_secondary_crows)
+    {
+        m_primary_crows.insert(m_primary_crows.end(), crows_list.cbegin(), crows_list.cend());
+        crows_list.clear();
+    }
+
     if (!Device.Paused() || bForce)
     {
         // Clients
@@ -223,9 +236,6 @@ void CObjectList::Update(bool bForce)
         {
             // Select Crow-Mode
             stats.Updated = 0;
-
-            m_primary_crows.insert(m_primary_crows.end(), m_secondary_crows.begin(), m_secondary_crows.end());
-            m_secondary_crows.clear();
 
 #if 0
             std::sort (m_own_crows.begin(), m_own_crows.end());
@@ -302,7 +312,7 @@ void CObjectList::Update(bool bForce)
                 (*oit)->net_Relcase(destroy_queue[it]);
 
         for (int it = destroy_queue.size() - 1; it >= 0; it--)
-            GEnv.Sound->object_relcase(destroy_queue[it]);
+            g_pGameLevel->Sound->object_relcase(destroy_queue[it]);
 
         RELCASE_CALLBACK_VEC::iterator it = m_relcase_callbacks.begin();
         const RELCASE_CALLBACK_VEC::iterator ite = m_relcase_callbacks.end();
@@ -450,6 +460,8 @@ void CObjectList::Load()
 
 void CObjectList::Unload()
 {
+    ZoneScoped;
+
     if (objects_sleeping.size() || objects_active.size())
         Msg("! objects-leaked: %d", objects_sleeping.size() + objects_active.size());
 
@@ -496,33 +508,18 @@ void CObjectList::Destroy(IGameObject* game_obj)
         return;
     net_Unregister(game_obj);
 
-    if (!Device.Paused())
-    {
-        // if a game is paused list of other crows should be empty - Why?
-        if (!m_secondary_crows.empty())
-        {
-            Msg("assertion !m_other_crows.empty() failed: %d", m_secondary_crows.size());
-
-            u32 j = 0;
-            for (auto& iter : m_secondary_crows)
-                Msg("%d %s", j++, iter->cName().c_str());
-            VERIFY(Device.Paused() || m_secondary_crows.empty());
-            m_secondary_crows.clear();
-        }
-    }
-    else
-    {
-        // if game is paused remove the object from list of other crows
-        auto iter = std::find(m_secondary_crows.begin(), m_secondary_crows.end(), game_obj);
-        if (iter != m_secondary_crows.end())
-            m_secondary_crows.erase(iter);
-    }
-
     {
         // Always remove the object from list of own crows. The object may be not a crow.
         auto iter = std::find(m_primary_crows.begin(), m_primary_crows.end(), game_obj);
         if (iter != m_primary_crows.end())
             m_primary_crows.erase(iter);
+
+        for (auto& crows_list : m_secondary_crows)
+        {
+            auto iter = std::find(crows_list.begin(), crows_list.end(), game_obj);
+            if (iter != crows_list.end())
+                crows_list.erase(iter);
+        }
     }
 
     // Remove the object from list of active objects if the object is active,
@@ -581,13 +578,19 @@ bool CObjectList::dump_all_objects()
     dump_list(objects_active, "objects_active");
     dump_list(objects_sleeping, "objects_sleeping");
     dump_list(m_primary_crows, "m_own_crows");
-    dump_list(m_secondary_crows, "m_other_crows");
+    for (auto& crows_list : m_secondary_crows)
+    {
+        dump_list(crows_list, "m_other_crows");
+    }
     return false;
 }
 
 void CObjectList::register_object_to_destroy(IGameObject* object_to_destroy)
 {
+#ifdef DEBUG
     VERIFY(!registered_object_to_destroy(object_to_destroy));
+#endif
+
     // Msg("CObjectList::register_object_to_destroy [%x]", object_to_destroy);
     destroy_queue.push_back(object_to_destroy);
 
@@ -612,6 +615,22 @@ void CObjectList::register_object_to_destroy(IGameObject* object_to_destroy)
             O->setDestroy(true);
         }
     }
+}
+
+IC CObjectList::Objects& CObjectList::get_crows()
+{
+    const size_t list_id = TaskScheduler->GetCurrentWorkerID();
+    VERIFY(list_id < m_secondary_crows.size());
+    return m_secondary_crows[list_id];
+}
+
+void CObjectList::o_crow(IGameObject* O)
+{
+    Objects& crows = get_crows();
+    VERIFY(std::find(crows.begin(), crows.end(), O) == crows.end());
+    crows.push_back(O);
+
+    O->SetCrowUpdateFrame(Device.dwFrame);
 }
 
 #ifdef DEBUG

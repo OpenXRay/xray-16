@@ -42,7 +42,7 @@ int get_texture_load_lod(LPCSTR fn)
         {
             if (psTextureLOD < 1)
             {
-                if (enough_address_space_available || GEnv.Render->GenerationIsR1())
+                if (enough_address_space_available || RImplementation.GenerationIsR1())
                     return 0;
                 else
                     return 1;
@@ -56,7 +56,7 @@ int get_texture_load_lod(LPCSTR fn)
 
     if (psTextureLOD < 2)
     {
-        //if (enough_address_space_available || GEnv.Render->GenerationIsR1())
+        //if (enough_address_space_available || RImplementation.GenerationIsR1())
         return 0;
         //else
         //    return 1;
@@ -252,6 +252,9 @@ IC u32 it_height_rev_base(u32 d, u32 s)
 
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
+    ret_msize = 0;
+    R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });
+
     HRESULT result;
     ID3DTexture2D* pTexture2D = nullptr;
     IDirect3DCubeTexture9* pTextureCUBE = nullptr;
@@ -262,10 +265,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     D3DFORMAT fmt;
     u32 mip_cnt = u32(-1);
     bool dummyTextureExist;
-
-    // validation
-    R_ASSERT(fRName);
-    R_ASSERT(fRName[0]);
 
     // make file name
     string_path fname;

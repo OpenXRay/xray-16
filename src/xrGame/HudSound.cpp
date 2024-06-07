@@ -13,6 +13,8 @@ void InitHudSoundSettings()
 
 void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_snd, int type)
 {
+    ZoneScoped;
+
     hud_snd.m_activeSnd = nullptr;
     hud_snd.sounds.clear();
 
@@ -31,6 +33,8 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_
 
 void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int type, float* volume, float* delay)
 {
+    ZoneScoped;
+
     LPCSTR str = pSettings->r_string(section, line);
     string256 buf_str;
 
@@ -65,6 +69,8 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int 
 
 void HUD_SOUND_ITEM::DestroySound(HUD_SOUND_ITEM& hud_snd)
 {
+    ZoneScoped;
+
     for (auto& sound : hud_snd.sounds)
         sound.snd.destroy();
 
@@ -110,6 +116,8 @@ void HUD_SOUND_ITEM::StopSound(HUD_SOUND_ITEM& hud_snd)
 //----------------------------------------------------------
 HUD_SOUND_COLLECTION::~HUD_SOUND_COLLECTION()
 {
+    ZoneScoped;
+
     for (auto& sound_item : m_sound_items)
     {
         HUD_SOUND_ITEM::StopSound(sound_item);
@@ -162,6 +170,8 @@ void HUD_SOUND_COLLECTION::StopAllSounds()
 
 void HUD_SOUND_COLLECTION::LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive, int type)
 {
+    ZoneScoped;
+
     R_ASSERT(NULL == FindSoundItem(alias, false));
     m_sound_items.resize(m_sound_items.size() + 1);
     HUD_SOUND_ITEM& snd_item = m_sound_items.back();
@@ -216,6 +226,8 @@ HUD_SOUND_ITEM* HUD_SOUND_COLLECTION_LAYERED::FindSoundItem(pcstr alias, bool b_
 
 void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr alias, bool exclusive, int type)
 {
+    ZoneScoped;
+
     pcstr str = pSettings->r_string(section, line);
     string256 buf_str;
 
@@ -249,6 +261,8 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr al
 
 void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, pcstr section, pcstr line, pcstr alias, bool exclusive, int type)
 {
+    ZoneScoped;
+
     pcstr str = ini->r_string(section, line);
     string256 buf_str;
 

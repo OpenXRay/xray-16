@@ -1155,6 +1155,8 @@ void ConsoleBindCmds::save(IWriter* f)
 
 void CCC_RegisterInput()
 {
+    ZoneScoped;
+
     initialize_bindings();
     CMD2(CCC_Bind, "bind", 0);
     CMD2(CCC_Bind, "bind_sec", 1);

@@ -1,7 +1,0 @@
-c:\openxray\src\utils\xrmiscmath\pch.hpp
-c:\openxray\src\utils\xrmiscmath\matrix.cpp
-c:\openxray\src\utils\xrmiscmath\pch.cpp
-c:\openxray\src\utils\xrmiscmath\quaternion.cpp
-c:\openxray\src\utils\xrmiscmath\vector.cpp
-c:\openxray\src\utils\xrmiscmath\vector3d_ext.cpp
-c:\openxray\src\utils\xrmiscmath\xrmiscmath.cpp

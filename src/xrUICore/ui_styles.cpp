@@ -10,6 +10,8 @@ UIStyleManager* UIStyles = nullptr;
 
 UIStyleManager::UIStyleManager()
 {
+    ZoneScoped;
+
     m_token.emplace_back(DEFAULT_UI_STYLE_NAME, DEFAULT_STYLE_ID);
 
     string_path path;

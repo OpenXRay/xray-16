@@ -27,7 +27,7 @@ void CUIListBoxItem::OnFocusReceive()
     GetMessageTarget()->SendMessage(this, LIST_ITEM_FOCUS_RECEIVED);
 }
 
-void CUIListBoxItem::InitDefault() { InitTexture("ui_listline", "hud" DELIMITER "default"); }
+void CUIListBoxItem::InitDefault() { InitTexture("ui_listline"); }
 void CUIListBoxItem::SetFont(CGameFont* F) { m_text->SetFont(F); }
 CGameFont* CUIListBoxItem::GetFont() { return (m_text) ? m_text->GetFont() : NULL; }
 bool CUIListBoxItem::OnMouseDown(int mouse_btn)
@@ -76,9 +76,9 @@ CUIStatic* CUIListBoxItem::AddIconField(float width)
     return st;
 }
 
-CUITextWnd* CUIListBoxItem::AddTextField(LPCSTR txt, float width)
+CUIStatic* CUIListBoxItem::AddTextField(LPCSTR txt, float width)
 {
-    CUITextWnd* st = xr_new<CUITextWnd>();
+    auto* st = xr_new<CUIStatic>("Text field");
     st->SetAutoDelete(true);
     st->SetWndPos(Fvector2().set(FieldsLength(), 0.0f));
     st->SetWndSize(Fvector2().set(width, GetHeight()));

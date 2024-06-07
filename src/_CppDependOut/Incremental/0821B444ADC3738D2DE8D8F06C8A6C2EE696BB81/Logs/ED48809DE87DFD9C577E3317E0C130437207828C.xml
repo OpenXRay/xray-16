@@ -1,9 +1,0 @@
-<log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
-</log><log>
- <error level="error" id="err_pp_file_not_found" file="C:\OpenXRay\Externals\LuaJIT\src\host\buildvm.c" line="73" col="10" msg="&apos;buildvm_arch.h&apos; file not found" />
-</log>

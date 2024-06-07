@@ -225,6 +225,21 @@ public:
         return xform(b, m);
     }
 
+    Fmatrix get_xform() const
+    {
+        Fvector center, extent;
+        center.add(vMin, vMax).div(2.0f);
+        extent.sub(vMax, vMin).div(2.0f);
+
+        Fmatrix transformMatrix;
+        transformMatrix.identity();
+
+        transformMatrix.translate(center);
+        transformMatrix.scale(extent);
+
+        return transformMatrix;
+    }
+
     void getsize(Fvector3& R) const { R.sub(vMax, vMin); }
 
     void getradius(Fvector3& R) const

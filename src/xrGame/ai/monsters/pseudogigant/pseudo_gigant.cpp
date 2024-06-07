@@ -200,10 +200,8 @@ void CPseudoGigant::Load(LPCSTR section)
 
     // --------------------------------------------------------------------------------
 
-    GEnv.Sound->create(
-        m_sound_threaten_hit, pSettings->r_string(section, "sound_threaten_hit"), st_Effect, SOUND_TYPE_WORLD);
-    GEnv.Sound->create(m_sound_start_threaten, pSettings->r_string(section, "sound_threaten_start"), st_Effect,
-        SOUND_TYPE_MONSTER_ATTACKING);
+    m_sound_threaten_hit.create(pSettings->r_string(section, "sound_threaten_hit"), st_Effect, SOUND_TYPE_WORLD);
+    m_sound_start_threaten.create(pSettings->r_string(section, "sound_threaten_start"), st_Effect, SOUND_TYPE_MONSTER_ATTACKING);
 
     m_kick_damage = pSettings->r_float(section, "HugeKick_Damage");
     m_kick_particles = pSettings->r_string(section, "HugeKick_Particles");
@@ -287,6 +285,7 @@ void CPseudoGigant::on_activate_control(ControlCom::EControlType type)
     }
 }
 
+extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 void CPseudoGigant::on_threaten_execute()
 {
     // разбросить объекты
@@ -312,6 +311,9 @@ void CPseudoGigant::on_threaten_execute()
     pos.set(Position());
     pos.y += 0.1f;
     m_sound_threaten_hit.play_at_pos(this, pos);
+
+    // Interactive Grass FX
+    g_pGamePersistent->GrassBendersAddExplosion(ID(), pos, Fvector().set(0, -99, 0), 1.33f, 5.0f, ps_ssfx_grass_interactive.w, 20);
 
     // играть партиклы
     PlayParticles(m_kick_particles, pos, Direction());

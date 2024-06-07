@@ -44,6 +44,14 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
     if (!m_icons[eIcon])
         Init_IconInfoItem(*xml_doc, "icon_static", eIcon);
 
+    m_original_color = m_icons[eIcon] ? m_icons[eIcon]->GetTextureColor() : color_xrgb(255, 255, 255);
+
+    m_deadbody_color = color_argb(160, 160, 160, 160);
+    if (xml_doc->NavigateToNode("icon:deadbody", 0))
+    {
+        m_deadbody_color = CUIXmlInit::GetColor(*xml_doc, "icon:deadbody", 0, m_deadbody_color);
+    }
+
     Init_IconInfoItem(*xml_doc, "icon_over", eIconOver);
 
     Init_IconInfoItem(*xml_doc, "rank_icon", eRankIcon);
@@ -54,13 +62,6 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
     Init_IconInfoItem(*xml_doc, "commumity_big_icon", eCommunityBigIcon);
     Init_IconInfoItem(*xml_doc, "commumity_big_icon_over", eCommunityBigIconOver);
-
-    VERIFY(m_icons[eIcon]);
-    m_deadbody_color = color_argb(160, 160, 160, 160);
-    if (xml_doc->NavigateToNode("icon:deadbody", 0))
-    {
-        m_deadbody_color = CUIXmlInit::GetColor(*xml_doc, "icon:deadbody", 0, m_deadbody_color);
-    }
 
     // ----------------------------
     Init_StrInfoItem(*xml_doc, "name_caption", eNameCaption);
@@ -83,8 +84,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
 void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
 {
-    CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
-    if (item)
+    if (CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false))
     {
         m_icons[type] = item;
     }
@@ -92,10 +92,8 @@ void CUICharacterInfo::Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItem
 
 void CUICharacterInfo::Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type)
 {
-    CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false);
-    if (item)
+    if (CUIStatic* item = UIHelper::CreateStatic(xml_doc, item_str, this, false))
     {
-        //.		item->ClipperOn();
         item->Show(true);
         m_icons[type] = item;
     }
@@ -114,8 +112,8 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, cpcstr xml
 void CUICharacterInfo::InitCharacterInfo(CUIXml* xml_doc, LPCSTR node_str)
 {
     Fvector2 pos, size;
-    XML_NODE stored_root = xml_doc->GetLocalRoot();
-    XML_NODE ch_node = xml_doc->NavigateToNode(node_str, 0);
+    const XML_NODE stored_root = xml_doc->GetLocalRoot();
+    const XML_NODE ch_node = xml_doc->NavigateToNode(node_str, 0);
     xml_doc->SetLocalRoot(ch_node);
     pos.x = xml_doc->ReadAttribFlt(ch_node, "x");
     pos.y = xml_doc->ReadAttribFlt(ch_node, "y");
@@ -155,9 +153,9 @@ void CUICharacterInfo::InitCharacter(u16 id)
     if (pUIBio && pUIBio->IsEnabled())
     {
         pUIBio->Clear();
-        if (chInfo.Bio().size())
+        if (!chInfo.Bio().empty())
         {
-            CUITextWnd* pItem = xr_new<CUITextWnd>();
+            auto* pItem = xr_new<CUIStatic>("Biography");
             pItem->SetWidth(pUIBio->GetDesiredChildWidth());
             pItem->SetText(chInfo.Bio().c_str());
             pItem->AdjustHeightToText();
@@ -166,7 +164,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
     }
 
     shared_str const& comm_id = chInfo.Community().id();
-    LPCSTR community0 = comm_id.c_str();
+    cpcstr community0 = comm_id.c_str();
     string64 community1;
     xr_strcpy(community1, sizeof(community1), community0);
     xr_strcat(community1, sizeof(community1), "_icon");
@@ -328,13 +326,12 @@ void CUICharacterInfo::Update()
 
         if (m_icons[eIcon])
         {
-            CSE_ALifeCreatureAbstract* pCreature = smart_cast<CSE_ALifeCreatureAbstract*>(T);
-            if (pCreature)
+            if (const auto* creature = smart_cast<CSE_ALifeCreatureAbstract*>(T))
             {
-                if (pCreature->g_Alive())
-                    m_icons[eIcon]->SetTextureColor(color_argb(255, 255, 255, 160));
+                if (creature->g_Alive())
+                    m_icons[eIcon]->SetTextureColor(m_original_color);
                 else
-                    m_icons[eIcon]->SetTextureColor(color_argb(255, 255, 160, 160));
+                    m_icons[eIcon]->SetTextureColor(m_deadbody_color);
             }
         }
     }

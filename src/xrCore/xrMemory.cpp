@@ -91,8 +91,7 @@ bool shared_str_initialized = false;
 
 void xrMemory::_initialize()
 {
-    stat_calls = 0;
-
+    ZoneScoped;
     g_pStringContainer = xr_new<str_container>();
     shared_str_initialized = true;
     g_pSharedMemoryContainer = xr_new<smem_container>();
@@ -100,6 +99,7 @@ void xrMemory::_initialize()
 
 void xrMemory::_destroy()
 {
+    ZoneScoped;
     xr_delete(g_pSharedMemoryContainer);
     xr_delete(g_pStringContainer);
 }
@@ -133,7 +133,7 @@ XRCORE_API void log_vminfo()
 {
     size_t w_free, w_reserved, w_committed;
     vminfo(&w_free, &w_reserved, &w_committed);
-    Msg("* [ %s ]: free[%d K], reserved[%d K], committed[%d K]", SDL_GetPlatform(), w_free / 1024, w_reserved / 1024, w_committed / 1024);
+    Msg("* [ %s ]: free[%zu K], reserved[%zu K], committed[%zu K]", SDL_GetPlatform(), w_free / 1024, w_reserved / 1024, w_committed / 1024);
 }
 
 size_t xrMemory::mem_usage()
@@ -182,61 +182,70 @@ void xrMemory::mem_compact()
 
 void* xrMemory::mem_alloc(size_t size)
 {
-    stat_calls++;
-    return xr_internal_malloc(size);
+    const auto result = xr_internal_malloc(size);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::mem_alloc(size_t size, size_t alignment)
 {
-    stat_calls++;
-    return xr_internal_malloc_aligned(size, alignment);
+    const auto result = xr_internal_malloc_aligned(size, alignment);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::mem_alloc(size_t size, const std::nothrow_t&) noexcept
 {
-    stat_calls++;
-    return xr_internal_malloc_nothrow(size);
+    const auto result = xr_internal_malloc_nothrow(size);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::mem_alloc(size_t size, size_t alignment, const std::nothrow_t&) noexcept
 {
-    stat_calls++;
-    return xr_internal_malloc_nothrow_aligned(size, alignment);
+    const auto result = xr_internal_malloc_nothrow_aligned(size, alignment);
+    //TracyAlloc(result, size);
+    return result;
 }
 
 void* xrMemory::small_alloc(size_t size) noexcept
 {
-    stat_calls++;
-    return xr_internal_small_alloc(size);
+    const auto result = xr_internal_small_alloc(size);
+    //TracyAllocN(result, size, "small alloc");
+    return result;
 }
 
 void xrMemory::small_free(void* ptr) noexcept
 {
-    stat_calls++;
+    //TracyFree(ptr);
     xr_internal_small_free(ptr);
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size)
 {
-    stat_calls++;
-    return xr_internal_realloc(ptr, size);
+    //TracyFree(ptr);
+    const auto result = xr_internal_realloc(ptr, size);
+    //TracyAllocN(result, size, "realloc");
+    return result;
 }
 
 void* xrMemory::mem_realloc(void* ptr, size_t size, size_t alignment)
 {
-    stat_calls++;
-    return xr_internal_realloc_aligned(ptr, size, alignment);
+    //TracyFree(ptr);
+    const auto result = xr_internal_realloc_aligned(ptr, size, alignment);
+    //TracyAllocN(result, size, "realloc");
+    return result;
 }
 
 void xrMemory::mem_free(void* ptr)
 {
-    stat_calls++;
+    //TracyFree(ptr);
     xr_internal_free(ptr);
 }
 
 void xrMemory::mem_free(void* ptr, size_t alignment)
 {
-    stat_calls++;
+    //TracyFree(ptr);
     xr_internal_free_aligned(ptr, alignment);
 }
 

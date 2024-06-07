@@ -37,7 +37,8 @@ public:
 
 public:
     constexpr TaskRange() = default;
-    constexpr TaskRange(T begin, T end) : m_begin(begin), m_end(end), m_grain(size() / TaskScheduler->GetWorkersCount())
+    constexpr TaskRange(T begin, T end) : m_begin(begin), m_end(end),
+        m_grain(size() / (TaskScheduler ? TaskScheduler->GetWorkersCount() : std::thread::hardware_concurrency()))
     {
         if (m_grain <= 0)
             m_grain = 1;
@@ -125,83 +126,85 @@ private:
     size_t m_grain{ 1 };
 };
 
-namespace details
+namespace detail
 {
 template <typename Range, typename Function>
-class ParallelForTask
+class ParallelFor
 {
 public:
     static decltype(auto) Run(const Range& range, bool wait, const Function& function)
     {
-        TaskData taskData{ range, function };
-
-        auto& task = TaskScheduler->AddTask(__FUNCTION__, task_func, sizeof(TaskData), &taskData);
+        auto& task = TaskManager::AddTask(Functor{ range, function });
         if (wait)
-            TaskScheduler->Wait(task);
+        {
+            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
+                "You should explicitly state that you know this by setting 'wait' param to false.");
+            if (TaskScheduler)
+                TaskScheduler->Wait(task);
+        }
         return task;
     }
 
-    // Doesn't wait until done
-    static decltype(auto) Run(const Range& range, bool wait, const Task::OnFinishFunc& callback, const Function& function)
+    static decltype(auto) Run(Task& parent, const Range& range, bool wait, const Function& function)
     {
-        TaskData taskData{ range, function };
-
-        auto& task = TaskScheduler->AddTask(__FUNCTION__, callback, task_func, sizeof(TaskData), &taskData);
+        auto& task = TaskManager::AddTask(parent, Functor{ range, function });
         if (wait)
-            TaskScheduler->Wait(task);
+        {
+            VERIFY2(TaskScheduler, "Task scheduler is not yet created. "
+                "You should explicitly state that you know this by setting 'wait' param to false.");
+            if (TaskScheduler)
+                TaskScheduler->Wait(task);
+        }
         return task;
     }
 
 private:
-    static void task_func(Task& thisTask, void* data_ptr)
-    {
-        auto& data = *static_cast<TaskData*>(data_ptr);
-        auto& range = data.range;
-
-        if (range.is_splittable())
-        {
-            TaskData leftData{ TaskRange(range, SplitTaskRange()), data.function };
-            TaskScheduler->AddTask(thisTask, __FUNCTION__, task_func, sizeof(TaskData), &leftData);
-            TaskScheduler->AddTask(thisTask, __FUNCTION__, task_func, sizeof(TaskData), &data);
-        }
-        else
-        {
-            data.function(range);
-        }
-    }
-
-private:
-    struct TaskData
+    struct Functor
     {
         Range range;
-        const Function function;
+        Function function;
+
+        void operator()(Task& task)
+        {
+            if (range.is_splittable())
+            {
+                Functor left{ TaskRange(range, SplitTaskRange()), function };
+                TaskManager::AddTask(task, left);
+                TaskManager::AddTask(task, *this);
+            }
+            else
+            {
+                function(range);
+            }
+        }
     };
 };
-} // namespace details
+} // namespace detail
 
 // User can specify if he wants caller thread to wait on the task finish
 template <typename Range, typename Function>
 decltype(auto) xr_parallel_for(const Range& range, bool wait, const Function& function)
 {
-    return details::ParallelForTask<Range, Function>::Run(range, wait, function);
+    return detail::ParallelFor<Range, Function>::Run(range, wait, function);
 }
 
 // Caller thread will wait on the task finish
 template <typename Range, typename Function>
 decltype(auto) xr_parallel_for(const Range& range, const Function& function)
 {
-    return details::ParallelForTask<Range, Function>::Run(range, true, function);
+    return detail::ParallelFor<Range, Function>::Run(range, true, function);
 }
 
+// User can specify if he wants caller thread to wait on the task finish
 template <typename Range, typename Function>
-decltype(auto) xr_parallel_for(const Range& range, bool wait, const Task::OnFinishFunc& callback, const Function& function)
+decltype(auto) xr_parallel_for(Task& parent, const Range& range, bool wait, const Function& function)
 {
-    return details::ParallelForTask<Range, Function>::Run(range, wait, callback, function);
+    return detail::ParallelFor<Range, Function>::Run(parent, range, wait, function);
 }
 
 // Caller thread will wait on the task finish
 template <typename Range, typename Function>
-decltype(auto) xr_parallel_for(const Range& range, const Task::OnFinishFunc& callback, const Function& function)
+decltype(auto) xr_parallel_for(Task& parent, const Range& range, const Function& function)
 {
-    return details::ParallelForTask<Range, Function>::Run(range, true, callback, function);
+    return detail::ParallelFor<Range, Function>::Run(parent, range, true, function);
 }

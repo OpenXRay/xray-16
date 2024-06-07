@@ -3,7 +3,7 @@
 
 //	Define default sample index for MSAA
 #ifndef	ISAMPLE
-#define ISAMPLE 0
+#define ISAMPLE uint(0)
 #endif	//	ISAMPLE
 
 //	redefine sample index

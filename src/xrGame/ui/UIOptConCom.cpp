@@ -12,7 +12,6 @@
 xr_token g_GameModes[] = {{"st_deathmatch", eGameIDDeathmatch}, {"st_team_deathmatch", eGameIDTeamDeathmatch},
     {"st_artefacthunt", eGameIDArtefactHunt}, {"st_capture_the_artefact", eGameIDCaptureTheArtefact}, {0, 0}};
 
-CUIOptConCom::CUIOptConCom() { xr_strcpy(m_playerName, ""); }
 class CCC_UserName : public CCC_String
 {
 public:

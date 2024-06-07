@@ -1,14 +1,17 @@
 #pragma once
 #include "xrUICore/Windows/UIFrameWindow.h"
 
-class CUITextWnd;
+class CUIStatic;
+class CUIFrameLineWnd;
 
 class XRUICORE_API CUIButtonHint final : public CUIFrameWindow
 {
-    CUIWindow* m_ownerWnd;
+    CUIWindow* m_ownerWnd{};
 
-    CUITextWnd* m_text;
-    bool m_enabledOnFrame;
+    CUIStatic* m_text;
+    CUIFrameLineWnd* m_border{};
+
+    bool m_enabledOnFrame{};
 
 public:
     CUIButtonHint();

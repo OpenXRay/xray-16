@@ -664,9 +664,7 @@ public:
     CScriptGameObject* active_detector() const;
     u32 active_slot();
     void activate_slot(u32 slot_id);
-    void enable_level_changer(bool b);
-    bool is_level_changer_enabled();
-    void set_level_changer_invitation(LPCSTR str);
+
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);
 #endif

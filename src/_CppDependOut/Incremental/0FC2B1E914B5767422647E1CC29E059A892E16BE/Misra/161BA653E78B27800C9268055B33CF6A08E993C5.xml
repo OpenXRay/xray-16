@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\core\mgcmtedge.cpp"><violation beginline="66" endline="66" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="80" endline="80" rule="Rule6-6-5" ruleset="Statements">
-</violation></file></cppdepend-plugin>

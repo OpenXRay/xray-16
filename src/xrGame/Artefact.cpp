@@ -46,11 +46,6 @@ CArtefact::CArtefact()
 {
     shedule.t_min = 20;
     shedule.t_max = 50;
-    m_sParticlesName = NULL;
-    m_pTrailLight = NULL;
-    m_activationObj = NULL;
-    m_detectorObj = NULL;
-    m_additional_weight = 0.0f;
 }
 
 CArtefact::~CArtefact() {}

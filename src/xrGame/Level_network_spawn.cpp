@@ -51,6 +51,8 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
 
 void CLevel::g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos)
 {
+    ZoneScoped;
+
     // Create
     CSE_Abstract* E = F_entity_Create(name);
     VERIFY(E);
@@ -84,6 +86,8 @@ extern float debug_on_frame_gather_stats_frequency;
 
 void CLevel::g_sv_Spawn(CSE_Abstract* E)
 {
+    ZoneScoped;
+
 //	CTimer		T(false);
 
 #ifdef DEBUG
@@ -179,6 +183,8 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 CSE_Abstract* CLevel::spawn_item(
     LPCSTR section, const Fvector& position, u32 level_vertex_id, u16 parent_id, bool return_item)
 {
+    ZoneScoped;
+
     CSE_Abstract* abstract = F_entity_Create(section);
     R_ASSERT3(abstract, "Cannot find item with section", section);
     CSE_ALifeDynamicObject* dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(abstract);
@@ -220,6 +226,8 @@ CSE_Abstract* CLevel::spawn_item(
 
 void CLevel::ProcessGameSpawns()
 {
+    ZoneScoped;
+
     while (!game_spawn_queue.empty())
     {
         CSE_Abstract* E = game_spawn_queue.front();

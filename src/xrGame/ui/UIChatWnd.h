@@ -5,7 +5,6 @@
 class CUIXml;
 class CUIGameLog;
 class CUIEditBox;
-class CUITextWnd;
 
 class CUIChatWnd final : public CUIDialogWnd, public CUIWndCallback
 {
@@ -25,8 +24,8 @@ public:
     pcstr GetDebugType() override { return "CUIChatWnd"; }
 
 protected:
-    CUIEditBox* UIEditBox;
-    CUITextWnd* UIPrefix;
+    CUIEditBox UIEditBox;
+    CUIStatic UIPrefix{ "Chat prefix" };
 
     bool sendNextMessageToAll;
     bool pendingGameMode;

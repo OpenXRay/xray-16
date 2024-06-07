@@ -52,6 +52,9 @@ void ScriptExporter::Node::Export(lua_State* luaState)
 #endif
         return;
     }
+
+    ZoneScoped;
+
     // export dependencies recursively
     for (size_t i = 0; i < depCount; i++)
     {
@@ -120,6 +123,7 @@ void ScriptExporter::Node::InsertAfter(Node* target, Node* node)
 
 void ScriptExporter::Export(lua_State* luaState)
 {
+    ZoneScoped;
 #ifdef CONFIG_SCRIPT_ENGINE_LOG_EXPORTS
     Msg("* ScriptExporter: total nodes: %zu", Node::GetCount());
     for (auto node = Node::GetFirst(); node; node = node->GetNext())
@@ -137,6 +141,7 @@ void ScriptExporter::Export(lua_State* luaState)
 
 void ScriptExporter::Reset()
 {
+    ZoneScoped;
     for (auto node = Node::GetFirst(); node; node = node->GetNext())
         node->Reset();
 }

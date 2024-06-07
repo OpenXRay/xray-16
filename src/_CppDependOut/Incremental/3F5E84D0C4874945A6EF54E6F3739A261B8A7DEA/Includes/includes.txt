@@ -1,2 +1,0 @@
-c:\openxray\src\utils\xrlc_lightstab\xrlc_lightstab.h
-c:\openxray\src\utils\xrlc_lightstab\xrlc_lightstab.cpp

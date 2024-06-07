@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Geometry.h"
-#include "xrEngine/GameMtlLib.h"
 
 using GEOM_STORAGE = xr_vector<CODEGeom*>;
 using GEOM_I = GEOM_STORAGE::iterator;

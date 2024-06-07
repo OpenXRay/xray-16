@@ -5,39 +5,28 @@
 class CSoundRender_Target
 {
 protected:
-    CSoundRender_Emitter* m_pEmitter;
-    bool rendering;
+    CSoundRender_Emitter* m_pEmitter{};
+    bool rendering{};
+    float priority{ -1 };
 
 public:
-    float priority;
+    CSoundRender_Target() = default;
+    virtual ~CSoundRender_Target() = default;
 
-protected:
-    OggVorbis_File ovf;
-    IReader* wave;
-    void attach();
-    void detach();
+    CSoundRender_Emitter* get_emitter() const { return m_pEmitter; }
+    bool get_Rendering() const { return rendering; }
 
-public:
-    OggVorbis_File* get_data()
-    {
-        if (!wave)
-            attach();
-        return &ovf;
-    }
-
-    CSoundRender_Target();
-    virtual ~CSoundRender_Target();
-
-    CSoundRender_Emitter* get_emitter() { return m_pEmitter; }
-    bool get_Rendering() { return rendering; }
     virtual bool _initialize() = 0;
     virtual void _destroy() = 0;
     virtual void _restart() = 0;
 
-    virtual void start(CSoundRender_Emitter* E) = 0;
-    virtual void render() = 0;
-    virtual void rewind() = 0;
-    virtual void stop() = 0;
-    virtual void update() = 0;
-    virtual void fill_parameters() = 0;
+    virtual void start(CSoundRender_Emitter* E);
+    virtual void render();
+    virtual void rewind();
+    virtual void stop();
+    virtual void update();
+    virtual void fill_parameters();
+
+    ICF auto get_priority() const { return priority; }
+    ICF void set_priority(const float p) { priority = p; }
 };

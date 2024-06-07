@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\gamespy\src\gamespy\md5c.c"><violation beginline="284" endline="284" rule="Rule5-18-1" ruleset="Statements">
-</violation><violation beginline="284" endline="284" rule="Rule5-18-1" ruleset="Statements">
-</violation><violation beginline="328" endline="328" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

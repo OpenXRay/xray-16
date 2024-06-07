@@ -11,8 +11,6 @@
 #include "UILoadingScreen.h"
 #include "UILoadingScreenHardcoded.h"
 
-#include "xrEngine/x_ray.h"
-#include "xrEngine/GameFont.h"
 #include "UIHelper.h"
 #include "xrUICore/XML/UITextureMaster.h"
 
@@ -144,7 +142,7 @@ void UILoadingScreen::Show(bool show)
     }
 }
 
-bool UILoadingScreen::IsShown()
+bool UILoadingScreen::IsShown() const
 {
     return CUIWindow::IsShown();
 }

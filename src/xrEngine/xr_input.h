@@ -1,7 +1,14 @@
 #pragma once
 
-#include <SDL.h>
 #include <bitset>
+
+#include <SDL.h>
+
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !(defined(__APPLE__) && TARGET_OS_IOS) && !defined(__amigaos4__)
+#   define SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE 1
+#else
+#   define SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE 0
+#endif
 
 DECLARE_MESSAGE(KeyMapChanged);
 
@@ -137,10 +144,13 @@ public:
     void iRelease(IInputReceiver* pc);
 
     bool iGetAsyncKeyState(const int key);
+    bool iAnyMouseButtonDown() const { return mouseState.any(); }
+    bool iAnyKeyButtonDown() const { return keyboardState.any(); }
+    bool iAnyControllerButtonDown() const { return controllerState.any(); }
 
     void iGetAsyncScrollPos(Ivector2& p) const;
-    void iGetAsyncMousePos(Ivector2& p) const;
-    void iSetMousePos(const Ivector2& p) const;
+    bool iGetAsyncMousePos(Ivector2& p, bool global = false) const;
+    bool iSetMousePos(const Ivector2& p, bool global = false) const;
 
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;

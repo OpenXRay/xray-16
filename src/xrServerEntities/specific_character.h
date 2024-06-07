@@ -37,10 +37,10 @@ struct SSpecificCharacterData : CSharedResource
     //имя секции конфигурации звука для NPC персонажа
     xr_string m_sound_voice_prefix;
 
-    float m_fPanic_threshold;
-    float m_fHitProbabilityFactor;
-    int m_crouch_type;
-    bool m_upgrade_mechanic;
+    float m_fPanic_threshold{};
+    float m_fHitProbabilityFactor{ 1.f };
+    int m_crouch_type{};
+    bool m_upgrade_mechanic{};
 
     xr_string m_critical_wound_weights;
 #endif
@@ -63,9 +63,9 @@ struct SSpecificCharacterData : CSharedResource
 #endif
 
     //ранг
-    CHARACTER_RANK_VALUE m_Rank;
+    CHARACTER_RANK_VALUE m_Rank{ NO_RANK };
     //репутация
-    CHARACTER_REPUTATION_VALUE m_Reputation;
+    CHARACTER_REPUTATION_VALUE m_Reputation{ NO_REPUTATION };
 
     //классы персонажа (военные-ветераны, ученые и т.д.)
     //к которым он принадлежит
@@ -73,9 +73,9 @@ struct SSpecificCharacterData : CSharedResource
 
     //указание на то что персонаж не предназначен для случайного выбора
     //и задается только через явное указание ID
-    bool m_bNoRandom;
+    bool m_bNoRandom{};
     //если персонаж является заданым по умолчанию для своей команды
-    bool m_bDefaultForCommunity;
+    bool m_bDefaultForCommunity{};
 #ifdef XRGAME_EXPORTS
     struct SMoneyDef
     {

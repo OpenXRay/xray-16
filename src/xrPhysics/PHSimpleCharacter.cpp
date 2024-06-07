@@ -13,8 +13,6 @@
 #include "params.h"
 #include "MathUtils.h"
 
-#include "xrEngine/GameMtlLib.h"
-
 #include "IPhysicsShellHolder.h"
 #include "Include/xrRender/Kinematics.h"
 #include "PHSimpleCharacterInline.h"

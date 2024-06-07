@@ -8,7 +8,6 @@
 
 #include "StdAfx.h"
 #include "alife_graph_registry.h"
-#include "xrEngine/x_ray.h"
 #include "xrServerEntities/xrMessages.h"
 
 using namespace ALife;
@@ -93,7 +92,7 @@ void CALifeGraphRegistry::setup_current_level()
         ai().game_graph().header().levels().find(ai().game_graph().vertex(actor()->m_tGraphID)->level_id());
     R_ASSERT2(ai().game_graph().header().levels().end() != I, "Graph point level ID not found!");
 
-    [[maybe_unused]] int id = pApp->Level_ID(*(*I).second.name(), "1.0", true);
+    [[maybe_unused]] const int id = g_pGamePersistent->Level_ID(*(*I).second.name(), "1.0", true);
     VERIFY3(id >= 0, "Level is corrupted or doesn't exist", *(*I).second.name());
     ai().load(*(*I).second.name());
 

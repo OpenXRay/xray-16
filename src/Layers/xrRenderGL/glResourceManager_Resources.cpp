@@ -105,7 +105,7 @@ bool CResourceManager::_LinkPP(SPass& pass)
     if (pp.pp)
         return true;
 
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         pp.pp = GLGeneratePipeline(pp.cName.c_str(), pass.ps->sh, pass.vs->sh, pass.gs->sh);
     else
     {
@@ -143,7 +143,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
-    switch (GEnv.Render->m_skinning)
+    switch (RImplementation.m_skinning)
     {
     case 0:
         xr_strcat(name, "_0");
@@ -172,7 +172,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    switch (GEnv.Render->m_MSAASample)
+    switch (RImplementation.m_MSAASample)
     {
     case 0:
         xr_strcat(name, "_0");

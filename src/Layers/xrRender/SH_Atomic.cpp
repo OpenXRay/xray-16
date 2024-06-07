@@ -44,10 +44,10 @@ SVS::~SVS()
     //	Now it is release automatically
 #endif
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -60,10 +60,10 @@ SVS::~SVS()
 // SPS
 SPS::~SPS()
 {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     _RELEASE(sh);
 #elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -74,7 +74,6 @@ SPS::~SPS()
     RImplementation.Resources->_DeletePS(this);
 }
 
-#if defined(USE_DX11) || defined(USE_OGL)
 ///////////////////////////////////////////////////////////////////////
 // SGS
 SGS::~SGS()
@@ -82,7 +81,7 @@ SGS::~SGS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -98,7 +97,7 @@ SHS::~SHS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -114,7 +113,7 @@ SDS::~SDS()
 #   if defined(USE_DX11)
     _RELEASE(sh);
 #   elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -128,7 +127,7 @@ SCS::~SCS()
 #    if defined(USE_DX11)
     _RELEASE(sh);
 #    elif defined(USE_OGL)
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
     else
         CHK_GL(glDeleteShader(sh));
@@ -138,12 +137,11 @@ SCS::~SCS()
 
     RImplementation.Resources->_DeleteCS(this);
 }
-#endif // USE_DX11 || USE_OGL
 
 #if defined(USE_OGL)
 SPP::~SPP()
 {
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgramPipelines(1, &pp));
     else
         CHK_GL(glDeleteProgram(pp));
@@ -184,9 +182,7 @@ SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
     //	Release vertex layout
-#ifdef USE_OGL
-    glDeleteVertexArrays(1, &dcl);
-#elif defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX11)
     xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout;
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
@@ -194,8 +190,8 @@ SDeclaration::~SDeclaration()
         //	Release vertex layout
         _RELEASE(iLayout->second);
     }
-#elif defined(USE_DX9)// USE_DX9
-    _RELEASE(dcl);
+#elif defined(USE_OGL)
+    glDeleteVertexArrays(1, &dcl);
 #else
 #   error No graphics API selected or enabled!
 #endif

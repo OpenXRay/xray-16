@@ -34,16 +34,19 @@ private:
     };
 #pragma pack(pop)
 
-    ImageDataFormat format;
-    int channelCount;
-    u16 width, height;
-    void* data;
+    ImageDataFormat format{};
+    int channelCount{};
+    u32 width{}, height{};
+    void* data{};
+    bool ownsData{};
 
 public:
     Image() = default;
-    ~Image() = default;
+    Image(u32 w, u32 h, void* dataPtr, ImageDataFormat fmt);
+    ~Image();
 
-    Image& Create(u16 width, u16 height, void* data, ImageDataFormat format);
+    bool OpenJPEG(const IReader& reader);
+    bool OpenJPEG(const u8* dataPtr, u32 dataSize);
 
     void SaveTGA(IWriter& writer, bool align);
     void SaveTGA(IWriter& writer, ImageDataFormat format, bool align);

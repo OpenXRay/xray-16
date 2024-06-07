@@ -1616,8 +1616,6 @@ void PAVortex::Transform(const Fmatrix& m)
 static int noise_start = 1;
 extern void noise3Init();
 
-#ifndef _EDITOR
-
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
@@ -1653,10 +1651,6 @@ ICF void _mm_store_fvector(Fvector& v, const __m128 R1)
 
 void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)
 {
-#ifdef _GPA_ENABLED
-    TAL_SCOPED_TASK_NAMED("PATurbulence::Execute()");
-#endif // _GPA_ENABLED
-
     if (noise_start)
     {
         noise_start = 0;
@@ -1670,12 +1664,7 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
     if (!p_cnt)
         return;
 
-#ifdef _GPA_ENABLED
-    TAL_SCOPED_TASK_NAMED("PATurbulenceExecuteStream()");
-
-    TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
-    TAL_AddRelationThis(TAL_RELATION_IS_CHILD_OF, rtID);
-#endif // _GPA_ENABLED
+    ZoneScoped;
 
     pVector pV;
     pVector vX;
@@ -1693,10 +1682,11 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
         vY.set(pV.x, pV.y + epsilon, pV.z);
         vZ.set(pV.x, pV.y, pV.z + epsilon);
 
-        float d = fractalsum3(pV, frequency, octaves);
+        const float d = fractalsum3(pV, frequency, octaves);
 
         pVector D;
 
+#if 1
         D.x = fractalsum3(vX, frequency, octaves);
         D.y = fractalsum3(vY, frequency, octaves);
         D.z = fractalsum3(vZ, frequency, octaves);
@@ -1732,35 +1722,7 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
         _mvel = _mm_mul_ps(_mvel, _vmo);
 
         _mm_store_fvector(m.vel, _mvel);
-    }
-}
-
 #else
-
-void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max)
-{
-    if (noise_start)
-    {
-        noise_start = 0;
-        noise3Init();
-    };
-
-    pVector pV;
-    pVector vX;
-    pVector vY;
-    pVector vZ;
-    age += dt;
-    for (u32 i = 0; i < effect->p_count; i++)
-    {
-        Particle& m = effect->particles[i];
-
-        pV.mad(m.pos, offset, age);
-        vX.set(pV.x + epsilon, pV.y, pV.z);
-        vY.set(pV.x, pV.y + epsilon, pV.z);
-        vZ.set(pV.x, pV.y, pV.z + epsilon);
-
-        pVector D;
-        float d = fractalsum3(pV, frequency, octaves);
         D.x = (fractalsum3(vX, frequency, octaves) - d) * (float)magnitude;
         D.y = (fractalsum3(vY, frequency, octaves) - d) * (float)magnitude;
         D.z = (fractalsum3(vZ, frequency, octaves) - d) * (float)magnitude;
@@ -1770,9 +1732,9 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
         float velMagNow = m.vel.magnitude();
         float valMagScale = velMagOrig / velMagNow;
         m.vel.mul(valMagScale);
+#endif
     }
 }
-#endif
 
 void PATurbulence::Transform(const Fmatrix& m) {}
 //-------------------------------------------------------------------------------------------------

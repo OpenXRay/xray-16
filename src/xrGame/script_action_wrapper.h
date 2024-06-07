@@ -22,12 +22,8 @@ public:
     static void execute_static(CScriptActionBase* action);
     virtual void finalize();
     static void finalize_static(CScriptActionBase* action);
-    //	virtual _edge_value_type	weight				(const CSConditionState &condition0, const CSConditionState
-    //&condition1)
-    // const;
-    //	static	_edge_value_type	weight_static		(CScriptActionBase *action, const CSConditionState &condition0,
-    //const
-    // CSConditionState &condition1);
+    virtual edge_value_type weight(const CSConditionState& condition0, const CSConditionState& condition1) const;
+    static  edge_value_type weight_static(CScriptActionBase* action, const CSConditionState& condition0, const CSConditionState& condition1);
 };
 
 #include "script_action_wrapper_inline.h"

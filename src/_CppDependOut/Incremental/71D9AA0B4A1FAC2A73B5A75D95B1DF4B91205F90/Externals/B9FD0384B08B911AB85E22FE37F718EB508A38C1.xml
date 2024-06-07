@@ -1,4 +1,0 @@
-<Externals>
-<cr access="none" depth="0" pod="true" kind="struct" name="z_stream_s" id="ab3439502eb24404f5136aff4b30b757_f5c2ce9c3af4222fe05a75b4ff3eefe8" file="2" linestart="86" lineend="106"/>
-<cr access="none" depth="0" pod="true" kind="struct" name="inflate_state" id="26e8d573ae6b0b52d85e4c12d38fe0d3_75ac1d9ceb7e5ef82cc8bbe7c54d3106" file="3" linestart="82" lineend="126"/>
-</Externals>

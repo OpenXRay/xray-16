@@ -1,6 +1,6 @@
 #pragma once
 
-struct XRUICORE_API CFontManager : public pureDeviceReset
+struct XRUICORE_API CFontManager : public CUIResetNotifier
 {
     CFontManager();
     ~CFontManager();
@@ -28,5 +28,5 @@ struct XRUICORE_API CFontManager : public pureDeviceReset
     void InitializeFont(CGameFont*& F, LPCSTR section, u32 flags = 0);
     LPCSTR GetFontTexName(LPCSTR section);
 
-    virtual void OnDeviceReset();
+    void OnUIReset() override;
 };

@@ -199,8 +199,8 @@ void CSoundPlayer::play(
     **/
     sound_single.m_sound->clone((*I).second.second->random(id), st_Effect, sg_SourceType);
 
-    sound_single.m_sound->_p->g_object = m_object;
-    sound_single.m_sound->_p->g_userdata = (*I).second.first.m_data;
+    sound_single.m_sound->_get()->g_object = m_object;
+    sound_single.m_sound->_get()->g_userdata = (*I).second.first.m_data;
     VERIFY(sound_single.m_sound->_handle());
 
     VERIFY(max_start_time >= min_start_time);

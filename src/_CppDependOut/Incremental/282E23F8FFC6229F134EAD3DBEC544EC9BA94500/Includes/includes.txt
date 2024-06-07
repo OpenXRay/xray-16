@@ -1,3 +1,0 @@
-c:\openxray\src\utils\xrdo_light\stdafx.h
-c:\openxray\src\utils\xrdo_light\stdafx.cpp
-c:\openxray\src\utils\xrdo_light\xrdo_light.cpp

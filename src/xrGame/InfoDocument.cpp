@@ -10,8 +10,8 @@
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServerEntities/xrMessages.h"
 
-CInfoDocument::CInfoDocument(void) { m_Info = NULL; }
-CInfoDocument::~CInfoDocument(void) {}
+CInfoDocument::CInfoDocument() = default;
+
 bool CInfoDocument::net_Spawn(CSE_Abstract* DC)
 {
     BOOL res = inherited::net_Spawn(DC);

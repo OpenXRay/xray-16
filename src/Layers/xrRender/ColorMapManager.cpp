@@ -26,7 +26,7 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
         if (I != m_TexCache.end())
         {
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
             ID3DBaseTexture* e0 = I->second->surface_get();
             m_CMap[iTex]->surface_set(e0);
             _RELEASE(e0);
@@ -42,9 +42,9 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
             ref_texture tmp;
             tmp.create(strTexName.c_str());
 
-            m_TexCache.insert(std::make_pair(strTexName, tmp));
+            m_TexCache.emplace(strTexName, tmp);
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
             ID3DBaseTexture* e0 = tmp->surface_get();
             m_CMap[iTex]->surface_set(e0);
             _RELEASE(e0);
@@ -58,7 +58,7 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
     }
     else
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         m_CMap[iTex]->surface_set(nullptr);
 #elif defined(USE_OGL)
         m_CMap[iTex]->surface_set(GL_TEXTURE_2D, 0);

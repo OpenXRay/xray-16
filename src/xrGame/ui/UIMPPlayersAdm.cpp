@@ -45,7 +45,7 @@ CUIMpPlayersAdm::CUIMpPlayersAdm() : CUIWindow("CUIMpPlayersAdm")
     m_pPingLimitTrack->SetAutoDelete(true);
     AttachChild(m_pPingLimitTrack);
 
-    m_pPingLimitText = xr_new<CUITextWnd>();
+    m_pPingLimitText = xr_new<CUIStatic>("Ping limit");
     m_pPingLimitText->SetAutoDelete(true);
     AttachChild(m_pPingLimitText);
 
@@ -69,11 +69,11 @@ CUIMpPlayersAdm::CUIMpPlayersAdm() : CUIWindow("CUIMpPlayersAdm")
     m_pBanPlayerCombo->SetAutoDelete(true);
     AttachChild(m_pBanPlayerCombo);
 
-    // m_pBanTimeTrack = new CUITrackBar();
+    // m_pBanTimeTrack = xr_new<CUITrackBar>();
     // m_pBanTimeTrack->SetAutoDelete(true);
     // AttachChild(m_pBanTimeTrack);
 
-    // m_pBanTimeText = new CUITextWnd();
+    // m_pBanTimeText = xr_new<CUIStatic>("Ban time");
     // m_pBanTimeText->SetAutoDelete(true);
     // AttachChild(m_pBanTimeText);
 }
@@ -88,14 +88,14 @@ void CUIMpPlayersAdm::Init(CUIXml& xml_doc)
     CUIXmlInit::Init3tButton(xml_doc, "players_adm:config_all_button", 0, m_pConfigAllBtn);
     CUIXmlInit::Init3tButton(xml_doc, "players_adm:max_ping_limit_button", 0, m_pPingLimitBtn);
     CUIXmlInit::InitTrackBar(xml_doc, "players_adm:max_ping_limit_track", 0, m_pPingLimitTrack);
-    CUIXmlInit::InitTextWnd(xml_doc, "players_adm:max_ping_limit_text", 0, m_pPingLimitText);
+    CUIXmlInit::InitStatic(xml_doc, "players_adm:max_ping_limit_text", 0, m_pPingLimitText);
     CUIXmlInit::Init3tButton(xml_doc, "players_adm:screen_player_button", 0, m_pScreenPlayerBtn);
     CUIXmlInit::Init3tButton(xml_doc, "players_adm:config_player_button", 0, m_pConfigPlayerBtn);
     CUIXmlInit::Init3tButton(xml_doc, "players_adm:kick_player_button", 0, m_pKickPlayerBtn);
     CUIXmlInit::Init3tButton(xml_doc, "players_adm:ban_player_button", 0, m_pBanPlayerBtn);
     CUIXmlInit::InitComboBox(xml_doc, "players_adm:ban_player_combo", 0, m_pBanPlayerCombo);
     // CUIXmlInit::InitTrackBar(xml_doc, "players_adm:ban_time_track", 0, m_pBanTimeTrack);
-    // CUIXmlInit::InitTextWnd(xml_doc, "players_adm:ban_time_text", 0, m_pBanTimeText);
+    // CUIXmlInit::InitStatic(xml_doc, "players_adm:ban_time_text", 0, m_pBanTimeText);
     RefreshPlayersList();
     int min, max;
     g_sv_adm_menu_ping_limit = iCeil(Console->GetInteger("sv_max_ping_limit", min, max) / 10.0f);

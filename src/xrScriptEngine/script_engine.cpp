@@ -21,6 +21,8 @@
 #include "xrLuaFix/xrLuaFix.h"
 #include "luabind/class_info.hpp"
 
+#include <tracy/TracyLua.hpp>
+
 Flags32 g_LuaDebug;
 
 #define SCRIPT_GLOBAL_NAMESPACE "_G"
@@ -106,6 +108,7 @@ string4096 CScriptEngine::g_ca_stdout;
 
 void CScriptEngine::reinit()
 {
+    ZoneScoped;
     stateMapLock.Enter();
     stateMap.reserve(32); // 32 lua states should be enough
     stateMapLock.Leave();
@@ -928,6 +931,8 @@ struct luajit
 
 void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 {
+    ZoneScoped;
+
 #ifdef USE_LUA_STUDIO
     bool lua_studio_connected = !!m_lua_studio_world;
     if (lua_studio_connected)
@@ -984,6 +989,8 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
 #endif
 
     luaopen_xrluafix(lua());
+
+    tracy::LuaRegister(lua());
 
     // Game scripts doesn't call randomize but use random
     // So, we should randomize in the engine.

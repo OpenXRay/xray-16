@@ -94,7 +94,7 @@ class CUIQuestionItem final : public CUIWindow, public CUIWndCallback
     float m_min_height;
 
 public:
-    CUITextWnd* m_num_text;
+    CUIStatic* m_num_text;
     CUI3tButton* m_text;
     shared_str m_s_value;
     CUIQuestionItem(CUIXml* xml_doc, LPCSTR path);
@@ -112,8 +112,8 @@ class CUIAnswerItem: public CUIWindow
 
     float m_min_height;
     float m_bottom_footer;
-    CUITextWnd* m_text;
-    CUITextWnd* m_name;
+    CUIStatic* m_text;
+    CUIStatic* m_name;
 
 public:
     CUIAnswerItem(CUIXml* xml_doc, LPCSTR path);

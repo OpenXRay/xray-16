@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\freemagic\source\surface\mgcbezierrectangleg.cpp"><violation beginline="30" endline="30" rule="Rule18-4-1" ruleset="Library">
-</violation><violation beginline="35" endline="35" rule="Rule18-4-1" ruleset="Library">
-</violation><violation beginline="40" endline="40" rule="Rule18-4-1" ruleset="Library">
-</violation></file></cppdepend-plugin>

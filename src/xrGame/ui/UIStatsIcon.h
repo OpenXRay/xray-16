@@ -34,5 +34,8 @@ protected:
 
     static void InitTexInfo();
     static void FreeTexInfo();
-    static TEX_INFO m_tex_info[MAX_DEF_TEX][2];
+
+    using tex_info_data = std::array<TEX_INFO[2], MAX_DEF_TEX>;
+
+    inline static tex_info_data* m_tex_info;
 };

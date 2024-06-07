@@ -171,31 +171,31 @@ struct vertHW_1W
 {
     static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    TVal _P[4];
-    u32 _N_I;
-    u32 _T;
-    u32 _B;
-    TVal _tc[2];
+    TVal Position[4];
+    u32 Normal_and_index;
+    u32 Tangent;
+    u32 Binormal;
+    TVal TexCoord[2];
 
-    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc, int index)
+    void set(const Fvector3& position, Fvector3 normal, Fvector3 tangent, Fvector3 binormal, const Fvector2& texcoord, int index)
     {
-        N.normalize_safe();
-        T.normalize_safe();
-        B.normalize_safe();
-        q_P(_P[0], P.x);
-        q_P(_P[1], P.y);
-        q_P(_P[2], P.z);
-        _P[3] = TVal(1);
-        _N_I = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(index));
-        _T = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), 0);
-        _B = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), 0);
-        q_tc(_tc[0], tc.x);
-        q_tc(_tc[1], tc.y);
+        normal.normalize_safe();
+        tangent.normalize_safe();
+        binormal.normalize_safe();
+        q_P(Position[0], position.x);
+        q_P(Position[1], position.y);
+        q_P(Position[2], position.z);
+        Position[3] = TVal(1);
+        Normal_and_index = color_rgba(q_N(normal.x), q_N(normal.y), q_N(normal.z), u8(index));
+        Tangent = color_rgba(q_N(tangent.x), q_N(tangent.y), q_N(tangent.z), 0);
+        Binormal = color_rgba(q_N(binormal.x), q_N(binormal.y), q_N(binormal.z), 0);
+        q_tc(TexCoord[0], texcoord.x);
+        q_tc(TexCoord[1], texcoord.y);
     }
 
     u16 get_bone() const
     {
-        return (u16)color_get_A(_N_I) / 3;
+        return (u16)color_get_A(Normal_and_index) / 3;
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const
@@ -207,9 +207,9 @@ struct vertHW_1W
 
     void get_pos(Fvector& p) const
     {
-        p.x = u_P(_P[0]);
-        p.y = u_P(_P[1]);
-        p.z = u_P(_P[2]);
+        p.x = u_P(Position[0]);
+        p.y = u_P(Position[1]);
+        p.z = u_P(Position[2]);
     }
 };
 
@@ -218,46 +218,46 @@ struct vertHW_2W
 {
     static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    TVal _P[4];
-    u32 _N_w;
-    u32 _T;
-    u32 _B;
-    TVal _tc_i[4];
+    TVal Position[4];
+    u32 Normal_and_w;
+    u32 Tangent;
+    u32 Binormal;
+    TVal TexCoord_and_index[4];
 
-    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc,
+    void set(const Fvector3& position, Fvector3 normal, Fvector3 tangent, Fvector3 binormal, const Fvector2& texcoord,
         int index0, int index1, float w)
     {
-        N.normalize_safe();
-        T.normalize_safe();
-        B.normalize_safe();
-        q_P(_P[0], P.x);
-        q_P(_P[1], P.y);
-        q_P(_P[2], P.z);
-        _P[3] = TVal(1);
-        _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w * 255.f + .5f), 0, 255)));
-        _T = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), 0);
-        _B = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), 0);
-        q_tc(_tc_i[0], tc.x);
-        q_tc(_tc_i[1], tc.y);
-        _tc_i[2] = s16(index0);
-        _tc_i[3] = s16(index1);
+        normal.normalize_safe();
+        tangent.normalize_safe();
+        binormal.normalize_safe();
+        q_P(Position[0], position.x);
+        q_P(Position[1], position.y);
+        q_P(Position[2], position.z);
+        Position[3] = TVal(1);
+        Normal_and_w = color_rgba(q_N(normal.x), q_N(normal.y), q_N(normal.z), u8(clampr(iFloor(w * 255.f + .5f), 0, 255)));
+        Tangent = color_rgba(q_N(tangent.x), q_N(tangent.y), q_N(tangent.z), 0);
+        Binormal = color_rgba(q_N(binormal.x), q_N(binormal.y), q_N(binormal.z), 0);
+        q_tc(TexCoord_and_index[0], texcoord.x);
+        q_tc(TexCoord_and_index[1], texcoord.y);
+        TexCoord_and_index[2] = s16(index0);
+        TexCoord_and_index[3] = s16(index1);
     }
 
     float get_weight() const
     {
-        return float(color_get_A(_N_w)) / 255.f;
+        return float(color_get_A(Normal_and_w)) / 255.f;
     }
 
     u16 get_bone(u16 w) const
     {
-        return (u16)_tc_i[w + 2] / 3;
+        return (u16)TexCoord_and_index[w + 2] / 3;
     }
 
     void get_pos(Fvector& p) const
     {
-        p.x = u_P(_P[0]);
-        p.y = u_P(_P[1]);
-        p.z = u_P(_P[2]);
+        p.x = u_P(Position[0]);
+        p.y = u_P(Position[1]);
+        p.z = u_P(Position[2]);
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const
@@ -278,40 +278,40 @@ struct vertHW_3W
 {
     static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    TVal _P[4];
-    u32 _N_w;
-    u32 _T_w;
-    u32 _B_i;
-    TVal _tc_i[4];
+    TVal Position[4];
+    u32 Normal_and_w;
+    u32 Tangent_and_w;
+    u32 Binormal_and_index;
+    TVal TexCoord_and_index[4];
 
-    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc,
+    void set(const Fvector3& position, Fvector3 normal, Fvector3 tangent, Fvector3 binormal, const Fvector2& texcoord,
         int index0, int index1, int index2,
         float w0, float w1)
     {
-        N.normalize_safe();
-        T.normalize_safe();
-        B.normalize_safe();
-        q_P(_P[0], P.x);
-        q_P(_P[1], P.y);
-        q_P(_P[2], P.z);
-        _P[3] = TVal(1);
-        _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
-        _T_w = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
-        _B_i = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), u8(index2));
-        q_tc(_tc_i[0], tc.x);;
-        q_tc(_tc_i[1], tc.y);;
-        _tc_i[2] = s16(index0);
-        _tc_i[3] = s16(index1);
+        normal.normalize_safe();
+        tangent.normalize_safe();
+        binormal.normalize_safe();
+        q_P(Position[0], position.x);
+        q_P(Position[1], position.y);
+        q_P(Position[2], position.z);
+        Position[3] = TVal(1);
+        Normal_and_w = color_rgba(q_N(normal.x), q_N(normal.y), q_N(normal.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
+        Tangent_and_w = color_rgba(q_N(tangent.x), q_N(tangent.y), q_N(tangent.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
+        Binormal_and_index = color_rgba(q_N(binormal.x), q_N(binormal.y), q_N(binormal.z), u8(index2));
+        q_tc(TexCoord_and_index[0], texcoord.x);;
+        q_tc(TexCoord_and_index[1], texcoord.y);;
+        TexCoord_and_index[2] = s16(index0);
+        TexCoord_and_index[3] = s16(index1);
     }
 
     float get_weight0() const
     {
-        return float(color_get_A(_N_w)) / 255.f;
+        return float(color_get_A(Normal_and_w)) / 255.f;
     }
 
     float get_weight1() const
     {
-        return float(color_get_A(_T_w)) / 255.f;
+        return float(color_get_A(Tangent_and_w)) / 255.f;
     }
 
     u16 get_bone(u16 w) const
@@ -319,8 +319,8 @@ struct vertHW_3W
         switch (w)
         {
         case 0:
-        case 1: return (u16)_tc_i[w + 2] / 3;
-        case 2: return (u16)color_get_A(_B_i) / 3;
+        case 1: return (u16)TexCoord_and_index[w + 2] / 3;
+        case 2: return (u16)color_get_A(Binormal_and_index) / 3;
         }
         R_ASSERT(0);
         return 0;
@@ -328,9 +328,9 @@ struct vertHW_3W
 
     void get_pos(Fvector& p) const
     {
-        p.x = u_P(_P[0]);
-        p.y = u_P(_P[1]);
-        p.z = u_P(_P[2]);
+        p.x = u_P(Position[0]);
+        p.y = u_P(Position[1]);
+        p.z = u_P(Position[2]);
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const
@@ -361,55 +361,55 @@ struct vertHW_4W
 {
     static_assert(std::is_same_v<TVal, float> || std::is_same_v<TVal, s16>, "Only float and s16 are supported");
 
-    TVal _P[4];
-    u32 _N_w;
-    u32 _T_w;
-    u32 _B_w;
-    TVal _tc[2];
-    u32 _i;
+    TVal Position[4];
+    u32 Normal_and_w;
+    u32 Tangent_and_w;
+    u32 Binormal_and_w;
+    TVal TexCoord[2];
+    u32 Index;
 
-    void set(const Fvector3& P, Fvector3 N, Fvector3 T, Fvector3 B, const Fvector2& tc,
+    void set(const Fvector3& position, Fvector3 normal, Fvector3 tangent, Fvector3 binormal, const Fvector2& texcoord,
         int index0, int index1, int index2, int index3,
         float w0, float w1, float w2)
     {
-        N.normalize_safe();
-        T.normalize_safe();
-        B.normalize_safe();
-        q_P(_P[0], P.x);
-        q_P(_P[1], P.y);
-        q_P(_P[2], P.z);
-        _P[3] = TVal(1);
-        _N_w = color_rgba(q_N(N.x), q_N(N.y), q_N(N.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
-        _T_w = color_rgba(q_N(T.x), q_N(T.y), q_N(T.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
-        _B_w = color_rgba(q_N(B.x), q_N(B.y), q_N(B.z), u8(clampr(iFloor(w2 * 255.f + .5f), 0, 255)));
-        q_tc(_tc[0], tc.x);
-        q_tc(_tc[1], tc.y);
-        _i = color_rgba(u8(index0), u8(index1), u8(index2), u8(index3));
+        normal.normalize_safe();
+        tangent.normalize_safe();
+        binormal.normalize_safe();
+        q_P(Position[0], position.x);
+        q_P(Position[1], position.y);
+        q_P(Position[2], position.z);
+        Position[3] = TVal(1);
+        Normal_and_w = color_rgba(q_N(normal.x), q_N(normal.y), q_N(normal.z), u8(clampr(iFloor(w0 * 255.f + .5f), 0, 255)));
+        Tangent_and_w = color_rgba(q_N(tangent.x), q_N(tangent.y), q_N(tangent.z), u8(clampr(iFloor(w1 * 255.f + .5f), 0, 255)));
+        Binormal_and_w = color_rgba(q_N(binormal.x), q_N(binormal.y), q_N(binormal.z), u8(clampr(iFloor(w2 * 255.f + .5f), 0, 255)));
+        q_tc(TexCoord[0], texcoord.x);
+        q_tc(TexCoord[1], texcoord.y);
+        Index = color_rgba(u8(index0), u8(index1), u8(index2), u8(index3));
     }
 
     float get_weight0() const
     {
-        return float(color_get_A(_N_w)) / 255.f;
+        return float(color_get_A(Normal_and_w)) / 255.f;
     }
 
     float get_weight1() const
     {
-        return float(color_get_A(_T_w)) / 255.f;
+        return float(color_get_A(Tangent_and_w)) / 255.f;
     }
 
     float get_weight2() const
     {
-        return float(color_get_A(_B_w)) / 255.f;
+        return float(color_get_A(Binormal_and_w)) / 255.f;
     }
 
     u16 get_bone(u16 w) const
     {
         switch (w)
         {
-        case 0: return (u16)color_get_R(_i) / 3;
-        case 1: return (u16)color_get_G(_i) / 3;
-        case 2: return (u16)color_get_B(_i) / 3;
-        case 3: return (u16)color_get_A(_i) / 3;
+        case 0: return (u16)color_get_R(Index) / 3;
+        case 1: return (u16)color_get_G(Index) / 3;
+        case 2: return (u16)color_get_B(Index) / 3;
+        case 3: return (u16)color_get_A(Index) / 3;
         }
         R_ASSERT(0);
         return 0;
@@ -417,9 +417,9 @@ struct vertHW_4W
 
     void get_pos(Fvector& p) const
     {
-        p.x = u_P(_P[0]);
-        p.y = u_P(_P[1]);
-        p.z = u_P(_P[2]);
+        p.x = u_P(Position[0]);
+        p.y = u_P(Position[1]);
+        p.z = u_P(Position[2]);
     }
 
     void get_pos_bones(Fvector& p, CKinematics* Parent) const

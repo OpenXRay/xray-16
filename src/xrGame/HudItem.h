@@ -93,6 +93,9 @@ public:
     virtual bool Action(u16 cmd, u32 flags) { return false; }
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 
+    virtual void TransformPosFromWorldToHud(Fvector& worldPos);
+    virtual void TransformDirFromWorldToHud(Fvector& worldDir);
+
     virtual u8 GetCurrentHudOffsetIdx() { return 0; }
     BOOL GetHUDmode();
     IC BOOL IsPending() const { return !!m_huditem_flags.test(fl_pending); }
@@ -178,7 +181,6 @@ public:
     }
     IC u32 animation_slot() { return m_animation_slot; }
     virtual void on_renderable_Render(u32 context_id, IRenderable* root) = 0;
-    virtual void debug_draw_firedeps(){};
 
     virtual CHudItem* cast_hud_item() { return this; }
     void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation

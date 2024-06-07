@@ -6,7 +6,7 @@
 #include "character_info.h"
 #include "xrEngine/xr_level_controller.h"
 #include "CustomZone.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "ui/UIMainIngameWnd.h"
 #include "UIGameCustom.h"
 #include "Grenade.h"
@@ -162,7 +162,7 @@ void CActor::PickupModeUpdate_COD()
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     ISpatialResult.clear();
-    g_SpatialSpace->q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
+    g_pGamePersistent->SpatialSpace.q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
 
     float maxlen = 1000.0f;
     CInventoryItem* pNearestItem = NULL;
@@ -259,7 +259,7 @@ void CActor::Check_for_AutoPickUp()
     APU_Box.set(Fvector().sub(bc, m_AutoPickUp_AABB), Fvector().add(bc, m_AutoPickUp_AABB));
 
     xr_vector<ISpatial*> ISpatialResult;
-    g_SpatialSpace->q_box(ISpatialResult, 0, STYPE_COLLIDEABLE, bc, m_AutoPickUp_AABB);
+    g_pGamePersistent->SpatialSpace.q_box(ISpatialResult, 0, STYPE_COLLIDEABLE, bc, m_AutoPickUp_AABB);
 
     // Determine visibility for dynamic part of scene
     for (u32 o_it = 0; o_it < ISpatialResult.size(); o_it++)

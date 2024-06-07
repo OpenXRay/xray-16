@@ -59,7 +59,7 @@ void CAI_Crow::SSound::Load(LPCSTR prefix)
     if (FS.exist(fn, "$game_sounds$", prefix, ".ogg"))
     {
         m_Sounds.push_back(ref_sound());
-        GEnv.Sound->create(m_Sounds.back(), prefix, st_Effect, sg_SourceType);
+        m_Sounds.back().create(prefix, st_Effect, sg_SourceType);
     }
     for (int i = 0; (i < MAX_SND_COUNT) && (m_Sounds.size() < MAX_SND_COUNT); ++i)
     {
@@ -68,7 +68,7 @@ void CAI_Crow::SSound::Load(LPCSTR prefix)
         if (FS.exist(fn, "$game_sounds$", name, ".ogg"))
         {
             m_Sounds.push_back(ref_sound());
-            GEnv.Sound->create(m_Sounds.back(), name, st_Effect, sg_SourceType);
+            m_Sounds.back().create(name, st_Effect, sg_SourceType);
         }
     }
     R_ASSERT(m_Sounds.size());
@@ -84,7 +84,7 @@ void CAI_Crow::SSound::SetPosition(const Fvector& pos)
 void CAI_Crow::SSound::Unload()
 {
     for (auto& sound : m_Sounds)
-        GEnv.Sound->destroy(sound);
+        sound.destroy();
 }
 
 void cb_OnHitEndPlaying(CBlend* B) { ((CAI_Crow*)B->CallbackParam)->OnHitEndPlaying(B); }
@@ -325,15 +325,12 @@ void CAI_Crow::UpdateCL()
 }
 void CAI_Crow::renderable_Render(u32 context_id, IRenderable* root)
 {
-    ScopeLock lock{ &render_lock };
     UpdateWorkload(Device.fTimeDelta * (Device.dwFrame - o_workload_frame));
     inherited::renderable_Render(context_id, root);
     o_workload_rframe = Device.dwFrame;
 }
 void CAI_Crow::shedule_Update(u32 DT)
 {
-    ScopeLock lock{ &render_lock };
-
     float fDT = float(DT) / 1000.F;
     spatial.type &= ~STYPE_VISIBLEFORAI;
 
@@ -384,7 +381,7 @@ void CAI_Crow::shedule_Update(u32 DT)
         {
             fIdleSoundTime = fIdleSoundDelta + fIdleSoundDelta * Random.randF(-0.5f, 0.5f);
             // if (st_current==eFlyIdle)
-            GEnv.Sound->play_at_pos(m_Sounds.m_idle.GetRandom(), H_Root(), Position());
+            m_Sounds.m_idle.GetRandom().play_at_pos(H_Root(), Position());
         }
         fIdleSoundTime -= fDT;
     }

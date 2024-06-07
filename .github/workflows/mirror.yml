@@ -3,15 +3,28 @@ name: Mirror
 on: [push, delete, workflow_dispatch]
 
 jobs:
-  to_bitbucket:
+  mirror:
     if: github.repository == 'OpenXRay/xray-16'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: pixta-dev/repository-mirroring-action@v1.1.1
+
+      - name: Bitbucket.org
+        uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
           target_repo_url: git@bitbucket.org:OpenXRay/xray-16.git
           ssh_private_key: ${{ secrets.RABOTYAGA_BITBUCKET_PRIVATE_SSH_KEY }}
 
+      - name: gitflic.ru
+        uses: pixta-dev/repository-mirroring-action@v1.1.1
+        with:
+          target_repo_url: git@gitflic.ru:openxray/xray-16.git
+          ssh_private_key: ${{ secrets.GITFLIC_PRIVATE_SSH_KEY }}
+
+      - name: abf.io
+        uses: pixta-dev/repository-mirroring-action@v1.1.1
+        with:
+          target_repo_url: git@abf.io:openxray/xray-16.git
+          ssh_private_key: ${{ secrets.ABF_IO_PRIVATE_SSH_KEY }}

@@ -25,7 +25,7 @@ bool CUIEditBox::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*
         AttachChild(m_frameLine);
         m_frameLine->SetAutoDelete(true);
     }
-    const bool result = m_frameLine->InitTexture(texture, shader, fatal);
+    const bool result = m_frameLine->InitTextureEx(texture, shader, fatal);
     m_frameLine->SetWndPos(Fvector2().set(0, 0));
     m_frameLine->SetWndSize(GetWndSize());
     return result;
@@ -54,8 +54,16 @@ void CUIEditBox::SaveBackUpOptValue()
 
 void CUIEditBox::UndoOptValue()
 {
-    SetText(m_opt_backup_value.c_str());
+    cpcstr backup = !m_opt_backup_value ? GetOptStringValue() : m_opt_backup_value.c_str();
+    SetText(backup);
     CUIOptionsItem::UndoOptValue();
 }
 
-bool CUIEditBox::IsChangedOptValue() const { return 0 != xr_strcmp(m_opt_backup_value.c_str(), GetText()); }
+bool CUIEditBox::IsChangedOptValue() const
+{
+    cpcstr current = GetText();
+    cpcstr backup = !m_opt_backup_value ? GetOptStringValue() : m_opt_backup_value.c_str();
+    if (!current || !backup)
+        return false;
+    return 0 != xr_strcmp(current, backup);
+}

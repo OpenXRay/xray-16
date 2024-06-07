@@ -1,0 +1,66 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 17.1
+ * @ Description: Rain Shader - PS
+ * @ Modified time: 2023-08-07 06:17
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "screenspace_common.h"
+
+// Pixel Struct
+struct p_Rain
+{
+	float2 Tex0	 : TEXCOORD0;
+	float4 tc	 : TEXCOORD1;
+};
+
+float4 ssfx_rain_setup; // Alpha, Brigthness, Refraction, Reflection
+
+float4 main ( p_Rain I ) : SV_Target
+{
+	// Factor to adjust the effect depending on light conditions
+	float HemiFactor = saturate(dot(L_hemi_color.rgb, float3(1.0f, 1.0f, 1.0f)));
+
+	// Screen Space
+	float2 PosTc = I.tc.xy / I.tc.w;
+
+	// Normal Setup
+	float4 N0 = s_base.Sample( smp_rtlinear, I.Tex0);
+	N0.xy = N0.xy * 2.0f - 1.0f; // Convert to -1.0f ~ 1.0f
+
+	// Adjust "refraction" offset
+	float4 UV_Offset = float4(N0.xy * 0.0125f, N0.xy);
+	UV_Offset.xy = normalize(float3(UV_Offset.xy * ssfx_rain_setup.z, 1.0f));
+	UV_Offset.zw = normalize(float3(UV_Offset.zw * (0.2f + HemiFactor * 0.5f), 1.0f));
+
+#if SSFX_RAIN_QUALITY > 0
+	// Remove incorrect refraction
+	float Depth = SSFX_get_depth(saturate(PosTc + UV_Offset.xy), 0);
+	UV_Offset.xy *= (I.tc.w < Depth || Depth <= SKY_EPS);
+#endif
+
+	// Screen Buffer ( Blur )
+	float3 Screen = s_blur_4.Sample(smp_nofilter, saturate(PosTc + UV_Offset.xy)).rgb;
+
+#if SSFX_RAIN_QUALITY > 1
+	// Fake reflection using light accumulator with a high UV offset
+#ifndef USE_MSAA
+	float3 rL = s_accumulator.Sample(smp_nofilter, saturate(PosTc + UV_Offset.zw)).rgb;
+#else
+	float3 rL = s_accumulator.Load(int3(saturate(PosTc + UV_Offset.zw) * screen_res.xy, 0), 0).rgb;
+#endif
+
+	// Adjust intensity ( Day: 3.0f | Night: 18.0f )
+	rL *= 3.0f + (1.0 - HemiFactor) * 15.0f;
+
+	// Add fake reflection
+	Screen += rL * ssfx_rain_setup.w;
+#endif
+
+	// Add Brightness
+	Screen += L_hemi_color.rgb * ssfx_rain_setup.y;
+
+	// Result
+	return float4( saturate(Screen), N0.w * ssfx_rain_setup.x );
+}

@@ -24,7 +24,7 @@
 #include "ui/UIMainIngameWnd.h"
 #include "CarWeapon.h"
 #include "game_object_space.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 
 #include "CharacterPhysicsSupport.h"
 #include "car_memory.h"
@@ -125,7 +125,9 @@ void CCar::reload(LPCSTR section)
 
 void CCar::cb_Steer(CBoneInstance* B)
 {
+#ifdef DEBUG
     VERIFY2(fsimilar(DET(B->mTransform), 1.f, DET_CHECK_EPS), "Bones receive returns 0 matrix");
+#endif
     CCar* C = static_cast<CCar*>(B->callback_param());
     Fmatrix m;
 

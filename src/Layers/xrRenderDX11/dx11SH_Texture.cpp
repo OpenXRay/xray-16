@@ -61,8 +61,7 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
         pSurface->GetType(&type);
         if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type)
         {
-            D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc;
-            ZeroMemory(&ViewDesc, sizeof(ViewDesc));
+            D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc{};
 
             if (desc.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE)
             {
@@ -72,21 +71,29 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
             }
             else
             {
+                const bool isArray = desc.ArraySize > 1;
                 if (desc.SampleDesc.Count <= 1)
                 {
-                    ViewDesc.ViewDimension = (desc.ArraySize > 1) ? D3D_SRV_DIMENSION_TEXTURE2DARRAY : D3D_SRV_DIMENSION_TEXTURE2D;
-                    ViewDesc.Texture2D.MostDetailedMip = 0;
-                    ViewDesc.Texture2D.MipLevels = desc.MipLevels;
+                    ViewDesc.ViewDimension = isArray ? D3D_SRV_DIMENSION_TEXTURE2DARRAY : D3D_SRV_DIMENSION_TEXTURE2D;
+                    if (isArray)
+                    {
+                        ViewDesc.Texture2DArray.MipLevels = desc.MipLevels;
+                        ViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+                    }
+                    else
+                    {
+                        ViewDesc.Texture2D.MipLevels = desc.MipLevels;
+                    }
                 }
                 else
                 {
-                    VERIFY(desc.ArraySize == 1);
-                    ViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2DMS;
-                    ViewDesc.Texture2DMS.UnusedField_NothingToDefine = 0;
+                    ViewDesc.ViewDimension = isArray ? D3D_SRV_DIMENSION_TEXTURE2DMSARRAY : D3D_SRV_DIMENSION_TEXTURE2DMS;
+                    if (isArray)
+                    {
+                        ViewDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
+                    }
                 }
             }
-
-            ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
 
             switch (desc.Format)
             {
@@ -107,31 +114,27 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
                 break;
             }
 
-            if (desc.ArraySize > 1)
-            {
-                ViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
-            }
+            _RELEASE(srv_all);
+            CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_all));
 
-            // this would be supported by DX10.1 but is not needed for stalker // XXX: why?
-            // if( ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS )
-            if ((desc.SampleDesc.Count <= 1) || (ViewDesc.Format != DXGI_FORMAT_R24_UNORM_X8_TYPELESS))
+            srv_per_slice.resize(desc.ArraySize);
+            for (u32 id = 0; id < desc.ArraySize; ++id)
             {
-                _RELEASE(srv_all);
-                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_all));
+                _RELEASE(srv_per_slice[id]);
 
-                srv_per_slice.resize(desc.ArraySize);
-                for (int id = 0; id < desc.ArraySize; ++id)
+                if (desc.SampleDesc.Count <= 1)
                 {
-                    _RELEASE(srv_per_slice[id]);
-
                     ViewDesc.Texture2DArray.ArraySize = 1;
                     ViewDesc.Texture2DArray.FirstArraySlice = id;
-                    CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_per_slice[id]));
                 }
-                set_slice(-1);
+                else
+                {
+                    ViewDesc.Texture2DMSArray.ArraySize = 1;
+                    ViewDesc.Texture2DMSArray.FirstArraySlice = id;
+                }
+                CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, &ViewDesc, &srv_per_slice[id]));
             }
-            else
-                srv_all = 0;
+            set_slice(-1);
         }
         else
         {
@@ -338,6 +341,8 @@ void CTexture::Load()
         return;
     }
 
+    ZoneScoped;
+
     Preload();
 
     bool bCreateView = true;
@@ -510,6 +515,7 @@ void CTexture::Load()
 
 void CTexture::Unload()
 {
+    ZoneScoped;
 #ifdef DEBUG
     string_path msg_buff;
     xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount =", cName.c_str());
