@@ -223,6 +223,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     };
 
     options.add("#version 410");
+    options.add("#extension GL_ARB_separate_shader_objects : enable");
 
 #ifdef DEBUG
     options.add("#pragma optimize (off)");
@@ -231,8 +232,6 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     options.add("#pragma optimize (on)");
     sh_name.append(1u);
 #endif
-
-    options.add("#extension GL_ARB_separate_shader_objects : enable");
 
     xr_sprintf(c_name, "// %s.%s", name, pTarget);
     options.add(c_name);
