@@ -58,11 +58,6 @@ void CHudTuner::UpdateValues()
 {
     if (current_hud_item)
     {
-        new_measures.m_hands_attach[0].set(curr_measures.m_hands_attach[0]);
-        new_measures.m_hands_attach[1].set(curr_measures.m_hands_attach[1]);
-        new_measures.m_hands_attach[0].add(new_measures.m_hands_offset[0][0]);
-        new_measures.m_hands_attach[1].add(new_measures.m_hands_offset[1][0]);
-
         current_hud_item->m_measures = new_measures;
     }
 }
@@ -75,6 +70,13 @@ void CHudTuner::OnFrame()
 
     if (!g_player_hud)
         return;
+
+    auto calcColumnCount = [](float columnWidth) -> int
+    {
+        float windowWidth = ImGui::GetWindowWidth();
+        int columnCount = _max(1, static_cast<int>(windowWidth / columnWidth));
+        return columnCount;
+    };
 
     auto hud_item = g_player_hud->attached_item(current_hud_idx);
     if (current_hud_item != hud_item)
@@ -124,8 +126,8 @@ void CHudTuner::OnFrame()
             ImGui::SliderFloat("Position step", &_delta_pos, 0.0000001f, 0.001f, "%.7f");
             ImGui::SliderFloat("Rotation step", &_delta_rot, 0.000001f, 0.1f, "%.6f");
 
-            ImGui::DragFloat3(hud_adj_modes[HUD_POS], (float*)&new_measures.m_hands_offset[0][0], _delta_pos, 0.f, 0.f, "%.7f");
-            ImGui::DragFloat3(hud_adj_modes[HUD_ROT], (float*)&new_measures.m_hands_offset[1][0], _delta_rot, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_POS], (float*)&new_measures.m_hands_attach[0], _delta_pos, 0.f, 0.f, "%.7f");
+            ImGui::DragFloat3(hud_adj_modes[HUD_ROT], (float*)&new_measures.m_hands_attach[1], _delta_rot, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[HUD_POS_AIM], (float*)&new_measures.m_hands_offset[0][1], _delta_pos, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[HUD_ROT_AIM], (float*)&new_measures.m_hands_offset[1][1], _delta_rot, 0.f, 0.f, "%.7f");
             ImGui::DragFloat3(hud_adj_modes[HUD_POS_GL], (float*)&new_measures.m_hands_offset[0][2], _delta_pos, 0.f, 0.f, "%.7f");
@@ -152,9 +154,9 @@ void CHudTuner::OnFrame()
                     ImGui::LogToClipboard();
                     xr_sprintf(selectable, "[%s]\n", m_sect_name.c_str());
                     ImGui::LogText(selectable);
-                    xr_sprintf(selectable, "hands_position%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[0][0].x, new_measures.m_hands_offset[0][0].y, new_measures.m_hands_offset[0][0].z);
+                    xr_sprintf(selectable, "hands_position%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_attach[0].x, new_measures.m_hands_attach[0].y, new_measures.m_hands_attach[0].z);
                     ImGui::LogText(selectable);
-                    xr_sprintf(selectable, "hands_orientation%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[1][0].x, new_measures.m_hands_offset[1][0].y, new_measures.m_hands_offset[1][0].z);
+                    xr_sprintf(selectable, "hands_orientation%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_attach[1].x, new_measures.m_hands_attach[1].y, new_measures.m_hands_attach[1].z);
                     ImGui::LogText(selectable);
                     xr_sprintf(selectable, "aim_hud_offset_pos%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[0][1].x, new_measures.m_hands_offset[0][1].y, new_measures.m_hands_offset[0][1].z);
                     ImGui::LogText(selectable);
@@ -187,11 +189,21 @@ void CHudTuner::OnFrame()
                 CDebugRenderer& render = Level().debug_renderer();
 
                 ImGui::SliderFloat("Debug Point Size", &debug_point_size, 0.00005f, 1.f, "%.5f");
-                if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; }; ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; } ImGui::SameLine();
-                if (ImGui::RadioButton("Draw Shell Point", draw_sp)) { draw_sp = !draw_sp; }
+
+                if (ImGui::BeginTable("Show Debug Widgets", calcColumnCount(210.f)))
+                {
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Point", draw_fp)) { draw_fp = !draw_fp; };
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Point (GL)", draw_fp2)) { draw_fp2 = !draw_fp2; }
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Direction", draw_fd)) { draw_fd = !draw_fd; }
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Fire Direction (GL)", draw_fd2)) { draw_fd2 = !draw_fd2; }
+                    ImGui::TableNextColumn();
+                    if (ImGui::RadioButton("Draw Shell Point", draw_sp)) { draw_sp = !draw_sp; }
+                    ImGui::EndTable();
+                }
 
                 if (draw_fp)
                 {
@@ -257,31 +269,49 @@ void CHudTuner::OnFrame()
             }
         }
 
+        ImGui::NewLine();
+
         if (current_hud_item && ImGui::CollapsingHeader("Bone and Animation Debugging", ImGuiTreeNodeFlags_DefaultOpen))
         {
             IKinematics* ik = current_hud_item->m_model;
             ImGui::Text("Bone Count = %i", ik->LL_BoneCount());
-            ImGui::Text("Root Bone = %s", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()));
+            ImGui::Text("Root Bone = %s, ID: %i", ik->LL_BoneName_dbg(ik->LL_GetBoneRoot()), ik->LL_GetBoneRoot());
 
-            for (const auto& [bone_name, bone_id] : *ik->LL_Bones())
+            if (ImGui::BeginTable("Bone Visibility", calcColumnCount(125.f)))
             {
-                if (bone_id == ik->LL_GetBoneRoot())
-                    continue;
+                for (const auto& [bone_name, bone_id] : *ik->LL_Bones())
+                {
+                    if (bone_id == ik->LL_GetBoneRoot())
+                        continue;
 
-                bool visible = ik->LL_GetBoneVisible(bone_id);
-                if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; }; ImGui::SameLine();
-                ik->LL_SetBoneVisible(bone_id, visible, FALSE);
+                    ImGui::TableNextColumn();
+                    bool visible = ik->LL_GetBoneVisible(bone_id);
+                    if (ImGui::RadioButton(bone_name.c_str(), visible)) { visible = !visible; };
+                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+                    {
+                        ImGui::SetTooltip("Bone Name = %s, ID: %i", bone_name.c_str(), bone_id);
+                    }
+                    ik->LL_SetBoneVisible(bone_id, visible, FALSE);
+                }
+                ImGui::EndTable();
             }
 
             ImGui::NewLine();
-
-            for (const auto& [anim_name, motion] : current_hud_item->m_hand_motions.m_anims)
+            if (ImGui::BeginTable("Animations", calcColumnCount(125.f)))
             {
-                if (ImGui::Button(anim_name.c_str()))
+                for (const auto& [anim_name, motion] : current_hud_item->m_hand_motions.m_anims)
                 {
-                    current_hud_item->m_parent_hud_item->PlayHUDMotion_noCB(anim_name, false);
-                };
-                ImGui::SameLine();
+                    ImGui::TableNextColumn();
+                    if (ImGui::Button(anim_name.c_str()))
+                    {
+                        current_hud_item->m_parent_hud_item->PlayHUDMotion_noCB(anim_name, false);
+                    }
+                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+                    {
+                        ImGui::SetTooltip("%s = %s, %s", anim_name.c_str(), motion.m_base_name.c_str(), motion.m_additional_name.c_str());
+                    }
+                }
+                ImGui::EndTable();
             }
         }
     }
