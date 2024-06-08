@@ -26,6 +26,8 @@
 #include "GamePersistent.h"
 #include "Actor.h"
 
+#include "debug_renderer.h"
+
 extern Fvector g_first_person_cam_offset;
 
 void CActor::cam_Set(EActorCameras style)
@@ -366,12 +368,15 @@ void CActor::cam_Update(float dt, float fFOV)
 
     if (FirstPersonBodyActive()) // update camera position with offset for first person body
     {
-        Fvector camdir = { cam_Active()->Direction().x, 0.f, cam_Active()->Direction().z }; // Ignore y axis
+        const float pitchFactor = C->pitch > 0.f ? C->pitch / C->lim_pitch.x : 0.f; // only apply pitch factor when we are looking down
+        m_firstPersonCameraXform.c.mad(m_firstPersonCameraXform.j, g_first_person_cam_offset.y * pitchFactor);
         point = m_firstPersonCameraXform.c;
-        point.y += g_first_person_cam_offset.y;
-        point.add(camdir.normalize().mul(g_first_person_cam_offset.z));
-        _viewport_near = VIEWPORT_NEAR * .1f; // .02f
+        _viewport_near = HUD_VIEWPORT_NEAR * .3f;
         Visual()->dcast_PKinematics()->CalculateBones(true);
+
+#ifdef DEBUG
+        DBG_DrawOBB(m_firstPersonCameraXform, Fvector{ 0.1, 0.1, 0.1 }, color_xrgb(255, 0, 0));
+#endif
     }
 
     C->Update(point, dangle);
