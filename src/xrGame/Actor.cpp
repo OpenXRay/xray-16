@@ -76,6 +76,7 @@
 #include "xrCore/xr_token.h"
 
 #include "xrEngine/Rain.h"
+#include "xrEngine/xr_collide_form.h"
 
 //const u32 patch_frames = 50;
 //const float respawn_delay = 1.f;
@@ -100,7 +101,7 @@ Flags32 psActorFlags =
     AF_AUTOPICKUP |
     AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
-    AF_MULTI_ITEM_PICKUP | 
+    AF_MULTI_ITEM_PICKUP |
     AF_FIRST_PERSON_BODY
 };
 int psActorSleepTime = 1;
@@ -1613,7 +1614,7 @@ bool CActor::FirstPersonBodyEnabled()
     return psActorFlags.test(AF_FIRST_PERSON_BODY) && cam_active == eacFirstEye;
 }
 
-bool CActor::FirstPersonBodyActive() 
+bool CActor::FirstPersonBodyActive()
 {
     return m_firstPersonBody;
 }
@@ -1623,8 +1624,12 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     ScopeLock lock{ &render_lock };
     IKinematics* realBodyK = Visual()->dcast_PKinematics();
 
-    m_firstPersonCameraXform.set(XFORM());
-    m_firstPersonCameraXform.mulB_43(realBodyK->LL_GetTransform(m_head));
+    auto obb = realBodyK->LL_GetData(m_head).obb;
+    Fmatrix Mbox;
+    obb.xform_get(Mbox);
+    const Fmatrix& Mbone = realBodyK->LL_GetBoneInstance(m_head).mTransform;
+    Fmatrix X;
+    m_firstPersonCameraXform.mul_43(XFORM(), X.mul_43(Mbone, Mbox));
 
     if (!FirstPersonBodyEnabled())
         return;
