@@ -1307,6 +1307,7 @@
     <ClInclude Include="ui\UIActorStateInfo.h" />
     <ClInclude Include="ui\UIArtefactPanel.h" />
     <ClInclude Include="ui\UIBoosterInfo.h" />
+    <ClInclude Include="ui\UIBoostStatesWnd.h" />
     <ClInclude Include="ui\UIBuyWeaponTab.h" />
     <ClInclude Include="ui\UIBuyWndBase.h" />
     <ClInclude Include="ui\UIBuyWndShared.h" />
@@ -3227,6 +3228,7 @@
     <ClCompile Include="ui\UIActorStateInfo.cpp" />
     <ClCompile Include="ui\UIArtefactPanel.cpp" />
     <ClCompile Include="ui\UIBoosterInfo.cpp" />
+    <ClCompile Include="ui\UIBoostStatesWnd.cpp" />
     <ClCompile Include="ui\UIBuyWeaponTab.cpp" />
     <ClCompile Include="ui\UIBuyWndShared.cpp" />
     <ClCompile Include="ui\UICarPanel.cpp" />
