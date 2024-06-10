@@ -111,7 +111,7 @@ public:
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToIgnoreAnims;
     u32 m_timeOfDeath{};
     u32 m_fpDeathCamOfffsetTime{};
-    Fmatrix m_firstPersonBodyXform{};
+    Fmatrix m_firstPersonBodyXform{Fidentity};
     Fmatrix m_firstPersonCameraXform{};
 
     Lock render_lock{};

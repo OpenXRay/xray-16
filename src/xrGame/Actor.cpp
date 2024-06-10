@@ -1353,6 +1353,7 @@ void CActor::shedule_Update(u32 DT)
     //------------------------------------------------
     {
         g_cl_CheckControls(mstate_wishful, NET_SavedAccel, NET_Jump, dt);
+        m_firstPersonBodyXform = XFORM();
         {
             /*
             if (mstate_real & mcJump)
@@ -1642,7 +1643,6 @@ void CActor::RenderFirstPersonBody(u32 context_id, IRenderable* root)
     }
 
     IKinematics* kinematics = m_firstPersonBody->dcast_PKinematics();
-    m_firstPersonBodyXform = XFORM();
 
     // Add body to render
     GEnv.Render->add_Visual(context_id, root, m_firstPersonBody, m_firstPersonBodyXform);
