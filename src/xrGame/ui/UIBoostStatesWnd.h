@@ -15,8 +15,9 @@ public:
     void UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences);
 
 private:
-    float dx, dy = 0.f;
-    Fvector2 pos = {0.f, 0.f};
+    bool bHorizontal, bInverse;
+    float dx, dy;
+    u8 max_item;
     xr_vector<EBoostParams> m_ind_boost_pos;
     xr_map<EBoostParams, CUIStatic*> m_ind_boost_state;
 };

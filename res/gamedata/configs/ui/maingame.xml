@@ -23,6 +23,7 @@
     <indicator_bleeding x="980" y="590" width="33" height="35"/>
 
 	<booster_states x="20" y="660" width="34" height="44" stretch="1">
+		<settings dx="34" dy="-44" max_item="5" horz_align="1" inverse="0"></settings>
 		<indicator_booster_psy x="0" y="0" width="31" height="41" stretch="1">
 			<texture>ui_inGame2_shield_Psy</texture>
 		</indicator_booster_psy>

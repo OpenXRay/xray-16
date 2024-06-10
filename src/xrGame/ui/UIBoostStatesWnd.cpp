@@ -3,7 +3,14 @@
 #include "UIHelper.h"
 
 CUIBoostStatesWnd::CUIBoostStatesWnd() 
-    : CUIWindow(CUIBoostStatesWnd::GetDebugType()) {}
+    : CUIWindow(CUIBoostStatesWnd::GetDebugType()) 
+{
+    bHorizontal = true;
+    bInverse = false;
+    dx = 0.f;
+    dy = 0.f;
+    max_item = 8;
+}
 
 void CUIBoostStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path) 
 {
@@ -14,8 +21,12 @@ void CUIBoostStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     
     XML_NODE new_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(new_root);
-    dx = CUIBoostStatesWnd::GetWidth();
-    dy = CUIBoostStatesWnd::GetHeight();
+
+    dx = xml.ReadAttribFlt("settings", 0, "dx", GetWidth());
+    dy = xml.ReadAttribFlt("settings", 0, "dy", GetHeight());
+    bHorizontal = (xml.ReadAttribInt("settings", 0, "horz_align", 1) == 1);
+    bInverse = (xml.ReadAttribInt("settings", 0, "inverse", 0) == 1);
+    max_item = xml.ReadAttribInt("settings", 0, "max_item", 8);
     constexpr std::tuple<EBoostParams, cpcstr> booster_list[] = {
         {eBoostHpRestore, "indicator_booster_health"}, 
         {eBoostPowerRestore, "indicator_booster_power"},
@@ -57,45 +68,88 @@ void CUIBoostStatesWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_
 
     for (const auto& [type, item] : m_ind_boost_state)
     {
-        if (influences.count(type) && !influences.empty())
+        if (influences.empty())
         {
-            if (!m_ind_boost_state[type]->IsShown())
+            item->Show(false);
+            continue;
+        }
+        CEntityCondition::BOOSTER_MAP::const_iterator It = influences.find(type);
+        if (It != influences.end())
+        {
+            if (!item->IsShown())
             {
                 m_ind_boost_pos.push_back(type);
-                m_ind_boost_state[type]->Show(true);
+                item->Show(true);
             }
-            if (influences.find(type)->second.fBoostTime <= 3.0f)
+            if (It->second.fBoostTime <= 3.0f)
             {
-                m_ind_boost_state[type]->SetColorAnimation(str_flag, flags);
+                item->SetColorAnimation(str_flag, flags);
             }
             else
             {
-                m_ind_boost_state[type]->ResetColorAnimation();
+                item->ResetColorAnimation();
             }
         }
         else
         {
-            m_ind_boost_state[type]->Show(false);
+            item->Show(false);
         }
     }
+
     if (!m_ind_boost_pos.empty())
     {
-        bool rev_add = false;
-        int i = 0;
-        Fvector2 p = pos;
-        for (auto It = m_ind_boost_pos.begin(); It != m_ind_boost_pos.end(); It++)
+        u8 i = 0,j = 0,max = max_item - 1;
+        if (bInverse)
         {
-            if (m_ind_boost_state[*It]->IsShown())
+            for (auto It = m_ind_boost_pos.end() - 1; It >= m_ind_boost_pos.begin(); It--)
             {
-                m_ind_boost_state[*It]->SetWndPos({p.x + dx * i, p.y});
-                i++;
-                m_ind_boost_state[*It]->Update();
-                m_ind_boost_state[*It]->Draw();
+                if (m_ind_boost_state[*It]->IsShown())
+                {
+                    (bHorizontal ? m_ind_boost_state[*It]->SetWndPos({dx * i, dy * j}) :
+                                   m_ind_boost_state[*It]->SetWndPos({dx * j, dy * i}));
+                    if (i >= max_item)
+                    {
+                        i = 0;
+                        j++;
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                    m_ind_boost_state[*It]->Update();
+                    m_ind_boost_state[*It]->Draw();
+                }
+                else
+                {
+                    m_ind_boost_pos.erase(It);
+                }
             }
-            else
+        }
+        else
+        {
+            for (auto It = m_ind_boost_pos.begin(); It != m_ind_boost_pos.end(); It++)
             {
-                m_ind_boost_pos.erase(It);
-                It--;
+                if (m_ind_boost_state[*It]->IsShown())
+                {
+                    (bHorizontal ? m_ind_boost_state[*It]->SetWndPos({dx * i, dy * j}) :
+                                   m_ind_boost_state[*It]->SetWndPos({dx * j, dy * i}));
+                    if (i >= max)
+                    {
+                        i = 0;
+                        j++;
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                    m_ind_boost_state[*It]->Update();
+                    m_ind_boost_state[*It]->Draw();
+                }
+                else
+                {
+                    m_ind_boost_pos.erase(It);
+                    It--;
+                }
             }
         }
     }
