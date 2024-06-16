@@ -135,7 +135,6 @@ protected:
     bool m_b_local;
 
     CUIMessageBoxEx* m_message_box;
-    CUIMessageBoxEx* m_version_switch_msgbox;
 
     ESortingMode m_sort_mode;
     bool m_sort_ascending;

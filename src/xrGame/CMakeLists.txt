@@ -1591,8 +1591,6 @@ target_sources(xrGame PRIVATE
     UITimeDilator.h
     UIZoneMap.cpp
     UIZoneMap.h
-    VersionSwitcher.cpp
-    VersionSwitcher.h
     vision_client.cpp
     vision_client.h
     vision_client_inline.h
@@ -2471,8 +2469,6 @@ target_sources(xrGame PRIVATE
     ui/UITradeBar.h
     ui/UITradeWnd.cpp
     ui/UITradeWnd.h
-    ui/UIVersionList.cpp
-    ui/UIVersionList.h
     ui/UIVote.cpp
     ui/UIVote.h
     ui/UIVoteStatusWnd.cpp

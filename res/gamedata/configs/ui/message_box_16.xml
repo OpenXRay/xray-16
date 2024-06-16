@@ -584,21 +584,4 @@
 	        <texture>ui_inGame2_Mp_bigbuttone</texture>
 	    </button_no>
 	</message_box_ra_login>
-	
-	<message_box_version_switch type="yes_no" x="240" y="256" width="541" height="255" stretch="1">
-		<texture>ui_inGame2_message_box</texture>
-	    <message_text x="49" y="28" width="461" height="150" complex_mode="1">
-		    <text align="c" vert_align="c" font="letterica18">st_switch_version_invitation</text>
-	    </message_text>
-	    <button_yes x="167" y="212" width="101" height="28" check_mode="0">
-	        <window_name>button_yes</window_name>
-	        <text font="letterica18">Btn_Yes</text>
-	        <texture>ui_inGame2_Mp_bigbuttone</texture>
-	    </button_yes>
-	    <button_no x="272" y="212" width="101" height="28" check_mode="0">
-	        <window_name>button_no</window_name>
-	        <text font="letterica18">Btn_No</text>
-	        <texture>ui_inGame2_Mp_bigbuttone</texture>
-	    </button_no>
-	</message_box_version_switch>	
 </w>
