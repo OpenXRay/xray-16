@@ -13,6 +13,7 @@ public:
     void InitFromXml(CUIXml& xml, LPCSTR path);
     void DrawBoosterIndicators();
     void UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences);
+    void UpdateBoosterPosition(const CEntityCondition::BOOSTER_MAP& influences);
 
 private:
     bool bHorizontal, bInverse;

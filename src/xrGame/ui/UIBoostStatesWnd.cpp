@@ -46,14 +46,16 @@ void CUIBoostStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     xml.SetLocalRoot(stored_root);
 }
 
-void CUIBoostStatesWnd::DrawBoosterIndicators() 
+void CUIBoostStatesWnd::DrawBoosterIndicators()
 {
-    for (const auto& Iter : m_ind_boost_state)
+    if (m_ind_boost_pos.empty())
+        return;
+    for (const auto& [type, Item] : m_ind_boost_state)
     {
-        if (Iter.second && Iter.second->IsShown())
+        if (Item && Item->IsShown())
         {
-            Iter.second->Update();
-            Iter.second->Draw();
+            Item->Update();
+            Item->Draw();
         }
     }
 }
@@ -66,90 +68,108 @@ void CUIBoostStatesWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_
     flags |= LA_ONLYALPHA;
     flags |= LA_TEXTURECOLOR;
 
-    for (const auto& [type, item] : m_ind_boost_state)
+    for (const auto& [type, Item] : m_ind_boost_state)
     {
         if (influences.empty())
         {
-            item->Show(false);
+            Item->Show(false);
             continue;
         }
         CEntityCondition::BOOSTER_MAP::const_iterator It = influences.find(type);
         if (It != influences.end())
         {
-            if (!item->IsShown())
+            if (!Item->IsShown())
             {
                 m_ind_boost_pos.push_back(type);
-                item->Show(true);
+                Item->Show(true);
             }
             if (It->second.fBoostTime <= 3.0f)
             {
-                item->SetColorAnimation(str_flag, flags);
+                Item->SetColorAnimation(str_flag, flags);
             }
             else
             {
-                item->ResetColorAnimation();
+                Item->ResetColorAnimation();
             }
         }
         else
         {
-            item->Show(false);
+            Item->Show(false);
         }
     }
-
-    if (!m_ind_boost_pos.empty())
+    if(!influences.empty() || !m_ind_boost_pos.empty())
     {
-        u8 i = 0,j = 0,max = max_item - 1;
-        if (bInverse)
+        UpdateBoosterPosition(influences);
+    }
+}
+
+void CUIBoostStatesWnd::UpdateBoosterPosition(const CEntityCondition::BOOSTER_MAP& influences)
+{
+    if (m_ind_boost_pos.empty() && !influences.empty())
+    {
+        for (const auto& [type, Item] : m_ind_boost_state)
         {
-            for (auto It = m_ind_boost_pos.end() - 1; It >= m_ind_boost_pos.begin(); It--)
+            if (Item && Item->IsShown())
             {
-                if (m_ind_boost_state[*It]->IsShown())
-                {
-                    (bHorizontal ? m_ind_boost_state[*It]->SetWndPos({dx * i, dy * j}) :
-                                   m_ind_boost_state[*It]->SetWndPos({dx * j, dy * i}));
-                    if (i >= max_item)
-                    {
-                        i = 0;
-                        j++;
-                    }
-                    else
-                    {
-                        i++;
-                    }
-                    m_ind_boost_state[*It]->Update();
-                    m_ind_boost_state[*It]->Draw();
-                }
-                else
-                {
-                    m_ind_boost_pos.erase(It);
-                }
+                Item->Show(false);
             }
         }
-        else
+    }
+    if (m_ind_boost_pos.empty())
+        return;
+    u8 i = 0, j = 0, max = max_item - 1;
+    if (bInverse)
+    {
+        for (auto It = m_ind_boost_pos.end() - 1; It >= m_ind_boost_pos.begin(); It--)
         {
-            for (auto It = m_ind_boost_pos.begin(); It != m_ind_boost_pos.end(); It++)
+            xr_map<EBoostParams, CUIStatic*>::const_iterator Item = m_ind_boost_state.find(*It);
+            if (Item->second->IsShown())
             {
-                if (m_ind_boost_state[*It]->IsShown())
+                (bHorizontal ? Item->second->SetWndPos({dx * i, dy * j}) :
+                	Item->second->SetWndPos({dx * j, dy * i}));
+                if (i >= max_item)
                 {
-                    (bHorizontal ? m_ind_boost_state[*It]->SetWndPos({dx * i, dy * j}) :
-                                   m_ind_boost_state[*It]->SetWndPos({dx * j, dy * i}));
-                    if (i >= max)
-                    {
-                        i = 0;
-                        j++;
-                    }
-                    else
-                    {
-                        i++;
-                    }
-                    m_ind_boost_state[*It]->Update();
-                    m_ind_boost_state[*It]->Draw();
+                    i = 0;
+                    j++;
                 }
                 else
                 {
-                    m_ind_boost_pos.erase(It);
-                    It--;
+                    i++;
                 }
+                Item->second->Update();
+                Item->second->Draw();
+            }
+            else
+            {
+                m_ind_boost_pos.erase(It);
+            }
+        }
+    }
+    else
+    {
+        for (auto It = m_ind_boost_pos.begin(); It != m_ind_boost_pos.end(); It++)
+        {
+            xr_map<EBoostParams, CUIStatic*>::const_iterator Item = m_ind_boost_state.find(*It);
+            if (Item->second->IsShown())
+            {
+                (bHorizontal ? Item->second->SetWndPos({dx * i, dy * j}) :
+                	Item->second->SetWndPos({dx * j, dy * i}));
+                if (i >= max)
+                {
+                    i = 0;
+                    j++;
+                }
+                else
+                {
+                    i++;
+                }
+                Item->second->Update();
+                Item->second->Draw();
+            }
+            else
+            {
+                m_ind_boost_pos.erase(It);
+                It--;
             }
         }
     }
