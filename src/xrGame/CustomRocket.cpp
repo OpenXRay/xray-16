@@ -180,6 +180,12 @@ void CCustomRocket::create_physic_shell()
 // Rocket specific functions
 //////////////////////////////////////////////////////////////////////////
 
+#pragma warning(push)
+
+// XXX: maybe update ODE to a newer version
+// The warning happens on line 241: l_pMYU->last_pos[0] != -dInfinity
+#pragma warning(disable : 4756)
+
 void CCustomRocket::ObjectContactCallback(
     bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
@@ -291,6 +297,7 @@ void CCustomRocket::ObjectContactCallback(
     {
     }
 }
+#pragma warning(pop)
 
 void CCustomRocket::Load(LPCSTR section)
 {
