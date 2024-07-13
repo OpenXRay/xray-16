@@ -3,13 +3,13 @@
 #include "UIHelper.h"
 
 CUIBoostStatesWnd::CUIBoostStatesWnd() 
-    : CUIWindow(CUIBoostStatesWnd::GetDebugType()) 
+    : CUIWindow(CUIBoostStatesWnd::GetDebugType()),
+    bHorizontal(true),
+    bInverse(false),
+    dx(0.f),
+    dy(0.f),
+    maxItem(8)
 {
-    bHorizontal = true;
-    bInverse = false;
-    dx = 0.f;
-    dy = 0.f;
-    maxItem = 8;
 }
 
 void CUIBoostStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path) 
