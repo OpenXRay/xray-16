@@ -288,8 +288,6 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
 
-    m_fTreeAmplitudeIntensity = 0.01f;
-
     lens_flare = nullptr;
     thunderbolt = nullptr;
 
@@ -407,7 +405,17 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
     m_fWaterIntensity = config.read_if_exists<float>(identifier, "water_intensity", 1.0);
-    m_fTreeAmplitudeIntensity = config.read_if_exists<float>(identifier, "tree_amplitude_intensity", 0.01);
+
+    m_fTreeAmplitude = 0.005f;
+    if (config.line_exist(identifier, "trees_amplitude")) // Lost Alpha config
+        m_fTreeAmplitude = config.r_float(identifier, "trees_amplitude");
+    else if (config.line_exist(identifier, "tree_amplitude_intensity")) // Call of Chernobyl config
+        m_fTreeAmplitude = config.r_float(identifier, "tree_amplitude_intensity");
+
+    m_fTreeSpeed    = config.read_if_exists<float>(identifier, "trees_speed",    1.0f);
+    m_fTreeRotation = config.read_if_exists<float>(identifier, "trees_rotation", 10.0f);
+
+    m_fTreeWave = config.read_if_exists<Fvector>(identifier, "trees_wave", { .1f, .01f, .11f });
 
     C_CHECK(clouds_color);
     C_CHECK(sky_color);
@@ -565,7 +573,11 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
 
     m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
-    m_fTreeAmplitudeIntensity = fi * A.m_fTreeAmplitudeIntensity + f * B.m_fTreeAmplitudeIntensity;
+    // trees
+    m_fTreeAmplitude = fi * A.m_fTreeAmplitude + f * B.m_fTreeAmplitude;
+    m_fTreeSpeed = fi * A.m_fTreeSpeed + f * B.m_fTreeSpeed;
+    m_fTreeRotation = fi * A.m_fTreeRotation + f * B.m_fTreeRotation;
+    m_fTreeWave.lerp(A.m_fTreeWave, B.m_fTreeWave, f);
 
     // colors
     //. sky_color.lerp (A.sky_color,B.sky_color,f).add(Mdf.sky_color).mul(modif_power);

@@ -130,10 +130,6 @@ float ps_r__Detail_density = 0.3f;
 float ps_r__Detail_height = 1.f;
 float ps_r__Detail_rainbow_hemi = 0.75f;
 
-float ps_r__Tree_w_rot = 10.0f;
-float ps_r__Tree_w_speed = 1.00f;
-float ps_r__Tree_w_amp = 0.005f;
-Fvector ps_r__Tree_Wave = {.1f, .01f, .11f};
 float ps_r__Tree_SBC = 1.5f; // scale bias correct
 
 float ps_r__WallmarkTTL = 50.f;
@@ -881,8 +877,6 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__gamma", &ps_r2_img_gamma, 0.5f, 2.2f);
     CMD4(CCC_Float, "r__saturation", &ps_r2_img_saturation, 0.0f, 2.0f);
 
-    Fvector tw_min, tw_max;
-
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
 
@@ -893,14 +887,6 @@ void xrRender_initconsole()
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
     CMD4(CCC_Float, "r__detail_l_aniso", &ps_r__Detail_l_aniso, .1f, .5f);
-
-    CMD4(CCC_Float, "r__d_tree_w_amp", &ps_r__Tree_w_amp, .001f, 1.f);
-    CMD4(CCC_Float, "r__d_tree_w_rot", &ps_r__Tree_w_rot, .01f, 100.f);
-    CMD4(CCC_Float, "r__d_tree_w_speed", &ps_r__Tree_w_speed, 1.0f, 10.f);
-
-    tw_min.set(EPS, EPS, EPS);
-    tw_max.set(2, 2, 2);
-    CMD4(CCC_Vector3, "r__d_tree_wave", &ps_r__Tree_Wave, tw_min, tw_max);
 #endif // DEBUG
 
     CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
@@ -1028,6 +1014,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_slight_fade", &ps_r2_slight_fade, .2f, 1.f);
     CMD3(CCC_Token, "r2_smap_size", &ps_r2_smapsize, qsmapsize_token);
 
+    Fvector tw_min, tw_max;
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r2_aa_break", &ps_r2_aa_barier, tw_min, tw_max);

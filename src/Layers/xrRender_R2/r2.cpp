@@ -109,17 +109,6 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
-static class cl_tree_amplitude_intensity : public R_constant_setup
-{
-    void setup(CBackend& cmd_list, R_constant* C) override
-    {
-        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
-        const float fValue = env.m_fTreeAmplitudeIntensity;
-        cmd_list.set_c(C, fValue, fValue, fValue, 0.f);
-    }
-} binder_tree_amplitude_intensity;
-// XXX: do we need to register this binder?
-
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override

@@ -169,7 +169,11 @@ public:
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
 
-    float m_fTreeAmplitudeIntensity;
+    // SkyLoader: trees wave
+    float m_fTreeAmplitude { 0.005f };
+    float m_fTreeSpeed     { 1.00f };
+    float m_fTreeRotation  { 10.0f };
+    Fvector3 m_fTreeWave   { 0.1f, 0.01f, 0.11f };
 
     CLensFlareDescriptor* lens_flare;
     SThunderboltCollection* thunderbolt;
