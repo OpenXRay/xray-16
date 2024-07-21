@@ -1304,7 +1304,7 @@ public:
     {
         error = false;
         errorId = 0;
-        errorDesc = "";
+        errorDesc.clear();
         errorLocation.row = errorLocation.col = 0;
         // errorLocation.last = 0;
     }
