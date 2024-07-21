@@ -30,17 +30,20 @@ void XRNETSERVER_API fill_auth_check_params(xr_auth_strings_t& ignore, xr_auth_s
     check.push_back(shared_str(FS.update_path(config, "$game_textures$", "wpn\\wpn_crosshair_l85.dds")));
     check.push_back(shared_str(FS.update_path(config, "$game_textures$", "wpn\\wpn_crosshair_rpg.dds")));
 
+#ifndef MASTER_GOLD
+    // ODE is a static library in Master Gold builds
     check.push_back(shared_str("ODE"));
+#endif
     check.push_back(shared_str("xrCDB"));
     check.push_back(shared_str("xrCore"));
     //check.push_back(shared_str("xrGame"));
-    check.push_back(shared_str("xrGamespy"));
-    check.push_back(shared_str("xrNetserver"));
+    check.push_back(shared_str("xrGameSpy"));
+    check.push_back(shared_str("xrMaterialSystem"));
+    check.push_back(shared_str("xrNetServer"));
     check.push_back(shared_str("xrParticles"));
-    check.push_back(shared_str("xrRender_R1"));
-    check.push_back(shared_str("xrRender_R2"));
+    check.push_back(shared_str("xrRender_R4"));
+    check.push_back(shared_str("xrRender_RGL"));
     check.push_back(shared_str("xrSound"));
-    check.push_back(shared_str("xrXMLParser"));
     //check.push_back(shared_str("xrEngine.exe"));
 }
 
