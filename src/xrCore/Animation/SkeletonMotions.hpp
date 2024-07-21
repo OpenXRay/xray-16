@@ -215,7 +215,7 @@ struct XRCORE_API motions_value
     shared_str m_id;
 
     BOOL load(pcstr N, IReader* data, vecBones* bones);
-    MotionVec* bone_motions(shared_str bone_name);
+    MotionVec* bone_motions(const shared_str& bone_name);
 
     u32 mem_usage()
     {
