@@ -53,6 +53,8 @@ extern ECORE_API float ps_r__ssaHZBvsTEX;
 extern ECORE_API int ps_r__tf_Anisotropic;
 extern ECORE_API float ps_r__tf_Mipbias;
 
+extern ECORE_API int ps_r__clear_models_on_unload;
+
 enum
 {
     RFLAG_ACTOR_SHADOW = 1 << 0,
