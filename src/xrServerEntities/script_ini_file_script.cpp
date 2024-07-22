@@ -99,9 +99,9 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("w_u64", &CScriptIniFile::w_u64)
             .def("w_u8", &CScriptIniFile::w_u8)
             .def("save_as", &CScriptIniFile::save_as)
-            .def("save_at_end", &CInifile::save_at_end)
+            .def("save_at_end", +[](CScriptIniFile* self, bool value) { self->save_at_end(value); })
             .def("remove_line", &CScriptIniFile::remove_line)
-            .def("set_override_names", &CInifile::set_override_names)
+            .def("set_override_names", +[](CScriptIniFile* self, bool value) { self->set_override_names(value); })
             .def("section_count", &CScriptIniFile::section_count)
             .def("section_for_each", +[](CScriptIniFile* self, const luabind::functor<void>& functor)
             {
@@ -113,9 +113,9 @@ static void CScriptIniFile_Export(lua_State* luaState)
                     functor(section->Name.c_str());
                 }
             })
-            .def("set_readonly", &CInifile::set_readonly)
+            .def("set_readonly", +[](CScriptIniFile* self, bool value) { self->set_readonly(value); })
             //Alundaio: END
-            .def("fname", &CScriptIniFile::fname)
+            .def("fname", +[](const CScriptIniFile* self) { return self->fname(); })
             .def("section_exist", (bool (CScriptIniFile::*)(pcstr) const)&CScriptIniFile::section_exist)
             .def("line_exist", (bool (CScriptIniFile::*)(pcstr, pcstr) const)&CScriptIniFile::line_exist)
             .def("r_clsid", &CScriptIniFile::r_clsid)
