@@ -1122,11 +1122,6 @@ void CInifile::remove_line(pcstr S, pcstr L)
     }
 }
 
-void CInifile::set_readonly(bool b)
-{
-    m_flags.set(eReadOnly, b);
-}
-
 template<>
 XRCORE_API pcstr CInifile::read(pcstr section, pcstr line) const
 {
