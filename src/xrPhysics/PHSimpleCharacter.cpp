@@ -205,6 +205,28 @@ void CPHSimpleCharacter::TestPathCallback(
     ch->b_side_contact = true;
 }
 
+void CPHSimpleCharacter::InUpdateCL()
+{
+    const dReal k = 1.20f;
+    dReal doun = m_radius * _sqrt(1.f - 1.f / k / k) / 2.f;
+    float test_radius = m_radius * 2.f;
+    float test_height = test_radius + m_radius / 2.f;
+
+    Fvector t1{ 0.f, m_cyl_hight, 0.f };
+    Fvector t2{ 0.f, m_cyl_hight / 2.f - doun, 0.f };
+    Fvector t3{ 0.f, test_height, 0.f };
+
+    Fmatrix object_form;
+    object_form.set(m_phys_ref_object->ObjectXFORM());
+
+    object_form.transform_tiny(t1);
+    object_form.transform_tiny(t2);
+    object_form.transform_tiny(t3);
+    debug_output().DBG_DrawPoint(t1, .1f, color_xrgb(255, 0, 0));
+    debug_output().DBG_DrawPoint(t2, .1f, color_xrgb(255, 0, 0));
+    debug_output().DBG_DrawPoint(t3, .1f, color_xrgb(255, 0, 0));
+}
+
 void CPHSimpleCharacter::SetBox(const dVector3& sizes)
 {
     m_radius = std::min(sizes[0], sizes[2]) / 2.f;

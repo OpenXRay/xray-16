@@ -78,6 +78,8 @@
 #include "xrEngine/Rain.h"
 #include "xrEngine/xr_collide_form.h"
 
+#include "xrPhysics/PHSimpleCharacter.h"
+
 //const u32 patch_frames = 50;
 //const float respawn_delay = 1.f;
 //const float respawn_auto = 7.f;
@@ -1281,6 +1283,8 @@ void CActor::UpdateCL()
 
     UpdateVisorRainDrops();
     UpdateVisor();
+
+    character_physics_support()->movement()->character()->InUpdateCL();
 }
 
 float NET_Jump = 0;

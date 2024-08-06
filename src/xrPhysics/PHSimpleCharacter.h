@@ -294,6 +294,7 @@ public:
 #ifdef DEBUG
     virtual void OnRender();
 #endif
+    virtual void InUpdateCL();
 };
 
 const dReal def_spring_rate = 0.5f;

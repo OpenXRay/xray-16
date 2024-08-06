@@ -124,6 +124,7 @@ public:
     virtual void GroundNormal(Fvector& norm) = 0;
     virtual void Create(dVector3 /**sizes**/) = 0;
     virtual void Destroy(void) = 0;
+    virtual void InUpdateCL() = 0;
     virtual void SetBox(const dVector3& sizes) = 0;
     virtual void SetAcceleration(Fvector accel) = 0;
     virtual void SetForcedPhysicsControl(bool v) {}
