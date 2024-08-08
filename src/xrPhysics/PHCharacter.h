@@ -126,6 +126,7 @@ public:
     virtual void Destroy(void) = 0;
     virtual void InUpdateCL() = 0;
     virtual void SetBox(const dVector3& sizes) = 0;
+    virtual void SetBox(const dVector3& sizes, Fvector& position, Fvector& camPosition) = 0;
     virtual void SetAcceleration(Fvector accel) = 0;
     virtual void SetForcedPhysicsControl(bool v) {}
     virtual bool ForcedPhysicsControl() { return false; }

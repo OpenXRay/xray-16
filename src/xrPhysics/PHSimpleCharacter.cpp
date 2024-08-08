@@ -205,6 +205,7 @@ void CPHSimpleCharacter::TestPathCallback(
     ch->b_side_contact = true;
 }
 
+extern ENGINE_API Fvector4 ps_dev_param_7;
 void CPHSimpleCharacter::InUpdateCL()
 {
     const dReal k = 1.20f;
@@ -212,9 +213,10 @@ void CPHSimpleCharacter::InUpdateCL()
     float test_radius = m_radius * 2.f;
     float test_height = test_radius + m_radius / 2.f;
 
-    Fvector t1{ 0.f, m_cyl_hight, 0.f };
-    Fvector t2{ 0.f, m_cyl_hight / 2.f - doun, 0.f };
-    Fvector t3{ 0.f, test_height, 0.f };
+    Fvector t1{ cast_fv(dGeomGetPosition(m_geom_shell)) };
+    Fvector t2{ cast_fv(dGeomGetPosition(m_hat)) };
+    Fvector t3{ cast_fv(dGeomGetPosition(m_wheel)) };
+    Fvector t4{ cast_fv(dGeomGetPosition(m_cap)) };
 
     Fmatrix object_form;
     object_form.set(m_phys_ref_object->ObjectXFORM());
@@ -222,9 +224,19 @@ void CPHSimpleCharacter::InUpdateCL()
     object_form.transform_tiny(t1);
     object_form.transform_tiny(t2);
     object_form.transform_tiny(t3);
-    debug_output().DBG_DrawPoint(t1, .1f, color_xrgb(255, 0, 0));
-    debug_output().DBG_DrawPoint(t2, .1f, color_xrgb(255, 0, 0));
-    debug_output().DBG_DrawPoint(t3, .1f, color_xrgb(255, 0, 0));
+    object_form.transform_tiny(t4);
+
+    if (!fsimilar(ps_dev_param_7.x, 0.f))
+        debug_output().DBG_DrawPoint(t1, .1f, color_xrgb(255, 0, 0));
+
+    if (!fsimilar(ps_dev_param_7.y, 0.f))
+        debug_output().DBG_DrawPoint(t2, .1f, color_xrgb(255, 0, 0));
+
+    if (!fsimilar(ps_dev_param_7.z, 0.f))
+        debug_output().DBG_DrawPoint(t3, .1f, color_xrgb(255, 0, 0));
+
+    if (!fsimilar(ps_dev_param_7.w, 0.f))
+        debug_output().DBG_DrawPoint(t4, .1f, color_xrgb(255, 0, 0));
 }
 
 void CPHSimpleCharacter::SetBox(const dVector3& sizes)
@@ -251,6 +263,40 @@ void CPHSimpleCharacter::SetBox(const dVector3& sizes)
     dGeomSphereSetRadius(m_cap, test_radius);
     dGeomSetPosition(m_cap, 0.f, test_height, 0.f);
 }
+
+void CPHSimpleCharacter::SetBox(const dVector3& sizes, Fvector& position, Fvector& camPos)
+{
+    m_dynamic_radius = std::max(sizes[0], sizes[2]) / 2.f;
+
+    const dReal k = 1.20f;
+    dReal doun = m_radius * _sqrt(1.f - 1.f / k / k) / 2.f;
+
+    dGeomCylinderSetParams(m_geom_shell, m_dynamic_radius / k, m_cyl_hight);
+    dGeomSetPosition(m_hat, camPos.x, m_cyl_hight, camPos.z);
+    dGeomSetPosition(m_geom_shell, position.x, m_cyl_hight / 2.f - doun, position.z);
+
+    return;
+
+    m_radius = std::max(sizes[0], sizes[2]) / 2.f;
+    m_cyl_hight = sizes[1];
+    if (m_cyl_hight < 0.f)
+        m_cyl_hight = 0.01f;
+    // m_geom_shell=dCreateCylinder(0,m_radius/k,m_cyl_hight+doun);
+    dGeomCylinderSetParams(m_geom_shell, m_radius / k, m_cyl_hight);
+    // m_wheel=dCreateSphere(0,m_radius);
+    //dGeomSphereSetRadius(m_wheel, m_radius);
+    // m_hat=dCreateSphere(0,m_radius/k);
+    //dGeomSphereSetRadius(m_hat, m_radius / k);
+
+    //dGeomSetPosition(m_geom_shell, position.x, 0.01f, position.z);
+
+    float test_radius = m_radius * 2.f;
+    float test_height = m_cyl_hight + m_radius / 2.f;
+    // m_cap=dCreateSphere(0,test_radius);
+    dGeomSphereSetRadius(m_cap, test_radius);
+    dGeomSetPosition(m_cap, 0.f, test_height, 0.f);
+}
+
 void CPHSimpleCharacter::get_Box(Fvector& sz, Fvector& c) const
 {
     float r, h;
@@ -284,9 +330,8 @@ void CPHSimpleCharacter::Create(dVector3 sizes)
     dReal doun = m_radius * _sqrt(1.f - 1.f / k / k) / 2.f;
 
     m_geom_shell = dCreateCylinder(0, m_radius / k, m_cyl_hight + doun);
-
-    m_wheel = dCreateSphere(0, m_radius);
-    m_hat = dCreateSphere(0, m_radius / k);
+    m_wheel = dCreateSphere(0, 0.f);
+    m_hat = dCreateSphere(0, 0.f);
 
     m_shell_transform = dCreateGeomTransform(0);
     dGeomTransformSetCleanup(m_shell_transform, 0);

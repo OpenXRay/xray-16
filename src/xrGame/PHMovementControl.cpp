@@ -60,6 +60,7 @@ CPHMovementControl::CPHMovementControl(IGameObject* parent)
     eOldEnvironment = peInAir;
     eEnvironment = peInAir;
     aabb.set(-def_X_SIZE_2, 0, -def_Z_SIZE_2, def_X_SIZE_2, def_Y_SIZE_2 * 2, def_Z_SIZE_2);
+    dynamic_aabb.set(aabb);
     fMass = 100;
     fMinCrashSpeed = 12.0f;
     fMaxCrashSpeed = 25.0f;

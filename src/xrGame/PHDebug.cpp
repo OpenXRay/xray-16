@@ -823,7 +823,7 @@ void DBG_DrawBones(const Fmatrix& xform, IKinematics* K)
         Fmatrix bone_pos = bi.mTransform;
         // K->Bone_GetAnimPos( bone_pos, i, u8(-1), false );
 
-        DBG_DrawMatrix(Fmatrix().mul_43(xform, bone_pos), 0.1);
+        //DBG_DrawMatrix(Fmatrix().mul_43(xform, bone_pos), 0.1);
 
         u16 bp = bd.GetParentID();
         if (BI_NONE != bp)

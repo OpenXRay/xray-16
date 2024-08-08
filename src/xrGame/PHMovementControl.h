@@ -109,6 +109,7 @@ private:
     EEnvironment eOldEnvironment;
     EEnvironment eEnvironment;
     Fbox aabb;
+    Fbox dynamic_aabb;
     Fbox boxes[4];
 
     u32 trying_times[4];
@@ -297,6 +298,8 @@ public:
 
     CPHCharacter* character() { return m_character; };
     void NetRelcase(IGameObject* O);
+
+    Fbox& GetDynamicAABB() { return dynamic_aabb; };
 
 private:
     void actor_calculate(Fvector& vAccel, const Fvector& camDir, float ang_speed, float jump, float dt, bool bLight);

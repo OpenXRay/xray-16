@@ -56,6 +56,7 @@ void DBG_DrawTri(CDB::TRI* T, const Fvector* V_verts, u32 c);
 void DBG_DrawLine(const Fvector& p0, const Fvector& p1, u32 c);
 void DBG_DrawAABB(const Fvector& center, const Fvector& AABB, u32 c);
 void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c);
+void DBG_DrawOBB(const Fobb& b, u32 c);
 void DBG_DrawPoint(const Fvector& p, float size, u32 c);
 void DBG_DrawMatrix(const Fmatrix& m, float size, u8 a = 255);
 void DBG_DrawRotationX(

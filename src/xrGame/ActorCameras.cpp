@@ -368,8 +368,7 @@ void CActor::cam_Update(float dt, float fFOV)
 
     if (FirstPersonBodyActive()) // update camera position with offset for first person body
     {
-        const float pitchFactor = C->pitch > 0.f ? C->pitch / C->lim_pitch.x : 0.f; // only apply pitch factor when we are looking down
-        m_firstPersonCameraXform.c.mad(m_firstPersonCameraXform.j, g_first_person_cam_offset.y * pitchFactor);
+        m_firstPersonCameraXform.c.mad(Direction(), g_first_person_cam_offset.z);
         point = m_firstPersonCameraXform.c;
         _viewport_near = HUD_VIEWPORT_NEAR * .3f;
         Visual()->dcast_PKinematics()->CalculateBones(true);
