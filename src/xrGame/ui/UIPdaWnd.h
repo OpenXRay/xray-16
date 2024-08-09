@@ -77,11 +77,13 @@ public:
     void SetCaption(pcstr text);
     void Show_SecondTaskWnd(bool status);
     void Show_MapLegendWnd(bool status);
-    pcstr GetActiveSection() { return m_sActiveSection.c_str(); };
-    CUITabControl* GetTabControl() const { return UITabControl; };
 
+    void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
+    CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }
+    pcstr GetActiveSection() const { return m_sActiveSection.c_str(); }
     void SetActiveSubdialog(const shared_str& section);
-    void SetActiveSubdialog_script(pcstr section) { SetActiveSubdialog(section); };
+    CUITabControl* GetTabControl() const { return UITabControl; }
+
     virtual bool StopAnyMove() { return false; }
     void UpdatePda();
     void UpdateRankingWnd();

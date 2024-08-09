@@ -226,7 +226,7 @@ void CUICellItem::UpdateConditionProgressBar()
             if (eitm)
             {
                 const u8 max_uses = eitm->GetMaxUses();
-                if (max_uses > 1)
+                if (max_uses > 0)
                 {
                     const u8 remaining_uses = eitm->GetRemainingUses();
 

@@ -1092,6 +1092,12 @@ bool CInventory::Eat(PIItem pIItem)
         pItemToEat->object().cNameSect().c_str());
 #endif // MP_LOGGING
 
+    luabind::functor<bool> funct;
+    if (GEnv.ScriptEngine->functor("_G.CInventory__eat", funct))
+    {
+        if (!funct(smart_cast<CGameObject*>(pItemToEat->object().H_Parent())->lua_game_object(), smart_cast<CGameObject*>(pIItem)->lua_game_object()))
+            return false;
+    }
 
     CActor* pActor = smart_cast<CActor*>(Level().CurrentControlEntity());
     if (pActor && pActor->m_inventory == this)
@@ -1104,7 +1110,6 @@ bool CInventory::Eat(PIItem pIItem)
 
         CurrentGameUI()->GetActorMenu().SetCurrentItem(nullptr);
     }
-
 
     if (pItemToEat->Empty())
     {
@@ -1292,13 +1297,24 @@ u32 CInventory::BeltMaxWidth() const
     return m_iMaxBelt;
 }
 
-void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade) const
+void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade, bool bOverride /*= false*/) const
 {
     for (TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it)
     {
         PIItem pIItem = *it;
         if (!for_trade || pIItem->CanTrade())
+        {
+            if (bOverride)
+            {
+                luabind::functor<bool> funct;
+                if (GEnv.ScriptEngine->functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
+                {
+                    if (!funct(m_pOwner->cast_game_object()->lua_game_object(), pIItem->cast_game_object()->lua_game_object()))
+                        continue;
+                }
+            }
             items_container.push_back(pIItem);
+        }
     }
 
     if (m_bBeltUseful)
@@ -1307,7 +1323,18 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
         {
             PIItem pIItem = *it;
             if (!for_trade || pIItem->CanTrade())
+            {
+                if (bOverride)
+                {
+                    luabind::functor<bool> funct;
+                    if (GEnv.ScriptEngine->functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
+                    {
+                        if (!funct(m_pOwner->cast_game_object()->lua_game_object(), pIItem->cast_game_object()->lua_game_object()))
+                            continue;
+                    }
+                }
                 items_container.push_back(pIItem);
+            }
         }
     }
 
@@ -1321,7 +1348,18 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
             if (item && (!for_trade || item->CanTrade()))
             {
                 if (!SlotIsPersistent(I) || item->BaseSlot() == GRENADE_SLOT)
+                {
+                    if (bOverride)
+                    {
+                        luabind::functor<bool> funct;
+                        if (GEnv.ScriptEngine->functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
+                        {
+                            if (!funct(m_pOwner->cast_game_object()->lua_game_object(), item->cast_game_object()->lua_game_object()))
+                                continue;
+                        }
+                    }
                     items_container.push_back(item);
+                }
             }
         }
     }

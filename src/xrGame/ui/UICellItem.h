@@ -86,6 +86,7 @@ public:
     bool m_b_destroy_childs;
     bool m_selected;
     bool m_select_armament;
+    bool m_select_equipped{};
     bool m_cur_mark;
     bool m_has_upgrade;
 };

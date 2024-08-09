@@ -63,7 +63,7 @@ bool CTrade::CanTrade()
     return true;
 }
 
-void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying, bool bFree)
+void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying, bool bFree /*= false*/)
 {
     // сумма сделки учитывая ценовой коэффициент
     // актер цену не говорит никогда, все делают за него
@@ -137,7 +137,7 @@ CInventory& CTrade::GetTradeInv(SInventoryOwner owner)
 CTrade* CTrade::GetPartnerTrade() { return pPartner.inv_owner->GetTrade(); }
 CInventory* CTrade::GetPartnerInventory() { return &GetTradeInv(pPartner); }
 CInventoryOwner* CTrade::GetPartner() { return pPartner.inv_owner; }
-u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
+u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree /*= false*/)
 {
     if (bFree)
         return 0;
@@ -216,6 +216,9 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
 
     clamp(action_factor, _min(trade_factors.enemy_factor(), trade_factors.friend_factor()),
         _max(trade_factors.enemy_factor(), trade_factors.friend_factor()));
+
+	if (action_factor == 0)
+		return 0;
 
     // computing deficit_factor
     // float deficit_factor = partner.inv_owner->deficit_factor(pItem->object().cNameSect());

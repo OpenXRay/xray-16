@@ -74,7 +74,7 @@ struct functor3<void> : public functor2<void>
 
 enum EMaxProps
 {
-    max_properties_count = 3,
+    max_properties_count = 4,
 };
 
 class Upgrade : public UpgradeBase

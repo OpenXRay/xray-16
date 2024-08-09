@@ -90,7 +90,7 @@ bool CArtefact::net_Spawn(CSE_Abstract* DC)
     StartLights();
     m_CarringBoneID = u16(-1);
     IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
-    if (K)
+    if (K && K->ID_Cycle_Safe("idle"))
         K->PlayCycle("idle");
 
     o_fastmode = FALSE; // start initially with fast-mode enabled

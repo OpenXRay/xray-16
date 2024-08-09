@@ -10,32 +10,18 @@
 #include "player_hud.h"
 #include "UIHelper.h"
 
-constexpr cpcstr immunity_names[] =
+constexpr std::tuple<ALife::EHitType, cpcstr, cpcstr> immunity_names[] =
 {
-    "burn_immunity",
-    "shock_immunity",
-    "chemical_burn_immunity",
-    "radiation_immunity",
-    "telepatic_immunity",
-    "wound_immunity",
-    "fire_wound_immunity",
-    "strike_immunity",
-    "explosion_immunity",
-    nullptr
-};
-
-constexpr cpcstr immunity_st_names[] =
-{
-    "ui_inv_outfit_burn_protection",
-    "ui_inv_outfit_shock_protection",
-    "ui_inv_outfit_chemical_burn_protection",
-    "ui_inv_outfit_radiation_protection",
-    "ui_inv_outfit_telepatic_protection",
-    "ui_inv_outfit_wound_protection",
-    "ui_inv_outfit_fire_wound_protection",
-    "ui_inv_outfit_strike_protection",
-    "ui_inv_outfit_explosion_protection",
-    nullptr
+    // { hit type,                 "immunity",               "immunity text" }
+    { ALife::eHitTypeBurn,         "burn_immunity",          "ui_inv_outfit_burn_protection" },
+    { ALife::eHitTypeShock,        "shock_immunity",         "ui_inv_outfit_shock_protection" },
+    { ALife::eHitTypeChemicalBurn, "chemical_burn_immunity", "ui_inv_outfit_chemical_burn_protection" },
+    { ALife::eHitTypeRadiation,    "radiation_immunity",     "ui_inv_outfit_radiation_protection" },
+    { ALife::eHitTypeTelepatic,    "telepatic_immunity",     "ui_inv_outfit_telepatic_protection" },
+    { ALife::eHitTypeStrike,       "strike_immunity",        "ui_inv_outfit_strike_protection" },
+    { ALife::eHitTypeWound,        "wound_immunity",         "ui_inv_outfit_wound_protection" },
+    { ALife::eHitTypeExplosion,    "explosion_immunity",     "ui_inv_outfit_explosion_protection" },
+    { ALife::eHitTypeFireWound,    "fire_wound_immunity",    "ui_inv_outfit_fire_wound_protection" },
 };
 
 CUIOutfitImmunity::CUIOutfitImmunity()
@@ -47,23 +33,23 @@ CUIOutfitImmunity::CUIOutfitImmunity()
     m_magnitude = 1.0f;
 }
 
-bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type)
+bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immunity, pcstr immunity_text)
 {
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
     string256 buf;
 
-    strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type]);
+    strconcat(sizeof(buf), buf, base_str, ":", immunity);
     if (!CUIXmlInit::InitWindow(xml_doc, buf, 0, this, false))
         return false;
 
     CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_name);
-    m_name.TextItemControl()->SetTextST(immunity_st_names[hit_type]);
+    m_name.TextItemControl()->SetTextST(immunity_text);
 
-    strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type], ":progress_immunity");
+    strconcat(sizeof(buf), buf, base_str, ":", immunity, ":progress_immunity");
     m_progress.InitFromXml(xml_doc, buf);
 
-    strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type], ":static_value");
+    strconcat(sizeof(buf), buf, base_str, ":", immunity, ":static_value");
     if (xml_doc.NavigateToNode(buf, 0) && !CallOfPripyatMode)
     {
         CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_value);
@@ -92,7 +78,7 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 // ===========================================================================================
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
-    LPCSTR base_str = "outfit_info";
+    const LPCSTR base_str = "outfit_info";
 
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
@@ -104,51 +90,49 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
     strconcat(sizeof(buf), buf, base_str, ":", "prop_line");
     m_Prop_line = UIHelper::CreateStatic(xml_doc, buf, this, false);
 
-    Fvector2 pos;
-    pos.set(0.0f, 0.0f);
+    Fvector2 pos{};
 
     if (m_Prop_line)
         pos.set(0.0f, m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y);
     else if (m_caption)
         pos.set(0.0f, m_caption->GetWndSize().y);
 
-    for (u32 i = 0; i < max_count; ++i)
+    for (const auto [hit_type, immunity, immunity_text] : immunity_names)
     {
-        auto immunity = xr_new<CUIOutfitImmunity>();
-        if (!immunity->InitFromXml(xml_doc, base_str, i))
+        auto item = xr_new<CUIOutfitImmunity>();
+        if (!item->InitFromXml(xml_doc, base_str, immunity, immunity_text))
         {
-            xr_delete(immunity);
+            xr_delete(item);
             continue;
         }
-        immunity->SetAutoDelete(true);
-        AttachChild(immunity);
-        immunity->SetWndPos(pos);
-        pos.y += immunity->GetWndSize().y;
-
-        m_items[i] = immunity;
+        item->SetAutoDelete(true);
+        AttachChild(item);
+        item->SetWndPos(pos);
+        pos.y += item->GetWndSize().y;
+        m_items[hit_type] = item;
     }
+
     pos.x = GetWndSize().x;
     SetWndSize(pos);
 }
 
 void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit)
 {
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor || !cur_outfit)
     {
         return;
     }
 
-    for (u32 i = 0; i < max_count; ++i)
+    for (auto& [hit_type, item] : m_items)
     {
-        if (!m_items[i])
+        if (!item)
             continue;
 
-        if (i == ALife::eHitTypeFireWound)
+        if (hit_type == ALife::eHitTypeFireWound)
             continue;
 
-        ALife::EHitType hit_type = (ALife::EHitType)i;
-        float max_power = actor->conditions().GetZoneMaxPower(hit_type);
+        const float max_power = actor->conditions().GetZoneMaxPower(hit_type);
 
         float cur = cur_outfit->GetDefHitTypeProtection(hit_type);
         cur /= max_power; // = 0..1
@@ -159,10 +143,10 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
             slot = slot_outfit->GetDefHitTypeProtection(hit_type);
             slot /= max_power; //  = 0..1
         }
-        m_items[i]->SetProgressValue(cur, slot);
+        item->SetProgressValue(cur, slot);
     }
 
-    if (m_items[ALife::eHitTypeFireWound])
+    if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound])
     {
         IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
         VERIFY(ikv);
@@ -185,31 +169,30 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
             //	slot += slot_outfit->GetBoneArmor(spine_bone);
             //}
         }
-        float max_power = actor->conditions().GetMaxFireWoundProtection();
+        const float max_power = actor->conditions().GetMaxFireWoundProtection();
         cur /= max_power;
         slot /= max_power;
-        m_items[ALife::eHitTypeFireWound]->SetProgressValue(cur, slot);
+        fireWoundItem->SetProgressValue(cur, slot);
     }
 }
 
 void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
 {
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor || !cur_helmet)
     {
         return;
     }
 
-    for (u32 i = 0; i < max_count; ++i)
+    for (auto& [hit_type, item] : m_items)
     {
-        if (!m_items[i])
+        if (!item)
             continue;
 
-        if (i == ALife::eHitTypeFireWound)
+        if (hit_type == ALife::eHitTypeFireWound)
             continue;
 
-        ALife::EHitType hit_type = (ALife::EHitType)i;
-        float max_power = actor->conditions().GetZoneMaxPower(hit_type);
+        const float max_power = actor->conditions().GetZoneMaxPower(hit_type);
 
         float cur = cur_helmet->GetDefHitTypeProtection(hit_type);
         cur /= max_power; // = 0..1
@@ -220,18 +203,18 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
             slot = slot_helmet->GetDefHitTypeProtection(hit_type);
             slot /= max_power; //  = 0..1
         }
-        m_items[i]->SetProgressValue(cur, slot);
+        item->SetProgressValue(cur, slot);
     }
 
-    if (m_items[ALife::eHitTypeFireWound])
+    if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound])
     {
         IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
         VERIFY(ikv);
-        u16 spine_bone = ikv->LL_BoneID("bip01_head");
+        const u16 spine_bone = ikv->LL_BoneID("bip01_head");
 
-        float cur = cur_helmet->GetBoneArmor(spine_bone) * cur_helmet->GetCondition();
-        float slot = (slot_helmet) ? slot_helmet->GetBoneArmor(spine_bone) * slot_helmet->GetCondition() : cur;
+        const float cur = cur_helmet->GetBoneArmor(spine_bone) * cur_helmet->GetCondition();
+        const float slot = (slot_helmet) ? slot_helmet->GetBoneArmor(spine_bone) * slot_helmet->GetCondition() : cur;
 
-        m_items[ALife::eHitTypeFireWound]->SetProgressValue(cur, slot);
+        fireWoundItem->SetProgressValue(cur, slot);
     }
 }

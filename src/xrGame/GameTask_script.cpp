@@ -58,6 +58,8 @@ SCRIPT_EXPORT(CGameTask, (),
             .def("get_type", &SGameTaskObjective::GetType_script)
             .def("set_type", &SGameTaskObjective::SetType_script)
 
+            .def("get_map_location", +[](const SGameTaskObjective* self) -> pcstr { return self->m_map_location.c_str(); })
+            .def("get_map_object_id", +[](const SGameTaskObjective* self) -> u16 { return self->m_map_object_id; })
             .def("set_map_hint", &SGameTaskObjective::SetMapHint_script)
             .def("set_map_location", &SGameTaskObjective::SetMapLocation_script)
             .def("set_map_object_id", &SGameTaskObjective::SetMapObjectID_script)
@@ -66,6 +68,7 @@ SCRIPT_EXPORT(CGameTask, (),
 
             .def("remove_map_locations", &SGameTaskObjective::RemoveMapLocations)
             .def("change_map_location", &SGameTaskObjective::ChangeMapLocation)
+            .def("create_map_location", &SGameTaskObjective::CreateMapLocation)
 
             .def("add_complete_info", &SGameTaskObjective::AddCompleteInfo_script)
             .def("add_complete_func", &SGameTaskObjective::AddCompleteFunc_script)

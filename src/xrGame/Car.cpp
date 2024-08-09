@@ -464,7 +464,7 @@ void CCar::VisualUpdate(float fov)
         // 			OwnerActor()->Cameras().ApplyDevice();
         // 		}
         //
-        /*		if(CurrentGameUI())//
+        /*		if(CurrentGameUI())
                 {
                     CurrentGameUI()->UIMainIngameWnd->CarPanel().Show(true);
                     CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
