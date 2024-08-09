@@ -25,9 +25,9 @@ void CBaseAction::init(_object_type* object, LPCSTR action_name)
     m_object = object;
     m_weight = edge_value_type(1);
 
+    m_action_name = action_name;
 #ifdef LOG_ACTION
     m_use_log = false;
-    m_action_name = action_name;
     m_switched = false;
 //	if (xr_strlen(m_action_name))
 //		debug_log		(eActionStateConstructed);

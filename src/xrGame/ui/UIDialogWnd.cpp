@@ -80,6 +80,6 @@ void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 
 void CUIDialogWnd::HideDialog()
 {
-    if (IsShown())
+    if (GetHolder() && IsShown())
         GetHolder()->StopDialog(this);
 }

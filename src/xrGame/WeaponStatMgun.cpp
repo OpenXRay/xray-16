@@ -62,7 +62,7 @@ void CWeaponStatMgun::ResetBoneCallbacks()
     m_pPhysicsShell->EnabledCallbacks(TRUE);
 }
 
-void CWeaponStatMgun::Load(LPCSTR section)
+void CWeaponStatMgun::Load(cpcstr section)
 {
     inheritedPH::Load(section);
     inheritedShooting::Load(section);
@@ -73,6 +73,15 @@ void CWeaponStatMgun::Load(LPCSTR section)
     camMaxAngle = _abs(deg2rad(camMaxAngle));
     camRelaxSpeed = pSettings->r_float(section, "cam_relax_speed");
     camRelaxSpeed = _abs(deg2rad(camRelaxSpeed));
+
+    m_overheat_enabled = pSettings->read_if_exists<bool>(section, "overheat_enabled", false);
+    m_overheat_time_quant = pSettings->read_if_exists<float>(section, "overheat_time_quant", 0.025f);
+    m_overheat_decr_quant = pSettings->read_if_exists<float>(section, "overheat_decr_quant", 0.002f);
+    m_overheat_threshold = pSettings->read_if_exists<float>(section, "overheat_threshold", 110.f);
+    m_overheat_particles = pSettings->read_if_exists<pcstr>(section, "overheat_particles", "damage_fx\\burn_creatures00");
+
+    m_bEnterLocked = pSettings->read_if_exists<bool>(section, "lock_enter", false);
+    m_bExitLocked = pSettings->read_if_exists<bool>(section, "lock_exit", false);
 
     VERIFY(!fis_zero(camMaxAngle));
     VERIFY(!fis_zero(camRelaxSpeed));
@@ -129,6 +138,12 @@ bool CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 
 void CWeaponStatMgun::net_Destroy()
 {
+    if (p_overheat)
+    {
+        if (p_overheat->IsPlaying())
+            p_overheat->Stop(false);
+        CParticlesObject::Destroy(p_overheat);
+    }
     inheritedPH::net_Destroy();
     processing_deactivate();
 }

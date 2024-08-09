@@ -31,13 +31,14 @@ u32 get_rank(const shared_str& section)
         }
     }
 
+    //R_ASSERT3(res != -1, "cannot find rank for", section.c_str());
     if (res == -1)
     {
-        Msg("Setting rank to 0. Cannot find rank for: [%s]", section.c_str());
+        Msg("! Setting rank to 0. Cannot find rank for: [%s]", section.c_str());
         // Xottab_DUTY: I'm not sure if it's save to leave it -1
         res = 0;
     }
-    //R_ASSERT3(res != -1, "cannot find rank for", section.c_str());
+
     return res;
 }
 

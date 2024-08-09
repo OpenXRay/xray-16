@@ -2,9 +2,20 @@
 #include "UICellItem.h"
 #include "Weapon.h"
 
+struct SIconLayer
+{
+    pcstr m_name;
+    CUIStatic* m_icon;
+    Fvector2 offset;
+    //u32 m_color;
+    float m_scale;
+};
+
 class CUIInventoryCellItem : public CUICellItem
 {
     typedef CUICellItem inherited;
+
+    xr_vector<SIconLayer*> m_layers;
 
 public:
     CUIInventoryCellItem(CInventoryItem* itm);
@@ -17,6 +28,15 @@ public:
     bool IsHelperOrHasHelperChild();
     void Update();
     CInventoryItem* object() { return (CInventoryItem*)m_pData; }
+
+    //Alundaio
+    void OnAfterChild(CUIDragDropListEx* parent_list) override;
+    void SetTextureColor(u32 color) override;
+
+    void RemoveLayer(const SIconLayer* layer);
+    void CreateLayer(pcstr name, Fvector2 offset, float scale);
+    CUIStatic* InitLayer(CUIStatic* s, pcstr section, Fvector2 addon_offset, bool b_rotate, float scale);
+    //-Alundaio
 
     pcstr GetDebugType() override { return "CUIInventoryCellItem"; }
 };

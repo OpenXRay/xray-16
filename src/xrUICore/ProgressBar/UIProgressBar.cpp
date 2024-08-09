@@ -59,7 +59,7 @@ void CUIProgressBar::UpdateProgressBar()
 
     if (m_bUseColor)
     {
-        if ( m_bUseGradient )
+        if (m_bUseGradient)
         {
             Fcolor curr;
             if (m_bUseMiddleColor)

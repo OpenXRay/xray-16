@@ -41,7 +41,14 @@ void CSE_ALifeDynamicObject::on_before_register() {}
 #include "Level.h"
 #include "map_manager.h"
 
-void CSE_ALifeDynamicObject::on_unregister() { Level().MapManager().OnObjectDestroyNotify(ID); }
+void CSE_ALifeDynamicObject::on_unregister()
+{
+    luabind::functor<void> funct;
+    if (GEnv.ScriptEngine->functor("_G.CSE_ALifeDynamicObject_on_unregister", funct))
+        funct(ID);
+    Level().MapManager().OnObjectDestroyNotify(ID);
+}
+
 void CSE_ALifeDynamicObject::switch_online()
 {
     R_ASSERT(!m_bOnline);
