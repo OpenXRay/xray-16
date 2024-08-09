@@ -272,7 +272,11 @@ void CGameObject::reinit()
         it->second.clear();
 }
 
-void CGameObject::reload(LPCSTR section) { m_script_clsid = object_factory().script_clsid(CLS_ID); }
+void CGameObject::reload(LPCSTR section)
+{
+    m_script_clsid = object_factory().script_clsid(CLS_ID);
+}
+
 void CGameObject::net_Destroy()
 {
 #ifdef DEBUG
@@ -286,7 +290,6 @@ void CGameObject::net_Destroy()
 
     xr_delete(m_ini_file);
 
-    m_script_clsid = -1;
     if (Visual() && smart_cast<IKinematics*>(Visual()))
         smart_cast<IKinematics*>(Visual())->Callback(0, 0);
     //
@@ -324,6 +327,7 @@ void CGameObject::net_Destroy()
     //.	Parent									= 0;
 
     scriptBinder.net_Destroy();
+    m_script_clsid = -1;
 
     xr_delete(m_lua_game_object);
     m_spawned = false;
