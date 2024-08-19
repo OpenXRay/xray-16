@@ -152,6 +152,10 @@ jobs:
       id: cmake-build
       run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
 
+    - name: Run CTest
+      working-directory: build
+      run: ctest --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }} --output-on-failure --schedule-random --no-tests=error
+
     - name: Make package
       if: ${{ steps.cmake-build.outcome == 'success' }}
       id: make-package
@@ -233,3 +237,16 @@ jobs:
         shutdown_vm: false
         sync_files: false
         run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4
+
+    - name: Run CTest
+      uses: cross-platform-actions/action@v0.23.0
+      with:
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 13G
+        environment_variables: CFLAGS CXXFLAGS
+        shutdown_vm: false
+        sync_files: false
+        run: ctest -C ${{ matrix.Configuration }} --parallel 4 --output-on-failure --schedule-random --no-tests=error

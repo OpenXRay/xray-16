@@ -40,3 +40,7 @@
 [submodule "Externals/xrLuaFix"]
 	path = Externals/xrLuaFix
 	url = https://github.com/OpenXRay/xrLuaFix.git
+[submodule "Externals/doctest"]
+	path = Externals/doctest
+	url = https://github.com/doctest/doctest.git
+	branch = master

@@ -139,12 +139,16 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
 
     if (XRAY_CXX_LIB STREQUAL "libstdc++")
         add_compile_options(-stdlib=libstdc++)
+        add_link_options(-stdlib=libstdc++)
     elseif (XRAY_CXX_LIB STREQUAL "libc++")
         add_compile_options(-stdlib=libc++)
+        add_link_options(-stdlib=libc++)
         if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
             add_compile_options(-lcxxrt)
+            add_link_options(-lcxxrt)
         else()
             add_compile_options(-lc++abi)
+            add_link_options(-lc++abi)
         endif()
     endif()
 endif()
@@ -294,6 +298,13 @@ add_compile_options(
 add_subdirectory(src)
 add_subdirectory(res)
 add_subdirectory(misc)
+
+# Tests
+option(BUILD_TESTS "Build tests" ON)
+if (BUILD_TESTS)
+    include(CTest)
+    add_subdirectory(tests)
+endif()
 
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 
