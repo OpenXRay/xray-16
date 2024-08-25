@@ -42,7 +42,7 @@
 #elif defined (_M_ARM64) || defined(__aarch64__)
 #   define XR_ARCHITECTURE_ARM64
 #   define _XRAY_ARCHITECTURE_MARKER "ARM 64-bit"
-#elif (defined(__riscv) || defined(__riscv__))
+#elif defined(__riscv) || defined(__riscv__)
 #   define XR_ARCHITECTURE_RISCV
 #   define _XRAY_ARCHITECTURE_MARKER "RISC-V"
 #elif defined(__powerpc64__) || defined(__ppc64__)
