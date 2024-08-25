@@ -31,6 +31,8 @@
 #include <immintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
 #elif defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #else
