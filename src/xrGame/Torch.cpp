@@ -78,10 +78,10 @@ void CTorch::Load(LPCSTR section)
 
     m_bNightVisionEnabled = !!pSettings->r_bool(section, "night_vision");
 
-    if (pSettings->line_exist(section, "snd_turn_on"))
-        m_sounds.LoadSound(section, "snd_turn_on", "sndTurnOn", false, SOUND_TYPE_ITEM_USING);
-    if (pSettings->line_exist(section, "snd_turn_off"))
-        m_sounds.LoadSound(section, "snd_turn_off", "sndTurnOff", false, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "snd_night_vision_on"))
+        m_sounds.LoadSound(section, "snd_night_vision_on", "sndTurnOn", false, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "snd_night_vision_off"))
+        m_sounds.LoadSound(section, "snd_night_vision_off", "sndTurnOff", false, SOUND_TYPE_ITEM_USING);
 }
 
 void CTorch::SwitchNightVision()
