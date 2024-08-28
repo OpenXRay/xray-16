@@ -52,7 +52,7 @@ void CHW::OnAppDeactivate()
 void CHW::CreateD3D()
 {
     hDXGI = XRay::LoadModule("dxgi");
-    hD3D = XRay::LoadModule("d3d11");
+    hD3D = XRay::LoadModule("d3d11_43");
     if (!hD3D->IsLoaded() || !hDXGI->IsLoaded())
     {
         Valid = false;
@@ -82,7 +82,7 @@ void CHW::DestroyD3D()
     // To make it work with DXVK, etc.
     hD3D->Close();
     hDXGI->Close();
-    if (auto hModule = GetModuleHandleA("d3d11.dll"))
+    if (auto hModule = GetModuleHandleA("d3d11_43.dll"))
         FreeLibrary(hModule);
     if (auto hModule = GetModuleHandleA("dxgi.dll"))
         FreeLibrary(hModule);
@@ -174,7 +174,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         {
             if (ClearSkyMode)
             {
-                hD3DCompiler = XRay::LoadModule("d3dcompiler_37");
+                hD3DCompiler = XRay::LoadModule("d3dcompiler_47");
                 D3DCompile = static_cast<D3DCompileFunc>(hD3DCompiler->GetProcAddress("D3DCompileFromMemory"));
             }
             else
