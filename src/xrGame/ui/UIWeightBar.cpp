@@ -11,12 +11,12 @@ void CUIWeightBar::init_from_xml(CUIXml& uiXml, pcstr path)
     m_BottomInfo = UIHelper::CreateStatic(uiXml, buf, this);
 
     xr_sprintf(buf, "%s_weight", path);
-    m_Weight = UIHelper::CreateTextWnd(uiXml, buf, this);
+    m_Weight = UIHelper::CreateStatic(uiXml, buf, this);
 
     xr_sprintf(buf, "%s_weight_max", path);
-    m_WeightMax = UIHelper::CreateTextWnd(uiXml, buf, this, false);
+    m_WeightMax = UIHelper::CreateStatic(uiXml, buf, this, false);
     {
-        CUITextWnd* weightLabel = m_WeightMax ? m_WeightMax : m_Weight;
+        const auto* weightLabel = m_WeightMax ? m_WeightMax : m_Weight;
         m_Weight_end_x = weightLabel->GetWndPos().x;
     }
     m_BottomInfo->AdjustWidthToText();

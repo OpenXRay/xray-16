@@ -11,67 +11,23 @@
 #include "UIMapList.h"
 #include "Common/object_broker.h"
 #include "UIGameCustom.h"
-#include "UIDialogHolder.h"
-#include "xrUICore/Windows/UIFrameWindow.h"
+#include "UIHelper.h"
 
-CUIChangeMap::CUIChangeMap() : CUIDialogWnd(CUIChangeMap::GetDebugType())
-{
-    m_prev_upd_time = 0;
-
-    bkgrnd = xr_new<CUIStatic>("Background");
-    bkgrnd->SetAutoDelete(true);
-    AttachChild(bkgrnd);
-
-    header = xr_new<CUITextWnd>();
-    header->SetAutoDelete(true);
-    AttachChild(header);
-
-    map_pic = xr_new<CUIStatic>("Map picture");
-    map_pic->SetAutoDelete(true);
-    AttachChild(map_pic);
-
-    map_frame = xr_new<CUIStatic>("Map frame");
-    map_frame->SetAutoDelete(true);
-    AttachChild(map_frame);
-
-    map_version = xr_new<CUITextWnd>();
-    map_version->SetAutoDelete(true);
-    AttachChild(map_version);
-
-    frame = xr_new<CUIFrameWindow>("Frame");
-    frame->SetAutoDelete(true);
-    AttachChild(frame);
-
-    lst_back = xr_new<CUIFrameWindow>("Map list back");
-    lst_back->SetAutoDelete(true);
-    AttachChild(lst_back);
-
-    lst = xr_new<CUIListBox>();
-    lst->SetAutoDelete(true);
-    AttachChild(lst);
-
-    btn_ok = xr_new<CUI3tButton>();
-    btn_ok->SetAutoDelete(true);
-    AttachChild(btn_ok);
-
-    btn_cancel = xr_new<CUI3tButton>();
-    btn_cancel->SetAutoDelete(true);
-    AttachChild(btn_cancel);
-}
+CUIChangeMap::CUIChangeMap() : CUIDialogWnd(CUIChangeMap::GetDebugType()) {}
 
 void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map", 0, this);
-    CUIXmlInit::InitTextWnd(xml_doc, "change_map:header", 0, header);
-    CUIXmlInit::InitStatic(xml_doc, "change_map:background", 0, bkgrnd);
-    CUIXmlInit::InitStatic(xml_doc, "change_map:map_frame", 0, map_frame);
-    CUIXmlInit::InitTextWnd(xml_doc, "change_map:map_ver_txt", 0, map_version);
-    CUIXmlInit::InitStatic(xml_doc, "change_map:map_pic", 0, map_pic);
-    //	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:list_back", 0, lst_back);
-    //	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:frame", 0, frame);
-    CUIXmlInit::InitListBox(xml_doc, "change_map:list", 0, lst);
-    CUIXmlInit::Init3tButton(xml_doc, "change_map:btn_ok", 0, btn_ok);
-    CUIXmlInit::Init3tButton(xml_doc, "change_map:btn_cancel", 0, btn_cancel);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "change_map:background", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "change_map:header", this);
+    map_pic     = UIHelper::CreateStatic(xml_doc, "change_map:map_pic", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "change_map:map_frame", this);
+    map_version = UIHelper::CreateStatic(xml_doc, "change_map:map_ver_txt", this);
+    std::ignore = UIHelper::CreateFrameWindow(xml_doc, "change_map:frame", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml_doc, "change_map:list_back", this, false);
+    lst         = UIHelper::CreateListBox(xml_doc, "change_map:list", this);
+    btn_ok      = UIHelper::Create3tButton(xml_doc, "change_map:btn_ok", this);
+    btn_cancel  = UIHelper::Create3tButton(xml_doc, "change_map:btn_cancel", this);
 
     FillUpList();
 }
@@ -103,19 +59,19 @@ void CUIChangeMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIChangeMap::OnItemSelect()
 {
-    u32 idx = lst->GetSelectedIDX();
+    const u32 idx = lst->GetSelectedIDX();
     if (idx == u32(-1))
         return;
 
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
     const shared_str& name = M.m_map_names[idx].map_name;
-    pstr map_ver = NULL;
+    pstr map_ver = nullptr;
     STRCONCAT(map_ver, "[", M.m_map_names[idx].map_ver.c_str() ? M.m_map_names[idx].map_ver.c_str() : "unknown", "]");
     xr_string map_name = "intro" DELIMITER "intro_map_pic_";
     map_name += name.c_str();
-    xr_string full_name = map_name + ".dds";
+    const xr_string full_name = map_name + ".dds";
 
-    Frect orig_rect = map_pic->GetTextureRect();
+    const Frect orig_rect = map_pic->GetTextureRect();
     if (FS.exist("$game_textures$", full_name.c_str()))
         map_pic->InitTexture(map_name.c_str());
     else
@@ -146,11 +102,11 @@ void CUIChangeMap::FillUpList()
     lst->Clear();
 
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
-    u32 cnt = M.m_map_names.size();
+    const u32 cnt = M.m_map_names.size();
     for (u32 i = 0; i < cnt; ++i)
     {
         CUIListBoxItem* itm = lst->AddTextItem(StringTable().translate(M.m_map_names[i].map_name).c_str());
-        itm->Enable(true); // m_pExtraContentFilter->IsDataEnabled(M.m_map_names[i].map_name.c_str()));
+        itm->Enable(true);
     }
 }
 

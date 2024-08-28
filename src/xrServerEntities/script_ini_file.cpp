@@ -26,7 +26,11 @@ LPCSTR CScriptIniFile::update(LPCSTR initial, LPCSTR file_name)
     return *shared_str(S1);
 }
 
-int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return object_factory().script_clsid(inherited::r_clsid(S, L)); }
+int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L)
+{
+    return object_factory().script_clsid(inherited::r_clsid(S, L));
+}
+
 int CScriptIniFile::r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list)
 {
     return inherited::r_token(S, L, &token_list.tokens().front());
@@ -192,20 +196,9 @@ bool CScriptIniFile::save_as(pcstr new_fname)
     return(inherited::save_as(new_fname));
 }
 
-void CScriptIniFile::save_at_end(bool b)
-{
-    inherited::save_at_end(b);
-}
-
 void CScriptIniFile::remove_line(pcstr S, pcstr L)
 {
     THROW3(inherited::section_exist(S), "Cannot find section", S);
     THROW3(inherited::line_exist(S, L), "Cannot find line", L);
     inherited::remove_line(S, L);
 }
-
-void CScriptIniFile::set_override_names(bool b)
-{
-    inherited::set_override_names(b);
-}
-

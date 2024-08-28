@@ -39,6 +39,134 @@
             xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
     } while (false)
 
+#define R_CHK(expr)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        HRESULT hr = expr;\
+        if (!ignoreAlways && FAILED(hr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr);\
+    } while (false)
+#define R_CHK2(expr, arg1)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        HRESULT hr = expr;\
+        if (!ignoreAlways && FAILED(hr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr, arg1);\
+    } while (false)
+#define FATAL(desc) xrDebug::Fatal(DEBUG_INFO, "%s", desc)
+#define FATAL_F(format, ...) xrDebug::Fatal(DEBUG_INFO, format, __VA_ARGS__)
+
+#ifdef VERIFY
+#undef VERIFY
+#endif
+
+#ifdef DEBUG
+#define NODEFAULT FATAL("nodefault reached")
+
+#define R_ASSERT1_CURE(expr, can_be_cured, cure)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
+            if (can_be_cured)\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define R_ASSERT2_CURE(expr, desc, can_be_cured, cure)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
+            if (can_be_cured)\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define R_ASSERT3_CURE(expr, desc, arg1, can_be_cured, cure)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
+            if (can_be_cured)\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define R_ASSERT4_CURE(expr, cure, desc, arg1, arg2, can_be_cured)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+        {\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
+            if (can_be_cured)\
+            {\
+                cure;\
+            }\
+        }\
+    } while (false)
+
+#define VERIFY(expr)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
+    } while (false)
+#define VERIFY2(expr, desc)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
+    } while (false)
+#define VERIFY3(expr, desc, arg1)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
+    } while (false)
+#define VERIFY4(expr, desc, arg1, arg2)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        if (!ignoreAlways && !(expr))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
+    } while (false)
+#define CHK_DX(expr)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        HRESULT hr_ = expr;\
+        if (!ignoreAlways && FAILED(hr_))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr_);\
+    } while (false)
+#define CHK_GL(expr)\
+    do\
+    {\
+        static bool ignoreAlways = false;\
+        expr;\
+        GLenum err = glGetError();\
+        if (!ignoreAlways && err != GL_NO_ERROR)\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, (long)err);\
+    } while (false)
+#else // DEBUG
 #define R_ASSERT1_CURE(expr, can_be_cured, cure)\
     do\
     {\
@@ -99,82 +227,7 @@
         }\
     } while (false)
 
-#define R_CHK(expr)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        HRESULT hr = expr;\
-        if (!ignoreAlways && FAILED(hr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr);\
-    } while (false)
-#define R_CHK2(expr, arg1)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        HRESULT hr = expr;\
-        if (!ignoreAlways && FAILED(hr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr, arg1);\
-    } while (false)
-#define FATAL(desc) xrDebug::Fatal(DEBUG_INFO, "%s", desc)
-#define FATAL_F(format, ...) xrDebug::Fatal(DEBUG_INFO, format, __VA_ARGS__)
-
-#ifdef VERIFY
-#undef VERIFY
-#endif
-
-#ifdef DEBUG
-#define NODEFAULT FATAL("nodefault reached")
-#define VERIFY(expr)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        if (!ignoreAlways && !(expr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr);\
-    } while (false)
-#define VERIFY2(expr, desc)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        if (!ignoreAlways && !(expr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc);\
-    } while (false)
-#define VERIFY3(expr, desc, arg1)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        if (!ignoreAlways && !(expr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1);\
-    } while (false)
-#define VERIFY4(expr, desc, arg1, arg2)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        if (!ignoreAlways && !(expr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, desc, arg1, arg2);\
-    } while (false)
-#define CHK_DX(expr)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        HRESULT hr_ = expr;\
-        if (!ignoreAlways && FAILED(hr_))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr_);\
-    } while (false)
-#define CHK_GL(expr)\
-    do\
-    {\
-        static bool ignoreAlways = false;\
-        expr;\
-        GLenum err = glGetError();\
-        if (!ignoreAlways && err != GL_NO_ERROR)\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, (long)err);\
-    } while (false)
-#else // DEBUG
-#ifdef __BORLANDC__
-#define NODEFAULT
-#else
 #define NODEFAULT XR_ASSUME(0)
-#endif
 #define VERIFY(expr) XR_ASSUME(expr)
 #define VERIFY2(expr, desc) XR_ASSUME(expr)
 #define VERIFY3(expr, desc, arg1) XR_ASSUME(expr)

@@ -31,7 +31,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
         float _h = float(Device.dwHeight);
         float o_w = (.5f / _w);
         float o_h = (.5f / _h);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         Fmatrix m_TexelAdjust =
         {
             0.5f, 0.0f, 0.0f, 0.0f,
@@ -72,10 +72,6 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
         cmd_list.set_c("direction", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("m_texgen", m_Texgen);
 
-#ifdef USE_DX9
-        RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
-        draw_volume(cmd_list, L);
-#elif defined(USE_DX11) || defined(USE_OGL)
         if (!RImplementation.o.msaa)
         {
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
@@ -118,7 +114,6 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
 #   endif // USE_DX11
             }
         }
-#endif // USE_DX9
     }
 
     // blend-copy
@@ -127,9 +122,6 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
         u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
         cmd_list.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         cmd_list.set_c("m_texgen", m_Texgen);
-#ifdef USE_DX9
-        draw_volume(cmd_list, L);
-#elif defined(USE_DX11) || defined(USE_OGL)
         if (!RImplementation.o.msaa)
         {
             // per pixel
@@ -163,11 +155,10 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
                 VERIFY(!"Only optimized MSAA is supported in OpenGL");
 #   endif // USE_DX11
             }
-#   if defined(USE_DX9) || defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
+#   if defined(USE_DX11) // XXX: not sure why this is needed. Just preserving original behaviour
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
 #   endif // !USE_OGL
         }
-#endif // USE_DX9
     }
 
     //

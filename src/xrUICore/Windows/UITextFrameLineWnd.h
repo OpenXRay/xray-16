@@ -18,11 +18,6 @@ public:
         m_frameline.SetHorizontal(horizontal);
     }
 
-    float GetTextureHeight() const
-    {
-        return m_frameline.GetTextureHeight();
-    }
-
     void SetColor(u32 cl)
     {
         m_frameline.SetTextureColor(cl);

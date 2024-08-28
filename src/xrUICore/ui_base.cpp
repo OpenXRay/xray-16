@@ -314,7 +314,12 @@ void UICore::pp_stop()
     g_current_font_scale.set(1.0f, 1.0f);
 }
 
-void UICore::RenderFont() { Font().Render(); }
+void UICore::RenderFont()
+{
+    ZoneScoped;
+    Font().Render();
+}
+
 bool UICore::is_widescreen()
 {
     return (Device.dwWidth) / float(Device.dwHeight) > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);

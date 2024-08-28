@@ -55,8 +55,7 @@ const xr_token qsmapsize_token[] =
     { "2560", 2560 },
     { "3072", 3072 },
     { "3584", 3584 },
-    { "4096", 4096 },
-#if defined(USE_DX11) || defined(USE_OGL) // XXX: check if values more than 8192 are supported on OpenGL
+    { "4096", 4096 }, // XXX: runtime check for maximum smap-size on OpenGL
     { "5120", 5120 },
     { "6144", 6144 },
     { "7168", 7168 },
@@ -69,7 +68,6 @@ const xr_token qsmapsize_token[] =
     { "14336", 14336 },
     { "15360", 15360 },
     { "16384", 16384 },
-#endif // !USE_DX9
     { nullptr, 0 }
 };
 
@@ -81,16 +79,14 @@ const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
-#if defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
-#endif
-    {nullptr, 0}};
+{nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
 const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
 #if defined(USE_DX11) // TODO: OGL: fix ultra and extreme settings
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
-#endif // !USE_DX9
+#endif // USE_DX11
     {nullptr, 0}};
 
 u32 ps_r_water_reflection = 3;
@@ -134,10 +130,6 @@ float ps_r__Detail_density = 0.3f;
 float ps_r__Detail_height = 1.f;
 float ps_r__Detail_rainbow_hemi = 0.75f;
 
-float ps_r__Tree_w_rot = 10.0f;
-float ps_r__Tree_w_speed = 1.00f;
-float ps_r__Tree_w_amp = 0.005f;
-Fvector ps_r__Tree_Wave = {.1f, .01f, .11f};
 float ps_r__Tree_SBC = 1.5f; // scale bias correct
 
 float ps_r__WallmarkTTL = 50.f;
@@ -154,6 +146,8 @@ float ps_r__ssaHZBvsTEX = 96.f; // RO
 
 int ps_r__tf_Anisotropic = 8;
 float ps_r__tf_Mipbias = 0.0f;
+
+int ps_r__clear_models_on_unload = 0; // Alundaio
 
 // R1
 float ps_r1_ssaLOD_A = 64.f;
@@ -368,16 +362,13 @@ class CCC_tf_Aniso : public CCC_Integer
 public:
     void apply()
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
 #endif
         int val = *value;
         clamp(val, 1, 16);
-#if defined(USE_DX9)
-        for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
         SSManager.SetMaxAnisotropy(val);
 #elif defined(USE_OGL)
         // OGL: don't set aniso here because it will be updated after vid restart
@@ -402,15 +393,10 @@ class CCC_tf_MipBias : public CCC_Float
 public:
     void apply()
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         if (nullptr == HW.pDevice)
             return;
-#endif
 
-#if defined(USE_DX9)
-        for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((u32*)value)));
-#elif defined(USE_DX11)
         SSManager.SetMipLODBias(*value);
 #endif
     }
@@ -621,7 +607,7 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
         // TODO: OGL: Implement memory usage statistics.
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         u32 m_base = 0;
         u32 c_base = 0;
         u32 m_lmaps = 0;
@@ -855,6 +841,8 @@ public:
 //-----------------------------------------------------------------------
 void xrRender_initconsole()
 {
+    ZoneScoped;
+
     CMD3(CCC_Preset, "_preset", &ps_Preset, qpreset_token);
     CMD3(CCC_Shader_Preset, "_shader_preset", &ps_ShaderPreset, qshader_preset_token);
     CMD3(CCC_ColorGrading_Preset, "_colorgrading_preset", &ps_ColorGradingPreset, qcolorgrading_preset_token);
@@ -891,8 +879,6 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__gamma", &ps_r2_img_gamma, 0.5f, 2.2f);
     CMD4(CCC_Float, "r__saturation", &ps_r2_img_saturation, 0.0f, 2.0f);
 
-    Fvector tw_min, tw_max;
-
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
 
@@ -903,14 +889,6 @@ void xrRender_initconsole()
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
     CMD4(CCC_Float, "r__detail_l_aniso", &ps_r__Detail_l_aniso, .1f, .5f);
-
-    CMD4(CCC_Float, "r__d_tree_w_amp", &ps_r__Tree_w_amp, .001f, 1.f);
-    CMD4(CCC_Float, "r__d_tree_w_rot", &ps_r__Tree_w_rot, .01f, 100.f);
-    CMD4(CCC_Float, "r__d_tree_w_speed", &ps_r__Tree_w_speed, 1.0f, 10.f);
-
-    tw_min.set(EPS, EPS, EPS);
-    tw_max.set(2, 2, 2);
-    CMD4(CCC_Vector3, "r__d_tree_wave", &ps_r__Tree_Wave, tw_min, tw_max);
 #endif // DEBUG
 
     CMD3(CCC_Mask, "r__actor_shadow", &ps_r__common_flags, RFLAG_ACTOR_SHADOW);
@@ -918,6 +896,8 @@ void xrRender_initconsole()
     CMD2(CCC_tf_Aniso, "r__tf_aniso", &ps_r__tf_Anisotropic); // {1..16}
     CMD2(CCC_tf_MipBias, "r1_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
     CMD2(CCC_tf_MipBias, "r2_tf_mipbias", &ps_r__tf_Mipbias); // {-3 +3}
+
+    CMD4(CCC_Integer, "r__clear_models_on_unload", &ps_r__clear_models_on_unload, 0, 1); // Alundaio
 
     // R1
     CMD4(CCC_Float, "r1_ssa_lod_a", &ps_r1_ssaLOD_A, 16, 96);
@@ -1038,6 +1018,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_slight_fade", &ps_r2_slight_fade, .2f, 1.f);
     CMD3(CCC_Token, "r2_smap_size", &ps_r2_smapsize, qsmapsize_token);
 
+    Fvector tw_min, tw_max;
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r2_aa_break", &ps_r2_aa_barier, tw_min, tw_max);

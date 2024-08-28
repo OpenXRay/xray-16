@@ -110,7 +110,6 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     Fvector N, T;
     N.set(0, 0, 0);
 
-    FPU::m64r();
     u32 _cnt = 0;
     for (int i = 2; i < vcnt; i++)
     {
@@ -125,7 +124,6 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     R_ASSERT2(_cnt, "Invalid portal detected");
     N.div(float(_cnt));
     P.build(poly[0], N);
-    FPU::m24r();
 
     /*
     if (_abs(1-P.n.magnitude())<EPS)

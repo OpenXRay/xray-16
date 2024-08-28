@@ -9,7 +9,6 @@
     <ClInclude Include="resource.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="AccessibilityShortcuts.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -54,8 +53,5 @@
     <CopyFileToFolders Include="..\..\Externals\AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll">
       <Filter>Dependecies</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

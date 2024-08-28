@@ -43,7 +43,7 @@ extern float g_fTimeFactor;
 
 #define CURRENT_ENTITY() (game ? ((GameID() == eGameIDSingle) ? CurrentEntity() : CurrentControlEntity()) : NULL)
 
-void CLevel::IR_OnMouseWheel(int x, int y)
+void CLevel::IR_OnMouseWheel(float x, float y)
 {
     if (g_bDisableAllInput)
         return;

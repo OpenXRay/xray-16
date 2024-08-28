@@ -131,7 +131,6 @@ public:
         D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE, u32 aRef = 0);
 
     void r_Constant(LPCSTR name, R_constant_setup* s);
-#if defined(USE_DX11) || defined(USE_OGL)
     void r_Pass(LPCSTR vs, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE,
         BOOL bABlend = FALSE, D3DBLEND abSRC = D3DBLEND_ONE, D3DBLEND abDST = D3DBLEND_ZERO, BOOL aTest = FALSE,
         u32 aRef = 0);
@@ -145,7 +144,6 @@ public:
         u32 Fail = D3DSTENCILOP_KEEP, u32 Pass = D3DSTENCILOP_KEEP, u32 ZFail = D3DSTENCILOP_KEEP);
     void r_StencilRef(u32 Ref);
     void r_CullMode(D3DCULL Mode);
-#endif // !USE_DX9
 
 #if defined(USE_DX11)
     void r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive = false);

@@ -20,6 +20,8 @@ bool check_grass_shadow(light* L, CFrustum VB)
 
 void CRender::render_lights(light_Package& LP)
 {
+    ZoneScoped;
+
     //////////////////////////////////////////////////////////////////////////
     // Refactor order based on ability to pack shadow-maps
     // 1. calculate area + sort in descending order
@@ -102,39 +104,20 @@ void CRender::render_lights(light_Package& LP)
 
     struct task_data_t
     {
-        light* L;
-        Task* task;
-        u32 batch_id;
+        light* L{};
+        Task* task{};
+        u32 batch_id{};
     };
     static xr_vector<task_data_t> lights_queue{};
     lights_queue.reserve(R__NUM_SUN_CASCADES);
 
-    const auto &calc_lights = [](Task &, void* data)
-    {
-        const auto* task_data = static_cast<task_data_t*>(data);
-        auto& dsgraph = RImplementation.get_context(task_data->batch_id);
-        {
-            auto* L = task_data->L;
-
-            L->svis[task_data->batch_id].begin();
-
-            dsgraph.o.phase = PHASE_SMAP;
-            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-            dsgraph.o.sector_id = L->spatial.sector_id;
-            dsgraph.o.view_pos = L->position;
-            dsgraph.o.xform = L->X.S.combine;
-            dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
-
-            dsgraph.build_subspace();
-        }
-    };
-
     const auto& flush_lights = [&]()
     {
+        ZoneScopedN("flush lights");
         for (const auto& [L, task, batch_id] : lights_queue)
         {
-            VERIFY(task);
-            TaskScheduler->Wait(*task);
+            if (task)
+                TaskScheduler->Wait(*task);
 
             auto& dsgraph = get_context(batch_id);
 
@@ -213,18 +196,38 @@ void CRender::render_lights(light_Package& LP)
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
-            // calculate
-            task_data_t data;
+            task_data_t data{};
             data.batch_id = batch_id;
             data.L = L;
-            data.task = &TaskScheduler->CreateTask("slight_calc", calc_lights, sizeof(data), (void*)&data);
+
+            const auto& calc_lights = [data]
+            {
+                ZoneScopedN("calc lights");
+                auto& dsgraph = RImplementation.get_context(data.batch_id);
+                {
+                    auto* L = data.L;
+
+                    L->svis[data.batch_id].begin();
+
+                    dsgraph.o.phase = PHASE_SMAP;
+                    dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+                    dsgraph.o.sector_id = L->spatial.sector_id;
+                    dsgraph.o.view_pos = L->position;
+                    dsgraph.o.xform = L->X.S.combine;
+                    dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+
+                    dsgraph.build_subspace();
+                }
+            };
+
+            // calculate
             if (o.mt_calculate)
             {
-                TaskScheduler->PushTask(*data.task);
+                data.task = &TaskScheduler->AddTask(calc_lights);
             }
             else
             {
-                TaskScheduler->RunTask(*data.task);
+                calc_lights();
             }
             lights_queue.emplace_back(data);
         }

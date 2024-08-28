@@ -108,7 +108,6 @@ struct attachable_hud_item
     bool render_item_ui_query() const;
     bool need_renderable() const;
     void set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent = FALSE);
-    void debug_draw_firedeps();
 
     // hands bind position
     Fvector& hands_attach_pos();

@@ -28,12 +28,6 @@
 [submodule "Externals/cryptopp"]
 	path = Externals/cryptopp
 	url = https://github.com/weidai11/cryptopp.git
-[submodule "Externals/OpenAutomate"]
-	path = Externals/OpenAutomate
-	url = https://github.com/OpenXRay/OpenAutomate.git
-[submodule "Externals/FreeMagic"]
-	path = Externals/FreeMagic
-	url = https://github.com/OpenXRay/FreeMagic.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
@@ -46,3 +40,6 @@
 [submodule "Externals/xrLuaFix"]
 	path = Externals/xrLuaFix
 	url = https://github.com/OpenXRay/xrLuaFix.git
+[submodule "Externals/sse2rvv"]
+	path = Externals/sse2rvv
+	url = https://github.com/pattonkan/sse2rvv.git

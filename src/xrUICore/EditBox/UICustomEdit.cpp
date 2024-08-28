@@ -8,6 +8,8 @@
 
 CUICustomEdit::CUICustomEdit() : CUIStatic("CUICustomEdit")
 {
+    m_bFocusValuable = true;
+
     m_editor_control = xr_new<text_editor::line_edit_control>(EDIT_BUF_SIZE);
     Init(EDIT_BUF_SIZE);
 

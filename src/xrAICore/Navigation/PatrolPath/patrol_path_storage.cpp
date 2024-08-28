@@ -16,6 +16,8 @@ CPatrolPathStorage::~CPatrolPathStorage() { delete_data(m_registry); }
 void CPatrolPathStorage::load_raw(
     const CLevelGraph* level_graph, const CGameLevelCrossTable* cross, const CGameGraph* game_graph, IReader& stream)
 {
+    ZoneScoped;
+
     IReader* chunk = stream.open_chunk(WAY_PATROLPATH_CHUNK);
 
     if (!chunk)
@@ -42,6 +44,8 @@ void CPatrolPathStorage::load_raw(
 
 void CPatrolPathStorage::load(IReader& stream)
 {
+    ZoneScoped;
+
     IReader* chunk = stream.open_chunk(0);
     const u32 size = chunk->r_u32();
     chunk->close();

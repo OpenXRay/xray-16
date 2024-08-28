@@ -33,14 +33,13 @@
     <ClInclude Include="OpenALDeviceList.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundRender.h" />
-    <ClInclude Include="SoundRender_Cache.h" />
     <ClInclude Include="SoundRender_Core.h" />
     <ClInclude Include="SoundRender_CoreA.h" />
     <ClInclude Include="SoundRender_Effects.h" />
     <ClInclude Include="SoundRender_EffectsA_EAX.h" />
-    <ClInclude Include="SoundRender_EffectsA_EFX.h" />
     <ClInclude Include="SoundRender_Emitter.h" />
     <ClInclude Include="SoundRender_Environment.h" />
+    <ClInclude Include="SoundRender_Scene.h" />
     <ClInclude Include="SoundRender_Source.h" />
     <ClInclude Include="SoundRender_Target.h" />
     <ClInclude Include="SoundRender_TargetA.h" />
@@ -52,22 +51,19 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="OpenALDeviceList.cpp" />
-    <ClCompile Include="sound.cpp" />
-    <ClCompile Include="SoundRender_Cache.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundRender_Core.cpp" />
     <ClCompile Include="SoundRender_CoreA.cpp" />
     <ClCompile Include="SoundRender_Core_Processor.cpp" />
     <ClCompile Include="SoundRender_Core_SourceManager.cpp" />
     <ClCompile Include="SoundRender_Core_StartStop.cpp" />
     <ClCompile Include="SoundRender_EffectsA_EAX.cpp" />
-    <ClCompile Include="SoundRender_EffectsA_EFX.cpp" />
     <ClCompile Include="SoundRender_Emitter.cpp" />
     <ClCompile Include="SoundRender_Emitter_FSM.cpp" />
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp" />
-    <ClCompile Include="SoundRender_Emitter_streamer.cpp" />
     <ClCompile Include="SoundRender_Environment.cpp" />
+    <ClCompile Include="SoundRender_Scene.cpp" />
     <ClCompile Include="SoundRender_Source.cpp" />
-    <ClCompile Include="SoundRender_Source_loader.cpp" />
     <ClCompile Include="SoundRender_Target.cpp" />
     <ClCompile Include="SoundRender_TargetA.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -92,6 +88,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

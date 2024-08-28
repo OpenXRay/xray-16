@@ -39,7 +39,7 @@ constexpr cpcstr immunity_st_names[] =
 };
 
 CUIOutfitImmunity::CUIOutfitImmunity()
-    : CUIWindow("CUIOutfitImmunity"), m_name("Name")
+    : CUIWindow("CUIOutfitImmunity"), m_name("Name"), m_value("Value")
 {
     AttachChild(&m_name);
     AttachChild(&m_progress);
@@ -66,7 +66,7 @@ bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_ty
     strconcat(sizeof(buf), buf, base_str, ":", immunity_names[hit_type], ":static_value");
     if (xml_doc.NavigateToNode(buf, 0) && !CallOfPripyatMode)
     {
-        CUIXmlInit::InitTextWnd(xml_doc, buf, 0, &m_value);
+        CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_value);
         m_value.Show(true);
     }
     else

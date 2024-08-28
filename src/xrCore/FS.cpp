@@ -18,7 +18,7 @@ u32 g_file_mapped_count = 0;
 typedef xr_map<u32, std::pair<u32, shared_str>> FILE_MAPPINGS;
 FILE_MAPPINGS g_file_mappings;
 
-void register_file_mapping(void* address, const u32& size, LPCSTR file_name)
+void register_file_mapping(void* address, const u32& size, pcstr file_name)
 {
     FILE_MAPPINGS::const_iterator I = g_file_mappings.find(*(u32*)&address);
     VERIFY(I == g_file_mappings.end());
@@ -83,22 +83,6 @@ void VerifyPath(pcstr path)
     }
 }
 
-#ifdef _EDITOR
-bool file_handle_internal(pcstr file_name, size_t& size, int& hFile)
-{
-    hFile = _open(file_name, O_RDONLY | O_BINARY | O_SEQUENTIAL);
-    if (hFile <= 0)
-    {
-        Sleep(1);
-        hFile = _open(file_name, O_RDONLY | O_BINARY | O_SEQUENTIAL);
-        if (hFile <= 0)
-            return (false);
-    }
-
-    size = filelength(hFile);
-    return (true);
-}
-#else // EDITOR
 static int open_internal(pcstr fn, int& handle)
 {
 #if defined(XR_PLATFORM_WINDOWS)
@@ -127,15 +111,14 @@ bool file_handle_internal(pcstr file_name, size_t& size, int& file_handle)
     size = _filelength(file_handle);
     return (true);
 }
-#endif // EDITOR
 
 void* FileDownload(pcstr file_name, const int& file_handle, size_t& file_size)
 {
     VERIFY(file_size != 0);
     void* buffer = xr_malloc(file_size);
 
-    const ssize_t r_bytes = _read(file_handle, buffer, file_size);
-    R_ASSERT3(r_bytes > 0 && static_cast<size_t>(r_bytes) == file_size, "Can't read from file : ", file_name);
+    const auto r_bytes = _read(file_handle, buffer, file_size);
+    R_ASSERT3(file_size == static_cast<size_t>(r_bytes), "Can't read from file : ", file_name);
 
     // file_size = r_bytes;
 
@@ -216,7 +199,7 @@ void CMemoryWriter::w(const void* ptr, size_t count)
 }
 
 // static const u32 mb_sz = 0x1000000;
-bool CMemoryWriter::save_to(LPCSTR fn) const
+bool CMemoryWriter::save_to(pcstr fn) const
 {
     IWriter* F = FS.w_open(fn);
     if (F)
@@ -426,11 +409,7 @@ void IReader::r_string(char* dest, size_t tgt_sz)
     R_ASSERT(!IsBadReadPtr((void*)src, sz));
 #endif
 
-#ifdef _EDITOR
-    CopyMemory(dest, src, sz);
-#else
     strncpy_s(dest, tgt_sz, src, sz);
-#endif
     dest[sz] = 0;
 }
 void IReader::r_string(xr_string& dest)
@@ -479,11 +458,7 @@ bool IReader::try_r_string(char* dest, size_t tgt_sz)
     R_ASSERT(!IsBadReadPtr((void*)src, sz));
 #endif
 
-#ifdef _EDITOR
-    CopyMemory(dest, src, sz);
-#else
     strncpy_s(dest, tgt_sz, src, sz);
-#endif
     dest[sz] = 0;
 
     return true;

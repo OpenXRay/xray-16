@@ -14,7 +14,6 @@ class ui_actor_state_wnd;
 class CUIItemInfo;
 class CUIFrameLineWnd;
 class CUIStatic;
-class CUITextWnd;
 class CUI3tButton;
 class CInventoryOwner;
 class CInventoryBox;

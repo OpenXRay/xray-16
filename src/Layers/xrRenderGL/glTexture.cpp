@@ -101,11 +101,11 @@ _DDS:
     {
         // Load and get header
         S = FS.r_open(fn);
-#ifdef DEBUG
-        Msg("* Loaded: %s[%d]b", fn, S->length());
-#endif // DEBUG
+        R_ASSERT2_CURE(S, fn, true, { return 0; });
         img_size = S->length();
-        R_ASSERT(S);
+#ifdef DEBUG
+        Msg("* Loaded: %s[%d]b", fn, img_size);
+#endif // DEBUG
         gli::texture texture = gli::load((char*)S->pointer(), img_size);
         R_ASSERT2(!texture.empty(), fn);
 

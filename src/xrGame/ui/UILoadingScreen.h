@@ -47,3 +47,20 @@ public:
 
     pcstr GetDebugType() override { return "UILoadingScreen"; }
 };
+
+class NullLoadingScreen : public ILoadingScreen
+{
+public:
+    void Initialize() override {}
+
+    [[nodiscard]]
+    bool IsShown() const override { return false; }
+    void Show(bool /*status*/) override {}
+
+    void Update(int /*stagesCompleted*/, int /*stagesTotal*/) override {}
+    void Draw() override {}
+
+    void SetLevelLogo(cpcstr /*name*/) override {}
+    void SetStageTitle(cpcstr /*title*/) override {}
+    void SetStageTip(cpcstr /*header*/, cpcstr /*tipNumber*/, cpcstr /*tip*/) override {}
+};

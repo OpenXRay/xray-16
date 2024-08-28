@@ -309,27 +309,6 @@ bool CScriptGameObject::inv_box_can_take_status()
 CZoneCampfire* CScriptGameObject::get_campfire() { return smart_cast<CZoneCampfire*>(&object()); }
 CArtefact* CScriptGameObject::get_artefact() { return smart_cast<CArtefact*>(&object()); }
 CPhysicObject* CScriptGameObject::get_physics_object() { return smart_cast<CPhysicObject*>(&object()); }
-#include "level_changer.h"
-void CScriptGameObject::enable_level_changer(bool b)
-{
-    CLevelChanger* lch = smart_cast<CLevelChanger*>(&object());
-    if (lch)
-        lch->EnableLevelChanger(b);
-}
-bool CScriptGameObject::is_level_changer_enabled()
-{
-    CLevelChanger* lch = smart_cast<CLevelChanger*>(&object());
-    if (lch)
-        return lch->IsLevelChangerEnabled();
-    return false;
-}
-
-void CScriptGameObject::set_level_changer_invitation(LPCSTR str)
-{
-    CLevelChanger* lch = smart_cast<CLevelChanger*>(&object());
-    if (lch)
-        lch->SetLEvelChangerInvitationStr(str);
-}
 
 void CScriptGameObject::start_particles(LPCSTR pname, LPCSTR bone)
 {

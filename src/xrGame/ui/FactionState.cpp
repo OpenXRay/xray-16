@@ -45,12 +45,12 @@ void FactionState::ResetStates()
 {
 	for ( int i = 0; i < war_state_count ; ++i )
 	{
-		m_war_state_str[i]._set( NULL );
-		m_war_state_hint_str[i]._set( NULL );
+		m_war_state_str[i] = nullptr;
+		m_war_state_hint_str[i] = nullptr;
 	}
 	/*for ( int i = 0; i < bonuses_count ; ++i )
 	{
-	bonuses_vs[i]._set( NULL );
+	bonuses_vs[i] = nullptr;
 	}*/
 }
 

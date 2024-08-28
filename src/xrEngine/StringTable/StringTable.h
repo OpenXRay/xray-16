@@ -15,6 +15,7 @@ using STRING_TABLE_MAP = xr_map<STRING_ID, STRING_VALUE>;
 
 struct STRING_TABLE_DATA
 {
+    shared_str m_fontPrefix;
     shared_str m_sLanguage;
     STRING_TABLE_MAP m_StringTable;
 };
@@ -35,6 +36,7 @@ public:
     static BOOL m_bWriteErrorsToLog;
 
     shared_str GetCurrentLanguage() const;
+    shared_str GetCurrentFontPrefix() const;
     xr_token* GetLanguagesToken() const;
     static u32 LanguageID;
 

@@ -54,7 +54,7 @@ void CPHSkeleton::Init()
 {
     m_remove_time = u32(-1);
     b_removing = false;
-    m_startup_anim = NULL;
+    m_startup_anim = nullptr;
 }
 
 bool CPHSkeleton::Spawn(CSE_Abstract* D)

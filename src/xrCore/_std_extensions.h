@@ -5,6 +5,9 @@
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
+
+#include <string_view>
+
 #include "xrCommon/math_funcs_inline.h"
 //#include "xr_token.h"
 
@@ -27,36 +30,6 @@
 #ifdef max
 #undef max
 #endif
-
-#if 0//def _EDITOR
-IC char* strncpy_s(char* strDestination, size_t sizeInBytes, const char* strSource, size_t count)
-{
-    return strncpy(strDestination, strSource, count);
-}
-
-IC char* xr_strcpy(char* strDestination, size_t sizeInBytes, const char* strSource)
-{
-    return strcpy(strDestination, strSource);
-}
-
-IC char* xr_strcpy(char* strDestination, const char* strSource) { return strcpy(strDestination, strSource); }
-IC char* _strlwr_s(char* strDestination, size_t sizeInBytes) { return xr_strlwr(strDestination); }
-IC char* xr_strcat(char* strDestination, size_t sizeInBytes, const char* strSource)
-{
-    return strncat(strDestination, strSource, sizeInBytes);
-}
-
-IC char* xr_strcat(char* strDestination, const char* strSource) { return strcat(strDestination, strSource); }
-IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
-{
-    va_list mark;
-    va_start(mark, format);
-    int sz = _vsnprintf(dest, sizeOfBuffer, format, mark);
-    dest[sizeOfBuffer - 1] = 0;
-    va_end(mark);
-    return sz;
-}
-#endif // _EDITOR
 
 // generic
 template <class T>
@@ -167,20 +140,19 @@ IC s64 _max(s64 x, s64 y) { return x - ((x - y) & ((x - y) >> (sizeof(s64) * 8 -
 IC char* strext(const char* S) { return (char*)strrchr(S, '.'); }
 IC size_t xr_strlen(const char* S) { return strlen(S); }
 
-//#ifndef _EDITOR
 #ifndef MASTER_GOLD
 
-inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(pstr destination, size_t const destination_size, pcstr source)
 {
     return strcpy_s(destination, destination_size, source);
 }
 
-inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(pstr destination, size_t const buffer_size, pcstr source)
 {
     return strcat_s(destination, buffer_size, source);
 }
 
-inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -190,7 +162,7 @@ inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR
 }
 
 template <size_t count>
-inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(char (&destination)[count], pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -200,12 +172,12 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 }
 #else // #ifndef MASTER_GOLD
 
-inline int xr_strcpy(pstr destination, size_t const destination_size, LPCSTR source)
+inline int xr_strcpy(pstr destination, size_t const destination_size, pcstr source)
 {
     return strncpy_s(destination, destination_size, source, destination_size);
 }
 
-inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
+inline int xr_strcat(pstr destination, size_t const buffer_size, pcstr source)
 {
     size_t const destination_length = xr_strlen(destination);
     pstr i = destination + destination_length;
@@ -213,14 +185,14 @@ inline int xr_strcat(pstr destination, size_t const buffer_size, LPCSTR source)
     if (i > e)
         return 0;
 
-    for (LPCSTR j = source; *j && (i != e); ++i, ++j)
+    for (pcstr j = source; *j && (i != e); ++i, ++j)
         *i = *j;
 
     *i = 0;
     return 0;
 }
 
-inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -230,7 +202,7 @@ inline int __cdecl xr_sprintf(pstr destination, size_t const buffer_size, LPCSTR
 }
 
 template <int count>
-inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, ...)
+inline int __cdecl xr_sprintf(char (&destination)[count], pcstr format_string, ...)
 {
     va_list args;
     va_start(args, format_string);
@@ -241,17 +213,16 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
 #endif // #ifndef MASTER_GOLD
 
 template <size_t count>
-inline int xr_strcpy(char(&destination)[count], LPCSTR source)
+inline int xr_strcpy(char (&destination)[count], pcstr source)
 {
     return xr_strcpy(destination, count, source);
 }
 
 template <size_t count>
-inline int xr_strcat(char(&destination)[count], LPCSTR source)
+inline int xr_strcat(char (&destination)[count], pcstr source)
 {
     return xr_strcat(destination, count, source);
 }
-//#endif // #ifndef _EDITOR
 
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
 {
@@ -260,6 +231,17 @@ inline void MemFill32(void* dst, u32 value, size_t dstSize)
     while (ptr != end)
         *ptr++ = value;
 }
+
+// source: https://stackoverflow.com/a/46711735
+constexpr u32 strhash(const std::string_view data) noexcept
+{
+    uint32_t hash = 5385;
+    for (const auto& e : data)
+        hash = ((hash << 5) + hash) + e;
+    return hash;
+}
+
+constexpr u32 operator""_hash(char const* p, size_t size) { return strhash({ p, size }); }
 
 XRCORE_API char* timestamp(string64& dest);
 

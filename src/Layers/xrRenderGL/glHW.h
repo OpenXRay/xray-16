@@ -60,9 +60,6 @@ public:
     pcstr AdapterName;
     pcstr OpenGLVersionString;
     pcstr ShadingVersion;
-    std::pair<GLint, GLint> OpenGLVersion;
-    bool SeparateShaderObjectsSupported;
-    bool ShaderBinarySupported;
     bool ComputeShadersSupported;
 };
 

@@ -11,6 +11,8 @@ int rsDIB_Size = 512;
 
 void _VertexStream::Create()
 {
+    ZoneScoped;
+
     RImplementation.Resources->Evict();
 
     mSize = rsDVB_Size * 1024;

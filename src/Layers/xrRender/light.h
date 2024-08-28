@@ -77,21 +77,21 @@ public:
 
     union _xform
     {
-        struct _D
+        struct Directional
         {
             Fmatrix combine;
             s32 minX, maxX;
             s32 minY, maxY;
             BOOL transluent;
         } D[R__NUM_SUN_CASCADES];
-        struct _P
+        struct Point
         {
             Fmatrix world;
             Fmatrix view;
             Fmatrix project;
             Fmatrix combine;
         } P;
-        struct _S
+        struct Spot
         {
             Fmatrix view;
             Fmatrix project;

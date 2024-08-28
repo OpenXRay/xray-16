@@ -35,4 +35,6 @@ public:
     void Destroy(CMapLocation*);
 
     void OnUIReset() override;
+
+    inline static CUIXml m_uiSpotXml;
 };

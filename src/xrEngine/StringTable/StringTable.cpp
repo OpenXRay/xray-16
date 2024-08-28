@@ -45,6 +45,8 @@ void CStringTable::Init()
     if (pData)
         return;
 
+    ZoneScoped;
+
     pData = xr_make_unique<STRING_TABLE_DATA>();
 
     FillLanguageToken();
@@ -72,6 +74,8 @@ void CStringTable::Init()
 
 void CStringTable::FillLanguageToken()
 {
+    ZoneScoped;
+
     languagesToken.clear();
 
     string_path path;
@@ -128,18 +132,48 @@ void CStringTable::FillLanguageToken()
 
 void CStringTable::SetLanguage()
 {
+    cpcstr defined_language = pSettings->r_string("string_table", "language");
+    cpcstr defined_prefix   = pSettings->r_string("string_table", "font_prefix");
+
     if (LanguageID != std::numeric_limits<u32>::max())
+    {
         pData->m_sLanguage = languagesToken.at(LanguageID).name;
+
+        if (0 == xr_strcmp(pData->m_sLanguage, defined_language))
+            pData->m_fontPrefix = defined_prefix;
+        else
+        {
+            pData->m_fontPrefix = nullptr;
+
+            constexpr std::tuple<pcstr, pcstr> known_prefixes[] =
+            {
+                { "fra", "_west" },
+                { "ger", "_west" },
+                { "ita", "_west" },
+                { "spa", "_west" },
+                { "pol", "_cent" },
+                { "cze", "_cent" },
+            };
+            for (const auto [language, prefix] : known_prefixes)
+            {
+                if (0 == xr_strcmp(pData->m_sLanguage, language))
+                    pData->m_fontPrefix = prefix;
+            }
+        }
+    }
     else
     {
-        pData->m_sLanguage = pSettings->r_string("string_table", "language");
-        auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token) {
+        pData->m_sLanguage  = defined_language;
+        pData->m_fontPrefix = defined_prefix;
+
+        const auto it = std::find_if(languagesToken.begin(), languagesToken.end(), [](const xr_token& token)
+        {
             return token.name && token.name == pData->m_sLanguage;
         });
 
         R_ASSERT3(it != languagesToken.end(), "Check localization.ltx! Current language: ", pData->m_sLanguage.c_str());
         if (it != languagesToken.end())
-            LanguageID = (*it).id;
+            LanguageID = it->id;
     }
 }
 
@@ -148,10 +182,17 @@ shared_str CStringTable::GetCurrentLanguage() const
     return pData ? pData->m_sLanguage : nullptr;
 }
 
+shared_str CStringTable::GetCurrentFontPrefix() const
+{
+    return pData ? pData->m_fontPrefix : nullptr;
+}
+
 xr_token* CStringTable::GetLanguagesToken() const { return languagesToken.data(); }
 
 void CStringTable::Load(LPCSTR xml_file_full)
 {
+    ZoneScoped;
+
     XMLDocument uiXml;
     string_path _s;
     strconcat(sizeof(_s), _s, "text" DELIMITER, pData->m_sLanguage.c_str());

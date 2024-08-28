@@ -95,6 +95,8 @@ void CPHCommander::UpdateDeferred()
 
 void CPHCommander::update()
 {
+    ZoneScoped;
+
     UpdateDeferred();
 
     // One by one, using old style index-based cycle,

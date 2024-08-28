@@ -3,16 +3,15 @@
 #include "xrUICore/XML/xrUIXmlParser.h"
 
 class CUIStatic;
-class CUITextWnd;
 struct GAME_NEWS_DATA;
 
 class CUINewsItemWnd final : public CUIWindow
 {
     typedef CUIWindow inherited;
 
-    CUITextWnd* m_UIDate;
-    CUITextWnd* m_UICaption;
-    CUITextWnd* m_UIText;
+    CUIStatic* m_UIDate;
+    CUIStatic* m_UICaption;
+    CUIStatic* m_UIText;
     CUIStatic* m_UIImage;
 
 public:

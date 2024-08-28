@@ -1,21 +1,19 @@
 #pragma once
-#ifndef _PLANE
-#define _PLANE
+
 #include "_vector3d.h"
 #include "_matrix.h"
 
-template <class T>
-class _plane
+class Fplane
 {
 public:
-    typedef T TYPE;
-    typedef _plane<T> Self;
-    typedef Self& SelfRef;
-    typedef const Self& SelfCRef;
+    using TYPE     = float;
+    using Self     = Fplane;
+    using SelfRef  = Self&;
+    using SelfCRef = const Self&;
 
 public:
-    _vector3<T> n;
-    T d;
+    Fvector3 n;
+    float d;
 
 public:
     IC SelfRef set(Self& P)
@@ -24,59 +22,59 @@ public:
         d = P.d;
         return *this;
     }
-    IC BOOL similar(Self& P, T eps_n = EPS, T eps_d = EPS)
+    IC BOOL similar(Self& P, float eps_n = EPS, float eps_d = EPS)
     {
         return (n.similar(P.n, eps_n) && (_abs(d - P.d) < eps_d));
     }
-    ICF SelfRef build(const _vector3<T>& v1, const _vector3<T>& v2, const _vector3<T>& v3)
+    ICF SelfRef build(const Fvector3& v1, const Fvector3& v2, const Fvector3& v3)
     {
-        _vector3<T> t1, t2;
+        Fvector3 t1, t2;
         n.crossproduct(t1.sub(v1, v2), t2.sub(v1, v3)).normalize();
         d = -n.dotproduct(v1);
         return *this;
     }
-    ICF SelfRef build_precise(const _vector3<T>& v1, const _vector3<T>& v2, const _vector3<T>& v3)
+    ICF SelfRef build_precise(const Fvector3& v1, const Fvector3& v2, const Fvector3& v3)
     {
-        _vector3<T> t1, t2;
+        Fvector3 t1, t2;
         n.crossproduct(t1.sub(v1, v2), t2.sub(v1, v3));
         exact_normalize(n);
         d = -n.dotproduct(v1);
         return *this;
     }
-    ICF SelfRef build(const _vector3<T>& _p, const _vector3<T>& _n)
+    ICF SelfRef build(const Fvector3& _p, const Fvector3& _n)
     {
         d = -n.normalize(_n).dotproduct(_p);
         return *this;
     }
-    ICF SelfRef build_unit_normal(const _vector3<T>& _p, const _vector3<T>& _n)
+    ICF SelfRef build_unit_normal(const Fvector3& _p, const Fvector3& _n)
     {
         VERIFY(fsimilar(_n.magnitude(), 1, EPS));
         d = -n.set(_n).dotproduct(_p);
         return *this;
     }
-    IC SelfCRef project(_vector3<T>& pdest, _vector3<T> const& psrc) const
+    IC SelfCRef project(Fvector3& pdest, Fvector3 const& psrc) const
     {
         pdest.mad(psrc, n, -classify(psrc));
         return *this;
     }
-    IC SelfRef project(_vector3<T>& pdest, _vector3<T> const& psrc)
+    IC SelfRef project(Fvector3& pdest, Fvector3 const& psrc)
     {
         pdest.mad(psrc, n, -classify(psrc));
         return *this;
     }
-    ICF T classify(const _vector3<T>& v) const { return n.dotproduct(v) + d; }
+    ICF float classify(const Fvector3& v) const { return n.dotproduct(v) + d; }
     IC SelfRef normalize()
     {
-        T denom = 1.f / n.magnitude();
+        float denom = 1.f / n.magnitude();
         n.mul(denom);
         d *= denom;
         return *this;
     }
-    IC T distance(const _vector3<T>& v) { return _abs(classify(v)); }
-    IC BOOL intersectRayDist(const _vector3<T>& P, const _vector3<T>& D, T& dist)
+    IC float distance(const Fvector3& v) { return _abs(classify(v)); }
+    IC BOOL intersectRayDist(const Fvector3& P, const Fvector3& D, float& dist)
     {
-        T numer = classify(P);
-        T denom = n.dotproduct(D);
+        float numer = classify(P);
+        float denom = n.dotproduct(D);
 
         if (_abs(denom) < EPS_S) // normal is orthogonal to vector3, cant intersect
             return FALSE;
@@ -84,10 +82,10 @@ public:
         dist = -(numer / denom);
         return ((dist > 0.f) || fis_zero(dist));
     }
-    ICF BOOL intersectRayPoint(const _vector3<T>& P, const _vector3<T>& D, _vector3<T>& dest)
+    ICF BOOL intersectRayPoint(const Fvector3& P, const Fvector3& D, Fvector3& dest)
     {
-        T numer = classify(P);
-        T denom = n.dotproduct(D);
+        float numer = classify(P);
+        float denom = n.dotproduct(D);
 
         if (_abs(denom) < EPS_S)
             return FALSE; // normal is orthogonal to vector3, cant intersect
@@ -98,11 +96,11 @@ public:
             return ((dist > 0.f) || fis_zero(dist));
         }
     }
-    IC BOOL intersect(const _vector3<T>& u, const _vector3<T>& v, // segment
-        _vector3<T>& isect) // intersection point
+    IC BOOL intersect(const Fvector3& u, const Fvector3& v, // segment
+        Fvector3& isect) // intersection point
     {
-        T denom, dist;
-        _vector3<T> t;
+        float denom, dist;
+        Fvector3 t;
 
         t.sub(v, u);
         denom = n.dotproduct(t);
@@ -116,11 +114,11 @@ public:
         return true;
     }
 
-    IC BOOL intersect_2(const _vector3<T>& u, const _vector3<T>& v, // segment
-        _vector3<T>& isect) // intersection point
+    IC BOOL intersect_2(const Fvector3& u, const Fvector3& v, // segment
+        Fvector3& isect) // intersection point
     {
-        T dist1, dist2;
-        _vector3<T> t;
+        float dist1, dist2;
+        Fvector3 t;
 
         dist1 = n.dotproduct(u) + d;
         dist2 = n.dotproduct(v) + d;
@@ -133,7 +131,7 @@ public:
 
         return true;
     }
-    IC SelfRef transform(_matrix<T>& M)
+    IC SelfRef transform(Fmatrix& M)
     {
         // rotate the normal
         M.transform_dir(n);
@@ -143,13 +141,7 @@ public:
     }
 };
 
-typedef _plane<float> Fplane;
-typedef _plane<double> Dplane;
-
-template <class T>
-bool _valid(const _plane<T>& s)
+inline bool _valid(const Fplane& s)
 {
     return _valid(s.n) && _valid(s.d);
 }
-
-#endif

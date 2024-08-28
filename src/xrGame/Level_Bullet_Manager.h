@@ -134,7 +134,7 @@ protected:
     xr_vector<_event> m_Events;
 
 #ifdef DEBUG
-    Threading::ThreadId m_thread_id;
+    std::thread::id m_thread_id;
 
     typedef xr_vector<Fvector> BulletPoints;
     BulletPoints m_bullet_points;

@@ -12,6 +12,8 @@
 #include "xrUICore/uiabstract.h"
 #include "xrUICore/ui_debug.h"
 
+class CUIFocusSystem;
+
 class XRUICORE_API CUIWindow : public CUISimpleWindow, public CUIDebuggable
 {
 public:
@@ -77,18 +79,43 @@ public:
     //ф-ция должна переопределяться
     // pWnd - указатель на окно, которое послало сообщение
     // pData - указатель на дополнительные данные, которые могут понадобиться
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
+    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = nullptr);
 
     virtual void Enable(bool status) { m_bIsEnabled = status; }
 
+    void SetFocusValuable(bool valuable) { m_bFocusValuable = valuable; }
+
     [[nodiscard]]
     bool IsEnabled() const { return m_bIsEnabled; }
+
+    [[nodiscard]]
+    bool IsFocusValuable() const
+    {
+        if (!m_bFocusValuable)
+            return false;
+
+        bool ok;
+        for (auto it = this; ; it = it->GetParent())
+        {
+            ok = it->IsShown() && it->IsEnabled();
+            if (!ok || !it->GetParent())
+                break;
+        }
+        return ok;
+    }
 
     //убрать/показать окно и его дочерние окна
     virtual void Show(bool status)
     {
         SetVisible(status);
         Enable(status);
+    }
+
+    virtual CUIFocusSystem* GetCurrentFocusSystem() const
+    {
+        if (m_pParentWnd)
+            return m_pParentWnd->GetCurrentFocusSystem();
+        return nullptr;
     }
 
     [[nodiscard]]
@@ -118,10 +145,7 @@ public:
     virtual void Reset();
     void ResetAll();
 
-    virtual void SetFont(CGameFont* pFont)
-    {
-        UNUSED(pFont);
-    }
+    virtual void SetFont(CGameFont* /*pFont*/) {}
 
     virtual CGameFont* GetFont()
     {
@@ -200,6 +224,8 @@ protected:
     // Если курсор над окном
     bool m_bCursorOverWindow{};
     bool m_bCustomDraw{};
+
+    bool m_bFocusValuable{};
 };
 
 XRUICORE_API bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border = 0.0f, float dx16pos = 0.0f);

@@ -25,6 +25,8 @@ bool CObjectSpace::RayTest(const Fvector& start, const Fvector& dir, float range
 bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
     collide::ray_cache* cache, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     VERIFY(_abs(dir.magnitude() - 1) < EPS);
     r_temp.r_clear();
 
@@ -107,6 +109,8 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
 bool CObjectSpace::RayPick(
     const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     bool _res = _RayPick(start, dir, range, tgt, R, ignore_object);
     r_spatial.clear();
     return _res;
@@ -177,6 +181,8 @@ bool CObjectSpace::_RayPick(
 bool CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     bool _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
     r_spatial.clear();
     return (_res);
@@ -481,6 +487,8 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
 
 bool CObjectSpace::RayQuery(collide::rq_results& r_dest, ICollisionForm* target, const collide::ray_defs& R)
 {
+    ZoneScoped;
+
     VERIFY(target);
     r_dest.r_clear();
     return target->_RayQuery(R, r_dest);

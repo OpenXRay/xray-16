@@ -60,6 +60,7 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, const Flags8& compress_type)
 
 void CLevel::init_compression()
 {
+    ZoneScoped;
     compression::init_ppmd_trained_stream(m_trained_stream);
     compression::init_lzo(m_lzo_working_memory, m_lzo_working_buffer, m_lzo_dictionary);
     // XXX: if client doesn't support compression, server should know about that
@@ -69,6 +70,7 @@ void CLevel::init_compression()
 
 void CLevel::deinit_compression()
 {
+    ZoneScoped;
     if (m_trained_stream)
     {
         compression::deinit_ppmd_trained_stream(m_trained_stream);

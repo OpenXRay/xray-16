@@ -77,6 +77,8 @@ private:
 
     void resize()
     {
+        ZoneScoped;
+
         size_t newLimit;
 
         if constexpr (TGrowMultiplier > 1)
@@ -363,6 +365,7 @@ public:
 
     void traverse_left_right(u32 id, callback CB)
     {
+
         if (pool)
             recurse_left_right(id, nodes, CB);
     }

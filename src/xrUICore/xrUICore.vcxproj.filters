@@ -276,6 +276,7 @@
     </ClCompile>
     <ClCompile Include="ui_styles.cpp" />
     <ClCompile Include="ui_debug.cpp" />
+    <ClCompile Include="ui_focus.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -458,6 +459,7 @@
     </ClInclude>
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_debug.h" />
+    <ClInclude Include="ui_focus.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

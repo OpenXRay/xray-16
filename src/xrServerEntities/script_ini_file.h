@@ -48,7 +48,5 @@ public:
     void w_u64(pcstr S, pcstr L, u64 V, pcstr comment /* = nullptr */);
     void w_u8(pcstr S, pcstr L, u8 V, pcstr comment /* = nullptr */);
     bool save_as(pcstr new_fname /* = nullptr */);
-    void save_at_end(bool b);
     void remove_line(pcstr S, pcstr L);
-    void set_override_names(bool b);
 };

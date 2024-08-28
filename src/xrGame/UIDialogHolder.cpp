@@ -55,6 +55,7 @@ void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
             CurrentGameUI()->ShowGameIndicators(false);
         }
     }
+    SetFocused(nullptr);
     pDialog->SetHolder(this);
 
     if (pDialog->NeedCursor())
@@ -139,6 +140,8 @@ void CDialogHolder::RemoveDialogToRender(CUIWindow* pDialog)
 
 void CDialogHolder::DoRenderDialogs()
 {
+    ZoneScoped;
+
     xr_vector<dlgItem>::iterator it = m_dialogsToRender.begin();
     for (; it != m_dialogsToRender.end(); ++it)
     {
@@ -223,9 +226,11 @@ void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 
 void CDialogHolder::OnFrame()
 {
+    ZoneScoped;
+
     m_b_in_update = true;
 
-    if (GetUICursor().IsVisible() && pInput->IsCurrentInputTypeController())
+    if (!GEnv.isDedicatedServer && GetUICursor().IsVisible() && pInput->IsCurrentInputTypeController())
         GetUICursor().UpdateAutohideTiming();
 
     CUIDialogWnd* wnd = TopInputReceiver();
@@ -299,6 +304,25 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             return (false);
         }
     }
+
+    /*if (const auto focused = GetFocused())
+    {
+        CUIWindow* target{};
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:  target = FindClosestFocusable(focused, FocusDirection::Left); break;
+        case kUI_MOVE_RIGHT: target = FindClosestFocusable(focused, FocusDirection::Right); break;
+        case kUI_MOVE_UP:    target = FindClosestFocusable(focused, FocusDirection::Up); break;
+        case kUI_MOVE_DOWN:  target = FindClosestFocusable(focused, FocusDirection::Down); break;
+        }
+
+        if (target)
+        {
+            SetFocused(target);
+            GetUICursor().WarpToWindow(target, true);
+        }
+    }*/
+
     return true;
 }
 
@@ -373,15 +397,13 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
     return true;
 }
 
-bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
+bool CDialogHolder::IR_UIOnMouseWheel(float x, float y)
 {
     CUIDialogWnd* TIR = TopInputReceiver();
     if (!TIR)
         return false;
     if (!TIR->IR_process())
         return false;
-
-    Fvector2 pos = GetUICursor().GetCursorPosition();
 
     // Vertical scroll is in higher priority
     EUIMessages wheelMessage;
@@ -394,6 +416,7 @@ bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
     else
         wheelMessage = WINDOW_MOUSE_WHEEL_LEFT;
 
+    const Fvector2 pos = GetUICursor().GetCursorPosition();
     TIR->OnMouseAction(pos.x, pos.y, wheelMessage);
     return true;
 }
@@ -441,13 +464,7 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
         return true;
 
-    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
-    {
-        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-        Fvector2 cPos = GetUICursor().GetCursorPosition();
-        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-    }
-    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
         if (O)
@@ -507,13 +524,7 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
         return true;
 
-    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
-    {
-        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-        Fvector2 cPos = GetUICursor().GetCursorPosition();
-        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-    }
-    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
         if (O)

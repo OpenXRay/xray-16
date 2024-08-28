@@ -15,6 +15,8 @@
 
 void CObjectFactory::register_script_class(LPCSTR client_class, LPCSTR server_class, LPCSTR clsid, LPCSTR script_clsid)
 {
+    ZoneScoped;
+
 #ifdef CONFIG_OBJECT_FACTORY_LOG_REGISTER
     Msg("* CObjectFactory: registering script class '%s'", clsid);
 #endif
@@ -37,6 +39,8 @@ void CObjectFactory::register_script_class(LPCSTR client_class, LPCSTR server_cl
 
 void CObjectFactory::register_script_class(LPCSTR unknown_class, LPCSTR clsid, LPCSTR script_clsid)
 {
+    ZoneScoped;
+
 #ifdef CONFIG_OBJECT_FACTORY_LOG_REGISTER
     Msg("* CObjectFactory: registering script class '%s'", clsid);
 #endif
@@ -61,6 +65,8 @@ struct CInternal
 
 void CObjectFactory::register_script() const
 {
+    ZoneScoped;
+
     actualize();
 
     luabind::class_<CInternal> instance("clsid");

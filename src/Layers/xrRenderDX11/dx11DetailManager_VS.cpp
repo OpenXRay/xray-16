@@ -28,6 +28,7 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
 {
+    ZoneScoped;
     using namespace detail_manager;
 
     // Render-prepare
@@ -90,6 +91,8 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id)
 {
+    ZoneScoped;
+
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");

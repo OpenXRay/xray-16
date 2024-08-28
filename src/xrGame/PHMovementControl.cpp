@@ -15,7 +15,7 @@
 #include "xrPhysics/IPHWorld.h"
 
 #include "detail_path_manager.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "xrEngine/xr_object.h"
 #include "CaptureBoneCallback.h"
 #include "Level.h"
@@ -102,8 +102,9 @@ static ALife::EHitType DefineCollisionHitType(u16 material_idx)
     {
         if (GMLib.GetMaterialByIdx(material_idx)->Flags.test(SGameMtl::flInjurious))
             return ALife::eHitTypeRadiation;
+        return ALife::eHitTypeStrike;
     }
-    else if (ShadowOfChernobylMode || ClearSkyMode)
+    if (ShadowOfChernobylMode || ClearSkyMode)
         return ALife::eHitTypePhysicStrike;
     return ALife::eHitTypeStrike;
 }
@@ -1285,7 +1286,6 @@ void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHit
         case ALife::eHitTypeBurn:; // stop
         case ALife::eHitTypeShock:; // stop
         case ALife::eHitTypeStrike:; // stop
-        case ALife::eHitTypePhysicStrike: // stop
         case ALife::eHitTypeWound:
             SetVelocity(Fvector().set(0, 0, 0));
             break; // stop							;
@@ -1296,8 +1296,9 @@ void CPHMovementControl::ApplyHit(const Fvector& dir, const float P, ALife::EHit
             break; // not stop
         case ALife::eHitTypeExplosion:; // stop
         case ALife::eHitTypeFireWound:; // stop
-        case ALife::eHitTypeWound_2:;
-            break; // stop		//knife's alternative fire
+        case ALife::eHitTypeWound_2:;   // stop		//knife's alternative fire
+        case ALife::eHitTypePhysicStrike: // stop
+            break; // stop
         default: NODEFAULT;
         }
     }

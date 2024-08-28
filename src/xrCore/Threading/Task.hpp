@@ -38,67 +38,175 @@ class XRCORE_API Task final : Noncopyable
 {
     friend class TaskManager;
     friend class TaskAllocator;
-    friend class FallbackTaskAllocator;
-
-public:
-    using TaskFunc      = fastdelegate::FastDelegate<void(Task&, void*)>;
-    using OnFinishFunc  = fastdelegate::FastDelegate<void(const Task&, void*)>;
 
 private:
+    using CallFunc  = void(Task&);
+
     // ordered from biggest to smallest
     struct Data
     {
-        TaskFunc            task_func{};
-        OnFinishFunc        on_finish_callback{};
-        pcstr               name{};
-        Task*               parent{};
-        std::atomic_int16_t jobs{}; // at least 1 (task itself), zero means task is done.
+        CallFunc*           call;
+        Task*               parent;
+        std::atomic_int16_t jobs; // at least 1 (task itself), zero means task is done.
+        std::atomic_bool    has_result{};
 
         Data() = default;
-        Data(pcstr name, const TaskFunc& task, Task* parent);
-        Data(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, Task* parent);
-    } m_data;
+        Data(CallFunc* call, Task* parent)
+            : call(call), parent(parent), jobs(1) {}
+    };
 
-    u8 m_user_data[TASK_SIZE - sizeof(m_data)];
+    static constexpr size_t USER_DATA_SIZE = TASK_SIZE - sizeof(Data);
+
+    std::byte m_user_data[USER_DATA_SIZE];
+    Data      m_data;
+
+    template <typename Invokable,
+        bool TaskAware = std::is_invocable_v<Invokable, Task&>,
+        typename HasResult = void
+    >
+    struct Dispatcher
+    {
+        static constexpr bool task_unaware = std::is_invocable_v<Invokable>;
+
+        static_assert(TaskAware || task_unaware,
+            "Provide callable with type: void() or void(Task&) or T() or T(Task&), "
+            "where T is any result of your function.");
+    };
+
+    template <typename Invokable>
+    struct Dispatcher<Invokable, true, std::enable_if_t<std::is_same_v<void, std::invoke_result_t<Invokable, Task&>>>>
+    {
+        static void Call(Task& task)
+        {
+            auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
+            obj(task);
+            if constexpr (!std::is_trivially_copyable_v<Invokable>)
+                obj.~Invokable();
+        }
+    };
+
+    template <typename Invokable>
+    struct Dispatcher<Invokable, false, std::enable_if_t<std::is_same_v<void, std::invoke_result_t<Invokable>>>>
+    {
+        static void Call(Task& task)
+        {
+            auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
+            obj();
+            if constexpr (!std::is_trivially_copyable_v<Invokable>)
+                obj.~Invokable();
+        }
+    };
+
+    template <typename Invokable>
+    struct Dispatcher<Invokable, true, std::enable_if_t<!std::is_same_v<void, std::invoke_result_t<Invokable, Task&>>>>
+    {
+        static_assert(sizeof(std::invoke_result_t<Invokable>) <= USER_DATA_SIZE,
+            "Not enough storage to save result of your function. Try to reduce its size.");
+
+        static void Call(Task& task)
+        {
+            auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
+            auto result = std::move(obj(task));
+            if constexpr (!std::is_trivially_copyable_v<Invokable>)
+                obj.~Invokable();
+            ::new (task.m_user_data) decltype(result)(std::move(result));
+            task.m_data.has_result.store(true, std::memory_order_release);
+        }
+    };
+
+    template <typename Invokable>
+    struct Dispatcher<Invokable, false, std::enable_if_t<!std::is_same_v<void, std::invoke_result_t<Invokable>>>>
+    {
+        static_assert(sizeof(std::invoke_result_t<Invokable>) <= USER_DATA_SIZE,
+            "Not enough storage to save result of your function. Try to reduce its size.");
+
+        static void Call(Task& task)
+        {
+            auto& obj = *reinterpret_cast<Invokable*>(task.m_user_data);
+            auto result = std::move(obj());
+            if constexpr (!std::is_trivially_copyable_v<Invokable>)
+                obj.~Invokable();
+            ::new (task.m_user_data) decltype(result)(std::move(result));
+            task.m_data.has_result.store(true, std::memory_order_release);
+        }
+    };
 
 private:
-    // Used by TaskAllocator as Task initial state
-    Task() = default;
+    Task() = default; // used by TaskAllocator as Task initial state
 
-    // Will just execute
-    Task(pcstr name, const TaskFunc& task, void* data, size_t dataSize, Task* parent = nullptr);
+    template <typename Invokable>
+    Task(Invokable func, Task* parent = nullptr)
+        : m_data(&Dispatcher<Invokable>::Call, parent)
+    {
+        static_assert(sizeof(Invokable) <= USER_DATA_SIZE,
+            "Not enough storage to save your functor/lambda. Try to reduce its size.");
 
-    // Will execute and call back
-    Task(pcstr name, const TaskFunc& task, const OnFinishFunc& onFinishCallback, void* data, size_t dataSize, Task* parent = nullptr);
+        if constexpr (!std::is_empty_v<Invokable> || !std::is_trivially_copyable_v<Invokable>)
+        {
+            ::new (m_user_data) Invokable(std::move(func));
+        }
+
+        if (parent)
+        {
+            VERIFY2(parent->m_data.jobs.load(std::memory_order_relaxed) > 0, "Adding child task to a parent that has already finished.");
+            [[maybe_unused]] const auto prev = parent->m_data.jobs.fetch_add(1, std::memory_order_acq_rel);
+            VERIFY2(prev != std::numeric_limits<decltype(prev)>::max(), "Max jobs overflow. (too much children)");
+        }
+    }
 
 public:
-    static constexpr size_t GetAvailableDataStorageSize()
+    Task(Task&&) = delete;
+    Task(const Task&) = delete;
+    Task& operator=(Task&&) = delete;
+    Task& operator=(const Task&) = delete;
+
+    [[nodiscard]]
+    static constexpr size_t AvailableDataStorageSize() noexcept
     {
         return sizeof(m_user_data);
     }
 
-    Task* GetParent() const
+    [[nodiscard]]
+    auto GetParent() const noexcept
     {
         return m_data.parent;
     }
 
-    auto GetJobsCount() const
+    template <typename T = void>
+    [[nodiscard]]
+    const T* GetData() const noexcept
+    {
+        if (!m_data.has_result.load(std::memory_order_consume))
+            return nullptr;
+        return reinterpret_cast<const T*>(m_user_data);
+    }
+
+    [[nodiscard]]
+    auto GetJobsCount() const noexcept
     {
         return m_data.jobs.load(std::memory_order_relaxed);
     }
 
-    bool HasChildren() const
+    [[nodiscard]]
+    bool IsFinished() const noexcept
     {
-        return GetJobsCount() > 1;
-    }
-
-    bool IsFinished() const
-    {
-        return 0 == m_data.jobs.load(std::memory_order_relaxed);
+        return GetJobsCount() == 0;
     }
 
 private:
     // Called by TaskManager
-    void Execute();
-    void Finish();
+    void operator()()
+    {
+        m_data.call(*this);
+
+        for (Task* it = this; ; it = it->m_data.parent)
+        {
+            const auto unfinishedJobs = it->m_data.jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
+            VERIFY2(unfinishedJobs >= 0, "The same task was executed two times.");
+            if (unfinishedJobs || !it->m_data.parent)
+                break;
+        }
+    }
 };
+
+static_assert(sizeof(Task) == TASK_SIZE);

@@ -21,8 +21,17 @@ public:
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
     bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
 
-    CDialogHolder* GetHolder() { return m_pParentHolder; }
-    void SetHolder(CDialogHolder* h) { m_pParentHolder = h; }
+    CDialogHolder* GetHolder() const { return m_pParentHolder; }
+
+    void SetHolder(CDialogHolder* h)
+    {
+        if (m_pParentHolder)
+            m_pParentHolder->UnregisterFocusable(this);
+        m_pParentHolder = h;
+    }
+
+    CUIFocusSystem* GetCurrentFocusSystem() const override { return GetHolder(); }
+
     virtual bool StopAnyMove() { return true; }
     virtual bool NeedCursor() const { return true; }
     virtual bool NeedCenterCursor() const { return true; }

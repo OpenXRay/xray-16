@@ -1594,11 +1594,6 @@ static void draw_animation_bones(
 #endif // #ifdef DEBUG_RENDER
 }
 
-Fvector g_debug_position_0 = Fvector().set(0.f, 0.f, 0.f);
-Fvector g_debug_position_1 = Fvector().set(0.f, 0.f, 0.f);
-Fvector g_debug_position_2 = Fvector().set(0.f, 0.f, 0.f);
-Fvector g_debug_position_3 = Fvector().set(0.f, 0.f, 0.f);
-
 void CAI_Stalker::OnRender()
 {
 #if 0

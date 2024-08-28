@@ -2,8 +2,16 @@
 #include "Render.h"
 
 // resources
-IRender_Light::~IRender_Light() { GEnv.Render->light_destroy(this); }
-IRender_Glow::~IRender_Glow() { GEnv.Render->glow_destroy(this); }
+IRender_Light::~IRender_Light()
+{
+    if (GEnv.Render)
+        GEnv.Render->light_destroy(this);
+}
+IRender_Glow::~IRender_Glow()
+{
+    if (GEnv.Render)
+        GEnv.Render->glow_destroy(this);
+}
 
 IRender::ScopedContext::ScopedContext(RenderContext context)
 {

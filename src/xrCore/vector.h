@@ -12,8 +12,7 @@
 #include "_std_extensions.h"
 #include "xrCommon/math_funcs_inline.h"
 
-template <class T>
-struct _quaternion;
+struct Fquaternion;
 
 #pragma pack(push)
 #pragma pack(1)

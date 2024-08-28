@@ -51,6 +51,9 @@
     <ProjectReference Include="..\Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\xrSound\xrSound.vcxproj">
+      <Project>{ccca7859-eb86-493e-9b53-c4235f45b3c5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h" />
@@ -107,6 +110,7 @@
     <ClInclude Include="uiabstract.h" />
     <ClInclude Include="UIMessages.h" />
     <ClInclude Include="ui_debug.h" />
+    <ClInclude Include="ui_focus.h" />
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="ui_defs.h" />
@@ -179,6 +183,7 @@
     <ClCompile Include="TabControl\UITabControl_script.cpp" />
     <ClCompile Include="TrackBar\UITrackBar.cpp" />
     <ClCompile Include="ui_debug.cpp" />
+    <ClCompile Include="ui_focus.cpp" />
     <ClCompile Include="ui_styles.cpp" />
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="Windows\UIFrameLineWnd.cpp" />

@@ -18,9 +18,7 @@ template <class T>
 struct _vector3;
 typedef _vector3<float> Fvector;
 
-template <class T>
-struct _obb;
-typedef _obb<float> Fobb;
+struct Fobb;
 
 //----------------------------------------------------
 // Utilities

@@ -78,9 +78,6 @@
 	<string id="ui_mm_fov">
 		<text>Pole widzenia</text>
 	</string>
-	<string id="st_switch_version_invitation">
-		<text>Czy na pewno chcesz uruchomic kolejna wersje gry?</text>
-	</string>		
 	<string id="ui_mm_localization">
 		<text>Jêzyk</text>
 	</string>

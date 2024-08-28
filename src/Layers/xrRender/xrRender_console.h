@@ -37,11 +37,7 @@ extern ECORE_API float ps_r__Detail_l_aniso;
 extern ECORE_API float ps_r__Detail_density;
 extern ECORE_API float ps_r__Detail_height;
 
-extern ECORE_API float ps_r__Tree_w_rot;
-extern ECORE_API float ps_r__Tree_w_speed;
-extern ECORE_API float ps_r__Tree_w_amp;
 extern ECORE_API float ps_r__Tree_SBC; // scale bias correct
-extern ECORE_API Fvector ps_r__Tree_Wave;
 
 extern ECORE_API float ps_r__WallmarkTTL;
 extern ECORE_API float ps_r__WallmarkSHIFT;
@@ -56,6 +52,8 @@ extern ECORE_API float ps_r__ssaDONTSORT;
 extern ECORE_API float ps_r__ssaHZBvsTEX;
 extern ECORE_API int ps_r__tf_Anisotropic;
 extern ECORE_API float ps_r__tf_Mipbias;
+
+extern ECORE_API int ps_r__clear_models_on_unload;
 
 enum
 {

@@ -658,6 +658,8 @@ bool IPureClient::Connect(pcstr options)
 
 void IPureClient::Disconnect()
 {
+    ZoneScoped;
+
     if (NET)
         NET->Close(0);
 
@@ -1074,12 +1076,11 @@ void IPureClient::net_Syncronize()
 {
     net_Syncronised = false;
     net_DeltaArray.clear();
-    Threading::SpawnThread([](void* P)
+
+    Threading::SpawnThread("network-time-sync", [this]
     {
-        SetThreadPriority(Threading::GetCurrentThreadHandle(), THREAD_PRIORITY_TIME_CRITICAL);
-        IPureClient* C = static_cast<IPureClient*>(P);
-        C->Sync_Thread();
-    }, "network-time-sync", 0, this);
+        Sync_Thread();
+    });
 }
 
 void IPureClient::ClearStatistic()

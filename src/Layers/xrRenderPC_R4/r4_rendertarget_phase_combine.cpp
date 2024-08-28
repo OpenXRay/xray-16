@@ -5,36 +5,11 @@
 
 #define STENCIL_CULL 0
 
-void CRenderTarget::DoAsyncScreenshot()
-{
-    //	Igor: screenshot will not have postprocess applied.
-    //	TODO: fix that later
-    if (RImplementation.m_bMakeAsyncSS)
-    {
-        HRESULT hr;
-
-        //	HACK: unbind RT. CopyResourcess needs src and targetr to be unbound.
-        // u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb());
-
-        // ID3DTexture2D *pTex = 0;
-        // if (RImplementation.o.msaa)
-        //	pTex = rt_Generic->pSurface;
-        // else
-        //	pTex = rt_Color->pSurface;
-
-        // HW.pDevice->CopyResource( t_ss_async, pTex );
-        ID3DTexture2D* pBuffer;
-        hr = HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
-        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(t_ss_async, pBuffer);
-
-        RImplementation.m_bMakeAsyncSS = false;
-    }
-}
-
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
 void CRenderTarget::phase_combine()
 {
+    ZoneScoped;
     PIX_EVENT(phase_combine);
 
     //	TODO: DX11: Remove half pixel offset
@@ -332,7 +307,7 @@ void CRenderTarget::phase_combine()
 
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
-    BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP();
     if (_menu_pp)
         PP_Complex = FALSE;
 

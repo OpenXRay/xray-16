@@ -790,7 +790,7 @@ void CAI_Stalker::update_object_handler()
 bool CAI_Stalker::mt_object_handler_update_allowed() const
 {
     return m_client_updated &&
-        (g_pGameLevel->WorldRendered() || IGame_Persistent::IsMainMenuActive())
+        (g_pGameLevel->WorldRendered() || g_pGamePersistent->IsMainMenuActive())
 #ifdef DEBUG
         && !ShouldProcessOnRender()
 #endif

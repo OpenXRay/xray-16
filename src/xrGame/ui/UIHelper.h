@@ -12,7 +12,6 @@ class CUIXml;
 class CUIWindow;
 class CUIStatic;
 class CUIScrollView;
-class CUITextWnd;
 class CUIProgressBar;
 class CUIProgressShape;
 class CUIFrameLineWnd;
@@ -34,7 +33,6 @@ public:
     static CUIStatic* CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIStatic* CreateStatic(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
     static CUIScrollView* CreateScrollView(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
-    static CUITextWnd* CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIProgressBar* CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIProgressShape* CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIFrameLineWnd* CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
@@ -43,6 +41,7 @@ public:
     static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
     static CUICheckButton* CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
+    static CUIListBox* CreateListBox(CUIXml& xml, pcstr ui_path, CUIWindow* parent, bool critical = true);
     static CUIEditBox* CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
 
     static UIHint* CreateHint(CUIXml& xml, LPCSTR ui_path /*, CUIWindow* parent*/, bool critical = true);

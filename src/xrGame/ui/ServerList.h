@@ -121,7 +121,7 @@ protected:
     SServerFilters m_sf;
     //	CUIListWnd		m_list[3];
     CUIListBox m_list[3];
-    CUIFrameWindow m_frame[3];
+    std::array<CUIFrameWindow, 3> m_frame;
     CUI3tButton m_header[LST_COLUMN_COUNT];
     std::array<CUIFrameLineWnd, 4> m_header2;
     std::array<CUIFrameLineWnd, LST_COLUMN_COUNT> m_header_frames;
@@ -135,7 +135,6 @@ protected:
     bool m_b_local;
 
     CUIMessageBoxEx* m_message_box;
-    CUIMessageBoxEx* m_version_switch_msgbox;
 
     ESortingMode m_sort_mode;
     bool m_sort_ascending;

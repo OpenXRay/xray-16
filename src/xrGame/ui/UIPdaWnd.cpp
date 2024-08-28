@@ -81,14 +81,14 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
     m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
     m_caption_const = (m_caption->GetText());
-    m_clock = UIHelper::CreateTextWnd(uiXml, "clock_wnd", this, false);
+    m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
     {
-        m_anim_static = xr_new<CUIAnimatedStatic>();
-        AttachChild(m_anim_static);
-        m_anim_static->SetAutoDelete(true);
-        CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, m_anim_static);
+        auto* anim_static = xr_new<CUIAnimatedStatic>();
+        AttachChild(anim_static);
+        anim_static->SetAutoDelete(true);
+        CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, anim_static);
     }
 
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
@@ -201,8 +201,7 @@ void CUIPdaWnd::Update()
 
     if (m_clock)
     {
-        m_clock->TextItemControl().SetText(
-            GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+        m_clock->SetText(GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     }
 
     if (pUILogsWnd)

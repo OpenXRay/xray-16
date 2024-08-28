@@ -341,6 +341,8 @@ void CTexture::Load()
         return;
     }
 
+    ZoneScoped;
+
     Preload();
 
     bool bCreateView = true;
@@ -513,6 +515,7 @@ void CTexture::Load()
 
 void CTexture::Unload()
 {
+    ZoneScoped;
 #ifdef DEBUG
     string_path msg_buff;
     xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount =", cName.c_str());

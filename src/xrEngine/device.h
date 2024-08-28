@@ -16,6 +16,7 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #define VIEWPORT_NEAR 0.2f
+#define HUD_VIEWPORT_NEAR 0.05f
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
@@ -121,6 +122,7 @@ private:
 public:
     // Engine flow-control
     float fTimeDelta{};
+    float fTimeDeltaReal{};
     float fTimeGlobal{};
     u32 dwTimeDelta{};
     u32 dwTimeGlobal{};
@@ -162,19 +164,16 @@ public:
     void Pause(bool bOn, bool bTimer, bool bSound, pcstr reason);
     bool Paused();
 
-private:
-    void ProcessParallelSequence(Task&, void*);
-
 public:
     // Scene control
     void ProcessFrame();
 
-    void PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input);
+    void PreCache(u32 amount, bool wait_user_input);
 
     bool BeforeFrame();
     void FrameMove();
 
-    void BeforeRender();
+    void OnCameraUpdated();
     void DoRender();
     bool RenderBegin();
     void Clear();
@@ -191,15 +190,24 @@ public:
 public:
     // Creation & Destroying
     void Create();
-    void Run();
     void Destroy();
+
     void Reset(bool precache = true);
+
+    void Run();
+    void Shutdown();
+
+    void ProcessEvent(const SDL_Event& event);
+    void OnWindowActivate(SDL_Window* window, bool activated);
 
     void UpdateWindowProps();
     void UpdateWindowRects();
     void SelectResolution(bool windowed);
 
     void Initialize();
+
+    void InitializeImGui();
+    void DestroyImGui();
 
     void FillVideoModes();
     void CleanupVideoModes();
@@ -226,7 +234,6 @@ public:
 public:
     // Multi-threading
     Event PresentationFinished = nullptr;
-    volatile bool mt_bMustExit{};
 
     static constexpr u32 MaximalWaitTime = 16; // ms
 
@@ -258,10 +265,6 @@ public:
 private:
     void CalcFrameStats();
 
-    void OnWindowActivate(bool activated);
-
-    void message_loop();
-
 public:
     [[nodiscard]]
     auto& editor() { return m_editor; }
@@ -269,8 +272,38 @@ public:
     [[nodiscard]]
     auto editor_mode() const { return m_editor.is_shown(); }
 
+    [[nodiscard]]
+    auto GetImGuiContext() const { return m_imgui_context; }
+
+public:
+    struct ImGuiViewportData
+    {
+        SDL_Window* Window;
+        bool        WindowOwned;
+
+        ImGuiViewportData(SDL_Window* window) : Window(window), WindowOwned(false) {}
+
+        ImGuiViewportData(ImVec2 pos, ImVec2 size, Uint32 flags)
+        {
+            Window = SDL_CreateWindow("ImGui Viewport (no title yet)",
+                (int)pos.x, (int)pos.y, (int)size.x, (int)size.y, flags);
+            WindowOwned = true;
+        }
+
+        ~ImGuiViewportData()
+        {
+            if (Window && WindowOwned)
+            {
+                SDL_DestroyWindow(Window);
+            }
+        }
+    };
+
 private:
     xray::editor::ide m_editor;
+
+    ImGuiContext* m_imgui_context{};
+    IImGuiRender* m_imgui_render{};
 };
 
 extern ENGINE_API CRenderDevice Device;

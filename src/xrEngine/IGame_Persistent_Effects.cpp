@@ -2,12 +2,10 @@
 
 #include "IGame_Persistent.h"
 
-#ifndef _EDITOR
 #include "Environment.h"
 #include "IGame_Level.h"
 #include "Render.h"
 #include "perlin.h"
-#endif
 
 void IGame_Persistent::GrassBendersUpdate(u16 id, u8& data_idx, u32& data_frame, Fvector& position, float init_radius, float init_str, bool CheckDistance)
 {

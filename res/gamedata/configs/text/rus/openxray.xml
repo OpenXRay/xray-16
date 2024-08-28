@@ -87,9 +87,6 @@
 	<string id="ui_mm_fov">
 		<text>Поле зрения</text>
 	</string>
-	<string id="st_switch_version_invitation">
-		<text>Вы действительно хотите запустить другую версию игры?</text>
-	</string>
 	<string id="ui_mm_localization">
 		<text>Язык</text>
 	</string>

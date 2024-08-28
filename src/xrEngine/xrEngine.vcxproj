@@ -29,6 +29,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AccessibilityShortcuts.hpp" />
     <ClInclude Include="CameraBase.h" />
     <ClInclude Include="CameraDefs.h" />
     <ClInclude Include="CameraManager.h" />
@@ -53,7 +54,6 @@
     <ClInclude Include="Feel_Touch.h" />
     <ClInclude Include="Feel_Vision.h" />
     <ClInclude Include="GameFont.h" />
-    <ClInclude Include="GameMtlLib.h" />
     <ClInclude Include="ICollidable.h" />
     <ClInclude Include="IGameFont.hpp" />
     <ClInclude Include="IGame_Level.h" />
@@ -71,7 +71,6 @@
     <ClInclude Include="LightAnimLibrary.h" />
     <ClInclude Include="line_editor.h" />
     <ClInclude Include="line_edit_control.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="mp_logging.h" />
     <ClInclude Include="ObjectAnimator.h" />
     <ClInclude Include="ObjectDump.h" />
@@ -85,12 +84,10 @@
     <ClInclude Include="pure_relcase.h" />
     <ClInclude Include="Rain.h" />
     <ClInclude Include="Render.h" />
-    <ClInclude Include="splash.h" />
     <ClInclude Include="ShadersExternalData.h" />
     <ClInclude Include="StatGraph.h" />
     <ClInclude Include="Stats.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="std_classes.h" />
     <ClInclude Include="StringTable\StringTable.h" />
     <ClInclude Include="Text_Console.h" />
     <ClInclude Include="thunderbolt.h" />
@@ -100,7 +97,6 @@
     <ClInclude Include="WaveForm.h" />
     <ClInclude Include="xrHemisphere.h" />
     <ClInclude Include="xrImage_Resampler.h" />
-    <ClInclude Include="xrSASH.h" />
     <ClInclude Include="xrSheduler.h" />
     <ClInclude Include="xrTheora_Stream.h" />
     <ClInclude Include="xrTheora_Surface.h" />
@@ -123,6 +119,7 @@
     <ClCompile Include="device.cpp" />
     <ClCompile Include="Device_create.cpp" />
     <ClCompile Include="Device_destroy.cpp" />
+    <ClCompile Include="Device_imgui.cpp" />
     <ClCompile Include="Device_Initialize.cpp" />
     <ClCompile Include="Device_mode.cpp" />
     <ClCompile Include="Device_overdraw.cpp" />
@@ -144,8 +141,6 @@
     <ClCompile Include="Feel_Touch.cpp" />
     <ClCompile Include="Feel_Vision.cpp" />
     <ClCompile Include="GameFont.cpp" />
-    <ClCompile Include="GameMtlLib.cpp" />
-    <ClCompile Include="GameMtlLib_Engine.cpp" />
     <ClCompile Include="ICollidable.cpp" />
     <ClCompile Include="IGame_Level.cpp" />
     <ClCompile Include="IGame_Level_check_textures.cpp" />
@@ -171,7 +166,6 @@
     <ClCompile Include="pure_relcase.cpp" />
     <ClCompile Include="Rain.cpp" />
     <ClCompile Include="Render.cpp" />
-    <ClCompile Include="splash.cpp" />
     <ClCompile Include="StatGraph.cpp" />
     <ClCompile Include="Stats.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -184,7 +178,6 @@
     <ClCompile Include="tntQAVI.cpp" />
     <ClCompile Include="xrHemisphere.cpp" />
     <ClCompile Include="xrImage_Resampler.cpp" />
-    <ClCompile Include="xrSASH.cpp" />
     <ClCompile Include="xrSheduler.cpp" />
     <ClCompile Include="xrTheora_Stream.cpp" />
     <ClCompile Include="xrTheora_Surface.cpp" />
@@ -199,7 +192,6 @@
     <ClCompile Include="xr_ioc_cmd.cpp" />
     <ClCompile Include="xr_object_list.cpp" />
     <ClCompile Include="x_ray.cpp" />
-    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ClientServer.txt" />
@@ -232,9 +224,6 @@
     <ProjectReference Include="$(xrExternals)LuaJIT-proj\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)oalib.vcxproj">
-      <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
@@ -247,11 +236,20 @@
     <ProjectReference Include="$(xrExternals)imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
+      <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)DiscordGameSDK\DiscordGameSDK.vcxproj">
+      <Project>{cff9f0dd-c2fc-424c-800b-bfba35003932}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

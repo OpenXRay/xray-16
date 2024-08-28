@@ -391,46 +391,46 @@ void CUILevelMap::Draw()
         for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
         {
             CMapSpot* sp = smart_cast<CMapSpot*>((*it));
-            if (sp)
+            if (!sp)
+                continue;
+
+            if (sp->m_bScale)
             {
-                if (sp->m_bScale)
+                Fvector2 sz = sp->m_originSize;
+                // XXX: try to remove if-else branches and use common code path
+                if (ShadowOfChernobylMode)
                 {
-                    Fvector2 sz = sp->m_originSize;
-                    // XXX: try to remove if-else branches and use common code path
-                    if (ShadowOfChernobylMode)
+                    sz.mul(gmz);
+                    sp->SetWndSize(sz);
+                }
+                else if (ClearSkyMode)
+                {
+                    if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
                     {
-                        sz.mul(gmz);
-                        sp->SetWndSize(sz);
-                    }
-                    else if (ClearSkyMode)
-                    {
-                        if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
-                        {
-                            float k = (gmz - sp->m_scale_bounds.x) / (sp->m_scale_bounds.y - sp->m_scale_bounds.x);
-                            sz.mul(k);
-                            sp->SetWndSize(sz);
-                        }
-                        else if (gmz > sp->m_scale_bounds.y)
-                        {
-                            sp->SetWndSize(sz);
-                        }
-                    }
-                    else // COP
-                    {
-                        float k = gmz;
-
-                        if (gmz > sp->m_scale_bounds.y)
-                            k = sp->m_scale_bounds.y;
-                        else if (gmz < sp->m_scale_bounds.x)
-                            k = sp->m_scale_bounds.x;
-
+                        float k = (gmz - sp->m_scale_bounds.x) / (sp->m_scale_bounds.y - sp->m_scale_bounds.x);
                         sz.mul(k);
                         sp->SetWndSize(sz);
                     }
+                    else if (gmz > sp->m_scale_bounds.y)
+                    {
+                        sp->SetWndSize(sz);
+                    }
                 }
-                else if (sp->m_scale_bounds.x > 0.0f)
-                    sp->SetVisible(sp->m_scale_bounds.x < gmz);
+                else // COP
+                {
+                    float k = gmz;
+
+                    if (gmz > sp->m_scale_bounds.y)
+                        k = sp->m_scale_bounds.y;
+                    else if (gmz < sp->m_scale_bounds.x)
+                        k = sp->m_scale_bounds.x;
+
+                    sz.mul(k);
+                    sp->SetWndSize(sz);
+                }
             }
+            else if (sp->m_scale_bounds.x > 0.0f)
+                sp->SetVisible(sp->m_scale_bounds.x < gmz);
         }
     }
     inherited::Draw();

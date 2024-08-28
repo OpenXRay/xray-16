@@ -62,8 +62,28 @@ static u32 init_counter = 0;
 void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
 
 const pcstr xrCore::buildDate = __DATE__;
-const pcstr xrCore::buildCommit = MACRO_TO_STRING(GIT_INFO_CURRENT_COMMIT);
-const pcstr xrCore::buildBranch = MACRO_TO_STRING(GIT_INFO_CURRENT_BRANCH);
+const pcstr xrCore::buildCommit = GIT_INFO_CURRENT_COMMIT;
+const pcstr xrCore::buildBranch = GIT_INFO_CURRENT_BRANCH;
+
+void SanitizeString(pcstr str)
+{
+    pstr mut_str = const_cast<pstr>(str);
+
+    while (*mut_str != '\0')
+    {
+        switch (*mut_str)
+        {
+        case '\\':
+        case '/':
+        case ',':
+        case '.':
+            *mut_str = '_';
+            [[fallthrough]];
+        default:
+            ++mut_str;
+        }
+    }
+}
 
 xrCore::xrCore()
     : ApplicationName{}, ApplicationPath{},
@@ -117,19 +137,14 @@ void xrCore::PrintBuildInfo()
 #if defined(CI)
 #   if defined(APPVEYOR)
     name            = "AppVeyor";
-    buildUniqueId   = MACRO_TO_STRING(APPVEYOR_BUILD_ID);
-    buildId         = MACRO_TO_STRING(APPVEYOR_BUILD_VERSION);
-    builder         = MACRO_TO_STRING(APPVEYOR_ACCOUNT_NAME);
-#   elif defined(TRAVIS)
-    name            = "Travis";
-    buildUniqueId   = MACRO_TO_STRING(TRAVIS_BUILD_ID);
-    buildId         = MACRO_TO_STRING(TRAVIS_BUILD_NUMBER);
-    builder         = MACRO_TO_STRING(TRAVIS_REPO_SLUG);
+    buildUniqueId   = APPVEYOR_BUILD_ID;
+    buildId         = APPVEYOR_BUILD_VERSION;
+    builder         = APPVEYOR_ACCOUNT_NAME;
 #   elif defined(GITHUB_ACTIONS)
     name            = "GitHub Actions";
-    buildUniqueId   = MACRO_TO_STRING(GITHUB_RUN_ID);
-    buildId         = MACRO_TO_STRING(GITHUB_RUN_NUMBER);
-    builder         = MACRO_TO_STRING(GITHUB_REPOSITORY);
+    buildUniqueId   = GITHUB_RUN_ID;
+    buildId         = GITHUB_RUN_NUMBER;
+    builder         = GITHUB_REPOSITORY;
 #else
 #   pragma TODO("PrintBuildInfo for other CIs")
     name            = "CI";
@@ -156,25 +171,27 @@ void xrCore::PrintBuildInfo()
     Log(buf); // "%s build %s from commit[%s] branch[%s] (built by %s)"
 }
 
-void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs, pcstr fs_fname, bool plugin)
 {
-    Threading::SetCurrentThreadName("Primary thread");
+    ZoneScoped;
     xr_strcpy(ApplicationName, _ApplicationName);
     PrintBuildInfo();
 
     if (0 == init_counter)
     {
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
+        R_ASSERT2(CPU::HasSSE2, "Your CPU must support SSE2.");
+#endif
+
         PluginMode = plugin;
-        // Init COM so we can use CoCreateInstance
-        // HRESULT co_res =
         if (commandLine)
             Params = xr_strdup(commandLine);
         else
             Params = xr_strdup("");
 
-        CoInitializeMultithreaded();
-
 #if defined(XR_PLATFORM_WINDOWS)
+        CoInitializeEx(nullptr, COINIT_MULTITHREADED); // needed for OpenAL initialization
+
         string_path fn, dr, di;
 
         // application path
@@ -226,19 +243,29 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
-        if(pw)
+        if (pw)
         {
-            strcpy(UserName, pw->pw_gecos);
-            char* pos = strchr(UserName, ','); // pw_gecos return string
-            if(NULL != pos)
-                *pos = 0;
-            if(0 == UserName[0])
-                strcpy(UserName, pw->pw_name);
+            strncpy(UserName, pw->pw_gecos, sizeof(UserName) - 1);
+            if (UserName[0] == '\0')
+                strncpy(UserName, pw->pw_name, sizeof(UserName) - 1);
         }
+        else
+            Msg("! Failed to get user name");
 
-        gethostname(CompName, sizeof(CompName));
+        if (gethostname(CompName, sizeof(CompName)) == 0)
+            CompName[sizeof(CompName) - 1] = '\0';
+        else
+            Msg("! Failed to get computer name");
 #else
 #   error Select or add implementation for your platform
+#endif
+
+        SanitizeString(UserName);
+        SanitizeString(CompName);
+
+#ifdef DEBUG
+        Msg("UserName: %s", UserName);
+        Msg("ComputerName: %s", CompName);
 #endif
 
         Memory._initialize();
@@ -246,10 +273,8 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64)
-        R_ASSERT(SDL_HasSSE());
-#endif
         TaskScheduler = xr_make_unique<TaskManager>();
+        TaskScheduler->SpawnThreads();
         // xrDebug::Initialize ();
 
         rtc_initialize();
@@ -275,9 +300,13 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
 #ifdef _EDITOR // for EDITORS - no cache
         flags &= ~CLocatorAPI::flCacheFiles;
 #endif // _EDITOR
-#ifndef DISABLE_PORTABLE_MODE
-        flags |= CLocatorAPI::flScanAppRoot;
+
+// TODO Add proper check for CMake Windows build
+#if !defined(XR_PLATFORM_WINDOWS)
+        if (xr_stricmp(ApplicationPath, CMAKE_INSTALL_FULL_DATAROOTDIR) != 0)
+            flags |= CLocatorAPI::flScanAppRoot;
 #endif
+
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
         if (strstr(Params, "-file_activity") != nullptr)
@@ -287,7 +316,6 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, LogCallback c
         FS._initialize(flags, nullptr, fs_fname);
         EFS._initialize();
     }
-    SetLogCB(cb);
     init_counter++;
 }
 
@@ -296,10 +324,11 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
+        ZoneScoped;
         FS._destroy();
         EFS._destroy();
-        xr_FS.reset();
-        xr_EFS.reset();
+        xr_FS = nullptr;
+        xr_EFS = nullptr;
 
         if (trained_model)
         {
@@ -310,15 +339,10 @@ void xrCore::_destroy()
         TaskScheduler = nullptr;
         xr_free(Params);
         Memory._destroy();
-    }
-}
-
-void xrCore::CoInitializeMultithreaded() const
-{
-#if defined(XR_PLATFORM_WINDOWS)
-    if (!strstr(Params, "-weather"))
-        CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+#ifdef XR_PLATFORM_WINDOWS
+        CoUninitialize();
 #endif
+    }
 }
 
 #if defined(XR_PLATFORM_WINDOWS)

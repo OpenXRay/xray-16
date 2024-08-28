@@ -4,7 +4,7 @@
 
 // fwd. decl.
 template <class T> struct _vector3; typedef _vector3<float> Fvector;
-template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
+struct Fmatrix;
 struct Fbox3; using Fbox = Fbox3;
 
 XRCORE_API std::string get_string(bool v);

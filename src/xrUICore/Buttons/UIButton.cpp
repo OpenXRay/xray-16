@@ -10,6 +10,7 @@
 
 CUIButton::CUIButton() : CUIStatic("CUIButton")
 {
+    m_bFocusValuable = true;
     m_eButtonState = BUTTON_NORMAL;
     m_bIsSwitch = false;
 

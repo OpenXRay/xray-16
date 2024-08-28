@@ -68,6 +68,8 @@ void render_rain::init()
 //////////////////////////////////////////////////////////////////////////
 void render_rain::calculate()
 {
+    ZoneScoped;
+
     // static const float	source_offset		= 40.f;
 
     static const float source_offset = 10000.f;
@@ -114,7 +116,6 @@ void render_rain::calculate()
     Fvector3 cull_COP;
     Fmatrix cull_xform;
     {
-        FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv = ex_full_inverse;
 #ifdef _DEBUG
@@ -269,7 +270,6 @@ void render_rain::calculate()
         RainLight.X.D[0].maxY = limit;
 
         // full-xform
-        FPU::m24r();
     }
 
     // Begin SMAP-render
@@ -295,6 +295,10 @@ void render_rain::render()
 {
     if (o.active)
     {
+#if defined(USE_DX11)
+        //TracyD3D11Zone(HW.profiler_ctx, "render_rain::render");
+#endif
+
         auto& dsgraph = RImplementation.get_context(context_id);
 
         // Render shadow-map
@@ -318,6 +322,9 @@ void render_rain::flush()
 {
     if (o.active)
     {
+#if defined(USE_DX11)
+    //TracyD3D11Zone(HW.profiler_ctx, "render_rain::flush - submit and release");
+#endif
         auto& dsgraph = RImplementation.get_context(context_id);
 
         dsgraph.cmd_list.submit();
@@ -325,6 +332,11 @@ void render_rain::flush()
     }
 
     auto& cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+
+#if defined(USE_DX11)
+    //TracyD3D11Zone(HW.profiler_ctx, "render_rain::flush - accumulate");
+#endif
+
     cmd_list_imm.Invalidate();
 
     // Restore XForms

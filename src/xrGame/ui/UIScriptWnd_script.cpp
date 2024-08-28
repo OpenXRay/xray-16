@@ -4,6 +4,10 @@
 
 #include "xrUICore/ListWnd/UIListWnd.h"
 #include "xrUICore/TabControl/UITabControl.h"
+#include "xrUICore/Buttons/UICheckButton.h"
+#include "xrUICore/Buttons/UIRadioButton.h"
+#include "xrUICore/MessageBox/UIMessageBox.h"
+#include "xrUICore/PropertiesBox/UIPropertiesBox.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -206,22 +210,33 @@ SCRIPT_EXPORT(CUIDialogWndEx, (CUIDialogWnd, IFactoryObject),
     [
         class_<CUIDialogWndEx, luabind::bases<CUIDialogWnd, IFactoryObject>, luabind::default_holder, WrapType>("CUIScriptWnd")
             .def(constructor<>())
-            .def("AddCallback", &BaseType::AddCallback)
-            .def("Register", (void (BaseType::*)(CUIWindow*, pcstr)) & BaseType::Register)
-            .def("OnKeyboard", &BaseType::OnKeyboardAction, &WrapType::OnKeyboard_static)
-            .def("Update", &BaseType::Update, &WrapType::Update_static)
-            .def("Dispatch", &BaseType::Dispatch, &WrapType::Dispatch_static)
-            .def("Load", &BaseType::Load)
 
-            .def("GetStatic", (CUIStatic* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIStatic>)
-            .def("GetEditBox", (CUIEditBox* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIEditBox>)
-            .def("GetDialogWnd", (CUIDialogWnd* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIDialogWnd>)
-            .def("GetFrameWindow", (CUIFrameWindow* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIFrameWindow>)
-            .def("GetFrameLineWnd", (CUIFrameLineWnd* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIFrameLineWnd>)
-            .def("GetProgressBar", (CUIProgressBar* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIProgressBar>)
-            .def("GetTabControl", (CUITabControl* (BaseType::*)(pcstr)) &BaseType::GetControl<CUITabControl>)
-            .def("GetListBox", (CUIListBox* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIListBox>)
-            .def("GetListWnd", (CUIListWnd* (BaseType::*)(pcstr)) &BaseType::GetControl<CUIListWnd>)
+            .def("AddCallback",     (void(BaseType::*)(pcstr, s16, const luabind::functor<void>&)) &BaseType::AddCallback)
+            .def("AddCallback",     (void(BaseType::*)(pcstr, s16, const luabind::functor<void>&, const luabind::object&)) &BaseType::AddCallback)
+
+            .def("Register",        (void (BaseType::*)(CUIWindow*)) &BaseType::Register)
+            .def("Register",        (void (BaseType::*)(CUIWindow*, pcstr)) &BaseType::Register)
+
+            .def("OnKeyboard",      &BaseType::OnKeyboardAction, &WrapType::OnKeyboard_static)
+            .def("Update",          &BaseType::Update, &WrapType::Update_static)
+            .def("Dispatch",        &BaseType::Dispatch, &WrapType::Dispatch_static)
+            .def("Load",            &BaseType::Load)
+
+            .def("GetButton",       &BaseType::GetControl<CUIButton>)
+            .def("GetMessageBox",   &BaseType::GetControl<CUIMessageBox>)
+            .def("GetPropertiesBox",&BaseType::GetControl<CUIPropertiesBox>)
+            .def("GetCheckButton",  &BaseType::GetControl<CUICheckButton>)
+            .def("GetRadioButton",  &BaseType::GetControl<CUIRadioButton>)
+            // .def("GetRadioGroup",   &BaseType::GetControl<CUIRadioGroup>)
+            .def("GetStatic",       &BaseType::GetControl<CUIStatic>)
+            .def("GetEditBox",      &BaseType::GetControl<CUIEditBox>)
+            .def("GetDialogWnd",    &BaseType::GetControl<CUIDialogWnd>)
+            .def("GetFrameWindow",  &BaseType::GetControl<CUIFrameWindow>)
+            .def("GetFrameLineWnd", &BaseType::GetControl<CUIFrameLineWnd>)
+            .def("GetProgressBar",  &BaseType::GetControl<CUIProgressBar>)
+            .def("GetTabControl",   &BaseType::GetControl<CUITabControl>)
+            .def("GetListBox",      &BaseType::GetControl<CUIListBox>)
+            .def("GetListWnd",      &BaseType::GetControl<CUIListWnd>)
     ];
 });
 // clang-format on

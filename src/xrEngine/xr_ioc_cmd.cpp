@@ -1,10 +1,8 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
 
-#include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
-#include "xrSASH.h"
 
 #include "CameraManager.h"
 #include "Environment.h"
@@ -21,17 +19,12 @@ extern xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 
-const xr_token snd_precache_all_token[] = {{"off", 0}, {"on", 1}, {nullptr, 0}};
-
 void IConsole_Command::InvalidSyntax()
 {
     TInfo I;
     Info(I);
     Msg("~ Invalid syntax in call to '%s'", cName);
     Msg("~ Valid arguments: %s", I);
-
-    g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
-    g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
 }
 
 //-----------------------------------------------------------------------
@@ -125,12 +118,12 @@ public:
         for (it = Console->Commands.begin(); it != Console->Commands.end(); ++it)
         {
             IConsole_Command& C = *(it->second);
-            TStatus _S;
-            C.GetStatus(_S);
-            TInfo _I;
-            C.Info(_I);
+            TStatus status;
+            C.GetStatus(status);
+            TInfo info;
+            C.Info(info);
 
-            Msg("%-20s (%-10s) --- %s", C.Name(), _S, _I);
+            Msg("%-20s (%-10s) --- %s", C.Name(), status, info);
         }
         Log("Key: Ctrl + A         === Select all ");
         Log("Key: Ctrl + C         === Copy to clipboard ");
@@ -625,6 +618,8 @@ ENGINE_API float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 ENGINE_API float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 ENGINE_API int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
+int ps_disable_lens_flare = 1;
+
 class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -702,8 +697,8 @@ public:
 
     const xr_token* GetToken() noexcept override
     {
-        tokens = snd_devices_token;
-        return inherited::GetToken();
+        tokens = Engine.Sound.GetDevicesList().data();
+        return tokens;
     }
 
     virtual void Save(IWriter* F)
@@ -755,16 +750,6 @@ public:
     virtual void Execute(pcstr args) { Console->Hide(); }
     void GetStatus(TStatus& S) override { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "hide console"); }
-};
-
-class CCC_CenterScreen : public IConsole_Command
-{
-public:
-    CCC_CenterScreen(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
-    void Execute(pcstr args) override
-    {
-        SDL_SetWindowPosition(Device.m_sdlWnd, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    }
 };
 
 class CCC_ControllerSensorEnable final : public CCC_Mask
@@ -902,9 +887,9 @@ void CCC_Register()
     CMD1(CCC_SND_Restart, "snd_restart");
     CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
     CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EFX);
+    CMD3(CCC_Mask, "snd_use_float32", &psSoundFlags, ss_UseFloat32);
     CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 4, 256);
     CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 4, 64);
-    CMD3(CCC_Token, "snd_precache_all", &psSoundPrecacheAll, snd_precache_all_token);
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "snd_stats", &g_stats_flags, st_sound);
@@ -938,8 +923,6 @@ void CCC_Register()
     // Camera
     CMD2(CCC_Float, "cam_inert", &psCamInert);
     CMD2(CCC_Float, "cam_slide_inert", &psCamSlideInert);
-
-    CMD1(CCC_CenterScreen, "center_screen");
 
     CMD1(CCC_renderer, "renderer");
 
@@ -978,4 +961,6 @@ void CCC_Register()
 #endif
 
     CMD4(CCC_Vector3, "ssfx_wetness_multiplier", &ssfx_wetness_multiplier, Fvector3({ 0.1f, 0.1f, 0.0f} ), Fvector3({ 20.0f, 20.0f, 0.0f }));
+
+    CMD4(CCC_Integer, "disable_lens_flare", &ps_disable_lens_flare, 0, 1);
 };

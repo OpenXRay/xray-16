@@ -4,16 +4,18 @@
 #include "Common/Noncopyable.hpp"
 
 #ifdef CONFIG_PROFILE_LOCKS
-typedef void (*add_profile_portion_callback)(LPCSTR id, const u64& time);
+#include "xrCore.h"
+typedef void (*add_profile_portion_callback)(pcstr id, const u64& time);
 void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 
 #define MUTEX_PROFILE_PREFIX_ID #mutexes /
 #define MUTEX_PROFILE_ID(a) MACRO_TO_STRING(CONCATENIZE(MUTEX_PROFILE_PREFIX_ID, a))
 #endif // CONFIG_PROFILE_LOCKS
 
-class XRCORE_API Lock : Noncopyable
+class XRCORE_API Lock
 {
-    struct LockImpl* impl;
+    struct LockImpl* impl{};
+
 public:
 #ifdef CONFIG_PROFILE_LOCKS
     Lock(const char* id);
@@ -21,6 +23,12 @@ public:
     Lock();
 #endif
     ~Lock();
+
+    Lock(Lock& other) = delete;
+    Lock& operator=(Lock& other) = delete;
+
+    Lock(Lock&& other) noexcept(false);
+    Lock& operator=(Lock&& other) noexcept(false);
 
 #ifdef CONFIG_PROFILE_LOCKS
     void Enter();

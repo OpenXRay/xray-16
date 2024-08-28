@@ -357,8 +357,6 @@ public:
     void reset_light_marker(CBackend& cmd_list, bool bResetStencil = false);
     void increment_light_marker(CBackend& cmd_list);
 
-    void DoAsyncScreenshot();
-
 #ifdef DEBUG
     void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)
     {

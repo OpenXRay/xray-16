@@ -41,13 +41,6 @@ u32 get_rank(const shared_str& section)
     return res;
 }
 
-CRestrictions::CRestrictions()
-{
-    m_rank = 0;
-    m_bInited = false;
-}
-
-CRestrictions::~CRestrictions() {}
 void CRestrictions::InitGroups()
 {
     if (m_bInited)

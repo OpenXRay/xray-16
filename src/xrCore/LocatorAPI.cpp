@@ -183,7 +183,6 @@ CLocatorAPI::CLocatorAPI() :
 CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
-    _dump_open_files(1);
     xr_delete(m_auth_lock);
 }
 
@@ -198,6 +197,8 @@ const CLocatorAPI::file* CLocatorAPI::RegisterExternal(pcstr name)
 const CLocatorAPI::file* CLocatorAPI::Register(
     pcstr name, size_t vfs, u32 crc, u32 ptr, u32 size_real, u32 size_compressed, u32 modif)
 {
+    ZoneScoped;
+
     string256 temp_file_name;
     xr_strcpy(temp_file_name, sizeof temp_file_name, name);
     xr_fs_strlwr(temp_file_name);
@@ -394,6 +395,8 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
 
 void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
 {
+    ZoneScoped;
+
     // Create base path
     string_path fs_entry_point;
     bool shouldDecrypt = false;
@@ -521,6 +524,8 @@ void CLocatorAPI::archive::close()
 
 void CLocatorAPI::ProcessArchive(pcstr _path)
 {
+    ZoneScoped;
+
     // find existing archive
     shared_str path = _path;
 
@@ -601,6 +606,8 @@ bool ignore_name(const char* _name)
 
 void CLocatorAPI::ProcessOne(pcstr path, const _finddata_t& entry)
 {
+    ZoneScoped;
+
     string_path N;
 #if defined(XR_PLATFORM_WINDOWS)
     xr_strcpy(N, sizeof N, path);
@@ -677,6 +684,8 @@ bool ignore_path(pcstr _path)
 
 bool CLocatorAPI::Recurse(pcstr path)
 {
+    ZoneScoped;
+
     string_path scanPath = { 0 };
     xr_strcpy(scanPath, sizeof scanPath, path);
     xr_strcat(scanPath, ".xrignore");
@@ -845,7 +854,7 @@ void CLocatorAPI::setup_fs_path(pcstr fs_name)
              * I propose adding shaders from <CMAKE_INSTALL_FULL_DATAROOTDIR>/openxray/gamedata/shaders so that we remove unnecessary questions from users who want to start
              * the game using resources not from the proposed ~/.local/share/GSC Game World/Game in this case, this section of code can be safely removed */
             chdir(pref_path);
-            static constexpr pcstr install_dir = MACRO_TO_STRING(CMAKE_INSTALL_FULL_DATAROOTDIR);
+            static constexpr pcstr install_dir = CMAKE_INSTALL_FULL_DATAROOTDIR;
             string_path tmp, tmp_link;
             xr_sprintf(tmp, "%sfsgame.ltx", pref_path);
             struct stat statbuf;
@@ -933,6 +942,8 @@ IReader* CLocatorAPI::setup_fs_ltx(pcstr fs_name)
 
 void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 {
+    ZoneScoped;
+
     char _delimiter = '|'; //','
     if (m_Flags.is(flReady))
         return;
@@ -959,6 +970,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     }
     else
     {
+        ZoneScopedN("Process FS ltx");
         IReader* pFSltx = setup_fs_ltx(fs_name);
 
         // append all pathes
@@ -969,6 +981,8 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 
         while (!pFSltx->eof())
         {
+            ZoneScopedN("Read string");
+
             pFSltx->r_string(buf, sizeof buf);
             if (buf[0] == ';')
                 continue;
@@ -1021,7 +1035,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
     };
 
     const size_t M2 = Memory.mem_usage();
-    Msg("FS: %d files cached %d archives, %dKb memory used.", m_files.size(), m_archives.size(), (M2 - M1) / 1024);
+    Msg("FS: %zu files cached %zu archives, %zuKb memory used.", m_files.size(), m_archives.size(), (M2 - M1) / 1024);
 
     m_Flags.set(flReady, true);
 
@@ -1052,7 +1066,7 @@ void CLocatorAPI::_initialize(u32 flags, pcstr target_folder, pcstr fs_name)
 
 void CLocatorAPI::_destroy()
 {
-    CloseLog();
+    ZoneScoped;
 
     for (auto& it : m_files)
     {
@@ -1075,6 +1089,9 @@ void CLocatorAPI::_destroy()
         it.close();
     }
     m_archives.clear();
+
+    _dump_open_files(1);
+    CloseLog();
 }
 
 const CLocatorAPI::file* CLocatorAPI::GetFileDesc(pcstr path)
@@ -1232,7 +1249,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
             // file
             if ((flags & FS_ListFiles) == 0)
                 continue;
-            LPCSTR entry_begin = entry.name + base_len;
+            pcstr entry_begin = entry.name + base_len;
             if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER))
                 continue; // folder in folder
             // check extension
@@ -1266,7 +1283,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
             // folder
             if ((flags & FS_ListFolders) == 0)
                 continue;
-            LPCSTR entry_begin = entry.name + base_len;
+            pcstr entry_begin = entry.name + base_len;
 
             if (flags & FS_RootOnly && strchr(entry_begin, _DELIMITER) != end_symbol)
                 continue; // folder in folder
@@ -1286,9 +1303,9 @@ void CLocatorAPI::check_cached_files(pstr fname, const size_t& fname_size, const
     if (!path_exist("$server_root$"))
         return;
 
-    LPCSTR path_base = get_path("$server_root$")->m_Path;
+    pcstr path_base = get_path("$server_root$")->m_Path;
     size_t len_base = xr_strlen(path_base);
-    LPCSTR path_file = fname;
+    pcstr path_file = fname;
     const size_t len_file = xr_strlen(path_file);
     if (len_file <= len_base)
         return;

@@ -36,6 +36,8 @@ bool task_prio_pred(const SGameTaskKey& k1, const SGameTaskKey& k2)
 
 CGameTaskManager::CGameTaskManager()
 {
+    m_gameTaskXml.Load(CONFIG_PATH, "gameplay", "game_tasks.xml", false);
+
     m_gametasks_wrapper = xr_new<CGameTaskWrapper>();
     m_gametasks_wrapper->registry().init(0); // actor's id
     m_flags.zero();
@@ -60,6 +62,7 @@ CGameTaskManager::~CGameTaskManager()
     delete_data(m_gametasks_wrapper);
     for (auto& taskId : g_active_task_id)
         taskId = nullptr;
+    m_gameTaskXml.ClearInternal();
 }
 
 vGameTasks& CGameTaskManager::GetGameTasks()
@@ -184,6 +187,7 @@ void CGameTaskManager::UpdateTasks()
     if (Device.Paused())
         return;
 
+    ZoneScoped;
     Level().MapManager().DisableAllPointers();
 
     u32 task_count = GetGameTasks().size();

@@ -8,13 +8,14 @@
 
 inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 {
+    ZoneScoped;
     const size_t pitch = source->pitch;
     const size_t size = pitch * source->h;
 
-    // XXX: get rid of xr_alloca usage, possible stack overflow
-    //auto original = new u8(size);
+    // XXX: don't alloc at all, flip surface in-place
+    auto ptr = static_cast<u8*>(xr_malloc(size));
+    auto original = ptr;
 
-    auto original = static_cast<u8*>(xr_alloca(size));
     CopyMemory(original, source->pixels, size);
 
     auto flipped = static_cast<u8*>(source->pixels) + size;
@@ -26,20 +27,21 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
         flipped -= pitch;
     }
 
-    //xr_delete(original);
+    xr_free(ptr);
     return source;
 }
 
 #ifdef XR_PLATFORM_WINDOWS
 inline HANDLE ExtractImage(int idx, UINT type)
 {
+    ZoneScoped;
     return LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(idx),
         type, 0, 0, LR_CREATEDIBSECTION);
 }
 
-
 inline SDL_Surface* CreateSurfaceFromBitmap(HBITMAP bitmapHandle)
 {
+    ZoneScoped;
     BITMAP bitmap;
     const int bitmapSize = GetObject(bitmapHandle, sizeof(BITMAP), &bitmap);
 
@@ -79,20 +81,16 @@ inline SDL_Surface* ExtractBitmap(int idx)
     return CreateSurfaceFromBitmap(bitmap);
 }
 
-inline xr_vector<SDL_Surface*> ExtractSplashScreen()
+inline SDL_Surface* ExtractSplashScreen()
 {
-    // XXX: that's the place, where splash frames can be added
-    // Animated splash screen!
-    SDL_Surface* surface = ExtractBitmap(IDB_SPLASH);
-
-    if (surface)
-        return { surface };
-
-    return {};
+    ZoneScoped;
+    return ExtractBitmap(IDB_SPLASH);
 }
 
 inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
 {
+    ZoneScoped;
+
     const HICON icon = (HICON)ExtractImage(iconIdx, IMAGE_ICON);
 
     SDL_SysWMinfo info;
@@ -104,19 +102,17 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
     SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 }
 #else
-inline xr_vector<SDL_Surface*> ExtractSplashScreen()
+inline SDL_Surface* ExtractSplashScreen()
 {
+    ZoneScoped;
+
     // You need to place logo.bmp beside fsgame.ltx
-    SDL_Surface* surface = SDL_LoadBMP("logo.bmp");
-
-    if (surface)
-        return { surface };
-
-    return {};
+    return SDL_LoadBMP("logo.bmp");
 }
 
 inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
 {
+    ZoneScoped;
     SDL_Surface* surface = nullptr;
     switch (iconIdx)
     {

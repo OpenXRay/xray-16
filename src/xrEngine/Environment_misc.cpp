@@ -188,6 +188,8 @@ void CEnvAmbient::destroy()
 void CEnvAmbient::load(
     const CInifile& ambients_config, const CInifile& sound_channels_config, const CInifile& effects_config, const shared_str& sect)
 {
+    ZoneScoped;
+
     m_ambients_config_filename = ambients_config.fname();
     m_load_section = sect;
     string_path tmp;
@@ -286,8 +288,6 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
     m_fSunShaftsIntensity = 0;
     m_fWaterIntensity = 1;
 
-    m_fTreeAmplitudeIntensity = 0.01f;
-
     lens_flare = nullptr;
     thunderbolt = nullptr;
 
@@ -302,6 +302,8 @@ CEnvDescriptor::CEnvDescriptor(shared_str const& identifier) : m_identifier(iden
 
 void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcstr section /*= nullptr*/)
 {
+    ZoneScoped;
+
     const bool old_style               = section;
 
     cpcstr ambient_name                = old_style ? "env_ambient"   : "ambient";
@@ -403,7 +405,17 @@ void CEnvDescriptor::load(CEnvironment& environment, const CInifile& config, pcs
 
     m_fSunShaftsIntensity = config.read_if_exists<float>(identifier, "sun_shafts_intensity", 0.0);
     m_fWaterIntensity = config.read_if_exists<float>(identifier, "water_intensity", 1.0);
-    m_fTreeAmplitudeIntensity = config.read_if_exists<float>(identifier, "tree_amplitude_intensity", 0.01);
+
+    m_fTreeAmplitude = 0.005f;
+    if (config.line_exist(identifier, "trees_amplitude")) // Lost Alpha config
+        m_fTreeAmplitude = config.r_float(identifier, "trees_amplitude");
+    else if (config.line_exist(identifier, "tree_amplitude_intensity")) // Call of Chernobyl config
+        m_fTreeAmplitude = config.r_float(identifier, "tree_amplitude_intensity");
+
+    m_fTreeSpeed    = config.read_if_exists<float>(identifier, "trees_speed",    1.0f);
+    m_fTreeRotation = config.read_if_exists<float>(identifier, "trees_rotation", 10.0f);
+
+    m_fTreeWave = config.read_if_exists<Fvector>(identifier, "trees_wave", { .1f, .01f, .11f });
 
     C_CHECK(clouds_color);
     C_CHECK(sky_color);
@@ -421,6 +433,8 @@ void CEnvDescriptor::save(CInifile& config, pcstr section /*= nullptr*/) const
 {
     if (dont_save)
         return;
+
+    ZoneScoped;
 
     const bool old_style               = section;
 
@@ -559,7 +573,11 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
 
     m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
-    m_fTreeAmplitudeIntensity = fi * A.m_fTreeAmplitudeIntensity + f * B.m_fTreeAmplitudeIntensity;
+    // trees
+    m_fTreeAmplitude = fi * A.m_fTreeAmplitude + f * B.m_fTreeAmplitude;
+    m_fTreeSpeed = fi * A.m_fTreeSpeed + f * B.m_fTreeSpeed;
+    m_fTreeRotation = fi * A.m_fTreeRotation + f * B.m_fTreeRotation;
+    m_fTreeWave.lerp(A.m_fTreeWave, B.m_fTreeWave, f);
 
     // colors
     //. sky_color.lerp (A.sky_color,B.sky_color,f).add(Mdf.sky_color).mul(modif_power);
@@ -730,6 +748,8 @@ CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect, CInifile const* 
 
 void CEnvironment::mods_load()
 {
+    ZoneScoped;
+
     Modifiers.clear();
     string_path path;
     if (FS.exist(path, "$level$", "level.env_mod"))
@@ -761,6 +781,8 @@ void CEnvironment::mods_load()
 void CEnvironment::mods_unload() { Modifiers.clear(); }
 void CEnvironment::load_level_specific_ambients()
 {
+    ZoneScoped;
+
     const shared_str level_name = g_pGameLevel->name();
 
     string_path path;
@@ -819,6 +841,8 @@ void CEnvironment::load_weathers()
 {
     if (!WeatherCycles.empty())
         return;
+
+    ZoneScoped;
 
     FS_FileSet weathers;
     FS.file_list(weathers, "$game_weathers$", FS_ListFiles, "*.ltx");
@@ -891,6 +915,8 @@ void CEnvironment::load_weather_effects()
 {
     if (!WeatherFXs.empty())
         return;
+
+    ZoneScoped;
 
     FS_FileSet weathersEffects;
     FS.file_list(weathersEffects, "$game_weather_effects$", FS_ListFiles, "*.ltx");
@@ -967,6 +993,8 @@ void CEnvironment::load_weather_effects()
 
 void CEnvironment::load()
 {
+    ZoneScoped;
+
     if (!eff_Rain)
         eff_Rain = xr_new<CEffect_Rain>();
     if (!eff_LensFlare)
@@ -980,6 +1008,8 @@ void CEnvironment::load()
 
 void CEnvironment::unload()
 {
+    ZoneScoped;
+
     // clear weathers
     for (auto& cycle : WeatherCycles)
         for (auto& env : cycle.second)
@@ -1011,6 +1041,7 @@ void CEnvironment::unload()
 
 void CEnvironment::ED_Reload()
 {
+    ZoneScoped;
     unload();
     load();
     OnFrame();
@@ -1018,6 +1049,8 @@ void CEnvironment::ED_Reload()
 
 void CEnvironment::save() const
 {
+    ZoneScoped;
+
     string_path environment_config_path;
     FS.update_path(environment_config_path, "$game_config$", "weathers\\environment.ltx");
 
@@ -1031,6 +1064,8 @@ void CEnvironment::save() const
 
 void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) const
 {
+    ZoneScoped;
+
     string_path weathers_path;
     if (!FS.update_path(weathers_path, "$game_weathers$", "", false))
         FS.update_path(weathers_path, "$game_config$", "environment\\weathers");
@@ -1080,6 +1115,8 @@ void CEnvironment::save_weathers(CInifile* environment_config /*= nullptr*/) con
 
 void CEnvironment::save_weather_effects(CInifile* environment_config /*= nullptr*/) const
 {
+    ZoneScoped;
+
     string_path effects_path;
     if (!FS.update_path(effects_path, "$game_weather_effects$", "", false))
         FS.update_path(effects_path, "$game_config$", "environment\\weather_effects");

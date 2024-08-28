@@ -9,6 +9,8 @@ using namespace collide;
 bool CObjectSpace::BoxQuery(Fvector const& box_center, Fvector const& box_z_axis, Fvector const& box_y_axis,
     Fvector const& box_sizes, xr_vector<Fvector>* out_tris)
 {
+    ZoneScoped;
+
     Fvector z_axis = box_z_axis;
     z_axis.normalize();
     Fvector y_axis = box_y_axis;

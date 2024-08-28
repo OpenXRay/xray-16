@@ -373,6 +373,7 @@ BindingsDumper::BindingsDumper()
 
 void BindingsDumper::Dump(lua_State* luaState, IWriter* outStream, const Options& opt)
 {
+    ZoneScoped;
     ls = luaState;
     options = opt;
     shiftLevel = 0;

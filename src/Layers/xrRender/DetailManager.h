@@ -203,13 +203,7 @@ public:
     void hw_Load_Shaders();
     void hw_Unload();
     void hw_Render(CBackend& cmd_list);
-#if defined(USE_DX9)
-    void hw_Render_dump(CBackend& cmd_list, ref_constant array, u32 var_id, u32 lod_id, u32 c_base);
-#elif defined(USE_DX11) || defined(USE_OGL)
     void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);
@@ -231,18 +225,9 @@ public:
     void Render(CBackend& cmd_list);
 
     /// MT stuff
-    Lock MT;
-    volatile u32 m_frame_calc;
-    volatile u32 m_frame_rendered;
+    Task* m_calc_task{};
 
-    void MT_CALC();
-    ICF void MT_SYNC()
-    {
-        if (m_frame_calc == Device.dwFrame)
-            return;
-
-        MT_CALC();
-    }
+    void DispatchMTCalc();
 
     CDetailManager();
     virtual ~CDetailManager();

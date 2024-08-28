@@ -12,6 +12,8 @@ void check_kinematics(CKinematics* _k, LPCSTR s);
 
 void CKinematics::CalculateBones(BOOL bForceExact)
 {
+    ZoneScoped;
+
     // early out.
     // check if the info is still relevant
     // skip all the computations - assume nothing changes in a small period of time :)
@@ -46,6 +48,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     UCalc_Visibox++;
     if (UCalc_Visibox >= psSkeletonUpdate)
     {
+        ZoneScopedN("Skeleton update");
+
         // mark
         UCalc_Visibox = -(::Random.randI(psSkeletonUpdate - 1));
 
@@ -195,6 +199,8 @@ void CKinematics::CalculateBonesAdditionalTransforms(
 
 void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask /*= (1<<0)*/)
 {
+    ZoneScoped;
+
     u16 SelfID = bd->GetSelfID();
 
     if (LL_GetBoneVisible(SelfID))
@@ -224,6 +230,8 @@ void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* 
 
 void CKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 mask_channel, bool ignore_callbacks)
 {
+    ZoneScoped;
+
     R_ASSERT(id < LL_BoneCount());
     CBoneInstance bi = LL_GetBoneInstance(id);
     BoneChain_Calculate(&LL_GetData(id), bi, mask_channel, ignore_callbacks);
@@ -235,6 +243,8 @@ void CKinematics::Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 mask_channel, bool ig
 
 void CKinematics::Bone_Calculate(CBoneData* bd, Fmatrix* parent)
 {
+    ZoneScoped;
+
     u16 SelfID = bd->GetSelfID();
     CBoneInstance& BONE_INST = LL_GetBoneInstance(SelfID);
     CLBone(bd, BONE_INST, parent, u8(-1));
@@ -245,6 +255,8 @@ void CKinematics::Bone_Calculate(CBoneData* bd, Fmatrix* parent)
 
 void CKinematics::BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8 mask_channel, bool ignore_callbacks)
 {
+    ZoneScoped;
+
     u16 SelfID = bd->GetSelfID();
     // CBlendInstance& BLEND_INST	= LL_GetBlendInstance(SelfID);
     // CBlendInstance::BlendSVec &Blend = BLEND_INST.blend_vector();

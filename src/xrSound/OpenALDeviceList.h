@@ -39,7 +39,6 @@ class ALDeviceList
 
 public:
     ALDeviceList();
-    ~ALDeviceList();
 
     [[nodiscard]]
     size_t GetNumDevices() const { return m_devices.size(); }

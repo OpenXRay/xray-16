@@ -6,7 +6,13 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-#if DEBUG
+#if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
+#   ifndef MASTER_GOLD
+#       define USE_RENDERDOC
+#   endif
+#endif
+
+#ifdef USE_RENDERDOC
 #include <renderdoc/renderdoc_app.h>
 RENDERDOC_API_1_0_0* g_renderdoc_api;
 #endif
@@ -70,7 +76,8 @@ void D3DXRenderBase::Destroy()
 
 void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
+    ZoneScoped;
+#if defined(DEBUG) && defined(USE_DX11)
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif // DEBUG
 
@@ -92,7 +99,7 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
     Resources->Dump(true);
 #endif
 
-#if defined(DEBUG) && (defined(USE_DX9) || defined(USE_DX11))
+#if defined(DEBUG) && defined(USE_DX11)
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
 #endif
 }
@@ -117,6 +124,8 @@ void D3DXRenderBase::SetupStates()
 
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
 {
+    ZoneScoped;
+
     // Signal everyone - device created
 
     // streams
@@ -151,7 +160,9 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
 
 void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
-#if defined(DEBUG) && defined(USE_DX11)
+    ZoneScoped;
+
+#if defined(USE_RENDERDOC) && defined(USE_DX11)
     if (!g_renderdoc_api)
     {
         HMODULE hModule = GetModuleHandleA("renderdoc.dll");
@@ -278,8 +289,6 @@ void D3DXRenderBase::Clear()
     }
 }
 
-void DoAsyncScreenshot();
-
 void D3DXRenderBase::End()
 {
     if (HW.Caps.SceneMode)
@@ -292,7 +301,6 @@ void D3DXRenderBase::End()
 #else
     RCache.OnFrameEnd();
 #endif
-    DoAsyncScreenshot();
 
     // we're done with rendering
     cleanup_contexts();
@@ -333,6 +341,7 @@ bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 
 void D3DXRenderBase::OnAssetsChanged()
 {
+    ZoneScoped;
     Resources->m_textures_description.UnLoad();
     Resources->m_textures_description.Load();
 }

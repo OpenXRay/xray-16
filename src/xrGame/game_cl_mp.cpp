@@ -432,9 +432,7 @@ void game_cl_mp::TranslateGameMessage(u32 msg, NET_Packet& P)
         clientdata_event_t etype = static_cast<clientdata_event_t>(P.r_u8());
         if (etype == e_screenshot_request)
         {
-            screenshot_manager::complete_callback_t compl_cb =
-                fastdelegate::MakeDelegate(this, &game_cl_mp::SendCollectedData);
-            ss_manager.make_screenshot(compl_cb);
+            // XXX: removed, should be reimplemented
         }
         else if (etype == e_configs_request)
         {
@@ -855,7 +853,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     KMS.m_victim.m_name = pPlayer->getName();
     KMS.m_victim.m_color = Color_Teams_u32[ModifyTeam(pPlayer->team) + 1];
 
-    KMS.m_killer.m_name = NULL;
+    KMS.m_killer.m_name = nullptr;
     KMS.m_killer.m_color = color_rgba(255, 255, 255, 255);
 
     switch (KillType)
@@ -999,7 +997,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         // suicide
         if (KilledID == KillerID)
         {
-            KMS.m_victim.m_name = NULL;
+            KMS.m_victim.m_name = nullptr;
 
             KMS.m_ext_info.m_shader = GetKillEventIconsShader();
             KMS.m_ext_info.m_rect.x1 = 32;
@@ -1868,7 +1866,8 @@ void game_cl_mp::draw_all_active_binder_states()
         m_detected_cheaters.end());
 }
 
-void game_cl_mp::draw_downloads(bool draw) { ss_manager.set_draw_downloads(draw); }
+void game_cl_mp::draw_downloads(bool /*draw*/) {}
+
 void game_cl_mp::extract_server_info(u8* data_ptr, u32 data_size)
 {
     UIGameMP* tmp_ui_mp_game = smart_cast<UIGameMP*>(m_game_ui_custom);

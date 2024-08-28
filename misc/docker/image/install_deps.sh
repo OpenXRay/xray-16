@@ -30,7 +30,6 @@ apt-get install -y \
   gdb \
   wget \
   autoconf \
-  libglew-dev \
   libjpeg-dev \
   libopenal-dev \
   libcrypto++-dev \

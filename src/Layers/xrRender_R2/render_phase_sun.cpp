@@ -61,6 +61,8 @@ void render_sun::init()
 
 void render_sun::calculate()
 {
+    ZoneScoped;
+
     need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     last_cascade_chain_mode = m_sun_cascades[R__NUM_SUN_CASCADES - 1].reset_chain;
     if (need_to_render_sunshafts)
@@ -116,8 +118,6 @@ void render_sun::calculate()
     {
         cull_planes.clear();
 
-        FPU::m64r();
-
         //******************************* Need to be placed after cuboid built **************************
         // COP - 100 km away
         cull_COP[cascade_ind].mad(Device.vCameraPosition, sun->direction, -tweak_COP_initial_offs);
@@ -160,17 +160,10 @@ void render_sun::calculate()
         XRMatrixOrthoOffCenterLH(&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
             map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
 #else
-#ifdef USE_DX9
-        XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
-            -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
-            map_size * 0.5f, 0.1f, dist + map_size)
-        );
-#else
         XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
             -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
             map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/ 1.41421f * map_size)
         );
-#endif
 #endif
         //////////////////////////////////////////////////////////////////////////
         // snap view-position to pixel
@@ -273,7 +266,6 @@ void render_sun::calculate()
         sun->X.D[cascade_ind].combine = cull_xform[cascade_ind];
 
         // full-xform
-        FPU::m24r();
     }
 
     const auto process_cascade = [&, this](const TaskRange<u32>& range)
@@ -320,6 +312,10 @@ void render_sun::render()
     {
         for (u32 cascade_ind = range.begin(); cascade_ind != range.end(); ++cascade_ind)
         {
+#if defined(USE_DX11)
+            //TracyD3D11Zone(HW.profiler_ctx, "render_sun::render_cascade");
+#endif
+
             auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
             bool bNormal = !dsgraph.mapNormalPasses[0][0].empty() || !dsgraph.mapMatrixPasses[0][0].empty();
@@ -399,6 +395,10 @@ void render_sun::flush()
 
 void render_sun::accumulate_cascade(u32 cascade_ind)
 {
+#if defined(USE_DX11)
+    //TracyD3D11Zone(HW.profiler_ctx, "render_sun::accumulate_cascade");
+#endif
+
     auto& dsgraph = RImplementation.get_context(contexts_ids[cascade_ind]);
 
     if ((cascade_ind == SE_SUN_NEAR) && RImplementation.Target->use_minmax_sm_this_frame())

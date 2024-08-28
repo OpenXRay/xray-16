@@ -5,7 +5,6 @@
 #include "game_cl_base.h"
 #include "xrMessages.h"
 #include "xrGameSpyServer.h"
-#include "xrEngine/x_ray.h"
 #include "xrEngine/device.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/XR_IOConsole.h"
@@ -24,9 +23,11 @@ shared_str CLevel::OpenDemoFile(const char* demo_file_name)
 void CLevel::net_StartPlayDemo() { net_Start(m_demo_server_options.c_str(), "localhost"); }
 bool CLevel::net_Start(const char* op_server, const char* op_client)
 {
+    ZoneScoped;
+
     net_start_result_total = TRUE;
 
-    pApp->LoadBegin();
+    g_pGamePersistent->LoadBegin();
 
     string64 player_name;
     GetPlayerName_FromRegistry(player_name, sizeof(player_name));
@@ -99,11 +100,12 @@ shared_str level_version(const shared_str& server_options);
 shared_str level_name(const shared_str& server_options);
 bool CLevel::net_start1()
 {
+    ZoneScoped;
+
     // Start client and server if need it
     if (m_caServerOptions.size())
     {
-        g_pGamePersistent->SetLoadStageTitle("st_server_starting");
-        g_pGamePersistent->LoadTitle();
+        g_pGamePersistent->LoadTitle("st_server_starting");
 
         typedef IGame_Persistent::params params;
         params& p = g_pGamePersistent->m_game_params;
@@ -124,9 +126,9 @@ bool CLevel::net_start1()
             map_data.m_name = game_sv_GameState::parse_level_name(m_caServerOptions);
 
             if (!GEnv.isDedicatedServer)
-                g_pGamePersistent->LoadTitle(true, map_data.m_name);
+                g_pGamePersistent->LoadTitle(nullptr, true, map_data.m_name);
 
-            int id = pApp->Level_ID(map_data.m_name.c_str(), l_ver.c_str(), true);
+            const int id = g_pGamePersistent->Level_ID(map_data.m_name.c_str(), l_ver.c_str(), true);
 
             if (id < 0)
             {
@@ -144,6 +146,7 @@ bool CLevel::net_start2()
 {
     if (net_start_result_total && m_caServerOptions.size())
     {
+        ZoneScoped;
         GameDescriptionData game_descr;
         if ((m_connect_server_err = Server->Connect(m_caServerOptions, game_descr)) != xrServer::ErrNoError)
         {
@@ -154,7 +157,7 @@ bool CLevel::net_start2()
         Server->SLS_Default();
         map_data.m_name = Server->level_name(m_caServerOptions);
         if (!GEnv.isDedicatedServer)
-            g_pGamePersistent->LoadTitle(true, map_data.m_name);
+            g_pGamePersistent->LoadTitle(nullptr, true, map_data.m_name);
     }
     return true;
 }
@@ -163,6 +166,9 @@ bool CLevel::net_start3()
 {
     if (!net_start_result_total)
         return true;
+
+    ZoneScoped;
+
     // add server port if don't have one in options
     if (!strstr(m_caClientOptions.c_str(), "port=") && Server)
     {
@@ -210,6 +216,7 @@ bool CLevel::net_start4()
     if (!net_start_result_total)
         return true;
 
+    ZoneScoped;
     g_loading_events.pop_front();
 
     g_loading_events.push_front(LOADING_EVENT(this, &CLevel::net_start_client6));
@@ -226,6 +233,7 @@ bool CLevel::net_start5()
 {
     if (net_start_result_total)
     {
+        ZoneScoped;
         NET_Packet NP;
         NP.w_begin(M_CLIENTREADY);
         Game().local_player->net_Export(NP, TRUE);
@@ -240,20 +248,29 @@ bool CLevel::net_start5()
 }
 bool CLevel::net_start6()
 {
+    ZoneScoped;
+
     // init bullet manager
     BulletManager().Clear();
     BulletManager().Load();
 
-    pApp->LoadEnd();
+    g_pGamePersistent->LoadEnd();
 
     if (net_start_result_total)
     {
         if (strstr(Core.Params, "-$"))
         {
-            string256 buf, cmd, param;
-            sscanf(strstr(Core.Params, "-$") + 2, "%[^ ] %[^ ] ", cmd, param);
-            strconcat(sizeof(buf), buf, cmd, " ", param);
-            Console->Execute(buf);
+            string256 buf{}, cmd{}, param{};
+            const int result = sscanf(strstr(Core.Params, "-$") + 2, "%[^ ] %[^ ] ", cmd, param);
+            if (result == 2)
+            {
+                strconcat(buf, cmd, " ", param);
+                Console->Execute(buf);
+            }
+            else
+            {
+                Log("! The key '-$' is not being used correctly. Correct format: -$ <command> <param>");
+            }
         }
     }
     else
@@ -262,7 +279,7 @@ bool CLevel::net_start6()
 
         if (m_connect_server_err == xrServer::ErrConnect && !psNET_direct_connect && !GEnv.isDedicatedServer)
         {
-            DEL_INSTANCE(g_pGameLevel);
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
 
             MainMenu()->SwitchToMultiplayerMenu();
@@ -278,7 +295,7 @@ bool CLevel::net_start6()
             STRCONCAT(level_id_string, StringTable().translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, StringTable().translate("ui_st_map_not_found"));
 
-            DEL_INSTANCE(g_pGameLevel);
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
 
             if (!GEnv.isDedicatedServer)
@@ -297,8 +314,8 @@ bool CLevel::net_start6()
             STRCONCAT(level_id_string, StringTable().translate("st_level"), ":", map_data.m_name.c_str(), "(", tmp_map_ver, "). ");
             STRCONCAT(dialog_string, level_id_string, StringTable().translate("ui_st_map_data_corrupted"));
 
-            g_pGameLevel->net_Stop();
-            DEL_INSTANCE(g_pGameLevel);
+            net_Stop();
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
             if (!GEnv.isDedicatedServer)
             {
@@ -308,7 +325,7 @@ bool CLevel::net_start6()
         }
         else
         {
-            DEL_INSTANCE(g_pGameLevel);
+            g_pGamePersistent->DestroyLevel(g_pGameLevel); // XXX: level destroying itself!!!
             Console->Execute("main_menu on");
         }
 
@@ -326,6 +343,8 @@ bool CLevel::net_start6()
 
 void CLevel::InitializeClientGame(NET_Packet& P)
 {
+    ZoneScoped;
+
     string256 game_type_name;
     P.r_stringZ(game_type_name);
     if (game && !xr_strcmp(game_type_name, game->type_name()))

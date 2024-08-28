@@ -37,31 +37,14 @@ static const float MAX_NOISE_FREQ = 0.03f;
 
 //////////////////////////////////////////////////////////////////////////
 // environment
-CEnvironment::CEnvironment() : m_ambients_config(0)
+CEnvironment::CEnvironment()
+    : PerlinNoise1D(xr_new<CPerlinNoise1D>(Random.randI(0, 0xFFFF)))
 {
-    bWFX = false;
-    Current[0] = 0;
-    Current[1] = 0;
-    CurrentWeather = 0;
-    CurrentWeatherName = 0;
-    eff_Rain = 0;
-    eff_LensFlare = 0;
-    eff_Thunderbolt = 0;
     OnDeviceCreate();
 
-    fGameTime = 0.f;
     fTimeFactor = 12.f;
 
-    wind_strength_factor = 0.f;
-    wind_gust_factor = 0.f;
-
-    wetness_factor = 0.f;
-
-    wind_blast_strength = 0.f;
     wind_blast_direction.set(1.f, 0.f, 0.f);
-
-    wind_blast_strength_start_value = 0.f;
-    wind_blast_strength_stop_value = 0.f;
 
     // fill clouds hemi verts & faces
     const Fvector* verts;
@@ -72,7 +55,6 @@ CEnvironment::CEnvironment() : m_ambients_config(0)
     CopyMemory(&CloudsIndices.front(), indices, CloudsIndices.size() * sizeof(u16));
 
     // perlin noise
-    PerlinNoise1D = xr_new<CPerlinNoise1D>(Random.randI(0, 0xFFFF));
     PerlinNoise1D->SetOctaves(2);
     PerlinNoise1D->SetAmplitude(0.66666f);
 
@@ -417,6 +399,8 @@ void CEnvironment::lerp()
 
 void CEnvironment::OnFrame()
 {
+    ZoneScoped;
+
     if (!g_pGameLevel)
         return;
 

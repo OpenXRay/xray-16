@@ -89,15 +89,12 @@ void R_constant_table::merge(R_constant_table* T)
             C->type = src->type;
             C->ps = src->ps;
             C->vs = src->vs;
-#ifndef USE_DX9
             C->gs = src->gs;
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
             C->hs = src->hs;
             C->ds = src->ds;
             C->cs = src->cs;
-#   endif
-#endif
-#ifdef USE_OGL
+#elif defined(USE_OGL)
             C->pp = src->pp;
 #endif
             C->samp = src->samp;

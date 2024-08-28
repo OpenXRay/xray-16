@@ -30,14 +30,14 @@ protected:
     CUIStatic* m_icon_rpm;
 
     CUIStatic* m_stAmmo;
-    CUITextWnd m_textAccuracy;
-    CUITextWnd m_textHandling;
-    CUITextWnd m_textDamage;
-    CUITextWnd m_textRPM;
-    CUITextWnd* m_textAmmoTypes;
-    CUITextWnd* m_textAmmoUsedType;
-    CUITextWnd* m_textAmmoCount;
-    CUITextWnd* m_textAmmoCount2;
+    CUIStatic m_textAccuracy{ "Accuracy" };
+    CUIStatic m_textHandling{ "Handling" };
+    CUIStatic m_textDamage{ "Damage" };
+    CUIStatic m_textRPM{ "RPM" };
+    CUIStatic* m_textAmmoTypes;
+    CUIStatic* m_textAmmoUsedType;
+    CUIStatic* m_textAmmoCount;
+    CUIStatic* m_textAmmoCount2;
     CUIStatic* m_stAmmoType1;
     CUIStatic* m_stAmmoType2;
     CUIStatic* m_Prop_line;

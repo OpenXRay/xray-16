@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Text_Console.h"
 #include "line_editor.h"
-#include "x_ray.h"
 
 #include <windowsx.h>
 
@@ -329,44 +328,4 @@ void CTextConsole::OnFrame()
      */ InvalidateRect(m_hConsoleWnd, NULL, FALSE);
     SetCursor(LoadCursor(NULL, IDC_ARROW));
     // m_bNeedUpdate = true;
-}
-
-void TextLoadingScreen::Initialize()
-{
-
-}
-
-bool TextLoadingScreen::IsShown() const
-{
-    return false;
-}
-
-void TextLoadingScreen::Show(bool status)
-{
-
-}
-
-void TextLoadingScreen::Update(int stagesCompleted, int stagesTotal)
-{
-
-}
-
-void TextLoadingScreen::Draw()
-{
-
-}
-
-void TextLoadingScreen::SetLevelLogo(cpcstr name)
-{
-
-}
-
-void TextLoadingScreen::SetStageTitle(cpcstr title)
-{
-
-}
-
-void TextLoadingScreen::SetStageTip(cpcstr header, cpcstr tipNumber, cpcstr tip)
-{
-
 }

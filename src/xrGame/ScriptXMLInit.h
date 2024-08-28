@@ -5,7 +5,6 @@
 class CUIWindow;
 class CUIFrameWindow;
 class CUIStatic;
-class CUITextWnd;
 class CUICheckButton;
 class CUISpinNum;
 class CUISpinText;
@@ -22,7 +21,6 @@ class CUIAnimatedStatic;
 class CUISleepStatic;
 class CServerList;
 class CUIMapList;
-class CUIVersionList;
 class CUITrackBar;
 class CUIMapInfo;
 class CUIMMShniaga;
@@ -43,7 +41,7 @@ public:
     CUIStatic* InitStatic(LPCSTR path, CUIWindow* parent);
     CUIStatic* InitAnimStatic(LPCSTR path, CUIWindow* parent);
     CUIStatic* InitSleepStatic(LPCSTR path, CUIWindow* parent);
-    CUITextWnd* InitTextWnd(LPCSTR path, CUIWindow* parent);
+    CUIStatic* InitTextWnd(LPCSTR path, CUIWindow* parent);
     CUICheckButton* InitCheck(LPCSTR path, CUIWindow* parent);
     CUISpinNum* InitSpinNum(LPCSTR path, CUIWindow* parent);
     CUISpinFlt* InitSpinFlt(LPCSTR path, CUIWindow* parent);
@@ -54,7 +52,6 @@ public:
     CUITabControl* InitTab(LPCSTR path, CUIWindow* parent);
     CServerList* InitServerList(LPCSTR path, CUIWindow* parent);
     CUIMapList* InitMapList(LPCSTR path, CUIWindow* parent);
-    CUIVersionList* InitVerList(LPCSTR path, CUIWindow* parent);
     CUIMapInfo* InitMapInfo(LPCSTR path, CUIWindow* parent);
     CUITrackBar* InitTrackBar(LPCSTR path, CUIWindow* parent);
     CUIEditBox* InitCDkey(LPCSTR path, CUIWindow* parent);

@@ -239,8 +239,8 @@ u32 CLevel::Objects_net_Save(NET_Packet* _Packet, u32 start, u32 max_object_size
     u32 position;
     for (; start < Objects.o_count(); start++)
     {
-        IGameObject* _P = Objects.o_get_by_iterator(start);
-        CGameObject* P = smart_cast<CGameObject*>(_P);
+        IGameObject* object = Objects.o_get_by_iterator(start);
+        CGameObject* P = smart_cast<CGameObject*>(object);
         //		Msg			("save:iterating:%d:%s, size[%d]",P->ID(),*P->cName(), Packet.w_tell() );
         if (P && !P->getDestroy() && P->net_SaveRelevant())
         {
@@ -319,6 +319,8 @@ void CLevel::Send(NET_Packet& P, u32 dwFlags, u32 dwTimeout)
 
 void CLevel::net_Update()
 {
+    ZoneScoped;
+
     if (game_configured)
     {
         // If we have enought bandwidth - replicate client data on to server

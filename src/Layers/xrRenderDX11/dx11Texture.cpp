@@ -316,11 +316,12 @@ _DDS:
 {
     // Load and get header
     S = FS.r_open(fn);
+    R_ASSERT2_CURE(S, fn, true, { return nullptr; });
+
     img_size = S->length();
 #ifdef DEBUG
     Msg("* Loaded: %s[%zu]", fn, img_size);
 #endif // DEBUG
-    R_ASSERT(S);
 
     R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_PERMISSIVE, &IMG, texture), fn);
 

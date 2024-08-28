@@ -4,7 +4,6 @@
 
 #include "xrSheduler.h"
 #include "xr_object_list.h"
-#include "std_classes.h"
 
 #include "xr_object.h"
 #include "xrCore/net_utils.h"
@@ -216,6 +215,8 @@ void CObjectList::clear_crow_vec(Objects& o)
 
 void CObjectList::Update(bool bForce)
 {
+    ZoneScoped;
+
     if (statsFrame != Device.dwFrame)
     {
         statsFrame = Device.dwFrame;
@@ -311,7 +312,7 @@ void CObjectList::Update(bool bForce)
                 (*oit)->net_Relcase(destroy_queue[it]);
 
         for (int it = destroy_queue.size() - 1; it >= 0; it--)
-            GEnv.Sound->object_relcase(destroy_queue[it]);
+            g_pGameLevel->Sound->object_relcase(destroy_queue[it]);
 
         RELCASE_CALLBACK_VEC::iterator it = m_relcase_callbacks.begin();
         const RELCASE_CALLBACK_VEC::iterator ite = m_relcase_callbacks.end();
@@ -459,6 +460,8 @@ void CObjectList::Load()
 
 void CObjectList::Unload()
 {
+    ZoneScoped;
+
     if (objects_sleeping.size() || objects_active.size())
         Msg("! objects-leaked: %d", objects_sleeping.size() + objects_active.size());
 

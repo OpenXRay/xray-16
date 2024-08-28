@@ -3,7 +3,6 @@
 
 class CInventoryItem;
 class CUIStatic;
-class CUITextWnd;
 class CUIScrollView;
 class CUIProgressBar;
 class CUIConditionParams;
@@ -54,10 +53,10 @@ public:
     u32 delay;
 
     CUIFrameWindow* UIBackground;
-    CUITextWnd* UIName;
-    CUITextWnd* UIWeight;
-    CUITextWnd* UICost;
-    CUITextWnd* UITradeTip;
+    CUIStatic* UIName;
+    CUIStatic* UIWeight;
+    CUIStatic* UICost;
+    CUIStatic* UITradeTip;
     //	CUIStatic*			UIDesc_line;
     CUIScrollView* UIDesc;
     bool m_complex_desc;

@@ -37,7 +37,7 @@
 #define NOSOUND
 //#define NOTEXTMETRIC
 #define NOWH
-#define NOWINOFFSETS
+//#define NOWINOFFSETS
 #define NOCOMM
 #define NOKANJI
 #define NOCRYPT
@@ -46,6 +46,17 @@
 #define NODEFERWINDOWPOS
 #define NOMCX
 #define NOIME
+#define NODESKTOP
+#define NOWINDOWSTATION
+#define NOSECURITY
+#define NONCMESSAGES
+#define NOTRACKMOUSEEVENT
+#define NOKEYSTATES
+#define NOTRACKMOUSEEVENT
+#define NODEFERWINDOWPOS
+#define NOMDI
+#define NOWINABLE
+#define NO_STATE_FLAGS
 
 #define DOSWIN32
 #define _WIN32_DCOM

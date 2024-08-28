@@ -13,20 +13,19 @@ class CUIDialogWndEx : public CUIDialogWnd, public FactoryObjectBase
 
 private:
     CALLBACKS m_callbacks;
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
+    void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = nullptr) override;
     SCallbackInfo* NewCallback();
 
 public:
-    bool Load(LPCSTR xml_name);
+    bool Load(pcstr xml_name);
     void Register(CUIWindow* pChild);
-    void Register(CUIWindow* pChild, LPCSTR name);
+    void Register(CUIWindow* pChild, pcstr name);
+
     CUIDialogWndEx();
-    virtual ~CUIDialogWndEx();
-    void AddCallback(
-        LPCSTR control_id, s16 event, const luabind::functor<void>& functor, const luabind::object& object);
-    virtual void Update();
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    virtual bool Dispatch(int cmd, int param) { return true; }
+    ~CUIDialogWndEx() override;
+
+    void AddCallback(pcstr control_id, s16 event, const luabind::functor<void>& lua_function);
+    void AddCallback(pcstr control_id, s16 event, const luabind::functor<void>& functor, const luabind::object& object);
 
     template <typename T>
     T* GetControl(pcstr name);

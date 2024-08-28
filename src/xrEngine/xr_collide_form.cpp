@@ -3,7 +3,6 @@
 #include "xr_collide_form.h"
 #include "xr_object.h"
 #include "xrCDB/xr_area.h"
-#include "x_ray.h"
 #include "Common/LevelStructure.hpp"
 #include "xrCore/FMesh.hpp"
 #include "xrCDB/Frustum.h"
@@ -206,6 +205,8 @@ void CCF_Skeleton::BuildTopLevel()
 
 bool CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 {
+    ZoneScoped;
+
     if (dwFrameTL != Device.dwFrame)
         BuildTopLevel();
 
@@ -327,6 +328,8 @@ void CCF_EventBox::_BoxQuery(const Fbox& B, const Fmatrix& M, u32 flags)
 CCF_Shape::CCF_Shape(IGameObject* _owner) : ICollisionForm(_owner, cftShape) {}
 bool CCF_Shape::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 {
+    ZoneScoped;
+
     // Convert ray into local model space
     Fvector dS, dD;
     Fmatrix temp;
@@ -469,6 +472,8 @@ void CCF_Shape::ComputeBounds()
 
 bool CCF_Shape::Contact(IGameObject* O)
 {
+    ZoneScoped;
+
     // Build object-sphere in World-Space
     Fsphere S;
     if (O->Visual())

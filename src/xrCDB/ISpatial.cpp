@@ -96,6 +96,7 @@ void SpatialBase::spatial_unregister()
 
 void SpatialBase::spatial_move()
 {
+    ZoneScoped;
     if (spatial.node_ptr)
     {
         //*** somehow it was determined that object has been moved
@@ -116,6 +117,7 @@ void SpatialBase::spatial_move()
 
 void SpatialBase::spatial_updatesector_internal(IRender_Sector::sector_id_t sector_id)
 {
+    ZoneScoped;
     spatial.type &= ~STYPEFLAG_INVALIDSECTOR;
     if (sector_id != IRender_Sector::INVALID_SECTOR_ID)
         spatial.sector_id = sector_id;
@@ -173,6 +175,8 @@ ISpatial_DB::~ISpatial_DB()
 
 void ISpatial_DB::initialize(const Fbox& BB)
 {
+    ZoneScoped;
+
     // initialize
     Fvector bbc, bbd;
     BB.get_CD(bbc, bbd);

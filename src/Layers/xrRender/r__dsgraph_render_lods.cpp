@@ -18,6 +18,7 @@ template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs
 
 void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
 {
+    ZoneScoped;
     PIX_EVENT_CTX(cmd_list, dsgraph_render_lods);
 
     if (mapLOD.empty())

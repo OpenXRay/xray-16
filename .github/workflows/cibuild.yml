@@ -8,9 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
+  windows:
     name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
     runs-on: windows-latest
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -67,133 +68,168 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh release upload --clobber latest-nightly (get-item res/*.*.7z)
 
-  build-ubuntu:
-    name: Ubuntu ${{ matrix.Configuration }} ${{ matrix.Platform }} (${{ matrix.CC }})
-    runs-on: ubuntu-latest
+  cmake:
+    name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc || 'unknown compiler' }})
+    runs-on: ${{ matrix.platform.os }}
+
+    container: ${{ matrix.platform.container || '' }}
+
+    defaults:
+      run:
+        shell: ${{ matrix.platform.shell || 'bash -e {0}' }}
+
+    env:
+      CFLAGS: "-w"
+      CXXFLAGS: "-w"
+
     strategy:
       fail-fast: false
       matrix:
-        Configuration: [Debug, Release]
-        Platform: [x64]
-        CC: [gcc, clang]
-        include:
-          - CC: gcc
-            CXX: g++
-          - CC: clang
-            CXX: clang++
+        platform:
+        # cc is always set for the correct naming of the job.
+        # Both cc and cxx should be set if we want to change the compiler.
+        # You may also want to set XRAY_LINKER when changing the compiler.
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc, }
+        - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   container: 'dockcross/linux-arm64', }
+        #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
+        - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
+        - { name: Fedora, os: ubuntu-latest, arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
+        #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
+        - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
+        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", threads: 3 }
+
+        configuration: [Debug, Release]
 
     steps:
+    - name: Install latest stable Alpine Linux and packages
+      if: ${{ matrix.platform.name == 'Alpine' }}
+      uses: jirutka/setup-alpine@master
+      with:
+        arch: ${{ matrix.platform.arch }}
+        branch: 'latest-stable'
+        packages: build-base cmake git mold sdl2-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
+
+    - name: Install Ubuntu packages
+      if: ${{ matrix.platform.name == 'Ubuntu' }}
+      run: |
+          sudo dpkg --add-architecture ${{ matrix.platform.arch }}
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y \
+              libsdl2-dev:${{ matrix.platform.arch }} \
+              liblzo2-dev:${{ matrix.platform.arch }} \
+              libjpeg-dev:${{ matrix.platform.arch }} \
+              libopenal-dev:${{ matrix.platform.arch }} \
+              libogg-dev:${{ matrix.platform.arch }} \
+              libtheora-dev:${{ matrix.platform.arch }} \
+              libvorbis-dev:${{ matrix.platform.arch }}
+
+    - name: Install macOS packages
+      if: ${{ matrix.platform.name == 'macOS' }}
+      run: |
+          brew update
+          brew install sdl2 lzo libogg libvorbis theora
+
+    - name: Install Fedora packages
+      if: ${{ matrix.platform.name == 'Fedora' }}
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+
+    - name: Set environment variables
+      if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
+      run: |
+        echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
+
     - uses: actions/checkout@main
       with:
         submodules: recursive
 
-    - name: Deinit Crypto++
-      run: git submodule deinit Externals/cryptopp
-
-    - name: Install packages
-      run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq -y libsdl2-dev libglew-dev liblzo2-dev libjpeg-dev &&
-          sudo apt-get install -qq -y libopenal-dev libogg-dev libtheora-dev libvorbis-dev
-
-    - name: Install Clang
-      if: ${{ matrix.CC == 'clang' }}
-      uses: egor-tensin/setup-clang@master
-
     - name: Run CMake
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} -DCMAKE_UNITY_BUILD=ON ${{ matrix.platform.flags }}
 
     - name: Run CMake Build
       id: cmake-build
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
-      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
+      run: cmake --build build --config ${{ matrix.configuration }} --parallel ${{ matrix.platform.threads || 4 }}
 
     - name: Make package
       if: ${{ steps.cmake-build.outcome == 'success' }}
       id: make-package
-      working-directory: build
       #continue-on-error: true
-      env:
-          CC: ${{ matrix.CC }}
-          CXX: ${{ matrix.CXX }}
+      working-directory: build
       run: |
-        make -j $(nproc || echo 4) package
-        file openxray_1.6.02_*.deb
+          cpack -B artifacts -C ${{ matrix.configuration }} -DCPACK_THREADS=${{ matrix.platform.threads || 4 }}
+          file artifacts/openxray*.*
 
     - name: Upload OpenXRay artifact
       if: ${{ steps.make-package.outcome == 'success' }}
       uses: actions/upload-artifact@main
       with:
-        name: openxray_1.6.02_${{ matrix.Configuration }}_${{ matrix.Platform }}_(github-${{ matrix.CC }}-${{ github.run_number }}).deb
-        path: build/openxray_1.6.02_*.deb
+        name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }} (${{ matrix.platform.cc }} github-${{ github.run_number }})
+        path: build/artifacts/openxray*.*
 
-  build-alpine:
-    name: Alpine ${{ matrix.Configuration }} ${{ matrix.Platform }} (gcc)
+  bsd:
+    name: ${{ matrix.platform.name }} ${{ matrix.configuration }} ${{ matrix.platform.arch }}
     runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CFLAGS: "-w"
+      CXXFLAGS: "-w"
     strategy:
       fail-fast: false
       matrix:
-        Configuration: [Debug, Release]
-        Platform: [x86_64, x86]
+        platform:
+        - { name: FreeBSD, os: freebsd, os-version: '14.0', arch: x86_64,
+            install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
+          }
+        - { name: OpenBSD, os: openbsd, os-version: '7.5',  arch: x86_64,
+            install-cmd: "sudo pkg_add cmake SDL2 lzo2 jpeg openal libogg libtheora libvorbis",
+          }
+        - { name: NetBSD,  os: netbsd,  os-version: '10.0',  arch: x86_64,
+            install-cmd: "sudo pkgin -y install cmake SDL2 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
+          }
+        configuration: [Debug, Release]
 
     steps:
     - uses: actions/checkout@main
       with:
         submodules: recursive
 
-    - name: Deinit Crypto++
-      run: |
-        git submodule deinit Externals/cryptopp
-
-    - name: Install latest stable Alpine Linux
-      uses: jirutka/setup-alpine@master
+    - name: Setup ${{ matrix.platform.name }} and packages
+      uses: cross-platform-actions/action@v0.25.0
       with:
-        arch: ${{ matrix.Platform }}
-        branch: 'latest-stable'
-        packages: build-base cmake mold sdl2-dev glew-dev lzo-dev libjpeg-turbo-dev openal-soft-dev libogg-dev libtheora-dev libvorbis-dev
-
-    - name: Run CMake x64
-      if: ${{ matrix.Platform == 'x86_64' }}
-      shell: alpine.sh {0}
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
-
-    - name: Run CMake x86
-      if: ${{ matrix.Platform == 'x86' }}
-      shell: alpine.sh {0}
-      run: CFLAGS="-m32 -w" CXXFLAGS="-m32 -w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_ASM_FLAGS=-m32 -DCMAKE_UNITY_BUILD=ON -DXRAY_LINKER=mold
-
-    - name: Run CMake Build
-      shell: alpine.sh {0}
-      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(nproc || echo 4)
-
-  build-macos:
-    name: macOS ${{ matrix.Configuration }} ${{ matrix.Platform }}
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        Configuration: [Debug, Release]
-
-    steps:
-    - uses: actions/checkout@main
-      with:
-        submodules: recursive
-
-    - name: Deinit Crypto++
-      run: git submodule deinit Externals/cryptopp
-
-    - name: Install packages
-      run: |
-          brew update
-          brew install sdl2 glew lzo libogg libvorbis theora
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 13G
+        environment_variables: CFLAGS CXXFLAGS
+        shutdown_vm: false
+        sync_files: runner-to-vm
+        run: ${{ matrix.platform.install-cmd }}
 
     - name: Run CMake
-      run: CFLAGS="-w" CXXFLAGS="-w" cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+      uses: cross-platform-actions/action@v0.25.0
+      with:
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 13G
+        environment_variables: CFLAGS CXXFLAGS
+        shutdown_vm: false
+        sync_files: false
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake Build
-      run: cmake --build build --config ${{ matrix.Configuration }} --parallel $(sysctl -n hw.ncpu || echo 4)
+      uses: cross-platform-actions/action@v0.25.0
+      with:
+        operating_system: ${{ matrix.platform.os }}
+        architecture: ${{ matrix.platform.arch }}
+        version: ${{ matrix.platform.os-version }}
+        cpu_count: 4
+        memory: 13G
+        environment_variables: CFLAGS CXXFLAGS
+        shutdown_vm: false
+        sync_files: false
+        run: cmake --build build --config ${{ matrix.Configuration }} --parallel 4

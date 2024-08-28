@@ -35,6 +35,8 @@ constexpr size_t MAX_CONTROLLER_EVENTS = 64;
 
 CInput::CInput(const bool exclusive)
 {
+    ZoneScoped;
+
     exclusiveInput = exclusive;
 
     Log("Starting INPUT device...");
@@ -50,7 +52,6 @@ CInput::CInput(const bool exclusive)
     //===================== Dummy pack
     iCapture(&dummyController);
 
-    SDL_StopTextInput(); // sanity
     SDL_SetHint(SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1"); // We need to handle it manually
 
     Device.seqAppActivate.Add(this);
@@ -69,6 +70,8 @@ CInput::CInput(const bool exclusive)
 
 CInput::~CInput()
 {
+    ZoneScoped;
+
     GrabInput(false);
 
     for (auto& controller : controllers)
@@ -89,19 +92,16 @@ void CInput::OpenController(int idx)
     if (!controller)
         return;
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     if (psControllerEnableSensors.test(1))
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
-#endif
+
     controllers.emplace_back(controller);
 }
 
 void CInput::EnableControllerSensors(bool enable)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     for (auto controller : controllers)
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
-#endif
 }
 
 //-----------------------------------------------------------------------
@@ -121,6 +121,8 @@ void CInput::SetCurrentInputType(InputType type)
 
 void CInput::MouseUpdate()
 {
+    ZoneScoped;
+
     // Mouse2 is a middle button in SDL,
     // but in X-Ray this is a right button
     constexpr int RemapIdx[] = { 0, 2, 1, 3, 4 };
@@ -129,7 +131,8 @@ void CInput::MouseUpdate()
     static_assert(std::size(IdxToKey) == COUNT_MOUSE_BUTTONS);
 
     bool mouseMoved = false;
-    int offs[COUNT_MOUSE_AXIS]{};
+    int offs[2]{};
+    float scroll[2]{};
     const auto mousePrev = mouseState;
     mouseAxisState[2] = 0;
     mouseAxisState[3] = 0;
@@ -172,8 +175,8 @@ void CInput::MouseUpdate()
         }
         case SDL_MOUSEWHEEL:
             mouseMoved = true;
-            offs[2] += event.wheel.x;
-            offs[3] += event.wheel.y;
+            scroll[0] += event.wheel.preciseX;
+            scroll[1] += event.wheel.preciseY;
             mouseAxisState[2] += event.wheel.x;
             mouseAxisState[3] += event.wheel.y;
             break;
@@ -190,13 +193,16 @@ void CInput::MouseUpdate()
     {
         if (offs[0] || offs[1])
             cbStack.back()->IR_OnMouseMove(offs[0], offs[1]);
-        if (offs[2] || offs[3])
-            cbStack.back()->IR_OnMouseWheel(offs[2], offs[3]);
+
+        if (!fis_zero(scroll[0]) || !fis_zero(scroll[1]))
+            cbStack.back()->IR_OnMouseWheel(scroll[0], scroll[1]);
     }
 }
 
 void CInput::KeyUpdate()
 {
+    ZoneScoped;
+
     SDL_Event events[MAX_KEYBOARD_EVENTS];
     const auto count = SDL_PeepEvents(events, MAX_KEYBOARD_EVENTS,
         SDL_GETEVENT, SDL_KEYDOWN, SDL_KEYMAPCHANGED);
@@ -273,6 +279,8 @@ void CInput::KeyUpdate()
 
 void CInput::ControllerUpdate()
 {
+    ZoneScoped;
+
     constexpr int ControllerButtonToKey[] =
     {
         XR_CONTROLLER_BUTTON_A,
@@ -317,11 +325,7 @@ void CInput::ControllerUpdate()
     decltype(controllerAxisState) controllerAxisStatePrev;
     CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
     constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERSENSORUPDATE;
-#else
-    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERDEVICEREMAPPED;
-#endif
 
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
         SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, MAX_EVENT);
@@ -387,7 +391,6 @@ void CInput::ControllerUpdate()
             break;
         }
 
-#if SDL_VERSION_ATLEAST(2, 0, 14)
         case SDL_CONTROLLERSENSORUPDATE:
         {
             if (last_input_controller != event.csensor.which) // only use data from the recently used controller
@@ -400,7 +403,6 @@ void CInput::ControllerUpdate()
                 cbStack.back()->IR_OnControllerAttitudeChange(gyro);
             break;
         }
-#endif
         } // switch (event.type)
     }
 
@@ -434,25 +436,29 @@ void CInput::ControllerUpdate()
     checkAxis(XR_CONTROLLER_AXIS_TRIGGER_RIGHT, controllerAxisState[5], 0,                      controllerAxisStatePrev[5], 0);
 }
 
-bool KbdKeyToButtonName(const int dik, xr_string& name)
+bool KbdKeyToButtonName(const int dik, xr_string& result)
 {
     static std::locale locale("");
 
     if (dik >= 0)
     {
-        name = StringFromUTF8(SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik)), locale);
-        return true;
+        cpcstr name = SDL_GetKeyName(SDL_GetKeyFromScancode((SDL_Scancode)dik));
+        if (name && name[0])
+        {
+            result = StringFromUTF8(name, locale);
+            return true;
+        }
     }
 
     return false;
 }
 
-bool OtherDevicesKeyToButtonName(const int btn, xr_string& name)
+bool OtherDevicesKeyToButtonName(const int btn, xr_string& /*result*/)
 {
     if (btn > CInput::COUNT_KB_BUTTONS)
     {
         // XXX: Not implemented
-        return false; // true;
+        return false;
     }
 
     return false;
@@ -516,14 +522,37 @@ void CInput::iGetAsyncScrollPos(Ivector2& p) const
     p = { mouseAxisState[2], mouseAxisState[3] };
 }
 
-void CInput::iGetAsyncMousePos(Ivector2& p) const
+bool CInput::iGetAsyncMousePos(Ivector2& p, bool global /*= false*/) const
 {
+    if (global)
+    {
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
+        SDL_GetGlobalMouseState(&p.x, &p.y);
+        return true;
+#endif
+        // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
+        // fallback to SDL_GetMouseState
+        // but report false
+    }
     SDL_GetMouseState(&p.x, &p.y);
+    return !global;
 }
 
-void CInput::iSetMousePos(const Ivector2& p) const
+bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
 {
+    if (global)
+    {
+#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
+        SDL_WarpMouseGlobal(p.x, p.y);
+        return true;
+#endif
+        // if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE unavailable
+        // fallback to SDL_WarpMouseInWindow
+        // but report false
+    }
+
     SDL_WarpMouseInWindow(Device.m_sdlWnd, p.x, p.y);
+    return !global;
 }
 
 void CInput::GrabInput(const bool grab)
@@ -650,6 +679,8 @@ void CInput::OnAppDeactivate(void)
 
 void CInput::OnFrame(void)
 {
+    ZoneScoped;
+
     if (AltF4Pressed)
         return;
 
@@ -696,7 +727,6 @@ bool CInput::IsExclusiveMode() const
 
 void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 {
-#if SDL_VERSION_ATLEAST(2, 0, 9)
     const u16 s1_rumble = iFloor(u16(-1) * clampr(s1, 0.0f, 1.0f));
     const u16 s2_rumble = iFloor(u16(-1) * clampr(s2, 0.0f, 1.0f));
     const u32 duration_ms = duration < 0.f ? 0 : iFloor(duration * 1000.f);
@@ -715,17 +745,14 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 
     case FeedbackTriggers:
     {
-#if SDL_VERSION_ATLEAST(2, 0, 14)
         if (last_input_controller != -1)
         {
             const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
             SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
-#endif
     }
 
     default: NODEFAULT;
     }
-#endif
 }

@@ -1771,9 +1771,6 @@
     <Filter Include="Core\Server\Games\client\mp">
       <UniqueIdentifier>{0d87a81d-98e6-455c-99bd-e046d405955e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Server\Games\client\mp\screenshots">
-      <UniqueIdentifier>{083893c7-5148-4c4f-8b0d-e28d55dc5ef7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Server\Games\client\mp\anticheat">
       <UniqueIdentifier>{05fd45d5-e228-4cf4-b0ba-95c70c241d32}</UniqueIdentifier>
     </Filter>
@@ -2235,9 +2232,6 @@
     </Filter>
     <Filter Include="Core\Server\Games\server\base">
       <UniqueIdentifier>{f7b72e14-4fc5-4054-98a9-cff48b3fc45b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI\Multiplayer\MM_MP\VersionList">
-      <UniqueIdentifier>{04c90fd3-e247-4f21-b715-8dc556986837}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Server\Games\server\mp_script">
       <UniqueIdentifier>{e4a3fb7b-b6ee-40f3-a25a-be388178d29e}</UniqueIdentifier>
@@ -5556,15 +5550,6 @@
     <ClInclude Include="game_cl_mp_snd_messages.h">
       <Filter>Core\Server\Games\client\mp</Filter>
     </ClInclude>
-    <ClInclude Include="screenshot_manager.h">
-      <Filter>Core\Server\Games\client\mp\screenshots</Filter>
-    </ClInclude>
-    <ClInclude Include="screenshots_common.h">
-      <Filter>Core\Server\Games\client\mp\screenshots</Filter>
-    </ClInclude>
-    <ClInclude Include="screenshots_writer.h">
-      <Filter>Core\Server\Games\client\mp\screenshots</Filter>
-    </ClInclude>
     <ClInclude Include="configs_common.h">
       <Filter>Core\Server\Games\client\mp\anticheat</Filter>
     </ClInclude>
@@ -6464,10 +6449,6 @@
     <ClInclude Include="game_sv_base_console_vars.h">
       <Filter>Core\Server\Games\server\base</Filter>
     </ClInclude>
-    <ClInclude Include="VersionSwitcher.h" />
-    <ClInclude Include="ui\UIVersionList.h">
-      <Filter>UI\Multiplayer\MM_MP\VersionList</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIOutfitSlot.h">
       <Filter>UI\Common\Inventory</Filter>
     </ClInclude>
@@ -6500,6 +6481,12 @@
     </ClInclude>
     <ClInclude Include="ui\UIMapFilters.h">
       <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="xrGame.h">
+      <Filter>Core\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="player_hud_tune.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\HudItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8807,15 +8794,6 @@
     <ClCompile Include="game_cl_mp_snd_messages.cpp">
       <Filter>Core\Server\Games\client\mp</Filter>
     </ClCompile>
-    <ClCompile Include="screenshot_manager.cpp">
-      <Filter>Core\Server\Games\client\mp\screenshots</Filter>
-    </ClCompile>
-    <ClCompile Include="screenshots_common.cpp">
-      <Filter>Core\Server\Games\client\mp\screenshots</Filter>
-    </ClCompile>
-    <ClCompile Include="screenshots_writer.cpp">
-      <Filter>Core\Server\Games\client\mp\screenshots</Filter>
-    </ClCompile>
     <ClCompile Include="configs_common.cpp">
       <Filter>Core\Server\Games\client\mp\anticheat</Filter>
     </ClCompile>
@@ -9834,10 +9812,6 @@
     </ClCompile>
     <ClCompile Include="game_cl_base_script.cpp">
       <Filter>Core\Server\Games\client\base</Filter>
-    </ClCompile>
-    <ClCompile Include="VersionSwitcher.cpp" />
-    <ClCompile Include="ui\UIVersionList.cpp">
-      <Filter>UI\Multiplayer\MM_MP\VersionList</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIOutfitSlot.cpp">
       <Filter>UI\Common\Inventory</Filter>

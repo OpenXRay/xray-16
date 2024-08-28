@@ -19,7 +19,7 @@ namespace lua_studio
 {
 struct backend;
 
-struct DECLSPEC_NOVTABLE XRSCRIPTENGINE_API engine
+struct XR_NOVTABLE XRSCRIPTENGINE_API engine
 {
 public:
     enum lua_hook_type

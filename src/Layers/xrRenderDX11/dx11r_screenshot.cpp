@@ -126,8 +126,7 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
 
         if (IWriter* fs = FS.w_open("$screenshots$", buf))
         {
-            XRay::Media::Image img;
-            img.Create(u16(Device.dwHeight), u16(Device.dwHeight), data, XRay::Media::ImageDataFormat::RGBA8);
+            XRay::Media::Image img{ Device.dwHeight, Device.dwHeight, data, XRay::Media::ImageDataFormat::RGBA8 };
             img.SaveTGA(*fs, true);
             FS.w_close(fs);
         }
@@ -138,32 +137,4 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
 
 _end_:
     _RELEASE(pSrcTexture);
-}
-
-void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
-{
-    VERIFY(!m_bMakeAsyncSS);
-
-    // Don't own. No need to release.
-    ID3DTexture2D* pTex = Target->t_ss_async;
-
-    D3D_MAPPED_TEXTURE2D MappedData;
-
-    HW.get_context(CHW::IMM_CTX_ID)->Map(pTex, 0, D3D_MAP_READ, 0, &MappedData);
-    {
-        u32* pPixel = (u32*)MappedData.pData;
-        u32* pEnd = pPixel + (Device.dwWidth * Device.dwHeight);
-
-        // Kill alpha and swap r and b.
-        for (; pPixel != pEnd; pPixel++)
-        {
-            u32 p = *pPixel;
-            *pPixel = color_xrgb(color_get_B(p), color_get_G(p), color_get_R(p));
-        }
-
-        memory_writer.w(&Device.dwWidth, sizeof(Device.dwWidth));
-        memory_writer.w(&Device.dwHeight, sizeof(Device.dwHeight));
-        memory_writer.w(MappedData.pData, (Device.dwWidth * Device.dwHeight) * 4);
-    }
-    HW.get_context(CHW::IMM_CTX_ID)->Unmap(pTex, 0);
 }

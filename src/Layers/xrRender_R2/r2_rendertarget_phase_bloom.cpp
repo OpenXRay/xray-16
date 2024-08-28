@@ -110,7 +110,7 @@ void CRenderTarget::phase_bloom()
 
         // Fill vertex buffer
         v_build* pv = (v_build*)RImplementation.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         pv->p.set(EPS, float(th + EPS), EPS, 1.f);
         pv->uv0.set(a_0.x, b_0.y);
         pv->uv1.set(a_1.x, b_1.y);
@@ -162,7 +162,7 @@ void CRenderTarget::phase_bloom()
         pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // USE_DX9/11
+#endif // USE_DX11
         RImplementation.Vertex.Unlock(4, g_bloom_build->vb_stride);
 
         // Perform combine (all scalers must account for 4 samples + final diffuse multiply);
@@ -190,7 +190,7 @@ void CRenderTarget::phase_bloom()
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
         v_build* pv = (v_build*)RImplementation.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
         pv->uv0.set(p0.x - ddw, p1.y - ddh);
         pv->uv1.set(p0.x + ddw, p1.y + ddh);
@@ -278,7 +278,7 @@ void CRenderTarget::phase_bloom()
             // Fill vertex buffer
             v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
             // 0 - LB
             pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
             pv->uv0.set(a_0.x, 1 + a_0.y, 0, 0);
@@ -410,7 +410,7 @@ void CRenderTarget::phase_bloom()
             // Fill vertex buffer
             v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
             // 0 - LB
             pv->p.set(EPS, float(_h + EPS), EPS, 1.f);
             pv->uv0.set(a_0.x, 1 + a_0.y, 0, 0);
@@ -508,7 +508,7 @@ void CRenderTarget::phase_bloom()
             pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // !USE_OGL
+#endif // USE_DX11
             RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
             // Perform filtering

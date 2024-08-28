@@ -74,6 +74,8 @@ CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 
 CMainMenu::CMainMenu()
 {
+    ZoneScoped;
+
     class CResetEventCb : public CEventNotifierCallbackWithCid
     {
         CMainMenu* m_mainmenu;
@@ -316,7 +318,7 @@ void CMainMenu::Activate(bool bActivate)
             Device.Reset();
 #else
             // Do only a precache for Debug and Mixed
-            Device.PreCache(20, true, false);
+            Device.PreCache(20, false);
 #endif
         }
     }
@@ -443,7 +445,7 @@ void CMainMenu::IR_OnTextInput(pcstr text)
     CDialogHolder::IR_UIOnTextInput(text);
 }
 
-void CMainMenu::IR_OnMouseWheel(int x, int y)
+void CMainMenu::IR_OnMouseWheel(float x, float y)
 {
     if (!IsActive())
         return;
@@ -494,6 +496,8 @@ bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGame
 
 void CMainMenu::OnRender()
 {
+    ZoneScoped;
+
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
@@ -549,6 +553,8 @@ void CMainMenu::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 // pureFrame
 void CMainMenu::OnFrame()
 {
+    ZoneScoped;
+
     if (m_Flags.test(flNeedChangeCapture))
     {
         m_Flags.set(flNeedChangeCapture, FALSE);

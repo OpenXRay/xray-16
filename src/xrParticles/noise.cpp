@@ -2,11 +2,12 @@
 
 #include "noise.h"
 
-#ifndef _EDITOR
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
 #else
 #error Add your platform here
 #endif
@@ -15,7 +16,6 @@
 ICF int iFloor_SSE(float const x) { return floor(x); }
 #else
 ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
-#endif
 #endif
 
 //==============================================================================
@@ -27,7 +27,6 @@ ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
 #define S_CURVE(t) (t * t * (3.f - 2.f * t))
 #define LERP(t, a, b) (a + t * (b - a))
 
-#ifndef _EDITOR
 #define PN_SETUP(i, b0, b1, r0, r1) \
     t = vec[i] + 10000.f;           \
     tt = iFloor_SSE(t);             \
@@ -35,16 +34,6 @@ ICF int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
     b1 = (b0 + 1) & (B - 1);        \
     r0 = t - float(tt);             \
     r1 = r0 - 1.f;
-#else
-
-#define PN_SETUP(i, b0, b1, r0, r1) \
-    t = vec[i] + 10000.f;           \
-    b0 = iFloor(t) & (B - 1);       \
-    b1 = (b0 + 1) & (B - 1);        \
-    r0 = t - iFloor(t);             \
-    r1 = r0 - 1.f;
-
-#endif
 
 static int p[B + B + 2];
 static float g[B + B + 2][3];

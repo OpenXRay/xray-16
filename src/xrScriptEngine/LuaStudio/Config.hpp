@@ -38,7 +38,7 @@ STATIC_CHECK(false, Unknown_Platform);
 #ifdef CS_STATIC_LIBRARIES
 #define CS_API
 #else // #ifdef CS_STATIC_LIBRARIES
-#define CS_API __declspec(dllimport)
+#define CS_API XR_IMPORT
 #endif // #ifdef CS_STATIC_LIBRARIES
 #endif // #ifndef CS_API
 

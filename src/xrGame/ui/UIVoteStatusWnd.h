@@ -2,13 +2,13 @@
 #include "xrUICore/Windows/UIFrameWindow.h"
 
 class CUIXml;
-class CUITextWnd;
+class CUIStatic;
 
 class UIVoteStatusWnd final : public CUIFrameWindow
 {
-    CUITextWnd* m_str_message{};
-    CUITextWnd* m_hint{};
-    CUITextWnd* m_time_message{};
+    CUIStatic* m_str_message{};
+    CUIStatic* m_hint{};
+    CUIStatic* m_time_message{};
 
 public:
     UIVoteStatusWnd() : CUIFrameWindow(UIVoteStatusWnd::GetDebugType()) {}

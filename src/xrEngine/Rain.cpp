@@ -55,6 +55,8 @@ CEffect_Rain::~CEffect_Rain()
 // Born
 void CEffect_Rain::Born(Item& dest, float radius, float speed)
 {
+    ZoneScoped;
+
     Fvector axis;
     axis.set(0, -1, 0);
     float gust = g_pGamePersistent->Environment().wind_strength_factor / 10.f;
@@ -80,6 +82,8 @@ void CEffect_Rain::Born(Item& dest, float radius, float speed)
 
 bool CEffect_Rain::RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt)
 {
+    ZoneScoped;
+
     bool bRes = true;
 #ifdef _EDITOR
     Tools->RayPick(s, d, range);
@@ -112,6 +116,8 @@ void CEffect_Rain::RenewItem(Item& dest, float height, bool bHit)
 
 void CEffect_Rain::OnFrame()
 {
+    ZoneScoped;
+
 #ifndef _EDITOR
     if (!g_pGameLevel)
         return;

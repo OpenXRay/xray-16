@@ -364,8 +364,6 @@ public:
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
-    virtual void ScreenshotAsyncBegin() = 0;
-    virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer) = 0;
 
     // Render mode
     virtual void rmNear(CBackend& cmd_list) = 0;
@@ -413,7 +411,7 @@ public:
     virtual DeviceState GetDeviceState() = 0;
     virtual bool GetForceGPU_REF() = 0;
     virtual u32 GetCacheStatPolys() = 0;
-    virtual void BeforeRender() = 0;
+    virtual void OnCameraUpdated() = 0;
     virtual void Begin() = 0;
     virtual void Clear() = 0;
     virtual void End() = 0;

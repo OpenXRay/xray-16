@@ -51,6 +51,8 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
+    ZoneScoped;
+
     hDXGI = XRay::LoadModule("dxgi");
     hD3D = XRay::LoadModule("d3d11_43");
     if (!hD3D->IsLoaded() || !hDXGI->IsLoaded())
@@ -90,6 +92,8 @@ void CHW::DestroyD3D()
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
+    ZoneScoped;
+
     CreateD3D();
     if (!Valid)
         return;
@@ -144,6 +148,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
+        ZoneScopedN("Create device");
+
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
         return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
             nullptr, createDeviceFlags, level, levels,
@@ -212,11 +218,25 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     _SHOW_REF("* CREATE: DeviceREF:", pDevice);
 
-    // Create deferred contexts
-    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    // Register immediate context in profiler
+    if (ThisInstanceIsGlobal())
     {
-        R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
-        VERIFY(SUCCEEDED(R));
+        TaskScheduler->AddTask([this]
+        {
+            ZoneScopedN("TracyD3D11Context");
+            profiler_ctx = TracyD3D11Context(pDevice, get_context(CHW::IMM_CTX_ID));
+        });
+    }
+
+    // Create deferred contexts
+    if (ThisInstanceIsGlobal())
+    {
+        ZoneScopedN("Create deferred contexts");
+        for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+        {
+            R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
+            VERIFY(SUCCEEDED(R));
+        }
     }
 
     SDL_SysWMinfo info;
@@ -262,6 +282,8 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
 bool CHW::CreateSwapChain(HWND hwnd)
 {
+    ZoneScoped;
+
     // Set up the presentation parameters
     DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
     ZeroMemory(&sd, sizeof(sd));
@@ -315,6 +337,8 @@ bool CHW::CreateSwapChain2(HWND hwnd)
 {
     if (strstr(Core.Params, "-no_dx11_2"))
         return false;
+
+    ZoneScoped;
 
 #ifdef HAS_DX11_2
     IDXGIFactory2* pFactory2{};
@@ -411,6 +435,9 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
 
+    if (profiler_ctx)
+        TracyD3D11Destroy(profiler_ctx);
+
     _RELEASE(pContext1);
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
@@ -431,6 +458,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset()
 {
+    ZoneScoped;
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
     const bool bWindowed = ThisInstanceIsGlobal() ? psDeviceMode.WindowStyle != rsFullscreen : true;
     cd.Windowed = bWindowed;
@@ -496,29 +524,42 @@ void CHW::Present()
 {
     const bool bUseVSync = psDeviceMode.WindowStyle == rsFullscreen &&
         psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX11
-    m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
-#ifdef HAS_DX11_2
-    if (m_pSwapChain2 && UsingFlipPresentationModel())
+
+    switch (m_pSwapChain->Present(bUseVSync ? 1 : 0, 0))
     {
-        const float fps = Device.GetStats().fFPS;
-        if (fps < 30)
-            m_pSwapChain2->SetSourceSize(UINT(Device.dwWidth * 0.85f), UINT(Device.dwHeight * 0.85f));
-        else if (fps < 15)
-            m_pSwapChain2->SetSourceSize(UINT(Device.dwWidth * 0.7f), UINT(Device.dwHeight * 0.7f));
+    case DXGI_STATUS_OCCLUDED:
+    case DXGI_ERROR_DEVICE_REMOVED:
+        doPresentTest = true;
+        break;
     }
-#endif
+
     CurrentBackBuffer = (CurrentBackBuffer + 1) % BackBufferCount;
+
+    TracyD3D11Collect(profiler_ctx);
 }
 
-DeviceState CHW::GetDeviceState() const
+DeviceState CHW::GetDeviceState()
 {
-    const auto result = m_pSwapChain->Present(0, DXGI_PRESENT_TEST);
-
-    switch (result)
+    if (doPresentTest)
     {
-        // Check if the device is ready to be reset
-    case DXGI_ERROR_DEVICE_RESET:
-        return DeviceState::NeedReset;
+        switch (m_pSwapChain->Present(0, DXGI_PRESENT_TEST))
+        {
+        case S_OK:
+            doPresentTest = false;
+            break;
+
+        case DXGI_STATUS_OCCLUDED:
+            // Do not render until we become visible again
+            return DeviceState::Lost;
+
+        case DXGI_ERROR_DEVICE_RESET:
+            return DeviceState::NeedReset;
+
+        case DXGI_ERROR_DEVICE_REMOVED:
+            FATAL("Graphics driver was updated or GPU was physically removed from computer.\n"
+                  "Please, restart the game.");
+            break;
+        }
     }
 
     return DeviceState::Normal;

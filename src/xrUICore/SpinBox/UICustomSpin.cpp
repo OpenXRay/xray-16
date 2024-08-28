@@ -52,8 +52,8 @@ void CUICustomSpin::InitSpin(Fvector2 pos, Fvector2 size)
     m_pFrameLine->SetWndPos(Fvector2().set(0, 0));
     m_pFrameLine->SetWndSize(Fvector2().set(size.x, SPIN_HEIGHT));
 
-    if (!m_pFrameLine->InitTexture("ui_inGame2_spin_box", "hud" DELIMITER "default", false))
-        m_pFrameLine->InitTexture("ui_spiner", "hud" DELIMITER "default", false);
+    if (!m_pFrameLine->InitTexture("ui_inGame2_spin_box", false))
+        m_pFrameLine->InitTexture("ui_spiner", false);
 
     m_pBtnUp->InitButton(Fvector2().set(size.x - BTN_SIZE_X - 2.0f, 1.0f), Fvector2().set(BTN_SIZE_X, BTN_SIZE_Y));
 

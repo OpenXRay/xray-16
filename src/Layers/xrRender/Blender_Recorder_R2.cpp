@@ -25,7 +25,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     // Create shaders
 #if defined(USE_OGL)
     dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, "null", "null", "null");
-    if (HW.SeparateShaderObjectsSupported || !dest.pp->pp)
+    if (GLAD_GL_ARB_separate_shader_objects || !dest.pp->pp)
 #endif
     {
         dest.ps = RImplementation.Resources->_CreatePS(_ps);
@@ -37,14 +37,12 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
 #endif
         dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
         ctable.merge(&dest.vs->constants);
-#if defined(USE_DX11) || defined(USE_OGL)
         dest.gs = RImplementation.Resources->_CreateGS("null");
-#    ifdef USE_DX11
+#ifdef USE_DX11
         dest.hs = RImplementation.Resources->_CreateHS("null");
         dest.ds = RImplementation.Resources->_CreateDS("null");
         dest.cs = RImplementation.Resources->_CreateCS("null");
-#    endif
-#endif // !USE_DX9
+#endif
     }
 #if defined(USE_OGL)
     RImplementation.Resources->_LinkPP(dest);
@@ -144,7 +142,7 @@ u32 CBlender_Compile::r_Sampler(
     {
 #if defined(USE_DX11)
         r_dx11Texture(_name, texture, true);
-#elif defined(USE_DX9) || defined(USE_OGL)
+#elif defined(USE_OGL)
         i_Texture(dwStage, texture);
 #else
 #   error No graphics API selected or enabled!

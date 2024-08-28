@@ -6,9 +6,23 @@
 #elif defined(__linux__)
 #   define XR_PLATFORM_LINUX
 #   define _XRAY_PLATFORM_MARKER "Linux"
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(BSD)
 #   define XR_PLATFORM_BSD
-#   define _XRAY_PLATFORM_MARKER "BSD"
+#   if defined(__FreeBSD__)
+#       define XR_PLATFORM_FREEBSD
+#       define _XRAY_PLATFORM_MARKER "FreeBSD"
+#   elif defined(__OpenBSD__)
+#       define XR_PLATFORM_OPENBSD
+#       define _XRAY_PLATFORM_MARKER "OpenBSD"
+#   elif defined(__NetBSD__)
+#       define XR_PLATFORM_NETBSD
+#       define _XRAY_PLATFORM_MARKER "NetBSD"
+#   elif defined(__DragonFly__)
+#       define XR_PLATFORM_DRAGONFLYBSD
+#       define _XRAY_PLATFORM_MARKER "DragonFlyBSD"
+#   else
+#       define _XRAY_PLATFORM_MARKER "*BSD"
+#   endif
 #elif defined(__APPLE__)
 #   define XR_PLATFORM_APPLE
 #   define _XRAY_PLATFORM_MARKER "Apple"
@@ -28,6 +42,9 @@
 #elif defined (_M_ARM64) || defined(__aarch64__)
 #   define XR_ARCHITECTURE_ARM64
 #   define _XRAY_ARCHITECTURE_MARKER "ARM 64-bit"
+#elif defined(__riscv) || defined(__riscv__)
+#   define XR_ARCHITECTURE_RISCV
+#   define _XRAY_ARCHITECTURE_MARKER "RISC-V"
 #elif defined(__powerpc64__) || defined(__ppc64__)
 #   define XR_ARCHITECTURE_PPC64
 #   define _XRAY_ARCHITECTURE_MARKER "PowerPC 64-bit"

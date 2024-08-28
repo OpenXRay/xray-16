@@ -557,17 +557,14 @@ void IPureClient::Sync_Thread()
 
 void IPureClient::Sync_Average() {}
 
-void sync_thread(void* P)
-{
-    IPureClient* C = (IPureClient*)P;
-    C->Sync_Thread();
-}
-
 void IPureClient::net_Syncronize()
 {
     net_Syncronised = false;
     net_DeltaArray.clear();
-    Threading::SpawnThread(sync_thread, "network-time-sync", 0, this);
+    Threading::SpawnThread("network-time-sync", [this]
+    {
+        Sync_Thread();
+    });
 }
 
 bool IPureClient::net_isDisconnected() const

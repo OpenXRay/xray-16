@@ -122,7 +122,7 @@ void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, LPCSTR path)
     {
         for (u32 i = 0; i < m_field_info.size(); ++i)
         {
-            CUITextWnd* st = xr_new<CUITextWnd>();
+            auto* st = xr_new<CUIStatic>("Field");
             st->SetAutoDelete(true);
             st->SetWndPos(Fvector2().set(indent, 10.0f));
             st->SetWndSize(Fvector2().set(m_field_info[i].width, m_header->GetHeight()));
@@ -148,7 +148,7 @@ void CUIStatsPlayerList::InitHeader(CUIXml& xml_doc, LPCSTR path)
     }
     else
     {
-        CUITextWnd* st = xr_new<CUITextWnd>();
+        auto* st = xr_new<CUIStatic>("Field");
         st->SetAutoDelete(true);
         st->SetWndPos(Fvector2().set(10, 0));
         st->SetWndSize(Fvector2().set(this->GetDesiredChildWidth(), m_h.h));
@@ -187,9 +187,9 @@ void CUIStatsPlayerList::InitTeamHeader(CUIXml& xml_doc, LPCSTR path)
     CUIXmlInit::InitFont(xml_doc, strconcat(sizeof(_path), _path, path, ":team_header:text_format"), 0, t.c, t.f);
     t.h = m_header_team->GetHeight();
 
-    m_header_text = xr_new<CUITextWnd>();
+    m_header_text = xr_new<CUIStatic>("Header");
     m_header_text->SetAutoDelete(true);
-    CUIXmlInit::InitTextWnd(xml_doc, strconcat(sizeof(_path), _path, path, ":team_header:header"), 0, m_header_text);
+    CUIXmlInit::InitStatic(xml_doc, strconcat(sizeof(_path), _path, path, ":team_header:header"), 0, m_header_text);
     m_header_text->SetWidth(GetDesiredChildWidth());
     m_header_text->SetVTextAlignment(valCenter);
     m_header_team->AttachChild(m_header_text);

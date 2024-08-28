@@ -178,6 +178,8 @@ bool CTheoraStream::ParseHeaders()
 
 bool CTheoraStream::Decode(u32 in_tm_play)
 {
+    ZoneScoped;
+
     VERIFY(in_tm_play < tm_total);
     ogg_int64_t t_frame;
     t_frame = iFloor(in_tm_play * fpms);
@@ -241,12 +243,7 @@ bool CTheoraStream::Decode(u32 in_tm_play)
 bool CTheoraStream::Load(const char* fname)
 {
     VERIFY(0 == source);
-// open source
-#ifdef _EDITOR
-    source = FS.r_open(0, fname);
-#else
     source = FS.rs_open(0, fname);
-#endif
     VERIFY(source);
 
     // parse headers

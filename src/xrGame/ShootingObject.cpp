@@ -20,31 +20,10 @@
 #define HIT_POWER_EPSILON 0.05f
 #define WALLMARK_SIZE 0.04f
 
-CShootingObject::CShootingObject(void)
+CShootingObject::CShootingObject()
 {
-    fShotTimeCounter = 0;
-    fOneShotTime = 0;
     // fHitPower						= 0.0f;
-    fvHitPower.set(0.0f, 0.0f, 0.0f, 0.0f);
-    fvHitPowerCritical.set(0.0f, 0.0f, 0.0f, 0.0f);
     m_fStartBulletSpeed = 1000.f;
-
-    m_vCurrentShootDir.set(0, 0, 0);
-    m_vCurrentShootPos.set(0, 0, 0);
-    m_iCurrentParentID = 0xFFFF;
-
-    m_fPredBulletTime = 0.0f;
-    m_bUseAimBullet = false;
-    m_fTimeToAim = 0.0f;
-
-    // particles
-    m_sFlameParticlesCurrent = m_sFlameParticles = NULL;
-    m_sSmokeParticlesCurrent = m_sSmokeParticles = NULL;
-    m_sShellParticles = NULL;
-
-    bWorking = false;
-
-    light_render = 0;
 
     reinit();
 }

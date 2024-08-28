@@ -250,8 +250,8 @@ public:
     }
 };
 
-typedef _vector2<float> Fvector2;
-typedef _vector2<int> Ivector2;
+using Fvector2 = _vector2<float>;
+using Ivector2 = _vector2<int>;
 
 template <class T>
 bool _valid(const _vector2<T>& v)

@@ -7,8 +7,8 @@
 #include "static_cast_checked.hpp"
 #include "ActorEffector.h"
 #include "WeaponMagazinedWGrenade.h" // XXX: move somewhere
+#include "GamePersistent.h"
 
-extern u32 hud_adj_mode;
 player_hud* g_player_hud = nullptr;
 extern ENGINE_API shared_str current_player_hud_sect;
 // clang-format off
@@ -131,7 +131,7 @@ void attachable_hud_item::update(bool bForce)
         reload_measures();
     }
 
-    if (hud_adj_mode > 0)
+    if (GamePersistent().GetHudTuner().is_active())
         m_measures.update(m_attach_offset);
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
@@ -199,7 +199,6 @@ bool attachable_hud_item::need_renderable() const { return m_parent_hud_item->ne
 void attachable_hud_item::render(u32 context_id, IRenderable* root)
 {
     GEnv.Render->add_Visual(context_id, root, m_model->dcast_RenderVisual(), m_item_transform);
-    debug_draw_firedeps();
     m_parent_hud_item->render_hud_mode();
 }
 

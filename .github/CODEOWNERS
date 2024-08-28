@@ -1,0 +1,10 @@
+# Lines starting with '#' are comments.
+# More details are here: https://help.github.com/articles/about-codeowners/
+
+# CMake
+CMakeLists.txt @Masterkatze
+*.cmake @Masterkatze
+
+# xrRender
+/src/Layers/* @vTurbine @Xottab-DUTY
+/src/Layers/xrAPI

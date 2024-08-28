@@ -10,6 +10,8 @@
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
 #else
 #error Add your platform here
 #endif
@@ -435,6 +437,7 @@ public:
 
 void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
 {
+    ZoneScoped;
     m_def->syncronize();
 
     // Get nodes

@@ -8,10 +8,10 @@ struct Fsphere
     float R;
 
 public:
-    void set(const Fvector3& _P, float _R)
+    void set(const Fvector3& p, float r)
     {
-        P.set(_P);
-        R = _R;
+        P.set(p);
+        R = r;
     }
 
     void set(const Fsphere& S)

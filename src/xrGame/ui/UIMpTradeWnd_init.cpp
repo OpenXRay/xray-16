@@ -179,14 +179,14 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     //(this,
     //&CUIMpTradeWnd::OnBtnRifleAmmo2Clicked		));
 
-    m_static_player_money = UIHelper::CreateTextWnd(xml_doc, "static_player_money", this);
-    m_static_curr_items_money = UIHelper::CreateTextWnd(xml_doc, "static_curr_items_money", this);
+    m_static_player_money = UIHelper::CreateStatic(xml_doc, "static_player_money", this);
+    m_static_curr_items_money = UIHelper::CreateStatic(xml_doc, "static_curr_items_money", this);
 
-    m_static_preset_money[0] = UIHelper::CreateTextWnd(xml_doc, "static_preset_money_last", this);
-    m_static_preset_money[1] = UIHelper::CreateTextWnd(xml_doc, "static_preset_money_1", this);
-    m_static_preset_money[2] = UIHelper::CreateTextWnd(xml_doc, "static_preset_money_2", this);
-    m_static_preset_money[3] = UIHelper::CreateTextWnd(xml_doc, "static_preset_money_3", this);
-    m_static_preset_money[4] = UIHelper::CreateTextWnd(xml_doc, "static_preset_money_def", this);
+    m_static_preset_money[0] = UIHelper::CreateStatic(xml_doc, "static_preset_money_last", this);
+    m_static_preset_money[1] = UIHelper::CreateStatic(xml_doc, "static_preset_money_1", this);
+    m_static_preset_money[2] = UIHelper::CreateStatic(xml_doc, "static_preset_money_2", this);
+    m_static_preset_money[3] = UIHelper::CreateStatic(xml_doc, "static_preset_money_3", this);
+    m_static_preset_money[4] = UIHelper::CreateStatic(xml_doc, "static_preset_money_def", this);
 
     // preset money indicators
     m_item_color_restr_rank = CUIXmlInit::GetColor(xml_doc, "item_color_restr_rank", 0, color_rgba(255, 255, 255, 255));
@@ -201,8 +201,8 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
 
     m_static_player_rank = UIHelper::CreateStatic(xml_doc, "static_player_rank", this);
     m_static_item_rank = UIHelper::CreateStatic(xml_doc, "static_item_rank", this);
-    m_static_information = UIHelper::CreateTextWnd(xml_doc, "static_info", this);
-    m_static_money_change = UIHelper::CreateTextWnd(xml_doc, "static_money_change", this);
+    m_static_information = UIHelper::CreateStatic(xml_doc, "static_info", this);
+    m_static_money_change = UIHelper::CreateStatic(xml_doc, "static_money_change", this);
 
     m_item_info = xr_new<CUIItemInfo>();
     AttachChild(m_item_info);

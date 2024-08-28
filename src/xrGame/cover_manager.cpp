@@ -72,6 +72,7 @@ IC bool CCoverManager::critical_cover(u32 index) const
 
 void CCoverManager::compute_static_cover()
 {
+    ZoneScoped;
     clear();
     xr_delete(m_covers);
     m_covers = xr_new<CPointQuadTree>(
@@ -83,6 +84,7 @@ void CCoverManager::compute_static_cover()
 
     xr_parallel_for(TaskRange<u32>(0, levelVertexCount), [&](const TaskRange<u32>& range)
     {
+        ZoneScopedN("Process vertices");
         for (u32 i = range.begin(); i != range.end(); ++i)
         {
             const CLevelGraph::CLevelVertex& vertex = *graph.vertex(i);

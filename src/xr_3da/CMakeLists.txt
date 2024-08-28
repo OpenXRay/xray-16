@@ -1,34 +1,33 @@
-project(xr_3da)
+add_executable(xr_3da)
 
-set(SRC_FILES
-    "AccessibilityShortcuts.hpp"
-    "entry_point.cpp"
-    "resource.h"
-    "stdafx.h"
-    "stdafx.cpp"
+target_sources(xr_3da PRIVATE
+    entry_point.cpp
+    stdafx.h
 )
 
-group_sources(SRC_FILES)
+set_property(
+    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    PROPERTY
+    VS_STARTUP_PROJECT xr_3da
+)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-target_include_directories(${PROJECT_NAME}
+target_include_directories(xr_3da
     PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-    ${SDL2_INCLUDE_DIRS}
+    "${CMAKE_SOURCE_DIR}/src"
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(xr_3da
     PRIVATE
     xrCore
     xrAPI
     xrEngine
+    xrGame
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+set_target_properties(xr_3da PROPERTIES
+    PREFIX ""
+)
 
-install(TARGETS ${PROJECT_NAME} RUNTIME
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+install(TARGETS xr_3da RUNTIME
+    DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )

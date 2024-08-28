@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.22)
 
-project(minilua)
+project(minilua C)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (CMAKE_VERBOSE_MAKEFILE)
     set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
