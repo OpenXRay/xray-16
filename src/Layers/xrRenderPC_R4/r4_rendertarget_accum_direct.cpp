@@ -208,10 +208,11 @@ void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
             Fmatrix m_xform;
             Fvector direction = fuckingsun->direction;
             float w_dir = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
-            // float	w_speed				= g_pGamePersistent->Environment().CurrentEnv.wind_velocity	;
+            float w_speed = g_pGamePersistent->Environment().CurrentEnv.wind_velocity * 0.001f;
+            clamp(w_speed, 0.1f, 1.0f);
             Fvector normal;
             normal.setHP(w_dir, 0);
-            w_shift += 0.003f * Device.fTimeDelta;
+            w_shift -= 0.005f * w_speed * Device.fTimeDelta;
             Fvector position;
             position.set(0, 0, 0);
             m_xform.build_camera_dir(position, direction, normal);
@@ -523,9 +524,11 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
             Fmatrix m_xform;
             Fvector direction = fuckingsun->direction;
             float w_dir = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
-            // float	w_speed				= g_pGamePersistent->Environment().CurrentEnv.wind_velocity	;
+            float w_speed = g_pGamePersistent->Environment().CurrentEnv.wind_velocity * 0.001f;
+            clamp(w_speed, 0.1f, 1.0f);
             Fvector normal;
-            normal.setHP(w_dir, 0);
+            normal.setHP(-w_dir, 0);
+            w_shift -= 0.005f * w_speed * Device.fTimeDelta;
             w_shift += 0.003f * Device.fTimeDelta;
             Fvector position;
             position.set(0, 0, 0);
@@ -1194,6 +1197,12 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, c
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_FAR))
         return;
 
+    float w = float(Device.dwWidth);
+    float h = float(Device.dwHeight);
+
+    if (RImplementation.o.ssfx_volumetric)
+        set_viewport_size(HW.get_context(CHW::IMM_CTX_ID), w / ps_ssfx_volumetric.w, h / ps_ssfx_volumetric.w);
+
     phase_vol_accumulator(cmd_list);
 
     cmd_list.set_ColorWriteEnable();
@@ -1344,5 +1353,8 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, c
         //	TODO: DX11: Check if DX11 has analog for NV DBT
         // disable depth bounds
         //		u_DBT_disable	();
+
+        if (RImplementation.o.ssfx_volumetric)
+            set_viewport_size(HW.get_context(CHW::IMM_CTX_ID), w, h);
     }
 }

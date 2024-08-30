@@ -6,14 +6,14 @@
 
 //	Warning: duplicated in rain.cpp
 static const int max_desired_items = 2500;
-static const float source_radius = 12.5f;
-static const float source_offset = 40.f;
-static const float max_distance = source_offset * 1.25f;
+static const float source_radius = 15;//12.5f;
+static const float source_offset = 20.f; // 40
+static const float max_distance = source_offset * 1.5f; //1.25f;
 static const float sink_offset = -(max_distance - source_offset);
 static const float drop_length = 5.f;
 static const float drop_width = 0.30f;
 static const float drop_angle = 3.0f;
-static const float drop_max_angle = deg2rad(10.f);
+static const float drop_max_angle = deg2rad(35.f); //10
 static const float drop_max_wind_vel = 20.0f;
 static const float drop_speed_min = 40.f;
 static const float drop_speed_max = 80.f;
@@ -22,8 +22,12 @@ const int max_particles = 1000;
 const int particles_cache = 400;
 const float particles_time = .3f;
 
+int current_items;
+
 dxRainRender::dxRainRender()
 {
+    current_items = 0;
+
     IReader* F = FS.r_open("$game_meshes$", "dm" DELIMITER "rain.dm");
     VERIFY3(F, "Can't open file.", "dm" DELIMITER "rain.dm");
 
@@ -68,26 +72,29 @@ void dxRainRender::Render(CEffect_Rain& owner)
     }
 #endif
 
-    const u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
+    u32 desired_items = iFloor(0.01f * (1.f + factor * 99.0f) * float(max_desired_items));
+
+    // Get to the desired items
+    if (current_items < desired_items)
+        current_items += desired_items - current_items;
+
+    // visual
+    float factor_visual = factor / 2.f + .5f;
+    Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
+    u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
 
     // born _new_ if needed
-    if (owner.items.size() < desired_items)
+    float b_radius_wrap_sqr = _sqr((source_radius * 1.5f));
+    if (owner.items.size() < current_items)
     {
-        owner.items.reserve(desired_items);
-        while (owner.items.size() < desired_items)
+        // owner.items.reserve (desired_items);
+        while (owner.items.size() < current_items)
         {
             CEffect_Rain::Item one;
             owner.Born(one, source_radius, _drop_speed);
             owner.items.push_back(one);
         }
     }
-
-    // visual
-    const float factor_visual = factor / 2.f + .5f;
-    const Fvector3 f_rain_color = g_pGamePersistent->Environment().CurrentEnv.rain_color;
-    const u32 u_rain_color = color_rgba_f(f_rain_color.x, f_rain_color.y, f_rain_color.z, factor_visual);
-
-    const float b_radius_wrap_sqr = _sqr((source_radius + .5f));
 
     // build source plane
     Fplane src_plane;
@@ -101,15 +108,21 @@ void dxRainRender::Render(CEffect_Rain& owner)
     FVF::LIT* verts = (FVF::LIT*)RImplementation.Vertex.Lock(desired_items * 4, hGeom_Rain->vb_stride, vOffset);
     FVF::LIT* start = verts;
     const Fvector& vEye = Device.vCameraPosition;
-    for (u32 I = 0; I < desired_items; I++)
+    for (u32 I = 0; I < current_items; I++)
     {
         // physics and time control
         CEffect_Rain::Item& one = owner.items[I];
 
         if (one.dwTime_Hit < Device.dwTimeGlobal)
+        {
             owner.Hit(one.Phit);
+            if (current_items > desired_items) current_items--; // Hit something
+        }
         if (one.dwTime_Life < Device.dwTimeGlobal)
+        {
             owner.Born(one, source_radius, _drop_speed);
+            if (current_items > desired_items) current_items--; // Out of life ( invalidated, never hit something, etc. )
+        }
 
         // последняя дельта ??
         //.		float xdt		= float(one.dwTime_Hit-Device.dwTimeGlobal)/1000.f;

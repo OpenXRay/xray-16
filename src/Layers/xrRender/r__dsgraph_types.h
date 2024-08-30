@@ -19,6 +19,7 @@ struct _MatrixItem
     IRenderable* pObject;
     dxRender_Visual* pVisual;
     Fmatrix Matrix; // matrix (copy)
+    Fmatrix PrevMatrix;
 };
 
 struct _MatrixItemS
@@ -66,4 +67,17 @@ using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];
 using mapSorted_T = xr_fixed_map<float, _MatrixItemS>;
 using mapHUD_T    = xr_fixed_map<float, _MatrixItemS>;
 using mapLOD_T    = xr_fixed_map<float, _LodItem>;
+
+/*
+    // Yohji: note - unsure how to proceed
+
+    typedef FixedMAP<float, _MatrixItemS, render_allocator> HUDMask_T;
+    typedef HUDMask_T::TNode HUDMask_Node;
+
+    typedef FixedMAP<float, _MatrixItemS, render_allocator> mapWater_T;
+    typedef mapWater_T::TNode mapWater_Node;
+*/
+
+using HUDMask_T = xr_fixed_map<float, _MatrixItemS>;
+using mapWater_T = xr_fixed_map<float, _MatrixItemS>;
 }

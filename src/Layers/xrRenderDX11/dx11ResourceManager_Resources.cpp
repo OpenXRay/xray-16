@@ -40,28 +40,39 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 //--------------------------------------------------------------------------------------------------------------
 SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
+    int skinning = -1;
+
     string_path name;
     xr_strcpy(name, shader);
     switch (RImplementation.m_skinning)
     {
     case 0:
         xr_strcat(name, "_0");
+        skinning = 0;
         break;
     case 1:
         xr_strcat(name, "_1");
+        skinning = 1;
         break;
     case 2:
         xr_strcat(name, "_2");
+        skinning = 2;
         break;
     case 3:
         xr_strcat(name, "_3");
+        skinning = 3;
         break;
     case 4:
         xr_strcat(name, "_4");
+        skinning = 4;
         break;
     }
 
-    return CreateShader<SVS>(name, shader, flags);
+    SVS* vs = CreateShader<SVS>(name, shader, flags);
+
+    vs->skinning = skinning;
+
+    return vs;
 }
 
 void CResourceManager::_DeleteVS(const SVS* vs)

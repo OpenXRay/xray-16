@@ -75,6 +75,7 @@ private:
     void Hit(Fvector& pos);
     bool RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt);
     void RenewItem(Item& dest, float height, bool bHit);
+    void Prepare(Fvector2& offset, Fvector3& axis, float Wind_Vel, float Wind_Dir);
 
 public:
     CEffect_Rain();

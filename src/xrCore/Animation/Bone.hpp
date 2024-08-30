@@ -35,6 +35,8 @@ public:
     // data
     Fmatrix mTransform; // final x-form matrix (local to model)
     Fmatrix mRenderTransform; // final x-form matrix (model_base -> bone -> model)
+    Fmatrix mRenderTransform_prev; // Prev x-form matrix
+    Fmatrix mRenderTransform_temp; // Temp var
 private:
     BoneCallback Callback;
     void* Callback_Param;
@@ -508,6 +510,9 @@ IC void CBoneInstance::construct()
 {
     mTransform.identity();
     mRenderTransform.identity();
+
+    mRenderTransform_prev.identity();
+    mRenderTransform_temp.identity();
 
     Callback = nullptr;
     Callback_Param = nullptr;

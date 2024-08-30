@@ -55,12 +55,30 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
 
 void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)
 {
-    u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, rt_MSAADepth);
+#if RENDER == R_R4
+    // yohji: maybe wrong
+    u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, get_base_zb());
+#endif
 
     if (!m_bHasActiveVolumetric)
     {
         m_bHasActiveVolumetric = true;
+        /*
+        if (!RImplementation.o.dx10_msaa)
+            u_setrt(rt_Generic_2, NULL,NULL, RImplementation.o.ssfx_volumetric ? NULL : HW.pBaseZB);
+        else
+            u_setrt(rt_Generic_2, NULL,NULL, RImplementation.o.ssfx_volumetric ? NULL : HW.pBaseZB);
+        */
         cmd_list.ClearRT(rt_Generic_2, {}); // black
+    }
+    else
+    {
+        /*
+        if (!RImplementation.o.dx10_msaa)
+            u_setrt(rt_Generic_2, NULL,NULL, RImplementation.o.ssfx_volumetric ? NULL : HW.pBaseZB);
+        else
+            u_setrt(rt_Generic_2, NULL,NULL, RImplementation.o.ssfx_volumetric ? NULL : HW.pBaseZB);
+        */
     }
 
     cmd_list.set_Stencil(FALSE);
