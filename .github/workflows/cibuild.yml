@@ -127,7 +127,7 @@ jobs:
               libvorbis-dev:${{ matrix.platform.arch }}
 
     - name: Install macOS packages
-      if: ${{ matrix.platform.name == 'macOS' }}
+      if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
           brew update
           brew install sdl2 lzo libogg libvorbis theora
