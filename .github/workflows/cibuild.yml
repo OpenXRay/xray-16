@@ -97,9 +97,9 @@ jobs:
         - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Fedora, os: ubuntu-latest, arch: x86_64,  cc: gcc,   container: 'fedora:latest', }
         #- { name: Haiku,  os: ubuntu-latest, arch: x86_64,  cc: x86_64-unknown-haiku-gcc, cxx: x86_64-unknown-haiku-g++, container: 'haiku/cross-compiler:x86_64-r1beta4', }
-        - { name: macOS,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
-        - { name: macOS,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", threads: 3 }
-        - { name: macOS,  os: macos-15,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=15.0", threads: 3 }
+        - { name: macOS 13,  os: macos-13,      arch: x86_64,  cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.6" }
+        - { name: macOS 14,  os: macos-14,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0", threads: 3 }
+        - { name: macOS 15,  os: macos-15,      arch: arm64,   cc: clang, flags: "-DCMAKE_OSX_DEPLOYMENT_TARGET=15.0", threads: 3 }
 
         configuration: [Debug, Release]
 
