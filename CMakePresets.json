@@ -1,0 +1,247 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired":
+    {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "configurePresets":
+    [
+        {
+            "name": "Base",
+            "hidden": true
+        },
+        {
+            "name": "Debug",
+            "hidden": true,
+            "inherits": "Base"
+        },
+        {
+            "name": "Mixed",
+            "hidden": true,
+            "inherits": "Base"
+        },
+        {
+            "name": "Release",
+            "hidden": true,
+            "inherits": "Base"
+        },
+        {
+            "name": "Release Master Gold",
+            "hidden": true,
+            "inherits": "Base"
+        },
+        {
+            "name": "Debug x86",
+            "inherits": "Debug",
+            "architecture":
+            {
+                "value": "x86"
+            }
+        },
+        {
+            "name": "Debug x64",
+            "inherits": "Debug",
+            "architecture":
+            {
+                "value": "x64"
+            }
+        },
+        {
+            "name": "Debug ARM",
+            "inherits": "Debug",
+            "architecture":
+            {
+                "value": "ARM"
+            }
+        },
+        {
+            "name": "Debug ARM64",
+            "inherits": "Debug",
+            "architecture":
+            {
+                "value": "ARM64"
+            }
+        },
+        {
+            "name": "Mixed x86",
+            "inherits": "Mixed",
+            "architecture":
+            {
+                "value": "x86"
+            }
+        },
+        {
+            "name": "Mixed x64",
+            "inherits": "Mixed",
+            "architecture":
+            {
+                "value": "x64"
+            }
+        },
+        {
+            "name": "Mixed ARM",
+            "inherits": "Mixed",
+            "architecture":
+            {
+                "value": "ARM"
+            }
+        },
+        {
+            "name": "Mixed ARM64",
+            "inherits": "Mixed",
+            "architecture":
+            {
+                "value": "ARM64"
+            }
+        },
+        {
+            "name": "Release x86",
+            "inherits": "Release",
+            "architecture":
+            {
+                "value": "x86"
+            }
+        },
+        {
+            "name": "Release x64",
+            "inherits": "Release",
+            "architecture":
+            {
+                "value": "x64"
+            }
+        },
+        {
+            "name": "Release ARM",
+            "inherits": "Release",
+            "architecture":
+            {
+                "value": "ARM"
+            }
+        },
+        {
+            "name": "Release ARM64",
+            "inherits": "Release",
+            "architecture":
+            {
+                "value": "ARM64"
+            }
+        },
+        {
+            "name": "Release Master Gold x86",
+            "inherits": "Release Master Gold",
+            "architecture":
+            {
+                "value": "x86"
+            }
+        },
+        {
+            "name": "Release Master Gold x64",
+            "inherits": "Release Master Gold",
+            "architecture":
+            {
+                "value": "x64"
+            }
+        },
+        {
+            "name": "Release Master Gold ARM",
+            "inherits": "Release Master Gold",
+            "architecture":
+            {
+                "value": "ARM"
+            }
+        },
+        {
+            "name": "Release Master Gold ARM64",
+            "inherits": "Release Master Gold",
+            "architecture":
+            {
+                "value": "ARM64"
+            }
+        }
+    ],
+    "buildPresets":
+    [
+        {
+            "name": "Debug x86",
+            "configurePreset": "Debug x86",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Debug x64",
+            "configurePreset": "Debug x64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Debug ARM",
+            "configurePreset": "Debug ARM",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Debug ARM64",
+            "configurePreset": "Debug ARM64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Mixed x86",
+            "configurePreset": "Mixed x86",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Mixed x64",
+            "configurePreset": "Mixed x64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Mixed ARM",
+            "configurePreset": "Mixed ARM",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Mixed ARM64",
+            "configurePreset": "Mixed ARM64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "Release x86",
+            "configurePreset": "Release x86",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "Release x64",
+            "configurePreset": "Release x64",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "Release ARM",
+            "configurePreset": "Release ARM",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "Release ARM64",
+            "configurePreset": "Release ARM64",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "Release Master Gold x86",
+            "configurePreset": "Release Master Gold x86",
+            "configuration": "Release"
+        },
+        {
+            "name": "Release Master Gold x64",
+            "configurePreset": "Release Master Gold x64",
+            "configuration": "Release"
+        },
+        {
+            "name": "Release Master Gold ARM",
+            "configurePreset": "Release Master Gold ARM",
+            "configuration": "Release"
+        },
+        {
+            "name": "Release Master Gold ARM64",
+            "configurePreset": "Release Master Gold ARM64",
+            "configuration": "Release"
+        }
+    ]
+}

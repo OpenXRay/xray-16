@@ -154,11 +154,6 @@ target_link_libraries(xrUICore
     xrSound
 )
 
-if (WIN32)
-    add_compile_options(/fp:fast "/Yupch.hpp")
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp" PROPERTIES COMPILE_FLAGS /Yc)
-endif()
-
 target_compile_definitions(xrUICore
     PRIVATE
     XRUICORE_EXPORTS
@@ -167,6 +162,7 @@ target_compile_definitions(xrUICore
 
 set_target_properties(xrUICore PROPERTIES
     PREFIX ""
+    POSITION_INDEPENDENT_CODE ON
 )
 
 target_precompile_headers(xrUICore
