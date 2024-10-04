@@ -201,15 +201,6 @@ int main(int argc, char** argv)
     {
         print_format();
     }
-#ifdef DEBUG
-    else if (strstr(cmd_params, "--gen_params"))
-    {
-        printf("Initializing core...\n");
-        initialize_core();
-        crypto::xr_dsa::generate_params();
-        deinitialize_core();
-    }
-#endif
     else
     {
         printf("ERROR: bad command parameters\n");

@@ -1,14 +1,7 @@
 #pragma once
-#ifndef XR_DSA_INCLUDED
-#define XR_DSA_INCLUDED
 
-#include "xrCore/xrCore.h"
-
-#ifdef USE_CRYPTOPP
-#include <cryptopp/dsa.h>
-#include <cryptopp/sha.h>
-#include <cryptopp/osrng.h>
-#endif
+struct evp_pkey_st;
+struct evp_pkey_ctx_st;
 
 namespace crypto
 {
@@ -32,20 +25,11 @@ public:
         u8 m_value[public_key_length];
     }; // struct public_key_t
 
-    shared_str sign(private_key_t const& priv_key, u8 const* data, u32 const data_size);
-    bool verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign);
-
-#ifdef DEBUG
-    static void generate_params();
-#endif
+    shared_str sign(private_key_t const& priv_key, u8 const* data, u32 const data_size) const;
+    bool verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign) const;
 
 private:
-#ifdef USE_CRYPTOPP
-    CryptoPP::DL_GroupParameters_DSA m_dsa;
-    CryptoPP::AutoSeededRandomPool m_rng;
-#endif // USE_CRYPTOPP
+    evp_pkey_st* m_key{};
+    evp_pkey_ctx_st* m_context{};
 }; // class xr_dsa
-
 } // namespace crypto
-
-#endif //#ifndef XR_DSA_INCLUDED

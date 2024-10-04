@@ -23,10 +23,10 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)lzo\include;$(xrSdkDir)include\mimalloc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";TRACY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";OPENSSL_NO_DEPRECATED;TRACY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>DbgHelp.lib;FaultRep.lib;jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DbgHelp.lib;FaultRep.lib;jpeg-static.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="!$(Configuration.Contains('Debug'))">mimalloc-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="$(Configuration.Contains('Debug'))">mimalloc-static-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -65,6 +65,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Crypto\xr_dsa.cpp" />
     <ClCompile Include="Crypto\xr_dsa_signer.cpp" />
     <ClCompile Include="Crypto\xr_dsa_verifyer.cpp" />
+    <ClCompile Include="Crypto\xr_sha.cpp" />
     <ClCompile Include="Debug\dxerr.cpp" />
     <ClCompile Include="Debug\MiniDump.cpp" />
     <ClCompile Include="dump_string.cpp" />
@@ -257,15 +258,18 @@ call .GitInfo.cmd</Command>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Condition="'$(Platform)'=='Win32'" Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Condition="'$(Platform)'=='x64'" Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3-x64.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="Debug\DXTrace.inl" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(xrExternals)BugTrap.vcxproj">
       <Project>{e8cf1ada-264a-4127-86c2-fd7057d3792c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(xrExternals)cryptlib.vcxproj">
-      <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)lzo.vcxproj">
       <Project>{614aa57f-58d7-45a8-a5ff-93f04b05fac6}</Project>
