@@ -454,7 +454,7 @@ void CDetailManager::DispatchMTCalc()
         const int s_z = iFloor(EYE.z / dm_slot_size + .5f);
 
         RImplementation.BasicStats.DetailCache.Begin();
-        cache_Update(s_x, s_z, EYE, dm_max_decompress);
+        cache_Update(s_x, s_z, EYE);
         RImplementation.BasicStats.DetailCache.End();
 
         UpdateVisibleM();
