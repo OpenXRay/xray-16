@@ -96,7 +96,7 @@ BOOL CDetailManager::cache_Validate()
     return TRUE;
 }
 
-void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view, int limit)
+void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
 {
     ZoneScoped;
 
@@ -166,47 +166,58 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view, int limit)
     }
 
     // Task performer
-    BOOL bFullUnpack = FALSE;
-    if (cache_task.size() == dm_cache_size)
+    if (cache_task.size() == dm_cache_size) // full unpack, first time
     {
-        limit = dm_cache_size;
-        bFullUnpack = TRUE;
-    }
-
-    for (int iteration = 0; cache_task.size() && (iteration < limit); iteration++)
-    {
-        u32 best_id = 0;
-        float best_dist = flt_max;
-
-        if (bFullUnpack)
+        while (!cache_task.empty())
         {
-            best_id = cache_task.size() - 1;
+            // Decompress and remove task
+            const u32 bestId = cache_task.size() - 1;
+            cache_Decompress(cache_task[bestId]);
+            cache_task.erase(bestId);
         }
-        else
+    }
+    else
+    {
+        const u32 invalidIndex = u32(-1);
+        u32 bestIndexes[dm_max_decompress];
+        std::fill_n(bestIndexes, dm_max_decompress, invalidIndex);
+
+        float bestDistances[dm_max_decompress];
+        std::fill_n(bestDistances, dm_max_decompress, flt_max);
+
+        for (u32 i = 0, size = cache_task.size(); i < size; ++i)
         {
-            for (u32 entry = 0; entry < cache_task.size(); entry++)
+            // Gain access to data
+            Slot* S = cache_task[i];
+            VERIFY(stPending == S->type);
+
+            // Estimate
+            Fvector C;
+            S->vis.box.getcenter(C);
+            float D = view.distance_to_sqr(C);
+
+            // Select
+            for (int j = 0; j < dm_max_decompress; ++j)
             {
-                // Gain access to data
-                Slot* S = cache_task[entry];
-                VERIFY(stPending == S->type);
-
-                // Estimate
-                Fvector C;
-                S->vis.box.getcenter(C);
-                float D = view.distance_to_sqr(C);
-
-                // Select
-                if (D < best_dist)
+                if (D < bestDistances[j])
                 {
-                    best_dist = D;
-                    best_id = entry;
+                    bestDistances[j] = D;
+                    bestIndexes[j] = i;
                 }
             }
         }
 
-        // Decompress and remove task
-        cache_Decompress(cache_task[best_id]);
-        cache_task.erase(best_id);
+        for (int i = 0; i < dm_max_decompress; ++i)
+        {
+            const u32 bestId = bestIndexes[i];
+
+            if (bestId != invalidIndex)
+            {
+                // Decompress and remove task
+                cache_Decompress(cache_task[bestId]);
+                cache_task.erase(bestId);
+            }
+        }
     }
 
     if (bNeedMegaUpdate)
