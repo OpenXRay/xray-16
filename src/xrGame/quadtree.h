@@ -50,6 +50,9 @@ public:
         IC T* get_object()
         {
             VERIFY(m_free);
+            if (!m_free)
+                return nullptr;
+
             T* node = m_free;
             m_free = m_free->next();
             ZeroMemory(node, sizeof(T));
