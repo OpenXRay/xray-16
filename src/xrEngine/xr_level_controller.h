@@ -108,6 +108,19 @@ enum EGameActions : u32
     kQUICK_LOAD,
     kALIFE_CMD,
 
+    kNUMPAD0,
+    kINSERT,
+    kNUMPAD1,
+    kNUMPAD2,
+    kNUMPAD3,
+    kNUMPAD4,
+    kNUMPAD5,
+    kNUMPAD6,
+    kNUMPAD7,
+    kNUMPAD8,
+    kNUMPAD9,
+    kNUMPADENTER,
+
     kCUSTOM1,
     kCUSTOM2,
     kCUSTOM3,
@@ -123,6 +136,13 @@ enum EGameActions : u32
     kCUSTOM13,
     kCUSTOM14,
     kCUSTOM15,
+
+    kPDA_TAB1,
+    kPDA_TAB2,
+    kPDA_TAB3,
+    kPDA_TAB4,
+    kPDA_TAB5,
+    kPDA_TAB6,
 
     kKICK, // alpet: kick dynamic objects
 
