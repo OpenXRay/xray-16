@@ -1,0 +1,21 @@
+find_path(DBGHELP_INCLUDE_DIR
+    NAMES dbghelp.h
+    PATH_SUFFIXES include
+)
+
+find_library(DBGHELP_LIBRARY
+    NAMES dbghelp
+)
+
+mark_as_advanced(
+    DBGHELP_INCLUDE_DIR
+    DBGHELP_LIBRARY
+)
+
+add_library(WinAPI_DBGHELP STATIC IMPORTED GLOBAL)
+add_library(WinAPI::DbgHelp ALIAS WinAPI_DBGHELP)
+
+set_target_properties(WinAPI_DBGHELP PROPERTIES
+    IMPORTED_LOCATION "${DBGHELP_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${DBGHELP_INCLUDE_DIR}"
+)

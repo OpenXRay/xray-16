@@ -138,16 +138,18 @@ target_sources_grouped(
     xrDebug_macros.h
 )
 
-#target_sources_grouped(
-#    TARGET xrCore
-#    NAME "Debug core\\DxErr"
-#    FILES
-#    Debug/dxerr.cpp
-#    Debug/dxerr.h
-#    Debug/DXGetErrorDescription.inl
-#    Debug/DXGetErrorString.inl
-#    Debug/DXTrace.inl
-#)
+if (OS_WINDOWS)
+    target_sources_grouped(
+        TARGET xrCore
+        NAME "Debug core\\DxErr"
+        FILES
+        Debug/dxerr.cpp
+        Debug/dxerr.h
+        Debug/DXGetErrorDescription.inl
+        Debug/DXGetErrorString.inl
+        Debug/DXTrace.inl
+    )
+endif()
 
 target_sources_grouped(
     TARGET xrCore
@@ -447,18 +449,24 @@ target_include_directories(xrCore
 
 target_link_libraries(xrCore
     PUBLIC
-    pthread
+    $<$<NOT:$<PLATFORM_ID:Windows>>:pthread>
     $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
     SDL2::SDL2
 
     PRIVATE
+    $<$<PLATFORM_ID:Windows>:WinAPI::DbgHelp>
+    $<$<PLATFORM_ID:Windows>:WinAPI::FaultRep>
+    #$<$<PLATFORM_ID:Windows>:dxerr.lib legacy_stdio_definitions.lib>
+    #$<$<PLATFORM_ID:Windows>:jpeg-static.lib>
     xrMiscMath
-    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
+    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc::mimalloc>
     $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
     LZO::LZO
+    $<$<PLATFORM_ID:Windows>:BugTrap::BugTrap>
+    xrAPI
 )
 
-if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD" AND NOT WIN32)
+if (NOT OS_BSD AND NOT OS_WINDOWS)
     target_link_libraries(xrCore
         PRIVATE
         dl
@@ -467,7 +475,9 @@ endif()
 
 target_compile_definitions(xrCore
     PRIVATE
+    _USRDLL
     XRCORE_EXPORTS
+    CRYPTO_BUILD
     CMAKE_INSTALL_FULL_LIBDIR=\"${CMAKE_INSTALL_FULL_LIBDIR}\"
     CMAKE_INSTALL_FULL_DATAROOTDIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\"
     CI=$ENV{CI}
@@ -479,6 +489,7 @@ target_compile_definitions(xrCore
     GIT_INFO_CURRENT_BRANCH=\"${GIT_BRANCH}\"
 )
 
+# TODO move to mimalloc target?
 if (MEMORY_ALLOCATOR STREQUAL "mimalloc")
     target_compile_definitions(xrCore PRIVATE USE_MIMALLOC)
 else()
