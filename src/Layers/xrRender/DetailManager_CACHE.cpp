@@ -211,6 +211,7 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
             }
         }
 
+        // We sort indexes and process them in reverse order to erase correctly from cache_task
         std::sort(bestIndexes, bestIndexes + dm_max_decompress);
 
         for (int i = dm_max_decompress - 1; i >= 0; --i)
