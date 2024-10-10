@@ -185,6 +185,10 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
         float bestDistances[dm_max_decompress];
         std::fill_n(bestDistances, dm_max_decompress, flt_max);
 
+        auto bestDistancesBegin = std::begin(bestDistances);
+        auto bestDistancesEnd = std::end(bestDistances);
+        ptrdiff_t maxIdx = 0;
+
         for (u32 i = 0, size = cache_task.size(); i < size; ++i)
         {
             // Gain access to data
@@ -197,17 +201,20 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
             float D = view.distance_to_sqr(C);
 
             // Select
-            for (int j = 0; j < dm_max_decompress; ++j)
+            if (D < bestDistances[maxIdx])
             {
-                if (D < bestDistances[j])
-                {
-                    bestDistances[j] = D;
-                    bestIndexes[j] = i;
-                }
+                bestDistances[maxIdx] = D;
+                bestIndexes[maxIdx] = i;
+
+                const auto maxIt = std::max_element(bestDistancesBegin, bestDistancesEnd);
+                maxIdx = std::distance(bestDistancesBegin, maxIt);
             }
         }
 
-        for (int i = 0; i < dm_max_decompress; ++i)
+        // Because indexes become invalid after an erase, sort them and process in the reverse order to erase everything correctly
+        std::sort(bestIndexes, bestIndexes + dm_max_decompress);
+
+        for (int i = dm_max_decompress - 1; i >= 0; --i)
         {
             const u32 bestId = bestIndexes[i];
 
