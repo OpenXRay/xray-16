@@ -29,6 +29,22 @@
 // refs
 class Task;
 
+class ENGINE_API CSecondVPParams //--#SM+#-- +SecondVP+
+{
+    bool isActive = false;
+
+public:
+    bool isCamReady;
+    u32 screenWidth;
+    u32 screenHeight;
+    float scale{ 1.0f };
+    float fov{ 1.f };
+    Fvector position{}, direction{}, normal{}, right{};
+    IC bool IsSVPActive() { return isActive; }
+    IC void SetSVPActive(bool bState) {};
+    IC bool IsSVPFrame() { return false; }
+};
+
 class ENGINE_API CRenderDevice : public IWindowHandler
 {
 public:
@@ -155,6 +171,8 @@ public:
 
     bool m_allowWindowDrag{}; // For windowed mode
     bool IsAnselActive{};
+
+    CSecondVPParams m_SecondViewport;
 
     CRenderDevice()
     {

@@ -194,12 +194,24 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
     // codepath is the same, only the shaders differ
     // ***only pixel shaders differ***
+    C.SH->flags.isLandscape = FALSE;
     string256 mask;
     strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_mask");
     switch (C.iElement)
     {
     case SE_R2_NORMAL_HQ: // deffer
-        uber_deffer(C, true, "impl", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
+#if RENDER == R_R4
+        if (RImplementation.o.ssfx_terrain)
+        {
+            C.SH->flags.isLandscape = TRUE;
+            uber_deffer(C, true, "terrain", "terrain_high", false, oT2_Name[0] ? oT2_Name : 0, true);
+        }
+        else
+#endif
+        {
+            uber_deffer(C, true, "impl", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
+        }
+
         // C.r_Sampler		("s_mask",	mask);
         // C.r_Sampler		("s_lmap",	C.L_textures[1]);
 
@@ -230,6 +242,16 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_dx11Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
 
+#if RENDER == R_R4
+        if (RImplementation.o.ssfx_terrain)
+        {
+            C.r_dx11Texture("s_height_r", strconcat(sizeof(mask), mask, oR_Name, "_height"));
+            C.r_dx11Texture("s_height_g", strconcat(sizeof(mask), mask, oG_Name, "_height"));
+            C.r_dx11Texture("s_height_b", strconcat(sizeof(mask), mask, oB_Name, "_height"));
+            C.r_dx11Texture("s_height_a", strconcat(sizeof(mask), mask, oA_Name, "_height"));
+        }
+#endif
+
         C.r_dx11Texture("s_puddles_normal", "fx\\water_normal");
         C.r_dx11Texture("s_puddles_perlin", "fx\\puddles_perlin");
         C.r_dx11Texture("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
@@ -252,11 +274,44 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     case SE_R2_NORMAL_LQ: // deffer
-        uber_deffer(C, false, "base", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
+#if RENDER == R_R4
+        if (RImplementation.o.ssfx_terrain)
+        {
+            C.SH->flags.isLandscape = TRUE;
+            uber_deffer(C, false, "base", "terrain_mid", false, oT2_Name[0] ? oT2_Name : 0, true);
+        }
+        else
+#endif
+        {
+            // Vanilla
+            uber_deffer(C, false, "base", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
+        }
 
         // C.r_Sampler		("s_lmap",	C.L_textures[1]);
 
-        C.r_dx11Texture("s_lmap", C.L_textures[1]);
+#if RENDER == R_R4
+        if (RImplementation.o.ssfx_terrain)
+        {
+            C.r_dx11Texture("s_mask", mask);
+            LPSTR LodTexture = strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_lod_textures");
+            string_path fn;
+            if (FS.exist(fn, "$game_textures$", LodTexture, ".dds"))
+            {
+                C.r_dx11Texture("s_lod_texture", LodTexture);
+            }
+            else
+            {
+                C.r_dx11Texture("s_lod_texture", "terrain\\default_lod_textures");
+            }
+
+            C.r_dx11Sampler("smp_base");
+        }
+        else
+#endif
+        {
+            C.r_dx11Texture("s_lmap", C.L_textures[1]);
+        }
+
         C.r_dx11Sampler("smp_linear");
 
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -267,12 +322,34 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     case SE_R2_SHADOW: // smap
         // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
         // else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
-        C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
+#if RENDER == R_R4
+        if (RImplementation.o.ssfx_terrain)
+        {
+            C.r_Pass("shadow_direct_terrain", "dumb", FALSE, TRUE, TRUE, FALSE);
+        }
+        else
+#endif
+        {
+            // Vanilla
+            C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
+        }
         // C.r_Sampler		("s_base",C.L_textures[0]);
         C.r_dx11Texture("s_base", C.L_textures[0]);
         C.r_dx11Sampler("smp_base");
         C.r_dx11Sampler("smp_linear");
         C.r_ColorWriteEnable(false, false, false, false);
+        C.r_End();
+        break;
+    case SE_R2_SSFX_LQ_TERRAIN: // SSFX Low quality terrain
+        C.SH->flags.isLandscape = TRUE;
+
+        uber_deffer(C, false, "base", "terrain_low", false, oT2_Name[0] ? oT2_Name : 0, true);
+
+        C.r_dx11Sampler("smp_linear");
+
+        C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        C.r_StencilRef(0x01);
+
         C.r_End();
         break;
     }

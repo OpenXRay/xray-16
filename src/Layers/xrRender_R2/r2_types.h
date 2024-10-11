@@ -71,6 +71,21 @@
 #define     r2_RT_blur_h_8      "$user$blur_h_8"
 #define     r2_RT_blur_8        "$user$blur_8"
 
+#define		r2_RT_ssfx				"$user$ssfx" // SSS Temp1
+#define		r2_RT_ssfx_temp			"$user$ssfx_temp" // SSS Temp2
+#define		r2_RT_ssfx_temp2		"$user$ssfx_temp2" // SSS Temp3
+#define		r2_RT_ssfx_temp3		"$user$ssfx_temp3"
+#define		r2_RT_ssfx_accum		"$user$ssfx_accum" // SSS Volumetric
+#define		r2_RT_ssfx_hud			"$user$ssfx_hud" // HUD & Velocity Buffer
+
+#define		r2_RT_ssfx_ssr			"$user$ssfx_ssr" // SSR Acc
+#define		r2_RT_ssfx_water		"$user$ssfx_water" // Water Acc
+#define		r2_RT_ssfx_water_waves	"$user$ssfx_water_waves"
+#define		r2_RT_ssfx_ao			"$user$ssfx_ao" // AO Acc
+#define		r2_RT_ssfx_il			"$user$ssfx_il" // IL Acc
+
+#define		r2_RT_ssfx_prevPos		"$user$ssfx_prev_p" // Prev Position
+
 static constexpr auto c_lmaterial = "L_material";
 static constexpr auto c_sbase = "s_base";
 static constexpr auto c_snoise = "s_noise";
@@ -101,6 +116,7 @@ const u32 LUMINANCE_size = 16;
 #define SE_R2_NORMAL_HQ     0 // high quality/detail
 #define SE_R2_NORMAL_LQ     1 // low quality
 #define SE_R2_SHADOW        2 // shadow generation
+#define SE_R2_SSFX_LQ_TERRAIN 3 // SSFX Low quality terrain
 
 // spot
 #define SE_L_FILL           0
