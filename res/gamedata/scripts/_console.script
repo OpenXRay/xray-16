@@ -1,0 +1,501 @@
+--[[ ----------------------------------------------------------------------------------------------
+ Платформы: CoP v1.6.02
+ Описание : Скриптовая консоль
+ Поддержка: 2013 © Shoker Mod
+ Версия	  : 1.0 (12.09.2013)
+ Автор	  : Shoker
+ Отдельное спасибо за метод отлова нажатия клавиш: Charsi, Shadows и ColR_iT
+--]] ----------------------------------------------------------------------------------------------
+
+--[[
+	Подключение:
+		* Функция actor_update() на апдейт игрока или любой другой постоянно выполняющийся код
+		* Если нужен вызов из меню, то вставить туда код для вызова консоли
+		* Все изменения в ориг. скриптах игры помечены знаком --#SM+#--
+		* XML-файлы с интерфейсом, сделаны под ЗП но там закоментированы текстуры под ЧН\ТЧ (правда не тестировал)
+--]]
+
+-- <!> Команды из мод-консоли можно также вводить через обычную игровую консоль через команду CONSOLE_COMMAND_NAME
+--     Однако команда выполнится только если игра не на паузе\в меню, а если в меню, то только если мод-консоль открыта
+
+LOG_FILE_NAME				= "gamedata\\"..user_name().."_console.log_dump"	--> Файл, куда сохраняется весь текст из консоли
+VAL_FILE_NAME				= "gamedata\\"..user_name().."_console.values"		--> Файл, куда сохраняются значения консольных переменных
+MENU_KEY					= DIK_keys.DIK_U			--> Клавиша для открытия консоли из меню
+GAME_KEY					= "kU"						--> Клавиша для открытия консоли из игры
+
+local CONSOLE_COMMAND_NAME	= "mm_net_srv_name"			--> Название консольной команды для ввода команд из ориг. консоли
+local FUNC_SCRIPT			= "_console_func"			--> Скрипт, где хранятся все функции
+local SAVE_TO_FILE			= true						--> Нужно ли сохранять текст
+local LOAD_FROM_FILE		= true						--> Нужно ли загружать текст
+local DIV					= string.char(1)			--> Символ-разделитель для файла лога, строки с ним не сохраняются в файл
+
+--\\ Возможные типы: "bol", "num", nil (строка)
+VALUES_TBL = {	--> Консольные переменные (Получать методами Get\SetValue)
+	["flush_log"]	=	{value_and_def = true,			types	=	"bol",		descr_1 = "true\\false",	descr_2 = "Сохранять лог на диск"}, 
+--	["num_test"]	=	{value_and_def = 1.23,			types	=	"num",		descr_1 = "number",			descr_2 = "Тест числа"}, 	
+--	["str_test"]	=	{value_and_def = "Hello Zep",	types	=	nil,		descr_1 = "string",			descr_2 = "Тест строки"}, 		
+}
+
+
+local uiConsole				= nil
+local registred_commands	= {}
+local bBindKey				= false
+
+--\\ Показать консоль
+function Show()
+	InitUI()
+	
+	if not uiConsole:IsShown() then
+		uiConsole:ShowDialog(false)
+	end
+end
+
+--\\ Скрыть консоль
+function Hide()
+	if uiConsole then
+		if uiConsole:IsShown() then
+			uiConsole:HideDialog()
+		end
+	end
+end
+
+--\\ Получить ссылку на консоль
+function Get()
+	InitUI()
+	return uiConsole
+end
+
+--\\ Выполнить консольную команду
+function Execute(sCommand, bNoLog)
+	Get():OnButtonExecute(sCommand, (bNoLog or true))
+end
+
+local bNeedLoad = true
+
+--\\ Получить консольное значение
+function GetVal(name)
+	if bNeedLoad == true then
+		fill_values_tbl()
+		bNeedLoad = false
+	end
+	
+	return VALUES_TBL[name].value_and_def
+end
+
+--\\ Сохранить консольное значение
+function SetVal(name, val)
+	if bNeedLoad == true then
+		fill_values_tbl()
+		bNeedLoad = false
+	end
+	
+	local tbl = VALUES_TBL[name]
+	
+	if tbl then
+		local set_value = _G[FUNC_SCRIPT].cast(val, tbl.types)
+		
+		if set_value == nil then
+			set_value = tbl.value_and_def
+		end
+		
+		if tbl.value_and_def ~= set_value then
+			tbl.value_and_def = set_value
+
+			-----------------------
+			local file = io.open( VAL_FILE_NAME, "w" )
+			for cmnd, ctbl in pairs(VALUES_TBL) do
+				if file ~= nil then
+					file:write( cmnd..DIV..tostring(ctbl.value_and_def), "\n" )		
+				else
+					Get():AddString("Can't find or create values file: "..VAL_FILE_NAME, "Red")
+				end
+			end
+			file:close()
+			-----------------------
+		end
+	else
+		Get():AddString("Can't finde console value with name ["..name.."]", "Red")
+	end
+end
+
+--\\ Инициализировать консоль
+function InitUI()
+	InitCommands()
+	if (uiConsole==nil) then
+		uiConsole = console_dialog()
+	end
+end
+
+--\\ Инициализировать только команды
+local bNeedInit = true
+function InitCommands()
+	if bNeedInit == true then
+		for idx,cmnd in ipairs(_G[FUNC_SCRIPT].COMMANDS_LIST) do
+			registred_commands[cmnd[1]] = cmnd[2]
+		end
+		get_console():execute(CONSOLE_COMMAND_NAME.." nil")
+		bNeedInit = false
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------
+
+--\\ Апдейт игрока
+function actor_update()
+	InitCommands()
+	UpdateConsole()
+end
+
+--\\ Апдейт консоли (как от игрока так и от интерфейса)
+function UpdateConsole()
+	if bBindKey == false then
+		get_console():execute("bind_console mm_net_srv_name con.show "..GAME_KEY)
+		bBindKey = true
+	end
+
+	local text = get_console():get_string(CONSOLE_COMMAND_NAME)
+	if text ~= "nil" then
+		Execute(text)	
+		get_console():execute(CONSOLE_COMMAND_NAME.." nil")
+	end
+end
+
+--\\ Вызвать консольную функцию из файла FUNC_SCRIPT
+function ExecuteFunc(reg_func, parsed_string)	
+	if _G[FUNC_SCRIPT][reg_func] then
+		_G[FUNC_SCRIPT][reg_func](parsed_string)
+	else
+		Get():AddString("Can't find registred function: "..reg_func.." ", "Red")
+	end
+end
+
+--\\ Вызвать консольную функцию из файла FUNC_SCRIPT
+function ExecuteValue(reg_value, value, bMsg)
+	if VALUES_TBL[reg_value] then			
+		if value ~= nil then
+			SetVal(reg_value, value)
+			
+			if bMsg == true then
+				Get():AddString("Set value for "..reg_value.." ["..tostring(value).."]", "Green")
+			end
+		else
+			if bMsg == true then
+				Get():AddString(reg_value.." = "..tostring(GetVal(reg_value)).." ", "Green")
+			end
+		end
+	end
+end
+
+--\\ Загрузить таблицу консольных переменных из файла
+function fill_values_tbl()
+	local file = io.open( VAL_FILE_NAME, "r" )
+	if file ~= nil then
+		for line in file:lines() do
+			if line then
+				local tbl = _u.string_expl(line, DIV)				
+				
+				if tbl[1] ~= nil and tbl[1] ~= "" then
+					local tbl_val = VALUES_TBL[tbl[1]]
+					if tbl_val then
+						local last_value = tbl_val.value_and_def
+						tbl_val.value_and_def = _G[FUNC_SCRIPT].cast(tbl[2], tbl_val.types)
+						
+						if tbl_val.value_and_def == nil then
+							tbl_val.value_and_def = last_value
+						end
+					else
+						-- Заблокировано из за применения функции GetValue в коде консоли
+						-- т.к там идёт вызов функции GetVal в процессе создания консоли, которая 
+						-- вызывает эту функцию fill_values_tbl и если код доходит до этих строчек
+						-- то функция Get() обращается к ещё не созданной до конца консоли и создаёт вторую (3-ю, 4-ю...)
+						-- консоль и так всё циклится пока игра не вылетит.
+						--Get():AddString("Can't finde console value with name ["..tbl[1].."]", "Red")
+					end
+				end
+			end
+		end
+		file:close()
+	else
+		--Get():AddString("Can't find values file: "..VAL_FILE_NAME, "Red")
+	end		
+end
+
+---------------------------------------------------------------------------------------------------------------
+
+
+class "console_dialog" (CUIScriptWnd)
+function console_dialog:__init() super()
+
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_console.xml")
+	
+	self:SetWndRect(Frect():set(0,0,1024,768))
+	self.form		= xml:InitStatic("console", self)
+	
+	
+	self.editbox	= xml:InitEditBox("console:edit_box", self.form)
+	self:Register	(self.editbox, "command_box")
+
+	self.btn_x	= xml:Init3tButton("console:btn_x", self.form)
+	self:Register(self.btn_x, "btn_x")
+		
+	self.btn_exec	= xml:Init3tButton("console:btn_execute", self.form)
+	self:Register(self.btn_exec, "btn_execute")
+	
+	self.btn_r	= xml:Init3tButton("console:btn_r", self.form)
+	self:Register(self.btn_r, "btn_r")
+	
+	ctrl					= CUIWindow()
+	xml:InitWindow			("file_item:main",0,ctrl)
+
+	self.file_item_main_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+	
+	xml:InitWindow			("file_item:fn",0,ctrl)
+	self.file_item_fn_sz	= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+
+	self.list_box	= xml:InitListBox("console:list",self.form)
+
+	self.list_box:ShowSelectedItem	(true)
+	self:Register	(self.list_box, "list_window")	
+
+	self:Clear()
+	
+	if LOAD_FROM_FILE then
+		self:LoadLog()
+	end
+	
+	self:ReInit()
+	InitCommands()
+	
+	--------------------------------------------------------------------------------
+	self:AddCallback("btn_execute",	ui_events.BUTTON_CLICKED,				self.OnButtonExecute,		self)
+	self:AddCallback("btn_x",		ui_events.BUTTON_CLICKED,				self.OnButtonX,				self)	
+	self:AddCallback("btn_r",		ui_events.BUTTON_CLICKED,				self.OnButtonR,				self)		
+	self:AddCallback("list_window", ui_events.WINDOW_LBUTTON_DB_CLICK,		self.OnListItemDbClicked,	self)
+end
+
+function console_dialog:ReInit()
+	self:AddString("")
+	self:AddString("<<<New Console ["..os.date().."]>>>")
+	self:AddString("_______________________________")		
+end
+
+function console_dialog:Clear()
+	self.list_box:Clear()	
+end
+
+function console_dialog:Update()
+	CUIScriptWnd.Update(self)
+	UpdateConsole()	--> Для обновления из меню
+end
+
+class "console_item" (CUIListBoxItem)
+
+function console_item:__init() super()
+	self:SetTextColor(GetARGB(255, 170, 170, 170))
+
+	self.fn = self:GetTextItem()
+	self.fn:SetFont(GetFontLetterica18Russian())
+	self.fn:SetEllipsis(true)
+end
+
+function console_dialog:AddString(sStr, sColor, bNoFlush)
+	if sStr ~= nil then
+		if string.match(sStr, DIV) then
+			bNoFlush = true
+		end
+	
+		local _itm			= console_item(self.file_item_main_sz.y)
+		
+		if sColor == nil then sColor = "White" end
+		_itm:SetTextColor(GetARGB(_G[FUNC_SCRIPT].ColorTbl[sColor].a, _G[FUNC_SCRIPT].ColorTbl[sColor].r, _G[FUNC_SCRIPT].ColorTbl[sColor].g, _G[FUNC_SCRIPT].ColorTbl[sColor].b))
+
+		_itm:SetWndSize		(self.file_item_main_sz)
+
+		_itm.fn:SetWndPos	(vector2():set(0,0))
+		_itm.fn:SetWndSize	(self.file_item_fn_sz)
+		_itm.fn:SetText		(sStr)
+
+		self.list_box:AddExistingItem(_itm)
+		
+		if bNoFlush ~= true then
+			if SAVE_TO_FILE and GetVal("flush_log") == true then
+				self:Flush(sStr, sColor)
+			end
+		end
+	end
+end
+
+function console_dialog:Log(text)
+	self:AddString(text, "Log")
+end
+
+function console_dialog:Flush(sStr, sColor)
+	local sStr = tostring(sStr)
+	local file = io.open( LOG_FILE_NAME, "a" )
+	if file ~= nil then
+		file:write( sColor..DIV..sStr, "\n" )		
+		file:close()
+	end
+end
+
+function console_dialog:LoadLog(file_name, bAsText)
+	if file_name == nil then
+		file_name = LOG_FILE_NAME
+	end
+	
+	local file = io.open( file_name, "r" )
+	if file ~= nil then
+		for line in file:lines() do
+			if line then
+				local tbl = {}
+				
+				if bAsText == true then
+					tbl[1] = "Yelow"
+					tbl[2] = line
+				else
+					tbl = _u.string_expl(line, DIV)				
+					if tbl[2] == "" or tbl[2] == nil or tbl[2] == "nil" then
+						tbl[2] = " "
+					end
+				end
+				
+				if bAsText == true or tbl[1] == nil or _G[FUNC_SCRIPT].ColorTbl[tbl[1]] == nil then
+					tbl[1] = "Yelow"
+				end
+				
+				
+				self:AddString(tbl[2], tbl[1], true)
+			end
+		end
+		file:close()
+	else
+		self:AddString("Can't find file: "..file_name, "Red")
+	end
+end
+
+-------------------------------------------------------------------------------
+
+function console_dialog:OnListItemDbClicked()
+	if self.list_box:GetSize()==0 then return end
+
+	self:OnButtonX()
+	
+	local item			= self.list_box:GetSelectedItem()
+	
+	if item then
+		local item_text		= item.fn:GetText()
+		self.editbox:SetText(item_text)
+	end
+end
+
+function console_dialog:OnButtonX()
+	self.editbox:SetText("")
+end
+
+function console_dialog:OnButtonR()
+	if self.list_box:GetSize()==0 then return end
+	
+	local item	= self.list_box:GetSelectedItem()
+
+	if item then
+		local index = self.list_box:GetSelectedIndex()
+
+		if index == -1 or index == nil then return end
+
+		item		= self.list_box:GetItemByIndex(index)
+		self.list_box:RemoveItem(item)
+	end
+end
+
+
+function console_dialog:OnButtonExecute(manual_text, bSilent)
+	local text = manual_text or self.editbox:GetText()
+	
+	if bSilent == nil then bSilent = false end
+	
+	if bSilent ~= true then
+		self:AddString(text, "Alpha")
+	end
+	
+	if text ~= "" then
+	------------------------------------	
+		local parsed_string = _u.string_expl(text, " ")
+		local command_name	= parsed_string[1]
+		local reg_func		= registred_commands[command_name]
+		local bIsValue		= VALUES_TBL[command_name] ~= nil
+
+		parsed_string[1] = nil
+		if text ~= command_name and text ~= command_name.." " then
+			local params = string.gsub (text, command_name.." ", "")
+			local spaces = string.gsub (params, " ", "")
+				
+			if spaces ~= "" then
+				parsed_string[1] = tostring(string.gsub (text, command_name.." ", ""))
+			end
+		end
+			
+		--* Это зарегистрированная команда
+		if reg_func ~= nil then		
+			if bSilent ~= true then
+				self:AddString("Execute command: "..command_name.." ("..reg_func..")", "Green")		
+			end
+			
+			ExecuteFunc(reg_func, parsed_string)
+		end
+		
+		--* Это консольная переменная
+		if bIsValue then
+			ExecuteValue(command_name, parsed_string[1], not bSilent)
+		end		
+	------------------------------------
+	end
+end
+
+function console_dialog:OnButtonClose()
+	Hide()
+end
+
+function console_dialog:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	local bNeedFocus = true
+	
+	if (dik == DIK_keys.DIK_ESCAPE) and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		self:OnButtonClose()
+		bNeedFocus = false
+	end
+	
+	if dik == DIK_keys.DIK_RETURN and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+  		self:OnButtonExecute()
+		bNeedFocus = false
+    end
+	
+	if dik == DIK_keys.DIK_LMENU and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+  		self:OnButtonX()
+		bNeedFocus = false
+    end
+	
+	if bNeedFocus then
+		self.editbox:CaptureFocus(true)
+	end
+	
+	return true
+end
+

@@ -18,7 +18,7 @@ IC static void CScriptActionBase_Export(lua_State* luaState)
     module(luaState)
     [
         class_<CScriptActionBase, no_bases, default_holder, CScriptActionWrapper>("action_base")
-            .def_readonly("object", &CScriptActionBase::m_object)
+            .def_readwrite("object", &CScriptActionBase::m_object)
             .def_readonly("storage", &CScriptActionBase::m_storage)
             .def(constructor<>())
             .def(constructor<CScriptGameObject*>())

@@ -54,6 +54,9 @@ enum ECallbackType : u32
     eInvBoxItemTake,
     eWeaponNoAmmoAvailable,
 
+    //Alundaio: added defines
+    eActorHudAnimationEnd,
+
     //AVO: custom callbacks
     // Input
     eKeyPress,
@@ -69,19 +72,18 @@ enum ECallbackType : u32
     eItemToBelt,
     eItemToSlot,
     eItemToRuck,
-    // Actor
-    eActorBeforeDeath,
-    //-AVO
-
-    // vehicle
-    eAttachVehicle,
-    eDetachVehicle,
-    eUseVehicle,
-
     // weapon
     eOnWeaponZoomIn,
     eOnWeaponZoomOut,
     eOnWeaponJammed,
+    eOnWeaponMagazineEmpty,
+    // Actor
+    eActorBeforeDeath,
+    // vehicle
+    eAttachVehicle,
+    eDetachVehicle,
+    eUseVehicle,
+    //-AVO
 
     eDummy = u32(-1),
 };

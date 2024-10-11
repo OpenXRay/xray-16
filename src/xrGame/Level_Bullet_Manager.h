@@ -83,7 +83,7 @@ struct SBullet
 public:
     SBullet(const Fvector& position, const Fvector& direction, float start_speed, float power,
         /*float power_critical,*/ float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type,
-        float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit);
+        float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, int iShotNum = 0);
 
     bool CanBeRenderedNow() const { return (Device.dwFrame > init_frame_num); }
 };
@@ -207,7 +207,7 @@ public:
     void AddBullet(const Fvector& position, const Fvector& direction, float starting_speed, float power,
         /*float power_critical,*/ float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type,
         float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit,
-        bool AimBullet = false);
+        bool AimBullet = false, int iShotNum = 0);
 
     void CommitEvents(); // @ the start of frame
     void CommitRenderSet(); // @ the end of frame

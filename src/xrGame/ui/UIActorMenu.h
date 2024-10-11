@@ -222,6 +222,7 @@ private:
     void highlight_weapons_for_ammo(PIItem ammo_item, CUIDragDropListEx* ddlist);
     bool highlight_addons_for_weapon(PIItem weapon_item, CUICellItem* ci);
     void highlight_weapons_for_addon(PIItem addon_item, CUIDragDropListEx* ddlist);
+    void highlight_equipped() const;
 
 protected:
     void Construct();
@@ -393,12 +394,17 @@ public:
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
 
-    CScriptGameObject* GetCurrentItemAsGameObject();
-    void HighlightSectionInSlot(pcstr section, EDDListType type, u16 slot_id = 0);
-    void HighlightForEachInSlot(const luabind::functor<bool>& functor, EDDListType type, u16 slot_id);
+	//AxelDominator && Alundaio consumable use condition
+	void RefreshCurrentItemCell();
 
-    void RefreshCurrentItemCell();
-    void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
+	CScriptGameObject* GetCurrentItemAsGameObject();
+	void HighlightSectionInSlot(pcstr section, EDDListType type, u16 slot_id = 0);
+	void HighlightForEachInSlot(const luabind::functor<bool>& functor, EDDListType type, u16 slot_id);
+    bool ToSlotScript(CScriptGameObject* GO, bool force_place, u16 slot_id);
+    bool ToBeltScript(CScriptGameObject* GO, bool b_use_cursor_pos);
+
+	//-AxelDominator && Alundaio consumable use condition
+	void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu
 
     pcstr GetDebugType() override { return "CUIActorMenu"; }
 }; // class CUIActorMenu

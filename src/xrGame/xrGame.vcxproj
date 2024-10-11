@@ -784,6 +784,7 @@
     <ClInclude Include="hit_immunity_space.h" />
     <ClInclude Include="hit_memory_manager.h" />
     <ClInclude Include="hit_memory_manager_inline.h" />
+    <ClInclude Include="HolderEntityObject.h" />
     <ClInclude Include="holder_custom.h" />
     <ClInclude Include="HUDCrosshair.h" />
     <ClInclude Include="HudItem.h" />
@@ -1371,6 +1372,7 @@
     <ClInclude Include="ui\UIPdaWnd.h" />
     <ClInclude Include="ui\UIRankFaction.h" />
     <ClInclude Include="ui\UIRankIndicator.h" />
+    <ClInclude Include="ui\UIRankingsCoC.h" />
     <ClInclude Include="ui\UIRankingWnd.h" />
     <ClInclude Include="ui\UIScriptWnd.h" />
     <ClInclude Include="ui\UISecondTaskWnd.h" />
@@ -1411,7 +1413,6 @@
     <ClInclude Include="WeaponBinoculars.h" />
     <ClInclude Include="WeaponBinocularsVision.h" />
     <ClInclude Include="weaponBM16.h" />
-    <ClInclude Include="WeaponCustomPistolAuto.h" />
     <ClInclude Include="WeaponCustomPistol.h" />
     <ClInclude Include="WeaponFN2000.h" />
     <ClInclude Include="WeaponFORT.h" />
@@ -2358,6 +2359,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp" />
     <ClCompile Include="holder_custom.cpp" />
     <ClCompile Include="holder_custom_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3334,6 +3336,7 @@
     <ClCompile Include="ui\UIPdaWnd.cpp" />
     <ClCompile Include="ui\UIRankFaction.cpp" />
     <ClCompile Include="ui\UIRankIndicator.cpp" />
+    <ClCompile Include="ui\UIRankingsCoC.cpp" />
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3396,7 +3399,6 @@
     <ClCompile Include="WeaponBinoculars.cpp" />
     <ClCompile Include="WeaponBinocularsVision.cpp" />
     <ClCompile Include="weaponBM16.cpp" />
-    <ClCompile Include="WeaponCustomPistolAuto.cpp" />
     <ClCompile Include="WeaponCustomPistol.cpp" />
     <ClCompile Include="WeaponDispersion.cpp" />
     <ClCompile Include="WeaponFire.cpp" />

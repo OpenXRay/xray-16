@@ -106,7 +106,6 @@ luabind::class_<CScriptGameObject>& script_register_game_object1(luabind::class_
         .def("group", &CScriptGameObject::Group)
         .def("change_team", (void (CScriptGameObject::*)(u8, u8, u8))(&CScriptGameObject::ChangeTeam))
         .def("set_visual_memory_enabled", &CScriptGameObject::SetVisualMemoryEnabled)
-         // XXX: this is a workaround, since luabind can't determine default function arguments...
         .def("kill", (void (CScriptGameObject::*)(CScriptGameObject*))&CScriptGameObject::Kill)
         .def("kill", (void (CScriptGameObject::*)(CScriptGameObject*, bool))(&CScriptGameObject::Kill))
         .def("hit", &CScriptGameObject::Hit)

@@ -79,7 +79,7 @@ static void CSE_ALifeOnlineOfflineGroup_Export(lua_State* luaState)
     [
         class_<CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type>("MEMBERS__value_type")
             .def_readonly("id", &CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type::first)
-            .def_readonly("object", &CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type::second),
+            .def_readwrite("object", &CSE_ALifeOnlineOfflineGroup::MEMBERS::value_type::second),
 
         luabind_class_online_offline_group2(CSE_ALifeOnlineOfflineGroup, "cse_alife_online_offline_group",
                                             CSE_ALifeDynamicObject, CSE_ALifeSchedulable)

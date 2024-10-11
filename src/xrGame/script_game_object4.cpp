@@ -24,6 +24,26 @@
 #include "Artefact.h"
 #include "stalker_sound_data.h"
 
+// AVO: for functions for testing object class
+//#include "car.h"
+//#include "helicopter.h"
+#include "Actor.h"
+#include "CustomOutfit.h"
+//#include "CustomZone.h"
+#include "ai/monsters/basemonster/base_monster.h"
+//#include "Artifact.h"
+//#include "medkit.h"
+//#include "antirad.h"
+#include "Scope.h"
+#include "Silencer.h"
+#include "Torch.h"
+#include "GrenadeLauncher.h"
+#include "searchlight.h"
+//#include "WeaponAmmo.h"
+//#include "Grenade.h"
+//#include "BottleItem.h"
+#include "WeaponMagazinedWGrenade.h"
+
 class CWeapon;
 
 //////////////////////////////////////////////////////////////////////////
@@ -317,7 +337,7 @@ void CScriptGameObject::start_particles(LPCSTR pname, LPCSTR bone)
         return;
 
     IKinematics* K = smart_cast<IKinematics*>(object().Visual());
-    R_ASSERT(K);
+    R_ASSERT1_CURE(K, true, { return; });
 
     u16 play_bone = K->LL_BoneID(bone);
     R_ASSERT(play_bone != BI_NONE);
@@ -335,7 +355,7 @@ void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
         return;
 
     IKinematics* K = smart_cast<IKinematics*>(object().Visual());
-    R_ASSERT(K);
+    R_ASSERT1_CURE(K, true, { return; });
 
     u16 play_bone = K->LL_BoneID(bone);
     R_ASSERT(play_bone != BI_NONE);
@@ -347,7 +367,6 @@ void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
             LuaMessageType::Error, "Cant stop particles, bone [%s] is not visible now", bone);
 }
 
-#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 //AVO: directly set entity health instead of going through normal health property which operates on delta
 void CScriptGameObject::SetHealthEx(float hp)
 {
@@ -357,4 +376,51 @@ void CScriptGameObject::SetHealthEx(float hp)
     obj->SetfHealth(hp);
 }
 //-AVO
-#endif
+
+// AVO: functions for testing object class
+// Credits: KD
+#define TEST_OBJECT_CLASS(funcname, classname)\
+    bool funcname() const\
+    {\
+        if (smart_cast<classname*>(&object()))\
+            return true;\
+        return false;\
+    }
+
+//TEST_OBJECT_CLASS(CScriptGameObject::IsGameObject, CGameObject)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsCar, CCar)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsHeli, CHelicopter)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsHolderCustom, CHolderCustom)
+TEST_OBJECT_CLASS(CScriptGameObject::IsEntityAlive, CEntityAlive)
+TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryItem, CInventoryItem)
+TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryOwner, CInventoryOwner)
+TEST_OBJECT_CLASS(CScriptGameObject::IsActor, CActor)
+TEST_OBJECT_CLASS(CScriptGameObject::IsCustomMonster, CCustomMonster)
+TEST_OBJECT_CLASS(CScriptGameObject::IsWeapon, CWeapon)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsMedkit, CMedkit)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsEatableItem, CEatableItem)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsAntirad, CAntirad)
+TEST_OBJECT_CLASS(CScriptGameObject::IsCustomOutfit, CCustomOutfit)
+TEST_OBJECT_CLASS(CScriptGameObject::IsScope, CScope)
+TEST_OBJECT_CLASS(CScriptGameObject::IsSilencer, CSilencer)
+TEST_OBJECT_CLASS(CScriptGameObject::IsGrenadeLauncher, CGrenadeLauncher)
+TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponMagazined, CWeaponMagazined)
+TEST_OBJECT_CLASS(CScriptGameObject::IsSpaceRestrictor, CSpaceRestrictor)
+TEST_OBJECT_CLASS(CScriptGameObject::IsStalker, CAI_Stalker)
+TEST_OBJECT_CLASS(CScriptGameObject::IsAnomaly, CCustomZone)
+TEST_OBJECT_CLASS(CScriptGameObject::IsMonster, CBaseMonster)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsExplosive, CExplosive)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsScriptZone, CScriptZone)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsProjector, CProjector)
+TEST_OBJECT_CLASS(CScriptGameObject::IsTrader, CAI_Trader)
+TEST_OBJECT_CLASS(CScriptGameObject::IsHudItem, CHudItem)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsFoodItem, CFoodItem)
+TEST_OBJECT_CLASS(CScriptGameObject::IsArtefact, CArtefact)
+TEST_OBJECT_CLASS(CScriptGameObject::IsAmmo, CWeaponAmmo)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsMissile, CMissile)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsPhysicsShellHolder, CPhysicsShellHolder)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsGrenade, CGrenade)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsBottleItem, CBottleItem)
+//TEST_OBJECT_CLASS(CScriptGameObject::IsTorch, CTorch)
+TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponGL, CWeaponMagazinedWGrenade)
+TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryBox, CInventoryBox)

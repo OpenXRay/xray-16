@@ -1703,6 +1703,14 @@ const CInventoryItem* CWeapon::can_kill(const xr_vector<const CGameObject*>& ite
 
 bool CWeapon::ready_to_kill() const
 {
+	//Alundaio
+    const auto io = smart_cast<const CInventoryOwner*>(H_Parent());
+	if (!io)
+		return false;
+
+	if (!io->inventory().ActiveItem() || io->inventory().ActiveItem()->object().ID() != ID())
+		return false;
+	//-Alundaio
     return (
         !IsMisfire() && ((GetState() == eIdle) || (GetState() == eFire) || (GetState() == eFire2)) && GetAmmoElapsed());
 }

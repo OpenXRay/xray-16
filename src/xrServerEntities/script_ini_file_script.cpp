@@ -14,14 +14,14 @@
 CScriptIniFile* get_system_ini() { return ((CScriptIniFile*)pSettings); }
 bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::string& V)
 {
-    THROW3(self->section_exist(S), "Cannot find section", S);
-    THROW2((int)self->line_count(S) > L, "Invalid line number");
+    VERIFY3(self->section_exist(S), "Cannot find section", S);
+    VERIFY2((int)self->line_count(S) > L, "Invalid line number");
 
     N = "";
     V = "";
 
     LPCSTR n, v;
-    bool result = !!self->r_line(S, L, &n, &v);
+    bool result = self->r_line(S, L, &n, &v);
     if (!result)
         return (false);
 
@@ -33,7 +33,7 @@ bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::
 
 bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind::string& V)
 {
-    THROW3(self->section_exist(S), "Cannot find section", S);
+    VERIFY3(self->section_exist(S), "Cannot find section", S);
 
     N = "";
     V = "";
