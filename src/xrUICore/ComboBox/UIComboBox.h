@@ -36,6 +36,8 @@ public:
     void InitComboBox(Fvector2 pos, float width);
     void SetItemIDX(int idx);
     void SetItemToken(int tok);
+    u32 GetSelectedIDX();
+    void SetSelectedIDX(u32 idx);
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
     virtual void OnFocusLost();

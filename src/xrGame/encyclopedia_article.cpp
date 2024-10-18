@@ -145,5 +145,5 @@ void CEncyclopediaArticle::InitXmlIdToIndex()
     if (!id_to_index::tag_name)
         id_to_index::tag_name = "article";
     if (!id_to_index::file_str)
-        id_to_index::file_str = pSettings->r_string("encyclopedia", "files");
+        id_to_index::file_str = pSettings->read_if_exists<pcstr>("encyclopedia", "files", "");
 }

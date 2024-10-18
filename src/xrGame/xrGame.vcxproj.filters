@@ -6400,9 +6400,6 @@
     <ClInclude Include="WeaponRevolver.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
     </ClInclude>
-    <ClInclude Include="WeaponCustomPistolAuto.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
-    </ClInclude>
     <ClInclude Include="raypick.h">
       <Filter>Core\Common</Filter>
     </ClInclude>
@@ -6487,6 +6484,12 @@
     </ClInclude>
     <ClInclude Include="player_hud_tune.h">
       <Filter>Core\Client\Objects\items &amp; weapons\HudItem</Filter>
+    </ClInclude>
+    <ClInclude Include="HolderEntityObject.h">
+      <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIRankingsCoC.h">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9755,9 +9758,6 @@
     <ClCompile Include="WeaponRevolver.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponCustomPistolAuto.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Pistol</Filter>
-    </ClCompile>
     <ClCompile Include="raypick.cpp">
       <Filter>Core\Common</Filter>
     </ClCompile>
@@ -9842,6 +9842,12 @@
     </ClCompile>
     <ClCompile Include="ui\UIMapFilters.cpp">
       <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp">
+      <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIRankingsCoC.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

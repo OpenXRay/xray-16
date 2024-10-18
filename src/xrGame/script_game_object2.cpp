@@ -81,8 +81,15 @@ CScriptGameObject* CScriptGameObject::best_weapon()
     }
     else
     {
-        CGameObject* game_object = object_handler->best_weapon() ? &object_handler->best_weapon()->object() : 0;
-        return (game_object ? game_object->lua_game_object() : 0);
+        //Alundaio: extra security
+        CGameObject* game_object = object_handler->best_weapon() ? &object_handler->best_weapon()->object() : nullptr;
+        if (!game_object)
+            return nullptr;
+
+        if (!game_object->H_Parent() || game_object->H_Parent()->ID() != object().ID())
+            return nullptr;
+        //-Alundaio
+        return game_object->lua_game_object();
     }
 }
 
@@ -610,3 +617,6 @@ void CScriptGameObject::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
 
     stalker->ResetBoneProtections(imm_sect, bone_sect);
 }
+
+void CScriptGameObject::set_visual_name(pcstr visual) { object().cNameVisual_set(visual); }
+pcstr CScriptGameObject::get_visual_name() const { return object().cNameVisual().c_str(); }

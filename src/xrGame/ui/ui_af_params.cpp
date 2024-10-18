@@ -3,6 +3,7 @@
 #include "xrUICore/Static/UIStatic.h"
 #include "Actor.h"
 #include "ActorCondition.h"
+#include "inventory_item.h"
 #include "Common/object_broker.h"
 #include "UIXmlInit.h"
 #include "UIHelper.h"
@@ -18,7 +19,7 @@ CUIArtefactParams::~CUIArtefactParams()
     xr_delete(m_Prop_line);
 }
 
-constexpr std::tuple<ALife::EInfluenceType, cpcstr, cpcstr, float, bool, cpcstr> af_immunity[] =
+constexpr std::tuple<u32, cpcstr, cpcstr, float, bool, cpcstr> af_immunity[] =
 {
     //{ ALife::infl_,           "section",                  "caption",                                  magnitude, sign_inverse, "unit" }
     { ALife::infl_rad,          "radiation_immunity",       "ui_inv_outfit_radiation_protection",       1.0f,      false,        "%" },
@@ -26,13 +27,11 @@ constexpr std::tuple<ALife::EInfluenceType, cpcstr, cpcstr, float, bool, cpcstr>
     { ALife::infl_acid,         "chemical_burn_immunity",   "ui_inv_outfit_chemical_burn_protection",   1.0f,      false,        "%" },
     { ALife::infl_psi,          "telepatic_immunity",       "ui_inv_outfit_telepatic_protection",       1.0f,      false,        "%" },
     { ALife::infl_electra,      "shock_immunity",           "ui_inv_outfit_shock_protection",           1.0f,      false,        "%" },
-    //{ ALife::infl_strike,     "strike_immunity",          "ui_inv_outfit_strike_protection",          1.0f,      false,        "%" }
-    //{ ALife::infl_wound,      "wound_immunity",           "ui_inv_outfit_wound_protection",           1.0f,      false,        "%" }
-    //{ ALife::infl_explosion,  "explosion_immunity",       "ui_inv_outfit_explosion_protection",       1.0f,      false,        "%" }
-    //{ ALife::infl_fire_wound, "fire_wound_immunity",      "ui_inv_outfit_fire_wound_protection",      1.0f,      false,        "%" }
+    { 5,                        "strike_immunity",          "ui_inv_outfit_strike_protection",          1.0f,      false,        "%" },
+    { 6,                        "wound_immunity",           "ui_inv_outfit_wound_protection",           1.0f,      false,        "%" },
+    { 7,                        "explosion_immunity",       "ui_inv_outfit_explosion_protection",       1.0f,      false,        "%" },
+    { 8,                        "fire_wound_immunity",      "ui_inv_outfit_fire_wound_protection",      1.0f,      false,        "%" },
 };
-static_assert(std::size(af_immunity) == ALife::infl_max_count,
-    "All influences should be listed in the tuple above.");
 
 constexpr std::tuple<ALife::EConditionRestoreType, cpcstr, cpcstr, float, bool, cpcstr> af_restore[] =
 {
@@ -73,6 +72,10 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
     if ((m_Prop_line = UIHelper::CreateStatic(xml, "prop_line", this, false)))
         m_Prop_line->SetAutoDelete(false);
 
+    //Alundaio: Show AF Condition
+    m_disp_condition = CreateItem(xml, "condition", "ui_inv_af_condition");
+    //-Alundaio
+
     for (auto [id, section, caption, magnitude, sign_inverse, unit] : af_immunity)
     {
         m_immunity_item[id] = CreateItem(xml, section, magnitude, sign_inverse, unit, caption);
@@ -93,8 +96,7 @@ UIArtefactParamItem* CUIArtefactParams::CreateItem(CUIXml& uiXml, pcstr section,
 {
     UIArtefactParamItem* item = xr_new<UIArtefactParamItem>();
 
-    const UIArtefactParamItem::InitResult result = item->Init(uiXml, section);
-    switch (result)
+    switch (item->Init(uiXml, section))
     {
     case UIArtefactParamItem::InitResult::Failed:
         xr_delete(item);
@@ -129,23 +131,23 @@ bool CUIArtefactParams::Check(const shared_str& af_section)
     return !!pSettings->line_exist(af_section, "af_actor_properties");
 }
 
-void CUIArtefactParams::SetInfo(shared_str const& af_section)
+void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
 {
     DetachAll();
     if (m_Prop_line)
         AttachChild(m_Prop_line);
 
-    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor)
-    {
         return;
-    }
 
-    float val = 0.0f, max_val = 1.0f, h = 0.0f;
+    const shared_str& af_section = pInvItem.object().cNameSect();
+
+    float h = 0.0f;
     if (m_Prop_line)
         h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
 
-    const auto setValue = [&](UIArtefactParamItem* item)
+    const auto setValue = [&](UIArtefactParamItem* item, const float val)
     {
         item->SetValue(val);
 
@@ -157,27 +159,34 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
         AttachChild(item);
     };
 
+    //Alundaio: Show AF Condition
+    if (m_disp_condition)
+        setValue(m_disp_condition, pInvItem.GetCondition());
+    //-Alundaio
+
     for (auto [id, immunity_section, immunity_caption, magnitude, sign_inverse, unit] : af_immunity)
     {
         if (!m_immunity_item[id])
             continue;
 
         shared_str const& hit_absorbation_sect = pSettings->r_string(af_section, "hit_absorbation_sect");
-        val = pSettings->r_float(hit_absorbation_sect, immunity_section);
+        float val = pSettings->r_float(hit_absorbation_sect, immunity_section);
         if (fis_zero(val))
             continue;
 
-        max_val = actor->conditions().GetZoneMaxPower(id);
+        val *= pInvItem.GetCondition();
+        const float max_val = actor->conditions().GetZoneMaxPower(static_cast<ALife::EInfluenceType>(id));
         val /= max_val;
-        setValue(m_immunity_item[id]);
+        setValue(m_immunity_item[id], val);
     }
 
     if (m_additional_weight)
     {
-        val = pSettings->r_float(af_section, "additional_inventory_weight");
+        float val = pSettings->r_float(af_section, "additional_inventory_weight");
         if (!fis_zero(val))
         {
-            setValue(m_additional_weight);
+            val *= pInvItem.GetCondition();
+            setValue(m_additional_weight, val);
         }
     }
 
@@ -186,11 +195,12 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
         if (!m_restore_item[id])
             continue;
 
-        val = pSettings->r_float(af_section, restore_section);
+        float val = pSettings->r_float(af_section, restore_section);
         if (fis_zero(val))
             continue;
 
-        setValue(m_restore_item[id]);
+        val *= pInvItem.GetCondition();
+        setValue(m_restore_item[id], val);
     }
 
     SetHeight(h);

@@ -19,6 +19,14 @@ SCRIPT_EXPORT(CSE_ALifeInventoryItem, (),
     [
         class_<CSE_ALifeInventoryItem>("cse_alife_inventory_item")
             //.def(constructor<pcstr>())
+            .def("has_upgrade", +[](CSE_ALifeInventoryItem* ta, pcstr str)
+            {
+                ta->add_upgrade(str);
+            })
+            .def("add_upgrade", +[](CSE_ALifeInventoryItem* ta, pcstr str)
+            {
+                return ta->has_upgrade(str);
+            })
     ];
 });
 
@@ -70,6 +78,9 @@ SCRIPT_EXPORT(CSE_ALifeItemWeapon, (CSE_ALifeItem),
                 value("eAddonPermanent", int(CSE_ALifeItemWeapon::EWeaponAddonStatus::eAddonPermanent))
             ]
             .def("clone_addons", &CSE_ALifeItemWeapon::clone_addons)
+            .def("set_ammo_elapsed", &CSE_ALifeItemWeapon::set_ammo_elapsed)
+            .def("get_ammo_elapsed", &CSE_ALifeItemWeapon::get_ammo_elapsed)
+            .def("get_ammo_magsize", &CSE_ALifeItemWeapon::get_ammo_magsize)
     ];
 });
 

@@ -42,6 +42,7 @@ public:
     SCartridgeParam param_s;
 
     u8 m_LocalAmmoType;
+    bool m_4to1_tracer{};
 
     u16 bullet_material_idx;
     Flags8 m_flags;
@@ -81,6 +82,7 @@ public:
     u16 m_boxSize;
     u16 m_boxCurr;
     bool m_tracer;
+    bool m_4to1_tracer{};
 
 public:
     virtual CInventoryItem* can_make_killing(const CInventory* inventory) const;

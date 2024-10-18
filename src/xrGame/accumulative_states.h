@@ -1,6 +1,8 @@
 #ifndef ACCUMULATIVE_STATES_INCLUDED
 #define ACCUMULATIVE_STATES_INCLUDED
 
+#include <loki/Typelist.h>
+
 namespace award_system
 {
 enum enum_accumulative_player_values

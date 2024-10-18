@@ -64,7 +64,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     TIItemContainer items_list;
     if (m_pPartnerInvOwner)
     {
-        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false); // true
+        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false, m_pPartnerInvOwner->is_alive());
         UpdatePartnerBag();
     }
     else
@@ -87,7 +87,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
 
     // only for partner, box = no, monster = no
-    if (m_pPartnerInvOwner && !monster)
+    if (m_pPartnerInvOwner && !monster && !m_pPartnerInvOwner->is_alive())
     {
         CInfoPortionWrapper known_info_registry;
         known_info_registry.registry().init(m_pPartnerInvOwner->object_id());

@@ -69,26 +69,29 @@ void CPlanner::update()
         }
     }
 #endif
+	//Alundaio: debug action
+	static bool bDbgAct = strstr(Core.Params, "-dbgact") != NULL;
 
 #ifdef LOG_ACTION
     if (this->m_failed)
     {
         // printing current world state
         show();
-
-        Msg("! ERROR : there is no action sequence, which can transfer current world state to the target one");
-        Msg("Time : %6d", Device.dwTimeGlobal);
-        Msg("Object : %s", object_name());
-
+        Msg("! ERROR: there is no action sequence, which can transfer current world state to the target one: action[%s] object[%s], time[%6d]",
+            object_name(), current_action().m_action_name, Device.dwTimeGlobal);
         show_current_world_state();
         show_target_world_state();
-        //		VERIFY2						(!this->m_failed,"Problem solver couldn't build a valid path - verify your
-        //conditions,
-        // effects and goals!");
     }
+#else
+	if (bDbgAct && this->m_failed && current_action().m_action_name)
+		Msg("! ERROR: there is no action sequence, which can transfer current world state to the target one: action[%s]", current_action().m_action_name);
 #endif
 
     THROW(!this->solution().empty());
+	//Alundaio:
+	if (this->solution().empty())
+		return;
+	//-Alundaio
 
     if (initialized())
     {
@@ -96,6 +99,9 @@ void CPlanner::update()
         {
             current_action().finalize();
             m_current_action_id = this->solution().front();
+            //Alundaio: More detailed logging for initializing action
+            if (bDbgAct)
+                Msg("DEBUG: Action [%s] initializing", current_action().m_action_name);
             current_action().initialize();
         }
     }
@@ -103,8 +109,16 @@ void CPlanner::update()
     {
         m_initialized = true;
         m_current_action_id = this->solution().front();
+        //Alundaio: More detailed logging for initializing action
+        if (bDbgAct)
+            Msg("DEBUG: Action [%s] initializing", current_action().m_action_name);
         current_action().initialize();
     }
+
+    //Alundaio: More detailed logging for executing action; Knowing the last executing action before a crash can be very useful for debugging
+    if (bDbgAct)
+        Msg("DEBUG: Action [%s] executing", current_action().m_action_name);
+    //-Alundaio: Debug Action
 
     current_action().execute();
 }

@@ -77,6 +77,10 @@
 
 #include "xrEngine/Rain.h"
 
+//Alundaio
+#include "script_hit.h"
+//-Alundaio
+
 //const u32 patch_frames = 50;
 //const float respawn_delay = 1.f;
 //const float respawn_auto = 7.f;
@@ -100,7 +104,8 @@ Flags32 psActorFlags =
     AF_AUTOPICKUP |
     AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
-    AF_MULTI_ITEM_PICKUP
+    AF_MULTI_ITEM_PICKUP |
+    AF_USE_TRACERS
 };
 int psActorSleepTime = 1;
 
@@ -653,13 +658,35 @@ void CActor::Hit(SHit* pHDS)
         {
             HDS.power = 0.0f;
             inherited::Hit(&HDS);
+            return;
         }
 
-        float hit_power = HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
-        HDS.power = hit_power;
+        HDS.power = HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
         HDS.add_wound = true;
         if (g_Alive())
         {
+            CScriptHit tLuaHit;
+
+            tLuaHit.m_fPower = HDS.power;
+            tLuaHit.m_fImpulse = HDS.impulse;
+            tLuaHit.m_tDirection = HDS.direction();
+            tLuaHit.m_tHitType = HDS.hit_type;
+            tLuaHit.m_tpDraftsman = smart_cast<const CGameObject*>(HDS.who)->lua_game_object();
+
+            luabind::functor<bool> funct;
+            if (GEnv.ScriptEngine->functor("_G.CActor__BeforeHitCallback", funct))
+            {
+                if (!funct(smart_cast<CGameObject*>(this->lua_game_object()), &tLuaHit, HDS.boneID))
+                    return;
+            }
+
+            HDS.power = tLuaHit.m_fPower;
+            HDS.impulse = tLuaHit.m_fImpulse;
+            HDS.dir = tLuaHit.m_tDirection;
+            HDS.hit_type = (ALife::EHitType)(tLuaHit.m_tHitType);
+            //HDS.who = smart_cast<CObject*>(tLuaHit.m_tpDraftsman->object());
+            //HDS.whoID = tLuaHit.m_tpDraftsman->ID();
+
             /* AVO: send script callback*/
             callback(GameObject::eHit)(
                 this->lua_game_object(),
@@ -780,13 +807,13 @@ void CActor::HitMark(float P, Fvector dir, IGameObject* who_object, s16 element,
 
 void CActor::HitSignal(float perc, Fvector& vLocalDir, IGameObject* who, s16 element)
 {
+    //AVO: get bone names from IDs
+    //cpcstr bone_name = smart_cast<IKinematics*>(this->Visual())->LL_BoneName_dbg(element);
+    //Msg("Bone [%d]->[%s]", element, bone_name);
+    //-AVO
+
     if (g_Alive())
     {
-        /* AVO: to get bone names from IDs*/
-        /*Log("hit info");
-        Log("bone ID = %s", element);
-        Log("bone Name = %s", smart_cast<IKinematics*>(this->Visual())->LL_BoneName_dbg(element));
-        Log("hit info END");*/
         // check damage bone
         Fvector D;
         XFORM().transform_dir(D, vLocalDir);
@@ -1541,7 +1568,7 @@ void CActor::shedule_Update(u32 DT)
                 }
                 else if (m_pVehicleWeLookingAt)
                 {
-                    m_sDefaultObjAction = m_sCarCharacterUseAction;
+                    m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction != nullptr ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
                 }
                 else if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
                     m_pObjectWeLookingAt->cast_inventory_item()->CanTake())
@@ -1928,18 +1955,19 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
         {
-            conditions().ChangeBleeding(artefact->m_fBleedingRestoreSpeed * f_update_time);
-            conditions().ChangeHealth(artefact->m_fHealthRestoreSpeed * f_update_time);
-            conditions().ChangePower(artefact->m_fPowerRestoreSpeed * f_update_time);
-            conditions().ChangeSatiety(artefact->m_fSatietyRestoreSpeed * f_update_time);
-            if (artefact->m_fRadiationRestoreSpeed > 0.0f)
+            const float art_cond = artefact->GetCondition();
+            conditions().ChangeBleeding((artefact->m_fBleedingRestoreSpeed * art_cond) * f_update_time);
+            conditions().ChangeHealth((artefact->m_fHealthRestoreSpeed * art_cond) * f_update_time);
+            conditions().ChangePower((artefact->m_fPowerRestoreSpeed * art_cond) * f_update_time);
+            conditions().ChangeSatiety((artefact->m_fSatietyRestoreSpeed * art_cond) * f_update_time);
+            if (artefact->m_fRadiationRestoreSpeed * art_cond > 0.0f)
             {
-                float val = artefact->m_fRadiationRestoreSpeed - conditions().GetBoostRadiationImmunity();
+                float val = (artefact->m_fRadiationRestoreSpeed * art_cond) - conditions().GetBoostRadiationImmunity();
                 clamp(val, 0.0f, val);
                 conditions().ChangeRadiation(val * f_update_time);
             }
             else
-                conditions().ChangeRadiation(artefact->m_fRadiationRestoreSpeed * f_update_time);
+                conditions().ChangeRadiation((artefact->m_fRadiationRestoreSpeed * art_cond) * f_update_time);
         }
     }
 
@@ -1986,7 +2014,7 @@ float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
-            sum += artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type);
+            sum += artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type) * artefact->GetCondition();
     }
     return sum;
 }
@@ -2141,7 +2169,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fHealthRestoreSpeed;
+                res += artefact->m_fHealthRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
@@ -2156,7 +2184,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fRadiationRestoreSpeed;
+                res += artefact->m_fRadiationRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
@@ -2173,7 +2201,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fSatietyRestoreSpeed;
+                res += artefact->m_fSatietyRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
@@ -2190,7 +2218,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fPowerRestoreSpeed;
+                res += artefact->m_fPowerRestoreSpeed * artefact->GetCondition();
         }
         auto outfit = GetOutfit();
         if (outfit)
@@ -2212,7 +2240,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fBleedingRestoreSpeed;
+                res += artefact->m_fBleedingRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();

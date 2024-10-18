@@ -29,7 +29,7 @@ IC static void CScriptActionPlanner_Export(lua_State* luaState)
     module(luaState)
     [
         class_<CScriptActionPlanner, no_bases, default_holder, CScriptActionPlannerWrapper>("action_planner")
-            .def_readonly("object", &CScriptActionPlanner::m_object)
+            .def_readwrite("object", &CScriptActionPlanner::m_object)
             .def_readonly("storage", &CScriptActionPlanner::m_storage)
             .def(constructor<>())
             .def("actual", &get_actual)

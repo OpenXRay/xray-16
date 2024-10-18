@@ -62,6 +62,15 @@ private:
     float camRelaxSpeed;
     float camMaxAngle;
 
+	bool m_firing_disabled{};
+	bool m_overheat_enabled{};
+	float m_overheat_value{};
+	float m_overheat_time_quant{};
+	float m_overheat_decr_quant{};
+	float m_overheat_threshold{};
+	shared_str m_overheat_particles;
+	CParticlesObject* p_overheat{};
+
 protected:
     void UpdateBarrelDir();
     virtual const Fvector& get_CurrentFirePoint();

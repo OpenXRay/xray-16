@@ -671,6 +671,8 @@ target_sources(xrGame PRIVATE
     hits_store.cpp
     hits_store.h
     hits_store_inline.h
+    HolderEntityObject.cpp
+    HolderEntityObject.h
     holder_custom.cpp
     holder_custom.h
     holder_custom_script.cpp
@@ -1615,8 +1617,6 @@ target_sources(xrGame PRIVATE
     weaponBM16.cpp
     weaponBM16.h
     Weapon.cpp
-    WeaponCustomPistolAuto.cpp
-    WeaponCustomPistolAuto.h
     WeaponCustomPistol.cpp
     WeaponCustomPistol.h
     WeaponDispersion.cpp
@@ -2426,6 +2426,8 @@ target_sources(xrGame PRIVATE
     ui/UIRankFaction.h
     ui/UIRankIndicator.cpp
     ui/UIRankIndicator.h
+    ui/UIRankingsCoC.cpp
+    ui/UIRankingsCoC.h
     ui/UIRankingWnd.cpp
     ui/UIRankingWnd.h
     ui/UIScriptWnd.cpp
