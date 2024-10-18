@@ -61,7 +61,7 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
     ret_msize = 0;
-    R_ASSERT1_CURE(fRName && fRName[0], true, { return 0; });
+    R_ASSERT1_CURE(fRName && fRName[0], { return 0; });
 
     GLuint pTexture = 0;
     string_path fn;
@@ -101,7 +101,7 @@ _DDS:
     {
         // Load and get header
         S = FS.r_open(fn);
-        R_ASSERT2_CURE(S, fn, true, { return 0; });
+        R_ASSERT2_CURE(S, fn, { return 0; });
         img_size = S->length();
 #ifdef DEBUG
         Msg("* Loaded: %s[%d]b", fn, img_size);

@@ -253,7 +253,7 @@ IC u32 it_height_rev_base(u32 d, u32 s)
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
-    R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });
+    R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
     HRESULT result;
     ID3DTexture2D* pTexture2D = nullptr;

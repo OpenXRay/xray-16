@@ -275,7 +275,7 @@ IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
-    R_ASSERT1_CURE(fRName && fRName[0], true, { return nullptr; });
+    R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
     DirectX::TexMetadata IMG;
     DirectX::ScratchImage texture;
@@ -316,7 +316,7 @@ _DDS:
 {
     // Load and get header
     S = FS.r_open(fn);
-    R_ASSERT2_CURE(S, fn, true, { return nullptr; });
+    R_ASSERT2_CURE(S, fn, { return nullptr; });
 
     img_size = S->length();
 #ifdef DEBUG

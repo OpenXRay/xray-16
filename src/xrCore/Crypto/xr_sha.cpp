@@ -15,17 +15,17 @@ static_assert(xr_sha1::DigestSize == SHA_DIGEST_LENGTH);
 xr_sha1::hash_t xr_sha1::calculate_with_yielder(const u8* data, u32 data_size, const yielder_t& yielder)
 {
 #ifdef USE_OPENSSL
-    R_ASSERT1_CURE(data && data_size, true,
+    R_ASSERT1_CURE(data && data_size,
     {
         return {};
     });
 
     EVP_MD_CTX* sha_ctx = EVP_MD_CTX_new();
-    R_ASSERT1_CURE(sha_ctx, true,
+    R_ASSERT1_CURE(sha_ctx,
     {
         return {};
     });
-    R_ASSERT1_CURE(EVP_DigestInit_ex(sha_ctx, EVP_sha1(), nullptr) != 0, true,
+    R_ASSERT1_CURE(EVP_DigestInit_ex(sha_ctx, EVP_sha1(), nullptr) != 0,
     {
         EVP_MD_CTX_free(sha_ctx);
         return {};

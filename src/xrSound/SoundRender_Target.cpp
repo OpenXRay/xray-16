@@ -6,7 +6,7 @@
 
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
 {
-    R_ASSERT1_CURE(E, true, { return; });
+    R_ASSERT1_CURE(E, { return; });
 
     // *** Initial buffer startup ***
     // 1. Fill parameters
@@ -37,7 +37,7 @@ void CSoundRender_Target::rewind()
 
 void CSoundRender_Target::update()
 {
-    R_ASSERT1_CURE(m_pEmitter, true, { return; });
+    R_ASSERT1_CURE(m_pEmitter, { return; });
 }
 
 void CSoundRender_Target::fill_parameters()

@@ -169,7 +169,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName)
     const vorbis_info* ovi = ov_info(&ovf, -1);
 
     // verify
-    R_ASSERT3_CURE(ovi, "Invalid source info:", pName, true,
+    R_ASSERT3_CURE(ovi, "Invalid source info:", pName,
     {
         ov_clear(&ovf);
         return false;
@@ -244,7 +244,7 @@ bool CSoundRender_Source::LoadWave(pcstr pName)
 #endif
     }
 
-    R_ASSERT3_CURE(m_info.maxAIDist >= 0.1f && m_info.maxDist >= 0.1f, "Invalid max distance.", pName, true,
+    R_ASSERT3_CURE(m_info.maxAIDist >= 0.1f && m_info.maxDist >= 0.1f, "Invalid max distance.", pName,
     {
         ov_clear(&ovf);
         return false;

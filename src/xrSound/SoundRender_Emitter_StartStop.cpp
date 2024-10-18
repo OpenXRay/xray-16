@@ -110,7 +110,7 @@ void CSoundRender_Emitter::cancel()
 void CSoundRender_Emitter::stop_target()
 {
     wait_prefill();
-    R_ASSERT1_CURE(target, true, { return; });
+    R_ASSERT1_CURE(target, { return; });
     target->stop();
     target = nullptr;
 }

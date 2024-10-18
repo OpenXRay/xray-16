@@ -7,7 +7,7 @@
 
 void CSoundRender_Core::i_start(CSoundRender_Emitter* E) const
 {
-    R_ASSERT1_CURE(E, true, { return; });
+    R_ASSERT1_CURE(E, { return; });
 
     // Search lowest-priority target
     float Ptarget = flt_max;

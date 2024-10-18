@@ -142,7 +142,7 @@ void CSoundRender_TargetA::update()
 
 void CSoundRender_TargetA::fill_parameters()
 {
-    R_ASSERT1_CURE(m_pEmitter, true, { return; });
+    R_ASSERT1_CURE(m_pEmitter, { return; });
     inherited::fill_parameters();
 
     // 3D params
@@ -177,7 +177,7 @@ void CSoundRender_TargetA::fill_parameters()
 
 void CSoundRender_TargetA::submit_buffer(ALuint BufferID) const
 {
-    R_ASSERT1_CURE(m_pEmitter, true, { return; });
+    R_ASSERT1_CURE(m_pEmitter, { return; });
     const auto [data, dataSize] = m_pEmitter->obtain_block();
     A_CHK(alBufferData(BufferID, dataFormat, data, static_cast<ALsizei>(dataSize), sampleRate));
 }
