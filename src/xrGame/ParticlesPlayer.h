@@ -46,6 +46,7 @@ private:
     u64 bone_mask; // используемые кости
     BoneInfoVec m_Bones;
     IGameObject* m_self_object;
+    Fvector parent_vel;
 
 protected:
     bool m_bActiveBones; //есть ли косточки на которых играются партиклы
@@ -61,7 +62,6 @@ public:
         return 0;
     }
     SBoneInfo* get_nearest_bone_info(IKinematics* K, u16 bone_index);
-    Fvector parent_vel;
 
     CParticlesPlayer(void);
     virtual ~CParticlesPlayer(void);
