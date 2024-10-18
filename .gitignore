@@ -2,28 +2,23 @@
 .*
 !.git*
 !.appveyor*
-!.travis.yml
 !.editorconfig
 !.vscode
 
 # exclude binaries and temporary files
-CMakeCache.txt
-cmake_install.cmake
-cmake-build-*
-install_manifest.txt
-bin/
-[bB]uild*/
-intermediate/
-intermediate_plugs/
-lib/
-CMakeFiles/
-*.aps
+[Bb]in/
+[Bb]uild*/
+
+# User-specific files
 *.user
+*.user.props
+*.nvuser
 *.PVS-Studio.*
-*.gch
-*.so
-*.a
-*.o
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
 
 # exclude doxygen output
 doc/doxygen/html/*
