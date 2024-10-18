@@ -517,6 +517,16 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
             C.iElement = 0;
             C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
             S.E[0] = C._lua_Compile(s_shader, "normal");
+
+            /// SSS fix water for DX10
+#if RENDER == R_R4
+            // Water Flag
+            if (S.E[0]->flags.bDistort)
+            {
+                if (strstr(s_shader, "effects_water"))
+                    S.E[0]->flags.isWater = TRUE;
+            }
+#endif
         }
     }
 

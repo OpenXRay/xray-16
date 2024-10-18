@@ -9,6 +9,8 @@
 #include "light_gi.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
+extern ENGINE_API Fvector4 ps_ssfx_volumetric;
+
 class light : public IRender_Light, public SpatialBase
 {
 public:
@@ -117,13 +119,19 @@ public:
 
     void set_shadow(bool b) override { flags.bShadow = b; }
 
-    void set_volumetric(bool b) override { flags.bVolumetric = b; }
+    void set_volumetric(bool b) override
+    {
+        if (ps_ssfx_volumetric.x > 0)
+            b = true;
+
+        flags.bVolumetric = b;
+    }
 
     void set_volumetric_quality(float fValue) override { m_volumetric_quality = fValue; }
 
-    void set_volumetric_intensity(float fValue) override { m_volumetric_intensity = fValue; }
+    void set_volumetric_intensity(float fValue) override { m_volumetric_intensity = ps_ssfx_volumetric.y; }
 
-    void set_volumetric_distance(float fValue) override { m_volumetric_distance = fValue; }
+    void set_volumetric_distance(float fValue) override { m_volumetric_distance = 1.0f; }
 
     void set_position(const Fvector& P) override;
 
