@@ -78,7 +78,7 @@ public:
         FeedbackTriggers,
     };
 
-    enum InputType
+    enum InputType : u8
     {
         KeyboardMouse,
         Controller,
@@ -106,18 +106,17 @@ public:
     };
 
 private:
-    std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
+    InputStatistics stats;
+
     std::bitset<COUNT_KB_BUTTONS> keyboardState;
-    std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
+    std::bitset<COUNT_MOUSE_BUTTONS> mouseState;
     int mouseAxisState[COUNT_MOUSE_AXIS];
+    std::bitset<COUNT_CONTROLLER_BUTTONS> controllerState;
     int controllerAxisState[COUNT_CONTROLLER_AXIS];
-    s32 last_input_controller;
 
     xr_vector<IInputReceiver*> cbStack;
 
     xr_vector<SDL_GameController*> controllers;
-
-    InputType currentInputType{ KeyboardMouse };
 
     void SetCurrentInputType(InputType type);
 
@@ -127,16 +126,18 @@ private:
 
     void OpenController(int idx);
 
-    InputStatistics stats;
-    bool exclusiveInput;
-    bool inputGrabbed;
-    int textInputCounter{};
-
     MessageRegistry<pureKeyMapChanged> seqKeyMapChanged;
 
-public:
-    u32 m_mouseDelta;
+    int textInputCounter{};
 
+    s32 last_input_controller;
+
+    InputType currentInputType{ KeyboardMouse };
+
+    bool exclusiveInput;
+    bool inputGrabbed;
+
+public:
     const InputStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
 

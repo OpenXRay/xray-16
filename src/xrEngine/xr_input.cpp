@@ -41,8 +41,6 @@ CInput::CInput(const bool exclusive)
 
     Log("Starting INPUT device...");
 
-    m_mouseDelta = 25;
-
     mouseState.reset();
     keyboardState.reset();
     controllerState.reset();
