@@ -98,7 +98,8 @@ void CWeaponMagazined::Load(LPCSTR section)
             m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
 
         //Alundaio: LAYERED_SND_SHOOT Silencer
-        m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
+        if (WeaponSoundExist(section, "snd_silncer_shot"))
+            m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
         if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
             m_layered_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
         //-Alundaio
@@ -1065,7 +1066,9 @@ void CWeaponMagazined::InitAddons()
         }
     }
 
-    if (IsSilencerAttached() /* && SilencerAttachable() */)
+    if (IsSilencerAttached() && pSettings->line_exist(*cNameSect(), "silencer_flame_particles")
+        && pSettings->line_exist(*cNameSect(), "silencer_light_color")
+        && pSettings->line_exist(*cNameSect(), "silencer_smoke_particles"))
     {
         m_sFlameParticlesCurrent = m_sSilencerFlameParticles;
         m_sSmokeParticlesCurrent = m_sSilencerSmokeParticles;
