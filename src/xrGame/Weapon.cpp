@@ -180,7 +180,8 @@ void CWeapon::UpdateXForm()
     if ((HandDependence() == hd1Hand) || (GetState() == eReload) || (!E->g_Alive()))
         boneL = boneR2;
 
-    V->CalculateBones();
+    BOOL forceExact = psActorFlags.test(AF_FIRST_PERSON_BODY) ? TRUE : FALSE;
+    V->CalculateBones(forceExact);
     Fmatrix& mL = V->LL_GetTransform(u16(boneL));
     Fmatrix& mR = V->LL_GetTransform(u16(boneR));
     // Calculate
