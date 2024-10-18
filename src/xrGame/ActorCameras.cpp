@@ -389,6 +389,7 @@ void CActor::cam_Update(float dt, float fFOV)
 
     if (Level().CurrentEntity() == this)
     {
+        Level().Cameras().UpdateFromCamera(C);
         const bool allow = !Level().Cameras().GetCamEffector(cefDemo) && !Level().Cameras().GetCamEffector(cefAnsel);
         if (eacFirstEye == cam_active && allow)
         {
