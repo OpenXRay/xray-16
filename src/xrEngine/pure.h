@@ -34,8 +34,8 @@ class MessageRegistry
         int Prio;
     };
 
-    bool changed, inProcess;
     xr_vector<MessageObject> messages;
+    bool changed, inProcess;
 
 public:
     MessageRegistry() : changed(false), inProcess(false) {}
