@@ -1,160 +1,126 @@
 #include "stdafx.h"
 #include "xr_dsa.h"
 
-#ifdef USE_CRYPTOPP
-#include <cryptopp/dsa.h>
-#include <cryptopp/integer.h>
+#ifdef USE_OPENSSL
+#   include <openssl/dsa.h>
+#   include <openssl/evp.h>
+#   include <openssl/core_names.h>
 #endif
 
 namespace crypto
 {
+#ifdef USE_OPENSSL
+static_assert(xr_dsa::key_bit_length >= OPENSSL_DSA_FIPS_MIN_MODULUS_BITS);
+#endif
+
 xr_dsa::xr_dsa(u8 const p[public_key_length], u8 const q[private_key_length], u8 const g[public_key_length])
 {
-#ifdef USE_CRYPTOPP
-    CryptoPP::Integer p_number(p, public_key_length);
-    CryptoPP::Integer q_number(q, private_key_length);
-    CryptoPP::Integer g_number(g, public_key_length);
+#ifdef USE_OPENSSL
+    m_context = EVP_PKEY_CTX_new_from_name(nullptr, "DSA", nullptr);
+    EVP_PKEY_fromdata_init(m_context);
 
-    m_dsa.Initialize(p_number, q_number, g_number);
-#endif // USE_CRYPTOPP
-}
+    // Transform p, q, g into OpenSSL acceptable form
+    auto* bn_p = BN_bin2bn(p, public_key_length,  nullptr);
+    auto* bn_q = BN_bin2bn(q, private_key_length, nullptr);
+    auto* bn_g = BN_bin2bn(g, public_key_length,  nullptr);
 
-xr_dsa::~xr_dsa() {}
-shared_str xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
-{
-#ifdef USE_CRYPTOPP
-    CryptoPP::Integer exp(priv_key.m_value, sizeof(priv_key.m_value));
-    CryptoPP::DSA::PrivateKey private_key;
-    private_key.Initialize(m_dsa, exp);
-
-    std::string signature;
-    CryptoPP::DSA::Signer signer(private_key);
-    CryptoPP::StringSource(data, data_size, true,
-        xr_new<CryptoPP::SignerFilter>(m_rng, signer, xr_new<CryptoPP::StringSink>(signature)) // SignerFilter
-    ); // StringSource
-
-    return shared_str(signature.c_str());
-#else // USE_CRYPTOPP
-    UNUSED(priv_key);
-    UNUSED(data);
-    UNUSED(data_size);
-    return shared_str("(null signature)");
-#endif // USE_CRYPTOPP
-}
-
-bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign)
-{
-#ifdef USE_CRYPTOPP
-    CryptoPP::Integer exp(pub_key.m_value, sizeof(pub_key.m_value));
-    CryptoPP::DSA::PublicKey public_key;
-    public_key.Initialize(m_dsa, exp);
-
-    std::string signature(dsign.c_str());
-    std::string message((const char*)data, data_size);
-    CryptoPP::DSA::Verifier verifier(public_key);
-    CryptoPP::SignatureVerificationFilter svf(verifier);
-    CryptoPP::StringSource(signature + message, true, xr_new<CryptoPP::Redirector>(svf));
-
-    return svf.GetLastResult();
-#else
-    UNUSED(pub_key);
-    UNUSED(data);
-    UNUSED(data_size);
-    UNUSED(dsign);
-    return true;
-#endif // USE_CRYPTOPP
-}
-
-#ifdef DEBUG
-#ifdef USE_CRYPTOPP
-void print_big_number(CryptoPP::Integer big_num, u32 max_columns = 8)
-{
-    u8 bin_buff[xr_dsa::public_key_length]; // public_key_length is the max
-    int bin_size = 0;
-
-    string4096 result_buffer;
-    string16 tmp_buff;
-
-    ZeroMemory(bin_buff, sizeof(bin_buff));
-    big_num.Encode(bin_buff, xr_dsa::public_key_length);
-    bin_size = big_num.ByteCount();
-
-    result_buffer[0] = 0;
-    xr_strcat(result_buffer, "\t");
-    for (int i = 0; i < bin_size; ++i)
+    OSSL_PARAM params[] =
     {
-        if (((i % max_columns) == 0) && (i > 0))
+        OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_P, bn_p, public_key_length),
+        OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_Q, bn_q, private_key_length),
+        OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_G, bn_g, public_key_length),
+        OSSL_PARAM_END
+    };
+
+    // Fill the key with p, q, g data
+    EVP_PKEY_fromdata(m_context, &m_key, EVP_PKEY_KEY_PARAMETERS, params);
+
+    // Everything is in pkey now, clean the rest
+    BN_free(bn_p);
+    BN_free(bn_q);
+    BN_free(bn_g);
+#endif
+}
+
+xr_dsa::~xr_dsa()
+{
+#ifdef USE_OPENSSL
+    EVP_PKEY_CTX_free(m_context);
+    EVP_PKEY_free(m_key);
+#endif
+}
+
+shared_str xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size) const
+{
+#ifdef USE_OPENSSL
+    BIGNUM* temp{};
+
+    // Fill in the private key into existing m_key
+    EVP_PKEY_fromdata_init(m_context);
+    {
+        temp = BN_bin2bn(priv_key.m_value, sizeof(priv_key.m_value), nullptr);
+        OSSL_PARAM params[] =
         {
-            xr_strcat(result_buffer, "\n\t");
-        }
-        xr_sprintf(tmp_buff, "0x%02x, ", bin_buff[i]);
-        xr_strcat(result_buffer, tmp_buff);
-    }
-    Msg(result_buffer);
-};
-
-void xr_dsa::generate_params()
-{
-    CryptoPP::AutoSeededRandomPool rng;
-    CryptoPP::DSA::PrivateKey priv_key;
-    priv_key.GenerateRandomWithKeySize(rng, key_bit_length);
-    CryptoPP::DSA::PublicKey pub_key;
-    pub_key.AssignFrom(priv_key);
-
-    const CryptoPP::DL_GroupParameters_DSA& tmp_dsa_params = priv_key.GetGroupParameters();
-    VERIFY(tmp_dsa_params.GetModulus().ByteCount() == public_key_length);
-    VERIFY(tmp_dsa_params.GetSubgroupOrder().ByteCount() == private_key_length);
-    VERIFY(tmp_dsa_params.GetSubgroupGenerator().ByteCount() == public_key_length);
-    VERIFY(pub_key.GetPublicElement().ByteCount() == public_key_length);
-    VERIFY(priv_key.GetPrivateExponent().ByteCount() == private_key_length);
-
-    Msg("// DSA params ");
-
-    Msg("u8 const p_number[crypto::xr_dsa::public_key_length] = {");
-    print_big_number(tmp_dsa_params.GetModulus());
-    Msg("};//p_number");
-
-    Msg("u8 const q_number[crypto::xr_dsa::private_key_length] = {");
-    print_big_number(tmp_dsa_params.GetSubgroupOrder());
-    Msg("};//q_number");
-
-    Msg("u8 const g_number[crypto::xr_dsa::public_key_length] = {");
-    print_big_number(tmp_dsa_params.GetSubgroupGenerator());
-    Msg("};//g_number");
-
-    Msg("u8 const public_key[crypto::xr_dsa::public_key_length] = {");
-    print_big_number(pub_key.GetPublicElement());
-    Msg("};//public_key");
-
-    u8 priv_bin[private_key_length];
-    priv_key.GetPrivateExponent().Encode(priv_bin, private_key_length);
-    Msg("// Private key:");
-    for (int i = 0; i < private_key_length; ++i)
-    {
-        Msg("	m_private_key.m_value[%d]	= 0x%02x;", i, priv_bin[i]);
+            OSSL_PARAM_BN(OSSL_PKEY_PARAM_PRIV_KEY, temp, sizeof(priv_key.m_value)),
+            OSSL_PARAM_END
+        };
+        EVP_PKEY_fromdata(m_context, nullptr, EVP_PKEY_PRIVATE_KEY, params);
     }
 
-    std::string debug_digest = "this is a test";
-    std::string debug_bad_digest = "this as a test";
+    // Initialize the signing context
+    EVP_PKEY_sign_init(m_context);
 
-    std::string signature;
-    CryptoPP::DSA::Signer signer(priv_key);
-    CryptoPP::StringSource(debug_digest, true, xr_new<CryptoPP::SignerFilter>(rng, signer,
-                                                   xr_new<CryptoPP::StringSink>(signature)) // SignerFilter
-        ); // StringSource
+    // Finalize the signature and get the required buffer size
+    size_t sign_size{};
+    EVP_PKEY_sign(m_context, nullptr, &sign_size, data, data_size);
+    u8* sign_dest = static_cast<u8*>(xr_alloca(sign_size));
 
-    CryptoPP::DSA::Verifier verifier(pub_key);
-    CryptoPP::SignatureVerificationFilter svf(verifier);
+    // Perform the actual signing
+    EVP_PKEY_sign(m_context, sign_dest, &sign_size, data, data_size);
 
-    CryptoPP::StringSource(signature + debug_digest, true, xr_new<CryptoPP::Redirector>(svf));
-    VERIFY(svf.GetLastResult() == true);
-
-    CryptoPP::StringSource(signature + debug_bad_digest, true, xr_new<CryptoPP::Redirector>(svf));
-    VERIFY(svf.GetLastResult() == false);
+    // Convert the signature to a BIGNUM
+    BN_bin2bn(sign_dest, sign_size, temp);
+    shared_str ret = BN_bn2hex(temp);
+    BN_free(temp);
+    return ret;
+#else
+    Msg("! [%s] Engine was built without OpenSSL, verifying will always fail.", __FUNCTION__);
+    return "";
+#endif
 }
-#else // USE_CRYPTOPP
-void xr_dsa::generate_params() {}
-#endif // USE_CRYPTOPP
-#endif //#ifdef DEBUG
 
+bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign) const
+{
+#ifdef USE_OPENSSL
+    BIGNUM* temp{};
+
+    // Convert the hex signature (dsign) to binary
+    BN_hex2bn(&temp, dsign.c_str());
+    const size_t sig_size = BN_num_bytes(temp);
+    u8* sig_buff = static_cast<u8*>(xr_alloca(sig_size));
+    BN_bn2bin(temp, sig_buff);
+
+    EVP_PKEY_fromdata_init(m_context);
+    {
+        BN_bin2bn(pub_key.m_value, sizeof(pub_key.m_value), temp);
+        OSSL_PARAM params[] =
+        {
+            OSSL_PARAM_BN(OSSL_PKEY_PARAM_PUB_KEY, temp, sizeof(pub_key.m_value)),
+            OSSL_PARAM_END
+        };
+        EVP_PKEY_fromdata(m_context, nullptr, EVP_PKEY_PUBLIC_KEY, params);
+    }
+    BN_free(temp);
+
+    // Initialize the context for verification
+    EVP_PKEY_verify_init(m_context);
+
+    // Perform the verification
+    const bool ret = EVP_PKEY_verify(m_context, sig_buff, sig_size, data, data_size) == 1;
+    return ret;
+#else
+    Msg("! [%s] Engine was built without OpenSSL, verifying will always fail.", __FUNCTION__);
+    return false;
+#endif
+}
 } // namespace crypto

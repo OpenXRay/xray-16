@@ -25,7 +25,7 @@
         MSVC;
         dSINGLE;
         WIN32;
-        USE_CRYPTOPP;
+        USE_OPENSSL;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>

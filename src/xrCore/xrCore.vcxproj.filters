@@ -243,6 +243,9 @@
     <ClCompile Include="Crypto\xr_dsa.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
+    <ClCompile Include="Crypto\xr_sha.cpp">
+      <Filter>Crypto</Filter>
+    </ClCompile>
     <ClCompile Include="Crypto\xr_dsa_signer.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
@@ -732,5 +735,9 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Condition="'$(Platform)'=='Win32'" Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3.dll" />
+    <CopyFileToFolders Condition="'$(Platform)'=='x64'" Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3-x64.dll" />
   </ItemGroup>
 </Project>

@@ -1,25 +1,6 @@
 #pragma once
-#include "xrCore/xrCore.h"
 
-#include <optional>
 #include <array>
-
-#ifdef USE_CRYPTOPP
-#include <cryptopp/sha.h>
-#else // hack
-namespace CryptoPP
-{
-class SHA1
-{
-public:
-    static constexpr size_t DIGESTSIZE = 20;
-    static constexpr size_t BLOCKSIZE = 64;
-
-    static void Update(const u8* /*input*/, size_t /*len*/) {}
-    static void Final(u8* /*digest*/) {}
-};
-}
-#endif
 
 namespace crypto
 {
@@ -47,10 +28,10 @@ class XRCORE_API xr_sha1
 {
 public:
     /// Size of resulting SHA1 hash value.
-    static const size_t DigestSize = CryptoPP::SHA1::DIGESTSIZE;
+    static constexpr size_t DigestSize = 20;
 
     /// Size of block that SHA1 hasher can process in one iteration.
-    static const size_t BlockSize = CryptoPP::SHA1::BLOCKSIZE;
+    static constexpr  size_t BlockSize = 64;
 
     /// Represents SHA1 hash.
     using hash_t = std::array<u8, DigestSize>;
@@ -64,26 +45,7 @@ public:
     /// @param data the address of data to be hashed.
     /// @param data_size the size of data to be hashed.
     /// @param yielder function-object that yields calculation every processed block.
-    template <typename T>
-    static hash_t calculate_with_yielder(const u8* data, u32 data_size, T yielder)
-    {
-        VERIFY(data_size);
-        const u8* data_pos = data;
-        CryptoPP::SHA1 sha_ctx{};
-        long chunks_processed{};
-        while (0 != data_size)
-        {
-            const u32 chunk_size = data_size >= BlockSize ? BlockSize : data_size;
-            sha_ctx.Update(data_pos, chunk_size);
-            data_pos += chunk_size;
-            data_size -= chunk_size;
-            yielder(chunks_processed);
-            ++chunks_processed;
-        }
-        hash_t result;
-        sha_ctx.Final(result.data());
-        return result;
-    }
+    static hash_t calculate_with_yielder(const u8* data, u32 data_size, const yielder_t& yielder);
 
     /// Calculates the SHA1 hash of passed data.
     /// @param data the address of data to be hashed.
@@ -93,4 +55,4 @@ public:
         return calculate_with_yielder(data, data_size, EmptyYielder);
     }
 };
-}
+} // namespace crypto

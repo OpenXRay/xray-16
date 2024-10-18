@@ -124,6 +124,7 @@ target_sources_grouped(
     Crypto/xr_dsa_signer.h
     Crypto/xr_dsa_verifyer.cpp
     Crypto/xr_dsa_verifyer.h
+    Crypto/xr_sha.cpp
     Crypto/xr_sha.h
 )
 
@@ -477,6 +478,7 @@ target_compile_definitions(xrCore
     GITHUB_REPOSITORY=\"$ENV{GITHUB_REPOSITORY}\"
     GIT_INFO_CURRENT_COMMIT=\"${GIT_SHA1}\"
     GIT_INFO_CURRENT_BRANCH=\"${GIT_BRANCH}\"
+    OPENSSL_NO_DEPRECATED
 )
 
 if (MEMORY_ALLOCATOR STREQUAL "mimalloc")

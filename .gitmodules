@@ -25,9 +25,6 @@
 [submodule "Externals/BugTrap"]
 	path = Externals/BugTrap
 	url = https://github.com/OpenXRay/BugTrap.git
-[submodule "Externals/cryptopp"]
-	path = Externals/cryptopp
-	url = https://github.com/weidai11/cryptopp.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
