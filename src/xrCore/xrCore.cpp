@@ -52,11 +52,11 @@ static u32 init_counter = 0;
 #endif
 
 #ifndef GIT_INFO_CURRENT_COMMIT
-#define GIT_INFO_CURRENT_COMMIT unknown
+#define GIT_INFO_CURRENT_COMMIT "unknown"
 #endif
 
 #ifndef GIT_INFO_CURRENT_BRANCH
-#define GIT_INFO_CURRENT_BRANCH unknown
+#define GIT_INFO_CURRENT_BRANCH "unknown"
 #endif
 
 void SDLLogOutput(void* userdata, int category, SDL_LogPriority priority, const char* message);
