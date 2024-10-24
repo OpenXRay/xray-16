@@ -378,6 +378,24 @@ extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
 extern ENGINE_API int ps_ssfx_is_underground;
 extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
 
+extern ENGINE_API float ps_ssfx_hud_hemi;
+extern ENGINE_API Fvector4 ps_ssfx_il;
+extern ENGINE_API Fvector4 ps_ssfx_il_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_ao;
+extern ENGINE_API Fvector4 ps_ssfx_ao_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_water;
+extern ENGINE_API Fvector4 ps_ssfx_water_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_water_setup2;
+
+extern ENGINE_API Fvector4 ps_ssfx_volumetric;
+extern ENGINE_API Fvector4 ps_ssfx_ssr_2;
+extern ENGINE_API Fvector4 ps_ssfx_terrain_offset;
+
+extern ENGINE_API Fvector3 ps_ssfx_shadow_bias;
+extern ENGINE_API Fvector4 ps_ssfx_lut;
+extern ENGINE_API Fvector4 ps_ssfx_wind_grass;
+extern ENGINE_API Fvector4 ps_ssfx_wind_trees;
+
 class cl_inv_v : public R_constant_setup
 {
     Fmatrix result;
@@ -617,6 +635,159 @@ class ssfx_florafixes_2 : public R_constant_setup
 };
 static ssfx_florafixes_2 binder_ssfx_florafixes_2;
 
+class ssfx_wind_grass : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_wind_grass);
+    }
+};
+static ssfx_wind_grass binder_ssfx_wind_grass;
+
+class ssfx_wind_trees : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_wind_trees);
+    }
+};
+static ssfx_wind_trees binder_ssfx_wind_trees;
+
+class ssfx_wind_anim : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, g_pGamePersistent->Environment().wind_anim);
+    }
+};
+static ssfx_wind_anim binder_ssfx_wind_anim;
+
+class ssfx_lut : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_lut);
+    }
+};
+static ssfx_lut binder_ssfx_lut;
+
+class ssfx_shadow_bias : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_shadow_bias.x, ps_ssfx_shadow_bias.y, 0.f, 0.f);
+    }
+};
+static ssfx_shadow_bias binder_ssfx_shadow_bias;
+
+class ssfx_terrain_offset : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_terrain_offset);
+    }
+};
+static ssfx_terrain_offset binder_ssfx_terrain_offset;
+
+class ssfx_ssr_2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_ssr_2);
+    }
+};
+static ssfx_ssr_2 binder_ssfx_ssr_2;
+
+class ssfx_volumetric : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_volumetric);
+    }
+};
+static ssfx_volumetric binder_ssfx_volumetric;
+
+class ssfx_water : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_water);
+    }
+};
+static ssfx_water binder_ssfx_water;
+
+class ssfx_water_setup1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_water_setup1);
+    }
+};
+static ssfx_water_setup1 binder_ssfx_water_setup1;
+
+class ssfx_water_setup2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_water_setup2);
+    }
+};
+static ssfx_water_setup2 binder_ssfx_water_setup2;
+
+class ssfx_ao : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_ao);
+    }
+};
+static ssfx_ao binder_ssfx_ao;
+
+class ssfx_ao_setup1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_ao_setup1);
+    }
+};
+static ssfx_ao_setup1 binder_ssfx_ao_setup1;
+
+class ssfx_il : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_il);
+    }
+};
+static ssfx_il binder_ssfx_il;
+
+class ssfx_il_setup1 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_il_setup1);
+    }
+};
+static ssfx_il_setup1 binder_ssfx_il_setup1;
+
+class ssfx_hud_hemi : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, ps_ssfx_hud_hemi, 0.f, 0.f, 0.f);
+    }
+};
+static ssfx_hud_hemi binder_ssfx_hud_hemi;
+
+class ssfx_issvp : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, Device.m_SecondViewport.IsSVPFrame() ? 1.f : 0.f, 0.f, 0.f, 0.f);
+    }
+};
+static ssfx_issvp binder_ssfx_issvp;
+
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
@@ -726,4 +897,21 @@ void CBlender_Compile::SetMapping()
 	r_Constant("ssfx_gloss", &binder_ssfx_gloss);
 	r_Constant("ssfx_florafixes_1", &binder_ssfx_florafixes_1);
 	r_Constant("ssfx_florafixes_2", &binder_ssfx_florafixes_2);
+    r_Constant("ssfx_issvp", &binder_ssfx_issvp);
+    r_Constant("ssfx_hud_hemi", &binder_ssfx_hud_hemi);
+    r_Constant("ssfx_il_setup", &binder_ssfx_il);
+    r_Constant("ssfx_il_setup2", &binder_ssfx_il_setup1);
+    r_Constant("ssfx_ao_setup", &binder_ssfx_ao);
+    r_Constant("ssfx_ao_setup2", &binder_ssfx_ao_setup1);
+    r_Constant("ssfx_water", &binder_ssfx_water);
+    r_Constant("ssfx_water_setup1", &binder_ssfx_water_setup1);
+    r_Constant("ssfx_water_setup2", &binder_ssfx_water_setup2);
+    r_Constant("ssfx_volumetric", &binder_ssfx_volumetric);
+    r_Constant("ssfx_ssr_2", &binder_ssfx_ssr_2);
+    r_Constant("ssfx_terrain_offset", &binder_ssfx_terrain_offset);
+    r_Constant("ssfx_shadow_bias", &binder_ssfx_shadow_bias);
+    r_Constant("ssfx_wind_anim", &binder_ssfx_wind_anim);
+    r_Constant("ssfx_wsetup_grass", &binder_ssfx_wind_grass);
+    r_Constant("ssfx_wsetup_trees", &binder_ssfx_wind_trees);
+    r_Constant("ssfx_lut", &binder_ssfx_lut);
 }

@@ -152,4 +152,6 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
 
     if (_clear)
         mapLOD.clear();
+
+    mapWater.clear();
 }

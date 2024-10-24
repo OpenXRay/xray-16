@@ -271,6 +271,18 @@ public:
 
         // Yohji - New shader support
         u32 new_shader_support : 1;
+
+        u32 ssfx_branches : 1;
+        u32 ssfx_blood : 1;
+        u32 ssfx_rain : 1;
+        u32 ssfx_hud_raindrops : 1;
+        u32 ssfx_ssr : 1;
+        u32 ssfx_terrain : 1;
+        u32 ssfx_volumetric : 1;
+        u32 ssfx_water : 1;
+        u32 ssfx_ao : 1;
+        u32 ssfx_il : 1;
+        u32 ssfx_core : 1;
     } o;
 
     struct RenderR2Statistics
