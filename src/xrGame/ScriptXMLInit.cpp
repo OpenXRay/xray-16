@@ -8,6 +8,7 @@
 #include "xrUICore/ComboBox/UIComboBox.h"
 #include "xrUICore/TabControl/UITabControl.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/Hint/UIHint.h"
 #include "ui/UILabel.h"
 #include "ui/ServerList.h"
 #include "ui/UIMapList.h"
@@ -47,6 +48,14 @@ void CScriptXmlInit::ParseShTexInfo(pcstr xml_file)
 void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
 {
     CUIXmlInit::InitWindow(m_xml, path, index, pWnd);
+}
+
+UIHint* CScriptXmlInit::InitHint(pcstr path, CUIWindow* parent)
+{
+    UIHint* pWnd = xr_new<UIHint>();
+    pWnd->init_from_xml(m_xml, path);
+    _attach_child(pWnd, parent);
+	return pWnd;
 }
 
 CUIFrameWindow* CScriptXmlInit::InitFrame(LPCSTR path, CUIWindow* parent)
@@ -271,6 +280,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("ParseFile", &CScriptXmlInit::ParseFile)
             .def("ParseShTexInfo", &CScriptXmlInit::ParseShTexInfo)
             .def("InitWindow", &CScriptXmlInit::InitWindow)
+            .def("InitHint", &CScriptXmlInit::InitHint)
             .def("InitFrame", &CScriptXmlInit::InitFrame)
             .def("InitFrameLine", &CScriptXmlInit::InitFrameLine)
             .def("InitEditBox", &CScriptXmlInit::InitEditBox)

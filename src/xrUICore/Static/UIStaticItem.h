@@ -51,11 +51,8 @@ public:
     IC float GetPosY() { return vPos.y; }
     IC void SetTextureColor(u32 clr) { dwColor = clr; }
     IC u32 GetTextureColor() const { return dwColor; }
-    void SetColor(u32 clr) { dwColor = clr; }
-    void SetColor(Fcolor clr) { dwColor = clr.get(); }
-    u32 GetColor() const { return dwColor; }
-    u32& GetColorRef() { return dwColor; }
     ui_shader& GetShader() { return hShader; }
+
 public:
     CUIStaticItem();
     IC void SetSize(const Fvector2& sz)

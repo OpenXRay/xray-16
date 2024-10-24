@@ -280,7 +280,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         }
         TryAddConditionInfo(*pInvItem, pCompareItem);
         TryAddWpnInfo(*pInvItem, pCompareItem);
-        TryAddArtefactInfo(pInvItem->object().cNameSect());
+        TryAddArtefactInfo(*pInvItem);
         TryAddOutfitInfo(*pInvItem, pCompareItem);
         TryAddUpgradeInfo(*pInvItem);
         TryAddBoosterInfo(*pInvItem);
@@ -350,14 +350,14 @@ void CUIItemInfo::TryAddWpnInfo(CInventoryItem& pInvItem, CInventoryItem* pCompa
     }
 }
 
-void CUIItemInfo::TryAddArtefactInfo(const shared_str& af_section)
+void CUIItemInfo::TryAddArtefactInfo(CInventoryItem& pInvItem)
 {
     if (!UIArtefactParams)
         return;
 
-    if (UIArtefactParams->Check(af_section))
+    if (UIArtefactParams->Check(pInvItem.object().cNameSect()))
     {
-        UIArtefactParams->SetInfo(af_section);
+        UIArtefactParams->SetInfo(pInvItem);
         UIDesc->AddWindow(UIArtefactParams, false);
     }
 }

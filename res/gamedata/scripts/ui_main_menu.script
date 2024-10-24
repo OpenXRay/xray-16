@@ -344,6 +344,10 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 			end
 		end
 
+    if dik == _console.MENU_KEY then	--#SM+#--
+			_console.Show()
+		end
+    
 --		if dik == DIK_keys.DIK_S then
 --			self:OnButton_load_spawn()
 --			return true

@@ -49,6 +49,7 @@
 #include "stalker_planner.h"
 #include "stalker_decision_space.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "Inventory.h"
 #include "trajectories.h"
 
@@ -229,6 +230,14 @@ void CAI_Stalker::Hit(SHit* pHDS)
     SHit HDS = *pHDS;
     HDS.add_wound = true;
 
+    //AVO: get bone names from IDs
+    //if (HDS.whoID == 0) // if shot by actor
+    //{
+    //    pcstr bone_name = smart_cast<IKinematics*>(Visual())->LL_BoneName_dbg(HDS.boneID);
+    //    Msg("Bone [%d]->[%s]", HDS.boneID, bone_name);
+    //}
+    //-AVO
+
     float hit_power = HDS.power * m_fRankImmunity;
 
     if (m_boneHitProtection && HDS.hit_type == ALife::eHitTypeFireWound)
@@ -405,7 +414,22 @@ void CAI_Stalker::update_best_item_info()
 
 void CAI_Stalker::update_best_item_info_impl()
 {
+    luabind::functor<CScriptGameObject*> funct;
+    if (GEnv.ScriptEngine->functor("ai_stalker.update_best_weapon", funct))
+    {
+        CGameObject* cur_itm = smart_cast<CGameObject*>(m_best_item_to_kill);
+        CScriptGameObject* GO = funct(lua_game_object(),cur_itm ? cur_itm->lua_game_object() : nullptr);
+        CInventoryItem* bw = GO ? smart_cast<CInventoryItem*>(&GO->object()): nullptr;
+        if (bw)
+        {
+            m_best_item_to_kill = bw;
+            m_best_ammo = bw;
+            return;
+        }
+    }
+
     ai().ef_storage().alife_evaluation(false);
+    /* Alundaio: This is what causes stalkers to switch weapons during combat; It's stupid
     if (m_item_actuality && m_best_item_to_kill && m_best_item_to_kill->can_kill())
     {
         if (!memory().enemy().selected())
@@ -419,6 +443,7 @@ void CAI_Stalker::update_best_item_info_impl()
         if (fsimilar(value, m_best_item_value))
             return;
     }
+    */
 
     // initialize parameters
     m_item_actuality = true;

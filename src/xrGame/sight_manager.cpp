@@ -65,7 +65,7 @@ void CSightManager::vfValidateAngleDependency(float x1, float& x2, float x3)
 BOOL g_ai_dbg_sight = 0;
 #endif // #ifdef DEBUG
 
-float g_ai_aim_min_speed = PI_DIV_8 / 2.f;
+float g_ai_aim_min_speed = 0.24f; // PI_DIV_8 / 2.f; //Alundaio
 float g_ai_aim_min_angle = PI_DIV_8 / 2.f;
 float g_ai_aim_max_angle = PI_DIV_4;
 BOOL g_ai_aim_use_smooth_aim = 1;

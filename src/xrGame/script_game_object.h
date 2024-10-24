@@ -191,11 +191,7 @@ public:
     _DECLARE_FUNCTION10(Squad, int);
     _DECLARE_FUNCTION10(Group, int);
 
-    // XXX: this is a workaround, since luabind can't determine default function arguments...
-    // There is more places, not only this one
-    // Look here: https://github.com/qweasdd136963/OXR_CoC/commit/c37d8f4e49c92fe226a5958954cc9a6a1ab18c93
-    void Kill(CScriptGameObject* who) { Kill(who, false); }
-    void Kill(CScriptGameObject* who, bool bypass_actor_check /*= false*/ /*AVO: added for actor before death callback*/);
+    void Kill(CScriptGameObject* who, bool bypass_actor_check = false);
 
     // CEntityAlive
     _DECLARE_FUNCTION10(GetFOV, float);
@@ -359,8 +355,8 @@ public:
     bool IsInvUpgradeEnabled();
 
     void ActorLookAtPoint(Fvector point);
-    void IterateInventory(luabind::functor<void> functor, luabind::adl::object object);
-    void IterateInventoryBox(luabind::functor<void> functor, luabind::adl::object object);
+    void IterateInventory(luabind::functor<bool> functor, luabind::adl::object object);
+    void IterateInventoryBox(luabind::functor<bool> functor, luabind::adl::object object);
     void MarkItemDropped(CScriptGameObject* item);
     bool MarkedDropped(CScriptGameObject* item);
     void UnloadMagazine();
@@ -421,6 +417,7 @@ public:
     void SetCharacterRank(int);
     void ChangeCharacterRank(int);
     void ChangeCharacterReputation(int);
+    void SetCharacterReputation(int);
     void SetCharacterCommunity(LPCSTR, int, int);
 
     u32 GetInventoryObjectCount() const;
@@ -794,7 +791,45 @@ public:
     bool is_door_blocked_by_npc() const;
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
 
-#ifdef GAME_OBJECT_EXTENDED_EXPORTS
+    //AVO: functions for object testing
+    //_DECLARE_FUNCTION10(IsGameObject, bool);
+    //_DECLARE_FUNCTION10(IsCar, bool);
+    //_DECLARE_FUNCTION10(IsHeli, bool);
+    //_DECLARE_FUNCTION10(IsHolderCustom, bool);
+    _DECLARE_FUNCTION10(IsEntityAlive, bool);
+    _DECLARE_FUNCTION10(IsInventoryItem, bool);
+    _DECLARE_FUNCTION10(IsInventoryOwner, bool);
+    _DECLARE_FUNCTION10(IsActor, bool);
+    _DECLARE_FUNCTION10(IsCustomMonster, bool);
+    _DECLARE_FUNCTION10(IsWeapon, bool);
+    //_DECLARE_FUNCTION10(IsMedkit, bool);
+    //_DECLARE_FUNCTION10(IsEatableItem, bool);
+    //_DECLARE_FUNCTION10(IsAntirad, bool);
+    _DECLARE_FUNCTION10(IsCustomOutfit, bool);
+    _DECLARE_FUNCTION10(IsScope, bool);
+    _DECLARE_FUNCTION10(IsSilencer, bool);
+    _DECLARE_FUNCTION10(IsGrenadeLauncher, bool);
+    _DECLARE_FUNCTION10(IsWeaponMagazined, bool);
+    _DECLARE_FUNCTION10(IsSpaceRestrictor, bool);
+    _DECLARE_FUNCTION10(IsStalker, bool);
+    _DECLARE_FUNCTION10(IsAnomaly, bool);
+    _DECLARE_FUNCTION10(IsMonster, bool);
+    //_DECLARE_FUNCTION10(IsExplosive, bool);
+    //_DECLARE_FUNCTION10(IsScriptZone, bool);
+    //_DECLARE_FUNCTION10(IsProjector, bool);
+    _DECLARE_FUNCTION10(IsTrader, bool);
+    _DECLARE_FUNCTION10(IsHudItem, bool);
+    //_DECLARE_FUNCTION10(IsFoodItem, bool);
+    _DECLARE_FUNCTION10(IsArtefact, bool);
+    _DECLARE_FUNCTION10(IsAmmo, bool);
+    //_DECLARE_FUNCTION10(IsMissile, bool);
+    //_DECLARE_FUNCTION10(IsPhysicsShellHolder, bool);
+    //_DECLARE_FUNCTION10(IsGrenade, bool);
+    //_DECLARE_FUNCTION10(IsBottleItem, bool);
+    //_DECLARE_FUNCTION10(IsTorch, bool);
+    _DECLARE_FUNCTION10(IsWeaponGL, bool);
+    _DECLARE_FUNCTION10(IsInventoryBox, bool);
+
     // Alundaio
     void inactualize_level_path();
     void inactualize_game_path();
@@ -812,12 +847,13 @@ public:
     u8 GetRestrictionType();
     void SetRestrictionType(u8 type);
 
-    //CWeaponAmmo
-    u16 AmmoGetCount();
-    void AmmoSetCount(u16 count);
-    u16 AmmoBoxSize();
+    void RemoveDanger(const CDangerObject& dobject);
 
-    //Weapon
+    void RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object);
+    void RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object);
+    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object);
+
+    // Weapon
     void Weapon_AddonAttach(CScriptGameObject* item);
     void Weapon_AddonDetach(pcstr item_section);
     bool HasAmmoType(u8 type);
@@ -830,7 +866,12 @@ public:
     u8 GetWeaponSubstate();
     u8 GetAmmoType();
 
-    //Weapon & Outfit
+    // CWeaponAmmo
+    u16 AmmoGetCount();
+    void AmmoSetCount(u16 count);
+    u16 AmmoBoxSize();
+
+    // Weapon & Outfit
     bool AddUpgrade(pcstr upgrade);
     bool InstallUpgrade(pcstr upgrade);
     bool HasUpgrade(pcstr upgrade) const;
@@ -839,11 +880,12 @@ public:
     bool CanAddUpgrade(pcstr upgrade) const;
     bool CanInstallUpgrade(pcstr upgrade) const;
     void IterateInstalledUpgrades(luabind::functor<void> functor);
+    bool WeaponInGrenadeMode();
 
     //Car
     CScriptGameObject* GetAttachedVehicle();
-    void AttachVehicle(CScriptGameObject* veh);
-    void DetachVehicle();
+    void AttachVehicle(CScriptGameObject* veh, bool bForce = false);
+    void DetachVehicle(bool bForce = false);
 
     //Any class that is derived from CHudItem
     u32 PlayHudMotion(pcstr M, bool mixIn, u32 state);
@@ -854,9 +896,12 @@ public:
     bool IsBoneVisible(pcstr bone_name);
     void SetBoneVisible(pcstr bone_name, bool bVisibility, bool bRecursive = true);
 
-    //Anything with PPhysicShell (ie. car, actor, stalker, monster, heli)
+    // CAI_Stalker
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
+    // Anything with PPhysicShell (ie. car, actor, stalker, monster, heli)
     void ForceSetPosition(Fvector pos, bool bActivate = false);
 
+    // Artefacts
     float GetArtefactHealthRestoreSpeed();
     float GetArtefactRadiationRestoreSpeed();
     float GetArtefactSatietyRestoreSpeed();
@@ -869,53 +914,38 @@ public:
     void SetArtefactPowerRestoreSpeed(float value);
     void SetArtefactBleedingRestoreSpeed(float value);
 
-    void RemoveDanger(const CDangerObject& dobject);
-
-    void RemoveMemorySoundObject(const MemorySpace::CSoundObject& memory_object);
-    void RemoveMemoryHitObject(const MemorySpace::CHitObject& memory_object);
-    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject& memory_object);
-
-    //CAI_Stalker
-    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
-
-    //Eatable items
+    // Eatable items
     void SetRemainingUses(u8 value);
     u8 GetRemainingUses();
     u8 GetMaxUses();
 
-    //Phantom
+    // Phantom
     void PhantomSetEnemy(CScriptGameObject*);
-    //Actor
+
+    // Actor
     float GetActorMaxWeight() const;
     void SetActorMaxWeight(float max_weight);
-
     float GetActorMaxWalkWeight() const;
     void SetActorMaxWalkWeight(float max_walk_weight);
-
     float GetAdditionalMaxWeight() const;
     void SetAdditionalMaxWeight(float add_max_weight);
-
     float GetAdditionalMaxWalkWeight() const;
     void SetAdditionalMaxWalkWeight(float add_max_walk_weight);
-
     float GetTotalWeight() const;
     float Weight() const;
 
     float GetActorJumpSpeed() const;
     void SetActorJumpSpeed(float jump_speed);
-
     float GetActorSprintKoef() const;
     void SetActorSprintKoef(float sprint_koef);
-
     float GetActorRunCoef() const;
     void SetActorRunCoef(float run_coef);
-
     float GetActorRunBackCoef() const;
     void SetActorRunBackCoef(float run_back_coef);
 
     void SetCharacterIcon(pcstr iconName);
     //-Alundaio
-#endif // GAME_OBJECT_EXTENDED_EXPORTS
+
     doors::door* m_door;
 };
 

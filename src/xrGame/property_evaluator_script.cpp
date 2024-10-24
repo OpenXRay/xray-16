@@ -21,7 +21,7 @@ SCRIPT_EXPORT(CScriptPropertyEvaluator, (),
         class_<CScriptPropertyEvaluator, no_bases, default_holder,
             CScriptPropertyEvaluatorWrapper
         >("property_evaluator")
-            .def_readonly("object", &CScriptPropertyEvaluator::m_object)
+            .def_readwrite("object", &CScriptPropertyEvaluator::m_object)
             .def_readonly("storage", &CScriptPropertyEvaluator::m_storage)
             .def(constructor<>())
             .def(constructor<CScriptGameObject*>())

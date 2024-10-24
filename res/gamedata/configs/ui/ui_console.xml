@@ -1,0 +1,52 @@
+<w>
+	<console x="0" y="384" width="1024" height="768">
+		<texture width="1024" height="384" r="0" g="0"  b="0" a="180">ui\ui_console</texture>
+		
+		<edit_box x="0" y="0" width="900" height="30">
+			<!--
+			<texture>ui_linetext_e</texture>
+			-->
+			<texture>ui_inGame2_edit_box_1</texture>
+			<text font="letterica18" r="240" g="217" b="182" vert_align="c"/>
+		</edit_box>
+
+		<btn_x x="900" y="0" width="24" height="30">
+			<!--
+			<texture_e>ui_button_ordinary_e</texture_e>
+			<texture_t>ui_button_ordinary_t</texture_t>
+			<texture_h>ui_button_ordinary_h</texture_h>
+			-->
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="letterica18">X</text>
+		</btn_x>
+		
+		<btn_execute x="924" y="0" width="76" height="30">
+			<!--
+			<texture_e>ui_button_ordinary_e</texture_e>
+			<texture_t>ui_button_ordinary_t</texture_t>
+			<texture_h>ui_button_ordinary_h</texture_h>
+			-->
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="letterica18">Execute</text>
+		</btn_execute>
+		
+		<btn_r x="1000" y="0" width="24" height="30">
+			<!--
+			<texture_e>ui_button_ordinary_e</texture_e>
+			<texture_t>ui_button_ordinary_t</texture_t>
+			<texture_h>ui_button_ordinary_h</texture_h>
+			-->
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+			<text font="letterica18">R</text>
+		</btn_r>
+		
+	    <list x="0" y="30" width="1024" height="350" item_height="18" can_select="1" inverse_dir="1" flip_vert="0">
+		    <font font="letterica18"/>
+	    </list>		
+	</console>
+	
+	<file_item>
+	    <main width="1024" height="22"/>
+	    <fn width="1024" height="22"/>
+	</file_item>	
+</w>

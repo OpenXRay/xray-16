@@ -76,11 +76,11 @@ bool CPhantom::net_Spawn(CSE_Abstract* DC)
 
     SwitchToState(stBirth); // initial state (changed on load method in inherited::)
 
+    OBJ->set_killer_id(u16(-1)); // Alundaio: Hack to prevent strange crash with dynamic phantoms
+
     // inherited
     if (!inherited::net_Spawn(DC))
         return FALSE;
-
-    OBJ->set_killer_id(u16(-1)); // Alundaio: Hack to prevent strange crash with dynamic phantoms
 
     m_enemy = Level().CurrentEntity();
     VERIFY(m_enemy);
@@ -294,7 +294,7 @@ void CPhantom::Hit(SHit* pHDS)
         SwitchToState(stShoot);
     if (g_Alive())
     {
-        SetfHealth(-1.f);
+        //SetfHealth(-1.f);
         //		inherited::Hit	(P,dir,who,element,p_in_object_space,impulse/100.f, hit_type);
         inherited::Hit(pHDS);
     }
@@ -354,8 +354,14 @@ void CPhantom::PsyHit(const IGameObject* object, float value)
 
 //---------------------------------------------------------------------
 // Core events
-void CPhantom::save(NET_Packet& output_packet) { output_packet.w_s32(s32(m_CurState)); }
-void CPhantom::load(IReader& input_packet) { SwitchToState(EState(input_packet.r_s32())); }
+void CPhantom::save(NET_Packet& output_packet)
+{
+    //output_packet.w_s32(s32(m_CurState));
+}
+void CPhantom::load(IReader& input_packet)
+{
+    //SwitchToState(EState(input_packet.r_s32()));
+}
 void CPhantom::net_Export(NET_Packet& P) // export to server
 {
     // export

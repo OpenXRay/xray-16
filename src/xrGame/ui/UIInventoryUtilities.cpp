@@ -331,9 +331,10 @@ LPCSTR InventoryUtilities::GetTimePeriodAsString(pstr _buff, u32 buff_sz, ALife:
     int cnt = 0;
     _buff[0] = 0;
 
-    if (month1 != month2)
-        cnt = xr_sprintf(
-            _buff + cnt, buff_sz - cnt, "%d %s ", month2 - month1, *StringTable().translate("ui_st_months"));
+    u8 yrdiff = ((year2 - year1) * 12);
+
+    if (month1 != month2 || yrdiff > 0)
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", month2 + (yrdiff - month1), *CStringTable().translate("ui_st_months"));
 
     if (!cnt && day1 != day2)
         cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", day2 - day1, *StringTable().translate("ui_st_days"));

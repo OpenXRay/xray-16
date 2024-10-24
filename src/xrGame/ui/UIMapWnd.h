@@ -19,6 +19,7 @@ class CMapSpot;
 class CGameTask;
 class CUIXml;
 class UIHint;
+class CUIPropertiesBox;
 
 using GAME_MAPS = xr_map<shared_str, CUICustomMap*>;
 
