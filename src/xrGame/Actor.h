@@ -102,6 +102,20 @@ public:
     // Render
     void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual bool renderable_ShadowGenerate();
+    // First person body
+    bool FirstPersonBodyEnabled();
+    bool FirstPersonBodyActive();
+    virtual void RenderFirstPersonBody(u32 context_id, IRenderable* root);
+    IRenderVisual* m_firstPersonBody{};
+    xr_unordered_map<u16, bool> m_firstPersonBodyBonesToHide;
+    xr_unordered_map<u16, bool> m_firstPersonBodyBonesToIgnoreAnims;
+    u32 m_timeOfDeath{};
+    u32 m_fpDeathCamOfffsetTime{};
+    Fmatrix m_firstPersonBodyXform{Fidentity};
+    Fmatrix m_firstPersonCameraXform{};
+
+    Lock render_lock{};
+
     void feel_sound_new(IGameObject* who, int type, const CSound_UserDataPtr& user_data,
         const Fvector& position, float power) override;
     virtual Feel::Sound* dcast_FeelSound() { return this; }
@@ -294,15 +308,15 @@ public:
     // callback на анимации модели актера
     void SetCallbacks();
     void ResetCallbacks();
-    static void Spin0Callback(CBoneInstance*);
-    static void Spin1Callback(CBoneInstance*);
-    static void ShoulderCallback(CBoneInstance*);
+    static void Spine0Callback(CBoneInstance*);
+    static void Spine1Callback(CBoneInstance*);
+    static void Spine2Callback(CBoneInstance*);
     static void HeadCallback(CBoneInstance*);
     static void VehicleHeadCallback(CBoneInstance*);
 
     virtual const SRotation Orientation() const { return r_torso; };
     SRotation& Orientation() { return r_torso; };
-    void g_SetAnimation(u32 mstate_rl);
+    void g_SetAnimation(u32 mstate_rl, bool force = false);
     void g_SetSprintAnimation(u32 mstate_rl, MotionID& head, MotionID& torso, MotionID& legs);
 
 public:
@@ -511,19 +525,19 @@ public:
 
 protected:
     //косточки используемые при стрельбе
-    int m_r_hand;
-    int m_l_finger1;
-    int m_r_finger2;
-    int m_head;
-    int m_eye_left;
-    int m_eye_right;
+    int m_r_hand{};
+    int m_l_finger1{};
+    int m_r_finger2{};
+    int m_head{};
+    int m_eye_left{};
+    int m_eye_right{};
 
-    int m_l_clavicle;
-    int m_r_clavicle;
-    int m_spine2;
-    int m_spine1;
-    int m_spine;
-    int m_neck;
+    int m_l_clavicle{};
+    int m_r_clavicle{};
+    int m_spine2{};
+    int m_spine1{};
+    int m_spine{};
+    int m_neck{};
 
     //////////////////////////////////////////////////////////////////////////
     // Network

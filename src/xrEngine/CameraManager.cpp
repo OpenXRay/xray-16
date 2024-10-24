@@ -312,7 +312,7 @@ void CCameraManager::UpdatePPEffectors()
     pp_affected.validate("after applying pp");
 }
 
-void CCameraManager::ApplyDevice()
+void CCameraManager::ApplyDevice(float override_fnear)
 {
     ZoneScoped;
     // Device params
@@ -326,7 +326,7 @@ void CCameraManager::ApplyDevice()
     // projection
     Device.fFOV = m_cam_info.fFov;
     Device.fASPECT = m_cam_info.fAspect;
-    Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
+    Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, !fis_zero(override_fnear) ? override_fnear : m_cam_info.fNear, m_cam_info.fFar);
 
     // Apply offset required for Nvidia Ansel
     Device.mProject._31 = -m_cam_info.offsetX;
