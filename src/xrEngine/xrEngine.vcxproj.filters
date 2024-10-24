@@ -634,9 +634,9 @@
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
