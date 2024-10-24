@@ -268,9 +268,6 @@ target_sources(xrGame PRIVATE
     base_client_classes_wrappers.h
     BastArtifact.cpp
     BastArtifact.h
-    battleye.h
-    #battleye_system.cpp
-    #battleye_system.h
     BlackDrops.cpp
     BlackDrops.h
     BlackGraviArtifact.cpp
@@ -1566,8 +1563,6 @@ target_sources(xrGame PRIVATE
     Wound.h
     wrapper_abstract.h
     wrapper_abstract_inline.h
-    #xr_Client_BattlEye.cpp
-    #xr_Client_BattlEye.h
     xrClientsPool.cpp
     xrClientsPool.h
     xrGame.cpp
@@ -1579,8 +1574,6 @@ target_sources(xrGame PRIVATE
     xrGameSpyServer.cpp
     xrGameSpyServer.h
     xrServer_balance.cpp
-    #xr_Server_BattlEye.cpp
-    #xr_Server_BattlEye.h
     xrServer_CL_connect.cpp
     xrServer_CL_disconnect.cpp
     xrServer_Connect.cpp
