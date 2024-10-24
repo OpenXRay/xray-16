@@ -43,6 +43,7 @@
 #include "UIActorMenu.h"
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "UIArtefactPanel.h"
+#include "UIBoostStatesWnd.h"
 
 #include "Include/xrRender/Kinematics.h"
 
@@ -120,29 +121,6 @@ void CUIMainIngameWnd::Init()
     m_ind_outfit_broken = UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this, false);
     m_ind_overweight = UIHelper::CreateStatic(uiXml, "indicator_overweight", this, false);
 
-    if ((m_ind_boost_psy = UIHelper::CreateStatic(uiXml, "indicator_booster_psy", this, false)))
-        m_ind_boost_psy->Show(false);
-
-    if ((m_ind_boost_radia = UIHelper::CreateStatic(uiXml, "indicator_booster_radia", this, false)))
-        m_ind_boost_radia->Show(false);
-
-    if ((m_ind_boost_chem = UIHelper::CreateStatic(uiXml, "indicator_booster_chem", this, false)))
-        m_ind_boost_chem->Show(false);
-
-    if ((m_ind_boost_wound = UIHelper::CreateStatic(uiXml, "indicator_booster_wound", this, false)))
-        m_ind_boost_wound->Show(false);
-
-    if ((m_ind_boost_weight = UIHelper::CreateStatic(uiXml, "indicator_booster_weight", this, false)))
-        m_ind_boost_weight->Show(false);
-
-    if ((m_ind_boost_health = UIHelper::CreateStatic(uiXml, "indicator_booster_health", this, false)))
-        m_ind_boost_health->Show(false);
-
-    if ((m_ind_boost_power = UIHelper::CreateStatic(uiXml, "indicator_booster_power", this, false)))
-        m_ind_boost_power->Show(false);
-
-    if ((m_ind_boost_rad = UIHelper::CreateStatic(uiXml, "indicator_booster_rad", this, false)))
-        m_ind_boost_rad->Show(false);
 
     // Загружаем иконки
     /*	if ( IsGameTypeSingle() )
@@ -254,6 +232,11 @@ void CUIMainIngameWnd::Init()
 
         i++;
     }
+
+    m_ui_boost_states = xr_new<CUIBoostStatesWnd>();
+    m_ui_boost_states->SetAutoDelete(true);
+    AttachChild(m_ui_boost_states);
+    m_ui_boost_states->InitFromXml(uiXml, "booster_states");
 
     HUD_SOUND_ITEM::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
@@ -891,193 +874,17 @@ void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
         return;
 
     UpdateQuickSlots();
-    UpdateBoosterIndicators(pActor->conditions().GetCurBoosterInfluences());
+    m_ui_boost_states->UpdateBoosterIndicators(pActor->conditions().GetCurBoosterInfluences());
 
     for (const auto& slot : m_quick_slots_icons)
         slot->Draw();
 
     for (const auto& slot : m_quick_slots_texts)
         slot->Draw();
-
-    if (m_ind_boost_psy && m_ind_boost_psy->IsShown())
-    {
-        m_ind_boost_psy->Update();
-        m_ind_boost_psy->Draw();
-    }
-
-    if (m_ind_boost_radia && m_ind_boost_radia->IsShown())
-    {
-        m_ind_boost_radia->Update();
-        m_ind_boost_radia->Draw();
-    }
-
-    if (m_ind_boost_chem && m_ind_boost_chem->IsShown())
-    {
-        m_ind_boost_chem->Update();
-        m_ind_boost_chem->Draw();
-    }
-
-    if (m_ind_boost_wound && m_ind_boost_wound->IsShown())
-    {
-        m_ind_boost_wound->Update();
-        m_ind_boost_wound->Draw();
-    }
-
-    if (m_ind_boost_weight && m_ind_boost_weight->IsShown())
-    {
-        m_ind_boost_weight->Update();
-        m_ind_boost_weight->Draw();
-    }
-
-    if (m_ind_boost_health && m_ind_boost_health->IsShown())
-    {
-        m_ind_boost_health->Update();
-        m_ind_boost_health->Draw();
-    }
-
-    if (m_ind_boost_power && m_ind_boost_power->IsShown())
-    {
-        m_ind_boost_power->Update();
-        m_ind_boost_power->Draw();
-    }
-
-    if (m_ind_boost_rad && m_ind_boost_rad->IsShown())
-    {
-        m_ind_boost_rad->Update();
-        m_ind_boost_rad->Draw();
-    }
-
+    m_ui_boost_states->DrawBoosterIndicators();
     m_ui_hud_states->DrawZoneIndicators();
 }
-
-void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences)
+void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences) 
 {
-    if (m_ind_boost_psy)
-        m_ind_boost_psy->Show(false);
-    if (m_ind_boost_radia)
-        m_ind_boost_radia->Show(false);
-    if (m_ind_boost_chem)
-        m_ind_boost_chem->Show(false);
-    if (m_ind_boost_wound)
-        m_ind_boost_wound->Show(false);
-    if (m_ind_boost_weight)
-        m_ind_boost_weight->Show(false);
-    if (m_ind_boost_health)
-        m_ind_boost_health->Show(false);
-    if (m_ind_boost_power)
-        m_ind_boost_power->Show(false);
-    if (m_ind_boost_rad)
-        m_ind_boost_rad->Show(false);
-
-    LPCSTR str_flag = "ui_slow_blinking_alpha";
-    u8 flags = 0;
-    flags |= LA_CYCLIC;
-    flags |= LA_ONLYALPHA;
-    flags |= LA_TEXTURECOLOR;
-
-    for(const auto& [_, booster] : influences)
-    {
-        switch (booster.m_type)
-        {
-        case eBoostHpRestore:
-        {
-            if (m_ind_boost_health)
-            {
-                m_ind_boost_health->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_health->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_health->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostPowerRestore:
-        {
-            if (m_ind_boost_power)
-            {
-                m_ind_boost_power->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_power->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_power->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostRadiationRestore:
-        {
-            if (m_ind_boost_rad)
-            {
-                m_ind_boost_rad->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_rad->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_rad->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostBleedingRestore:
-        {
-            if (m_ind_boost_wound)
-            {
-                m_ind_boost_wound->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_wound->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_wound->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostMaxWeight:
-        {
-            if (m_ind_boost_weight)
-            {
-                m_ind_boost_weight->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_weight->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_weight->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostRadiationImmunity:
-        case eBoostRadiationProtection:
-        {
-            if (m_ind_boost_radia)
-            {
-                m_ind_boost_radia->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_radia->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_radia->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostTelepaticImmunity:
-        case eBoostTelepaticProtection:
-        {
-            if (m_ind_boost_psy)
-            {
-                m_ind_boost_psy->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_psy->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_psy->ResetColorAnimation();
-            }
-            break;
-        }
-        case eBoostChemicalBurnImmunity:
-        case eBoostChemicalBurnProtection:
-        {
-            if (m_ind_boost_chem)
-            {
-                m_ind_boost_chem->Show(true);
-                if (booster.fBoostTime <= 3.0f)
-                    m_ind_boost_chem->SetColorAnimation(str_flag, flags);
-                else
-                    m_ind_boost_chem->ResetColorAnimation();
-            }
-            break;
-        }
-        }
-    }
+    m_ui_boost_states->UpdateBoosterIndicators(influences);
 }
