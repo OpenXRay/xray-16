@@ -43,8 +43,6 @@ target_sources_grouped(
     GameSpy_Patching.h
     GameSpy_QR2.cpp
     GameSpy_QR2.h
-    GameSpy_SAKE.cpp
-    GameSpy_SAKE.h
 )
 
 target_include_directories(xrGameSpy

@@ -2,11 +2,9 @@
 #include "account_manager_console.h"
 #include "xrGameSpy/GameSpy_Full.h"
 #include "xrGameSpy/GameSpy_GP.h"
-#include "xrGameSpy/GameSpy_SAKE.h"
 #include "account_manager.h"
 #include "login_manager.h"
 #include "profile_store.h"
-#include "stats_submitter.h"
 #include "MainMenu.h"
 #include "profile_data_types_script.h"
 
@@ -114,35 +112,6 @@ void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
         Msg("- Current profile:");
         Msg("- ProfileID  : %u", tmp_profile->m_profile_id);
         Msg("- UniqueNick : %s", tmp_profile->m_unique_nick.c_str());
-
-        gamespy_profile::profile_store* tmp_store = MainMenu()->GetProfileStore();
-        if (!tmp_store)
-        {
-            Msg("! No profile store available");
-            return;
-        }
-
-        Msg("- Player awards:");
-        gamespy_profile::all_awards_t const& tmp_awards = tmp_store->get_awards();
-        for (gamespy_profile::all_awards_t::const_iterator i = tmp_awards.begin(), ie = tmp_awards.end(); i < ie; ++i)
-        {
-            string64 rdate_str;
-            rdate_str[0] = 0;
-            print_time(i->second.m_last_reward_date, rdate_str);
-            Msg("- (award: %s), (count: %u), (last reward date: %s)",
-                gamespy_profile::get_award_name(static_cast<gamespy_profile::enum_awards_t>(i->first)),
-                i->second.m_count, rdate_str);
-        }
-
-        Msg("- Best player scores:");
-        gamespy_profile::all_best_scores_t const& tmp_best_scores = tmp_store->get_best_scores();
-        for (gamespy_profile::all_best_scores_t::const_iterator i = tmp_best_scores.begin(), ie = tmp_best_scores.end();
-             i < ie; ++i)
-        {
-            Msg("- (score: %s), (score: %d)",
-                gamespy_profile::get_best_score_name(static_cast<gamespy_profile::enum_best_score_type>(i->first)),
-                i->second);
-        }
     }
     else
     {
@@ -185,8 +154,6 @@ void CCC_GameSpyDeleteProfile::Execute(LPCSTR args)
 #endif
 }
 
-static gamespy_profile::all_best_scores_t debug_best_scores;
-
 void CCC_GameSpyProfile::Execute(LPCSTR args)
 {
 #ifdef XR_PLATFORM_WINDOWS
@@ -216,45 +183,9 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
         tmp_prof_store->load_current_profile(
             gamespy_profile::store_operation_cb(), gamespy_profile::store_operation_cb());
     }
-    else if (!xr_strcmp(tmp_command, "reward"))
+    else if (!xr_strcmp(tmp_command, "reward") || !xr_strcmp(tmp_command, "bestscore"))
     {
-        gamespy_profile::stats_submitter* tmp_ssubmitter = MainMenu()->GetStatsSubmitter();
-        VERIFY(tmp_ssubmitter);
-        char const* tmp_reward_id_str = args + xr_strlen(tmp_command);
-        unsigned int tmp_award_id = 0;
-
-        if (!sscanf(tmp_reward_id_str, "%u", &tmp_award_id) || tmp_award_id >= gamespy_profile::enum_awards_t::at_awards_count)
-        {
-            Msg("! Bad award id");
-            return;
-        }
-        tmp_ssubmitter->reward_with_award(static_cast<gamespy_profile::enum_awards_t>(tmp_award_id), 1, tmp_curr_prof,
-            gamespy_profile::store_operation_cb());
-    }
-    else if (!xr_strcmp(tmp_command, "bestscore"))
-    {
-        gamespy_profile::stats_submitter* tmp_ssubmitter = MainMenu()->GetStatsSubmitter();
-        VERIFY(tmp_ssubmitter);
-        char const* tmp_scores_str = args + xr_strlen(tmp_command);
-        unsigned int score_id = 0;
-        int score_value = 0;
-        if (sscanf(tmp_scores_str, "%u %d", &score_id, &score_value) != 2)
-        {
-            Msg("! Not enough parameters");
-            return;
-        }
-        if (score_id >= gamespy_profile::bst_score_types_count)
-        {
-            Msg("! Bad scoreid");
-        }
-        if (score_value < 0)
-        {
-            Msg("! Bad score value");
-        }
-        debug_best_scores.clear();
-        debug_best_scores.insert(
-            std::make_pair(static_cast<gamespy_profile::enum_best_score_type>(score_id), score_value));
-        tmp_ssubmitter->set_best_scores(&debug_best_scores, tmp_curr_prof, gamespy_profile::store_operation_cb());
+        Log("~ This command is unsupported since old gamespy profile code has been removed from the engine.");
     }
 #endif
 }

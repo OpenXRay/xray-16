@@ -5,7 +5,6 @@
 #include "GameSpy_HTTP.h"
 #include "GameSpy_BrowsersWrapper.h"
 #include "GameSpy_GP.h"
-#include "GameSpy_SAKE.h"
 #include "GameSpy_ATLAS.h"
 #include "Common/object_broker.h"
 
@@ -16,7 +15,6 @@ CGameSpy_Full::CGameSpy_Full()
     m_pGS_HTTP = NULL;
     m_pGS_SB = NULL;
     m_pGS_GP = NULL;
-    m_bServicesAlreadyChecked = false;
     //---------------------------------------
     m_pGSA = xr_new<CGameSpy_Available>();
     //-----------------------------------------------------
@@ -29,7 +27,6 @@ CGameSpy_Full::CGameSpy_Full()
     m_pGS_SB = xr_new<CGameSpy_BrowsersWrapper>();
 
     m_pGS_GP = xr_new<CGameSpy_GP>();
-    m_pGS_SAKE = xr_new<CGameSpy_SAKE>();
     m_pGS_ATLAS = xr_new<CGameSpy_ATLAS>();
 }
 
@@ -40,7 +37,6 @@ CGameSpy_Full::~CGameSpy_Full()
     delete_data(m_pGS_HTTP);
     delete_data(m_pGS_SB);
     delete_data(m_pGS_GP);
-    delete_data(m_pGS_SAKE);
     delete_data(m_pGS_ATLAS);
     gsCoreShutdown();
 }

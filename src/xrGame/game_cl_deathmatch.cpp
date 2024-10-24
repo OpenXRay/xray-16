@@ -20,7 +20,6 @@
 #include "Weapon.h"
 
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "reward_event_generator.h"
 
 #include "game_cl_deathmatch_snd_messages.h"
 #include "game_base_menu_events.h"
@@ -139,11 +138,6 @@ void game_cl_Deathmatch::net_import_state(NET_Packet& P)
         if (NeedSndMessage && local_player && !xr_strcmp(WinnerName, local_player->getName()))
         {
             PlaySndMessage(ID_YOU_WON);
-        }
-        if (NeedSndMessage && m_reward_generator)
-        {
-            m_reward_generator->OnRoundEnd();
-            m_reward_generator->CommitBestResults();
         }
     }
     break;
@@ -996,13 +990,6 @@ void game_cl_Deathmatch::OnSpawn(IGameObject* pObj)
     {
         if (xr_strlen(Actor_Spawn_Effect))
             PlayParticleEffect(Actor_Spawn_Effect.c_str(), pObj->Position());
-        game_PlayerState* ps = GetPlayerByGameID(pActor->ID());
-
-        if (ps && m_reward_generator)
-        {
-            m_reward_generator->OnPlayerSpawned(ps);
-            m_reward_generator->init_bone_groups(pActor);
-        }
     };
     if (smart_cast<CWeapon*>(pObj))
     {
@@ -1089,7 +1076,6 @@ void game_cl_Deathmatch::OnGameRoundStarted()
         if (pCurBuyMenu && pCurPresetItems)
         {
             LoadTeamDefaultPresetItems(GetTeamMenu(local_player->team), pCurBuyMenu, pCurPresetItems);
-            ReInitRewardGenerator(local_player);
         }
     }
     if (pCurBuyMenu)
@@ -1156,7 +1142,6 @@ void game_cl_Deathmatch::OnGameMenuRespond_ChangeSkin(NET_Packet& P)
     if (pCurSkinMenu)
         pCurSkinMenu->SetCurSkin(local_player->skin);
     SetCurrentBuyMenu();
-    ReInitRewardGenerator(local_player);
     m_bSpectatorSelected = FALSE;
 
     if (m_bMenuCalledFromReady)

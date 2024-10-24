@@ -26,10 +26,7 @@ class login_manager;
 namespace gamespy_profile
 {
 class profile_store;
-class stats_submitter;
 } // namespace gamespy_profile
-
-class atlas_submit_queue;
 
 struct Patch_Dawnload_Progress
 {
@@ -72,15 +69,11 @@ class CMainMenu : public IMainMenu,
 
     xr_vector<CUIWindow*> m_pp_draw_wnds;
 
-    CGameSpy_Full* m_pGameSpyFull;
-    gamespy_gp::account_manager* m_account_mngr;
-    gamespy_gp::login_manager* m_login_mngr;
-    gamespy_profile::profile_store* m_profile_store;
+    CGameSpy_Full* m_pGameSpyFull{};
+    gamespy_gp::account_manager* m_account_mngr{};
+    gamespy_gp::login_manager* m_login_mngr{};
+    gamespy_profile::profile_store* m_profile_store{};
 
-#ifdef XR_PLATFORM_WINDOWS
-    gamespy_profile::stats_submitter* m_stats_submitter;
-    atlas_submit_queue* m_atlas_submit_queue;
-#endif
     demo_info_loader* m_demo_info_loader;
 
 public:
@@ -117,8 +110,6 @@ public:
 
 #ifdef XR_PLATFORM_WINDOWS
     CGameSpy_Full* GetGS() { return m_pGameSpyFull; };
-    gamespy_profile::stats_submitter* GetStatsSubmitter() { return m_stats_submitter; };
-    atlas_submit_queue* GetSubmitQueue() { return m_atlas_submit_queue; };
 #endif
 protected:
     EErrorDlg m_NeedErrDialog;

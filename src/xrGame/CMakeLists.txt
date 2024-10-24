@@ -10,7 +10,6 @@ target_sources(xrGame PRIVATE
     account_manager.cpp
     account_manager.h
     account_manager_script.cpp
-    accumulative_states.h
     action_base.h
     action_base_inline.h
     action_base_script.cpp
@@ -241,8 +240,6 @@ target_sources(xrGame PRIVATE
     alife_update_manager.h
     AmebaZone.cpp
     AmebaZone.h
-    ammunition_groups.cpp
-    ammunition_groups.h
     animation_movement_controller.cpp
     animation_movement_controller.h
     animation_script_callback.cpp
@@ -259,12 +256,6 @@ target_sources(xrGame PRIVATE
     Artefact.cpp
     Artefact.h
     artefact_script.cpp
-    atlas_stalkercoppc_v1.c
-    atlas_stalkercoppc_v1.h
-    #atlas_stalkercs_v1.c
-    #atlas_stalkercs_v1.h
-    atlas_submit_queue.cpp
-    atlas_submit_queue.h
     attachable_item.cpp
     attachable_item.h
     attachable_item_inline.h
@@ -273,8 +264,6 @@ target_sources(xrGame PRIVATE
     autosave_manager.cpp
     autosave_manager.h
     autosave_manager_inline.h
-    awards_store.cpp
-    awards_store.h
     base_client_classes_script.cpp
     base_client_classes_wrappers.h
     BastArtifact.cpp
@@ -282,21 +271,13 @@ target_sources(xrGame PRIVATE
     battleye.h
     #battleye_system.cpp
     #battleye_system.h
-    best_scores_helper.cpp
-    best_scores_helper.h
-    best_scores_store.cpp
-    best_scores_store.h
     BlackDrops.cpp
     BlackDrops.h
     BlackGraviArtifact.cpp
     BlackGraviArtifact.h
-    black_list.cpp
-    black_list.h
     BlockAllocator.h
     Bolt.cpp
     Bolt.h
-    bone_groups.cpp
-    bone_groups.h
     BoneProtections.cpp
     BoneProtections.h
     BottleItem.cpp
@@ -349,7 +330,6 @@ target_sources(xrGame PRIVATE
     client_spawn_manager_script.cpp
     ClimableObject.cpp
     ClimableObject.h
-    command_switch_counter.h
     configs_common.cpp
     configs_common.h
     configs_dumper.cpp
@@ -449,8 +429,6 @@ target_sources(xrGame PRIVATE
     doors.h
     doors_manager.cpp
     doors_manager.h
-    double_shot_double_kill.cpp
-    double_shot_double_kill.h
     DummyArtifact.cpp
     DummyArtifact.h
     #DynamicHeightMap.cpp
@@ -499,8 +477,6 @@ target_sources(xrGame PRIVATE
     EntityCondition_script.cpp
     Entity.cpp
     Entity.h
-    event_conditions_collection.cpp
-    event_conditions_collection.h
     ExoOutfit.cpp
     ExoOutfit.h
     Explosive.cpp
@@ -513,8 +489,6 @@ target_sources(xrGame PRIVATE
     F1.h
     FadedBall.cpp
     FadedBall.h
-    faster_than_bullets_time.cpp
-    faster_than_bullets_time.h
     filereceiver_node.cpp
     filereceiver_node.h
     filetransfer_common.h
@@ -574,7 +548,6 @@ target_sources(xrGame PRIVATE
     game_cl_teamdeathmatch.cpp
     game_cl_teamdeathmatch.h
     game_cl_teamdeathmatch_snd_messages.h
-    game_events_handler.h
     game_location_selector.h
     game_location_selector_inline.h
     game_news.cpp
@@ -586,10 +559,6 @@ target_sources(xrGame PRIVATE
     game_path_manager_inline.h
     GamePersistent.cpp
     GamePersistent.h
-    game_state_accumulator.cpp
-    game_state_accumulator.h
-    game_state_accumulator_inline.h
-    game_state_accumulator_state_register.cpp
     game_sv_artefacthunt.cpp
     game_sv_artefacthunt.h
     game_sv_artefacthunt_process_event.cpp
@@ -650,8 +619,6 @@ target_sources(xrGame PRIVATE
     HairsZone_script.cpp
     HangingLamp.cpp
     HangingLamp.h
-    harvest_time.cpp
-    harvest_time.h
     Helicopter2.cpp
     Helicopter.cpp
     helicopter.h
@@ -668,9 +635,6 @@ target_sources(xrGame PRIVATE
     hit_memory_manager.cpp
     hit_memory_manager.h
     hit_memory_manager_inline.h
-    hits_store.cpp
-    hits_store.h
-    hits_store_inline.h
     holder_custom.cpp
     holder_custom.h
     holder_custom_script.cpp
@@ -756,16 +720,9 @@ target_sources(xrGame PRIVATE
     inventory_upgrade_root.cpp
     inventory_upgrade_root.h
     inventory_upgrade_root_inline.h
-    invincible_fury.cpp
-    invincible_fury.h
     item_manager.cpp
     item_manager.h
     item_manager_inline.h
-    killer_victim_velocity_angle.cpp
-    killer_victim_velocity_angle.h
-    kills_store.cpp
-    kills_store.h
-    kills_store_inline.h
     Level_Bullet_Manager.cpp
     Level_bullet_manager_firetrace.cpp
     Level_Bullet_Manager.h
@@ -921,8 +878,6 @@ target_sources(xrGame PRIVATE
     object_property_evaluators.cpp
     object_property_evaluators.h
     object_property_evaluators_inline.h
-    obsolete_queue.h
-    obsolete_queue_inline.h
     obstacles_query.cpp
     obstacles_query.h
     obstacles_query_inline.h
@@ -1008,41 +963,6 @@ target_sources(xrGame PRIVATE
     player_hud_tune.h
     player_name_modifyer.cpp
     player_name_modifyer.h
-    player_spot_params.cpp
-    player_spot_params.h
-    player_state_achilles_heel.cpp
-    player_state_achilles_heel.h
-    player_state_ambassador.cpp
-    player_state_ambassador.h
-    player_state_ammo_elapsed.cpp
-    player_state_ammo_elapsed.h
-    player_state_avenger.cpp
-    player_state_avenger.h
-    player_state_blitzkrieg.cpp
-    player_state_blitzkrieg.h
-    player_state_cherub.cpp
-    player_state_cherub.h
-    player_state_climber.cpp
-    player_state_climber.h
-    player_state_mad.cpp
-    player_state_mad.h
-    player_state_marksman.cpp
-    player_state_marksman.h
-    player_state_multichampion.cpp
-    player_state_multichampion.h
-    player_state_opener.cpp
-    player_state_opener.h
-    player_state_param.h
-    player_state_params.cpp
-    player_state_params.h
-    player_state_remembrance.cpp
-    player_state_remembrance.h
-    player_state_skewer.cpp
-    player_state_skewer.h
-    player_state_toughy.cpp
-    player_state_toughy.h
-    player_team_win_score.cpp
-    player_team_win_score.h
     pose_extrapolation.cpp
     pose_extrapolation.h
     poses_blending.cpp
@@ -1053,7 +973,6 @@ target_sources(xrGame PRIVATE
     pp_effector_custom.h
     pp_effector_distance.cpp
     pp_effector_distance.h
-    profile_data_types.cpp
     profile_data_types.h
     profile_data_types_script.cpp
     profile_data_types_script.h
@@ -1104,16 +1023,6 @@ target_sources(xrGame PRIVATE
     restricted_object_inline.h
     restricted_object_obstacle.cpp
     restricted_object_obstacle.h
-    reward_event_generator.cpp
-    reward_event_generator.h
-    reward_event_handler.h
-    rewarding_events_handlers.cpp
-    rewarding_events_handlers.h
-    rewarding_state_events.cpp
-    rewarding_state_events.h
-    reward_manager.cpp
-    reward_manager.h
-    reward_snd_messages.h
     RGD5.h
     RocketLauncher.cpp
     RocketLauncher.h
@@ -1266,8 +1175,6 @@ target_sources(xrGame PRIVATE
     sight_manager_target.cpp
     Silencer.cpp
     Silencer.h
-    silent_shots.cpp
-    silent_shots.h
     SimpleDetector.cpp
     SimpleDetector.h
     SleepEffector.cpp
@@ -1362,8 +1269,6 @@ target_sources(xrGame PRIVATE
     spectator_camera_first_eye.h
     Spectator.cpp
     Spectator.h
-    sprinter_stopper.cpp
-    sprinter_stopper.h
     squad_hierarchy_holder.cpp
     squad_hierarchy_holder.h
     squad_hierarchy_holder_inline.h
@@ -1441,8 +1346,6 @@ target_sources(xrGame PRIVATE
     stalker_death_planner.cpp
     stalker_death_planner.h
     stalker_decision_space.h
-    stalker_flair.cpp
-    stalker_flair.h
     stalker_get_distance_actions.cpp
     stalker_get_distance_actions.h
     stalker_get_distance_planner.cpp
@@ -1497,16 +1400,11 @@ target_sources(xrGame PRIVATE
     stalker_velocity_holder.cpp
     stalker_velocity_holder.h
     stalker_velocity_holder_inline.h
-    state_arguments_functions.cpp
-    state_arguments_functions.h
     static_cast_checked.hpp
     #static_cast_checked_test.cpp
     static_obstacles_avoider.cpp
     static_obstacles_avoider.h
     static_obstacles_avoider_inline.h
-    #stats_submitter.cpp
-    stats_submitter_dsa_params.cpp
-    stats_submitter.h
     StdAfx.cpp
     StdAfx.h
     steering_behaviour_alignment.h
@@ -1553,8 +1451,6 @@ target_sources(xrGame PRIVATE
     traffic_optimization.h
     trajectories.cpp
     trajectories.h
-    UIAchivementsIndicator.cpp
-    UIAchivementsIndicator.h
     UIDialogHolder.cpp
     UIDialogHolder.h
     ui_export_script.cpp

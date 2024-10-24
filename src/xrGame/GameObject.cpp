@@ -27,7 +27,6 @@
 #include "xrPhysics/MathUtils.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "game_cl_mp.h"
-#include "reward_event_generator.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
 #include "ai_obstacle.h"
 #include "magic_box3.h"
@@ -392,9 +391,6 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
         if (GameID() != eGameIDSingle)
         {
             Game().m_WeaponUsageStatistic->OnBullet_Check_Result(false);
-            game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
-            if (mp_game->get_reward_generator())
-                mp_game->get_reward_generator()->OnBullet_Hit(Hitter, this, Weapon, HDS.boneID);
         }
         //---------------------------------------------------------------------------
     }

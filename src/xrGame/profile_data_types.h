@@ -1,9 +1,6 @@
 #pragma once
-#ifndef PLAYER_AWARDS
-#define PLAYER_AWARDS
 
 #include "xrCore/Containers/AssociativeVector.hpp"
-#include "atlas_stalkercoppc_v1.h"
 
 namespace gamespy_profile
 {
@@ -57,16 +54,7 @@ struct award_data
     u32 m_last_reward_date;
 };
 
-typedef AssociativeVector<enum_awards_t, award_data> all_awards_t;
-
-char const* get_award_name(enum_awards_t award);
-extern u16 get_award_id_key(enum_awards_t award);
-extern u16 get_award_reward_date_key(enum_awards_t award);
-
-extern u16 get_award_id_stat(enum_awards_t award);
-extern u16 get_award_reward_date_stat(enum_awards_t award);
-
-extern enum_awards_t get_award_by_stat_name(char const* stat_name);
+using all_awards_t = AssociativeVector<enum_awards_t, award_data>;
 
 enum enum_best_score_type
 {
@@ -80,23 +68,5 @@ enum enum_best_score_type
     bst_score_types_count
 }; // enum enum_best_score_type
 
-char const* get_best_score_name(enum_best_score_type bst);
-u16 get_best_score_id_key(enum_best_score_type bst);
-u16 get_best_score_id_stat(enum_best_score_type bst);
-enum_best_score_type get_best_score_type_by_sname(char const* stat_name);
-
-typedef AssociativeVector<enum_best_score_type, s32> all_best_scores_t;
-
-constexpr pcstr profile_table_name = "PlayerStats_v1";
-
-constexpr pcstr profile_store_file_name = "mp_profile.ltx";
-constexpr pcstr award_count_line = "count";
-constexpr pcstr award_rdate_line = "rdate";
-constexpr pcstr best_score_value_line = "value";
-constexpr pcstr profile_data_section = "profile_data";
-constexpr pcstr profile_id_line = "id";
-constexpr pcstr profile_last_submit_time = "last_submit";
-
+using all_best_scores_t = AssociativeVector<enum_best_score_type, s32>;
 } // namespace gamespy_profile
-
-#endif //#ifndef PLAYER_AWARDS

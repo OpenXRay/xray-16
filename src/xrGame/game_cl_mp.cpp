@@ -34,11 +34,8 @@
 #include "xrCore/Compression/rt_compressor.h"
 #include "game_cl_mp_snd_messages.h"
 
-#include "reward_event_generator.h"
 #include "game_cl_base_weapon_usage_statistic.h"
-#include "reward_manager.h"
 #include "login_manager.h"
-#include "stats_submitter.h"
 
 #include "xrServer_info.h" //for enum_server_info_type
 
@@ -91,9 +88,7 @@ game_cl_mp::game_cl_mp()
         abs(m_iSpawn_Cost));
     pBuySpawnMsgBox->SetText(BuySpawnText);
 */ //-----------------------------------------------------------
-    m_reward_generator = NULL;
     m_ready_to_open_buy_menu = true;
-    m_reward_manager = NULL;
 };
 
 game_cl_mp::~game_cl_mp()
@@ -140,8 +135,6 @@ game_cl_mp::~game_cl_mp()
     xr_delete(m_pAdminMenuWindow);
     xr_delete(m_pMessageBox);
 
-    xr_delete(m_reward_generator);
-    xr_delete(m_reward_manager);
     local_player = NULL;
 };
 
@@ -573,11 +566,6 @@ void game_cl_mp::shedule_Update(u32 dt)
     if (GEnv.isDedicatedServer)
         return;
 
-    if (m_reward_generator)
-        m_reward_generator->update();
-    if (m_reward_manager)
-        m_reward_manager->update_tasks();
-
     switch (Phase())
     {
     case GAME_PHASE_PENDING:
@@ -727,9 +715,6 @@ void game_cl_mp::OnSwitchPhase(u32 old_phase, u32 new_phase)
     {
     case GAME_PHASE_INPROGRESS:
     {
-        if (m_reward_generator)
-            m_reward_generator->OnRoundStart();
-
         m_bSpectatorSelected = FALSE;
 
         if (CurrentGameUI())
@@ -831,8 +816,6 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     u16 KillerID = P.r_u16();
     u16 WeaponID = P.r_u16();
     SPECIAL_KILL_TYPE SpecialKill = SPECIAL_KILL_TYPE(P.r_u8());
-    if (m_reward_generator)
-        m_reward_generator->OnPlayerKilled(KillerID, KilledID, WeaponID, std::make_pair(KillType, SpecialKill));
     //-----------------------------------------------------------
     IGameObject* pOKiller = Level().Objects.net_Find(KillerID);
     IGameObject* pWeapon = Level().Objects.net_Find(WeaponID);
@@ -1121,8 +1104,6 @@ void game_cl_mp::OnRankChanged(u8 OldRank)
 #ifdef DEBUG
     Msg("- %s", RankStr);
 #endif
-    if (m_reward_generator)
-        m_reward_generator->OnPlayerRankdChanged();
 };
 
 void game_cl_mp::net_import_update(NET_Packet& P)
@@ -1889,25 +1870,6 @@ void game_cl_mp::extract_server_info(u8* data_ptr, u32 data_size)
     {
         tmp_ui_mp_game->SetServerRules(tmp_vector[1].first, tmp_vector[1].second);
     }
-}
-
-void game_cl_mp::AddRewardTask(u32 const award_id)
-{
-    IGameObject* tmp_view_entity = Level().CurrentViewEntity();
-    if ((tmp_view_entity && local_player) && (tmp_view_entity->ID() == local_player->GameID))
-    {
-        m_reward_manager->add_task(award_id);
-    }
-}
-
-void game_cl_mp::ReInitRewardGenerator(game_PlayerState* local_ps)
-{
-    if (!m_reward_generator)
-    {
-        m_reward_generator = xr_new<award_system::reward_event_generator>(u32(-1));
-        m_reward_manager = xr_new<award_system::reward_manager>(this);
-    }
-    m_reward_generator->init_player(local_ps);
 }
 
 bool game_cl_mp::IsLocalPlayerInitialized() const

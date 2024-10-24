@@ -103,7 +103,6 @@
     <ClInclude Include="abstract_path_manager_inline.h" />
     <ClInclude Include="account_manager.h" />
     <ClInclude Include="account_manager_console.h" />
-    <ClInclude Include="accumulative_states.h" />
     <ClInclude Include="action_base.h" />
     <ClInclude Include="action_base_inline.h" />
     <ClInclude Include="action_management_config.h" />
@@ -565,7 +564,6 @@
     <ClInclude Include="alife_time_manager_inline.h" />
     <ClInclude Include="alife_update_manager.h" />
     <ClInclude Include="AmebaZone.h" />
-    <ClInclude Include="ammunition_groups.h" />
     <ClInclude Include="animation_movement_controller.h" />
     <ClInclude Include="animation_script_callback.h" />
     <ClInclude Include="animation_utils.h" />
@@ -574,24 +572,17 @@
     <ClInclude Include="antirad.h" />
     <ClInclude Include="Artefact.h" />
     <ClInclude Include="artefact_activation.h" />
-    <ClInclude Include="atlas_stalkercoppc_v1.h" />
-    <ClInclude Include="atlas_submit_queue.h" />
     <ClInclude Include="attachable_item.h" />
     <ClInclude Include="attachable_item_inline.h" />
     <ClInclude Include="attachment_owner.h" />
     <ClInclude Include="autosave_manager.h" />
     <ClInclude Include="autosave_manager_inline.h" />
-    <ClInclude Include="awards_store.h" />
     <ClInclude Include="base_client_classes_wrappers.h" />
     <ClInclude Include="BastArtifact.h" />
-    <ClInclude Include="best_scores_helper.h" />
-    <ClInclude Include="best_scores_store.h" />
     <ClInclude Include="BlackDrops.h" />
     <ClInclude Include="BlackGraviArtifact.h" />
-    <ClInclude Include="black_list.h" />
     <ClInclude Include="Bolt.h" />
     <ClInclude Include="BoneProtections.h" />
-    <ClInclude Include="bone_groups.h" />
     <ClInclude Include="BottleItem.h" />
     <ClInclude Include="BreakableObject.h" />
     <ClInclude Include="CameraEffector.h" />
@@ -617,7 +608,6 @@
     <ClInclude Include="client_spawn_manager.h" />
     <ClInclude Include="client_spawn_manager_inline.h" />
     <ClInclude Include="ClimableObject.h" />
-    <ClInclude Include="command_switch_counter.h" />
     <ClInclude Include="configs_common.h" />
     <ClInclude Include="configs_dumper.h" />
     <ClInclude Include="configs_dump_verifyer.h" />
@@ -671,7 +661,6 @@
     <ClInclude Include="doors_actor.h" />
     <ClInclude Include="doors_door.h" />
     <ClInclude Include="doors_manager.h" />
-    <ClInclude Include="double_shot_double_kill.h" />
     <ClInclude Include="DummyArtifact.h" />
     <ClInclude Include="DynamicHeightMap.h" />
     <ClInclude Include="dynamic_obstacles_avoider.h" />
@@ -698,14 +687,12 @@
     <ClInclude Include="EntityCondition.h" />
     <ClInclude Include="entity_alive.h" />
     <ClInclude Include="entity_alive_inline.h" />
-    <ClInclude Include="event_conditions_collection.h" />
     <ClInclude Include="ExoOutfit.h" />
     <ClInclude Include="Explosive.h" />
     <ClInclude Include="ExplosiveItem.h" />
     <ClInclude Include="ExplosiveRocket.h" />
     <ClInclude Include="F1.h" />
     <ClInclude Include="FadedBall.h" />
-    <ClInclude Include="faster_than_bullets_time.h" />
     <ClInclude Include="filereceiver_node.h" />
     <ClInclude Include="filetransfer_common.h" />
     <ClInclude Include="filetransfer_node.h" />
@@ -741,15 +728,12 @@
     <ClInclude Include="game_cl_single.h" />
     <ClInclude Include="game_cl_teamdeathmatch.h" />
     <ClInclude Include="game_cl_teamdeathmatch_snd_messages.h" />
-    <ClInclude Include="game_events_handler.h" />
     <ClInclude Include="game_location_selector.h" />
     <ClInclude Include="game_location_selector_inline.h" />
     <ClInclude Include="game_news.h" />
     <ClInclude Include="game_object_space.h" />
     <ClInclude Include="game_path_manager.h" />
     <ClInclude Include="game_path_manager_inline.h" />
-    <ClInclude Include="game_state_accumulator.h" />
-    <ClInclude Include="game_state_accumulator_inline.h" />
     <ClInclude Include="game_sv_artefacthunt.h" />
     <ClInclude Include="game_sv_base.h" />
     <ClInclude Include="game_sv_base_console_vars.h" />
@@ -774,12 +758,9 @@
     <ClInclude Include="gsc_dsigned_ltx.h" />
     <ClInclude Include="HairsZone.h" />
     <ClInclude Include="HangingLamp.h" />
-    <ClInclude Include="harvest_time.h" />
     <ClInclude Include="helicopter.h" />
     <ClInclude Include="Hit.h" />
     <ClInclude Include="HitMarker.h" />
-    <ClInclude Include="hits_store.h" />
-    <ClInclude Include="hits_store_inline.h" />
     <ClInclude Include="hit_immunity.h" />
     <ClInclude Include="hit_immunity_space.h" />
     <ClInclude Include="hit_memory_manager.h" />
@@ -842,11 +823,7 @@
     <ClInclude Include="inventory_upgrade_property_inline.h" />
     <ClInclude Include="inventory_upgrade_root.h" />
     <ClInclude Include="inventory_upgrade_root_inline.h" />
-    <ClInclude Include="invincible_fury.h" />
     <ClInclude Include="item_manager.h" />
-    <ClInclude Include="killer_victim_velocity_angle.h" />
-    <ClInclude Include="kills_store.h" />
-    <ClInclude Include="kills_store_inline.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelGraphDebugRender.hpp" />
     <ClInclude Include="Level_Bullet_Manager.h" />
@@ -924,8 +901,6 @@
     <ClInclude Include="object_manager_inline.h" />
     <ClInclude Include="object_property_evaluators.h" />
     <ClInclude Include="object_property_evaluators_inline.h" />
-    <ClInclude Include="obsolete_queue.h" />
-    <ClInclude Include="obsolete_queue_inline.h" />
     <ClInclude Include="obstacles_query.h" />
     <ClInclude Include="obstacles_query_inline.h" />
     <ClInclude Include="ParticlesObject.h" />
@@ -969,24 +944,6 @@
     <ClInclude Include="player_hud.h" />
     <ClInclude Include="player_hud_tune.h" />
     <ClInclude Include="player_name_modifyer.h" />
-    <ClInclude Include="player_spot_params.h" />
-    <ClInclude Include="player_state_achilles_heel.h" />
-    <ClInclude Include="player_state_ambassador.h" />
-    <ClInclude Include="player_state_ammo_elapsed.h" />
-    <ClInclude Include="player_state_avenger.h" />
-    <ClInclude Include="player_state_blitzkrieg.h" />
-    <ClInclude Include="player_state_cherub.h" />
-    <ClInclude Include="player_state_climber.h" />
-    <ClInclude Include="player_state_mad.h" />
-    <ClInclude Include="player_state_marksman.h" />
-    <ClInclude Include="player_state_multichampion.h" />
-    <ClInclude Include="player_state_opener.h" />
-    <ClInclude Include="player_state_param.h" />
-    <ClInclude Include="player_state_params.h" />
-    <ClInclude Include="player_state_remembrance.h" />
-    <ClInclude Include="player_state_skewer.h" />
-    <ClInclude Include="player_state_toughy.h" />
-    <ClInclude Include="player_team_win_score.h" />
     <ClInclude Include="poses_blending.h" />
     <ClInclude Include="pose_extrapolation.h" />
     <ClInclude Include="PostprocessAnimator.h" />
@@ -1024,12 +981,6 @@
     <ClInclude Include="restricted_object.h" />
     <ClInclude Include="restricted_object_inline.h" />
     <ClInclude Include="restricted_object_obstacle.h" />
-    <ClInclude Include="rewarding_events_handlers.h" />
-    <ClInclude Include="rewarding_state_events.h" />
-    <ClInclude Include="reward_event_generator.h" />
-    <ClInclude Include="reward_event_handler.h" />
-    <ClInclude Include="reward_manager.h" />
-    <ClInclude Include="reward_snd_messages.h" />
     <ClInclude Include="RGD5.h" />
     <ClInclude Include="RocketLauncher.h" />
     <ClInclude Include="RustyHairArtifact.h" />
@@ -1110,7 +1061,6 @@
     <ClInclude Include="sight_manager_inline.h" />
     <ClInclude Include="sight_manager_space.h" />
     <ClInclude Include="Silencer.h" />
-    <ClInclude Include="silent_shots.h" />
     <ClInclude Include="SimpleDetector.h" />
     <ClInclude Include="smart_cover.h" />
     <ClInclude Include="smart_cover_action.h" />
@@ -1169,7 +1119,6 @@
     <ClInclude Include="space_restrictor_inline.h" />
     <ClInclude Include="Spectator.h" />
     <ClInclude Include="spectator_camera_first_eye.h" />
-    <ClInclude Include="sprinter_stopper.h" />
     <ClInclude Include="squad_hierarchy_holder.h" />
     <ClInclude Include="squad_hierarchy_holder_inline.h" />
     <ClInclude Include="StalkerOutfit.h" />
@@ -1209,7 +1158,6 @@
     <ClInclude Include="stalker_death_actions.h" />
     <ClInclude Include="stalker_death_planner.h" />
     <ClInclude Include="stalker_decision_space.h" />
-    <ClInclude Include="stalker_flair.h" />
     <ClInclude Include="stalker_get_distance_actions.h" />
     <ClInclude Include="stalker_get_distance_planner.h" />
     <ClInclude Include="stalker_kill_wounded_actions.h" />
@@ -1241,11 +1189,9 @@
     <ClInclude Include="stalker_velocity_collection_inline.h" />
     <ClInclude Include="stalker_velocity_holder.h" />
     <ClInclude Include="stalker_velocity_holder_inline.h" />
-    <ClInclude Include="state_arguments_functions.h" />
     <ClInclude Include="static_cast_checked.hpp" />
     <ClInclude Include="static_obstacles_avoider.h" />
     <ClInclude Include="static_obstacles_avoider_inline.h" />
-    <ClInclude Include="stats_submitter.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="steering_behaviour.h" />
     <ClInclude Include="steering_behaviour_alignment.h" />
@@ -1276,7 +1222,6 @@
     <ClInclude Include="trade_parameters_inline.h" />
     <ClInclude Include="traffic_optimization.h" />
     <ClInclude Include="trajectories.h" />
-    <ClInclude Include="UIAchivementsIndicator.h" />
     <ClInclude Include="UIDialogHolder.h" />
     <ClInclude Include="UIGameAHunt.h" />
     <ClInclude Include="UIGameCTA.h" />
@@ -2022,7 +1967,6 @@
     <ClCompile Include="alife_trader_abstract.cpp" />
     <ClCompile Include="alife_update_manager.cpp" />
     <ClCompile Include="AmebaZone.cpp" />
-    <ClCompile Include="ammunition_groups.cpp" />
     <ClCompile Include="animation_movement_controller.cpp" />
     <ClCompile Include="animation_script_callback.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -2037,28 +1981,18 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="atlas_stalkercoppc_v1.c">
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="atlas_submit_queue.cpp" />
     <ClCompile Include="attachable_item.cpp" />
     <ClCompile Include="attachment_owner.cpp" />
     <ClCompile Include="autosave_manager.cpp" />
-    <ClCompile Include="awards_store.cpp" />
     <ClCompile Include="base_client_classes_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="BastArtifact.cpp" />
-    <ClCompile Include="best_scores_helper.cpp" />
-    <ClCompile Include="best_scores_store.cpp" />
     <ClCompile Include="BlackDrops.cpp" />
     <ClCompile Include="BlackGraviArtifact.cpp" />
-    <ClCompile Include="black_list.cpp" />
     <ClCompile Include="Bolt.cpp" />
     <ClCompile Include="BoneProtections.cpp" />
-    <ClCompile Include="bone_groups.cpp" />
     <ClCompile Include="BottleItem.cpp" />
     <ClCompile Include="BreakableObject.cpp" />
     <ClCompile Include="CameraEffector.cpp" />
@@ -2168,7 +2102,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="doors_manager.cpp" />
-    <ClCompile Include="double_shot_double_kill.cpp" />
     <ClCompile Include="DummyArtifact.cpp" />
     <ClCompile Include="DynamicHeightMap.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -2205,7 +2138,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="event_conditions_collection.cpp" />
     <ClCompile Include="ExoOutfit.cpp" />
     <ClCompile Include="Explosive.cpp" />
     <ClCompile Include="ExplosiveItem.cpp" />
@@ -2215,7 +2147,6 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="FadedBall.cpp" />
-    <ClCompile Include="faster_than_bullets_time.cpp" />
     <ClCompile Include="filereceiver_node.cpp" />
     <ClCompile Include="filetransfer_node.cpp" />
     <ClCompile Include="file_transfer.cpp" />
@@ -2285,8 +2216,6 @@
     </ClCompile>
     <ClCompile Include="game_cl_teamdeathmatch.cpp" />
     <ClCompile Include="game_news.cpp" />
-    <ClCompile Include="game_state_accumulator.cpp" />
-    <ClCompile Include="game_state_accumulator_state_register.cpp" />
     <ClCompile Include="game_sv_artefacthunt.cpp" />
     <ClCompile Include="game_sv_artefacthunt_process_event.cpp" />
     <ClCompile Include="game_sv_base.cpp" />
@@ -2332,7 +2261,6 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="harvest_time.cpp" />
     <ClCompile Include="Helicopter.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2352,7 +2280,6 @@
     </ClCompile>
     <ClCompile Include="Hit.cpp" />
     <ClCompile Include="HitMarker.cpp" />
-    <ClCompile Include="hits_store.cpp" />
     <ClCompile Include="hit_immunity.cpp" />
     <ClCompile Include="hit_memory_manager.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -2448,10 +2375,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="invincible_fury.cpp" />
     <ClCompile Include="item_manager.cpp" />
-    <ClCompile Include="killer_victim_velocity_angle.cpp" />
-    <ClCompile Include="kills_store.cpp" />
     <ClCompile Include="Level.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -2650,29 +2574,11 @@
     <ClCompile Include="player_hud.cpp" />
     <ClCompile Include="player_hud_tune.cpp" />
     <ClCompile Include="player_name_modifyer.cpp" />
-    <ClCompile Include="player_spot_params.cpp" />
-    <ClCompile Include="player_state_achilles_heel.cpp" />
-    <ClCompile Include="player_state_ambassador.cpp" />
-    <ClCompile Include="player_state_ammo_elapsed.cpp" />
-    <ClCompile Include="player_state_avenger.cpp" />
-    <ClCompile Include="player_state_blitzkrieg.cpp" />
-    <ClCompile Include="player_state_cherub.cpp" />
-    <ClCompile Include="player_state_climber.cpp" />
-    <ClCompile Include="player_state_mad.cpp" />
-    <ClCompile Include="player_state_marksman.cpp" />
-    <ClCompile Include="player_state_multichampion.cpp" />
-    <ClCompile Include="player_state_opener.cpp" />
-    <ClCompile Include="player_state_params.cpp" />
-    <ClCompile Include="player_state_remembrance.cpp" />
-    <ClCompile Include="player_state_skewer.cpp" />
-    <ClCompile Include="player_state_toughy.cpp" />
-    <ClCompile Include="player_team_win_score.cpp" />
     <ClCompile Include="poses_blending.cpp" />
     <ClCompile Include="pose_extrapolation.cpp" />
     <ClCompile Include="PostprocessAnimator.cpp" />
     <ClCompile Include="pp_effector_custom.cpp" />
     <ClCompile Include="pp_effector_distance.cpp" />
-    <ClCompile Include="profile_data_types.cpp" />
     <ClCompile Include="profile_data_types_script.cpp" />
     <ClCompile Include="profile_store.cpp" />
     <ClCompile Include="profile_store_script.cpp" />
@@ -2700,10 +2606,6 @@
     <ClCompile Include="relation_registry_fights.cpp" />
     <ClCompile Include="restricted_object.cpp" />
     <ClCompile Include="restricted_object_obstacle.cpp" />
-    <ClCompile Include="rewarding_events_handlers.cpp" />
-    <ClCompile Include="rewarding_state_events.cpp" />
-    <ClCompile Include="reward_event_generator.cpp" />
-    <ClCompile Include="reward_manager.cpp" />
     <ClCompile Include="RocketLauncher.cpp" />
     <ClCompile Include="RustyHairArtifact.cpp" />
     <ClCompile Include="saved_game_wrapper.cpp" />
@@ -2908,7 +2810,6 @@
     <ClCompile Include="sight_manager.cpp" />
     <ClCompile Include="sight_manager_target.cpp" />
     <ClCompile Include="Silencer.cpp" />
-    <ClCompile Include="silent_shots.cpp" />
     <ClCompile Include="SimpleDetector.cpp" />
     <ClCompile Include="smart_cover.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3005,7 +2906,6 @@
     </ClCompile>
     <ClCompile Include="Spectator.cpp" />
     <ClCompile Include="spectator_camera_first_eye.cpp" />
-    <ClCompile Include="sprinter_stopper.cpp" />
     <ClCompile Include="squad_hierarchy_holder.cpp" />
     <ClCompile Include="StalkerOutfit.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3073,7 +2973,6 @@
     <ClCompile Include="stalker_danger_unknown_planner.cpp" />
     <ClCompile Include="stalker_death_actions.cpp" />
     <ClCompile Include="stalker_death_planner.cpp" />
-    <ClCompile Include="stalker_flair.cpp" />
     <ClCompile Include="stalker_get_distance_actions.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3131,13 +3030,10 @@
     </ClCompile>
     <ClCompile Include="stalker_velocity_collection.cpp" />
     <ClCompile Include="stalker_velocity_holder.cpp" />
-    <ClCompile Include="state_arguments_functions.cpp" />
     <ClCompile Include="static_cast_checked_test.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="static_obstacles_avoider.cpp" />
-    <ClCompile Include="stats_submitter.cpp" />
-    <ClCompile Include="stats_submitter_dsa_params.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -3165,7 +3061,6 @@
     <ClCompile Include="trade_parameters.cpp" />
     <ClCompile Include="traffic_optimization.cpp" />
     <ClCompile Include="trajectories.cpp" />
-    <ClCompile Include="UIAchivementsIndicator.cpp" />
     <ClCompile Include="UIDialogHolder.cpp" />
     <ClCompile Include="UIGameAHunt.cpp" />
     <ClCompile Include="UIGameCTA.cpp" />

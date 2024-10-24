@@ -162,7 +162,6 @@
 #include "xrGame/CameraEffector.h" // ~75, very heavy to compile
 #include "xrGame/alife_simulator.h" // ~80
 #include "xrGame/alife_update_manager.h"
-#include "xrGame/ammunition_groups.h"
 #include "xrGame/animation_utils.h"
 #include "xrGame/Artefact.h" // ~50
 #include "xrGame/character_hit_animations.h"
@@ -170,7 +169,6 @@
 #include "xrGame/CharacterPhysicsSupport.h" // ~65
 #include "xrGame/danger_object.h"
 #include "xrGame/Inventory.h" // ~120
-#include "xrGame/kills_store.h"
 #include "xrGame/MainMenu.h"
 #include "xrGame/map_location.h"
 #include "xrGame/map_location_defs.h"
@@ -208,7 +206,6 @@
 #include "xrGame/stalker_decision_space.h" // ~60, only enum's
 #include "xrGame/Spectator.h" // ~60, INCREDIBLY heavy to compile
 #include "xrGame/game_cl_mp.h" // ~60, INCREDIBLY heavy to compile
-#include "xrGame/game_events_handler.h" // ~30, INCREDIBLY heavy to compile
 #include "xrGame/steering_behaviour.h" // ~30, measurable compile time
 #include "xrEngine/xr_level_controller.h"
 #include "xrGame/UIGameCustom.h" // ~85, quite heavy to compile

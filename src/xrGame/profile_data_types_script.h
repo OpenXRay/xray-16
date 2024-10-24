@@ -10,5 +10,5 @@
 
 namespace gamespy_profile
 {
-typedef mixed_delegate<void(bool, const char*), store_operation_cb_tag> store_operation_cb;
+using store_operation_cb = mixed_delegate<void(bool, const char*), store_operation_cb_tag>;
 }
