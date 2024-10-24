@@ -20,7 +20,6 @@ CServerList::CServerList()
       m_header2{ "Server properties", "Players list", "Frags", "Deaths" },
       m_header_frames{ "Icon frame", "Server name frame", "Map frame", "Game type frame", "Players frame", "Ping frame", "Version frame" }
 {
-#ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
     m_subscriber_id = browser().SubscribeUpdates(updateCb);
@@ -55,7 +54,6 @@ CServerList::CServerList()
 
     m_last_retreived_index = u32(-1);
     m_need_refresh_fr = u32(-1);
-#endif
 }
 
 CServerList::~CServerList()
@@ -71,15 +69,11 @@ CServerList::~CServerList()
 
 CGameSpy_BrowsersWrapper* CServerList::browser_LL()
 {
-#ifdef XR_PLATFORM_WINDOWS
-    auto mm = MainMenu();
-    if (mm)
+    if (const auto mm = MainMenu())
     {
-        auto gs = mm->GetGS();
-        if (gs)
+        if (const auto gs = mm->GetGS())
             return gs->GetGameSpyBrowser();
     }
-#endif
     return nullptr;
 }
 
@@ -570,7 +564,6 @@ void CServerList::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 
 void CServerList::ConnectToSelected()
 {
-#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager const* lmngr = MainMenu()->GetLoginMngr();
     R_ASSERT(lmngr);
     gamespy_gp::profile const* tmp_profile = lmngr->get_current_profile();
@@ -621,7 +614,6 @@ void CServerList::ConnectToSelected()
         item->CreateConsoleCommand(command, m_playerName.c_str(), "", "");
         Console->Execute(command.c_str());
     }
-#endif
 }
 
 void CServerList::InitHeader()

@@ -108,9 +108,8 @@ public:
     gamespy_gp::login_manager* GetLoginMngr() { return m_login_mngr; }
     gamespy_profile::profile_store* GetProfileStore() { return m_profile_store; }
 
-#ifdef XR_PLATFORM_WINDOWS
-    CGameSpy_Full* GetGS() { return m_pGameSpyFull; };
-#endif
+    CGameSpy_Full* GetGS() const { return m_pGameSpyFull; }
+
 protected:
     EErrorDlg m_NeedErrDialog;
     u32 m_start_time;

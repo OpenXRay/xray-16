@@ -1865,13 +1865,11 @@ public:
         if (mm == nullptr)
             return;
 
-#ifdef XR_PLATFORM_WINDOWS
         if (!m_checkInProgress.exchange(true))
         {
             SetupCallParams(arguments);
             mm->GetGS()->GetGameSpyPatching()->CheckForPatch(true, m_resultCallbackBinded);
         }
-#endif
     }
 };
 

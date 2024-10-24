@@ -42,7 +42,6 @@ extern ENGINE_API bool bShowPauseString;
 
 //#define DEMO_BUILD
 
-#ifdef XR_PLATFORM_WINDOWS
 constexpr cpcstr ErrMsgBoxTemplate[] =
 {
     "message_box_invalid_pass",
@@ -64,7 +63,6 @@ constexpr cpcstr ErrMsgBoxTemplate[] =
     "msg_box_error_loading",
     "message_box_download_level"
 };
-#endif
 
 extern bool b_shniaganeed_pp;
 
@@ -121,7 +119,6 @@ CMainMenu::CMainMenu()
         g_statHint = xr_new<CUIButtonHint>();
         m_pGameSpyFull = xr_new<CGameSpy_Full>();
 
-#ifdef XR_PLATFORM_WINDOWS
         for (cpcstr name : ErrMsgBoxTemplate)
         {
             CUIMessageBoxEx* msgBox = m_pMB_ErrDlgs.emplace_back(xr_new<CUIMessageBoxEx>());
@@ -145,7 +142,7 @@ CMainMenu::CMainMenu()
             downloadMsg->AddCallbackStr(
                 "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadMPMap));
         }
-#endif
+
         m_account_mngr = xr_new<gamespy_gp::account_manager>(m_pGameSpyFull->GetGameSpyGP());
         m_login_mngr = xr_new<gamespy_gp::login_manager>(m_pGameSpyFull);
         m_profile_store = xr_new<gamespy_profile::profile_store>();
@@ -165,13 +162,10 @@ CMainMenu::~CMainMenu()
 
     g_pGamePersistent->m_pMainMenu = nullptr;
 
-#ifdef XR_PLATFORM_WINDOWS
     xr_delete(m_account_mngr);
     xr_delete(m_login_mngr);
     xr_delete(m_profile_store);
-
     xr_delete(m_pGameSpyFull);
-#endif
 
     xr_delete(m_demo_info_loader);
     delete_data(m_pMB_ErrDlgs);
@@ -563,7 +557,6 @@ void CMainMenu::OnFrame()
             Console->Show();
     }
 
-#ifdef XR_PLATFORM_WINDOWS
     if (IsActive() || m_sPDProgress.IsInProgress)
     {
         GSUpdateStatus status = m_pGameSpyFull->Update();
@@ -576,7 +569,6 @@ void CMainMenu::OnFrame()
         case GSUpdateStatus::OutOfService: SetErrorDialog(ErrGSServiceFailed); break;
         }
     }
-#endif
 
     if (IsActive())
     {
@@ -799,10 +791,8 @@ void CMainMenu::OnRunDownloadedPatch(CUIWindow*, void*)
 
 void CMainMenu::CancelDownload()
 {
-#ifdef XR_PLATFORM_WINDOWS
     m_pGameSpyFull->GetGameSpyHTTP()->StopDownload();
     m_sPDProgress.IsInProgress = false;
-#endif
 }
 
 void CMainMenu::SetNeedVidRestart() { m_Flags.set(flNeedVidRestart, TRUE); }
@@ -925,7 +915,6 @@ LPCSTR CMainMenu::GetGSVer()
 
 LPCSTR CMainMenu::GetPlayerName()
 {
-#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager* l_mngr = GetLoginMngr();
     gamespy_gp::profile const* tmp_prof = l_mngr ? l_mngr->get_current_profile() : NULL;
 
@@ -934,7 +923,6 @@ LPCSTR CMainMenu::GetPlayerName()
         m_player_name = tmp_prof->unique_nick();
     }
     else
-#endif
     {
         string512 name;
         GetPlayerName_FromRegistry(name, sizeof(name));

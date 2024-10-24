@@ -234,7 +234,7 @@ void account_manager::delete_profile(account_operation_cb dpcb)
     {
         m_profile_deleting_cb = dpcb;
     }
-#ifdef XR_PLATFORM_WINDOWS
+
     login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     if (!tmp_lmngr->get_current_profile())
@@ -248,7 +248,6 @@ void account_manager::delete_profile(account_operation_cb dpcb)
     {
         m_profile_deleting_cb(false, CGameSpy_GP::TryToTranslate(tmp_res).c_str());
     }
-#endif
 }
 
 void account_manager::get_account_profiles(char const* email, char const* password, account_profiles_cb profiles_cb)
@@ -447,12 +446,10 @@ void __cdecl account_manager::delete_profile_cb(GPConnection* connection, void* 
         return;
     }
     VERIFY(tmp_inst->m_gamespy_gp);
-#ifdef XR_PLATFORM_WINDOWS
     login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     tmp_lmngr->delete_profile_obj();
     tmp_inst->m_profile_deleting_cb(true, "");
-#endif
 }
 
 void __cdecl account_manager::search_profile_cb(GPConnection* connection, void* arg, void* param)
