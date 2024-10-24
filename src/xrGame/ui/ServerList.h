@@ -38,6 +38,7 @@ public:
     bool with_pass;
     bool without_pass;
     bool without_ff;
+    bool with_battleye{}; // don't remove, needed for Clear Sky scripts
     bool listen_servers;
 };
 
