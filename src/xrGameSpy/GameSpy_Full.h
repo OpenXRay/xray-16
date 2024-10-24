@@ -2,7 +2,6 @@
 #include "xrGameSpy/xrGameSpy.h"
 
 class CGameSpy_Available;
-class CGameSpy_Patching;
 class CGameSpy_HTTP;
 enum class GSUpdateStatus;
 class CGameSpy_BrowsersWrapper;
@@ -18,7 +17,6 @@ public:
     ~CGameSpy_Full();
 
     CGameSpy_Available* GetGameSpyAvailable() const { return m_pGSA; }
-    CGameSpy_Patching* GetGameSpyPatching() const { return m_pGS_Patching; }
     CGameSpy_HTTP* GetGameSpyHTTP() const { return m_pGS_HTTP; }
     CGameSpy_BrowsersWrapper* GetGameSpyBrowser() const { return m_pGS_SB; }
     CGameSpy_GP* GetGameSpyGP() const { return m_pGS_GP; }
@@ -28,7 +26,6 @@ public:
 
 private:
     CGameSpy_Available* m_pGSA;
-    CGameSpy_Patching* m_pGS_Patching;
     CGameSpy_HTTP* m_pGS_HTTP;
     CGameSpy_BrowsersWrapper* m_pGS_SB;
     CGameSpy_GP* m_pGS_GP;

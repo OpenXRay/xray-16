@@ -39,8 +39,6 @@ target_sources_grouped(
     GameSpy_HTTP.cpp
     GameSpy_HTTP.h
     GameSpy_Keys.h
-    GameSpy_Patching.cpp
-    GameSpy_Patching.h
     GameSpy_QR2.cpp
     GameSpy_QR2.h
 )

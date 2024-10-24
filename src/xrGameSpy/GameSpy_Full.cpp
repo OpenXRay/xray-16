@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "GameSpy_Full.h"
 #include "GameSpy_Available.h"
-#include "GameSpy_Patching.h"
 #include "GameSpy_HTTP.h"
 #include "GameSpy_BrowsersWrapper.h"
 #include "GameSpy_GP.h"
@@ -11,7 +10,6 @@
 CGameSpy_Full::CGameSpy_Full()
 {
     m_pGSA = NULL;
-    m_pGS_Patching = NULL;
     m_pGS_HTTP = NULL;
     m_pGS_SB = NULL;
     m_pGS_GP = NULL;
@@ -22,7 +20,6 @@ CGameSpy_Full::CGameSpy_Full()
     m_bServicesAlreadyChecked = m_pGSA->CheckAvailableServices(resultstr);
     //-----------------------------------------------------
     gsCoreInitialize();
-    m_pGS_Patching = xr_new<CGameSpy_Patching>();
     m_pGS_HTTP = xr_new<CGameSpy_HTTP>();
     m_pGS_SB = xr_new<CGameSpy_BrowsersWrapper>();
 
@@ -33,7 +30,6 @@ CGameSpy_Full::CGameSpy_Full()
 CGameSpy_Full::~CGameSpy_Full()
 {
     delete_data(m_pGSA);
-    delete_data(m_pGS_Patching);
     delete_data(m_pGS_HTTP);
     delete_data(m_pGS_SB);
     delete_data(m_pGS_GP);

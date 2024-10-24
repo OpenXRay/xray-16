@@ -5,7 +5,6 @@
 #include "xrGameSpy/GameSpy_Full.h"
 #include "xrGameSpy/GameSpy_GP.h"
 #include "xrGameSpy/GameSpy_ATLAS.h"
-#include "xrGameSpy/GameSpy_Patching.h"
 #include "RegistryFuncs.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "player_name_modifyer.h"
@@ -25,8 +24,6 @@ login_manager::login_manager(CGameSpy_Full* fullgs_obj)
     VERIFY(m_gamespy_gp);
     m_gamespy_atlas = fullgs_obj->GetGameSpyATLAS();
     VERIFY(m_gamespy_atlas);
-    m_gamespy_patching = fullgs_obj->GetGameSpyPatching();
-    VERIFY(m_gamespy_patching);
     m_current_profile = NULL;
 }
 
@@ -286,7 +283,6 @@ void __cdecl login_manager::login_cb(GPConnection* connection, void* arg, void* 
     }
 
     my_inst->m_current_profile = xr_new<profile>(tmp_res->profile, tmp_res->uniquenick, tmp_ticket_dest, true);
-    my_inst->m_gamespy_patching->PtTrackUsage(tmp_res->profile);
 
     my_inst->m_gamespy_atlas->WSLoginProfile(
         my_inst->m_last_email, my_inst->m_last_nick, my_inst->m_last_password, &login_manager::wslogin_cb, my_inst);

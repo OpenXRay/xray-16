@@ -40,7 +40,6 @@
     <ClCompile Include="GameSpy_GCD_Server.cpp" />
     <ClCompile Include="GameSpy_GP.cpp" />
     <ClCompile Include="GameSpy_HTTP.cpp" />
-    <ClCompile Include="GameSpy_Patching.cpp" />
     <ClCompile Include="GameSpy_QR2.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -58,7 +57,6 @@
     <ClInclude Include="GameSpy_GP.h" />
     <ClInclude Include="GameSpy_HTTP.h" />
     <ClInclude Include="GameSpy_Keys.h" />
-    <ClInclude Include="GameSpy_Patching.h" />
     <ClInclude Include="GameSpy_QR2.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="xrGameSpy.h" />

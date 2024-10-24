@@ -55,9 +55,6 @@ constexpr cpcstr ErrMsgBoxTemplate[] =
     "message_box_gs_service_not_available",
     "message_box_sb_master_server_connect_failed",
     "msg_box_no_new_patch",
-    "msg_box_new_patch",
-    "msg_box_patch_download_error",
-    "msg_box_patch_download_success",
     "msg_box_connect_to_master_server",
     "msg_box_kicked_by_server",
     "msg_box_error_loading",
@@ -99,9 +96,6 @@ CMainMenu::CMainMenu()
     g_statHint = NULL;
     m_deactivated_frame = 0;
 
-    m_sPatchURL = "";
-
-    m_sPDProgress.IsInProgress = false;
     m_downloaded_mp_map_url._set("");
 
     //-------------------------------------------
@@ -128,11 +122,6 @@ CMainMenu::CMainMenu()
                 xr_delete(msgBox);
             }
         }
-
-        m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_YES_CLICKED,
-            CUIWndCallback::void_function(this, &CMainMenu::OnRunDownloadedPatch));
-        m_pMB_ErrDlgs[PatchDownloadSuccess]->AddCallbackStr("button_yes", MESSAGE_BOX_OK_CLICKED,
-            CUIWndCallback::void_function(this, &CMainMenu::OnConnectToMasterServerOkClicked));
 
         CUIMessageBoxEx* downloadMsg = m_pMB_ErrDlgs[DownloadMPMap];
         if (downloadMsg)
@@ -662,7 +651,7 @@ void CMainMenu::DestroyInternal(bool bForce)
     }
 }
 
-void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
+void CMainMenu::OnPatchCheck(bool success)
 {
     if (!success)
     {
@@ -671,75 +660,7 @@ void CMainMenu::OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL)
     }
     if (m_sPDProgress.IsInProgress)
         return;
-
-    if (m_pMB_ErrDlgs[NewPatchFound])
-    {
-        delete_data(m_pMB_ErrDlgs[NewPatchFound]);
-        m_pMB_ErrDlgs[NewPatchFound] = NULL;
-    }
-    if (!m_pMB_ErrDlgs[NewPatchFound])
-    {
-        m_pMB_ErrDlgs[NewPatchFound] = xr_new<CUIMessageBoxEx>();
-        m_pMB_ErrDlgs[NewPatchFound]->InitMessageBox("msg_box_new_patch");
-
-        shared_str tmpText;
-        tmpText.printf(m_pMB_ErrDlgs[NewPatchFound]->GetText(), VersionName, URL);
-        m_pMB_ErrDlgs[NewPatchFound]->SetText(*tmpText);
-    }
-    m_sPatchURL = URL;
-
-    Register(m_pMB_ErrDlgs[NewPatchFound]);
-    m_pMB_ErrDlgs[NewPatchFound]->AddCallbackStr(
-        "button_yes", MESSAGE_BOX_YES_CLICKED, CUIWndCallback::void_function(this, &CMainMenu::OnDownloadPatch));
-    m_pMB_ErrDlgs[NewPatchFound]->ShowDialog(false);
-};
-
-void CMainMenu::OnDownloadPatch(CUIWindow*, void*)
-{
-#ifdef XR_PLATFORM_WINDOWS
-    CGameSpy_Available GSA;
-    shared_str result_string;
-    if (!GSA.CheckAvailableServices(result_string))
-    {
-        Msg(*result_string);
-        return;
-    };
-
-    LPCSTR fileName = *m_sPatchURL;
-    if (!fileName)
-        return;
-
-    string4096 FilePath = "";
-    char* FileName = NULL;
-    GetFullPathName(fileName, 4096, FilePath, &FileName);
-    string_path fname;
-    if (FS.path_exist("$downloads$"))
-    {
-        FS.update_path(fname, "$downloads$", FileName);
-        m_sPatchFileName = fname;
-    }
-    else
-        m_sPatchFileName.printf("downloads" DELIMITER "%s", FileName);
-
-    m_sPDProgress.IsInProgress = true;
-    m_sPDProgress.Progress = 0;
-    m_sPDProgress.FileName = m_sPatchFileName;
-    m_sPDProgress.Status = "";
-    CGameSpy_HTTP::CompletionCallback completionCallback;
-    completionCallback.bind(this, &CMainMenu::OnDownloadPatchResult);
-    CGameSpy_HTTP::ProgressCallback progressCallback;
-    progressCallback.bind(this, &CMainMenu::OnDownloadPatchProgress);
-    m_pGameSpyFull->GetGameSpyHTTP()->DownloadFile(
-        *m_sPatchURL, *m_sPatchFileName, completionCallback, progressCallback);
-#endif
 }
-
-void CMainMenu::OnDownloadPatchResult(bool success)
-{
-    m_sPDProgress.IsInProgress = false;
-    auto dialogId = success ? PatchDownloadSuccess : PatchDownloadError;
-    m_pMB_ErrDlgs[dialogId]->ShowDialog(false);
-};
 
 void CMainMenu::OnSessionTerminate(LPCSTR reason)
 {
@@ -773,25 +694,8 @@ void CMainMenu::OnLoadError(LPCSTR module)
     SetErrorDialog(CMainMenu::LoadingError);
 }
 
-void CMainMenu::OnDownloadPatchProgress(u64 bytesReceived, u64 totalSize)
-{
-    m_sPDProgress.Progress = (float(bytesReceived) / float(totalSize)) * 100.0f;
-};
-
-extern ENGINE_API string512 g_sLaunchOnExit_app;
-extern ENGINE_API string512 g_sLaunchOnExit_params;
-extern ENGINE_API string_path g_sLaunchWorkingFolder;
-void CMainMenu::OnRunDownloadedPatch(CUIWindow*, void*)
-{
-    xr_strcpy(g_sLaunchOnExit_app, *m_sPatchFileName);
-    xr_strcpy(g_sLaunchOnExit_params, "");
-    xr_strcpy(g_sLaunchWorkingFolder, "");
-    Console->Execute("quit");
-}
-
 void CMainMenu::CancelDownload()
 {
-    m_pGameSpyFull->GetGameSpyHTTP()->StopDownload();
     m_sPDProgress.IsInProgress = false;
 }
 
@@ -905,7 +809,6 @@ void CMainMenu::Hide_CTMS_Dialog()
     m_pMB_ErrDlgs[ConnectToMasterServer]->HideDialog();
 }
 
-void CMainMenu::OnConnectToMasterServerOkClicked(CUIWindow*, void*) { Hide_CTMS_Dialog(); }
 LPCSTR CMainMenu::GetGSVer()
 {
     static string256 buff;

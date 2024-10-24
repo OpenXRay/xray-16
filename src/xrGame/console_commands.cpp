@@ -45,7 +45,6 @@
 #include "inventory_upgrade_manager.h"
 
 #include "xrGameSpy/GameSpy_Full.h"
-#include "xrGameSpy/GameSpy_Patching.h"
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
@@ -1826,20 +1825,7 @@ public:
 
 class CCC_GSCheckForUpdates : public IConsole_Command
 {
-private:
-    CGameSpy_Patching::PatchCheckCallback m_resultCallbackBinded;
-    std::atomic<bool> m_checkInProgress = false;
     bool m_informNoPatch = true;
-
-    void ResultCallback(bool success, pcstr VersionName, pcstr URL)
-    {
-        auto mm = MainMenu();
-        if ((success || m_informNoPatch) && mm != nullptr)
-        {
-            mm->OnPatchCheck(success, VersionName, URL);
-        }
-        m_checkInProgress.store(false);
-    }
 
     void SetupCallParams(pcstr args)
     {
@@ -1855,7 +1841,6 @@ private:
 public:
     CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N)
     {
-        m_resultCallbackBinded.bind(this, &CCC_GSCheckForUpdates::ResultCallback);
         bEmptyArgsHandled = true;
     };
 
@@ -1865,10 +1850,11 @@ public:
         if (mm == nullptr)
             return;
 
-        if (!m_checkInProgress.exchange(true))
+        SetupCallParams(arguments);
+
+        if (m_informNoPatch)
         {
-            SetupCallParams(arguments);
-            mm->GetGS()->GetGameSpyPatching()->CheckForPatch(true, m_resultCallbackBinded);
+            mm->OnPatchCheck(false);
         }
     }
 };
