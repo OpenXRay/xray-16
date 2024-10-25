@@ -676,13 +676,13 @@ void CDemoRecord::IR_OnKeyboardRelease(int dik)
     } // switch (GetBindedAction(dik))
 }
 
-void CDemoRecord::OnAxisMove(float x, float y, float scale, bool invert)
+void CDemoRecord::OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY)
 {
     Fvector vR_delta = Fvector().set(0, 0, 0);
     if (!fis_zero(x) || !fis_zero(y))
     {
-        vR_delta.y += x * scale; // heading
-        vR_delta.x += (invert ? -1.f : 1.f) * y * scale * (3.f / 4.f); // pitch
+        vR_delta.y += (invertX ? -1.f : 1.f) * x * scaleX; // heading
+        vR_delta.x += (invertY ? -1.f : 1.f) * y * scaleY * (3.f / 4.f); // pitch
     }
     update_whith_timescale(m_vR, vR_delta);
 }
@@ -696,7 +696,7 @@ void CDemoRecord::IR_OnMouseMove(int dx, int dy)
     }
 
     const float scale = .5f; // psMouseSens;
-    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
+    OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
 void CDemoRecord::IR_OnMouseHold(int btn)
@@ -742,8 +742,9 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
     case kLOOK_AROUND:
     {
         m_angle_speed = speed;
-        const float scale = .05f; // psControllerStickSens;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        const float scaleX = .05f; // psControllerStickSensX;
+        const float scaleY = .05f; // psControllerStickSensY;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -826,7 +827,7 @@ void CDemoRecord::IR_OnControllerAttitudeChange(Fvector change)
     }
 
     const float scale = 5.f; // psControllerSensorSens;
-    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+    OnAxisMove(change.x, change.y, scale, scale, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
 }
 
 void CDemoRecord::RecordKey()

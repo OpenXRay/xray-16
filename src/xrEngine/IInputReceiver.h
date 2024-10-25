@@ -50,14 +50,20 @@ ENGINE_API extern float psMouseSens;
 ENGINE_API extern float psMouseSensScale;
 ENGINE_API extern Flags32 psMouseInvert;
 
-ENGINE_API extern float psControllerStickSens;
+ENGINE_API extern float psControllerStickSensX;
+ENGINE_API extern float psControllerStickSensY;
 ENGINE_API extern float psControllerStickSensScale;
 ENGINE_API extern float psControllerStickDeadZone;
 ENGINE_API extern float psControllerSensorSens;
 ENGINE_API extern float psControllerSensorDeadZone;
-ENGINE_API extern Flags32 psControllerInvertY;
-ENGINE_API extern Flags32 psControllerEnableSensors;
-
 ENGINE_API extern float psControllerCursorAutohideTime;
+ENGINE_API extern Flags32 psControllerFlags;
+
+enum EControllerFlags
+{
+    ControllerInvertX,
+    ControllerInvertY,
+    ControllerEnableSensors,
+};
 
 #endif

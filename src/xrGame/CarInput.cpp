@@ -17,17 +17,17 @@
 #include "Level.h"
 #include "CarWeapon.h"
 
-void CCar::OnAxisMove(float x, float y, float scale, bool invert)
+void CCar::OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY)
 {
     CCameraBase* C = active_camera;
     if (!fis_zero(x))
     {
-        const float d = x * scale;
+        const float d = (invertX ? -1.f : 1.f) * x * scaleX;
         C->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
     }
     if (!fis_zero(y))
     {
-        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
+        const float d = (invertY ? -1.f : 1.f) * y * scaleY * 3.f / 4.f;
         C->Move((d > 0) ? kUP : kDOWN, _abs(d));
     }
 }
@@ -38,7 +38,7 @@ void CCar::OnMouseMove(int dx, int dy)
         return;
 
     const float scale = (active_camera->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f;
-    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
+    OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
 bool CCar::bfAssignMovement(CScriptEntityAction* tpEntityAction)
@@ -236,8 +236,9 @@ void CCar::OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scale = (active_camera->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        const float scaleX = (active_camera->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f;
+        const float scaleY = (active_camera->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -298,8 +299,9 @@ void CCar::OnControllerHold(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scale = (active_camera->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        const float scaleX = (active_camera->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f;
+        const float scaleY = (active_camera->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -357,7 +359,7 @@ void CCar::OnControllerHold(int cmd, float x, float y)
 void CCar::OnControllerAttitudeChange(Fvector change)
 {
     const float scale = (active_camera->f_fov / g_fov) * psControllerSensorSens / 50.f;
-    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+    OnAxisMove(change.x, change.y, scale, scale, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
 }
 
 void CCar::Action(u16 id, u32 flags)

@@ -80,7 +80,7 @@ public:
     // HolderCustom
     virtual bool Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos) { return !Owner(); };
 
-    void OnAxisMove(float x, float y, float scale, bool invert);
+    void OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY);
 
     virtual void OnMouseMove(int x, int y);
 

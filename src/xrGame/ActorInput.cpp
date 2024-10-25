@@ -332,16 +332,16 @@ void CActor::IR_OnKeyboardHold(int cmd)
     }
 }
 
-void CActor::OnAxisMove(float x, float y, float scale, bool invert)
+void CActor::OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY)
 {
     if (!fis_zero(x))
     {
-        const float d = x * scale;
+        const float d = (invertX ? -1.f : 1.f) * x * scaleX;
         cam_Active()->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
     }
     if (!fis_zero(y))
     {
-        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
+        const float d = (invertY ? -1.f : 1.f) * y * scaleY * 3.f / 4.f;
         cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
     }
 }
@@ -366,7 +366,7 @@ void CActor::IR_OnMouseMove(int dx, int dy)
 
     const float LookFactor = GetLookFactor();
     const float scale = (cam_Active()->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f / LookFactor;
-    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
+    OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
 void CActor::IR_OnControllerPress(int cmd, float x, float y)
@@ -409,8 +409,9 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
     case kLOOK_AROUND:
     {
         const float LookFactor = GetLookFactor();
-        float scale = (cam_Active()->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f / LookFactor;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        float scaleX = (cam_Active()->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f / LookFactor;
+        float scaleY = (cam_Active()->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f / LookFactor;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -504,8 +505,9 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
     case kLOOK_AROUND:
     {
         const float LookFactor = GetLookFactor();
-        float scale = (cam_Active()->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f / LookFactor;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        float scaleX = (cam_Active()->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f / LookFactor;
+        float scaleY = (cam_Active()->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f / LookFactor;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -562,7 +564,7 @@ void CActor::IR_OnControllerAttitudeChange(Fvector change)
 
     const float LookFactor = GetLookFactor();
     const float scale = (cam_Active()->f_fov / g_fov) * psControllerSensorSens / 50.f / LookFactor;
-    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+    OnAxisMove(change.x, change.y, scale, scale, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
 }
 
 #include "HudItem.h"

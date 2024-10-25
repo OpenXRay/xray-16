@@ -908,16 +908,14 @@ void CCC_Register()
     CMD4(CCC_Float, "mouse_sens", &psMouseSens, 0.001f, 0.6f);
 
     // Gamepad
-    CMD3(CCC_Mask, "gamepad_invert_y", &psControllerInvertY, 1);
-    psControllerStickSens = 0.02f;
-    CMD4(CCC_Float, "gamepad_stick_sens", &psControllerStickSens, 0.001f, 0.6f);
-    psControllerStickDeadZone = 15.f;
+    CMD3(CCC_Mask, "gamepad_invert_x", &psControllerFlags, ControllerInvertX);
+    CMD3(CCC_Mask, "gamepad_invert_y", &psControllerFlags, ControllerInvertY);
+    CMD4(CCC_Float, "gamepad_stick_sens_x", &psControllerStickSensX, 0.00001f, 2.0f);
+    CMD4(CCC_Float, "gamepad_stick_sens_y", &psControllerStickSensY, 0.00001f, 2.0f);
     CMD4(CCC_Float, "gamepad_stick_deadzone", &psControllerStickDeadZone, 1.f, 35.f);
-    psControllerSensorSens = 0.5f;
     CMD4(CCC_Float, "gamepad_sensor_sens", &psControllerSensorSens, 0.01f, 3.f);
-    psControllerSensorDeadZone = 0.005f;
     CMD4(CCC_Float, "gamepad_sensor_deadzone", &psControllerSensorDeadZone, 0.001f, 1.f);
-    CMD3(CCC_ControllerSensorEnable, "gamepad_sensors_enable", &psControllerEnableSensors, 1);
+    CMD3(CCC_ControllerSensorEnable, "gamepad_sensors_enable", &psControllerFlags, ControllerEnableSensors);
     CMD4(CCC_Float, "gamepad_cursor_autohide_time", &psControllerCursorAutohideTime, 0.5f, 3.f);
 
     // Camera

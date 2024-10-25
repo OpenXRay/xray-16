@@ -16,13 +16,13 @@ ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {};
 
-ENGINE_API float psControllerStickSens = 1.f;
+ENGINE_API float psControllerStickSensX = 0.02f;
+ENGINE_API float psControllerStickSensY = 0.02f;
 ENGINE_API float psControllerStickSensScale = 1.f;
-ENGINE_API float psControllerStickDeadZone = 0.f;
-ENGINE_API float psControllerSensorSens = 1.f;
-ENGINE_API float psControllerSensorDeadZone = 0.f;
-ENGINE_API Flags32 psControllerInvertY = { false };
-ENGINE_API Flags32 psControllerEnableSensors = { true };
+ENGINE_API float psControllerStickDeadZone = 15.f;
+ENGINE_API float psControllerSensorSens = 0.5f;
+ENGINE_API float psControllerSensorDeadZone = 0.005f;
+ENGINE_API Flags32 psControllerFlags = { ControllerEnableSensors };
 
 ENGINE_API float psControllerCursorAutohideTime = 1.5f;
 
@@ -90,7 +90,7 @@ void CInput::OpenController(int idx)
     if (!controller)
         return;
 
-    if (psControllerEnableSensors.test(1))
+    if (psControllerFlags.test(ControllerEnableSensors))
         SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
 
     controllers.emplace_back(controller);

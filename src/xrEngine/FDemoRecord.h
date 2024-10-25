@@ -64,7 +64,7 @@ public:
     CDemoRecord(const char* name, float life_time = 60 * 60 * 1000);
     virtual ~CDemoRecord();
 
-    void OnAxisMove(float x, float y, float scale, bool invert);
+    void OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY);
     virtual void IR_OnMouseMove(int dx, int dy);
     virtual void IR_OnMouseHold(int btn);
 

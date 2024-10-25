@@ -588,7 +588,7 @@ public:
     virtual void net_Relcase(IGameObject* O);
 
     // Input
-    void OnAxisMove(float x, float y, float scale, bool invert);
+    void OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY);
 
     virtual void OnMouseMove(int x, int y);
 
