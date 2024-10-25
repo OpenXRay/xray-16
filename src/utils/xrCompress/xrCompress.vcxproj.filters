@@ -27,4 +27,8 @@
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Condition="'$(Platform)'=='Win32'" Include="..\..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3.dll" />
+    <CopyFileToFolders Condition="'$(Platform)'=='x64'" Include="..\..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3-x64.dll" />
+  </ItemGroup>
 </Project>
