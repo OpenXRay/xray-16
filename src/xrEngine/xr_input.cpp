@@ -306,27 +306,53 @@ void CInput::ControllerUpdate()
 
     SDL_Event events[MAX_CONTROLLER_EVENTS];
     auto count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEADDED);
+        SDL_GETEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEREMAPPED);
 
     for (int i = 0; i < count; ++i)
     {
         const SDL_Event& event = events[i];
-        OpenController(event.cdevice.which);
+        switch (event.type)
+        {
+        case SDL_CONTROLLERDEVICEADDED:
+            OpenController(event.cdevice.which);
+            break;
+
+        case SDL_CONTROLLERDEVICEREMOVED:
+        {
+            const auto controller = SDL_GameControllerFromInstanceID(event.cdevice.which);
+            const auto it = std::find(controllers.begin(), controllers.end(), controller);
+            if (it != controllers.end())
+                controllers.erase(it);
+            break;
+        }
+
+        case SDL_CONTROLLERDEVICEREMAPPED:
+            // We are skipping it,
+            // but it's in the SDL_PeepEvents call
+            // to make sure it's removed from event queue
+            break;
+        } // switch (event.type)
     }
 
     if (!IsControllerAvailable())
         return;
+
+    count = SDL_PeepEvents(nullptr, 0,
+        SDL_PEEKEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERTOUCHPADUP);
+
+    if (count)
+        SetCurrentInputType(Controller);
+    else if (currentInputType != Controller)
+        return;
+
+    count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
+        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERSENSORUPDATE);
 
     const int controllerDeadZone = int(psControllerStickDeadZone * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
 
     const auto controllerPrev = controllerState;
     decltype(controllerAxisState) controllerAxisStatePrev;
     CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
-
-    constexpr SDL_EventType MAX_EVENT = SDL_CONTROLLERSENSORUPDATE;
-
-    count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
-        SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, MAX_EVENT);
 
     for (int i = 0; i < count; ++i)
     {
@@ -347,7 +373,6 @@ void CInput::ControllerUpdate()
             else
             {
                 controllerAxisState[event.caxis.axis] = event.caxis.value;
-                SetCurrentInputType(Controller);
             }
             break;
         }
@@ -358,7 +383,6 @@ void CInput::ControllerUpdate()
 
             if (last_input_controller != event.cbutton.which) // don't write if don't really need to
                 last_input_controller = event.cbutton.which;
-            SetCurrentInputType(Controller);
 
             controllerState[event.cbutton.button] = true;
             cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], 1.f, 0.f);
@@ -370,24 +394,10 @@ void CInput::ControllerUpdate()
 
             if (last_input_controller != event.cbutton.which) // don't write if don't really need to
                 last_input_controller = event.cbutton.which;
-            SetCurrentInputType(Controller);
 
             controllerState[event.cbutton.button] = false;
             cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], 0.f, 0.f);
             break;
-
-        case SDL_CONTROLLERDEVICEADDED:
-            OpenController(event.cdevice.which);
-            break;
-
-        case SDL_CONTROLLERDEVICEREMOVED:
-        {
-            const auto controller = SDL_GameControllerFromInstanceID(event.cdevice.which);
-            const auto it = std::find(controllers.begin(), controllers.end(), controller);
-            if (it != controllers.end())
-                controllers.erase(it);
-            break;
-        }
 
         case SDL_CONTROLLERSENSORUPDATE:
         {
