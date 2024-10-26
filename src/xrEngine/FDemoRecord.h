@@ -72,9 +72,9 @@ public:
     virtual void IR_OnKeyboardHold(int dik);
     virtual void IR_OnKeyboardRelease(int dik);
 
-    void IR_OnControllerPress(int key, float x, float y) override;
-    void IR_OnControllerHold(int key, float x, float y) override;
-    void IR_OnControllerRelease(int key, float x, float y) override;
+    void IR_OnControllerPress(int key, const ControllerAxisState& state) override;
+    void IR_OnControllerHold(int key, const ControllerAxisState& state) override;
+    void IR_OnControllerRelease(int key, const ControllerAxisState& state) override;
 
     void IR_OnControllerAttitudeChange(Fvector change) override;
 

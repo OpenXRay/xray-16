@@ -148,11 +148,11 @@ bool CUITaskWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
-bool CUITaskWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUITaskWnd::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
     if (m_pKeyboardCapturer && pInput->IsCurrentInputTypeController())
-        return m_pKeyboardCapturer->OnControllerAction(axis, x, y, controller_action);
-    return inherited::OnControllerAction(axis, x, y, controller_action);
+        return m_pKeyboardCapturer->OnControllerAction(axis, state, controller_action);
+    return inherited::OnControllerAction(axis, state, controller_action);
 }
 
 void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)

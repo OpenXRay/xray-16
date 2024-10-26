@@ -51,7 +51,7 @@ void CWeaponStatMgun::OnKeyboardHold(int dik)
 
 }
 
-void CWeaponStatMgun::OnControllerPress(int cmd, float x, float y)
+void CWeaponStatMgun::OnControllerPress(int cmd, const ControllerAxisState& state)
 {
     if (Remote())
         return;
@@ -60,9 +60,9 @@ void CWeaponStatMgun::OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scaleX = psControllerStickSensX * psControllerStickSensScale / 50.f;
-        const float scaleY = psControllerStickSensY * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        const float scaleX = psControllerStickSensX * psControllerStickSensScale;
+        const float scaleY = psControllerStickSensY * psControllerStickSensScale;
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -72,7 +72,7 @@ void CWeaponStatMgun::OnControllerPress(int cmd, float x, float y)
     };
 }
 
-void CWeaponStatMgun::OnControllerRelease(int cmd, float x, float y)
+void CWeaponStatMgun::OnControllerRelease(int cmd, const ControllerAxisState& state)
 {
     if (Remote())
         return;
@@ -88,7 +88,7 @@ void CWeaponStatMgun::OnControllerRelease(int cmd, float x, float y)
     };
 }
 
-void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
+void CWeaponStatMgun::OnControllerHold(int cmd, const ControllerAxisState& state)
 {
     if (Remote())
         return;
@@ -96,9 +96,9 @@ void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
     switch (cmd)
     {
     case kLOOK_AROUND:
-        const float scaleX = psControllerStickSensX * psControllerStickSensScale / 50.f;
-        const float scaleY = psControllerStickSensY * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        const float scaleX = psControllerStickSensX * psControllerStickSensScale;
+        const float scaleY = psControllerStickSensY * psControllerStickSensScale;
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }; // switch (cmd)
 }

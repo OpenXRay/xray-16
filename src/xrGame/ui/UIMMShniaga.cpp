@@ -452,16 +452,16 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIMMShniaga::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUIMMShniaga::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
     if (WINDOW_KEY_PRESSED == controller_action || WINDOW_KEY_HOLD == controller_action)
     {
-        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI) && !fis_zero(y))
+        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI) && !fis_zero(state.y))
         {
             if (!m_flags.test(fl_MovingStoped))
                 return true;
 
-            if (y < 0) // scroll up
+            if (state.y < 0) // scroll up
             {
                 if (m_selected_btn > 0)
                     SelectBtn(m_selected_btn - 1);
@@ -478,7 +478,7 @@ bool CUIMMShniaga::OnControllerAction(int axis, float x, float y, EUIMessages co
             return true;
         }
     }
-    return CUIWindow::OnControllerAction(axis, x, y, controller_action);
+    return CUIWindow::OnControllerAction(axis, state, controller_action);
 }
 
 int CUIMMShniaga::BtnCount()

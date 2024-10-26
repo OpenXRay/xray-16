@@ -151,9 +151,9 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIEditKeyBind::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUIEditKeyBind::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
-    if (CUIStatic::OnControllerAction(axis, x, y, controller_action))
+    if (CUIStatic::OnControllerAction(axis, state, controller_action))
         return true;
 
     if (m_isEditMode)

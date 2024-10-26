@@ -21,4 +21,12 @@ enum
 extern Flags32 psActorFlags;
 extern BOOL GodMode();
 
+extern float psLookIntensityMin;
+extern float psLookIntensityMax;
+extern float psLookIntensityStep;
+
+extern float psCursorIntensityMin;
+extern float psCursorIntensityMax;
+extern float psCursorIntensityStep;
+
 extern int psActorSleepTime;

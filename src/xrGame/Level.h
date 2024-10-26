@@ -316,9 +316,9 @@ public:
     void IR_OnMouseMove(int, int) override;
     void IR_OnMouseWheel(float x, float y) override;
 
-    void IR_OnControllerPress(int key, float x, float y) override;
-    void IR_OnControllerRelease(int key, float x, float y) override;
-    void IR_OnControllerHold(int key, float x, float y) override;
+    void IR_OnControllerPress(int key, const ControllerAxisState& state) override;
+    void IR_OnControllerRelease(int key, const ControllerAxisState& state) override;
+    void IR_OnControllerHold(int key, const ControllerAxisState& state) override;
 
     void IR_OnControllerAttitudeChange(Fvector change) override;
 

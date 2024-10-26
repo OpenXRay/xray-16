@@ -96,14 +96,14 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     std::ignore = pInput->iSetMousePos(p);
 }
 
-void CUICursor::UpdateCursorPosition(int _dx, int _dy)
+void CUICursor::UpdateCursorPosition(Fvector2 pos)
 {
     vPrevPos = vPos;
     if (pInput->IsExclusiveMode() || !m_bound_to_system_cursor)
     {
-        float sens = 1.0f;
-        vPos.x += (float)_dx * sens * correction.x;
-        vPos.y += (float)_dy * sens * correction.y;
+        constexpr float sens = 1.0f;
+        vPos.x += pos.x * sens * correction.x;
+        vPos.y += pos.y * sens * correction.y;
     }
     else
     {

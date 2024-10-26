@@ -39,9 +39,9 @@ public:
     virtual void IR_OnKeyboardHold(int /*dik*/) {}
     virtual void IR_OnTextInput(pcstr /*text*/) {}
 
-    virtual void IR_OnControllerPress(int /*dik*/, float /*x*/, float /*y*/) {}
-    virtual void IR_OnControllerRelease(int /*dik*/, float /*x*/, float /*y*/) {}
-    virtual void IR_OnControllerHold(int /*dik*/, float /*x*/, float /*y*/) {}
+    virtual void IR_OnControllerPress(int /*dik*/, const ControllerAxisState& /*state*/) {}
+    virtual void IR_OnControllerRelease(int /*dik*/, const ControllerAxisState& /*state*/) {}
+    virtual void IR_OnControllerHold(int /*dik*/, const ControllerAxisState& /*state*/) {}
 
     virtual void IR_OnControllerAttitudeChange(Fvector /*change*/) {}
 };
@@ -53,7 +53,9 @@ ENGINE_API extern Flags32 psMouseInvert;
 ENGINE_API extern float psControllerStickSensX;
 ENGINE_API extern float psControllerStickSensY;
 ENGINE_API extern float psControllerStickSensScale;
-ENGINE_API extern float psControllerStickDeadZone;
+ENGINE_API extern float psControllerStickInnerDeadZone;
+ENGINE_API extern float psControllerStickOuterDeadZone;
+ENGINE_API extern float psControllerStickAngularDeadZone;
 ENGINE_API extern float psControllerSensorSens;
 ENGINE_API extern float psControllerSensorDeadZone;
 ENGINE_API extern float psControllerCursorAutohideTime;

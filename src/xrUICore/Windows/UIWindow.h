@@ -76,7 +76,7 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
     virtual void OnMouseUp(int mouse_btn);
 
-    virtual bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action);
+    virtual bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action);
 
     virtual void OnFocusReceive();
     virtual void OnFocusLost();

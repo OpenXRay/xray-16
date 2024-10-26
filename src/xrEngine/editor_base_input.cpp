@@ -445,7 +445,7 @@ void ide::IR_OnTextInput(pcstr text)
         io.AddInputCharactersUTF8(text);
 }
 
-void ide::IR_OnControllerPress(int key, float x, float y)
+void ide::IR_OnControllerPress(int key, const ControllerAxisState& state)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -462,10 +462,10 @@ void ide::IR_OnControllerPress(int key, float x, float y)
         case XR_CONTROLLER_AXIS_RIGHT:
             break;
         case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-            io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, true, x);
+            io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, true, state.magnitude);
             break;
         case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-            io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, true, x);
+            io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, true, state.magnitude);
             break;
     }
 
@@ -495,7 +495,7 @@ void ide::IR_OnControllerPress(int key, float x, float y)
 #undef IM_SATURATE*/
 }
 
-void ide::IR_OnControllerRelease(int key, float x, float y)
+void ide::IR_OnControllerRelease(int key, const ControllerAxisState& state)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -512,15 +512,15 @@ void ide::IR_OnControllerRelease(int key, float x, float y)
     case XR_CONTROLLER_AXIS_RIGHT:
         break;
     case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-        io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, false, x);
+        io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, false, state.magnitude);
         break;
     case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-        io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, false, x);
+        io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, false, state.magnitude);
         break;
     }
 }
 
-void ide::IR_OnControllerHold(int /*key*/, float /*x*/, float /*y*/)
+void ide::IR_OnControllerHold(int /*key*/, const ControllerAxisState /*x*/& state)
 {
     // ImGui handles hold state on its own
 }

@@ -709,32 +709,32 @@ void CDemoRecord::IR_OnMouseHold(int btn)
     IR_OnKeyboardHold(btn);
 }
 
-void CDemoRecord::IR_OnControllerPress(int key, float x, float y)
+void CDemoRecord::IR_OnControllerPress(int key, const ControllerAxisState& state)
 {
     if (m_b_redirect_input_to_level)
     {
-        g_pGameLevel->IR_OnControllerPress(key, x, y);
+        g_pGameLevel->IR_OnControllerPress(key, state);
         return;
     }
 
     IR_OnKeyboardPress(key);
 }
 
-void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
+void CDemoRecord::IR_OnControllerHold(int key, const ControllerAxisState& state)
 {
     if (m_b_redirect_input_to_level)
     {
-        g_pGameLevel->IR_OnControllerHold(key, x, y);
+        g_pGameLevel->IR_OnControllerHold(key, state);
         return;
     }
 
-    const float look = std::max(std::abs(x), std::abs(y));
+    const float look = state.magnitude;
     movement_speed speed = speed_1;
-    if (look >= 90.f)
+    if (look >= 0.9f)
         speed = speed_3;
-    else if (look >= 75.f)
+    else if (look >= 0.75f)
         speed = speed_2;
-    else if (look < 45.f)
+    else if (look < 0.45f)
         speed = speed_0;
 
     switch (GetBindedAction(key))
@@ -744,7 +744,7 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
         m_angle_speed = speed;
         const float scaleX = .05f; // psControllerStickSensX;
         const float scaleY = .05f; // psControllerStickSensY;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -769,18 +769,18 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
         m_speed = speed;
         Fvector vT_delta = Fvector().set(0, 0, 0);
 
-        if (!fis_zero(x))
+        if (!fis_zero(state.x))
         {
-            if (x > 35.f)
+            if (state.x > 0.35f)
                 vT_delta.x += 1.0f;
-            else if (x < -35.f)
+            else if (state.x < -0.35f)
                 vT_delta.x -= 1.0f;
         }
-        if (!fis_zero(y))
+        if (!fis_zero(state.y))
         {
-            if (y > 35.f)
+            if (state.y > 0.35f)
                 vT_delta.y -= 1.0f;
-            else if (y < -35.f)
+            else if (state.y < -0.35f)
                 vT_delta.y += 1.0f;
         }
 
@@ -794,11 +794,11 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
     }
 }
 
-void CDemoRecord::IR_OnControllerRelease(int key, float x, float y)
+void CDemoRecord::IR_OnControllerRelease(int key, const ControllerAxisState& state)
 {
     if (m_b_redirect_input_to_level)
     {
-        g_pGameLevel->IR_OnControllerRelease(key, x, y);
+        g_pGameLevel->IR_OnControllerRelease(key, state);
         return;
     }
 

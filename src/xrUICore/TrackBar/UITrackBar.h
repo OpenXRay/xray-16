@@ -21,7 +21,7 @@ public:
     virtual void Update();
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
-    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
+    bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action) override;
     virtual void OnMessage(LPCSTR message);
     // CUIWindow
     void InitTrackBar(Fvector2 pos, Fvector2 size);

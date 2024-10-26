@@ -897,10 +897,12 @@ void CCC_Register()
     CMD3(CCC_Mask, "gamepad_invert_y", &psControllerFlags, ControllerInvertY);
     CMD4(CCC_Float, "gamepad_stick_sens_x", &psControllerStickSensX, 0.00001f, 2.0f);
     CMD4(CCC_Float, "gamepad_stick_sens_y", &psControllerStickSensY, 0.00001f, 2.0f);
-    CMD4(CCC_Float, "gamepad_stick_deadzone", &psControllerStickDeadZone, 1.f, 35.f);
+    CMD4(CCC_Float, "gamepad_stick_inner_deadzone", &psControllerStickInnerDeadZone, 0.0f, 1.0f);
+    CMD4(CCC_Float, "gamepad_stick_outer_deadzone", &psControllerStickOuterDeadZone, 0.0f, 1.0f);
+    //CMD4(CCC_Float, "gamepad_stick_angular_deadzone", &psControllerStickAngularDeadZone, 0.0f, 1.0f);
     CMD4(CCC_Float, "gamepad_sensor_sens", &psControllerSensorSens, 0.01f, 3.f);
     CMD4(CCC_Float, "gamepad_sensor_deadzone", &psControllerSensorDeadZone, 0.001f, 1.f);
-    CMD3(CCC_Mask, "gamepad_sensors_enable", &psControllerFlags, ControllerEnableSensors);
+    CMD3(CCC_Mask,  "gamepad_sensors_enable", &psControllerFlags, ControllerEnableSensors);
     CMD4(CCC_Float, "gamepad_cursor_autohide_time", &psControllerCursorAutohideTime, 0.5f, 3.f);
 
     // Camera

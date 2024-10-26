@@ -41,10 +41,12 @@ ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
 ENGINE_API Flags32 psMouseInvert = {};
 
-ENGINE_API float psControllerStickSensX = 0.02f;
-ENGINE_API float psControllerStickSensY = 0.02f;
+ENGINE_API float psControllerStickSensX = 0.12f;
+ENGINE_API float psControllerStickSensY = 0.7f;
 ENGINE_API float psControllerStickSensScale = 1.f;
-ENGINE_API float psControllerStickDeadZone = 15.f;
+ENGINE_API float psControllerStickInnerDeadZone = 0.15f;
+ENGINE_API float psControllerStickOuterDeadZone = 0.96f;
+ENGINE_API float psControllerStickAngularDeadZone = 0.95f;
 ENGINE_API float psControllerSensorSens = 0.5f;
 ENGINE_API float psControllerSensorDeadZone = 0.005f;
 ENGINE_API Flags32 psControllerFlags = { ControllerEnableSensors };
@@ -68,9 +70,6 @@ CInput::CInput(const bool exclusive)
 
     mouseState.reset();
     keyboardState.reset();
-    controllerState.reset();
-    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
-    last_input_controller = -1;
 
     //===================== Dummy pack
     iCapture(&dummyController);
@@ -148,7 +147,7 @@ void CInput::SetCurrentInputType(InputType type)
     switch (type)
     {
     case KeyboardMouse:
-        last_input_controller = -1;
+        controllerState.id = -1;
         if (psControllerFlags.test(ControllerEnableSensors))
         {
             for (auto controller : controllers)
@@ -325,6 +324,12 @@ void CInput::KeyUpdate()
             cbStack.back()->IR_OnKeyboardHold(i);
 }
 
+bool ControllerState::attitude_changed() const
+{
+    // XXX: maybe check if magnitude is 0 instead?
+    return gyroscope.similar(Fvector{ 0.f, 0.f, 0.f }, psControllerSensorDeadZone);
+}
+
 void CInput::ControllerUpdate()
 {
     ZoneScoped;
@@ -399,11 +404,13 @@ void CInput::ControllerUpdate()
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
         SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERSENSORUPDATE);
 
-    const int controllerDeadZone = int(psControllerStickDeadZone * (SDL_JOYSTICK_AXIS_MAX / 100.f)); // raw
+    constexpr ControllerAxisState pressedAxis{ 1.0f };
+    constexpr ControllerAxisState releasedAxis{};
 
+    static_assert(SDL_CONTROLLER_AXIS_MAX == 6, "Align the depending code with the changes in SDL_GameControllerAxis.");
+    static float axes[SDL_CONTROLLER_AXIS_MAX]{};
+    bool axisMoved[SDL_CONTROLLER_AXIS_MAX]{};
     const auto controllerPrev = controllerState;
-    decltype(controllerAxisState) controllerAxisStatePrev;
-    CopyMemory(controllerAxisStatePrev, controllerAxisState, sizeof(controllerAxisState));
 
     for (int i = 0; i < count; ++i)
     {
@@ -413,86 +420,98 @@ void CInput::ControllerUpdate()
         {
         case SDL_CONTROLLERAXISMOTION:
         {
-            if (event.caxis.axis >= COUNT_CONTROLLER_AXIS)
-                break; // SDL added new axis, not supported by engine yet
+            if (controllerState.id != event.caxis.which) // don't write if don't really need to
+                controllerState.id = event.caxis.which;
 
-            if (last_input_controller != event.caxis.which) // don't write if don't really need to
-                last_input_controller = event.caxis.which;
-
-            if (std::abs(event.caxis.value) < controllerDeadZone)
-                controllerAxisState[event.caxis.axis] = 0;
-            else
-            {
-                controllerAxisState[event.caxis.axis] = event.caxis.value;
-            }
+            axisMoved[event.caxis.axis] = true;
+            axes[event.caxis.axis] = event.caxis.value;
             break;
         }
 
         case SDL_CONTROLLERBUTTONDOWN:
-            if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
-                break; // SDL added new button, not supported by engine yet
+            if (controllerState.id != event.cbutton.which) // don't write if don't really need to
+                controllerState.id = event.cbutton.which;
 
-            if (last_input_controller != event.cbutton.which) // don't write if don't really need to
-                last_input_controller = event.cbutton.which;
-
-            controllerState[event.cbutton.button] = true;
-            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], 1.f, 0.f);
+            controllerState.buttons[event.cbutton.button] = true;
+            cbStack.back()->IR_OnControllerPress(ControllerButtonToKey[event.cbutton.button], pressedAxis);
             break;
 
         case SDL_CONTROLLERBUTTONUP:
-            if (event.cbutton.button >= XR_CONTROLLER_BUTTON_COUNT)
-                break; // SDL added new button, not supported by engine yet
+            if (controllerState.id != event.cbutton.which) // don't write if don't really need to
+                controllerState.id = event.cbutton.which;
 
-            if (last_input_controller != event.cbutton.which) // don't write if don't really need to
-                last_input_controller = event.cbutton.which;
-
-            controllerState[event.cbutton.button] = false;
-            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], 0.f, 0.f);
+            controllerState.buttons[event.cbutton.button] = false;
+            cbStack.back()->IR_OnControllerRelease(ControllerButtonToKey[event.cbutton.button], releasedAxis);
             break;
 
         case SDL_CONTROLLERSENSORUPDATE:
         {
-            if (last_input_controller != event.csensor.which) // only use data from the recently used controller
-                break;
+            if (controllerState.id != event.csensor.which)
+                break; // only use data from the recently used controller
             if (event.csensor.sensor != SDL_SENSOR_GYRO)
                 break;
 
-            const auto gyro = Fvector { -event.csensor.data[1], -event.csensor.data[0], -event.csensor.data[2] };
-            if (!gyro.similar(Fvector{ 0.f, 0.f, 0.f }, psControllerSensorDeadZone))
-                cbStack.back()->IR_OnControllerAttitudeChange(gyro);
+            controllerState.gyroscope = Fvector{ -event.csensor.data[1], -event.csensor.data[0], -event.csensor.data[2] };
+            if (controllerState.attitude_changed())
+                cbStack.back()->IR_OnControllerAttitudeChange(controllerState.gyroscope);
             break;
         }
         } // switch (event.type)
     }
 
-    for (int i = 0; i < COUNT_CONTROLLER_BUTTONS; ++i)
+    for (int i = 0; i < XR_CONTROLLER_BUTTON_COUNT; ++i)
     {
-        if (controllerState[i] && controllerPrev[i])
-            cbStack.back()->IR_OnControllerHold(ControllerButtonToKey[i], 1.f, 0.f);
+        if (controllerState.buttons[i] && controllerPrev.buttons[i])
+            cbStack.back()->IR_OnControllerHold(ControllerButtonToKey[i], pressedAxis);
     }
 
-    const auto checkAxis = [this](int axis, int rawX, int rawY, int prevRawX, int prevRawY)
+    const float innerDeadZone = psControllerStickInnerDeadZone * SDL_JOYSTICK_AXIS_MAX;
+    const float outerDeadZone = psControllerStickOuterDeadZone * SDL_JOYSTICK_AXIS_MAX;
+
+    const auto applyStickDeadZone = [&](Fvector2 axis) -> ControllerAxisState
     {
-        const auto quantize = [](int value)
-        {
-            return value / (SDL_JOYSTICK_AXIS_MAX / 100.f);
-        };
+        Fvector2 bak = axis;
+        float magnitude = axis.magnitude();
 
-        const auto x = quantize(rawX), y = quantize(rawY), prevX = quantize(prevRawX), prevY = quantize(prevRawY);
-        const bool xActive = !fis_zero(x), yActive = !fis_zero(y), prevXActive = !fis_zero(prevX), prevYActive = !fis_zero(prevY);
+        if (magnitude <= innerDeadZone || psControllerStickInnerDeadZone >= 1.0f)
+            return {};
 
-        if ((xActive && prevXActive) || (yActive && prevYActive))
-            cbStack.back()->IR_OnControllerHold(axis, x, y);
-        else if (xActive || yActive)
-            cbStack.back()->IR_OnControllerPress(axis, x, y);
-        else if (prevXActive || prevYActive)
-            cbStack.back()->IR_OnControllerRelease(axis, 0.f, 0.f);
+        axis.div(magnitude);
+
+        if (magnitude > outerDeadZone)
+            magnitude = outerDeadZone;
+
+        const float normalizedMagnitude = (magnitude - innerDeadZone) / (outerDeadZone - innerDeadZone);
+        axis.mul(normalizedMagnitude);
+        return { axis, normalizedMagnitude };
     };
 
-    checkAxis(XR_CONTROLLER_AXIS_LEFT,          controllerAxisState[0], controllerAxisState[1], controllerAxisStatePrev[0], controllerAxisStatePrev[1]);
-    checkAxis(XR_CONTROLLER_AXIS_RIGHT,         controllerAxisState[2], controllerAxisState[3], controllerAxisStatePrev[2], controllerAxisStatePrev[3]);
-    checkAxis(XR_CONTROLLER_AXIS_TRIGGER_LEFT,  controllerAxisState[4], 0,                      controllerAxisStatePrev[4], 0);
-    checkAxis(XR_CONTROLLER_AXIS_TRIGGER_RIGHT, controllerAxisState[5], 0,                      controllerAxisStatePrev[5], 0);
+    if (axisMoved[0] || axisMoved[1])
+        controllerState.axis.left = applyStickDeadZone({ axes[0], axes[1] });
+    if (axisMoved[2] || axisMoved[3])
+        controllerState.axis.right = applyStickDeadZone({ axes[2], axes[3] });
+    if (axisMoved[4])
+        controllerState.axis.trigger_left = axes[4]; // XXX: needs separate dead zone function
+    if (axisMoved[5])
+        controllerState.axis.trigger_right = axes[5];
+
+    const auto checkAxis = [this](int axis, const ControllerAxisState& state, const ControllerAxisState& prevState)
+    {
+        const bool isActive = !fis_zero(state.magnitude);
+        const bool isPrevActive = !fis_zero(prevState.magnitude);
+
+        if (isActive && isPrevActive)
+            cbStack.back()->IR_OnControllerHold(axis, state);
+        else if (isActive)
+            cbStack.back()->IR_OnControllerPress(axis, state);
+        else if (isPrevActive)
+            cbStack.back()->IR_OnControllerRelease(axis, state);
+    };
+
+    checkAxis(XR_CONTROLLER_AXIS_LEFT,          controllerState.axis.left,          controllerPrev.axis.left);
+    checkAxis(XR_CONTROLLER_AXIS_RIGHT,         controllerState.axis.right,         controllerPrev.axis.right);
+    checkAxis(XR_CONTROLLER_AXIS_TRIGGER_LEFT,  controllerState.axis.trigger_left,  controllerPrev.axis.trigger_left);
+    checkAxis(XR_CONTROLLER_AXIS_TRIGGER_RIGHT, controllerState.axis.trigger_right, controllerPrev.axis.trigger_right);
 }
 
 bool KbdKeyToButtonName(const int dik, xr_string& result)
@@ -554,22 +573,12 @@ bool CInput::iGetAsyncKeyState(const int key)
     if (key > XR_CONTROLLER_BUTTON_INVALID && key < XR_CONTROLLER_BUTTON_MAX)
     {
         const int idx = key - (XR_CONTROLLER_BUTTON_INVALID + 1);
-        return controllerState[idx];
+        return controllerState.buttons[idx];
     }
 
     if (key > XR_CONTROLLER_AXIS_INVALID && key < XR_CONTROLLER_AXIS_MAX)
     {
-        switch (static_cast<EControllerAxis>(key))
-        {
-        case XR_CONTROLLER_AXIS_LEFT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_LEFTX] || controllerAxisState[SDL_CONTROLLER_AXIS_LEFTY];
-        case XR_CONTROLLER_AXIS_RIGHT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_RIGHTX] || controllerAxisState[SDL_CONTROLLER_AXIS_RIGHTY];
-        case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_TRIGGERLEFT];
-        case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-            return controllerAxisState[SDL_CONTROLLER_AXIS_TRIGGERRIGHT];
-        }
+        return !fis_zero(controllerState.get_axis(key).magnitude);
     }
 
     // unknown key ???
@@ -701,8 +710,7 @@ void CInput::iCapture(IInputReceiver* p)
     cbStack.back()->IR_OnActivate();
 
     // prepare for _new_ controller
-    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
-    last_input_controller = -1;
+    controllerState = {};
 }
 
 void CInput::iRelease(IInputReceiver* p)
@@ -734,9 +742,7 @@ void CInput::OnAppActivate(void)
 
     mouseState.reset();
     keyboardState.reset();
-    controllerState.reset();
-    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
-    last_input_controller = -1;
+    controllerState = {};
 }
 
 void CInput::OnAppDeactivate(void)
@@ -746,9 +752,7 @@ void CInput::OnAppDeactivate(void)
 
     mouseState.reset();
     keyboardState.reset();
-    controllerState.reset();
-    ZeroMemory(controllerAxisState, sizeof(controllerAxisState));
-    last_input_controller = -1;
+    controllerState = {};
 }
 
 void CInput::OnFrame(void)
@@ -804,9 +808,9 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
     {
     case FeedbackController:
     {
-        if (last_input_controller != -1)
+        if (controllerState.id != -1)
         {
-            const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
+            const auto controller = SDL_GameControllerFromInstanceID(controllerState.id);
             SDL_GameControllerRumble(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;
@@ -814,9 +818,9 @@ void CInput::Feedback(FeedbackType type, float s1, float s2, float duration)
 
     case FeedbackTriggers:
     {
-        if (last_input_controller != -1)
+        if (controllerState.id != -1)
         {
-            const auto controller = SDL_GameControllerFromInstanceID(last_input_controller);
+            const auto controller = SDL_GameControllerFromInstanceID(controllerState.id);
             SDL_GameControllerRumbleTriggers(controller, s1_rumble, s2_rumble, duration_ms);
         }
         break;

@@ -109,15 +109,15 @@ bool CUITrackBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUITrackBar::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUITrackBar::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
-    CUIWindow::OnControllerAction(axis, x, y, controller_action);
+    CUIWindow::OnControllerAction(axis, state, controller_action);
 
     if (CursorOverWindow() && IsBinded(kUI_MOVE, axis, EKeyContext::UI))
     {
-        if (fis_zero(y))
+        if (std::abs(state.x) > 0.5f && std::abs(state.y) < 0.2f)
         {
-            if (x < 0)
+            if (state.x < 0)
             {
                 StepLeft();
                 UI().GetUICursor().WarpToWindow(m_pSlider);

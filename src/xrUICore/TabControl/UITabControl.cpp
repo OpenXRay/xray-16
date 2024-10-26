@@ -246,7 +246,7 @@ bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUITabControl::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUITabControl::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
     if (WINDOW_KEY_PRESSED == controller_action)
     {

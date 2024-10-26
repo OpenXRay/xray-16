@@ -39,9 +39,9 @@ public:
     virtual void OnKeyboardRelease(int dik) = 0;
     virtual void OnKeyboardHold(int dik) = 0;
 
-    virtual void OnControllerPress(int cmd, float x, float y) = 0;
-    virtual void OnControllerRelease(int cmd, float x, float y) = 0;
-    virtual void OnControllerHold(int cmd, float x, float y) = 0;
+    virtual void OnControllerPress(int cmd, const ControllerAxisState& state) = 0;
+    virtual void OnControllerRelease(int cmd, const ControllerAxisState& state) = 0;
+    virtual void OnControllerHold(int cmd, const ControllerAxisState& state) = 0;
 
     virtual void OnControllerAttitudeChange(Fvector change) = 0;
 

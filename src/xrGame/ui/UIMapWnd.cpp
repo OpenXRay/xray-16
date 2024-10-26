@@ -475,7 +475,7 @@ bool CUIMapWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
-bool CUIMapWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUIMapWnd::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
     switch (GetBindedAction(axis, EKeyContext::PDA))
     {
@@ -486,13 +486,13 @@ bool CUIMapWnd::OnControllerAction(int axis, float x, float y, EUIMessages contr
     {
         if (controller_action != WINDOW_KEY_HOLD)
             break;
-        const auto pos_delta = Fvector2{ m_map_move_step, m_map_move_step }.mul(Fvector2{ -x, -y }.normalize());
+        const auto pos_delta = Fvector2{ m_map_move_step, m_map_move_step }.mul(Fvector2{ -state.x, -state.y }.normalize());
         MoveMap(pos_delta);
         return true;
     }
     } // switch (GetBindedAction(axis, EKeyContext::PDA))
 
-    return inherited::OnControllerAction(axis, x, y, controller_action);
+    return inherited::OnControllerAction(axis, state, controller_action);
 }
 
 bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)

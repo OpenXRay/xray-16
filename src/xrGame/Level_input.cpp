@@ -549,7 +549,7 @@ void CLevel::IR_OnTextInput(pcstr text)
     }
 }
 
-void CLevel::IR_OnControllerPress(int key, float x, float y)
+void CLevel::IR_OnControllerPress(int key, const ControllerAxisState& state)
 {
     if (g_bDisableAllInput)
         return;
@@ -563,10 +563,10 @@ void CLevel::IR_OnControllerPress(int key, float x, float y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eControllerPress)(key, x, y);
+        g_actor->callback(GameObject::eControllerPress)(key, state);
     }
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerPress(key, x, y))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerPress(key, state))
         return;
 
 #ifndef MASTER_GOLD
@@ -581,12 +581,12 @@ void CLevel::IR_OnControllerPress(int key, float x, float y)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnControllerPress(GetBindedAction(key), x, y);
+            IR->IR_OnControllerPress(GetBindedAction(key), state);
     }
 
 }
 
-void CLevel::IR_OnControllerRelease(int key, float x, float y)
+void CLevel::IR_OnControllerRelease(int key, const ControllerAxisState& state)
 {
     if (g_bDisableAllInput)
         return;
@@ -600,10 +600,10 @@ void CLevel::IR_OnControllerRelease(int key, float x, float y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eControllerRelease)(key, x, y);
+        g_actor->callback(GameObject::eControllerRelease)(key, state);
     }
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerRelease(key, x, y))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerRelease(key, state))
         return;
 
 #ifndef MASTER_GOLD
@@ -618,11 +618,11 @@ void CLevel::IR_OnControllerRelease(int key, float x, float y)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnControllerRelease(GetBindedAction(key), x, y);
+            IR->IR_OnControllerRelease(GetBindedAction(key), state);
     }
 }
 
-void CLevel::IR_OnControllerHold(int key, float x, float y)
+void CLevel::IR_OnControllerHold(int key, const ControllerAxisState& state)
 {
     if (g_bDisableAllInput)
         return;
@@ -636,10 +636,10 @@ void CLevel::IR_OnControllerHold(int key, float x, float y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eControllerHold)(key, x, y);
+        g_actor->callback(GameObject::eControllerHold)(key, state);
     }
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerHold(key, x, y))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerHold(key, state))
         return;
 
 #ifndef MASTER_GOLD
@@ -654,7 +654,7 @@ void CLevel::IR_OnControllerHold(int key, float x, float y)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnControllerHold(GetBindedAction(key), x, y);
+            IR->IR_OnControllerHold(GetBindedAction(key), state);
     }
 }
 

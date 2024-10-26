@@ -30,13 +30,15 @@ void IInputReceiver::IR_OnDeactivate()
         if (IR_GetKeyState(i))
             IR_OnMouseRelease(i);
 
+    constexpr ControllerAxisState releasedAxis{};
+
     for (i = XR_CONTROLLER_BUTTON_INVALID + 1; i < XR_CONTROLLER_BUTTON_MAX; i++)
         if (IR_GetKeyState(i))
-            IR_OnControllerRelease(i, 0.0f, 0.0f);
+            IR_OnControllerRelease(i, releasedAxis);
 
     for (i = XR_CONTROLLER_AXIS_INVALID + 1; i < XR_CONTROLLER_AXIS_MAX; i++)
         if (IR_GetKeyState(i))
-            IR_OnControllerRelease(i, 0.0f, 0.0f);
+            IR_OnControllerRelease(i, releasedAxis);
 }
 
 bool IInputReceiver::IR_GetKeyState(int dik) const

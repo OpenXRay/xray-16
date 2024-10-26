@@ -227,7 +227,7 @@ void CCar::OnKeyboardHold(int cmd)
     //	clamp(m_vCamDeltaHP.y, active_camera->lim_pitch.x,	active_camera->lim_pitch.y);
 }
 
-void CCar::OnControllerPress(int cmd, float x, float y)
+void CCar::OnControllerPress(int cmd, const ControllerAxisState& state)
 {
     if (Remote())
         return;
@@ -236,26 +236,27 @@ void CCar::OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scaleX = (active_camera->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f;
-        const float scaleY = (active_camera->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        const float scale  = active_camera->f_fov / g_fov * psControllerStickSensScale;
+        const float scaleX = scale * psControllerStickSensX;
+        const float scaleY = scale * psControllerStickSensY;
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
     case kMOVE_AROUND:
     {
-        if (!fis_zero(x))
+        if (!fis_zero(state.x))
         {
-            if (x > 35.f)
+            if (state.x > 0.35f)
                 OnKeyboardPress(kR_STRAFE);
-            else if (x < -35.f)
+            else if (state.x < -0.35f)
                 OnKeyboardPress(kL_STRAFE);
         }
-        if (!fis_zero(y))
+        if (!fis_zero(state.y))
         {
-            if (y > 35.f)
+            if (state.y > 0.35f)
                 OnKeyboardPress(kBACK);
-            else if (y < -35.f)
+            else if (state.y < -0.35f)
                 OnKeyboardPress(kFWD);
         }
         break;
@@ -267,7 +268,7 @@ void CCar::OnControllerPress(int cmd, float x, float y)
     };
 }
 
-void CCar::OnControllerRelease(int cmd, float x, float y)
+void CCar::OnControllerRelease(int cmd, const ControllerAxisState& state)
 {
     if (Remote())
         return;
@@ -290,7 +291,7 @@ void CCar::OnControllerRelease(int cmd, float x, float y)
     };
 }
 
-void CCar::OnControllerHold(int cmd, float x, float y)
+void CCar::OnControllerHold(int cmd, const ControllerAxisState& state)
 {
     if (Remote())
         return;
@@ -299,22 +300,23 @@ void CCar::OnControllerHold(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scaleX = (active_camera->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f;
-        const float scaleY = (active_camera->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        const float scale  = active_camera->f_fov / g_fov * psControllerStickSensScale;
+        const float scaleX = scale * psControllerStickSensX;
+        const float scaleY = scale * psControllerStickSensY;
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
     case kMOVE_AROUND:
     {
-        if (!fis_zero(x))
+        if (!fis_zero(state.x))
         {
-            if (x > 35.f && !rsp) // right
+            if (state.x > 0.35f && !rsp) // right
             {
                 OnKeyboardRelease(kL_STRAFE);
                 OnKeyboardPress(kR_STRAFE);
             }
-            else if (x < -35.f && !lsp) // left
+            else if (state.x < -0.35f && !lsp) // left
             {
                 OnKeyboardRelease(kR_STRAFE);
                 OnKeyboardPress(kL_STRAFE);
@@ -327,14 +329,14 @@ void CCar::OnControllerHold(int cmd, float x, float y)
                     OnKeyboardRelease(kR_STRAFE);
             }
         }
-        if (!fis_zero(y))
+        if (!fis_zero(state.y))
         {
-            if (y > 35.f && !bkp) // backward
+            if (state.y > 0.35f && !bkp) // backward
             {
                 OnKeyboardRelease(kFWD);
                 OnKeyboardPress(kBACK);
             }
-            else if (y < -35.f && !fwp) // forward
+            else if (state.y < -0.35f && !fwp) // forward
             {
                 OnKeyboardRelease(kBACK);
                 OnKeyboardPress(kFWD);

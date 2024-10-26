@@ -107,6 +107,15 @@ Flags32 psActorFlags =
     AF_MULTI_ITEM_PICKUP |
     AF_USE_TRACERS
 };
+
+float psLookIntensityMin  = 15.f;
+float psLookIntensityMax  = 60.f;
+float psLookIntensityStep = 0.7f;
+
+float psCursorIntensityMin  = 5.f;
+float psCursorIntensityMax  = 15.f;
+float psCursorIntensityStep = 0.5f;
+
 int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)

@@ -29,7 +29,7 @@ public:
     void OnUIReset() override;
 
     void WarpToWindow(const CUIWindow* wnd, bool center = false);
-    void UpdateCursorPosition(int _dx, int _dy);
+    void UpdateCursorPosition(Fvector2 pos);
 
     void SetUICursorPosition(Fvector2 pos);
 
