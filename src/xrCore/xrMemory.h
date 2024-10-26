@@ -7,18 +7,17 @@
 class XRCORE_API xrMemory
 {
 public:
+    static constexpr size_t SMALL_SIZE_MAX = 128 * sizeof(void*);
+
+public:
     xrMemory() = default;
     void _initialize();
     void _destroy();
 
-public:
     size_t mem_usage();
-    void   mem_compact();
 
-public:
-    static constexpr size_t SMALL_SIZE_MAX = 128 * sizeof(void*);
+    void mem_compact();
 
-public:
     void* mem_alloc(size_t size);
     void* mem_alloc(size_t size, size_t alignment);
     void* mem_alloc(size_t size, const std::nothrow_t&) noexcept;
