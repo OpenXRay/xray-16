@@ -390,7 +390,6 @@ void CUIMMShniaga::OnBtnClick()
 
 bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    return false;
     if (IsBinded(kQUIT, dik))
     {
         if (m_page != epi_main)
