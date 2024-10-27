@@ -59,7 +59,7 @@ CUIDebugger::CUIDebugger()
     ImGui::SetCurrentContext(Device.GetImGuiContext());
 }
 
-void CUIDebugger::OnFrame()
+void CUIDebugger::on_tool_frame()
 {
 #ifndef MASTER_GOLD
     if (!get_open_state())

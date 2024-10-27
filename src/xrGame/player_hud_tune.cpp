@@ -62,7 +62,7 @@ void CHudTuner::UpdateValues()
     }
 }
 
-void CHudTuner::OnFrame()
+void CHudTuner::on_tool_frame()
 {
 #ifndef MASTER_GOLD
     if (!get_open_state())

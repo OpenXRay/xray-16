@@ -63,7 +63,7 @@ void ide::OnFrame()
         if (m_show_weather_editor)
             ShowWeatherEditor();
         for (const auto& tool : m_tools)
-            tool->OnFrame();
+            tool->on_tool_frame();
         break;
     }
 

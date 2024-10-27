@@ -9,13 +9,15 @@
 
 namespace xray::editor
 {
-class XR_NOVTABLE ENGINE_API ide_tool : public pureFrame
+class XR_NOVTABLE ENGINE_API ide_tool
 {
     bool is_opened{};
 
 public:
     ide_tool();
     virtual ~ide_tool();
+
+    virtual void on_tool_frame() = 0;
 
     virtual pcstr tool_name() = 0;
 
