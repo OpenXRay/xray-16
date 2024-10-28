@@ -348,7 +348,6 @@ void CEnvironment::on_tool_frame()
             ImGui::EndMenuBar();
         }
 
-        auto& current = CurrentEnv;
         float time_factor = g_pGameLevel ? g_pGameLevel->GetEnvironmentTimeFactor() : fTimeFactor;
 
         if (ImGui::CollapsingHeader("Environment time", ImGuiTreeNodeFlags_DefaultOpen))
@@ -403,7 +402,7 @@ void CEnvironment::on_tool_frame()
                 }
                 //ImGui::SameLine();
                 if (ConfigStyleSelector("Weather config style", CurrentWeather->soc_style))
-                    current.soc_style = CurrentWeather->soc_style;
+                    CurrentEnv.soc_style = CurrentWeather->soc_style;
 
                 ImGui::TableNextColumn();
                 if (ImGui::BeginCombo("Effect", IsWFXPlaying() ? CurrentWeatherName.c_str() : ""))
@@ -427,7 +426,7 @@ void CEnvironment::on_tool_frame()
                 //ImGui::SameLine();
                 ImGui::BeginDisabled(!IsWFXPlaying());
                 if (ConfigStyleSelector("Effect config style", CurrentWeather->soc_style))
-                    current.soc_style = CurrentWeather->soc_style;
+                    CurrentEnv.soc_style = CurrentWeather->soc_style;
                 ImGui::EndDisabled();
                 ImGui::EndTable();
             }
@@ -447,22 +446,22 @@ void CEnvironment::on_tool_frame()
 
                 ImGui::TableNextColumn();
                 u32 hours, minutes, seconds;
-                SplitTime(current.exec_time, hours, minutes, seconds);
+                SplitTime(CurrentEnv.exec_time, hours, minutes, seconds);
 
                 string128 temp;
                 xr_sprintf(temp, "%02d:%02d:%02d###frame_time", hours, minutes, seconds);
 
-                const float current0_time = Current[0] ? Current[0]->exec_time : current.exec_time;
-                const float current1_time = Current[1] ? Current[1]->exec_time : current.exec_time;
+                const float current0_time = Current[0] ? Current[0]->exec_time : CurrentEnv.exec_time;
+                const float current1_time = Current[1] ? Current[1]->exec_time : CurrentEnv.exec_time;
 
                 ImGui::BeginDisabled(!Current[0] || !Current[1]);
-                if (ImGui::SliderFloat(temp, &current.exec_time,
+                if (ImGui::SliderFloat(temp, &CurrentEnv.exec_time,
                     current0_time, current1_time, "", ImGuiSliderFlags_NoInput))
                 {
                     //Invalidate();
                     if (g_pGameLevel)
-                        g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(current.exec_time * 1000.f), time_factor);
-                    SetGameTime(current.exec_time, time_factor);
+                        g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(CurrentEnv.exec_time * 1000.f), time_factor);
+                    SetGameTime(CurrentEnv.exec_time, time_factor);
                     lerp();
                 }
                 ImGui::EndDisabled();
@@ -487,7 +486,7 @@ void CEnvironment::on_tool_frame()
                     ImGui::Text("Please, load a level or select time frame manually.");
 
                 ImGui::TableNextColumn();
-                current.ed_show_params(*this);
+                CurrentEnv.ed_show_params(*this);
 
                 ImGui::TableNextColumn();
                 if (Current[1])
