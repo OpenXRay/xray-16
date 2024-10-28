@@ -107,10 +107,9 @@ private:
     CInifile* m_thunderbolt_collections_config{};
     CInifile* m_thunderbolts_config{};
 
-public:
-    static constexpr float MAX_DIST_FACTOR = 0.95f;
 
     // params
+    static constexpr float MAX_DIST_FACTOR = 0.95f;
     Fvector2 p_var_alt;
     float p_var_long;
     float p_min_dist;
