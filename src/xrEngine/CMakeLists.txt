@@ -9,7 +9,6 @@ target_sources_grouped(
     editor_base_input.cpp
     editor_helper.cpp
     editor_helper.h
-    editor_weather.cpp
 )
 
 target_sources_grouped(
@@ -142,6 +141,7 @@ target_sources_grouped(
     FILES
     Environment.cpp
     Environment.h
+    Environment_editor.cpp
     Environment_misc.cpp
     Environment_render.cpp
     xrHemisphere.cpp

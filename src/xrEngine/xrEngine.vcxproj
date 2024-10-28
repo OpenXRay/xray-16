@@ -125,7 +125,6 @@
     <ClCompile Include="Device_overdraw.cpp" />
     <ClCompile Include="editor_base.cpp" />
     <ClCompile Include="editor_base_input.cpp" />
-    <ClCompile Include="editor_weather.cpp" />
     <ClCompile Include="editor_helper.cpp" />
     <ClCompile Include="edit_actions.cpp" />
     <ClCompile Include="Effector.cpp" />
@@ -133,6 +132,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="EngineAPI.cpp" />
     <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="Environment_editor.cpp" />
     <ClCompile Include="Environment_misc.cpp" />
     <ClCompile Include="Environment_render.cpp" />
     <ClCompile Include="EventAPI.cpp" />

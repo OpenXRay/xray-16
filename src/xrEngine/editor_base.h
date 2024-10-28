@@ -99,7 +99,6 @@ private:
 
 private:
     void ShowMain();
-    void ShowWeatherEditor();
 
     void RegisterTool(ide_tool* tool);
     void UnregisterTool(const ide_tool* tool);
@@ -110,7 +109,6 @@ private:
 
 private:
     visible_state m_state{};
-    bool m_show_weather_editor{}; // to be refactored
     bool m_text_input_enabled{};
 
     xr_vector<ide_tool*> m_tools;

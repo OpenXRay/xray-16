@@ -7,6 +7,7 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrSound/Sound.h"
+#include "editor_base.h"
 
 // refs
 class ENGINE_API IRender_Visual;
@@ -193,6 +194,8 @@ public:
         exec_time_loaded = tm1;
     }
 
+    void ed_show_params(const CEnvironment& env); // ImGui editor
+
     void on_device_create();
     void on_device_destroy();
 
@@ -217,9 +220,11 @@ public:
         float f, CEnvModifier& M, float m_power);
 
     static std::pair<Fvector3, float> calculate_dynamic_sun_dir(float fGameTime, float azimuth);
+
+    void ed_show_params(const CEnvironment& env); // ImGui editor
 };
 
-class ENGINE_API CEnvironment
+class ENGINE_API CEnvironment : public xray::editor::ide_tool
 {
     friend class dxEnvironmentRender;
     struct str_pred
@@ -318,6 +323,7 @@ public:
     void mods_unload();
 
     void OnFrame();
+    void on_tool_frame() override;
     void lerp();
 
     void RenderSky();
@@ -362,6 +368,9 @@ protected:
 
     void save_weathers(CInifile* environment_config = nullptr) const;
     void save_weather_effects(CInifile* environment_config = nullptr) const;
+
+private:
+    pcstr tool_name() override { return "Weather Editor"; }
 };
 
 ENGINE_API extern Flags32 psEnvFlags;

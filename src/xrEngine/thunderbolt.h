@@ -135,4 +135,6 @@ public:
 
     [[nodiscard]]
     auto& GetCollections() { return collections; }
+
+    void ED_ShowParams(); // ImGui editor
 };
