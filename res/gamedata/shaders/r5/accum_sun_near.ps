@@ -15,8 +15,12 @@
 
 #include "shadow.h"
 
-// SSS Implementation
-#include "screenspace_shadows.h"
+// Check Screen Space Shaders modules & addons
+#include "check_screenspace.h"
+
+#ifdef SSFX_SSS
+	#include "screenspace_shadows.h"
+#endif
 
 #ifdef USE_SUNFILTER
 #ifdef MSAA_OPTIMIZATION
@@ -57,13 +61,22 @@ float4 main ( v2p_volume I ) : SV_Target
 	float4	light	= plight_infinity ( m, _P, _N, _C, Ldynamic_dir );
 
 	// ----- shadow
-  	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.0);
+	// SHADOWS FIXES - SSS Update 19
+	// Normal Offset for biasing
+	float3 NormalOffset = 0;
+#ifdef SSFX_SHADOWS
+	NormalOffset = _N * ssfx_shadow_bias.y;
+#endif
+
+  	float4 	P4 	= float4( _P.xyz + NormalOffset, 1.0);
 	float4 	PS	= mul( m_shadow, P4 );
 	float 	s 	= sunmask( P4 );
 			s *= shadow( PS );
 
+#ifdef SSFX_SSS
 	s *= SSFX_ScreenSpaceShadows(_P, I.hpos, ISAMPLE);
-	
+#endif
+
 #ifdef SSFX_ENHANCED_SHADERS // We have Enhanced Shaders installed
 	return 	float4( SRGBToLinear(Ldynamic_color.rgb * s.xxx),1) * light;
 #else

@@ -11,15 +11,31 @@
 	#include "night_vision.h"
 #endif
 
-#ifdef SSFX_SSR
-	#include "screenspace_reflections.h"
-#endif
-
 #ifdef SSFX_FOG
 	#include "screenspace_fog.h"
 #endif
 
+#ifdef SSFX_AO
+	#include "settings_screenspace_AO.h"
+
+	uniform float4 ssfx_ao_setup;
+	uniform float4 ssfx_ao_setup2;
+	Texture2D ssfx_ao;
+#endif
+
+#ifdef SSFX_INDIRECT_LIGHT
+	#include "settings_screenspace_IL.h"
+
+	Texture2D ssfx_il;
+	uniform float4 ssfx_il_setup;
+	uniform float4 ssfx_il_setup2;
+#endif
+
+uniform float4 ssfx_hud_hemi;
+Texture2D s_hud_mask;
+
 Texture2D s_half_depth;
+
 #include "ssao.ps"
 
 #ifdef HDAO
@@ -31,7 +47,7 @@ Texture2D<float> s_occ;
 #endif // SM_5
 
 #if SSAO_QUALITY <=3
-#include "ssdo.ps"
+//#include "ssdo.ps"
 
 #else
 #ifndef USE_HDAO
@@ -58,7 +74,6 @@ Texture2D<float> s_occ;
 #include "ssao_hbao.ps"
 #endif	//	USE_HBAO
 #endif // USE_HDAO
-
 
 struct	_input
 {
@@ -139,38 +154,56 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 #ifdef USE_HBAO
 	 occ = calc_hbao( P.z, N, I.tc0, I.pos2d );
 #else // USE_HBAO
-	occ = calc_ssdo(P, N, I.tc0, I.pos2d, ISAMPLE);
+	occ = 0;//calc_ssdo(P, N, I.tc0, I.pos2d, ISAMPLE);
 #endif
 #endif // USE_HDAO
 
 #ifdef SSAO_QUALITY
 	occ = compute_colored_ao(occ.x, D.xyz);
 #endif
-	
-	//occ.rgb = SRGBToLinear(occ.rgb); 		//gamma correct
-	
+
 	L.rgb += L.a * SRGBToLinear(D.rgb); //illum in alpha
-	
+
+	// HUD Mask
+	float HudMask = s_hud_mask.Sample(smp_linear, I.tc0).r;
+
+	// HUD hemi
+	float env_fac = 1.0 - saturate(dot(env_color.rgb, 0.15f));
+	float hud_hemi = N.w + ssfx_hud_hemi.x * env_fac;
 	
 	// hemisphere
 	float3 hdiffuse, hspecular;
-	hmodel	(hdiffuse, hspecular, mtl, N.w, D, P.xyz, N.xyz);
+	hmodel	(hdiffuse, hspecular, mtl, lerp(hud_hemi, N.w, HudMask), D, P.xyz, N.xyz);
+
+	// IL Implementation
+#ifdef SSFX_INDIRECT_LIGHT
+
+	float3 IL_sample = ssfx_il.Sample(smp_linear, I.tc0 / ssfx_il_setup.x).rgb;
+
+	// Lower highs ~ Higher lows.
+	IL_sample *= 1.0f / (1.0 + IL_sample);
+	
+	// Apply HUD intensity
+	IL_sample *= lerp(ssfx_il_setup2.y, 1.0f, HudMask);
+
+	// Vibrance
+	IL_sample = vibrance( IL_sample, ssfx_il_setup.z );
+
+	hdiffuse *= lerp(1.0f, IL_sample * (30.0f * ssfx_il_setup.y), IL_sample); // 30
+		
+#endif
 
 	// AO implementation
 #ifdef SSFX_AO
-	hdiffuse *= (1.0f - SRGBToLinear(1.0f - occ) * (1.0f - dot(hdiffuse.rgb, LUMINANCE_VECTOR)));
+	hdiffuse.rgb *= ssfx_ao.Sample(smp_linear, I.tc0).www;
 #else
-	hdiffuse *= occ;	
+	hdiffuse *= occ;
 #endif
-	//hspecular *= occ;
+	
+	hdiffuse.rgb = saturate(hdiffuse.rgb);
 
-		float3       color     = L.rgb + hdiffuse.rgb;
-					 color = LinearTosRGB(color); 			//gamma correct
-
-	// SSR Implementation
-#ifdef SSFX_SSR
-	SSFX_ScreenSpaceReflections(I.tc0, P, N, D.a, color, ISAMPLE);	
-#endif
+	float3 color	= L.rgb + hdiffuse.rgb;
+	color 			= LinearTosRGB(color); 			//gamma correct
 
 #ifdef SSFX_BEEFS_NVG
 	//// SOME NVG SHIT ////

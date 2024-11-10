@@ -1,7 +1,7 @@
 /**
- * @ Version: SCREEN SPACE SHADERS - UPDATE 12.6
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
  * @ Description: Water implementation
- * @ Modified time: 2022-11-26 02:05
+ * @ Modified time: 2024-06-14 08:39
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
@@ -25,10 +25,10 @@ float3 SSFX_ssr_water_ray(float3 ray_start_vs, float3 ray_dir_vs, float noise, u
 	int prev_sign;
 	float3 behind_hit = 0;
 
-	float RayThick = clamp( 48.0f / q_steps[G_SSR_WATER_QUALITY].x, 1.0f, 3.0f);
+	float RayThick = clamp( 48.0f / q_steps[SSFX_WATER_QUALITY].x, 1.0f, 3.0f);
 
 	// Initialize Ray
-	RayTrace ssr_ray = SSFX_ray_init(ray_start_vs, ray_dir_vs, 150, q_steps[G_SSR_WATER_QUALITY].x, noise);
+	RayTrace ssr_ray = SSFX_ray_init(ray_start_vs, ray_dir_vs, 150, q_steps[SSFX_WATER_QUALITY].x, noise);
 
 	// Save the original step.x
 	float ori_x = ssr_ray.r_step.x;
@@ -37,16 +37,16 @@ float3 SSFX_ssr_water_ray(float3 ray_start_vs, float3 ray_dir_vs, float noise, u
 	float ray_depthstart = SSFX_get_depth(ssr_ray.r_start, iSample);
 
 	// Ray-march
-	[unroll (q_steps[G_SSR_WATER_QUALITY].x)]
-	for (int st = 1; st <= q_steps[G_SSR_WATER_QUALITY].x; st++)
+	[unroll (q_steps[SSFX_WATER_QUALITY].x)]
+	for (int st = 1; st <= q_steps[SSFX_WATER_QUALITY].x; st++)
 	{
-		// Ray out of screen...
-		if (ssr_ray.r_pos.y < 0.0f || ssr_ray.r_pos.y > 1.0f)
-			return 0;
-
 		// Horizontal stretch to avoid borders
 		float2 hor = ssr_ray.r_pos.x > 0.5f ? float2(1.0f, -0.1) : float2(-0.1, 1.0f);
 		ssr_ray.r_step.x = ori_x * lerp(hor.x, hor.y, saturate(ssr_ray.r_pos.x * 2.0f));
+
+		// Ray out of screen...
+		if (!SSFX_is_valid_uv(ssr_ray.r_pos.xy))
+			return 0;
 
 		// Ray intersect check ( x = difference | y = depth sample )
 		float2 ray_check = SSFX_ray_intersect(ssr_ray, iSample);
@@ -71,7 +71,7 @@ float3 SSFX_ssr_water_ray(float3 ray_start_vs, float3 ray_dir_vs, float noise, u
 			prev_sign = -1;
 
 			// Binary Search
-			for (int x = 0; x < q_steps[G_SSR_WATER_QUALITY].y; x++)
+			for (int x = 0; x < q_steps[SSFX_WATER_QUALITY].y; x++)
 			{
 				// Half and flip depending on depth difference sign
 				if (sign(ray_check.x) != prev_sign)
@@ -105,7 +105,7 @@ float3 SSFX_ssr_water_ray(float3 ray_start_vs, float3 ray_dir_vs, float noise, u
 		}
 
 		// Pass through condition
-		bool PTh = (!NoWpnSky && ray_check.y > 0.01f && st > q_steps[G_SSR_WATER_QUALITY].x * 0.4f);
+		bool PTh = (!NoWpnSky && ray_check.y > 0.01f && st > q_steps[SSFX_WATER_QUALITY].x * 0.4f);
 
 		// Step ray... Try to pass through closer objects ( Like weapons and sights )
 		ssr_ray.r_pos += ssr_ray.r_step * (1.0f + 2.5f * PTh);

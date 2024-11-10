@@ -4,6 +4,10 @@
 // Check Screen Space Shaders modules & addons
 #include "check_screenspace.h"
 
+#ifdef SSFX_SSS
+	#include "screenspace_shadows.h"
+#endif
+
 #ifdef USE_MINMAX_SM
 #define SM_MINMAX
 #endif
@@ -58,7 +62,15 @@ float4 main ( v2p_volume I ) : SV_Target
 	float4	light	= plight_infinity ( m, _P, _N, _C, Ldynamic_dir );
 
 	// ----- shadow
-  	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.0);
+
+	// SHADOWS FIXES - SSS Update 19
+	// Normal Offset for biasing
+	float3 NormalOffset = 0;
+#ifdef SSFX_SHADOWS
+	NormalOffset = _N * ssfx_shadow_bias.y;
+#endif
+
+  	float4 	P4 	= float4( _P.xyz + NormalOffset, 1.0);
 	float4 	PS	= mul( m_shadow, P4 );
 	
 	// SHADOWS FIXES - SSS Update 14.7
@@ -73,6 +85,10 @@ float4 main ( v2p_volume I ) : SV_Target
 	float4 fade = smoothstep(0.0f, 0.1f, float4(FadeUV.x, 1.0f - FadeUV.x, FadeUV.y, 1.0f - FadeUV.y));
 	float f = fade.x * fade.y * fade.z * fade.w;
 	s += ( 1.0f - s ) * ( 1.0f - f );
+
+#ifdef SSFX_SSS
+	s *= SSFX_ScreenSpaceShadows_Far(_P, I.hpos, ISAMPLE);
+#endif
 
 	// Add Shadows
 	shadows *= s;

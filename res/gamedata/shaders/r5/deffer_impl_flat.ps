@@ -56,7 +56,7 @@ f_deffer 	main	( p_flat I 		)
 	 float g_A=n_At.w*mask.a;
 
 	 float3	mix		= 	n_R+n_G+n_B+n_A;
-			mix	*=	float3(G_SSR_TERRAIN_BUMP_INTENSITY, G_SSR_TERRAIN_BUMP_INTENSITY, 1); // Adjust bump strength
+			mix	*=	float3(0.6f, 0.6f, 1); // Adjust bump strength
 
 	 float3	N		= 	mul     	(float3x3(I.M1, I.M2, I.M3), mix.xyz);
 

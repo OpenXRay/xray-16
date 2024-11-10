@@ -1,12 +1,16 @@
 /**
  * @ Version: SCREEN SPACE SHADERS - UPDATE 17.1
  * @ Description: Rain Shader - PS
- * @ Modified time: 2023-08-07 06:17
+ * @ Modified time: 2024-02-10 06:32
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
 
 #include "screenspace_common.h"
+
+#ifdef SSFX_BEEFS_NVG
+	uniform float4 shader_param_8;
+#endif
 
 // Pixel Struct
 struct p_Rain
@@ -60,6 +64,10 @@ float4 main ( p_Rain I ) : SV_Target
 
 	// Add Brightness
 	Screen += L_hemi_color.rgb * ssfx_rain_setup.y;
+
+#ifdef SSFX_BEEFS_NVG
+	N0.w *= shader_param_8.x > 0 ? 0.5f : 1.0f;
+#endif
 
 	// Result
 	return float4( saturate(Screen), N0.w * ssfx_rain_setup.x );

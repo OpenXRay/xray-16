@@ -5,7 +5,7 @@
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  *
- * Based on the work of Sébastien Lagarde for the game "Remember Me"
+ * Based on the work of SÃ©bastien Lagarde for the game "Remember Me"
  * https://seblagarde.wordpress.com/2013/01/03/water-drop-2b-dynamic-rain-and-its-effects/
  *
  * Setup : [ x: speed | y: intensity | z: ripple frequency ]
