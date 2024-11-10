@@ -141,8 +141,8 @@ struct R_dsgraph_structure
         mapLOD.destroy();
         mapDistort.destroy();
         mapHUDSorted.destroy();
-        HUDMask.destroy();
-        mapWater.destroy();
+        //HUDMask.destroy();
+        //mapWater.destroy();
 
 #if RENDER != R_R1
         mapWmark.destroy();

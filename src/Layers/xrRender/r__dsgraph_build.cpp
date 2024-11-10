@@ -89,7 +89,12 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
 
         if (!sh->passes[0]->ps->hud_disabled)
         {
-            HUDMask.insert_anyway(distSQ, _MatrixItemSSFX({ SSA, root, pVisual, xform, sh }));
+            auto hudMaskNode = HUDMask.insert_anyway(distSQ);
+            hudMaskNode->second.ssa = SSA;
+            hudMaskNode->second.pObject = root;
+            hudMaskNode->second.pVisual = pVisual;
+            hudMaskNode->second.Matrix = xform;
+            hudMaskNode->second.se = sh;
         }
 
 #if RENDER != R_R1
@@ -202,7 +207,12 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
     // Water rendering
     if (sh->flags.isWater)
     {
-        mapWater.insert_anyway(distSQ, _MatrixItemSSFX({ SSA, NULL, pVisual, Fidentity, sh }));
+        auto waterNode = mapWater.insert_anyway(distSQ);
+        waterNode->second.ssa = SSA;
+        waterNode->second.pObject = NULL;
+        waterNode->second.pVisual = pVisual;
+        waterNode->second.Matrix = Fidentity;
+        waterNode->second.se = sh;
         return;
     }
 

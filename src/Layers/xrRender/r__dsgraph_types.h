@@ -28,7 +28,7 @@ struct _MatrixItemSSFX
     dxRender_Visual* pVisual;
     Fmatrix Matrix; // matrix (copy)
     ShaderElement* se;
-    Fmatrix PrevMatrix{};
+    mutable Fmatrix PrevMatrix{};
 };
 
 struct _MatrixItemS
