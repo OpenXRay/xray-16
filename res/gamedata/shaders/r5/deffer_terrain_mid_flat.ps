@@ -1,0 +1,61 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 20
+ * @ Description: Terrain Shader - MID
+ * @ Modified time: 2024-02-27 23:31
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "common.h"
+
+Texture2D s_lod_texture;
+
+static float2 terrain_lod_offset[4] = {
+	float2(0.15f, 0.15f),
+	float2(0.65f, 0.15f),
+	float2(0.15f, 0.65f),
+	float2(0.65f, 0.65f)
+};
+
+f_deffer main( p_flat I )
+{
+	f_deffer	O;
+
+ 	// diffuse
+	float4	D = s_base.Sample( smp_base, I.tcdh);
+	float3	N = I.N.xyz;
+
+	float4	mask= s_mask.Sample( smp_base, I.tcdh );
+	float 	mag	= dot( mask, 1 );
+			mask= mask / mag;
+
+	float2 lod_uv = 0, p_lod_uv = 0;
+	float factor = 0.0f;
+	float2 tc = (frac( I.tcdh * 100 ) * 0.35f);
+
+	for (int a = 0; a <= 3; a++)
+	{
+		if (mask[a] > factor) 
+		{
+			p_lod_uv = lod_uv;
+			lod_uv = terrain_lod_offset[a] + tc;
+			factor = mask[a]; 
+		}
+	}
+
+	// Texture - TODO: Use partial derivative?
+	float3 lod_texture = s_lod_texture.Sample(smp_base, lod_uv).rgb * factor;
+
+	lod_texture += s_lod_texture.Sample(smp_linear, p_lod_uv).rgb * (1.0 - factor);
+
+	D.rgb = lerp( 2 * D.rgb * lod_texture, D.rgb, saturate(-2.4f + length(I.position) * 0.013f));
+
+	float4 Ne = float4(normalize(N), D.w);
+
+	// Standart output
+	O = pack_gbuffer( 	Ne,
+						float4( I.position.xyz + Ne.xyz * def_virtualh / 2.h, 0.95f ), // Pos & MatID
+						float4( D.rgb, 0.001f)); // RGB & Gloss
+
+	return O;
+}

@@ -1,0 +1,52 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
+ * @ Description: SSR - Blur Phase
+ * @ Modified time: 2024-06-04 09:43
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "screenspace_common.h"
+
+uniform float4 blur_params; // x: | y: | z: Buffer width | w: Buffer Height
+uniform float4 ssr_setup; // x: SSR Resolution | y: Blur Intensity
+
+Texture2D ssr_image;
+
+float4 main(p_screen I) : SV_Target
+{
+	// Sample SSR result
+	float4 base_image = ssr_image.SampleLevel(smp_nofilter, I.tc0, 0);
+
+#ifndef USE_MSAA
+	float gloss = s_diffuse.Sample( smp_nofilter, I.tc0 * ssr_setup.x ).a;
+#else
+	float gloss = s_diffuse.Load( int3( I.hpos.xy * ssr_setup.x, 0 ), 0 ).a;
+#endif
+
+	float4 blur = 0;
+
+	float2 buffer_pixel_size = 1.0 / blur_params.zw;
+	
+	float2 offset = 1.0f;
+	float r = 0.9f;
+	
+	for (int i = 0; i < 12; i++) 
+	{
+		r += 1.0f / r; 
+		offset = mul(offset, pp_rotation_matrix);
+
+		float4 test = ssr_image.SampleLevel(smp_nofilter, I.tc0 + (offset * (r - 1.0f) * buffer_pixel_size), 0);
+
+		blur.rgb += test.rgb;
+	}
+	blur /= 12;
+
+	// Limit at lower resolution
+	float Blur_Int = clamp(ssr_setup.y, ( ssr_setup.x / 10 - 0.1f ) * 3.0f, 1);
+
+	// Blur <- 0.0f Gloss 0.4f -> Sharp
+	blur.rgb = lerp(blur.rgb, base_image.rgb, saturate((gloss * (1.0f - Blur_Int)) * 2.5f));
+
+	return blur;
+}

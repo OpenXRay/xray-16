@@ -1,0 +1,71 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
+ * @ Description: AO - Blur Phase
+ * @ Modified time: 2024-08-18 08:11
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "screenspace_common.h"
+#include "settings_screenspace_AO.h"
+
+uniform float4 blur_setup; // x: | y: | z: Buffer width | w: Buffer Height
+uniform float4 ao_setup; // Res | Intensity | - | Radius
+
+Texture2D ao_image;
+Texture2D s_hud_mask;
+
+float4 main(p_screen I) : SV_Target
+{
+	float2 tc = I.tc0 / blur_setup.x;
+
+	float2 tc2D = I.tc0.xy;// * ao_setup.x;
+	float2 Pos2D = I.hpos.xy;// * ao_setup.x;
+
+	float4 base_image = ao_image.SampleLevel(smp_linear, tc, 0);
+
+	float4 blur = 0;
+
+	float2 buffer_pixel_size = 1.0 / blur_setup.zw;
+	
+	float radius = 1.0;
+
+#ifndef USE_MSAA
+	float Depth = s_position.Sample( smp_nofilter, tc2D ).z;
+#else
+	float Depth = s_position.Load( int3( Pos2D, 0 ), 0 ).z;
+#endif
+
+	float2 offset = float2(radius, radius) * clamp(base_image.r, ao_setup.z, 1.0f) * blur_setup.y; // 0.25 ~ 0.5 ~ 0.75f ~ 1.0f
+	float2 blur_tc = 0;
+	float2 blur_offset = 0;
+
+	float r = 2.0f;
+	
+	[unroll (G_SSDO_AO_BLUR_SAMPLES)]
+	for (int i = 0; i < G_SSDO_AO_BLUR_SAMPLES; i++) 
+	{
+		r += 1.0f / r; 
+		offset = mul(offset, pp_rotation_matrix);
+		
+		blur_offset = offset * (r - 1.0f) * buffer_pixel_size;
+		blur_tc = tc + blur_offset;
+
+		float4 BlurSample = ao_image.SampleLevel(smp_linear, blur_tc, 0);
+
+#ifndef USE_MSAA
+		float SDepth = s_position.Sample( smp_nofilter, tc2D + blur_offset ).z;
+#else
+		float SDepth = s_position.Load( int3( Pos2D + blur_offset, 0 ), 0 ).z;
+#endif
+
+		if (any(blur_tc < 0) || any(blur_tc > radius))
+			blur.w += base_image.w;
+		else
+			blur.w += lerp(BlurSample.w, base_image.w, saturate(abs(Depth - SDepth) * 10.0f));
+
+	}
+	blur.w /= G_SSDO_AO_BLUR_SAMPLES;
+
+	return float4(base_image.r, 0, 0, blur.w);
+} 

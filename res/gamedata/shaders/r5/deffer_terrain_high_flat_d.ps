@@ -1,0 +1,367 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 20
+ * @ Description: Terrain Shader - HIGH ( Texture Splatting, POM & Puddles )
+ * @ Modified time: 2024-02-28 02:22
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#define USE_TDETAIL // Keep this here, used by "common_iostructs"
+#include "common.h"
+
+#include "check_screenspace.h"
+
+#ifdef SSFX_PUDDLES
+	#include "settings_screenspace_PUDDLES.h"
+#endif
+
+#include "screenspace_common_ripples.h"
+
+// Setup
+#include "settings_screenspace_TERRAIN.h"
+
+// Puddles textures
+#ifdef SSFX_PUDDLES
+	Texture2D s_puddles_normal;
+	Texture2D s_puddles_mask;
+	Texture2D s_rainsplash;
+#endif
+
+// Height Textures
+Texture2D s_height_r;
+Texture2D s_height_g;
+Texture2D s_height_b;
+Texture2D s_height_a;
+
+uniform float4 ssfx_terrain_offset;
+
+struct surface 
+{
+	float4 base;
+	float4 normal;
+	float gloss;
+	float mask;
+	float height;
+	float AO;
+	float2 tc;
+};
+
+surface Terrain_InitSurfaces(Texture2D height_tex, float2 tc, float mask, int idx)
+{
+	surface S;
+
+	S.base = 0;
+	S.gloss = 0;
+	S.normal = 0;
+
+#ifdef TERRAIN_GTR_COMPATIBILITY
+	S.height = saturate(height_tex.Sample(smp_base, tc).a + ssfx_terrain_offset[idx]);
+#else
+	S.height = saturate(height_tex.Sample(smp_base, tc).r + ssfx_terrain_offset[idx]);
+#endif
+	
+	S.AO = TERRAIN_POM_AO - S.height * S.height * TERRAIN_POM_AO; // Use the height as AO
+	S.mask = mask;
+	S.tc = tc;
+
+	return S;
+}
+
+void HeightBlending(float4 heights, inout float4 weights) 
+{
+	// Texture height + splatting weight
+	float4 H = heights + weights;
+	float H_weights = max(max(H.x, H.y), max(H.z, H.w)) - 1.01f;
+
+	// Cut
+	heights = max(heights - H_weights, 0.0f) * weights;
+
+	// Normalize
+	weights.rgba = heights / dot(heights, 1.0f);
+}
+
+
+void ApplyWeights(inout surface Sr, inout surface Sg, inout surface Sb, inout surface Sa, float4 weights)
+{
+	// Just apply the texture splatting
+	Sr.base.rgb *= weights.x;
+	Sr.normal *= weights.x;
+	Sr.gloss *= weights.x;
+
+	Sg.base.rgb *= weights.y;
+	Sg.normal *= weights.y;
+	Sg.gloss *= weights.y;
+
+	Sb.base.rgb *= weights.z;
+	Sb.normal *= weights.z;
+	Sb.gloss *= weights.z;
+
+	Sa.base.rgb *= weights.a;
+	Sa.normal *= weights.a;
+	Sa.gloss *= weights.a;
+}
+
+void TerrainParallax(float2 tc_step, float _step, inout surface S, inout p_bumped p, Texture2D height_tex, int idx)
+{
+	if (S.mask <= 0)
+		return;
+
+	if (p.position.z >= TERRAIN_POM_RANGE)
+		return;
+
+	// Init vars to store steps
+	float curr_step = 0;
+	float2 parallax_tc = p.tcdbump;
+	
+	// Store the previous & current sample to do the POM calc later
+	float prev_Height = 0;
+	float curr_Height = TERRAIN_POM_PLANE - S.height * S.mask; // Apply the splatting weight and limit
+	
+	float prev_Sam = 0;
+	float curr_Sam = S.height;
+	
+	do // Basic Step Parallax
+	{
+		// Save previous data ( Used for interpolation and final height )
+		prev_Height = curr_Height;
+		prev_Sam = curr_Sam;
+
+		// Step TexCoor
+		parallax_tc -= tc_step;
+		curr_step += _step;
+
+		// Sample
+#ifdef TERRAIN_GTR_COMPATIBILITY
+		curr_Sam = saturate(height_tex.SampleLevel(smp_base, parallax_tc, 0).a + ssfx_terrain_offset[idx]);
+#else
+		curr_Sam = saturate(height_tex.SampleLevel(smp_base, parallax_tc, 0).r + ssfx_terrain_offset[idx]);
+#endif
+		curr_Height = TERRAIN_POM_PLANE - curr_Sam * S.mask; // Apply the splatting weight and limit
+
+	} while(curr_Height > curr_step);
+
+	// [ POM ] Interpolation between the previous offset and the current offset
+	float currentDiff = curr_Height - curr_step;
+	float ratio = currentDiff / (currentDiff - saturate(prev_Height - curr_step + _step));
+
+	// Final TexCoor
+	S.tc = lerp(parallax_tc, parallax_tc + tc_step, ratio);
+
+	// Get height
+	S.height = lerp(curr_Sam, prev_Sam, ratio);
+}
+
+
+
+void TerrainTextures(inout surface S, Texture2D s_base_det, Texture2D s_bump_det, float2 offset)
+{
+	if (S.mask <= 0)
+		return;
+
+	S.base 			= s_base_det.Sample(smp_base, S.tc + offset);
+	S.normal 		= s_bump_det.Sample(smp_base, S.tc + offset);
+	S.gloss 		= S.normal.x;
+	S.normal.rgb	= S.normal.wzy * 2.0f - 1.0f;//- 0.5;
+	
+	// Apply ambient occlusion
+	S.base.rgb *= (1.0 - S.AO);
+}
+
+
+f_deffer main(p_bumped I)
+{
+
+// General --------------------------------------------------------
+
+	// Normal & Eye Vector
+	float3 Nw = normalize(float3(I.M1.z, I.M2.z, I.M3.z));
+	float3 eyeVec = normalize(I.position.xyz);
+
+	// Refraction UV
+	float2 N_refra = 0;
+
+	// Color
+	float4 C = s_base.Sample(smp_base, I.tcdh.xy);
+
+	// Splatting Mask
+	float4 mask = s_mask.Sample(smp_base, I.tcdh.xy);
+	mask /= dot(mask, 1.0);
+
+// Init Surfaces --------------------------------------------------
+
+#ifdef TERRAIN_GTR_COMPATIBILITY
+	surface Sr = Terrain_InitSurfaces(s_dt_r, I.tcdbump.xy, mask.x, 0);
+	surface Sg = Terrain_InitSurfaces(s_dt_g, I.tcdbump.xy, mask.y, 1);
+	surface Sb = Terrain_InitSurfaces(s_dt_b, I.tcdbump.xy, mask.z, 2);
+	surface Sa = Terrain_InitSurfaces(s_dt_a, I.tcdbump.xy, mask.w, 3);
+#else
+	surface Sr = Terrain_InitSurfaces(s_height_r, I.tcdbump.xy, mask.x, 0);
+	surface Sg = Terrain_InitSurfaces(s_height_g, I.tcdbump.xy, mask.y, 1);
+	surface Sb = Terrain_InitSurfaces(s_height_b, I.tcdbump.xy, mask.z, 2);
+	surface Sa = Terrain_InitSurfaces(s_height_a, I.tcdbump.xy, mask.w, 3);
+#endif
+
+	// Texture splatting ( TODO: Improve Texture Splatting )
+	//HeightBlending(float4(Sr.height, Sg.height, Sb.height, Sa.height), mask);
+
+// Parallax -------------------------------------------------------
+
+	// Distance attenuation
+	float dist_att = 1.0 - smoothstep(TERRAIN_POM_RANGE * 0.8f, TERRAIN_POM_RANGE, I.position.z);
+
+	float3 eye = normalize(mul(float3x3(I.M1.x, I.M2.x, I.M3.x,
+		I.M1.y, I.M2.y, I.M3.y,
+		I.M1.z, I.M2.z, I.M3.z), -I.position));
+
+	float view_angle = abs(dot(float3(0.0, 0.0, 1.0), eye));
+
+	// Dynamic steps
+	float _step = rcp(lerp(TERRAIN_POM_STEPS_MAX, TERRAIN_POM_STEPS_MIN, view_angle)); // 1.0 / Step Qty
+	_step *= TERRAIN_POM_PLANE; // We are working with 0.0 ~ 0.5
+
+	// View direction + bias to try to minimize issues with some slopes.
+	float2 viewdir = eye.xy / (abs(eye.z) + 0.41f);
+
+	// Offset direction
+	float2 tc_step = _step * viewdir * 0.04f * dist_att;
+
+	// Do Parallax
+#ifdef TERRAIN_GTR_COMPATIBILITY
+	TerrainParallax(tc_step, _step, Sr, I, s_dt_r, 0);
+	TerrainParallax(tc_step, _step, Sg, I, s_dt_g, 1);
+	TerrainParallax(tc_step, _step, Sb, I, s_dt_b, 2);
+	TerrainParallax(tc_step, _step, Sa, I, s_dt_a, 3);
+#else
+	TerrainParallax(tc_step, _step, Sr, I, s_height_r, 0);
+	TerrainParallax(tc_step, _step, Sg, I, s_height_g, 1);
+	TerrainParallax(tc_step, _step, Sb, I, s_height_b, 2);
+	TerrainParallax(tc_step, _step, Sa, I, s_height_a, 3);
+#endif
+
+	// Calculate height using splatting mask
+	float PixelHeight = dot(float4(Sr.height, Sg.height, Sb.height, Sa.height), mask);
+
+// Puddles slope mask and height ----------------------------------
+#ifdef SSFX_PUDDLES
+
+	// Wetness factor
+	float wetness_f = saturate(rain_params.y) * TERRAIN_WATER_LEVEL;
+
+	// Always render puddles if G_PUDDLES_ALLWAYS is defined
+	#ifdef G_PUDDLES_ALLWAYS
+		wetness_f = 1.0f;
+	#endif
+	
+	float height_str = saturate(wetness_f * TERRAIN_POM_PLANE - PixelHeight);
+	float puddles = saturate(height_str * 4.0f);
+
+	// Texture mask
+	float PuddlesMask = 1.0f - s_puddles_mask.Sample(smp_base, I.tcdh).r;
+
+	// Transform space to create a slope mask
+	float3 N = mul(m_inv_V, Nw);
+
+	// Slope mask
+	float SlopeMask = 1.0f - max(abs(N.x), abs(N.z));
+	
+	// Slope adjustements... Some magic numbers
+	SlopeMask = saturate(SlopeMask - 0.9f) * 13.0f;
+
+	// Slope & texture mask defines final puddles intensity
+	puddles *= SlopeMask * PuddlesMask;
+
+
+// Puddles Ripples ------------------------------------------------
+
+	#ifdef G_PUDDLES_RIPPLES
+
+		float rain_int = saturate(rain_params.x * 1.5f);
+
+		// Base ripples anim speed
+		float ripples_anim =  timers.x * ((0.01f + (rain_int * 0.008f)) * G_PUDDLES_RIPPLES_SPEED );
+		
+		// Base ripples scale
+		float ripples_scale = 140 / G_PUDDLES_RIPPLES_SCALE;
+
+		// Base ripples Normal
+		float3 WN0 = s_puddles_normal.Sample(smp_base, I.tcdh * ripples_scale + float2(0, ripples_anim));
+		float3 WN1 = s_puddles_normal.Sample(smp_base, I.tcdh * ripples_scale - float2(0.33f, ripples_anim));
+		float3 ripplesNormal = normalize(float3(WN0.xy + WN1.xy, WN0.z * WN1.z)) * 2.0f - 1.0f;//((WN0 + WN1) * 0.5f) * 2.0f - 1.0f;
+
+		// Rain Ripples
+		float2 ripplesUV = I.tcdh * ripples_scale * 1.3f / G_PUDDLES_RAIN_RIPPLES_SCALE;
+		float2 rainRipples = ssfx_rain_ripples( s_rainsplash, ripplesUV, float3(0.85f, 1.0f, 10.0f), I.position.z);
+
+		// Rain ripples intensity... ( Rain intensity * Depth fadeout * Intensity )
+		rainRipples *= rain_params.x * G_PUDDLES_RAIN_RIPPLES_INTENSITY;
+
+		// Base ripples Intensity
+		ripplesNormal *= saturate(0.05f + rain_int * G_PUDDLES_RIPPLES_RAINING_INT * G_PUDDLES_RIPPLES_INTENSITY);
+		
+		// Mix ripples
+		ripplesNormal = ripplesNormal * 0.666f + float3(rainRipples * 0.333f, 0);
+
+	#else
+		float3 ripplesNormal = 0;
+	#endif
+
+	// Refraction Normal
+	N_refra = ripplesNormal.xy;
+
+	// Adjust refraction intensity based on wetness and puddle height
+	N_refra *= 0.15f * smoothstep( 0.6f, 0.8f, puddles ) * G_PUDDLES_REFRACTION_INTENSITY;
+
+#endif
+
+// Textures -------------------------------------------------------
+
+	// Sample color and bump textures with new parallax TexCoors and refraction displacement
+	TerrainTextures(Sr, s_dt_r, s_dn_r, N_refra);
+	TerrainTextures(Sg, s_dt_g, s_dn_g, N_refra);
+	TerrainTextures(Sb, s_dt_b, s_dn_b, N_refra);
+	TerrainTextures(Sa, s_dt_a, s_dn_a, N_refra);
+
+	// Apply splatting mask to everything ( Color, Normal and Gloss )
+	ApplyWeights(Sr, Sg, Sb, Sa, mask);
+
+// Mix everything  ------------------------------------------------
+
+	// Normal
+	float3 Ne = normalize(mul(float3x3(I.M1, I.M2, I.M3), Sr.normal.rgb + Sg.normal.rgb + Sb.normal.rgb + Sa.normal.rgb ));
+
+	// Color
+	C.rgb = (Sr.base.rgb + Sg.base.rgb + Sb.base.rgb + Sa.base.rgb ) * C.rgb * 2.0;
+
+	// Gloss
+	float G = Sr.gloss + Sg.gloss + Sb.gloss + Sa.gloss;
+
+#ifdef SSFX_PUDDLES // Puddles Mix
+
+	// Normal Up and ripples for puddles
+	float3 PuddlesNormal = mul(m_V, float3(ripplesNormal.x, 1, ripplesNormal.y));
+
+	// Puddles Normal
+	Ne = lerp(Ne, PuddlesNormal, saturate(puddles * puddles * 2) );
+
+	// Puddles Color
+	C.rgb = lerp( C.rgb, C.rgb * G_PUDDLES_TINT, puddles);
+
+	// Puddles Gloss
+	G = max(G, puddles * 0.4f);
+
+#endif
+
+// Depth Offset ---------------------------------------------------
+
+	float d1 = dot(Nw, Nw * (1.0 - PixelHeight * 1.5) * -0.11f); // Exaggerate shadows? ( 1.5f )
+	float d2 = dot(eyeVec, Nw); // Limit to -0.3 to avoid problems with some slopes
+
+	float3 offset_pos = I.position.xyz + eyeVec * (d1 / min(d2, -0.3f));
+
+// Send Pack ------------------------------------------------------
+
+	return pack_gbuffer(	float4( Ne, C.w ), // normal.hemi
+							float4( offset_pos, 0.95f ),
+							float4( C.rgb, G )
+	);
+}

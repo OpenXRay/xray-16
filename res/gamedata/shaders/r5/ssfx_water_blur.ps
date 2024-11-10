@@ -1,0 +1,44 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
+ * @ Description: Water Blur
+ * @ Modified time: 2024-03-30 12:15
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+//#include "common.h"
+#include "screenspace_common.h"
+
+Texture2D water_buffer;
+
+uniform float4 blur_setup; // Buffer Res [ x:width | y:height | z:scale | w:offset size ]
+uniform float4 ssfx_water;
+//uniform float4 shader_param_7;
+
+float4 main ( p_screen I ) : SV_Target
+{
+
+	float2 tc = I.tc0.xy * blur_setup.w;
+	float2 buffer_pixel_size = 1.0 / ((screen_res.xy / 2.0f) * ssfx_water.x);
+
+	float2 offset = blur_setup.xy * buffer_pixel_size * clamp(ssfx_water.y * 2.0, 1.0f, 2.0f);
+
+	float3 blur = 0;
+	float2 blur_tc = 0;
+	float tc_limit = 1.0 / ssfx_water.x;
+
+	float3 base_image = water_buffer.SampleLevel(smp_linear, tc, 0).rgb;
+
+	for (int i = -6; i <= 6; i++) 
+	{
+		blur_tc = tc + i * offset;
+
+		if (blur_tc.x < 0 || blur_tc.x > tc_limit)
+			blur_tc = tc;
+
+		blur += water_buffer.SampleLevel(smp_linear, blur_tc, 0);
+	}
+	blur.rgb /= 12;
+
+	return float4(lerp(base_image, blur, ssfx_water.y), 1);
+}
