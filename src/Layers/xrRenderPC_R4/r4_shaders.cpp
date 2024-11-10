@@ -3,6 +3,11 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 
+extern ENGINE_API int ps_ssfx_ssr_quality;
+extern ENGINE_API Fvector3 ps_ssfx_water_quality;
+extern ENGINE_API int ps_ssfx_il_quality;
+extern ENGINE_API int ps_ssfx_ao_quality;
+
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
@@ -226,6 +231,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string32 c_sun_quality;
     char c_msaa_samples[2];
     char c_msaa_current_sample[2];
+
+    // SSS preprocessor stuff
+    char c_ssfx_il[32];
+    char c_ssfx_ao[32];
+    char c_ssfx_water[32];
+    char c_ssfx_water_parallax[32];
+    char c_ssr_quality[32];
     char c_rain_quality[32];
     char c_inter_grass[32];
 
@@ -436,6 +448,28 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
     else
         sh_name.append(static_cast<u32>(0));
+
+    xr_sprintf(c_ssr_quality, "%d", u8(_min(_max(ps_ssfx_ssr_quality, 0), 5)));
+    options.add("SSFX_SSR_QUALITY", c_ssr_quality);
+    sh_name.append(c_ssr_quality);
+
+    xr_sprintf(c_ssfx_water, "%d", u8(_min(_max(ps_ssfx_water_quality.x, 0.0f), 4.0f)));
+    options.add("SSFX_WATER_QUALITY", c_ssfx_water);
+    sh_name.append(c_ssfx_water);
+
+
+    xr_sprintf(c_ssfx_water_parallax, "%d", u8(_min(_max(ps_ssfx_water_quality.y, 0.0f), 3.0f)));
+    options.add("SSFX_WATER_PARALLAX", c_ssfx_water_parallax);
+    sh_name.append(c_ssfx_water_parallax);
+
+
+    xr_sprintf(c_ssfx_il, "%d", u8(_min(_max(ps_ssfx_il_quality, 0), 64)));
+    options.add("SSFX_IL_QUALITY", c_ssfx_il);
+    sh_name.append(c_ssfx_il);
+
+    xr_sprintf(c_ssfx_ao, "%d", u8(_min(_max(ps_ssfx_ao_quality, 2), 8)));
+    options.add("SSFX_AO_QUALITY", c_ssfx_ao);
+    sh_name.append(c_ssfx_ao);
 
     appendShaderOption(1, "SSFX_MODEXE", "1");
 

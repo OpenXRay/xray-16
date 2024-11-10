@@ -235,17 +235,109 @@ ICF void sort_back_to_front_render_and_clean(u32 context_id, T& vec)
     vec.clear();
 }
 
+template<class T>
+void __fastcall water_node_ssr(u32 context_id, T& item)
+{
+#ifdef USE_DX11
+    auto& dsgraph = RImplementation.get_context(context_id);
+
+    dxRender_Visual* V = item.second.pVisual;
+    VERIFY(V && V->shader._get());
+
+    dsgraph.cmd_list.set_Shader(RImplementation.Target->s_ssfx_water_ssr);
+
+    dsgraph.cmd_list.set_xform_world(item.second.Matrix);
+    RImplementation.apply_object(dsgraph.cmd_list, item.second.pObject);
+    dsgraph.cmd_list.apply_lmaterial();
+
+    dsgraph.cmd_list.set_c("cam_pos", RImplementation.Target->Position_previous.x, RImplementation.Target->Position_previous.y, RImplementation.Target->Position_previous.z, 0.0f);
+
+    // Previous matrix data
+    dsgraph.cmd_list.set_c("m_previous", item.second.PrevMatrix);
+    item.second.PrevMatrix.set(dsgraph.cmd_list.xforms.m_wvp);
+
+    V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), false);
+#endif
+}
+
+template<class T>
+void __fastcall water_node(u32 context_id, T& item)
+{
+#ifdef USE_DX11
+    auto& dsgraph = RImplementation.get_context(context_id);
+
+    dxRender_Visual* V = item.second.pVisual;
+    VERIFY(V && V->shader._get());
+
+    if (RImplementation.o.ssfx_water)
+    {
+        dsgraph.cmd_list.set_Shader(RImplementation.Target->s_ssfx_water);
+    }
+
+    dsgraph.cmd_list.set_xform_world(item.second.Matrix);
+    RImplementation.apply_object(dsgraph.cmd_list, item.second.pObject);
+    dsgraph.cmd_list.apply_lmaterial();
+
+    // Wind settings
+    float WindDir = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+    float WindVel = g_pGamePersistent->Environment().CurrentEnv.wind_velocity;
+    dsgraph.cmd_list.set_c("wind_setup", WindDir, WindVel, 0.f, 0.f);
+
+    V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), false);
+#endif
+}
+
+template<class T>
+void __fastcall hud_node(u32 context_id, T& item)
+{
+    auto& dsgraph = RImplementation.get_context(context_id);
+
+    dxRender_Visual* V = item.second.pVisual;
+    VERIFY(V && V->shader._get());
+
+    dsgraph.cmd_list.set_xform_world(item.second.Matrix);
+
+#ifdef USE_DX11
+    if (item.second.se->passes[0]->ps->hud_disabled)
+        return;
+
+    int skinning = item.second.se->passes[0]->vs->skinning;
+    dsgraph.cmd_list.set_Shader(RImplementation.Target->s_ssfx_hud[skinning]);
+
+    RImplementation.Target->Matrix_HUD_previous.set(item.second.PrevMatrix);
+    item.second.PrevMatrix.set(dsgraph.cmd_list.xforms.m_wvp);
+
+    RImplementation.Target->RVelocity = true;
+
+#endif
+
+    V->Render(dsgraph.cmd_list, calcLOD(item.first, V->vis.sphere.R), dsgraph.o.phase == CRender::PHASE_SMAP);
+
+#ifdef USE_DX11
+    RImplementation.Target->RVelocity = false;
+#endif
+}
+
 //////////////////////////////////////////////////////////////////////////
 // HUD render
-void R_dsgraph_structure::render_hud()
+void R_dsgraph_structure::render_hud(bool NoPS)
 {
     ZoneScoped;
     PIX_EVENT_CTX(cmd_list, dsgraph_render_hud);
 
-    if (!mapHUD.empty())
+    if (mapHUD.empty())
+        return;
+
+    hud_transform_helper helper{ cmd_list };
+
+    if (!NoPS)
     {
-        hud_transform_helper helper{ cmd_list };
         sort_front_to_back_render_and_clean(context_id, mapHUD);
+    }
+    else
+    {
+        HUDMask.traverse_left_right(context_id, hud_node);
+        HUDMask.clear();
     }
 
 #if RENDER == R_R1
@@ -413,4 +505,15 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
         break;
         }
     }
+}
+
+void R_dsgraph_structure::r_dsgraph_render_water_ssr()
+{
+    mapWater.traverse_left_right(context_id, water_node_ssr);
+}
+
+void R_dsgraph_structure::r_dsgraph_render_water()
+{
+    mapWater.traverse_left_right(context_id, water_node);
+    mapWater.clear();
 }

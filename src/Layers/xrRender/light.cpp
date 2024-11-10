@@ -368,7 +368,9 @@ void light::Export(light_Package& package)
 #endif // (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
                 //  Igor: add volumetric support
-                L->set_volumetric(flags.bVolumetric);
+                if (ps_ssfx_volumetric.x <= 0)
+                    L->set_volumetric(flags.bVolumetric);
+
                 L->set_volumetric_quality(m_volumetric_quality);
                 L->set_volumetric_intensity(m_volumetric_intensity);
                 L->set_volumetric_distance(m_volumetric_distance);
@@ -377,7 +379,10 @@ void light::Export(light_Package& package)
             }
         }
         break;
-        case IRender_Light::SPOT: package.v_shadowed.push_back(this); break;
+        case IRender_Light::SPOT:
+            this->set_volumetric_intensity(m_volumetric_intensity);
+            package.v_shadowed.push_back(this);
+            break;
         }
     }
     else

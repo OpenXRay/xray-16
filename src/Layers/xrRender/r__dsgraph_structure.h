@@ -53,6 +53,8 @@ struct R_dsgraph_structure
     R_dsgraph::mapLOD_T mapLOD;
     R_dsgraph::mapSorted_T mapDistort;
     R_dsgraph::mapHUD_T    mapHUDSorted;
+    R_dsgraph::HUDMask_T HUDMask;
+    R_dsgraph::mapWater_T mapWater;
 
 #if RENDER != R_R1
     R_dsgraph::mapSorted_T mapWmark; // sorted
@@ -139,6 +141,8 @@ struct R_dsgraph_structure
         mapLOD.destroy();
         mapDistort.destroy();
         mapHUDSorted.destroy();
+        HUDMask.destroy();
+        mapWater.destroy();
 
 #if RENDER != R_R1
         mapWmark.destroy();
@@ -180,7 +184,7 @@ struct R_dsgraph_structure
 
     // render primitives
     void render_graph(u32 _priority);
-    void render_hud();
+    void render_hud(bool NoPS = false);
     void render_hud_ui();
     void render_lods(bool _setup_zb, bool _clear);
     void render_sorted();
@@ -188,6 +192,9 @@ struct R_dsgraph_structure
     void render_wmarks();
     void render_distort();
     void render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& _bb, int _element);
+
+    void r_dsgraph_render_water_ssr();
+    void r_dsgraph_render_water();
 
     void build_subspace();
 };

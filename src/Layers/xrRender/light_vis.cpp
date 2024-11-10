@@ -8,6 +8,8 @@ const u32 delay_large_min = 10;
 const u32 delay_large_max = 20;
 const u32 cullfragments = 4;
 
+ENGINE_API Fvector4 ps_ssfx_volumetric;
+
 void light::vis_prepare(CBackend& cmd_list)
 {
     if (int(indirect_photons) != ps_r2_GI_photons)
@@ -39,6 +41,8 @@ void light::vis_prepare(CBackend& cmd_list)
         skiptest = true;
     if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_SHADOWED) && flags.bShadow)
         skiptest = true;
+    if (ps_ssfx_volumetric.x > 0 && flags.bShadow)
+        skiptest = true; // Temp Fix
 
     vis.distance = Device.vCameraPosition.distance_to(spatial.sphere.P);
 

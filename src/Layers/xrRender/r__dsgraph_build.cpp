@@ -87,6 +87,11 @@ void R_dsgraph_structure::insert_dynamic(IRenderable* root, dxRender_Visual* pVi
         }
         mapHUD.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh }));
 
+        if (!sh->passes[0]->ps->hud_disabled)
+        {
+            HUDMask.insert_anyway(distSQ, _MatrixItemSSFX({ SSA, root, pVisual, xform, sh }));
+        }
+
 #if RENDER != R_R1
         if (sh->flags.bEmissive && sh_d)
             mapHUDEmissive.insert_anyway(distSQ, _MatrixItemS({ SSA, root, pVisual, xform, sh_d })); // sh_d -> L_special
@@ -193,6 +198,13 @@ void R_dsgraph_structure::insert_static(dxRender_Visual* pVisual)
         return;
     if (!o.pmask[sh->flags.iPriority / 2])
         return;
+
+    // Water rendering
+    if (sh->flags.isWater)
+    {
+        mapWater.insert_anyway(distSQ, _MatrixItemSSFX({ SSA, NULL, pVisual, Fidentity, sh }));
+        return;
+    }
 
     // strict-sorting selection
     if (sh->flags.bStrictB2F)

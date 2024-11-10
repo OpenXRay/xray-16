@@ -7,10 +7,16 @@
 
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
+extern ENGINE_API Fvector4 ps_ssfx_il;
+extern ENGINE_API Fvector4 ps_ssfx_ao;
+extern ENGINE_API Fvector4 ps_ssfx_water;
+
 void CRenderTarget::phase_combine()
 {
     ZoneScoped;
     PIX_EVENT(phase_combine);
+
+    bool ssfx_PrevPos_Requiered = false;
 
     //	TODO: DX11: Remove half pixel offset
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
@@ -39,6 +45,50 @@ void CRenderTarget::phase_combine()
         else if (RImplementation.o.ssao_blur_on)
         {
             phase_ssao();
+        }
+    }
+
+    // Save previus and current matrices
+    Fvector2 m_blur_scale;
+    {
+        static Fmatrix m_saved_viewproj;
+
+        if (!Device.m_SecondViewport.IsSVPFrame())
+        {
+            static Fvector3 saved_position;
+            Position_previous.set(saved_position);
+            saved_position.set(Device.vCameraPosition);
+
+            Fmatrix m_invview;
+            m_invview.invert(Device.mView);
+            Matrix_previous.mul(m_saved_viewproj, m_invview);
+            Matrix_current.set(Device.mProject);
+            m_saved_viewproj.set(Device.mFullTransform);
+        }
+        float scale = ps_r2_mblur / 2.f;
+        m_blur_scale.set(scale, -scale).div(12.f);
+    }
+
+    {
+        // Disable when rendering SecondViewport
+        if (!Device.m_SecondViewport.IsSVPFrame())
+        {
+            // Clear RT
+            Fcolor ColorRGBA = { 0.0f, 0.0f, 0.0f, 1.0f };
+            RCache.ClearRT(rt_ssfx_temp->pRT, ColorRGBA);
+            RCache.ClearRT(rt_ssfx_temp2->pRT, ColorRGBA);
+
+            if (RImplementation.o.ssfx_ao && ps_ssfx_ao.y > 0)
+            {
+                ssfx_PrevPos_Requiered = true;
+                phase_ssfx_ao(); // [SSFX] - New AO Phase
+            }
+
+            if (RImplementation.o.ssfx_il && ps_ssfx_il.y > 0)
+            {
+                ssfx_PrevPos_Requiered = true;
+                phase_ssfx_il(); // [SSFX] - New IL Phase
+            }
         }
     }
 
@@ -83,7 +133,7 @@ void CRenderTarget::phase_combine()
     //}
 
     // calc m-blur matrices
-    Fmatrix m_previous, m_current;
+    /*Fmatrix m_previous, m_current;
     Fvector2 m_blur_scale;
     {
         static Fmatrix m_saved_viewproj;
@@ -94,7 +144,7 @@ void CRenderTarget::phase_combine()
         m_saved_viewproj.set(Device.mFullTransform);
         float scale = ps_r2_mblur / 2.f;
         m_blur_scale.set(scale, -scale).div(12.f);
-    }
+    }*/
 
     // Draw full-screen quad textured with our scene image
     if (!_menu_pp)
@@ -230,6 +280,61 @@ void CRenderTarget::phase_combine()
     else
         HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_Generic_temp->pTexture->surface_get(), rt_Generic_0_r->pTexture->surface_get());
 
+    auto& dsgraph = RImplementation.get_imm_context();
+    if (RImplementation.o.ssfx_ssr && !Device.m_SecondViewport.IsSVPFrame())
+    {
+        ssfx_PrevPos_Requiered = true;
+        phase_ssfx_ssr(); // [SSFX] - New SSR Phase
+    }
+
+    // [SSFX] - Water SSR rendering
+    if (RImplementation.o.ssfx_water && !Device.m_SecondViewport.IsSVPFrame())
+    {
+        Fcolor ColorRGBA = { 0.0f, 0.0f, 0.0f, 1.0f };
+        RCache.ClearRT(rt_ssfx_temp->pRT, ColorRGBA);
+        RCache.ClearRT(rt_ssfx_temp2->pRT, ColorRGBA);
+
+        if (!RImplementation.o.msaa)
+            u_setrt(RCache, rt_ssfx_temp, 0, 0, 0);
+        else
+            u_setrt(RCache, rt_ssfx_temp, 0, 0, 0);
+
+        float w = float(Device.dwWidth);
+        float h = float(Device.dwHeight);
+
+        // Render Scale
+        set_viewport_size(HW.get_context(CHW::IMM_CTX_ID), w / ps_ssfx_water.x, h / ps_ssfx_water.x);
+
+        // Render Water SSR
+        RCache.set_xform_world(Fidentity);
+        dsgraph.r_dsgraph_render_water_ssr();
+
+        // Restore Viewport
+        set_viewport_size(HW.get_context(CHW::IMM_CTX_ID), w, h);
+
+        // Save Frame
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_ssfx_water->pTexture->surface_get(), rt_ssfx_temp->pTexture->surface_get());
+
+        // Water SSR Blur
+        phase_ssfx_water_blur();
+
+        // Water waves
+        phase_ssfx_water_waves();
+    }
+
+    if (!RImplementation.o.msaa)
+        u_setrt(RCache, rt_Generic_0, 0, 0, get_base_zb());
+    else
+        u_setrt(RCache, rt_Generic_0_r, 0, 0, rt_MSAADepth);
+
+    // Final water rendering ( All the code above can be omitted if the Water module isn't installed )
+    RCache.set_xform_world(Fidentity);
+    dsgraph.r_dsgraph_render_water();
+    g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
+
+    if (ssfx_PrevPos_Requiered)
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_ssfx_prevPos->pTexture->surface_get(), rt_Position->pTexture->surface_get());
+
     // Forward rendering
     {
         PIX_EVENT(Forward_rendering);
@@ -266,7 +371,6 @@ void CRenderTarget::phase_combine()
     // u_setrt(rt_Generic_1,0,0,get_base_zb());
 
     // Distortion filter
-    auto& dsgraph = RImplementation.get_imm_context();
     BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
     {
         if ((0 == dsgraph.mapDistort.size()) && !_menu_pp)
@@ -288,7 +392,9 @@ void CRenderTarget::phase_combine()
     if (RImplementation.o.new_shader_support)
     {
         //(Anomaly) Compute blur textures
-        phase_blur();
+
+        if (!Device.m_SecondViewport.IsSVPFrame()) // Temp fix for blur buffer and SVP
+            phase_blur();
 
         //(Anomaly) Compute depth of field effect
         if (ps_r2_ls_flags.test(R2FLAG_DOF))
@@ -419,8 +525,8 @@ void CRenderTarget::phase_combine()
         RCache.set_c("e_barrier", ps_r2_aa_barier.x, ps_r2_aa_barier.y, ps_r2_aa_barier.z, 0.f);
         RCache.set_c("e_weights", ps_r2_aa_weight.x, ps_r2_aa_weight.y, ps_r2_aa_weight.z, 0.f);
         RCache.set_c("e_kernel", ps_r2_aa_kernel, ps_r2_aa_kernel, ps_r2_aa_kernel, 0.f);
-        RCache.set_c("m_current", m_current);
-        RCache.set_c("m_previous", m_previous);
+        RCache.set_c("m_current", Matrix_current);
+        RCache.set_c("m_previous", Matrix_previous);
         RCache.set_c("m_blur", m_blur_scale.x, m_blur_scale.y, 0.f, 0.f);
         Fvector3 dof;
         g_pGamePersistent->GetCurrentDof(dof);
@@ -594,18 +700,18 @@ void CRenderTarget::phase_combine_volumetric()
     RCache.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
     {
         // Fill VB
-        float scale_X = float(Device.dwWidth) / float(TEX_jitter);
-        float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
+        //float scale_X = float(Device.dwWidth) / float(TEX_jitter);
+        //float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
 
         // Fill vertex buffer
         FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
+        pv->set(-1, 1, 0, 1, 0, 0, 1);
         pv++;
         pv->set(-1, -1, 0, 0, 0, 0, 0);
         pv++;
-        pv->set(1, 1, 1, 1, 0, scale_X, scale_Y);
+        pv->set(1, 1, 1, 1, 0, 1, 1);
         pv++;
-        pv->set(1, -1, 1, 0, 0, scale_X, 0);
+        pv->set(1, -1, 1, 0, 0, 1, 0);
         pv++;
         RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 

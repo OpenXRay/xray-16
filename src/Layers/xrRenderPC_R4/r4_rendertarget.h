@@ -30,6 +30,11 @@ public:
     IBlender* b_accum_spot_msaa[8]{};
     IBlender* b_accum_volumetric_msaa[8]{};
 
+    // [SSS Stuff]
+    IBlender* b_ssfx_ssr;
+    IBlender* b_ssfx_volumetric_blur;
+    IBlender* b_ssfx_ao;
+
 #ifdef DEBUG
     struct dbg_line_t
     {
@@ -76,6 +81,32 @@ public:
     ref_rt rt_smap_depth; // 24(32) bit,	depth
     ref_rt rt_smap_rain;
     ref_rt rt_smap_depth_minmax; //	is used for min/max sm
+
+    // Screen Space Shaders Stuff
+    ref_rt rt_ssfx;
+    ref_rt rt_ssfx_temp;
+    ref_rt rt_ssfx_temp2;
+    ref_rt rt_ssfx_temp3;
+
+    ref_rt rt_ssfx_accum;
+    ref_rt rt_ssfx_hud;
+    ref_rt rt_ssfx_ssr;
+    ref_rt rt_ssfx_water;
+    ref_rt rt_ssfx_water_waves;
+    ref_rt rt_ssfx_ao;
+    ref_rt rt_ssfx_il;
+
+    ref_rt rt_ssfx_prevPos;
+
+    ref_shader s_ssfx_water;
+    ref_shader s_ssfx_water_ssr;
+    ref_shader s_ssfx_ao;
+    ref_shader s_ssfx_hud[5];
+
+    Fmatrix Matrix_previous, Matrix_current;
+    Fmatrix Matrix_HUD_previous, Matrix_HUD_current;
+    Fvector3 Position_previous;
+    bool RVelocity;
 
     //	Igor: for async screenshots
     ID3DTexture2D* t_ss_async; // 32bit		(r,g,b,a) is situated in the system memory
@@ -127,6 +158,11 @@ private:
     ref_shader s_gasmask_drops;
     ref_shader s_gasmask_dudv;
     ref_shader s_nightvision;
+    ref_shader s_lut;
+
+    // Screen Space Shaders Stuff
+    ref_shader s_ssfx_ssr;
+    ref_shader s_ssfx_volumetric_blur;
 
     //	generate min/max
     ref_shader s_create_minmax_sm;
@@ -293,6 +329,18 @@ public:
     void phase_gasmask_drops();
     void phase_gasmask_dudv();
     void phase_nightvision();
+
+    // SSS Stuff
+    void phase_ssfx_ssr(); // SSR Phase
+    void phase_ssfx_volumetric_blur(); // Volumetric Blur
+    void phase_ssfx_water_blur(); // Water Blur
+    void phase_ssfx_water_waves(); // Water Waves
+#if (RENDER == R_R4) // Yohji: note - this if/endif was unnecessary in monolith engine, can we refactor?
+    void phase_ssfx_ao(); // AO
+    void phase_ssfx_il(); // IL
+    void set_viewport_size(ID3DDeviceContext* dev, float w, float h);
+    void phase_lut();
+#endif
 
     //	Generates min/max sm
     void create_minmax_SM(CBackend& cmd_list);

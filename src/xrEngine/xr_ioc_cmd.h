@@ -64,6 +64,21 @@ extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 
+extern ENGINE_API int ps_ssfx_il_quality;
+extern ENGINE_API int ps_ssfx_ao_quality;
+extern ENGINE_API Fvector3 ps_ssfx_water_quality;
+extern ENGINE_API Fvector4 ps_ssfx_il;
+extern ENGINE_API Fvector4 ps_ssfx_ao;
+extern ENGINE_API Fvector4 ps_ssfx_water;
+extern ENGINE_API int ps_ssfx_ssr_quality;
+extern ENGINE_API Fvector4 ps_ssfx_ssr;
+extern ENGINE_API Fvector4 ps_ssfx_ssr_2;
+extern ENGINE_API Fvector4 ps_ssfx_terrain_quality;
+extern ENGINE_API Fvector3 ps_ssfx_shadows;
+extern ENGINE_API Fvector4 ps_ssfx_volumetric;
+extern ENGINE_API Fvector4 ps_ssfx_wind_grass;
+extern ENGINE_API Fvector4 ps_ssfx_wind_trees;
+
 extern ENGINE_API float ps_r3_dyn_wet_surf_near; // 10.0f
 extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256

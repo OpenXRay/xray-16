@@ -26,6 +26,18 @@
     #include "Layers/xrRender/blenders/blender_nightvision.h"
     #include "Layers/xrRender/blenders/blender_gasmask_drops.h"
     #include "Layers/xrRender/blenders/blender_gasmask_dudv.h"
+    #include "Layers/xrRender/blenders/blender_lut.h"
+#endif
+
+#if (RENDER == R_R4)
+D3D_VIEWPORT custom_viewport = { 0.f, 0.f, 0.f, 0.f, 0.f, 1.f };
+
+void CRenderTarget::set_viewport_size(ID3DDeviceContext* dev, float w, float h)
+{
+    custom_viewport.Width = w;
+    custom_viewport.Height = h;
+    dev->RSSetViewports(1, &custom_viewport);
+}
 #endif
 
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
@@ -346,6 +358,11 @@ CRenderTarget::CRenderTarget()
         CBlender_gasmask_dudv b_gasmask_dudv;
         CBlender_nightvision b_nightvision;
 
+        CBlender_lut b_lut;
+        b_ssfx_ssr = xr_new<CBlender_ssfx_ssr>();
+        b_ssfx_volumetric_blur = xr_new<CBlender_ssfx_volumetric_blur>();
+        b_ssfx_ao = xr_new<CBlender_ssfx_ao>();
+
         //Rendertargets
         rt_dof.create(r2_RT_dof, w, h, D3DFMT_A8R8G8B8);
 
@@ -358,12 +375,46 @@ CRenderTarget::CRenderTarget()
         rt_blur_h_8.create(r2_RT_blur_h_8, u32(w / 8), u32(h / 8), D3DFMT_A8R8G8B8);
         rt_blur_8.create(r2_RT_blur_8, u32(w / 8), u32(h / 8), D3DFMT_A8R8G8B8);
 
+        // Screen Space Shaders Stuff
+        rt_ssfx.create(r2_RT_ssfx, w, h, D3DFMT_A8R8G8B8); // Temp RT
+        rt_ssfx_temp.create(r2_RT_ssfx_temp, w, h, D3DFMT_A8R8G8B8); // Temp RT
+        rt_ssfx_temp2.create(r2_RT_ssfx_temp2, w, h, D3DFMT_A8R8G8B8); // Temp RT
+        rt_ssfx_temp3.create(r2_RT_ssfx_temp3, w, h, D3DFMT_A8R8G8B8); // Temp RT
+
+        rt_ssfx_accum.create(r2_RT_ssfx_accum, w, h, D3DFMT_A16B16G16R16F, SampleCount); // Volumetric Acc
+        rt_ssfx_ssr.create(r2_RT_ssfx_ssr, w, h, D3DFMT_A8R8G8B8); // SSR Acc
+        rt_ssfx_water.create(r2_RT_ssfx_water, w, h, D3DFMT_A8R8G8B8); // Water Acc
+        rt_ssfx_ao.create(r2_RT_ssfx_ao, w, h, D3DFMT_A8R8G8B8); // AO Acc
+        rt_ssfx_il.create(r2_RT_ssfx_il, w, h, D3DFMT_A8R8G8B8); // IL Acc
+
+        rt_ssfx_water_waves.create(r2_RT_ssfx_water_waves, 512, 512, D3DFMT_A8R8G8B8); // Water Waves
+
+        rt_ssfx_prevPos.create(r2_RT_ssfx_prevPos, w, h, D3DFMT_A16B16G16R16F, SampleCount);
+
+        rt_ssfx_hud.create(r2_RT_ssfx_hud, w, h, D3DFMT_A16B16G16R16F); // HUD mask & Velocity buffer
+
+        s_ssfx_ssr.create(b_ssfx_ssr, "r2\\ssfx_ssr"); // SSR
+        s_ssfx_volumetric_blur.create(b_ssfx_volumetric_blur, "r2\\ssfx_volumetric_blur"); // Volumetric Blur
+
+        s_ssfx_water_ssr.create("ssfx_water_ssr"); // Water SSR
+        s_ssfx_water.create("ssfx_water"); // Water
+
+        s_ssfx_ao.create(b_ssfx_ao, "ssfx_ao"); // SSR
+
+        string32 cskin_buffer;
+        for (int skin_num = 0; skin_num < 5; skin_num++)
+        {
+            sprintf(cskin_buffer, "ssfx_hud_skin%i", skin_num);
+            s_ssfx_hud[skin_num].create(cskin_buffer);
+        }
+
         //Shader
         s_blur.create(&b_blur, "r2\\blur");
         s_dof.create(&b_dof, "r2\\dof");
         s_gasmask_drops.create(&b_gasmask_drops, "r2\\gasmask_drops");
         s_gasmask_dudv.create(&b_gasmask_dudv, "r2\\gasmask_dudv");
         s_nightvision.create(&b_nightvision, "r2\\nightvision");
+        s_lut.create(&b_lut, "r2\\lut");
     }
 #endif
 
@@ -785,6 +836,13 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_accum_volumetric_msaa[i]);
         }
     }
+
+#if RENDER == R_R4
+    // [ SSS Stuff ]
+    xr_delete(b_ssfx_ssr); // SSR Phase
+    xr_delete(b_ssfx_volumetric_blur); // Volumetric Phase
+    xr_delete(b_ssfx_ao); // AO Phase
+#endif
 }
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)

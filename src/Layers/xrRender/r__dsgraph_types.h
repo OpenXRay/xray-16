@@ -21,6 +21,16 @@ struct _MatrixItem
     Fmatrix Matrix; // matrix (copy)
 };
 
+struct _MatrixItemSSFX
+{
+    float ssa;
+    IRenderable* pObject;
+    dxRender_Visual* pVisual;
+    Fmatrix Matrix; // matrix (copy)
+    ShaderElement* se;
+    Fmatrix PrevMatrix{};
+};
+
 struct _MatrixItemS
 {
     // Хак для использования списков инициализации
@@ -66,4 +76,7 @@ using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];
 using mapSorted_T = xr_fixed_map<float, _MatrixItemS>;
 using mapHUD_T    = xr_fixed_map<float, _MatrixItemS>;
 using mapLOD_T    = xr_fixed_map<float, _LodItem>;
+
+using HUDMask_T = xr_fixed_map<float, _MatrixItemSSFX>;
+using mapWater_T = xr_fixed_map<float, _MatrixItemSSFX>;
 }
