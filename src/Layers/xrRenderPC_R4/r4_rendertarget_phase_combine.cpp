@@ -400,6 +400,8 @@ void CRenderTarget::phase_combine()
         if (ps_r2_ls_flags.test(R2FLAG_DOF))
             phase_dof();
 
+        phase_lut();
+
         //(Anomaly) Compute night vision effect
         if (ps_r2_nightvision > 0)
             phase_nightvision();

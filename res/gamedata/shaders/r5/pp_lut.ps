@@ -1,0 +1,7 @@
+#include "common.h"
+
+float4 main(p_screen I) : SV_Target
+{
+	float3 image = s_image.Sample(smp_nofilter, I.tc0).xyz;
+	return float4(image, 1.0);
+}

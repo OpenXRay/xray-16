@@ -75,6 +75,7 @@
     <ClInclude Include="..\xrRender\blenders\blender_dof.h" />
     <ClInclude Include="..\xrRender\blenders\blender_gasmask_drops.h" />
     <ClInclude Include="..\xrRender\blenders\blender_gasmask_dudv.h" />
+    <ClInclude Include="..\xrRender\blenders\blender_lut.h" />
     <ClInclude Include="..\xrRender\blenders\blender_nightvision.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="..\xrRender\blenders\blender_dof.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_gasmask_drops.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_gasmask_dudv.cpp" />
+    <ClCompile Include="..\xrRender\blenders\blender_lut.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\blender_nightvision.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
@@ -335,6 +337,7 @@
     <ClCompile Include="..\xrRender\rendertarget_phase_dof.cpp" />
     <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_drops.cpp" />
     <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_dudv.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_lut.cpp" />
     <ClCompile Include="..\xrRender\rendertarget_phase_nightvision.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Loader.cpp" />
