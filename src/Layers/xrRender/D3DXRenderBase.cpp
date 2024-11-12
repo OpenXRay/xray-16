@@ -70,6 +70,11 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
 void D3DXRenderBase::Destroy()
 {
+    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    {
+        contexts_pool[id].destroy();
+    }
+
     xr_delete(Resources);
     HW.DestroyDevice();
 }

@@ -141,8 +141,6 @@ struct R_dsgraph_structure
         mapLOD.destroy();
         mapDistort.destroy();
         mapHUDSorted.destroy();
-        //HUDMask.destroy();
-        //mapWater.destroy();
 
 #if RENDER != R_R1
         mapWmark.destroy();
@@ -150,6 +148,12 @@ struct R_dsgraph_structure
         mapHUDEmissive.destroy();
 #endif
         cmd_list.Invalidate();
+    }
+
+    void destroy()
+    {
+        HUDMask.destroy();
+        mapWater.destroy();
     }
 
     void r_pmask(bool _1, bool _2, bool _wm = false)
