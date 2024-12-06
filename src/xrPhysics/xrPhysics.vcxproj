@@ -27,6 +27,7 @@
       <PreprocessorDefinitions>_USRDLL;XRPHYSICS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(xrExternals)ode/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FloatingPointModel Condition="'$(Platform)'=='x64'">Precise</FloatingPointModel>
+      <DisableSpecificWarnings Condition="'$(PlatformShortName)'=='x86'">4756;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
