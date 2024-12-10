@@ -90,8 +90,14 @@ void CAI_Trader::BoneCallback(CBoneInstance* B)
 
 void CAI_Trader::LookAtActor(CBoneInstance* B)
 {
-    Fvector dir;
-    dir.sub(Level().CurrentEntity()->Position(), Position());
+    Fvector dir{};
+    Fvector actor_pos = Level().CurrentEntity()->Position();
+    Fvector this_pos = Position();
+
+    if (actor_pos.distance_to(this_pos) > 20.f)
+        return;
+
+    dir.sub(actor_pos, this_pos);
 
     float yaw, pitch;
     dir.getHP(yaw, pitch);
@@ -100,6 +106,7 @@ void CAI_Trader::LookAtActor(CBoneInstance* B)
     XFORM().getHPB(h, p, b);
     float cur_yaw = h;
     float dy = _abs(angle_normalize_signed(yaw - cur_yaw));
+    clamp(dy, 0.f, 1.f);
 
     if (angle_normalize_signed(yaw - cur_yaw) > 0)
         dy *= -1.f;
