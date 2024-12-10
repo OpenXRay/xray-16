@@ -42,19 +42,15 @@ net_updateInvData* CInventoryItem::NetSync()
 
 CInventoryItem::CInventoryItem()
 {
-    m_net_updateData = NULL;
     m_flags.set(Fbelt, FALSE);
     m_flags.set(Fruck, TRUE);
     m_flags.set(FRuckDefault, TRUE);
-    m_pInventory = NULL;
 
     SetDropManual(FALSE);
 
     m_flags.set(FCanTake, TRUE);
-    m_can_trade = TRUE;
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FUsingCondition, FALSE);
-    m_fCondition = 1.0f;
 
     m_ItemCurrPlace.value = 0;
     m_ItemCurrPlace.type = eItemPlaceUndefined;

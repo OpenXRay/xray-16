@@ -87,7 +87,7 @@ protected:
     };
 
     Flags16 m_flags;
-    BOOL m_can_trade;
+    bool m_can_trade{ true };
 
 public:
     CInventoryItem();
@@ -149,7 +149,7 @@ public:
     void SetWeight(float w) { m_weight = w; }
 
 public:
-    CInventory* m_pInventory;
+    CInventory* m_pInventory{};
     shared_str m_section_id;
     shared_str m_name;
     shared_str m_nameShort;
@@ -188,7 +188,7 @@ public:
 protected:
     u32 m_cost;
     float m_weight;
-    float m_fCondition;
+    float m_fCondition{ 1.0f };
     shared_str m_Description;
 
 protected:
@@ -221,7 +221,7 @@ public:
     virtual void UpdateXForm();
 
 protected:
-    net_updateInvData* m_net_updateData;
+    net_updateInvData* m_net_updateData{};
     net_updateInvData* NetSync();
     void CalculateInterpolationParams();
 
