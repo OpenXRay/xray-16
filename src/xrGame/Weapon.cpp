@@ -35,6 +35,8 @@
 constexpr pcstr WPN_SCOPE = "wpn_scope";
 constexpr pcstr WPN_SILENCER = "wpn_silencer";
 constexpr pcstr WPN_GRENADE_LAUNCHER = "wpn_launcher";
+// SoC Support - APAMk2
+constexpr pcstr WPN_GRENADE_LAUNCHER_SOC = "wpn_grenade_launcher";
 
 BOOL b_toggle_weapon_aim = FALSE;
 
@@ -1309,6 +1311,11 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
     //.	return;
 
+    u16 bone_id;
+    bone_id = HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher);
+    if (bone_id == BI_NONE && ShadowOfChernobylMode)
+        wpn_grenade_launcher = WPN_GRENADE_LAUNCHER_SOC;
+
     if (ScopeAttachable())
     {
         HudItemData()->set_bone_visible(wpn_scope, IsScopeAttached());
@@ -1401,6 +1408,9 @@ void CWeapon::UpdateAddonsVisibility()
     }
 
     bone_id = pWeaponVisual->LL_BoneID(wpn_grenade_launcher);
+    if (bone_id == BI_NONE && ShadowOfChernobylMode)
+        wpn_grenade_launcher = WPN_GRENADE_LAUNCHER_SOC;
+
     if (GrenadeLauncherAttachable())
     {
         if (IsGrenadeLauncherAttached())
