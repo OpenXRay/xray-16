@@ -97,8 +97,11 @@ void CInventoryItem::Load(LPCSTR section)
     R_ASSERT(m_weight >= 0.f);
 
     m_cost = pSettings->r_u32(section, "cost");
-    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT);
-    m_ItemCurrPlace.base_slot_id = (sl == u32(-1)) ? 0 : (sl + 1);
+
+    // Assets follow initial SOC system, where slots start from -1
+    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT - 1);
+    // Engine is following new system since COP: slots start from 0
+    m_ItemCurrPlace.base_slot_id = sl + 1;
 
     // Description
     if (pSettings->line_exist(section, DESCRIPTION_KEY))

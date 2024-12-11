@@ -35,6 +35,7 @@ int g_auto_ammo_unload = 0;
 
 bool defaultSlotActiveness[] =
 {
+    false, // no slot
     true, // knife
     true, // pistol
     true, // automatic
@@ -176,33 +177,30 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
 
     if (pIItem->CurrPlace() == eItemPlaceUndefined)
     {
-        if (!pIItem->RuckDefault())
+        const bool slotFirst = pSettingsOpenXRay->read_if_exists<bool>("compatibility", "default_to_slot", ShadowOfChernobylMode);
+        const bool defaultToRuck = pIItem->RuckDefault();
+
+        if (slotFirst || !defaultToRuck)
         {
             if (CanPutInSlot(pIItem, pIItem->BaseSlot()))
             {
                 result = Slot(pIItem->BaseSlot(), pIItem, bNotActivate, strict_placement);
-                VERIFY(result);
             }
-            else if (CanPutInBelt(pIItem))
+            else if (!defaultToRuck && CanPutInBelt(pIItem))
             {
                 result = Belt(pIItem, strict_placement);
-                VERIFY(result);
-            }
-            else
-            {
-                result = Ruck(pIItem, strict_placement);
-                VERIFY(result);
-                CWeaponMagazined* pWeapon = smart_cast<CWeaponMagazined*>(pIItem);
-                if (pWeapon && result && g_auto_ammo_unload)
-                {
-                    pWeapon->UnloadMagazine();
-                }
             }
         }
-        else
+
+        if (!result)
         {
             result = Ruck(pIItem, strict_placement);
             VERIFY(result);
+            CWeaponMagazined* pWeapon = smart_cast<CWeaponMagazined*>(pIItem);
+            if (pWeapon && result && !defaultToRuck && g_auto_ammo_unload)
+            {
+                pWeapon->UnloadMagazine();
+            }
         }
     }
 
@@ -607,10 +605,16 @@ void CInventory::Activate(u16 slot, bool bForce)
         PIItem active_item = ActiveItem();
         if (active_item && !bForce)
         {
-            CHudItem* tempItem = active_item->cast_hud_item();
-            R_ASSERT2(tempItem, active_item->object().cNameSect().c_str());
+            if (CHudItem* tempItem = active_item->cast_hud_item())
+                tempItem->SendDeactivateItem();
+            else
+            {
+#ifndef MASTER_GOLD
+                Msg("! Can't cast [%s] to CHudItem", active_item->object().cNameSect().c_str());
+#endif
+                active_item->DeactivateItem();
+            }
 
-            tempItem->SendDeactivateItem();
 #ifdef DEBUG
 //			Msg("--- Inventory owner [%s]: send deactivate item [%s]", m_pOwner->Name(), active_item->NameItem());
 #endif // #ifdef DEBUG
@@ -801,7 +805,7 @@ void CInventory::Update()
             {
                 CHudItem* hi = ActiveItem()->cast_hud_item();
 
-                if (!hi->IsHidden())
+                if (hi && !hi->IsHidden())
                 {
                     if (hi->GetState() == CHUDState::eIdle && hi->GetNextState() == CHUDState::eIdle)
                         hi->SendDeactivateItem();
@@ -833,8 +837,13 @@ void CInventory::Update()
 
             m_iActiveSlot = GetNextActiveSlot();
         }
-        if ((GetNextActiveSlot() != NO_ACTIVE_SLOT) && ActiveItem() && ActiveItem()->cast_hud_item()->IsHidden())
+        if (GetNextActiveSlot() != NO_ACTIVE_SLOT &&
+            ActiveItem() &&
+            ActiveItem()->cast_hud_item() &&
+            ActiveItem()->cast_hud_item()->IsHidden())
+        {
             ActiveItem()->ActivateItem();
+        }
     }
     UpdateDropTasks();
 }
