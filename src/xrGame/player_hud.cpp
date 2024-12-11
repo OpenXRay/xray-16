@@ -316,12 +316,12 @@ Fmatrix hud_item_measures::load_monolithic(const shared_str& sect_name, IKinemat
                 rotation.y = pSettings->r_float(sect_name, strconcat(full_name, prefix, "zoom_rotate_y"));
                 rotation.z = pSettings->read_if_exists<float>(sect_name, strconcat(full_name, prefix, "zoom_rotate_z"), 0.f);
             };
-            load_zoom_offsets("", m_hands_offset[0][0], m_hands_offset[1][0]);
+            load_zoom_offsets("", m_hands_offset[0][1], m_hands_offset[1][1]);
             if (smart_cast<CWeaponMagazinedWGrenade*>(wpn))
             {
-                load_zoom_offsets("grenade_", m_hands_offset[0][1], m_hands_offset[1][1]);
+                load_zoom_offsets("grenade_", m_hands_offset[0][2], m_hands_offset[1][2]);
                 if (wpn->GrenadeLauncherAttachable())
-                    load_zoom_offsets("grenade_normal_", m_hands_offset[0][2], m_hands_offset[1][2]);
+                    load_zoom_offsets("grenade_normal_", m_hands_offset[0][1], m_hands_offset[1][1]);
             }
         }
     }
