@@ -1258,6 +1258,9 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u32 slot_id) const
         return (0);
     }
 
+    if (pSettingsOpenXRay->read_if_exists<bool>("compatibility", "minus_one_slot_ordering", ShadowOfChernobylMode || ClearSkyMode))
+        ++slot_id;
+
     CInventoryItem* result = inventory_owner->inventory().ItemFromSlot((u16)slot_id);
     return (result ? result->object().lua_game_object() : 0);
 }
