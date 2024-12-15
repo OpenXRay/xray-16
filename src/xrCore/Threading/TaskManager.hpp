@@ -96,7 +96,7 @@ public:
     }
 
 public:
-    void Wait(const Task& task) const;
+    void Wait(const Task& task, bool updateSystemEvents = false) const;
     bool ExecuteOneTask() const;
 
     void Pause(bool pause) { shouldPause.store(pause, std::memory_order_release); }

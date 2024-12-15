@@ -304,13 +304,13 @@ void TaskManager::RunTask(Task& task)
     ExecuteTask(task);
 }
 
-void TaskManager::Wait(const Task& task) const
+void TaskManager::Wait(const Task& task, bool updateSystemEvents /*= false*/) const
 {
     ZoneScoped;
     while (!task.IsFinished())
     {
         ExecuteOneTask();
-        if (s_tl_worker.id == 0 && xrDebug::ProcessingFailure())
+        if (s_tl_worker.id == 0 && (xrDebug::ProcessingFailure() || updateSystemEvents))
             SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
