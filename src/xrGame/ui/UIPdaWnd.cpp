@@ -124,7 +124,8 @@ void CUIPdaWnd::Init()
     UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
     AttachChild(UITabControl);
-    CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
+    CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
+    UITabControl->SetMessageTarget(this);
 
     constexpr std::tuple<pcstr, pcstr> socIds[] = 
     {
@@ -132,7 +133,7 @@ void CUIPdaWnd::Init()
         {"1", "eptMap"},
         {"2", "eptDiary"},
         {"3", "eptContacts"},
-        {"4", "eptRanking"},
+        {"4", "eptStalkersRanking"},
         {"5", "eptStatistics"},
         {"6", "eptEncyclopedia"},
     };
@@ -152,8 +153,6 @@ void CUIPdaWnd::Init()
             }
         }
     }
-
-    UITabControl->SetMessageTarget(this);
 
     UINoice = xr_new<CUIStatic>("Noise");
     UINoice->SetAutoDelete(true);
