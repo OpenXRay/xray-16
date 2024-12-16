@@ -141,7 +141,7 @@ void CUIPdaWnd::Init()
     for (u32 i = 0; i < UITabControl->GetTabsCount(); i++)
     {
         CUITabButton* btn = UITabControl->GetButtonByIndex(i);
-        if (!btn || !btn->m_btn_id_default_assigned)
+        if (!btn || !btn->IsIdDefaultAssigned())
             continue;
 
         for (const auto& [id, replace] : known_soc_tab_ids)
