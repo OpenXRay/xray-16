@@ -1303,16 +1303,13 @@ void CWeapon::UpdateHUDAddonsVisibility()
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+    static shared_str wpn_grenade_launcher_soc = WPN_GRENADE_LAUNCHER_SOC;
 
     // actor only
     if (!GetHUDmode())
         return;
 
     //.	return;
-
-    u16 bone_id = HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher);
-    if (bone_id == BI_NONE)
-        wpn_grenade_launcher = WPN_GRENADE_LAUNCHER_SOC;
 
     if (ScopeAttachable())
     {
@@ -1337,16 +1334,18 @@ void CWeapon::UpdateHUDAddonsVisibility()
     else if (m_eSilencerStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(wpn_silencer, TRUE, TRUE);
 
+    bool useSoCName = HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher) == BI_NONE;
+
     if (GrenadeLauncherAttachable())
     {
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, IsGrenadeLauncherAttached());
+        HudItemData()->set_bone_visible((useSoCName ? wpn_grenade_launcher_soc : wpn_grenade_launcher), IsGrenadeLauncherAttached());
     }
     if (m_eGrenadeLauncherStatus == ALife::eAddonDisabled)
     {
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, FALSE, TRUE);
+        HudItemData()->set_bone_visible((useSoCName ? wpn_grenade_launcher_soc : wpn_grenade_launcher), FALSE, TRUE);
     }
     else if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, TRUE, TRUE);
+        HudItemData()->set_bone_visible((useSoCName ? wpn_grenade_launcher_soc : wpn_grenade_launcher), TRUE, TRUE);
 }
 
 void CWeapon::UpdateAddonsVisibility()
