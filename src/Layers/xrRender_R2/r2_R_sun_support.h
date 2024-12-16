@@ -241,7 +241,7 @@ public:
             {
                 tmp_plane.n.mul(-sign);
                 tmp_plane.d *= -sign;
-                dest.push_back(tmp_plane);
+                dest.emplace_back(std::move(tmp_plane));
             }
         }
 
@@ -274,15 +274,15 @@ public:
             if (max_dist > -1000)
             {
                 plane.d += max_dist;
-                dest.push_back(plane);
+                dest.emplace_back(std::move(plane));
             }
         }
 
         for (u32 i = 0; i < LIGHT_CUBOIDSIDEPOLYS_COUNT; i++)
         {
-            dest.push_back(light_cuboid_polys[i].plane);
-            dest.back().n.mul(-1);
-            dest.back().d *= -1;
+            Fplane& plane = dest.emplace_back(light_cuboid_polys[i].plane);
+            plane.n.mul(-1);
+            plane.d *= -1;
             VERIFY(light_cuboid_polys[i].plane.classify(light_ray.P) > 0);
         }
 
@@ -480,9 +480,9 @@ public:
                     }
                 if (!found)
                 {
-                    edges.push_back(E);
                     if constexpr (_debug)
                         T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 0, 0, 255));
+                    edges.emplace_back(std::move(E));
                 }
             }
 
@@ -503,15 +503,14 @@ public:
             if constexpr (_debug)
                 T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 255, 255, 255));
             Fvector3 point;
-            points.push_back(point.sub(points[E.p0], direction));
-            points.push_back(point.sub(points[E.p1], direction));
-            polys.push_back(_poly());
-            _poly& P = polys.back();
-            int pend = int(points.size());
-            P.points.push_back(E.p0);
-            P.points.push_back(E.p1);
-            P.points.push_back(pend - 1); // p1 mod
-            P.points.push_back(pend - 2); // p0 mod
+            points.emplace_back(point.sub(points[E.p0], direction));
+            points.emplace_back(point.sub(points[E.p1], direction));
+            _poly& P = polys.emplace_back(_poly());
+            const int pend = int(points.size());
+            P.points.emplace_back(E.p0);
+            P.points.emplace_back(E.p1);
+            P.points.emplace_back(pend - 1); // p1 mod
+            P.points.emplace_back(pend - 2); // p0 mod
             if constexpr (_debug)
             {
                 T.dbg_addline(points[E.p0], point.mad(points[E.p0], direction, -1000), color_rgba(0, 255, 0, 255));
@@ -521,20 +520,15 @@ public:
 
         // Reorient planes (try to write more inefficient code :)
         compute_planes();
-        for (int it = 0; it < int(polys.size()); it++)
+        for (_poly& base : polys)
         {
-            _poly& base = polys[it];
             if (base.classify(cog) > 0)
                 std::reverse(base.points.begin(), base.points.end());
         }
 
         // Export
         compute_planes();
-        for (int it = 0; it < int(polys.size()); it++)
-        {
-            _poly& P = polys[it];
-            Fplane pp = { P.planeN, P.planeD };
-            dest.push_back(pp);
-        }
+        for (_poly& poly : polys)
+            dest.emplace_back(Fplane{ poly.planeN, poly.planeD });
     }
 };
