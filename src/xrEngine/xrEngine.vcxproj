@@ -69,7 +69,6 @@
     <ClInclude Include="IRenderable.h" />
     <ClInclude Include="ISheduled.h" />
     <ClInclude Include="LightAnimLibrary.h" />
-    <ClInclude Include="line_editor.h" />
     <ClInclude Include="line_edit_control.h" />
     <ClInclude Include="mp_logging.h" />
     <ClInclude Include="ObjectAnimator.h" />
@@ -152,7 +151,6 @@
     <ClCompile Include="ISheduled.cpp" />
     <ClCompile Include="key_binding_registrator_script.cpp" />
     <ClCompile Include="LightAnimLibrary.cpp" />
-    <ClCompile Include="line_editor.cpp" />
     <ClCompile Include="line_edit_control.cpp" />
     <ClCompile Include="mailSlot.cpp" />
     <ClCompile Include="ObjectAnimator.cpp" />

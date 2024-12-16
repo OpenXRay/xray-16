@@ -14,7 +14,6 @@ class ENGINE_API IConsole_Command;
 
 namespace text_editor
 {
-class line_editor;
 class line_edit_control;
 };
 
@@ -52,10 +51,9 @@ struct TipString
 };
 
 class ENGINE_API CConsole :
-    public pureRender,
     public pureFrame,
+    public IInputReceiver,
     public IEventReceiver,
-    public CUIResetNotifier,
     public IUserConfigHandler
 {
 public:
@@ -82,19 +80,10 @@ public:
     };
 
 protected:
-    int scroll_delta{};
-
-    CGameFont* pFont{};
-    CGameFont* pFont2{};
-
-    FactoryPtr<IUIShader>* m_hShader_back{};
-
     bool m_disable_tips;
 
 private:
     EVENT eConsole;
-
-    int lastBindedKeys[bindtypes_count]{};
 
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;
@@ -117,11 +106,13 @@ public:
 
     virtual void OnDeviceInitialize() {}
 
-    virtual void OnRender();
     virtual void OnFrame();
     virtual void OnEvent(EVENT E, u64 P1, u64 P2) override;
 
-    void OnUIReset() override;
+    void IR_OnKeyboardPress(int key) override;
+    void IR_OnKeyboardRelease(int key) override;
+    void IR_OnKeyboardHold(int key) override;
+    void IR_OnTextInput(pcstr text) override;
 
     pcstr GetUserConfigFileName() override { return ConfigFile; }
 
@@ -151,8 +142,7 @@ public:
     IConsole_Command* GetCommand(pcstr cmd) const;
 
 protected:
-    text_editor::line_editor* m_editor;
-    text_editor::line_edit_control& ec();
+    char m_edit_string[CONSOLE_BUF_SIZE]{};
 
     enum Console_mark // (int)=char
     {
@@ -173,21 +163,9 @@ protected:
     };
 
     bool is_mark(Console_mark type);
-    u32 get_mark_color(Console_mark type);
-
-    void DrawBackgrounds(bool bGame);
-    void DrawRect(Frect const& r, u32 color);
-    void OutFont(pcstr text, float& pos_y);
-    void Register_callbacks();
+    static Fcolor get_mark_color(Console_mark type);
 
 protected:
-    void Prev_log();
-    void Next_log();
-    void Begin_log();
-    void End_log();
-
-    void Find_cmd();
-    void Find_cmd_back();
     void Prev_cmd();
     void Next_cmd();
     void Prev_tip();
@@ -198,12 +176,7 @@ protected:
     void PageUp_tips();
     void PageDown_tips();
 
-    void Execute_cmd();
-    void Show_cmd();
-    void Hide_cmd();
-    void Hide_cmd_esc();
-
-    void GamePause();
+    int InputCallback(ImGuiInputTextCallbackData* data);
 
 protected:
     void add_cmd_history(shared_str const& str);

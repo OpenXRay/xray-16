@@ -228,6 +228,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         ShowSplash(topmost);
     }
 
+    SDL_StopTextInput(); // It's enabled by default for some reason, we don't want it
     const auto& inputTask = TaskManager::AddTask([]
     {
         const bool captureInput = !strstr(Core.Params, "-i");

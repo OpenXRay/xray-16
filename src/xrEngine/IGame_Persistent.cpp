@@ -540,9 +540,10 @@ void IGame_Persistent::LoadDraw() const
     if (!Device.RenderBegin())
         return;
 
-    if (GEnv.isDedicatedServer)
-        Console->OnRender();
-    else
+    // XXX: fix dedicated server
+    //if (GEnv.isDedicatedServer)
+    //    Console->OnRender();
+    //else
         load_draw_internal();
 
     Device.RenderEnd();
