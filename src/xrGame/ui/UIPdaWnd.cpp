@@ -127,7 +127,7 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
     UITabControl->SetMessageTarget(this);
 
-    constexpr std::tuple<pcstr, pcstr> known_soc_tab_ids[] = 
+    constexpr std::tuple<pcstr, pcstr> known_soc_tab_ids[] =
     {
         {"0", "eptTasks"},
         {"1", "eptMap"},
