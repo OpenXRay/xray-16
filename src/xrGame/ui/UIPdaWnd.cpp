@@ -127,7 +127,7 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
     UITabControl->SetMessageTarget(this);
 
-    constexpr std::tuple<pcstr, pcstr> socIds[] = 
+    constexpr std::tuple<pcstr, pcstr> known_soc_tab_ids[] = 
     {
         {"0", "eptTasks"},
         {"1", "eptMap"},
@@ -141,10 +141,10 @@ void CUIPdaWnd::Init()
     for (u32 i = 0; i < UITabControl->GetTabsCount(); i++)
     {
         CUITabButton* btn = UITabControl->GetButtonByIndex(i);
-        if (!btn) 
+        if (!btn || !btn->m_btn_id_default_assigned)
             continue;
 
-        for (const auto& [id, replace] : socIds)
+        for (const auto& [id, replace] : known_soc_tab_ids)
         {
             if (btn->m_btn_id == id)
             {
