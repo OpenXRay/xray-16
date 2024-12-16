@@ -126,24 +126,30 @@ void CUIPdaWnd::Init()
     AttachChild(UITabControl);
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
 
-    const std::tuple<shared_str, shared_str> socIds[] = 
+    constexpr std::tuple<pcstr, pcstr> socIds[] = 
     {
-        {"eptMap", "1"},
-        {"eptDiary", "2"},
-        {"eptContacts", "3"},
-        {"eptStatistics", "5"},
-        {"eptEncyclopedia", "6"}
+        {"0", "eptTasks"},
+        {"1", "eptMap"},
+        {"2", "eptDiary"},
+        {"3", "eptContacts"},
+        {"4", "eptRanking"},
+        {"5", "eptStatistics"},
+        {"6", "eptEncyclopedia"},
     };
 
-    for (u32 i = 0, len = UITabControl->GetTabsCount(); i < len; i++)
+    for (u32 i = 0; i < UITabControl->GetTabsCount(); i++)
     {
         CUITabButton* btn = UITabControl->GetButtonByIndex(i);
-        if (!btn) continue;
+        if (!btn) 
+            continue;
 
-        for (const auto& [replace, id] : socIds)
+        for (const auto& [id, replace] : socIds)
         {
-            if (btn->m_btn_id != id) continue;
-            btn->m_btn_id = replace;
+            if (btn->m_btn_id == id)
+            {
+                btn->m_btn_id = replace;
+                break;
+            }
         }
     }
 
