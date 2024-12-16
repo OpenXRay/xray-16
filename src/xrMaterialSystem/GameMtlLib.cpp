@@ -173,10 +173,10 @@ void CGameMtlLibrary::Load()
     IReader& fs = *F;
 
     R_ASSERT(fs.find_chunk(GAMEMTLS_CHUNK_VERSION));
-    const u16 version = fs.r_u16();
-    if (GAMEMTL_CURRENT_VERSION != version)
+    m_version = static_cast<EGameMtlVersion>(fs.r_u16());
+    if (GAMEMTL_CURRENT_VERSION != m_version)
     {
-        Log("CGameMtlLibrary: invalid version. Library can't load.");
+        Msg("CGameMtlLibrary: unsupported version [%u]. Library can't load.", m_version);
         FS.r_close(F);
         return;
     }
