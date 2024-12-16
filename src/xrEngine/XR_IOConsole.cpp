@@ -10,40 +10,30 @@
 
 #include "xr_input.h"
 #include "xr_ioc_cmd.h"
-#include "GameFont.h"
 
-#include "Include/xrRender/UIRender.h"
-#include "xrUICore/ui_defs.h"
+#include <imgui_internal.h>
 
-static float const LDIST = 0.05f;
 static u32 const cmd_history_max = 64;
 
-static u32 const prompt_font_color = color_rgba(228, 228, 255, 255);
-static u32 const tips_font_color = color_rgba(230, 250, 230, 255);
-static u32 const cmd_font_color = color_rgba(138, 138, 245, 255);
-static u32 const cursor_font_color = color_rgba(255, 255, 255, 255);
-static u32 const total_font_color = color_rgba(250, 250, 15, 180);
-static u32 const default_font_color = color_rgba(250, 250, 250, 250);
+static Fcolor const prompt_font_color  = color_rgba(228, 228, 255, 255);
+static Fcolor const tips_font_color    = color_rgba(230, 250, 230, 255);
+static Fcolor const cmd_font_color     = color_rgba(138, 138, 245, 255);
+static Fcolor const total_font_color   = color_rgba(250, 250, 15, 180);
+static Fcolor const default_font_color = color_rgba(250, 250, 250, 250);
 
-static u32 const back_color = color_rgba(20, 20, 20, 200);
-static u32 const tips_back_color = color_rgba(20, 20, 20, 200);
-static u32 const tips_select_color = color_rgba(90, 90, 140, 230);
-static u32 const tips_word_color = color_rgba(5, 100, 56, 200);
-static u32 const tips_scroll_back_color = color_rgba(15, 15, 15, 230);
-static u32 const tips_scroll_pos_color = color_rgba(70, 70, 70, 240);
+static Fcolor const back_color         = color_rgba(20, 20, 20, 200);
+static Fcolor const tips_back_color    = color_rgba(20, 20, 20, 200);
+static Fcolor const tips_select_color  = color_rgba(90, 90, 140, 230);
+static Fcolor const tips_word_color    = color_rgba(5, 100, 56, 200);
 
 ENGINE_API CConsole* Console = NULL;
 
 extern char const* const ioc_prompt;
-char const* const ioc_prompt = ">>> ";
+char const* const ioc_prompt = ">>>";
 
-extern char const* const ch_cursor;
-char const* const ch_cursor = "_";
-
-text_editor::line_edit_control& CConsole::ec() { return m_editor->control(); }
-u32 CConsole::get_mark_color(Console_mark type)
+Fcolor CConsole::get_mark_color(Console_mark type)
 {
-    u32 color = default_font_color;
+    Fcolor color = default_font_color;
     switch (type)
     {
     case no_mark: break;
@@ -91,10 +81,8 @@ bool CConsole::is_mark(Console_mark type)
 
 CConsole::CConsole()
 {
-    m_editor = xr_new<text_editor::line_editor>(CONSOLE_BUF_SIZE);
     m_cmd_history_max = cmd_history_max;
     m_disable_tips = false;
-    Register_callbacks();
     xrDebug::SetUserConfigHandler(this);
 }
 
@@ -122,8 +110,6 @@ void CConsole::Initialize()
 
 CConsole::~CConsole()
 {
-    xr_delete(m_hShader_back);
-    xr_delete(m_editor);
     Destroy();
     xrDebug::SetUserConfigHandler(nullptr);
 }
@@ -132,8 +118,6 @@ void CConsole::Destroy()
 {
     ZoneScoped;
 
-    xr_delete(pFont);
-    xr_delete(pFont2);
     Commands.clear();
     Engine.Event.Handler_Detach(eConsole, this);
 }
@@ -152,94 +136,22 @@ void CConsole::OnFrame()
 {
     ZoneScoped;
 
-    m_editor->on_frame();
-
     if (Device.dwFrame % 10 == 0)
     {
         update_tips();
     }
-}
-
-void CConsole::OnEvent(EVENT E, u64 P1, u64 P2)
-{
-    pstr command = (pstr)P1;
-    ExecuteCommand(command, false);
-    xr_free(command);
-}
-
-void CConsole::OutFont(pcstr text, float& pos_y)
-{
-    float str_length = pFont->SizeOf_(text);
-    float scr_width = 1.98f * Device.fWidth_2;
-    if (str_length > scr_width) // 1024.0f
-    {
-        // XXX: do something with 'f' after its assignment in while loop?
-        [[maybe_unused]] float f = 0.0f;
-        int sz = 0;
-        int ln = 0;
-        PSTR one_line = (PSTR)xr_alloca((CONSOLE_BUF_SIZE + 1) * sizeof(char));
-
-        while (text[sz] && (ln + sz < CONSOLE_BUF_SIZE - 5)) // перенос строк
-        {
-            one_line[ln + sz] = text[sz];
-            one_line[ln + sz + 1] = 0;
-
-            float t = pFont->SizeOf_(one_line + ln);
-            if (t > scr_width)
-            {
-                OutFont(text + sz + 1, pos_y);
-                pos_y -= LDIST;
-                pFont->OutI(-1.0f, pos_y, "%s", one_line + ln);
-                ln = sz + 1;
-                f = 0.0f;
-            }
-            else
-            {
-                f = t;
-            }
-
-            ++sz;
-        }
-    }
-    else
-    {
-        pFont->OutI(-1.0f, pos_y, "%s", text);
-    }
-}
-
-void CConsole::OnUIReset()
-{
-    xr_delete(pFont);
-    xr_delete(pFont2);
-}
-
-void CConsole::OnRender()
-{
-    ZoneScoped;
 
     if (!bVisible)
-    {
         return;
-    }
 
-    if (!m_hShader_back)
+    if (!Device.editor().IsActiveState())
     {
-        m_hShader_back = xr_new<FactoryPtr<IUIShader>>();
-        (*m_hShader_back)->create("hud" DELIMITER "default", "ui" DELIMITER "ui_console"); // "ui/ui_empty"
-    }
+        Device.editor().UpdateTextInput();
 
-    if (!pFont)
-    {
-        pFont = xr_new<CGameFont>("hud_font_di", CGameFont::fsDeviceIndependent);
-        pFont->SetHeightI(0.025f);
-    }
-    if (!pFont2)
-    {
-        pcstr fontSection = "hud_font_di2";
-        if (!pSettings->section_exist(fontSection))
-            fontSection = "hud_font_di";
-        pFont2 = xr_new<CGameFont>(fontSection, CGameFont::fsDeviceIndependent);
-        pFont2->SetHeightI(0.025f);
+        // Activate console input after hiding the editor
+        // XXX: not really great I'd say
+        if (pInput->CurrentIR() != this)
+            IR_Capture();
     }
 
     bool bGame = false;
@@ -253,271 +165,251 @@ void CConsole::OnRender()
         bGame = false;
     }
 
-    DrawBackgrounds(bGame);
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    float fMaxY;
-    float dwMaxY = (float)Device.dwHeight;
-    // float dwMaxX=float(Device.dwWidth/2);
+    auto size = viewport->WorkSize;
     if (bGame)
+        size.y /= 2;
+
+    ImVec2 pos{};
+    const auto padding = ImGui::GetStyle().WindowPadding;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+    // Console window
+    ImGui::SetNextWindowSize(size);
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, reinterpret_cast<const ImVec4&>(back_color));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { padding.x, 0.0f }); // we want to disable padding for window bottom
+
+    constexpr ImGuiWindowFlags console_window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking |
+        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
+        ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav; //| ImGuiWindowFlags_NoMove;
+
+    if (ImGui::Begin("Console", nullptr, console_window_flags))
     {
-        fMaxY = 0.0f;
-        dwMaxY /= 2;
+        ImGui::SetCursorPosY(padding.y); // since we have disabled padding
+
+        const size_t amount = LogFile.size();
+        const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+
+        // Log subwindow
+        if (ImGui::BeginChild("Log", { 0, -footer_height_to_reserve }))
+        {
+            ImGuiListClipper clipper;
+            clipper.Begin(static_cast<int>(amount));
+            while (clipper.Step())
+            {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                {
+                    const auto& line = LogFile[i];
+                    if (!line.c_str())
+                        continue;
+                    const auto& color = get_mark_color((Console_mark)line[0]);
+                    ImGui::PushStyleColor(ImGuiCol_Text, reinterpret_cast<const ImVec4&>(color));
+                    ImGui::TextUnformatted(line.c_str(), line.data() + line.size());
+                    ImGui::PopStyleColor();
+                }
+            }
+            ImGui::SetScrollHereY();
+        }
+        ImGui::EndChild();
+
+        // Command input
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextColored(reinterpret_cast<const ImVec4&>(prompt_font_color), "%s", ioc_prompt);
+
+        ImGui::SameLine();
+        pos = ImGui::GetCursorScreenPos();
+
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, {});
+        ImGui::PushStyleColor(ImGuiCol_Text, reinterpret_cast<const ImVec4&>(cmd_font_color));
+        ImGui::SetNextItemWidth(-100);
+
+        constexpr ImGuiInputTextFlags input_text_flags =
+            ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory |
+            ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
+
+        constexpr auto callback = [](ImGuiInputTextCallbackData* data)
+        {
+            return static_cast<CConsole*>(data->UserData)->InputCallback(data);
+        };
+
+        if (Device.editor().GetState() != xray::editor::ide::visible_state::full)
+            ImGui::SetKeyboardFocusHere(0);
+
+        if (ImGui::InputText("##input", m_edit_string, std::size(m_edit_string), input_text_flags, callback, this))
+        {
+            if (m_select_tip < 0 || m_select_tip >= static_cast<int>(m_tips.size()))
+                ExecuteCommand(m_edit_string);
+            else
+            {
+                shared_str const& str = m_tips[m_select_tip].text;
+                if (m_tips_mode == 1)
+                {
+                    pstr buf;
+                    STRCONCAT(buf, str.c_str(), " ");
+                    xr_strcpy(m_edit_string, buf);
+                }
+                else if (m_tips_mode == 2)
+                {
+                    pstr buf;
+                    STRCONCAT(buf, m_cur_cmd.c_str(), " ", str.c_str());
+                    xr_strcpy(m_edit_string, buf);
+                }
+                reset_selected_tip();
+
+                if (ImGuiInputTextState* state = ImGui::GetInputTextState(ImGui::GetItemID()))
+                    state->ReloadUserBufAndMoveToEnd();
+            }
+            m_disable_tips = false;
+            ImGui::SetKeyboardFocusHere(-1);
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::PopStyleColor(2);
+
+        // Amount of log lines
+        ImGui::SameLine();
+        ImGui::TextColored(reinterpret_cast<const ImVec4&>(total_font_color), "[%zu]", amount);
+
+        pos.y = ImGui::GetWindowPos().y + ImGui::GetWindowHeight();
     }
-    else
-    {
-        fMaxY = 1.0f;
-    }
+    ImGui::End();
+    ImGui::PopStyleColor(); // ImGuiCol_WindowBg
+    ImGui::PopStyleVar();   // ImGuiStyleVar_WindowPadding
 
-    float ypos = fMaxY - LDIST * 1.1f;
-    float scr_x = 1.0f / Device.fWidth_2;
-
-    //---------------------------------------------------------------------------------
-    float scr_width = 1.9f * Device.fWidth_2;
-    float ioc_d = pFont->SizeOf_(ioc_prompt);
-    float d1 = pFont->SizeOf_("_");
-
-    pcstr s_cursor = ec().str_before_cursor();
-    pcstr s_b_mark = ec().str_before_mark();
-    pcstr s_mark = ec().str_mark();
-    pcstr s_mark_a = ec().str_after_mark();
-
-    // strncpy_s( buf1, cur_pos, editor, MAX_LEN );
-    float str_length = ioc_d + pFont->SizeOf_(s_cursor);
-    float out_pos = 0.0f;
-    if (str_length > scr_width)
-    {
-        out_pos -= (str_length - scr_width);
-        str_length = scr_width;
-    }
-
-    pFont->SetColor(prompt_font_color);
-    pFont->OutI(-1.0f + out_pos * scr_x, ypos, "%s", ioc_prompt);
-    out_pos += ioc_d;
-
+    // Tips
     if (bGame && !m_disable_tips && m_tips.size())
     {
-        pFont->SetColor(tips_font_color);
+        constexpr ImGuiWindowFlags tips_window_flags =
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
+            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoDocking;
 
-        float shift_x = 0.0f;
-        switch (m_tips_mode)
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, reinterpret_cast<const ImVec4&>(tips_back_color));
+        ImGui::PushStyleColor(ImGuiCol_Text, (ImVec4&)tips_font_color);
+        ImGui::SetNextWindowPos(pos);
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::SetNextWindowSizeConstraints({ 300.f, 50.f }, { 500.f, size.y * 0.9f });
+        if (ImGui::Begin("##tooltip", nullptr, tips_window_flags))
         {
-        case 0: shift_x = scr_x * 1.0f; break;
-        case 1: shift_x = scr_x * out_pos; break;
-        case 2: shift_x = scr_x * (ioc_d + pFont->SizeOf_(m_cur_cmd.c_str()) + d1); break;
-        case 3: shift_x = scr_x * str_length; break;
-        }
+            ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-        vecTipsEx::iterator itb = m_tips.begin() + m_start_tip;
-        vecTipsEx::iterator ite = m_tips.end();
-        for (u32 i = 0; itb != ite; ++itb, ++i) // tips
-        {
-            pFont->OutI(-1.0f + shift_x, fMaxY + i * LDIST, "%s", (*itb).text.c_str());
-            if (i >= VIEW_TIPS_COUNT - 1)
+            ImGuiListClipper clipper;
+            clipper.Begin(static_cast<int>(m_tips.size()));
+
+            // Scroll to focused item once
+            static int itm_scroll_to = -1;
+            if (itm_scroll_to != m_select_tip && m_select_tip >= 0)
+                clipper.IncludeItemByIndex(m_select_tip);
+
+            while (clipper.Step())
             {
-                break; // for
-            }
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                {
+                    const auto& line = m_tips[i].text;
+                    if (line.empty())
+                        continue;
+
+                    cpcstr text = line.c_str();
+                    pos = ImGui::GetCursorScreenPos();
+
+                    const TipString& ts = m_tips[i];
+                    if (ts.HL_start >= 0 && ts.HL_finish >= 0 && ts.HL_start <= ts.HL_finish)
+                    {
+                        const int str_size = static_cast<int>(ts.text.size());
+                        if (ts.HL_start < str_size && ts.HL_finish <= str_size)
+                        {
+                            const ImVec2 text_size_before = ImGui::CalcTextSize(text, text + ts.HL_start);
+                            const ImVec2 text_size_after = ImGui::CalcTextSize(text + ts.HL_start, text + ts.HL_finish);
+
+                            const ImVec2 char_pos = ImVec2(pos.x + text_size_before.x, pos.y);
+                            const float text_height = ImGui::GetTextLineHeight();
+                            const float rect_width = text_size_after.x;
+
+                            draw_list->AddRectFilled(
+                                ImVec2(char_pos.x, char_pos.y),
+                                ImVec2(char_pos.x + rect_width, char_pos.y + text_height),
+                                tips_word_color.get_windows()
+                            );
+                        }
+                    }
+
+                    ImGui::PushStyleColor(ImGuiCol_Header, reinterpret_cast<const ImVec4&>(tips_select_color));
+                    if (ImGui::Selectable(text, i == m_select_tip))
+                    {
+                        if (m_tips_mode == 1)
+                        {
+                            pstr buf;
+                            STRCONCAT(buf, text, " ");
+                            xr_strcpy(m_edit_string, buf);
+                        }
+                        else if (m_tips_mode == 2)
+                        {
+                            pstr buf;
+                            STRCONCAT(buf, m_cur_cmd.c_str(), " ", text);
+                            xr_strcpy(m_edit_string, buf);
+                        }
+                    }
+                    ImGui::PopStyleColor();
+
+                    if (itm_scroll_to != m_select_tip && i == m_select_tip)
+                    {
+                        ImGui::SetScrollHereY();
+                        itm_scroll_to = m_select_tip;
+                    }
+                }
+            } // while (clipper.Step())
         }
+        ImGui::End();
+        ImGui::PopStyleColor(2);
     }
 
-    // ===== ==============================================
-    pFont->SetColor(cmd_font_color);
-    pFont2->SetColor(cmd_font_color);
-
-    pFont->OutI(-1.0f + out_pos * scr_x, ypos, "%s", s_b_mark);
-    out_pos += pFont->SizeOf_(s_b_mark);
-    pFont2->OutI(-1.0f + out_pos * scr_x, ypos, "%s", s_mark);
-    out_pos += pFont2->SizeOf_(s_mark);
-    pFont->OutI(-1.0f + out_pos * scr_x, ypos, "%s", s_mark_a);
-
-    // pFont2->OutI( -1.0f + ioc_d * scr_x, ypos, "%s", editor=all );
-
-    if (ec().cursor_view())
-    {
-        pFont->SetColor(cursor_font_color);
-        pFont->OutI(-1.0f + str_length * scr_x, ypos, "%s", ch_cursor);
-    }
-
-    // ---------------------
-    u32 log_line = LogFile.size() - 1;
-    ypos -= LDIST;
-    for (int i = log_line - scroll_delta; i >= 0; --i)
-    {
-        ypos -= LDIST;
-        if (ypos < -1.0f)
-        {
-            break;
-        }
-        pcstr ls = LogFile[i].c_str();
-
-        if (!ls)
-        {
-            continue;
-        }
-        Console_mark cm = (Console_mark)ls[0];
-        pFont->SetColor(get_mark_color(cm));
-        // u8 b = (is_mark( cm ))? 2 : 0;
-        // OutFont( ls + b, ypos );
-        OutFont(ls, ypos);
-    }
-
-    string16 q;
-    xr_itoa(log_line, q, 10);
-    u32 qn = xr_strlen(q);
-    pFont->SetColor(total_font_color);
-    pFont->OutI(0.95f - 0.03f * qn, fMaxY - 2.0f * LDIST, "[%d]", log_line);
-
-    pFont->OnRender();
-    pFont2->OnRender();
+    ImGui::PopStyleVar(); // ImGuiStyleVar_WindowBorderSize
 }
 
-void CConsole::DrawBackgrounds(bool bGame)
+void CConsole::OnEvent(EVENT E, u64 P1, u64 P2)
 {
-    float ky = (bGame) ? 0.5f : 1.0f;
+    pstr command = (pstr)P1;
+    ExecuteCommand(command, false);
+    xr_free(command);
+}
 
-    Frect r;
-    r.set(0.0f, 0.0f, float(Device.dwWidth), ky* float(Device.dwHeight));
-
-    GEnv.UIRender->SetShader(**m_hShader_back);
-    // 6 = back, 12 = tips, (VIEW_TIPS_COUNT+1)*6 = highlight_words, 12 = scroll
-    const u32 numVertices = 6 + (bGame ? 12 + (VIEW_TIPS_COUNT + 1) * 6 + 12 : 0);
-    GEnv.UIRender->StartPrimitive(numVertices, IUIRender::ptTriList, IUIRender::pttTL);
-
-    DrawRect(r, back_color);
-
-    if (!bGame || m_tips.size() == 0 || m_disable_tips)
+void CConsole::IR_OnKeyboardPress(int key)
+{
+    switch (GetBindedAction(key))
     {
-        GEnv.UIRender->FlushPrimitive();
+    case kQUIT:
+        if (0 <= m_select_tip && m_select_tip < (int)m_tips.size())
+        {
+            m_disable_tips = true;
+            return;
+        }
+        [[fallthrough]];
+
+    case kCONSOLE:
+    {
+        Hide();
         return;
     }
+    } // switch (GetBindedAction(key))
 
-    pcstr max_str = "xxxxx";
-    for (auto& it : m_tips)
-        if (pFont->SizeOf_(it.text.c_str()) > pFont->SizeOf_(max_str))
-            max_str = it.text.c_str();
-
-    float w1 = pFont->SizeOf_("_");
-    float ioc_w = pFont->SizeOf_(ioc_prompt) - w1;
-    float cur_cmd_w = pFont->SizeOf_(m_cur_cmd.c_str());
-    cur_cmd_w += (cur_cmd_w > 0.01f) ? w1 : 0.0f;
-
-    float list_w = pFont->SizeOf_(max_str) + 2.0f * w1;
-
-    float font_h = pFont->CurrentHeight_();
-    float tips_h = std::min(m_tips.size(), (size_t)VIEW_TIPS_COUNT) * font_h;
-    tips_h += (m_tips.size() > 0) ? 5.0f : 0.0f;
-
-    Frect pr, sr;
-    pr.x1 = ioc_w + cur_cmd_w;
-    pr.x2 = pr.x1 + list_w;
-
-    pr.y1 = UI_BASE_HEIGHT * 0.5f;
-    pr.y1 *= float(Device.dwHeight) / UI_BASE_HEIGHT;
-
-    pr.y2 = pr.y1 + tips_h;
-
-    float select_y = 0.0f;
-    float select_h = 0.0f;
-
-    if (m_select_tip >= 0 && m_select_tip < (int)m_tips.size())
-    {
-        int sel_pos = m_select_tip - m_start_tip;
-
-        select_y = sel_pos * font_h;
-        select_h = font_h; // 1 string
-    }
-
-    sr.x1 = pr.x1;
-    sr.y1 = pr.y1 + select_y;
-
-    sr.x2 = pr.x2;
-    sr.y2 = sr.y1 + select_h;
-
-    DrawRect(pr, tips_back_color);
-    DrawRect(sr, tips_select_color);
-
-    // --------------------------- highlight words --------------------
-
-    if (m_select_tip < (int)m_tips.size())
-    {
-        Frect r2;
-        xr_string tmp;
-        vecTipsEx::iterator itb2 = m_tips.begin() + m_start_tip;
-        vecTipsEx::iterator ite2 = m_tips.end();
-        for (u32 i = 0; itb2 != ite2; ++itb2, ++i) // tips
-        {
-            TipString const& ts = (*itb2);
-            if ((ts.HL_start < 0) || (ts.HL_finish < 0) || (ts.HL_start > ts.HL_finish))
-            {
-                continue;
-            }
-            int str_size = (int)ts.text.size();
-            if ((ts.HL_start >= str_size) || (ts.HL_finish > str_size))
-            {
-                continue;
-            }
-
-            r2.set_zero();
-            tmp.assign(ts.text.c_str(), ts.HL_start);
-            r2.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-            r2.y1 = pr.y1 + i * font_h;
-
-            tmp.assign(ts.text.c_str(), ts.HL_finish);
-            r2.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-            r2.y2 = r2.y1 + font_h;
-
-            DrawRect(r2, tips_word_color);
-
-            if (i >= VIEW_TIPS_COUNT - 1)
-            {
-                break; // for itb2
-            }
-        } // for itb
-    } // if
-
-    // --------------------------- scroll bar --------------------
-
-    u32 tips_sz = m_tips.size();
-    if (tips_sz > VIEW_TIPS_COUNT)
-    {
-        Frect rb, rs;
-
-        rb.x1 = pr.x2;
-        rb.y1 = pr.y1;
-        rb.x2 = rb.x1 + 2 * w1;
-        rb.y2 = pr.y2;
-        DrawRect(rb, tips_scroll_back_color);
-
-        VERIFY(rb.y2 - rb.y1 >= 1.0f);
-        float back_height = rb.y2 - rb.y1;
-        float u_height = (back_height * VIEW_TIPS_COUNT) / float(tips_sz);
-        if (u_height < 0.5f * font_h)
-        {
-            u_height = 0.5f * font_h;
-        }
-
-        // float u_pos = (back_height - u_height) * float(m_start_tip) / float(tips_sz);
-        float u_pos = back_height * float(m_start_tip) / float(tips_sz);
-
-        // clamp( u_pos, 0.0f, back_height - u_height );
-
-        rs = rb;
-        rs.y1 = pr.y1 + u_pos;
-        rs.y2 = rs.y1 + u_height;
-        DrawRect(rs, tips_scroll_pos_color);
-    }
-
-    GEnv.UIRender->FlushPrimitive();
+    Device.editor().IR_OnKeyboardPress(key);
 }
 
-void CConsole::DrawRect(Frect const& r, u32 color)
+void CConsole::IR_OnKeyboardRelease(int key)
 {
-    GEnv.UIRender->PushPoint(r.x1, r.y1, 0.0f, color, 0.0f, 0.0f);
-    GEnv.UIRender->PushPoint(r.x2, r.y1, 0.0f, color, 1.0f, 0.0f);
-    GEnv.UIRender->PushPoint(r.x2, r.y2, 0.0f, color, 1.0f, 1.0f);
+    Device.editor().IR_OnKeyboardRelease(key);
+}
 
-    GEnv.UIRender->PushPoint(r.x1, r.y1, 0.0f, color, 0.0f, 0.0f);
-    GEnv.UIRender->PushPoint(r.x2, r.y2, 0.0f, color, 1.0f, 1.0f);
-    GEnv.UIRender->PushPoint(r.x1, r.y2, 0.0f, color, 0.0f, 1.0f);
+void CConsole::IR_OnKeyboardHold(int key)
+{
+    Device.editor().IR_OnKeyboardHold(key);
+}
+
+void CConsole::IR_OnTextInput(pcstr text)
+{
+    Device.editor().IR_OnTextInput(text);
 }
 
 void CConsole::ExecuteCommand(pcstr cmd_str, bool record_cmd)
@@ -530,7 +422,6 @@ void CConsole::ExecuteCommand(pcstr cmd_str, bool record_cmd)
     xr_strcpy(edt, str_size + 1, cmd_str);
     edt[str_size] = 0;
 
-    scroll_delta = 0;
     reset_cmd_history_idx();
     reset_selected_tip();
 
@@ -599,7 +490,7 @@ void CConsole::ExecuteCommand(pcstr cmd_str, bool record_cmd)
 
     if (record_cmd)
     {
-        ec().clear_states();
+        m_edit_string[0] = '\0';
     }
 }
 
@@ -611,23 +502,13 @@ void CConsole::Show()
     }
     bVisible = true;
 
-    ec().clear_states();
-    scroll_delta = 0;
+    m_edit_string[0] = '\0';
     reset_cmd_history_idx();
     reset_selected_tip();
     update_tips();
 
-    ForAllActionKeys(kCONSOLE, [&](size_t keyboard_index, int key)
-    {
-        if (key < CInput::COUNT_KB_BUTTONS)
-        {
-            ec().assign_callback(key, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
-            lastBindedKeys[keyboard_index] = key;
-        }
-    });
-
-    m_editor->IR_Capture();
-    Device.seqRender.Add(this, 1);
+    if (!Device.editor().IsActiveState())
+        IR_Capture();
     Device.seqFrame.Add(this);
 }
 
@@ -645,16 +526,8 @@ void CConsole::Hide()
     reset_selected_tip();
     update_tips();
 
-    for (int key : lastBindedKeys)
-    {
-        if (key)
-            ec().remove_callback(key);
-    }
-    ZeroMemory(lastBindedKeys, sizeof(lastBindedKeys));
-
     Device.seqFrame.Remove(this);
-    Device.seqRender.Remove(this);
-    m_editor->IR_Release();
+    IR_Release();
 }
 
 void CConsole::SelectCommand()
@@ -666,7 +539,7 @@ void CConsole::SelectCommand()
     VERIFY(0 <= m_cmd_history_idx && m_cmd_history_idx < (int)m_cmd_history.size());
 
     vecHistory::reverse_iterator it_rb = m_cmd_history.rbegin() + m_cmd_history_idx;
-    ec().set_edit((*it_rb).c_str());
+    xr_strcpy(m_edit_string, it_rb->c_str());
     reset_selected_tip();
 }
 
@@ -832,7 +705,7 @@ void CConsole::update_tips()
         return;
     }
 
-    pcstr cur = ec().str_edit();
+    pcstr cur = m_edit_string;
     u32 cur_length = xr_strlen(cur);
 
     if (cur_length == 0)

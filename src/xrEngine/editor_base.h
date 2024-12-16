@@ -64,6 +64,8 @@ public:
     void SwitchToNextState();
     bool IsActiveState() const { return m_state == visible_state::full; }
 
+    void UpdateTextInput(bool force_disable = false);
+
 public:
     // Interface implementations
     void OnFrame() override;
@@ -105,7 +107,6 @@ private:
 
     void UpdateMouseCursor();
     void UpdateMouseData();
-    void UpdateTextInput(bool force_disable = false);
 
 private:
     visible_state m_state{};

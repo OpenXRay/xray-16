@@ -2,6 +2,7 @@
 
 #include "editor_base.h"
 #include "editor_helper.h"
+#include "XR_IOConsole.h"
 
 namespace
 {
@@ -301,6 +302,17 @@ void ide::IR_OnKeyboardPress(int key)
     case kEDITOR:
         SwitchToNextState();
         return;
+
+    case kCONSOLE:
+        if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        {
+            if (Console->bVisible)
+                Console->Hide();
+            else
+                Console->Show();
+            return;
+        }
+        break;
 
     case kSCORES:
         if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))

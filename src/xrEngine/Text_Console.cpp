@@ -5,7 +5,7 @@
 #include <windowsx.h>
 
 extern char const* const ioc_prompt;
-extern char const* const ch_cursor;
+constexpr pcstr ch_cursor = "_";
 int g_svTextConsoleUpdateRate = 1;
 
 CTextConsole::CTextConsole()
@@ -213,6 +213,8 @@ void CTextConsole::OnPaint()
 
 void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
 {
+    // XXX: fix dedicated server
+    /*
     TEXTMETRIC tm;
     GetTextMetrics(hDC, &tm);
 
@@ -309,7 +311,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         {
             break;
         }
-    }
+    }*/
 }
 /*
 void CTextConsole::IR_OnKeyboardPress( int dik ) !!!!!!!!!!!!!!!!!!!!!
