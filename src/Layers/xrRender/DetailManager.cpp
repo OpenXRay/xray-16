@@ -348,7 +348,7 @@ void CDetailManager::UpdateVisibleM()
                         float R = objects[sp.id]->bv_sphere.R;
                         float Rq_drcp = R * R * dist_sq_rcp; // reordered expression for 'ssa' calc
 
-                        for(auto &siIT : sp.items)
+                        for(auto& siIT : sp.items)
                         {
                             SlotItem& Item = *siIT;
                             float scale = Item.scale_calculated = Item.scale * alpha_i;

@@ -290,7 +290,7 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
             Item.vis_ID = 0;
 #endif
             // Save it
-            D.G[index].items.push_back(ItemP);
+            D.G[index].items.emplace_back(ItemP);
         }
     }
 
