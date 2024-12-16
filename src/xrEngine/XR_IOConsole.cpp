@@ -193,6 +193,8 @@ void CConsole::OnFrame()
         const size_t amount = LogFile.size();
         const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
 
+        static float prev_scroll_max = ImGui::GetScrollMaxY();
+
         // Log subwindow
         if (ImGui::BeginChild("Log", { 0, -footer_height_to_reserve }))
         {
@@ -211,8 +213,10 @@ void CConsole::OnFrame()
                     ImGui::PopStyleColor();
                 }
             }
-            ImGui::SetScrollHereY();
+            if (ImGui::GetScrollY() >= prev_scroll_max)
+                ImGui::SetScrollHereY();
         }
+        prev_scroll_max = ImGui::GetScrollMaxY();
         ImGui::EndChild();
 
         // Command input
