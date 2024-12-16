@@ -80,6 +80,9 @@ int CConsole::InputCallback(ImGuiInputTextCallbackData* data)
                 Prev_cmd();
             else if (data->EventKey == ImGuiKey_DownArrow)
                 Next_cmd();
+
+            data->BufTextLen = 0;
+            data->InsertChars(0, m_edit_string);
         }
         else
         {
@@ -87,6 +90,9 @@ int CConsole::InputCallback(ImGuiInputTextCallbackData* data)
                 Prev_tip();
             else if (data->EventKey == ImGuiKey_DownArrow)
                 Next_tip();
+
+            data->BufTextLen = 0;
+            data->InsertChars(0, m_edit_string);
         }
         data->ClearSelection();
         break;
@@ -109,7 +115,7 @@ void CConsole::Next_cmd() // SDL_SCANCODE_DOWN + Ctrl
 
 void CConsole::Prev_tip() // SDL_SCANCODE_UP
 {
-    if (xr_strlen(m_edit_string) == 0)
+    if (xr_strlen(m_edit_string) == 0 || m_disable_tips)
     {
         prev_cmd_history_idx();
         SelectCommand();
@@ -120,7 +126,7 @@ void CConsole::Prev_tip() // SDL_SCANCODE_UP
 
 void CConsole::Next_tip() // SDL_SCANCODE_DOWN + Ctrl
 {
-    if (xr_strlen(m_edit_string) == 0)
+    if (xr_strlen(m_edit_string) == 0 || m_disable_tips)
     {
         next_cmd_history_idx();
         SelectCommand();
