@@ -125,7 +125,7 @@ void CConsole::Destroy()
 void CConsole::AddCommand(IConsole_Command* cc) { Commands[cc->Name()] = cc; }
 void CConsole::RemoveCommand(IConsole_Command* cc)
 {
-    vecCMD_IT it = Commands.find(cc->Name());
+    const auto it = Commands.find(cc->Name());
     if (Commands.end() != it)
     {
         Commands.erase(it);
@@ -207,7 +207,7 @@ void CConsole::OnFrame()
                     const auto& line = LogFile[i];
                     if (!line.c_str())
                         continue;
-                    const auto& color = get_mark_color((Console_mark)line[0]);
+                    const auto& color = get_mark_color(static_cast<Console_mark>(line[0]));
                     ImGui::PushStyleColor(ImGuiCol_Text, reinterpret_cast<const ImVec4&>(color));
                     ImGui::TextUnformatted(line.c_str(), line.data() + line.size());
                     ImGui::PopStyleColor();
@@ -419,9 +419,9 @@ void CConsole::IR_OnTextInput(pcstr text)
 void CConsole::ExecuteCommand(pcstr cmd_str, bool record_cmd)
 {
     u32 str_size = xr_strlen(cmd_str);
-    PSTR edt = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
-    PSTR first = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
-    PSTR last = (PSTR)xr_alloca((str_size + 1) * sizeof(char));
+    pstr edt = (pstr)xr_alloca((str_size + 1) * sizeof(char));
+    pstr first = (pstr)xr_alloca((str_size + 1) * sizeof(char));
+    pstr last = (pstr)xr_alloca((str_size + 1) * sizeof(char));
 
     xr_strcpy(edt, str_size + 1, cmd_str);
     edt[str_size] = 0;
@@ -450,7 +450,7 @@ void CConsole::ExecuteCommand(pcstr cmd_str, bool record_cmd)
     text_editor::split_cmd(first, last, edt);
 
     // search
-    vecCMD_IT it = Commands.find(first);
+    const auto it = Commands.find(first);
     if (it != Commands.end())
     {
         IConsole_Command* cc = it->second;
@@ -542,7 +542,7 @@ void CConsole::SelectCommand()
     }
     VERIFY(0 <= m_cmd_history_idx && m_cmd_history_idx < (int)m_cmd_history.size());
 
-    vecHistory::reverse_iterator it_rb = m_cmd_history.rbegin() + m_cmd_history_idx;
+    const auto it_rb = m_cmd_history.rbegin() + m_cmd_history_idx;
     xr_strcpy(m_edit_string, it_rb->c_str());
     reset_selected_tip();
 }
@@ -551,7 +551,7 @@ void CConsole::Execute(pcstr cmd) { ExecuteCommand(cmd, false); }
 void CConsole::ExecuteScript(pcstr str)
 {
     u32 str_size = xr_strlen(str);
-    PSTR buf = (PSTR)xr_alloca((str_size + 10) * sizeof(char));
+    pstr buf = (pstr)xr_alloca((str_size + 10) * sizeof(char));
     xr_strcpy(buf, str_size + 10, "cfg_load ");
     xr_strcat(buf, str_size + 10, str);
     Execute(buf);
@@ -568,13 +568,13 @@ IConsole_Command* CConsole::find_next_cmd(pcstr in_str, shared_str& out_str)
     pstr t2;
     STRCONCAT(t2, in_str + offset, " ");
 
-    vecCMD_IT it = Commands.lower_bound(t2);
+    const auto it = Commands.lower_bound(t2);
     if (it != Commands.end())
     {
         IConsole_Command* cc = it->second;
         pcstr name_cmd = cc->Name();
         u32 name_cmd_size = xr_strlen(name_cmd);
-        PSTR new_str = (PSTR)xr_alloca((offset + name_cmd_size + 2) * sizeof(char));
+        pstr new_str = (pstr)xr_alloca((offset + name_cmd_size + 2) * sizeof(char));
 
         xr_strcpy(new_str, offset + name_cmd_size + 2, (b_ra) ? radmin_cmd_name : "");
         xr_strcat(new_str, offset + name_cmd_size + 2, name_cmd);
@@ -610,8 +610,7 @@ bool CConsole::add_next_cmds(pcstr in_str, vecTipsEx& out_v)
         bool dup = (std::find(out_v.begin(), out_v.end(), temp) != out_v.end());
         if (!dup)
         {
-            TipString ts(temp);
-            out_v.push_back(ts);
+            out_v.emplace_back(temp);
             res = true;
         }
         if (out_v.size() >= MAX_TIPS_COUNT)
@@ -641,11 +640,9 @@ bool CConsole::add_internal_cmds(pcstr in_str, vecTipsEx& out_v)
     bool res = false;
     // word in begin
     xr_string name2;
-    vecCMD_IT itb = Commands.begin();
-    vecCMD_IT ite = Commands.end();
-    for (; itb != ite; ++itb)
+
+    for (const auto [name, command] : Console->Commands)
     {
-        pcstr name = itb->first;
         u32 name_sz = xr_strlen(name);
         if (name_sz >= in_sz)
         {
@@ -657,7 +654,7 @@ bool CConsole::add_internal_cmds(pcstr in_str, vecTipsEx& out_v)
                 bool dup = (std::find(out_v.begin(), out_v.end(), temp) != out_v.end());
                 if (!dup)
                 {
-                    out_v.push_back(TipString(temp, 0, in_sz));
+                    out_v.emplace_back(temp, 0, in_sz);
                     res = true;
                 }
             }
@@ -670,22 +667,18 @@ bool CConsole::add_internal_cmds(pcstr in_str, vecTipsEx& out_v)
     } // for
 
     // word in internal
-    itb = Commands.begin();
-    ite = Commands.end();
-    for (; itb != ite; ++itb)
+    for (const auto [name, command] : Console->Commands)
     {
-        pcstr name = itb->first;
-        pcstr fd_str = strstr(name, in_str);
-        if (fd_str)
+        if (cpcstr fd_str = strstr(name, in_str))
         {
             shared_str temp;
             temp._set(name);
-            bool dup = (std::find(out_v.begin(), out_v.end(), temp) != out_v.end());
+            const bool dup = (std::find(out_v.begin(), out_v.end(), temp) != out_v.end());
             if (!dup)
             {
                 u32 name_sz = xr_strlen(name);
                 int fd_sz = name_sz - xr_strlen(fd_str);
-                out_v.push_back(TipString(temp, fd_sz, fd_sz + in_sz));
+                out_v.emplace_back(temp, fd_sz, fd_sz + in_sz);
                 res = true;
             }
         }
@@ -724,8 +717,8 @@ void CConsole::update_tips()
     }
     m_prev_length_str = cur_length;
 
-    PSTR first = (PSTR)xr_alloca((cur_length + 1) * sizeof(char));
-    PSTR last = (PSTR)xr_alloca((cur_length + 1) * sizeof(char));
+    pstr first = (pstr)xr_alloca((cur_length + 1) * sizeof(char));
+    pstr last = (pstr)xr_alloca((cur_length + 1) * sizeof(char));
     text_editor::split_cmd(first, last, cur);
 
     u32 first_lenght = xr_strlen(first);
@@ -739,7 +732,7 @@ void CConsole::update_tips()
                 reset_selected_tip();
             }
 
-            vecCMD_IT it = Commands.find(first);
+            const auto it = Commands.find(first);
             if (it != Commands.end())
             {
                 IConsole_Command* cc = it->second;
@@ -758,7 +751,7 @@ void CConsole::update_tips()
 
                 if (m_tips.size() == 0)
                 {
-                    m_tips.push_back(TipString("(empty)"));
+                    m_tips.emplace_back("(empty)");
                 }
                 if ((int)m_tips.size() <= m_select_tip)
                 {
@@ -787,33 +780,26 @@ void CConsole::update_tips()
     }
 }
 
-void CConsole::select_for_filter(pcstr filter_str, vecTips& in_v, vecTipsEx& out_v)
+void CConsole::select_for_filter(pcstr filter_str, const vecTips& in_v, vecTipsEx& out_v)
 {
     out_v.clear();
-    u32 in_count = in_v.size();
+    const u32 in_count = in_v.size();
     if (in_count == 0 || !filter_str)
-    {
         return;
-    }
 
-    bool all = (xr_strlen(filter_str) == 0);
+    const bool all = xr_strlen(filter_str) == 0;
     const size_t filter_str_len = xr_strlen(filter_str);
-    //vecTips::iterator itb = in_v.begin();
-    //vecTips::iterator ite = in_v.end();
-    //for (; itb != ite; ++itb)
-    for (auto& it : in_v)
+
+    for (const auto& str : in_v)
     {
-        shared_str const& str = it;
         if (all)
-            out_v.push_back(TipString(str));
+            out_v.emplace_back(str);
         else
         {
-            pcstr fd_str = strstr(str.c_str(), filter_str);
-            if (fd_str)
+            if (cpcstr fd_str = strstr(str.c_str(), filter_str))
             {
                 size_t fd_sz = str.size() - xr_strlen(fd_str);
-                TipString ts(str, fd_sz, fd_sz + filter_str_len);
-                out_v.push_back(ts);
+                out_v.emplace_back(str, fd_sz, fd_sz + filter_str_len);
             }
         }
     } // for
