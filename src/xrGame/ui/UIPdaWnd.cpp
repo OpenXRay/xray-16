@@ -124,8 +124,35 @@ void CUIPdaWnd::Init()
     UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
     AttachChild(UITabControl);
-    CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
+    CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
     UITabControl->SetMessageTarget(this);
+
+    constexpr std::tuple<pcstr, pcstr> known_soc_tab_ids[] =
+    {
+        {"0", "eptTasks"},
+        {"1", "eptMap"},
+        {"2", "eptDiary"},
+        {"3", "eptContacts"},
+        {"4", "eptStalkersRanking"},
+        {"5", "eptStatistics"},
+        {"6", "eptEncyclopedia"},
+    };
+
+    for (u32 i = 0; i < UITabControl->GetTabsCount(); i++)
+    {
+        CUITabButton* btn = UITabControl->GetButtonByIndex(i);
+        if (!btn || !btn->IsIdDefaultAssigned())
+            continue;
+
+        for (const auto& [id, replace] : known_soc_tab_ids)
+        {
+            if (btn->m_btn_id == id)
+            {
+                btn->m_btn_id = replace;
+                break;
+            }
+        }
+    }
 
     UINoice = xr_new<CUIStatic>("Noise");
     UINoice->SetAutoDelete(true);
