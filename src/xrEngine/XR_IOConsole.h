@@ -14,7 +14,6 @@ class ENGINE_API IConsole_Command;
 
 namespace text_editor
 {
-class line_editor;
 class line_edit_control;
 };
 
