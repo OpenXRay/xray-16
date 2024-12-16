@@ -103,9 +103,9 @@ Thank you for your support!
   * The first OpenXRay team (2014-2017) – for being at the origins of the project.
     * [nitrocaster](https://github.com/nitrocaster) – original project founder.
     * [Kaffeine](https://github.com/Kaffeine) – initial work on the Linux port, refactoring, polishing.
-    * [Armada651](https://github.com/CrossVR) – creation of the OpenGL renderer, work on the build system, other project maintenance work.
+    * [CrossVR](https://github.com/CrossVR) (Armada651) – creation of the OpenGL renderer, work on the build system, other project maintenance work.
     * [andrew-boyarshin](https://github.com/andrew-boyarshin) – work on the build system.
-    * Swartz27 – work on renderer features.
+    * [CasualDev242](https://github.com/CasualDev242) (Swartz27) – work on renderer features.
     * [awdavies](https://github.com/awdavies) – project maintenance work.
   * The second OpenXRay team (2017-now) – for continuing work on the project.
     * [Xottab_DUTY](https://github.com/Xottab-DUTY) – current project leader.
@@ -130,18 +130,32 @@ Thank you for your support!
     * [NeoAnomaly](https://github.com/NeoAnomaly) – help with debug functionality on Windows.
     * [RainbowZerg](https://github.com/RainbowZerg) – work on the renderer features, bug fixing.
     * [FozeSt](https://github.com/FozeSt) – help with some fixes and features.
-    * [mrnotbadguy](https://github.com/mrnotbadguy) – work on gamepads support and bug fixing.
+    * [justtails](https://github.com/justtails) (mrnotbadguy) – work on gamepads support and bug fixing.
     * [devnexen](https://github.com/devnexen) – work on FreeBSD support and portability.
+    * [vamit611](https://github.com/vamit611) – work on code quality and bug fixes.
     * [ZeeWanderer](https://github.com/ZeeWanderer) – work on the build system.
     * [GeorgeIvlev](https://github.com/GeorgeIvlev) – work on the build system, bug fixing.
+    * [r-a-sattarov](https://github.com/r-a-sattarov) – work on portability and E2K support.
     * [TmLev](https://github.com/TmLev) – work on code quality and Docker support.
     * [Plotja](https://github.com/Plotja) – work on new gameplay features, bug fixes, portability, polishing.
+    * [jjdredd](https://github.com/jjdredd) – work on various useful features.
     * [dimhotepus](https://github.com/dimhotepus) – work on code quality.
     * [HeapRaid](https://github.com/HeapRaid) – work on renderer cleanup, code quality, portability.
-    * [Vertver](https://github.com/Vertver) – work on macOS support.
+    * [OPNA2608](https://github.com/OPNA2608) – maintaining NixOS package, work on portability.
+    * [kosumosu](https://github.com/kosumosu) – work on portability, including E2K support, and renderer features.
+    * [Graff46](https://github.com/Graff46) – work on various scripting features.
+    * [vertver](https://github.com/vertver) – work on macOS support.
     * [Lnd-stoL](https://github.com/Lnd-stoL) – work on macOS support.
     * [GermanAizek](https://github.com/GermanAizek) – work on code quality, finding and fixing vanilla bugs.
     * [dasehak](https://github.com/dasehak) – work on FreeBSD support, finding and fixing vanilla bugs.
+    * [Hrust](https://github.com/Hrusteckiy) – work various features, including UI, CS/SOC support and bug fixes.
+    * [johncurley](https://github.com/johncurley) – work on EFX, bugs and portability.
+    * [v2v3v4](https://github.com/v2v3v4) – work on physics and useful help with the engine.
+    * [Neloreck](https://github.com/Neloreck) – work on extending Lua scripting features.
+    * [sobkas](https://github.com/sobkas) – work on code quality and bug fixing.
+    * [AMS21](https://github.com/AMS21) – work on CMake, code quality, and project standards and infrastructure.
+    * [olefirenque](https://github.com/olefirenque) – work on multithreading and code optimization.
+    * [tsmp](https://github.com/tsmp) – work on performance and code optimization.
 * Particular projects:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) and [Shoker](https://github.com/ShokerStlk) – for contributing new features, bug fixing.
