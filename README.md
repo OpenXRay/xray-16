@@ -150,7 +150,7 @@ Thank you for your support!
     * [dasehak](https://github.com/dasehak) – work on FreeBSD support, finding and fixing vanilla bugs.
     * [Hrust](https://github.com/Hrusteckiy) – work various features, including UI, CS/SOC support and bug fixes.
     * [johncurley](https://github.com/johncurley) – work on EFX, bugs and portability.
-    * [v2v3v4](https://github.com/v2v3v4) – work on physics and useful help with the engine.
+    * [v2v3v4](https://github.com/v2v3v4) – work on physics, useful help with the engine and showing sexy screenshots and videos about his X-Ray fork, but refusing to send pull requests :D
     * [Neloreck](https://github.com/Neloreck) – work on extending Lua scripting features.
     * [sobkas](https://github.com/sobkas) – work on code quality and bug fixing.
     * [AMS21](https://github.com/AMS21) – work on CMake, code quality, and project standards and infrastructure.
