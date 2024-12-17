@@ -866,7 +866,7 @@ void xrServer::Server_Client_Check(IClient* CL)
         return;
     };
 
-    if (CL->process_id == GetCurrentProcessId())
+    if (CL->process_id == static_cast<u32>(GetCurrentProcessId()))
     {
         CL->flags.bLocal = 1;
         SV_Client = (xrClientData*)CL;
