@@ -71,7 +71,7 @@ const xr_token qsmapsize_token[] =
     { nullptr, 0 }
 };
 
-u32 ps_r_ssao_mode = ssao_mode_hdao;
+u32 ps_r_ssao_mode = ssao_mode_default;
 const xr_token qssao_mode_token[] =
 {
     { "disabled", ssao_mode_off },
