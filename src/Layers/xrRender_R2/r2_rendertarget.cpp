@@ -588,7 +588,7 @@ CRenderTarget::CRenderTarget()
     }
 
     // Check if SSAO Ultra is allowed
-    if (ps_r_ssao_mode != 2 /*hdao*/ || !options.ssao_ultra)
+    if (ps_r_ssao_mode != ssao_mode_hdao || !options.ssao_ultra)
         ps_r_ssao = _min(ps_r_ssao, 3);
 
     // HBAO
