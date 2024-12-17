@@ -207,7 +207,7 @@ protected:
     friend struct CSound;
     friend struct resptrcode_sound;
 
-    virtual CSound* create(pcstr fName, esound_type sound_type, int game_type) = 0;
+    virtual CSound* create(pcstr fName, esound_type sound_type, u32 game_type) = 0;
     virtual void destroy(CSound& S) = 0;
 
     virtual void attach_tail(CSound& S, pcstr fName) = 0;
@@ -318,7 +318,7 @@ struct resptrcode_sound : public resptr_base<CSound>
     [[nodiscard]]
     ICF CSound_UserDataPtr _g_userdata() const { VERIFY(p_); return p_ ? p_->g_userdata : nullptr; }
 
-    ICF bool create(pcstr name, esound_type sound_type, int game_type)
+    ICF bool create(pcstr name, esound_type sound_type, u32 game_type)
     {
         VerSndUnlocked();
         _set(GEnv.Sound->create(name, sound_type, game_type));
@@ -338,7 +338,7 @@ struct resptrcode_sound : public resptr_base<CSound>
         GEnv.Sound->attach_tail(*p_, name);
     }
 
-    void clone(const ref_sound& from, esound_type sound_type, int game_type)
+    void clone(const ref_sound& from, esound_type sound_type, u32 game_type)
     {
         if (!from._get())
             return;
@@ -422,7 +422,7 @@ public:
         CSound_params params;
         float volume;
         esound_type type;
-        int game_type;
+        u32 game_type;
         IGameObject* game_object;
 
         struct
