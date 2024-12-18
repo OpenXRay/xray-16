@@ -6308,6 +6308,9 @@
     <ClInclude Include="player_hud_tune.h">
       <Filter>Core\Client\Objects\items &amp; weapons\HudItem</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIBoostStatesWnd.h">
+      <Filter>UI\Common\MainIngame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9521,6 +9524,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIMapFilters.cpp">
       <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIBoostStatesWnd.cpp">
+      <Filter>UI\Common\MainIngame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
