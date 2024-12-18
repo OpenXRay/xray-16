@@ -24,6 +24,7 @@ public:
         flValidTextureRect = (1 << 1),
         flValidHeadingPivot = (1 << 2),
         flFixedLTWhileHeading = (1 << 3),
+        flNoShaderCache = (1 << 4),
     };
 
     Frect TextureRect;
@@ -76,7 +77,9 @@ public:
     Fvector2 GetHeadingPivot() { return vHeadingPivot; }
     IC void SetMirrorMode(EUIMirroring m) { eMirrorMode = m; }
     IC EUIMirroring GetMirrorMode() { return eMirrorMode; }
-
+    void SetNoShaderCache(const bool v) {
+        uFlags.set(flNoShaderCache, v);
+    }
 private:
     void RenderInternal(const Fvector2& pos);
     void RenderInternal(float angle);

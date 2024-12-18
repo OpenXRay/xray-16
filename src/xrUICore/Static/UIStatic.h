@@ -109,6 +109,8 @@ public:
     pcstr GetDebugType() override { return "CUIStatic"; }
     void FillDebugInfo() override;
 
+    void SetNoShaderCache(bool v) { m_UIStaticItem.SetNoShaderCache(v); }
+
 protected:
     CUILines* m_pTextControl{};
 
