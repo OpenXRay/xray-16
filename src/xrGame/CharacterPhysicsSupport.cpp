@@ -723,7 +723,9 @@ bool CCharacterPhysicsSupport::CollisionCorrectObjPos(const Fvector& start_from,
         activation_res, vbox, activation_pos, mXFORM, not_collide_characters, set_rotation, &m_EntityAlife);
     //////////////////
 
-    m_EntityAlife.Position().sub(activation_res, shift);
+    auto actor = smart_cast<CActor*>(&m_EntityAlife);
+    if (!(actor && actor->FirstPersonBodyEnabled() && !actor->g_Alive()))
+        m_EntityAlife.Position().sub(activation_res, shift);
 
     if (m_pPhysicsShell)
         m_pPhysicsShell->EnableCollision();

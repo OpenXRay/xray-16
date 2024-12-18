@@ -75,6 +75,10 @@ void CCameraFirstEye::Update(Fvector& point, Fvector& noise_dangle)
 
 void CCameraFirstEye::Move(int cmd, float val, float factor)
 {
+    CActor* pActor = smart_cast<CActor*>(parent);
+    if (pActor && !pActor->g_Alive() && pActor->FirstPersonBodyEnabled())
+        return;
+
     if (bClampPitch)
     {
         while (pitch < lim_pitch[0])

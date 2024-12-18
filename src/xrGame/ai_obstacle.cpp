@@ -98,7 +98,7 @@ void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
     u16 visible_bone_count = kinematics->LL_VisibleBoneCount();
     if (!visible_bone_count)
     {
-        result.scale(0.f, 0.f, 0.f);
+        result.scale(M_MIN_SCALE, M_MIN_SCALE, M_MIN_SCALE);
         return;
     }
 

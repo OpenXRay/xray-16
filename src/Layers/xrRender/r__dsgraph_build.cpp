@@ -815,6 +815,7 @@ void R_dsgraph_structure::build_subspace()
                 IGameObject* O = g_pGameLevel->CurrentViewEntity();
                 if (O)
                 {
+                    O->RenderFirstPersonBody(context_id, O);
                     CROS_impl* R = (CROS_impl*)O->ROS();
                     if (R)
                         R->update(O);

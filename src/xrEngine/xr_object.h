@@ -308,6 +308,7 @@ public:
     virtual void ShouldProcessOnRender(bool should_process) = 0;
     virtual void OnRender() = 0;
 #endif
+    virtual void RenderFirstPersonBody(u32 context_id, IRenderable* root) {};
     virtual void reinit() = 0;
     virtual void reload(pcstr section) = 0;
     // network

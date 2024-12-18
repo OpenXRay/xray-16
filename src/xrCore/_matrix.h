@@ -532,4 +532,6 @@ inline bool _valid(const Fmatrix& m)
 
 extern XRCORE_API Fmatrix Fidentity;
 
+constexpr float M_MIN_SCALE = 0.01f;
+
 #endif

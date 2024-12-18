@@ -30,6 +30,7 @@ static const float p_spin0_factor = 0.0f;
 static const float p_spin1_factor = 0.2f;
 static const float p_shoulder_factor = 0.7f;
 static const float p_head_factor = 0.1f;
+static const float p_head_unarmed_factor = 0.9f;
 static const float r_spin0_factor = 0.3f;
 static const float r_spin1_factor = 0.3f;
 static const float r_shoulder_factor = 0.2f;
@@ -38,7 +39,7 @@ static const float r_head_factor = 0.2f;
 CBlend* PlayMotionByParts(
     IKinematicsAnimated* sa, MotionID motion_ID, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam);
 
-void CActor::Spin0Callback(CBoneInstance* B)
+void CActor::Spine0Callback(CBoneInstance* B)
 {
     CActor* A = static_cast<CActor*>(B->callback_param());
     VERIFY(A);
@@ -52,7 +53,7 @@ void CActor::Spin0Callback(CBoneInstance* B)
     B->mTransform.mulA_43(spin);
     B->mTransform.c = c;
 }
-void CActor::Spin1Callback(CBoneInstance* B)
+void CActor::Spine1Callback(CBoneInstance* B)
 {
     CActor* A = static_cast<CActor*>(B->callback_param());
     VERIFY(A);
@@ -66,7 +67,7 @@ void CActor::Spin1Callback(CBoneInstance* B)
     B->mTransform.mulA_43(spin);
     B->mTransform.c = c;
 }
-void CActor::ShoulderCallback(CBoneInstance* B)
+void CActor::Spine2Callback(CBoneInstance* B)
 {
     CActor* A = static_cast<CActor*>(B->callback_param());
     VERIFY(A);
@@ -74,8 +75,9 @@ void CActor::ShoulderCallback(CBoneInstance* B)
     float bone_yaw = angle_normalize_signed(A->r_torso.yaw - A->r_model_yaw - A->r_model_yaw_delta) * y_shoulder_factor;
     float bone_pitch = angle_normalize_signed(A->r_torso.pitch) * p_shoulder_factor;
     float bone_roll = angle_normalize_signed(A->r_torso.roll) * r_shoulder_factor;
+    float correctedPitch = A->inventory().GetActiveSlot() == NO_ACTIVE_SLOT ? 0.f : bone_pitch; // yohji: force arms pitch to be neutral when we are unarmed
     Fvector c = B->mTransform.c;
-    spin.setXYZ(-bone_pitch, bone_yaw, bone_roll);
+    spin.setXYZ(-correctedPitch, bone_yaw, bone_roll);
     B->mTransform.mulA_43(spin);
     B->mTransform.c = c;
 }
@@ -85,7 +87,8 @@ void CActor::HeadCallback(CBoneInstance* B)
     VERIFY(A);
     Fmatrix spin;
     float bone_yaw = angle_normalize_signed(A->r_torso.yaw - A->r_model_yaw - A->r_model_yaw_delta) * y_head_factor;
-    float bone_pitch = angle_normalize_signed(A->r_torso.pitch) * p_head_factor;
+    float correctedHeadFactor = A->inventory().GetActiveSlot() == NO_ACTIVE_SLOT ? p_head_unarmed_factor : p_head_factor;
+    float bone_pitch = angle_normalize_signed(A->cam_Active()->GetWorldPitch()) * correctedHeadFactor;
     float bone_roll = angle_normalize_signed(A->r_torso.roll) * r_head_factor;
     Fvector c = B->mTransform.c;
     spin.setXYZ(-bone_pitch, bone_yaw, bone_roll);
@@ -321,17 +324,17 @@ constexpr pcstr mov_state[] = {
 };
 #endif // DEBUG
 
-void CActor::g_SetAnimation(u32 mstate_rl)
+void CActor::g_SetAnimation(u32 mstate_rl, bool force)
 {
     if (!g_Alive())
     {
         if (m_current_legs || m_current_torso)
         {
-//            SActorState* ST = 0;
-//            if (mstate_rl & mcCrouch)
-//                ST = &m_anims->m_crouch;
-//            else
-//                ST = &m_anims->m_normal;
+            SActorState* ST = 0;
+            if (mstate_rl & mcCrouch)
+                ST = &m_anims->m_crouch;
+            else
+                ST = &m_anims->m_normal;
             mstate_real = 0;
             m_current_legs.invalidate();
             m_current_torso.invalidate();
@@ -515,6 +518,9 @@ void CActor::g_SetAnimation(u32 mstate_rl)
                             default: M_torso = TW->moving[moving_idx]; break;
                             }
                         }
+
+                        if (!M_torso)
+                            M_torso = ST->m_torso[4].moving[moving_idx]; //Alundaio: Fix torso animations for binoc
                     }
                     else if (M)
                     {
@@ -561,10 +567,12 @@ void CActor::g_SetAnimation(u32 mstate_rl)
                 }
             }
         }
+        else if (!m_bAnimTorsoPlayed)
+            M_torso = ST->m_torso[4].moving[moving_idx]; //Alundaio: Fix torso animations for no weapon
     }
 
     // XXX: check why 'mid' was unused
-    //MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
+    MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
 
     if (!M_legs)
     {
@@ -606,7 +614,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
         m_current_head = M_head;
     }
 
-    if (m_current_legs != M_legs)
+    if (m_current_legs != M_legs || force)
     {
         float pos = 0.f;
         VERIFY(!m_current_legs_blend || !fis_zero(m_current_legs_blend->timeTotal));

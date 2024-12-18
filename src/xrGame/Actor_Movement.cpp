@@ -153,7 +153,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
         };
     };
 };
-
+extern Fvector g_first_person_cam_offset;
 void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Jump, float dt)
 {
     float cam_eff_factor = 0.0f;
@@ -419,7 +419,11 @@ void CActor::g_Orientate(u32 mstate_rl, float dt)
     }
 
     // lerp angle for "effect" and capture torso data from camera
-    angle_lerp(r_model_yaw_delta, calc_yaw, PI_MUL_4, dt);
+    float diff = abs(calc_yaw - r_model_yaw_delta); // yohji: smoother transition when turning
+    if (diff > EPS)
+    {
+        angle_lerp(r_model_yaw_delta, calc_yaw, PI * diff, dt);
+    }
 
     // build matrix
     Fmatrix mXFORM;
@@ -528,10 +532,12 @@ void CActor::g_cl_Orientate(u32 mstate_rl, float dt)
     {
         // if camera rotated more than 45 degrees - align model with it
         float ty = angle_normalize(r_torso.yaw);
-        if (_abs(r_model_yaw - ty) > PI_DIV_4)
+        float minYaw = PI_DIV_4;
+        if (FirstPersonBodyActive()) // yohji: model should always align to first person body in first person body mode, looks more natural
+            minYaw = 0.f;
+        if (_abs(r_model_yaw - ty) > minYaw)
         {
             r_model_yaw_dest = ty;
-            //
             mstate_real |= mcTurn;
         }
         if (_abs(r_model_yaw - r_model_yaw_dest) < EPS_L)

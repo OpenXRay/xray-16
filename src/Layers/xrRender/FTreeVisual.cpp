@@ -114,7 +114,7 @@ struct FTreeVisual_setup
     Fvector4 wave;
     Fvector4 wind;
 
-    FTreeVisual_setup(): dwFrame(0), scale(0) {}
+    FTreeVisual_setup(): dwFrame(0), scale(M_MIN_SCALE) {}
 
     void calculate()
     {
