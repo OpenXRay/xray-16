@@ -464,6 +464,7 @@ void CStalkerCombatPlanner::add_actions()
     add_condition(action, eWorldPropertyUseSuddenness, true);
     add_condition(action, eWorldPropertyEnemyWounded, false);
     add_condition(action, eWorldPropertyInSmartCover, false);
+	add_condition(action, eWorldPropertyEnemy, true);
     add_effect(action, eWorldPropertyEnemy, false);
     add_operator(eWorldOperatorSuddenAttack, action);
 

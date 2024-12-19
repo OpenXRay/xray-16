@@ -600,6 +600,7 @@ u8 CSE_ALifeItemWeapon::get_slot() { return ((u8)pSettings->r_u8(s_name, "slot")
 u16 CSE_ALifeItemWeapon::get_ammo_limit() { return (u16)pSettings->r_u16(s_name, "ammo_limit"); }
 u16 CSE_ALifeItemWeapon::get_ammo_total() { return ((u16)a_current); }
 u16 CSE_ALifeItemWeapon::get_ammo_elapsed() { return ((u16)a_elapsed); }
+void CSE_ALifeItemWeapon::set_ammo_elapsed(u16 count) { a_elapsed = count; }
 u16 CSE_ALifeItemWeapon::get_ammo_magsize()
 {
     if (pSettings->line_exist(s_name, "ammo_mag_size"))

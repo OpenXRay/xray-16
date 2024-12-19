@@ -14,7 +14,7 @@ class CUIOutfitImmunity final : public CUIWindow
 public:
     CUIOutfitImmunity();
 
-    bool InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type);
+    bool InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immunity, pcstr immunity_text);
     void SetProgressValue(float cur, float comp);
 
     pcstr GetDebugType() override { return "CUIOutfitImmunity"; }
@@ -41,13 +41,7 @@ public:
     pcstr GetDebugType() override { return "CUIOutfitInfo"; }
 
 protected:
-    enum
-    {
-        max_count = ALife::eHitTypeMax - 3
-    };
-
     CUIStatic* m_caption{};
     CUIStatic* m_Prop_line{};
-    CUIOutfitImmunity* m_items[max_count]{};
-
+    xr_unordered_map<ALife::EHitType, CUIOutfitImmunity*> m_items;
 }; // class CUIOutfitInfo

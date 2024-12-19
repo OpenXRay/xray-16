@@ -56,8 +56,7 @@ void CWeaponMagazined::net_Destroy() { inherited::net_Destroy(); }
 bool CWeaponMagazined::WeaponSoundExist(pcstr section, pcstr sound_name) const
 {
     pcstr str;
-    bool sec_exist = process_if_exists_set(section, sound_name, &CInifile::r_string, str, true);
-    if (sec_exist)
+    if (process_if_exists_set(section, sound_name, &CInifile::r_string, str, true))
         return true;
 #ifdef DEBUG
     Msg("~ [WARNING] ------ Sound [%s] does not exist in [%s]", sound_name, section);
@@ -72,14 +71,14 @@ void CWeaponMagazined::Load(LPCSTR section)
     inherited::Load(section);
 
     // Sounds
-    m_sounds.LoadSound(section, "snd_draw", "sndShow", false, m_eSoundShow);
-    m_sounds.LoadSound(section, "snd_holster", "sndHide", false, m_eSoundHide);
+    m_sounds.LoadSound(section, "snd_draw", "sndShow", true, m_eSoundShow);
+    m_sounds.LoadSound(section, "snd_holster", "sndHide", true, m_eSoundHide);
 
     //Alundaio: LAYERED_SND_SHOOT
     m_layered_sounds.LoadSound(section, "snd_shoot", "sndShot", false, m_eSoundShot);
     //-Alundaio
 
-    m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", false, m_eSoundEmptyClick);
+    m_sounds.LoadSound(section, "snd_empty", "sndEmptyClick", true, m_eSoundEmptyClick);
     m_sounds.LoadSound(section, "snd_reload", "sndReload", true, m_eSoundReload);
 
     if (WeaponSoundExist(section, "snd_reload_empty"))
@@ -87,7 +86,7 @@ void CWeaponMagazined::Load(LPCSTR section)
     if (WeaponSoundExist(section, "snd_reload_misfire"))
         m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", true, m_eSoundReloadMisfire);
 
-    m_sSndShotCurrent = "sndShot";
+    m_sSndShotCurrent = IsSilencerAttached() ? "sndSilencerShot" : "sndShot";
 
     //звуки и партиклы глушителя, если такой есть
     if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent)
@@ -99,8 +98,6 @@ void CWeaponMagazined::Load(LPCSTR section)
 
         //Alundaio: LAYERED_SND_SHOOT Silencer
         m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
-        if (WeaponSoundExist(section, "snd_silncer_shot_actor"))
-            m_layered_sounds.LoadSound(section, "snd_silncer_shot_actor", "sndSilencerShotActor", false, m_eSoundShot);
         //-Alundaio
     }
 
@@ -169,12 +166,9 @@ void CWeaponMagazined::FireStart()
     else // misfire
     {
         // Alundaio
-        CGameObject* object = smart_cast<CGameObject*>(H_Parent());
-        if (object)
+        if (const auto object = smart_cast<CGameObject*>(H_Parent()))
         {
-            auto& cb = object->callback(GameObject::eOnWeaponJammed);
-            if (cb)
-                cb(object->lua_game_object(), this->lua_game_object());
+            object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
         }
 
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
@@ -258,6 +252,12 @@ bool CWeaponMagazined::IsAmmoAvailable()
 
 void CWeaponMagazined::OnMagazineEmpty()
 {
+    if (IsGameTypeSingle() && ParentIsActor())
+    {
+        int AC = GetSuitableAmmoTotal();
+        Actor()->callback(GameObject::eOnWeaponMagazineEmpty)(lua_game_object(), AC);
+    }
+
     if (GetState() == eIdle)
     {
         OnEmptyClick();
@@ -296,6 +296,12 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
+
+    if (IsGameTypeSingle() && ParentIsActor())
+    {
+        int AC = GetSuitableAmmoTotal();
+        Actor()->callback(GameObject::eOnWeaponMagazineEmpty)(lua_game_object(), AC);
+    }
 
     if (!spawn_ammo)
         return;
@@ -550,8 +556,8 @@ void CWeaponMagazined::state_Fire(float dt)
 
             //Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
             //Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
-            if (GetCurrentFireMode() == 2 || (cycleDown == true && m_iShotNum <= 1))
-                fShotTimeCounter = modeShotTime;
+            if (GetCurrentFireMode() == 2 || (bCycleDown == true && m_iShotNum <= 1))
+                fShotTimeCounter = fModeShotTime;
             else
                 fShotTimeCounter = fOneShotTime;
             //Alundaio: END
@@ -677,42 +683,33 @@ void CWeaponMagazined::switch2_Idle()
 void CWeaponMagazined::switch2_Fire()
 {
     CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-
-#ifdef DEBUG
     if (!io)
         return;
-    // VERIFY2(io, make_string("no inventory owner, item %s", *cName()));
 
     CInventoryItem* ii = smart_cast<CInventoryItem*>(this);
+    if (ii != io->inventory().ActiveItem())
+    {
+        Msg("~ WARNING: Not an active item, item %s, owner %s, active item %s",
+            cName().c_str(), H_Parent()->cName().c_str(),
+            io->inventory().ActiveItem() ? io->inventory().ActiveItem()->object().cName().c_str() : "no_active_item");
+        return;
+    }
 
+#ifdef DEBUG
     if (ii != io->inventory().ActiveItem())
         Msg("! not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(),
             io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");
 
     if (!(io && (ii == io->inventory().ActiveItem())))
     {
-        CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(H_Parent());
-        if (stalker)
+        if (const auto stalker = smart_cast<CAI_Stalker*>(H_Parent()))
         {
             stalker->planner().show();
             stalker->planner().show_current_world_state();
             stalker->planner().show_target_world_state();
         }
     }
-#else
-    if (!io)
-        return;
 #endif // DEBUG
-
-    //
-    //	VERIFY2(
-    //		io && (ii == io->inventory().ActiveItem()),
-    //		make_string(
-    //			"item[%s], parent[%s]",
-    //			*cName(),
-    //			H_Parent() ? *H_Parent()->cName() : "no_parent"
-    //		)
-    //	);
 
     m_bStopedAfterQueueFired = false;
     m_bFireSingleShot = true;
@@ -750,10 +747,12 @@ void CWeaponMagazined::PlayReloadSound()
         else
         {
             if (iAmmoElapsed == 0)
+            {
                 if (m_sounds.FindSoundItem("sndReloadEmpty", false))
                     PlaySound("sndReloadEmpty", get_LastFP());
                 else
                     PlaySound("sndReload", get_LastFP());
+            }
             else
                 PlaySound("sndReload", get_LastFP());
         }
@@ -1171,16 +1170,12 @@ void CWeaponMagazined::OnZoomIn()
         PlayAnimIdle();
 
     // Alundaio
-    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
-    if (object)
+    if (const auto object = smart_cast<CGameObject*>(H_Parent()))
     {
-        auto& cb = object->callback(GameObject::eOnWeaponZoomIn);
-        if (cb)
-            cb(object->lua_game_object(), this->lua_game_object());
+        object->callback(GameObject::eOnWeaponZoomIn)(object->lua_game_object(), this->lua_game_object());
     }
 
-    CActor* pActor = smart_cast<CActor*>(H_Parent());
-    if (pActor)
+    if (CActor* pActor = smart_cast<CActor*>(H_Parent()))
     {
         CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(pActor->Cameras().GetCamEffector(eCEZoom));
         if (!S)
@@ -1203,17 +1198,12 @@ void CWeaponMagazined::OnZoomOut()
         PlayAnimIdle();
 
     //Alundaio
-    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
-    if (object)
+    if (const auto object = smart_cast<CGameObject*>(H_Parent()))
     {
-        auto& cb = object->callback(GameObject::eOnWeaponZoomOut);
-        if (cb)
-            cb(object->lua_game_object(), this->lua_game_object());
+        object->callback(GameObject::eOnWeaponZoomOut)(object->lua_game_object(), this->lua_game_object());
     }
 
-    CActor* pActor = smart_cast<CActor*>(H_Parent());
-
-    if (pActor)
+    if (CActor* pActor = smart_cast<CActor*>(H_Parent()))
         pActor->Cameras().RemoveCamEffector(eCEZoom);
 }
 
@@ -1537,5 +1527,5 @@ void CWeaponMagazined::FireBullet(const Fvector& pos, const Fvector& shot_dir, f
             SetBulletSpeed(m_fOldBulletSpeed);
         }
     }
-    inherited::FireBullet(pos, shot_dir, fire_disp, cartridge, parent_id, weapon_id, send_hit);
+    inherited::FireBullet(pos, shot_dir, fire_disp, cartridge, parent_id, weapon_id, send_hit, GetAmmoElapsed());
 }

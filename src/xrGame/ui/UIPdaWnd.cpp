@@ -189,8 +189,8 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     default:
     {
-        R_ASSERT(m_pActiveDialog);
-        m_pActiveDialog->SendMessage(pWnd, msg, pData);
+        if (m_pActiveDialog)
+            m_pActiveDialog->SendMessage(pWnd, msg, pData);
     }
     };
 }
@@ -202,20 +202,24 @@ void CUIPdaWnd::Show(bool status)
     {
         InventoryUtilities::SendInfoToActor("ui_pda");
 
-        if (!m_pActiveDialog)
+        if (!m_sActiveSection.empty())
+            SetActiveSubdialog(m_sActiveSection);
+        else
         {
-            if (pUIMapWnd && !pUITaskWnd)
-                SetActiveSubdialog("eptMap");
-            else
-                SetActiveSubdialog("eptTasks");
+            cpcstr subdialog = pUIMapWnd && !pUITaskWnd ? "eptMap" : "eptTasks";
+            SetActiveSubdialog(subdialog);
+            UITabControl->SetActiveTab(subdialog);
         }
-        m_pActiveDialog->Show(true);
     }
     else
     {
         InventoryUtilities::SendInfoToActor("ui_pda_hide");
         CurrentGameUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
-        m_pActiveDialog->Show(false);
+        if (m_pActiveDialog)
+        {
+            m_pActiveDialog->Show(false);
+            m_pActiveDialog = pUITaskWnd; //hack for script window
+        }
         g_btnHint->Discard();
         g_statHint->Discard();
     }
@@ -224,12 +228,12 @@ void CUIPdaWnd::Show(bool status)
 void CUIPdaWnd::Update()
 {
     inherited::Update();
-    m_pActiveDialog->Update();
+
+    if (m_pActiveDialog)
+        m_pActiveDialog->Update();
 
     if (m_clock)
-    {
         m_clock->SetText(GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
-    }
 
     if (pUILogsWnd)
         Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
@@ -237,12 +241,13 @@ void CUIPdaWnd::Update()
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 {
-    if (m_sActiveSection == section)
-        return;
+    //if (m_sActiveSection == section)
+    //    return;
 
     if (m_pActiveDialog)
     {
-        UIMainPdaFrame->DetachChild(m_pActiveDialog);
+        if (UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->DetachChild(m_pActiveDialog);
         m_pActiveDialog->Show(false);
     }
 
@@ -268,8 +273,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     luabind::functor<CUIDialogWndEx*> functor;
     if (GEnv.ScriptEngine->functor("pda.set_active_subdialog", functor))
     {
-        CUIDialogWndEx* scriptWnd = functor(section.c_str());
-        if (scriptWnd)
+        if (CUIDialogWndEx* scriptWnd = functor(section.c_str()))
         {
             scriptWnd->SetHolder(CurrentDialogHolder());
             m_pActiveDialog = scriptWnd;
@@ -281,16 +285,18 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
     }
 
-    R_ASSERT(m_pActiveDialog);
-    UIMainPdaFrame->AttachChild(m_pActiveDialog);
-    m_pActiveDialog->Show(true);
-
-    if (UITabControl->GetActiveId() != section)
+    if (m_pActiveDialog)
     {
-        UITabControl->SetActiveTab(section);
+        if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->AttachChild(m_pActiveDialog);
+        m_pActiveDialog->Show(true);
+        m_sActiveSection = section;
+        SetActiveCaption();
     }
-    m_sActiveSection = section;
-    SetActiveCaption();
+    else
+    {
+        m_sActiveSection = "";
+    }
 }
 
 void CUIPdaWnd::SetActiveCaption()
@@ -347,24 +353,12 @@ void CUIPdaWnd::Draw()
 void CUIPdaWnd::DrawHint()
 {
     if (m_pActiveDialog == pUITaskWnd && pUITaskWnd)
-    {
         pUITaskWnd->DrawHint();
-    }
-    if (m_pActiveDialog == pUIMapWnd && pUIMapWnd)
-    {
+    else if (m_pActiveDialog == pUIMapWnd && pUIMapWnd)
         pUIMapWnd->DrawHint();
-    }
-    else if (m_pActiveDialog == pUIFactionWarWnd && pUIFactionWarWnd)
-    {
-        //m_hint_wnd->Draw();
-    }
     else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
-    {
         pUIRankingWnd->DrawHint();
-    }
-    else if (m_pActiveDialog == pUILogsWnd && pUILogsWnd)
-    {
-    }
+
     m_hint_wnd->Draw();
 }
 
