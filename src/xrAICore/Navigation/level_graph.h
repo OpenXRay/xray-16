@@ -125,6 +125,7 @@ public:
     ICF u32 vertex(const CLevelVertex& vertex_r) const;
     IC const Fvector vertex_position(const CLevelGraph::CPosition& source_position) const;
     IC const Fvector& vertex_position(Fvector& dest_position, const CLevelGraph::CPosition& source_position) const;
+    IC int calculate_packed_xz(const float x, const float z) const;
     IC const CLevelGraph::CPosition& vertex_position(
         CLevelGraph::CPosition& dest_position, const Fvector& source_position) const;
     IC const CLevelGraph::CPosition vertex_position(const Fvector& position) const;
@@ -196,7 +197,7 @@ public:
     template <class _predicate>
     IC float vertex_low_cover_angle(u32 vertex_id, float inc_angle, _predicate compare_predicate) const;
     IC void set_invalid_vertex(u32& vertex_id, CLevelVertex** vertex = NULL) const;
-    IC const u32 vertex_id(const CLevelGraph::CLevelVertex* vertex) const;
+    IC u32 vertex_id(const CLevelGraph::CLevelVertex* vertex) const;
     u32 vertex_id(const Fvector& position) const;
 
 private:
