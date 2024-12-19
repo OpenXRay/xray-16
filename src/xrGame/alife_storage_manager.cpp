@@ -143,6 +143,12 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
         return;
 
     Level().autosave_manager().on_game_loaded();
+
+	//Alundaio: For consistency with before/after save callbacks.
+    luabind::functor<void> funct2;
+    if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_after_load", funct2))
+        funct2(file_name);
+	//-Alundaio
 }
 
 bool CALifeStorageManager::load(LPCSTR save_name_no_check)
