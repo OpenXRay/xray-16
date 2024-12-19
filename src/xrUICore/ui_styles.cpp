@@ -74,12 +74,7 @@ void UIStyleManager::SetupStyle(u32 styleID)
     if (DefaultStyleIsSet())
         return;
 
-    pcstr selectedStyle = nullptr;
-    for (const auto& token : m_token)
-    {
-        if (token.id == static_cast<int>(m_style_id))
-            selectedStyle = token.name;
-    }
+    pcstr selectedStyle = GetCurrentStyleName();
 
     string_path selectedStylePath;
     strconcat(selectedStylePath, UI_PATH_DEFAULT, DELIMITER "styles" DELIMITER, selectedStyle);
@@ -125,9 +120,9 @@ pcstr UIStyleManager::GetCurrentStyleName() const
 {
     for (const auto& token : m_token)
     {
-        if (token.id == m_style_id)
+        if (token.id == static_cast<int>(m_style_id))
             return token.name;
     }
-    VERIFY(!"Could retrieve current style name!");
+    VERIFY(!"Could not retrieve current style name!");
     return nullptr;
 }
