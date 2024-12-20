@@ -5,36 +5,42 @@ class CUIStatic;
 
 class XRUICORE_API CUICursor : public pureRender, public CDeviceResetNotifier, public CUIResetNotifier
 {
-    bool bVisible{};
     Fvector2 vPos{};
+    CUIStatic* m_static{};
     Fvector2 vPrevPos{};
     Fvector2 correction;
+    bool bVisible{};
     bool m_bound_to_system_cursor{};
-    CUIStatic* m_static{};
-    u32 m_become_visible_time{};
     bool m_pause_autohide{};
+    u32 m_become_visible_time{};
 
     void InitInternal();
 
 public:
     CUICursor();
-    virtual ~CUICursor();
-    virtual void OnRender();
+    ~CUICursor() override;
+
+    void Show();
+    void Hide();
+
+    [[nodiscard]]
+    bool IsVisible() const { return bVisible; }
+
+    void OnRender() override;
+    void OnDeviceReset() override;
+    void OnUIReset() override;
 
     void UpdateAutohideTiming();
     void PauseAutohiding(bool pause);
 
-    Fvector2 GetCursorPositionDelta();
-
-    Fvector2 GetCursorPosition();
-    void SetUICursorPosition(Fvector2 pos);
     void WarpToWindow(CUIWindow* wnd, bool change_visibility = true);
     void UpdateCursorPosition(int _dx, int _dy);
 
-    void OnDeviceReset() override;
-    void OnUIReset() override;
+    void SetUICursorPosition(Fvector2 pos);
 
-    bool IsVisible() const { return bVisible; }
-    void Show();
-    void Hide();
+    [[nodiscard]]
+    Fvector2 GetCursorPosition() const;
+
+    [[nodiscard]]
+    Fvector2 GetCursorPositionDelta() const;
 };
