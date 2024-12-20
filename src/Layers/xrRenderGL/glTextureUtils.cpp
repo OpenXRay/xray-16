@@ -99,12 +99,11 @@ TextureFormatPairs TextureFormatList[] =
 
 GLenum ConvertTextureFormat(D3DFORMAT dx9FMT)
 {
-    constexpr size_t arrayLength = sizeof(TextureFormatList) / sizeof(TextureFormatList[0]);
-    for (int i = 0; i < arrayLength; ++i)
-    {
-        if (TextureFormatList[i].m_dx9FMT == dx9FMT)
-            return TextureFormatList[i].m_glFMT;
-    }
+	for (const auto& textureFormat : TextureFormatList)
+	{
+		if (textureFormat.m_dx9FMT == dx9FMT)
+			return textureFormat.m_glFMT;
+	}
 
     VERIFY(!"ConvertTextureFormat didn't find appropriate gl texture format!");
     return GL_NONE;
