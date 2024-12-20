@@ -57,19 +57,6 @@ CUICursor::~CUICursor()
     Device.seqRender.Remove(this);
 }
 
-void CUICursor::Show()
-{
-    bVisible = true;
-    m_become_visible_time  = Device.dwTimeContinual;
-}
-
-void CUICursor::Hide()
-{
-    bVisible = false;
-    m_become_visible_time = 0;
-    m_pause_autohide = false;
-}
-
 //--------------------------------------------------------------------
 u32 last_render_frame = 0;
 void CUICursor::OnRender()
@@ -98,29 +85,6 @@ void CUICursor::OnRender()
     m_static->SetWndPos(vPos);
     m_static->Update();
     m_static->Draw();
-}
-
-void CUICursor::UpdateAutohideTiming()
-{
-    if (m_pause_autohide)
-        return;
-
-    const u32 cur_time = Device.dwTimeContinual;
-
-    if (float(cur_time - m_become_visible_time) > (psControllerCursorAutohideTime * 1000.f))
-    {
-        Hide();
-    }
-}
-
-void CUICursor::PauseAutohiding(bool pause)
-{
-    if (m_pause_autohide == pause)
-        return;
-
-    m_pause_autohide = pause;
-    if (!m_pause_autohide)
-        m_become_visible_time = Device.dwTimeContinual;
 }
 
 void CUICursor::SetUICursorPosition(Fvector2 pos)

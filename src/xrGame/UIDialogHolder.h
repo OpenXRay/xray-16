@@ -39,6 +39,7 @@ class CDialogHolder : public pureFrame, public CUIDebuggable, public CUIFocusSys
     xr_vector<recvItem> m_input_receivers;
     xr_vector<dlgItem> m_dialogsToRender;
     xr_vector<dlgItem> m_dialogsToRender_new;
+    u32 m_become_visible_time{};
     bool m_b_in_update;
 
     void StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators);
