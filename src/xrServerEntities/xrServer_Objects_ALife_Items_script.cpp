@@ -21,11 +21,11 @@ SCRIPT_EXPORT(CSE_ALifeInventoryItem, (),
             //.def(constructor<pcstr>())
             .def("has_upgrade", +[](CSE_ALifeInventoryItem* ta, pcstr str)
             {
-                ta->add_upgrade(str);
+                return ta->has_upgrade(str);
             })
             .def("add_upgrade", +[](CSE_ALifeInventoryItem* ta, pcstr str)
             {
-                return ta->has_upgrade(str);
+                ta->add_upgrade(str);
             })
     ];
 });
