@@ -1125,11 +1125,11 @@ bool CScriptEngine::function_object(LPCSTR function_to_call, luabind::object& ob
     {
         pstr file_name = strchr(name_space, '.');
         if (!file_name)
-            process_file(name_space);
+            process_file_if_exists(name_space, false);
         else
         {
             *file_name = 0;
-            process_file(name_space);
+            process_file_if_exists(name_space, false);
             *file_name = '.';
         }
     }
