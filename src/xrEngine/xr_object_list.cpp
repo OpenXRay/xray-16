@@ -254,42 +254,20 @@ void CObjectList::Update(bool bForce)
 #endif
 
             stats.Crows = m_primary_crows.size();
-            Objects* workload;
-            if (!psDeviceFlags.test(rsDisableObjectsAsCrows))
-                workload = &m_primary_crows;
-            else
-            {
-                workload = &objects_active;
-                clear_crow_vec(m_primary_crows);
-            }
-
             stats.Update.Begin();
             stats.Active = objects_active.size();
             stats.Total = objects_active.size() + objects_sleeping.size();
 
-            u32 const objects_count = workload->size();
-            IGameObject** objects = (IGameObject**)xr_alloca(objects_count * sizeof(IGameObject*));
-            std::copy(workload->begin(), workload->end(), objects);
-
             m_primary_crows.clear();
 
-            IGameObject** b = objects;
-            IGameObject** e = objects + objects_count;
-            for (IGameObject** i = b; i != e; ++i)
-            {
-                (*i)->IAmNotACrowAnyMore();
-                (*i)->SetCrowUpdateFrame(u32(-1));
-            }
-
-            for (IGameObject** i = b; i != e; ++i)
-            {
-                (*i)->PreUpdateCL();
-                SingleUpdate(*i);
-            }
-
-            //--#SM+#-- PostUpdateCL для всех клиентских объектов [for crowed and non-crowed]
             for (auto& object : objects_active)
+            {
+                object->IAmNotACrowAnyMore();
+                object->SetCrowUpdateFrame(u32(-1));
+                object->PreUpdateCL();
+                SingleUpdate(object);
                 object->PostUpdateCL(false);
+            }
 
             for (auto& object : objects_sleeping)
                 object->PostUpdateCL(true);
