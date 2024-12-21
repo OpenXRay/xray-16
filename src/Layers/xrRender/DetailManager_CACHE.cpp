@@ -37,9 +37,9 @@ void CDetailManager::cache_Initialize()
 CDetailManager::Slot* CDetailManager::cache_Query(int r_x, int r_z)
 {
     int gx = w2cg_X(r_x + cache_cx);
-    VERIFY(gx >= 0 && gx < dm_cache_line);
+    VERIFY(gx >= 0 && gx < static_cast<int>(dm_cache_line));
     int gz = w2cg_Z(r_z + cache_cz);
-    VERIFY(gz >= 0 && gz < dm_cache_line);
+    VERIFY(gz >= 0 && gz < static_cast<int>(dm_cache_line));
     return cache[gz][gx];
 }
 

@@ -115,7 +115,7 @@ CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, u32 game_
     auto* snd = xr_new<CSound>(handle);
 
     snd->g_type = game_type;
-    if (game_type == sg_SourceType)
+    if (game_type == static_cast<int>(sg_SourceType))
         snd->g_type = snd->handle->game_type();
 
     snd->s_type = sound_type;
