@@ -258,9 +258,7 @@ void CObjectList::Update(bool bForce)
             stats.Active = objects_active.size();
             stats.Total = objects_active.size() + objects_sleeping.size();
 
-            m_primary_crows.clear();
-
-            for (auto& object : objects_active)
+            for (auto& object : m_primary_crows)
             {
                 object->IAmNotACrowAnyMore();
                 object->SetCrowUpdateFrame(u32(-1));
@@ -268,6 +266,8 @@ void CObjectList::Update(bool bForce)
                 SingleUpdate(object);
                 object->PostUpdateCL(false);
             }
+
+            m_primary_crows.clear();
 
             for (auto& object : objects_sleeping)
                 object->PostUpdateCL(true);
