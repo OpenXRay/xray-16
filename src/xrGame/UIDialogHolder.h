@@ -49,6 +49,7 @@ class CDialogHolder : public pureFrame, public CUIDebuggable, public CUIFocusSys
 protected:
     void DoRenderDialogs();
     void CleanInternals();
+    void UpdateCursorVisibility();
 
 public:
     CDialogHolder();
