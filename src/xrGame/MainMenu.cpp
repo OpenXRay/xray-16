@@ -315,6 +315,16 @@ bool CMainMenu::ReloadUI()
 bool CMainMenu::IsActive() const { return m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
 
+void CMainMenu::IR_OnActivate()
+{
+    MarkForemost(true);
+}
+
+void CMainMenu::IR_OnDeactivate()
+{
+    MarkForemost(false);
+}
+
 // IInputReceiver
 void CMainMenu::IR_OnMousePress(int btn)
 {

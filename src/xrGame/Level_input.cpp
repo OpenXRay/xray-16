@@ -686,6 +686,9 @@ void CLevel::IR_OnControllerAttitudeChange(Fvector change)
 
 void CLevel::IR_OnActivate()
 {
+    if (CUIGameCustom* ui = CurrentGameUI())
+        ui->MarkForemost(true);
+
     if (!pInput)
         return;
 
@@ -714,4 +717,10 @@ void CLevel::IR_OnActivate()
             };
         };
     }
+}
+
+void CLevel::IR_OnDeactivate()
+{
+    if (CUIGameCustom* ui = CurrentGameUI())
+        ui->MarkForemost(false);
 }

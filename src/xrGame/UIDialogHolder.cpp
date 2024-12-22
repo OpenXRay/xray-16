@@ -58,6 +58,12 @@ void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
     SetFocused(nullptr);
     pDialog->SetHolder(this);
 
+    if (pDialog->NeedCursor())
+    {
+        GetUICursor().Show();
+        m_become_visible_time = Device.dwTimeContinual;
+    }
+
     if (g_pGameLevel)
     {
         CActor* A = smart_cast<CActor*>(Level().CurrentViewEntity());
@@ -94,6 +100,9 @@ void CDialogHolder::StopMenu(CUIDialogWnd* pDialog)
 
     RemoveDialogToRender(pDialog);
     pDialog->SetHolder(NULL);
+
+    if (!TopInputReceiver() || !TopInputReceiver()->NeedCursor())
+        GetUICursor().Hide();
 }
 
 void CDialogHolder::AddDialogToRender(CUIWindow* pDialog)
@@ -224,7 +233,7 @@ void CDialogHolder::OnFrame()
 
     m_b_in_update = true;
 
-    if (!GEnv.isDedicatedServer)
+    if (m_is_foremost && !GEnv.isDedicatedServer)
     {
         auto& cursor = GetUICursor();
         const bool need_cursor = TopInputReceiver() && TopInputReceiver()->NeedCursor();
