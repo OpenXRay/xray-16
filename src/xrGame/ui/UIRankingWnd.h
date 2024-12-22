@@ -39,7 +39,7 @@ class CUIRankingWnd final : public CUIWindow, public CUIWndCallback
 
     //Alundaio: CoC Rankings
     xr_vector<CUIRankingsCoC*> m_coc_ranking_vec;
-    CUIRankingsCoC* m_coc_ranking_actor;
+    CUIRankingsCoC* m_coc_ranking_actor{};
     //-Alundaio
 
     xr_vector<CUIStatic*> m_stat_info;
