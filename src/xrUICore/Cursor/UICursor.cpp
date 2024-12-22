@@ -130,6 +130,9 @@ void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
     if (change_visibility)
         Show();
 
+    if (!IsVisible())
+        return;
+
     Fvector2 pos;
     wnd->GetAbsolutePos(pos);
     Fvector2 size = wnd->GetWndSize();

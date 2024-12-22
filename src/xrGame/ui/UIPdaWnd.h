@@ -84,7 +84,8 @@ public:
     void SetActiveSubdialog(const shared_str& section);
     CUITabControl* GetTabControl() const { return UITabControl; }
 
-    virtual bool StopAnyMove() { return false; }
+    bool StopAnyMove() override { return false; }
+    bool NeedCursor() const override;
     void UpdatePda();
     void UpdateRankingWnd();
 

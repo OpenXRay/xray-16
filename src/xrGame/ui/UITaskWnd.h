@@ -77,6 +77,8 @@ public:
     void SecondaryTasksEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::SecondaryTasks, enable); }
     void PrimaryObjectsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::PrimaryObjects, enable); }
 
+    bool IsUsingCursorRightNow() const override;
+
 private:
     void TaskSetTargetMap(CGameTask* task) const;
     void TaskShowMapSpot(CGameTask* task, bool show) const;

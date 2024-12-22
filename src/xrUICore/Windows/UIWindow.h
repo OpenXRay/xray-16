@@ -170,6 +170,9 @@ public:
     CUIWindow* FindChild(const shared_str name);
 
     [[nodiscard]]
+    virtual bool IsUsingCursorRightNow() const { return false; }
+
+    [[nodiscard]]
     IC bool CursorOverWindow() const { return m_bCursorOverWindow; }
 
     [[nodiscard]]

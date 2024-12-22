@@ -33,7 +33,7 @@ public:
     CUIFocusSystem* GetCurrentFocusSystem() const override { return GetHolder(); }
 
     virtual bool StopAnyMove() { return true; }
-    virtual bool NeedCursor() const { return true; }
+    virtual bool NeedCursor() const { return pInput->IsCurrentInputTypeKeyboardMouse(); }
     virtual bool NeedCenterCursor() const { return true; }
     virtual bool WorkInPause() const { return m_bWorkInPause; }
     virtual bool Dispatch(int cmd, int param) { return true; }

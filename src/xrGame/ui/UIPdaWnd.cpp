@@ -362,6 +362,14 @@ void CUIPdaWnd::DrawHint()
     m_hint_wnd->Draw();
 }
 
+bool CUIPdaWnd::NeedCursor() const
+{
+    if (m_pActiveDialog && m_pActiveDialog->IsUsingCursorRightNow())
+       return true;
+
+    return CUIDialogWnd::NeedCursor();
+}
+
 void CUIPdaWnd::UpdatePda()
 {
     if (pUILogsWnd)
