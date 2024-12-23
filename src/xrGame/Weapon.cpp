@@ -35,6 +35,7 @@
 constexpr pcstr WPN_SCOPE = "wpn_scope";
 constexpr pcstr WPN_SILENCER = "wpn_silencer";
 constexpr pcstr WPN_GRENADE_LAUNCHER = "wpn_launcher";
+constexpr pcstr WPN_GRENADE_LAUNCHER_SOC = "wpn_grenade_launcher";
 
 BOOL b_toggle_weapon_aim = FALSE;
 
@@ -1302,6 +1303,7 @@ void CWeapon::UpdateHUDAddonsVisibility()
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+    static shared_str wpn_grenade_launcher_soc = WPN_GRENADE_LAUNCHER_SOC;
 
     // actor only
     if (!GetHUDmode())
@@ -1332,16 +1334,20 @@ void CWeapon::UpdateHUDAddonsVisibility()
     else if (m_eSilencerStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(wpn_silencer, TRUE, TRUE);
 
+    bool use_soc_name{};
+    if (HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher) == BI_NONE)
+        use_soc_name = HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher_soc) != BI_NONE;
+
     if (GrenadeLauncherAttachable())
     {
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, IsGrenadeLauncherAttached());
+        HudItemData()->set_bone_visible((use_soc_name ? wpn_grenade_launcher_soc : wpn_grenade_launcher), IsGrenadeLauncherAttached());
     }
     if (m_eGrenadeLauncherStatus == ALife::eAddonDisabled)
     {
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, FALSE, TRUE);
+        HudItemData()->set_bone_visible((use_soc_name ? wpn_grenade_launcher_soc : wpn_grenade_launcher), FALSE, TRUE);
     }
     else if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, TRUE, TRUE);
+        HudItemData()->set_bone_visible((use_soc_name ? wpn_grenade_launcher_soc : wpn_grenade_launcher), TRUE, TRUE);
 }
 
 void CWeapon::UpdateAddonsVisibility()
@@ -1352,6 +1358,7 @@ void CWeapon::UpdateAddonsVisibility()
     static shared_str wpn_scope = WPN_SCOPE;
     static shared_str wpn_silencer = WPN_SILENCER;
     static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+    static shared_str wpn_grenade_launcher_soc = WPN_GRENADE_LAUNCHER_SOC;
 
     IKinematics* pWeaponVisual = smart_cast<IKinematics*>(Visual());
     R_ASSERT(pWeaponVisual);
@@ -1401,6 +1408,9 @@ void CWeapon::UpdateAddonsVisibility()
     }
 
     bone_id = pWeaponVisual->LL_BoneID(wpn_grenade_launcher);
+    if (bone_id == BI_NONE)
+        bone_id = pWeaponVisual->LL_BoneID(wpn_grenade_launcher_soc);
+
     if (GrenadeLauncherAttachable())
     {
         if (IsGrenadeLauncherAttached())
