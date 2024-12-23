@@ -41,20 +41,19 @@ struct hud_item_measures
         e_shell_point = (1 << 2),
         e_16x9_mode_now = (1 << 3)
     };
-    Flags8 m_prop_flags;
-
-    Fvector m_item_attach[2]{}; // pos,rot
 
     Fvector m_hands_offset[2][3]{}; // pos,rot/ normal,aim,GL
+    Fvector m_hands_attach[2]{}; // pos,rot
+    Fvector m_item_attach[2]{}; // pos,rot
 
-    u16 m_fire_bone;
     Fvector m_fire_point_offset{};
-    u16 m_fire_bone2;
     Fvector m_fire_point2_offset{};
-    u16 m_shell_bone;
     Fvector m_shell_point_offset{};
 
-    Fvector m_hands_attach[2]{}; // pos,rot
+    u16 m_fire_bone;
+    u16 m_fire_bone2;
+    u16 m_shell_bone;
+    Flags8 m_prop_flags;
 
     Fmatrix load(const shared_str& sect_name, IKinematics* K);
     Fmatrix load_monolithic(const shared_str& sect_name, IKinematics* K, CHudItem* owner);
@@ -83,6 +82,7 @@ struct attachable_hud_item
     shared_str m_visual_name;
     IKinematics* m_model{};
     u16 m_attach_place_idx{};
+    bool m_monolithic{};
     hud_item_measures m_measures;
 
     // runtime positioning
@@ -90,8 +90,6 @@ struct attachable_hud_item
     Fmatrix m_item_transform{};
 
     player_hud_motion_container m_hand_motions;
-
-    bool m_monolithic;
 
     attachable_hud_item(player_hud* parent, const shared_str& sect_name, IKinematicsAnimated* model);
     ~attachable_hud_item();
