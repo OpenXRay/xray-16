@@ -212,9 +212,9 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
     string128 val_name;
 
-    strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
+    strconcat(val_name, "hands_position", _prefix);
     m_hands_attach[0] = pSettings->r_fvector3(sect_name, val_name);
-    strconcat(sizeof(val_name), val_name, "hands_orientation", _prefix);
+    strconcat(val_name, "hands_orientation", _prefix);
     m_hands_attach[1] = pSettings->r_fvector3(sect_name, val_name);
 
     m_item_attach[0] = pSettings->r_fvector3(sect_name, "item_position");
@@ -232,7 +232,7 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         m_fire_point_offset = pSettings->r_fvector3(sect_name, "fire_point");
     }
     else
-        m_fire_point_offset.set(0, 0, 0);
+        m_fire_point_offset = {};
 
     m_prop_flags.set(e_fire_point2, pSettings->line_exist(sect_name, "fire_bone2"));
     if (m_prop_flags.test(e_fire_point2))
@@ -242,7 +242,7 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         m_fire_point2_offset = pSettings->r_fvector3(sect_name, "fire_point2");
     }
     else
-        m_fire_point2_offset.set(0, 0, 0);
+        m_fire_point2_offset = {};
 
     m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "shell_bone"));
     if (m_prop_flags.test(e_shell_point))
@@ -252,19 +252,19 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         m_shell_point_offset = pSettings->r_fvector3(sect_name, "shell_point");
     }
     else
-        m_shell_point_offset.set(0, 0, 0);
+        m_shell_point_offset = {};
 
-    m_hands_offset[0][0].set(0, 0, 0);
-    m_hands_offset[1][0].set(0, 0, 0);
+    m_hands_offset[0][0] = {};
+    m_hands_offset[1][0] = {};
 
-    strconcat(sizeof(val_name), val_name, "aim_hud_offset_pos", _prefix);
+    strconcat(val_name, "aim_hud_offset_pos", _prefix);
     m_hands_offset[0][1] = pSettings->r_fvector3(sect_name, val_name);
-    strconcat(sizeof(val_name), val_name, "aim_hud_offset_rot", _prefix);
+    strconcat(val_name, "aim_hud_offset_rot", _prefix);
     m_hands_offset[1][1] = pSettings->r_fvector3(sect_name, val_name);
 
-    strconcat(sizeof(val_name), val_name, "gl_hud_offset_pos", _prefix);
+    strconcat(val_name, "gl_hud_offset_pos", _prefix);
     m_hands_offset[0][2] = pSettings->r_fvector3(sect_name, val_name);
-    strconcat(sizeof(val_name), val_name, "gl_hud_offset_rot", _prefix);
+    strconcat(val_name, "gl_hud_offset_rot", _prefix);
     m_hands_offset[1][2] = pSettings->r_fvector3(sect_name, val_name);
 
     R_ASSERT2(pSettings->line_exist(sect_name, "fire_point") == pSettings->line_exist(sect_name, "fire_bone"),
@@ -306,6 +306,9 @@ Fmatrix hud_item_measures::load_monolithic(const shared_str& sect_name, IKinemat
         else
             m_shell_point_offset.set(0, 0, 0);
 
+        m_hands_offset[0][0] = {};
+        m_hands_offset[1][0] = {};
+
         if (wpn->IsZoomEnabled())
         {
             const auto load_zoom_offsets = [&](pcstr prefix, Fvector3& position, Fvector3& rotation)
@@ -327,13 +330,13 @@ Fmatrix hud_item_measures::load_monolithic(const shared_str& sect_name, IKinemat
     }
     else
     {
-        m_fire_bone = BI_NONE;
+        m_fire_bone  = BI_NONE;
         m_fire_bone2 = BI_NONE;
         m_shell_bone = BI_NONE;
 
-        m_fire_point_offset.set(0, 0, 0);
-        m_fire_point2_offset.set(0, 0, 0);
-        m_shell_point_offset.set(0, 0, 0);
+        m_fire_point_offset  = {};
+        m_fire_point2_offset = {};
+        m_shell_point_offset = {};
     }
 
     load_inertion_params(sect_name);
@@ -476,7 +479,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 
         string_path ce_path;
         string_path anm_name;
-        strconcat(sizeof(anm_name), anm_name, "camera_effects" DELIMITER "weapon" DELIMITER, M.name.c_str(), ".anm");
+        strconcat(anm_name, "camera_effects" DELIMITER "weapon" DELIMITER, M.name.c_str(), ".anm");
         if (FS.exist(ce_path, "$game_anims$", anm_name))
         {
             CEffectorCam* ec = current_actor->Cameras().GetCamEffector(eCEWeaponAction);
