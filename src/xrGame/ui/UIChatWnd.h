@@ -18,7 +18,7 @@ public:
     void SetEditBoxPrefix(LPCSTR prefix);
     void ChatToAll(bool b) { sendNextMessageToAll = b; }
     void PendingMode(bool const is_pending_mode);
-    virtual bool NeedCursor() const { return false; }
+    bool NeedCursor() const override { return false; }
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
     pcstr GetDebugType() override { return "CUIChatWnd"; }

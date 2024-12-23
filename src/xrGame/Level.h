@@ -322,7 +322,8 @@ public:
 
     void IR_OnControllerAttitudeChange(Fvector change) override;
 
-    void IR_OnActivate(void) override;
+    void IR_OnActivate() override;
+    void IR_OnDeactivate() override;
 
     // Returns respawn point ID
     int get_RPID(LPCSTR name); // Xottab_DUTY: Seems to be deprecated

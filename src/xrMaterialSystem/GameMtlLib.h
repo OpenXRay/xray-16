@@ -14,8 +14,6 @@
 #define MTL_EXPORT_API XR_IMPORT
 #endif
 
-constexpr u16 GAMEMTL_CURRENT_VERSION     = 0x0001;
-
 constexpr u32 GAMEMTLS_CHUNK_VERSION      = 0x1000;
 constexpr u32 GAMEMTLS_CHUNK_AUTOINC      = 0x1001;
 constexpr u32 GAMEMTLS_CHUNK_MTLS         = 0x1002;
@@ -45,6 +43,22 @@ constexpr u32 GAMEMTL_NONE_ID             = u32(-1);
 constexpr u32 GAMEMTL_NONE_IDX            = u16(-1);
 
 constexpr pcstr GAMEMTL_FILENAME          = "gamemtl.xr";
+
+enum EGameMtlVersion : u16
+{
+    // The big issue is that GSC had version 1 in SOC,
+    // then they introduced a significant change in CS,
+    // but didn't change the version number...
+    // In fact, they NEVER have changed the number
+    // since the system was introduced in 2002.
+    // So, we introduce helper values:
+    GAMEMTL_VERSION_SOC     = u16(-1),
+
+    GAMEMTL_VERSION_UNKNOWN = 0,
+
+    // Real version numbers in GAMEMTL_FILENAME:
+    GAMEMTL_CURRENT_VERSION = 1,
+};
 
 // fwd. decl.
 class IReader;
@@ -233,6 +247,7 @@ private:
     GameMtlPairVec material_pairs_rt;
 
     u32 m_file_age{};
+    EGameMtlVersion m_version{};
 
 public:
     CGameMtlLibrary();

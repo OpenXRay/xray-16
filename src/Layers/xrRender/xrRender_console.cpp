@@ -71,8 +71,15 @@ const xr_token qsmapsize_token[] =
     { nullptr, 0 }
 };
 
-u32 ps_r_ssao_mode = 2;
-const xr_token qssao_mode_token[] = {{"disabled", 0}, {"default", 1}, {"hdao", 2}, {"hbao", 3}, {nullptr, 0}};
+u32 ps_r_ssao_mode = ssao_mode_default;
+const xr_token qssao_mode_token[] =
+{
+    { "disabled", ssao_mode_off },
+    { "default",  ssao_mode_default },
+    { "hdao",     ssao_mode_hdao },
+    { "hbao",     ssao_mode_hbao },
+    { nullptr,    0 }
+};
 
 u32 ps_r_sun_shafts = 2;
 const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3}, {nullptr, 0}};
@@ -477,14 +484,14 @@ public:
 
         switch (*value)
         {
-        case 0:
+        case ssao_mode_off:
         {
             ps_r_ssao = 0;
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HBAO, 0);
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HDAO, 0);
             break;
         }
-        case 1:
+        case ssao_mode_default:
         {
             if (ps_r_ssao == 0)
             {
@@ -495,7 +502,7 @@ public:
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HALF_DATA, 0);
             break;
         }
-        case 2:
+        case ssao_mode_hdao:
         {
             if (ps_r_ssao == 0)
             {
@@ -507,7 +514,7 @@ public:
             ps_r2_ls_flags_ext.set(R2FLAGEXT_SSAO_HALF_DATA, 0);
             break;
         }
-        case 3:
+        case ssao_mode_hbao:
         {
             if (ps_r_ssao == 0)
             {

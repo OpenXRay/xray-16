@@ -10,7 +10,6 @@
 #include "CharacterPhysicsSupport.h"
 #include "entity_alive.h"
 
-
 CAmebaZone::CAmebaZone() : m_fVelocityLimit(1.f) {}
 
 CAmebaZone::~CAmebaZone() {}

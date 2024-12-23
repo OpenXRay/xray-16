@@ -98,7 +98,6 @@ void CWeaponRevolver::PlayAnimReload()
         PlayHUDMotion("anm_reload_5", true, this, state);
     else
         PlayHUDMotion("anm_reload", true, this, state);
-
 }
 
 

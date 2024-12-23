@@ -739,14 +739,13 @@ IC static void CLevel_Export(lua_State* luaState)
     [
         //Alundaio: Extend level namespace exports
         def("send", &g_send) , //allow the ability to send netpacket to level
-        //def("ray_pick",g_ray_pick),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
         def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
-        def("get_start_time", +[]() { return xrTime(Level().GetStartGameTime()); }),
+        def("get_start_time", +[]() -> xrTime { return xrTime(Level().GetStartGameTime()); }),
         def("valid_vertex", +[](u32 level_vertex_id)
         {
             return ai().level_graph().valid_vertex_id(level_vertex_id);
@@ -863,34 +862,34 @@ IC static void CLevel_Export(lua_State* luaState)
     module(luaState)
     [
         class_<CRayPick>("ray_pick")
-        .def(constructor<>())
-        .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
-        .def("set_position", &CRayPick::set_position)
-        .def("set_direction", &CRayPick::set_direction)
-        .def("set_range", &CRayPick::set_range)
-        .def("set_flags", &CRayPick::set_flags)
-        .def("set_ignore_object", &CRayPick::set_ignore_object)
-        .def("query", &CRayPick::query)
-        .def("get_result", &CRayPick::get_result)
-        .def("get_object", &CRayPick::get_object)
-        .def("get_distance", &CRayPick::get_distance)
-        .def("get_element", &CRayPick::get_element),
+            .def(constructor<>())
+            .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
+            .def("set_position", &CRayPick::set_position)
+            .def("set_direction", &CRayPick::set_direction)
+            .def("set_range", &CRayPick::set_range)
+            .def("set_flags", &CRayPick::set_flags)
+            .def("set_ignore_object", &CRayPick::set_ignore_object)
+            .def("query", &CRayPick::query)
+            .def("get_result", &CRayPick::get_result)
+            .def("get_object", &CRayPick::get_object)
+            .def("get_distance", &CRayPick::get_distance)
+            .def("get_element", &CRayPick::get_element),
         class_<script_rq_result>("rq_result")
-        .def_readonly("object", &script_rq_result::O)
-        .def_readonly("range", &script_rq_result::range)
-        .def_readonly("element", &script_rq_result::element)
-        .def(constructor<>()),
+            .def_readonly("object", &script_rq_result::O)
+            .def_readonly("range", &script_rq_result::range)
+            .def_readonly("element", &script_rq_result::element)
+            .def(constructor<>()),
         class_<EnumCallbackType<collide::rq_target>>("rq_target")
-        .enum_("targets")
-        [
-            value("rqtNone", int(collide::rqtNone)),
-            value("rqtObject", int(collide::rqtObject)),
-            value("rqtStatic", int(collide::rqtStatic)),
-            value("rqtShape", int(collide::rqtShape)),
-            value("rqtObstacle", int(collide::rqtObstacle)),
-            value("rqtBoth", int(collide::rqtBoth)),
-            value("rqtDyn", int(collide::rqtDyn))
-        ]
+            .enum_("targets")
+            [
+                value("rqtNone", int(collide::rqtNone)),
+                value("rqtObject", int(collide::rqtObject)),
+                value("rqtStatic", int(collide::rqtStatic)),
+                value("rqtShape", int(collide::rqtShape)),
+                value("rqtObstacle", int(collide::rqtObstacle)),
+                value("rqtBoth", int(collide::rqtBoth)),
+                value("rqtDyn", int(collide::rqtDyn))
+            ]
     ];
 
     module(luaState)

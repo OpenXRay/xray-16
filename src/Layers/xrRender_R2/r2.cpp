@@ -403,15 +403,10 @@ void CRender::create()
 #endif
 
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
-    o.hbao_vectorized = false;
-    if (o.ssao_hdao)
-        o.ssao_opt_data = false;
-    else if (o.ssao_hbao)
-    {
-        if (HW.Caps.id_vendor == 0x1002)
-            o.hbao_vectorized = true;
-        o.ssao_opt_data = true;
-    }
+    if (o.ssao_hbao && HW.Caps.id_vendor == 0x1002)
+        o.hbao_vectorized = true;
+    else
+        o.hbao_vectorized = false;
 
 #if defined(USE_DX11)
     o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);

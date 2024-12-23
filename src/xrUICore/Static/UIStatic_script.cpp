@@ -50,8 +50,8 @@ SCRIPT_EXPORT(CUIStatic, (CUIWindow),
             .def("GetTextX", +[](CUIStatic* self) { return self->TextItemControl()->m_TextOffset.x; })
             .def("GetTextY", +[](CUIStatic* self) { return self->TextItemControl()->m_TextOffset.y; })
 
-            .def("SetColor", &CUIStatic::SetColor)
-            .def("GetColor", &CUIStatic::GetColor)
+            .def("SetColor", &CUIStatic::SetTextureColor)
+            .def("GetColor", &CUIStatic::GetTextureColor)
 
             .def("SetFont", &CUIStatic::SetFont)
             .def("GetFont", &CUIStatic::GetFont)

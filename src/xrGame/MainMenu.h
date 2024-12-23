@@ -131,6 +131,9 @@ public:
 
     bool IgnorePause() override { return true; }
 
+    void IR_OnActivate() override;
+    void IR_OnDeactivate() override;
+
     void IR_OnMousePress(int btn) override;
     void IR_OnMouseRelease(int btn) override;
     void IR_OnMouseHold(int btn) override;

@@ -165,6 +165,7 @@ SCRIPT_EXPORT(CUIWindow, (),
             .def("IsAutoDelete", &CUIWindow::IsAutoDelete)
 
             .def("IsCursorOverWindow", &CUIWindow::CursorOverWindow)
+            .def("IsUsingCursorRightNow", &CUIWindow::IsUsingCursorRightNow)
             .def("FocusReceiveTime", &CUIWindow::FocusReceiveTime)
             .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 

@@ -321,6 +321,11 @@ void CUITaskWnd::Show_TaskListWnd(bool status) const
     m_task_wnd->Show(status);
 }
 
+bool CUITaskWnd::IsUsingCursorRightNow() const
+{
+    return m_pKeyboardCapturer == &m_filters;
+}
+
 void CUITaskWnd::TaskSetTargetMap(CGameTask* task) const
 {
     if (!task || !IsSecondaryTasksEnabled())
