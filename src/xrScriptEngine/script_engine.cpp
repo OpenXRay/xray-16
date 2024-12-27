@@ -1004,6 +1004,21 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
             luaL_dostring(lua(), mathRandom);
     }
 
+    // Adds gamedata folder as module root for lua `require` and allows usage of built-in lua module system.
+    // Notes:
+    // - Does not resolve files inside archived game files
+    // Example:
+    // `local example = require("scripts.folder.file")` tries to import `gamedata\scripts\folder\file.script`
+    {
+        string_path gamedataPath;
+        string_path packagePath;
+
+        FS.update_path(gamedataPath, "$game_data$", "?.script;");
+        xr_sprintf(packagePath, "package.path = package.path .. [[%s]]", gamedataPath);
+
+        luaL_dostring(lua(), packagePath);
+     }
+
     // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
     // is that lua hooks somehow make 'super' global unavailable (is's used all over the vanilla scripts).
     // You can disable script profiler by commenting out the following lines in the beginning of _g.script:
