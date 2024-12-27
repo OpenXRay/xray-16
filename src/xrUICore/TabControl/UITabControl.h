@@ -49,7 +49,7 @@ public:
     void SetActiveTabByIndex(u32 index);
     bool SetNextActiveTab(bool next, bool loop);
 
-    const u32 GetTabsCount() const { return m_TabsArr.size(); }
+    u32 GetTabsCount() const { return m_TabsArr.size(); }
 
     // Режим клавилатурных акселераторов (вкл/выкл)
     IC bool GetAcceleratorsMode() const { return m_bAcceleratorsEnable; }
@@ -73,13 +73,13 @@ protected:
     shared_str m_sPrevPushedId;
 
     // Цвет неактивных элементов
-    u32 m_cGlobalTextColor;
-    u32 m_cGlobalButtonColor;
+    u32 m_cGlobalTextColor{ 0xFFFFFFFF };
+    u32 m_cGlobalButtonColor{ 0xFFFFFFFF };
 
     // Цвет надписи на активном элементе
-    u32 m_cActiveTextColor;
-    u32 m_cActiveButtonColor;
+    u32 m_cActiveTextColor{ 0xFFFFFFFF };
+    u32 m_cActiveButtonColor{ 0xFFFFFFFF };
 
-    bool m_bAcceleratorsEnable;
+    bool m_bAcceleratorsEnable{ true };
     shared_str m_opt_backup_value;
 };

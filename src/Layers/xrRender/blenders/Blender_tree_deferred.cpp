@@ -79,21 +79,21 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     //*************** codepath is the same, only shaders differ
     LPCSTR tvs;
     LPCSTR tvs_s;
-    if (oNotAnTree.value)	
-    { 
+    if (oNotAnTree.value)
+    {
         tvs="tree_s";
         if (oBlend.value)
-            tvs_s="shadow_direct_tree_s_aref"; 
+            tvs_s="shadow_direct_tree_s_aref";
         else
-            tvs_s="shadow_direct_tree_s"; 
+            tvs_s="shadow_direct_tree_s";
     }
     else
     {
         tvs = "tree";
         if (oBlend.value)
-            tvs_s="shadow_direct_tree_aref"; 
+            tvs_s="shadow_direct_tree_aref";
         else
-            tvs_s="shadow_direct_tree"; 
+            tvs_s="shadow_direct_tree";
     }
 
     bool bUseATOC = (oBlend.value && (RImplementation.o.msaa_alphatest==CRender::MSAA_ATEST_DX10_0_ATOC));
@@ -101,6 +101,10 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     switch (C.iElement)
     {
     case SE_R2_NORMAL_HQ:   // deffer
+        // Is a branch/bush. Use a different VS
+        if (RImplementation.o.new_shader_support && oBlend.value)
+            tvs = "tree_branch";
+
         if (bUseATOC)
         {
             uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true);

@@ -30,6 +30,14 @@ function opt_video:InitControls(x, y, xml, handler)
 	xml:InitStatic					("tab_video:cap_resolution",		self)
 	xml:InitComboBox				("tab_video:list_resolution",		self)
 
+	xml:InitStatic					("tab_video:cap_color_grading_preset",			self)
+	handler.combo_color_grading_preset	= xml:InitComboBox("tab_video:list_color_grading_presets",	self)
+	handler:Register				(handler.combo_color_grading_preset,				"combo_color_grading_preset")
+
+	xml:InitStatic					("tab_video:cap_shader_preset",			self)
+	handler.combo_shader_preset		= xml:InitComboBox("tab_video:list_shader_presets",	self)
+	handler:Register				(handler.combo_shader_preset,				"combo_shader_preset")
+
 	xml:InitStatic					("tab_video:cap_preset",			self)
 	handler.combo_preset			= xml:InitComboBox("tab_video:list_presets",	self)
 	handler:Register				(handler.combo_preset,				"combo_preset")
@@ -47,4 +55,7 @@ function opt_video:InitControls(x, y, xml, handler)
         _enable = renderer_allow_override()
     end
 	handler.combo_renderer:Enable(_enable)
+
+    local current_shader_preset = handler.combo_shader_preset:CurrentID()
+    handler.combo_color_grading_preset:Enable(current_shader_preset ~= 0)
 end

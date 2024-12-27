@@ -25,6 +25,8 @@ bool CObjectSpace::RayTest(const Fvector& start, const Fvector& dir, float range
 bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,
     collide::ray_cache* cache, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     VERIFY(_abs(dir.magnitude() - 1) < EPS);
     r_temp.r_clear();
 
@@ -36,7 +38,7 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
         u32 d_flags =
             STYPE_COLLIDEABLE | ((tgt & rqtObstacle) ? STYPE_OBSTACLE : 0) | ((tgt & rqtShape) ? STYPE_SHAPE : 0);
         // traverse object database
-        g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
+        SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
         for (auto spatial : r_spatial)
         {
@@ -107,6 +109,8 @@ bool CObjectSpace::_RayTest(const Fvector& start, const Fvector& dir, float rang
 bool CObjectSpace::RayPick(
     const Fvector& start, const Fvector& dir, float range, rq_target tgt, rq_result& R, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     bool _res = _RayPick(start, dir, range, tgt, R, ignore_object);
     r_spatial.clear();
     return _res;
@@ -132,7 +136,7 @@ bool CObjectSpace::_RayPick(
         // traverse object database
         u32 d_flags =
             STYPE_COLLIDEABLE | ((tgt & rqtObstacle) ? STYPE_OBSTACLE : 0) | ((tgt & rqtShape) ? STYPE_SHAPE : 0);
-        g_SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
+        SpatialSpace->q_ray(r_spatial, 0, d_flags, start, dir, range);
         // Determine visibility for dynamic part of scene
 #ifdef DEBUG
         if (bDebug())
@@ -177,6 +181,8 @@ bool CObjectSpace::_RayPick(
 bool CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& R, collide::rq_callback* CB,
     LPVOID user_data, collide::test_callback* tb, IGameObject* ignore_object)
 {
+    ZoneScoped;
+
     bool _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
     r_spatial.clear();
     return (_res);
@@ -206,7 +212,7 @@ bool CObjectSpace::_RayQuery2(collide::rq_results& r_dest, const collide::ray_de
     if (R.tgt & d_mask)
     {
         // Traverse object database
-        g_SpatialSpace->q_ray(r_spatial, 0, d_flags, R.start, R.dir, R.range);
+        SpatialSpace->q_ray(r_spatial, 0, d_flags, R.start, R.dir, R.range);
         for (auto& p_spatial : r_spatial)
         {
             IGameObject* collidable = p_spatial->dcast_GameObject();
@@ -286,7 +292,7 @@ bool CObjectSpace::_RayQuery3(collide::rq_results& r_dest, const collide::ray_de
         if (R.tgt & d_mask)
         {
             // Traverse object database
-            g_SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
+            SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
             for (auto& p_spatial : r_spatial)
             {
                 IGameObject* collidable = p_spatial->dcast_GameObject();
@@ -392,7 +398,7 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             if (d_rd.range > EPS)
             {
                 // Traverse object database
-                g_SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
+                SpatialSpace->q_ray(r_spatial, 0, d_flags, d_rd.start, d_rd.dir, d_rd.range);
                 // Determine visibility for dynamic part of scene
                 for (auto& p_spatial : r_spatial)
                 {
@@ -481,6 +487,8 @@ bool CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
 
 bool CObjectSpace::RayQuery(collide::rq_results& r_dest, ICollisionForm* target, const collide::ray_defs& R)
 {
+    ZoneScoped;
+
     VERIFY(target);
     r_dest.r_clear();
     return target->_RayQuery(R, r_dest);

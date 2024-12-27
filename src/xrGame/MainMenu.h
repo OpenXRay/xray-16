@@ -26,22 +26,19 @@ class login_manager;
 namespace gamespy_profile
 {
 class profile_store;
-class stats_submitter;
 } // namespace gamespy_profile
-
-class atlas_submit_queue;
 
 struct Patch_Dawnload_Progress
 {
-    bool IsInProgress;
-    float Progress;
-    shared_str Status;
-    shared_str FileName;
+    bool IsInProgress{};
+    float Progress{};
+    shared_str Status{ "" };
+    shared_str FileName{ "" };
 
-    bool GetInProgress() { return IsInProgress; }
-    float GetProgress() { return Progress; }
-    LPCSTR GetStatus() { return Status.c_str(); }
-    LPCSTR GetFlieName() { return FileName.c_str(); }
+    [[nodiscard]] bool  GetInProgress() const { return IsInProgress; }
+    [[nodiscard]] float GetProgress()   const { return Progress; }
+    [[nodiscard]] pcstr GetStatus()     const { return Status.c_str(); }
+    [[nodiscard]] pcstr GetFlieName()   const { return FileName.c_str(); }
 };
 
 class CMainMenu : public IMainMenu,
@@ -72,15 +69,11 @@ class CMainMenu : public IMainMenu,
 
     xr_vector<CUIWindow*> m_pp_draw_wnds;
 
-    CGameSpy_Full* m_pGameSpyFull;
-    gamespy_gp::account_manager* m_account_mngr;
-    gamespy_gp::login_manager* m_login_mngr;
-    gamespy_profile::profile_store* m_profile_store;
+    CGameSpy_Full* m_pGameSpyFull{};
+    gamespy_gp::account_manager* m_account_mngr{};
+    gamespy_gp::login_manager* m_login_mngr{};
+    gamespy_profile::profile_store* m_profile_store{};
 
-#ifdef XR_PLATFORM_WINDOWS
-    gamespy_profile::stats_submitter* m_stats_submitter;
-    atlas_submit_queue* m_atlas_submit_queue;
-#endif
     demo_info_loader* m_demo_info_loader;
 
 public:
@@ -97,9 +90,6 @@ public:
         ErrGSServiceFailed,
         ErrMasterServerConnectFailed,
         NoNewPatch,
-        NewPatchFound,
-        PatchDownloadError,
-        PatchDownloadSuccess,
         ConnectToMasterServer,
         SessionTerminate,
         LoadingError,
@@ -115,17 +105,12 @@ public:
     gamespy_gp::login_manager* GetLoginMngr() { return m_login_mngr; }
     gamespy_profile::profile_store* GetProfileStore() { return m_profile_store; }
 
-#ifdef XR_PLATFORM_WINDOWS
-    CGameSpy_Full* GetGS() { return m_pGameSpyFull; };
-    gamespy_profile::stats_submitter* GetStatsSubmitter() { return m_stats_submitter; };
-    atlas_submit_queue* GetSubmitQueue() { return m_atlas_submit_queue; };
-#endif
+    CGameSpy_Full* GetGS() const { return m_pGameSpyFull; }
+
 protected:
     EErrorDlg m_NeedErrDialog;
     u32 m_start_time;
 
-    shared_str m_sPatchURL;
-    shared_str m_sPatchFileName;
     shared_str m_downloaded_mp_map_url;
     shared_str m_player_name;
     shared_str m_cdkey;
@@ -146,10 +131,13 @@ public:
 
     bool IgnorePause() override { return true; }
 
+    void IR_OnActivate() override;
+    void IR_OnDeactivate() override;
+
     void IR_OnMousePress(int btn) override;
     void IR_OnMouseRelease(int btn) override;
     void IR_OnMouseHold(int btn) override;
-    void IR_OnMouseWheel(int x, int y) override;
+    void IR_OnMouseWheel(float x, float y) override;
     void IR_OnMouseMove(int x, int y) override;
 
     void IR_OnKeyboardPress(int dik) override;
@@ -185,9 +173,7 @@ public:
 
     void SwitchToMultiplayerMenu();
 
-    void OnPatchCheck(bool success, LPCSTR VersionName, LPCSTR URL);
-    void OnDownloadPatch(CUIWindow*, void*);
-    void OnConnectToMasterServerOkClicked(CUIWindow*, void*);
+    void OnPatchCheck(bool success);
 
     void Show_DownloadMPMap(LPCSTR text, LPCSTR url);
     void OnDownloadMPMap_CopyURL(CUIWindow*, void*);
@@ -195,10 +181,6 @@ public:
 
     void OnSessionTerminate(LPCSTR reason);
     void OnLoadError(LPCSTR module);
-
-    void OnDownloadPatchResult(bool success);
-    void OnDownloadPatchProgress(u64 received, u64 total);
-    void OnRunDownloadedPatch(CUIWindow*, void*);
 
     void Show_CTMS_Dialog();
     void Hide_CTMS_Dialog();

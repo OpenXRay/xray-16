@@ -59,7 +59,7 @@ void CUIProgressBar::UpdateProgressBar()
 
     if (m_bUseColor)
     {
-        if ( m_bUseGradient )
+        if (m_bUseGradient)
         {
             Fcolor curr;
             if (m_bUseMiddleColor)
@@ -73,9 +73,9 @@ void CUIProgressBar::UpdateProgressBar()
     }
 }
 
-void CUIProgressBar::SetProgressPos(float _Pos)
+void CUIProgressBar::SetProgressPos(float pos)
 {
-    m_ProgressPos.y = _Pos;
+    m_ProgressPos.y = pos;
     clamp(m_ProgressPos.y, m_MinPos, m_MaxPos);
     UpdateProgressBar();
 }
@@ -98,7 +98,7 @@ void CUIProgressBar::Update()
         float _diff = m_ProgressPos.y - m_ProgressPos.x;
 
         float _length = (m_MaxPos - m_MinPos);
-        float _val = _length * (1.0f - m_inertion) * Device.fTimeDelta;
+        float _val = _length * (1.0f - m_inertion) * Device.fTimeDelta / Device.time_factor();
 
         _val = _min(_abs(_val), _abs(_diff));
         _val *= _sign(_diff);

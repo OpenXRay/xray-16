@@ -43,7 +43,7 @@ extern float g_fTimeFactor;
 
 #define CURRENT_ENTITY() (game ? ((GameID() == eGameIDSingle) ? CurrentEntity() : CurrentControlEntity()) : NULL)
 
-void CLevel::IR_OnMouseWheel(int x, int y)
+void CLevel::IR_OnMouseWheel(float x, float y)
 {
     if (g_bDisableAllInput)
         return;
@@ -111,8 +111,10 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 extern bool g_block_pause;
 
 // Lain: added TEMP!!!
+#ifdef DEBUG
 extern float g_separate_factor;
 extern float g_separate_radius;
+#endif
 
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
@@ -213,6 +215,13 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     if (game && game->OnKeyboardPress(GetBindedAction(key)))
         return;
+
+    luabind::functor<bool> funct;
+    if (GEnv.ScriptEngine->functor("level_input.on_key_press", funct))
+    {
+        if (funct(key, _curr))
+            return;
+    }
 
     if (_curr == kQUICK_SAVE && IsGameTypeSingle())
     {
@@ -385,7 +394,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     // Lain: added
     case SDL_SCANCODE_F5:
     {
-        if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
+        if (smart_cast<CBaseMonster*>(CurrentEntity()))
         {
             DBG().log_debug_info();
         }
@@ -483,7 +492,7 @@ void CLevel::IR_OnKeyboardHold(int key)
         static u32 time = Device.dwTimeGlobal;
         if (Device.dwTimeGlobal - time > 20)
         {
-            if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
+            if (smart_cast<CBaseMonster*>(CurrentEntity()))
             {
                 DBG().debug_info_up();
                 time = Device.dwTimeGlobal;
@@ -495,7 +504,7 @@ void CLevel::IR_OnKeyboardHold(int key)
         static u32 time = Device.dwTimeGlobal;
         if (Device.dwTimeGlobal - time > 20)
         {
-            if (CBaseMonster* pBM = smart_cast<CBaseMonster*>(CurrentEntity()))
+            if (smart_cast<CBaseMonster*>(CurrentEntity()))
             {
                 DBG().debug_info_down();
                 time = Device.dwTimeGlobal;
@@ -677,6 +686,9 @@ void CLevel::IR_OnControllerAttitudeChange(Fvector change)
 
 void CLevel::IR_OnActivate()
 {
+    if (CUIGameCustom* ui = CurrentGameUI())
+        ui->MarkForemost(true);
+
     if (!pInput)
         return;
 
@@ -705,4 +717,10 @@ void CLevel::IR_OnActivate()
             };
         };
     }
+}
+
+void CLevel::IR_OnDeactivate()
+{
+    if (CUIGameCustom* ui = CurrentGameUI())
+        ui->MarkForemost(false);
 }

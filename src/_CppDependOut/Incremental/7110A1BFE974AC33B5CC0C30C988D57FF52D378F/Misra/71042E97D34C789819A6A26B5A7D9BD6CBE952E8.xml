@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\editors\xrweathereditor\property_holder.cpp"><violation beginline="46" endline="46" rule="Rule6-6-5" ruleset="Statements">
-</violation></file><file path="c:\openxray\src\include\editor\property_holder_base.hpp"><violation beginline="49" endline="49" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="46" endline="46" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

@@ -5,31 +5,6 @@
 
 #define STENCIL_CULL 0
 
-void CRenderTarget::DoAsyncScreenshot()
-{
-    //	Igor: screenshot will not have postprocess applied.
-    //	TODO: fix that later
-    if (RImplementation.m_bMakeAsyncSS)
-    {
-        //	HACK: unbind RT. CopyResourcess needs src and targetr to be unbound.
-        // u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),nullptr,nullptr,get_base_zb());
-
-        // ID3DTexture2D *pTex = 0;
-        // if (RImplementation.o.msaa)
-        //	pTex = rt_Generic->pSurface;
-        // else
-        //	pTex = rt_Color->pSurface;
-
-
-        //HW.pDevice->CopyResource( t_ss_async, pTex );
-        glBindTexture(GL_TEXTURE_2D, t_ss_async);
-        CHK_GL(glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, Device.dwWidth, Device.dwHeight, 0));
-
-
-        RImplementation.m_bMakeAsyncSS = false;
-    }
-}
-
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
 void CRenderTarget::phase_combine()
@@ -296,7 +271,7 @@ void CRenderTarget::phase_combine()
 
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
-    BOOL PP_Complex = u_need_PP() || (BOOL)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP();
     if (_menu_pp)
         PP_Complex = FALSE;
 
@@ -456,7 +431,7 @@ void CRenderTarget::phase_combine()
 		Fplane&		P	=	dbg_planes[it];
 		Fvector		zero	;
 		zero.mul	(P.n,P.d);
-		
+
 		Fvector             L_dir,L_up=P.n,L_right;
 		L_dir.set           (0,0,1);                if (_abs(L_up.dotproduct(L_dir))>.99f)  L_dir.set(1,0,0);
 		L_right.crossproduct(L_up,L_dir);           L_right.normalize       ();
@@ -493,7 +468,7 @@ void CRenderTarget::phase_combine()
         if (0) for (u32 it=0; it<dbg_spheres.size(); it++)
         {
             Fsphere				S	= dbg_spheres[it].first;
-            Fmatrix				M;	
+            Fmatrix				M;
             u32				ccc		= dbg_spheres[it].second.get();
             M.scale					(S.R,S.R,S.R);
             M.translate_over		(S.P);
@@ -502,7 +477,7 @@ void CRenderTarget::phase_combine()
         }
 #endif
         // Draw quater-screen quad textured with our direct-shadow-map-image
-        if (1) 
+        if (1)
         {
             u32							IX=0,IY=1;
             p0.set						(.5f/_w, .5f/_h);

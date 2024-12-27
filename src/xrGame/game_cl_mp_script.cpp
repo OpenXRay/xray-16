@@ -121,7 +121,7 @@ void game_cl_mp_script_script_register(lua_State* luaState)
             .def("StartMenu", &BaseType::StartStopMenu)
             .def("StopMenu", &BaseType::StartStopMenu)
             .def("GetRoundTime", &BaseType::GetRoundTime)
-            
+
             .def("CanBeReady", &BaseType::CanBeReady, &WrapType::CanBeReady_static)
             .def("Init", &BaseType::Init, &WrapType::Init_static)
             .def("OnKeyboardPress", &BaseType::OnKeyboardPress, &WrapType::OnKeyboardPress_static)
@@ -130,7 +130,7 @@ void game_cl_mp_script_script_register(lua_State* luaState)
             .def("shedule_Update", &BaseType::shedule_Update, &WrapType::shedule_Update_static)
             .def("FillMapEntities", &BaseType::GetMapEntities, &WrapType::GetMapEntities_static)
             .def("TranslateGameMessage", &BaseType::TranslateGameMessage, &WrapType::TranslateGameMessage_static)
-            
+
             .def("createPlayerState", &BaseType::createPlayerState, &WrapType::createPlayerState_static, adopt<0>())
             .def("createGameUI", &BaseType::createGameUI, &WrapType::createGameUI_static, adopt<0>())
     ];

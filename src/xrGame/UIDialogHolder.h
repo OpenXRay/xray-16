@@ -4,6 +4,7 @@
 #include "xrCore/_flags.h"
 #include "xrEngine/pure.h"
 #include "xrUICore/ui_debug.h"
+#include "xrUICore/ui_focus.h"
 
 #include <SDL.h>
 
@@ -32,13 +33,15 @@ public:
     Flags8 m_flags;
 };
 
-class CDialogHolder : public pureFrame, public CUIDebuggable
+class CDialogHolder : public pureFrame, public CUIDebuggable, public CUIFocusSystem
 {
     // dialogs
     xr_vector<recvItem> m_input_receivers;
     xr_vector<dlgItem> m_dialogsToRender;
     xr_vector<dlgItem> m_dialogsToRender_new;
+    u32 m_become_visible_time{};
     bool m_b_in_update;
+    bool m_is_foremost{};
 
     void StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators);
     void StopMenu(CUIDialogWnd* pDialog);
@@ -46,6 +49,7 @@ class CDialogHolder : public pureFrame, public CUIDebuggable
 protected:
     void DoRenderDialogs();
     void CleanInternals();
+    void UpdateCursorVisibility();
 
 public:
     CDialogHolder();
@@ -65,7 +69,7 @@ public:
     virtual bool IgnorePause() { return false; }
 
     virtual bool IR_UIOnMouseMove(int dx, int dy);
-    virtual bool IR_UIOnMouseWheel(int x, int y);
+    virtual bool IR_UIOnMouseWheel(float x, float y);
 
     virtual bool IR_UIOnKeyboardPress(int dik);
     virtual bool IR_UIOnKeyboardRelease(int dik);
@@ -75,6 +79,8 @@ public:
     virtual bool IR_UIOnControllerPress(int dik, float x, float y);
     virtual bool IR_UIOnControllerRelease(int dik, float x, float y);
     virtual bool IR_UIOnControllerHold(int dik, float x, float y);
+
+    void MarkForemost(bool foremost) { m_is_foremost = foremost; }
 
     pcstr GetDebugType() override { return "CDialogHolder"; }
     bool FillDebugTree(const CUIDebugState& debugState) override;

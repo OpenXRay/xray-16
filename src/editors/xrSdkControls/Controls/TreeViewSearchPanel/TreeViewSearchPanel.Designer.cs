@@ -2,12 +2,12 @@ namespace XRay.SdkControls
 {
     partial class TreeViewSearchPanel
     {
-        /// <summary> 
+        /// <summary>
         /// Обязательная переменная конструктора.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Освободить все используемые ресурсы.
         /// </summary>
         /// <param name="disposing">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
@@ -22,8 +22,8 @@ namespace XRay.SdkControls
 
         #region Код, автоматически созданный конструктором компонентов
 
-        /// <summary> 
-        /// Требуемый метод для поддержки конструктора — не изменяйте 
+        /// <summary>
+        /// Требуемый метод для поддержки конструктора — не изменяйте
         /// содержимое этого метода с помощью редактора кода.
         /// </summary>
         private void InitializeComponent()
@@ -36,28 +36,28 @@ namespace XRay.SdkControls
             this.searchNext = new System.Windows.Forms.Button();
             this.searchClose = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
+            //
             // searchLabel
-            // 
+            //
             this.searchLabel.AutoSize = true;
             this.searchLabel.Location = new System.Drawing.Point(3, 6);
             this.searchLabel.Name = "searchLabel";
             this.searchLabel.Size = new System.Drawing.Size(44, 13);
             this.searchLabel.TabIndex = 0;
             this.searchLabel.Text = "Search:";
-            // 
+            //
             // searchBox
-            // 
-            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.searchBox.Location = new System.Drawing.Point(46, 3);
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(128, 20);
             this.searchBox.TabIndex = 1;
             this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
-            // 
+            //
             // searchButton
-            // 
+            //
             this.searchButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.searchButton.Location = new System.Drawing.Point(174, 2);
             this.searchButton.Name = "searchButton";
@@ -66,9 +66,9 @@ namespace XRay.SdkControls
             this.searchButton.Text = "Search";
             this.searchButton.UseVisualStyleBackColor = true;
             this.searchButton.Click += new System.EventHandler(this.searchButton_Click);
-            // 
+            //
             // resultLabel
-            // 
+            //
             this.resultLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.resultLabel.AutoSize = true;
             this.resultLabel.Location = new System.Drawing.Point(3, 31);
@@ -76,9 +76,9 @@ namespace XRay.SdkControls
             this.resultLabel.Size = new System.Drawing.Size(65, 13);
             this.resultLabel.TabIndex = 3;
             this.resultLabel.Text = "Results: - / -";
-            // 
+            //
             // searchPrev
-            // 
+            //
             this.searchPrev.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.searchPrev.Location = new System.Drawing.Point(98, 26);
             this.searchPrev.Name = "searchPrev";
@@ -87,9 +87,9 @@ namespace XRay.SdkControls
             this.searchPrev.Text = "Prev";
             this.searchPrev.UseVisualStyleBackColor = true;
             this.searchPrev.Click += new System.EventHandler(this.searchPrev_Click);
-            // 
+            //
             // searchNext
-            // 
+            //
             this.searchNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.searchNext.Location = new System.Drawing.Point(136, 26);
             this.searchNext.Name = "searchNext";
@@ -98,9 +98,9 @@ namespace XRay.SdkControls
             this.searchNext.Text = "Next";
             this.searchNext.UseVisualStyleBackColor = true;
             this.searchNext.Click += new System.EventHandler(this.searchNext_Click);
-            // 
+            //
             // searchClose
-            // 
+            //
             this.searchClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.searchClose.Location = new System.Drawing.Point(174, 26);
             this.searchClose.Name = "searchClose";
@@ -109,9 +109,9 @@ namespace XRay.SdkControls
             this.searchClose.Text = "Close";
             this.searchClose.UseVisualStyleBackColor = true;
             this.searchClose.Click += new System.EventHandler(this.searchClose_Click);
-            // 
+            //
             // TreeViewSearchPanel
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.searchClose);

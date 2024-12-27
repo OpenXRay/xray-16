@@ -13,6 +13,8 @@ void InitHudSoundSettings()
 
 void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_snd, int type)
 {
+    ZoneScoped;
+
     hud_snd.m_activeSnd = nullptr;
     hud_snd.sounds.clear();
 
@@ -31,6 +33,8 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_
 
 void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int type, float* volume, float* delay)
 {
+    ZoneScoped;
+
     LPCSTR str = pSettings->r_string(section, line);
     string256 buf_str;
 
@@ -65,6 +69,8 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int 
 
 void HUD_SOUND_ITEM::DestroySound(HUD_SOUND_ITEM& hud_snd)
 {
+    ZoneScoped;
+
     for (auto& sound : hud_snd.sounds)
         sound.snd.destroy();
 
@@ -93,9 +99,17 @@ void HUD_SOUND_ITEM::PlaySound(
 
     hud_snd.m_activeSnd = &hud_snd.sounds[index];
 
-    hud_snd.m_activeSnd->snd.play_at_pos(const_cast<IGameObject*>(parent),
-        flags & sm_2D ? Fvector().set(0, 0, 0) : position, flags, hud_snd.m_activeSnd->delay);
-
+    if (hud_snd.m_b_exclusive)
+    {
+        hud_snd.m_activeSnd->snd.play_at_pos(const_cast<IGameObject*>(parent),
+            flags & sm_2D ? Fvector().set(0, 0, 0) : position, flags, hud_snd.m_activeSnd->delay);
+    }
+    else
+    {
+        Fvector pos = flags & sm_2D ? Fvector{} : position;
+        hud_snd.m_activeSnd->snd.play_no_feedback(const_cast<IGameObject*>(parent),
+                flags, hud_snd.m_activeSnd->delay, &pos, nullptr, nullptr, nullptr);
+    }
     hud_snd.m_activeSnd->snd.set_volume(hud_snd.m_activeSnd->volume * (b_hud_mode ? psHUDSoundVolume : 1.0f));
 }
 
@@ -110,6 +124,8 @@ void HUD_SOUND_ITEM::StopSound(HUD_SOUND_ITEM& hud_snd)
 //----------------------------------------------------------
 HUD_SOUND_COLLECTION::~HUD_SOUND_COLLECTION()
 {
+    ZoneScoped;
+
     for (auto& sound_item : m_sound_items)
     {
         HUD_SOUND_ITEM::StopSound(sound_item);
@@ -137,8 +153,8 @@ void HUD_SOUND_COLLECTION::PlaySound(
         if (sound_item.m_b_exclusive)
             HUD_SOUND_ITEM::StopSound(sound_item);
 
-    HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, true);
-    HUD_SOUND_ITEM::PlaySound(*snd_item, position, parent, hud_mode, looped, index);
+    if (const auto snd_item = FindSoundItem(alias, false))
+        HUD_SOUND_ITEM::PlaySound(*snd_item, position, parent, hud_mode, looped, index);
 }
 
 void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
@@ -149,8 +165,8 @@ void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
 
 void HUD_SOUND_COLLECTION::SetPosition(LPCSTR alias, const Fvector& pos)
 {
-    HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, true);
-    if (snd_item->playing())
+    HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, false);
+    if (snd_item && snd_item->playing())
         snd_item->set_position(pos);
 }
 
@@ -162,6 +178,8 @@ void HUD_SOUND_COLLECTION::StopAllSounds()
 
 void HUD_SOUND_COLLECTION::LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive, int type)
 {
+    ZoneScoped;
+
     R_ASSERT(NULL == FindSoundItem(alias, false));
     m_sound_items.resize(m_sound_items.size() + 1);
     HUD_SOUND_ITEM& snd_item = m_sound_items.back();
@@ -216,11 +234,13 @@ HUD_SOUND_ITEM* HUD_SOUND_COLLECTION_LAYERED::FindSoundItem(pcstr alias, bool b_
 
 void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr alias, bool exclusive, int type)
 {
+    ZoneScoped;
+
+    if (!pSettings->line_exist(section, line))
+        return;
+
     pcstr str = pSettings->r_string(section, line);
     string256 buf_str;
-
-    int count = _GetItemCount(str);
-    R_ASSERT(count);
 
     _GetItem(str, 0, buf_str);
 
@@ -249,11 +269,13 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr al
 
 void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, pcstr section, pcstr line, pcstr alias, bool exclusive, int type)
 {
+    ZoneScoped;
+
+    if (!pSettings->line_exist(section, line))
+        return;
+
     pcstr str = ini->r_string(section, line);
     string256 buf_str;
-
-    int count = _GetItemCount(str);
-    R_ASSERT(count);
 
     _GetItem(str, 0, buf_str);
 

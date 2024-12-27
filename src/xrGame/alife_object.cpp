@@ -32,14 +32,15 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
     // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specified it will spawn that type
     // count is used only for ammo boxes (ie wpn_pm = 3) will spawn 3 boxes, not 3 wpn_pm
     // Usage: to create random weapon loadouts
-    if (ini.section_exist("spawn_loadout"))
+    static constexpr cpcstr LOADOUT_SECTION = "spawn_loadout";
+    if (ini.section_exist(LOADOUT_SECTION))
     {
         pcstr itmSection, V;
         xr_vector<u32> OnlyOne;
 
-        pcstr lname = *ai().game_graph().header().level(ai().game_graph().vertex(m_tGraphID)->level_id()).name();
+        pcstr lname = ai().game_graph().header().level(ai().game_graph().vertex(m_tGraphID)->level_id()).name().c_str();
 
-        for (u32 k = 0; ini.r_line("spawn_loadout", k, &itmSection, &V); k++)
+        for (u32 k = 0; ini.r_line(LOADOUT_SECTION, k, &itmSection, &V); k++)
         {
             // If level=<lname> then only spawn items if object on that level
             if (strstr(V, "level=") != nullptr)
@@ -56,7 +57,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         if (!OnlyOne.empty())
         {
             s32 sel = Random.randI(0, OnlyOne.size());
-            if (ini.r_line("spawn_loadout", OnlyOne.at(sel), &itmSection, &V))
+            if (ini.r_line(LOADOUT_SECTION, OnlyOne.at(sel), &itmSection, &V))
             {
                 VERIFY(xr_strlen(itmSection));
                 if (pSettings->section_exist(itmSection))
@@ -116,8 +117,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                                     alife().spawn_item(ammoSec, o_Position, m_tNodeID, m_tGraphID, ID);
                         }
                     }
-                    CSE_ALifeInventoryItem* IItem = smart_cast<CSE_ALifeInventoryItem*>(E);
-                    if (IItem)
+                    if (const auto IItem = smart_cast<CSE_ALifeInventoryItem*>(E))
                         IItem->m_fCondition = f_cond;
                 }
             }

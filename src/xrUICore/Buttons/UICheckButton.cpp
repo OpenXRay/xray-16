@@ -10,10 +10,10 @@
 CUICheckButton::CUICheckButton()
 {
     TextItemControl()->SetTextAlignment(CGameFont::alLeft);
+    SetButtonAsSwitch(true);
     m_pDependControl = NULL;
 }
 
-CUICheckButton::~CUICheckButton() {}
 void CUICheckButton::SetDependControl(CUIWindow* pWnd) { m_pDependControl = pWnd; }
 void CUICheckButton::Update()
 {
@@ -61,16 +61,6 @@ void CUICheckButton::InitTexture2(LPCSTR texture_name)
     TextItemControl()->m_TextOffset.x = TextItemControl()->m_TextOffset.x + r.width();
 }
 
-void CUICheckButton::OnFocusLost()
-{
-    if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncKeyState(MOUSE_1))
-        return;
-
-    inherited::OnFocusLost();
-}
-
-void CUICheckButton::OnFocusReceive() { inherited::OnFocusReceive(); }
-void CUICheckButton::Show(bool status) { inherited::Show(status); }
 bool CUICheckButton::OnMouseDown(int mouse_btn)
 {
     if (mouse_btn == MOUSE_1)

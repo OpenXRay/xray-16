@@ -9,8 +9,7 @@ template <class T> struct _rect;
 using Irect = _rect<int>;
 template <class T> struct _vector2;
 using Fvector2 = _vector2<float>;
-template <class T> struct _matrix;
-using Fmatrix = _matrix<float>;
+struct Fmatrix;
 
 class IUIRender
 {

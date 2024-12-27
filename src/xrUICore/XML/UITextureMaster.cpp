@@ -192,7 +192,7 @@ bool CUITextureMaster::GetTextureWidth(const shared_str& texture_name, float& ou
 TEX_INFO CUITextureMaster::FindItem(const shared_str& texture_name, pcstr default_texture /*= nullptr*/)
 {
     TEX_INFO info;
-    
+
     VERIFY4(FindItem(texture_name, default_texture, info),
         "Can't find texture", texture_name.c_str(), default_texture);
 

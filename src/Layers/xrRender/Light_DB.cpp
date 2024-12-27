@@ -195,7 +195,7 @@ void CLight_DB::Update()
         VERIFY2(E.sun_dir.y < 0, "Invalid sun direction settings in evironment-config");
         Fvector dir, pos;
 
-        if (!GEnv.Render->is_sun_static() && !ShadowOfChernobylMode)
+        if (!RImplementation.is_sun_static() && !ShadowOfChernobylMode)
         {
             // true sunlight direction
             dir.set(E.sun_dir).normalize();

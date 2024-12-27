@@ -42,21 +42,15 @@ net_updateInvData* CInventoryItem::NetSync()
 
 CInventoryItem::CInventoryItem()
 {
-    m_net_updateData = NULL;
     m_flags.set(Fbelt, FALSE);
     m_flags.set(Fruck, TRUE);
     m_flags.set(FRuckDefault, TRUE);
-    m_pInventory = NULL;
 
     SetDropManual(FALSE);
 
     m_flags.set(FCanTake, TRUE);
-    m_can_trade = TRUE;
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FUsingCondition, FALSE);
-    m_fCondition = 1.0f;
-
-    m_name = m_nameShort = NULL;
 
     m_ItemCurrPlace.value = 0;
     m_ItemCurrPlace.type = eItemPlaceUndefined;
@@ -64,7 +58,6 @@ CInventoryItem::CInventoryItem()
     m_ItemCurrPlace.slot_id = NO_ACTIVE_SLOT;
 
     m_Description = "";
-    m_section_id = 0;
     m_flags.set(FIsHelperItem, FALSE);
 }
 
@@ -104,8 +97,11 @@ void CInventoryItem::Load(LPCSTR section)
     R_ASSERT(m_weight >= 0.f);
 
     m_cost = pSettings->r_u32(section, "cost");
-    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT);
-    m_ItemCurrPlace.base_slot_id = (sl == u32(-1)) ? 0 : (sl + 1);
+
+    // Assets follow initial SOC system, where slots start from -1
+    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT - 1);
+    // Engine is following new system since COP: slots start from 0
+    m_ItemCurrPlace.base_slot_id = sl + 1;
 
     // Description
     if (pSettings->line_exist(section, DESCRIPTION_KEY))
@@ -121,6 +117,8 @@ void CInventoryItem::Load(LPCSTR section)
 
     // Added by Axel, to enable optional condition use on any item
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", false));
+
+    m_highlight_equipped = READ_IF_EXISTS(pSettings, r_bool, section, "highlight_equipped", false);
 
     if (BaseSlot() != NO_ACTIVE_SLOT || Belt())
     {
@@ -336,11 +334,6 @@ bool CInventoryItem::net_Spawn(CSE_Abstract* DC)
 
     //!!!
     m_fCondition = pSE_InventoryItem->m_fCondition;
-
-    if (IsGameTypeSingle())
-    {
-        net_Spawn_install_upgrades(pSE_InventoryItem->m_upgrades);
-    }
 
     if (GameID() != eGameIDSingle)
         object().processing_activate();

@@ -3,6 +3,8 @@
 // TODO: Get rid of D3D types.
 #if defined(XR_PLATFORM_WINDOWS)
 #include <d3d9types.h>
+#else
+#include "Common/d3d9compat.hpp"
 #endif
 
 class glState;

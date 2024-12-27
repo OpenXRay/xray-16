@@ -54,6 +54,7 @@ void CStalkerAnimationManager::reinit()
     m_script.global_animation(true);
 
     m_call_script_callback = false;
+    m_call_global_callback = false;
 
     m_previous_speed = 0.f;
     m_target_speed = 0.f;

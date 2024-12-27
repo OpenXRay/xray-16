@@ -18,7 +18,6 @@
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/ScrollBar/UIFixedScrollBar.h"
 #include "xrUICore/Hint/UIHint.h"
-#include "UITaskWnd.h"
 #include "GameTaskDefs.h"
 #include "GameTask.h"
 #include "map_location.h"
@@ -27,19 +26,15 @@
 #include "GametaskManager.h"
 #include "Actor.h"
 
-UITaskListWnd::UITaskListWnd()
-    : CUIWindow("UITaskListWnd"),
-      hint_wnd(nullptr), m_background(nullptr), m_list(nullptr),
-      m_caption(nullptr), m_bt_close(nullptr), m_orig_h(0) {}
+UITaskListWnd::UITaskListWnd() : CUIWindow("UITaskListWnd") {}
 
-UITaskListWnd::~UITaskListWnd() {}
 void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     VERIFY(hint_wnd);
     CUIXmlInit::InitWindow(xml, path, 0, this);
 
-    XML_NODE stored_root = xml.GetLocalRoot();
-    XML_NODE tmpl_root = xml.NavigateToNode(path, 0);
+    const XML_NODE stored_root = xml.GetLocalRoot();
+    const XML_NODE tmpl_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(tmpl_root);
 
     m_background = UIHelper::CreateFrameWindow(xml, "background_frame", this);
@@ -57,7 +52,13 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
     m_orig_h = GetHeight();
 
     m_list->SetWindowName("---second_task_list");
-    m_list->m_sort_function = fastdelegate::MakeDelegate(this, &UITaskListWnd::SortingLessFunction);
+    m_list->m_sort_function = +[](CUIWindow* left, CUIWindow* right) -> bool
+    {
+        const auto* lpi = smart_cast<UITaskListWndItem*>(left);
+        const auto* rpi = smart_cast<UITaskListWndItem*>(right);
+        VERIFY(lpi && rpi);
+        return lpi->get_priority_task() > rpi->get_priority_task();
+    };
 
     xml.SetLocalRoot(stored_root);
 }
@@ -92,7 +93,7 @@ bool UITaskListWnd::OnControllerAction(int axis, float x, float y, EUIMessages c
 void UITaskListWnd::Show(bool status)
 {
     inherited::Show(status);
-    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, NULL);
+    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, nullptr);
     if (status)
         UpdateList();
 }
@@ -100,13 +101,13 @@ void UITaskListWnd::Show(bool status)
 void UITaskListWnd::OnFocusReceive()
 {
     inherited::OnFocusReceive();
-    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, NULL);
+    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, nullptr);
 }
 
 void UITaskListWnd::OnFocusLost()
 {
     inherited::OnFocusLost();
-    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, NULL);
+    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, nullptr);
 }
 
 void UITaskListWnd::Update()
@@ -124,45 +125,36 @@ void UITaskListWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void UITaskListWnd::OnBtnClose(CUIWindow* w, void* d)
 {
-    CUITaskWnd* wnd = smart_cast<CUITaskWnd*>(GetParent()->GetParent());
-    if (wnd)
-        wnd->Show_TaskListWnd(false);
-    //	Show( false );
+    Show(false);
     m_bt_close->SetButtonState(CUIButton::BUTTON_NORMAL);
 }
 
 void UITaskListWnd::UpdateList()
 {
-    int prev_scroll_pos = m_list->GetCurrentScrollPos();
+    const int prev_scroll_pos = m_list->GetCurrentScrollPos();
 
     m_list->Clear();
 
     u32 count_for_check = 0;
-    vGameTasks& tasks = Level().GameTaskManager().GetGameTasks();
-    vGameTasks::iterator itb = tasks.begin();
-    vGameTasks::iterator ite = tasks.end();
-    for (; itb != ite; ++itb)
+    const vGameTasks& tasks = Level().GameTaskManager().GetGameTasks();
+
+    for (const auto& key : tasks)
     {
-        CGameTask* task = (*itb).game_task;
-        if (task && task->GetTaskState() == eTaskStateInProgress)
+        CGameTask* task = key.game_task;
+
+        if (!task || task->GetTaskState() != eTaskStateInProgress)
+            continue;
+        if (m_show_only_secondary_tasks && task->GetTaskType() == eTaskTypeStoryline)
+            continue;
+
+        auto* item = xr_new<UITaskListWndItem>();
+        if (item->init_task(task, this))
         {
-            UITaskListWndItem* item = xr_new<UITaskListWndItem>();
-            if (item->init_task(task, this))
-            {
-                m_list->AddWindow(item, true);
-                ++count_for_check;
-            }
+            m_list->AddWindow(item, true);
+            ++count_for_check;
         }
     } // for
     m_list->SetScrollPos(prev_scroll_pos);
-}
-
-bool UITaskListWnd::SortingLessFunction(CUIWindow* left, CUIWindow* right)
-{
-    UITaskListWndItem* lpi = smart_cast<UITaskListWndItem*>(left);
-    UITaskListWndItem* rpi = smart_cast<UITaskListWndItem*>(right);
-    VERIFY(lpi && rpi);
-    return (lpi->get_priority_task() > rpi->get_priority_task());
 }
 
 /*
@@ -179,12 +171,7 @@ void UITaskListWnd::UpdateCounter()
 */
 // - -----------------------------------------------------------------------------------------------
 
-UITaskListWndItem::UITaskListWndItem()
-    : CUIWindow("UITaskListWndItem"),
-      show_hint_can(false), show_hint(false),
-      m_task(nullptr), m_name(nullptr),
-      m_bt_view(nullptr), m_st_story(nullptr),
-      m_bt_focus(nullptr)
+UITaskListWndItem::UITaskListWndItem() : CUIWindow("UITaskListWndItem")
 {
      m_color_states[0] = u32(-1);
      m_color_states[1] = u32(-1);
@@ -217,9 +204,9 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     m_st_story = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:st_story", this, false);
     m_bt_focus = UIHelper::Create3tButton(xml, "second_task_wnd:task_item:btn_focus", this);
 
-    m_color_states[stt_activ] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:activ", 0, (u32)(-1));
-    m_color_states[stt_unread] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:unread", 0, (u32)(-1));
-    m_color_states[stt_read] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:read", 0, (u32)(-1));
+    m_color_states[stt_activ] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:activ", 0, u32(-1));
+    m_color_states[stt_unread] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:unread", 0, u32(-1));
+    m_color_states[stt_read] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:read", 0, u32(-1));
     update_view();
     return true;
 }
@@ -228,7 +215,7 @@ void UITaskListWndItem::hide_hint()
 {
     show_hint_can = false;
     show_hint = false;
-    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, NULL);
+    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, nullptr);
 }
 
 void UITaskListWndItem::Update()
@@ -238,7 +225,7 @@ void UITaskListWndItem::Update()
 
     if (m_task && m_name->CursorOverWindow() && show_hint_can)
     {
-        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700))
+        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700 * Device.time_factor()))
         {
             show_hint = true;
             GetMessageTarget()->SendMessage(this, PDA_TASK_SHOW_HINT, (void*)m_task);
@@ -283,7 +270,7 @@ void UITaskListWndItem::update_view()
 
     const CGameTask* storyTask = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
     const CGameTask* additionalTask = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
-    
+
     if (m_task == storyTask || m_task == additionalTask)
     {
         m_name->SetStateTextColor(m_color_states[stt_activ], S_Enabled);
@@ -307,7 +294,7 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             GetMessageTarget()->SendMessage(this, PDA_TASK_SET_TARGET_MAP, (void*)m_task);
         }
     }
-    if (pWnd == m_bt_view)
+    if (pWnd == m_bt_view && m_bt_view)
     {
         if (m_bt_view->GetCheck() && msg == BUTTON_CLICKED)
         {
@@ -320,7 +307,7 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             return;
         }
     }
-    
+
     if (pWnd == m_name)
     {
         if (msg == BUTTON_DOWN)

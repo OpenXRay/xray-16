@@ -39,13 +39,7 @@
     <ClCompile Include="GameSpy_HTTP.cpp">
       <Filter>Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="GameSpy_Patching.cpp">
-      <Filter>Wrapper</Filter>
-    </ClCompile>
     <ClCompile Include="GameSpy_QR2.cpp">
-      <Filter>Wrapper</Filter>
-    </ClCompile>
-    <ClCompile Include="GameSpy_SAKE.cpp">
       <Filter>Wrapper</Filter>
     </ClCompile>
     <ClCompile Include="GameSpy_BrowsersWrapper.cpp">
@@ -89,13 +83,7 @@
     <ClInclude Include="GameSpy_Keys.h">
       <Filter>Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="GameSpy_Patching.h">
-      <Filter>Wrapper</Filter>
-    </ClInclude>
     <ClInclude Include="GameSpy_QR2.h">
-      <Filter>Wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSpy_SAKE.h">
       <Filter>Wrapper</Filter>
     </ClInclude>
     <ClInclude Include="GameSpy_BrowsersWrapper.h">
@@ -104,8 +92,5 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

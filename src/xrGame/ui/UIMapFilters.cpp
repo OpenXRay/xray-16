@@ -154,7 +154,6 @@ void CUIMapFilters::SelectFilter(bool select, bool next /*= true*/)
                 m_selected_filter = int(m_filters.size() - 1);
         }
         cursor.WarpToWindow(m_filters[m_selected_filter]);
-        cursor.PauseAutohiding(true);
     }
 }
 

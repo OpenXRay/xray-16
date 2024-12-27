@@ -309,7 +309,7 @@ protected:
 protected:
     xr_vector<CArtefact*> m_SpawnedArtefacts;
 
-    //вероятность того, что артефакт засповниться при единичном 
+    //вероятность того, что артефакт засповниться при единичном
     //срабатывании аномалии
     float m_fArtefactSpawnProbability;
     //величина импульса выкидывания артефакта из зоны
@@ -327,7 +327,7 @@ protected:
         shared_str section;
         float      probability;
     };
-    
+
     xr_vector<ARTEFACT_SPAWN> m_ArtefactSpawn;
 
     //расстояние от зоны до текущего актера
@@ -351,4 +351,27 @@ public:
     // Lain: added
 private:
     virtual bool light_in_slow_mode() { return true; }
+
+protected:
+    // Interactive grass Settings
+    float m_fBlowoutTimeLeft{};
+
+    s8 m_BendGrass_idle_anim{};
+    float m_BendGrass_idle_radius{};
+    float m_BendGrass_idle_speed{};
+    float m_BendGrass_idle_str{};
+
+    s8 m_BendGrass_whenactive_anim{};
+    float m_BendGrass_whenactive_speed{};
+    float m_BendGrass_whenactive_str{};
+
+    bool m_BendGrass_Blowout{};
+    s32 m_BendGrass_Blowout_time{};
+    float m_BendGrass_Blowout_speed{};
+    float m_BendGrass_Blowout_radius{};
+
+    u8 grassbender_id{};
+    u32 grassbender_frame{};
+
+    void GrassZoneUpdate();
 };

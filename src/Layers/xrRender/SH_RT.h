@@ -14,14 +14,13 @@ public:
         CreateBase = 1 << 3, // Creates basic RTV from backbuffer or DSV (depending on format)
     };
 
-    CRT();
+    CRT() = default;
     ~CRT();
     void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, u32 slices_num = 1, Flags32 flags = {});
     void destroy();
     void reset_begin();
     void reset_end();
     BOOL valid() { return !!pTexture; }
-    bool used_as_depth() const;
 
     void set_slice_read(int slice);
     void set_slice_write(u32 context_id, int slice);
@@ -29,32 +28,30 @@ public:
     void resolve_into(CRT& destination) const; // only RTs with same format supported
 
 public:
-#if defined(USE_DX9) || (USE_DX11)
-    ID3DTexture2D* pSurface;
-    ID3DRenderTargetView* pRT;
-#   if defined(USE_DX11)
-    ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS];
-    ID3DDepthStencilView* dsv_all{ nullptr };
+#if defined(USE_DX11)
+    ID3DTexture2D* pSurface{};
+    ID3DRenderTargetView* pRT{};
+    ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS]{};
+    ID3DDepthStencilView* dsv_all{};
     xr_vector<ID3DDepthStencilView*> dsv_per_slice;
-    ID3D11UnorderedAccessView* pUAView;
-#   endif
+    ID3D11UnorderedAccessView* pUAView{};
 #elif defined(USE_OGL)
-    GLuint pRT;
-    GLuint pZRT;
-    GLenum target;
+    GLuint pRT{};
+    GLuint pZRT{};
+    GLenum target{};
 #else
 #   error No graphics API selected or enabled!
 #endif
 
     ref_texture pTexture;
 
-    u32 dwWidth;
-    u32 dwHeight;
-    D3DFORMAT fmt;
-    u32 sampleCount;
+    u32 dwWidth{};
+    u32 dwHeight{};
+    D3DFORMAT fmt{};
+    u32 sampleCount{};
     u32 n_slices{};
 
-    u64 _order;
+    u64 _order{};
 };
 
 struct resptrcode_crt : public resptr_base<CRT>

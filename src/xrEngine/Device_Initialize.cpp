@@ -7,11 +7,39 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #include <SDL.h>
+#ifdef IMGUI_ENABLE_VIEWPORTS
+#   include <SDL_syswm.h>
+#endif
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
 
+namespace
+{
+// This is put in a separate function due to bunch of defines.
+// Keeping that in CRenderDevice::Initialize would harm the readability.
+void SetSDLSettings(pcstr title)
+{
+#ifdef  SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+#endif
+#ifdef  SDL_HINT_AUDIO_DEVICE_APP_NAME
+    SDL_SetHint(SDL_HINT_AUDIO_DEVICE_APP_NAME, title);
+#endif
+#ifdef  SDL_HINT_APP_NAME
+    SDL_SetHint(SDL_HINT_APP_NAME, title);
+#endif
+#ifdef  SDL_HINT_IME_SHOW_UI
+    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+#endif
+#ifdef  SDL_HINT_MOUSE_AUTO_CAPTURE
+    SDL_SetHint(SDL_HINT_MOUSE_AUTO_CAPTURE, "0");
+#endif
+}
+} // namespace
+
 void CRenderDevice::Initialize()
 {
+    ZoneScoped;
     Log("Initializing Engine...");
     TimerGlobal.Start();
     TimerMM.Start();
@@ -36,22 +64,48 @@ void CRenderDevice::Initialize()
             title = "S.T.A.L.K.E.R.: Clear Sky";
         }
 
-        title = READ_IF_EXISTS(pSettingsOpenXRay, r_string,
-            "window", "title", title);
+        title = READ_IF_EXISTS(pSettingsOpenXRay, r_string_wb,
+            "window", "title", title).c_str();
 
         xr_strcpy(Core.ApplicationTitle, title);
+        SetSDLSettings(title);
+
         m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
+
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
         ExtractAndSetWindowIcon(m_sdlWnd, icon);
+
+        TracySetProgramName(title);
     }
+
+#ifdef IMGUI_ENABLE_VIEWPORTS
+    // Register main window handle (which is owned by the main application, not by us)
+    // This is mostly for consistency, so that our code can use same logic for main and secondary viewports.
+    {
+        ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+        main_viewport->PlatformUserData = IM_NEW(ImGuiViewportData){ m_sdlWnd };
+        main_viewport->PlatformHandle = m_sdlWnd;
+        main_viewport->PlatformHandleRaw = nullptr;
+        SDL_SysWMinfo info;
+        SDL_VERSION(&info.version);
+        if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+        {
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+            main_viewport->PlatformHandleRaw = (void*)info.info.win.window;
+#elif defined(__APPLE__) && defined(SDL_VIDEO_DRIVER_COCOA)
+            main_viewport->PlatformHandleRaw = (void*)info.info.cocoa.window;
+#endif
+        }
+    }
+#endif
 
     if (!GEnv.isDedicatedServer)
     {
-        Device.seqAppStart.Add(&m_editor);
-        Device.seqAppEnd.Add(&m_editor);
+        seqAppStart.Add(&m_editor);
+        seqAppEnd.Add(&m_editor);
     }
 }
 
@@ -76,7 +130,7 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
     constexpr int hit = 15;
     constexpr int fix = 65535; // u32(-1)
 
-    // Workaround for SDL bug 
+    // Workaround for SDL bug
     if (area.x + hit >= fix && rect.w <= fix - hit)
         area.x -= fix;
 
@@ -110,4 +164,15 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
         return SDL_HITTEST_RESIZE_LEFT;
 
     return SDL_HITTEST_DRAGGABLE;
+}
+
+void* CRenderDevice::GetApplicationWindowHandle() const
+{
+#if defined(XR_PLATFORM_WINDOWS)
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
+        return info.info.win.window;
+#endif
+    return nullptr;
 }

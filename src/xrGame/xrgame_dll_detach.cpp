@@ -35,6 +35,8 @@ extern void InitHudSoundSettings();
 #include "xrEngine/IGame_Persistent.h"
 void init_game_globals()
 {
+    ZoneScoped;
+
     InitHudSoundSettings();
     if (!GEnv.isDedicatedServer)
     {

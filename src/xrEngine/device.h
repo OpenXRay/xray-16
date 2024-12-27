@@ -4,10 +4,7 @@
 
 // Note:
 // ZNear - always 0.0f
-// ZFar - always 1.0f
-
-// class ENGINE_API CResourceManager;
-// class ENGINE_API CGammaControl;
+// ZFar  - always 1.0f
 
 #include "pure.h"
 
@@ -19,6 +16,7 @@
 #include "xrCore/ModuleLookup.hpp"
 
 #define VIEWPORT_NEAR 0.2f
+#define HUD_VIEWPORT_NEAR 0.05f
 
 #define DEVICE_RESET_PRECACHE_FRAME_COUNT 10
 
@@ -28,126 +26,50 @@
 
 #include <SDL.h>
 
+// refs
 class Task;
 
-#pragma pack(push, 4)
-
-// XXX: Merge CRenderDeviceData into CRenderDevice to make it look like in X-Ray 1.5
-
-class ENGINE_API CRenderDeviceData
+class ENGINE_API CRenderDevice : public IWindowHandler
 {
 public:
-    static const u32 MaximalWaitTime; // ms
-
-    // Rendering resolution
-    u32 dwWidth;
-    u32 dwHeight;
-
+    // Main objects used for creating and rendering the 3D scene
     // Real application window resolution
-    SDL_Rect m_rcWindowBounds;
+    SDL_Rect m_rcWindowBounds{};
 
     // Real game window resolution
-    SDL_Rect m_rcWindowClient;
+    SDL_Rect m_rcWindowClient{};
 
-    // Main window
-    SDL_Window* m_sdlWnd;
-
-    u32 dwPrecacheFrame;
-    bool b_is_Ready;
-    bool b_is_Active;
-    bool b_is_InFocus;
-    bool IsAnselActive;
-
-    // Engine flow-control
-    u32 dwFrame;
-
-    float fTimeDelta;
-    float fTimeGlobal;
-    u32 dwTimeDelta;
-    u32 dwTimeGlobal;
-    u32 dwTimeContinual;
-
-    Fvector vCameraPosition;
-    Fvector vCameraDirection;
-    Fvector vCameraTop;
-    Fvector vCameraRight;
-
-    Fmatrix mView;
-    Fmatrix mInvView;
-    Fmatrix mProject;
-    Fmatrix mFullTransform;
-    Fmatrix mInvFullTransform;
-
-    // Copies of corresponding members. Used for synchronization.
-    Fvector vCameraPositionSaved;
-    Fvector vCameraDirectionSaved;
-    Fvector vCameraTopSaved;
-    Fvector vCameraRightSaved;
-
-    Fmatrix mViewSaved;
-    Fmatrix mProjectSaved;
-    Fmatrix mFullTransformSaved;
-
-    float fFOV;
-    float fASPECT;
-
-protected:
-    u32 Timer_MM_Delta;
+private:
+    u32 Timer_MM_Delta{};
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
-
-    bool m_allowWindowDrag; // For windowed mode
-
-public:
-    // Registrators
-    MessageRegistry<pureRender> seqRender;
-    MessageRegistry<pureAppActivate> seqAppActivate;
-    MessageRegistry<pureAppDeactivate> seqAppDeactivate;
-    MessageRegistry<pureAppStart> seqAppStart;
-    MessageRegistry<pureAppEnd> seqAppEnd;
-    MessageRegistry<pureFrame> seqFrame;
-};
-
-#pragma pack(pop)
-// refs
-class ENGINE_API CRenderDevice : public CRenderDeviceData, public IWindowHandler
-{
-    struct RenderDeviceStatictics
-    {
-        CStatTimer RenderTotal; // pureRender
-        CStatTimer EngineTotal; // pureFrame
-        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
-
-        RenderDeviceStatictics()
-        {
-            fFPS = 30.f;
-            fRFPS = 30.f;
-            fTPS = 0;
-        }
-    };
-
-    // Main objects used for creating and rendering the 3D scene
     CTimer TimerMM;
-    RenderDeviceStatictics stats;
-    CStats* Statistic{};
 
-    void _SetupStates();
+    void SetupStates();
 
 public:
-    // u32 dwFrame;
-    // u32 dwPrecacheFrame;
-    u32 dwPrecacheTotal;
+    // Main window
+    SDL_Window* m_sdlWnd{};
 
-    // u32 dwWidth, dwHeight;
-    float fWidth_2, fHeight_2;
-    // bool b_is_Ready;
-    // bool b_is_Active;
-    void OnWindowActivate(bool activated);
+    // Engine flow-control
+    u32 dwFrame{};
+    u32 dwPrecacheFrame{};
+    u32 dwPrecacheTotal{};
 
-    // ref_shader m_WireShader;
-    // ref_shader m_SelectionShader;
+    // Rendering resolution
+    u32 dwWidth{};
+    u32 dwHeight{};
 
-    bool m_bNearer;
+    float fWidth_2{};
+    float fHeight_2{};
+
+    bool b_is_Ready{};
+    bool b_is_Active{};
+    bool b_is_InFocus{};
+
+    bool m_bNearer{};
+
+public:
     void SetNearer(bool enabled)
     {
         if (enabled && !m_bNearer)
@@ -166,38 +88,92 @@ public:
         // RCache.set_xform_project (mProject);
     }
 
+public:
+    // Registrators
+    MessageRegistry<pureRender> seqRender;
+    MessageRegistry<pureAppActivate> seqAppActivate;
+    MessageRegistry<pureAppDeactivate> seqAppDeactivate;
+    MessageRegistry<pureAppStart> seqAppStart;
+    MessageRegistry<pureAppEnd> seqAppEnd;
+    MessageRegistry<pureFrame> seqFrame;
     MessageRegistry<pureFrame> seqFrameMT;
     MessageRegistry<pureDeviceReset> seqDeviceReset;
     MessageRegistry<pureUIReset> seqUIReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
 
-    CRenderDevice()
-        : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
-          mt_bMustExit(false)
+private:
+    struct RenderDeviceStatistics
     {
-        m_sdlWnd = NULL;
-        b_is_Active = false;
-        b_is_Ready = false;
-        Timer.Start();
-        m_bNearer = false;
+        CStatTimer RenderTotal; // pureRender
+        CStatTimer EngineTotal; // pureFrame
+        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
+
+        RenderDeviceStatistics()
+        {
+            fFPS = 30.f;
+            fRFPS = 30.f;
+            fTPS = 0;
+        }
     };
+
+    RenderDeviceStatistics stats;
+    CStats* Statistic{};
+
+public:
+    // Engine flow-control
+    float fTimeDelta{};
+    float fTimeDeltaReal{};
+    float fTimeGlobal{};
+    u32 dwTimeDelta{};
+    u32 dwTimeGlobal{};
+    u32 dwTimeContinual{};
+
+    // Cameras & projection
+    Fvector vCameraPosition{};
+    Fvector vCameraDirection{};
+    Fvector vCameraTop{};
+    Fvector vCameraRight{};
+
+    Fmatrix mView{};
+    Fmatrix mInvView{};
+    Fmatrix mProject{};
+    Fmatrix mFullTransform{};
+    Fmatrix mInvFullTransform{};
+
+    // Copies of corresponding members. Used for synchronization.
+    Fvector vCameraPositionSaved{};
+    Fvector vCameraDirectionSaved{};
+    Fvector vCameraTopSaved{};
+    Fvector vCameraRightSaved{};
+
+    Fmatrix mViewSaved{};
+    Fmatrix mProjectSaved{};
+    Fmatrix mFullTransformSaved{};
+
+    float fFOV{};
+    float fASPECT{};
+
+    bool m_allowWindowDrag{}; // For windowed mode
+    bool IsAnselActive{};
+
+    CRenderDevice()
+    {
+        Timer.Start();
+    }
 
     void Pause(bool bOn, bool bTimer, bool bSound, pcstr reason);
     bool Paused();
-
-private:
-    void ProcessParallelSequence(Task&, void*);
 
 public:
     // Scene control
     void ProcessFrame();
 
-    void PreCache(u32 amount, bool draw_loadscreen, bool wait_user_input);
+    void PreCache(u32 amount, bool wait_user_input);
 
     bool BeforeFrame();
     void FrameMove();
 
-    void BeforeRender();
+    void OnCameraUpdated();
     void DoRender();
     bool RenderBegin();
     void Clear();
@@ -211,48 +187,55 @@ public:
     u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
 
-private:
-    // Creation & Destroying
-    void CreateInternal();
-
 public:
+    // Creation & Destroying
     void Create();
+    void Destroy();
 
-    void Run(void);
-    void Destroy(void);
     void Reset(bool precache = true);
+
+    void Run();
+    void Shutdown();
+
+    void ProcessEvent(const SDL_Event& event);
+    void OnWindowActivate(SDL_Window* window, bool activated);
 
     void UpdateWindowProps();
     void UpdateWindowRects();
     void SelectResolution(bool windowed);
 
-    void Initialize(void);
-    void ShutDown(void);
+    void Initialize();
+
+    void InitializeImGui();
+    void DestroyImGui();
 
     void FillVideoModes();
     void CleanupVideoModes();
 
-    const RenderDeviceStatictics& GetStats() const { return stats; }
+    const RenderDeviceStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
 
     void SetWindowDraggable(bool draggable);
     bool IsWindowDraggable() const { return m_allowWindowDrag; }
 
+    void* GetApplicationWindowHandle() const override;
     SDL_Window* GetApplicationWindow() override;
     void OnErrorDialog(bool beforeDialog) override;
     void OnFatalError() override;
 
     void time_factor(const float time_factor);
 
-    IC const float time_factor() const
+    IC float time_factor() const
     {
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());
     }
 
 public:
+    // Multi-threading
     Event PresentationFinished = nullptr;
-    volatile bool mt_bMustExit;
+
+    static constexpr u32 MaximalWaitTime = 16; // ms
 
     // Usable only when called from thread, that initialized SDL
     // Calls SDL_PumpEvents() at least twice.
@@ -282,18 +265,45 @@ public:
 private:
     void CalcFrameStats();
 
-private:
-    void message_loop();
-
-private:
-    xray::editor::ide m_editor;
-
 public:
     [[nodiscard]]
     auto& editor() { return m_editor; }
 
     [[nodiscard]]
     auto editor_mode() const { return m_editor.is_shown(); }
+
+    [[nodiscard]]
+    auto GetImGuiContext() const { return m_imgui_context; }
+
+public:
+    struct ImGuiViewportData
+    {
+        SDL_Window* Window;
+        bool        WindowOwned;
+
+        ImGuiViewportData(SDL_Window* window) : Window(window), WindowOwned(false) {}
+
+        ImGuiViewportData(ImVec2 pos, ImVec2 size, Uint32 flags)
+        {
+            Window = SDL_CreateWindow("ImGui Viewport (no title yet)",
+                (int)pos.x, (int)pos.y, (int)size.x, (int)size.y, flags);
+            WindowOwned = true;
+        }
+
+        ~ImGuiViewportData()
+        {
+            if (Window && WindowOwned)
+            {
+                SDL_DestroyWindow(Window);
+            }
+        }
+    };
+
+private:
+    xray::editor::ide m_editor;
+
+    ImGuiContext* m_imgui_context{};
+    IImGuiRender* m_imgui_render{};
 };
 
 extern ENGINE_API CRenderDevice Device;

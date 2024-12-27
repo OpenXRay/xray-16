@@ -15,7 +15,9 @@ ScheduledBase::ScheduledBase()
 
 ScheduledBase::~ScheduledBase()
 {
+#ifndef MASTER_GOLD
     VERIFY2(!Engine.Sheduler.Registered(this), make_string("0x%08x : %s", this, *shedule_Name()));
+#endif
 
 // XXX: WTF???
 // sad, but true

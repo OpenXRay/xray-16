@@ -60,15 +60,15 @@ u32 calc_texture_size(int lod, u32 mip_cnt, size_t orig_size)
 
 GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 {
+    ret_msize = 0;
+    R_ASSERT1_CURE(fRName && fRName[0], { return 0; });
+
     GLuint pTexture = 0;
     string_path fn;
     size_t img_size = 0;
     int img_loaded_lod = 0;
     gli::gl::format fmt;
     u32 mip_cnt = u32(-1);
-    // validation
-    R_ASSERT(fRName);
-    R_ASSERT(fRName[0]);
 
     bool dummyTextureExist;
 
@@ -101,15 +101,15 @@ _DDS:
     {
         // Load and get header
         S = FS.r_open(fn);
-#ifdef DEBUG
-        Msg("* Loaded: %s[%d]b", fn, S->length());
-#endif // DEBUG
+        R_ASSERT2_CURE(S, fn, { return 0; });
         img_size = S->length();
-        R_ASSERT(S);
+#ifdef DEBUG
+        Msg("* Loaded: %s[%d]b", fn, img_size);
+#endif // DEBUG
         gli::texture texture = gli::load((char*)S->pointer(), img_size);
         R_ASSERT2(!texture.empty(), fn);
-        
-        
+
+
         gli::gl GL(gli::gl::PROFILE_GL33);
 
         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
@@ -232,14 +232,14 @@ _DDS:
                         }
                         break;
                     }
-                    default: 
-                        NODEFAULT; 
+                    default:
+                        NODEFAULT;
                         break;
                     }
                 }
             }
         }
-        
+
         FS.r_close(S);
 
         xr_strlwr(fn);

@@ -92,6 +92,7 @@
       <Filter>Externals</Filter>
     </ClInclude>
     <ClInclude Include="OGF_GContainer_Vertices.hpp" />
+    <ClInclude Include="d3d9compat.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">

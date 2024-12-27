@@ -9,10 +9,7 @@
 #include "Level.h"
 #include "game_cl_mp.h"
 
-#if __has_include("ximage.h")
-#   include "ximage.h"
-#   include "xmemfile.h"
-#endif
+#include "xrCore/Media/Image.hpp"
 
 CUIServerInfo::CUIServerInfo()
     : CUIDialogWnd(CUIServerInfo::GetDebugType())
@@ -35,7 +32,7 @@ CUIServerInfo::CUIServerInfo()
     AttachChild(m_text_desc);
     m_text_desc->SetAutoDelete(true);
 
-    m_text_body = xr_new<CUITextWnd>();
+    m_text_body = xr_new<CUIStatic>("Text body");
     // m_text_desc->AttachChild		(m_text_body);
     // m_text_body->SetAutoDelete		(true);
 
@@ -63,7 +60,7 @@ void CUIServerInfo::Init()
     CUIXmlInit::InitScrollView(xml_doc, "server_info:text_desc", 0, m_text_desc);
     CUIXmlInit::InitStatic(xml_doc, "server_info:image", 0, m_image);
 
-    CUIXmlInit::InitTextWnd(xml_doc, "server_info:text_body", 0, m_text_body);
+    CUIXmlInit::InitStatic(xml_doc, "server_info:text_body", 0, m_text_body);
     m_text_body->SetTextComplexMode(true);
     m_text_body->SetWidth(m_text_desc->GetDesiredChildWidth());
     m_text_desc->AddWindow(m_text_body, true);
@@ -94,12 +91,10 @@ void CUIServerInfo::InitCallbacks()
 char const* CUIServerInfo::tmp_logo_file_name = "tmp_sv_logo.dds";
 void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
 {
-#if __has_include("ximage.h")
-    CxMemFile tmp_memfile(const_cast<u8*>(data_ptr), data_size);
-    CxImage tmp_image;
-    if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG))
+    XRay::Media::Image img;
+    if (!img.OpenJPEG(data_ptr, data_size))
     {
-        Msg("! ERROR: Failed to decode server logo image as JPEG formated.");
+        Msg("! ERROR: Failed to decode server logo image as JPEG.");
         return;
     }
 
@@ -109,14 +104,12 @@ void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
         Msg("! ERROR: failed to create temporary dds file");
         return;
     }
+    // XXX: real convert jpg to dds
     tmp_writer->w((void*)data_ptr, data_size); // sorry :(
     FS.w_close(tmp_writer);
     m_dds_file_created = true;
     m_image->InitTexture(tmp_logo_file_name);
     FS.file_delete("$game_saves$", tmp_logo_file_name);
-#else
-    VERIFY(!"Not implemented.");
-#endif
 }
 
 void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)

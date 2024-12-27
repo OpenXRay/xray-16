@@ -17,17 +17,15 @@
 #include "alife_registry_container.h"
 #include "xrServer.h"
 #include "Level.h"
-#include "xrEngine/x_ray.h"
 #include "saved_game_wrapper.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "autosave_manager.h"
-XRCORE_API string_path g_bug_report_file;
 
 using namespace ALife;
 
 extern string_path g_last_saved_game;
 
-CALifeStorageManager::~CALifeStorageManager() { *g_last_saved_game = 0; }
+CALifeStorageManager::~CALifeStorageManager() {}
 void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
     pcstr gameSaveExtension = SAVE_EXTENSION;
@@ -56,6 +54,12 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
             return;
         }
     }
+
+	//Alundaio: To get the savegame fname to make our own custom save states
+    luabind::functor<void> funct1;
+    if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_before_save", funct1))
+        funct1((pcstr)m_save_name);
+	//-Alundaio
 
     u32 source_count;
     u32 dest_count;
@@ -92,12 +96,24 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
     Msg("* Game %s is successfully saved to file '%s'", m_save_name, temp);
 #endif // DEBUG
 
+	//Alundaio: To get the savegame fname to make our own custom save states
+    luabind::functor<void> funct2;
+    if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_save", funct2))
+        funct2((pcstr)m_save_name);
+    //-Alundaio
+
     if (!update_name)
         xr_strcpy(m_save_name, saveBackup);
 }
 
 void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
 {
+	//Alundaio: So we can get the fname to make our own custom save states
+    luabind::functor<void> funct;
+    if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_load", funct))
+        funct(file_name);
+	//-Alundaio
+
     IReader source(buffer, buffer_size);
     header().load(source);
     time_manager().load(source);
@@ -127,6 +143,12 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
         return;
 
     Level().autosave_manager().on_game_loaded();
+
+	//Neloreck: For consistency with before/after save callbacks.
+    luabind::functor<void> funct2;
+    if (GEnv.ScriptEngine->functor("alife_storage_manager.CALifeStorageManager_after_load", funct2))
+        funct2(file_name);
+	//-Neloreck
 }
 
 bool CALifeStorageManager::load(LPCSTR save_name_no_check)
@@ -185,11 +207,10 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
     }
 
     string512 temp;
-    strconcat(sizeof(temp), temp, StringTable().translate("st_loading_saved_game").c_str(),
+    strconcat(temp, StringTable().translate("st_loading_saved_game").c_str(),
         " \"", save_name, gameSaveExtension, "\"");
 
-    g_pGamePersistent->SetLoadStageTitle(temp);
-    g_pGamePersistent->LoadTitle();
+    g_pGamePersistent->LoadTitle(temp);
 
     unload();
     reload(m_section);

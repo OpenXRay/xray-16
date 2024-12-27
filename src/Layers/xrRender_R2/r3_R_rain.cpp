@@ -44,7 +44,10 @@ static int facetable[6][4] =
 
 void render_rain::init()
 {
-    rain_factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+    if (ps_ssfx_gloss_method == 0)
+        rain_factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+    else
+        rain_factor = g_pGamePersistent->Environment().wetness_factor;
 
     o.active  = ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF);
     o.active &= rain_factor >= EPS_L;
@@ -65,6 +68,8 @@ void render_rain::init()
 //////////////////////////////////////////////////////////////////////////
 void render_rain::calculate()
 {
+    ZoneScoped;
+
     // static const float	source_offset		= 40.f;
 
     static const float source_offset = 10000.f;
@@ -77,7 +82,10 @@ void render_rain::calculate()
     // calculate view-frustum bounds in world space
     Fmatrix ex_project, ex_full, ex_full_inverse;
     {
-        const float fRainFar = ps_r3_dyn_wet_surf_far;
+        float fRainFar = 250.f;
+        if (ps_ssfx_gloss_method == 0)
+            fRainFar = ps_r3_dyn_wet_surf_far;
+
         ex_project.build_projection(deg2rad(Device.fFOV /* * Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
         ex_full.mul(ex_project, Device.mView);
 #if defined(USE_DX11)
@@ -108,7 +116,6 @@ void render_rain::calculate()
     Fvector3 cull_COP;
     Fmatrix cull_xform;
     {
-        FPU::m64r();
         // Lets begin from base frustum
         Fmatrix fullxform_inv = ex_full_inverse;
 #ifdef _DEBUG
@@ -263,7 +270,6 @@ void render_rain::calculate()
         RainLight.X.D[0].maxY = limit;
 
         // full-xform
-        FPU::m24r();
     }
 
     // Begin SMAP-render
@@ -289,6 +295,10 @@ void render_rain::render()
 {
     if (o.active)
     {
+#if defined(USE_DX11)
+        //TracyD3D11Zone(HW.profiler_ctx, "render_rain::render");
+#endif
+
         auto& dsgraph = RImplementation.get_context(context_id);
 
         // Render shadow-map
@@ -312,13 +322,21 @@ void render_rain::flush()
 {
     if (o.active)
     {
+#if defined(USE_DX11)
+    //TracyD3D11Zone(HW.profiler_ctx, "render_rain::flush - submit and release");
+#endif
         auto& dsgraph = RImplementation.get_context(context_id);
-    
+
         dsgraph.cmd_list.submit();
         RImplementation.release_context(context_id);
     }
 
     auto& cmd_list_imm = RImplementation.get_imm_context().cmd_list;
+
+#if defined(USE_DX11)
+    //TracyD3D11Zone(HW.profiler_ctx, "render_rain::flush - accumulate");
+#endif
+
     cmd_list_imm.Invalidate();
 
     // Restore XForms

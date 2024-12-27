@@ -15,7 +15,7 @@
 #include "xrCore/Threading/TaskManager.hpp"
 
 int g_ErrorLineCount = 15;
-Flags32 g_stats_flags = {0};
+Flags32 g_stats_flags = {};
 
 ENGINE_API CStatTimer gTestTimer0;
 ENGINE_API CStatTimer gTestTimer1;
@@ -31,7 +31,6 @@ CStats::CStats()
 {
     statsFont = nullptr;
     fpsFont = nullptr;
-    fMem_calls = 0;
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 }
 
@@ -43,38 +42,31 @@ CStats::~CStats()
 
 static void DumpTaskManagerStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
-    size_t allocated{}, allocatedWithFallback{}, pushed{}, finished{};
-    TaskScheduler->GetStats(allocated, allocatedWithFallback, pushed, finished);
+    size_t allocated{}, pushed{}, finished{};
+    TaskScheduler->GetStats(allocated, pushed, finished);
 
     static size_t allocatedPrev{};
-    static size_t allocatedWithFallbackPrev{};
     static size_t pushedPrev{};
     static size_t finishedPrev{};
 
     font.OutNext("Task scheduler:    ");
     font.OutNext("- threads:       %zu", TaskScheduler->GetWorkersCount());
-    font.OutNext("  - active:      %zu", TaskScheduler->GetActiveWorkersCount());
     font.OutNext("- tasks:           ");
     font.OutNext("  - total:         ");
     font.OutNext("    - allocated: %zu", allocated);
-    font.OutNext("      - fallback:%zu", allocatedWithFallback);
     font.OutNext("    - pushed:    %zu", pushed);
     font.OutNext("    - finished:  %zu", finished);
     font.OutNext("  - this frame:    ");
     font.OutNext("    - allocated: %zu", allocated - allocatedPrev);
-    font.OutNext("      - fallback:%zu", allocatedWithFallback - allocatedWithFallbackPrev);
     font.OutNext("    - pushed     %zu", pushed - pushedPrev);
     font.OutNext("    - finished:  %zu", finished - finishedPrev);
 
-    if (allocatedWithFallback != allocatedWithFallbackPrev)
-        alert->Print(font, "Task scheduler overload!");
-
     allocatedPrev = allocated;
-    allocatedWithFallbackPrev = allocatedWithFallback;
     pushedPrev = pushed;
     finishedPrev = finished;
 }
 
+// XXX: move to IGame_Persistent
 static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISpatial_DB& db, float engineTotal)
 {
 #ifdef DEBUG
@@ -98,12 +90,6 @@ void CStats::Show()
     gTestTimer2.FrameEnd();
     gTestTimer3.FrameEnd();
 
-    float memCalls = float(Memory.stat_calls);
-    if (memCalls > fMem_calls)
-        fMem_calls = memCalls;
-    else
-        fMem_calls = 0.9f * fMem_calls + 0.1f * memCalls;
-    Memory.stat_calls = 0;
     if (GEnv.isDedicatedServer)
         return;
     auto& font = *statsFont;
@@ -120,7 +106,6 @@ void CStats::Show()
         font.OutNext("Mapped:       %d", g_file_mapped_memory);
 #endif
         Device.DumpStatistics(font, alertPtr);
-        font.OutNext("Memory:       %2.2f", fMem_calls);
         if (g_pGameLevel)
             g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
@@ -128,9 +113,9 @@ void CStats::Show()
         if (g_pGamePersistent)
         {
             g_pGamePersistent->DumpStatistics(font, alertPtr);
+            DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpace, engineTotal);
+            DumpSpatialStatistics(font, alertPtr, g_pGamePersistent->SpatialSpacePhysic, engineTotal);
         }
-        DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
-        DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
         font.OutSet(200, 0);
         GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();

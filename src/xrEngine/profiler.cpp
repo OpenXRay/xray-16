@@ -19,14 +19,14 @@ static volatile LONG					critical_section_counter = 0;
 void add_profile_portion				(pcstr id, const u64 &time)
 {
 	if (!*id)
-		return;	
+		return;
 	if (!psDeviceFlags.test(rsStatistic))
 		return;
 
 	CProfileResultPortion			temp;
 	temp.m_timer_id					= id;
 	temp.m_time						= time;
-	
+
 	profiler().add_profile_portion	(temp);
 }
 #endif // CONFIG_PROFILE_LOCKS

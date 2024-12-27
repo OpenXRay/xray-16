@@ -848,7 +848,7 @@ IC void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref
         curr_rt_width = zb->dwWidth;
         curr_rt_height = zb->dwHeight;
     }
-    
+
     set_RT(_1 ? _1->pRT : nullptr, 0);
     set_RT(_2 ? _2->pRT : nullptr, 1);
     set_RT(_3 ? _3->pRT : nullptr, 2);

@@ -254,7 +254,7 @@ public:
     void detach_Vehicle();
     void steer_Vehicle(float angle);
     void attach_Vehicle(CHolderCustom* vehicle);
-    bool use_MountedWeapon(CHolderCustom* object);
+    bool use_HolderEx(CHolderCustom* object, bool bForce);
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
 
 protected:
@@ -332,6 +332,9 @@ protected:
     void cam_SetLadder();
     void cam_UnsetLadder();
     float currentFOV();
+
+    void UpdateVisorRainDrops();
+    void UpdateVisor();
 
     // Cameras
     CCameraBase* cameras[eacMaxCam];
@@ -412,6 +415,9 @@ public:
     bool AnyMove() { return (mstate_real & mcAnyMove) != 0; };
     bool is_jump();
     u32 MovingState() const { return mstate_real; }
+    float m_dropsIntensity{};
+    float m_dropsAnimIncrementor{};
+
 protected:
     u32 mstate_wishful;
     u32 mstate_old;
@@ -438,9 +444,9 @@ public:
     // User input/output
     //////////////////////////////////////////////////////////////////////////
 public:
-    void OnAxisMove(float x, float y, float scale, bool invert);
+    void OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY);
     virtual void IR_OnMouseMove(int x, int y);
-    virtual void IR_OnMouseWheel(int x, int y);
+    virtual void IR_OnMouseWheel(float x, float y);
 
     virtual void IR_OnKeyboardPress(int dik);
     virtual void IR_OnKeyboardRelease(int dik);

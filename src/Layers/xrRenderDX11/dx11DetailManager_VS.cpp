@@ -28,6 +28,7 @@ void CDetailManager::hw_Load_Shaders()
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
 {
+    ZoneScoped;
     using namespace detail_manager;
 
     // Render-prepare
@@ -90,11 +91,24 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id)
 {
+    ZoneScoped;
+
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
     static shared_str strArray("array");
     static shared_str strXForm("xform");
+    static shared_str strPos("benders_pos");
+    static shared_str strGrassSetup("benders_setup");
+
+    // Grass benders data
+    IGame_Persistent::grass_data& GData = g_pGamePersistent->grass_shader_data;
+    Fvector4 player_pos = { 0, 0, 0, 0 };
+    int BendersQty = _min(16, (int)(ps_ssfx_grass_interactive.y + 1));
+
+    // Add Player?
+    if (ps_ssfx_grass_interactive.x > 0)
+        player_pos.set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
 
     RImplementation.BasicStats.DetailCount = 0;
 
@@ -132,6 +146,30 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 cmd_list.set_c(strDir2D, wind);
                 cmd_list.set_c(strXForm, Device.mFullTransform);
 
+                if (ps_ssfx_grass_interactive.y > 0)
+                {
+                    cmd_list.set_c(strGrassSetup, ps_ssfx_int_grass_params_1);
+
+                    Fvector4* c_grass{};
+                    {
+                        void* GrassData;
+                        cmd_list.get_ConstantDirect(strPos, BendersQty * sizeof(Fvector4), &GrassData, 0, 0);
+                        c_grass = (Fvector4*)GrassData;
+                    }
+
+                    if (c_grass)
+                    {
+                        c_grass[0].set(player_pos);
+                        c_grass[16].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+                        for (int Bend = 1; Bend < BendersQty; Bend++)
+                        {
+                            c_grass[Bend].set(GData.pos[Bend].x, GData.pos[Bend].y, GData.pos[Bend].z, GData.radius_curr[Bend]);
+                            c_grass[Bend + 16].set(GData.dir[Bend].x, GData.dir[Bend].y, GData.dir[Bend].z, GData.str[Bend]);
+                        }
+                    }
+                }
+
                 // ref_constant constArray = RCache.get_c(strArray);
                 // VERIFY(constArray);
 
@@ -148,21 +186,26 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
 
                 u32 dwBatch = 0;
 
-                xr_vector<SlotItemVec*>::iterator _vI = vis.begin();
-                xr_vector<SlotItemVec*>::iterator _vE = vis.end();
-                for (; _vI != _vE; ++_vI)
+                for (SlotItemVec* items : vis)
                 {
-                    SlotItemVec* items = *_vI;
-
-                    auto _iI = items->begin();
-                    auto _iE = items->end();
-                    for (; _iI != _iE; ++_iI)
+                    for (SlotItem* item : *items)
                     {
-                        SlotItem& Instance = **_iI;
+                        SlotItem& Instance = *item;
                         u32 base = dwBatch * 4;
 
                         // Build matrix ( 3x4 matrix, last row - color )
                         float scale = Instance.scale_calculated;
+
+                        // Sort of fade using the scale
+                        // fade_distance == -1 use light_position to define "fade", anything else uses fade_distance
+                        if (fade_distance <= -1)
+                            scale *= 1.0f - Instance.position.distance_to_xz_sqr(light_position) * 0.005f;
+                        else if (Instance.distance > fade_distance)
+                            scale *= 1.0f - abs(Instance.distance - fade_distance) * 0.005f;
+
+                        if (scale <= 0)
+                            break;
+
                         Fmatrix& M = Instance.mRotY;
                         c_storage[base + 0].set(M._11 * scale, M._21 * scale, M._31 * scale, M._41);
                         c_storage[base + 1].set(M._12 * scale, M._22 * scale, M._32 * scale, M._42);

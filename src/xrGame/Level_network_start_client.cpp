@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 
 #include "Level.h"
-#include "xrEngine/x_ray.h"
 #include "xrEngine/IGame_Persistent.h"
 
 #include "ai_space.h"
@@ -21,7 +20,9 @@ bool CLevel::net_Start_client(const char* options) { return false; }
 
 bool CLevel::net_start_client1()
 {
-    pApp->LoadBegin();
+    ZoneScoped;
+
+    g_pGamePersistent->LoadBegin();
     // name_of_server
     string64 name_of_server = "";
     //	xr_strcpy						(name_of_server,*m_caClientOptions);
@@ -32,14 +33,12 @@ bool CLevel::net_start_client1()
         *strchr(name_of_server, '/') = 0;
 
     // Startup client
-
     string256 temp;
     xr_sprintf(temp, "%s %s",
                StringTable().translate("st_client_connecting_to").c_str(),
                name_of_server);
 
-    pApp->SetLoadStageTitle(temp);
-    pApp->LoadStage();
+    g_pGamePersistent->LoadTitle(temp);
     return true;
 }
 
@@ -47,6 +46,8 @@ bool CLevel::net_start_client1()
 
 bool CLevel::net_start_client2()
 {
+    ZoneScoped;
+
     if (psNET_direct_connect)
     {
         Server->create_direct_client();
@@ -65,6 +66,7 @@ bool CLevel::net_start_client2()
 }
 void rescan_mp_archives()
 {
+    ZoneScoped;
     FS_Path* mp_archs_path = FS.get_path("$game_arch_mp$");
     FS.rescan_path(mp_archs_path->m_Path, mp_archs_path->m_Flags.is(FS_Path::flRecurse));
 }
@@ -73,6 +75,8 @@ bool CLevel::net_start_client3()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         LPCSTR level_name = NULL;
         LPCSTR level_ver = NULL;
         LPCSTR download_url = NULL;
@@ -91,7 +95,7 @@ bool CLevel::net_start_client3()
             rescan_mp_archives(); // because if we are using psNET_direct_connect, we not download map...
         }
         // Determine internal level-ID
-        int level_id = pApp->Level_ID(level_name, level_ver, true);
+        const int level_id = g_pGamePersistent->Level_ID(level_name, level_ver, true);
         if (level_id == -1)
         {
             Disconnect();
@@ -127,9 +131,10 @@ bool CLevel::net_start_client4()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         // Begin spawn
-        g_pGamePersistent->SetLoadStageTitle("st_client_spawning");
-        g_pGamePersistent->LoadTitle();
+        g_pGamePersistent->LoadTitle("st_client_spawning");
 
         // Send physics to single or multithreaded mode
 
@@ -206,13 +211,14 @@ bool CLevel::net_start_client5()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         // HUD
 
         // Textures
         if (!GEnv.isDedicatedServer)
         {
-            g_pGamePersistent->SetLoadStageTitle("st_loading_textures");
-            g_pGamePersistent->LoadTitle();
+            g_pGamePersistent->LoadTitle("st_loading_textures");
             GEnv.Render->DeferredLoad(FALSE);
             GEnv.Render->ResourcesDeferredUpload();
             LL_CheckTextures();
@@ -227,13 +233,15 @@ bool CLevel::net_start_client6()
 {
     if (connected_to_server)
     {
+        ZoneScoped;
+
         // Sync
         if (!synchronize_map_data())
             return false;
 
         if (!game_configured)
         {
-            pApp->LoadEnd();
+            g_pGamePersistent->LoadEnd();
             return true;
         }
         if (!GEnv.isDedicatedServer)
@@ -255,9 +263,8 @@ bool CLevel::net_start_client6()
             }
         }
 
-        g_pGamePersistent->SetLoadStageTitle("st_client_synchronising");
-        g_pGamePersistent->LoadTitle();
-        Device.PreCache(60, true, true);
+        g_pGamePersistent->LoadTitle("st_client_synchronising");
+        Device.PreCache(60, true);
         net_start_result_total = TRUE;
     }
     else
@@ -265,6 +272,6 @@ bool CLevel::net_start_client6()
         net_start_result_total = FALSE;
     }
 
-    pApp->LoadEnd();
+    g_pGamePersistent->LoadEnd();
     return true;
 }

@@ -137,4 +137,4 @@ ambient* manager::get_ambient(shared_str const& id) const
     return nullptr;
 #endif // #ifdef DEBUG
 }
-} // namespace 
+} // namespace

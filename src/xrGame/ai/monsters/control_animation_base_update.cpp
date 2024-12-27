@@ -10,6 +10,7 @@
 #include "ai/monsters/control_path_builder_base.h"
 
 // DEBUG purpose only
+#if 0
 constexpr pcstr dbg_anim_name_table[] = {"eAnimStandIdle", "eAnimStandTurnLeft", "eAnimStandTurnRight",
 
     "eAnimSitIdle", "eAnimLieIdle",
@@ -52,6 +53,7 @@ constexpr pcstr dbg_anim_name_table[] = {"eAnimStandIdle", "eAnimStandTurnLeft",
     "eAnimTeleRaise", "eAnimTeleFire", "eAnimGraviPrepare", "eAnimGraviFire",
 
     "eAnimCount", "eAnimUndefined"};
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // m_tAction processing

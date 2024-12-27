@@ -162,7 +162,7 @@ Highflex: Alex M
   - Python scripts for stalker skeleton control rig creation
 - game code
   - Improve Weapon System ( Additional Animations, Options )
-  
+
 Swartz27: Matthew Swartz
 + Fix blurred text on R4
 + Fix issue #24: Fix overloaded particle system

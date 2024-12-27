@@ -152,15 +152,12 @@ void line_edit_control::clear_states()
 
 void line_edit_control::on_ir_capture()
 {
-    SDL_PumpEvents();
-    SDL_StartTextInput();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    pInput->EnableTextInput();
 }
 
 void line_edit_control::on_ir_release()
 {
-    SDL_StopTextInput();
-    SDL_FlushEvents(SDL_TEXTEDITING, SDL_TEXTINPUT);
+    pInput->DisableTextInput();
 }
 
 void line_edit_control::init(size_t str_buffer_size, init_mode mode)
@@ -632,21 +629,26 @@ void line_edit_control::delete_word_forward()
 
 void line_edit_control::move_pos_home() { m_cur_pos = 0; }
 void line_edit_control::move_pos_end() { m_cur_pos = xr_strlen(m_edit_str); }
-void line_edit_control::move_pos_left() { --m_cur_pos; }
+void line_edit_control::move_pos_left()
+{
+    if (m_cur_pos > 0)
+        --m_cur_pos;
+}
 void line_edit_control::move_pos_right() { ++m_cur_pos; }
 void line_edit_control::move_pos_left_word()
 {
-    size_t i = m_cur_pos - 1;
+    size_t i = m_cur_pos > 0 ? m_cur_pos - 1 : 0;
 
-    while (i >= 0 && m_edit_str[i] == ' ')
+    while (i > 0 && m_edit_str[i] == ' ')
         --i;
 
-    if (!terminate_char(m_edit_str[i]))
+    if (i > 0 && !terminate_char(m_edit_str[i]))
     {
-        while (i >= 0 && !terminate_char(m_edit_str[i], true))
+        while (i > 0 && !terminate_char(m_edit_str[i], true))
             --i;
 
-        ++i;
+        if (i > 0)
+            ++i;
     }
 
     m_cur_pos = i;

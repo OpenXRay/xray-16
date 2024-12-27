@@ -1,13 +1,12 @@
 #include "StdAfx.h"
 #include "UIGameMP.h"
-#include "UIAchivementsIndicator.h"
 #include "ui/UIDemoPlayControl.h"
 #include "ui/UIServerInfo.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "Level.h"
 #include "game_cl_mp.h"
 
-UIGameMP::UIGameMP() : m_pDemoPlayControl(NULL), m_pServerInfo(NULL), m_pAchivementIdicator(NULL), m_game(NULL) {}
+UIGameMP::UIGameMP() : m_pDemoPlayControl(NULL), m_pServerInfo(NULL), m_game(NULL) {}
 UIGameMP::~UIGameMP()
 {
     xr_delete(m_pDemoPlayControl);
@@ -32,12 +31,6 @@ bool UIGameMP::IR_UIOnKeyboardPress(int dik)
         ShowDemoPlayControl();
         return true;
     }
-#ifdef DEBUG
-    if (dik == SDL_SCANCODE_T)
-    {
-        m_game->AddRewardTask(0); // mp_award_massacre
-    }
-#endif
     return inherited::IR_UIOnKeyboardPress(dik);
 }
 
@@ -111,9 +104,6 @@ void UIGameMP::SetClGame(game_cl_GameState* g)
         xr_delete(m_pServerInfo);
     }
     m_pServerInfo = xr_new<CUIServerInfo>();
-    m_pAchivementIdicator = xr_new<CUIAchivementIndicator>();
-    m_pAchivementIdicator->SetAutoDelete(true);
-    Window->AttachChild(m_pAchivementIdicator);
 }
 
 void UIGameMP::SetServerLogo(u8 const* data_ptr, u32 data_size)
@@ -125,11 +115,4 @@ void UIGameMP::SetServerRules(u8 const* data_ptr, u32 data_size)
 {
     VERIFY(m_pServerInfo);
     m_pServerInfo->SetServerRules(data_ptr, data_size);
-}
-
-void UIGameMP::AddAchivment(
-    shared_str const& achivement_name, shared_str const& color_animation, u32 const width, u32 const height)
-{
-    VERIFY(m_pAchivementIdicator);
-    m_pAchivementIdicator->AddAchivement(achivement_name, color_animation, width, height);
 }

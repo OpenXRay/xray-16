@@ -142,8 +142,8 @@ public:
     BasicPostProcessAnimator();
     virtual ~BasicPostProcessAnimator();
     void Clear();
-    virtual void Load(LPCSTR name, bool internalFs = true);
-    IC LPCSTR Name() { return *m_Name; }
+    virtual void Load(pcstr name, bool internalFs = true);
+    IC pcstr Name() { return *m_Name; }
     virtual void Stop(float speed);
     void SetDesiredFactor(float f, float sp);
     void SetCurrentFactor(float f);
@@ -154,5 +154,5 @@ public:
     void Create();
     CPostProcessParam* GetParam(pp_params param);
     void ResetParam(pp_params param);
-    void Save(LPCSTR name);
+    void Save(pcstr name);
 };

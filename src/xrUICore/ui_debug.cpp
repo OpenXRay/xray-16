@@ -48,18 +48,18 @@ CUIDebugger::CUIDebugger()
 {
     ImGui::SetAllocatorFunctions(
         [](size_t size, void* /*user_data*/)
-    {
+        {
         return xr_malloc(size);
-    },
+        },
         [](void* ptr, void* /*user_data*/)
-    {
+        {
         xr_free(ptr);
-    }
+        }
     );
-    ImGui::SetCurrentContext(Device.editor().GetImGuiContext());
+    ImGui::SetCurrentContext(Device.GetImGuiContext());
 }
 
-void CUIDebugger::OnFrame()
+void CUIDebugger::on_tool_frame()
 {
 #ifndef MASTER_GOLD
     if (!get_open_state())

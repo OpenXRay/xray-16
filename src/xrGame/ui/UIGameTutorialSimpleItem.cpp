@@ -59,7 +59,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     if (m_snd_name && m_snd_name[0])
     {
         m_sound.create(m_snd_name, st_Effect, sg_Undefined);
-        VERIFY(m_sound._handle() || strstr(Core.Params, "-nosound"));
+        VERIFY(m_sound._handle() || !Engine.Sound.IsSoundEnabled());
     }
     m_time_length = xml->ReadFlt("length_sec", 0, 0);
     m_desired_cursor_pos.x = xml->ReadAttribFlt("cursor_pos", 0, "x", 0);
@@ -305,7 +305,11 @@ void CUISequenceSimpleItem::Start()
         }
 
         if ((!pda.IsShown() && bShowPda) || (pda.IsShown() && !bShowPda))
+        {
+            isTimeDilatedInPDA = TimeDilator()->GetModeEnability(UITimeDilator::Pda);
+            TimeDilator()->SetModeEnability(UITimeDilator::Pda, false);
             pda.ShowOrHideDialog(true);
+        }
     }
 }
 
@@ -334,6 +338,7 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
         if (ui_game_sp && ui_game_sp->GetPdaMenu().IsShown())
         {
             ui_game_sp->GetPdaMenu().HideDialog();
+            TimeDilator()->SetModeEnability(UITimeDilator::Pda, isTimeDilatedInPDA);
         }
     }
     inherited::Stop();

@@ -65,8 +65,7 @@ IC typename _graph_type::CEdge* CSGraphVertex::edge(const _vertex_id_type& verte
 TEMPLATE_SPECIALIZATION
 IC void CSGraphVertex::add_edge(CGraphVertex* vertex, const typename _graph_type::CEdge::edge_weight_type& edge_weight)
 {
-    typename EDGES::iterator I = std::find(m_edges.begin(), m_edges.end(), vertex->vertex_id());
-    VERIFY(m_edges.end() == I);
+    VERIFY(m_edges.end() == std::find(m_edges.begin(), m_edges.end(), vertex->vertex_id()));
     vertex->on_edge_addition(this);
     m_edges.push_back(typename _graph_type::CEdge(edge_weight, vertex));
     ++*m_edge_count;
@@ -86,8 +85,7 @@ IC void CSGraphVertex::remove_edge(const _vertex_id_type& vertex_id)
 TEMPLATE_SPECIALIZATION
 IC void CSGraphVertex::on_edge_addition(CGraphVertex* vertex)
 {
-    typename VERTICES::const_iterator I = std::find(m_vertices.begin(), m_vertices.end(), vertex);
-    VERIFY(I == m_vertices.end());
+    VERIFY(std::find(m_vertices.begin(), m_vertices.end(), vertex) == m_vertices.end());
     m_vertices.push_back(vertex);
 }
 

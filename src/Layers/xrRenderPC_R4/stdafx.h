@@ -13,10 +13,9 @@
 #ifdef _DEBUG
 #define D3D_DEBUG_INFO
 #endif
-#include <d3dx9.h>
+#include <D3D9.h>
 
 #include <D3D11.h>
-#include <D3Dx11core.h>
 #include <D3DCompiler.h>
 
 #if __has_include(<dxgi1_4.h>)
@@ -33,6 +32,8 @@
 #include <d3d11_3.h>
 #define HAS_DX11_3
 #endif
+
+#include <tracy/TracyD3D11.hpp>
 
 #include "Layers/xrRenderDX11/CommonTypes.h"
 

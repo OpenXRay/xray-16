@@ -107,14 +107,20 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
         --output;
         *output = (char)((input | BYTE_MARK) & BYTE_MASK);
         input >>= 6;
+        [[fallthrough]];
+
     case 3:
         --output;
         *output = (char)((input | BYTE_MARK) & BYTE_MASK);
         input >>= 6;
+        [[fallthrough]];
+
     case 2:
         --output;
         *output = (char)((input | BYTE_MARK) & BYTE_MASK);
         input >>= 6;
+        [[fallthrough]];
+
     case 1: --output; *output = (char)(input | FIRST_BYTE_MARK[*length]);
     }
 }
@@ -269,6 +275,11 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
                         p += 3;
                         ++col;
                     } // A normal character.
+                }
+                else
+                {
+                    ++p;
+                    ++col;
                 }
             }
             else

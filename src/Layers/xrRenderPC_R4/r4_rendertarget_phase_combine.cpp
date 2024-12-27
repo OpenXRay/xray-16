@@ -5,36 +5,11 @@
 
 #define STENCIL_CULL 0
 
-void CRenderTarget::DoAsyncScreenshot()
-{
-    //	Igor: screenshot will not have postprocess applied.
-    //	TODO: fix that later
-    if (RImplementation.m_bMakeAsyncSS)
-    {
-        HRESULT hr;
-
-        //	HACK: unbind RT. CopyResourcess needs src and targetr to be unbound.
-        // u_setrt				( Device.dwWidth,Device.dwHeight,get_base_rt(),NULL,NULL,get_base_zb());
-
-        // ID3DTexture2D *pTex = 0;
-        // if (RImplementation.o.msaa)
-        //	pTex = rt_Generic->pSurface;
-        // else
-        //	pTex = rt_Color->pSurface;
-
-        // HW.pDevice->CopyResource( t_ss_async, pTex );
-        ID3DTexture2D* pBuffer;
-        hr = HW.m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (LPVOID*)&pBuffer);
-        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(t_ss_async, pBuffer);
-
-        RImplementation.m_bMakeAsyncSS = false;
-    }
-}
-
 float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
 void CRenderTarget::phase_combine()
 {
+    ZoneScoped;
     PIX_EVENT(phase_combine);
 
     //	TODO: DX11: Remove half pixel offset
@@ -249,6 +224,12 @@ void CRenderTarget::phase_combine()
         }
     }
 
+    //Copy previous rt
+    if (!RImplementation.o.msaa)
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_Generic_temp->pTexture->surface_get(), rt_Generic_0->pTexture->surface_get());
+    else
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_Generic_temp->pTexture->surface_get(), rt_Generic_0_r->pTexture->surface_get());
+
     // Forward rendering
     {
         PIX_EVENT(Forward_rendering);
@@ -304,9 +285,29 @@ void CRenderTarget::phase_combine()
 
     RCache.set_Stencil(FALSE);
 
+    if (RImplementation.o.new_shader_support)
+    {
+        //(Anomaly) Compute blur textures
+        phase_blur();
+
+        //(Anomaly) Compute depth of field effect
+        if (ps_r2_ls_flags.test(R2FLAG_DOF))
+            phase_dof();
+
+        //(Anomaly) Compute night vision effect
+        if (ps_r2_nightvision > 0)
+            phase_nightvision();
+
+        if (ps_r2_mask_control.x > 0)
+        {
+            phase_gasmask_dudv();
+            phase_gasmask_drops();
+        }
+    }
+
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
-    BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
+    BOOL PP_Complex = u_need_PP();
     if (_menu_pp)
         PP_Complex = FALSE;
 

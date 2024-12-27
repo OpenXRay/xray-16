@@ -65,7 +65,7 @@ set(VORBISFILE_NAMES vorbisfile libvorbisfile)
 set(VORBISFILE_NAMES_DEBUG vorbisfiled vorbisfile_d vorbisfileD vorbisfile_D)
 
 foreach(search ${_VORBIS_SEARCHES})
-  find_path(VORBIS_INCLUDE_DIR NAMES codec.h ${${search}} PATH_SUFFIXES vorbis)
+  find_path(VORBIS_INCLUDE_DIR NAMES vorbis/codec.h ${${search}} PATH_SUFFIXES include)
 endforeach()
 
 if(${VORBIS_INCLUDE_DIR} MATCHES ".framework")

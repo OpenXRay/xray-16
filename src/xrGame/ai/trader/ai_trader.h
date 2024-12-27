@@ -119,6 +119,7 @@ public:
     virtual bool natural_weapon() const { return false; }
     virtual bool natural_detector() const { return false; }
     virtual bool AllowItemToTrade(CInventoryItem const* item, const SInvItemPlace& place) const;
+    virtual bool CanPutInSlot(PIItem item, u32 slot) { return (slot == PDA_SLOT); }
 
     void dialog_sound_start(LPCSTR phrase);
     void dialog_sound_stop();

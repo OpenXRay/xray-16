@@ -83,7 +83,7 @@ IC u64 btwCount1(u64 v)
 #ifdef XR_COMPILER_GCC
     return __builtin_popcountll(v);
 #else
-    return btwCount1(u32(v & u32(-1))) + btwCount1(u32(v >> u64(32))); 
+    return btwCount1(u32(v & u32(-1))) + btwCount1(u32(v >> u64(32)));
 #endif
 }
 

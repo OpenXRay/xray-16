@@ -38,8 +38,7 @@ IC static void CScriptActionBase_Export(lua_State* luaState)
             .def("initialize", &CScriptActionBase::initialize, &CScriptActionWrapper::initialize_static)
             .def("execute", &CScriptActionBase::execute, &CScriptActionWrapper::execute_static)
             .def("finalize", &CScriptActionBase::finalize, &CScriptActionWrapper::finalize_static)
-            //			.def("weight",						&CScriptActionBase::weight,
-            //&CScriptActionWrapper::weight_static)
+            .def("weight", &CScriptActionBase::weight, &CScriptActionWrapper::weight_static)
             .def("set_weight", &CScriptActionBase::set_weight)
 #ifdef LOG_ACTION
             .def("show", &CScriptActionBase::show)

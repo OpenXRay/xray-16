@@ -14,7 +14,6 @@
 #include "Level_Bullet_Manager.h"
 
 #include "game_cl_mp.h"
-#include "reward_event_generator.h"
 
 #define FLAME_TIME 0.05f
 
@@ -51,6 +50,8 @@ void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion)
 }
 
 float CWeapon::GetWeaponDeterioration() { return conditionDecreasePerShot; };
+
+extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
 void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
 {
     VERIFY(m_magazine.size());
@@ -87,10 +88,6 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
                 m_first_bullet_controller.make_shot();
             }
         }
-        game_cl_mp* tmp_mp_game = smart_cast<game_cl_mp*>(&Game());
-        VERIFY(tmp_mp_game);
-        if (tmp_mp_game->get_reward_generator())
-            tmp_mp_game->get_reward_generator()->OnWeapon_Fire(H_Parent()->ID(), ID());
     }
     if (fsimilar(fire_disp, 0.f))
     {
@@ -109,13 +106,17 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
     //выстерлить пулю (с учетом возможной стрельбы дробью)
     for (int i = 0; i < l_cartridge.param_s.buckShot; ++i)
     {
-        FireBullet(P, D, fire_disp, l_cartridge, H_Parent()->ID(), ID(), SendHit);
+        FireBullet(P, D, fire_disp, l_cartridge, H_Parent()->ID(), ID(), SendHit, iAmmoElapsed);
     }
 
     StartShotParticles();
 
     if (m_bLightShotEnabled)
         Light_Start();
+
+    // Interactive Grass FX
+    Fvector ShotPos = Fvector().mad(P, D, 1.5f);
+    g_pGamePersistent->GrassBendersAddShot(cast_game_object()->ID(), ShotPos, D, 3.0f, 20.0f, ps_ssfx_int_grass_params_2.z, ps_ssfx_int_grass_params_2.w);
 
     // Ammo
     m_magazine.pop_back();

@@ -27,34 +27,53 @@
 #include "Torch.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/xr_token.h"
+#include "GamePersistent.h"
 
 #define WEAPON_REMOVE_TIME 60000
 #define ROTATION_TIME 0.25f
 
+constexpr pcstr WPN_SCOPE = "wpn_scope";
+constexpr pcstr WPN_SILENCER = "wpn_silencer";
+constexpr pcstr WPN_GRENADE_LAUNCHER = "wpn_launcher";
+constexpr pcstr WPN_GRENADE_LAUNCHER_SOC = "wpn_grenade_launcher";
+
 BOOL b_toggle_weapon_aim = FALSE;
 
-static class CUIWpnScopeXmlManager : public CUIResetNotifier, public pureAppEnd
+static class CUIWpnScopeXmlManager : public pureUIReset, public pureAppEnd
 {
     CUIXml m_xml;
     bool m_loaded{};
 
-public:
     void Load()
     {
-        if (m_loaded)
-            return;
         m_loaded = m_xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scopes.xml");
     }
 
-    void OnAppEnd()
+    void Clear()
     {
         m_xml.ClearInternal();
         m_loaded = false;
     }
 
+public:
+    void Init()
+    {
+        if (m_loaded)
+            return;
+
+        Load();
+        Device.seqUIReset.Add(this);
+    }
+
+    void OnAppEnd() override
+    {
+        Clear();
+        Device.seqUIReset.Remove(this);
+    }
+
     void OnUIReset() override
     {
-        OnAppEnd();
+        Clear();
         if (g_pGameLevel)
             Load();
     }
@@ -519,7 +538,7 @@ void CWeapon::LoadScope(const shared_str& section)
 {
     if (ShadowOfChernobylMode) // XXX: temporary check for SOC mode, to be removed
         return;
-    pWpnScopeXml.Load();
+    pWpnScopeXml.Init();
     R_ASSERT(m_UIScope);
     CUIXmlInit::InitWindow(*pWpnScopeXml, section.c_str(), 0, m_UIScope);
 }
@@ -578,6 +597,9 @@ bool CWeapon::net_Spawn(CSE_Abstract* DC)
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
     m_bAmmoWasSpawned = false;
+
+    if (m_bLightShotEnabled)
+        Light_Create();
 
     return bResult;
 }
@@ -837,7 +859,6 @@ void CWeapon::OnH_B_Chield()
     m_set_next_ammoType_on_reload = undefined_ammo_type;
 }
 
-extern u32 hud_adj_mode;
 bool CWeapon::AllowBore() { return true; }
 void CWeapon::UpdateCL()
 {
@@ -858,7 +879,7 @@ void CWeapon::UpdateCL()
         CActor* pActor = smart_cast<CActor*>(H_Parent());
         if (pActor && !pActor->AnyMove() && this == pActor->inventory().ActiveItem())
         {
-            if (hud_adj_mode == 0 && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
+            if (!GamePersistent().GetHudTuner().is_active() && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
                 !IsZoomed() && g_player_hud->attached_item(1) == nullptr)
             {
                 if (AllowBore())
@@ -1273,12 +1294,18 @@ bool CWeapon::IsSilencerAttached() const
 bool CWeapon::GrenadeLauncherAttachable() { return (ALife::eAddonAttachable == m_eGrenadeLauncherStatus); }
 bool CWeapon::ScopeAttachable() { return (ALife::eAddonAttachable == m_eScopeStatus); }
 bool CWeapon::SilencerAttachable() { return (ALife::eAddonAttachable == m_eSilencerStatus); }
-shared_str wpn_scope = "wpn_scope";
-shared_str wpn_silencer = "wpn_silencer";
-shared_str wpn_grenade_launcher = "wpn_launcher";
+
 
 void CWeapon::UpdateHUDAddonsVisibility()
-{ // actor only
+{
+    if (GamePersistent().GetHudTuner().is_active())
+        return;
+    static shared_str wpn_scope = WPN_SCOPE;
+    static shared_str wpn_silencer = WPN_SILENCER;
+    static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+    static shared_str wpn_grenade_launcher_soc = WPN_GRENADE_LAUNCHER_SOC;
+
+    // actor only
     if (!GetHUDmode())
         return;
 
@@ -1307,20 +1334,32 @@ void CWeapon::UpdateHUDAddonsVisibility()
     else if (m_eSilencerStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(wpn_silencer, TRUE, TRUE);
 
+    bool use_soc_name{};
+    if (HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher) == BI_NONE)
+        use_soc_name = HudItemData()->m_model->LL_BoneID(wpn_grenade_launcher_soc) != BI_NONE;
+
     if (GrenadeLauncherAttachable())
     {
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, IsGrenadeLauncherAttached());
+        HudItemData()->set_bone_visible((use_soc_name ? wpn_grenade_launcher_soc : wpn_grenade_launcher), IsGrenadeLauncherAttached());
     }
     if (m_eGrenadeLauncherStatus == ALife::eAddonDisabled)
     {
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, FALSE, TRUE);
+        HudItemData()->set_bone_visible((use_soc_name ? wpn_grenade_launcher_soc : wpn_grenade_launcher), FALSE, TRUE);
     }
     else if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
-        HudItemData()->set_bone_visible(wpn_grenade_launcher, TRUE, TRUE);
+        HudItemData()->set_bone_visible((use_soc_name ? wpn_grenade_launcher_soc : wpn_grenade_launcher), TRUE, TRUE);
 }
 
 void CWeapon::UpdateAddonsVisibility()
 {
+    if (GamePersistent().GetHudTuner().is_active())
+        return;
+
+    static shared_str wpn_scope = WPN_SCOPE;
+    static shared_str wpn_silencer = WPN_SILENCER;
+    static shared_str wpn_grenade_launcher = WPN_GRENADE_LAUNCHER;
+    static shared_str wpn_grenade_launcher_soc = WPN_GRENADE_LAUNCHER_SOC;
+
     IKinematics* pWeaponVisual = smart_cast<IKinematics*>(Visual());
     R_ASSERT(pWeaponVisual);
 
@@ -1369,6 +1408,9 @@ void CWeapon::UpdateAddonsVisibility()
     }
 
     bone_id = pWeaponVisual->LL_BoneID(wpn_grenade_launcher);
+    if (bone_id == BI_NONE)
+        bone_id = pWeaponVisual->LL_BoneID(wpn_grenade_launcher_soc);
+
     if (GrenadeLauncherAttachable())
     {
         if (IsGrenadeLauncherAttached())
@@ -1671,6 +1713,14 @@ const CInventoryItem* CWeapon::can_kill(const xr_vector<const CGameObject*>& ite
 
 bool CWeapon::ready_to_kill() const
 {
+	//Alundaio
+    const auto io = smart_cast<const CInventoryOwner*>(H_Parent());
+	if (!io)
+		return false;
+
+	if (!io->inventory().ActiveItem() || io->inventory().ActiveItem()->object().ID() != ID())
+		return false;
+	//-Alundaio
     return (
         !IsMisfire() && ((GetState() == eIdle) || (GetState() == eFire) || (GetState() == eFire2)) && GetAmmoElapsed());
 }
@@ -1865,27 +1915,6 @@ BOOL CWeapon::ParentIsActor()
         return FALSE;
 
     return EA->cast_actor() != nullptr;
-}
-
-extern u32 hud_adj_mode;
-
-void CWeapon::debug_draw_firedeps()
-{
-#ifdef DEBUG
-    if (hud_adj_mode == 5 || hud_adj_mode == 6 || hud_adj_mode == 7)
-    {
-        CDebugRenderer& render = Level().debug_renderer();
-
-        if (hud_adj_mode == 5)
-            render.draw_aabb(get_LastFP(), 0.005f, 0.005f, 0.005f, color_xrgb(255, 0, 0));
-
-        if (hud_adj_mode == 6)
-            render.draw_aabb(get_LastFP2(), 0.005f, 0.005f, 0.005f, color_xrgb(0, 0, 255));
-
-        if (hud_adj_mode == 7)
-            render.draw_aabb(get_LastSP(), 0.005f, 0.005f, 0.005f, color_xrgb(0, 255, 0));
-    }
-#endif // DEBUG
 }
 
 const float& CWeapon::hit_probability() const

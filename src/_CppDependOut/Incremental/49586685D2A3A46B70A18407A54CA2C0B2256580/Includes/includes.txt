@@ -1,7 +1,0 @@
-c:\openxray\externals\openal\openal-windows\router\allist.h
-c:\openxray\externals\openal\openal-windows\router\openal32.h
-c:\openxray\externals\openal\openal-windows\router\resource.h
-c:\openxray\externals\openal\openal-windows\router\al.cpp
-c:\openxray\externals\openal\openal-windows\router\alc.cpp
-c:\openxray\externals\openal\openal-windows\router\allist.cpp
-c:\openxray\externals\openal\openal-windows\router\openal32.cpp

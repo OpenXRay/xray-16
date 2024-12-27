@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\cximage\ximath.cpp"><violation beginline="72" endline="72" rule="Rule6-6-5" ruleset="Statements">
-</violation></file><file path="h:\programs\codergears\cppdepend\defaulttoolchain\include\math.h"><violation beginline="174" endline="174" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="174" endline="174" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

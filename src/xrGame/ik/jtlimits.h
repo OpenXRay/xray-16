@@ -223,9 +223,9 @@ private:
     float theta1_d_aux(float v, float delta) const;
 
 #if 0
-    void clip(int family, 
-	      float psi0, float psi1, 
-	      float low, float high, 
+    void clip(int family,
+	      float psi0, float psi1,
+	      float low, float high,
 	      AngleIntList &a) const;
 #else
     void clip(float low, float high, int family, int n, const float p[], AngleIntList& f) const;

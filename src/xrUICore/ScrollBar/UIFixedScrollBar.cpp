@@ -7,13 +7,12 @@
 #include "Cursor/UICursor.h"
 
 CUIFixedScrollBar::CUIFixedScrollBar()
+    : m_ScrollBox(xr_new<CUI3tButton>())
 {
-    m_ScrollBox = xr_new<CUI3tButton>();
     m_ScrollBox->SetAutoDelete(true);
     AttachChild(m_ScrollBox);
 }
 
-CUIFixedScrollBar::~CUIFixedScrollBar(void) {}
 bool CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, cpcstr profile)
 {
     string256 _path;
@@ -35,16 +34,16 @@ bool CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, cpcstr prof
     {
         inherited::SetWndSize(Fvector2().set(width, height));
 
-        strconcat(sizeof(_path), _path, profile, ":left_arrow");
+        strconcat(_path, profile, ":left_arrow");
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_DecButton);
 
-        strconcat(sizeof(_path), _path, profile, ":right_arrow");
+        strconcat(_path, profile, ":right_arrow");
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_IncButton);
 
-        strconcat(sizeof(_path), _path, profile, ":box");
+        strconcat(_path, profile, ":box");
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_ScrollBox);
 
-        strconcat(sizeof(_path), _path, profile, ":back");
+        strconcat(_path, profile, ":back");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_FrameBackground, false))
             return false;
 
@@ -54,16 +53,16 @@ bool CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, cpcstr prof
     {
         inherited::SetWndSize(Fvector2().set(width_v, height_v));
 
-        strconcat(sizeof(_path), _path, profile, ":up_arrow");
+        strconcat(_path, profile, ":up_arrow");
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_DecButton);
 
-        strconcat(sizeof(_path), _path, profile, ":down_arrow");
+        strconcat(_path, profile, ":down_arrow");
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_IncButton);
 
-        strconcat(sizeof(_path), _path, profile, ":box_v");
+        strconcat(_path, profile, ":box_v");
         CUIXmlInitBase::Init3tButton(xml_doc, _path, 0, m_ScrollBox);
 
-        strconcat(sizeof(_path), _path, profile, ":back_v");
+        strconcat(_path, profile, ":back_v");
         if (!CUIXmlInitBase::InitFrameLine(xml_doc, _path, 0, m_FrameBackground, false))
             return false;
 
@@ -90,7 +89,7 @@ void CUIFixedScrollBar::UpdateScrollBar()
                     GetWidth() - m_IncButton->GetWidth() - m_DecButton->GetWidth() - 2 * m_ScrollBoxOffset.x);
                 m_ScrollBox->SetWidth(box_sz);
                 // set pos
-                int pos = PosViewFromScroll(iFloor(box_sz), iFloor(GetHeight()));
+                const int pos = PosViewFromScroll(iFloor(box_sz), iFloor(GetHeight()));
                 m_ScrollBox->SetWndPos(Fvector2().set(float(pos), m_ScrollBox->GetWndRect().top));
                 m_IncButton->SetWndPos(Fvector2().set(GetWidth() - m_IncButton->GetWidth(), 0.0f));
             }
@@ -101,7 +100,7 @@ void CUIFixedScrollBar::UpdateScrollBar()
                     GetHeight() - m_IncButton->GetHeight() - m_DecButton->GetHeight() - 2 * m_ScrollBoxOffset.y);
                 m_ScrollBox->SetHeight(box_sz);
                 // set pos
-                int pos = PosViewFromScroll(iFloor(box_sz), iFloor(GetWidth()));
+                const int pos = PosViewFromScroll(iFloor(box_sz), iFloor(GetWidth()));
                 m_ScrollBox->SetWndPos(Fvector2().set(m_ScrollBox->GetWndRect().left, float(pos)));
                 m_IncButton->SetWndPos(Fvector2().set(0.0f, GetHeight() - m_IncButton->GetHeight()));
             }
@@ -162,21 +161,31 @@ bool CUIFixedScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action
     switch (mouse_action)
     {
     case WINDOW_MOUSE_WHEEL_DOWN:
+    {
         TryScrollInc(true);
         return true;
         break;
+    }
     case WINDOW_MOUSE_WHEEL_UP:
+    {
         TryScrollDec(true);
         return true;
         break;
+    }
     case WINDOW_LBUTTON_UP:
+    {
         SetCapture(m_ScrollBox, false);
         m_mouse_state = 0;
         return true;
-    case WINDOW_LBUTTON_DOWN: SetCapture(m_ScrollBox, true); return true;
+    }
+    case WINDOW_LBUTTON_DOWN:
+    {
+        SetCapture(m_ScrollBox, true);
+        return true;
+    }
     case WINDOW_MOUSE_MOVE:
     {
-        bool im_capturer = (GetMouseCapturer() == m_ScrollBox);
+        const bool im_capturer = (GetMouseCapturer() == m_ScrollBox);
         bool cursor_over = false;
         Fvector2 cursor_pos = GetUICursor().GetCursorPosition();
         Frect box_rect;
@@ -192,7 +201,7 @@ bool CUIFixedScrollBar::OnMouseAction(float x, float y, EUIMessages mouse_action
         if (im_capturer && cursor_over)
         {
             Fvector2 pos = m_ScrollBox->GetWndPos();
-            Fvector2 delta = GetUICursor().GetCursorPositionDelta();
+            const Fvector2 delta = GetUICursor().GetCursorPositionDelta();
             if (m_bIsHorizontal)
                 pos.x += delta.x;
             else
@@ -302,9 +311,9 @@ void CUIFixedScrollBar::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIFixedScrollBar::SetPosScrollFromView(float view_pos, float view_size, float view_offs)
 {
-    int scroll_size = ScrollSize();
-    float pos = view_pos - view_offs;
-    float work_size = m_ScrollWorkArea - view_size;
+    const int scroll_size = ScrollSize();
+    const float pos = view_pos - view_offs;
+    const float work_size = m_ScrollWorkArea - view_size;
     m_iScrollPos = work_size ? iFloor(((pos / work_size) * (scroll_size) + m_iMinPos)) : 0;
     clamp(m_iScrollPos, m_iMinPos, m_iMaxPos - m_iPageSize + 1);
     UpdateScrollBar();

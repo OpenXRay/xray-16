@@ -13,9 +13,8 @@
 #include "GameObject.h"
 #include "relation_registry.h"
 
-CAI_PhraseDialogManager::CAI_PhraseDialogManager(void) { m_sStartDialog = m_sDefaultStartDialog = NULL; }
-CAI_PhraseDialogManager::~CAI_PhraseDialogManager(void) {}
-// PhraseDialogManager
+CAI_PhraseDialogManager::CAI_PhraseDialogManager() = default;
+
 void CAI_PhraseDialogManager::ReceivePhrase(DIALOG_SHARED_PTR& phrase_dialog)
 {
     AnswerPhrase(phrase_dialog);

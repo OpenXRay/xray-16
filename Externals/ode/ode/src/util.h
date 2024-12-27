@@ -27,7 +27,7 @@
 #include "float.h"
 
 #ifndef MSVC
-#include <math.h> // for fpclassify
+#include <cmath> // for fpclassify
 #endif
 
 void dInternalHandleAutoDisabling (dxWorld *world, dReal stepsize);
@@ -45,11 +45,11 @@ inline bool dValid(const float x)
 {
 #ifdef MSVC
     // check for: Signaling NaN, Quiet NaN, Negative infinity (-INF), Positive infinity (+INF), Negative denormalized, Positive denormalized
-    int cls = _fpclass (double(x));
+    int cls = _fpclass(double(x));
     if (cls&(_FPCLASS_SNAN+_FPCLASS_QNAN+_FPCLASS_NINF+_FPCLASS_PINF+_FPCLASS_ND+_FPCLASS_PD))
        return false;
 #else
-	int cls = fpclassify((double )x);
+	int cls = std::fpclassify((double)x);
     switch (cls)
     {
     case FP_NAN:

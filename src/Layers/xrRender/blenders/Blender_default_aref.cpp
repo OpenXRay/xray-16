@@ -24,7 +24,7 @@ BOOL CBlender_default_aref::canBeDetailed()
     return TRUE;
 }
 
-BOOL CBlender_default_aref::canBeLMAPped() 
+BOOL CBlender_default_aref::canBeLMAPped()
 {
     return TRUE;
 }

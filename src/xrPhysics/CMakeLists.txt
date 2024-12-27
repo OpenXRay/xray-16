@@ -1,374 +1,413 @@
-project(xrPhysics)
-
-set(KERNEL
-    "stdafx.cpp"
-    "StdAfx.h"
-    "xrPhysics.cpp"
-    "xrPhysics.h"
-)
-
-set(PHYSICS
-    "console_vars.cpp"
-    "console_vars.h"
-    "ShellHit.cpp"
-)
-
-set(PHYSICS_ACTIVATION_BOX
-    "IActivationShape.cpp"
-    "IActivationShape.h"
-    "PHActivationShape.cpp"
-    "PHActivationShape.h"
-)
-
-set(PHYSICS_BASE
-    "DamageSource.h"
-    "ode_include.h"
-    "ode_redefine.h"
-    "PhysicsCommon.h"
-    "PhysicsExternalCommon.cpp"
-    "PhysicsExternalCommon.h"
-)
-
-set(PHYSICS_BASE_DEBUG
-    "debug_output.cpp"
-    "debug_output.h"
-)
-
-set(PHYSICS_BASE_IMPACT
-    "PHImpact.h"
-)
-
-set(PHYSICS_BASE_OBJECTS
-    "PHDefs.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_BASE_SHELL
-    "IPhysicsShellHolder.h"
-    "PhysicsShell.cpp"
-    "PhysicsShell.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_BASE_SHELL_ANIMATOR
-    "PhysicsShellAnimatorBoneData.h"
-    "PhysicsShellAnimator.cpp"
-    "PhysicsShellAnimator.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_BODY_EFFECTORS
-    "PHBaseBodyEffector.h"
-    "PHContactBodyEffector.cpp"
-    "PHContactBodyEffector.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_BREAKABLE
-    "PHFracture.cpp"
-    "PHFracture.h"
-    "PHJointDestroyInfo.cpp"
-    "PHJointDestroyInfo.h"
-    "PHShellSplitter.cpp"
-    "PHShellSplitter.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_COLLIDE_VALIDATOR
-    "ICollideValidator.h"
-    "PHCollideValidator.cpp"
-    "PHCollideValidator.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_DISABLING
-    "DisablingParams.cpp"
-    "DisablingParams.h"
-    "PHDisabling.cpp"
-    "PHDisabling.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_ELEMENT
-    "PHElement.cpp"
-    "PHElement.h"
-    "PHElementInline.h"
-    "PHElementNetState.cpp"
-)
-
-set(PHYSICS_BASE_OBJECTS_ELEMENT_GEOM
-    "ExtendedGeom.cpp"
-    "ExtendedGeom.h"
-    "Geometry.cpp"
-    "Geometry.h"
-    "PHGeometryOwner.cpp"
-    "PHGeometryOwner.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_JOINT
-    "PHJoint.cpp"
-    "PHJoint.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_MOVE_STORAGE
-    "PHMoveStorage.cpp"
-    "PHMoveStorage.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PH_ISLAND
-    "PHIsland.cpp"
-    "PHIsland.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PH_NET
-    "../xrServerEntities/PHNetState.cpp"
-    "../xrServerEntities/PHNetState.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PH_OBJECT
-    "PHObject.cpp"
-    "PHObject.h"
-    "PHUpdateObject.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PHY_MOVE_ACTOR_CHARACTER
-    "PHActorCharacter.cpp"
-    "PHActorCharacter.h"
-    "PHActorCharacterInline.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PHY_MOVE_AI_CHARACTER
-    "PHAICharacter.cpp"
-    "PHAICharacter.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PHY_MOVE_BASE_CHARACTER
-    "IColisiondamageInfo.h"
-    "MovementBoxDynamicActivate.cpp"
-    "MovementBoxDynamicActivate.h"
-    "PHCharacter.cpp"
-    "PHCharacter.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_PHY_MOVE_CAPTURE
-    "IPHCapture.h"
-    "PHCapture.cpp"
-    "PHCapture.h"
-    "PHCaptureInit.cpp"
-)
-
-set(PHYSICS_BASE_OBJECTS_PHY_MOVE_SIMPLE_CHARACTER
-    "ElevatorState.cpp"
-    "ElevatorState.h"
-    "IClimableObject.h"
-    "IElevatorState.h"
-    "PHSimpleCharacter.cpp"
-    "PHSimpleCharacter.h"
-    "PHSimpleCharacterInline.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_SCRIPT
-    "iphysics_scripted.h"
-    "physics_scripted.cpp"
-    "physics_scripted.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_SHELL
-    "PHShell.cpp"
-    "PHShell.h"
-    "PHShellActivate.cpp"
-    "PHShellBuildJoint.h"
-    "PHShellNetState.cpp"
-)
-
-set(PHYSICS_BASE_OBJECTS_SPLITED_SHELL
-    "PHSplitedShell.cpp"
-    "PHSplitedShell.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_STATIC_SHELL
-    "IPHStaticGeomShell.h"
-    "PHStaticGeomShell.cpp"
-    "PHStaticGeomShell.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_UTILS
-    "ph_valid_ode.h"
-    "phvalide.cpp"
-    "phvalide.h"
-    "PHValideValues.h"
-)
-set(PHYSICS_BASE_OBJECTS_UTILS_INTERPOLATION
-    "PHInterpolation.cpp"
-    "PHInterpolation.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_UTILS_MATH
-    "CalculateTriangle.h"
-    "MathUtils.cpp"
-    "MathUtils.h"
-    "MathUtilsOde.h"
-    "matrix_utils.h"
-    "PHDynamicData.cpp"
-    "PHDynamicData.h"
-    "SpaceUtils.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_UTILS_STORAGE
-    "BlockAllocator.h"
-    "CycleConstStorage.h"
-)
-
-set(PHYSICS_BASE_OBJECTS_WORLD
-    "GeometryBits.cpp"
-    "GeometryBits.h"
-    "IPHWorld.h"
-    "params.cpp"
-    "params.h"
-    "PHItemList.h"
-    "PHWorld.cpp"
-    "PHWorld.h"
-    "Physics.cpp"
-    "Physics.h"
-)
-
-set(CAMERA_COLLISION
-    "ActorCameraCollision.cpp"
-    "ActorCameraCollision.h"
-)
-
-set(COLLIDERS_CYL
-    "dcylinder/dCylinder.cpp"
-    "dcylinder/dCylinder.h"
-)
-
-set(COLLIDERS_RAY_MOTIONS
-    "dRayMotions.cpp"
-    "dRayMotions.h"
-)
-
-set(COLLIDERS_TRI
-    "tri-colliderknoopc/__aabb_tri.h"
-    "tri-colliderknoopc/dcTriangle.h"
-    #"tri-colliderknoopc/dcTriListCollider.cpp"
-    #"tri-colliderknoopc/dcTriListCollider.h"
-    "tri-colliderknoopc/dSortTriPrimitive.cpp"
-    "tri-colliderknoopc/dSortTriPrimitive.h"
-    "tri-colliderknoopc/dTriBox.cpp"
-    "tri-colliderknoopc/dTriBox.h"
-    "tri-colliderknoopc/dTriCallideK.cpp"
-    "tri-colliderknoopc/dTriCollideK.h"
-    "tri-colliderknoopc/dTriColliderCommon.h"
-    "tri-colliderknoopc/dTriColliderMath.h"
-    "tri-colliderknoopc/dTriCylinder.cpp"
-    "tri-colliderknoopc/dTriCylinder.h"
-    "tri-colliderknoopc/dTriList.cpp"
-    "tri-colliderknoopc/dTriList.h"
-    "tri-colliderknoopc/dTriSphere.cpp"
-    "tri-colliderknoopc/dTriSphere.h"
-    "tri-colliderknoopc/dxTriList.h"
-    "tri-colliderknoopc/TriPrimitiveCollideClassDef.h")
-
-set(DAMAGE_RECEIVER
-    "collisiondamagereceiver.cpp"
-    "icollisiondamagereceiver.h"
-)
-
-source_group("kernel" FILES ${KERNEL})
-source_group("physics" FILES ${PHYSICS})
-source_group("physics\\ActivationBox" FILES ${PHYSICS_ACTIVATION_BOX})
-source_group("physics\\Base" FILES ${PHYSICS_BASE})
-source_group("physics\\Base\\Debug" FILES ${PHYSICS_BASE_DEBUG})
-source_group("physics\\Base\\Impact" FILES ${PHYSICS_BASE_IMPACT})
-source_group("physics\\Base\\Objects" FILES ${PHYSICS_BASE_OBJECTS})
-source_group("physics\\Base\\Objects\\BaseShell" FILES ${PHYSICS_BASE_OBJECTS_BASE_SHELL})
-source_group("physics\\Base\\Objects\\BaseShell\\PhysicsShellAnimator" FILES ${PHYSICS_BASE_OBJECTS_BASE_SHELL_ANIMATOR})
-source_group("physics\\Base\\Objects\\BodyEffectors" FILES ${PHYSICS_BASE_OBJECTS_BODY_EFFECTORS})
-source_group("physics\\Base\\Objects\\Breakable" FILES ${PHYSICS_BASE_OBJECTS_BREAKABLE})
-source_group("physics\\Base\\Objects\\CollideValidator" FILES ${PHYSICS_BASE_OBJECTS_COLLIDE_VALIDATOR})
-source_group("physics\\Base\\Objects\\Disabling" FILES ${PHYSICS_BASE_OBJECTS_DISABLING})
-source_group("physics\\Base\\Objects\\Element" FILES ${PHYSICS_BASE_OBJECTS_ELEMENT})
-source_group("physics\\Base\\Objects\\Element\\Geom" FILES ${PHYSICS_BASE_OBJECTS_ELEMENT_GEOM})
-source_group("physics\\Base\\Objects\\Joint" FILES ${PHYSICS_BASE_OBJECTS_JOINT})
-source_group("physics\\Base\\Objects\\MoveStorage" FILES ${PHYSICS_BASE_OBJECTS_MOVE_STORAGE})
-source_group("physics\\Base\\Objects\\PHIsland" FILES ${PHYSICS_BASE_OBJECTS_PH_ISLAND})
-source_group("physics\\Base\\Objects\\PHNet" FILES ${PHYSICS_BASE_OBJECTS_PH_NET})
-source_group("physics\\Base\\Objects\\PHObject" FILES ${PHYSICS_BASE_OBJECTS_PH_OBJECT})
-source_group("physics\\Base\\Objects\\PhyMove\\ActorCharacter" FILES ${PHYSICS_BASE_OBJECTS_PHY_MOVE_ACTOR_CHARACTER})
-source_group("physics\\Base\\Objects\\PhyMove\\AICharacter" FILES ${PHYSICS_BASE_OBJECTS_PHY_MOVE_AI_CHARACTER})
-source_group("physics\\Base\\Objects\\PhyMove\\BaseCharacter" FILES ${PHYSICS_BASE_OBJECTS_PHY_MOVE_BASE_CHARACTER})
-source_group("physics\\Base\\Objects\\PhyMove\\Capture" FILES ${PHYSICS_BASE_OBJECTS_PHY_MOVE_CAPTURE})
-source_group("physics\\Base\\Objects\\PhyMove\\SimpleCharacter" FILES ${PHYSICS_BASE_OBJECTS_PHY_MOVE_SIMPLE_CHARACTER})
-source_group("physics\\Base\\Objects\\script" FILES ${PHYSICS_BASE_OBJECTS_SCRIPT})
-source_group("physics\\Base\\Objects\\Shell" FILES ${PHYSICS_BASE_OBJECTS_SHELL})
-source_group("physics\\Base\\Objects\\SplitedShell" FILES ${PHYSICS_BASE_OBJECTS_SPLITED_SHELL})
-source_group("physics\\Base\\Objects\\StaticShell" FILES ${PHYSICS_BASE_OBJECTS_STATIC_SHELL})
-source_group("physics\\Base\\Objects\\utils" FILES ${PHYSICS_BASE_OBJECTS_UTILS})
-source_group("physics\\Base\\Objects\\utils\\Interpolation" FILES ${PHYSICS_BASE_OBJECTS_UTILS_INTERPOLATION})
-source_group("physics\\Base\\Objects\\utils\\Math" FILES ${PHYSICS_BASE_OBJECTS_UTILS_MATH})
-source_group("physics\\Base\\Objects\\utils\\Storage" FILES ${PHYSICS_BASE_OBJECTS_UTILS_STORAGE})
-source_group("physics\\Base\\Objects\\World" FILES ${PHYSICS_BASE_OBJECTS_WORLD})
-source_group("physics\\Camera collision" FILES ${CAMERA_COLLISION})
-source_group("physics\\colliders\\cyl" FILES ${COLLIDERS_CYL})
-source_group("physics\\colliders\\RayMotions" FILES ${COLLIDERS_RAY_MOTIONS})
-source_group("physics\\colliders\\tri" FILES ${COLLIDERS_TRI})
-source_group("physics\\Damage receiver" FILES ${DAMAGE_RECEIVER})
-
-set(SRC_FILES
-    ${KERNEL}
-    ${PHYSICS}
-    ${PHYSICS_ACTIVATION_BOX}
-    ${PHYSICS_BASE}
-    ${PHYSICS_BASE_DEBUG}
-    ${PHYSICS_BASE_IMPACT}
-    ${PHYSICS_BASE_OBJECTS}
-    ${PHYSICS_BASE_OBJECTS_BASE_SHELL}
-    ${PHYSICS_BASE_OBJECTS_BASE_SHELL_ANIMATOR}
-    ${PHYSICS_BASE_OBJECTS_BODY_EFFECTORS}
-    ${PHYSICS_BASE_OBJECTS_BREAKABLE}
-    ${PHYSICS_BASE_OBJECTS_COLLIDE_VALIDATOR}
-    ${PHYSICS_BASE_OBJECTS_DISABLING}
-    ${PHYSICS_BASE_OBJECTS_ELEMENT}
-    ${PHYSICS_BASE_OBJECTS_ELEMENT_GEOM}
-    ${PHYSICS_BASE_OBJECTS_JOINT}
-    ${PHYSICS_BASE_OBJECTS_MOVE_STORAGE}
-    ${PHYSICS_BASE_OBJECTS_PH_ISLAND}
-    ${PHYSICS_BASE_OBJECTS_PH_NET}
-    ${PHYSICS_BASE_OBJECTS_PH_OBJECT}
-    ${PHYSICS_BASE_OBJECTS_PHY_MOVE_ACTOR_CHARACTER}
-    ${PHYSICS_BASE_OBJECTS_PHY_MOVE_AI_CHARACTER}
-    ${PHYSICS_BASE_OBJECTS_PHY_MOVE_BASE_CHARACTER}
-    ${PHYSICS_BASE_OBJECTS_PHY_MOVE_CAPTURE}
-    ${PHYSICS_BASE_OBJECTS_PHY_MOVE_SIMPLE_CHARACTER}
-    ${PHYSICS_BASE_OBJECTS_SCRIPT}
-    ${PHYSICS_BASE_OBJECTS_SHELL}
-    ${PHYSICS_BASE_OBJECTS_SPLITED_SHELL}
-    ${PHYSICS_BASE_OBJECTS_STATIC_SHELL}
-    ${PHYSICS_BASE_OBJECTS_UTILS}
-    ${PHYSICS_BASE_OBJECTS_UTILS_INTERPOLATION}
-    ${PHYSICS_BASE_OBJECTS_UTILS_MATH}
-    ${PHYSICS_BASE_OBJECTS_UTILS_STORAGE}
-    ${PHYSICS_BASE_OBJECTS_WORLD}
-    ${CAMERA_COLLISION}
-    ${COLLIDERS_CYL}
-    ${COLLIDERS_RAY_MOTIONS}
-    ${COLLIDERS_TRI}
-    ${DAMAGE_RECEIVER}
-)
-
 if (STATIC_BUILD)
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    add_library(xrPhysics STATIC)
 else()
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+    add_library(xrPhysics SHARED)
 endif()
 
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/Externals/ode/include
-    ${SDL2_INCLUDE_DIRS}
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Kernel"
+    FILES
+    stdafx.cpp
+    StdAfx.h
+    xrPhysics.cpp
+    xrPhysics.h
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics"
+    FILES
+    console_vars.cpp
+    console_vars.h
+    ShellHit.cpp
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\ActivationBox"
+    FILES
+    IActivationShape.cpp
+    IActivationShape.h
+    PHActivationShape.cpp
+    PHActivationShape.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base"
+    FILES
+    DamageSource.h
+    ode_include.h
+    ode_redefine.h
+    PhysicsCommon.h
+    PhysicsExternalCommon.cpp
+    PhysicsExternalCommon.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Debug"
+    FILES
+    debug_output.cpp
+    debug_output.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Impact"
+    FILES
+    PHImpact.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects"
+    FILES
+    PHDefs.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\BaseShell"
+    FILES
+    IPhysicsShellHolder.h
+    PhysicsShell.cpp
+    PhysicsShell.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\BaseShell\\PhysicsShellAnimator"
+    FILES
+    PhysicsShellAnimatorBoneData.h
+    PhysicsShellAnimator.cpp
+    PhysicsShellAnimator.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\BodyEffectors"
+    FILES
+    PHBaseBodyEffector.h
+    PHContactBodyEffector.cpp
+    PHContactBodyEffector.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\Breakable"
+    FILES
+    PHFracture.cpp
+    PHFracture.h
+    PHJointDestroyInfo.cpp
+    PHJointDestroyInfo.h
+    PHShellSplitter.cpp
+    PHShellSplitter.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\CollideValidator"
+    FILES
+    ICollideValidator.h
+    PHCollideValidator.cpp
+    PHCollideValidator.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\Disabling"
+    FILES
+    DisablingParams.cpp
+    DisablingParams.h
+    PHDisabling.cpp
+    PHDisabling.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\Element"
+    FILES
+    PHElement.cpp
+    PHElement.h
+    PHElementInline.h
+    PHElementNetState.cpp
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\Element\\Geom"
+    FILES
+    ExtendedGeom.cpp
+    ExtendedGeom.h
+    Geometry.cpp
+    Geometry.h
+    PHGeometryOwner.cpp
+    PHGeometryOwner.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\Joint"
+    FILES
+    PHJoint.cpp
+    PHJoint.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\MoveStorage"
+    FILES
+    PHMoveStorage.cpp
+    PHMoveStorage.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PHIsland"
+    FILES
+    PHIsland.cpp
+    PHIsland.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PHNet"
+    FILES
+    ../xrServerEntities/PHNetState.cpp
+    ../xrServerEntities/PHNetState.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PHObject"
+    FILES
+    PHObject.cpp
+    PHObject.h
+    PHUpdateObject.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PhyMove\\ActorCharacter"
+    FILES
+    PHActorCharacter.cpp
+    PHActorCharacter.h
+    PHActorCharacterInline.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PhyMove\\AICharacter"
+    FILES
+    PHAICharacter.cpp
+    PHAICharacter.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PhyMove\\BaseCharacter"
+    FILES
+    IColisiondamageInfo.h
+    MovementBoxDynamicActivate.cpp
+    MovementBoxDynamicActivate.h
+    PHCharacter.cpp
+    PHCharacter.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PhyMove\\Capture"
+    FILES
+    IPHCapture.h
+    PHCapture.cpp
+    PHCapture.h
+    PHCaptureInit.cpp
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\PhyMove\\SimpleCharacter"
+    FILES
+    ElevatorState.cpp
+    ElevatorState.h
+    IClimableObject.h
+    IElevatorState.h
+    PHSimpleCharacter.cpp
+    PHSimpleCharacter.h
+    PHSimpleCharacterInline.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\script"
+    FILES
+    iphysics_scripted.h
+    physics_scripted.cpp
+    physics_scripted.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\Shell"
+    FILES
+    PHShell.cpp
+    PHShell.h
+    PHShellActivate.cpp
+    PHShellBuildJoint.h
+    PHShellNetState.cpp
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\SplitedShell"
+    FILES
+    PHSplitedShell.cpp
+    PHSplitedShell.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\StaticShell"
+    FILES
+    IPHStaticGeomShell.h
+    PHStaticGeomShell.cpp
+    PHStaticGeomShell.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\utils"
+    FILES
+    ph_valid_ode.h
+    phvalide.cpp
+    phvalide.h
+    PHValideValues.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\utils\\Interpolation"
+    FILES
+    PHInterpolation.cpp
+    PHInterpolation.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\utils\\Math"
+    FILES
+    CalculateTriangle.h
+    MathUtils.cpp
+    MathUtils.h
+    MathUtilsOde.h
+    matrix_utils.h
+    PHDynamicData.cpp
+    PHDynamicData.h
+    SpaceUtils.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\utils\\Storage"
+    FILES
+    BlockAllocator.h
+    CycleConstStorage.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Base\\Objects\\World"
+    FILES
+    GeometryBits.cpp
+    GeometryBits.h
+    IPHWorld.h
+    params.cpp
+    params.h
+    PHItemList.h
+    PHWorld.cpp
+    PHWorld.h
+    Physics.cpp
+    Physics.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Camera collision"
+    FILES
+    ActorCameraCollision.cpp
+    ActorCameraCollision.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\colliders\\cyl"
+    FILES
+    dcylinder/dCylinder.cpp
+    dcylinder/dCylinder.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\colliders\\RayMotions"
+    FILES
+    dRayMotions.cpp
+    dRayMotions.h
+)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\colliders\\tri"
+    FILES
+    tri-colliderknoopc/__aabb_tri.h
+    tri-colliderknoopc/dcTriangle.h
+    #tri-colliderknoopc/dcTriListCollider.cpp
+    #tri-colliderknoopc/dcTriListCollider.h
+    tri-colliderknoopc/dSortTriPrimitive.cpp
+    tri-colliderknoopc/dSortTriPrimitive.h
+    tri-colliderknoopc/dTriBox.cpp
+    tri-colliderknoopc/dTriBox.h
+    tri-colliderknoopc/dTriCallideK.cpp
+    tri-colliderknoopc/dTriCollideK.h
+    tri-colliderknoopc/dTriColliderCommon.h
+    tri-colliderknoopc/dTriColliderMath.h
+    tri-colliderknoopc/dTriCylinder.cpp
+    tri-colliderknoopc/dTriCylinder.h
+    tri-colliderknoopc/dTriList.cpp
+    tri-colliderknoopc/dTriList.h
+    tri-colliderknoopc/dTriSphere.cpp
+    tri-colliderknoopc/dTriSphere.h
+    tri-colliderknoopc/dxTriList.h
+    tri-colliderknoopc/TriPrimitiveCollideClassDef.h)
+
+target_sources_grouped(
+    TARGET xrPhysics
+    NAME "Physics\\Damage receiver"
+    FILES
+    collisiondamagereceiver.cpp
+    icollisiondamagereceiver.h
+)
+
+
+target_include_directories(xrPhysics
+    PUBLIC
+    "${CMAKE_SOURCE_DIR}/Externals"
+
+    PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/Externals/imgui"
+    "${CMAKE_SOURCE_DIR}/Externals/ode/include"
+)
+
+target_link_libraries(xrPhysics
     PUBLIC
     xrODE
     PRIVATE
     xrCore
     xrEngine
+    xrMaterialSystem
     xrMiscMath
     xrScriptEngine
     xrAPI
@@ -376,24 +415,24 @@ target_link_libraries(${PROJECT_NAME}
     xrSound
 )
 
-target_compile_definitions(${PROJECT_NAME}
+target_compile_definitions(xrPhysics
     PRIVATE
-    -DXRPHYSICS_EXPORTS
+    XRPHYSICS_EXPORTS
+    PURE_DYNAMIC_CAST
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(xrPhysics PROPERTIES
     PREFIX ""
     POSITION_INDEPENDENT_CODE ON
 )
 
-target_precompile_headers(${PROJECT_NAME}
+target_precompile_headers(xrPhysics
     PRIVATE
-    "StdAfx.h"
+    StdAfx.h
 )
 
 if (NOT STATIC_BUILD)
-    install(TARGETS ${PROJECT_NAME} LIBRARY
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+    install(TARGETS xrPhysics LIBRARY
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 endif()

@@ -57,6 +57,8 @@ void CHOM::Load()
     if (strstr(Core.Params, "-no_hom") )
         return;
 
+    ZoneScoped;
+
     // Find and open file
     string_path fName;
     FS.update_path(fName, "$level$", "level.hom");
@@ -91,6 +93,7 @@ void CHOM::Load()
 
     xr_parallel_for(TaskRange<size_t>(0, CL.getTS()), [&](const TaskRange<size_t>& range)
     {
+        ZoneScopedN("Process triangles");
         for (size_t it = range.begin(); it != range.end(); ++it)
         {
             const CDB::TRI& clT = CL.getT()[it];
@@ -145,6 +148,7 @@ void CHOM::Load()
 
 void CHOM::Unload()
 {
+    ZoneScoped;
     xr_delete(m_pModel);
     xr_free(m_pTris);
     bEnabled = FALSE;
@@ -152,9 +156,11 @@ void CHOM::Unload()
 
 void CHOM::Render_DB(CFrustum& base)
 {
+    ZoneScoped;
+
     // Update projection matrices on every frame to ensure valid HOM culling
     float view_dim = occ_dim_0;
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
     Fmatrix m_viewport = {view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, view_dim / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         view_dim / 2.f + 0 + 0, view_dim / 2.f + 0 + 0, 0.0f, 1.0f};
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
@@ -253,6 +259,7 @@ void CHOM::Render(CFrustum& base)
     if (!bEnabled)
         return;
 
+    ZoneScoped;
     stats.Total.Begin();
     Raster.clear();
     Render_DB(base);
@@ -260,12 +267,16 @@ void CHOM::Render(CFrustum& base)
     stats.Total.End();
 }
 
-void CHOM::MT_RENDER(Task& /*thisTask*/, void* /*data*/)
+Task& CHOM::DispatchMTRender()
 {
-    CFrustum ViewBase;
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-    Enable();
-    Render(ViewBase);
+    return TaskManager::AddTask([this]
+    {
+        ZoneScoped;
+        CFrustum ViewBase;
+        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+        Enable();
+        Render(ViewBase);
+    });
 }
 
 ICF BOOL xform_b0(Fvector2& min, Fvector2& max, float& minz, const Fmatrix& X, float _x, float _y, float _z)

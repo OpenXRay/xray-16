@@ -15,8 +15,6 @@
 #include "Inventory.h"
 #include "game_cl_base.h"
 
-#include "xrEngine/x_ray.h"
-
 #include "ui/UICellItem.h" //Alundaio
 //#include "script_game_object.h" //Alundaio
 
@@ -229,8 +227,12 @@ void CUIGameCustom::ShowMessagesWindow()
 bool CUIGameCustom::ShowPdaMenu()
 {
     HideActorMenu();
-    PdaMenu->ShowDialog(true);
-    return true;
+    if (!PdaMenu->IsShown())
+    {
+        PdaMenu->ShowDialog(true);
+        return true;
+    }
+    return false;
 }
 
 void CUIGameCustom::HidePdaMenu()
@@ -254,6 +256,9 @@ void CUIGameCustom::Load()
 {
     if (!g_pGameLevel)
         return;
+
+    ZoneScoped;
+
     R_ASSERT(!MsgConfig);
     MsgConfig = xr_new<CUIXml>();
     MsgConfig->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_custom_msgs.xml");

@@ -469,7 +469,7 @@ void dx113DFluidRenderer::CalculateLighting(const dx113DFluidData& FluidData, Fo
     box.getradius(size);
 
     // Traverse object database
-    g_SpatialSpace->q_box(m_lstRenderables,
+    g_pGamePersistent->SpatialSpace.q_box(m_lstRenderables,
         0, // ISpatial_DB::O_ORDERED,
         STYPE_LIGHTSOURCE, center, size);
 
@@ -529,8 +529,8 @@ void dx113DFluidRenderer::PrepareCBuffer(const dx113DFluidData &FluidData, u32 R
     RCache.set_c(strGridScaleFactor, worldScale);
 
     // We prepend the current world matrix with this other matrix which adds an offset (-0.5, -0.5, -0.5)
-    //  and scale factors to account for unequal number of voxels on different sides of the volume box. 
-    // This is because we want to preserve the aspect ratio of the original simulation grid when 
+    //  and scale factors to account for unequal number of voxels on different sides of the volume box.
+    // This is because we want to preserve the aspect ratio of the original simulation grid when
     //  raytracing through it.
     const XMMATRIX gridMatrix = XMLoadFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&m_gridMatrix));
     WorldView = gridMatrix * WorldView;
@@ -553,7 +553,7 @@ void dx113DFluidRenderer::PrepareCBuffer(const dx113DFluidData &FluidData, u32 R
     }
 
     {
-        // Compute the inverse of the worldView matrix 
+        // Compute the inverse of the worldView matrix
         const XMMATRIX WorldViewInv = XMMatrixInverse(nullptr, WorldView);
 
         // Compute the eye's position in "grid space" (the 0-1 texture coordinate cube)

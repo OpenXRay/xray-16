@@ -2,6 +2,7 @@
 
 #include "editor_base.h"
 #include "editor_helper.h"
+#include "XR_IOConsole.h"
 
 namespace xray::editor
 {
@@ -32,116 +33,36 @@ void ide::UnregisterTool(const ide_tool* tool)
         m_tools.erase(it);
 }
 
-ide::ide()
-{
-    ImGui::SetAllocatorFunctions(
-        [](size_t size, void* /*user_data*/)
-        {
-            return xr_malloc(size);
-        },
-        [](void* ptr, void* /*user_data*/)
-        {
-            xr_free(ptr);
-        }
-    );
-    m_context = ImGui::CreateContext();
+ide::ide() = default;
 
-    InitBackend();
-}
-
-ide::~ide()
-{
-    ShutdownBackend();
-    ImGui::DestroyContext(m_context);
-}
-
-void ide::UpdateWindowProps()
-{
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
-}
-
-void ide::OnDeviceCreate()
-{
-    m_render = GEnv.RenderFactory->CreateImGuiRender();
-    m_render->OnDeviceCreate(m_context);
-}
-
-void ide::OnDeviceDestroy()
-{
-    m_render->OnDeviceDestroy();
-    GEnv.RenderFactory->DestroyImGuiRender(m_render);
-    m_render = nullptr;
-}
-
-void ide::OnDeviceResetBegin() const
-{
-    m_render->OnDeviceResetBegin();
-}
-
-void ide::OnDeviceResetEnd() const
-{
-    m_render->OnDeviceResetEnd();
-}
+ide::~ide() = default;
 
 void ide::OnAppStart()
 {
-    ImGuiIO& io = ImGui::GetIO();
-
-    string_path fName;
-    FS.update_path(fName, "$app_data_root$", io.IniFilename);
-    convert_path_separators(fName);
-    io.IniFilename = xr_strdup(fName);
-
-    FS.update_path(fName, "$logs$", io.LogFilename);
-    io.LogFilename = xr_strdup(fName);
-
     Device.seqFrame.Add(this, -5);
-    Device.seqRender.Add(this, -5);
 }
 
 void ide::OnAppEnd()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    xr_free(io.IniFilename);
-    xr_free(io.LogFilename);
-
     Device.seqFrame.Remove(this);
-    Device.seqRender.Remove(this);
 }
 
 void ide::OnFrame()
 {
-    const float frametime = m_timer.GetElapsed_sec();
-    m_timer.Start();
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = frametime;
-
-    // When shown, input being is updated
-    // through IInputReceiver interface
-    if (m_state == visible_state::full)
-    {
-        if (io.WantTextInput)
-            SDL_StartTextInput();
-        else
-            SDL_StopTextInput();
-    }
-
-    m_render->Frame();
-    ImGui::NewFrame();
+    ZoneScoped;
 
     switch (m_state)
     {
     case visible_state::full:
+        UpdateMouseData();
+        UpdateMouseCursor();
+        UpdateTextInput();
         ShowMain();
         [[fallthrough]];
 
     case visible_state::light:
-        if (m_show_weather_editor)
-            ShowWeatherEditor();
         for (const auto& tool : m_tools)
-            tool->OnFrame();
+            tool->on_tool_frame();
         break;
     }
 
@@ -151,14 +72,6 @@ void ide::OnFrame()
     {
         SwitchToNextState();
     }
-
-    ImGui::EndFrame();
-}
-
-void ide::OnRender()
-{
-    ImGui::Render();
-    m_render->Render(ImGui::GetDrawData());
 }
 
 void ide::ShowMain()
@@ -170,6 +83,17 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
+            if (imgui::MenuItemWithShortcut("Console", kCONSOLE,
+                "Show engine console.\n"
+                "Key shortcut will only work when no window is in focus",
+                Console->bVisible))
+            {
+                if (Console->bVisible)
+                    Console->Hide();
+                else
+                    Console->Show();
+            }
+
             if (imgui::MenuItemWithShortcut("Stats", kSCORES,
                 "Show engine statistics.\n"
                 "Key shortcut will only work when no window is in focus",
@@ -190,7 +114,6 @@ void ide::ShowMain()
 #ifndef MASTER_GOLD
         if (ImGui::BeginMenu("Tools"))
         {
-            ImGui::MenuItem("Weather Editor", nullptr, &m_show_weather_editor);
             for (const auto& tool : m_tools)
             {
                 ImGui::MenuItem(tool->tool_name(), nullptr, &tool->get_open_state());
@@ -236,7 +159,7 @@ bool ide::is_shown() const
         if (tool->get_open_state())
             return true;
     }
-    return m_show_weather_editor;
+    return false;
 }
 
 void ide::SetState(visible_state state)

@@ -92,7 +92,6 @@ private:
     ai_obstacle* m_ai_obstacle;
     Fmatrix m_previous_matrix;
     CALLBACK_VECTOR m_visual_callback;
-    Lock render_lock{};
 
 protected:
     CScriptBinder scriptBinder;
@@ -321,7 +320,7 @@ public:
     virtual CScriptGameObject* lua_game_object() const override;
     virtual int clsid() const override
     {
-        THROW(m_script_clsid >= 0);
+        VERIFY(m_script_clsid >= 0);
         return m_script_clsid;
     }
     virtual CInifile* spawn_ini() override { return m_ini_file; }

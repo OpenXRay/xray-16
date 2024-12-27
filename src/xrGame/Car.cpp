@@ -24,7 +24,7 @@
 #include "ui/UIMainIngameWnd.h"
 #include "CarWeapon.h"
 #include "game_object_space.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 
 #include "CharacterPhysicsSupport.h"
 #include "car_memory.h"
@@ -125,7 +125,9 @@ void CCar::reload(LPCSTR section)
 
 void CCar::cb_Steer(CBoneInstance* B)
 {
+#ifdef DEBUG
     VERIFY2(fsimilar(DET(B->mTransform), 1.f, DET_CHECK_EPS), "Bones receive returns 0 matrix");
+#endif
     CCar* C = static_cast<CCar*>(B->callback_param());
     Fmatrix m;
 
@@ -446,7 +448,7 @@ void CCar::VisualUpdate(float fov)
     Fvector C, V;
     Center(C);
     V.set(lin_vel);
-    
+
     m_car_sound->Update();
     if (Owner())
     {
@@ -462,7 +464,7 @@ void CCar::VisualUpdate(float fov)
         // 			OwnerActor()->Cameras().ApplyDevice();
         // 		}
         //
-        /*		if(CurrentGameUI())//
+        /*		if(CurrentGameUI())
                 {
                     CurrentGameUI()->UIMainIngameWnd->CarPanel().Show(true);
                     CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
@@ -1988,7 +1990,7 @@ void CCar::SetfFuel(float fuel)
     m_fuel = fuel;
 }
 
-// получить и задать размер топливного бака 
+// получить и задать размер топливного бака
 float CCar::GetfFuelTank()
 {
     return m_fuel_tank;

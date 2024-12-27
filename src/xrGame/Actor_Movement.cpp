@@ -679,7 +679,7 @@ float CActor::get_additional_weight() const
     {
         CArtefact* artefact = smart_cast<CArtefact*>(*it);
         if (artefact)
-            res += artefact->AdditionalInventoryWeight();
+            res += artefact->AdditionalInventoryWeight() * artefact->GetCondition();
     }
 
     return res;

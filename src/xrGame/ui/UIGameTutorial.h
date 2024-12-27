@@ -54,7 +54,7 @@ public:
     void IR_OnControllerRelease(int key, float x, float y) override;
     void IR_OnControllerHold(int key, float x, float y) override;
 
-    virtual void IR_OnMouseWheel(int x, int y);
+    virtual void IR_OnMouseWheel(float x, float y);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
     pcstr GetTutorName() { return m_name; }
@@ -145,6 +145,8 @@ class CUISequenceSimpleItem : public CUISequenceItem
         shared_str m_functor;
         bool m_bfinalize;
     };
+
+    bool isTimeDilatedInPDA;
 
 public:
     CUIWindow* m_UIWindow;

@@ -112,20 +112,11 @@
     <Filter Include="Engine\text_editor">
       <UniqueIdentifier>{0f8148ae-26b3-4084-84f0-9711e72596b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\text_editor\line_editor">
-      <UniqueIdentifier>{a561951d-df21-4744-bd9e-0bc69e0dfa42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\text_editor\line_editor_control">
       <UniqueIdentifier>{982d1115-af31-4164-88bf-d50bb3a7cad1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\text_editor\edit_actions">
       <UniqueIdentifier>{e23b35a1-652e-47bb-8941-1653504cd776}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="OpenAutomate">
-      <UniqueIdentifier>{fe56b488-34f8-4632-9f5e-7805f761b338}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game API\MaterialSystem">
-      <UniqueIdentifier>{59004dc1-5e77-4968-8321-6290b1ab9d3a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game API\Level">
       <UniqueIdentifier>{6e4e4f2d-02fc-4141-9ae3-ca29550fc16d}</UniqueIdentifier>
@@ -144,9 +135,6 @@
     </Filter>
     <Filter Include="Game API\Level Controller\KeyBindings">
       <UniqueIdentifier>{88084f61-660e-4bb7-ab64-5fd27a09d18a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Render\Device">
-      <UniqueIdentifier>{e4d34774-3a5b-468f-9400-12c702636fa1}</UniqueIdentifier>
     </Filter>
     <Filter Include="editor">
       <UniqueIdentifier>{9edc9b50-4fb3-495e-b1c7-692a6947715f}</UniqueIdentifier>
@@ -312,9 +300,6 @@
     <ClInclude Include="pure.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="std_classes.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="XR_IOConsole.h">
       <Filter>Engine\Console</Filter>
     </ClInclude>
@@ -333,20 +318,11 @@
     <ClInclude Include="perlin.h">
       <Filter>Engine\Noise</Filter>
     </ClInclude>
-    <ClInclude Include="line_editor.h">
-      <Filter>Engine\text_editor\line_editor</Filter>
-    </ClInclude>
     <ClInclude Include="line_edit_control.h">
       <Filter>Engine\text_editor\line_editor_control</Filter>
     </ClInclude>
     <ClInclude Include="edit_actions.h">
       <Filter>Engine\text_editor\edit_actions</Filter>
-    </ClInclude>
-    <ClInclude Include="xrSASH.h">
-      <Filter>OpenAutomate</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMtlLib.h">
-      <Filter>Game API\MaterialSystem</Filter>
     </ClInclude>
     <ClInclude Include="IGameFont.hpp">
       <Filter>Render\Font output</Filter>
@@ -360,35 +336,14 @@
     <ClInclude Include="profiler_inline.h">
       <Filter>General\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="splash.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="vis_object_data.h">
       <Filter>Render\Visibility</Filter>
     </ClInclude>
     <ClInclude Include="ShadersExternalData.h">
       <Filter>Render\Visibility</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="ILoadingScreen.h">
       <Filter>Interfaces\ILoadingScreen</Filter>
-    </ClInclude>
-    <ClInclude Include="device.h">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="IPerformanceAlert.hpp">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="PerformanceAlert.hpp">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="StatGraph.h">
-      <Filter>Render\Device</Filter>
-    </ClInclude>
-    <ClInclude Include="Stats.h">
-      <Filter>Render\Device</Filter>
     </ClInclude>
     <ClInclude Include="StringTable\StringTable.h">
       <Filter>Game API\StringTable</Filter>
@@ -405,6 +360,24 @@
     <ClInclude Include="editor_helper.h">
       <Filter>editor</Filter>
     </ClInclude>
+    <ClInclude Include="AccessibilityShortcuts.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="device.h">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="StatGraph.h">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Stats.h">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="IPerformanceAlert.hpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
+    <ClInclude Include="PerformanceAlert.hpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -414,9 +387,6 @@
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="x_ray.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="IInputReceiver.cpp">
@@ -447,9 +417,6 @@
       <Filter>Game API\Objects</Filter>
     </ClCompile>
     <ClCompile Include="pure_relcase.cpp">
-      <Filter>Game API\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="xr_object.cpp">
       <Filter>Game API\Objects</Filter>
     </ClCompile>
     <ClCompile Include="xr_object_list.cpp">
@@ -575,23 +542,11 @@
     <ClCompile Include="perlin.cpp">
       <Filter>Engine\Noise</Filter>
     </ClCompile>
-    <ClCompile Include="line_editor.cpp">
-      <Filter>Engine\text_editor\line_editor</Filter>
-    </ClCompile>
     <ClCompile Include="line_edit_control.cpp">
       <Filter>Engine\text_editor\line_editor_control</Filter>
     </ClCompile>
     <ClCompile Include="edit_actions.cpp">
       <Filter>Engine\text_editor\edit_actions</Filter>
-    </ClCompile>
-    <ClCompile Include="xrSASH.cpp">
-      <Filter>OpenAutomate</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMtlLib.cpp">
-      <Filter>Game API\MaterialSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMtlLib_Engine.cpp">
-      <Filter>Game API\MaterialSystem</Filter>
     </ClCompile>
     <ClCompile Include="IGame_Level.cpp">
       <Filter>Game API\Level</Filter>
@@ -605,38 +560,8 @@
     <ClCompile Include="profiler.cpp">
       <Filter>General\Profiler</Filter>
     </ClCompile>
-    <ClCompile Include="splash.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
-    <ClCompile Include="device.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_create.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_destroy.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_Initialize.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_overdraw.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="PerformanceAlert.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="StatGraph.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
-    <ClCompile Include="Stats.cpp">
-      <Filter>Render\Device</Filter>
-    </ClCompile>
     <ClCompile Include="StringTable\StringTable.cpp">
       <Filter>Game API\StringTable</Filter>
-    </ClCompile>
-    <ClCompile Include="Device_mode.cpp">
-      <Filter>Render\Device</Filter>
     </ClCompile>
     <ClCompile Include="xr_level_controller.cpp">
       <Filter>Game API\Level Controller</Filter>
@@ -653,8 +578,41 @@
     <ClCompile Include="editor_base_input.cpp">
       <Filter>editor</Filter>
     </ClCompile>
-    <ClCompile Include="editor_weather.cpp">
-      <Filter>editor</Filter>
+    <ClCompile Include="IGame_Persistent_Effects.cpp">
+      <Filter>Game API\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="device.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_create.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_destroy.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_imgui.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_Initialize.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_mode.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_overdraw.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="StatGraph.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Stats.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="PerformanceAlert.cpp">
+      <Filter>Render\Execution &amp; 3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment_editor.cpp">
+      <Filter>Game API\Environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -665,6 +623,9 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\discord_game_sdk.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

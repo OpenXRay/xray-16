@@ -63,7 +63,7 @@ public:
 
     void on_dbg_render();
 
-#ifdef DEBUG 
+#ifdef DEBUG
     struct pixel_box
     {
         Fvector center;

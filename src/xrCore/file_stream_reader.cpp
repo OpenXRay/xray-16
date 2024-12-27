@@ -17,7 +17,7 @@ void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
     VERIFY(file_mapping_handle != INVALID_HANDLE_VALUE);
 
     inherited::construct(file_mapping_handle, 0, file_size, file_size, window_size);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     pstr conv_fn = xr_strdup(file_name);
     convert_path_separators(conv_fn);
     m_file_handle = ::open(conv_fn, O_RDONLY);

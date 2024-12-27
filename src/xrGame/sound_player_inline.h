@@ -46,12 +46,12 @@ IC ref_sound* CSoundPlayer::CSoundCollection::add(ESoundTypes type, LPCSTR name)
 {
     ref_sound* temp = xr_new<ref_sound>();
     temp->create(name, st_Effect, type);
-    if (!temp->_p)
+    if (!temp)
     {
         xr_delete(temp);
-        return (0);
+        return nullptr;
     }
-    return (temp);
+    return temp;
 }
 
 IC const CSoundPlayer::SOUND_COLLECTIONS& CSoundPlayer::objects() const { return (m_sounds); }

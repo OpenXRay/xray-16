@@ -29,11 +29,9 @@ bool CUIListBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
     case WINDOW_MOUSE_WHEEL_UP:
         m_VScrollBar->TryScrollDec();
         return true;
-        break;
     case WINDOW_MOUSE_WHEEL_DOWN:
         m_VScrollBar->TryScrollInc();
         return true;
-        break;
     };
     return false;
 }
@@ -57,7 +55,7 @@ CUIListBoxItem* CUIListBox::AddItem()
     item->SetWidth(GetDesiredChildWidth());
 
     if (m_selection_texture.size())
-        item->InitTexture(m_selection_texture.c_str(), "hud" DELIMITER "default");
+        item->InitTexture(m_selection_texture.c_str());
     else
         item->InitDefault();
 
@@ -74,7 +72,7 @@ void CUIListBox::AddExistingItem(CUIListBoxItem* item)
     item->SetWidth(GetDesiredChildWidth());
 
     if (m_selection_texture.size())
-        item->InitTexture(m_selection_texture.c_str(), "hud" DELIMITER "default");
+        item->InitTexture(m_selection_texture.c_str());
     else
         item->InitDefault();
 

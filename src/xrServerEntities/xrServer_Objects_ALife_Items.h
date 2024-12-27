@@ -226,6 +226,7 @@ public:
     u16 get_ammo_limit();
     u16 get_ammo_total();
     u16 get_ammo_elapsed();
+    void set_ammo_elapsed(u16 count);
     u16 get_ammo_magsize();
     void clone_addons(CSE_ALifeItemWeapon* parent);
 
@@ -344,12 +345,11 @@ class CSE_ALifeItemPDA : public CSE_ALifeItem
     using inherited = CSE_ALifeItem;
 
 public:
-    u16 m_original_owner;
+    u16 m_original_owner{ 0xffff };
     shared_str m_specific_character;
     shared_str m_info_portion;
 
     CSE_ALifeItemPDA(LPCSTR caSection);
-    virtual ~CSE_ALifeItemPDA();
     virtual CSE_ALifeItemPDA* cast_item_pda() { return this; };
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -365,7 +365,6 @@ class CSE_ALifeItemDocument : public CSE_ALifeItem
 public:
     shared_str m_wDoc;
     CSE_ALifeItemDocument(LPCSTR caSection);
-    virtual ~CSE_ALifeItemDocument();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);

@@ -34,25 +34,6 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 
 //--------------------------------------------------------------------------------------------------------------
 
-SDeclaration* CResourceManager::_CreateDecl(u32 FVF)
-{
-    // Search equal code
-    for (SDeclaration* D : v_declarations)
-    {
-        if (D->dcl_code.empty() && D->FVF == FVF)
-            return D;
-    }
-
-    SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
-    glGenVertexArrays(1, &D->dcl);
-
-    D->FVF = FVF;
-    ConvertVertexDeclaration(FVF, D);
-    D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-
-    return D;
-}
-
 SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
 {
     // Search equal code
@@ -65,7 +46,6 @@ SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
     SDeclaration* D = v_declarations.emplace_back(xr_new<SDeclaration>());
     glGenVertexArrays(1, &D->dcl);
 
-    D->FVF = 0;
     u32 dcl_size = GetDeclLength(dcl) + 1;
     D->dcl_code.assign(dcl, dcl + dcl_size);
     ConvertVertexDeclaration(dcl, D);
@@ -105,7 +85,7 @@ SPP* CResourceManager::_CreatePP(pcstr vs, pcstr ps, pcstr gs, pcstr hs, pcstr d
 
     string256 name{};
     strconcat(name, vs, skinning, "|", ps, samples, "|", gs/*, "|", hs, "|", ds*/); // XXX: Tesselation
-    
+
     const auto iterator = m_pp.find(name);
 
     if (iterator != m_pp.end())
@@ -125,7 +105,7 @@ bool CResourceManager::_LinkPP(SPass& pass)
     if (pp.pp)
         return true;
 
-    if (HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_separate_shader_objects)
         pp.pp = GLGeneratePipeline(pp.cName.c_str(), pass.ps->sh, pass.vs->sh, pass.gs->sh);
     else
     {
@@ -163,7 +143,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
-    switch (GEnv.Render->m_skinning)
+    switch (RImplementation.m_skinning)
     {
     case 0:
         xr_strcat(name, "_0");
@@ -192,7 +172,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    switch (GEnv.Render->m_MSAASample)
+    switch (RImplementation.m_MSAASample)
     {
     case 0:
         xr_strcat(name, "_0");
@@ -239,50 +219,4 @@ SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); 
 void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------
-SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, GLuint vb, GLuint ib)
-{
-    R_ASSERT(decl && vb);
 
-    SDeclaration* dcl = _CreateDecl(decl);
-    u32 vb_stride = GetDeclVertexSize(decl, 0);
-
-    // ***** first pass - search already loaded shader
-    for (SGeometry* geom : v_geoms)
-    {
-        SGeometry& G = *geom;
-        if (G.dcl == dcl && G.vb == vb && G.ib == ib && G.vb_stride == vb_stride) return geom;
-    }
-
-    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
-    Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    Geom->dcl = dcl;
-    Geom->vb = vb;
-    Geom->vb_stride = vb_stride;
-    Geom->ib = ib;
-
-    return Geom;
-}
-
-SGeometry* CResourceManager::CreateGeom(u32 FVF, GLuint vb, GLuint ib)
-{
-    R_ASSERT(FVF && vb);
-
-    SDeclaration* dcl = _CreateDecl(FVF);
-    u32 vb_stride = GetFVFVertexSize(FVF);
-
-    // ***** first pass - search already loaded shader
-    for (SGeometry* geom : v_geoms)
-    {
-        SGeometry& G = *geom;
-        if (G.dcl == dcl && G.vb == vb && G.ib == ib && G.vb_stride == vb_stride) return geom;
-    }
-
-    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
-    Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    Geom->dcl = dcl;
-    Geom->vb = vb;
-    Geom->vb_stride = vb_stride;
-    Geom->ib = ib;
-
-    return Geom;
-}

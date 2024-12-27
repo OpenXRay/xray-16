@@ -30,7 +30,6 @@ private:
 
 public:
     UITaskListWnd();
-    ~UITaskListWnd() override;
 
     void init_from_xml(CUIXml& xml, LPCSTR path);
 
@@ -44,29 +43,29 @@ public:
     virtual void Update();
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
+    void ShowOnlySecondaryTasks(bool mode) { m_show_only_secondary_tasks = mode; }
+
     void UpdateList();
 
     pcstr GetDebugType() override { return "UITaskListWnd"; }
 
 protected:
     void OnBtnClose(CUIWindow* w, void* d);
-    bool SortingLessFunction(CUIWindow* left, CUIWindow* right);
-
     //			void	UpdateCounter		();
+
 public:
-    UIHint* hint_wnd;
+    UIHint* hint_wnd{};
 
 private: // m_
-    CUIFrameWindow* m_background;
-    CUIScrollView* m_list;
+    CUIFrameWindow* m_background{};
+    CUIScrollView* m_list{};
 
-    CUIStatic* m_caption;
-    //	CUIStatic*			m_counter;
-    CUI3tButton* m_bt_close;
+    CUIStatic* m_caption{};
+    //	CUIStatic*			m_counter{};
+    CUI3tButton* m_bt_close{};
 
-    //	u32					m_activ_task_count;
-    float m_orig_h;
-
+    float m_orig_h{};
+    bool m_show_only_secondary_tasks{};
 }; // class UITaskListWnd
 
 // -------------------------------------------------------------------------------------------------
@@ -78,7 +77,6 @@ private:
 
 public:
     UITaskListWndItem();
-    virtual ~UITaskListWndItem() = default;
 
     bool init_task(CGameTask* task, UITaskListWnd* parent);
     IC u32 get_priority_task() const;
@@ -95,15 +93,15 @@ private:
     void update_visible_map_spot();
 
 public:
-    bool show_hint_can;
-    bool show_hint;
+    bool show_hint_can{};
+    bool show_hint{};
 
-private: // m_
-    CGameTask* m_task;
-    CUI3tButton* m_name;
-    CUICheckButton* m_bt_view;
-    CUIStatic* m_st_story;
-    CUI3tButton* m_bt_focus;
+private:
+    CGameTask* m_task{};
+    CUI3tButton* m_name{};
+    CUICheckButton* m_bt_view{};
+    CUIStatic* m_st_story{};
+    CUI3tButton* m_bt_focus{};
 
     enum
     {
@@ -113,7 +111,6 @@ private: // m_
         stt_count
     };
     u32 m_color_states[stt_count];
-
 }; // class UITaskListWndItem
 
 #endif // UI_SECOND_TASK_WND_H_INCLUDED

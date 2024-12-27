@@ -14,8 +14,7 @@ private:
     typedef CInventoryItemObject inherited;
 
 public:
-    CInfoDocument(void);
-    virtual ~CInfoDocument(void);
+    CInfoDocument();
 
     virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void Load(LPCSTR section);

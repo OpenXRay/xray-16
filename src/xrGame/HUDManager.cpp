@@ -35,6 +35,8 @@ CHUDManager::~CHUDManager()
 //--------------------------------------------------------------------
 void CHUDManager::OnFrame()
 {
+    ZoneScoped;
+
     if (!psHUD_Flags.is(HUD_DRAW_RT2))
         return;
 
@@ -50,6 +52,8 @@ void CHUDManager::OnFrame()
 
 void CHUDManager::Render_First(u32 context_id)
 {
+    ZoneScoped;
+
     if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))
         return;
     if (0 == pUIGame)
@@ -64,10 +68,11 @@ void CHUDManager::Render_First(u32 context_id)
     // On R1 render only shadow
     // On R2+ render everything
     {
+        const auto root = O->H_Root();
         ScopeLock lock{ &render_lock };
-        O->renderable_Invisible(GEnv.Render->GenerationIsR1());
-        O->renderable_Render(context_id, O->H_Root());
-        O->renderable_Invisible(false);
+        root->renderable_Invisible(GEnv.Render->GenerationIsR1());
+        O->renderable_Render(context_id, root);
+        root->renderable_Invisible(false);
     }
 }
 
@@ -92,6 +97,8 @@ bool need_render_hud()
 
 void CHUDManager::Render_Last(u32 context_id)
 {
+    ZoneScoped;
+
     if (!psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2 | HUD_DRAW_RT2))
         return;
     if (0 == pUIGame)
@@ -103,10 +110,11 @@ void CHUDManager::Render_Last(u32 context_id)
     IGameObject* O = g_pGameLevel->CurrentViewEntity();
     // hud itself
     {
+        const auto root = O->H_Root();
         ScopeLock lock{ &render_lock };
-        O->renderable_HUD(true);
-        O->OnHUDDraw(context_id, this, O->H_Root());
-        O->renderable_HUD(false);
+        root->renderable_HUD(true);
+        O->OnHUDDraw(context_id, this, root);
+        root->renderable_HUD(false);
     }
 }
 
@@ -137,6 +145,8 @@ extern ENGINE_API bool bShowPauseString;
 //отрисовка элементов интерфейса
 void CHUDManager::RenderUI()
 {
+    ZoneScoped;
+
     if (!psHUD_Flags.is(HUD_DRAW_RT2))
         return;
 
@@ -197,6 +207,8 @@ void CHUDManager::SetGrenadeMarkType(LPCSTR tex_name) { HitMarker.InitShader_Gre
 
 void CHUDManager::Load()
 {
+    ZoneScoped;
+
     if (!pUIGame)
     {
         pUIGame = Game().createGameUI();
@@ -209,6 +221,8 @@ void CHUDManager::Load()
 
 void CHUDManager::OnUIReset()
 {
+    ZoneScoped;
+
     pUIGame->HideShownDialogs();
 
     pUIGame->UnLoad();
@@ -219,6 +233,8 @@ void CHUDManager::OnUIReset()
 
 void CHUDManager::OnDisconnected()
 {
+    ZoneScoped;
+
     b_online = false;
     if (pUIGame)
         Device.seqFrame.Remove(pUIGame);
@@ -228,6 +244,9 @@ void CHUDManager::OnConnected()
 {
     if (b_online)
         return;
+
+    ZoneScoped;
+
     b_online = true;
     if (pUIGame)
         Device.seqFrame.Add(pUIGame, REG_PRIORITY_LOW - 1000);
@@ -235,6 +254,8 @@ void CHUDManager::OnConnected()
 
 void CHUDManager::net_Relcase(IGameObject* obj)
 {
+    ZoneScoped;
+
     HitMarker.net_Relcase(obj);
 
     VERIFY(m_pHUDTarget);

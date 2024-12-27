@@ -19,23 +19,20 @@ CUI3tButton::CUI3tButton()
     m_frameline_mode = false;
 }
 
-CUI3tButton::~CUI3tButton() {}
 void CUI3tButton::OnClick()
 {
     CUIButton::OnClick();
     PlaySoundT();
 }
 
-bool CUI3tButton::OnMouseDown(int mouse_btn) { return CUIButton::OnMouseDown(mouse_btn); }
-void CUI3tButton::OnFocusLost() { inherited::OnFocusLost(); }
 void CUI3tButton::OnFocusReceive()
 {
     inherited::OnFocusReceive();
     PlaySoundH();
 }
 
-void CUI3tButton::InitSoundH(LPCSTR sound_file) { GEnv.Sound->create(m_sound_h, sound_file, st_Effect, sg_SourceType); }
-void CUI3tButton::InitSoundT(LPCSTR sound_file) { GEnv.Sound->create(m_sound_t, sound_file, st_Effect, sg_SourceType); }
+void CUI3tButton::InitSoundH(LPCSTR sound_file) { m_sound_h.create(sound_file, st_Effect, sg_SourceType); }
+void CUI3tButton::InitSoundT(LPCSTR sound_file) { m_sound_t.create(sound_file, st_Effect, sg_SourceType); }
 void CUI3tButton::PlaySoundT()
 {
     if (m_sound_t._handle())

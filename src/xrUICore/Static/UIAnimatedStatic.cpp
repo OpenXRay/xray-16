@@ -11,13 +11,8 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-CUIAnimatedStatic::CUIAnimatedStatic()
-    : CUIStatic("CUIAnimatedStatic"),
-      m_uFrameCount(0), m_uCurFrame(0xffffffff), m_uAnimCols(0xffffffff), m_uFrameWidth(0), m_uFrameHeight(0),
-      m_uAnimationDuration(0), m_uTimeElapsed(0), m_bParamsChanged(true), m_bPlaying(false), m_prevTime(0),
-      m_bCyclic(true)
+CUIAnimatedStatic::CUIAnimatedStatic() : CUIStatic("CUIAnimatedStatic")
 {
-    m_pos.set(0, 0);
     //.	ClipperOn();
 }
 
@@ -67,9 +62,8 @@ void CUIAnimatedStatic::Update()
 
 void CUIAnimatedStatic::SetFrame(const u32 frameNum)
 {
-    // static u32 currRow = 0xffffffff, currCol = 0xffffffff;
-    int currRow = frameNum / m_uAnimCols;
-    int currCol = frameNum % m_uAnimCols;
+    const int currRow = frameNum / m_uAnimRows;
+    const int currCol = frameNum % m_uAnimCols;
     Frect texture_rect;
 
     texture_rect.lt.set(m_pos.x + currCol * m_uFrameWidth, m_pos.y + currRow * m_uFrameHeight);

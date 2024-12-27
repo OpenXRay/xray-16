@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\editors\xrweathereditor\window_weather_editor.cpp"><violation beginline="23" endline="23" rule="Rule11-0-1" ruleset="Classes">
-</violation></file><file path="c:\openxray\src\include\editor\engine.hpp"><violation beginline="59" endline="59" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="58" endline="58" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="59" endline="59" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="58" endline="58" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\libtheora\lib\encint.h"><violation beginline="812" endline="812" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

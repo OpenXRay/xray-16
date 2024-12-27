@@ -57,7 +57,7 @@ void CRenderTarget::phase_luminance()
         // Fill vertex buffer
         v_build* pv = (v_build*)RImplementation.Vertex.Lock(4, g_bloom_build->vb_stride, Offset);
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         pv->p.set(eps, float(ts + eps), eps, 1.f);
         pv->uv0.set(a_0.x, b_0.y);
         pv->uv1.set(a_1.x, b_1.y);
@@ -109,7 +109,7 @@ void CRenderTarget::phase_luminance()
         pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // USE_OGL
+#endif
         RImplementation.Vertex.Unlock(4, g_bloom_build->vb_stride);
         RCache.set_Element(s_luminance->E[0]);
         RCache.set_Geometry(g_bloom_build);
@@ -133,7 +133,7 @@ void CRenderTarget::phase_luminance()
 
         // Fill vertex buffer
         v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
             pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
@@ -169,7 +169,7 @@ void CRenderTarget::phase_luminance()
         pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // !USE_OGL
+#endif
         RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
         RCache.set_Element(s_luminance->E[1]);
         RCache.set_Geometry(g_bloom_filter);
@@ -194,7 +194,7 @@ void CRenderTarget::phase_luminance()
 
         // Fill vertex buffer
         v_filter* pv = (v_filter*)RImplementation.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
             pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
@@ -230,7 +230,7 @@ void CRenderTarget::phase_luminance()
         pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // !USE_OGL
+#endif
         RImplementation.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 
         f_luminance_adapt = .9f * f_luminance_adapt + .1f * Device.fTimeDelta * ps_r2_tonemap_adaptation;

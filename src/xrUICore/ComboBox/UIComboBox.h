@@ -16,7 +16,6 @@ class XRUICORE_API CUIComboBox final : public CUIWindow, public CUIOptionsItem, 
 
 public:
     CUIComboBox();
-    virtual ~CUIComboBox();
 
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
@@ -27,7 +26,7 @@ public:
 
     virtual void OnRender(); // only for list-box
 
-    LPCSTR GetText();
+    LPCSTR GetText() const;
     LPCSTR GetTextOf(int index);
     void SetText(LPCSTR text);
 
@@ -37,6 +36,8 @@ public:
     void InitComboBox(Fvector2 pos, float width);
     void SetItemIDX(int idx);
     void SetItemToken(int tok);
+    u32 GetSelectedIDX();
+    void SetSelectedIDX(u32 idx);
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
     virtual void OnFocusLost();
@@ -58,7 +59,7 @@ protected:
 public:
     void ClearList();
 
-    u32 GetSize();
+    u32 GetSize() const;
 
 protected:
     bool m_bInited;
@@ -68,7 +69,7 @@ protected:
     int m_opt_backup_value;
 
     CUI_IB_FrameLineWnd m_frameLine;
-    CUITextWnd m_text;
+    CUIStatic m_text{ "Text" };
     CUIFrameWindow m_list_frame{ "List frame" };
 
     u32 m_textColor[2];

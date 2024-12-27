@@ -21,8 +21,6 @@ game_cl_GameState::game_cl_GameState()
     local_player = createPlayerState(NULL); // initializing account info
     m_WeaponUsageStatistic = NULL;
 
-    m_game_type_name = 0;
-
     shedule.t_min = 5;
     shedule.t_max = 20;
     m_game_ui_custom = NULL;

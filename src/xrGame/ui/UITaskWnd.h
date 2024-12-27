@@ -23,30 +23,23 @@ class CUITaskWnd final : public CUIWindow, public CUIWndCallback
 private:
     typedef CUIWindow inherited;
 
-    CUIFrameWindow* m_background;
-    CUIFrameLineWnd* m_background2;
+    CUIStatic* m_center_background{};
+    CUIStatic* m_right_bottom_background{};
 
-    CUIStatic* m_center_background;
-    CUIStatic* m_right_bottom_background;
-    CUIFrameLineWnd* m_task_split;
+    CUIMapWnd* m_pMapWnd{};
+    CUITaskItem* m_pStoryLineTaskItem{};
+    CUITaskItem* m_pSecondaryTaskItem{};
 
-    CUIMapWnd* m_pMapWnd;
-    CUITaskItem* m_pStoryLineTaskItem;
-    CUITaskItem* m_pSecondaryTaskItem;
+    CUIStatic* m_second_task_index{};
+    u32 m_actual_frame{};
 
-    CUI3tButton* m_BtnTaskListWnd;
-    CUIStatic* m_second_task_index;
-    CUIStatic* m_devider;
-    u32 m_actual_frame;
-
-    CUI3tButton* m_btn_focus;
-    CUI3tButton* m_btn_focus2;
+    CUI3tButton* m_btn_focus{};
+    CUI3tButton* m_btn_focus2{};
 
     CUIMapFilters m_filters;
 
-    UITaskListWnd* m_task_wnd;
-    bool m_task_wnd_show;
-    UIMapLegend* m_map_legend_wnd;
+    UITaskListWnd* m_task_wnd{};
+    UIMapLegend* m_map_legend_wnd{};
 
 public:
     UIHint* hint_wnd;
@@ -68,7 +61,7 @@ public:
     void ReloadTaskInfo();
     void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
-    void Show_TaskListWnd(bool status);
+    void Show_TaskListWnd(bool status) const;
 
     [[nodiscard]]
     bool IsTreasuresEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::Treasures); }
@@ -84,13 +77,13 @@ public:
     void SecondaryTasksEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::SecondaryTasks, enable); }
     void PrimaryObjectsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::PrimaryObjects, enable); }
 
+    bool IsUsingCursorRightNow() const override;
+
 private:
-    void TaskSetTargetMap(CGameTask* task);
+    void TaskSetTargetMap(CGameTask* task) const;
     void TaskShowMapSpot(CGameTask* task, bool show) const;
 
-    void OnNextTaskClicked();
-    void OnPrevTaskClicked();
-    void OnShowTaskListWnd(CUIWindow* w, void* d);
+    void OnShowTaskListWnd(CUIWindow* w, void* d) const;
     void OnTask1DbClicked(CUIWindow*, void*);
     void OnTask2DbClicked(CUIWindow*, void*);
 };
@@ -101,7 +94,7 @@ private:
     typedef CUIWindow inherited;
 
     AssociativeVector<shared_str, CUIStatic*> m_info;
-    CGameTask* m_owner;
+    CGameTask* m_owner{};
 
 public:
     CUITaskItem();
@@ -115,13 +108,13 @@ public:
 
     void Init(CUIXml& uiXml, LPCSTR path);
     void InitTask(CGameTask* task);
-    CGameTask* OwnerTask() { return m_owner; }
+    CGameTask* OwnerTask() const { return m_owner; }
 
     pcstr GetDebugType() override { return "CUITaskItem"; }
 
 public:
-    bool show_hint_can;
-    bool show_hint;
+    bool show_hint_can{};
+    bool show_hint{};
 
 protected:
     u32 m_hint_wt;

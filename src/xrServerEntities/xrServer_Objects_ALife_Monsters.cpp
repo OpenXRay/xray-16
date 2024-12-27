@@ -615,7 +615,7 @@ CSE_ALifeCustomZone::~CSE_ALifeCustomZone() {}
 void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
-    
+
     tNetPacket.r_float(m_maxPower);
 
     if (m_wVersion < 113)
@@ -878,7 +878,7 @@ u32 CSE_ALifeCreatureAbstract::ef_detector_type() const
 #ifdef XRGAME_EXPORTS
 void CSE_ALifeCreatureAbstract::on_death(CSE_Abstract* killer)
 {
-    VERIFY(!m_game_death_time);
+    //VERIFY(!m_game_death_time);
     m_game_death_time = ai().get_alife() ? alife().time_manager().game_time() : Level().GetGameTime();
     fHealth = -1.f;
 }

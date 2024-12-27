@@ -4,38 +4,12 @@
 #include "../xrRender/ResourceManager.h"
 #include "glTextureUtils.h"
 
-CRT::CRT()
-{
-    pRT = 0;
-    dwWidth = 0;
-    dwHeight = 0;
-    fmt = D3DFMT_UNKNOWN;
-}
-
 CRT::~CRT()
 {
     destroy();
 
     // release external reference
     RImplementation.Resources->_DeleteRT(this);
-}
-
-bool CRT::used_as_depth() const
-{
-    switch (fmt)
-    {
-    case D3DFMT_D16:
-    case D3DFMT_D16_LOCKABLE:
-    case D3DFMT_D15S1:
-    case D3DFMT_D24X8:
-    case D3DFMT_D24S8:
-        return true; 
-    }
-
-    if (fmt == MAKEFOURCC('D', 'F', '2', '4'))
-        return true;
-
-    return false;
 }
 
 void CRT::set_slice_read(int slice) {}

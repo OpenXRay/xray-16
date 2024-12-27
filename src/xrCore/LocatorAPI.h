@@ -108,7 +108,7 @@ public:
 #   error Select or add implementation for your platform
 #endif
         CInifile* header = nullptr;
-        
+
         archive() = default;
         void open();
         void close();
@@ -266,7 +266,6 @@ public:
 
     size_t file_list(FS_FileSet& dest, pcstr path, u32 flags = FS_ListFiles, pcstr mask = nullptr);
 
-    bool load_all_unloaded_archives();
     void unload_archive(archive& A);
 
     void auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_str>& important);

@@ -30,14 +30,13 @@
 #include "clsid_game.h"
 #include "HUDManager.h"
 #include "Weapon.h"
-
-extern u32 hud_adj_mode;
+#include "GamePersistent.h"
 
 bool g_bAutoClearCrouch = true;
 
 void CActor::IR_OnKeyboardPress(int cmd)
 {
-    if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
+    if (GamePersistent().GetHudTuner().is_active())
         return;
 
     if (Remote())
@@ -211,13 +210,10 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
 }
 
-void CActor::IR_OnMouseWheel(int x, int y)
+void CActor::IR_OnMouseWheel(float x, float y)
 {
-    if (hud_adj_mode)
-    {
-        g_player_hud->tune(Ivector().set(0, 0, y));
+    if (GamePersistent().GetHudTuner().is_active())
         return;
-    }
 
     if (inventory().Action((y > 0) ? (u16)kWPN_ZOOM_INC : (u16)kWPN_ZOOM_DEC, CMD_START))
         return;
@@ -230,7 +226,7 @@ void CActor::IR_OnMouseWheel(int x, int y)
 
 void CActor::IR_OnKeyboardRelease(int cmd)
 {
-    if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
+    if (GamePersistent().GetHudTuner().is_active())
         return;
 
     if (Remote())
@@ -272,7 +268,7 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 
 void CActor::IR_OnKeyboardHold(int cmd)
 {
-    if (hud_adj_mode && pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT))
+    if (GamePersistent().GetHudTuner().is_active())
         return;
 
     if (Remote() || !g_Alive())
@@ -336,27 +332,24 @@ void CActor::IR_OnKeyboardHold(int cmd)
     }
 }
 
-void CActor::OnAxisMove(float x, float y, float scale, bool invert)
+void CActor::OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY)
 {
     if (!fis_zero(x))
     {
-        const float d = x * scale;
+        const float d = (invertX ? -1.f : 1.f) * x * scaleX;
         cam_Active()->Move((d < 0) ? kLEFT : kRIGHT, _abs(d));
     }
     if (!fis_zero(y))
     {
-        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
+        const float d = (invertY ? -1.f : 1.f) * y * scaleY * 3.f / 4.f;
         cam_Active()->Move((d > 0) ? kUP : kDOWN, _abs(d));
     }
 }
 
 void CActor::IR_OnMouseMove(int dx, int dy)
 {
-    if (hud_adj_mode)
-    {
-        g_player_hud->tune(Ivector().set(dx, dy, 0));
+    if (GamePersistent().GetHudTuner().is_active())
         return;
-    }
 
     PIItem iitem = inventory().ActiveItem();
     if (iitem && iitem->cast_hud_item())
@@ -370,10 +363,10 @@ void CActor::IR_OnMouseMove(int dx, int dy)
         m_holder->OnMouseMove(dx, dy);
         return;
     }
-    
+
     const float LookFactor = GetLookFactor();
     const float scale = (cam_Active()->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f / LookFactor;
-    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
+    OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
 void CActor::IR_OnControllerPress(int cmd, float x, float y)
@@ -416,8 +409,9 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
     case kLOOK_AROUND:
     {
         const float LookFactor = GetLookFactor();
-        float scale = (cam_Active()->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f / LookFactor;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        float scaleX = (cam_Active()->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f / LookFactor;
+        float scaleY = (cam_Active()->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f / LookFactor;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -511,8 +505,9 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
     case kLOOK_AROUND:
     {
         const float LookFactor = GetLookFactor();
-        float scale = (cam_Active()->f_fov / g_fov) * psControllerStickSens * psControllerStickSensScale / 50.f / LookFactor;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        float scaleX = (cam_Active()->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f / LookFactor;
+        float scaleY = (cam_Active()->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f / LookFactor;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -566,10 +561,10 @@ void CActor::IR_OnControllerAttitudeChange(Fvector change)
         m_holder->OnControllerAttitudeChange(change);
         return;
     }
-    
+
     const float LookFactor = GetLookFactor();
     const float scale = (cam_Active()->f_fov / g_fov) * psControllerSensorSens / 50.f / LookFactor;
-    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+    OnAxisMove(change.x, change.y, scale, scale, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
 }
 
 #include "HudItem.h"
@@ -582,8 +577,8 @@ bool CActor::use_Holder(CHolderCustom* holder)
 
         if (smart_cast<CCar*>(holderGO))
             b = use_Vehicle(0);
-        else if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN)
-            b = use_MountedWeapon(0);
+        else if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN || holderGO->CLS_ID==CLSID_OBJECT_HOLDER_ENT)
+            b = use_HolderEx(0, false);
 
         if (inventory().ActiveItem())
         {
@@ -601,8 +596,8 @@ bool CActor::use_Holder(CHolderCustom* holder)
         if (smart_cast<CCar*>(holder))
             b = use_Vehicle(holder);
 
-        if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN)
-            b = use_MountedWeapon(holder);
+        if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN || holderGO->CLS_ID==CLSID_OBJECT_HOLDER_ENT)
+            b = use_HolderEx(holder, false);
 
         if (b)
         { // used succesfully

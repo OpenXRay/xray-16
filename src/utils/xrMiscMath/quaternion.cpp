@@ -3,15 +3,11 @@
 #include "xrCore/_quaternion.h"
 #include "xrCore/_matrix.h"
 
-//
-// _quaternion<T> member functions
-//
-
 #define TRACE_QZERO_TOLERANCE 0.1f
-template <class T>
-_quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
+
+Fquaternion& Fquaternion::set(const Fmatrix& M)
 {
-	auto s = T(0);
+	float s{};
 
 	float trace = M._11 + M._22 + M._33;
 	if (trace > 0.0f)
@@ -154,16 +150,13 @@ _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
 }
 
 
-template Fquaternion& Fquaternion::set(const _matrix<float>& M);
-template Dquaternion& Dquaternion::set(const _matrix<double>& M);
-
 //////////////////////////////////////////////////////////////////
 // quaternion non-member functions
 
 /* Commented out, since it's currently unused (only use is commented out in xrPhysics)
 void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector& w) noexcept
 {
-	//	
+	//
 	//	w=	2/dt*arccos(q1.w*q2.w+ q1.v.dotproduct(q2.v))
 	//		*1/sqr(1-(q1.w*q2.w+ q1.v.dotproduct(q2.v))^2)
 	//		[q1.w*q2.v-q2.w*q1.v-q1.v.crossproduct(q2.v)]

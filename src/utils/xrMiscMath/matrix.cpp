@@ -7,18 +7,17 @@
 
 #include <limits>
 
-template <typename T>
-_matrix<T>& _matrix<T>::rotation(const _quaternion<T>& Q)
+Fmatrix& Fmatrix::rotation(const Fquaternion& Q)
 {
-	T xx = Q.x*Q.x;
-	T yy = Q.y*Q.y;
-	T zz = Q.z*Q.z;
-	T xy = Q.x*Q.y;
-	T xz = Q.x*Q.z;
-	T yz = Q.y*Q.z;
-	T wx = Q.w*Q.x;
-	T wy = Q.w*Q.y;
-	T wz = Q.w*Q.z;
+	float xx = Q.x*Q.x;
+	float yy = Q.y*Q.y;
+	float zz = Q.z*Q.z;
+	float xy = Q.x*Q.y;
+	float xz = Q.x*Q.z;
+	float yz = Q.y*Q.z;
+	float wx = Q.w*Q.x;
+	float wy = Q.w*Q.y;
+	float wz = Q.w*Q.z;
 
 	_11 = 1 - 2 * (yy + zz);
 	_12 = 2 * (xy - wz);
@@ -39,18 +38,17 @@ _matrix<T>& _matrix<T>::rotation(const _quaternion<T>& Q)
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::mk_xform(const _quaternion<T>& Q, const Tvector& V)
+Fmatrix& Fmatrix::mk_xform(const Fquaternion& Q, const Fvector& V)
 {
-	T xx = Q.x*Q.x;
-	T yy = Q.y*Q.y;
-	T zz = Q.z*Q.z;
-	T xy = Q.x*Q.y;
-	T xz = Q.x*Q.z;
-	T yz = Q.y*Q.z;
-	T wx = Q.w*Q.x;
-	T wy = Q.w*Q.y;
-	T wz = Q.w*Q.z;
+	float xx = Q.x*Q.x;
+	float yy = Q.y*Q.y;
+	float zz = Q.z*Q.z;
+	float xy = Q.x*Q.y;
+	float xz = Q.x*Q.z;
+	float yz = Q.y*Q.z;
+	float wx = Q.w*Q.x;
+	float wy = Q.w*Q.y;
+	float wz = Q.w*Q.z;
 
 	_11 = 1 - 2 * (yy + zz);
 	_12 = 2 * (xy - wz);
@@ -71,8 +69,7 @@ _matrix<T>& _matrix<T>::mk_xform(const _quaternion<T>& Q, const Tvector& V)
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::identity()
+Fmatrix& Fmatrix::identity()
 {
 	_11 = 1;
 	_12 = 0;
@@ -94,8 +91,7 @@ _matrix<T>& _matrix<T>::identity()
 }
 
 // Multiply RES = A[4x4]*B[4x4] (WITH projection)
-template <typename T>
-_matrix<T>& _matrix<T>::mul(const _matrix<T>& A, const _matrix<T>& B)
+Fmatrix& Fmatrix::mul(const Fmatrix& A, const Fmatrix& B)
 {
 	VERIFY((this != &A) && (this != &B));
 	m[0][0] = A.m[0][0] * B.m[0][0] + A.m[1][0] * B.m[0][1] + A.m[2][0] * B.m[0][2] + A.m[3][0] * B.m[0][3];
@@ -121,8 +117,7 @@ _matrix<T>& _matrix<T>::mul(const _matrix<T>& A, const _matrix<T>& B)
 }
 
 // Multiply RES = A[4x3]*B[4x3] (no projection), faster than ordinary multiply
-template <typename T>
-_matrix<T>& _matrix<T>::mul_43(const _matrix<T>& A, const _matrix<T>& B)
+Fmatrix& Fmatrix::mul_43(const Fmatrix& A, const Fmatrix& B)
 {
 	VERIFY((this != &A) && (this != &B));
 	m[0][0] = A.m[0][0] * B.m[0][0] + A.m[1][0] * B.m[0][1] + A.m[2][0] * B.m[0][2];
@@ -147,11 +142,10 @@ _matrix<T>& _matrix<T>::mul_43(const _matrix<T>& A, const _matrix<T>& B)
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::invert(const _matrix<T>& a)   // important: this is 4x3 invert, not the 4x4 one
+Fmatrix& Fmatrix::invert(const Fmatrix& a)   // important: this is 4x3 invert, not the 4x4 one
 {
 	// faster than self-invert
-	T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) -
+	float fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) -
 		a._12 * (a._21 * a._33 - a._23 * a._31) +
 		a._13 * (a._21 * a._32 - a._22 * a._31));
 
@@ -180,11 +174,10 @@ _matrix<T>& _matrix<T>::invert(const _matrix<T>& a)   // important: this is 4x3 
 	return *this;
 }
 
-template <typename T>
-bool _matrix<T>::invert_b(const _matrix<T>& a)   // important: this is 4x3 invert, not the 4x4 one
+bool Fmatrix::invert_b(const Fmatrix& a)   // important: this is 4x3 invert, not the 4x4 one
 {
 	// faster than self-invert
-	T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) -
+	float fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) -
 		a._12 * (a._21 * a._33 - a._23 * a._31) +
 		a._13 * (a._21 * a._32 - a._22 * a._31));
 
@@ -213,27 +206,26 @@ bool _matrix<T>::invert_b(const _matrix<T>& a)   // important: this is 4x3 inver
 	return true;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::invert_44(const _matrix<T>& a)
+Fmatrix& Fmatrix::invert_44(const Fmatrix& a)
 {
-    const T &a11 = a._11, &a12 = a._12, &a13 = a._13, &a14 = a._14;
-    const T &a21 = a._21, &a22 = a._22, &a23 = a._23, &a24 = a._24;
-    const T &a31 = a._31, &a32 = a._32, &a33 = a._33, &a34 = a._34;
-    const T &a41 = a._41, &a42 = a._42, &a43 = a._43, &a44 = a._44;
+    const float &a11 = a._11, &a12 = a._12, &a13 = a._13, &a14 = a._14;
+    const float &a21 = a._21, &a22 = a._22, &a23 = a._23, &a24 = a._24;
+    const float &a31 = a._31, &a32 = a._32, &a33 = a._33, &a34 = a._34;
+    const float &a41 = a._41, &a42 = a._42, &a43 = a._43, &a44 = a._44;
 
-    T mn1 = a33 * a44 - a34 * a43;
-    T mn2 = a32 * a44 - a34 * a42;
-    T mn3 = a32 * a43 - a33 * a42;
-    T mn4 = a31 * a44 - a34 * a41;
-    T mn5 = a31 * a43 - a33 * a41;
-    T mn6 = a31 * a42 - a32 * a41;
+    float mn1 = a33 * a44 - a34 * a43;
+    float mn2 = a32 * a44 - a34 * a42;
+    float mn3 = a32 * a43 - a33 * a42;
+    float mn4 = a31 * a44 - a34 * a41;
+    float mn5 = a31 * a43 - a33 * a41;
+    float mn6 = a31 * a42 - a32 * a41;
 
-    T A11 = a22 * mn1 - a23 * mn2 + a24 * mn3;
-    T A12 = -(a21 * mn1 - a23 * mn4 + a24 * mn5);
-    T A13 = a21 * mn2 - a22 * mn4 + a24 * mn6;
-    T A14 = -(a21 * mn3 - a22 * mn5 + a23 * mn6);
+    float A11 = a22 * mn1 - a23 * mn2 + a24 * mn3;
+    float A12 = -(a21 * mn1 - a23 * mn4 + a24 * mn5);
+    float A13 = a21 * mn2 - a22 * mn4 + a24 * mn6;
+    float A14 = -(a21 * mn3 - a22 * mn5 + a23 * mn6);
 
-    T detInv = a11 * A11 + a12 * A12 + a13 * A13 + a14 * A14;
+    float detInv = a11 * A11 + a12 * A12 + a13 * A13 + a14 * A14;
     VERIFY(_abs(detInv) > flt_zero);
 
     detInv = 1.f / detInv;
@@ -268,8 +260,7 @@ _matrix<T>& _matrix<T>::invert_44(const _matrix<T>& a)
     return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::transpose(const _matrix<T>& matSource)
+Fmatrix& Fmatrix::transpose(const Fmatrix& matSource)
 {
 	_11 = matSource._11;
 	_12 = matSource._21;
@@ -290,11 +281,10 @@ _matrix<T>& _matrix<T>::transpose(const _matrix<T>& matSource)
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::rotateX(T Angle) // rotation about X axis
+Fmatrix& Fmatrix::rotateX(float Angle) // rotation about X axis
 {
-	T cosa = _cos(Angle);
-	T sina = _sin(Angle);
+	float cosa = _cos(Angle);
+	float sina = _sin(Angle);
 	i.set(1, 0, 0);
 	_14 = 0;
 	j.set(0, cosa, sina);
@@ -306,11 +296,10 @@ _matrix<T>& _matrix<T>::rotateX(T Angle) // rotation about X axis
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::rotateY(T Angle) // rotation about Y axis
+Fmatrix& Fmatrix::rotateY(float Angle) // rotation about Y axis
 {
-	T cosa = _cos(Angle);
-	T sina = _sin(Angle);
+	float cosa = _cos(Angle);
+	float sina = _sin(Angle);
 	i.set(cosa, 0, -sina);
 	_14 = 0;
 	j.set(0, 1, 0);
@@ -322,11 +311,10 @@ _matrix<T>& _matrix<T>::rotateY(T Angle) // rotation about Y axis
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::rotateZ(T Angle) // rotation about Z axis
+Fmatrix& Fmatrix::rotateZ(float Angle) // rotation about Z axis
 {
-	T cosa = _cos(Angle);
-	T sina = _sin(Angle);
+	float cosa = _cos(Angle);
+	float sina = _sin(Angle);
 	i.set(cosa, sina, 0);
 	_14 = 0;
 	j.set(-sina, cosa, 0);
@@ -338,10 +326,9 @@ _matrix<T>& _matrix<T>::rotateZ(T Angle) // rotation about Z axis
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::rotation(const Tvector& vdir, const Tvector& vnorm)
+Fmatrix& Fmatrix::rotation(const Fvector& vdir, const Fvector& vnorm)
 {
-	Tvector vright;
+	Fvector vright;
 	vright.crossproduct(vnorm, vdir).normalize();
 	m[0][0] = vright.x;
 	m[0][1] = vright.y;
@@ -362,11 +349,10 @@ _matrix<T>& _matrix<T>::rotation(const Tvector& vdir, const Tvector& vnorm)
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::rotation(const Tvector& axis, T Angle)
+Fmatrix& Fmatrix::rotation(const Fvector& axis, float Angle)
 {
-	T Cosine = _cos(Angle);
-	T Sine = _sin(Angle);
+	float Cosine = _cos(Angle);
+	float Sine = _sin(Angle);
 	m[0][0] = axis.x * axis.x + (1 - axis.x * axis.x) * Cosine;
 	m[0][1] = axis.x * axis.y * (1 - Cosine) + axis.z * Sine;
 	m[0][2] = axis.x * axis.z * (1 - Cosine) - axis.y * Sine;
@@ -386,21 +372,14 @@ _matrix<T>& _matrix<T>::rotation(const Tvector& axis, T Angle)
 	return *this;
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::mapXYZ() { i.set(1, 0, 0); _14 = 0; j.set(0, 1, 0); _24 = 0; k.set(0, 0, 1); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
-template <typename T>
-_matrix<T>& _matrix<T>::mapXZY() { i.set(1, 0, 0); _14 = 0; j.set(0, 0, 1); _24 = 0; k.set(0, 1, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
-template <typename T>
-_matrix<T>& _matrix<T>::mapYXZ() { i.set(0, 1, 0); _14 = 0; j.set(1, 0, 0); _24 = 0; k.set(0, 0, 1); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
-template <typename T>
-_matrix<T>& _matrix<T>::mapYZX() { i.set(0, 1, 0); _14 = 0; j.set(0, 0, 1); _24 = 0; k.set(1, 0, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
-template <typename T>
-_matrix<T>& _matrix<T>::mapZXY() { i.set(0, 0, 1); _14 = 0; j.set(1, 0, 0); _24 = 0; k.set(0, 1, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
-template <typename T>
-_matrix<T>& _matrix<T>::mapZYX() { i.set(0, 0, 1); _14 = 0; j.set(0, 1, 0); _24 = 0; k.set(1, 0, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+Fmatrix& Fmatrix::mapXYZ() { i.set(1, 0, 0); _14 = 0; j.set(0, 1, 0); _24 = 0; k.set(0, 0, 1); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+Fmatrix& Fmatrix::mapXZY() { i.set(1, 0, 0); _14 = 0; j.set(0, 0, 1); _24 = 0; k.set(0, 1, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+Fmatrix& Fmatrix::mapYXZ() { i.set(0, 1, 0); _14 = 0; j.set(1, 0, 0); _24 = 0; k.set(0, 0, 1); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+Fmatrix& Fmatrix::mapYZX() { i.set(0, 1, 0); _14 = 0; j.set(0, 0, 1); _24 = 0; k.set(1, 0, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+Fmatrix& Fmatrix::mapZXY() { i.set(0, 0, 1); _14 = 0; j.set(1, 0, 0); _24 = 0; k.set(0, 1, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+Fmatrix& Fmatrix::mapZYX() { i.set(0, 0, 1); _14 = 0; j.set(0, 1, 0); _24 = 0; k.set(1, 0, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
 
-template <typename T>
-_matrix<T>& _matrix<T>::mul(const _matrix<T>& A, T v)
+Fmatrix& Fmatrix::mul(const Fmatrix& A, float v)
 {
 	m[0][0] = A.m[0][0] * v;
 	m[0][1] = A.m[0][1] * v;
@@ -420,8 +399,8 @@ _matrix<T>& _matrix<T>::mul(const _matrix<T>& A, T v)
 	m[3][3] = A.m[3][3] * v;
 	return *this;
 }
-template <typename T>
-_matrix<T>& _matrix<T>::mul(T v)
+
+Fmatrix& Fmatrix::mul(float v)
 {
 	m[0][0] *= v;
 	m[0][1] *= v;
@@ -441,23 +420,23 @@ _matrix<T>& _matrix<T>::mul(T v)
 	m[3][3] *= v;
 	return *this;
 }
-template <typename T>
-_matrix<T>& _matrix<T>::div(const _matrix<T>& A, T v)
+
+Fmatrix& Fmatrix::div(const Fmatrix& A, float v)
 {
 	VERIFY(_abs(v) > 0.000001f);
 	return mul(A, 1.0f / v);
 }
-template <typename T>
-_matrix<T>& _matrix<T>::div(T v)
+
+Fmatrix& Fmatrix::div(float v)
 {
 	VERIFY(_abs(v) > 0.000001f);
 	return mul(1.0f / v);
 }
 
-template <typename T>
-_matrix<T>& _matrix<T>::setHPB(T h, T p, T b)
+
+Fmatrix& Fmatrix::setHPB(float h, float p, float b)
 {
-	T _ch, _cp, _cb, _sh, _sp, _sb, _cc, _cs, _sc, _ss;
+	float _ch, _cp, _cb, _sh, _sp, _sb, _cc, _cs, _sc, _ss;
 
 	_sh = _sin(h);
 	_ch = _cos(h);
@@ -481,78 +460,19 @@ _matrix<T>& _matrix<T>::setHPB(T h, T p, T b)
 	return *this;
 }
 
-template <typename T>
-void _matrix<T>::getHPB(T& h, T& p, T& b) const
+void Fmatrix::getHPB(float& h, float& p, float& b) const
 {
-	T cy = _sqrt(j.y*j.y + i.y*i.y);
-	if (cy > 16.0f*type_epsilon<T>)
+	float cy = _sqrt(j.y*j.y + i.y*i.y);
+	if (cy > 16.0f * type_epsilon<float>)
 	{
-		h = (T)-atan2(k.x, k.z);
-		p = (T)-atan2(-k.y, cy);
-		b = (T)-atan2(i.y, j.y);
+		h = -atan2(k.x, k.z);
+		p = -atan2(-k.y, cy);
+		b = -atan2(i.y, j.y);
 	}
 	else
 	{
-		h = (T)-atan2(-i.z, i.x);
-		p = (T)-atan2(-k.y, cy);
+		h = -atan2(-i.z, i.x);
+		p = -atan2(-k.y, cy);
 		b = 0;
 	}
 }
-
-// explicit instantiations
-
-template Fmatrix& Fmatrix::rotation(const _quaternion<float>& Q);
-template Dmatrix& Dmatrix::rotation(const _quaternion<double>& Q);
-template Fmatrix& Fmatrix::mk_xform(const _quaternion<float>& Q, const Tvector& V);
-template Dmatrix& Dmatrix::mk_xform(const _quaternion<double>& Q, const Tvector& V);
-template Fmatrix& Fmatrix::identity();
-template Dmatrix& Dmatrix::identity();
-template Fmatrix& Fmatrix::mul(const Fmatrix& A, const Fmatrix& B);
-template Dmatrix& Dmatrix::mul(const Dmatrix& A, const Dmatrix& B);
-template Fmatrix& Fmatrix::mul_43(const Fmatrix& A, const Fmatrix& B);
-template Dmatrix& Dmatrix::mul_43(const Dmatrix& A, const Dmatrix& B);
-template Fmatrix& Fmatrix::invert(const Fmatrix& a);
-template Dmatrix& Dmatrix::invert(const Dmatrix& a);
-template bool     Fmatrix::invert_b(const Fmatrix& a);
-template bool     Dmatrix::invert_b(const Dmatrix& a);
-template Fmatrix& Fmatrix::invert_44(const Fmatrix& a);
-template Dmatrix& Dmatrix::invert_44(const Dmatrix& a);
-template Fmatrix& Fmatrix::transpose(const Fmatrix& matSource);
-template Dmatrix& Dmatrix::transpose(const Dmatrix& matSource);
-template Fmatrix& Fmatrix::rotateX(Fmatrix::TYPE Angle);
-template Dmatrix& Dmatrix::rotateX(Dmatrix::TYPE Angle);
-template Fmatrix& Fmatrix::rotateY(Fmatrix::TYPE Angle);
-template Dmatrix& Dmatrix::rotateY(Dmatrix::TYPE Angle);
-template Fmatrix& Fmatrix::rotateZ(Fmatrix::TYPE Angle);
-template Dmatrix& Dmatrix::rotateZ(Dmatrix::TYPE Angle);
-template Fmatrix& Fmatrix::rotation(const Tvector& vdir, const Tvector& vnorm);
-template Dmatrix& Dmatrix::rotation(const Tvector& vdir, const Tvector& vnorm);
-template Fmatrix& Fmatrix::rotation(const Tvector& axis, Fmatrix::TYPE  Angle);
-template Dmatrix& Dmatrix::rotation(const Tvector& axis, Dmatrix::TYPE  Angle);
-
-template Fmatrix& Fmatrix::mapXYZ();
-template Fmatrix& Fmatrix::mapXZY();
-template Fmatrix& Fmatrix::mapYXZ();
-template Fmatrix& Fmatrix::mapYZX();
-template Fmatrix& Fmatrix::mapZXY();
-template Fmatrix& Fmatrix::mapZYX();
-template Dmatrix& Dmatrix::mapXYZ();
-template Dmatrix& Dmatrix::mapXZY();
-template Dmatrix& Dmatrix::mapYXZ();
-template Dmatrix& Dmatrix::mapYZX();
-template Dmatrix& Dmatrix::mapZXY();
-template Dmatrix& Dmatrix::mapZYX();
-
-template Fmatrix& Fmatrix::mul(const Fmatrix& A, Fmatrix::TYPE v);
-template Dmatrix& Dmatrix::mul(const Dmatrix& A, Dmatrix::TYPE v);
-template Fmatrix& Fmatrix::mul(Fmatrix::TYPE v);
-template Dmatrix& Dmatrix::mul(Dmatrix::TYPE v);
-template Fmatrix& Fmatrix::div(const Fmatrix& A, Fmatrix::TYPE v);
-template Dmatrix& Dmatrix::div(const Dmatrix& A, Dmatrix::TYPE v);
-template Fmatrix& Fmatrix::div(Fmatrix::TYPE v);
-template Dmatrix& Dmatrix::div(Dmatrix::TYPE v);
-
-template Fmatrix& Fmatrix::setHPB(Fmatrix::TYPE h, Fmatrix::TYPE p, Fmatrix::TYPE b);
-template Dmatrix& Dmatrix::setHPB(Dmatrix::TYPE h, Dmatrix::TYPE p, Dmatrix::TYPE b);
-template void     Fmatrix::getHPB(Fmatrix::TYPE& h, Fmatrix::TYPE& p, Fmatrix::TYPE& b) const;
-template void     Dmatrix::getHPB(Dmatrix::TYPE& h, Dmatrix::TYPE& p, Dmatrix::TYPE& b) const;

@@ -72,7 +72,7 @@ void CUIActorMenu::OnDragItemOnTrash(CUIDragItem* item, bool b_receive)
 
 bool CUIActorMenu::DropItemOnAnotherItem(EDDListType t_old, EDDListType t_new, CUIDragDropListEx* old_owner, CUIDragDropListEx* new_owner)
 {
-    //Alundaio: Here we export the action of dragging one inventory item on top of another! 
+    //Alundaio: Here we export the action of dragging one inventory item on top of another!
     luabind::functor<bool> funct1;
     if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemDropped", funct1))
     {
@@ -254,8 +254,10 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
             ToBag(itm, false);
         }
         else if (!ToSlot(itm, false, iitem_to_place->BaseSlot()))
+        {
             if (!ToBelt(itm, false))
                 ToSlot(itm, true, iitem_to_place->BaseSlot());
+        }
         break;
     }
     case iActorBelt:
@@ -319,6 +321,16 @@ bool CUIActorMenu::OnItemFocusReceive(CUICellItem* itm)
 
     itm->m_selected = true;
     set_highlight_item(itm);
+
+	luabind::functor<bool> funct1;
+	if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemFocusReceive", funct1))
+	{
+		PIItem _iitem = (PIItem)itm->m_pData;
+
+        const CGameObject* GO = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
+		if (GO)
+			funct1(GO->lua_game_object());
+	}
     return true;
 }
 
@@ -330,6 +342,16 @@ bool CUIActorMenu::OnItemFocusLost(CUICellItem* itm)
     }
     InfoCurItem(NULL);
     clear_highlight_lists();
+
+	luabind::functor<bool> funct1;
+	if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemFocusLost", funct1))
+	{
+		PIItem _iitem = (PIItem)itm->m_pData;
+
+        const CGameObject* GO = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
+		if (GO)
+			funct1(GO->lua_game_object());
+	}
 
     return true;
 }
@@ -344,7 +366,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
             set_highlight_item(itm);
         }
     }
-    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay : 0))
+    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + (m_ItemInfo ? m_ItemInfo->delay * Device.time_factor() : 0))
     {
         return true; // false
     }
@@ -429,7 +451,7 @@ void CUIActorMenu::OnPressUserKey(bool take)
         //		OnBtnPerformTrade( this, 0 );
         break;
     case mmUpgrade: TrySetCurUpgrade(); break;
-    case mmDeadBodySearch: 
+    case mmDeadBodySearch:
     {
         if (take)
             TakeAllFromPartner(this, 0);

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\utils\xrlc_light\lcnet_execution_tasks_add.h"><violation beginline="6" endline="6" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\utils\xrlc_light\lcnet_task_manager.h"><violation beginline="46" endline="46" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="63" endline="63" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

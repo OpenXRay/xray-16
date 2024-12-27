@@ -26,14 +26,14 @@ namespace XRay.SdkControls
         private static readonly Int32 DefaultMaximum = 100;
         private static readonly Int32 DefaultIncrement = 1;
 
-        // Provides for finer acceleration behavior. 
+        // Provides for finer acceleration behavior.
         private IntegerUpDownAccelerationCollection accelerations;
 
-        // the current NumericUpDownAcceleration object. 
+        // the current NumericUpDownAcceleration object.
         private int accelerationsCurrentIndex;
 
         // Used to calculate the time elapsed since the up/down button was pressed,
-        // to know when to get the next entry in the accelaration table. 
+        // to know when to get the next entry in the accelaration table.
         private long buttonPressedStartTime;
         private Int32 currentValue = DefaultValue;
         private bool currentValueChanged;
@@ -54,20 +54,20 @@ namespace XRay.SdkControls
         /// </summary>
         [
             SuppressMessage("Microsoft.Globalization", "CA1303:DoNotPassLiteralsAsLocalizedParameters") // "0" is the default value for numeric up down.
-            // So we don't have to localize it. 
+            // So we don't have to localize it.
         ]
         public IntegerUpDown()
         {
-            // this class overrides GetPreferredSizeCore, let Control automatically cache the result 
+            // this class overrides GetPreferredSizeCore, let Control automatically cache the result
             //SetState2(STATE2_USEPREFERREDSIZECACHE, true);
             Text = "0";
             StopAcceleration();
         }
 
-        ////////////////////////////////////////////////////////////// 
+        //////////////////////////////////////////////////////////////
         // Properties
-        // 
-        ////////////////////////////////////////////////////////////// 
+        //
+        //////////////////////////////////////////////////////////////
 
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace XRay.SdkControls
             Bindable(false),
             DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)
         ]
-        // We're just overriding this to make it non-browsable. 
+        // We're just overriding this to make it non-browsable.
         public override string Text
         {
             get
@@ -229,8 +229,8 @@ namespace XRay.SdkControls
             }
         }
 
-        /* 
-         * The current value of the control 
+        /*
+         * The current value of the control
          */
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace XRay.SdkControls
         //////////////////////////////////////////////////////////////
         // Methods
         //
-        ////////////////////////////////////////////////////////////// 
+        //////////////////////////////////////////////////////////////
 
         /// <summary>
         ///     Handles tasks required when the control is being initialized.
@@ -332,9 +332,9 @@ namespace XRay.SdkControls
             }
         }
 
-        // 
+        //
         // Returns the provided value constrained to be within the min and max.
-        // 
+        //
         private Int32 Constrain(Int32 value)
         {
             Debug.Assert(minimum <= maximum, "minimum > maximum");
@@ -366,7 +366,7 @@ namespace XRay.SdkControls
 
             var newValue = currentValue;
 
-            // Operations on Decimals can throw OverflowException. 
+            // Operations on Decimals can throw OverflowException.
             //
             try
             {
@@ -432,16 +432,16 @@ namespace XRay.SdkControls
 
             if (Char.IsDigit(e.KeyChar))
             {
-                // Digits are OK 
+                // Digits are OK
             }
             else if (keyInput.Equals(decimalSeparator) || keyInput.Equals(groupSeparator) ||
                      keyInput.Equals(negativeSign))
             {
-                // Int32 separator is OK 
+                // Int32 separator is OK
             }
             else if (e.KeyChar == '\b')
             {
-                // Backspace key is OK 
+                // Backspace key is OK
             }
             else if (Hexadecimal && ((e.KeyChar >= 'a' && e.KeyChar <= 'f') || e.KeyChar >= 'A' && e.KeyChar <= 'F'))
             {
@@ -449,11 +449,11 @@ namespace XRay.SdkControls
             }
             else if ((ModifierKeys & (Keys.Control | Keys.Alt)) != 0)
             {
-                // Let the edit control handle control and alt key combinations 
+                // Let the edit control handle control and alt key combinations
             }
             else
             {
-                // Eat this invalid key and beep 
+                // Eat this invalid key and beep
                 e.Handled = true;
                 //SafeNativeMethods.MessageBeep(0);
             }
@@ -503,9 +503,9 @@ namespace XRay.SdkControls
 
             try
             {
-                // VSWhidbey 173332: Verify that the user is not starting the string with a "-" 
+                // VSWhidbey 173332: Verify that the user is not starting the string with a "-"
                 // before attempting to set the Value property since a "-" is a valid character with
-                // which to start a string representing a negative number. 
+                // which to start a string representing a negative number.
                 if (!string.IsNullOrEmpty(Text) &&
                     !(Text.Length == 1 && Text == "-"))
                 {
@@ -536,8 +536,8 @@ namespace XRay.SdkControls
         {
             // Spinning will check if accelerations is null.
             if (Spinning && accelerationsCurrentIndex < (accelerations.Count - 1))
-            { // if index not the last entry ... 
-                // Ticks are in 100-nanoseconds (1E-7 seconds). 
+            { // if index not the last entry ...
+                // Ticks are in 100-nanoseconds (1E-7 seconds).
                 var nowTicks = DateTime.Now.Ticks;
                 var buttonPressedElapsedTime = nowTicks - buttonPressedStartTime;
                 var accelerationInterval = 10000000L * accelerations[accelerationsCurrentIndex + 1].Seconds; // next entry.
@@ -656,7 +656,7 @@ namespace XRay.SdkControls
         /// </summary>
         protected override void UpdateEditText()
         {
-            // If we're initializing, we don't want to update the edit text yet, 
+            // If we're initializing, we don't want to update the edit text yet,
             // just in case the value is invalid.
             if (initializing)
             {
@@ -669,8 +669,8 @@ namespace XRay.SdkControls
                 ParseEditText();
             }
 
-            // VSWhidbey 173332: Verify that the user is not starting the string with a "-" 
-            // before attempting to set the Value property since a "-" is a valid character with 
+            // VSWhidbey 173332: Verify that the user is not starting the string with a "-"
+            // before attempting to set the Value property since a "-" is a valid character with
             // which to start a string representing a negative number.
             if (currentValueChanged || (!string.IsNullOrEmpty(Text) &&
                                         !(Text.Length == 1 && Text == "-")))
@@ -678,7 +678,7 @@ namespace XRay.SdkControls
                 currentValueChanged = false;
                 ChangingText = true;
 
-                // Make sure the current value is within the min/max 
+                // Make sure the current value is within the min/max
                 Debug.Assert(minimum <= currentValue && currentValue <= maximum,
                              "DecimalValue lies outside of [minimum, maximum]");
 
@@ -693,7 +693,7 @@ namespace XRay.SdkControls
         /// </summary>
         protected override void ValidateEditText()
         {
-            // See if the edit text parses to a valid decimal 
+            // See if the edit text parses to a valid decimal
             ParseEditText();
             UpdateEditText();
         }

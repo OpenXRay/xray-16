@@ -26,7 +26,7 @@ public:
         tcmFORCE32 = u32(-1)
     };
 
-public:    
+public:
     Fmatrix xform{};
 
     u32 dwFrame{ 0 };

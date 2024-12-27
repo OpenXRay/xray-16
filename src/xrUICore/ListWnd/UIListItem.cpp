@@ -28,14 +28,14 @@ void CUIListItem::InitListItem(Fvector2 pos, Fvector2 size)
 void CUIListItem::InitTexture(pcstr tex_name)
 {
     CUIButton::InitTexture(tex_name);
-    SetTextX(m_UIStaticItem.GetTextureRect().width());
+    TextItemControl()->m_TextOffset.x = m_UIStaticItem.GetTextureRect().width();
 }
 
 /*
 void CUIListItem::Init(const char* str, float x, float y, float width, float height)
 {
     Init(x,y,width, height);
-    SetTextST(str);	
+    SetTextST(str);
 }*/
 
 bool CUIListItem::IsHighlightText()

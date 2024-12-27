@@ -5,15 +5,76 @@
 pcstr UI_PATH = UI_PATH_DEFAULT;
 pcstr UI_PATH_WITH_DELIMITER = UI_PATH_DEFAULT_WITH_DELIMITER;
 
-XMLDocument::XMLDocument() : m_xml_file_name(), m_root(nullptr), m_pLocalRoot(nullptr) {}
+XMLDocument::XMLDocument() : m_xml_file_name(), m_root(nullptr), m_pLocalRoot(nullptr), m_bIgnoreMissingEndTagError(false) {}
 
 XMLDocument::~XMLDocument() { ClearInternal(); }
 
 void XMLDocument::ClearInternal() { m_Doc.Clear(); }
 
-void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
+enum class ParseIncludeResult
 {
-    string4096 str;
+    Success,   /// There is a valid #include and 'out_include_name' returns the filename
+    Error,     /// There is a #include but there is some problem
+    NoInclude, /// There is no #include on this line
+};
+
+// Given a string of the form: '#include "filename"' we return the filename in 'out_include_name'
+ParseIncludeResult ParseInclude(pstr string, pcstr& out_include_name)
+{
+    // Skip any whitespace characters
+    while (*string != '\0' && std::isblank(*string))
+    {
+        ++string;
+    }
+
+    // Check for #include
+    static constexpr pcstr IncludeTag = "#include";
+    if (std::strncmp(string, IncludeTag, 8) != 0)
+        return ParseIncludeResult::NoInclude;
+
+    string += 8;
+
+    // Skip any whitespace characters
+    while (*string != '\0' && std::isblank(*string))
+        ++string;
+
+    // Check that after the tag there is a quote
+    if (*string != '\"')
+        return ParseIncludeResult::Error;
+
+    // Mark the start of the include name
+    ++string;
+    out_include_name = string;
+
+    while (*string != '\0' && *string != '\"')
+        ++string;
+
+    // Check for unterminated or empty include name
+    if (*string == '\0' || out_include_name == string)
+        return ParseIncludeResult::Error;
+
+    // Check for unreasonably long include names
+    const size_t size = string - out_include_name;
+    if (size > 1024)
+        return ParseIncludeResult::Error;
+
+    // NOTE(Andre): Yes this might look scary but it's perfectly fine. Since the include name is already in the string
+    // we are parsing and its not used afterwards we simply replace the closing quote with a null byte and we have a
+    // valid c-string pointed to by 'out_include_name' and safe ourselves the need to copy the string.
+    *string = '\0';
+
+    return ParseIncludeResult::Success;
+}
+
+void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml, bool fatal, u8 include_depth)
+{
+    // Prevent stack overflow due to recursive or cyclic includes
+    if (include_depth >= 128)
+    {
+        R_ASSERT3(!fatal, "XML file[%s] parsing failed. Maximum include depth reached (> 128)", path);
+        Msg("! XML file[%s] parsing failed. Maximum include depth reached (> 128)", path);
+        return;
+    }
 
     const auto tryOpenFile = [&](IReader*& file, pcstr includeName, pcstr comparePath, pcstr uiPath, pcstr uiPathDelim)
     {
@@ -21,7 +82,10 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
             return;
         if (includeName == strstr(includeName, comparePath))
         {
-            shared_str fn = xml->correct_file_name(uiPath, strchr(includeName, _DELIMITER) + 1);
+            pcstr fileName = strstr(includeName, comparePath);
+            fileName = fileName ? ++fileName : includeName;
+
+            shared_str fn = xml->correct_file_name(uiPath, fileName);
             string_path buff;
             strconcat(buff, uiPathDelim, fn.c_str());
             file = FS.r_open(path, buff);
@@ -30,12 +94,18 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
 
     while (!F->eof())
     {
-        F->r_string(str, sizeof str);
-
-        if (str[0] && str[0] == '#' && strstr(str, "#include"))
+        string4096 str;
+        if (!F->try_r_string(str, sizeof(str)))
         {
-            string256 inc_name;
-            if (_GetItem(str, 1, inc_name, '"'))
+            R_ASSERT3(!fatal, "XML file[%s] parsing failed. Line is too long (>= 4096)", path);
+            Msg("! XML file[%s] parsing failed. Line is too long (>= 4096)", path);
+            return;
+        }
+
+        pcstr inc_name;
+        switch (ParseInclude(str, inc_name))
+        {
+            case ParseIncludeResult::Success:
             {
                 IReader* I = nullptr;
                 tryOpenFile(I, inc_name, UI_PATH, UI_PATH, UI_PATH_WITH_DELIMITER);
@@ -46,13 +116,26 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
                     I = FS.r_open(path, inc_name);
 
                 if (!I)
-                    FATAL_F("XML file[%s] parsing failed. Can't find include file: [%s]", path, inc_name);
-                ParseFile(path, W, I, xml);
+                {
+                    R_ASSERT4(!fatal, "XML file[%s] parsing failed. Can't find include file: [%s]", path, inc_name);
+                    Msg("! XML file[%s] parsing failed. Can't find include file: [%s]", path, inc_name);
+                    return;
+                }
+
+                ParseFile(path, W, I, xml, fatal, include_depth + 1);
                 FS.r_close(I);
+                break;
             }
+
+            case ParseIncludeResult::Error:
+                R_ASSERT4(!fatal, "XML file[%s] invalid include directive: '%s'", path, str);
+                Msg("! XML file[%s] invalid include directive: '%s'", path, str);
+                break;
+
+            case ParseIncludeResult::NoInclude:
+                W.w_string(str);
+                break;
         }
-        else
-            W.w_string(str);
     }
 }
 
@@ -93,7 +176,7 @@ bool XMLDocument::Load(pcstr path, pcstr xml_filename, bool fatal)
     xr_strcpy(m_xml_file_name, xml_filename);
 
     CMemoryWriter W;
-    ParseFile(path, W, F, this);
+    ParseFile(path, W, F, this, fatal, 0);
     W.w_stringZ("");
     FS.r_close(F);
 
@@ -116,6 +199,16 @@ bool XMLDocument::Set(pcstr text, bool fatal)
     m_root = m_Doc.FirstChildElement();
 
     return true;
+}
+
+bool XMLDocument::IsErrored() const
+{
+    return m_Doc.Error();
+}
+
+pcstr XMLDocument::GetErrorDesc() const
+{
+    return m_Doc.ErrorDesc();
 }
 
 XML_NODE XMLDocument::NavigateToNode(CONST_XML_NODE start_node, pcstr path, const size_t node_index) const

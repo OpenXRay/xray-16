@@ -55,7 +55,7 @@ bool CLevelChanger::net_Spawn(CSE_Abstract* DC)
     m_bSilentMode = !!l_tpALifeLevelChanger->m_bSilentMode;
     if (ai().get_level_graph())
     {
-        //. this information should be computed in xrAI
+        // XXX: this information should be computed in xrAI
         ai_location().level_vertex(ai().level_graph().vertex(u32(-1), Position()));
         ai_location().game_vertex(ai().cross_table().vertex(ai_location().level_vertex_id()).game_vertex_id());
     }
@@ -113,13 +113,16 @@ void CLevelChanger::feel_touch_new(IGameObject* tpObject)
 
     if (m_bSilentMode)
     {
-        NET_Packet p;
-        p.w_begin(M_CHANGE_LEVEL);
-        p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
-        p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
-        p.w_vec3(m_position);
-        p.w_vec3(m_angles);
-        Level().Send(p, net_flags(TRUE));
+        if (m_b_enabled)
+        {
+            NET_Packet p;
+            p.w_begin(M_CHANGE_LEVEL);
+            p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
+            p.w(&m_level_vertex_id, sizeof(m_level_vertex_id));
+            p.w_vec3(m_position);
+            p.w_vec3(m_angles);
+            Level().Send(p, net_flags(TRUE));
+        }
         return;
     }
     Fvector p, r;

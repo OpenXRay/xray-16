@@ -43,5 +43,7 @@ SCRIPT_EXPORT(CUIComboBox, (CUIWindow),
             .def("ClearList", &CUIComboBox::ClearList)
             .def("SetCurrentValue", &CUIComboBox::SetCurrentOptValue)
             .def("SetCurrentOptValue", &CUIComboBox::SetCurrentOptValue)
+            .def("SetCurrentIdx", &CUIComboBox::SetSelectedIDX)
+            .def("GetCurrentIdx", &CUIComboBox::GetSelectedIDX)
     ];
 });

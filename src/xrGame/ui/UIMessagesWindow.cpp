@@ -17,14 +17,16 @@
 #include "UIPdaMsgListItem.h"
 #include "xrGame/game_type.h"
 
-CUIMessagesWindow::CUIMessagesWindow()
-    : CUIWindow("CUIMessagesWindow"), m_pChatLog(nullptr), m_pChatWnd(nullptr), m_pGameLog(nullptr)
+constexpr cpcstr CHAT_LOG_LIST_PENDING = "chat_log_list_pending";
+
+CUIMessagesWindow::CUIMessagesWindow() : CUIWindow("CUIMessagesWindow")
 {
     Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 }
 
-void CUIMessagesWindow::AddLogMessage(KillMessageStruct& msg) { m_pGameLog->AddLogMessage(msg); }
-void CUIMessagesWindow::AddLogMessage(const shared_str& msg) { m_pGameLog->AddLogMessage(*msg); }
+void CUIMessagesWindow::AddLogMessage(KillMessageStruct& msg) const { m_pGameLog->AddLogMessage(msg); }
+void CUIMessagesWindow::AddLogMessage(const shared_str& msg) const { m_pGameLog->AddLogMessage(msg.c_str()); }
+
 void CUIMessagesWindow::PendingMode(bool const is_pending_mode)
 {
     if (is_pending_mode)
@@ -45,7 +47,6 @@ void CUIMessagesWindow::PendingMode(bool const is_pending_mode)
     m_in_pending_mode = false;
 }
 
-#define CHAT_LOG_LIST_PENDING "chat_log_list_pending"
 void CUIMessagesWindow::Init(float x, float y, float width, float height)
 {
     CUIXml xml;
@@ -104,8 +105,7 @@ void CUIMessagesWindow::AddIconedPdaMessage(GAME_NEWS_DATA* news)
 {
     CUIPdaMsgListItem* pItem = m_pGameLog->AddPdaMessage();
 
-    LPCSTR time_str =
-        InventoryUtilities::GetTimeAsString(news->receive_time, InventoryUtilities::etpTimeToMinutes).c_str();
+    cpcstr time_str = GetTimeAsString(news->receive_time, InventoryUtilities::etpTimeToMinutes).c_str();
     pItem->UITimeText.SetText(time_str);
     pItem->UITimeText.AdjustWidthToText();
     Fvector2 p = pItem->UICaptionText.GetWndPos();
@@ -119,20 +119,17 @@ void CUIMessagesWindow::AddIconedPdaMessage(GAME_NEWS_DATA* news)
         "ui_main_msgs_short", LA_ONLYALPHA | LA_TEXTCOLOR | LA_TEXTURECOLOR, float(news->show_time));
     pItem->UIIcon.InitTexture(news->texture_name.c_str());
 
-    float h1 = _max(pItem->UIIcon.GetHeight(), pItem->UIMsgText.GetWndPos().y + pItem->UIMsgText.GetHeight());
+    const float h1 = _max(pItem->UIIcon.GetHeight(), pItem->UIMsgText.GetWndPos().y + pItem->UIMsgText.GetHeight());
     pItem->SetHeight(h1 + 3.0f);
 
     m_pGameLog->SendMessage(pItem, CHILD_CHANGED_SIZE);
 }
 
-void CUIMessagesWindow::AddChatMessage(shared_str msg, shared_str author) { m_pChatLog->AddChatMessage(*msg, *author); }
-/*
-void CUIMessagesWindow::SetChatOwner(game_cl_GameState* owner)
+void CUIMessagesWindow::AddChatMessage(const shared_str& msg, const shared_str& author) const
 {
-    if (m_pChatWnd)
-        m_pChatWnd->SetOwner(owner);
+    m_pChatLog->AddChatMessage(msg.c_str(), author.c_str());
 }
-*/
+
 void CUIMessagesWindow::Show(bool show)
 {
     if (m_pChatWnd)

@@ -837,7 +837,7 @@ bool CActorCondition::ApplyInfluence(const SMedicineInfluenceValues& V, const sh
 
             shared_str snd_name = pSettings->r_string(sect, "use_sound");
             m_use_sound.create(snd_name.c_str(), st_Effect, sg_SourceType);
-            m_use_sound.play(NULL, sm_2D);
+            m_use_sound.play(NULL, sm_2D | sm_IgnoreTimeFactor);
         }
     }
 
@@ -861,7 +861,7 @@ bool CActorCondition::ApplyBooster(const SBooster& B, const shared_str& sect)
 
                 shared_str snd_name = pSettings->r_string(sect, "use_sound");
                 m_use_sound.create(snd_name.c_str(), st_Effect, sg_SourceType);
-                m_use_sound.play(NULL, sm_2D);
+                m_use_sound.play(NULL, sm_2D | sm_IgnoreTimeFactor);
             }
         }
 

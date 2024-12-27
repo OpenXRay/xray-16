@@ -77,9 +77,6 @@ public:
     ref_rt rt_smap_rain;
     ref_rt rt_smap_depth_minmax; //	is used for min/max sm
 
-    //	Igor: for async screenshots
-    GLuint t_ss_async; // 32bit		(r,g,b,a) is situated in the system memory
-
     // Textures
     GLuint t_material_surf;
     ref_texture t_material;
@@ -90,6 +87,10 @@ public:
     ref_texture t_noise_mipped;
 
     ref_texture t_base;
+
+    // Anomaly
+    ref_rt rt_Generic_temp;
+
 private:
     // OCCq
     ref_shader s_occq;
@@ -320,8 +321,6 @@ public:
     //	Don't clear when render for the first time
     void reset_light_marker(CBackend& cmd_list, bool bResetStencil = false);
     void increment_light_marker(CBackend& cmd_list);
-
-    void DoAsyncScreenshot();
 
 #ifdef DEBUG
     void dbg_addline(const Fvector& P0, const Fvector& P1, u32 c)

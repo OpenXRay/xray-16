@@ -124,7 +124,7 @@ public:
         D3D10_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
+        strconcat(pname, RImplementation.getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
         if (nullptr == R)
         {
@@ -226,6 +226,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     string32 c_sun_quality;
     char c_msaa_samples[2];
     char c_msaa_current_sample[2];
+    char c_rain_quality[32];
+    char c_inter_grass[32];
 
     // options:
     const auto appendShaderOption = [&](u32 option, cpcstr macro, cpcstr value)
@@ -403,7 +405,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Shader Model 5.0
     appendShaderOption(HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0, "SM_5", "1");
-     
+
     // Double precision
     appendShaderOption(HW.DoublePrecisionFloatShaderOps, "DOUBLE_PRECISION", "1");
 
@@ -415,6 +417,27 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Minmax SM
     appendShaderOption(o.minmax_sm, "USE_MINMAX_SM", "1");
+
+    // Ascii's Screen Space Shaders - SSS preprocessor stuff
+    if (ps_ssfx_rain_1.w > 0)
+    {
+        xr_sprintf(c_rain_quality, "%d", (u8)ps_ssfx_rain_1.w);
+        options.add("SSFX_RAIN_QUALITY", c_rain_quality);
+        sh_name.append(c_rain_quality);
+    }
+    else
+        sh_name.append(static_cast<u32>(0));
+
+    if (ps_ssfx_grass_interactive.y > 0)
+    {
+        xr_sprintf(c_inter_grass, "%d", (u8)ps_ssfx_grass_interactive.y);
+        options.add("SSFX_INT_GRASS", c_inter_grass);
+        sh_name.append(c_inter_grass);
+    }
+    else
+        sh_name.append(static_cast<u32>(0));
+
+    appendShaderOption(1, "SSFX_MODEXE", "1");
 
     // Be carefull!!!!! this should be at the end to correctly generate
     // compiled shader name;
@@ -514,7 +537,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     }
 
     string_path shadersFolder;
-    FS.update_path(shadersFolder, "$game_shaders$", GEnv.Render->getShaderPath());
+    FS.update_path(shadersFolder, "$game_shaders$", RImplementation.getShaderPath());
 
     u32 fileCrc = 0;
     getFileCrc32(fs, shadersFolder, fileCrc);

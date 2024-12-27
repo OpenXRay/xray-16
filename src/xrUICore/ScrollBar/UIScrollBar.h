@@ -16,33 +16,33 @@ protected:
     CUIScrollBox* m_ScrollBox;
     CUIFrameLineWnd* m_FrameBackground;
 
-    float m_hold_delay;
-    int m_iScrollPos;
+    float m_hold_delay{ 50.0f };
+    int m_iScrollPos{};
 
-    int m_iStepSize;
+    int m_iStepSize{ 1 };
 
-    int m_iMinPos;
-    int m_iMaxPos;
+    int m_iMinPos{ 1 };
+    int m_iMaxPos{ 1 };
 
-    int m_iPageSize;
+    int m_iPageSize{ 1 };
 
     int m_ScrollWorkArea;
-    bool m_b_enabled;
+    bool m_b_enabled{ true };
     bool m_bIsHorizontal;
 
-    int m_mouse_state;
+    int m_mouse_state{};
 
     bool ScrollInc(bool by_scrollbox = false);
     bool ScrollDec(bool by_scrollbox = false);
     virtual void UpdateScrollBar();
 
-    u32 ScrollSize() { return _max(1, m_iMaxPos - m_iMinPos - m_iPageSize + 1); }
+    u32 ScrollSize() const { return _max(1, m_iMaxPos - m_iMinPos - m_iPageSize + 1); }
     virtual void ClampByViewRect();
-    virtual void SetPosScrollFromView(float view_pos, float view_width, float view_offs);
-    int PosViewFromScroll(int view_size, int view_offs);
+    virtual void SetPosScrollFromView(float view_pos, float view_size, float view_offs);
+    int PosViewFromScroll(int view_size, int view_offs) const;
     void SetScrollPosClamped(int iPos);
 
-    bool IsRelevant();
+    bool IsRelevant() const;
 
 public:
     CUIScrollBar();
@@ -53,7 +53,7 @@ public:
         if (!m_b_enabled)
             Show(m_b_enabled);
     }
-    bool GetEnabled() { return m_b_enabled; }
+    bool GetEnabled() const { return m_b_enabled; }
     virtual void Show(bool b);
     virtual void Enable(bool b);
     virtual bool InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal, cpcstr profile = "default");
@@ -73,27 +73,27 @@ public:
     virtual void Reset();
     void Refresh();
     void SetStepSize(int step);
-    IC int GetStepSize() { return m_iStepSize; }
+    IC int GetStepSize() const { return m_iStepSize; }
     void SetRange(int iMin, int iMax);
-    void GetRange(int& iMin, int& iMax)
+    void GetRange(int& iMin, int& iMax) const
     {
         iMin = m_iMinPos;
         iMax = m_iMaxPos;
     }
-    int GetMaxRange() { return m_iMaxPos; }
-    int GetMinRange() { return m_iMinPos; }
+    int GetMaxRange() const { return m_iMaxPos; }
+    int GetMinRange() const { return m_iMinPos; }
     void SetPageSize(int iPage)
     {
         m_iPageSize = _max(0, iPage);
         UpdateScrollBar();
     }
-    int GetPageSize() { return m_iPageSize; }
+    int GetPageSize() const { return m_iPageSize; }
     void SetScrollPos(int iPos)
     {
         SetScrollPosClamped(iPos);
         UpdateScrollBar();
     }
-    int GetScrollPos() { return _max(m_iMinPos, m_iScrollPos); }
+    int GetScrollPos() const { return _max(m_iMinPos, m_iScrollPos); }
     void TryScrollInc(bool by_scrollbox = false);
     void TryScrollDec(bool by_scrollbox = false);
 

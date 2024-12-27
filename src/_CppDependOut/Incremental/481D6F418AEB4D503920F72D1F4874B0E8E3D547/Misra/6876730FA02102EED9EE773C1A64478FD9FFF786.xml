@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\utils\etools\etools.cpp"><violation beginline="9" endline="9" rule="Rule6-4-4" ruleset="Statements">
-</violation></file></cppdepend-plugin>

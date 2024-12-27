@@ -46,7 +46,8 @@ CPhysicsShellAnimator::~CPhysicsShellAnimator()
 }
 void CPhysicsShellAnimator::CreateJoints(LPCSTR controled)
 {
-    IPhysicsShellHolder* obj = (*(m_pPhysicsShell->Elements().begin()))->PhysicsRefObject();
+    [[maybe_unused]] IPhysicsShellHolder* obj = (*(m_pPhysicsShell->Elements().begin()))->PhysicsRefObject();
+
     const u16 nb = (u16)_GetItemCount(controled);
     for (u16 i = 0; nb > i; ++i)
     {

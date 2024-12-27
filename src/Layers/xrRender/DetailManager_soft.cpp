@@ -16,6 +16,7 @@ void CDetailManager::soft_Load()
 void CDetailManager::soft_Unload() { soft_Geom.destroy(); }
 void CDetailManager::soft_Render()
 {
+    ZoneScoped;
     // Render itself
     // float    fPhaseRange = PI/16;
     // float    fPhaseX     = _sin(RDEVICE.fTimeGlobal*0.1f)    *fPhaseRange;

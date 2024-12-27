@@ -3,9 +3,7 @@
 #include "Render.h"
 #include "xrCDB/xrXRC.h"
 
-extern XRCDB_API bool* cdb_bDebug;
-
-void CRenderDevice::_SetupStates()
+void CRenderDevice::SetupStates()
 {
     // General Render States
     mView.identity();
@@ -23,16 +21,7 @@ void CRenderDevice::Create()
     if (b_is_Ready)
         return; // prevent double call
 
-    // Start all threads
-    mt_bMustExit = false;
-
-    CreateInternal();
-}
-
-void CRenderDevice::CreateInternal()
-{
-    if (b_is_Ready)
-        return; // prevent double call
+    ZoneScoped;
 
     Statistic = xr_new<CStats>();
     Log("Starting RENDER device...");
@@ -52,13 +41,12 @@ void CRenderDevice::CreateInternal()
     Memory.mem_compact();
     b_is_Ready = true;
 
-    _SetupStates();
+    SetupStates();
     string_path fname;
     FS.update_path(fname, "$game_data$", "shaders.xr");
     GEnv.Render->OnDeviceCreate(fname);
-    if (!GEnv.isDedicatedServer)
-        m_editor.OnDeviceCreate();
+    m_imgui_render = GEnv.RenderFactory->CreateImGuiRender();
+    m_imgui_render->OnDeviceCreate(GetImGuiContext());
     Statistic->OnDeviceCreate();
     dwFrame = 0;
-    PreCache(0, false, false);
 }

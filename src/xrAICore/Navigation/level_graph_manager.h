@@ -87,7 +87,7 @@ public:
             xr_free(m_nodes);
         }
     }
-    
+
     [[nodiscard]] CLevelVertex* begin() { return m_nodes; }
     [[nodiscard]] CLevelVertex* end() { return m_nodes + m_vertex_count; }
 };

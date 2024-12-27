@@ -4,12 +4,12 @@
 #include "xrCore/_fbox.h"
 #include "xrCDB.h"
 
-#include <SDL.h>
-
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
 #else
 #error Add your platform here
 #endif
@@ -435,6 +435,7 @@ public:
 
 void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_start, const Fvector& r_dir, float r_range)
 {
+    ZoneScoped;
     m_def->syncronize();
 
     // Get nodes
@@ -442,7 +443,7 @@ void COLLIDER::ray_query(u32 ray_mode, const MODEL* m_def, const Fvector& r_star
     const AABBNoLeafNode* N = T->GetNodes();
     r_clear();
 
-    if (SDL_HasSSE())
+    if (CPU::HasSSE)
     {
         // SSE
         // Binary dispatcher

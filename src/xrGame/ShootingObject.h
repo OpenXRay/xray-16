@@ -29,15 +29,15 @@ protected:
     void reload(LPCSTR section){};
     void Load(LPCSTR section);
 
-    Fvector m_vCurrentShootDir;
-    Fvector m_vCurrentShootPos;
+    Fvector m_vCurrentShootDir{};
+    Fvector m_vCurrentShootPos{};
 
 private:
     float m_air_resistance_factor;
 
 protected:
     // ID персонажа который иницировал действие
-    u16 m_iCurrentParentID;
+    u16 m_iCurrentParentID{ 0xFFFF };
 
     //////////////////////////////////////////////////////////////////////////
     // Fire Params
@@ -46,7 +46,7 @@ protected:
     virtual void LoadFireParams(LPCSTR section); //сила выстрела
     virtual bool SendHitAllowed(IGameObject* pUser);
     virtual void FireBullet(const Fvector& pos, const Fvector& dir, float fire_disp, const CCartridge& cartridge,
-        u16 parent_id, u16 weapon_id, bool send_hit);
+        u16 parent_id, u16 weapon_id, bool send_hit, int iShotNum = 0);
     void SetBulletSpeed(float new_speed) { m_fStartBulletSpeed = new_speed; }
     float GetBulletSpeed() { return m_fStartBulletSpeed; }
     virtual void FireStart();
@@ -58,13 +58,13 @@ public:
     virtual BOOL ParentIsActor() { return FALSE; }
 protected:
     // Weapon fires now
-    bool bWorking;
+    bool bWorking{};
 
-    float fOneShotTime;
-    float modeShotTime;
-    bool cycleDown;
-    Fvector4 fvHitPower;
-    Fvector4 fvHitPowerCritical;
+    float fOneShotTime{};
+    float fModeShotTime;
+    bool bCycleDown;
+    Fvector4 fvHitPower{};
+    Fvector4 fvHitPowerCritical{};
     float fHitImpulse;
 
     //скорость вылета пули из ствола
@@ -76,7 +76,7 @@ protected:
     float fireDispersionBase;
 
     //счетчик времени, затрачиваемого на выстрел
-    float fShotTimeCounter;
+    float fShotTimeCounter{};
 
     struct SilencerKoeffs // value *= koef;
     {
@@ -170,9 +170,9 @@ protected:
 
 public:
     Fvector vLoadedShellPoint;
-    float m_fPredBulletTime;
-    float m_fTimeToAim;
-    bool m_bUseAimBullet;
+    float m_fPredBulletTime{};
+    float m_fTimeToAim{};
+    bool m_bUseAimBullet{};
 
 protected:
     //имя пратиклов для огня

@@ -1,6 +1,5 @@
 #define VC_EXTRALEAN // Exclude rarely-used stuff from Windows headers
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#define IDIRECTPLAY2_OR_GREATER // ?
 
 #ifndef _WIN32_WINNT
 // Request Windows 7 functionality
@@ -8,22 +7,56 @@
 #endif
 
 #define NOGDICAPMASKS
-//#define NOSYSMETRICS
+#define NOVIRTUALKEYCODES
+//#define NOWINMESSAGES
+//#define NOWINSTYLES
+#define NOSYSMETRICS
 #define NOMENUS
 #define NOICONS
 #define NOKEYSTATES
+#define NOSYSCOMMANDS
+//#define NORASTEROPS
+//#define NOSHOWWINDOW
+#define NOATOM
+#define NOCLIPBOARD
+#define NOCOLOR
+//#define NOCTLMGR
 #define NODRAWTEXT
+//#define NOGDI
+#define NOKERNEL
+//#define NOUSER
+//#define NONLS
+//#define NOMB
 #define NOMEMMGR
 #define NOMETAFILE
+#define NOMINMAX
+//#define NOMSG
+#define NOOPENFILE
+#define NOSCROLL
 #define NOSERVICE
+#define NOSOUND
+//#define NOTEXTMETRIC
+#define NOWH
+//#define NOWINOFFSETS
 #define NOCOMM
+#define NOKANJI
+#define NOCRYPT
 #define NOHELP
 #define NOPROFILER
+#define NODEFERWINDOWPOS
 #define NOMCX
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+#define NOIME
+#define NODESKTOP
+#define NOWINDOWSTATION
+#define NOSECURITY
+#define NONCMESSAGES
+#define NOTRACKMOUSEEVENT
+#define NOKEYSTATES
+#define NOTRACKMOUSEEVENT
+#define NODEFERWINDOWPOS
+#define NOMDI
+#define NOWINABLE
+#define NO_STATE_FLAGS
 
 #define DOSWIN32
 #define _WIN32_DCOM
@@ -42,3 +75,5 @@ inline tm* localtime_safe(const time_t *time, struct tm* result){ return localti
 #define xr_strerror(errno, buffer, bufferSize) strerror_s(buffer, sizeof(buffer), errno)
 
 using xrpid_t = DWORD;
+
+using ssize_t = SSIZE_T;

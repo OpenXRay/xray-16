@@ -34,8 +34,8 @@ class MessageRegistry
         int Prio;
     };
 
-    bool changed, inProcess;
     xr_vector<MessageObject> messages;
+    bool changed, inProcess;
 
 public:
     MessageRegistry() : changed(false), inProcess(false) {}
@@ -119,7 +119,7 @@ public:
             messages.pop_back();
 
         if (messages.empty())
-            messages.clear();
+            messages.shrink_to_fit();
 
         changed = false;
     }

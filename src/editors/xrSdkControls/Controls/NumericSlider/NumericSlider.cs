@@ -69,7 +69,7 @@ namespace XRay.SdkControls
             get { return trackBar.Maximum; }
             set { trackBar.Maximum = value; }
         }
-        
+
         /// <summary>
         /// Gets or sets a value that specifies the delta between ticks drawn on the control.
         /// </summary>
@@ -124,7 +124,7 @@ namespace XRay.SdkControls
                 base.MinimumSize = value;
             }
         }
-        
+
         private void OnValueChanged()
         {
             ValueChanged?.Invoke(this, null);

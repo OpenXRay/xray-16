@@ -27,6 +27,7 @@ void CExplosiveRocket::Load(LPCSTR section)
 
 bool CExplosiveRocket::net_Spawn(CSE_Abstract* DC)
 {
+    CInventoryItem::net_Spawn_install_upgrades(DC);
     BOOL result = inherited::net_Spawn(DC);
     result = result && CInventoryItem::net_Spawn(DC);
     Fvector box;

@@ -203,7 +203,6 @@ public:
 };
 
 typedef _vector4<float> Fvector4;
-typedef _vector4<double> Dvector4;
 typedef _vector4<s32> Ivector4;
 
 template <class T>

@@ -3,22 +3,16 @@
 #include "xrEngine/xr_level_controller.h"
 #include "xrEngine/IInputReceiver.h"
 
-void CWeaponStatMgun::OnAxisMove(float x, float y, float scale, bool invert)
+void CWeaponStatMgun::OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY)
 {
+    if (fis_zero(x) && fis_zero(y))
+        return;
+
     float h, p;
     m_destEnemyDir.getHP(h, p);
-    if (!fis_zero(x))
-    {
-        const float d = x * scale;
-        h -= d;
-        SetDesiredDir(h, p);
-    }
-    if (!fis_zero(y))
-    {
-        const float d = (invert ? -1.f : 1.f) * y * scale * 3.f / 4.f;
-        p -= d;
-        SetDesiredDir(h, p);
-    }
+    h -= (invertX ? -1.f : 1.f) * x * scaleX;
+    p -= (invertY ? -1.f : 1.f) * y * scaleY * 3.f / 4.f;
+    SetDesiredDir(h, p);
 }
 
 
@@ -28,7 +22,7 @@ void CWeaponStatMgun::OnMouseMove(int dx, int dy)
         return;
 
     const float scale = psMouseSens * psMouseSensScale / 50.f;
-    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
+    OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
 void CWeaponStatMgun::OnKeyboardPress(int dik)
@@ -66,8 +60,9 @@ void CWeaponStatMgun::OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float scale = psControllerStickSens * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        const float scaleX = psControllerStickSensX * psControllerStickSensScale / 50.f;
+        const float scaleY = psControllerStickSensY * psControllerStickSensScale / 50.f;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -101,8 +96,9 @@ void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
     switch (cmd)
     {
     case kLOOK_AROUND:
-        const float scale = psControllerStickSens * psControllerStickSensScale / 50.f;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        const float scaleX = psControllerStickSensX * psControllerStickSensScale / 50.f;
+        const float scaleY = psControllerStickSensY * psControllerStickSensScale / 50.f;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }; // switch (cmd)
 }
@@ -110,5 +106,5 @@ void CWeaponStatMgun::OnControllerHold(int cmd, float x, float y)
 void CWeaponStatMgun::OnControllerAttitudeChange(Fvector change)
 {
     const float scale = psControllerSensorSens / 50.f;
-    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+    OnAxisMove(change.x, change.y, scale, scale, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
 }

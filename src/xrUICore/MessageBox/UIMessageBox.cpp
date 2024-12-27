@@ -149,9 +149,9 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
     strconcat(sizeof(str), str, box_template, ":message_text");
     if (uiXml.NavigateToNode(str, 0))
     {
-        m_UIStaticText = xr_new<CUITextWnd>();
+        m_UIStaticText = xr_new<CUIStatic>("Text");
         AttachChild(m_UIStaticText);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticText);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticText);
     }
 
     xr_strcpy(str, box_template);
@@ -221,9 +221,9 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
 
     case MESSAGEBOX_DIRECT_IP:
         strconcat(sizeof(str), str, box_template, ":cap_host");
-        m_UIStaticHost = xr_new<CUITextWnd>();
+        m_UIStaticHost = xr_new<CUIStatic>("Host");
         AttachChild(m_UIStaticHost);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticHost);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticHost);
 
         strconcat(sizeof(str), str, box_template, ":edit_host");
         m_UIEditHost = xr_new<CUIEditBox>();
@@ -231,9 +231,9 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditHost);
 
         strconcat(sizeof(str), str, box_template, ":cap_password");
-        m_UIStaticPass = xr_new<CUITextWnd>();
+        m_UIStaticPass = xr_new<CUIStatic>("Password");
         AttachChild(m_UIStaticPass);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticPass);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_password");
         m_UIEditPass = xr_new<CUIEditBox>();
@@ -255,14 +255,14 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
     case MESSAGEBOX_PASSWORD:
     {
         strconcat(sizeof(str), str, box_template, ":cap_user_password");
-        m_UIStaticUserPass = xr_new<CUITextWnd>();
+        m_UIStaticUserPass = xr_new<CUIStatic>("User password");
         AttachChild(m_UIStaticUserPass);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticUserPass);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticUserPass);
 
         strconcat(sizeof(str), str, box_template, ":cap_password");
-        m_UIStaticPass = xr_new<CUITextWnd>();
+        m_UIStaticPass = xr_new<CUIStatic>("Password");
         AttachChild(m_UIStaticPass);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticPass);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_user_password");
         m_UIEditUserPass = xr_new<CUIEditBox>();
@@ -288,14 +288,14 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
 
     case MESSAGEBOX_RA_LOGIN:
         strconcat(sizeof(str), str, box_template, ":cap_login");
-        m_UIStaticUserPass = xr_new<CUITextWnd>();
+        m_UIStaticUserPass = xr_new<CUIStatic>("Login");
         AttachChild(m_UIStaticUserPass);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticUserPass);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticUserPass);
 
         strconcat(sizeof(str), str, box_template, ":cap_password");
-        m_UIStaticPass = xr_new<CUITextWnd>();
+        m_UIStaticPass = xr_new<CUIStatic>("Password");
         AttachChild(m_UIStaticPass);
-        CUIXmlInitBase::InitTextWnd(uiXml, str, 0, m_UIStaticPass);
+        CUIXmlInitBase::InitStatic(uiXml, str, 0, m_UIStaticPass);
 
         strconcat(sizeof(str), str, box_template, ":edit_login");
         m_UIEditUserPass = xr_new<CUIEditBox>();
@@ -310,7 +310,7 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIEditUserPass->SetNextFocusCapturer(m_UIEditPass);
         m_UIEditPass->SetNextFocusCapturer(m_UIEditUserPass);
         m_UIEditUserPass->CaptureFocus(true);
-
+        [[fallthrough]];
     case MESSAGEBOX_QUIT_WINDOWS:
     case MESSAGEBOX_QUIT_GAME:
     case MESSAGEBOX_YES_NO:
@@ -461,13 +461,15 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
                 GetMessageTarget()->SendMessage(this, MESSAGE_BOX_COPY_CLICKED);
             }
             break;
+        case MESSAGEBOX_INFO:
+            break;
         };
     };
     inherited::SendMessage(pWnd, msg, pData);
 }
 
 void CUIMessageBox::SetText(LPCSTR str) { m_UIStaticText->SetTextST(str); }
-LPCSTR CUIMessageBox::GetText() { return m_UIStaticText->GetText(); }
+LPCSTR CUIMessageBox::GetText() const { return m_UIStaticText->GetText(); }
 LPCSTR CUIMessageBox::GetHost()
 {
     if (m_UIEditHost)

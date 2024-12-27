@@ -10,7 +10,7 @@ private:
     typedef xr_vector<CUIStatic*> ITEMS_REFERENCES_VEC;
     typedef ITEMS_REFERENCES_VEC::iterator ITEMS_REFERENCES_VEC_IT;
     ITEMS_REFERENCES_VEC m_references;
-    xr_vector<CUITextWnd*> m_labels;
+    xr_vector<CUIStatic*> m_labels;
     pcstr m_translation_id;
 
 public:

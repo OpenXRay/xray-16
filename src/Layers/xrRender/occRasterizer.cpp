@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "occRasterizer.h"
 
-#ifdef DEBUG 
+#ifdef DEBUG
 #include "xrRender_console.h"
 #endif
 
@@ -68,6 +68,8 @@ BOOL shared(occTri* T1, occTri* T2);
 
 void occRasterizer::propagade()
 {
+    ZoneScoped;
+
     // Clip-and-propagade zero level
     occTri** pFrame = get_frame();
     float* pDepth = get_depth();

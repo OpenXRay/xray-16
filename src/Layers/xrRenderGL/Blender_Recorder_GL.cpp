@@ -66,7 +66,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     // Create shaders
 #if defined(USE_OGL)
     dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, _gs, "null", "null");
-    if (HW.SeparateShaderObjectsSupported || !dest.pp->pp)
+    if (GLAD_GL_ARB_separate_shader_objects || !dest.pp->pp)
 #endif
     {
         dest.ps = RImplementation.Resources->_CreatePS(_ps);

@@ -55,7 +55,10 @@ void game_sv_mp_script::Create(shared_str& options)
 void game_sv_mp_script::SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoint rp)
 {
     xrClientData* CL = m_server->ID_to_client(id);
+    VERIFY(CL);
+
     game_PlayerState* ps_who = CL->ps;
+    VERIFY(ps_who);
     ps_who->setFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);
 
     CSE_Abstract* pOldOwner = CL->owner;
@@ -119,9 +122,11 @@ void game_sv_mp_script::SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoi
     Msg("* %s respawned as %s", get_name_id(id), (0 == pA) ? "spectator" : "actor");
     spawn_end(E, id);
 
-    ps_who->SetGameID(CL->owner->ID);
-
-    CL->owner->owner = CL;
+    if (CL->owner)
+    {
+        ps_who->SetGameID(CL->owner->ID);
+        CL->owner->owner = CL;
+    }
 
     signal_Syncronize();
 }

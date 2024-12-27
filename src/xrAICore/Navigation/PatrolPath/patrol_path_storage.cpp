@@ -16,6 +16,8 @@ CPatrolPathStorage::~CPatrolPathStorage() { delete_data(m_registry); }
 void CPatrolPathStorage::load_raw(
     const CLevelGraph* level_graph, const CGameLevelCrossTable* cross, const CGameGraph* game_graph, IReader& stream)
 {
+    ZoneScoped;
+
     IReader* chunk = stream.open_chunk(WAY_PATROLPATH_CHUNK);
 
     if (!chunk)
@@ -31,8 +33,7 @@ void CPatrolPathStorage::load_raw(
 
         shared_str patrol_name;
         sub_chunk->r_stringZ(patrol_name);
-        const_iterator I = m_registry.find(patrol_name);
-        VERIFY3(I == m_registry.end(), "Duplicated patrol path found", *patrol_name);
+        VERIFY3(m_registry.find(patrol_name) == m_registry.end(), "Duplicated patrol path found", *patrol_name);
         m_registry.emplace(
             patrol_name, &(xr_new<CPatrolPath>(patrol_name))->load_raw(level_graph, cross, game_graph, *sub_chunk)
 		);
@@ -43,6 +44,8 @@ void CPatrolPathStorage::load_raw(
 
 void CPatrolPathStorage::load(IReader& stream)
 {
+    ZoneScoped;
+
     IReader* chunk = stream.open_chunk(0);
     const u32 size = chunk->r_u32();
     chunk->close();

@@ -32,7 +32,7 @@ void CMonsterEnemyMemory::update()
     VERIFY(monster->g_Alive());
 
     CMonsterHitMemory& monster_hit_memory = monster->HitMemory;
-    
+
     auto const& objects = monster->memory().enemy().objects();
 
     if (monster_hit_memory.is_hit() && time() < monster_hit_memory.get_last_hit_time() + 1000)
@@ -56,7 +56,7 @@ void CMonsterEnemyMemory::update()
     }
 
     // XXX: monster doesn't react to sounds when Actor doesn't see him
-    // and the distance to an Actor being calculated, instead of the actual enemy who made the sound 
+    // and the distance to an Actor being calculated, instead of the actual enemy who made the sound
     // Probably this was made for optimization or for immersiveness
     // But this conflicts with the ALife idea
     if (monster->SoundMemory.IsRememberSound())

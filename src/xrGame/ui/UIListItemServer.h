@@ -64,14 +64,15 @@ protected:
     LIST_SRV_SIZES m_sizes;
 
     LIST_SRV_ITEM m_srv_info;
+
     CUIStatic* m_iconPass;
     CUIStatic* m_iconDedicated;
     //	CUIStatic* 				m_iconPunkBuster;
     CUIStatic* m_iconUserPass;
-    CUITextWnd* m_server;
-    CUITextWnd* m_map;
-    CUITextWnd* m_game;
-    CUITextWnd* m_players;
-    CUITextWnd* m_ping;
-    CUITextWnd* m_version;
+    CUIStatic* m_server;
+    CUIStatic* m_map;
+    CUIStatic* m_game;
+    CUIStatic* m_players;
+    CUIStatic* m_ping;
+    CUIStatic* m_version;
 };

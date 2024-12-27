@@ -41,13 +41,13 @@ void CPortal::OnRender()
         {
             vCenter.add(poly[k]);
             V[k * 3 + 1].set(poly[k], portalColor);
-          
+
             if (k + 1 == poly.size())
                 V[k * 3 + 2].set(poly[0], portalColor);
             else
                 V[k * 3 + 2].set(poly[k + 1], portalColor);
         }
-      
+
         vCenter.div((float)poly.size());
 
         for (u32 k = 0; k < poly.size(); ++k)
@@ -67,12 +67,12 @@ void CPortal::OnRender()
         for (u32 k = 0; k < poly.size(); ++k)
             V[k].set(poly[k], portalColor);
         V.back().set(poly[0], portalColor);
-        
+
         if (bDebug)
             RImplementation.rmNear(RCache);
         else
             Device.SetNearer(TRUE);
-      
+
         RCache.set_Shader(RImplementation.m_WireShader);
 #ifndef USE_DX9 // when we don't have FFP support
         RCache.set_c("tfactor", float(color_get_R(portalColor)) / 255.f, float(color_get_G(portalColor)) / 255.f, \
@@ -110,7 +110,6 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     Fvector N, T;
     N.set(0, 0, 0);
 
-    FPU::m64r();
     u32 _cnt = 0;
     for (int i = 2; i < vcnt; i++)
     {
@@ -125,7 +124,6 @@ void CPortal::setup(const level_portal_data_t& data, const xr_vector<CSector*>& 
     R_ASSERT2(_cnt, "Invalid portal detected");
     N.div(float(_cnt));
     P.build(poly[0], N);
-    FPU::m24r();
 
     /*
     if (_abs(1-P.n.magnitude())<EPS)

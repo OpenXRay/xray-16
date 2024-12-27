@@ -17,43 +17,62 @@
 
 #include "ParallelFor.hpp"
 
-namespace details
+namespace detail
 {
-class ParallelForEachTask
+class ParallelForEach
 {
 public:
-    template <typename Iterator, typename Function, typename ThirdArgument>
-    static decltype(auto) Run(Iterator begin, Iterator end, ThirdArgument thirdArgument, const Function& function)
+    template <typename Iterator, typename Function>
+    static decltype(auto) Run(Iterator begin, Iterator end, bool wait, const Function& function)
     {
-        return xr_parallel_for(TaskRange(begin, end), thirdArgument, [&](const TaskRange<Iterator>& range)
+        return xr_parallel_for(TaskRange(begin, end), wait, [&](TaskRange<Iterator>& range)
         {
-            const Iterator ite = range.end();
-            for (Iterator it = range.begin(); it != ite; ++it)
+            for (auto& it : range)
             {
-                function(*it);
+                function(it);
             }
         });
     }
+
+    template <typename Iterator, typename Function>
+    static decltype(auto) Run(Task& parent, Iterator begin, Iterator end, bool wait, const Function& function)
+    {
+        return xr_parallel_for(parent, TaskRange(begin, end), wait, [&](TaskRange<Iterator>& range)
+        {
+            for (auto& it : range)
+            {
+                function(it);
+            }
+        });
+    }
+
 };
-} // namespace details
+} // namespace detail
 
 // User can specify if he wants caller thread to wait on the task finish
 template <typename Range, typename Function>
-decltype(auto) xr_parallel_for_each(const Range& range, bool wait, const Function& function)
+decltype(auto) xr_parallel_for_each(Range& range, bool wait, const Function& function)
 {
-    return details::ParallelForEachTask::Run(std::begin(range), std::end(range), wait, function);
+    return detail::ParallelForEach::Run(std::begin(range), std::end(range), wait, function);
 }
 
 // Caller thread will wait on the task finish
 template <typename Range, typename Function>
-decltype(auto) xr_parallel_for_each(const Range& range, const Function& function)
+decltype(auto) xr_parallel_for_each(Range& range, const Function& function)
 {
-    return details::ParallelForEachTask::Run(std::begin(range), std::end(range), true, function);
+    return detail::ParallelForEach::Run(std::begin(range), std::end(range), true, function);
 }
 
-// User has a callback, he is responsible for waiting on the task finish (due to task management system limitation)
+// User can specify if he wants caller thread to wait on the task finish
 template <typename Range, typename Function>
-decltype(auto) xr_parallel_for_each(const Range& range, const Task::OnFinishFunc& callback, const Function& function)
+decltype(auto) xr_parallel_for_each(Task& parent, Range& range, bool wait, const Function& function)
 {
-    return details::ParallelForEachTask::Run(std::begin(range), std::end(range), callback, function);
+    return detail::ParallelForEach::Run(parent, std::begin(range), std::end(range), wait, function);
+}
+
+// Caller thread will wait on the task finish
+template <typename Range, typename Function>
+decltype(auto) xr_parallel_for_each(Task& parent, Range& range, const Function& function)
+{
+    return detail::ParallelForEach::Run(parent, std::begin(range), std::end(range), true, function);
 }

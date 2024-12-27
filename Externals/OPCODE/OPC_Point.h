@@ -12,13 +12,12 @@
 #ifndef __ICEPOINT_H__
 #define __ICEPOINT_H__
 
-enum PointComponent
+enum class PointComponent : u32
 {
-    _X = 0,
-    _Y = 1,
-    _Z = 2,
-    _W = 3,
-    _FORCE_DWORD = 0x7fffffff
+    X = 0,
+    Y = 1,
+    Z = 2,
+    W = 3,
 };
 
 // Forward declarations
@@ -44,7 +43,7 @@ public:
     //! Constructor from floats
     inline_ Point(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
     //! Constructor from array
-    inline_ Point(float f[3]) : x(f[_X]), y(f[_Y]), z(f[_Z]) {}
+    inline_ Point(float f[3]) : x(f[(u32)PointComponent::X]), y(f[(u32)PointComponent::Y]), z(f[(u32)PointComponent::Z]) {}
     //! Copy constructor
     inline_ Point(const Point& p) : x(p.x), y(p.y), z(p.z) {}
     //! Destructor
@@ -85,9 +84,9 @@ public:
     //! Assignment from array
     inline_ Point& Set(float f[3])
     {
-        x = f[_X];
-        y = f[_Y];
-        z = f[_Z];
+        x = f[(u32)PointComponent::X];
+        y = f[(u32)PointComponent::Y];
+        z = f[(u32)PointComponent::Z];
         return *this;
     }
     //! Assignment from another point
@@ -118,9 +117,9 @@ public:
     //! Adds a vector3
     inline_ Point& Add(float f[3])
     {
-        x += f[_X];
-        y += f[_Y];
-        z += f[_Z];
+        x += f[(u32)PointComponent::X];
+        y += f[(u32)PointComponent::Y];
+        z += f[(u32)PointComponent::Z];
         return *this;
     }
     //! Adds vectors
@@ -151,9 +150,9 @@ public:
     //! Subtracts a vector3
     inline_ Point& Sub(float f[3])
     {
-        x -= f[_X];
-        y -= f[_Y];
-        z -= f[_Z];
+        x -= f[(u32)PointComponent::X];
+        y -= f[(u32)PointComponent::Y];
+        z -= f[(u32)PointComponent::Z];
         return *this;
     }
     //! Subtracts vectors
@@ -463,11 +462,11 @@ public:
     inline_ PointComponent LargestAxis() const
     {
         const float* Vals = &x;
-        PointComponent m = _X;
-        if (Vals[_Y] > Vals[m])
-            m = _Y;
-        if (Vals[_Z] > Vals[m])
-            m = _Z;
+        PointComponent m = PointComponent::X;
+        if (Vals[(u32)PointComponent::Y] > Vals[(u32)m])
+            m = PointComponent::Y;
+        if (Vals[(u32)PointComponent::Z] > Vals[(u32)m])
+            m = PointComponent::Z;
         return m;
     }
 
@@ -475,11 +474,11 @@ public:
     inline_ PointComponent ClosestAxis() const
     {
         const float* Vals = &x;
-        PointComponent m = _X;
-        if (AIR(Vals[_Y]) > AIR(Vals[m]))
-            m = _Y;
-        if (AIR(Vals[_Z]) > AIR(Vals[m]))
-            m = _Z;
+        PointComponent m = PointComponent::X;
+        if (AIR(Vals[(u32)PointComponent::Y]) > AIR(Vals[(u32)m]))
+            m = PointComponent::Y;
+        if (AIR(Vals[(u32)PointComponent::Z]) > AIR(Vals[(u32)m]))
+            m = PointComponent::Z;
         return m;
     }
 
@@ -487,11 +486,11 @@ public:
     inline_ PointComponent SmallestAxis() const
     {
         const float* Vals = &x;
-        PointComponent m = _X;
-        if (Vals[_Y] < Vals[m])
-            m = _Y;
-        if (Vals[_Z] < Vals[m])
-            m = _Z;
+        PointComponent m = PointComponent::X;
+        if (Vals[(u32)PointComponent::Y] < Vals[(u32)m])
+            m = PointComponent::Y;
+        if (Vals[(u32)PointComponent::Z] < Vals[(u32)m])
+            m = PointComponent::Z;
         return m;
     }
 

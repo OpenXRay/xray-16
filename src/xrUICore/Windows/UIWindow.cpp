@@ -1,11 +1,11 @@
 #include "pch.hpp"
 
 #include "UIWindow.h"
+
+#include "ui_focus.h"
 #include "Cursor/UICursor.h"
 
-CUIWindow::CUIWindow(pcstr window_name)
-    : m_windowName(window_name), m_pParentWnd(NULL), m_pMouseCapturer(NULL), m_pKeyboardCapturer(NULL), m_pMessageTarget(NULL),
-      m_dwFocusReceiveTime(0), m_bAutoDelete(false), m_bCursorOverWindow(false), m_bCustomDraw(false)
+CUIWindow::CUIWindow(pcstr window_name) : m_windowName(window_name)
 {
     Show(true);
     Enable(true);
@@ -43,6 +43,25 @@ void CUIWindow::Draw(float x, float y)
 
 void CUIWindow::Update()
 {
+    /*if (auto* focusSystem = GetCurrentFocusSystem())
+    {
+        const bool valuable = IsFocusValuable();
+        const bool registered = focusSystem->IsRegistered(this);
+        if (valuable)
+        {
+            if (!registered)
+                focusSystem->RegisterFocusable(this);
+            if (!focusSystem->GetFocused())
+                focusSystem->SetFocused(this);
+        }
+        else if (!valuable && registered)
+        {
+            if (focusSystem->GetFocused() == this)
+                focusSystem->SetFocused(nullptr);
+            focusSystem->UnregisterFocusable(this);
+        }
+    }*/
+
     bool cursor_on_window = false;
     if (GetUICursor().IsVisible())
     {
@@ -553,6 +572,10 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
             rnd.seed((s32)(intptr_t)this);
             color = color_rgba(rnd.randI(255), rnd.randI(255), rnd.randI(255), 255);
         }
+        else if (GetCurrentFocusSystem() && GetCurrentFocusSystem()->GetFocused() == this)
+            color = color_rgba(200, 150, 200, 255);
+        else if (IsFocusValuable())
+            color = color_rgba(255, 0, 255, 255);
 
         const auto draw_list = hovered ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
         draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color);

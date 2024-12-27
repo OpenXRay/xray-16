@@ -14,7 +14,7 @@
 #include "ai_monster_space.h"
 #include "stalker_movement_params.h"
 
-#ifndef MASTER_GOLD
+#if defined(DEBUG) || !defined(MASTER_GOLD)
 #include "detail_path_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #else

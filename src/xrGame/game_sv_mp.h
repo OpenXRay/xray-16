@@ -15,17 +15,9 @@ class xrClientData;
 struct Rank_Struct
 {
     shared_str m_sTitle;
-    int m_iTerms[MAX_TERMS];
-    int m_iBonusMoney;
+    int m_iTerms[MAX_TERMS]{};
+    int m_iBonusMoney{};
     xr_vector<float> m_aRankDiff_ExpBonus;
-
-    Rank_Struct()
-    {
-        m_sTitle = NULL;
-        ZeroMemory(m_iTerms, sizeof(m_iTerms));
-        m_iBonusMoney = 0;
-        m_aRankDiff_ExpBonus.clear();
-    };
 };
 
 class game_sv_mp : public game_sv_GameState

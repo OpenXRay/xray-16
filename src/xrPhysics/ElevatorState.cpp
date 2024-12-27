@@ -10,8 +10,8 @@
 #include "debug_output.h"
 #endif
 static const float getting_on_dist = 0.3f;
-static const float getting_out_dist = 0.4f;
-static const float start_climbing_dist = 0.f;
+//static const float getting_out_dist = 0.4f;
+//static const float start_climbing_dist = 0.f;
 static const float stop_climbing_dist = 0.1f;
 static const float out_dist = 1.5f;
 

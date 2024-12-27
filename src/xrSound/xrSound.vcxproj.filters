@@ -25,14 +25,14 @@
     <Filter Include="Environment">
       <UniqueIdentifier>{ea9d1124-af1e-471f-a0a0-d2d77275a8ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Cache">
-      <UniqueIdentifier>{9143e5b9-296c-4d3e-8424-83f75457dfa9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Effects">
       <UniqueIdentifier>{cc264c98-2f74-4a25-8885-d8a019b936dd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Effects\OpenAL">
       <UniqueIdentifier>{d66ed9a4-3e7a-471f-9b63-7596368b6f66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{764beefb-01ae-4d1b-9504-a66144a44420}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,24 +69,21 @@
     <ClInclude Include="SoundRender_Environment.h">
       <Filter>Environment</Filter>
     </ClInclude>
-    <ClInclude Include="SoundRender_Cache.h">
-      <Filter>Cache</Filter>
-    </ClInclude>
     <ClInclude Include="SoundRender_Effects.h">
       <Filter>Effects</Filter>
     </ClInclude>
     <ClInclude Include="SoundRender_EffectsA_EAX.h">
       <Filter>Effects\OpenAL</Filter>
     </ClInclude>
-    <ClInclude Include="SoundRender_EffectsA_EFX.h">
-      <Filter>Effects\OpenAL</Filter>
+    <ClInclude Include="SoundRender_Scene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="sound.cpp">
+    <ClCompile Include="Sound.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -119,13 +116,7 @@
     <ClCompile Include="SoundRender_Emitter_StartStop.cpp">
       <Filter>Emitter</Filter>
     </ClCompile>
-    <ClCompile Include="SoundRender_Emitter_streamer.cpp">
-      <Filter>Emitter</Filter>
-    </ClCompile>
     <ClCompile Include="SoundRender_Source.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundRender_Source_loader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="SoundRender_Target.cpp">
@@ -137,14 +128,11 @@
     <ClCompile Include="SoundRender_Environment.cpp">
       <Filter>Environment</Filter>
     </ClCompile>
-    <ClCompile Include="SoundRender_Cache.cpp">
-      <Filter>Cache</Filter>
-    </ClCompile>
     <ClCompile Include="SoundRender_EffectsA_EAX.cpp">
       <Filter>Effects\OpenAL</Filter>
     </ClCompile>
-    <ClCompile Include="SoundRender_EffectsA_EFX.cpp">
-      <Filter>Effects\OpenAL</Filter>
+    <ClCompile Include="SoundRender_Scene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,5 +140,6 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\soft_oal.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll" />
   </ItemGroup>
 </Project>

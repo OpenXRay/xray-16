@@ -80,6 +80,11 @@ public:
         T* prhs = rhs._get();
         _set(prhs);
     }
+    ICF void _set(resptr_base<T>&& rhs)
+    {
+        p_ = rhs.p_;
+        rhs.p_ = nullptr;
+    }
     ICF T* _get() const { return p_; }
     void _clear() { p_ = 0; }
 };
@@ -106,11 +111,21 @@ public:
         C::p_ = rhs.p_;
         C::_inc();
     }
+    resptr_core(self&& rhs) noexcept
+    {
+        C::p_ = rhs.p_;
+        rhs.p_ = nullptr;
+    }
     ~resptr_core() { C::_dec(); }
     // assignment
     self& operator=(const self& rhs)
     {
         this->_set(rhs);
+        return (self&)*this;
+    }
+    self& operator=(self&& rhs) noexcept
+    {
+        this->_set(std::move(rhs));
         return (self&)*this;
     }
 

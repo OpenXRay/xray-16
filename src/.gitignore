@@ -1,21 +1,5 @@
 xrCore/.GitInfo.hpp
 
 # exclude binaries and temporary files
-ipch/
 packages/
 _ReSharper.Caches/
-
-# User-specific files
-*.suo
-*.sdf
-*.opensdf
-*.user
-*.user.props
-*.VC.opendb
-*.VC.db
-*.nvuser
-
-# Visual Studio profiler
-*.psess
-*.vsp
-*.vspx

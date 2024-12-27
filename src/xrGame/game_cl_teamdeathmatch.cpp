@@ -18,7 +18,6 @@
 
 
 #include "game_cl_teamdeathmatch_snd_messages.h"
-#include "reward_event_generator.h"
 
 namespace detail::mp::tdm
 {
@@ -106,11 +105,6 @@ void game_cl_TeamDeathmatch::net_import_state(NET_Packet& P)
                     PlaySndMessage(ID_TEAMS_EQUAL);
         }
     };
-    if ((old_phase != new_phase) && ((new_phase == GAME_PHASE_TEAM1_SCORES) || (new_phase == GAME_PHASE_TEAM2_SCORES)))
-    {
-        if (m_reward_generator)
-            m_reward_generator->OnRoundEnd();
-    }
 }
 void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
 {
@@ -727,10 +721,6 @@ void game_cl_TeamDeathmatch::OnTeamChanged()
 {
     xr_delete(pCurBuyMenu);
     SetCurrentBuyMenu();
-    if (pCurBuyMenu)
-    {
-        ReInitRewardGenerator(local_player);
-    }
     inherited::OnTeamChanged();
 };
 
@@ -758,8 +748,6 @@ void game_cl_TeamDeathmatch::OnGameMenuRespond_ChangeTeam(NET_Packet& P)
     if (OldTeam != local_player->team)
     {
         OnTeamChanged();
-        if (m_reward_generator)
-            m_reward_generator->OnPlayerChangeTeam(local_player->team);
     }
 
     SetCurrentSkinMenu();

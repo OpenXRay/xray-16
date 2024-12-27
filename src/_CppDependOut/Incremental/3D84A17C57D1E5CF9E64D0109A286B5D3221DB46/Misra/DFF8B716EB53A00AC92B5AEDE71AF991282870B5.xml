@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\nvtt\src\nvtt\squish\colourfit.h"><violation beginline="46" endline="46" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="47" endline="47" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="47" endline="47" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\externals\nvtt\src\nvtt\squish\colourset.h"><violation beginline="45" endline="45" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

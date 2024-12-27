@@ -34,9 +34,9 @@ void SStaticSound::Update(u32 game_time, u32 global_time)
         if (0 == m_Source._feedback())
         {
             Fvector occ[3];
-            const float occluder_volume = GEnv.Sound->get_occlusion(m_Position, .2f, occ);
+            const float occluder_volume = g_pGameLevel->Sound->get_occlusion(m_Position, .2f, occ);
             const float vol = m_Volume * occluder_volume;
-            
+
             if ((0 == m_PauseTime.x) && (0 == m_PauseTime.y))
             {
                 m_Source.play_at_pos(0, m_Position, sm_Looped);
@@ -87,13 +87,14 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
     m_DbgName = fn;
 #endif
     // create source
-    string_path _l, _r;
-    strconcat(sizeof(_l), _l, fn, "_l");
-    strconcat(sizeof(_r), _r, fn, "_r");
-    const bool left = m_SourceLeft.create(_l, st_Music, sg_Undefined, false);
-    const bool right = m_SourceRight.create(_r, st_Music, sg_Undefined, false);
-
-    m_SourceStereo.create(fn, st_Music, sg_Undefined, !left && !right);
+    if (!m_SourceStereo.create(fn, st_Music, sg_Undefined))
+    {
+        string_path left, right;
+        strconcat(left, fn, "_l");
+        strconcat(right, fn, "_r");
+        m_SourceLeft.create(left, st_Music, sg_Undefined);
+        m_SourceRight.create(right, st_Music, sg_Undefined);
+    }
 
     // parse params
     [[maybe_unused]] auto cnt = _GetItemCount(params);
@@ -132,9 +133,9 @@ BOOL SMusicTrack::in(u32 game_time)
 
 void SMusicTrack::Play()
 {
-    m_SourceStereo.play_at_pos(0, Fvector().set(0.0f, 0.0f, 0.0f), sm_2D);
-    m_SourceLeft.play_at_pos(0, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D);
-    m_SourceRight.play_at_pos(0, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D);
+    m_SourceStereo.play_at_pos(0, Fvector().set(0.0f, 0.0f, 0.0f), sm_2D | sm_IgnoreTimeFactor);
+    m_SourceLeft.play_at_pos(0, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D | sm_IgnoreTimeFactor);
+    m_SourceRight.play_at_pos(0, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D | sm_IgnoreTimeFactor);
 
     SetVolume(1.0f);
 }
@@ -148,9 +149,10 @@ bool SMusicTrack::IsPlaying() const
 
 void SMusicTrack::SetVolume(float volume)
 {
-    m_SourceStereo.set_volume(volume * m_Volume);
-    m_SourceLeft.set_volume(volume * m_Volume);
-    m_SourceRight.set_volume(volume * m_Volume);
+    const bool finalVolume = volume * m_Volume;
+    m_SourceStereo.set_volume(finalVolume);
+    m_SourceLeft.set_volume(finalVolume);
+    m_SourceRight.set_volume(finalVolume);
 }
 void SMusicTrack::Stop()
 {
@@ -166,6 +168,8 @@ CLevelSoundManager::CLevelSoundManager() : m_CurrentTrack(0) { m_NextTrackTime =
 
 void CLevelSoundManager::Load()
 {
+    ZoneScoped;
+
     // static level sounds
     VERIFY(m_StaticSounds.empty());
     string_path fn;
@@ -219,6 +223,8 @@ void CLevelSoundManager::Unload()
 
 void CLevelSoundManager::Update()
 {
+    ZoneScoped;
+
     if (Device.Paused())
         return;
     if (Device.dwPrecacheFrame != 0)

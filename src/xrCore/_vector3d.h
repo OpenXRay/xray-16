@@ -344,9 +344,6 @@ struct _vector3
 using Fvector = _vector3<float>;
 using Fvector3 = _vector3<float>;
 
-using Dvector = _vector3<double>;
-using Dvector3 = _vector3<double>;
-
 using Ivector = _vector3<s32>;
 using Ivector3 = _vector3<s32>;
 

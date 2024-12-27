@@ -1,7 +1,27 @@
 #include "stdafx.h"
 
+bool check_grass_shadow(light* L, CFrustum VB)
+{
+    // Grass shadows are allowed?
+    if (ps_ssfx_grass_shadows.x < 3 || !ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+        return false;
+
+    // Inside the range?
+    if (L->vis.distance > ps_ssfx_grass_shadows.z)
+        return false;
+
+    // Is in view? L->vis.visible?
+    u32 mask = 0xff;
+    if (!VB.testSphere(L->position, L->range * 0.6f, mask))
+        return false;
+
+    return true;
+}
+
 void CRender::render_lights(light_Package& LP)
 {
+    ZoneScoped;
+
     //////////////////////////////////////////////////////////////////////////
     // Refactor order based on ability to pack shadow-maps
     // 1. calculate area + sort in descending order
@@ -84,39 +104,20 @@ void CRender::render_lights(light_Package& LP)
 
     struct task_data_t
     {
-        light* L;
-        Task* task;
-        u32 batch_id;
+        light* L{};
+        Task* task{};
+        u32 batch_id{};
     };
     static xr_vector<task_data_t> lights_queue{};
     lights_queue.reserve(R__NUM_SUN_CASCADES);
 
-    const auto &calc_lights = [](Task &, void* data)
-    {
-        const auto* task_data = static_cast<task_data_t*>(data);
-        auto& dsgraph = RImplementation.get_context(task_data->batch_id);
-        {
-            auto* L = task_data->L;
-            
-            L->svis[task_data->batch_id].begin();
-
-            dsgraph.o.phase = PHASE_SMAP;
-            dsgraph.r_pmask(true, RImplementation.o.Tshadows);
-            dsgraph.o.sector_id = L->spatial.sector_id;
-            dsgraph.o.view_pos = L->position;
-            dsgraph.o.xform = L->X.S.combine;
-            dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
-
-            dsgraph.build_subspace();
-        }
-    };
-
     const auto& flush_lights = [&]()
     {
+        ZoneScopedN("flush lights");
         for (const auto& [L, task, batch_id] : lights_queue)
         {
-            VERIFY(task);
-            TaskScheduler->Wait(*task);
+            if (task)
+                TaskScheduler->Wait(*task);
 
             auto& dsgraph = get_context(batch_id);
 
@@ -135,7 +136,14 @@ void CRender::render_lights(light_Package& LP)
                 dsgraph.cmd_list.set_xform_project(L->X.S.project);
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
-                    Details->Render(dsgraph.cmd_list);
+                {
+                    if (check_grass_shadow(L, ViewBase))
+                    {
+                        Details->fade_distance = -1; // Use light position to calc "fade"
+                        Details->light_position.set(L->position);
+                        Details->Render(dsgraph.cmd_list);
+                    }
+                }
                 L->X.S.transluent = FALSE;
                 if (bSpecial)
                 {
@@ -188,18 +196,38 @@ void CRender::render_lights(light_Package& LP)
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
-            // calculate
-            task_data_t data;
+            task_data_t data{};
             data.batch_id = batch_id;
             data.L = L;
-            data.task = &TaskScheduler->CreateTask("slight_calc", calc_lights, sizeof(data), (void*)&data);
+
+            const auto& calc_lights = [data]
+            {
+                ZoneScopedN("calc lights");
+                auto& dsgraph = RImplementation.get_context(data.batch_id);
+                {
+                    auto* L = data.L;
+
+                    L->svis[data.batch_id].begin();
+
+                    dsgraph.o.phase = PHASE_SMAP;
+                    dsgraph.r_pmask(true, RImplementation.o.Tshadows);
+                    dsgraph.o.sector_id = L->spatial.sector_id;
+                    dsgraph.o.view_pos = L->position;
+                    dsgraph.o.xform = L->X.S.combine;
+                    dsgraph.o.view_frustum.CreateFromMatrix(L->X.S.combine, FRUSTUM_P_ALL & (~FRUSTUM_P_NEAR));
+
+                    dsgraph.build_subspace();
+                }
+            };
+
+            // calculate
             if (o.mt_calculate)
             {
-                TaskScheduler->PushTask(*data.task);
+                data.task = &TaskScheduler->AddTask(calc_lights);
             }
             else
             {
-                TaskScheduler->RunTask(*data.task);
+                calc_lights();
             }
             lights_queue.emplace_back(data);
         }

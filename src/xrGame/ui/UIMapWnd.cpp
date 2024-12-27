@@ -597,7 +597,7 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
     luabind::functor<void> funct;
     if (GEnv.ScriptEngine->functor("pda.property_box_add_properties", funct))
     {
-        funct(m_UIPropertiesBox, m_cur_location->ObjectID(), (LPCSTR)m_cur_location->GetLevelName().c_str(), m_cur_location);
+        funct(m_UIPropertiesBox, m_cur_location->ObjectID(), (LPCSTR)m_cur_location->GetLevelName().c_str(), m_cur_location->GetHint());
     }
 
     // Только для меток игрока

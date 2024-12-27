@@ -1,2 +1,0 @@
-c:\openxray\src\xrcore\compression\model.cpp
-c:\openxray\src\utils\compressiontest\compressiontest.cpp

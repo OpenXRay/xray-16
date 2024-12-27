@@ -1,4 +1,7 @@
 #include "StdAfx.h"
+
+#include "xrEngine/IGame_Persistent.h"
+
 #include "Physics.h"
 #include "PHObject.h"
 #include "PHWorld.h"
@@ -9,9 +12,10 @@
 #ifdef DEBUG
 #include "debug_output.h"
 #endif
+
 extern CPHWorld* ph_world;
 
-CPHObject::CPHObject() : SpatialBase(g_SpatialSpacePhysic)
+CPHObject::CPHObject() : SpatialBase(g_pGamePersistent->SpatialSpacePhysic)
 {
     m_flags.flags = 0;
     spatial.type |= STYPE_PHYSIC;
@@ -100,7 +104,7 @@ void CPHObject::Collide()
             if (magnitude < EPS)
                 continue;
             dir.mul(1.f / magnitude);
-            g_SpatialSpacePhysic->q_ray(
+            g_pGamePersistent->SpatialSpacePhysic.q_ray(
                 ph_world->r_spatial, 0, STYPE_PHYSIC, *from, dir, magnitude); //|ISpatial_DB::O_ONLYFIRST
 #ifdef DEBUG
             if (debug_output().ph_dbg_draw_mask().test(phDbgDrawRayMotions))
@@ -135,7 +139,7 @@ void CPHObject::Collide()
 }
 void CPHObject::CollideDynamics()
 {
-    g_SpatialSpacePhysic->q_box(ph_world->r_spatial, 0, STYPE_PHYSIC, spatial.sphere.P, AABB);
+    g_pGamePersistent->SpatialSpacePhysic.q_box(ph_world->r_spatial, 0, STYPE_PHYSIC, spatial.sphere.P, AABB);
     qResultVec& result = ph_world->r_spatial;
     auto i = result.begin(), e = result.end();
     for (; i != e; ++i)

@@ -22,8 +22,8 @@ void CUIAchievements::init_from_xml(CUIXml& xml)
     XML_NODE node = xml.NavigateToNode("achievements_itm", 0);
     xml.SetLocalRoot(node);
 
-    m_name = UIHelper::CreateTextWnd(xml, "name", this);
-    m_descr = UIHelper::CreateTextWnd(xml, "descr", this);
+    m_name = UIHelper::CreateStatic(xml, "name", this);
+    m_descr = UIHelper::CreateStatic(xml, "descr", this);
     m_icon = UIHelper::CreateStatic(xml, "icon", this);
     m_hint = UIHelper::CreateHint(xml, "hint_wnd");
 

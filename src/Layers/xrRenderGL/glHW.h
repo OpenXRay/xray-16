@@ -48,7 +48,7 @@ public:
 
     u32 BackBufferCount{};
     u32 CurrentBackBuffer{};
-    
+
     GLuint pFB{};
 
     SDL_Window* m_window{};
@@ -60,9 +60,6 @@ public:
     pcstr AdapterName;
     pcstr OpenGLVersionString;
     pcstr ShadingVersion;
-    std::pair<GLint, GLint> OpenGLVersion;
-    bool SeparateShaderObjectsSupported;
-    bool ShaderBinarySupported;
     bool ComputeShadersSupported;
 };
 

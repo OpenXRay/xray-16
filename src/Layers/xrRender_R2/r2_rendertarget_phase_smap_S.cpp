@@ -36,11 +36,6 @@ void CRenderTarget::phase_smap_spot(CBackend& cmd_list, light* L)
 #pragma todo("can optimize for multi-lights covering more than say 50%...")
     if (RImplementation.o.HW_smap)
         cmd_list.set_ColorWriteEnable(FALSE);
-
-    // For DX11 do it once per smap generation pass in phase_smap_spot_clear
-#ifdef USE_DX9
-    cmd_list.ClearZB(rt_smap_depth, 1.0f);
-#endif
 }
 
 void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
@@ -74,7 +69,7 @@ void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
         p1.set((_w + .5f) / _w, (_h + .5f) / _h);
 
         FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         pv->set(EPS, float(_h + EPS), d_Z, d_W, C, p0.x, p1.y);
         pv++;
         pv->set(EPS, EPS, d_Z, d_W, C, p0.x, p0.y);
@@ -94,7 +89,7 @@ void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
         pv++;
 #else
 #   error No graphics API selected or enabled!
-#endif // USE_DX9 || USE_DX11
+#endif
         RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
         cmd_list.set_Geometry(g_combine);
 

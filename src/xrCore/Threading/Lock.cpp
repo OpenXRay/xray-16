@@ -28,9 +28,9 @@ void set_add_profile_portion(add_profile_portion_callback callback) { add_profil
 struct profiler
 {
     u64 m_time;
-    LPCSTR m_timer_id;
+    pcstr m_timer_id;
 
-    IC profiler::profiler(LPCSTR timer_id)
+    IC profiler::profiler(pcstr timer_id)
     {
         if (!add_profile_portion)
             return;
@@ -67,10 +67,29 @@ Lock::Lock() : impl(xr_new<LockImpl>()), lockCounter(0) {}
 
 Lock::~Lock() { xr_delete(impl); }
 
+Lock::Lock(Lock&& other) noexcept(false)
+{
+    xr_delete(impl);
+    impl = other.impl;
+    lockCounter.store(other.lockCounter.load(std::memory_order_acquire), std::memory_order_release);
+    other.impl = xr_new<LockImpl>();
+    other.lockCounter.store(0, std::memory_order_release);
+}
+
+Lock& Lock::operator=(Lock&& other) noexcept(false)
+{
+    xr_delete(impl);
+    impl = other.impl;
+    lockCounter.store(other.lockCounter.load(std::memory_order_acquire), std::memory_order_release);
+    other.impl = xr_new<LockImpl>();
+    other.lockCounter.store(0, std::memory_order_release);
+    return *this;
+}
+
 void Lock::Enter()
 {
     impl->Lock();
-    ++lockCounter;
+    lockCounter.fetch_add(1, std::memory_order_acq_rel);
 }
 #endif // CONFIG_PROFILE_LOCKS
 
@@ -78,14 +97,14 @@ bool Lock::TryEnter()
 {
     const bool locked = impl->TryLock();
     if (locked)
-        ++lockCounter;
+        lockCounter.fetch_add(1, std::memory_order_acq_rel);
     return locked;
 }
 
 void Lock::Leave()
 {
     impl->Unlock();
-    --lockCounter;
+    lockCounter.fetch_sub(1, std::memory_order_acq_rel);
 }
 
 #ifdef DEBUG

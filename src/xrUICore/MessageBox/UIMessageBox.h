@@ -30,7 +30,7 @@ public:
     virtual bool InitMessageBox(LPCSTR xml_template);
     void Clear();
     virtual void SetText(LPCSTR str);
-    virtual LPCSTR GetText();
+    virtual LPCSTR GetText() const;
     LPCSTR GetHost();
     LPCSTR GetPassword();
     LPCSTR GetUserPassword();
@@ -60,10 +60,10 @@ protected:
     CUI3tButton* m_UIButtonCopy;
 
     CUIStatic* m_UIStaticPicture;
-    CUITextWnd* m_UIStaticText;
-    CUITextWnd* m_UIStaticHost;
-    CUITextWnd* m_UIStaticPass;
-    CUITextWnd* m_UIStaticUserPass;
+    CUIStatic* m_UIStaticText;
+    CUIStatic* m_UIStaticHost;
+    CUIStatic* m_UIStaticPass;
+    CUIStatic* m_UIStaticUserPass;
     CUIEditBox* m_UIEditHost;
     CUIEditBox* m_UIEditPass;
     CUIEditBox* m_UIEditUserPass;

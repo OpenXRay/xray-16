@@ -47,6 +47,8 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float c
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq, u32 phase)
 {
+    if (!pVisual->shader)
+        return nullptr;
     int id = SE_R2_SHADOW;
     if (CRender::PHASE_NORMAL == phase)
     {
@@ -74,7 +76,7 @@ static class cl_pos_decompress_params : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
     {
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
         const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
         const float HorzTan = -VertTan / Device.fASPECT;
 #elif defined(USE_OGL)
@@ -107,17 +109,6 @@ static class cl_water_intensity : public R_constant_setup
     }
 } binder_water_intensity;
 
-static class cl_tree_amplitude_intensity : public R_constant_setup
-{
-    void setup(CBackend& cmd_list, R_constant* C) override
-    {
-        const auto& env = g_pGamePersistent->Environment().CurrentEnv;
-        const float fValue = env.m_fTreeAmplitudeIntensity;
-        cmd_list.set_c(C, fValue, fValue, fValue, 0.f);
-    }
-} binder_tree_amplitude_intensity;
-// XXX: do we need to register this binder?
-
 static class cl_sun_shafts_intensity : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
@@ -128,7 +119,6 @@ static class cl_sun_shafts_intensity : public R_constant_setup
     }
 } binder_sun_shafts_intensity;
 
-#if defined(USE_DX11) || defined(USE_OGL)
 static class cl_alpha_ref : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
@@ -139,7 +129,6 @@ static class cl_alpha_ref : public R_constant_setup
 #   endif
     }
 } binder_alpha_ref;
-#endif
 
 // Defined in ResourceManager.cpp
 IReader* open_shader(pcstr shader);
@@ -148,14 +137,7 @@ IReader* open_shader(pcstr shader);
 static bool must_enable_old_cascades()
 {
     bool oldCascades = false;
-#if RENDER == R_R2
-    {
-        // Check for new cascades support on R2
-        IReader* accumSunNearCascade = open_shader("accum_sun_cascade.ps");
-        oldCascades = !accumSunNearCascade;
-        FS.r_close(accumSunNearCascade);
-    }
-#elif RENDER != R_R1
+#if RENDER != R_R1
     {
         IReader* accumSunNear = open_shader("accum_sun_near.ps");
         R_ASSERT3(accumSunNear, "Can't open shader", "accum_sun_near.ps");
@@ -207,16 +189,28 @@ static bool must_enable_old_cascades()
     return exist;
 }
 
+void CRender::OnDeviceCreate(pcstr shName)
+{
+    o.new_shader_support = 0;
+
+#if defined(USE_DX11)
+    o.new_shader_support = HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT);
+    Msg("- NEW SHADER SUPPORT ENABLED %i", o.new_shader_support);
+#endif
+
+    D3DXRenderBase::OnDeviceCreate(shName);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
 {
+    ZoneScoped;
+
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
     m_skinning = -1;
-#ifndef USE_DX9
     m_MSAASample = -1;
-#endif
     m_SMAPSize = ps_r2_smapsize;
 
     // hardware
@@ -226,14 +220,8 @@ void CRender::create()
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
     // Check for NULL render target support
-#ifdef USE_DX9
-    D3DFORMAT nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
-    o.nullrt = HW.support(nullrt, D3DRTYPE_SURFACE, D3DUSAGE_RENDERTARGET);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.nullrt = false;
-#else
-#   error No graphics API selected or enabled!
-#endif
+
     /*
     if (o.nullrt)		{
     Msg				("* NULLRT supported and used");
@@ -298,14 +286,9 @@ void CRender::create()
 
     // SMAP / DST
     o.HW_smap_FETCH4 = FALSE;
-#ifdef USE_DX9
-    o.HW_smap = HW.support(D3DFMT_D24X8, D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.HW_smap = true;
-#else
-#   error No graphics API selected or enabled!
-#endif
     o.HW_smap_PCF = o.HW_smap;
+
     if (o.HW_smap)
     {
 #if defined(USE_DX11)
@@ -320,30 +303,8 @@ void CRender::create()
         Msg("* HWDST/PCF supported and used");
     }
 
-#ifdef USE_DX9
-    // search for ATI formats
-    if (!o.HW_smap && (0 == strstr(Core.Params, "-nodf24")))
-    {
-        o.HW_smap = HW.support((D3DFORMAT)(MAKEFOURCC('D', 'F', '2', '4')), D3DRTYPE_TEXTURE, D3DUSAGE_DEPTHSTENCIL);
-        if (o.HW_smap)
-        {
-            o.HW_smap_FORMAT = MAKEFOURCC('D', 'F', '2', '4');
-            o.HW_smap_PCF = FALSE;
-            o.HW_smap_FETCH4 = TRUE;
-        }
-        Msg("* DF24/F4 supported and used [%X]", o.HW_smap_FORMAT);
-    }
-#endif
-
-#ifdef USE_DX9
-    o.fp16_filter = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_FILTER);
-    o.fp16_blend = HW.support(D3DFMT_A16B16G16R16F, D3DRTYPE_TEXTURE, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.fp16_filter = true;
     o.fp16_blend = true;
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     // emulate ATI-R4xx series
     if (strstr(Core.Params, "-r4xx"))
@@ -368,35 +329,14 @@ void CRender::create()
     // if hardware support early stencil (>= GF 8xxx) stencil reset trick only
     // slows down.
     o.nvstencil = FALSE;
-#ifdef USE_DX9
-    if ((HW.Caps.id_vendor == 0x10DE) && (HW.Caps.id_device >= 0x40))
-    {
-        // o.nvstencil = HW.support	((D3DFORMAT)MAKEFOURCC('R','A','W','Z'), D3DRTYPE_SURFACE, 0);
-        // o.nvstencil = TRUE;
-        o.nvstencil = (S_OK ==
-            HW.pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, 0, D3DRTYPE_TEXTURE,
-                (D3DFORMAT MAKEFOURCC('R', 'A', 'W', 'Z'))));
-    }
-#endif
     if (strstr(Core.Params, "-nonvs"))
         o.nvstencil = FALSE;
 
     // nv-dbt
-#ifdef USE_DX9
-    o.nvdbt = HW.support((D3DFORMAT)MAKEFOURCC('N', 'V', 'D', 'B'), D3DRTYPE_SURFACE, 0);
-#elif defined(USE_DX11) || defined(USE_OGL)
     o.nvdbt = false;
-#else
-#   error No graphics API selected or enabled!
-#endif
+
     if (o.nvdbt)
         Msg("* NV-DBT supported and used");
-
-#if defined(USE_DX9) || defined(USE_DX11)
-    o.no_ram_textures = (strstr(Core.Params, "-noramtex")) ? TRUE : ps_r__common_flags.test(RFLAG_NO_RAM_TEXTURES);
-    if (o.no_ram_textures)
-        Msg("* Managed textures disabled");
-#endif
 
     o.ffp = false;
 
@@ -430,13 +370,11 @@ void CRender::create()
     //.	o.sunstatic			= (strstr(Core.Params,"-sunstatic"))?	TRUE	:FALSE	;
     o.sunstatic = ps_r2_sun_static;
     o.advancedpp = ps_r2_advanced_pp;
-#if defined(USE_DX11) || defined(USE_OGL)
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     o.volumetricfog = ps_r2_ls_flags.test(R3FLAG_VOLUMETRIC_SMOKE);
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
     o.volumetricfog = false;
-#   endif
 #endif
     o.sjitter = (strstr(Core.Params, "-sjitter")) ? TRUE : FALSE;
     o.depth16 = (strstr(Core.Params, "-depth16")) ? TRUE : FALSE;
@@ -452,13 +390,9 @@ void CRender::create()
     o.ssao_blur_on = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_BLUR) && (ps_r_ssao != 0);
     o.ssao_opt_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_OPT_DATA) && (ps_r_ssao != 0);
     o.ssao_half_data = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HALF_DATA) && o.ssao_opt_data && (ps_r_ssao != 0);
-#if defined(USE_DX9) || defined(USE_DX11)
-#   if defined(USE_DX9)
-    o.ssao_hdao = false;
-#   elif defined(USE_DX11)
+#if defined(USE_DX11)
     o.ssao_hdao = ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HDAO) && (ps_r_ssao != 0);
     o.ssao_ultra = HW.ComputeShadersSupported && ssao_hdao_cs_shaders_exist();
-#   endif
     o.ssao_hbao = !o.ssao_hdao && ps_r2_ls_flags_ext.test(R2FLAGEXT_SSAO_HBAO) && (ps_r_ssao != 0);
 #elif defined(USE_OGL)
     // TODO: OGL: temporary disabled HBAO/HDAO, need to fix it
@@ -468,37 +402,23 @@ void CRender::create()
 #   error No graphics API selected or enabled!
 #endif
 
-#ifdef USE_DX9
-    if ((HW.Caps.id_vendor == 0x1002) && (HW.Caps.id_device <= 0x72FF))
-    {
-        o.ssao_opt_data = false;
-        o.ssao_hbao = false;
-    }
-#elif defined(USE_DX11) || defined(USE_OGL)
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
-    o.hbao_vectorized = false;
-    if (o.ssao_hdao)
-        o.ssao_opt_data = false;
-    else if (o.ssao_hbao)
-    {
-        if (HW.Caps.id_vendor == 0x1002)
-            o.hbao_vectorized = true;
-        o.ssao_opt_data = true;
-    }
-#endif // USE_DX9
+    if (o.ssao_hbao && HW.Caps.id_vendor == 0x1002)
+        o.hbao_vectorized = true;
+    else
+        o.hbao_vectorized = false;
 
-#if defined(USE_DX11) || defined(USE_OGL)
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.dx11_sm4_1 = o.dx11_sm4_1 && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     o.dx11_sm4_1 = true;
 #else
 #   error No graphics API selected or enabled!
-#   endif
+#endif
 
     //	MSAA option dependencies
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     o.msaa = !!ps_r3_msaa;
     o.msaa_samples = (1 << ps_r3_msaa);
 
@@ -509,7 +429,7 @@ void CRender::create()
     // o.msaa_hybrid	= ps_r2_ls_flags.test(R3FLAG_MSAA_HYBRID);
     o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
-#   elif defined(USE_OGL)
+#elif defined(USE_OGL)
     // TODO: OGL: temporary disabled, need to fix it
     o.msaa = false;
     o.msaa_samples = 0;
@@ -517,7 +437,7 @@ void CRender::create()
     o.msaa_hybrid = false;
 #else
 #   error No graphics API selected or enabled!
-#   endif
+#endif
     //	Allow alpha test MSAA for DX10.0
 
     // o.msaa_alphatest= ps_r2_ls_flags.test((u32)R3FLAG_MSAA_ALPHATEST);
@@ -583,7 +503,6 @@ void CRender::create()
             }
         }
     }
-#endif
 
     // constants
     Resources->RegisterConstantSetup("parallax", &binder_parallax);
@@ -591,14 +510,10 @@ void CRender::create()
     Resources->RegisterConstantSetup("sun_shafts_intensity", &binder_sun_shafts_intensity);
     Resources->RegisterConstantSetup("pos_decompression_params", &binder_pos_decompress_params);
     Resources->RegisterConstantSetup("pos_decompression_params2", &binder_pos_decompress_params2);
-#if defined(USE_DX11) || defined(USE_OGL)
     Resources->RegisterConstantSetup("m_AlphaRef", &binder_alpha_ref);
-#   if defined(USE_DX11)
+#if defined(USE_DX11)
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
-#   endif
 #endif
-
-    m_bMakeAsyncSS = false;
 
     Target = xr_new<CRenderTarget>(); // Main target
 
@@ -606,9 +521,7 @@ void CRender::create()
     PSLibrary.OnCreate();
     HWOCC.occq_create(occq_size);
 
-#if defined(USE_DX11) || defined(USE_OGL)
     rmNormal(RCache);
-#endif
     q_sync_point.Create();
 
     //	TODO: OGL: Implement FluidManager.
@@ -621,7 +534,6 @@ void CRender::create()
 
 void CRender::destroy()
 {
-    m_bMakeAsyncSS = false;
 #if defined(USE_DX11)
     FluidManager.Destroy();
 #endif
@@ -635,6 +547,7 @@ void CRender::destroy()
 
 void CRender::reset_begin()
 {
+    ZoneScoped;
     // Wait for tasks to be done
     r_main.sync();
     r_sun.sync();
@@ -683,6 +596,7 @@ void CRender::reset_begin()
 
 void CRender::reset_end()
 {
+    ZoneScoped;
     q_sync_point.Create();
     HWOCC.occq_create(occq_size);
 
@@ -709,25 +623,32 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::BeforeRender()
+void CRender::OnCameraUpdated()
 {
-    if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
+    ZoneScoped;
+
+    // Frustum
+    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
 
-    ProcessHOMTask = &TaskScheduler->AddTask("MT-HOM", { &HOM, &CHOM::MT_RENDER });
+    ProcessHOMTask = &HOM.DispatchMTRender();
+    if (Details)
+        Details->DispatchMTCalc();
 }
 
 void CRender::OnFrame()
 {
+    ZoneScoped;
+
     Models->DeleteQueue();
-    if (IGame_Persistent::MainMenuActiveOrLevelNotExist())
+
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
-    {
-        // MT-details (@front)
-        Device.seqParallel.insert(
-            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
-    }
+
+    if (Details)
+        g_pGamePersistent->GrassBendersUpdateAnimations();
 }
 
 #ifdef USE_OGL

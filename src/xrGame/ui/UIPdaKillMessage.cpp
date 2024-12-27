@@ -1,3 +1,11 @@
+// File:		UIPdaKillMessage.cpp
+// Description:	HUD message about player death. Implementation of visual behavior
+// Created:		10.03.2005
+// Author:		Serge Vynnychenko
+// Mail:		narrator@gsc-game.kiev.ua
+//
+// Copyright 2005 GSC GameWorld
+
 #include "StdAfx.h"
 #include "UIPdaKillMessage.h"
 #include "UIInventoryUtilities.h"
@@ -37,7 +45,7 @@ void CUIPdaKillMessage::Init(KillMessageStruct& msg, CGameFont* F)
     SetColorAnimation("ui_main_msgs_short", LA_ONLYALPHA | LA_TEXTCOLOR | LA_TEXTURECOLOR, 5000.0f);
 }
 
-float CUIPdaKillMessage::InitText(CUITextWnd& refStatic, float x, ColoredName& info)
+float CUIPdaKillMessage::InitText(CUIStatic& refStatic, float x, ColoredName& info)
 {
     if (0 == xr_strlen(info.m_name))
         return 0.0f;

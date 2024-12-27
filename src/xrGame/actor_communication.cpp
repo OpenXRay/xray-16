@@ -85,7 +85,7 @@ void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
             pGameSP->PdaMenu->PdaContentsChanged(p);
         }
         */
-        
+
         if (CurrentGameUI())
         {
             CurrentGameUI()->UpdatePda();

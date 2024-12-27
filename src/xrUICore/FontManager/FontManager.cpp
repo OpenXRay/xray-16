@@ -4,8 +4,6 @@
 
 CFontManager::CFontManager()
 {
-    Device.seqDeviceReset.Add(this, REG_PRIORITY_HIGH);
-
     m_all_fonts.push_back(&pFontMedium); // used cpp
     m_all_fonts.push_back(&pFontDI); // used cpp
     m_all_fonts.push_back(&pFontArial14); // used xml
@@ -39,7 +37,6 @@ void CFontManager::InitializeFonts()
     InitializeFont(pFontGraffiti50Russian, "ui_font_graff_50");
     InitializeFont(pFontLetterica25, "ui_font_letter_25");
     InitializeFont(pFontStat, "stat_font", CGameFont::fsDeviceIndependent);
-    pFontStat->SetInterval(0.75f, 1.0f);
 }
 
 LPCSTR CFontManager::GetFontTexName(LPCSTR section)
@@ -80,11 +77,21 @@ void CFontManager::InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
 #ifdef DEBUG
     F->m_font_name = section;
 #endif
+
+    if (pSettings->line_exist(section, "size"))
+    {
+        const float sz = pSettings->r_float(section, "size");
+        if (flags & CGameFont::fsDeviceIndependent)
+            F->SetHeightI(sz);
+        else
+            F->SetHeight(sz);
+    }
+    if (pSettings->line_exist(section, "interval"))
+        F->SetInterval(pSettings->r_fvector2(section, "interval"));
 }
 
 CFontManager::~CFontManager()
 {
-    Device.seqDeviceReset.Remove(this);
     FONTS_VEC_IT it = m_all_fonts.begin();
     FONTS_VEC_IT it_e = m_all_fonts.end();
     for (; it != it_e; ++it)
@@ -98,4 +105,9 @@ void CFontManager::Render()
     for (; it != it_e; ++it)
         (**it)->OnRender();
 }
-void CFontManager::OnDeviceReset() { InitializeFonts(); }
+
+void CFontManager::OnUIReset()
+{
+    // XXX: memory leak, font aren't being deallocated
+    InitializeFonts();
+}

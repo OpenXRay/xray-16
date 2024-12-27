@@ -600,6 +600,7 @@ u8 CSE_ALifeItemWeapon::get_slot() { return ((u8)pSettings->r_u8(s_name, "slot")
 u16 CSE_ALifeItemWeapon::get_ammo_limit() { return (u16)pSettings->r_u16(s_name, "ammo_limit"); }
 u16 CSE_ALifeItemWeapon::get_ammo_total() { return ((u16)a_current); }
 u16 CSE_ALifeItemWeapon::get_ammo_elapsed() { return ((u16)a_elapsed); }
+void CSE_ALifeItemWeapon::set_ammo_elapsed(u16 count) { a_elapsed = count; }
 u16 CSE_ALifeItemWeapon::get_ammo_magsize()
 {
     if (pSettings->line_exist(s_name, "ammo_mag_size"))
@@ -840,12 +841,8 @@ BOOL CSE_ALifeItemArtefact::Net_Relevant()
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeItemPDA::CSE_ALifeItemPDA(LPCSTR caSection) : CSE_ALifeItem(caSection)
 {
-    m_original_owner = 0xffff;
-    m_specific_character = NULL;
-    m_info_portion = NULL;
 }
 
-CSE_ALifeItemPDA::~CSE_ALifeItemPDA() {}
 void CSE_ALifeItemPDA::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
@@ -859,8 +856,8 @@ void CSE_ALifeItemPDA::STATE_Read(NET_Packet& tNetPacket, u16 size)
             int tmp, tmp2;
             tNetPacket.r(&tmp, sizeof(int));
             tNetPacket.r(&tmp2, sizeof(int));
-            m_info_portion = NULL;
-            m_specific_character = NULL;
+            m_info_portion = nullptr;
+            m_specific_character = nullptr;
         }
         else
         {
@@ -877,8 +874,8 @@ void CSE_ALifeItemPDA::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_stringZ(m_specific_character);
     tNetPacket.w_stringZ(m_info_portion);
 #else
-    shared_str tmp_1 = NULL;
-    shared_str tmp_2 = NULL;
+    shared_str tmp_1;
+    shared_str tmp_2;
 
     tNetPacket.w_stringZ(tmp_1);
     tNetPacket.w_stringZ(tmp_2);
@@ -894,8 +891,7 @@ void CSE_ALifeItemPDA::FillProps(LPCSTR pref, PropItemVec& items) { inherited::F
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemDocument
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeItemDocument::CSE_ALifeItemDocument(LPCSTR caSection) : CSE_ALifeItem(caSection) { m_wDoc = NULL; }
-CSE_ALifeItemDocument::~CSE_ALifeItemDocument() {}
+CSE_ALifeItemDocument::CSE_ALifeItemDocument(pcstr caSection) : CSE_ALifeItem(caSection) {}
 void CSE_ALifeItemDocument::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
@@ -904,7 +900,7 @@ void CSE_ALifeItemDocument::STATE_Read(NET_Packet& tNetPacket, u16 size)
     {
         u16 tmp;
         tNetPacket.r_u16(tmp);
-        m_wDoc = NULL;
+        m_wDoc = nullptr;
     }
     else
         tNetPacket.r_stringZ(m_wDoc);

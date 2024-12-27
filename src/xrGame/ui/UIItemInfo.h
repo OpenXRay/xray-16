@@ -3,7 +3,6 @@
 
 class CInventoryItem;
 class CUIStatic;
-class CUITextWnd;
 class CUIScrollView;
 class CUIProgressBar;
 class CUIConditionParams;
@@ -44,7 +43,7 @@ public:
 
     void TryAddConditionInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem);
     void TryAddWpnInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem);
-    void TryAddArtefactInfo(const shared_str& af_section);
+    void TryAddArtefactInfo(CInventoryItem& pInvItem);
     void TryAddOutfitInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem);
     void TryAddUpgradeInfo(CInventoryItem& pInvItem);
     void TryAddBoosterInfo(CInventoryItem& pInvItem);
@@ -54,10 +53,10 @@ public:
     u32 delay;
 
     CUIFrameWindow* UIBackground;
-    CUITextWnd* UIName;
-    CUITextWnd* UIWeight;
-    CUITextWnd* UICost;
-    CUITextWnd* UITradeTip;
+    CUIStatic* UIName;
+    CUIStatic* UIWeight;
+    CUIStatic* UICost;
+    CUIStatic* UITradeTip;
     //	CUIStatic*			UIDesc_line;
     CUIScrollView* UIDesc;
     bool m_complex_desc;

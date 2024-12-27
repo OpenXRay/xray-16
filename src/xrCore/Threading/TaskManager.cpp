@@ -23,10 +23,16 @@
 #include <thread>
 #include <SDL_events.h>
 
+#include "Math/fast_lc16.hpp"
+
+#include <random>
+
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K)
 #include <immintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
 #elif defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #else
@@ -35,9 +41,7 @@
 
 xr_unique_ptr<TaskManager> TaskScheduler;
 
-static constexpr size_t OTHER_THREADS_COUNT = 1; // Primary thread
-
-static u32 ttapi_dwFastIter = 0;
+static constexpr size_t OTHER_THREADS_COUNT = 1; // Primary and Secondary thread
 
 class TaskStorageSize
 {
@@ -52,7 +56,7 @@ class TaskStorageSize
     {
         static constexpr size_t value = 1;
     };
-    
+
 public:
     template <size_t Power>
     static constexpr size_t Get()
@@ -64,41 +68,16 @@ public:
 static constexpr size_t TASK_STORAGE_SIZE = TaskStorageSize::Get<12>(); // 4096 tasks
 static constexpr size_t TASK_STORAGE_MASK = TASK_STORAGE_SIZE - 1;
 
-class FallbackTaskAllocator
-{
-    std::atomic_size_t m_allocated{};
-    Task               m_storage[TASK_STORAGE_SIZE];
-
-public:
-    Task* allocate()
-    {
-        const auto task_pos = m_allocated.fetch_add(1, std::memory_order_acq_rel);
-        Task* task = &m_storage[task_pos & TASK_STORAGE_MASK];
-        R_ASSERT2(task->IsFinished(), "Both thread local and fallback task allocator are full. "
-            "Too much workload for one thread.");
-        return task;
-    }
-
-    size_t get_allocated_count() const
-    {
-        return m_allocated.load(std::memory_order_relaxed);
-    }
-} static s_task_allocator_mt;
-
 class TaskAllocator
 {
     size_t m_allocated{};
     Task   m_storage[TASK_STORAGE_SIZE];
 
 public:
-    Task* allocate()
+    Task* allocate() noexcept
     {
         Task* task = &m_storage[m_allocated++ & TASK_STORAGE_MASK];
-        if (!task->IsFinished()) // XXX: mark as unlikely
-        {
-            --m_allocated;
-            return s_task_allocator_mt.allocate();
-        }
+        VERIFY(task->IsFinished());
         return task;
     }
 } static thread_local s_tl_allocator;
@@ -112,16 +91,16 @@ class TaskQueue
     Task*               m_storage[TASK_STORAGE_SIZE]{};
 
 public:
-    void push(Task* task)
+    void push(Task* task) noexcept
     {
-        const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_relaxed);
-        VERIFY2(task_pos - m_head_pos.load(std::memory_order_relaxed) < TASK_STORAGE_SIZE, "Task queue overflow");
+        const auto task_pos = m_tail_pos.fetch_add(1, std::memory_order_acq_rel);
+        VERIFY2(task_pos - m_head_pos.load(std::memory_order_acquire) < TASK_STORAGE_SIZE, "Task queue overflow");
         m_storage[task_pos & TASK_STORAGE_MASK] = task;
     }
 
-    Task* pop()
+    Task* pop() noexcept
     {
-        size_t head_pos = m_head_pos.load(std::memory_order_relaxed);
+        size_t head_pos = m_head_pos.load(std::memory_order_acquire);
         Task* task = m_storage[head_pos & TASK_STORAGE_MASK];
         if (!task)
             return nullptr;
@@ -135,25 +114,24 @@ public:
         return nullptr;
     }
 
-    Task* steal()
+    Task* steal() noexcept
     {
         return pop();
     }
 
-    size_t size() const
+    size_t size() const noexcept
     {
         return m_head_pos - m_tail_pos;
     }
 
-    bool empty() const
+    bool empty() const noexcept
     {
         return size() == 0;
     }
 };
 
-class TaskWorkerStats
+struct TaskWorkerStats
 {
-public:
     size_t allocatedTasks{};
     size_t pushedTasks{};
     size_t finishedTasks{};
@@ -162,202 +140,113 @@ public:
 class TaskWorker : public TaskQueue, public TaskWorkerStats
 {
 public:
-    std::atomic<TaskWorker*> steal_from{};
-    std::atomic_bool sleeps{};
-    Event event;
-    size_t id;
+    std::mutex       mutex;
+    fast_lc16        random{ this };
+    size_t           id    { size_t(-1) };
 } static thread_local s_tl_worker;
-
-static TaskWorker* s_main_thread_worker = nullptr;
-
-class ThreadPriorityHelper
-{
-#ifdef XR_PLATFORM_WINDOWS
-    DWORD m_priority;
-
-public:
-    ThreadPriorityHelper()
-        : m_priority(GetPriorityClass(GetCurrentProcess()))
-    {
-        SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-    }
-
-    ~ThreadPriorityHelper()
-    {
-        SetPriorityClass(GetCurrentProcess(), m_priority);
-    }
-#else
-    // XXX: add other platforms
-public:
-    ThreadPriorityHelper() = default;
-#endif
-};
-
-// Get fast spin-loop timings
-void CalcIterations()
-{
-    [[maybe_unused]] ThreadPriorityHelper priority;
-
-    volatile bool dummy = false;
-    const u64 frequency = CPU::qpc_freq;
-    const u32 iterations = 100000000; // approximately 1 second
-    const u64 start = CPU::QPC();
-    for (u32 i = 0; i < iterations; ++i)
-    {
-        if (dummy)
-            break;
-        _mm_pause();
-    }
-    const u64 end = CPU::QPC();
-    // We want 1/50000 (0.02ms) fast spin-loop
-    ttapi_dwFastIter = u32((iterations * frequency) / ((end - start) * 50000));
-}
 
 TaskManager::TaskManager()
 {
-    s_main_thread_worker = &s_tl_worker;
-    s_main_thread_worker->id = 0;
+    ZoneScoped;
+    workers.reserve(std::thread::hardware_concurrency());
+    RegisterThisThreadAsWorker();
+}
 
-    const u32 threads = std::thread::hardware_concurrency() - OTHER_THREADS_COUNT;
-    workers.reserve(threads);
+void TaskManager::SpawnThreads()
+{
+    ZoneScoped;
+
+    const u32 threads = workers.capacity() - OTHER_THREADS_COUNT;
+    workerThreads.reserve(threads);
+
     for (u32 i = 0; i < threads; ++i)
     {
-        Threading::SpawnThread([](void* this_ptr)
-        {
-            TaskManager& self = *static_cast<TaskManager*>(this_ptr);
-            self.TaskWorkerStart();
-        }, "Task Worker", 0, this);
+        workerThreads.emplace_back(Threading::RunThread("Task Worker", &TaskManager::TaskWorkerStart, this));
     }
-    CalcIterations();
-    while (threads != workersCount.load(std::memory_order_consume))
-    {
-        Sleep(2);
-    }
-    for (TaskWorker* worker : workers)
-        worker->event.Set();
 }
 
 TaskManager::~TaskManager()
 {
+    ZoneScoped;
     shouldStop.store(true, std::memory_order_release);
-    {
-        ScopeLock scope(&workersLock);
-        for (TaskWorker* worker : workers)
-            worker->event.Set();
-    }
-    while (workersCount.load(std::memory_order_consume))
-    {
-        Sleep(2);
-    }
-    for (TaskWorker* worker : workers)
-        worker->event.Set();
 
-    s_main_thread_worker = nullptr;
+    // Finish all pending tasks
+    while (Task* t = s_tl_worker.pop())
+    {
+        ExecuteTask(*t);
+    }
+
+    UnregisterThisThreadAsWorker();
+    newWorkArrived.notify_all();
+    for (auto& thread : workerThreads)
+    {
+        if (thread.joinable())
+            thread.join();
+    }
 }
 
-void TaskManager::SetThreadStatus(bool active)
+void TaskManager::RegisterThisThreadAsWorker()
 {
-    s_tl_worker.sleeps.store(!active, std::memory_order_relaxed);
+    ZoneScoped;
+    R_ASSERT2(workers.size() < std::thread::hardware_concurrency(),
+        "You must change OTHER_THREADS_COUNT if you want to register more custom threads.");
+
+    std::lock_guard guard{ workersLock };
+    s_tl_worker.id = workers.size();
+    workers.emplace_back(&s_tl_worker);
+}
+
+void TaskManager::UnregisterThisThreadAsWorker()
+{
+    ZoneScoped;
+    std::lock_guard guard{ workersLock };
+
+    shouldPause.store(true, std::memory_order_release);
+    while (activeWorkersCount.load(std::memory_order_relaxed))
+        Sleep(2);
+
+    s_tl_worker.id = size_t(-1);
+
+    const auto it = std::find(workers.begin(), workers.end(), &s_tl_worker);
+    if (it != workers.end())
+        workers.erase(it);
+
+    shouldPause.store(false, std::memory_order_release);
+}
+
+void TaskManager::SetThreadStatus(bool active) noexcept
+{
     if (active)
         activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
     else
         activeWorkersCount.fetch_sub(1, std::memory_order_relaxed);
 }
 
-void TaskManager::WakeUpIfNeeded()
-{
-    const auto overall = workersCount.load(std::memory_order_relaxed);
-    const auto active = activeWorkersCount.load(std::memory_order_relaxed);
-    if (active < overall)
-    {
-        auto* steal_from = &s_tl_worker;
-        for (auto* worker : workers)
-        {
-            if (worker == &s_tl_worker)
-                continue;
-            if (worker->sleeps.load(std::memory_order_relaxed))
-            {
-                worker->steal_from.store(steal_from, std::memory_order_relaxed);
-                worker->event.Set();
-                break;
-            }
-        }
-    }
-}
-
 void TaskManager::TaskWorkerStart()
 {
-    {
-        ScopeLock scope(&workersLock);
-        workers.emplace_back(&s_tl_worker);
-        s_tl_worker.id = workers.size();
-    }
-    workersCount.fetch_add(1, std::memory_order_release);
-    activeWorkersCount.fetch_add(1, std::memory_order_relaxed);
+    RegisterThisThreadAsWorker();
+    SetThreadStatus(true);
 
-    s_tl_worker.event.Wait();
-
-    const u32 fastIterations = ttapi_dwFastIter;
-
-    u32 iteration = 0;
-    Task* task;
-    while (true)
+    while (!shouldStop.load(std::memory_order_consume))
     {
-        goto check_own_queue;
-
-    execute:
-    {
-        ExecuteTask(*task);
-        iteration = 0;
-    }
-    check_own_queue:
-    {
-        task = s_tl_worker.pop();
-        if (task)
-            goto execute;
-    }
-    check_main_queue:
-    {
-        task = s_main_thread_worker->steal();
-        if (task)
-            goto execute;
-    }
-    steal:
-    {
-        task = TryToSteal(&s_tl_worker);
-        if (task)
-            goto execute;
-    }
-    count_spins:
-    {
-        if (shouldStop.load(std::memory_order_consume))
-            break;
-
-        ++iteration;
-        if (iteration < fastIterations)
+        if (!shouldPause.load(std::memory_order_consume))
         {
-            _mm_pause();
-            goto check_own_queue;
+            if (ExecuteOneTask())
+                continue;
         }
-    }
-    wait:
-    {
-        iteration = 0;
+
         SetThreadStatus(false);
-        s_tl_worker.event.Wait();
-        SetThreadStatus(true);
-        auto* stealFrom = s_tl_worker.steal_from.load(std::memory_order_relaxed);
-        if (stealFrom)
         {
-            while (Task* t = stealFrom->steal())
+            std::unique_lock lck(s_tl_worker.mutex);
+            do
             {
-                ExecuteTask(*t);
-            }
-            s_tl_worker.steal_from.store(nullptr, std::memory_order_relaxed);
+                newWorkArrived.wait(lck); // spurious wakeups allowed
+            } while (shouldPause.load(std::memory_order_consume));
         }
-        goto check_own_queue;
+        SetThreadStatus(true);
     }
-    } // while (true)
+
+    SetThreadStatus(false);
 
     // Finish all pending tasks
     while (Task* t = s_tl_worker.pop())
@@ -366,68 +255,48 @@ void TaskManager::TaskWorkerStart()
     }
 
     // Prepare to exit
-    workersCount.fetch_sub(1, std::memory_order_release);
-    s_tl_worker.event.Wait(); // prevent crash when other thread tries to steal
+    UnregisterThisThreadAsWorker();
 }
 
-Task* TaskManager::TryToSteal(TaskWorker* thief)
+Task* TaskManager::TryToSteal() const
 {
-    const auto count = workersCount.load(std::memory_order_relaxed);
-    if (count == 1)
-    {
-        if (&s_tl_worker == s_main_thread_worker)
-            return workers[0]->steal();
-        return nullptr; // thread itself
-    }
+    std::uniform_int_distribution<u16> dist{ 0, static_cast<u16>(workers.size() - 1) };
 
-    TaskWorker* other = workers[random.randI(count)];
-    if (other != thief)
+    int steal_attempts = 5;
+    while (steal_attempts > 0)
     {
-        auto* task = other->steal();
-        if (!other->empty() && other->sleeps.load(std::memory_order_relaxed))
-            other->event.Set(); // Wake up, you have work to do!
-        return task;
+        const auto idx = dist(s_tl_worker.random);
+        TaskWorker* other = workers[idx];
+        if (other == &s_tl_worker)
+            continue;
+        if (auto* task = other->steal())
+        {
+            if (!other->empty())
+                newWorkArrived.notify_all();
+            return task;
+        }
+        --steal_attempts;
     }
     return nullptr;
 }
 
-void TaskManager::ExecuteTask(Task& task)
-{
-    task.Execute();
-    FinalizeTask(task);
-}
-
-void TaskManager::FinalizeTask(Task& task)
-{
-    for (Task* it = &task; ; it = it->m_data.parent)
-    {
-        const auto unfinishedJobs = it->m_data.jobs.fetch_sub(1, std::memory_order_acq_rel) - 1; // fetch_sub returns previous value
-        VERIFY2(unfinishedJobs >= 0, "The same task was executed two times.");
-        it->Finish();
-        if (unfinishedJobs || !it->m_data.parent)
-            break;
-    }
-    ++s_tl_worker.finishedTasks;
-}
-
-Task* TaskManager::AllocateTask()
+Task* TaskManager::AllocateTask() noexcept
 {
     ++s_tl_worker.allocatedTasks;
     return s_tl_allocator.allocate();
 }
 
-void TaskManager::IncrementTaskJobsCounter(Task& parent)
-{
-    VERIFY2(parent.m_data.jobs.load(std::memory_order_relaxed) > 0, "Adding child task to a parent that has already finished.");
-    [[maybe_unused]] const auto prev = parent.m_data.jobs.fetch_add(1, std::memory_order_relaxed);
-    VERIFY2(prev != std::numeric_limits<decltype(prev)>::max(), "Max jobs overflow. (too much children)");
-}
-
-void TaskManager::PushTask(Task& task)
+void TaskManager::PushTask(Task& task) noexcept
 {
     s_tl_worker.push(&task);
-    WakeUpIfNeeded();
+    newWorkArrived.notify_one();
     ++s_tl_worker.pushedTasks;
+}
+
+void TaskManager::ExecuteTask(Task& task)
+{
+    task();
+    ++s_tl_worker.finishedTasks;
 }
 
 void TaskManager::RunTask(Task& task)
@@ -435,33 +304,26 @@ void TaskManager::RunTask(Task& task)
     ExecuteTask(task);
 }
 
-void TaskManager::Wait(const Task& task)
+void TaskManager::Wait(const Task& task, bool updateSystemEvents /*= false*/) const
 {
+    ZoneScoped;
     while (!task.IsFinished())
     {
         ExecuteOneTask();
-        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
+        if (s_tl_worker.id == 0 && (xrDebug::ProcessingFailure() || updateSystemEvents))
             SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }
 
-void TaskManager::WaitForChildren(const Task& task)
+bool TaskManager::ExecuteOneTask() const
 {
-    while (!task.HasChildren())
-    {
-        ExecuteOneTask();
-        if (s_main_thread_worker == &s_tl_worker && xrDebug::ProcessingFailure())
-            SDL_PumpEvents(); // Necessary to prevent dead locks
-    }
-}
-
-bool TaskManager::ExecuteOneTask()
-{
-    WakeUpIfNeeded();
-
     Task* task = s_tl_worker.pop();
+
     if (!task)
-        task = TryToSteal(&s_tl_worker);
+        task = workers[0]->steal();
+
+    if (!task)
+        task = TryToSteal();
 
     if (task)
     {
@@ -471,81 +333,20 @@ bool TaskManager::ExecuteOneTask()
     return false;
 }
 
-Task& TaskManager::CreateTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
+size_t TaskManager::GetWorkersCount() const noexcept
 {
-    return *new (AllocateTask()) Task(name, taskFunc, data, dataSize);
+    return workers.size();
 }
 
-Task& TaskManager::CreateTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    return *new (AllocateTask()) Task(name, taskFunc, onFinishCallback, data, dataSize);
-}
-
-Task& TaskManager::CreateTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    IncrementTaskJobsCounter(parent);
-    return *new (AllocateTask()) Task(name, taskFunc, data, dataSize, &parent);
-}
-
-Task& TaskManager::CreateTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    IncrementTaskJobsCounter(parent);
-    return *new (AllocateTask()) Task(name, taskFunc, onFinishCallback, data, dataSize, &parent);
-}
-
-Task& TaskManager::AddTask(pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(name, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-Task& TaskManager::AddTask(pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(name, onFinishCallback, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-Task& TaskManager::AddTask(Task& parent, pcstr name, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(parent, name, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-Task& TaskManager::AddTask(Task& parent, pcstr name, const Task::OnFinishFunc& onFinishCallback, const Task::TaskFunc& taskFunc, size_t dataSize /*= 0*/, void* data /*= nullptr*/)
-{
-    auto& task = CreateTask(parent, name, onFinishCallback, taskFunc, dataSize, data);
-    PushTask(task);
-    return task;
-}
-
-size_t TaskManager::GetWorkersCount() const
-{
-    return workersCount.load(std::memory_order_relaxed) + OTHER_THREADS_COUNT;
-}
-
-size_t TaskManager::GetActiveWorkersCount() const
-{
-    return activeWorkersCount.load(std::memory_order_relaxed) + OTHER_THREADS_COUNT;
-}
-
-size_t TaskManager::GetCurrentWorkerID()
+size_t TaskManager::GetCurrentWorkerID() noexcept
 {
     return s_tl_worker.id;
 }
 
-void TaskManager::GetStats(size_t& allocated, size_t& allocatedWithFallback, size_t& pushed, size_t& finished)
+void TaskManager::GetStats(size_t& allocated, size_t& pushed, size_t& finished)
 {
-    allocatedWithFallback += s_task_allocator_mt.get_allocated_count();
-
-    allocated += s_main_thread_worker->allocatedTasks;
-    pushed += s_main_thread_worker->pushedTasks;
-    finished += s_main_thread_worker->finishedTasks;
-
-    ScopeLock scope(&workersLock);
-    for (TaskWorker* worker : workers)
+    std::lock_guard guard{ workersLock };
+    for (const TaskWorker* worker : workers)
     {
         allocated += worker->allocatedTasks;
         pushed += worker->pushedTasks;

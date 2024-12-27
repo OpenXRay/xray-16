@@ -5,17 +5,17 @@
 *.ps -binary
 
 # DirectX renderer shader extension names
-r*/*.ps text diff=cpp linguist-language=HLSL
-r*/*.vs text diff=cpp linguist-language=HLSL
-r*/*.gs text diff=cpp linguist-language=HLSL
-r*/*.cs text diff=cpp linguist-language=HLSL
-r*/*.hs text diff=cpp linguist-language=HLSL
-r*/*.ds text diff=cpp linguist-language=HLSL
+r*/*.ps text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
+r*/*.vs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
+r*/*.gs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
+r*/*.cs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
+r*/*.hs text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
+r*/*.ds text diff=cpp linguist-language=HLSL linguist-detectable=true linguist-documentation=false
 
 # OpenGL renderer uses the same extensions
-gl/*.ps text diff=cpp linguist-language=GLSL
-gl/*.vs text diff=cpp linguist-language=GLSL
-gl/*.gs text diff=cpp linguist-language=GLSL
-gl/*.cs text diff=cpp linguist-language=GLSL
-gl/*.hs text diff=cpp linguist-language=GLSL
-gl/*.ds text diff=cpp linguist-language=GLSL
+gl/*.ps text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
+gl/*.vs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
+gl/*.gs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
+gl/*.cs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
+gl/*.hs text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false
+gl/*.ds text diff=cpp linguist-language=GLSL linguist-detectable=true linguist-documentation=false

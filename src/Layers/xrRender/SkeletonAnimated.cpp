@@ -11,6 +11,7 @@
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif
+extern ENGINE_API shared_str current_player_hud_sect;
 extern int psSkeletonUpdate;
 using namespace animation;
 
@@ -598,6 +599,9 @@ void CKinematicsAnimated::UpdateTracks()
     _DBG_SINGLE_USE_MARKER;
     if (Update_LastTime == Device.dwTimeGlobal)
         return;
+
+    ZoneScoped;
+
     u32 DT = Device.dwTimeGlobal - Update_LastTime;
     if (DT > 66)
         DT = 66;
@@ -723,48 +727,71 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
     m_Partition = nullptr;
     Update_LastTime = 0;
 
+    const auto loadOMF = [&](LPCSTR _path)
+    {
+        string_path fn;
+        if (!FS.exist(fn, "$level$", _path))
+        {
+            if (!FS.exist(fn, "$game_meshes$", _path))
+            {
+#ifdef _EDITOR
+                Msg("! Can't find motion file '%s'.", nm);
+                return;
+#else
+                xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'\nsection '%s'\nmodel '%s'", _path, current_player_hud_sect.c_str(), N);
+#endif
+            }
+        }
+
+        // Check compatibility
+        m_Motions.push_back(SMotionsSlot());
+        bool create_res = true;
+        if (!g_pMotionsContainer->has(_path)) //optimize fs operations
+        {
+            IReader* MS = FS.r_open(fn);
+            create_res = m_Motions.back().motions.create(_path, MS, bones);
+            FS.r_close(MS);
+        }
+        if (create_res)
+            m_Motions.back().motions.create(_path, NULL, bones);
+        else
+        {
+            m_Motions.pop_back();
+            Msg("! error in model [%s]. Unable to load motion file '%s', section '%s'.", N, _path, current_player_hud_sect.c_str());
+        }
+    };
+
     // Load animation
     if (data->find_chunk(OGF_S_MOTION_REFS))
     {
         string_path items_nm;
         data->r_stringZ(items_nm, sizeof(items_nm));
         u32 set_cnt = _GetItemCount(items_nm);
-        R_ASSERT(set_cnt < MAX_ANIM_SLOT);
+        R_ASSERT2(set_cnt < MAX_ANIM_SLOT, make_string("section '%s'\nmodel '%s'", current_player_hud_sect.c_str(), N).c_str());
         m_Motions.reserve(set_cnt);
         string_path nm;
         for (u32 k = 0; k < set_cnt; ++k)
         {
             _GetItem(items_nm, k, nm);
-            xr_strcat(nm, ".omf");
-            string_path fn;
-            if (!FS.exist(fn, "$level$", nm))
+            if (strstr(nm, "\\*.omf"))
             {
-                if (!FS.exist(fn, "$game_meshes$", nm))
+                FS_FileSet fset;
+                FS.file_list(fset, "$game_meshes$", FS_ListFiles, nm);
+                FS.file_list(fset, "$level$", FS_ListFiles, nm);
+
+                if (fset.size())
                 {
-#ifdef _EDITOR
-                    Msg("! Can't find motion file '%s'.", nm);
-                    return;
-#else
-                    xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", nm);
-#endif
+                    m_Motions.reserve(fset.size() - 1);
+
+                    for (FS_FileSet::iterator it = fset.begin(); it != fset.end(); it++)
+                        loadOMF((*it).name.c_str());
                 }
+
+                continue;
             }
-            // Check compatibility
-            m_Motions.push_back(SMotionsSlot());
-            bool create_res = true;
-            if (!g_pMotionsContainer->has(nm)) // optimize fs operations
-            {
-                IReader* MS = FS.r_open(fn);
-                create_res = m_Motions.back().motions.create(nm, MS, bones);
-                FS.r_close(MS);
-            }
-            if (create_res)
-                m_Motions.back().motions.create(nm, nullptr, bones);
-            else
-            {
-                m_Motions.pop_back();
-                Msg("! error in model [%s]. Unable to load motion file '%s'.", N, nm);
-            }
+
+            xr_strcat(nm, ".omf");
+            loadOMF(nm);
         }
     }
     else if (data->find_chunk(OGF_S_MOTION_REFS2))
@@ -775,36 +802,24 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         for (u32 k = 0; k < set_cnt; ++k)
         {
             data->r_stringZ(nm, sizeof(nm));
-            xr_strcat(nm, ".omf");
-            string_path fn;
-            if (!FS.exist(fn, "$level$", nm))
+            if (strstr(nm, "\\*.omf"))
             {
-                if (!FS.exist(fn, "$game_meshes$", nm))
+                FS_FileSet fset;
+                FS.file_list(fset, "$game_meshes$", FS_ListFiles, nm);
+                FS.file_list(fset, "$level$", FS_ListFiles, nm);
+
+                if (fset.size())
                 {
-#ifdef _EDITOR
-                    Msg("! Can't find motion file '%s'.", nm);
-                    return;
-#else
-                    xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", nm);
-#endif
+                    m_Motions.reserve(fset.size() - 1);
+
+                    for (FS_FileSet::iterator it = fset.begin(); it != fset.end(); it++)
+                        loadOMF((*it).name.c_str());
                 }
+
+                continue;
             }
-            // Check compatibility
-            m_Motions.push_back(SMotionsSlot());
-            bool create_res = true;
-            if (!g_pMotionsContainer->has(nm)) // optimize fs operations
-            {
-                IReader* MS = FS.r_open(fn);
-                create_res = m_Motions.back().motions.create(nm, MS, bones);
-                FS.r_close(MS);
-            }
-            if (create_res)
-                m_Motions.back().motions.create(nm, nullptr, bones);
-            else
-            {
-                m_Motions.pop_back();
-                Msg("! error in model [%s]. Unable to load motion file '%s'.", N, nm);
-            }
+            xr_strcat(nm, ".omf");
+            loadOMF(nm);
         }
     }
     else
@@ -815,7 +830,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         m_Motions.back().motions.create(nm, data, bones);
     }
 
-    R_ASSERT(m_Motions.size());
+    R_ASSERT2(m_Motions.size(), make_string("section '%s'\nmodel '%s'", current_player_hud_sect.c_str(), N).c_str());
 
     m_Partition = m_Motions[0].motions.partition();
     m_Partition->load(this, N);

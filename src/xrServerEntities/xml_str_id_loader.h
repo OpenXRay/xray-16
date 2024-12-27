@@ -41,8 +41,8 @@ protected:
     static LPCSTR tag_name;
 
 public:
-    CXML_IdToIndex();
-    virtual ~CXML_IdToIndex();
+    CXML_IdToIndex() = default;
+    virtual ~CXML_IdToIndex() = default;
 
     static void InitInternal(bool crashOnFail = true, bool ignoreMissingEndTagError = false);
 
@@ -74,10 +74,6 @@ TEMPLATE_SPECIALIZATION
 LPCSTR CSXML_IdToIndex::tag_name = NULL;
 
 TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::CXML_IdToIndex() {}
-TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::~CXML_IdToIndex() {}
-TEMPLATE_SPECIALIZATION
 const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
 {
     T_INIT::InitXmlIdToIndex();
@@ -90,7 +86,7 @@ const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_asse
 
     if (it == m_pItemDataVector->end())
     {
-#ifndef MASTER_GOLD
+#if 0 // ndef MASTER_GOLD
         int i = 0;
         for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; ++it, i++)
             Msg("[%d]=[%s]", i, *(*it).id);
@@ -160,10 +156,11 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/, bool ignoreMissi
         for (int i = 0; i < items_num; ++i)
         {
             LPCSTR item_name = uiXml->ReadAttrib(uiXml->GetRoot(), tag_name, i, "id", NULL);
-
-            string256 buf;
-            xr_sprintf(buf, "id for item don't set, number %d in %s", i, xml_file);
-            R_ASSERT2(item_name, buf);
+            if (!item_name || !item_name[0])
+            {
+                Msg("! id for %s don't set, number %d in %s", tag_name, i, xml_file_full);
+                continue;
+            }
 
             //проверетить ID на уникальность
             T_VECTOR::iterator t_it = m_pItemDataVector->begin();
@@ -173,7 +170,11 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/, bool ignoreMissi
                     break;
             }
 
-            R_ASSERT3(m_pItemDataVector->end() == t_it, "duplicate item id", item_name);
+            if (m_pItemDataVector->end() != t_it)
+            {
+                Msg("! duplicate %s with id[%s] in %s", tag_name, item_name, xml_file_full);
+                continue;
+            }
 
             ITEM_DATA data;
             data.id = item_name;

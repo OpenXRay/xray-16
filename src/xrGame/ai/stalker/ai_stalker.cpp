@@ -763,7 +763,7 @@ void CAI_Stalker::update_object_handler()
         {
             CObjectHandler::update();
         }
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(LUABIND_NO_EXCEPTIONS)
         catch (const luabind::cast_failed& message)
         {
             Msg("! Expression \"%s\" from luabind::object to %s", message.what(), message.info().name());
@@ -790,7 +790,7 @@ void CAI_Stalker::update_object_handler()
 bool CAI_Stalker::mt_object_handler_update_allowed() const
 {
     return m_client_updated &&
-        (g_pGameLevel->WorldRendered() || IGame_Persistent::IsMainMenuActive())
+        (g_pGameLevel->WorldRendered() || g_pGamePersistent->IsMainMenuActive())
 #ifdef DEBUG
         && !ShouldProcessOnRender()
 #endif

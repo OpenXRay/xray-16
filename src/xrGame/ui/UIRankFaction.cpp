@@ -85,14 +85,14 @@ void CUIRankFaction::init_from_xml(CUIXml& xml)
 {
     CUIXmlInit::InitWindow(xml, "fraction_stand_wnd", 0, this);
 
-    m_sn = UIHelper::CreateTextWnd(xml, "serial_number", this);
-    m_name = UIHelper::CreateTextWnd(xml, "name", this);
+    m_sn = UIHelper::CreateStatic(xml, "serial_number", this);
+    m_name = UIHelper::CreateStatic(xml, "name", this);
     m_icon = UIHelper::CreateStatic(xml, "icon", this);
     m_icon_over = UIHelper::CreateStatic(xml, "icon_over", this);
-    m_location_static = UIHelper::CreateTextWnd(xml, "location_static", this);
-    m_location_value = UIHelper::CreateTextWnd(xml, "location_value", this);
-    m_power_static = UIHelper::CreateTextWnd(xml, "power_static", this);
-    m_power_value = UIHelper::CreateTextWnd(xml, "power_value", this);
+    m_location_static = UIHelper::CreateStatic(xml, "location_static", this);
+    m_location_value = UIHelper::CreateStatic(xml, "location_value", this);
+    m_power_static = UIHelper::CreateStatic(xml, "power_static", this);
+    m_power_value = UIHelper::CreateStatic(xml, "power_value", this);
 
     m_relation_minus = UIHelper::CreateProgressBar(xml, "relation_minus", this);
     m_relation_center_minus = UIHelper::CreateProgressBar(xml, "relation_center_minus", this);
@@ -102,8 +102,8 @@ void CUIRankFaction::init_from_xml(CUIXml& xml)
     m_origin_static = UIHelper::CreateStatic(xml, "origin_static", this);
     m_border_minus = UIHelper::CreateStatic(xml, "border_minus", this);
     m_border_plus = UIHelper::CreateStatic(xml, "border_plus", this);
-    m_enemy_static = UIHelper::CreateTextWnd(xml, "enemy_static", this);
-    m_frined_static = UIHelper::CreateTextWnd(xml, "frined_static", this);
+    m_enemy_static = UIHelper::CreateStatic(xml, "enemy_static", this);
+    m_frined_static = UIHelper::CreateStatic(xml, "frined_static", this);
 
     m_rating_up = UIHelper::CreateStatic(xml, "rating_up", this);
     m_rating_down = UIHelper::CreateStatic(xml, "rating_down", this);

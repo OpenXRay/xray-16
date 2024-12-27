@@ -3,37 +3,58 @@
 #include <process.h>
 #endif
 
+#include <thread>
+
 namespace Threading
 {
-#ifdef XR_PLATFORM_WINDOWS
-using ThreadHandle = HANDLE;
-using ThreadId = u32;
-#else
-using ThreadHandle = pthread_t;
-using ThreadId = pthread_t;
-#endif
-using EntryFuncType = void (*)(void*);
-
-struct SThreadStartupInfo
+enum class priority_class
 {
-    pcstr threadName;
-    EntryFuncType entryFunc;
-    void* argList;
+    idle,
+    below_normal,
+    normal,
+    above_normal,
+    high,
+    realtime,
 };
 
-//////////////////////////////////////////////////////////////
+enum class priority_level
+{
+    idle,
+    lowest,
+    below_normal,
+    normal,
+    above_normal,
+    highest,
+    time_critical,
+};
 
-XRCORE_API ThreadId GetCurrThreadId();
-XRCORE_API ThreadHandle GetCurrentThreadHandle();
+XRCORE_API priority_level GetCurrentThreadPriorityLevel();
+XRCORE_API priority_class GetCurrentProcessPriorityClass();
 
-XRCORE_API bool ThreadIdsAreEqual(ThreadId left, ThreadId right);
+XRCORE_API void SetCurrentThreadPriorityLevel(priority_level prio);
+XRCORE_API void SetCurrentProcessPriorityClass(priority_class cls);
 
-XRCORE_API void SetCurrentThreadName(pcstr name);
+XRCORE_API void SetCurrentThreadName(cpcstr name);
 
-XRCORE_API bool SpawnThread(EntryFuncType entry, pcstr name, u32 stack, void* arglist);
+template <typename Invocable, typename... Args>
+[[nodiscard]] std::thread RunThread(cpcstr name, Invocable&& invocable, Args&&... args)
+{
+    return std::move(std::thread
+    {
+        [name](Invocable&& invocable2, Args&&... args2)
+        {
+            SetCurrentThreadName(name);
+            _initialize_cpu_thread();
+            std::invoke(std::move(invocable2), std::move(args2)...);
+        },
+        std::forward<Invocable>(invocable),
+        std::forward<Args>(args)...
+    });
+}
 
-XRCORE_API void WaitThread(ThreadHandle& threadHandle);
-
-XRCORE_API void CloseThreadHandle(ThreadHandle& threadHandle);
-
+template <typename... Args>
+void SpawnThread(Args&&... args)
+{
+    RunThread(std::forward<Args>(args)...).detach();
+}
 } // namespace Threading

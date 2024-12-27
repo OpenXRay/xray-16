@@ -1,6 +1,6 @@
 #pragma once
 
-class CBlender_LIGHT : public IBlender  
+class CBlender_LIGHT : public IBlender
 {
 public:
     CBlender_LIGHT();

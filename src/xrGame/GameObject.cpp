@@ -27,7 +27,6 @@
 #include "xrPhysics/MathUtils.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "game_cl_mp.h"
-#include "reward_event_generator.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
 #include "ai_obstacle.h"
 #include "magic_box3.h"
@@ -55,7 +54,7 @@ extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 static const float base_spu_epsP = 0.05f;
 static const float base_spu_epsR = 0.05f;
 
-CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
+CGameObject::CGameObject() : SpatialBase(g_pGamePersistent->SpatialSpace), scriptBinder(this)
 {
     dwFrame_AsCrow = u32(-1);
     Props.storage = 0;
@@ -102,8 +101,6 @@ CGameObject::~CGameObject()
 
 void CGameObject::MakeMeCrow()
 {
-    ScopeLock lock{ &render_lock };
-
     if (Props.crow)
         return;
     if (!processing_enabled())
@@ -112,7 +109,7 @@ void CGameObject::MakeMeCrow()
     u32 const object_frame_id = dwFrame_AsCrow;
 #ifdef XR_PLATFORM_WINDOWS // XXX: Just use std::atomic
     if ((u32)_InterlockedCompareExchange((long*)&dwFrame_AsCrow, device_frame_id, object_frame_id) == device_frame_id)
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) 
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
     if (__sync_val_compare_and_swap(&dwFrame_AsCrow, object_frame_id, device_frame_id) == device_frame_id)
 #else
 #   error Select or add implementation for your platform
@@ -156,7 +153,7 @@ void CGameObject::cNameVisual_set(shared_str N)
     else
     {
         GEnv.Render->model_Delete(renderable.visual);
-        NameVisual = 0;
+        NameVisual = nullptr;
     }
     OnChangeVisual();
 }
@@ -275,7 +272,11 @@ void CGameObject::reinit()
         it->second.clear();
 }
 
-void CGameObject::reload(LPCSTR section) { m_script_clsid = object_factory().script_clsid(CLS_ID); }
+void CGameObject::reload(LPCSTR section)
+{
+    m_script_clsid = object_factory().script_clsid(CLS_ID);
+}
+
 void CGameObject::net_Destroy()
 {
 #ifdef DEBUG
@@ -289,7 +290,6 @@ void CGameObject::net_Destroy()
 
     xr_delete(m_ini_file);
 
-    m_script_clsid = -1;
     if (Visual() && smart_cast<IKinematics*>(Visual()))
         smart_cast<IKinematics*>(Visual())->Callback(0, 0);
     //
@@ -327,6 +327,7 @@ void CGameObject::net_Destroy()
     //.	Parent									= 0;
 
     scriptBinder.net_Destroy();
+    m_script_clsid = -1;
 
     xr_delete(m_lua_game_object);
     m_spawned = false;
@@ -394,9 +395,6 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
         if (GameID() != eGameIDSingle)
         {
             Game().m_WeaponUsageStatistic->OnBullet_Check_Result(false);
-            game_cl_mp* mp_game = smart_cast<game_cl_mp*>(&Game());
-            if (mp_game->get_reward_generator())
-                mp_game->get_reward_generator()->OnBullet_Hit(Hitter, this, Weapon, HDS.boneID);
         }
         //---------------------------------------------------------------------------
     }
@@ -452,6 +450,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     cNameSect_set(E->s_name);
     if (E->name_replace()[0])
         cName_set(E->name_replace());
+
     bool demo_spectator = false;
 
     if (Level().IsDemoPlayStarted() && E->ID == u16(-1))
@@ -463,11 +462,12 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     {
         //Alundaio:
         //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
-        if (Level().Objects.net_Find(E->ID) != nullptr)
+        if (const auto obj = Level().Objects.net_Find(E->ID))
         {
-            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name.c_str());
+            Msg("! ERROR: CGameObject:net_spawn() Object with ID[%u] already exists! self=%s other=%s", E->ID, cName().c_str(), obj->cName().c_str());
             return false;
         }
+        //-Alundaio
     }
 
     setID(E->ID);
@@ -715,57 +715,57 @@ void CGameObject::spawn_supplies()
     for (u32 k = 0, j; spawn_ini()->r_line("spawn", k, &N, &V); k++)
     {
         VERIFY(xr_strlen(N));
-        if (pSettings->section_exist(N)) //Alundaio: Validate section exists
+        if (!pSettings->section_exist(N)) //Alundaio: Validate section exists
+            continue;
+
+        j = 1;
+        p = 1.f;
+
+        float f_cond = 1.0f;
+        if (V && xr_strlen(V))
         {
-            j = 1;
-            p = 1.f;
+            int n = _GetItemCount(V);
+            string16 temp;
+            if (n > 0)
+                j = atoi(_GetItem(V, 0, temp)); // count
 
-            float f_cond = 1.0f;
-            if (V && xr_strlen(V))
+            if (NULL != strstr(V, "prob="))
+                p = (float)atof(strstr(V, "prob=") + 5);
+            if (fis_zero(p))
+                p = 1.f;
+            if (!j)
+                j = 1;
+            if (NULL != strstr(V, "cond="))
+                f_cond = (float)atof(strstr(V, "cond=") + 5);
+            bScope = (NULL != strstr(V, "scope"));
+            bSilencer = (NULL != strstr(V, "silencer"));
+            bLauncher = (NULL != strstr(V, "launcher"));
+        }
+        for (u32 i = 0; i < j; ++i)
+        {
+            if (::Random.randF(1.f) < p)
             {
-                int n = _GetItemCount(V);
-                string16 temp;
-                if (n > 0)
-                    j = atoi(_GetItem(V, 0, temp)); // count
+                CSE_Abstract* A = Level().spawn_item(N, Position(), ai_location().level_vertex_id(), ID(), true);
 
-                if (NULL != strstr(V, "prob="))
-                    p = (float)atof(strstr(V, "prob=") + 5);
-                if (fis_zero(p))
-                    p = 1.f;
-                if (!j)
-                    j = 1;
-                if (NULL != strstr(V, "cond="))
-                    f_cond = (float)atof(strstr(V, "cond=") + 5);
-                bScope = (NULL != strstr(V, "scope"));
-                bSilencer = (NULL != strstr(V, "silencer"));
-                bLauncher = (NULL != strstr(V, "launcher"));
-            }
-            for (u32 i = 0; i < j; ++i)
-            {
-                if (::Random.randF(1.f) < p)
+                CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
+                if (pSE_InventoryItem)
+                    pSE_InventoryItem->m_fCondition = f_cond;
+
+                CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
+                if (W)
                 {
-                    CSE_Abstract* A = Level().spawn_item(N, Position(), ai_location().level_vertex_id(), ID(), true);
-
-                    CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(A);
-                    if (pSE_InventoryItem)
-                        pSE_InventoryItem->m_fCondition = f_cond;
-
-                    CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
-                    if (W)
-                    {
-                        if (W->m_scope_status == ALife::eAddonAttachable)
-                            W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
-                        if (W->m_silencer_status == ALife::eAddonAttachable)
-                            W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
-                        if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
-                            W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
-                    }
-
-                    NET_Packet P;
-                    A->Spawn_Write(P, TRUE);
-                    Level().Send(P, net_flags(TRUE));
-                    F_entity_Destroy(A);
+                    if (W->m_scope_status == ALife::eAddonAttachable)
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
+                    if (W->m_silencer_status == ALife::eAddonAttachable)
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
+                    if (W->m_grenade_launcher_status == ALife::eAddonAttachable)
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
                 }
+
+                NET_Packet P;
+                A->Spawn_Write(P, TRUE);
+                Level().Send(P, net_flags(TRUE));
+                F_entity_Destroy(A);
             }
         }
     }
@@ -1039,8 +1039,10 @@ void CGameObject::setDestroy(bool _destroy)
         Msg("cl setDestroy [%d][%d]", ID(), Device.dwFrame);
 #endif //#ifdef MP_LOGGING
     }
+#ifdef DEBUG
     else
         VERIFY(!g_pGameLevel->Objects.registered_object_to_destroy(this));
+#endif
 }
 
 Fvector CGameObject::get_new_local_point_on_mesh(u16& bone_id) const
@@ -1531,6 +1533,6 @@ bool CGameObject::use(IGameObject* obj)
 
 LPCSTR CGameObject::tip_text() { return *m_sTipText; }
 void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
-void CGameObject::set_tip_text_default() { m_sTipText = NULL; }
+void CGameObject::set_tip_text_default() { m_sTipText = nullptr; }
 bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }
 void CGameObject::set_nonscript_usable(bool usable) { m_bNonscriptUsable = usable; }

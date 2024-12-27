@@ -13,7 +13,6 @@
 #include "Include/xrRender/Kinematics.h"
 #include "PHCollideValidator.h"
 #include "xrCore/Animation/Bone.hpp"
-#include "xrEngine/GameMtlLib.h"
 
 #include "ExtendedGeom.h"
 #include "PHElement.h"
@@ -194,8 +193,8 @@ void CPHShell::PhDataUpdate(dReal step)
         ReanableObject();
 #if 0
     DBG_OpenCashedDraw();
-    dbg_draw_velocity   ( 0.1f, color_xrgb( 255, 0, 0 ) ); 
-    dbg_draw_force      ( 0.1f, color_xrgb( 0, 0, 255 ) ); 
+    dbg_draw_velocity   ( 0.1f, color_xrgb( 255, 0, 0 ) );
+    dbg_draw_force      ( 0.1f, color_xrgb( 0, 0, 255 ) );
     DBG_ClosedCashedDraw( 10000 );
     //dbg_draw_geometry
 #endif
@@ -404,7 +403,7 @@ void CPHShell::Enable()
     if (!isActive())
         return;
 
-    
+
     for (auto& it : elements)
     {
         //if(dBodyIsEnabled(it->get_body()))

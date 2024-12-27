@@ -5,7 +5,6 @@
 
 #include "IPhysicsShellHolder.h"
 
-#include "xrEngine/GameMtlLib.h"
 
 // const float JUMP_HIGHT=0.5;
 const float JUMP_UP_VELOCITY = 6.0f; // 5.6f;
@@ -52,7 +51,7 @@ void CPHActorCharacter::Create(dVector3 sizes)
     }
     if (slide_material_index == GAMEMTL_NONE_IDX)
     {
-        GameMtlIt mi = GMLib.GetMaterialIt("materials" DELIMITER "earth_slide");
+        const auto mi = GMLib.GetMaterialIt("materials" DELIMITER "earth_slide");
         if (mi != GMLib.LastMaterial())
             slide_material_index = u16(mi - GMLib.FirstMaterial());
         // slide_material_index = GMLib.GetMaterialIdx("earth_slide");

@@ -16,10 +16,9 @@
 
 CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 {
-    m_bIsNoSound = strstr(Core.Params, "-nosound");
+    m_bIsNoSound = !Engine.Sound.IsSoundEnabled();
     m_caSoundToPlay = caSoundName;
     string_path l_caFileName;
-    VERIFY(GEnv.Sound);
     if (FS.exist(l_caFileName, "$game_sounds$", caSoundName, ".ogg"))
         m_sound.create(caSoundName, st_Effect, sound_type);
     else

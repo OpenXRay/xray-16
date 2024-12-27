@@ -36,15 +36,15 @@ SCRIPT_EXPORT(CScriptAnimationAction, (),
                 value("look_around", int(MonsterSpace::eAA_LookAround)),
                 value("turn", int(MonsterSpace::eAA_Turn))
             ]
-            
+
             .def(constructor<>())
             .def(constructor<pcstr>())
             .def(constructor<pcstr, bool>())
             .def(constructor<MonsterSpace::EMentalState>())
-            
+
             // Monster specific
             .def(constructor<MonsterSpace::EScriptMonsterAnimAction, int>())
-            
+
             .def("anim", &CScriptAnimationAction::SetAnimation)
             .def("type", &CScriptAnimationAction::SetMentalState)
             .def("completed", &CScriptAbstractAction::completed)

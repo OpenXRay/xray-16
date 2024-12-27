@@ -41,7 +41,7 @@ void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
     AddDialogToRender(pDialog);
     SetMainInputReceiver(pDialog, false);
 
-    if (UseIndicators())
+    if (UseIndicators() && !m_input_receivers.empty()) //Alundaio
     {
         bool b = !!psHUD_Flags.test(HUD_CROSSHAIR_RT);
         m_input_receivers.back().m_flags.set(recvItem::eCrosshair, b);
@@ -55,10 +55,14 @@ void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
             CurrentGameUI()->ShowGameIndicators(false);
         }
     }
+    SetFocused(nullptr);
     pDialog->SetHolder(this);
 
     if (pDialog->NeedCursor())
+    {
         GetUICursor().Show();
+        m_become_visible_time = Device.dwTimeContinual;
+    }
 
     if (g_pGameLevel)
     {
@@ -81,7 +85,7 @@ void CDialogHolder::StopMenu(CUIDialogWnd* pDialog)
 
     if (TopInputReceiver() == pDialog)
     {
-        if (UseIndicators())
+        if (UseIndicators() && !m_input_receivers.empty()) //Alundaio
         {
             bool b = !!m_input_receivers.back().m_flags.test(recvItem::eCrosshair);
             psHUD_Flags.set(HUD_CROSSHAIR_RT, b);
@@ -139,6 +143,8 @@ void CDialogHolder::RemoveDialogToRender(CUIWindow* pDialog)
 
 void CDialogHolder::DoRenderDialogs()
 {
+    ZoneScoped;
+
     xr_vector<dlgItem>::iterator it = m_dialogsToRender.begin();
     for (; it != m_dialogsToRender.end(); ++it)
     {
@@ -223,10 +229,11 @@ void CDialogHolder::StartStopMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 
 void CDialogHolder::OnFrame()
 {
+    ZoneScoped;
+
     m_b_in_update = true;
 
-    if (GetUICursor().IsVisible() && pInput->IsCurrentInputTypeController())
-        GetUICursor().UpdateAutohideTiming();
+    UpdateCursorVisibility();
 
     CUIDialogWnd* wnd = TopInputReceiver();
     if (wnd && wnd->IsEnabled())
@@ -260,6 +267,33 @@ void CDialogHolder::CleanInternals()
 
     m_dialogsToRender.clear();
     GetUICursor().Hide();
+}
+
+void CDialogHolder::UpdateCursorVisibility()
+{
+    if (m_is_foremost && !GEnv.isDedicatedServer)
+    {
+        auto& cursor = GetUICursor();
+        const bool cursor_is_visible = cursor.IsVisible();
+        const bool need_cursor = TopInputReceiver() && TopInputReceiver()->NeedCursor();
+
+        const u32 cur_time = Device.dwTimeContinual;
+
+        // These conditions are optimal, don't reorder.
+        if (need_cursor)
+        {
+            if (!cursor_is_visible)
+            {
+                cursor.Show();
+                m_become_visible_time = cur_time;
+            }
+        }
+        else if (cursor_is_visible)
+        {
+            if (cur_time - m_become_visible_time > psControllerCursorAutohideTime * 1000.f)
+                cursor.Hide();
+        }
+    }
 }
 
 bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
@@ -299,6 +333,25 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             return (false);
         }
     }
+
+    /*if (const auto focused = GetFocused())
+    {
+        CUIWindow* target{};
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:  target = FindClosestFocusable(focused, FocusDirection::Left); break;
+        case kUI_MOVE_RIGHT: target = FindClosestFocusable(focused, FocusDirection::Right); break;
+        case kUI_MOVE_UP:    target = FindClosestFocusable(focused, FocusDirection::Up); break;
+        case kUI_MOVE_DOWN:  target = FindClosestFocusable(focused, FocusDirection::Down); break;
+        }
+
+        if (target)
+        {
+            SetFocused(target);
+            GetUICursor().WarpToWindow(target, true);
+        }
+    }*/
+
     return true;
 }
 
@@ -373,7 +426,7 @@ bool CDialogHolder::IR_UIOnKeyboardHold(int dik)
     return true;
 }
 
-bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
+bool CDialogHolder::IR_UIOnMouseWheel(float x, float y)
 {
     CUIDialogWnd* TIR = TopInputReceiver();
     if (!TIR)
@@ -381,7 +434,7 @@ bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
     if (!TIR->IR_process())
         return false;
 
-    Fvector2 pos = GetUICursor().GetCursorPosition();
+    UpdateCursorVisibility();
 
     // Vertical scroll is in higher priority
     EUIMessages wheelMessage;
@@ -394,6 +447,7 @@ bool CDialogHolder::IR_UIOnMouseWheel(int x, int y)
     else
         wheelMessage = WINDOW_MOUSE_WHEEL_LEFT;
 
+    const Fvector2 pos = GetUICursor().GetCursorPosition();
     TIR->OnMouseAction(pos.x, pos.y, wheelMessage);
     return true;
 }
@@ -405,6 +459,9 @@ bool CDialogHolder::IR_UIOnMouseMove(int dx, int dy)
         return false;
     if (!TIR->IR_process())
         return false;
+
+    UpdateCursorVisibility();
+
     if (GetUICursor().IsVisible())
     {
         GetUICursor().UpdateCursorPosition(dx, dy);
@@ -441,13 +498,7 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
         return true;
 
-    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
-    {
-        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-        Fvector2 cPos = GetUICursor().GetCursorPosition();
-        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-    }
-    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
         if (O)
@@ -507,13 +558,7 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
         return true;
 
-    if (GetUICursor().IsVisible() && IsBinded(kLOOK_AROUND, dik))
-    {
-        GetUICursor().UpdateCursorPosition(int(std::round(x)), int(std::round(y)));
-        Fvector2 cPos = GetUICursor().GetCursorPosition();
-        TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
-    }
-    else if (!TIR->StopAnyMove() && g_pGameLevel)
+    if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
         if (O)
@@ -529,7 +574,8 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
 
 bool CDialogHolder::FillDebugTree(const CUIDebugState& debugState)
 {
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    // XXX: Was this meant to be used somewhere here? Because currently its unused and could also be constexpr
+    //ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
 
     if (m_input_receivers.empty())
         ImGui::BulletText("Input receivers: 0");

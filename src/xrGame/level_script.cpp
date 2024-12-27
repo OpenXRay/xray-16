@@ -41,6 +41,7 @@
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
 #include "xrNetServer/NET_Messages.h"
+#include "xrEngine/Rain.h"
 
 LPCSTR command_line() { return Core.Params; }
 bool IsDynamicMusic() { return !!psActorFlags.test(AF_DYNAMIC_MUSIC); }
@@ -191,6 +192,33 @@ float low_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
 }
 
 float rain_factor() { return (g_pGamePersistent->Environment().CurrentEnv.rain_density); }
+float rain_wetness() { return (g_pGamePersistent->Environment().wetness_factor); }
+float rain_hemi()
+{
+    CEffect_Rain* rain = g_pGamePersistent->pEnvironment->eff_Rain;
+
+    if (rain)
+    {
+        return rain->GetRainHemi();
+    }
+    else
+    {
+        IGameObject* E = g_pGameLevel->CurrentViewEntity();
+        if (E && E->renderable_ROS())
+        {
+            float* hemi_cube = E->renderable_ROS()->get_luminocity_hemi_cube();
+            float hemi_val = _max(hemi_cube[0], hemi_cube[1]);
+            hemi_val = _max(hemi_val, hemi_cube[2]);
+            hemi_val = _max(hemi_val, hemi_cube[3]);
+            hemi_val = _max(hemi_val, hemi_cube[5]);
+
+            return hemi_val;
+        }
+
+        return 0.f;
+    }
+}
+
 u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
     direction.normalize_safe();
@@ -284,7 +312,13 @@ void show_indicators()
     psActorFlags.set(AF_GODMODE_RT, FALSE);
 }
 
-void show_weapon(bool b) { psHUD_Flags.set(HUD_WEAPON_RT2, b); }
+void show_weapon(bool b)
+{
+    if (psActorFlags.test(AF_GODMODE) && Actor())
+        return;
+
+    psHUD_Flags.set(HUD_WEAPON_RT2, b);
+}
 bool is_level_present() { return (!!g_pGameLevel); }
 void add_call(const luabind::functor<bool>& condition, const luabind::functor<void>& action)
 {
@@ -349,6 +383,9 @@ CEnvDescriptor* current_environment(CEnvironment* self) { return &self->CurrentE
 extern bool g_bDisableAllInput;
 void disable_input()
 {
+    if (psActorFlags.test(AF_GODMODE) && Actor())
+        return;
+
     g_bDisableAllInput = true;
 #ifdef DEBUG
     Msg("input disabled");
@@ -702,14 +739,13 @@ IC static void CLevel_Export(lua_State* luaState)
     [
         //Alundaio: Extend level namespace exports
         def("send", &g_send) , //allow the ability to send netpacket to level
-        //def("ray_pick",g_ray_pick),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
         def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
-        def("get_start_time", +[]() { return xrTime(Level().GetStartGameTime()); }),
+        def("get_start_time", +[]() -> xrTime { return xrTime(Level().GetStartGameTime()); }),
         def("valid_vertex", +[](u32 level_vertex_id)
         {
             return ai().level_graph().valid_vertex_id(level_vertex_id);
@@ -738,6 +774,7 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("high_cover_in_direction", high_cover_in_direction), def("low_cover_in_direction", low_cover_in_direction),
         def("vertex_in_direction", vertex_in_direction), def("rain_factor", rain_factor),
+        def("rain_wetness", rain_wetness), def("rain_hemi", rain_hemi),
         def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position),
         def("name", +[]() { return Level().name().c_str(); }),
         def("prefetch_sound", prefetch_sound),
@@ -825,34 +862,34 @@ IC static void CLevel_Export(lua_State* luaState)
     module(luaState)
     [
         class_<CRayPick>("ray_pick")
-        .def(constructor<>())
-        .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
-        .def("set_position", &CRayPick::set_position)
-        .def("set_direction", &CRayPick::set_direction)
-        .def("set_range", &CRayPick::set_range)
-        .def("set_flags", &CRayPick::set_flags)
-        .def("set_ignore_object", &CRayPick::set_ignore_object)
-        .def("query", &CRayPick::query)
-        .def("get_result", &CRayPick::get_result)
-        .def("get_object", &CRayPick::get_object)
-        .def("get_distance", &CRayPick::get_distance)
-        .def("get_element", &CRayPick::get_element),
+            .def(constructor<>())
+            .def(constructor<Fvector&, Fvector&, float, collide::rq_target, CScriptGameObject*>())
+            .def("set_position", &CRayPick::set_position)
+            .def("set_direction", &CRayPick::set_direction)
+            .def("set_range", &CRayPick::set_range)
+            .def("set_flags", &CRayPick::set_flags)
+            .def("set_ignore_object", &CRayPick::set_ignore_object)
+            .def("query", &CRayPick::query)
+            .def("get_result", &CRayPick::get_result)
+            .def("get_object", &CRayPick::get_object)
+            .def("get_distance", &CRayPick::get_distance)
+            .def("get_element", &CRayPick::get_element),
         class_<script_rq_result>("rq_result")
-        .def_readonly("object", &script_rq_result::O)
-        .def_readonly("range", &script_rq_result::range)
-        .def_readonly("element", &script_rq_result::element)
-        .def(constructor<>()),
+            .def_readonly("object", &script_rq_result::O)
+            .def_readonly("range", &script_rq_result::range)
+            .def_readonly("element", &script_rq_result::element)
+            .def(constructor<>()),
         class_<EnumCallbackType<collide::rq_target>>("rq_target")
-        .enum_("targets")
-        [
-            value("rqtNone", int(collide::rqtNone)),
-            value("rqtObject", int(collide::rqtObject)),
-            value("rqtStatic", int(collide::rqtStatic)),
-            value("rqtShape", int(collide::rqtShape)),
-            value("rqtObstacle", int(collide::rqtObstacle)),
-            value("rqtBoth", int(collide::rqtBoth)),
-            value("rqtDyn", int(collide::rqtDyn))
-        ]
+            .enum_("targets")
+            [
+                value("rqtNone", int(collide::rqtNone)),
+                value("rqtObject", int(collide::rqtObject)),
+                value("rqtStatic", int(collide::rqtStatic)),
+                value("rqtShape", int(collide::rqtShape)),
+                value("rqtObstacle", int(collide::rqtObstacle)),
+                value("rqtBoth", int(collide::rqtBoth)),
+                value("rqtDyn", int(collide::rqtDyn))
+            ]
     ];
 
     module(luaState)

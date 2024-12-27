@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "IGame_Level.h"
+#include "IGame_Persistent.h"
 
 #include "GameFont.h"
 #include "FDemoRecord.h"
@@ -13,9 +14,9 @@
 constexpr cpcstr DEMO_RECORD_HELP_FONT = "ui_font_letterica18_russian"; // "ui_font_graffiti19_russian";
 
 ENGINE_API extern bool g_bDisableRedText;
-static Flags32 s_hud_flag = {0};
-static Flags32 s_dev_flags = {0};
-static u32     s_window_mode = {0};
+static Flags32 s_hud_flag = {};
+static Flags32 s_dev_flags = {};
+static u32     s_window_mode = {};
 
 bool stored_weapon;
 bool stored_cross;
@@ -284,6 +285,12 @@ void CDemoRecord::MakeLevelMapProcess()
             if (bDevReset)
                 Device.Reset();
 
+            if (!m_CurrentWeatherCycle.empty())
+            {
+                g_pGamePersistent->Environment().SetWeather(m_CurrentWeatherCycle, true);
+                m_CurrentWeatherCycle = nullptr;
+            }
+
             m_bMakeLevelMap = false;
             m_iLMScreenshotFragment = -1;
         }
@@ -449,7 +456,7 @@ bool CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
 void CDemoRecord::IR_OnKeyboardPress(int dik)
 {
-    if (dik == SDL_SCANCODE_KP_MULTIPLY)
+    if (dik == SDL_SCANCODE_PERIOD)
         m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
 
     if (m_b_redirect_input_to_level)
@@ -669,13 +676,13 @@ void CDemoRecord::IR_OnKeyboardRelease(int dik)
     } // switch (GetBindedAction(dik))
 }
 
-void CDemoRecord::OnAxisMove(float x, float y, float scale, bool invert)
+void CDemoRecord::OnAxisMove(float x, float y, float scaleX, float scaleY, bool invertX, bool invertY)
 {
     Fvector vR_delta = Fvector().set(0, 0, 0);
     if (!fis_zero(x) || !fis_zero(y))
     {
-        vR_delta.y += x * scale; // heading
-        vR_delta.x += (invert ? -1.f : 1.f) * y * scale * (3.f / 4.f); // pitch
+        vR_delta.y += (invertX ? -1.f : 1.f) * x * scaleX; // heading
+        vR_delta.x += (invertY ? -1.f : 1.f) * y * scaleY * (3.f / 4.f); // pitch
     }
     update_whith_timescale(m_vR, vR_delta);
 }
@@ -687,9 +694,9 @@ void CDemoRecord::IR_OnMouseMove(int dx, int dy)
         g_pGameLevel->IR_OnMouseMove(dx, dy);
         return;
     }
-    
+
     const float scale = .5f; // psMouseSens;
-    OnAxisMove(float(dx), float(dy), scale, psMouseInvert.test(1));
+    OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
 void CDemoRecord::IR_OnMouseHold(int btn)
@@ -735,8 +742,9 @@ void CDemoRecord::IR_OnControllerHold(int key, float x, float y)
     case kLOOK_AROUND:
     {
         m_angle_speed = speed;
-        const float scale = .05f; // psControllerStickSens;
-        OnAxisMove(x, y, scale, psControllerInvertY.test(1));
+        const float scaleX = .05f; // psControllerStickSensX;
+        const float scaleY = .05f; // psControllerStickSensY;
+        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
@@ -817,9 +825,9 @@ void CDemoRecord::IR_OnControllerAttitudeChange(Fvector change)
         g_pGameLevel->IR_OnControllerAttitudeChange(change);
         return;
     }
-    
+
     const float scale = 5.f; // psControllerSensorSens;
-    OnAxisMove(change.x, change.y, scale, psControllerInvertY.test(1));
+    OnAxisMove(change.x, change.y, scale, scale, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
 }
 
 void CDemoRecord::RecordKey()
@@ -845,7 +853,9 @@ void CDemoRecord::MakeScreenshot()
 
 void CDemoRecord::MakeLevelMapScreenshot(bool bHQ)
 {
-    Console->Execute("run_string level.set_weather(\"map\",true)");
+    auto& env = g_pGamePersistent->Environment();
+    m_CurrentWeatherCycle = env.CurrentCycleName;
+    env.SetWeather("map", true);
 
     if (!bHQ)
         m_iLMScreenshotFragment = -1;

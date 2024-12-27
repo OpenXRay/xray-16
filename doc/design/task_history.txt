@@ -5,7 +5,7 @@ TITLE: X-Ray Engine 1.6 task history
 nitrocaster: Pavel Kovalenko
 + get rid of STLPort
 + bugs
-  + fix lights_hanging_lamp class name in system.ltx (used 'SO_HLAMP', should be 'O_HLAMP')  
+  + fix lights_hanging_lamp class name in system.ltx (used 'SO_HLAMP', should be 'O_HLAMP')
   + core
     + xrMemory::mem_usage -> mem_usage_impl falls into infinite loop or finds bad nodes
     + stackoverflow when game directory contains too many files (_alloca)

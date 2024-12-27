@@ -36,6 +36,8 @@ CAI_Space& CAI_Space::GetInstance()
 
 void CAI_Space::init()
 {
+    ZoneScoped;
+
     R_ASSERT(!m_inited);
 
     if (!GEnv.isDedicatedServer)
@@ -56,6 +58,8 @@ void CAI_Space::init()
 
 CAI_Space::~CAI_Space()
 {
+    ZoneScoped;
+
     if (GEnv.ScriptEngine != nullptr)
     {
         m_events_notifier.FireEvent(EVENT_SCRIPT_ENGINE_RESET);
@@ -67,6 +71,8 @@ CAI_Space::~CAI_Space()
 
 void CAI_Space::RegisterScriptClasses()
 {
+    ZoneScoped;
+
 #ifdef DBG_DISABLE_SCRIPTS
     return;
 #else
@@ -99,6 +105,8 @@ void CAI_Space::RegisterScriptClasses()
 
 void CAI_Space::LoadCommonScripts()
 {
+    ZoneScoped;
+
 #ifdef DBG_DISABLE_SCRIPTS
     return;
 #else
@@ -128,6 +136,8 @@ void CAI_Space::LoadCommonScripts()
 
 void CAI_Space::SetupScriptEngine()
 {
+    ZoneScoped;
+
     XRay::ScriptExporter::Reset(); // mark all nodes as undone
     GEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();
@@ -137,6 +147,8 @@ void CAI_Space::SetupScriptEngine()
 
 void CAI_Space::RestartScriptEngine()
 {
+    ZoneScoped;
+
     if (GEnv.ScriptEngine != nullptr)
     {
         m_events_notifier.FireEvent(EVENT_SCRIPT_ENGINE_RESET);
@@ -155,6 +167,8 @@ void CAI_Space::RestartScriptEngine()
 
 void CAI_Space::load(LPCSTR level_name)
 {
+    ZoneScoped;
+
     VERIFY(m_game_graph);
 
     unload(true);
@@ -181,6 +195,9 @@ void CAI_Space::unload(bool reload)
 {
     if (GEnv.isDedicatedServer)
         return;
+
+    ZoneScoped;
+
     GEnv.ScriptEngine->unload();
     m_doors_manager.reset(nullptr);
     AISpaceBase::Unload(reload);

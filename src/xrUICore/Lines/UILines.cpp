@@ -103,6 +103,7 @@ void CUILines::ParseText(bool force)
     BOOL bNewLines = FALSE;
 
     if (uFlags.test(flRecognizeNewLine))
+    {
         if (m_pFont->IsMultibyte())
         {
             CUILine* ptmp_line = xr_new<CUILine>();
@@ -113,7 +114,7 @@ void CUILines::ParseText(bool force)
                 char* pszTemp = NULL;
                 const u32 tcolor = line->m_subLines[i].m_color;
                 char szTempLine[MAX_MB_CHARS], *pszSearch = NULL;
-                size_t llen = xr_strlen(line->m_subLines[i].m_text.c_str());
+                [[maybe_unused]] auto llen = xr_strlen(line->m_subLines[i].m_text.c_str());
                 VERIFY(llen < MAX_MB_CHARS);
                 xr_strcpy(szTempLine, line->m_subLines[i].m_text.c_str());
                 pszSearch = szTempLine;
@@ -139,7 +140,7 @@ void CUILines::ParseText(bool force)
         {
             line->ProcessNewLines();
         }
-
+    }
     if (m_pFont->IsMultibyte())
     {
 #define UBUFFER_SIZE 100
@@ -206,8 +207,9 @@ void CUILines::ParseText(bool force)
         CUILine tmp_line;
         string4096 buff;
         float curr_width = 0.0f;
-        bool bnew_line = false;
-        float __eps = get_str_width(m_pFont, 'o'); // hack -(
+        // XXX: use 'bnew_line' or remove it
+        [[maybe_unused]] bool bnew_line = false;
+        float eps = get_str_width(m_pFont, 'o'); // hack -(
         for (u32 sbl_idx = 0; sbl_idx < sbl_cnt; ++sbl_idx)
         {
             bool b_last_subl = (sbl_idx == sbl_cnt - 1);
@@ -224,7 +226,7 @@ void CUILines::ParseText(bool force)
                     last_space_idx = idx;
 
                 float w1 = get_str_width(m_pFont, sbl.m_text[idx]);
-                bool bOver = (curr_width + w1 + __eps > max_width);
+                bool bOver = (curr_width + w1 + eps > max_width);
 
                 if (bOver || b_last_ch)
                 {
@@ -352,10 +354,8 @@ void CUILines::Draw(float x, float y)
         text_pos.set(0, 0);
 
         text_pos.x = x + GetIndentByAlign();
-        //		text_pos.y = y + GetVIndentByAlign();
-        text_pos.y = y;
+        text_pos.y = y + GetVIndentByAlign();
         UI().ClientToScreenScaled(text_pos);
-        text_pos.y += GetVIndentByAlign();
 
         if (uFlags.test(flPasswordMode))
         {

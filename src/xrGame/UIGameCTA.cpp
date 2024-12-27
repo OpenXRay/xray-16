@@ -50,14 +50,14 @@ void CUIGameCTA::Init(int stage)
 {
     if (stage == 0)
     {
-        m_round_result_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_round_result", Window);
-        m_pressbuy_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_pressbuy", Window);
-        m_pressjump_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_pressjump", Window);
-        m_spectator_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_spectator", Window);
-        m_spectrmode_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_spetatormode", Window);
-        m_warm_up_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_warm_up", Window);
-        m_time_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_timelimit", Window);
-        m_demo_play_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_demo_play", Window);
+        m_round_result_caption = UIHelper::CreateStatic(*MsgConfig, "mp_round_result", Window);
+        m_pressbuy_caption = UIHelper::CreateStatic(*MsgConfig, "mp_pressbuy", Window);
+        m_pressjump_caption = UIHelper::CreateStatic(*MsgConfig, "mp_pressjump", Window);
+        m_spectator_caption = UIHelper::CreateStatic(*MsgConfig, "mp_spectator", Window);
+        m_spectrmode_caption = UIHelper::CreateStatic(*MsgConfig, "mp_spetatormode", Window);
+        m_warm_up_caption = UIHelper::CreateStatic(*MsgConfig, "mp_warm_up", Window);
+        m_time_caption = UIHelper::CreateStatic(*MsgConfig, "mp_timelimit", Window);
+        m_demo_play_caption = UIHelper::CreateStatic(*MsgConfig, "mp_demo_play", Window);
 
         teamPanels = xr_new<UITeamPanels>();
         teamPanels->Init(TEAM_PANELS_XML_NAME, "team_panels_wnd");
@@ -75,25 +75,25 @@ void CUIGameCTA::Init(int stage)
         m_pRankIndicator->SetAutoDelete(true);
         m_pRankIndicator->InitFromXml(uiXml);
 
-        m_pReinforcementInidcator = xr_new<CUITextWnd>();
+        m_pReinforcementInidcator = xr_new<CUIStatic>("Reinforcement indicator");
         m_pReinforcementInidcator->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
+        CUIXmlInit::InitStatic(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
 
         m_team1_icon = xr_new<CUIStatic>("Team 1 icon");
         m_team2_icon = xr_new<CUIStatic>("Team 2 icon");
         CUIXmlInit::InitStatic(uiXml, "team1_icon", 0, m_team1_icon);
         CUIXmlInit::InitStatic(uiXml, "team2_icon", 0, m_team2_icon);
 
-        m_team1_score = xr_new<CUITextWnd>();
-        m_team2_score = xr_new<CUITextWnd>();
+        m_team1_score = xr_new<CUIStatic>("Team 1 score");
+        m_team2_score = xr_new<CUIStatic>("Team 2 score");
         m_team1_score->SetAutoDelete(true);
         m_team2_score->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "team1_score", 0, m_team1_score);
-        CUIXmlInit::InitTextWnd(uiXml, "team2_score", 0, m_team2_score);
+        CUIXmlInit::InitStatic(uiXml, "team1_score", 0, m_team1_score);
+        CUIXmlInit::InitStatic(uiXml, "team2_score", 0, m_team2_score);
 
-        m_pFragLimitIndicator = xr_new<CUITextWnd>();
+        m_pFragLimitIndicator = xr_new<CUIStatic>("Frag limit indicator");
         m_pFragLimitIndicator->SetAutoDelete(true);
-        CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
+        CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
     }
 
     if (stage == 2)

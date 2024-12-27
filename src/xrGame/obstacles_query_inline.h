@@ -10,7 +10,13 @@
 #define OBSTACLES_QUERY_INLINE_H
 
 IC obstacles_query::obstacles_query() { init(); }
-IC void obstacles_query::init() { m_crc = 0; }
+
+IC void obstacles_query::init()
+{
+    m_crc = 0;
+    m_actual = true;
+}
+
 IC void obstacles_query::clear()
 {
     m_area.clear();

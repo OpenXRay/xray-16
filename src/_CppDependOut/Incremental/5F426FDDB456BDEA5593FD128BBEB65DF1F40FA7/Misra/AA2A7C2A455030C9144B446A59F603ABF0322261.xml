@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\xrgame\cdkeydecode\cdkeydecode.c"><violation beginline="20" endline="20" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="24" endline="24" rule="Rule6-3-1" ruleset="Statements">
-</violation><violation beginline="53" endline="53" rule="Rule6-6-5" ruleset="Statements">
-</violation><violation beginline="29" endline="29" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

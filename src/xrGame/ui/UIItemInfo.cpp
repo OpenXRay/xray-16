@@ -84,13 +84,13 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
     }
     UIBackground = UIHelper::CreateFrameWindow(uiXml, "background_frame", this, false);
 
-    UIName = UIHelper::CreateTextWnd(uiXml, "static_name", this, false);
+    UIName = UIHelper::CreateStatic(uiXml, "static_name", this, false);
     if (UIName)
         m_complex_desc = (uiXml.ReadAttribInt("static_name", 0, "complex_desc", 0) == 1);
 
-    UIWeight = UIHelper::CreateTextWnd(uiXml, "static_weight", this, false);
-    UICost = UIHelper::CreateTextWnd(uiXml, "static_cost", this, false);
-    UITradeTip = UIHelper::CreateTextWnd(uiXml, "static_no_trade", this, false);
+    UIWeight = UIHelper::CreateStatic(uiXml, "static_weight", this, false);
+    UICost = UIHelper::CreateStatic(uiXml, "static_cost", this, false);
+    UITradeTip = UIHelper::CreateStatic(uiXml, "static_no_trade", this, false);
 
     if (uiXml.NavigateToNode("descr_list", 0))
     {
@@ -269,7 +269,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         VERIFY(0 == UIDesc->GetSize());
         if (m_desc_info.bShowDescrText)
         {
-            CUITextWnd* pItem = xr_new<CUITextWnd>();
+            auto* pItem = xr_new<CUIStatic>("Description");
             pItem->SetTextColor(m_desc_info.uDescClr);
             pItem->SetFont(m_desc_info.pDescFont);
             pItem->SetWidth(UIDesc->GetDesiredChildWidth());
@@ -280,7 +280,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         }
         TryAddConditionInfo(*pInvItem, pCompareItem);
         TryAddWpnInfo(*pInvItem, pCompareItem);
-        TryAddArtefactInfo(pInvItem->object().cNameSect());
+        TryAddArtefactInfo(*pInvItem);
         TryAddOutfitInfo(*pInvItem, pCompareItem);
         TryAddUpgradeInfo(*pInvItem);
         TryAddBoosterInfo(*pInvItem);
@@ -350,14 +350,14 @@ void CUIItemInfo::TryAddWpnInfo(CInventoryItem& pInvItem, CInventoryItem* pCompa
     }
 }
 
-void CUIItemInfo::TryAddArtefactInfo(const shared_str& af_section)
+void CUIItemInfo::TryAddArtefactInfo(CInventoryItem& pInvItem)
 {
     if (!UIArtefactParams)
         return;
 
-    if (UIArtefactParams->Check(af_section))
+    if (UIArtefactParams->Check(pInvItem.object().cNameSect()))
     {
-        UIArtefactParams->SetInfo(af_section);
+        UIArtefactParams->SetInfo(pInvItem);
         UIDesc->AddWindow(UIArtefactParams, false);
     }
 }

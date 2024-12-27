@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\nvtt\src\nvtt\nvtt.cpp"><violation beginline="31" endline="31" rule="Rule6-4-4" ruleset="Statements">
-</violation><violation beginline="36" endline="36" rule="Rule6-6-5" ruleset="Statements">
-</violation></file><file path="c:\openxray\externals\nvtt\src\nvtt\nvtt.h"><violation beginline="98" endline="98" rule="Rule11-0-1" ruleset="Classes">
-</violation><violation beginline="177" endline="177" rule="Rule11-0-1" ruleset="Classes">
-</violation><violation beginline="263" endline="263" rule="Rule11-0-1" ruleset="Classes">
-</violation><violation beginline="282" endline="282" rule="Rule11-0-1" ruleset="Classes">
-</violation></file></cppdepend-plugin>

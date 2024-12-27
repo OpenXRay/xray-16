@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\luabind\luabind\class.hpp"><violation beginline="409" endline="409" rule="Rule11-0-1" ruleset="Classes">
-</violation></file><file path="c:\openxray\externals\luabind\luabind\scope.hpp"><violation beginline="90" endline="90" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="97" endline="97" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\src\xruicore\messagebox\uimessagebox_script.cpp"><violation beginline="5" endline="5" rule="Rule7-3-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

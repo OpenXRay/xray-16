@@ -11,7 +11,6 @@
 #include "mt_config.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "game_cl_mp.h"
-#include "reward_event_generator.h"
 
 #include "Include/xrRender/UIRender.h"
 #include "Include/xrRender/Kinematics.h"
@@ -35,7 +34,7 @@ float g_bullet_time_factor = 1.f;
 
 SBullet::SBullet(const Fvector& position, const Fvector& direction, float starting_speed, float power,
     /*float power_critical,*/ float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type,
-    float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit)
+    float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, int iShotNum /*= 0*/)
 {
     bullet_pos = position;
     speed = max_speed = starting_speed;
@@ -67,6 +66,11 @@ SBullet::SBullet(const Fvector& position, const Fvector& direction, float starti
     bullet_material_idx = cartridge.bullet_material_idx;
     VERIFY(u16(-1) != bullet_material_idx);
 
+    //Alundaio: Tracer for every 5th bullet
+    if (flags.allow_tracer && cartridge.m_4to1_tracer && iShotNum % 5 != 0)
+        flags.allow_tracer = false;
+    //-Alundaio
+
     flags.allow_tracer = !!cartridge.m_flags.test(CCartridge::cfTracer);
     flags.allow_ricochet = !!cartridge.m_flags.test(CCartridge::cfRicochet);
     flags.explosive = !!cartridge.m_flags.test(CCartridge::cfExplosive);
@@ -80,11 +84,11 @@ CBulletManager::CBulletManager()
 #if 0 // def CONFIG_PROFILE_LOCKS
     : m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
-        ,m_thread_id(Threading::GetCurrThreadId())
+        ,m_thread_id(std::this_thread::get_id())
 #endif // #ifdef DEBUG
 #else // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
-    : m_thread_id(Threading::GetCurrThreadId())
+    : m_thread_id(std::this_thread::get_id())
 #endif // #ifdef DEBUG
 #endif // #ifdef CONFIG_PROFILE_LOCKS
 {
@@ -101,6 +105,8 @@ CBulletManager::~CBulletManager()
 
 void CBulletManager::Load()
 {
+    ZoneScoped;
+
     char const* bullet_manager_sect = "bullet_manager";
     if (!IsGameTypeSingle())
     {
@@ -174,33 +180,36 @@ void CBulletManager::Clear()
 void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction, float starting_speed, float power,
     //.							   float power_critical,
     float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
-    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet)
+    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet, int iShotNum /*= 0*/)
 {
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
-    VERIFY(Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+#ifdef DEBUG
+    VERIFY(m_thread_id == std::this_thread::get_id());
+#endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
     //	u32 OwnerID					= sender_id;
     SBullet& bullet = m_Bullets.emplace_back(position, direction, starting_speed, power, /*power_critical,*/ impulse, sender_id,
-        sendersweapon_id, e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit);
+        sendersweapon_id, e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit, iShotNum);
     //	bullet.frame_num			= Device.dwFrame;
     bullet.flags.aim_bullet = AimBullet;
     if (!IsGameTypeSingle())
     {
         if (SendHit)
             Game().m_WeaponUsageStatistic->OnBullet_Fire(&bullet, cartridge);
-        game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
-        if (tmp_cl_game->get_reward_generator())
-            tmp_cl_game->get_reward_generator()->OnBullet_Fire(sender_id, sendersweapon_id, position, direction);
     }
 }
 
 void CBulletManager::UpdateWorkload()
 {
-    VERIFY(g_mt_config.test(mtBullets) || Threading::ThreadIdsAreEqual(m_thread_id, Threading::GetCurrThreadId()));
+    ZoneScoped;
+
+#ifdef DEBUG
+    VERIFY(g_mt_config.test(mtBullets) || m_thread_id == std::this_thread::get_id());
+#endif
 
     rq_storage.r_clear();
 
@@ -786,6 +795,8 @@ float SqrDistancePointToSegment(const Fvector& pt, const Fvector& orig, const Fv
 
 void CBulletManager::Render()
 {
+    ZoneScoped;
+
 #ifdef DEBUG
     if (g_bDrawBulletHit && !m_bullet_points.empty())
     {
@@ -842,6 +853,8 @@ void CBulletManager::Render()
     {
         SBullet* bullet = &sbullet;
         if (!bullet->flags.allow_tracer)
+            continue;
+        if (!psActorFlags.test(AF_USE_TRACERS))
             continue;
 
         if (!bullet->CanBeRenderedNow())
@@ -908,6 +921,8 @@ void CBulletManager::CommitRenderSet() // @ the end of frame
 }
 void CBulletManager::CommitEvents() // @ the start of frame
 {
+    ZoneScoped;
+
     if (m_Events.size() > 1000)
         Msg("! too many bullets during single frame: %d", m_Events.size());
 

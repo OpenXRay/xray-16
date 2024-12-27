@@ -28,8 +28,11 @@
 #      define XRCORE_API XR_EXPORT
 #   else
 #      define XRCORE_API XR_IMPORT
+#      define TRACY_IMPORTS
 #   endif
 #endif
+
+#include <tracy/Tracy.hpp>
 
 #include "xrDebug.h"
 //#include "vector.h"
@@ -120,15 +123,13 @@ public:
     bool PluginMode;
 
     void Initialize(
-        pcstr ApplicationName, pcstr commandLine = nullptr, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);
+        pcstr ApplicationName, pcstr commandLine = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);
     void _destroy();
 
     u32 GetBuildId() const { return buildId; }
     static pcstr GetBuildDate() { return buildDate; }
     static pcstr GetBuildCommit() { return buildCommit; }
     static pcstr GetBuildBranch() { return buildBranch; }
-
-    void CoInitializeMultithreaded() const;
 
 private:
     void CalculateBuildId();

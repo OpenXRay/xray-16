@@ -22,12 +22,12 @@ class adopt_sampler
     u32 stage;
 
 public:
-    adopt_sampler(CBlender_Compile* _C, u32 _stage) : C(_C), stage(_stage)
+    adopt_sampler(CBlender_Compile* compiler, u32 _stage) : C(compiler), stage(_stage)
     {
         if (u32(-1) == stage)
             C = nullptr;
     }
-    adopt_sampler(const adopt_sampler& _C) : C(_C.C), stage(_C.stage)
+    adopt_sampler(const adopt_sampler& other) : C(other.C), stage(other.stage)
     {
         if (u32(-1) == stage)
             C = nullptr;
@@ -161,8 +161,8 @@ class adopt_compiler
     CBlender_Compile* C;
 
 public:
-    adopt_compiler(CBlender_Compile* _C) : C(_C) {}
-    adopt_compiler(const adopt_compiler& _C) : C(_C.C) {}
+    adopt_compiler(CBlender_Compile* compiler) : C(compiler) {}
+    adopt_compiler(const adopt_compiler& other) : C(other.C) {}
     adopt_compiler& _options(int P, bool S)
     {
         C->SetParams(P, S);
@@ -193,7 +193,7 @@ public:
         C->PassSET_LightFog(FALSE, _fog);
         return *this;
     }
-    adopt_compiler& _ZB(bool _test, bool _write)
+    adopt_compiler& _zbuffer(bool _test, bool _write)
     {
         C->PassSET_ZB(_test, _write);
         return *this;
@@ -267,7 +267,7 @@ void CResourceManager::LS_Load()
                 .def("distort",            &adopt_compiler::_o_distort,          return_reference_to<1>())
                 .def("wmark",              &adopt_compiler::_o_wmark,            return_reference_to<1>())
                 .def("fog",                &adopt_compiler::_fog,                return_reference_to<1>())
-                .def("zb",                 &adopt_compiler::_ZB,                 return_reference_to<1>())
+                .def("zb",                 &adopt_compiler::_zbuffer,                 return_reference_to<1>())
                 .def("blend",              &adopt_compiler::_blend,              return_reference_to<1>())
                 .def("aref",               &adopt_compiler::_aref,               return_reference_to<1>())
                 .def("color_write_enable", &adopt_compiler::_color_write_enable, return_reference_to<1>())

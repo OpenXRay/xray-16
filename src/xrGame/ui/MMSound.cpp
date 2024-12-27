@@ -60,29 +60,25 @@ void CMMSound::music_Play()
 
     const int i = Random.randI(m_play_list.size());
 
-    string_path _stereo, _l, _r;
-    strconcat(sizeof(_stereo), _stereo, m_play_list[i].c_str(), ".ogg");
-    strconcat(sizeof(_l), _l, m_play_list[i].c_str(), "_l.ogg");
-    strconcat(sizeof(_r), _r, m_play_list[i].c_str(), "_r.ogg");
+    string_path stereo;
+    strconcat(stereo, m_play_list[i].c_str(), ".ogg");
 
-    bool found[channels_count + 1];
-    ref_sound separated[channels_count];
-    found[0] = separated[0].create(_l, st_Effect, sg_Undefined, false);
-    found[1] = separated[1].create(_r, st_Effect, sg_Undefined, false);
-
-    ref_sound one;
-    found[channels_count] = one.create(_stereo, st_Music, sg_SourceType, !(found[0] && found[1]));
-
-    if (!found[channels_count] && found[0] && found[1])
+    if (!m_music[0].create(stereo, st_Music, sg_SourceType))
     {
-        m_music[0] = separated[0];
-        m_music[1] = separated[1];
+        string_path left, right;
+        strconcat(left, m_play_list[i].c_str(), "_l.ogg");
+        strconcat(right, m_play_list[i].c_str(), "_r.ogg");
+        m_music[0].create(left, st_Effect, sg_Undefined);
+        m_music[1].create(right, st_Effect, sg_Undefined);
+    }
+
+    if (m_music[0] && m_music[1])
+    {
         m_music[0].play_at_pos(nullptr, Fvector().set(-0.5f, 0.f, 0.3f), sm_2D);
         m_music[1].play_at_pos(nullptr, Fvector().set(+0.5f, 0.f, 0.3f), sm_2D);
     }
     else
     {
-        m_music[0] = one;
         m_music[0].play(nullptr, sm_2D);
         m_music[1].destroy();
     }

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\src\xrcore\_flags.h"><violation beginline="7" endline="7" rule="Rule11-0-1" ruleset="Classes">
-</violation></file><file path="c:\openxray\src\xrcore\xrdebug.h"><violation beginline="111" endline="111" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

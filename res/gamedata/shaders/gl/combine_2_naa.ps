@@ -32,13 +32,13 @@ c2_out _main( v2p_aa_AA I )
 
 /*	
 #ifdef USE_MSAA
-	[unroll] for( int iSample = 0; iSample < MSAA_SAMPLES; ++iSample )
+	[unroll] for( uint iSample = 0; iSample < uint(MSAA_SAMPLES); ++iSample )
 	{
 #else // USE_MSAA	
-	int iSample = 0;
+	uint iSample = uint(0);
 #endif
 */
-	int iSample = 0;
+	uint iSample = uint(0);
 
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, I.HPos, iSample );
@@ -52,7 +52,7 @@ c2_out _main( v2p_aa_AA I )
 #ifndef USE_MSAA
 	float4 	distort	= tex2D		(s_distort, 	I.Tex0);
 #else // USE_MSAA
-	float4 	distort	= texelFetch( s_distort, int2( I.Tex0 * pos_decompression_params2.xy), iSample );
+	float4 	distort	= texelFetch( s_distort, int2( I.Tex0 * pos_decompression_params2.xy), int(iSample) );
 #endif // USE_MSAA
 	float2	offset	= (distort.xy-(127.0/255.0))*def_distort;  // fix newtral offset
 	float2	center	= I.Tex0 + offset;

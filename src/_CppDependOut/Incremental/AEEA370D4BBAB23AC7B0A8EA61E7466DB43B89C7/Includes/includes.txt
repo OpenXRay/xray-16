@@ -1,5 +1,0 @@
-c:\openxray\src\xr_3da\resource.h
-c:\openxray\src\xr_3da\stdafx.h
-c:\openxray\src\xr_3da\accessibilityshortcuts.hpp
-c:\openxray\src\xr_3da\entry_point.cpp
-c:\openxray\src\xr_3da\stdafx.cpp

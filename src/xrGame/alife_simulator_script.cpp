@@ -30,16 +30,22 @@ STORY_PAIRS story_ids;
 SPAWN_STORY_PAIRS spawn_story_ids;
 
 CALifeSimulator* alife() { return (const_cast<CALifeSimulator*>(ai().get_alife())); }
-CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
-{
-    VERIFY(self);
-    return (self->objects().object(object_id, true));
-}
 
 bool valid_object_id(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
 {
     VERIFY(self);
     return (object_id != 0xffff);
+}
+
+CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
+{
+    VERIFY(self);
+    if (!valid_object_id(self, object_id))
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,"! alife():object(id): invalid id[%u] specified", object_id);
+        return nullptr;
+    }
+    return (self->objects().object(object_id, true));
 }
 
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, pcstr name)
@@ -74,27 +80,25 @@ void generate_story_ids(STORY_PAIRS& result, _id_type INVALID_ID, LPCSTR section
 {
     result.clear();
 
-    CInifile* Ini = pGameIni;
+    const CInifile* Ini = pGameIni;
 
     LPCSTR N, V;
-    u32 k;
-    shared_str temp;
-    LPCSTR section = section_name;
-    R_ASSERT(Ini->section_exist(section));
+    u32 k = 0;
+    R_ASSERT(Ini->section_exist(section_name));
 
-    for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
+    result.reserve(Ini->line_count(section_name) + 1);
+    while (Ini->r_line(section_name, k, &N, &V))
     {
-        temp = Ini->r_string_wb(section, N);
+        const shared_str& temp = Ini->r_string_wb(section_name, N);
 
         R_ASSERT3(!strchr(*temp, ' '), invalid_id_description, *temp);
         R_ASSERT2(xr_strcmp(*temp, INVALID_ID_STRING), invalid_id_redefinition);
 
-        STORY_PAIRS::const_iterator I = result.begin();
-        STORY_PAIRS::const_iterator E = result.end();
-        for (; I != E; ++I)
-            R_ASSERT3((*I).first != temp, duplicated_id_description, *temp);
+        for (const auto& story : result)
+            R_ASSERT3(story.first != temp, duplicated_id_description, *temp);
 
         result.emplace_back(*temp, atoi(N));
+        ++k;
     }
 
     result.emplace_back(INVALID_ID_STRING, INVALID_ID);
@@ -186,6 +190,32 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
     return (self->server().Process_spawn(packet, clientID));
 }
 
+//Alundaio: Allows to call alife():register(se_obj) manually afterward so that packet editing can be done safely when spawning object with a parent
+CSE_Abstract* CALifeSimulator__spawn_item3(CALifeSimulator* self, pcstr section, const Fvector& position,
+                                           u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,
+                                           ALife::_OBJECT_ID id_parent, bool reg = true)
+{
+    if (reg)
+        return CALifeSimulator__spawn_item2(self, section, position, level_vertex_id, game_vertex_id, id_parent);
+
+    if (id_parent == ALife::_OBJECT_ID(-1))
+        return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent));
+
+    const auto object = ai().alife().objects().object(id_parent, true);
+    if (!object)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "! invalid parent id [%u] specified", id_parent);
+        return nullptr;
+    }
+
+    if (!object->m_bOnline)
+        return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent));
+
+    CSE_Abstract* item = self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent, false);
+
+    return item;
+}
+
 CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section, const Fvector& position,
     u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent, int ammo_to_spawn)
 {
@@ -197,7 +227,7 @@ CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section,
         object = ai().alife().objects().object(id_parent, true);
         if (!object)
         {
-            Msg("! invalid parent id [%d] specified", id_parent);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "! invalid parent id [%u] specified", id_parent);
             return (0);
         }
     }
@@ -311,17 +341,15 @@ void teleport_object(CALifeSimulator* alife, ALife::_OBJECT_ID id, GameGraph::_G
 {
     alife->teleport_object(id, game_vertex_id, level_vertex_id, position);
 }
-//-Alundaio
 
-void iterate_objects(const CALifeSimulator* self, luabind::functor<bool> functor)
+void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, const luabind::functor<void>& functor)
 {
-    THROW(self);
-    for (const auto& it : self->objects().objects())
-    {
-        CSE_ALifeDynamicObject* obj = it.second;
-        if (functor(obj))
-            return;
-    }
+    const auto known_info = registry(alife, id);
+    if (!known_info)
+        return;
+
+    for (const auto& it : *known_info)
+        functor(id, it.info_id);
 }
 
 CSE_Abstract* reprocess_spawn(CALifeSimulator* self, CSE_Abstract* object)
@@ -342,6 +370,7 @@ CSE_Abstract* reprocess_spawn(CALifeSimulator* self, CSE_Abstract* object)
 
     return self->server().Process_spawn(packet, clientID);
 }
+
 CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, pcstr section, const Fvector& position,
                                   u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent,
                                   bool bRegister = true)
@@ -389,15 +418,17 @@ xr_vector<u16>& get_children(const CALifeSimulator* self, CSE_Abstract* object)
     VERIFY(self);
     return object->children;
 }
+//-Alundaio
 
-void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, const luabind::functor<void>& functor)
+void iterate_objects(const CALifeSimulator* self, luabind::functor<bool> functor)
 {
-    const auto known_info = registry(alife, id);
-    if (!known_info)
-        return;
-
-    for (const auto& it : *known_info)
-        functor(id, it.info_id);
+    THROW(self);
+    for (const auto& it : self->objects().objects())
+    {
+        CSE_ALifeDynamicObject* obj = it.second;
+        if (functor(obj))
+            return;
+    }
 }
 
 void set_start_position(Fvector& pos)
@@ -445,6 +476,7 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("create", &CALifeSimulator__create)
             .def("create", &CALifeSimulator__spawn_item2)
             .def("create", &CALifeSimulator__spawn_item)
+            .def("create", &CALifeSimulator__spawn_item3)
             .def("create_ammo", &CALifeSimulator__spawn_ammo)
             .def("release", &CALifeSimulator__release)
             .def("spawn_id", &CALifeSimulator__spawn_id)
@@ -458,7 +490,6 @@ SCRIPT_EXPORT(CALifeSimulator, (),
                (&CALifeSimulator::set_switch_distance)) //Alundaio: renamed to set_switch_distance from switch_distance
             //Alundaio: extend alife simulator exports
             .def("teleport_object", &teleport_object)
-            //Alundaio: END
             .def("iterate_objects", &iterate_objects)
             .def("iterate_info", &IterateInfo)
             .def("clone_weapon", (CSE_Abstract* (*)(CALifeSimulator*, CSE_Abstract*, pcstr, const Fvector&, u32,
@@ -469,6 +500,7 @@ SCRIPT_EXPORT(CALifeSimulator, (),
             .def("set_objects_per_update", &set_objects_per_update)
             .def("set_process_time", &set_process_time)
             .def("get_children", &get_children, return_stl_iterator()),
+            //Alundaio: END
 
         def("alife", &alife),
         def("set_start_position", &set_start_position),

@@ -9,9 +9,7 @@
 
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
-#if defined(USE_DX9)
-#include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
 #include "Layers/xrRenderDX11/dx11R_Backend_Runtime.h"
 #elif defined(USE_OGL)
 #include "Layers/xrRenderGL/glR_Backend_Runtime.h"
@@ -60,7 +58,7 @@ IC void CBackend::set_xform_project(const Fmatrix& M) { xforms.set_P(M); }
 IC const Fmatrix& CBackend::get_xform_world() { return xforms.get_W(); }
 IC const Fmatrix& CBackend::get_xform_view() { return xforms.get_V(); }
 IC const Fmatrix& CBackend::get_xform_project() { return xforms.get_P(); }
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
 IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
 #elif defined(USE_OGL)
 IC GLuint CBackend::get_RT(u32 ID)
@@ -73,7 +71,7 @@ IC GLuint CBackend::get_RT(u32 ID)
     return pRT[ID];
 }
 
-#if defined(USE_DX9) || defined(USE_DX11)
+#if defined(USE_DX11)
 IC ID3DDepthStencilView* CBackend::get_ZB()
 #elif defined(USE_OGL)
 IC GLuint CBackend::get_ZB()
@@ -85,32 +83,26 @@ IC GLuint CBackend::get_ZB()
 }
 ICF void CBackend::set_States(SState* _state)
 {
-//	DX11 Manages states using it's own algorithm. Don't mess with it.
-#ifdef USE_DX9
-    if (state != _state->state)
-#endif
-    {
-        PGO(Msg("PGO:state_block"));
-        stat.states++;
-        state = _state->state;
+    PGO(Msg("PGO:state_block"));
+    stat.states++;
+    state = _state->state;
 #if defined(USE_DX11)
-        state->Apply(*this);
+    state->Apply(*this);
 #else
         state->Apply();
 #endif
-    }
 }
 
-IC void CBackend::set_Matrices(SMatrixList* _M)
+IC void CBackend::set_Matrices(SMatrixList* matrix_list)
 {
-    if (M != _M)
+    if (M != matrix_list)
     {
-        M = _M;
+        M = matrix_list;
         if (M)
         {
             for (u32 it = 0; it < M->size(); it++)
             {
-                CMatrix* mat = &*((*M)[it]);
+                CMatrix* mat = (*M)[it]._get();
                 if (mat && matrices[it] != mat)
                 {
                     matrices[it] = mat;

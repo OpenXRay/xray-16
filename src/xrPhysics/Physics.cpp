@@ -6,7 +6,6 @@
 #include "Physics.h"
 #include "tri-colliderknoopc/dTriList.h"
 #include "PHContactBodyEffector.h"
-#include "xrEngine/GameMtlLib.h"
 
 #include "PHCollideValidator.h"
 #ifdef DEBUG

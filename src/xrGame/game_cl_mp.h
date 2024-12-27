@@ -4,7 +4,6 @@
 #include "xrUICore/ui_defs.h"
 #include "Spectator.h"
 #include "file_transfer.h"
-#include "screenshot_manager.h"
 #include "configs_dumper.h"
 #include "configs_dump_verifyer.h"
 #include "screenshot_server.h"
@@ -13,11 +12,6 @@
 class CUIWindow;
 class CUISpeechMenu;
 class CUIMessageBoxEx;
-
-namespace award_system
-{
-class reward_manager;
-} // namespace award_system
 
 struct SND_Message
 {
@@ -113,11 +107,6 @@ class CUIVote;
 class CUIMessageBoxEx;
 class CUIMpAdminMenu;
 
-namespace award_system
-{
-class reward_event_generator;
-}
-
 class game_cl_mp : public game_cl_GameState
 {
     typedef game_cl_GameState inherited;
@@ -182,9 +171,6 @@ protected:
     u32 m_cur_MenuID;
 
     virtual void LoadBonuses();
-
-    award_system::reward_event_generator* m_reward_generator;
-    void ReInitRewardGenerator(game_PlayerState* local_ps);
 
 public:
     game_cl_mp();
@@ -255,12 +241,8 @@ public:
     virtual void OnConnected();
     virtual LPCSTR GetGameScore(string32& score_dest) { return score_dest; }
 
-    screenshot_manager ss_manager;
     mp_anticheat::configs_dumper cd_manager;
     mp_anticheat::configs_verifyer cd_verifyer;
-
-    award_system::reward_event_generator* get_reward_generator() const { return m_reward_generator; };
-    void AddRewardTask(u32 const award_id);
 
     void AddSoundMessage(LPCSTR sound_name, u32 const sound_priority, u32 const soundID);
     void PlaySndMessage(u32 ID);
@@ -274,7 +256,6 @@ private:
     void reinit_compress_buffer(u32 need_size);
     void deinit_compress_buffer();
 
-    award_system::reward_manager* m_reward_manager;
     void start_receive_server_info(ClientID const& svclient_id);
 
     player_info_reply_cb_t m_players_info_reply;

@@ -1,0 +1,79 @@
+# .git-blame-ignore-revs
+
+# Reformat: xrSound
+6852d9d7cfe361217fd614426ff56d8fab031a9b
+
+# Reformat: xrServerEntities
+00c727d42bbcc473c66a118dd3500e507d2cba3c
+
+# Reformat: xrScriptEngine
+b2244e6b123d8d7f1fa2eb847ef8d656f6731684
+
+# Reformat: xrPhysics
+848c60d22d9b3f902ff8e94be8d78ab5f1f7f5d5
+
+# Reformat: xrParticles
+cad7b7c26f6f030af93d2d1be85dc03affdbeb8a
+
+# Reformat: xrNetServer
+32e8f37eb640bd6661d5766542189507f8dc9713
+
+# Reformat: xrGameSpy
+6cf79729db2fa6847c41904d30d812c177092cc9
+
+# Reformat: xrGame
+ed510c65879da42ce134d989ccb95d32fa687cc1
+
+# Reformat: xrEngine
+eea17cc094f99a7648b07085a558d726f4844cfc
+
+# Reformat: xrCore
+ef4849190da23595f2dca1ef276f7c9f98cab740
+
+# Reformat: xrCDB
+521f85615a07c2684335b492d7e9b9938bf998d1
+
+# Reformat: xrAICore
+3dbacd39bf0b356e3c5b5aa6fb41b7822a917205
+
+# Reformat: xrD3D9-Null
+be1a18fdc523903ef3aace3e39b76973003240b0
+
+# Reformat: utils
+e79bc5e509a63d9e27f3adb5fd35796b7652ee40
+
+# Reformat: plugins
+3d01d0a3b1a0585dc160f54ba2d6df017d998128
+
+# Reformat: Layers
+88a3f6a31518542ba956dfa817c04489f6d71350
+
+# Reformat: Include
+5f6470792b105bdd2a110751f87f88e900fb3e9e
+
+# Reformat: Common
+716dc0364691082f5055404f27cd537283be9e9a
+
+# Reformat with new clang-format config
+34ab0fbfb2dee554cc9e8ee3331efa1c248b5c63
+
+# Revert "Reformat souce code"
+28313d10aff692f0be5e3d93b21f3e93dc932802
+
+# Reformat source code
+c96c2e4cc9fadf29c023464ba1885e7351d68943
+
+# Reformat the sources.
+2b938eaa7b258edc038b24a74363e276b2ace262
+
+# Convert all files to UTF-8
+a8fa7736faf079897b8605b3893a08b3e0f5d69f
+
+# Style: Replace tabs with 4 spaces
+3970dd95199e99fecc50e55868019cd08f21925e
+
+# Style: Remove trailing whitespaces
+331da1b22fb73224d64a09924d96d23414ef4b09
+
+# Style: Ensure files end with a new line
+2e1bd658355e94e5205aa0c1064ecf5ee7281488

@@ -45,7 +45,6 @@
 #include "inventory_upgrade_manager.h"
 
 #include "xrGameSpy/GameSpy_Full.h"
-#include "xrGameSpy/GameSpy_Patching.h"
 
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
@@ -159,7 +158,7 @@ static void full_memory_stats()
     size_t _process_heap = ::Memory.mem_usage();
     int _eco_strings = (int)g_pStringContainer->stat_economy();
     int _eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
-    Msg("* [ Render ]: textures[%d K]", (m_base + m_lmaps) / 1024);
+    Msg("* [ render ]: textures[%d K]", (m_base + m_lmaps) / 1024);
     Msg("* [ x-ray  ]: process heap[%u K]", _process_heap / 1024);
     Msg("* [ x-ray  ]: economy: strings[%d K], smem[%d K]", _eco_strings / 1024, _eco_smem);
 #ifdef FS_DEBUG
@@ -214,8 +213,7 @@ public:
         CCC_Token::Execute(args);
         StringTable().ReloadLanguage();
 
-        if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
-            MainMenu()->OnUIReset();
+        Device.seqUIReset.Process();
 
         if (!g_pGameLevel)
             return;
@@ -539,7 +537,7 @@ class CCC_SpawnToInventory : public IConsole_Command
 {
 public:
     CCC_SpawnToInventory(pcstr name) : IConsole_Command(name) {}
-    
+
     void Execute(pcstr args) override
     {
         if (!g_pGameLevel)
@@ -559,7 +557,7 @@ public:
 
         Level().spawn_item(args, Actor()->Position(), false, Actor()->ID());
     }
-    
+
     void Info(TInfo& I) override
     {
         xr_strcpy(I, "valid name of an item that can be spawned");
@@ -642,7 +640,7 @@ public:
 
         string_path S, S1;
         S[0] = 0;
-        strncpy_s(S, sizeof(S), args, _MAX_PATH - 1);
+        strncpy_s(S, sizeof(S), args, MAX_PATH - 1);
 
 #ifdef DEBUG
         CTimer timer;
@@ -710,7 +708,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         string_path saved_game;
-        strncpy_s(saved_game, sizeof(saved_game), args, _MAX_PATH - 1);
+        strncpy_s(saved_game, sizeof(saved_game), args, MAX_PATH - 1);
 
         if (!ai().get_alife())
         {
@@ -790,7 +788,7 @@ public:
         string_path saved_game = "";
         if (args)
         {
-            strncpy_s(saved_game, sizeof(saved_game), args, _MAX_PATH - 1);
+            strncpy_s(saved_game, sizeof(saved_game), args, MAX_PATH - 1);
         }
 
         if (*saved_game)
@@ -1080,11 +1078,22 @@ class CCC_DebugFonts : public IConsole_Command
 {
 public:
     CCC_DebugFonts(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+
+    ~CCC_DebugFonts()
+    {
+        xr_free(m_ui);
+    }
+
     virtual void Execute(LPCSTR args)
     {
-        // BUG: leak
-        (xr_new<CUIDebugFonts>())->ShowDialog(true);
+        if (!m_ui)
+            m_ui = xr_new<CUIDebugFonts>();
+
+        m_ui->ShowDialog(true);
     }
+
+private:
+    CUIDebugFonts* m_ui;
 };
 
 class CCC_DebugNode : public IConsole_Command
@@ -1479,7 +1488,7 @@ public:
         CCC_Token::Execute(args);
         UIStyles->SetupStyle(m_id);
     }
-    
+
     const xr_token* GetToken() noexcept override // may throw exceptions!
     {
         return UIStyles->GetToken().data();
@@ -1816,20 +1825,7 @@ public:
 
 class CCC_GSCheckForUpdates : public IConsole_Command
 {
-private:
-    CGameSpy_Patching::PatchCheckCallback m_resultCallbackBinded;
-    std::atomic<bool> m_checkInProgress = false;
     bool m_informNoPatch = true;
-
-    void ResultCallback(bool success, pcstr VersionName, pcstr URL)
-    {
-        auto mm = MainMenu();
-        if ((success || m_informNoPatch) && mm != nullptr)
-        {
-            mm->OnPatchCheck(success, VersionName, URL);
-        }
-        m_checkInProgress.store(false);
-    }
 
     void SetupCallParams(pcstr args)
     {
@@ -1845,7 +1841,6 @@ private:
 public:
     CCC_GSCheckForUpdates(LPCSTR N) : IConsole_Command(N)
     {
-        m_resultCallbackBinded.bind(this, &CCC_GSCheckForUpdates::ResultCallback);
         bEmptyArgsHandled = true;
     };
 
@@ -1855,13 +1850,12 @@ public:
         if (mm == nullptr)
             return;
 
-#ifdef XR_PLATFORM_WINDOWS
-        if (!m_checkInProgress.exchange(true))
+        SetupCallParams(arguments);
+
+        if (m_informNoPatch)
         {
-            SetupCallParams(arguments);
-            mm->GetGS()->GetGameSpyPatching()->CheckForPatch(true, m_resultCallbackBinded);
+            mm->OnPatchCheck(false);
         }
-#endif
     }
 };
 
@@ -1923,8 +1917,85 @@ public:
     }
 };
 
+class CCC_UI_Time_Dilation_Mode : public IConsole_Command
+{
+    UITimeDilator::UIMode mode;
+    bool isEnable;
+
+public:
+    CCC_UI_Time_Dilation_Mode(pcstr name, UITimeDilator::UIMode mode) : IConsole_Command(name), mode(mode) {};
+
+    void Execute(pcstr args) override
+    {
+        if (EQ(args, "on") || EQ(args, "1"))
+        {
+            TimeDilator()->SetModeEnability(mode, true);
+            isEnable = true;
+        }
+        else if (EQ(args, "off") || EQ(args, "0"))
+        {
+            TimeDilator()->SetModeEnability(mode, false);
+            isEnable = false;
+        }
+        else
+            InvalidSyntax();
+    }
+
+    void GetStatus(TStatus& status) override
+    {
+        xr_strcpy(status, isEnable ? "on" : "off");
+    }
+
+    void Info(TInfo& info) override
+    {
+        xr_strcpy(info, "'on/off' or '1/0'");
+    }
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "%s (current) [on/off]", isEnable ? "on" : "off");
+        tips.push_back(str);
+    }
+};
+
+class CCC_UI_Time_Factor : public IConsole_Command
+{
+    float uiTimeFactor = 1.0;
+
+public:
+    CCC_UI_Time_Factor(pcstr name) : IConsole_Command(name){};
+
+    void Execute(pcstr args) override
+    {
+        float time_factor = (float)atof(args);
+        clamp(time_factor, EPS, 1.f);
+        TimeDilator()->SetUiTimeFactor(time_factor);
+        uiTimeFactor = time_factor;
+    }
+
+    void Info(TInfo& info) override
+    {
+        xr_strcpy(info, "[0.001 - 1.0]");
+    }
+
+    void fill_tips(vecTips& tips, u32 mode) override
+    {
+        TStatus str;
+        xr_sprintf(str, sizeof(str), "%3.3f (current) [0.001 - 1.0]", uiTimeFactor);
+        tips.push_back(str);
+    }
+
+    void GetStatus(TStatus& status) override
+    {
+        xr_sprintf(status, sizeof(status), "%f", uiTimeFactor);
+    }
+};
+
 void CCC_RegisterCommands()
 {
+    ZoneScoped;
+
     // options
     g_OptConCom.Init();
 
@@ -2118,6 +2189,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD3(CCC_Mask, "g_loading_stages", &psActorFlags, AF_LOADING_STAGES);
     CMD3(CCC_Mask, "g_always_use_attitude_sensors", &psActorFlags, AF_ALWAYS_USE_ATTITUDE_SENSORS);
+    CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);
 
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
@@ -2382,5 +2454,9 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "dbg_load_pre_c5ef6c7_saves", &g_dbg_load_pre_c5ef6c7_saves, 0, 1); //Alundaio
 
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
+    CMD1(CCC_UI_Time_Factor, "ui_time_factor");
+    CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_inventory", UITimeDilator::Inventory);
+    CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_pda", UITimeDilator::Pda);
+
     register_mp_console_commands();
 }

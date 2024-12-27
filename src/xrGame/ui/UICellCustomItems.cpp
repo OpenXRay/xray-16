@@ -10,6 +10,8 @@
 
 namespace detail
 {
+static constexpr pcstr ICON_LAYER_FIELD = "icon_layer";
+
 struct is_helper_pred
 {
     bool operator()(CUICellItem* child) { return child->IsHelper(); }
@@ -30,6 +32,43 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 
     inherited::SetTextureRect(rect);
     inherited::SetStretchTexture(true);
+
+    //Alundaio; Layered icon
+    for (u8 i = 0; i < 255; ++i)
+    {
+        string32 layer_str;
+        xr_sprintf(layer_str, "%u%s", i, detail::ICON_LAYER_FIELD);
+        if (!pSettings->line_exist(itm->m_section_id, layer_str))
+            break;
+
+        cpcstr section = pSettings->r_string(itm->m_section_id, layer_str);
+        if (!section)
+            continue;
+
+        string32 temp;
+        const Fvector2 offset
+        {
+            pSettings->r_float(itm->m_section_id, strconcat(temp, layer_str, "_x")),
+            pSettings->r_float(itm->m_section_id, strconcat(temp, layer_str, "_y"))
+        };
+
+        cpcstr field_scale = strconcat(temp, layer_str, "_scale");
+        const float scale = pSettings->read_if_exists<float>(itm->m_section_id, field_scale, 1.0f);
+
+        //cpcstr field_color = strconcat(temp, layer_str, "_color");
+        //const u32 color = READ_IF_EXISTS(pSettings, r_color, itm->m_section_id, field_color, 0);
+
+        CreateLayer(section, offset, scale);
+    }
+    //-Alundaio
+}
+
+void CUIInventoryCellItem::OnAfterChild(CUIDragDropListEx* parent_list)
+{
+    for (SIconLayer* layer : m_layers)
+    {
+        layer->m_icon = InitLayer(layer->m_icon, layer->m_name, layer->offset, parent_list->GetVerticalPlacement(), layer->m_scale);
+    }
 }
 
 bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
@@ -61,11 +100,136 @@ bool CUIInventoryCellItem::IsHelperOrHasHelperChild()
 
 CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 {
-    return IsHelperOrHasHelperChild() ? NULL : inherited::CreateDragItem();
+    if (IsHelperOrHasHelperChild())
+        return nullptr;
+
+    CUIDragItem* i = inherited::CreateDragItem();
+
+    for (const SIconLayer* layer : m_layers)
+    {
+        CUIStatic* s = xr_new<CUIStatic>("Layer");
+        s->SetAutoDelete(true);
+        s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+        InitLayer(s, layer->m_name, layer->offset, false, layer->m_scale);
+        s->SetTextureColor(i->wnd()->GetTextureColor());
+        i->wnd()->AttachChild(s);
+    }
+
+    return i;
+}
+
+void CUIInventoryCellItem::SetTextureColor(u32 color)
+{
+    inherited::SetTextureColor(color);
+    for (const SIconLayer* layer : m_layers)
+    {
+        if (layer->m_icon)
+            layer->m_icon->SetTextureColor(color);
+    }
 }
 
 bool CUIInventoryCellItem::IsHelper() { return object()->is_helper_item(); }
 void CUIInventoryCellItem::SetIsHelper(bool is_helper) { object()->set_is_helper(is_helper); }
+
+//Alundaio
+void CUIInventoryCellItem::RemoveLayer(const SIconLayer* layer)
+{
+    for (auto it = m_layers.begin(); m_layers.end() != it; ++it)
+    {
+        if ((*it) == layer)
+        {
+            DetachChild((*it)->m_icon);
+            m_layers.erase(it);
+            break;
+        }
+    }
+}
+
+void CUIInventoryCellItem::CreateLayer(pcstr section, Fvector2 offset, float scale)
+{
+    SIconLayer* layer = xr_new<SIconLayer>();
+    layer->m_name = section;
+    layer->offset = offset;
+    //layer->m_color = color;
+    layer->m_scale = scale;
+    m_layers.push_back(layer);
+}
+
+CUIStatic* CUIInventoryCellItem::InitLayer(CUIStatic* s, pcstr section,
+    Fvector2 addon_offset, bool b_rotate, float scale)
+{
+    if (!s)
+    {
+        s = xr_new<CUIStatic>("Layer");
+        s->SetAutoDelete(true);
+        AttachChild(s);
+        s->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+        s->SetTextureColor(GetTextureColor());
+    }
+
+    Fvector2 base_scale;
+
+    if (Heading())
+    {
+        base_scale.x = (GetHeight() / (INV_GRID_WIDTHF * m_grid_size.x)) * scale;
+        base_scale.y = (GetWidth() / (INV_GRID_HEIGHTF * m_grid_size.y)) * scale;
+    }
+    else
+    {
+        base_scale.x = (GetWidth() / (INV_GRID_WIDTHF * m_grid_size.x)) * scale;
+        base_scale.y = (GetHeight() / (INV_GRID_HEIGHTF * m_grid_size.y)) * scale;
+    }
+    Fvector2 cell_size
+    {
+        pSettings->r_float(section, "inv_grid_width") * INV_GRID_WIDTHF,
+        pSettings->r_float(section, "inv_grid_height") * INV_GRID_HEIGHTF
+    };
+
+    Frect tex_rect
+    {
+        pSettings->r_float(section, "inv_grid_x") * INV_GRID_WIDTHF,
+        pSettings->r_float(section, "inv_grid_y") * INV_GRID_HEIGHTF
+    };
+
+    tex_rect.rb.add(tex_rect.lt, cell_size);
+
+    cell_size.mul(base_scale);
+
+    if (b_rotate)
+    {
+        s->SetWndSize(Fvector2{ cell_size.y, cell_size.x });
+
+        const Fvector2 new_offset
+        {
+            addon_offset.y * base_scale.x,
+            GetHeight() - addon_offset.x * base_scale.x - cell_size.x
+        };
+        addon_offset = new_offset;
+        addon_offset.x *= UICore::get_current_kx();
+    }
+    else
+    {
+        s->SetWndSize(cell_size);
+        addon_offset.mul(base_scale);
+    }
+
+    s->SetWndPos(addon_offset);
+    s->SetTextureRect(tex_rect);
+    s->SetStretchTexture(true);
+
+    s->EnableHeading(b_rotate);
+
+    if (b_rotate)
+    {
+        s->SetHeading(GetHeading());
+        const Fvector2 offs{ 0.0f, s->GetWndSize().y };
+        s->SetHeadingPivot(Fvector2{ 0.0f, 0.0f }, /*Fvector2{ 0.0f, 0.0f }*/offs, true);
+    }
+
+    return s;
+}
+//-Alundaio
+
 void CUIInventoryCellItem::Update()
 {
     inherited::Update();
@@ -83,6 +247,12 @@ void CUIInventoryCellItem::Update()
     }
 
     SetTextureColor(color);
+
+    for (SIconLayer* layer : m_layers)
+    {
+        layer->m_icon = InitLayer(layer->m_icon, layer->m_name, layer->offset, Heading(), layer->m_scale);
+        layer->m_icon->SetTextureColor(color);
+    }
 }
 
 void CUIInventoryCellItem::UpdateItemText()

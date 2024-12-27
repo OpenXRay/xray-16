@@ -7,7 +7,7 @@
 #include "xrEngine/xr_level_controller.h"
 #include "game_cl_base.h"
 #include "Include/xrRender/Kinematics.h"
-#include "xrEngine/GameMtlLib.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 #include "Level_Bullet_Manager.h"
 #include "ai_sounds.h"
 #include "game_cl_single.h"
@@ -886,7 +886,7 @@ bool CWeaponKnife::SelectBestHitVictim(
 #endif
 
     m_spartial_query_res.clear();
-    g_SpatialSpace->q_sphere(m_spartial_query_res, 0, STYPE_COLLIDEABLE, fendpos_dest, m_splash_radius);
+    g_pGamePersistent->SpatialSpace.q_sphere(m_spartial_query_res, 0, STYPE_COLLIDEABLE, fendpos_dest, m_splash_radius);
 
     if ((m_eHitType == m_eHitType_2) && (!m_spartial_query_res.empty()))
     {

@@ -34,6 +34,8 @@ public:
 
 BOOL xrRender_test_hw()
 {
+    ZoneScoped;
+
     const DX11TestHelper helper;
     if (!helper.Successful())
         return FALSE;

@@ -87,7 +87,7 @@ protected:
     };
 
     Flags16 m_flags;
-    BOOL m_can_trade;
+    bool m_can_trade{ true };
 
 public:
     CInventoryItem();
@@ -149,11 +149,12 @@ public:
     void SetWeight(float w) { m_weight = w; }
 
 public:
-    CInventory* m_pInventory;
+    CInventory* m_pInventory{};
     shared_str m_section_id;
     shared_str m_name;
     shared_str m_nameShort;
     shared_str m_nameComplex;
+    bool m_highlight_equipped;
 
     SInvItemPlace m_ItemCurrPlace;
 
@@ -188,7 +189,7 @@ public:
 protected:
     u32 m_cost;
     float m_weight;
-    float m_fCondition;
+    float m_fCondition{ 1.0f };
     shared_str m_Description;
 
 protected:
@@ -221,7 +222,7 @@ public:
     virtual void UpdateXForm();
 
 protected:
-    net_updateInvData* m_net_updateData;
+    net_updateInvData* m_net_updateData{};
     net_updateInvData* NetSync();
     void CalculateInterpolationParams();
 
@@ -285,11 +286,10 @@ public:
     IC bool has_any_upgrades() { return (m_upgrades.size() != 0); }
     bool has_upgrade(const shared_str& upgrade_id);
     bool has_upgrade_group(const shared_str& upgrade_group_id);
+    bool has_upgrade_group_by_upgrade_id(const shared_str& upgrade_id);
     void add_upgrade(const shared_str& upgrade_id, bool loading);
     bool get_upgrades_str(string2048& res) const;
-#ifdef GAME_OBJECT_EXTENDED_EXPORTS
     Upgrades_type get_upgrades() { return m_upgrades; } //Alundaio
-#endif
 
     bool equal_upgrades(Upgrades_type const& other_upgrades) const;
 
@@ -306,7 +306,7 @@ public:
     float interpolate_states(net_update_IItem const& first, net_update_IItem const& last, SPHNetState& current);
 
 protected:
-    virtual void net_Spawn_install_upgrades(Upgrades_type saved_upgrades);
+    virtual void net_Spawn_install_upgrades(CSE_Abstract* DC);
     virtual bool install_upgrade_impl(LPCSTR section, bool test);
 
     template <typename T>

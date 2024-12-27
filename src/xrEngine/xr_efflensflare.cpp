@@ -11,6 +11,7 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrCDB/Intersect.hpp"
 #include "Common/object_broker.h"
+#include "xrMaterialSystem/GameMtlLib.h"
 
 #ifdef _EDITOR
 #include "ui_toolscustom.h"
@@ -28,6 +29,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #define BLEND_INC_SPEED 8.0f
 #define BLEND_DEC_SPEED 4.0f
+
+extern ENGINE_API int ps_disable_lens_flare;
 
 //------------------------------------------------------------------------------
 void CLensFlareDescriptor::SetSource(float fRadius, bool ign_color, pcstr tex_name, pcstr sh_name)
@@ -209,8 +212,8 @@ struct STranspParam
     collide::ray_cache* pray_cache;
     float vis;
     float vis_threshold;
-    STranspParam(collide::ray_cache* p, const Fvector& _P, const Fvector& _D, float _f, float _vis_threshold)
-        : P(_P), D(_D), f(_f), pray_cache(p), vis(1.f), vis_threshold(_vis_threshold)
+    STranspParam(collide::ray_cache* cache, const Fvector& p, const Fvector& d, float fval, float _vis_threshold)
+        : P(p), D(d), f(fval), pray_cache(cache), vis(1.f), vis_threshold(_vis_threshold)
     {
     }
 };
@@ -223,12 +226,15 @@ IC bool material_callback(collide::rq_result& result, LPVOID params)
         vis = 0.f;
         IKinematics* K = PKinematics(result.O->GetRenderData().visual);
         if (K && (result.element > 0))
-            vis = g_pGamePersistent->MtlTransparent(K->LL_GetData(u16(result.element)).game_mtl_idx);
+        {
+            const auto& bone_data = K->LL_GetData(u16(result.element));
+            vis = GMLib.GetMaterialByIdx(bone_data.game_mtl_idx)->fVisTransparencyFactor;
+        }
     }
     else
     {
         CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + result.element;
-        vis = g_pGamePersistent->MtlTransparent(T->material);
+        vis = GMLib.GetMaterialByIdx(T->material)->fVisTransparencyFactor;
         if (fis_zero(vis))
         {
             Fvector* V = g_pGameLevel->ObjectSpace.GetStaticVerts();
@@ -288,6 +294,8 @@ void CLensFlare::OnFrame(const CEnvDescriptorMixer& currentEnv, float time_facto
     if (!g_pGameLevel)
         return;
 #endif
+    ZoneScoped;
+
     dwFrame = Device.dwFrame;
 
     R_ASSERT(_valid(currentEnv.sun_dir));
@@ -531,6 +539,10 @@ blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
 
 void CLensFlare::Render(bool bSun, bool bFlares, bool bGradient)
 {
+    if (ps_disable_lens_flare)
+    {
+        bFlares = false;
+    }
     if (!bRender)
         return;
     if (!m_Current)

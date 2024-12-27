@@ -17,9 +17,7 @@ struct SEnumVerticesCallback;
 struct Fbox3;
 using Fbox = Fbox3;
 
-template <class T>
-struct _obb;
-typedef _obb<float> Fobb;
+struct Fobb;
 
 // 100 ms = 10 fps
 #define UCalc_Interval (u32(100))

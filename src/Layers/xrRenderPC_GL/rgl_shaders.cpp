@@ -88,6 +88,11 @@ class shader_options_holder
     string512 m_options[128];
 
 public:
+    void add(cpcstr string)
+    {
+        strconcat(m_options[pos++], string, "\n");
+    }
+
     void add(cpcstr name, cpcstr value)
     {
         // It's important to have postfix increment!
@@ -108,14 +113,8 @@ class shader_sources_manager
     pcstr* m_sources{};
     size_t m_sources_lines{};
     xr_vector<pstr> m_source, m_includes;
-    string512 m_name_comment;
 
 public:
-    explicit shader_sources_manager(cpcstr name)
-    {
-        strconcat(m_name_comment, "// ", name, "\n");
-    }
-
     ~shader_sources_manager()
     {
         // Free string resources
@@ -128,15 +127,6 @@ public:
 
     [[nodiscard]] auto get() const { return m_sources; }
     [[nodiscard]] auto length() const { return m_sources_lines; }
-
-    [[nodiscard]] static constexpr bool optimized()
-    {
-#ifdef DEBUG
-        return false;
-#else
-        return true;
-#endif
-    }
 
     void compile(IReader* file, shader_options_holder& options)
     {
@@ -171,7 +161,7 @@ private:
             *str = '\0'; // Terminate filename path
 
             // Create path to included shader
-            strconcat(sizeof(path), path, GEnv.Render->getShaderPath(), fn);
+            strconcat(path, RImplementation.getShaderPath(), fn);
             FS.update_path(path, _game_shaders_, path);
             while (cpstr sep = strchr(path, '/'))
                 *sep = '\\';
@@ -191,22 +181,15 @@ private:
     void apply_options(shader_options_holder& options)
     {
         // Compile sources list
-        const size_t head_lines = 2; // "#version" line + name_comment line
-        m_sources_lines = m_source.size() + options.size() + head_lines;
+        m_sources_lines = m_source.size() + options.size();
         m_sources = xr_alloc<pcstr>(m_sources_lines);
-#ifdef DEBUG
-        m_sources[0] = "#version 410\n#pragma optimize (off)\n";
-#else
-        m_sources[0] = "#version 410\n";
-#endif
-        m_sources[1] = m_name_comment;
 
         // Make define lines
         for (size_t i = 0; i < options.size(); ++i)
         {
-            m_sources[head_lines + i] = options[i];
+            m_sources[i] = options[i];
         }
-        CopyMemory(m_sources + head_lines + options.size(), m_source.data(), m_source.size() * sizeof(pstr));
+        CopyMemory(m_sources + options.size(), m_source.data(), m_source.size() * sizeof(pstr));
     }
 };
 
@@ -217,11 +200,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     shader_name_holder sh_name;
 
     // Don't move these variables to lower scope!
+    string64 c_name;
     string32 c_smapsize;
     string32 c_gloss;
     string32 c_sun_shafts;
     string32 c_ssao;
     string32 c_sun_quality;
+    string32 c_isample;
     string32 c_water_reflection;
 
     // TODO: OGL: Implement these parameters.
@@ -236,6 +221,20 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
         sh_name.append(option);
     };
+
+    options.add("#version 410");
+    options.add("#extension GL_ARB_separate_shader_objects : enable");
+
+#ifdef DEBUG
+    options.add("#pragma optimize (off)");
+    sh_name.append(0u);
+#else
+    options.add("#pragma optimize (on)");
+    sh_name.append(1u);
+#endif
+
+    xr_sprintf(c_name, "// %s.%s", name, pTarget);
+    options.add(c_name);
 
     // Shadow map size
     {
@@ -436,17 +435,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             appendShaderOption(o.msaa_samples, "MSAA_SAMPLES", samples);
         }
 
-        {
-            static char def[2];
-            if (m_MSAASample < 0)
-                def[0] = '0';
-            else
-                def[0] = '0' + char(m_MSAASample);
-
-            def[1] = 0;
-            options.add("ISAMPLE", def);
-            sh_name.append(static_cast<u32>(0));
-        }
+        xr_sprintf(c_isample, "uint(%d)", m_MSAASample);
+        options.add("ISAMPLE", c_isample);
+        sh_name.append(static_cast<u32>(0));
 
         appendShaderOption(o.msaa_opt, "MSAA_OPTIMIZATION", "1");
 
@@ -490,9 +481,6 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         sh_name.append(static_cast<u32>(0)); // DX10_1_NATIVE off
     }
 
-    // Don't mix optimized and unoptimized shaders
-    sh_name.append(static_cast<u32>(shader_sources_manager::optimized()));
-
     // finish
     options.finish();
     sh_name.finish();
@@ -503,21 +491,21 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     u32 fileCrc = 0;
     string_path filename, full_path{};
     strconcat(sizeof(filename), filename, "gl" DELIMITER, name, ".", extension, DELIMITER, sh_name.c_str());
-    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported)
+    if (GLAD_GL_ARB_get_program_binary && GLAD_GL_ARB_separate_shader_objects)
     {
         string_path file;
         strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename);
         FS.update_path(full_path, "$app_data_root$", file);
 
         string_path shadersFolder;
-        FS.update_path(shadersFolder, "$game_shaders$", GEnv.Render->getShaderPath());
+        FS.update_path(shadersFolder, "$game_shaders$", RImplementation.getShaderPath());
 
         getFileCrc32(fs, shadersFolder, fileCrc);
         fs->seek(0);
     }
 
     GLuint program = 0;
-    if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && FS.exist(full_path))
+    if (GLAD_GL_ARB_get_program_binary && GLAD_GL_ARB_separate_shader_objects && FS.exist(full_path))
     {
         IReader* file = FS.r_open(full_path);
         if (file->length() > 8)
@@ -558,13 +546,13 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         Log("- Compile shader:", filename);
 #endif
         // Compile sources list
-        shader_sources_manager sources(name);
+        shader_sources_manager sources;
         sources.compile(fs, options);
 
         // Compile the shader from sources
         program = create_shader(pTarget, sources.get(), sources.length(), filename, result, nullptr);
 
-        if (HW.ShaderBinarySupported && HW.SeparateShaderObjectsSupported && program)
+        if (GLAD_GL_ARB_get_program_binary && GLAD_GL_ARB_separate_shader_objects && program)
         {
             GLint binaryLength{};
             GLenum binaryFormat{};

@@ -119,7 +119,7 @@ void game_cl_Deathmatch::OnBuyMenu_DefaultItems()
     //---------------------------------------------------------
     /*	auto It = PlayerDefItems.begin();
 	auto Et = PlayerDefItems.end();
-	for ( ; It != Et; ++It) 
+	for ( ; It != Et; ++It)
 	{
 		s16	ItemID = (*It);
 

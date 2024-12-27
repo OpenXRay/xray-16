@@ -12,6 +12,7 @@ void R_sync_point::Destroy() {}
 
 bool R_sync_point::Wait(u32 /*wait_sleep*/, u64 timeout)
 {
+    ZoneScoped;
     CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
 
     const auto status = glClientWaitSync((GLsync)q_sync_point[q_sync_count],
@@ -43,7 +44,7 @@ void R_sync_point::End()
     q_sync_count = (q_sync_count + 1) % HW.Caps.iGPUNum;
     CHK_GL(glDeleteSync((GLsync)q_sync_point[q_sync_count]));
 }
-#elif defined(USE_DX9) || defined(USE_DX11)
+#elif defined(USE_DX11)
 void R_sync_point::Create()
 {
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
@@ -60,6 +61,7 @@ void R_sync_point::Destroy()
 
 bool R_sync_point::Wait(u32 wait_sleep, u64 timeout)
 {
+    ZoneScoped;
     CTimer T;
     T.Start();
     BOOL result = FALSE;

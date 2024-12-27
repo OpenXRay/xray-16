@@ -3,6 +3,8 @@
 
 void light::gi_generate()
 {
+    ZoneScoped;
+
     indirect.clear();
     indirect_photons = ps_r2_ls_flags.test(R2FLAG_GI) ? ps_r2_GI_photons : 0;
 
@@ -13,7 +15,7 @@ void light::gi_generate()
     const CDB::MODEL* model = g_pGameLevel->ObjectSpace.GetStaticModel();
     const CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     const Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
-    
+
     const u32 photons_count = indirect_photons * 8;
 
     indirect.reserve(photons_count);

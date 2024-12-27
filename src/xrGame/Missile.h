@@ -65,6 +65,7 @@ protected:
     //время нахождения в текущем состоянии
     u32 m_dwStateTime;
     bool m_throw;
+    bool m_motion_marks_available{ true };
 
     //время уничтожения
     u32 m_dwDestroyTime;

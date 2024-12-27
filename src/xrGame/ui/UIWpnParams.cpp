@@ -69,10 +69,10 @@ bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
     m_icon_han = UIHelper::CreateStatic(xml_doc, "wpn_params:static_handling", this, false);
     m_icon_rpm = UIHelper::CreateStatic(xml_doc, "wpn_params:static_rpm", this, false);
 
-    CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_accuracy", 0, &m_textAccuracy);
-    CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_damage", 0, &m_textDamage);
-    CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_handling", 0, &m_textHandling);
-    CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_rpm", 0, &m_textRPM);
+    CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_accuracy", 0, &m_textAccuracy);
+    CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_damage", 0, &m_textDamage);
+    CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_handling", 0, &m_textHandling);
+    CUIXmlInit::InitStatic(xml_doc, "wpn_params:cap_rpm", 0, &m_textRPM);
 
     m_progressAccuracy.InitFromXml(xml_doc, "wpn_params:progress_accuracy");
     m_progressDamage.InitFromXml(xml_doc, "wpn_params:progress_damage");
@@ -82,10 +82,10 @@ bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
     if (IsGameTypeSingle())
     {
         m_stAmmo = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo", this, false);
-        m_textAmmoCount = UIHelper::CreateTextWnd(xml_doc, "wpn_params:cap_ammo_count", this, false);
-        m_textAmmoCount2 = UIHelper::CreateTextWnd(xml_doc, "wpn_params:cap_ammo_count2", this, false);
-        m_textAmmoTypes = UIHelper::CreateTextWnd(xml_doc, "wpn_params:cap_ammo_types", this, false);
-        m_textAmmoUsedType = UIHelper::CreateTextWnd(xml_doc, "wpn_params:cap_ammo_used_type", this, false);
+        m_textAmmoCount = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_ammo_count", this, false);
+        m_textAmmoCount2 = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_ammo_count2", this, false);
+        m_textAmmoTypes = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_ammo_types", this, false);
+        m_textAmmoUsedType = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_ammo_used_type", this, false);
         m_stAmmoType1 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type1", this, false);
         m_stAmmoType2 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type2", this, false);
     }
@@ -232,6 +232,13 @@ bool CUIWpnParams::Check(const shared_str& wpn_section)
 {
     if (pSettings->line_exist(wpn_section, "fire_dispersion_base"))
     {
+        //Alundaio: Most likely a fake weapon or melee weapon
+        if (pSettings->line_exist(wpn_section, "ammo_mag_size"))
+            if (pSettings->r_u32(wpn_section, "ammo_mag_size") == 0)
+                return false;
+
+		if (0 == xr_strcmp(pSettings->r_string(wpn_section,"class"), "WP_KNIFE"))
+			return false;
         if (0 == xr_strcmp(wpn_section, "wpn_addon_silencer"))
             return false;
         if (0 == xr_strcmp(wpn_section, "wpn_binoc"))

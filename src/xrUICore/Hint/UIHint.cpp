@@ -31,10 +31,10 @@ void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
     m_background->SetAutoDelete(true);
     CUIXmlInitBase::InitFrameWindow(xml, "background", 0, m_background);
 
-    m_text = xr_new<CUITextWnd>();
+    m_text = xr_new<CUIStatic>("Text");
     AttachChild(m_text);
     m_text->SetAutoDelete(true);
-    CUIXmlInitBase::InitTextWnd(xml, "text", 0, m_text);
+    CUIXmlInitBase::InitStatic(xml, "text", 0, m_text);
 
     m_border = xml.ReadAttribFlt("background", 0, "border", 0.0f);
 
@@ -112,7 +112,7 @@ void UIHintWindow::update_hint_text()
     {
         return;
     }
-    if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + m_hint_delay))
+    if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + m_hint_delay * Device.time_factor()))
     {
         return;
     }

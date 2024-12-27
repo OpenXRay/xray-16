@@ -41,7 +41,7 @@ namespace XRay.SdkControls
             }
         }
 
-        // ICollection<IntegerUpDownAcceleration> implementation. 
+        // ICollection<IntegerUpDownAcceleration> implementation.
 
         /// <summary>
         ///     Adds an item (IntegerUpDownAcceleration object) to the ICollection.

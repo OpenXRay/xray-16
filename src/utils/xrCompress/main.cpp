@@ -8,7 +8,7 @@ int __cdecl main(int argc, char* argv[])
     cpcstr params = GetCommandLine();
 
     xrDebug::Initialize(params);
-    Core.Initialize("xrCompress", nullptr, nullptr, false);
+    Core.Initialize("xrCompress", nullptr, false);
     printf("\n\n");
 
 

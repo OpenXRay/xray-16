@@ -96,8 +96,10 @@ BOOL CDetailManager::cache_Validate()
     return TRUE;
 }
 
-void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view, int limit)
+void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
 {
+    ZoneScoped;
+
     bool bNeedMegaUpdate = (cache_cx != v_x) || (cache_cz != v_z);
     // ***** Cache shift
     while (cache_cx != v_x)
@@ -164,47 +166,65 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view, int limit)
     }
 
     // Task performer
-    BOOL bFullUnpack = FALSE;
-    if (cache_task.size() == dm_cache_size)
+    if (cache_task.size() == dm_cache_size) // full unpack, first time
     {
-        limit = dm_cache_size;
-        bFullUnpack = TRUE;
-    }
-
-    for (int iteration = 0; cache_task.size() && (iteration < limit); iteration++)
-    {
-        u32 best_id = 0;
-        float best_dist = flt_max;
-
-        if (bFullUnpack)
+        while (!cache_task.empty())
         {
-            best_id = cache_task.size() - 1;
+            // Decompress and remove task
+            const u32 bestId = cache_task.size() - 1;
+            cache_Decompress(cache_task[bestId]);
+            cache_task.erase(bestId);
         }
-        else
+    }
+    else
+    {
+        const u32 invalidIndex = u32(-1);
+        u32 bestIndexes[dm_max_decompress];
+        std::fill_n(bestIndexes, dm_max_decompress, invalidIndex);
+
+        float bestDistances[dm_max_decompress];
+        std::fill_n(bestDistances, dm_max_decompress, flt_max);
+
+        auto bestDistancesBegin = std::begin(bestDistances);
+        auto bestDistancesEnd = std::end(bestDistances);
+        ptrdiff_t maxIdx = 0;
+
+        for (u32 i = 0, size = cache_task.size(); i < size; ++i)
         {
-            for (u32 entry = 0; entry < cache_task.size(); entry++)
+            // Gain access to data
+            Slot* S = cache_task[i];
+            VERIFY(stPending == S->type);
+
+            // Estimate
+            Fvector C;
+            S->vis.box.getcenter(C);
+            float D = view.distance_to_sqr(C);
+
+            // Select
+            if (D < bestDistances[maxIdx])
             {
-                // Gain access to data
-                Slot* S = cache_task[entry];
-                VERIFY(stPending == S->type);
+                bestDistances[maxIdx] = D;
+                bestIndexes[maxIdx] = i;
 
-                // Estimate
-                Fvector C;
-                S->vis.box.getcenter(C);
-                float D = view.distance_to_sqr(C);
-
-                // Select
-                if (D < best_dist)
-                {
-                    best_dist = D;
-                    best_id = entry;
-                }
+                const auto maxIt = std::max_element(bestDistancesBegin, bestDistancesEnd);
+                maxIdx = std::distance(bestDistancesBegin, maxIt);
             }
         }
 
-        // Decompress and remove task
-        cache_Decompress(cache_task[best_id]);
-        cache_task.erase(best_id);
+        // Because indexes become invalid after an erase, sort them and process in the reverse order to erase everything correctly
+        std::sort(bestIndexes, bestIndexes + dm_max_decompress);
+
+        for (int i = dm_max_decompress - 1; i >= 0; --i)
+        {
+            const u32 bestId = bestIndexes[i];
+
+            if (bestId != invalidIndex)
+            {
+                // Decompress and remove task
+                cache_Decompress(cache_task[bestId]);
+                cache_task.erase(bestId);
+            }
+        }
     }
 
     if (bNeedMegaUpdate)

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <DirectXTex.h>
+
 static void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
@@ -132,11 +134,6 @@ void CRenderTarget::build_textures()
         R_CHK(HW.pDevice->CreateTexture3D(&desc, &subData, &t_material_surf));
         t_material = RImplementation.Resources->_CreateTexture(r2_material);
         t_material->surface_set(t_material_surf);
-
-        // #ifdef DEBUG
-        // R_CHK	(D3DXSaveTextureToFile	("x:" DELIMITER "r2_material.dds",D3DXIFF_DDS,t_material_surf,0));
-        // #endif
-
         _RELEASE(t_material_surf);
     }
 
@@ -252,17 +249,27 @@ void CRenderTarget::build_textures()
         //	Create noise mipped
         {
             //	Autogen mipmaps
-            desc.MipLevels = 0;
             ID3DTexture2D* t_noise_surf_mipped{};
-            R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_noise_surf_mipped));
-            t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
-            t_noise_mipped->surface_set(t_noise_surf_mipped);
+            DirectX::ScratchImage mippedNoise;
+            DirectX::Image img
+            {
+                /*.width      =*/ TEX_jitter,
+                /*.height     =*/ TEX_jitter,
+                /*.format     =*/ desc.Format,
+                /*.rowPitch   =*/ desc.Width * sampleSize,
+                /*.slicePitch =*/ 0,
+                /*.pixels     =*/ (uint8_t*)tempData[0],
+            };
 
             //	Update texture. Generate mips.
+            // WIC produces bad texture, non-WIC gives 100% identical texture as from D3DX11FilterTexture
+            GenerateMipMaps(img, DirectX::TEX_FILTER_POINT | DirectX::TEX_FILTER_FORCE_NON_WIC, 0, mippedNoise);
 
-            HW.get_context(CHW::IMM_CTX_ID)->CopySubresourceRegion(t_noise_surf_mipped, 0, 0, 0, 0, t_noise_surf[0], 0, 0); // TODO: id
+            R_CHK(CreateTexture(HW.pDevice, mippedNoise.GetImages(), mippedNoise.GetImageCount(),
+                mippedNoise.GetMetadata(), (ID3D11Resource**)&t_noise_surf_mipped));
 
-            D3DX11FilterTexture(HW.get_context(CHW::IMM_CTX_ID), t_noise_surf_mipped, 0, D3DX11_FILTER_POINT); // TODO: id
+            t_noise_mipped = RImplementation.Resources->_CreateTexture(r2_jitter_mipped);
+            t_noise_mipped->surface_set(t_noise_surf_mipped);
             _RELEASE(t_noise_surf_mipped);
         }
         for (size_t it2 = 0; it2 < TEX_jitter_count; ++it2)

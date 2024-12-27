@@ -7,7 +7,6 @@ class player_account
 {
 public:
     player_account();
-    ~player_account();
 
     shared_str const& name() const { return m_player_name; };
     shared_str const& clan_name() const { return m_clan_name; };
@@ -18,7 +17,6 @@ public:
     static void skip_Import(NET_Packet& P);
     void load_account();
     bool is_online() const { return m_online_account; };
-    gamespy_profile::all_awards_t const& get_awards() const { return m_awards; };
     void set_player_name(char const* new_name);
 
 protected:
@@ -27,8 +25,6 @@ protected:
     u32 m_profile_id;
     bool m_clan_leader;
     bool m_online_account;
-
-    gamespy_profile::all_awards_t m_awards;
 }; // class player_account
 
 #endif //#ifndef PLAYER_ACCOUNT_H

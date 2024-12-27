@@ -18,9 +18,6 @@
 
 // client entities includes
 #ifndef NO_XR_GAME
-#include "xrEngine/std_classes.h"
-#include "Level.h"
-#include "GamePersistent.h"
 #include "Actor.h"
 #include "Spectator.h"
 
@@ -154,6 +151,7 @@
 #include "BreakableObject.h"
 #include "PhysicsSkeletonObject.h"
 #include "DestroyablePhysicsObject.h"
+#include "HolderEntityObject.h"
 
 #include "game_sv_single.h"
 #include "game_sv_deathmatch.h"
@@ -189,10 +187,9 @@
 
 void CObjectFactory::register_classes()
 {
+    ZoneScoped;
+
 #ifndef NO_XR_GAME
-    // client entities
-    add<CLevel>(CLSID_GAME_LEVEL, "level");
-    add<CGamePersistent>(CLSID_GAME_PERSISTANT, "game");
     // Server Game type
     add<game_sv_Single>(CLSID_SV_GAME_SINGLE, "game_sv_single");
     add<game_sv_Deathmatch>(CLSID_SV_GAME_DEATHMATCH, "game_sv_deathmatch");
@@ -399,6 +396,7 @@ void CObjectFactory::register_classes()
     ADD(CClimableObject, CSE_ALifeObjectClimable, CLSID_OBJECT_CLIMABLE, "obj_climable");
     ADD(CPhysicsSkeletonObject, CSE_ALifePHSkeletonObject, CLSID_PH_SKELETON_OBJECT, "obj_phskeleton");
     ADD(CDestroyablePhysicsObject, CSE_ALifeObjectPhysic, CLSID_PHYSICS_DESTROYABLE, "obj_phys_destroyable");
+    ADD(CHolderEntityObject, CSE_ALifeDynamicObjectVisual, CLSID_OBJECT_HOLDER_ENT, "obj_holder_ent");
 
     ADD(CInventoryBox, CSE_ALifeInventoryBox, CLSID_INVENTORY_BOX, "inventory_box");
     ADD(smart_cover::object, CSE_SmartCover, TEXT2CLSID("SMRTCOVR"), "smart_cover");

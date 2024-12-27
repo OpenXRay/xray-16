@@ -1,0 +1,158 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 18
+ * @ Description: Rain patch normal
+ * @ Modified time: 2023-10-09 07:25
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "common.h"
+#include "lmodel.h"
+#include "shadow.h"
+
+#include "screenspace_common_ripples.h"
+
+uniform float4 ssfx_wetsurfaces_1; // Ripples [ Size, Speed, Min Speed, Int ]
+uniform float4 ssfx_wetsurfaces_2; // FallWater [ Size, Speed, Min Speed, Int ]
+
+Texture2D	s_water;
+Texture2D	s_waterFall;
+
+float4 RainFallof;
+
+float3	GetWaterFall( Texture2D s_texture, float2 tc)
+{
+	// 0.75 1.5 0.2 0.5
+
+	// Num of columns
+	float col_num = 50;
+	float col_scale = 1.0 / col_num;
+
+	// Original UV Coors
+	float2 tc_ori = tc * ssfx_wetsurfaces_2.x;
+
+	// UV Columns
+	float2 col_tc = float2(frac(tc_ori.x * col_num), tc_ori.y);
+
+	// Column ID to add a random offset and adjust horizontal offset
+	half col_id = ceil(tc_ori.x * col_num);
+
+	// Random Y-Offset for each column
+	float col_offset = hash22(float2(col_id, 1.0));
+
+	// Limit min speed
+	col_offset = (col_offset < ssfx_wetsurfaces_2.z ? col_offset * 3.0f : col_offset);
+
+	// Animate
+	col_offset += timers.x * col_offset * ssfx_wetsurfaces_2.y;
+
+	// Add wabbly
+	//col_tc.x += sin((tc_ori.y + col_offset) * 20) * 0.5f + 0.5f;
+
+	// Base Bump. Columns UVs, scale and apply offset.
+	float3 water = s_texture.Sample(smp_base, (col_tc * float2(col_scale, 1.0f) + float2(col_scale * col_id, col_offset)));
+
+	// Bump to -1.0 ~ 1.0
+	water.xyz = water.xzy * 2.0f - 1.0f;
+
+	// Intensity
+	water.xyz *= ssfx_wetsurfaces_2.w * clamp(rain_params.x, 0.1f, 1.f);
+
+	return water.xyz;
+}
+
+#ifndef ISAMPLE
+	#define ISAMPLE 0
+#endif
+
+#ifdef MSAA_OPTIMIZATION
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, float4 pos2d : SV_Position, uint iSample : SV_SAMPLEINDEX  ) : SV_Target
+#else
+float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLOR, float4 pos2d : SV_Position ) : SV_Target
+#endif
+{
+
+#ifdef MSAA_OPTIMIZATION
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
+#else
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+#endif
+
+	// Buffers
+	float4 _P = float4( gbd.P, 1.0 );
+	float3 _N = normalize(gbd.N.xyz);
+	float3 _D = gbd.C;
+	float _M = gbd.mtl;
+
+	float4 PS = mul( m_shadow,  _P );
+	float3 WorldP = mul( m_sunmask, _P );
+	float3 WorldN = mul( m_sunmask, _N.xyz );
+
+	// Read rain projection with some jetter. Also adding pixel normal 
+	// factor to jitter to make rain strips more realistic.
+	float Cover = shadow_rain( PS, WorldP.xz - WorldN.xz );  // Wet Surfaces fix by Diana.Petran
+
+	// Distance
+	float p_len = length( _P.xyz );
+	bool is_flora = abs(_M - 0.15) < 0.04f;
+	bool is_terrain = abs(_M - 0.95) < 0.04f;
+	
+	// Rain parameters ( Wetness > 0.5 = 100% | Rain Intensity > 0.66 = 100% )
+	float Wetness = saturate(rain_params.y * 2.0f);
+	float RainInt = clamp(rain_params.x * ssfx_wetsurfaces_1.y, ssfx_wetsurfaces_1.z * (rain_params.x > 0), 2.0f); // 1.5
+	
+	// [ BUMP ] -------------------------------------------
+	float3 waterSplash = 0;
+	waterSplash.xy = ssfx_rain_ripples( s_water, WorldP.xz * ssfx_wetsurfaces_1.x, float3(RainInt, ssfx_wetsurfaces_1.w, 6), _P.z); // 0.9
+
+	// Blending weights ( We don't want splashes or fall water on FLORA )
+	float3 weights = WorldN.xyz * !is_flora;
+
+	// Water Fall
+	float3 waterFallX = GetWaterFall( s_waterFall, WorldP.zy );
+	float3 waterFallZ = GetWaterFall( s_waterFall, WorldP.xy );
+
+	// Base bump - Splahes
+	float3 water = waterSplash * smoothstep(0.75f, 0.8f, weights.y);
+
+	// Adjust Water fall and add to the Normal
+	weights.xz = saturate(abs(weights.xz) - 0.15f);
+
+	weights.xz *= float2(weights.x > weights.z, weights.x < weights.z);
+
+	water += waterFallX.yxz * weights.x;
+	water += waterFallZ.zxy * weights.z;
+
+	// HUD attenuations ( Remove Terrain & Flora )
+	float HUD_Attenuation = smoothstep( 1.0f, 1.3f, p_len + (is_terrain * 1.3f) ) * !is_flora;
+
+	// Apply attenuations
+	water *= HUD_Attenuation * saturate(RainInt) * Cover;
+
+	// Convert normal to view space
+	water = mul( m_V, water );
+
+	// Add water normal
+	_N = normalize(_N + water.xyz);
+
+
+	// [ GLOSS ] ------------------------------------------
+	float Gloss = (0.15f + saturate(RainInt) * 0.05) * Wetness; // Wetness
+
+	// Fade to full cover. ( RainFallof.y = far shadow rain rendering )
+	Cover += smoothstep( RainFallof.y - 20, RainFallof.y, _P.z );
+
+	// If gloss is high, remove cover factor
+	Gloss *= HUD_Attenuation * saturate(Cover + (gbd.gloss > 0.3f));
+
+	// Limit gloss on terrain ( Puddles )
+	Gloss = (is_terrain && gbd.gloss > 0.3f) ? 0.15f : Gloss;
+
+	// Remove rain gloss from bottom surfaces
+	Gloss *= saturate(weights.y * 1.5f);
+
+	//	Apply distance falloff
+	Gloss *= smoothstep( 250, 200, p_len );
+
+	return float4( _N.xyz, Gloss );
+}

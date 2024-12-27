@@ -1,4 +1,14 @@
+// File:        UI3tButton.cpp
+// Description: Button with 3 texutres (for <enabled>, <disabled> and <touched> states)
+// Created:     07.12.2004
+// Author:      Serhiy 0. Vynnychenk0
+// Mail:        narrator@gsc-game.kiev.ua
+//
+// copyright 2004 GSC Game World
+//
+
 #pragma once
+
 #include "xrUICore/Buttons/UIButton.h"
 #include "xrUICore/InteractiveBackground/UI_IB_Static.h"
 #include "xrSound/Sound.h"
@@ -10,7 +20,6 @@ class XRUICORE_API CUI3tButton : public CUIButton
     //.	using CUIButton::SetTextColor;
 public:
     CUI3tButton();
-    virtual ~CUI3tButton();
     // appearance
 
     virtual void InitButton(Fvector2 pos, Fvector2 size);
@@ -26,13 +35,10 @@ public:
 
     virtual void OnClick();
     virtual void OnFocusReceive();
-    virtual void OnFocusLost();
 
     virtual void DrawTexture();
     virtual void Update();
     virtual void Draw();
-
-    virtual bool OnMouseDown(int mouse_btn);
 
     pcstr GetDebugType() override { return "CUI3tButton"; }
 

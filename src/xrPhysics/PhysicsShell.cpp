@@ -290,7 +290,7 @@ void phys_shell_verify_object_model(IPhysicsShellHolder& O)
 
     // IKinematics		*K = V->dcast_PKinematics();
 
-    IKinematics* K = O.ObjectKinematics();
+    [[maybe_unused]] IKinematics* K = O.ObjectKinematics();
 
     VERIFY2(K, make_string("Can not create physics shell for object %s, model %s is not skeleton", O.ObjectName(),
                    O.ObjectNameVisual()));

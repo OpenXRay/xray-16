@@ -6,10 +6,9 @@
 #pragma once
 
 #include "xrEngine/Engine.h"
-#include "xrCore/ModuleLookup.hpp"
 #include "xrCore/clsid.h"
 
-#include <memory>
+class IGame_Persistent;
 
 class XR_NOVTABLE IFactoryObject
 {
@@ -39,55 +38,47 @@ using Factory_Create = IFactoryObject* __cdecl(CLASS_ID CLS_ID);
 using Factory_Destroy = void __cdecl(IFactoryObject* O);
 }
 
+class XR_NOVTABLE GameModule
+{
+public:
+    virtual ~GameModule() = default;
+    virtual void initialize(Factory_Create*& pCreate, Factory_Destroy*& pDestroy) = 0;
+    virtual void finalize() = 0;
+    virtual IGame_Persistent* create_persistent() = 0;
+    virtual void destroy_persistent(IGame_Persistent*& persistent) = 0;
+};
+
 class XR_NOVTABLE RendererModule
 {
 public:
     virtual ~RendererModule() = default;
-    virtual const xr_vector<pcstr>& ObtainSupportedModes() = 0;
+    virtual const xr_vector<std::pair<pcstr, int>>& ObtainSupportedModes() = 0;
+    virtual bool CheckGameRequirements() = 0;
     virtual void SetupEnv(pcstr mode) = 0;
+    virtual void ClearEnv() = 0;
 };
 
 class ENGINE_API CEngineAPI
 {
-    using InitializeGameLibraryProc = void(*)();
-    using FinalizeGameLibraryProc = void(*)();
-
-    using GetRendererModule = RendererModule*(*)();
-
-    struct RendererDesc
-    {
-        pcstr libraryName;
-        XRay::Module handle;
-        RendererModule* module;
-    };
-
-    xr_vector<RendererDesc> renderers;
     xr_map<shared_str, RendererModule*> renderModes;
 
+    GameModule* gameModule{};
     RendererModule* selectedRenderer{};
 
-    XRay::Module hGame;
-
-    InitializeGameLibraryProc pInitializeGame{};
-    FinalizeGameLibraryProc pFinalizeGame{};
+    void SelectRenderer();
+    void CloseUnusedLibraries() const;
 
 public:
     Factory_Create*  pCreate;
     Factory_Destroy* pDestroy;
 
-    void Initialize();
-
-    void InitializeRenderers();
-    pcstr SelectRenderer();
-    void CloseUnusedLibraries();
-
-    void Destroy();
-
-    void CreateRendererList();
-    bool CanSkipGameModuleLoading() const { return !!strstr(Core.Params, "-nogame"); }
-
+public:
     CEngineAPI();
     ~CEngineAPI();
+
+    void CreateRendererList(); // Better to call it in the main thread
+    void Initialize(GameModule* game);
+    void Destroy();
 };
 
 ENGINE_API bool is_enough_address_space_available();

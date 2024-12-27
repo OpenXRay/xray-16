@@ -10,7 +10,6 @@
 #include "UIMapInfo.h"
 #include "xrUICore/ComboBox/UIComboBox.h"
 #include "UIMapList.h"
-#include "UIVersionList.h"
 #include "ScriptXMLInit.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -105,6 +104,7 @@ SCRIPT_EXPORT(SServerFilters, (),
             .def_readwrite("with_pass", &SServerFilters::with_pass)
             .def_readwrite("without_pass", &SServerFilters::without_pass)
             .def_readwrite("without_ff", &SServerFilters::without_ff)
+            .def_readwrite("with_battleye", &SServerFilters::with_battleye)
             .def_readwrite("listen_servers", &SServerFilters::listen_servers)
     ];
 });
@@ -169,21 +169,6 @@ SCRIPT_EXPORT(CUIMapList, (CUIWindow),
             .def("SetMapInfo", &CUIMapList::SetMapInfo)
             .def("ClearList", &CUIMapList::ClearList)
             .def("IsEmpty", &CUIMapList::IsEmpty)
-    ];
-});
-
-SCRIPT_EXPORT(CUIVersionList, (CUIWindow),
-{
-    using namespace luabind;
-
-    module(luaState)
-    [
-        class_<CUIVersionList, CUIWindow>("CUIVersionList")
-            .def(constructor<>())
-            .def("GetCurrentVersionName", &CUIVersionList::GetCurrentVersionName)
-            .def("GetCurrentVersionDescr", &CUIVersionList::GetCurrentVersionDescr)
-            .def("GetItemsCount", &CUIVersionList::GetItemsCount)
-            .def("SwitchToSelectedVersion", &CUIVersionList::SwitchToSelectedVersion)
     ];
 });
 

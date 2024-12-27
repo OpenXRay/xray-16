@@ -157,7 +157,7 @@ public:
     virtual Feel::Sound* dcast_FeelSound() override { return nullptr; }
     virtual IRenderable* dcast_Renderable() override { return nullptr; }
     virtual IRender_Light* dcast_Light() override { return nullptr; }
-    SpatialBase(ISpatial_DB* space);
+    SpatialBase(ISpatial_DB& space);
     virtual ~SpatialBase();
 };
 
@@ -171,8 +171,8 @@ public:
     xr_vector<ISpatial*> items; // own items
 
     void _init(ISpatial_NODE* _parent);
-    void _remove(ISpatial* _S);
-    void _insert(ISpatial* _S);
+    void _remove(ISpatial* S);
+    void _insert(ISpatial* S);
     bool _empty()
     {
         return items.empty() &&
@@ -227,14 +227,14 @@ private:
     poolSS<ISpatial_NODE, 128> allocator;
 
     xr_vector<ISpatial_NODE*> allocator_pool;
-    ISpatial* rt_insert_object;
+    ISpatial* rt_insert_object{};
 
 public:
-    char Name[64];
-    ISpatial_NODE* m_root;
-    Fvector m_center;
-    float m_bounds;
-    xr_vector<ISpatial*>* q_result;
+    string64 Name;
+    ISpatial_NODE* m_root{};
+    Fvector m_center{};
+    float m_bounds{};
+    xr_vector<ISpatial*>* q_result{};
     SpatialDBStatistics Stats;
 
 private:
@@ -260,11 +260,11 @@ private:
     void _remove(ISpatial_NODE* N, ISpatial_NODE* N_sub);
 
 public:
-    ISpatial_DB(const char* name);
+    ISpatial_DB(pcstr name);
     ~ISpatial_DB();
 
     // managing
-    void initialize(Fbox& BB);
+    void initialize(const Fbox& BB);
     // void							destroy			();
     void insert(ISpatial* S);
     void remove(ISpatial* S);
@@ -286,8 +286,5 @@ public:
     void q_sphere(xr_vector<ISpatial*>& R, u32 _o, u32 _mask_or, const Fvector& _center, const float _radius);
     void q_frustum(xr_vector<ISpatial*>& R, u32 _o, u32 _mask_or, const CFrustum& _frustum);
 };
-
-XRCDB_API extern ISpatial_DB* g_SpatialSpace;
-XRCDB_API extern ISpatial_DB* g_SpatialSpacePhysic;
 
 #pragma pack(pop)

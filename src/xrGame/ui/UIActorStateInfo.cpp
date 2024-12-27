@@ -107,7 +107,7 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
     // show bleeding icon
     value = conditions.BleedingSpeed();
     m_state[stt_health]->show_static((value > 0.01f)); // Bleeding icon in Clear Sky
-    
+
     m_state[stt_bleeding]->show_static(false, 1);
     m_state[stt_bleeding]->show_static(false, 2);
     m_state[stt_bleeding]->show_static(false, 3);

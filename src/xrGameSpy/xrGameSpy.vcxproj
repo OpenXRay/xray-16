@@ -40,9 +40,7 @@
     <ClCompile Include="GameSpy_GCD_Server.cpp" />
     <ClCompile Include="GameSpy_GP.cpp" />
     <ClCompile Include="GameSpy_HTTP.cpp" />
-    <ClCompile Include="GameSpy_Patching.cpp" />
     <ClCompile Include="GameSpy_QR2.cpp" />
-    <ClCompile Include="GameSpy_SAKE.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -59,9 +57,7 @@
     <ClInclude Include="GameSpy_GP.h" />
     <ClInclude Include="GameSpy_HTTP.h" />
     <ClInclude Include="GameSpy_Keys.h" />
-    <ClInclude Include="GameSpy_Patching.h" />
     <ClInclude Include="GameSpy_QR2.h" />
-    <ClInclude Include="GameSpy_SAKE.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="xrGameSpy.h" />
     <ClInclude Include="xrGameSpy_MainDefs.h" />
@@ -80,19 +76,6 @@
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.26.1\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.26.1\build\native\sdl2.nuget.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

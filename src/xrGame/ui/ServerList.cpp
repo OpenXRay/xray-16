@@ -11,7 +11,6 @@
 #include "xrGameSpy/GameSpy_Keys.h"
 #include "xrGameSpy/GameSpy_Full.h"
 #include "Spectator.h"
-#include "VersionSwitcher.h"
 
 LPCSTR GameTypeToStringEx(u32 gt, bool bShort);
 
@@ -21,7 +20,6 @@ CServerList::CServerList()
       m_header2{ "Server properties", "Players list", "Frags", "Deaths" },
       m_header_frames{ "Icon frame", "Server name frame", "Map frame", "Game type frame", "Players frame", "Ping frame", "Version frame" }
 {
-#ifdef XR_PLATFORM_WINDOWS
     CGameSpy_BrowsersWrapper::UpdateCallback updateCb;
     updateCb.bind(this, &CServerList::OnUpdate);
     m_subscriber_id = browser().SubscribeUpdates(updateCb);
@@ -52,28 +50,14 @@ CServerList::CServerList()
     m_message_box->InitMessageBox("message_box_password");
     m_message_box->SetMessageTarget(this);
 
-    if (CVersionSwitcher::GetVerCount() > 0)
-    {
-        m_version_switch_msgbox = xr_new<CUIMessageBoxEx>();
-        m_version_switch_msgbox->SetMessageTarget(this);
-        if (!m_version_switch_msgbox->InitMessageBox("message_box_version_switch"))
-            xr_delete(m_version_switch_msgbox);
-    }
-    else
-    {
-        m_version_switch_msgbox = nullptr;
-    }
-
     m_b_local = false;
 
     m_last_retreived_index = u32(-1);
     m_need_refresh_fr = u32(-1);
-#endif
 }
 
 CServerList::~CServerList()
 {
-    xr_delete(m_version_switch_msgbox);
     xr_delete(m_message_box);
 
     auto bro = browser_LL();
@@ -85,15 +69,11 @@ CServerList::~CServerList()
 
 CGameSpy_BrowsersWrapper* CServerList::browser_LL()
 {
-#ifdef XR_PLATFORM_WINDOWS
-    auto mm = MainMenu();
-    if (mm)
+    if (const auto mm = MainMenu())
     {
-        auto gs = mm->GetGS();
-        if (gs)
+        if (const auto gs = mm->GetGS())
             return gs->GetGameSpyBrowser();
     }
-#endif
     return nullptr;
 }
 
@@ -187,27 +167,13 @@ void CServerList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         if (!item)
             return;
 
-        if (m_version_switch_msgbox != nullptr && pWnd == m_version_switch_msgbox)
+        if (pWnd == m_message_box)
         {
-            pcstr srvpsw = (item->GetInfo()->info.icons.pass) ? m_message_box->GetPassword() : "";
-            pcstr upsw = (item->GetInfo()->info.icons.user_pass) ? m_message_box->m_pMessageBox->GetUserPassword() : "";
-            CVersionSwitcher::SetupMPParams(m_playerName.c_str(), srvpsw, upsw, m_itemInfo.info.address.c_str());
-            CVersionSwitcher::SwitchToGameVer(m_itemInfo.info.version.c_str(), CVersionSwitcher::SWITCH_TO_SERVER);
-        }
-        else if (pWnd == m_message_box)
-        {
-            if (m_version_switch_msgbox != nullptr &&
-                xr_strcmp(item->GetInfo()->info.version, MainMenu()->GetGSVer()) != 0)
-            {
-                m_version_switch_msgbox->ShowDialog(true);
-            }
-            else
-            {
-                xr_string command;
-                item->CreateConsoleCommand(command, m_playerName.c_str(),
-                    m_message_box->m_pMessageBox->GetUserPassword(), m_message_box->GetPassword());
-                Console->Execute(command.c_str());
-            }
+            xr_string command;
+            item->CreateConsoleCommand(command, m_playerName.c_str(),
+                m_message_box->m_pMessageBox->GetUserPassword(),
+                m_message_box->GetPassword());
+            Console->Execute(command.c_str());
         }
     }
     else if (WINDOW_LBUTTON_DB_CLICK == msg && &m_list[LST_SERVER] == pWnd)
@@ -598,7 +564,6 @@ void CServerList::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 
 void CServerList::ConnectToSelected()
 {
-#ifdef XR_PLATFORM_WINDOWS
     gamespy_gp::login_manager const* lmngr = MainMenu()->GetLoginMngr();
     R_ASSERT(lmngr);
     gamespy_gp::profile const* tmp_profile = lmngr->get_current_profile();
@@ -631,12 +596,7 @@ void CServerList::ConnectToSelected()
         return;
     }
 
-    pcstr ver = item->GetInfo()->info.version.c_str();
-    bool dif_ver = xr_strcmp(ver, MainMenu()->GetGSVer()) != 0;
-
-    if (dif_ver &&
-        (m_version_switch_msgbox == nullptr ||
-            CVersionSwitcher::FindVersionIdByName(ver) == CVersionSwitcher::VERSION_NOT_FOUND))
+    if (xr_strcmp(item->GetInfo()->info.version, MainMenu()->GetGSVer()))
     {
         MainMenu()->SetErrorDialog(CMainMenu::ErrDifferentVersion);
         return;
@@ -650,18 +610,10 @@ void CServerList::ConnectToSelected()
     }
     else
     {
-        if (dif_ver)
-        {
-            m_version_switch_msgbox->ShowDialog(true);
-        }
-        else
-        {
-            xr_string command;
-            item->CreateConsoleCommand(command, m_playerName.c_str(), "", "");
-            Console->Execute(command.c_str());
-        }
+        xr_string command;
+        item->CreateConsoleCommand(command, m_playerName.c_str(), "", "");
+        Console->Execute(command.c_str());
     }
-#endif
 }
 
 void CServerList::InitHeader()

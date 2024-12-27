@@ -8,10 +8,10 @@ CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name)
     m_texture_color = color_argb(255, 255, 255, 255);
 }
 
-bool CUIFrameLineWnd::InitFrameLineWnd(LPCSTR base_name, Fvector2 pos, Fvector2 size, bool horizontal, bool fatal /*= true*/)
+bool CUIFrameLineWnd::InitFrameLineWnd(pcstr base_name, Fvector2 pos, Fvector2 size, bool horizontal, bool fatal /*= true*/)
 {
     InitFrameLineWnd(pos, size, horizontal);
-    return InitTexture(base_name, "hud" DELIMITER "default", fatal);
+    return InitTexture(base_name, fatal);
 }
 
 void CUIFrameLineWnd::InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal)
@@ -24,10 +24,10 @@ void CUIFrameLineWnd::InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizon
 
 bool CUIFrameLineWnd::InitTexture(pcstr texture, bool fatal /*= true*/)
 {
-    return InitTexture(texture, "hud" DELIMITER "default", fatal);
+    return InitTextureEx(texture, "hud" DELIMITER "default", fatal);
 }
 
-bool CUIFrameLineWnd::InitTexture(pcstr texture, pcstr shader, bool fatal /*= true*/)
+bool CUIFrameLineWnd::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*/)
 {
     dbg_tex_name = texture;
     string256 buf;

@@ -21,8 +21,7 @@ ENGINE_API extern Flags32 psHUD_Flags;
 class IGameObject;
 
 class ENGINE_API XR_NOVTABLE CCustomHUD
-    : public FactoryObjectBase,
-      public IEventReceiver,
+    : public IEventReceiver,
       public CUIResetNotifier
 {
 public:

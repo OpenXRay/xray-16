@@ -4,12 +4,12 @@
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
 
-#include <SDL.h>
-
 #if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
+#elif defined(XR_ARCHITECTURE_RISCV)
+#include "sse2rvv/sse2rvv.h"
 #else
 #error Add your platform here
 #endif
@@ -353,11 +353,12 @@ void ISpatial_DB::q_ray(
 {
     using namespace Spatial;
 
+    ZoneScoped;
     ScopeLock scope(&cs);
     Stats.Query.Begin();
     q_result = &R;
     q_result->clear();
-    if (SDL_HasSSE())
+    if (CPU::HasSSE)
     {
         if (_o & O_ONLYFIRST)
         {

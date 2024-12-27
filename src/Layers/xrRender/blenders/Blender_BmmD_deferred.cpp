@@ -69,7 +69,7 @@ BOOL CBlender_BmmD::canUseSteepParallax()
     return TRUE;
 }
 
-#if RENDER == R_R2 
+#if RENDER == R_R2
 void CBlender_BmmD::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -97,6 +97,11 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_Sampler("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
         C.r_Sampler("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_Sampler("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
+
+        C.r_Sampler("s_puddles_normal", "fx\\water_normal");
+        C.r_Sampler("s_puddles_perlin", "fx\\puddles_perlin");
+        C.r_Sampler("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
+        C.r_Sampler("s_rainsplash", "fx\\water_sbumpvolume");
 
         if (C.bUseSteepParallax)
         {
@@ -134,7 +139,7 @@ void	CBlender_BmmD::Compile	(CBlender_Compile& C)
 	// ***only pixel shaders differ***
 	string256				mask;
 	strconcat				(sizeof(mask),mask,C.L_textures[0].c_str(),"_mask");
-	switch(C.iElement) 
+	switch(C.iElement)
 	{
 	case SE_R2_NORMAL_HQ: 		// deffer
 		uber_deffer		(C, true,	"impl","impl",false,oT2_Name[0]?oT2_Name:0,true);
@@ -224,6 +229,11 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
         C.r_dx11Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_dx11Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
+
+        C.r_dx11Texture("s_puddles_normal", "fx\\water_normal");
+        C.r_dx11Texture("s_puddles_perlin", "fx\\puddles_perlin");
+        C.r_dx11Texture("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
+        C.r_dx11Texture("s_rainsplash", "fx\\water_sbumpvolume");
 
         if (C.bUseSteepParallax)
         {

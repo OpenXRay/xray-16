@@ -16,7 +16,7 @@
 #include "xrCore/xrDebug_macros.h"
 #include "xrCore/buffer_vector.h"
 
-const float dependent_distance = 100.f;
+//const float dependent_distance = 100.f;
 
 template <bool a>
 struct CMergeInOutPredicate

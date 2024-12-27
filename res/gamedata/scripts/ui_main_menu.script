@@ -30,10 +30,9 @@ function main_menu:InitControls()
 	self.message_box				= CUIMessageBoxEx()
 	self:Register					(self.message_box, "msg_box")
 
-	local _ver = xml:Init3tButton	("static_version",self)
+	local _ver = xml:InitStatic		("static_version",self)
 	local mm						= _G.main_menu.get_main_menu()
 	_ver:TextControl():SetText		("ver. " .. mm:GetGSVer())
-	self:Register(_ver, 'btn_version');
 
     self.l_mgr = mm:GetLoginMngr()
     self.acc_mgr = mm:GetAccountMngr()
@@ -86,8 +85,6 @@ function main_menu:InitCallBacks()
 	self:AddCallback("msg_box",     ui_events.MESSAGE_BOX_NO_CLICKED,		self.OnMsgNo,						self)
 	self:AddCallback("msg_box",			ui_events.MESSAGE_BOX_QUIT_GAME_CLICKED,self.OnMessageQuitGame,				self)
 	self:AddCallback("msg_box",			ui_events.MESSAGE_BOX_QUIT_WIN_CLICKED,	self.OnMessageQuitWin,				self)
-	
-	self:AddCallback("btn_version",		ui_events.BUTTON_CLICKED,				self.OnButton_version_clicked,		self)
 
 	self:Register(self, "self")
 	self:AddCallback("self",	ui_events.MAIN_MENU_RELOADED, self.OnMenuReloaded, self)
@@ -323,19 +320,6 @@ function main_menu:OnButton_localnet_clicked()
 	console:execute			("check_for_updates 0")
 end
 
-function main_menu:OnButton_version_clicked()
-	if self.ver_dlg ==nil then
-		self.ver_dlg = ui_versions_dialog.versions_dialog()
-		self.ver_dlg.owner = self
-	end
-
-	if self.ver_dlg:NeedToBeShown() then
-		self.ver_dlg:ShowDialog(true)
-		self:HideDialog()
-		self:Show(false)
-	end
-end
-
 function main_menu:Dispatch(cmd, param)  --virtual function
 	if cmd == 2 then
 		self:OnButton_multiplayer_clicked()
@@ -356,20 +340,22 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 				) then
 				self.OnButton_return_game()                      --' xStream 02.2008
 				-- console:execute("main_menu off")							   --' xStream 02.2008
+				return true
 			end
 		end
 
 --		if dik == DIK_keys.DIK_S then
 --			self:OnButton_load_spawn()
-
+--			return true
 --		else
 		if dik == DIK_keys.DIK_Q then
 			self:OnMessageQuitWin()
+			return true
 		end
 
 	end
 
-	return true
+	return false
 end
 
 function main_menu:OnMenuReloaded()

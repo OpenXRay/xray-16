@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\gamespy\src\gamespy\gcdkey\gcdkeyc.h"><violation beginline="32" endline="32" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="h:\programs\codergears\cppdepend\defaulttoolchain\include\string.h"><violation beginline="107" endline="107" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

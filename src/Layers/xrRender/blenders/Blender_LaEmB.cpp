@@ -20,7 +20,7 @@ CBlender_LaEmB::CBlender_LaEmB()
     xr_strcpy(oT2_const, "$null");
 }
 
-LPCSTR CBlender_LaEmB::getComment() 
+LPCSTR CBlender_LaEmB::getComment()
 {
     return "LEVEL: (lmap+env*const)*base";
 }

@@ -7,18 +7,18 @@ class ENGINE_API CPerlinNoiseCustom
 {
 protected:
     int mSeed;
-    bool mReady;
+    bool mReady{};
 
     int p[PERLIN_SAMPLE_SIZE + PERLIN_SAMPLE_SIZE + 2];
 
 protected:
-    int mOctaves;
-    float mFrequency;
-    float mAmplitude;
+    int mOctaves{ 2 };
+    float mFrequency{ 1.0f };
+    float mAmplitude{ 1.0f };
     xr_vector<float> mTimes;
 
 public:
-    CPerlinNoiseCustom(int seed) : mOctaves(2), mFrequency(1), mAmplitude(1), mSeed(seed), mReady(false) {}
+    CPerlinNoiseCustom(int seed) : mSeed(seed) {}
     IC void SetParams(int oct, float freq, float amp)
     {
         mOctaves = oct;

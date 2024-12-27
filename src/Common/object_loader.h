@@ -55,10 +55,10 @@ struct CLoader
         template <typename T>
         struct has_value_compare
         {
-            template <typename _P>
+            template <typename T2>
             static object_type_traits::detail::yes select(
-                object_type_traits::detail::other<typename _P::value_compare>*);
-            template <typename _P>
+                object_type_traits::detail::other<typename T2::value_compare>*);
+            template <typename T2>
             static object_type_traits::detail::no select(...);
             enum
             {

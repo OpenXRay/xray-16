@@ -33,7 +33,6 @@ CCharacterInfo::CCharacterInfo()
 #ifdef XRGAME_EXPORTS
     m_CurrentRank.set(NO_RANK);
     m_CurrentReputation.set(NO_REPUTATION);
-    m_StartDialog = NULL;
     m_Sympathy = 0.0f;
 #endif
 }

@@ -8,10 +8,10 @@
 #include "xrUICore/ComboBox/UIComboBox.h"
 #include "xrUICore/TabControl/UITabControl.h"
 #include "xrUICore/Windows/UIFrameWindow.h"
+#include "xrUICore/Hint/UIHint.h"
 #include "ui/UILabel.h"
 #include "ui/ServerList.h"
 #include "ui/UIMapList.h"
-#include "ui/UIVersionList.h"
 #include "ui/UIKeyBinding.h"
 #include "xrUICore/EditBox/UIEditBox.h"
 #include "xrUICore/Static/UIAnimatedStatic.h"
@@ -50,6 +50,14 @@ void CScriptXmlInit::InitWindow(LPCSTR path, int index, CUIWindow* pWnd)
     CUIXmlInit::InitWindow(m_xml, path, index, pWnd);
 }
 
+UIHint* CScriptXmlInit::InitHint(pcstr path, CUIWindow* parent)
+{
+    UIHint* pWnd = xr_new<UIHint>();
+    pWnd->init_from_xml(m_xml, path);
+    _attach_child(pWnd, parent);
+	return pWnd;
+}
+
 CUIFrameWindow* CScriptXmlInit::InitFrame(LPCSTR path, CUIWindow* parent)
 {
     CUIFrameWindow* pWnd = xr_new<CUIFrameWindow>(path);
@@ -82,10 +90,10 @@ CUIStatic* CScriptXmlInit::InitStatic(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
-CUITextWnd* CScriptXmlInit::InitTextWnd(LPCSTR path, CUIWindow* parent)
+CUIStatic* CScriptXmlInit::InitTextWnd(LPCSTR path, CUIWindow* parent)
 {
-    CUITextWnd* pWnd = xr_new<CUITextWnd>();
-    CUIXmlInit::InitTextWnd(m_xml, path, 0, pWnd);
+    auto* pWnd = xr_new<CUIStatic>(path);
+    CUIXmlInit::InitStatic(m_xml, path, 0, pWnd, true, true);
     _attach_child(pWnd, parent);
     return pWnd;
 }
@@ -202,14 +210,6 @@ CUIMapList* CScriptXmlInit::InitMapList(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
-CUIVersionList* CScriptXmlInit::InitVerList(LPCSTR path, CUIWindow* parent)
-{
-    CUIVersionList* pWnd = xr_new<CUIVersionList>();
-    pWnd->InitFromXml(m_xml, path);
-    _attach_child(pWnd, parent);
-    return pWnd;
-}
-
 CUIMMShniaga* CScriptXmlInit::InitMMShniaga(LPCSTR path, CUIWindow* parent)
 {
     CUIMMShniaga* pWnd = xr_new<CUIMMShniaga>();
@@ -280,6 +280,7 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("ParseFile", &CScriptXmlInit::ParseFile)
             .def("ParseShTexInfo", &CScriptXmlInit::ParseShTexInfo)
             .def("InitWindow", &CScriptXmlInit::InitWindow)
+            .def("InitHint", &CScriptXmlInit::InitHint)
             .def("InitFrame", &CScriptXmlInit::InitFrame)
             .def("InitFrameLine", &CScriptXmlInit::InitFrameLine)
             .def("InitEditBox", &CScriptXmlInit::InitEditBox)
@@ -297,7 +298,6 @@ SCRIPT_EXPORT(CScriptXmlInit, (),
             .def("InitTab", &CScriptXmlInit::InitTab)
             .def("InitServerList", &CScriptXmlInit::InitServerList)
             .def("InitMapList", &CScriptXmlInit::InitMapList)
-            .def("InitVerList", &CScriptXmlInit::InitVerList)
             .def("InitMapInfo", &CScriptXmlInit::InitMapInfo)
             .def("InitTrackBar", &CScriptXmlInit::InitTrackBar)
             .def("InitCDkey", &CScriptXmlInit::InitCDkey)

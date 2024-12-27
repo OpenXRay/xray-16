@@ -15,6 +15,14 @@ extern ECORE_API const xr_token qssao_token[];
 extern ECORE_API u32 ps_r_ssao_mode;
 extern ECORE_API const xr_token qssao_mode_token[];
 
+enum
+{
+    ssao_mode_off,
+    ssao_mode_default,
+    ssao_mode_hdao,
+    ssao_mode_hbao,
+};
+
 extern ECORE_API u32 ps_r_sun_quality; //	=	0;
 extern ECORE_API u32 ps_r_water_reflection; //	=	0;
 extern ECORE_API const xr_token qsun_quality_token[];
@@ -37,11 +45,7 @@ extern ECORE_API float ps_r__Detail_l_aniso;
 extern ECORE_API float ps_r__Detail_density;
 extern ECORE_API float ps_r__Detail_height;
 
-extern ECORE_API float ps_r__Tree_w_rot;
-extern ECORE_API float ps_r__Tree_w_speed;
-extern ECORE_API float ps_r__Tree_w_amp;
 extern ECORE_API float ps_r__Tree_SBC; // scale bias correct
-extern ECORE_API Fvector ps_r__Tree_Wave;
 
 extern ECORE_API float ps_r__WallmarkTTL;
 extern ECORE_API float ps_r__WallmarkSHIFT;
@@ -57,10 +61,11 @@ extern ECORE_API float ps_r__ssaHZBvsTEX;
 extern ECORE_API int ps_r__tf_Anisotropic;
 extern ECORE_API float ps_r__tf_Mipbias;
 
+extern ECORE_API int ps_r__clear_models_on_unload;
+
 enum
 {
-    RFLAG_NO_RAM_TEXTURES = (1 << 0),
-    RFLAG_ACTOR_SHADOW = (1 << 1),
+    RFLAG_ACTOR_SHADOW = 1 << 0,
 };
 
 extern ECORE_API Flags32 ps_r__common_flags;
@@ -150,9 +155,9 @@ extern ECORE_API Fvector3 ps_r2_dof;
 extern ECORE_API float ps_r2_dof_sky; //	distance to sky
 extern ECORE_API float ps_r2_dof_kernel_size; //	7.0f
 
-extern ECORE_API float ps_r3_dyn_wet_surf_near; // 10.0f
-extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
-extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
+extern ENGINE_API float ps_r3_dyn_wet_surf_near; // 10.0f
+extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
+extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 enum
 {
@@ -215,6 +220,7 @@ enum
     R2FLAGEXT_SUN_OLD = (1 << 9),
     R3FLAGEXT_SSR_HALF_DEPTH = (1 << 10),
     R3FLAGEXT_SSR_JITTER = (1 << 11),
+    R4FLAGEXT_NEW_SHADER_SUPPORT = (1 << 12),
 };
 
 extern void xrRender_initconsole();

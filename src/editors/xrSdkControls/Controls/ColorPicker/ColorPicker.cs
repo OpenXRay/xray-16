@@ -13,7 +13,7 @@ namespace XRay.SdkControls
         private bool ignoreOnChanged = false;
         private bool alphaEnabled = true;
         private HorizontalAlignment textAlignment = HorizontalAlignment.Left;
-        
+
         public ColorPicker()
         {
             InitializeComponent();

@@ -35,7 +35,7 @@ INetQueue::~INetQueue()
     xr_delete(pcs);
 }
 
-static u32 LastTimeCreate = 0;
+//static u32 LastTimeCreate = 0;
 
 NET_Packet* INetQueue::Create()
 {
@@ -103,7 +103,7 @@ void INetQueue::Release()
     VERIFY(!ready.empty());
     //---------------------------------------------
     // u32 tmp_time = SDL_GetTicks() - 60000;
-    u32 size = unused.size();
+    //u32 size = unused.size();
     ready.front()->B.count = 0;
     /*
    * if ((LastTimeCreate < tmp_time) && (size > 32))
@@ -128,7 +128,7 @@ void INetQueue::UnlockQ()
 }
 
 const u32 syncQueueSize = 512;
-const int syncSamples = 256;
+//const int syncSamples = 256;
 
 class XRNETSERVER_API syncQueue {
     u32 table[syncQueueSize];
@@ -330,8 +330,6 @@ bool IPureClient::Connect(pcstr options)
         net_Disconnected = false;
 
         //---------------------------
-        string1024 tmp = "";
-//---------------------------
 
         bool bSimulator = false;
         if (strstr(Core.Params, "-netsim"))
@@ -382,7 +380,6 @@ bool IPureClient::Connect(pcstr options)
             string64 EnumData;
             EnumData[0] = 0;
             xr_strcat(EnumData, "ToConnect");
-            u32 EnumSize = xr_strlen(EnumData) + 1;
             // We now have the host address so lets enum
             u32 c_port = psCL_Port;
             HRESULT res = S_FALSE;
@@ -402,9 +399,9 @@ bool IPureClient::Connect(pcstr options)
                 return false;
             }
 
-            WCHAR SessionPasswordUNICODE[4096];
-            if (xr_strlen(password_str)) {
-            }
+            //WCHAR SessionPasswordUNICODE[4096];
+            //if (xr_strlen(password_str)) {
+            //}
 
             net_csEnumeration->Enter();
             // real connect
@@ -438,9 +435,14 @@ void IPureClient::Disconnect()
 {
     // Clean up Host _list_
     net_csEnumeration->Enter();
+
+    // XXX: Were we supposed to do something here? Because this code currently does absolutely nothing
+    #if 0
     for (u32 i = 0; i < net_Hosts.size(); i++) {
         HOST_NODE& N = net_Hosts[i];
     }
+    #endif
+
     net_Hosts.clear();
     net_csEnumeration->Leave();
 
@@ -555,17 +557,14 @@ void IPureClient::Sync_Thread()
 
 void IPureClient::Sync_Average() {}
 
-void sync_thread(void* P)
-{
-    IPureClient* C = (IPureClient*)P;
-    C->Sync_Thread();
-}
-
 void IPureClient::net_Syncronize()
 {
     net_Syncronised = false;
     net_DeltaArray.clear();
-    Threading::SpawnThread(sync_thread, "network-time-sync", 0, this);
+    Threading::SpawnThread("network-time-sync", [this]
+    {
+        Sync_Thread();
+    });
 }
 
 bool IPureClient::net_isDisconnected() const

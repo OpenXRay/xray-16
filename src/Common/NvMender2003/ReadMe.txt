@@ -1,5 +1,5 @@
 ========================================================================
-    STATIC LIBRARY : nv_meshmender 
+    STATIC LIBRARY : nv_meshmender
 ========================================================================
 
 revision history
@@ -13,5 +13,4 @@ revision history
   - renamed MeshMender::MenderVertex to  MeshMender::Vertex since the extra mender was redundant
   - added some more comments in the options section with advice on usage
   - turned bool parameters into enums so that they aren't easily mixed up.
-  
-    
+

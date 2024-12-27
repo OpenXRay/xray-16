@@ -16,7 +16,6 @@ inline bool dcl_equal(const VertexElement* a, const VertexElement* b)
 
 struct SDeclaration;
 
-void ConvertVertexDeclaration(u32 FVF, SDeclaration* decl);
 void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl);
 void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<InputElementDesc>& declOut);
 

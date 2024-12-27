@@ -1,0 +1,161 @@
+///////////////////////////////////////////////////////
+//      BEEF'S SHADER BASED NIGHT VISION EFFECT      //
+///////////////////////////////////////////////////////
+// Huge credit TO LVutner from Anomaly Discord, who  //
+// literally taught me everything I know, to Sky4Ace //
+// who's simple_blur function I've adapted for this  //
+// shader, and to Meltac, who provided some advice   //
+// and inspiration for developing this shader.       //
+///////////////////////////////////////////////////////
+// Note: You are free to distribute and adapt this   //
+// Shader and any components, just please provide    //
+// credit to myself and/or the above individuals. I  //
+// have provided credit for individual functions and //
+// their original authors where applicable.	- BEEF   //
+///////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////
+// STEP 0 - GLOBAL DEFINITIONS AND INCLUDES
+///////////////////////////////////////////////////////
+
+#include "night_vision.h"
+#include "common.h"
+
+float3 bokeh_pass_3 (float image, float2 tc)
+{
+	float Pi = 6.28318530718; float blur_directions = 8.0; float blur_quality = 4.0; float blur_radius = 5; float3 color = 0.0f; float3 color_average = 0.0f;
+	float light_avgs = 0.0f; float weight = 0.0f; float total_weight = 0.0f;
+	for(float i=1.0; i<=blur_quality; i++) { for( float d=0.0; d<Pi; d+=Pi/blur_directions) {
+		color = s_blur_8.SampleLevel(smp_rtlinear, tc + (float2(cos(d),sin(d))*blur_radius*i/screen_res.xy),0).rgb;
+		color += s_blur_4.SampleLevel(smp_rtlinear, tc + (float2(cos(d),sin(d))*blur_radius*i/screen_res.xy),0).rgb;
+		if (color.g > 0.0f) { color.g *= 1.0f; light_avgs += 1.0f;}	else {light_avgs += 0.5;} color_average += color; } } image = color_average.g / light_avgs;
+	return image;
+}
+
+
+float4 main(p_screen I) : SV_Target
+{
+	///////////////////////////////////////////////////////
+	// STEP 0 - LOCAL DEFINITIONS
+	///////////////////////////////////////////////////////
+	
+	// TC vars
+	float2 corrected_texturecoords = aspect_ratio_correction(I.tc0);
+	
+	///////////////////////////////////////////////////////
+	// STEP 0 - MAIN SAMPLES
+	///////////////////////////////////////////////////////
+	float3 image = s_image.Sample(smp_rtlinear, I.tc0).xyz;
+	///////////////////////////////////////////////////////
+	// STEP 0 - MAIN FUNCTION
+	///////////////////////////////////////////////////////
+	float3 half_res_blur = s_blur_2.Sample(smp_rtlinear, I.tc0).rgb;
+	
+	float lua_param_nvg_num_tubes = frac(shader_param_8.x) * 10.0f;  
+	if (compute_lens_mask(corrected_texturecoords, lua_param_nvg_num_tubes) == 1) // see if we're inside the lens mask
+	{
+			// GRAB SAMPLES FOR NVG SHADER
+			float3 eighth_res_bloom = s_blur_8.Sample(smp_rtlinear, I.tc0).rgb;
+			float3 quarter_res_bloom = s_blur_4.Sample(smp_rtlinear, I.tc0).rgb;
+			
+			float4 jitter = float4( 					
+				frac(sin(dot(I.tc0, float2(12.0, 78.0) + (timers.x) )) * 12345.0), 
+				frac(sin(dot(I.tc0-fmod(I.tc0,float2(3.0,3.0)/screen_res.xy), float2(12.0, 78.0) + (timers.x) )) * 22738.0), 
+				frac(sin(dot(I.tc0-fmod(I.tc0,float2(3.0,3.0)/screen_res.xy), float2(12.0, 78.0) + (timers.x) )) * 78372.0), 
+				frac(sin(dot(I.tc0, float2(12.0, 78.0) + (timers.x) )) * 37857.0));
+			
+			//float depth = s_position.Load(int3(I.tc0 * screen_res.xy,0),0).z; // Sample the depth buffer in a better way
+			//float depth = pow(blurred_depth(I.tc0),2)*1000;
+			float depth = blurred_depth(I.tc0);
+
+			//image.r = lerp(half_res_blur.r,image.r,0.6f);
+			//image = pow(image,0.75);
+
+				image = lerp(image,half_res_blur,clamp(1-smoothstep(0,15,depth),0.4,1)); // NEAR BLUR
+				
+			if (depth < 1000)
+			{
+				float light_att = pow(1.0f-(smoothstep(5,300,depth)),0.5); // Distance from full brightness to full black
+				if ((image.r+image.g) < 0.9f) 
+				{
+					image.r *= (light_att+0.1f); //Apply light attenuation (plus offset to prevent sky turning black)
+				} 
+			}
+			
+			// GLITCH EFFECT -- TO DO
+			float lua_param_glitch_power = fmod(shader_param_8.z,1.0f); 
+				if (lua_param_glitch_power > 0.0f)
+				{
+				image = lerp(image, glitchEffect(image, I.tc0, lua_param_glitch_power),0.9);
+				}
+				
+			// APPLY BLOOM / WASHOUT
+			float addon = bokeh_pass_3( (eighth_res_bloom.g + quarter_res_bloom.g),I.tc0);
+			float addon_hard = max(addon - 0.7,0.0) * 2.0f;
+			float addon_soft = (max(half_res_blur.g - 0.6,0.0f) / 0.6) / 1.0f;
+//			addon = max(addon - 0.01,0) * 3;
+			image = image + (float3)addon_soft + (float3)addon_hard;
+	//		image *= 3;
+				
+			// APPLY CRT EFFECT
+			image = lerp(image,make_crt_ified(half_res_blur, I.tc0),gen_2_crt_effect_factor); // Adds a CRT effect that I think looks better than draw_scanlines
+
+			// APPLY NOISE
+			float lua_param_nvg_gain_current = floor(shader_param_8.y) / 10.0f; 
+			image.r += jitter.y * (gen_2_nvg_noise_factor * (pow(lua_param_nvg_gain_current,0.5) )); // Add the noise to the image
+			
+			// APPLY SCINTILLATION EFFECT 
+			if (jitter.z > (gen_2_scintillation_constant - ( (1.0-gen_2_scintillation_constant) * (lua_param_nvg_gain_current - 1.0f) ) ) )
+			{ image.r = 1.0f; }
+			
+			
+			// APPLY IMAGE COLOR CORRECTION AND MAKE BRIGHT SPOTS WHITE
+			image.rgb = saturate(image.r) * gen_2_saturation_color;
+			if	(image.g >= 0.95)
+			{
+				image.rgb = pow(image.ggg,2);
+			}
+			
+			// APPLY VIGNETTE
+			float lua_param_vignette_current = floor(shader_param_8.z) / 100.0f;
+			float vignette = calc_vignette(lua_param_nvg_num_tubes, I.tc0, lua_param_vignette_current);
+			image = clamp(image,0.0,1.0);
+			image *= vignette;
+
+		// RETURN THE RESULTING IMAGE
+		return float4(image, 1.0);
+	}
+	
+	
+	///////////////////////////////////////////////////////	
+	// OUTSIDE NVG CIRCLES OF EFFECT - If the absolute distance from screen center is farther than circle_radius, then we'll run the other shader effects below                                           
+	///////////////////////////////////////////////////////
+	else
+	{	
+		float lua_param_nvg_mode = frac(shader_param_8.w) * 10;
+		
+		if (abs(lua_param_nvg_mode-0.0) <= 0.01) // mode 0 - blur
+		{
+			image = half_res_blur;
+			image = clamp(image,0.0,1.0);
+		}
+		else if (abs(lua_param_nvg_mode-1.0) <= 0.01) // mode 1 - black
+		{
+			image = float3(0.0,0.0,0.0);
+		}
+		else if (abs(lua_param_nvg_mode-2.0) <= 0.01) // mode 2 - image overlay
+		{
+			image = clamp(image,0.0,1.0);
+		}
+		else if (abs(lua_param_nvg_mode-3.0) <= 0.01) // mode 3 - no changes (clear vision)
+		{
+			image = clamp(image,0.0,1.0);
+		}
+		
+		// RETURN THE RESULTING IMAGE
+		return float4(image, 1.0);
+	}
+	
+	
+} 

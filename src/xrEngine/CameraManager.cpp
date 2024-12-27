@@ -12,7 +12,6 @@
 #include "Effector.h"
 #include "EffectorPP.h"
 
-#include "x_ray.h"
 #include "GameFont.h"
 #include "Render.h"
 
@@ -170,6 +169,7 @@ void CCameraManager::UpdateFromCamera(const CCameraBase* C)
 void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,
     float fFAR_Dest, u32 flags)
 {
+    ZoneScoped;
 #ifdef DEBUG
     if (!Device.Paused())
     {
@@ -251,7 +251,7 @@ void CCameraManager::UpdateCamEffectors()
         else
         {
             // Dereferencing reverse iterator returns previous element of the list, r_it.base() returns current element
-            // So, we should use base()-1 iterator to delete just processed element. 'Previous' element would be 
+            // So, we should use base()-1 iterator to delete just processed element. 'Previous' element would be
             // automatically changed after deletion, so r_it would dereferencing to another value, no need to change it
             OnEffectorReleased(*r_it);
             auto r_to_del = r_it.base();
@@ -314,6 +314,7 @@ void CCameraManager::UpdatePPEffectors()
 
 void CCameraManager::ApplyDevice()
 {
+    ZoneScoped;
     // Device params
     Device.mView.build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
 
@@ -326,7 +327,7 @@ void CCameraManager::ApplyDevice()
     Device.fFOV = m_cam_info.fFov;
     Device.fASPECT = m_cam_info.fAspect;
     Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
-    
+
     // Apply offset required for Nvidia Ansel
     Device.mProject._31 = -m_cam_info.offsetX;
     Device.mProject._32 = -m_cam_info.offsetY;
@@ -380,15 +381,15 @@ void CCameraManager::ResetPP()
 void CCameraManager::Dump()
 {
     Fmatrix mInvCamera;
-    Fvector _R, _U, _T, _P;
-
     mInvCamera.invert(Device.mView);
-    _R.set(mInvCamera._11, mInvCamera._12, mInvCamera._13);
-    _U.set(mInvCamera._21, mInvCamera._22, mInvCamera._23);
-    _T.set(mInvCamera._31, mInvCamera._32, mInvCamera._33);
-    _P.set(mInvCamera._41, mInvCamera._42, mInvCamera._43);
-    Log("CCameraManager::Dump::vPosition = ", _P);
-    Log("CCameraManager::Dump::vDirection = ", _T);
-    Log("CCameraManager::Dump::vNormal = ", _U);
-    Log("CCameraManager::Dump::vRight = ", _R);
+
+    const Fvector right{ mInvCamera._11, mInvCamera._12, mInvCamera._13 };
+    const Fvector normal{ mInvCamera._21, mInvCamera._22, mInvCamera._23 };
+    const Fvector direction{ mInvCamera._31, mInvCamera._32, mInvCamera._33 };
+    const Fvector position{ mInvCamera._41, mInvCamera._42, mInvCamera._43 };
+
+    Log("CCameraManager::Dump::vPosition = ", position);
+    Log("CCameraManager::Dump::vDirection = ", direction);
+    Log("CCameraManager::Dump::vNormal = ", normal);
+    Log("CCameraManager::Dump::vRight = ", right);
 }

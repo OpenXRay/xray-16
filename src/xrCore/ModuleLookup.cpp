@@ -24,6 +24,8 @@ ModuleHandle::~ModuleHandle()
 
 void* ModuleHandle::Open(pcstr moduleName)
 {
+    ZoneScoped;
+
     if (IsLoaded())
         Close();
 
@@ -64,7 +66,9 @@ void* ModuleHandle::Open(pcstr moduleName)
 
 void ModuleHandle::Close()
 {
-    if (dontUnload)
+    ZoneScoped;
+
+    if (dontUnload || !handle)
         return;
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD)

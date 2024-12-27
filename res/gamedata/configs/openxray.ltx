@@ -31,3 +31,11 @@ allow_escape_sequences = false
 ; cop, cs, shoc or soc and unlock
 ; unlock is cop with disabled restrictions
 game_mode = cop
+
+; Always try to put item in the slot, SOC behaviour
+; For the comparison, COP tries to do that only if item has default_to_ruck = false
+default_to_slot = false
+
+; SOC/CS slots ordering
+; e.g. knife slot is 0 in SOC/CS and 1 in COP
+minus_one_slot_ordering = false

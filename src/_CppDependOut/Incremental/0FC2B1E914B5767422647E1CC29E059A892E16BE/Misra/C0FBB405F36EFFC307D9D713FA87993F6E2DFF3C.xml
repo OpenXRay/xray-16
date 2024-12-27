@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="h:\programs\codergears\cppdepend\defaulttoolchain\include\assert.h"><violation beginline="38" endline="38" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="38" endline="38" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file></cppdepend-plugin>

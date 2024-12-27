@@ -30,39 +30,37 @@
 // NOTE_3: I,J,K,C equals to R,N,D,T
 // NOTE_4: The rotation sequence is ZXY
 
-template <class T> struct _quaternion;
+struct Fquaternion;
 
-template <class T>
-struct _matrix
+struct Fmatrix
 {
-    using TYPE = T;
-    using Self = _matrix<T>;
-    using SelfRef = Self&;
+    using TYPE     = float;
+    using Self     = Fmatrix;
+    using SelfRef  = Self&;
     using SelfCRef = const Self&;
-    using Tvector = _vector3<T>;
 
     union
     {
         struct // Direct definition
         {
-            T _11, _12, _13, _14;
-            T _21, _22, _23, _24;
-            T _31, _32, _33, _34;
-            T _41, _42, _43, _44;
+            float _11, _12, _13, _14;
+            float _21, _22, _23, _24;
+            float _31, _32, _33, _34;
+            float _41, _42, _43, _44;
         };
 
         struct
         {
-            Tvector i;
-            T _14_;
-            Tvector j;
-            T _24_;
-            Tvector k;
-            T _34_;
-            Tvector c;
-            T _44_;
+            Fvector i;
+            float _14_;
+            Fvector j;
+            float _24_;
+            Fvector k;
+            float _34_;
+            Fvector c;
+            float _44_;
         };
-        T m[4][4]; // Array
+        float m[4][4]; // Array
     };
 
     // Class members
@@ -79,7 +77,7 @@ struct _matrix
         return *this;
     }
 
-    ICF SelfRef set(const Tvector& R, const Tvector& N, const Tvector& D, const Tvector& C)
+    ICF SelfRef set(const Fvector& R, const Fvector& N, const Fvector& D, const Fvector& C)
     {
         i.set(R);
         _14_ = 0;
@@ -93,8 +91,8 @@ struct _matrix
     }
 
     SelfRef identity();
-    SelfRef rotation(const _quaternion<T>& Q);
-    SelfRef mk_xform(const _quaternion<T>& Q, const Tvector& V);
+    SelfRef rotation(const Fquaternion& Q);
+    SelfRef mk_xform(const Fquaternion& Q, const Fvector& V);
 
     // Multiply RES = A[4x4]*B[4x4] (WITH projection)
     SelfRef mul(const Self& A, const Self& B);
@@ -154,39 +152,39 @@ struct _matrix
         return *this;
     }
 
-    IC SelfRef translate(const Tvector& Loc) // setup translation matrix
+    IC SelfRef translate(const Fvector& Loc) // setup translation matrix
     {
         identity();
         c.set(Loc.x, Loc.y, Loc.z);
         return *this;
     }
 
-    IC SelfRef translate(T _x, T _y, T _z) // setup translation matrix
+    IC SelfRef translate(float _x, float _y, float _z) // setup translation matrix
     {
         identity();
         c.set(_x, _y, _z);
         return *this;
     }
 
-    IC SelfRef translate_over(const Tvector& Loc) // modify only translation
+    IC SelfRef translate_over(const Fvector& Loc) // modify only translation
     {
         c.set(Loc.x, Loc.y, Loc.z);
         return *this;
     }
 
-    IC SelfRef translate_over(T _x, T _y, T _z) // modify only translation
+    IC SelfRef translate_over(float _x, float _y, float _z) // modify only translation
     {
         c.set(_x, _y, _z);
         return *this;
     }
 
-    IC SelfRef translate_add(const Tvector& Loc) // combine translation
+    IC SelfRef translate_add(const Fvector& Loc) // combine translation
     {
         c.add(Loc);
         return *this;
     }
 
-    IC SelfRef scale(T x, T y, T z) // setup scale matrix
+    IC SelfRef scale(float x, float y, float z) // setup scale matrix
     {
         identity();
         m[0][0] = x;
@@ -195,16 +193,16 @@ struct _matrix
         return *this;
     }
 
-    IC SelfRef scale(const Tvector& v) // setup scale matrix
+    IC SelfRef scale(const Fvector& v) // setup scale matrix
     {
         return scale(v.x, v.y, v.z);
     }
 
-    SelfRef rotateX(T Angle); // rotation about X axis
-    SelfRef rotateY(T Angle); // rotation about Y axis
-    SelfRef rotateZ(T Angle); // rotation about Z axis
+    SelfRef rotateX(float Angle); // rotation about X axis
+    SelfRef rotateY(float Angle); // rotation about Y axis
+    SelfRef rotateZ(float Angle); // rotation about Z axis
 
-    SelfRef rotation(const Tvector& vdir, const Tvector& vnorm);
+    SelfRef rotation(const Fvector& vdir, const Fvector& vnorm);
 
     SelfRef mapXYZ();
     SelfRef mapXZY();
@@ -213,7 +211,7 @@ struct _matrix
     SelfRef mapZXY();
     SelfRef mapZYX();
 
-    SelfRef rotation(const Tvector& axis, T Angle);
+    SelfRef rotation(const Fvector& axis, float Angle);
 
     // mirror X
     IC SelfRef mirrorX()
@@ -275,27 +273,27 @@ struct _matrix
         return *this;
     }
 
-    SelfRef mul(const Self& A, T v);
-    SelfRef mul(T v);
-    SelfRef div(const Self& A, T v);
-    SelfRef div(T v);
+    SelfRef mul(const Self& A, float v);
+    SelfRef mul(float v);
+    SelfRef div(const Self& A, float v);
+    SelfRef div(float v);
 
     // fov
-    IC SelfRef build_projection(T fFOV, T fAspect, T fNearPlane, T fFarPlane)
+    IC SelfRef build_projection(float fFOV, float fAspect, float fNearPlane, float fFarPlane)
     {
         return build_projection_HAT(tanf(fFOV / 2.f), fAspect, fNearPlane, fFarPlane);
     }
 
     // half_fov-angle-tangent
-    IC SelfRef build_projection_HAT(T HAT, T fAspect, T fNearPlane, T fFarPlane)
+    IC SelfRef build_projection_HAT(float HAT, float fAspect, float fNearPlane, float fFarPlane)
     {
         VERIFY(_abs(fFarPlane - fNearPlane) > EPS_S);
         VERIFY(_abs(HAT) > EPS_S);
 
-        T cot = T(1) / HAT;
-        T w = fAspect * cot;
-        T h = T(1) * cot;
-        T Q = fFarPlane / (fFarPlane - fNearPlane);
+        float cot = 1.0f / HAT;
+        float w = fAspect * cot;
+        float h = 1.0f * cot;
+        float Q = fFarPlane / (fFarPlane - fNearPlane);
 
         _11 = w;
         _12 = 0;
@@ -316,44 +314,44 @@ struct _matrix
         return *this;
     }
 
-    IC SelfRef build_projection_ortho(T w, T h, T zn, T zf)
+    IC SelfRef build_projection_ortho(float w, float h, float zn, float zf)
     {
-        _11 = T(2) / w;
+        _11 = 2.0f / w;
         _12 = 0;
         _13 = 0;
         _14 = 0;
         _21 = 0;
-        _22 = T(2) / h;
+        _22 = 2.0f / h;
         _23 = 0;
         _24 = 0;
         _31 = 0;
         _32 = 0;
-        _33 = T(1) / (zf - zn);
+        _33 = 1.0f / (zf - zn);
         _34 = 0;
         _41 = 0;
         _42 = 0;
         _43 = zn / (zn - zf);
-        _44 = T(1);
+        _44 = 1.0f;
         return *this;
     }
 
-    IC SelfRef build_camera(const Tvector& vFrom, const Tvector& vAt, const Tvector& vWorldUp)
+    IC SelfRef build_camera(const Fvector& vFrom, const Fvector& vAt, const Fvector& vWorldUp)
     {
         // Get the z basis vector3, which points straight ahead. This is the
         // difference from the eyepoint to the lookat point.
-        Tvector vView;
+        Fvector vView;
         vView.sub(vAt, vFrom).normalize();
 
         // Get the dot product, and calculate the projection of the z basis
         // vector3 onto the up vector3. The projection is the y basis vector3.
-        T fDotProduct = vWorldUp.dotproduct(vView);
+        float fDotProduct = vWorldUp.dotproduct(vView);
 
-        Tvector vUp;
+        Fvector vUp;
         vUp.mul(vView, -fDotProduct).add(vWorldUp).normalize();
 
         // The x basis vector3 is found simply with the cross product of the y
         // and z basis vectors
-        Tvector vRight;
+        Fvector vRight;
         vRight.crossproduct(vUp, vView);
 
         // Start building the Device.mView. The first three rows contains the basis
@@ -379,18 +377,18 @@ struct _matrix
         return *this;
     }
 
-    IC SelfRef build_camera_dir(const Tvector& vFrom, const Tvector& vView, const Tvector& vWorldUp)
+    IC SelfRef build_camera_dir(const Fvector& vFrom, const Fvector& vView, const Fvector& vWorldUp)
     {
         // Get the dot product, and calculate the projection of the z basis
         // vector3 onto the up vector3. The projection is the y basis vector3.
-        T fDotProduct = vWorldUp.dotproduct(vView);
+        float fDotProduct = vWorldUp.dotproduct(vView);
 
-        Tvector vUp;
+        Fvector vUp;
         vUp.mul(vView, -fDotProduct).add(vWorldUp).normalize();
 
         // The x basis vector3 is found simply with the cross product of the y
         // and z basis vectors
-        Tvector vRight;
+        Fvector vRight;
         vRight.crossproduct(vUp, vView);
 
         // Start building the Device.mView. The first three rows contains the basis
@@ -416,9 +414,9 @@ struct _matrix
         return *this;
     }
 
-    IC SelfRef inertion(const Self& mat, T v)
+    IC SelfRef inertion(const Self& mat, float v)
     {
-        T iv = 1.f - v;
+        float iv = 1.f - v;
         for (int i = 0; i < 4; i++)
         {
             m[i][0] = m[i][0] * v + mat.m[i][0] * iv;
@@ -429,34 +427,34 @@ struct _matrix
         return *this;
     }
 
-    ICF void transform_tiny(Tvector& dest, const Tvector& v) const // preferred to use
+    ICF void transform_tiny(Fvector& dest, const Fvector& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
         dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
         dest.z = v.x * _13 + v.y * _23 + v.z * _33 + _43;
     }
 
-    ICF void transform_tiny32(Fvector2& dest, const Tvector& v) const // preferred to use
+    ICF void transform_tiny32(Fvector2& dest, const Fvector& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
         dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
     }
 
-    ICF void transform_tiny23(Tvector& dest, const Fvector2& v) const // preferred to use
+    ICF void transform_tiny23(Fvector& dest, const Fvector2& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + _41;
         dest.y = v.x * _12 + v.y * _22 + _42;
         dest.z = v.x * _13 + v.y * _23 + _43;
     }
 
-    ICF void transform_dir(Tvector& dest, const Tvector& v) const // preferred to use
+    ICF void transform_dir(Fvector& dest, const Fvector& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + v.z * _31;
         dest.y = v.x * _12 + v.y * _22 + v.z * _32;
         dest.z = v.x * _13 + v.y * _23 + v.z * _33;
     }
 
-    IC void transform(Fvector4& dest, const Tvector& v) const // preferred to use
+    IC void transform(Fvector4& dest, const Fvector& v) const // preferred to use
     {
         dest.w = v.x * _14 + v.y * _24 + v.z * _34 + _44;
         dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) / dest.w;
@@ -464,9 +462,9 @@ struct _matrix
         dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) / dest.w;
     }
 
-    IC void transform(Tvector& dest, const Tvector& v) const // preferred to use
+    IC void transform(Fvector& dest, const Fvector& v) const // preferred to use
     {
-        T iw = 1.f / (v.x * _14 + v.y * _24 + v.z * _34 + _44);
+        float iw = 1.f / (v.x * _14 + v.y * _24 + v.z * _34 + _44);
         dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) * iw;
         dest.y = (v.x * _12 + v.y * _22 + v.z * _32 + _42) * iw;
         dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) * iw;
@@ -480,38 +478,38 @@ struct _matrix
         dest.z = v.x * _13 + v.y * _23 + v.z * _33 + v.w * _43;
     }
 
-    ICF void transform_tiny(Tvector& v) const
+    ICF void transform_tiny(Fvector& v) const
     {
-        Tvector res;
+        Fvector res;
         transform_tiny(res, v);
         v.set(res);
     }
 
-    IC void transform(Tvector& v) const
+    IC void transform(Fvector& v) const
     {
-        Tvector res;
+        Fvector res;
         transform(res, v);
         v.set(res);
     }
-    ICF void transform_dir(Tvector& v) const
+    ICF void transform_dir(Fvector& v) const
     {
-        Tvector res;
+        Fvector res;
         transform_dir(res, v);
         v.set(res);
     }
 
-    SelfRef setHPB(T h, T p, T b);
-    IC SelfRef setXYZ(T x, T y, T z) { return setHPB(y, x, z); }
-    IC SelfRef setXYZ(Tvector const& xyz) { return setHPB(xyz.y, xyz.x, xyz.z); }
-    IC SelfRef setXYZi(T x, T y, T z) { return setHPB(-y, -x, -z); }
-    IC SelfRef setXYZi(Tvector const& xyz) { return setHPB(-xyz.y, -xyz.x, -xyz.z); }
+    SelfRef setHPB(float h, float p, float b);
+    IC SelfRef setXYZ(float x, float y, float z) { return setHPB(y, x, z); }
+    IC SelfRef setXYZ(Fvector const& xyz) { return setHPB(xyz.y, xyz.x, xyz.z); }
+    IC SelfRef setXYZi(float x, float y, float z) { return setHPB(-y, -x, -z); }
+    IC SelfRef setXYZi(Fvector const& xyz) { return setHPB(-xyz.y, -xyz.x, -xyz.z); }
     //
-    void getHPB(T& h, T& p, T& b) const;
-    IC void getHPB(Tvector& hpb) const { getHPB(hpb.x, hpb.y, hpb.z); }
-    IC void getXYZ(T& x, T& y, T& z) const { getHPB(y, x, z); }
-    IC void getXYZ(Tvector& xyz) const { getXYZ(xyz.x, xyz.y, xyz.z); }
+    void getHPB(float& h, float& p, float& b) const;
+    IC void getHPB(Fvector& hpb) const { getHPB(hpb.x, hpb.y, hpb.z); }
+    IC void getXYZ(float& x, float& y, float& z) const { getHPB(y, x, z); }
+    IC void getXYZ(Fvector& xyz) const { getXYZ(xyz.x, xyz.y, xyz.z); }
 
-    IC void getXYZi(T& x, T& y, T& z) const
+    IC void getXYZi(float& x, float& y, float& z) const
     {
         getHPB(y, x, z);
         x *= -1.f;
@@ -519,24 +517,19 @@ struct _matrix
         z *= -1.f;
     }
 
-    IC void getXYZi(Tvector& xyz) const
+    IC void getXYZi(Fvector& xyz) const
     {
         getXYZ(xyz.x, xyz.y, xyz.z);
         xyz.mul(-1.f);
     }
 };
 
-using Fmatrix = _matrix<float>;
-using Dmatrix = _matrix<double>;
-
-template <class T>
-bool _valid(const _matrix<T>& m)
+inline bool _valid(const Fmatrix& m)
 {
     return _valid(m.i) && _valid(m._14_) && _valid(m.j) && _valid(m._24_)
         && _valid(m.k) && _valid(m._34_) && _valid(m.c) && _valid(m._44_);
 }
 
 extern XRCORE_API Fmatrix Fidentity;
-extern XRCORE_API Dmatrix Didentity;
 
 #endif

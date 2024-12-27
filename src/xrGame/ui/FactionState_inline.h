@@ -86,13 +86,13 @@ void   FactionState::set_location( LPCSTR location )
 LPCSTR FactionState::get_war_state( u8 index ) const
 {
 	VERIFY( 0 <= index && index < war_state_count );
-	return	m_war_state_str[index].c_str();	
+	return	m_war_state_str[index].c_str();
 }
 
 LPCSTR FactionState::get_war_state_hint( u8 index ) const
 {
 	VERIFY( 0 <= index && index < war_state_count );
-	return	m_war_state_hint_str[index].c_str();	
+	return	m_war_state_hint_str[index].c_str();
 }
 
 LPCSTR FactionState::get_war_state1() const			{	return	m_war_state_str[0].c_str();		}

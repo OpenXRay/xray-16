@@ -160,6 +160,8 @@ SThunderboltCollection* CEffect_Thunderbolt::AppendDef(shared_str sect)
 
 bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& range)
 {
+    ZoneScoped;
+
     bool bRes = true;
 #ifdef _EDITOR
     bRes = Tools->RayPick(s, d, range, 0, 0);
@@ -190,6 +192,8 @@ bool CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& ran
 
 void CEffect_Thunderbolt::Bolt(const CEnvDescriptorMixer& currentEnv)
 {
+    ZoneScoped;
+
     VERIFY(currentEnv.thunderbolt);
     state = stWorking;
     const float lt = currentEnv.bolt_duration;
@@ -244,6 +248,8 @@ void CEffect_Thunderbolt::Bolt(const CEnvDescriptorMixer& currentEnv)
 
 void CEffect_Thunderbolt::OnFrame(CEnvDescriptorMixer& currentEnv)
 {
+    ZoneScoped;
+
     const bool enabled = currentEnv.thunderbolt;
     if (bEnabled != enabled)
     {

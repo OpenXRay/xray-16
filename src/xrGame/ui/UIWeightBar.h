@@ -3,8 +3,8 @@
 class CUIWeightBar final : public CUIWindow
 {
     CUIStatic* m_BottomInfo{};
-    CUITextWnd* m_Weight{};
-    CUITextWnd* m_WeightMax{};
+    CUIStatic* m_Weight{};
+    CUIStatic* m_WeightMax{};
     float m_Weight_end_x{};
 
 public:

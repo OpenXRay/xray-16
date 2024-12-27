@@ -1,189 +1,24 @@
 #include "stdafx.h"
 
-#if defined(XR_PLATFORM_WINDOWS)
-#   include <float.h> // _controlfp
-#   if defined(_M_FP_PRECISE)
-#       pragma fenv_access(on)
-#   endif
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
-// XXX: check if these includes needed
-#include <pthread.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <chrono>
-#include <stdint.h>
-
-#   if __has_include(<fpu_control.h>)
-#       include <fpu_control.h>
-#       define USE_FPU_CONTROL_H
-#   else
-#       include <cfenv>
-#       pragma STDC FENV_ACCESS on
-#       if defined(XR_PLATFORM_BSD)
-#           define USE_FPU_CONTROL_H
-            typedef unsigned int fpu_control_t __attribute__((__mode__(__HI__))); // XXX: replace with type alias
-#           define _FPU_GETCW(x) asm volatile ("fnstcw %0" : "=m" ((*&x)))
-#           define _FPU_SETCW(x) asm volatile ("fldcw %0" : : "m" ((*&x)))
-#           define _FPU_EXTENDED FP_PRC_FLD
-#           define _FPU_DOUBLE 0x200
-#           define _FPU_SINGLE 0x0
-#           define _FPU_RC_NEAREST FP_PS
-#           define _FPU_DEFAULT FP_PD
-#       endif
-#   endif
-#endif
-
 #include <thread>
 #include <SDL.h>
 
-#if (defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)) && !defined(XR_COMPILER_MSVC)
-#define _FPU_EXTENDED 0
-#define _FPU_DOUBLE 0
-#define _FPU_SINGLE 0
-#define _FPU_RC_NEAREST 0
-#endif // defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64) || defined(XR_ARCHITECTURE_E2K)
-
 // Initialized on startup
 XRCORE_API Fmatrix Fidentity;
-XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
-
-/*
-Функции управления точностью вычислений с плавающей точкой.
-Более подробную информацию можно получить здесь:
-https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/control87-controlfp-control87-2
-Число 24, 53 и 64 - определяют ограничение точности в битах.
-Наличие 'r' - включает округление результатов.
-Реально в движке используются только m24r и m64r. И один раз m64 - возможно ошибка?
-*/
-namespace FPU
-{
-XRCORE_API void m24()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifndef XR_ARCHITECTURE_X64
-    _controlfp(_PC_24, MCW_PC);
-#   endif
-    _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::fesetround(FE_TOWARDZERO);
-#endif
-}
-
-XRCORE_API void m24r()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifndef XR_ARCHITECTURE_X64
-    _controlfp(_PC_24, MCW_PC);
-#   endif
-    _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_DOUBLE) | _FPU_SINGLE | _FPU_RC_NEAREST;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::fesetround(FE_TONEAREST);
-#endif
-}
-
-XRCORE_API void m53()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifndef XR_ARCHITECTURE_X64
-    _controlfp(_PC_53, MCW_PC);
-#   endif
-    _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::fesetround(FE_TOWARDZERO);
-#endif
-}
-
-XRCORE_API void m53r()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifndef XR_ARCHITECTURE_X64
-    _controlfp(_PC_53, MCW_PC);
-#   endif
-    _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_EXTENDED & ~_FPU_SINGLE) | _FPU_DOUBLE | _FPU_RC_NEAREST;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::fesetround(FE_TONEAREST);
-#endif
-}
-
-XRCORE_API void m64()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#   ifndef XR_ARCHITECTURE_X64
-    _controlfp(_PC_64, MCW_PC);
-#   endif
-    _controlfp(_RC_CHOP, MCW_RC);
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::fesetround(FE_TOWARDZERO);
-#endif
-}
-
-XRCORE_API void m64r()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-#ifndef XR_ARCHITECTURE_X64
-    _controlfp(_PC_64, MCW_PC);
-#endif
-    _controlfp(_RC_NEAR, MCW_RC);
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    _FPU_GETCW(fpu_cw);
-    fpu_cw = (fpu_cw & ~_FPU_DOUBLE & ~_FPU_SINGLE) | _FPU_EXTENDED | _FPU_RC_NEAREST;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::fesetround(FE_TONEAREST);
-#endif
-}
-
-void initialize()
-{
-#if defined(XR_PLATFORM_WINDOWS)
-    _clearfp();
-#elif defined(USE_FPU_CONTROL_H)
-    fpu_control_t fpu_cw;
-    fpu_cw = _FPU_DEFAULT;
-    _FPU_SETCW(fpu_cw);
-#else
-    std::feclearexcept(FE_ALL_EXCEPT);
-#endif
-
-    // По-умолчанию для плагинов экспорта из 3D-редакторов включена высокая точность вычислений с плавающей точкой
-    if (Core.PluginMode)
-        m64r();
-    else
-        m24r();
-
-    ::Random.seed(u32(CPU::QPC() % (s64(1) << s32(32))));
-}
-};
 
 namespace CPU
 {
+XRCORE_API bool HasSSE     = SDL_HasSSE();
+XRCORE_API bool HasSSE2    = SDL_HasSSE2();
+XRCORE_API bool HasSSE42   = SDL_HasSSE42();
+
+XRCORE_API bool HasAVX     = SDL_HasAVX();
+
+XRCORE_API bool HasAVX2    = SDL_HasAVX2();
+
+XRCORE_API bool HasAVX512F = SDL_HasAVX512F();
+
 XRCORE_API u64 qpc_freq = SDL_GetPerformanceFrequency();
 
 XRCORE_API u32 qpc_counter = 0;
@@ -201,11 +36,11 @@ XRCORE_API u32 GetTicks()
 }
 } // namespace CPU
 
-bool g_initialize_cpu_called = false;
-
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
+    ZoneScoped;
+
     // General CPU identification
     string256 features{};
 
@@ -222,28 +57,39 @@ void _initialize_cpu()
             }
         }
     };
+
+    // x86
     listFeature("RDTSC",   SDL_HasRDTSC());
     listFeature("MMX",     SDL_HasMMX());
     listFeature("3DNow!",  SDL_Has3DNow());
     listFeature("SSE",     SDL_HasSSE());
-    listFeature("AVX",     SDL_HasAVX());
-#if SDL_VERSION_ATLEAST(2, 0, 12)
-    listFeature("ARMSIMD", SDL_HasARMSIMD());
-#endif
-    listFeature("NEON",    SDL_HasNEON());
+    listFeature("SSE2",    CPU::HasSSE2);
+    listFeature("SSE3",    SDL_HasSSE3());
+    listFeature("SSE41",   SDL_HasSSE41());
+    listFeature("SSE42",   CPU::HasSSE42);
+    listFeature("AVX",     CPU::HasAVX);
+    listFeature("AVX2",    CPU::HasAVX2);
+    listFeature("AVX512F", CPU::HasAVX512F);
+
+    // Other architectures
     listFeature("AltiVec", SDL_HasAltiVec());
+    listFeature("ARMSIMD", SDL_HasARMSIMD());
+    listFeature("NEON",    SDL_HasNEON());
+#if SDL_VERSION_ATLEAST(2, 24, 0)
+    listFeature("LSX",     SDL_HasLSX());
+    listFeature("LASX",    SDL_HasLASX());
+#endif
 
     Msg("* CPU features: %s", features);
     Msg("* CPU threads: %d", std::thread::hardware_concurrency());
 
     Log("");
     Fidentity.identity(); // Identity matrix
-    Didentity.identity(); // Identity matrix
-    pvInitializeStatics(); // Lookup table for compressed normals
-    FPU::initialize();
-    _initialize_cpu_thread();
+    Random.seed(u32(CPU::QPC() % (s64(1) << s32(32))));
 
-    g_initialize_cpu_called = true;
+    pvInitializeStatics(); // Lookup table for compressed normals
+
+    _initialize_cpu_thread();
 }
 
 // per-thread initialization
@@ -261,13 +107,7 @@ void _initialize_cpu_thread()
 {
     xrDebug::OnThreadSpawn();
 
-    // По-умолчанию для плагинов экспорта из 3D-редакторов включена высокая точность вычислений с плавающей точкой
-    if (Core.PluginMode)
-        FPU::m64r();
-    else
-        FPU::m24r();
-
-    if (SDL_HasSSE())
+    if (CPU::HasSSE)
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);

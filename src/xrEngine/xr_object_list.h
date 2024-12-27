@@ -42,8 +42,8 @@ private:
      * @brief m_primary_crows   - list of items of the primary thread
      * @brief m_secondary_crows - list of items of the secondary thread
      */
-    Objects m_primary_crows, m_secondary_crows;
-    Threading::ThreadId m_owner_thread_id;
+    Objects m_primary_crows;
+    xr_vector<Objects> m_secondary_crows;
     ObjectUpdateStatistics stats;
     u32 statsFrame;
 
@@ -130,13 +130,7 @@ public:
 #endif // #ifdef DEBUG
 
 private:
-    IC Objects& get_crows()
-    {
-        if (Threading::ThreadIdsAreEqual(Threading::GetCurrThreadId(), m_owner_thread_id))
-            return (m_primary_crows);
-
-        return (m_secondary_crows);
-    }
+    IC Objects& get_crows();
 
     static void clear_crow_vec(Objects& o);
     static void dump_list(Objects& v, pcstr reason);

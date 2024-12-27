@@ -48,7 +48,7 @@
 	<string id="ui_mm_loadingstages">
 		<text>Show loading stages</text>
 	</string>
-	<string id="renderer_gl">
+	<string id="renderer_rgl">
 		<text>Enhanced full dyn. lighting (OpenGL)</text>
 	</string>
 	<string id="ui_mm_window_mode">
@@ -81,9 +81,6 @@
 	<string id="ui_mm_fov">
 		<text>Field of view</text>
 	</string>
-	<string id="st_switch_version_invitation">
-		<text>Do you really want to launch another version of the game?</text>
-	</string>	
 	<string id="ui_mm_localization">
 		<text>Language</text>
 	</string>
@@ -95,6 +92,48 @@
 	</string>
 	<string id="ui_mm_fps_limit_in_menu">
 		<text>Menu FPS limit</text>
+	</string>
+	<string id="ui_mm_shader_preset">
+		<text>Graphics mode</text>
+	</string>
+	<string id="ui_mm_shader_preset_vanilla">
+		<text>vanilla</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_default">
+		<text>enhanced (Default)</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_high">
+		<text>enhanced (High)</text>
+	</string>
+	<string id="ui_mm_color_grading_preset">
+		<text>Colour grading</text>
+	</string>
+	<string id="ui_mm_color_grading_default">
+		<text>default</text>
+	</string>
+	<string id="ui_mm_color_grading_cold">
+		<text>cold</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_01">
+		<text>Filmic 1</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_02">
+		<text>Filmic 2</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_03">
+		<text>Filmic 3</text>
+	</string>
+	<string id="ui_mm_color_grading_hollywood">
+		<text>Hollywood</text>
+	</string>
+	<string id="ui_mm_color_grading_vanilla">
+		<text>Vanilla</text>
+	</string>
+	<string id="ui_mm_color_grading_vibrant">
+		<text>Vibrant</text>
+	</string>
+	<string id="ui_mm_color_grading_warm">
+		<text>warm</text>
 	</string>
 	<string id="eng">
 		<text>English</text>

@@ -9,6 +9,7 @@
 #include "ScrollView/UIScrollView.h"
 #include "Hint/UIHint.h"
 #include "Cursor/UICursor.h"
+#include "ui_focus.h"
 #include "ui_styles.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -66,6 +67,34 @@ SCRIPT_EXPORT(UIStyleManager, (),
             .def("ResetUI", &UIStyleManager::Reset),
 
         def("GetUIStyleManager", +[] { return UIStyles; })
+    ];
+});
+
+SCRIPT_EXPORT(CUIFocusSystem, (),
+{
+    using namespace luabind;
+    using namespace luabind::policy;
+
+    module(luaState)
+    [
+        class_<FocusDirection>("FocusDirection")
+            .enum_("direction")
+            [
+                value("Same",       (int)FocusDirection::Same),
+                value("Up",         (int)FocusDirection::Up),
+                value("Down",       (int)FocusDirection::Down),
+                value("Left",       (int)FocusDirection::Left),
+                value("Right",      (int)FocusDirection::Right),
+                value("UpperLeft",  (int)FocusDirection::UpperLeft),
+                value("UpperRight", (int)FocusDirection::UpperRight),
+                value("LowerLeft",  (int)FocusDirection::LowerLeft),
+                value("LowerRight", (int)FocusDirection::LowerRight)
+            ],
+        class_<CUIFocusSystem>("CUIFocusSystem")
+            .def("RegisterFocusable", &CUIFocusSystem::RegisterFocusable)
+            .def("UnregisterFocusable", &CUIFocusSystem::UnregisterFocusable)
+            .def("IsRegistered", &CUIFocusSystem::IsRegistered)
+            .def("FindClosestFocusable", &CUIFocusSystem::FindClosestFocusable)
     ];
 });
 
@@ -136,6 +165,7 @@ SCRIPT_EXPORT(CUIWindow, (),
             .def("IsAutoDelete", &CUIWindow::IsAutoDelete)
 
             .def("IsCursorOverWindow", &CUIWindow::CursorOverWindow)
+            .def("IsUsingCursorRightNow", &CUIWindow::IsUsingCursorRightNow)
             .def("FocusReceiveTime", &CUIWindow::FocusReceiveTime)
             .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 
@@ -183,6 +213,8 @@ SCRIPT_EXPORT(CUIWindow, (),
 
             .def("SetFont", &CUIWindow::SetFont)
             .def("GetFont", &CUIWindow::GetFont)
+
+            .def("GetCurrentFocusSystem", &CUIWindow::GetCurrentFocusSystem)
 
             .def("WindowName", +[](CUIWindow* self) -> pcstr { return self->WindowName().c_str(); })
             .def("SetWindowName", &CUIWindow::SetWindowName),
@@ -316,7 +348,12 @@ SCRIPT_EXPORT(EnumUIMessages, (),
             value("WINDOW_LBUTTON_DB_CLICK", int(WINDOW_LBUTTON_DB_CLICK)),
             value("WINDOW_KEY_PRESSED", int(WINDOW_KEY_PRESSED)),
             value("WINDOW_KEY_RELEASED", int(WINDOW_KEY_RELEASED)),
+            value("WINDOW_MOUSE_CAPTURE_LOST", int(WINDOW_MOUSE_CAPTURE_LOST)),
             value("WINDOW_KEYBOARD_CAPTURE_LOST", int(WINDOW_KEYBOARD_CAPTURE_LOST)),
+
+            // Legacy SOC/CS events
+            value("STATIC_FOCUS_RECEIVED", int(WINDOW_FOCUS_RECEIVED)),
+            value("STATIC_FOCUS_LOST",     int(WINDOW_FOCUS_LOST)),
 
             // CUIButton
             value("BUTTON_CLICKED", int(BUTTON_CLICKED)),

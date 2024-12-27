@@ -500,7 +500,7 @@ its empty inline implementation after the class definition:
     public:
         virtual ~IServer() = 0;
     };
-    
+
     inline IServer::~IServer() {}
 
 Do not mark interface classes with linkage attributes.
@@ -635,9 +635,9 @@ across compilers.
  BAD
     #ifndef _XRAY_HPP_
     #define _XRAY_HPP_
-    
+
     // The XRay.hpp content comes here
-    
+
     #endif // _XRAY_HPP_
  GOOD
     #pragma once
@@ -773,7 +773,7 @@ that flags can be grouped under another one new flag:
     #if !defined(DEDICATED_SERVER) && defined(CONFIG_SHOW_LOGO_WINDOW)
         DestroyWindow(logoWindow);
     #endif
-    
+
 Use using instead of typedef:
  BAD
     typedef void (*FunctionType)(double);
@@ -781,7 +781,7 @@ Use using instead of typedef:
  GOOD
     using FunctionType = void (*)(double);
     using vector3f = Vector3<float>;
-    
+
 Use strongly typed enums instead of plain C enums:
  BAD
     enum CmdStatus
@@ -797,7 +797,7 @@ Use strongly typed enums instead of plain C enums:
         InProgress,
         Failed,
     };
-    
+
 Enums that can be serialized should have values assigned:
  BAD
     enum class CmdStatus
@@ -919,7 +919,7 @@ code fragments, put a comment line.
  BAD
     for (auto &item : items)
         storage.push_back(item);
-    
+
     if (!storage.size())
         Log("! ERROR: No items found");
  GOOD
@@ -945,15 +945,15 @@ compiles standalone without any dependency on includes before it.
     #pragma once
     #include "Config.hpp"
     ... Put here minimal includes required by Foo.hpp ...
-    
+
     ... Put here your declarations ...
-    
+
     Foo.cpp template
     ------------------------------
     #include "Config.hpp"
     #include "Foo.hpp"
     ... Put here minimal includes required by Foo.cpp ...
-    
+
     ... Put here your code ...
 
  GOOD (using precompiled headers)
@@ -962,22 +962,22 @@ compiles standalone without any dependency on includes before it.
     #pragma once
     #include "Config.hpp"
     ... Put here additional includes ...
-    
+
     Foo.hpp template
     ------------------------------
     #pragma once
     #include "Config.hpp"
     ... Put here minimal includes required by Foo.hpp ...
-    
+
     ... Put here your declarations ...
-    
+
     Foo.cpp template
     ------------------------------
     #include "stdafx.hpp"
     #include "Config.hpp"
     #include "Foo.hpp"
     ... Put here minimal includes required by Foo.cpp ...
-    
+
     ... Put here your code ...
 
 Use #include "Foo.hpp" for headers in the same directory as the source

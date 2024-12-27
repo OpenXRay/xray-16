@@ -60,7 +60,6 @@ CCarWeapon::CCarWeapon(CPhysicsShellHolder* obj)
     m_destEnemyDir.setHP(m_bind_y_rot, m_bind_x_rot);
     m_object->XFORM().transform_dir(m_destEnemyDir);
 
-    inheritedShooting::Light_Create();
     Load(pUserData->r_string("mounted_weapon_definition", "wpn_section"));
     SetBoneCallbacks();
     m_object->processing_activate();
@@ -82,6 +81,8 @@ void CCarWeapon::Load(LPCSTR section)
     inheritedShooting::Load(section);
     HUD_SOUND_ITEM::LoadSound(section, "snd_shoot", m_sndShot, SOUND_TYPE_WEAPON_SHOOTING);
     m_Ammo->Load(pSettings->r_string(section, "ammo_class"), 0);
+    if (m_bLightShotEnabled)
+        inheritedShooting::Light_Create();
 }
 
 void CCarWeapon::UpdateCL()
@@ -211,8 +212,8 @@ void CCarWeapon::FireEnd()
 
 void CCarWeapon::OnShot()
 {
-    FireBullet(
-        m_fire_pos, m_fire_dir, fireDispersionBase, *m_Ammo, m_object->ID(), m_object->ID(), SendHitAllowed(m_object));
+    FireBullet(m_fire_pos, m_fire_dir, fireDispersionBase,
+        *m_Ammo, m_object->ID(), m_object->ID(), SendHitAllowed(m_object), ::Random.randI(0,30));
 
     StartShotParticles();
 

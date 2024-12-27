@@ -24,25 +24,23 @@
 #=============================================================================
 
 # If LZO_ROOT_DIR was defined in the environment, use it.
-IF(NOT LZO_ROOT_DIR AND NOT $ENV{LZO_ROOT_DIR} STREQUAL "")
-  SET(LZO_ROOT_DIR $ENV{LZO_ROOT_DIR})
-ENDIF()
+if(NOT LZO_ROOT_DIR AND NOT $ENV{LZO_ROOT_DIR} STREQUAL "")
+  set(LZO_ROOT_DIR $ENV{LZO_ROOT_DIR})
+endif()
 
-SET(_lzo_SEARCH_DIRS
+set(_lzo_SEARCH_DIRS
   ${LZO_ROOT_DIR}
   /usr/local
-  /sw # Fink
-  /opt/local # DarwinPorts
 )
 
-FIND_PATH(LZO_INCLUDE_DIR lzo/lzo1x.h
+find_path(LZO_INCLUDE_DIR lzo/lzo1x.h
   HINTS
     ${_lzo_SEARCH_DIRS}
   PATH_SUFFIXES
     include
 )
 
-FIND_LIBRARY(LZO_LIBRARY
+find_library(LZO_LIBRARY
   NAMES
     lzo2
   HINTS
@@ -51,18 +49,24 @@ FIND_LIBRARY(LZO_LIBRARY
     lib64 lib
   )
 
-# handle the QUIETLY and REQUIRED arguments and set LZO_FOUND to TRUE if 
+# handle the QUIETLY and REQUIRED arguments and set LZO_FOUND to TRUE if
 # all listed variables are TRUE
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(LZO DEFAULT_MSG
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(LZO DEFAULT_MSG
   LZO_LIBRARY LZO_INCLUDE_DIR)
 
-IF(LZO_FOUND)
-  SET(LZO_LIBRARIES ${LZO_LIBRARY})
-  SET(LZO_INCLUDE_DIRS ${LZO_INCLUDE_DIR})
-ENDIF(LZO_FOUND)
+if(LZO_FOUND)
+  set(LZO_LIBRARIES ${LZO_LIBRARY})
+  set(LZO_INCLUDE_DIRS ${LZO_INCLUDE_DIR})
 
-MARK_AS_ADVANCED(
+  add_library(LZO::LZO UNKNOWN IMPORTED)
+  set_target_properties(LZO::LZO PROPERTIES
+    IMPORTED_LOCATION "${LZO_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${LZO_INCLUDE_DIR}"
+  )
+endif()
+
+mark_as_advanced(
   LZO_INCLUDE_DIR
   LZO_LIBRARY
 )

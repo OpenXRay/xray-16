@@ -114,13 +114,17 @@ bool CAttachableItem::can_be_attached() const
 
 void CAttachableItem::afterAttach()
 {
+#ifdef DEBUG
     VERIFY(m_valid);
+#endif
     object().processing_activate();
 }
 
 void CAttachableItem::afterDetach()
 {
+#ifdef DEBUG
     VERIFY(m_valid);
+#endif
     object().processing_deactivate();
 }
 
@@ -128,98 +132,3 @@ bool CAttachableItem::use_parent_ai_locations() const
 {
     return !enabled();
 }
-
-#ifdef DEBUG
-float ATT_ITEM_MOVE_CURR = 0.01f;
-float ATT_ITEM_ROT_CURR = 0.1f;
-
-float ATT_ITEM_MOVE_STEP = 0.001f;
-float ATT_ITEM_ROT_STEP = 0.01f;
-
-void attach_adjust_mode_keyb(int dik)
-{
-    if (!CAttachableItem::m_dbgItem)
-        return;
-
-    bool b_move = !!(pInput->iGetAsyncKeyState(SDL_SCANCODE_LSHIFT));
-    bool b_rot = !!(pInput->iGetAsyncKeyState(SDL_SCANCODE_LALT));
-
-    int axis = -1;
-    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_Z))
-        axis = 0;
-    else if (pInput->iGetAsyncKeyState(SDL_SCANCODE_X))
-        axis = 1;
-    if (pInput->iGetAsyncKeyState(SDL_SCANCODE_C))
-        axis = 2;
-
-    if (!b_move && !b_rot)
-        return;
-
-    switch (dik)
-    {
-    case SDL_SCANCODE_LEFT:
-    {
-        if (b_move)
-            CAttachableItem::mov(axis, ATT_ITEM_MOVE_CURR);
-        else
-            CAttachableItem::rot(axis, ATT_ITEM_ROT_CURR);
-    }
-    break;
-    case SDL_SCANCODE_RIGHT:
-    {
-        if (b_move)
-            CAttachableItem::mov(axis, -ATT_ITEM_MOVE_CURR);
-        else
-            CAttachableItem::rot(axis, -ATT_ITEM_ROT_CURR);
-    }
-    break;
-    case SDL_SCANCODE_PAGEUP:
-    {
-        if (b_move)
-            ATT_ITEM_MOVE_CURR += ATT_ITEM_MOVE_STEP;
-        else
-            ATT_ITEM_ROT_CURR += ATT_ITEM_ROT_STEP;
-    }
-    break;
-    case SDL_SCANCODE_PAGEDOWN:
-    {
-        if (b_move)
-            ATT_ITEM_MOVE_CURR -= ATT_ITEM_MOVE_STEP;
-        else
-            ATT_ITEM_ROT_CURR -= ATT_ITEM_ROT_STEP;
-    }
-    break;
-    };
-}
-
-void attach_draw_adjust_mode()
-{
-    if (!CAttachableItem::m_dbgItem)
-        return;
-
-    string1024 _text;
-
-    CGameFont* F = UI().Font().pFontDI;
-    F->SetAligment(CGameFont::alCenter);
-    F->OutSetI(0.f, -0.8f);
-    F->SetColor(0xffffffff);
-    xr_sprintf(_text, "Adjusting attachable item [%s]", CAttachableItem::m_dbgItem->object().cNameSect().c_str());
-    F->OutNext(_text);
-    xr_sprintf(_text, "move step  [%3.3f] rotate step  [%3.3f]", ATT_ITEM_MOVE_CURR, ATT_ITEM_ROT_CURR);
-    F->OutNext(_text);
-
-    F->OutNext("HOLD LShift to move. ALT to rotate");
-    F->OutNext("HOLD [Z]-x axis [X]-y axis [C]-z axis");
-
-    F->OutNext("RIGHT-LEFT - move. PgUP-PgDOWN - step");
-    F->OutSkip();
-
-    Fvector _pos = CAttachableItem::get_pos_offset();
-    xr_sprintf(_text, "attach_position_offset IS [%3.3f][%3.3f][%3.3f]", _pos.x, _pos.y, _pos.z);
-    F->OutNext(_text);
-
-    Fvector _ang = CAttachableItem::get_angle_offset();
-    xr_sprintf(_text, "attach_angle_offset IS [%3.3f][%3.3f][%3.3f]", _ang.x, _ang.y, _ang.z);
-    F->OutNext(_text);
-}
-#endif // #ifdef DEBUG

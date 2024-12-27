@@ -6,9 +6,6 @@
 #include "MusicStream.h"
 #include "xr_streamsnd.h"
 
-#if defined(WINDOWS)
-#include "x_ray.h"
-#endif
 #include "GameFont.h"
 
 //////////////////////////////////////////////////////////////////////

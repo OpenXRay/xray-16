@@ -136,11 +136,11 @@ public:
                 Fcylinder c_cylinder;
             };
         };
-        u16 type;
-        u16 elem_id;
+        u16 type{};
+        u16 elem_id{ u16(-1) };
 
-        SElement() : elem_id(u16(-1)), type(0) {}
-        SElement(u16 id, u16 t) : elem_id(id), type(t) {}
+        SElement() = default;
+        SElement(u16 id, u16 t) : type(t), elem_id(id) {}
         bool valid() const { return (elem_id != (u16(-1))) && (type != 0); }
         void center(Fvector& center) const;
     };

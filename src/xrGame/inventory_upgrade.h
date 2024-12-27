@@ -74,7 +74,7 @@ struct functor3<void> : public functor2<void>
 
 enum EMaxProps
 {
-    max_properties_count = 3,
+    max_properties_count = 4,
 };
 
 class Upgrade : public UpgradeBase
@@ -106,6 +106,7 @@ public:
     virtual void fill_root_container(Root* root);
 
     virtual UpgradeStateResult can_install(CInventoryItem& item, bool loading);
+    virtual UpgradeStateResult can_add(CInventoryItem& item);
     bool check_scheme_index(const Ivector2& scheme_index);
     void set_highlight(bool value);
     void run_effects(bool loading);

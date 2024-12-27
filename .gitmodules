@@ -13,27 +13,9 @@
 [submodule "Externals/zlib"]
 	path = Externals/zlib
 	url = https://github.com/madler/zlib.git
-[submodule "Externals/libvorbis"]
-	path = Externals/libvorbis
-	url = https://github.com/xiph/vorbis.git
-[submodule "Externals/libogg"]
-	path = Externals/libogg
-	url = https://github.com/xiph/ogg.git
-[submodule "Externals/libtheora"]
-	path = Externals/libtheora
-	url = https://github.com/xiph/theora.git
 [submodule "Externals/BugTrap"]
 	path = Externals/BugTrap
 	url = https://github.com/OpenXRay/BugTrap.git
-[submodule "Externals/cryptopp"]
-	path = Externals/cryptopp
-	url = https://github.com/weidai11/cryptopp.git
-[submodule "Externals/OpenAutomate"]
-	path = Externals/OpenAutomate
-	url = https://github.com/OpenXRay/OpenAutomate.git
-[submodule "Externals/FreeMagic"]
-	path = Externals/FreeMagic
-	url = https://github.com/OpenXRay/FreeMagic.git
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
@@ -46,3 +28,6 @@
 [submodule "Externals/xrLuaFix"]
 	path = Externals/xrLuaFix
 	url = https://github.com/OpenXRay/xrLuaFix.git
+[submodule "Externals/sse2rvv"]
+	path = Externals/sse2rvv
+	url = https://github.com/pattonkan/sse2rvv.git

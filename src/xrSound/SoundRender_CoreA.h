@@ -5,6 +5,16 @@
 #include <al.h>
 #include <alc.h>
 
+#if __has_include(<alext.h>)
+#include <alext.h>
+#endif
+
+#ifndef AL_EXT_float32
+#define AL_EXT_float32 1
+#define AL_FORMAT_MONO_FLOAT32                   0x10010
+#define AL_FORMAT_STEREO_FLOAT32                 0x10011
+#endif
+
 #ifdef DEBUG
 #define A_CHK(expr)                                             \
     do                                                          \
@@ -48,23 +58,11 @@ class CSoundRender_CoreA : public CSoundRender_Core
     ALCcontext* pContext;
     ALDeviceList* pDeviceList;
 
-    struct SListener
-    {
-        Fvector position{};
-        Fvector velocity{};
-        Fvector curVelocity{};
-        Fvector prevVelocity{};
-        Fvector accVelocity{};
-        Fvector orientation[2]{};
-    };
-
-    SListener Listener;
-
 protected:
-    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) override;
+    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt) override;
 
 public:
-    CSoundRender_CoreA();
+    CSoundRender_CoreA(CSoundManager& p);
 
     void _initialize_devices_list() override;
     void _initialize() override;
@@ -73,6 +71,4 @@ public:
 
     void set_master_volume(float f) override;
 
-    const Fvector& listener_position() override { return Listener.position; }
 };
-extern CSoundRender_CoreA* SoundRenderA;

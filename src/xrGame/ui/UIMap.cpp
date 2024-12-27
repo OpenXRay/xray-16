@@ -8,9 +8,9 @@
 #include "xrEngine/xr_input.h" //remove me !!!
 #include "xrCore/_fbox2.h"
 
-const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
-const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
-const u32 ourLevelMapColor = 0xffffffff;
+//const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
+//const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
+//const u32 ourLevelMapColor = 0xffffffff;
 
 CUICustomMap::CUICustomMap() : CUIStatic("Custom Map")
 {
@@ -391,46 +391,46 @@ void CUILevelMap::Draw()
         for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
         {
             CMapSpot* sp = smart_cast<CMapSpot*>((*it));
-            if (sp)
+            if (!sp)
+                continue;
+
+            if (sp->m_bScale)
             {
-                if (sp->m_bScale)
+                Fvector2 sz = sp->m_originSize;
+                // XXX: try to remove if-else branches and use common code path
+                if (ShadowOfChernobylMode)
                 {
-                    Fvector2 sz = sp->m_originSize;
-                    // XXX: try to remove if-else branches and use common code path
-                    if (ShadowOfChernobylMode)
+                    sz.mul(gmz);
+                    sp->SetWndSize(sz);
+                }
+                else if (ClearSkyMode)
+                {
+                    if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
                     {
-                        sz.mul(gmz);
-                        sp->SetWndSize(sz);
-                    }
-                    else if (ClearSkyMode)
-                    {
-                        if (gmz > sp->m_scale_bounds.x && gmz < sp->m_scale_bounds.y)
-                        {
-                            float k = (gmz - sp->m_scale_bounds.x) / (sp->m_scale_bounds.y - sp->m_scale_bounds.x);
-                            sz.mul(k);
-                            sp->SetWndSize(sz);
-                        }
-                        else if (gmz > sp->m_scale_bounds.y)
-                        {
-                            sp->SetWndSize(sz);
-                        }
-                    }
-                    else // COP
-                    {
-                        float k = gmz;
-
-                        if (gmz > sp->m_scale_bounds.y)
-                            k = sp->m_scale_bounds.y;
-                        else if (gmz < sp->m_scale_bounds.x)
-                            k = sp->m_scale_bounds.x;
-
+                        float k = (gmz - sp->m_scale_bounds.x) / (sp->m_scale_bounds.y - sp->m_scale_bounds.x);
                         sz.mul(k);
                         sp->SetWndSize(sz);
                     }
+                    else if (gmz > sp->m_scale_bounds.y)
+                    {
+                        sp->SetWndSize(sz);
+                    }
                 }
-                else if (sp->m_scale_bounds.x > 0.0f)
-                    sp->SetVisible(sp->m_scale_bounds.x < gmz);
+                else // COP
+                {
+                    float k = gmz;
+
+                    if (gmz > sp->m_scale_bounds.y)
+                        k = sp->m_scale_bounds.y;
+                    else if (gmz < sp->m_scale_bounds.x)
+                        k = sp->m_scale_bounds.x;
+
+                    sz.mul(k);
+                    sp->SetWndSize(sz);
+                }
             }
+            else if (sp->m_scale_bounds.x > 0.0f)
+                sp->SetVisible(sp->m_scale_bounds.x < gmz);
         }
     }
     inherited::Draw();
@@ -510,7 +510,7 @@ void CUILevelMap::Update()
     if (m_bCursorOverWindow)
     {
         VERIFY(m_dwFocusReceiveTime >= 0);
-        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500))
+        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500 * Device.time_factor()))
         {
             if (fsimilar(MapWnd()->GlobalMap()->GetCurrentZoom().x, MapWnd()->GlobalMap()->GetMinZoom(), EPS_L))
                 MapWnd()->ShowHintStr(this, MapName().c_str());
@@ -552,9 +552,7 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
     }
     else if (msg == MAP_HIDE_HINT)
-    {
         MapWnd()->HideHint(pWnd);
-    }
     else if (msg == MAP_SELECT_SPOT)
         MapWnd()->SpotSelected(pWnd);
     else if (msg == MAP_SELECT_SPOT2)

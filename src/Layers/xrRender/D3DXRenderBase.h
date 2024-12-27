@@ -166,9 +166,7 @@ protected:
     std::bitset<R__NUM_CONTEXTS> contexts_used{};
 #endif
 private:
-#if defined(USE_DX9) || defined(USE_DX11)
     CGammaControl m_Gamma;
-#endif
 
 protected:
     bool b_loaded{};

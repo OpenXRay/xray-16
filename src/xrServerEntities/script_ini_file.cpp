@@ -15,17 +15,22 @@
 
 CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
 CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
-    : inherited(update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
-{}
+    : inherited(update("$game_config$", szFileName), ReadOnly, bLoadAtStart, SaveAtEnd) {}
+CScriptIniFile::CScriptIniFile(LPCSTR initial, LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
+    : inherited(update(initial, szFileName), ReadOnly, bLoadAtStart, SaveAtEnd) {}
 
-LPCSTR CScriptIniFile::update(LPCSTR file_name)
+LPCSTR CScriptIniFile::update(LPCSTR initial, LPCSTR file_name)
 {
     string_path S1;
-    FS.update_path(S1, "$game_config$", file_name);
+    FS.update_path(S1, initial, file_name);
     return *shared_str(S1);
 }
 
-int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return object_factory().script_clsid(inherited::r_clsid(S, L)); }
+int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L)
+{
+    return object_factory().script_clsid(inherited::r_clsid(S, L));
+}
+
 int CScriptIniFile::r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list)
 {
     return inherited::r_token(S, L, &token_list.tokens().front());
@@ -191,20 +196,9 @@ bool CScriptIniFile::save_as(pcstr new_fname)
     return(inherited::save_as(new_fname));
 }
 
-void CScriptIniFile::save_at_end(bool b)
-{
-    inherited::save_at_end(b);
-}
-
 void CScriptIniFile::remove_line(pcstr S, pcstr L)
 {
     THROW3(inherited::section_exist(S), "Cannot find section", S);
     THROW3(inherited::line_exist(S, L), "Cannot find line", L);
     inherited::remove_line(S, L);
 }
-
-void CScriptIniFile::set_override_names(bool b)
-{
-    inherited::set_override_names(b);
-}
-

@@ -30,25 +30,17 @@ public:
     Flags32 m_Flags;
 
 public:
-    FS_Path(LPCSTR _Root, LPCSTR _Add, LPCSTR _DefExt = 0, LPCSTR _FilterString = 0, u32 flags = 0);
+    FS_Path(pcstr _Root, pcstr _Add, pcstr _DefExt = 0, pcstr _FilterString = 0, u32 flags = 0);
     ~FS_Path();
-    LPCSTR _update(string_path& dest, LPCSTR src) const;
-    void _set(LPCSTR add);
-    void _set_root(LPCSTR root);
+    pcstr _update(string_path& dest, pcstr src) const;
+    void _set(pcstr add);
+    void _set_root(pcstr root);
 
     void rescan_path_cb();
 };
 
-#ifdef _EDITOR
-namespace std
-{
-struct _finddata_t;
-};
-#define _FINDDATA_T std::_finddata_t
-#else
 struct _finddata64i32_t;
 #define _FINDDATA_T _finddata64i32_t
-#endif
 
 struct XRCORE_API FS_File
 {
@@ -69,10 +61,10 @@ public:
     FS_File(const _FINDDATA_T& f);
     FS_File(const xr_string& nm, const _FINDDATA_T& f);
     FS_File(const xr_string& nm, long sz, time_t modif, unsigned attr);
-    bool operator<(const FS_File& _X) const { return xr_strcmp(name.c_str(), _X.name.c_str()) < 0; }
+    bool operator<(const FS_File& other) const { return xr_strcmp(name.c_str(), other.name.c_str()) < 0; }
 };
 using FS_FileSet = xr_set<FS_File>;
 
-extern bool XRCORE_API PatternMatch(LPCSTR s, LPCSTR mask);
+extern bool XRCORE_API PatternMatch(pcstr s, pcstr mask);
 
 #endif // LocatorAPI_defsH

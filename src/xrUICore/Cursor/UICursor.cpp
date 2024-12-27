@@ -1,30 +1,31 @@
 #include "pch.hpp"
+
 #include "UICursor.h"
 
 #include "Static/UIStatic.h"
 #include "Buttons/UIBtnHint.h"
 #include "xrEngine/xr_input.h"
 
-#define C_DEFAULT color_xrgb(0xff, 0xff, 0xff)
+void CUICursor::InitInternal()
+{
+    m_static = xr_new<CUIStatic>("ui_ani_cursor");
+    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
+    Frect rect;
+    rect.set(0.0f, 0.0f, 40.0f, 40.0f);
+    m_static->SetTextureRect(rect);
+    Fvector2 sz;
+    sz.set(rect.rb);
+    sz.x *= UICore::get_current_kx();
 
-CUICursor::CUICursor() : m_static(NULL), m_bound_to_system_cursor(false)
-{
-    bVisible = false;
-    vPrevPos.set(0.0f, 0.0f);
-    vPos.set(0.f, 0.f);
-    InitInternal();
-    Device.seqRender.Add(this, -3 /*2*/);
-}
-//--------------------------------------------------------------------
-CUICursor::~CUICursor()
-{
-    xr_delete(m_static);
-    Device.seqRender.Remove(this);
+    m_static->SetWndSize(sz);
+    m_static->SetStretchTexture(true);
+
+    OnDeviceReset();
 }
 
 void CUICursor::OnDeviceReset()
 {
-    correction.x = UI_BASE_WIDTH / (float)Device.m_rcWindowClient.w;
+    correction.x = UI_BASE_WIDTH  / (float)Device.m_rcWindowClient.w;
     correction.y = UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h;
 
     SDL_Rect display;
@@ -44,34 +45,16 @@ void CUICursor::OnUIReset()
     InitInternal();
 }
 
-void CUICursor::Show()
+CUICursor::CUICursor()
 {
-    bVisible = true;
-    m_become_visible_time  = Device.dwTimeContinual;
+    InitInternal();
+    Device.seqRender.Add(this, -3 /*2*/);
 }
-
-void CUICursor::Hide()
+//--------------------------------------------------------------------
+CUICursor::~CUICursor()
 {
-    bVisible = false;
-    m_become_visible_time = 0;
-    m_pause_autohide = false;
-}
-
-void CUICursor::InitInternal()
-{
-    m_static = xr_new<CUIStatic>("ui_ani_cursor");
-    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
-    Frect rect;
-    rect.set(0.0f, 0.0f, 40.0f, 40.0f);
-    m_static->SetTextureRect(rect);
-    Fvector2 sz;
-    sz.set(rect.rb);
-    sz.x *= UICore::get_current_kx();
-
-    m_static->SetWndSize(sz);
-    m_static->SetStretchTexture(true);
-
-    OnDeviceReset();
+    xr_delete(m_static);
+    Device.seqRender.Remove(this);
 }
 
 //--------------------------------------------------------------------
@@ -104,38 +87,13 @@ void CUICursor::OnRender()
     m_static->Draw();
 }
 
-void CUICursor::UpdateAutohideTiming()
+void CUICursor::SetUICursorPosition(Fvector2 pos)
 {
-    if (m_pause_autohide)
-        return;
-
-    const u32 cur_time = Device.dwTimeContinual;
-
-    if (float(cur_time - m_become_visible_time) > (psControllerCursorAutohideTime * 1000.f))
-    {
-        Hide();
-    }
-}
-
-void CUICursor::PauseAutohiding(bool pause)
-{
-    if (m_pause_autohide == pause)
-        return;
-
-    m_pause_autohide = pause;
-    if (!m_pause_autohide)
-        m_become_visible_time = Device.dwTimeContinual;
-}
-
-Fvector2 CUICursor::GetCursorPosition() { return vPos; }
-
-Fvector2 CUICursor::GetCursorPositionDelta()
-{
-    Fvector2 res_delta;
-
-    res_delta.x = vPos.x - vPrevPos.x;
-    res_delta.y = vPos.y - vPrevPos.y;
-    return res_delta;
+    vPos = pos;
+    Ivector2 p;
+    p.x = iFloor(vPos.x / correction.x);
+    p.y = iFloor(vPos.y / correction.y);
+    std::ignore = pInput->iSetMousePos(p);
 }
 
 void CUICursor::UpdateCursorPosition(int _dx, int _dy)
@@ -144,8 +102,8 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
     if (pInput->IsExclusiveMode() || !m_bound_to_system_cursor)
     {
         float sens = 1.0f;
-        vPos.x += _dx * sens * correction.x;
-        vPos.y += _dy * sens * correction.y;
+        vPos.x += (float)_dx * sens * correction.x;
+        vPos.y += (float)_dy * sens * correction.y;
     }
     else
     {
@@ -156,15 +114,6 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
     }
     clamp(vPos.x, 0.f, UI_BASE_WIDTH);
     clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
-}
-
-void CUICursor::SetUICursorPosition(Fvector2 pos)
-{
-    vPos = pos;
-    Ivector2 p;
-    p.x = iFloor(vPos.x / correction.x);
-    p.y = iFloor(vPos.y / correction.y);
-    pInput->iSetMousePos(p);
 }
 
 void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
@@ -181,10 +130,27 @@ void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
     if (change_visibility)
         Show();
 
+    if (!IsVisible())
+        return;
+
     Fvector2 pos;
     wnd->GetAbsolutePos(pos);
     Fvector2 size = wnd->GetWndSize();
     const Fvector2 sizeOfThird = Fvector2(size).div(3);
     pos.add(size).sub(sizeOfThird);
     SetUICursorPosition(pos);
+}
+
+Fvector2 CUICursor::GetCursorPosition() const
+{
+    return vPos;
+}
+
+Fvector2 CUICursor::GetCursorPositionDelta() const
+{
+    return
+    {
+        vPos.x - vPrevPos.x,
+        vPos.y - vPrevPos.y
+    };
 }

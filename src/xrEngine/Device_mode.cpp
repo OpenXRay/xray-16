@@ -25,8 +25,37 @@ void FillResolutionsForMonitor(const int monitorID)
     vid_mode_token[monitorID].emplace_back(nullptr, -1);
 }
 
+void FillImGuiMonitorData(const int monitorID)
+{
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+
+    // Warning: the validity of monitor DPI information on Windows
+    // depends on the application DPI awareness settings,
+    // which generally needs to be set in the manifest or at runtime.
+    ImGuiPlatformMonitor monitor;
+    SDL_Rect r;
+    SDL_GetDisplayBounds(monitorID, &r);
+    monitor.MainPos = monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
+    monitor.MainSize = monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
+
+    SDL_GetDisplayUsableBounds(monitorID, &r);
+    monitor.WorkPos = ImVec2((float)r.x, (float)r.y);
+    monitor.WorkSize = ImVec2((float)r.w, (float)r.h);
+
+    // FIXME-VIEWPORT: On MacOS SDL reports actual monitor DPI scale, ignoring OS configuration. We may want to set
+    //  DpiScale to cocoa_window.backingScaleFactor here.
+    float dpi = 0.0f;
+    if (!SDL_GetDisplayDPI(monitorID, &dpi, nullptr, nullptr))
+        monitor.DpiScale = dpi / 96.0f;
+
+    monitor.PlatformHandle = (void*)(intptr_t)monitorID;
+    platform_io.Monitors.push_back(monitor);
+}
+
 void CRenderDevice::FillVideoModes()
 {
+    ZoneScoped;
+
     const int displayCount = SDL_GetNumVideoDisplays();
     R_ASSERT3(displayCount > 0, "Failed to find display", SDL_GetError());
 
@@ -37,12 +66,15 @@ void CRenderDevice::FillVideoModes()
         vid_monitor_token.emplace_back(xr_strdup(buf), i);
 
         FillResolutionsForMonitor(i);
+        FillImGuiMonitorData(i);
     }
     vid_monitor_token.emplace_back(nullptr, -1);
 }
 
 void CRenderDevice::CleanupVideoModes()
 {
+    ZoneScoped;
+
     for (auto& [monitor_id, tokens] : vid_mode_token)
     {
         for (auto& token : tokens)
@@ -60,6 +92,8 @@ void CRenderDevice::CleanupVideoModes()
         xr_free(tokenName);
     }
     vid_monitor_token.clear();
+
+    ImGui::GetPlatformIO().Monitors.resize(0);
 }
 
 void CRenderDevice::SetWindowDraggable(bool draggable)
@@ -69,19 +103,19 @@ void CRenderDevice::SetWindowDraggable(bool draggable)
     const bool resizable = SDL_GetWindowFlags(Device.m_sdlWnd) & SDL_WINDOW_RESIZABLE;
     m_allowWindowDrag = draggable && windowed && resizable;
 
-#if SDL_VERSION_ATLEAST(2, 0, 5)
     SDL_SetWindowOpacity(Device.m_sdlWnd, m_allowWindowDrag ? 0.95f : 1.0f);
-#endif
 }
 
 void CRenderDevice::UpdateWindowProps()
 {
+    ZoneScoped;
+
     const bool windowed = psDeviceMode.WindowStyle != rsFullscreen;
     SelectResolution(windowed);
 
     // Changing monitor, unset fullscreen for the previous monitor
     // and move the window to the new monitor
-    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != psDeviceMode.Monitor)
+    if (SDL_GetWindowDisplayIndex(m_sdlWnd) != static_cast<int>(psDeviceMode.Monitor))
     {
         SDL_SetWindowFullscreen(m_sdlWnd, SDL_DISABLE);
 
@@ -90,7 +124,15 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowPosition(m_sdlWnd, rect.x, rect.y);
     }
 
-    SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
+    if (psDeviceMode.WindowStyle != rsFullscreenBorderless)
+        SDL_SetWindowSize(m_sdlWnd, psDeviceMode.Width, psDeviceMode.Height);
+    else
+    {
+        SDL_DisplayMode current;
+        SDL_GetCurrentDisplayMode(psDeviceMode.Monitor, &current);
+
+        SDL_SetWindowSize(m_sdlWnd, current.w, current.h);
+    }
 
     if (windowed)
     {
@@ -114,10 +156,13 @@ void CRenderDevice::UpdateWindowProps()
         SDL_SetWindowDisplayMode(m_sdlWnd, &mode);
     }
 
+    SDL_PumpEvents();
     UpdateWindowRects();
-    SDL_FlushEvents(SDL_WINDOWEVENT, SDL_SYSWMEVENT);
 
-    editor().UpdateWindowProps();
+    ImGuiIO& io = ImGui::GetIO();
+
+    io.DisplaySize = { static_cast<float>(psDeviceMode.Width), static_cast<float>(psDeviceMode.Height) };
+    io.DisplayFramebufferScale = ImVec2{ float(dwWidth / m_rcWindowClient.w), float(dwHeight / m_rcWindowClient.h) };
 }
 
 void CRenderDevice::UpdateWindowRects()
@@ -129,14 +174,12 @@ void CRenderDevice::UpdateWindowRects()
     SDL_GetWindowPosition(m_sdlWnd, &m_rcWindowBounds.x, &m_rcWindowBounds.y);
     SDL_GetWindowSize(m_sdlWnd, &m_rcWindowBounds.w, &m_rcWindowBounds.h);
 
-#if SDL_VERSION_ATLEAST(2, 0, 5)
     int top, left, bottom, right;
     SDL_GetWindowBordersSize(m_sdlWnd, &top, &left, &bottom, &right);
     m_rcWindowBounds.x -= left;
     m_rcWindowBounds.y -= top;
     m_rcWindowBounds.w += right;
     m_rcWindowBounds.h += bottom;
-#endif
 }
 
 void CRenderDevice::SelectResolution(const bool windowed)
@@ -174,7 +217,8 @@ void CRenderDevice::SelectResolution(const bool windowed)
                 SDL_PIXELFORMAT_UNKNOWN,
                 (int)psDeviceMode.Width,
                 (int)psDeviceMode.Height,
-                (int)psDeviceMode.RefreshRate
+                (int)psDeviceMode.RefreshRate,
+                nullptr
             };
 
             SDL_DisplayMode closest; // try closest or fallback to desktop mode
@@ -216,9 +260,7 @@ void CRenderDevice::OnFatalError()
 {
     // make it sure window will hide in any way
     SDL_SetWindowFullscreen(m_sdlWnd, SDL_FALSE);
-#if SDL_VERSION_ATLEAST(2, 0, 16)
     SDL_SetWindowAlwaysOnTop(m_sdlWnd, SDL_FALSE);
-#endif
     SDL_ShowWindow(m_sdlWnd);
     SDL_MinimizeWindow(m_sdlWnd);
     SDL_HideWindow(m_sdlWnd);

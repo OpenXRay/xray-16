@@ -7,7 +7,6 @@ class CUIFrameLineWnd;
 class CUI3tButton;
 class CUITabControl;
 class CUIStatic;
-class CUITextWnd;
 class CUIXml;
 class CUIFrameWindow;
 class UIHint;
@@ -34,8 +33,7 @@ protected:
 
     CUIStatic* m_caption;
     shared_str m_caption_const;
-    CUIAnimatedStatic* m_anim_static;
-    CUITextWnd* m_clock;
+    CUIStatic* m_clock;
 
     // Текущий активный диалог
     CUIWindow* m_pActiveDialog;
@@ -79,12 +77,15 @@ public:
     void SetCaption(pcstr text);
     void Show_SecondTaskWnd(bool status);
     void Show_MapLegendWnd(bool status);
-    pcstr GetActiveSection() { return m_sActiveSection.c_str(); };
-    CUITabControl* GetTabControl() const { return UITabControl; };
 
+    void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
+    CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }
+    pcstr GetActiveSection() const { return m_sActiveSection.c_str(); }
     void SetActiveSubdialog(const shared_str& section);
-    void SetActiveSubdialog_script(pcstr section) { SetActiveSubdialog(section); };
-    virtual bool StopAnyMove() { return false; }
+    CUITabControl* GetTabControl() const { return UITabControl; }
+
+    bool StopAnyMove() override { return false; }
+    bool NeedCursor() const override;
     void UpdatePda();
     void UpdateRankingWnd();
 

@@ -42,7 +42,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
 {
     string_path name;
     xr_strcpy(name, shader);
-    switch (GEnv.Render->m_skinning)
+    switch (RImplementation.m_skinning)
     {
     case 0:
         xr_strcat(name, "_0");
@@ -60,7 +60,7 @@ SVS* CResourceManager::_CreateVS(cpcstr shader, u32 flags /*= 0*/)
         xr_strcat(name, "_4");
         break;
     }
-    
+
     return CreateShader<SVS>(name, shader, flags);
 }
 
@@ -86,7 +86,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    switch (GEnv.Render->m_MSAASample)
+    switch (RImplementation.m_MSAASample)
     {
     case 0:
         xr_strcat(name, "_0");
@@ -155,40 +155,6 @@ SDeclaration* CResourceManager::_CreateDecl(const D3DVERTEXELEMENT9* dcl)
     D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 
     return D;
-}
-
-//--------------------------------------------------------------------------------------------------------------
-SGeometry* CResourceManager::CreateGeom(const D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
-{
-    R_ASSERT(decl && vb);
-
-    SDeclaration* dcl = _CreateDecl(decl);
-    u32 vb_stride = GetDeclVertexSize(decl, 0);
-
-    // ***** first pass - search already loaded shader
-    for (SGeometry* v_geom : v_geoms)
-    {
-        SGeometry& G = *v_geom;
-        if ((G.dcl == dcl) && (G.vb == vb) && (G.ib == ib) && (G.vb_stride == vb_stride))
-            return v_geom;
-    }
-
-    SGeometry* Geom = v_geoms.emplace_back(xr_new<SGeometry>());
-    Geom->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-    Geom->dcl = dcl;
-    Geom->vb = vb;
-    Geom->vb_stride = vb_stride;
-    Geom->ib = ib;
-
-    return Geom;
-}
-
-SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
-{
-    D3DVERTEXELEMENT9 dcl[MAX_FVF_DECL_SIZE];
-    CHK_DX(D3DXDeclaratorFromFVF(FVF, dcl));
-    SGeometry* g = CreateGeom(dcl, vb, ib);
-    return g;
 }
 
 //--------------------------------------------------------------------------------------------------------------

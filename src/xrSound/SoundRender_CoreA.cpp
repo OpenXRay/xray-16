@@ -5,11 +5,9 @@
 #include "SoundRender_TargetA.h"
 #include "OpenALDeviceList.h"
 #include "SoundRender_EffectsA_EAX.h"
-#include "SoundRender_EffectsA_EFX.h"
 
-CSoundRender_CoreA* SoundRenderA = nullptr;
-
-CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
+CSoundRender_CoreA::CSoundRender_CoreA(CSoundManager& p)
+    : CSoundRender_Core(p)
 {
     pDevice = nullptr;
     pDeviceList = nullptr;
@@ -24,14 +22,23 @@ void CSoundRender_CoreA::_initialize_devices_list()
 
     if (0 == pDeviceList->GetNumDevices())
     {
-        CHECK_OR_EXIT(0, "OpenAL: Can't create sound device.");
+        Log("! SOUND: OpenAL: No sound devices found.");
+        bPresent = false;
         xr_delete(pDeviceList);
     }
+    bPresent = true;
 }
 
 void CSoundRender_CoreA::_initialize()
 {
-    R_ASSERT2(pDeviceList, "Incorrect initialization order. Call _initialize_devices_list() first.");
+    ZoneScoped;
+
+    if (!pDeviceList)
+    {
+        VERIFY2(pDeviceList, "Probably incorrect initialization order. Make sure to call _initialize_devices_list() first.");
+        bPresent = false;
+        return;
+    }
 
     pDeviceList->SelectBestDevice();
     R_ASSERT(snd_device_id >= 0 && snd_device_id < pDeviceList->GetNumDevices());
@@ -39,21 +46,21 @@ void CSoundRender_CoreA::_initialize()
 
     // OpenAL device
     pDevice = alcOpenDevice(deviceDesc.name);
-    if (pDevice == nullptr)
+    if (!pDevice)
     {
-        CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create device.");
-        bPresent = FALSE;
+        Log("! SOUND: OpenAL: Failed to create device.");
+        bPresent = false;
         return;
     }
 
     // Get the device specifier.
-    const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
+    //const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
 
     // Create context
     pContext = alcCreateContext(pDevice, nullptr);
-    if (nullptr == pContext)
+    if (!pContext)
     {
-        CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create context.");
+        Log("! SOUND: OpenAL: Failed to create context.");
         bPresent = FALSE;
         alcCloseDevice(pDevice);
         pDevice = nullptr;
@@ -74,7 +81,11 @@ void CSoundRender_CoreA::_initialize()
     A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&orient[0].x));
     A_CHK(alListenerf(AL_GAIN, 1.f));
 
-    auto auxSlot = ALuint(-1);
+    supports_float_pcm = alIsExtensionPresent("AL_EXT_FLOAT32")  // first is OpenAL Soft,
+                      || alIsExtensionPresent("AL_EXT_float32"); // second is macOS
+
+    supports_float_pcm &= psSoundFlags.test(ss_UseFloat32);
+
 #if defined(XR_HAS_EAX)
     // Check for EAX extension
     if (deviceDesc.props.eax && !m_effects)
@@ -86,19 +97,6 @@ void CSoundRender_CoreA::_initialize()
             xr_delete(m_effects);
         }
     }
-#elif defined(XR_HAS_EFX)
-    // Check for EFX extension
-    if (deviceDesc.props.efx && !m_effects)
-    {
-        m_effects = xr_new<CSoundRender_EffectsA_EFX>();
-        if (m_effects->initialized())
-            auxSlot = ((CSoundRender_EffectsA_EFX*)m_effects)->get_slot();
-        else
-        {
-            Log("SOUND: OpenAL: Failed to initialize EFX.");
-            xr_delete(m_effects);
-        }
-    }
 #endif
     inherited::_initialize();
 
@@ -106,10 +104,10 @@ void CSoundRender_CoreA::_initialize()
     CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
-        T = xr_new<CSoundRender_TargetA>(auxSlot);
+        T = xr_new<CSoundRender_TargetA>();
         if (T->_initialize())
         {
-            s_targets.push_back(T);
+            s_targets.emplace_back(T);
         }
         else
         {
@@ -132,13 +130,12 @@ void CSoundRender_CoreA::_clear()
     inherited::_clear();
     xr_delete(m_effects);
     // remove targets
-    CSoundRender_Target* T = nullptr;
-    for (auto& sr_target : s_targets)
+    for (auto& T : s_targets)
     {
-        T = sr_target;
         T->_destroy();
         xr_delete(T);
     }
+    s_targets.clear();
     // Reset the current context to NULL.
     alcMakeContextCurrent(nullptr);
     // Release the context and the device.
@@ -149,25 +146,13 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
-void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
+void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt)
 {
-    inherited::update_listener(P, D, N, dt);
+    inherited::update_listener(P, D, N, R, dt);
 
-    // Use exponential moving average for a nice smooth doppler effect.
-    Listener.prevVelocity.set(Listener.accVelocity);
-    Listener.curVelocity.sub(P, Listener.position);
-    Listener.accVelocity.set(Listener.curVelocity.mul(psSoundVelocityAlpha).add(Listener.prevVelocity.mul(1.f - psSoundVelocityAlpha)));
-    Listener.prevVelocity.set(Listener.accVelocity).div(dt);
+    const auto listener = Listener.ToRHS();
 
-    if (!Listener.position.similar(P))
-    {
-        Listener.position.set(P);
-        bListenerMoved = TRUE;
-    }
-    Listener.orientation[0].set(D.x, D.y, -D.z);
-    Listener.orientation[1].set(N.x, N.y, -N.z);
-
-    A_CHK(alListener3f(AL_POSITION, Listener.position.x, Listener.position.y, -Listener.position.z));
-    A_CHK(alListener3f(AL_VELOCITY, Listener.prevVelocity.x, Listener.prevVelocity.y, -Listener.prevVelocity.z));
-    A_CHK(alListenerfv(AL_ORIENTATION, (const ALfloat*)&Listener.orientation[0].x));
+    A_CHK(alListener3f(AL_POSITION, listener.position.x, listener.position.y, listener.position.z));
+    A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
+    A_CHK(alListenerfv(AL_ORIENTATION, &listener.orientation[0].x));
 }

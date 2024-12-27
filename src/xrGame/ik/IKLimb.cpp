@@ -19,22 +19,22 @@ int ik_blend_free_foot = 1;
 int ik_local_blending = 0;
 int ik_collide_blend = 0;
 
-const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}; //. in XGlobal
+//const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}; //. in XGlobal
 
-const Matrix IKLocalJoint = {0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1}; //. in XGlobal
-const Fmatrix XLocalJoint = {0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+//const Matrix IKLocalJoint = {0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1}; //. in XGlobal
+//const Fmatrix XLocalJoint = {0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
 const Fmatrix xm2im = {0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
 
-const Fvector xgproj_axis = {0, 1, 0};
-const Fvector xgpos_axis = {0, 0, 1};
+//const Fvector xgproj_axis = {0, 1, 0};
+//const Fvector xgpos_axis = {0, 0, 1};
 
-const Fvector xlproj_axis = {1, 0, 0};
-const Fvector xlpos_axis = {0, 0, 1};
+//const Fvector xlproj_axis = {1, 0, 0};
+//const Fvector xlpos_axis = {0, 0, 1};
 typedef float IVektor[3];
 
-const IVektor lproj_vector = {0, 0, 1};
-const IVektor lpos_vector = {-1, 0, 0};
+//const IVektor lproj_vector = {0, 0, 1};
+//const IVektor lpos_vector = {-1, 0, 0};
 
 const IVektor gproj_vector = {0, 0, 1}; //. in XGlobal
 const IVektor gpos_vector = {1, 0, 0};
@@ -494,8 +494,10 @@ void CIKLimb::SetNewGoal(const SIKCollideData& cld, SCalculateData& cd)
     cd.state.foot_step =
         m_foot.GetFootStepMatrix(cd.state.goal, cd, cld, true, !!ik_allign_free_foot) && cd.state.foot_step;
 
+#ifdef DEBUG
     VERIFY2(fsimilar(1.f, DET(cd.state.goal.get()), det_tolerance),
         dump_string("cd.state.goal", cd.state.goal.get()).c_str());
+#endif
 
     cd.state.blend_to = cd.state.goal;
     sv_state.get_calculate_state(cd.state);
@@ -671,27 +673,36 @@ void CIKLimb::Blending(SCalculateData& cd)
     {
         blend_speed_accel(cd);
         ik_goal_matrix m;
+
+#ifdef DEBUG
         VERIFY(fsimilar(1.f, DET(sv_state.goal(m).get()), det_tolerance));
         VERIFY(fsimilar(1.f, DET(sv_state.blend_to(m).get()), det_tolerance));
+#endif
 
         Fmatrix diff;
         diff.mul_43(Fmatrix().invert(sv_state.blend_to(m).get()), Fmatrix(sv_state.goal(m).get()));
 
+#ifdef DEBUG
         VERIFY(fsimilar(1.f, DET(diff), det_tolerance));
+#endif
 
         Fmatrix blend = Fidentity; // cd.state.blend_to;
         cd.state.blending =
             !clamp_change(blend, diff, cd.l, cd.a, linear_tolerance, angualar_tolerance); // 0.01f //0.005f
 
+#ifdef DEBUG
         VERIFY(fsimilar(1.f, DET(blend), det_tolerance));
         VERIFY(fsimilar(1.f, DET(cd.state.blend_to.get()), det_tolerance));
+#endif
 
         Fmatrix fm = Fmatrix().mul_43(cd.state.blend_to.get(), blend);
         if (ik_collide_blend)
             m_foot.GetFootStepMatrix(cd.state.goal, fm, collide_data, true, true);
         else
             cd.state.goal.set(fm, cd.state.blend_to.collide_state());
+#ifdef DEBUG
         VERIFY(fsimilar(DET(cd.state.goal.get()), 1.f, det_tolerance));
+#endif
     }
     else
     {
@@ -845,7 +856,7 @@ void CIKLimb::ToeTimeDiff(Fvector& v, const SCalculateData& cd) const
 
 void CIKLimb::ToeTimeDiffPredict(Fvector& v) const { v.set(0, -1, 0); }
 static const float pick_dir_mix_in_factor = 0.01f;
-static const float pick_dir_mix_in_doun_factor = 0.01f;
+//static const float pick_dir_mix_in_doun_factor = 0.01f;
 void pick_dir_update(Fvector& v, const Fvector& previous_dir, const Fvector& new_dir)
 {
     Fvector dir = new_dir;

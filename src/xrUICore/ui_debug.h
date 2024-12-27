@@ -22,8 +22,8 @@ struct CUIDebugState
 {
     CUIDebuggable* selected{};
     mutable CUIDebuggable* newSelected{};
-    bool drawWndRects{};
-    bool coloredRects{};
+    bool drawWndRects{ true };
+    bool coloredRects{ true };
 
     void select(CUIDebuggable* debuggable) const
     {
@@ -45,7 +45,7 @@ public:
     void Register(CUIDebuggable* debuggable);
     void Unregister(CUIDebuggable* debuggable);
 
-    void OnFrame() override;
+    void on_tool_frame() override;
 
     [[nodiscard]]
     CUIDebuggable* GetSelected() const { return m_state.selected; }

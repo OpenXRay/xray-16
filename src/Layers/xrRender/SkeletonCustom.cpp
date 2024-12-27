@@ -50,10 +50,9 @@ u16 CKinematics::LL_BoneID(const shared_str& B)
 //
 LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
 {
-    CKinematics::accel::iterator _I, _E = bone_map_N->end();
-    for (_I = bone_map_N->begin(); _I != _E; ++_I)
-        if (_I->second == ID)
-            return *_I->first;
+    for (const auto& [bone_name, bone_id] : *bone_map_N)
+        if (bone_id == ID)
+            return bone_name.c_str();
     return nullptr;
 }
 
@@ -182,7 +181,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             string_path lod_name;
             LD->r_string(lod_name, sizeof(lod_name));
             //.         strconcat       (sizeof(name_load),name_load, short_name, ":lod:", lod_name.c_str());
-            m_lod = (dxRender_Visual*)GEnv.Render->model_CreateChild(lod_name, nullptr);
+            m_lod = (dxRender_Visual*)RImplementation.model_CreateChild(lod_name, nullptr);
 
             if (CKinematics* lod_kinematics = dynamic_cast<CKinematics*>(m_lod))
             {
@@ -194,7 +193,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             //    m_lod->Type==MT_NORMAL,lod_name.c_str());
             /*
                 strconcat(name_load, short_name, ":lod:1");
-                m_lod = GEnv.Render->model_CreateChild(name_load, LD);
+                m_lod = RImplementation.model_CreateChild(name_load, LD);
                 VERIFY(m_lod->Type==MT_SKELETON_GEOMDEF_PM || m_lod->Type==MT_SKELETON_GEOMDEF_ST);
             */
         }
@@ -424,7 +423,7 @@ void CKinematics::Copy(dxRender_Visual* P)
 
     CalculateBones_Invalidate();
 
-    m_lod = (pFrom->m_lod) ? (dxRender_Visual*)GEnv.Render->model_Duplicate(pFrom->m_lod) : 0;
+    m_lod = (pFrom->m_lod) ? (dxRender_Visual*)RImplementation.model_Duplicate(pFrom->m_lod) : 0;
 }
 
 void CKinematics::CalculateBones_Invalidate()
@@ -536,6 +535,8 @@ void CKinematics::LL_SetBonesVisible(u64 mask)
 
 void CKinematics::Visibility_Update()
 {
+    ZoneScoped;
+
     Update_Visibility = FALSE;
     // check visible
     for (u32 c_it = 0; c_it < children.size(); c_it++)
@@ -630,6 +631,8 @@ bool CKinematics::PickBone(const Fmatrix& parent_xform, IKinematics::pick_result
 void CKinematics::AddWallmark(
     const Fmatrix* parent_xform, const Fvector3& start, const Fvector3& dir, ref_shader shader, float size)
 {
+    ZoneScoped;
+
     Fvector S, D, normal = {0, 0, 0};
     // transform ray from world to model
     Fmatrix P;
@@ -731,6 +734,8 @@ void CKinematics::AddWallmark(
 
 void CKinematics::CalculateWallmarks(bool hud)
 {
+    ZoneScoped;
+
     if (!wallmarks.empty() && (wm_frame != Device.dwFrame))
     {
         wm_frame = Device.dwFrame;
@@ -742,8 +747,7 @@ void CKinematics::CalculateWallmarks(bool hud)
             if (w < 1.f)
             {
                 // append wm to WallmarkEngine
-                if (!hud && GEnv.Render->ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
-                    // GEnv.Render->add_SkeletonWallmark   (wm);
+                if (!hud && RImplementation.ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
                     ::RImplementation.add_SkeletonWallmark(wm);
             }
             else
@@ -765,6 +769,8 @@ void CKinematics::CalculateWallmarks(bool hud)
 
 void CKinematics::RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*& V)
 {
+    ZoneScoped;
+
     VERIFY(wm);
     VERIFY(V);
     VERIFY2(bones, "Invalid visual. Bones already released.");

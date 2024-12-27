@@ -104,7 +104,7 @@ CUISequencer::CUISequencer()
 bool CUISequencer::Start(LPCSTR tutor_name)
 {
     VERIFY(m_sequencer_items.empty());
-    
+
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "game_tutorials.xml");
 
@@ -150,7 +150,7 @@ bool CUISequencer::Start(LPCSTR tutor_name)
     if (snd_name && snd_name[0])
     {
         m_global_sound.create(snd_name, st_Effect, sg_Undefined);
-        VERIFY(m_global_sound._handle() || strstr(Core.Params, "-nosound"));
+        VERIFY(m_global_sound._handle() || !Engine.Sound.IsSoundEnabled());
     }
     m_start_lua_function = uiXml.Read("function_on_start", 0, "");
     m_stop_lua_function = uiXml.Read("function_on_stop", 0, "");
@@ -293,6 +293,8 @@ void CUISequencer::Stop()
 
 void CUISequencer::OnFrame()
 {
+    ZoneScoped;
+
     if (!Device.b_is_Active)
         return;
     if (!IsActive())
@@ -323,6 +325,8 @@ void CUISequencer::OnFrame()
 
 void CUISequencer::OnRender()
 {
+    ZoneScoped;
+
     if (m_UIWindow->IsShown())
         m_UIWindow->Draw();
 
@@ -395,7 +399,7 @@ void CUISequencer::IR_OnKeyboardHold(int dik)
         m_pStoredInputReceiver->IR_OnKeyboardHold(dik);
 }
 
-void CUISequencer::IR_OnMouseWheel(int x, int y)
+void CUISequencer::IR_OnMouseWheel(float x, float y)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
         m_pStoredInputReceiver->IR_OnMouseWheel(x, y);

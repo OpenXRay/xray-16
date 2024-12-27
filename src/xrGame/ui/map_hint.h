@@ -3,7 +3,6 @@
 #include "xrCore/Containers/AssociativeVector.hpp"
 
 class CUIStatic;
-class CUITextWnd;
 class CUIXml;
 class CGameTask;
 class CMapSpot;

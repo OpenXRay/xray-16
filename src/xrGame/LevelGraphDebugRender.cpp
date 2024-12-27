@@ -368,11 +368,12 @@ void LevelGraphDebugRender::DrawGameGraph()
     IGameObject* entity = Level().CurrentEntity();
     if (!entity)
         return;
+
+// draw back plane
+#if 0 // XXX: disabled in original, reenable?
     const Fmatrix& xform = entity->XFORM();
     Fvector center = {0.f, 5.f, 0.f};
     Fvector bounds = {3.f, 0.f, 3.f};
-// draw back plane
-#if 0 // XXX: disabled in original, reenable?
     Fvector vertices[4];
     xform.transform_tiny(vertices[0], {center.x-bounds.x, center.y+bounds.y, center.z+bounds.z});
     xform.transform_tiny(vertices[1], {center.x+bounds.x, center.y+bounds.y, center.z+bounds.z});

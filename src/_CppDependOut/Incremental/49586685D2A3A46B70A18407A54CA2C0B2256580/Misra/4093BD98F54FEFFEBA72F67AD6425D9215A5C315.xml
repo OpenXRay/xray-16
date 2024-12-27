@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cppdepend-plugin tool="Misra">
-<file path="c:\openxray\externals\openal\openal-windows\router\allist.h"><violation beginline="172" endline="172" rule="Rule7-5-4" ruleset="Declarations">
-</violation><violation beginline="182" endline="182" rule="Rule7-5-4" ruleset="Declarations">
-</violation></file><file path="c:\openxray\externals\openal\openal-windows\router\openal32.cpp"><violation beginline="37" endline="37" rule="Rule6-4-4" ruleset="Statements">
-</violation><violation beginline="55" endline="55" rule="Rule4-10-2" ruleset="Expressions">
-</violation></file></cppdepend-plugin>

@@ -2,6 +2,7 @@
 #include "UIGameCustom.h"
 #include "ui/UIDialogWnd.h"
 #include "xrAICore/Navigation/game_graph_space.h"
+#include "UITimeDilator.h"
 
 class CUITradeWnd;
 class CUITalkWnd;
@@ -12,6 +13,9 @@ class CChangeLevelWnd;
 class CUIMessageBox;
 class CInventoryBox;
 class CInventoryOwner;
+
+extern UITimeDilator* TimeDilator();
+extern void CloseTimeDilator();
 
 class CUIGameSP final : public CUIGameCustom
 {
@@ -38,6 +42,9 @@ public:
 
     void HideShownDialogs() override;
     void ReinitDialogs() override;
+
+    void StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators) override;
+    void StopDialog(CUIDialogWnd* pDialog) override;
 
 #ifdef DEBUG
     virtual void Render();

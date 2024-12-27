@@ -1,6 +1,0 @@
-c:\openxray\externals\luajit\src\host\buildvm.h
-c:\openxray\externals\luajit\src\host\buildvm.c
-c:\openxray\externals\luajit\src\host\buildvm_asm.c
-c:\openxray\externals\luajit\src\host\buildvm_fold.c
-c:\openxray\externals\luajit\src\host\buildvm_lib.c
-c:\openxray\externals\luajit\src\host\buildvm_peobj.c

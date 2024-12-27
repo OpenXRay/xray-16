@@ -43,7 +43,6 @@ private:
     void sign_configs();
     void compress_configs();
 
-    static void dumper_thread(void* my_ptr);
     void yield_cb(long progress);
     void switch_thread();
 

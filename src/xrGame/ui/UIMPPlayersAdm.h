@@ -7,7 +7,6 @@ class CUIXml;
 class CUIListBox;
 class CUI3tButton;
 class CUITrackBar;
-class CUITextWnd;
 class CUIComboBox;
 
 class CUIMpPlayersAdm final : public CUIWindow, public CUIWndCallback
@@ -19,14 +18,14 @@ class CUIMpPlayersAdm final : public CUIWindow, public CUIWndCallback
     CUI3tButton* m_pConfigAllBtn;
     CUI3tButton* m_pPingLimitBtn;
     CUITrackBar* m_pPingLimitTrack;
-    CUITextWnd* m_pPingLimitText;
+    CUIStatic* m_pPingLimitText;
     CUI3tButton* m_pScreenPlayerBtn;
     CUI3tButton* m_pConfigPlayerBtn;
     CUI3tButton* m_pKickPlayerBtn;
     CUI3tButton* m_pBanPlayerBtn;
     CUIComboBox* m_pBanPlayerCombo;
     // CUITrackBar*		m_pBanTimeTrack;
-    // CUITextWnd*			m_pBanTimeText;
+    // CUIStatic*			m_pBanTimeText;
 public:
     CUIMpPlayersAdm();
     ~CUIMpPlayersAdm() override;

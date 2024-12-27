@@ -8,12 +8,13 @@ endif
 	dh $@ --buildsystem=cmake --parallel
 
 extra_flags += \
--DCMAKE_C_COMPILER=gcc-10 \
--DCMAKE_CXX_COMPILER=g++-10 \
+-DCMAKE_C_COMPILER=gcc-14 \
+-DCMAKE_CXX_COMPILER=g++-14 \
 -DCMAKE_BUILD_TYPE="RelWithDebInfo" \
 -DCMAKE_INSTALL_BINDIR="/usr/games" \
 -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=FALSE \
 -DALLOW_RPATH=FALSE \
+-DLUABIND_BUILD_SHARED=TRUE \
 -DDISABLE_PORTABLE_MODE=TRUE
 
 override_dh_auto_configure:

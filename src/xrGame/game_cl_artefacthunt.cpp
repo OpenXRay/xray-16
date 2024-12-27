@@ -27,8 +27,6 @@
 #include "game_cl_artefacthunt_snd_msg.h"
 #include "xrEngine/IGame_Persistent.h"
 
-#include "reward_event_generator.h"
-
 namespace detail::mp::ahunt
 {
 //static constexpr pcstr TEAM0_MENU       = "artefacthunt_team0";
@@ -188,9 +186,6 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
         if (!pPlayer)
             break;
 
-        if (m_reward_generator)
-            m_reward_generator->OnPlayerTakeArtefact(pPlayer);
-
         xr_sprintf(tmp, "%s%s", "%s%s %s", *st.translate("mp_has_tak_art"));
 
         xr_sprintf(Text, tmp, CTeamInfo::GetTeam_color_tag(int(Team)), pPlayer->getName(), Color_Main, Color_Artefact);
@@ -218,9 +213,6 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
         if (!pPlayer)
             break;
 
-        if (m_reward_generator)
-            m_reward_generator->OnPlayerDropArtefact(pPlayer);
-
         xr_sprintf(tmp, "%s%s", "%s%s %s", *st.translate("mp_has_drop_art"));
 
         xr_sprintf(Text, tmp, CTeamInfo::GetTeam_color_tag(int(Team)), pPlayer->getName(), Color_Main, Color_Artefact);
@@ -240,9 +232,6 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
         game_PlayerState* pPlayer = GetPlayerByGameID(PlayerID);
         if (!pPlayer)
             break;
-
-        if (m_reward_generator)
-            m_reward_generator->OnPlayerBringArtefact(pPlayer);
 
         xr_sprintf(tmp, "%s%s", "%s%s %s", *st.translate("mp_scores"));
 
@@ -265,8 +254,6 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
         xr_sprintf(Text, "%s%s", Color_Main, *st.translate("mp_art_spowned"));
         if (CurrentGameUI())
             CurrentGameUI()->CommonMessageOut(Text);
-        if (m_reward_generator)
-            m_reward_generator->OnArtefactSpawned();
 
         PlaySndMessage(ID_NEW_AF);
     }

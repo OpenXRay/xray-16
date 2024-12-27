@@ -10,6 +10,8 @@ UIStyleManager* UIStyles = nullptr;
 
 UIStyleManager::UIStyleManager()
 {
+    ZoneScoped;
+
     m_token.emplace_back(DEFAULT_UI_STYLE_NAME, DEFAULT_STYLE_ID);
 
     string_path path;
@@ -75,7 +77,7 @@ void UIStyleManager::SetupStyle(u32 styleID)
     pcstr selectedStyle = nullptr;
     for (const auto& token : m_token)
     {
-        if (token.id == m_style_id)
+        if (token.id == static_cast<int>(m_style_id))
             selectedStyle = token.name;
     }
 

@@ -246,7 +246,9 @@ bool CSheduler::Registered(ISheduled* object) const
 
 void CSheduler::Register(ISheduled* A, bool RT)
 {
+#ifndef MASTER_GOLD
     VERIFY(!Registered(A));
+#endif
 
     ItemReg R;
     R.OP = true;
@@ -263,7 +265,9 @@ void CSheduler::Register(ISheduled* A, bool RT)
 
 void CSheduler::Unregister(ISheduled* A)
 {
+#ifndef MASTER_GOLD
     VERIFY(Registered(A));
+#endif
 
 #ifdef DEBUG_SCHEDULER
     Msg("SCHEDULER: unregister [%s][%x]", A->shedule_Name().c_str(), A);
@@ -313,9 +317,14 @@ void CSheduler::Pop()
 
 void CSheduler::ProcessStep()
 {
+    ZoneScoped;
+
     // Normal priority
     const u32 dwTime = Device.dwTimeGlobal;
+
+#ifdef DEBUG
     CTimer eTimer;
+#endif
 
     for (int i = 0; !Items.empty() && Top().dwTimeForExecute < dwTime; ++i)
     {
@@ -415,6 +424,8 @@ void CSheduler::ProcessStep()
 
 void CSheduler::Update()
 {
+    ZoneScoped;
+
     // Initialize
     stats.Update.Begin();
     cycles_start = CPU::QPC();

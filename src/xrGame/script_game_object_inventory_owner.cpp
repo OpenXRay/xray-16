@@ -53,7 +53,6 @@
 #include "CustomOutfit.h"
 #include "ActorBackpack.h"
 #include "inventory_item_impl.h"
-#include "Inventory.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServerEntities/inventory_space.h"
 //-Alundaio
@@ -289,7 +288,7 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& func
 }
 
 // 1
-void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind::object object)
+void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind::object object)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
     if (!inventory_owner)
@@ -299,14 +298,15 @@ void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind
         return;
     }
 
-    TIItemContainer::iterator I = inventory_owner->inventory().m_all.begin();
-    TIItemContainer::iterator E = inventory_owner->inventory().m_all.end();
+    TIItemContainer::iterator	I = inventory_owner->inventory().m_all.begin();
+    TIItemContainer::iterator	E = inventory_owner->inventory().m_all.end();
     for (; I != E; ++I)
-        functor(object, (*I)->object().lua_game_object());
+        if (functor(object, (*I)->object().lua_game_object()) == true)
+            return;
 }
 
 #include "InventoryBox.h"
-void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luabind::object object)
+void CScriptGameObject::IterateInventoryBox(luabind::functor<bool> functor, luabind::object object)
 {
     CInventoryBox* inventory_box = smart_cast<CInventoryBox*>(&this->object());
     if (!inventory_box)
@@ -320,9 +320,9 @@ void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luab
     xr_vector<u16>::const_iterator E = inventory_box->m_items.end();
     for (; I != E; ++I)
     {
-        CGameObject* GO = smart_cast<CGameObject*>(Level().Objects.net_Find(*I));
-        if (GO)
-            functor(object, GO->lua_game_object());
+        if (const auto GO = smart_cast<CGameObject*>(Level().Objects.net_Find(*I)))
+            if (functor(object, GO->lua_game_object()) == true)
+                return;
     }
 }
 
@@ -755,6 +755,18 @@ void CScriptGameObject::ChangeCharacterReputation(int char_rep)
     pInventoryOwner->ChangeReputation(char_rep);
 }
 
+void CScriptGameObject::SetCharacterReputation(int char_rep)
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+
+    if (!pInventoryOwner)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "SetCharacterReputation available only for InventoryOwner");
+        return;
+    }
+    pInventoryOwner->SetReputation(char_rep);
+}
+
 LPCSTR CScriptGameObject::CharacterCommunity()
 {
     CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
@@ -1136,19 +1148,11 @@ void CScriptGameObject::attachable_item_load_attach(LPCSTR section)
 
 void CScriptGameObject::RestoreWeapon()
 {
-#ifdef DEBUG
-    GEnv.ScriptEngine->script_log(LuaMessageType::Message, "CScriptGameObject::RestoreWeapon called!!!");
-    GEnv.ScriptEngine->print_stack();
-#endif //#ifdef DEBUG
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
 }
 
 void CScriptGameObject::HideWeapon()
 {
-#ifdef DEBUG
-    GEnv.ScriptEngine->script_log(LuaMessageType::Message, "CScriptGameObject::HideWeapon called!!!");
-    GEnv.ScriptEngine->print_stack();
-#endif //#ifdef DEBUG
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
 }
 
@@ -1265,6 +1269,9 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u32 slot_id) const
             LuaMessageType::Error, "CInventoryOwner : cannot access class member item_in_slot!");
         return (0);
     }
+
+    if (pSettingsOpenXRay->read_if_exists<bool>("compatibility", "minus_one_slot_ordering", ShadowOfChernobylMode || ClearSkyMode))
+        ++slot_id;
 
     CInventoryItem* result = inventory_owner->inventory().ItemFromSlot((u16)slot_id);
     return (result ? result->object().lua_game_object() : 0);
@@ -1763,7 +1770,6 @@ bool CScriptGameObject::is_door_blocked_by_npc() const
 
 
 //Alundaio: Methods for exporting the ability to detach/attach addons for magazined weapons
-#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject* item)
 {
     auto weapon = smart_cast<CWeaponMagazined*>(&object());
@@ -1797,6 +1803,21 @@ void CScriptGameObject::Weapon_AddonDetach(pcstr item_section)
         weapon->Detach(item_section, true);
 }
 
+bool CScriptGameObject::AddUpgrade(pcstr upgrade)
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member AddUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return ai().alife().inventory_upgrade_manager().upgrade_add(*item, upgrade);
+}
+
 bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
 {
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
@@ -1812,6 +1833,36 @@ bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
     return ai().alife().inventory_upgrade_manager().upgrade_install(*item, upgrade, false);
 }
 
+bool CScriptGameObject::CanAddUpgrade(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member CanAddUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return ai().alife().inventory_upgrade_manager().can_add_upgrade(*item, upgrade);
+}
+
+bool CScriptGameObject::CanInstallUpgrade(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member CanInstallUpgrade!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return ai().alife().inventory_upgrade_manager().can_install_upgrade(*item, upgrade);
+}
+
 bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
 {
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
@@ -1825,6 +1876,36 @@ bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
         return false;
 
     return item->has_upgrade(upgrade);
+}
+
+bool CScriptGameObject::HasUpgradeGroup(pcstr upgrade_group) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member HasUpgradeGroup!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade_group))
+        return false;
+
+    return item->has_upgrade_group(upgrade_group);
+}
+
+bool CScriptGameObject::HasUpgradeGroupByUpgradeId(pcstr upgrade) const
+{
+    CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
+    if (!item)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CInventoryItem : cannot access class member HasUpgradeGroupByUpgradeId!");
+        return false;
+    }
+
+    if (!pSettings->section_exist(upgrade))
+        return false;
+
+    return item->has_upgrade_group_by_upgrade_id(upgrade);
 }
 
 void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
@@ -2074,7 +2155,7 @@ void CScriptGameObject::SetActorJumpSpeed(float jump_speed)
         return;
     }
     pActor->m_fJumpSpeed = jump_speed;
-    //character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);  
+    //character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);
 }
 
 float CScriptGameObject::GetActorSprintKoef() const
@@ -2160,5 +2241,4 @@ void CScriptGameObject::SetCharacterIcon(pcstr iconName)
     }
     return pInventoryOwner->SetIcon(iconName);
 }
-#endif
 //-Alundaio

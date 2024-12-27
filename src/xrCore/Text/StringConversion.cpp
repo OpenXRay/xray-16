@@ -88,7 +88,7 @@ u16 mbhMulti2Wide(xr_wide_char* WideStr, xr_wide_char* WidePos, u16 WideStrSize,
             WidePos[dpos] = spos;
 
         spos++;
-        
+
         if ((b1 & BITS1_MASK) == BITS1_EXP)
         {
             wc = b1;
