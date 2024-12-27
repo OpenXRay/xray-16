@@ -86,8 +86,6 @@ void CWeaponMagazined::Load(LPCSTR section)
     if (WeaponSoundExist(section, "snd_reload_misfire"))
         m_sounds.LoadSound(section, "snd_reload_misfire", "sndReloadMisfire", true, m_eSoundReloadMisfire);
 
-    m_sSndShotCurrent = IsSilencerAttached() ? "sndSilencerShot" : "sndShot";
-
     //звуки и партиклы глушителя, если такой есть
     if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent)
     {
@@ -100,6 +98,11 @@ void CWeaponMagazined::Load(LPCSTR section)
         m_layered_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", false, m_eSoundShot);
         //-Alundaio
     }
+
+    if (IsSilencerAttached() && m_layered_sounds.FindSoundItem("sndSilencerShot", false))
+        m_sSndShotCurrent = "sndSilencerShot";
+    else
+        m_sSndShotCurrent = "sndShot";
 
     m_iBaseDispersionedBulletsCount = READ_IF_EXISTS(pSettings, r_u8, section, "base_dispersioned_bullets_count", 0);
     m_fBaseDispersionedBulletsSpeed =
@@ -1064,7 +1067,9 @@ void CWeaponMagazined::InitAddons()
         }
     }
 
-    if (IsSilencerAttached() /* && SilencerAttachable() */)
+    const bool silencer = IsSilencerAttached();
+
+    if (silencer && m_layered_sounds.FindSoundItem("sndSilencerShot", false))
     {
         m_sFlameParticlesCurrent = m_sSilencerFlameParticles;
         m_sSmokeParticlesCurrent = m_sSilencerSmokeParticles;
@@ -1072,7 +1077,6 @@ void CWeaponMagazined::InitAddons()
 
         //подсветка от выстрела
         LoadLights(*cNameSect(), "silencer_");
-        ApplySilencerKoeffs();
     }
     else
     {
@@ -1082,8 +1086,12 @@ void CWeaponMagazined::InitAddons()
 
         //подсветка от выстрела
         LoadLights(*cNameSect(), "");
-        ResetSilencerKoeffs();
     }
+
+    if (silencer)
+        ApplySilencerKoeffs();
+    else
+        ResetSilencerKoeffs();
 
     inherited::InitAddons();
 }
