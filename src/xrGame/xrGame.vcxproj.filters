@@ -6311,6 +6311,9 @@
     <ClInclude Include="ui\UIRankingsCoC.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIWheelMenu.h">
+      <Filter>UI\Common\MainIngame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9527,6 +9530,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIRankingsCoC.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIWheelMenu.cpp">
+      <Filter>UI\Common\MainIngame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
