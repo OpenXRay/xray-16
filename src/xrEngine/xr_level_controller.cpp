@@ -143,6 +143,13 @@ game_action actions[] =
     { "custom14",               kCUSTOM14,                  _sp },
     { "custom15",               kCUSTOM15,                  _sp },
 
+    { "pda_tab1",               kPDA_TAB1,                  _sp },
+    { "pda_tab2",               kPDA_TAB2,                  _sp },
+    { "pda_tab3",               kPDA_TAB3,                  _sp },
+    { "pda_tab4",               kPDA_TAB4,                  _sp },
+    { "pda_tab5",               kPDA_TAB5,                  _sp },
+    { "pda_tab6",               kPDA_TAB6,                  _sp },
+
     { "kick",                   kKICK,                      _sp },
 
     { "editor",                 kEDITOR,                    _both },

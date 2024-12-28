@@ -75,6 +75,7 @@ void CEngine::Initialize(GameModule* game)
     Device.seqFrame.Add(&g_sound_processor, REG_PRIORITY_NORMAL - 1000); // Place it after Level update
     Device.seqFrameMT.Add(&g_sound_renderer);
 
+    External.CreateRendererList();
     CheckAndSetupRenderer();
 
     External.Initialize(game);

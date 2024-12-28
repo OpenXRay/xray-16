@@ -236,11 +236,11 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(pcstr section, pcstr line, pcstr al
 {
     ZoneScoped;
 
+    if (!pSettings->line_exist(section, line))
+        return;
+
     pcstr str = pSettings->r_string(section, line);
     string256 buf_str;
-
-    int count = _GetItemCount(str);
-    R_ASSERT(count);
 
     _GetItem(str, 0, buf_str);
 
@@ -271,11 +271,11 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, pcstr section,
 {
     ZoneScoped;
 
+    if (!pSettings->line_exist(section, line))
+        return;
+
     pcstr str = ini->r_string(section, line);
     string256 buf_str;
-
-    int count = _GetItemCount(str);
-    R_ASSERT(count);
 
     _GetItem(str, 0, buf_str);
 

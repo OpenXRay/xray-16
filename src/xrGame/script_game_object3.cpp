@@ -592,7 +592,7 @@ void CScriptGameObject::set_desired_direction(const Fvector* desired_direction)
         if (fsimilar(desired_direction->magnitude(), 0.f))
             GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                 "CAI_Stalker : [%s] set_desired_direction - you passed zero direction!", stalker->cName().c_str());
-        else if (!ClearSkyMode && !ShadowOfChernobylMode)
+        else if (!ShadowOfChernobylMode)
         {
             if (!fsimilar(desired_direction->magnitude(), 1.f))
                 GEnv.ScriptEngine->script_log(LuaMessageType::Error,
@@ -601,7 +601,7 @@ void CScriptGameObject::set_desired_direction(const Fvector* desired_direction)
         }
 
         Fvector direction = *desired_direction;
-        if (!ClearSkyMode && !ShadowOfChernobylMode)
+        if (!ShadowOfChernobylMode)
             direction.normalize_safe();
         stalker->movement().set_desired_direction(&direction);
     }
@@ -767,12 +767,15 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector* 
     }
     else
     {
-        if ((sight_type == SightManager::eSightTypeDirection) && vector3d && (_abs(vector3d->magnitude() - 1.f) > .01f))
+        const bool check_for_norm = sight_type == SightManager::eSightTypeDirection && vector3d &&
+                                    !ClearSkyMode && !ShadowOfChernobylMode;
+        if (check_for_norm)
         {
-#ifndef MASTER_GOLD
-            Msg("~ CSightManager : non-normalized direction passed [%f][%f][%f]", VPUSH(*vector3d));
-#endif
-            vector3d->normalize();
+            if (_abs(vector3d->magnitude() - 1.f) > .01f)
+            {
+                VERIFY2(false, make_string("non-normalized direction passed [%f][%f][%f]", VPUSH(*vector3d)));
+                vector3d->normalize();
+            }
         }
 
         stalker->sight().setup(sight_type, vector3d);
@@ -798,12 +801,15 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector& 
     }
     else
     {
-        if ((sight_type == SightManager::eSightTypeDirection) && (_abs(vector3d.magnitude() - 1.f) > .01f))
+        const bool check_for_norm = sight_type == SightManager::eSightTypeDirection &&
+                                    !ClearSkyMode && !ShadowOfChernobylMode;
+        if (check_for_norm)
         {
-#ifndef MASTER_GOLD
-                Msg("~ CSightManager : non-normalized direction passed [%f][%f][%f]", VPUSH(vector3d));
-#endif
+            if (_abs(vector3d.magnitude() - 1.f) > .01f)
+            {
+                VERIFY2(false, make_string("non-normalized direction passed [%f][%f][%f]", VPUSH(vector3d)));
                 vector3d.normalize();
+            }
         }
 
         stalker->sight().setup(sight_type, vector3d, torso_look);
@@ -819,12 +825,15 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector* 
     }
     else
     {
-        if ((sight_type == SightManager::eSightTypeDirection) && vector3d && (_abs(vector3d->magnitude() - 1.f) > .01f))
+        const bool check_for_norm = sight_type == SightManager::eSightTypeDirection && vector3d &&
+                                    !ClearSkyMode && !ShadowOfChernobylMode;
+        if (check_for_norm)
         {
-#ifndef MASTER_GOLD
-            Msg("~ CSightManager : non-normalized direction passed [%f][%f][%f]", VPUSH(*vector3d));
-#endif
-            vector3d->normalize();
+            if (_abs(vector3d->magnitude() - 1.f) > .01f)
+            {
+                VERIFY2(false, make_string("non-normalized direction passed [%f][%f][%f]", VPUSH(*vector3d)));
+                vector3d->normalize();
+            }
         }
 
         stalker->sight().setup(sight_type, vector3d);
