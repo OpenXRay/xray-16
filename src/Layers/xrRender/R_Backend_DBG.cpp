@@ -193,9 +193,9 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
 
     const u32 vcnt = sizeof(gVertices) / (sizeof(float) * 3);
     FVF::L verts[vcnt];
-    for (int i = 0; i < vcnt; i++)
+    for (u32 i = 0; i < vcnt; i++)
     {
-        int k = i * 3;
+        u32 k = i * 3;
         verts[i].set(gVertices[k], gVertices[k + 1], gVertices[k + 2], C);
     }
 

@@ -178,7 +178,7 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
     }
 }
 
-IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLENDED], unsigned int b_count)
+IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLENDED], u32 b_count)
 {
     VERIFY(MAX_BLENDED >= b_count);
     switch (b_count)
@@ -237,14 +237,14 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
         //int count = Blend.size();
         float total = 0;
         ConsistantKey S[MAX_BLENDED];
-        for (unsigned int i = 0; i < b_count; i++)
+        for (u32 i = 0; i < b_count; i++)
             S[i].set(R + i, BA[i]->blendAmount);
 
         std::sort(S, S + b_count);
         CKey tmp;
         total = S[0].w;
         tmp = *S[0].K;
-        for (unsigned int cnt = 1; cnt < b_count; cnt++)
+        for (u32 cnt = 1; cnt < b_count; cnt++)
         {
             total += S[cnt].w;
             float d;
@@ -400,14 +400,14 @@ IC void process_single_channel(
     VERIFY(_valid(Result.T));
     VERIFY(_valid(Result.Q));
 }
-IC void MixChannels(CKey& Result, const CKey* R, const animation::channel_def* BA, unsigned int b_count)
+IC void MixChannels(CKey& Result, const CKey* R, const animation::channel_def* BA, u32 b_count)
 {
     VERIFY(b_count > 0);
     Result = R[0];
 
     // MixinAdd(Result,R,BA,b_count);
     float lerp_factor_sum = 0.f;
-    for (unsigned int i = 1; i < b_count; i++)
+    for (u32 i = 1; i < b_count; i++)
         switch (BA[i].rule.extern_)
         {
         case animation::add: key_mad(Result, CKey(Result), R[i], BA[i].factor); break;
