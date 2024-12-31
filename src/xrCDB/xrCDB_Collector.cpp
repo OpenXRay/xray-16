@@ -305,9 +305,9 @@ CollectorPacked::CollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces
     flags.reserve(apx_faces);
     int _size = (clpMX + 1) * (clpMY + 1) * (clpMZ + 1);
     int _average = (apx_vertices / _size) / 2;
-    for (unsigned int ix = 0; ix < clpMX + 1; ix++)
-        for (unsigned int iy = 0; iy < clpMY + 1; iy++)
-            for (unsigned int iz = 0; iz < clpMZ + 1; iz++)
+    for (u32 ix = 0; ix < clpMX + 1; ix++)
+        for (u32 iy = 0; iy < clpMY + 1; iy++)
+            for (u32 iz = 0; iz < clpMZ + 1; iz++)
                 VM[ix][iy][iz].reserve(_average);
 }
 

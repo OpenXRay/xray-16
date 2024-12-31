@@ -80,23 +80,19 @@ ICF const Fvector& CLevelGraph::vertex_position(
     return (dest_position = vertex_position(source_position));
 }
 
-IC int CLevelGraph::calculate_packed_xz(const float x, const float z) const
+// XXX: This method is WAY to large to inline.
+IC const CLevelGraph::CPosition& CLevelGraph::vertex_position(CPosition& dest_position, const Fvector& source_position) const
 {
     const auto [box_x, box_y, box_z] = header().box().vMin;
     const auto cell_size = header().cell_size();
-    const int packed_xz = iFloor((x - box_x) / cell_size + .5f) * m_row_length +
-		iFloor((z - box_z) / cell_size + .5f);
 
-    VERIFY(packed_xz < static_cast<int>(NodePosition::MAX_XZ));
-    return packed_xz;
-}
+    VERIFY(iFloor((source_position.z - box_z) / cell_size + .5f) < (int)m_row_length);
 
-// XXX: This method is WAY too large to inline.
-IC const CLevelGraph::CPosition& CLevelGraph::vertex_position(CPosition& dest_position, const Fvector& source_position) const
-{
-    const int packed_xz = calculate_packed_xz(source_position.x, source_position.z);
+    const int packed_xz = iFloor((source_position.x - box_x) / cell_size + .5f)
+                        * m_row_length + iFloor((source_position.z - box_z) / cell_size + .5f);
+    VERIFY(packed_xz < NodePosition::MAX_XZ);
 
-    int packed_y = iFloor(65535.f * (source_position.y - header().box().vMin.y) / header().factor_y() + EPS_S);
+    int packed_y = iFloor(65535.f * (source_position.y - box_y) / header().factor_y() + EPS_S);
     clamp(packed_y, 0, 65535);
 
     dest_position.xz(u32(packed_xz));
@@ -199,8 +195,15 @@ IC bool CLevelGraph::inside(const u32 vertex_id, const Fvector& position, const 
 
 IC bool CLevelGraph::inside(const u32 vertex_id, const Fvector2& position) const
 {
-    const int packed_xz = calculate_packed_xz(position.x, position.y);
-    return vertex(vertex_id)->position().xz() == u32(packed_xz);
+    [[maybe_unused]]
+    const auto [box_x, box_y, box_z] = header().box().vMin;
+    const auto cell_size = header().cell_size();
+
+    const int packed_xz = iFloor((position.x - box_x) / cell_size + .5f) * m_row_length +
+        iFloor((position.y - box_z) / cell_size + .5f);
+    VERIFY(packed_xz < NodePosition::MAX_XZ);
+    const bool b = vertex(vertex_id)->position().xz() == u32(packed_xz);
+    return b;
 }
 
 IC float CLevelGraph::vertex_plane_y(const CLevelGraph::CLevelVertex& vertex, const float X, const float Z) const

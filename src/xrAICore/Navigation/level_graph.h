@@ -125,7 +125,6 @@ public:
     ICF u32 vertex(const CLevelVertex& vertex_r) const;
     IC const Fvector vertex_position(const CLevelGraph::CPosition& source_position) const;
     IC const Fvector& vertex_position(Fvector& dest_position, const CLevelGraph::CPosition& source_position) const;
-    IC int calculate_packed_xz(const float x, const float z) const;
     IC const CLevelGraph::CPosition& vertex_position(
         CLevelGraph::CPosition& dest_position, const Fvector& source_position) const;
     IC const CLevelGraph::CPosition vertex_position(const Fvector& position) const;

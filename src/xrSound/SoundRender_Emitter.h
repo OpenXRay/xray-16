@@ -85,7 +85,7 @@ private:
     std::atomic<Task*> prefill_task{};
 
     size_t current_block{};
-    u32 filled_blocks{};
+    int filled_blocks{};
 
     void fill_block(void* ptr, u32 size);
     void fill_data(void* dest, u32 offset, u32 size) const;
