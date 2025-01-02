@@ -178,6 +178,7 @@ TaskManager::~TaskManager()
 
     UnregisterThisThreadAsWorker();
     newWorkArrived.notify_all();
+    SDL_PumpEvents();
     for (auto& thread : workerThreads)
     {
         if (thread.joinable())
