@@ -748,7 +748,7 @@ bool CCustomMonster::net_Spawn(CSE_Abstract* DC)
             const Fvector vertex_pos = ai().level_graph().vertex_position(ai_location().level_vertex_id());
             const u32 level_vertex_id = movement().restrictions().accessible_nearest(vertex_pos, dest_position);
 
-            const bool vertex_id_is_valid = ai().game_graph().valid_vertex_id(level_vertex_id);
+            const bool vertex_id_is_valid = ai().level_graph().valid_vertex_id(level_vertex_id);
             VERIFY(vertex_id_is_valid);
             if (vertex_id_is_valid)
             {
