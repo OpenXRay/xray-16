@@ -196,10 +196,10 @@
     } while (false)
 
 #define NODEFAULT XR_ASSUME(0)
-#define VERIFY(expr) XR_ASSUME(expr)
-#define VERIFY2(expr, desc) XR_ASSUME(expr)
-#define VERIFY3(expr, desc, arg1) XR_ASSUME(expr)
-#define VERIFY4(expr, desc, arg1, arg2) XR_ASSUME(expr)
+#define VERIFY(expr) do {} while (false)
+#define VERIFY2(expr, desc) do {} while (false)
+#define VERIFY3(expr, desc, arg1) do {} while (false)
+#define VERIFY4(expr, desc, arg1, arg2) do {} while (false)
 #define CHK_DX(expr) expr
 #define CHK_GL(expr) expr
 #endif // DEBUG

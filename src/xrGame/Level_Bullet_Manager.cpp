@@ -185,9 +185,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
-#ifdef DEBUG
     VERIFY(m_thread_id == std::this_thread::get_id());
-#endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
@@ -207,9 +205,7 @@ void CBulletManager::UpdateWorkload()
 {
     ZoneScoped;
 
-#ifdef DEBUG
     VERIFY(g_mt_config.test(mtBullets) || m_thread_id == std::this_thread::get_id());
-#endif
 
     rq_storage.r_clear();
 

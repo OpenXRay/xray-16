@@ -130,10 +130,8 @@ void CCF_Skeleton::BuildState()
         Fmatrix ME, T, TW;
         const Fmatrix& Mbone = K->LL_GetTransform(I->elem_id);
 
-#ifdef DEBUG
         VERIFY2(DET(Mbone) > EPS,
             (make_string("0 scale bone matrix, %d \n", I->elem_id) + dbg_object_full_dump_string(owner)).c_str());
-#endif
 
         switch (I->type)
         {

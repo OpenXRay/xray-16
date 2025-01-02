@@ -125,9 +125,7 @@ void CCar::reload(LPCSTR section)
 
 void CCar::cb_Steer(CBoneInstance* B)
 {
-#ifdef DEBUG
     VERIFY2(fsimilar(DET(B->mTransform), 1.f, DET_CHECK_EPS), "Bones receive returns 0 matrix");
-#endif
     CCar* C = static_cast<CCar*>(B->callback_param());
     Fmatrix m;
 

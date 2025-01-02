@@ -789,9 +789,7 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, pcstr path, int index, CUIFr
     strconcat(buf, path, ":texture");
     const shared_str base_name = xml_doc.Read(buf, index, nullptr);
 
-#ifdef DEBUG
     VERIFY(base_name);
-#endif
 
     const u32 color = GetColor(xml_doc, buf, index, 0xff);
     pWnd->SetTextureColor(color);

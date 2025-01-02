@@ -18,9 +18,7 @@
 bool CCar::HUDView() const { return active_camera->tag == ectFirst; }
 void CCar::cam_Update(float dt, float fov)
 {
-#ifdef DEBUG
     VERIFY(!physics_world()->Processing());
-#endif
     Fvector P, Da;
     Da.set(0, 0, 0);
     // bool							owner = !!Owner();

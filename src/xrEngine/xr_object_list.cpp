@@ -143,9 +143,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     O->UpdateCL();
 
-#ifdef DEBUG
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", *O->cName());
-#endif
 #if 0 // ndef DEBUG
     __try
     {
@@ -587,10 +585,7 @@ bool CObjectList::dump_all_objects()
 
 void CObjectList::register_object_to_destroy(IGameObject* object_to_destroy)
 {
-#ifdef DEBUG
     VERIFY(!registered_object_to_destroy(object_to_destroy));
-#endif
-
     // Msg("CObjectList::register_object_to_destroy [%x]", object_to_destroy);
     destroy_queue.push_back(object_to_destroy);
 
