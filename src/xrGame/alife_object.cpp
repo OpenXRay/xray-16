@@ -125,6 +125,13 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                                     alife().spawn_item(ammoSec, o_Position, m_tNodeID, m_tGraphID, ID);
                         }
                     }
+                    // If not weapon item, handle count as literal count, not ammo (useful for grenades and consumables).
+                    else
+                    {
+                        for (u32 i = 1; i <= spawnCount - 1; ++i)
+                            alife().spawn_item(itmSection, o_Position, m_tNodeID, m_tGraphID, ID);
+                    }
+
                     if (const auto IItem = smart_cast<CSE_ALifeInventoryItem*>(E))
                         IItem->m_fCondition = fCond;
                 }
