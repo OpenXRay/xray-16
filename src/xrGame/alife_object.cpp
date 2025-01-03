@@ -27,42 +27,38 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
     IReader reader((void*)ini_string, xr_strlen(ini_string));
     CInifile ini(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
-    // Alundaio: This will spawn a single random section listed in [spawn_loadout]
-    // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specified it will spawn that type
-    // count is used only for ammo boxes (ie wpn_pm = 3) will spawn 3 boxes, not 3 wpn_pm
-    // Usage: to create random weapon loadouts
-    u8 loadout_index = 1;
-    string32 loadout_section = "spawn_loadout";
+    u8 loadoutIndex = 1;
+    string32 loadoutSection = "spawn_loadout";
 
     // Alundaio: This will spawn a single random section listed in [spawn_loadout].
     // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specified it will spawn that type.
     // Count is used only for ammo boxes (ie wpn_pm = 3) will spawn 3 boxes, not 3 wpn_pm.
     // Supports few loadout options, iterates over `spawn_loadout`, `spawn_loadout2` ... `spawn_loadoutN`.
-    while (ini.section_exist(loadout_section))
+    while (ini.section_exist(loadoutSection))
     {
         pcstr itmSection, V;
-        xr_vector<u32> spawn_loadouts;
+        xr_vector<u32> spawnLoadouts;
 
         pcstr lname = ai().game_graph().header().level(ai().game_graph().vertex(m_tGraphID)->level_id()).name().c_str();
 
-        for (u32 k = 0; ini.r_line(loadout_section, k, &itmSection, &V); k++)
+        for (u32 k = 0; ini.r_line(loadoutSection, k, &itmSection, &V); k++)
         {
             // If level=<lname> then only spawn items if object on that level
             if (strstr(V, "level=") != nullptr)
             {
                 if (strstr(V, lname) != nullptr)
-                    spawn_loadouts.push_back(k);
+                    spawnLoadouts.push_back(k);
             }
             else
             {
-                spawn_loadouts.push_back(k);
+                spawnLoadouts.push_back(k);
             }
         }
 
-        if (!spawn_loadouts.empty())
+        if (!spawnLoadouts.empty())
         {
-            s32 sel = Random.randI(0, spawn_loadouts.size());
-            if (ini.r_line(loadout_section, spawn_loadouts.at(sel), &itmSection, &V))
+            s32 sel = Random.randI(0, spawnLoadouts.size());
+            if (ini.r_line(loadoutSection, spawnLoadouts.at(sel), &itmSection, &V))
             {
                 VERIFY(xr_strlen(itmSection));
                 if (pSettings->section_exist(itmSection))
@@ -127,8 +123,8 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
             }
         }
 
-        loadout_index += 1;
-        xr_sprintf(loadout_section, "spawn_loadout%d", loadout_index);
+        loadoutIndex += 1;
+        xr_sprintf(loadoutSection, "spawn_loadout%d", loadoutIndex);
     }
     // -Alundaio
 
