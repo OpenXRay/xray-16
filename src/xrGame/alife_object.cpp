@@ -70,12 +70,12 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                 VERIFY(xr_strlen(itmSection));
                 if (pSettings->section_exist(itmSection))
                 {
-                    u32 spawn_count = 1;
+                    u32 spawnCount = 1;
                     bool bScope = false;
                     bool bSilencer = false;
                     bool bLauncher = false;
-                    float f_cond = 1.0f;
-                    int i_ammo_type = 0, n = 0;
+                    float fCond = 1.0f;
+                    int iAmmoType = 0, n = 0;
 
                     if (V && xr_strlen(V))
                     {
@@ -83,17 +83,18 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         if (n > 0)
                         {
                             string64 tmp;
-                            spawn_count = atoi(_GetItem(V, 0, tmp)); //count
+                            spawnCount = atoi(_GetItem(V, 0, tmp)); //count
                         }
 
-                        if (!spawn_count) spawn_count = 1;
-                        if (nullptr != strstr(V, "cond="))
-                            f_cond = static_cast<float>(atof(strstr(V, "cond=") + 5));
-                        bScope = nullptr != strstr(V, "scope");
-                        bSilencer = nullptr != strstr(V, "silencer");
-                        bLauncher = nullptr != strstr(V, "launcher");
-                        if (nullptr != strstr(V, "ammo_type="))
-                            i_ammo_type = atoi(strstr(V, "ammo_type=") + 10);
+                        bScope = is_spawn_supplies_flag_set(V, "scope");
+                        bSilencer = is_spawn_supplies_flag_set(V, "silencer");
+                        bLauncher = is_spawn_supplies_flag_set(V, "launcher");
+
+                        if (!spawnCount) spawnCount = 1;
+                        if (strstr(V, "cond=") != nullptr)
+                            fCond = static_cast<float>(atof(strstr(V, "cond=") + 5));
+                        if (strstr(V, "ammo_type=") != nullptr)
+                            iAmmoType = atoi(strstr(V, "ammo_type=") + 10);
                     }
 
                     CSE_Abstract* E = alife().spawn_item(itmSection, o_Position, m_tNodeID, m_tGraphID, ID);
@@ -116,16 +117,16 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                             {
                                 string128 tmp;
                                 ammoSec = _GetItem(ammo_class, i, tmp);
-                                if (i == i_ammo_type)
+                                if (i == iAmmoType)
                                     break;
                             }
                             if (xr_strlen(ammoSec) && pSettings->section_exist(ammoSec))
-                                for (u32 i = 1; i <= spawn_count; ++i)
+                                for (u32 i = 1; i <= spawnCount; ++i)
                                     alife().spawn_item(ammoSec, o_Position, m_tNodeID, m_tGraphID, ID);
                         }
                     }
                     if (const auto IItem = smart_cast<CSE_ALifeInventoryItem*>(E))
-                        IItem->m_fCondition = f_cond;
+                        IItem->m_fCondition = fCond;
                 }
             }
         }
@@ -145,7 +146,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
             if (pSettings->section_exist(N)) //Alundaio: verify item section exists!
             {
-                float f_cond = 1.0f;
+                float fCond = 1.0f;
                 bool bScope = false;
                 bool bSilencer = false;
                 bool bLauncher = false;
@@ -160,16 +161,17 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     if (!j)
                         j = 1;
 
-                    bScope = nullptr != strstr(V, "scope");
-                    bSilencer = nullptr != strstr(V, "silencer");
-                    bLauncher = nullptr != strstr(V, "launcher");
+                    bScope = is_spawn_supplies_flag_set(V, "scope");
+                    bSilencer = is_spawn_supplies_flag_set(V, "silencer");
+                    bLauncher = is_spawn_supplies_flag_set(V, "launcher");
+
                     // probability
-                    if (nullptr != strstr(V, "prob="))
+                    if (strstr(V, "prob=") != nullptr)
                         p = static_cast<float>(atof(strstr(V, "prob=") + 5));
                     if (fis_zero(p))
                         p = 1.0f;
-                    if (nullptr != strstr(V, "cond="))
-                        f_cond = static_cast<float>(atof(strstr(V, "cond=") + 5));
+                    if (strstr(V, "cond=") != nullptr)
+                        fCond = static_cast<float>(atof(strstr(V, "cond=") + 5));
                 }
                 for (u32 i = 0; i < j; ++i)
                 {
@@ -189,7 +191,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         }
                         CSE_ALifeInventoryItem* IItem = smart_cast<CSE_ALifeInventoryItem*>(E);
                         if (IItem)
-                            IItem->m_fCondition = f_cond;
+                            IItem->m_fCondition = fCond;
                     }
                 }
             }
@@ -198,3 +200,36 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 }
 
 bool CSE_ALifeObject::keep_saved_data_anyway() const /* noexcept */ { return false; }
+
+/// Check if spawn supplies section flag was set.
+/// Comparing to original `section = value, scope, silencer, launcher, cond=0.5`,
+/// also support extended variants like `section = value, scope=true, silencer=0.5, launcher, cond=0.5`.
+bool CSE_ALifeObject::is_spawn_supplies_flag_set(pcstr value, pcstr flag)
+{
+    pcstr flagSubstring = strstr(value, flag);
+    int flagLength = strlen(flag);
+
+    if (flagSubstring != nullptr)
+    {
+        // Got full definition with '=' char, not simple shorthand like scope/silencer.
+        if (*(flagSubstring + flagLength) == '=')
+        {
+            if (strncmp(flagSubstring + flagLength, "=true", 5) != -1)
+            {
+                return true;
+            }
+
+            float probability = static_cast<float>(atof(flagSubstring + flagLength + 1));
+
+            // Assume 0 is 1 for cases like `flag=,flag=\n` and consistency with `prob` calculations.
+            return fis_zero(probability) ? true : randF(1.f) <= probability;
+        }
+        // Short variant of flag without assigned value.
+        else
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
