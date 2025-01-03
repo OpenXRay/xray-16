@@ -22,6 +22,13 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
     if (!xr_strlen(ini_string))
         return;
 
+    luabind::functor<bool> funct;
+	if (GEnv.ScriptEngine->functor("ai_stalker.CSE_ALifeObject_spawn_supplies", funct))
+	{
+		if (funct(this, ID, ini_string))
+			return;
+	}
+
 #pragma warning(push)
 #pragma warning(disable : 4238)
     IReader reader((void*)ini_string, xr_strlen(ini_string));
