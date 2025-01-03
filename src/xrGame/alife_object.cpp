@@ -126,7 +126,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         loadoutIndex += 1;
         xr_sprintf(loadoutSection, "spawn_loadout%d", loadoutIndex);
     }
-    // -Alundaio
+    //-Alundaio
 
     if (ini.section_exist("spawn"))
     {
@@ -136,7 +136,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         {
             VERIFY(xr_strlen(N));
 
-            if (pSettings->section_exist(N)) // Alundaio: verify item section exists!
+            if (pSettings->section_exist(N)) //Alundaio: verify item section exists!
             {
                 float f_cond = 1.0f;
                 bool bScope = false;
@@ -169,7 +169,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     if (randF(1.f) < p)
                     {
                         CSE_Abstract* E = alife().spawn_item(N, o_Position, m_tNodeID, m_tGraphID, ID);
-                        // подсоединить аддоны к оружию, если включены соответствующие флажки
+                        //подсоединить аддоны к оружию, если включены соответствующие флажки
                         CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(E);
                         if (W)
                         {
