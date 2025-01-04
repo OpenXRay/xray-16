@@ -29,7 +29,7 @@ void CBackend::dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV
 
 #ifdef DEBUG
 
-void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt)
+void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt)
 {
     u32 vBase;
     {
@@ -191,11 +191,11 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
         102, 113, 104, 103, 113, 105, 104, 113, 106, 105, 113, 107, 106, 113, 108, 107, 113, 109, 108, 113, 110, 109,
         113, 111, 110, 113, 112, 111, 113, 97, 112};
 
-    const int vcnt = sizeof(gVertices) / (sizeof(float) * 3);
+    const u32 vcnt = sizeof(gVertices) / (sizeof(float) * 3);
     FVF::L verts[vcnt];
-    for (int i = 0; i < vcnt; i++)
+    for (u32 i = 0; i < vcnt; i++)
     {
-        int k = i * 3;
+        u32 k = i * 3;
         verts[i].set(gVertices[k], gVertices[k + 1], gVertices[k + 2], C);
     }
 

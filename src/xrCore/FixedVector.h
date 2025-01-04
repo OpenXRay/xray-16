@@ -20,7 +20,7 @@ private:
 
 public:
     svector() : count(0) {}
-    svector(iterator p, int c) { assign(p, c); }
+    svector(iterator p, size_t c) { assign(p, c); }
     IC iterator begin() { return array; }
     IC iterator end() { return array + count; }
     IC const_iterator begin() const { return array; }
@@ -30,13 +30,13 @@ public:
     IC u32 size() const { return count; }
     IC void clear() { count = 0; }
 
-    IC void resize(int c)
+    IC void resize(size_t c)
     {
         VERIFY(c <= dim);
         count = c;
     }
 
-    IC void reserve(int c) {}
+    IC void reserve(size_t c) {}
 
     IC void push_back(value_type e)
     {
@@ -98,7 +98,7 @@ public:
         count++;
         array[id] = V;
     }
-    IC void assign(const_iterator p, int c)
+    IC void assign(const_iterator p, size_t c)
     {
         VERIFY(c > 0 && c <= dim);
         CopyMemory(array, p, c * sizeof(value_type));

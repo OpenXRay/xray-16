@@ -299,7 +299,7 @@ IC void CLevelGraph::set_invalid_vertex(u32& vertex_id, CLevelVertex** vertex) c
         *vertex = NULL;
 }
 
-IC const u32 CLevelGraph::vertex_id(const CLevelGraph::CLevelVertex* vertex) const
+IC u32 CLevelGraph::vertex_id(const CLevelGraph::CLevelVertex* vertex) const
 {
     VERIFY(valid_vertex_id(u32(vertex - m_nodes->begin())));
     return (u32(vertex - m_nodes->begin()));

@@ -95,7 +95,7 @@ public:
     void _restart() override;
 
     // Sound interface
-    CSound* create(pcstr fName, esound_type sound_type, int game_type) override;
+    CSound* create(pcstr fName, esound_type sound_type, u32 game_type) override;
     void attach_tail(CSound& S, pcstr fName) override;
 
     void destroy(CSound& S) override;
