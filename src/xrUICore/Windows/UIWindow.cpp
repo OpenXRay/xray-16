@@ -126,7 +126,7 @@ void CUIWindow::DetachAll()
     }
 }
 
-void CUIWindow::GetAbsoluteRect(Frect& r)
+void CUIWindow::GetAbsoluteRect(Frect& r) const
 {
     auto parent = GetParent();
     if (parent == nullptr)

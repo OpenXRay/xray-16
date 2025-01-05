@@ -47,17 +47,26 @@ public:
 
     virtual void SetWndPos(const Fvector2& pos) { m_wndPos.set(pos.x, pos.y); }
     IC const Fvector2& GetWndPos() const { return m_wndPos; }
+
+    Fvector2 GetWndCenterPos() const
+    {
+        return { m_wndPos.x + m_wndSize.x / 2.0f, m_wndPos.y + m_wndSize.y / 2.0f, };
+    }
+
     virtual void SetWndSize(const Fvector2& size) { m_wndSize = size; }
     IC const Fvector2& GetWndSize() const { return m_wndSize; }
+
     virtual void SetWndRect(const Frect& rect)
     {
         m_wndPos.set(rect.lt);
         rect.getsize(m_wndSize);
     }
+
     virtual void SetHeight(float height) { m_wndSize.y = height; }
     IC float GetHeight() const { return m_wndSize.y; }
     virtual void SetWidth(float width) { m_wndSize.x = width; }
     IC float GetWidth() const { return m_wndSize.x; }
+
     IC void SetVisible(bool vis) { m_bShowMe = vis; }
     IC bool GetVisible() const { return m_bShowMe; }
     IC void SetAlignment(EWindowAlignment al) { m_alignment = al; };

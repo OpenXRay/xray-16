@@ -124,12 +124,22 @@ public:
     void ShowChildren(bool show);
 
     //абсолютные координаты
-    void GetAbsoluteRect(Frect& r);
-    IC void GetAbsolutePos(Fvector2& p)
+    void GetAbsoluteRect(Frect& r) const;
+
+    void GetAbsolutePos(Fvector2& p) const
     {
         Frect abs;
         GetAbsoluteRect(abs);
         p.set(abs.x1, abs.y1);
+    }
+
+    Fvector2 GetAbsoluteCenterPos() const
+    {
+        Frect abs;
+        GetAbsoluteRect(abs);
+        auto size = GetWndSize();
+        size.div(2.0f);
+        return { abs.x1 + size.x, abs.y1 + size.y };
     }
 
     void SetWndRect_script(Frect rect) { CUISimpleWindow::SetWndRect(rect); }
