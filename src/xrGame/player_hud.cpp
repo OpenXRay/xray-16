@@ -53,16 +53,20 @@ void player_hud_motion_container::load(IKinematicsAnimated* model, const shared_
             {
                 pm.m_base_name = anm;
                 pm.m_additional_name = anm;
+                pm.m_anim_speed = 1.f;
             }
             else
             {
-                R_ASSERT2(_GetItemCount(anm.c_str()) == 2, anm.c_str());
+                R_ASSERT2(_GetItemCount(anm.c_str()) <= 3, anm.c_str());
                 string512 str_item;
                 _GetItem(anm.c_str(), 0, str_item);
                 pm.m_base_name = str_item;
 
                 _GetItem(anm.c_str(), 1, str_item);
                 pm.m_additional_name = str_item;
+
+                _GetItem(anm.c_str(), 2, str_item);
+                pm.m_anim_speed = strlen(str_item) > 0 ? atof(str_item) : 1.f;
             }
 
             // and load all motions for it
@@ -414,8 +418,6 @@ void attachable_hud_item::reload_measures()
 
 u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, const CMotionDef*& md, u8& rnd_idx)
 {
-    const float speed = CalcMotionSpeed(anm_name_b);
-
     string256 anim_name_r;
     const bool is_16x9 = UICore::is_widescreen();
     xr_sprintf(anim_name_r, "%s%s", anm_name_b.c_str(), m_attach_place_idx == 1 && is_16x9 ? "_16x9" : "");
@@ -425,6 +427,8 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
     R_ASSERT2(anm->m_animations.size(), make_string("model [%s] has no motion defined in motion_alias [%s]",
                                             m_visual_name.c_str(), anim_name_r)
                                             .c_str());
+
+    const float speed = anm->m_anim_speed;
 
     rnd_idx = (u8)Random.randI(anm->m_animations.size());
     const motion_descr& M = anm->m_animations[rnd_idx];
