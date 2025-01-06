@@ -63,10 +63,10 @@ void player_hud_motion_container::load(IKinematicsAnimated* model, const shared_
                 pm.m_base_name = str_item;
 
                 _GetItem(anm.c_str(), 1, str_item);
-                pm.m_additional_name = (strlen(str_item) > 0) ? pm.m_additional_name = str_item : pm.m_base_name;
+                pm.m_additional_name = xr_strlen(str_item) > 0 ? str_item : pm.m_base_name;
 
                 _GetItem(anm.c_str(), 2, str_item);
-                pm.m_anim_speed = strlen(str_item) > 0 ? atof(str_item) : 1.f;
+                pm.m_anim_speed = xr_strlen(str_item) > 0 ? atof(str_item) : 1.f;
             }
 
             // and load all motions for it
