@@ -35,14 +35,15 @@ public:
     float blendPower;
     float speed;
 
-    BOOL playing;
-    BOOL stop_at_end_callback;
-    BOOL stop_at_end;
-    BOOL fall_at_end;
-    PlayCallback Callback;
-    void* CallbackParam;
+    bool playing;
+    bool stop_at_end_callback;
+    bool stop_at_end;
+    bool fall_at_end;
 
     u32 dwFrame;
+
+    PlayCallback Callback;
+    void* CallbackParam;
 
     u32 mem_usage() { return sizeof(*this); }
     IC bool update_time(float dt);
@@ -117,7 +118,7 @@ IC void CBlend::update_play(float dt, PlayCallback _Callback)
     if (_Callback && stop_at_end_callback)
         _Callback(this); // callback only once
 
-    stop_at_end_callback = FALSE;
+    stop_at_end_callback = false;
 
     if (fall_at_end)
     {

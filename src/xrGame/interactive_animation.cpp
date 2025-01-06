@@ -41,7 +41,7 @@ bool interactive_animation::update(const Fmatrix& xrorm)
         if (blend->Callback)
             blend->Callback(blend);
         blend->blendPower *= 0.5f;
-        blend->playing = FALSE;
+        blend->playing = false;
     }
     if (!blend->playing)
     {

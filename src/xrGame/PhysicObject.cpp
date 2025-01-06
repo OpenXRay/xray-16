@@ -218,8 +218,8 @@ void CPhysicObject::run_anim_forward()
 {
     if (!check_blend(m_anim_blend, cName().c_str(), cNameSect().c_str(), cNameVisual().c_str()))
         return;
-    m_anim_blend->playing = TRUE;
-    m_anim_blend->stop_at_end_callback = TRUE;
+    m_anim_blend->playing = true;
+    m_anim_blend->stop_at_end_callback = true;
     if (m_anim_blend->speed < 0.f)
         m_anim_blend->speed = -m_anim_blend->speed;
 }
@@ -227,8 +227,8 @@ void CPhysicObject::run_anim_back()
 {
     if (!check_blend(m_anim_blend, cName().c_str(), cNameSect().c_str(), cNameVisual().c_str()))
         return;
-    m_anim_blend->playing = TRUE;
-    m_anim_blend->stop_at_end_callback = TRUE;
+    m_anim_blend->playing = true;
+    m_anim_blend->stop_at_end_callback = true;
     if (m_anim_blend->speed > 0.f)
         m_anim_blend->speed = -m_anim_blend->speed;
 }
@@ -236,7 +236,7 @@ void CPhysicObject::stop_anim()
 {
     if (!check_blend(m_anim_blend, cName().c_str(), cNameSect().c_str(), cNameVisual().c_str()))
         return;
-    m_anim_blend->playing = FALSE;
+    m_anim_blend->playing = false;
 }
 
 float CPhysicObject::anim_time_get()
