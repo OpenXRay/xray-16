@@ -19,8 +19,6 @@ CUITrackBar::CUITrackBar()
     : m_b_invert(false), m_b_is_float(true), m_b_bound_already_set(false), m_f_val(0), m_f_max(1), m_f_min(0),
       m_f_step(0.01f), m_f_opt_backup_value(0)
 {
-    m_bFocusValuable = true;
-
     m_pSlider = xr_new<CUI3tButton>();
     AttachChild(m_pSlider);
     m_pSlider->SetAutoDelete(true);
@@ -31,6 +29,13 @@ CUITrackBar::CUITrackBar()
     m_static->SetAutoDelete(true);
 
     m_b_mouse_capturer = false;
+
+    //UI().Focus().RegisterFocusable(this);
+}
+
+CUITrackBar::~CUITrackBar()
+{
+    //UI().Focus().UnregisterFocusable(this);
 }
 
 bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)

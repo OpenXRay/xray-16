@@ -8,6 +8,8 @@ class XRUICORE_API CUITrackBar final : public CUI_IB_FrameLineWnd, public CUIOpt
 {
 public:
     CUITrackBar();
+    ~CUITrackBar() override;
+
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
     virtual void SaveBackUpOptValue(); // current->backup

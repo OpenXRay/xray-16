@@ -8,8 +8,6 @@
 
 CUICustomEdit::CUICustomEdit() : CUIStatic("CUICustomEdit")
 {
-    m_bFocusValuable = true;
-
     m_editor_control = xr_new<text_editor::line_edit_control>(EDIT_BUF_SIZE);
     Init(EDIT_BUF_SIZE);
 
@@ -25,9 +23,15 @@ CUICustomEdit::CUICustomEdit() : CUIStatic("CUICustomEdit")
     m_force_update = true;
     m_last_key_state_time = 0;
     m_next_focus_capturer = NULL;
+
+    UI().Focus().RegisterFocusable(this);
 }
 
-CUICustomEdit::~CUICustomEdit() { xr_delete(m_editor_control); }
+CUICustomEdit::~CUICustomEdit()
+{
+    xr_delete(m_editor_control);
+    UI().Focus().UnregisterFocusable(this);
+}
 
 text_editor::line_edit_control& CUICustomEdit::ec()
 {

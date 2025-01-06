@@ -18,12 +18,11 @@ limitations under the License.
 
 #include "ui_defs.h"
 
-#include "xrCommon/xr_map.h"
-#include "xrCommon/xr_unordered_map.h"
+#include "xrCommon/xr_list.h"
 
 class CUIWindow;
 
-enum class FocusDirection
+enum class FocusDirection : u8
 {
     Same, // exactly same coordinates with the target
     Up,
@@ -36,37 +35,25 @@ enum class FocusDirection
     LowerRight,
 };
 
-// 1. Doesn't own CUIWindow* pointers it holds
+// Doesn't own CUIWindow* pointers it holds
 class XRUICORE_API CUIFocusSystem
 {
-    struct FocusData
-    {
-        float distance;
-        FocusDirection direction;
-    };
+    xr_list<const CUIWindow*> m_valuable;
+    xr_list<const CUIWindow*> m_non_valuable;
 
-    using relates_t = xr_map<CUIWindow*, FocusData>;
-    using targets_t = xr_unordered_map<CUIWindow*, relates_t>;
-
-    targets_t m_structure;
-
-    xr_list<CUIWindow*> m_all_windows; // helper to make code simpler
-
-    CUIWindow* m_current_focused{};
-
-private:
-    static FocusData CalculateFocusData(const CUIWindow* from, const CUIWindow* to);
+    const CUIWindow* m_current_focused{};
 
 public:
     virtual ~CUIFocusSystem() = default;
 
-    void RegisterFocusable(CUIWindow* focusable);
-    void UnregisterFocusable(CUIWindow* focusable);
-
+    void RegisterFocusable(const CUIWindow* focusable);
+    void UnregisterFocusable(const CUIWindow* focusable);
     bool IsRegistered(const CUIWindow* focusable) const;
 
-    CUIWindow* FindClosestFocusable(CUIWindow* target, FocusDirection direction) const;
+    void Update(const CUIWindow* root);
 
-    CUIWindow* GetFocused() const { return m_current_focused;}
-    void SetFocused(CUIWindow* window) { m_current_focused = window; }
+    auto GetFocused() const { return const_cast<CUIWindow*>(m_current_focused);}
+    void SetFocused(const CUIWindow* window) { m_current_focused = window; }
+
+    std::pair<CUIWindow*, bool> FindClosestFocusable(const Fvector2& from, FocusDirection direction) const;
 };

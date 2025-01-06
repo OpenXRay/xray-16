@@ -9,8 +9,6 @@
 
 CUIComboBox::CUIComboBox() : CUIWindow("CUIComboBox")
 {
-    m_bFocusValuable = true;
-
     AttachChild(&m_frameLine);
     AttachChild(&m_text);
 
@@ -21,6 +19,13 @@ CUIComboBox::CUIComboBox() : CUIWindow("CUIComboBox")
     m_bInited = false;
     m_eState = LIST_FONDED;
     m_textColor[0] = 0xff00ff00;
+
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUIComboBox::~CUIComboBox()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUIComboBox::SetListLength(int length)

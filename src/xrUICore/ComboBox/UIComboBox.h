@@ -16,6 +16,7 @@ class XRUICORE_API CUIComboBox final : public CUIWindow, public CUIOptionsItem, 
 
 public:
     CUIComboBox();
+    ~CUIComboBox() override;
 
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current

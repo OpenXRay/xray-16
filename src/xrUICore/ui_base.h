@@ -2,6 +2,7 @@
 
 #include "ui_defs.h"
 #include "ui_debug.h"
+#include "ui_focus.h"
 #include "FontManager/FontManager.h"
 
 #include "xrEngine/pure.h"
@@ -23,6 +24,7 @@ class XRUICORE_API UICore : public CDeviceResetNotifier, public CUIResetNotifier
 
     CFontManager* m_pFontManager;
     CUICursor* m_pUICursor;
+    CUIFocusSystem m_focusSystem;
     CUIDebugger m_debugger;
 
     Fvector2 m_pp_scale_;
@@ -37,6 +39,7 @@ public:
     void ReadTextureInfo();
     CFontManager& Font() { return *m_pFontManager; }
     CUICursor& GetUICursor() { return *m_pUICursor; }
+    auto& Focus() { return m_focusSystem; }
     auto& Debugger() { return m_debugger; }
     IC float ClientToScreenScaledX(float left) const { return left * m_current_scale->x; };
     IC float ClientToScreenScaledY(float top) const { return top * m_current_scale->y; };

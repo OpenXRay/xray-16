@@ -10,7 +10,6 @@
 
 CUIButton::CUIButton() : CUIStatic("CUIButton")
 {
-    m_bFocusValuable = true;
     m_eButtonState = BUTTON_NORMAL;
     m_bIsSwitch = false;
 
@@ -22,6 +21,13 @@ CUIButton::CUIButton() : CUIStatic("CUIButton")
     TextItemControl()->SetTextComplexMode(false);
     TextItemControl()->SetTextAlignment(CGameFont::alCenter); // this will create class instance for m_pLines
     TextItemControl()->SetVTextAlignment(valCenter);
+
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUIButton::~CUIButton()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUIButton::Reset()
