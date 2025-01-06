@@ -334,7 +334,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
         {
             auto& focus = UI().Focus();
             const auto focused = focus.GetFocused();
-            const Fvector2 vec = focused ? focused->GetWndPos() : UI().GetUICursor().GetCursorPosition();
+            const Fvector2 vec = focused ? focused->GetAbsoluteCenterPos() : UI().GetUICursor().GetCursorPosition();
             const auto [target, direct] = focus.FindClosestFocusable(vec, direction);
 
             if (target)
