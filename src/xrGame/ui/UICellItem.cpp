@@ -36,6 +36,8 @@ CUICellItem::CUICellItem()
     m_has_upgrade = false;
 
     init();
+
+    UI().Focus().RegisterFocusable(this);
 }
 
 CUICellItem::~CUICellItem()
@@ -44,6 +46,8 @@ CUICellItem::~CUICellItem()
         delete_data(m_childs);
 
     delete_data(m_custom_draw);
+
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUICellItem::init()
