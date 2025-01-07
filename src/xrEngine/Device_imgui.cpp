@@ -27,8 +27,9 @@ void CRenderDevice::InitializeImGui()
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard |
                       ImGuiConfigFlags_NavEnableGamepad |
-                      ImGuiConfigFlags_NavEnableSetMousePos |
                       ImGuiConfigFlags_DockingEnable;
+
+    io.ConfigNavMoveSetMousePos = true;
 
     string_path fName;
     FS.update_path(fName, "$app_data_root$", io.IniFilename);
@@ -40,7 +41,10 @@ void CRenderDevice::InitializeImGui()
 
     io.BackendPlatformName = "OpenXRay";
 
-    io.SetPlatformImeDataFn = [](ImGuiViewport* viewport, ImGuiPlatformImeData* data)
+    // Register platform interface (will be coupled with a renderer interface)
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+
+    platform_io.Platform_SetImeDataFn = [](ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data)
     {
         if (data->WantVisible)
         {
@@ -56,9 +60,6 @@ void CRenderDevice::InitializeImGui()
     };
 
 #ifdef IMGUI_ENABLE_VIEWPORTS
-    // Register platform interface (will be coupled with a renderer interface)
-    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
-
     platform_io.Platform_CreateWindow = [](ImGuiViewport* viewport)
     {
         Uint32 sdl_flags{};

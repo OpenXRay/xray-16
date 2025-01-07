@@ -4,6 +4,8 @@
 #include "editor_helper.h"
 #include "XR_IOConsole.h"
 
+#include <imgui_internal.h>
+
 namespace
 {
 bool mouse_can_use_global_state()
@@ -45,14 +47,17 @@ void ide::InitBackend()
 #endif
     }
 
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+
     // Clipboard functionality
-    io.SetClipboardTextFn = [](void*, const char* text)
+    platform_io.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text)
     {
         SDL_SetClipboardText(text);
     };
-    io.GetClipboardTextFn = [](void* user_data) -> const char*
+    platform_io.Platform_GetClipboardTextFn = [](ImGuiContext* ctx) -> const char*
     {
-        auto& bd = *static_cast<ImGuiBackend*>(user_data);
+        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(ctx);
+        auto& bd = *static_cast<ImGuiBackend*>(platform_io.Platform_ClipboardUserData);
 
         if (bd.clipboard_text_data)
             SDL_free(bd.clipboard_text_data);
@@ -61,7 +66,7 @@ void ide::InitBackend()
 
         return bd.clipboard_text_data;
     };
-    io.ClipboardUserData = &m_imgui_backend;
+    platform_io.Platform_ClipboardUserData = &m_imgui_backend;
 
     auto& bd = m_imgui_backend;
 
