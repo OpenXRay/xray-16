@@ -39,7 +39,7 @@ class ENGINE_API ide final :
     friend class ide_tool;
 
 public:
-    enum class visible_state
+    enum class visible_state : u8
     {
         hidden, // all ide windows are hidden
         full,   // input captured, opaque windows
@@ -109,16 +109,16 @@ private:
 
 private:
     visible_state m_state{};
-    bool m_text_input_enabled{};
-
-    xr_vector<ide_tool*> m_tools;
 
     struct ImGuiBackend
     {
-        Uint32      mouse_window_id{};
-        int         mouse_last_leave_frame{};
-        bool        mouse_can_report_hovered_viewport{};
+        Uint32 mouse_window_id{};
+        int    mouse_last_leave_frame{};
+        bool   mouse_can_report_hovered_viewport{};
+        bool   text_input_enabled{};
     };
     ImGuiBackend m_imgui_backend{};
+
+    xr_vector<ide_tool*> m_tools;
 };
 } // namespace xray::editor

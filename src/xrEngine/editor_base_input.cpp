@@ -173,21 +173,21 @@ void ide::UpdateTextInput(bool force_disable /*= false*/)
 {
     if (force_disable)
     {
-        if (m_text_input_enabled)
+        if (m_imgui_backend.text_input_enabled)
         {
             pInput->DisableTextInput();
-            m_text_input_enabled = false;
+            m_imgui_backend.text_input_enabled = false;
         }
         return;
     }
 
     const ImGuiIO& io = ImGui::GetIO();
 
-    if (m_text_input_enabled != io.WantTextInput)
+    if (m_imgui_backend.text_input_enabled != io.WantTextInput)
     {
-        m_text_input_enabled = io.WantTextInput;
+        m_imgui_backend.text_input_enabled = io.WantTextInput;
 
-        if (m_text_input_enabled)
+        if (m_imgui_backend.text_input_enabled)
             pInput->EnableTextInput();
         else
             pInput->DisableTextInput();
