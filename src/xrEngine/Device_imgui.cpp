@@ -4,6 +4,8 @@
 #   include <SDL_syswm.h>
 #endif
 
+#include <imgui_internal.h>
+
 void CRenderDevice::InitializeImGui()
 {
     if (m_imgui_context)
@@ -43,6 +45,25 @@ void CRenderDevice::InitializeImGui()
 
     // Register platform interface (will be coupled with a renderer interface)
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+
+    // Clipboard functionality
+    platform_io.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text)
+    {
+        SDL_SetClipboardText(text);
+    };
+
+    platform_io.Platform_GetClipboardTextFn = [](ImGuiContext* ctx) -> const char*
+    {
+        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(ctx);
+        auto clipboard_text_data = static_cast<char*>(platform_io.Platform_ClipboardUserData);
+
+        if (clipboard_text_data)
+            SDL_free(clipboard_text_data);
+
+        clipboard_text_data = SDL_GetClipboardText();
+
+        return clipboard_text_data;
+    };
 
     platform_io.Platform_SetImeDataFn = [](ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data)
     {
@@ -218,11 +239,17 @@ void CRenderDevice::DestroyImGui()
 #ifdef IMGUI_ENABLE_VIEWPORTS
     ImGui::DestroyPlatformWindows();
 #endif
-    editor().ShutdownBackend();
 
     ImGuiIO& io = ImGui::GetIO();
     xr_free(io.IniFilename);
     xr_free(io.LogFilename);
+
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(m_imgui_context);
+
+    if (platform_io.Platform_ClipboardUserData)
+    {
+        SDL_free(platform_io.Platform_ClipboardUserData);
+    }
 
     ImGui::DestroyContext(m_imgui_context);
     m_imgui_context = nullptr;

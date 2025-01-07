@@ -4,8 +4,6 @@
 #include "editor_helper.h"
 #include "XR_IOConsole.h"
 
-#include <imgui_internal.h>
-
 namespace
 {
 bool mouse_can_use_global_state()
@@ -45,38 +43,6 @@ void ide::InitBackend()
 #ifndef XR_PLATFORM_APPLE
         m_imgui_backend.mouse_can_report_hovered_viewport = true;
 #endif
-    }
-
-    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
-
-    // Clipboard functionality
-    platform_io.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text)
-    {
-        SDL_SetClipboardText(text);
-    };
-    platform_io.Platform_GetClipboardTextFn = [](ImGuiContext* ctx) -> const char*
-    {
-        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(ctx);
-        auto& bd = *static_cast<ImGuiBackend*>(platform_io.Platform_ClipboardUserData);
-
-        if (bd.clipboard_text_data)
-            SDL_free(bd.clipboard_text_data);
-
-        bd.clipboard_text_data = SDL_GetClipboardText();
-
-        return bd.clipboard_text_data;
-    };
-    platform_io.Platform_ClipboardUserData = &m_imgui_backend;
-}
-
-void ide::ShutdownBackend()
-{
-    auto& backend = m_imgui_backend;
-
-    if (backend.clipboard_text_data)
-    {
-        SDL_free(backend.clipboard_text_data);
-        backend.clipboard_text_data = nullptr;
     }
 }
 

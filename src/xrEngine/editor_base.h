@@ -51,7 +51,6 @@ public:
     ~ide() override;
 
     void InitBackend();
-    void ShutdownBackend();
 
     void ProcessEvent(const SDL_Event& event);
 
@@ -116,7 +115,6 @@ private:
 
     struct ImGuiBackend
     {
-        char* clipboard_text_data{};
         Uint32      mouse_window_id{};
         int         mouse_last_leave_frame{};
         bool        mouse_can_report_hovered_viewport{};
