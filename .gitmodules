@@ -1,9 +1,11 @@
 [submodule "Externals/LuaJIT"]
 	path = Externals/LuaJIT
 	url = https://github.com/OpenXRay/LuaJIT.git
+	branch = v2.1
 [submodule "Externals/luabind"]
 	path = Externals/luabind
 	url = https://github.com/OpenXRay/luabind-deboostified.git
+	branch = xray
 [submodule "Externals/GameSpy"]
 	path = Externals/GameSpy
 	url = https://github.com/OpenXRay/GameSpy.git
@@ -25,6 +27,7 @@
 [submodule "Externals/imgui"]
 	path = Externals/imgui
 	url = https://github.com/ocornut/imgui.git
+	branch = docking
 [submodule "Externals/xrLuaFix"]
 	path = Externals/xrLuaFix
 	url = https://github.com/OpenXRay/xrLuaFix.git
