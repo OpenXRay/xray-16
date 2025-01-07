@@ -117,8 +117,6 @@ private:
     struct ImGuiBackend
     {
         char* clipboard_text_data{};
-        SDL_Cursor* mouse_cursors[ImGuiMouseCursor_COUNT]{};
-        SDL_Cursor* last_cursor{};
         Uint32      mouse_window_id{};
         int         mouse_last_leave_frame{};
         bool        mouse_can_report_hovered_viewport{};

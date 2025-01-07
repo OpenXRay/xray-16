@@ -137,6 +137,9 @@ private:
     bool exclusiveInput;
     bool inputGrabbed;
 
+    SDL_Cursor* mouseCursors[SDL_NUM_SYSTEM_CURSORS]{};
+    SDL_Cursor* lastCursor{};
+
 public:
     const InputStatistics& GetStats() const { return stats; }
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
@@ -155,6 +158,9 @@ public:
 
     void GrabInput(const bool grab);
     bool InputIsGrabbed() const;
+
+    void ShowCursor(const bool show);
+    void SetCursor(const SDL_SystemCursor cursor);
 
     void EnableTextInput();
     void DisableTextInput();

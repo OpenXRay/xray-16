@@ -97,6 +97,13 @@ CInput::~CInput()
 
     GrabInput(false);
 
+    for (auto& cursor : mouseCursors)
+    {
+        SDL_FreeCursor(cursor);
+        cursor = nullptr;
+    }
+    lastCursor = nullptr;
+
     for (auto& controller : controllers)
         SDL_GameControllerClose(controller);
     SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
@@ -591,7 +598,7 @@ bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
-    SDL_ShowCursor(grab ? SDL_FALSE : SDL_TRUE);
+    ShowCursor(grab);
 
     // Clip cursor to the current window
     // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too
@@ -608,6 +615,21 @@ void CInput::GrabInput(const bool grab)
 bool CInput::InputIsGrabbed() const
 {
     return inputGrabbed;
+}
+
+void CInput::ShowCursor(const bool show)
+{
+    SDL_ShowCursor(show ? SDL_FALSE : SDL_TRUE);
+}
+
+void CInput::SetCursor(const SDL_SystemCursor cursor)
+{
+    SDL_Cursor* expected_cursor = mouseCursors[cursor] ? mouseCursors[cursor] : mouseCursors[ImGuiMouseCursor_Arrow];
+    if (lastCursor != expected_cursor) // SDL function doesn't have an early out
+    {
+        SDL_SetCursor(expected_cursor);
+        lastCursor = expected_cursor;
+    }
 }
 
 void CInput::EnableTextInput()
