@@ -4,13 +4,38 @@
 #include "xr_input.h"
 #include "IInputReceiver.h"
 #include "GameFont.h"
+#include "XR_IOConsole.h"
 #include "xrCore/Text/StringConversion.hpp"
 #include "xrCore/xr_token.h"
 
 #include <locale>
 
 CInput* pInput = nullptr;
-IInputReceiver dummyController;
+
+class DummyReceiver : public IInputReceiver
+{
+public:
+    void IR_OnKeyboardPress(int dik) override
+    {
+        switch (GetBindedAction(dik))
+        {
+        case kQUIT:
+            if (Console)
+                Console->Execute("main_menu");
+            return;
+
+        case kCONSOLE:
+            if (Console)
+                Console->Show();
+            return;
+
+        case kEDITOR:
+            if (Device.b_is_Ready)
+                Device.editor().SwitchToNextState();
+            return;
+        }
+    }
+} dummyController;
 
 ENGINE_API float psMouseSens = 1.f;
 ENGINE_API float psMouseSensScale = 1.f;
