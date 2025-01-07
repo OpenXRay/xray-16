@@ -21,6 +21,8 @@ limitations under the License.
 
 #include "xrCore/buffer_vector.h"
 
+#include <array>
+
 namespace
 {
 std::array<FocusDirection, 3> allowed_directions(FocusDirection direction)
