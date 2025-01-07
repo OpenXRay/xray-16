@@ -532,6 +532,8 @@ void CConsole::Hide()
 
     Device.seqFrame.Remove(this);
     IR_Release();
+    if (!Device.editor().IsActiveState())
+        Device.editor().UpdateTextInput(true);
 }
 
 void CConsole::SelectCommand()
