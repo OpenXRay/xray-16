@@ -778,11 +778,6 @@ void CInput::ExclusiveMode(const bool exclusive)
 {
     GrabInput(false);
 
-    // Original CInput was using DirectInput in exclusive mode
-    // In which keyboard was grabbed with the mouse.
-    // It produces problems on Linux, so it's disabled by default.
-    if (strstr(Core.Params, "-grab_keyboard"))
-        SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, exclusive ? "1" : "0");
     exclusiveInput = exclusive;
 
     GrabInput(true);
