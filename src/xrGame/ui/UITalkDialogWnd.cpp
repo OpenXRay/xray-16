@@ -212,12 +212,12 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_
         xr_sprintf(buff, "%d.", (number == 10) ? 0 : number);
         if (itm->m_num_text)
             itm->m_num_text->SetText(buff);
-        itm->m_text->SetAccelerator(SDL_SCANCODE_1 - 1 + number, 0);
+        itm->m_text->SetAccelerator(SDL_SCANCODE_1 - 1 + number, true, 0);
     }
     if (b_finalizer)
     {
-        itm->m_text->SetAccelerator(kQUIT, 2); // XXX: DON'T USE 2, instead use SDL_SCANCODE_*
-        itm->m_text->SetAccelerator(kUSE, 3);
+        itm->m_text->SetAccelerator(kQUIT, false, 2);
+        itm->m_text->SetAccelerator(kUSE, false, 3);
     }
 
     itm->SetWindowName("question_item");

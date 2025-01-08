@@ -377,17 +377,29 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, pcstr path, int index, CUI3tB
     InitTextureOffset(xml_doc, path, index, pWnd);
     InitSound(xml_doc, path, index, pWnd);
 
-    if (cpcstr accel = xml_doc.ReadAttrib(path, index, "accel", nullptr))
+    const auto checkAccelerator = [&](pcstr attrName, size_t accelIdx)
     {
-        const int acc = KeynameToDik(accel);
-        pWnd->SetAccelerator(acc, 0);
-    }
+        if (cpcstr accel = xml_doc.ReadAttrib(path, index, attrName, nullptr))
+        {
+            const int acc = KeynameToDik(accel);
+            if (acc != SDL_SCANCODE_UNKNOWN)
+                pWnd->SetAccelerator(acc, true, accelIdx);
+            else
+            {
+                const auto action = ActionNameToId(accel);
+                if (action != kNOTBINDED)
+                    pWnd->SetAccelerator(static_cast<int>(action), false, accelIdx);
+                else
+                {
+                    Msg("~ [%s] has wrong '%s' attribute value[%s] for button[%s] with index[%d] - can't find such button or action",
+                        xml_doc.m_xml_file_name, attrName, accel, path, index);
+                }
+            }
+        }
+    };
 
-    if (cpcstr accel = xml_doc.ReadAttrib(path, index, "accel_ext", nullptr))
-    {
-        const int acc = KeynameToDik(accel);
-        pWnd->SetAccelerator(acc, 1);
-    }
+    checkAccelerator("accel", 0);
+    checkAccelerator("accel_ext", 1);
 
     if (cpcstr text_hint = xml_doc.ReadAttrib(path, index, "hint", nullptr))
         pWnd->m_hint_text = StringTable().translate(text_hint);

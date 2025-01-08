@@ -13,10 +13,10 @@ CUIButton::CUIButton() : CUIStatic("CUIButton")
     m_eButtonState = BUTTON_NORMAL;
     m_bIsSwitch = false;
 
-    m_uAccelerator[0] = 0;
-    m_uAccelerator[1] = 0;
-    m_uAccelerator[2] = -1;
-    m_uAccelerator[3] = -1;
+    for (auto& accelerator : m_accelerators)
+    {
+        accelerator.accel = -1;
+    }
 
     TextItemControl()->SetTextComplexMode(false);
     TextItemControl()->SetTextAlignment(CGameFont::alCenter); // this will create class instance for m_pLines
@@ -204,25 +204,34 @@ bool CUIButton::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
-void CUIButton::SetAccelerator(int iAccel, int idx)
+void CUIButton::SetAccelerator(int iAccel, bool isKey, size_t idx)
 {
-    VERIFY(idx >= 0 && idx < 4);
-    m_uAccelerator[idx] = s16(iAccel);
+    R_ASSERT1_CURE(idx < std::size(m_accelerators), return);
+    m_accelerators[idx] = { (s16)iAccel, isKey };
 }
 
-int CUIButton::GetAccelerator(int idx) const
+int CUIButton::GetAccelerator(size_t idx) const
 {
-    VERIFY(idx >= 0 && idx < 4);
-    return m_uAccelerator[idx];
+    R_ASSERT1_CURE(idx < std::size(m_accelerators), return -1);
+    return m_accelerators[idx].accel;
 }
 
 bool CUIButton::IsAccelerator(int iAccel) const
 {
-    bool res = GetAccelerator(0) == iAccel || GetAccelerator(1) == iAccel;
-    if (!res)
+    for (const auto [accelerator, isKey] : m_accelerators)
     {
-        res = ((m_uAccelerator[2] != -1) ? IsBinded((EGameActions)GetAccelerator(2), iAccel) : false) ||
-            ((m_uAccelerator[3] != -1) ? IsBinded((EGameActions)GetAccelerator(3), iAccel) : false);
+        if (accelerator == -1)
+            continue;
+        if (isKey)
+        {
+            if (accelerator == iAccel)
+                return true;
+        }
+        else
+        {
+            if (IsBinded(static_cast<EGameActions>(accelerator), iAccel))
+                return true;
+        }
     }
-    return res;
+    return false;
 }

@@ -40,8 +40,8 @@ public:
     // Работа с акселератором
     // Код акселератора берётся из файла SDL_scancode.h, из SDL2.
     // Например: кнопка A - код 4 (SDL_SCANCODE_A)
-    void SetAccelerator(int iAccel, int idx);
-    int GetAccelerator(int idx) const;
+    void SetAccelerator(int iAccel, bool isKey, size_t idx);
+    int GetAccelerator(size_t idx) const;
     bool IsAccelerator(int iAccel) const;
 
     shared_str m_hint_text;
@@ -49,7 +49,13 @@ public:
     pcstr GetDebugType() override { return "CUIButton"; }
 
 protected:
+    struct ButtonAccelerator
+    {
+        s16  accel;
+        bool isKey;
+    };
+
     E_BUTTON_STATE m_eButtonState;
-    s16 m_uAccelerator[4];
+    ButtonAccelerator m_accelerators[4]{};
     bool m_bIsSwitch;
 };
