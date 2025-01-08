@@ -642,15 +642,16 @@ pcstr IdToActionName(EGameActions id)
 
 EGameActions ActionNameToId(pcstr name)
 {
-    game_action* action = ActionNameToPtr(name);
-    if (action)
+    if (const game_action* action = ActionNameToPtr(name))
         return action->id;
-    else
-        return kNOTBINDED;
+
+    return kNOTBINDED;
 }
 
 game_action* ActionNameToPtr(pcstr name)
 {
+    R_ASSERT1_CURE(name, return nullptr);
+
     size_t idx = 0;
     while (actions[idx].action_name)
     {
@@ -721,12 +722,15 @@ keyboard_key* DikToPtr(int dik, bool safe)
 
 int KeynameToDik(pcstr name)
 {
-    keyboard_key* kb = KeynameToPtr(name);
-    return kb->dik;
+    if (const keyboard_key* kb = KeynameToPtr(name))
+        return kb->dik;
+    return SDL_SCANCODE_UNKNOWN;
 }
 
 keyboard_key* KeynameToPtr(pcstr name)
 {
+    R_ASSERT1_CURE(name, return nullptr);
+
     size_t idx = 0;
     while (keyboards[idx].key_name)
     {
@@ -737,7 +741,7 @@ keyboard_key* KeynameToPtr(pcstr name)
     }
 
     Msg("! [KeynameToPtr] cant find corresponding 'keyboard_key' for keyname %s", name);
-    return NULL;
+    return nullptr;
 }
 
 bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2)
