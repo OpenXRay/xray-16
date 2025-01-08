@@ -231,6 +231,8 @@ bool CUIButton::IsAccelerator(int iAccel) const
         {
             if (IsBinded(static_cast<EGameActions>(accelerator), iAccel))
                 return true;
+            if (IsBinded(static_cast<EGameActions>(accelerator), iAccel, EKeyContext::UI))
+                return true;
         }
     }
     return false;
