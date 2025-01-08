@@ -611,7 +611,7 @@ bool CInput::iSetMousePos(const Ivector2& p, bool global /*= false*/) const
 void CInput::GrabInput(const bool grab)
 {
     // Self descriptive
-    ShowCursor(grab);
+    ShowCursor(!grab);
 
     // Clip cursor to the current window
     // If SDL_HINT_GRAB_KEYBOARD is set then the keyboard will be grabbed too
@@ -632,7 +632,7 @@ bool CInput::InputIsGrabbed() const
 
 void CInput::ShowCursor(const bool show)
 {
-    SDL_ShowCursor(show ? SDL_FALSE : SDL_TRUE);
+    SDL_ShowCursor(show ? SDL_TRUE : SDL_FALSE);
 }
 
 void CInput::SetCursor(const SDL_SystemCursor cursor)
