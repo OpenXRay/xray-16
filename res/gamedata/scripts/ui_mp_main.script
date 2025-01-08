@@ -618,7 +618,9 @@ function mp_main:OnBtn_Join()
 end
 
 function mp_main:OnKeyboard(dik, keyboard_action)
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
 
 	local bind = dik_to_bind(dik)
 	local console = get_console()
@@ -628,10 +630,11 @@ function mp_main:OnKeyboard(dik, keyboard_action)
 			self.owner:ShowDialog(true) --new(show main window)
 			self:HideDialog()
 			self.owner:Show(true)
+			return true
 		end
 	end
 
-	return true
+	return false
 end
 
 function mp_main:Update()

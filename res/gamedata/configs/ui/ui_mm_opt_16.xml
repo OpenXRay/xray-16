@@ -22,7 +22,7 @@
 	        </auto_static>
 		</dialog>
 
-		<btn_accept x="84" y="431" width="108" height="26" stretch="1">
+		<btn_accept x="84" y="431" width="108" height="26" stretch="1" accel="ui_accept">
 			<text font="letterica18" align="c">ui_mm_apply</text>
 			<texture>ui_inGame2_Mp_bigbuttone</texture>
             <text_color>
@@ -30,7 +30,7 @@
             </text_color>
 		</btn_accept>
 
-		<btn_cancel x="196" y="431" width="108" height="26" stretch="1">
+		<btn_cancel x="196" y="431" width="108" height="26" stretch="1" accel="ui_back">
 			<text font="letterica18" align="c">ui_mm_cancel</text>
 			<texture>ui_inGame2_Mp_bigbuttone</texture>
             <text_color>
@@ -38,8 +38,8 @@
             </text_color>
 		</btn_cancel>
 
-		<tab x="11" y="27" width="368" height="38">
-			<button x="1" y="2" width="105" height="25" id="video" stretch="1">
+		<tab x="11" y="27" width="368" height="38" accelerators="1">
+			<button x="1" y="2" width="105" height="25" id="video" stretch="1" accel="ui_button_1">
 				<texture>ui_inGame2_opt_button_1</texture>
 				<text font="letterica18" align="c">ui_mm_video</text>
 				<text_color>
@@ -47,7 +47,7 @@
 				</text_color>
 			</button>
 
-			<button x="89" y="2" width="104" height="25" id="sound" stretch="1">
+			<button x="89" y="2" width="104" height="25" id="sound" stretch="1" accel="ui_button_2">
 				<texture>ui_inGame2_opt_button_1</texture>
 				<text font="letterica18" align="c">ui_mm_sound</text>
 				<text_color>
@@ -55,7 +55,7 @@
 				</text_color>
 			</button>
 
-			<button x="176" y="2" width="105" height="25" id="gameplay" stretch="1">
+			<button x="176" y="2" width="105" height="25" id="gameplay" stretch="1" accel="ui_button_3">
 	            <texture>ui_inGame2_opt_button_1</texture>
 	            <text font="letterica18" align="c">ui_mm_gameplay</text>
 				<text_color>
@@ -63,7 +63,7 @@
 				</text_color>
 			</button>
 
-			<button x="264" y="2" width="103" height="25" id="controls" stretch="1">
+			<button x="264" y="2" width="103" height="25" id="controls" stretch="1" accel="ui_button_4">
 	            <texture>ui_inGame2_opt_button_2</texture>
 	            <text font="letterica18" align="c">ui_mm_controls</text>
 				<text_color>
@@ -168,7 +168,7 @@
             <options_item entry="rs_c_brightness" group="mm_opt_video" depend="runtime"/>
         </track_brightness>
 
-        <btn_advanced x="270" y="322" width="86" height="24" stretch="1">
+        <btn_advanced x="270" y="322" width="86" height="24" stretch="1" accel="ui_action_1">
             <text r="170" g="170" b="170" align="c" font="letterica16">ui_mm_advanced</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
@@ -526,7 +526,7 @@
             <options_item entry="r4_enable_tessellation" group="mm_opt_video_adv" depend="vid"/>
         </check_r4_tessellation>
 
-        <btn_to_simply x="270" y="322" width="86" height="24" stretch="1">
+        <btn_to_simply x="270" y="322" width="86" height="24" stretch="1" accel="ui_action_1">
             <text align="c" font="letterica16">ui_mm_simply</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
@@ -808,7 +808,7 @@
             </scroll_view>
         </key_binding>
 
-        <btn_default x="270" y="322" width="86" height="24" stretch="1">
+        <btn_default x="270" y="322" width="86" height="24" stretch="1" accel="ui_action_2">
             <text align="c" font="letterica16">ui_mm_default</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
@@ -816,7 +816,7 @@
 			</text_color>
         </btn_default>
 		
-		<btn_advanced x="156" y="322" width="110" height="24" stretch="1">
+		<btn_advanced x="156" y="322" width="110" height="24" stretch="1" accel="ui_action_1">
             <text align="c" font="letterica16">ui_mm_gamepad_setup</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
@@ -862,7 +862,7 @@
             </scroll_view>
         </key_binding_gamepad>
 
-		<btn_default x="270" y="322" width="86" height="24" stretch="1">
+		<btn_default x="270" y="322" width="86" height="24" stretch="1" accel="ui_action_2">
             <text align="c" font="letterica16">ui_mm_default</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>
@@ -870,7 +870,7 @@
 			</text_color>
         </btn_default>
 		
-		<btn_controls x="150" y="322" width="116" height="24" stretch="1">
+		<btn_controls x="150" y="322" width="116" height="24" stretch="1" accel="ui_action_1">
             <text align="c" font="letterica16">ui_mm_keyboard_setup</text>
             <texture>ui_inGame2_button</texture>
 			<text_color>

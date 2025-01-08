@@ -405,8 +405,6 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         switch (action)
         {
         case kUI_ACCEPT:
-            if (WINDOW_KEY_HOLD == keyboard_action)
-                return false;
             OnBtnClick();
             return true;
 
@@ -414,9 +412,15 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             if (m_page != epi_main)
                 ShowMain();
             return true;
+
+        case kUI_MOVE_UP:
+        case kUI_MOVE_DOWN:
+            // CInput sends both 'key hold' and 'key press' during one frame for keyboard (not gamepad)
+            // Prevent double scroll for keyboard
+            // Prevent focus system triggering for gamepad
+            return true;
         } // switch (GetBindedAction(dik))
     }
-    // CInput sends both 'key hold' and 'key press' during one frame, no need to check WINDOW_KEY_PRESSED here
     else if (WINDOW_KEY_HOLD == keyboard_action)
     {
         switch (action)

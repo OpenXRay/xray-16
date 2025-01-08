@@ -9,6 +9,12 @@ CUIListBoxItem::CUIListBoxItem(float height)
 {
     SetHeight(height);
     m_text = AddTextField("", 10.0f);
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUIListBoxItem::~CUIListBoxItem()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUIListBoxItem::SetTAG(u32 value) { tag = value; }

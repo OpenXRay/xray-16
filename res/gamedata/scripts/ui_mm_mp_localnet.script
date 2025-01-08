@@ -103,7 +103,9 @@ function localnet_page:OnEditLPNicknameChanged()
 end
 
 function localnet_page:OnKeyboard(dik, keyboard_action)
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
 
 	local bind = dik_to_bind(dik)
 	local console = get_console()
@@ -111,8 +113,9 @@ function localnet_page:OnKeyboard(dik, keyboard_action)
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if bind == key_bindings.kQUIT then
 			self:OnBtnCancel()
+			return true
 		end
 	end
 	
-	return true
+	return false
 end

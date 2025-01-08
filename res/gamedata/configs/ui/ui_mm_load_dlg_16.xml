@@ -47,15 +47,15 @@
 	    <list x="26" y="215" width="417" height="173" item_height="18" can_select="1">
 		    <font font="letterica16"/>
 	    </list>
-	    <btn_load x="54" y="427" width="108" height="26" stretch="1">
+	    <btn_load x="54" y="427" width="108" height="26" stretch="1" accel="ui_accept">
 	        <texture>ui_inGame2_Mp_bigbuttone</texture>
 	        <text font="letterica18">ui_mm_load</text>
 	    </btn_load>
-	    <btn_delete x="184" y="427" width="108" height="26" stretch="1">
+	    <btn_delete x="184" y="427" width="108" height="26" stretch="1" accel="ui_action_1">
 	        <texture>ui_inGame2_Mp_bigbuttone</texture>
 	        <text font="letterica18">ui_mm_delete</text>
 	    </btn_delete>
-	    <btn_cancel x="314" y="427" width="108" height="26" stretch="1">
+	    <btn_cancel x="314" y="427" width="108" height="26" stretch="1" accel="ui_back">
 	        <texture>ui_inGame2_Mp_bigbuttone</texture>
 	        <text font="letterica18">ui_mm_cancel</text>
 	    </btn_cancel>

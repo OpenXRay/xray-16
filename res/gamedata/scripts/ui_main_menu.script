@@ -328,7 +328,10 @@ function main_menu:Dispatch(cmd, param)  --virtual function
 end
 
 function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
+
 	local bind = dik_to_bind(dik)
 	local console = get_console()
 

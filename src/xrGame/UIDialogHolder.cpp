@@ -570,6 +570,52 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
         return true;
 
+    if (IsBinded(kUI_MOVE, dik, EKeyContext::UI))
+    {
+        FocusDirection direction = FocusDirection::Same;
+
+        if (fis_zero(y))
+        {
+            if (x < 0)
+                direction = FocusDirection::Left;
+            else
+                direction = FocusDirection::Right;
+        }
+        else if (y < 0)
+        {
+            if (fis_zero(x))
+                direction = FocusDirection::Up;
+            else if (x < 0)
+                direction = FocusDirection::UpperLeft;
+            else
+                direction = FocusDirection::UpperRight;
+        }
+        else
+        {
+            if (fis_zero(x)) // same x
+                direction = FocusDirection::Down;
+            else if (x < 0)
+                direction = FocusDirection::LowerLeft;
+            else
+                direction = FocusDirection::LowerRight;
+        }
+
+        if (direction != FocusDirection::Same)
+        {
+            auto& focus = UI().Focus();
+            const auto focused = focus.GetFocused();
+            const Fvector2 vec = focused ? focused->GetAbsoluteCenterPos() : UI().GetUICursor().GetCursorPosition();
+            const auto [target, direct] = focus.FindClosestFocusable(vec, direction);
+
+            if (target)
+            {
+                focus.SetFocused(target);
+                GetUICursor().WarpToWindow(target, true);
+                return true;
+            }
+        }
+    }
+
     if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();

@@ -200,16 +200,20 @@ function save_dialog:OnButton_cancel_clicked()
 end
 
 function save_dialog:OnKeyboard(dik, keyboard_action)  --virtual function
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
 	local bind = dik_to_bind(dik)
 	if bind == key_bindings.kQUIT then
 		self:OnButton_cancel_clicked()
+		return true
 	else
 		if bind == key_bindings.kENTER and keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 			self:OnButton_ok_clicked()
+			return true
 		end
-   end
-	return true
+	end
+	return false
 end
 
 function save_dialog:AddItemToList(file_name, date_time)

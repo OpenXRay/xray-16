@@ -9,6 +9,7 @@ class XRUICORE_API CUIListBoxItem : public CUIFrameLineWnd, public CUISelectable
 
 public:
     CUIListBoxItem(float height);
+    ~CUIListBoxItem() override;
 
     virtual void Draw();
     virtual bool OnMouseDown(int mouse_btn);
