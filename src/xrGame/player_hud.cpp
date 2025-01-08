@@ -24,12 +24,14 @@ constexpr float TENDTO_SPEED_AIM  = 8.f;    // (Для прицеливания)
 // --#SM+# End--
 // clang-format on
 
-float CalcMotionSpeed(const shared_str& anim_name)
+float CalcMotionSpeed(const shared_str& anim_name, const float anim_speed)
 {
-    if (!IsGameTypeSingle() && (anim_name == "anm_show" || anim_name == "anm_hide"))
-        return 2.0f;
+    // Apply custom animation speeds / configuration only for singleplayer games.
+    // Fast reloading / showing / hiding animation does not seem fair.
+    if (IsGameTypeSingle())
+        return anim_speed;
     else
-        return 1.0f;
+        return (anim_name == "anm_show" || anim_name == "anm_hide") ? 2.0f : 1.0f;
 }
 
 const player_hud_motion* player_hud_motion_container::find_motion(const shared_str& name) const
@@ -428,7 +430,7 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
                                             m_visual_name.c_str(), anim_name_r)
                                             .c_str());
 
-    const float speed = anm->m_anim_speed;
+    const float speed = CalcMotionSpeed(anm->m_base_name, anm->m_anim_speed);
 
     rnd_idx = (u8)Random.randI(anm->m_animations.size());
     const motion_descr& M = anm->m_animations[rnd_idx];
@@ -628,7 +630,7 @@ void player_hud::render_hud(u32 context_id, IRenderable* root)
 
 u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md)
 {
-    const float speed = CalcMotionSpeed(anim_name);
+    const float speed = CalcMotionSpeed(anim_name, 1.0f);
     attachable_hud_item* pi = create_hud_item(hud_name);
     const player_hud_motion* pm = pi->m_hand_motions.find_motion(anim_name);
 
