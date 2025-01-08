@@ -185,9 +185,6 @@ void CInput::MouseUpdate()
     const auto count = SDL_PeepEvents(events, MAX_MOUSE_EVENTS,
         SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
 
-    if (count)
-        SetCurrentInputType(KeyboardMouse);
-
     for (int i = 0; i < count; ++i)
     {
         const SDL_Event& event = events[i];
