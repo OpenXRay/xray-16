@@ -400,3 +400,47 @@ void CUIScrollView::UpdateChildrenLenght()
         it->SetWidth(len);
     }
 }
+
+void CUIScrollView::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+
+    if (!ImGui::CollapsingHeader(CUIScrollView::GetDebugType()))
+        return;
+
+    ImGui::DragFloat("Up indent", &m_upIndent);
+    ImGui::DragFloat("Down indent", &m_downIndent);
+    ImGui::DragFloat("Left indent", &m_leftIndent);
+    ImGui::DragFloat("Right indent", &m_rightIndent);
+
+    ImGui::DragFloat("Vertical interval", &m_vertInterval);
+
+    ImGui::Separator();
+    ImGui::Text("Flags:");
+
+    if (ImGui::Button("Recalculate"))
+        m_flags.set(eNeedRecalc, true);
+
+    const auto addFlag = [this](pcstr text, u16 flag)
+    {
+        ImGui::SameLine();
+        bool value = m_flags.test(flag);
+        if (ImGui::Checkbox(text, &value))
+            m_flags.set(flag, value);
+    };
+
+    addFlag("Vertical flip", eVertFlip);
+    addFlag("Fixed scrollbar", eFixedScrollBar);
+    addFlag("Items selectable", eItemsSelectabe);
+    addFlag("Inverse direction", eInverseDir);
+
+    ImGui::Separator();
+    ImGui::LabelText("Scrollbar profile", "%s", m_scrollbar_profile.empty() ? "" : m_scrollbar_profile.c_str());
+    ImGui::Separator();
+
+    ImGui::BeginDisabled();
+    ImGui::DragInt2("Visible region", (int*)&m_visible_rgn);
+    ImGui::EndDisabled();
+#endif
+}
