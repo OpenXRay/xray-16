@@ -221,14 +221,32 @@ bool CUITabControl::SetNextActiveTab(bool next, bool loop)
 
 bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (GetAcceleratorsMode() && WINDOW_KEY_PRESSED == keyboard_action)
+    if (WINDOW_KEY_PRESSED == keyboard_action)
     {
-        for (u32 i = 0; i < m_TabsArr.size(); ++i)
+        if (GetAcceleratorsMode())
         {
-            if (m_TabsArr[i]->IsAccelerator(dik))
+            switch (GetBindedAction(dik, EKeyContext::UI))
             {
-                SetActiveTab(m_TabsArr[i]->m_btn_id);
+            case kUI_TAB_PREV:
+                if (WINDOW_KEY_PRESSED == keyboard_action)
+                    SetNextActiveTab(false, true);
                 return true;
+
+            case kUI_TAB_NEXT:
+                if (WINDOW_KEY_PRESSED == keyboard_action)
+                    SetNextActiveTab(true, true);
+                return true;
+            }
+        }
+        if (GetButtonsAcceleratorsMode())
+        {
+            for (const auto& button : m_TabsArr)
+            {
+                if (button->IsAccelerator(dik))
+                {
+                    SetActiveTab(button->m_btn_id);
+                    return true;
+                }
             }
         }
     }

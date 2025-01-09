@@ -741,6 +741,10 @@ bool CUIXmlInitBase::InitTabControl(CUIXml& xml_doc, pcstr path,
 
     status &= InitWindow(xml_doc, path, index, pWnd);
     InitOptionsItem(xml_doc, path, index, pWnd);
+
+    const int accelerators = xml_doc.ReadAttribInt(path, index, "accelerators");
+    pWnd->SetAcceleratorsMode(accelerators);
+
     const auto tabsCount = (int)xml_doc.GetNodesNum(path, index, "button");
     const int radio = xml_doc.ReadAttribInt(path, index, "radio");
 

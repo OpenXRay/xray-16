@@ -31,7 +31,7 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         if (m_shop_wnd->OnKeyboardAction(dik, keyboard_action))
             return true;
 
-        m_root_tab_control->SetAcceleratorsMode(false);
+        m_root_tab_control->SetButtonsAcceleratorsMode(false);
     }
 
     if (keyboard_action == WINDOW_KEY_PRESSED)
@@ -57,7 +57,7 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     bool res = inherited::OnKeyboardAction(dik, keyboard_action);
 
-    m_root_tab_control->SetAcceleratorsMode(true);
+    m_root_tab_control->SetButtonsAcceleratorsMode(true);
 
     return res;
 }
