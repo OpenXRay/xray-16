@@ -34,6 +34,19 @@ public:
     CUIWindow* GetParent() const { return m_pParentWnd; }
     void SetParent(CUIWindow* pNewParent);
 
+    [[nodiscard]]
+    CUIWindow* GetWindowBeforeParent(const CUIWindow* parent)
+    {
+        CUIWindow* result = this;
+        for (CUIWindow* it = GetParent(); it; it = it->GetParent())
+        {
+            if (it == parent)
+                return result;
+            result = it;
+        }
+        return nullptr;
+    }
+
     //получить окно самого верхнего уровня
     [[nodiscard]]
     CUIWindow* GetTop()

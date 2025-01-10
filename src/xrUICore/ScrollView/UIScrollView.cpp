@@ -115,6 +115,24 @@ void CUIScrollView::Update()
     if (m_flags.test(eNeedRecalc))
         RecalcSize();
 
+    if (const auto focused = CursorOverWindow() ? UI().Focus().GetFocused() : nullptr)
+    {
+        const auto scrollItem = focused->GetWindowBeforeParent(m_pad);
+
+        if (scrollItem && GetSelected() != scrollItem)
+        {
+            const auto prevPos = GetCurrentScrollPos();
+
+            ScrollToWindow(scrollItem);
+
+            if (m_flags.test(eItemsSelectabe))
+                scrollItem->OnMouseDown(MOUSE_1);
+
+            if (prevPos != GetCurrentScrollPos())
+                UI().GetUICursor().WarpToWindow(focused);
+        }
+    }
+
     inherited::Update();
 }
 
@@ -318,6 +336,19 @@ void CUIScrollView::ScrollToEnd()
 
     m_VScrollBar->SetScrollPos(m_VScrollBar->GetMaxRange());
     OnScrollV(nullptr, nullptr);
+}
+
+void CUIScrollView::ScrollToWindow(CUIWindow* pWnd, float center_y_ratio /*= 0.5f*/)
+{
+    R_ASSERT2_CURE(pWnd->GetParent() == m_pad, "Requested window to scroll to doesn't belong to the scroll view", return);
+
+    if (m_flags.test(eNeedRecalc))
+        RecalcSize();
+
+    const float ratio = GetHeight() * center_y_ratio;
+    const int pos = iFloor(m_upIndent + pWnd->GetWndPos().y - ratio);
+
+    SetScrollPos(pos);
 }
 
 void CUIScrollView::SetRightIndention(float val)

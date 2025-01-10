@@ -76,7 +76,7 @@ public:
 
     void ScrollToBegin();
     void ScrollToEnd();
-    void ScrollToPos(int position);
+    void ScrollToPos(int position, float center_y_ratio = 0.5f);
 
     IC bool IsActiveBackgroundEnabled() { return m_bActiveBackground; }
     void EnableActiveBackground(bool enable);
