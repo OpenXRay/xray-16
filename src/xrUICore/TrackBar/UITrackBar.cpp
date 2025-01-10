@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "UITrackBar.h"
 #include "Buttons/UI3tButton.h"
+#include "Cursor/UICursor.h"
 #include "XML/UITextureMaster.h"
 #include "xrEngine/xr_input.h"
 
@@ -30,12 +31,12 @@ CUITrackBar::CUITrackBar()
 
     m_b_mouse_capturer = false;
 
-    //UI().Focus().RegisterFocusable(this);
+    UI().Focus().RegisterFocusable(this);
 }
 
 CUITrackBar::~CUITrackBar()
 {
-    //UI().Focus().UnregisterFocusable(this);
+    UI().Focus().UnregisterFocusable(this);
 }
 
 bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -51,7 +52,7 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
             if (pInput->iGetAsyncKeyState(MOUSE_1))
                 UpdatePosRelativeToMouse();
         }
-        break;
+        return true;
     }
     case WINDOW_LBUTTON_DOWN:
     {
@@ -59,27 +60,74 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
         if (m_b_mouse_capturer)
             UpdatePosRelativeToMouse();
 
-        break;
+        return true;
     }
     case WINDOW_LBUTTON_UP:
     {
         m_b_mouse_capturer = false;
-        break;
+        return true;
     }
     case WINDOW_MOUSE_WHEEL_UP:
     {
         StepLeft();
-        break;
+        return true;
     }
     case WINDOW_MOUSE_WHEEL_DOWN:
     {
         StepRight();
-        break;
+        return true;
     }
-    default:
-        break;
-    };
-    return true;
+    } // switch (mouse_action)
+
+    return false;
+}
+
+bool CUITrackBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    CUIWindow::OnKeyboardAction(dik, keyboard_action);
+
+    if (CursorOverWindow() && keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:
+            StepLeft();
+            UI().GetUICursor().WarpToWindow(m_pSlider);
+            return true;
+        case kUI_MOVE_RIGHT:
+            StepRight();
+            UI().GetUICursor().WarpToWindow(m_pSlider);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CUITrackBar::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    CUIWindow::OnControllerAction(axis, x, y, controller_action);
+
+    if (CursorOverWindow() && IsBinded(kUI_MOVE, axis, EKeyContext::UI))
+    {
+        if (fis_zero(y))
+        {
+            if (x < 0)
+            {
+                StepLeft();
+                UI().GetUICursor().WarpToWindow(m_pSlider);
+                return true;
+            }
+            else
+            {
+                StepRight();
+                UI().GetUICursor().WarpToWindow(m_pSlider);
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void CUITrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
