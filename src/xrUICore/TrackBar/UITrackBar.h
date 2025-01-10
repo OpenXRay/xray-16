@@ -36,6 +36,9 @@ public:
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
 
+    void StepLeft();
+    void StepRight();
+
     pcstr GetDebugType() override { return "CUITrackBar"; }
 
     CUIStatic* m_static;
