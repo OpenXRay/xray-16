@@ -69,6 +69,11 @@ public:
     void UpdateButtonsLayout(bool b_disable_break, bool trade_enabled);
 
     void TryScrollAnswersList(bool down);
+    void FocusOnNextQuestion(bool next, bool loop) const;
+    void FocusOnFirstQuestion() const;
+    void FocusOnLastQuestion() const;
+
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
 
 private:
     // List of questions we can ask the character

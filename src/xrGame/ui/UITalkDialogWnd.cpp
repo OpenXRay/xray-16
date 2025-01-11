@@ -345,6 +345,89 @@ void CUITalkDialogWnd::TryScrollAnswersList(bool down)
         UIAnswersList->ScrollBar()->TryScrollInc();
 }
 
+void CUITalkDialogWnd::FocusOnNextQuestion(bool next, bool loop) const
+{
+    auto& focus = UI().Focus();
+
+    const auto focused = focus.GetFocused();
+
+    if (auto questionItem = focused ? dynamic_cast<CUIQuestionItem*>(focused->GetParent()) : nullptr)
+    {
+        const Fvector2 vec = focused->GetAbsoluteCenterPos();
+        const auto direction = next ? FocusDirection::Down : FocusDirection::Up;
+        const auto [target, direct] = focus.FindClosestFocusable(vec, direction);
+
+        questionItem = target ? dynamic_cast<CUIQuestionItem*>(target->GetParent()) : nullptr;
+
+        if (questionItem)
+        {
+            focus.SetFocused(target);
+            GetUICursor().WarpToWindow(target);
+        }
+        else if (loop)
+        {
+            if (next)
+                FocusOnFirstQuestion();
+            else
+                FocusOnLastQuestion();
+        }
+        return;
+    }
+
+    // Failed to find something, let's try first
+    FocusOnFirstQuestion();
+}
+
+void CUITalkDialogWnd::FocusOnFirstQuestion() const
+{
+    const auto questions = UIQuestionsList->Items();
+    if (questions.empty())
+        return;
+
+    const auto questionItem = dynamic_cast<CUIQuestionItem*>(questions.front());
+    if (!questionItem)
+        return;
+
+    UI().Focus().SetFocused(questionItem->m_text);
+    UI().GetUICursor().WarpToWindow(questionItem->m_text);
+}
+
+void CUITalkDialogWnd::FocusOnLastQuestion() const
+{
+    const auto questions = UIQuestionsList->Items();
+    if (questions.empty())
+        return;
+
+    const auto questionItem = dynamic_cast<CUIQuestionItem*>(questions.back());
+    if (!questionItem)
+        return;
+
+    UI().Focus().SetFocused(questionItem->m_text);
+    UI().GetUICursor().WarpToWindow(questionItem->m_text);
+}
+
+bool CUITalkDialogWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (CUIWindow::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    if (keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        const auto focused = UIQuestionsList->CursorOverWindow() ? UI().Focus().GetFocused() : nullptr;
+
+        if (focused && IsBinded(kUI_ACCEPT, dik, EKeyContext::UI))
+        {
+            if (const auto questionItem = dynamic_cast<CUIQuestionItem*>(focused->GetParent()))
+            {
+                questionItem->OnTextClicked(nullptr, nullptr);
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
     : CUIWindow("CUIQuestionItem")

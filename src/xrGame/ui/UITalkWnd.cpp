@@ -139,6 +139,9 @@ void CUITalkWnd::UpdateQuestions()
                 UpdateQuestions();
         }
     }
+
+    UITalkDialogWnd->FocusOnFirstQuestion();
+
     m_bNeedToUpdateQuestions = false;
 }
 
@@ -355,9 +358,8 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 return true;
             }
         }
-        switch (GetBindedAction(dik, EKeyContext::Talk))
+        else if (IsBinded(kTALK_SWITCH_TO_TRADE, dik, EKeyContext::Talk))
         {
-        case kTALK_SWITCH_TO_TRADE:
             if (!m_pOthersInvOwner->NeedOsoznanieMode())
             {
                 if (UITalkDialogWnd->mechanic_mode)
@@ -366,7 +368,6 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                     SwitchToTrade();
                 return true;
             }
-            break;
         }
     }
     else if (keyboard_action == WINDOW_KEY_HOLD)
@@ -375,27 +376,68 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         {
         case kTALK_LOG_SCROLL_UP:
             UITalkDialogWnd->TryScrollAnswersList(false);
-            break;
+            return true;
         case kTALK_LOG_SCROLL_DOWN:
             UITalkDialogWnd->TryScrollAnswersList(true);
-            break;
+            return true;
         }
     }
+
+    if (keyboard_action == WINDOW_KEY_PRESSED || keyboard_action == WINDOW_KEY_HOLD)
+    {
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:
+        case kUI_MOVE_RIGHT:
+            // Suppress focus system activation
+            return true;
+
+        case kUI_MOVE_UP:
+            UITalkDialogWnd->FocusOnNextQuestion(false, keyboard_action != WINDOW_KEY_HOLD);
+            return true;
+
+        case kUI_MOVE_DOWN:
+            UITalkDialogWnd->FocusOnNextQuestion(true, keyboard_action != WINDOW_KEY_HOLD);
+            return true;
+        } // switch (GetBindedAction(dik, EKeyContext::UI))
+    }
+
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
 bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
 {
-    if (controller_action == WINDOW_KEY_PRESSED)
+    if (controller_action == WINDOW_KEY_HOLD)
     {
         switch (GetBindedAction(axis, EKeyContext::Talk))
         {
-        default:
-            return OnKeyboardAction(axis, controller_action);
         case kTALK_LOG_SCROLL:
+            if (y > 0)
+                UITalkDialogWnd->TryScrollAnswersList(false);
+            else
+                UITalkDialogWnd->TryScrollAnswersList(true);
             return true;
         }
     }
+
+    if (controller_action == WINDOW_KEY_PRESSED || controller_action == WINDOW_KEY_HOLD)
+    {
+        switch (GetBindedAction(axis, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:
+        case kUI_MOVE_RIGHT:
+            // Suppress focus system activation
+            return true;
+
+        case kUI_MOVE:
+            if (y > 0)
+                UITalkDialogWnd->FocusOnNextQuestion(true, controller_action != WINDOW_KEY_HOLD);
+            else
+                UITalkDialogWnd->FocusOnNextQuestion(false, controller_action != WINDOW_KEY_HOLD);
+            return true;
+        } // switch (GetBindedAction(axis, EKeyContext::UI))
+    }
+
     return inherited::OnControllerAction(axis, x, y, controller_action);
 }
 
