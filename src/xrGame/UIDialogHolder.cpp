@@ -336,11 +336,11 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             auto& focus = UI().Focus();
             const auto focused = focus.GetFocused();
             const Fvector2 vec = focused ? focused->GetAbsoluteCenterPos() : UI().GetUICursor().GetCursorPosition();
-            const auto [target, direct] = focus.FindClosestFocusable(vec, direction);
+            const auto [candidate, candidate2] = focus.FindClosestFocusable(vec, direction);
 
-            if (target)
+            if (candidate || candidate2)
             {
-                focus.SetFocused(target);
+                focus.SetFocused(candidate ? candidate : candidate2);
                 return true;
             }
         }
@@ -637,11 +637,11 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
             auto& focus = UI().Focus();
             const auto focused = focus.GetFocused();
             const Fvector2 vec = focused ? focused->GetAbsoluteCenterPos() : UI().GetUICursor().GetCursorPosition();
-            const auto [target, direct] = focus.FindClosestFocusable(vec, direction);
+            const auto [candidate, candidate2] = focus.FindClosestFocusable(vec, direction);
 
-            if (target)
+            if (candidate || candidate2)
             {
-                focus.SetFocused(target);
+                focus.SetFocused(candidate ? candidate : candidate2);
                 return true;
             }
         }

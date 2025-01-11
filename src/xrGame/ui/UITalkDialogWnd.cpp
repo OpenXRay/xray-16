@@ -355,13 +355,16 @@ void CUITalkDialogWnd::FocusOnNextQuestion(bool next, bool loop) const
     {
         const Fvector2 vec = focused->GetAbsoluteCenterPos();
         const auto direction = next ? FocusDirection::Down : FocusDirection::Up;
-        const auto [target, direct] = focus.FindClosestFocusable(vec, direction);
 
-        questionItem = target ? dynamic_cast<CUIQuestionItem*>(target->GetParent()) : nullptr;
+        auto [candidate, candidate2] = focus.FindClosestFocusable(vec, direction);
+        if (!candidate)
+            candidate = candidate2;
+
+        questionItem = candidate ? dynamic_cast<CUIQuestionItem*>(candidate->GetParent()) : nullptr;
 
         if (questionItem)
         {
-            focus.SetFocused(target);
+            focus.SetFocused(candidate);
         }
         else if (loop)
         {

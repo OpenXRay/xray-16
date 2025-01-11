@@ -186,7 +186,7 @@ void CUIFocusSystem::SetFocused(const CUIWindow* window)
     UI().GetUICursor().WarpToWindow(window, true);
 }
 
-std::pair<CUIWindow*, bool> CUIFocusSystem::FindClosestFocusable(const Fvector2& from, FocusDirection direction) const
+std::pair<CUIWindow*, CUIWindow*> CUIFocusSystem::FindClosestFocusable(const Fvector2& from, FocusDirection direction) const
 {
     const CUIWindow* closest  = nullptr;
     const CUIWindow* closest2 = nullptr;
@@ -216,8 +216,9 @@ std::pair<CUIWindow*, bool> CUIFocusSystem::FindClosestFocusable(const Fvector2&
 
     // We hold const pointers to guarantee that we don't do anything.
     // But the caller can do anything.
-    if (closest)
-        return { const_cast<CUIWindow*>(closest), true };
-
-    return { const_cast<CUIWindow*>(closest2), false };
+    return
+    {
+        const_cast<CUIWindow*>(closest),
+        const_cast<CUIWindow*>(closest2)
+    };
 }

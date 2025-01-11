@@ -55,5 +55,5 @@ public:
     auto GetFocused() const { return const_cast<CUIWindow*>(m_current_focused);}
     void SetFocused(const CUIWindow* window);
 
-    std::pair<CUIWindow*, bool> FindClosestFocusable(const Fvector2& from, FocusDirection direction) const;
+    std::pair<CUIWindow*, CUIWindow*> FindClosestFocusable(const Fvector2& from, FocusDirection direction) const;
 };
