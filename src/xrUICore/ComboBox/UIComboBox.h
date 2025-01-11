@@ -53,6 +53,8 @@ public:
 
 protected:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void OnBtnClicked();
     void ShowList(bool bShow);
     void OnListItemSelect();

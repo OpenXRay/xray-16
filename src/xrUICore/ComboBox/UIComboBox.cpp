@@ -290,6 +290,8 @@ void CUIComboBox::OnFocusLost()
     CUIWindow::OnFocusLost();
     if (m_bIsEnabled)
         m_frameLine.SetCurrentState(S_Enabled);
+    if (m_eState == LIST_EXPANDED && pInput->IsCurrentInputTypeController())
+        ShowList(false);
 }
 
 void CUIComboBox::OnFocusReceive()
@@ -321,6 +323,94 @@ bool CUIComboBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
     else if (mouse_action == WINDOW_RBUTTON_DOWN)
     {
         SetNextItemSelected(true, true);
+    }
+
+    return false;
+}
+
+bool CUIComboBox::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (CUIWindow::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    if (CursorOverWindow() && keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_ACCEPT:
+        case kUI_BACK:
+            if (m_list_frame.IsShown())
+            {
+                ShowList(false);
+                return true;
+            }
+            break;
+        case kUI_MOVE_LEFT:
+        {
+            if (!m_list_frame.IsShown())
+                SetNextItemSelected(false, false);
+            return true;
+        }
+        case kUI_MOVE_RIGHT:
+        {
+            if (!m_list_frame.IsShown())
+                SetNextItemSelected(true, false);
+            return true;
+        }
+        case kUI_MOVE_UP:
+        {
+            if (m_list_frame.IsShown())
+            {
+                SetNextItemSelected(false, false);
+                if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
+                    UI().Focus().SetFocused(itm);
+                return true;
+            }
+            break;
+        }
+        case kUI_MOVE_DOWN:
+        {
+            if (m_list_frame.IsShown())
+            {
+                SetNextItemSelected(true, false);
+                if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
+                    UI().Focus().SetFocused(itm);
+                return true;
+            }
+            break;
+        }
+        } // switch (action)
+    }
+
+    return false;
+}
+
+bool CUIComboBox::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (CUIWindow::OnControllerAction(axis, x, y, controller_action))
+        return true;
+
+    if (CursorOverWindow())
+    {
+        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
+        {
+            if (!fis_zero(x))
+            {
+                if (!m_list_frame.IsShown())
+                    SetNextItemSelected(x > 0, false);
+                return true;
+            }
+            if (!fis_zero(y))
+            {
+                if (m_list_frame.IsShown())
+                {
+                    SetNextItemSelected(y > 0, false);
+                    if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
+                        UI().Focus().SetFocused(itm);
+                    return true;
+                }
+            }
+        }
     }
 
     return false;
