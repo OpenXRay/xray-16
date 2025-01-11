@@ -75,7 +75,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     ZoneScoped;
 
     m_window = hWnd;
-
     R_ASSERT(m_window);
 
     // Choose the closest pixel format
@@ -86,8 +85,8 @@ void CHW::CreateDevice(SDL_Window* hWnd)
     SDL_SetWindowDisplayMode(m_window, &mode);
 
     // Create the context
-    m_context = SDL_GL_CreateContext(m_window);
-    if (m_context == nullptr)
+    m_context = nullptr; // Clean up first
+    if (! (m_context = SDL_GL_CreateContext(m_window));
     {
         Log("! Could not create drawing context:", SDL_GetError());
         return;
@@ -123,6 +122,12 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     UpdateVSync();
 
+    // Initialize GLAD
+    if ( (gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress)) == 0)
+    {
+        Log ("! Could not intialize GLAD", SDL_GetError());
+    }
+    
 #ifdef DEBUG
     if (glDebugMessageCallback)
     {
