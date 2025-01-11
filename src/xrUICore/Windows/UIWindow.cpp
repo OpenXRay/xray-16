@@ -560,7 +560,8 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
                 color = color_rgba(255, 0, 255, 255);
         }
 
-        const auto draw_list = hovered ? ImGui::GetForegroundDrawList() : ImGui::GetBackgroundDrawList();
+        const auto mainVP = ImGui::GetMainViewport();
+        const auto draw_list = hovered ? ImGui::GetForegroundDrawList(mainVP) : ImGui::GetBackgroundDrawList(mainVP);
         draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color);
     }
 
