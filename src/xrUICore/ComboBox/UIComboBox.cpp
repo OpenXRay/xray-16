@@ -218,6 +218,34 @@ void CUIComboBox::SetItemToken(int tok_id)
     SetItemIDX(idx);
 }
 
+bool CUIComboBox::SetNextItemSelected(bool next, bool loop)
+{
+    const auto lastItem = (int)m_list_box.GetSize() - 1;
+
+    int idx = (int)m_list_box.GetSelectedIDX();
+
+    if (next)
+    {
+        if (idx < lastItem)
+            idx++;
+        else if (loop)
+            idx = 0;
+        else
+            return false;
+    }
+    else
+    {
+        if (idx > 0)
+            --idx;
+        else if (loop)
+            idx = lastItem;
+        else
+            return false;
+    }
+    SetItemIDX(idx);
+    return true;
+}
+
 void CUIComboBox::OnBtnClicked() { ShowList(!m_list_frame.IsShown()); }
 void CUIComboBox::ShowList(bool bShow)
 {
@@ -289,6 +317,10 @@ bool CUIComboBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
             OnBtnClicked();
             return true;
         }
+    }
+    else if (mouse_action == WINDOW_RBUTTON_DOWN)
+    {
+        SetNextItemSelected(true, true);
     }
 
     return false;

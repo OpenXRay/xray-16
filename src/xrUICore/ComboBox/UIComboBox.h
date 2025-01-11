@@ -40,6 +40,8 @@ public:
     u32 GetSelectedIDX();
     void SetSelectedIDX(u32 idx);
 
+    bool SetNextItemSelected(bool next, bool loop);
+
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = 0);
     virtual void OnFocusLost();
     virtual void OnFocusReceive();
