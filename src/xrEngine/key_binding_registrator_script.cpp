@@ -167,6 +167,9 @@ SCRIPT_EXPORT(KeyBindings, (),
 
                 value("kUI_MOVE_SECONDARY",         int(kUI_MOVE_SECONDARY)),
 
+                value("kUI_CLICK_1",                int(kUI_CLICK_1)),
+                value("kUI_CLICK_2",                int(kUI_CLICK_2)),
+
                 value("kUI_ACCEPT",                 int(kUI_ACCEPT)),
                 value("kUI_BACK",                   int(kUI_BACK)),
                 value("kUI_ACTION_1",               int(kUI_ACTION_1)),

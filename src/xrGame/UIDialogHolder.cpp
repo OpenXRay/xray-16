@@ -306,6 +306,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
         return false;
     if (!TIR->IR_process())
         return false;
+
     // mouse click
     if (dik == MOUSE_1 || dik == MOUSE_2 || dik == MOUSE_3)
     {
@@ -510,6 +511,22 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
         return true;
 
+    // simulate mouse click
+    if (TIR->NeedCursor())
+    {
+        int action = -1;
+        if (IsBinded(kUI_CLICK_1, dik, EKeyContext::UI))
+            action = WINDOW_LBUTTON_DOWN;
+        else if (IsBinded(kUI_CLICK_2, dik, EKeyContext::UI))
+            action = WINDOW_RBUTTON_DOWN;
+        if (action != -1)
+        {
+            Fvector2 cp = GetUICursor().GetCursorPosition();
+            if (TIR->OnMouseAction(cp.x, cp.y, (EUIMessages)action))
+                return true;
+        }
+    }
+
     if (!TIR->StopAnyMove() && g_pGameLevel)
     {
         IGameObject* O = Level().CurrentEntity();
@@ -539,6 +556,22 @@ bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
 
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_RELEASED))
         return true;
+
+    // simulate mouse click
+    if (TIR->NeedCursor())
+    {
+        int action = -1;
+        if (IsBinded(kUI_CLICK_1, dik, EKeyContext::UI))
+            action = WINDOW_LBUTTON_UP;
+        else if (IsBinded(kUI_CLICK_2, dik, EKeyContext::UI))
+            action = WINDOW_RBUTTON_UP;
+        if (action != -1)
+        {
+            Fvector2 cp = GetUICursor().GetCursorPosition();
+            if (TIR->OnMouseAction(cp.x, cp.y, (EUIMessages)action))
+                return true;
+        }
+    }
 
     if (!TIR->StopAnyMove() && g_pGameLevel)
     {

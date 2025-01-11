@@ -145,6 +145,9 @@ enum EGameActions : u32
 
     kUI_MOVE_SECONDARY,
 
+    kUI_CLICK_1,
+    kUI_CLICK_2,
+
     kUI_ACCEPT,
     kUI_BACK,
     kUI_ACTION_1,
