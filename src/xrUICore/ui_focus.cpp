@@ -119,6 +119,9 @@ void CUIFocusSystem::UnregisterFocusable(const CUIWindow* focusable)
     if (!focusable)
         return;
 
+    if (m_current_focused == focusable)
+        m_current_focused = nullptr;
+
     if (const auto it = std::find(m_valuable.begin(), m_valuable.end(), focusable);
         it != m_valuable.end())
     {
