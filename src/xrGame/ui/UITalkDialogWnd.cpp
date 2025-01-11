@@ -362,7 +362,6 @@ void CUITalkDialogWnd::FocusOnNextQuestion(bool next, bool loop) const
         if (questionItem)
         {
             focus.SetFocused(target);
-            GetUICursor().WarpToWindow(target);
         }
         else if (loop)
         {
@@ -389,7 +388,6 @@ void CUITalkDialogWnd::FocusOnFirstQuestion() const
         return;
 
     UI().Focus().SetFocused(questionItem->m_text);
-    UI().GetUICursor().WarpToWindow(questionItem->m_text);
 }
 
 void CUITalkDialogWnd::FocusOnLastQuestion() const
@@ -403,7 +401,6 @@ void CUITalkDialogWnd::FocusOnLastQuestion() const
         return;
 
     UI().Focus().SetFocused(questionItem->m_text);
-    UI().GetUICursor().WarpToWindow(questionItem->m_text);
 }
 
 bool CUITalkDialogWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)

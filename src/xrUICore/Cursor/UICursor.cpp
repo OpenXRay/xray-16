@@ -116,7 +116,7 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
     clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
 }
 
-void CUICursor::WarpToWindow(CUIWindow* wnd, bool change_visibility /*= true*/)
+void CUICursor::WarpToWindow(const CUIWindow* wnd, bool change_visibility /*= true*/)
 {
     // When change_visibility is true, call Show/Hide anyway
     // to update autohide data

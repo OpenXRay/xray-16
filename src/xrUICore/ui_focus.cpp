@@ -18,6 +18,7 @@ limitations under the License.
 
 #include "ui_focus.h"
 #include "Windows/UIWindow.h"
+#include "Cursor/UICursor.h"
 
 #include "xrCore/buffer_vector.h"
 
@@ -177,6 +178,12 @@ void CUIFocusSystem::Update(const CUIWindow* root)
 
     if (m_current_focused && !m_current_focused->CursorOverWindow())
         m_current_focused = nullptr;
+}
+
+void CUIFocusSystem::SetFocused(const CUIWindow* window)
+{
+    m_current_focused = window;
+    UI().GetUICursor().WarpToWindow(window, true);
 }
 
 std::pair<CUIWindow*, bool> CUIFocusSystem::FindClosestFocusable(const Fvector2& from, FocusDirection direction) const

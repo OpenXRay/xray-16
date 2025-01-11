@@ -341,7 +341,6 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             if (target)
             {
                 focus.SetFocused(target);
-                GetUICursor().WarpToWindow(target, true);
                 return true;
             }
         }
@@ -643,7 +642,6 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
             if (target)
             {
                 focus.SetFocused(target);
-                GetUICursor().WarpToWindow(target, true);
                 return true;
             }
         }
