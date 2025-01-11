@@ -24,6 +24,14 @@ CUIScrollBar::CUIScrollBar()
 
     m_FrameBackground->SetAutoDelete(true);
     AttachChild(m_FrameBackground);
+
+    // All buttons are automatically registered
+    // but we don't need scrollbar buttons, since
+    // scrolling when using gamepad is to be handled
+    // by the parent of the scroll bar
+    auto& focus = UI().Focus();
+    focus.UnregisterFocusable(m_DecButton);
+    focus.UnregisterFocusable(m_IncButton);
 }
 
 bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal, cpcstr profile)
