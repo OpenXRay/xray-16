@@ -535,34 +535,34 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
     const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
     if (debugState.drawWndRects && (IsShown() || hovered))
     {
+        const auto& focus = UI().Focus();
+
         Frect rect;
         GetAbsoluteRect(rect);
         UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
         UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
 
         // XXX: make colours user configurable
-        u32 color = color_rgba(255, 0, 0, 255);
+        const u32 alpha = CursorOverWindow() ? 255 : 200;
+        Fcolor color = color_rgba(0, 0, 255, alpha);
         if (hovered)
-            color = color_rgba(255, 255, 0, 255);
+            color = color_rgba(0, 255, 255, 255);
+        else if (focus.GetFocused() == this)
+            color = color_rgba(255, 215, 0, 255);
         else if (debugState.coloredRects)
         {
             // This is pseudo RNG, so when we are seeding it with 'this' pointer
             // we can expect predictable and stable values (no *blinking* at all)
             CRandom rnd;
             rnd.seed((s32)(intptr_t)this);
-            color = color_rgba(rnd.randI(255), rnd.randI(255), rnd.randI(255), 255);
+            color = color_rgba(rnd.randI(255), rnd.randI(255), rnd.randI(255), alpha);
         }
-        else if (IsFocusValuable(nullptr))
-        {
-            if (CursorOverWindow())
-                color = color_rgba(200, 150, 200, 255);
-            else
-                color = color_rgba(255, 0, 255, 255);
-        }
+        else if (focus.IsRegistered(this))
+            color = color_rgba(0, 255, 0, alpha);
 
         const auto mainVP = ImGui::GetMainViewport();
         const auto draw_list = hovered ? ImGui::GetForegroundDrawList(mainVP) : ImGui::GetBackgroundDrawList(mainVP);
-        draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color);
+        draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color.get_windows());
     }
 
     if (open)
