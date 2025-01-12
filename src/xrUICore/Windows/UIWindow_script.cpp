@@ -94,6 +94,8 @@ SCRIPT_EXPORT(CUIFocusSystem, (),
             .def("RegisterFocusable", &CUIFocusSystem::RegisterFocusable)
             .def("UnregisterFocusable", &CUIFocusSystem::UnregisterFocusable)
             .def("IsRegistered", &CUIFocusSystem::IsRegistered)
+            .def("IsValuable", &CUIFocusSystem::IsValuable)
+            .def("IsNonValuable", &CUIFocusSystem::IsNonValuable)
             .def("Update", &CUIFocusSystem::Update)
             .def("GetFocused", &CUIFocusSystem::GetFocused)
             .def("SetFocused", &CUIFocusSystem::SetFocused)

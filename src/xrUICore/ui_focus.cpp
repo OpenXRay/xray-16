@@ -138,13 +138,24 @@ void CUIFocusSystem::UnregisterFocusable(const CUIWindow* focusable)
 
 bool CUIFocusSystem::IsRegistered(const CUIWindow* focusable) const
 {
+    return IsValuable(focusable) || IsNonValuable(focusable);
+}
+
+bool CUIFocusSystem::IsValuable(const CUIWindow* focusable) const
+{
     if (!focusable)
         return false;
-
     const auto it = std::find(m_valuable.begin(), m_valuable.end(), focusable);
-    const auto it2 = std::find(m_non_valuable.begin(), m_non_valuable.end(), focusable);
+    return it != m_valuable.end();
+}
 
-    return it != m_valuable.end() || it2 != m_non_valuable.end();
+bool CUIFocusSystem::IsNonValuable(const CUIWindow* focusable) const
+{
+    if (!focusable)
+        return false;
+    const auto it = std::find(m_non_valuable.begin(), m_non_valuable.end(), focusable);
+    return it != m_non_valuable.end();
+
 }
 
 void CUIFocusSystem::Update(const CUIWindow* root)

@@ -48,7 +48,10 @@ public:
 
     void RegisterFocusable(const CUIWindow* focusable);
     void UnregisterFocusable(const CUIWindow* focusable);
+
     bool IsRegistered(const CUIWindow* focusable) const;
+    bool IsValuable(const CUIWindow* focusable) const;
+    bool IsNonValuable(const CUIWindow* focusable) const;
 
     void Update(const CUIWindow* root);
 
