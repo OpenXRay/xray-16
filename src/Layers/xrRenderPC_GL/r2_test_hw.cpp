@@ -3,38 +3,31 @@
 class sdl_window_test_helper
 {
     SDL_Window* m_window{};
-    SDL_GLContext m_context{};
+    CHW m_hw;
 
 public:
     sdl_window_test_helper()
     {
-        ZoneScoped;
         u32 flags{};
-        HW.SetPrimaryAttributes(flags);
+        m_hw.SetPrimaryAttributes(flags);
         m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | flags);
         if (!m_window)
         {
-            Log("~ Cannot create helper window for OpenGL:", SDL_GetError());
+            Log("~ Cannot create helper window for OpenGL test:", SDL_GetError());
             return;
         }
-
-        m_context = SDL_GL_CreateContext(m_window);
-        if (!m_context)
-        {
-            Log("~ Cannot create OpenGL context:", SDL_GetError());
-            return;
-        }
+        m_hw.CreateDevice(m_window);
     }
 
     [[nodiscard]]
     bool successful() const
     {
-        return m_window && m_context;
+        return m_window && m_hw.m_context && m_hw.pFB;
     }
 
     ~sdl_window_test_helper()
     {
-        SDL_GL_DeleteContext(m_context);
+        m_hw.DestroyDevice();
         SDL_DestroyWindow(m_window);
     }
 };
@@ -45,21 +38,8 @@ BOOL xrRender_test_hw()
 
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
-    if (!windowTest.successful())
-        return FALSE;
+    if (windowTest.successful())
+        return TRUE;
 
-    int version;
-    {
-        ZoneScopedN("gladLoadGL");
-        version = gladLoadGL((GLADloadfunc) SDL_GL_GetProcAddress);
-    }
-    if (version == 0)
-    {
-        Log("~ Could not initialize GLAD.");
-        if (auto err = SDL_GetError())
-            Log("SDL Error:", err);
-        return FALSE;
-    }
-
-    return TRUE;
+    return FALSE;
 }
