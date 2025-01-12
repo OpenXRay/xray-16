@@ -52,10 +52,8 @@ public:
     GLuint pFB{};
 
     SDL_Window* m_window{};
-    SDL_Window* m_helper_window{};
 
     SDL_GLContext m_context{};
-    SDL_GLContext m_helper_context{};
 
     pcstr AdapterName;
     pcstr OpenGLVersionString;

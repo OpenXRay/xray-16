@@ -99,28 +99,6 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
-    {
-        const Uint32 flags = SDL_WINDOW_BORDERLESS | SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
-
-        m_helper_window = SDL_CreateWindow("OpenXRay OpenGL helper window", 0, 0, 1, 1, flags);
-        R_ASSERT3(m_helper_window, "Cannot create helper window for OpenGL", SDL_GetError());
-
-        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-
-        // Create helper context
-        m_helper_context = SDL_GL_CreateContext(m_helper_window);
-        R_ASSERT3(m_helper_context, "Cannot create OpenGL context", SDL_GetError());
-
-        // just in case
-        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
-    }
-
-    if (MakeContextCurrent(IRender::PrimaryContext) != 0)
-    {
-        Log("! Could not make context current after creating helper context:", SDL_GetError());
-        return;
-    }
-
     UpdateVSync();
 
 #ifdef DEBUG
@@ -159,9 +137,6 @@ void CHW::DestroyDevice()
 
     SDL_GL_DeleteContext(m_context);
     m_context = nullptr;
-
-    SDL_GL_DeleteContext(m_helper_context);
-    m_helper_context = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -203,8 +178,6 @@ IRender::RenderContext CHW::GetCurrentContext() const
     const auto context = SDL_GL_GetCurrentContext();
     if (context == m_context)
         return IRender::PrimaryContext;
-    if (context == m_helper_context)
-        return IRender::HelperContext;
     return IRender::NoContext;
 }
 
@@ -217,9 +190,6 @@ int CHW::MakeContextCurrent(IRender::RenderContext context) const
 
     case IRender::PrimaryContext:
         return SDL_GL_MakeCurrent(m_window, m_context);
-
-    case IRender::HelperContext:
-        return SDL_GL_MakeCurrent(m_helper_window, m_helper_context);
 
     default:
         NODEFAULT;
