@@ -86,7 +86,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     // Create the context
     m_context = nullptr; // Clean up first
-    if (! (m_context = SDL_GL_CreateContext(m_window)));
+    if (! (m_context = SDL_GL_CreateContext(m_window)))
     {
         Log("! Could not create drawing context:", SDL_GetError());
         return;
