@@ -120,7 +120,7 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         case mmTrade: DeInitTradeMode(); break;
         case mmUpgrade: DeInitUpgradeMode(); break;
         case mmDeadBodySearch: DeInitDeadBodySearchMode(); break;
-        default: R_ASSERT(0); break;
+        default: NODEFAULT; break;
         }
 
         CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(false);
@@ -128,18 +128,12 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         m_currMenuMode = mode;
         switch (mode)
         {
-        case mmUndefined:
-            ResetMode();
-            break;
-        case mmInventory: InitInventoryMode();
-            break;
-        case mmTrade: InitTradeMode();
-            break;
-        case mmUpgrade: InitUpgradeMode();
-            break;
-        case mmDeadBodySearch: InitDeadBodySearchMode();
-            break;
-        default: R_ASSERT(0); break;
+        case mmUndefined: ResetMode(); break;
+        case mmInventory: InitInventoryMode(); break;
+        case mmTrade: InitTradeMode(); break;
+        case mmUpgrade: InitUpgradeMode(); break;
+        case mmDeadBodySearch: InitDeadBodySearchMode(); break;
+        default: NODEFAULT; break;
         }
         InitActorInfo();
         if (m_currMenuMode != mmUndefined && m_currMenuMode != mmInventory)
