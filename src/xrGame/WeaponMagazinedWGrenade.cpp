@@ -736,10 +736,14 @@ void CWeaponMagazinedWGrenade::PlayAnimShoot()
 
 void CWeaponMagazinedWGrenade::PlayAnimModeSwitch()
 {
-    if (m_bGrenadeMode)
-        PlayHUDMotion("anm_switch_g", "anim_switch_grenade_on", /*FALSE*/ TRUE, this, eSwitch); //AVO: fix fast anim switch
+    // Respect SOC/CS/COP animations naming with two possible animation assignments and do not spam in logs on checks.
+    // Possible place to inject anm_switch_g_empty / anm_switch_empty logics later with CoC/anomaly-like implementation.
+    cpcstr animation = m_bGrenadeMode ? WhichHUDAnimationExist("anm_switch_g", "anim_switch_grenade_on", true) : WhichHUDAnimationExist("anm_switch", "anim_switch_grenade_off", true);
+
+    if (animation)
+        PlayHUDMotion(animation, TRUE, this, eSwitch);
     else
-        PlayHUDMotion("anm_switch", "anim_switch_grenade_off", /*FALSE*/ TRUE, this, eSwitch); //AVO: fix fast anim switch
+        SwitchState(eSwitch);
 }
 
 void CWeaponMagazinedWGrenade::PlayAnimBore()
