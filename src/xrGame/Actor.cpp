@@ -86,6 +86,11 @@
 
 constexpr float default_feedback_duration = 0.2f;
 
+constexpr Fvector aabb_offsets[8] = {
+        {-1, -1, -1}, {-1,  1, -1}, { 1,  1, -1}, { 1, -1, -1},
+        {-1, -1,  1}, {-1,  1,  1}, { 1,  1,  1}, { 1, -1,  1}
+};
+
 extern float cammera_into_collision_shift;
 extern int g_first_person_death;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
@@ -104,7 +109,8 @@ Flags32 psActorFlags =
     AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
     AF_MULTI_ITEM_PICKUP |
-    AF_FIRST_PERSON_BODY
+    AF_FIRST_PERSON_BODY |
+    AF_FIRST_PERSON_BODY_DEBUG
 };
 int psActorSleepTime = 1;
 
@@ -1284,128 +1290,95 @@ void CActor::UpdateCL()
     UpdateVisorRainDrops();
     UpdateVisor();
 
+    UpdateFirstPersonBodyBox();
+    if (psActorFlags.test(AF_FIRST_PERSON_BODY_DEBUG))
+        character_physics_support()->movement()->character()->InUpdateCL();
+}
 
+void CActor::TransformAndModifyAABB(const Fmatrix& transform, const Fvector& scale, Fbox& aabb) const
+{
+#ifdef DEBUG
+    const bool isDebugMode = psActorFlags.test(AF_FIRST_PERSON_BODY_DEBUG);
+    Fvector corners[8];
+    for (int i = 0; i < 8; ++i)
+    {
+        transform.transform_tiny(corners[i], Fvector().mul(scale, aabb_offsets[i]));
+        aabb.modify(corners[i]);
 
+        if (isDebugMode)
+            DBG_DrawPoint(corners[i], 0.01f, color_xrgb(255, 0, 0));
+    }
 
-    auto k = PKinematics(Visual());
-    auto boneCount = k->LL_BoneCount();
+    if (isDebugMode)
+        DBG_DrawOBB(transform, scale, color_rgba(0, 255, 0, 255));
+#else
+    Fvector corners[8];
+    for (int i = 0; i < 8; ++i)
+    {
+        transform.transform_tiny(corners[i], Fvector().mul(scale, aabb_offsets[i]));
+        aabb.modify(corners[i]);
+    }
+#endif
+}
+
+void CActor::UpdateFirstPersonBodyBox()
+{
+    constexpr float CAMERA_HALF_SIZE = 0.1f;
+    auto kinematics = PKinematics(Visual());
+    const u16 boneCount = kinematics->LL_BoneCount();
+    const bool isDebugMode = psActorFlags.test(AF_FIRST_PERSON_BODY_DEBUG);
+
     Fbox newAABB;
     newAABB.invalidate();
 
-    {
-        Fvector aabb[8];
-        m_firstPersonCameraXform.transform_tiny(aabb[0], Fvector().set(-.1, -.1, -.1)); // 0
-        m_firstPersonCameraXform.transform_tiny(aabb[1], Fvector().set(-.1, +.1, -.1)); // 1
-        m_firstPersonCameraXform.transform_tiny(aabb[2], Fvector().set(+.1, +.1, -.1)); // 2
-        m_firstPersonCameraXform.transform_tiny(aabb[3], Fvector().set(+.1, -.1, -.1)); // 3
-        m_firstPersonCameraXform.transform_tiny(aabb[4], Fvector().set(-.1, -.1, +.1)); // 4
-        m_firstPersonCameraXform.transform_tiny(aabb[5], Fvector().set(-.1, +.1, +.1)); // 5
-        m_firstPersonCameraXform.transform_tiny(aabb[6], Fvector().set(+.1, +.1, +.1)); // 6
-        m_firstPersonCameraXform.transform_tiny(aabb[7], Fvector().set(+.1, -.1, +.1)); // 7
-
-        for (int i = 0; i < 8; ++i)
-        {
-            Fvector corner = aabb[i];
-            newAABB.modify(corner);
-
-            {
-                DBG_DrawPoint(corner, 0.01f, color_xrgb(255, 0, 0));
-            }
-        }
-
-        {
-            DBG_DrawOBB(m_firstPersonCameraXform, Fvector{ .1, .1, .1 }, color_rgba(0, 255, 0, 255));
-        }
-    }
+    const Fvector cameraScale({ CAMERA_HALF_SIZE, CAMERA_HALF_SIZE, CAMERA_HALF_SIZE });
+    TransformAndModifyAABB(m_firstPersonCameraXform, cameraScale, newAABB);
 
     for (u16 i = 0; i < boneCount; i++)
     {
-        auto boneData = k->LL_GetData(i);
+        const auto& boneData = kinematics->LL_GetData(i);
         if (boneData.GetParentID() == BI_NONE)
             continue;
 
-        Fobb obb = k->LL_GetBox(i);
-        Fmatrix BoneMatrix;
-        Fmatrix BoneMatrixRes;
+        Fobb obb = kinematics->LL_GetBox(i);
+        Fmatrix boneMatrix, boneMatrixRes;
 
-        obb.xform_get(BoneMatrix);
-        BoneMatrixRes.mul(k->LL_GetTransform(i), BoneMatrix);
-        BoneMatrix.mul(XFORM(), BoneMatrixRes); // transform from model to world, only useful for debugging
+        obb.xform_get(boneMatrix);
+        boneMatrixRes.mul(kinematics->LL_GetTransform(i), boneMatrix);
+        boneMatrix.mul(XFORM(), boneMatrixRes);
 
-        Fmatrix mL2W_Transform, mScaleTransform;
-        mScaleTransform.scale(obb.m_halfsize);
-        mL2W_Transform.mul_43(BoneMatrix, mScaleTransform);
-
-        Fvector aabb[8];
-        mL2W_Transform.transform_tiny(aabb[0], Fvector().set(-1, -1, -1)); // 0
-        mL2W_Transform.transform_tiny(aabb[1], Fvector().set(-1, +1, -1)); // 1
-        mL2W_Transform.transform_tiny(aabb[2], Fvector().set(+1, +1, -1)); // 2
-        mL2W_Transform.transform_tiny(aabb[3], Fvector().set(+1, -1, -1)); // 3
-        mL2W_Transform.transform_tiny(aabb[4], Fvector().set(-1, -1, +1)); // 4
-        mL2W_Transform.transform_tiny(aabb[5], Fvector().set(-1, +1, +1)); // 5
-        mL2W_Transform.transform_tiny(aabb[6], Fvector().set(+1, +1, +1)); // 6
-        mL2W_Transform.transform_tiny(aabb[7], Fvector().set(+1, -1, +1)); // 7
-
-
-        for (int i = 0; i < 8; ++i)
-        {
-            Fvector corner = aabb[i];
-            newAABB.modify(corner);
-
-            {
-                DBG_DrawPoint(corner, 0.01f, color_xrgb(255, 0, 0));
-            }
-
-        }
-
-        {
-            DBG_DrawOBB(BoneMatrix, obb.m_halfsize, color_rgba(0, 255, 0, 255));
-        }
-    };
-
-    Fbox& dynamic_aabb = character_physics_support()->movement()->GetDynamicAABB();
-    Fbox aabb = character_physics_support()->movement()->Box();
-    dynamic_aabb.set(newAABB);
-    Fvector center, radius, pos;
-    dynamic_aabb.getcenter(center);
-    dynamic_aabb.getradius(radius);
-    pos.set(Position());
-
-    {
-        DBG_DrawPoint(center, .1f, color_xrgb(255, 0, 0));
-        DBG_DrawAABB(center, radius, color_xrgb(255, 0, 0));
+        TransformAndModifyAABB(boneMatrix, obb.m_halfsize, newAABB);
     }
 
-    string1024 text;
-    CGameFont* F = UI().Font().pFontArial14;
-    F->SetAligment(CGameFont::alLeft);
-    F->OutSetI(-.9, 0);
-    F->SetColor(color_rgba(255, 0, 0, 255));
-    xr_sprintf(text, "aabb bounds:\n[%3.3f %3.3f %3.3f]\n[%3.3f %3.3f %3.3f]", aabb.vMin.x, aabb.vMin.y, aabb.vMin.z, aabb.vMax.x, aabb.vMax.y, aabb.vMax.z);
-    F->OutNext(text);
-    xr_sprintf(text, "dynamic aabb bounds:\n[%3.3f %3.3f %3.3f]\n[%3.3f %3.3f %3.3f]", dynamic_aabb.vMin.x, dynamic_aabb.vMin.y, dynamic_aabb.vMin.z, dynamic_aabb.vMax.x, dynamic_aabb.vMax.y, dynamic_aabb.vMax.z);
-    F->OutNext(text);
+    auto movementSupport = character_physics_support()->movement();
+    Fbox& dynamicAABB = movementSupport->GetDynamicAABB();
+    dynamicAABB.set(newAABB);
 
-    dVector3 aabbSize = { aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1 };
-    dVector3 dynSize = { dynamic_aabb.x2 - dynamic_aabb.x1, dynamic_aabb.y2 - dynamic_aabb.y1, dynamic_aabb.z2 - dynamic_aabb.z1 };
+    Fvector center, radius;
+    dynamicAABB.getcenter(center);
+    dynamicAABB.getradius(radius);
 
-    xr_sprintf(text, "aabb size :\n[%3.3f %3.3f %3.3f]", aabb.x2 - aabb.x1, aabb.y2 - aabb.y1, aabb.z2 - aabb.z1);
-    F->OutNext(text);
+    const Fbox& originalBox = movementSupport->Box();
+    const dVector3 originalSize = {
+        originalBox.x2 - originalBox.x1,
+        originalBox.y2 - originalBox.y1,
+        originalBox.z2 - originalBox.z1
+    };
 
-    xr_sprintf(text, "dynamic aabb size :\n[%3.3f %3.3f %3.3f]", dynamic_aabb.x2 - dynamic_aabb.x1, dynamic_aabb.y2 - dynamic_aabb.y1, dynamic_aabb.z2 - dynamic_aabb.z1);
-    F->OutNext(text);
+    const dVector3 dynamicSize = {
+        dynamicAABB.x2 - dynamicAABB.x1,
+        dynamicAABB.y2 - dynamicAABB.y1,
+        dynamicAABB.z2 - dynamicAABB.z1
+    };
 
-    Fvector centerPos = { center.x, center.y, center.z };
-    centerPos.sub(Position());
+    Fvector centerOffset = center;
+    centerOffset.sub(Position());
 
-    auto character = character_physics_support()->movement()->character();
-    auto camPos = m_firstPersonCameraXform.c;
-    camPos.sub(Position());
-    character_physics_support()->movement()->character()->SetBox(dynSize, centerPos, camPos);
+    Fvector cameraOffset = m_firstPersonCameraXform.c;
+    cameraOffset.sub(Position());
 
-    ///
-
-    character_physics_support()->movement()->character()->InUpdateCL();
+    auto character = movementSupport->character();
+    character->SetBox(dynamicSize, centerOffset, cameraOffset);
 }
 
 float NET_Jump = 0;
@@ -1724,7 +1697,6 @@ void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
     VERIFY(_valid(XFORM()));
 
-    return;
     inherited::renderable_Render(context_id, root);
     CInventoryOwner::renderable_Render(context_id, root);
 }

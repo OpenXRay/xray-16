@@ -1530,6 +1530,7 @@ void CActor::OnRender_Network()
         {
             if (this != Level().CurrentViewEntity() || cam_active != eacFirstEye)
             {
+                /*
                 u16 BoneCount = V->LL_BoneCount();
                 for (u16 i=0; i<BoneCount; i++)
                 {
@@ -1539,6 +1540,7 @@ void CActor::OnRender_Network()
                     BoneMatrix.mul(XFORM(), BoneMatrixRes);
                     Level().debug_renderer().draw_obb(BoneMatrix, BoneOBB.m_halfsize, color_rgba(0, 255, 0, 255));
                 };
+                */
                 CCF_Skeleton* Skeleton = smart_cast<CCF_Skeleton*>(CForm);
                 if (Skeleton)
                 {

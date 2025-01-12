@@ -103,8 +103,10 @@ public:
     void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual bool renderable_ShadowGenerate();
     // First person body
+    void TransformAndModifyAABB(const Fmatrix& transform, const Fvector& scale, Fbox& aabb) const;
     bool FirstPersonBodyEnabled();
     bool FirstPersonBodyActive();
+    void UpdateFirstPersonBodyBox();
     virtual void RenderFirstPersonBody(u32 context_id, IRenderable* root);
     IRenderVisual* m_firstPersonBody{};
     xr_unordered_map<u16, bool> m_firstPersonBodyBonesToHide;

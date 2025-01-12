@@ -205,9 +205,9 @@ void CPHSimpleCharacter::TestPathCallback(
     ch->b_side_contact = true;
 }
 
-extern ENGINE_API Fvector4 ps_dev_param_7;
 void CPHSimpleCharacter::InUpdateCL()
 {
+#ifdef DEBUG
     const dReal k = 1.20f;
     dReal doun = m_radius * _sqrt(1.f - 1.f / k / k) / 2.f;
     float test_radius = m_radius * 2.f;
@@ -226,17 +226,11 @@ void CPHSimpleCharacter::InUpdateCL()
     object_form.transform_tiny(t3);
     object_form.transform_tiny(t4);
 
-    if (!fsimilar(ps_dev_param_7.x, 0.f))
-        debug_output().DBG_DrawPoint(t1, .1f, color_xrgb(255, 0, 0));
-
-    if (!fsimilar(ps_dev_param_7.y, 0.f))
-        debug_output().DBG_DrawPoint(t2, .1f, color_xrgb(255, 0, 0));
-
-    if (!fsimilar(ps_dev_param_7.z, 0.f))
-        debug_output().DBG_DrawPoint(t3, .1f, color_xrgb(255, 0, 0));
-
-    if (!fsimilar(ps_dev_param_7.w, 0.f))
-        debug_output().DBG_DrawPoint(t4, .1f, color_xrgb(255, 0, 0));
+    debug_output().DBG_DrawPoint(t1, .1f, color_xrgb(255, 0, 0));
+    debug_output().DBG_DrawPoint(t2, .1f, color_xrgb(255, 0, 0));
+    debug_output().DBG_DrawPoint(t3, .1f, color_xrgb(255, 0, 0));
+    debug_output().DBG_DrawPoint(t4, .1f, color_xrgb(255, 0, 0));
+#endif // DEBUG
 }
 
 void CPHSimpleCharacter::SetBox(const dVector3& sizes)

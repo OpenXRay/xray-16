@@ -16,6 +16,7 @@ enum
     AF_LOADING_STAGES = (1 << 12),
     AF_ALWAYS_USE_ATTITUDE_SENSORS = (1 << 13), // or only when zooming if false
     AF_FIRST_PERSON_BODY = (1 << 14),
+    AF_FIRST_PERSON_BODY_DEBUG = (1 << 15),
 };
 
 extern Flags32 psActorFlags;
