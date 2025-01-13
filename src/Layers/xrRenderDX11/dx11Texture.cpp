@@ -284,7 +284,6 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     size_t img_size = 0;
     int img_loaded_lod = 0;
     u32 mip_cnt = u32(-1);
-    bool dummyTextureExist;
 
     // make file name
     string_path fname;
@@ -300,17 +299,10 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     if (FS.exist(fn, "$game_textures$", fname, ".dds"))
         goto _DDS;
 
-#ifdef _EDITOR
-    ELog.Msg(mtError, "Can't find texture '%s'", fname);
-    return 0;
-#else
     Msg("! Can't find texture '%s'", fname);
-    dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
-    if (!ShadowOfChernobylMode)
-        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
-    if (!dummyTextureExist)
-        return nullptr;
-#endif
+
+    R_ASSERT3_CURE(FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"),
+        "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE, return nullptr);
 
 _DDS:
 {

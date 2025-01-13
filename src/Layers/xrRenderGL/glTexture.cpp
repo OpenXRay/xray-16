@@ -70,8 +70,6 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     gli::gl::format fmt;
     u32 mip_cnt = u32(-1);
 
-    bool dummyTextureExist;
-
     // make file name
     string_path fname;
     strcpy_s(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
@@ -82,20 +80,10 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     if (FS.exist(fn, "$game_saves$", fname, ".dds")) goto _DDS;
     if (FS.exist(fn, "$game_textures$", fname, ".dds")) goto _DDS;
 
-
-#ifdef _EDITOR
-    ELog.Msg(mtError, "Can't find texture '%s'", fname);
-    return 0;
-#else
-
     Msg("! Can't find texture '%s'", fname);
-    dummyTextureExist = FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds");
-    if (!ShadowOfChernobylMode)
-        R_ASSERT3(dummyTextureExist, "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE);
-    if (!dummyTextureExist)
-        return 0;
 
-#endif
+    R_ASSERT3_CURE(FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"),
+        "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE, return 0);
 
 _DDS:
     {
