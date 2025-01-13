@@ -6,8 +6,6 @@
 
 #include <gli/gli.hpp>
 
-constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
-
 void fix_texture_name(pstr fn)
 {
     pstr _ext = strext(fn);
@@ -65,38 +63,52 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
 
     GLuint pTexture = 0;
     string_path fn;
-    size_t img_size = 0;
-    int img_loaded_lod = 0;
-    gli::gl::format fmt;
-    u32 mip_cnt = u32(-1);
+    {
+        // make file name
+        string_path fname;
+        xr_strcpy(fname, fRName);
+        fix_texture_name(fname);
 
-    // make file name
-    string_path fname;
-    strcpy_s(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
-    fix_texture_name(fname);
-    IReader* S = nullptr;
-    if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump")) goto _BUMP_from_base;
-    if (FS.exist(fn, "$level$", fname, ".dds")) goto _DDS;
-    if (FS.exist(fn, "$game_saves$", fname, ".dds")) goto _DDS;
-    if (FS.exist(fn, "$game_textures$", fname, ".dds")) goto _DDS;
+        // Call to FS.exist WRITES to fn !
 
-    Msg("! Can't find texture '%s'", fname);
+        if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
+        {
+            Msg("! Fallback to default bump map: %s", fname);
+            if (strstr(fname, "_bump#"))
+                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), return 0);
+            else
+                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump", ".dds"), return 0);
+        }
+        else
+        {
+            bool exist = false;
 
-    R_ASSERT3_CURE(FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"),
-        "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE, return 0);
+            for (cpcstr folder : { "$level$", "$game_saves$", "$game_textures$" })
+            {
+                exist = FS.exist(fn, folder, fname, ".dds");
+                if (exist)
+                    break;
+            }
 
-_DDS:
-{
+            if (!exist)
+            {
+                Msg("! Can't find texture '%s'", fname);
+                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"), return 0);
+            }
+        }
+    }
+
     // Load and get header
-    S = FS.r_open(fn);
+    IReader* S = FS.r_open(fn);
     R_ASSERT2_CURE(S, fn, { return 0; });
-    img_size = S->length();
+    size_t img_size = S->length();
 #ifdef DEBUG
     Msg("* Loaded: %s[%d]b", fn, img_size);
 #endif // DEBUG
     gli::texture texture = gli::load((char*)S->pointer(), img_size);
     R_ASSERT2(!texture.empty(), fn);
 
+    u32 mip_cnt = u32(-1); // XXX: write to it when reading with GLI!
 
     gli::gl GL(gli::gl::PROFILE_GL33);
 
@@ -125,7 +137,7 @@ _DDS:
         if (err != GL_NO_ERROR)
         {
             VERIFY(err == GL_NO_ERROR);
-            Msg("! OpenGL: 0x%x: Invalid 2D texture: '%s'", err, fname);
+            Msg("! OpenGL: 0x%x: Invalid 2D texture: '%s'", err, fn);
         }
         break;
     case gli::TARGET_3D:
@@ -136,7 +148,7 @@ _DDS:
         if (err != GL_NO_ERROR)
         {
             VERIFY(err == GL_NO_ERROR);
-            Msg("! OpenGL: 0x%x: Invalid 3D texture: '%s'", err, fname);
+            Msg("! OpenGL: 0x%x: Invalid 3D texture: '%s'", err, fn);
         }
         break;
     default:
@@ -170,7 +182,7 @@ _DDS:
                         if (err != GL_NO_ERROR)
                         {
                             VERIFY(err == GL_NO_ERROR);
-                            Msg("! OpenGL: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fname);
+                            Msg("! OpenGL: 0x%x: Invalid 2D compressed subtexture: '%s'", err, fn);
                         }
                     }
                     else
@@ -183,7 +195,7 @@ _DDS:
                         if (err != GL_NO_ERROR)
                         {
                             VERIFY(err == GL_NO_ERROR);
-                            Msg("! OpenGL: 0x%x: Invalid 2D subtexture: '%s'", err, fname);
+                            Msg("! OpenGL: 0x%x: Invalid 2D subtexture: '%s'", err, fn);
                         }
 
                     }
@@ -202,7 +214,7 @@ _DDS:
                         if (err != GL_NO_ERROR)
                         {
                             VERIFY(err == GL_NO_ERROR);
-                            Msg("! OpenGL: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fname);
+                            Msg("! OpenGL: 0x%x: Invalid compressed 3D subtexture: '%s'", err, fn);
                         }
                     }
                     else
@@ -215,7 +227,7 @@ _DDS:
                         if (err != GL_NO_ERROR)
                         {
                             VERIFY(err == GL_NO_ERROR);
-                            Msg("! OpenGL: 0x%x: Invalid 3D subtexture: '%s'", err, fname);
+                            Msg("! OpenGL: 0x%x: Invalid 3D subtexture: '%s'", err, fn);
                         }
                     }
                     break;
@@ -232,36 +244,7 @@ _DDS:
 
     xr_strlwr(fn);
     ret_desc = target;
-    img_loaded_lod = is_target_cube(texture.target()) ? img_loaded_lod : get_texture_load_lod(fn);
+    int img_loaded_lod = is_target_cube(texture.target()) ? 0 : get_texture_load_lod(fn);
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture;
-}
-
-_BUMP_from_base:
-{
-    //Msg			("! auto-generated bump map: %s",fname);
-    Msg("! Fallback to default bump map: %s", fname);
-    //////////////////
-    if (strstr(fname, "_bump#"))
-    {
-        R_ASSERT2 (FS.exist(fn,"$game_textures$", "ed" DELIMITER "ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
-        S = FS.r_open(fn);
-        R_ASSERT2 (S, fn);
-        img_size = S->length();
-        goto _DDS;
-    }
-    if (strstr(fname, "_bump"))
-    {
-        R_ASSERT2 (FS.exist(fn,"$game_textures$", "ed" DELIMITER "ed_dummy_bump", ".dds"),"ed_dummy_bump");
-        S = FS.r_open(fn);
-
-        R_ASSERT2 (S, fn);
-
-        img_size = S->length();
-        goto _DDS;
-    }
-    //////////////////
-}
-
-    return 0;
 }

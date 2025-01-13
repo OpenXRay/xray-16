@@ -3,8 +3,6 @@
 
 #include <DirectXTex.h>
 
-constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
-
 void fix_texture_name(pstr fn)
 {
     pstr _ext = strext(fn);
@@ -99,50 +97,60 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
-    DirectX::TexMetadata IMG;
-    DirectX::ScratchImage texture;
-    ID3DBaseTexture* pTexture2D = NULL;
+    ID3DBaseTexture* pTexture2D{};
     string_path fn;
-    size_t img_size = 0;
-    int img_loaded_lod = 0;
-    u32 mip_cnt = u32(-1);
+    {
+        // make file name
+        string_path fname;
+        xr_strcpy(fname, fRName);
+        fix_texture_name(fname);
 
-    // make file name
-    string_path fname;
-    xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
-    fix_texture_name(fname);
-    IReader* S = NULL;
-    if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
-        goto _BUMP_from_base;
-    if (FS.exist(fn, "$level$", fname, ".dds"))
-        goto _DDS;
-    if (FS.exist(fn, "$game_saves$", fname, ".dds"))
-        goto _DDS;
-    if (FS.exist(fn, "$game_textures$", fname, ".dds"))
-        goto _DDS;
+        // Call to FS.exist WRITES to fn !
 
-    Msg("! Can't find texture '%s'", fname);
+        if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
+        {
+            Msg("! Fallback to default bump map: %s", fname);
+            if (strstr(fname, "_bump#"))
+                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), return nullptr);
+            else
+                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump", ".dds"), return nullptr);
+        }
+        else
+        {
+            bool exist = false;
 
-    R_ASSERT3_CURE(FS.exist(fn, "$game_textures$", NOT_EXISTING_TEXTURE, ".dds"),
-        "Dummy texture doesn't exist", NOT_EXISTING_TEXTURE, return nullptr);
+            for (cpcstr folder : { "$level$", "$game_saves$", "$game_textures$" })
+            {
+                exist = FS.exist(fn, folder, fname, ".dds");
+                if (exist)
+                    break;
+            }
 
-_DDS:
-{
+            if (!exist)
+            {
+                Msg("! Can't find texture '%s'", fname);
+                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"), return nullptr);
+            }
+        }
+    }
+
     // Load and get header
-    S = FS.r_open(fn);
-    R_ASSERT2_CURE(S, fn, { return nullptr; });
+    IReader* S = FS.r_open(fn);
+    R_ASSERT3_CURE(S, "Can't open texture", fn, { return nullptr; });
 
-    img_size = S->length();
+    size_t img_size = S->length();
 #ifdef DEBUG
     Msg("* Loaded: %s[%zu]", fn, img_size);
 #endif // DEBUG
 
+    DirectX::TexMetadata IMG;
+    DirectX::ScratchImage texture;
     R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_PERMISSIVE, &IMG, texture), fn);
 
     // Check for LMAP and compress if needed
     xr_strlwr(fn);
 
-    img_loaded_lod = get_texture_load_lod(fn);
+    const int img_loaded_lod = get_texture_load_lod(fn);
 
     size_t mip_lod = 0;
     if (img_loaded_lod && !IMG.IsCubemap())
@@ -167,33 +175,6 @@ _DDS:
     FS.r_close(S);
 
     // OK
-    mip_cnt = IMG.mipLevels;
-    ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
+    ret_msize = calc_texture_size(img_loaded_lod, IMG.mipLevels, img_size);
     return pTexture2D;
-}
-
-_BUMP_from_base:
-{
-    // Msg          ("! auto-generated bump map: %s",fname);
-    Msg("! Fallback to default bump map: %s", fname);
-    //////////////////
-    if (strstr(fname, "_bump#"))
-    {
-        R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
-        S = FS.r_open(fn);
-        R_ASSERT2(S, fn);
-        goto _DDS;
-    }
-    if (strstr(fname, "_bump"))
-    {
-        R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump", ".dds"), "ed_dummy_bump");
-        S = FS.r_open(fn);
-
-        R_ASSERT2(S, fn);
-        goto _DDS;
-    }
-    //////////////////
-}
-
-    return nullptr;
 }
