@@ -143,38 +143,64 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     Msg("* Loaded: %s[%zu]", fn, img_size);
 #endif // DEBUG
 
-    DirectX::TexMetadata IMG;
-    DirectX::ScratchImage texture;
-    R_CHK2(LoadFromDDSMemory(S->pointer(), S->length(), DirectX::DDS_FLAGS_PERMISSIVE, &IMG, texture), fn);
+    DirectX::DDS_FLAGS dds_flags{ DirectX::DDS_FLAGS_PERMISSIVE };
 
-    // Check for LMAP and compress if needed
-    xr_strlwr(fn);
-
-    const int img_loaded_lod = get_texture_load_lod(fn);
-
-    size_t mip_lod = 0;
-    if (img_loaded_lod && !IMG.IsCubemap())
+    for (int i = 1; i <= 3; ++i) // 3 attempts
     {
-        const auto old_mipmap_cnt = IMG.mipLevels;
-        Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod);
-        mip_lod = old_mipmap_cnt - IMG.mipLevels;
+        DirectX::TexMetadata IMG;
+        DirectX::ScratchImage texture;
+        auto hresult = LoadFromDDSMemory(S->pointer(), img_size, dds_flags, &IMG, texture);
+
+        R_ASSERT3_CURE(SUCCEEDED(hresult), "Failed to load texture from memory", fn,
+        {
+            FS.r_close(S);
+            return nullptr;
+        });
+
+        // Check for LMAP and compress if needed
+        xr_strlwr(fn);
+
+        const int img_loaded_lod = get_texture_load_lod(fn);
+
+        size_t mip_lod = 0;
+        if (img_loaded_lod && !IMG.IsCubemap())
+        {
+            const auto old_mipmap_cnt = IMG.mipLevels;
+            Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod);
+            mip_lod = old_mipmap_cnt - IMG.mipLevels;
+        }
+
+        // DirectX requires compressed texture size to be
+        // a multiple of 4. Make sure to meet this requirement.
+        if (DirectX::IsCompressed(IMG.format))
+        {
+            IMG.width = (IMG.width + 3u) & ~0x3u;
+            IMG.height = (IMG.height + 3u) & ~0x3u;
+        }
+
+        hresult = CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
+            D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
+            &pTexture2D);
+
+        if (SUCCEEDED(hresult))
+        {
+            // OK
+            ret_msize = calc_texture_size(img_loaded_lod, IMG.mipLevels, img_size);
+            break;
+        }
+
+        if (i == 1)
+            dds_flags |= DirectX::DDS_FLAGS::DDS_FLAGS_NO_16BPP; // System isn't WDDM 1.2 compliant
+        else if (i == 2)
+            dds_flags |= DirectX::DDS_FLAGS::DDS_FLAGS_FORCE_RGB; // Not even WDDM 1.1 compliant
+        else if (i == 3)
+            Msg("! Could not load texture [%s] after %d attempts", fn, i);
+        else
+        {
+            NODEFAULT;
+        }
     }
 
-    // DirectX requires compressed texture size to be
-    // a multiple of 4. Make sure to meet this requirement.
-    if (DirectX::IsCompressed(IMG.format))
-    {
-        IMG.width = (IMG.width + 3u) & ~0x3u;
-        IMG.height = (IMG.height + 3u) & ~0x3u;
-    }
-
-    R_CHK2(CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
-        D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
-        &pTexture2D), fn
-    );
     FS.r_close(S);
-
-    // OK
-    ret_msize = calc_texture_size(img_loaded_lod, IMG.mipLevels, img_size);
     return pTexture2D;
 }
