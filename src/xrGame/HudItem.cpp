@@ -378,11 +378,6 @@ bool CHudItem::TryPlayAnimIdle()
     return false;
 }
 
-bool CHudItem::isHUDAnimationExist(pcstr anim_name) const
-{
-    return isHUDAnimationExist(anim_name, false);
-}
-
 //AVO: check if animation exists
 bool CHudItem::isHUDAnimationExist(pcstr anim_name, bool is_silent) const
 {
@@ -408,11 +403,6 @@ bool CHudItem::isHUDAnimationExist(pcstr anim_name, bool is_silent) const
         Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
 #endif
     return false;
-}
-
-pcstr CHudItem::WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2) const
-{
-    return WhichHUDAnimationExist(anim_name, anim_name2, false);
 }
 
 pcstr CHudItem::WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2, bool is_silent) const
