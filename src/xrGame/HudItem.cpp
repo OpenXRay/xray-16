@@ -379,7 +379,7 @@ bool CHudItem::TryPlayAnimIdle()
 }
 
 //AVO: check if animation exists
-bool CHudItem::isHUDAnimationExist(pcstr anim_name, bool is_silent) const
+bool CHudItem::isHUDAnimationExist(pcstr anim_name, bool silent) const
 {
     if (const auto* data = HudItemData()) // First person
     {
@@ -399,17 +399,17 @@ bool CHudItem::isHUDAnimationExist(pcstr anim_name, bool is_silent) const
     else
         return false; // No hud section, no warning
 #ifdef DEBUG
-    if (!is_silent)
+    if (!silent)
         Msg("~ [WARNING] ------ Animation [%s] does not exist in [%s]", anim_name, HudSection().c_str());
 #endif
     return false;
 }
 
-pcstr CHudItem::WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2, bool is_silent) const
+pcstr CHudItem::WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2, bool silent) const
 {
-    if (isHUDAnimationExist(anim_name, is_silent))
+    if (isHUDAnimationExist(anim_name, silent))
         return anim_name;
-    if (isHUDAnimationExist(anim_name2, is_silent))
+    if (isHUDAnimationExist(anim_name2, silent))
         return anim_name2;
     return nullptr;
 }
