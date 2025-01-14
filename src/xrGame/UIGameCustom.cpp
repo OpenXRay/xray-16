@@ -226,13 +226,14 @@ void CUIGameCustom::ShowMessagesWindow()
 
 bool CUIGameCustom::ShowPdaMenu()
 {
-    HideActorMenu();
-    if (!PdaMenu->IsShown())
+    if (PdaMenu->IsShown())
     {
-        PdaMenu->ShowDialog(true);
-        return true;
+        PdaMenu->HideDialog();
+        return false;
     }
-    return false;
+    HideActorMenu();
+    PdaMenu->ShowDialog(true);
+    return true;
 }
 
 void CUIGameCustom::HidePdaMenu()

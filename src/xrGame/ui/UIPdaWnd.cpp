@@ -329,6 +329,24 @@ void CUIPdaWnd::Show_SecondTaskWnd(bool status)
     }
 }
 
+void CUIPdaWnd::Show_MapWnd(bool status)
+{
+    if (pUIMapWnd)
+    {
+        if (status)
+            SetActiveSubdialog("eptMap");
+    }
+}
+
+void CUIPdaWnd::Show_ContactsWnd(bool status)
+{
+    if (true) // XXX: replace with contacts wnd pointer
+    {
+        if (status)
+            SetActiveSubdialog("eptContacts");
+    }
+}
+
 void CUIPdaWnd::Draw()
 {
     inherited::Draw();
@@ -433,15 +451,11 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             UITabControl->SetNextActiveTab(true, true);
         return true;
 
-    hide_pda:
     case kUI_BACK:
         if (WINDOW_KEY_PRESSED == keyboard_action)
             HideDialog();
         return true;
     }
-
-    if (IsBinded(kACTIVE_JOBS, dik))
-        goto hide_pda;
 
     return false;
 }
