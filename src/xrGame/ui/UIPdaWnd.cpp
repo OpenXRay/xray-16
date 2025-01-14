@@ -126,6 +126,7 @@ void CUIPdaWnd::Init()
     AttachChild(UITabControl);
     CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
     UITabControl->SetMessageTarget(this);
+    UITabControl->SetAcceleratorsMode(true);
 
     constexpr std::tuple<pcstr, pcstr> known_soc_tab_ids[] =
     {
@@ -441,16 +442,6 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     switch (GetBindedAction(dik, EKeyContext::UI))
     {
-    case kUI_TAB_PREV:
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            UITabControl->SetNextActiveTab(false, true);
-        return true;
-
-    case kUI_TAB_NEXT:
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            UITabControl->SetNextActiveTab(true, true);
-        return true;
-
     case kUI_BACK:
         if (WINDOW_KEY_PRESSED == keyboard_action)
             HideDialog();
