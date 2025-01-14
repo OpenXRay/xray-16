@@ -66,6 +66,36 @@ bool is_editor()
     return GEnv.ScriptEngine->is_editor();
 }
 
+void isProfilerActive()
+{
+    GEnv.ScriptEngine->m_profiler->isActive();
+}
+
+void startProfiler()
+{
+    GEnv.ScriptEngine->m_profiler->start();
+}
+
+void stopProfiler()
+{
+    GEnv.ScriptEngine->m_profiler->stop();
+}
+
+void resetProfiler()
+{
+    GEnv.ScriptEngine->m_profiler->reset();
+}
+
+void saveProfiler()
+{
+    GEnv.ScriptEngine->m_profiler->save();
+}
+
+void logProfiler()
+{
+    GEnv.ScriptEngine->m_profiler->log();
+}
+
 inline int bit_and(const int i, const int j) { return i & j; }
 inline int bit_or(const int i, const int j) { return i | j; }
 inline int bit_xor(const int i, const int j) { return i ^ j; }
@@ -163,5 +193,15 @@ SCRIPT_EXPORT(CScriptEngine, (),
         def("bit_not", &bit_not),
         def("editor", &is_editor),
         def("user_name", &user_name)
+    ];
+
+    module(luaState, "profiler")
+    [
+        def("isActive", &isProfilerActive),
+        def("start", &startProfiler),
+        def("stop", &stopProfiler),
+        def("reset", &resetProfiler),
+        def("log", &logProfiler),
+        def("save", &saveProfiler)
     ];
 });

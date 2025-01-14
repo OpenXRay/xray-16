@@ -45,6 +45,9 @@
     <ClInclude Include="script_lua_helper.hpp">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="script_profiler.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
     <ClInclude Include="script_debugger_threads.hpp">
       <Filter>Debug</Filter>
     </ClInclude>
@@ -141,6 +144,9 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="script_lua_helper.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="script_profiler.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="script_process.cpp">

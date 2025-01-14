@@ -9,6 +9,7 @@
 #include "pch.hpp"
 #include "script_engine.hpp"
 #include "script_process.hpp"
+#include "script_profiler.hpp"
 #include "script_thread.hpp"
 #include "ScriptExporter.hpp"
 #include "BindingsDumper.hpp"
@@ -769,6 +770,7 @@ CScriptEngine::CScriptEngine(bool is_editor)
 #endif
 #endif
     m_is_editor = is_editor;
+    m_profiler = xr_new<CScriptProfiler>();
 }
 
 CScriptEngine::~CScriptEngine()
@@ -789,6 +791,8 @@ CScriptEngine::~CScriptEngine()
 #endif
     if (scriptBuffer)
         xr_free(scriptBuffer);
+
+    xr_free(m_profiler);
 }
 
 void CScriptEngine::unload()
@@ -878,11 +882,15 @@ void CScriptEngine::lua_hook_call(lua_State* L, lua_Debug* dbg)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
+
     if (scriptEngine->current_thread())
         scriptEngine->current_thread()->script_hook(L, dbg);
     else
         scriptEngine->m_stack_is_ready = true;
+
+    scriptEngine->m_profiler->onLuaHookCall(L, dbg);
 }
+
 #endif
 
 int CScriptEngine::auto_load(lua_State* L)
@@ -1060,6 +1068,12 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         m_reload_modules = save;
     }
     m_stack_level = lua_gettop(lua());
+
+    // todo: Hook on activation wich check.
+    // todo: Hook on activation wich check.
+    // todo: Hook on activation wich check.
+    lua_sethook(lua(), CScriptEngine::lua_hook_call, LUA_MASKLINE | LUA_MASKCALL | LUA_MASKRET, 0);
+
     setvbuf(stderr, g_ca_stdout, _IOFBF, sizeof(g_ca_stdout));
 }
 

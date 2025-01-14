@@ -10,6 +10,7 @@
 #include "xrCore/xrCore.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/script_profiler.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrScriptEngine/Functor.hpp"
 #include "xrCore/Threading/Lock.hpp"
@@ -153,6 +154,8 @@ protected:
     }
 
 public:
+    CScriptProfiler* m_profiler;
+
     lua_State* lua() { return m_virtual_machine; }
     void current_thread(CScriptThread* thread)
     {
