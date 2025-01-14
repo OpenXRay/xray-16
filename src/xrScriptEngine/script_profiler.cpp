@@ -178,7 +178,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
 
     if (!lua_getstack(L, 0, &stack_info))
     {
-        return;  
+        return;
     }
 
     lua_getinfo(L, "nSl", &stack_info);
@@ -221,7 +221,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
 
         return;
     }
-    case LUA_HOOKRET: 
+    case LUA_HOOKRET:
     {
         if (exists)
         {
