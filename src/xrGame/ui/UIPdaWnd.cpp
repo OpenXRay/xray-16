@@ -329,18 +329,6 @@ void CUIPdaWnd::Show_SecondTaskWnd(bool status)
     }
 }
 
-void CUIPdaWnd::Show_MapLegendWnd(bool status)
-{
-    if (pUITaskWnd)
-    {
-        if (status)
-        {
-            SetActiveSubdialog("eptTasks");
-        }
-        pUITaskWnd->ShowMapLegend(status);
-    }
-}
-
 void CUIPdaWnd::Draw()
 {
     inherited::Draw();

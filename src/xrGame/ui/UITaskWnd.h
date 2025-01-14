@@ -59,7 +59,6 @@ public:
     virtual void Show(bool status);
 
     void ReloadTaskInfo();
-    void ShowMapLegend(bool status) const;
     void Switch_ShowMapLegend() const;
     void Show_TaskListWnd(bool status) const;
 

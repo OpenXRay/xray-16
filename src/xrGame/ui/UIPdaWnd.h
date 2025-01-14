@@ -76,7 +76,6 @@ public:
     void SetActiveCaption();
     void SetCaption(pcstr text);
     void Show_SecondTaskWnd(bool status);
-    void Show_MapLegendWnd(bool status);
 
     void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
     CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }

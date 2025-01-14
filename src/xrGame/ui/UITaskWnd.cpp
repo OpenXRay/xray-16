@@ -377,7 +377,6 @@ void CUITaskWnd::OnTask2DbClicked(CUIWindow*, void*)
     TaskSetTargetMap(task);
 }
 
-void CUITaskWnd::ShowMapLegend(bool status) const { m_map_legend_wnd->Show(status); }
 void CUITaskWnd::Switch_ShowMapLegend() const { m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown()); }
 
 // --------------------------------------------------------------------------------------------------
