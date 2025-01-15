@@ -194,7 +194,7 @@ void CUIFocusSystem::Update(const CUIWindow* root)
 void CUIFocusSystem::SetFocused(const CUIWindow* window)
 {
     m_current_focused = window;
-    UI().GetUICursor().WarpToWindow(window, true);
+    UI().GetUICursor().WarpToWindow(window);
 }
 
 std::pair<CUIWindow*, CUIWindow*> CUIFocusSystem::FindClosestFocusable(const Fvector2& from, FocusDirection direction) const

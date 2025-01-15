@@ -135,7 +135,7 @@ void CUIMapFilters::SelectFilter(bool select, bool next /*= true*/)
     if (!select)
     {
         m_selected_filter = -1;
-        cursor.WarpToWindow(nullptr, pInput->IsCurrentInputTypeController());
+        cursor.WarpToWindow(nullptr);
     }
     else
     {
