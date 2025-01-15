@@ -14,8 +14,8 @@ target_sources_grouped(
     script_debugger_threads.hpp
     script_lua_helper.cpp
     script_lua_helper.hpp
-    script_profiler.cpp,
-    script_profiler.hpp,
+    script_profiler.cpp
+    script_profiler.hpp
 )
 
 target_sources_grouped(

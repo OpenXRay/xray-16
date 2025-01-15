@@ -66,36 +66,6 @@ bool is_editor()
     return GEnv.ScriptEngine->is_editor();
 }
 
-void isProfilerActive()
-{
-    GEnv.ScriptEngine->m_profiler->isActive();
-}
-
-void startProfiler()
-{
-    GEnv.ScriptEngine->m_profiler->start();
-}
-
-void stopProfiler()
-{
-    GEnv.ScriptEngine->m_profiler->stop();
-}
-
-void resetProfiler()
-{
-    GEnv.ScriptEngine->m_profiler->reset();
-}
-
-void saveProfiler()
-{
-    GEnv.ScriptEngine->m_profiler->save();
-}
-
-void logProfiler()
-{
-    GEnv.ScriptEngine->m_profiler->log();
-}
-
 inline int bit_and(const int i, const int j) { return i & j; }
 inline int bit_or(const int i, const int j) { return i | j; }
 inline int bit_xor(const int i, const int j) { return i ^ j; }
@@ -169,6 +139,10 @@ std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt) { ret
 SCRIPT_EXPORT(CScriptEngine, (),
 {
     using namespace luabind;
+
+    globals(luaState) ["PROFILER_TYPE_HOOK"] = (u32) CScriptProfilerType::Hook;
+    globals(luaState) ["PROFILER_TYPE_JIT"] = (u32) CScriptProfilerType::Jit;
+
     module(luaState)
     [
         class_<profile_timer_script>("profile_timer")
@@ -197,11 +171,33 @@ SCRIPT_EXPORT(CScriptEngine, (),
 
     module(luaState, "profiler")
     [
-        def("isActive", &isProfilerActive),
-        def("start", &startProfiler),
-        def("stop", &stopProfiler),
-        def("reset", &resetProfiler),
-        def("log", &logProfiler),
-        def("save", &saveProfiler)
+        def("is_active", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler.isActive();
+        }),
+    	def("start", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler.start();
+        }),
+        def("start", +[](CScriptProfilerType hook_type)
+        {
+            GEnv.ScriptEngine->m_profiler.start(hook_type);
+        }),
+        def("stop", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler.stop();
+        }),
+        def("reset", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler.reset();
+        }),
+        def("log_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler.logReport();
+        }),
+        def("save_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler.saveReport();
+        })
     ];
 });

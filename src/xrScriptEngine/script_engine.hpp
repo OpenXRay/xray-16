@@ -154,7 +154,7 @@ protected:
     }
 
 public:
-    CScriptProfiler* m_profiler;
+    CScriptProfiler m_profiler;
 
     lua_State* lua() { return m_virtual_machine; }
     void current_thread(CScriptThread* thread)

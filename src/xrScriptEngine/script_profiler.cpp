@@ -1,26 +1,34 @@
 #include "pch.hpp"
 #include "script_profiler.hpp"
+#include "xrScriptEngine/script_engine.hpp"
 
-CScriptProfiler::CScriptProfiler()
+CScriptProfiler::CScriptProfiler(CScriptEngine* engine)
 {
+    R_ASSERT(engine != NULL);
+
+    m_engine = engine;
+
     m_active = false;
     m_profile_level = 1;
+    m_profiler_type = CScriptProfilerType::None;
 
-    // todo: Configuration of profile levels.
-    // todo: Configuration of profile levels.
-    // todo: Configuration of profile levels.
+    // todo: Configuration of profile levels for hook profiler.
+    // todo: Configuration of profile levels for hook profiler.
+    // todo: Configuration of profile levels for hook profiler.
 
     if (strstr(Core.Params, "-lua_profiler"))
-    {
         start();
-    }
+	else if (strstr(Core.Params, "-lua_hook_profiler"))
+    	start(CScriptProfilerType::Hook);
+    else if (strstr(Core.Params, "-lua_jit_profiler"))
+        start(CScriptProfilerType::Jit);
 }
 
 CScriptProfiler::~CScriptProfiler()
 {
 }
 
-void CScriptProfiler::start()
+void CScriptProfiler::start(CScriptProfilerType profiler_type)
 {
     if (m_active)
     {
@@ -28,58 +36,107 @@ void CScriptProfiler::start()
         return;
     }
 
-    Msg("Starting lua scripts profiler");
+    if (profiler_type == CScriptProfilerType::None)
+    {
+        Msg("Tried to start none profiler type");
+        return;
+    }
 
+    // todo: Check JIT and warn? Allow turn it off with parameter?
+    // todo: Check JIT and warn? Allow turn it off with parameter?
+    // todo: Check JIT and warn? Allow turn it off with parameter?
+
+    m_profiling_portions.clear();
     m_active = true;
+    m_profiler_type = profiler_type;
 
-    // todo: Reset?
-    // todo: Reset?
-    // todo: Reset?
+    switch (profiler_type)
+    {
+	case CScriptProfilerType::Hook:
+    	Msg("Starting lua scripts hook profiler");
 
-    // todo: Check JIT and warn? Allow turn it off with parameter?
-    // todo: Check JIT and warn? Allow turn it off with parameter?
-    // todo: Check JIT and warn? Allow turn it off with parameter?
+    	attachLuaHook();
 
-    // todo: Attach hook?
-    // todo: Attach hook?
-    // todo: Attach hook?
+    	return;
+    case CScriptProfilerType::Jit:
+    {
+    	Msg("Starting lua scripts jit profiler");
+
+    	return;
+    }
+
+    default:  NODEFAULT;
+    }
 }
 
 void CScriptProfiler::stop()
 {
     if (!m_active)
     {
-        Msg("Tried to stop inactive profiler, operation ignored");
+        Msg("Tried to stop inactive profiler");
         return;
     }
 
-    Msg("Stopping lua scripts profiler");
+    if (m_profiler_type == CScriptProfilerType::None)
+    {
+        Msg("Tried to stop none profiler type");
+        return;
+    }
 
-    // todo: Reset?
-    // todo: Reset?
-    // todo: Reset?
+    switch (m_profiler_type)
+    {
+	case CScriptProfilerType::Hook:
+        Msg("Stopping lua scripts hook profiler");
 
-    // todo: Detach hook?
-    // todo: Detach hook?
-    // todo: Detach hook?
+        // Do not detach hook here, adding it means that it is already test run in the first place.
+
+    	break;
+    case CScriptProfilerType::Jit:
+    {
+    	Msg("Stopping lua scripts jit profiler");
+
+    	break;
+    }
+
+    default:  NODEFAULT;
+    }
+
+    m_active = false;
 }
 
 void CScriptProfiler::reset() 
 { 
     Msg("Reset profiler");
 
-    // todo;
-    // todo;
-    // todo;
+    m_profiling_portions.clear();
 }
 
-void CScriptProfiler::log()
+void CScriptProfiler::logReport()
 {
+	switch (m_profiler_type)
+    {
+        case CScriptProfilerType::Hook:
+            return logHookReport();
+        case CScriptProfilerType::Jit:
+            return logJitReport();
+        default:
+            Msg("Nothing to report for profiler");
+            return;
+    }
+}
+
+void CScriptProfiler::logHookReport()
+{
+    if (m_profiling_portions.empty())
+    {
+        Msg("Nothing to report for hook profiler, data is missing");
+        return;
+    }
 
     u64 total_count = 0;
     u64 total_duration = 0;
 
-    std::vector<decltype(m_profiling_portions)::iterator> entries;
+    xr_vector<decltype(m_profiling_portions)::iterator> entries;
     entries.reserve(m_profiling_portions.size());
 
     for (auto it = m_profiling_portions.begin(); it != m_profiling_portions.end(); it++)
@@ -90,9 +147,8 @@ void CScriptProfiler::log()
         total_duration += it->second.duration();
     }
 
-
      Msg("==================================================================");
-     Msg("= Log profiler report, %d entries", entries.size());
+     Msg("= Log hook profiler report, %d entries", entries.size());
      Msg("==================================================================");
      Msg("= By calls duration:");
      Msg("====");
@@ -148,13 +204,39 @@ void CScriptProfiler::log()
     // todo;
 }
 
-void CScriptProfiler::save()
+void CScriptProfiler::logJitReport()
+{
+	// todo;
+	// todo;
+	// todo;
+}
+
+void CScriptProfiler::saveReport()
 {
     Log("Save profiler report");
 
     // todo;
     // todo;
     // todo;
+}
+
+void CScriptProfiler::attachLuaHook()
+{
+    lua_State* L = lua();
+	lua_Hook hook = lua_gethook(L);
+
+    if (hook)
+    {
+        if (hook != CScriptEngine::lua_hook_call)
+        {
+            Msg("Warning: hook already defined by something else, cannot take ownership as CScriptEngine");
+        }
+    }
+    else
+    {
+      	Msg("Attaching lua scripts hook");
+		lua_sethook(L, CScriptEngine::lua_hook_call, LUA_MASKLINE | LUA_MASKCALL | LUA_MASKRET, 0);
+    }
 }
 
 void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
@@ -241,6 +323,16 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
     }
     default: NODEFAULT;
     }
+}
+
+lua_State* CScriptProfiler::lua() const
+{
+    return this->m_engine->lua();
+}
+
+bool CScriptProfiler::luaIsJitProfilerDefined(lua_State* L)
+{
+    return true;
 }
 
 // todo: Add util to get frame info
