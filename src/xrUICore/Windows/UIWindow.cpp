@@ -532,36 +532,42 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
     if (ImGui::IsItemClicked())
         debugState.select(this);
 
-    const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
-    if (debugState.drawWndRects && (IsShown() || hovered))
+    const bool examined = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+    if (debugState.settings.drawWndRects && (IsShown() || examined))
     {
         const auto& focus = UI().Focus();
+        auto& colors = debugState.settings.colors;
 
         Frect rect;
         GetAbsoluteRect(rect);
         UI().ClientToScreenScaled(rect.lt, rect.lt.x, rect.lt.y);
         UI().ClientToScreenScaled(rect.rb, rect.rb.x, rect.rb.y);
 
-        // XXX: make colours user configurable
-        const u32 alpha = CursorOverWindow() ? 255 : 200;
-        Fcolor color = color_rgba(0, 0, 255, alpha);
-        if (hovered)
-            color = color_rgba(0, 255, 255, 255);
+        Fcolor color;
+        const bool hovered = CursorOverWindow();
+
+        if (examined)
+            color = colors.examined;
         else if (focus.GetFocused() == this)
-            color = color_rgba(255, 215, 0, 255);
-        else if (debugState.coloredRects)
+            color = colors.focused;
+        else if (debugState.settings.coloredRects)
         {
+            const u32 alpha = hovered ? 255 : 200;
             // This is pseudo RNG, so when we are seeding it with 'this' pointer
             // we can expect predictable and stable values (no *blinking* at all)
             CRandom rnd;
             rnd.seed((s32)(intptr_t)this);
             color = color_rgba(rnd.randI(255), rnd.randI(255), rnd.randI(255), alpha);
         }
-        else if (focus.IsRegistered(this))
-            color = color_rgba(0, 255, 0, alpha);
+        else if (focus.IsValuable(this))
+            color = hovered ? colors.focusableValuableHovered : colors.focusableValuable;
+        else if (focus.IsNonValuable(this))
+            color = hovered ? colors.focusableNonValuableHovered : colors.focusableNonValuable;
+        else
+            color = hovered ? colors.normalHovered : colors.normal;
 
         const auto mainVP = ImGui::GetMainViewport();
-        const auto draw_list = hovered ? ImGui::GetForegroundDrawList(mainVP) : ImGui::GetBackgroundDrawList(mainVP);
+        const auto draw_list = examined ? ImGui::GetForegroundDrawList(mainVP) : ImGui::GetBackgroundDrawList(mainVP);
         draw_list->AddRect((const ImVec2&)rect.lt, (const ImVec2&)rect.rb, color.get_windows());
     }
 
