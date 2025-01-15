@@ -370,7 +370,7 @@ protected:
     void save_weather_effects(CInifile* environment_config = nullptr) const;
 
 private:
-    pcstr tool_name() override { return "Weather Editor"; }
+    pcstr tool_name() const override { return "Weather Editor"; }
 };
 
 ENGINE_API extern Flags32 psEnvFlags;

@@ -55,5 +55,5 @@ public:
     bool ShouldDrawRects() const { return m_state.drawWndRects; }
 
 private:
-    pcstr tool_name() override { return "UI Debugger"; }
+    pcstr tool_name() const override { return "UI Debugger"; }
 };

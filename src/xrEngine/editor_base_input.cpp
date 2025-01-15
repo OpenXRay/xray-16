@@ -4,6 +4,8 @@
 #include "editor_helper.h"
 #include "XR_IOConsole.h"
 
+#include <imgui_internal.h>
+
 namespace
 {
 bool mouse_can_use_global_state()
@@ -44,6 +46,74 @@ void ide::InitBackend()
         m_imgui_backend.mouse_can_report_hovered_viewport = true;
 #endif
     }
+
+    ImGuiSettingsHandler ini_handler;
+    ini_handler.TypeName = "OpenXRay";
+    ini_handler.TypeHash = ImHashStr("OpenXRay");
+    ini_handler.UserData = this;
+
+    ini_handler.ClearAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler)
+    {
+        ide& self = *static_cast<ide*>(handler->UserData);
+        for (ide_tool* tool : self.m_tools)
+        {
+            tool->reset_settings();
+        }
+    };
+
+    ini_handler.ReadOpenFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, pcstr name) -> void*
+    {
+        ide& self = *static_cast<ide*>(handler->UserData);
+        for (ide_tool* tool : self.m_tools)
+        {
+            if (xr_strcmp(tool->tool_name(), name) == 0)
+            {
+                tool->reset_settings(); // Clear existing if recycling previous entry
+                return tool;
+            }
+        }
+        return nullptr;
+    };
+
+    ini_handler.ReadLineFn = [](ImGuiContext*, ImGuiSettingsHandler*, void* entry, pcstr line)
+    {
+        if (!entry)
+            return;
+        ide_tool& self = *static_cast<ide_tool*>(entry);
+        self.apply_setting(line);
+
+    };
+
+    // We don't store separate copy of settings and
+    // intended workflow is to apply settings immediately in apply_setting,
+    // so this isn't much useful, but who knows
+    ini_handler.ApplyAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler)
+    {
+        ide& self = *static_cast<ide*>(handler->UserData);
+        for (ide_tool* tool : self.m_tools)
+        {
+            tool->apply_settings();
+        }
+    };
+
+    ini_handler.WriteAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buffer)
+    {
+        ide& self = *static_cast<ide*>(handler->UserData);
+
+        size_t estimated_buffer_size = 0;
+        for (const ide_tool* tool : self.m_tools)
+        {
+            estimated_buffer_size += tool->estimate_settings_size();
+        }
+        buffer->reserve(estimated_buffer_size);
+
+        for (const ide_tool* tool : self.m_tools)
+        {
+            buffer->appendf("[%s][%s]\n", handler->TypeName, tool->tool_name());
+            tool->save_settings(buffer);
+        }
+    };
+    ImGui::AddSettingsHandler(&ini_handler);
 }
 
 void ide::ProcessEvent(const SDL_Event& event)

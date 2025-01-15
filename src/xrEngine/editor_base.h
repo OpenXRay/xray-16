@@ -19,13 +19,19 @@ public:
 
     virtual void on_tool_frame() = 0;
 
-    virtual pcstr tool_name() = 0;
+    virtual pcstr tool_name() const = 0;
 
     bool& get_open_state() { return is_opened; }
     bool is_open() const { return is_opened; }
     virtual bool is_active() const { return is_opened; }
 
     ImGuiWindowFlags get_default_window_flags() const;
+
+    virtual void reset_settings() {}
+    virtual void apply_setting(pcstr /*line*/) {}
+    virtual void apply_settings() {}
+    virtual void save_settings(ImGuiTextBuffer* /*buffer*/) const {}
+    virtual size_t estimate_settings_size() const { return 0; }
 };
 
 class ENGINE_API ide final :

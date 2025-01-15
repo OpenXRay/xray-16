@@ -10,7 +10,7 @@ public:
     bool is_active() const override;
 
 private:
-    pcstr tool_name() override { return "Hud Tuner"; }
+    pcstr tool_name() const override { return "Hud Tuner"; }
 
     void ResetToDefaultValues();
     void UpdateValues();
