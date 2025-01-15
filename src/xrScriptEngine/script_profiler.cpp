@@ -104,8 +104,8 @@ void CScriptProfiler::stop()
     m_active = false;
 }
 
-void CScriptProfiler::reset() 
-{ 
+void CScriptProfiler::reset()
+{
     Msg("Reset profiler");
 
     m_profiling_portions.clear();
