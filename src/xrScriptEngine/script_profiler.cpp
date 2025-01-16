@@ -9,60 +9,74 @@ CScriptProfiler::CScriptProfiler(CScriptEngine* engine)
     m_engine = engine;
 
     m_active = false;
-    m_profile_level = 1;
+    m_hook_profile_level = 1;
     m_profiler_type = CScriptProfilerType::None;
-
-    // todo: Configuration of profile levels for hook profiler.
-    // todo: Configuration of profile levels for hook profiler.
-    // todo: Configuration of profile levels for hook profiler.
 
     if (strstr(Core.Params, "-lua_profiler"))
         start();
 	else if (strstr(Core.Params, "-lua_hook_profiler"))
     	start(CScriptProfilerType::Hook);
-    else if (strstr(Core.Params, "-lua_jit_profiler"))
-        start(CScriptProfilerType::Jit);
+    else if (strstr(Core.Params, "-lua_sampling_profiler"))
+        start(CScriptProfilerType::Sampling);
 }
 
-CScriptProfiler::~CScriptProfiler()
-{
-}
+CScriptProfiler::~CScriptProfiler() {}
 
 void CScriptProfiler::start(CScriptProfilerType profiler_type)
 {
     if (m_active)
     {
-        Msg("Tried to start active profiler, operation ignored");
+        Msg("[P] Tried to start already active profiler, operation ignored");
         return;
     }
 
     if (profiler_type == CScriptProfilerType::None)
     {
-        Msg("Tried to start none profiler type");
+        Msg("[P] Tried to start none type profiler");
         return;
     }
 
-    // todo: Check JIT and warn? Allow turn it off with parameter?
-    // todo: Check JIT and warn? Allow turn it off with parameter?
-    // todo: Check JIT and warn? Allow turn it off with parameter?
+    if (!lua())
+    {
+    	Msg("[P] Activating profiler on lua engine start, waiting init");
 
-    m_profiling_portions.clear();
-    m_active = true;
-    m_profiler_type = profiler_type;
+		m_profiler_type = profiler_type;
+		m_active = true;
+
+        return;
+    }
 
     switch (profiler_type)
     {
 	case CScriptProfilerType::Hook:
-    	Msg("Starting lua scripts hook profiler");
+   		if (!attachLuaHook())
+        {
+        	Msg("[P] Cannot start scripts hook profiler, hook was not set properly");
+			return;
+        }
 
-    	attachLuaHook();
+    	Msg("[P] Starting scripts hook profiler");
+
+        m_profiling_portions.clear();
+		m_profiler_type = profiler_type;
+	    m_active = true;
 
     	return;
-    case CScriptProfilerType::Jit:
+    case CScriptProfilerType::Sampling:
     {
-    	Msg("Starting lua scripts jit profiler");
+        if (!luaIsJitProfilerDefined(lua()))
+        {
+        	Msg("[P] Cannot start scripts sampling profiler, jit.profiler module is not defined");
+			return;
+        }
 
-    	return;
+    	Msg("[P] Starting scripts sampling profiler");
+        luaJitSamplingProfilerAttach(this);
+
+        m_profiler_type = profiler_type;
+		m_active = true;
+
+	    return;
     }
 
     default:  NODEFAULT;
@@ -73,27 +87,29 @@ void CScriptProfiler::stop()
 {
     if (!m_active)
     {
-        Msg("Tried to stop inactive profiler");
+        Msg("[P] Tried to stop inactive profiler");
         return;
     }
 
     if (m_profiler_type == CScriptProfilerType::None)
     {
-        Msg("Tried to stop none profiler type");
+        Msg("[P] Tried to stop none type profiler");
         return;
     }
 
     switch (m_profiler_type)
     {
 	case CScriptProfilerType::Hook:
-        Msg("Stopping lua scripts hook profiler");
+        Msg("[P] Stopping scripts hook profiler");
 
         // Do not detach hook here, adding it means that it is already test run in the first place.
 
     	break;
-    case CScriptProfilerType::Jit:
+    case CScriptProfilerType::Sampling:
     {
-    	Msg("Stopping lua scripts jit profiler");
+    	Msg("[P] Stopping scripts sampling profiler");
+
+        luaJitProfilerStop(lua());
 
     	break;
     }
@@ -106,9 +122,10 @@ void CScriptProfiler::stop()
 
 void CScriptProfiler::reset()
 {
-    Msg("Reset profiler");
+    Msg("[P] Reset profiler");
 
     m_profiling_portions.clear();
+    m_profiling_log.clear();
 }
 
 void CScriptProfiler::logReport()
@@ -117,10 +134,10 @@ void CScriptProfiler::logReport()
     {
         case CScriptProfilerType::Hook:
             return logHookReport();
-        case CScriptProfilerType::Jit:
-            return logJitReport();
+        case CScriptProfilerType::Sampling:
+            return logSamplingReport();
         default:
-            Msg("Nothing to report for profiler");
+            Msg("[P] No active profiling data to report");
             return;
     }
 }
@@ -129,7 +146,7 @@ void CScriptProfiler::logHookReport()
 {
     if (m_profiling_portions.empty())
     {
-        Msg("Nothing to report for hook profiler, data is missing");
+        Msg("[P] Nothing to report for hook profiler, data is missing");
         return;
     }
 
@@ -147,11 +164,11 @@ void CScriptProfiler::logHookReport()
         total_duration += it->second.duration();
     }
 
-     Msg("==================================================================");
-     Msg("= Log hook profiler report, %d entries", entries.size());
-     Msg("==================================================================");
-     Msg("= By calls duration:");
-     Msg("====");
+     Msg("[P] ==================================================================");
+     Msg("[P] = Hook profiler report, %d entries", entries.size());
+     Msg("[P] ==================================================================");
+     Msg("[P] = By calls duration:");
+     Msg("[P] ====");
 
      u64 index = 0;
      string512 buffer;
@@ -164,7 +181,7 @@ void CScriptProfiler::logHookReport()
          if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
              break;
 
-         Msg("[%3d] %6.3f ms (%5.2f%%) %6d calls, %6.3f ms avg : %s", index, (*it)->second.duration() / 1000.0,
+         Msg("[P] [%3d] %6.3f ms (%5.2f%%) %6d calls, %6.3f ms avg : %s", index, (*it)->second.duration() / 1000.0,
              ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration, (*it)->second.count(),
              (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0,
              (*it)->first.c_str());
@@ -172,9 +189,9 @@ void CScriptProfiler::logHookReport()
          index += 1;
      }
 
-     Msg("==================================================================");
-     Msg("= By calls count:");
-     Msg("====");
+     Msg("[P] ==================================================================");
+     Msg("[P] = By calls count:");
+     Msg("[P] ====");
 
      index = 0;
 
@@ -186,16 +203,16 @@ void CScriptProfiler::logHookReport()
          if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
              break;
 
-         Msg("[%3d] %6d (%5.2f%%) : %s", index, (*it)->second.count(),
+         Msg("[P] [%3d] %6d (%5.2f%%) : %s", index, (*it)->second.count(),
              ((f64)(*it)->second.count() * 100.0) / (f64)total_count, (*it)->first.c_str());
 
          index += 1;
      }
 
-     Msg("==================================================================");
-     Msg("= Total function calls count: %d", total_count);
-     Msg("= Total function calls duration: %f ms", (f32) total_duration / 1000.0);
-     Msg("==================================================================");
+     Msg("[P] ==================================================================");
+     Msg("[P] = Total function calls count: %d", total_count);
+     Msg("[P] = Total function calls duration: %f ms", (f32) total_duration / 1000.0);
+     Msg("[P] ==================================================================");
 
      FlushLog();
 
@@ -204,51 +221,120 @@ void CScriptProfiler::logHookReport()
     // todo;
 }
 
-void CScriptProfiler::logJitReport()
+void CScriptProfiler::logSamplingReport()
 {
-	// todo;
-	// todo;
-	// todo;
+    // todo: Separete save method, implement printing function here.
+    // todo: Separete save method, implement printing function here.
+    // todo: Separete save method, implement printing function here.
+
+    if (m_profiling_log.empty())
+    {
+        Msg("[P] Nothing to report for sampling profiler, data is missing");
+        return;
+    }
+
+    string_path log_file_name;
+    strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, "_sampling_profile.perf");
+    FS.update_path(log_file_name, "$logs$", log_file_name);
+
+    Msg("[P] Saving sampling report to %s", log_file_name);
+
+    IWriter* F = FS.w_open(log_file_name);
+
+    if (F)
+    {
+        for (auto &it : m_profiling_log)
+        {
+            F->w_string(*it);
+        }
+
+        FS.w_close(F);
+    }
 }
 
 void CScriptProfiler::saveReport()
 {
-    Log("Save profiler report");
+    Log("[P] Saving profiler report");
 
     // todo;
     // todo;
     // todo;
 }
 
-void CScriptProfiler::attachLuaHook()
+/*
+* @returns whether profiling lua hook was/is attached to current VM context
+*/
+bool CScriptProfiler::attachLuaHook()
 {
-    lua_State* L = lua();
-	lua_Hook hook = lua_gethook(L);
+    lua_Hook hook = lua_gethook(lua());
 
-    if (hook)
+    return hook ? hook == CScriptEngine::lua_hook_call : lua_sethook(lua(), CScriptEngine::lua_hook_call, LUA_MASKLINE | LUA_MASKCALL | LUA_MASKRET, 0);
+}
+
+void CScriptProfiler::onDispose(lua_State* L)
+{
+    // When handling instance disposal (reinit), stop profiling for VM.
+    // Otherwise you cannot stop profiling because VM pointer will be destroyed and become inaccessible.
+    if (m_active && m_profiler_type == CScriptProfilerType::Sampling)
     {
-        if (hook != CScriptEngine::lua_hook_call)
-        {
-            Msg("Warning: hook already defined by something else, cannot take ownership as CScriptEngine");
-        }
+        Msg("[P] Disposing sampling dependencies");
+		luaJitProfilerStop(L);
     }
-    else
+}
+
+void CScriptProfiler::onReinit(lua_State* L)
+{
+	// todo: Should we get old ref and detach profiler / hook?
+	// todo: Should we get old ref and detach profiler / hook?
+	// todo: Should we get old ref and detach profiler / hook?
+
+    if (!m_active)
+    	return;
+
+	Msg("[P] Profiler reinit %d", lua());
+
+    switch (m_profiler_type)
     {
-      	Msg("Attaching lua scripts hook");
-		lua_sethook(L, CScriptEngine::lua_hook_call, LUA_MASKLINE | LUA_MASKCALL | LUA_MASKRET, 0);
+	case CScriptProfilerType::Hook:
+   		if (!attachLuaHook())
+        {
+        	Msg("[P] Cannot start scripts hook profiler on reinit, hook was not set properly");
+			return;
+        }
+
+    	Msg("[P] Reinit scripts hook profiler");
+
+        m_profiling_portions.clear();
+
+    	return;
+    case CScriptProfilerType::Sampling:
+    {
+        if (!luaIsJitProfilerDefined(lua()))
+        {
+        	Msg("[P] Cannot start scripts sampling profiler on reinit, jit.profiler module is not defined");
+			return;
+        }
+
+    	Msg("[P] Re-init scripts sampling profiler, attach handler");
+        luaJitSamplingProfilerAttach(this);
+
+	    return;
+    }
+
+    default:  NODEFAULT;
     }
 }
 
 void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
 {
-    if (!m_active || dbg->event == LUA_HOOKLINE)
+    if (!m_active || m_profiler_type != CScriptProfilerType::Hook || dbg->event == LUA_HOOKLINE)
         return;
 
     lua_Debug parent_stack_info;
     lua_Debug stack_info;
 
     // Check higher level of stack.
-    if (m_profile_level > 0)
+    if (m_hook_profile_level > 0)
     {
         if (!lua_getstack(L, 1, &parent_stack_info))
         {
@@ -268,7 +354,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
     string512 buffer;
 
     auto name = stack_info.name ? stack_info.name : "?";
-    auto parent_name = m_profile_level > 0 && parent_stack_info.name ? parent_stack_info.name : "?";
+    auto parent_name = m_hook_profile_level > 0 && parent_stack_info.name ? parent_stack_info.name : "?";
     auto short_src = stack_info.short_src;
     auto line_defined = stack_info.linedefined;
 
@@ -276,7 +362,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
         name = "lua-script-body";
 
     // Include date from higher stack levels.
-    if (m_profile_level > 0)
+    if (m_hook_profile_level > 0)
         xr_sprintf(buffer, "%s [%d] - %s @ %s", name, line_defined, parent_name, short_src);
     else
         xr_sprintf(buffer, "%s [%d] @ %s", name, line_defined, parent_name, short_src);
@@ -330,11 +416,108 @@ lua_State* CScriptProfiler::lua() const
     return this->m_engine->lua();
 }
 
-bool CScriptProfiler::luaIsJitProfilerDefined(lua_State* L)
+/*
+ * @returns used memory by lua state in bytes
+ */
+int CScriptProfiler::luaMemoryUsed(lua_State* L)
 {
-    return true;
+	return lua_gc(L, LUA_GCCOUNT, 0) * 1024 + lua_gc(L, LUA_GCCOUNTB, 0);
 }
 
-// todo: Add util to get frame info
-// todo: Add util to get frame info
-// todo: Add util to get frame info
+/*
+ * @returns whether jit.profile module is defined in lua state
+ */
+bool CScriptProfiler::luaIsJitProfilerDefined(lua_State* L)
+{
+    if (L == nullptr)
+    {
+        return false;
+    }
+
+    auto top = lua_gettop(L);
+
+    lua_getglobal(L, "require");
+    lua_pushstring(L, "jit.profile");
+
+    if (lua_pcall(L, 1, 0, 0) == LUA_OK)
+    {
+		R_ASSERT2(top == lua_gettop(L), "Lua VM stack should not be affected by jit.profile check");
+     	return true;
+    }
+    else
+    {
+        // Remove error message to keep stack in previous state.
+    	lua_pop(L, 1);
+
+        R_ASSERT2(top == lua_gettop(L), "Lua VM stack should not be affected by jit.profile check");
+    	return true;
+    }
+}
+
+/**
+* Attach sampling profiling hooks.
+* With provided period report samples and store information in profiler for further reporting.
+*/
+void CScriptProfiler::luaJitSamplingProfilerAttach(CScriptProfiler* profiler)
+{
+    luaJitProfilerStart(
+        profiler->lua(), "fli",
+        [](void* data, lua_State* L, int samples, int vmstate) {
+            CScriptProfiler* profiler = static_cast<CScriptProfiler*>(data);
+            string2048 buffer;
+
+            // Build flamechart folded stack including frames and samples count
+            // Example: `C;frame_1_func:24;frame_2_func:45 4`
+            auto [dump, length] = luaJitProfilerDump(L, "flZ;", -64);
+
+            buffer[0] = vmstate;
+            buffer[1] = ';';
+            strncpy_s(buffer + 2, sizeof(buffer) - 2, dump, length);
+            buffer[length + 2] = ' ';
+            xr_itoa(samples, buffer + length + 3, 10);
+
+            profiler->m_profiling_log.push_back(shared_str(buffer));
+        },
+        profiler);
+}
+
+/*
+ * Possible modes for profiling:
+ * f — profile with precision down to the function level
+ * l — profile with precision down to the line level
+ * i<number> — sampling interval in milliseconds (default 10ms)
+ *
+ * Note: The actual sampling precision is OS-dependent.
+ *
+ * @param mode - jit profiling mode variant
+ * @returns whether jit profiler start call was successful
+ */
+void CScriptProfiler::luaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_profile_callback callback, void* data)
+{
+    // Only single JIT profiler can exist and it will not attach with multiple states.
+    // Also only VM started profiler can end it, be careful.
+
+    luaJIT_profile_start(L, mode, callback, data);
+}
+
+void CScriptProfiler::luaJitProfilerStop(lua_State* L)
+{
+    luaJIT_profile_stop(L);
+}
+
+/*
+ * Possible format values for dump:
+ * f — dump function name
+ * F — dump function name, module:name for F variant
+ * p — preserve full path
+ * l — dump module:line
+ * Z — zap trailing separator
+ * i<number> — Sampling interval in milliseconds (default 10ms)
+ */
+std::pair<cpcstr, size_t> CScriptProfiler::luaJitProfilerDump(lua_State* L, cpcstr format, int depth)
+{
+	size_t length;
+    cpcstr dump = luaJIT_profile_dumpstack(L, format, depth, &length);
+
+    return std::make_pair(dump, length);
+}

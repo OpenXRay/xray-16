@@ -154,7 +154,7 @@ protected:
     }
 
 public:
-    CScriptProfiler m_profiler;
+    CScriptProfiler* m_profiler;
 
     lua_State* lua() { return m_virtual_machine; }
     void current_thread(CScriptThread* thread)
@@ -221,7 +221,7 @@ public:
     void LogVariable(lua_State* l, pcstr name, int level);
 
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
-    CScriptEngine(bool is_editor = false);
+    CScriptEngine(bool is_editor = false, bool is_with_profiler = false);
     virtual ~CScriptEngine();
     void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
@@ -231,9 +231,7 @@ public:
 #if 1 //!XRAY_EXCEPTIONS
     static void lua_cast_failed(lua_State* L, const luabind::type_id& info);
 #endif
-#ifdef DEBUG
     static void lua_hook_call(lua_State* L, lua_Debug* dbg);
-#endif
     void setup_callbacks();
     bool load_file(const char* scriptName, const char* namespaceName);
     CScriptProcess* script_process(const ScriptProcessor& process_id) const;

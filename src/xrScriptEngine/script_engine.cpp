@@ -16,6 +16,9 @@
 #ifdef USE_DEBUGGER
 #include "script_debugger.hpp"
 #endif
+#ifdef DEBUG
+#include "script_thread.hpp"
+#endif
 #include <stdarg.h>
 #include "Common/Noncopyable.hpp"
 #include "xrCore/ModuleLookup.hpp"
@@ -115,7 +118,10 @@ void CScriptEngine::reinit()
     stateMapLock.Leave();
     if (m_virtual_machine)
     {
-        lua_close(m_virtual_machine);
+        if (m_profiler)
+	        m_profiler->onDispose(m_virtual_machine);
+
+		lua_close(m_virtual_machine);
         UnregisterState(m_virtual_machine);
     }
     m_virtual_machine = lua_newstate(lua_alloc, nullptr);
@@ -131,6 +137,9 @@ void CScriptEngine::reinit()
         file_header = file_header_old;
     scriptBufferSize = 1024 * 1024;
     scriptBuffer = xr_alloc<char>(scriptBufferSize);
+
+    if (m_profiler)
+	    m_profiler->onReinit(m_virtual_machine);
 }
 
 void CScriptEngine::print_stack(lua_State* L)
@@ -748,13 +757,14 @@ void CScriptEngine::disconnect_from_debugger()
 }
 #endif
 
-CScriptEngine::CScriptEngine(bool is_editor) : m_profiler(this)
+CScriptEngine::CScriptEngine(bool is_editor, bool is_with_profiler)
 {
     luabind::allocator = &luabind_allocator;
     luabind::allocator_context = nullptr;
     m_current_thread = nullptr;
     m_stack_is_ready = false;
     m_virtual_machine = nullptr;
+    m_profiler = is_with_profiler ? xr_new<CScriptProfiler>(this) : nullptr;
     m_stack_level = 0;
     m_reload_modules = false;
     m_last_no_file_length = 0;
@@ -774,6 +784,14 @@ CScriptEngine::CScriptEngine(bool is_editor) : m_profiler(this)
 
 CScriptEngine::~CScriptEngine()
 {
+    if (m_profiler)
+    {
+        if (m_virtual_machine)
+            m_profiler->onDispose(m_virtual_machine);
+
+        xr_delete(m_profiler);
+    }
+
     if (m_virtual_machine)
         lua_close(m_virtual_machine);
     while (!m_script_processes.empty())
@@ -872,23 +890,21 @@ void CScriptEngine::setup_callbacks()
     lua_atpanic(lua(), CScriptEngine::lua_panic);
 }
 
-#ifdef DEBUG
-#include "script_thread.hpp"
-
 void CScriptEngine::lua_hook_call(lua_State* L, lua_Debug* dbg)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
 
+    #ifdef DEBUG
     if (scriptEngine->current_thread())
         scriptEngine->current_thread()->script_hook(L, dbg);
     else
         scriptEngine->m_stack_is_ready = true;
+    #endif
 
-    scriptEngine->m_profiler.onLuaHookCall(L, dbg);
+    if (scriptEngine->m_profiler)
+	    scriptEngine->m_profiler->onLuaHookCall(L, dbg);
 }
-
-#endif
 
 int CScriptEngine::auto_load(lua_State* L)
 {
@@ -1065,7 +1081,6 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
         m_reload_modules = save;
     }
     m_stack_level = lua_gettop(lua());
-
     setvbuf(stderr, g_ca_stdout, _IOFBF, sizeof(g_ca_stdout));
 }
 

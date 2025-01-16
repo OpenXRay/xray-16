@@ -141,7 +141,7 @@ SCRIPT_EXPORT(CScriptEngine, (),
     using namespace luabind;
 
     globals(luaState) ["PROFILER_TYPE_HOOK"] = (u32) CScriptProfilerType::Hook;
-    globals(luaState) ["PROFILER_TYPE_JIT"] = (u32) CScriptProfilerType::Jit;
+    globals(luaState) ["PROFILER_TYPE_SAMPLING"] = (u32) CScriptProfilerType::Sampling;
 
     module(luaState)
     [
@@ -173,31 +173,31 @@ SCRIPT_EXPORT(CScriptEngine, (),
     [
         def("is_active", +[]()
         {
-            GEnv.ScriptEngine->m_profiler.isActive();
+            GEnv.ScriptEngine->m_profiler->isActive();
         }),
     	def("start", +[]()
         {
-            GEnv.ScriptEngine->m_profiler.start();
+            GEnv.ScriptEngine->m_profiler->start();
         }),
         def("start", +[](CScriptProfilerType hook_type)
         {
-            GEnv.ScriptEngine->m_profiler.start(hook_type);
+            GEnv.ScriptEngine->m_profiler->start(hook_type);
         }),
         def("stop", +[]()
         {
-            GEnv.ScriptEngine->m_profiler.stop();
+            GEnv.ScriptEngine->m_profiler->stop();
         }),
         def("reset", +[]()
         {
-            GEnv.ScriptEngine->m_profiler.reset();
+            GEnv.ScriptEngine->m_profiler->reset();
         }),
         def("log_report", +[]()
         {
-            GEnv.ScriptEngine->m_profiler.logReport();
+            GEnv.ScriptEngine->m_profiler->logReport();
         }),
         def("save_report", +[]()
         {
-            GEnv.ScriptEngine->m_profiler.saveReport();
+            GEnv.ScriptEngine->m_profiler->saveReport();
         })
     ];
 });
