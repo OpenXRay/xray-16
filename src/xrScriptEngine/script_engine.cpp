@@ -764,7 +764,7 @@ CScriptEngine::CScriptEngine(bool is_editor, bool is_with_profiler)
     m_current_thread = nullptr;
     m_stack_is_ready = false;
     m_virtual_machine = nullptr;
-    m_profiler = is_with_profiler ? xr_new<CScriptProfiler>(this) : nullptr;
+    m_profiler = is_with_profiler && !is_editor ? xr_new<CScriptProfiler>(this) : nullptr;
     m_stack_level = 0;
     m_reload_modules = false;
     m_last_no_file_length = 0;

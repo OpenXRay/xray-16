@@ -57,7 +57,7 @@ void CScriptProfiler::start(CScriptProfilerType profiler_type)
 
     	Msg("[P] Starting scripts hook profiler");
 
-        m_profiling_portions.clear();
+        m_hook_profiling_portions.clear();
 		m_profiler_type = profiler_type;
 	    m_active = true;
 
@@ -124,8 +124,8 @@ void CScriptProfiler::reset()
 {
     Msg("[P] Reset profiler");
 
-    m_profiling_portions.clear();
-    m_profiling_log.clear();
+    m_hook_profiling_portions.clear();
+    m_sampling_profiling_log.clear();
 }
 
 void CScriptProfiler::logReport()
@@ -144,7 +144,7 @@ void CScriptProfiler::logReport()
 
 void CScriptProfiler::logHookReport()
 {
-    if (m_profiling_portions.empty())
+    if (m_hook_profiling_portions.empty())
     {
         Msg("[P] Nothing to report for hook profiler, data is missing");
         return;
@@ -153,10 +153,10 @@ void CScriptProfiler::logHookReport()
     u64 total_count = 0;
     u64 total_duration = 0;
 
-    xr_vector<decltype(m_profiling_portions)::iterator> entries;
-    entries.reserve(m_profiling_portions.size());
+    xr_vector<decltype(m_hook_profiling_portions)::iterator> entries;
+    entries.reserve(m_hook_profiling_portions.size());
 
-    for (auto it = m_profiling_portions.begin(); it != m_profiling_portions.end(); it++)
+    for (auto it = m_hook_profiling_portions.begin(); it != m_hook_profiling_portions.end(); it++)
     {
         entries.push_back(it);
 
@@ -227,7 +227,7 @@ void CScriptProfiler::logSamplingReport()
     // todo: Separete save method, implement printing function here.
     // todo: Separete save method, implement printing function here.
 
-    if (m_profiling_log.empty())
+    if (m_sampling_profiling_log.empty())
     {
         Msg("[P] Nothing to report for sampling profiler, data is missing");
         return;
@@ -243,7 +243,7 @@ void CScriptProfiler::logSamplingReport()
 
     if (F)
     {
-        for (auto &it : m_profiling_log)
+        for (auto &it : m_sampling_profiling_log)
         {
             F->w_string(*it);
         }
@@ -304,7 +304,7 @@ void CScriptProfiler::onReinit(lua_State* L)
 
     	Msg("[P] Reinit scripts hook profiler");
 
-        m_profiling_portions.clear();
+        m_hook_profiling_portions.clear();
 
     	return;
     case CScriptProfilerType::Sampling:
@@ -367,8 +367,8 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
     else
         xr_sprintf(buffer, "%s [%d] @ %s", name, line_defined, parent_name, short_src);
 
-    auto it = m_profiling_portions.find(buffer);
-    bool exists = it != m_profiling_portions.end();
+    auto it = m_hook_profiling_portions.find(buffer);
+    bool exists = it != m_hook_profiling_portions.end();
 
     switch (dbg->event)
     {
@@ -380,11 +380,11 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
         }
         else
         {
-            CScriptProfilerPortion portion;
+            CScriptProfilerHookPortion portion;
 
             portion.start();
 
-            m_profiling_portions.emplace(buffer, std::move(portion));
+            m_hook_profiling_portions.emplace(buffer, std::move(portion));
         }
 
         return;
@@ -476,7 +476,7 @@ void CScriptProfiler::luaJitSamplingProfilerAttach(CScriptProfiler* profiler)
             buffer[length + 2] = ' ';
             xr_itoa(samples, buffer + length + 3, 10);
 
-            profiler->m_profiling_log.push_back(shared_str(buffer));
+            profiler->m_sampling_profiling_log.push_back(shared_str(buffer));
         },
         profiler);
 }

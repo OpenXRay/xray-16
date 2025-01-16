@@ -6,7 +6,7 @@
 struct lua_State;
 struct lua_Debug;
 
-class CScriptProfilerPortion {
+class CScriptProfilerHookPortion {
     using Clock = std::chrono::high_resolution_clock;
     using Time = Clock::time_point;
     using Duration = Clock::duration;
@@ -19,7 +19,7 @@ class CScriptProfilerPortion {
         Duration m_duration;
 
     public:
-        CScriptProfilerPortion(): m_calls_count(0), m_calls_active(0), m_duration(0), m_started_at() {}
+        CScriptProfilerHookPortion(): m_calls_count(0), m_calls_active(0), m_duration(0), m_started_at() {}
 
     void start()
     {
@@ -92,8 +92,8 @@ private:
     // todo: Profiler-type specific naming for containers.
     // todo: Profiler-type specific naming for containers.
     // todo: Profiler-type specific naming for containers.
-    xr_unordered_map<shared_str, CScriptProfilerPortion> m_profiling_portions;
-    xr_vector<shared_str> m_profiling_log;
+    xr_unordered_map<shared_str, CScriptProfilerHookPortion> m_hook_profiling_portions;
+    xr_vector<shared_str> m_sampling_profiling_log;
 
 public:
     CScriptProfiler(CScriptEngine* engine);
