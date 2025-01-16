@@ -114,19 +114,26 @@ public:
     bool IsEnabled() const { return m_bIsEnabled; }
 
     [[nodiscard]]
-    bool IsFocusValuable(const CUIWindow* parent) const
+    bool IsFocusValuable(const CUIWindow* top_parent, const CUIWindow* locker) const
     {
-        bool ok;
+        bool valuable;
+        bool child_of_locker{};
         const CUIWindow* it = this;
+
         for (;; it = it->GetParent())
         {
-            ok = it->IsShown() && it->IsEnabled();
-            if (!ok || !it->GetParent())
+            valuable = it->IsShown() && it->IsEnabled();
+            if (it == locker)
+                child_of_locker = true;
+            if (!valuable || !it->GetParent())
                 break;
         }
-        if (parent && parent != it)
+
+        if (locker && !child_of_locker)
             return false;
-        return ok;
+        if (top_parent && top_parent != it)
+            return false;
+        return valuable;
     }
 
     //убрать/показать окно и его дочерние окна

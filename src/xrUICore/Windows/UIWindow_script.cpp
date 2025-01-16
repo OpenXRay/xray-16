@@ -97,6 +97,9 @@ SCRIPT_EXPORT(CUIFocusSystem, (),
             .def("IsValuable", &CUIFocusSystem::IsValuable)
             .def("IsNonValuable", &CUIFocusSystem::IsNonValuable)
             .def("Update", &CUIFocusSystem::Update)
+            .def("LockToWindow", &CUIFocusSystem::LockToWindow)
+            .def("Unlock", &CUIFocusSystem::Unlock)
+            .def("GetLocker", &CUIFocusSystem::GetLocker)
             .def("GetFocused", &CUIFocusSystem::GetFocused)
             .def("SetFocused", &CUIFocusSystem::SetFocused)
             .def("FindClosestFocusable", &CUIFocusSystem::FindClosestFocusable),

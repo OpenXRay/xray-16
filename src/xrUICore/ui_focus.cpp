@@ -165,7 +165,7 @@ void CUIFocusSystem::Update(const CUIWindow* root)
 
     for (auto it = m_valuable.begin(); it != m_valuable.end(); ++it)
     {
-        if ((*it)->IsFocusValuable(root))
+        if ((*it)->IsFocusValuable(root, m_focus_locker))
             continue;
         temp.push_back(*it);
         it = m_valuable.erase(it);
@@ -176,7 +176,7 @@ void CUIFocusSystem::Update(const CUIWindow* root)
 
     for (auto it = m_non_valuable.begin(); it != m_non_valuable.end(); ++it)
     {
-        if (!(*it)->IsFocusValuable(root))
+        if (!(*it)->IsFocusValuable(root, m_focus_locker))
             continue;
         m_valuable.emplace_back(*it);
         it = m_non_valuable.erase(it);

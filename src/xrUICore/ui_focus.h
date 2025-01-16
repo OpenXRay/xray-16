@@ -42,6 +42,7 @@ class XRUICORE_API CUIFocusSystem
     xr_list<const CUIWindow*> m_non_valuable;
 
     const CUIWindow* m_current_focused{};
+    const CUIWindow* m_focus_locker{};
 
 public:
     virtual ~CUIFocusSystem() = default;
@@ -54,6 +55,11 @@ public:
     bool IsNonValuable(const CUIWindow* focusable) const;
 
     void Update(const CUIWindow* root);
+
+    // Make locker's children the only valuable
+    void LockToWindow(const CUIWindow* locker) { m_focus_locker = locker; }
+    void Unlock() { LockToWindow(nullptr); }
+    auto GetLocker() const { return const_cast<CUIWindow*>(m_focus_locker); }
 
     auto GetFocused() const { return const_cast<CUIWindow*>(m_current_focused);}
     void SetFocused(const CUIWindow* window);
