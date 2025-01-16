@@ -390,14 +390,14 @@ void CUIMMShniaga::OnBtnClick()
 
 bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (IsBinded(kQUIT, dik))
-    {
-        if (m_page != epi_main)
-            ShowMain();
+    if (CUIWindow::OnKeyboardAction(dik, keyboard_action))
         return true;
-    }
 
-    const auto action = GetBindedAction(dik, EKeyContext::UI);
+    EGameActions action;
+    if (IsBinded(kQUIT, dik))
+        action = kUI_BACK;
+    else
+        action = GetBindedAction(dik, EKeyContext::UI);
 
     // Check here only for key press to fix too fast clicks
     if (WINDOW_KEY_PRESSED == keyboard_action)
@@ -410,9 +410,11 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
         case kUI_BACK:
             if (m_page != epi_main)
+            {
                 ShowMain();
-            return true;
-
+                return true;
+            }
+            break;
         case kUI_MOVE_UP:
         case kUI_MOVE_DOWN:
             // CInput sends both 'key hold' and 'key press' during one frame for keyboard (not gamepad)
@@ -447,7 +449,7 @@ bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         } // switch (GetBindedAction(dik))
     }
 
-    return CUIWindow::OnKeyboardAction(dik, keyboard_action);
+    return false;
 }
 
 bool CUIMMShniaga::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
