@@ -84,16 +84,16 @@ void CUIDebugger::on_tool_frame()
 
                 auto& colors = m_state.settings.colors;
 
-                imgui::ColorEdit4("Normal", colors.normal);
-                imgui::ItemHelp("Just a normal window");
-                imgui::ColorEdit4("Normal hovered", colors.normalHovered);
-                imgui::ItemHelp("Just a normal window hovered by in-game cursor");
                 imgui::ColorEdit4("Examined", colors.examined);
                 imgui::ItemHelp("A window that is hovered here, in the tree of the UI Debugger");
                 imgui::ColorEdit4("Focused", colors.focused);
                 imgui::ItemHelp("Window currectly selected in the focus system");
 
                 ImGui::BeginDisabled(m_state.settings.coloredRects);
+                imgui::ColorEdit4("Normal", colors.normal);
+                imgui::ItemHelp("Just a normal window");
+                imgui::ColorEdit4("Normal hovered", colors.normalHovered);
+                imgui::ItemHelp("Just a normal window hovered by in-game cursor");
                 imgui::ColorEdit4("Valuable focusable", colors.focusableValuable);
                 imgui::ItemHelp("Window that is currently valuable in the focus system");
                 imgui::ColorEdit4("Valuable focusable hovered", colors.focusableValuableHovered);
