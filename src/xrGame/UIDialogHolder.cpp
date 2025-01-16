@@ -511,19 +511,36 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
         return true;
 
     // simulate mouse click
-    if (TIR->NeedCursor())
+    if (GetUICursor().IsVisible())
     {
-        int action = -1;
-        if (IsBinded(kUI_CLICK_1, dik, EKeyContext::UI))
-            action = WINDOW_LBUTTON_DOWN;
-        else if (IsBinded(kUI_CLICK_2, dik, EKeyContext::UI))
-            action = WINDOW_RBUTTON_DOWN;
-        if (action != -1)
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE:
+        {
+            return true;
+        }
+        case kUI_MOVE_SECONDARY:
+        {
+            if (TIR->StopAnyMove())
+            {
+                // XXX: emulate mouse move
+                return true;
+            }
+            break;
+        }
+        case kUI_CLICK_1:
         {
             Fvector2 cp = GetUICursor().GetCursorPosition();
-            if (TIR->OnMouseAction(cp.x, cp.y, (EUIMessages)action))
-                return true;
+            TIR->OnMouseAction(cp.x, cp.y, WINDOW_LBUTTON_DOWN);
+            return true;
         }
+        case kUI_CLICK_2:
+        {
+            Fvector2 cp = GetUICursor().GetCursorPosition();
+            TIR->OnMouseAction(cp.x, cp.y, WINDOW_RBUTTON_DOWN);
+            return true;
+        }
+        } // switch (GetBindedAction(dik, EKeyContext::UI))
     }
 
     if (!TIR->StopAnyMove() && g_pGameLevel)
@@ -557,19 +574,33 @@ bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
         return true;
 
     // simulate mouse click
-    if (TIR->NeedCursor())
+    if (GetUICursor().IsVisible())
     {
-        int action = -1;
-        if (IsBinded(kUI_CLICK_1, dik, EKeyContext::UI))
-            action = WINDOW_LBUTTON_UP;
-        else if (IsBinded(kUI_CLICK_2, dik, EKeyContext::UI))
-            action = WINDOW_RBUTTON_UP;
-        if (action != -1)
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE:
+        {
+            return true;
+        }
+        case kUI_MOVE_SECONDARY:
+        {
+            if (TIR->StopAnyMove())
+                return true;
+            break;
+        }
+        case kUI_CLICK_1:
         {
             Fvector2 cp = GetUICursor().GetCursorPosition();
-            if (TIR->OnMouseAction(cp.x, cp.y, (EUIMessages)action))
-                return true;
+            TIR->OnMouseAction(cp.x, cp.y, WINDOW_LBUTTON_UP);
+            return true;
         }
+        case kUI_CLICK_2:
+        {
+            Fvector2 cp = GetUICursor().GetCursorPosition();
+            TIR->OnMouseAction(cp.x, cp.y, WINDOW_RBUTTON_UP);
+            return true;
+        }
+        } // switch (GetBindedAction(dik, EKeyContext::UI))
     }
 
     if (!TIR->StopAnyMove() && g_pGameLevel)
@@ -602,38 +633,40 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
         return true;
 
-    if (IsBinded(kUI_MOVE, dik, EKeyContext::UI))
+    if (GetUICursor().IsVisible())
     {
-        FocusDirection direction = FocusDirection::Same;
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE:
+        {
+            FocusDirection direction;
 
-        if (fis_zero(y))
-        {
-            if (x < 0)
-                direction = FocusDirection::Left;
+            if (fis_zero(y))
+            {
+                if (x < 0)
+                    direction = FocusDirection::Left;
+                else
+                    direction = FocusDirection::Right;
+            }
+            else if (y < 0)
+            {
+                if (fis_zero(x))
+                    direction = FocusDirection::Up;
+                else if (x < 0)
+                    direction = FocusDirection::UpperLeft;
+                else
+                    direction = FocusDirection::UpperRight;
+            }
             else
-                direction = FocusDirection::Right;
-        }
-        else if (y < 0)
-        {
-            if (fis_zero(x))
-                direction = FocusDirection::Up;
-            else if (x < 0)
-                direction = FocusDirection::UpperLeft;
-            else
-                direction = FocusDirection::UpperRight;
-        }
-        else
-        {
-            if (fis_zero(x)) // same x
-                direction = FocusDirection::Down;
-            else if (x < 0)
-                direction = FocusDirection::LowerLeft;
-            else
-                direction = FocusDirection::LowerRight;
-        }
+            {
+                if (fis_zero(x)) // same x
+                    direction = FocusDirection::Down;
+                else if (x < 0)
+                    direction = FocusDirection::LowerLeft;
+                else
+                    direction = FocusDirection::LowerRight;
+            }
 
-        if (direction != FocusDirection::Same)
-        {
             auto& focus = UI().Focus();
             const auto focused = focus.GetFocused();
             const Fvector2 vec = focused ? focused->GetAbsoluteCenterPos() : UI().GetUICursor().GetCursorPosition();
@@ -642,9 +675,31 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
             if (candidate || candidate2)
             {
                 focus.SetFocused(candidate ? candidate : candidate2);
+            }
+            return true;
+        }
+        case kUI_MOVE_SECONDARY:
+        {
+            if (TIR->StopAnyMove())
+            {
+                // XXX: emulate mouse move
                 return true;
             }
+            break;
         }
+        case kUI_CLICK_1:
+        {
+            Fvector2 cp = GetUICursor().GetCursorPosition();
+            TIR->OnMouseAction(cp.x, cp.y, WINDOW_LBUTTON_UP);
+            return true;
+        }
+        case kUI_CLICK_2:
+        {
+            Fvector2 cp = GetUICursor().GetCursorPosition();
+            TIR->OnMouseAction(cp.x, cp.y, WINDOW_RBUTTON_UP);
+            return true;
+        }
+        } // switch (GetBindedAction(dik, EKeyContext::UI))
     }
 
     if (!TIR->StopAnyMove() && g_pGameLevel)
