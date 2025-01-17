@@ -76,25 +76,26 @@ class XRSCRIPTENGINE_API CScriptProfiler
     using Duration = Clock::duration;
 
 private:
+    // List of commnad line args for startup profuler attach:
     constexpr static cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
     constexpr static cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
     constexpr static cpcstr ARGUMENT_PROFILER_SAMPLING = "-lua_sampling_profiler";
 
     static const u32 PROFILE_ENTRIES_LOG_LIMIT = 128;
-    static const u32 PROFILE_HOOK_LEVEL_DEFAULT = 1;
+    static const u32 PROFILE_HOOK_DEPTH_DEFAULT = 1;
+    static const u32 PROFILE_HOOK_DEPTH_MAX = 1;
     static const u32 PROFILE_SAMPLING_INTERVAL_DEFAULT = 10;
     static const u32 PROFILE_SAMPLING_INTERVAL_MAX = 1000;
 
     CScriptEngine* m_engine;
-
-    bool m_active;
     CScriptProfilerType m_profiler_type;
+    bool m_active;
 
     /*
-     * Profiling level - number of stacks to check before each function call.
+     * Profiling depth - number of stacks to summarise function call trace.
      * Helps validating results of same functions called from different places vs totals by specific function.
      */
-	u32 m_hook_profile_level;
+	u32 m_hook_profile_depth;
     /*
      * Sampling interval for JIT based profiler.
      * Value should be set in ms and defaults to 10ms.
@@ -110,6 +111,8 @@ public:
     bool isActive() const { return m_active; };
 
 	void start(CScriptProfilerType profiler_type = CScriptProfilerType::Hook);
+    void startSamplingMode(u32 sampling_interval);
+    void startHookMode(u32 stack_depth);
     void stop();
     void reset();
 

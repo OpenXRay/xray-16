@@ -7,11 +7,10 @@ CScriptProfiler::CScriptProfiler(CScriptEngine* engine)
     R_ASSERT(engine != NULL);
 
     m_engine = engine;
-
     m_active = false;
     m_profiler_type = CScriptProfilerType::None;
 	m_sampling_profile_interval = PROFILE_SAMPLING_INTERVAL_DEFAULT;
-    m_hook_profile_level = PROFILE_HOOK_LEVEL_DEFAULT;
+    m_hook_profile_depth = PROFILE_HOOK_DEPTH_DEFAULT;
 
     if (strstr(Core.Params, ARGUMENT_PROFILER_DEFAULT))
         start();
@@ -28,63 +27,88 @@ CScriptProfiler::~CScriptProfiler()
 
 void CScriptProfiler::start(CScriptProfilerType profiler_type)
 {
+    switch (profiler_type)
+    {
+	case CScriptProfilerType::Hook:
+		startHookMode(PROFILE_HOOK_DEPTH_DEFAULT);
+    	return;
+    case CScriptProfilerType::Sampling:
+		startSamplingMode(PROFILE_SAMPLING_INTERVAL_DEFAULT);
+	    return;
+    case CScriptProfilerType::None:
+		Msg("[P] Tried to start none type profiler");
+	    return;
+    default: NODEFAULT;
+    }
+}
+
+void CScriptProfiler::startHookMode(u32 stack_depth)
+{
     if (m_active)
     {
         Msg("[P] Tried to start already active profiler, operation ignored");
         return;
     }
 
-    if (profiler_type == CScriptProfilerType::None)
+    if (!lua())
     {
-        Msg("[P] Tried to start none type profiler");
+    	Msg("[P] Activating hook profiler on lua engine start, waiting init");
+
+		m_profiler_type = CScriptProfilerType::Hook;
+		m_active = true;
+
+        return;
+    }
+
+    clamp(stack_depth, 0u, PROFILE_SAMPLING_INTERVAL_MAX);
+
+    if (!attachLuaHook())
+    {
+        Msg("[P] Cannot start scripts hook profiler, hook was not set properly");
+		return;
+    }
+
+    Msg("[P] Starting scripts hook profiler, depth: %d", stack_depth);
+
+    m_hook_profile_depth = stack_depth;
+    m_hook_profiling_portions.clear();
+	m_profiler_type = CScriptProfilerType::Hook;
+	m_active = true;
+}
+
+void CScriptProfiler::startSamplingMode(u32 sampling_interval)
+{
+    if (m_active)
+    {
+        Msg("[P] Tried to start already active profiler, operation ignored");
         return;
     }
 
     if (!lua())
     {
-    	Msg("[P] Activating profiler on lua engine start, waiting init");
+    	Msg("[P] Activating sampling profiler on lua engine start, waiting init");
 
-		m_profiler_type = profiler_type;
+		m_profiler_type = CScriptProfilerType::Sampling;
 		m_active = true;
 
         return;
     }
 
-    switch (profiler_type)
+    if (!luaIsJitProfilerDefined(lua()))
     {
-	case CScriptProfilerType::Hook:
-   		if (!attachLuaHook())
-        {
-        	Msg("[P] Cannot start scripts hook profiler, hook was not set properly");
-			return;
-        }
-
-    	Msg("[P] Starting scripts hook profiler");
-
-        m_hook_profiling_portions.clear();
-		m_profiler_type = profiler_type;
-	    m_active = true;
-
-    	return;
-    case CScriptProfilerType::Sampling:
-    {
-        if (!luaIsJitProfilerDefined(lua()))
-        {
-        	Msg("[P] Cannot start scripts sampling profiler, jit.profiler module is not defined");
-			return;
-        }
-
-    	Msg("[P] Starting scripts sampling profiler, interval: %d", m_sampling_profile_interval);
-        luaJitSamplingProfilerAttach(this, m_sampling_profile_interval);
-
-        m_profiler_type = profiler_type;
-		m_active = true;
-
-	    return;
+        Msg("[P] Cannot start scripts sampling profiler, jit.profiler module is not defined");
+		return;
     }
 
-    default:  NODEFAULT;
-    }
+    clamp(sampling_interval, 1u, PROFILE_SAMPLING_INTERVAL_MAX);
+
+    Msg("[P] Starting scripts sampling profiler, interval: %d", sampling_interval);
+
+    luaJitSamplingProfilerAttach(this, sampling_interval);
+
+    m_sampling_profile_interval = sampling_interval;
+	m_profiler_type = CScriptProfilerType::Sampling;
+	m_active = true;
 }
 
 void CScriptProfiler::stop()
@@ -380,8 +404,11 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
     lua_Debug parent_stack_info;
     lua_Debug stack_info;
 
+    // todo: Implement dynamic depth.
+    // todo: Implement dynamic depth.
+
     // Check higher level of stack.
-    if (m_hook_profile_level > 0)
+    if (m_hook_profile_depth > 0)
     {
         if (!lua_getstack(L, 1, &parent_stack_info))
         {
@@ -401,7 +428,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
     string512 buffer;
 
     auto name = stack_info.name ? stack_info.name : "?";
-    auto parent_name = m_hook_profile_level > 0 && parent_stack_info.name ? parent_stack_info.name : "?";
+    auto parent_name = m_hook_profile_depth > 0 && parent_stack_info.name ? parent_stack_info.name : "?";
     auto short_src = stack_info.short_src;
     auto line_defined = stack_info.linedefined;
 
@@ -409,7 +436,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
         name = "lua-script-body";
 
     // Include date from higher stack levels.
-    if (m_hook_profile_level > 0)
+    if (m_hook_profile_depth > 0)
         xr_sprintf(buffer, "%s [%d] - %s @ %s", name, line_defined, parent_name, short_src);
     else
         xr_sprintf(buffer, "%s [%d] @ %s", name, line_defined, parent_name, short_src);
@@ -511,7 +538,7 @@ void CScriptProfiler::luaJitSamplingProfilerAttach(CScriptProfiler* profiler, u3
     xr_itoa(interval, buffer + 3, 10);
 
     luaJitProfilerStart(
-        profiler->lua(), "fli",
+        profiler->lua(), buffer,
         [](void* data, lua_State* L, int samples, int vmstate) {
             CScriptProfiler* profiler = static_cast<CScriptProfiler*>(data);
             string2048 buffer;

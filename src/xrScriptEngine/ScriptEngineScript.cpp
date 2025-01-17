@@ -183,6 +183,14 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->start(hook_type);
         }),
+        def("start_sampling_mode", +[](u32 sampling_interval)
+        {
+            GEnv.ScriptEngine->m_profiler->startSamplingMode(sampling_interval);
+        }),
+        def("start_hook_mode", +[](u32 stack_depth)
+        {
+            GEnv.ScriptEngine->m_profiler->startHookMode(stack_depth);
+        }),
         def("stop", +[]()
         {
             GEnv.ScriptEngine->m_profiler->stop();
