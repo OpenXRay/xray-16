@@ -1,66 +1,11 @@
 #pragma once
 
 #include "pch.hpp"
+#include "script_profiler_portions.hpp"
 #include "xrCommon/xr_unordered_map.h"
 
 struct lua_State;
 struct lua_Debug;
-
-class CScriptProfilerHookPortion {
-    using Clock = std::chrono::high_resolution_clock;
-    using Time = Clock::time_point;
-    using Duration = Clock::duration;
-
-    private:
-        u64 m_calls_count;
-        u32 m_calls_active;
-
-        Time m_started_at;
-        Duration m_duration;
-
-    public:
-        CScriptProfilerHookPortion(): m_calls_count(0), m_calls_active(0), m_duration(0), m_started_at() {}
-
-    void start()
-    {
-        m_calls_count += 1;
-
-        if (m_calls_active)
-        {
-            m_calls_active += 1;
-            return;
-        }
-        else
-        {
-            m_started_at = Clock::now();
-            m_calls_active += 1;
-        }
-    }
-
-    void stop()
-    {
-        if (!m_calls_active)
-            return;
-
-        m_calls_active -= 1;
-
-        if (m_calls_active)
-            return;
-
-        const auto now = Clock::now();
-
-        if (now > m_started_at)
-            m_duration += now - m_started_at;
-    }
-
-    u64 count() const { return m_calls_count; }
-
-    u64 duration() const
-    {
-        using namespace std::chrono;
-        return u64(duration_cast<microseconds>(m_duration).count());
-    }
-};
 
 enum class CScriptProfilerType : u32
 {
@@ -71,12 +16,8 @@ enum class CScriptProfilerType : u32
 
 class XRSCRIPTENGINE_API CScriptProfiler
 {
-    using Clock = std::chrono::high_resolution_clock;
-    using Time = Clock::time_point;
-    using Duration = Clock::duration;
-
+// todo: Can we make some global module to store all the arguments as experessions?
 private:
-    // todo: Can we make some global module to store all the arguments as experessions?
     // List of commnad line args for startup profuler attach:
     constexpr static cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
     constexpr static cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
@@ -103,7 +44,7 @@ private:
      */
 	u32 m_sampling_profile_interval;
     xr_unordered_map<shared_str, CScriptProfilerHookPortion> m_hook_profiling_portions;
-    xr_vector<shared_str> m_sampling_profiling_log;
+    xr_vector<CScriptProfilerSamplingPortion> m_sampling_profiling_log;
 
 public:
     CScriptProfiler(CScriptEngine* engine);
@@ -137,5 +78,6 @@ private:
     static void luaJitSamplingProfilerAttach(CScriptProfiler* profiler, u32 interval);
     static void luaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_profile_callback callback, void* data);
     static void luaJitProfilerStop(lua_State* L);
+    static shared_str luaJitProfilerDumpToString(lua_State* L, cpcstr format, int depth);
     static std::pair<cpcstr, size_t> luaJitProfilerDump(lua_State* L, cpcstr format, int depth);
 };

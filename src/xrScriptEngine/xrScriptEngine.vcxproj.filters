@@ -48,6 +48,9 @@
     <ClInclude Include="script_profiler.hpp">
       <Filter>Debug</Filter>
     </ClInclude>
+    <ClInclude Include="script_profiler_portions.hpp">
+      <Filter>Debug</Filter>
+    </ClInclude>
     <ClInclude Include="script_debugger_threads.hpp">
       <Filter>Debug</Filter>
     </ClInclude>

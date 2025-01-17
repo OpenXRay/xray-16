@@ -16,6 +16,7 @@ target_sources_grouped(
     script_lua_helper.hpp
     script_profiler.cpp
     script_profiler.hpp
+    script_profiler_portions.hpp
 )
 
 target_sources_grouped(

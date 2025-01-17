@@ -267,7 +267,7 @@ void CScriptProfiler::logSamplingReport()
     {
         for (auto &it : m_sampling_profiling_log)
         {
-            F->w_string(*it);
+            F->w_string(*it.getFoldedStack());
         }
 
         FS.w_close(F);
@@ -323,7 +323,7 @@ void CScriptProfiler::saveSamplingReport()
     {
         for (auto &it : m_sampling_profiling_log)
         {
-            F->w_string(*it);
+            F->w_string(*it.getFoldedStack());
         }
 
         FS.w_close(F);
@@ -516,19 +516,14 @@ void CScriptProfiler::luaJitSamplingProfilerAttach(CScriptProfiler* profiler, u3
         profiler->lua(), buffer,
         [](void* data, lua_State* L, int samples, int vmstate) {
             CScriptProfiler* profiler = static_cast<CScriptProfiler*>(data);
-            string2048 buffer;
 
-            // Build flamechart folded stack including frames and samples count
-            // Example: `C;frame_1_func:24;frame_2_func:45 4`
-            auto [dump, length] = luaJitProfilerDump(L, "flZ;", -64);
-
-            buffer[0] = vmstate;
-            buffer[1] = ';';
-            strncpy_s(buffer + 2, sizeof(buffer) - 2, dump, length);
-            buffer[length + 2] = ' ';
-            xr_itoa(samples, buffer + length + 3, 10);
-
-            profiler->m_sampling_profiling_log.push_back(shared_str(buffer));
+            profiler->m_sampling_profiling_log.push_back(std::move(CScriptProfilerSamplingPortion(
+                luaJitProfilerDumpToString(L, "fl", 1),
+                luaJitProfilerDumpToString(L, "flZ;", -64),
+                samples,
+                vmstate,
+                luaMemoryUsed(L)
+            )));
         },
         profiler);
 }
@@ -555,6 +550,29 @@ void CScriptProfiler::luaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_prof
 void CScriptProfiler::luaJitProfilerStop(lua_State* L)
 {
     luaJIT_profile_stop(L);
+}
+
+/*
+ * Possible format values for dump:
+ * f — dump function name
+ * F — dump function name, module:name for F variant
+ * p — preserve full path
+ * l — dump module:line
+ * Z — zap trailing separator
+ * i<number> — Sampling interval in milliseconds (default 10ms)
+ */
+shared_str CScriptProfiler::luaJitProfilerDumpToString(lua_State* L, cpcstr format, int depth)
+{
+	string2048 buffer;
+ 	size_t length;
+    cpcstr dump = luaJIT_profile_dumpstack(L, format, depth, &length);
+
+    R_ASSERT2(length < 2048, "Profiling dump buffer overflow");
+
+    strncpy_s(buffer, sizeof(buffer), dump, length);
+    buffer[length] = 0;
+
+    return shared_str(buffer);
 }
 
 /*
