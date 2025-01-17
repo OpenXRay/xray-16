@@ -7,7 +7,6 @@ CUIMessageBoxEx::CUIMessageBoxEx() : CUIDialogWnd(CUIMessageBoxEx::GetDebugType(
 {
     m_pMessageBox = xr_new<CUIMessageBox>();
     m_pMessageBox->SetWindowName("msg_box");
-    m_pMessageBox->AllowInputHandling(true);
     //	m_pMessageBox->SetAutoDelete(true);
     AttachChild(m_pMessageBox);
 }
