@@ -50,6 +50,23 @@ void CUIMessageBoxEx::OnNOClicked(CUIWindow* w, void* d)
     }
 }
 
+bool CUIMessageBoxEx::NeedCursor() const
+{
+    if (pInput->IsCurrentInputTypeKeyboardMouse())
+        return true;
+
+    switch (m_pMessageBox->GetBoxStyle())
+    {
+    case CUIMessageBox::MESSAGEBOX_DIRECT_IP:
+    case CUIMessageBox::MESSAGEBOX_PASSWORD:
+    case CUIMessageBox::MESSAGEBOX_RA_LOGIN:
+    case CUIMessageBox::MESSAGEBOX_YES_NO_COPY:
+        return true;
+    }
+
+    return false;
+}
+
 void CUIMessageBoxEx::SetText(LPCSTR text) { m_pMessageBox->SetText(text); }
 LPCSTR CUIMessageBoxEx::GetText() { return m_pMessageBox->GetText(); }
 void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NULL */)
