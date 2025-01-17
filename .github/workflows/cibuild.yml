@@ -126,7 +126,7 @@ jobs:
               libvorbis-dev:${{ matrix.platform.arch }}
 
     - name: Install Clang Ubuntu packages
-      if: ${{ matrix.platform.name == 'Ubuntu' && matrix.cxx == 'clang++' }}
+      if: ${{ matrix.platform.name == 'Ubuntu' && matrix.platform.cxx == 'clang++' }}
       run: sudo apt-get install -qq -y libstdc++-dev
 
     - name: Install macOS packages
