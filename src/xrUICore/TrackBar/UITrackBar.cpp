@@ -31,6 +31,11 @@ CUITrackBar::CUITrackBar()
 
     m_b_mouse_capturer = false;
 
+    // We already have input logic for the track bar
+    // Separately existing slider will slightly pollute
+    // the focus search
+    UI().Focus().UnregisterFocusable(m_pSlider);
+
     UI().Focus().RegisterFocusable(this);
 }
 
