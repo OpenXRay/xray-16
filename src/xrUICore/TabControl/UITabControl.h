@@ -22,6 +22,7 @@ public:
     virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void OnTabChange(const shared_str& sCur, const shared_str& sPrev);
     virtual void OnStaticFocusReceive(CUIWindow* pWnd);
     virtual void OnStaticFocusLost(CUIWindow* pWnd);

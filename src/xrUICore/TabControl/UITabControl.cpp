@@ -227,15 +227,8 @@ bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         {
             switch (GetBindedAction(dik, EKeyContext::UI))
             {
-            case kUI_TAB_PREV:
-                if (WINDOW_KEY_PRESSED == keyboard_action)
-                    SetNextActiveTab(false, true);
-                return true;
-
-            case kUI_TAB_NEXT:
-                if (WINDOW_KEY_PRESSED == keyboard_action)
-                    SetNextActiveTab(true, true);
-                return true;
+            case kUI_TAB_PREV: return SetNextActiveTab(false, true);
+            case kUI_TAB_NEXT: return SetNextActiveTab(true,  true);
             }
         }
         if (GetButtonsAcceleratorsMode())
@@ -243,6 +236,25 @@ bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             for (const auto& button : m_TabsArr)
             {
                 if (button->IsAccelerator(dik))
+                {
+                    SetActiveTab(button->m_btn_id);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CUITabControl::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (WINDOW_KEY_PRESSED == controller_action)
+    {
+        if (GetButtonsAcceleratorsMode())
+        {
+            for (const auto& button : m_TabsArr)
+            {
+                if (button->IsAccelerator(axis))
                 {
                     SetActiveTab(button->m_btn_id);
                     return true;
