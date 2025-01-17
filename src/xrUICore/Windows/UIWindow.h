@@ -67,10 +67,17 @@ public:
     [[nodiscard]]
     CUIWindow* GetTop()
     {
-        if (m_pParentWnd == NULL)
+        if (m_pParentWnd == nullptr)
             return this;
-        else
-            return m_pParentWnd->GetTop();
+        return m_pParentWnd->GetTop();
+    }
+    //получить окно самого верхнего уровня
+    [[nodiscard]]
+    const CUIWindow* GetTop() const
+    {
+        if (m_pParentWnd == nullptr)
+            return this;
+        return m_pParentWnd->GetTop();
     }
     CUIWindow* GetCurrentMouseHandler();
     CUIWindow* GetChildMouseHandler();
