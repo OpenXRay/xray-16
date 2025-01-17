@@ -24,6 +24,7 @@ jobs:
           ssh_private_key: ${{ secrets.GITFLIC_PRIVATE_SSH_KEY }}
 
       - name: abf.io
+        continue-on-error: true
         uses: pixta-dev/repository-mirroring-action@v1.1.1
         with:
           target_repo_url: git@abf.io:openxray/xray-16.git
