@@ -125,6 +125,10 @@ jobs:
               libtheora-dev:${{ matrix.platform.arch }} \
               libvorbis-dev:${{ matrix.platform.arch }}
 
+    - name: Install Clang Ubuntu packages
+      if: ${{ matrix.platform.name == 'Ubuntu' && matrix.cxx == "clang++" }}
+      run: sudo apt-get install -qq -y libstdc++-dev
+
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
