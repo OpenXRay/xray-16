@@ -388,6 +388,10 @@ bool CUIActorMenu::OnMouseAction(float x, float y, EUIMessages mouse_action)
 bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     InfoCurItem(NULL);
+
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
     if (IsBinded(kDROP, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem() &&
@@ -425,7 +429,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
 
-    if (IsBinded(kQUIT, dik))
+    if (IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
@@ -434,9 +438,6 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         }
         return true;
     }
-
-    if (inherited::OnKeyboardAction(dik, keyboard_action))
-        return true;
 
     return false;
 }

@@ -179,6 +179,17 @@ bool CUICellItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
             GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DB_CLICK, NULL);
             return true;
         }
+        if (CursorOverWindow())
+        {
+            const auto [x, y] = UI().GetUICursor().GetCursorPosition();
+            switch (GetBindedAction(dik, EKeyContext::UI))
+            {
+            case kUI_ACCEPT:
+                return OnMouseAction(x, y, WINDOW_LBUTTON_DB_CLICK);
+            case kUI_ACTION_1:
+                return OnMouseAction(x, y, WINDOW_RBUTTON_DOWN);
+            } // switch (GetBindedAction(dik, EKeyContext::UI))
+        }
     }
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }

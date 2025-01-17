@@ -175,6 +175,25 @@ void CUIActorMenu::Show(bool status)
     m_message_static = nullptr;
 }
 
+void CUIActorMenu::ShowDialog(bool bDoHideIndicators)
+{
+    CUIDialogWnd::ShowDialog(bDoHideIndicators);
+
+    CUIDragDropListEx* bag{};
+    switch (m_currMenuMode)
+    {
+    case mmInventory:      bag = m_pLists[eInventoryBagList]; break;
+    case mmTrade:          bag = m_pLists[eTradeActorBagList]; break;
+    case mmUpgrade:        bag = m_pLists[eInventoryBagList]; break;
+    case mmDeadBodySearch: bag = m_pLists[eSearchLootActorBagList]; break;
+    }
+
+    if (bag && bag->ItemsCount() && pInput->IsCurrentInputTypeController())
+    {
+        UI().Focus().SetFocused(bag->GetItemIdx(0));
+    }
+}
+
 void CUIActorMenu::Draw()
 {
     CurrentGameUI()->UIMainIngameWnd->DrawZoneMap();
@@ -260,6 +279,23 @@ bool CUIActorMenu::StopAnyMove() // true = актёр не идёт при от�
     case mmDeadBodySearch: return true;
     }
     return true;
+}
+
+bool CUIActorMenu::NeedCenterCursor() const
+{
+    CUIDragDropListEx* bag{};
+    switch (m_currMenuMode)
+    {
+    case mmInventory:      bag = m_pLists[eInventoryBagList]; break;
+    case mmTrade:          bag = m_pLists[eTradeActorBagList]; break;
+    case mmUpgrade:        bag = m_pLists[eInventoryBagList]; break;
+    case mmDeadBodySearch: bag = m_pLists[eSearchLootActorBagList]; break;
+    }
+
+    if (bag)
+        return bag->ItemsCount() == 0;
+
+    return CUIDialogWnd::NeedCenterCursor();
 }
 
 void CUIActorMenu::CheckDistance()
