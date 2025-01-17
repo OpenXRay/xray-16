@@ -47,22 +47,6 @@ public:
         return nullptr;
     }
 
-    template <typename F>
-    void ProcessFunctor(const F& functor) const
-    {
-        static_assert(std::is_invocable_r_v<bool, F, CUIWindow*>);
-
-        for (auto it = m_ChildWndList.rbegin(); it != m_ChildWndList.rend(); ++it)
-        {
-            if (!(*it)->IsEnabled())
-                continue;
-
-            if (functor(*it))
-                break;
-            (*it)->ProcessFunctor(functor);
-        }
-    }
-
     //получить окно самого верхнего уровня
     [[nodiscard]]
     CUIWindow* GetTop()

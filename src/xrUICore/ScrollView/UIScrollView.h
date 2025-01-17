@@ -49,8 +49,6 @@ public:
     void InitScrollView(); // need parent to be initialized
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
-    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
-    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void Draw();
     virtual void Update();
     void AddWindow(CUIWindow* pWnd, bool auto_delete);
@@ -71,7 +69,6 @@ public:
     float GetDesiredChildWidth() const;
     virtual void SetSelected(CUIWindow*);
     bool SelectFirst();
-    bool SelectNext(bool next, bool loop);
     CUIWindow* GetSelected();
     Fvector2 GetPadSize();
     void ForceUpdate();
