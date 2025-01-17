@@ -17,6 +17,7 @@ class CUIEditKeyBind final : public CUIStatic, public CUIOptionsItem
 
 public:
     CUIEditKeyBind(bool primary, bool isGamepadBinds = false);
+    ~CUIEditKeyBind();
 
     // options item
     virtual void AssignProps(const shared_str& entry, const shared_str& group);

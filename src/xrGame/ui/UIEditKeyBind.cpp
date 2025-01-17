@@ -16,6 +16,12 @@ CUIEditKeyBind::CUIEditKeyBind(bool primary, bool isGamepadBinds /*= false*/)
     m_keyboard = NULL;
     m_opt_backup_value = NULL;
     m_action = NULL;
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUIEditKeyBind::~CUIEditKeyBind()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 u32 CutStringByLength(CGameFont* font, LPCSTR src, pstr dst, u32 dst_size, float length)
