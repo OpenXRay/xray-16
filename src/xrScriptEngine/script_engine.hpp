@@ -71,7 +71,8 @@ extern Flags32 XRSCRIPTENGINE_API g_LuaDebug;
 class XRSCRIPTENGINE_API CScriptEngine
 {
 public:
-    typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
+    constexpr static cpcstr ARGUMENT_ENGINE_NOJIT = "-nojit";
+	typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
     static const char* const GlobalNamespace;
 
 private:

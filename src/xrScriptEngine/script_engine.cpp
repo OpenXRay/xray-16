@@ -1046,7 +1046,9 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     // if (jit == nil) then
     //     profiler.setup_hook()
     // end
-    if (!strstr(Core.Params, "-nojit"))
+    //
+    // Update: '-nojit' option adds garbage to stack and luabind calls fail
+    if (!strstr(Core.Params, ARGUMENT_ENGINE_NOJIT))
     {
         luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
         // Xottab_DUTY: commented this. Let's use default opt level, which is 3

@@ -76,6 +76,7 @@ class XRSCRIPTENGINE_API CScriptProfiler
     using Duration = Clock::duration;
 
 private:
+    // todo: Can we make some global module to store all the arguments as experessions?
     // List of commnad line args for startup profuler attach:
     constexpr static cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
     constexpr static cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";

@@ -96,7 +96,7 @@ void CScriptProfiler::startSamplingMode(u32 sampling_interval)
 
     if (!luaIsJitProfilerDefined(lua()))
     {
-        Msg("[P] Cannot start scripts sampling profiler, jit.profiler module is not defined");
+        Msg("[P] Cannot start scripts sampling profiler, jit module is not defined");
 		return;
     }
 
@@ -499,33 +499,14 @@ int CScriptProfiler::luaMemoryUsed(lua_State* L)
 }
 
 /*
- * @returns whether jit.profile module is defined in lua state
+ * @returns whether jit is enabled
  */
 bool CScriptProfiler::luaIsJitProfilerDefined(lua_State* L)
 {
-    if (L == nullptr)
-    {
-        return false;
-    }
-
-    auto top = lua_gettop(L);
-
-    lua_getglobal(L, "require");
-    lua_pushstring(L, "jit.profile");
-
-    if (lua_pcall(L, 1, 0, 0) == LUA_OK)
-    {
-		R_ASSERT2(top == lua_gettop(L), "Lua VM stack should not be affected by jit.profile check");
-     	return true;
-    }
-    else
-    {
-        // Remove error message to keep stack in previous state.
-    	lua_pop(L, 1);
-
-        R_ASSERT2(top == lua_gettop(L), "Lua VM stack should not be affected by jit.profile check");
-    	return true;
-    }
+    // Safest and least invasive way to check it.
+    // Other methods affect lua stack and may add interfere with VS extensions / other hooks / error callbacks.
+    // We assume that we do not load JIT libs only if nojit parameter is provided.
+    return !strstr(Core.Params, CScriptEngine::ARGUMENT_ENGINE_NOJIT);
 }
 
 /**
