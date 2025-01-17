@@ -76,22 +76,30 @@ class XRSCRIPTENGINE_API CScriptProfiler
     using Duration = Clock::duration;
 
 private:
+    constexpr static cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
+    constexpr static cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
+    constexpr static cpcstr ARGUMENT_PROFILER_SAMPLING = "-lua_sampling_profiler";
+
     static const u32 PROFILE_ENTRIES_LOG_LIMIT = 128;
+    static const u32 PROFILE_HOOK_LEVEL_DEFAULT = 1;
+    static const u32 PROFILE_SAMPLING_INTERVAL_DEFAULT = 10;
+    static const u32 PROFILE_SAMPLING_INTERVAL_MAX = 1000;
 
     CScriptEngine* m_engine;
 
     bool m_active;
-
-    // todo: Add period parameter for sampling profiler.
-
-    // Profiling level - number of stacks to check before each function call.
-    // Helps validating results of same functions called from different places vs totals by specific function.
- 	// todo: Handle level / provide level properly.
-	u8 m_hook_profile_level;
     CScriptProfilerType m_profiler_type;
-    // todo: Profiler-type specific naming for containers.
-    // todo: Profiler-type specific naming for containers.
-    // todo: Profiler-type specific naming for containers.
+
+    /*
+     * Profiling level - number of stacks to check before each function call.
+     * Helps validating results of same functions called from different places vs totals by specific function.
+     */
+	u32 m_hook_profile_level;
+    /*
+     * Sampling interval for JIT based profiler.
+     * Value should be set in ms and defaults to 10ms.
+     */
+	u32 m_sampling_profile_interval;
     xr_unordered_map<shared_str, CScriptProfilerHookPortion> m_hook_profiling_portions;
     xr_vector<shared_str> m_sampling_profiling_log;
 
@@ -109,20 +117,20 @@ public:
     void logHookReport();
     void logSamplingReport();
     void saveReport();
-    // todo: Save sampling report.
-    // todo: Save hook.
+    void saveHookReport();
+    void saveSamplingReport();
 
-    bool attachLuaHook();
    	void onReinit(lua_State* L);
 	void onDispose(lua_State* L);
     void onLuaHookCall(lua_State* L, lua_Debug* dbg);
 
 private:
     lua_State* lua() const;
+    bool attachLuaHook();
 
-    static int luaMemoryUsed(lua_State* L);
+   	static int luaMemoryUsed(lua_State* L);
     static bool luaIsJitProfilerDefined(lua_State* L);
-    static void luaJitSamplingProfilerAttach(CScriptProfiler* profiler);
+    static void luaJitSamplingProfilerAttach(CScriptProfiler* profiler, u32 interval);
     static void luaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_profile_callback callback, void* data);
     static void luaJitProfilerStop(lua_State* L);
     static std::pair<cpcstr, size_t> luaJitProfilerDump(lua_State* L, cpcstr format, int depth);

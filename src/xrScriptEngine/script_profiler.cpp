@@ -9,18 +9,22 @@ CScriptProfiler::CScriptProfiler(CScriptEngine* engine)
     m_engine = engine;
 
     m_active = false;
-    m_hook_profile_level = 1;
     m_profiler_type = CScriptProfilerType::None;
+	m_sampling_profile_interval = PROFILE_SAMPLING_INTERVAL_DEFAULT;
+    m_hook_profile_level = PROFILE_HOOK_LEVEL_DEFAULT;
 
-    if (strstr(Core.Params, "-lua_profiler"))
+    if (strstr(Core.Params, ARGUMENT_PROFILER_DEFAULT))
         start();
-	else if (strstr(Core.Params, "-lua_hook_profiler"))
+	else if (strstr(Core.Params, ARGUMENT_PROFILER_HOOK))
     	start(CScriptProfilerType::Hook);
-    else if (strstr(Core.Params, "-lua_sampling_profiler"))
+    else if (strstr(Core.Params, ARGUMENT_PROFILER_SAMPLING))
         start(CScriptProfilerType::Sampling);
 }
 
-CScriptProfiler::~CScriptProfiler() {}
+CScriptProfiler::~CScriptProfiler()
+{
+    m_engine = nullptr;
+}
 
 void CScriptProfiler::start(CScriptProfilerType profiler_type)
 {
@@ -70,8 +74,8 @@ void CScriptProfiler::start(CScriptProfilerType profiler_type)
 			return;
         }
 
-    	Msg("[P] Starting scripts sampling profiler");
-        luaJitSamplingProfilerAttach(this);
+    	Msg("[P] Starting scripts sampling profiler, interval: %d", m_sampling_profile_interval);
+        luaJitSamplingProfilerAttach(this, m_sampling_profile_interval);
 
         m_profiler_type = profiler_type;
 		m_active = true;
@@ -254,11 +258,58 @@ void CScriptProfiler::logSamplingReport()
 
 void CScriptProfiler::saveReport()
 {
-    Log("[P] Saving profiler report");
+	switch (m_profiler_type)
+    {
+        case CScriptProfilerType::Hook:
+            return saveHookReport();
+        case CScriptProfilerType::Sampling:
+            return saveSamplingReport();
+        default:
+            Msg("[P] No active profiling data to save report");
+            return;
+    }
+}
+
+void CScriptProfiler::saveHookReport()
+{
+    if (m_hook_profiling_portions.empty())
+	{
+        Msg("[P] Nothing to report for hook profiler, data is missing");
+        return;
+    }
+
+    Log("[P] Saving hook profiler report");
 
     // todo;
     // todo;
     // todo;
+}
+
+void CScriptProfiler::saveSamplingReport()
+{
+	if (m_sampling_profiling_log.empty())
+	{
+        Msg("[P] Nothing to report for sampling profiler, data is missing");
+        return;
+    }
+
+    string_path log_file_name;
+    strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, "_sampling_profile.perf");
+    FS.update_path(log_file_name, "$logs$", log_file_name);
+
+    Msg("[P] Saving sampling report to %s", log_file_name);
+
+    IWriter* F = FS.w_open(log_file_name);
+
+    if (F)
+    {
+        for (auto &it : m_sampling_profiling_log)
+        {
+            F->w_string(*it);
+        }
+
+        FS.w_close(F);
+    }
 }
 
 /*
@@ -284,10 +335,6 @@ void CScriptProfiler::onDispose(lua_State* L)
 
 void CScriptProfiler::onReinit(lua_State* L)
 {
-	// todo: Should we get old ref and detach profiler / hook?
-	// todo: Should we get old ref and detach profiler / hook?
-	// todo: Should we get old ref and detach profiler / hook?
-
     if (!m_active)
     	return;
 
@@ -315,13 +362,13 @@ void CScriptProfiler::onReinit(lua_State* L)
 			return;
         }
 
-    	Msg("[P] Re-init scripts sampling profiler, attach handler");
-        luaJitSamplingProfilerAttach(this);
+        Msg("[P] Re-init scripts sampling profiler - attach handler, interval: %d", m_sampling_profile_interval);
+		luaJitSamplingProfilerAttach(this, m_sampling_profile_interval);
 
 	    return;
     }
 
-    default:  NODEFAULT;
+    default: NODEFAULT;
     }
 }
 
@@ -458,8 +505,11 @@ bool CScriptProfiler::luaIsJitProfilerDefined(lua_State* L)
 * Attach sampling profiling hooks.
 * With provided period report samples and store information in profiler for further reporting.
 */
-void CScriptProfiler::luaJitSamplingProfilerAttach(CScriptProfiler* profiler)
+void CScriptProfiler::luaJitSamplingProfilerAttach(CScriptProfiler* profiler, u32 interval)
 {
+	string32 buffer = "fli";
+    xr_itoa(interval, buffer + 3, 10);
+
     luaJitProfilerStart(
         profiler->lua(), "fli",
         [](void* data, lua_State* L, int samples, int vmstate) {
