@@ -84,6 +84,12 @@ void CScriptProfiler::startSamplingMode(u32 sampling_interval)
         return;
     }
 
+    if (!luaIsJitProfilerDefined(lua()))
+    {
+        Msg("[P] Cannot start scripts sampling profiler, jit module is not defined");
+		return;
+    }
+
     if (!lua())
     {
     	Msg("[P] Activating sampling profiler on lua engine start, waiting init");
@@ -92,12 +98,6 @@ void CScriptProfiler::startSamplingMode(u32 sampling_interval)
 		m_active = true;
 
         return;
-    }
-
-    if (!luaIsJitProfilerDefined(lua()))
-    {
-        Msg("[P] Cannot start scripts sampling profiler, jit module is not defined");
-		return;
     }
 
     clamp(sampling_interval, 1u, PROFILE_SAMPLING_INTERVAL_MAX);
@@ -119,33 +119,27 @@ void CScriptProfiler::stop()
         return;
     }
 
-    if (m_profiler_type == CScriptProfilerType::None)
-    {
-        Msg("[P] Tried to stop none type profiler");
-        return;
-    }
-
     switch (m_profiler_type)
     {
 	case CScriptProfilerType::Hook:
         Msg("[P] Stopping scripts hook profiler");
-
         // Do not detach hook here, adding it means that it is already test run in the first place.
-
     	break;
     case CScriptProfilerType::Sampling:
     {
     	Msg("[P] Stopping scripts sampling profiler");
-
+        // Detach profiler from luajit, stop operation will be ignore anyway if it is stopped/captured by another VM.
         luaJitProfilerStop(lua());
-
     	break;
     }
-
-    default:  NODEFAULT;
+    default:
+        Msg("[P] Tried to stop none type profiler");
+        return;
     }
 
     m_active = false;
+    m_hook_profiling_portions.clear();
+    m_sampling_profiling_log.clear();
 }
 
 void CScriptProfiler::reset()
