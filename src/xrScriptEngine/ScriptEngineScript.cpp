@@ -208,4 +208,22 @@ SCRIPT_EXPORT(CScriptEngine, (),
             GEnv.ScriptEngine->m_profiler->saveReport();
         })
     ];
+
+    /**
+	 * Exports injected from tracy profiler:
+     *
+     * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/manual/tracy.tex#L1932
+     * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/public/tracy/TracyLua.hpp#L18
+     *
+	 * global tracy {
+     *     function ZoneBegin;
+     *     function ZoneBeginN;
+     *     function ZoneBeginS;
+     *     function ZoneBeginNS;
+     *     function ZoneEnd;
+     *     function ZoneText;
+     *     function ZoneName;
+     *     function Message;
+	 * }
+	*/
 });
