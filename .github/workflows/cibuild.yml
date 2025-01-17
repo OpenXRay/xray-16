@@ -91,7 +91,7 @@ jobs:
         # You may also want to set XRAY_LINKER when changing the compiler.
         - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc, }
         - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
-        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   container: 'dockcross/linux-arm64', }
+        - { name: Ubuntu, os: ubuntu-24.04-arm, arch: arm64,   cc: gcc }
         #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
         - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
