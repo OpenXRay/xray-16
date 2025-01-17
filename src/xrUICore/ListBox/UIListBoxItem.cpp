@@ -31,6 +31,11 @@ void CUIListBoxItem::OnFocusReceive()
 {
     inherited::OnFocusReceive();
     GetMessageTarget()->SendMessage(this, LIST_ITEM_FOCUS_RECEIVED);
+    if (UI().Focus().GetFocused() == this)
+    {
+        smart_cast<CUIScrollView*>(GetParent()->GetParent())->SetSelected(this);
+        GetMessageTarget()->SendMessage(this, LIST_ITEM_SELECT, &tag);
+    }
 }
 
 void CUIListBoxItem::InitDefault() { InitTexture("ui_listline"); }

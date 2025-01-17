@@ -26,8 +26,31 @@ CUIScrollView::~CUIScrollView() { Clear(); }
 void CUIScrollView::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     CUIWndCallback::OnEvent(pWnd, msg, pData);
-    if (CHILD_CHANGED_SIZE == msg && m_pad->IsChild(pWnd))
-        m_flags.set(eNeedRecalc, true);
+
+    switch (msg)
+    {
+    case CHILD_CHANGED_SIZE:
+    {
+        if (m_pad->IsChild(pWnd))
+            m_flags.set(eNeedRecalc, true);
+        break;
+    }
+    case WINDOW_FOCUS_RECEIVED:
+    {
+        if (UI().Focus().GetFocused() != pWnd)
+            break;
+
+        if (const auto& item = pWnd->GetWindowBeforeParent(m_pad);
+            item && item != GetSelected())
+        {
+            const auto prevPos = GetCurrentScrollPos();
+            ScrollToWindow(item);
+            if (prevPos != GetCurrentScrollPos())
+                UI().GetUICursor().WarpToWindow(item);
+        }
+        break;
+    }
+    } // switch (msg)
 }
 
 void CUIScrollView::ForceUpdate() { m_flags.set(eNeedRecalc, true); }
@@ -115,7 +138,11 @@ void CUIScrollView::Update()
     if (m_flags.test(eNeedRecalc))
         RecalcSize();
 
-    if (const auto focused = CursorOverWindow() ? UI().Focus().GetFocused() : nullptr)
+    CUIWindow* focused{};
+    if (m_pad->CursorOverWindow() && !m_flags.test(eItemsSelectabe))
+        focused = UI().Focus().GetFocused();
+
+    if (focused)
     {
         const auto scrollItem = focused->GetWindowBeforeParent(m_pad);
 
@@ -124,9 +151,6 @@ void CUIScrollView::Update()
             const auto prevPos = GetCurrentScrollPos();
 
             ScrollToWindow(scrollItem);
-
-            if (m_flags.test(eItemsSelectabe))
-                scrollItem->OnMouseDown(MOUSE_1);
 
             if (prevPos != GetCurrentScrollPos())
                 UI().GetUICursor().WarpToWindow(focused);
