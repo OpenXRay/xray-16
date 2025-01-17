@@ -70,6 +70,7 @@ public:
     void SetFixedScrollBar(bool b);
     float GetDesiredChildWidth() const;
     virtual void SetSelected(CUIWindow*);
+    bool SelectFirst();
     bool SelectNext(bool next, bool loop);
     CUIWindow* GetSelected();
     Fvector2 GetPadSize();

@@ -100,7 +100,7 @@ public:
     //захватить/освободить мышь окном
     //сообщение посылается дочерним окном родительскому
     void SetCapture(CUIWindow* pChildWindow, bool capture_status);
-    CUIWindow* GetMouseCapturer() { return m_pMouseCapturer; }
+    CUIWindow* GetMouseCapturer() const { return m_pMouseCapturer; }
 
     //окошко, которому пересылаются сообщения,
     //если NULL, то шлем на GetParent()
@@ -108,6 +108,7 @@ public:
     CUIWindow* GetMessageTarget();
 
     void SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status);
+    CUIWindow* GetKeyboardCapturer() const { return m_pKeyboardCapturer; }
 
     //обработка сообщений не предусмотреных стандартными обработчиками
     //ф-ция должна переопределяться

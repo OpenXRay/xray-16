@@ -27,6 +27,19 @@ void CUIListBoxItem::Draw()
     CUIWindow::Draw();
 }
 
+bool CUIListBoxItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (WINDOW_KEY_PRESSED == keyboard_action && CursorOverWindow() && GetSelected())
+    {
+        if (IsBinded(kUI_ACCEPT, dik, EKeyContext::UI))
+        {
+            GetMessageTarget()->SendMessage(this, LIST_ITEM_CLICKED, &tag);
+            return true;
+        }
+    }
+    return inherited::OnKeyboardAction(dik, keyboard_action);
+}
+
 void CUIListBoxItem::OnFocusReceive()
 {
     inherited::OnFocusReceive();

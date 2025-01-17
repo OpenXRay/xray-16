@@ -473,6 +473,21 @@ void CUIScrollView::SetSelected(CUIWindow* w)
     }
 }
 
+bool CUIScrollView::SelectFirst()
+{
+    ScrollToBegin();
+
+    if (Empty() || !m_flags.test(eItemsSelectabe))
+        return false;
+
+    const auto first = Items()[0];
+    ScrollToWindow(first);
+    SetSelected(first);
+    if (UI().Focus().IsRegistered(first))
+        UI().Focus().SetFocused(first);
+    return true;
+}
+
 bool CUIScrollView::SelectNext(bool next, bool loop)
 {
     if (Empty())
