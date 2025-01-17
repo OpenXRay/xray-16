@@ -380,7 +380,7 @@ void CUIScrollView::ScrollToEnd()
 
 void CUIScrollView::ScrollToWindow(CUIWindow* pWnd, float center_y_ratio /*= 0.5f*/)
 {
-    R_ASSERT2_CURE(pWnd->GetParent() == m_pad, "Requested window to scroll to doesn't belong to the scroll view", return);
+    R_ASSERT2_CURE(pWnd && pWnd->GetParent() == m_pad, "Requested window to scroll to doesn't belong to the scroll view", return);
 
     if (m_flags.test(eNeedRecalc))
         RecalcSize();
