@@ -127,7 +127,7 @@ jobs:
 
     - name: Install Clang Ubuntu packages
       if: ${{ matrix.platform.name == 'Ubuntu' && matrix.platform.cxx == 'clang++' }}
-      run: sudo apt-get install -qq -y libstdc++-dev
+      run: sudo apt-get install -qq -y libc++-dev
 
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
