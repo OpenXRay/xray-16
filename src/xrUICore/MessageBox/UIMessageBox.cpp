@@ -203,7 +203,7 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
     else if (0 == xr_stricmp(_type, "info"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_INFO;
-    };
+    }
 
     switch (m_eMessageBoxStyle)
     {
@@ -213,11 +213,10 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonYesOk = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonYesOk);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        break;
     }
-    break;
-    case MESSAGEBOX_INFO: {
-    }
-    break;
+    case MESSAGEBOX_INFO:
+        break;
 
     case MESSAGEBOX_DIRECT_IP:
         strconcat(sizeof(str), str, box_template, ":cap_host");
@@ -250,8 +249,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         AttachChild(m_UIButtonNo);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
         // m_message_box_yes_no->func_on_ok = CUIWndCallback::void_function( this, &CUIActorMenu::OnMesBoxYes );
-
         break;
+
     case MESSAGEBOX_PASSWORD:
     {
         strconcat(sizeof(str), str, box_template, ":cap_user_password");
@@ -283,8 +282,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonNo = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonNo);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        break;
     }
-    break;
 
     case MESSAGEBOX_RA_LOGIN:
         strconcat(sizeof(str), str, box_template, ":cap_login");
@@ -324,8 +323,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonNo = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonNo);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        break;
     }
-    break;
 
     case MESSAGEBOX_YES_NO_CANCEL:
     {
@@ -343,8 +342,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonCancel = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonCancel);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonCancel);
+        break;
     }
-    break;
 
     case MESSAGEBOX_YES_NO_COPY:
     {
@@ -371,9 +370,9 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
             CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditURL);
             //				m_UIEditURL->read_only
         }
+        break;
     }
-    break;
-    }
+    } // switch (m_eMessageBoxStyle)
     return true;
 }
 
@@ -398,7 +397,7 @@ void CUIMessageBox::OnYesOk()
         break;
     case MESSAGEBOX_QUIT_WINDOWS: GetMessageTarget()->SendMessage(this, MESSAGE_BOX_QUIT_WIN_CLICKED); break;
     case MESSAGEBOX_QUIT_GAME: GetMessageTarget()->SendMessage(this, MESSAGE_BOX_QUIT_GAME_CLICKED); break;
-    };
+    } // switch (m_eMessageBoxStyle)
 }
 
 void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -463,8 +462,8 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             break;
         case MESSAGEBOX_INFO:
             break;
-        };
-    };
+        } // switch (m_eMessageBoxStyle)
+    }
     inherited::SendMessage(pWnd, msg, pData);
 }
 
