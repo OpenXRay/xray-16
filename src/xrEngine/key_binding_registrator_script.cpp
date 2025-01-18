@@ -204,7 +204,6 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kPDA_MAP_SHOW_LEGEND",       int(kPDA_MAP_SHOW_LEGEND)),
 
                 value("kPDA_FILTER_TOGGLE",         int(kPDA_FILTER_TOGGLE)),
-                value("kPDA_TASKS_TOGGLE",          int(kPDA_TASKS_TOGGLE)),
 
                 // Talk:
                 value("kTALK_SWITCH_TO_TRADE",      int(kTALK_SWITCH_TO_TRADE)),

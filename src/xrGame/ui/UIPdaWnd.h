@@ -69,6 +69,7 @@ public:
         return true;
     } // always true because StopAnyMove() == false
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
 
     UIHint* get_hint_wnd() const { return m_hint_wnd; }
     void DrawHint();

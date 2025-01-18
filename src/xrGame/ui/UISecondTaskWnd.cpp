@@ -40,10 +40,14 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
     m_background = UIHelper::CreateFrameWindow(xml, "background_frame", this);
     m_caption = UIHelper::CreateStatic(xml, "t_caption", this);
     //	m_counter    = UIHelper::CreateStatic( xml, "t_counter", this );
+
     m_bt_close = UIHelper::Create3tButton(xml, "btn_close", this);
+    m_bt_close->SetAccelerator(kQUIT, false, 2);
+    m_bt_close->SetAccelerator(kUI_BACK, false, 3);
 
     Register(m_bt_close);
-    AddCallback(m_bt_close, BUTTON_DOWN, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));
+    AddCallback(m_bt_close, BUTTON_CLICKED, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));
+    UI().Focus().UnregisterFocusable(m_bt_close);
 
     m_list = xr_new<CUIScrollView>();
     m_list->SetAutoDelete(true);
@@ -80,22 +84,40 @@ void UITaskListWnd::OnMouseScroll(float iDirection)
         m_list->ScrollBar()->TryScrollInc();
 }
 
-bool UITaskListWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
-{
-    return inherited::OnKeyboardAction(dik, keyboard_action);
-}
-
-bool UITaskListWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
-{
-    return inherited::OnControllerAction(axis, x, y, controller_action);
-}
-
 void UITaskListWnd::Show(bool status)
 {
     inherited::Show(status);
-    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, nullptr);
+
+    auto& focus = UI().Focus();
+
     if (status)
+    {
         UpdateList();
+        GetMessageTarget()->SetKeyboardCapture(this, true);
+        focus.LockToWindow(this);
+
+        if (m_list->Empty())
+        {
+            focus.SetFocused(nullptr);
+            UI().GetUICursor().WarpToWindow(m_list, true);
+        }
+        else
+        {
+            const auto item = static_cast<UITaskListWndItem*>(m_list->Items()[0]);
+            item->Focus();
+        }
+    }
+    else
+    {
+        if (GetMessageTarget()->GetKeyboardCapturer() == this)
+            GetMessageTarget()->SetKeyboardCapture(nullptr, true);
+        if (focus.GetLocker() == this)
+            focus.Unlock();
+        GetMessageTarget()->SendMessage(GetMessageTarget(), WINDOW_KEYBOARD_CAPTURE_LOST, this);
+    }
+
+    GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, nullptr);
+    Enable(status); // hack to prevent m_bt_close intercepting quit from PDA itself
 }
 
 void UITaskListWnd::OnFocusReceive()
@@ -208,6 +230,10 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     m_color_states[stt_unread] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:unread", 0, u32(-1));
     m_color_states[stt_read] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:read", 0, u32(-1));
     update_view();
+
+    if (m_bt_view)
+        UI().Focus().UnregisterFocusable(m_bt_view);
+    UI().Focus().UnregisterFocusable(m_bt_focus);
     return true;
 }
 
@@ -344,6 +370,38 @@ bool UITaskListWndItem::OnMouseAction(float x, float y, EUIMessages mouse_action
     } // switch
 
     return true;
+}
+
+bool UITaskListWndItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    if (CursorOverWindow())
+    {
+        const auto [x, y] = UI().GetUICursor().GetCursorPosition();
+
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_ACCEPT:
+            m_name->OnMouseAction(x, y, WINDOW_LBUTTON_DOWN);
+            return true;
+        case kUI_ACTION_1:
+            m_bt_focus->OnMouseAction(x, y, WINDOW_LBUTTON_DOWN);
+            return true;
+        case kUI_ACTION_2:
+            if (m_bt_view)
+                m_bt_view->OnMouseAction(x, y, WINDOW_LBUTTON_DOWN);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void UITaskListWndItem::Focus() const
+{
+    UI().Focus().SetFocused(m_name);
 }
 
 void UITaskListWndItem::OnFocusReceive()

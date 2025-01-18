@@ -92,6 +92,10 @@ void CUIPdaWnd::Init()
     }
 
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
+    m_btn_close->SetAccelerator(kQUIT, false, 2);
+    m_btn_close->SetAccelerator(kUI_BACK, false, 3);
+    UI().Focus().UnregisterFocusable(m_btn_close);
+
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
     if (IsGameTypeSingle())
@@ -175,8 +179,6 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         {
             const auto& id = UITabControl->GetActiveId();
             SetActiveSubdialog(id);
-            if (pInput->IsCurrentInputTypeController())
-                UI().GetUICursor().WarpToWindow(UITabControl->GetButtonById(id));
         }
         break;
     }
@@ -249,6 +251,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     {
         if (UIMainPdaFrame->IsChild(m_pActiveDialog))
             UIMainPdaFrame->DetachChild(m_pActiveDialog);
+        UIMainPdaFrame->SetKeyboardCapture(nullptr, true);
         m_pActiveDialog->Show(false);
     }
 
@@ -290,6 +293,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     {
         if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
             UIMainPdaFrame->AttachChild(m_pActiveDialog);
+        UIMainPdaFrame->SetKeyboardCapture(m_pActiveDialog, true);
         m_pActiveDialog->Show(true);
         m_sActiveSection = section;
         SetActiveCaption();
@@ -440,13 +444,13 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     if (inherited::OnKeyboardAction(dik, keyboard_action))
         return true;
 
-    switch (GetBindedAction(dik, EKeyContext::UI))
-    {
-    case kUI_BACK:
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            HideDialog();
+    return false;
+}
+
+bool CUIPdaWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (inherited::OnControllerAction(axis, x, y, controller_action))
         return true;
-    }
 
     return false;
 }

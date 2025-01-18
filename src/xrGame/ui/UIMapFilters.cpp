@@ -8,14 +8,10 @@ CUIMapFilters::CUIMapFilters() : CUIWindow("Map locations filters") {}
 
 bool CUIMapFilters::Init(CUIXml& xml)
 {
-    if (!CUIXmlInit::InitWindow(xml, "filters_wnd", 0, this, false))
-    {
-        if (const auto parent = GetParent())
-        {
-            SetWndPos(parent->GetWndPos());
-            SetWndSize(parent->GetWndSize());
-        }
-    }
+    bool result = false;
+
+    const bool convertPosToOurs = !CUIXmlInit::InitWindow(xml, "filters_wnd", 0, this, false);
+
     constexpr std::tuple<eSpotsFilter, pcstr> filters[] =
     {
         { Treasures,      "filter_treasures" },
@@ -28,94 +24,144 @@ bool CUIMapFilters::Init(CUIXml& xml)
     {
         auto& filter = m_filters[filter_id];
         filter = UIHelper::CreateCheck(xml, filter_section, this, false);
-        if (filter)
-        {
-            filter->SetMessageTarget(this);
-            filter->SetWindowName(filter_section);
-            filter->SetCheck(true);
-        }
-        m_filters_state[filter_id] = true;
+        if (!filter)
+            continue;
+
+        filter->SetMessageTarget(this);
+        filter->SetWindowName(filter_section);
+        filter->SetCheck(true);
+
+        result = true;
     }
 
-    return true;
+    if (result && convertPosToOurs)
+    {
+        // Adjust this window rect first
+        Frect rect{ type_max<float>, type_max<float>, 0, 0 };
+
+        for (const auto filter : m_filters)
+        {
+            if (!filter)
+                continue;
+            rect.lt.min(filter->GetWndPos());
+            Frect filterRect;
+            filter->GetWndRect(filterRect);
+            rect.rb.max(filterRect.rb);
+        }
+
+        SetWndRect(rect);
+
+        // Adjust filters positions
+        for (const auto filter : m_filters)
+        {
+            if (!filter)
+                continue;
+            Fvector2 ourAbsPos;
+            GetAbsolutePos(ourAbsPos);
+            const Fvector2& pos = filter->GetWndPos();
+            filter->SetWndPos({ pos.x - ourAbsPos.x, pos.y - ourAbsPos.y });
+        }
+    }
+
+    return result;
 }
 
 void CUIMapFilters::Reset()
 {
     inherited::Reset();
-    SelectFilter(false);
+    Activate(false);
+}
+
+bool CUIMapFilters::Activate(bool activate)
+{
+    m_activated = activate;
+
+    auto& focus = UI().Focus();
+    if (activate)
+    {
+        GetMessageTarget()->SetKeyboardCapture(this, true);
+        focus.LockToWindow(this);
+        focus.SetFocused(m_filters[0]);
+    }
+    else
+    {
+        if (GetMessageTarget()->GetKeyboardCapturer() == this)
+            GetMessageTarget()->SetKeyboardCapture(nullptr, true);
+        if (focus.GetLocker() == this)
+            focus.Unlock();
+        GetMessageTarget()->SendMessage(GetMessageTarget(), WINDOW_KEYBOARD_CAPTURE_LOST, this);
+    }
+    return true;
 }
 
 bool CUIMapFilters::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (const auto filter = GetSelectedFilter())
+    if (!m_activated)
     {
-        if (keyboard_action != WINDOW_KEY_PRESSED)
-            return true; // intercept all
-
-        switch (GetBindedAction(dik, EKeyContext::UI))
+        if (IsBinded(kPDA_FILTER_TOGGLE, dik, EKeyContext::PDA))
         {
-        case kUI_BACK:
-            SelectFilter(false);
-            return true;
-
-        case kUI_ACCEPT:
-            filter->OnMouseDown(MOUSE_1);
-            return true;
-
-        case kUI_MOVE_LEFT:
-        case kUI_MOVE_DOWN:
-            SelectFilter(true, false);
-            return true;
-
-        case kUI_MOVE_RIGHT:
-        case kUI_MOVE_UP:
-            SelectFilter(true, true);
+            Activate(true);
             return true;
         }
+        return false;
     }
-    return inherited::OnKeyboardAction(dik, keyboard_action);
-}
 
-bool CUIMapFilters::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
-{
-    switch (GetBindedAction(axis, EKeyContext::UI))
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    auto action = GetBindedAction(dik, EKeyContext::UI);
+    if (action == kNOTBINDED)
+        action = GetBindedAction(dik);
+
+    switch (action)
     {
-    default:
-        return OnKeyboardAction(axis, controller_action);
-    case kUI_MOVE:
-        if (GetSelectedFilter())
-            return true; // just screw it for now
+    case kQUIT:
+    case kUI_BACK:
+        Activate(false);
+        return true;
+
+    case kENTER:
+    case kUI_ACCEPT:
+        if (keyboard_action == WINDOW_KEY_PRESSED)
+        {
+            if (const auto filter = GetSelectedFilter())
+                filter->OnMouseDown(MOUSE_1);
+        }
+        return true;
+
+    case kUI_ACTION_1:
+    case kUI_ACTION_2:
+        return true; // intercept
     }
-    return inherited::OnControllerAction(axis, x, y, controller_action);
+
+    return false;
 }
 
 void CUIMapFilters::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    // This cycle could be implemented through CUIWndCallback,
-    // but we don't need it too much here
-    for (u32 i = 0; i < Filter_Count; ++i)
+    if (msg == BUTTON_CLICKED)
     {
-        if (m_filters[i] == pWnd && msg == BUTTON_CLICKED)
+        // This cycle could be implemented through CUIWndCallback,
+        // but we don't need it too much here
+        for (const auto filter : m_filters)
         {
-            m_filters_state[i] = m_filters[i]->GetCheck();
-            GetMessageTarget()->SendMessage(this, PDA_TASK_RELOAD_FILTERS, nullptr);
-            return;
+            if (filter == pWnd)
+            {
+                GetMessageTarget()->SendMessage(this, PDA_TASK_RELOAD_FILTERS, nullptr);
+                return;
+            }
         }
     }
-    if (msg == PDA_TASK_SELECT_FILTERS)
+    else if (msg == WINDOW_KEYBOARD_CAPTURE_LOST && pWnd == GetMessageTarget())
     {
-        SelectFilter(!GetSelectedFilter());
+        if (m_activated)
+            Activate(false);
         return;
     }
-    if (msg == WINDOW_KEYBOARD_CAPTURE_LOST && pWnd == GetMessageTarget())
+    else if (msg == WINDOW_FOCUS_LOST && pWnd == this)
     {
-        SelectFilter(false);
-        return;
-    }
-    if (msg == WINDOW_FOCUS_LOST && pWnd == this)
-    {
-        SelectFilter(false);
+        if (m_activated)
+            Activate(false);
         return;
     }
     inherited::SendMessage(pWnd, msg, pData);
@@ -123,43 +169,19 @@ void CUIMapFilters::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 CUICheckButton* CUIMapFilters::GetSelectedFilter() const
 {
-    if (m_selected_filter == -1)
-        return nullptr;
-    return m_filters[m_selected_filter];
+    auto focused = UI().Focus().GetFocused();
+    if (IsChild(focused))
+        return static_cast<CUICheckButton*>(focused);
+    return nullptr;
 }
 
-void CUIMapFilters::SelectFilter(bool select, bool next /*= true*/)
+bool CUIMapFilters::IsFilterEnabled(eSpotsFilter filter) const
 {
-    auto& cursor = GetUICursor();
-
-    if (!select)
-    {
-        m_selected_filter = -1;
-        cursor.WarpToWindow(nullptr);
-    }
-    else
-    {
-        if (next)
-        {
-            if (m_selected_filter < int(m_filters.size() - 1))
-                m_selected_filter++;
-            else
-                m_selected_filter = 0;
-        }
-        else // prev
-        {
-            if (m_selected_filter > 0)
-                m_selected_filter--;
-            else
-                m_selected_filter = int(m_filters.size() - 1);
-        }
-        cursor.WarpToWindow(m_filters[m_selected_filter]);
-    }
+    return m_filters[filter] && m_filters[filter]->GetCheck();
 }
 
-void CUIMapFilters::SetFilterEnabled(eSpotsFilter filter, bool enable)
+void CUIMapFilters::SetFilterEnabled(eSpotsFilter filter, bool enable) const
 {
-    m_filters_state[filter] = enable;
     if (m_filters[filter])
         m_filters[filter]->SetCheck(enable);
 }

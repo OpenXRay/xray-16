@@ -4,9 +4,9 @@
 #include "xrUICore/Callbacks/UIWndCallback.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "GameTaskDefs.h"
-#include "UIMapFilters.h"
 
 class CUIMapWnd;
+class CUIMapFilters;
 class CUIStatic;
 class CGameTask;
 class CUIXml;
@@ -36,7 +36,7 @@ private:
     CUI3tButton* m_btn_focus{};
     CUI3tButton* m_btn_focus2{};
 
-    CUIMapFilters m_filters;
+    CUIMapFilters* m_filters;
 
     UITaskListWnd* m_task_wnd{};
     UIMapLegend* m_map_legend_wnd{};
@@ -51,6 +51,7 @@ public:
     pcstr GetDebugType() override { return "CUITaskWnd"; }
 
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     bool Init();
     virtual void Update();
@@ -63,18 +64,21 @@ public:
     void Show_TaskListWnd(bool status) const;
 
     [[nodiscard]]
-    bool IsTreasuresEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::Treasures); }
-    [[nodiscard]]
-    bool IsQuestNpcsEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::QuestNpcs); }
-    [[nodiscard]]
-    bool IsSecondaryTasksEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::SecondaryTasks); }
-    [[nodiscard]]
-    bool IsPrimaryObjectsEnabled() const { return m_filters.IsFilterEnabled(CUIMapFilters::PrimaryObjects); }
+    bool IsTreasuresEnabled() const;
 
-    void TreasuresEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::Treasures, enable); }
-    void QuestNpcsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::QuestNpcs, enable); }
-    void SecondaryTasksEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::SecondaryTasks, enable); }
-    void PrimaryObjectsEnabled(bool enable) { m_filters.SetFilterEnabled(CUIMapFilters::PrimaryObjects, enable); }
+    [[nodiscard]]
+    bool IsQuestNpcsEnabled() const;
+
+    [[nodiscard]]
+    bool IsSecondaryTasksEnabled() const;
+
+    [[nodiscard]]
+    bool IsPrimaryObjectsEnabled() const;
+
+    void TreasuresEnabled(bool enable);
+    void QuestNpcsEnabled(bool enable);
+    void SecondaryTasksEnabled(bool enable);
+    void PrimaryObjectsEnabled(bool enable);
 
     bool IsUsingCursorRightNow() const override;
 

@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "UITaskWnd.h"
 #include "UIMapWnd.h"
+#include "UIMapFilters.h"
 #include "Common/object_broker.h"
 #include "UIXmlInit.h"
 #include "xrUICore/Static/UIStatic.h"
@@ -39,9 +40,14 @@ bool CUITaskWnd::Init()
 
     std::ignore = UIHelper::CreateFrameLine(xml, "task_split", this, false);
 
-    AttachChild(&m_filters);
-    m_filters.SetMessageTarget(this);
-    m_filters.Init(xml);
+    m_filters = xr_new<CUIMapFilters>();
+    if (!m_filters->Init(xml))
+        xr_delete(m_filters);
+    else
+    {
+        AttachChild(m_filters);
+        m_filters->SetMessageTarget(this);
+    }
 
     m_pMapWnd = xr_new<CUIMapWnd>(hint_wnd);
     m_pMapWnd->SetAutoDelete(false);
@@ -84,6 +90,8 @@ bool CUITaskWnd::Init()
 
     auto* btnTaskListWnd = UIHelper::Create3tButton(xml, "btn_second_task", this);
     AddCallback(btnTaskListWnd, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTaskListWnd));
+    btnTaskListWnd->SetAccelerator(kSCORES, false, 2);
+    btnTaskListWnd->SetAccelerator(kUI_ACTION_1, false, 3);
 
     m_second_task_index = UIHelper::CreateStatic(xml, "second_task_index", this, false);
 
@@ -135,36 +143,29 @@ void CUITaskWnd::DrawHint() { m_pMapWnd->DrawHint(); }
 
 bool CUITaskWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (inherited::OnKeyboardAction(dik, keyboard_action))
-        return true;
+    if (m_pKeyboardCapturer && pInput->IsCurrentInputTypeController())
+        return m_pKeyboardCapturer->OnKeyboardAction(dik, keyboard_action);
+    return inherited::OnKeyboardAction(dik, keyboard_action);
+}
 
-    if (keyboard_action == WINDOW_KEY_PRESSED)
-    {
-        switch (GetBindedAction(dik, EKeyContext::PDA))
-        {
-        case kPDA_FILTER_TOGGLE:
-            if (m_pKeyboardCapturer == &m_filters)
-                SetKeyboardCapture(nullptr, false);
-            else
-                SetKeyboardCapture(&m_filters, true);
-            m_filters.SendMessage(this, PDA_TASK_SELECT_FILTERS, nullptr);
-            return true;
-
-        case kPDA_TASKS_TOGGLE:
-            if (m_pKeyboardCapturer == m_task_wnd)
-                SetKeyboardCapture(nullptr, false);
-            else
-                SetKeyboardCapture(m_task_wnd, true);
-            OnShowTaskListWnd(nullptr, nullptr);
-            return true;
-        }
-    }
-
-    return false;
+bool CUITaskWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+{
+    if (m_pKeyboardCapturer && pInput->IsCurrentInputTypeController())
+        return m_pKeyboardCapturer->OnControllerAction(axis, x, y, controller_action);
+    return inherited::OnControllerAction(axis, x, y, controller_action);
 }
 
 void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
+    if (msg == WINDOW_KEYBOARD_CAPTURE_LOST && pWnd == this)
+    {
+        if ((m_filters && pData == m_filters) || pData == m_task_wnd)
+        {
+            if (pInput->IsCurrentInputTypeController())
+                UI().GetUICursor().WarpToWindow(m_pMapWnd, true);
+            return;
+        }
+    }
     if (msg == PDA_TASK_SET_TARGET_MAP && pData)
     {
         CGameTask* task = static_cast<CGameTask*>(pData);
@@ -183,7 +184,6 @@ void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         TaskShowMapSpot(task, false);
         return;
     }
-
     if (msg == PDA_TASK_SHOW_HINT && pData)
     {
         CGameTask* task = static_cast<CGameTask*>(pData);
@@ -321,9 +321,35 @@ void CUITaskWnd::Show_TaskListWnd(bool status) const
     m_task_wnd->Show(status);
 }
 
+bool CUITaskWnd::IsTreasuresEnabled() const { return m_filters && m_filters->IsFilterEnabled(CUIMapFilters::Treasures); }
+bool CUITaskWnd::IsQuestNpcsEnabled() const { return m_filters && m_filters->IsFilterEnabled(CUIMapFilters::QuestNpcs); }
+bool CUITaskWnd::IsSecondaryTasksEnabled() const { return m_filters && m_filters->IsFilterEnabled(CUIMapFilters::SecondaryTasks); }
+bool CUITaskWnd::IsPrimaryObjectsEnabled() const { return m_filters && m_filters->IsFilterEnabled(CUIMapFilters::PrimaryObjects); }
+
+void CUITaskWnd::TreasuresEnabled(bool enable)
+{
+    if (m_filters)
+        m_filters->SetFilterEnabled(CUIMapFilters::Treasures, enable);
+}
+void CUITaskWnd::QuestNpcsEnabled(bool enable)
+{
+    if (m_filters)
+        m_filters->SetFilterEnabled(CUIMapFilters::QuestNpcs, enable);
+}
+void CUITaskWnd::SecondaryTasksEnabled(bool enable)
+{
+    if (m_filters)
+        m_filters->SetFilterEnabled(CUIMapFilters::SecondaryTasks, enable);
+}
+void CUITaskWnd::PrimaryObjectsEnabled(bool enable)
+{
+    if (m_filters)
+        m_filters->SetFilterEnabled(CUIMapFilters::PrimaryObjects, enable);
+}
+
 bool CUITaskWnd::IsUsingCursorRightNow() const
 {
-    return m_pKeyboardCapturer == &m_filters;
+    return true;
 }
 
 void CUITaskWnd::TaskSetTargetMap(CGameTask* task) const
