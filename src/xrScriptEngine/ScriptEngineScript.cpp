@@ -140,6 +140,7 @@ SCRIPT_EXPORT(CScriptEngine, (),
 {
     using namespace luabind;
 
+    globals(luaState) ["PROFILER_TYPE_NONE"] = (u32) CScriptProfilerType::None;
     globals(luaState) ["PROFILER_TYPE_HOOK"] = (u32) CScriptProfilerType::Hook;
     globals(luaState) ["PROFILER_TYPE_SAMPLING"] = (u32) CScriptProfilerType::Sampling;
 
@@ -175,17 +176,21 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->isActive();
         }),
+        def("get_type", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->getType();
+        }),
         def("start", +[](CScriptProfilerType hook_type = CScriptProfilerType::None)
         {
             GEnv.ScriptEngine->m_profiler->start(hook_type);
         }),
-        def("start_sampling_mode", +[](u32 sampling_interval = CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT)
-        {
-            GEnv.ScriptEngine->m_profiler->startSamplingMode(sampling_interval);
-        }),
         def("start_hook_mode", +[]()
         {
             GEnv.ScriptEngine->m_profiler->startHookMode();
+        }),
+        def("start_sampling_mode", +[](u32 sampling_interval = CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT)
+        {
+            GEnv.ScriptEngine->m_profiler->startSamplingMode(sampling_interval);
         }),
         def("stop", +[]()
         {

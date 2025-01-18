@@ -533,7 +533,6 @@ void CScriptProfiler::onReinit(lua_State* L)
         }
 
         Msg("[P] Reinit scripts hook profiler");
-        m_hook_profiling_portions.clear();
 
         return;
     case CScriptProfilerType::Sampling:
@@ -546,7 +545,6 @@ void CScriptProfiler::onReinit(lua_State* L)
 
         Msg("[P] Re-init scripts sampling profiler - attach handler, interval: %d", m_sampling_profile_interval);
         luaJitSamplingProfilerAttach(this, m_sampling_profile_interval);
-        m_sampling_profiling_log.clear();
 
         return;
     }
