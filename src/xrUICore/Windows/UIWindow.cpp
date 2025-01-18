@@ -426,7 +426,12 @@ CUIWindow* CUIWindow::GetChildMouseHandler()
 }
 
 //для перевода окна и потомков в исходное состояние
-void CUIWindow::Reset() { m_pMouseCapturer = NULL; }
+void CUIWindow::Reset()
+{
+    m_pMouseCapturer    = nullptr;
+    m_pKeyboardCapturer = nullptr;
+}
+
 void CUIWindow::ResetAll()
 {
     for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
