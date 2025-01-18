@@ -149,7 +149,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     {
         DirectX::TexMetadata IMG;
         DirectX::ScratchImage texture;
-        auto hresult = LoadFromDDSMemory(S->pointer(), img_size, dds_flags, &IMG, texture);
+        auto hresult = LoadFromDDSMemory(static_cast<u8*>(S->pointer()), img_size, dds_flags, &IMG, texture);
 
         R_ASSERT3_CURE(SUCCEEDED(hresult), "Failed to load texture from memory", fn,
         {
