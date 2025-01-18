@@ -169,6 +169,12 @@ TaskManager::~TaskManager()
     ZoneScoped;
     shouldStop.store(true, std::memory_order_release);
 
+    // Event::Set() wakes up only one thread
+    // Try to wake all of them
+    const auto count = workerThreads.size();
+    for (size_t i = 0; i < count; ++i)
+        newWorkArrived.Set();
+
     // Finish all pending tasks
     while (Task* t = s_tl_worker.pop())
     {
@@ -179,7 +185,6 @@ TaskManager::~TaskManager()
     while (!workers.empty())
     {
         newWorkArrived.Set();
-        SDL_PumpEvents();
         Sleep(0);
     }
     for (auto& thread : workerThreads)
