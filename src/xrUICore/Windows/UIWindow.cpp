@@ -374,11 +374,14 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 
     if (capture_status)
     {
-        //оповестить дочернее окно о потере фокуса клавиатуры
-        if (NULL != m_pKeyboardCapturer)
-            m_pKeyboardCapturer->SendMessage(this, WINDOW_KEYBOARD_CAPTURE_LOST);
+        if (m_pKeyboardCapturer != pChildWindow)
+        {
+            //оповестить дочернее окно о потере фокуса клавиатуры
+            if (m_pKeyboardCapturer)
+                m_pKeyboardCapturer->SendMessage(this, WINDOW_KEYBOARD_CAPTURE_LOST);
 
-        m_pKeyboardCapturer = pChildWindow;
+            m_pKeyboardCapturer = pChildWindow;
+        }
     }
     else
         m_pKeyboardCapturer = NULL;
