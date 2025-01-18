@@ -59,8 +59,8 @@ public:
     void logHookReport(u32 entries_limit = PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
     void logSamplingReport(u32 entries_limit = PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
     void saveReport();
-    void saveHookReport();
-    void saveSamplingReport();
+    void saveHookReport(shared_str filename);
+    void saveSamplingReport(shared_str filename);
     shared_str getHookReportFilename();
     shared_str getSamplingReportFilename();
 
@@ -71,8 +71,9 @@ public:
 
 private:
     lua_State* lua() const;
+
     static int luaMemoryUsed(lua_State* L);
-    static bool luaIsJitProfilerDefined(lua_State* L);
+    static bool luaIsJitProfilerDefined();
     static void luaJitSamplingProfilerAttach(CScriptProfiler* profiler, u32 interval);
     static void luaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_profile_callback callback, void* data);
     static void luaJitProfilerStop(lua_State* L);

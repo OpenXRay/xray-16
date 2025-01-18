@@ -1998,43 +1998,47 @@ public:
     CCC_LuaProfiler(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args)
     {
-  
-        if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+        CScriptProfiler* profiler = GEnv.ScriptEngine->m_profiler;
+
+        if (strstr(cName, "lua_profiler_status") == cName)
         {
-            GEnv.ScriptEngine->m_profiler->startHookMode();
+            Msg("[P] Profiler status: %s, type - %s", profiler->isActive() ? "on" : "off",
+                profiler->getTypeString().c_str());
+        }
+        else if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+        {
+            profiler->startHookMode();
         }
         else if (strstr(cName, "lua_profiler_start_sampling_mode") == cName)
         {
             u32 interval = atoi(args);
 
-            GEnv.ScriptEngine->m_profiler->startSamplingMode(
-                interval ? interval : CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT);
+            profiler->startSamplingMode(interval ? interval : CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT);
         }
         else if (strstr(cName, "lua_profiler_start") == cName)
         {
             u32 profiler_type = atoi(args);
 
-            GEnv.ScriptEngine->m_profiler->start(
+            profiler->start(
                 (profiler_type ? (CScriptProfilerType)profiler_type : CScriptProfiler::PROFILE_TYPE_DEFAULT));
         }
         else if (strstr(cName, "lua_profiler_stop") == cName)
         {
-            GEnv.ScriptEngine->m_profiler->stop();
+            profiler->stop();
         }
         else if (strstr(cName, "lua_profiler_reset") == cName)
         {
-            GEnv.ScriptEngine->m_profiler->reset();
+            profiler->reset();
         }
         else if (strstr(cName, "lua_profiler_log") == cName)
         {
             u32 limit = atoi(args);
 
-            GEnv.ScriptEngine->m_profiler->logReport(
-                limit ? limit : CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
+            profiler->logReport(limit ? limit : CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
         }
         else if (strstr(cName, "lua_profiler_save") == cName)
         {
-            GEnv.ScriptEngine->m_profiler->saveReport();
+            profiler->saveReport();
         }
     };
 
@@ -2043,8 +2047,11 @@ public:
         CScriptProfiler* profiler = GEnv.ScriptEngine->m_profiler;
         TStatus status_buffer;
 
-
-        if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+        if (strstr(cName, "lua_profiler_status") == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
         {
             // No arguments.
         }
@@ -2084,10 +2091,14 @@ public:
 
     void Info(TInfo& I) override
     {
-        if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+        if (strstr(cName, "lua_profiler_status") == cName)
+            xr_strcpy(I, "no arguments : print lua profiler status");
+        else if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
             xr_strcpy(I, "no arguments : start lua script profiling in hook mode");
         else if (strstr(cName, "lua_profiler_start_sampling_mode") == cName)
-            xr_strcpy(I, "integer value in range [1,1000] : start lua script profiling in sampling mode with provided sampling interval");
+            xr_strcpy(I,
+                "integer value in range [1,1000] : start lua script profiling in sampling mode with provided sampling "
+                "interval");
         else if (strstr(cName, "lua_profiler_start") == cName)
             xr_strcpy(I, "integer value in range [0,2] : start lua script profiling in provided mode");
         else if (strstr(cName, "lua_profiler_stop") == cName)
@@ -2185,6 +2196,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
 #endif // MASTER_GOLD
 
+    CMD1(CCC_LuaProfiler, "lua_profiler_status");
     CMD1(CCC_LuaProfiler, "lua_profiler_start");
     CMD1(CCC_LuaProfiler, "lua_profiler_start_sampling_mode");
     CMD1(CCC_LuaProfiler, "lua_profiler_start_hook_mode");

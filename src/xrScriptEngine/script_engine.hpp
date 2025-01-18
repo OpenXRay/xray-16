@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: script_engine.h
-//	Created 	: 01.04.2004
-//  Modified 	: 01.04.2004
-//	Author		: Dmitriy Iassenev
-//	Description : XRay Script Engine
+//  Module      : script_engine.h
+//  Created     : 01.04.2004
+//  Modified    : 01.04.2004
+//  Author      : Dmitriy Iassenev
+//  Description : XRay Script Engine
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -72,7 +72,7 @@ class XRSCRIPTENGINE_API CScriptEngine
 {
 public:
     constexpr static cpcstr ARGUMENT_ENGINE_NOJIT = "-nojit";
-	typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
+    typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
     static const char* const GlobalNamespace;
 
 private:
