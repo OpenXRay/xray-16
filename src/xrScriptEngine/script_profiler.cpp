@@ -186,6 +186,7 @@ void CScriptProfiler::stop()
     }
 
     m_active = false;
+    m_profiler_type = CScriptProfilerType::None;
     m_hook_profiling_portions.clear();
     m_sampling_profiling_log.clear();
 }
@@ -264,10 +265,15 @@ void CScriptProfiler::logHookReport(u32 entries_limit)
         if (index >= entries_limit)
             break;
 
-        Msg("[P] [%3d] %9.3f ms %5.2f%%  %9.3f ms | %9d | %s", index, (*it)->second.duration() / 1000.0,
-            ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration,
-            (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0, (*it)->second.count(),
-            (*it)->first.c_str());
+        if (total_duration > 0)
+            Msg("[P] [%3d] %9.3f ms %5.2f%%  %9.3f ms | %9d | %s", index, (*it)->second.duration() / 1000.0,
+                ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration,
+                (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0, (*it)->second.count(),
+                (*it)->first.c_str());
+        else
+            // Small measurements chunks can result in 10-20 calls with ~0 total duration.
+            Msg("[P] [%3d] %9.3f ms %5.2f%%  %9.3f ms | %9d | %s", index, 0, 0, 0, (*it)->second.count(),
+                (*it)->first.c_str());
 
         index += 1;
     }
