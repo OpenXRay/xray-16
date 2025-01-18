@@ -181,56 +181,57 @@ void CScriptProfiler::logHookReport()
         total_duration += it->second.duration();
     }
 
-     Msg("[P] ==================================================================");
-     Msg("[P] = Hook profiler report, %d entries", entries.size());
-     Msg("[P] ==================================================================");
-     Msg("[P] = By calls duration:");
-     Msg("[P] ====");
+    Msg("[P] ==================================================================");
+    Msg("[P] = Hook profiler report, %d entries", entries.size());
+    Msg("[P] ==================================================================");
+    Msg("[P] = By calls duration:");
+    Msg("[P] ==================================================================");
+    Msg("[P] [idx]     sum        sum%% |   calls         avg    | trace");
 
-     u64 index = 0;
+    u64 index = 0;
 
-     std::sort(entries.begin(), entries.end(),
-         [](auto& left, auto& right) { return left->second.duration() > right->second.duration(); });
+    std::sort(entries.begin(), entries.end(),
+        [](auto& left, auto& right) { return left->second.duration() > right->second.duration(); });
 
-     for (auto it = entries.begin(); it != entries.end(); it++)
-     {
-         if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
-             break;
+    for (auto it = entries.begin(); it != entries.end(); it++)
+    {
+        if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
+            break;
 
-         Msg("[P] [%3d] %6.3f ms (%5.2f%%) %6d calls, %6.3f ms avg : %s", index, (*it)->second.duration() / 1000.0,
-             ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration, (*it)->second.count(),
-             (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0,
-             (*it)->first.c_str());
+        Msg("[P] [%3d] %9.3f ms %5.2f%% | %9d %9.3f ms | %s", index, (*it)->second.duration() / 1000.0,
+            ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration, (*it)->second.count(),
+            (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0, (*it)->first.c_str());
 
-         index += 1;
-     }
+        index += 1;
+    }
 
-     Msg("[P] ==================================================================");
-     Msg("[P] = By calls count:");
-     Msg("[P] ====");
+    Msg("[P] ==================================================================");
+    Msg("[P] = By calls count:");
+    Msg("[P] ==================================================================");
+    Msg("[P] [idx]    calls  calls%% | trace");
 
-     index = 0;
+    index = 0;
 
-     std::sort(entries.begin(), entries.end(),
-         [](auto& left, auto& right) { return left->second.count() > right->second.count(); });
+    std::sort(entries.begin(), entries.end(),
+        [](auto& left, auto& right) { return left->second.count() > right->second.count(); });
 
-     for (auto it = entries.begin(); it != entries.end(); it++)
-     {
-         if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
-             break;
+    for (auto it = entries.begin(); it != entries.end(); it++)
+    {
+        if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
+            break;
 
-         Msg("[P] [%3d] %6d (%5.2f%%) : %s", index, (*it)->second.count(),
-             ((f64)(*it)->second.count() * 100.0) / (f64)total_count, (*it)->first.c_str());
+        Msg("[P] [%3d] %9d %5.2f%% | %s", index, (*it)->second.count(),
+            ((f64)(*it)->second.count() * 100.0) / (f64)total_count, (*it)->first.c_str());
 
-         index += 1;
-     }
+        index += 1;
+    }
 
-     Msg("[P] ==================================================================");
-     Msg("[P] = Total function calls count: %d", total_count);
-     Msg("[P] = Total function calls duration: %f ms", (f32) total_duration / 1000.0);
-     Msg("[P] ==================================================================");
+    Msg("[P] ==================================================================");
+    Msg("[P] = Total function calls count: %d", total_count);
+    Msg("[P] = Total function calls duration: %f ms", (f32) total_duration / 1000.0);
+    Msg("[P] ==================================================================");
 
-     FlushLog();
+    FlushLog();
 }
 
 void CScriptProfiler::logSamplingReport()
@@ -263,34 +264,33 @@ void CScriptProfiler::logSamplingReport()
         total_count += it->second.m_samples;
     }
 
-     std::sort(entries.begin(), entries.end(),
-         [](auto& left, auto& right) { return left->second.m_samples > right->second.m_samples; });
+    std::sort(entries.begin(), entries.end(),
+        [](auto& left, auto& right) { return left->second.m_samples > right->second.m_samples; });
 
-     Msg("[P] ==================================================================");
-     Msg("[P] = Sampling profiler report, %d entries", entries.size());
-     Msg("[P] ==================================================================");
-     Msg("[P] = By samples count:");
-     Msg("[P] ====");
+    Msg("[P] ==================================================================");
+    Msg("[P] = Sampling profiler report, %d entries", entries.size());
+    Msg("[P] ==================================================================");
+    Msg("[P] [idx]  samples    %%    | trace");
 
-     u64 index = 0;
+    u64 index = 0;
 
-     for (auto it = entries.begin(); it != entries.end(); it++)
-     {
-         if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
-             break;
+    for (auto it = entries.begin(); it != entries.end(); it++)
+    {
+        if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
+            break;
 
-         Msg("[P] [%3d] %d (%5.2f%%) : %s", index, (*it)->second.m_samples,
-             ((f64)(*it)->second.m_samples * 100.0) / (f64)total_count, (*it)->first.c_str());
+        Msg("[P] [%3d] %9d %5.2f%% | %s", index, (*it)->second.m_samples,
+            ((f64)(*it)->second.m_samples * 100.0) / (f64)total_count, (*it)->first.c_str());
 
-         index += 1;
-     }
+        index += 1;
+    }
 
-     Msg("[P] ==================================================================");
-     Msg("[P] = Total samples: %d", total_count);
-     Msg("[P] = Total function calls duration: %d ms (approximate)", total_count * m_sampling_profile_interval);
-     Msg("[P] ==================================================================");
+    Msg("[P] ==================================================================");
+    Msg("[P] = Total samples: %d", total_count);
+    Msg("[P] = Total function calls duration: %d ms (approximate)", total_count * m_sampling_profile_interval);
+    Msg("[P] ==================================================================");
 
-     FlushLog();
+    FlushLog();
 }
 
 void CScriptProfiler::saveReport()
@@ -315,11 +315,33 @@ void CScriptProfiler::saveHookReport()
         return;
     }
 
-    Log("[P] Saving hook profiler report");
+    shared_str log_file_name = getHookReportFilename();
+    IWriter* F = FS.w_open(log_file_name.c_str());
 
-    // todo;
-    // todo;
-    // todo;
+    Msg("[P] Saving hook report to %s", log_file_name.c_str());
+
+    xr_vector<decltype(m_hook_profiling_portions)::iterator> entries;
+    entries.reserve(m_hook_profiling_portions.size());
+
+    for (auto it = m_hook_profiling_portions.begin(); it != m_hook_profiling_portions.end(); it++)
+        entries.push_back(it);
+
+    std::sort(entries.begin(), entries.end(),
+        [](auto& left, auto& right) { return left->second.duration() > right->second.duration(); });
+
+    if (F)
+    {
+        string2048 buffer;
+
+        for (auto &it : entries)
+        {
+            xr_sprintf(buffer, "trace:%s calls:%d avg:%.3fms sum:%.3fms ", it->first.c_str(), it->second.count(),
+               (f32)it->second.duration() / (f32)it->second.count() / 1000.0, it->second.duration() / 1000.0);
+            F->w_string(buffer);
+        }
+
+        FS.w_close(F);
+    }
 }
 
 void CScriptProfiler::saveSamplingReport()
@@ -433,21 +455,31 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
 
     auto [parent_stack_info, has_parent_stack_info] = luaDebugStackInfo(L, 2, "nSl");
     auto [stack_info, has_stack_info] = luaDebugStackInfo(L, 1, "nSl");
+    auto [at_stack_info, has_at_stack_info] = luaDebugStackInfo(L, 0, "nSl");
 
     if (!has_parent_stack_info || !has_stack_info)
         return;
 
     string512 buffer;
 
-    auto name = stack_info.name ? stack_info.name : "?";
+    auto name = stack_info.name ? stack_info.name : at_stack_info.name ;
     auto parent_name = parent_stack_info.name ? parent_stack_info.name : "[C]";
     auto short_src = stack_info.short_src;
+    auto parent_short_src = parent_stack_info.short_src;
     auto line_defined = stack_info.linedefined;
+    auto parent_line_defined = parent_stack_info.linedefined;
+
+    if (!name)
+        name = "?";
 
     if (!stack_info.name && line_defined == 0)
-        name = "lua-script-body";
+        name = "script-body";
 
-    xr_sprintf(buffer, "%s [%d] - %s @ %s", name, line_defined, parent_name, short_src);
+    if (xr_strcmp(short_src, parent_short_src) == 0)
+        xr_sprintf(buffer, "%s:%d;%s@%s:%d", name, line_defined, parent_name, parent_short_src, parent_line_defined);
+    else
+        xr_sprintf(buffer, "%s@%s:%d;%s@%s:%d", name, short_src, line_defined, parent_name, parent_short_src,
+            parent_line_defined);
 
     auto it = m_hook_profiling_portions.find(buffer);
     bool exists = it != m_hook_profiling_portions.end();
@@ -457,9 +489,7 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
     case LUA_HOOKCALL:
     {
         if (exists)
-        {
             it->second.start();
-        }
         else
         {
             CScriptProfilerHookPortion portion;
@@ -472,20 +502,10 @@ void CScriptProfiler::onLuaHookCall(lua_State* L, lua_Debug* dbg)
         return;
     }
     case LUA_HOOKRET:
-    {
-        if (exists)
-        {
-            it->second.stop();
-        }
-
-        return;
-    }
     case LUA_HOOKTAILRET:
     {
         if (exists)
-        {
             it->second.stop();
-        }
 
         return;
     }
@@ -557,7 +577,6 @@ void CScriptProfiler::luaJitProfilerStart(lua_State* L, cpcstr mode, luaJIT_prof
 {
     // Only single JIT profiler can exist and it will not attach with multiple states.
     // Also only VM started profiler can end it, be careful.
-
     luaJIT_profile_start(L, mode, callback, data);
 }
 
@@ -581,8 +600,7 @@ shared_str CScriptProfiler::luaJitProfilerDumpToString(lua_State* L, cpcstr form
     size_t length;
     cpcstr dump = luaJIT_profile_dumpstack(L, format, depth, &length);
 
-    R_ASSERT2(length < 2048, "Profiling dump buffer overflow");
-
+    R_ASSERT2(length < sizeof(buffer), "Profiling dump buffer overflow");
     strncpy_s(buffer, sizeof(buffer), dump, length);
     buffer[length] = 0;
 

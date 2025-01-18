@@ -119,9 +119,9 @@ void CScriptEngine::reinit()
     if (m_virtual_machine)
     {
         if (m_profiler)
-	        m_profiler->onDispose(m_virtual_machine);
+            m_profiler->onDispose(m_virtual_machine);
 
-		lua_close(m_virtual_machine);
+        lua_close(m_virtual_machine);
         UnregisterState(m_virtual_machine);
     }
     m_virtual_machine = lua_newstate(lua_alloc, nullptr);
@@ -139,7 +139,7 @@ void CScriptEngine::reinit()
     scriptBuffer = xr_alloc<char>(scriptBufferSize);
 
     if (m_profiler)
-	    m_profiler->onReinit(m_virtual_machine);
+        m_profiler->onReinit(m_virtual_machine);
 }
 
 void CScriptEngine::print_stack(lua_State* L)
@@ -903,7 +903,7 @@ void CScriptEngine::lua_hook_call(lua_State* L, lua_Debug* dbg)
     #endif
 
     if (scriptEngine->m_profiler)
-	    scriptEngine->m_profiler->onLuaHookCall(L, dbg);
+        scriptEngine->m_profiler->onLuaHookCall(L, dbg);
 }
 
 int CScriptEngine::auto_load(lua_State* L)
