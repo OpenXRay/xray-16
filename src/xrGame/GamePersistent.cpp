@@ -142,11 +142,12 @@ void CGamePersistent::OnAppEnd()
 
     xr_delete(m_pLoadingScreen);
     xr_delete(m_pMainMenu);
-    xr_delete(GEnv.UI);
 
     inherited::OnAppEnd();
 
     clean_game_globals();
+
+    xr_delete(GEnv.UI);
 
     GMLib.Unload();
 
