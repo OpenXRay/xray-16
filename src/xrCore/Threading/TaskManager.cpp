@@ -140,7 +140,6 @@ struct TaskWorkerStats
 class TaskWorker : public TaskQueue, public TaskWorkerStats
 {
 public:
-    std::mutex       mutex;
     fast_lc16        random{ this };
     size_t           id    { size_t(-1) };
 } static thread_local s_tl_worker;
@@ -179,7 +178,7 @@ TaskManager::~TaskManager()
     UnregisterThisThreadAsWorker();
     while (!workers.empty())
     {
-        newWorkArrived.notify_all();
+        newWorkArrived.Set();
         SDL_PumpEvents();
         Sleep(0);
     }
@@ -242,10 +241,9 @@ void TaskManager::TaskWorkerStart()
 
         SetThreadStatus(false);
         {
-            std::unique_lock lck(s_tl_worker.mutex);
             do
             {
-                newWorkArrived.wait(lck); // spurious wakeups allowed
+                newWorkArrived.Wait();
             } while (shouldPause.load(std::memory_order_consume));
         }
         SetThreadStatus(true);
@@ -277,7 +275,7 @@ Task* TaskManager::TryToSteal() const
         if (auto* task = other->steal())
         {
             if (!other->empty())
-                newWorkArrived.notify_all();
+                newWorkArrived.Set();
             return task;
         }
         --steal_attempts;
@@ -294,7 +292,7 @@ Task* TaskManager::AllocateTask() noexcept
 void TaskManager::PushTask(Task& task) noexcept
 {
     s_tl_worker.push(&task);
-    newWorkArrived.notify_one();
+    newWorkArrived.Set();
     ++s_tl_worker.pushedTasks;
 }
 

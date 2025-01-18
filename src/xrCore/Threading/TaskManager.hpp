@@ -16,9 +16,9 @@
 #pragma once
 
 #include "Task.hpp"
+#include "Event.hpp"
 
 #include <atomic>
-#include <condition_variable>
 #include <mutex>
 
 class TaskWorker;
@@ -30,7 +30,7 @@ private:
     xr_vector<std::thread> workerThreads;
     std::mutex workersLock;
 
-    inline static std::condition_variable newWorkArrived;
+    inline static Event newWorkArrived;
     std::atomic_size_t activeWorkersCount{};
 
     std::atomic_bool shouldPause{};
