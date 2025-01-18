@@ -1992,6 +1992,115 @@ public:
     }
 };
 
+class CCC_LuaProfiler : public IConsole_Command
+{
+public:
+    CCC_LuaProfiler(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    virtual void Execute(LPCSTR args)
+    {
+  
+        if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+        {
+            GEnv.ScriptEngine->m_profiler->startHookMode();
+        }
+        else if (strstr(cName, "lua_profiler_start_sampling_mode") == cName)
+        {
+            u32 interval = atoi(args);
+
+            GEnv.ScriptEngine->m_profiler->startSamplingMode(
+                interval ? interval : CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT);
+        }
+        else if (strstr(cName, "lua_profiler_start") == cName)
+        {
+            u32 profiler_type = atoi(args);
+
+            GEnv.ScriptEngine->m_profiler->start(
+                (profiler_type ? (CScriptProfilerType)profiler_type : CScriptProfiler::PROFILE_TYPE_DEFAULT));
+        }
+        else if (strstr(cName, "lua_profiler_stop") == cName)
+        {
+            GEnv.ScriptEngine->m_profiler->stop();
+        }
+        else if (strstr(cName, "lua_profiler_reset") == cName)
+        {
+            GEnv.ScriptEngine->m_profiler->reset();
+        }
+        else if (strstr(cName, "lua_profiler_log") == cName)
+        {
+            u32 limit = atoi(args);
+
+            GEnv.ScriptEngine->m_profiler->logReport(
+                limit ? limit : CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
+        }
+        else if (strstr(cName, "lua_profiler_save") == cName)
+        {
+            GEnv.ScriptEngine->m_profiler->saveReport();
+        }
+    };
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        CScriptProfiler* profiler = GEnv.ScriptEngine->m_profiler;
+        TStatus status_buffer;
+
+
+        if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, "lua_profiler_start_sampling_mode") == cName)
+        {
+            xr_sprintf(status_buffer, "%d (default) [1-%d] - sampling interval",
+                CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT, CScriptProfiler::PROFILE_SAMPLING_INTERVAL_MAX);
+            tips.push_back(status_buffer);
+        }
+        else if (strstr(cName, "lua_profiler_start") == cName)
+        {
+            xr_sprintf(status_buffer, "%d - hooks based profiler", CScriptProfilerType::Hook);
+            tips.push_back(status_buffer);
+
+            xr_sprintf(status_buffer, "%d - sampling based profiler", CScriptProfilerType::Sampling);
+            tips.push_back(status_buffer);
+        }
+        else if (strstr(cName, "lua_profiler_stop") == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, "lua_profiler_reset") == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, "lua_profiler_log") == cName)
+        {
+            xr_sprintf(status_buffer, "%d (default) - count of profiling entries to print",
+                CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT, CScriptProfiler::PROFILE_SAMPLING_INTERVAL_MAX);
+            tips.push_back(status_buffer);
+        }
+        else if (strstr(cName, "lua_profiler_save") == cName)
+        {
+            // No arguments.
+        }
+    }
+
+    void Info(TInfo& I) override
+    {
+        if (strstr(cName, "lua_profiler_start_hook_mode") == cName)
+            xr_strcpy(I, "no arguments : start lua script profiling in hook mode");
+        else if (strstr(cName, "lua_profiler_start_sampling_mode") == cName)
+            xr_strcpy(I, "integer value in range [1,1000] : start lua script profiling in sampling mode with provided sampling interval");
+        else if (strstr(cName, "lua_profiler_start") == cName)
+            xr_strcpy(I, "integer value in range [0,2] : start lua script profiling in provided mode");
+        else if (strstr(cName, "lua_profiler_stop") == cName)
+            xr_strcpy(I, "no arguments : stop lua script profiling");
+        else if (strstr(cName, "lua_profiler_reset") == cName)
+            xr_strcpy(I, "no arguments : reset lua script profiling stats");
+        else if (strstr(cName, "lua_profiler_log") == cName)
+            xr_strcpy(I, "integer value : log lua script profiling stats, limit entries with argument");
+        else if (strstr(cName, "lua_profiler_save") == cName)
+            xr_strcpy(I, "no arguments : save lua script profiling stats in a file");
+    }
+};
+
 void CCC_RegisterCommands()
 {
     ZoneScoped;
@@ -2075,6 +2184,14 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "ai_smart_factor", &g_smart_cover_factor, 0.f, 1000000.f);
     CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
 #endif // MASTER_GOLD
+
+    CMD1(CCC_LuaProfiler, "lua_profiler_start");
+    CMD1(CCC_LuaProfiler, "lua_profiler_start_sampling_mode");
+    CMD1(CCC_LuaProfiler, "lua_profiler_start_hook_mode");
+    CMD1(CCC_LuaProfiler, "lua_profiler_stop");
+    CMD1(CCC_LuaProfiler, "lua_profiler_reset");
+    CMD1(CCC_LuaProfiler, "lua_profiler_log");
+    CMD1(CCC_LuaProfiler, "lua_profiler_save");
 
 #ifdef DEBUG
     CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);

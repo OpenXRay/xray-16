@@ -24,6 +24,34 @@ CScriptProfiler::~CScriptProfiler()
     m_engine = nullptr;
 }
 
+shared_str CScriptProfiler::getTypeString() const
+{
+    switch (m_profiler_type)
+    {
+    case CScriptProfilerType::None:
+        return "None";
+    case CScriptProfilerType::Hook:
+        return "Hook";
+    case CScriptProfilerType::Sampling:
+        return "Sampling";
+    default: NODEFAULT;
+    }
+};
+
+u32 CScriptProfiler::getRecordsCount() const
+{
+    switch (m_profiler_type)
+    {
+    case CScriptProfilerType::None:
+        return 0;
+    case CScriptProfilerType::Hook:
+        return m_hook_profiling_portions.size();
+    case CScriptProfilerType::Sampling:
+        return m_sampling_profiling_log.size();
+    default: NODEFAULT;
+    }
+};
+
 void CScriptProfiler::start(CScriptProfilerType profiler_type)
 {
     switch (profiler_type)
@@ -37,7 +65,9 @@ void CScriptProfiler::start(CScriptProfilerType profiler_type)
     case CScriptProfilerType::None:
         Msg("[P] Tried to start none type profiler");
         return;
-    default: NODEFAULT;
+    default:
+        Msg("[P] Tried to start unknown type (%d) profiler", profiler_type);
+        return;
     }
 }
 
@@ -146,21 +176,21 @@ void CScriptProfiler::reset()
     m_sampling_profiling_log.clear();
 }
 
-void CScriptProfiler::logReport()
+void CScriptProfiler::logReport(u32 entries_limit)
 {
     switch (m_profiler_type)
     {
-        case CScriptProfilerType::Hook:
-            return logHookReport();
-        case CScriptProfilerType::Sampling:
-            return logSamplingReport();
-        default:
-            Msg("[P] No active profiling data to report");
-            return;
+    case CScriptProfilerType::Hook:
+        return logHookReport(entries_limit);
+    case CScriptProfilerType::Sampling:
+        return logSamplingReport(entries_limit);
+    default:
+        Msg("[P] No active profiling data to report");
+        return;
     }
 }
 
-void CScriptProfiler::logHookReport()
+void CScriptProfiler::logHookReport(u32 entries_limit)
 {
     if (m_hook_profiling_portions.empty())
     {
@@ -186,7 +216,7 @@ void CScriptProfiler::logHookReport()
     Msg("[P] ==================================================================");
     Msg("[P] = By calls duration:");
     Msg("[P] ==================================================================");
-    Msg("[P] [idx]     sum        sum%% |   calls         avg    | trace");
+    Msg("[P] [idx]     sum        sum%%        avg    |   calls   | trace");
 
     u64 index = 0;
 
@@ -195,12 +225,13 @@ void CScriptProfiler::logHookReport()
 
     for (auto it = entries.begin(); it != entries.end(); it++)
     {
-        if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
+        if (index >= entries_limit)
             break;
 
-        Msg("[P] [%3d] %9.3f ms %5.2f%% | %9d %9.3f ms | %s", index, (*it)->second.duration() / 1000.0,
-            ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration, (*it)->second.count(),
-            (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0, (*it)->first.c_str());
+        Msg("[P] [%3d] %9.3f ms %5.2f%%  %9.3f ms | %9d | %s", index, (*it)->second.duration() / 1000.0,
+            ((f64)(*it)->second.duration() * 100.0) / (f64)total_duration,
+            (f64)(*it)->second.duration() / (f64)(*it)->second.count() / 1000.0, (*it)->second.count(),
+            (*it)->first.c_str());
 
         index += 1;
     }
@@ -217,7 +248,7 @@ void CScriptProfiler::logHookReport()
 
     for (auto it = entries.begin(); it != entries.end(); it++)
     {
-        if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
+        if (index >= entries_limit)
             break;
 
         Msg("[P] [%3d] %9d %5.2f%% | %s", index, (*it)->second.count(),
@@ -234,7 +265,7 @@ void CScriptProfiler::logHookReport()
     FlushLog();
 }
 
-void CScriptProfiler::logSamplingReport()
+void CScriptProfiler::logSamplingReport(u32 entries_limit)
 {
     if (m_sampling_profiling_log.empty())
     {
@@ -276,7 +307,7 @@ void CScriptProfiler::logSamplingReport()
 
     for (auto it = entries.begin(); it != entries.end(); it++)
     {
-        if (index >= CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT)
+        if (index >= entries_limit)
             break;
 
         Msg("[P] [%3d] %9d %5.2f%% | %s", index, (*it)->second.m_samples,
@@ -287,7 +318,6 @@ void CScriptProfiler::logSamplingReport()
 
     Msg("[P] ==================================================================");
     Msg("[P] = Total samples: %d", total_count);
-    Msg("[P] = Total function calls duration: %d ms (approximate)", total_count * m_sampling_profile_interval);
     Msg("[P] ==================================================================");
 
     FlushLog();
@@ -297,13 +327,13 @@ void CScriptProfiler::saveReport()
 {
     switch (m_profiler_type)
     {
-        case CScriptProfilerType::Hook:
-            return saveHookReport();
-        case CScriptProfilerType::Sampling:
-            return saveSamplingReport();
-        default:
-            Msg("[P] No active profiling data to save report");
-            return;
+    case CScriptProfilerType::Hook:
+        return saveHookReport();
+    case CScriptProfilerType::Sampling:
+        return saveSamplingReport();
+    default:
+        Msg("[P] No active profiling data to save report");
+        return;
     }
 }
 

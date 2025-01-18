@@ -18,25 +18,27 @@ class XRSCRIPTENGINE_API CScriptProfiler
 {
 // todo: Can we make some global module to store all the arguments as experessions?
 public:
-    // List of commnad line args for startup profuler attach:
+    // List of commnad line args for startup profiler attach:
     constexpr static cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
     constexpr static cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
     constexpr static cpcstr ARGUMENT_PROFILER_SAMPLING = "-lua_sampling_profiler";
 
-    static const u32 PROFILE_ENTRIES_LOG_LIMIT = 128;
-    static const u32 PROFILE_SAMPLING_INTERVAL_DEFAULT = 1;
+    static const CScriptProfilerType PROFILE_TYPE_DEFAULT = CScriptProfilerType::Hook;
+    static const u32 PROFILE_ENTRIES_LOG_LIMIT_DEFAULT = 128;
+    static const u32 PROFILE_SAMPLING_INTERVAL_DEFAULT = 10;
     static const u32 PROFILE_SAMPLING_INTERVAL_MAX = 1000;
 
 private:
     CScriptEngine* m_engine;
     CScriptProfilerType m_profiler_type;
     bool m_active;
+
+    xr_unordered_map<shared_str, CScriptProfilerHookPortion> m_hook_profiling_portions;
+    xr_vector<CScriptProfilerSamplingPortion> m_sampling_profiling_log;
     /*
      * Sampling interval for JIT based profiler.
      * Value should be set in ms and defaults to 10ms.
      */
-    xr_unordered_map<shared_str, CScriptProfilerHookPortion> m_hook_profiling_portions;
-    xr_vector<CScriptProfilerSamplingPortion> m_sampling_profiling_log;
     u32 m_sampling_profile_interval;
 
 public:
@@ -44,14 +46,18 @@ public:
     virtual ~CScriptProfiler();
 
     bool isActive() const { return m_active; };
-    void start(CScriptProfilerType profiler_type = CScriptProfilerType::Hook);
-    void startSamplingMode(u32 sampling_interval);
+    CScriptProfilerType getType() const { return m_profiler_type; };
+    shared_str getTypeString() const;
+    u32 getRecordsCount() const;
+
+    void start(CScriptProfilerType profiler_type = PROFILE_TYPE_DEFAULT);
     void startHookMode();
+    void startSamplingMode(u32 sampling_interval);
     void stop();
     void reset();
-    void logReport();
-    void logHookReport();
-    void logSamplingReport();
+    void logReport(u32 entries_limit = PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
+    void logHookReport(u32 entries_limit = PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
+    void logSamplingReport(u32 entries_limit = PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
     void saveReport();
     void saveHookReport();
     void saveSamplingReport();

@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: script_engine_script.cpp
-//	Created 	: 25.12.2002
-//  Modified 	: 13.05.2004
-//	Author		: Dmitriy Iassenev
-//	Description : ALife Simulator script engine export
+//  Module      : script_engine_script.cpp
+//  Created     : 25.12.2002
+//  Modified    : 13.05.2004
+//  Author      : Dmitriy Iassenev
+//  Description : ALife Simulator script engine export
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.hpp"
@@ -175,11 +175,7 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->isActive();
         }),
-    	def("start", +[]()
-        {
-            GEnv.ScriptEngine->m_profiler->start();
-        }),
-        def("start", +[](CScriptProfilerType hook_type)
+        def("start", +[](CScriptProfilerType hook_type = CScriptProfilerType::None)
         {
             GEnv.ScriptEngine->m_profiler->start(hook_type);
         }),
@@ -199,9 +195,9 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->reset();
         }),
-        def("log_report", +[]()
+        def("log_report", +[](u32 entries_limit = CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT)
         {
-            GEnv.ScriptEngine->m_profiler->logReport();
+            GEnv.ScriptEngine->m_profiler->logReport(entries_limit);
         }),
         def("save_report", +[]()
         {
@@ -210,12 +206,12 @@ SCRIPT_EXPORT(CScriptEngine, (),
     ];
 
     /**
-	 * Exports injected from tracy profiler:
+     * Exports injected from tracy profiler:
      *
      * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/manual/tracy.tex#L1932
      * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/public/tracy/TracyLua.hpp#L18
      *
-	 * global tracy {
+     * global tracy {
      *     function ZoneBegin;
      *     function ZoneBeginN;
      *     function ZoneBeginS;
@@ -224,6 +220,6 @@ SCRIPT_EXPORT(CScriptEngine, (),
      *     function ZoneText;
      *     function ZoneName;
      *     function Message;
-	 * }
-	*/
+     * }
+    */
 });
