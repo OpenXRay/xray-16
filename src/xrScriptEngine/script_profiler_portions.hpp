@@ -58,28 +58,35 @@ class CScriptProfilerHookPortion {
 };
 
 class CScriptProfilerSamplingPortion {
-	using Clock = std::chrono::high_resolution_clock;
+    using Clock = std::chrono::high_resolution_clock;
     using Time = Clock::time_point;
 
- 	public:
-        Time tracked_at;
+     public:
+        Time m_recoreded_at;
 
-    	int memory;
-        int samples;
-        int state;
-        shared_str name;
-        shared_str trace;
+        int m_memory;
+        int m_samples;
+        int m_state;
+        shared_str m_name;
+        shared_str m_trace;
 
         CScriptProfilerSamplingPortion(shared_str name, shared_str trace, int samples, int state, int memory)
-            : name(name), trace(trace), memory(memory), samples(samples), state(state), tracked_at(Clock::now()) {}
+            : m_name(name), m_trace(trace), m_memory(memory), m_samples(samples), m_state(state),
+              m_recoreded_at(Clock::now()) {}
+
+        CScriptProfilerSamplingPortion(const CScriptProfilerSamplingPortion& rhs)
+            : m_name(rhs.m_name), m_trace(rhs.m_trace), m_memory(rhs.m_memory), m_samples(rhs.m_samples),
+              m_state(rhs.m_state), m_recoreded_at(rhs.m_recoreded_at) {}
+
+        CScriptProfilerSamplingPortion cloned() const { return CScriptProfilerSamplingPortion(*this); }
 
         // Build flamechart folded stack including frames and samples count
         // Example: `C;frame_1_func:24;frame_2_func:45 4`
         shared_str getFoldedStack()
         {
             string2048 buffer;
-            xr_sprintf(buffer, "%c;%s %d", state, trace.c_str(), samples);
+            xr_sprintf(buffer, "%c;%s %d", m_state, m_trace.c_str(), m_samples);
 
-        	return shared_str(buffer);
+            return shared_str(buffer);
         }
 };
