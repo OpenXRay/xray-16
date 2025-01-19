@@ -51,7 +51,7 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
-    ZoneScoped;
+    ZoneTransient(tracy_scoped_zone, true);
 
     hDXGI = XRay::LoadModule("dxgi");
     hD3D = XRay::LoadModule("d3d11");
@@ -92,7 +92,7 @@ void CHW::DestroyD3D()
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
-    ZoneScoped;
+    ZoneTransient(tracy_scoped_zone, true);
 
     CreateD3D();
     if (!Valid)
@@ -148,7 +148,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
-        ZoneScopedN("Create device");
+        ZoneTransientN(tracy_scoped_zone_2, "CreateDevice", true);
 
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
         return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
@@ -223,7 +223,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     {
         TaskScheduler->AddTask([this]
         {
-            ZoneScopedN("TracyD3D11Context");
+            ZoneTransientN(tracy_scoped_zone_2, "TracyD3D11Context", true);
             profiler_ctx = TracyD3D11Context(pDevice, get_context(CHW::IMM_CTX_ID));
         });
     }
@@ -231,7 +231,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     // Create deferred contexts
     if (ThisInstanceIsGlobal())
     {
-        ZoneScopedN("Create deferred contexts");
+        ZoneTransientN(tracy_scoped_zone_2, "Create deferred contexts", true);
         for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
         {
             R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
@@ -282,7 +282,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
 bool CHW::CreateSwapChain(HWND hwnd)
 {
-    ZoneScoped;
+    ZoneTransient(tracy_scoped_zone, true);
 
     // Set up the presentation parameters
     DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
@@ -338,7 +338,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     if (strstr(Core.Params, "-no_dx11_2"))
         return false;
 
-    ZoneScoped;
+    ZoneTransient(tracy_scoped_zone, true);
 
 #ifdef HAS_DX11_2
     IDXGIFactory2* pFactory2{};

@@ -72,7 +72,7 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateDevice(SDL_Window* hWnd)
 {
-    ZoneScoped;
+    ZoneTransient(tracy_scoped_zone, true);
 
     m_window = hWnd;
 
@@ -104,7 +104,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     int version;
     {
-        ZoneScopedN("gladLoadGL");
+        ZoneTransientN(tracy_scoped_zone_2, "gladLoadGL", true);
         version = gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress));
     }
     if (version == 0)

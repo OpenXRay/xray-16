@@ -27,7 +27,7 @@ public:
 
     const xr_vector<std::pair<pcstr, int>>& ObtainSupportedModes() override
     {
-        ZoneScoped;
+        ZoneTransient(tracy_scoped_zone, true);
 
         if (CheckCanAddMode())
         {

@@ -34,7 +34,7 @@ public:
 
 BOOL xrRender_test_hw()
 {
-    ZoneScoped;
+    ZoneTransient(tracy_scoped_zone, true);
 
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
