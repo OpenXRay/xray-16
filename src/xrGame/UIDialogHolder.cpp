@@ -719,9 +719,6 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
 bool CDialogHolder::FillDebugTree(const CUIDebugState& debugState)
 {
 #ifndef MASTER_GOLD
-    // XXX: Was this meant to be used somewhere here? Because currently its unused and could also be constexpr
-    //ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
-
     if (m_input_receivers.empty())
         ImGui::BulletText("Input receivers: 0");
     else
@@ -754,7 +751,8 @@ void CDialogHolder::FillDebugInfo()
 #ifndef MASTER_GOLD
     if (ImGui::CollapsingHeader(CDialogHolder::GetDebugType()))
     {
-
+        ImGui::DragScalar("Cursor become visible time", ImGuiDataType_U32, &m_become_visible_time);
+        ImGui::Checkbox("Foremost", &m_is_foremost);
     }
 #endif
 }
