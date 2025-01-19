@@ -36,7 +36,7 @@ enum class FocusDirection : u8
 };
 
 // Doesn't own CUIWindow* pointers it holds
-class XRUICORE_API CUIFocusSystem
+class XRUICORE_API CUIFocusSystem : public CUIDebuggable
 {
     xr_list<const CUIWindow*> m_valuable;
     xr_list<const CUIWindow*> m_non_valuable;
@@ -65,4 +65,8 @@ public:
     void SetFocused(const CUIWindow* window);
 
     std::pair<CUIWindow*, CUIWindow*> FindClosestFocusable(const Fvector2& from, FocusDirection direction) const;
+
+    pcstr GetDebugType() override { return "CUIFocusSystem"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 };

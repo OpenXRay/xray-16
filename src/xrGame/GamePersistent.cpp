@@ -116,6 +116,7 @@ void CGamePersistent::OnAppStart()
 #endif
 
     GEnv.UI = xr_new<UICore>();
+    GEnv.UI->Focus().RegisterDebuggable();
     m_pMainMenu = xr_new<CMainMenu>();
     if (GEnv.isDedicatedServer)
         m_pLoadingScreen = xr_new<NullLoadingScreen>();

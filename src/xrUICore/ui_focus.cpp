@@ -233,3 +233,59 @@ std::pair<CUIWindow*, CUIWindow*> CUIFocusSystem::FindClosestFocusable(const Fve
         const_cast<CUIWindow*>(closest2)
     };
 }
+
+bool CUIFocusSystem::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    const bool open = ImGui::TreeNodeEx(this, flags, "Focus system (%s)", GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.select(this);
+
+    if (open)
+    {
+        if (m_valuable.empty())
+            ImGui::BulletText("Valuable: 0");
+        else
+        {
+            if (ImGui::TreeNode(&m_valuable, "Valuable: %zu", m_valuable.size()))
+            {
+                for (auto& window : m_valuable)
+                    const_cast<CUIWindow*>(window)->FillDebugTree(debugState);
+                ImGui::TreePop();
+            }
+        }
+
+        if (m_non_valuable.empty())
+            ImGui::BulletText("Non valuable: 0");
+        else
+        {
+            if (ImGui::TreeNode(&m_non_valuable, "Valuable: %zu", m_non_valuable.size()))
+            {
+                for (auto& window : m_non_valuable)
+                    const_cast<CUIWindow*>(window)->FillDebugTree(debugState);
+                ImGui::TreePop();
+            }
+        }
+
+        ImGui::TreePop();
+    }
+
+    return open;
+#else
+    return true;
+#endif
+}
+void CUIFocusSystem::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!ImGui::CollapsingHeader(CUIFocusSystem::GetDebugType()))
+        return;
+
+    ImGui::LabelText("Current focused", "%s", m_current_focused ? m_current_focused->WindowName().c_str() : "none");
+    ImGui::LabelText("Locker", "%s", m_focus_locker ? m_focus_locker->WindowName().c_str() : "none");
+#endif
+}
