@@ -204,7 +204,11 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->reset();
         }),
-        def("log_report", +[](u32 entries_limit = CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT)
+        def("log_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->logReport();
+        }),
+        def("log_report", +[](u32 entries_limit)
         {
             GEnv.ScriptEngine->m_profiler->logReport(entries_limit);
         }),
