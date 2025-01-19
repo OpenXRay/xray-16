@@ -172,15 +172,19 @@ SCRIPT_EXPORT(CScriptEngine, (),
 
     module(luaState, "profiler")
     [
-        def("is_active", +[]()
+        def("is_active", +[]() -> bool
         {
-            GEnv.ScriptEngine->m_profiler->isActive();
+            return GEnv.ScriptEngine->m_profiler->isActive();
         }),
-        def("get_type", +[]()
+        def("get_type", +[]()-> u32
         {
-            GEnv.ScriptEngine->m_profiler->getType();
+            return static_cast<u32>(GEnv.ScriptEngine->m_profiler->getType());
         }),
-        def("start", +[](CScriptProfilerType hook_type = CScriptProfilerType::None)
+        def("start", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->start();
+        }),
+        def("start", +[](CScriptProfilerType hook_type)
         {
             GEnv.ScriptEngine->m_profiler->start(hook_type);
         }),
