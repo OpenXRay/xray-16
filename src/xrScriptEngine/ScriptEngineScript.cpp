@@ -192,6 +192,10 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->startHookMode();
         }),
+        def("start_sampling_mode", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->startSamplingMode();
+        }),
         def("start_sampling_mode", +[](u32 sampling_interval = CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT)
         {
             GEnv.ScriptEngine->m_profiler->startSamplingMode(sampling_interval);

@@ -52,7 +52,7 @@ public:
 
     void start(CScriptProfilerType profiler_type = PROFILE_TYPE_DEFAULT);
     void startHookMode();
-    void startSamplingMode(u32 sampling_interval);
+    void startSamplingMode(u32 sampling_interval = PROFILE_SAMPLING_INTERVAL_DEFAULT);
     void stop();
     void reset();
     void logReport(u32 entries_limit = PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
