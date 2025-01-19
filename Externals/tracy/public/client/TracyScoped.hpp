@@ -2,6 +2,7 @@
 #define __TRACYSCOPED_HPP__
 
 #include <limits>
+#include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -57,7 +58,7 @@ public:
         TracyQueueCommit( zoneBeginThread );
     }
 
-    tracy_force_inline ScopedZone( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, bool is_active = true )
+    tracy_force_inline ScopedZone( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, uint32_t color, bool is_active = true )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
 #else
@@ -69,13 +70,15 @@ public:
         m_connectionId = GetProfiler().ConnectionId();
 #endif
         TracyQueuePrepare( QueueType::ZoneBeginAllocSrcLoc );
-        const auto srcloc = Profiler::AllocSourceLocation( line, source, sourceSz, function, functionSz, name, nameSz );
+        const auto srcloc = Profiler::AllocSourceLocation( line, source, sourceSz, function, functionSz, name, nameSz, color );
         MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
         MemWrite( &item->zoneBegin.srcloc, srcloc );
         TracyQueueCommit( zoneBeginThread );
     }
 
-    tracy_force_inline ScopedZone( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, int depth, bool is_active = true )
+    tracy_force_inline ScopedZone( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, bool is_active = true ) : ScopedZone( line, source, sourceSz, function, functionSz, name, nameSz, static_cast<uint32_t>(0), is_active ) {}
+
+    tracy_force_inline ScopedZone( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, uint32_t color, int depth, bool is_active = true )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
 #else
@@ -89,11 +92,13 @@ public:
         GetProfiler().SendCallstack( depth );
 
         TracyQueuePrepare( QueueType::ZoneBeginAllocSrcLocCallstack );
-        const auto srcloc = Profiler::AllocSourceLocation( line, source, sourceSz, function, functionSz, name, nameSz );
+        const auto srcloc = Profiler::AllocSourceLocation( line, source, sourceSz, function, functionSz, name, nameSz, color );
         MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
         MemWrite( &item->zoneBegin.srcloc, srcloc );
         TracyQueueCommit( zoneBeginThread );
     }
+
+    tracy_force_inline ScopedZone( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, int depth, bool is_active = true ) : ScopedZone( line, source, sourceSz, function, functionSz, name, nameSz, 0, depth, is_active ) {}
 
     tracy_force_inline ~ScopedZone()
     {
@@ -121,6 +126,30 @@ public:
         TracyQueueCommit( zoneTextFatThread );
     }
 
+    void TextFmt( const char* fmt, ... )
+    {
+        if( !m_active ) return;
+#ifdef TRACY_ON_DEMAND
+        if( GetProfiler().ConnectionId() != m_connectionId ) return;
+#endif
+        va_list args;
+        va_start( args, fmt );
+        auto size = vsnprintf( nullptr, 0, fmt, args );
+        va_end( args );
+        if( size < 0 ) return;
+        assert( size < (std::numeric_limits<uint16_t>::max)() );
+
+        char* ptr = (char*)tracy_malloc( size_t( size ) + 1 );
+        va_start( args, fmt );
+        vsnprintf( ptr, size_t( size ) + 1, fmt, args );
+        va_end( args );
+
+        TracyQueuePrepare( QueueType::ZoneText );
+        MemWrite( &item->zoneTextFat.text, (uint64_t)ptr );
+        MemWrite( &item->zoneTextFat.size, (uint16_t)size );
+        TracyQueueCommit( zoneTextFatThread );
+    }
+
     tracy_force_inline void Name( const char* txt, size_t size )
     {
         assert( size < (std::numeric_limits<uint16_t>::max)() );
@@ -130,6 +159,30 @@ public:
 #endif
         auto ptr = (char*)tracy_malloc( size );
         memcpy( ptr, txt, size );
+        TracyQueuePrepare( QueueType::ZoneName );
+        MemWrite( &item->zoneTextFat.text, (uint64_t)ptr );
+        MemWrite( &item->zoneTextFat.size, (uint16_t)size );
+        TracyQueueCommit( zoneTextFatThread );
+    }
+
+    void NameFmt( const char* fmt, ... )
+    {
+        if( !m_active ) return;
+#ifdef TRACY_ON_DEMAND
+        if( GetProfiler().ConnectionId() != m_connectionId ) return;
+#endif
+        va_list args;
+        va_start( args, fmt );
+        auto size = vsnprintf( nullptr, 0, fmt, args );
+        va_end( args );
+        if( size < 0 ) return;
+        assert( size < (std::numeric_limits<uint16_t>::max)() );
+
+        char* ptr = (char*)tracy_malloc( size_t( size ) + 1 );
+        va_start( args, fmt );
+        vsnprintf( ptr, size_t( size ) + 1, fmt, args );
+        va_end( args );
+
         TracyQueuePrepare( QueueType::ZoneName );
         MemWrite( &item->zoneTextFat.text, (uint64_t)ptr );
         MemWrite( &item->zoneTextFat.size, (uint16_t)size );
