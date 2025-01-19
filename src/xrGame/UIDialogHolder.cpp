@@ -320,7 +320,7 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
     if (TIR->OnKeyboardAction(dik, WINDOW_KEY_PRESSED))
         return true;
 
-    if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
+    if (UI().GetUICursor().IsVisible() && dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
     {
         FocusDirection direction = FocusDirection::Same;
         switch (GetBindedAction(dik, EKeyContext::UI))
@@ -341,8 +341,8 @@ bool CDialogHolder::IR_UIOnKeyboardPress(int dik)
             if (candidate || candidate2)
             {
                 focus.SetFocused(candidate ? candidate : candidate2);
-                return true;
             }
+            return true;
         }
     }
 
