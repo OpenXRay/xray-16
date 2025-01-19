@@ -425,6 +425,7 @@ void CRenderDevice::Run()
 
 void CRenderDevice::Shutdown()
 {
+    ZoneScoped;
     seqAppEnd.Process();
 }
 

@@ -199,13 +199,14 @@ void execUserScript()
     Console->ExecuteScript(Console->ConfigFile);
 }
 
-constexpr pcstr APPLICATION_STARTUP = "Application startup";
-constexpr pcstr APPLICATION_SHUTDOWN = "Application shutdown";
+constexpr pcstr FRAME_MARK_APPLICATION_STARTUP = "Application startup";
+constexpr pcstr FRAME_MARK_APPLICATION_SHUTDOWN = "Application shutdown";
+constexpr pcstr FRAME_MARK_APPLICATION_RUN = "Application run";
 
 CApplication::CApplication(pcstr commandLine, GameModule* game)
 {
     Threading::SetCurrentThreadName("Primary thread");
-    FrameMarkStart(APPLICATION_STARTUP);
+    FrameMarkStart(FRAME_MARK_APPLICATION_STARTUP);
 
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
@@ -300,12 +301,12 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     if (!g_pGamePersistent)
         Console->Show();
 
-    FrameMarkEnd(APPLICATION_STARTUP);
+    FrameMarkEnd(FRAME_MARK_APPLICATION_STARTUP);
 }
 
 CApplication::~CApplication()
 {
-    FrameMarkStart(APPLICATION_SHUTDOWN);
+    FrameMarkStart(FRAME_MARK_APPLICATION_SHUTDOWN);
 
     // Destroy APP
     if (m_game_module)
@@ -353,7 +354,7 @@ CApplication::~CApplication()
     }
 
     xrDebug::Finalize();
-    FrameMarkEnd(APPLICATION_SHUTDOWN);
+    FrameMarkEnd(FRAME_MARK_APPLICATION_SHUTDOWN);
 }
 
 int CApplication::Run()
@@ -363,6 +364,7 @@ int CApplication::Run()
 
     while (!SDL_QuitRequested()) // SDL_PumpEvents is here
     {
+        FrameMarkStart(FRAME_MARK_APPLICATION_RUN);
         bool canCallActivate = false;
         bool shouldActivate = false;
 
@@ -424,7 +426,7 @@ int CApplication::Run()
         Device.ProcessFrame();
 
         UpdateDiscordStatus();
-        FrameMarkNamed("Primary thread");
+        FrameMarkEnd(FRAME_MARK_APPLICATION_RUN);
     } // while (!SDL_QuitRequested())
 
     Device.Shutdown();
