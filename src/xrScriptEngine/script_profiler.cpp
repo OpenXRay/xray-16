@@ -37,8 +37,8 @@ shared_str CScriptProfiler::getTypeString() const
         return "Hook";
     case CScriptProfilerType::Sampling:
         return "Sampling";
-    default: 
-        NODEFAULT; 
+    default:
+        NODEFAULT;
         return "Unknown";
     }
 };
@@ -56,7 +56,7 @@ u32 CScriptProfiler::getRecordsCount() const
         return m_hook_profiling_portions.size();
     case CScriptProfilerType::Sampling:
         return m_sampling_profiling_log.size();
-    default: 
+    default:
         NODEFAULT;
         return 0;
     }
