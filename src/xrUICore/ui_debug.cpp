@@ -36,6 +36,11 @@ void CUIDebugger::Unregister(CUIDebuggable* debuggable)
     const auto it = std::find(m_root_windows.begin(), m_root_windows.end(), debuggable);
     if (it != m_root_windows.end())
         m_root_windows.erase(it);
+
+    if (m_state.selected == debuggable)
+        m_state.selected = nullptr;
+    if (m_state.newSelected == debuggable)
+        m_state.newSelected = nullptr;
 #endif
 }
 
