@@ -184,9 +184,9 @@ SCRIPT_EXPORT(CScriptEngine, (),
         {
             GEnv.ScriptEngine->m_profiler->start();
         }),
-        def("start", +[](CScriptProfilerType hook_type)
+        def("start", +[](CScriptProfilerType profiler_type)
         {
-            GEnv.ScriptEngine->m_profiler->start(hook_type);
+            GEnv.ScriptEngine->m_profiler->start(profiler_type);
         }),
         def("start_hook_mode", +[]()
         {
