@@ -42,8 +42,7 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
     //	m_counter    = UIHelper::CreateStatic( xml, "t_counter", this );
 
     m_bt_close = UIHelper::Create3tButton(xml, "btn_close", this);
-    m_bt_close->SetAccelerator(kQUIT, false, 2);
-    m_bt_close->SetAccelerator(kUI_BACK, false, 3);
+    m_bt_close->SetAccelerator(kUI_BACK, false, 2);
 
     Register(m_bt_close);
     AddCallback(m_bt_close, BUTTON_CLICKED, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));

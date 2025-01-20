@@ -92,8 +92,7 @@ void CUIPdaWnd::Init()
     }
 
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
-    m_btn_close->SetAccelerator(kQUIT, false, 2);
-    m_btn_close->SetAccelerator(kUI_BACK, false, 3);
+    m_btn_close->SetAccelerator(kUI_BACK, false, 2);
     UI().Focus().UnregisterFocusable(m_btn_close);
 
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
