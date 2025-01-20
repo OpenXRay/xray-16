@@ -221,7 +221,6 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_
     if (b_finalizer)
     {
         itm->m_text->SetAccelerator(kUI_BACK, false, 2);
-        itm->m_text->SetAccelerator(kUSE, false, 3);
     }
 
     itm->SetWindowName("question_item");

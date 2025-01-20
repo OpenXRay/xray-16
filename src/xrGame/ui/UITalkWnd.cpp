@@ -348,9 +348,12 @@ void CUITalkWnd::SwitchToUpgrade()
 
 bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
+        if (IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
         {
             if (!b_disable_break)
             {
@@ -397,11 +400,14 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         } // switch (GetBindedAction(dik, EKeyContext::UI))
     }
 
-    return inherited::OnKeyboardAction(dik, keyboard_action);
+    return false;
 }
 
 bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
 {
+    if (inherited::OnControllerAction(axis, x, y, controller_action))
+        return true;
+
     if (controller_action == WINDOW_KEY_PRESSED || controller_action == WINDOW_KEY_HOLD)
     {
         if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
@@ -416,7 +422,7 @@ bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages cont
         }
     }
 
-    return inherited::OnControllerAction(axis, x, y, controller_action);
+    return false;
 }
 
 void CUITalkWnd::PlaySnd(LPCSTR text)
