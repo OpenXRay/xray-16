@@ -344,9 +344,9 @@ void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enab
 void CUITalkDialogWnd::TryScrollAnswersList(bool down)
 {
     if (down)
-        UIAnswersList->ScrollBar()->TryScrollDec();
-    else
         UIAnswersList->ScrollBar()->TryScrollInc();
+    else
+        UIAnswersList->ScrollBar()->TryScrollDec();
 }
 
 void CUITalkDialogWnd::FocusOnNextQuestion(bool next, bool loop) const

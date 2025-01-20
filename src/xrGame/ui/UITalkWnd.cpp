@@ -411,7 +411,7 @@ bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages cont
         }
         if (IsBinded(kTALK_LOG_SCROLL, axis, EKeyContext::Talk))
         {
-            UITalkDialogWnd->TryScrollAnswersList(y < 0);
+            UITalkDialogWnd->TryScrollAnswersList(y > 0);
             return true;
         }
     }
