@@ -55,7 +55,6 @@ void CDialogHolder::StartMenu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
             CurrentGameUI()->ShowGameIndicators(false);
         }
     }
-    UI().Focus().SetFocused(nullptr);
     pDialog->SetHolder(this);
 
     if (pDialog->NeedCursor())
