@@ -80,6 +80,9 @@ void CUIDebugger::on_tool_frame()
 
             if (ImGui::BeginMenu("Options"))
             {
+                if (ImGui::Button("Reset"))
+                    reset_settings();
+
                 ImGui::Checkbox("Randomly coloured rects", &m_state.settings.coloredRects);
 
                 ImGui::Text("");
