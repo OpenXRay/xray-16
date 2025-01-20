@@ -402,30 +402,18 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
 {
-    if (controller_action == WINDOW_KEY_HOLD)
-    {
-        switch (GetBindedAction(axis, EKeyContext::Talk))
-        {
-        case kTALK_LOG_SCROLL:
-            if (y > 0)
-                UITalkDialogWnd->TryScrollAnswersList(false);
-            else
-                UITalkDialogWnd->TryScrollAnswersList(true);
-            return true;
-        }
-    }
-
     if (controller_action == WINDOW_KEY_PRESSED || controller_action == WINDOW_KEY_HOLD)
     {
-        switch (GetBindedAction(axis, EKeyContext::UI))
+        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
         {
-        case kUI_MOVE:
-            if (y > 0)
-                UITalkDialogWnd->FocusOnNextQuestion(true, controller_action != WINDOW_KEY_HOLD);
-            else
-                UITalkDialogWnd->FocusOnNextQuestion(false, controller_action != WINDOW_KEY_HOLD);
+            UITalkDialogWnd->FocusOnNextQuestion(y > 0, controller_action != WINDOW_KEY_HOLD);
             return true;
-        } // switch (GetBindedAction(axis, EKeyContext::UI))
+        }
+        if (IsBinded(kTALK_LOG_SCROLL, axis, EKeyContext::Talk))
+        {
+            UITalkDialogWnd->TryScrollAnswersList(y < 0);
+            return true;
+        }
     }
 
     return inherited::OnControllerAction(axis, x, y, controller_action);
