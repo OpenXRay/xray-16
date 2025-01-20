@@ -70,7 +70,7 @@ bool CUIFixedScrollBar::InitScrollBar(Fvector2 pos, bool horizontal, cpcstr prof
     }
 
     UpdateScrollBar();
-    UI().Focus().UnregisterFocusable(this);
+    UI().Focus().UnregisterFocusable(m_ScrollBox);
     return true;
 }
 void CUIFixedScrollBar::UpdateScrollBar()
