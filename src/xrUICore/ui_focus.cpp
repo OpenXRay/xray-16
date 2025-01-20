@@ -301,7 +301,7 @@ bool CUIFocusSystem::FillDebugTree(const CUIDebugState& debugState)
             ImGui::BulletText("Non valuable: 0");
         else
         {
-            if (ImGui::TreeNode(&m_non_valuable, "Valuable: %zu", m_non_valuable.size()))
+            if (ImGui::TreeNode(&m_non_valuable, "Non valuable: %zu", m_non_valuable.size()))
             {
                 for (auto& window : m_non_valuable)
                     const_cast<CUIWindow*>(window)->FillDebugTree(debugState);
