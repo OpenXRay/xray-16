@@ -140,7 +140,8 @@ void CUITalkWnd::UpdateQuestions()
         }
     }
 
-    UITalkDialogWnd->FocusOnFirstQuestion();
+    if (pInput->IsCurrentInputTypeController())
+        UITalkDialogWnd->FocusOnFirstQuestion();
 
     m_bNeedToUpdateQuestions = false;
 }

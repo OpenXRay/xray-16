@@ -95,15 +95,18 @@ void UITaskListWnd::Show(bool status)
         GetMessageTarget()->SetKeyboardCapture(this, true);
         focus.LockToWindow(this);
 
-        if (m_list->Empty())
+        if (pInput->IsCurrentInputTypeController())
         {
-            focus.SetFocused(nullptr);
-            UI().GetUICursor().WarpToWindow(m_list, true);
-        }
-        else
-        {
-            const auto item = static_cast<UITaskListWndItem*>(m_list->Items()[0]);
-            item->Focus();
+            if (m_list->Empty())
+            {
+                focus.SetFocused(nullptr);
+                UI().GetUICursor().WarpToWindow(m_list, true);
+            }
+            else
+            {
+                const auto item = static_cast<UITaskListWndItem*>(m_list->Items()[0]);
+                item->Focus();
+            }
         }
     }
     else
