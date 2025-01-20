@@ -387,11 +387,6 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         switch (GetBindedAction(dik, EKeyContext::UI))
         {
-        case kUI_MOVE_LEFT:
-        case kUI_MOVE_RIGHT:
-            // Suppress focus system activation
-            return true;
-
         case kUI_MOVE_UP:
             UITalkDialogWnd->FocusOnNextQuestion(false, keyboard_action != WINDOW_KEY_HOLD);
             return true;
@@ -424,11 +419,6 @@ bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages cont
     {
         switch (GetBindedAction(axis, EKeyContext::UI))
         {
-        case kUI_MOVE_LEFT:
-        case kUI_MOVE_RIGHT:
-            // Suppress focus system activation
-            return true;
-
         case kUI_MOVE:
             if (y > 0)
                 UITalkDialogWnd->FocusOnNextQuestion(true, controller_action != WINDOW_KEY_HOLD);
