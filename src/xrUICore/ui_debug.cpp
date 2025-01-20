@@ -37,6 +37,8 @@ void CUIDebugger::Unregister(CUIDebuggable* debuggable)
         m_state.selected = nullptr;
     if (m_state.newSelected == debuggable)
         m_state.newSelected = nullptr;
+    if (m_state.examined == debuggable)
+        m_state.examined = nullptr;
 #endif
 }
 

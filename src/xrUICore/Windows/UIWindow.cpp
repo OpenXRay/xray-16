@@ -537,10 +537,13 @@ bool CUIWindow::FillDebugTree(const CUIDebugState& debugState)
         flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_Bullet;
 
     const bool open = ImGui::TreeNodeEx(this, flags, "%s (%s)", WindowName().c_str(), GetDebugType());
+
+    const bool examined = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
+    if (examined)
+        debugState.examined = this;
     if (ImGui::IsItemClicked())
         debugState.select(this);
 
-    const bool examined = ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled);
     if (debugState.settings.drawWndRects && (IsShown() || examined))
     {
         const auto& focus = UI().Focus();

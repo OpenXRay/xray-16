@@ -48,6 +48,7 @@ struct CUIDebugState
 {
     CUIDebuggable* selected{};
     mutable CUIDebuggable* newSelected{};
+    mutable CUIDebuggable* examined{};
 
     CUIDebuggerSettings settings;
 
