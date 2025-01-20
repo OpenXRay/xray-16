@@ -69,4 +69,6 @@ public:
     pcstr GetDebugType() override { return "CUIFocusSystem"; }
     bool FillDebugTree(const CUIDebugState& debugState) override;
     void FillDebugInfo() override;
+
+    void DrawDebugInfo(const CUIWindow& from, const CUIWindow& to, u32 color, u32 textColor) const;
 };
