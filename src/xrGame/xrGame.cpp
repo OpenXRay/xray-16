@@ -88,6 +88,7 @@ void xrGameModule::finalize()
 
 IGame_Persistent* xrGameModule::create_persistent()
 {
+    ZoneScoped;
     object_factory(); // XXX: remove this call
     return xr_new<CGamePersistent>();
 }

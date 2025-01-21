@@ -28,6 +28,7 @@ CAI_Space& CAI_Space::GetInstance()
 {
     if (!g_ai_space)
     {
+        ZoneScopedN("Create AI Space");
         g_ai_space = xr_new<CAI_Space>();
         g_ai_space->init();
     }
