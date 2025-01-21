@@ -179,7 +179,6 @@ public:
     IInputReceiver* CurrentIR();
 
     bool IsControllerAvailable() const { return !controllers.empty(); }
-    void EnableControllerSensors(bool enable);
 
     auto GetCurrentInputType() const { return currentInputType; }
     auto IsCurrentInputTypeController() const { return GetCurrentInputType() == InputType::Controller; }

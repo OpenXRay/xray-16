@@ -56,7 +56,7 @@ static bool AltF4Pressed = false;
 // Max events per frame
 constexpr size_t MAX_KEYBOARD_EVENTS = 64;
 constexpr size_t MAX_MOUSE_EVENTS = 256;
-constexpr size_t MAX_CONTROLLER_EVENTS = 64;
+constexpr size_t MAX_CONTROLLER_EVENTS = 256;
 
 CInput::CInput(const bool exclusive)
 {
@@ -134,12 +134,6 @@ void CInput::OpenController(int idx)
     controllers.emplace_back(controller);
 }
 
-void CInput::EnableControllerSensors(bool enable)
-{
-    for (auto controller : controllers)
-        SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, enable ? SDL_TRUE : SDL_FALSE);
-}
-
 //-----------------------------------------------------------------------
 
 void CInput::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
@@ -151,8 +145,29 @@ void CInput::SetCurrentInputType(InputType type)
 {
     currentInputType = type;
 
-    if (type == KeyboardMouse)
+    switch (type)
+    {
+    case KeyboardMouse:
         last_input_controller = -1;
+        if (psControllerFlags.test(ControllerEnableSensors))
+        {
+            for (auto controller : controllers)
+                SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_FALSE);
+        }
+        break;
+
+    case Controller:
+        if (psControllerFlags.test(ControllerEnableSensors))
+        {
+            for (auto controller : controllers)
+                SDL_GameControllerSetSensorEnabled(controller, SDL_SENSOR_GYRO, SDL_TRUE);
+        }
+        break;
+    }
+    // Always flush it. On the first controller invocation,
+    // prefer to receive sensor updates "from scratch",
+    // on the next frame.
+    SDL_FlushEvent(SDL_CONTROLLERSENSORUPDATE);
 }
 
 void CInput::MouseUpdate()
@@ -380,6 +395,7 @@ void CInput::ControllerUpdate()
     else if (currentInputType != Controller)
         return;
 
+    SDL_PumpEvents();
     count = SDL_PeepEvents(events, MAX_CONTROLLER_EVENTS,
         SDL_GETEVENT, SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERSENSORUPDATE);
 
