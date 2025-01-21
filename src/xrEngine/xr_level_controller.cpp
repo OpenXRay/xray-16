@@ -974,13 +974,13 @@ class CCC_DefControls : public CCC_UnBindAll
         { kMAP,                     { SDL_SCANCODE_M,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
         { kCONTACTS,                { SDL_SCANCODE_H,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
 
-        { kJUMP,                    { SDL_SCANCODE_SPACE,   SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSTICK } },
+        { kJUMP,                    { SDL_SCANCODE_SPACE,   SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_A } },
         { kCROUCH_TOGGLE,           { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_B } },
         { kWPN_RELOAD,              { SDL_SCANCODE_R,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_X } },
-        { kUSE,                     { SDL_SCANCODE_F,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_A } },
+        { kUSE,                     { SDL_SCANCODE_F,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
 
-        { kTORCH,                   { SDL_SCANCODE_L,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
-        { kSCORES,                  { SDL_SCANCODE_TAB,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+        { kTORCH,                   { SDL_SCANCODE_L,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_RIGHTSTICK } },
+        { kSCORES,                  { SDL_SCANCODE_TAB,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_LEFTSTICK } },
 
         { kENTER,                   { SDL_SCANCODE_RETURN,  SDL_SCANCODE_KP_ENTER,      XR_CONTROLLER_BUTTON_START } },
         { kQUIT,                    { SDL_SCANCODE_ESCAPE,  SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_BACK } },
