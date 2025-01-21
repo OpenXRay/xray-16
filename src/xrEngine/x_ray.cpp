@@ -215,7 +215,10 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     xrDebug::Initialize(commandLine);
     {
         ZoneScopedN("SDL_Init");
-        R_ASSERT3(SDL_Init(SDL_INIT_VIDEO) == 0, "Unable to initialize SDL", SDL_GetError());
+        u32 flags = SDL_INIT_VIDEO;
+        if (!strstr(commandLine, "-no_gamepad"))
+            flags |= SDL_INIT_GAMECONTROLLER;
+        R_ASSERT3(SDL_Init(flags) == 0, "Unable to initialize SDL", SDL_GetError());
     }
 
 #ifdef XR_PLATFORM_WINDOWS

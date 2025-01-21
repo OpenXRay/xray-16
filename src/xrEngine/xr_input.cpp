@@ -94,14 +94,8 @@ CInput::CInput(const bool exclusive)
     mouseCursors[SDL_SYSTEM_CURSOR_NO]        = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
     mouseCursors[SDL_SYSTEM_CURSOR_HAND]      = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
 
-    if (strstr(Core.Params, "-no_gamepad"))
-        return;
-
-    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0)
-    {
-        for (int i = 0; i < SDL_NumJoysticks(); ++i)
-            OpenController(i);
-    }
+    for (int i = 0; i < SDL_NumJoysticks(); ++i)
+        OpenController(i);
 }
 
 CInput::~CInput()
@@ -110,16 +104,15 @@ CInput::~CInput()
 
     GrabInput(false);
 
+    for (auto& controller : controllers)
+        SDL_GameControllerClose(controller);
+
     for (auto& cursor : mouseCursors)
     {
         SDL_FreeCursor(cursor);
         cursor = nullptr;
     }
     lastCursor = nullptr;
-
-    for (auto& controller : controllers)
-        SDL_GameControllerClose(controller);
-    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 
     Device.seqFrame.Remove(this);
     Device.seqAppDeactivate.Remove(this);
