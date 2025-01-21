@@ -76,7 +76,7 @@ public:
     CEngineAPI();
     ~CEngineAPI();
 
-    void CreateRendererList(); // Better to call it in the main thread
+    void CreateRendererList();
     void Initialize(GameModule* game);
     void Destroy();
 };

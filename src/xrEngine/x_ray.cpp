@@ -245,6 +245,13 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         Engine.Sound.CreateDevicesList();
     });
 
+#ifdef XR_PLATFORM_WINDOWS
+    const auto& createRendererList = TaskManager::AddTask([]
+    {
+        Engine.External.CreateRendererList();
+    });
+#endif
+
     pcstr fsltx = "-fsltx ";
     string_path fsgame = "";
     if (strstr(commandLine, fsltx))
@@ -268,6 +275,11 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     TaskScheduler->Wait(inputTask);
     InitConsole();
 
+#ifdef XR_PLATFORM_WINDOWS
+    TaskScheduler->Wait(createRendererList);
+#else
+    Engine.External.CreateRendererList();
+#endif
     Engine.Initialize(game);
     Device.Initialize();
 
