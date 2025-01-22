@@ -1,0 +1,26 @@
+find_path(JPEG_INCLUDE_DIR
+    NAMES jpeglib.h
+    PATHS "${CMAKE_SOURCE_DIR}/sdk/include"
+    NO_DEFAULT_PATH
+)
+
+find_library(JPEG_LIBRARY
+    NAMES jpeg-static
+    PATHS "${CMAKE_SOURCE_DIR}/sdk/libraries/${ARCH_TYPE}"
+    NO_CACHE
+    NO_DEFAULT_PATH
+    REQUIRED
+)
+
+mark_as_advanced(
+    JPEG_INCLUDE_DIR
+    JPEG_LIBRARY
+)
+
+add_library(JPEG_JPEG STATIC IMPORTED GLOBAL)
+add_library(JPEG::JPEG ALIAS JPEG_JPEG)
+
+set_target_properties(JPEG_JPEG PROPERTIES
+    IMPORTED_LOCATION "${JPEG_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${JPEG_INCLUDE_DIR}"
+)

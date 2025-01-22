@@ -2499,7 +2499,6 @@ target_include_directories(xrGame
 target_link_libraries(xrGame
     PRIVATE
     xrCore
-    xrEngine
     xrMaterialSystem
     xrMiscMath
     xrImGui
@@ -2514,6 +2513,13 @@ target_link_libraries(xrGame
     xrNetServer
 )
 
+if (NOT OS_WINDOWS)
+    target_link_libraries(xrGame
+        PRIVATE
+        xrEngine
+    )
+endif()
+
 target_compile_definitions(xrGame
     PUBLIC
     DECLARE_SPECIALIZATION
@@ -2525,7 +2531,7 @@ target_compile_definitions(xrGame
 
 target_compile_options(xrGame
     PRIVATE
-    -Wno-trigraphs
+    #-Wno-trigraphs
 )
 
 # E2K: hack for debug compile (MCST lcc compiler does not support a file > 4Gb, this is a bug in EDG frontend)

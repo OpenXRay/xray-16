@@ -398,12 +398,13 @@ target_include_directories(xrPhysics
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/Externals/imgui"
-    "${CMAKE_SOURCE_DIR}/Externals/ode/include"
 )
+
+get_target_property(ODE_TYPE xrODE::xrODE TYPE)
 
 target_link_libraries(xrPhysics
     PUBLIC
-    xrODE
+    xrODE::xrODE
     PRIVATE
     xrCore
     xrEngine
