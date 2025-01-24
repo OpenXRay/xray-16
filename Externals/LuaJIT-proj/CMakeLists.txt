@@ -180,7 +180,7 @@ elseif ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_MIPS")
     else()
         set(TARGET_LJARCH "mips")
     endif()
-elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "e2k") # MCST Elbrus 2000
+elseif ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_E2K")
     set(TARGET_LJARCH "e2k")
 else()
     message("${TESTARCH_OUTPUT}")
@@ -219,6 +219,8 @@ elseif (APPLE)
         string(APPEND TARGET_XLDFLAGS " -pagezero_size 10000 -image_base 100000000 -image_base 7fff04c4a000")
     elseif (${TARGET_LJARCH} STREQUAL "arm64")
         string(APPEND TARGET_XCFLAGS " -fno-omit-frame-pointer")
+    elseif (${TARGET_LJARCH} STREQUAL "e2k")
+        string(APPEND TARGET_XCFLAGS " -fexceptions")
     endif()
 
     set(LJVM_MODE machasm)
@@ -331,47 +333,40 @@ target_compile_options(xrLuaJIT
 
 set(DASM_DASC "${LUAJIT_DIR}/vm_${DASM_ARCH}.dasc")
 set(DASM "${LUAJIT_DIR}/../dynasm/dynasm.lua")
-
-if (PROJECT_PLATFORM_E2K)
-    set(BUILDVM_ARCH "${LUAJIT_DIR}/host/buildvm_arch.h")
-else()
-    set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
-endif()
+set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 
 # Generate buildvm arch header
-if (NOT PROJECT_PLATFORM_E2K)
-    set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
-    set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
+set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
+set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
 
-    add_custom_command(
-        OUTPUT "${MINILUA_FILE}"
-        COMMAND ${CMAKE_COMMAND}
-            -B${MINILUA_BINARY_DIR}
-            -G${CMAKE_GENERATOR}
-            -S${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
-            -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
-            -DCMAKE_BUILD_TYPE=Release
-            -DLUAJIT_DIR=${LUAJIT_DIR}
-            -DLUA_USE_POSIX=${LUA_USE_POSIX}
-            -DHOST_ACFLAGS="${HOST_ACFLAGS}"
-            -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
-        COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} --config Release --verbose
-    )
+add_custom_command(
+    OUTPUT "${MINILUA_FILE}"
+    COMMAND ${CMAKE_COMMAND}
+        -B${MINILUA_BINARY_DIR}
+        -G${CMAKE_GENERATOR}
+        -S${CMAKE_CURRENT_SOURCE_DIR}/HostBuildTools/minilua
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
+        -DCMAKE_BUILD_TYPE=Release
+        -DLUAJIT_DIR=${LUAJIT_DIR}
+        -DLUA_USE_POSIX=${LUA_USE_POSIX}
+        -DHOST_ACFLAGS="${HOST_ACFLAGS}"
+        -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
+    COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} --config Release --verbose
+)
 
-    add_custom_command(OUTPUT ${BUILDVM_ARCH}
-        COMMAND "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
-        DEPENDS "${MINILUA_FILE}"
-    )
+add_custom_command(OUTPUT ${BUILDVM_ARCH}
+    COMMAND "${MINILUA_FILE}" ${DASM} ${DASM_FLAGS} -o ${BUILDVM_ARCH} ${DASM_DASC}
+    DEPENDS "${MINILUA_FILE}"
+)
 
-    add_custom_target(buildvm_arch
-        DEPENDS ${BUILDVM_ARCH}
-    )
+add_custom_target(buildvm_arch
+    DEPENDS ${BUILDVM_ARCH}
+)
 
-    set_target_properties(buildvm_arch PROPERTIES
-         ADDITIONAL_CLEAN_FILES "${MINILUA_BINARY_DIR}"
-    )
-endif()
+set_target_properties(buildvm_arch PROPERTIES
+    ADDITIONAL_CLEAN_FILES "${MINILUA_BINARY_DIR}"
+)
 
 # Buildvm
 set(BUILDVM_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm")
@@ -400,9 +395,7 @@ set_target_properties(buildvm PROPERTIES
     ADDITIONAL_CLEAN_FILES "${BUILDVM_BINARY_DIR}"
 )
 
-if (NOT PROJECT_PLATFORM_E2K)
-    add_dependencies(buildvm buildvm_arch)
-endif()
+add_dependencies(buildvm buildvm_arch)
 
 list(APPEND LJLIB_C
     "${LUAJIT_DIR}/lib_base.c"
