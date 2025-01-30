@@ -92,8 +92,14 @@ IC void CSQuadTree::insert(_object_type* object)
         if (depth == m_max_depth)
         {
             CListItem* list_item = m_list_items->get_object();
+            if (!list_item)
+                return;
+
             list_item->m_object = object;
             list_item->m_next = (CListItem*)((void*)(*node));
+            if (!list_item->m_next)
+                return;
+
             *node = (CQuadNode*)((void*)list_item);
             ++m_leaf_count;
             return;
@@ -101,6 +107,9 @@ IC void CSQuadTree::insert(_object_type* object)
 
         if (!*node)
             *node = m_nodes->get_object();
+
+        if (!node)
+            return;
 
         distance *= .5f;
         u32 index = neighbour_index(object->position(), center, distance);
@@ -267,6 +276,9 @@ IC _object_type* CSQuadTree::remove(
     const _object_type* object, CQuadNode*& node, Fvector center, float distance, int depth)
 {
     VERIFY(node);
+    if (!node)
+        return nullptr;
+
     if (depth == m_max_depth)
     {
         CListItem*& node_leaf = ((CListItem*&)((void*&)(node)));
