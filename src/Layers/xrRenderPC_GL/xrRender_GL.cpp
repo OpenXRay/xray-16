@@ -85,6 +85,7 @@ public:
         GEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
         GEnv.DRender = &DebugRenderImpl;
+        rdebug_render->Register();
 #endif
         xrRender_initconsole();
     }
@@ -100,6 +101,9 @@ public:
             GEnv.DU = nullptr;
             GEnv.UIRender = nullptr;
             GEnv.DRender = nullptr;
+#ifdef DEBUG
+            rdebug_render->Unregister();
+#endif
         }
     }
 } static s_rgl_module;

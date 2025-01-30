@@ -136,13 +136,16 @@ private:
     xr_vector<FVF::L> _line_vertices;
 
 public:
-    RDebugRender()
+    void Register() override
     {
-        // Device.seqRender.Add		(this);
         Device.seqRender.Add(this, REG_PRIORITY_LOW - 100);
     }
 
-    virtual ~RDebugRender() { Device.seqRender.Remove(this); }
+    void Unregister() override
+    {
+        Device.seqRender.Remove(this);
+    }
+
     void OnRender()
     {
         m_line_indices = _line_indices;
