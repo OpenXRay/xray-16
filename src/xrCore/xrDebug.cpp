@@ -61,10 +61,6 @@
 #   endif
 #endif
 
-#ifdef DEBUG
-#   define USE_OWN_ERROR_MESSAGE_WINDOW
-#endif
-
 constexpr SDL_MessageBoxButtonData buttons[] =
 {
     /* .flags, .buttonid, .text */
@@ -408,17 +404,13 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
         return;
 #endif
     Log("stack trace:\n");
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "stack trace:\n\n");
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
 #if defined(XR_PLATFORM_WINDOWS)
     xr_vector<xr_string> stackTrace = BuildStackTrace();
     for (size_t i = 2; i < stackTrace.size(); i++)
     {
         Log(stackTrace[i].c_str());
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
 #elif defined(BACKTRACE_AVAILABLE)
     void* array[20];
@@ -450,9 +442,7 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
             }
 #   endif
             Log(functionName);
-#   ifdef USE_OWN_ERROR_MESSAGE_WINDOW
             buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
-#   endif // USE_OWN_ERROR_MESSAGE_WINDOW
         }
         ::free(demangledName);
     }
