@@ -52,9 +52,13 @@ CUICellItem::~CUICellItem()
 
 void CUICellItem::init()
 {
-    CUIXml uiXml;
-    if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml", false))
-        return;
+    static CUIXml uiXml;
+    static bool isXmlReady = false;
+    if (!isXmlReady)
+    {
+        uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "actor_menu_item.xml", false);
+        isXmlReady = true;
+    }
 
     m_text = xr_new<CUIStatic>("Text");
     m_text->SetAutoDelete(true);
