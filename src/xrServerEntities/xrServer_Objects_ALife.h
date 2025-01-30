@@ -168,6 +168,7 @@ public:
     virtual u32 ef_weapon_type() const;
     virtual u32 ef_detector_type() const;
 #ifdef XRGAME_EXPORTS
+    virtual bool is_spawn_supplies_flag_set(LPCSTR, LPCSTR);
     virtual void spawn_supplies(LPCSTR);
     virtual void spawn_supplies();
     CALifeSimulator& alife() const;
