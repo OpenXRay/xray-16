@@ -5,6 +5,17 @@
 #include "xrCore/xr_token.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
+#include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/xr_ioc_cmd.h"
+
+#if RENDER != R_R1
+#include "r__pixel_calculator.h"
+#endif
+
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
+#endif
+
 u32 ps_Preset = 2;
 u32 ps_ShaderPreset = 0;
 u32 ps_ColorGradingPreset = 0;
@@ -326,15 +337,6 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
 float ps_r2_gloss_factor = 4.0f;
 float ps_r2_gloss_min = 0.0f;
 //- Mad Max
-#ifndef _EDITOR
-#include "xrEngine/XR_IOConsole.h"
-#include "xrEngine/xr_ioc_cmd.h"
-
-#if defined(USE_DX11)
-#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
-#endif
-
-//-----------------------------------------------------------------------
 
 //AVO: detail draw radius
 class CCC_detail_radius : public CCC_Integer
@@ -687,7 +689,6 @@ public:
 };
 
 #if RENDER != R_R1
-#include "r__pixel_calculator.h"
 class CCC_BuildSSA : public IConsole_Command
 {
 public:
@@ -1162,5 +1163,3 @@ void xrRender_initconsole()
     tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r__color_grading", &ps_r2_img_cg, tw_min, tw_max);
 }
-
-#endif

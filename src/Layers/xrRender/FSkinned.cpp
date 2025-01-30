@@ -7,6 +7,7 @@
 #include "Layers/xrRender/BufferUtils.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
+#include "xrCDB/Intersect.hpp"
 
 // XXX: test the parallel code in the load_hw()
 //#define PARALLEL_BONE_VERTICES_PROCESSING
@@ -208,8 +209,6 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 //-----------------------------------------------------------------------------------------------------
 // Wallmarks
 //-----------------------------------------------------------------------------------------------------
-#include "xrCDB/Intersect.hpp"
-
 #ifdef DEBUG
 
 template <typename vertex_type>

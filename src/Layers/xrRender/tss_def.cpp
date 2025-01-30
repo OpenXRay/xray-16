@@ -3,7 +3,9 @@
 
 #include "tss_def.h"
 
-#ifdef USE_OGL
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/dx11StateUtils.h"
+#elif defined(USE_OGL)
 #include "../xrRenderGL/glState.h"
 #endif
 
@@ -121,8 +123,6 @@ BOOL SimulatorStates::equal(SimulatorStates& S)
 void SimulatorStates::clear() { States.clear(); }
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11StateUtils.h"
-
 void SimulatorStates::UpdateState(dx11State& state) const
 {
     for (u32 it = 0; it < States.size(); it++)

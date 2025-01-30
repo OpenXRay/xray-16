@@ -5,18 +5,20 @@
 #include "SkeletonCustom.h"
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
-int psSkeletonUpdate = 32;
-Lock UCalc_Mutex
-#ifdef CONFIG_PROFILE_LOCKS
-    (MUTEX_PROFILE_ID(UCalc_Mutex))
-#endif // CONFIG_PROFILE_LOCKS
-    ;
+#include "xrCDB/Intersect.hpp"
 
 #ifndef _EDITOR
 #include "xrServerEntities/smart_cast.h"
 #else
 #include "Include/xrAPI/xrAPI.h"
 #endif
+
+int psSkeletonUpdate = 32;
+Lock UCalc_Mutex
+#ifdef CONFIG_PROFILE_LOCKS
+    (MUTEX_PROFILE_ID(UCalc_Mutex))
+#endif // CONFIG_PROFILE_LOCKS
+    ;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -603,7 +605,6 @@ void CKinematics::EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id)
     for (u32 i = 0; i < children.size(); i++)
         LL_GetChild(i)->EnumBoneVertices(C, bone_id);
 }
-#include "xrCDB/Intersect.hpp"
 
 using OBBVec = xr_vector<Fobb>;
 

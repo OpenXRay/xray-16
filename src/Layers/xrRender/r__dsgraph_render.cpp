@@ -4,6 +4,8 @@
 #include "xrEngine/CustomHUD.h"
 
 #include "FBasicVisual.h"
+#include "SkeletonCustom.h"
+#include "FLOD.h"
 
 using namespace R_dsgraph;
 
@@ -339,9 +341,6 @@ void R_dsgraph_structure::render_distort()
 
     sort_back_to_front_render_and_clean(context_id, mapDistort);
 }
-
-#include "SkeletonCustom.h"
-#include "FLOD.h"
 
 void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& BB, int sh)
 {

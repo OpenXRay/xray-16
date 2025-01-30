@@ -4,6 +4,10 @@
 #include "ETextureParams.h"
 #include "xrCore/xr_token.h"
 
+#ifdef _EDITOR
+#include "xrServerEntities/PropertiesListHelper.h"
+#endif
+
 const xr_token tparam_token[] = {{"Advanced", STextureParams::kMIPFilterAdvanced},
 
     {"Point", STextureParams::kMIPFilterPoint}, {"Box", STextureParams::kMIPFilterBox},
@@ -125,8 +129,6 @@ void STextureParams::Save(IWriter& F)
 }
 
 #ifdef _EDITOR
-#include "xrServerEntities/PropertiesListHelper.h"
-
 void STextureParams::OnTypeChange(PropValue* prop)
 {
     switch (type)

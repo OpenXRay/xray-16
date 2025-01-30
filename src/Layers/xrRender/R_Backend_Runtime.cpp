@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include "LightTrack.h"
+#include "xrEngine/IRenderable.h"
+
 #if defined(USE_DX11)
 #include <DirectXMath.h>
 #endif
@@ -481,9 +484,6 @@ void CBackend::OnDeviceDestroy()
     _RELEASE(pAnnotation);
 #endif
 }
-
-#include "LightTrack.h"
-#include "xrEngine/IRenderable.h"
 
 void CBackend::apply_lmaterial()
 {

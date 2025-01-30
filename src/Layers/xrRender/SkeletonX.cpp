@@ -8,6 +8,7 @@
 #include "SkeletonX.h"
 #include "SkeletonXSkinXW.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCDB/Intersect.hpp"
 
 shared_str s_bones_array_const;
 
@@ -412,7 +413,7 @@ void get_pos_bones(const vertBoned4W& vert, Fvector& p, CKinematics* Parent)
 //-----------------------------------------------------------------------------------------------------
 // Wallmarks
 //-----------------------------------------------------------------------------------------------------
-#include "xrCDB/Intersect.hpp"
+
 BOOL CSkeletonX::_PickBoneSoft1W(IKinematics::pick_result& r, float dist, const Fvector& S, const Fvector& D,
     u16* indices, CBoneData::FacesVec& faces)
 {
