@@ -390,12 +390,6 @@
     <ClInclude Include="..\xrRender\R_DStreams.h">
       <Filter>Refactored\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="ComputeShader.h">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="CSCompiler.h">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClInclude>
@@ -991,12 +985,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\R_DStreams.cpp">
       <Filter>Refactored\Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="ComputeShader.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="CSCompiler.cpp">
-      <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp">
       <Filter>Refactored\Execution &amp; 3D\Shaders\Resources</Filter>

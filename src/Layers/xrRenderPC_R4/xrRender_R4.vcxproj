@@ -217,8 +217,6 @@
     <ClInclude Include="..\xrRender_R2\r2_R_sun_support.h" />
     <ClInclude Include="..\xrRender_R2\r2_types.h" />
     <ClInclude Include="..\xrRender_R2\SMAP_Allocator.h" />
-    <ClInclude Include="ComputeShader.h" />
-    <ClInclude Include="CSCompiler.h" />
     <ClInclude Include="..\xrRender\blenders\dx11HDAOCSBlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\light_gi.h" />
@@ -420,8 +418,6 @@
     <ClCompile Include="..\xrRender_R2\r3_R_rain.cpp" />
     <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp" />
     <ClCompile Include="..\xrRender_R2\render_phase_sun_old.cpp" />
-    <ClCompile Include="ComputeShader.cpp" />
-    <ClCompile Include="CSCompiler.cpp" />
     <ClCompile Include="..\xrRender\blenders\dx11HDAOCSBlender.cpp" />
     <ClCompile Include="..\xrRender\blenders\dx11MinMaxSMBlender.cpp" />
     <ClCompile Include="..\xrRender\light_GI.cpp" />

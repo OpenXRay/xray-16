@@ -1,10 +1,6 @@
 add_library(xrRenderPC_R4 SHARED)
 
 target_sources(xrRenderPC_R4 PRIVATE
-    ComputeShader.cpp
-    ComputeShader.h
-    CSCompiler.cpp
-    CSCompiler.h
     packages.config
     r2_test_hw.cpp
     r4_rendertarget.h
