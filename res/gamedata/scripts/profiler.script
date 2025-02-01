@@ -1,0 +1,11 @@
+-- Original profiler was not working and caused game to crash when jit parameter is disabled.
+-- For safety reasons there is mock setup function and empty module without original code.
+--
+-- 1) LUA does not allow setting up multiple hooks, adding hooks here instead of C++ codebase is problematic
+-- 2) Luabind/Luajit already injects complex logics, C++ codebase adds error callbacks and custom logics.
+--    As result, stack and state may be corrupted and cause random logics/memory errors.
+--
+-- See: https://github.com/OpenXRay/xray-16/issues/1436
+
+-- Mock placeholder.
+function setup_hook() end

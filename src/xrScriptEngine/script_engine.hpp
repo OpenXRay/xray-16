@@ -1,15 +1,16 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: script_engine.h
-//	Created 	: 01.04.2004
-//  Modified 	: 01.04.2004
-//	Author		: Dmitriy Iassenev
-//	Description : XRay Script Engine
+//  Module      : script_engine.h
+//  Created     : 01.04.2004
+//  Modified    : 01.04.2004
+//  Author      : Dmitriy Iassenev
+//  Description : XRay Script Engine
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 #include "xrCore/xrCore.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/script_profiler.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrScriptEngine/Functor.hpp"
 #include "xrCore/Threading/Lock.hpp"
@@ -70,6 +71,7 @@ extern Flags32 XRSCRIPTENGINE_API g_LuaDebug;
 class XRSCRIPTENGINE_API CScriptEngine
 {
 public:
+    constexpr static cpcstr ARGUMENT_ENGINE_NOJIT = "-nojit";
     typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
     static const char* const GlobalNamespace;
 
@@ -153,6 +155,8 @@ protected:
     }
 
 public:
+    CScriptProfiler* m_profiler;
+
     lua_State* lua() { return m_virtual_machine; }
     void current_thread(CScriptThread* thread)
     {
@@ -218,7 +222,7 @@ public:
     void LogVariable(lua_State* l, pcstr name, int level);
 
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
-    CScriptEngine(bool is_editor = false);
+    CScriptEngine(bool is_editor = false, bool is_with_profiler = false);
     virtual ~CScriptEngine();
     void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
@@ -228,9 +232,7 @@ public:
 #if 1 //!XRAY_EXCEPTIONS
     static void lua_cast_failed(lua_State* L, const luabind::type_id& info);
 #endif
-#ifdef DEBUG
     static void lua_hook_call(lua_State* L, lua_Debug* dbg);
-#endif
     void setup_callbacks();
     bool load_file(const char* scriptName, const char* namespaceName);
     CScriptProcess* script_process(const ScriptProcessor& process_id) const;

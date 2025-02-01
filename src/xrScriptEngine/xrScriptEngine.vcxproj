@@ -50,6 +50,8 @@
     <ClInclude Include="script_debugger_threads.hpp" />
     <ClInclude Include="script_engine.hpp" />
     <ClInclude Include="script_lua_helper.hpp" />
+    <ClInclude Include="script_profiler.hpp" />
+    <ClInclude Include="script_profiler_portions.hpp" />
     <ClInclude Include="script_process.hpp" />
     <ClInclude Include="script_space_forward.hpp" />
     <ClInclude Include="script_stack_tracker.hpp" />
@@ -68,6 +70,7 @@
     <ClCompile Include="script_engine.cpp" />
     <ClCompile Include="ScriptEngineScript.cpp" />
     <ClCompile Include="script_lua_helper.cpp" />
+    <ClCompile Include="script_profiler.cpp" />
     <ClCompile Include="script_process.cpp" />
     <ClCompile Include="script_stack_tracker.cpp" />
     <ClCompile Include="script_thread.cpp" />

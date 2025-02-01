@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: script_engine_script.cpp
-//	Created 	: 25.12.2002
-//  Modified 	: 13.05.2004
-//	Author		: Dmitriy Iassenev
-//	Description : ALife Simulator script engine export
+//  Module      : script_engine_script.cpp
+//  Created     : 25.12.2002
+//  Modified    : 13.05.2004
+//  Author      : Dmitriy Iassenev
+//  Description : ALife Simulator script engine export
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.hpp"
@@ -139,6 +139,11 @@ std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt) { ret
 SCRIPT_EXPORT(CScriptEngine, (),
 {
     using namespace luabind;
+
+    globals(luaState) ["PROFILER_TYPE_NONE"] = (u32) CScriptProfilerType::None;
+    globals(luaState) ["PROFILER_TYPE_HOOK"] = (u32) CScriptProfilerType::Hook;
+    globals(luaState) ["PROFILER_TYPE_SAMPLING"] = (u32) CScriptProfilerType::Sampling;
+
     module(luaState)
     [
         class_<profile_timer_script>("profile_timer")
@@ -164,4 +169,74 @@ SCRIPT_EXPORT(CScriptEngine, (),
         def("editor", &is_editor),
         def("user_name", &user_name)
     ];
+
+    module(luaState, "profiler")
+    [
+        def("is_active", +[]() -> bool
+        {
+            return GEnv.ScriptEngine->m_profiler->isActive();
+        }),
+        def("get_type", +[]()-> u32
+        {
+            return static_cast<u32>(GEnv.ScriptEngine->m_profiler->getType());
+        }),
+        def("start", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->start();
+        }),
+        def("start", +[](CScriptProfilerType profiler_type)
+        {
+            GEnv.ScriptEngine->m_profiler->start(profiler_type);
+        }),
+        def("start_hook_mode", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->startHookMode();
+        }),
+        def("start_sampling_mode", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->startSamplingMode();
+        }),
+        def("start_sampling_mode", +[](u32 sampling_interval = CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT)
+        {
+            GEnv.ScriptEngine->m_profiler->startSamplingMode(sampling_interval);
+        }),
+        def("stop", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->stop();
+        }),
+        def("reset", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->reset();
+        }),
+        def("log_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->logReport();
+        }),
+        def("log_report", +[](u32 entries_limit)
+        {
+            GEnv.ScriptEngine->m_profiler->logReport(entries_limit);
+        }),
+        def("save_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->saveReport();
+        })
+    ];
+
+    /**
+     * Exports injected from tracy profiler:
+     *
+     * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/manual/tracy.tex#L1932
+     * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/public/tracy/TracyLua.hpp#L18
+     *
+     * global tracy {
+     *     function ZoneBegin;
+     *     function ZoneBeginN;
+     *     function ZoneBeginS;
+     *     function ZoneBeginNS;
+     *     function ZoneEnd;
+     *     function ZoneText;
+     *     function ZoneName;
+     *     function Message;
+     * }
+    */
 });

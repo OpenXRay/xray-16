@@ -9,11 +9,15 @@
 #include "pch.hpp"
 #include "script_engine.hpp"
 #include "script_process.hpp"
+#include "script_profiler.hpp"
 #include "script_thread.hpp"
 #include "ScriptExporter.hpp"
 #include "BindingsDumper.hpp"
 #ifdef USE_DEBUGGER
 #include "script_debugger.hpp"
+#endif
+#ifdef DEBUG
+#include "script_thread.hpp"
 #endif
 #include <stdarg.h>
 #include "Common/Noncopyable.hpp"
@@ -114,6 +118,9 @@ void CScriptEngine::reinit()
     stateMapLock.Leave();
     if (m_virtual_machine)
     {
+        if (m_profiler)
+            m_profiler->onDispose(m_virtual_machine);
+
         lua_close(m_virtual_machine);
         UnregisterState(m_virtual_machine);
     }
@@ -130,6 +137,9 @@ void CScriptEngine::reinit()
         file_header = file_header_old;
     scriptBufferSize = 1024 * 1024;
     scriptBuffer = xr_alloc<char>(scriptBufferSize);
+
+    if (m_profiler)
+        m_profiler->onReinit(m_virtual_machine);
 }
 
 void CScriptEngine::print_stack(lua_State* L)
@@ -747,13 +757,14 @@ void CScriptEngine::disconnect_from_debugger()
 }
 #endif
 
-CScriptEngine::CScriptEngine(bool is_editor)
+CScriptEngine::CScriptEngine(bool is_editor, bool is_with_profiler)
 {
     luabind::allocator = &luabind_allocator;
     luabind::allocator_context = nullptr;
     m_current_thread = nullptr;
     m_stack_is_ready = false;
     m_virtual_machine = nullptr;
+    m_profiler = is_with_profiler && !is_editor ? xr_new<CScriptProfiler>(this) : nullptr;
     m_stack_level = 0;
     m_reload_modules = false;
     m_last_no_file_length = 0;
@@ -773,6 +784,14 @@ CScriptEngine::CScriptEngine(bool is_editor)
 
 CScriptEngine::~CScriptEngine()
 {
+    if (m_profiler)
+    {
+        if (m_virtual_machine)
+            m_profiler->onDispose(m_virtual_machine);
+
+        xr_delete(m_profiler);
+    }
+
     if (m_virtual_machine)
         lua_close(m_virtual_machine);
     while (!m_script_processes.empty())
@@ -871,19 +890,21 @@ void CScriptEngine::setup_callbacks()
     lua_atpanic(lua(), CScriptEngine::lua_panic);
 }
 
-#ifdef DEBUG
-#include "script_thread.hpp"
-
 void CScriptEngine::lua_hook_call(lua_State* L, lua_Debug* dbg)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
+
+    #ifdef DEBUG
     if (scriptEngine->current_thread())
         scriptEngine->current_thread()->script_hook(L, dbg);
     else
         scriptEngine->m_stack_is_ready = true;
+    #endif
+
+    if (scriptEngine->m_profiler)
+        scriptEngine->m_profiler->onLuaHookCall(L, dbg);
 }
-#endif
 
 int CScriptEngine::auto_load(lua_State* L)
 {
@@ -1025,7 +1046,9 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     // if (jit == nil) then
     //     profiler.setup_hook()
     // end
-    if (!strstr(Core.Params, "-nojit"))
+    //
+    // Update: '-nojit' option adds garbage to stack and luabind calls fail
+    if (!strstr(Core.Params, ARGUMENT_ENGINE_NOJIT))
     {
         luajit::open_lib(lua(), LUA_JITLIBNAME, luaopen_jit);
         // Xottab_DUTY: commented this. Let's use default opt level, which is 3
