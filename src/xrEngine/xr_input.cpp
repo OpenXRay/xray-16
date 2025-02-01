@@ -470,7 +470,6 @@ void CInput::ControllerUpdate()
 
     const auto applyStickDeadZone = [&](Fvector2 axis) -> ControllerAxisState
     {
-        Fvector2 bak = axis;
         float magnitude = axis.magnitude();
 
         if (magnitude <= innerDeadZone || psControllerStickInnerDeadZone >= 1.0f)
@@ -486,14 +485,19 @@ void CInput::ControllerUpdate()
         return { axis, normalizedMagnitude };
     };
 
+    const auto applyTriggerDeadZone = [](float value) -> ControllerAxisState
+    {
+        return value / SDL_JOYSTICK_AXIS_MAX;
+    };
+
     if (axisMoved[0] || axisMoved[1])
         controllerState.axis.left = applyStickDeadZone({ axes[0], axes[1] });
     if (axisMoved[2] || axisMoved[3])
         controllerState.axis.right = applyStickDeadZone({ axes[2], axes[3] });
     if (axisMoved[4])
-        controllerState.axis.trigger_left = axes[4]; // XXX: needs separate dead zone function
+        controllerState.axis.trigger_left = applyTriggerDeadZone(axes[4]);
     if (axisMoved[5])
-        controllerState.axis.trigger_right = axes[5];
+        controllerState.axis.trigger_right = applyTriggerDeadZone(axes[5]);
 
     const auto checkAxis = [this](int axis, const ControllerAxisState& state, const ControllerAxisState& prevState)
     {
