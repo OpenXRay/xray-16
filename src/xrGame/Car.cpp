@@ -1084,39 +1084,20 @@ void CCar::UpdatePower()
         i->UpdatePower();
 }
 
-void CCar::SteerRight()
+void CCar::Steer(float angle)
 {
     b_wheels_limited = true; // no need to limit wheels when stiring
     m_pPhysicsShell->Enable();
-    xr_vector<SWheelSteer>::iterator i, e;
-    i = m_steering_wheels.begin();
-    e = m_steering_wheels.end();
-    for (; i != e; ++i)
-        i->SteerRight();
-    e_state_steer = right;
-}
-void CCar::SteerLeft()
-{
-    b_wheels_limited = true; // no need to limit wheels when stiring
-    m_pPhysicsShell->Enable();
-    xr_vector<SWheelSteer>::iterator i, e;
-    i = m_steering_wheels.begin();
-    e = m_steering_wheels.end();
-    for (; i != e; ++i)
-        i->SteerLeft();
-    e_state_steer = left;
-}
 
-void CCar::SteerIdle()
-{
-    b_wheels_limited = false;
-    m_pPhysicsShell->Enable();
-    xr_vector<SWheelSteer>::iterator i, e;
-    i = m_steering_wheels.begin();
-    e = m_steering_wheels.end();
-    for (; i != e; ++i)
-        i->SteerIdle();
-    e_state_steer = idle;
+    for (auto& steering : m_steering_wheels)
+        steering.Steer(angle);
+
+    if (fis_zero(angle))
+        e_state_steer = idle;
+    else if (angle > 0)
+        e_state_steer = right;
+    else
+        e_state_steer = left;
 }
 
 void CCar::LimitWheels()
@@ -1163,10 +1144,10 @@ void CCar::PressRight()
     if (lsp)
     {
         if (!fwp)
-            SteerIdle();
+            Steer(0.0f);
     }
     else
-        SteerRight();
+        Steer(1.0f);
     rsp = true;
 }
 void CCar::PressLeft()
@@ -1174,10 +1155,10 @@ void CCar::PressLeft()
     if (rsp)
     {
         if (!fwp)
-            SteerIdle();
+            Steer(0.0f);
     }
     else
-        SteerLeft();
+        Steer(-1.0f);
     lsp = true;
 }
 void CCar::PressForward()
@@ -1235,17 +1216,17 @@ void CCar::DriveForward()
 void CCar::ReleaseRight()
 {
     if (lsp)
-        SteerLeft();
+        Steer(-1.0f);
     else
-        SteerIdle();
+        Steer(0.0f);
     rsp = false;
 }
 void CCar::ReleaseLeft()
 {
     if (rsp)
-        SteerRight();
+        Steer(1.0f);
     else
-        SteerIdle();
+        Steer(0.0f);
     lsp = false;
 }
 void CCar::ReleaseForward()

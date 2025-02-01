@@ -215,9 +215,7 @@ public:
         float GetSteerAngle();
 
         void Init();
-        void SteerRight();
-        void SteerLeft();
-        void SteerIdle();
+        void Steer(float angle);
         void Limit();
         void Load(LPCSTR /*section*/){};
     };
@@ -465,9 +463,7 @@ private:
     float DriveWheelsMeanAngleRate();
     IC float EngineRpmFromWheels() { return _abs(DriveWheelsMeanAngleRate() * m_current_gear_ratio); }
     /////////////////////////////////////////////////////////////////////////
-    void SteerRight();
-    void SteerLeft();
-    void SteerIdle();
+    void Steer(float angle);
     void Transmission(size_t num);
     void CircleSwitchTransmission();
     void TransmissionUp();

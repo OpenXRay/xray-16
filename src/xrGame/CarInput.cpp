@@ -245,12 +245,11 @@ void CCar::OnControllerPress(int cmd, const ControllerAxisState& state)
 
     case kMOVE_AROUND:
     {
-        if (!fis_zero(state.x))
+        if (std::abs(state.x) > 0.35f)
         {
-            if (state.x > 0.35f)
-                OnKeyboardPress(kR_STRAFE);
-            else if (state.x < -0.35f)
-                OnKeyboardPress(kL_STRAFE);
+            Steer(state.x);
+            if (OwnerActor())
+                OwnerActor()->steer_Vehicle(state.x);
         }
         if (!fis_zero(state.y))
         {
@@ -265,7 +264,7 @@ void CCar::OnControllerPress(int cmd, const ControllerAxisState& state)
     default:
         OnKeyboardPress(cmd);
         break;
-    };
+    }
 }
 
 void CCar::OnControllerRelease(int cmd, const ControllerAxisState& state)
@@ -279,16 +278,17 @@ void CCar::OnControllerRelease(int cmd, const ControllerAxisState& state)
         break;
 
     case kMOVE_AROUND:
-        OnKeyboardRelease(kFWD);
-        OnKeyboardRelease(kBACK);
-        OnKeyboardRelease(kL_STRAFE);
-        OnKeyboardRelease(kR_STRAFE);
+        Steer(0.0f);
+        if (fwp)
+            OnKeyboardRelease(kFWD);
+        if (bkp)
+            OnKeyboardRelease(kBACK);
         break;
 
     default:
         OnKeyboardPress(cmd);
         break;
-    };
+    }
 }
 
 void CCar::OnControllerHold(int cmd, const ControllerAxisState& state)
@@ -309,45 +309,33 @@ void CCar::OnControllerHold(int cmd, const ControllerAxisState& state)
 
     case kMOVE_AROUND:
     {
-        if (!fis_zero(state.x))
+        const float angle = std::abs(state.x) > 0.35f ? state.x : 0.0f;
+
+        Steer(angle);
+        if (OwnerActor())
+            OwnerActor()->steer_Vehicle(angle);
+
+        if (std::abs(state.y) > 0.35f)
         {
-            if (state.x > 0.35f && !rsp) // right
+            if (state.y < 0.f) // forward
             {
-                OnKeyboardRelease(kL_STRAFE);
-                OnKeyboardPress(kR_STRAFE);
-            }
-            else if (state.x < -0.35f && !lsp) // left
-            {
-                OnKeyboardRelease(kR_STRAFE);
-                OnKeyboardPress(kL_STRAFE);
-            }
-            else
-            {
-                if (lsp)
-                    OnKeyboardRelease(kL_STRAFE);
-                if (rsp)
-                    OnKeyboardRelease(kR_STRAFE);
-            }
-        }
-        if (!fis_zero(state.y))
-        {
-            if (state.y > 0.35f && !bkp) // backward
-            {
-                OnKeyboardRelease(kFWD);
-                OnKeyboardPress(kBACK);
-            }
-            else if (state.y < -0.35f && !fwp) // forward
-            {
-                OnKeyboardRelease(kBACK);
+                if (bkp)
+                    OnKeyboardRelease(kBACK);
                 OnKeyboardPress(kFWD);
             }
-            else
+            else // state.y > 0.f backward
             {
                 if (fwp)
                     OnKeyboardRelease(kFWD);
-                if (bkp)
-                    OnKeyboardRelease(kBACK);
+                OnKeyboardPress(kBACK);
             }
+        }
+        else
+        {
+            if (fwp)
+                OnKeyboardRelease(kFWD);
+            if (bkp)
+                OnKeyboardRelease(kBACK);
         }
         break;
     }
