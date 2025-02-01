@@ -1,10 +1,17 @@
 /**
  * @ Version: SCREEN SPACE SHADERS - UPDATE 12.5
  * @ Description: Main file - Noise
- * @ Modified time: 2022-11-23 14:22
+ * @ Modified time: 2024-04-25 01:58
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
+
+float3 hash33(float3 p3)
+{
+	p3 = frac(p3 * float3(0.1031f, 0.1030f, 0.0973f));
+	p3 += dot(p3, p3.yxz + 33.33f);
+	return frac((p3.xxy + p3.yxx) * p3.zyx);
+}
 
 float4 SSFX_mod289(float4 x) 
 { 

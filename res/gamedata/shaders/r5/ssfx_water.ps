@@ -1,0 +1,338 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
+ * @ Description: Water Shader
+ * @ Modified time: 2024-07-31 01:05
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "common.h"
+#include "anomaly_shaders.h"
+#include "reflections.h"
+#include "lmodel.h"
+
+// Screen space functions
+#include "check_screenspace.h"
+#include "screenspace_water.h"
+
+#ifdef SSFX_FOG
+	#include "screenspace_fog.h"
+#endif
+
+struct vf
+{
+	float2	tbase		: TEXCOORD0;	// base
+	float4	tnorm0		: TEXCOORD1;	// nm0
+	float4	position_w	: TEXCOORD2;	// nm1
+	float3	M1			: TEXCOORD3;
+	float3	M2			: TEXCOORD4;
+	float3	M3			: TEXCOORD5;
+	float3	v2point_w	: TEXCOORD6;
+	float4	tctexgen	: TEXCOORD7;
+	float4	c0			: COLOR0;
+	float	fog			: FOG;
+	float4	hpos		: SV_Position;
+};
+
+
+Texture2D	s_water_ssr_noblur;
+Texture2D	s_perlin;
+
+Texture2D	s_water_ssr;
+Texture2D	s_nmap;
+Texture2D	s_rainsplash;
+Texture2D	s_watercaustics;
+Texture2D	s_wind;
+Texture2D	s_water_height;
+
+uniform float4 ssfx_water; // Res, Blur, Blur Perlin, -
+uniform float4 ssfx_water_setup1; // Distortion, Turbidity, Softborder, Parallax Height
+uniform float4 ssfx_water_setup2; // Reflection, Specular, Caustics, Ripples
+
+uniform float4 ssfx_is_underground;
+uniform float4 ssfx_issvp;
+
+uniform float4 wind_setup;
+uniform float4 ssfx_wind_anim;
+
+static const int q_parallax[4] =
+{
+	0,
+	8,
+	16,
+	32
+};
+
+
+float3 Water_DoParallax(float2 tc, float2 tc_step, float _step, Texture2D height_tex, float height_scale)
+{
+	// Init vars to store steps
+	float curr_step = 0;
+	float2 parallax_tc = tc;
+	
+	// Store the previous & current sample to do the POM calc later
+	float prev_Height = 0;
+	float curr_Height = 0;
+	
+	float prev_Sam = 0;
+	float curr_Sam = 0;
+
+	do // Basic Step Parallax
+	{
+		// Save previous data ( Used for interpolation and final height )
+		prev_Height = curr_Height;
+		prev_Sam = curr_Sam;
+
+		// Step TexCoor
+		parallax_tc -= tc_step;
+		curr_step += _step;
+
+		// Sample
+		curr_Sam = height_tex.SampleLevel(smp_base, parallax_tc * height_scale, 0).x;
+
+		curr_Height = 1.0f - curr_Sam;
+
+	} while(curr_Height > curr_step);
+
+	// [ POM ] Interpolation between the previous offset and the current offset
+	float currentDiff = curr_Height - curr_step;
+	float ratio = currentDiff / (currentDiff - saturate(prev_Height - curr_step + _step));
+
+	// Final TexCoor
+	return float3(lerp(parallax_tc, parallax_tc + tc_step, ratio), curr_Sam);
+
+}
+
+
+float4 main( vf I ) : SV_Target
+{
+	// Wind data
+	float r = wind_setup.x + 1.57079f;
+	float2 Wind_Dir = float2(cos(r),sin(r));
+	float Wind_Int = saturate(wind_setup.y * 0.001);
+
+	// Waves speed
+	float TimeSpeed = clamp(0.97f * Wind_Int, 0.45f, 0.97f);
+
+	// 3d view space pos reconstruction math
+	float3 Pv = float3(I.tctexgen.z * (I.hpos.xy * pos_decompression_params.zw - pos_decompression_params.xy), I.tctexgen.z);
+
+	float dist_att = 1.0 - smoothstep(G_SSR_PARALLAX_DISTANCE * 0.6f, G_SSR_PARALLAX_DISTANCE, Pv.z);
+
+// PARALLAX -------------------------------------------------------------------
+#if SSFX_WATER_PARALLAX > 0
+
+	float3 eye = normalize(mul(float3x3(I.M1.x, I.M2.x, I.M3.x,
+		I.M1.y, I.M2.y, I.M3.y,
+		I.M1.z, I.M2.z, I.M3.z), -I.v2point_w.xyz));
+
+	float view_angle = abs(dot(float3(0.0, 0.0, 1.0), eye));
+
+	// Dynamic steps
+	float _step = rcp(lerp(q_parallax[SSFX_WATER_PARALLAX], 1, view_angle)); // 1.0 / Step Qty
+
+	_step = dist_att <= 0 ? 1 : _step;
+
+	// View direction + bias to try to minimize issues with some slopes.
+	float2 viewdir = eye.xy / eye.z;
+
+	// Offset direction
+	float2 tc_step = _step * viewdir * clamp(ssfx_water_setup1.w * Wind_Int, 0.015f, ssfx_water_setup1.w); // G_SSR_PARALLAX_HEIGHT
+
+	// Calc Parallax
+	float3 tc_parallax = Water_DoParallax(I.tbase , tc_step, _step, s_water_height, 0.35f); // 0.35f
+
+#else
+
+	// TCs
+	float2 tc_parallax = I.tbase + (ssfx_wind_anim.ww * float2(0.065f, 0.445f) * TimeSpeed);
+
+#endif
+// ----------------------------------------------------------------------------
+
+// Normal Textures ------------------------------------------------------------
+	
+	float3	n_tc = 0;
+	n_tc.xy = tc_parallax.xy;
+	n_tc.z = tc_parallax.z;
+
+	float3	n0	= s_nmap.Sample(smp_base, n_tc.xy + (ssfx_wind_anim.ww * float2(0.23f, 0.10f) * TimeSpeed) ).rgb;
+	float3	n1	= s_nmap.Sample(smp_base, n_tc.xy - (ssfx_wind_anim.ww * float2(0.21f, 0.28f) * TimeSpeed) ).rgb;
+
+	// Wind Layer
+	float2 wind_layer = s_wind.Sample(smp_base, n_tc.xy * 0.1f + (Wind_Dir * Wind_Int * ssfx_wind_anim.ww * 0.1f)).rg;
+	n0.xy = lerp(n0.xy, wind_layer.xy, 0.1f * Wind_Int); //dist_att
+
+	// Waves Normal
+	float3 Waves_Normal = n0 * 2.0f - 1.0f;
+	Waves_Normal.xy += float2(0.095f, 0.088f);
+
+	float2 Wave_Int = 0;
+	Wave_Int.x = clamp(0.1f * Wind_Int, 0.03f, 0.1f);
+	Wave_Int.y = clamp(0.2f * Wind_Int, 0.1f, 0.2f);
+	Waves_Normal = normalize(float3(Waves_Normal.xy * Wave_Int.xy * ssfx_water_setup1.x, Waves_Normal.z)); // G_SSR_WATER_DISTORTION
+
+// ----------------------------------------------------------------------------
+
+// Prepare Stuff --------------------------------------------------------------
+
+	float2 PosTc = I.tctexgen.xy / I.tctexgen.z;
+
+#ifndef USE_MSAA
+	float4 P = s_position.Sample( smp_nofilter, PosTc );
+	float4 C = s_diffuse.Sample( smp_nofilter, PosTc );	
+#else
+	float4 P = s_position.Load( int3( I.hpos.xy, 0 ), 0 );
+	float4 C = s_diffuse.Load( int3( I.hpos.xy, 0 ), 0 );
+#endif
+
+	// Water Surface to world space
+	float3 w_s = mul(m_inv_V, Pv );
+
+	// Rain intensity. Fadeout and rain cover
+	half is_raining = rain_params.x > 0 ? 1.0f : 0.0f;
+	float RainInt = clamp(rain_params.x * 1.6f, 0.65f * is_raining, 1.0f);
+	
+	// Ripples normal
+	float2 Ripples = ssfx_rain_ripples( s_rainsplash, n_tc.xy * 0.6f, float3(RainInt, ssfx_water_setup2.w, 15.0f), P.z); // 0.6f // G_SSR_WATER_RIPPLES
+	Waves_Normal += float3(Ripples, 0) * is_raining;
+
+	// Water wave intensity
+	float3 Navg = ((n0 + n1) * 0.5) * 2.0f - 1.0f;
+	Navg += float3(0.1f, 0.1f, 0.1f) + float3(Ripples, 0) * is_raining;
+	Navg.xy *= 0.5f;
+
+	float3	Nw	= mul (float3x3(I.M1, I.M2, I.M3), Navg);
+			Nw	= normalize (Nw);
+	
+	float3 v2point	= normalize (I.v2point_w);
+	float3 vreflect = reflect(v2point, Nw.xyz);
+
+	float3 eyedir = normalize(Pv);
+	float3 Nv = normalize(mul(m_V, Nw));
+
+	// Refractions normal ( Used by shadows and refraction )
+	float2 N_Scr = Waves_Normal; //G_SSR_WATER_REFRACTION
+	
+	// Discard refractions from things above the water ( Like weapons )
+	float Refraction_Discard = Pv.z < SSFX_get_depth(PosTc + N_Scr, 0);
+
+	// Screen UV + Discard
+	float2 Refraction_UV = N_Scr * Refraction_Discard;
+
+	// 3d view space pos reconstruction math
+	P.xyz = float3( P.z * ( I.hpos.xy * pos_decompression_params.zw - pos_decompression_params.xy ), P.z);
+
+	// Bottom of the water to world space ( Project the caustics and water fog )
+	float3 w_p = mul(m_inv_V, float4(P.xyz , 1));
+	
+	// Shadows to do some tricks
+#ifndef USE_MSAA
+	float water_shadows = saturate(s_accumulator.Sample(smp_nofilter, PosTc + Refraction_UV).r * 2000);
+#else
+	float water_shadows = saturate(s_accumulator.Load(int3((PosTc + Refraction_UV) * screen_res.xy, 0), 0).r * 2000);
+#endif
+
+	// Fresnel
+	float fresnel		 = saturate (dot(vreflect, v2point));
+	float fresnel_amount = pow(fresnel, 3.0);
+
+	//float fresnel		 = SSFX_calc_fresnel(eyedir, Nv, 1.33f); 
+	//float fresnel_amount = fresnel;
+
+	// Sun color
+	float test_sun = dot(L_sun_color.rgb, 0.5f);
+
+	// Caustics offset anim
+	float4 CausticsT = float4( ssfx_wind_anim.w * 0.1f, 0.0f, -ssfx_wind_anim.w * 0.07f, 0.2f );
+
+	// Fake Caustics
+	float sun_int = smoothstep(0.3f, 1.0f, test_sun);
+	float3 Ca0 = saturate(s_watercaustics.Sample(smp_base, w_p.xz * (0.19f / G_SSR_WATER_CAUSTICS_SCALE) + CausticsT.xy ) - 0.1f );
+	float3 Ca1 = saturate(s_watercaustics.Sample(smp_base, w_p.xz * (0.11f / G_SSR_WATER_CAUSTICS_SCALE) + CausticsT.zw ) - 0.1f );
+	float3 CA = min(Ca0, Ca1) * water_shadows * sun_int * ssfx_water_setup2.z;//G_SSR_WATER_CAUSTICS; // Caustics if light hit the water
+
+	// Specular
+	float3 Nf = normalize(float3(Nw.x, Nw.y * G_SSR_WATER_SPECULAR_NORMAL, Nw.z)); // flatten the water normal to get better specular
+	float3 spec = L_sun_color.rgb * pow(abs(dot(normalize(v2point + L_sun_dir_w), Nf)), 512) * saturate(test_sun) * ssfx_water_setup2.y; //G_SSR_WATER_SPECULAR
+
+	// Trick to check if rain can fall on the water, gloss include the rain_apply_gloss
+	float rain_cover = step(0.035f * (-0.4f + rain_params.x), C.w - 0.04f );
+
+// ----------------------------------------------------------------------------
+
+// Reflection -----------------------------------------------------------------
+
+	// The SSR texture is always at half resolution
+	float2 refle_tc = PosTc / 2;
+
+	// Apply offset
+	refle_tc += Waves_Normal.xy;
+
+	// Limit TC offset
+	if (any(refle_tc < 0) || any(refle_tc > 0.5f))
+		refle_tc = PosTc / 2;
+
+	// Reflection
+	float3 reflection = s_water_ssr.Sample(smp_linear, refle_tc).rgb;
+
+	// Reflection variation
+	float3 refle_no_blur = s_water_ssr_noblur.Sample(smp_linear, PosTc / ssfx_water.x + Waves_Normal.xy).rgb;
+	
+	float water_perlin = s_perlin.Sample(smp_linear, (w_s.xz + eye_position.xz + Nw.xy * 100) * 0.02f).r;
+
+	// Clear <-> Blurry
+	reflection = lerp(reflection, refle_no_blur, saturate(water_perlin * ssfx_water.z));
+
+	reflection = vibrance(reflection, G_SSR_WATER_REFLECTION_VIBRANCE);
+// ----------------------------------------------------------------------------
+
+// Add Everything -------------------------------------------------------------
+
+	// Normal for the base texture...
+	float2 N_Tex = Waves_Normal;
+
+	// Water Depth
+	float waterDepth = w_s.y - w_p.y + eye_position.y;
+
+	// Water Fog
+	float waterFog = exp(waterDepth + n_tc.z * 0.1f) - 1.0f;
+
+	// Screen buffer
+	float3 screen = SSFX_get_image(PosTc + Refraction_UV, 0);
+
+	// Base texture * base color
+	float3 base_tex = s_base.Sample(smp_base, (w_s.xz + eye_position.xz) * 0.1f + N_Tex).rgb;
+
+	// Texture * base color
+	base_tex *= I.c0.rgb;
+
+	// Mix refraction ( 100% clear water ) & base texture ( Turbidity )
+	float3 turbidity = lerp(base_tex, screen, smoothstep(G_SSR_WATER_FOG_MAXDEPTH, -ssfx_water_setup1.y, waterFog)); // G_SSR_WATER_TURBIDITY
+
+	if (ssfx_issvp.x > 0)
+		reflection = turbidity;
+
+	// Let's start the accumulation... First the water result and reflection.
+	float3 acc = lerp(turbidity, reflection, saturate(fresnel_amount * ssfx_water_setup2.x)); // G_SSR_WATER_REFLECTION
+	
+	// Caustics. Fade through water fog
+	acc = acc + CA * smoothstep(G_SSR_WATER_FOG_MAXDEPTH + 0.5f, 0.0f, waterFog) * saturate(waterFog * 3.0f);
+		
+	// Specular
+	acc += spec * water_shadows;
+
+	// Fogging
+#ifdef SSFX_FOG
+	float fogging = SSFX_FOGGING(1.0 - I.fog, w_s.y);
+#else
+	float fogging = I.fog;
+#endif
+	acc = lerp(fog_color, acc, fogging);
+	
+	// "Transparency"
+	acc = lerp(screen, acc, (smoothstep( 0.0, ssfx_water_setup1.z, waterDepth + fresnel_amount) * fogging * fogging)); // G_SSR_WATER_SOFTBORDER
+
+	// Done
+	return  float4(acc, saturate(waterDepth * 5));
+}

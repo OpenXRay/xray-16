@@ -239,6 +239,11 @@ bool CTorch::net_Spawn(CSE_Abstract* DC)
     light_render->set_color(clr);
     light_render->set_range(range);
 
+    if (parent_id() == g_actor->ID())
+    {
+        light_render->set_hud_mode(true); // Enable HUD flag to player headlamp
+    }
+
     if (b_r2)
     {
         bool useVolumetric = pUserData->read_if_exists<bool>(TORCH_DEFINITION, "volumetric_enabled", false);

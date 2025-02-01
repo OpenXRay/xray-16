@@ -738,6 +738,9 @@
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h">
       <Filter>Lights</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\blender_lut.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1362,6 +1365,12 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_dudv.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\blender_lut.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\rendertarget_phase_lut.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>

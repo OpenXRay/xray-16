@@ -1,13 +1,55 @@
 /**
  * @ Version: SCREEN SPACE SHADERS - UPDATE 11.3
  * @ Description: SSS implementation
- * @ Modified time: 2022-09-27 09:10
+ * @ Modified time: 2023-12-11 08:23
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
 
 #include "screenspace_common.h"
 #include "settings_screenspace_SSS.h"
+
+float SSFX_ScreenSpaceShadows_Far(float4 P, float2 tc, uint iSample)
+{
+	if ( abs(P.w - MAT_FLORA) > 0.03f )
+		return 1;
+
+	// Light vector
+	float3 L_dir = mul(m_V, float4(-normalize(L_sun_dir_w), 0)).xyz;
+
+	RayTrace sss_ray = SSFX_ray_init(P.xyz, L_dir, 2.5, 2, 1);
+
+	[unroll (2)]
+	for (int i = 0; i < 2; i++)
+	{
+		// Break the march if ray go out of screen...
+		if (!SSFX_is_valid_uv(sss_ray.r_pos))
+			return 1;
+
+		// Sample current ray pos ( x = difference | y = sample depth | z = current ray len )
+		float3 depth_ray = SSFX_ray_intersect(sss_ray, iSample);
+		
+		// Check depth difference
+		float diff = depth_ray.x;
+		
+		// No Sky
+		diff *= depth_ray.y > SKY_EPS;
+
+		// Negative: Ray is closer to the camera ( not occluded )
+		// Positive: Ray is beyond the depth sample ( occluded )
+		if (diff > 0 && diff < 3)
+		{
+			return 0;
+		}
+
+		// Step the ray
+		sss_ray.r_pos += sss_ray.r_step;
+	}
+
+	return 1;
+}
+
+
 
 float SSFX_ScreenSpaceShadows(float4 P, float2 tc, uint iSample)
 {

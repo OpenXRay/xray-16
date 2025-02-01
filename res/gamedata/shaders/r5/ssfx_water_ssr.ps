@@ -1,0 +1,144 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
+ * @ Description: Water SSR
+ * @ Modified time: 2024-08-10 04:51
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "common.h"
+#include "anomaly_shaders.h"
+#include "reflections.h"
+#include "lmodel.h"
+
+// Screen space functions
+#include "check_screenspace.h"
+#include "screenspace_water.h"
+
+struct vf
+{
+	float2	tbase		: TEXCOORD0;	// base
+	float4	tnorm0		: TEXCOORD1;	// nm0
+	float3	position_w	: TEXCOORD2;	// nm1
+	float3	M1			: TEXCOORD3;
+	float3	M2			: TEXCOORD4;
+	float3	M3			: TEXCOORD5;
+	float3	v2point_w	: TEXCOORD6;
+	float4	tctexgen	: TEXCOORD7;
+	float4	c0			: COLOR0;
+	float	fog			: FOG;
+	float4	hpos		: SV_Position;
+};
+
+
+Texture2D s_bluenoise;
+Texture2D ssr_image;
+
+uniform float4 ssfx_is_underground;
+
+uniform float4 ssfx_water; // Res, Blur, Blur Perlin, -
+
+// Used on `ssfx_water.ps` to setup the effect
+//uniform float4 ssfx_water_setup1; // Distortion, Turbidity, Softborder, Parallax Height
+//uniform float4 ssfx_water_setup2; // Reflection, Specular, Caustics, Ripples
+
+float4x4 m_current; // Current projection matrix
+float4x4 m_previous; // Previous projection matrix
+float4 cam_pos;
+
+float4 main( vf I ) : SV_Target
+{
+
+	float2 hpos = I.hpos.xy * ssfx_water.x;
+
+
+	// 3d view space pos reconstruction math
+	float3 Pv = float3(I.tctexgen.z * (hpos * pos_decompression_params.zw - pos_decompression_params.xy), I.tctexgen.z);
+	float2 PosTc = I.tctexgen.xy / I.tctexgen.z;
+
+	float3 Nw = normalize(float3(I.M1.z, I.M2.z, I.M3.z));
+	
+	float3 v2point	= normalize (I.v2point_w);
+	float3 vreflect = reflect(v2point, Nw.xyz);
+
+	float3 eyedir = normalize(Pv);
+	float3 Nv = normalize(mul(m_V, Nw));
+
+	// Some vars to put our reflection
+	float3 refl_ray, refl_skybox;
+	float3 reflection;
+	float3 ssr_hit_uv = 0.0f;
+
+	// Blue Noise
+	float2 uv_noise = PosTc * 1.33f + (timers.xx * 0.02f);
+	uv_noise.x *= screen_res.x / screen_res.y;
+	float blue_noise = s_bluenoise.Sample(smp_linear, uv_noise).x * 1.5f;
+
+
+	// Compute reflection bounce
+	float3 wreflect = reflect(eyedir, Nv);
+
+	// Don't trace rays which face the camera. Still worth to avoid the rays mess when you look down.
+	float edgeFade = step(dot(-eyedir, wreflect), -0.3f);
+	
+	// Trace a ray
+	if (edgeFade > 0.02f)
+		ssr_hit_uv = SSFX_ssr_water_ray(Pv, wreflect, blue_noise, 0);
+
+	// Get current Skybox
+	refl_skybox = SSFX_calc_sky(vreflect) * G_SSR_WATER_SKY_REFLECTION;
+
+	if (all(ssr_hit_uv.xy))
+	{
+		// Get reflection pixel from scene screen
+		refl_ray = SSFX_get_image(ssr_hit_uv.xy, 0);
+
+		// Adjust reflection intensity using ssr_hit_uv.y and edgeFade
+		float ray_fade = ssr_hit_uv.y * 5.0f;
+		
+		// Reflection fog fadeout
+		float fog = 1.0 - saturate(( length(float3(Pv.x,Pv.y,ssr_hit_uv.z)) * fog_params.w + fog_params.x) * 1.4f);
+		
+		float refl_power = saturate(ray_fade * edgeFade * fog);
+		
+		// Fallback to Skybox
+		reflection = lerp(refl_skybox * !ssfx_is_underground.x, refl_ray * G_SSR_WATER_MAP_REFLECTION, refl_power);
+	}
+	else
+	{
+		// No reflection data, we use only refl_skybox
+		reflection = refl_skybox * !ssfx_is_underground.x;
+	}
+
+	// Position
+	float4 P4 = float4(I.position_w.xyz, 1.0);
+	
+	// Get current
+	float4 p_current = mul(m_WVP, P4);
+	float2 current = p_current.xy / p_current.w;
+	
+	// Get previous
+	float4 p_previous = mul(m_previous, P4);
+	float2 previous = p_previous.xy / p_previous.w;
+
+	// Velocity
+	float vel = saturate(distance(current.xy, previous.xy) + distance(cam_pos, eye_position) * 5.0f);
+
+	// UV Reprojection
+	float2 uv_rp = (current.xy - previous.xy) * float2(0.5, -0.5);
+
+	// Offscreen check	
+	int outoffsrc = any((PosTc - uv_rp) < 0) + any((PosTc - uv_rp) > 1);
+
+	// 0 Current frame ~ 1 Prev frame
+	float weight = saturate(0.95f - (vel + outoffsrc));
+
+	// Previus frame sample
+	float4 prev = ssr_image.Sample(smp_linear, (PosTc - uv_rp) / ssfx_water.x);
+
+	// Mix new frame with old ones
+	reflection.rgb = lerp(reflection.rgb, prev.rgb, weight);
+
+	// Done
+	return float4(reflection.rgb, 1.0f);
+}

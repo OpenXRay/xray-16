@@ -1,54 +1,60 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 19
+ * @ Description: Trees - Shadows
+ * @ Modified time: 2023-12-16 13:42
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
 #include "common.h"
 
 uniform float3x4		m_xform;
-uniform float3x4		m_xform_v;
 uniform float4 			consts; 	// {1/quant,1/quant,???,???}
-uniform float4 			c_scale,c_bias,wind,wave;
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// Vertex
+#include "screenspace_wind.h"
+
 #ifdef	USE_AREF
 v2p_shadow_direct_aref main ( v_shadow_direct_aref I )
-#else	//	USE_AREF
+#else
 v2p_shadow_direct main ( v_shadow_direct I )
-#endif	//	USE_AREF
+#endif
 {
 #ifdef	USE_AREF
 	v2p_shadow_direct_aref 	O;
-#else	//	USE_AREF
+#else
 	v2p_shadow_direct 		O;
-#endif	//	USE_AREF
+#endif
 	
-
 	// Transform to world coords
-	float3 	pos	= mul		(m_xform , I.P);
+	float3 	pos	= mul(m_xform , I.P);
+	float 	H	= pos.y - m_xform._24;	// height of vertex (scaled, rotated, etc.)
+	float2	tc = 0;
+	float3	wind_result = 0;
 
-	// 
-	float 	base 	= m_xform._24;			// take base height from matrix
-	float 	dp		= calc_cyclic  (wave.w+dot(pos,(float3)wave));
-	float 	H 		= pos.y - base;			// height of vertex (scaled, rotated, etc.)
-	float 	inten 	= H * dp;			// intensity
-	float2 	result;
 #ifdef	USE_TREEWAVE
-			result	= 0;
-#else	//	USE_TREEWAVE
-#ifdef	USE_AREF
-	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
-#else	//	USE_AREF
-	float 	frac 	= 0;
-#endif	//	USE_AREF
-			result	= calc_xz_wave	(wind.xz*inten, frac);
-#endif	//	USE_TREEWAVE
+	wind_result	= 0;
+#else
 
-	float4 	f_pos 	= float4(pos.x+result.x, pos.y, pos.z+result.y, 1);
+	#ifdef	USE_AREF
+		tc = (I.tc * consts).xy;
+		wind_result = ssfx_wind_tree_branches(pos, H, tc.y, ssfx_wind_setup());
+	#else
+		wind_result.xz = ssfx_wind_tree_trunk(pos, H, ssfx_wind_setup()).xy;
+	#endif
 
-	O.hpos 	= mul		(m_VP,	f_pos	);
+#endif
+
+	float4 f_pos = float4(pos.xyz + wind_result.xyz, 1);
+
+	O.hpos 	= mul(m_VP,	f_pos	);
+
 #ifdef	USE_AREF
-	O.tc0 	= (I.tc * consts).xy;		//	+ result;
-#endif	//	USE_AREF
+	O.tc0 = tc;
+#endif
+
 #ifndef USE_HWSMAP
 	O.depth = O.hpos.z;
 #endif
- 	return	O;
+	return O;
 }
 FXVS;

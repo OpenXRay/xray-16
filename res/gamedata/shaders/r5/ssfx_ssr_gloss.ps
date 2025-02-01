@@ -1,0 +1,87 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 21
+ * @ Description: SSR - Gloss Phase
+ * @ Modified time: 2024-06-03 09:42
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "screenspace_common.h"
+#include "settings_screenspace_SSR.h"
+
+uniform float4 ssfx_ssr_2;
+uniform float4 ssfx_is_underground;
+
+Texture2D s_hud_mask;
+
+float4 main(p_screen I) : SV_Target
+{
+
+#ifndef USE_MSAA
+	float4 Pos = s_position.Sample( smp_nofilter, I.tc0 );
+	float gloss = s_diffuse.Sample( smp_nofilter, I.tc0 ).a;
+#else
+	float4 Pos = s_position.Load( int3( I.hpos.xy, 0 ), 0 );
+	float gloss = s_diffuse.Load( int3( I.hpos.xy, 0 ), 0 ).a;
+#endif
+
+	float3 P 	= float3( Pos.z * ( I.hpos * pos_decompression_params.zw - pos_decompression_params.xy ), Pos.z );
+	float3 N 	= gbuf_unpack_normal( Pos.xy );
+	float mtl	= gbuf_unpack_mtl( Pos.w );
+
+	float HUD_mask = s_hud_mask.Sample(smp_nofilter, I.tc0).r;
+
+	bool m_flora = abs(mtl - MAT_FLORA) <= 0.04f;
+
+	// Calc reflection bounce
+	float3 inVec = normalize(P.xyz); // Incident
+	float3 reVec = reflect(inVec , N); // Reflected
+
+	// Transform space and calc reflection vector ( Skybox & Fresnel )
+	float3 nw		 = mul(m_inv_V, N);
+	float3 v2point	 = mul(m_inv_V, inVec);
+	float3 v2reflect = reflect(v2point, nw);
+
+	// Fresnel
+	float fresnel = saturate (dot(v2reflect, v2point));
+	float fresnel_amount = pow(fresnel, 3);
+	gloss *= fresnel_amount;
+
+#ifdef G_SSR_CHEAP_SKYBOX
+	float3 sky = SSFX_calc_env(v2reflect) * ssfx_ssr_2.y * !ssfx_is_underground.x;
+#else
+	float3 sky = SSFX_calc_sky(v2reflect) * ssfx_ssr_2.y * !ssfx_is_underground.x;
+#endif
+
+	// Flora intensity
+	gloss *= m_flora ? G_SSR_FLORA_INTENSITY : 1.0f;
+
+	// Global intensity and limit max value.
+	float main_clamp = clamp(gloss * ssfx_ssr_2.x, 0, G_SSR_MAX_INTENSITY);
+	
+	// Raise reflection intensity and max limit when raining. ( NOTE: Reverted to rain intensity, but improvements are on the way... )
+	float rain_extra = G_SSR_WEAPON_RAIN_FACTOR * rain_params.x;
+
+	// Weapon intensity and limit max value.
+	float wpn_clamp = clamp(gloss * ssfx_ssr_2.z, 0, ssfx_ssr_2.w + rain_extra);
+
+	#ifdef G_SSR_WEAPON_REFLECT_ONLY_WITH_RAIN
+		wpn_clamp *= rain_params.x;
+	#endif
+
+	// Lerp between general reflections and weapon reflections.
+	gloss = lerp(wpn_clamp, main_clamp, HUD_mask);
+
+	// Fog
+	float fog = 1.0 - saturate(( length(P.xyz) * fog_params.w + fog_params.x));
+
+	// Sky discard
+	if (P.z < SKY_EPS)
+	{
+		sky *= 0;
+		gloss *= 0;
+	}
+
+	// Mix
+	return float4(sky, gloss * fog * fog);
+}

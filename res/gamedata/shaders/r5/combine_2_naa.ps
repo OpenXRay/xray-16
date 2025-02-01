@@ -12,12 +12,16 @@
 	#include "screenspace_debanding.h"
 #endif
 
+// Used by FOG and IL. Keep it here for the moment...
+uniform float4 fakescope_params3;
+
 #ifdef SSFX_FOG
 	#include "screenspace_fog.h"
+	#include "settings_screenspace_FOG.h"
 #endif
 
-#ifdef SSFX_INDIRECT_LIGHT
-	#include "screenspace_il.h"
+#ifdef SSFX_LUT_INUSE
+	#include "screenspace_lut.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +54,7 @@ struct c2_out
 #ifdef USE_MSAA
 	float	Depth : SV_Depth;
 #endif
-};
+};	
 
 c2_out main( v2p_aa_AA I )
 {
@@ -79,21 +83,47 @@ c2_out main( v2p_aa_AA I )
 	float2	center 	= I.Tex0;
 #endif
 
-	float3 img = s_image.SampleLevel(smp_rtlinear, center.xy, 0);
+	float3 img = s_image.Load(int3(center.xy * screen_res.xy, 0),0);
 
 	float4 bloom = s_bloom.Sample(smp_rtlinear,center);
 
 	img = mblur( center, ( gbd ).P, img.rgb);
 
-	// Indirect light - SCREEN SPACE SHADERS - UPDATE 14
-#ifdef SSFX_INDIRECT_LIGHT
-	ssfx_il(I.Tex0, I.HPos, gbd.P, gbd.N, img, iSample);
+#ifdef SSFX_FOG
+
+	// Calc Fog
+	float fogresult = SSFX_CALC_FOG(gbd.P);
+	fogresult *= fogresult;
+
+	// Fog Scattering -----------------------
+	#ifdef G_FOG_USE_SCATTERING
+		// Blur sample
+		float3 foggg = s_blur_2.Sample(smp_rtlinear, center);
+
+		// Scopes
+		int disablefog = (fakescope_params3.x > 0 ? 0 : 1);
+
+		// NVGs
+		#ifdef SSFX_BEEFS_NVG
+			disablefog *= (shader_param_8.x > 0 ? 0 : 1);
+		#endif
+
+		// Blend
+		img = lerp(img, max(img, foggg), smoothstep(0.2f, 0.8f, fogresult) * disablefog);
+	#endif
+	// --------------------------------------
 #endif
 
-	// Sky Debanding Implementation  - SCREEN SPACE SHADERS - UPDATE 12.5
 #ifdef SSFX_DEBAND
-	if (depth <= SKY_EPS)
-		img = ssfx_debanding(img, I.Tex0.xy);
+
+	#ifdef SSFX_FOG
+		float Debanding = depth <= SKY_EPS ? 1.0 : fogresult;
+	#else
+		float Debanding = depth <= SKY_EPS ? 1.0 : 0;
+	#endif
+
+	// Debanding  - SCREEN SPACE SHADERS - UPDATE 12.5
+	img = lerp(img, ssfx_debanding(img, I.Tex0.xy), Debanding);
 #endif
 
 #ifdef SSFX_BEEFS_NVG
@@ -108,12 +138,22 @@ c2_out main( v2p_aa_AA I )
 	img = blend_soft(img, bloom.xyz*bloom.w);
 #endif
 
+
+// Color grading --------------------------------
+#ifndef SSFX_ENHANCED_SHADERS
 	if (tnmp_onoff == 1.0)
-	{		
+	{
 		img = Uncharted2ToneMapping(img);
 	}
+#endif
 
+	// Vanilla color grading ( Exposure, saturation and gamma )
 	img = img_corrections(img);
+
+#ifdef SSFX_LUT_INUSE
+	img = ssfx_lut_pp(img);
+#endif
+// ----------------------------------------------
 		
 #ifdef 	USE_DISTORT
  	float3	blurred	= bloom*def_hdr	;

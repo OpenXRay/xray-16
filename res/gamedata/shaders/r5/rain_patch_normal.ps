@@ -44,7 +44,7 @@ float3	GetWaterFall( Texture2D s_texture, float2 tc)
 	col_offset = (col_offset < ssfx_wetsurfaces_2.z ? col_offset * 3.0f : col_offset);
 
 	// Animate
-	col_offset += timers.x * col_offset * ssfx_wetsurfaces_2.y;
+	col_offset += timers.x * col_offset * rain_params.x * ssfx_wetsurfaces_2.y;
 
 	// Add wabbly
 	//col_tc.x += sin((tc_ori.y + col_offset) * 20) * 0.5f + 0.5f;
@@ -56,7 +56,7 @@ float3	GetWaterFall( Texture2D s_texture, float2 tc)
 	water.xyz = water.xzy * 2.0f - 1.0f;
 
 	// Intensity
-	water.xyz *= ssfx_wetsurfaces_2.w * clamp(rain_params.x, 0.1f, 1.f);
+	water.xyz *= ssfx_wetsurfaces_2.w;
 
 	return water.xyz;
 }

@@ -55,12 +55,23 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
 
 void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)
 {
-    u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, rt_MSAADepth);
-
     if (!m_bHasActiveVolumetric)
     {
         m_bHasActiveVolumetric = true;
+
+        if (!RImplementation.o.msaa)
+            u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, RImplementation.o.ssfx_volumetric ? nullptr : rt_Base_Depth);
+        else
+            u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, RImplementation.o.ssfx_volumetric ? nullptr : rt_Base_Depth);
+
         cmd_list.ClearRT(rt_Generic_2, {}); // black
+    }
+    else
+    {
+        if (!RImplementation.o.msaa)
+            u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, RImplementation.o.ssfx_volumetric ? nullptr : rt_Base_Depth);
+        else
+            u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, RImplementation.o.ssfx_volumetric ? nullptr : rt_Base_Depth);
     }
 
     cmd_list.set_Stencil(FALSE);

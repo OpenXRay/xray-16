@@ -1,8 +1,18 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 20
+ * @ Description: Non-directional volumetric shader
+ * @ Modified time: 2024-02-20 07:26
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+// Remember: If you need new textures or samplers, remember to edit both `accum_volumetric.s` and `accum_volumetric_nomsaa.s`
+
 #include "common.h"
 #include "shadow.h"
 
 #ifndef ISAMPLE
-#define ISAMPLE 0
+	#define ISAMPLE 0
 #endif
 
 struct 	v2p
@@ -13,11 +23,8 @@ struct 	v2p
 };
 
 float4 m_lmap[2];
-Texture2D s_noise;
 
-#define	USE_LMAP
-#define	USE_LMAPXFORM
-#define	USE_SHADOW
+//uniform float4 shader_param_6;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
@@ -27,51 +34,43 @@ float4 main ( v2p I ) : SV_Target
 float4 main ( v2p I, uint iSample : SV_SAMPLEINDEX ) : SV_Target
 #endif
 {
-        // ----- shadow
-	float4	P4	= float4(I.vPos, 1);
-        float4	PS	= mul( m_shadow, P4);
-        float	s	= 1.h;
-        #ifdef	USE_SHADOW
-                  	s	= shadow_hw(PS);
-        #endif
+	// Screen UV ( view to uv ) // TODO : Use the Matrix mul from the vertex shader
+	float4 Postc = mul(m_P, float4(I.vPos, 1));
+	float2 tc = (Postc.xy / Postc.w) * float2(0.5f, -0.5f) + 0.5f;
 
-        // ----- lightmap
-        float4	lightmap = 1.h;
-        #ifdef	USE_LMAP
-                #ifdef	USE_LMAPXFORM
-					PS.x	= dot( P4, m_lmap[0]);
-					PS.y	= dot( P4, m_lmap[1]);
-                #endif
-					lightmap = s_lmap.Sample(smp_rtlinear, PS.xy/PS.w); 
-        #endif
+	// Shadow matrix
+	float4 P4 = float4(I.vPos, 1);
+	float4 PS = mul( m_shadow, P4);
+	PS.xyz /= PS.w;
 
-	// ----- attenuate
-	float rsqr	= dot( I.lightToPos, I.lightToPos); // distance 2 light (squared)
-  	float  att 	= saturate( 1 - rsqr * Ldynamic_pos.w ); // q-linear attenuate
+	// Occlusion from light perspective.
+	float occ = s_smap.SampleCmpLevelZero( smp_smap, PS.xy, PS.z).x;
 
-	// ----- noise
+	// Occlusion from player perspective.
+	float _depth = 0;
+	#ifndef USE_MSAA
+		_depth = s_position.Sample(smp_nofilter, tc).z;
+	#else
+		_depth = s_position.Load(int3(tc * screen_res.xy, 0), iSample).z;
+	#endif
+	_depth = _depth <= SKY_EPS ? 10000 : _depth; // Sky
+	occ *= _depth < Postc.z ? 0.0f : 1.0f;
+
+	// Texture mask 
+	PS.x	= dot( P4, m_lmap[0]);
+	PS.y	= dot( P4, m_lmap[1]);
 	PS.xy /= PS.w;
-	float time = timers.z*0.1;	
-	PS.xy /= 3;
-	PS.x += time;
-	//	TODO: DX10: Can use sampler with point mip filter
-	float4	t_noise	= s_noise.Sample( smp_linear, PS );
-	PS.x -= time;
-	PS.y -= time*0.70091;
-	//	TODO: DX10: Can use sampler with point mip filter	
-	t_noise *= s_noise.Sample( smp_linear, PS );
-	t_noise = t_noise*0.5+0.5;
-	
-	s = max(0, s);
-	att = max(0, att);
-	lightmap = max(0, lightmap);
-	t_noise = max(0, t_noise);
-	
-	// matches vanilla?
-	float maxIntens = I.fDensity;
-	float3	result = maxIntens * s * att;
-	result *= lightmap;
-	result *= Ldynamic_color * t_noise;
-	return  float4( result, 0); //srgb
-	//return  float4( SRGBToLinear(result), 0);
+	float4	lightmap = s_lmap.Sample(smp_jitter, PS.xy);
+
+	// Attenuate ( Vanilla light attenuation )
+	float rsqr	= dot( I.lightToPos, I.lightToPos); // distance 2 light (squared)
+	float att 	= saturate( 1.0f - rsqr * Ldynamic_pos.w ); // q-linear attenuate
+
+	// Add extra attenuation when passing through.
+	att *= saturate(Postc.z * 2.5f);
+
+	// Result
+	float3	result = I.fDensity * occ * att * lightmap * Ldynamic_color;
+
+	return  float4( result, 0);
 }

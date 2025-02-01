@@ -166,6 +166,20 @@ void CRender::Render()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))
         split_the_scene_to_minimize_wait = TRUE;
 
+#if RENDER == R_R4
+    if (RImplementation.o.ssfx_core)
+    {
+        // HUD Masking rendering
+        Fcolor ColorRGBA = { 1.0f, 0.0f, 0.0f, 1.0f };
+        RCache.ClearRT(Target->rt_ssfx_hud->pRT, ColorRGBA);
+        Target->u_setrt(RCache, Target->rt_ssfx_hud, 0, 0, Target->get_base_zb());
+        dsgraph.render_hud(true);
+
+        // Reset Depth
+        RCache.ClearZB(Target->get_base_zb(), 1.0);
+    }
+#endif
+
     //******* Main render :: PART-0	-- first
 #ifdef USE_OGL
     if (psDeviceFlags.test(rsWireframe))
@@ -374,6 +388,13 @@ void CRender::Render()
         render_lights(LP_pending);
     }
 
+#if RENDER == R_R4
+    {
+        if (RImplementation.o.ssfx_volumetric)
+            Target->phase_ssfx_volumetric_blur();
+    }
+#endif
+
     // Postprocess
     {
         PIX_EVENT(DEFER_LIGHT_COMBINE);
@@ -399,7 +420,7 @@ void CRender::render_forward()
         dsgraph.render_graph(1); // normal level, secondary priority
         dsgraph.PortalTraverser.fade_render(); // faded-portals
         dsgraph.render_sorted(); // strict-sorted geoms
-        g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
+        //g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
 }
 

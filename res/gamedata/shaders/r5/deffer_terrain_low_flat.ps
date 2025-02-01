@@ -1,0 +1,28 @@
+/**
+ * @ Version: SCREEN SPACE SHADERS - UPDATE 20
+ * @ Description: Terrain Shader - LOW
+ * @ Modified time: 2024-02-27 23:30
+ * @ Author: https://www.moddb.com/members/ascii1457
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+ */
+
+#include "common.h"
+
+f_deffer 	main	( p_flat I 		)
+{
+	f_deffer	O;
+
+ 	// diffuse
+	float4	D = s_base.Sample( smp_base, I.tcdh);
+	float	G = 0.001f;
+	float3	N = I.N.xyz;
+
+	// 2. Standart output
+	float4 Ne = float4	(normalize(N), D.w);
+	O	= pack_gbuffer(
+						Ne,	// hemi
+						float4 	(I.position.xyz + Ne.xyz*def_virtualh / 2.h, 0.95f),
+						float4	(D.rgb, G));	// OUT: rgb.gloss
+
+  return O;
+}

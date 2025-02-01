@@ -4,6 +4,8 @@
 #include "IGame_Persistent.h"
 #include "Environment.h"
 
+#include "perlin.h"
+
 #ifdef _EDITOR
 #include "ui_toolscustom.h"
 #else
@@ -16,13 +18,13 @@
 // Warning: duplicated in dxRainRender
 //static const int max_desired_items = 2500;
 //static const float source_radius = 12.5f;
-static const float source_offset = 40.f;
-static const float max_distance = source_offset * 1.25f;
+static const float source_offset = 20.f; // 40
+static const float max_distance = source_offset * 1.5f;//1.25f;
 //static const float sink_offset = -(max_distance - source_offset);
 //static const float drop_length = 5.f;
 //static const float drop_width = 0.30f;
-static const float drop_angle = 3.0f;
-static const float drop_max_angle = deg2rad(10.f);
+static const float drop_angle = deg2rad(15.0f); // 3.0
+static const float drop_max_angle = deg2rad(35.f); // 10
 static const float drop_max_wind_vel = 20.0f;
 static const float drop_speed_min = 40.f;
 static const float drop_speed_max = 80.f;
@@ -30,6 +32,7 @@ static const float drop_speed_max = 80.f;
 const int max_particles = 1000;
 //const int particles_cache = 400;
 const float particles_time = .3f;
+CPerlinNoise1D* RainPerlin;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -41,15 +44,46 @@ CEffect_Rain::CEffect_Rain()
 
     snd_Ambient.create("ambient" DELIMITER "rain", st_Effect, sg_Undefined);
 
+    RainPerlin = xr_new<CPerlinNoise1D>(Random.randI(0, 0xFFFF));
+    RainPerlin->SetOctaves(2);
+    RainPerlin->SetAmplitude(0.66666f);
+
     p_create();
 }
 
 CEffect_Rain::~CEffect_Rain()
 {
+    xr_delete(RainPerlin);
     snd_Ambient.destroy();
 
     // Cleanup
     p_destroy();
+}
+
+void CEffect_Rain::Prepare(Fvector2& offset, Fvector3& axis, float W_Velocity, float W_Direction)
+{
+    // Wind gust, to add variation.
+    float Wind_Gust = RainPerlin->GetContinious(Device.fTimeGlobal * 0.3f) * 2.0f;
+
+    // Wind velocity [ 0 ~ 1 ]
+    float Wind_Velocity = W_Velocity + Wind_Gust;
+
+    clamp(Wind_Velocity, 0.0f, 1.0f);
+
+    // Wind velocity controles the angle
+    float pitch = drop_max_angle * Wind_Velocity;
+    axis.setHP(W_Direction, pitch - PI_DIV_2);
+
+    // Get distance
+    float dist = _sin(pitch) * source_offset;
+    float C = PI_DIV_2 - pitch;
+    dist /= _sin(C);
+
+    // 0 is North
+    float fixNorth = W_Direction - PI_DIV_2;
+
+    // Set offset
+    offset.set(dist * _cos(fixNorth), dist * _sin(fixNorth));
 }
 
 // Born
@@ -57,25 +91,37 @@ void CEffect_Rain::Born(Item& dest, float radius, float speed)
 {
     ZoneScoped;
 
-    Fvector axis;
-    axis.set(0, -1, 0);
-    float gust = g_pGamePersistent->Environment().wind_strength_factor / 10.f;
-    float k = g_pGamePersistent->Environment().CurrentEnv.wind_velocity * gust / drop_max_wind_vel;
-    clamp(k, 0.f, 1.f);
-    float pitch = drop_max_angle * k - PI_DIV_2;
-    axis.setHP(g_pGamePersistent->Environment().CurrentEnv.wind_direction, pitch);
+    // Prepare correct angle and distance to hit the player
+    Fvector Rain_Axis = { 0, -1, 0 };
+    Fvector2 Rain_Offset;
 
+    float Wind_Direction = -g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+
+    // Wind Velocity [ From 0 ~ 1000 to 0 ~ 1 ]
+    float Wind_Velocity = g_pGamePersistent->Environment().CurrentEnv.wind_velocity * 0.001f;
+    clamp(Wind_Velocity, 0.0f, 1.0f);
+
+    Prepare(Rain_Offset, Rain_Axis, Wind_Velocity, Wind_Direction);
+
+    // Camera Position
     Fvector& view = Device.vCameraPosition;
-    float angle = ::Random.randF(0, PI_MUL_2);
-    float dist = ::Random.randF();
-    dist = _sqrt(dist) * radius;
-    float x = dist * _cos(angle);
-    float z = dist * _sin(angle);
-    dest.D.random_dir(axis, deg2rad(drop_angle));
-    dest.P.set(x + view.x - dest.D.x * source_offset, source_offset + view.y, z + view.z - dest.D.z * source_offset);
-    // dest.P.set (x+view.x,height+view.y,z+view.z);
-    dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max) * speed;
+    // Random Position
+    float r = radius * 0.5f;
+    Fvector2 RandomP = { ::Random.randF(-r, r), ::Random.randF(-r, r) };
 
+    // Aim ahead of where the player is facing
+    Fvector FinalView = Fvector().mad(view, Device.vCameraDirection, 5.0f);
+
+    // Random direction. Higher angle at lower velocity
+    dest.D.random_dir(Rain_Axis, ::Random.randF(-drop_angle, drop_angle) * (1.5f - Wind_Velocity));
+
+    // Set final destination
+    dest.P.set(Rain_Offset.x + FinalView.x + RandomP.x, source_offset + view.y, Rain_Offset.y + FinalView.z + RandomP.y);
+
+    // Set speed
+    dest.fSpeed = ::Random.randF(drop_speed_min, drop_speed_max) * speed * clampr(Wind_Velocity * 1.5f, 0.5f, 1.0f);
+
+    // Born
     float height = max_distance;
     RenewItem(dest, height, RayPick(dest.P, dest.D, height, collide::rqtBoth));
 }
@@ -127,7 +173,14 @@ void CEffect_Rain::OnFrame()
         return;
 
     // Parse states
-    float factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+    float rain_density = g_pGamePersistent->Environment().CurrentEnv.rain_density;
+    float wind_velocity = g_pGamePersistent->Environment().CurrentEnv.wind_velocity * 0.001f;
+    clamp(wind_velocity, 0.0f, 1.0f);
+
+    wind_velocity *= (rain_density > 0.0f ? 1.0f : 0.0f); // Only when raining
+
+    // 50% of the volume is by rain_density and 50% wind_velocity;
+    float factor = rain_density * 0.5f + wind_velocity * 0.5f;
     static float hemi_factor = 0.f;
 #ifndef _EDITOR
     IGameObject* E = g_pGameLevel->CurrentViewEntity();

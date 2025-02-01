@@ -58,12 +58,13 @@ f_deffer main( p_flat I )
 # endif
 #endif
 
-  // 2. Standart output
-  float4 Ne		= float4( normalize((float3)I.N.xyz + float3(drops.xy * drops.w, 0.0f)), h );
-  O				= pack_gbuffer(
-								Ne,
-								float4( I.position.xyz + Ne.xyz*def_virtualh/2.h, ms ),
-								float4( D.rgb, gloss ) );	// OUT: rgb.gloss
+// 2. Standart output
+float4 Ne = float4(normalize((float3)I.N.xyz + float3(drops.xy * drops.w, 0.0f)), h);
+
+O = pack_gbuffer(
+	Ne,
+	float4( I.position.xyz + Ne.xyz*def_virtualh/2.h, ms ),
+	float4( D.rgb, gloss ));
 
   return O;
 }

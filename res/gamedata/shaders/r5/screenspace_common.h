@@ -1,7 +1,7 @@
 /**
  * @ Version: SCREEN SPACE SHADERS - UPDATE 14
  * @ Description: Main file
- * @ Modified time: 2023-01-18 21:11
+ * @ Modified time: 2024-04-02 06:25
  * @ Author: https://www.moddb.com/members/ascii1457
  * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
@@ -17,7 +17,7 @@
 
 #include "check_screenspace.h"
 
-static const float3 ssfx_hemisphere[32] =
+static const float3 ssfx_hemisphere[64] =
 {
 	float3(-0.134, 0.044, -0.825),	float3(0.045, -0.431, -0.529),	float3(-0.537, 0.195, -0.371),
 	float3(0.525, -0.397, 0.713),	float3(0.895, 0.302, 0.139),	float3(-0.613, -0.408, -0.141),
@@ -30,6 +30,18 @@ static const float3 ssfx_hemisphere[32] =
 	float3(-0.638, 0.319, 0.686),	float3(-0.663, 0.230, -0.634),	float3(0.235, -0.547, 0.664),
 	float3(0.164, -0.710, 0.086),	float3(-0.009, 0.493, -0.038),	float3(-0.322, 0.147, -0.105),
 	float3(-0.554, -0.725, 0.289),	float3(0.534, 0.157, -0.250),
+
+	float3(-0.234, 0.084, -0.425),	float3(0.085, -0.831, -0.229),	float3(-0.837, 0.295, -0.671),
+	float3(0.225, -0.697, 0.113),	float3(0.295, 0.602, 0.239),	float3(-0.413, -0.808, -0.241),
+	float3(0.607, 0.222, 0.269),	float3(-0.219, 0.067, -0.688),	float3(0.676, 0.0, 0.293),
+	float3(-0.00, -0.203, -0.135),	float3(0.198, 0.693, 0.019),	float3(0.842, -0.418, -0.193),
+	float3(0.526, -0.283, 0.824),	float3(-0.529, -0.278, 0.484),	float3(0.166, -0.707, -0.170),
+	float3(-0.414, 0.488, 0.288),	float3(-0.489, -0.422, -0.292),	float3(-0.008, -0.412, -0.321),
+	float3(0.153, -0.263, 0.054),	float3(0.439, -0.558, 0.489),	float3(-0.455, 0.158, 0.099),
+	float3(-0.888, 0.873, -0.681),	float3(-0.192, -0.632, 0.237),	float3(0.080, 0.356, -0.894),
+	float3(-0.438, 0.619, 0.486),	float3(-0.463, 0.430, -0.434),	float3(0.435, -0.547, 0.464),
+	float3(0.264, -0.310, 0.186),	float3(-0.109, 0.893, -0.038),	float3(-0.622, 0.247, -0.205),
+	float3(-0.500, -0.325, 0.489),	float3(0.534, 0.247, -0.450)
 };
 
 #ifdef USE_MSAA
@@ -257,9 +269,9 @@ float3 SSFX_calc_sky(float3 dir)
 	
 	// Use hemi color or real sky color if the modded executable is installed.
 #ifndef SSFX_MODEXE
-	return saturate(L_hemi_color.rgb * 3.0f) * lerp(sky0, sky1, L_ambient.w);
+	return saturate(L_hemi_color.rgb) * lerp(sky0, sky1, L_ambient.w);
 #else
-	return saturate(sky_color.bgr * 3.0f) * lerp(sky0, sky1, L_ambient.w);
+	return saturate(sky_color.bgr) * lerp(sky0, sky1, L_ambient.w);
 #endif
 }
 

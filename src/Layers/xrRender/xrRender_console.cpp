@@ -300,6 +300,29 @@ extern ENGINE_API float ps_ssfx_gloss_factor;
 extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
 extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
 
+extern ENGINE_API float ps_ssfx_hud_hemi;
+extern ENGINE_API int ps_ssfx_il_quality;
+extern ENGINE_API Fvector4 ps_ssfx_il;
+extern ENGINE_API Fvector4 ps_ssfx_il_setup1;
+extern ENGINE_API int ps_ssfx_ao_quality;
+extern ENGINE_API Fvector4 ps_ssfx_ao;
+extern ENGINE_API Fvector4 ps_ssfx_ao_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_water;
+extern ENGINE_API Fvector3 ps_ssfx_water_quality;
+extern ENGINE_API Fvector4 ps_ssfx_water_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_water_setup2;
+extern ENGINE_API int ps_ssfx_ssr_quality;
+extern ENGINE_API Fvector4 ps_ssfx_ssr;
+extern ENGINE_API Fvector4 ps_ssfx_ssr_2;
+extern ENGINE_API Fvector4 ps_ssfx_terrain_quality;
+extern ENGINE_API Fvector4 ps_ssfx_terrain_offset;
+extern ENGINE_API Fvector3 ps_ssfx_shadows;
+extern ENGINE_API Fvector4 ps_ssfx_volumetric;
+extern ENGINE_API Fvector3 ps_ssfx_shadow_bias;
+extern ENGINE_API Fvector4 ps_ssfx_lut;
+extern ENGINE_API Fvector4 ps_ssfx_wind_grass;
+extern ENGINE_API Fvector4 ps_ssfx_wind_trees;
+
 //  x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
@@ -952,7 +975,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_ls_dsm_kernel", &ps_r2_ls_dsm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_psm_kernel", &ps_r2_ls_psm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_ssm_kernel", &ps_r2_ls_ssm_kernel, .1f, 3.f);
-    CMD4(CCC_Float, "r2_ls_squality", &ps_r2_ls_squality, .5f, 1.f);
+    CMD4(CCC_Float, "r2_ls_squality", &ps_r2_ls_squality, .5f, 3.f);
 
     CMD3(CCC_Mask, "r2_zfill", &ps_r2_ls_flags, R2FLAG_ZFILL);
     CMD4(CCC_Float, "r2_zfill_depth", &ps_r2_zfill, .001f, .5f);
@@ -1158,6 +1181,39 @@ void xrRender_initconsole()
     CMD4(CCC_Vector3, "ssfx_gloss_minmax", &ps_ssfx_gloss_minmax, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 1.0, 1.0));
     CMD4(CCC_Float, "ssfx_gloss_factor", &ps_ssfx_gloss_factor, 0.0f, 1.0f);
     CMD4(CCC_Vector4, "ssfx_lightsetup_1", &ps_ssfx_lightsetup_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(1.0, 1.0, 1.0, 1.0));
+
+    // Screen Space Shaders
+    CMD4(CCC_Float, "ssfx_hud_hemi", &ps_ssfx_hud_hemi, 0.0f, 1.0f);
+
+    CMD4(CCC_Integer, "ssfx_il_quality", &ps_ssfx_il_quality, 16, 64);
+    CMD4(CCC_Vector4, "ssfx_il", &ps_ssfx_il, Fvector4().set(0, 0, 0, 0), Fvector4().set(8, 10, 3, 6));
+    CMD4(CCC_Vector4, "ssfx_il_setup1", &ps_ssfx_il_setup1, Fvector4().set(0, 0, 0, 0), Fvector4().set(300, 1, 1, 1));
+
+    CMD4(CCC_Integer, "ssfx_ao_quality", &ps_ssfx_ao_quality, 2, 8);
+    CMD4(CCC_Vector4, "ssfx_ao", &ps_ssfx_ao, Fvector4().set(0, 0, 0, 0), Fvector4().set(8, 10, 1, 10));
+    CMD4(CCC_Vector4, "ssfx_ao_setup1", &ps_ssfx_ao_setup1, Fvector4().set(0, 0, 0, 0), Fvector4().set(300, 1, 1, 1));
+
+    CMD4(CCC_Vector4, "ssfx_water", &ps_ssfx_water, Fvector4().set(1, 0, 0, 0), Fvector4().set(8, 1, 1, 0));
+    CMD4(CCC_Vector3, "ssfx_water_quality", &ps_ssfx_water_quality, Fvector3().set(0, 0, 0), Fvector3().set(4, 3, 0));
+    CMD4(CCC_Vector4, "ssfx_water_setup1", &ps_ssfx_water_setup1, Fvector4().set(0, 0, 0, 0), Fvector4().set(2, 10, 1, 0.1));
+    CMD4(CCC_Vector4, "ssfx_water_setup2", &ps_ssfx_water_setup2, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 10, 1, 1));
+
+    CMD4(CCC_Integer, "ssfx_ssr_quality", &ps_ssfx_ssr_quality, 0, 5);
+    CMD4(CCC_Vector4, "ssfx_ssr", &ps_ssfx_ssr, Fvector4().set(1, 0, 0, 0), Fvector4().set(2, 1, 1, 1));
+    CMD4(CCC_Vector4, "ssfx_ssr_2", &ps_ssfx_ssr_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(2, 2, 2, 2));
+
+    CMD4(CCC_Vector4, "ssfx_terrain_quality", &ps_ssfx_terrain_quality, Fvector4().set(0, 0, 0, 0), Fvector4().set(12, 0, 0, 0));
+    CMD4(CCC_Vector4, "ssfx_terrain_offset", &ps_ssfx_terrain_offset, Fvector4().set(-1, -1, -1, -1), Fvector4().set(1, 1, 1, 1));
+
+    CMD4(CCC_Vector3, "ssfx_shadows", &ps_ssfx_shadows, Fvector3().set(128, 1536, 0), Fvector3().set(1536, 4096, 0));
+    CMD4(CCC_Vector4, "ssfx_volumetric", &ps_ssfx_volumetric, Fvector4().set(0, 0, 1.0, 1.0), Fvector4().set(1.0, 5.0, 5.0, 16.0));
+
+    CMD4(CCC_Vector3, "ssfx_shadow_bias", &ps_ssfx_shadow_bias, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 1.0, 1.0));
+
+    CMD4(CCC_Vector4, "ssfx_lut", &ps_ssfx_lut, Fvector4().set(0.0, 0.0, 0.0, 0.0), tw2_max);
+
+    CMD4(CCC_Vector4, "ssfx_wind_grass", &ps_ssfx_wind_grass, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(20.0, 5.0, 5.0, 5.0));
+    CMD4(CCC_Vector4, "ssfx_wind_trees", &ps_ssfx_wind_trees, Fvector4().set(0.0, 0.0, 0.0, 0.0), Fvector4().set(20.0, 5.0, 5.0, 1.0));
 
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);

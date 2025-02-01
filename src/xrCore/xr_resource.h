@@ -30,6 +30,8 @@ struct xr_resource_flagged : public xr_resource
     };
 
     u32 dwFlags{ 0 };
+    int skinning;
+    bool hud_disabled;
 };
 
 struct xr_resource_named : public xr_resource_flagged

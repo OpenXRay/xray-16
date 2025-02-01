@@ -593,7 +593,7 @@ ENGINE_API Fvector4 ps_ssfx_hud_drops_1_cfg = { 3.0f, 1.f, 1.f, 50.f }; // Quant
 ENGINE_API Fvector4 ps_ssfx_hud_drops_2_cfg = { 50.f, 50.f, 0.75f, 2.f }; // Drops build up speed, Drying speed, Size of the drops, Raindrops gloss intensity
 ENGINE_API Fvector4 ps_ssfx_blood_decals = { 0.6f, 0.6f, 0.f, 0.f };
 ENGINE_API Fvector4 ps_ssfx_rain_1 = { 2.0f, 0.1f, 0.6f, 2.f }; // Len, Width, Speed, Quality
-ENGINE_API Fvector4 ps_ssfx_rain_2 = { 0.7f, 0.1f, 1.0f, 0.5f }; // Alpha, Brigthness, Refraction, Reflection
+ENGINE_API Fvector4 ps_ssfx_rain_2 = { 0.5f, 0.1f, 1.0f, 0.5f }; // Alpha, Brigthness, Refraction, Reflection
 ENGINE_API Fvector4 ps_ssfx_rain_3 = { 0.01f, 1.0f, 0.0f, 0.0f }; // Alpha, Refraction ( Splashes ) - Yohji: Alpha was edited (0.5->0.01f) due to a bug with transparency and other particles.
 ENGINE_API Fvector3 ps_ssfx_shadow_cascades = { 20.f, 40.f, 160.f };
 ENGINE_API Fvector4 ps_ssfx_grass_shadows = { .0f, .35f, 30.0f, .0f };
@@ -611,10 +611,32 @@ ENGINE_API int ps_ssfx_gloss_method = 1;
 ENGINE_API float ps_ssfx_gloss_factor = 0.5f;
 ENGINE_API Fvector3 ps_ssfx_gloss_minmax = { 0.0f,0.92f,0.0f }; // Gloss
 ENGINE_API Fvector4 ps_ssfx_lightsetup_1 = { 0.35f, 0.5f, 0.0f, 0.0f }; // Spec intensity
-
 ENGINE_API float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
 ENGINE_API float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
 ENGINE_API int ps_r3_dyn_wet_surf_sm_res = 256; // 256
+
+ENGINE_API float ps_ssfx_hud_hemi = 0.15f; // HUD Hemi Offset
+ENGINE_API int ps_ssfx_il_quality = 32; // IL Samples
+ENGINE_API Fvector4 ps_ssfx_il = { 6.66f, 1.0f, 1.0f, 5.0f }; // Res, Int, Vibrance, Blur
+ENGINE_API Fvector4 ps_ssfx_il_setup1 = { 150.0f, 1.0f, 0.5f, 0.0f }; // Distance, HUD, Flora, -
+ENGINE_API int ps_ssfx_ao_quality = 4; // AO Samples
+ENGINE_API Fvector4 ps_ssfx_ao = { 1.0f, 5.0f, 1.0f, 2.5f }; // Res, AO int, Blur, Radius
+ENGINE_API Fvector4 ps_ssfx_ao_setup1 = { 150.0, 1.0, 1.0, 0.0 }; // Distance, HUD, Flora, Max OCC
+ENGINE_API Fvector4 ps_ssfx_water = { 1.0f, 0.8f, 1.0f, 0.0f }; // Res, Blur, Blur Perlin, -
+ENGINE_API Fvector3 ps_ssfx_water_quality = { 1.0, 2.0, 0.0 }; // SSR Quality, Parallax Quality, -
+ENGINE_API Fvector4 ps_ssfx_water_setup1 = { 0.6f, 3.0f, 0.3f, 0.05f }; // Distortion, Turbidity, Softborder, Parallax Height
+ENGINE_API Fvector4 ps_ssfx_water_setup2 = { 0.8f, 6.0f, 0.3f, 0.5f }; // Reflection, Specular, Caustics, Ripples
+ENGINE_API int ps_ssfx_ssr_quality = 0; // Quality
+ENGINE_API Fvector4 ps_ssfx_ssr = { 1.0f, 0.2f, 0.0f, 0.0f }; // Res, Blur, Temp, Noise
+ENGINE_API Fvector4 ps_ssfx_ssr_2 = { 0.0f, 1.3f, 1.0f, 0.015f }; // Quality, Fade, Int, Wpn Int
+ENGINE_API Fvector4 ps_ssfx_terrain_quality = { 6, 0, 0, 0 };
+ENGINE_API Fvector4 ps_ssfx_terrain_offset = { 0, 0, 0, 0 };
+ENGINE_API Fvector3 ps_ssfx_shadows = { 256, 1536, 0.0f };
+ENGINE_API Fvector4 ps_ssfx_volumetric = { 0, 1.0f, 3.0f, 8.0f };
+ENGINE_API Fvector3 ps_ssfx_shadow_bias = { 0.4f, 0.03f, 0.0f };
+ENGINE_API Fvector4 ps_ssfx_lut = { 0.0f, 0.0f, 0.0f, 0.0f };
+ENGINE_API Fvector4 ps_ssfx_wind_grass = { 9.5f, 1.4f, 1.5f, 0.4f };
+ENGINE_API Fvector4 ps_ssfx_wind_trees = { 11.0f, 0.15f, 0.5f, 0.15f };
 
 int ps_disable_lens_flare = 1;
 

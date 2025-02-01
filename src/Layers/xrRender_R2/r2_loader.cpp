@@ -102,6 +102,9 @@ void CRender::level_Load(IReader* fs)
     // End
     g_pGamePersistent->LoadEnd();
 
+    // Yohji: Originally added here, where should we put it?
+    //mapWater.clear();
+
     // signal loaded
     b_loaded = TRUE;
 }

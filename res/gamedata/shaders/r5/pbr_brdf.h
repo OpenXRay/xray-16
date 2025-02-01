@@ -1,7 +1,7 @@
 /**
  * @ Description: Enhanced Shaders and Color Grading 1.10
  * @ Author: https://www.moddb.com/members/kennshade
- * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/enhanced-shaders-and-color-grading-for-151
+ * @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
  */
  
 //=================================================================================================
@@ -125,8 +125,6 @@ void calc_rain(inout float3 albedo, inout float3 specular, inout float rough, in
 {
 	//rain based on Remember Me's implementation
 	//float wetness = saturate(rain_params.x*rainmask);
-	// yohji - edited to clamp rain_density between 0-0.5, to prevent weird shading with high rain_density
-	//float wetness = saturate(smoothstep(0.1,0.9,clamp(rain_params.x, 0.0, 0.5)*rainmask));
 	float wetness = saturate(smoothstep(0.1,0.9,rain_params.x*rainmask));
 
 	float porosity = 1-saturate(material_ID*1.425); //metal material at 0, concrete at 1
@@ -249,7 +247,8 @@ float3 Lit_BRDF(float rough, float3 albedo, float3 f0, float3 V, float3 N, float
 	specular_term *= 1.0f - ((light.r + light.g + light.b) / 3.0) * (1.0f - ssfx_lightsetup_1.x);
 	specular_term *= lerp(1.0f, Ldynamic_color.rgb, ssfx_lightsetup_1.y);
 
-	return (diffuse_term + specular_term) *  nDotL * PI;
+	// SSS Update 19 - Smooth Shading ( squared nDotL )
+	return (diffuse_term + specular_term) * nDotL * nDotL * PI;
 }
 
 //=================================================================================================

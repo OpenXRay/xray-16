@@ -14,6 +14,8 @@ Texture2D<float> s_smap_minmax;		// 2D/cube shadowmap
 SamplerComparisonState smp_smap;	//	Special comare sampler
 sampler smp_jitter;
 
+uniform float4 ssfx_shadow_bias;
+
 Texture2D jitter0;
 Texture2D jitter1;
 Texture2D jitterMipped;
@@ -213,16 +215,20 @@ float shadow_pcss( float4 tc )
 
 #else // No blocker search ( Penumbra ), just filter
 
-	float fRatio = max(PCSS_PIXEL_MIN, 0.5f * float(PCSS_PIXEL)) / float(SMAP_size);
+
+	float fRatio = 4.0f / float(SMAP_size);
 
 	float s = 0.0;
 	[unroll] 
 	for( uint i = 0; i < PCSS_NUM_SAMPLES; ++i )
 	{
 		float2 offset = poissonDisk[i] * fRatio;
-		s += s_smap.SampleCmpLevelZero( smp_smap, tc.xy + offset, tc.z ).x;
+		float test = s_smap.SampleCmpLevelZero( smp_smap, tc.xy + offset, tc.z ).x;
+		s += test;
 	}
+
 	return s / PCSS_NUM_SAMPLES;
+	
 
 #endif
 
