@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_object.cpp
-//	Created 	: 27.10.2005
-//  Modified 	: 27.10.2005
-//	Author		: Dmitriy Iassenev
-//	Description : ALife object class
+//  Module      : alife_object.cpp
+//  Created     : 27.10.2005
+//  Modified    : 27.10.2005
+//  Author      : Dmitriy Iassenev
+//  Description : ALife object class
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
@@ -23,11 +23,11 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
         return;
 
     luabind::functor<bool> funct;
-	if (GEnv.ScriptEngine->functor("ai_stalker.CSE_ALifeObject_spawn_supplies", funct))
-	{
-		if (funct(this, ID, ini_string))
-			return;
-	}
+    if (GEnv.ScriptEngine->functor("ai_stalker.CSE_ALifeObject_spawn_supplies", funct))
+    {
+        if (funct(this, ID, ini_string))
+            return;
+    }
 
 #pragma warning(push)
 #pragma warning(disable : 4238)
@@ -90,7 +90,8 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         bSilencer = is_spawn_supplies_flag_set(V, "silencer");
                         bLauncher = is_spawn_supplies_flag_set(V, "launcher");
 
-                        if (!spawnCount) spawnCount = 1;
+                        if (!spawnCount)
+                            spawnCount = 1;
                         if (strstr(V, "cond=") != nullptr)
                             fCond = static_cast<float>(atof(strstr(V, "cond=") + 5));
                         if (strstr(V, "ammo_type=") != nullptr)
