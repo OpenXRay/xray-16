@@ -190,7 +190,7 @@ static tracy_force_inline void SendLuaCallstack( lua_State* L, uint32_t depth )
 
 static inline void LuaShortenSrc( char* dst, const char* src )
 {
-    // OpenXray - remove '@' prefix from luaJIT to allow directly working with file source with tracy application.
+    // OpenXRay - remove '@' prefix from LuaJIT to allow directly working with file source with Tracy application.
     const char* src_trimmed = src && *src == '@' ? src + 1 : src;
 
     size_t l = std::min( (size_t)255, strlen( src_trimmed ) );
