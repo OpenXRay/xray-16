@@ -49,8 +49,8 @@ ParseIncludeResult ParseInclude(pstr string, pcstr& out_include_name)
     while (*string != '\0' && *string != '\"')
         ++string;
 
-    // Check for unterminated or empty include name
-    if (*string == '\0' || out_include_name == string)
+    // Check for empty include name
+    if (out_include_name == string)
         return ParseIncludeResult::Error;
 
     // Check for unreasonably long include names
@@ -59,8 +59,8 @@ ParseIncludeResult ParseInclude(pstr string, pcstr& out_include_name)
         return ParseIncludeResult::Error;
 
     // NOTE(Andre): Yes this might look scary but it's perfectly fine. Since the include name is already in the string
-    // we are parsing and its not used afterwards we simply replace the closing quote with a null byte and we have a
-    // valid c-string pointed to by 'out_include_name' and safe ourselves the need to copy the string.
+    // we are parsing and its not used afterwards we simply replace the closing quote (if there is one) with a null byte
+    // and we have a valid c-string pointed to by 'out_include_name' and safe ourselves the need to copy the string.
     *string = '\0';
 
     return ParseIncludeResult::Success;
