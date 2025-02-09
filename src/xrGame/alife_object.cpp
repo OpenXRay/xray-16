@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//  Module      : alife_object.cpp
-//  Created     : 27.10.2005
-//  Modified    : 27.10.2005
-//  Author      : Dmitriy Iassenev
-//  Description : ALife object class
+//	Module 		: alife_object.cpp
+//	Created 	: 27.10.2005
+//  Modified 	: 27.10.2005
+//	Author		: Dmitriy Iassenev
+//	Description : ALife object class
 ////////////////////////////////////////////////////////////////////////////
 
 #include "StdAfx.h"
@@ -175,7 +175,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
                     // probability
                     if (strstr(V, "prob=") != nullptr)
-                        sscanf(strstr(V, "prob=") + 5, "%f", &p);
+                        p = static_cast<float>(atof(strstr(V, "prob=") + 5));
                     if (strstr(V, "cond=") != nullptr)
                         fCond = static_cast<float>(atof(strstr(V, "cond=") + 5));
                 }
@@ -225,12 +225,7 @@ bool CSE_ALifeObject::is_spawn_supplies_flag_set(pcstr value, pcstr flag)
                 return true;
             }
 
-            float probability = 1.0;
-
-            if (sscanf(flagSubstring + flagLength + 1, "%f", &probability) == 1)
-                return randF(1.f) <= probability;
-            else
-                return true;
+            return randF(1.f) <= static_cast<float>(atof(flagSubstring + flagLength + 1));
         }
         // Short variant of flag without assigned value.
         else
