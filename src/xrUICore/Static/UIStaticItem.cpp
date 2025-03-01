@@ -208,7 +208,7 @@ void CUIStaticItem::Render(float angle)
 
 void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)
 {
-    hShader->create(sh, tex);
+    hShader->create(sh, tex, !!uFlags.test(flNoShaderCache));
 
 #ifdef DEBUG
     dbg_tex_name = tex;

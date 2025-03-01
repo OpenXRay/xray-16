@@ -135,7 +135,7 @@ void UILoadingScreen::Show(bool show)
     CUIWindow::Show(show);
     if (!show)
     {
-        loadingLogo->GetStaticItem()->GetShader()->destroy();
+        // loadingLogo->GetStaticItem()->GetShader()->destroy();
         if (loadingStage)
             loadingStage->SetText(nullptr);
         SetStageTip(nullptr, nullptr, nullptr);
