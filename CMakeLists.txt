@@ -171,6 +171,9 @@ if (USE_ADDRESS_SANITIZER)
 
     add_link_options(
         $<$<CXX_COMPILER_ID:Clang>:-shared-libasan>
+        -fsanitize=address
+        -fsanitize=leak
+        -fsanitize=undefined
     )
 endif()
 
