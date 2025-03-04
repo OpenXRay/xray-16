@@ -8,7 +8,7 @@
       "name": "(gdb) SoC",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/x64/${input:buildType}/xr_3da",
+      "program": "${workspaceFolder}/bin/x86_64/${input:buildType}/xr_3da",
       "args": [
         "-soc",
         "-nointro",
@@ -20,7 +20,7 @@
       "environment": [
         {
           "name": "LD_LIBRARY_PATH",
-          "value": "${workspaceFolder}/bin/x64/${input:buildType}"
+          "value": "${workspaceFolder}/bin/x86_64/${input:buildType}"
         }
       ],
       "preLaunchTask": "Compile",
@@ -31,7 +31,7 @@
       "name": "(gdb) CS",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/x64/${input:buildType}/xr_3da",
+      "program": "${workspaceFolder}/bin/x86_64/${input:buildType}/xr_3da",
       "args": [
         "-cs",
         "-nointro",
@@ -43,7 +43,7 @@
       "environment": [
         {
           "name": "LD_LIBRARY_PATH",
-          "value": "${workspaceFolder}/bin/x64/${input:buildType}"
+          "value": "${workspaceFolder}/bin/x86_64/${input:buildType}"
         }
       ],
       "preLaunchTask": "Compile",
@@ -54,7 +54,7 @@
       "name": "(gdb) CoP",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/x64/${input:buildType}/xr_3da",
+      "program": "${workspaceFolder}/bin/x86_64/${input:buildType}/xr_3da",
       "args": [
         "-nointro",
         "-fsltx",
@@ -65,7 +65,29 @@
       "environment": [
         {
           "name": "LD_LIBRARY_PATH",
-          "value": "${workspaceFolder}/bin/x64/${input:buildType}"
+          "value": "${workspaceFolder}/bin/x86_64/${input:buildType}"
+        }
+      ],
+      "preLaunchTask": "Compile",
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
+      "name": "(gdb) CoC",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/x86_64/${input:buildType}/xr_3da",
+      "args": [
+        "-nointro",
+        "-fsltx",
+        "${COC_LTX_FILE_PATH}",
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/bin",
+      "environment": [
+        {
+          "name": "LD_LIBRARY_PATH",
+          "value": "${workspaceFolder}/bin/x86_64/${input:buildType}"
         }
       ],
       "preLaunchTask": "Compile",
