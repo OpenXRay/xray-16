@@ -441,47 +441,48 @@ float CUILines::GetVIndentByAlign()
 }
 
 // %c[255,255,255,255]
+// %c[default]
+// %c[color_name]
 u32 CUILines::GetColorFromText(const xr_string& str) const
 {
-    StrSize begin, end, comma1_pos, comma2_pos, comma3_pos;
+    StrSize begin = str.find(BEGIN);
+    const StrSize end = str.find(_END, begin);
 
-    begin = str.find(BEGIN);
-    end = str.find(_END, begin);
-    if (begin == npos || end == npos)
-        return m_dwTextColor;
-    // try default color
-    if (npos != str.find("%c[default]", begin, end - begin))
+    // Check if there even is a valid color tag
+    if (begin == npos || end == npos || end - begin < 3)
         return m_dwTextColor;
 
-    // Try predefined in XML colors
-    for (CUIXmlInitBase::ColorDefs::const_iterator it = CUIXmlInitBase::GetColorDefs()->begin();
-         it != CUIXmlInitBase::GetColorDefs()->end(); ++it)
-    {
-        int cmp = str.compare(begin + 3, end - begin - 3, *it->first);
-        if (cmp == 0)
-            return it->second;
-    }
+    // Extract color tag value
+    const xr_string color_tag = str.substr(begin + 3, end - begin - 3);
 
-    // try parse values separated by commas
-    comma1_pos = str.find(',', begin);
-    comma2_pos = str.find(',', comma1_pos + 1);
-    comma3_pos = str.find(',', comma2_pos + 1);
+    // Try default color
+    if (color_tag == "default")
+        return m_dwTextColor;
+
+    // Try predefined XML colors
+    const auto* color_defs = CUIXmlInitBase::GetColorDefs();
+    if (color_defs->contains(color_tag.c_str()))
+        return color_defs->at(color_tag.c_str());
+
+    // Try parse values separated by commas
+    const StrSize comma1_pos = str.find(',', begin);
+    const StrSize comma2_pos = str.find(',', comma1_pos + 1);
+    const StrSize comma3_pos = str.find(',', comma2_pos + 1);
     if (comma1_pos == npos || comma2_pos == npos || comma3_pos == npos)
         return m_dwTextColor;
 
-    u32 a, r, g, b;
     xr_string single_color;
 
     begin += 3;
 
     single_color = str.substr(begin, comma1_pos - 1);
-    a = atoi(single_color.c_str());
+    const u32 a = atoi(single_color.c_str());
     single_color = str.substr(comma1_pos + 1, comma2_pos - 1);
-    r = atoi(single_color.c_str());
+    const u32 r = atoi(single_color.c_str());
     single_color = str.substr(comma2_pos + 1, comma3_pos - 1);
-    g = atoi(single_color.c_str());
+    const u32 g = atoi(single_color.c_str());
     single_color = str.substr(comma3_pos + 1, end - 1);
-    b = atoi(single_color.c_str());
+    const u32 b = atoi(single_color.c_str());
 
     return color_argb(a, r, g, b);
 }
