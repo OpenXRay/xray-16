@@ -28,7 +28,7 @@ protected:
 
     int m_ScrollWorkArea;
     bool m_b_enabled{ true };
-    bool m_bIsHorizontal;
+    bool m_bIsHorizontal{ false };
 
     int m_mouse_state{};
 
