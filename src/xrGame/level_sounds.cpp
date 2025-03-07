@@ -149,7 +149,8 @@ bool SMusicTrack::IsPlaying() const
 
 void SMusicTrack::SetVolume(float volume)
 {
-    const bool finalVolume = volume * m_Volume;
+    const float finalVolume = volume * m_Volume;
+
     m_SourceStereo.set_volume(finalVolume);
     m_SourceLeft.set_volume(finalVolume);
     m_SourceRight.set_volume(finalVolume);
