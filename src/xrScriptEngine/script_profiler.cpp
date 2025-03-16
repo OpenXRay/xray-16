@@ -1,6 +1,6 @@
 #include "pch.hpp"
 #include "script_profiler.hpp"
-#include "xrScriptEngine/script_engine.hpp"
+#include "script_engine.hpp"
 
 CScriptProfiler::CScriptProfiler(CScriptEngine* engine)
 {

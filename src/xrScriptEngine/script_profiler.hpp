@@ -1,9 +1,8 @@
 #pragma once
 
-#include "pch.hpp"
-#include "script_profiler_portions.hpp"
 #include "xrCommon/xr_unordered_map.h"
 
+#include "script_profiler_portions.hpp"
 
 enum class CScriptProfilerType : u32
 {

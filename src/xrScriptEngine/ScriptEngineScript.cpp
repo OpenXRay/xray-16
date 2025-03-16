@@ -9,6 +9,7 @@
 #include "pch.hpp"
 #include "ScriptEngineScript.hpp"
 #include "script_engine.hpp"
+#include "script_profiler.hpp"
 #include "script_debugger.hpp"
 #include "DebugMacros.hpp"
 #include "ScriptExporter.hpp"
