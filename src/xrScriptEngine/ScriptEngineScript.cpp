@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//  Module      : script_engine_script.cpp
-//  Created     : 25.12.2002
-//  Modified    : 13.05.2004
-//  Author      : Dmitriy Iassenev
-//  Description : ALife Simulator script engine export
+//	Module 		: script_engine_script.cpp
+//	Created 	: 25.12.2002
+//  Modified 	: 13.05.2004
+//	Author		: Dmitriy Iassenev
+//	Description : ALife Simulator script engine export
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.hpp"
@@ -140,9 +140,9 @@ SCRIPT_EXPORT(CScriptEngine, (),
 {
     using namespace luabind;
 
-    globals(luaState) ["PROFILER_TYPE_NONE"] = (u32) CScriptProfilerType::None;
-    globals(luaState) ["PROFILER_TYPE_HOOK"] = (u32) CScriptProfilerType::Hook;
-    globals(luaState) ["PROFILER_TYPE_SAMPLING"] = (u32) CScriptProfilerType::Sampling;
+    globals(luaState)["PROFILER_TYPE_NONE"]     = (u32)CScriptProfilerType::None;
+    globals(luaState)["PROFILER_TYPE_HOOK"]     = (u32)CScriptProfilerType::Hook;
+    globals(luaState)["PROFILER_TYPE_SAMPLING"] = (u32)CScriptProfilerType::Sampling;
 
     module(luaState)
     [
@@ -221,22 +221,4 @@ SCRIPT_EXPORT(CScriptEngine, (),
             GEnv.ScriptEngine->m_profiler->saveReport();
         })
     ];
-
-    /**
-     * Exports injected from tracy profiler:
-     *
-     * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/manual/tracy.tex#L1932
-     * https://github.com/wolfpld/tracy/blob/da60684b9f61b34afa5aa243a7838d6e79096783/public/tracy/TracyLua.hpp#L18
-     *
-     * global tracy {
-     *     function ZoneBegin;
-     *     function ZoneBeginN;
-     *     function ZoneBeginS;
-     *     function ZoneBeginNS;
-     *     function ZoneEnd;
-     *     function ZoneText;
-     *     function ZoneName;
-     *     function Message;
-     * }
-    */
 });

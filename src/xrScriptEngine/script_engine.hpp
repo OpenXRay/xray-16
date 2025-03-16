@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//  Module      : script_engine.h
-//  Created     : 01.04.2004
-//  Modified    : 01.04.2004
-//  Author      : Dmitriy Iassenev
-//  Description : XRay Script Engine
+//	Module 		: script_engine.h
+//	Created 	: 01.04.2004
+//  Modified 	: 01.04.2004
+//	Author		: Dmitriy Iassenev
+//	Description : XRay Script Engine
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once

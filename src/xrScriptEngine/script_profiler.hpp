@@ -4,8 +4,6 @@
 #include "script_profiler_portions.hpp"
 #include "xrCommon/xr_unordered_map.h"
 
-struct lua_State;
-struct lua_Debug;
 
 enum class CScriptProfilerType : u32
 {

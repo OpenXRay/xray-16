@@ -895,12 +895,12 @@ void CScriptEngine::lua_hook_call(lua_State* L, lua_Debug* dbg)
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     if (scriptEngine->current_thread())
         scriptEngine->current_thread()->script_hook(L, dbg);
     else
         scriptEngine->m_stack_is_ready = true;
-    #endif
+#endif
 
     if (scriptEngine->m_profiler)
         scriptEngine->m_profiler->onLuaHookCall(L, dbg);
