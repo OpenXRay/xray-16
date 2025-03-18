@@ -13,12 +13,12 @@ enum class CScriptProfilerType : u32
 
 class XRSCRIPTENGINE_API CScriptProfiler
 {
-// todo: Can we make some global module to store all the arguments as experessions?
 public:
-    // List of commnad line args for startup profiler attach:
-    constexpr static cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
-    constexpr static cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
-    constexpr static cpcstr ARGUMENT_PROFILER_SAMPLING = "-lua_sampling_profiler";
+    // List of command line args for startup profiler attach:
+    // XXX: Can we make some global module to store all the arguments as expressions?
+    static constexpr cpcstr ARGUMENT_PROFILER_DEFAULT = "-lua_profiler";
+    static constexpr cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
+    static constexpr cpcstr ARGUMENT_PROFILER_SAMPLING = "-lua_sampling_profiler";
 
     static const CScriptProfilerType PROFILE_TYPE_DEFAULT = CScriptProfilerType::Hook;
     static const u32 PROFILE_ENTRIES_LOG_LIMIT_DEFAULT = 128;
@@ -45,7 +45,7 @@ public:
     bool IsActive() const { return m_active; }
     CScriptProfilerType GetType() const { return m_profiler_type; }
     shared_str GetTypeString() const;
-    u32 GetRecordsCount() const;
+    size_t GetRecordsCount() const;
 
     void Start(CScriptProfilerType profiler_type = PROFILE_TYPE_DEFAULT);
     void StartHookMode();

@@ -7,24 +7,19 @@ class CScriptProfilerHookPortion
     using Duration = Clock::duration;
 
 private:
-    u64 m_calls_count;
-    u32 m_calls_active;
+    u64 m_calls_count{};
+    u32 m_calls_active{};
 
-    Time m_started_at;
-    Duration m_duration;
+    Time m_started_at{};
+    Duration m_duration{};
 
 public:
-    CScriptProfilerHookPortion() : m_calls_count(0), m_calls_active(0), m_duration(0), m_started_at() {}
-
     void start()
     {
         m_calls_count += 1;
 
         if (m_calls_active)
-        {
             m_calls_active += 1;
-            return;
-        }
         else
         {
             m_started_at = Clock::now();
@@ -88,6 +83,6 @@ public:
         string2048 buffer;
         xr_sprintf(buffer, "%c;%s %d", m_state, m_trace.c_str(), m_samples);
 
-        return shared_str(buffer);
+        return { buffer };
     }
 };

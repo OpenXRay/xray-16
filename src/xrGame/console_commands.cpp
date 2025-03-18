@@ -2004,8 +2004,9 @@ public:
     constexpr static cpcstr COMMAND_LUA_PROFILER_LOG = "lua_profiler_log";
     constexpr static cpcstr COMMAND_LUA_PROFILER_SAVE = "lua_profiler_save";
 
-    CCC_LuaProfiler(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args)
+    CCC_LuaProfiler(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr args) override
     {
         CScriptProfiler* profiler = GEnv.ScriptEngine->m_profiler;
 
@@ -2048,11 +2049,10 @@ public:
         {
             profiler->SaveReport();
         }
-    };
+    }
 
     void fill_tips(vecTips& tips, u32 /*mode*/) override
     {
-        CScriptProfiler* profiler = GEnv.ScriptEngine->m_profiler;
         TStatus status_buffer;
 
         if (strstr(cName, COMMAND_LUA_PROFILER_STATUS) == cName)
@@ -2067,15 +2067,15 @@ public:
         {
             xr_sprintf(status_buffer, "%d (default) [1-%d] - sampling interval",
                 CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT, CScriptProfiler::PROFILE_SAMPLING_INTERVAL_MAX);
-            tips.push_back(status_buffer);
+            tips.emplace_back(status_buffer);
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_START) == cName)
         {
             xr_sprintf(status_buffer, "%d - hooks based profiler", CScriptProfilerType::Hook);
-            tips.push_back(status_buffer);
+            tips.emplace_back(status_buffer);
 
             xr_sprintf(status_buffer, "%d - sampling based profiler", CScriptProfilerType::Sampling);
-            tips.push_back(status_buffer);
+            tips.emplace_back(status_buffer);
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_STOP) == cName)
         {
@@ -2089,7 +2089,7 @@ public:
         {
             xr_sprintf(status_buffer, "%d (default) - count of profiling entries to print",
                 CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT, CScriptProfiler::PROFILE_SAMPLING_INTERVAL_MAX);
-            tips.push_back(status_buffer);
+            tips.emplace_back(status_buffer);
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_SAVE) == cName)
         {
@@ -2097,26 +2097,26 @@ public:
         }
     }
 
-    void Info(TInfo& I) override
+    void Info(TInfo& info) override
     {
         if (strstr(cName, COMMAND_LUA_PROFILER_STATUS) == cName)
-            xr_strcpy(I, "no arguments : print lua profiler status");
+            xr_strcpy(info, "no arguments : print lua profiler status");
         else if (strstr(cName, COMMAND_LUA_PROFILER_START_HOOK_MODE) == cName)
-            xr_strcpy(I, "no arguments : start lua script profiling in hook mode");
+            xr_strcpy(info, "no arguments : start lua script profiling in hook mode");
         else if (strstr(cName, COMMAND_LUA_PROFILER_START_SAMPLING_MODE) == cName)
-            xr_strcpy(I,
+            xr_strcpy(info,
                 "integer value in range [1,1000] : start lua script profiling in sampling mode with provided sampling "
                 "interval");
         else if (strstr(cName, COMMAND_LUA_PROFILER_START) == cName)
-            xr_strcpy(I, "integer value in range [0,2] : start lua script profiling in provided mode");
+            xr_strcpy(info, "integer value in range [0,2] : start lua script profiling in provided mode");
         else if (strstr(cName, COMMAND_LUA_PROFILER_STOP) == cName)
-            xr_strcpy(I, "no arguments : stop lua script profiling");
+            xr_strcpy(info, "no arguments : stop lua script profiling");
         else if (strstr(cName, COMMAND_LUA_PROFILER_RESET) == cName)
-            xr_strcpy(I, "no arguments : reset lua script profiling stats");
+            xr_strcpy(info, "no arguments : reset lua script profiling stats");
         else if (strstr(cName, COMMAND_LUA_PROFILER_LOG) == cName)
-            xr_strcpy(I, "integer value : log lua script profiling stats, limit entries with argument");
+            xr_strcpy(info, "integer value : log lua script profiling stats, limit entries with argument");
         else if (strstr(cName, COMMAND_LUA_PROFILER_SAVE) == cName)
-            xr_strcpy(I, "no arguments : save lua script profiling stats in a file");
+            xr_strcpy(info, "no arguments : save lua script profiling stats in a file");
     }
 };
 
