@@ -175,51 +175,51 @@ SCRIPT_EXPORT(CScriptEngine, (),
     [
         def("is_active", +[]() -> bool
         {
-            return GEnv.ScriptEngine->m_profiler->isActive();
+            return GEnv.ScriptEngine->m_profiler->IsActive();
         }),
         def("get_type", +[]()-> u32
         {
-            return static_cast<u32>(GEnv.ScriptEngine->m_profiler->getType());
+            return static_cast<u32>(GEnv.ScriptEngine->m_profiler->GetType());
         }),
         def("start", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->start();
+            GEnv.ScriptEngine->m_profiler->Start();
         }),
         def("start", +[](CScriptProfilerType profiler_type)
         {
-            GEnv.ScriptEngine->m_profiler->start(profiler_type);
+            GEnv.ScriptEngine->m_profiler->Start(profiler_type);
         }),
         def("start_hook_mode", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->startHookMode();
+            GEnv.ScriptEngine->m_profiler->StartHookMode();
         }),
         def("start_sampling_mode", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->startSamplingMode();
+            GEnv.ScriptEngine->m_profiler->StartSamplingMode();
         }),
         def("start_sampling_mode", +[](u32 sampling_interval = CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT)
         {
-            GEnv.ScriptEngine->m_profiler->startSamplingMode(sampling_interval);
+            GEnv.ScriptEngine->m_profiler->StartSamplingMode(sampling_interval);
         }),
         def("stop", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->stop();
+            GEnv.ScriptEngine->m_profiler->Stop();
         }),
         def("reset", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->reset();
+            GEnv.ScriptEngine->m_profiler->Reset();
         }),
         def("log_report", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->logReport();
+            GEnv.ScriptEngine->m_profiler->LogReport();
         }),
         def("log_report", +[](u32 entries_limit)
         {
-            GEnv.ScriptEngine->m_profiler->logReport(entries_limit);
+            GEnv.ScriptEngine->m_profiler->LogReport(entries_limit);
         }),
         def("save_report", +[]()
         {
-            GEnv.ScriptEngine->m_profiler->saveReport();
+            GEnv.ScriptEngine->m_profiler->SaveReport();
         })
     ];
 });

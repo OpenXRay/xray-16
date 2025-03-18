@@ -2011,43 +2011,42 @@ public:
 
         if (strstr(cName, COMMAND_LUA_PROFILER_STATUS) == cName)
         {
-            Msg("[P] Profiler status: %s, type - %s", profiler->isActive() ? "on" : "off",
-                profiler->getTypeString().c_str());
+            Msg("[P] Profiler status: %s, type - %s", profiler->IsActive() ? "on" : "off",
+                profiler->GetTypeString().c_str());
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_START_HOOK_MODE) == cName)
         {
-            profiler->startHookMode();
+            profiler->StartHookMode();
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_START_SAMPLING_MODE) == cName)
         {
             u32 interval = atoi(args);
 
-            profiler->startSamplingMode(interval ? interval : CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT);
+            profiler->StartSamplingMode(interval ? interval : CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT);
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_START) == cName)
         {
             u32 profiler_type = atoi(args);
 
-            profiler->start(
-                (profiler_type ? (CScriptProfilerType)profiler_type : CScriptProfiler::PROFILE_TYPE_DEFAULT));
+            profiler->Start(profiler_type ? (CScriptProfilerType)profiler_type : CScriptProfiler::PROFILE_TYPE_DEFAULT);
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_STOP) == cName)
         {
-            profiler->stop();
+            profiler->Stop();
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_RESET) == cName)
         {
-            profiler->reset();
+            profiler->Reset();
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_LOG) == cName)
         {
             u32 limit = atoi(args);
 
-            profiler->logReport(limit ? limit : CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
+            profiler->LogReport(limit ? limit : CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
         }
         else if (strstr(cName, COMMAND_LUA_PROFILER_SAVE) == cName)
         {
-            profiler->saveReport();
+            profiler->SaveReport();
         }
     };
 

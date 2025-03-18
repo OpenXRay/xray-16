@@ -63,7 +63,7 @@ class CScriptProfilerSamplingPortion
     using Time = Clock::time_point;
 
 public:
-    Time m_recoreded_at;
+    Time m_recorded_at;
 
     int m_memory;
     int m_samples;
@@ -72,18 +72,18 @@ public:
     shared_str m_trace;
 
     CScriptProfilerSamplingPortion(shared_str name, shared_str trace, int samples, int state, int memory)
-        : m_name(name), m_trace(trace), m_memory(memory), m_samples(samples), m_state(state),
-            m_recoreded_at(Clock::now()) {}
+        : m_recorded_at(Clock::now()), m_memory(memory), m_samples(samples), m_state(state), m_name(std::move(name)),
+          m_trace(std::move(trace)) {}
 
     CScriptProfilerSamplingPortion(const CScriptProfilerSamplingPortion& rhs)
-        : m_name(rhs.m_name), m_trace(rhs.m_trace), m_memory(rhs.m_memory), m_samples(rhs.m_samples),
-            m_state(rhs.m_state), m_recoreded_at(rhs.m_recoreded_at) {}
+        : m_recorded_at(rhs.m_recorded_at), m_memory(rhs.m_memory), m_samples(rhs.m_samples), m_state(rhs.m_state),
+            m_name(rhs.m_name), m_trace(rhs.m_trace) {}
 
     CScriptProfilerSamplingPortion cloned() const { return CScriptProfilerSamplingPortion(*this); }
 
     // Build flamechart folded stack including frames and samples count
     // Example: `C;frame_1_func:24;frame_2_func:45 4`
-    shared_str getFoldedStack()
+    shared_str GetFoldedStack() const
     {
         string2048 buffer;
         xr_sprintf(buffer, "%c;%s %d", m_state, m_trace.c_str(), m_samples);
