@@ -283,14 +283,13 @@ CSoundPlayer::CSoundCollection::~CSoundCollection()
     delete_data(m_sounds);
 }
 
-const ref_sound& CSoundPlayer::CSoundCollection::random(const u32& id)
+const ref_sound& CSoundPlayer::CSoundCollection::random(u32 id)
 {
     VERIFY(!m_sounds.empty());
 
-    if (id != u32(-1))
+    if (id != u32(-1) && id < m_sounds.size())
     {
         m_last_sound_id = id;
-        VERIFY(id < m_sounds.size());
         return (*m_sounds[id]);
     }
 
@@ -307,5 +306,5 @@ const ref_sound& CSoundPlayer::CSoundCollection::random(const u32& id)
     } while (result == m_last_sound_id);
 
     m_last_sound_id = result;
-    return (*m_sounds[result]);
+    return *m_sounds[result];
 }

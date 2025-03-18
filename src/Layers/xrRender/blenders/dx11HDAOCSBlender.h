@@ -1,6 +1,7 @@
-#ifndef dx11HDAOCSBlender_included
-#define dx11HDAOCSBlender_included
+#pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_CS_HDAO : public IBlender
 {
 public:
@@ -18,5 +19,4 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

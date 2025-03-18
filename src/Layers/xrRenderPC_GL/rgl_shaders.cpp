@@ -4,6 +4,8 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::addShaderOption(const char* name, const char* value)
 {
     m_ShaderOptions += "#define ";
@@ -586,3 +588,4 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     return E_FAIL;
 }
+} // namespace xray::render::RENDER_NAMESPACE

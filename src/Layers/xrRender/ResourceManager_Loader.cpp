@@ -4,6 +4,8 @@
 #include "ResourceManager.h"
 #include "Blender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
     if (Device.b_is_Ready)
@@ -171,3 +173,4 @@ void CResourceManager::StoreNecessaryTextures()
 }
 
 void CResourceManager::DestroyNecessaryTextures() { m_necessary.clear(); }
+} // namespace xray::render::RENDER_NAMESPACE

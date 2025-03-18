@@ -3,6 +3,8 @@
 
 #include "R_Backend_hemi.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 R_hemi::R_hemi(CBackend& cmd_list_in) : cmd_list(cmd_list_in) { unmap(); }
 void R_hemi::unmap()
 {
@@ -45,3 +47,4 @@ void R_hemi::c_update(IRenderVisual* pVisual)
     if (c_entity_data)
         cmd_list.set_c(c_entity_data, _data->sh_entity_data);
 }
+} // namespace xray::render::RENDER_NAMESPACE

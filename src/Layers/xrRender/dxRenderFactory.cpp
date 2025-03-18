@@ -20,6 +20,8 @@
 #include "dxUISequenceVideoItem.h"
 #include "dxUIShader.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 dxRenderFactory RenderFactoryImpl;
 
 #define RENDER_FACTORY_IMPLEMENT(Class)\
@@ -49,3 +51,4 @@ RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
 RENDER_FACTORY_IMPLEMENT(FlareRender)
 #endif
 RENDER_FACTORY_IMPLEMENT(FontRender)
+} // namespace xray::render::RENDER_NAMESPACE

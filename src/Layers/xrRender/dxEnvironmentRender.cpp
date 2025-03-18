@@ -8,6 +8,8 @@
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////////
 // half box def
 static Fvector3 hbox_verts[24] =
@@ -416,3 +418,4 @@ void dxEnvironmentRender::OnDeviceDestroy()
     tonemap_tstage_2sky = u32(-1);
     tonemap_tstage_clouds = u32(-1);
 }
+} // namespace xray::render::RENDER_NAMESPACE

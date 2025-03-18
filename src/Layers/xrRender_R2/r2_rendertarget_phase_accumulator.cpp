@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_accumulator(CBackend& cmd_list)
 {
     // Targets
@@ -67,3 +69,4 @@ void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_ColorWriteEnable();
 }
+} // namespace xray::render::RENDER_NAMESPACE

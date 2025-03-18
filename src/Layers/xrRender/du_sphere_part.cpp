@@ -4,6 +4,9 @@
 
 #include "du_sphere_part.h"
 //---------------------------------------------------------------------------
+
+namespace xray::render::RENDER_NAMESPACE
+{
 #pragma warning(disable : 4305)
 Fvector du_sphere_part_vertices[DU_SPHERE_PART_NUMVERTEX] = {{-.288675, -.288675, .288675},
     {.288675, -.288675, .288675}, {-.288675, .288675, .288675}, {.288675, .288675, .288675},
@@ -65,3 +68,4 @@ u16 du_sphere_part_lines[DU_SPHERE_PART_NUMLINES * 2] = {
     74, 38, 77, 38, 78, 39, 48, 39, 71, 39, 77, 39, 79, 40, 67, 40, 75, 40, 79, 40, 80, 41, 81, 44, 81, 47, 81, 51, 81,
     53, 81, 56, 81, 59, 81, 62, 81, 63, 81, 66, 81, 69, 81, 72, 81, 73, 81, 76, 81, 78, 81, 80, 81,
 };
+} // namespace xray::render::RENDER_NAMESPACE

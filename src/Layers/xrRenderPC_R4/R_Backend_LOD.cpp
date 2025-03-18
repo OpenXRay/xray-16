@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "r_backend_lod.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 R_LOD::R_LOD(CBackend& cmd_list_in) : cmd_list(cmd_list_in)
 {
     unmap();
@@ -14,3 +16,4 @@ void R_LOD::set_LOD(float LOD)
         cmd_list.set_c(c_LOD, factor);
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

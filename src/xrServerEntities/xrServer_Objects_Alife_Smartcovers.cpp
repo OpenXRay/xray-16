@@ -13,27 +13,14 @@
 #include "character_info.h"
 #endif
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 
-#include <luabind/luabind.hpp>
-#include <shlwapi.h>
+extern SFillPropData fp_data;
+#endif // !MASTER_GOLD
 
-#pragma comment(lib, "shlwapi.lib")
-static SFillPropData fp_data;
-#endif // XRSE_FACTORY_EXPORTS
-
-#ifdef XRSE_FACTORY_EXPORTS
-bool parse_bool(luabind::object const& table, LPCSTR identifier)
-{
-    VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
-    luabind::object result = table[identifier];
-    VERIFY2(luabind::type(result) != LUA_TNIL, make_string("cannot read boolean value %s", identifier));
-    VERIFY2(luabind::type(result) == LUA_TBOOLEAN, make_string("cannot read boolean value %s", identifier));
-    return (luabind::object_cast<bool>(result));
-}
-
+#ifndef MASTER_GOLD
 BOOL is_combat_cover(shared_str const& table_id)
 {
     if (table_id.size() == 0)
@@ -60,15 +47,15 @@ BOOL is_combat_cover(shared_str const& table_id)
         return (TRUE);
     }
 
-    return (parse_bool(table, "is_combat_cover") ? TRUE : FALSE);
+    return (smart_cover::detail::parse_bool(table, "is_combat_cover") ? TRUE : FALSE);
 }
-#endif // XRSE_FACTORY_EXPORTS
+#endif // !MASTER_GOLD
 
 CSE_SmartCover::CSE_SmartCover(LPCSTR section) : CSE_ALifeDynamicObject(section)
 {
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.inc();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
 
     m_enter_min_enemy_distance = pSettings->r_float(section, "enter_min_enemy_distance");
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
@@ -79,9 +66,9 @@ CSE_SmartCover::CSE_SmartCover(LPCSTR section) : CSE_ALifeDynamicObject(section)
 
 CSE_SmartCover::~CSE_SmartCover()
 {
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.dec();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
 }
 
 IServerEntityShape* CSE_SmartCover::shape() { return this; }
@@ -139,7 +126,6 @@ void CSE_SmartCover::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_W
 #ifndef MASTER_GOLD
 void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "hold position time"), &m_hold_position_time, 0.f, 60.f);
     RListValue* value = PHelper().CreateRList(items, PrepareKey(pref, *s_name, "description"), &m_description,
         &*fp_data.smart_covers.begin(), fp_data.smart_covers.size());
@@ -155,11 +141,10 @@ void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "is combat cover"), &m_is_combat_cover);
         PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "can fire"), &m_can_fire);
     }
-#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 #endif // #ifndef MASTER_GOLD
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
 void CSE_SmartCover::set_loopholes_table_checker(BOOLValue* value)
 {
     value->OnChangeEvent.bind(this, &CSE_SmartCover::OnChangeLoopholes);
@@ -176,66 +161,6 @@ void CSE_SmartCover::OnChangeDescription(PropValue* sender)
     set_editor_flag(flVisualChange);
     load_draw_data();
 }
-
-LPCSTR parse_string(luabind::object const& table, LPCSTR identifier)
-{
-    VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
-    luabind::object result = table[identifier];
-    VERIFY2(luabind::type(result) != LUA_TNIL, make_string("cannot read string value %s", identifier));
-    VERIFY2(luabind::type(result) == LUA_TSTRING, make_string("cannot read string value %s", identifier));
-    return (luabind::object_cast<LPCSTR>(result));
-}
-
-Fvector parse_fvector(luabind::object const& table, LPCSTR identifier)
-{
-    VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
-    luabind::object result = table[identifier];
-    VERIFY2(luabind::type(result) != LUA_TNIL, make_string("cannot read vector value %s", identifier));
-    return (luabind::object_cast<Fvector>(result));
-}
-
-float parse_float(luabind::object const& table, LPCSTR identifier, float const& min_threshold = flt_min,
-    float const& max_threshold = flt_max)
-{
-    VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
-    luabind::object lua_result = table[identifier];
-    VERIFY2(luabind::type(lua_result) != LUA_TNIL, make_string("cannot read number value %s", identifier));
-    VERIFY2(luabind::type(lua_result) == LUA_TNUMBER, make_string("cannot read number value %s", identifier));
-    float result = luabind::object_cast<float>(lua_result);
-    VERIFY2(result >= min_threshold, make_string("invalid read number value %s", identifier));
-    VERIFY2(result <= max_threshold, make_string("invalid number value %s", identifier));
-    return (result);
-}
-
-void parse_table(luabind::object const& table, LPCSTR identifier, luabind::object& result)
-{
-    VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
-    result = table[identifier];
-    VERIFY2(luabind::type(result) != LUA_TNIL, make_string("cannot read table value %s", identifier));
-    VERIFY2(luabind::type(result) == LUA_TTABLE, make_string("cannot read table value %s", identifier));
-}
-
-namespace smart_cover
-{
-static LPCSTR s_enter_loophole_id = "<__ENTER__>";
-static LPCSTR s_exit_loophole_id = "<__EXIT__>";
-
-shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
-{
-    if (*vertex_id.c_str())
-        return (vertex_id);
-
-    if (in)
-        return (s_enter_loophole_id);
-
-    return (s_exit_loophole_id);
-}
-
-shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in)
-{
-    return (transform_vertex(parse_string(table, identifier), in));
-}
-} // namespace smart_cover
 
 void CSE_SmartCover::set_enterable(shared_str const& id)
 {
@@ -428,7 +353,7 @@ void CSE_SmartCover::load_draw_data()
             for (luabind::iterator i(m_available_loopholes), e; i != e; ++i)
             {
                 LPCSTR const loophole_id = luabind::object_cast<LPCSTR>(i.key());
-                shared_str descr_loophole_id = parse_string(*I, "id");
+                shared_str descr_loophole_id = smart_cover::detail::parse_string(*I, "id");
                 if (xr_strcmp(loophole_id, descr_loophole_id))
                     continue;
                 if (!luabind::object_cast<bool>(*i))
@@ -448,10 +373,10 @@ void CSE_SmartCover::load_draw_data()
         m_draw_data.resize(m_draw_data.size() + 1);
         SSCDrawHelper& H = m_draw_data.back();
 
-        H.string_identifier = parse_string(table, "id");
-        H.point_position = parse_fvector(table, "fov_position");
-        H.is_enterable = false;
-        H.fov_direction = parse_fvector(table, "fov_direction");
+        H.string_identifier = smart_cover::detail::parse_string(table, "id");
+        H.point_position    = smart_cover::detail::parse_fvector(table, "fov_position");
+        H.is_enterable      = false;
+        H.fov_direction     = smart_cover::detail::parse_fvector(table, "fov_direction");
 
         if (H.fov_direction.square_magnitude() < EPS_L)
         {
@@ -461,7 +386,7 @@ void CSE_SmartCover::load_draw_data()
         else
             H.fov_direction.normalize();
 
-        H.enter_direction = parse_fvector(table, "enter_direction");
+        H.enter_direction = smart_cover::detail::parse_fvector(table, "enter_direction");
 
         if (H.enter_direction.square_magnitude() < EPS_L)
         {
@@ -471,8 +396,8 @@ void CSE_SmartCover::load_draw_data()
         else
             H.enter_direction.normalize();
 
-        H.fov = parse_float(table, "fov", 0.f, 360.f);
-        H.range = parse_float(table, "range", 0.f);
+        H.fov   = smart_cover::detail::parse_float(table, "fov", 0.f, 360.f);
+        H.range = smart_cover::detail::parse_float(table, "range", 0.f);
 
         /*      luabind::object transitions;
                 parse_table     (table, "transitions", transitions);
@@ -541,4 +466,4 @@ void CSE_SmartCover::on_render(
         draw_frustum(du, H.fov, H.range, 1.f, pos, dir, up, color_rgba(255, 0, 0, 255));
     }
 }
-#endif // #ifdef XRSE_FACTORY_EXPORTS
+#endif // !MASTER_GOLD

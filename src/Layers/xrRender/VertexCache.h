@@ -1,9 +1,10 @@
 #pragma once
-#ifndef VERTEX_CACHE_H
-#define VERTEX_CACHE_H
+
 #include"xrCore/xr_types.h"
 //#include"xrCore/_stl_extensions.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class VertexCache
 {
 public:
@@ -55,5 +56,4 @@ IC int VertexCache::AddEntry(int entry)
 
     return removed;
 }
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

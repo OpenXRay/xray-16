@@ -4,7 +4,13 @@
 #include "xrEngine/CustomHUD.h"
 
 #include "FBasicVisual.h"
+#include "SkeletonCustom.h"
+#include "FLOD.h"
 
+extern ENGINE_API float psHUD_FOV;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 using namespace R_dsgraph;
 
 extern float r_ssaHZBvsTEX;
@@ -144,8 +150,6 @@ public:
     explicit hud_transform_helper(CBackend& cmd_list_in)
         : cmd_list(cmd_list_in)
     {
-        extern ENGINE_API float psHUD_FOV;
-
         // Change projection
         Pold  = Device.mProject;
 
@@ -340,9 +344,6 @@ void R_dsgraph_structure::render_distort()
     sort_back_to_front_render_and_clean(context_id, mapDistort);
 }
 
-#include "SkeletonCustom.h"
-#include "FLOD.h"
-
 void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, Fbox& BB, int sh)
 {
     VERIFY(sector_id != IRender_Sector::INVALID_SECTOR_ID);
@@ -414,3 +415,4 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

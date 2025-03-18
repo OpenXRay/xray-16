@@ -3,6 +3,8 @@
 
 #include "Blender_Model.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Model::CBlender_Model()
 {
     description.CLS = B_MODEL;
@@ -210,3 +212,4 @@ void CBlender_Model::CompileProgrammable(CBlender_Compile& C) const
         break;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

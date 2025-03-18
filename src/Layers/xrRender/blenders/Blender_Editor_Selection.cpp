@@ -3,6 +3,8 @@
 
 #include "Blender_Editor_Selection.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Editor_Selection::CBlender_Editor_Selection()
 {
     description.CLS = B_EDITOR_SEL;
@@ -73,3 +75,4 @@ void CBlender_Editor_Selection::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
+} // namespace xray::render::RENDER_NAMESPACE

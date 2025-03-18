@@ -8,6 +8,8 @@
 #include <backends/imgui_impl_opengl3.h>
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void dxImGuiRender::Copy(IImGuiRender& _in)
 {
     *this = *dynamic_cast<dxImGuiRender*>(&_in);
@@ -107,3 +109,4 @@ void dxImGuiRender::OnDeviceResetEnd()
     ImGui_ImplOpenGL3_CreateDeviceObjects();
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

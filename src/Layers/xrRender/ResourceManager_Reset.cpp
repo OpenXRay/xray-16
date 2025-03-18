@@ -8,6 +8,8 @@
 #include "Include/xrAPI/xrAPI.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CResourceManager::reset_begin()
 {
     ZoneScoped;
@@ -147,3 +149,4 @@ void CResourceManager::Dump(bool bBrief)
     Msg("* RM_Dump: v_elements: %d", v_elements.size());
     Msg("* RM_Dump: v_shaders : %d", v_shaders.size());
 }
+} // namespace xray::render::RENDER_NAMESPACE

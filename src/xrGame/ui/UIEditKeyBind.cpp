@@ -151,9 +151,9 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIEditKeyBind::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUIEditKeyBind::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
-    if (CUIStatic::OnControllerAction(axis, x, y, controller_action))
+    if (CUIStatic::OnControllerAction(axis, state, controller_action))
         return true;
 
     if (m_isEditMode)
@@ -193,11 +193,15 @@ void CUIEditKeyBind::SetEditMode(bool b)
     {
         SetColorAnimation("ui_map_area_anim", LA_CYCLIC | LA_ONLYALPHA | LA_TEXTCOLOR);
         TextureOn();
+        if (GetParent())
+            GetParent()->SetKeyboardCapture(this, true);
     }
     else
     {
         SetColorAnimation(NULL, 0);
         TextureOff();
+        if (GetParent())
+            GetParent()->SetKeyboardCapture(this, false);
     }
 }
 

@@ -3,6 +3,8 @@
 
 #include "blender_light_mask.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_accum_direct_mask::CBlender_accum_direct_mask() { description.CLS = 0; }
 CBlender_accum_direct_mask::~CBlender_accum_direct_mask() {}
 void CBlender_accum_direct_mask::Compile(CBlender_Compile& C)
@@ -282,3 +284,4 @@ void CBlender_accum_direct_mask_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

@@ -11,6 +11,8 @@
 // Y =  76.544*R +150.272*G  +29.184*B
 // Y =  76(4C)    150(96)     29(1D)
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Screen_GRAY::CBlender_Screen_GRAY()
 {
     description.CLS = B_SCREEN_GRAY;
@@ -59,3 +61,4 @@ void CBlender_Screen_GRAY::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
+} // namespace xray::render::RENDER_NAMESPACE

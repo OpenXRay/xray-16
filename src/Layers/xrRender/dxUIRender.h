@@ -1,9 +1,9 @@
-#ifndef dxUIRender_included
-#define dxUIRender_included
 #pragma once
 
 #include "Include/xrRender/UIRender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxUIRender : public IUIRender
 {
 public:
@@ -57,5 +57,4 @@ private:
 };
 
 extern dxUIRender UIRenderImpl;
-
-#endif //	dxUIRender_included
+} // namespace xray::render::RENDER_NAMESPACE

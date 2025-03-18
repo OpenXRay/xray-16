@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_luminance : public IBlender
 {
 public:
@@ -11,3 +13,4 @@ public:
     CBlender_luminance();
     virtual ~CBlender_luminance();
 };
+} // namespace xray::render::RENDER_NAMESPACE

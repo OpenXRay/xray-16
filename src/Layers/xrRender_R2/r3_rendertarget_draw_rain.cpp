@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 {
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
@@ -195,7 +197,6 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             zMin = 0;
             zMax = ps_r2_sun_near;
         } else {
-            extern float	OLES_SUN_LIMIT_27_01_07;
             zMin = ps_r2_sun_near;
             zMax = OLES_SUN_LIMIT_27_01_07;
         }
@@ -406,3 +407,4 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         //		u_DBT_disable	();
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

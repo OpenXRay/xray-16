@@ -3,6 +3,8 @@
 #include "xrEngine/Environment.h"
 #include "FVF.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CPortalTraverser::CPortalTraverser() { i_marker = 0xffffffff; }
 #ifdef DEBUG
 xr_vector<IRender_Sector*> dbg_sectors;
@@ -316,3 +318,4 @@ void CPortalTraverser::traverse_sector(CSector* sector, CFrustum& F, _scissor& R
         traverse_sector(pSector, Clip, scissor);
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

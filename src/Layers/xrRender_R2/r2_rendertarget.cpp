@@ -28,6 +28,8 @@
     #include "Layers/xrRender/blenders/blender_gasmask_dudv.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 {
     PIX_EVENT(stencil_optimize);
@@ -860,3 +862,4 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     default: return false;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

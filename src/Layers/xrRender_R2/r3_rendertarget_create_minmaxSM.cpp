@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::create_minmax_SM(CBackend& cmd_list)
 {
     u32 Offset;
@@ -31,3 +33,4 @@ void CRenderTarget::create_minmax_SM(CBackend& cmd_list)
 
     cmd_list.set_ColorWriteEnable();
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,5 +1,3 @@
-#ifndef r_backendH
-#define r_backendH
 #pragma once
 
 //#define RBackend_PGO
@@ -26,6 +24,8 @@
 
 #include "FVF.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 const u32 CULL_CCW = D3DCULL_CCW;
 const u32 CULL_CW = D3DCULL_CW;
 const u32 CULL_NONE = D3DCULL_NONE;
@@ -605,5 +605,4 @@ public:
 #pragma warning(pop)
 
 #define RCache RImplementation.get_imm_context().cmd_list
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

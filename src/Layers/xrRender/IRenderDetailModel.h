@@ -1,9 +1,9 @@
-#ifndef IRenderDetailModelH
-#define IRenderDetailModelH
 #pragma once
 
 #include "Include/xrRender/RenderDetailModel.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////////
 // definition (Detail Model)
 class IRender_DetailModel
@@ -39,5 +39,4 @@ public:
     virtual void transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, u32 iOffset, float du, float dv) = 0;
     virtual ~IRender_DetailModel(){};
 };
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

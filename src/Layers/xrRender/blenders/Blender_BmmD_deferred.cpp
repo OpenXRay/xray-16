@@ -4,6 +4,8 @@
 #include "Blender_BmmD.h"
 #include "uber_deffer.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_BmmD::CBlender_BmmD()
 {
     description.CLS = B_BmmD;
@@ -278,3 +280,4 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

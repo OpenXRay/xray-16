@@ -19,7 +19,7 @@ public:
     virtual void Show(bool status);
 
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
-    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
+    bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action) override;
 
     CDialogHolder* GetHolder() const { return m_pParentHolder; }
     void SetHolder(CDialogHolder* h) { m_pParentHolder = h; }

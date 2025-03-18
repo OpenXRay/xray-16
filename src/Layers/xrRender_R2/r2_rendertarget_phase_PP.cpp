@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
     R_constant* C = RCache.get_c(c_snoise)._get(); // get texture
@@ -188,3 +190,4 @@ void CRenderTarget::phase_pp()
     RCache.set_Geometry(g_postprocess);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
+} // namespace xray::render::RENDER_NAMESPACE

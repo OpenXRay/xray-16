@@ -58,6 +58,15 @@ bool CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
             m_destroy_sound.create(ini->r_string("sound", "break_sound"), st_Effect, sg_SourceType);
         if (ini->section_exist("particles"))
             m_destroy_particles = ini->r_string("particles", "destroy_particles");
+        if (ini->section_exist("hit_from"))
+        {
+            CInifile::Sect& data = ini->r_section("hit_from");
+            if (data.Data.size() > 0)
+            {
+                for (auto I = data.Data.cbegin(); I != data.Data.cend(); ++I)
+                    hit_object_name.push_back(I->first.c_str());
+            }
+        }
     }
     CParticlesPlayer::LoadParticles(K);
     RunStartupAnim(DC);
@@ -70,8 +79,12 @@ bool CDestroyablePhysicsObject::net_Spawn(CSE_Abstract* DC)
 void CDestroyablePhysicsObject::Hit(SHit* pHDS)
 {
     SHit HDS = *pHDS;
-    callback(GameObject::eHit)(
-        lua_game_object(), HDS.power, HDS.dir, smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.bone());
+    IGameObject* who = HDS.who;
+    callback(GameObject::eHit)(lua_game_object(), HDS.power, HDS.dir, who->lua_game_object(), HDS.bone());
+
+    if (!hit_object_name.empty() && std::find(hit_object_name.begin(), hit_object_name.end(), who->Name()) == hit_object_name.end())
+        return;
+
     HDS.power = CHitImmunity::AffectHit(HDS.power, HDS.hit_type);
     float hit_scale = 1.f, wound_scale = 1.f;
     CDamageManager::HitScale(HDS.bone(), hit_scale, wound_scale);

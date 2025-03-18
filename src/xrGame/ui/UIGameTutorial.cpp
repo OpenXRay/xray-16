@@ -441,7 +441,7 @@ void CUISequencer::IR_OnKeyboardPress(int dik)
         m_pStoredInputReceiver->IR_OnKeyboardPress(dik);
 }
 
-void CUISequencer::IR_OnControllerPress(int key, float x, float y)
+void CUISequencer::IR_OnControllerPress(int key, const ControllerAxisState& state)
 {
     CUISequenceItem* item = m_sequencer_items.empty() ? nullptr : m_sequencer_items.front();
 
@@ -474,19 +474,19 @@ void CUISequencer::IR_OnControllerPress(int key, float x, float y)
     }
 
     if (b && !GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnControllerPress(key, x, y);
+        m_pStoredInputReceiver->IR_OnControllerPress(key, state);
 }
 
-void CUISequencer::IR_OnControllerRelease(int key, float x, float y)
+void CUISequencer::IR_OnControllerRelease(int key, const ControllerAxisState& state)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnControllerRelease(key, x, y);
+        m_pStoredInputReceiver->IR_OnControllerRelease(key, state);
 }
 
-void CUISequencer::IR_OnControllerHold(int key, float x, float y)
+void CUISequencer::IR_OnControllerHold(int key, const ControllerAxisState& state)
 {
     if (!GrabInput() && m_pStoredInputReceiver)
-        m_pStoredInputReceiver->IR_OnControllerHold(key, x, y);
+        m_pStoredInputReceiver->IR_OnControllerHold(key, state);
 }
 
 void CUISequencer::IR_OnActivate()

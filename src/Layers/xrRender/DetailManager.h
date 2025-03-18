@@ -2,14 +2,14 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef DetailManagerH
-#define DetailManagerH
 #pragma once
 
 #include "xrCore/xrPool.h"
 #include "DetailFormat.h"
 #include "DetailModel.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #ifdef _EDITOR
 //.	#include	"ESceneClassList.h"
 const int dm_max_decompress = 14;
@@ -232,5 +232,4 @@ public:
     CDetailManager();
     virtual ~CDetailManager();
 };
-
-#endif // DetailManagerH
+} // namespace xray::render::RENDER_NAMESPACE

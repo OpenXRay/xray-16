@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 struct SMAP_Rect
 {
     Ivector2 min, max;
@@ -102,3 +104,4 @@ public:
         return false;
     }
 };
+} // namespace xray::render::RENDER_NAMESPACE

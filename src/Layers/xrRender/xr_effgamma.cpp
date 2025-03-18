@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "xr_effgamma.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 IC u16 clr2gamma(float c)
 {
     int C = iFloor(c);
@@ -84,3 +86,4 @@ void CGammaControl::Update() const
     GenLUT(red, green, blue, 256);
     SDL_SetWindowGammaRamp(Device.m_sdlWnd, red, green, blue);
 }
+} // namespace xray::render::RENDER_NAMESPACE

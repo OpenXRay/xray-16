@@ -4,6 +4,8 @@
 #include "Layers/xrRender/blenders/uber_deffer.h"
 #include "blender_deffer_model.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_deffer_model::CBlender_deffer_model()
 {
     description.CLS = B_MODEL;
@@ -339,3 +341,4 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

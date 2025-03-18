@@ -14,6 +14,18 @@ class ENGINE_API IRender_DetailModel;
 class ENGINE_API CLAItem;
 class ENGINE_API CEnvDescriptorMixer;
 
+namespace xray::render
+{
+namespace render_r4
+{
+class dxThunderboltRender;
+}
+namespace render_gl
+{
+class dxThunderboltRender;
+}
+} // namespace xray::render
+
 struct ENGINE_API SThunderboltDesc
 {
     // geom
@@ -73,7 +85,8 @@ struct ENGINE_API SThunderboltCollection
 //
 class ENGINE_API CEffect_Thunderbolt
 {
-    friend class dxThunderboltRender;
+    friend class xray::render::render_r4::dxThunderboltRender;
+    friend class xray::render::render_gl::dxThunderboltRender;
 
 protected:
     xr_vector<SThunderboltCollection*> collections;

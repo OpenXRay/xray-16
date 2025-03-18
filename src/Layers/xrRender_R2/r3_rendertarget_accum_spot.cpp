@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Layers/xrRender/du_cone.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // extern Fvector du_cone_vertices[DU_CONE_NUMVERTEX];
 
 void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
@@ -660,3 +662,4 @@ void CRenderTarget::accum_volumetric(CBackend& cmd_list, light* L)
     */
     cmd_list.set_Scissor(0);
 }
+} // namespace xray::render::RENDER_NAMESPACE

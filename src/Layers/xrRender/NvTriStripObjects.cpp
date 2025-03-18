@@ -9,6 +9,8 @@
 
 #define CACHE_INEFFICIENCY 6
 
+namespace xray::render::RENDER_NAMESPACE
+{
 NvStripifier::NvStripifier() {}
 NvStripifier::~NvStripifier() {}
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1350,3 +1352,4 @@ int NvStripifier::CountRemainingTris(xr_list<NvStripInfo*>::iterator iter, xr_li
     }
     return count;
 }
+} // namespace xray::render::RENDER_NAMESPACE

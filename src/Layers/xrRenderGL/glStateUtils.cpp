@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "glStateUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace glStateUtils
 {
 GLenum ConvertFillMode(u32 Mode)
@@ -202,4 +204,5 @@ GLint ConvertTextureFilter(u32 dxFilter, GLint glFilter, bool MipMap)
         return glFilter;
     }
 }
-};
+} // namespace glStateUtils
+} // namespace xray::render::RENDER_NAMESPACE

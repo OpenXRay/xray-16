@@ -7,36 +7,9 @@
 #include "dx113DFluidObstacles.h"
 #include "dx113DFluidEmitters.h"
 
-dx113DFluidManager FluidManager;
-
-namespace
+namespace xray::render::RENDER_NAMESPACE
 {
-// For render call
-// DrawTextureShaderVariable = pEffect->GetVariableByName( "textureNumber")->AsScalar();
-shared_str strDrawTexture("textureNumber");
-// For project, advect
-// ModulateShaderVariable = pEffect->GetVariableByName( "modulate")->AsScalar();
-shared_str strModulate("modulate");
-// For gaussian
-//ImpulseSizeShaderVariable = pEffect->GetVariableByName("size")->AsScalar();
-//shared_str strImpulseSize("size");
-//ImpulseCenterShaderVariable = pEffect->GetVariableByName("center")->AsVector();
-//shared_str strImpulseCenter("center");
-//SplatColorShaderVariable = pEffect->GetVariableByName("splatColor")->AsVector();
-//shared_str strSplatColor("splatColor");
-// For confinement
-// EpsilonShaderVariable = pEffect->GetVariableByName( "epsilon")->AsScalar();
-shared_str strEpsilon("epsilon");
-// For confinement, advect
-shared_str strTimeStep("timestep");
-// For advect BFECC
-// ForwardShaderVariable = pEffect->GetVariableByName( "forward")->AsScalar();
-shared_str strForward("forward");
-// HalfVolumeDimShaderVariable = pEffect->GetVariableByName( "halfVolumeDim")->AsVector();
-shared_str strHalfVolumeDim("halfVolumeDim");
-
-shared_str strGravityBuoyancy("GravityBuoyancy");
-}
+dx113DFluidManager FluidManager;
 
 LPCSTR dx113DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
     "$user$Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
@@ -385,6 +358,11 @@ void dx113DFluidManager::DetachAndSwapFluidData(dx113DFluidData& FluidData)
 
 void dx113DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
 {
+    static shared_str strModulate("modulate");
+    static shared_str strTimeStep("timestep");
+    static shared_str strForward("forward");
+    static shared_str strHalfVolumeDim("halfVolumeDim");
+
     PIX_EVENT(AdvectColorBFECC);
 
     // Clear to zero
@@ -483,6 +461,10 @@ void dx113DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
 
 void dx113DFluidManager::AdvectColor(float timestep, bool bTeperature)
 {
+    static shared_str strModulate("modulate");
+    static shared_str strTimeStep("timestep");
+    static shared_str strForward("forward");
+
     PIX_EVENT(AdvectColor);
     // if(ColorTextureNumber == 0)
     //{
@@ -517,6 +499,11 @@ void dx113DFluidManager::AdvectColor(float timestep, bool bTeperature)
 
 void dx113DFluidManager::AdvectVelocity(float timestep, float fGravity)
 {
+    static shared_str strModulate("modulate");
+    static shared_str strTimeStep("timestep");
+    static shared_str strForward("forward");
+    static shared_str strGravityBuoyancy("GravityBuoyancy");
+
     PIX_EVENT(AdvectVelocity);
 
     // pShaderResourceVariables[RENDER_TARGET_VELOCITY1]->SetResource( NULL );
@@ -547,6 +534,9 @@ void dx113DFluidManager::AdvectVelocity(float timestep, float fGravity)
 
 void dx113DFluidManager::ApplyVorticityConfinement(float timestep)
 {
+    static shared_str strEpsilon("epsilon");
+    static shared_str strTimeStep("timestep");
+
     PIX_EVENT(ApplyVorticityConfinement);
 
     // Compute vorticity
@@ -681,6 +671,8 @@ void dx113DFluidManager::ComputePressure(float /*timestep*/)
 
 void dx113DFluidManager::ProjectVelocity(float /*timestep*/)
 {
+    static shared_str strModulate("modulate");
+
     PIX_EVENT(ProjectVelocity);
 
     // pShaderResourceVariables[RENDER_TARGET_VELOCITY0]->SetResource( NULL );
@@ -800,3 +792,4 @@ void dx113DFluidManager::UpdateProfiles()
 }
 
 #endif // !MASTER_GOLD
+} // namespace xray::render::RENDER_NAMESPACE

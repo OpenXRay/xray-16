@@ -3,6 +3,8 @@
 
 #include "dx11StateCache.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 dx11State::dx11State()
 {
 }
@@ -111,3 +113,4 @@ void dx11State::InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& stat
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

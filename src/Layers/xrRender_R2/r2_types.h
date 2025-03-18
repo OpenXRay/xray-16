@@ -1,5 +1,11 @@
 #pragma once
 
+extern ENGINE_API int ps_ssfx_gloss_method;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 // Base targets
 #define     r2_RT_base          "$user$base_"
 #define     r2_RT_base_depth    "$user$base_depth"
@@ -129,10 +135,6 @@ const u32 LUMINANCE_size = 16;
 extern float ps_r2_gloss_factor;
 extern float ps_r2_gloss_min;
 
-extern ENGINE_API int ps_ssfx_gloss_method;
-extern ENGINE_API float ps_ssfx_gloss_factor;
-extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
-
 IC float u_diffuse2s(float x, float y, float z)
 {
 	if (ps_ssfx_gloss_method == 0)
@@ -151,3 +153,4 @@ IC float u_diffuse2s(Fvector3& c)
 {
     return u_diffuse2s(c.x, c.y, c.z);
 }
+} // namespace xray::render::RENDER_NAMESPACE

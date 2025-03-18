@@ -31,6 +31,8 @@
 #endif
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 const float dbgOffset = 0.f;
 const int dbgItems = 128;
 
@@ -483,3 +485,4 @@ void CDetailManager::details_clear()
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

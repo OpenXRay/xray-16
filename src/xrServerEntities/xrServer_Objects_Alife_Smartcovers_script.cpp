@@ -22,7 +22,7 @@ static void CSE_SmartCover_Export(lua_State* luaState)
 #ifndef AI_COMPILER
             .def("set_available_loopholes", &CSE_SmartCover::set_available_loopholes)
 #endif
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
             .def("set_loopholes_table_checker", &CSE_SmartCover::set_loopholes_table_checker)
 #endif
     ];

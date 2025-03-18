@@ -2,6 +2,8 @@
 
 #include "ResourceManager.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #ifdef USE_OGL
 static void show_compile_errors(cpcstr filename, GLuint program, GLuint shader)
 {
@@ -730,3 +732,4 @@ bool CResourceManager::DestroyShader(const T* sh)
     Msg("! ERROR: Failed to find compiled shader '%s'", sh->cName.c_str());
     return false;
 }
+} // namespace xray::render::RENDER_NAMESPACE

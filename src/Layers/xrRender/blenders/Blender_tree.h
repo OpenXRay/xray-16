@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_Tree : public IBlender
 {
     xrP_BOOL oBlend;
@@ -20,3 +22,4 @@ public:
 
     void Compile(CBlender_Compile& C) override;
 };
+} // namespace xray::render::RENDER_NAMESPACE

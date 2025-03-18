@@ -8,7 +8,12 @@
 #include "pch_script.h"
 #include "smart_cover_detail.h"
 
-float smart_cover::detail::parse_float(
+namespace smart_cover
+{
+constexpr pcstr s_enter_loophole_id = "<__ENTER__>";
+constexpr pcstr s_exit_loophole_id  = "<__EXIT__>";
+
+float detail::parse_float(
     luabind::object const& table, LPCSTR identifier, float const& min_threshold, float const& max_threshold)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
@@ -21,7 +26,7 @@ float smart_cover::detail::parse_float(
     return (result);
 }
 
-bool smart_cover::detail::parse_float(float& output,
+bool detail::parse_float(float& output,
     luabind::object const& table, LPCSTR identifier, float const& min_threshold, float const& max_threshold)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
@@ -37,7 +42,7 @@ bool smart_cover::detail::parse_float(float& output,
     return false;
 }
 
-LPCSTR smart_cover::detail::parse_string(luabind::object const& table, LPCSTR identifier)
+LPCSTR detail::parse_string(luabind::object const& table, LPCSTR identifier)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
     luabind::object result = table[identifier];
@@ -46,7 +51,7 @@ LPCSTR smart_cover::detail::parse_string(luabind::object const& table, LPCSTR id
     return (luabind::object_cast<LPCSTR>(result));
 }
 
-void smart_cover::detail::parse_table(luabind::object const& table, LPCSTR identifier, luabind::object& result)
+void detail::parse_table(luabind::object const& table, LPCSTR identifier, luabind::object& result)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
     result = table[identifier];
@@ -54,7 +59,7 @@ void smart_cover::detail::parse_table(luabind::object const& table, LPCSTR ident
     VERIFY2(luabind::type(result) == LUA_TTABLE, make_string("cannot read table value %s", identifier));
 }
 
-bool smart_cover::detail::parse_bool(luabind::object const& table, LPCSTR identifier)
+bool detail::parse_bool(luabind::object const& table, LPCSTR identifier)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
     luabind::object result = table[identifier];
@@ -63,7 +68,7 @@ bool smart_cover::detail::parse_bool(luabind::object const& table, LPCSTR identi
     return (luabind::object_cast<bool>(result));
 }
 
-int smart_cover::detail::parse_int(luabind::object const& table, LPCSTR identifier)
+int detail::parse_int(luabind::object const& table, LPCSTR identifier)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
     luabind::object result = table[identifier];
@@ -72,7 +77,7 @@ int smart_cover::detail::parse_int(luabind::object const& table, LPCSTR identifi
     return (luabind::object_cast<int>(result));
 }
 
-Fvector smart_cover::detail::parse_fvector(luabind::object const& table, LPCSTR identifier)
+Fvector detail::parse_fvector(luabind::object const& table, LPCSTR identifier)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
     luabind::object result = table[identifier];
@@ -80,7 +85,7 @@ Fvector smart_cover::detail::parse_fvector(luabind::object const& table, LPCSTR 
     return (luabind::object_cast<Fvector>(result));
 }
 
-bool smart_cover::detail::parse_fvector(luabind::adl::object const& table, LPCSTR identifier, Fvector& output)
+bool detail::parse_fvector(luabind::adl::object const& table, LPCSTR identifier, Fvector& output)
 {
     VERIFY2(luabind::type(table) == LUA_TTABLE, "invalid loophole description passed");
     luabind::object result = table[identifier];
@@ -91,3 +96,20 @@ bool smart_cover::detail::parse_fvector(luabind::adl::object const& table, LPCST
     }
     return false;
 }
+
+shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
+{
+    if (*vertex_id.c_str())
+        return (vertex_id);
+
+    if (in)
+        return (s_enter_loophole_id);
+
+    return (s_exit_loophole_id);
+}
+
+shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in)
+{
+    return (transform_vertex(detail::parse_string(table, identifier), in));
+}
+} // namespace smart_cover

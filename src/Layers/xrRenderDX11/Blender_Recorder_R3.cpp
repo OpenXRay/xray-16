@@ -6,6 +6,8 @@
 #include "Layers/xrRender/Blender.h"
 #include "Layers/xrRender/tss.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
@@ -191,3 +193,4 @@ void CBlender_Compile::r_ComputePass(LPCSTR cs)
     ctable.merge(&dest.cs->constants);
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

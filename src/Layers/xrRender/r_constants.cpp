@@ -5,6 +5,8 @@
 
 //.#include "xrCore/xrPool.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // pool
 //.static	poolSS<R_constant,512>			g_constant_allocator;
 
@@ -166,3 +168,4 @@ BOOL R_constant_table::equal(R_constant_table& C)
 
     return TRUE;
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -29,8 +29,6 @@ IGame_Persistent::IGame_Persistent()
     eDisconnect = Engine.Event.Handler_Attach("KERNEL:disconnect", this);
     eStartMPDemo = Engine.Event.Handler_Attach("KERNEL:start_mp_demo", this);
 
-    Device.seqAppStart.Add(this);
-    Device.seqAppEnd.Add(this);
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1);
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this);
@@ -55,8 +53,6 @@ IGame_Persistent::~IGame_Persistent()
     DefaultSoundScene = nullptr;
 
     Device.seqFrame.Remove(this);
-    Device.seqAppStart.Remove(this);
-    Device.seqAppEnd.Remove(this);
     Device.seqAppActivate.Remove(this);
     Device.seqAppDeactivate.Remove(this);
 

@@ -1819,9 +1819,6 @@
     <Filter Include="Core\Server\ServerEntities\objects_alife_monsters">
       <UniqueIdentifier>{6a99613c-d574-4ebd-ab6e-9b88bd8f7141}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Server\ServerEntities\script_value_container">
-      <UniqueIdentifier>{74aee90d-4f0c-4bf8-80f0-df89e02371ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Server\ServerEntities\objects_alife_smartcover">
       <UniqueIdentifier>{0034515f-4f2f-4cce-a711-0d19844fcbb4}</UniqueIdentifier>
     </Filter>
@@ -2229,6 +2226,21 @@
     </Filter>
     <Filter Include="AI\AMonsters\common\monster states\Rest\Squad\Rest">
       <UniqueIdentifier>{4946196d-1f2b-4e07-9207-f0789b2528fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\ServerEntities\scripts">
+      <UniqueIdentifier>{680ffaa3-1f14-47a9-a263-58e2f92d6da1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\ServerEntities\scripts\script_value_container">
+      <UniqueIdentifier>{74aee90d-4f0c-4bf8-80f0-df89e02371ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\ServerEntities\scripts\script_value">
+      <UniqueIdentifier>{d25084c1-8225-43b0-ac51-d3bded007961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\ServerEntities\scripts\script_properties_list_helper">
+      <UniqueIdentifier>{cb669a46-85df-40d9-a002-0c46f942402d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Server\ServerEntities\scripts\script_value_wrapper">
+      <UniqueIdentifier>{51778476-f463-42d8-bf56-1f2ffa97a662}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -5662,10 +5674,10 @@
       <Filter>Core\Server\ServerEntities\objects_alife_monsters</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_value_container.h">
-      <Filter>Core\Server\ServerEntities\script_value_container</Filter>
+      <Filter>Core\Server\ServerEntities\scripts\script_value_container</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_value_container_impl.h">
-      <Filter>Core\Server\ServerEntities\script_value_container</Filter>
+      <Filter>Core\Server\ServerEntities\scripts\script_value_container</Filter>
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\xrServer_Objects_Alife_Smartcovers.h">
       <Filter>Core\Server\ServerEntities\objects_alife_smartcover</Filter>
@@ -6313,6 +6325,21 @@
     </ClInclude>
     <ClInclude Include="ui\UIWheelMenu.h">
       <Filter>UI\Common\MainIngame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrServerEntities\script_value.h">
+      <Filter>Core\Server\ServerEntities\scripts\script_value</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrServerEntities\script_value_inline.h">
+      <Filter>Core\Server\ServerEntities\scripts\script_value</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrServerEntities\script_properties_list_helper.h">
+      <Filter>Core\Server\ServerEntities\scripts\script_properties_list_helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrServerEntities\script_value_wrapper.h">
+      <Filter>Core\Server\ServerEntities\scripts\script_value_wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrServerEntities\script_value_wrapper_inline.h">
+      <Filter>Core\Server\ServerEntities\scripts\script_value_wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -9533,6 +9560,12 @@
     </ClCompile>
     <ClCompile Include="ui\UIWheelMenu.cpp">
       <Filter>UI\Common\MainIngame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrServerEntities\script_properties_list_helper.cpp">
+      <Filter>Core\Server\ServerEntities\scripts\script_properties_list_helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrServerEntities\script_properties_list_helper_script.cpp">
+      <Filter>Core\Server\ServerEntities\scripts\script_properties_list_helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

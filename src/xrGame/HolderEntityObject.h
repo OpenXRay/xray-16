@@ -54,9 +54,9 @@ public:
     void OnKeyboardPress(int dik) override;
     void OnKeyboardRelease(int dik) override;
     void OnKeyboardHold(int dik) override;
-    void OnControllerPress(int cmd, float x, float y) override;
-    void OnControllerRelease(int cmd, float x, float y) override;
-    void OnControllerHold(int cmd, float x, float y) override;
+    void OnControllerPress(int cmd, const ControllerAxisState& state) override;
+    void OnControllerRelease(int cmd, const ControllerAxisState& state) override;
+    void OnControllerHold(int cmd, const ControllerAxisState& state) override;
     void OnControllerAttitudeChange(Fvector change) override;
     CInventory* GetInventory() override { return nullptr; };
     void cam_Update(float dt, float fov = 90.0f) override;

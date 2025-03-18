@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "glState.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 glState::glState()
 {
     // Clear the sampler array
@@ -271,3 +273,4 @@ void glState::UpdateSamplerState(u32 stage, u32 name, u32 value)
         break;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

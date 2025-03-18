@@ -1,9 +1,9 @@
-#ifndef dxUISequenceVideoItem_included
-#define dxUISequenceVideoItem_included
 #pragma once
 
 #include "Include/xrRender/UISequenceVideoItem.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxUISequenceVideoItem : public IUISequenceVideoItem
 {
 public:
@@ -20,5 +20,4 @@ public:
 private:
     CTexture* m_texture;
 };
-
-#endif //	dxUISequenceVideoItem_included
+} // namespace xray::render::RENDER_NAMESPACE

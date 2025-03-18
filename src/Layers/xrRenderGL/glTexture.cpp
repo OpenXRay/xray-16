@@ -6,6 +6,8 @@
 
 #include <gli/gli.hpp>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr fn)
 {
     pstr _ext = strext(fn);
@@ -248,3 +250,4 @@ GLuint CRender::texture_load(LPCSTR fRName, u32& ret_msize, GLenum& ret_desc)
     ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
     return pTexture;
 }
+} // namespace xray::render::RENDER_NAMESPACE

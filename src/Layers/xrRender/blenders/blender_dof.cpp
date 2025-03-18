@@ -2,6 +2,8 @@
 
 #include "blender_dof.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_dof::CBlender_dof()
 {
     description.CLS = B_BLUR;
@@ -41,3 +43,4 @@ void CBlender_dof::Compile(CBlender_Compile& C)
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

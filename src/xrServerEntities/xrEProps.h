@@ -158,11 +158,7 @@ public:
     virtual CTextValue* CreateTexture(PropItemVec& items, shared_str key, pstr val, u32 sz) = 0;
 };
 //---------------------------------------------------------------------------
-#ifdef __BORLANDC__
-extern "C" XR_EPROPS_API IPropHelper& PHelper();
-#else
 extern IPropHelper& PHelper();
-#endif
 //---------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------

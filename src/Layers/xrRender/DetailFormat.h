@@ -56,6 +56,8 @@
 
 #define DO_NO_WAVING 0x0001
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class DetailHeader
 {
 private:
@@ -227,5 +229,5 @@ IC Fvector& get_slot_diameter(Fvector& diameter, const DetailSlot& DS)
     diameter.set(DETAIL_SLOT_SIZE, DS.r_yheight(), DETAIL_SLOT_SIZE);
     return diameter;
 }
-
+} // namespace xray::render::RENDER_NAMESPACE
 #pragma pack(pop)

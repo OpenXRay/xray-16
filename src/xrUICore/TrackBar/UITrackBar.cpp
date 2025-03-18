@@ -109,15 +109,15 @@ bool CUITrackBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUITrackBar::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUITrackBar::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
-    CUIWindow::OnControllerAction(axis, x, y, controller_action);
+    CUIWindow::OnControllerAction(axis, state, controller_action);
 
     if (CursorOverWindow() && IsBinded(kUI_MOVE, axis, EKeyContext::UI))
     {
-        if (fis_zero(y))
+        if (std::abs(state.x) > 0.5f && std::abs(state.y) < 0.2f)
         {
-            if (x < 0)
+            if (state.x < 0)
             {
                 StepLeft();
                 UI().GetUICursor().WarpToWindow(m_pSlider);
@@ -404,11 +404,11 @@ void CUITrackBar::UpdatePos()
         string256 buff;
         if (m_b_is_float)
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val);
+            xr_sprintf(buff, (m_static_format.empty() ? "%.1f" : m_static_format.c_str()), m_f_val);
         }
         else
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val);
+            xr_sprintf(buff, (m_static_format.empty() ? "%d" : m_static_format.c_str()), m_i_val);
         }
         m_static->TextItemControl()->SetTextST(buff);
     }

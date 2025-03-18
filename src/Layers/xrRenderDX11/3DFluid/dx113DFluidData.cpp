@@ -3,6 +3,8 @@
 #include "dx113DFluidManager.h"
 #include "xrCore/xr_token.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace
 {
 const xr_token simulation_type_token[] = {
@@ -227,3 +229,4 @@ void dx113DFluidData::ReparseProfile(const xr_string& Profile)
     ParseProfile(Profile);
 }
 #endif // !MASTER_GOLD
+} // namespace xray::render::RENDER_NAMESPACE

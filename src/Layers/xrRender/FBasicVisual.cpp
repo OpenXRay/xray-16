@@ -8,6 +8,8 @@
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -44,7 +46,7 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         R_ASSERT2(hdr.format_version == xrOGF_FormatVersion, "Invalid visual version");
         Type = hdr.type;
         if (hdr.shader_id)
-            shader = ::RImplementation.getShader(hdr.shader_id);
+            shader = RImplementation.getShader(hdr.shader_id);
         vis.box.set(hdr.bb.min, hdr.bb.max);
         vis.sphere.set(hdr.bs.c, hdr.bs.r);
     }
@@ -82,3 +84,4 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
     PCOPY(dbg_name);
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

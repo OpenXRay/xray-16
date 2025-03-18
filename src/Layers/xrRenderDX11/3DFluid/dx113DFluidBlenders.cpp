@@ -4,6 +4,8 @@
 #include "dx113DFluidManager.h"
 #include "dx113DFluidRenderer.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace
 {
 // Volume texture width
@@ -455,3 +457,4 @@ void CBlender_fluid_raycast::Compile(CBlender_Compile& C)
     //	Constants must be bound before r_End()
     C.r_End();
 }
+} // namespace xray::render::RENDER_NAMESPACE

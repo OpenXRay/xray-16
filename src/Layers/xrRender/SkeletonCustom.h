@@ -1,19 +1,20 @@
-//---------------------------------------------------------------------------
-#ifndef SkeletonCustomH
-#define SkeletonCustomH
+#pragma once
 
 #include "FHierrarhyVisual.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "Include/xrRender/Kinematics.h"
 
+class CInifile;
+class CBoneData;
+struct SEnumVerticesCallback;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 // consts
 extern Lock UCalc_Mutex;
 
 // refs
 class CKinematics;
-class CInifile;
-class CBoneData;
-struct SEnumVerticesCallback;
 class CSkeletonX;
 
 // MT-locker
@@ -318,6 +319,6 @@ public:
 private:
     bool m_is_original_lod;
 };
+
 IC CKinematics* PCKinematics(dxRender_Visual* V) { return V ? (CKinematics*)V->dcast_PKinematics() : 0; }
-//---------------------------------------------------------------------------
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

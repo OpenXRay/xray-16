@@ -15,6 +15,7 @@ struct ENGINE_API FSlideWindowItem;
 
 // fwd. decl.
 struct SDL_Window;
+struct SPPInfo;
 class IRenderVisual;
 class IKinematics;
 class IGameFont;
@@ -112,32 +113,6 @@ public:
     virtual float* get_luminocity_hemi_cube() = 0;
 
     virtual ~IRender_ObjectSpecific(){};
-};
-
-class CBackend; // TODO: the real command list interface should be defined here
-
-//////////////////////////////////////////////////////////////////////////
-// definition (Target)
-class ENGINE_API IRender_Target
-{
-public:
-    virtual void set_blur(float f) = 0;
-    virtual void set_gray(float f) = 0;
-    virtual void set_duality_h(float f) = 0;
-    virtual void set_duality_v(float f) = 0;
-    virtual void set_noise(float f) = 0;
-    virtual void set_noise_scale(float f) = 0;
-    virtual void set_noise_fps(float f) = 0;
-    virtual void set_color_base(u32 f) = 0;
-    virtual void set_color_gray(u32 f) = 0;
-    // virtual void set_color_add (u32 f) = 0;
-    virtual void set_color_add(const Fvector& f) = 0;
-    virtual u32 get_width(CBackend& cmd_list) = 0; // TODO: use equivalent from cmd_list
-    virtual u32 get_height(CBackend& cmd_list) = 0;
-    virtual void set_cm_imfluence(float f) = 0;
-    virtual void set_cm_interpolate(float f) = 0;
-    virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1) = 0;
-    virtual ~IRender_Target(){};
 };
 
 enum class DeviceState
@@ -306,8 +281,6 @@ public:
     virtual pcstr getShaderPath() = 0;
     // virtual ref_shader getShader (int id) = 0;
     virtual IRenderVisual* getVisual(int id) = 0;
-    virtual IRender_Target* getTarget() = 0;
-    virtual CBackend& get_imm_command_list() = 0;
 
     // Main
     virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)
@@ -364,11 +337,7 @@ public:
     virtual void AfterWorldRender() = 0; //--#SM+#-- После рендеринга мира (до UI)
 
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
-
-    // Render mode
-    virtual void rmNear(CBackend& cmd_list) = 0;
-    virtual void rmFar(CBackend& cmd_list) = 0;
-    virtual void rmNormal(CBackend& cmd_list) = 0;
+    virtual void SetPostProcessParams(const SPPInfo& ppi) = 0;
 
     // Constructor/destructor
     virtual ~IRender() {}

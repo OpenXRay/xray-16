@@ -14,6 +14,11 @@
 
 #ifdef USE_RENDERDOC
 #include <renderdoc/renderdoc_app.h>
+#endif
+
+namespace xray::render::RENDER_NAMESPACE
+{
+#ifdef USE_RENDERDOC
 RENDERDOC_API_1_0_0* g_renderdoc_api;
 #endif
 
@@ -410,3 +415,4 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     }
     BasicStats.FrameStart();
 }
+} // namespace xray::render::RENDER_NAMESPACE

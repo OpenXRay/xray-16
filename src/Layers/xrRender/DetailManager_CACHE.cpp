@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "DetailManager.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CDetailManager::cache_Initialize()
 {
     // Centroid
@@ -269,3 +271,4 @@ DetailSlot& CDetailManager::QueryDB(int sx, int sz)
         return DS_empty;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -184,13 +184,11 @@ CGameFont::~CGameFont()
 
 static inline float DI2PX(float x)
 {
-    auto& cmd_list = GEnv.Render->get_imm_command_list();
-    return float(iFloor((x + 1) * float(GEnv.Render->getTarget()->get_width(cmd_list)) * 0.5f));
+    return float(iFloor((x + 1) * float(Device.dwWidth) * 0.5f));
 }
 static inline float DI2PY(float y)
 {
-    auto& cmd_list = GEnv.Render->get_imm_command_list();
-    return float(iFloor((y + 1) * float(GEnv.Render->getTarget()->get_height(cmd_list)) * 0.5f));
+    return float(iFloor((y + 1) * float(Device.dwHeight) * 0.5f));
 }
 
 void CGameFont::OutSet(float x, float y)

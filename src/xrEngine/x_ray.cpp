@@ -203,7 +203,7 @@ constexpr pcstr FRAME_MARK_APPLICATION_STARTUP = "Application startup";
 constexpr pcstr FRAME_MARK_APPLICATION_SHUTDOWN = "Application shutdown";
 constexpr pcstr FRAME_MARK_APPLICATION_RUN = "Application run";
 
-CApplication::CApplication(pcstr commandLine, GameModule* game)
+CApplication::CApplication(pcstr commandLine, GameModule* game, const std::span<RendererModule*>& modules)
 {
     TracySetProgramName("OpenXRay");
     Threading::SetCurrentThreadName("Primary thread");
@@ -246,9 +246,9 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
     });
 
 #ifdef XR_PLATFORM_WINDOWS
-    const auto& createRendererList = TaskManager::AddTask([]
+    const auto& createRendererList = TaskManager::AddTask([&]
     {
-        Engine.External.CreateRendererList();
+        Engine.External.CreateRendererList(modules);
     });
 #endif
 
@@ -278,7 +278,7 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
 #ifdef XR_PLATFORM_WINDOWS
     TaskScheduler->Wait(createRendererList);
 #else
-    Engine.External.CreateRendererList();
+    Engine.External.CreateRendererList(modules);
 #endif
     Engine.Initialize(game);
     Device.Initialize();
@@ -314,7 +314,9 @@ CApplication::CApplication(pcstr commandLine, GameModule* game)
         g_pGamePersistent = game->create_persistent();
         R_ASSERT(g_pGamePersistent);
     }
-    if (!g_pGamePersistent)
+    if (g_pGamePersistent)
+        g_pGamePersistent->OnAppStart();
+    else
         Console->Show();
 
     FrameMarkEnd(FRAME_MARK_APPLICATION_STARTUP);
@@ -324,13 +326,14 @@ CApplication::~CApplication()
 {
     FrameMarkStart(FRAME_MARK_APPLICATION_SHUTDOWN);
 
-    // Destroy APP
+    if (g_pGamePersistent)
+        g_pGamePersistent->OnAppEnd();
+
     if (m_game_module)
         m_game_module->destroy_persistent(g_pGamePersistent);
 
     Engine.Event.Dump();
 
-    // Destroying
     xr_delete(pInput);
     destroySettings();
 

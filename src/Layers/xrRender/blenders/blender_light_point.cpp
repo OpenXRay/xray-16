@@ -3,6 +3,8 @@
 
 #include "blender_light_point.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_accum_point::CBlender_accum_point() { description.CLS = 0; }
 CBlender_accum_point::~CBlender_accum_point() {}
 void CBlender_accum_point::Compile(CBlender_Compile& C)
@@ -452,3 +454,4 @@ void CBlender_accum_point_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

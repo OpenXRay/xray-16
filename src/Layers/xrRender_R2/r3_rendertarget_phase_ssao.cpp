@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_ssao()
 {
     u32 Offset = 0;
@@ -142,3 +144,4 @@ void CRenderTarget::phase_downsamp()
     if (RImplementation.o.ssao_half_data)
         RCache.SetViewport({ 0.f, 0.f, float(Device.dwWidth), float(Device.dwHeight), 0.f, 1.f });
 }
+} // namespace xray::render::RENDER_NAMESPACE

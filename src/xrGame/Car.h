@@ -215,9 +215,7 @@ public:
         float GetSteerAngle();
 
         void Init();
-        void SteerRight();
-        void SteerLeft();
-        void SteerIdle();
+        void Steer(float angle);
         void Limit();
         void Load(LPCSTR /*section*/){};
     };
@@ -465,9 +463,7 @@ private:
     float DriveWheelsMeanAngleRate();
     IC float EngineRpmFromWheels() { return _abs(DriveWheelsMeanAngleRate() * m_current_gear_ratio); }
     /////////////////////////////////////////////////////////////////////////
-    void SteerRight();
-    void SteerLeft();
-    void SteerIdle();
+    void Steer(float angle);
     void Transmission(size_t num);
     void CircleSwitchTransmission();
     void TransmissionUp();
@@ -599,9 +595,9 @@ public:
     virtual void OnKeyboardRelease(int dik);
     virtual void OnKeyboardHold(int dik);
 
-    void OnControllerPress(int cmd, float x, float y) override;
-    void OnControllerHold(int cmd, float x, float y) override;
-    void OnControllerRelease(int cmd, float x, float y) override;
+    void OnControllerPress(int cmd, const ControllerAxisState& state) override;
+    void OnControllerHold(int cmd, const ControllerAxisState& state) override;
+    void OnControllerRelease(int cmd, const ControllerAxisState& state) override;
 
     void OnControllerAttitudeChange(Fvector change) override;
 

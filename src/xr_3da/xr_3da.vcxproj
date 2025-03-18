@@ -59,6 +59,12 @@
     <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Layers\xrRenderPC_GL\xrRender_GL.vcxproj">
+      <Project>{2c5af8c8-96a6-45b2-860b-5e9c9911ddd6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Layers\xrRenderPC_R4\xrRender_R4.vcxproj">
+      <Project>{ac9b12ed-a2d7-4337-a981-5bd8430e96d8}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrGame\xrGame.vcxproj">
       <Project>{200652a6-043e-4634-8837-87983b3bd5e0}</Project>
     </ProjectReference>

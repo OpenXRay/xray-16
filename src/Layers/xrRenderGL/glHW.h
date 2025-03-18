@@ -3,6 +3,8 @@
 #include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CHW
     : public pureAppActivate,
       public pureAppDeactivate
@@ -62,3 +64,4 @@ public:
 };
 
 extern ECORE_API CHW HW;
+} // namespace xray::render::RENDER_NAMESPACE

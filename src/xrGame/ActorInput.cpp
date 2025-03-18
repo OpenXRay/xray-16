@@ -369,7 +369,7 @@ void CActor::IR_OnMouseMove(int dx, int dy)
     OnAxisMove(float(dx), float(dy), scale, scale, false, psMouseInvert.test(1));
 }
 
-void CActor::IR_OnControllerPress(int cmd, float x, float y)
+void CActor::IR_OnControllerPress(int cmd, const ControllerAxisState& state)
 {
     switch (cmd)
     {
@@ -397,7 +397,7 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
 
     if (m_holder && kUSE != cmd)
     {
-        m_holder->OnControllerPress(cmd, x, y);
+        m_holder->OnControllerPress(cmd, state);
 
         if (m_holder->allowWeapon())
             inventory().Action((u16)cmd, CMD_START);
@@ -408,35 +408,40 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float LookFactor = GetLookFactor();
-        float scaleX = (cam_Active()->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f / LookFactor;
-        float scaleY = (cam_Active()->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f / LookFactor;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        const auto fov = cam_Active()->f_fov;
+        const float lookFactor = GetLookFactor();
+
+        const float scale  = Device.fTimeDeltaReal * psLookIntensityMin * (fov / g_fov) * psControllerStickSensScale / lookFactor;
+        const float scaleX = scale * psControllerStickSensX;
+        const float scaleY = scale * psControllerStickSensY;
+
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
     case kMOVE_AROUND:
     {
-        if (!fis_zero(x))
+        if (state.magnitude < 0.5f)
+            mstate_wishful |= mcAccel;
+
+        if (!fis_zero(state.x))
         {
-            if (x > 35.f)
+            if (state.x > 0.3f)
                 mstate_wishful |= mcRStrafe;
-            else if (x < -35.f)
+            else if (state.x < -0.3f)
                 mstate_wishful |= mcLStrafe;
         }
-        if (!fis_zero(y))
+        if (!fis_zero(state.y))
         {
-            if (y > 35.f)
+            if (state.y > 0.3f)
                 mstate_wishful |= mcBack;
-            else if (y < -35.f)
+            else if (state.y < -0.3f)
+            {
                 mstate_wishful |= mcFwd;
 
-            if (std::abs(y) < 65.f)
-                mstate_wishful |= mcAccel;
-            else if (y < -85.f)
-                mstate_wishful |= mcSprint;
-            else
-                mstate_wishful &= ~mcSprint;
+                if (state.y < -0.95f)
+                    mstate_wishful |= mcSprint;
+            }
         }
         break;
     }
@@ -448,7 +453,7 @@ void CActor::IR_OnControllerPress(int cmd, float x, float y)
     } // switch (GetBindedAction(axis))}
 }
 
-void CActor::IR_OnControllerRelease(int cmd, float x, float y)
+void CActor::IR_OnControllerRelease(int cmd, const ControllerAxisState& state)
 {
     if (Remote() || !g_Alive())
         return;
@@ -458,7 +463,7 @@ void CActor::IR_OnControllerRelease(int cmd, float x, float y)
 
     if (m_holder)
     {
-        m_holder->OnControllerRelease(cmd, x, y);
+        m_holder->OnControllerRelease(cmd, state);
 
         if (m_holder->allowWeapon())
             inventory().Action((u16)cmd, CMD_STOP);
@@ -478,7 +483,7 @@ void CActor::IR_OnControllerRelease(int cmd, float x, float y)
     }
 }
 
-void CActor::IR_OnControllerHold(int cmd, float x, float y)
+void CActor::IR_OnControllerHold(int cmd, const ControllerAxisState& state)
 {
     if (cmd == kLOOK_AROUND)
     {
@@ -496,7 +501,7 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
 
     if (m_holder)
     {
-        m_holder->OnControllerHold(cmd, x, y);
+        m_holder->OnControllerHold(cmd, state);
         return;
     }
 
@@ -504,35 +509,50 @@ void CActor::IR_OnControllerHold(int cmd, float x, float y)
     {
     case kLOOK_AROUND:
     {
-        const float LookFactor = GetLookFactor();
-        float scaleX = (cam_Active()->f_fov / g_fov) * psControllerStickSensX * psControllerStickSensScale / 50.f / LookFactor;
-        float scaleY = (cam_Active()->f_fov / g_fov) * psControllerStickSensY * psControllerStickSensScale / 50.f / LookFactor;
-        OnAxisMove(x, y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
+        static float intensity = psLookIntensityMin;
+
+        const auto fov = cam_Active()->f_fov;
+        const float lookFactor = GetLookFactor();
+
+        const float scale  = Device.fTimeDeltaReal * intensity * (fov / g_fov) * psControllerStickSensScale / lookFactor;
+        const float scaleX = scale * psControllerStickSensX;
+        const float scaleY = scale * psControllerStickSensY;
+
+        if (state.magnitude > 0.99f)
+            intensity += psLookIntensityStep;
+        else if (state.magnitude > 0.1f)
+            intensity -= psLookIntensityStep;
+        else
+            intensity -= 5 * psLookIntensityStep;
+        clamp(intensity, psLookIntensityMin, psLookIntensityMax);
+
+        OnAxisMove(state.x, state.y, scaleX, scaleY, psControllerFlags.test(ControllerInvertX), psControllerFlags.test(ControllerInvertY));
         break;
     }
 
     case kMOVE_AROUND:
     {
-        if (!fis_zero(x))
+        if (state.magnitude < 0.5f)
+            mstate_wishful |= mcAccel;
+
+        if (!fis_zero(state.x))
         {
-            if (x > 35.f)
+            if (state.x > 0.3f)
                 mstate_wishful |= mcRStrafe;
-            else if (x < -35.f)
+            else if (state.x < -0.3f)
                 mstate_wishful |= mcLStrafe;
         }
-        if (!fis_zero(y))
+        if (!fis_zero(state.y))
         {
-            if (y > 35.f)
+            if (state.y > 0.3f)
                 mstate_wishful |= mcBack;
-            else if (y < -35.f)
+            else if (state.y < -0.3f)
+            {
                 mstate_wishful |= mcFwd;
 
-            if (std::abs(y) < 65.f)
-                mstate_wishful |= mcAccel;
-            else if (y < -85.f)
-                mstate_wishful |= mcSprint;
-            else
-                mstate_wishful &= ~mcSprint;
+                if (state.y < -0.95f)
+                    mstate_wishful |= mcSprint;
+            }
         }
         break;
     }

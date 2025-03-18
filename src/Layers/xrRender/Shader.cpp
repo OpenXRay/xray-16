@@ -7,6 +7,9 @@
 
 #include "Shader.h"
 #include "ResourceManager.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
 // XXX: render scripts should call these destructors before resource manager gets destroyed
 STextureList::~STextureList() { RImplementation.Resources->_DeleteTextureList(this); }
 SMatrixList::~SMatrixList() { RImplementation.Resources->_DeleteMatrixList(this); }
@@ -162,3 +165,4 @@ void STextureList::create_texture(u32 stage, pcstr textureName, bool overrideIfE
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -8,6 +8,8 @@
 #include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
@@ -219,4 +221,4 @@ SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); 
 void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------
-
+} // namespace xray::render::RENDER_NAMESPACE

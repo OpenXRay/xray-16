@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class R_sync_point
 {
     void* q_sync_point[CHWCaps::MAX_GPUS]{};
@@ -14,3 +16,4 @@ public:
     bool Wait(u32 wait_sleep, u64 timeout);
     void End();
 };
+} // namespace xray::render::RENDER_NAMESPACE

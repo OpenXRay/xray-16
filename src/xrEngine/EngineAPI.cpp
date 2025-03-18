@@ -14,28 +14,7 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-#include <array>
-
 extern xr_vector<xr_token> VidQualityToken;
-
-constexpr pcstr GET_RENDERER_MODULE_FUNC = "GetRendererModule";
-
-using GetRendererModule = RendererModule*();
-
-struct RendererDesc
-{
-    pcstr libraryName;
-    XRay::Module handle;
-    RendererModule* module;
-};
-
-RendererDesc g_render_modules[] =
-{
-#ifdef XR_PLATFORM_WINDOWS
-    { "xrRender_R4", nullptr, nullptr },
-#endif
-    { "xrRender_GL", nullptr, nullptr },
-};
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -103,7 +82,6 @@ void CEngineAPI::SelectRenderer()
         }
     }
 
-    CloseUnusedLibraries();
     R_ASSERT2(selectedRenderer, "Can't setup renderer");
 
     // Ask current renderer to setup GEnv
@@ -135,7 +113,6 @@ void CEngineAPI::Destroy()
         gameModule->finalize();
 
     selectedRenderer = nullptr;
-    CloseUnusedLibraries();
 
     pCreate = nullptr;
     pDestroy = nullptr;
@@ -143,23 +120,7 @@ void CEngineAPI::Destroy()
     XRC.r_clear_compact();
 }
 
-void CEngineAPI::CloseUnusedLibraries() const
-{
-    ZoneScoped;
-    for (auto& [_, handle, module] : g_render_modules)
-    {
-        if (!handle)
-            continue;
-        if (module == selectedRenderer)
-            continue;
-
-        module->ClearEnv();
-        module = nullptr;
-        handle = nullptr;
-    }
-}
-
-void CEngineAPI::CreateRendererList()
+void CEngineAPI::CreateRendererList(const std::span<RendererModule*>& modules)
 {
     if (!VidQualityToken.empty())
         return;
@@ -167,23 +128,11 @@ void CEngineAPI::CreateRendererList()
     ZoneScoped;
 
     std::mutex mutex;
-    const auto loadRenderer = [&](RendererDesc& desc) -> bool
+    const auto loadRenderer = [&](RendererModule* module) -> bool
     {
-        auto handle = XRay::LoadModule(desc.libraryName);
-        if (!handle->IsLoaded())
-            return false;
-
-        const auto getModule = reinterpret_cast<GetRendererModule*>(handle->GetProcAddress(GET_RENDERER_MODULE_FUNC));
-        RendererModule* module = getModule ? getModule() : nullptr;
-        if (!module)
-            return false;
-
         const auto& modes = module->ObtainSupportedModes(); // Performs HW tests, may take time
         if (modes.empty())
             return false;
-
-        desc.handle = std::move(handle);
-        desc.module = module;
 
         std::lock_guard guard{ mutex };
         for (auto [mode, modeIndex] : modes)
@@ -196,7 +145,7 @@ void CEngineAPI::CreateRendererList()
             }
             // mode string will be freed after library unloading, copy.
             shared_str copiedMode = mode;
-            renderModes[copiedMode] = desc.module;
+            renderModes[mode] = module;
             VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex);
         }
 
@@ -205,14 +154,14 @@ void CEngineAPI::CreateRendererList()
 
     if (GEnv.isDedicatedServer)
     {
-        R_ASSERT2(loadRenderer(g_render_modules[0]), "Dedicated server needs xrRender to work");
+        R_ASSERT2(loadRenderer(modules[0]), "Dedicated server needs xrRender to work");
     }
     else
     {
 #ifdef XR_PLATFORM_WINDOWS
-        xr_parallel_for_each(g_render_modules, loadRenderer);
+        xr_parallel_for_each(modules, loadRenderer);
 #else
-        std::for_each(std::begin(g_render_modules), std::end(g_render_modules), loadRenderer);
+        std::for_each(std::begin(modules), std::end(modules), loadRenderer);
 #endif
     }
 

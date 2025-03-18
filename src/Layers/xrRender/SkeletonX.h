@@ -2,21 +2,21 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef SkeletonXH
-#define SkeletonXH
 #pragma once
 
 #include "SkeletonCustom.h"
 #include "SkeletonXVertRender.h"
 #include "xrCDB/Intersect.hpp"
 
-// refs
+struct SEnumVerticesCallback;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 class CKinematics;
 class Fvisual;
 
 //.#pragma pack(push,4)
 
-struct SEnumVerticesCallback;
 class CSkeletonX
 {
 protected:
@@ -136,5 +136,4 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
     }
     return FALSE;
 }
-
-#endif // SkeletonXH
+} // namespace xray::render::RENDER_NAMESPACE

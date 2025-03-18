@@ -29,7 +29,10 @@ bool parse_bool(luabind::adl::object const& table, LPCSTR identifier);
 int parse_int(luabind::adl::object const& table, LPCSTR identifier);
 Fvector parse_fvector(luabind::adl::object const& table, LPCSTR identifier);
 bool parse_fvector(luabind::adl::object const& table, LPCSTR identifier, Fvector& output);
-}; // namespace detail
+} // namespace detail
+
+shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
+shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in);
 } // namespace smart_cover
 
 #endif // SMART_COVER_DETAIL_H_INCLUDED

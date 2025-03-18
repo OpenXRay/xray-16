@@ -2,6 +2,8 @@
 
 #include "BufferUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API _VertexStream
 {
     VertexStreamBuffer pVB;
@@ -77,3 +79,4 @@ private:
         mDiscardID = 0;
     }
 };
+} // namespace xray::render::RENDER_NAMESPACE

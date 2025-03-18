@@ -4,6 +4,8 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Rain.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //	Warning: duplicated in rain.cpp
 static const int max_desired_items = 2500;
 static const float source_radius = 12.5f;
@@ -27,7 +29,7 @@ dxRainRender::dxRainRender()
     IReader* F = FS.r_open("$game_meshes$", "dm" DELIMITER "rain.dm");
     VERIFY3(F, "Can't open file.", "dm" DELIMITER "rain.dm");
 
-    DM_Drop = ::RImplementation.model_CreateDM(F);
+    DM_Drop = RImplementation.model_CreateDM(F);
 
     //
     SH_Rain.create("effects" DELIMITER "rain", "fx" DELIMITER "fx_rain");
@@ -42,7 +44,7 @@ dxRainRender::dxRainRender()
     FS.r_close(F);
 }
 
-dxRainRender::~dxRainRender() { ::RImplementation.model_Delete(DM_Drop); }
+dxRainRender::~dxRainRender() { RImplementation.model_Delete(DM_Drop); }
 void dxRainRender::Copy(IRainRender& _in) { *this = *(dxRainRender*)&_in; }
 
 void dxRainRender::Render(CEffect_Rain& owner)
@@ -313,3 +315,4 @@ void dxRainRender::Render(CEffect_Rain& owner)
 }
 
 const Fsphere& dxRainRender::GetDropBounds() const { return DM_Drop->bv_sphere; }
+} // namespace xray::render::RENDER_NAMESPACE

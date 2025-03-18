@@ -7,6 +7,8 @@
 #include "glHW.h"
 #include "xrEngine/XR_IOConsole.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CHW HW;
 
 void CALLBACK OnDebugCallback(GLenum /*source*/, GLenum /*type*/, GLuint id, GLenum severity, GLsizei /*length*/,
@@ -72,7 +74,7 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateDevice(SDL_Window* hWnd)
 {
-    ZoneTransient(tracy_scoped_zone, true);
+    ZoneScoped;
 
     m_window = hWnd;
 
@@ -280,3 +282,4 @@ void CHW::EndPixEvent() const
     if (glPushDebugGroup)
         glPopDebugGroup();
 }
+} // namespace xray::render::RENDER_NAMESPACE

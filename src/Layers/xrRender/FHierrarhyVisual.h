@@ -2,13 +2,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef FHierrarhyVisualH
-#define FHierrarhyVisualH
 
 #pragma once
 
 #include "FBasicVisual.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class FHierrarhyVisual : public dxRender_Visual
 {
 public:
@@ -29,5 +29,4 @@ public:
         return NULL;
     }
 };
-
-#endif // FHierrarhyVisualH
+} // namespace xray::render::RENDER_NAMESPACE

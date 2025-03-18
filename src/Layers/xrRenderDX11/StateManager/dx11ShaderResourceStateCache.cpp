@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "dx11ShaderResourceStateCache.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 dx11ShaderResourceStateCache::dx11ShaderResourceStateCache() { ResetDeviceState(); }
 void dx11ShaderResourceStateCache::ResetDeviceState()
 {
@@ -208,3 +210,4 @@ void dx11ShaderResourceStateCache::SetCSResource(u32 uiSlot, ID3DShaderResourceV
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

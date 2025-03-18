@@ -2,13 +2,15 @@
 //
 //////////////////////////////////////////////////////////////////////
 #pragma once
-#ifndef FSkinnedH
-#define FSkinnedH
 
 #include "FVisual.h"
 #include "FProgressive.h"
 #include "SkeletonX.h"
+
 struct SEnumVerticesCallback;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 class CSkeletonX_ext : public CSkeletonX // shared code for SkeletonX derivates
 {
 protected:
@@ -81,5 +83,4 @@ private:
     CSkeletonX_PM(const CSkeletonX_PM& other);
     void operator=(const CSkeletonX_PM& other);
 };
-
-#endif // FSkinnedH
+} // namespace xray::render::RENDER_NAMESPACE

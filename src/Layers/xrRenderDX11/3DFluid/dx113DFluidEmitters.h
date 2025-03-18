@@ -1,7 +1,7 @@
-#ifndef dx113DFluidEmitters_included
-#define dx113DFluidEmitters_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx113DFluidGrid;
 class dx113DFluidData;
 
@@ -67,5 +67,4 @@ private:
 
     dx113DFluidGrid* m_pGrid;
 };
-
-#endif //	dx113DFluidEmitters_included
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,9 +1,9 @@
-#ifndef dxUIShader_included
-#define dxUIShader_included
 #pragma once
 
 #include "Include/xrRender/UIShader.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxUIShader : public IUIShader
 {
     friend class dxUIRender;
@@ -21,5 +21,4 @@ public:
 private:
     ref_shader hShader;
 };
-
-#endif //	dxUIShader_included
+} // namespace xray::render::RENDER_NAMESPACE

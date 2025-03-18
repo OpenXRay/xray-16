@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace phase_luminance
 {
 #pragma pack(push, 4)
@@ -249,3 +251,4 @@ void CRenderTarget::phase_luminance()
     // Cleanup states
     RCache.set_Z(true);
 }
+} // namespace xray::render::RENDER_NAMESPACE

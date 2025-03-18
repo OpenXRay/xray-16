@@ -1,10 +1,10 @@
 #pragma once
-#ifndef dxStatGraphRender_included
-#define dxStatGraphRender_included
 
 #include "Include/xrRender/StatGraphRender.h"
 #include "xrEngine/StatGraph.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxStatGraphRender : public IStatGraphRender
 {
 public:
@@ -25,5 +25,4 @@ private:
     ref_geom hGeomTri;
     ref_geom hGeomLine;
 };
-
-#endif //	dxStatGraphRender_included
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,5 +1,4 @@
-#ifndef LAYERS_XRRENDER_LIGHT_H_INCLUDED
-#define LAYERS_XRRENDER_LIGHT_H_INCLUDED
+#pragma once
 
 #include "xrCDB/ISpatial.h"
 
@@ -9,6 +8,8 @@
 #include "light_gi.h"
 #endif //(RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class light : public IRender_Light, public SpatialBase
 {
 public:
@@ -172,5 +173,4 @@ public:
     light();
     ~light() override;
 };
-
-#endif // #define LAYERS_XRRENDER_LIGHT_H_INCLUDED
+} // namespace xray::render::RENDER_NAMESPACE

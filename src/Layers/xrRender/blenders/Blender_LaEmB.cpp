@@ -12,6 +12,8 @@
 #error "The blender can't be used in this renderer generation"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_LaEmB::CBlender_LaEmB()
 {
     description.CLS = B_LaEmB;
@@ -382,3 +384,4 @@ void CBlender_LaEmB::compile_Lc(CBlender_Compile& C)
     }
     C.PassEnd();
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Light_Render_Direct.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CLight_Compute_XFORM_and_VIS::compute_xf_spot(light* L)
 {
     ZoneScoped;
@@ -99,3 +101,4 @@ void CLight_Compute_XFORM_and_VIS::compute_xf_spot(light* L)
     L->X.S.project.build_projection(L->cone + tan_shift, 1.f, L->virtual_size, L->range + EPS_S);
     L->X.S.combine.mul(L->X.S.project, L->X.S.view);
 }
+} // namespace xray::render::RENDER_NAMESPACE

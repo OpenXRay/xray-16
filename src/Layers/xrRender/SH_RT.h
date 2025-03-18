@@ -1,7 +1,7 @@
-#ifndef SH_RT_H
-#define SH_RT_H
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////////
 class CRT : public xr_resource_named
 {
@@ -94,5 +94,4 @@ struct 		resptrcode_crtc	: public resptr_base<CRTC>
 };
 typedef	resptr_core<CRTC,resptrcode_crtc>		ref_rtc;
 */
-
-#endif // SH_RT_H
+} // namespace xray::render::RENDER_NAMESPACE

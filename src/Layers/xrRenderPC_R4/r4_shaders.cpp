@@ -3,6 +3,8 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
@@ -620,3 +622,4 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     return _result;
 }
+} // namespace xray::render::RENDER_NAMESPACE

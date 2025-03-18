@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "script_value.h"
+#include "xrServerEntities/script_value.h"
 
 template <typename T>
 class CScriptValueWrapperImpl : public CScriptValue

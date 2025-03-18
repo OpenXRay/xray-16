@@ -39,8 +39,6 @@ class ENGINE_API ide final :
     public pureFrame,
     public pureAppActivate,
     public pureAppDeactivate,
-    public pureAppStart,
-    public pureAppEnd,
     public IInputReceiver
 {
     friend class ide_tool;
@@ -79,9 +77,6 @@ public:
     void OnAppActivate() override;
     void OnAppDeactivate() override;
 
-    void OnAppStart() override;
-    void OnAppEnd() override;
-
     void IR_OnActivate() override;
     void IR_OnDeactivate() override;
 
@@ -96,9 +91,9 @@ public:
     void IR_OnKeyboardHold(int key) override;
     void IR_OnTextInput(pcstr text) override;
 
-    void IR_OnControllerPress(int key, float x, float y) override;
-    void IR_OnControllerRelease(int key, float x, float y) override;
-    void IR_OnControllerHold(int key, float x, float y) override;
+    void IR_OnControllerPress(int key, const ControllerAxisState& state) override;
+    void IR_OnControllerRelease(int key, const ControllerAxisState& state) override;
+    void IR_OnControllerHold(int key, const ControllerAxisState& state) override;
 
     void IR_OnControllerAttitudeChange(Fvector change) override;
 

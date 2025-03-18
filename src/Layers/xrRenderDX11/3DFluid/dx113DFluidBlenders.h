@@ -1,7 +1,7 @@
-#ifndef dx113DFluidBlenders_included
-#define dx113DFluidBlenders_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_fluid_advect : public IBlender
 {
 public:
@@ -73,5 +73,4 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
-
-#endif //	dx113DFluidBlenders_included
+} // namespace xray::render::RENDER_NAMESPACE

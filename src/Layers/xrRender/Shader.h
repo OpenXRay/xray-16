@@ -2,8 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(SHADER__INCLUDED_)
-#define SHADER__INCLUDED_
 #pragma once
 
 #include "r_constants.h"
@@ -15,6 +13,8 @@
 #include "SH_Constant.h"
 #include "SH_RT.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 using sh_list = xr_vector<shared_str>;
 class CBlender_Compile;
 class IBlender;
@@ -170,5 +170,4 @@ enum SE_R1
 //  E[4] Can use for lightmap capturing.
 
 #pragma pack(pop)
-
-#endif // !defined(AFX_SHADER_H__9CBD70DD_E147_446B_B4EE_5DA321EB726F__INCLUDED_)
+} // namespace xray::render::RENDER_NAMESPACE

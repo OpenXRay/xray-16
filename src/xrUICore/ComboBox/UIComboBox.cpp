@@ -255,6 +255,7 @@ void CUIComboBox::ShowList(bool bShow)
         m_list_frame.Show(true);
         m_eState = LIST_EXPANDED;
         GetParent()->SetCapture(this, true);
+        UI().Focus().LockToWindow(&m_list_frame);
     }
     else
     {
@@ -262,6 +263,8 @@ void CUIComboBox::ShowList(bool bShow)
         SetHeight(m_frameLine.GetHeight());
         m_eState = LIST_FONDED;
         GetParent()->SetCapture(this, false);
+        if (UI().Focus().GetLocker() == &m_list_frame)
+            UI().Focus().Unlock();
     }
 }
 
@@ -385,26 +388,26 @@ bool CUIComboBox::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUIComboBox::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUIComboBox::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
-    if (CUIWindow::OnControllerAction(axis, x, y, controller_action))
+    if (CUIWindow::OnControllerAction(axis, state, controller_action))
         return true;
 
     if (CursorOverWindow())
     {
         if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
         {
-            if (!fis_zero(x))
+            if (std::abs(state.x) > 0.5f && std::abs(state.y) < 0.2f)
             {
                 if (!m_list_frame.IsShown())
-                    SetNextItemSelected(x > 0, false);
+                    SetNextItemSelected(state.x > 0, false);
                 return true;
             }
-            if (!fis_zero(y))
+            if (std::abs(state.y) > 0.5f && std::abs(state.x) < 0.2f)
             {
                 if (m_list_frame.IsShown())
                 {
-                    SetNextItemSelected(y > 0, false);
+                    SetNextItemSelected(state.y > 0, false);
                     if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
                         UI().Focus().SetFocused(itm);
                     return true;

@@ -103,6 +103,7 @@ public:
     static void SetUserConfigHandler(IUserConfigHandler* handler) { userConfigHandler = handler; }
     static OutOfMemoryCallbackFunc GetOutOfMemoryCallback() { return OutOfMemoryCallback; }
     static void SetOutOfMemoryCallback(OutOfMemoryCallbackFunc cb) { OutOfMemoryCallback = cb; }
+    static bool WouldShowErrorMessage() { return ShowErrorMessage; }
     static pcstr ErrorToString(long code);
     static void SetBugReportFile(const char* fileName);
     static void GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLocation& loc, const char* expr,

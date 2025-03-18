@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "dxHashHelper.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 bool dxHashHelper::m_bTableReady = false;
 u32 dxHashHelper::m_CrcTable[256]; // Lookup table array
 
@@ -79,3 +81,4 @@ void dxHashHelper::Crc32Init()
 // Exclusive OR the result with the beginning value.
 // return ulCRC ^ 0xffffffff;
 //}
+} // namespace xray::render::RENDER_NAMESPACE

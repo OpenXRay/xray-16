@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #if 0 // kept for historical reasons
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_flip()
 {
     PIX_EVENT(phase_flip);
@@ -39,4 +41,5 @@ void CRenderTarget::phase_flip()
     // Switch to framebuffer
     RCache.set_FB(HW.pFB);
 }
+} // namespace xray::render::RENDER_NAMESPACE
 #endif

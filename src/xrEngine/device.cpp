@@ -414,9 +414,6 @@ void CRenderDevice::Run()
         Timer_MM_Delta = time_system - time_local;
     }
 
-    // Pre start
-    seqAppStart.Process();
-
     SDL_HideWindow(m_sdlWnd); // workaround for SDL bug
     UpdateWindowProps();
     SDL_ShowWindow(m_sdlWnd);

@@ -1,5 +1,3 @@
-#ifndef FBasicVisualH
-#define FBasicVisualH
 #pragma once
 
 #include "xrEngine/vis_common.h"
@@ -8,10 +6,13 @@
 
 #define VLOAD_NOVERTICES (1 << 0)
 
+class IParticleCustom;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 // The class itself
 class CKinematicsAnimated;
 class CKinematics;
-class IParticleCustom;
 
 struct IRender_Mesh
 {
@@ -81,5 +82,4 @@ public:
     dxRender_Visual();
     virtual ~dxRender_Visual();
 };
-
-#endif // !FBasicVisualH
+} // namespace xray::render::RENDER_NAMESPACE

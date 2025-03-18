@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #if RENDER == R_R2
 class CBlender_SSAO : public IBlender
 {
@@ -41,4 +43,5 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
+} // namespace xray::render::RENDER_NAMESPACE
 #endif

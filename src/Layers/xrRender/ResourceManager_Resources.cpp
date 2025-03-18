@@ -2,6 +2,8 @@
 
 #include <FlexibleVertexFormat.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr fn);
 
 void simplify_texture(string_path& fn)
@@ -194,7 +196,7 @@ SGeometry* CResourceManager::CreateGeom(const VertexElement* decl, VertexBufferH
 SGeometry* CResourceManager::CreateGeom(u32 FVF, VertexBufferHandle vb, IndexBufferHandle ib)
 {
     thread_local xr_vector<VertexElement> decl;
-    [[maybe_unused]] const bool result = FVF::CreateDeclFromFVF(FVF, decl);
+    [[maybe_unused]] const bool result = ::FVF::CreateDeclFromFVF(FVF, decl);
     VERIFY(result);
     SGeometry* g = CreateGeom(decl.data(), vb, ib);
     return g;
@@ -464,3 +466,4 @@ void CResourceManager::_DeleteConstantList(const SConstantList* L)
     Msg("! ERROR: Failed to find compiled list of r1-constant-defs");
 }
 
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+namespace xray::render::RENDER_NAMESPACE
+{
 extern IC u32 GetIndexCount(D3DPRIMITIVETYPE T, u32 iPrimitiveCount);
 
 void CBackend::InitializeDebugDraw()
@@ -265,3 +267,4 @@ void CBackend::dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
 {
     VERIFY(!"Not implemented");
 }
+} // namespace xray::render::RENDER_NAMESPACE

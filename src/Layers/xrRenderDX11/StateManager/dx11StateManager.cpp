@@ -3,6 +3,8 @@
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
 #include "dx11StateCache.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //  DX11: TODO: Implement alpha referense control
 
 dx11StateManager::dx11StateManager(CBackend& cmd_list_in)
@@ -443,3 +445,4 @@ void dx11StateManager::OverrideScissoring(bool bOverride, BOOL bValue)
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

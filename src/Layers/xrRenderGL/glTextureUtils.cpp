@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "glTextureUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace glTextureUtils
 {
 struct TextureFormatPairs
@@ -108,4 +110,5 @@ GLenum ConvertTextureFormat(D3DFORMAT dx9FMT)
     VERIFY(!"ConvertTextureFormat didn't find appropriate gl texture format!");
     return GL_NONE;
 }
-}
+} // namespace glTextureUtils
+} // namespace xray::render::RENDER_NAMESPACE

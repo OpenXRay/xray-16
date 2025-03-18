@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 constexpr u32 occq_size_base = 768; // // queue for occlusion queries
 constexpr u32 occq_size = 2 * occq_size_base * R__NUM_PARALLEL_CONTEXTS; // // queue for occlusion queries
 
@@ -30,7 +32,7 @@ private:
 
     static constexpr u32 iInvalidHandle = 0xFFFFFFFF;
 
-    bool enabled;
+    bool enabled{ true };
     xr_vector<Query> pool; // sorted (max ... min), insertions are usually at the end
     xr_vector<Query> used; // id's are generated from this and it is cleared from back only
     xr_vector<u32> fids; // free id's
@@ -45,7 +47,6 @@ public:
 #   error No graphics API selected or enabled!
 #endif
 public:
-    R_occlusion();
     ~R_occlusion();
 
     void occq_create(u32 limit);
@@ -54,3 +55,4 @@ public:
     void occq_end(u32& ID);
     occq_result occq_get(u32& ID);
 };
+} // namespace xray::render::RENDER_NAMESPACE

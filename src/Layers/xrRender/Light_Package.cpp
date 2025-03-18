@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Light_Package.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void light_Package::clear()
 {
     v_point.clear();
@@ -35,3 +37,4 @@ void light_Package::sort()
     std::stable_sort(v_shadowed.begin(), v_shadowed.end(), pred_light_cmp);
 }
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
+} // namespace xray::render::RENDER_NAMESPACE

@@ -37,16 +37,6 @@ ide::ide() = default;
 
 ide::~ide() = default;
 
-void ide::OnAppStart()
-{
-    Device.seqFrame.Add(this, -5);
-}
-
-void ide::OnAppEnd()
-{
-    Device.seqFrame.Remove(this);
-}
-
 void ide::OnFrame()
 {
     ZoneScoped;

@@ -1,9 +1,9 @@
-#ifndef r_backend_hemiH
-#define r_backend_hemiH
 #pragma once
 
 #include "Include/xrRender/RenderVisual.h" //--#SM+#--
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API R_hemi
 {
 public:
@@ -29,4 +29,4 @@ public:
 
     CBackend& cmd_list;
 };
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

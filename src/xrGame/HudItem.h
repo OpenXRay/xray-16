@@ -184,6 +184,6 @@ public:
 
     virtual CHudItem* cast_hud_item() { return this; }
     void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation
-    bool isHUDAnimationExist(pcstr anim_name) const;
-    pcstr WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2) const;
+    bool isHUDAnimationExist(pcstr anim_name, bool silent = false) const;
+    pcstr WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2, bool silent = false) const;
 };

@@ -2,6 +2,8 @@
 #include "xrCore/FMesh.hpp"
 #include "FLOD.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace flod
 {
 struct _hw
@@ -117,3 +119,4 @@ void FLOD::Render(CBackend& cmd_list, float /*LOD*/, bool use_fast_geo)
     RCache.Render			(D3DPT_TRIANGLEFAN,vOffset,2);
     */
 }
+} // namespace xray::render::RENDER_NAMESPACE

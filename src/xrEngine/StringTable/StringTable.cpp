@@ -16,6 +16,7 @@ CStringTable& StringTable()
 xr_unique_ptr<STRING_TABLE_DATA> CStringTable::pData{};
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 u32 CStringTable::LanguageID = std::numeric_limits<u32>::max();
+string32 CStringTable::LanguageIDInLTX{};
 xr_vector<xr_token> CStringTable::languagesToken;
 
 void CStringTable::Destroy()
@@ -135,7 +136,10 @@ void CStringTable::SetLanguage()
     cpcstr defined_language = pSettings->r_string("string_table", "language");
     cpcstr defined_prefix   = pSettings->r_string("string_table", "font_prefix");
 
-    if (LanguageID != std::numeric_limits<u32>::max())
+    // Before introducing a console command to change the language,
+    // mods used to change localization.ltx. We detect that
+    // by saving the last value in LanguageIDInLTX
+    if (LanguageID != std::numeric_limits<u32>::max() && xr_strcmp(LanguageIDInLTX, defined_language) == 0)
     {
         pData->m_sLanguage = languagesToken.at(LanguageID).name;
 
@@ -175,6 +179,7 @@ void CStringTable::SetLanguage()
         if (it != languagesToken.end())
             LanguageID = it->id;
     }
+    xr_strcpy(LanguageIDInLTX, defined_language);
 }
 
 shared_str CStringTable::GetCurrentLanguage() const

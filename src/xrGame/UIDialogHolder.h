@@ -75,9 +75,9 @@ public:
     virtual bool IR_UIOnKeyboardHold(int dik);
     virtual bool IR_UIOnTextInput(pcstr text);
 
-    virtual bool IR_UIOnControllerPress(int dik, float x, float y);
-    virtual bool IR_UIOnControllerRelease(int dik, float x, float y);
-    virtual bool IR_UIOnControllerHold(int dik, float x, float y);
+    virtual bool IR_UIOnControllerPress(int dik, const ControllerAxisState& state);
+    virtual bool IR_UIOnControllerRelease(int dik, const ControllerAxisState& state);
+    virtual bool IR_UIOnControllerHold(int dik, const ControllerAxisState& state);
 
     void MarkForemost(bool foremost) { m_is_foremost = foremost; }
 

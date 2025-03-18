@@ -737,6 +737,8 @@
     <Natvis Include="..\OpenXRay.natvis" />
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\BugTrap.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\dbghelp.dll" />
     <CopyFileToFolders Condition="'$(Platform)'=='Win32'" Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3.dll" />
     <CopyFileToFolders Condition="'$(Platform)'=='x64'" Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3-x64.dll" />
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\libcrypto-3-x64.dll" />

@@ -3,6 +3,8 @@
 
 #include <DirectXTex.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr fn)
 {
     pstr _ext = strext(fn);
@@ -204,3 +206,4 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     FS.r_close(S);
     return pTexture2D;
 }
+} // namespace xray::render::RENDER_NAMESPACE

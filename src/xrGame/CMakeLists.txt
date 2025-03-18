@@ -2429,6 +2429,9 @@ target_sources(xrGame PRIVATE
     ../xrServerEntities/script_ini_file.h
     ../xrServerEntities/script_ini_file_script.cpp
     ../xrServerEntities/script_net_packet_script.cpp
+    ../xrServerEntities/script_properties_list_helper.cpp
+    ../xrServerEntities/script_properties_list_helper.h
+    ../xrServerEntities/script_properties_list_helper_script.cpp
     ../xrServerEntities/script_reader_script.cpp
     ../xrServerEntities/script_rtoken_list.h
     ../xrServerEntities/script_rtoken_list_inline.h
@@ -2437,8 +2440,12 @@ target_sources(xrGame PRIVATE
     ../xrServerEntities/script_token_list.cpp
     ../xrServerEntities/script_token_list.h
     ../xrServerEntities/script_token_list_script.cpp
+    ../xrServerEntities/script_value.h
+    ../xrServerEntities/script_value_inline.h
     ../xrServerEntities/script_value_container.h
     ../xrServerEntities/script_value_container_impl.h
+    ../xrServerEntities/script_value_wrapper.h
+    ../xrServerEntities/script_value_wrapper_inline.h
     ../xrServerEntities/ShapeData.h
     ../xrServerEntities/shared_data.h
     ../xrServerEntities/smart_cast.cpp

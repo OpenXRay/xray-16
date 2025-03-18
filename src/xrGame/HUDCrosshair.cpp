@@ -31,10 +31,7 @@ void CHUDCrosshair::SetDispersion(float disp)
     Fvector R = {VIEWPORT_NEAR * _sin(disp), 0.f, VIEWPORT_NEAR};
     Device.mProject.transform(r, R);
 
-    auto& cmd_list_imm = GEnv.Render->get_imm_command_list();
-
-    Fvector2 scr_size;
-    scr_size.set(float(GEnv.Render->getTarget()->get_width(cmd_list_imm)), float(GEnv.Render->getTarget()->get_height(cmd_list_imm)));
+    Fvector2 scr_size{ float(Device.dwWidth), float(Device.dwHeight) };
     float radius_pixels = _abs(r.x) * scr_size.x / 2.0f;
     target_radius = radius_pixels;
 }
@@ -46,10 +43,7 @@ void CHUDCrosshair::SetFirstBulletDispertion(float fbdisp)
     Fvector R = {VIEWPORT_NEAR * _sin(fbdisp), 0.f, VIEWPORT_NEAR};
     Device.mProject.transform(r, R);
 
-    auto& cmd_list = GEnv.Render->get_imm_command_list();
-
-    Fvector2 scr_size;
-    scr_size.set(float(GEnv.Render->getTarget()->get_width(cmd_list)), float(GEnv.Render->getTarget()->get_height(cmd_list)));
+    Fvector2 scr_size{ float(Device.dwWidth), float(Device.dwHeight) };
     fb_radius = _abs(r.x) * scr_size.x / 2.0f;
 }
 
@@ -59,12 +53,8 @@ void CHUDCrosshair::OnRenderFirstBulletDispertion()
 {
     VERIFY(g_bRendering);
 
-    auto& cmd_list = GEnv.Render->get_imm_command_list();
-
-    Fvector2 center;
-    Fvector2 scr_size;
-    scr_size.set(float(GEnv.Render->getTarget()->get_width(cmd_list)), float(GEnv.Render->getTarget()->get_height(cmd_list)));
-    center.set(scr_size.x / 2.0f, scr_size.y / 2.0f);
+    Fvector2 scr_size{ float(Device.dwWidth), float(Device.dwHeight) };
+    Fvector2 center{ scr_size.x / 2.0f, scr_size.y / 2.0f };
 
     GEnv.UIRender->StartPrimitive(10, IUIRender::ptLineList, UI().m_currentPointType);
 
@@ -110,12 +100,8 @@ void CHUDCrosshair::OnRender()
 {
     VERIFY(g_bRendering);
 
-    auto& cmd_list = GEnv.Render->get_imm_command_list();
-
-    Fvector2 center;
-    Fvector2 scr_size;
-    scr_size.set(float(GEnv.Render->getTarget()->get_width(cmd_list)), float(GEnv.Render->getTarget()->get_height(cmd_list)));
-    center.set(scr_size.x / 2.0f, scr_size.y / 2.0f);
+    Fvector2 scr_size{ float(Device.dwWidth), float(Device.dwHeight) };
+    Fvector2 center{ scr_size.x / 2.0f, scr_size.y / 2.0f };
 
     GEnv.UIRender->StartPrimitive(10, IUIRender::ptLineList, UI().m_currentPointType);
 

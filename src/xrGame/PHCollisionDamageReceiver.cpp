@@ -49,7 +49,7 @@ void CPHCollisionDamageReceiver::CollisionHit(u16 source_id, u16 bone_id, float 
     SHit HS;
 
     HS.GenHeader(GE_HIT, ph->ID()); //	ph->u_EventGen(P,GE_HIT,ph->ID());
-    HS.whoID = ph->ID(); //	P.w_u16		(ph->ID());
+    HS.whoID = source_id; //	P.w_u16		(ph->ID());
     HS.weaponID = source_id; //	P.w_u16		(source_id);
     HS.dir = dir; //	P.w_dir		(dir);
     HS.power = power; //	P.w_float	(power);

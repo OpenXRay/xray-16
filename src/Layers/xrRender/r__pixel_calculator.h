@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 struct r_aabb_ssa
 {
     u8 ssa[6];
@@ -17,3 +19,4 @@ public:
 
     void run();
 };
+} // namespace xray::render::RENDER_NAMESPACE

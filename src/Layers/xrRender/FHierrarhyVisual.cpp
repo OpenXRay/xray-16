@@ -11,6 +11,8 @@
 #include "Include/xrAPI/xrAPI.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -100,3 +102,4 @@ void FHierrarhyVisual::Copy(dxRender_Visual* pSrc)
     }
     bDontDelete = FALSE;
 }
+} // namespace xray::render::RENDER_NAMESPACE

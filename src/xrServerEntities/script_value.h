@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "script_space.h"
-
 class CSE_Abstract;
 
 class CScriptValue

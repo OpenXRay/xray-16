@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Layers/xrRender/light.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void light::gi_generate()
 {
     ZoneScoped;
@@ -80,3 +82,4 @@ void light::gi_generate()
             light.E *= scale_E;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -11,6 +11,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 float psOSSR = .001f;
 
 //////////////////////////////////////////////////////////////////////
@@ -480,3 +482,4 @@ void CHOM::OnRender()
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,7 +1,10 @@
 #pragma once
+
 //------------------------------------------------------------------------------
 // calculate
 //------------------------------------------------------------------------------
+namespace xray::render::RENDER_NAMESPACE
+{
 IC void KEY_Interp(CKey& D, const CKey& K1, const CKey& K2, float delta)
 {
     VERIFY(_valid(delta));
@@ -421,3 +424,4 @@ IC void MixChannels(CKey& Result, const CKey* R, const animation::channel_def* B
     VERIFY(_valid(Result.T));
     VERIFY(_valid(Result.Q));
 }
+} // namespace xray::render::RENDER_NAMESPACE

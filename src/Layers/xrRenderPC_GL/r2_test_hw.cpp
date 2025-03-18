@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class sdl_window_test_helper
 {
     SDL_Window* m_window{};
@@ -34,7 +36,7 @@ public:
 
 BOOL xrRender_test_hw()
 {
-    ZoneTransient(tracy_scoped_zone, true);
+    ZoneScoped;
 
     // Check if minimal required OpenGL features are available
     const sdl_window_test_helper windowTest;
@@ -43,3 +45,4 @@ BOOL xrRender_test_hw()
 
     return FALSE;
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,6 +1,4 @@
-//---------------------------------------------------------------------------
-#ifndef SkeletonAnimatedH
-#define SkeletonAnimatedH
+#pragma once
 
 #include "SkeletonCustom.h"
 #include "Animation.h"
@@ -8,6 +6,8 @@
 
 #include "Include/xrRender/KinematicsAnimated.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //*** Bone Instance *******************************************************************************
 #pragma pack(push, 8)
 class CBlendInstance // Bone Instance Blend List (per-bone data)
@@ -220,10 +220,10 @@ public:
 
     virtual float get_animation_length(MotionID motion_ID);
 };
+
 // IC CKinematicsAnimated* PKinematicsAnimated(IRender_Visual* V) { return V?V->dcast_PKinematicsAnimated():0; }
 IC CKinematicsAnimated* PKinematicsAnimated(IRenderVisual* V)
 {
     return V ? (CKinematicsAnimated*)V->dcast_PKinematicsAnimated() : 0;
 }
-//---------------------------------------------------------------------------
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

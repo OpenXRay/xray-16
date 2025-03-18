@@ -3,10 +3,6 @@
 
 #include "PHNetState.h"
 
-// XXX: This file is include into xrSE_Factory and xrPhysics.
-// Previously it was included into xrGame too.
-#pragma TODO("This file should be included only into one project. Currently it isn't.")
-
 //////////////////////////////////////8/////////////////////////////////////////////////////
 
 static void w_vec_q8(NET_Packet& P, const Fvector& vec, const Fvector& min, const Fvector& max)

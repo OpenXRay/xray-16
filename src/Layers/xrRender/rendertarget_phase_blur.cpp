@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_blur()
 {
     //Get common data
@@ -147,3 +149,4 @@ void CRenderTarget::phase_blur()
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 ///////////////////////////////////////////////////////////////////////////////////
 };
+} // namespace xray::render::RENDER_NAMESPACE

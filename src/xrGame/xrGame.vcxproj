@@ -71,12 +71,17 @@
     <ClInclude Include="..\xrServerEntities\restriction_space.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file_inline.h" />
+    <ClInclude Include="..\xrServerEntities\script_properties_list_helper.h" />
     <ClInclude Include="..\xrServerEntities\script_rtoken_list.h" />
     <ClInclude Include="..\xrServerEntities\script_rtoken_list_inline.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list_inline.h" />
+    <ClInclude Include="..\xrServerEntities\script_value.h" />
     <ClInclude Include="..\xrServerEntities\script_value_container.h" />
     <ClInclude Include="..\xrServerEntities\script_value_container_impl.h" />
+    <ClInclude Include="..\xrServerEntities\script_value_inline.h" />
+    <ClInclude Include="..\xrServerEntities\script_value_wrapper.h" />
+    <ClInclude Include="..\xrServerEntities\script_value_wrapper_inline.h" />
     <ClInclude Include="..\xrServerEntities\ShapeData.h" />
     <ClInclude Include="..\xrServerEntities\shared_data.h" />
     <ClInclude Include="..\xrServerEntities\smart_cast.h" />
@@ -1449,6 +1454,11 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_net_packet_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\xrServerEntities\script_properties_list_helper.cpp" />
+    <ClCompile Include="..\xrServerEntities\script_properties_list_helper_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>

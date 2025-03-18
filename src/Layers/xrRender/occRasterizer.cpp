@@ -9,6 +9,8 @@
 #include "xrRender_console.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 occRasterizer Raster;
 
 static void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
@@ -219,3 +221,4 @@ BOOL occRasterizer::test(float _x0, float _y0, float _x1, float _y1, float _z)
     return FALSE;
     */
 }
+} // namespace xray::render::RENDER_NAMESPACE

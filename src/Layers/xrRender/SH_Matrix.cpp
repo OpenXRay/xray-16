@@ -2,6 +2,8 @@
 
 #include "SH_Matrix.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CMatrix::Calculate()
 {
     if (dwFrame == Device.dwFrame)
@@ -100,3 +102,4 @@ void CMatrix::Save(IWriter* fs)
     fs->w(&scrollU, sizeof(WaveForm));
     fs->w(&scrollV, sizeof(WaveForm));
 }
+} // namespace xray::render::RENDER_NAMESPACE

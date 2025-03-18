@@ -1,10 +1,10 @@
-#ifndef dx11State_included
-#define dx11State_included
 #pragma once
 
-class SimulatorStates;
-
 #include "dx11SamplerStateCache.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
+class SimulatorStates;
 
 class dx11State
 {
@@ -48,5 +48,4 @@ private:
     //	Private data
 private:
 };
-
-#endif //	dx11State_included
+} // namespace xray::render::RENDER_NAMESPACE

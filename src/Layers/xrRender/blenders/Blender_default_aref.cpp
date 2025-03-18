@@ -3,7 +3,8 @@
 
 #include "Blender_default_aref.h"
 
-
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_default_aref::CBlender_default_aref()
 {
     description.CLS = B_DEFAULT_AREF;
@@ -257,3 +258,4 @@ void CBlender_default_aref::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -10,6 +10,8 @@
 
 #include "Blender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CBlender_DESC::Setup(LPCSTR N)
 {
     // Name
@@ -86,10 +88,11 @@ void IBlender::Compile(CBlender_Compile& C)
 
 IBlender* IBlender::Create(CLASS_ID cls)
 {
-    return ::RImplementation.blender_create(cls);
+    return RImplementation.blender_create(cls);
 }
 
 void IBlender::Destroy(IBlender*& B)
 {
-    ::RImplementation.blender_destroy(B);
+    RImplementation.blender_destroy(B);
 }
+} // namespace xray::render::RENDER_NAMESPACE

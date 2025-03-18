@@ -1,9 +1,9 @@
-#ifndef dxWallMarkArray_included
-#define dxWallMarkArray_included
 #pragma once
 
 #include "Include/xrRender/WallMarkArray.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxWallMarkArray : public IWallMarkArray
 {
 public:
@@ -22,5 +22,4 @@ private:
 
     ShaderVec m_CollideMarks;
 };
-
-#endif //	WallMarkArray_included
+} // namespace xray::render::RENDER_NAMESPACE

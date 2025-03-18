@@ -1,6 +1,7 @@
-#ifndef dx11MSAABlender_included
-#define dx11MSAABlender_included
+#pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_msaa : public IBlender
 {
 public:
@@ -9,5 +10,4 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
-
-#endif //	dx11RainBlender_included
+} // namespace xray::render::RENDER_NAMESPACE

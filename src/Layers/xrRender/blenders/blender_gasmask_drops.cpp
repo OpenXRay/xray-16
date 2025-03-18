@@ -2,6 +2,8 @@
 
 #include "blender_gasmask_drops.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_gasmask_drops::CBlender_gasmask_drops()
 {
     description.CLS = B_BLUR;
@@ -24,3 +26,4 @@ void CBlender_gasmask_drops::Compile(CBlender_Compile& C)
     C.r_dx11Sampler("smp_rtlinear");
     C.r_End();
 }
+} // namespace xray::render::RENDER_NAMESPACE

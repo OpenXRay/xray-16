@@ -5,6 +5,8 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr fn);
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite,
@@ -221,3 +223,4 @@ void CBlender_Compile::r_End()
     dest.M = nullptr;
     SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
 }
+} // namespace xray::render::RENDER_NAMESPACE

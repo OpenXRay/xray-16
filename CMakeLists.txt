@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.23)
 
 message(STATUS "CMAKE_VERSION: ${CMAKE_VERSION}")
 
@@ -20,7 +20,7 @@ project(OpenXRay
 
 message(STATUS "CMAKE_PROJECT_VERSION: ${CMAKE_PROJECT_VERSION}")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(CMAKE_VERBOSE_MAKEFILE "Verbose build output" OFF)
@@ -171,6 +171,9 @@ if (USE_ADDRESS_SANITIZER)
 
     add_link_options(
         $<$<CXX_COMPILER_ID:Clang>:-shared-libasan>
+        -fsanitize=address
+        -fsanitize=leak
+        -fsanitize=undefined
     )
 endif()
 

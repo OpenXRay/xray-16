@@ -7,11 +7,24 @@
 #include "xrCore/xrstring.h"
 #endif
 
+namespace xray::render
+{
+namespace render_r4
+{
+class dxFontRender;
+}
+namespace render_gl
+{
+class dxFontRender;
+}
+} // namespace xray::render
+
 class IFontRender;
 
 class ENGINE_API CGameFont : public IGameFont
 {
-    friend class dxFontRender;
+    friend class xray::render::render_r4::dxFontRender;
+    friend class xray::render::render_gl::dxFontRender;
 
 private:
     struct String

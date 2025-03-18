@@ -2,6 +2,8 @@
 #include "dx11SamplerStateCache.h"
 #include "Layers/xrRenderDX11/dx11StateUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 using dx11StateUtils::operator==;
 
 dx11SamplerStateCache SSManager;
@@ -192,3 +194,4 @@ void dx11SamplerStateCache::SetMipLODBias(float uiMipLODBias)
         CreateState(desc, &rec.m_pState);
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

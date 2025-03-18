@@ -93,7 +93,6 @@ public:
     MessageRegistry<pureRender> seqRender;
     MessageRegistry<pureAppActivate> seqAppActivate;
     MessageRegistry<pureAppDeactivate> seqAppDeactivate;
-    MessageRegistry<pureAppStart> seqAppStart;
     MessageRegistry<pureAppEnd> seqAppEnd;
     MessageRegistry<pureFrame> seqFrame;
     MessageRegistry<pureFrame> seqFrameMT;

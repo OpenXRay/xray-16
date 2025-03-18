@@ -3,6 +3,8 @@
 #include "light.h"
 #include "Light_Package.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CLight_DB
 {
 private:
@@ -28,3 +30,4 @@ public:
     CLight_DB();
     ~CLight_DB();
 };
+} // namespace xray::render::RENDER_NAMESPACE

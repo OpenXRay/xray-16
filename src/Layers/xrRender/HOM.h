@@ -6,6 +6,8 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Render.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class occTri;
 
 class CHOM
@@ -66,3 +68,4 @@ public:
     virtual void OnRender();
 #endif
 };
+} // namespace xray::render::RENDER_NAMESPACE

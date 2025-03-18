@@ -4,12 +4,18 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrMaterialSystem/GameMtlLib.h"
 
+#ifdef DEBUG
+#include "dxDebugRender.h"
+#endif
+
 #ifdef _EDITOR
 #include "scene.h"
 #include "sceneobject.h"
 #include "utils/ETools/ETools.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //--------------------------------------------------- Decompression
 IC float Interpolate(float* base, u32 x, u32 y, u32 size)
 {
@@ -42,10 +48,7 @@ IC bool InterpolateAndDither(float* alpha255, u32 x, u32 y, u32 sx, u32 sy, u32 
     return c > dither[col][row];
 }
 
-#ifndef _EDITOR
 #ifdef DEBUG
-
-#include "dxDebugRender.h"
 static void draw_obb(const Fmatrix& matrix, const u32& color)
 {
     Fvector aabb[8];
@@ -65,7 +68,6 @@ static void draw_obb(const Fmatrix& matrix, const u32& color)
 }
 
 bool det_render_debug = false;
-#endif
 #endif
 
 //#define		DBG_SWITCHOFF_RANDOMIZE
@@ -299,3 +301,4 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
     D.vis.box.set(Bounds);
     D.vis.box.getsphere(D.vis.sphere.P, D.vis.sphere.R);
 }
+} // namespace xray::render::RENDER_NAMESPACE

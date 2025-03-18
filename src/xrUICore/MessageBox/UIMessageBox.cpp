@@ -410,8 +410,18 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     inherited::SendMessage(pWnd, msg, pData);
 }
 
-void CUIMessageBox::SetText(LPCSTR str) { m_UIStaticText->SetTextST(str); }
-LPCSTR CUIMessageBox::GetText() const { return m_UIStaticText->GetText(); }
+void CUIMessageBox::SetText(LPCSTR str)
+{
+    R_ASSERT1_CURE(m_UIStaticText, return);
+    m_UIStaticText->SetTextST(str);
+}
+
+LPCSTR CUIMessageBox::GetText() const
+{
+    R_ASSERT1_CURE(m_UIStaticText, return "");
+    return m_UIStaticText->GetText();
+}
+
 LPCSTR CUIMessageBox::GetHost()
 {
     if (m_UIEditHost)

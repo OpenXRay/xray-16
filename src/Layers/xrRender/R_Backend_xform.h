@@ -1,7 +1,7 @@
-#ifndef r_backend_xformH
-#define r_backend_xformH
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API R_xforms
 {
 public:
@@ -46,4 +46,4 @@ private:
 
     CBackend& cmd_list;
 };
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

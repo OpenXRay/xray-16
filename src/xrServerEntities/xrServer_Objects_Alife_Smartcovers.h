@@ -45,7 +45,7 @@ public:
     luabind::object m_available_loopholes;
 #endif // #ifndef AI_COMPILER
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
 private:
     typedef xr_vector<visual_data> visuals_collection;
 
@@ -57,7 +57,7 @@ public:
 
 private:
     mutable visuals_collection m_visuals;
-#endif // #ifdef XRSE_FACTORY_EXPORTS
+#endif // !MASTER_GOLD
 
 public:
     CSE_SmartCover(LPCSTR caSection);
@@ -73,12 +73,12 @@ public:
     void set_available_loopholes(luabind::object table);
 #endif // #ifndef AI_COMPILER
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     virtual void on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
     virtual visual_data* visual_collection() const { return &*m_visuals.begin(); }
     virtual u32 visual_collection_size() const { return m_visuals.size(); }
-#endif // #ifdef XRSE_FACTORY_EXPORTS
+#endif // !MASTER_GOLD
 
 private:
     void check_enterable_loopholes(shared_str const& description);

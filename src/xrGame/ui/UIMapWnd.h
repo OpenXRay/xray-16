@@ -144,7 +144,7 @@ public:
     void Hint(const shared_str& text);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
-    bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action) override;
+    bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action) override;
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 

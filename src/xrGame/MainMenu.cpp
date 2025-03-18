@@ -89,7 +89,6 @@ CMainMenu::CMainMenu()
     m_Flags.zero();
     m_startDialog = NULL;
     m_screenshotFrame = u32(-1);
-    g_pGamePersistent->m_pMainMenu = this;
     if (Device.b_is_Ready)
         OnDeviceCreate();
     g_btnHint = NULL;
@@ -148,8 +147,6 @@ CMainMenu::~CMainMenu()
     xr_delete(g_statHint);
 
     xr_delete(m_startDialog);
-
-    g_pGamePersistent->m_pMainMenu = nullptr;
 
     xr_delete(m_account_mngr);
     xr_delete(m_login_mngr);
@@ -428,7 +425,7 @@ void CMainMenu::IR_OnMouseWheel(float x, float y)
     CDialogHolder::IR_UIOnMouseWheel(x, y);
 }
 
-void CMainMenu::IR_OnControllerPress(int dik, float x, float y)
+void CMainMenu::IR_OnControllerPress(int dik, const ControllerAxisState& state)
 {
     if (!IsActive())
         return;
@@ -438,10 +435,10 @@ void CMainMenu::IR_OnControllerPress(int dik, float x, float y)
         IR_OnKeyboardPress(dik);
         return;
     }
-    CDialogHolder::IR_UIOnControllerPress(dik, x, y);
+    CDialogHolder::IR_UIOnControllerPress(dik, state);
 }
 
-void CMainMenu::IR_OnControllerRelease(int dik, float x, float y)
+void CMainMenu::IR_OnControllerRelease(int dik, const ControllerAxisState& state)
 {
     if (!IsActive())
         return;
@@ -451,10 +448,10 @@ void CMainMenu::IR_OnControllerRelease(int dik, float x, float y)
         IR_OnKeyboardRelease(dik);
         return;
     }
-    CDialogHolder::IR_UIOnControllerRelease(dik, x, y);
+    CDialogHolder::IR_UIOnControllerRelease(dik, state);
 }
 
-void CMainMenu::IR_OnControllerHold(int dik, float x, float y)
+void CMainMenu::IR_OnControllerHold(int dik, const ControllerAxisState& state)
 {
     if (!IsActive())
         return;
@@ -464,7 +461,7 @@ void CMainMenu::IR_OnControllerHold(int dik, float x, float y)
         IR_OnKeyboardHold(dik);
         return;
     }
-    CDialogHolder::IR_UIOnControllerHold(dik, x, y);
+    CDialogHolder::IR_UIOnControllerHold(dik, state);
 }
 
 bool CMainMenu::OnRenderPPUI_query() { return IsActive() && !m_Flags.test(flGameSaveScreenshot) && b_shniaganeed_pp; }

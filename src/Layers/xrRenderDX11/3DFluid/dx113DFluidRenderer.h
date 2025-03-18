@@ -1,7 +1,7 @@
-#ifndef dx113DFluidRenderer_included
-#define dx113DFluidRenderer_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx113DFluidData;
 
 class dx113DFluidRenderer
@@ -107,5 +107,4 @@ private:
     //	TODO: DX11: Reserve memory on object creation
     xr_vector<ISpatial*> m_lstRenderables;
 };
-
-#endif //	dx113DFluidRenderer_included
+} // namespace xray::render::RENDER_NAMESPACE

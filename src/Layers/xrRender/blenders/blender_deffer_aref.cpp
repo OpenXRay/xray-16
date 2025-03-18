@@ -4,6 +4,8 @@
 #include "Layers/xrRender/blenders/uber_deffer.h"
 #include "blender_deffer_aref.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_deffer_aref::CBlender_deffer_aref(bool _lmapped) : lmapped(_lmapped)
 {
     description.CLS = B_DEFAULT_AREF;
@@ -294,3 +296,4 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -4,6 +4,8 @@
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace detail_manager
 {
 extern const int quant;
@@ -263,3 +265,4 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         iOffset += hw_BatchSize * Object.number_indices;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

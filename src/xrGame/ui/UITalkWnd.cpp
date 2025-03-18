@@ -404,21 +404,21 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
+bool CUITalkWnd::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
 {
-    if (inherited::OnControllerAction(axis, x, y, controller_action))
+    if (inherited::OnControllerAction(axis, state, controller_action))
         return true;
 
     if (controller_action == WINDOW_KEY_PRESSED || controller_action == WINDOW_KEY_HOLD)
     {
         if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
         {
-            UITalkDialogWnd->FocusOnNextQuestion(y > 0, controller_action != WINDOW_KEY_HOLD);
+            UITalkDialogWnd->FocusOnNextQuestion(state.y > 0, controller_action != WINDOW_KEY_HOLD);
             return true;
         }
         if (IsBinded(kTALK_LOG_SCROLL, axis, EKeyContext::Talk))
         {
-            UITalkDialogWnd->TryScrollAnswersList(y > 0);
+            UITalkDialogWnd->TryScrollAnswersList(state.y > 0);
             return true;
         }
     }

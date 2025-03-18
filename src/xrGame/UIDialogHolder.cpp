@@ -475,7 +475,7 @@ bool CDialogHolder::IR_UIOnMouseMove(int dx, int dy)
 
     if (GetUICursor().IsVisible())
     {
-        GetUICursor().UpdateCursorPosition(dx, dy);
+        GetUICursor().UpdateCursorPosition({ (float)dx, (float)dy });
         Fvector2 cPos = GetUICursor().GetCursorPosition();
         TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
     }
@@ -493,7 +493,7 @@ bool CDialogHolder::IR_UIOnMouseMove(int dx, int dy)
     return true;
 }
 
-bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
+bool CDialogHolder::IR_UIOnControllerPress(int dik, const ControllerAxisState& state)
 {
     if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
     {
@@ -506,7 +506,7 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
     if (!TIR->IR_process())
         return false;
 
-    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_PRESSED))
+    if (TIR->OnControllerAction(dik, state, WINDOW_KEY_PRESSED))
         return true;
 
     // simulate mouse click
@@ -521,10 +521,7 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
         case kUI_MOVE_SECONDARY:
         {
             if (TIR->StopAnyMove())
-            {
-                // XXX: emulate mouse move
                 return true;
-            }
             break;
         }
         case kUI_CLICK_1:
@@ -549,14 +546,14 @@ bool CDialogHolder::IR_UIOnControllerPress(int dik, float x, float y)
         {
             IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
             if (IR)
-                IR->IR_OnControllerPress(dik, x, y);
+                IR->IR_OnControllerPress(dik, state);
             return false;
         }
     };
     return true;
 }
 
-bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
+bool CDialogHolder::IR_UIOnControllerRelease(int dik, const ControllerAxisState& state)
 {
     if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
     {
@@ -569,7 +566,7 @@ bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
     if (!TIR->IR_process())
         return false;
 
-    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_RELEASED))
+    if (TIR->OnControllerAction(dik, state, WINDOW_KEY_RELEASED))
         return true;
 
     // simulate mouse click
@@ -609,14 +606,14 @@ bool CDialogHolder::IR_UIOnControllerRelease(int dik, float x, float y)
         {
             IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
             if (IR)
-                IR->IR_OnControllerRelease(dik, x, y);
+                IR->IR_OnControllerRelease(dik, state);
             return false;
         }
     };
     return true;
 }
 
-bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
+bool CDialogHolder::IR_UIOnControllerHold(int dik, const ControllerAxisState& state)
 {
     if (dik > XR_CONTROLLER_BUTTON_INVALID && dik < XR_CONTROLLER_BUTTON_MAX)
     {
@@ -629,7 +626,7 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
     if (!TIR->IR_process())
         return false;
 
-    if (TIR->OnControllerAction(dik, x, y, WINDOW_KEY_HOLD))
+    if (TIR->OnControllerAction(dik, state, WINDOW_KEY_HOLD))
         return true;
 
     if (GetUICursor().IsVisible())
@@ -638,29 +635,32 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
         {
         case kUI_MOVE:
         {
+            if (state.magnitude < 0.9f)
+                return true;
+
             FocusDirection direction;
 
-            if (fis_zero(y))
+            if (fis_zero(state.y))
             {
-                if (x < 0)
+                if (state.x < 0)
                     direction = FocusDirection::Left;
                 else
                     direction = FocusDirection::Right;
             }
-            else if (y < 0)
+            else if (state.y < 0)
             {
-                if (fis_zero(x))
+                if (fis_zero(state.x))
                     direction = FocusDirection::Up;
-                else if (x < 0)
+                else if (state.x < 0)
                     direction = FocusDirection::UpperLeft;
                 else
                     direction = FocusDirection::UpperRight;
             }
             else
             {
-                if (fis_zero(x)) // same x
+                if (fis_zero(state.x)) // same x
                     direction = FocusDirection::Down;
-                else if (x < 0)
+                else if (state.x < 0)
                     direction = FocusDirection::LowerLeft;
                 else
                     direction = FocusDirection::LowerRight;
@@ -681,21 +681,37 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
         {
             if (TIR->StopAnyMove())
             {
-                // XXX: emulate mouse move
+                static float intensity = psCursorIntensityMin;
+
+                if (state.magnitude > 0.1f)
+                {
+                    if (state.magnitude > 0.99f)
+                        intensity += psCursorIntensityStep;
+                    else
+                        intensity -= psCursorIntensityStep;
+
+                    clamp(intensity, psCursorIntensityMin, psCursorIntensityMax);
+                }
+                else
+                {
+                    intensity = psCursorIntensityMin;
+                }
+
+                const float scale = Device.fTimeDeltaReal * intensity * psControllerStickSensScale * 100.f;
+
+                Fvector2 newPos = state.xy;
+                newPos.mul(scale);
+                GetUICursor().UpdateCursorPosition(newPos);
+
+                Fvector2 cPos = GetUICursor().GetCursorPosition();
+                TIR->OnMouseAction(cPos.x, cPos.y, WINDOW_MOUSE_MOVE);
                 return true;
             }
             break;
         }
         case kUI_CLICK_1:
-        {
-            Fvector2 cp = GetUICursor().GetCursorPosition();
-            TIR->OnMouseAction(cp.x, cp.y, WINDOW_LBUTTON_UP);
-            return true;
-        }
         case kUI_CLICK_2:
         {
-            Fvector2 cp = GetUICursor().GetCursorPosition();
-            TIR->OnMouseAction(cp.x, cp.y, WINDOW_RBUTTON_UP);
             return true;
         }
         } // switch (GetBindedAction(dik, EKeyContext::UI))
@@ -708,7 +724,7 @@ bool CDialogHolder::IR_UIOnControllerHold(int dik, float x, float y)
         {
             IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(O));
             if (IR)
-                IR->IR_OnControllerHold(dik, x, y);
+                IR->IR_OnControllerHold(dik, state);
             return false;
         }
     };

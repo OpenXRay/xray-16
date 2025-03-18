@@ -10,6 +10,8 @@
 #include "xrEngine/Environment.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 extern float r_ssaLOD_A;
 extern float r_ssaLOD_B;
 
@@ -153,3 +155,4 @@ void R_dsgraph_structure::render_lods(bool _setup_zb, bool _clear)
     if (_clear)
         mapLOD.clear();
 }
+} // namespace xray::render::RENDER_NAMESPACE

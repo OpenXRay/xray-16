@@ -15,6 +15,8 @@
 #include "Layers/xrRender/blenders/Blender_Model_EbB.h"
 #include "Layers/xrRender/blenders/Blender_Lm(EbB).h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 IBlender* CRender::blender_create(CLASS_ID cls)
 {
     switch (cls)
@@ -49,3 +51,4 @@ void CRender::blender_destroy(IBlender*& B)
 {
     xr_delete(B);
 }
+} // namespace xray::render::RENDER_NAMESPACE

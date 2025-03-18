@@ -1,9 +1,9 @@
-#ifndef dx11R_Backend_Runtime_included
-#define dx11R_Backend_Runtime_included
 #pragma once
 
 #include "StateManager/dx11ShaderResourceStateCache.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 IC void CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
     stat.xforms++;
@@ -857,5 +857,4 @@ IC void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref
     const D3D_VIEWPORT viewport = { 0, 0, curr_rt_width, curr_rt_height, 0.f, 1.f };
     SetViewport(viewport);
 }
-
-#endif //   dx11R_Backend_Runtime_included
+} // namespace xray::render::RENDER_NAMESPACE

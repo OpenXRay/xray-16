@@ -1,7 +1,12 @@
-#ifndef xrRender_consoleH
-#define xrRender_consoleH
 #pragma once
 
+extern ENGINE_API int ps_r__Supersample;
+extern ENGINE_API float ps_r3_dyn_wet_surf_near; // 10.0f
+extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
+extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256
+
+namespace xray::render::RENDER_NAMESPACE
+{
 // Common
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
 extern ECORE_API const xr_token qsun_shafts_token[];
@@ -37,7 +42,6 @@ extern ECORE_API const xr_token qmsaa__atest_token[];
 extern ECORE_API u32 ps_r3_minmax_sm; //	=	0;
 extern ECORE_API const xr_token qminmax_sm_token[];
 
-extern ENGINE_API int ps_r__Supersample;
 extern ECORE_API int ps_r__LightSleepFrames;
 
 extern ECORE_API float ps_r__Detail_l_ambient;
@@ -131,6 +135,7 @@ extern ECORE_API float ps_r2_ls_depth_bias; // -0.0001f
 extern ECORE_API float ps_r2_ls_squality; // 1.0f
 extern ECORE_API float ps_r2_sun_near; // 10.0f
 extern ECORE_API float ps_r2_sun_near_border; // 1.0f
+extern ECORE_API float ps_r2_sun_far;
 extern ECORE_API float ps_r2_sun_tsm_projection; // 0.2f
 extern ECORE_API float ps_r2_sun_tsm_bias; // 0.0001f
 extern ECORE_API float ps_r2_sun_depth_far_scale; // 1.00001f
@@ -154,10 +159,6 @@ extern ECORE_API int ps_r2_wait_timeout;
 extern ECORE_API Fvector3 ps_r2_dof;
 extern ECORE_API float ps_r2_dof_sky; //	distance to sky
 extern ECORE_API float ps_r2_dof_kernel_size; //	7.0f
-
-extern ENGINE_API float ps_r3_dyn_wet_surf_near; // 10.0f
-extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
-extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 enum
 {
@@ -225,5 +226,4 @@ enum
 
 extern void xrRender_initconsole();
 extern BOOL xrRender_test_hw();
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

@@ -2,6 +2,8 @@
 #include "xrCDB/Intersect.hpp"
 #include "Layers/xrRender/du_cone.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // extern Fvector du_cone_vertices			[DU_CONE_NUMVERTEX];
 
 bool tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fvector& v2)
@@ -177,3 +179,4 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     }
 }
 */
+} // namespace xray::render::RENDER_NAMESPACE

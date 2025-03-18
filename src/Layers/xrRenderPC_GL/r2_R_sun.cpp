@@ -12,9 +12,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/matrix_access.hpp"
 
-// float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
-float OLES_SUN_LIMIT_27_01_07 = 100.f;
-
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////////
 // XXX: examine
 #define DW_AS_FLT(DW) (*(float*)&(DW))
@@ -336,7 +335,7 @@ void render_sun_old::render_sun() const
     // calculate view-frustum bounds in world space
     glm::mat4 ex_full, ex_project, ex_full_inverse;
     {
-        float _far_ = std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv.far_plane);
+        float _far_ = std::min(ps_r2_sun_far, g_pGamePersistent->Environment().CurrentEnv.far_plane);
         ex_project = glm::perspective(deg2rad(Device.fFOV), Device.fASPECT, VIEWPORT_NEAR, _far_);
         ex_full = ex_project * glm::make_mat4x4(&Device.mView.m[0][0]);
         ex_full_inverse = glm::inverse(ex_full);
@@ -1003,3 +1002,4 @@ void render_sun_old::render_sun_filtered() const
     PIX_EVENT(SE_SUN_LUMINANCE);
     RImplementation.Target->accum_direct(RCache, SE_SUN_LUMINANCE);
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -217,15 +217,15 @@ void CHolderEntityObject::OnKeyboardHold(int dik)
 {
 }
 
-void CHolderEntityObject::OnControllerPress(int cmd, float x, float y)
+void CHolderEntityObject::OnControllerPress(int cmd, const ControllerAxisState& state)
 {
 }
 
-void CHolderEntityObject::OnControllerRelease(int cmd, float x, float y)
+void CHolderEntityObject::OnControllerRelease(int cmd, const ControllerAxisState& state)
 {
 }
 
-void CHolderEntityObject::OnControllerHold(int cmd, float x, float y)
+void CHolderEntityObject::OnControllerHold(int cmd, const ControllerAxisState& state)
 {
 }
 

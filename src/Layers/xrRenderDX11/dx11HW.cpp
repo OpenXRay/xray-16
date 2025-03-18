@@ -7,6 +7,8 @@
 
 #include <SDL_syswm.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CHW HW;
 
 CHW::CHW()
@@ -51,7 +53,7 @@ void CHW::OnAppDeactivate()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
-    ZoneTransient(tracy_scoped_zone, true);
+    ZoneScoped;
 
     hDXGI = XRay::LoadModule("dxgi");
     hD3D = XRay::LoadModule("d3d11");
@@ -92,7 +94,7 @@ void CHW::DestroyD3D()
 
 void CHW::CreateDevice(SDL_Window* sdlWnd)
 {
-    ZoneTransient(tracy_scoped_zone, true);
+    ZoneScoped;
 
     CreateD3D();
     if (!Valid)
@@ -148,7 +150,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
-        ZoneTransientN(tracy_scoped_zone_2, "CreateDevice", true);
+        ZoneScopedN("CreateDevice");
 
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
         return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
@@ -223,7 +225,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     {
         TaskScheduler->AddTask([this]
         {
-            ZoneTransientN(tracy_scoped_zone_2, "TracyD3D11Context", true);
+            ZoneScopedN("TracyD3D11Context");
             profiler_ctx = TracyD3D11Context(pDevice, get_context(CHW::IMM_CTX_ID));
         });
     }
@@ -231,7 +233,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
     // Create deferred contexts
     if (ThisInstanceIsGlobal())
     {
-        ZoneTransientN(tracy_scoped_zone_2, "Create deferred contexts", true);
+        ZoneScopedN("Create deferred contexts");
         for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
         {
             R = pDevice->CreateDeferredContext(0, &d3d_contexts_pool[id]);
@@ -282,7 +284,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
 bool CHW::CreateSwapChain(HWND hwnd)
 {
-    ZoneTransient(tracy_scoped_zone, true);
+    ZoneScoped;
 
     // Set up the presentation parameters
     DXGI_SWAP_CHAIN_DESC& sd = m_ChainDesc;
@@ -338,7 +340,7 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     if (strstr(Core.Params, "-no_dx11_2"))
         return false;
 
-    ZoneTransient(tracy_scoped_zone, true);
+    ZoneScoped;
 
 #ifdef HAS_DX11_2
     IDXGIFactory2* pFactory2{};
@@ -564,3 +566,4 @@ DeviceState CHW::GetDeviceState()
 
     return DeviceState::Normal;
 }
+} // namespace xray::render::RENDER_NAMESPACE

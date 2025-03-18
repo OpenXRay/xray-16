@@ -3,6 +3,8 @@
 #include "Layers/xrRender/du_cone.h"
 #include "Layers/xrRender/du_sphere.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::draw_volume(CBackend& cmd_list, light* L)
 {
     switch (L->flags.type)
@@ -24,3 +26,4 @@ void CRenderTarget::draw_volume(CBackend& cmd_list, light* L)
         break;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

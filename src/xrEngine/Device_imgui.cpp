@@ -54,7 +54,7 @@ void CRenderDevice::InitializeImGui()
 
     platform_io.Platform_GetClipboardTextFn = [](ImGuiContext* ctx) -> const char*
     {
-        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(ctx);
+        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO(ctx);
         auto clipboard_text_data = static_cast<char*>(platform_io.Platform_ClipboardUserData);
 
         if (clipboard_text_data)
@@ -244,7 +244,7 @@ void CRenderDevice::DestroyImGui()
     xr_free(io.IniFilename);
     xr_free(io.LogFilename);
 
-    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIOEx(m_imgui_context);
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO(m_imgui_context);
 
     if (platform_io.Platform_ClipboardUserData)
     {

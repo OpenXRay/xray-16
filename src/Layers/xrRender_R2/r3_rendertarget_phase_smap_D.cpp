@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_smap_direct(CBackend& cmd_list, light *L, u32 sub_phase)
 {
     if (sub_phase == SE_SUN_RAIN_SMAP)
@@ -32,3 +34,4 @@ void CRenderTarget::phase_smap_direct_tsh(CBackend& cmd_list, light *L, u32 sub_
     RImplementation.rmNormal(cmd_list);
     cmd_list.ClearRT(cmd_list.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
 }
+} // namespace xray::render::RENDER_NAMESPACE

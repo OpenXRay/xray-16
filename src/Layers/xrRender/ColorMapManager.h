@@ -1,11 +1,10 @@
 #pragma once
-#ifndef ColorMapManager_included
-#define ColorMapManager_included
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //	Reduces amount of work if the texture was not changed.
 //	Stores used textures in a separate map to avoid removal of
 //	of color map textures from memory.
-
 class ColorMapManager
 {
 public:
@@ -28,5 +27,4 @@ private:
 
     map_Tex m_TexCache;
 };
-
-#endif //	ColorMapManager_included
+} // namespace xray::render::RENDER_NAMESPACE

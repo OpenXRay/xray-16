@@ -6,6 +6,8 @@
 #include "utils/xrLC_Light/R_light.h"
 #include "Light_DB.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CLight_DB::CLight_DB() : sun(nullptr) {}
 CLight_DB::~CLight_DB() {}
 void CLight_DB::Load(IReader* fs)
@@ -222,3 +224,4 @@ void CLight_DB::Update()
     // Clear selection
     package.clear();
 }
+} // namespace xray::render::RENDER_NAMESPACE

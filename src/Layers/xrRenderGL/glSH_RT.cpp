@@ -4,6 +4,8 @@
 #include "../xrRender/ResourceManager.h"
 #include "glTextureUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CRT::~CRT()
 {
     destroy();
@@ -104,3 +106,4 @@ void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCo
 {
     _set(RImplementation.Resources->_CreateRT(Name, w, h, f, SampleCount, 1, flags));
 }
+} // namespace xray::render::RENDER_NAMESPACE

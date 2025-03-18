@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "VertexCache.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 VertexCache::VertexCache() : VertexCache(16) {}
 VertexCache::VertexCache(int size) { entries.assign(size, -1); }
 VertexCache::~VertexCache() { entries.clear(); }
@@ -19,3 +21,4 @@ void VertexCache::Copy(VertexCache* inVcache)
         inVcache->Set(i, entries[i]);
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

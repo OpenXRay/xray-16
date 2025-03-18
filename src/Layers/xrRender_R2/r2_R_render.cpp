@@ -8,6 +8,8 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::RenderMenu()
 {
 #if defined(USE_DX11)
@@ -408,3 +410,4 @@ void CRender::BeforeWorldRender() {}
 
 // После рендера мира и пост-эффектов --#SM+#--
 void CRender::AfterWorldRender() {}
+} // namespace xray::render::RENDER_NAMESPACE

@@ -5,6 +5,8 @@
 //****************************************************************************
 #pragma once
 
+#include <span>
+
 #include "xrEngine/Engine.h"
 #include "xrCore/clsid.h"
 
@@ -66,7 +68,6 @@ class ENGINE_API CEngineAPI
     RendererModule* selectedRenderer{};
 
     void SelectRenderer();
-    void CloseUnusedLibraries() const;
 
 public:
     Factory_Create*  pCreate;
@@ -76,7 +77,7 @@ public:
     CEngineAPI();
     ~CEngineAPI();
 
-    void CreateRendererList();
+    void CreateRendererList(const std::span<RendererModule*>& modules);
     void Initialize(GameModule* game);
     void Destroy();
 };

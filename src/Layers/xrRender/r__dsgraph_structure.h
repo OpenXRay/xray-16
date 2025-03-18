@@ -2,6 +2,8 @@
 
 #include "r__sector.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // feedback	for receiving visuals
 class R_feedback
 {
@@ -191,3 +193,4 @@ struct R_dsgraph_structure
 
     void build_subspace();
 };
+} // namespace xray::render::RENDER_NAMESPACE

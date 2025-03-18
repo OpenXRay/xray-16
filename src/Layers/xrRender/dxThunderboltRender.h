@@ -1,9 +1,9 @@
-#ifndef dxThunderboltRender_included
-#define dxThunderboltRender_included
 #pragma once
 
 #include "Include/xrRender/ThunderboltRender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxThunderboltRender : public IThunderboltRender
 {
 public:
@@ -18,5 +18,4 @@ private:
     ref_geom hGeom_model;
     ref_geom hGeom_gradient;
 };
-
-#endif //	ThunderboltRender_included
+} // namespace xray::render::RENDER_NAMESPACE

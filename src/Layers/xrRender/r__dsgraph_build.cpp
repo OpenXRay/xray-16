@@ -12,6 +12,8 @@
 #include "ParticleGroup.h"
 #include "FTreeVisual.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 using namespace R_dsgraph;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -956,3 +958,4 @@ void R_dsgraph_structure::build_subspace()
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

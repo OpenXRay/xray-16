@@ -1,6 +1,7 @@
-#ifndef R_BACKEND_LOD_H_INCLUDED
-#define R_BACKEND_LOD_H_INCLUDED
+#pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class R_LOD
 {
 public:
@@ -15,5 +16,4 @@ public:
 
     CBackend& cmd_list;
 };
-
-#endif // #ifndef R_BACKEND_LOD_H_INCLUDED
+} // namespace xray::render::RENDER_NAMESPACE

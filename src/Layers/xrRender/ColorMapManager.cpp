@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "ColorMapManager.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 ColorMapManager::ColorMapManager()
 {
     m_CMap[0] = RImplementation.Resources->_CreateTexture("$user$cmap0");
@@ -67,3 +69,4 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 #endif
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

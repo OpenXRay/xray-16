@@ -2,6 +2,8 @@
 
 #include "KinematicAnimatedDefs.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace animation
 {
 enum mix_type
@@ -47,3 +49,4 @@ public:
     }
 };
 };
+} // namespace xray::render::RENDER_NAMESPACE

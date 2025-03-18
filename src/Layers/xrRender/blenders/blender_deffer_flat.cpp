@@ -4,6 +4,8 @@
 #include "Layers/xrRender/blenders/uber_deffer.h"
 #include "blender_deffer_flat.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_deffer_flat::CBlender_deffer_flat()
 {
     description.CLS = B_DEFAULT;
@@ -130,3 +132,4 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

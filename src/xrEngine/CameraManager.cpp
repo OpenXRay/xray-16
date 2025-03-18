@@ -338,44 +338,19 @@ void CCameraManager::ApplyDevice()
     {
         pp_affected.validate("apply device");
         // postprocess
-        IRender_Target* T = GEnv.Render->getTarget();
-        T->set_duality_h(pp_affected.duality.h);
-        T->set_duality_v(pp_affected.duality.v);
-        T->set_blur(pp_affected.blur);
-        T->set_gray(pp_affected.gray);
-        T->set_noise(pp_affected.noise.intensity);
-
         clamp(pp_affected.noise.grain, EPS_L, 1000.0f);
-
-        T->set_noise_scale(pp_affected.noise.grain);
-
-        T->set_noise_fps(pp_affected.noise.fps);
-        T->set_color_base(pp_affected.color_base);
-        T->set_color_gray(pp_affected.color_gray);
-        T->set_color_add(pp_affected.color_add);
-
-        T->set_cm_imfluence(pp_affected.cm_influence);
-        T->set_cm_interpolate(pp_affected.cm_interpolate);
-        T->set_cm_textures(pp_affected.cm_tex1, pp_affected.cm_tex2);
+        GEnv.Render->SetPostProcessParams(pp_affected);
     }
 }
 
 void CCameraManager::ResetPP()
 {
-    IRender_Target* T = GEnv.Render->getTarget();
-    T->set_duality_h(pp_identity.duality.h);
-    T->set_duality_v(pp_identity.duality.v);
-    T->set_blur(pp_identity.blur);
-    T->set_gray(pp_identity.gray);
-    T->set_noise(pp_identity.noise.intensity);
-    T->set_noise_scale(pp_identity.noise.grain);
-    T->set_noise_fps(pp_identity.noise.fps);
-    T->set_color_base(pp_identity.color_base);
-    T->set_color_gray(pp_identity.color_gray);
-    T->set_color_add(pp_identity.color_add);
-    T->set_cm_imfluence(0.0f);
-    T->set_cm_interpolate(1.0f);
-    T->set_cm_textures("", "");
+    SPPInfo params = pp_identity;
+    params.cm_influence = 0.0f;
+    params.cm_interpolate = 1.0f;
+    params.cm_tex1 = "";
+    params.cm_tex2 = "";
+    GEnv.Render->SetPostProcessParams(params);
 }
 
 void CCameraManager::Dump()

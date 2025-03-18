@@ -12,6 +12,8 @@
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::level_Load(IReader* fs)
 {
     ZoneScoped;
@@ -514,3 +516,4 @@ void CRender::Load3DFluid()
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

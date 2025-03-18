@@ -23,6 +23,8 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CRenderTarget;
 class dxRender_Visual;
 
@@ -439,7 +441,6 @@ public:
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
     IRenderVisual* getVisual(int id) override;
-    IRender_Target* getTarget() override;
 
     // Main
     void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) override; // add visual leaf	(no culling performed at all)
@@ -496,15 +497,17 @@ public:
     void BeforeWorldRender() override; //--#SM+#-- +SecondVP+ Procedure is called before world render and post-effects
     void AfterWorldRender() override;  //--#SM+#-- +SecondVP+ Procedure is called after world render and before UI
 
+    void SetPostProcessParams(const SPPInfo& ppi) override;
+
 #ifdef USE_OGL
     RenderContext GetCurrentContext() const override;
     void MakeContextCurrent(RenderContext context) override;
 #endif
 
     // Render mode
-    void rmNear(CBackend& cmd_list) override;
-    void rmFar(CBackend& cmd_list) override;
-    void rmNormal(CBackend& cmd_list) override;
+    void rmNear(CBackend& cmd_list);
+    void rmFar(CBackend& cmd_list);
+    void rmNormal(CBackend& cmd_list);
 
     // Constructor/destructor/loader
     CRender();
@@ -526,3 +529,4 @@ private:
 };
 
 extern CRender RImplementation;
+} // namespace xray::render::RENDER_NAMESPACE

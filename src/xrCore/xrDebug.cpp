@@ -31,7 +31,7 @@
 
 #   define USE_BUG_TRAP
 #   ifdef USE_BUG_TRAP
-#       include <BugTrap/source/Client/BugTrap.h>
+#       include "BugTrap.h"
 #   endif
 
 #   include "Debug/dxerr.h"
@@ -59,10 +59,6 @@
 #           define PTRACE_DETACH PT_DETACH
 #       endif
 #   endif
-#endif
-
-#ifdef DEBUG
-#   define USE_OWN_ERROR_MESSAGE_WINDOW
 #endif
 
 constexpr SDL_MessageBoxButtonData buttons[] =
@@ -111,7 +107,7 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
     {
         SDL_MESSAGEBOX_ERROR,
         windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
-        title, message, SDL_arraysize(buttons), buttons
+        title, message, SDL_arraysize(buttons), buttons, nullptr
     };
 
     int button = -1;
@@ -342,6 +338,43 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(u16 maxFramesCount)
     currentThreadCtx.ContextFlags = CONTEXT_FULL;
 
     return BuildStackTrace(&currentThreadCtx, maxFramesCount);
+#elif defined(BACKTRACE_AVAILABLE)
+    xr_vector<xr_string> result;
+
+    void** array = reinterpret_cast<void**>(xr_alloca(sizeof(void*) * maxFramesCount));
+    int nptrs = backtrace(array, maxFramesCount); // get void*'s for all entries on the stack
+    char** strings = backtrace_symbols(array, nptrs);
+
+    if (strings)
+    {
+        size_t demangledBufSize = 0;
+        char* demangledName = nullptr;
+        for (int i = 1; i < nptrs; i++) // skip this function
+        {
+            char* functionName = strings[i];
+
+#   ifdef CXXABI_AVAILABLE
+            Dl_info info;
+
+            if (dladdr(array[i], &info))
+            {
+                if (info.dli_sname)
+                {
+                    int status = -1;
+                    demangledName = abi::__cxa_demangle(info.dli_sname, demangledName, &demangledBufSize, &status);
+                    if (status == 0)
+                    {
+                        functionName = demangledName;
+                    }
+                }
+            }
+#   endif
+            result.emplace_back(functionName);
+        }
+        ::free(demangledName);
+    }
+
+    return result;
 #else
 #pragma todo("Implement stack trace for Linux")
     return {"Implement stack trace for Linux"};
@@ -407,56 +440,17 @@ void xrDebug::GatherInfo(char* assertionInfo, size_t bufferSize, const ErrorLoca
     if (DebuggerIsPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert"))
         return;
 #endif
+
     Log("stack trace:\n");
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "stack trace:\n\n");
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
-#if defined(XR_PLATFORM_WINDOWS)
+
     xr_vector<xr_string> stackTrace = BuildStackTrace();
     for (size_t i = 2; i < stackTrace.size(); i++)
     {
         Log(stackTrace[i].c_str());
-#ifdef USE_OWN_ERROR_MESSAGE_WINDOW
         buffer += xr_sprintf(buffer, oneAboveBuffer - buffer, "%s\n", stackTrace[i].c_str());
-#endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-#elif defined(BACKTRACE_AVAILABLE)
-    void* array[20];
-    int nptrs = backtrace(array, 20); // get void*'s for all entries on the stack
-    char** strings = backtrace_symbols(array, nptrs);
 
-    if (strings)
-    {
-        size_t demangledBufSize = 0;
-        char* demangledName = nullptr;
-        for (int i = 0; i < nptrs; i++)
-        {
-            char* functionName = strings[i];
-
-#   ifdef CXXABI_AVAILABLE
-            Dl_info info;
-
-            if (dladdr(array[i], &info))
-            {
-                if (info.dli_sname)
-                {
-                    int status = -1;
-                    demangledName = abi::__cxa_demangle(info.dli_sname, demangledName, &demangledBufSize, &status);
-                    if (status == 0)
-                    {
-                        functionName = demangledName;
-                    }
-                }
-            }
-#   endif
-            Log(functionName);
-#   ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-            buffer += xr_sprintf(buffer, bufferSize, "%s\n", functionName);
-#   endif // USE_OWN_ERROR_MESSAGE_WINDOW
-        }
-        ::free(demangledName);
-    }
-#endif
     FlushLog();
     os_clipboard::copy_to_clipboard(assertionInfo);
 }

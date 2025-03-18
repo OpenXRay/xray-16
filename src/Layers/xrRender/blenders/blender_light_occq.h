@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_light_occq : public IBlender
 {
 public:
@@ -11,3 +13,4 @@ public:
     CBlender_light_occq();
     virtual ~CBlender_light_occq();
 };
+} // namespace xray::render::RENDER_NAMESPACE

@@ -77,9 +77,9 @@ bool UITaskListWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 
 void UITaskListWnd::OnMouseScroll(float iDirection)
 {
-    if (iDirection == WINDOW_MOUSE_WHEEL_UP)
+    if (int(iDirection) == WINDOW_MOUSE_WHEEL_UP)
         m_list->ScrollBar()->TryScrollDec();
-    else if (iDirection == WINDOW_MOUSE_WHEEL_DOWN)
+    else if (int(iDirection) == WINDOW_MOUSE_WHEEL_DOWN)
         m_list->ScrollBar()->TryScrollInc();
 }
 
