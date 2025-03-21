@@ -20,10 +20,10 @@ public:
     static constexpr cpcstr ARGUMENT_PROFILER_HOOK = "-lua_hook_profiler";
     static constexpr cpcstr ARGUMENT_PROFILER_SAMPLING = "-lua_sampling_profiler";
 
-    static const CScriptProfilerType PROFILE_TYPE_DEFAULT = CScriptProfilerType::Hook;
-    static const u32 PROFILE_ENTRIES_LOG_LIMIT_DEFAULT = 128;
-    static const u32 PROFILE_SAMPLING_INTERVAL_DEFAULT = 10;
-    static const u32 PROFILE_SAMPLING_INTERVAL_MAX = 1000;
+    static constexpr CScriptProfilerType PROFILE_TYPE_DEFAULT = CScriptProfilerType::Hook;
+    static constexpr u32 PROFILE_ENTRIES_LOG_LIMIT_DEFAULT = 128;
+    static constexpr u32 PROFILE_SAMPLING_INTERVAL_DEFAULT = 10;
+    static constexpr u32 PROFILE_SAMPLING_INTERVAL_MAX = 1000;
 
 private:
     CScriptEngine* m_engine;
