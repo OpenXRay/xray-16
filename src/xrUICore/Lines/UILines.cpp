@@ -445,8 +445,8 @@ float CUILines::GetVIndentByAlign()
 // %c[color_name]
 u32 CUILines::GetColorFromText(const xr_string& str) const
 {
-    StrSize begin = str.find(BEGIN);
-    const StrSize end = str.find(_END, begin);
+    auto begin = str.find(BEGIN);
+    const auto end = str.find(_END, begin);
 
     // Check if there even is a valid color tag
     if (begin == npos || end == npos || end - begin < 3)
@@ -461,13 +461,13 @@ u32 CUILines::GetColorFromText(const xr_string& str) const
 
     // Try predefined XML colors
     const auto* color_defs = CUIXmlInitBase::GetColorDefs();
-    if (color_defs->contains(color_tag.c_str()))
+    if (color_defs->find(color_tag.c_str()) != color_defs->end())
         return color_defs->at(color_tag.c_str());
 
     // Try parse values separated by commas
-    const StrSize comma1_pos = str.find(',', begin);
-    const StrSize comma2_pos = str.find(',', comma1_pos + 1);
-    const StrSize comma3_pos = str.find(',', comma2_pos + 1);
+    const auto comma1_pos = str.find(',', begin);
+    const auto comma2_pos = str.find(',', comma1_pos + 1);
+    const auto comma3_pos = str.find(',', comma2_pos + 1);
     if (comma1_pos == npos || comma2_pos == npos || comma3_pos == npos)
         return m_dwTextColor;
 
