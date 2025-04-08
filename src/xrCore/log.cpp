@@ -231,13 +231,13 @@ void CreateLog(bool nl)
     if (no_log)
         return;
 
-	if (!unique_logs)
-	{
-		// Alun: Backup existing log
+    if (!unique_logs)
+    {
+        // Alun: Backup existing log
         const xr_string backup_logFName = EFS.ChangeFileExt(log_file_name, ".bkp");
         FS.file_rename(log_file_name, backup_logFName.c_str(), true);
-		//-Alun
-	}
+        //-Alun
+    }
 
     if (const auto w = FS.w_open(log_file_name))
     {
