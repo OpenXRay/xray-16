@@ -137,7 +137,7 @@ jobs:
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
-      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-soft-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
