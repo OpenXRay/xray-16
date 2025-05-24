@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "Event.hpp"
 
 Event::Event(std::nullptr_t) noexcept { handle = nullptr; }
@@ -13,10 +14,11 @@ bool Event::Wait(u32 millisecondsTimeout) noexcept
 {
     return WaitForSingleObject(handle, millisecondsTimeout) != WAIT_TIMEOUT;
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)  // XXX: maybe optimize the implementation or even replace with std or SDL
+#elif defined(XR_PLATFORM_POSIX) // XXX: maybe optimize the implementation or even replace with std or SDL
 #include <pthread.h>
 Event::Event() noexcept
 {
+    handle = nullptr;
     m_id.signaled = false;
     pthread_mutex_init(&m_id.mutex, nullptr);
     pthread_cond_init(&m_id.cond, nullptr);

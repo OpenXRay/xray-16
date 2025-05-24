@@ -21,7 +21,7 @@
 #if defined(XR_PLATFORM_WINDOWS)
 #include "AccessibilityShortcuts.hpp"
 #include "Text_Console.h"
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#else
 #define CTextConsole CConsole
 #pragma todo("Implement text console or it's alternative")
 #endif

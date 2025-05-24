@@ -2,7 +2,9 @@
 #include <cstring>
 #include <stdlib.h> // for malloc
 #include <unistd.h> // for rmdir
+#ifndef __HAIKU__
 #include <sys/fcntl.h>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>

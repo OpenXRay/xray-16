@@ -11,6 +11,10 @@
 #elif defined(XR_PLATFORM_BSD)
 #include <sys/time.h>
 #include <sys/resource.h>
+#elif defined(XR_PLATFORM_HAIKU)
+#include <OS.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #endif
 
 // On other platforms these options are controlled by CMake
@@ -126,6 +130,15 @@ XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
     *_free = si.freeram * si.mem_unit;
     *reserved = si.bufferram * si.mem_unit;
     *committed = (si.totalram - si.freeram + si.totalswap - si.freeswap) * si.mem_unit;
+#elif defined(XR_PLATFORM_HAIKU)
+    *_free = *reserved = *committed = 0;
+    system_info info;
+    if (get_system_info(&info) == B_OK)
+    {
+        *_free = B_PAGE_SIZE * (uint64)(info.max_pages - info.used_pages);
+        *reserved = B_PAGE_SIZE * (uint64)info.cached_pages;
+        *committed = B_PAGE_SIZE * (uint64)info.used_pages;
+    }
 #endif
 }
 
@@ -150,8 +163,12 @@ size_t xrMemory::mem_usage()
     struct rusage ru;
     getrusage(RUSAGE_SELF, &ru);
     return (size_t)ru.ru_maxrss;
+#elif defined(XR_PLATFORM_HAIKU)
+    system_info info;
+    get_system_info(&info);
+    return B_PAGE_SIZE * (uint64)info.used_pages;
 #else
-#   error Select or add an implementation for your platform
+    return 0;
 #endif
 }
 

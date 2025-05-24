@@ -4,7 +4,7 @@
 #include "xrGame/xrGame.h"
 #include "Include/xrRender/xrRender.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#if !defined(XR_PLATFORM_WINDOWS)
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -77,7 +77,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
 
     return result;
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#else
 int main(int argc, char *argv[])
 {
     int result = EXIT_FAILURE;
@@ -128,6 +128,4 @@ int main(int argc, char *argv[])
 
     return result;
 }
-#else
-#   error Select or add an implementation for your platform
 #endif

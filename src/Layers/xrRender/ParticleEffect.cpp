@@ -16,10 +16,6 @@
 #endif
 #endif
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE) // XXX: remove
-#include <math.h>
-#endif
-
 extern ENGINE_API float psHUD_FOV;
 
 namespace xray::render::RENDER_NAMESPACE

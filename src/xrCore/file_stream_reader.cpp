@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "file_stream_reader.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#if defined(XR_PLATFORM_POSIX)
 #include <fcntl.h>
 #endif
 
@@ -20,7 +20,7 @@ void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
     VERIFY(file_mapping_handle != INVALID_HANDLE_VALUE);
 
     inherited::construct(file_mapping_handle, 0, file_size, file_size, window_size);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
     pstr conv_fn = xr_strdup(file_name);
     convert_path_separators(conv_fn);
     m_file_handle = ::open(conv_fn, O_RDONLY);
@@ -42,7 +42,7 @@ void CFileStreamReader::destroy()
     inherited::destroy();
     CloseHandle(file_mapping_handle);
     CloseHandle(m_file_handle);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
     inherited::destroy();
     ::close(m_file_handle);
     m_file_handle = -1;

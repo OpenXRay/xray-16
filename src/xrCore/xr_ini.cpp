@@ -7,7 +7,7 @@ XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;
 XRCORE_API CInifile const* pSettingsOpenXRay = nullptr;
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#if !defined(XR_PLATFORM_WINDOWS)
 #include <stdint.h>
 #define MSVCRT_EINVAL	22
 #define MSVCRT_ERANGE	34
@@ -232,7 +232,6 @@ uint64_t _cdecl _strtoui64(const char *nptr, char **endptr, int base)
     return _strtoui64_l(nptr, endptr, base, NULL);
 }
 #endif
-
 
 CInifile* CInifile::Create(pcstr fileName, bool readOnly)
 {

@@ -46,10 +46,11 @@ elseif (APPLE)
 else()
     option(LUA_USE_POSIX "Use POSIX functionality." ON)
 
-    # OpenBSD has dl as a part of libc
-    # NetBSD includes dl functions automatically
-    if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
-        # This option only links dl and doesn't change anything other from that.
+    if (CMAKE_SYSTEM_NAME STREQUAL "Haiku")
+        option(LUA_USE_DLOPEN "Use dynamic linker to load modules." OFF)
+    elseif (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+        # OpenBSD has dl as a part of libc
+        # NetBSD includes dl functions automatically
         option(LUA_USE_DLOPEN "Use dynamic linker to load modules." ON)
     endif()
 endif()

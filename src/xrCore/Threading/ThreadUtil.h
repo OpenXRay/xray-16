@@ -1,7 +1,4 @@
 #pragma once
-#if defined(XR_PLATFORM_WINDOWS)
-#include <process.h>
-#endif
 
 #include <thread>
 

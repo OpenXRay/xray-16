@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ThreadUtil.h"
 
-#if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#if defined(XR_PLATFORM_POSIX)
 #   include <pthread.h>
 
 #   if defined(XR_PLATFORM_OPENBSD) || (defined(XR_PLATFORM_FREEBSD) && __FreeBSD_version < 1201519)
@@ -21,6 +21,14 @@ static int pthread_setname_np(pthread_t threadId, const char* name)
 static int pthread_setname_np(pthread_t /*threadId*/, const char* name)
 {
     return pthread_setname_np(name);
+}
+#   elif defined(XR_PLATFORM_HAIKU)
+#include <OS.h>
+
+static int pthread_setname_np(pthread_t /*threadId*/, const char* name)
+{
+    thread_id this_thread = find_thread(NULL);
+    return rename_thread(this_thread, name);
 }
 #   endif
 #endif
@@ -133,7 +141,7 @@ void SetCurrentProcessPriorityClass(priority_class cls)
     }
     SetPriorityClass(GetCurrentProcess(), dwPriorityClass);
 }
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
 void SetCurrentThreadName(cpcstr name)
 {
     if (auto error = pthread_setname_np(pthread_self(), name) != 0)

@@ -193,6 +193,9 @@ jobs:
         - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
             install-cmd: "sudo pkgin -y install cmake SDL2 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
           }
+        #- { name: Haiku,  os: haiku,  os-version: 'r1beta5',  arch: x86_64,
+        #    install-cmd: "sudo pkgman install -y cmake libsdl2_devel lzo_devel libjpeg_turbo_devel openal_devel libogg_devel libtheora_devel libvorbis_devel",
+        #  }
         configuration: [Debug, Release]
 
     steps:

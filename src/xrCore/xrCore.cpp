@@ -7,7 +7,7 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #pragma comment(lib, "winmm.lib")
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -199,7 +199,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
         char* base_path = SDL_GetBasePath();
         if (!base_path)
         {
@@ -228,7 +228,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
 #if defined(XR_PLATFORM_WINDOWS)
         GetCurrentDirectory(sizeof(WorkingPath), WorkingPath);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
         getcwd(WorkingPath, sizeof(WorkingPath));
 #else
 #   error Select or add implementation for your platform
@@ -241,7 +241,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
-#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
+#elif defined(XR_PLATFORM_POSIX)
         uid_t uid = geteuid();
         struct passwd *pw = getpwuid(uid);
         if (pw)

@@ -5,9 +5,11 @@
 #   define _XRAY_PLATFORM_MARKER "Windows"
 #elif defined(__linux__)
 #   define XR_PLATFORM_LINUX
+#   define XR_PLATFORM_POSIX
 #   define _XRAY_PLATFORM_MARKER "Linux"
 #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(BSD)
 #   define XR_PLATFORM_BSD
+#   define XR_PLATFORM_POSIX
 #   if defined(__FreeBSD__)
 #       define XR_PLATFORM_FREEBSD
 #       define _XRAY_PLATFORM_MARKER "FreeBSD"
@@ -25,7 +27,12 @@
 #   endif
 #elif defined(__APPLE__)
 #   define XR_PLATFORM_APPLE
+#   define XR_PLATFORM_POSIX
 #   define _XRAY_PLATFORM_MARKER "Apple"
+#elif defined(__HAIKU__)
+#   define XR_PLATFORM_HAIKU
+#   define XR_PLATFORM_POSIX
+#   define _XRAY_PLATFORM_MARKER "Haiku"
 #else
 #   error Unsupported platform
 #endif
@@ -69,7 +76,7 @@
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include "Common/PlatformWindows.inl"
-#elif defined(XR_PLATFORM_LINUX)
+#elif defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_HAIKU)
 #include "Common/PlatformLinux.inl"
 #elif defined(XR_PLATFORM_BSD)
 #include "Common/PlatformBSD.inl"
