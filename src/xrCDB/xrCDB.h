@@ -80,10 +80,10 @@ private:
     u32 version;
 
     // tris
-    TRI* tris;
     int tris_count;
-    Fvector* verts;
     int verts_count;
+    TRI* tris;
+    Fvector* verts;
 
 public:
     MODEL();

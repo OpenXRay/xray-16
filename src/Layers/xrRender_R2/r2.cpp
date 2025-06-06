@@ -361,7 +361,7 @@ void CRender::create()
         o.smapsize = 8192;
 
     // gloss
-    char* g = strstr(Core.Params, "-gloss ");
+    cpcstr g = strstr(Core.Params, "-gloss ");
     o.forcegloss = g ? TRUE : FALSE;
     if (g)
     {

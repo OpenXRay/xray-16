@@ -61,7 +61,7 @@ void CheckAndSetupRenderer()
 
 extern void msCreate(pcstr name);
 
-void CEngine::Initialize(GameModule* game)
+void CEngine::Initialize(GameModule* game, const std::array<RendererModule*, 2>& modules)
 {
     ZoneScoped;
 #ifdef DEBUG
@@ -75,6 +75,7 @@ void CEngine::Initialize(GameModule* game)
     Device.seqFrame.Add(&g_sound_processor, REG_PRIORITY_NORMAL - 1000); // Place it after Level update
     Device.seqFrameMT.Add(&g_sound_renderer);
 
+    External.CreateRendererList(modules);
     CheckAndSetupRenderer();
 
     External.Initialize(game);

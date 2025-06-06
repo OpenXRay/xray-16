@@ -9,8 +9,6 @@
 #include "XR_IOConsole.h"
 
 #include "xrCore/xr_token.h"
-#include "xrCore/ModuleLookup.hpp"
-#include "xrCore/Threading/ParallelForEach.hpp"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
@@ -53,10 +51,14 @@ void CEngineAPI::SelectRenderer()
 {
     ZoneScoped;
 
-    // User has some renderer selected
-    // Find it and check if we can use it
+    // User has some renderer selected, find it
     pcstr selected_mode = Console->GetString("renderer");
-    const auto it = renderModes.find(selected_mode);
+    const auto it = std::find_if(renderModes.begin(), renderModes.end(), [selected_mode](const auto& pair)
+    {
+        return xr_strcmp(selected_mode, pair.first) == 0;
+    });
+
+    // Check if we can use it
     if (it != renderModes.end())
     {
         if (it->second->CheckGameRequirements())
@@ -64,7 +66,7 @@ void CEngineAPI::SelectRenderer()
     }
 
     // Renderer is either fully unsupported (hardware)
-    // or we don't comply with it requirements (e.g. shaders missing)
+    // or we don't comply with it's requirements (e.g. shaders missing)
     if (!selectedRenderer)
     {
         // Select any suitable
@@ -73,7 +75,7 @@ void CEngineAPI::SelectRenderer()
             if (renderer->CheckGameRequirements())
             {
                 selectedRenderer = renderer;
-                selected_mode = mode.c_str();
+                selected_mode = mode;
                 string64 buf;
                 xr_sprintf(buf, "renderer %s", selected_mode);
                 Console->Execute(buf);
@@ -120,22 +122,23 @@ void CEngineAPI::Destroy()
     XRC.r_clear_compact();
 }
 
-void CEngineAPI::CreateRendererList(const std::span<RendererModule*>& modules)
+void CEngineAPI::CreateRendererList(const std::array<RendererModule*, 2>& modules)
 {
     if (!VidQualityToken.empty())
         return;
 
     ZoneScoped;
 
-    std::mutex mutex;
-    const auto loadRenderer = [&](RendererModule* module) -> bool
+    const auto loadRenderer = [this](RendererModule* module) -> bool
     {
+        if (!module)
+            return false;
+
         const auto& modes = module->ObtainSupportedModes(); // Performs HW tests, may take time
         if (modes.empty())
             return false;
 
-        std::lock_guard guard{ mutex };
-        for (auto [mode, modeIndex] : modes)
+        for (const auto [mode, modeIndex] : modes)
         {
             const auto it = renderModes.find(mode);
             if (it != renderModes.end())
@@ -143,10 +146,8 @@ void CEngineAPI::CreateRendererList(const std::span<RendererModule*>& modules)
                 VERIFY3(false, "Renderer mode duplicate. Skipping.", mode);
                 continue;
             }
-            // mode string will be freed after library unloading, copy.
-            shared_str copiedMode = mode;
             renderModes[mode] = module;
-            VidQualityToken.emplace_back(copiedMode.c_str(), modeIndex);
+            VidQualityToken.emplace_back(mode, modeIndex);
         }
 
         return true;
@@ -158,11 +159,8 @@ void CEngineAPI::CreateRendererList(const std::span<RendererModule*>& modules)
     }
     else
     {
-#ifdef XR_PLATFORM_WINDOWS
-        xr_parallel_for_each(modules, loadRenderer);
-#else
-        std::for_each(std::begin(modules), std::end(modules), loadRenderer);
-#endif
+        for (const auto& module : modules)
+            loadRenderer(module);
     }
 
     auto& modes = VidQualityToken;

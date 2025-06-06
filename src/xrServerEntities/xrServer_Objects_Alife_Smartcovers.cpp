@@ -15,6 +15,7 @@
 
 #ifndef MASTER_GOLD
 #include "ai_space.h"
+#include "script_value_container_impl.h"
 #include "xrScriptEngine/script_engine.hpp"
 
 extern SFillPropData fp_data;

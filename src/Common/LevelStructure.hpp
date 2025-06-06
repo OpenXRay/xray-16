@@ -588,5 +588,7 @@ enum xrAI_Versions : u8
 static_assert(XRAI_VERSION_ALLOWED  <= type_max<u8>);
 static_assert(XRAI_CURRENT_VERSION  <= type_max<u8>);
 
-#define ASSERT_XRAI_VERSION_MATCH(version, description)\
-    R_ASSERT2((version) >= XRAI_VERSION_ALLOWED && (version) <= XRAI_CURRENT_VERSION, description);
+#define ASSERT_XRAI_VERSION_MATCH(version, description) \
+    R_ASSERT2((version) >= XRAI_VERSION_ALLOWED && (version) <= XRAI_CURRENT_VERSION, \
+        make_string("%s version mismatch! %s has version %u but engine supports only %u.", \
+        description, description, (version), XRAI_CURRENT_VERSION).c_str())

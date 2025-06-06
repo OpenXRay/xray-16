@@ -106,7 +106,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     int version;
     {
-        ZoneTransientN(tracy_scoped_zone_2, "gladLoadGL", true);
+        ZoneScopedN("gladLoadGL");
         version = gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress));
     }
     if (version == 0)
@@ -145,8 +145,8 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     ComputeShadersSupported = false; // XXX: Implement compute shaders support
 
-    //	Create render target and depth-stencil views here
-    UpdateViews();
+    if (glGenFramebuffers && glBindFramebuffer)
+        UpdateViews();
 }
 
 void CHW::DestroyDevice()

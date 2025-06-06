@@ -9,53 +9,57 @@
 int _cdecl XRCORE_API _resetstkoflw(void);
 #endif
 
+// Tries to match C11 strcpy_s behaviour
+// First source string pointer is allowed to be equal to dest string pointer,
+// behaviour for other cases of string overlapping is undefined.
 template <typename... Args>
-pstr strconcat(size_t size, pstr outStr, const Args... args)
+pstr strconcat(size_t dest_sz, const pstr dest, const Args... sources)
 {
-    pstr currSymbol = &outStr[0];
-    const pstr endSymbol = &outStr[0] + size - 1;
+    constexpr size_t MAXIMUM_ADEQUATE_STRING_SIZE = 256UL << 20; // 256 MB
 
-#ifdef MASTER_GOLD
-    bool shouldStop = false;
-#endif
-    std::initializer_list<pcstr> strArgs = { args... };
-    for (pcstr strCursor : strArgs)
+    R_ASSERT1_CURE(dest && dest_sz > 0, return nullptr);
+
+    R_ASSERT2_CURE(dest_sz < MAXIMUM_ADEQUATE_STRING_SIZE,
+        "Isn't it too much to take more than 256 MB for a single string?\n"
+        "If you really need the string THAT BIG, please report.",
     {
-        while (*strCursor)
-        {
-#ifdef MASTER_GOLD
-            // silently skip and prevent crash
-            if (currSymbol == endSymbol)
-            {
-                shouldStop = true;
-            }
-#else
-            R_ASSERT3(currSymbol != endSymbol, "buffer overflow: cannot concatenate string ", &outStr[0]);
-#endif
+        dest[0] = '\0';
+        return dest;
+    });
 
-            *currSymbol = *strCursor;
-            currSymbol++;
-            strCursor++;
-#ifdef MASTER_GOLD
-            if (shouldStop)
-                break;
-#endif
+    cpcstr dest_end = dest + dest_sz - 1;
+    pstr current = dest;
+
+    for (pcstr source : { static_cast<cpcstr>(sources)... })
+    {
+        R_ASSERT1_CURE(source,
+        {
+            dest[0] = '\0';
+            return dest;
+        });
+
+        while (*source)
+        {
+            R_ASSERT1_CURE(current != dest_end,
+            {
+                dest[0] = '\0';
+                return dest;
+            });
+            *current = *source;
+            ++current;
+            ++source;
         }
-#ifdef MASTER_GOLD
-        if (shouldStop)
-            break;
-#endif
     }
 
-    *currSymbol = '\0';
-    return &outStr[0];
+    *current = '\0';
+    return dest;
 }
 
 template <size_t Size, typename... Args>
-pstr strconcat(char (&outStr)[Size], const Args... args)
+pstr strconcat(char (&dest)[Size], const Args... sources)
 {
-    strconcat(Size, &outStr[0], args...);
-    return &outStr[0];
+    strconcat(Size, dest, std::forward<const Args>(sources)...);
+    return dest;
 }
 
 // warning: do not comment this macro, as stack overflow check is very light

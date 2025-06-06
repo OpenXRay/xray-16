@@ -10,10 +10,10 @@ class text_tree;
 }
 #endif
 
-class IStateManagerBase
+class XR_NOVTABLE IStateManagerBase
 {
 public:
-    virtual ~IStateManagerBase(){};
+    virtual ~IStateManagerBase() = 0;
     virtual void reinit() = 0;
     virtual void update() = 0;
     virtual void force_script_state(EMonsterState state) = 0;
@@ -29,3 +29,5 @@ public:
     virtual void add_debug_info(debug::text_tree& root_s) {}
 #endif
 };
+
+inline IStateManagerBase::~IStateManagerBase() = default;

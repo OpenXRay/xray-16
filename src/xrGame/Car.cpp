@@ -833,18 +833,10 @@ void CCar::CreateSkeleton(CSE_Abstract* po)
         pK->CalculateBones(TRUE);
     }
     phys_shell_verify_object_model(*this);
-    /* Alundaio: p_build_shell
-    #pragma todo(" replace below by P_build_Shell or call inherited")
-    m_pPhysicsShell = P_create_Shell();
-    m_pPhysicsShell->build_FromKinematics(pK, &bone_map);
-    m_pPhysicsShell->set_PhysicsRefObject(this);
-    m_pPhysicsShell->mXFORM.set(XFORM());
-    m_pPhysicsShell->Activate(true);
-    m_pPhysicsShell->SetAirResistance(0.f, 0.f);
-    m_pPhysicsShell->SetPrefereExactIntegration();
-    */
+
     m_pPhysicsShell = P_build_Shell(this, false, &bone_map);
-    //-Alundaio
+    if (!bone_map.empty())
+        m_pPhysicsShell->SetPrefereExactIntegration();
 
     ApplySpawnIniToPhysicShell(&po->spawn_ini(), m_pPhysicsShell, false);
     ApplySpawnIniToPhysicShell(pK->LL_UserData(), m_pPhysicsShell, false);

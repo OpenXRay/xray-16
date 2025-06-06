@@ -354,7 +354,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
-        if (IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
+        if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
         {
             if (!b_disable_break)
             {

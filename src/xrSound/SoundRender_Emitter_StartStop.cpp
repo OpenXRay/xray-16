@@ -113,4 +113,5 @@ void CSoundRender_Emitter::stop_target()
     R_ASSERT1_CURE(target, { return; });
     target->stop();
     target = nullptr;
+    source()->close(ovf);
 }

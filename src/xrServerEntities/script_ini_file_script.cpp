@@ -11,24 +11,24 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/Functor.hpp"
 
-CScriptIniFile* get_system_ini() { return ((CScriptIniFile*)pSettings); }
-bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::string& V)
+CScriptIniFile* get_system_ini() { return (CScriptIniFile*)pSettings; }
+
+bool r_line(const CScriptIniFile* self, pcstr S, int L, luabind::string& N, luabind::string& V)
 {
     THROW3(self->section_exist(S), "Cannot find section", S);
-    THROW2((int)self->line_count(S) > L, "Invalid line number");
 
     N = "";
     V = "";
 
-    LPCSTR n, v;
-    bool result = !!self->r_line(S, L, &n, &v);
+    pcstr n, v;
+    bool result = self->r_line(S, L, &n, &v);
     if (!result)
-        return (false);
+        return false;
 
     N = n;
     if (v)
         V = v;
-    return (true);
+    return true;
 }
 
 bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind::string& V)
@@ -49,10 +49,10 @@ bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind
 
 #pragma warning(push)
 #pragma warning(disable : 4238)
-CScriptIniFile* create_ini_file(LPCSTR ini_string)
+CScriptIniFile* create_ini_file(pcstr ini_string)
 {
     IReader reader((void*)ini_string, xr_strlen(ini_string));
-    return ((CScriptIniFile*)xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path));
+    return (CScriptIniFile*)xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path);
 }
 #pragma warning(pop)
 

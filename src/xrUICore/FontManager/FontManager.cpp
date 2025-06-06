@@ -108,6 +108,5 @@ void CFontManager::Render()
 
 void CFontManager::OnUIReset()
 {
-    // XXX: memory leak, font aren't being deallocated
     InitializeFonts();
 }

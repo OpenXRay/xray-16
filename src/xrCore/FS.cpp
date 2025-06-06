@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "FS_internal.h"
+#include "FS_impl.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <io.h>
@@ -319,8 +320,6 @@ void IReader::close()
     xr_delete(self);
 }
 
-#include "FS_impl.h"
-
 #ifdef TESTING_IREADER
 IReaderTestPolicy::~IReaderTestPolicy() { xr_delete(m_test); };
 #endif // TESTING_IREADER
@@ -504,7 +503,7 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
     // Open the file
     hSrcFile = CreateFile(cFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     R_ASSERT3(hSrcFile != INVALID_HANDLE_VALUE, cFileName, xrDebug::ErrorToString(GetLastError()));
-    Size = (int)GetFileSize(hSrcFile, NULL);
+    Size = GetFileSize(hSrcFile, NULL);
     R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
 
     hSrcMap = CreateFileMapping(hSrcFile, 0, PAGE_READWRITE, 0, 0, 0);
@@ -520,7 +519,7 @@ CVirtualFileRW::CVirtualFileRW(pcstr cFileName)
     R_ASSERT3(hSrcFile != -1, cFileName, xrDebug::ErrorToString(GetLastError()));
     struct stat file_info;
     ::fstat(hSrcFile, &file_info);
-    Size = (int)file_info.st_size;
+    Size = file_info.st_size;
     R_ASSERT3(Size, cFileName, xrDebug::ErrorToString(GetLastError()));
     data = (char*)::mmap(NULL, Size, PROT_READ | PROT_WRITE, MAP_SHARED, hSrcFile, 0);
     R_ASSERT3(data && data != MAP_FAILED, cFileName, xrDebug::ErrorToString(GetLastError()));

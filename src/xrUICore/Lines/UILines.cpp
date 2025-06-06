@@ -9,34 +9,26 @@
 #include "pch.hpp"
 #include "UILines.h"
 #include "XML/UIXmlInitBase.h"
-#include "uilinestd.h"
 #include "xrCore/Text/StringConversion.hpp"
+
+constexpr auto COLOR_TAG_BEGIN = "%c[";
+constexpr auto COLOR_TAG_END = ']';
 
 CUILines::CUILines()
 {
-    m_pFont = NULL;
-    m_eTextAlign = CGameFont::alLeft;
-    m_eVTextAlign = valTop;
-    m_dwTextColor = 0xffffffff;
-    m_TextOffset.set(0.0f, 0.0f);
-    m_wndSize.set(0.f, 0.f);
-    m_wndPos.set(0.f, 0.f);
-    m_text = "";
-    uFlags.zero();
-    uFlags.set(flNeedReparse, FALSE);
-    uFlags.set(flComplexMode, FALSE);
-    uFlags.set(flPasswordMode, FALSE);
-    uFlags.set(flColoringMode, TRUE);
-    uFlags.set(flCutWordsMode, FALSE);
-    uFlags.set(flRecognizeNewLine, TRUE);
+    uFlags.set(flNeedReparse, false);
+    uFlags.set(flComplexMode, false);
+    uFlags.set(flPasswordMode, false);
+    uFlags.set(flColoringMode, true);
+    uFlags.set(flCutWordsMode, false);
+    uFlags.set(flRecognizeNewLine, true);
 }
 
-CUILines::~CUILines() {}
 void CUILines::SetTextComplexMode(bool mode)
 {
     uFlags.set(flComplexMode, mode);
     if (mode)
-        uFlags.set(flPasswordMode, FALSE);
+        uFlags.set(flPasswordMode, false);
 }
 
 void CUILines::SetPasswordMode(bool mode)
@@ -60,7 +52,7 @@ void CUILines::SetText(const char* text)
         if (m_text == text)
             return;
         m_text = text;
-        uFlags.set(flNeedReparse, TRUE);
+        uFlags.set(flNeedReparse, true);
     }
     else
     {
@@ -69,7 +61,7 @@ void CUILines::SetText(const char* text)
     }
 }
 void CUILines::SetTextST(LPCSTR str_id) { SetText(*StringTable().translate(str_id)); }
-LPCSTR CUILines::GetText() { return m_text.c_str(); }
+LPCSTR CUILines::GetText() const { return m_text.c_str(); }
 void CUILines::Reset() { m_lines.clear(); }
 float get_str_width(CGameFont* pFont, char ch)
 {
@@ -83,118 +75,98 @@ void CUILines::ParseText(bool force)
     if (!force && (!uFlags.test(flComplexMode) || !uFlags.test(flNeedReparse)))
         return;
 
-    if (NULL == m_pFont)
+    if (!m_pFont)
         return;
 
     Reset();
 
-    CUILine* line = NULL;
+    CUILine line;
     if (uFlags.test(flColoringMode))
         line = ParseTextToColoredLine(m_text.c_str());
     else
-    {
-        line = xr_new<CUILine>();
-        CUISubLine subline;
-        subline.m_text = m_text.c_str();
-        subline.m_color = GetTextColor();
-        line->AddSubLine(&subline);
-    }
+        line.AddSubLine({ m_text.c_str(), GetTextColor() });
 
-    BOOL bNewLines = FALSE;
+    bool bNewLines = false;
 
     if (uFlags.test(flRecognizeNewLine))
     {
         if (m_pFont->IsMultibyte())
         {
-            CUILine* ptmp_line = xr_new<CUILine>();
-            int vsz = line->m_subLines.size();
+            CUILine tmp_line;
+            const size_t vsz = line.m_subLines.size();
             VERIFY(vsz);
-            for (int i = 0; i < vsz; i++)
+            for (size_t i = 0; i < vsz; i++)
             {
-                char* pszTemp = NULL;
-                const u32 tcolor = line->m_subLines[i].m_color;
-                char szTempLine[MAX_MB_CHARS], *pszSearch = NULL;
-                [[maybe_unused]] auto llen = xr_strlen(line->m_subLines[i].m_text.c_str());
+                char* pszTemp;
+                const u32 tcolor = line.m_subLines[i].m_color;
+                char szTempLine[MAX_MB_CHARS], *pszSearch = nullptr;
+                [[maybe_unused]] const auto llen = line.m_subLines[i].m_text.size();
                 VERIFY(llen < MAX_MB_CHARS);
-                xr_strcpy(szTempLine, line->m_subLines[i].m_text.c_str());
+                xr_strcpy(szTempLine, line.m_subLines[i].m_text.c_str());
                 pszSearch = szTempLine;
-                while ((pszTemp = strstr(pszSearch, "\\n")) != NULL)
+                while ((pszTemp = strstr(pszSearch, "\\n")) != nullptr)
                 {
-                    bNewLines = TRUE;
+                    bNewLines = true;
                     *pszTemp = '\0';
-                    CUISubLine subline;
-                    subline.m_text = pszSearch;
-                    subline.m_color = tcolor;
-                    subline.m_last_in_line = true;
-                    //ptmp_line->AddSubLine(pszSearch, tcolor);
-                    ptmp_line->AddSubLine(&subline);
+                    tmp_line.AddSubLine({ pszSearch, tcolor, true });
                     pszSearch = pszTemp + 2;
                 }
-                ptmp_line->AddSubLine(pszSearch, tcolor);
+                tmp_line.AddSubLine(pszSearch, tcolor);
             }
-            line->Clear();
-            xr_free(line);
-            line = ptmp_line;
+            line = std::move(tmp_line);
         }
         else
         {
-            line->ProcessNewLines();
+            line.ProcessNewLines();
         }
     }
     if (m_pFont->IsMultibyte())
     {
 #define UBUFFER_SIZE 100
         u16 aMarkers[UBUFFER_SIZE];
-        CUILine tmp_line;
         char szTempLine[MAX_MB_CHARS];
         float fTargetWidth = 1.0f;
         UI().ClientToScreenScaledWidth(fTargetWidth);
         VERIFY((m_wndSize.x > 0) && (fTargetWidth > 0));
         fTargetWidth = m_wndSize.x / fTargetWidth;
-        int vsz = line->m_subLines.size();
+        size_t vsz = line.m_subLines.size();
         VERIFY(vsz);
         if ((vsz > 1) && (!bNewLines))
-        { // only colored line, pizdets
-            for (int i = 0; i < vsz; i++)
+        { // only colored line
+            for (auto& subLine : line.m_subLines)
             {
-                const char* pszText = line->m_subLines[i].m_text.c_str();
-                const u32 tcolor = line->m_subLines[i].m_color;
-                VERIFY(pszText);
-                tmp_line.AddSubLine(pszText, tcolor);
+                VERIFY(subLine.m_text.data());
+                subLine.m_last_in_line = false;
             }
-            m_lines.push_back(tmp_line);
-            tmp_line.Clear();
+            m_lines.emplace_back(std::move(line));
         }
         else
         {
-            for (int i = 0; i < vsz; i++)
+            CUILine tmp_line;
+            for (size_t i = 0; i < vsz; i++)
             {
-                CUISubLine* pSubLine = &line->m_subLines[i];
-                const char* pszText = pSubLine->m_text.c_str();
-                const u32 tcolor = pSubLine->m_color;
-                u16 uFrom = 0, uPartLen = 0;
+                CUISubLine subLine = line.m_subLines[i];
+                const char* pszText = subLine.m_text.c_str();
+                const u32 tcolor = subLine.m_color;
+                u16 uFrom = 0;
                 VERIFY(pszText);
                 u16 nMarkers = m_pFont->SplitByWidth(aMarkers, UBUFFER_SIZE, fTargetWidth, pszText);
                 for (u16 j = 0; j < nMarkers; j++)
                 {
-                    uPartLen = aMarkers[j] - uFrom;
+                    const u16 uPartLen = aMarkers[j] - uFrom;
                     VERIFY((uPartLen > 0) && (uPartLen < MAX_MB_CHARS));
                     strncpy_s(szTempLine, pszText + uFrom, uPartLen);
                     szTempLine[uPartLen] = '\0';
                     tmp_line.AddSubLine(szTempLine, tcolor);
-                    m_lines.push_back(tmp_line);
+                    m_lines.emplace_back(tmp_line);
                     tmp_line.Clear();
-// Compiler bug :)
-#pragma warning(push)
-#pragma warning(disable : 4244)
                     uFrom += uPartLen;
-#pragma warning(pop)
                 }
                 strncpy_s(szTempLine, pszText + uFrom, MAX_MB_CHARS);
                 tmp_line.AddSubLine(szTempLine, tcolor);
-                if (pSubLine->m_last_in_line || i == (vsz -1))
+                if (subLine.m_last_in_line || i == (vsz -1))
                 {
-                    m_lines.push_back(tmp_line);
+                    m_lines.emplace_back(tmp_line);
                     tmp_line.Clear();
                 }
             }
@@ -203,22 +175,21 @@ void CUILines::ParseText(bool force)
     else
     {
         float max_width = m_wndSize.x;
-        u32 sbl_cnt = line->m_subLines.size();
+        size_t sbl_cnt = line.m_subLines.size();
         CUILine tmp_line;
         string4096 buff;
         float curr_width = 0.0f;
-        // XXX: use 'bnew_line' or remove it
-        [[maybe_unused]] bool bnew_line = false;
+
         float eps = get_str_width(m_pFont, 'o'); // hack -(
-        for (u32 sbl_idx = 0; sbl_idx < sbl_cnt; ++sbl_idx)
+        for (size_t sbl_idx = 0; sbl_idx < sbl_cnt; ++sbl_idx)
         {
             bool b_last_subl = (sbl_idx == sbl_cnt - 1);
-            CUISubLine& sbl = line->m_subLines[sbl_idx];
-            u32 sub_len = (u32)sbl.m_text.length();
-            u32 curr_w_pos = 0;
+            CUISubLine& sbl = line.m_subLines[sbl_idx];
+            size_t sub_len = sbl.m_text.length();
+            size_t curr_w_pos = 0;
 
-            u32 last_space_idx = 0;
-            for (u32 idx = 0; idx < sub_len; ++idx)
+            size_t last_space_idx = 0;
+            for (size_t idx = 0; idx < sub_len; ++idx)
             {
                 bool b_last_ch = (idx == sub_len - 1);
 
@@ -245,23 +216,20 @@ void CUILines::ParseText(bool force)
 
                 if (bOver || (b_last_ch && sbl.m_last_in_line))
                 {
-                    m_lines.push_back(tmp_line);
+                    m_lines.emplace_back(tmp_line);
                     tmp_line.Clear();
                     curr_width = 0.0f;
-                    bnew_line = false;
                 }
             }
             if (b_last_subl && !tmp_line.IsEmpty())
             {
-                m_lines.push_back(tmp_line);
+                m_lines.emplace_back(tmp_line);
                 tmp_line.Clear();
                 curr_width = 0.0f;
-                bnew_line = false;
             }
         }
     }
-    xr_delete(line);
-    uFlags.set(flNeedReparse, FALSE);
+    uFlags.set(flNeedReparse, false);
 }
 
 float CUILines::GetVisibleHeight()
@@ -342,7 +310,7 @@ void CUILines::Draw(float x, float y)
 
     static string256 passText;
 
-    if (m_text.size() == 0)
+    if (m_text.empty())
         return;
 
     R_ASSERT(m_pFont);
@@ -359,8 +327,8 @@ void CUILines::Draw(float x, float y)
 
         if (uFlags.test(flPasswordMode))
         {
-            int sz = (int)m_text.size();
-            for (int i = 0; i < sz; i++)
+            const size_t sz = m_text.size();
+            for (size_t i = 0; i < sz; i++)
                 passText[i] = '*';
             passText[sz] = 0;
             m_pFont->SetAligment((CGameFont::EAligment)m_eTextAlign);
@@ -392,20 +360,18 @@ void CUILines::Draw(float x, float y)
         float height = m_pFont->CurrentHeight_();
         UI().ClientToScreenScaledHeight(height);
 
-        u32 size = m_lines.size();
-
         m_pFont->SetAligment((CGameFont::EAligment)m_eTextAlign);
-        for (int i = 0; i < (int)size; i++)
+        for (const auto& line : m_lines)
         {
             pos.x = x + GetIndentByAlign();
-            m_lines[i].Draw(m_pFont, pos.x, pos.y);
+            line.Draw(m_pFont, pos.x, pos.y);
             pos.y += height;
         }
     }
     m_pFont->OnRender();
 }
 
-void CUILines::OnDeviceReset() { uFlags.set(flNeedReparse, TRUE); }
+void CUILines::OnDeviceReset() { uFlags.set(flNeedReparse, true); }
 float CUILines::GetIndentByAlign() const
 {
     switch (m_eTextAlign)
@@ -432,7 +398,7 @@ float CUILines::GetVIndentByAlign()
     {
     case valTop: return 0;
     case valCenter: return (m_wndSize.y - GetVisibleHeight()) / 2;
-    case valBotton: return m_wndSize.y - GetVisibleHeight();
+    case valBottom: return m_wndSize.y - GetVisibleHeight();
     default: NODEFAULT;
     }
 #ifdef DEBUG
@@ -441,77 +407,77 @@ float CUILines::GetVIndentByAlign()
 }
 
 // %c[255,255,255,255]
+// %c[default]
+// %c[color_name]
 u32 CUILines::GetColorFromText(const xr_string& str) const
 {
-    StrSize begin, end, comma1_pos, comma2_pos, comma3_pos;
+    auto begin = str.find(COLOR_TAG_BEGIN);
+    const auto end = str.find(COLOR_TAG_END, begin);
 
-    begin = str.find(BEGIN);
-    end = str.find(_END, begin);
-    if (begin == npos || end == npos)
-        return m_dwTextColor;
-    // try default color
-    if (npos != str.find("%c[default]", begin, end - begin))
+    // Check if there even is a valid color tag
+    if (begin == xr_string::npos || end == xr_string::npos || end - begin < 3)
         return m_dwTextColor;
 
-    // Try predefined in XML colors
-    for (CUIXmlInitBase::ColorDefs::const_iterator it = CUIXmlInitBase::GetColorDefs()->begin();
-         it != CUIXmlInitBase::GetColorDefs()->end(); ++it)
-    {
-        int cmp = str.compare(begin + 3, end - begin - 3, *it->first);
-        if (cmp == 0)
-            return it->second;
-    }
+    // Extract color tag value
+    const xr_string color_tag = str.substr(begin + 3, end - begin - 3);
 
-    // try parse values separated by commas
-    comma1_pos = str.find(',', begin);
-    comma2_pos = str.find(',', comma1_pos + 1);
-    comma3_pos = str.find(',', comma2_pos + 1);
-    if (comma1_pos == npos || comma2_pos == npos || comma3_pos == npos)
+    // Try default color
+    if (color_tag == "default")
         return m_dwTextColor;
 
-    u32 a, r, g, b;
+    // Try predefined XML colors
+    const auto* color_defs = CUIXmlInitBase::GetColorDefs();
+    if (color_defs->find(color_tag.c_str()) != color_defs->end())
+        return color_defs->at(color_tag.c_str());
+
+    // Try parse values separated by commas
+    const auto comma1_pos = str.find(',', begin);
+    const auto comma2_pos = str.find(',', comma1_pos + 1);
+    const auto comma3_pos = str.find(',', comma2_pos + 1);
+    if (comma1_pos == xr_string::npos || comma2_pos == xr_string::npos || comma3_pos == xr_string::npos)
+        return m_dwTextColor;
+
     xr_string single_color;
 
     begin += 3;
 
     single_color = str.substr(begin, comma1_pos - 1);
-    a = atoi(single_color.c_str());
+    const u32 a = atoi(single_color.c_str());
     single_color = str.substr(comma1_pos + 1, comma2_pos - 1);
-    r = atoi(single_color.c_str());
+    const u32 r = atoi(single_color.c_str());
     single_color = str.substr(comma2_pos + 1, comma3_pos - 1);
-    g = atoi(single_color.c_str());
+    const u32 g = atoi(single_color.c_str());
     single_color = str.substr(comma3_pos + 1, end - 1);
-    b = atoi(single_color.c_str());
+    const u32 b = atoi(single_color.c_str());
 
     return color_argb(a, r, g, b);
 }
 
-CUILine* CUILines::ParseTextToColoredLine(const xr_string& str)
+CUILine CUILines::ParseTextToColoredLine(const std::string_view& str)
 {
-    CUILine* line = xr_new<CUILine>();
-    xr_string tmp = str;
-    xr_string entry;
-    u32 color;
+    xr_string tmp{ str };
 
+    CUILine line;
     do
     {
-        CutFirstColoredTextEntry(entry, color, tmp);
-        line->AddSubLine(entry, subst_alpha(color, color_get_A(GetTextColor())));
-    } while (tmp.size() > 0);
+        u32 color;
+        xr_string entry = CutFirstColoredTextEntry(color, tmp);
+        line.AddSubLine({ std::move(entry), subst_alpha(color, color_get_A(GetTextColor())) });
+    } while (!tmp.empty());
 
     return line;
 }
 
-void CUILines::CutFirstColoredTextEntry(xr_string& entry, u32& color, xr_string& text) const
+xr_string CUILines::CutFirstColoredTextEntry(u32& color, xr_string& text) const
 {
-    entry.clear();
+    xr_string entry;
 
-    StrSize begin = text.find(BEGIN);
-    StrSize end = text.find(_END, begin);
+    auto begin = text.find(COLOR_TAG_BEGIN);
+    auto end = text.find(COLOR_TAG_END, begin);
     if (xr_string::npos == end)
         begin = end;
-    StrSize begin2 = text.find(BEGIN, end);
-    StrSize end2 = text.find(_END, begin2);
+    auto begin2 = text.find(COLOR_TAG_BEGIN, end);
+    auto end2 = text.find(COLOR_TAG_END, begin2);
     if (xr_string::npos == end2)
         begin2 = end2;
 
@@ -544,4 +510,6 @@ void CUILines::CutFirstColoredTextEntry(xr_string& entry, u32& color, xr_string&
         entry.replace(begin, end - begin + 1, "");
         text.replace(0, begin2, "");
     }
+
+    return entry;
 }

@@ -2242,6 +2242,9 @@
     <Filter Include="Core\Server\ServerEntities\scripts\script_value_wrapper">
       <UniqueIdentifier>{51778476-f463-42d8-bf56-1f2ffa97a662}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AI\AMonsters\common\monster states\Move">
+      <UniqueIdentifier>{8ca91267-ead8-4233-af9a-9771664b4be5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6340,6 +6343,9 @@
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\script_value_wrapper_inline.h">
       <Filter>Core\Server\ServerEntities\scripts\script_value_wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ai\monsters\states\monster_state_move.h">
+      <Filter>AI\AMonsters\common\monster states\Move</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,8 +7,7 @@
 #include "xrCore/Threading/Lock.hpp"
 
 bool LogExecCB = true;
-string_path logFName = "engine.log";
-string_path log_file_name = "engine.log";
+string_path log_file_name{};
 bool no_log = true;
 #ifdef CONFIG_PROFILE_LOCKS
 Lock logCS(MUTEX_PROFILE_ID(log));
@@ -209,19 +208,38 @@ void CreateLog(bool nl)
     LogFile.reserve(1000);
 
     no_log = nl;
-    strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
+
+    const bool unique_logs = strstr(Core.Params, "-unique_logs");
+
+    if (unique_logs)
+    {
+        string32 TimeBuf;
+        using namespace std::chrono;
+        const auto now = system_clock::now();
+        const auto time = system_clock::to_time_t(now);
+        std::strftime(TimeBuf, sizeof(TimeBuf), "%d-%m-%y_%H-%M-%S", std::localtime(&time));
+        strconcat(log_file_name, Core.ApplicationName, "_", Core.UserName, "_", TimeBuf, ".log");
+    }
+    else
+    {
+        strconcat(log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
+    }
+
     if (FS.path_exist("$logs$"))
-        FS.update_path(logFName, "$logs$", log_file_name);
+        FS.update_path(log_file_name, "$logs$", log_file_name);
 
     if (no_log)
         return;
 
-    // Alun: Backup existing log
-    const xr_string backup_logFName = EFS.ChangeFileExt(logFName, ".bkp");
-    FS.file_rename(logFName, backup_logFName.c_str(), true);
-    //-Alun
+    if (!unique_logs)
+    {
+        // Alun: Backup existing log
+        const xr_string backup_logFName = EFS.ChangeFileExt(log_file_name, ".bkp");
+        FS.file_rename(log_file_name, backup_logFName.c_str(), true);
+        //-Alun
+    }
 
-    if (const auto w = FS.w_open(logFName))
+    if (const auto w = FS.w_open(log_file_name))
     {
         for (u32 it = 0; it < LogFile.size(); it++)
         {

@@ -644,8 +644,6 @@ public:
             return;
         }
 
-        tokens = VidQualityToken.data();
-
         inherited::Execute(args);
 
         cmd_lock = true;

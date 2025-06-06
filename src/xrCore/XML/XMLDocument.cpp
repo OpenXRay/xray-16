@@ -83,7 +83,10 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml, bool 
         if (includeName == strstr(includeName, comparePath))
         {
             pcstr fileName = strstr(includeName, comparePath);
-            fileName = fileName ? ++fileName : includeName;
+            if (fileName)
+                fileName++;
+            else
+                fileName = includeName;
 
             shared_str fn = xml->correct_file_name(uiPath, fileName);
             string_path buff;

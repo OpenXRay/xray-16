@@ -25,18 +25,6 @@ void INFO_DATA::save(IWriter& stream)
     save_data(receive_time, stream);
 }
 
-SInfoPortionData::SInfoPortionData() {}
-SInfoPortionData::~SInfoPortionData() {}
-
-CInfoPortion::CInfoPortion() {}
-CInfoPortion::~CInfoPortion() {}
-
-void CInfoPortion::Load(shared_str info_id)
-{
-    m_InfoId = info_id;
-    inherited_shared::load_shared(m_InfoId, nullptr);
-}
-
 void CInfoPortion::load_shared(LPCSTR)
 {
     const ITEM_DATA* item_data = GetById(m_InfoId, true);

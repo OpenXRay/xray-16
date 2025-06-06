@@ -40,15 +40,9 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "scroll_bar.xml");
 
-    float height = xml_doc.ReadAttribFlt(profile, 0, (bIsHorizontal) ? "height" : "height_v");
-    if (height == 0.0f)
-    {
-        if (ShadowOfChernobylMode)
-            height = xml_doc.ReadAttribFlt(profile, 0, "height");
-        else if (ClearSkyMode)
-            height = 16;
-    }
-    R_ASSERT(height > 0.0f);
+    const float default_height = xml_doc.ReadAttribFlt(profile, 0, "height", 16.f);
+    const float height = bIsHorizontal ? default_height : xml_doc.ReadAttribFlt(profile, 0, "height_v", default_height);
+
     m_hold_delay = xml_doc.ReadAttribFlt(profile, 0, "hold_delay", 50.0f);
 
     inherited::SetWndPos(pos);

@@ -65,7 +65,7 @@ struct CUIDebugState
     }
 };
 
-class XRUICORE_API CUIDebugger final : public xray::editor::ide_tool
+class XRUICORE_API CUIDebugger final : public xray::editor::ide_tool, public CUIResetNotifier
 {
     xr_vector<CUIDebuggable*> m_root_windows;
     CUIDebugState m_state;
@@ -84,6 +84,8 @@ public:
 
     [[nodiscard]]
     bool ShouldDrawRects() const { return m_state.settings.drawWndRects; }
+
+    void OnUIReset() override;
 
 private:
     pcstr tool_name() const override { return "UI Debugger"; }

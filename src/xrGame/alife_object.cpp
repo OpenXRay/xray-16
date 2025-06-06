@@ -114,9 +114,9 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         {
                             pcstr ammo_class = pSettings->r_string(itmSection, "ammo_class");
                             pcstr ammoSec = "";
+                            string128 tmp;
                             for (int i = 0, n = _GetItemCount(ammo_class); i < n; ++i)
                             {
-                                string128 tmp;
                                 ammoSec = _GetItem(ammo_class, i, tmp);
                                 if (i == iAmmoType)
                                     break;

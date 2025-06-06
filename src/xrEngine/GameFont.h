@@ -21,7 +21,7 @@ class dxFontRender;
 
 class IFontRender;
 
-class ENGINE_API CGameFont : public IGameFont
+class ENGINE_API CGameFont final : public IGameFont
 {
     friend class xray::render::render_r4::dxFontRender;
     friend class xray::render::render_gl::dxFontRender;
@@ -40,26 +40,26 @@ protected:
     Fvector2 vHalfPixel;
     Ivector2 vTS;
     EAligment eCurrentAlignment;
+    u8 uFlags;
     u32 dwCurrentColor;
     float fCurrentHeight;
     float fCurrentX, fCurrentY;
     Fvector2 vInterval;
-    Fvector* TCMap;
     float fHeight;
     float fXStep;
     float fYStep;
     float fTCHeight;
+    u32 nNumChars{ 256 };
     xr_vector<String> strings;
+    Fvector* TCMap{};
     IFontRender* pFontRender;
-    u32 nNumChars;
-    u32 uFlags;
 
 protected:
-    const Fvector& GetCharTC(u16 c) { return TCMap[c]; }
+    const Fvector& GetCharTC(u16 c) const { return TCMap[c]; }
 
 public:
-    CGameFont(pcstr section, u32 flags = 0);
-    CGameFont(pcstr shader, pcstr texture, u32 flags = 0);
+    CGameFont(pcstr section, u8 flags = 0);
+    CGameFont(pcstr shader, pcstr texture, u8 flags = 0);
     virtual ~CGameFont();
 
     virtual void Initialize(pcstr shader, pcstr texture) override;

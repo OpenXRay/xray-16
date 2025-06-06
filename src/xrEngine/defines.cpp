@@ -9,7 +9,7 @@ ECORE_API bool bDebug = false;
 DeviceMode psDeviceMode =
 {
     .Monitor      = 0,
-    .WindowStyle  = rsFullscreen,
+    .WindowStyle  = rsWindowedBorderless,
     .Width        = 0,
     .Height       = 0,
     .RefreshRate  = 0,

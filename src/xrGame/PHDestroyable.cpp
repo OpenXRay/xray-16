@@ -176,7 +176,7 @@ void CPHDestroyable::Load(CInifile* ini, LPCSTR section)
         {
             if (I.first.empty())
                 continue;
-            m_destroyed_obj_visual_names.push_back(I.first);
+
             u32 count = 1;
             if (!I.second.empty())
                 count = atoi(I.second.c_str());

@@ -8,48 +8,22 @@
 
 #include "pch.hpp"
 #include "UISubLine.h"
-#include "uilinestd.h"
 #include "ui_base.h"
 #include "xrEngine/GameFont.h"
 
-CUISubLine::CUISubLine(const CUISubLine& other)
+CUISubLine CUISubLine::Cut2Pos(size_t i)
 {
-    m_color = other.m_color;
-    m_last_in_line = other.m_last_in_line;
-    m_text = other.m_text;
-    m_pTempLine = NULL;
-}
+    CUISubLine result;
+    result.m_color = m_color;
 
-CUISubLine& CUISubLine::operator=(const CUISubLine& other)
-{
-    m_color = other.m_color;
-    m_text = other.m_text;
-    m_last_in_line = other.m_last_in_line;
-    xr_delete(m_pTempLine);
-    return (*this);
-}
+    R_ASSERT2_CURE(i < m_text.size(),
+        make_string("CUISubLine::Cut2Pos - invalid parameter [%zu][%zu]", i, m_text.size()).c_str(),
+        return result);
 
-CUISubLine::CUISubLine() : m_color(0), m_pTempLine(NULL), m_last_in_line(false)
-{
-}
-
-CUISubLine::~CUISubLine()
-{
-    xr_delete(m_pTempLine);
-}
-
-const CUISubLine* CUISubLine::Cut2Pos(int i)
-{
-    R_ASSERT2(i < (int)m_text.size(),
-        make_string("CUISubLine::Cut2Pos - invalid parameter [%d][%d]", i, m_text.size()).c_str());
-
-    if (!m_pTempLine)
-        m_pTempLine = xr_new<CUISubLine>();
-    m_pTempLine->m_color = m_color;
-    m_pTempLine->m_text.assign(m_text, 0, i + 1);
+    result.m_text.assign(m_text, 0, i + 1);
     m_text.replace(0, i + 1, "");
 
-    return m_pTempLine;
+    return result;
 }
 
 void CUISubLine::Draw(CGameFont* pFont, float x, float y) const

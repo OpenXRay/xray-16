@@ -104,43 +104,37 @@ SFillPropData::SFillPropData() { counter = 0; };
 SFillPropData::~SFillPropData() { VERIFY(0 == counter); };
 void SFillPropData::load()
 {
-// create ini
-#ifdef XRGAME_EXPORTS
     CInifile* Ini = pGameIni;
-#else // XRGAME_EXPORTS
-    CInifile* Ini = nullptr;
-    string_path gm_name;
-    FS.update_path(gm_name, "$game_config$", GAME_CONFIG);
-    R_ASSERT3(FS.exist(gm_name), "Couldn't find file", gm_name);
-    Ini = xr_new<CInifile>(gm_name);
-#endif // XRGAME_EXPORTS
 
     // location type
     LPCSTR N, V;
-    u32 k;
     for (int i = 0; i < GameGraph::LOCATION_TYPE_COUNT; ++i)
     {
         VERIFY(locations[i].empty());
         string256 caSection, T;
         strconcat(sizeof(caSection), caSection, SECTION_HEADER, xr_itoa(i, T, 10));
         R_ASSERT(Ini->section_exist(caSection));
-        for (k = 0; Ini->r_line(caSection, k, &N, &V); ++k)
-            locations[i].push_back(xr_rtoken(V, atoi(N)));
+        for (int k = 0; Ini->r_line(caSection, k, &N, &V); ++k)
+            locations[i].emplace_back(V, atoi(N));
     }
-    for (k = 0; Ini->r_line("graph_points_draw_color_palette", k, &N, &V); ++k)
+
+    if (Ini->section_exist("graph_points_draw_color_palette"))
     {
-        u32 color;
-        if (1 == sscanf(V, "%x", &color))
+        for (int k = 0; Ini->r_line("graph_points_draw_color_palette", k, &N, &V); ++k)
         {
-            location_colors[N] = color;
+            u32 color;
+            if (1 == sscanf(V, "%x", &color))
+            {
+                location_colors[N] = color;
+            }
+            else
+                Msg("! invalid record format in [graph_points_draw_color_palette] %s=%s", N, V);
         }
-        else
-            Msg("! invalid record format in [graph_points_draw_color_palette] %s=%s", N, V);
     }
 
     // level names/ids
     VERIFY(level_ids.empty());
-    for (k = 0; Ini->r_line("levels", k, &N, &V); ++k)
+    for (int k = 0; Ini->r_line("levels", k, &N, &V); ++k)
         level_ids.push_back(Ini->r_string_wb(N, "caption"));
 
     // story names
@@ -148,8 +142,8 @@ void SFillPropData::load()
         VERIFY(story_names.empty());
         LPCSTR section = "story_ids";
         R_ASSERT(Ini->section_exist(section));
-        for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
-            story_names.push_back(xr_rtoken(V, atoi(N)));
+        for (int k = 0; Ini->r_line(section, k, &N, &V); ++k)
+            story_names.emplace_back(V, atoi(N));
 
         std::sort(story_names.begin(), story_names.end(), story_name_predicate());
         story_names.insert(story_names.begin(), xr_rtoken("NO STORY ID", ALife::_STORY_ID(-1)));
@@ -160,8 +154,8 @@ void SFillPropData::load()
         VERIFY(spawn_story_names.empty());
         LPCSTR section = "spawn_story_ids";
         R_ASSERT(Ini->section_exist(section));
-        for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
-            spawn_story_names.push_back(xr_rtoken(V, atoi(N)));
+        for (int k = 0; Ini->r_line(section, k, &N, &V); ++k)
+            spawn_story_names.emplace_back(V, atoi(N));
 
         std::sort(spawn_story_names.begin(), spawn_story_names.end(), story_name_predicate());
         spawn_story_names.insert(spawn_story_names.begin(), xr_rtoken("NO SPAWN STORY ID", ALife::_SPAWN_STORY_ID(-1)));
@@ -172,28 +166,23 @@ void SFillPropData::load()
     VERIFY(character_profiles.empty());
     for (int i = 0; i <= CCharacterInfo::GetMaxIndex(); i++)
     {
-        character_profiles.push_back(CCharacterInfo::IndexToId(i));
+        character_profiles.emplace_back(CCharacterInfo::IndexToId(i));
     }
 
     std::sort(character_profiles.begin(), character_profiles.end(), SortStringsByAlphabetPred);
 #endif // AI_COMPILER
-
-// destroy ini
-#ifndef XRGAME_EXPORTS
-    xr_delete(Ini);
-#endif // XRGAME_EXPORTS
 
     luabind::object table;
 
     R_ASSERT(GEnv.ScriptEngine->function_object("smart_covers.descriptions", table, LUA_TTABLE));
 
     for (luabind::iterator I(table), E; I != E; ++I)
-        smart_covers.push_back(luabind::object_cast<LPCSTR>(I.key()));
+        smart_covers.emplace_back(luabind::object_cast<pcstr>(I.key()));
 
 #ifdef XR_PLATFORM_WINDOWS
     std::sort(smart_covers.begin(), smart_covers.end(), logical_string_predicate());
 #endif
-    };
+};
 
 void SFillPropData::unload()
 {

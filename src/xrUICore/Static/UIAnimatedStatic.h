@@ -19,6 +19,8 @@ class XRUICORE_API CUIAnimatedStatic final : public CUIStatic
     u32 m_uAnimationDuration{};
     // Время прошедшее с начала анимации
     u32 m_uTimeElapsed{};
+    // Флаг-признак циклического проигрывания
+    bool m_bCyclic{ true };
     // флаг-признак необходимости пересчета статичных параметров анимации
     bool m_bParamsChanged{ true };
     // Признак проигрывания анимации
@@ -72,8 +74,10 @@ public:
     }
     void SetAnimPos(float pos);
 
-    // Флаг-признак циклического проигрывания
-    bool m_bCyclic{ true };
+    void SetCyclic(bool cyclic)
+    {
+        m_bCyclic = cyclic;
+    }
 
     virtual void Update();
 

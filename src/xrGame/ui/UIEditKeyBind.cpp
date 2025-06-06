@@ -193,11 +193,15 @@ void CUIEditKeyBind::SetEditMode(bool b)
     {
         SetColorAnimation("ui_map_area_anim", LA_CYCLIC | LA_ONLYALPHA | LA_TEXTCOLOR);
         TextureOn();
+        if (GetParent())
+            GetParent()->SetKeyboardCapture(this, true);
     }
     else
     {
         SetColorAnimation(NULL, 0);
         TextureOff();
+        if (GetParent())
+            GetParent()->SetKeyboardCapture(this, false);
     }
 }
 

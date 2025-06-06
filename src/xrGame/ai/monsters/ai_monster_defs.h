@@ -479,6 +479,7 @@ enum EAccelValue
     eAV_Braking
 };
 
+// XXX: Replace macro with constexpr function
 #define deg(x) (x * PI / 180)
 
 ///////////////////////////////////////////////////////////////////////////////

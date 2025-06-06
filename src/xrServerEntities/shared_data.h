@@ -15,8 +15,7 @@ public:
     static bool _on_self_delete;
 
 public:
-    CSingleton() {}
-    virtual ~CSingleton() { _self = NULL; }
+    virtual ~CSingleton() { _self = nullptr; }
     static void DestroySingleton()
     {
         if (!_self)
@@ -58,14 +57,13 @@ template <class T>
 bool CSingleton<T>::_on_self_delete = true;
 
 template <class SHARED_TYPE, class KEY_TYPE>
-class CSharedObj : public CSingleton<CSharedObj<SHARED_TYPE, KEY_TYPE>>
+class CSharedObj final : public CSingleton<CSharedObj<SHARED_TYPE, KEY_TYPE>>
 {
     xr_map<KEY_TYPE, SHARED_TYPE*> _shared_tab;
     typedef typename xr_map<KEY_TYPE, SHARED_TYPE*>::iterator SHARED_DATA_MAP_IT;
 
 public:
-    CSharedObj(){};
-    virtual ~CSharedObj()
+    ~CSharedObj() override
     {
         for (SHARED_DATA_MAP_IT it = _shared_tab.begin(); it != _shared_tab.end(); ++it)
         {
@@ -99,7 +97,7 @@ class CSharedResource
 
 public:
     CSharedResource() { loaded = false; }
-    bool IsLoaded() { return loaded; }
+    bool IsLoaded() const { return loaded; }
     void SetLoad(bool l = true) { loaded = l; }
 };
 

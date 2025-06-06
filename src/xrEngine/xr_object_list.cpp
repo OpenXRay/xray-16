@@ -229,6 +229,8 @@ void CObjectList::Update(bool bForce)
 
     if (!Device.Paused() || bForce)
     {
+        ZoneScopedN("UpdateCL");
+
         // Clients
         if (Device.fTimeDelta > EPS_S || bForce)
         {
@@ -299,6 +301,8 @@ void CObjectList::Update(bool bForce)
     // Destroy
     if (!destroy_queue.empty())
     {
+        ZoneScopedN("net_Relcase");
+
         // Info
         for (Objects::iterator oit = objects_active.begin(); oit != objects_active.end(); ++oit)
             for (int it = destroy_queue.size() - 1; it >= 0; it--)

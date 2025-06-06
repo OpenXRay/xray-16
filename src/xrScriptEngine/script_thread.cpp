@@ -11,11 +11,7 @@
 #include "script_engine.hpp"
 
 #ifdef USE_DEBUGGER
-#ifndef USE_LUA_STUDIO
-#include "script_debugger.h"
-#else
-#include "LuaStudio/LuaStudio.hpp"
-#endif
+#include "script_debugger.hpp"
 #endif
 
 const LPCSTR main_function = "console_command_run_string_main_thread_function";
@@ -70,10 +66,6 @@ CScriptThread::CScriptThread(CScriptEngine* scriptEngine, LPCSTR caNamespaceName
         }
         m_virtual_machine = lua_newthread(engineLua);
         VERIFY2(lua(), "Cannot create new Lua thread");
-#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
-        if (scriptEngine->debugger())
-            scriptEngine->debugger()->add(m_virtual_machine);
-#endif
 #if !defined(USE_LUA_STUDIO) && defined(DEBUG)
 #ifdef USE_DEBUGGER
         if (scriptEngine.debugger() && scriptEngine.debugger()->Active())

@@ -243,13 +243,13 @@ ENGINE_API bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2);
 ENGINE_API bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2);
 
 ENGINE_API pcstr IdToActionName(EGameActions id);
-ENGINE_API EGameActions ActionNameToId(pcstr name);
-ENGINE_API game_action* ActionNameToPtr(pcstr name);
+ENGINE_API EGameActions ActionNameToId(pcstr name, bool silent = false);
+ENGINE_API game_action* ActionNameToPtr(pcstr name, bool silent = false);
 
 ENGINE_API pcstr DikToKeyname(int dik);
-ENGINE_API int KeynameToDik(pcstr name);
-ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
-ENGINE_API keyboard_key* DikToPtr(int dik, bool safe);
+ENGINE_API int KeynameToDik(pcstr name, bool silent = false);
+ENGINE_API keyboard_key* KeynameToPtr(pcstr name, bool silent = false);
+ENGINE_API keyboard_key* DikToPtr(int dik, bool silent);
 
 ENGINE_API bool IsBinded(EGameActions action_id, int dik, EKeyContext context = EKeyContext::Undefined);
 ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);

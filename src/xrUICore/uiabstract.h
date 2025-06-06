@@ -6,9 +6,12 @@
 #include "Common/Noncopyable.hpp"
 #include "xrEngine/GameFont.h"
 
-typedef CGameFont::EAligment ETextAlignment;
+using ETextAlignment = CGameFont::EAligment;
 
-typedef enum { valTop = 0, valCenter, valBotton } EVTextAlignment;
+enum EVTextAlignment : u8
+{
+    valTop = 0, valCenter, valBottom
+};
 
 class XR_NOVTABLE ITextureOwner
 {
@@ -25,26 +28,19 @@ public:
 };
 
 // Window
-enum EWindowAlignment
+enum EWindowAlignment : u8
 {
-    waNone = 0,
-    waLeft = 1,
-    waRight = 2,
-    waTop = 4,
-    waBottom = 8,
-    waCenter = 16
+    waNone   = 0,
+    waLeft   = 1 << 0,
+    waRight  = 1 << 1,
+    waTop    = 1 << 2,
+    waBottom = 1 << 3,
+    waCenter = 1 << 4,
 };
 
 class CUISimpleWindow : public Noncopyable
 {
 public:
-    CUISimpleWindow() : m_bShowMe(false)
-    {
-        m_alignment = waNone;
-        m_wndPos.set(0, 0);
-        m_wndSize.set(0, 0);
-    }
-
     virtual void SetWndPos(const Fvector2& pos) { m_wndPos.set(pos.x, pos.y); }
     IC const Fvector2& GetWndPos() const { return m_wndPos; }
 
@@ -69,8 +65,8 @@ public:
 
     IC void SetVisible(bool vis) { m_bShowMe = vis; }
     IC bool GetVisible() const { return m_bShowMe; }
-    IC void SetAlignment(EWindowAlignment al) { m_alignment = al; };
-    IC EWindowAlignment GetAlignment() const { return m_alignment; };
+    IC void SetAlignment(EWindowAlignment al) { m_alignment = al; }
+    IC EWindowAlignment GetAlignment() const { return m_alignment; }
     IC Frect GetWndRect() const
     {
         Frect r;
@@ -111,19 +107,22 @@ public:
             res.set(m_wndPos.x, height - m_wndSize.y, m_wndPos.x + m_wndSize.x, height);
             break;
         default: NODEFAULT;
-        };
+        }
     }
+
     void MoveWndDelta(float dx, float dy)
     {
         m_wndPos.x += dx;
         m_wndPos.y += dy;
     }
-    void MoveWndDelta(const Fvector2& d) { MoveWndDelta(d.x, d.y); };
+
+    void MoveWndDelta(const Fvector2& d) { MoveWndDelta(d.x, d.y); }
+
 protected:
-    bool m_bShowMe;
-    Fvector2 m_wndPos;
-    Fvector2 m_wndSize;
-    EWindowAlignment m_alignment;
+    bool m_bShowMe{};
+    EWindowAlignment m_alignment{};
+    Fvector2 m_wndPos{};
+    Fvector2 m_wndSize{};
 };
 
 class CUISelectable
@@ -134,5 +133,5 @@ protected:
 public:
     CUISelectable() : m_bSelected(false) {}
     bool GetSelected() const { return m_bSelected; }
-    virtual void SetSelected(bool b) { m_bSelected = b; };
+    virtual void SetSelected(bool b) { m_bSelected = b; }
 };

@@ -2,6 +2,7 @@
 
 #include "ui_debug.h"
 #include "ui_base.h"
+#include "ui_styles.h"
 #include "xrEngine/editor_helper.h"
 
 CUIDebuggable::~CUIDebuggable()
@@ -64,6 +65,13 @@ CUIDebugger::CUIDebugger()
     reset_settings();
 }
 
+void CUIDebugger::OnUIReset()
+{
+    m_state.selected = nullptr;
+    m_state.newSelected = nullptr;
+    m_state.examined = nullptr;
+}
+
 void CUIDebugger::on_tool_frame()
 {
 #ifndef MASTER_GOLD
@@ -80,7 +88,7 @@ void CUIDebugger::on_tool_frame()
 
             if (ImGui::BeginMenu("Options"))
             {
-                if (ImGui::Button("Reset"))
+                if (ImGui::Button("Reset options"))
                     reset_settings();
 
                 ImGui::Checkbox("Randomly coloured rects", &m_state.settings.coloredRects);
@@ -117,6 +125,29 @@ void CUIDebugger::on_tool_frame()
 
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Styles"))
+            {
+                if (ImGui::BeginCombo("##", UIStyles->GetCurrentStyleName()))
+                {
+                    for (const auto [name, id] : UIStyles->GetToken())
+                    {
+                        if (!name)
+                            continue;
+                        if (ImGui::Selectable(name, name == UIStyles->GetCurrentStyleName()))
+                            UIStyles->SetStyle(name, true);
+                    }
+                    ImGui::EndCombo();
+                }
+
+                if (ImGui::Button("Reload UI"))
+                {
+                    UIStyles->Reset();
+                }
+
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenuBar();
         }
 

@@ -50,7 +50,7 @@ void CAI_Space::init()
         m_moving_objects = xr_make_unique<::moving_objects>();
 
         VERIFY(!GEnv.ScriptEngine);
-        GEnv.ScriptEngine = xr_new<CScriptEngine>();
+        GEnv.ScriptEngine = xr_new<CScriptEngine>(false, true);
         RestartScriptEngine();
     }
 

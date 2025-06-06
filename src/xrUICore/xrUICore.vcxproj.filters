@@ -361,9 +361,6 @@
     <ClInclude Include="Lines\UILines.h">
       <Filter>Lines</Filter>
     </ClInclude>
-    <ClInclude Include="Lines\uilinestd.h">
-      <Filter>Lines</Filter>
-    </ClInclude>
     <ClInclude Include="Lines\UISubLine.h">
       <Filter>Lines</Filter>
     </ClInclude>

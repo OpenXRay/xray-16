@@ -137,7 +137,7 @@ jobs:
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
-      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-soft-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
@@ -200,7 +200,7 @@ jobs:
         submodules: recursive
 
     - name: Setup ${{ matrix.platform.name }} and packages
-      uses: cross-platform-actions/action@v0.27.0
+      uses: cross-platform-actions/action@v0.28.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -213,7 +213,7 @@ jobs:
         run: ${{ matrix.platform.install-cmd }}
 
     - name: Run CMake
-      uses: cross-platform-actions/action@v0.27.0
+      uses: cross-platform-actions/action@v0.28.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -226,7 +226,7 @@ jobs:
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake Build
-      uses: cross-platform-actions/action@v0.27.0
+      uses: cross-platform-actions/action@v0.28.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}

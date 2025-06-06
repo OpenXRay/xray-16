@@ -102,24 +102,28 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         {
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
-            IBlender* B = IBlender::Create(desc.CLS);
-            if (nullptr == B)
+            if (IBlender* B = IBlender::Create(desc.CLS))
             {
-                Msg("! Renderer doesn't support blender '%s'", desc.cName);
-            }
-            else
-            {
+#ifndef MASTER_GOLD
                 if (B->getDescription().version != desc.version)
                 {
                     Msg("! Version conflict in shader '%s'", desc.cName);
                 }
-
+#endif
                 chunk->seek(0);
                 B->Load(*chunk, desc.version);
 
+                // XXX: SDK must prevent the duplication,
+                // the engine should just work
                 auto I = m_blenders.emplace(xr_strdup(desc.cName), B);
                 R_ASSERT2(I.second, "shader.xr - found duplicate name!!!");
             }
+#ifndef MASTER_GOLD
+            else
+            {
+                Msg("! Renderer doesn't support blender '%s'", desc.cName);
+            }
+#endif
             chunk->close();
             chunk_id += 1;
         }

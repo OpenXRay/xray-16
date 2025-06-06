@@ -17,13 +17,6 @@
 
 #include "specific_character.h"
 
-GAME_NEWS_DATA::GAME_NEWS_DATA() : receive_time(0)
-{
-    m_type = eNews;
-    //	tex_rect.set	(0.0f,0.0f,0.0f,0.0f);
-    show_time = DEFAULT_NEWS_SHOW_TIME;
-}
-
 void GAME_NEWS_DATA::save(IWriter& stream)
 {
     save_data(m_type, stream);

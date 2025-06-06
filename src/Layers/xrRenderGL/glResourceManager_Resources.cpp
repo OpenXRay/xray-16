@@ -136,7 +136,9 @@ void CResourceManager::_DeletePP(const SPP* pp)
         return;
     }
 
+#ifndef MASTER_GOLD
     Msg("! ERROR: Failed to find program pipeline '%s'", pp->cName.c_str());
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------

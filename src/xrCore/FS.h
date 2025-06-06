@@ -421,6 +421,8 @@ private:
     typedef IReaderBase<IReader> inherited;
 };
 
+template class IReaderBase<IReader>;
+
 class XRCORE_API CVirtualFileRW final : public IReader
 {
 private:

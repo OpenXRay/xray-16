@@ -19,7 +19,7 @@ struct SControlledInfo
     float m_radius;
 };
 
-class CControlledEntityBase
+class XR_NOVTABLE CControlledEntityBase
 {
 public:
     virtual bool is_under_control() = 0;

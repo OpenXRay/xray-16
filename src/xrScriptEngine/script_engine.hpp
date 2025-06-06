@@ -10,6 +10,7 @@
 #include "xrCore/xrCore.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrScriptEngine/script_profiler.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrScriptEngine/Functor.hpp"
 #include "xrCore/Threading/Lock.hpp"
@@ -32,18 +33,7 @@ struct lua_State;
 struct lua_Debug;
 
 #ifdef USE_DEBUGGER
-#ifndef USE_LUA_STUDIO
 class CScriptDebugger;
-#else
-namespace cs
-{
-namespace lua_studio
-{
-struct world;
-}
-}
-class lua_studio_engine;
-#endif
 #endif
 
 enum class ScriptProcessor : u32
@@ -65,11 +55,13 @@ enum class LuaMessageType : u32
     HookTailReturn = u32(-1),
 };
 
-extern Flags32 XRSCRIPTENGINE_API g_LuaDebug;
+extern XRSCRIPTENGINE_API Flags32 g_LuaDebug;
+extern XRSCRIPTENGINE_API int g_LuaDumpDepth;
 
 class XRSCRIPTENGINE_API CScriptEngine
 {
 public:
+    constexpr static cpcstr ARGUMENT_ENGINE_NOJIT = "-nojit";
     typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
     static const char* const GlobalNamespace;
 
@@ -95,16 +87,8 @@ protected:
     CMemoryWriter m_output; // for call stack
 
 #ifdef USE_DEBUGGER
-#ifndef USE_LUA_STUDIO
-    CScriptDebugger* m_scriptDebugger;
-#else
-    cs::lua_studio::world* m_lua_studio_world;
-    lua_studio_engine* m_lua_studio_engine;
+    CScriptDebugger* m_scriptDebugger{};
 #endif
-#endif
-
-public:
-    bool m_stack_is_ready;
 
 private:
     static CScriptEngine* GetInstance(lua_State* state);
@@ -153,6 +137,8 @@ protected:
     }
 
 public:
+    CScriptProfiler* m_profiler;
+
     lua_State* lua() { return m_virtual_machine; }
     void current_thread(CScriptThread* thread)
     {
@@ -184,7 +170,7 @@ public:
     {
         int result = 0;
 
-        //if (g_LuaDebug.test(1) || message == LuaMessageType::Error)
+        if (g_LuaDebug.test(1) || message == LuaMessageType::Error)
         {
             string4096 log;
             result = xr_sprintf(log, format, std::forward<Args>(args)...);
@@ -196,8 +182,12 @@ public:
             m_output.w("\r\n", sizeof("\r\n"));
         }
 
-        if (message == LuaMessageType::Error)
+        if (message == LuaMessageType::Error && !logReenterability)
+        {
+            logReenterability = true;
             print_stack();
+            logReenterability = false;
+        }
 
         return result;
     }
@@ -206,7 +196,6 @@ public:
 
 private:
     static void print_error(lua_State* L, int iErrorCode);
-    static bool onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
 
 public:
     static void on_error(lua_State* state);
@@ -214,23 +203,22 @@ public:
     void flush_log();
     void print_stack(lua_State* L = nullptr);
 
-    void LogTable(lua_State* l, pcstr S, int level);
-    void LogVariable(lua_State* l, pcstr name, int level);
+    // Logs current value on the Lua stack
+    // Expands the tables/userdata and logs their contents too
+    void log_value(lua_State* L, pcstr name, int depth);
 
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
-    CScriptEngine(bool is_editor = false);
+    CScriptEngine(bool is_editor = false, bool is_with_profiler = false);
     virtual ~CScriptEngine();
     void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
     static int lua_panic(lua_State* L);
     static void lua_error(lua_State* L);
     static int lua_pcall_failed(lua_State* L);
-#if 1 //!XRAY_EXCEPTIONS
+#if !XRAY_EXCEPTIONS
     static void lua_cast_failed(lua_State* L, const luabind::type_id& info);
 #endif
-#ifdef DEBUG
     static void lua_hook_call(lua_State* L, lua_Debug* dbg);
-#endif
     void setup_callbacks();
     bool load_file(const char* scriptName, const char* namespaceName);
     CScriptProcess* script_process(const ScriptProcessor& process_id) const;
@@ -246,17 +234,9 @@ public:
     template <typename TResult>
     IC bool functor(LPCSTR function_to_call, luabind::functor<TResult>& lua_function);
 #ifdef USE_DEBUGGER
-#ifndef USE_LUA_STUDIO
     void stopDebugger();
     void restartDebugger();
     CScriptDebugger* debugger() { return m_scriptDebugger; }
-#else
-    void try_connect_to_debugger();
-    void disconnect_from_debugger();
-    cs::lua_studio::world* debugger() const { return m_lua_studio_world; }
-    void initialize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine);
-    void finalize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine);
-#endif
 #endif
     void collect_all_garbage();
 

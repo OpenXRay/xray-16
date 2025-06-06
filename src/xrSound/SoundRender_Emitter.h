@@ -88,7 +88,7 @@ private:
     int filled_blocks{};
 
     void fill_block(void* ptr, u32 size);
-    void fill_data(void* dest, u32 offset, u32 size) const;
+    void fill_data(void* dest, u32 offset, u32 size);
 
     void fill_all_blocks();
     void dispatch_prefill();

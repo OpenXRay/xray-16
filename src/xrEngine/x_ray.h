@@ -2,7 +2,7 @@
 #define __X_RAY_H__
 
 #include <mutex>
-#include <span>
+#include <array>
 
 #include "xrEngine/Engine.h"
 
@@ -41,7 +41,7 @@ private:
 
 public:
     // Other
-    CApplication(pcstr commandLine, GameModule* game, const std::span<RendererModule*>& modules);
+    CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 2>& modules);
     ~CApplication();
 
     int Run();

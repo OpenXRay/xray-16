@@ -10,9 +10,6 @@
 
 struct SInfoPortionData : CSharedResource
 {
-    SInfoPortionData();
-    virtual ~SInfoPortionData();
-
     //массив с именами диалогов, которые могут быть инициированы
     //из этого InfoPortion
     DIALOG_ID_VECTOR m_DialogNames;
@@ -37,7 +34,7 @@ struct SInfoPortionData : CSharedResource
 };
 
 //квант  - порция информации
-class CInfoPortion : public CSharedClass<SInfoPortionData, shared_str, false>,
+class CInfoPortion final : public CSharedClass<SInfoPortionData, shared_str, false>,
                      public CXML_IdToIndex<CInfoPortion>
 {
 private:
@@ -45,14 +42,17 @@ private:
     using id_to_index = CXML_IdToIndex<CInfoPortion>;
 
     friend id_to_index;
-public:
-    CInfoPortion(void);
-    ~CInfoPortion(void) override;
 
+public:
     //инициализация info данными
     //если info с таким id раньше не использовался
     //он будет загружен из файла
-    virtual void Load(shared_str info_str_id);
+    void Load(const shared_str& info_id)
+    {
+        m_InfoId = info_id;
+        inherited_shared::load_shared(m_InfoId, nullptr);
+    }
+
     const ARTICLE_ID_VECTOR& Articles() const { return info_data()->m_Articles; }
     const ARTICLE_ID_VECTOR& ArticlesDisable() const { return info_data()->m_ArticlesDisable; }
     const TASK_ID_VECTOR& GameTasks() const { return info_data()->m_GameTasks; }

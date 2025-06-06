@@ -33,7 +33,7 @@ public:
     CSheduler Sheduler;
     CSoundManager Sound;
 
-    void Initialize(GameModule* game);
+    void Initialize(GameModule* game, const std::array<RendererModule*, 2>& modules);
     void Destroy();
 
     void OnEvent(EVENT E, u64 P1, u64 P2) override;

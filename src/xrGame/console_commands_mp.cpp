@@ -1687,15 +1687,13 @@ public:
     CCC_StartTimeEnvironment(LPCSTR N) : IConsole_Command(N){};
     virtual void Execute(LPCSTR args)
     {
-        u32 hours = 0, mins = 0;
-
-        sscanf(args, "%d:%d", &hours, &mins);
-        u64 NewTime = generate_time(1, 1, 1, hours, mins, 0, 0);
-
-        if (!g_pGameLevel)
+        u32 hours = 0, mins = 0, seconds = 0;
+        if (sscanf(args, "%d:%d:%d", &hours, &mins, &seconds) < 2)
             return;
 
-        if (!Level().Server)
+        u64 NewTime = generate_time(1, 1, 1, hours, mins, seconds, 0);
+
+        if (!OnServer() && IsGameTypeSingle())
             return;
 
         if (!Level().Server->GetGameState())
@@ -1723,7 +1721,7 @@ public:
         }
 
 #ifdef MASTER_GOLD
-        if (!OnServer())
+        if (!OnServer() || IsGameTypeSingle())
             return;
         constexpr bool forced = false;
 #else

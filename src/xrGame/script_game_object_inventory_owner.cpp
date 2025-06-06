@@ -138,9 +138,9 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
     news_data.texture_name = texture_name;
 
     if (delay == 0)
-        Actor()->AddGameNews(news_data);
+        Actor()->AddGameNews(std::move(news_data));
     else
-        Actor()->AddGameNews_deffered(news_data, delay);
+        Actor()->AddGameNews_deffered(std::move(news_data), delay);
 }
 
 void CScriptGameObject::ClearGameNews() const

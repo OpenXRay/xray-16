@@ -288,7 +288,7 @@ void OPCODE_Model::Load(IReader* stream)
         auto* ptr = xr_alloc<AABBNoLeafNode>(nodesNum);
         const u32 size = nodesNum * sizeof(AABBNoLeafNode);
         CopyMemory(ptr, stream->pointer(), size);
-        for (int i = 0; i < nodesNum; ++i)
+        for (u32 i = 0; i < nodesNum; ++i)
         {
             const auto* rootPtr = &ptr[0];
             if (!ptr[i].HasLeaf())
@@ -320,7 +320,7 @@ void OPCODE_Model::Save(IWriter* stream) const
         R_ASSERT(size == mTree->GetUsedBytes());
         CopyMemory(ptr, mTree->GetData(), size);
         pData = ptr;
-        for (int i = 0; i < nodesNum; ++i, ++ptr)
+        for (u32 i = 0; i < nodesNum; ++i, ++ptr)
         {
             const auto* rootPtr = mTree->GetData();
             if (!ptr->HasLeaf())

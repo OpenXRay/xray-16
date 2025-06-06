@@ -22,33 +22,6 @@ static const Fvector local_points[8] = {Fvector().set(-1.f, -1.f, -1.f), Fvector
 
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
-struct merge_predicate
-{
-public:
-    typedef moving_objects::AREA AREA;
-
-public:
-    ai_obstacle* m_object;
-    AREA* m_area;
-    const CLevelGraph* m_level_graph;
-
-    IC merge_predicate(ai_obstacle* object, AREA& area)
-    {
-        m_object = object;
-        m_area = &area;
-        m_level_graph = &ai().level_graph();
-    }
-
-    IC void operator()(const CLevelGraph::CLevelVertex& vertex) const
-    {
-        u32 vertex_id = m_level_graph->vertex_id(&vertex);
-        if (!m_object->inside(vertex_id))
-            return;
-
-        m_area->push_back(vertex_id);
-    }
-};
-
 IC bool ai_obstacle::inside(const Fvector& position, const float& radius) const
 {
     for (u32 i = 0; i < PLANE_COUNT; ++i)
@@ -233,7 +206,16 @@ void ai_obstacle::compute_impl()
     const_iterator E = level_graph.end();
 
     m_area.clear();
-    merge_predicate predicate(this, m_area);
+
+    const auto merge = [this, &level_graph](const CLevelGraph::CLevelVertex& vertex)
+    {
+        const u32 vertex_id = level_graph.vertex_id(&vertex);
+        if (!this->inside(vertex_id))
+            return;
+
+        m_area.emplace_back(vertex_id);
+    };
+
     for (u32 x = x_min; x <= x_max; ++x)
     {
         for (u32 z = z_min; z <= z_max; ++z)
@@ -243,14 +225,14 @@ void ai_obstacle::compute_impl()
             if ((I == E) || ((*I).position().xz() != xz))
                 continue;
 
-            predicate(*I);
+            merge(*I);
 
             for (++I; I != E; ++I)
             {
                 if ((*I).position().xz() != xz)
                     break;
 
-                predicate(*I);
+                merge(*I);
             }
         }
     }

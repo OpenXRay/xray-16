@@ -28,9 +28,9 @@ protected:
 
     int m_ScrollWorkArea;
     bool m_b_enabled{ true };
-    bool m_bIsHorizontal;
+    bool m_bIsHorizontal{ false };
 
-    int m_mouse_state{};
+    u8 m_mouse_state{};
 
     bool ScrollInc(bool by_scrollbox = false);
     bool ScrollDec(bool by_scrollbox = false);

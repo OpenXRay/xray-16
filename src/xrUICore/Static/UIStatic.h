@@ -109,15 +109,14 @@ public:
 protected:
     CUILines* m_pTextControl{};
 
+    CUIStaticItem m_UIStaticItem;
+    Fvector2 m_TextureOffset;
     bool m_bStretchTexture{};
     bool m_bTextureEnable{ true };
-    CUIStaticItem m_UIStaticItem;
 
     bool m_bHeading{};
     bool m_bConstHeading{};
     float m_fHeading{};
-
-    Fvector2 m_TextureOffset;
 
 public:
     CUILines* TextItemControl();

@@ -21,7 +21,7 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
-RendererModule* s_render_modules[] =
+std::array<RendererModule*, 2> s_render_modules =
 {
 #ifdef XR_PLATFORM_WINDOWS
     xray::render::render_r4::GetRendererModule(),
@@ -29,8 +29,23 @@ RendererModule* s_render_modules[] =
     xray::render::render_gl::GetRendererModule(),
 };
 
+struct tracy_raii
+{
+    ~tracy_raii()
+    {
+#ifdef TRACY_ENABLE
+        tracy::GetProfiler().RequestShutdown();
+        while (!tracy::GetProfiler().HasShutdownFinished())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+#endif
+    }
+};
+
 int entry_point(pcstr commandLine)
 {
+    tracy_raii raii;
     auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
 
     CApplication app{ commandLine, game, s_render_modules };

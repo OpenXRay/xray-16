@@ -107,7 +107,7 @@ AssertionResult xrDebug::ShowMessage(pcstr title, pcstr message, bool simpleMode
     {
         SDL_MESSAGEBOX_ERROR,
         windowHandler ? windowHandler->GetApplicationWindow() : nullptr,
-        title, message, SDL_arraysize(buttons), buttons
+        title, message, SDL_arraysize(buttons), buttons, nullptr
     };
 
     int button = -1;
@@ -153,7 +153,7 @@ xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
 xrDebug::OutOfMemoryCallbackFunc xrDebug::OutOfMemoryCallback = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
-bool xrDebug::ShowErrorMessage = false;
+bool xrDebug::ShowErrorMessage = true;
 
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
@@ -944,9 +944,7 @@ void xrDebug::Initialize(pcstr commandLine)
 #if defined(XR_PLATFORM_WINDOWS)
     PrevFilter = SetUnhandledExceptionFilter(UnhandledFilter);
 #endif
-#ifdef DEBUG
-    ShowErrorMessage = true;
-#else
+#ifdef MASTER_GOLD
     ShowErrorMessage = commandLine ? !!strstr(commandLine, "-show_error_window") : false;
 #endif
 }
@@ -958,5 +956,7 @@ void xrDebug::Finalize()
 #if defined(XR_PLATFORM_WINDOWS)
     SetUnhandledExceptionFilter(nullptr);
 #endif
+#ifdef MASTER_GOLD
     ShowErrorMessage = false;
+#endif
 }

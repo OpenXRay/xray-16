@@ -359,7 +359,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
             u8* src_data = xr_alloc<u8>(dwSize);
             read_byte = _read(fd, src_data, dwSize);
 
-            VERIFY(read_byte == dwSize);
+            VERIFY(static_cast<size_t>(read_byte) == dwSize);
             if (dwType & CFS_CompressMark)
             {
                 u8* dest = nullptr;

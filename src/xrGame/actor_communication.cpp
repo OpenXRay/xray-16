@@ -112,16 +112,16 @@ void CActor::AddGameTask(const CInfoPortion* info_portion) const
     }
 }
 
-void CActor::AddGameNews(GAME_NEWS_DATA& news_data)
+void CActor::AddGameNews(GAME_NEWS_DATA&& news_data)
 {
-    GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
-    news_data.receive_time = Level().GetGameTime();
-    news_vector.push_back(news_data);
-
     if (CurrentGameUI())
     {
         CurrentGameUI()->UIMainIngameWnd->ReceiveNews(&news_data);
     }
+
+    GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
+    news_data.receive_time = Level().GetGameTime();
+    news_vector.emplace_back(std::move(news_data));
 }
 
 void CActor::ClearGameNews()
@@ -281,25 +281,20 @@ void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
     };
 }
 
-void CActor::AddGameNews_deffered(GAME_NEWS_DATA& news_data, u32 delay)
+void CActor::AddGameNews_deffered(GAME_NEWS_DATA&& news_data, u32 delay)
 {
-    GAME_NEWS_DATA* d = xr_new<GAME_NEWS_DATA>(news_data);
-    //*d = news_data;
-    m_defferedMessages.push_back(SDefNewsMsg());
-    m_defferedMessages.back().news_data = d;
-    m_defferedMessages.back().time = Device.dwTimeGlobal + delay;
+    m_defferedMessages.emplace_back(SDefNewsMsg{ std::move(news_data), Device.dwTimeGlobal + delay });
     std::sort(m_defferedMessages.begin(), m_defferedMessages.end());
 }
 
 void CActor::UpdateDefferedMessages()
 {
-    while (m_defferedMessages.size())
+    while (!m_defferedMessages.empty())
     {
-        SDefNewsMsg& M = m_defferedMessages.back();
-        if (M.time <= Device.dwTimeGlobal)
+        auto& [news_data, time] = m_defferedMessages.back();
+        if (time <= Device.dwTimeGlobal)
         {
-            AddGameNews(*M.news_data);
-            xr_delete(M.news_data);
+            AddGameNews(std::move(news_data));
             m_defferedMessages.pop_back();
         }
         else

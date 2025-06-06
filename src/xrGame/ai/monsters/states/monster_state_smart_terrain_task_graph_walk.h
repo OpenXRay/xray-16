@@ -1,10 +1,11 @@
 #pragma once
-#include "ai/monsters/state.h"
+
+#include "ai/monsters/states/monster_state_move.h"
 
 template <typename _Object>
-class CStateMonsterSmartTerrainTaskGraphWalk : public CStateMove<_Object>
+class CStateMonsterSmartTerrainTaskGraphWalk : public CMonsterStateMove<_Object>
 {
-    typedef CStateMove<_Object> inherited;
+    typedef CMonsterStateMove<_Object> inherited;
 
     CALifeSmartTerrainTask* m_task;
 
