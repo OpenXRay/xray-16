@@ -289,9 +289,10 @@ public:
     void net_Update() override;
     bool Load_GameSpecific_Before() override;
     bool Load_GameSpecific_After() override;
+    void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) override;
     void Load_GameSpecific_CFORM_Serialize(IWriter& writer) override;
     bool Load_GameSpecific_CFORM_Deserialize(IReader& reader) override;
-    void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) override;
+    void Load_GameSpecific_CFORM_SetMaterials(CDB::TRI* tris, u32 count, xr_map<u16, shared_str>& gameMtls) override;
 
     // Events
     void OnEvent(EVENT E, u64 P1, u64 P2) override;

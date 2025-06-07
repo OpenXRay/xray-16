@@ -93,6 +93,11 @@ bool deserialize_callback(IReader& reader)
 {
     return g_pGameLevel->Load_GameSpecific_CFORM_Deserialize(reader);
 }
+
+void remapping_materials_callback(CDB::TRI* T, u32 Tcnt, xr_map<u16, shared_str>& gameMtls)
+{
+    g_pGameLevel->Load_GameSpecific_CFORM_SetMaterials(T, Tcnt, gameMtls);
+}
 } // namespace
 
 bool IGame_Level::Load(u32 dwNum)
@@ -119,7 +124,7 @@ bool IGame_Level::Load(u32 dwNum)
     // CForms
     g_pGamePersistent->LoadTitle("st_loading_cform");
 
-    ObjectSpace.Load(build_callback, serialize_callback, deserialize_callback);
+    ObjectSpace.Load(build_callback, serialize_callback, deserialize_callback, remapping_materials_callback);
     g_pGamePersistent->SpatialSpace.initialize(ObjectSpace.GetBoundingVolume());
     g_pGamePersistent->SpatialSpacePhysic.initialize(ObjectSpace.GetBoundingVolume());
 

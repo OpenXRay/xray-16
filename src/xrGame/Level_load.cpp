@@ -180,6 +180,14 @@ struct translation_pair
     IC bool operator<(const u16& id) const { return (m_id < id); }
 };
 
+struct translation_struct
+{
+    u16 m_id;
+    u16 m_index;
+    bool m_suppress_shadows;
+    bool m_suppress_wm;
+};
+
 void CLevel::Load_GameSpecific_CFORM_Serialize(IWriter& writer)
 {
     writer.w_u32(GMLib.GetLibraryCrc32());
@@ -261,6 +269,41 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         }
     }
 }
+
+void CLevel::Load_GameSpecific_CFORM_SetMaterials(CDB::TRI* tris, u32 count, xr_map<u16, shared_str>& gameMtls)
+{
+    // SkyLoader: reassing material indexes because they could have changed after various gamemtl.xr edits
+    xr_vector<translation_struct> translator;
+    translator.reserve(gameMtls.size());
+    for (const auto& [id, mtlName] : gameMtls)
+    {
+        SGameMtl* mtl = GMLib.GetMaterial(mtlName.c_str());
+        R_ASSERT2(mtl, make_string("Game material '%s' not found", mtlName.c_str()).c_str());
+
+        translation_struct mat;
+        mat.m_id = id;
+        mat.m_index = GMLib.GetMaterialIdx(mtlName.c_str());
+        mat.m_suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
+        mat.m_suppress_wm = mtl->Flags.is(SGameMtl::flSuppressWallmarks);
+        translator.emplace_back(std::move(mat));
+    }
+
+    CDB::TRI* I = tris;
+    CDB::TRI* E = tris + count;
+    for (; I != E; ++I)
+    {
+        auto it = std::find_if(translator.begin(), translator.end(), [=](const translation_struct& mat) { return mat.m_id == (u16)(*I).material; });
+        if (it != translator.end())
+        {
+            (*I).material = (*it).m_index;
+            (*I).suppress_shadows = (*it).m_suppress_shadows;
+            (*I).suppress_wm = (*it).m_suppress_wm;
+        }
+        else
+            xrDebug::Fatal(DEBUG_INFO, "Game material '%d' not found", (*I).material);
+    }
+}
+
 
 void CLevel::BlockCheatLoad()
 {

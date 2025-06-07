@@ -113,6 +113,7 @@ public:
     virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) = 0;
     virtual void Load_GameSpecific_CFORM_Serialize(IWriter& writer) = 0;
     virtual bool Load_GameSpecific_CFORM_Deserialize(IReader& reader) = 0;
+    virtual void Load_GameSpecific_CFORM_SetMaterials(CDB::TRI* tris, u32 count, xr_map<u16, shared_str>& gameMtls) = 0;
 
     virtual void OnFrame(void);
     virtual void OnRender(void);

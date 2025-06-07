@@ -60,6 +60,7 @@ static_assert(sizeof(TRI) == 16, "TRI always should be 16 bytes on any architect
 using build_callback = void(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, void* params);
 using serialize_callback = void(IWriter& writer);
 using deserialize_callback = bool(IReader& reader);
+using remapping_materials_callback = void(TRI* T, u32 Tcnt, xr_map<u16, shared_str>& gameMtls);
 
 // Model definition
 class XRCDB_API MODEL : Noncopyable
@@ -113,10 +114,12 @@ public:
     void build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc = nullptr, void* bcp = nullptr);
 
     void set_model_crc32(u32 value) { model_crc32 = value; }
+    void load_geom(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt);
     bool serialize(pcstr fileName, serialize_callback callback = nullptr) const;
     bool deserialize(pcstr fileName, bool skipCrc32Check = false, deserialize_callback callback = nullptr);
+    void deserialize_tree(IReader* rstream);
 
-    u32 memory();
+    size_t memory();
 
 private:
     void syncronize_impl() const;

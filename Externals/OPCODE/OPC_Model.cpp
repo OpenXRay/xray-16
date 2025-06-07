@@ -276,7 +276,7 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
     return true;
 }
 
-bool OPCODE_Model::Load(IReader* stream, bool skipCrc32Check /*= false*/)
+bool OPCODE_Model::Load(IReader* stream, bool skipCrc32Check /*= false*/, bool readCrc32 /*= true*/)
 {
     mNoLeaf = stream->r_u32();
     mQuantized = stream->r_u32();
@@ -285,14 +285,17 @@ bool OPCODE_Model::Load(IReader* stream, bool skipCrc32Check /*= false*/)
 
     if (mNoLeaf && !mQuantized)
     {
-        const u32 size = nodesNum * sizeof(AABBNoLeafNode);
+        const size_t size = static_cast<size_t>(nodesNum) * sizeof(AABBNoLeafNode);
         if (size > stream->elapsed())
             return false;
 
-        const auto crc = stream->r_u32();
-        auto actualCrc = skipCrc32Check ? crc : crc32(stream->pointer(), size);
-        if (crc != actualCrc)
-            return false;
+        if (readCrc32)
+        {
+            const auto crc = stream->r_u32();
+            auto actualCrc = skipCrc32Check ? crc : crc32(stream->pointer(), size);
+            if (crc != actualCrc)
+                return false;
+        }
 
         mTree = xr_new<AABBNoLeafTree>();
         auto* ptr = xr_alloc<AABBNoLeafNode>(nodesNum);
@@ -325,7 +328,7 @@ void OPCODE_Model::Save(IWriter* stream) const
     void* pData = nullptr;
     if (mNoLeaf && !mQuantized)
     {
-        const u32 size = nodesNum * sizeof(AABBNoLeafNode);
+        const size_t size = static_cast<size_t>(nodesNum) * sizeof(AABBNoLeafNode);
         R_ASSERT(size == mTree->GetUsedBytes());
 
         auto* ptr = xr_alloc<AABBNoLeafNode>(nodesNum);

@@ -83,7 +83,7 @@ void MODEL::build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callbac
 
     xr_free(verts);
     xr_free(tris);
-    xr_free(tree);
+    xr_delete(tree);
 
     // verts
     verts_count = Vcnt;
@@ -139,6 +139,22 @@ void MODEL::build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callbac
 
     // Free temporary tris
     xr_free(temp_tris);
+}
+
+void MODEL::load_geom(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt)
+{
+    xr_free(verts);
+    xr_free(tris);
+
+    // verts
+    verts_count = Vcnt;
+    verts = xr_alloc<Fvector>(verts_count);
+    CopyMemory(verts, V, static_cast<size_t>(verts_count) * sizeof(Fvector));
+
+    // tris
+    tris_count = Tcnt;
+    tris = xr_alloc<TRI>(tris_count);
+    CopyMemory(tris, T, static_cast<size_t>(tris_count) * sizeof(TRI));
 }
 
 /*
@@ -218,9 +234,9 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
     verts_count = rstream->r_u32();
     tris_count = rstream->r_u32();
 
-    const u32 vertsSize = verts_count * sizeof(Fvector);
-    const u32 trisSize = tris_count * sizeof(TRI);
-    const u32 treeSize = sizeof(verts_count) + sizeof(tris_count) + vertsSize + trisSize;
+    const size_t vertsSize = static_cast<size_t>(verts_count) * sizeof(Fvector);
+    const size_t trisSize = static_cast<size_t>(tris_count) * sizeof(TRI);
+    const size_t treeSize = sizeof(verts_count) + sizeof(tris_count) + vertsSize + trisSize;
     if (treeSize > rstream->elapsed())
     {
         FS.r_close(rstream);
@@ -236,7 +252,7 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
 
     xr_free(verts);
     xr_free(tris);
-    xr_free(tree);
+    xr_delete(tree);
 
     verts = xr_alloc<Fvector>(verts_count);
     tris = xr_alloc<TRI>(tris_count);
@@ -257,15 +273,29 @@ bool MODEL::deserialize(pcstr fileName, bool skipCrc32Check /*= false*/, deseria
     return success;
 }
 
-u32 MODEL::memory()
+void MODEL::deserialize_tree(IReader* rstream)
+{
+    R_ASSERT(rstream);
+
+    xr_delete(tree);
+
+    tree = xr_new<OPCODE_Model>();
+
+    // Load the OPCODE tree
+    const bool success = tree->Load(rstream, true, false);
+    if (success)
+        status = S_READY;
+}
+
+size_t MODEL::memory()
 {
     if (S_BUILD == status)
     {
         Msg("! xrCDB: model still isn't ready");
         return 0;
     }
-    u32 V = verts_count * sizeof(Fvector);
-    u32 T = tris_count * sizeof(TRI);
+    size_t V = static_cast<size_t>(verts_count) * sizeof(Fvector);
+    size_t T = static_cast<size_t>(tris_count) * sizeof(TRI);
     return tree->GetUsedBytes() + V + T + sizeof(*this) + sizeof(*tree);
 }
 

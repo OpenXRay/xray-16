@@ -87,25 +87,28 @@ int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionForm*
 
 void CObjectSpace::Load(CDB::build_callback build_callback,
     CDB::serialize_callback serialize_callback,
-    CDB::deserialize_callback deserialize_callback)
+    CDB::deserialize_callback deserialize_callback,
+    CDB::remapping_materials_callback remapping_materials_callback)
 {
-    Load("$level$", "level.cform", build_callback, serialize_callback, deserialize_callback);
+    Load("$level$", "level.cform", build_callback, serialize_callback, deserialize_callback, remapping_materials_callback);
 }
 
 void CObjectSpace::Load(LPCSTR path, LPCSTR fname,
     CDB::build_callback build_callback,
     CDB::serialize_callback serialize_callback,
-    CDB::deserialize_callback deserialize_callback)
+    CDB::deserialize_callback deserialize_callback,
+    CDB::remapping_materials_callback remapping_materials_callback)
 {
     IReader* F = FS.r_open(path, fname);
     R_ASSERT(F);
-    Load(F, build_callback, serialize_callback, deserialize_callback);
+    Load(F, build_callback, serialize_callback, deserialize_callback, remapping_materials_callback);
 }
 
 void CObjectSpace::Load(IReader* F,
     CDB::build_callback build_callback,
     CDB::serialize_callback serialize_callback,
-    CDB::deserialize_callback deserialize_callback)
+    CDB::deserialize_callback deserialize_callback,
+    CDB::remapping_materials_callback remapping_materials_callback)
 {
     ZoneScoped;
 
@@ -119,14 +122,27 @@ void CObjectSpace::Load(IReader* F,
     Fvector* verts = (Fvector*)F->pointer();
     CDB::TRI* tris = (CDB::TRI*)(verts + H.vertcount);
 
-    Create(verts, tris, H, build_callback, serialize_callback, deserialize_callback);
+    // SkyLoader: Check for the new format
+    IReader* cacheStream = nullptr;
+    size_t totalGeomSize = (static_cast<size_t>(H.vertcount) * sizeof(Fvector)) + (H.facecount * sizeof(CDB::TRI));
+    F->advance(totalGeomSize);
+    if (F->elapsed() > sizeof(u32))
+    {
+        u32 version = F->r_u32();
+        if (version == CFORM_CACHE_CURRENT_VERSION)
+            cacheStream = F;
+    }
+
+    Create(verts, tris, H, build_callback, serialize_callback, deserialize_callback, remapping_materials_callback, cacheStream);
     FS.r_close(F);
 }
 
 void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
     CDB::build_callback build_callback,
     CDB::serialize_callback serialize_callback,
-    CDB::deserialize_callback deserialize_callback)
+    CDB::deserialize_callback deserialize_callback,
+    CDB::remapping_materials_callback remapping_materials_callback,
+    IReader* cacheStream /*= nullptr*/)
 {
     ZoneScoped;
 
@@ -139,7 +155,33 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
     strconcat(file_name, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "objspace.bin");
     FS.update_path(file_name, "$app_data_root$", file_name);
 
-    if (use_cache && FS.exist(file_name) && Static.deserialize(file_name, skip_crc32_check, deserialize_callback))
+    if (use_cache && cacheStream)
+    {
+#ifndef MASTER_GOLD
+        Msg("* Loading ObjectSpace cache from level.cform...");
+#endif
+
+        // Load geometry
+        Static.load_geom(verts, H.vertcount, tris, H.facecount);
+
+        // Read game material list
+        xr_map<u16, shared_str> gameMtls;
+        u32 cnt = cacheStream->r_u32();
+        for (u32 i = 0; i < cnt; i++)
+        {
+            u16 idx = cacheStream->r_u16();
+            shared_str mtlName;
+            cacheStream->r_stringZ(mtlName);
+            gameMtls[idx] = mtlName;
+        }
+
+        if (remapping_materials_callback)
+            remapping_materials_callback(Static.get_tris(), Static.get_tris_count(), gameMtls);
+
+        // Load OPCODE tree
+        Static.deserialize_tree(cacheStream);
+    }
+    else if (use_cache && FS.exist(file_name) && Static.deserialize(file_name, skip_crc32_check, deserialize_callback))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded ObjectSpace cache (%s)...", file_name);

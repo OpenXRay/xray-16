@@ -124,7 +124,7 @@ public:\
     void* GetData() const override { return static_cast<void*>(mNodes); }\
     void SetData(void* ptr, udword nbNodes) override { mNodes = static_cast<volume*>(ptr); mNbNodes = nbNodes; }\
     /* Stats */\
-    virtual udword GetUsedBytes() const { return mNbNodes * sizeof(volume); }\
+    virtual size_t GetUsedBytes() const { return static_cast<size_t>(mNbNodes) * sizeof(volume); }\
     \
 private:\
     volume* mNodes;
@@ -139,7 +139,7 @@ public:
     inline_ udword GetNbNodes() const { return mNbNodes; }
     virtual void* GetData() const = 0;
     virtual void SetData(void* ptr, udword nbNodes) = 0;
-    virtual udword GetUsedBytes() const = 0;
+    virtual size_t GetUsedBytes() const = 0;
     virtual bool Build(AABBTree* tree) = 0;
 
 protected:

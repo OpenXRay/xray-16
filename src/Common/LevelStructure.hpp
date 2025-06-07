@@ -555,6 +555,7 @@ using NodeCompressed = NodeCompressed13;
 const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
+const u32 CFORM_CACHE_CURRENT_VERSION = 1; // SkyLoader: Added CDB cache, physical material list
 
 enum xrAI_Versions : u8
 {
