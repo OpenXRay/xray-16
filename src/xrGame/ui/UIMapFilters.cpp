@@ -177,7 +177,7 @@ CUICheckButton* CUIMapFilters::GetSelectedFilter() const
 
 bool CUIMapFilters::IsFilterEnabled(eSpotsFilter filter) const
 {
-    return m_filters[filter] && m_filters[filter]->GetCheck();
+    return !m_filters[filter] || m_filters[filter]->GetCheck();
 }
 
 void CUIMapFilters::SetFilterEnabled(eSpotsFilter filter, bool enable) const
