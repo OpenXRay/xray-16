@@ -321,10 +321,10 @@ void CUITaskWnd::Show_TaskListWnd(bool status) const
     m_task_wnd->Show(status);
 }
 
-bool CUITaskWnd::IsTreasuresEnabled() const { return ClearSkyMode || (m_filters && m_filters->IsFilterEnabled(CUIMapFilters::Treasures)); }
-bool CUITaskWnd::IsQuestNpcsEnabled() const { return ClearSkyMode || (m_filters && m_filters->IsFilterEnabled(CUIMapFilters::QuestNpcs)); }
-bool CUITaskWnd::IsSecondaryTasksEnabled() const { return ClearSkyMode || (m_filters && m_filters->IsFilterEnabled(CUIMapFilters::SecondaryTasks)); }
-bool CUITaskWnd::IsPrimaryObjectsEnabled() const { return ClearSkyMode || (m_filters && m_filters->IsFilterEnabled(CUIMapFilters::PrimaryObjects)); }
+bool CUITaskWnd::IsTreasuresEnabled() const { return !m_filters || m_filters->IsFilterEnabled(CUIMapFilters::Treasures); }
+bool CUITaskWnd::IsQuestNpcsEnabled() const { return !m_filters || m_filters->IsFilterEnabled(CUIMapFilters::QuestNpcs); }
+bool CUITaskWnd::IsSecondaryTasksEnabled() const { return !m_filters || m_filters->IsFilterEnabled(CUIMapFilters::SecondaryTasks); }
+bool CUITaskWnd::IsPrimaryObjectsEnabled() const { return !m_filters || m_filters->IsFilterEnabled(CUIMapFilters::PrimaryObjects); }
 
 void CUITaskWnd::TreasuresEnabled(bool enable)
 {
