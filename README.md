@@ -80,7 +80,7 @@ Take a look at our [Issues](https://github.com/openxray/xray-16/issues) page:
 
 Make sure to visit our [wiki](https://github.com/OpenXRay/xray-16/wiki):
 * [Build instructions for Windows](https://github.com/OpenXRay/xray-16/wiki/[EN]-How-to-build-and-setup-on-Windows).
-* [Build instructions for Linux and other platforms](https://github.com/OpenXRay/xray-16/wiki/[EN]-How-to-build-and-setup-on-Linux).
+* [Build instructions for Linux and other platforms](https://github.com/OpenXRay/xray-16/wiki/%5BEN%5D-How-to-build-and-setup-on-Linux-and-MacOS).
 
 The `dev` branch is the default and base branch for the project. It is used for development, and all pull requests should go there. But be aware that this branch sometimes may be broken, and we can only rarely do force pushes to this branch.
 
