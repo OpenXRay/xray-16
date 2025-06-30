@@ -332,6 +332,8 @@ private:
     size_t m_last_pos;
 };
 
+#include "FS_impl.h"
+
 class XRCORE_API IReader : public IReaderBase<IReader>
 {
 protected:
