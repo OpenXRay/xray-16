@@ -61,6 +61,14 @@ void game_cl_freemp::shedule_Update(u32 dt)
 		pActor->SetName(ps->getName());
 		pActor->cName_set(ps->getName());
 
+		if (ps->team != pActor->Community())
+		{
+			CHARACTER_COMMUNITY	community;
+			community.set(ps->team);
+			pActor->SetCommunity(community.index());
+			pActor->ChangeTeam(community.team(), 0, 0);
+		}
+
 		if (local_player->GameID == ps->GameID)
 		{
 			pActor->set_money((u32)ps->money_for_round, false);
