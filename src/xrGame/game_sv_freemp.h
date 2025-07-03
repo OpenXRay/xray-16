@@ -23,6 +23,8 @@ public:
 	// helper functions
 	void									AddMoneyToPlayer(game_PlayerState* ps, s32 amount);
 
+	virtual		void				OnPlayerRepairItem(NET_Packet& P, ClientID const& clientID);
+
 	virtual		void				OnPlayerReady(ClientID id_who);
 	virtual		void				OnPlayerConnect(ClientID id_who);
 	virtual		void				OnPlayerConnectFinished(ClientID id_who);

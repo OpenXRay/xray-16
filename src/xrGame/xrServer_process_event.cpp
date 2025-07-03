@@ -264,6 +264,17 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     case GE_CHANGE_POS: { SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
     }
     break;
+    case GE_REPAIR_ITEM:
+    {
+        CSE_ALifeInventoryItem* iitem = smart_cast<CSE_ALifeInventoryItem*>(receiver);
+        if (!iitem)
+            break;
+
+        iitem->m_fCondition = 1.0f;
+
+        SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
+    }
+    break;
     case GE_INSTALL_UPGRADE:
     {
         shared_str upgrade_id;

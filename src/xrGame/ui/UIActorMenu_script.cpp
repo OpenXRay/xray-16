@@ -67,6 +67,28 @@ void CUIActorMenu::RepairEffect_CurItem()
     {
         return;
     }
+
+    if (!IsGameTypeSingle())
+    {
+        LPCSTR item_name = item->m_section_id.c_str();
+        luabind::functor<int> funct;
+        R_ASSERT2(
+            GEnv.ScriptEngine->functor("inventory_upgrades.how_much_repair", funct),
+            make_string("Failed to get functor <inventory_upgrades.how_much_repair>, item = %s", item_name)
+        );
+
+        int cost = funct(item_name, item->GetCondition());
+
+        NET_Packet P;
+        CGameObject::u_EventGen(P, GE_GAME_EVENT, item->object().ID());
+        P.w_u16(GAME_EVENT_MP_REPAIR);
+        P.w_u16(item->object().ID());
+        P.w_s32(cost);
+        CGameObject::u_EventSend(P);
+
+        return;
+    }
+
     LPCSTR item_name = item->m_section_id.c_str();
 
     luabind::functor<void> funct;

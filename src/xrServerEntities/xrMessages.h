@@ -110,6 +110,7 @@ enum : u32
     GE_ADDON_ATTACH,
     GE_ADDON_DETACH,
     GE_ADDON_CHANGE,
+    GE_REPAIR_ITEM,
     GE_INSTALL_UPGRADE,
 
     GE_GRENADE_EXPLODE,
@@ -221,6 +222,11 @@ enum EGameMessages : u32
     GAME_EVENT_RECEIVE_SERVER_LOGO,
     GAME_EVENT_CREATE_PLAYER_STATE,
     GAME_EVENT_PLAYERS_INFO_REPLY,
+
+    //-----------------------------------------
+
+    GAME_EVENT_MP_REPAIR,
+    GAME_EVENT_MP_REPAIR_SUCCESS,
 
     //-----------------------------------------
     GAME_EVENT_SCRIPT_BEGINS_FROM, // don't add messages after this

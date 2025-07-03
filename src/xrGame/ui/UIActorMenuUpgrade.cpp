@@ -141,3 +141,15 @@ void CUIActorMenu::SeparateUpgradeItem()
     //		m_upgrade_selected->Mark( true );
     //	}
 }
+
+void CUIActorMenu::OnSuccessRepairMP(PIItem item)
+{
+    UpdateItemsPlace();
+
+    UpdateConditionProgressBars();
+    
+    if (CurrentItem() && ((PIItem)m_upgrade_selected->m_pData)->object_id() == item->object_id())
+    {
+        SeparateUpgradeItem();
+    }
+}
