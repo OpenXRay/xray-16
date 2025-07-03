@@ -658,7 +658,16 @@ void CActor::Hit(SHit* pHDS)
         b_initiated = b_initiated && (pHDS->hit_type == ALife::eHitTypeStrike);
 
         if (b_fireWound || b_initiated)
+        {
             HitMark(HDS.damage(), HDS.dir, HDS.who, HDS.bone(), HDS.p_in_bone_space, HDS.impulse, HDS.hit_type);
+        }
+        else
+        {
+            if (!IsGameTypeSingle() && !!smart_cast<CBaseMonster*>(HDS.who) && pHDS->hit_type == ALife::eHitTypeWound)
+            {
+                HitMarkMonster(HDS.dir, HDS.damage());
+            }
+        }
     }
 
     if (IsGameTypeSingle())
@@ -812,6 +821,91 @@ void CActor::HitMark(float P, Fvector dir, IGameObject* who_object, s16 element,
         AddEffector(this, effFireHit, sect_name, P * 0.001f);
 
     } // if hit_type
+}
+
+#define MAX_LOCK_TIME 2.f
+
+void CActor::HitMarkMonster(Fvector dir, float damage)
+{
+    if (!g_Alive() || !Local() || !(Level().CurrentEntity() == this))
+        return;
+
+    SDrawStaticStruct* s = CurrentGameUI()->AddCustomStatic("monster_claws", false);
+
+    float h1, p1;
+    Device.vCameraDirection.getHP(h1, p1);
+    Fvector hd = dir;
+    hd.mul(-1);
+    float d = -h1 + hd.getH();
+    s->wnd()->SetHeading(d);
+    Fvector2 wnd_pos = s->wnd()->GetWndPos();
+    wnd_pos.y += 400.0f * _cos(d);
+    wnd_pos.x += 500.0f * _sin(d);
+    s->wnd()->SetWndPos(wnd_pos);
+
+    float time_to_lock = damage * MAX_LOCK_TIME;
+    clamp(time_to_lock, 0.f, MAX_LOCK_TIME);
+    this->lock_accel_for(int(time_to_lock * 1000));
+
+    CEffectorCam* ce = Cameras().GetCamEffector((ECamEffectorType)effBigMonsterHit);
+    if (ce)
+    {
+        const shared_str& eff_sect = pSettings->r_string(cNameSect(), "actor_hit_effect");
+        if (eff_sect.c_str())
+        {
+            int id = -1;
+            Fvector cam_pos, cam_dir, cam_norm;
+            cam_Active()->Get(cam_pos, cam_dir, cam_norm);
+            cam_dir.normalize_safe();
+            dir.normalize_safe();
+
+            float ang_diff = angle_difference(cam_dir.getH(), dir.getH());
+            Fvector cp;
+            cp.crossproduct(cam_dir, dir);
+            bool bUp = (cp.y > 0.0f);
+
+            Fvector cross;
+            cross.crossproduct(cam_dir, dir);
+            VERIFY(ang_diff >= 0.0f && ang_diff <= PI);
+
+            float _s1 = PI_DIV_8;
+            float _s2 = _s1 + PI_DIV_4;
+            float _s3 = _s2 + PI_DIV_4;
+            float _s4 = _s3 + PI_DIV_4;
+
+            if (ang_diff <= _s1)
+            {
+                id = 2;
+            }
+            else
+            {
+                if (ang_diff > _s1 && ang_diff <= _s2)
+                {
+                    id = (bUp) ? 5 : 7;
+                }
+                else if (ang_diff > _s2 && ang_diff <= _s3)
+                {
+                    id = (bUp) ? 3 : 1;
+                }
+                else if (ang_diff > _s3 && ang_diff <= _s4)
+                {
+                    id = (bUp) ? 4 : 6;
+                }
+                else if (ang_diff > _s4)
+                {
+                    id = 0;
+                }
+                else
+                {
+                    VERIFY(0);
+                }
+            }
+
+            string64 sect_name;
+            xr_sprintf(sect_name, "%s_%d", eff_sect.c_str(), id);
+            AddEffector(this, effBigMonsterHit, sect_name, damage);
+        }
+    }
 }
 
 void CActor::HitSignal(float perc, Fvector& vLocalDir, IGameObject* who, s16 element)
