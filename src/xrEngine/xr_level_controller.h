@@ -63,6 +63,8 @@ enum EGameActions : u32
     kSCORES,
     kCHAT,
     kCHAT_TEAM,
+    kVOICE_CHAT,
+    kVOICE_DISTANCE,
     kSCREENSHOT,
     kENTER,
     kQUIT,
