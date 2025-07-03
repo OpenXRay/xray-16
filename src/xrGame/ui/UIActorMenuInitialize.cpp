@@ -283,13 +283,10 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
     //-	m_ItemInfo->SetAutoDelete			(true);
     //-	AttachChild							(m_ItemInfo);
 
-    if (ai().get_alife())
-    {
-        m_upgrade_info = xr_new<UIInvUpgradeInfo>();
-        m_upgrade_info->SetAutoDelete(true);
-        AttachChild(m_upgrade_info);
-        m_upgrade_info->init_from_xml(ACTOR_MENU_ITEM_XML);
-    }
+    m_upgrade_info = xr_new<UIInvUpgradeInfo>();
+    m_upgrade_info->SetAutoDelete(true);
+    AttachChild(m_upgrade_info);
+    m_upgrade_info->init_from_xml(ACTOR_MENU_ITEM_XML);
 }
 
 void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
