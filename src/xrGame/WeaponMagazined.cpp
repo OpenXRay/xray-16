@@ -309,21 +309,56 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
     if (!spawn_ammo)
         return;
 
-    xr_map<LPCSTR, u16>::iterator l_it;
-    for (l_it = l_ammo.begin(); l_ammo.end() != l_it; ++l_it)
+    if (OnServer() || IsGameTypeSingle())
     {
-        if (m_pInventory)
+        xr_map<u16, u16> ammos_to_sync;
+
+        xr_map<LPCSTR, u16>::iterator l_it;
+        for (l_it = l_ammo.begin(); l_ammo.end() != l_it; ++l_it)
         {
-            CWeaponAmmo* l_pA = smart_cast<CWeaponAmmo*>(m_pInventory->GetAny(l_it->first));
-            if (l_pA)
+            if (m_pInventory)
             {
-                u16 l_free = l_pA->m_boxSize - l_pA->m_boxCurr;
-                l_pA->m_boxCurr = l_pA->m_boxCurr + (l_free < l_it->second ? l_free : l_it->second);
-                l_it->second = l_it->second - (l_free < l_it->second ? l_free : l_it->second);
+                const TIItemContainer& list = m_pInventory->m_ruck;
+                for (TIItemContainer::const_iterator it = list.begin(); list.end() != it; ++it)
+                {
+                    PIItem pIItem = *it;
+                    CWeaponAmmo* l_pA = smart_cast<CWeaponAmmo*>(pIItem);
+                    if (l_pA && pIItem->Useful())
+                    {
+                        if (!xr_strcmp(pIItem->object().cNameSect(), l_it->first))
+                        {
+                            u16 l_free = l_pA->m_boxSize - l_pA->m_boxCurr;
+                            if (l_free > 0)
+                            {
+                                u16 to_add = l_free < l_it->second ? l_free : l_it->second;
+                                l_pA->m_boxCurr = l_pA->m_boxCurr + to_add;
+                                l_it->second = l_it->second - to_add;
+                                ammos_to_sync[l_pA->ID()] = l_pA->m_boxCurr;
+                                if (l_it->second <= 0) break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (l_it->second > 0 && !unlimited_ammo())
+            {
+                SpawnAmmo(l_it->second, l_it->first);
             }
         }
-        if (l_it->second && !unlimited_ammo())
-            SpawnAmmo(l_it->second, l_it->first);
+
+        if (!IsGameTypeSingle())
+        {
+            NET_Packet P;
+            CGameObject::u_EventGen(P, GE_WPN_UPDATE_AMMO, ID());
+            xr_map<u16, u16>::iterator _it;
+            P.w_u32(ammos_to_sync.size());
+            for (_it = ammos_to_sync.begin(); ammos_to_sync.end() != _it; ++_it)
+            {
+                P.w_u16(_it->first);
+                P.w_u16(_it->second);
+            }
+            CGameObject::u_EventSend(P);
+        }
     }
 }
 
@@ -1305,6 +1340,32 @@ void CWeaponMagazined::net_Import(NET_Packet& P)
 
     m_iCurFireMode = P.r_u8();
     SetQueueSize(GetCurrentFireMode());
+}
+
+void CWeaponMagazined::OnEvent(NET_Packet& P, u16 type)
+{
+    switch (type)
+    {
+    case GE_WPN_UNLOAD_AMMO:
+    {
+        UnloadMagazine();
+    }break;
+    case GE_WPN_UPDATE_AMMO:
+    {
+        u32 count = P.r_u32();
+        for (u16 i = 0; i < count; ++i)
+        {
+            u16 id = P.r_u16();
+            u16 boxSize = P.r_u16();
+            CWeaponAmmo* pA = smart_cast<CWeaponAmmo*>(Level().Objects.net_Find(id));
+            pA->m_boxCurr = boxSize;
+        }
+    }break;
+    default:
+    {
+        inherited::OnEvent(P, type);
+    }break;
+    }
 }
 
 bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)

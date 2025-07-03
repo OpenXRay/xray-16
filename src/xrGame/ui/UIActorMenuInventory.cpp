@@ -388,6 +388,22 @@ void CUIActorMenu::DetachAddon(LPCSTR addon_name, PIItem itm)
         itm->Detach(addon_name, true);
 }
 
+void CUIActorMenu::UnloadWeapon(CWeaponMagazined* pWpn)
+{
+    if (!pWpn) return;
+
+    if (IsGameTypeSingle() || OnServer())
+    {
+        pWpn->UnloadMagazine();
+    }
+    else
+    {
+        NET_Packet P;
+        CGameObject::u_EventGen(P, GE_WPN_UNLOAD_AMMO, pWpn->ID());
+        CGameObject::u_EventSend(P);
+    }
+}
+
 void CUIActorMenu::InitCellForSlot(u16 slot_idx)
 {
     //VERIFY(KNIFE_SLOT <= slot_idx && slot_idx <= LAST_SLOT);
@@ -1079,7 +1095,7 @@ void CUIActorMenu::PropertiesBoxForWeapon(CUICellItem* cell_item, PIItem item, b
         {
         }
     }
-    if (smart_cast<CWeaponMagazined*>(pWeapon) && IsGameTypeSingle())
+    if (smart_cast<CWeaponMagazined*>(pWeapon))
     {
         bool b = (pWeapon->GetAmmoElapsed() != 0);
         if (!b)
@@ -1500,14 +1516,14 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         {
             break;
         }
-        weap_mag->UnloadMagazine();
+        UnloadWeapon(weap_mag);
         for (u32 i = 0; i < cell_item->ChildsCount(); ++i)
         {
             CUICellItem* child_itm = cell_item->Child(i);
             CWeaponMagazined* child_weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)child_itm->m_pData);
             if (child_weap_mag)
             {
-                child_weap_mag->UnloadMagazine();
+                UnloadWeapon(child_weap_mag);
             }
         }
         break;
