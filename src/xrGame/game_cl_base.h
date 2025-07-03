@@ -122,6 +122,8 @@ public:
     virtual bool IsPlayerInTeam(game_PlayerState* ps, ETeam team) { return ps->team == team; };
     virtual void OnConnected();
 
+    virtual void OnScreenResolutionChanged(){};
+
     u8 m_u8SpectatorModes;
     virtual bool Is_Spectator_Camera_Allowed(CSpectator::EActorCameras Camera);
 };

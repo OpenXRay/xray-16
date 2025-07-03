@@ -220,6 +220,14 @@ void game_cl_freemp::OnConnected()
 	funct();
 }
 
+void game_cl_freemp::OnScreenResolutionChanged()
+{
+	if (m_game_ui && m_pVoiceChat)
+	{
+		m_game_ui->UIMainIngameWnd->SetVoiceDistance(m_pVoiceChat->GetDistance());
+	}
+}
+
 void game_cl_freemp::OnVoiceMessage(NET_Packet* P)
 {
 	m_pVoiceChat->ReceiveMessage(P);
