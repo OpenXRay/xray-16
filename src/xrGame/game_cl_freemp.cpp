@@ -47,6 +47,8 @@ void game_cl_freemp::net_import_update(NET_Packet & P)
 
 void game_cl_freemp::shedule_Update(u32 dt)
 {
+	game_cl_GameState::shedule_Update(dt);
+
 	if (!local_player)
 		return;
 
