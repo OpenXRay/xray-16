@@ -48,7 +48,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     R_ASSERT2(GEnv.ScriptEngine->functor(precondition_functor_str, m_preconditions.functr),
         make_string(
             "Failed to get precondition functor in section[%s], functor[%s]", id_str(), precondition_functor_str));
-    m_preconditions();
+    //m_preconditions();
 
     // effect_functor
     LPCSTR effect_functor_str = pSettings->r_string(id(), "effect_functor");
@@ -57,7 +57,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_effects.parameter3 = 1;
     R_ASSERT2(GEnv.ScriptEngine->functor(effect_functor_str, m_effects.functr),
         make_string("Failed to get effect functor in section[%s], functor[%s]", id_str(), effect_functor_str));
-    m_effects();
+    //m_effects();
 
     // prereq_functor (1,2) : m_prerequisites, m_tooltip
     LPCSTR prereq_functor_str = pSettings->r_string(id(), "prereq_functor"); // prerequisites_functor
@@ -67,7 +67,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     //	m_tooltip.parameter			= pSettings->r_string( id(), "prereq_params" );
     R_ASSERT2(GEnv.ScriptEngine->functor(prereq_functor_str, m_prerequisites.functr),
         make_string("Failed to get prerequisites functor in section[%s], functor[%s]", id_str(), prereq_functor_str));
-    m_prerequisites();
+    //m_prerequisites();
 
     /*R_ASSERT2(
         GEnv.ScriptEngine->functor( tooltip_functor_str, m_tooltip.functr ),
