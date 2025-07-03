@@ -377,6 +377,7 @@ public:
     void OnInventoryAction(PIItem pItem, u16 action_type);
     void ShowRepairButton(bool status);
     void OnSuccessRepairMP(PIItem item);
+    void OnSuccessUpgradeInstallMP(PIItem item);
     bool SetInfoCurUpgrade(Upgrade_type* upgrade_type, CInventoryItem* inv_item);
     void SeparateUpgradeItem();
     PIItem get_upgrade_item();

@@ -24,6 +24,7 @@ public:
 	void									AddMoneyToPlayer(game_PlayerState* ps, s32 amount);
 
 	virtual		void				OnPlayerRepairItem(NET_Packet& P, ClientID const& clientID);
+	virtual		void				OnPlayerInstallUpgrade(NET_Packet& P, ClientID const& clientID);
 
 	virtual		void				OnPlayerReady(ClientID id_who);
 	virtual		void				OnPlayerConnect(ClientID id_who);

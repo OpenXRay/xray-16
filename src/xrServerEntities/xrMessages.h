@@ -227,6 +227,8 @@ enum EGameMessages : u32
 
     GAME_EVENT_MP_REPAIR,
     GAME_EVENT_MP_REPAIR_SUCCESS,
+    GAME_EVENT_MP_INSTALL_UPGRADE,
+    GAME_EVENT_MP_INSTALL_UPGRADE_SUCCESS,
 
     //-----------------------------------------
     GAME_EVENT_SCRIPT_BEGINS_FROM, // don't add messages after this

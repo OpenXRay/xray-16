@@ -163,9 +163,15 @@ void CInventoryItem::net_Spawn_install_upgrades(CSE_Abstract* DC) // net_Spawn
 
     Level().UpgradeManager().init_install(*this); // from pSettings
 
-    for (const auto& upgrade : saved_upgrades)
+    if (IsGameTypeSingle())
     {
-        Level().UpgradeManager().upgrade_install(*this, *upgrade, true);
+        for (auto& upgrade : saved_upgrades)
+            Level().UpgradeManager().upgrade_install(*this, (*upgrade), true);
+    }
+    else
+    {
+        for (auto& upgrade : saved_upgrades)
+            Level().UpgradeManager().upgrade_install_mp(*this, (*upgrade), true);
     }
 }
 
