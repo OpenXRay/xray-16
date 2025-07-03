@@ -50,6 +50,7 @@
 #include "xrPhysics/console_vars.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrEngine/GameFont.h"
+#include "inventory_upgrade_manager.h"
 
 #ifdef DEBUG
 #include "level_debug.h"
@@ -170,6 +171,7 @@ CLevel::~CLevel()
 #endif
     xr_delete(m_map_manager);
     delete_data(m_game_task_manager);
+    xr_delete(m_upgrade_manager);
     // here we clean default trade params
     // because they should be new for each saved/loaded game
     // and I didn't find better place to put this code in
@@ -1078,6 +1080,12 @@ void CLevel::OnAlifeSimulatorLoaded()
 {
     MapManager().ResetStorage();
     GameTaskManager().ResetStorage();
+    
+    // moved from alife simulator for supporting in MP
+    // only for single and server
+    // for client manager creates in Load_GameSpecific_Before()
+    R_ASSERT(m_upgrade_manager == nullptr);
+    m_upgrade_manager = xr_new<inventory::upgrade::Manager>();
 }
 
 void CLevel::OnSessionTerminate(pcstr reason) { MainMenu()->OnSessionTerminate(StringTable().translate(reason).c_str()); }

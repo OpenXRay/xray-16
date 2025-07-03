@@ -10,6 +10,7 @@
 #include "xrPhysics/PhysicsCommon.h"
 #include "level_sounds.h"
 #include "GamePersistent.h"
+#include "inventory_upgrade_manager.h"
 
 bool CLevel::Load_GameSpecific_Before()
 {
@@ -49,6 +50,13 @@ bool CLevel::Load_GameSpecific_Before()
         IReader* stream = FS.r_open(fn_game);
         ai().patrol_path_storage_raw(*stream);
         FS.r_close(stream);
+    }
+
+    if (GamePersistent().GameType() != eGameIDSingle && OnClient())
+    {
+        //Pavel: for server and single player the upgrade manager creates in OnAlifeSimulatorLoaded()
+        R_ASSERT(m_upgrade_manager == nullptr);
+        m_upgrade_manager = xr_new<inventory::upgrade::Manager>();
     }
 
     return (TRUE);
