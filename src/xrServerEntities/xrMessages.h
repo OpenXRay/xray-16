@@ -77,6 +77,10 @@ enum : u32
     M_SECURE_MESSAGE,
     M_CREATE_PLAYER_STATE,
     M_COMPRESSED_UPDATE_OBJECTS,
+
+    M_VOICE_MESSAGE,
+
+    MSG_FORCEDWORD				= u32(-1)
 };
 
 enum : u32
