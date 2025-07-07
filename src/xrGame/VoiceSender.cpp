@@ -2,7 +2,7 @@
 #include "VoiceSender.h"
 #include "game_cl_mp.h"
 #include"game_sv_mp.h"
-#include "../xrSound/SoundVoiceChat.h"
+#include "xrSound/ISoundVoiceChat.h"
 
 void CVoiceSender::Send(VoicePacket** packets, u8 count)
 {

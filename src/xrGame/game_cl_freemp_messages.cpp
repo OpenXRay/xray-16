@@ -10,8 +10,8 @@ void game_cl_freemp::TranslateGameMessage(u32 msg, NET_Packet& P)
 	case GAME_EVENT_MP_REPAIR_SUCCESS:
 		{
 			if (m_game_ui &&
-				m_game_ui->ActorMenu().IsShown() &&
-				m_game_ui->ActorMenu().GetMenuMode() == mmUpgrade
+				m_game_ui->GetActorMenu().IsShown() &&
+                m_game_ui->GetActorMenu().GetMenuMode() == mmUpgrade
 				)
 			{
 				u16 itemId = P.r_u16();
@@ -19,15 +19,15 @@ void game_cl_freemp::TranslateGameMessage(u32 msg, NET_Packet& P)
 				PIItem item = smart_cast<PIItem>(Level().Objects.net_Find(itemId));
 				if (item)
 				{
-					m_game_ui->ActorMenu().OnSuccessRepairMP(item);
+                    m_game_ui->GetActorMenu().OnSuccessRepairMP(item);
 				}
 			}
 		}break;
 	case GAME_EVENT_MP_INSTALL_UPGRADE_SUCCESS:
 		{
 			if (m_game_ui &&
-				m_game_ui->ActorMenu().IsShown() &&
-				m_game_ui->ActorMenu().GetMenuMode() == mmUpgrade
+                m_game_ui->GetActorMenu().IsShown() &&
+                m_game_ui->GetActorMenu().GetMenuMode() == mmUpgrade
 				)
 			{
 				u16 itemId = P.r_u16();
@@ -35,7 +35,7 @@ void game_cl_freemp::TranslateGameMessage(u32 msg, NET_Packet& P)
 				PIItem item = smart_cast<PIItem>(Level().Objects.net_Find(itemId));
 				if (item)
 				{
-					m_game_ui->ActorMenu().OnSuccessUpgradeInstallMP(item);
+                    m_game_ui->GetActorMenu().OnSuccessUpgradeInstallMP(item);
 				}
 			}
 		}break;

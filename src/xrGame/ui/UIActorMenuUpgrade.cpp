@@ -146,8 +146,8 @@ void CUIActorMenu::OnSuccessRepairMP(PIItem item)
 {
     UpdateItemsPlace();
 
-    UpdateConditionProgressBars();
-    
+    //UpdateConditionProgressBars();
+
     if (CurrentItem() && ((PIItem)m_upgrade_selected->m_pData)->object_id() == item->object_id())
     {
         SeparateUpgradeItem();
@@ -157,7 +157,7 @@ void CUIActorMenu::OnSuccessRepairMP(PIItem item)
 void CUIActorMenu::OnSuccessUpgradeInstallMP(PIItem item)
 {
     UpdateItemsPlace();
-    
+
     if (CurrentItem() && ((PIItem)m_upgrade_selected->m_pData)->object_id() == item->object_id())
     {
         SeparateUpgradeItem();

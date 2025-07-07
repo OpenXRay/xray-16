@@ -104,7 +104,7 @@ void CVoiceChat::OnRender()
 			game_PlayerState* ps = it->second;
 			u16 id = ps->GameID;
 
-			if (ps == local_player || ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD) || ps->testFlag(GAME_PLAYER_MP_INVIS))
+			if (ps == local_player || ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD) /* || ps->testFlag(GAME_PLAYER_MP_INVIS) */)
 				continue;
 
 			auto voiceTimeIt = m_voiceTimeMap.find(id);
@@ -116,7 +116,7 @@ void CVoiceChat::OnRender()
 			if (voiceIconInfo.time + 200 < GetTickCount())
 				continue;
 
-			CObject* pObject = Level().Objects.net_Find(id);
+            IGameObject* pObject = Level().Objects.net_Find(id);
 			if (!pObject) continue;
 
 			CActor* pActor = smart_cast<CActor*>(pObject);
@@ -138,7 +138,7 @@ void CVoiceChat::ReceiveMessage(NET_Packet* P)
 	u8 voiceDistance = P->r_u8();
 
 	u16 clientId = P->r_u16();
-	CObject* obj = Level().Objects.net_Find(clientId);
+    IGameObject* obj = Level().Objects.net_Find(clientId);
 	if (!obj)
 	{
 		return;
@@ -184,7 +184,7 @@ IStreamPlayer* CVoiceChat::GetStreamPlayer(u16 clientId)
 {
 	if (!m_pSoundVoiceChat)
 		return nullptr;
-		
+
 	IStreamPlayer* player = m_soundPlayersMap[clientId];
 	if (!player)
 	{
@@ -202,7 +202,7 @@ void CVoiceChat::CheckAndClearPlayers(SOUND_PLAYERS& players)
 
 	for (; I != E;)
 	{
-		CObject* obj = Level().Objects.net_Find(I->first);
+        IGameObject* obj = Level().Objects.net_Find(I->first);
 		if (!obj)
 		{
 			J = I;

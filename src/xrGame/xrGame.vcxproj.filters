@@ -9618,6 +9618,12 @@
     <ClCompile Include="net_physics_state.cpp">
       <Filter>AI\AMonsters\common\net</Filter>
     </ClCompile>
+    <ClCompile Include="game_cl_freemp_messages.cpp">
+      <Filter>Core\Server\Games\client\freemp</Filter>
+    </ClCompile>
+    <ClCompile Include="game_sv_freemp_upgrade_and_repair.cpp">
+      <Filter>Core\Server\Games\client\freemp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

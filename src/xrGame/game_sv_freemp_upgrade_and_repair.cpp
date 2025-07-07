@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_sv_freemp.h"
 #include "ai_space.h"
-#include "../xrServerEntities/script_engine.h"
+#include "xrScriptEngine/script_engine.hpp"
 #include "inventory_item.h"
 #include "Level.h"
 #include "inventory_upgrade_manager.h"

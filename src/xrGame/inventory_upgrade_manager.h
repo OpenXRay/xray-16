@@ -62,9 +62,9 @@ public:
 
     bool can_install_upgrade(CInventoryItem& item, shared_str const& upgrade_id);
     bool can_add_upgrade(CInventoryItem& item, shared_str const& upgrade_id);
-    bool can_upgrade_install(CInventoryItem& item, shared_str const& upgrade_id, bool loading);
+    bool can_upgrade_install(CInventoryItem& item, shared_str const& upgrade_id, bool loading) { return false;  };
     bool upgrade_install(CInventoryItem& item, shared_str const& upgrade_id, bool loading);
-    bool upgrade_install_mp(CInventoryItem& item, shared_str const& upgrade_id, bool loading);
+    bool upgrade_install_mp(CInventoryItem& item, shared_str const& upgrade_id, bool loading) { return false; };
     bool upgrade_add(CInventoryItem& item, shared_str const& upgrade_id);
     void init_install(CInventoryItem& item);
 
@@ -95,7 +95,7 @@ private:
     Upgrades_type m_upgrades;
 
 public:
-    Properties_type m_properties;
+    Properties_type m_properties{};
 
 }; // class Manager
 

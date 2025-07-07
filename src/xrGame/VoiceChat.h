@@ -1,5 +1,4 @@
 #pragma once
-#include "ui_defs.h"
 #include "../xrSound/ISoundVoiceChat.h"
 #include "VoiceSender.h"
 

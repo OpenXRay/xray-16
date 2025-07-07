@@ -530,7 +530,7 @@ void CUIGameCustom::HideShownDialogs()
 
 bool CUIGameCustom::HasShownDialogs() const
 {
-	return ActorMenu().IsShown() || PdaMenu().IsShown() || TalkMenu->IsShown();
+	return ActorMenu->IsShown() || PdaMenu->IsShown() || TalkMenu->IsShown();
 }
 
 void CUIGameCustom::StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner)

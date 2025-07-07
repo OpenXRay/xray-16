@@ -26,6 +26,7 @@ class CTrade;
 class CUIProgressBar;
 class CUITradeBar;
 class CUIWeightBar;
+class CWeaponMagazined;
 
 namespace inventory
 {

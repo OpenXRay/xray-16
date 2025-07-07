@@ -167,7 +167,7 @@ EGameIDs CUIMapList::GetCurGameType()
         else if (0 == xr_strcmp(text, StringTable().translate(get_token_name(g_GameModes, eGameIDFreeMp))))
             return eGameIDFreeMp;
         else
-            NODEFAULT;
+            return eGameIDTeamDeathmatch;
     }
     else if (spin_ms)
     {

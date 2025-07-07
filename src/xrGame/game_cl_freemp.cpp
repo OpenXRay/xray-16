@@ -9,7 +9,7 @@
 
 game_cl_freemp::game_cl_freemp()
 {
-	if (!g_dedicated_server)
+	if (!GEnv.isDedicatedServer)
 		m_pVoiceChat = xr_new<CVoiceChat>();
 	else
 		m_pVoiceChat = NULL;
@@ -64,7 +64,7 @@ void game_cl_freemp::shedule_Update(u32 dt)
 	if (!local_player)
 		return;
 
-	if (!g_dedicated_server && m_pVoiceChat)
+	if (!GEnv.isDedicatedServer && m_pVoiceChat)
 	{
 		const bool started = m_pVoiceChat->IsStarted();
 		const bool is_dead = !local_player || local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);

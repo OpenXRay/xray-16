@@ -1080,7 +1080,7 @@ void CLevel::OnAlifeSimulatorLoaded()
 {
     MapManager().ResetStorage();
     GameTaskManager().ResetStorage();
-    
+
     // moved from alife simulator for supporting in MP
     // only for single and server
     // for client manager creates in Load_GameSpecific_Before()

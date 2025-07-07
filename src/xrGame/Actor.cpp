@@ -830,7 +830,7 @@ void CActor::HitMarkMonster(Fvector dir, float damage)
     if (!g_Alive() || !Local() || !(Level().CurrentEntity() == this))
         return;
 
-    SDrawStaticStruct* s = CurrentGameUI()->AddCustomStatic("monster_claws", false);
+    StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("monster_claws", false);
 
     float h1, p1;
     Device.vCameraDirection.getHP(h1, p1);

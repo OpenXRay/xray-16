@@ -44,6 +44,9 @@
     <ClInclude Include="SoundRender_Target.h" />
     <ClInclude Include="SoundRender_TargetA.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ISoundVoiceChat.h" />
+    <ClInclude Include="IVoicePacketSender.h" />
+    <ClInclude Include="VoicePacket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">

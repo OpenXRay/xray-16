@@ -729,6 +729,8 @@
     <ClInclude Include="game_cl_deathmatch_snd_messages.h" />
     <ClInclude Include="game_cl_freemp.h" />
     <ClInclude Include="game_cl_mp.h" />
+    <ClInclude Include="VoiceChat.h" />
+    <ClInclude Include="VoiceSender.h" />
     <ClInclude Include="game_cl_mp_messages_menu.h" />
     <ClInclude Include="game_cl_mp_script.h" />
     <ClInclude Include="game_cl_mp_snd_messages.h" />
@@ -2224,7 +2226,10 @@
     <ClCompile Include="game_cl_deathmatch.cpp" />
     <ClCompile Include="game_cl_deathmatch_buywnd.cpp" />
     <ClCompile Include="game_cl_freemp.cpp" />
+    <ClCompile Include="game_cl_freemp_messages.cpp" />
     <ClCompile Include="game_cl_mp.cpp" />
+    <ClCompile Include="VoiceChat.cpp" />
+    <ClCompile Include="VoiceSender.cpp" />
     <ClCompile Include="game_cl_mp_messages_menu.cpp" />
     <ClCompile Include="game_cl_mp_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -2254,6 +2259,7 @@
     </ClCompile>
     <ClCompile Include="game_sv_event_queue.cpp" />
     <ClCompile Include="game_sv_freemp.cpp" />
+    <ClCompile Include="game_sv_freemp_upgrade_and_repair.cpp" />
     <ClCompile Include="game_sv_item_respawner.cpp" />
     <ClCompile Include="game_sv_mp.cpp" />
     <ClCompile Include="game_sv_mp_script.cpp">
