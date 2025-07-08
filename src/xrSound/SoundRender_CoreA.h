@@ -2,6 +2,8 @@
 
 #include "SoundRender_Core.h"
 
+class SoundVoiceChat;
+
 #include <al.h>
 #include <alc.h>
 
@@ -58,6 +60,8 @@ class CSoundRender_CoreA : public CSoundRender_Core
     ALCcontext* pContext;
     ALDeviceList* pDeviceList;
 
+    SoundVoiceChat* pSoundVoiceChat = nullptr;
+
 protected:
     void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R, float dt) override;
 
@@ -71,4 +75,7 @@ public:
 
     void set_master_volume(float f) override;
 
+    void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) override;
+
+    ISoundVoiceChat* GetSoundVoiceChat() override { return (ISoundVoiceChat*)pSoundVoiceChat; }
 };

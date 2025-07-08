@@ -1,6 +1,6 @@
 #pragma once
-#include "al.h"
-#include "alc.h"
+#include <al.h>
+#include <alc.h>
 #include "ISoundVoiceChat.h"
 #include "SoundRecorderA.h"
 #include "StreamPlayerA.h"

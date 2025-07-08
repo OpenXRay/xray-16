@@ -40,6 +40,8 @@ using Fvector2 = _vector2<float>;
 struct Fbox3;
 using Fbox = Fbox3;
 
+class XRSOUND_API ISoundVoiceChat;
+
 XRSOUND_API extern u32 psSoundModel;
 XRSOUND_API extern float psSoundVEffects;
 XRSOUND_API extern float psSoundVFactor;
@@ -51,6 +53,10 @@ XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
 XRSOUND_API extern u32 snd_device_id;
+XRSOUND_API extern float psSoundVPlayers;
+XRSOUND_API extern float psSoundVRecorder;
+XRSOUND_API extern int psSoundRecorderMode;
+XRSOUND_API extern int psSoundRecorderDenoise;
 
 XRSOUND_API extern ISoundScene* DefaultSoundScene;
 
@@ -232,6 +238,8 @@ public:
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 
     virtual const Fvector& listener_position() = 0;
+
+    virtual ISoundVoiceChat* GetSoundVoiceChat() = 0;
 
     virtual void refresh_sources() = 0;
 };

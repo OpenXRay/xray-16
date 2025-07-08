@@ -81,5 +81,4 @@ void SoundVoiceChat::Update(const Fvector& P, const Fvector& D, const Fvector& N
 
 	for (auto& player : m_players)
 		player->Update();
-
 }

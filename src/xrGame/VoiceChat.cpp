@@ -8,8 +8,7 @@
 CVoiceChat::CVoiceChat()
 {
 	// TODO: Initialize with sound system when available
-	// m_pSoundVoiceChat = ::Sound->GetSoundVoiceChat();
-	m_pSoundVoiceChat = nullptr;
+	m_pSoundVoiceChat = GEnv.Sound->GetSoundVoiceChat();
 	CreateRecorder();
 }
 
@@ -38,9 +37,7 @@ bool CVoiceChat::CreateRecorder()
 	m_pSender = xr_new<CVoiceSender>();
 	m_pSender->SetDistance(10); // default
 
-	// TODO: Create recorder when sound system is available
-	// m_pRecorder = m_pSoundVoiceChat->CreateRecorder((IVoicePacketSender*)m_pSender);
-	m_pRecorder = nullptr;
+	m_pRecorder = m_pSoundVoiceChat->CreateRecorder((IVoicePacketSender*)m_pSender);
 
 	return m_pRecorder != nullptr;
 }
