@@ -42,7 +42,6 @@ private:
 	void OnVoiceMessage(NET_Packet* P);
 
 private:
-	CVoiceChat* m_pVoiceChat = nullptr;
 
 };
 

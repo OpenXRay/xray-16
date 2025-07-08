@@ -9,15 +9,10 @@
 
 game_cl_freemp::game_cl_freemp()
 {
-	if (!GEnv.isDedicatedServer)
-		m_pVoiceChat = xr_new<CVoiceChat>();
-	else
-		m_pVoiceChat = NULL;
 }
 
 game_cl_freemp::~game_cl_freemp()
 {
-	xr_delete(m_pVoiceChat);
 }
 
 
@@ -115,29 +110,6 @@ bool game_cl_freemp::OnKeyboardPress(int key)
 {
 	switch (key)
 	{
-	case kVOICE_CHAT:
-	{
-		if (local_player && !local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
-		{
-			if (!m_pVoiceChat->IsStarted())
-			{
-				m_pVoiceChat->Start();
-				CurrentGameUI()->UIMainIngameWnd->SetActiveVoiceIcon(true);
-			}
-		}
-		return true;
-	}break;
-
-	case kVOICE_DISTANCE:
-	{
-		if (local_player && !local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
-		{
-			u8 distance = m_pVoiceChat->SwitchDistance();
-			CurrentGameUI()->UIMainIngameWnd->SetVoiceDistance(distance);
-		}
-		return true;
-	}break;
-
 	case kJUMP:
 	{
 		bool b_need_to_send_ready = false;

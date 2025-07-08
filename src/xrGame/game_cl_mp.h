@@ -8,6 +8,7 @@
 #include "configs_dump_verifyer.h"
 #include "screenshot_server.h"
 #include "xrCore/fastdelegate.h"
+#include "VoiceChat.h"
 
 class CUIWindow;
 class CUISpeechMenu;
@@ -180,6 +181,8 @@ public:
     virtual void CommonMessageOut(pcstr msg);
 
     virtual bool OnKeyboardPress(int key);
+    virtual	bool OnKeyboardRelease(int key);
+    CVoiceChat* m_pVoiceChat = nullptr;
 
     virtual bool CanBeReady() { return true; };
     virtual void shedule_Update(u32 dt);
