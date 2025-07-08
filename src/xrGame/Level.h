@@ -414,6 +414,7 @@ public:
     inventory::upgrade::Manager& UpgradeManager() const { return *m_upgrade_manager; }
     void OnAlifeSimulatorLoaded();
     void OnAlifeSimulatorUnLoaded();
+    void InitUpgradeManager();
 
 protected:
     CBulletManager* m_pBulletManager;

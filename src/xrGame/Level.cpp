@@ -1080,10 +1080,18 @@ void CLevel::OnAlifeSimulatorLoaded()
 {
     MapManager().ResetStorage();
     GameTaskManager().ResetStorage();
+    InitUpgradeManager();
+}
 
+void CLevel::InitUpgradeManager()
+{
+    // pavel:
     // moved from alife simulator for supporting in MP
     // only for single and server
     // for client manager creates in Load_GameSpecific_Before()
+    // yohji:
+    // if we don't create an alife simulator (in the case of vanilla MP modes),
+    // we still need to call this otherwise there will be a crash
     R_ASSERT(m_upgrade_manager == nullptr);
     m_upgrade_manager = xr_new<inventory::upgrade::Manager>();
 }
