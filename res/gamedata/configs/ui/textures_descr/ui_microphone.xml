@@ -1,0 +1,5 @@
+<w>
+    <file name="ui\ui_microphone">
+        <texture id="ui_microphone_icon" x="0" y="0" width="64" height="64" />
+   </file>
+</w>

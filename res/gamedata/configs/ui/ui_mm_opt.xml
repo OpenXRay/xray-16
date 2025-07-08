@@ -574,6 +574,40 @@
 	        <texture>ui_inGame2_checkbox</texture>
             <options_item entry="g_dynamic_music" group="mm_opt_sound" depend="snd"/>
         </check_dynamic_music>
+
+        <cap_vc_title x="15" y="183" width="400" height="24">
+          <text r="170" g="170" b="170" font="letterica18" align="c" vert_align="c">ui_mm_voice_chat</text>
+        </cap_vc_title>
+
+        <cap_players_voice_volume x="15" y="217" width="135" height="24">
+          <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_players_voice_volume</text>
+        </cap_players_voice_volume>
+        <track_players_voice_volume x="175" y="210" width="235" height="16">
+          <options_item entry="snd_volume_players" group="mm_opt_sound"/>
+        </track_players_voice_volume>
+
+        <cap_recorder_volume x="15" y="247" width="135" height="24">
+          <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_recorder_volume</text>
+        </cap_recorder_volume>
+        <track_recorder_volume x="175" y="250" width="235" height="16">
+          <options_item entry="snd_volume_recorder" group="mm_opt_sound"/>
+        </track_recorder_volume>
+
+        <cap_check_recorder_agc x="15" y="280" width="135" height="24">
+          <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_recorder_agc</text>
+        </cap_check_recorder_agc>
+        <check_recorder_agc  x="162" y="277" width="44" height="29">
+          <texture>ui_inGame2_checkbox</texture>
+          <options_item entry="snd_recorder_mode" group="mm_opt_sound" depend="snd"/>
+        </check_recorder_agc>
+
+        <cap_check_recorder_denoise x="15" y="313" width="135" height="24">
+          <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_denoise</text>
+        </cap_check_recorder_denoise>
+        <check_recorder_denoise  x="162" y="310" width="44" height="29">
+          <texture>ui_inGame2_checkbox</texture>
+          <options_item entry="snd_recorder_denoise" group="mm_opt_sound" depend="snd"/>
+        </check_recorder_denoise>
     </tab_sound>
     <tab_gameplay>
         <scroll_v x="-5" y="0" width="450" height="320"
@@ -619,7 +653,7 @@
 	            <d r="70" g="70" b="70"/>
             </text_color>
         </list_ui_style>
-		
+
 		<cap_fov x="20" y="3" width="135" height="24">
 			<text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_fov</text>
 		</cap_fov>
@@ -813,7 +847,7 @@
 				<e r="210" g="210" b="210"/>
 			</text_color>
         </btn_default>
-		
+
 		<btn_advanced x="201" y="322" width="133" height="24" stretch="1" accel="ui_action_1">
             <text align="c" font="letterica16">ui_mm_gamepad_setup</text>
             <texture>ui_inGame2_button</texture>
@@ -822,7 +856,7 @@
 			</text_color>
         </btn_advanced>
     </tab_controls>
-	
+
 	<tab_controls_gpad>
 		<cap_gamepadsetup x="0" y="65" width="430" height="15">
             <texture a="150">ui_inGame2_servers_list_button</texture>
@@ -830,7 +864,7 @@
                 <text r="170" g="170" b="170" font="letterica16" vert_align="c">ui_mm_gamepad_setup</text>
             </auto_static>
         </cap_gamepadsetup>
-		
+
 		<key_binding_gamepad x="0" y="85" width="430" height="240" gamepad_bind="1">
             <header_1 x="0" y="0" width="220" height="15">
                 <texture a="150">ui_inGame2_servers_list_button</texture>
@@ -867,7 +901,7 @@
 				<e r="210" g="210" b="210"/>
 			</text_color>
         </btn_default>
-		
+
 		<btn_controls x="191" y="322" width="143" height="24" stretch="1" accel="ui_action_1">
             <text align="c" font="letterica16">ui_mm_keyboard_setup</text>
             <texture>ui_inGame2_button</texture>
@@ -876,7 +910,7 @@
 			</text_color>
         </btn_controls>
 	</tab_controls_gpad>
-	
+
     <download_static x="186" y="717" width="603" height="51">
         <texture>ui_patch_back</texture>
     </download_static>
