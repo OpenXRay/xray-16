@@ -20,7 +20,7 @@ void game_sv_freemp::Create(shared_str & options)
 
 	switch_Phase(GAME_PHASE_PENDING);
 
-	::Random.seed(GetTickCount());
+	::Random.seed(Device.dwTimeGlobal);
 	m_CorpseList.clear();
 }
 

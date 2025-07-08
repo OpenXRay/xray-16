@@ -52,7 +52,6 @@
     <ClInclude Include="NET_Compressor.h" />
     <ClInclude Include="NET_Log.h" />
     <ClInclude Include="NET_Messages.h" />
-    <ClInclude Include="NET_PlayersMonitor.h" />
     <ClInclude Include="NET_Shared.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="IClientStatistic.h">
@@ -123,5 +122,10 @@
     <Filter Include="NET_Client">
       <UniqueIdentifier>{e9d7a0f5-655c-4c81-b93c-cdb619930612}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\abseil_dll.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\GameNetworkingSockets.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\libprotobufd.dll" />
   </ItemGroup>
 </Project>

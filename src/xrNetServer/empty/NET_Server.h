@@ -1,22 +1,10 @@
 #pragma once
 
 #include "../NET_Common.h"
-#include "../NET_PlayersMonitor.h"
+#include "../PlayersMonitor.h"
 #include "../NET_Shared.h"
 #include "../ip_filter.h"
-
-struct SClientConnectData {
-    ClientID clientID;
-    string64 name;
-    string64 pass;
-    u32 process_id;
-
-    SClientConnectData()
-    {
-        name[0] = pass[0] = 0;
-        process_id = 0;
-    }
-};
+#include "../IClientStatistic.h"
 
 // -----------------------------------------------------
 

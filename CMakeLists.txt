@@ -225,6 +225,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         MIXED
     )
     add_compile_options(-Og)
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    add_compile_definitions(RELEASE)
 endif()
 
 add_compile_definitions(

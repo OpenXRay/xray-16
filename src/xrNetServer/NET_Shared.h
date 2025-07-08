@@ -24,6 +24,11 @@
 
 // #define USE_DIRECT_PLAY
 
+// Define DirectPlay constants for compatibility
+#if !defined(DPNSEND_GUARANTEED) && !defined(XR_PLATFORM_WINDOWS)
+#define DPNSEND_GUARANTEED 0x00000008
+#endif
+
 IC bool UseDirectPlay()
 {
 #ifdef USE_DIRECT_PLAY
@@ -61,4 +66,17 @@ extern "C"
 {
     typedef struct _DPN_CONNECTION_INFO DPN_CONNECTION_INFO;
 }
+#else
+// Dummy structure for Linux builds
+typedef struct _DPN_CONNECTION_INFO {
+    u32 dwMessagesReceived;
+    u32 dwMessagesTransmittedHighPriority;
+    u32 dwMessagesTransmittedNormalPriority;
+    u32 dwMessagesTransmittedLowPriority;
+    u32 dwRoundTripLatencyMS;
+    u32 dwThroughputBPS;
+    u32 dwPeakThroughputBPS;
+    u32 dwPacketsDropped;
+    u32 dwPacketsRetried;
+} DPN_CONNECTION_INFO;
 #endif
