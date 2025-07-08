@@ -1,0 +1,35 @@
+class "opt_sound" (CUIWindow)
+
+function opt_sound:__init() super()
+end
+
+function opt_sound:__finalize()
+
+end
+
+function opt_sound:InitControls(x, y, xml, handler)
+
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+
+--	self.bk = xml:InitFrame("frame", self)
+
+	xml:InitStatic("tab_sound:cap_mastervolume",		self)
+	xml:InitStatic("tab_sound:cap_musicvolume",			self)
+
+	xml:InitStatic("tab_sound:cap_check_eax",			self)
+	xml:InitStatic("tab_sound:cap_check_dynamic_music",	self)
+
+	xml:InitCheck("tab_sound:check_eax",				self)
+	xml:InitCheck("tab_sound:check_dynamic_music",		self)
+
+
+	xml:InitTrackBar				("tab_sound:track_musicvolume",	self)
+	xml:InitTrackBar				("tab_sound:track_mastervolume",self)
+
+
+	xml:InitStatic					("tab_sound:cap_snd_device",		self)
+	xml:InitComboBox				("tab_sound:list_snd_device",	self)
+
+end
