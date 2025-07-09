@@ -78,6 +78,17 @@
     <ClInclude Include="SoundRender_Scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="ISoundRecorder.h" />
+    <ClInclude Include="ISoundVoiceChat.h" />
+    <ClInclude Include="IStreamPlayer.h" />
+    <ClInclude Include="IVoicePacketSender.h" />
+    <ClInclude Include="VoicePacket.h" />
+    <ClInclude Include="SpeexPreprocess.h" />
+    <ClInclude Include="VoicePacketsPacker.h" />
+    <ClInclude Include="RingBuffer.h" />
+    <ClInclude Include="SoundRecorderA.h" />
+    <ClInclude Include="StreamPlayerA.h" />
+    <ClInclude Include="SoundVoiceChat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
@@ -134,6 +145,11 @@
     <ClCompile Include="SoundRender_Scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="SpeexPreprocess.cpp" />
+    <ClCompile Include="VoicePacketsPacker.cpp" />
+    <ClCompile Include="SoundRecorderA.cpp" />
+    <ClCompile Include="StreamPlayerA.cpp" />
+    <ClCompile Include="SoundVoiceChat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
@@ -141,5 +157,7 @@
   <ItemGroup>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\soft_oal.dll" />
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\libspeexdsp-1.dll" />
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\msys-opus-0.dll" />
   </ItemGroup>
 </Project>

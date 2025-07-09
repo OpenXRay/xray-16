@@ -60,6 +60,8 @@
 		<command id="kb_scores"						exe="scores"/>
 		<command id="kb_chat"						  exe="chat"/>
 		<command id="kb_chat_team"				exe="chat_team"/>
+		<command id="kb_voice_chat"					exe="voice_chat"/>
+		<command id="kb_voice_distanec"				exe="voice_distance"/>
 		<command id="kb_buy_menu"					exe="buy_menu"/>
 		<command id="kb_skin_menu"				exe="skin_menu"/>
 		<command id="kb_team_menu"				exe="team_menu"/>

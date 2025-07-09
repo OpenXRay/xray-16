@@ -94,6 +94,7 @@ public:
     virtual void OnChatMessage(NET_Packet* P){};
     virtual void OnWarnMessage(NET_Packet* P){};
     virtual void OnRadminMessage(u16 type, NET_Packet* P){};
+    virtual void OnVoiceMessage(NET_Packet* P){};
 
     virtual bool IsVotingEnabled() { return m_u16VotingEnabled != 0; };
     virtual bool IsVotingEnabled(u16 flag) { return (m_u16VotingEnabled & flag) != 0; };
@@ -120,6 +121,8 @@ public:
 
     virtual bool IsPlayerInTeam(game_PlayerState* ps, ETeam team) { return ps->team == team; };
     virtual void OnConnected();
+
+    virtual void OnScreenResolutionChanged(){};
 
     u8 m_u8SpectatorModes;
     virtual bool Is_Spectator_Camera_Allowed(CSpectator::EActorCameras Camera);

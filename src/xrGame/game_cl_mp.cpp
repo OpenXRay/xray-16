@@ -51,6 +51,11 @@ BOOL g_draw_downloads = FALSE;
 
 game_cl_mp::game_cl_mp()
 {
+    if (!GEnv.isDedicatedServer)
+        m_pVoiceChat = xr_new<CVoiceChat>();
+    else
+        m_pVoiceChat = NULL;
+
     m_bVotingActive = false;
     m_pVoteStartWindow = NULL;
     m_pAdminMenuWindow = NULL;
@@ -93,6 +98,8 @@ game_cl_mp::game_cl_mp()
 
 game_cl_mp::~game_cl_mp()
 {
+    xr_delete(m_pVoiceChat);
+
     /*	TODO: check if shaders are deleted automatically...
     CL_TEAM_DATA_LIST_it it = TeamList.begin();
     for(;it!=TeamList.end();++it)
@@ -236,11 +243,51 @@ bool game_cl_mp::OnKeyboardPress(int key)
             return true;
         }
         break;
+        case kVOICE_CHAT:
+        {
+            if (local_player && !local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+            {
+                if (!m_pVoiceChat->IsStarted())
+                {
+                    m_pVoiceChat->Start();
+                    CurrentGameUI()->UIMainIngameWnd->SetActiveVoiceIcon(true);
+                }
+            }
+            return true;
+        }break;
+
+        case kVOICE_DISTANCE:
+        {
+            if (local_player && !local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+            {
+                u8 distance = m_pVoiceChat->SwitchDistance();
+                CurrentGameUI()->UIMainIngameWnd->SetVoiceDistance(distance);
+            }
+            return true;
+        }break;
         }
     }
 
     m_cur_MenuID = u32(-1);
     return false;
+}
+
+bool game_cl_mp::OnKeyboardRelease(int key)
+{
+    switch (key)
+    {
+    case kVOICE_CHAT:
+    {
+        m_pVoiceChat->Stop();
+        CurrentGameUI()->UIMainIngameWnd->SetActiveVoiceIcon(false);
+        return true;
+    }break;
+
+    default:
+        break;
+    }
+
+    return inherited::OnKeyboardRelease(key);
 }
 
 void game_cl_mp::VotingBegin()
@@ -1847,4 +1894,9 @@ void game_cl_mp::ProcessPlayersInfoReply(NET_Packet& P)
         m_players_info_reply.clear();
         tmp_cb(info_count);
     }
+}
+
+void game_cl_mp::OnVoiceMessage(NET_Packet* P)
+{
+    m_pVoiceChat->ReceiveMessage(P);
 }

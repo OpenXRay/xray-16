@@ -1,6 +1,7 @@
 #pragma once
 #include "game_cl_mp.h"
 
+class CVoiceChat;
 class CUIGameFMP;
 
 class game_cl_freemp :public game_cl_mp
@@ -20,15 +21,24 @@ public:
 
 	virtual	void net_import_state(NET_Packet& P);
 	virtual	void net_import_update(NET_Packet& P);
-	
+
 	virtual void shedule_Update(u32 dt);
 
+	virtual void OnRender();
+
 	virtual	bool OnKeyboardPress(int key);
+	virtual	bool OnKeyboardRelease(int key);
+
+	virtual void TranslateGameMessage(u32 msg, NET_Packet& P);
 
 	virtual LPCSTR GetGameScore(string32&	score_dest);
 	virtual bool Is_Rewarding_Allowed()  const { return false; };
 
 	virtual void OnConnected();
+
+	virtual void OnScreenResolutionChanged();
+
+private:
 
 };
 

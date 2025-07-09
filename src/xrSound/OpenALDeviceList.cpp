@@ -32,12 +32,12 @@
 ALDeviceList::ALDeviceList()
 {
     snd_device_id = (u32)-1;
+    snd_input_device_id = (u32)-1;
     Enumerate();
 }
 
 void ALDeviceList::IterateAndAddDevicesString(pcstr devices)
 {
-    // go through device list (each device terminated with a single NULL, list terminated with double NULL)
     while (*devices != '\0')
     {
         if (ALCdevice* device = alcOpenDevice(devices))
@@ -48,7 +48,6 @@ void ALDeviceList::IterateAndAddDevicesString(pcstr devices)
 
                 const bool enumerateAllPresent = alcIsExtensionPresent(device, "ALC_ENUMERATE_ALL_EXT");
 
-                // if new actual device name isn't already in the list, then add it...
                 pcstr actualDeviceName = alcGetString(device, enumerateAllPresent ? ALC_ALL_DEVICES_SPECIFIER : ALC_DEVICE_SPECIFIER);
 
                 if (actualDeviceName != nullptr && xr_strlen(actualDeviceName) > 0)
@@ -86,6 +85,7 @@ void ALDeviceList::Enumerate()
     // have a set of vectors storing the device list, selection status, spec version #
     // -- empty all the lists and reserve space for 10 devices
     m_devices.clear();
+    m_capture_devices.clear();
 
     // grab function pointers for 1.1-API functions, and if successful proceed to enumerate all devices
     if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT"))
@@ -136,9 +136,18 @@ void ALDeviceList::Enumerate()
         Msg("~ SOUND: OpenAL: EnumerationExtension NOT Present");
     }
 
-    // make token
-    const auto _cnt = GetNumDevices();
+    if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT"))
+    {
+        pcstr captureDevices = (pstr)alcGetString(nullptr, ALC_CAPTURE_DEVICE_SPECIFIER);
+        if (captureDevices)
+        {
+            xr_strcpy(m_defaultCaptureDeviceName, alcGetString(nullptr, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
+            Log("SOUND: OpenAL: system default capture device name is", m_defaultCaptureDeviceName);
+            IterateAndAddCaptureDevicesString(captureDevices);
+        }
+    }
 
+    const auto _cnt = GetNumDevices();
     auto& devices = SoundRender->Parent.GetDevicesList();
     devices.reserve(_cnt + 1);
 
@@ -147,7 +156,16 @@ void ALDeviceList::Enumerate()
         devices.emplace_back(xr_strdup(m_devices[i].name), i);
     }
     devices.emplace_back(nullptr, -1);
-    //--
+
+    const auto _capture_cnt = GetNumCaptureDevices();
+    auto& captureDevices = SoundRender->Parent.GetCaptureDevicesList();
+    captureDevices.reserve(_capture_cnt + 1);
+
+    for (u32 i = 0; i < _capture_cnt; ++i)
+    {
+        captureDevices.emplace_back(xr_strdup(m_capture_devices[i].name), i);
+    }
+    captureDevices.emplace_back(nullptr, -1);
 
     if (0 == GetNumDevices())
     {
@@ -206,16 +224,43 @@ void ALDeviceList::SelectBestDevice()
             new_device_id = 0; // first
         }
         snd_device_id = new_device_id;
+        snd_input_device_id = new_device_id; // Sync output device ID
     }
+
+    // Ensure output device ID is synchronized
+    if (snd_input_device_id == (u32)-1)
+        snd_input_device_id = snd_device_id;
+
     if (GetNumDevices() == 0)
         Msg("SOUND: Can't select device. List empty");
     else
-        Msg("SOUND: Selected device is %s", GetDeviceName(snd_device_id));
+        Msg("SOUND: Selected output device is %s", GetDeviceName(snd_device_id));
 }
 
 /*
  * Returns the major and minor version numbers for a device at a specified index in the complete list
  */
+void ALDeviceList::IterateAndAddCaptureDevicesString(pcstr devices)
+{
+    while (*devices != '\0')
+    {
+        auto& addedDevice = m_capture_devices.emplace_back(devices, 0, 0);
+        addedDevice.props.storage = 0;
+        devices += xr_strlen(devices) + 1;
+    }
+}
+
+pcstr ALDeviceList::GetCaptureDeviceName(size_t index) const
+{
+    return m_capture_devices[index].name;
+}
+
+void ALDeviceList::GetCaptureDeviceVersion(size_t index, int* major, int* minor)
+{
+    *major = m_capture_devices[index].major_ver;
+    *minor = m_capture_devices[index].minor_ver;
+}
+
 void ALDeviceList::GetDeviceVersion(size_t index, int* major, int* minor)
 {
     *major = m_devices[index].major_ver;

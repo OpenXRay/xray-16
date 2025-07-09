@@ -152,7 +152,7 @@ void CUIInventoryUpgradeWnd::InitInventory(CUICellItem* cellItem, bool can_upgra
     }
     m_btn_repair->Enable(false);
 
-    if (ai().get_alife() && m_inv_item)
+    if (m_inv_item)
     {
         if (install_item(*m_inv_item, can_upgrade))
         {

@@ -487,6 +487,7 @@ void game_sv_mp::Create(shared_str& options)
     }
     else
     {
+        Level().InitUpgradeManager();
         Msg("Multiplayer>> alife.spawn not found! No A-life");
     }
 	//-------------------------------------------------------------------

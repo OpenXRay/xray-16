@@ -20,7 +20,7 @@ void game_sv_freemp::Create(shared_str & options)
 
 	switch_Phase(GAME_PHASE_PENDING);
 
-	::Random.seed(GetTickCount());
+	::Random.seed(Device.dwTimeGlobal);
 	m_CorpseList.clear();
 }
 
@@ -69,6 +69,28 @@ void game_sv_freemp::OnPlayerConnectFinished(ClientID id_who)
 		u_EventSend(P);
 		xrCData->net_Ready = TRUE;
 	};
+}
+
+void game_sv_freemp::AddMoneyToPlayer(game_PlayerState* ps, s32 amount)
+{
+	if (!ps) return;
+
+	Msg("- Add money to player: [%u]%s, amount %d", ps->GameID, ps->getName(), amount);
+
+	s64 total_money = ps->money_for_round;
+	total_money += amount;
+
+	if (total_money < 0)
+		total_money = 0;
+
+	if (total_money > std::numeric_limits<s32>().max())
+	{
+		Msg("! The limit of the maximum amount of money has been exceeded.");
+		total_money = std::numeric_limits<s32>().max() - 1;
+	}
+
+	ps->money_for_round = s32(total_money);
+	signal_Syncronize();
 }
 
 void game_sv_freemp::OnPlayerReady(ClientID id_who)
@@ -123,6 +145,16 @@ void game_sv_freemp::OnEvent(NET_Packet &P, u16 type, u32 time, ClientID sender)
 			xrClientData *l_pC = (xrClientData*)get_client(ID);
 			if (!l_pC) break;
 			KillPlayer(l_pC->ID, l_pC->ps->GameID);
+		}
+		break;
+	case GAME_EVENT_MP_REPAIR:
+		{
+			OnPlayerRepairItem(P, sender);
+		}
+		break;
+	case GAME_EVENT_MP_INSTALL_UPGRADE:
+		{
+			OnPlayerInstallUpgrade(P, sender);
 		}
 		break;
 	default:

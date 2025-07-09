@@ -40,6 +40,8 @@ using Fvector2 = _vector2<float>;
 struct Fbox3;
 using Fbox = Fbox3;
 
+class XRSOUND_API ISoundVoiceChat;
+
 XRSOUND_API extern u32 psSoundModel;
 XRSOUND_API extern float psSoundVEffects;
 XRSOUND_API extern float psSoundVFactor;
@@ -51,6 +53,11 @@ XRSOUND_API extern Flags32 psSoundFlags;
 XRSOUND_API extern int psSoundTargets;
 XRSOUND_API extern int psSoundCacheSizeMB;
 XRSOUND_API extern u32 snd_device_id;
+XRSOUND_API extern u32 snd_input_device_id;
+XRSOUND_API extern float psSoundVPlayers;
+XRSOUND_API extern float psSoundVRecorder;
+XRSOUND_API extern int psSoundRecorderMode;
+XRSOUND_API extern int psSoundRecorderDenoise;
 
 XRSOUND_API extern ISoundScene* DefaultSoundScene;
 
@@ -233,18 +240,24 @@ public:
 
     virtual const Fvector& listener_position() = 0;
 
+    virtual ISoundVoiceChat* GetSoundVoiceChat() = 0;
+
     virtual void refresh_sources() = 0;
+
+    virtual xr_vector<xr_token>& GetCaptureDevicesList() = 0;
 };
 
 class XRSOUND_API CSoundManager
 {
     xr_vector<xr_token> soundDevices;
+    xr_vector<xr_token> soundCaptureDevices;
 
     SoundEnvironment_LIB* soundEnvironment{};
 
 public:
     void  CreateDevicesList();
-    auto& GetDevicesList() { return soundDevices; }
+    xr_vector<xr_token>& GetDevicesList() { return soundDevices; }
+    xr_vector<xr_token>& GetCaptureDevicesList() { return soundCaptureDevices; }
 
     void Create();
     void Destroy();

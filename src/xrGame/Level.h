@@ -51,6 +51,14 @@ class CFogOfWarMngr;
 class CBulletManager;
 class CMapManager;
 
+namespace inventory
+{
+namespace upgrade
+{
+class Manager;
+}
+}
+
 namespace file_transfer
 {
 class client_site;
@@ -398,12 +406,15 @@ protected:
     // CFogOfWarMngr* m_pFogOfWarMngr;
     CMapManager* m_map_manager = nullptr;
     CGameTaskManager* m_game_task_manager = nullptr;
+    inventory::upgrade::Manager* m_upgrade_manager = nullptr;
 
 public:
     CMapManager& MapManager() const { return *m_map_manager; }
     CGameTaskManager& GameTaskManager() const { return *m_game_task_manager; }
+    inventory::upgrade::Manager& UpgradeManager() const { return *m_upgrade_manager; }
     void OnAlifeSimulatorLoaded();
     void OnAlifeSimulatorUnLoaded();
+    void InitUpgradeManager();
 
 protected:
     CBulletManager* m_pBulletManager;

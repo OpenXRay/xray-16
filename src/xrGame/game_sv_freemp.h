@@ -20,6 +20,11 @@ public:
 	virtual		LPCSTR				type_name() const { return "freemp"; };
     void __stdcall		net_Relcase(IGameObject* O) {};
 
+	// helper functions
+	void									AddMoneyToPlayer(game_PlayerState* ps, s32 amount);
+
+	virtual		void				OnPlayerRepairItem(NET_Packet& P, ClientID const& clientID);
+	virtual		void				OnPlayerInstallUpgrade(NET_Packet& P, ClientID const& clientID);
 
 	virtual		void				OnPlayerReady(ClientID id_who);
 	virtual		void				OnPlayerConnect(ClientID id_who);

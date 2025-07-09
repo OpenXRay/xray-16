@@ -56,7 +56,9 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     case GEG_PLAYER_ITEM2SLOT:
     case GEG_PLAYER_ITEM2BELT:
     case GEG_PLAYER_ITEM2RUCK:
-    case GE_GRENADE_EXPLODE: { SendBroadcast(BroadcastCID, P, MODE);
+    case GE_GRENADE_EXPLODE:
+    case GE_WPN_UNLOAD_AMMO:
+    case GE_WPN_UPDATE_AMMO: { SendBroadcast(BroadcastCID, P, MODE);
     }
     break;
     case GEG_PLAYER_ACTIVATEARTEFACT:
@@ -262,6 +264,17 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     }
     break;
     case GE_CHANGE_POS: { SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
+    }
+    break;
+    case GE_REPAIR_ITEM:
+    {
+        CSE_ALifeInventoryItem* iitem = smart_cast<CSE_ALifeInventoryItem*>(receiver);
+        if (!iitem)
+            break;
+
+        iitem->m_fCondition = 1.0f;
+
+        SendBroadcast(BroadcastCID, P, net_flags(TRUE, TRUE));
     }
     break;
     case GE_INSTALL_UPGRADE:

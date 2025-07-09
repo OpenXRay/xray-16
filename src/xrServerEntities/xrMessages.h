@@ -77,6 +77,10 @@ enum : u32
     M_SECURE_MESSAGE,
     M_CREATE_PLAYER_STATE,
     M_COMPRESSED_UPDATE_OBJECTS,
+
+    M_VOICE_MESSAGE,
+
+    MSG_FORCEDWORD				= u32(-1)
 };
 
 enum : u32
@@ -106,10 +110,13 @@ enum : u32
 
     GE_WPN_AMMO_ADD,
     GE_WPN_STATE_CHANGE,
+    GE_WPN_UNLOAD_AMMO,
+    GE_WPN_UPDATE_AMMO,
 
     GE_ADDON_ATTACH,
     GE_ADDON_DETACH,
     GE_ADDON_CHANGE,
+    GE_REPAIR_ITEM,
     GE_INSTALL_UPGRADE,
 
     GE_GRENADE_EXPLODE,
@@ -221,6 +228,13 @@ enum EGameMessages : u32
     GAME_EVENT_RECEIVE_SERVER_LOGO,
     GAME_EVENT_CREATE_PLAYER_STATE,
     GAME_EVENT_PLAYERS_INFO_REPLY,
+
+    //-----------------------------------------
+
+    GAME_EVENT_MP_REPAIR,
+    GAME_EVENT_MP_REPAIR_SUCCESS,
+    GAME_EVENT_MP_INSTALL_UPGRADE,
+    GAME_EVENT_MP_INSTALL_UPGRADE_SUCCESS,
 
     //-----------------------------------------
     GAME_EVENT_SCRIPT_BEGINS_FROM, // don't add messages after this

@@ -21,11 +21,12 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(xrSdkDir)include\AL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(xrSdkDir)include\AL;$(xrSdkDir)include\speex;$(xrSdkDir)include\opus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libogg_static.lib;libvorbis_static.lib;libvorbisfile.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libogg_static.lib;libvorbis_static.lib;libvorbisfile.lib;OpenAL32.lib;opus.lib;speexdsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers Condition="'$(Platform)'=='Win32'" />
     </Link>
   </ItemDefinitionGroup>
@@ -44,13 +45,26 @@
     <ClInclude Include="SoundRender_Target.h" />
     <ClInclude Include="SoundRender_TargetA.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ISoundRecorder.h" />
+    <ClInclude Include="ISoundVoiceChat.h" />
+    <ClInclude Include="IStreamPlayer.h" />
+    <ClInclude Include="IVoicePacketSender.h" />
+    <ClInclude Include="VoicePacket.h" />
+    <ClInclude Include="SpeexPreprocess.h" />
+    <ClInclude Include="VoicePacketsPacker.h" />
+    <ClInclude Include="RingBuffer.h" />
+    <ClInclude Include="SoundRecorderA.h" />
+    <ClInclude Include="StreamPlayerA.h" />
+    <ClInclude Include="SoundVoiceChat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guids.cpp">
       <PrecompiledHeader>
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="OpenALDeviceList.cpp" />
+    <ClCompile Include="OpenALDeviceList.cpp">
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundRender_Core.cpp" />
     <ClCompile Include="SoundRender_CoreA.cpp" />
@@ -69,6 +83,11 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SpeexPreprocess.cpp" />
+    <ClCompile Include="VoicePacketsPacker.cpp" />
+    <ClCompile Include="SoundRecorderA.cpp" />
+    <ClCompile Include="StreamPlayerA.cpp" />
+    <ClCompile Include="SoundVoiceChat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
@@ -92,6 +111,12 @@
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\msys-opus-0.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\libspeexdsp-1.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
   </ItemGroup>

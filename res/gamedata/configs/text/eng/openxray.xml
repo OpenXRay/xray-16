@@ -135,6 +135,9 @@
 	<string id="ui_mm_color_grading_warm">
 		<text>warm</text>
 	</string>
+	<string id="ui_mm_snd_input_device">
+		<text>Input Device</text>
+	</string>
 	<string id="eng">
 		<text>English</text>
 	</string>

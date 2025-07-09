@@ -3,6 +3,7 @@
 #include "SoundRender_CoreA.h"
 
 XRSOUND_API u32 snd_device_id = u32(-1);
+XRSOUND_API u32 snd_input_device_id = u32(-1);
 
 ISoundScene* DefaultSoundScene{};
 

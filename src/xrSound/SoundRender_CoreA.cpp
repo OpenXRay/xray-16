@@ -5,6 +5,7 @@
 #include "SoundRender_TargetA.h"
 #include "OpenALDeviceList.h"
 #include "SoundRender_EffectsA_EAX.h"
+#include "SoundVoiceChat.h"
 
 CSoundRender_CoreA::CSoundRender_CoreA(CSoundManager& p)
     : CSoundRender_Core(p)
@@ -117,6 +118,8 @@ void CSoundRender_CoreA::_initialize()
             break;
         }
     }
+
+    pSoundVoiceChat = xr_new<SoundVoiceChat>(pContext);
 }
 
 void CSoundRender_CoreA::set_master_volume(float f)
@@ -129,6 +132,8 @@ void CSoundRender_CoreA::_clear()
 {
     inherited::_clear();
     xr_delete(m_effects);
+
+    xr_delete(pSoundVoiceChat);
     // remove targets
     for (auto& T : s_targets)
     {
@@ -155,4 +160,12 @@ void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, con
     A_CHK(alListener3f(AL_POSITION, listener.position.x, listener.position.y, listener.position.z));
     A_CHK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
     A_CHK(alListenerfv(AL_ORIENTATION, &listener.orientation[0].x));
+}
+
+void CSoundRender_CoreA::update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R)
+{
+    inherited::update(P, D, N, R);
+
+    if (pSoundVoiceChat)
+        pSoundVoiceChat->Update(P, D, N);
 }

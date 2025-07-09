@@ -8,11 +8,11 @@
     <auto_static x="85" y="0" width="854" height="768" stretch="1">
       <texture>ui_inGame2_back_01</texture>
     </auto_static>
-    
+
     <auto_static x="0" y="0" width="85" height="768" stretch="1">
       <texture>ui_inGame2_back_01w10_l</texture>
     </auto_static>
-    
+
     <auto_static x="939" y="0" width="85" height="768" stretch="1">
       <texture>ui_inGame2_back_01w10_r</texture>
     </auto_static>
@@ -30,7 +30,7 @@
     <cap_options x="38" y="9" width="315" height="33">
 			<text font="graffiti22" color="ui_6">ui_mm_options</text>
 		</cap_options>
-	
+
     <btn_accept x="183" y="429" width="131" height="48">
 			<text font="graffiti19" align="c">ui_mm_apply</text>
 			<texture>ui_button_main02</texture>
@@ -38,7 +38,7 @@
 				<e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>
 			</text_color>
 		</btn_accept>
-		
+
     <btn_cancel x="313" y="429" width="131" height="48">
 			<text font="graffiti19" align="c">ui_mm_cancel</text>
 			<texture>ui_button_main02</texture>
@@ -46,16 +46,16 @@
 				<e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>
 			</text_color>
 		</btn_cancel>
-		
+
     <tab x="46" y="22" width="384" height="52">
 			<button x="0" y="20" width="95" height="44" id="video">
 				<texture>ui_button_tablist</texture>
-				<text font="graffiti19" align="c">ui_mm_video</text>				
+				<text font="graffiti19" align="c">ui_mm_video</text>
 				<text_color>
 					<e r="106" g="95" b="91"/> <t r="227" g="199" b="178"/> <h r="180" g="153" b="155"/>
 				</text_color>
 			</button>
-      
+
 			<button x="97" y="20" width="95" height="44" id="sound" stretch="1">
 				<texture>ui_button_tablist</texture>
 				<text font="graffiti19" align="c">ui_mm_sound</text>
@@ -63,7 +63,7 @@
 					<e r="106" g="95" b="91"/> <t r="227" g="199" b="178"/> <h r="180" g="153" b="155"/>
 				</text_color>
 			</button>
-      
+
 			<button x="193" y="20" width="95" height="44" id="gameplay" stretch="1">
         <texture>ui_button_tablist</texture>
         <text font="graffiti19" align="c">ui_mm_gameplay</text>
@@ -93,7 +93,7 @@
   <tab_size x="46" y="74" width="615" height="416"/>
 	<tab_video>
 		<cap_renderer x="17" y="10" width="119" height="21">
-			<text font="letterica16" color="ui_6">ui_mm_renderer</text>			
+			<text font="letterica16" color="ui_6">ui_mm_renderer</text>
 		</cap_renderer>
 		<list_renderer x="162" y="10" width="218" height="21" list_length="5" always_show_scroll="0">
 			<options_item entry="renderer" group="mm_opt_video" depend="restart"/>
@@ -106,7 +106,7 @@
 		</list_renderer>
 
 		<cap_preset x="17" y="40" width="119" height="21">
-			<text font="letterica16" color="ui_6">ui_mm_quality_presets</text>			
+			<text font="letterica16" color="ui_6">ui_mm_quality_presets</text>
 		</cap_preset>
 		<list_presets x="162" y="40" width="218" height="21" list_length="5"  always_show_scroll="0">
 			<options_item entry="_preset" group="mm_opt_video_preset" depend="vid"/>
@@ -156,17 +156,17 @@
 			<text font="letterica16" color="ui_6">ui_mm_fullscreen</text>
 		</cap_fullscreen>
 		<check_fullscreen x="162" y="190" width="27" height="21" stretch="1">
-			<options_item entry="rs_fullscreen" group="mm_opt_video" depend="vid"/>	
+			<options_item entry="rs_fullscreen" group="mm_opt_video" depend="vid"/>
 		</check_fullscreen>
-		
+
 
 		<btn_advanced x="265" y="325" width="111" height="29">
-			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_advanced</text>	
-			<texture>ui_button_ordinary</texture>			
+			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_advanced</text>
+			<texture>ui_button_ordinary</texture>
 		</btn_advanced>
-		
+
 	</tab_video>
-  
+
   <con_cmd>
     <scroll_v	x="0" y="10" width="385" height="313"
 					right_ident="0" left_ident="0" top_indent="0" bottom_indent="0"
@@ -586,7 +586,7 @@
       <text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_simply</text>
       <texture>ui_button_ordinary</texture>
     </btn_to_simply>
-  
+
 </video_adv>
 
   <tab_sound>
@@ -596,7 +596,7 @@
 		<cap_musicvolume x="17" y="50" width="119" height="21">
 			<text font="letterica16" color="ui_6">ui_mm_music_volume</text>
 		</cap_musicvolume>
-		
+
 		<check_eax x="17" y="110" width="27" height="21" stretch="1">
 			<options_item entry="snd_efx" group="mm_opt_sound" depend="snd"/>
 			<text font="letterica16" color="ui_6">ui_mm_eax</text>
@@ -626,14 +626,27 @@
       <list_font_s r="240" g="217" b="182"/>
       <list_font	 r="216" g="186" b="140" font="letterica16"/>
     </list_snd_device>
+
+    <cap_snd_input_device x="17" y="105" width="119" height="21">
+      <text font="letterica16" color="ui_6">ui_mm_snd_input_device</text>
+    </cap_snd_input_device>
+    <list_snd_input_device x="162" y="105" width="217" height="21" always_show_scroll="1">
+      <options_item entry="snd_input_device" group="mm_opt_sound" depend="restart"/>
+      <text_color>
+        <e r="216" g="186" b="140"/>
+        <d color="ui_gray"/>
+      </text_color>
+      <list_font_s r="240" g="217" b="182"/>
+      <list_font	 r="216" g="186" b="140" font="letterica16"/>
+    </list_snd_input_device>
   </tab_sound>
 
   <tab_gameplay>
 		<cap_difficulty x="17" y="20" width="203" height="21">
-			<text font="letterica16" color="ui_6">ui_mm_difficulty</text>			
+			<text font="letterica16" color="ui_6">ui_mm_difficulty</text>
 		</cap_difficulty>
 
-		<list_difficulty x="162" y="20" width="217" height="21">	
+		<list_difficulty x="162" y="20" width="217" height="21">
 			<options_item entry="g_game_difficulty" group="mm_opt_gameplay"/>
 			<text_color>
 				<e r="216" g="186" b="140"/>
@@ -641,7 +654,7 @@
 			<list_font_s r="240" g="217" b="182"/>
 			<list_font	 r="216" g="186" b="140" font="letterica16"/>
 		</list_difficulty>
-		
+
 		<check_tips x="17" y="180" width="27" height="21" stretch="1">
 			<options_item entry="hud_info" group="mm_opt_gameplay"/>
 			<text font="letterica16" color="ui_6">ui_mm_tips</text>
@@ -668,10 +681,10 @@
 		</check_dist>
 
 		<btn_check_updates x="270" y="290" width="111" height="29">
-			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_check_updates</text>	
-			<texture>ui_button_ordinary</texture>			
+			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_check_updates</text>
+			<texture>ui_button_ordinary</texture>
 		</btn_check_updates>
-		
+
 	</tab_gameplay>
 	<tab_controls>
 		<cap_mousesens x="17" y="20" width="125" height="21">
@@ -683,7 +696,7 @@
         <text font="letterica16" color="ui_6">ui_mm_keyboard_setup</text>
       </auto_static>
     </cap_keyboardsetup>
-	
+
 		<track_mousesens x="162" y="20" width="217" height="21" step="0.01">
 			<options_item entry="mouse_sens" group="mm_opt_controls"/>
 		</track_mousesens>
@@ -717,14 +730,14 @@
 			</frame>
 			<list x="0" y="20" width="376" height="181" item_height="18" always_show_scroll="1">
 				<group_name font="letterica16" color="ui_6"/>
-				<item_text font="letterica16" r="215" g="215" b="215"/>				
+				<item_text font="letterica16" r="215" g="215" b="215"/>
 			</list>
-			
+
 			<scroll_view x="0" y="20" width="373" height="181" always_show_scroll="1" vert_interval="3">
 				<item_group x="0" y="0" width="133" height="25">
 					<text font="letterica16" color="ui_6"/>
 				</item_group>
-				
+
 				<item_key x="0" y="0" width="345" height="18">
 					<text font="letterica16" r="215" g="215" b="215"/>
 				</item_key>
@@ -732,36 +745,36 @@
 		</key_binding>
 
 		<btn_default x="265" y="325" width="111" height="29">
-			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_default</text>	
-			<texture>ui_button_ordinary</texture>			
+			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_default</text>
+			<texture>ui_button_ordinary</texture>
 		</btn_default>
 	</tab_controls>
-	
+
 	<frame x="0" y="0" width="392" height="330">
-		<texture>ui_tablist_textbox</texture>		
+		<texture>ui_tablist_textbox</texture>
 	</frame>
 	<frame_gameplay x="0" y="0" width="392" height="330">
-		<texture>ui_tablist_textbox</texture>		
+		<texture>ui_tablist_textbox</texture>
 	</frame_gameplay>
 	<frame_videoadv x="0" y="0" width="392" height="330">
-		<texture>ui_tablist_textbox</texture>		
+		<texture>ui_tablist_textbox</texture>
 	</frame_videoadv>
 	<download_static x="186" y="717" width="603" height="51">
 		<texture>ui_patch_back</texture>
 	</download_static>
 
 	<download_text x="200" y="730" width="480" height="30">
-		<text align="c" font="letterica16" r="135" g="123" b="116" complex_mode="0">mm_mp_progress</text>	
+		<text align="c" font="letterica16" r="135" g="123" b="116" complex_mode="0">mm_mp_progress</text>
 	</download_text>
-	
+
 	<progress_download x="222" y="754" width="403" height="10" horz="1" min="0" max="100">
 		<progress>
 			<texture>ui_patch_progress</texture>
 		</progress>
 	</progress_download>
-	
+
 	<btn_cancel_download x="652" y="732" width="111" height="29">
-		<text align="c" font="letterica16" r="227" g="199" b="178">mm_mp_cancel</text>	
-		<texture>ui_button_ordinary</texture>			
+		<text align="c" font="letterica16" r="227" g="199" b="178">mm_mp_cancel</text>
+		<texture>ui_button_ordinary</texture>
 	</btn_cancel_download>
 </w>

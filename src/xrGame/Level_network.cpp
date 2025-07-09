@@ -148,7 +148,6 @@ void CLevel::net_Stop()
     else if (IsDemoSave() && !IsDemoInfoSaved())
         SaveDemoInfo();
 
-
 	if (!IsGameTypeSingle())
 	{
 		luabind::functor<void> funct;
@@ -383,11 +382,11 @@ bool CLevel::Connect2Server(const char* options)
 	}
 	else
 	{
-		u32 EndTime = GetTickCount() + ConnectionTimeOut;
+		u32 EndTime = Device.dwTimeGlobal + ConnectionTimeOut;
 		while (!HasSessionName())
 		{
 			Sleep(5);
-			u32 CurTime = GetTickCount();
+			u32 CurTime = Device.dwTimeGlobal;
 			if (CurTime > EndTime || net_isFails_Connect())
 			{
 				OnConnectRejected();
@@ -396,7 +395,7 @@ bool CLevel::Connect2Server(const char* options)
 			}
 		}
 
-		EndTime = GetTickCount() + ConnectionTimeOut;
+		EndTime = Device.dwTimeGlobal + ConnectionTimeOut;
 		while (!m_bConnectResultReceived)
 		{
 			ClientReceive();
@@ -404,7 +403,7 @@ bool CLevel::Connect2Server(const char* options)
 			if (Server)
 				Server->Update();
 
-			u32 CurTime = GetTickCount();
+			u32 CurTime = Device.dwTimeGlobal;
 			if (CurTime > EndTime)
 			{
 				NET_Packet	P;

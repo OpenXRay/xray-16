@@ -8,6 +8,7 @@
 #include "configs_dump_verifyer.h"
 #include "screenshot_server.h"
 #include "xrCore/fastdelegate.h"
+#include "VoiceChat.h"
 
 class CUIWindow;
 class CUISpeechMenu;
@@ -179,8 +180,6 @@ public:
     virtual void TranslateGameMessage(u32 msg, NET_Packet& P);
     virtual void CommonMessageOut(pcstr msg);
 
-    virtual bool OnKeyboardPress(int key);
-
     virtual bool CanBeReady() { return true; };
     virtual void shedule_Update(u32 dt);
     bool IsLocalPlayerInitialized() const;
@@ -310,6 +309,12 @@ public:
     //-------------------------------------------------------------------------------------------------
     static xr_string generate_file_name(const xr_string& base_name, const time_t* date_time = nullptr);
     static xr_string sanitize_filename(const xr_string& base_name);
+
+    virtual bool OnKeyboardPress(int key);
+    virtual	bool OnKeyboardRelease(int key);
+    CVoiceChat* m_pVoiceChat = nullptr;
+private:
+    virtual void OnVoiceMessage(NET_Packet* P);
 //-------------------------------------------------------------------------------------------------
 #include "game_cl_mp_messages_menu.h"
 };

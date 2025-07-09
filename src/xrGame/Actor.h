@@ -186,6 +186,8 @@ public:
     void HitMark(float P, Fvector dir, IGameObject* who, s16 element, Fvector position_in_bone_space, float impulse,
         ALife::EHitType hit_type);
 
+    void HitMarkMonster(Fvector dir, float damage);
+
     void Feel_Grenade_Update(float rad);
 
     virtual float GetMass();

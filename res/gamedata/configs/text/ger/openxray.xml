@@ -79,7 +79,7 @@
 		<text>Spiel-FPS-Limit</text>
 	</string>
 	<string id="ui_mm_fps_limit_in_menu">
-		<text>Men�-FPS-Limit</text>
+		<text>MenпїЅ-FPS-Limit</text>
 	</string>
 	<string id="ui_mm_localization">
 		<text>Sprache</text>
@@ -125,6 +125,9 @@
 	</string>
 	<string id="ui_mm_color_grading_warm">
 		<text>warm</text>
+	</string>
+	<string id="ui_mm_snd_input_device">
+		<text>Eingabegerät</text>
 	</string>
 	<string id="eng">
 		<text>Englisch (English)</text>

@@ -151,11 +151,6 @@ void CInventoryItem::log_upgrades()
 
 void CInventoryItem::net_Spawn_install_upgrades(CSE_Abstract* DC) // net_Spawn
 {
-    if (!IsGameTypeSingle() || !ai().get_alife())
-    {
-        return;
-    }
-
     CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(DC);
     if (!pSE_InventoryItem)
     {
@@ -166,11 +161,17 @@ void CInventoryItem::net_Spawn_install_upgrades(CSE_Abstract* DC) // net_Spawn
 
     m_upgrades.clear();
 
-    ai().alife().inventory_upgrade_manager().init_install(*this); // from pSettings
+    Level().UpgradeManager().init_install(*this); // from pSettings
 
-    for (const auto& upgrade : saved_upgrades)
+    if (IsGameTypeSingle())
     {
-        ai().alife().inventory_upgrade_manager().upgrade_install(*this, *upgrade, true);
+        for (auto& upgrade : saved_upgrades)
+            Level().UpgradeManager().upgrade_install(*this, (*upgrade), true);
+    }
+    else
+    {
+        for (auto& upgrade : saved_upgrades)
+            Level().UpgradeManager().upgrade_install_mp(*this, (*upgrade), true);
     }
 }
 

@@ -94,6 +94,7 @@ struct ClientStatisticImpl {
     CTimer* device_timer;
 };
 
+#ifdef XR_PLATFORM_WINDOWS
 IClientStatistic::IClientStatistic()
     : m_pimpl(xr_new<ClientStatisticImpl>())
 {
@@ -127,7 +128,9 @@ u32 IClientStatistic::getMPS_Receive() const { return m_pimpl->mps_receive; }
 u32 IClientStatistic::getMPS_Send() const { return m_pimpl->mps_send; }
 u32 IClientStatistic::getReceivedPerSec() const { return dwBytesReceivedPerSec; }
 u32 IClientStatistic::getSendedPerSec() const { return dwBytesSendedPerSec; }
+#endif
 
+#ifdef XR_PLATFORM_WINDOWS
 void IClientStatistic::Clear()
 {
     // XXX: Ugly, ugly hack (just following the lead of original code). FIX!
@@ -139,6 +142,7 @@ void IClientStatistic::Clear()
     m_pimpl->device_timer = saved_timer;
     m_pimpl->dwBaseTime = TimeGlobal(m_pimpl->device_timer);
 }
+#endif
 
 //------------------------------------------------------------------------------
 

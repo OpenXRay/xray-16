@@ -120,6 +120,16 @@ void CUIMainIngameWnd::Init()
     m_ind_outfit_broken = UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this, false);
     m_ind_overweight = UIHelper::CreateStatic(uiXml, "indicator_overweight", this, false);
 
+    if(!IsGameTypeSingle())
+    {
+        m_icon_microphone = UIHelper::CreateStatic(uiXml, "icon_microphone", this);
+        m_icon_microphone->Show(true);
+
+        m_voice_distance = UIHelper::CreateStatic(uiXml, "voice_distance", this);
+
+        SetActiveVoiceIcon(false);
+    }
+
     if ((m_ind_boost_psy = UIHelper::CreateStatic(uiXml, "indicator_booster_psy", this, false)))
         m_ind_boost_psy->Show(false);
 
@@ -306,6 +316,28 @@ void CUIMainIngameWnd::Draw()
     UIMotionIcon->Show(tmp);
 
     RenderQuickInfos();
+}
+
+void CUIMainIngameWnd::SetActiveVoiceIcon(bool active)
+{
+	R_ASSERT(m_icon_microphone || m_voice_distance);
+
+	u32 a = active ? 255 : 100;
+
+	u32 color = m_icon_microphone->GetTextureColor();
+	m_icon_microphone->SetTextureColor(subst_alpha(color, a));
+
+	color = m_voice_distance->GetTextColor();
+	m_voice_distance->SetTextColor(subst_alpha(color, a));
+}
+
+void CUIMainIngameWnd::SetVoiceDistance(u8 distance)
+{
+	R_ASSERT(m_voice_distance);
+
+	string16 text;
+	xr_sprintf(text, sizeof(text), "%u", distance);
+	m_voice_distance->SetText(text);
 }
 
 void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog)

@@ -26,6 +26,7 @@ class CTrade;
 class CUIProgressBar;
 class CUITradeBar;
 class CUIWeightBar;
+class CWeaponMagazined;
 
 namespace inventory
 {
@@ -333,6 +334,7 @@ protected:
 
     void AttachAddon(PIItem item_to_upgrade);
     void DetachAddon(LPCSTR addon_name, PIItem itm = NULL);
+    void UnloadWeapon(CWeaponMagazined* pWpn);
 
     void SendEvent_Item2Slot(PIItem pItem, u16 parent, u16 slot_id);
     void SendEvent_Item2Belt(PIItem pItem, u16 parent);
@@ -376,6 +378,8 @@ public:
 
     void OnInventoryAction(PIItem pItem, u16 action_type);
     void ShowRepairButton(bool status);
+    void OnSuccessRepairMP(PIItem item);
+    void OnSuccessUpgradeInstallMP(PIItem item);
     bool SetInfoCurUpgrade(Upgrade_type* upgrade_type, CInventoryItem* inv_item);
     void SeparateUpgradeItem();
     PIItem get_upgrade_item();

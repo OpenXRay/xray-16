@@ -4,6 +4,8 @@
 #include "xrEngine/xr_level_controller.h"
 #include "UIGameFMP.h"
 #include "actor_mp_client.h"
+#include "VoiceChat.h"
+#include "ui/UIMainIngameWnd.h"
 
 game_cl_freemp::game_cl_freemp()
 {
@@ -32,6 +34,11 @@ void game_cl_freemp::SetGameUI(CUIGameCustom* uigame)
 	inherited::SetGameUI(uigame);
 	m_game_ui = smart_cast<CUIGameFMP*>(uigame);
 	R_ASSERT(m_game_ui);
+
+	if (m_pVoiceChat)
+	{
+		m_game_ui->UIMainIngameWnd->SetVoiceDistance(m_pVoiceChat->GetDistance());
+	}
 }
 
 
@@ -47,8 +54,23 @@ void game_cl_freemp::net_import_update(NET_Packet & P)
 
 void game_cl_freemp::shedule_Update(u32 dt)
 {
+	game_cl_GameState::shedule_Update(dt);
+
 	if (!local_player)
 		return;
+
+	if (!GEnv.isDedicatedServer && m_pVoiceChat)
+	{
+		const bool started = m_pVoiceChat->IsStarted();
+		const bool is_dead = !local_player || local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);
+		const bool has_shown_dialogs = CurrentGameUI()->HasShownDialogs();
+		if (started && (is_dead || has_shown_dialogs))
+		{
+			m_pVoiceChat->Stop();
+			CurrentGameUI()->UIMainIngameWnd->SetActiveVoiceIcon(false);
+		}
+		m_pVoiceChat->Update();
+	}
 
 	for (auto cl : players)
 	{
@@ -61,6 +83,14 @@ void game_cl_freemp::shedule_Update(u32 dt)
 		pActor->SetName(ps->getName());
 		pActor->cName_set(ps->getName());
 
+		if (ps->team != pActor->Community())
+		{
+			CHARACTER_COMMUNITY	community;
+			community.set(ps->team);
+			pActor->SetCommunity(community.index());
+			pActor->ChangeTeam(community.team(), 0, 0);
+		}
+
 		if (local_player->GameID == ps->GameID)
 		{
 			pActor->set_money((u32)ps->money_for_round, false);
@@ -68,9 +98,19 @@ void game_cl_freemp::shedule_Update(u32 dt)
 	}
 }
 
+void game_cl_freemp::OnRender()
+{
+	inherited::OnRender();
+
+	if (m_pVoiceChat)
+		m_pVoiceChat->OnRender();
+}
+
 bool game_cl_freemp::OnKeyboardPress(int key)
 {
-	if (kJUMP == key)
+	switch (key)
+	{
+	case kJUMP:
 	{
 		bool b_need_to_send_ready = false;
 
@@ -100,9 +140,31 @@ bool game_cl_freemp::OnKeyboardPress(int key)
 		{
 			return false;
 		}
-	};
+	}break;
+
+	default:
+		break;
+	}
 
 	return inherited::OnKeyboardPress(key);
+}
+
+bool game_cl_freemp::OnKeyboardRelease(int key)
+{
+	switch (key)
+	{
+	case kVOICE_CHAT:
+	{
+		m_pVoiceChat->Stop();
+		CurrentGameUI()->UIMainIngameWnd->SetActiveVoiceIcon(false);
+		return true;
+	}break;
+
+	default:
+		break;
+	}
+
+	return inherited::OnKeyboardRelease(key);
 }
 
 LPCSTR game_cl_freemp::GetGameScore(string32&	score_dest)
@@ -128,5 +190,13 @@ void game_cl_freemp::OnConnected()
 	luabind::functor<void>	funct;
 	R_ASSERT(GEnv.ScriptEngine->functor("mp_game_cl.on_connected", funct));
 	funct();
+}
+
+void game_cl_freemp::OnScreenResolutionChanged()
+{
+	if (m_game_ui && m_pVoiceChat)
+	{
+		m_game_ui->UIMainIngameWnd->SetVoiceDistance(m_pVoiceChat->GetDistance());
+	}
 }
 
