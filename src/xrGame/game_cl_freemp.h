@@ -39,9 +39,6 @@ public:
 	virtual void OnScreenResolutionChanged();
 
 private:
-	void OnVoiceMessage(NET_Packet* P);
-
-private:
 
 };
 

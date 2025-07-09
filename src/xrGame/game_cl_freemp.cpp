@@ -200,8 +200,3 @@ void game_cl_freemp::OnScreenResolutionChanged()
 	}
 }
 
-void game_cl_freemp::OnVoiceMessage(NET_Packet* P)
-{
-	m_pVoiceChat->ReceiveMessage(P);
-}
-

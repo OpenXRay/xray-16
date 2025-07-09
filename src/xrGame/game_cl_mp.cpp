@@ -1895,3 +1895,8 @@ void game_cl_mp::ProcessPlayersInfoReply(NET_Packet& P)
         tmp_cb(info_count);
     }
 }
+
+void game_cl_mp::OnVoiceMessage(NET_Packet* P)
+{
+    m_pVoiceChat->ReceiveMessage(P);
+}
