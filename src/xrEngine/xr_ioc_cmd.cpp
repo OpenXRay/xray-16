@@ -706,6 +706,44 @@ public:
     }
 };
 
+class CCC_soundInputDevice : public CCC_Token
+{
+    typedef CCC_Token inherited;
+
+public:
+    CCC_soundInputDevice(pcstr N) : inherited(N, &snd_input_device_id, NULL){};
+    virtual ~CCC_soundInputDevice() {}
+    virtual void Execute(pcstr args)
+    {
+        GetToken();
+        if (!tokens)
+            return;
+        inherited::Execute(args);
+    }
+
+    void GetStatus(TStatus& S) override
+    {
+        GetToken();
+        if (!tokens)
+            return;
+        inherited::GetStatus(S);
+    }
+
+    const xr_token* GetToken() noexcept override
+    {
+        tokens = Engine.Sound.GetCaptureDevicesList().data();
+        return tokens;
+    }
+
+    virtual void Save(IWriter* F)
+    {
+        GetToken();
+        if (!tokens)
+            return;
+        inherited::Save(F);
+    }
+};
+
 //-----------------------------------------------------------------------
 
 class CCC_ExclusiveMode : public IConsole_Command
@@ -910,7 +948,10 @@ void CCC_Register()
     CMD1(CCC_renderer, "renderer");
 
     if (!GEnv.isDedicatedServer)
+    {
         CMD1(CCC_soundDevice, "snd_device");
+        CMD1(CCC_soundInputDevice, "snd_input_device");
+    }
 
     // psSoundRolloff = pSettings->r_float ("sound","rolloff"); clamp(psSoundRolloff, EPS_S, 2.f);
     psSoundOcclusionScale = pSettings->r_float("sound", "occlusion_scale");

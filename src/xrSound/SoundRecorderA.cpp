@@ -57,14 +57,71 @@ bool CSoundRecorderA::Init(CVoicePacketsPacker* packetsPacker)
 
 	alGetError();
 
-	m_pCaptureDevice = alcCaptureOpenDevice(0, m_sampleRate, m_format, m_samplesPerBuffer * 2);
+	pcstr selectedDeviceName = nullptr;
+
+	if (snd_input_device_id != (u32)-1)
+	{
+		auto& captureDevices = GEnv.Sound->GetCaptureDevicesList();
+		if (snd_input_device_id < captureDevices.size() && captureDevices[snd_input_device_id].name)
+		{
+			selectedDeviceName = captureDevices[snd_input_device_id].name;
+			Msg("* Using selected capture device: %s", selectedDeviceName);
+			m_pCaptureDevice = alcCaptureOpenDevice(selectedDeviceName, m_sampleRate, m_format, m_samplesPerBuffer * 2);
+
+			if (m_pCaptureDevice)
+			{
+				Msg("* Successfully opened selected capture device: %s", selectedDeviceName);
+			}
+			else
+			{
+				Msg("! Failed to open selected capture device: %s", selectedDeviceName);
+			}
+		}
+	}
+
+	if (!m_pCaptureDevice && alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT"))
+	{
+		const ALCchar* devices = alcGetString(nullptr, ALC_CAPTURE_DEVICE_SPECIFIER);
+
+		if (devices)
+		{
+			const ALCchar* device = devices;
+
+			while (device && *device != '\0')
+			{
+				Msg("* Trying capture device: %s", device);
+
+				m_pCaptureDevice = alcCaptureOpenDevice(device, m_sampleRate, m_format, m_samplesPerBuffer * 2);
+
+				if (m_pCaptureDevice)
+				{
+					Msg("* Successfully opened capture device: %s", device);
+					break;
+				}
+				else
+				{
+					Msg("! Failed to open capture device: %s", device);
+				}
+
+				device += strlen(device) + 1;
+			}
+		}
+	}
+
+	if (!m_pCaptureDevice)
+	{
+		Msg("* Trying default capture device");
+		m_pCaptureDevice = alcCaptureOpenDevice(nullptr, m_sampleRate, m_format, m_samplesPerBuffer * 2);
+	}
 
 	ALenum error = alGetError();
-	if (error == AL_NO_ERROR)
+	if (error == AL_NO_ERROR && m_pCaptureDevice)
 	{
 		alcCaptureStart(m_pCaptureDevice);
 		return true;
 	}
+
+	Msg("! Failed to initialize any capture device");
 	return false;
 }
 

@@ -78,4 +78,8 @@ public:
     void update(const Fvector& P, const Fvector& D, const Fvector& N, const Fvector& R) override;
 
     ISoundVoiceChat* GetSoundVoiceChat() override { return (ISoundVoiceChat*)pSoundVoiceChat; }
+    xr_vector<xr_token>& GetCaptureDevicesList() override
+    {
+        return SoundRender->Parent.GetCaptureDevicesList();
+    }
 };

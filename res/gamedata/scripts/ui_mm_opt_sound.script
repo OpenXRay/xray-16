@@ -32,4 +32,7 @@ function opt_sound:InitControls(x, y, xml, handler)
 	xml:InitStatic					("tab_sound:cap_snd_device",		self)
 	xml:InitComboBox				("tab_sound:list_snd_device",	self)
 
+	xml:InitStatic					("tab_sound:cap_snd_input_device",		self)
+	xml:InitComboBox				("tab_sound:list_snd_input_device",	self)
+
 end

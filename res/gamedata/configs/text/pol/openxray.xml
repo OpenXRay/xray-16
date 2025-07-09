@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
 	<string id="st_unload_magazine_all">
-		<text>rozіaduj wszystkie bronie</text>
+		<text>rozпїЅaduj wszystkie bronie</text>
 	</string>
 	<string id="st_unequip">
 		<text>Zdejmij</text>
@@ -10,7 +10,7 @@
 		<text>Podaruj</text>
 	</string>
 	<string id="st_loading_lights">
-		<text>Wczytywanie oњwietlenia</text>
+		<text>Wczytywanie oпїЅwietlenia</text>
 	</string>
 	<string id="st_client_connecting_to">
 		<text>Klient: Czenie z</text>
@@ -25,10 +25,10 @@
 		<text>Tworzenie nowej gry</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Dziaіanie w tle (Alt+Tab)</text>
+		<text>DziaпїЅanie w tle (Alt+Tab)</text>
 	</string>
 	<string id="ui_mm_detail_radius">
-		<text>Odlegіoњж rys. trawy</text>
+		<text>OdlegпїЅoпїЅпїЅ rys. trawy</text>
 	</string>
 	<string id="ui_mm_ui_style">
 		<text>Styl interfejsu</text>
@@ -37,19 +37,19 @@
 		<text>Zew Prypeci</text>
 	</string>
 	<string id="ui_mm_simplified_item_pickup">
-		<text>Uproszczone podn. przedmiotуw</text>
+		<text>Uproszczone podn. przedmiotпїЅw</text>
 	</string>
 	<string id="ui_mm_multi_item_pickup">
-		<text>Podn. wsz. przedmiotуw na raz</text>
+		<text>Podn. wsz. przedmiotпїЅw na raz</text>
 	</string>
 	<string id="ui_mm_loadingstages">
-		<text>Postкp wczytywania</text>
+		<text>PostпїЅp wczytywania</text>
 	</string>
 	<string id="renderer_rgl">
-		<text>Rozsz. peіne oњw. dynam. (OpenGL)</text>
+		<text>Rozsz. peпїЅne oпїЅw. dynam. (OpenGL)</text>
 	</string>
 	<string id="ui_mm_window_mode">
-		<text>Tryb wyњwietlania</text>
+		<text>Tryb wyпїЅwietlania</text>
 	</string>
 	<string id="st_opt_windowed">
 		<text>Okienkowy</text>
@@ -58,28 +58,28 @@
 		<text>Okienkowy (bez ramek)</text>
 	</string>
 	<string id="st_opt_fullscreen">
-		<text>Peіnoekranowy</text>
+		<text>PeпїЅnoekranowy</text>
 	</string>
 	<string id="st_opt_fullscreen_borderless">
-		<text>Peіnoekranowy (szybki Alt+Tab)</text>
+		<text>PeпїЅnoekranowy (szybki Alt+Tab)</text>
 	</string>
 	<string id="ui_mm_r2_smap_size">
-		<text>Jakoњж cieni map</text>
+		<text>JakoпїЅпїЅ cieni map</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
-		<text>Mokre pow. na blisk. odlegіoњci</text>
+		<text>Mokre pow. na blisk. odlegпїЅoпїЅci</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
-		<text>Mokre pow. na dal. odlegіoњci</text>
+		<text>Mokre pow. na dal. odlegпїЅoпїЅci</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
-		<text>Jakoњж mokrych powierzchni</text>
+		<text>JakoпїЅпїЅ mokrych powierzchni</text>
 	</string>
 	<string id="ui_mm_fov">
 		<text>Pole widzenia</text>
 	</string>
 	<string id="ui_mm_localization">
-		<text>Jкzyk</text>
+		<text>JпїЅzyk</text>
 	</string>
 	<string id="ui_mm_gamepad_setup">
 		<text>Konfiguracja gamepada</text>
@@ -132,6 +132,9 @@
 	<string id="ui_mm_color_grading_warm">
 		<text>warm</text>
 	</string>
+	<string id="ui_mm_snd_input_device">
+		<text>UrzД…dzenie wejЕ›cia</text>
+	</string>
 	<string id="eng">
 		<text>Angielski (English)</text>
 	</string>
@@ -142,7 +145,7 @@
 		<text>Niemiecki (German)</text>
 	</string>
 	<string id="ita">
-		<text>Wіoski (Italian)</text>
+		<text>WпїЅoski (Italian)</text>
 	</string>
 	<string id="pol">
 		<text>Polski (Polish)</text>
@@ -151,7 +154,7 @@
 		<text>Rosyjski (Russian)</text>
 	</string>
 	<string id="spa">
-		<text>Hiszpaсski (Spanish)</text>
+		<text>HiszpaпїЅski (Spanish)</text>
 	</string>
 	<string id="ukr">
 		<text>Ukrainski (Ukrainian)</text>
