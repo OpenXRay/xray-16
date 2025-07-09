@@ -23,6 +23,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrSdkDir)include\AL;$(xrSdkDir)include\speex;$(xrSdkDir)include\opus;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRSOUND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libogg_static.lib;libvorbis_static.lib;libvorbisfile.lib;OpenAL32.lib;opus.lib;speexdsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -61,7 +62,9 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="OpenALDeviceList.cpp" />
+    <ClCompile Include="OpenALDeviceList.cpp">
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundRender_Core.cpp" />
     <ClCompile Include="SoundRender_CoreA.cpp" />
@@ -110,7 +113,7 @@
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\OpenAL32.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\opus.dll">
+    <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\msys-opus-0.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\..\sdk\binaries\$(PlatformShortName)\libspeexdsp-1.dll">
