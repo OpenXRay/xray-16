@@ -4,6 +4,8 @@
 #include "Blender_detail_still.h"
 #include "uber_deffer.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Detail_Still::CBlender_Detail_Still()
 {
     description.CLS = B_DETAIL;
@@ -97,3 +99,4 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

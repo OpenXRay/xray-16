@@ -125,7 +125,7 @@ public:
     void AnimateContacts(bool b_snd);
     HUD_SOUND_ITEM m_contactSnd;
 
-    void ReceiveNews(GAME_NEWS_DATA* news);
+    void ReceiveNews(const GAME_NEWS_DATA* news);
     void UpdateMainIndicators();
     void UpdateBoosterIndicators(const CEntityCondition::BOOSTER_MAP& influences);
 

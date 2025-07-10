@@ -2,6 +2,8 @@
 
 #include "Layers/xrRender/du_sphere.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::accum_point_geom_create()
 {
     // vertices
@@ -35,3 +37,4 @@ void CRenderTarget::accum_point_geom_destroy()
     g_accum_point_ib.Release();
     g_accum_point_vb.Release();
 }
+} // namespace xray::render::RENDER_NAMESPACE

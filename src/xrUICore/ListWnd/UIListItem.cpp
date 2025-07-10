@@ -13,10 +13,12 @@ CUIListItem::CUIListItem()
     m_bHighlightText = false;
     m_iGroupID = -1;
     SetAutoDelete(true);
+    UI().Focus().RegisterFocusable(this);
 }
 
 CUIListItem::~CUIListItem()
 {
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUIListItem::InitListItem(Fvector2 pos, Fvector2 size)

@@ -65,7 +65,7 @@ void CSightManager::vfValidateAngleDependency(float x1, float& x2, float x3)
 BOOL g_ai_dbg_sight = 0;
 #endif // #ifdef DEBUG
 
-float g_ai_aim_min_speed = PI_DIV_8 / 2.f;
+float g_ai_aim_min_speed = 0.24f; // PI_DIV_8 / 2.f; //Alundaio
 float g_ai_aim_min_angle = PI_DIV_8 / 2.f;
 float g_ai_aim_max_angle = PI_DIV_4;
 BOOL g_ai_aim_use_smooth_aim = 1;
@@ -482,7 +482,9 @@ Fvector CSightManager::aiming_position() const
     return (result);
 }
 
-static inline float lerp(float low, float high, float value)
+namespace
+{
+float xr_lerp(float low, float high, float value)
 {
     float result;
     if (low > high)
@@ -501,6 +503,7 @@ static inline float lerp(float low, float high, float value)
         return (low);
 
     return (result);
+}
 }
 
 void CSightManager::process_action(float const time_delta)
@@ -522,28 +525,28 @@ void CSightManager::process_action(float const time_delta)
     VERIFY(_valid(factors));
     //	if ( object().cName() == "level_prefix_stalker" ) {
     //		Msg							("[%6d][%6d] [%f] + [%f] = [%f] ([%f])",  Device.dwFrame, Device.dwTimeGlobal,
-    // m_current.m_head.m_factor,		s_factor_lerp_speed*time_delta,		lerp ( m_current.m_head.m_factor,
+    // m_current.m_head.m_factor,		s_factor_lerp_speed*time_delta,		xr_lerp ( m_current.m_head.m_factor,
     // factors.x,
     // s_factor_lerp_speed*time_delta ), factors.x );
     //		Msg							("[%6d][%6d] [%f] + [%f] = [%f] ([%f])",  Device.dwFrame, Device.dwTimeGlobal,
-    // m_current.m_shoulder.m_factor,	s_factor_lerp_speed*time_delta,		lerp ( m_current.m_shoulder.m_factor,
+    // m_current.m_shoulder.m_factor,	s_factor_lerp_speed*time_delta,		xr_lerp ( m_current.m_shoulder.m_factor,
     // factors.y, s_factor_lerp_speed*time_delta ), factors.y );
     //		Msg							("[%6d][%6d] [%f] + [%f] = [%f] ([%f])",  Device.dwFrame, Device.dwTimeGlobal,
-    // m_current.m_spine.m_factor,	s_factor_lerp_speed*time_delta,		lerp ( m_current.m_spine.m_factor,
+    // m_current.m_spine.m_factor,	s_factor_lerp_speed*time_delta,		xr_lerp ( m_current.m_spine.m_factor,
     // factors.z,
     // s_factor_lerp_speed*time_delta ), factors.z );
     //	}
 
     VERIFY(_valid(m_current.m_head.m_factor));
-    m_current.m_head.m_factor = lerp(m_current.m_head.m_factor, factors.x, s_factor_lerp_speed * time_delta);
+    m_current.m_head.m_factor = xr_lerp(m_current.m_head.m_factor, factors.x, s_factor_lerp_speed * time_delta);
     VERIFY(_valid(m_current.m_head.m_factor));
 
     VERIFY(_valid(m_current.m_shoulder.m_factor));
-    m_current.m_shoulder.m_factor = lerp(m_current.m_shoulder.m_factor, factors.y, s_factor_lerp_speed * time_delta);
+    m_current.m_shoulder.m_factor = xr_lerp(m_current.m_shoulder.m_factor, factors.y, s_factor_lerp_speed * time_delta);
     VERIFY(_valid(m_current.m_shoulder.m_factor));
 
     VERIFY(_valid(m_current.m_spine.m_factor));
-    m_current.m_spine.m_factor = lerp(m_current.m_spine.m_factor, factors.z, s_factor_lerp_speed * time_delta);
+    m_current.m_spine.m_factor = xr_lerp(m_current.m_spine.m_factor, factors.z, s_factor_lerp_speed * time_delta);
     VERIFY(_valid(m_current.m_spine.m_factor));
 
     Fvector const angles = Fvector().set(angle_normalize_signed(-(head.current.pitch - body.current.pitch)),

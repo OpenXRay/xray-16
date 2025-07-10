@@ -55,7 +55,6 @@ target_sources(xrUICore PRIVATE
     Lines/UILines.h
     Lines/UISubLine.cpp
     Lines/UISubLine.h
-    Lines/uilinestd.h
     ListBox/UIListBox.cpp
     ListBox/UIListBox.h
     ListBox/UIListBoxItem.cpp

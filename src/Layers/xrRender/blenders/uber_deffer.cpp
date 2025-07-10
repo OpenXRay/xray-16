@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "uber_deffer.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr fn);
 
 void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOOL _aref, LPCSTR _detail_replace,
@@ -360,3 +363,4 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

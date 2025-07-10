@@ -92,6 +92,8 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("take_item_from_box", int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo", int(GameObject::eWeaponNoAmmoAvailable)),
 
+                //Alundaio:
+                value("hud_animation_end", int(GameObject::eActorHudAnimationEnd)),
                 //AVO: custom callbacks
                 // Input
                 value("key_press", int(GameObject::eKeyPress)),
@@ -102,23 +104,22 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("controller_press", int(GameObject::eControllerPress)),
                 value("controller_release", int(GameObject::eControllerRelease)),
                 value("controller_hold", int(GameObject::eControllerHold)),
+                // Actor
+                value("actor_before_death", int(GameObject::eActorBeforeDeath)),
+                // Vehicle
+                value("on_attach_vehicle", int(GameObject::eAttachVehicle)),
+                value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
+                value("on_use_vehicle", int(GameObject::eUseVehicle)),
+                // Weapon
+                value("weapon_jammed", int(GameObject::eOnWeaponJammed)),
+                value("weapon_zoom_in", int(GameObject::eOnWeaponZoomIn)),
+                value("weapon_zoom_out", int(GameObject::eOnWeaponZoomOut)),
+                value("weapon_magazine_empty", int(GameObject::eOnWeaponMagazineEmpty)),
                 // Inventory
                 value("item_to_belt", int(GameObject::eItemToBelt)),
                 value("item_to_slot", int(GameObject::eItemToSlot)),
                 value("item_to_ruck", int(GameObject::eItemToRuck)),
-                // Actor
-                value("actor_before_death", int(GameObject::eActorBeforeDeath)),
                 //-AVO
-
-                // vehicle
-                value("on_attach_vehicle", int(GameObject::eAttachVehicle)),
-                value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
-                value("on_use_vehicle", int(GameObject::eUseVehicle)),
-
-                // weapon
-                value("weapon_jammed", int(GameObject::eOnWeaponJammed)),
-                value("weapon_zoom_in", int(GameObject::eOnWeaponZoomIn)),
-                value("weapon_zoom_out", int(GameObject::eOnWeaponZoomOut)),
 
                 value("map_location_added", int(GameObject::eMapLocationAdded))
             ],

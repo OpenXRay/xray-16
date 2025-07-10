@@ -1,7 +1,7 @@
-#ifndef dx11SamplerStateCache_included
-#define dx11SamplerStateCache_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx11SamplerStateCache
 {
 public:
@@ -58,5 +58,4 @@ private:
 };
 
 extern dx11SamplerStateCache SSManager;
-
-#endif //	dx11SamplerStateCache_included
+} // namespace xray::render::RENDER_NAMESPACE

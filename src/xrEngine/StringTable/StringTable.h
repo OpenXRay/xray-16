@@ -8,6 +8,8 @@
 #include "xrCore/xrstring.h"
 #include "xrCore/xr_token.h"
 
+#include <mutex>
+
 using STRING_ID = shared_str;
 using STRING_VALUE = shared_str;
 
@@ -17,6 +19,7 @@ struct STRING_TABLE_DATA
 {
     shared_str m_fontPrefix;
     shared_str m_sLanguage;
+    shared_str m_sCurrency;
     STRING_TABLE_MAP m_StringTable;
 };
 
@@ -33,18 +36,21 @@ public:
 
     void ReloadLanguage();
 
-    static BOOL m_bWriteErrorsToLog;
-
     shared_str GetCurrentLanguage() const;
     shared_str GetCurrentFontPrefix() const;
+    shared_str GetCurrency() const;
     xr_token* GetLanguagesToken() const;
+
     static u32 LanguageID;
+    static string32 LanguageIDInLTX;
 
 private:
     void Load(LPCSTR xml_file);
     void FillLanguageToken();
     void SetLanguage();
     static STRING_VALUE ParseLine(pcstr str);
+
+    static std::mutex pDataMutex;
     static xr_unique_ptr<STRING_TABLE_DATA> pData;
     static xr_vector<xr_token> languagesToken;
 };

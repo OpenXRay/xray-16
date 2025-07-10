@@ -135,6 +135,8 @@ SCRIPT_EXPORT(CUIActorMenu, (CUIDialogWnd),
             .def("IsShown", &CUIActorMenu::IsShown)
             .def("ShowDialog", &CUIActorMenu::ShowDialog)
             .def("HideDialog", &CUIActorMenu::HideDialog)
+            .def("ToSlot", &CUIActorMenu::ToSlotScript)
+            .def("ToBelt", &CUIActorMenu::ToBeltScript)
     ];
 
     using namespace luabind;
@@ -159,7 +161,9 @@ SCRIPT_EXPORT(CUIPdaWnd, (CUIDialogWnd),
             .def("IsShown", &CUIPdaWnd::IsShown)
             .def("ShowDialog", &CUIPdaWnd::ShowDialog)
             .def("HideDialog", &CUIPdaWnd::HideDialog)
-            .def("SetActiveSubdialog", &CUIPdaWnd::SetActiveSubdialog_script)
+            .def("SetActiveSubdialog", +[](CUIPdaWnd* self, pcstr section) { self->SetActiveSubdialog(section); })
+            .def("SetActiveDialog", &CUIPdaWnd::SetActiveDialog)
+            .def("GetActiveDialog", &CUIPdaWnd::GetActiveDialog)
             .def("GetActiveSection", &CUIPdaWnd::GetActiveSection)
             .def("GetTabControl", &CUIPdaWnd::GetTabControl)
     ];

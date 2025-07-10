@@ -3,6 +3,8 @@
 
 #include "QueryHelper.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #ifdef USE_OGL
 // Assert this just in case
 static_assert(sizeof(void*) == sizeof(GLsync), "void* is used instead of GLsync, sizes should match");
@@ -87,3 +89,4 @@ void R_sync_point::End()
 #else
 #   error No graphics API selected or enabled!
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

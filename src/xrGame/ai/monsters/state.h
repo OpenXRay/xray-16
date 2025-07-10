@@ -65,25 +65,7 @@ protected:
 private:
     void free_mem();
 
-    using SubStates = xr_map<u32, CSState*>;
-    SubStates substates;
-    using STATE_MAP_IT = typename xr_map<u32, CSState*>::iterator;
-};
-
-template <typename _Object>
-class CStateMove : public CState<_Object>
-{
-protected:
-    using inherited = CState<_Object>;
-
-public:
-    CStateMove(_Object* obj, void* data = 0) : inherited(obj, data) {}
-    virtual ~CStateMove() {}
-    virtual void initialize()
-    {
-        inherited::initialize();
-        this->object->path().prepare_builder();
-    }
+    xr_map<u32, CSState*> substates;
 };
 
 #include "state_inline.h"

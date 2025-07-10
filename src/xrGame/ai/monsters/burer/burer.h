@@ -49,7 +49,11 @@ public:
             enemy = e;
         }
 
-        void deactivate() { active = false; }
+        void deactivate()
+        {
+            active = false;
+            enemy = nullptr;
+        }
     } m_gravi_object;
 
     LPCSTR particle_gravi_wave;

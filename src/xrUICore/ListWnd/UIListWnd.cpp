@@ -1,6 +1,7 @@
 #include"pch.hpp"
 #include "UIListWnd.h"
 //.#include "uiscrollbar.h"
+#include "Cursor/UICursor.h"
 #include "Windows/UIFrameLineWnd.h"
 
 //#define ACTIVE_BACKGROUND			"ui\\ui_pop_up_active_back"
@@ -544,11 +545,11 @@ void CUIListWnd::ScrollToEnd()
     UpdateList();
 }
 
-void CUIListWnd::ScrollToPos(int position)
+void CUIListWnd::ScrollToPos(int position, float center_y_ratio /*= 0.5f*/)
 {
     if (IsScrollBarEnabled())
     {
-        int pos = position;
+        int pos = position - iFloor(float(m_iRowNum) * center_y_ratio);
         clamp(pos, m_ScrollBar->GetMinRange(), (m_ScrollBar->GetMaxRange() - m_ScrollBar->GetPageSize() / + 1));
         m_ScrollBar->SetScrollPos(pos);
         m_iFirstShownIndex = m_ScrollBar->GetScrollPos();
@@ -562,6 +563,27 @@ void CUIListWnd::Update()
     {
         OnMouseAction(cursor_pos.x, cursor_pos.y, WINDOW_MOUSE_MOVE);
         m_bUpdateMouseMove = false;
+    }
+
+    if (const auto focused = CursorOverWindow() ? UI().Focus().GetFocused() : nullptr)
+    {
+        const auto parentItem = focused->GetWindowBeforeParent(this);
+
+        const auto listItem = dynamic_cast<CUIListItem*>(parentItem);
+        const auto currentSelectedItem = GetItem(GetSelectedItem());
+
+        if (listItem && listItem != currentSelectedItem)
+        {
+            const auto prevPos = m_iFirstShownIndex;
+
+            ScrollToPos(GetItemPos(listItem));
+
+            if (prevPos != m_iFirstShownIndex)
+            {
+                SendMessage(listItem, BUTTON_CLICKED, nullptr);
+                UI().GetUICursor().WarpToWindow(focused);
+            }
+        }
     }
 
     inherited::Update();

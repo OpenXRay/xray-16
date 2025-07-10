@@ -6,6 +6,8 @@
 
 #include "xrCore/Threading/ParallelFor.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #if !defined(XR_PLATFORM_WINDOWS) || !defined(XR_ARCHITECTURE_X86)
 void Skin1W(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 {
@@ -232,3 +234,4 @@ void Skin4W(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
     });
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

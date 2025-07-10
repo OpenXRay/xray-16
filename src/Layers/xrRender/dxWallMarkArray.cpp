@@ -3,6 +3,8 @@
 
 #include "dxUIShader.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void dxWallMarkArray::Copy(IWallMarkArray& _in) { *this = *(dxWallMarkArray*)&_in; }
 dxWallMarkArray::~dxWallMarkArray()
 {
@@ -40,3 +42,4 @@ ref_shader* dxWallMarkArray::dxGenerateWallmark()
 {
     return m_CollideMarks.empty() ? NULL : &m_CollideMarks[::Random.randI(0, m_CollideMarks.size())];
 }
+} // namespace xray::render::RENDER_NAMESPACE

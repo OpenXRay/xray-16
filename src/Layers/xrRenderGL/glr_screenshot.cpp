@@ -1,8 +1,11 @@
 #include "stdafx.h"
+
 //#include "xr_effgamma.h"
 #include "xrCore/Media/Image.hpp"
 #include "xrEngine/xrImage_Resampler.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 using namespace XRay::Media;
 
 #define GAMESAVE_SIZE 128
@@ -48,3 +51,4 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
         VERIFY(!"CRender::Screenshot. This screenshot type is not supported for OGL.");
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

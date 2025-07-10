@@ -11,6 +11,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 float psOSSR = .001f;
 
 //////////////////////////////////////////////////////////////////////
@@ -71,6 +73,13 @@ void CHOM::Load()
 
     IReader* fs = FS.r_open(fName);
 
+    // Prepare AABB-tree
+    static const bool use_cache = !strstr(Core.Params, "-no_cdb_cache");
+
+    m_pModel = xr_new<CDB::MODEL>();
+    if (use_cache)
+        m_pModel->set_model_crc32(crc32(fs->pointer(), fs->length()));
+
     // Load tris and merge them
     CDB::Collector CL;
     {
@@ -117,15 +126,12 @@ void CHOM::Load()
     });
 
     // Create AABB-tree
-    m_pModel = xr_new<CDB::MODEL>();
-    m_pModel->set_version(fs->get_age());
-    const bool bUseCache = !strstr(Core.Params, "-no_cdb_cache");
-    const bool checkCrc32 = !strstr(Core.Params, "-skip_cdb_cache_crc32_check");
+    static const bool skip_crc32_check = strstr(Core.Params, "-skip_cdb_cache_crc32_check");
 
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
     FS.update_path(fName, "$app_data_root$", fName);
 
-    if (bUseCache && FS.exist(fName) && m_pModel->deserialize(fName, checkCrc32))
+    if (use_cache && FS.exist(fName) && m_pModel->deserialize(fName, skip_crc32_check))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded HOM cache (%s)...", fName);
@@ -136,9 +142,9 @@ void CHOM::Load()
 #ifndef MASTER_GOLD
         Msg("* HOM cache for '%s' was not loaded. Building the model from scratch..", fName);
 #endif
-        m_pModel->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
+        m_pModel->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
 
-        if (bUseCache)
+        if (use_cache)
             m_pModel->serialize(fName);
     }
 
@@ -480,3 +486,4 @@ void CHOM::OnRender()
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

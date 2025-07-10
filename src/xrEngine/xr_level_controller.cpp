@@ -143,6 +143,13 @@ game_action actions[] =
     { "custom14",               kCUSTOM14,                  _sp },
     { "custom15",               kCUSTOM15,                  _sp },
 
+    { "pda_tab1",               kPDA_TAB1,                  _sp },
+    { "pda_tab2",               kPDA_TAB2,                  _sp },
+    { "pda_tab3",               kPDA_TAB3,                  _sp },
+    { "pda_tab4",               kPDA_TAB4,                  _sp },
+    { "pda_tab5",               kPDA_TAB5,                  _sp },
+    { "pda_tab6",               kPDA_TAB6,                  _sp },
+
     { "kick",                   kKICK,                      _sp },
 
     { "editor",                 kEDITOR,                    _both },
@@ -156,6 +163,9 @@ game_action actions[] =
     { "ui_move_down",           kUI_MOVE_DOWN,              _both,  EKeyContext::UI },
 
     { "ui_move_secondary",      kUI_MOVE_SECONDARY,         _both,  EKeyContext::UI },
+
+    { "ui_click_1",             kUI_CLICK_1,                _both,  EKeyContext::UI },
+    { "ui_click_2",             kUI_CLICK_2,                _both,  EKeyContext::UI },
 
     { "ui_accept",              kUI_ACCEPT,                 _both,  EKeyContext::UI },
     { "ui_back",                kUI_BACK,                   _both,  EKeyContext::UI },
@@ -191,7 +201,6 @@ game_action actions[] =
     { "pda_map_show_legend",    kPDA_MAP_SHOW_LEGEND,       _sp,    EKeyContext::PDA },
 
     { "pda_filter_toggle",      kPDA_FILTER_TOGGLE,         _sp,    EKeyContext::PDA },
-    { "pda_tasks_toggle",       kPDA_TASKS_TOGGLE,          _sp,    EKeyContext::PDA },
 
     // Talk:
     { "talk_switch_to_trade",   kTALK_SWITCH_TO_TRADE,      _sp,    EKeyContext::Talk },
@@ -601,14 +610,8 @@ static void RemapKeys()
         keyboard_key& kb = keyboards[idx];
         if (pInput->GetKeyName(kb.dik, buff, sizeof(buff)))
             kb.key_local_name = buff;
-        else
-        {
-#ifndef MASTER_GOLD
-            Msg("! Can't find a key name for %s", kb.key_name);
-#endif
-            if (kb.key_local_name.empty())
-                kb.key_local_name = kb.key_name;
-        }
+        else if (kb.key_local_name.empty())
+            kb.key_local_name = kb.key_name;
 
         // Msg("[%s]-[%s]", kb.key_name, kb.key_local_name.c_str());
     }
@@ -629,21 +632,24 @@ pcstr IdToActionName(EGameActions id)
 
         ++idx;
     }
-    Msg("! cant find corresponding [action_name] for id");
-    return NULL;
+#ifndef MASTER_GOLD
+    Msg("! [IdToActionName] cant find corresponding 'action_name' for id '%u'", id);
+#endif
+    return nullptr;
 }
 
-EGameActions ActionNameToId(pcstr name)
+EGameActions ActionNameToId(pcstr name, bool silent /*= false*/)
 {
-    game_action* action = ActionNameToPtr(name);
-    if (action)
+    if (const game_action* action = ActionNameToPtr(name, silent))
         return action->id;
-    else
-        return kNOTBINDED;
+
+    return kNOTBINDED;
 }
 
-game_action* ActionNameToPtr(pcstr name)
+game_action* ActionNameToPtr(pcstr name, [[maybe_unused]] bool silent /*= false*/)
 {
+    R_ASSERT1_CURE(name, return nullptr);
+
     size_t idx = 0;
     while (actions[idx].action_name)
     {
@@ -651,7 +657,10 @@ game_action* ActionNameToPtr(pcstr name)
             return &actions[idx];
         ++idx;
     }
-    Msg("! [ActionNameToPtr] cant find corresponding 'id' for '%s'", name);
+#ifndef MASTER_GOLD
+    if (!silent)
+        Msg("! [ActionNameToPtr] cant find corresponding 'id' for '%s'", name);
+#endif
     return nullptr;
 }
 
@@ -687,14 +696,12 @@ int GetActionDik(EGameActions action_id, int idx)
 
 pcstr DikToKeyname(int dik)
 {
-    keyboard_key* kb = DikToPtr(dik, true);
-    if (kb)
+    if (const keyboard_key* kb = DikToPtr(dik, true))
         return kb->key_name;
-    else
-        return nullptr;
+    return nullptr;
 }
 
-keyboard_key* DikToPtr(int dik, bool safe)
+keyboard_key* DikToPtr(int dik, [[maybe_unused]] bool silent)
 {
     int idx = 0;
     while (keyboards[idx].key_name)
@@ -706,20 +713,25 @@ keyboard_key* DikToPtr(int dik, bool safe)
         ++idx;
     }
 
-    if (!safe)
+#ifndef MASTER_GOLD
+    if (!silent)
         Msg("! [DikToPtr] cant find corresponding 'keyboard_key' for dik '%d'", dik);
+#endif
 
     return nullptr;
 }
 
-int KeynameToDik(pcstr name)
+int KeynameToDik(pcstr name, bool silent /*= false*/)
 {
-    keyboard_key* kb = KeynameToPtr(name);
-    return kb->dik;
+    if (const keyboard_key* kb = KeynameToPtr(name, silent))
+        return kb->dik;
+    return SDL_SCANCODE_UNKNOWN;
 }
 
-keyboard_key* KeynameToPtr(pcstr name)
+keyboard_key* KeynameToPtr(pcstr name, [[maybe_unused]] bool silent /*= false*/)
 {
+    R_ASSERT1_CURE(name, return nullptr);
+
     size_t idx = 0;
     while (keyboards[idx].key_name)
     {
@@ -729,8 +741,11 @@ keyboard_key* KeynameToPtr(pcstr name)
         ++idx;
     }
 
-    Msg("! [KeynameToPtr] cant find corresponding 'keyboard_key' for keyname %s", name);
-    return NULL;
+#ifndef MASTER_GOLD
+    if (!silent)
+        Msg("! [KeynameToPtr] cant find corresponding 'keyboard_key' for keyname %s", name);
+#endif
+    return nullptr;
 }
 
 bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2)
@@ -987,6 +1002,9 @@ class CCC_DefControls : public CCC_UnBindAll
 
         { kUI_MOVE_SECONDARY,       { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_LEFT } },
 
+        { kUI_CLICK_1,              { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
+        { kUI_CLICK_2,              { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
+
         { kUI_ACCEPT,               { SDL_SCANCODE_RETURN,  SDL_SCANCODE_F,             XR_CONTROLLER_BUTTON_A } },
         { kUI_BACK,                 { SDL_SCANCODE_ESCAPE,  SDL_SCANCODE_G,             XR_CONTROLLER_BUTTON_B } },
         { kUI_ACTION_1,             { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_Y,             XR_CONTROLLER_BUTTON_X } },
@@ -1021,13 +1039,12 @@ class CCC_DefControls : public CCC_UnBindAll
         { kPDA_MAP_SHOW_LEGEND,     { SDL_SCANCODE_V,       SDL_SCANCODE_KP_MULTIPLY,   XR_CONTROLLER_BUTTON_INVALID } },
 
         { kPDA_FILTER_TOGGLE,       { SDL_SCANCODE_B,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_Y } },
-        { kPDA_TASKS_TOGGLE,        { SDL_SCANCODE_TAB,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_X } },
 
         // Talk:
         { kTALK_SWITCH_TO_TRADE,    { SDL_SCANCODE_X,       SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_X } },
-        { kTALK_LOG_SCROLL,         { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_RIGHT } },
-        { kTALK_LOG_SCROLL_UP,      { SDL_SCANCODE_E,       SDL_SCANCODE_PAGEUP,        XR_CONTROLLER_AXIS_TRIGGER_LEFT } },
-        { kTALK_LOG_SCROLL_DOWN,    { SDL_SCANCODE_Q,       SDL_SCANCODE_PAGEDOWN,      XR_CONTROLLER_AXIS_TRIGGER_RIGHT } },
+        { kTALK_LOG_SCROLL,         { SDL_SCANCODE_UNKNOWN, SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_AXIS_LEFT } },
+        { kTALK_LOG_SCROLL_UP,      { SDL_SCANCODE_Q,       SDL_SCANCODE_PAGEUP,        SDL_SCANCODE_UNKNOWN } },
+        { kTALK_LOG_SCROLL_DOWN,    { SDL_SCANCODE_E,       SDL_SCANCODE_PAGEDOWN,      SDL_SCANCODE_UNKNOWN } },
 
         { kEDITOR,                  { SDL_SCANCODE_F10,     SDL_SCANCODE_UNKNOWN,       XR_CONTROLLER_BUTTON_INVALID } },
     };

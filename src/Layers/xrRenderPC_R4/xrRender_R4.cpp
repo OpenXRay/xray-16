@@ -5,6 +5,10 @@
 #include "Layers/xrRender/dxDebugRender.h"
 #include "Layers/xrRender/D3DUtils.h"
 
+#include "Include/xrRender/xrRender.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
 constexpr pcstr RENDERER_R2A_MODE  = "renderer_r2a";  // id 1
 constexpr pcstr RENDERER_R2_MODE   = "renderer_r2";   // id 2
 constexpr pcstr RENDERER_R2_5_MODE = "renderer_r2.5"; // id 3
@@ -94,6 +98,7 @@ public:
         GEnv.UIRender = &UIRenderImpl;
 #ifdef DEBUG
         GEnv.DRender = &DebugRenderImpl;
+        rdebug_render->Register();
 #endif
         xrRender_initconsole();
     }
@@ -109,14 +114,16 @@ public:
             GEnv.DU = nullptr;
             GEnv.UIRender = nullptr;
             GEnv.DRender = nullptr;
+#ifdef DEBUG
+            rdebug_render->Unregister();
+#endif
         }
     }
 } static s_r4_module;
 
-extern "C"
-{
-XR_EXPORT RendererModule* GetRendererModule()
+RendererModule* GetRendererModule()
 {
     return &s_r4_module;
 }
-}
+} // namespace xray::render::RENDER_NAMESPACE
+

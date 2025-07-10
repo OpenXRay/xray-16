@@ -4,6 +4,8 @@
 
 #pragma warning(disable : 4018)
 
+namespace xray::render::RENDER_NAMESPACE
+{
 ////////////////////////////////////////////////////////////////////////////////////////
 // private data
 static unsigned int cacheSize = CACHESIZE_GEFORCE1_2;
@@ -255,3 +257,4 @@ void RemapIndices(
 
     xr_free(indexCache);
 }
+} // namespace xray::render::RENDER_NAMESPACE

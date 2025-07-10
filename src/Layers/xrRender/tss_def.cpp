@@ -3,10 +3,14 @@
 
 #include "tss_def.h"
 
-#ifdef USE_OGL
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/dx11StateUtils.h"
+#elif defined(USE_OGL)
 #include "../xrRenderGL/glState.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // TODO: DX11: Implement equivalent for SimulatorStates::record for DX11
 void SimulatorStates::record(ID3DState*& state)
 {
@@ -121,8 +125,6 @@ BOOL SimulatorStates::equal(SimulatorStates& S)
 void SimulatorStates::clear() { States.clear(); }
 
 #if defined(USE_DX11)
-#include "Layers/xrRenderDX11/dx11StateUtils.h"
-
 void SimulatorStates::UpdateState(dx11State& state) const
 {
     for (u32 it = 0; it < States.size(); it++)
@@ -493,3 +495,4 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
 }
 
 #endif // !USE_DX9 && !USE_OGL
+} // namespace xray::render::RENDER_NAMESPACE

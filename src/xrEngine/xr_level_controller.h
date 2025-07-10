@@ -124,6 +124,13 @@ enum EGameActions : u32
     kCUSTOM14,
     kCUSTOM15,
 
+    kPDA_TAB1,
+    kPDA_TAB2,
+    kPDA_TAB3,
+    kPDA_TAB4,
+    kPDA_TAB5,
+    kPDA_TAB6,
+
     kKICK, // alpet: kick dynamic objects
 
     kEDITOR,
@@ -137,6 +144,9 @@ enum EGameActions : u32
     kUI_MOVE_DOWN,
 
     kUI_MOVE_SECONDARY,
+
+    kUI_CLICK_1,
+    kUI_CLICK_2,
 
     kUI_ACCEPT,
     kUI_BACK,
@@ -172,7 +182,6 @@ enum EGameActions : u32
     kPDA_MAP_SHOW_LEGEND,
 
     kPDA_FILTER_TOGGLE,
-    kPDA_TASKS_TOGGLE,
 
     // Talk:
     kTALK_SWITCH_TO_TRADE, // _OR_UPGRADE
@@ -234,13 +243,13 @@ ENGINE_API bool IsGroupNotConflicted(EKeyGroup g1, EKeyGroup g2);
 ENGINE_API bool IsContextNotConflicted(EKeyContext c1, EKeyContext c2);
 
 ENGINE_API pcstr IdToActionName(EGameActions id);
-ENGINE_API EGameActions ActionNameToId(pcstr name);
-ENGINE_API game_action* ActionNameToPtr(pcstr name);
+ENGINE_API EGameActions ActionNameToId(pcstr name, bool silent = false);
+ENGINE_API game_action* ActionNameToPtr(pcstr name, bool silent = false);
 
 ENGINE_API pcstr DikToKeyname(int dik);
-ENGINE_API int KeynameToDik(pcstr name);
-ENGINE_API keyboard_key* KeynameToPtr(pcstr name);
-ENGINE_API keyboard_key* DikToPtr(int dik, bool safe);
+ENGINE_API int KeynameToDik(pcstr name, bool silent = false);
+ENGINE_API keyboard_key* KeynameToPtr(pcstr name, bool silent = false);
+ENGINE_API keyboard_key* DikToPtr(int dik, bool silent);
 
 ENGINE_API bool IsBinded(EGameActions action_id, int dik, EKeyContext context = EKeyContext::Undefined);
 ENGINE_API int GetActionDik(EGameActions action_id, int idx = -1);

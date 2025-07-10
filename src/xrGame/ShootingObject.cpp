@@ -40,18 +40,19 @@ void CShootingObject::Load(LPCSTR section)
 
     //время затрачиваемое на выстрел
     fOneShotTime = pSettings->r_float(section, "rpm");
+
     //Alundaio: Two-shot burst rpm; used for Abakan/AN-94
-    modeShotTime = READ_IF_EXISTS(pSettings, r_float, section, "rpm_mode_2", fOneShotTime);
+    fModeShotTime = READ_IF_EXISTS(pSettings, r_float, section, "rpm_mode_2", fOneShotTime);
 
     VERIFY(fOneShotTime > 0.f);
     fOneShotTime = 60.f / fOneShotTime;
-    modeShotTime = 60.f / modeShotTime;
+    fModeShotTime = 60.f / fModeShotTime;
 
     //Cycle down RPM after first 2 shots; used for Abakan/AN-94
     if (pSettings->line_exist(section, "cycle_down"))
-        cycleDown = pSettings->r_bool(section, "cycle_down") ? true : false;
+        bCycleDown = pSettings->r_bool(section, "cycle_down") ? true : false;
     else
-        cycleDown = false;
+        bCycleDown = false;
     //Alundaio: END
 
     LoadFireParams(section);
@@ -444,7 +445,7 @@ bool CShootingObject::SendHitAllowed(IGameObject* pUser)
 extern void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion);
 
 void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, float fire_disp,
-    const CCartridge& cartridge, u16 parent_id, u16 weapon_id, bool send_hit)
+    const CCartridge& cartridge, u16 parent_id, u16 weapon_id, bool send_hit, int iShotNum /*= 0*/)
 {
     Fvector dir;
     random_dir(dir, shot_dir, fire_disp);
@@ -504,7 +505,7 @@ void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, fl
 
     Level().BulletManager().AddBullet(pos, dir, m_fStartBulletSpeed * cur_silencer_koef.bullet_speed,
         l_fHitPower * cur_silencer_koef.hit_power, fHitImpulse * cur_silencer_koef.hit_impulse, parent_id, weapon_id,
-        ALife::eHitTypeFireWound, fireDistance, cartridge, m_air_resistance_factor, send_hit, aim_bullet);
+        ALife::eHitTypeFireWound, fireDistance, cartridge, m_air_resistance_factor, send_hit, aim_bullet, iShotNum);
 }
 void CShootingObject::FireStart() { bWorking = true; }
 void CShootingObject::FireEnd() { bWorking = false; }

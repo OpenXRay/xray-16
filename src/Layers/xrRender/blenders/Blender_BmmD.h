@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_BmmD : public IBlender
 {
     string64 oT2_Name; // name of secondary texture
@@ -26,3 +28,4 @@ public:
     CBlender_BmmD();
     ~CBlender_BmmD() override = default;
 };
+} // namespace xray::render::RENDER_NAMESPACE

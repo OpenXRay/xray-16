@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // Main blenders for level
 constexpr CLASS_ID B_DEFAULT        = MK_CLSID('L', 'M', ' ', ' ', ' ', ' ', ' ', ' ');
 constexpr CLASS_ID B_DEFAULT_AREF   = MK_CLSID('L', 'M', '_', 'A', 'R', 'E', 'F', ' ');
@@ -31,3 +33,4 @@ constexpr CLASS_ID B_MODEL_EbB      = MK_CLSID('M', 'O', 'D', 'E', 'L', 'E', 'b'
 // Editor
 constexpr CLASS_ID B_EDITOR_WIRE    = MK_CLSID('E', '_', 'W', 'I', 'R', 'E', ' ', ' ');
 constexpr CLASS_ID B_EDITOR_SEL     = MK_CLSID('E', '_', 'S', 'E', 'L', ' ', ' ', ' ');
+} // namespace xray::render::RENDER_NAMESPACE

@@ -3,6 +3,8 @@
 
 #include "blender_light_spot.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_accum_spot::CBlender_accum_spot() { description.CLS = 0; }
 CBlender_accum_spot::~CBlender_accum_spot() {}
 void CBlender_accum_spot::Compile(CBlender_Compile& C)
@@ -486,3 +488,4 @@ void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

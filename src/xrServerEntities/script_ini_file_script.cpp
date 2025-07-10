@@ -11,24 +11,22 @@
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/Functor.hpp"
 
-CScriptIniFile* get_system_ini() { return ((CScriptIniFile*)pSettings); }
-bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::string& V)
+bool r_line(const CScriptIniFile* self, pcstr S, int L, luabind::string& N, luabind::string& V)
 {
     THROW3(self->section_exist(S), "Cannot find section", S);
-    THROW2((int)self->line_count(S) > L, "Invalid line number");
 
     N = "";
     V = "";
 
-    LPCSTR n, v;
-    bool result = !!self->r_line(S, L, &n, &v);
+    pcstr n, v;
+    bool result = self->r_line(S, L, &n, &v);
     if (!result)
-        return (false);
+        return false;
 
     N = n;
     if (v)
         V = v;
-    return (true);
+    return true;
 }
 
 bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind::string& V)
@@ -49,10 +47,10 @@ bool r_line2(CScriptIniFile* self, pcstr S, pcstr L, luabind::string& N, luabind
 
 #pragma warning(push)
 #pragma warning(disable : 4238)
-CScriptIniFile* create_ini_file(LPCSTR ini_string)
+CScriptIniFile* create_ini_file(pcstr ini_string)
 {
     IReader reader((void*)ini_string, xr_strlen(ini_string));
-    return ((CScriptIniFile*)xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path));
+    return (CScriptIniFile*)xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path);
 }
 #pragma warning(pop)
 
@@ -66,10 +64,6 @@ CScriptIniFile* reload_system_ini()
     return (CScriptIniFile*)pSettings;
 }
 //Alundaio: END
-
-#ifdef XRGAME_EXPORTS
-CScriptIniFile* get_game_ini() { return (CScriptIniFile*)pGameIni; }
-#endif
 
 static void CScriptIniFile_Export(lua_State* luaState)
 {
@@ -139,13 +133,23 @@ static void CScriptIniFile_Export(lua_State* luaState)
             // XXX: uncomment after we check that out_value policy is working
             //.def("r_line", &::r_line2, policy_list<out_value<4>, out_value<5>>())
             ,
-#ifdef XRGAME_EXPORTS
-            def("game_ini", &get_game_ini),
-#endif
-            //Alundaio: extend
+
+            def("system_ini", +[]()
+            {
+                return (CScriptIniFile*)pSettings;
+            }),
+            def("game_ini", +[]()
+            {
+                return (CScriptIniFile*)pGameIni;
+            }),
+            def("openxray_ini", +[]()
+            {
+                return (CScriptIniFile*)pSettingsOpenXRay;
+            }),
+
             def("reload_system_ini", &reload_system_ini),
-            //Alundaio:: END
-            def("system_ini", &get_system_ini), def("create_ini_file", &create_ini_file, adopt<0>())
+
+            def("create_ini_file", &create_ini_file, adopt<0>())
     ];
 }
 

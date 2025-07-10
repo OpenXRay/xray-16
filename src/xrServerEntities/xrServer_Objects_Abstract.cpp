@@ -8,7 +8,6 @@
 
 #include "StdAfx.h"
 #pragma hdrstop
-#pragma pack(push, 4)
 
 #include "xrServer_Objects_Abstract.h"
 #include "xrMessages.h"
@@ -112,5 +111,3 @@ void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
     V->OnChangeEvent.bind(this, &CSE_Motion::OnChangeMotion);
 }
 #endif // #ifndef MASTER_GOLD
-
-#pragma pack(pop)

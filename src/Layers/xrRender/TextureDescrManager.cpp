@@ -5,6 +5,8 @@
 
 #include "xrCore/Threading/ParallelForEach.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // eye-params
 float r__dtex_range = 50;
 class cl_dt_scaler : public R_constant_setup
@@ -195,7 +197,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
                 xr_delete(desc.m_spec);
 
             desc.m_spec = xr_new<texture_spec>();
-            desc.m_spec->m_material = tp.material + tp.material_weight;
+            desc.m_spec->m_material = float(tp.material) + tp.material_weight;
             desc.m_spec->m_use_steep_parallax = false;
 
             if (tp.bump_mode == STextureParams::tbmUse)
@@ -330,3 +332,4 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
     }
     return FALSE;
 }
+} // namespace xray::render::RENDER_NAMESPACE

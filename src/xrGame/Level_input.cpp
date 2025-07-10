@@ -111,8 +111,10 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
 extern bool g_block_pause;
 
 // Lain: added TEMP!!!
+#ifdef DEBUG
 extern float g_separate_factor;
 extern float g_separate_radius;
+#endif
 
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
@@ -213,6 +215,13 @@ void CLevel::IR_OnKeyboardPress(int key)
 
     if (game && game->OnKeyboardPress(GetBindedAction(key)))
         return;
+
+    luabind::functor<bool> funct;
+    if (GEnv.ScriptEngine->functor("level_input.on_key_press", funct))
+    {
+        if (funct(key, _curr))
+            return;
+    }
 
     if (_curr == kQUICK_SAVE && IsGameTypeSingle())
     {
@@ -540,7 +549,7 @@ void CLevel::IR_OnTextInput(pcstr text)
     }
 }
 
-void CLevel::IR_OnControllerPress(int key, float x, float y)
+void CLevel::IR_OnControllerPress(int key, const ControllerAxisState& state)
 {
     if (g_bDisableAllInput)
         return;
@@ -554,10 +563,10 @@ void CLevel::IR_OnControllerPress(int key, float x, float y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eControllerPress)(key, x, y);
+        g_actor->callback(GameObject::eControllerPress)(key, state);
     }
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerPress(key, x, y))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerPress(key, state))
         return;
 
 #ifndef MASTER_GOLD
@@ -572,12 +581,12 @@ void CLevel::IR_OnControllerPress(int key, float x, float y)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnControllerPress(GetBindedAction(key), x, y);
+            IR->IR_OnControllerPress(GetBindedAction(key), state);
     }
 
 }
 
-void CLevel::IR_OnControllerRelease(int key, float x, float y)
+void CLevel::IR_OnControllerRelease(int key, const ControllerAxisState& state)
 {
     if (g_bDisableAllInput)
         return;
@@ -591,10 +600,10 @@ void CLevel::IR_OnControllerRelease(int key, float x, float y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eControllerRelease)(key, x, y);
+        g_actor->callback(GameObject::eControllerRelease)(key, state);
     }
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerRelease(key, x, y))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerRelease(key, state))
         return;
 
 #ifndef MASTER_GOLD
@@ -609,11 +618,11 @@ void CLevel::IR_OnControllerRelease(int key, float x, float y)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnControllerRelease(GetBindedAction(key), x, y);
+            IR->IR_OnControllerRelease(GetBindedAction(key), state);
     }
 }
 
-void CLevel::IR_OnControllerHold(int key, float x, float y)
+void CLevel::IR_OnControllerHold(int key, const ControllerAxisState& state)
 {
     if (g_bDisableAllInput)
         return;
@@ -627,10 +636,10 @@ void CLevel::IR_OnControllerHold(int key, float x, float y)
     /* avo: script callback */
     if (g_actor)
     {
-        g_actor->callback(GameObject::eControllerHold)(key, x, y);
+        g_actor->callback(GameObject::eControllerHold)(key, state);
     }
 
-    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerHold(key, x, y))
+    if (CurrentGameUI() && CurrentGameUI()->IR_UIOnControllerHold(key, state))
         return;
 
 #ifndef MASTER_GOLD
@@ -645,7 +654,7 @@ void CLevel::IR_OnControllerHold(int key, float x, float y)
     {
         IInputReceiver* IR = smart_cast<IInputReceiver*>(smart_cast<CGameObject*>(CURRENT_ENTITY()));
         if (IR)
-            IR->IR_OnControllerHold(GetBindedAction(key), x, y);
+            IR->IR_OnControllerHold(GetBindedAction(key), state);
     }
 }
 
@@ -677,6 +686,9 @@ void CLevel::IR_OnControllerAttitudeChange(Fvector change)
 
 void CLevel::IR_OnActivate()
 {
+    if (CUIGameCustom* ui = CurrentGameUI())
+        ui->MarkForemost(true);
+
     if (!pInput)
         return;
 
@@ -705,4 +717,10 @@ void CLevel::IR_OnActivate()
             };
         };
     }
+}
+
+void CLevel::IR_OnDeactivate()
+{
+    if (CUIGameCustom* ui = CurrentGameUI())
+        ui->MarkForemost(false);
 }

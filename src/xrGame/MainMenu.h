@@ -131,6 +131,9 @@ public:
 
     bool IgnorePause() override { return true; }
 
+    void IR_OnActivate() override;
+    void IR_OnDeactivate() override;
+
     void IR_OnMousePress(int btn) override;
     void IR_OnMouseRelease(int btn) override;
     void IR_OnMouseHold(int btn) override;
@@ -143,9 +146,9 @@ public:
 
     void IR_OnTextInput(pcstr text) override;
 
-    void IR_OnControllerPress(int dik, float x, float y) override;
-    void IR_OnControllerRelease(int dik, float x, float y) override;
-    void IR_OnControllerHold(int dik, float x, float y) override;
+    void IR_OnControllerPress(int dik, const ControllerAxisState& state) override;
+    void IR_OnControllerRelease(int dik, const ControllerAxisState& state) override;
+    void IR_OnControllerHold(int dik, const ControllerAxisState& state) override;
 
     bool OnRenderPPUI_query();
     void OnRenderPPUI_main();

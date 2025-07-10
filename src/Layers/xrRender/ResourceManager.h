@@ -2,8 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef ResourceManagerH
-#define ResourceManagerH
 #pragma once
 
 #include "Shader.h"
@@ -13,6 +11,8 @@
 // refs
 struct lua_State;
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx11ConstantBuffer;
 
 // defs
@@ -273,5 +273,4 @@ private:
         return false;
     }
 };
-
-#endif // ResourceManagerH
+} // namespace xray::render::RENDER_NAMESPACE

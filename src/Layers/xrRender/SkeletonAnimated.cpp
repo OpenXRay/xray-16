@@ -11,7 +11,11 @@
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif
+
 extern ENGINE_API shared_str current_player_hud_sect;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 extern int psSkeletonUpdate;
 using namespace animation;
 
@@ -238,7 +242,7 @@ void CKinematicsAnimated::LL_FadeCycle(u16 part, float falloff, u8 mask_channel 
         B.blendFalloff = falloff;
         // B.blendAccrue		= B.timeCurrent;
         if (B.stop_at_end)
-            B.stop_at_end_callback = FALSE; // callback не должен приходить!
+            B.stop_at_end_callback = false; // callback не должен приходить!
     }
 }
 void CKinematicsAnimated::LL_CloseCycle(u16 part, u8 mask_channel /*= (1<<0)*/)
@@ -315,8 +319,8 @@ void CKinematicsAnimated::IBlendSetup(CBlend& B, u16 part, u8 channel, MotionID 
     B.timeTotal = m_Motions[B.motionID.slot].bone_motions[LL_GetBoneRoot()]->at(motion_ID.idx).GetLength();
     B.bone_or_part = part;
     B.stop_at_end = noloop;
-    B.playing = TRUE;
-    B.stop_at_end_callback = TRUE;
+    B.playing = true;
+    B.stop_at_end_callback = true;
     B.Callback = Callback;
     B.CallbackParam = CallbackParam;
 
@@ -338,15 +342,15 @@ void CKinematicsAnimated::IFXBlendSetup(
     B.timeTotal = m_Motions[B.motionID.slot].bone_motions[bone]->at(motion_ID.idx).GetLength();
     B.bone_or_part = bone;
 
-    B.playing = TRUE;
-    B.stop_at_end_callback = TRUE;
-    B.stop_at_end = FALSE;
+    B.playing = true;
+    B.stop_at_end_callback = true;
+    B.stop_at_end = false;
     //
     B.Callback = nullptr;
     B.CallbackParam = nullptr;
 
     B.channel = 0;
-    B.fall_at_end = FALSE;
+    B.fall_at_end = false;
 }
 CBlend* CKinematicsAnimated::LL_PlayCycle(u16 part, MotionID motion_ID, BOOL bMixing, float blendAccrue,
     float blendFalloff, float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel /*=0*/)
@@ -558,7 +562,7 @@ void CKinematicsAnimated::LL_UpdateFxTracks(float dt)
         CBlend& B = *(*I);
         if (!B.stop_at_end_callback)
         {
-            B.playing = FALSE;
+            B.playing = false;
             continue;
         }
         // B.timeCurrent += dt*B.speed;
@@ -1049,3 +1053,4 @@ MotionID CKinematicsAnimated::ID_Motion(LPCSTR N, u16 slot)
     return motion_ID;
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

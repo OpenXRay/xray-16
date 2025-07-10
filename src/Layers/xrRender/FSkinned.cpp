@@ -7,6 +7,7 @@
 #include "Layers/xrRender/BufferUtils.h"
 #include "xrEngine/EnnumerateVertices.h"
 #include "xrCore/xrDebug_macros.h"
+#include "xrCDB/Intersect.hpp"
 
 // XXX: test the parallel code in the load_hw()
 //#define PARALLEL_BONE_VERTICES_PROCESSING
@@ -19,6 +20,8 @@
 #include "xrCore/dump_string.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////
 // Body Part
 //////////////////////////////////////////////////////////////////////
@@ -208,8 +211,6 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 //-----------------------------------------------------------------------------------------------------
 // Wallmarks
 //-----------------------------------------------------------------------------------------------------
-#include "xrCDB/Intersect.hpp"
-
 #ifdef DEBUG
 
 template <typename vertex_type>
@@ -805,3 +806,4 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
         V->p_rm_Vertices->Unmap();
     V->p_rm_Indices->Unmap();
 }
+} // namespace xray::render::RENDER_NAMESPACE

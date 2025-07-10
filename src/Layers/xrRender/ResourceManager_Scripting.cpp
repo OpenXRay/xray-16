@@ -15,6 +15,8 @@
 #define MDB
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // wrapper
 class adopt_sampler
 {
@@ -440,3 +442,4 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     ShaderElement* _r = RImplementation.Resources->_CreateElement(std::move(E));
     return _r;
 }
+} // namespace xray::render::RENDER_NAMESPACE

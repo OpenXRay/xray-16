@@ -9,7 +9,6 @@
 #include "ScrollView/UIScrollView.h"
 #include "Hint/UIHint.h"
 #include "Cursor/UICursor.h"
-#include "ui_focus.h"
 #include "ui_styles.h"
 
 #include "xrScriptEngine/ScriptExporter.hpp"
@@ -90,11 +89,22 @@ SCRIPT_EXPORT(CUIFocusSystem, (),
                 value("LowerLeft",  (int)FocusDirection::LowerLeft),
                 value("LowerRight", (int)FocusDirection::LowerRight)
             ],
+
         class_<CUIFocusSystem>("CUIFocusSystem")
             .def("RegisterFocusable", &CUIFocusSystem::RegisterFocusable)
             .def("UnregisterFocusable", &CUIFocusSystem::UnregisterFocusable)
             .def("IsRegistered", &CUIFocusSystem::IsRegistered)
-            .def("FindClosestFocusable", &CUIFocusSystem::FindClosestFocusable)
+            .def("IsValuable", &CUIFocusSystem::IsValuable)
+            .def("IsNonValuable", &CUIFocusSystem::IsNonValuable)
+            .def("Update", &CUIFocusSystem::Update)
+            .def("LockToWindow", &CUIFocusSystem::LockToWindow)
+            .def("Unlock", &CUIFocusSystem::Unlock)
+            .def("GetLocker", &CUIFocusSystem::GetLocker)
+            .def("GetFocused", &CUIFocusSystem::GetFocused)
+            .def("SetFocused", &CUIFocusSystem::SetFocused)
+            .def("FindClosestFocusable", &CUIFocusSystem::FindClosestFocusable),
+
+        def("GetUIFocusSystem", +[] { return UI().Focus(); })
     ];
 });
 
@@ -165,6 +175,7 @@ SCRIPT_EXPORT(CUIWindow, (),
             .def("IsAutoDelete", &CUIWindow::IsAutoDelete)
 
             .def("IsCursorOverWindow", &CUIWindow::CursorOverWindow)
+            .def("IsUsingCursorRightNow", &CUIWindow::IsUsingCursorRightNow)
             .def("FocusReceiveTime", &CUIWindow::FocusReceiveTime)
             .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 
@@ -212,8 +223,6 @@ SCRIPT_EXPORT(CUIWindow, (),
 
             .def("SetFont", &CUIWindow::SetFont)
             .def("GetFont", &CUIWindow::GetFont)
-
-            .def("GetCurrentFocusSystem", &CUIWindow::GetCurrentFocusSystem)
 
             .def("WindowName", +[](CUIWindow* self) -> pcstr { return self->WindowName().c_str(); })
             .def("SetWindowName", &CUIWindow::SetWindowName),

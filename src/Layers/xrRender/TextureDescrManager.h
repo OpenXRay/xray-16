@@ -5,6 +5,8 @@
 #include "ETextureParams.h"
 #include "xrCommon/xr_unordered_map.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class cl_dt_scaler;
 
 class CTextureDescrMngr
@@ -54,3 +56,4 @@ public:
     BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const;
     BOOL UseSteepParallax(const shared_str& tex_name) const;
 };
+} // namespace xray::render::RENDER_NAMESPACE

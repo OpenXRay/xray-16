@@ -651,8 +651,16 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     }
 
     string_path temp_name;
-    sky_texture_name = strconcat(temp_name, A.sky_texture_name.c_str(), "; ", B.sky_texture_name.c_str());
-    clouds_texture_name = strconcat(temp_name, A.clouds_texture_name.c_str(), "; ", B.clouds_texture_name.c_str());
+
+    if (!A.sky_texture_name.empty() && !B.sky_texture_name.empty())
+        sky_texture_name = strconcat(temp_name, A.sky_texture_name.c_str(), "; ", B.sky_texture_name.c_str());
+    else
+        sky_texture_name = f < 0.5f ? A.sky_texture_name : B.sky_texture_name;
+
+    if (!A.clouds_texture_name.empty() && !B.clouds_texture_name.empty())
+        clouds_texture_name = strconcat(temp_name, A.clouds_texture_name.c_str(), "; ", B.clouds_texture_name.c_str());
+    else
+        clouds_texture_name = f < 0.5f ? A.clouds_texture_name : B.clouds_texture_name;
 }
 
 std::pair<Fvector3, float> CEnvDescriptorMixer::calculate_dynamic_sun_dir(float fGameTime, float azimuth)

@@ -53,7 +53,6 @@
 #include "CustomOutfit.h"
 #include "ActorBackpack.h"
 #include "inventory_item_impl.h"
-#include "Inventory.h"
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServerEntities/inventory_space.h"
 //-Alundaio
@@ -139,9 +138,9 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
     news_data.texture_name = texture_name;
 
     if (delay == 0)
-        Actor()->AddGameNews(news_data);
+        Actor()->AddGameNews(std::move(news_data));
     else
-        Actor()->AddGameNews_deffered(news_data, delay);
+        Actor()->AddGameNews_deffered(std::move(news_data), delay);
 }
 
 void CScriptGameObject::ClearGameNews() const
@@ -289,7 +288,7 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& func
 }
 
 // 1
-void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind::object object)
+void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind::object object)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
     if (!inventory_owner)
@@ -299,14 +298,15 @@ void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind
         return;
     }
 
-    TIItemContainer::iterator I = inventory_owner->inventory().m_all.begin();
-    TIItemContainer::iterator E = inventory_owner->inventory().m_all.end();
+    TIItemContainer::iterator	I = inventory_owner->inventory().m_all.begin();
+    TIItemContainer::iterator	E = inventory_owner->inventory().m_all.end();
     for (; I != E; ++I)
-        functor(object, (*I)->object().lua_game_object());
+        if (functor(object, (*I)->object().lua_game_object()) == true)
+            return;
 }
 
 #include "InventoryBox.h"
-void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luabind::object object)
+void CScriptGameObject::IterateInventoryBox(luabind::functor<bool> functor, luabind::object object)
 {
     CInventoryBox* inventory_box = smart_cast<CInventoryBox*>(&this->object());
     if (!inventory_box)
@@ -320,9 +320,9 @@ void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luab
     xr_vector<u16>::const_iterator E = inventory_box->m_items.end();
     for (; I != E; ++I)
     {
-        CGameObject* GO = smart_cast<CGameObject*>(Level().Objects.net_Find(*I));
-        if (GO)
-            functor(object, GO->lua_game_object());
+        if (const auto GO = smart_cast<CGameObject*>(Level().Objects.net_Find(*I)))
+            if (functor(object, GO->lua_game_object()) == true)
+                return;
     }
 }
 
@@ -474,7 +474,7 @@ u32 CScriptGameObject::Money()
     return pOurOwner->get_money();
 }
 
-void CScriptGameObject::TransferMoney(int money, CScriptGameObject* pForWho)
+void CScriptGameObject::TransferMoney(u32 money, CScriptGameObject* pForWho)
 {
     if (!pForWho)
     {
@@ -486,9 +486,9 @@ void CScriptGameObject::TransferMoney(int money, CScriptGameObject* pForWho)
     CInventoryOwner* pOtherOwner = smart_cast<CInventoryOwner*>(&pForWho->object());
     VERIFY(pOtherOwner);
 
-    if (pOurOwner->get_money() - money < 0)
+    if (pOurOwner->get_money() < money)
     {
-        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Character does not have enought money");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Character does not have enough money");
         return;
     }
 
@@ -496,7 +496,7 @@ void CScriptGameObject::TransferMoney(int money, CScriptGameObject* pForWho)
     pOtherOwner->set_money(pOtherOwner->get_money() + money, true);
 }
 
-void CScriptGameObject::GiveMoney(int money)
+void CScriptGameObject::GiveMoney(u32 money)
 {
     CInventoryOwner* pOurOwner = smart_cast<CInventoryOwner*>(&object());
     VERIFY(pOurOwner);
@@ -753,6 +753,18 @@ void CScriptGameObject::ChangeCharacterReputation(int char_rep)
         return;
     }
     pInventoryOwner->ChangeReputation(char_rep);
+}
+
+void CScriptGameObject::SetCharacterReputation(int char_rep)
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+
+    if (!pInventoryOwner)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "SetCharacterReputation available only for InventoryOwner");
+        return;
+    }
+    pInventoryOwner->SetReputation(char_rep);
 }
 
 LPCSTR CScriptGameObject::CharacterCommunity()
@@ -1258,6 +1270,9 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u32 slot_id) const
         return (0);
     }
 
+    if (pSettingsOpenXRay->read_if_exists<bool>("compatibility", "minus_one_slot_ordering", ShadowOfChernobylMode || ClearSkyMode))
+        ++slot_id;
+
     CInventoryItem* result = inventory_owner->inventory().ItemFromSlot((u16)slot_id);
     return (result ? result->object().lua_game_object() : 0);
 }
@@ -1755,7 +1770,6 @@ bool CScriptGameObject::is_door_blocked_by_npc() const
 
 
 //Alundaio: Methods for exporting the ability to detach/attach addons for magazined weapons
-#ifdef GAME_OBJECT_EXTENDED_EXPORTS
 void CScriptGameObject::Weapon_AddonAttach(CScriptGameObject* item)
 {
     auto weapon = smart_cast<CWeaponMagazined*>(&object());
@@ -2227,5 +2241,4 @@ void CScriptGameObject::SetCharacterIcon(pcstr iconName)
     }
     return pInventoryOwner->SetIcon(iconName);
 }
-#endif
 //-Alundaio

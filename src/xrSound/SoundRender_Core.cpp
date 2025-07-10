@@ -98,7 +98,7 @@ void CSoundRender_Core::_restart()
     env_apply();
 }
 
-CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, int game_type)
+CSound* CSoundRender_Core::create(pcstr fName, esound_type sound_type, u32 game_type)
 {
     if (!bPresent)
         return nullptr;

@@ -46,7 +46,7 @@ void CRenderDevice::Create()
     FS.update_path(fname, "$game_data$", "shaders.xr");
     GEnv.Render->OnDeviceCreate(fname);
     m_imgui_render = GEnv.RenderFactory->CreateImGuiRender();
-    m_imgui_render->OnDeviceCreate(Device.GetImGuiContext());
+    m_imgui_render->OnDeviceCreate(GetImGuiContext());
     Statistic->OnDeviceCreate();
     dwFrame = 0;
 }

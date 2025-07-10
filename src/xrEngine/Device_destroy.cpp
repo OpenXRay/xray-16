@@ -18,7 +18,6 @@ void CRenderDevice::Destroy()
     seqRender.Clear();
     seqAppActivate.Clear();
     seqAppDeactivate.Clear();
-    seqAppStart.Clear();
     seqAppEnd.Clear();
     seqFrame.Clear();
     seqFrameMT.Clear();

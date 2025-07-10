@@ -15,7 +15,10 @@
         "cwd": "${workspaceFolder}"
       },
       "command": "rm",
-      "args": ["-rf", "bin"],
+      "args": [
+        "-rf",
+        "bin"
+      ],
       "problemMatcher": []
     },
     {
@@ -25,7 +28,10 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "args": ["-p", "bin"]
+      "args": [
+        "-p",
+        "bin"
+      ]
     },
     {
       "label": "Configure",
@@ -34,7 +40,9 @@
         "cwd": "${workspaceFolder}/bin"
       },
       "command": "cmake .. -DCMAKE_BUILD_TYPE=${input:buildType}",
-      "dependsOn": ["mkdir"],
+      "dependsOn": [
+        "mkdir"
+      ],
       "problemMatcher": []
     },
     {
@@ -44,7 +52,9 @@
         "cwd": "${workspaceFolder}/bin"
       },
       "command": "cmake --build . -j${CPU_COUNT}",
-      "dependsOn": ["Configure"]
+      "dependsOn": [
+        "Configure"
+      ]
     },
     {
       "label": "Run SoC",
@@ -72,6 +82,15 @@
       },
       "command": "./xr_3da -nointro -fsltx ${COP_LTX_FILE_PATH}",
       "problemMatcher": []
+    },
+    {
+      "label": "Run CoC",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/bin/x86_64/${input:buildType}"
+      },
+      "command": "./xr_3da -nointro -fsltx ${COC_LTX_FILE_PATH}",
+      "problemMatcher": []
     }
   ],
   "inputs": [
@@ -79,7 +98,12 @@
       "id": "buildType",
       "type": "pickString",
       "description": "choose build type:",
-      "options": ["Debug", "Release", "MinSizeRel", "RelWithDebInfo"],
+      "options": [
+        "Debug",
+        "Release",
+        "MinSizeRel",
+        "RelWithDebInfo"
+      ],
       "default": "Debug"
     }
   ]

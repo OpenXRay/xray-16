@@ -9,13 +9,13 @@ class XR_NOVTABLE IGameFont
     friend class dxFontRender;
 
 public:
-    enum EAligment
+    enum EAligment : u8
     {
         alLeft = 0,
         alRight,
         alCenter
     };
-    enum : u32
+    enum : u8
     {
         fsGradient = (1 << 0),
         fsDeviceIndependent = (1 << 1),

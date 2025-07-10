@@ -1,12 +1,13 @@
 #pragma once
-#include "ai/monsters/state.h"
+
+#include "ai/monsters/states/monster_state_move.h"
 
 template <typename _Object>
-class CStateMonsterRestMoveToHomePoint : public CStateMove<_Object>
+class CStateMonsterRestMoveToHomePoint : public CMonsterStateMove<_Object>
 {
 protected:
-    typedef CStateMove<_Object> inherited;
-    typedef CStateMove<_Object>* state_ptr;
+    typedef CMonsterStateMove<_Object> inherited;
+    typedef CMonsterStateMove<_Object>* state_ptr;
 
     u32 m_target_node;
 

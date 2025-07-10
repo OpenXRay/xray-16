@@ -9,8 +9,6 @@
 
 CUIComboBox::CUIComboBox() : CUIWindow("CUIComboBox")
 {
-    m_bFocusValuable = true;
-
     AttachChild(&m_frameLine);
     AttachChild(&m_text);
 
@@ -21,6 +19,13 @@ CUIComboBox::CUIComboBox() : CUIWindow("CUIComboBox")
     m_bInited = false;
     m_eState = LIST_FONDED;
     m_textColor[0] = 0xff00ff00;
+
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUIComboBox::~CUIComboBox()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUIComboBox::SetListLength(int length)
@@ -213,6 +218,34 @@ void CUIComboBox::SetItemToken(int tok_id)
     SetItemIDX(idx);
 }
 
+bool CUIComboBox::SetNextItemSelected(bool next, bool loop)
+{
+    const auto lastItem = (int)m_list_box.GetSize() - 1;
+
+    int idx = (int)m_list_box.GetSelectedIDX();
+
+    if (next)
+    {
+        if (idx < lastItem)
+            idx++;
+        else if (loop)
+            idx = 0;
+        else
+            return false;
+    }
+    else
+    {
+        if (idx > 0)
+            --idx;
+        else if (loop)
+            idx = lastItem;
+        else
+            return false;
+    }
+    SetItemIDX(idx);
+    return true;
+}
+
 void CUIComboBox::OnBtnClicked() { ShowList(!m_list_frame.IsShown()); }
 void CUIComboBox::ShowList(bool bShow)
 {
@@ -222,6 +255,7 @@ void CUIComboBox::ShowList(bool bShow)
         m_list_frame.Show(true);
         m_eState = LIST_EXPANDED;
         GetParent()->SetCapture(this, true);
+        UI().Focus().LockToWindow(&m_list_frame);
     }
     else
     {
@@ -229,6 +263,8 @@ void CUIComboBox::ShowList(bool bShow)
         SetHeight(m_frameLine.GetHeight());
         m_eState = LIST_FONDED;
         GetParent()->SetCapture(this, false);
+        if (UI().Focus().GetLocker() == &m_list_frame)
+            UI().Focus().Unlock();
     }
 }
 
@@ -257,6 +293,8 @@ void CUIComboBox::OnFocusLost()
     CUIWindow::OnFocusLost();
     if (m_bIsEnabled)
         m_frameLine.SetCurrentState(S_Enabled);
+    if (m_eState == LIST_EXPANDED && pInput->IsCurrentInputTypeController())
+        ShowList(false);
 }
 
 void CUIComboBox::OnFocusReceive()
@@ -270,27 +308,112 @@ bool CUIComboBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     if (CUIWindow::OnMouseAction(x, y, mouse_action))
         return true;
-
-    bool bCursorOverScb = false;
-    bCursorOverScb = m_list_box.ScrollBar()->CursorOverWindow();
-    switch (m_eState)
+    if (mouse_action == WINDOW_LBUTTON_DOWN)
     {
-    case LIST_EXPANDED:
-
-        if ((!bCursorOverScb) && mouse_action == WINDOW_LBUTTON_DOWN)
+        switch (m_eState)
         {
-            ShowList(false);
-            return true;
-        }
-        break;
-    case LIST_FONDED:
-        if (mouse_action == WINDOW_LBUTTON_DOWN)
-        {
+        case LIST_EXPANDED:
+            if (!m_list_box.ScrollBar()->CursorOverWindow())
+            {
+                ShowList(false);
+                return true;
+            }
+        case LIST_FONDED:
             OnBtnClicked();
             return true;
         }
-        break;
-    default: break;
+    }
+    else if (mouse_action == WINDOW_RBUTTON_DOWN)
+    {
+        SetNextItemSelected(true, true);
+    }
+
+    return false;
+}
+
+bool CUIComboBox::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (CUIWindow::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    if (CursorOverWindow() && keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_ACCEPT:
+        case kUI_BACK:
+            if (m_list_frame.IsShown())
+            {
+                ShowList(false);
+                return true;
+            }
+            break;
+        case kUI_MOVE_LEFT:
+        {
+            if (!m_list_frame.IsShown())
+                SetNextItemSelected(false, false);
+            return true;
+        }
+        case kUI_MOVE_RIGHT:
+        {
+            if (!m_list_frame.IsShown())
+                SetNextItemSelected(true, false);
+            return true;
+        }
+        case kUI_MOVE_UP:
+        {
+            if (m_list_frame.IsShown())
+            {
+                SetNextItemSelected(false, false);
+                if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
+                    UI().Focus().SetFocused(itm);
+                return true;
+            }
+            break;
+        }
+        case kUI_MOVE_DOWN:
+        {
+            if (m_list_frame.IsShown())
+            {
+                SetNextItemSelected(true, false);
+                if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
+                    UI().Focus().SetFocused(itm);
+                return true;
+            }
+            break;
+        }
+        } // switch (action)
+    }
+
+    return false;
+}
+
+bool CUIComboBox::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
+{
+    if (CUIWindow::OnControllerAction(axis, state, controller_action))
+        return true;
+
+    if (CursorOverWindow())
+    {
+        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
+        {
+            if (std::abs(state.x) > 0.5f && std::abs(state.y) < 0.2f)
+            {
+                if (!m_list_frame.IsShown())
+                    SetNextItemSelected(state.x > 0, false);
+                return true;
+            }
+            if (std::abs(state.y) > 0.5f && std::abs(state.x) < 0.2f)
+            {
+                if (m_list_frame.IsShown())
+                {
+                    SetNextItemSelected(state.y > 0, false);
+                    if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
+                        UI().Focus().SetFocused(itm);
+                    return true;
+                }
+            }
+        }
     }
 
     return false;
@@ -330,4 +453,14 @@ void CUIComboBox::ClearList()
     m_itoken_id = 0;
     ShowList(false);
     m_disabled.clear();
+}
+
+void CUIComboBox::SetSelectedIDX(u32 idx)
+{
+    m_list_box.SetSelectedIDX(idx);
+}
+
+u32 CUIComboBox::GetSelectedIDX()
+{
+    return m_list_box.GetSelectedIDX();
 }

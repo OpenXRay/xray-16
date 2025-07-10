@@ -8,6 +8,8 @@
 #include <DirectXTex.h>
 #include <wincodec.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #define GAMESAVE_SIZE 128
 
 void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nullptr*/)
@@ -138,3 +140,4 @@ void CRender::Screenshot(ScreenshotMode mode /*= SM_NORMAL*/, pcstr name /*= nul
 _end_:
     _RELEASE(pSrcTexture);
 }
+} // namespace xray::render::RENDER_NAMESPACE

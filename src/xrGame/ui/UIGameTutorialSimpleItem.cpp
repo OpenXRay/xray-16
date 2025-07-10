@@ -270,7 +270,7 @@ void CUISequenceSimpleItem::Start()
         CUIPdaWnd& pda = ui_game_sp->GetPdaMenu();
         if (!xr_stricmp(m_pda_section, "pda_map"))
         {
-            pda.SetActiveSubdialog("eptMap");
+            pda.Show_MapWnd(true);
             bShowPda = true;
         }
         else if (!xr_stricmp(m_pda_section, "pda_tasks"))

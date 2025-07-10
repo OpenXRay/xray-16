@@ -1,5 +1,3 @@
-#ifndef sh_atomicH
-#define sh_atomicH
 #pragma once
 
 #include "xrCore/xr_resource.h"
@@ -11,8 +9,9 @@
 #include "Layers/xrRenderGL/glState.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 #pragma pack(push, 4)
-
 //////////////////////////////////////////////////////////////////////////
 // Atomic resources
 //////////////////////////////////////////////////////////////////////////
@@ -162,4 +161,4 @@ struct ECORE_API SDeclaration : public xr_resource_flagged
 typedef resptr_core<SDeclaration, resptr_base<SDeclaration>> ref_declaration;
 
 #pragma pack(pop)
-#endif // sh_atomicH
+} // namespace xray::render::RENDER_NAMESPACE

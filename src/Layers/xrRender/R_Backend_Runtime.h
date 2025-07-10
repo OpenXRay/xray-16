@@ -1,5 +1,3 @@
-#ifndef R_BACKEND_RUNTIMEH
-#define R_BACKEND_RUNTIMEH
 #pragma once
 
 #include "SH_Texture.h"
@@ -16,6 +14,8 @@
 #include "Layers/xrRenderGL/glState.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 IC void R_xforms::set_c_w(R_constant* C)
 {
     c_w = C;
@@ -140,4 +140,4 @@ IC void CBackend::set_Pass(SPass* P)
 
 ICF void CBackend::set_Element(ShaderElement* S, u32 pass) { set_Pass(S->passes[pass]); }
 ICF void CBackend::set_Shader(Shader* S, u32 pass) { set_Element(S->E[0], pass); }
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

@@ -48,20 +48,26 @@ void CUIChatWnd::Init(CUIXml& uiXml)
 
     pendingGameMode = false;
 
-    R_ASSERT(uiXml.NavigateToNode(CHAT_PREFIX_PENDING));
-    R_ASSERT(uiXml.NavigateToNode(CHAT_EDITBOX_PENDING));
+    if (uiXml.NavigateToNode(CHAT_PREFIX_PENDING) && uiXml.NavigateToNode(CHAT_EDITBOX_PENDING))
+    {
+        pending_prefix_rect.x1 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "x");
+        pending_prefix_rect.y1 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "y");
+        pending_prefix_rect.x2 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "width");
+        pending_prefix_rect.y2 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "height");
+        pending_prefix_rect.rb.add(pending_prefix_rect.lt);
 
-    pending_prefix_rect.x1 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "x");
-    pending_prefix_rect.y1 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "y");
-    pending_prefix_rect.x2 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "width");
-    pending_prefix_rect.y2 = uiXml.ReadAttribFlt(CHAT_PREFIX_PENDING, 0, "height");
-    pending_prefix_rect.rb.add(pending_prefix_rect.lt);
+        pending_edit_rect.x1 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "x");
+        pending_edit_rect.y1 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "y");
+        pending_edit_rect.x2 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "width");
+        pending_edit_rect.y2 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "height");
+        pending_edit_rect.rb.add(pending_edit_rect.lt);
 
-    pending_edit_rect.x1 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "x");
-    pending_edit_rect.y1 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "y");
-    pending_edit_rect.x2 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "width");
-    pending_edit_rect.y2 = uiXml.ReadAttribFlt(CHAT_EDITBOX_PENDING, 0, "height");
-    pending_edit_rect.rb.add(pending_edit_rect.lt);
+    }
+    else
+    {
+        pending_prefix_rect = inprogress_prefix_rect;
+        pending_edit_rect   = inprogress_edit_rect;
+    }
 
     Register(&UIEditBox);
     AddCallback(&UIEditBox, EDIT_TEXT_COMMIT, CUIWndCallback::void_function(this, &CUIChatWnd::OnChatCommit));

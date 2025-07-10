@@ -1,11 +1,11 @@
-#ifndef dxFontRender_included
-#define dxFontRender_included
 #pragma once
 
 #include "Include/xrRender/FontRender.h"
 
 #include "xrEngine/GameFont.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxFontRender : public IFontRender
 {
 public:
@@ -22,5 +22,4 @@ private:
     ref_shader pShader;
     ref_geom pGeom;
 };
-
-#endif //	FontRender_included
+} // namespace xray::render::RENDER_NAMESPACE

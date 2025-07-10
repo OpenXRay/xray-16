@@ -30,7 +30,7 @@ void CWeaponMagazinedWGrenade::Load(LPCSTR section)
     CRocketLauncher::Load(section);
 
     //// Sounds
-    m_sounds.LoadSound(section, "snd_shoot_grenade", "sndShotG", false, m_eSoundShot);
+    m_sounds.LoadSound(section, "snd_shoot_grenade", "sndShotG", true, m_eSoundShot);
     m_sounds.LoadSound(section, "snd_reload_grenade", "sndReloadG", true, m_eSoundReload);
     m_sounds.LoadSound(section, "snd_switch", "sndSwitch", true, m_eSoundReload);
 
@@ -658,12 +658,12 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 {
                 case state::idle:
                 {
-                    PlayHUDMotion("anm_idle_g", "anim_idle_g", TRUE, nullptr, GetState());
+                    PlayHUDMotion("anm_idle_g", "anim_idle_g", true, nullptr, GetState());
                     break;
                 }
                 case state::sprint:
                 {
-                    PlayHUDMotion("anm_idle_sprint_g", "anim_idle_g", TRUE, nullptr, GetState());
+                    PlayHUDMotion("anm_idle_sprint_g", "anim_idle_g", true, nullptr, GetState());
                     break;
                 }
                 case state::crouch:
@@ -677,7 +677,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 }
                 case state::moving:
                 {
-                    PlayHUDMotion("anm_idle_moving_g", "anim_idle_g", TRUE, nullptr, GetState());
+                    PlayHUDMotion("anm_idle_moving_g", "anim_idle_g", true, nullptr, GetState());
                     break;
                 }
                 } // switch (act_state)
@@ -688,12 +688,12 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 {
                 case state::idle:
                 {
-                    PlayHUDMotion("anm_idle_w_gl", "anim_idle_gl", TRUE, nullptr, GetState());
+                    PlayHUDMotion("anm_idle_w_gl", "anim_idle_gl", true, nullptr, GetState());
                     break;
                 }
                 case state::sprint:
                 {
-                    PlayHUDMotion("anm_idle_sprint_w_gl", "anim_idle_sprint", TRUE, nullptr, GetState());
+                    PlayHUDMotion("anm_idle_sprint_w_gl", "anim_idle_sprint", true, nullptr, GetState());
                     break;
                 }
                 case state::crouch:
@@ -707,7 +707,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 }
                 case state::moving:
                 {
-                    PlayHUDMotion("anm_idle_moving_w_gl", "anim_idle_gl", TRUE, nullptr, GetState());
+                    PlayHUDMotion("anm_idle_moving_w_gl", "anim_idle_gl", true, nullptr, GetState());
                     break;
                 }
                 } // switch (act_state)
@@ -736,10 +736,14 @@ void CWeaponMagazinedWGrenade::PlayAnimShoot()
 
 void CWeaponMagazinedWGrenade::PlayAnimModeSwitch()
 {
-    if (m_bGrenadeMode)
-        PlayHUDMotion("anm_switch_g", "anim_switch_grenade_on", /*FALSE*/ TRUE, this, eSwitch); //AVO: fix fast anim switch
+    // Respect SOC/CS/COP animations naming with two possible animation assignments and do not spam in logs on checks.
+    // Possible place to inject anm_switch_g_empty / anm_switch_empty logics later with CoC/anomaly-like implementation.
+    cpcstr animation = m_bGrenadeMode ? WhichHUDAnimationExist("anm_switch_g", "anim_switch_grenade_on", true) : WhichHUDAnimationExist("anm_switch", "anim_switch_grenade_off", true);
+
+    if (animation)
+        PlayHUDMotion(animation, TRUE, this, eSwitch);
     else
-        PlayHUDMotion("anm_switch", "anim_switch_grenade_off", /*FALSE*/ TRUE, this, eSwitch); //AVO: fix fast anim switch
+        SwitchState(eSwitch);
 }
 
 void CWeaponMagazinedWGrenade::PlayAnimBore()
@@ -925,7 +929,7 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
             return false;
     */
     string32 int_str;
-    int ae = GetAmmoElapsed();
+    const int ae = GetAmmoElapsed();
     xr_sprintf(int_str, "%d", ae);
     info.cur_ammo._set(int_str);
     if (HasFireModes())
@@ -941,9 +945,7 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
     if (m_pInventory->ModifyFrame() <= m_BriefInfo_CalcFrame)
         return false;
 
-    GetSuitableAmmoTotal();
-
-    const u32 at_size = m_bGrenadeMode ? m_ammoTypes2.size() : m_ammoTypes.size();
+    const size_t at_size = m_bGrenadeMode ? m_ammoTypes2.size() : m_ammoTypes.size();
     if (unlimited_ammo() || at_size == 0)
     {
         info.fmj_ammo._set("--");
@@ -958,30 +960,27 @@ bool CWeaponMagazinedWGrenade::GetBriefInfo(II_BriefInfo& info)
         info.ap_ammo._set("");
         info.third_ammo._set("");
 
-        int total = 0;
         if (at_size >= 1)
         {
             const int fmj = m_bGrenadeMode ? GetAmmoCount2(0) : GetAmmoCount(0);
             xr_sprintf(int_str, "%d", fmj);
             info.fmj_ammo._set(int_str);
-            total += fmj;
         }
         if (at_size >= 2)
         {
             const int ap = m_bGrenadeMode ? GetAmmoCount2(1) : GetAmmoCount(1);
             xr_sprintf(int_str, "%d", ap);
             info.ap_ammo._set(int_str);
-            total += ap;
         }
         if (at_size >= 3)
         {
             const int third = m_bGrenadeMode ? GetAmmoCount2(2) : GetAmmoCount(2);
             xr_sprintf(int_str, "%d", third);
             info.third_ammo._set(int_str);
-            total += third;
         }
 
-        xr_sprintf(int_str, "%d", total);
+        const int ac = GetSuitableAmmoTotal();
+        xr_sprintf(int_str, "%d", ac - ae);
         info.total_ammo = int_str;
         //-Alundaio
     }

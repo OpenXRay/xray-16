@@ -2,6 +2,8 @@
 #include "dx11StateUtils.h"
 #include "Layers/xrRender/Utils/dxHashHelper.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace dx11StateUtils
 {
 D3D_FILL_MODE ConvertFillMode(D3DFILLMODE Mode)
@@ -628,4 +630,5 @@ void ValidateState(D3D_SAMPLER_DESC& desc)
         desc.MaxAnisotropy = 1;
     }
 }
-};
+} // namespace dx11StateUtils
+} // namespace xray::render::RENDER_NAMESPACE

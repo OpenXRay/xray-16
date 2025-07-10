@@ -3,6 +3,8 @@
 #include "Layers/xrRender/HWCaps.h"
 #include "xrCore/ModuleLookup.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CHW
     : public pureAppActivate,
       public pureAppDeactivate
@@ -52,10 +54,8 @@ public:
     GLuint pFB{};
 
     SDL_Window* m_window{};
-    SDL_Window* m_helper_window{};
 
     SDL_GLContext m_context{};
-    SDL_GLContext m_helper_context{};
 
     pcstr AdapterName;
     pcstr OpenGLVersionString;
@@ -64,3 +64,4 @@ public:
 };
 
 extern ECORE_API CHW HW;
+} // namespace xray::render::RENDER_NAMESPACE

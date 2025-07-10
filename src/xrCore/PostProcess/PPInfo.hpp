@@ -8,7 +8,7 @@ struct XRCORE_API SPPInfo
         float r, g, b;
         SColor() {}
         SColor(float _r, float _g, float _b) : r(_r), g(_g), b(_b) {}
-        IC operator u32()
+        IC operator u32() const
         {
             int _r = clampr(iFloor(r * 255.f + .5f), 0, 255);
             int _g = clampr(iFloor(g * 255.f + .5f), 0, 255);
@@ -16,7 +16,7 @@ struct XRCORE_API SPPInfo
             return color_rgba(_r, _g, _b, 0);
         }
 
-        IC operator const Fvector&() { return *((Fvector*)this); }
+        IC operator const Fvector&() const { return *reinterpret_cast<const Fvector*>(this); }
         IC SColor& operator+=(const SColor& ppi)
         {
             r += ppi.r;

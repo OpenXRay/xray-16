@@ -1,9 +1,9 @@
 // ModelPool.h: interface for the CModelPool class.
 //////////////////////////////////////////////////////////////////////
-#ifndef ModelPoolH
-#define ModelPoolH
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // refs
 class dxRender_Visual;
 namespace PS
@@ -79,4 +79,4 @@ public:
     void RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, float m_fLOD);
 #endif
 };
-#endif // ModelPoolH
+} // namespace xray::render::RENDER_NAMESPACE

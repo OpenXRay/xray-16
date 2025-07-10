@@ -4,6 +4,8 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "dx11TextureUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CRT::~CRT()
 {
     destroy();
@@ -398,3 +400,4 @@ void resptrcode_crtc::create(LPCSTR Name, u32 size, D3DFORMAT f)
     _set		(DEV->_CreateRTC(Name,size,f));
 }
 */
+} // namespace xray::render::RENDER_NAMESPACE

@@ -2,6 +2,8 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////////
 // tables to calculate view-frustum bounds in world space
 // note: D3D uses [0..1] range for Z
@@ -271,9 +273,8 @@ void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
         }
         else
         {
-            extern float OLES_SUN_LIMIT_27_01_07;
             zMin = ps_r2_sun_near;
-            zMax = OLES_SUN_LIMIT_27_01_07;
+            zMax = ps_r2_sun_far;
         }
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMin);
         Device.mFullTransform.transform(center_pt);
@@ -621,9 +622,8 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
         }
         else
         {
-            extern float OLES_SUN_LIMIT_27_01_07;
             zMin = ps_r2_sun_near;
-            zMax = OLES_SUN_LIMIT_27_01_07;
+            zMax = ps_r2_sun_far;
         }
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMin);
         Device.mFullTransform.transform(center_pt);
@@ -1259,12 +1259,11 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, c
         }
         else
         {
-            extern float OLES_SUN_LIMIT_27_01_07;
             if (RImplementation.o.oldshadowcascades)
                 zMin = ps_r2_sun_near;
             else
                 zMin = 0; /////*****************************************************************************************
-            zMax = OLES_SUN_LIMIT_27_01_07;
+            zMax = ps_r2_sun_far;
         }
 
         cmd_list.set_c("volume_range", zMin, zMax, 0.f, 0.f);
@@ -1358,3 +1357,4 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, c
             set_viewport_size(HW.get_context(CHW::IMM_CTX_ID), w, h);
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

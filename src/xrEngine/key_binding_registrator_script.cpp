@@ -146,6 +146,13 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kCUSTOM14",                  int(kCUSTOM14)),
                 value("kCUSTOM15",                  int(kCUSTOM15)),
 
+                value("kPDA_TAB1",                  int(kPDA_TAB1)),
+                value("kPDA_TAB2",                  int(kPDA_TAB2)),
+                value("kPDA_TAB3",                  int(kPDA_TAB3)),
+                value("kPDA_TAB4",                  int(kPDA_TAB4)),
+                value("kPDA_TAB5",                  int(kPDA_TAB5)),
+                value("kPDA_TAB6",                  int(kPDA_TAB6)),
+
                 value("kKICK",                      int(kKICK)),
 
                 value("kEDITOR",                    int(kEDITOR)),
@@ -159,6 +166,9 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kUI_MOVE_DOWN",              int(kUI_MOVE_DOWN)),
 
                 value("kUI_MOVE_SECONDARY",         int(kUI_MOVE_SECONDARY)),
+
+                value("kUI_CLICK_1",                int(kUI_CLICK_1)),
+                value("kUI_CLICK_2",                int(kUI_CLICK_2)),
 
                 value("kUI_ACCEPT",                 int(kUI_ACCEPT)),
                 value("kUI_BACK",                   int(kUI_BACK)),
@@ -194,7 +204,6 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kPDA_MAP_SHOW_LEGEND",       int(kPDA_MAP_SHOW_LEGEND)),
 
                 value("kPDA_FILTER_TOGGLE",         int(kPDA_FILTER_TOGGLE)),
-                value("kPDA_TASKS_TOGGLE",          int(kPDA_TASKS_TOGGLE)),
 
                 // Talk:
                 value("kTALK_SWITCH_TO_TRADE",      int(kTALK_SWITCH_TO_TRADE)),

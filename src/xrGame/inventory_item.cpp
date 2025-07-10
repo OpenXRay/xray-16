@@ -42,19 +42,15 @@ net_updateInvData* CInventoryItem::NetSync()
 
 CInventoryItem::CInventoryItem()
 {
-    m_net_updateData = NULL;
     m_flags.set(Fbelt, FALSE);
     m_flags.set(Fruck, TRUE);
     m_flags.set(FRuckDefault, TRUE);
-    m_pInventory = NULL;
 
     SetDropManual(FALSE);
 
     m_flags.set(FCanTake, TRUE);
-    m_can_trade = TRUE;
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FUsingCondition, FALSE);
-    m_fCondition = 1.0f;
 
     m_ItemCurrPlace.value = 0;
     m_ItemCurrPlace.type = eItemPlaceUndefined;
@@ -101,8 +97,11 @@ void CInventoryItem::Load(LPCSTR section)
     R_ASSERT(m_weight >= 0.f);
 
     m_cost = pSettings->r_u32(section, "cost");
-    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT);
-    m_ItemCurrPlace.base_slot_id = (sl == u32(-1)) ? 0 : (sl + 1);
+
+    // Assets follow initial SOC system, where slots start from -1
+    u32 sl = pSettings->read_if_exists<u32>(section, "slot", NO_ACTIVE_SLOT - 1);
+    // Engine is following new system since COP: slots start from 0
+    m_ItemCurrPlace.base_slot_id = sl + 1;
 
     // Description
     if (pSettings->line_exist(section, DESCRIPTION_KEY))
@@ -118,6 +117,8 @@ void CInventoryItem::Load(LPCSTR section)
 
     // Added by Axel, to enable optional condition use on any item
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", false));
+
+    m_highlight_equipped = READ_IF_EXISTS(pSettings, r_bool, section, "highlight_equipped", false);
 
     if (BaseSlot() != NO_ACTIVE_SLOT || Belt())
     {
@@ -1228,10 +1229,7 @@ void CInventoryItem::UpdateXForm()
         return;
 
     const CInventoryOwner* parent = smart_cast<const CInventoryOwner*>(E);
-    if (parent && parent->use_simplified_visual())
-        return;
-
-    if (parent->attached(this))
+    if (parent && parent->attached(this))
         return;
 
     R_ASSERT(E);

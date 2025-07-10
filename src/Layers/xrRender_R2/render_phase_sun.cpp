@@ -3,6 +3,8 @@
 #include "r2_R_sun_support.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void render_sun::init()
 {
     float fBias = -0.0000025f;
@@ -49,7 +51,7 @@ void render_sun::init()
         return;
 
     // pre-allocate contexts
-    for (int i = 0; i < R__NUM_SUN_CASCADES; ++i)
+    for (u32 i = 0; i < R__NUM_SUN_CASCADES; ++i)
     {
         contexts_ids[i] = RImplementation.alloc_context();
         VERIFY(contexts_ids[i] != R_dsgraph_structure::INVALID_CONTEXT_ID);
@@ -114,7 +116,7 @@ void render_sun::calculate()
     Fvector3 cull_COP[R__NUM_SUN_CASCADES];
     Fmatrix cull_xform[R__NUM_SUN_CASCADES];
 
-    for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
+    for (u32 cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
     {
         cull_planes.clear();
 
@@ -378,7 +380,7 @@ void render_sun::flush()
 
     if (RImplementation.o.support_rt_arrays)
     {
-        for (int cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
+        for (u32 cascade_ind = 0; cascade_ind < R__NUM_SUN_CASCADES; ++cascade_ind)
         {
             accumulate_cascade(cascade_ind);
         }
@@ -434,3 +436,4 @@ void render_sun::accumulate_cascade(u32 cascade_ind)
     dsgraph.cmd_list.submit(); // TODO: move into release (rename to submit?)
     RImplementation.release_context(dsgraph.context_id);
 }
+} // namespace xray::render::RENDER_NAMESPACE

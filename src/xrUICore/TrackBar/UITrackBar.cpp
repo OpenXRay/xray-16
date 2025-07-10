@@ -1,6 +1,7 @@
 #include "pch.hpp"
 #include "UITrackBar.h"
 #include "Buttons/UI3tButton.h"
+#include "Cursor/UICursor.h"
 #include "XML/UITextureMaster.h"
 #include "xrEngine/xr_input.h"
 
@@ -19,8 +20,6 @@ CUITrackBar::CUITrackBar()
     : m_b_invert(false), m_b_is_float(true), m_b_bound_already_set(false), m_f_val(0), m_f_max(1), m_f_min(0),
       m_f_step(0.01f), m_f_opt_backup_value(0)
 {
-    m_bFocusValuable = true;
-
     m_pSlider = xr_new<CUI3tButton>();
     AttachChild(m_pSlider);
     m_pSlider->SetAutoDelete(true);
@@ -31,6 +30,18 @@ CUITrackBar::CUITrackBar()
     m_static->SetAutoDelete(true);
 
     m_b_mouse_capturer = false;
+
+    // We already have input logic for the track bar
+    // Separately existing slider will slightly pollute
+    // the focus search
+    UI().Focus().UnregisterFocusable(m_pSlider);
+
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUITrackBar::~CUITrackBar()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
@@ -46,7 +57,7 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
             if (pInput->iGetAsyncKeyState(MOUSE_1))
                 UpdatePosRelativeToMouse();
         }
-        break;
+        return true;
     }
     case WINDOW_LBUTTON_DOWN:
     {
@@ -54,51 +65,74 @@ bool CUITrackBar::OnMouseAction(float x, float y, EUIMessages mouse_action)
         if (m_b_mouse_capturer)
             UpdatePosRelativeToMouse();
 
-        break;
+        return true;
     }
     case WINDOW_LBUTTON_UP:
     {
         m_b_mouse_capturer = false;
-        break;
+        return true;
     }
     case WINDOW_MOUSE_WHEEL_UP:
     {
-        if (m_b_is_float)
-        {
-            m_f_val -= GetInvert() ? -m_f_step : m_f_step;
-            clamp(m_f_val, m_f_min, m_f_max);
-        }
-        else
-        {
-            m_i_val -= GetInvert() ? -m_i_step : m_i_step;
-            clamp(m_i_val, m_i_min, m_i_max);
-        }
-        GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, NULL);
-        UpdatePos();
-        OnChangedOptValue();
-        break;
+        StepLeft();
+        return true;
     }
     case WINDOW_MOUSE_WHEEL_DOWN:
     {
-        if (m_b_is_float)
-        {
-            m_f_val += GetInvert() ? -m_f_step : m_f_step;
-            clamp(m_f_val, m_f_min, m_f_max);
-        }
-        else
-        {
-            m_i_val += GetInvert() ? -m_i_step : m_i_step;
-            clamp(m_i_val, m_i_min, m_i_max);
-        }
-        GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, NULL);
-        UpdatePos();
-        OnChangedOptValue();
-        break;
+        StepRight();
+        return true;
     }
-    default:
-        break;
-    };
-    return true;
+    } // switch (mouse_action)
+
+    return false;
+}
+
+bool CUITrackBar::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    CUIWindow::OnKeyboardAction(dik, keyboard_action);
+
+    if (CursorOverWindow() && keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_LEFT:
+            StepLeft();
+            UI().GetUICursor().WarpToWindow(m_pSlider);
+            return true;
+        case kUI_MOVE_RIGHT:
+            StepRight();
+            UI().GetUICursor().WarpToWindow(m_pSlider);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CUITrackBar::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
+{
+    CUIWindow::OnControllerAction(axis, state, controller_action);
+
+    if (CursorOverWindow() && IsBinded(kUI_MOVE, axis, EKeyContext::UI))
+    {
+        if (std::abs(state.x) > 0.5f && std::abs(state.y) < 0.2f)
+        {
+            if (state.x < 0)
+            {
+                StepLeft();
+                UI().GetUICursor().WarpToWindow(m_pSlider);
+                return true;
+            }
+            else
+            {
+                StepRight();
+                UI().GetUICursor().WarpToWindow(m_pSlider);
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void CUITrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
@@ -237,6 +271,40 @@ void CUITrackBar::Enable(bool status)
     m_pSlider->Enable(m_bIsEnabled);
 }
 
+void CUITrackBar::StepLeft()
+{
+    if (m_b_is_float)
+    {
+        m_f_val -= GetInvert() ? -m_f_step : m_f_step;
+        clamp(m_f_val, m_f_min, m_f_max);
+    }
+    else
+    {
+        m_i_val -= GetInvert() ? -m_i_step : m_i_step;
+        clamp(m_i_val, m_i_min, m_i_max);
+    }
+    GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, nullptr);
+    UpdatePos();
+    OnChangedOptValue();
+}
+
+void CUITrackBar::StepRight()
+{
+    if (m_b_is_float)
+    {
+        m_f_val += GetInvert() ? -m_f_step : m_f_step;
+        clamp(m_f_val, m_f_min, m_f_max);
+    }
+    else
+    {
+        m_i_val += GetInvert() ? -m_i_step : m_i_step;
+        clamp(m_i_val, m_i_min, m_i_max);
+    }
+    GetMessageTarget()->SendMessage(this, BUTTON_CLICKED, nullptr);
+    UpdatePos();
+    OnChangedOptValue();
+}
+
 void CUITrackBar::UpdatePosRelativeToMouse()
 {
     float _bkf = 0.0f;
@@ -336,11 +404,11 @@ void CUITrackBar::UpdatePos()
         string256 buff;
         if (m_b_is_float)
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%.1f" : m_static_format.c_str()), m_f_val);
+            xr_sprintf(buff, (m_static_format.empty() ? "%.1f" : m_static_format.c_str()), m_f_val);
         }
         else
         {
-            xr_sprintf(buff, (m_static_format == nullptr ? "%d" : m_static_format.c_str()), m_i_val);
+            xr_sprintf(buff, (m_static_format.empty() ? "%d" : m_static_format.c_str()), m_i_val);
         }
         m_static->TextItemControl()->SetTextST(buff);
     }

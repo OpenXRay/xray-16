@@ -1,9 +1,10 @@
 #include "pch.hpp"
 #include "UIFrameLineWnd.h"
 #include "XML/UITextureMaster.h"
+#include "xrEngine/editor_helper.h"
 
 CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name)
-    : CUIWindow(window_name), bHorizontal(true), m_bTextureVisible(false)
+    : CUIWindow(window_name), m_bTextureVisible(false), bHorizontal(true)
 {
     m_texture_color = color_argb(255, 255, 255, 255);
 }
@@ -169,6 +170,36 @@ void CUIFrameLineWnd::DrawElements()
         };
     }
     GEnv.UIRender->FlushPrimitive();
+}
+
+bool CUIFrameLineWnd::FillDebugTree(const CUIDebugState& debugState)
+{
+    return CUIWindow::FillDebugTree(debugState);
+}
+
+void CUIFrameLineWnd::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+
+    if (!ImGui::CollapsingHeader(CUIFrameLineWnd::GetDebugType()))
+        return;
+
+    ImGui::Checkbox("Texture visible", &m_bTextureVisible);
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Horizontal", &bHorizontal);
+
+    ImGui::BeginDisabled(true);
+    ImGui::LabelText("Texture name", "%s", dbg_tex_name.empty() ? "" : dbg_tex_name.c_str());
+    ImGui::EndDisabled();
+
+    xray::imgui::ColorEdit4("Texture color", m_texture_color);
+
+    ImGui::DragFloat4("Texture rect: back", reinterpret_cast<float*>(&m_tex_rect[flBack]));
+    ImGui::DragFloat4("Texture rect: first", reinterpret_cast<float*>(&m_tex_rect[flFirst]));
+    ImGui::DragFloat4("Texture rect: second", reinterpret_cast<float*>(&m_tex_rect[flSecond]));
+#endif
 }
 
 bool CUIFrameLineWnd::inc_pos(

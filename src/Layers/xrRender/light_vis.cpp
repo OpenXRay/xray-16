@@ -2,13 +2,15 @@
 #include "Layers/xrRender/light.h"
 #include "xrCDB/Intersect.hpp"
 
+ENGINE_API Fvector4 ps_ssfx_volumetric;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 const u32 delay_small_min = 1;
 const u32 delay_small_max = 3;
 const u32 delay_large_min = 10;
 const u32 delay_large_max = 20;
 const u32 cullfragments = 4;
-
-ENGINE_API Fvector4 ps_ssfx_volumetric;
 
 void light::vis_prepare(CBackend& cmd_list)
 {
@@ -95,3 +97,4 @@ void light::vis_update()
         vis.frame2test = frame + 1;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

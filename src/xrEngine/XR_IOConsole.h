@@ -1,75 +1,61 @@
 // XR_IOConsole.h: interface for the CConsole class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifndef XR_IOCONSOLE_H_INCLUDED
-#define XR_IOCONSOLE_H_INCLUDED
 
-#include "Include/xrRender/FactoryPtr.h"
-#include "Include/xrRender/UIShader.h"
-#include "xr_level_controller.h" // XXX: only for bindtypes_count, better to remove
+#pragma once
 
 // refs
-class ENGINE_API CGameFont;
 class ENGINE_API IConsole_Command;
 
-namespace text_editor
-{
-class line_editor;
-class line_edit_control;
-};
-
-struct TipString
-{
-    shared_str text;
-    int HL_start; // Highlight
-    int HL_finish;
-
-    TipString()
-    {
-        text._set("");
-        HL_start = 0;
-        HL_finish = 0;
-    }
-    TipString(shared_str const& tips_text, int start_pos, int finish_pos)
-    {
-        text._set(tips_text);
-        HL_start = start_pos;
-        HL_finish = finish_pos;
-    }
-    TipString(pcstr tips_text, int start_pos, int finish_pos)
-    {
-        text._set(tips_text);
-        HL_start = start_pos;
-        HL_finish = finish_pos;
-    }
-    TipString(shared_str const& tips_text)
-    {
-        text._set(tips_text);
-        HL_start = 0;
-        HL_finish = 0;
-    }
-    IC bool operator==(shared_str const& tips_text) { return (text == tips_text); }
-};
-
 class ENGINE_API CConsole :
-    public pureRender,
     public pureFrame,
+    public IInputReceiver,
     public IEventReceiver,
-    public CUIResetNotifier,
     public IUserConfigHandler
 {
 public:
+    struct TipString
+    {
+        shared_str text;
+        int HL_start; // Highlight
+        int HL_finish;
+
+        TipString()
+        {
+            text._set("");
+            HL_start = 0;
+            HL_finish = 0;
+        }
+        TipString(shared_str const& tips_text, int start_pos, int finish_pos)
+        {
+            text._set(tips_text);
+            HL_start = start_pos;
+            HL_finish = finish_pos;
+        }
+        TipString(pcstr tips_text, int start_pos, int finish_pos)
+        {
+            text._set(tips_text);
+            HL_start = start_pos;
+            HL_finish = finish_pos;
+        }
+        TipString(shared_str const& tips_text)
+        {
+            text._set(tips_text);
+            HL_start = 0;
+            HL_finish = 0;
+        }
+        bool operator==(shared_str const& tips_text) const { return text == tips_text; }
+    };
+
     struct str_pred
     {
-        IC bool operator()(const char* x, const char* y) const { return (xr_strcmp(x, y) < 0); }
+        bool operator()(const char* x, const char* y) const { return xr_strcmp(x, y) < 0; }
     };
-    typedef xr_map<pcstr, IConsole_Command*, str_pred> vecCMD;
-    typedef vecCMD::iterator vecCMD_IT;
-    typedef vecCMD::const_iterator vecCMD_CIT;
-    typedef fastdelegate::FastDelegate0<void> Callback;
-    typedef xr_vector<shared_str> vecHistory;
-    typedef xr_vector<shared_str> vecTips;
-    typedef xr_vector<TipString> vecTipsEx;
+
+    using vecCMD     = xr_map<pcstr, IConsole_Command*, str_pred>;
+    using vecHistory = xr_vector<shared_str>;
+    using vecTips    = xr_vector<shared_str>;
+    using vecTipsEx  = xr_vector<TipString>;
 
     enum
     {
@@ -82,19 +68,10 @@ public:
     };
 
 protected:
-    int scroll_delta{};
-
-    CGameFont* pFont{};
-    CGameFont* pFont2{};
-
-    FactoryPtr<IUIShader>* m_hShader_back{};
-
     bool m_disable_tips;
 
 private:
     EVENT eConsole;
-
-    int lastBindedKeys[bindtypes_count]{};
 
     vecHistory m_cmd_history;
     u32 m_cmd_history_max;
@@ -110,18 +87,28 @@ private:
     u32 m_prev_length_str{};
 
 public:
+    CConsole(const CConsole&) = delete;
+    CConsole(CConsole&&) = delete;
+
+    CConsole& operator=(const CConsole&) = delete;
+    CConsole& operator=(CConsole&&) = delete;
+
+public:
     CConsole();
-    virtual ~CConsole();
+    ~CConsole() override;
+
     virtual void Initialize();
     virtual void Destroy();
 
     virtual void OnDeviceInitialize() {}
 
-    virtual void OnRender();
-    virtual void OnFrame();
-    virtual void OnEvent(EVENT E, u64 P1, u64 P2) override;
+    void OnFrame() override;
+    void OnEvent(EVENT E, u64 P1, u64 P2) override;
 
-    void OnUIReset() override;
+    void IR_OnKeyboardPress(int key) override;
+    void IR_OnKeyboardRelease(int key) override;
+    void IR_OnKeyboardHold(int key) override;
+    void IR_OnTextInput(pcstr text) override;
 
     pcstr GetUserConfigFileName() override { return ConfigFile; }
 
@@ -151,10 +138,9 @@ public:
     IConsole_Command* GetCommand(pcstr cmd) const;
 
 protected:
-    text_editor::line_editor* m_editor;
-    text_editor::line_edit_control& ec();
+    char m_edit_string[CONSOLE_BUF_SIZE]{};
 
-    enum Console_mark // (int)=char
+    enum Console_mark : char // (int)=char
     {
         no_mark = ' ',
         mark0 = '~',
@@ -173,21 +159,9 @@ protected:
     };
 
     bool is_mark(Console_mark type);
-    u32 get_mark_color(Console_mark type);
-
-    void DrawBackgrounds(bool bGame);
-    void DrawRect(Frect const& r, u32 color);
-    void OutFont(pcstr text, float& pos_y);
-    void Register_callbacks();
+    static Fcolor get_mark_color(Console_mark type);
 
 protected:
-    void Prev_log();
-    void Next_log();
-    void Begin_log();
-    void End_log();
-
-    void Find_cmd();
-    void Find_cmd_back();
     void Prev_cmd();
     void Next_cmd();
     void Prev_tip();
@@ -198,12 +172,7 @@ protected:
     void PageUp_tips();
     void PageDown_tips();
 
-    void Execute_cmd();
-    void Show_cmd();
-    void Hide_cmd();
-    void Hide_cmd_esc();
-
-    void GamePause();
+    int InputCallback(ImGuiInputTextCallbackData* data);
 
 protected:
     void add_cmd_history(shared_str const& str);
@@ -222,10 +191,8 @@ protected:
     bool add_internal_cmds(pcstr in_str, vecTipsEx& out_v);
 
     void update_tips();
-    void select_for_filter(pcstr filter_str, vecTips& in_v, vecTipsEx& out_v);
+    void select_for_filter(pcstr filter_str, const vecTips& in_v, vecTipsEx& out_v);
 
 }; // class CConsole
 
 ENGINE_API extern CConsole* Console;
-
-#endif // XR_IOCONSOLE_H_INCLUDED

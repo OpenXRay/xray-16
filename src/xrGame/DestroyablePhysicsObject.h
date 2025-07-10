@@ -13,6 +13,7 @@ private:
     float m_fHealth;
     ref_sound m_destroy_sound;
     shared_str m_destroy_particles;
+    xr_vector<pcstr> hit_object_name;
 
 public:
     CDestroyablePhysicsObject();

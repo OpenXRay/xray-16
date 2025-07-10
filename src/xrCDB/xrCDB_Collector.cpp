@@ -289,7 +289,7 @@ void Collector::remove_duplicate_T()
     }
 }
 
-CollectorPacked::CollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces)
+CollectorPacked::CollectorPacked(const Fbox& bb, u32 apx_vertices, u32 apx_faces)
 {
     // Params
     VMscale.set(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMax.z - bb.vMin.z);
@@ -305,9 +305,9 @@ CollectorPacked::CollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces
     flags.reserve(apx_faces);
     int _size = (clpMX + 1) * (clpMY + 1) * (clpMZ + 1);
     int _average = (apx_vertices / _size) / 2;
-    for (int ix = 0; ix < clpMX + 1; ix++)
-        for (int iy = 0; iy < clpMY + 1; iy++)
-            for (int iz = 0; iz < clpMZ + 1; iz++)
+    for (u32 ix = 0; ix < clpMX + 1; ix++)
+        for (u32 iy = 0; iy < clpMY + 1; iy++)
+            for (u32 iz = 0; iz < clpMZ + 1; iz++)
                 VM[ix][iy][iz].reserve(_average);
 }
 
@@ -353,7 +353,7 @@ u32 CollectorPacked::VPack(const Fvector& V)
     clamp(iz, (u32)0, clpMZ);
 
     {
-        DWORDList* vl = &(VM[ix][iy][iz]);
+        auto* vl = &(VM[ix][iy][iz]);
         for (u32 it : *vl)
             if (verts[it].similar(V))
             {

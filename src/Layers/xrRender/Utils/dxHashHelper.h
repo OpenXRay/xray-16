@@ -1,7 +1,7 @@
-#ifndef dxHashHelper_included
-#define dxHashHelper_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxHashHelper
 {
 public:
@@ -30,5 +30,4 @@ IC void dxHashHelper::AddData(const void* P, u32 len)
         m_uiCrcValue = (m_uiCrcValue >> 8) ^ m_CrcTable[(m_uiCrcValue & 0xFF) ^ *buffer++];
     }
 }
-
-#endif //	dxHashHelper_included
+} // namespace xray::render::RENDER_NAMESPACE

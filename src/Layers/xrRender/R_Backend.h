@@ -1,5 +1,3 @@
-#ifndef r_backendH
-#define r_backendH
 #pragma once
 
 //#define RBackend_PGO
@@ -26,6 +24,8 @@
 
 #include "FVF.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 const u32 CULL_CCW = D3DCULL_CCW;
 const u32 CULL_CW = D3DCULL_CW;
 const u32 CULL_NONE = D3DCULL_NONE;
@@ -539,7 +539,7 @@ public:
     void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2);
     void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value);
 #ifdef DEBUG
-    void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt);
+    void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, u32 vcnt, u16* pIdx, int pcnt);
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
 
     void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
@@ -605,5 +605,4 @@ public:
 #pragma warning(pop)
 
 #define RCache RImplementation.get_imm_context().cmd_list
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

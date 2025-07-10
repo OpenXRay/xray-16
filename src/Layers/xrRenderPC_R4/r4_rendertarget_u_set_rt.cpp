@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, ID3DDepthStencilView* zb)
 {
     VERIFY(_1 || zb);
@@ -102,3 +104,4 @@ void CRenderTarget::u_setrt(CBackend& cmd_list, u32 W, u32 H, ID3DRenderTargetVi
     cmd_list.set_ZB(zb);
     //	RImplementation.rmNormal				();
 }
+} // namespace xray::render::RENDER_NAMESPACE

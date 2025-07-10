@@ -3,6 +3,8 @@
 
 #include "Blender_tree.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Tree::CBlender_Tree()
 {
     description.CLS = B_TREE;
@@ -202,3 +204,4 @@ void CBlender_Tree::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
+} // namespace xray::render::RENDER_NAMESPACE

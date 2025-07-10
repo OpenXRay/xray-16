@@ -125,9 +125,7 @@ void CCar::reload(LPCSTR section)
 
 void CCar::cb_Steer(CBoneInstance* B)
 {
-#ifdef DEBUG
     VERIFY2(fsimilar(DET(B->mTransform), 1.f, DET_CHECK_EPS), "Bones receive returns 0 matrix");
-#endif
     CCar* C = static_cast<CCar*>(B->callback_param());
     Fmatrix m;
 
@@ -464,7 +462,7 @@ void CCar::VisualUpdate(float fov)
         // 			OwnerActor()->Cameras().ApplyDevice();
         // 		}
         //
-        /*		if(CurrentGameUI())//
+        /*		if(CurrentGameUI())
                 {
                     CurrentGameUI()->UIMainIngameWnd->CarPanel().Show(true);
                     CurrentGameUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth());
@@ -835,18 +833,10 @@ void CCar::CreateSkeleton(CSE_Abstract* po)
         pK->CalculateBones(TRUE);
     }
     phys_shell_verify_object_model(*this);
-    /* Alundaio: p_build_shell
-    #pragma todo(" replace below by P_build_Shell or call inherited")
-    m_pPhysicsShell = P_create_Shell();
-    m_pPhysicsShell->build_FromKinematics(pK, &bone_map);
-    m_pPhysicsShell->set_PhysicsRefObject(this);
-    m_pPhysicsShell->mXFORM.set(XFORM());
-    m_pPhysicsShell->Activate(true);
-    m_pPhysicsShell->SetAirResistance(0.f, 0.f);
-    m_pPhysicsShell->SetPrefereExactIntegration();
-    */
+
     m_pPhysicsShell = P_build_Shell(this, false, &bone_map);
-    //-Alundaio
+    if (!bone_map.empty())
+        m_pPhysicsShell->SetPrefereExactIntegration();
 
     ApplySpawnIniToPhysicShell(&po->spawn_ini(), m_pPhysicsShell, false);
     ApplySpawnIniToPhysicShell(pK->LL_UserData(), m_pPhysicsShell, false);
@@ -1086,39 +1076,20 @@ void CCar::UpdatePower()
         i->UpdatePower();
 }
 
-void CCar::SteerRight()
+void CCar::Steer(float angle)
 {
     b_wheels_limited = true; // no need to limit wheels when stiring
     m_pPhysicsShell->Enable();
-    xr_vector<SWheelSteer>::iterator i, e;
-    i = m_steering_wheels.begin();
-    e = m_steering_wheels.end();
-    for (; i != e; ++i)
-        i->SteerRight();
-    e_state_steer = right;
-}
-void CCar::SteerLeft()
-{
-    b_wheels_limited = true; // no need to limit wheels when stiring
-    m_pPhysicsShell->Enable();
-    xr_vector<SWheelSteer>::iterator i, e;
-    i = m_steering_wheels.begin();
-    e = m_steering_wheels.end();
-    for (; i != e; ++i)
-        i->SteerLeft();
-    e_state_steer = left;
-}
 
-void CCar::SteerIdle()
-{
-    b_wheels_limited = false;
-    m_pPhysicsShell->Enable();
-    xr_vector<SWheelSteer>::iterator i, e;
-    i = m_steering_wheels.begin();
-    e = m_steering_wheels.end();
-    for (; i != e; ++i)
-        i->SteerIdle();
-    e_state_steer = idle;
+    for (auto& steering : m_steering_wheels)
+        steering.Steer(angle);
+
+    if (fis_zero(angle))
+        e_state_steer = idle;
+    else if (angle > 0)
+        e_state_steer = right;
+    else
+        e_state_steer = left;
 }
 
 void CCar::LimitWheels()
@@ -1165,10 +1136,10 @@ void CCar::PressRight()
     if (lsp)
     {
         if (!fwp)
-            SteerIdle();
+            Steer(0.0f);
     }
     else
-        SteerRight();
+        Steer(1.0f);
     rsp = true;
 }
 void CCar::PressLeft()
@@ -1176,10 +1147,10 @@ void CCar::PressLeft()
     if (rsp)
     {
         if (!fwp)
-            SteerIdle();
+            Steer(0.0f);
     }
     else
-        SteerLeft();
+        Steer(-1.0f);
     lsp = true;
 }
 void CCar::PressForward()
@@ -1237,17 +1208,17 @@ void CCar::DriveForward()
 void CCar::ReleaseRight()
 {
     if (lsp)
-        SteerLeft();
+        Steer(-1.0f);
     else
-        SteerIdle();
+        Steer(0.0f);
     rsp = false;
 }
 void CCar::ReleaseLeft()
 {
     if (rsp)
-        SteerRight();
+        Steer(1.0f);
     else
-        SteerIdle();
+        Steer(0.0f);
     lsp = false;
 }
 void CCar::ReleaseForward()

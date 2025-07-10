@@ -8,6 +8,8 @@ class XRUICORE_API CUITrackBar final : public CUI_IB_FrameLineWnd, public CUIOpt
 {
 public:
     CUITrackBar();
+    ~CUITrackBar() override;
+
     // CUIOptionsItem
     virtual void SetCurrentOptValue(); // opt->current
     virtual void SaveBackUpOptValue(); // current->backup
@@ -18,6 +20,8 @@ public:
     virtual void Draw();
     virtual void Update();
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
+    bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action) override;
     virtual void OnMessage(LPCSTR message);
     // CUIWindow
     void InitTrackBar(Fvector2 pos, Fvector2 size);
@@ -33,6 +37,9 @@ public:
     float GetFValue() { return m_f_val; }
     void SetOptIBounds(int imin, int imax);
     void SetOptFBounds(float fmin, float fmax);
+
+    void StepLeft();
+    void StepRight();
 
     pcstr GetDebugType() override { return "CUITrackBar"; }
 

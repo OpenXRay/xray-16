@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void D3DXRenderBase::CreateQuadIB()
 {
     ZoneScoped;
@@ -30,3 +32,4 @@ void D3DXRenderBase::CreateQuadIB()
     }
     QuadIB.Unmap(true); // upload index data
 }
+} // namespace xray::render::RENDER_NAMESPACE

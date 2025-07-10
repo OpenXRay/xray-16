@@ -25,17 +25,38 @@
 
 void CMovementManager::show_game_path_info()
 {
-    Msg("! Cannot build GAME path! (object %s)", *object().cName());
-    Msg("! CURRENT LEVEL : %s", *Level().name());
-    Fvector temp = ai().game_graph().vertex(object().ai_location().game_vertex_id())->level_point();
+    const auto& game_graph = ai().game_graph();
+
+    Msg("! Cannot build GAME path! (object %s)", object().cName().c_str());
+
+    Msg("! CURRENT LEVEL : %s", Level().name().c_str());
+
+    Fvector temp = game_graph.vertex(object().ai_location().game_vertex_id())->level_point();
     Msg("! CURRENT game point position : [%f][%f][%f]", VPUSH(temp));
-    const GameGraph::CGameVertex* vertex = ai().game_graph().vertex(game_dest_vertex_id());
-    Msg("! TARGET LEVEL : %s", *ai().game_graph().header().level(vertex->level_id()).name());
-    temp = vertex->level_point();
-    Msg("! TARGET  game point position : [%f][%f][%f]", VPUSH(temp));
-    const u8* target_vertex_type = ai().game_graph().vertex(game_dest_vertex_id())->vertex_type();
-    Msg("! Target point mask [%d][%d][%d][%d]", target_vertex_type[0], target_vertex_type[1], target_vertex_type[2],
-        target_vertex_type[3]);
+
+    const auto game_dst_vertex_id = game_dest_vertex_id();
+
+    if (game_graph.valid_vertex_id(game_dst_vertex_id))
+    {
+        const GameGraph::CGameVertex* vertex = game_graph.vertex(game_dst_vertex_id);
+
+        Msg("! TARGET LEVEL : %s", game_graph.header().level(vertex->level_id()).name().c_str());
+
+        temp = vertex->level_point();
+        Msg("! TARGET  game point position : [%f][%f][%f]", VPUSH(temp));
+
+        const u8* target_vertex_type = vertex->vertex_type();
+        Msg("! Target point mask [%d][%d][%d][%d]", target_vertex_type[0], target_vertex_type[1], target_vertex_type[2],
+            target_vertex_type[3]);
+    }
+    else
+    {
+        Log("! Game destination vertex id is invalid! No info about the target.");
+        Log("! TARGET LEVEL :");
+        Log("! TARGET  game point position :");
+        Log("! TARGET LEVEL :");
+        Log("! Target point mask [][][][]");
+    }
 
     Msg("! Object masks (%d) :", m_location_manager->vertex_types().size());
 

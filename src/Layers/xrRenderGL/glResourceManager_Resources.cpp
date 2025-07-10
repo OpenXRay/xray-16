@@ -8,6 +8,8 @@
 #include "Layers/xrRender/BufferUtils.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
@@ -134,7 +136,9 @@ void CResourceManager::_DeletePP(const SPP* pp)
         return;
     }
 
+#ifndef MASTER_GOLD
     Msg("! ERROR: Failed to find program pipeline '%s'", pp->cName.c_str());
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -219,4 +223,4 @@ SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); 
 void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 
 //--------------------------------------------------------------------------------------------------------------
-
+} // namespace xray::render::RENDER_NAMESPACE

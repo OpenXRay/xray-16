@@ -9,6 +9,8 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //--------------------------------------------------------------------------------------------------------------
 SPass* CResourceManager::_CreatePass(const SPass& proto)
 {
@@ -194,7 +196,9 @@ void CResourceManager::_DeleteConstantBuffer(u32 context_id, const dx11ConstantB
         return;
     if (reclaim(v_constant_buffer[context_id], pBuffer))
         return;
+#ifndef MASTER_GOLD
     Msg("! ERROR: Failed to find compiled constant buffer");
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -223,5 +227,8 @@ void CResourceManager::_DeleteInputSignature(const SInputSignature* pSignature)
         return;
     if (reclaim(v_input_signature, pSignature))
         return;
+#ifndef MASTER_GOLD
     Msg("! ERROR: Failed to find input signature");
+#endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

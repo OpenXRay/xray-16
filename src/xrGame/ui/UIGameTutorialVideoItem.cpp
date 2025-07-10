@@ -73,7 +73,7 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
     bool bFullScreen = (1 == xml->ReadAttribInt("video_wnd", 0, "fullscreen", 0));
     if (!bFullScreen)
     {
-        m_wnd->SetWndPos(Fvector2().set(512.0f, 384.0f));
+        m_wnd->SetWndPos({ UI_BASE_WIDTH / 2.0f, UI_BASE_HEIGHT / 2.0f });
         m_wnd->SetAlignment(waCenter);
         Frect texture_coords = m_wnd->GetUIStaticItem().GetTextureRect();
 

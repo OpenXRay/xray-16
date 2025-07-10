@@ -62,6 +62,15 @@ private:
     float camRelaxSpeed;
     float camMaxAngle;
 
+	bool m_firing_disabled{};
+	bool m_overheat_enabled{};
+	float m_overheat_value{};
+	float m_overheat_time_quant{};
+	float m_overheat_decr_quant{};
+	float m_overheat_threshold{};
+	shared_str m_overheat_particles;
+	CParticlesObject* p_overheat{};
+
 protected:
     void UpdateBarrelDir();
     virtual const Fvector& get_CurrentFirePoint();
@@ -88,9 +97,9 @@ public:
     virtual void OnKeyboardRelease(int dik);
     virtual void OnKeyboardHold(int dik);
 
-    void OnControllerPress(int cmd, float x, float y) override;
-    void OnControllerHold(int cmd, float x, float y) override;
-    void OnControllerRelease(int cmd, float x, float y) override;
+    void OnControllerPress(int cmd, const ControllerAxisState& state) override;
+    void OnControllerHold(int cmd, const ControllerAxisState& state) override;
+    void OnControllerRelease(int cmd, const ControllerAxisState& state) override;
 
     void OnControllerAttitudeChange(Fvector change) override;
 

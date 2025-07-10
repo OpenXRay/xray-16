@@ -2,6 +2,8 @@
 
 #include "../xrRender/SH_Texture.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 typedef struct
 {
     BOOL DepthEnable;
@@ -50,3 +52,4 @@ public:
     void UpdateRenderState(u32 name, u32 value);
     void UpdateSamplerState(u32 stage, u32 name, u32 value);
 };
+} // namespace xray::render::RENDER_NAMESPACE

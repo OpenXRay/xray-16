@@ -1,5 +1,12 @@
 #include "stdafx.h"
 
+#if defined(USE_DX11)
+extern ENGINE_API Fvector4 ps_ssfx_ssr;
+extern ENGINE_API Fvector4 ps_ssfx_water;
+#endif
+
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_blur()
 {
     //Get common data
@@ -149,8 +156,6 @@ void CRenderTarget::phase_blur()
 };
 
 #if defined(USE_DX11)
-extern ENGINE_API Fvector4 ps_ssfx_ssr;
-extern ENGINE_API Fvector4 ps_ssfx_water;
 void CRenderTarget::phase_ssfx_ssr()
 {
     //Constants
@@ -531,3 +536,4 @@ void CRenderTarget::phase_ssfx_water_waves()
 };
 
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

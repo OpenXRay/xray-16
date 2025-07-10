@@ -7,6 +7,8 @@
 
 #include <d3dx9.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 constexpr cpcstr NOT_EXISTING_TEXTURE = "ed" DELIMITER "ed_not_existing_texture";
 
 void fix_texture_name(pstr fn)
@@ -466,3 +468,4 @@ _BUMP_from_base:
     return T_normal_1C;
 }
 }
+} // namespace xray::render::RENDER_NAMESPACE

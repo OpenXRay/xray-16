@@ -3,6 +3,8 @@
 
 #include "blender_luminance.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_luminance::CBlender_luminance() { description.CLS = 0; }
 CBlender_luminance::~CBlender_luminance() {}
 void CBlender_luminance::Compile(CBlender_Compile& C)
@@ -79,3 +81,4 @@ void CBlender_luminance::Compile(CBlender_Compile& C)
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

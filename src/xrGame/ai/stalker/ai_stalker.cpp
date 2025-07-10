@@ -292,17 +292,10 @@ void CAI_Stalker::reload(LPCSTR section)
     brain().setup(this);
 
     CCustomMonster::reload(section);
-    if (!already_dead())
-        CStepManager::reload(section);
-
-    //	if (!already_dead())
+    CStepManager::reload(section);
     CObjectHandler::reload(section);
-
-    if (!already_dead())
-        sight().reload(section);
-
-    if (!already_dead())
-        movement().reload(section);
+    sight().reload(section);
+    movement().reload(section);
 
     m_disp_walk_stand = pSettings->r_float(section, "disp_walk_stand");
     m_disp_walk_crouch = pSettings->r_float(section, "disp_walk_crouch");
@@ -1199,9 +1192,6 @@ void CAI_Stalker::UpdateCamera()
 
 bool CAI_Stalker::can_attach(const CInventoryItem* inventory_item) const
 {
-    if (already_dead())
-        return (false);
-
     return (CObjectHandler::can_attach(inventory_item));
 }
 

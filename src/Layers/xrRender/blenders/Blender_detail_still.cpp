@@ -3,6 +3,8 @@
 
 #include "Blender_detail_still.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Detail_Still::CBlender_Detail_Still()
 {
     description.CLS = B_DETAIL;
@@ -120,3 +122,4 @@ void CBlender_Detail_Still::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
+} // namespace xray::render::RENDER_NAMESPACE

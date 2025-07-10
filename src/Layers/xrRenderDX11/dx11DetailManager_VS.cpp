@@ -4,6 +4,8 @@
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace detail_manager
 {
 extern const int quant;
@@ -186,17 +188,11 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
 
                 u32 dwBatch = 0;
 
-                xr_vector<SlotItemVec*>::iterator _vI = vis.begin();
-                xr_vector<SlotItemVec*>::iterator _vE = vis.end();
-                for (; _vI != _vE; ++_vI)
+                for (SlotItemVec* items : vis)
                 {
-                    SlotItemVec* items = *_vI;
-
-                    auto _iI = items->begin();
-                    auto _iE = items->end();
-                    for (; _iI != _iE; ++_iI)
+                    for (SlotItem* item : *items)
                     {
-                        SlotItem& Instance = **_iI;
+                        SlotItem& Instance = *item;
                         u32 base = dwBatch * 4;
 
                         // Build matrix ( 3x4 matrix, last row - color )
@@ -269,3 +265,4 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         iOffset += hw_BatchSize * Object.number_indices;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

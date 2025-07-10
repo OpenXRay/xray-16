@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx11State;
 
 using D3D_SAMPLER_DESC              = D3D11_SAMPLER_DESC;
@@ -276,3 +278,4 @@ using HostBufferHandle      = void*;
 
 using VertexElement         = D3DVERTEXELEMENT9;
 using InputElementDesc      = D3D11_INPUT_ELEMENT_DESC;
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.23)
 
 message(STATUS "CMAKE_VERSION: ${CMAKE_VERSION}")
 
@@ -171,6 +171,9 @@ if (USE_ADDRESS_SANITIZER)
 
     add_link_options(
         $<$<CXX_COMPILER_ID:Clang>:-shared-libasan>
+        -fsanitize=address
+        -fsanitize=leak
+        -fsanitize=undefined
     )
 endif()
 

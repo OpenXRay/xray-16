@@ -70,14 +70,6 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET xrEngine
-    NAME "Engine\\text_editor\\line_editor"
-    FILES
-    line_editor.cpp
-    line_editor.h
-)
-
-target_sources_grouped(
-    TARGET xrEngine
     NAME "Engine\\text_editor\\line_editor_control"
     FILES
     line_edit_control.cpp

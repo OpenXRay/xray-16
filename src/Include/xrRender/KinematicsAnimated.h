@@ -32,10 +32,11 @@ struct SKeyTable
     SKeyTable() { std::fill_n(chanel_blend_conts, MAX_CHANNELS, 0); }
 };
 
-class IKinematicsAnimated
+class XR_NOVTABLE IKinematicsAnimated
 {
 public:
-    virtual ~IKinematicsAnimated() { ; }
+    virtual ~IKinematicsAnimated() = 0;
+
     // Calculation
 public:
     virtual void OnCalculateBones() = 0;
@@ -120,5 +121,7 @@ public:
     //virtual const BlendSVec& blend_cycle(const u32& bone_part_id) const = 0;
     //#endif
 };
+
+inline IKinematicsAnimated::~IKinematicsAnimated() = default;
 
 #endif // KinematicsAnimated_included

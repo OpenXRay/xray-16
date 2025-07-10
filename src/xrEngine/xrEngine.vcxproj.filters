@@ -112,9 +112,6 @@
     <Filter Include="Engine\text_editor">
       <UniqueIdentifier>{0f8148ae-26b3-4084-84f0-9711e72596b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\text_editor\line_editor">
-      <UniqueIdentifier>{a561951d-df21-4744-bd9e-0bc69e0dfa42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\text_editor\line_editor_control">
       <UniqueIdentifier>{982d1115-af31-4164-88bf-d50bb3a7cad1}</UniqueIdentifier>
     </Filter>
@@ -320,9 +317,6 @@
     </ClInclude>
     <ClInclude Include="perlin.h">
       <Filter>Engine\Noise</Filter>
-    </ClInclude>
-    <ClInclude Include="line_editor.h">
-      <Filter>Engine\text_editor\line_editor</Filter>
     </ClInclude>
     <ClInclude Include="line_edit_control.h">
       <Filter>Engine\text_editor\line_editor_control</Filter>
@@ -547,9 +541,6 @@
     </ClCompile>
     <ClCompile Include="perlin.cpp">
       <Filter>Engine\Noise</Filter>
-    </ClCompile>
-    <ClCompile Include="line_editor.cpp">
-      <Filter>Engine\text_editor\line_editor</Filter>
     </ClCompile>
     <ClCompile Include="line_edit_control.cpp">
       <Filter>Engine\text_editor\line_editor_control</Filter>

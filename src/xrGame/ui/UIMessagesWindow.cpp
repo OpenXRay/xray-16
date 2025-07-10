@@ -101,7 +101,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
     }
 }
 
-void CUIMessagesWindow::AddIconedPdaMessage(GAME_NEWS_DATA* news)
+void CUIMessagesWindow::AddIconedPdaMessage(const GAME_NEWS_DATA* news)
 {
     CUIPdaMsgListItem* pItem = m_pGameLog->AddPdaMessage();
 

@@ -5,6 +5,11 @@
 #include "xrEngine/GameFont.h"
 #include "xrCore/Text/StringConversion.hpp"
 
+extern ENGINE_API bool g_bRendering;
+extern ENGINE_API Fvector2 g_current_font_scale;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 dxFontRender::~dxFontRender()
 {
     pShader.destroy();
@@ -16,9 +21,6 @@ void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
     pShader.create(cShader, cTexture);
     pGeom.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 }
-
-extern ENGINE_API bool g_bRendering;
-extern ENGINE_API Fvector2 g_current_font_scale;
 
 void dxFontRender::OnRender(CGameFont& owner)
 {
@@ -205,3 +207,4 @@ inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL
             X += owner.fXStep;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -15,7 +15,7 @@ CUIListItemEx::CUIListItemEx() : m_dwSelectionColor(color_argb(200, 95, 82, 74))
 {
     //.	InitTexture("ui\\hud_map_point");
     //.	SetStretchTexture(true);
-    inherited::SetColor(color_argb(0, 0, 0, 0));
+    inherited::SetTextureColor(color_argb(0, 0, 0, 0));
 }
 
 CUIListItemEx::~CUIListItemEx()
@@ -29,11 +29,11 @@ void CUIListItemEx::SendMessage(CUIWindow* /*pWnd*/, s16 msg, void* /*pData*/)
     switch (msg)
     {
     case LIST_ITEM_SELECT:
-        this->SetColor(m_dwSelectionColor);
+        this->SetTextureColor(m_dwSelectionColor);
         //this->Draw();
         break;
     case LIST_ITEM_UNSELECT:
-        this->SetColor(color_argb(0, 0, 0, 0));
+        this->SetTextureColor(color_argb(0, 0, 0, 0));
         //this->Draw();
         break;
     }

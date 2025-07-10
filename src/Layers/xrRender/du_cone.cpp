@@ -4,6 +4,8 @@
 
 #include "du_cone.h"
 //---------------------------------------------------------------------------
+namespace xray::render::RENDER_NAMESPACE
+{
 //#pragma package(smart_init)
 Fvector du_cone_vertices[DU_CONE_NUMVERTEX] = {{0.0000f, 0.0000f, 0.0000f}, {0.5000f, 0.0000f, 1.0000f},
     {0.4619f, 0.1913f, 1.0000f}, {0.3536f, 0.3536f, 1.0000f}, {0.1913f, 0.4619f, 1.0000f}, {-0.0000f, 0.5000f, 1.0000f},
@@ -38,3 +40,4 @@ u16 du_cone_lines[DU_CONE_NUMLINES * 2] =
     // cape
     1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 1,
 };
+} // namespace xray::render::RENDER_NAMESPACE

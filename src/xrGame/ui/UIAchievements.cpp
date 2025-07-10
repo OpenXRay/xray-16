@@ -10,9 +10,16 @@
 #include "xrScriptEngine/script_engine.hpp"
 
 CUIAchievements::CUIAchievements(CUIScrollView* parent)
-    : CUIWindow(CUIAchievements::GetDebugType()), m_parent(parent) {}
+    : CUIWindow(CUIAchievements::GetDebugType()), m_parent(parent)
+{
+    UI().Focus().RegisterFocusable(this);
+}
 
-CUIAchievements::~CUIAchievements() { xr_delete(m_hint); }
+CUIAchievements::~CUIAchievements()
+{
+    xr_delete(m_hint);
+    UI().Focus().UnregisterFocusable(this);
+}
 
 void CUIAchievements::init_from_xml(CUIXml& xml)
 {

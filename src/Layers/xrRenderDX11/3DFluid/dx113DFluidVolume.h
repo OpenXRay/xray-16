@@ -1,10 +1,10 @@
-#ifndef dx113DFluidVolume_included
-#define dx113DFluidVolume_included
 #pragma once
 
 #include "dx113DFluidData.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx113DFluidVolume : public dxRender_Visual
 {
 public:
@@ -22,5 +22,4 @@ private:
 
     dx113DFluidData m_FluidData;
 };
-
-#endif //	dx113DFluidVolume_included
+} // namespace xray::render::RENDER_NAMESPACE

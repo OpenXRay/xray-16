@@ -73,6 +73,18 @@ struct CUIDialogWndExWrapperBase final : public CUIDialogWndEx, public luabind::
         return ptr->self_type::inherited::Dispatch(cmd, param);
     }
 
+    bool NeedCursor() const override
+    {
+        if (luabind::call_member<bool>(this, "NeedCursor"))
+            return true;
+        return inherited::NeedCursor();
+    }
+
+    static bool NeedCursor_static(inherited* ptr)
+    {
+        return ptr->self_type::inherited::NeedCursor();
+    }
+
     pcstr GetDebugType() override { return "CUIScriptWnd"; }
 
     bool FillDebugTree(const CUIDebugState& debugState) override
@@ -221,6 +233,8 @@ SCRIPT_EXPORT(CUIDialogWndEx, (CUIDialogWnd, IFactoryObject),
             .def("Update",          &BaseType::Update, &WrapType::Update_static)
             .def("Dispatch",        &BaseType::Dispatch, &WrapType::Dispatch_static)
             .def("Load",            &BaseType::Load)
+
+            .def("NeedCursor",      &BaseType::NeedCursor, &WrapType::NeedCursor_static)
 
             .def("GetButton",       &BaseType::GetControl<CUIButton>)
             .def("GetMessageBox",   &BaseType::GetControl<CUIMessageBox>)

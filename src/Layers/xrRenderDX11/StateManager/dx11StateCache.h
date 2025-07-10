@@ -1,7 +1,7 @@
-#ifndef dx11StateCache_included
-#define dx11StateCache_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 template <class IDeviceState, class StateDecs>
 class dx11StateCache
 {
@@ -41,7 +41,6 @@ private:
 extern dx11StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC> RSManager;
 extern dx11StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC> DSSManager;
 extern dx11StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
+} // namespace xray::render::RENDER_NAMESPACE
 
 #include "dx11StateCacheImpl.h"
-
-#endif //	dx11StateCache_included

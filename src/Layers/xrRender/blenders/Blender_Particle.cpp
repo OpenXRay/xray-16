@@ -5,6 +5,8 @@
 
 #define oBlendCount 6
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Particle::CBlender_Particle()
 {
     description.CLS = B_PARTICLE;
@@ -90,3 +92,4 @@ void CBlender_Particle::Compile(CBlender_Compile& C)
     C.r_Sampler("s_base", C.L_textures[0], false, oClamp.value ? D3DTADDRESS_CLAMP : D3DTADDRESS_WRAP);
     C.r_End();
 }
+} // namespace xray::render::RENDER_NAMESPACE

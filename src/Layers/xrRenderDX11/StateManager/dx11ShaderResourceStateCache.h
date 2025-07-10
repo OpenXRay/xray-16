@@ -1,7 +1,7 @@
-#ifndef dx11ShaderResourceStateCache_included
-#define dx11ShaderResourceStateCache_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx11ShaderResourceStateCache
 {
 public:
@@ -51,5 +51,4 @@ private:
     bool m_bUpdateDSViews;
     bool m_bUpdateCSViews;
 };
-
-#endif //	dx11ShaderResourceStateCache_included
+} // namespace xray::render::RENDER_NAMESPACE

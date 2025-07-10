@@ -71,9 +71,6 @@ void CStalkerAnimationManager::reload()
     VERIFY((m_crouch_state_config == 0) || (m_crouch_state_config == 1) || (m_crouch_state_config == -1));
     m_crouch_state = m_crouch_state_config;
 
-    if (object().already_dead())
-        return;
-
     m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_visual);
     VERIFY(m_skeleton_animated);
 

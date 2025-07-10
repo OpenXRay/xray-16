@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API R_constants
 {
 public:
@@ -174,3 +176,4 @@ template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_GeometryB
 template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_ComputeBuffer>(R_constant* C) const;
 template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_HullBuffer>(R_constant* C) const;
 template<> dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_DomainBuffer>(R_constant* C) const;
+} // namespace xray::render::RENDER_NAMESPACE

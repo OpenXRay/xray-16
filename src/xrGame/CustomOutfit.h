@@ -21,9 +21,13 @@ public:
     //коэффициенты на которые домножается хит
     //при соответствующем типе воздействия
     //если на персонаже надет костюм
-    float GetHitTypeProtection(ALife::EHitType hit_type, s16 element);
-    float GetDefHitTypeProtection(ALife::EHitType hit_type);
-    float GetBoneArmor(s16 element);
+    [[nodiscard]] float GetHitTypeProtection(ALife::EHitType hit_type, s16 element) const;
+    [[nodiscard]] float GetDefHitTypeProtection(ALife::EHitType hit_type) const;
+    [[nodiscard]] float GetBoneArmor(s16 element) const;
+
+    //коэффициент на который домножается потеря силы
+    //если на персонаже надет костюм
+    [[nodiscard]] float GetPowerLoss() const;
 
     float HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type);
 
@@ -32,7 +36,7 @@ public:
     virtual void OnH_A_Chield();
 
 protected:
-    HitImmunity::HitTypeSVec m_HitTypeProtection;
+    mutable HitImmunity::HitTypeSVec m_HitTypeProtection;
 
     shared_str m_ActorVisual;
     shared_str m_full_icon_name;

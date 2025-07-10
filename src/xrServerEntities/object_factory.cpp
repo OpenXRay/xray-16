@@ -14,9 +14,14 @@ CObjectFactory* g_object_factory = nullptr;
 
 CObjectFactory::CObjectFactory()
 {
+    ZoneScoped;
     m_actual = false;
     register_classes();
 }
 
 CObjectFactory::~CObjectFactory() { delete_data(m_clsids); }
-void CObjectFactory::init() { register_script_classes(); }
+void CObjectFactory::init()
+{
+    ZoneScoped;
+    register_script_classes();
+}

@@ -8,6 +8,8 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::RenderMenu()
 {
 #if defined(USE_DX11)
@@ -341,6 +343,7 @@ void CRender::Render()
     }
 
     r_rain.sync();
+    RCache.ClearRT(Target->rt_Accumulator, {});
 
     // Directional light - fucking sun
     {
@@ -428,3 +431,4 @@ void CRender::BeforeWorldRender() {}
 
 // После рендера мира и пост-эффектов --#SM+#--
 void CRender::AfterWorldRender() {}
+} // namespace xray::render::RENDER_NAMESPACE

@@ -22,7 +22,7 @@ struct Fobb;
 // 100 ms = 10 fps
 #define UCalc_Interval (u32(100))
 
-class IKinematics
+class XR_NOVTABLE IKinematics
 {
 public:
     typedef xr_vector<std::pair<shared_str, u16>> accel;

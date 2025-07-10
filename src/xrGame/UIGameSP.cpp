@@ -125,6 +125,24 @@ bool CUIGameSP::IR_UIOnKeyboardPress(int dik)
             ShowPdaMenu();
         break;
     }
+    case kMAP:
+    {
+        if (!pActor->inventory_disabled())
+        {
+            PdaMenu->Show_MapWnd(true);
+            ShowPdaMenu();
+        }
+        break;
+    }
+    case kCONTACTS:
+    {
+        if (!pActor->inventory_disabled())
+        {
+            PdaMenu->Show_ContactsWnd(true);
+            ShowPdaMenu();
+        }
+        break;
+    }
     case kINVENTORY:
     {
         if (!pActor->inventory_disabled())

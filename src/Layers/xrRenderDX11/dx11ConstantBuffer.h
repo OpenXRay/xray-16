@@ -1,7 +1,7 @@
-#ifndef dx11ConstantBuffer_included
-#define dx11ConstantBuffer_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 struct R_constant;
 struct R_constant_load;
 
@@ -52,5 +52,4 @@ private:
 };
 
 typedef resptr_core<dx11ConstantBuffer, resptr_base<dx11ConstantBuffer>> ref_cbuffer;
-
-#endif //	dx11ConstantBuffer_included
+} // namespace xray::render::RENDER_NAMESPACE

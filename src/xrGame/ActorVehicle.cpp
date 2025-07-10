@@ -29,6 +29,10 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
     if(!vehicle || m_holder)
         return;
 
+	CCar* car = smart_cast<CCar*>(vehicle);
+	if (!car)
+		return;
+
     //PickupModeOff();
     m_holder=vehicle;
 
@@ -44,7 +48,6 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
     }
 
     // temp play animation
-    CCar* car = smart_cast<CCar*>(m_holder);
     u16 anim_type = car->DriverAnimationType();
     SVehicleAnimCollection& anims = m_vehicle_anims->m_vehicles_type_collections[anim_type];
     V->PlayCycle(anims.idles[0], false);

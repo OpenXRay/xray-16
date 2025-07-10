@@ -2,6 +2,8 @@
 
 #include "xrCore/Containers/FixedMap.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dxRender_Visual;
 
 namespace R_dsgraph
@@ -80,3 +82,4 @@ using mapLOD_T    = xr_fixed_map<float, _LodItem>;
 using HUDMask_T = xr_fixed_map<float, _MatrixItemSSFX>;
 using mapWater_T = xr_fixed_map<float, _MatrixItemSSFX>;
 }
+} // namespace xray::render::RENDER_NAMESPACE

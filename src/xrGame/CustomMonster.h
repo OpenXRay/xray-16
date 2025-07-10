@@ -252,12 +252,7 @@ public:
     virtual bool should_wait_to_use_corspe_visual() { return true; }
     virtual LPCSTR visual_name(CSE_Abstract* server_entity);
 
-private:
-    bool m_already_dead;
-
 public:
-    IC const bool& already_dead() const { return (m_already_dead); };
-    virtual bool use_simplified_visual() const { return false; } //(already_dead());};
     virtual void on_enemy_change(const CEntityAlive* enemy);
     virtual CVisualMemoryManager* visual_memory() const;
 

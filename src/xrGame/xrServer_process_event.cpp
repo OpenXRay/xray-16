@@ -91,17 +91,13 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     case GE_OWNERSHIP_TAKE:
     {
         Process_event_ownership(P, sender, timestamp, destination);
-#ifdef DEBUG
         VERIFY(verify_entities());
-#endif
     }
     break;
     case GE_OWNERSHIP_TAKE_MP_FORCED:
     {
         Process_event_ownership(P, sender, timestamp, destination, TRUE);
-#ifdef DEBUG
         VERIFY(verify_entities());
-#endif
     }
     break;
     case GE_TRADE_SELL:
@@ -109,17 +105,13 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     case GE_LAUNCH_ROCKET:
     {
         Process_event_reject(P, sender, timestamp, destination, P.r_u16());
-#ifdef DEBUG
         VERIFY(verify_entities());
-#endif
     }
     break;
     case GE_DESTROY:
     {
         Process_event_destroy(P, sender, timestamp, destination, NULL);
-#ifdef DEBUG
         VERIFY(verify_entities());
-#endif
     }
     break;
     case GE_TRANSFER_AMMO:
@@ -141,9 +133,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
 
         // Perfrom real destroy
         entity_Destroy(e_entity);
-#ifdef DEBUG
         VERIFY(verify_entities());
-#endif
     }
     break;
     case GE_HIT:
@@ -264,9 +254,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         }
         //////////////////////////////////////////////////////////////////////////
 
-#ifdef DEBUG
         VERIFY(verify_entities());
-#endif
     }
     break;
     case GE_ADDON_ATTACH:

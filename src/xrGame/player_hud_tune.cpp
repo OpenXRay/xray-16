@@ -153,29 +153,29 @@ void CHudTuner::on_tool_frame()
                 {
                     ImGui::LogToClipboard();
                     xr_sprintf(selectable, "[%s]\n", m_sect_name.c_str());
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "hands_position%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_attach[0].x, new_measures.m_hands_attach[0].y, new_measures.m_hands_attach[0].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "hands_orientation%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_attach[1].x, new_measures.m_hands_attach[1].y, new_measures.m_hands_attach[1].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "aim_hud_offset_pos%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[0][1].x, new_measures.m_hands_offset[0][1].y, new_measures.m_hands_offset[0][1].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "aim_hud_offset_rot%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[1][1].x, new_measures.m_hands_offset[1][1].y, new_measures.m_hands_offset[1][1].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "gl_hud_offset_pos%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[0][2].x, new_measures.m_hands_offset[0][2].y, new_measures.m_hands_offset[0][2].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "gl_hud_offset_rot%s = %f,%f,%f\n", (is_16x9) ? "_16x9" : "", new_measures.m_hands_offset[1][2].x, new_measures.m_hands_offset[1][2].y, new_measures.m_hands_offset[1][2].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "item_position = %f,%f,%f\n", new_measures.m_item_attach[0].x, new_measures.m_item_attach[0].y, new_measures.m_item_attach[0].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "item_orientation = %f,%f,%f\n", new_measures.m_item_attach[1].x, new_measures.m_item_attach[1].y, new_measures.m_item_attach[1].z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "fire_point = %f,%f,%f\n", new_measures.m_fire_point_offset.x, new_measures.m_fire_point_offset.y, new_measures.m_fire_point_offset.z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "fire_point = %f,%f,%f\n", new_measures.m_fire_point2_offset.x, new_measures.m_fire_point2_offset.y, new_measures.m_fire_point2_offset.z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     xr_sprintf(selectable, "shell_point = %f,%f,%f\n", new_measures.m_shell_point_offset.x, new_measures.m_shell_point_offset.y, new_measures.m_shell_point_offset.z);
-                    ImGui::LogText(selectable);
+                    ImGui::LogText("%s", selectable);
                     ImGui::LogFinish();
                 }
 

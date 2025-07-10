@@ -432,9 +432,9 @@ udword AABBTree::ComputeDepth() const
  *	\return		number of bytes used
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-udword AABBTree::GetUsedBytes() const
+size_t AABBTree::GetUsedBytes() const
 {
-    udword TotalSize = mTotalNbNodes * GetNodeSize();
+    size_t TotalSize = static_cast<size_t>(mTotalNbNodes) * GetNodeSize();
     if (mIndices)
         TotalSize += mNbPrimitives * sizeof(udword);
     return TotalSize;

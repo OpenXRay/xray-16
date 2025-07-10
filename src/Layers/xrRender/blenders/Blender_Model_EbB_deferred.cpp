@@ -4,6 +4,8 @@
 #include "Blender_Model_EbB.h"
 #include "uber_deffer.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Model_EbB::CBlender_Model_EbB()
 {
     description.CLS = B_MODEL_EbB;
@@ -198,3 +200,4 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

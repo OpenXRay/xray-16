@@ -1,5 +1,3 @@
-#ifndef SH_TEXTURE_H
-#define SH_TEXTURE_H
 #pragma once
 
 #include "xrCore/xr_resource.h"
@@ -7,6 +5,8 @@
 class CAviPlayerCustom;
 class ENGINE_API CTheoraSurface;
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API CTexture : public xr_resource_named
 {
 public:
@@ -202,5 +202,4 @@ struct resptrcode_texture : public resptr_base<CTexture>
 };
 
 typedef resptr_core<CTexture, resptrcode_texture> ref_texture;
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

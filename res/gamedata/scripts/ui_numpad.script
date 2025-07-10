@@ -158,43 +158,60 @@ function numpad:OnButton_OK_clicked()
 end
 
 function numpad:OnKeyboard(dik, keyboard_action)  --virtual function
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
+
 	local bind = dik_to_bind(dik)
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if bind == key_bindings.kQUIT then
 			self:HideDialog()
+			return true
 		elseif bind == key_bindings.kENTER or dik == DIK_keys.DIK_RETURN or dik == DIK_keys.DIK_NUMPADENTER then
 			self:OnButton_OK_clicked()
+			return true
 		end
 
 		if dik == DIK_keys.DIK_0 or dik == DIK_keys.DIK_NUMPAD0 then
 			self:AddNumber(0)
+			return true
 		elseif dik == DIK_keys.DIK_1 or dik == DIK_keys.DIK_NUMPAD1 then
 			self:AddNumber(1)
+			return true
 		elseif dik == DIK_keys.DIK_2 or dik == DIK_keys.DIK_NUMPAD2 then
 			self:AddNumber(2)
+			return true
 		elseif dik == DIK_keys.DIK_3 or dik == DIK_keys.DIK_NUMPAD3 then
 			self:AddNumber(3)
+			return true
 		elseif dik == DIK_keys.DIK_4 or dik == DIK_keys.DIK_NUMPAD4 then
 			self:AddNumber(4)
+			return true
 		elseif dik == DIK_keys.DIK_5 or dik == DIK_keys.DIK_NUMPAD5 then
 			self:AddNumber(5)
+			return true
 		elseif dik == DIK_keys.DIK_6 or dik == DIK_keys.DIK_NUMPAD6 then
 			self:AddNumber(6)
+			return true
 		elseif dik == DIK_keys.DIK_7 or dik == DIK_keys.DIK_NUMPAD7 then
 			self:AddNumber(7)
+			return true
 		elseif dik == DIK_keys.DIK_8 or dik == DIK_keys.DIK_NUMPAD8 then
 			self:AddNumber(8)
+			return true
 		elseif dik == DIK_keys.DIK_9 or dik == DIK_keys.DIK_NUMPAD9 then
 			self:AddNumber(9)
+			return true
 		elseif dik == DIK_keys.DIK_BACK then
 			self:OnButton_backspace_clicked()
+			return true
 		elseif dik == DIK_keys.DIK_DELETE or dik == DIK_keys.DIK_NUMPADCOMMA then
 			self:OnButton_c_clicked()
+			return true
 		end
 	end
 
-	return true
+	return false
 end
 

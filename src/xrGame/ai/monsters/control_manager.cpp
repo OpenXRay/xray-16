@@ -82,8 +82,6 @@ void CControl_Manager::reload(LPCSTR section)
 
 void CControl_Manager::reinit()
 {
-    if (m_object->CCustomMonster::use_simplified_visual())
-        return;
     // todo: make it simpler
     // reinit pure first, base second, custom third
 

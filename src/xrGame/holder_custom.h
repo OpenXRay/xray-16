@@ -14,6 +14,14 @@ private:
 protected:
     CGameObject* Owner() { return m_owner; }
     CActor* OwnerActor() { return m_ownerActor; }
+
+protected:
+    bool m_bEnterLocked{};
+    bool m_bExitLocked{};
+
+public:
+    shared_str m_sUseAction;
+
 public:
     CHolderCustom()
     {
@@ -31,9 +39,9 @@ public:
     virtual void OnKeyboardRelease(int dik) = 0;
     virtual void OnKeyboardHold(int dik) = 0;
 
-    virtual void OnControllerPress(int cmd, float x, float y) = 0;
-    virtual void OnControllerRelease(int cmd, float x, float y) = 0;
-    virtual void OnControllerHold(int cmd, float x, float y) = 0;
+    virtual void OnControllerPress(int cmd, const ControllerAxisState& state) = 0;
+    virtual void OnControllerRelease(int cmd, const ControllerAxisState& state) = 0;
+    virtual void OnControllerHold(int cmd, const ControllerAxisState& state) = 0;
 
     virtual void OnControllerAttitudeChange(Fvector change) = 0;
 
@@ -42,6 +50,10 @@ public:
 
     virtual void cam_Update(float dt, float fov = 90.0f) = 0;
 
+    bool EnterLocked() const { return m_bEnterLocked; }
+    bool ExitLocked() const { return m_bExitLocked; }
+    void SetEnterLocked(bool v) { m_bEnterLocked = v; }
+    void SetExitLocked(bool v) { m_bExitLocked = v; }
     virtual bool Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos) = 0;
     virtual bool attach_Actor(CGameObject* actor);
     virtual void detach_Actor();

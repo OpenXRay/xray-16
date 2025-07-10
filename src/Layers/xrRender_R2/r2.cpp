@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "xrCore/PostProcess/PPInfo.hpp"
+
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
@@ -13,9 +15,10 @@
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 #endif
 
-CRender RImplementation;
-
 extern ENGINE_API Fvector4 ps_ssfx_terrain_quality;
+namespace xray::render::RENDER_NAMESPACE
+{
+CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////
 class CGlow : public IRender_Glow
@@ -371,7 +374,7 @@ void CRender::create()
         o.smapsize = 8192;
 
     // gloss
-    char* g = strstr(Core.Params, "-gloss ");
+    cpcstr g = strstr(Core.Params, "-gloss ");
     o.forcegloss = g ? TRUE : FALSE;
     if (g)
     {
@@ -417,15 +420,10 @@ void CRender::create()
 #endif
 
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
-    o.hbao_vectorized = false;
-    if (o.ssao_hdao)
-        o.ssao_opt_data = false;
-    else if (o.ssao_hbao)
-    {
-        if (HW.Caps.id_vendor == 0x1002)
-            o.hbao_vectorized = true;
-        o.ssao_opt_data = true;
-    }
+    if (o.ssao_hbao && HW.Caps.id_vendor == 0x1002)
+        o.hbao_vectorized = true;
+    else
+        o.hbao_vectorized = false;
 
 #if defined(USE_DX11)
     o.dx11_sm4_1 = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
@@ -810,7 +808,7 @@ FSlideWindowItem* CRender::getSWI(int id)
     VERIFY(id < int(SWIs.size()));
     return &SWIs[id];
 }
-IRender_Target* CRender::getTarget() { return Target; }
+
 IRender_Light* CRender::light_create() { return Lights.Create(); }
 IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 bool CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
@@ -863,23 +861,41 @@ void CRender::add_SkeletonWallmark(
 
 void CRender::rmNear(CBackend& cmd_list)
 {
-    IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.f, 0.02f };
+    const D3D_VIEWPORT viewport = { 0, 0, Target->get_width(cmd_list), Target->get_height(cmd_list), 0.f, 0.02f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::rmFar(CBackend& cmd_list)
 {
-    IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.99999f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, Target->get_width(cmd_list), Target->get_height(cmd_list), 0.99999f, 1.f };
     cmd_list.SetViewport(viewport);
 }
 
 void CRender::rmNormal(CBackend& cmd_list)
 {
-    IRender_Target* T = getTarget();
-    const D3D_VIEWPORT viewport = { 0, 0, T->get_width(cmd_list), T->get_height(cmd_list), 0.f, 1.f };
+    const D3D_VIEWPORT viewport = { 0, 0, Target->get_width(cmd_list), Target->get_height(cmd_list), 0.f, 1.f };
     cmd_list.SetViewport(viewport);
+}
+
+void CRender::SetPostProcessParams(const SPPInfo& ppi)
+{
+    Target->set_blur(ppi.blur);
+    Target->set_gray(ppi.gray);
+
+    Target->set_duality_h(ppi.duality.h);
+    Target->set_duality_v(ppi.duality.v);
+
+    Target->set_noise(ppi.noise.intensity);
+    Target->set_noise_scale(ppi.noise.grain);
+    Target->set_noise_fps(ppi.noise.fps);
+
+    Target->set_color_base(ppi.color_base);
+    Target->set_color_gray(ppi.color_gray);
+    Target->set_color_add(ppi.color_add);
+
+    Target->set_cm_imfluence(ppi.cm_influence);
+    Target->set_cm_interpolate(ppi.cm_interpolate);
+    Target->set_cm_textures(ppi.cm_tex1, ppi.cm_tex2);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -913,3 +929,4 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     HOM.DumpStatistics(font, alert);
     Sectors_xrc.DumpStatistics(font, alert);
 }
+} // namespace xray::render::RENDER_NAMESPACE

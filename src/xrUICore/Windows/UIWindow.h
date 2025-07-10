@@ -2,17 +2,11 @@
 
 #define ui_list xr_vector
 
-#define DEF_UILIST(N, T)  \
-    typedef ui_list<T> N; \
-    typedef N::iterator N##_it;
-
 //////////////////////////////////////////////////////////////////////////
 
 #include "xrUICore/UIMessages.h"
 #include "xrUICore/uiabstract.h"
 #include "xrUICore/ui_debug.h"
-
-class CUIFocusSystem;
 
 class XRUICORE_API CUIWindow : public CUISimpleWindow, public CUIDebuggable
 {
@@ -36,14 +30,34 @@ public:
     CUIWindow* GetParent() const { return m_pParentWnd; }
     void SetParent(CUIWindow* pNewParent);
 
+    [[nodiscard]]
+    CUIWindow* GetWindowBeforeParent(const CUIWindow* parent)
+    {
+        CUIWindow* result = this;
+        for (CUIWindow* it = GetParent(); it; it = it->GetParent())
+        {
+            if (it == parent)
+                return result;
+            result = it;
+        }
+        return nullptr;
+    }
+
     //получить окно самого верхнего уровня
     [[nodiscard]]
     CUIWindow* GetTop()
     {
-        if (m_pParentWnd == NULL)
+        if (m_pParentWnd == nullptr)
             return this;
-        else
-            return m_pParentWnd->GetTop();
+        return m_pParentWnd->GetTop();
+    }
+    //получить окно самого верхнего уровня
+    [[nodiscard]]
+    const CUIWindow* GetTop() const
+    {
+        if (m_pParentWnd == nullptr)
+            return this;
+        return m_pParentWnd->GetTop();
     }
     CUIWindow* GetCurrentMouseHandler();
     CUIWindow* GetChildMouseHandler();
@@ -58,7 +72,7 @@ public:
     virtual bool OnMouseDown(int mouse_btn);
     virtual void OnMouseUp(int mouse_btn);
 
-    virtual bool OnControllerAction(int axis, float x, float y, EUIMessages controller_action);
+    virtual bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action);
 
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
@@ -66,7 +80,7 @@ public:
     //захватить/освободить мышь окном
     //сообщение посылается дочерним окном родительскому
     void SetCapture(CUIWindow* pChildWindow, bool capture_status);
-    CUIWindow* GetMouseCapturer() { return m_pMouseCapturer; }
+    CUIWindow* GetMouseCapturer() const { return m_pMouseCapturer; }
 
     //окошко, которому пересылаются сообщения,
     //если NULL, то шлем на GetParent()
@@ -74,6 +88,7 @@ public:
     CUIWindow* GetMessageTarget();
 
     void SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status);
+    CUIWindow* GetKeyboardCapturer() const { return m_pKeyboardCapturer; }
 
     //обработка сообщений не предусмотреных стандартными обработчиками
     //ф-ция должна переопределяться
@@ -83,25 +98,30 @@ public:
 
     virtual void Enable(bool status) { m_bIsEnabled = status; }
 
-    void SetFocusValuable(bool valuable) { m_bFocusValuable = valuable; }
-
     [[nodiscard]]
     bool IsEnabled() const { return m_bIsEnabled; }
 
     [[nodiscard]]
-    bool IsFocusValuable() const
+    bool IsFocusValuable(const CUIWindow* top_parent, const CUIWindow* locker) const
     {
-        if (!m_bFocusValuable)
-            return false;
+        bool valuable;
+        bool child_of_locker{};
+        const CUIWindow* it = this;
 
-        bool ok;
-        for (auto it = this; ; it = it->GetParent())
+        for (;; it = it->GetParent())
         {
-            ok = it->IsShown() && it->IsEnabled();
-            if (!ok || !it->GetParent())
+            valuable = it->IsShown() && it->IsEnabled();
+            if (it == locker)
+                child_of_locker = true;
+            if (!valuable || !it->GetParent())
                 break;
         }
-        return ok;
+
+        if (locker && !child_of_locker)
+            return false;
+        if (top_parent && top_parent != it)
+            return false;
+        return valuable;
     }
 
     //убрать/показать окно и его дочерние окна
@@ -111,25 +131,28 @@ public:
         Enable(status);
     }
 
-    virtual CUIFocusSystem* GetCurrentFocusSystem() const
-    {
-        if (m_pParentWnd)
-            return m_pParentWnd->GetCurrentFocusSystem();
-        return nullptr;
-    }
-
     [[nodiscard]]
     virtual bool IsShown() const { return GetVisible(); }
 
     void ShowChildren(bool show);
 
     //абсолютные координаты
-    void GetAbsoluteRect(Frect& r);
-    IC void GetAbsolutePos(Fvector2& p)
+    void GetAbsoluteRect(Frect& r) const;
+
+    void GetAbsolutePos(Fvector2& p) const
     {
         Frect abs;
         GetAbsoluteRect(abs);
         p.set(abs.x1, abs.y1);
+    }
+
+    Fvector2 GetAbsoluteCenterPos() const
+    {
+        Frect abs;
+        GetAbsoluteRect(abs);
+        auto size = GetWndSize();
+        size.div(2.0f);
+        return { abs.x1 + size.x, abs.y1 + size.y };
     }
 
     void SetWndRect_script(Frect rect) { CUISimpleWindow::SetWndRect(rect); }
@@ -157,7 +180,10 @@ public:
 
     using WINDOW_LIST = ui_list<CUIWindow*>;
 
+    [[nodiscard]]
     WINDOW_LIST& GetChildWndList() { return m_ChildWndList; }
+    [[nodiscard]]
+    const WINDOW_LIST& GetChildWndList() const { return m_ChildWndList; }
 
     [[nodiscard]]
     IC bool IsAutoDelete() const { return m_bAutoDelete; }
@@ -168,6 +194,9 @@ public:
     void SetWindowName(pcstr wn) { m_windowName = wn; }
 
     CUIWindow* FindChild(const shared_str name);
+
+    [[nodiscard]]
+    virtual bool IsUsingCursorRightNow() const { return false; }
 
     [[nodiscard]]
     IC bool CursorOverWindow() const { return m_bCursorOverWindow; }
@@ -224,8 +253,6 @@ protected:
     // Если курсор над окном
     bool m_bCursorOverWindow{};
     bool m_bCustomDraw{};
-
-    bool m_bFocusValuable{};
 };
 
 XRUICORE_API bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border = 0.0f, float dx16pos = 0.0f);

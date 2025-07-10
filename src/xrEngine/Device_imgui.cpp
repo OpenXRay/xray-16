@@ -4,6 +4,8 @@
 #   include <SDL_syswm.h>
 #endif
 
+#include <imgui_internal.h>
+
 void CRenderDevice::InitializeImGui()
 {
     if (m_imgui_context)
@@ -27,8 +29,9 @@ void CRenderDevice::InitializeImGui()
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard |
                       ImGuiConfigFlags_NavEnableGamepad |
-                      ImGuiConfigFlags_NavEnableSetMousePos |
                       ImGuiConfigFlags_DockingEnable;
+
+    io.ConfigNavMoveSetMousePos = true;
 
     string_path fName;
     FS.update_path(fName, "$app_data_root$", io.IniFilename);
@@ -40,7 +43,29 @@ void CRenderDevice::InitializeImGui()
 
     io.BackendPlatformName = "OpenXRay";
 
-    io.SetPlatformImeDataFn = [](ImGuiViewport* viewport, ImGuiPlatformImeData* data)
+    // Register platform interface (will be coupled with a renderer interface)
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+
+    // Clipboard functionality
+    platform_io.Platform_SetClipboardTextFn = [](ImGuiContext*, const char* text)
+    {
+        SDL_SetClipboardText(text);
+    };
+
+    platform_io.Platform_GetClipboardTextFn = [](ImGuiContext* ctx) -> const char*
+    {
+        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO(ctx);
+        auto clipboard_text_data = static_cast<char*>(platform_io.Platform_ClipboardUserData);
+
+        if (clipboard_text_data)
+            SDL_free(clipboard_text_data);
+
+        clipboard_text_data = SDL_GetClipboardText();
+
+        return clipboard_text_data;
+    };
+
+    platform_io.Platform_SetImeDataFn = [](ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data)
     {
         if (data->WantVisible)
         {
@@ -56,9 +81,6 @@ void CRenderDevice::InitializeImGui()
     };
 
 #ifdef IMGUI_ENABLE_VIEWPORTS
-    // Register platform interface (will be coupled with a renderer interface)
-    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
-
     platform_io.Platform_CreateWindow = [](ImGuiViewport* viewport)
     {
         Uint32 sdl_flags{};
@@ -217,11 +239,17 @@ void CRenderDevice::DestroyImGui()
 #ifdef IMGUI_ENABLE_VIEWPORTS
     ImGui::DestroyPlatformWindows();
 #endif
-    editor().ShutdownBackend();
 
     ImGuiIO& io = ImGui::GetIO();
     xr_free(io.IniFilename);
     xr_free(io.LogFilename);
+
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO(m_imgui_context);
+
+    if (platform_io.Platform_ClipboardUserData)
+    {
+        SDL_free(platform_io.Platform_ClipboardUserData);
+    }
 
     ImGui::DestroyContext(m_imgui_context);
     m_imgui_context = nullptr;

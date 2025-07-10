@@ -40,7 +40,25 @@ public:
 
     FactoryPtr& operator=(const FactoryPtr& _in)
     {
-        m_pObject->Copy(*_in.m_pObject);
+        if (this != &_in)
+            m_pObject->Copy(*_in.m_pObject);
+        return *this;
+    }
+
+    FactoryPtr(FactoryPtr&& other) noexcept
+        : m_pObject(other.m_pObject)
+    {
+        other.m_pObject = nullptr;
+    }
+
+    FactoryPtr& operator=(FactoryPtr&& other) noexcept
+    {
+        if (this != &other)
+        {
+            DestroyObject();
+            m_pObject = other.m_pObject;
+            other.m_pObject = nullptr;
+        }
         return *this;
     }
 
@@ -48,10 +66,12 @@ public:
     T* operator->() const { return m_pObject; }
     operator bool() const { return m_pObject; }
     bool operator!() const { return m_pObject == nullptr; }
+
 private:
     void CreateObject();
     void DestroyObject();
     T const* get() const { return m_pObject; }
+
 private:
     T* m_pObject;
 };

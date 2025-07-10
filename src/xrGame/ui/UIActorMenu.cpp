@@ -72,7 +72,7 @@ void CUIActorMenu::InitPartnerInfo()
     if (m_pPartnerInvOwner)
     {
         CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
-        if (monster || m_pPartnerInvOwner->use_simplified_visual())
+        if (monster)
         {
             GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
             if (monster)
@@ -120,7 +120,7 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         case mmTrade: DeInitTradeMode(); break;
         case mmUpgrade: DeInitUpgradeMode(); break;
         case mmDeadBodySearch: DeInitDeadBodySearchMode(); break;
-        default: R_ASSERT(0); break;
+        default: NODEFAULT; break;
         }
 
         CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(false);
@@ -128,37 +128,17 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         m_currMenuMode = mode;
         switch (mode)
         {
-        case mmUndefined:
-#ifdef DEBUG
-            Msg("* now is Undefined mode");
-#endif // #ifdef DEBUG
-            ResetMode();
-            break;
-        case mmInventory: InitInventoryMode();
-#ifdef DEBUG
-            Msg("* now is Inventory mode");
-#endif // #ifdef DEBUG
-            break;
-        case mmTrade: InitTradeMode();
-#ifdef DEBUG
-            Msg("* now is Trade mode");
-#endif // #ifdef DEBUG
-            break;
-        case mmUpgrade: InitUpgradeMode();
-#ifdef DEBUG
-            Msg("* now is Upgrade mode");
-#endif // #ifdef DEBUG
-            break;
-        case mmDeadBodySearch: InitDeadBodySearchMode();
-#ifdef DEBUG
-            Msg("* now is DeadBodySearch mode");
-#endif // #ifdef DEBUG
-            break;
-        default: R_ASSERT(0); break;
+        case mmUndefined: ResetMode(); break;
+        case mmInventory: InitInventoryMode(); break;
+        case mmTrade: InitTradeMode(); break;
+        case mmUpgrade: InitUpgradeMode(); break;
+        case mmDeadBodySearch: InitDeadBodySearchMode(); break;
+        default: NODEFAULT; break;
         }
         InitActorInfo();
         if (m_currMenuMode != mmUndefined && m_currMenuMode != mmInventory)
             InitPartnerInfo();
+        highlight_equipped();
         CurModeToScript();
     } // if
 
@@ -193,6 +173,25 @@ void CUIActorMenu::Show(bool status)
     }
     m_ActorStateInfo->Show(status);
     m_message_static = nullptr;
+}
+
+void CUIActorMenu::ShowDialog(bool bDoHideIndicators)
+{
+    CUIDialogWnd::ShowDialog(bDoHideIndicators);
+
+    CUIDragDropListEx* bag{};
+    switch (m_currMenuMode)
+    {
+    case mmInventory:      bag = m_pLists[eInventoryBagList]; break;
+    case mmTrade:          bag = m_pLists[eTradeActorBagList]; break;
+    case mmUpgrade:        bag = m_pLists[eInventoryBagList]; break;
+    case mmDeadBodySearch: bag = m_pLists[eSearchLootActorBagList]; break;
+    }
+
+    if (bag && bag->ItemsCount() && pInput->IsCurrentInputTypeController())
+    {
+        UI().Focus().SetFocused(bag->GetItemIdx(0));
+    }
 }
 
 void CUIActorMenu::Draw()
@@ -280,6 +279,23 @@ bool CUIActorMenu::StopAnyMove() // true = актёр не идёт при от�
     case mmDeadBodySearch: return true;
     }
     return true;
+}
+
+bool CUIActorMenu::NeedCenterCursor() const
+{
+    CUIDragDropListEx* bag{};
+    switch (m_currMenuMode)
+    {
+    case mmInventory:      bag = m_pLists[eInventoryBagList]; break;
+    case mmTrade:          bag = m_pLists[eTradeActorBagList]; break;
+    case mmUpgrade:        bag = m_pLists[eInventoryBagList]; break;
+    case mmDeadBodySearch: bag = m_pLists[eSearchLootActorBagList]; break;
+    }
+
+    if (bag)
+        return bag->ItemsCount() == 0;
+
+    return CUIDialogWnd::NeedCenterCursor();
 }
 
 void CUIActorMenu::CheckDistance()
@@ -526,6 +542,8 @@ void CUIActorMenu::UpdateItemsPlace()
         UpdateOutfit();
         UpdateActor();
     }
+
+    highlight_equipped();
 }
 
 // ================================================================
@@ -868,6 +886,25 @@ void CUIActorMenu::highlight_weapons_for_addon(PIItem addon_item, CUIDragDropLis
     } // for i
 }
 
+void CUIActorMenu::highlight_equipped() const
+{
+    // Highlight 'equipped' items in actor bag
+    CUIDragDropListEx* slot_list = m_pLists[eInventoryBagList];
+    u32 const cnt = slot_list->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = slot_list->GetItemIdx(i);
+        const auto item = static_cast<PIItem>(ci->m_pData);
+        if (!item)
+            continue;
+
+        if (item->m_highlight_equipped && item->m_pInventory && item->m_pInventory->ItemFromSlot(item->BaseSlot()) == item)
+            ci->m_select_equipped = true;
+        else
+            ci->m_select_equipped = false;
+    }
+}
+
 // -------------------------------------------------------------------
 
 void CUIActorMenu::ClearAllLists()
@@ -948,7 +985,7 @@ void CUIActorMenu::UpdateActorMP()
     int money = Game().local_player->money_for_round;
 
     string64 buf;
-    xr_sprintf(buf, "%d RU", money);
+    xr_sprintf(buf, "%d %s", money, StringTable().GetCurrency().c_str());
     m_ActorMoney->SetText(buf);
 
     GetModeSpecificActorInfo()->InitCharacterMP(Game().local_player->getName(), "ui_npc_u_nebo_1");
@@ -981,9 +1018,10 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
 void CUIActorMenu::HighlightSectionInSlot(pcstr section, EDDListType type, u16 slot_id /*= 0*/)
 {
     CUIDragDropListEx* slot_list = GetListByType(type);
-
     if (!slot_list)
         slot_list = m_pLists[eInventoryBagList];
+    if (!slot_list)
+        return;
 
     u32 const cnt = slot_list->ItemsCount();
     for (u32 i = 0; i < cnt; ++i)
@@ -1008,9 +1046,10 @@ void CUIActorMenu::HighlightForEachInSlot(const luabind::functor<bool>& functor,
         return;
 
     CUIDragDropListEx* slot_list = GetListByType(type);
-
     if (!slot_list)
         slot_list = m_pLists[eInventoryBagList];
+    if (!slot_list)
+        return;
 
     u32 const cnt = slot_list->ItemsCount();
     for (u32 i = 0; i < cnt; ++i)

@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_accum_direct : public IBlender
 {
 public:
@@ -61,3 +63,4 @@ public:
     virtual void Compile(CBlender_Compile& C);
 };
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

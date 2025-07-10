@@ -92,6 +92,9 @@ void CUIPdaWnd::Init()
     }
 
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
+    m_btn_close->SetAccelerator(kUI_BACK, false, 2);
+    UI().Focus().UnregisterFocusable(m_btn_close);
+
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
     if (IsGameTypeSingle())
@@ -124,8 +127,36 @@ void CUIPdaWnd::Init()
     UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
     AttachChild(UITabControl);
-    CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl);
+    CUIXmlInit::InitTabControl(uiXml, "tab", 0, UITabControl, true, ShadowOfChernobylMode);
     UITabControl->SetMessageTarget(this);
+    UITabControl->SetAcceleratorsMode(true);
+
+    constexpr std::tuple<pcstr, pcstr> known_soc_tab_ids[] =
+    {
+        {"0", "eptTasks"},
+        {"1", "eptMap"},
+        {"2", "eptDiary"},
+        {"3", "eptContacts"},
+        {"4", "eptStalkersRanking"},
+        {"5", "eptStatistics"},
+        {"6", "eptEncyclopedia"},
+    };
+
+    for (u32 i = 0; i < UITabControl->GetTabsCount(); i++)
+    {
+        CUITabButton* btn = UITabControl->GetButtonByIndex(i);
+        if (!btn || !btn->IsIdDefaultAssigned())
+            continue;
+
+        for (const auto& [id, replace] : known_soc_tab_ids)
+        {
+            if (btn->m_btn_id == id)
+            {
+                btn->m_btn_id = replace;
+                break;
+            }
+        }
+    }
 
     UINoice = xr_new<CUIStatic>("Noise");
     UINoice->SetAutoDelete(true);
@@ -147,8 +178,6 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         {
             const auto& id = UITabControl->GetActiveId();
             SetActiveSubdialog(id);
-            if (pInput->IsCurrentInputTypeController())
-                UI().GetUICursor().WarpToWindow(UITabControl->GetButtonById(id));
         }
         break;
     }
@@ -162,8 +191,8 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     default:
     {
-        R_ASSERT(m_pActiveDialog);
-        m_pActiveDialog->SendMessage(pWnd, msg, pData);
+        if (m_pActiveDialog)
+            m_pActiveDialog->SendMessage(pWnd, msg, pData);
     }
     };
 }
@@ -175,20 +204,24 @@ void CUIPdaWnd::Show(bool status)
     {
         InventoryUtilities::SendInfoToActor("ui_pda");
 
-        if (!m_pActiveDialog)
+        if (!m_sActiveSection.empty())
+            SetActiveSubdialog(m_sActiveSection);
+        else
         {
-            if (pUIMapWnd && !pUITaskWnd)
-                SetActiveSubdialog("eptMap");
-            else
-                SetActiveSubdialog("eptTasks");
+            cpcstr subdialog = pUIMapWnd && !pUITaskWnd ? "eptMap" : "eptTasks";
+            SetActiveSubdialog(subdialog);
+            UITabControl->SetActiveTab(subdialog);
         }
-        m_pActiveDialog->Show(true);
     }
     else
     {
         InventoryUtilities::SendInfoToActor("ui_pda_hide");
         CurrentGameUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
-        m_pActiveDialog->Show(false);
+        if (m_pActiveDialog)
+        {
+            m_pActiveDialog->Show(false);
+            m_pActiveDialog = pUITaskWnd; //hack for script window
+        }
         g_btnHint->Discard();
         g_statHint->Discard();
     }
@@ -197,12 +230,12 @@ void CUIPdaWnd::Show(bool status)
 void CUIPdaWnd::Update()
 {
     inherited::Update();
-    m_pActiveDialog->Update();
+
+    if (m_pActiveDialog)
+        m_pActiveDialog->Update();
 
     if (m_clock)
-    {
         m_clock->SetText(GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
-    }
 
     if (pUILogsWnd)
         Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(pUILogsWnd, &CUILogsWnd::PerformWork));
@@ -210,12 +243,14 @@ void CUIPdaWnd::Update()
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 {
-    if (m_sActiveSection == section)
-        return;
+    //if (m_sActiveSection == section)
+    //    return;
 
     if (m_pActiveDialog)
     {
-        UIMainPdaFrame->DetachChild(m_pActiveDialog);
+        if (UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->DetachChild(m_pActiveDialog);
+        UIMainPdaFrame->SetKeyboardCapture(nullptr, true);
         m_pActiveDialog->Show(false);
     }
 
@@ -241,8 +276,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     luabind::functor<CUIDialogWndEx*> functor;
     if (GEnv.ScriptEngine->functor("pda.set_active_subdialog", functor))
     {
-        CUIDialogWndEx* scriptWnd = functor(section.c_str());
-        if (scriptWnd)
+        if (CUIDialogWndEx* scriptWnd = functor(section.c_str()))
         {
             scriptWnd->SetHolder(CurrentDialogHolder());
             m_pActiveDialog = scriptWnd;
@@ -254,16 +288,19 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
     }
 
-    R_ASSERT(m_pActiveDialog);
-    UIMainPdaFrame->AttachChild(m_pActiveDialog);
-    m_pActiveDialog->Show(true);
-
-    if (UITabControl->GetActiveId() != section)
+    if (m_pActiveDialog)
     {
-        UITabControl->SetActiveTab(section);
+        if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->AttachChild(m_pActiveDialog);
+        UIMainPdaFrame->SetKeyboardCapture(m_pActiveDialog, true);
+        m_pActiveDialog->Show(true);
+        m_sActiveSection = section;
+        SetActiveCaption();
     }
-    m_sActiveSection = section;
-    SetActiveCaption();
+    else
+    {
+        m_sActiveSection = "";
+    }
 }
 
 void CUIPdaWnd::SetActiveCaption()
@@ -296,15 +333,21 @@ void CUIPdaWnd::Show_SecondTaskWnd(bool status)
     }
 }
 
-void CUIPdaWnd::Show_MapLegendWnd(bool status)
+void CUIPdaWnd::Show_MapWnd(bool status)
 {
-    if (pUITaskWnd)
+    if (pUIMapWnd)
     {
         if (status)
-        {
-            SetActiveSubdialog("eptTasks");
-        }
-        pUITaskWnd->ShowMapLegend(status);
+            SetActiveSubdialog("eptMap");
+    }
+}
+
+void CUIPdaWnd::Show_ContactsWnd(bool status)
+{
+    if (true) // XXX: replace with contacts wnd pointer
+    {
+        if (status)
+            SetActiveSubdialog("eptContacts");
     }
 }
 
@@ -320,25 +363,21 @@ void CUIPdaWnd::Draw()
 void CUIPdaWnd::DrawHint()
 {
     if (m_pActiveDialog == pUITaskWnd && pUITaskWnd)
-    {
         pUITaskWnd->DrawHint();
-    }
-    if (m_pActiveDialog == pUIMapWnd && pUIMapWnd)
-    {
+    else if (m_pActiveDialog == pUIMapWnd && pUIMapWnd)
         pUIMapWnd->DrawHint();
-    }
-    else if (m_pActiveDialog == pUIFactionWarWnd && pUIFactionWarWnd)
-    {
-        //m_hint_wnd->Draw();
-    }
     else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
-    {
         pUIRankingWnd->DrawHint();
-    }
-    else if (m_pActiveDialog == pUILogsWnd && pUILogsWnd)
-    {
-    }
+
     m_hint_wnd->Draw();
+}
+
+bool CUIPdaWnd::NeedCursor() const
+{
+    if (m_pActiveDialog && m_pActiveDialog->IsUsingCursorRightNow())
+       return true;
+
+    return CUIDialogWnd::NeedCursor();
 }
 
 void CUIPdaWnd::UpdatePda()
@@ -404,27 +443,13 @@ bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     if (inherited::OnKeyboardAction(dik, keyboard_action))
         return true;
 
-    switch (GetBindedAction(dik, EKeyContext::UI))
-    {
-    case kUI_TAB_PREV:
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            UITabControl->SetNextActiveTab(false, true);
-        return true;
+    return false;
+}
 
-    case kUI_TAB_NEXT:
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            UITabControl->SetNextActiveTab(true, true);
+bool CUIPdaWnd::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
+{
+    if (inherited::OnControllerAction(axis, state, controller_action))
         return true;
-
-    hide_pda:
-    case kUI_BACK:
-        if (WINDOW_KEY_PRESSED == keyboard_action)
-            HideDialog();
-        return true;
-    }
-
-    if (IsBinded(kACTIVE_JOBS, dik))
-        goto hide_pda;
 
     return false;
 }

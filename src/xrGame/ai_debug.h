@@ -14,7 +14,6 @@
 #define aiMotion (1 << 2)
 #define aiFrustum (1 << 3)
 #define aiFuncs (1 << 4)
-#define aiALife (1 << 5)
 #define aiGOAP (1 << 7)
 #define aiCover (1 << 8)
 #define aiAnimation (1 << 9)
@@ -40,6 +39,7 @@
 #endif // DEBUG
 
 #if defined(DEBUG) || !defined(MASTER_GOLD)
+#define aiALife (1 << 5)
 #define aiIgnoreActor (1 << 24)
 #define aiObstaclesAvoiding (1 << 28)
 #define aiObstaclesAvoidingStatic (1 << 29)

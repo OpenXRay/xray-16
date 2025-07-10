@@ -40,8 +40,6 @@ void CAI_PseudoDog::reinit()
     m_time_became_angry = 0;
     time_growling = 0;
 
-    if (CCustomMonster::use_simplified_visual())
-        return;
     com_man().add_rotation_jump_data("1", "2", "3", "4", deg(90));
 }
 
@@ -134,9 +132,6 @@ void CAI_PseudoDog::Load(LPCSTR section)
 void CAI_PseudoDog::reload(LPCSTR section)
 {
     inherited::reload(section);
-
-    if (CCustomMonster::use_simplified_visual())
-        return;
 
     // load additional sounds
     sound().add(pSettings->r_string(section, "sound_psy_attack"), DEFAULT_SAMPLE_COUNT, SOUND_TYPE_MONSTER_ATTACKING,

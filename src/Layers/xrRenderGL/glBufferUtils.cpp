@@ -3,6 +3,8 @@
 
 #include <FlexibleVertexFormat.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 enum
 {
     LOCKFLAGS_FLUSH  = GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT,
@@ -11,17 +13,17 @@ enum
 
 u32 GetFVFVertexSize(u32 FVF)
 {
-    return static_cast<u32>(FVF::ComputeVertexSize(FVF));
+    return static_cast<u32>(::FVF::ComputeVertexSize(FVF));
 }
 
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream)
 {
-    return static_cast<u32>(FVF::ComputeVertexSize(decl, Stream));
+    return static_cast<u32>(::FVF::ComputeVertexSize(decl, Stream));
 }
 
 u32 GetDeclLength(const VertexElement* decl)
 {
-    return static_cast<u32>(FVF::GetDeclLength(decl));
+    return static_cast<u32>(::FVF::GetDeclLength(decl));
 }
 
 static HRESULT CreateBuffer(GLuint* pBuffer, const void* pData, u32 dataSize, bool bDynamic, bool bIndexBuffer)
@@ -461,3 +463,4 @@ bool IndexStreamBuffer::IsValid() const
 {
     return !!m_DeviceBuffer;
 }
+} // namespace xray::render::RENDER_NAMESPACE

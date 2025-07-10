@@ -48,86 +48,6 @@ bool CUIMessageBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return inherited::OnMouseAction(x, y, mouse_action);
 }
 
-bool CUIMessageBox::OnKeyboardAction(int dik, EUIMessages keyboard_action)
-{
-    if (IsInputHandlingAllowed() && keyboard_action == WINDOW_KEY_PRESSED)
-    {
-        const bool quitPressed = IsBinded(kQUIT, dik);
-        auto action = GetBindedAction(dik, EKeyContext::UI);
-
-        switch (m_eMessageBoxStyle)
-        {
-        case MESSAGEBOX_OK:
-        case MESSAGEBOX_INFO:
-        {
-            if (quitPressed)
-                action = kUI_BACK;
-            switch (action)
-            {
-            case kUI_ACCEPT:
-            case kUI_BACK:
-                OnYesOk();
-                return true;
-            }
-            break;
-        }
-        case MESSAGEBOX_DIRECT_IP:
-        case MESSAGEBOX_RA_LOGIN:
-        case MESSAGEBOX_PASSWORD:
-        case MESSAGEBOX_YES_NO:
-        case MESSAGEBOX_QUIT_GAME:
-        case MESSAGEBOX_QUIT_WINDOWS:
-        {
-            switch (action)
-            {
-            case kUI_ACCEPT:
-                OnYesOk();
-                return true;
-            case kUI_BACK:
-                m_UIButtonNo->OnClick();
-                return true;
-            }
-            break;
-        }
-        case MESSAGEBOX_YES_NO_CANCEL:
-        {
-            switch (action)
-            {
-            case kUI_ACCEPT:
-                OnYesOk();
-                return true;
-            case kUI_ACTION_1:
-                m_UIButtonNo->OnClick();
-                return true;
-            case kUI_BACK:
-                m_UIButtonCancel->OnClick();
-                return true;
-            }
-            break;
-        }
-        case MESSAGEBOX_YES_NO_COPY:
-        {
-            switch (action)
-            {
-            case kUI_ACCEPT:
-                OnYesOk();
-                return true;
-            case kUI_BACK:
-                m_UIButtonNo->OnClick();
-                return true;
-            case kUI_ACTION_1:
-                m_UIButtonCopy->OnClick();
-                return true;
-            }
-            break;
-        }
-        default:
-            VERIFY(!"Unknown message box type!");
-        } // switch (m_eMessageBoxStyle)
-    }
-    return CUIStatic::OnKeyboardAction(dik, keyboard_action);
-}
-
 bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
 {
     Clear();
@@ -203,7 +123,7 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
     else if (0 == xr_stricmp(_type, "info"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_INFO;
-    };
+    }
 
     switch (m_eMessageBoxStyle)
     {
@@ -212,12 +132,12 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         strconcat(sizeof(str), str, box_template, ":button_ok");
         m_UIButtonYesOk = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonYesOk);
+        m_UIButtonYesOk->SetAccelerator(kQUIT, false, 1); // can be overridden by gamedata
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonYesOk);
+        break;
     }
-    break;
-    case MESSAGEBOX_INFO: {
-    }
-    break;
+    case MESSAGEBOX_INFO:
+        break;
 
     case MESSAGEBOX_DIRECT_IP:
         strconcat(sizeof(str), str, box_template, ":cap_host");
@@ -250,8 +170,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         AttachChild(m_UIButtonNo);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
         // m_message_box_yes_no->func_on_ok = CUIWndCallback::void_function( this, &CUIActorMenu::OnMesBoxYes );
-
         break;
+
     case MESSAGEBOX_PASSWORD:
     {
         strconcat(sizeof(str), str, box_template, ":cap_user_password");
@@ -283,8 +203,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonNo = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonNo);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        break;
     }
-    break;
 
     case MESSAGEBOX_RA_LOGIN:
         strconcat(sizeof(str), str, box_template, ":cap_login");
@@ -324,8 +244,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonNo = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonNo);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonNo);
+        break;
     }
-    break;
 
     case MESSAGEBOX_YES_NO_CANCEL:
     {
@@ -343,8 +263,8 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
         m_UIButtonCancel = xr_new<CUI3tButton>();
         AttachChild(m_UIButtonCancel);
         CUIXmlInitBase::Init3tButton(uiXml, str, 0, m_UIButtonCancel);
+        break;
     }
-    break;
 
     case MESSAGEBOX_YES_NO_COPY:
     {
@@ -371,9 +291,31 @@ bool CUIMessageBox::InitMessageBox(LPCSTR box_template)
             CUIXmlInitBase::InitEditBox(uiXml, str, 0, m_UIEditURL);
             //				m_UIEditURL->read_only
         }
+        break;
     }
-    break;
+    } // switch (m_eMessageBoxStyle)
+
+    if (m_UIButtonYesOk)
+    {
+        m_UIButtonYesOk->SetAccelerator(kENTER, false, 2);
+        m_UIButtonYesOk->SetAccelerator(kUI_ACCEPT, false, 3);
     }
+    if (m_UIButtonNo)
+    {
+        if (!m_UIButtonCancel)
+            m_UIButtonNo->SetAccelerator(kQUIT, false, 2);
+        m_UIButtonNo->SetAccelerator(kUI_BACK, false, 3);
+    }
+    if (m_UIButtonCancel)
+    {
+        m_UIButtonCancel->SetAccelerator(kQUIT, false, 2);
+        m_UIButtonCancel->SetAccelerator(kUI_ACTION_1, false, 3);
+    }
+    if (m_UIButtonCopy)
+    {
+        m_UIButtonCopy->SetAccelerator(kUI_ACTION_1, false, 2);
+    }
+
     return true;
 }
 
@@ -398,7 +340,7 @@ void CUIMessageBox::OnYesOk()
         break;
     case MESSAGEBOX_QUIT_WINDOWS: GetMessageTarget()->SendMessage(this, MESSAGE_BOX_QUIT_WIN_CLICKED); break;
     case MESSAGEBOX_QUIT_GAME: GetMessageTarget()->SendMessage(this, MESSAGE_BOX_QUIT_GAME_CLICKED); break;
-    };
+    } // switch (m_eMessageBoxStyle)
 }
 
 void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -463,13 +405,23 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             break;
         case MESSAGEBOX_INFO:
             break;
-        };
-    };
+        } // switch (m_eMessageBoxStyle)
+    }
     inherited::SendMessage(pWnd, msg, pData);
 }
 
-void CUIMessageBox::SetText(LPCSTR str) { m_UIStaticText->SetTextST(str); }
-LPCSTR CUIMessageBox::GetText() const { return m_UIStaticText->GetText(); }
+void CUIMessageBox::SetText(LPCSTR str)
+{
+    R_ASSERT1_CURE(m_UIStaticText, return);
+    m_UIStaticText->SetTextST(str);
+}
+
+LPCSTR CUIMessageBox::GetText() const
+{
+    R_ASSERT1_CURE(m_UIStaticText, return "");
+    return m_UIStaticText->GetText();
+}
+
 LPCSTR CUIMessageBox::GetHost()
 {
     if (m_UIEditHost)

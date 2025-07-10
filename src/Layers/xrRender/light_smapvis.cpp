@@ -2,6 +2,8 @@
 #include "Layers/xrRender/light.h"
 #include "Layers/xrRender/FBasicVisual.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 smapvis::smapvis()
 {
     invalidate();
@@ -133,3 +135,4 @@ void smapvis::rfeedback_static(dxRender_Visual* V)
     auto& dsgraph = RImplementation.get_context(id);
     dsgraph.set_Feedback(0, 0);
 }
+} // namespace xray::render::RENDER_NAMESPACE

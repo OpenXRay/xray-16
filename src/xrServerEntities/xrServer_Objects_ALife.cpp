@@ -26,13 +26,11 @@ LPCSTR GAME_CONFIG = "game.ltx";
 #include "xrEngine/Render.h"
 #endif // XRGAME_EXPORTS
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
 #include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
 
-#include <luabind/luabind.hpp>
-
-// XXX: maybe remove shlwapi
+#ifdef XR_PLATFORM_WINDOWS // XXX: replace with crossplatform natural sort
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
@@ -79,8 +77,8 @@ struct logical_string_predicate
         return (StrCmpLogicalW(buffer0, buffer1) < 0);
     }
 }; // struct logical_string_predicate
-
-#endif // XRSE_FACTORY_EXPORTS
+#endif
+#endif // !MASTER_GOLD
 
 bool SortStringsByAlphabetPred(const shared_str& s1, const shared_str& s2)
 {
@@ -101,48 +99,42 @@ struct story_name_predicate
     }
 };
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
 SFillPropData::SFillPropData() { counter = 0; };
 SFillPropData::~SFillPropData() { VERIFY(0 == counter); };
 void SFillPropData::load()
 {
-// create ini
-#ifdef XRGAME_EXPORTS
     CInifile* Ini = pGameIni;
-#else // XRGAME_EXPORTS
-    CInifile* Ini = nullptr;
-    string_path gm_name;
-    FS.update_path(gm_name, "$game_config$", GAME_CONFIG);
-    R_ASSERT3(FS.exist(gm_name), "Couldn't find file", gm_name);
-    Ini = xr_new<CInifile>(gm_name);
-#endif // XRGAME_EXPORTS
 
     // location type
     LPCSTR N, V;
-    u32 k;
     for (int i = 0; i < GameGraph::LOCATION_TYPE_COUNT; ++i)
     {
         VERIFY(locations[i].empty());
         string256 caSection, T;
         strconcat(sizeof(caSection), caSection, SECTION_HEADER, xr_itoa(i, T, 10));
         R_ASSERT(Ini->section_exist(caSection));
-        for (k = 0; Ini->r_line(caSection, k, &N, &V); ++k)
-            locations[i].push_back(xr_rtoken(V, atoi(N)));
+        for (int k = 0; Ini->r_line(caSection, k, &N, &V); ++k)
+            locations[i].emplace_back(V, atoi(N));
     }
-    for (k = 0; Ini->r_line("graph_points_draw_color_palette", k, &N, &V); ++k)
+
+    if (Ini->section_exist("graph_points_draw_color_palette"))
     {
-        u32 color;
-        if (1 == sscanf(V, "%x", &color))
+        for (int k = 0; Ini->r_line("graph_points_draw_color_palette", k, &N, &V); ++k)
         {
-            location_colors[N] = color;
+            u32 color;
+            if (1 == sscanf(V, "%x", &color))
+            {
+                location_colors[N] = color;
+            }
+            else
+                Msg("! invalid record format in [graph_points_draw_color_palette] %s=%s", N, V);
         }
-        else
-            Msg("! invalid record format in [graph_points_draw_color_palette] %s=%s", N, V);
     }
 
     // level names/ids
     VERIFY(level_ids.empty());
-    for (k = 0; Ini->r_line("levels", k, &N, &V); ++k)
+    for (int k = 0; Ini->r_line("levels", k, &N, &V); ++k)
         level_ids.push_back(Ini->r_string_wb(N, "caption"));
 
     // story names
@@ -150,8 +142,8 @@ void SFillPropData::load()
         VERIFY(story_names.empty());
         LPCSTR section = "story_ids";
         R_ASSERT(Ini->section_exist(section));
-        for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
-            story_names.push_back(xr_rtoken(V, atoi(N)));
+        for (int k = 0; Ini->r_line(section, k, &N, &V); ++k)
+            story_names.emplace_back(V, atoi(N));
 
         std::sort(story_names.begin(), story_names.end(), story_name_predicate());
         story_names.insert(story_names.begin(), xr_rtoken("NO STORY ID", ALife::_STORY_ID(-1)));
@@ -162,8 +154,8 @@ void SFillPropData::load()
         VERIFY(spawn_story_names.empty());
         LPCSTR section = "spawn_story_ids";
         R_ASSERT(Ini->section_exist(section));
-        for (k = 0; Ini->r_line(section, k, &N, &V); ++k)
-            spawn_story_names.push_back(xr_rtoken(V, atoi(N)));
+        for (int k = 0; Ini->r_line(section, k, &N, &V); ++k)
+            spawn_story_names.emplace_back(V, atoi(N));
 
         std::sort(spawn_story_names.begin(), spawn_story_names.end(), story_name_predicate());
         spawn_story_names.insert(spawn_story_names.begin(), xr_rtoken("NO SPAWN STORY ID", ALife::_SPAWN_STORY_ID(-1)));
@@ -174,25 +166,22 @@ void SFillPropData::load()
     VERIFY(character_profiles.empty());
     for (int i = 0; i <= CCharacterInfo::GetMaxIndex(); i++)
     {
-        character_profiles.push_back(CCharacterInfo::IndexToId(i));
+        character_profiles.emplace_back(CCharacterInfo::IndexToId(i));
     }
 
     std::sort(character_profiles.begin(), character_profiles.end(), SortStringsByAlphabetPred);
 #endif // AI_COMPILER
-
-// destroy ini
-#ifndef XRGAME_EXPORTS
-    xr_delete(Ini);
-#endif // XRGAME_EXPORTS
 
     luabind::object table;
 
     R_ASSERT(GEnv.ScriptEngine->function_object("smart_covers.descriptions", table, LUA_TTABLE));
 
     for (luabind::iterator I(table), E; I != E; ++I)
-        smart_covers.push_back(luabind::object_cast<LPCSTR>(I.key()));
+        smart_covers.emplace_back(luabind::object_cast<pcstr>(I.key()));
 
+#ifdef XR_PLATFORM_WINDOWS
     std::sort(smart_covers.begin(), smart_covers.end(), logical_string_predicate());
+#endif
 };
 
 void SFillPropData::unload()
@@ -224,13 +213,12 @@ void SFillPropData::inc()
 
     ++counter;
 }
-static SFillPropData fp_data;
-#endif // #ifdef XRSE_FACTORY_EXPORTS
+SFillPropData fp_data;
+#endif // !MASTER_GOLD
 
 #ifndef MASTER_GOLD
 void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     PHelper().CreateU32(items, PrepareKey(pref, *base()->s_name, "Money"), &m_dwMoney, 0, u32(-1));
     PHelper().CreateFlag32(items, PrepareKey(pref, *base()->s_name, "Trader" DELIMITER "Infinite ammo"),
         &m_trader_flags, eTraderFlagInfiniteAmmo);
@@ -238,7 +226,6 @@ void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
         &m_sCharacterProfile, &*fp_data.character_profiles.begin(), fp_data.character_profiles.size());
 
     value->OnChangeEvent.bind(this, &CSE_ALifeTraderAbstract::OnChangeProfile);
-#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 #endif // #ifndef MASTER_GOLD
 ////////////////////////////////////////////////////////////////////////////
@@ -252,16 +239,16 @@ CSE_ALifeGraphPoint::CSE_ALifeGraphPoint(LPCSTR caSection) : CSE_Abstract(caSect
     m_tLocations[2] = 0;
     m_tLocations[3] = 0;
 
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.inc();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
 }
 
 CSE_ALifeGraphPoint::~CSE_ALifeGraphPoint()
 {
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.dec();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
 }
 
 void CSE_ALifeGraphPoint::STATE_Read(NET_Packet& tNetPacket, u16 /*size*/)
@@ -292,7 +279,6 @@ void CSE_ALifeGraphPoint::UPDATE_Write(NET_Packet& /*tNetPacket*/) {}
 #ifndef MASTER_GOLD
 void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     PHelper().CreateRToken8(items, PrepareKey(pref, *s_name, "Location" DELIMITER "1"), &m_tLocations[0],
     &*fp_data.locations[0].begin(), fp_data.locations[0].size());
     PHelper().CreateRToken8(items, PrepareKey(pref, *s_name, "Location" DELIMITER "2"), &m_tLocations[1],
@@ -304,13 +290,11 @@ void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateRList(items, PrepareKey(pref, *s_name, "Connection" DELIMITER "Level name"), &m_caConnectionLevelName,
     &*fp_data.level_ids.begin(), fp_data.level_ids.size());
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Connection" DELIMITER "Point name"), &m_caConnectionPointName);
-#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeGraphPoint::on_render(CDUInterface* du, IServerEntityLEOwner* owner,
     bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     static const u32 IL[16] = {0, 1, 0, 2, 0, 3, 0, 4, 1, 3, 3, 2, 2, 4, 4, 1};
     static const u32 IT[12] = {1, 3, 0, 3, 2, 0, 2, 4, 0, 4, 1, 0};
     static const Fvector PT[5] =
@@ -347,9 +331,7 @@ void CSE_ALifeGraphPoint::on_render(CDUInterface* du, IServerEntityLEOwner* owne
 
     if (bSelected)
         du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), nullptr);
-#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-
 #endif // #ifndef MASTER_GOLD
 
 ////////////////////////////////////////////////////////////////////////////
@@ -371,9 +353,9 @@ CSE_ALifeObject::CSE_ALifeObject(LPCSTR caSection) : CSE_Abstract(caSection)
 #ifdef XRGAME_EXPORTS
     m_alife_simulator = 0;
 #endif
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.inc();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
     m_flags.set(flOfflineNoMove, false);
     seed(u32(CPU::QPC() & 0xffffffff));
 }
@@ -390,9 +372,9 @@ Fvector CSE_ALifeObject::draw_level_position() const { return (Position()); }
 
 CSE_ALifeObject::~CSE_ALifeObject()
 {
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.dec();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
 }
 
 bool CSE_ALifeObject::move_offline() const { return (!m_flags.test(flOfflineNoMove)); }
@@ -487,7 +469,6 @@ void CSE_ALifeObject::UPDATE_Read(NET_Packet& /*tNetPacket*/) {};
 #ifndef MASTER_GOLD
 void CSE_ALifeObject::FillProps(LPCSTR pref, PropItemVec& items)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     inherited::FillProps(pref, items);
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Custom data"), &m_ini_string);
     if (m_flags.is(flUseSwitches))
@@ -502,7 +483,6 @@ void CSE_ALifeObject::FillProps(LPCSTR pref, PropItemVec& items)
         &*fp_data.story_names.begin(), fp_data.story_names.size());
     PHelper().CreateRToken32(items, PrepareKey(pref, *s_name, "ALife" DELIMITER "Spawn Story ID"), &m_spawn_story_id,
         &*fp_data.spawn_story_names.begin(), fp_data.spawn_story_names.size());
-#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 #endif // #ifndef MASTER_GOLD
 
@@ -763,17 +743,17 @@ CSE_ALifeLevelChanger::CSE_ALifeLevelChanger(LPCSTR caSection) : CSE_ALifeSpaceR
     m_dwNextNodeID = u32(-1);
     m_tNextPosition.set(0.f, 0.f, 0.f);
     m_tAngles.set(0.f, 0.f, 0.f);
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.inc();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
     m_bSilentMode = FALSE;
 }
 
 CSE_ALifeLevelChanger::~CSE_ALifeLevelChanger()
 {
-#ifdef XRSE_FACTORY_EXPORTS
+#ifndef MASTER_GOLD
     fp_data.dec();
-#endif // XRSE_FACTORY_EXPORTS
+#endif
 }
 
 void CSE_ALifeLevelChanger::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -822,7 +802,6 @@ void CSE_ALifeLevelChanger::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UP
 #ifndef MASTER_GOLD
 void CSE_ALifeLevelChanger::FillProps(LPCSTR pref, PropItemVec& items)
 {
-#ifdef XRSE_FACTORY_EXPORTS
     inherited::FillProps(pref, items);
 
     PHelper().CreateRList(items, PrepareKey(pref, *s_name, "Level to change"), &m_caLevelToChange,
@@ -830,7 +809,6 @@ void CSE_ALifeLevelChanger::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Level point to change"), &m_caLevelPointToChange);
 
     PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "Silent mode"), &m_bSilentMode);
-#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 #endif // #ifndef MASTER_GOLD
 

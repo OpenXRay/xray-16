@@ -12,9 +12,13 @@
 #include "Lines/UILines.h"
 #include "UICustomSpin.h"
 
-#define SPIN_HEIGHT 20.0f
-#define BTN_SIZE_X 11.0f
-#define BTN_SIZE_Y 8.0f
+#include "XML/UITextureMaster.h"
+
+constexpr float    SPIN_HEIGHT_COP    = 20.0f;
+constexpr Fvector2 BTN_SIZE_COP       = { 11.0f, 8.0f };
+
+constexpr float    SPIN_HEIGHT_SOC_CS = 22.0f;
+constexpr Fvector2 BTN_SIZE_SOC_CS    = { 11.0f, 11.0f };
 
 CUICustomSpin::CUICustomSpin() : CUIWindow("CUICustomSpin")
 {
@@ -47,27 +51,43 @@ CUICustomSpin::~CUICustomSpin() { xr_delete(m_pLines); }
 void CUICustomSpin::InitSpin(Fvector2 pos, Fvector2 size)
 {
     CUIWindow::SetWndPos(pos);
-    CUIWindow::SetWndSize(Fvector2().set(size.x, SPIN_HEIGHT));
+    CUIWindow::SetWndSize({ size.x, SPIN_HEIGHT_COP });
 
-    m_pFrameLine->SetWndPos(Fvector2().set(0, 0));
-    m_pFrameLine->SetWndSize(Fvector2().set(size.x, SPIN_HEIGHT));
+    m_pFrameLine->SetWndPos({});
+    m_pLines->m_wndPos.set({});
 
-    if (!m_pFrameLine->InitTexture("ui_inGame2_spin_box", false))
-        m_pFrameLine->InitTexture("ui_spiner", false);
+    if (m_pFrameLine->InitTexture("ui_inGame2_spin_box", false))
+    {
+        m_pFrameLine->SetWndSize({ size.x, SPIN_HEIGHT_COP });
+        m_pLines->m_wndSize.set({ size.x - BTN_SIZE_COP.x - 10.0f, SPIN_HEIGHT_COP });
+    }
+    else if (m_pFrameLine->InitTexture("ui_spiner", false))
+    {
+        m_pFrameLine->SetWndSize({ size.x, SPIN_HEIGHT_SOC_CS });
+        m_pLines->m_wndSize.set({ size.x - BTN_SIZE_SOC_CS.x - 10.0f, SPIN_HEIGHT_SOC_CS });
+    }
 
-    m_pBtnUp->InitButton(Fvector2().set(size.x - BTN_SIZE_X - 2.0f, 1.0f), Fvector2().set(BTN_SIZE_X, BTN_SIZE_Y));
-
-    if (!m_pBtnUp->InitTexture("ui_inGame2_spin_box_button_top", false))
+    if (CUITextureMaster::ItemExist("ui_inGame2_spin_box_button_top_e"))
+    {
+        m_pBtnUp->InitButton({ size.x - BTN_SIZE_COP.x - 2.0f, 1.0f }, BTN_SIZE_COP);
+        m_pBtnUp->InitTexture("ui_inGame2_spin_box_button_top", false);
+    }
+    else if (CUITextureMaster::ItemExist("ui_spiner_button_t_e"))
+    {
+        m_pBtnUp->InitButton({ size.x - BTN_SIZE_SOC_CS.x - 1.0f, 0.0f }, BTN_SIZE_SOC_CS);
         m_pBtnUp->InitTexture("ui_spiner_button_t", false);
+    }
 
-    m_pBtnDown->InitButton(
-        Fvector2().set(size.x - BTN_SIZE_X - 2.0f, BTN_SIZE_Y + 2.0f), Fvector2().set(BTN_SIZE_X, BTN_SIZE_Y));
-
-    if (!m_pBtnDown->InitTexture("ui_inGame2_spin_box_button_bottom", false))
+    if (CUITextureMaster::ItemExist("ui_inGame2_spin_box_button_bottom_e"))
+    {
+        m_pBtnDown->InitButton({ size.x - BTN_SIZE_COP.x - 2.0f, BTN_SIZE_COP.y + 2.0f }, BTN_SIZE_COP);
+        m_pBtnDown->InitTexture("ui_inGame2_spin_box_button_bottom", false);
+    }
+    else if (CUITextureMaster::ItemExist("ui_spiner_button_b_e"))
+    {
+        m_pBtnDown->InitButton({ size.x - BTN_SIZE_SOC_CS.x - 1.0f, BTN_SIZE_SOC_CS.y + 1.0f }, BTN_SIZE_SOC_CS);
         m_pBtnDown->InitTexture("ui_spiner_button_b", false);
-
-    m_pLines->m_wndPos.set(Fvector2().set(0, 0));
-    m_pLines->m_wndSize.set(Fvector2().set(size.x - BTN_SIZE_X - 10.0f, SPIN_HEIGHT));
+    }
 }
 
 void CUICustomSpin::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)

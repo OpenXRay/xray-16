@@ -18,7 +18,7 @@ private:
 public:
 #ifdef DEBUG
     xr_vector<u32> m_test_storage;
-    bool m_correct;
+    bool m_correct{ false };
 #endif
 
 protected:

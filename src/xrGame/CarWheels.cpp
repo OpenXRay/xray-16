@@ -271,61 +271,67 @@ void CCar::SWheelSteer::Init()
     limited = false;
 }
 
-void CCar::SWheelSteer::SteerRight()
+void CCar::SWheelSteer::Steer(float angle)
 {
-    limited = true; // no need to limit wheels when steering
-    if (pos_right > 0)
+    const bool zeroAngle = fis_zero(angle);
+    limited = zeroAngle;
+
+    if (zeroAngle)
     {
-        pwheel->SetSteerHiLimit(hi_limit);
-        pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
-    }
-    else
-    {
-        pwheel->SetSteerLoLimit(lo_limit);
-        pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
-    }
-}
-void CCar::SWheelSteer::SteerLeft()
-{
-    limited = true; // no need to limit wheels when steering
-    if (pos_right < 0)
-    {
-        pwheel->SetSteerHiLimit(hi_limit);
-        pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
-    }
-    else
-    {
-        pwheel->SetSteerLoLimit(lo_limit);
-        pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
-    }
-}
-void CCar::SWheelSteer::SteerIdle()
-{
-    limited = false;
-    if (pwheel->car->e_state_steer == right)
-    {
-        if (pos_right < 0)
+        if (pwheel->car->e_state_steer == right)
         {
-            pwheel->SetSteerHiLimit(0.f);
-            pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
+            if (pos_right < 0)
+            {
+                pwheel->SetSteerHiLimit(0.f);
+                pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
+            }
+            else
+            {
+                pwheel->SetSteerLoLimit(0.f);
+                pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
+            }
         }
         else
         {
-            pwheel->SetSteerLoLimit(0.f);
-            pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
+            if (pos_right > 0)
+            {
+                pwheel->SetSteerHiLimit(0.f);
+                pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
+            }
+            else
+            {
+                pwheel->SetSteerLoLimit(0.f);
+                pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
+            }
         }
     }
     else
     {
-        if (pos_right > 0)
+        if (angle > 0.0f)
         {
-            pwheel->SetSteerHiLimit(0.f);
-            pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
+            if (pos_right > 0)
+            {
+                pwheel->SetSteerHiLimit(hi_limit * std::abs(angle));
+                pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
+            }
+            else
+            {
+                pwheel->SetSteerLoLimit(lo_limit * std::abs(angle));
+                pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
+            }
         }
-        else
+        else // angle < 0.0f
         {
-            pwheel->SetSteerLoLimit(0.f);
-            pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
+            if (pos_right < 0)
+            {
+                pwheel->SetSteerHiLimit(hi_limit * std::abs(angle));
+                pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
+            }
+            else
+            {
+                pwheel->SetSteerLoLimit(lo_limit * std::abs(angle));
+                pwheel->ApplySteerAxisVel(-pwheel->car->m_steering_speed);
+            }
         }
     }
 }

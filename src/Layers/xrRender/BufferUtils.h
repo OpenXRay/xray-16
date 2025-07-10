@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 u32 GetFVFVertexSize(u32 FVF);
 u32 GetDeclVertexSize(const VertexElement* decl, u32 Stream);
 u32 GetDeclLength(const VertexElement* decl);
@@ -237,3 +239,4 @@ private:
     IndexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
 };
+} // namespace xray::render::RENDER_NAMESPACE

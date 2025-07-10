@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
 {
     phase_accumulator(cmd_list);
@@ -223,3 +225,4 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
 
     u_DBT_disable();
 }
+} // namespace xray::render::RENDER_NAMESPACE

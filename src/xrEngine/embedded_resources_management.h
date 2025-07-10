@@ -10,24 +10,22 @@ inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
 {
     ZoneScoped;
     const size_t pitch = source->pitch;
-    const size_t size = pitch * source->h;
+    const size_t height = source->h;
 
-    // XXX: don't alloc at all, flip surface in-place
-    auto ptr = static_cast<u8*>(xr_malloc(size));
-    auto original = ptr;
-
-    CopyMemory(original, source->pixels, size);
-
-    auto flipped = static_cast<u8*>(source->pixels) + size;
-
-    for (auto line = 0; line < source->h; ++line)
+    // Flip the surface in-place without allocation
+    u8* pixels = static_cast<u8*>(source->pixels);
+    for (size_t row = 0; row < height / 2; ++row)
     {
-        CopyMemory(flipped, original, pitch);
-        original += pitch;
-        flipped -= pitch;
+        u8* top_row = pixels + row * pitch;
+        u8* bottom_row = pixels + (height - row - 1) * pitch;
+
+        // Swap the rows without temporary allocation
+        for (size_t col = 0; col < pitch; ++col)
+        {
+            std::swap(top_row[col], bottom_row[col]);
+        }
     }
 
-    xr_free(ptr);
     return source;
 }
 
@@ -70,8 +68,7 @@ inline SDL_Surface* CreateSurfaceFromBitmap(HBITMAP bitmapHandle)
         return nullptr;
     }
 
-    XRSDL_SurfaceVerticalFlip(surface);
-    return surface;
+    return XRSDL_SurfaceVerticalFlip(surface);
 }
 
 inline SDL_Surface* ExtractBitmap(int idx)

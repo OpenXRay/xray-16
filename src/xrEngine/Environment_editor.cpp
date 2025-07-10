@@ -441,8 +441,23 @@ void CEnvironment::on_tool_frame()
 
             if (ImGui::BeginTable("Environment lerp", 3, flags))
             {
+                // When target column is hidden, it's considered as simplified mode
+                const bool target_is_hidden = (ImGui::TableGetColumnFlags(2) & ImGuiTableColumnFlags_IsEnabled) == 0;
+
                 ImGui::TableNextColumn();
-                TimeFrameCombo("Time frame##current0", Current[0], CurrentWeather);
+                if (TimeFrameCombo("Time frame##current0", Current[0], CurrentWeather))
+                {
+                    // Force set & update the weather in the simplified mode
+                    if (target_is_hidden && Current[0])
+                    {
+                        const float time = Current[0]->exec_time + 0.1f; // hack for time between 23:00 and 00:00
+                        if (g_pGameLevel)
+                            g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(time * 1000.f), time_factor);
+                        SetGameTime(time, time_factor);
+                        Invalidate();
+                        lerp();
+                    }
+                }
 
                 ImGui::TableNextColumn();
                 u32 hours, minutes, seconds;
@@ -474,7 +489,7 @@ void CEnvironment::on_tool_frame()
 
             if (ImGui::BeginTable("Environment lerp", 3, flags))
             {
-                ImGui::TableSetupColumn("current");
+                ImGui::TableSetupColumn("current", ImGuiTableColumnFlags_NoHide);
                 ImGui::TableSetupColumn("blend");
                 ImGui::TableSetupColumn("target");
                 ImGui::TableHeadersRow();

@@ -49,25 +49,6 @@ using detail::parse_table;
 using detail::parse_fvector;
 using detail::parse_int;
 
-static LPCSTR s_enter_loophole_id = "<__ENTER__>";
-static LPCSTR s_exit_loophole_id = "<__EXIT__>";
-
-shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
-{
-    if (*vertex_id.c_str())
-        return (vertex_id);
-
-    if (in)
-        return (s_enter_loophole_id);
-
-    return (s_exit_loophole_id);
-}
-
-shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in)
-{
-    return (transform_vertex(parse_string(table, identifier), in));
-}
-
 class enterable_predicate
 {
 public:

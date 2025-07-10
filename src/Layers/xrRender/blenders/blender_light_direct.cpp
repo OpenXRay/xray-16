@@ -3,6 +3,8 @@
 
 #include "blender_light_direct.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_accum_direct::CBlender_accum_direct() { description.CLS = 0; }
 CBlender_accum_direct::~CBlender_accum_direct() {}
 void CBlender_accum_direct::Compile(CBlender_Compile& C)
@@ -682,3 +684,4 @@ void CBlender_accum_direct_volumetric_sun_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

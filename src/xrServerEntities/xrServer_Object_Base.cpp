@@ -18,22 +18,12 @@
 #include "object_factory.h"
 #endif
 
-#ifndef XRSE_FACTORY_EXPORTS
 #include "xrEProps.h"
-
-IPropHelper& PHelper()
-{
-    NODEFAULT;
-#ifdef DEBUG
-    return (*(IPropHelper*)0);
-#endif
-}
 
 #ifdef XRGAME_EXPORTS
 #include "ai_space.h"
 #include "alife_simulator.h"
 #endif // #ifdef XRGAME_EXPORTS
-#endif
 
 LPCSTR script_section = "script";
 LPCSTR current_version = "current_server_entity_version";
@@ -209,19 +199,15 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
 //	tNetPacket.w_u64			(m_min_spawn_interval);
 //	tNetPacket.w_u64			(m_max_spawn_interval);
 
-#ifdef XRSE_FACTORY_EXPORTS
     CScriptValueContainer::assign();
-#endif
 
     // write specific data
     u32 position = tNetPacket.w_tell();
     tNetPacket.w_u16(0);
     STATE_Write(tNetPacket);
     u16 size = u16(tNetPacket.w_tell() - position);
-    //#ifdef XRSE_FACTORY_EXPORTS
     R_ASSERT3((m_tClassID == CLSID_SPECTATOR) || (size > sizeof(size)),
         "object isn't successfully saved, get your backup :(", name_replace());
-    //#endif
     tNetPacket.w_seek(position, &size, sizeof(u16));
 }
 

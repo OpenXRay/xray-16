@@ -4,6 +4,8 @@
 #include "Layers/xrRender/HWCaps.h"
 #include "glHW.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace
 {
 u32 GetGpuNum()
@@ -70,3 +72,4 @@ void CHWCaps::Update()
 
     useCombinedSamplers = true;
 }
+} // namespace xray::render::RENDER_NAMESPACE

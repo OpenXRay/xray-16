@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_unload_magazine_after_pickup">
+		<text>Розряд. зброю при піднятті</text>
+	</string>
+	<string id="st_unload_magazine_all">
+		<text>розрядити всю зброю</text>
+	</string>
+	<string id="st_unequip">
+		<text>сховати в рюкзак</text>
+	</string>
+	<string id="st_donate">
+		<text>Подарувати</text>
+	</string>
+	<string id="st_loading_lights">
+		<text>Завантаження освітлення</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>Клієнт: З'єднання с</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>Клієнт: Створення</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>Клієнт: Синхронізація</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Створення нової гри</text>
+	</string>
+	<string id="ui_mm_always_active">
+		<text>Не ставити гру на пазу при Alt+Tab</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Відстань промальовування трави</text>
+	</string>
+	<string id="ui_mm_ui_style">
+		<text>Стиль інтерфейсу</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Поклик Прип'яті</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Спрощ. підбір предметів</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Множ. підбір предметів</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Стадії завантаження</text>
+	</string>
+	<string id="renderer_rgl">
+		<text>Покр. повне освітлення (OpenGL)</text>
+	</string>
+	<string id="ui_mm_window_mode">
+		<text>Режим вікна</text>
+	</string>
+	<string id="st_opt_windowed">
+		<text>Віконний</text>
+	</string>
+	<string id="st_opt_windowed_borderless">
+		<text>Віконний без рамок</text>
+	</string>
+	<string id="st_opt_fullscreen">
+		<text>Повноекранний</text>
+	</string>
+	<string id="st_opt_fullscreen_borderless">
+		<text>Повноекранний (швидкий Alt+Tab)</text>
+	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Якість карт тіней</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Оптимізація намокання</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Намокання поблизу</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Намокання вдалині</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Якість намокання</text>
+	</string>
+	<string id="ui_mm_fov">
+		<text>Поле зору</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Мова</text>
+	</string>
+	<string id="ui_mm_gamepad_setup">
+		<text>Налаштування геймпаду</text>
+	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Обмеження FPS у грі</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Обмеження FPS в меню</text>
+	</string>
+	<string id="ui_mm_shader_preset">
+		<text>Режим графіки</text>
+	</string>
+	<string id="ui_mm_shader_preset_vanilla">
+		<text>оригінальна</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_default">
+		<text>покращена (стандарт)</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_high">
+		<text>покращена (високо)</text>
+	</string>
+	<string id="ui_mm_color_grading_preset">
+		<text>Градація кольорів</text>
+	</string>
+	<string id="ui_mm_color_grading_default">
+		<text>стандартна</text>
+	</string>
+	<string id="ui_mm_color_grading_cold">
+		<text>холодна</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_01">
+		<text>Filmic 1</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_02">
+		<text>Filmic 2</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_03">
+		<text>Filmic 3</text>
+	</string>
+	<string id="ui_mm_color_grading_hollywood">
+		<text>Hollywood</text>
+	</string>
+	<string id="ui_mm_color_grading_vanilla">
+		<text>оригінальна</text>
+	</string>
+	<string id="ui_mm_color_grading_vibrant">
+		<text>Vibrant</text>
+	</string>
+	<string id="ui_mm_color_grading_warm">
+		<text>тепла</text>
+	</string>
+	<string id="eng">
+		<text>Англійська (English)</text>
+	</string>
+	<string id="fra">
+		<text>Французька (French)</text>
+	</string>
+	<string id="ger">
+		<text>Німецька (German)</text>
+	</string>
+	<string id="ita">
+		<text>Італійська (Italian)</text>
+	</string>
+	<string id="pol">
+		<text>Польська (Polish)</text>
+	</string>
+	<string id="rus">
+		<text>Російська (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Іспанська (Spanish)</text>
+	</string>
+	<string id="ukr">
+		<text>Українська (Ukrainian)</text>
+	</string>
+	<string id="jpn">
+		<text>Японська (Japanese)</text>
+	</string>
+</string_table>

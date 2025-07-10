@@ -62,20 +62,25 @@ public:
 
     void Load  (CDB::build_callback build_callback,
                 CDB::serialize_callback serialize_callback,
-                CDB::deserialize_callback deserialize_callback);
+                CDB::deserialize_callback deserialize_callback,
+                CDB::remapping_materials_callback remapping_materials_callback);
 
     void Load  (LPCSTR path, LPCSTR fname, CDB::build_callback build_callback,
                 CDB::serialize_callback serialize_callback,
-                CDB::deserialize_callback deserialize_callback);
+                CDB::deserialize_callback deserialize_callback,
+                CDB::remapping_materials_callback remapping_materials_callback);
 
     void Load  (IReader* R, CDB::build_callback build_callback,
                 CDB::serialize_callback serialize_callback,
-                CDB::deserialize_callback deserialize_callback);
+                CDB::deserialize_callback deserialize_callback,
+                CDB::remapping_materials_callback remapping_materials_callback);
 
     void Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H,
                 CDB::build_callback build_callback,
                 CDB::serialize_callback serialize_callback,
-                CDB::deserialize_callback deserialize_callback);
+                CDB::deserialize_callback deserialize_callback,
+                CDB::remapping_materials_callback remapping_materials_callback,
+                IReader* cacheStream = nullptr);
 
     // Occluded/No
     bool RayTest(const Fvector& start, const Fvector& dir, float range, collide::rq_target tgt,

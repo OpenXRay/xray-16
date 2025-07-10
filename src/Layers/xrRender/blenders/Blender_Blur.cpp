@@ -8,6 +8,8 @@
  * Consider removing.
  */
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Blur::CBlender_Blur()
 {
     description.CLS = B_BLUR;
@@ -121,7 +123,6 @@ void CBlender_Blur::Compile(CBlender_Compile& C)
     }
 }
 #endif
-
 
 CBlender_ssfx_ssr::CBlender_ssfx_ssr() { description.CLS = 0; }
 
@@ -379,3 +380,4 @@ void CBlender_ssfx_ao::Compile(CBlender_Compile& C)
         break;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

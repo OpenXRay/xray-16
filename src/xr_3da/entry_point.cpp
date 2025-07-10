@@ -2,6 +2,7 @@
 
 #include "xrEngine/x_ray.h"
 #include "xrGame/xrGame.h"
+#include "Include/xrRender/xrRender.h"
 
 #if defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_BSD) || defined(XR_PLATFORM_APPLE)
 #include <unistd.h>
@@ -20,11 +21,34 @@ XR_EXPORT u32 NvOptimusEnablement = 0x00000001; // NVIDIA Optimus
 XR_EXPORT u32 AmdPowerXpressRequestHighPerformance = 0x00000001; // PowerXpress or Hybrid Graphics
 }
 
+std::array<RendererModule*, 2> s_render_modules =
+{
+#ifdef XR_PLATFORM_WINDOWS
+    xray::render::render_r4::GetRendererModule(),
+#endif
+    xray::render::render_gl::GetRendererModule(),
+};
+
+struct tracy_raii
+{
+    ~tracy_raii()
+    {
+#ifdef TRACY_ENABLE
+        tracy::GetProfiler().RequestShutdown();
+        while (!tracy::GetProfiler().HasShutdownFinished())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+#endif
+    }
+};
+
 int entry_point(pcstr commandLine)
 {
+    tracy_raii raii;
     auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
 
-    CApplication app{ commandLine, game };
+    CApplication app{ commandLine, game, s_render_modules };
 
     return app.Run();
 }
@@ -50,8 +74,6 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
         _resetstkoflw();
         FATAL("stack overflow");
     }
-    if (!xrDebug::DebuggerIsPresent())
-        std::terminate(); // XXX: temporary to hide crashes on shutdown that make engine process hang
 
     return result;
 }

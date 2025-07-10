@@ -144,6 +144,9 @@ void CUIActorMenu::Construct()
     DeInitTradeMode();
     DeInitUpgradeMode();
     DeInitDeadBodySearchMode();
+
+    // We have shortcuts both for keyboard and gamepad
+    UI().Focus().UnregisterFocusable(m_exit_button);
 }
 
 void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)

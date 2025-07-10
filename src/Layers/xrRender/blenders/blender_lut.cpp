@@ -2,6 +2,8 @@
 
 #include "blender_lut.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_lut::CBlender_lut() { description.CLS = 0; }
 
 LPCSTR CBlender_lut::getComment()
@@ -22,4 +24,5 @@ void CBlender_lut::Compile(CBlender_Compile& C)
     C.r_dx11Sampler("smp_rtlinear");
     C.r_dx11Sampler("smp_linear");
     C.r_End();
+}
 }

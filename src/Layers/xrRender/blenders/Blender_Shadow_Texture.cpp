@@ -6,6 +6,8 @@
 #error "The blender can't be used in this renderer generation"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_ShTex::CBlender_ShTex()
 {
     description.CLS = B_SHADOW_TEX;
@@ -44,3 +46,4 @@ void CBlender_ShTex::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -28,7 +28,7 @@ void CUITradeBar::UpdateData(u32 price, float weight) const
 
     if (m_TradePrice)
     {
-        xr_sprintf(buf, "%d RU", price);
+        xr_sprintf(buf, "%d %s", price, StringTable().GetCurrency().c_str());
         m_TradePrice->SetText(buf);
         m_TradePrice->AdjustWidthToText();
     }

@@ -140,7 +140,6 @@ struct TaskWorkerStats
 class TaskWorker : public TaskQueue, public TaskWorkerStats
 {
 public:
-    std::mutex       mutex;
     fast_lc16        random{ this };
     size_t           id    { size_t(-1) };
 } static thread_local s_tl_worker;
@@ -170,6 +169,12 @@ TaskManager::~TaskManager()
     ZoneScoped;
     shouldStop.store(true, std::memory_order_release);
 
+    // Event::Set() wakes up only one thread
+    // Try to wake all of them
+    const auto count = workerThreads.size();
+    for (size_t i = 0; i < count; ++i)
+        newWorkArrived.Set();
+
     // Finish all pending tasks
     while (Task* t = s_tl_worker.pop())
     {
@@ -177,7 +182,11 @@ TaskManager::~TaskManager()
     }
 
     UnregisterThisThreadAsWorker();
-    newWorkArrived.notify_all();
+    while (!workers.empty())
+    {
+        newWorkArrived.Set();
+        Sleep(0);
+    }
     for (auto& thread : workerThreads)
     {
         if (thread.joinable())
@@ -237,10 +246,9 @@ void TaskManager::TaskWorkerStart()
 
         SetThreadStatus(false);
         {
-            std::unique_lock lck(s_tl_worker.mutex);
             do
             {
-                newWorkArrived.wait(lck); // spurious wakeups allowed
+                newWorkArrived.Wait();
             } while (shouldPause.load(std::memory_order_consume));
         }
         SetThreadStatus(true);
@@ -272,7 +280,7 @@ Task* TaskManager::TryToSteal() const
         if (auto* task = other->steal())
         {
             if (!other->empty())
-                newWorkArrived.notify_all();
+                newWorkArrived.Set();
             return task;
         }
         --steal_attempts;
@@ -289,7 +297,7 @@ Task* TaskManager::AllocateTask() noexcept
 void TaskManager::PushTask(Task& task) noexcept
 {
     s_tl_worker.push(&task);
-    newWorkArrived.notify_one();
+    newWorkArrived.Set();
     ++s_tl_worker.pushedTasks;
 }
 
@@ -304,13 +312,13 @@ void TaskManager::RunTask(Task& task)
     ExecuteTask(task);
 }
 
-void TaskManager::Wait(const Task& task) const
+void TaskManager::Wait(const Task& task, bool updateSystemEvents /*= false*/) const
 {
     ZoneScoped;
     while (!task.IsFinished())
     {
         ExecuteOneTask();
-        if (s_tl_worker.id == 0 && xrDebug::ProcessingFailure())
+        if (s_tl_worker.id == 0 && (xrDebug::ProcessingFailure() || updateSystemEvents))
             SDL_PumpEvents(); // Necessary to prevent dead locks
     }
 }

@@ -43,6 +43,17 @@ inline bool InputText(pcstr label, shared_str& texture_name)
     return false;
 }
 
+inline bool ColorEdit4(pcstr label, u32& clr, ImGuiColorEditFlags flags = 0)
+{
+    Fcolor color = clr;
+    if (ImGui::ColorEdit4(label, reinterpret_cast<float*>(&color), flags))
+    {
+        clr = color.get();
+        return true;
+    }
+    return false;
+}
+
 inline ImGuiKey xr_key_to_imgui_key(int key)
 {
     switch (key)

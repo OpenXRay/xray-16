@@ -2,6 +2,9 @@
 
 #include "editor_base.h"
 #include "editor_helper.h"
+#include "XR_IOConsole.h"
+
+#include <imgui_internal.h>
 
 namespace
 {
@@ -44,53 +47,73 @@ void ide::InitBackend()
 #endif
     }
 
-    // Clipboard functionality
-    io.SetClipboardTextFn = [](void*, const char* text)
+    ImGuiSettingsHandler ini_handler;
+    ini_handler.TypeName = "OpenXRay";
+    ini_handler.TypeHash = ImHashStr("OpenXRay");
+    ini_handler.UserData = this;
+
+    ini_handler.ClearAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler)
     {
-        SDL_SetClipboardText(text);
+        ide& self = *static_cast<ide*>(handler->UserData);
+        for (ide_tool* tool : self.m_tools)
+        {
+            tool->reset_settings();
+        }
     };
-    io.GetClipboardTextFn = [](void* user_data) -> const char*
+
+    ini_handler.ReadOpenFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, pcstr name) -> void*
     {
-        auto& bd = *static_cast<ImGuiBackend*>(user_data);
-
-        if (bd.clipboard_text_data)
-            SDL_free(bd.clipboard_text_data);
-
-        bd.clipboard_text_data = SDL_GetClipboardText();
-
-        return bd.clipboard_text_data;
+        ide& self = *static_cast<ide*>(handler->UserData);
+        for (ide_tool* tool : self.m_tools)
+        {
+            if (xr_strcmp(tool->tool_name(), name) == 0)
+            {
+                tool->reset_settings(); // Clear existing if recycling previous entry
+                return tool;
+            }
+        }
+        return nullptr;
     };
-    io.ClipboardUserData = &m_imgui_backend;
 
-    auto& bd = m_imgui_backend;
-
-    bd.mouse_cursors[ImGuiMouseCursor_Arrow]      = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-    bd.mouse_cursors[ImGuiMouseCursor_TextInput]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-    bd.mouse_cursors[ImGuiMouseCursor_ResizeAll]  = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
-    bd.mouse_cursors[ImGuiMouseCursor_ResizeNS]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
-    bd.mouse_cursors[ImGuiMouseCursor_ResizeEW]   = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
-    bd.mouse_cursors[ImGuiMouseCursor_ResizeNESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
-    bd.mouse_cursors[ImGuiMouseCursor_ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
-    bd.mouse_cursors[ImGuiMouseCursor_Hand]       = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-    bd.mouse_cursors[ImGuiMouseCursor_NotAllowed] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
-}
-
-void ide::ShutdownBackend()
-{
-    auto& backend = m_imgui_backend;
-
-    if (backend.clipboard_text_data)
+    ini_handler.ReadLineFn = [](ImGuiContext*, ImGuiSettingsHandler*, void* entry, pcstr line)
     {
-        SDL_free(backend.clipboard_text_data);
-        backend.clipboard_text_data = nullptr;
-    }
+        if (!entry)
+            return;
+        ide_tool& self = *static_cast<ide_tool*>(entry);
+        self.apply_setting(line);
 
-    for (auto& cursor : backend.mouse_cursors)
+    };
+
+    // We don't store separate copy of settings and
+    // intended workflow is to apply settings immediately in apply_setting,
+    // so this isn't much useful, but who knows
+    ini_handler.ApplyAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler)
     {
-        SDL_FreeCursor(cursor);
-        cursor = nullptr;
-    }
-    backend.last_cursor = nullptr;
+        ide& self = *static_cast<ide*>(handler->UserData);
+        for (ide_tool* tool : self.m_tools)
+        {
+            tool->apply_settings();
+        }
+    };
+
+    ini_handler.WriteAllFn = [](ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buffer)
+    {
+        ide& self = *static_cast<ide*>(handler->UserData);
+
+        size_t estimated_buffer_size = 0;
+        for (const ide_tool* tool : self.m_tools)
+        {
+            estimated_buffer_size += tool->estimate_settings_size();
+        }
+        buffer->reserve(estimated_buffer_size);
+
+        for (const ide_tool* tool : self.m_tools)
+        {
+            buffer->appendf("[%s][%s]\n", handler->TypeName, tool->tool_name());
+            tool->save_settings(buffer);
+        }
+    };
+    ImGui::AddSettingsHandler(&ini_handler);
 }
 
 void ide::ProcessEvent(const SDL_Event& event)
@@ -172,6 +195,29 @@ void ide::UpdateMouseData()
     }
 }
 
+#ifdef NDEBUG
+constexpr
+#endif
+SDL_SystemCursor get_sdl_cursor(ImGuiMouseCursor cursor)
+{
+    switch (cursor)
+    {
+    default:
+        VERIFY(false);
+        [[fallthrough]];
+
+    case ImGuiMouseCursor_Arrow:        return SDL_SYSTEM_CURSOR_ARROW;
+    case ImGuiMouseCursor_TextInput:    return SDL_SYSTEM_CURSOR_IBEAM;
+    case ImGuiMouseCursor_ResizeAll:    return SDL_SYSTEM_CURSOR_SIZEALL;
+    case ImGuiMouseCursor_ResizeNS:     return SDL_SYSTEM_CURSOR_SIZENS;
+    case ImGuiMouseCursor_ResizeEW:     return SDL_SYSTEM_CURSOR_SIZEWE;
+    case ImGuiMouseCursor_ResizeNESW:   return SDL_SYSTEM_CURSOR_SIZENESW;
+    case ImGuiMouseCursor_ResizeNWSE:   return SDL_SYSTEM_CURSOR_SIZENWSE;
+    case ImGuiMouseCursor_Hand:         return SDL_SYSTEM_CURSOR_HAND;
+    case ImGuiMouseCursor_NotAllowed:   return SDL_SYSTEM_CURSOR_NO;
+    }
+}
+
 void ide::UpdateMouseCursor()
 {
     const ImGuiIO& io = ImGui::GetIO();
@@ -179,24 +225,17 @@ void ide::UpdateMouseCursor()
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
         return;
 
-    auto& bd = m_imgui_backend;
     const ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
 
+    // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
     if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
     {
-        // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
-        SDL_ShowCursor(SDL_FALSE);
+        pInput->ShowCursor(false);
     }
     else
     {
-        // Show OS mouse cursor
-        SDL_Cursor* expected_cursor = bd.mouse_cursors[imgui_cursor] ? bd.mouse_cursors[imgui_cursor] : bd.mouse_cursors[ImGuiMouseCursor_Arrow];
-        if (bd.last_cursor != expected_cursor)
-        {
-            SDL_SetCursor(expected_cursor); // SDL function doesn't have an early out (see #6113)
-            bd.last_cursor = expected_cursor;
-        }
-        SDL_ShowCursor(SDL_TRUE);
+        pInput->SetCursor(get_sdl_cursor(imgui_cursor));
+        pInput->ShowCursor(true);
     }
 }
 
@@ -204,21 +243,21 @@ void ide::UpdateTextInput(bool force_disable /*= false*/)
 {
     if (force_disable)
     {
-        if (m_text_input_enabled)
+        if (m_imgui_backend.text_input_enabled)
         {
             pInput->DisableTextInput();
-            m_text_input_enabled = false;
+            m_imgui_backend.text_input_enabled = false;
         }
         return;
     }
 
     const ImGuiIO& io = ImGui::GetIO();
 
-    if (m_text_input_enabled != io.WantTextInput)
+    if (m_imgui_backend.text_input_enabled != io.WantTextInput)
     {
-        m_text_input_enabled = io.WantTextInput;
+        m_imgui_backend.text_input_enabled = io.WantTextInput;
 
-        if (m_text_input_enabled)
+        if (m_imgui_backend.text_input_enabled)
             pInput->EnableTextInput();
         else
             pInput->DisableTextInput();
@@ -301,6 +340,17 @@ void ide::IR_OnKeyboardPress(int key)
     case kEDITOR:
         SwitchToNextState();
         return;
+
+    case kCONSOLE:
+        if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+        {
+            if (Console->bVisible)
+                Console->Hide();
+            else
+                Console->Show();
+            return;
+        }
+        break;
 
     case kSCORES:
         if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
@@ -395,7 +445,7 @@ void ide::IR_OnTextInput(pcstr text)
         io.AddInputCharactersUTF8(text);
 }
 
-void ide::IR_OnControllerPress(int key, float x, float y)
+void ide::IR_OnControllerPress(int key, const ControllerAxisState& state)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -412,10 +462,10 @@ void ide::IR_OnControllerPress(int key, float x, float y)
         case XR_CONTROLLER_AXIS_RIGHT:
             break;
         case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-            io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, true, x);
+            io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, true, state.magnitude);
             break;
         case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-            io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, true, x);
+            io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, true, state.magnitude);
             break;
     }
 
@@ -445,7 +495,7 @@ void ide::IR_OnControllerPress(int key, float x, float y)
 #undef IM_SATURATE*/
 }
 
-void ide::IR_OnControllerRelease(int key, float x, float y)
+void ide::IR_OnControllerRelease(int key, const ControllerAxisState& state)
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -462,15 +512,15 @@ void ide::IR_OnControllerRelease(int key, float x, float y)
     case XR_CONTROLLER_AXIS_RIGHT:
         break;
     case XR_CONTROLLER_AXIS_TRIGGER_LEFT:
-        io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, false, x);
+        io.AddKeyAnalogEvent(ImGuiKey_GamepadL2, false, state.magnitude);
         break;
     case XR_CONTROLLER_AXIS_TRIGGER_RIGHT:
-        io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, false, x);
+        io.AddKeyAnalogEvent(ImGuiKey_GamepadR2, false, state.magnitude);
         break;
     }
 }
 
-void ide::IR_OnControllerHold(int /*key*/, float /*x*/, float /*y*/)
+void ide::IR_OnControllerHold(int /*key*/, const ControllerAxisState /*x*/& state)
 {
     // ImGui handles hold state on its own
 }

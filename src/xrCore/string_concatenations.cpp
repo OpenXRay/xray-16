@@ -108,7 +108,7 @@ void string_tupples::error_process() const
             }
         }
     }
-    VERIFY(overrun_string_index != -1);
+    VERIFY(overrun_string_index != u32(-1));
 
     strconcat_error::process(overrun_string_index, m_count, strings);
 }

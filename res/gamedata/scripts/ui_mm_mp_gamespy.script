@@ -393,7 +393,9 @@ function gamespy_page:OnMsgNo()
 end
 
 function gamespy_page:OnKeyboard(dik, keyboard_action)
-	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
 
 	local bind = dik_to_bind(dik)
 	local console = get_console()
@@ -401,12 +403,15 @@ function gamespy_page:OnKeyboard(dik, keyboard_action)
 	if keyboard_action == ui_events.WINDOW_KEY_RELEASED then
 		if dik == DIK_keys.DIK_LCONTROL then
 			ctrl = false
+			return true
 		end
 	elseif keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 		if dik == DIK_keys.DIK_LCONTROL then
 			ctrl = true
+			return true
 		elseif bind == key_bindings.kQUIT then
 			self:OnBtnCancel()
+			return true
 		elseif bind == key_bindings.kSCORES then
 			if(ctrl) then
 	            if(self.active_page=="login_page") then
@@ -414,10 +419,11 @@ function gamespy_page:OnKeyboard(dik, keyboard_action)
 				else
 					self:OnBtnLogin()
 				end
+				return true
 			end
 		end
 	end
-	return true
+	return false
 end
 
 function gamespy_page:OnEditLPEmailChanged()

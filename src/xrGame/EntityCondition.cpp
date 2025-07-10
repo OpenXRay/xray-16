@@ -328,7 +328,7 @@ float CEntityCondition::HitPowerEffect(float power_loss)
     if (!pOutfit)
         return power_loss * 0.5f;
 
-    float new_power_loss = power_loss * pOutfit->m_fPowerLoss;
+    const float new_power_loss = power_loss * pOutfit->GetPowerLoss();
 
     return new_power_loss;
 }

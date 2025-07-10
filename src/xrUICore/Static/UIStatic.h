@@ -60,9 +60,6 @@ public:
         TextItemControl()->m_TextOffset.y = y;
     }
 
-    virtual void SetColor(u32 color) { m_UIStaticItem.SetColor(color); }
-    virtual u32 GetColor() const { return m_UIStaticItem.GetColor(); }
-
     virtual void CreateShader(LPCSTR tex, LPCSTR sh = "hud" DELIMITER "default");
     ui_shader& GetShader() { return m_UIStaticItem.GetShader(); };
     virtual void SetTextureColor(u32 color) { m_UIStaticItem.SetTextureColor(color); }
@@ -112,15 +109,14 @@ public:
 protected:
     CUILines* m_pTextControl{};
 
+    CUIStaticItem m_UIStaticItem;
+    Fvector2 m_TextureOffset;
     bool m_bStretchTexture{};
     bool m_bTextureEnable{ true };
-    CUIStaticItem m_UIStaticItem;
 
     bool m_bHeading{};
     bool m_bConstHeading{};
     float m_fHeading{};
-
-    Fvector2 m_TextureOffset;
 
 public:
     CUILines* TextItemControl();

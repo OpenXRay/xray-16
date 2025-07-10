@@ -154,9 +154,9 @@ protected:
     float m_max_wound_protection;
     float m_max_fire_wound_protection;
 
-    mutable bool m_bLimping;
-    mutable bool m_bCantWalk;
-    mutable bool m_bCantSprint;
+    mutable bool m_bLimping{ false };
+    mutable bool m_bCantWalk{ false };
+    mutable bool m_bCantSprint{ false };
 
     //порог силы и здоровья меньше которого актер начинает хромать
     float m_fLimpingPowerBegin;

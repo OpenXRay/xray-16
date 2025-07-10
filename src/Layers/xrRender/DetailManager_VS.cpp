@@ -2,6 +2,8 @@
 #pragma hdrstop
 #include "DetailManager.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace detail_manager
 {
 extern const int quant = 16384;
@@ -118,3 +120,4 @@ void CDetailManager::hw_Unload()
     if (hw_VB)
         hw_VB.Release();
 }
+} // namespace xray::render::RENDER_NAMESPACE

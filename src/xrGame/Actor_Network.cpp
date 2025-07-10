@@ -513,9 +513,7 @@ void CActor::net_Import_Physic(NET_Packet& P)
             }
             else
             {
-#ifdef DEBUG
                 VERIFY(valid_pos(N_A.State.position, ph_boundaries()));
-#endif
                 NET_A.push_back(N_A);
                 if (NET_A.size() > 5)
                     NET_A.pop_front();

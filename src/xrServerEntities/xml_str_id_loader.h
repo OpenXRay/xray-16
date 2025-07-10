@@ -29,11 +29,12 @@ void _destroy_item_data_vector_cont(T_VECTOR* vec);
 TEMPLATE_SPECIALIZATION
 class CXML_IdToIndex
 {
-public:
 private:
     static T_VECTOR* m_pItemDataVector;
 
 protected:
+    CXML_IdToIndex() = default;
+
     //имена xml файлов (разделенных запятой) из которых
     //производить загрузку элементов
     static LPCSTR file_str;
@@ -41,37 +42,34 @@ protected:
     static LPCSTR tag_name;
 
 public:
-    CXML_IdToIndex() = default;
-    virtual ~CXML_IdToIndex() = default;
-
     static void InitInternal(bool crashOnFail = true, bool ignoreMissingEndTagError = false);
 
     static const ITEM_DATA* GetById(const shared_str& str_id, bool no_assert = false);
     static const ITEM_DATA* GetByIndex(int index, bool no_assert = false);
 
-    static const int IdToIndex(const shared_str& str_id, int default_index = -1, bool no_assert = false)
+    static int IdToIndex(const shared_str& str_id, int default_index = -1, bool no_assert = false)
     {
         const ITEM_DATA* item = GetById(str_id, no_assert);
         return item ? item->index : default_index;
     }
-    static const shared_str IndexToId(int index, shared_str default_id = NULL, bool no_assert = false)
+    static shared_str IndexToId(int index, shared_str default_id = nullptr, bool no_assert = false)
     {
         const ITEM_DATA* item = GetByIndex(index, no_assert);
         return item ? item->id : default_id;
     }
 
-    static const int GetMaxIndex() { return m_pItemDataVector->size() - 1; }
+    static int GetMaxIndex() { return m_pItemDataVector->size() - 1; }
     //удаление статичекого массива
     static void DeleteIdToIndexData();
 };
 
 TEMPLATE_SPECIALIZATION
-T_VECTOR* CSXML_IdToIndex::m_pItemDataVector = NULL;
+T_VECTOR* CSXML_IdToIndex::m_pItemDataVector = nullptr;
 
 TEMPLATE_SPECIALIZATION
-LPCSTR CSXML_IdToIndex::file_str = NULL;
+LPCSTR CSXML_IdToIndex::file_str = nullptr;
 TEMPLATE_SPECIALIZATION
-LPCSTR CSXML_IdToIndex::tag_name = NULL;
+LPCSTR CSXML_IdToIndex::tag_name = nullptr;
 
 TEMPLATE_SPECIALIZATION
 const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
@@ -93,7 +91,7 @@ const ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_asse
 #endif
 
         R_ASSERT3(no_assert, "item not found, id", *str_id);
-        return NULL;
+        return nullptr;
     }
 
     return &(*it);
@@ -105,7 +103,7 @@ const ITEM_DATA* CSXML_IdToIndex::GetByIndex(int index, bool no_assert)
     if ((size_t)index >= m_pItemDataVector->size())
     {
         R_ASSERT3(no_assert, "item by index not found in files", file_str);
-        return NULL;
+        return nullptr;
     }
     return &(*m_pItemDataVector)[index];
 }
@@ -128,7 +126,7 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/, bool ignoreMissi
     m_pItemDataVector = xr_new<T_VECTOR>();
 
     VERIFY(file_str);
-    VERIFY(tag_name);
+    R_ASSERT2_CURE(tag_name, "XML tag name is missing", { return; });
 
     string_path xml_file;
     int count = _GetItemCount(file_str);
@@ -155,13 +153,16 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/, bool ignoreMissi
 
         for (int i = 0; i < items_num; ++i)
         {
-            LPCSTR item_name = uiXml->ReadAttrib(uiXml->GetRoot(), tag_name, i, "id", NULL);
+            LPCSTR item_name = uiXml->ReadAttrib(uiXml->GetRoot(), tag_name, i, "id", nullptr);
+            if (!item_name || !item_name[0])
+            {
+#ifndef MASTER_GOLD
+                Msg("! id for %s don't set, number %d in %s", tag_name, i, xml_file_full.c_str());
+#endif
+                continue;
+            }
 
-            string256 buf;
-            xr_sprintf(buf, "id for item don't set, number %d in %s", i, xml_file);
-            R_ASSERT2(item_name, buf);
-
-            //проверетить ID на уникальность
+            //проверить ID на уникальность
             T_VECTOR::iterator t_it = m_pItemDataVector->begin();
             for (; m_pItemDataVector->end() != t_it; ++t_it)
             {
@@ -169,7 +170,13 @@ void CSXML_IdToIndex::InitInternal(bool crashOnFail /*= true*/, bool ignoreMissi
                     break;
             }
 
-            R_ASSERT3(m_pItemDataVector->end() == t_it, "duplicate item id", item_name);
+            if (m_pItemDataVector->end() != t_it)
+            {
+#ifndef MASTER_GOLD
+                Msg("! duplicate %s with id[%s] in %s", tag_name, item_name, xml_file_full);
+#endif
+                continue;
+            }
 
             ITEM_DATA data;
             data.id = item_name;

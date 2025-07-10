@@ -7,6 +7,8 @@
 #error "This blender can't be used in this renderer generation"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Vertex_aref::CBlender_Vertex_aref()
 {
     description.CLS = B_VERT_AREF;
@@ -242,3 +244,4 @@ void CBlender_Vertex_aref::CompileProgrammable(CBlender_Compile& C) const
         break;
     } // switch (C.iElement)
 }
+} // namespace xray::render::RENDER_NAMESPACE

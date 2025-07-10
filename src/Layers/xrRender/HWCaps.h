@@ -1,9 +1,9 @@
-#ifndef _HW_CAPS_
-#define _HW_CAPS_
 #pragma once
 
 #define CAP_VERSION(a, b) (u32(a) * 10 + u32(b))
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CHWCaps
 {
 public:
@@ -77,4 +77,4 @@ public:
 public:
     void Update(void);
 };
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

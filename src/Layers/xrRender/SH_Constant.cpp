@@ -24,6 +24,8 @@ BOOL	AAA_test		()
 }
 */
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CConstant::Calculate()
 {
     if (dwFrame == Device.dwFrame)
@@ -52,3 +54,4 @@ void CConstant::Save(IWriter* fs)
     fs->w(&B, sizeof(WaveForm));
     fs->w(&A, sizeof(WaveForm));
 }
+} // namespace xray::render::RENDER_NAMESPACE

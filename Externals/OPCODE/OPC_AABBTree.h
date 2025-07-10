@@ -77,7 +77,7 @@ public:
     bool IsComplete() const;
     // Stats
     udword ComputeDepth() const;
-    udword GetUsedBytes() const;
+    size_t GetUsedBytes() const;
 
 private:
     udword* mIndices; //!< Indices in the app list. Indices are reorganized during build.

@@ -137,7 +137,10 @@ function sleep_dialog:OnMessageBoxOk()
 end
 
 function sleep_dialog:OnKeyboard(dik, keyboard_action)
-	CUIScriptWnd.OnKeyboard(self, dik, keyboard_action)
+	if CUIScriptWnd.OnKeyboard(self,dik,keyboard_action) then
+		return true
+	end
+
 	local bind = dik_to_bind(dik)
 
 	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then

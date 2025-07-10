@@ -26,10 +26,16 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     param_s.kDist = pSettings->r_float(section, "k_dist");
     param_s.kDisp = pSettings->r_float(section, "k_disp");
     param_s.kHit = pSettings->r_float(section, "k_hit");
-    //.	param_s.kCritical			= pSettings->r_float(section, "k_hit_critical");
     param_s.kImpulse = pSettings->r_float(section, "k_impulse");
-    // m_kPierce				= pSettings->r_float(section, "k_pierce");
-    param_s.kAP = READ_IF_EXISTS(pSettings, r_float, section, "k_ap", 0.0f);
+
+    if (GMLib.GetLibraryVersion() >= GAMEMTL_VERSION_CS)
+        param_s.kAP = pSettings->r_float(section, "k_ap");
+    else
+    {
+        param_s.kPierce = pSettings->r_float(section, "k_pierce");
+        param_s.kAP     = pSettings->read_if_exists<float>(section, "k_ap", 0.0f);
+    }
+
     param_s.u8ColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 
     if (pSettings->line_exist(section, "k_air_resistance"))
@@ -55,6 +61,9 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
         if (pSettings->r_bool(section, "magnetic_beam_shot"))
             m_flags.set(cfMagneticBeam, TRUE);
     }
+
+    if (pSettings->line_exist(section, "4to1_tracer"))
+        m_4to1_tracer = pSettings->r_bool(section, "4to1_tracer");;
 
     if (pSettings->line_exist(section, "can_be_unlimited"))
         m_flags.set(cfCanBeUnlimited, pSettings->r_bool(section, "can_be_unlimited"));
@@ -93,10 +102,16 @@ void CWeaponAmmo::Load(LPCSTR section)
     cartridge_param.kDist = pSettings->r_float(section, "k_dist");
     cartridge_param.kDisp = pSettings->r_float(section, "k_disp");
     cartridge_param.kHit = pSettings->r_float(section, "k_hit");
-    //.	cartridge_param.kCritical	= pSettings->r_float(section, "k_hit_critical");
     cartridge_param.kImpulse = pSettings->r_float(section, "k_impulse");
-    // m_kPierce				= pSettings->r_float(section, "k_pierce");
-    cartridge_param.kAP = READ_IF_EXISTS(pSettings, r_float, section, "k_ap", 0.0f);
+
+    if (GMLib.GetLibraryVersion() >= GAMEMTL_VERSION_CS)
+        cartridge_param.kAP = pSettings->r_float(section, "k_ap");
+    else
+    {
+        cartridge_param.kPierce = pSettings->r_float(section, "k_pierce");
+        cartridge_param.kAP     = pSettings->read_if_exists<float>(section, "k_ap", 0.0f);
+    }
+
     cartridge_param.u8ColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 
     if (pSettings->line_exist(section, "k_air_resistance"))
@@ -104,6 +119,10 @@ void CWeaponAmmo::Load(LPCSTR section)
     else
         cartridge_param.kAirRes = pSettings->r_float(BULLET_MANAGER_SECTION, "air_resistance_k");
     m_tracer = !!pSettings->r_bool(section, "tracer");
+
+    if (pSettings->line_exist(section, "4to1_tracer"))
+        m_4to1_tracer = pSettings->r_bool(section, "4to1_tracer");;
+
     cartridge_param.buckShot = pSettings->r_s32(section, "buck_shot");
     cartridge_param.impair = pSettings->r_float(section, "impair");
     cartridge_param.fWallmarkSize = pSettings->r_float(section, "wm_size");
@@ -167,6 +186,7 @@ bool CWeaponAmmo::Get(CCartridge& cartridge)
     cartridge.param_s = cartridge_param;
 
     cartridge.m_flags.set(CCartridge::cfTracer, m_tracer);
+    cartridge.m_4to1_tracer = m_4to1_tracer;
     cartridge.bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
     cartridge.m_InvShortName = NameShort();
     --m_boxCurr;

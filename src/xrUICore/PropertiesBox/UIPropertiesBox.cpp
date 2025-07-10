@@ -152,7 +152,11 @@ void CUIPropertiesBox::Show(const Frect& parent_rect, const Fvector2& point)
     ResetAll();
 
     GetParent()->SetCapture(this, true);
+    GetParent()->SetKeyboardCapture(this, true);
+    UI().Focus().LockToWindow(this);
     m_UIListWnd.Reset();
+    if (pInput->IsCurrentInputTypeController())
+        m_UIListWnd.SelectFirst();
 }
 
 void CUIPropertiesBox::Hide()
@@ -164,6 +168,12 @@ void CUIPropertiesBox::Hide()
 
     if (GetParent()->GetMouseCapturer() == this)
         GetParent()->SetCapture(this, false);
+
+    if (GetParent()->GetKeyboardCapturer() == this)
+        GetParent()->SetKeyboardCapture(this, false);
+
+    if (UI().Focus().GetLocker())
+        UI().Focus().Unlock();
 
     if (m_sub_property_box)
         m_sub_property_box->Hide();
@@ -208,7 +218,33 @@ void CUIPropertiesBox::Update() { inherited::Update(); }
 void CUIPropertiesBox::Draw() { inherited::Draw(); }
 bool CUIPropertiesBox::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (keyboard_action == WINDOW_KEY_HOLD)
-        return false; // allow player to walk
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
+    EGameActions action = GetBindedAction(dik, EKeyContext::UI);
+    if (action == kNOTBINDED)
+        action = GetBindedAction(dik);
+
+    switch (action)
+    {
+    case kFWD:
+    case kBACK:
+    case kL_STRAFE:
+    case kR_STRAFE:
+        // Allow player to walk
+        return false;
+
+    case kUI_MOVE_LEFT:
+    case kUI_MOVE_RIGHT:
+    case kUI_MOVE_UP:
+    case kUI_MOVE_DOWN:
+        // Allow focus system to work
+        return false;
+
+    case kUI_BACK:
+    case kQUIT:
+        Hide();
+        return true;
+    }
     return true;
 }

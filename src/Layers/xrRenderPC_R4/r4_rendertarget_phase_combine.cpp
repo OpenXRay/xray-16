@@ -5,11 +5,14 @@
 
 #define STENCIL_CULL 0
 
-float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
-
 extern ENGINE_API Fvector4 ps_ssfx_il;
 extern ENGINE_API Fvector4 ps_ssfx_ao;
 extern ENGINE_API Fvector4 ps_ssfx_water;
+
+namespace xray::render::RENDER_NAMESPACE
+{
+
+float hclip(float v, float dim) { return 2.f * v / dim - 1.f; }
 
 void CRenderTarget::phase_combine()
 {
@@ -725,3 +728,4 @@ void CRenderTarget::phase_combine_volumetric()
     }
     RCache.set_ColorWriteEnable();
 }
+} // namespace xray::render::RENDER_NAMESPACE

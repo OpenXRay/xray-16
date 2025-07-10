@@ -29,17 +29,19 @@
     #include "Layers/xrRender/blenders/blender_lut.h"
 #endif
 
-#if (RENDER == R_R4)
-D3D_VIEWPORT custom_viewport = { 0.f, 0.f, 0.f, 0.f, 0.f, 1.f };
-
-void CRenderTarget::set_viewport_size(ID3DDeviceContext* dev, float w, float h)
+namespace xray::render::RENDER_NAMESPACE
 {
-    custom_viewport.Width = w;
-    custom_viewport.Height = h;
-    dev->RSSetViewports(1, &custom_viewport);
-}
-#endif
 
+#if (RENDER == R_R4)
+    D3D_VIEWPORT custom_viewport = { 0.f, 0.f, 0.f, 0.f, 0.f, 1.f };
+
+    void CRenderTarget::set_viewport_size(ID3DDeviceContext* dev, float w, float h)
+    {
+        custom_viewport.Width = w;
+        custom_viewport.Height = h;
+        dev->RSSetViewports(1, &custom_viewport);
+    }
+#endif
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
 {
     PIX_EVENT(stencil_optimize);
@@ -639,7 +641,7 @@ CRenderTarget::CRenderTarget()
     }
 
     // Check if SSAO Ultra is allowed
-    if (ps_r_ssao_mode != 2 /*hdao*/ || !options.ssao_ultra)
+    if (ps_r_ssao_mode != ssao_mode_hdao || !options.ssao_ultra)
         ps_r_ssao = _min(ps_r_ssao, 3);
 
     // HBAO
@@ -918,3 +920,4 @@ bool CRenderTarget::use_minmax_sm_this_frame()
     default: return false;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

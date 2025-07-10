@@ -75,6 +75,8 @@ ENGINE_API
 extern float psHUD_FOV;
 extern float psSqueezeVelocity;
 extern int psLUA_GCSTEP;
+extern int psLUA_GCTIMEOUT;
+extern u32 ps_lua_gc_method;
 extern int g_auto_ammo_unload;
 
 extern int x_m_x;
@@ -145,6 +147,15 @@ Flags32 g_uCommonFlags;
 enum E_COMMON_FLAGS
 {
     flAiUseTorchDynamicLights = 1
+};
+
+const xr_token lua_gc_method_token[] =
+{
+    { "gc_disable", 0 },
+    { "gc_step", 1 },
+    { "gc_timeout", 2 },
+    { "gc_full", 3 },
+    { nullptr, -1 }
 };
 
 CUIOptConCom g_OptConCom;
@@ -958,7 +969,7 @@ public:
     }
 };
 
-#if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
+#if defined(USE_DEBUGGER)
 class CCC_ScriptDbg : public IConsole_Command
 {
 public:
@@ -1000,23 +1011,7 @@ public:
             xr_strcpy(I, "restarts script debugger or start if no script debugger presents");
     }
 };
-#endif // #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
-
-#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
-class CCC_ScriptLuaStudioConnect : public IConsole_Command
-{
-public:
-    CCC_ScriptLuaStudioConnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { GEnv.ScriptEngine->try_connect_to_debugger(); };
-};
-
-class CCC_ScriptLuaStudioDisconnect : public IConsole_Command
-{
-public:
-    CCC_ScriptLuaStudioDisconnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { GEnv.ScriptEngine->disconnect_from_debugger(); };
-};
-#endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
+#endif // #if defined(USE_DEBUGGER)
 
 class CCC_DumpInfos : public IConsole_Command
 {
@@ -1383,7 +1378,7 @@ public:
 class CCC_ScriptCommand : public IConsole_Command
 {
 public:
-    CCC_ScriptCommand(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; };
+    CCC_ScriptCommand(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = false; bLowerCaseArgs = false; }
     virtual void Execute(LPCSTR args)
     {
         if (!xr_strlen(args))
@@ -1451,6 +1446,35 @@ public:
 };
 
 #endif // MASTER_GOLD
+
+class CCC_LuaGCMethod : public CCC_Token
+{
+public:
+    CCC_LuaGCMethod(pcstr name) : CCC_Token(name, &ps_lua_gc_method, lua_gc_method_token) {}
+
+    void Execute(pcstr args) override
+    {
+        const auto prev = *value;
+        CCC_Token::Execute(args);
+
+        switch (*value)
+        {
+        case 0:
+            lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTOP, 0);
+            break;
+        case 1:
+        case 2:
+            if (prev == 0)
+                lua_gc(GEnv.ScriptEngine->lua(), LUA_GCRESTART, 0);
+            break;
+        case 3:
+            // Perform a full garbage collection cycle and return to previous strategy.
+            lua_gc(GEnv.ScriptEngine->lua(), LUA_GCCOLLECT, 0);
+            *value = prev;
+            break;
+        }
+    }
+};
 
 #include "GamePersistent.h"
 
@@ -1992,6 +2016,134 @@ public:
     }
 };
 
+class CCC_LuaProfiler : public IConsole_Command
+{
+public:
+    constexpr static cpcstr COMMAND_LUA_PROFILER_STATUS = "lua_profiler_status";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_START = "lua_profiler_start";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_START_HOOK_MODE = "lua_profiler_start_hook_mode";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_START_SAMPLING_MODE = "lua_profiler_start_sampling_mode";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_STOP = "lua_profiler_stop";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_RESET = "lua_profiler_reset";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_LOG = "lua_profiler_log";
+    constexpr static cpcstr COMMAND_LUA_PROFILER_SAVE = "lua_profiler_save";
+
+    CCC_LuaProfiler(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr args) override
+    {
+        CScriptProfiler* profiler = GEnv.ScriptEngine->m_profiler;
+
+        if (strstr(cName, COMMAND_LUA_PROFILER_STATUS) == cName)
+        {
+            Msg("[P] Profiler status: %s, type - %s", profiler->IsActive() ? "on" : "off",
+                profiler->GetTypeString().c_str());
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START_HOOK_MODE) == cName)
+        {
+            profiler->StartHookMode();
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START_SAMPLING_MODE) == cName)
+        {
+            u32 interval = atoi(args);
+
+            profiler->StartSamplingMode(interval ? interval : CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT);
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START) == cName)
+        {
+            u32 profiler_type = atoi(args);
+
+            profiler->Start(profiler_type ? (CScriptProfilerType)profiler_type : CScriptProfiler::PROFILE_TYPE_DEFAULT);
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_STOP) == cName)
+        {
+            profiler->Stop();
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_RESET) == cName)
+        {
+            profiler->Reset();
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_LOG) == cName)
+        {
+            u32 limit = atoi(args);
+
+            profiler->LogReport(limit ? limit : CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT);
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_SAVE) == cName)
+        {
+            profiler->SaveReport();
+        }
+    }
+
+    void fill_tips(vecTips& tips, u32 /*mode*/) override
+    {
+        TStatus status_buffer;
+
+        if (strstr(cName, COMMAND_LUA_PROFILER_STATUS) == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START_HOOK_MODE) == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START_SAMPLING_MODE) == cName)
+        {
+            xr_sprintf(status_buffer, "%d (default) [1-%d] - sampling interval",
+                CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT, CScriptProfiler::PROFILE_SAMPLING_INTERVAL_MAX);
+            tips.emplace_back(status_buffer);
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START) == cName)
+        {
+            xr_sprintf(status_buffer, "%d - hooks based profiler", CScriptProfilerType::Hook);
+            tips.emplace_back(status_buffer);
+
+            xr_sprintf(status_buffer, "%d - sampling based profiler", CScriptProfilerType::Sampling);
+            tips.emplace_back(status_buffer);
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_STOP) == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_RESET) == cName)
+        {
+            // No arguments.
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_LOG) == cName)
+        {
+            xr_sprintf(status_buffer, "%d (default) - count of profiling entries to print",
+                CScriptProfiler::PROFILE_ENTRIES_LOG_LIMIT_DEFAULT, CScriptProfiler::PROFILE_SAMPLING_INTERVAL_MAX);
+            tips.emplace_back(status_buffer);
+        }
+        else if (strstr(cName, COMMAND_LUA_PROFILER_SAVE) == cName)
+        {
+            // No arguments.
+        }
+    }
+
+    void Info(TInfo& info) override
+    {
+        if (strstr(cName, COMMAND_LUA_PROFILER_STATUS) == cName)
+            xr_strcpy(info, "no arguments : print lua profiler status");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START_HOOK_MODE) == cName)
+            xr_strcpy(info, "no arguments : start lua script profiling in hook mode");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START_SAMPLING_MODE) == cName)
+            xr_strcpy(info,
+                "integer value in range [1,1000] : start lua script profiling in sampling mode with provided sampling "
+                "interval");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_START) == cName)
+            xr_strcpy(info, "integer value in range [0,2] : start lua script profiling in provided mode");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_STOP) == cName)
+            xr_strcpy(info, "no arguments : stop lua script profiling");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_RESET) == cName)
+            xr_strcpy(info, "no arguments : reset lua script profiling stats");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_LOG) == cName)
+            xr_strcpy(info, "integer value : log lua script profiling stats, limit entries with argument");
+        else if (strstr(cName, COMMAND_LUA_PROFILER_SAVE) == cName)
+            xr_strcpy(info, "no arguments : save lua script profiling stats in a file");
+    }
+};
+
 void CCC_RegisterCommands()
 {
     ZoneScoped;
@@ -2005,6 +2157,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
     CMD1(CCC_GameLanguage, "g_language");
+    CMD3(CCC_String, "g_language_ltx", CStringTable::LanguageIDInLTX, std::size(CStringTable::LanguageIDInLTX));
 
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
@@ -2073,11 +2226,25 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "ai_use_smart_covers", &psAI_Flags, aiUseSmartCovers);
     CMD3(CCC_Mask, "ai_use_smart_covers_animation_slots", &psAI_Flags, (u32)aiUseSmartCoversAnimationSlot);
     CMD4(CCC_Float, "ai_smart_factor", &g_smart_cover_factor, 0.f, 1000000.f);
-    CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
 #endif // MASTER_GOLD
 
-#ifdef DEBUG
+    CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
+    CMD4(CCC_Integer, "lua_dump_depth", &g_LuaDumpDepth, 0, 16);
+
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_STATUS);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_START);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_START_SAMPLING_MODE);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_START_HOOK_MODE);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_STOP);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_RESET);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_LOG);
+    CMD1(CCC_LuaProfiler, CCC_LuaProfiler::COMMAND_LUA_PROFILER_SAVE);
+
+    CMD1(CCC_LuaGCMethod, "lua_gc_method");
     CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
+    CMD4(CCC_Integer, "lua_gc_timeout", &psLUA_GCTIMEOUT, 1000, 16000);
+
+#ifdef DEBUG
     CMD3(CCC_Mask, "ai_debug", &psAI_Flags, aiDebug);
     CMD3(CCC_Mask, "ai_dbg_brain", &psAI_Flags, aiBrain);
     CMD3(CCC_Mask, "ai_dbg_motion", &psAI_Flags, aiMotion);
@@ -2137,16 +2304,11 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "ai_dbg_inactive_time", &g_AI_inactive_time, 0, 1000000);
 
     CMD1(CCC_DebugNode, "ai_dbg_node");
-#if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
+#if defined(USE_DEBUGGER)
     CMD1(CCC_ScriptDbg, "script_debug_break");
     CMD1(CCC_ScriptDbg, "script_debug_stop");
     CMD1(CCC_ScriptDbg, "script_debug_restart");
-#endif // #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
-
-#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
-    CMD1(CCC_ScriptLuaStudioConnect, "lua_studio_connect");
-    CMD1(CCC_ScriptLuaStudioDisconnect, "lua_studio_disconnect");
-#endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
+#endif // #if defined(USE_DEBUGGER)
 
     CMD1(CCC_ShowMonsterInfo, "ai_monster_info");
     CMD1(CCC_DebugFonts, "debug_fonts");
@@ -2189,12 +2351,21 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
     CMD3(CCC_Mask, "g_loading_stages", &psActorFlags, AF_LOADING_STAGES);
     CMD3(CCC_Mask, "g_always_use_attitude_sensors", &psActorFlags, AF_ALWAYS_USE_ATTITUDE_SENSORS);
+    CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);
 
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);
     CMD4(CCC_Integer, "g_unload_ammo_after_pick_up", &g_auto_ammo_unload, 0, 1);
     CMD4(CCC_Integer, "g_normalize_mouse_sens", &g_normalize_mouse_sens, 0, 1);
     CMD4(CCC_Integer, "g_normalize_upgrade_mouse_sens", &g_normalize_upgrade_mouse_sens, 0, 1);
+
+    CMD4(CCC_Float, "g_look_intensity_min", &psLookIntensityMin, 10.f, 100.f);
+    CMD4(CCC_Float, "g_look_intensity_max", &psLookIntensityMax, 10.f, 100.f);
+    CMD4(CCC_Float, "g_look_intensity_step", &psLookIntensityStep, 0.f, 10.f);
+
+    CMD4(CCC_Float, "g_cursor_intensity_min", &psCursorIntensityMin, 1.f, 100.f);
+    CMD4(CCC_Float, "g_cursor_intensity_max", &psCursorIntensityMax, 1.f, 100.f);
+    CMD4(CCC_Float, "g_cursor_intensity_step", &psCursorIntensityStep, 0.f, 10.f);
 
     CMD1(CCC_CleanupTasks, "dbg_cleanup_tasks");
 
@@ -2343,8 +2514,6 @@ void CCC_RegisterCommands()
 #endif
 
 #ifdef DEBUG
-    CMD4(CCC_Integer, "string_table_error_msg", &CStringTable::m_bWriteErrorsToLog, 0, 1);
-
     CMD1(CCC_DumpInfos, "dump_infos");
     CMD1(CCC_DumpTasks, "dump_tasks");
     CMD1(CCC_DumpMap, "dump_map");
@@ -2448,9 +2617,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_String, "slot_1", g_quick_use_slots[1], 32);
     CMD3(CCC_String, "slot_2", g_quick_use_slots[2], 32);
     CMD3(CCC_String, "slot_3", g_quick_use_slots[3], 32);
-
-    extern int g_dbg_load_pre_c5ef6c7_saves;
-    CMD4(CCC_Integer, "dbg_load_pre_c5ef6c7_saves", &g_dbg_load_pre_c5ef6c7_saves, 0, 1); //Alundaio
 
     CMD4(CCC_Integer, "keypress_on_start", &g_keypress_on_start, 0, 1);
     CMD1(CCC_UI_Time_Factor, "ui_time_factor");

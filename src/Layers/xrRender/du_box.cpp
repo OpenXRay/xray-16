@@ -4,6 +4,9 @@
 
 #include "du_box.h"
 //---------------------------------------------------------------------------
+
+namespace xray::render::RENDER_NAMESPACE
+{
 //#pragma package(smart_init)
 Fvector du_box_vertices2[DU_BOX_NUMVERTEX2] = {{-0.5f, -0.5f, -0.5f}, {-0.5f, +0.5f, -0.5f}, {+0.5f, +0.5f, -0.5f},
     {+0.5f, +0.5f, -0.5f}, {+0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f}, {+0.5f, -0.5f, -0.5f}, {+0.5f, +0.5f, -0.5f},
@@ -25,3 +28,4 @@ u16 du_box_faces[DU_BOX_NUMFACES * 3] = {
 };
 
 u16 du_box_lines[DU_BOX_NUMLINES * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 7, 6, 7, 6, 4, 0, 5, 1, 4, 2, 6, 3, 7};
+} // namespace xray::render::RENDER_NAMESPACE

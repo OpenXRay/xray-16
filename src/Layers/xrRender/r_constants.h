@@ -1,5 +1,3 @@
-#ifndef r_constantsH
-#define r_constantsH
 #pragma once
 
 #include "xrCore/xr_resource.h"
@@ -8,6 +6,8 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBackend;
 class ECORE_API R_constant_setup;
 
@@ -210,9 +210,8 @@ public:
 private:
 };
 typedef resptr_core<R_constant_table, resptr_base<R_constant_table>> ref_ctable;
+} // namespace xray::render::RENDER_NAMESPACE
 
 #if defined(USE_DX11)
 #include "../xrRenderDX11/dx11ConstantBuffer_impl.h"
-#endif
-
 #endif

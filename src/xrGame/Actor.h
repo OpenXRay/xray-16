@@ -8,6 +8,7 @@
 #include "actor_defs.h"
 #include "fire_disp_controller.h"
 #include "entity_alive.h"
+#include "game_news.h"
 #include "PHMovementControl.h"
 #include "xrPhysics/PhysicsShell.h"
 #include "InventoryOwner.h"
@@ -128,7 +129,7 @@ protected:
 
     struct SDefNewsMsg
     {
-        GAME_NEWS_DATA* news_data;
+        GAME_NEWS_DATA news_data;
         u32 time;
         bool operator<(const SDefNewsMsg& other) const { return time > other.time; }
     };
@@ -136,8 +137,8 @@ protected:
     void UpdateDefferedMessages();
 
 public:
-    void AddGameNews_deffered(GAME_NEWS_DATA& news_data, u32 delay);
-    virtual void AddGameNews(GAME_NEWS_DATA& news_data);
+    void AddGameNews_deffered(GAME_NEWS_DATA&& news_data, u32 delay);
+    virtual void AddGameNews(GAME_NEWS_DATA&& news_data);
     void ClearGameNews();
 
 protected:
@@ -254,7 +255,7 @@ public:
     void detach_Vehicle();
     void steer_Vehicle(float angle);
     void attach_Vehicle(CHolderCustom* vehicle);
-    bool use_MountedWeapon(CHolderCustom* object);
+    bool use_HolderEx(CHolderCustom* object, bool bForce);
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
 
 protected:
@@ -452,9 +453,9 @@ public:
     virtual void IR_OnKeyboardRelease(int dik);
     virtual void IR_OnKeyboardHold(int dik);
 
-    void IR_OnControllerPress(int dik, float x, float y) override;
-    void IR_OnControllerRelease(int dik, float x, float y) override;
-    void IR_OnControllerHold(int dik, float x, float y) override;
+    void IR_OnControllerPress(int dik, const ControllerAxisState& state) override;
+    void IR_OnControllerRelease(int dik, const ControllerAxisState& state) override;
+    void IR_OnControllerHold(int dik, const ControllerAxisState& state) override;
 
     void IR_OnControllerAttitudeChange(Fvector change) override;
 

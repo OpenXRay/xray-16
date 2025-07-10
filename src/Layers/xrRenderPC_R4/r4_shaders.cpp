@@ -8,6 +8,8 @@ extern ENGINE_API Fvector3 ps_ssfx_water_quality;
 extern ENGINE_API int ps_ssfx_il_quality;
 extern ENGINE_API int ps_ssfx_ao_quality;
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
@@ -654,3 +656,4 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     return _result;
 }
+} // namespace xray::render::RENDER_NAMESPACE

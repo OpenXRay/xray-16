@@ -28,6 +28,7 @@ class CUIScrollView;
 class CUIListWnd;
 class CUIListBox;
 class CUIProgressBar;
+class UIHint;
 
 class CScriptXmlInit
 {
@@ -35,6 +36,7 @@ public:
     void ParseFile(LPCSTR xml_file);
     void ParseShTexInfo(pcstr xml_file);
     void InitWindow(LPCSTR path, int index, CUIWindow* pWnd);
+    UIHint* InitHint(pcstr path, CUIWindow* parent);
     CUIFrameWindow* InitFrame(LPCSTR path, CUIWindow* parent);
     CUIFrameLineWnd* InitFrameLine(LPCSTR path, CUIWindow* parent);
     CUIEditBox* InitEditBox(LPCSTR path, CUIWindow* parent);
@@ -62,6 +64,8 @@ public:
     CUIListWnd* InitListWnd(pcstr path, CUIWindow* parent);
     CUIListBox* InitListBox(LPCSTR path, CUIWindow* parent);
     CUIProgressBar* InitProgressBar(LPCSTR path, CUIWindow* parent);
+
+	CUIXml&	GetXml() { return m_xml; }
 
 protected:
     CUIXml m_xml;

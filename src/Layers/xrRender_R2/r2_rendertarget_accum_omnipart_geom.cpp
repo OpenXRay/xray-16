@@ -2,6 +2,8 @@
 
 #include "Layers/xrRender/du_sphere_part.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::accum_omnip_geom_create()
 {
     // vertices
@@ -35,3 +37,4 @@ void CRenderTarget::accum_omnip_geom_destroy()
     g_accum_omnip_ib.Release();
     g_accum_omnip_vb.Release();
 }
+} // namespace xray::render::RENDER_NAMESPACE

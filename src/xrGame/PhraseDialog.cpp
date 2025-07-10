@@ -254,6 +254,7 @@ CPhrase* CPhraseDialog::AddPhrase(
 {
     CPhrase* phrase = NULL;
     CPhraseGraph::CVertex* _vertex = data()->m_PhraseGraph.vertex(phrase_id);
+
     if (!_vertex)
     {
         phrase = xr_new<CPhrase>();
@@ -265,6 +266,14 @@ CPhrase* CPhraseDialog::AddPhrase(
 
         data()->m_PhraseGraph.add_vertex(phrase, phrase_id);
     }
+#ifndef MASTER_GOLD
+    // Duplicating phrases with same ID and text is quite frequent in vanilla.
+    // Emit warning only if text is different.
+    else if (xr_strcmp(text, _vertex->data()->GetText()) != 0)
+    {
+        Msg("~ Trying to add phrase[%s] with ID[%s], but the ID is already used by phrase[%s]", text, phrase_id.c_str(), _vertex->data()->GetText());
+    }
+#endif
 
     if (prev_phrase_id != "")
         data()->m_PhraseGraph.add_edge(prev_phrase_id, phrase_id, 0.f);

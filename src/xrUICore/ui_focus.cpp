@@ -18,138 +18,340 @@ limitations under the License.
 
 #include "ui_focus.h"
 #include "Windows/UIWindow.h"
+#include "Cursor/UICursor.h"
 
-#include <cmath>
+#include "xrCore/buffer_vector.h"
+#include "xrEngine/editor_helper.h"
+
+#include <array>
 
 namespace
 {
-float euclidean_distance(const CUIWindow* from, const CUIWindow* to)
+constexpr cpcstr short_direction(FocusDirection direction)
 {
-    const auto& [aX, aY] = from->GetWndPos();
-    const auto& [bX, bY] = to->GetWndPos();
-
-    const auto& [aWidth, aHeight] = from->GetWndSize();
-    const auto& [bWidth, bHeight] = to->GetWndSize();
-
-    const Fvector2 centerA = { aX + aWidth / 2.0f, aY + aHeight / 2.0f };
-    const Fvector2 centerB = { bX + bWidth / 2.0f, bY + bHeight / 2.0f };
-
-    return sqrtf(powf(centerB.x - centerA.x, 2) + powf(centerB.y - centerA.y, 2));
-}
-}
-
-CUIFocusSystem::FocusData CUIFocusSystem::CalculateFocusData(const CUIWindow* from, const CUIWindow* to)
-{
-    const auto& fromPos = from->GetWndPos();
-    const auto& toPos = to->GetWndPos();
-
-    const bool upper = fromPos.y > toPos.y;
-    const bool lower = fromPos.y < toPos.y;
-    const bool left  = fromPos.x < toPos.x;
-    const bool right = fromPos.x > toPos.x;
-
-    FocusDirection direction;
-    if (upper)
+    switch (direction)
     {
-        if (left)
-            direction = FocusDirection::UpperLeft;
-        else if (right)
-            direction = FocusDirection::UpperRight;
-        else
-            direction = FocusDirection::Up;
+    case FocusDirection::Same:       return "S";
+    case FocusDirection::Up:         return "U";
+    case FocusDirection::Down:       return "D";
+    case FocusDirection::Left:       return "L";
+    case FocusDirection::Right:      return "R";
+    case FocusDirection::UpperLeft:  return "UL";
+    case FocusDirection::UpperRight: return "UR";
+    case FocusDirection::LowerLeft:  return "LL";
+    case FocusDirection::LowerRight: return "LR";
     }
-    else if (lower)
-    {
-        if (left)
-            direction = FocusDirection::LowerLeft;
-        else if (right)
-            direction = FocusDirection::LowerRight;
-        else
-            direction = FocusDirection::Down;
-    }
-    else if (left)
-    {
-        direction = FocusDirection::Left;
-    }
-    else if (right)
-    {
-        direction = FocusDirection::Right;
-    }
-    else
-    {
-        direction = FocusDirection::Same;
-    }
-
-    return
-    {
-        euclidean_distance(from, to),
-        direction
-    };
+    XR_ASSUME(false);
+    return "";
 }
 
-void CUIFocusSystem::RegisterFocusable(CUIWindow* focusable)
+std::array<FocusDirection, 3> allowed_directions(FocusDirection direction)
 {
-    ZoneScoped;
+    switch (direction)
+    {
+    case FocusDirection::Up:
+        return { FocusDirection::UpperLeft, FocusDirection::Up, FocusDirection::UpperRight };
 
-    auto& my_relates = m_structure[focusable];
+    default:
+    case FocusDirection::Same:
+        // Normally, you should not request same direction.
+        VERIFY(false);
 
-    // Split calculations to make it more CPU-cache friendly:
-    // 1. Calculate relations from focusable to all windows
-    for (auto& window : m_all_windows)
-        my_relates[window] = CalculateFocusData(focusable, window);
+        // Down would be the most natural default direction
+        // With the semantical meaning "enter into something"
+        [[fallthrough]];
 
-    // 2. Calculate relations from all windows to focusable
-    for (auto& window : m_all_windows)
-        m_structure[window][focusable] = CalculateFocusData(window, focusable);
+    case FocusDirection::Down:
+        return { FocusDirection::LowerLeft, FocusDirection::Down, FocusDirection::LowerRight };
 
-    m_all_windows.emplace_back(focusable);
+    case FocusDirection::Left:
+        return { FocusDirection::UpperLeft, FocusDirection::Left, FocusDirection::LowerLeft };
+
+    case FocusDirection::Right:
+        return { FocusDirection::UpperRight, FocusDirection::Right, FocusDirection::LowerRight };
+
+    case FocusDirection::UpperLeft:
+        return { FocusDirection::Up, FocusDirection::UpperLeft, FocusDirection::Left };
+
+    case FocusDirection::UpperRight:
+        return { FocusDirection::Up, FocusDirection::UpperRight, FocusDirection::Right };
+
+    case FocusDirection::LowerLeft:
+        return { FocusDirection::Left, FocusDirection::LowerLeft, FocusDirection::Down };
+
+    case FocusDirection::LowerRight:
+        return { FocusDirection::Right, FocusDirection::LowerRight, FocusDirection::Down };
+    } // switch (direction)
 }
 
-void CUIFocusSystem::UnregisterFocusable(CUIWindow* focusable)
+float get_distance(const Fvector2& a, const Fvector2& b)
 {
-    if (const auto it = m_structure.find(focusable);
-        it != m_structure.end())
+    Fvector2 c;
+    c.sub(b, a);
+    return c.dotproduct(c);
+}
+
+FocusDirection get_focus_direction(const Fvector2& a, const Fvector2& b)
+{
+    if (a.similar(b, EPS_S))
+        return FocusDirection::Same;
+
+    Fvector2 delta;
+    delta.sub(b, a);
+
+    if (fis_zero(delta.y)) // same y
     {
-        it->second.clear();
-        m_structure.erase(it);
+        if (delta.x < 0)
+            return FocusDirection::Left;
+
+        return FocusDirection::Right;
+    }
+    if (delta.y < 0) // 'to' is above
+    {
+        if (fis_zero(delta.x)) // same x
+            return FocusDirection::Up;
+        if (delta.x < 0)
+            return FocusDirection::UpperLeft;
+
+        return FocusDirection::UpperRight;
     }
 
-    if (const auto it = std::find(m_all_windows.begin(), m_all_windows.end(), focusable);
-        it != m_all_windows.end())
+    // 'to' is below
+    if (fis_zero(delta.x)) // same x
+        return FocusDirection::Down;
+    if (delta.x < 0)
+        return FocusDirection::LowerLeft;
+
+    return FocusDirection::LowerRight;
+}
+} // namespace
+
+void CUIFocusSystem::RegisterFocusable(const CUIWindow* focusable)
+{
+    if (!focusable || IsRegistered(focusable))
+        return;
+
+    m_non_valuable.emplace_back(focusable);
+}
+
+void CUIFocusSystem::UnregisterFocusable(const CUIWindow* focusable)
+{
+    if (!focusable)
+        return;
+
+    if (m_current_focused == focusable)
+        m_current_focused = nullptr;
+
+    if (const auto it = std::find(m_valuable.begin(), m_valuable.end(), focusable);
+        it != m_valuable.end())
     {
-        m_all_windows.erase(it);
+        m_valuable.erase(it);
+    }
+
+    if (const auto it = std::find(m_non_valuable.begin(), m_non_valuable.end(), focusable);
+        it != m_non_valuable.end())
+    {
+        m_non_valuable.erase(it);
     }
 }
 
 bool CUIFocusSystem::IsRegistered(const CUIWindow* focusable) const
 {
-    const auto& it = m_structure.find(const_cast<CUIWindow*>(focusable));
-    return it != m_structure.end();
+    return IsValuable(focusable) || IsNonValuable(focusable);
 }
 
-CUIWindow* CUIFocusSystem::FindClosestFocusable(CUIWindow* target, FocusDirection direction) const
+bool CUIFocusSystem::IsValuable(const CUIWindow* focusable) const
 {
-    const auto& it = m_structure.find(target);
-    if (it == m_structure.end())
+    if (!focusable)
+        return false;
+    const auto it = std::find(m_valuable.begin(), m_valuable.end(), focusable);
+    return it != m_valuable.end();
+}
+
+bool CUIFocusSystem::IsNonValuable(const CUIWindow* focusable) const
+{
+    if (!focusable)
+        return false;
+    const auto it = std::find(m_non_valuable.begin(), m_non_valuable.end(), focusable);
+    return it != m_non_valuable.end();
+
+}
+
+void CUIFocusSystem::Update(const CUIWindow* root)
+{
+    // temp vector allows to prevent calling for IsFocusValuable twice.
+    buffer_vector<const CUIWindow*> temp{ xr_alloca(sizeof(CUIWindow*) * m_valuable.size()), m_valuable.size() };
+
+    for (auto it = m_valuable.begin(); it != m_valuable.end(); ++it)
     {
-        VERIFY2(false, "Target CUIWindow is not registered in the focus system.");
-        return nullptr;
+        if ((*it)->IsFocusValuable(root, m_focus_locker))
+            continue;
+        temp.push_back(*it);
+        it = m_valuable.erase(it);
+
+        if (*it == m_current_focused)
+            m_current_focused = nullptr;
     }
 
-    const auto& my_relates = it->second;
-    CUIWindow* closest = nullptr;
-    float minDistance = type_max<float>;
-
-    for (const auto& [window, data] : my_relates)
+    for (auto it = m_non_valuable.begin(); it != m_non_valuable.end(); ++it)
     {
-        if (data.distance < minDistance && data.direction == direction)
+        if (!(*it)->IsFocusValuable(root, m_focus_locker))
+            continue;
+        m_valuable.emplace_back(*it);
+        it = m_non_valuable.erase(it);
+    }
+
+    for (const auto window : temp)
+        m_non_valuable.emplace_back(window);
+
+    // no need to clear temp vector, it's stack allocated.
+
+    if (m_current_focused && !m_current_focused->CursorOverWindow())
+        m_current_focused = nullptr;
+}
+
+void CUIFocusSystem::SetFocused(const CUIWindow* window)
+{
+    m_current_focused = window;
+    UI().GetUICursor().WarpToWindow(window);
+}
+
+std::pair<CUIWindow*, CUIWindow*> CUIFocusSystem::FindClosestFocusable(const Fvector2& from, FocusDirection direction) const
+{
+    const CUIWindow* closest  = nullptr;
+    const CUIWindow* closest2 = nullptr;
+    float min_distance  = type_max<float>;
+    float min_distance2 = type_max<float>;
+
+    const auto [dir1, mainDir, dir2] = allowed_directions(direction);
+
+    for (const auto& window : m_valuable)
+    {
+        const auto to_pos = window->GetAbsoluteCenterPos();
+
+        const auto dist = get_distance(from, to_pos);
+        const auto dir  = get_focus_direction(from, to_pos);
+
+        if (dist < min_distance && dir == mainDir)
         {
-            minDistance = data.distance;
+            min_distance = dist;
             closest = window;
+        }
+        if (dist < min_distance2 && (dir == dir1 || dir == dir2))
+        {
+            min_distance2 = dist;
+            closest2 = window;
         }
     }
 
     // We hold const pointers to guarantee that we don't do anything.
     // But the caller can do anything.
-    return closest;
+    return
+    {
+        const_cast<CUIWindow*>(closest),
+        const_cast<CUIWindow*>(closest2)
+    };
+}
+
+bool CUIFocusSystem::FillDebugTree(const CUIDebugState& debugState)
+{
+#ifndef MASTER_GOLD
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    if (debugState.selected == this)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    const bool open = ImGui::TreeNodeEx(this, flags, "Focus system (%s)", GetDebugType());
+    if (ImGui::IsItemClicked())
+        debugState.select(this);
+
+    if (open)
+    {
+        if (m_valuable.empty())
+            ImGui::BulletText("Valuable: 0");
+        else
+        {
+            if (ImGui::TreeNode(&m_valuable, "Valuable: %zu", m_valuable.size()))
+            {
+                const auto prevExamined = debugState.examined;
+                // Make sure we only draw debug data only in the focus system tree structure
+                debugState.examined = nullptr;
+
+                for (const auto& window : m_valuable)
+                {
+                    const_cast<CUIWindow*>(window)->FillDebugTree(debugState);
+                }
+
+                if (CUIWindow* examinedWindow = dynamic_cast<CUIWindow*>(debugState.examined))
+                {
+                    const auto& colors = debugState.settings.colors;
+                    for (const auto& window : m_valuable)
+                    {
+                        if (window == examinedWindow)
+                            continue;
+                        DrawDebugInfo(*examinedWindow, *window, colors.directionArrow, colors.directionText);
+                    }
+                }
+
+                debugState.examined = prevExamined;
+                ImGui::TreePop();
+            }
+        }
+
+        if (m_non_valuable.empty())
+            ImGui::BulletText("Non valuable: 0");
+        else
+        {
+            if (ImGui::TreeNode(&m_non_valuable, "Non valuable: %zu", m_non_valuable.size()))
+            {
+                for (auto& window : m_non_valuable)
+                    const_cast<CUIWindow*>(window)->FillDebugTree(debugState);
+                ImGui::TreePop();
+            }
+        }
+
+        ImGui::TreePop();
+    }
+
+    return open;
+#else
+    return true;
+#endif
+}
+void CUIFocusSystem::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    if (!ImGui::CollapsingHeader(CUIFocusSystem::GetDebugType()))
+        return;
+
+    ImGui::LabelText("Current focused", "%s", m_current_focused ? m_current_focused->WindowName().c_str() : "none");
+    ImGui::LabelText("Locker", "%s", m_focus_locker ? m_focus_locker->WindowName().c_str() : "none");
+#endif
+}
+
+void CUIFocusSystem::DrawDebugInfo(const CUIWindow& from, const CUIWindow& to, u32 color, u32 textColor) const
+{
+#ifndef MASTER_GOLD
+    const auto mainVP = ImGui::GetMainViewport();
+    const auto draw_list = ImGui::GetForegroundDrawList(mainVP);
+
+    auto fromPos = from.GetAbsoluteCenterPos();
+    auto toPos = to.GetAbsoluteCenterPos();
+
+    UI().ClientToScreenScaled(fromPos);
+    UI().ClientToScreenScaled(toPos);
+
+    const auto direction = get_focus_direction(fromPos, toPos);
+    const auto text = short_direction(direction);
+    ImVec2 text_size = ImGui::CalcTextSize(text);
+
+    Fcolor clr = color;
+    const float radius = text_size.x > text_size.y ? text_size.x / 1.5f : text_size.y / 1.5f;
+
+    draw_list->AddLine((ImVec2&)fromPos, (ImVec2&)toPos, clr.get_windows(), 2.0f);
+    draw_list->AddCircleFilled((ImVec2&)toPos, radius, clr.get_windows());
+
+    clr = textColor;
+    toPos.sub((Fvector2&)(text_size /= 2));
+    draw_list->AddText((ImVec2&)toPos, clr.get_windows(), text);
+#endif
 }

@@ -11,7 +11,7 @@ jobs:
   windows:
     name: Windows ${{ matrix.Configuration }} ${{ matrix.Platform }} (msvc)
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -91,7 +91,7 @@ jobs:
         # You may also want to set XRAY_LINKER when changing the compiler.
         - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: gcc, }
         - { name: Ubuntu, os: ubuntu-latest, arch: amd64,   cc: clang, cxx: clang++, flags: "-DXRAY_LINKER=lld", }
-        #- { name: Ubuntu, os: ubuntu-latest, arch: arm64,   cc: gcc,   container: 'dockcross/linux-arm64', }
+        - { name: Ubuntu, os: ubuntu-24.04-arm, arch: arm64,   cc: gcc }
         #- { name: Ubuntu, os: ubuntu-latest, arch: ppc64el, cc: gcc,   container: 'dockcross/linux-ppc64le:latest', }
         - { name: Alpine, os: ubuntu-latest, arch: x86_64,  cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
         - { name: Alpine, os: ubuntu-latest, arch: x86,     cc: gcc,   shell: 'alpine.sh {0}', flags: "-DXRAY_LINKER=mold", }
@@ -125,6 +125,10 @@ jobs:
               libtheora-dev:${{ matrix.platform.arch }} \
               libvorbis-dev:${{ matrix.platform.arch }}
 
+    - name: Install Clang Ubuntu packages
+      if: ${{ matrix.platform.name == 'Ubuntu' && matrix.platform.cxx == 'clang++' }}
+      run: sudo apt-get install -qq -y libc++-dev
+
     - name: Install macOS packages
       if: ${{ startsWith(matrix.platform.name, 'macOS') }}
       run: |
@@ -133,7 +137,7 @@ jobs:
 
     - name: Install Fedora packages
       if: ${{ matrix.platform.name == 'Fedora' }}
-      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-devel libogg-devel libtheora-devel libvorbis-devel
+      run: dnf install -y git gcc gcc-c++ rpmdevtools cmake SDL2-devel lzo-devel libjpeg-turbo-devel openal-soft-devel libogg-devel libtheora-devel libvorbis-devel
 
     - name: Set environment variables
       if: ${{ matrix.platform.cc != '' && matrix.platform.cxx != '' }}
@@ -179,13 +183,13 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: FreeBSD, os: freebsd, os-version: '14.1', arch: x86_64,
+        - { name: FreeBSD, os: freebsd, os-version: '14.2', arch: x86_64,
             install-cmd: "sudo pkg update && sudo pkg install -y cmake sdl2 lzo2 jpeg-turbo openal-soft libogg libtheora libvorbis"
           }
-        - { name: OpenBSD, os: openbsd, os-version: '7.5',  arch: x86_64,
+        - { name: OpenBSD, os: openbsd, os-version: '7.6',  arch: x86_64,
             install-cmd: "sudo pkg_add cmake SDL2 lzo2 jpeg openal libogg libtheora libvorbis",
           }
-        - { name: NetBSD,  os: netbsd,  os-version: '10.0',  arch: x86_64,
+        - { name: NetBSD,  os: netbsd,  os-version: '10.1',  arch: x86_64,
             install-cmd: "sudo pkgin -y install cmake SDL2 lzo libjpeg-turbo openal-soft libogg libtheora libvorbis",
           }
         configuration: [Debug, Release]
@@ -196,7 +200,7 @@ jobs:
         submodules: recursive
 
     - name: Setup ${{ matrix.platform.name }} and packages
-      uses: cross-platform-actions/action@v0.25.0
+      uses: cross-platform-actions/action@v0.28.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -209,7 +213,7 @@ jobs:
         run: ${{ matrix.platform.install-cmd }}
 
     - name: Run CMake
-      uses: cross-platform-actions/action@v0.25.0
+      uses: cross-platform-actions/action@v0.28.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}
@@ -222,7 +226,7 @@ jobs:
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake Build
-      uses: cross-platform-actions/action@v0.25.0
+      uses: cross-platform-actions/action@v0.28.0
       with:
         operating_system: ${{ matrix.platform.os }}
         architecture: ${{ matrix.platform.arch }}

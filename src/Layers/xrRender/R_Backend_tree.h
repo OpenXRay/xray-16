@@ -1,7 +1,7 @@
-#ifndef r_backend_treeH
-#define r_backend_treeH
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API R_tree
 {
 public:
@@ -37,4 +37,4 @@ public:
 
     CBackend& cmd_list;
 };
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

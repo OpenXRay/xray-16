@@ -6,7 +6,7 @@ class XRUICORE_API CUIFrameLineWnd : public CUIWindow, public ITextureOwner
     typedef CUIWindow inherited;
 
 public:
-    enum RectSegment
+    enum RectSegment : u8
     {
         flFirst = 0, // Left or top
         flBack, // Center texture
@@ -56,16 +56,18 @@ public:
     void SetHorizontal(bool horiz) { bHorizontal = horiz; }
 
     pcstr GetDebugType() override { return "CUIFrameLineWnd"; }
+    bool FillDebugTree(const CUIDebugState& debugState) override;
+    void FillDebugInfo() override;
 
 protected:
-    bool bHorizontal;
     bool inc_pos(Frect& rect, int counter, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
+    void DrawElements();
 
     u32 m_texture_color;
     bool m_bTextureVisible;
-    void DrawElements();
+    bool bHorizontal;
 
-    ui_shader m_shader;
     Frect m_tex_rect[flMax];
+    ui_shader m_shader;
     shared_str dbg_tex_name;
 };

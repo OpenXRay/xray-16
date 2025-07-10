@@ -2,6 +2,8 @@
 
 #include "blender_gasmask_dudv.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_gasmask_dudv::CBlender_gasmask_dudv()
 {
     description.CLS = B_BLUR;
@@ -36,3 +38,4 @@ void CBlender_gasmask_dudv::Compile(CBlender_Compile& C)
     C.r_dx11Sampler("smp_rtlinear");
     C.r_End();
 }
+} // namespace xray::render::RENDER_NAMESPACE

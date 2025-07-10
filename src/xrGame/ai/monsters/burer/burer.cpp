@@ -482,6 +482,9 @@ void CBurer::net_Relcase(IGameObject* O)
     inherited::net_Relcase(O);
 
     TTelekinesis::remove_links(O);
+
+    if (m_gravi_object.enemy == O)
+        m_gravi_object.deactivate();
 }
 
 #ifdef DEBUG

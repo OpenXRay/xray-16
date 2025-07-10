@@ -19,8 +19,8 @@ public:
     void Play2(CCar* car);
     /***** added by Ray Twitty (aka Shadows) START *****/
     // функции для выключения партиклов дыма
-    void    Stop1(CCar* car);
-    void    Stop2(CCar* car);
+    void Stop1(CCar* car);
+    void Stop2(CCar* car);
     /***** added by Ray Twitty (aka Shadows) END *****/
 
     void PlayWheel1(CCar* car, u16 bone_id) const;

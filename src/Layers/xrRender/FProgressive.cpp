@@ -8,6 +8,8 @@
 #include "xrCore/FMesh.hpp"
 #include "FProgressive.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -116,3 +118,4 @@ void FProgressive::Copy(dxRender_Visual* pSrc)
     PCOPY(nSWI);
     PCOPY(xSWI);
 }
+} // namespace xray::render::RENDER_NAMESPACE

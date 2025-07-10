@@ -94,8 +94,10 @@ bool assign_default_acoustics(const shared_str& material, SGameMtl::MtlAcoustics
     return found;
 }
 
-void SGameMtl::Load(IReader& fs)
+EGameMtlVersion SGameMtl::Load(IReader& fs)
 {
+    EGameMtlVersion vers{ GAMEMTL_VERSION_SOC };
+
     R_ASSERT(fs.find_chunk(GAMEMTL_CHUNK_MAIN));
     ID = fs.r_u32();
     fs.r_stringZ(m_Name);
@@ -121,11 +123,6 @@ void SGameMtl::Load(IReader& fs)
     fVisTransparencyFactor = fs.r_float();
     fSndOcclusionFactor = fs.r_float();
 
-    if (fs.find_chunk(GAMEMTL_CHUNK_FACTORS_MP))
-        fShootFactorMP = fs.r_float();
-    else
-        fShootFactorMP = fShootFactor;
-
     if (fs.find_chunk(GAMEMTL_CHUNK_FLOTATION))
         fFlotationFactor = fs.r_float();
 
@@ -133,7 +130,18 @@ void SGameMtl::Load(IReader& fs)
         fInjuriousSpeed = fs.r_float();
 
     if (fs.find_chunk(GAMEMTL_CHUNK_DENSITY))
+    {
         fDensityFactor = fs.r_float();
+        vers = GAMEMTL_VERSION_CS;
+    }
+
+    if (fs.find_chunk(GAMEMTL_CHUNK_FACTORS_MP))
+    {
+        fShootFactorMP = fs.r_float();
+        vers = GAMEMTL_VERSION_COP;
+    }
+    else
+        fShootFactorMP = fShootFactor;
 
     if (fs.find_chunk(GAMEMTL_CHUNK_ACOUSTICS))
         fs.r(&Acoustics, sizeof(Acoustics));
@@ -147,6 +155,8 @@ void SGameMtl::Load(IReader& fs)
             Acoustics.fAbsorption[2] = fSndOcclusionFactor;
         }
     }
+
+    return vers;
 }
 
 CGameMtlLibrary::CGameMtlLibrary()
@@ -173,15 +183,15 @@ void CGameMtlLibrary::Load()
     IReader& fs = *F;
 
     R_ASSERT(fs.find_chunk(GAMEMTLS_CHUNK_VERSION));
-    const u16 version = fs.r_u16();
-    if (GAMEMTL_CURRENT_VERSION != version)
+    const auto file_version = static_cast<EGameMtlVersion>(fs.r_u16());
+    if (file_version != GAMEMTL_VERSION_COP)
     {
-        Log("CGameMtlLibrary: invalid version. Library can't load.");
+        Msg("CGameMtlLibrary: unsupported version [%u]. Library can't load.", file_version);
         FS.r_close(F);
         return;
     }
 
-    m_file_age = fs.get_age();
+	m_library_crc32 = crc32(fs.pointer(), fs.length());
 
     R_ASSERT(fs.find_chunk(GAMEMTLS_CHUNK_AUTOINC));
     material_index = fs.r_u32();
@@ -190,6 +200,8 @@ void CGameMtlLibrary::Load()
     materials.reserve(material_index);
     material_pairs.reserve(material_pair_index);
 
+    auto detected_version{ GAMEMTL_VERSION_SOC };
+
     IReader* OBJ = fs.open_chunk(GAMEMTLS_CHUNK_MTLS);
     if (OBJ)
     {
@@ -197,10 +209,12 @@ void CGameMtlLibrary::Load()
         for (IReader* O = OBJ->open_chunk_iterator(count); O; O = OBJ->open_chunk_iterator(count, O))
         {
             SGameMtl* M = materials.emplace_back(xr_new<SGameMtl>());
-            M->Load(*O);
+            const auto version = M->Load(*O);
+            detected_version = std::max(detected_version, version);
         }
         OBJ->close();
     }
+    m_version = detected_version;
 
     OBJ = fs.open_chunk(GAMEMTLS_CHUNK_MTLS_PAIR);
     if (OBJ)
@@ -213,8 +227,8 @@ void CGameMtlLibrary::Load()
         }
         OBJ->close();
     }
-    const u32 mtlCount = materials.size();
-    material_pairs_rt.resize(mtlCount * mtlCount, 0);
+    const auto mtlCount = materials.size();
+    material_pairs_rt.resize(mtlCount * mtlCount, nullptr);
     for (const auto& mtlPair : material_pairs)
     {
         const int idx0 = GetMaterialIdx(mtlPair->mtl0) * mtlCount + GetMaterialIdx(mtlPair->mtl1);

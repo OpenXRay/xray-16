@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "light.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 static constexpr float RSQRTDIV2 = 0.70710678118654752440084436210485f;
 
 light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
@@ -36,7 +38,7 @@ light::light() : SpatialBase(g_pGamePersistent->SpatialSpace)
     vis.query_order = 0;
     vis.visible = true;
     vis.pending = false;
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    for (u32 id = 0; id < R__NUM_CONTEXTS; ++id)
         svis[id].id = id;
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER==R_GL)
 }
@@ -212,7 +214,7 @@ void light::spatial_move()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4) || (RENDER == R_GL)
     if (flags.bActive)
         gi_generate();
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    for (u32 id = 0; id < R__NUM_CONTEXTS; ++id)
         svis[id].invalidate();
 #endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4) || (RENDER == R_GL)
 }
@@ -416,3 +418,4 @@ float light::get_LOD() const
     const float lod = _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
     return lod;
 }
+} // namespace xray::render::RENDER_NAMESPACE

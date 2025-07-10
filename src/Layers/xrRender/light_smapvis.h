@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class smapvis : public R_feedback
 {
 public:
@@ -34,3 +36,4 @@ public:
     IC bool sleep() { return Device.dwFrame > frame_sleep; }
     virtual void rfeedback_static(dxRender_Visual* V) override;
 };
+} // namespace xray::render::RENDER_NAMESPACE

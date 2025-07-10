@@ -632,6 +632,8 @@ target_sources(xrGame PRIVATE
     hit_memory_manager.cpp
     hit_memory_manager.h
     hit_memory_manager_inline.h
+    HolderEntityObject.cpp
+    HolderEntityObject.h
     holder_custom.cpp
     holder_custom.h
     holder_custom_script.cpp
@@ -1508,8 +1510,6 @@ target_sources(xrGame PRIVATE
     weaponBM16.cpp
     weaponBM16.h
     Weapon.cpp
-    WeaponCustomPistolAuto.cpp
-    WeaponCustomPistolAuto.h
     WeaponCustomPistol.cpp
     WeaponCustomPistol.h
     WeaponDispersion.cpp
@@ -2021,6 +2021,7 @@ target_sources(xrGame PRIVATE
     ai/monsters/states/monster_state_home_point_danger_inline.h
     ai/monsters/states/monster_state_home_point_rest.h
     ai/monsters/states/monster_state_home_point_rest_inline.h
+    ai/monsters/states/monster_state_move.h
     ai/monsters/states/monster_state_panic.h
     ai/monsters/states/monster_state_panic_inline.h
     ai/monsters/states/monster_state_panic_run.h
@@ -2315,6 +2316,8 @@ target_sources(xrGame PRIVATE
     ui/UIRankFaction.h
     ui/UIRankIndicator.cpp
     ui/UIRankIndicator.h
+    ui/UIRankingsCoC.cpp
+    ui/UIRankingsCoC.h
     ui/UIRankingWnd.cpp
     ui/UIRankingWnd.h
     ui/UIScriptWnd.cpp
@@ -2368,6 +2371,8 @@ target_sources(xrGame PRIVATE
     ui/UIWarState.h
     ui/UIWeightBar.cpp
     ui/UIWeightBar.h
+    ui/UIWheelMenu.cpp
+    ui/UIWheelMenu.h
     ui/UIWindow_script.cpp
     ui/UIWpnParams.cpp
     ui/UIWpnParams.h
@@ -2425,6 +2430,9 @@ target_sources(xrGame PRIVATE
     ../xrServerEntities/script_ini_file.h
     ../xrServerEntities/script_ini_file_script.cpp
     ../xrServerEntities/script_net_packet_script.cpp
+    ../xrServerEntities/script_properties_list_helper.cpp
+    ../xrServerEntities/script_properties_list_helper.h
+    ../xrServerEntities/script_properties_list_helper_script.cpp
     ../xrServerEntities/script_reader_script.cpp
     ../xrServerEntities/script_rtoken_list.h
     ../xrServerEntities/script_rtoken_list_inline.h
@@ -2433,8 +2441,12 @@ target_sources(xrGame PRIVATE
     ../xrServerEntities/script_token_list.cpp
     ../xrServerEntities/script_token_list.h
     ../xrServerEntities/script_token_list_script.cpp
+    ../xrServerEntities/script_value.h
+    ../xrServerEntities/script_value_inline.h
     ../xrServerEntities/script_value_container.h
     ../xrServerEntities/script_value_container_impl.h
+    ../xrServerEntities/script_value_wrapper.h
+    ../xrServerEntities/script_value_wrapper_inline.h
     ../xrServerEntities/ShapeData.h
     ../xrServerEntities/shared_data.h
     ../xrServerEntities/smart_cast.cpp

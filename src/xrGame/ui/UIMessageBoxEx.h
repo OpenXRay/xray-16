@@ -25,7 +25,8 @@ public:
     void OnOKClicked(CUIWindow*, void*);
     void OnNOClicked(CUIWindow*, void*);
 
-    virtual bool NeedCenterCursor() const { return false; }
+    bool NeedCursor() const override;
+    bool NeedCenterCursor() const override { return false; }
     CUIMessageBox* m_pMessageBox;
 
     pcstr GetDebugType() override { return "CUIMessageBoxEx"; }

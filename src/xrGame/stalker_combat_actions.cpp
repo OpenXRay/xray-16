@@ -434,6 +434,7 @@ void CStalkerActionKillEnemy::execute()
 #endif // TEST_MENTAL_STATE
 
     inherited::execute();
+
     //Alundaio: Prevent Stalkers from shooting at walls for prolonged periods due to kill if not visible
     const CEntityAlive* enemy = object().memory().enemy().selected();
     if (enemy && enemy->g_Alive())
@@ -537,10 +538,6 @@ void CStalkerActionTakeCover::execute()
         object().movement().set_nearest_accessible_position();
         object().brain().affect_cover(true);
     }
-
-    //.	Add fire here
-    //	if (object().memory().visual().visible_now(object().memory().enemy().selected()) && object().can_kill_enemy())
-    //	if (object().memory().visual().visible_now(object().memory().enemy().selected()))
 
     if (object().movement().path_completed()) // && (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position()) >= 10.f))
     {
@@ -820,7 +817,6 @@ void CStalkerActionDetourEnemy::initialize()
 //#ifndef SILENT_COMBAT
     //Alundaio: Added sanity to make sure enemy exists
     if (object().memory().enemy().selected() && object().memory().enemy().selected()->human_being() && object().agent_manager().member().group_behaviour())
-    //Alundaio: END
         //object().sound().play(eStalkerSoundNeedBackup);
         object().sound().play(eStalkerSoundDetour);
 //#endif
@@ -1064,31 +1060,38 @@ void CStalkerActionSuddenAttack::execute()
 
     //Alundaio: Removed check to allow stalkers to sneak up on enemy even if they are in a group.
     //if (object().agent_manager().member().combat_members().size() > 1)
-    //    m_storage->set_property(eWorldPropertyUseSuddenness, false);
-    //-Alundaio
+    //    m_storage->set_property(eWorldPropertyUseSuddenness,false);
+    //Alundaio: END
 
     const CEntityAlive* enemy = object().memory().enemy().selected();
     if (!enemy)
+    {
+        m_storage->set_property(eWorldPropertyUseSuddenness, false);
         return;
+    }
 
     CMemoryInfo mem_object = object().memory().memory(enemy);
+
     if (!mem_object.m_object)
+    {
+        m_storage->set_property(eWorldPropertyUseSuddenness, false);
         return;
+    }
 
-    //Alundaio: Don't aim at ceiling or floor
-    bool visible_now = object().memory().visual().visible_now(enemy);
-
+    const bool visible_now = object().memory().visual().visible_now(enemy);
     if (visible_now)
         object().sight().setup(CSightAction(enemy, true));
     else
     {
         //Alundaio: Prevent stalkers from staring at floor or ceiling for this action
         u32 const level_time = object().memory().visual().visible_object_time_last_seen(mem_object.m_object);
-        if (Device.dwTimeGlobal >= level_time + 3000 && _abs(
-            object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
+        if (Device.dwTimeGlobal >= level_time + 3000 &&
+            _abs(object().Position().y - mem_object.m_object_params.m_position.y) > 3.5f)
         {
-            Fvector3 Vpos = {
-                mem_object.m_object_params.m_position.x, object().Position().y + 1.f,
+            const Fvector3 Vpos =
+            {
+                mem_object.m_object_params.m_position.x,
+                object().Position().y + 1.f,
                 mem_object.m_object_params.m_position.z
             };
             object().sight().setup(CSightAction(SightManager::eSightTypePosition, Vpos, true));
@@ -1102,11 +1105,13 @@ void CStalkerActionSuddenAttack::execute()
     if (object().movement().accessible(mem_object.m_object_params.m_level_vertex_id))
         object().movement().set_level_dest_vertex(mem_object.m_object_params.m_level_vertex_id);
     else
+    {
         object().movement().set_nearest_accessible_position(
             ai().level_graph().vertex_position(mem_object.m_object_params.m_level_vertex_id),
             mem_object.m_object_params.m_level_vertex_id);
+    }
 
-    if (!visible_now)
+    /*if (!visible_now)
     {
         u32 target_vertex_id = object().movement().level_path().dest_vertex_id();
         if (object().ai_location().level_vertex_id() == target_vertex_id)
@@ -1114,9 +1119,9 @@ void CStalkerActionSuddenAttack::execute()
             m_storage->set_property(eWorldPropertyUseSuddenness, false);
             return;
         }
-    }
+    }*/
 
-    float distance = object().Position().distance_to(mem_object.m_object_params.m_position);
+    const float distance = object().Position().distance_to(mem_object.m_object_params.m_position);
     if (distance >= 15.f)
     {
         object().movement().set_body_state(eBodyStateStand);
@@ -1253,7 +1258,9 @@ void CStalkerActionCriticalHit::initialize()
                               min_queue_interval, max_queue_interval);
         }
         else
+        {
             object().set_goal(eObjectActionIdle, object().best_weapon());
+        }
     }
 
     object().sight().setup(CSightAction(SightManager::eSightTypeCurrentDirection, true, true));

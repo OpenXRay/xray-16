@@ -1,5 +1,4 @@
-#ifndef LAYERS_XRRENDER_LIGHT_H_INCLUDED
-#define LAYERS_XRRENDER_LIGHT_H_INCLUDED
+#pragma once
 
 #include "xrCDB/ISpatial.h"
 
@@ -11,6 +10,8 @@
 
 extern ENGINE_API Fvector4 ps_ssfx_volumetric;
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class light : public IRender_Light, public SpatialBase
 {
 public:
@@ -180,5 +181,4 @@ public:
     light();
     ~light() override;
 };
-
-#endif // #define LAYERS_XRRENDER_LIGHT_H_INCLUDED
+} // namespace xray::render::RENDER_NAMESPACE

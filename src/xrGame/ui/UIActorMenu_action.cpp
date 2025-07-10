@@ -254,8 +254,10 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
             ToBag(itm, false);
         }
         else if (!ToSlot(itm, false, iitem_to_place->BaseSlot()))
+        {
             if (!ToBelt(itm, false))
                 ToSlot(itm, true, iitem_to_place->BaseSlot());
+        }
         break;
     }
     case iActorBelt:
@@ -319,6 +321,16 @@ bool CUIActorMenu::OnItemFocusReceive(CUICellItem* itm)
 
     itm->m_selected = true;
     set_highlight_item(itm);
+
+	luabind::functor<bool> funct1;
+	if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemFocusReceive", funct1))
+	{
+		PIItem _iitem = (PIItem)itm->m_pData;
+
+        const CGameObject* GO = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
+		if (GO)
+			funct1(GO->lua_game_object());
+	}
     return true;
 }
 
@@ -330,6 +342,16 @@ bool CUIActorMenu::OnItemFocusLost(CUICellItem* itm)
     }
     InfoCurItem(NULL);
     clear_highlight_lists();
+
+	luabind::functor<bool> funct1;
+	if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemFocusLost", funct1))
+	{
+		PIItem _iitem = (PIItem)itm->m_pData;
+
+        const CGameObject* GO = _iitem ? smart_cast<CGameObject*>(_iitem) : nullptr;
+		if (GO)
+			funct1(GO->lua_game_object());
+	}
 
     return true;
 }
@@ -366,6 +388,10 @@ bool CUIActorMenu::OnMouseAction(float x, float y, EUIMessages mouse_action)
 bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     InfoCurItem(NULL);
+
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
     if (IsBinded(kDROP, dik))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem() &&
@@ -403,7 +429,7 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
 
-    if (IsBinded(kQUIT, dik))
+    if (IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
     {
         if (WINDOW_KEY_PRESSED == keyboard_action)
         {
@@ -412,9 +438,6 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         }
         return true;
     }
-
-    if (inherited::OnKeyboardAction(dik, keyboard_action))
-        return true;
 
     return false;
 }

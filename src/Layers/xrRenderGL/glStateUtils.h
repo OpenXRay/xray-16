@@ -2,6 +2,8 @@
 
 #ifdef USE_OGL
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace glStateUtils
 {
 GLenum ConvertFillMode(u32 Mode);
@@ -12,6 +14,7 @@ GLenum ConvertBlendArg(u32 Arg);
 GLenum ConvertBlendOp(u32 Op);
 GLint ConvertTextureAddressMode(u32 Mode);
 GLint ConvertTextureFilter(u32 dxFilter, GLint glFilter = (GLint)GL_NEAREST, bool MipMap = false);
-};
+} // namespace glStateUtils
+} // namespace xray::render::RENDER_NAMESPACE
 
 #endif // USE_OGL

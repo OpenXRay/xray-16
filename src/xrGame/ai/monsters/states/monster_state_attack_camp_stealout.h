@@ -1,9 +1,11 @@
 #pragma once
 
+#include "ai/monsters/states/monster_state_move.h"
+
 template <typename _Object>
-class CStateMonsterAttackCampStealOut : public CStateMove<_Object>
+class CStateMonsterAttackCampStealOut : public CMonsterStateMove<_Object>
 {
-    typedef CStateMove<_Object> inherited;
+    typedef CMonsterStateMove<_Object> inherited;
 
 public:
     CStateMonsterAttackCampStealOut(_Object* obj);

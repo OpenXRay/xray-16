@@ -9,6 +9,8 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void fix_texture_name(pstr);
 
 static int ParseName(LPCSTR N)
@@ -446,3 +448,4 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
 
     return samplerStage;
 }
+} // namespace xray::render::RENDER_NAMESPACE

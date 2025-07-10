@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::mark_msaa_edges()
 {
     u32 Offset;
@@ -46,3 +48,4 @@ void CRenderTarget::mark_msaa_edges()
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     RCache.set_ColorWriteEnable();
 }
+} // namespace xray::render::RENDER_NAMESPACE

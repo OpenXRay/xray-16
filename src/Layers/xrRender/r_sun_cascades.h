@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace sun
 {
 struct ray
@@ -21,3 +23,4 @@ struct cascade
 };
 
 } // namespace sun
+} // namespace xray::render::RENDER_NAMESPACE

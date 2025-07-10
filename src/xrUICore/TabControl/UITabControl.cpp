@@ -2,7 +2,15 @@
 #include "UITabControl.h"
 #include "UITabButton.h"
 
-bool operator==(const CUITabButton* btn, const shared_str& id) { return (btn->m_btn_id == id); }
+bool operator==(const CUITabButton* btn, const shared_str& id)
+{
+    R_ASSERT2_CURE(btn, "The btn pointer should never be nullptr.\n"
+                        "It's either because of wrong usage or UB (yay!)",
+    {
+        return id.empty();
+    });
+    return btn->m_btn_id == id;
+}
 
 CUITabControl::CUITabControl() : CUIWindow("CUITabControl")
 {
@@ -221,14 +229,44 @@ bool CUITabControl::SetNextActiveTab(bool next, bool loop)
 
 bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (GetAcceleratorsMode() && WINDOW_KEY_PRESSED == keyboard_action)
+    if (WINDOW_KEY_PRESSED == keyboard_action)
     {
-        for (u32 i = 0; i < m_TabsArr.size(); ++i)
+        if (GetAcceleratorsMode())
         {
-            if (m_TabsArr[i]->IsAccelerator(dik))
+            switch (GetBindedAction(dik, EKeyContext::UI))
             {
-                SetActiveTab(m_TabsArr[i]->m_btn_id);
-                return true;
+            case kUI_TAB_PREV: return SetNextActiveTab(false, true);
+            case kUI_TAB_NEXT: return SetNextActiveTab(true,  true);
+            }
+        }
+        if (GetButtonsAcceleratorsMode())
+        {
+            for (const auto& button : m_TabsArr)
+            {
+                if (button->IsAccelerator(dik))
+                {
+                    SetActiveTab(button->m_btn_id);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CUITabControl::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
+{
+    if (WINDOW_KEY_PRESSED == controller_action)
+    {
+        if (GetButtonsAcceleratorsMode())
+        {
+            for (const auto& button : m_TabsArr)
+            {
+                if (button->IsAccelerator(axis))
+                {
+                    SetActiveTab(button->m_btn_id);
+                    return true;
+                }
             }
         }
     }

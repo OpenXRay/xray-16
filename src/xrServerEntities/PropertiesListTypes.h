@@ -18,8 +18,6 @@
 // fwd. decl.
 struct xr_rtoken;
 
-#pragma pack(push, 1)
-
 //---------------------------------------------------------------------------
 enum EPropType
 {
@@ -63,6 +61,8 @@ using PropItemVec = xr_vector<PropItem*>;
 typedef fastdelegate::FastDelegate2<PropValue*, xr_string&> TOnDrawTextEvent;
 typedef fastdelegate::FastDelegate1<PropItem*> TOnClick;
 //------------------------------------------------------------------------------
+
+#pragma pack(push, 1)
 
 class PropValue
 {

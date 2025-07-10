@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_gasmask_drops()
 {
     //Constants
@@ -55,3 +57,4 @@ void CRenderTarget::phase_gasmask_drops()
     HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_Generic_0->pTexture->surface_get(), dest_rt->pTexture->surface_get());
 #endif
 };
+} // namespace xray::render::RENDER_NAMESPACE

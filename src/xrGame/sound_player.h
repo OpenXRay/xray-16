@@ -60,7 +60,7 @@ public:
         CSoundCollection(const CSoundCollectionParams& params);
         ~CSoundCollection();
         IC ref_sound* add(ESoundTypes type, LPCSTR name) const;
-        const ref_sound& random(const u32& id);
+        const ref_sound& random(u32 id);
     };
 
     struct CSoundSingle : public CSoundParams

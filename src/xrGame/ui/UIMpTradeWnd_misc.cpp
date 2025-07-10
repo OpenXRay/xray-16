@@ -31,7 +31,7 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         if (m_shop_wnd->OnKeyboardAction(dik, keyboard_action))
             return true;
 
-        m_root_tab_control->SetAcceleratorsMode(false);
+        m_root_tab_control->SetButtonsAcceleratorsMode(false);
     }
 
     if (keyboard_action == WINDOW_KEY_PRESSED)
@@ -57,7 +57,7 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
     bool res = inherited::OnKeyboardAction(dik, keyboard_action);
 
-    m_root_tab_control->SetAcceleratorsMode(true);
+    m_root_tab_control->SetButtonsAcceleratorsMode(true);
 
     return res;
 }
@@ -109,7 +109,7 @@ void CUIMpTradeWnd::UpdateMoneyIndicator()
 void CUIMpTradeWnd::SetMoneyChangeString(int diff)
 {
     string128 buff;
-    xr_sprintf(buff, "%+d RU", diff);
+    xr_sprintf(buff, "%+d %s", diff, StringTable().GetCurrency().c_str());
     m_static_money_change->SetText(buff);
     u32 clr = (diff > 0) ? m_text_color_money_positive : m_text_color_money_negative;
     m_static_money_change->SetTextColor(clr);

@@ -12,6 +12,8 @@
 #include "Blender.h"
 #include "Blender_Recorder.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //	Already defined in Texture.cpp
 void fix_texture_name(pstr fn);
 /*
@@ -490,3 +492,4 @@ BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup
         return FALSE;
     }
 }*/
+} // namespace xray::render::RENDER_NAMESPACE

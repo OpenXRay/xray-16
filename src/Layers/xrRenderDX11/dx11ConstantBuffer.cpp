@@ -3,6 +3,8 @@
 
 #include "Layers/xrRender/BufferUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 dx11ConstantBuffer::~dx11ConstantBuffer()
 {
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
@@ -111,3 +113,4 @@ void dx11ConstantBuffer::Flush(u32 context_id)
         m_bChanged = false;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

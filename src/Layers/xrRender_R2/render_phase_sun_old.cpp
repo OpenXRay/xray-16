@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "r2_R_sun_support.h"
 
-float OLES_SUN_LIMIT_27_01_07 = 100.f; // 180.f
-
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////////
 // XXX: examine
 #define DW_AS_FLT(DW) (*(float*)&(DW))
@@ -301,7 +301,7 @@ void render_sun_old::render_sun() const
     Fmatrix ex_project, ex_full;
     XMMATRIX ex_full_inverse;
     {
-        float _far_ = std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv.far_plane);
+        float _far_ = std::min(ps_r2_sun_far, g_pGamePersistent->Environment().CurrentEnv.far_plane);
         // ex_project.build_projection	(deg2rad(Device.fFOV/* *Device.fASPECT*/),Device.fASPECT,ps_r2_sun_near,_far_);
         ex_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, _far_);
         // VIEWPORT_NEAR
@@ -971,3 +971,4 @@ void render_sun_old::render_sun_filtered() const
     RImplementation.release_context(context_id);
     RImplementation.get_imm_command_list().Invalidate();
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,5 +1,4 @@
-#ifndef NVTRISTRIP_H
-#define NVTRISTRIP_H
+#pragma once
 
 #ifndef NULL
 #define NULL 0
@@ -15,6 +14,8 @@
 // GeForce3 cache size
 #define CACHESIZE_GEFORCE3 24
 
+namespace xray::render::RENDER_NAMESPACE
+{
 enum PrimType
 {
     PT_LIST,
@@ -111,5 +112,4 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
 //
 void RemapIndices(
     const xr_vector<PrimitiveGroup>& in_primGroups, const u16 numVerts, xr_vector<PrimitiveGroup>& remappedGroups);
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

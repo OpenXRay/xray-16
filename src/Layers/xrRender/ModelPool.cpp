@@ -28,6 +28,10 @@
 #include "IGame_Persistent.h"
 #endif
 
+extern bool ENGINE_API g_bRendering;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
     dxRender_Visual* V = nullptr;
@@ -311,7 +315,6 @@ dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
     return Model;
 }
 
-extern bool ENGINE_API g_bRendering;
 void CModelPool::DeleteInternal(dxRender_Visual*& V, BOOL bDiscard)
 {
     VERIFY(!g_bRendering);
@@ -640,3 +643,4 @@ void CModelPool::RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransf
 }
 void CModelPool::OnDeviceDestroy() { Destroy(); }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

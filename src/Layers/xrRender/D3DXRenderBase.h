@@ -7,7 +7,8 @@
 #include "r__sector.h"
 #include "xr_effgamma.h"
 
-
+namespace xray::render::RENDER_NAMESPACE
+{
 // Common part of interface implementation for all D3D renderers
 class D3DXRenderBase : public IRender, public pureFrame
 {
@@ -62,7 +63,7 @@ public:
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
-    CBackend& get_imm_command_list() override
+    CBackend& get_imm_command_list()
     {
         return get_imm_context().cmd_list;
     }
@@ -171,3 +172,4 @@ private:
 protected:
     bool b_loaded{};
 };
+} // namespace xray::render::RENDER_NAMESPACE

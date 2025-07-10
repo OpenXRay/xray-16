@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+extern ENGINE_API Fvector4 ps_ssfx_il;
+extern ENGINE_API Fvector4 ps_ssfx_ao;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_ssao()
 {
     u32 Offset = 0;
@@ -144,8 +149,6 @@ void CRenderTarget::phase_downsamp()
 }
 
 #if (RENDER == R_R4)
-extern ENGINE_API Fvector4 ps_ssfx_il;
-extern ENGINE_API Fvector4 ps_ssfx_ao;
 void CRenderTarget::phase_ssfx_ao()
 {
     //Constants
@@ -426,3 +429,4 @@ void CRenderTarget::phase_ssfx_il()
     set_viewport_size(HW.get_context(CHW::IMM_CTX_ID), w, h);
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

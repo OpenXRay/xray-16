@@ -24,20 +24,10 @@ enum EPOType
     epotSkeleton
 };
 
-#ifdef XRGAME_EXPORTS
-#define DECLARE_ENTITY_DESTROY
-#endif
-
-#ifdef XRSE_FACTORY_EXPORTS
-#define DECLARE_ENTITY_DESTROY
-#endif
-
-#ifdef DECLARE_ENTITY_DESTROY
 template <class T>
 void F_entity_Destroy(T*& P)
 {
     xr_delete(P);
 };
-#endif
 
 #endif

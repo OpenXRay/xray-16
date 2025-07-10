@@ -4,6 +4,8 @@
 #include "SH_Atomic.h"
 #include "ResourceManager.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // Atomic
 //SVS::~SVS()
 //{
@@ -196,3 +198,4 @@ SDeclaration::~SDeclaration()
 #   error No graphics API selected or enabled!
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

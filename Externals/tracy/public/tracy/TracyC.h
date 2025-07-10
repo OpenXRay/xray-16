@@ -39,6 +39,8 @@ TRACY_API void ___tracy_set_thread_name( const char* name );
 
 typedef const void* TracyCZoneCtx;
 
+typedef const void* TracyCLockCtx;
+
 #define TracyCZone(c,x)
 #define TracyCZoneN(c,x,y)
 #define TracyCZoneC(c,x,y)
@@ -96,7 +98,18 @@ typedef const void* TracyCZoneCtx;
 #define TracyCMessageCS(x,y,z,w)
 #define TracyCMessageLCS(x,y,z)
 
+#define TracyCLockCtx(l)
+#define TracyCLockAnnounce(l)
+#define TracyCLockTerminate(l)
+#define TracyCLockBeforeLock(l)
+#define TracyCLockAfterLock(l)
+#define TracyCLockAfterUnlock(l)
+#define TracyCLockAfterTryLock(l,x)
+#define TracyCLockMark(l)
+#define TracyCLockCustomName(l,x,y)
+
 #define TracyCIsConnected 0
+#define TracyCIsStarted 0
 
 #ifdef TRACY_FIBERS
 #  define TracyCFiberEnter(fiber)
@@ -172,18 +185,31 @@ struct ___tracy_gpu_calibration_data {
     uint8_t context;
 };
 
+struct ___tracy_gpu_time_sync_data {
+    int64_t gpuTime;
+    uint8_t context;
+};
+
+struct __tracy_lockable_context_data;
+
 // Some containers don't support storing const types.
 // This struct, as visible to user, is immutable, so treat it as if const was declared here.
 typedef /*const*/ struct ___tracy_c_zone_context TracyCZoneCtx;
 
+typedef struct __tracy_lockable_context_data* TracyCLockCtx;
 
 #ifdef TRACY_MANUAL_LIFETIME
 TRACY_API void ___tracy_startup_profiler(void);
 TRACY_API void ___tracy_shutdown_profiler(void);
+TRACY_API int ___tracy_profiler_started(void);
+
+#  define TracyCIsStarted ___tracy_profiler_started()
+#else
+#  define TracyCIsStarted 1
 #endif
 
-TRACY_API uint64_t ___tracy_alloc_srcloc( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz );
-TRACY_API uint64_t ___tracy_alloc_srcloc_name( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz );
+TRACY_API uint64_t ___tracy_alloc_srcloc( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, uint32_t color );
+TRACY_API uint64_t ___tracy_alloc_srcloc_name( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, uint32_t color );
 
 TRACY_API TracyCZoneCtx ___tracy_emit_zone_begin( const struct ___tracy_source_location_data* srcloc, int active );
 TRACY_API TracyCZoneCtx ___tracy_emit_zone_begin_callstack( const struct ___tracy_source_location_data* srcloc, int depth, int active );
@@ -204,6 +230,7 @@ TRACY_API void ___tracy_emit_gpu_time( const struct ___tracy_gpu_time_data );
 TRACY_API void ___tracy_emit_gpu_new_context( const struct ___tracy_gpu_new_context_data );
 TRACY_API void ___tracy_emit_gpu_context_name( const struct ___tracy_gpu_context_name_data );
 TRACY_API void ___tracy_emit_gpu_calibration( const struct ___tracy_gpu_calibration_data );
+TRACY_API void ___tracy_emit_gpu_time_sync( const struct ___tracy_gpu_time_sync_data );
 
 TRACY_API void ___tracy_emit_gpu_zone_begin_serial( const struct ___tracy_gpu_zone_begin_data );
 TRACY_API void ___tracy_emit_gpu_zone_begin_callstack_serial( const struct ___tracy_gpu_zone_begin_callstack_data );
@@ -214,6 +241,7 @@ TRACY_API void ___tracy_emit_gpu_time_serial( const struct ___tracy_gpu_time_dat
 TRACY_API void ___tracy_emit_gpu_new_context_serial( const struct ___tracy_gpu_new_context_data );
 TRACY_API void ___tracy_emit_gpu_context_name_serial( const struct ___tracy_gpu_context_name_data );
 TRACY_API void ___tracy_emit_gpu_calibration_serial( const struct ___tracy_gpu_calibration_data );
+TRACY_API void ___tracy_emit_gpu_time_sync_serial( const struct ___tracy_gpu_time_sync_data );
 
 TRACY_API int ___tracy_connected(void);
 
@@ -350,6 +378,25 @@ TRACY_API void ___tracy_emit_message_appinfo( const char* txt, size_t size );
 #  define TracyCMessageCS( txt, size, color, depth ) TracyCMessageC( txt, size, color )
 #  define TracyCMessageLCS( txt, color, depth ) TracyCMessageLC( txt, color )
 #endif
+
+
+TRACY_API struct __tracy_lockable_context_data* ___tracy_announce_lockable_ctx( const struct ___tracy_source_location_data* srcloc );
+TRACY_API void ___tracy_terminate_lockable_ctx( struct __tracy_lockable_context_data* lockdata );
+TRACY_API int ___tracy_before_lock_lockable_ctx( struct __tracy_lockable_context_data* lockdata );
+TRACY_API void ___tracy_after_lock_lockable_ctx( struct __tracy_lockable_context_data* lockdata );
+TRACY_API void ___tracy_after_unlock_lockable_ctx( struct __tracy_lockable_context_data* lockdata );
+TRACY_API void ___tracy_after_try_lock_lockable_ctx( struct __tracy_lockable_context_data* lockdata, int acquired );
+TRACY_API void ___tracy_mark_lockable_ctx( struct __tracy_lockable_context_data* lockdata, const struct ___tracy_source_location_data* srcloc );
+TRACY_API void ___tracy_custom_name_lockable_ctx( struct __tracy_lockable_context_data* lockdata, const char* name, size_t nameSz );
+
+#define TracyCLockAnnounce( lock ) static const struct ___tracy_source_location_data TracyConcat(__tracy_source_location,TracyLine) = { NULL, __func__,  TracyFile, (uint32_t)TracyLine, 0 }; lock = ___tracy_announce_lockable_ctx( &TracyConcat(__tracy_source_location,TracyLine) );
+#define TracyCLockTerminate( lock ) ___tracy_terminate_lockable_ctx( lock );
+#define TracyCLockBeforeLock( lock ) ___tracy_before_lock_lockable_ctx( lock );
+#define TracyCLockAfterLock( lock ) ___tracy_after_lock_lockable_ctx( lock );
+#define TracyCLockAfterUnlock( lock ) ___tracy_after_unlock_lockable_ctx( lock );
+#define TracyCLockAfterTryLock( lock, acquired ) ___tracy_after_try_lock_lockable_ctx( lock, acquired );
+#define TracyCLockMark( lock ) static const struct ___tracy_source_location_data TracyConcat(__tracy_source_location,TracyLine) = { NULL, __func__,  TracyFile, (uint32_t)TracyLine, 0 }; ___tracy_mark_lockable_ctx( lock, &TracyConcat(__tracy_source_location,TracyLine) );
+#define TracyCLockCustomName( lock, name, nameSz ) ___tracy_custom_name_lockable_ctx( lock, name, nameSz );
 
 #define TracyCIsConnected ___tracy_connected()
 

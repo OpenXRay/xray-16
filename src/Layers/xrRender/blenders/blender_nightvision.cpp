@@ -2,6 +2,8 @@
 
 #include "blender_nightvision.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_nightvision::CBlender_nightvision()
 {
     description.CLS = B_BLUR;
@@ -72,3 +74,4 @@ void CBlender_nightvision::Compile(CBlender_Compile& C)
     }
 #endif
 }
+} // namespace xray::render::RENDER_NAMESPACE

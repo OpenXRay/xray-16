@@ -218,8 +218,6 @@ public:
     virtual void on_weapon_shot_remove(CWeapon* weapon);
     virtual void on_weapon_hide(CWeapon* weapon);
 
-public:
-    virtual bool use_simplified_visual() const { return (false); };
 private:
     CTradeParameters* m_trade_parameters{};
     CPurchaseList* m_purchase_list{};

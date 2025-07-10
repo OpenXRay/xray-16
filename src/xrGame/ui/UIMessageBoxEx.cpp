@@ -7,7 +7,6 @@ CUIMessageBoxEx::CUIMessageBoxEx() : CUIDialogWnd(CUIMessageBoxEx::GetDebugType(
 {
     m_pMessageBox = xr_new<CUIMessageBox>();
     m_pMessageBox->SetWindowName("msg_box");
-    m_pMessageBox->AllowInputHandling(true);
     //	m_pMessageBox->SetAutoDelete(true);
     AttachChild(m_pMessageBox);
 }
@@ -49,6 +48,23 @@ void CUIMessageBoxEx::OnNOClicked(CUIWindow* w, void* d)
     {
         func_on_no(w, d);
     }
+}
+
+bool CUIMessageBoxEx::NeedCursor() const
+{
+    if (pInput->IsCurrentInputTypeKeyboardMouse())
+        return true;
+
+    switch (m_pMessageBox->GetBoxStyle())
+    {
+    case CUIMessageBox::MESSAGEBOX_DIRECT_IP:
+    case CUIMessageBox::MESSAGEBOX_PASSWORD:
+    case CUIMessageBox::MESSAGEBOX_RA_LOGIN:
+    case CUIMessageBox::MESSAGEBOX_YES_NO_COPY:
+        return true;
+    }
+
+    return false;
 }
 
 void CUIMessageBoxEx::SetText(LPCSTR text) { m_pMessageBox->SetText(text); }

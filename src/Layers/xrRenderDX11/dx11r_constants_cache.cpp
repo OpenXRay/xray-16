@@ -3,6 +3,8 @@
 
 #include "Layers/xrRender/r_constants_cache.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 template<>
 dx11ConstantBuffer& R_constants::GetCBuffer<R_constants::BT_PixelBuffer>(R_constant* C) const
 {
@@ -146,3 +148,4 @@ void R_constants::flush_cache()
     }
 }
 */
+} // namespace xray::render::RENDER_NAMESPACE

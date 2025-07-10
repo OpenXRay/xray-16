@@ -4,6 +4,9 @@
 
 #include "du_sphere.h"
 //---------------------------------------------------------------------------
+
+namespace xray::render::RENDER_NAMESPACE
+{
 //#pragma package(smart_init)
 Fvector du_sphere_vertices[DU_SPHERE_NUMVERTEX] = {{0.0000f, 1.0000f, 0.0000f}, {0.8944f, 0.4472f, 0.0000f},
     {0.2764f, 0.4472f, 0.8507f}, {-0.7236f, 0.4472f, 0.5257f}, {-0.7236f, 0.4472f, -0.5257f},
@@ -87,3 +90,4 @@ u16 du_sphere_lines[DU_SPHERE_NUMLINES * 2] = {
     40, 41, 41, 42, 42, 43, 43, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54,
     55, 55, 56, 56, 57, 57, 58, 58, 59, 59, 40,
 };
+} // namespace xray::render::RENDER_NAMESPACE

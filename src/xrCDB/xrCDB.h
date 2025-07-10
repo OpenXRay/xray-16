@@ -28,12 +28,11 @@ struct Fbox3;
 using Fbox = Fbox3;
 class Lock;
 
-
 #pragma pack(push, 8)
 namespace CDB
 {
 // Triangle
-class XRCDB_API TRI //*** 16 bytes total (was 32 :)
+class TRI //*** 16 bytes total (was 32 :)
 {
 public:
     u32 verts[3]; // 3*4 = 12b
@@ -51,15 +50,17 @@ public:
 
 public:
     [[nodiscard]]
-    auto IDvert(size_t ID) const { return verts[ID]; }
+    auto IDvert(const size_t ID) const { return verts[ID]; }
 };
 
+static_assert(std::is_trivial_v<TRI> && std::is_standard_layout_v<TRI>);
 static_assert(sizeof(TRI) == 16, "TRI always should be 16 bytes on any architecture.");
 
 // Build callback
-using build_callback = void(Fvector* V, int Vcnt, TRI* T, int Tcnt, void* params);
+using build_callback = void(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, void* params);
 using serialize_callback = void(IWriter& writer);
 using deserialize_callback = bool(IReader& reader);
+using remapping_materials_callback = void(TRI* T, u32 Tcnt, xr_map<u16, shared_str>& gameMtls);
 
 // Model definition
 class XRCDB_API MODEL : Noncopyable
@@ -75,39 +76,50 @@ class XRCDB_API MODEL : Noncopyable
 
 private:
     Lock* pcs;
-    Opcode::OPCODE_Model* tree;
-    volatile u32 status; // 0=ready, 1=init, 2=building
-    u32 version;
+    Opcode::OPCODE_Model* tree{};
+    volatile u32 status{ S_INIT }; // 0=ready, 1=init, 2=building
+    u32 model_crc32{};
 
     // tris
-    TRI* tris;
-    int tris_count;
-    Fvector* verts;
-    int verts_count;
+    u32 tris_count{};
+    u32 verts_count{};
+    TRI* tris{};
+    Fvector* verts{};
 
 public:
     MODEL();
     ~MODEL();
 
-    IC Fvector* get_verts() { return verts; }
-    IC const Fvector* get_verts() const { return verts; }
-    IC int get_verts_count() const { return verts_count; }
-    IC const TRI* get_tris() const { return tris; }
-    IC TRI* get_tris() { return tris; }
-    IC int get_tris_count() const { return tris_count; }
-    IC void syncronize() const
+    [[nodiscard]]
+    auto get_verts_count() const { return verts_count; }
+    [[nodiscard]]
+    auto get_tris_count() const { return tris_count; }
+
+    [[nodiscard]]
+    const auto* get_verts() const { return verts; }
+    [[nodiscard]]
+    auto get_verts() { return verts; }
+    [[nodiscard]]
+    const auto* get_tris() const { return tris; }
+    [[nodiscard]]
+    auto get_tris() { return tris; }
+
+    void syncronize() const
     {
         if (S_READY != status)
             syncronize_impl();
     }
 
-    void build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
-    void build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc = NULL, void* bcp = NULL);
-    u32 memory();
+    void build_internal(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc = nullptr, void* bcp = nullptr);
+    void build(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt, build_callback* bc = nullptr, void* bcp = nullptr);
 
-    void set_version(u32 value) { version = value; }
+    void set_model_crc32(u32 value) { model_crc32 = value; }
+    void load_geom(Fvector* V, u32 Vcnt, TRI* T, u32 Tcnt);
     bool serialize(pcstr fileName, serialize_callback callback = nullptr) const;
-    bool deserialize(pcstr fileName, bool checkCrc32 = true, deserialize_callback callback = nullptr);
+    bool deserialize(pcstr fileName, bool skipCrc32Check = false, deserialize_callback callback = nullptr);
+    void deserialize_tree(IReader* rstream);
+
+    size_t memory();
 
 private:
     void syncronize_impl() const;
@@ -182,10 +194,21 @@ public:
     void remove_duplicate_T();
     void calc_adjacency(xr_vector<u32>& dest) const;
 
-    Fvector* getV() { return &*verts.begin(); }
-    size_t getVS() { return verts.size(); }
-    TRI* getT() { return &*faces.begin(); }
-    size_t getTS() { return faces.size(); }
+    [[nodiscard]]
+    auto getVS() const { return verts.size(); }
+    [[nodiscard]]
+    auto getTS() const { return faces.size(); }
+
+    [[nodiscard]]
+    auto getV() const { return &verts.front(); }
+    [[nodiscard]]
+    auto getT() const { return &faces.front(); }
+
+    [[nodiscard]]
+    auto getV() { return &verts.front(); }
+    [[nodiscard]]
+    auto getT() { return &faces.front(); }
+
     void clear()
     {
         verts.clear();
@@ -198,21 +221,17 @@ public:
 const u32 clpMX = 24, clpMY = 16, clpMZ = 24;
 class XRCDB_API CollectorPacked : public Noncopyable
 {
-    using DWORDList = xr_vector<u32>;
-    using DWORDIt = DWORDList::iterator;
-
-private:
     xr_vector<Fvector> verts;
     xr_vector<TRI> faces;
     xr_vector<u32> flags;
     Fvector VMmin, VMscale;
-    DWORDList VM[clpMX + 1][clpMY + 1][clpMZ + 1];
+    xr_vector<u32> VM[clpMX + 1][clpMY + 1][clpMZ + 1];
     Fvector VMeps;
 
     u32 VPack(const Fvector& V);
 
 public:
-    CollectorPacked(const Fbox& bb, int apx_vertices = 5000, int apx_faces = 5000);
+    CollectorPacked(const Fbox& bb, u32 apx_vertices = 5000, u32 apx_faces = 5000);
 
     //		ICN CollectorPacked &operator=	(const CollectorPacked &object)
     //		{
@@ -222,13 +241,31 @@ public:
     void add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2, u16 material, u16 sector, u32 flags);
     void add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy, u32 flags);
 
-    xr_vector<Fvector>& getV_Vec() { return verts; }
-    Fvector* getV() { return &verts.front(); }
-    size_t getVS() { return verts.size(); }
-    TRI* getT() { return &faces.front(); }
-    u32 getfFlags(size_t index) { return flags[index]; }
-    IC TRI& getT(size_t index) { return faces[index]; }
-    size_t getTS() { return faces.size(); }
+    [[nodiscard]]
+    auto getVS() const { return verts.size(); }
+    [[nodiscard]]
+    auto getTS() const { return faces.size(); }
+
+    [[nodiscard]]
+    auto& getV_Vec() const { return verts; }
+    [[nodiscard]]
+    auto& getV_Vec() { return verts; }
+
+    [[nodiscard]]
+    auto getV() const { return &verts.front(); }
+    [[nodiscard]]
+    auto getT() const { return &faces.front(); }
+
+    [[nodiscard]]
+    auto getV() { return &verts.front(); }
+    [[nodiscard]]
+    auto getT() { return &faces.front(); }
+
+    [[nodiscard]]
+    auto getfFlags(size_t index) const { return flags[index]; }
+    [[nodiscard]]
+    auto& getT(size_t index) { return faces[index]; }
+
     void clear();
 };
 #pragma warning(pop)

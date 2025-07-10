@@ -1,9 +1,7 @@
-#ifndef KINEMATIC_ANIMATED_DEFS_INCLUDED
-#define KINEMATIC_ANIMATED_DEFS_INCLUDED
-
 #pragma once
 
 #include "xrCore/Animation/SkeletonMotionDefs.hpp"
+
 // consts
 const u32 MAX_BLENDED = 16;
 const u32 MAX_CHANNELS = 4;
@@ -14,6 +12,3 @@ class CBlend;
 typedef svector<CBlend*, MAX_BLENDED * MAX_CHANNELS> BlendSVec; //*MAX_CHANNELS
 typedef BlendSVec::iterator BlendSVecIt;
 typedef BlendSVec::const_iterator BlendSVecCIt;
-//**********************************************************************************
-
-#endif

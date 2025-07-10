@@ -2,6 +2,7 @@
 
 #include "editor_base.h"
 #include "editor_helper.h"
+#include "XR_IOConsole.h"
 
 namespace xray::editor
 {
@@ -35,16 +36,6 @@ void ide::UnregisterTool(const ide_tool* tool)
 ide::ide() = default;
 
 ide::~ide() = default;
-
-void ide::OnAppStart()
-{
-    Device.seqFrame.Add(this, -5);
-}
-
-void ide::OnAppEnd()
-{
-    Device.seqFrame.Remove(this);
-}
 
 void ide::OnFrame()
 {
@@ -82,6 +73,17 @@ void ide::ShowMain()
     {
         if (ImGui::BeginMenu("File"))
         {
+            if (imgui::MenuItemWithShortcut("Console", kCONSOLE,
+                "Show engine console.\n"
+                "Key shortcut will only work when no window is in focus",
+                Console->bVisible))
+            {
+                if (Console->bVisible)
+                    Console->Hide();
+                else
+                    Console->Show();
+            }
+
             if (imgui::MenuItemWithShortcut("Stats", kSCORES,
                 "Show engine statistics.\n"
                 "Key shortcut will only work when no window is in focus",

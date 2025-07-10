@@ -69,6 +69,7 @@ public:
         return true;
     } // always true because StopAnyMove() == false
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    bool OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action) override;
 
     UIHint* get_hint_wnd() const { return m_hint_wnd; }
     void DrawHint();
@@ -76,13 +77,17 @@ public:
     void SetActiveCaption();
     void SetCaption(pcstr text);
     void Show_SecondTaskWnd(bool status);
-    void Show_MapLegendWnd(bool status);
-    pcstr GetActiveSection() { return m_sActiveSection.c_str(); };
-    CUITabControl* GetTabControl() const { return UITabControl; };
+    void Show_MapWnd(bool status);
+    void Show_ContactsWnd(bool status);
 
+    void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
+    CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }
+    pcstr GetActiveSection() const { return m_sActiveSection.c_str(); }
     void SetActiveSubdialog(const shared_str& section);
-    void SetActiveSubdialog_script(pcstr section) { SetActiveSubdialog(section); };
-    virtual bool StopAnyMove() { return false; }
+    CUITabControl* GetTabControl() const { return UITabControl; }
+
+    bool StopAnyMove() override { return false; }
+    bool NeedCursor() const override;
     void UpdatePda();
     void UpdateRankingWnd();
 

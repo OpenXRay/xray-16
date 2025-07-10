@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 static void generate_jitter(u32* dest, u32 elem_count)
 {
     const int cmax = 8;
@@ -203,3 +205,4 @@ void CRenderTarget::build_textures()
         }
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

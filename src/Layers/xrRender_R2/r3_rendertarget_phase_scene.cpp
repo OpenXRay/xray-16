@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 // startup
 void CRenderTarget::phase_scene_prepare()
 {
@@ -131,3 +133,4 @@ void CRenderTarget::phase_scene_end()
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }
+} // namespace xray::render::RENDER_NAMESPACE

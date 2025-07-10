@@ -27,8 +27,6 @@ class ENGINE_API CPS_Instance;
 //-----------------------------------------------------------------------------------------------------------
 class ENGINE_API IGame_Persistent :
     public pureFrame,
-    public pureAppStart,
-    public pureAppEnd,
     public pureAppActivate,
     public pureAppDeactivate,
     public IEventReceiver

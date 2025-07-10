@@ -1,7 +1,7 @@
-#ifndef glr_constants_cacheH
-#define glr_constants_cacheH
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class ECORE_API R_constants
 {
 private:
@@ -222,4 +222,4 @@ public:
     // TODO: OGL: Implement constant caching through UBOs
     ICF void flush() { }
 };
-#endif	//	glr_constants_cacheH
+} // namespace xray::render::RENDER_NAMESPACE

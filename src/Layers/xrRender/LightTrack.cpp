@@ -15,6 +15,8 @@
 #include "xrEngine/Environment.h"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -550,3 +552,4 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         });
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

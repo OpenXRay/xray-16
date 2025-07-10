@@ -7,6 +7,8 @@
 
 #include <SDL_syswm.h>
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CHW HW;
 
 CHW::CHW()
@@ -148,7 +150,7 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
 
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels)
     {
-        ZoneScopedN("Create device");
+        ZoneScopedN("CreateDevice");
 
         static const auto d3d11CreateDevice = static_cast<PFN_D3D11_CREATE_DEVICE>(hD3D->GetProcAddress("D3D11CreateDevice"));
         return d3d11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN,
@@ -564,3 +566,4 @@ DeviceState CHW::GetDeviceState()
 
     return DeviceState::Normal;
 }
+} // namespace xray::render::RENDER_NAMESPACE

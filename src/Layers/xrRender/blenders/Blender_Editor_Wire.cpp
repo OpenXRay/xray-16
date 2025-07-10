@@ -3,6 +3,8 @@
 
 #include "Blender_Editor_Wire.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_Editor_Wire::CBlender_Editor_Wire()
 {
     description.CLS = B_EDITOR_WIRE;
@@ -64,3 +66,4 @@ void CBlender_Editor_Wire::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
+} // namespace xray::render::RENDER_NAMESPACE

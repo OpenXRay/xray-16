@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "dx11RainBlender.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CBlender_rain::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -232,3 +234,4 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
     RImplementation.m_MSAASample = -1;
     RImplementation.m_SMAPSize = RImplementation.o.smapsize;
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -8,7 +8,13 @@ CUIListBoxItem::CUIListBoxItem(float height)
     : CUIFrameLineWnd(CUIListBoxItem::GetDebugType()), m_text(nullptr), tag(u32(-1))
 {
     SetHeight(height);
-    m_text = AddTextField("---", 10.0f);
+    m_text = AddTextField("", 10.0f);
+    UI().Focus().RegisterFocusable(this);
+}
+
+CUIListBoxItem::~CUIListBoxItem()
+{
+    UI().Focus().UnregisterFocusable(this);
 }
 
 void CUIListBoxItem::SetTAG(u32 value) { tag = value; }
@@ -21,10 +27,28 @@ void CUIListBoxItem::Draw()
     CUIWindow::Draw();
 }
 
+bool CUIListBoxItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
+{
+    if (WINDOW_KEY_PRESSED == keyboard_action && CursorOverWindow() && GetSelected())
+    {
+        if (IsBinded(kUI_ACCEPT, dik, EKeyContext::UI))
+        {
+            GetMessageTarget()->SendMessage(this, LIST_ITEM_CLICKED, &tag);
+            return true;
+        }
+    }
+    return inherited::OnKeyboardAction(dik, keyboard_action);
+}
+
 void CUIListBoxItem::OnFocusReceive()
 {
     inherited::OnFocusReceive();
     GetMessageTarget()->SendMessage(this, LIST_ITEM_FOCUS_RECEIVED);
+    if (UI().Focus().GetFocused() == this)
+    {
+        smart_cast<CUIScrollView*>(GetParent()->GetParent())->SetSelected(this);
+        GetMessageTarget()->SendMessage(this, LIST_ITEM_SELECT, &tag);
+    }
 }
 
 void CUIListBoxItem::InitDefault() { InitTexture("ui_listline"); }
@@ -39,8 +63,12 @@ bool CUIListBoxItem::OnMouseDown(int mouse_btn)
         GetMessageTarget()->SendMessage(this, LIST_ITEM_CLICKED, &tag);
         return true;
     }
-    else
-        return false;
+    if (mouse_btn == MOUSE_2)
+    {
+        GetMessageTarget()->SendMessage(this, WINDOW_RBUTTON_DOWN, &tag);
+        return true;
+    }
+    return false;
 }
 
 void CUIListBoxItem::SetTextColor(u32 color) { m_text->SetTextColor(color); }

@@ -5,6 +5,8 @@
 //****************************************************************************
 #pragma once
 
+#include <array>
+
 #include "xrEngine/Engine.h"
 #include "xrCore/clsid.h"
 
@@ -60,13 +62,12 @@ public:
 
 class ENGINE_API CEngineAPI
 {
-    xr_map<shared_str, RendererModule*> renderModes;
+    xr_map<cpcstr, RendererModule*> renderModes;
 
     GameModule* gameModule{};
     RendererModule* selectedRenderer{};
 
     void SelectRenderer();
-    void CloseUnusedLibraries() const;
 
 public:
     Factory_Create*  pCreate;
@@ -76,7 +77,8 @@ public:
     CEngineAPI();
     ~CEngineAPI();
 
-    void CreateRendererList();
+    // Call it in the main thread
+    void CreateRendererList(const std::array<RendererModule*, 2>& modules);
     void Initialize(GameModule* game);
     void Destroy();
 };

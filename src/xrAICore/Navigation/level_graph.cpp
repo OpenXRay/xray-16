@@ -31,7 +31,7 @@ void CLevelGraph::Initialize(const char* filePath)
     R_ASSERT3(m_reader, "Please, compile AI for the level.", filePath);
     // m_header & data
     m_header = (CHeader*)m_reader->pointer();
-    ASSERT_XRAI_VERSION_MATCH(header().version(), "Level graph version mismatch");
+    ASSERT_XRAI_VERSION_MATCH(header().version(), "Level graph");
     m_reader->advance(sizeof(CHeader));
     const auto& box = header().box();
     m_nodes = xr_new<CLevelGraphManager>(m_reader, header().vertex_count(), header().version());

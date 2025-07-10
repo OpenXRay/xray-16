@@ -1,6 +1,7 @@
-#ifndef dx11MinMaxSMBlender_included
-#define dx11MinMaxSMBlender_included
+#pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_createminmax : public IBlender
 {
 public:
@@ -9,5 +10,4 @@ public:
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual void Compile(CBlender_Compile& C);
 };
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

@@ -49,6 +49,7 @@
 #include "stalker_planner.h"
 #include "stalker_decision_space.h"
 #include "script_game_object.h"
+#include "script_game_object_impl.h"
 #include "Inventory.h"
 #include "trajectories.h"
 
@@ -229,55 +230,75 @@ void CAI_Stalker::Hit(SHit* pHDS)
     SHit HDS = *pHDS;
     HDS.add_wound = true;
 
+    //AVO: get bone names from IDs
+    //if (HDS.whoID == 0) // if shot by actor
+    //{
+    //    pcstr bone_name = smart_cast<IKinematics*>(Visual())->LL_BoneName_dbg(HDS.boneID);
+    //    Msg("Bone [%d]->[%s]", HDS.boneID, bone_name);
+    //}
+    //-AVO
+
     float hit_power = HDS.power * m_fRankImmunity;
 
     if (m_boneHitProtection && HDS.hit_type == ALife::eHitTypeFireWound)
     {
-        float BoneArmor = m_boneHitProtection->getBoneArmor(HDS.bone());
-        float ap = HDS.armor_piercing;
+        const float BoneArmor = m_boneHitProtection->getBoneArmor(HDS.bone());
 
-        if (ShadowOfChernobylMode || ClearSkyMode)
+        if (wounded()) // уже лежит => добивание
         {
+            hit_power = 1000.f;
+        }
+        else if (m_boneHitProtection->m_hitFracType == SBoneProtections::HitFractionNPC) // COP
+        {
+            if (!fis_zero(BoneArmor, EPS))
+            {
+                const float ap = HDS.armor_piercing;
+
+                if (ap > BoneArmor)
+                {
+                    float d_hit_power = (ap - BoneArmor) / ap;
+                    if (d_hit_power < m_boneHitProtection->m_fHitFrac)
+                        d_hit_power = m_boneHitProtection->m_fHitFrac;
+
+                    hit_power *= d_hit_power;
+                    VERIFY(hit_power >= 0.0f);
+                }
+                else
+                {
+                    hit_power *= m_boneHitProtection->m_fHitFrac;
+                    HDS.add_wound = false;
+                }
+            }
+        }
+        else if (GMLib.GetLibraryVersion() >= GAMEMTL_VERSION_CS)
+        {
+            const float ap = HDS.armor_piercing;
+
             if (ap > EPS && ap > BoneArmor)
             {
                 const float d_ap = ap - BoneArmor;
                 hit_power *= (d_ap / ap);
 
-                if (hit_power < m_boneHitProtection->m_fHitFracNpc)
-                {
-                    hit_power = m_boneHitProtection->m_fHitFracNpc;
-                }
-                if (hit_power < 0.0f) {
+                if (hit_power < m_boneHitProtection->m_fHitFrac)
+                    hit_power = m_boneHitProtection->m_fHitFrac;
+
+                if (hit_power < 0.0f)
                     hit_power = 0.0f;
-                }
             }
             else
             {
-                hit_power *= m_boneHitProtection->m_fHitFracNpc;
+                hit_power *= m_boneHitProtection->m_fHitFrac;
                 HDS.add_wound = false;
             }
         }
-        else if (!fis_zero(BoneArmor, EPS))
+        else if (GMLib.GetLibraryVersion() == GAMEMTL_VERSION_SOC)
         {
-            if (ap > BoneArmor)
-            {
-                float d_hit_power = (ap - BoneArmor) / ap;
-                if (d_hit_power < m_boneHitProtection->m_fHitFracNpc)
-                    d_hit_power = m_boneHitProtection->m_fHitFracNpc;
+            const float NewHitPower = HDS.damage() - BoneArmor;
 
-                hit_power *= d_hit_power;
-                VERIFY(hit_power >= 0.0f);
-            }
+            if (NewHitPower < HDS.power * m_boneHitProtection->m_fHitFrac)
+                hit_power = HDS.power * m_boneHitProtection->m_fHitFrac;
             else
-            {
-                hit_power *= m_boneHitProtection->m_fHitFracNpc;
-                HDS.add_wound = false;
-            }
-        }
-
-        if (wounded()) //уже лежит => добивание
-        {
-            hit_power = 1000.f;
+                hit_power = NewHitPower;
         }
     }
     HDS.power = hit_power;
@@ -405,7 +426,22 @@ void CAI_Stalker::update_best_item_info()
 
 void CAI_Stalker::update_best_item_info_impl()
 {
+    luabind::functor<CScriptGameObject*> funct;
+    if (GEnv.ScriptEngine->functor("ai_stalker.update_best_weapon", funct))
+    {
+        CGameObject* cur_itm = smart_cast<CGameObject*>(m_best_item_to_kill);
+        CScriptGameObject* GO = funct(lua_game_object(),cur_itm ? cur_itm->lua_game_object() : nullptr);
+        CInventoryItem* bw = GO ? smart_cast<CInventoryItem*>(&GO->object()): nullptr;
+        if (bw)
+        {
+            m_best_item_to_kill = bw;
+            m_best_ammo = bw;
+            return;
+        }
+    }
+
     ai().ef_storage().alife_evaluation(false);
+    /* Alundaio: This is what causes stalkers to switch weapons during combat; It's stupid
     if (m_item_actuality && m_best_item_to_kill && m_best_item_to_kill->can_kill())
     {
         if (!memory().enemy().selected())
@@ -419,6 +455,7 @@ void CAI_Stalker::update_best_item_info_impl()
         if (fsimilar(value, m_best_item_value))
             return;
     }
+    */
 
     // initialize parameters
     m_item_actuality = true;

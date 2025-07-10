@@ -192,13 +192,11 @@ class IReaderBase
 
 {
 public:
-    IC IReaderBase() : m_last_pos(0), m_file_age(0) {}
+    IC IReaderBase() : m_last_pos(0) {}
     virtual ~IReaderBase() = default;
     IC implementation_type& impl() { return *(implementation_type*)this; }
     IC const implementation_type& impl() const { return *(implementation_type*)this; }
 
-    IC void set_age(u32 age) { m_file_age = age; }
-    IC u32 get_age() const { return m_file_age; }
     IC bool eof() const { return impl().elapsed() <= 0; };
     virtual void r(void* p, size_t cnt) { impl().r(p, cnt); }
 
@@ -332,8 +330,11 @@ public:
 
 private:
     size_t m_last_pos;
-    u32 m_file_age;
 };
+
+#ifdef XR_PLATFORM_WINDOWS
+#   include "FS_impl.h"
+#endif
 
 class XRCORE_API IReader : public IReaderBase<IReader>
 {
@@ -347,8 +348,6 @@ public:
     IC IReader()
         : data(nullptr), Pos(0),
           Size(0), iterpos(0) {}
-
-    ~IReader() override = default;
 
     IC IReader(void* _data, size_t _size, size_t _iterpos = 0)
     {
@@ -420,6 +419,8 @@ public:
 private:
     typedef IReaderBase<IReader> inherited;
 };
+
+template class IReaderBase<IReader>;
 
 class XRCORE_API CVirtualFileRW final : public IReader
 {

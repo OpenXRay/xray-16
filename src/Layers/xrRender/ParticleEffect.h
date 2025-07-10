@@ -1,5 +1,5 @@
-#ifndef ParticleEffectH
-#define ParticleEffectH
+#pragma once
+
 #include "ParticleEffectDef.h"
 #ifdef _EDITOR
 #include "Layers/xrRender/FBasicVisual.h"
@@ -9,6 +9,8 @@
 #include "Layers/xrRender/dxParticleCustom.h"
 #endif // _EDITOR
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace PS
 {
 class ECORE_API CParticleEffect : public dxParticleCustom
@@ -105,4 +107,4 @@ extern const u32 uDT_STEP;
 extern const float fDT_STEP;
 }
 //---------------------------------------------------------------------------
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

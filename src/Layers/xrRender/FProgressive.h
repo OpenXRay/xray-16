@@ -2,13 +2,14 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef FProgressiveH
-#define FProgressiveH
 #pragma once
 
 #include "FVisual.h"
+
 struct FSlideWindowItem;
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class FProgressive : public Fvisual
 {
 protected:
@@ -28,5 +29,4 @@ private:
     FProgressive(const FProgressive& other);
     void operator=(const FProgressive& other);
 };
-
-#endif
+} // namespace xray::render::RENDER_NAMESPACE

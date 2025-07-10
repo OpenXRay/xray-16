@@ -23,6 +23,19 @@ bool CUIRadioButton::InitTexture(pcstr /*texture*/, bool /*fatal = true*/)
     return true;
 }
 
+void CUIRadioButton::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
+{
+    if (!IsEnabled())
+        return;
+
+    inherited::SendMessage(pWnd, msg, pData);
+
+    if (msg == TAB_CHANGED && this == pWnd)
+    {
+        GetMessageTarget()->SendMessage(this, RADIOBUTTON_SET, nullptr);
+    }
+}
+
 bool CUIRadioButton::OnMouseDown(int mouse_btn)
 {
     const bool result = inherited::OnMouseDown(mouse_btn);

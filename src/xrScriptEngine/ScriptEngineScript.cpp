@@ -9,6 +9,7 @@
 #include "pch.hpp"
 #include "ScriptEngineScript.hpp"
 #include "script_engine.hpp"
+#include "script_profiler.hpp"
 #include "script_debugger.hpp"
 #include "DebugMacros.hpp"
 #include "ScriptExporter.hpp"
@@ -18,7 +19,7 @@ void LuaLog(pcstr caMessage)
 #ifndef MASTER_GOLD
     GEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
 #endif
-#if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
+#if defined(USE_DEBUGGER)
     if (GEnv.ScriptEngine->debugger())
         GEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
@@ -28,17 +29,11 @@ void ErrorLog(pcstr caMessage)
 {
     GEnv.ScriptEngine->error_log("%s", caMessage);
     GEnv.ScriptEngine->print_stack();
-#if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
+#if defined(USE_DEBUGGER)
     if (GEnv.ScriptEngine->debugger())
         GEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
-#if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
-    bool lua_studio_connected = !!GEnv.ScriptEngine->debugger();
-    if (!lua_studio_connected)
-        R_ASSERT2(0, caMessage);
-#else
     R_ASSERT2(0, caMessage);
-#endif
 }
 
 //AVO:
@@ -139,6 +134,11 @@ std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt) { ret
 SCRIPT_EXPORT(CScriptEngine, (),
 {
     using namespace luabind;
+
+    globals(luaState)["PROFILER_TYPE_NONE"]     = (u32)CScriptProfilerType::None;
+    globals(luaState)["PROFILER_TYPE_HOOK"]     = (u32)CScriptProfilerType::Hook;
+    globals(luaState)["PROFILER_TYPE_SAMPLING"] = (u32)CScriptProfilerType::Sampling;
+
     module(luaState)
     [
         class_<profile_timer_script>("profile_timer")
@@ -163,5 +163,57 @@ SCRIPT_EXPORT(CScriptEngine, (),
         def("bit_not", &bit_not),
         def("editor", &is_editor),
         def("user_name", &user_name)
+    ];
+
+    module(luaState, "profiler")
+    [
+        def("is_active", +[]() -> bool
+        {
+            return GEnv.ScriptEngine->m_profiler->IsActive();
+        }),
+        def("get_type", +[]()-> u32
+        {
+            return static_cast<u32>(GEnv.ScriptEngine->m_profiler->GetType());
+        }),
+        def("start", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->Start();
+        }),
+        def("start", +[](CScriptProfilerType profiler_type)
+        {
+            GEnv.ScriptEngine->m_profiler->Start(profiler_type);
+        }),
+        def("start_hook_mode", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->StartHookMode();
+        }),
+        def("start_sampling_mode", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->StartSamplingMode();
+        }),
+        def("start_sampling_mode", +[](u32 sampling_interval = CScriptProfiler::PROFILE_SAMPLING_INTERVAL_DEFAULT)
+        {
+            GEnv.ScriptEngine->m_profiler->StartSamplingMode(sampling_interval);
+        }),
+        def("stop", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->Stop();
+        }),
+        def("reset", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->Reset();
+        }),
+        def("log_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->LogReport();
+        }),
+        def("log_report", +[](u32 entries_limit)
+        {
+            GEnv.ScriptEngine->m_profiler->LogReport(entries_limit);
+        }),
+        def("save_report", +[]()
+        {
+            GEnv.ScriptEngine->m_profiler->SaveReport();
+        })
     ];
 });

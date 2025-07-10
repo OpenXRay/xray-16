@@ -156,19 +156,6 @@ void CCharacterPhysicsSupport::update_interactive_anims()
 void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
 {
     m_sv_hit = SHit();
-    if (m_EntityAlife.use_simplified_visual())
-    {
-        m_flags.set(fl_death_anim_on, TRUE);
-        IKinematics* ka = smart_cast<IKinematics*>(m_EntityAlife.Visual());
-        VERIFY(ka);
-        ka->CalculateBones_Invalidate();
-        ka->CalculateBones(TRUE);
-        CollisionCorrectObjPos(m_EntityAlife.Position());
-        m_pPhysicsShell = P_build_Shell(&m_EntityAlife, false);
-        ka->CalculateBones_Invalidate();
-        ka->CalculateBones(TRUE);
-        return;
-    }
     CPHDestroyable::Init(); // this zerows colbacks !!;
     IRenderVisual* pVisual = m_EntityAlife.Visual();
     IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(pVisual);
@@ -358,10 +345,7 @@ void CCharacterPhysicsSupport::in_shedule_Update(u32 DT)
     if (m_collision_activating_delay)
         UpdateCollisionActivatingDellay();
 
-    if (!m_EntityAlife.use_simplified_visual())
-        CPHDestroyable::SheduleUpdate(DT);
-    else if (m_pPhysicsShell && m_pPhysicsShell->isFullActive() && !m_pPhysicsShell->isEnabled())
-        m_EntityAlife.deactivate_physics_shell();
+    CPHDestroyable::SheduleUpdate(DT);
     movement()->in_shedule_Update(DT);
 #if 0
 	if( anim_mov_state.active )
@@ -485,7 +469,7 @@ void CCharacterPhysicsSupport::in_Hit(SHit& H, bool is_killing)
 {
     m_sv_hit = H;
     m_hit_valide_time = Device.dwTimeGlobal + hit_valide_time;
-    if (m_EntityAlife.use_simplified_visual() || esRemoved == m_eState)
+    if (esRemoved == m_eState)
         return;
     if (m_flags.test(fl_block_hit))
     {
@@ -603,7 +587,7 @@ void CCharacterPhysicsSupport::in_UpdateCL()
 
         m_character_shell_control.UpdateFrictionAndJointResistanse(m_pPhysicsShell);
     }
-    // else if ( !m_EntityAlife.g_Alive( ) && !m_EntityAlife.use_simplified_visual( ) )
+    // else if ( !m_EntityAlife.g_Alive( ))
     //{
     // ActivateShell( NULL );
     // m_PhysicMovementControl->DestroyCharacter( );
@@ -1372,8 +1356,6 @@ void CCharacterPhysicsSupport::in_Die()
 {
     if (m_hit_valide_time < Device.dwTimeGlobal || !m_sv_hit.is_valide())
     {
-        if (m_EntityAlife.use_simplified_visual())
-            return;
         ActivateShell(NULL);
         m_PhysicMovementControl->DestroyCharacter();
         return;

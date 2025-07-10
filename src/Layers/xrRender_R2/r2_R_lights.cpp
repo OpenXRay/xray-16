@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 bool check_grass_shadow(light* L, CFrustum VB)
 {
     // Grass shadows are allowed?
@@ -400,3 +402,4 @@ void CRender::render_indirect(light* L) const
         Target->accum_reflected(cmd_list, &LIGEN);
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

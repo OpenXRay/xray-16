@@ -112,8 +112,7 @@ void CAI_Boar::Load(LPCSTR section)
 void CAI_Boar::reinit()
 {
     inherited::reinit();
-    if (CCustomMonster::use_simplified_visual())
-        return;
+
     com_man().add_rotation_jump_data("stand_jump_left_0", 0, "stand_jump_right_0", 0, PI - PI_DIV_6,
         SControlRotationJumpData::eStopAtOnce | SControlRotationJumpData::eRotateOnce);
 }

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRenderTarget::phase_nightvision()
 {
     //Constants
@@ -44,3 +46,4 @@ void CRenderTarget::phase_nightvision()
 
     HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_Generic_0->pTexture->surface_get(), dest_rt->pTexture->surface_get());
 };
+} // namespace xray::render::RENDER_NAMESPACE

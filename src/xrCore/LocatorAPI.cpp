@@ -359,7 +359,7 @@ IReader* open_chunk(int fd, u32 ID, pcstr archiveName, size_t archiveSize, bool 
             u8* src_data = xr_alloc<u8>(dwSize);
             read_byte = _read(fd, src_data, dwSize);
 
-            VERIFY(read_byte == dwSize);
+            VERIFY(static_cast<size_t>(read_byte) == dwSize);
             if (dwType & CFS_CompressMark)
             {
                 u8* dest = nullptr;
@@ -1596,8 +1596,6 @@ T* CLocatorAPI::r_open_impl(pcstr path, pcstr _fname)
         file_from_cache(R, fname, sizeof fname, *desc, source_name);
     else
         file_from_archive(R, fname, *desc);
-
-    R->set_age(desc->modif);
 
 #ifdef DEBUG
     if (R && m_Flags.is(flBuildCopy | flReady))

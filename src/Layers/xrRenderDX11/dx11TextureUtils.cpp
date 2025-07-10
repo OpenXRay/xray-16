@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "dx11TextureUtils.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace dx11TextureUtils
 {
 struct TextureFormatPairs
@@ -137,4 +139,5 @@ D3DFORMAT ConvertTextureFormat(DXGI_FORMAT dx11FMT)
     VERIFY(!"ConvertTextureFormat didn't find appropriate dx9 texture format!");
     return D3DFMT_UNKNOWN;
 }
-}
+} // namespace dx11TextureUtils
+} // namespace xray::render::RENDER_NAMESPACE

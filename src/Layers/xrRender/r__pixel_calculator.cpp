@@ -7,6 +7,8 @@
 #   include <DirectXMath.h>
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 static constexpr u32 rt_dimensions = 1024;
 
 void r_pixel_calculator::begin()
@@ -114,3 +116,4 @@ void r_pixel_calculator::run()
     end();
     Log("----- ssa build end -----");
 }
+} // namespace xray::render::RENDER_NAMESPACE

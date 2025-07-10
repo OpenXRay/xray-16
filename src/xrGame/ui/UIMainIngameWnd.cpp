@@ -421,7 +421,7 @@ void CUIMainIngameWnd::RenderQuickInfos()
     }
 }
 
-void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)
+void CUIMainIngameWnd::ReceiveNews(const GAME_NEWS_DATA* news)
 {
     VERIFY(news->texture_name.size());
 

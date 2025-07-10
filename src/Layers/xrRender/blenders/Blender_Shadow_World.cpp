@@ -7,6 +7,8 @@
 #error "The blender can't be used in this renderer generation"
 #endif
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_ShWorld::CBlender_ShWorld()
 {
     description.CLS = B_SHADOW_WORLD;
@@ -37,3 +39,4 @@ void CBlender_ShWorld::Compile(CBlender_Compile& C)
     }
     C.PassEnd();
 }
+} // namespace xray::render::RENDER_NAMESPACE

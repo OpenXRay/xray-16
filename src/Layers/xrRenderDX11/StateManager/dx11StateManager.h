@@ -1,7 +1,7 @@
-#ifndef dx11StateManager_included
-#define dx11StateManager_included
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class dx11StateManager
 {
 public:
@@ -92,5 +92,4 @@ private:
 
     CBackend& cmd_list;
 };
-
-#endif //	dx11StateManager_included
+} // namespace xray::render::RENDER_NAMESPACE

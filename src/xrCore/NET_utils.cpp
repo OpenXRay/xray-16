@@ -137,7 +137,9 @@ void NET_Packet::w_seek(u32 pos, const void* p, u32 count)
 void NET_Packet::r_seek(u32 pos)
 {
     INI_ASSERT(r_seek)
-    VERIFY(pos < B.count);
+    //AVO: changed changed condition to <= as all net packet script utils are using r_seek(0) to read the entire packet.
+    VERIFY(pos <= B.count);
+    //VERIFY(pos < B.count);
     r_pos = pos;
 }
 

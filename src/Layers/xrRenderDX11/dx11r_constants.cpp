@@ -6,6 +6,8 @@
 #include "Layers/xrRender/r_constants.h"
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable, u32 destination)
 {
     // VERIFY(_desc);
@@ -337,3 +339,4 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
     });
     return TRUE;
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -139,6 +139,10 @@ void CUITalkWnd::UpdateQuestions()
                 UpdateQuestions();
         }
     }
+
+    if (pInput->IsCurrentInputTypeController())
+        UITalkDialogWnd->FocusOnFirstQuestion();
+
     m_bNeedToUpdateQuestions = false;
 }
 
@@ -345,6 +349,9 @@ void CUITalkWnd::SwitchToUpgrade()
 
 bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
+
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
         if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
@@ -355,9 +362,8 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                 return true;
             }
         }
-        switch (GetBindedAction(dik, EKeyContext::Talk))
+        else if (IsBinded(kTALK_SWITCH_TO_TRADE, dik, EKeyContext::Talk))
         {
-        case kTALK_SWITCH_TO_TRADE:
             if (!m_pOthersInvOwner->NeedOsoznanieMode())
             {
                 if (UITalkDialogWnd->mechanic_mode)
@@ -366,7 +372,6 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
                     SwitchToTrade();
                 return true;
             }
-            break;
         }
     }
     else if (keyboard_action == WINDOW_KEY_HOLD)
@@ -375,28 +380,50 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         {
         case kTALK_LOG_SCROLL_UP:
             UITalkDialogWnd->TryScrollAnswersList(false);
-            break;
+            return true;
         case kTALK_LOG_SCROLL_DOWN:
             UITalkDialogWnd->TryScrollAnswersList(true);
-            break;
-        }
-    }
-    return inherited::OnKeyboardAction(dik, keyboard_action);
-}
-
-bool CUITalkWnd::OnControllerAction(int axis, float x, float y, EUIMessages controller_action)
-{
-    if (controller_action == WINDOW_KEY_PRESSED)
-    {
-        switch (GetBindedAction(axis, EKeyContext::Talk))
-        {
-        default:
-            return OnKeyboardAction(axis, controller_action);
-        case kTALK_LOG_SCROLL:
             return true;
         }
     }
-    return inherited::OnControllerAction(axis, x, y, controller_action);
+
+    if (keyboard_action == WINDOW_KEY_PRESSED || keyboard_action == WINDOW_KEY_HOLD)
+    {
+        switch (GetBindedAction(dik, EKeyContext::UI))
+        {
+        case kUI_MOVE_UP:
+            UITalkDialogWnd->FocusOnNextQuestion(false, keyboard_action != WINDOW_KEY_HOLD);
+            return true;
+
+        case kUI_MOVE_DOWN:
+            UITalkDialogWnd->FocusOnNextQuestion(true, keyboard_action != WINDOW_KEY_HOLD);
+            return true;
+        } // switch (GetBindedAction(dik, EKeyContext::UI))
+    }
+
+    return false;
+}
+
+bool CUITalkWnd::OnControllerAction(int axis, const ControllerAxisState& state, EUIMessages controller_action)
+{
+    if (inherited::OnControllerAction(axis, state, controller_action))
+        return true;
+
+    if (controller_action == WINDOW_KEY_PRESSED || controller_action == WINDOW_KEY_HOLD)
+    {
+        if (IsBinded(kUI_MOVE, axis, EKeyContext::UI))
+        {
+            UITalkDialogWnd->FocusOnNextQuestion(state.y > 0, controller_action != WINDOW_KEY_HOLD);
+            return true;
+        }
+        if (IsBinded(kTALK_LOG_SCROLL, axis, EKeyContext::Talk))
+        {
+            UITalkDialogWnd->TryScrollAnswersList(state.y > 0);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void CUITalkWnd::PlaySnd(LPCSTR text)

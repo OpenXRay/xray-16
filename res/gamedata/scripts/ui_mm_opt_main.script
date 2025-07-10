@@ -367,10 +367,12 @@ function options_dialog:OnKeyboard(dik, keyboard_action)
 				if self.dlg_video_adv:IsShown() then
 					self.dlg_video_adv:Show	(false)
 					self.dlg_video:Show		(true)
+					return true
 				else
 					self.owner:ShowDialog(true)
 					self:HideDialog()
 					self.owner:Show(true)
+					return true
 				end
 			end
 

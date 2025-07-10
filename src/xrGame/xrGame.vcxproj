@@ -71,12 +71,17 @@
     <ClInclude Include="..\xrServerEntities\restriction_space.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file.h" />
     <ClInclude Include="..\xrServerEntities\script_ini_file_inline.h" />
+    <ClInclude Include="..\xrServerEntities\script_properties_list_helper.h" />
     <ClInclude Include="..\xrServerEntities\script_rtoken_list.h" />
     <ClInclude Include="..\xrServerEntities\script_rtoken_list_inline.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list.h" />
     <ClInclude Include="..\xrServerEntities\script_token_list_inline.h" />
+    <ClInclude Include="..\xrServerEntities\script_value.h" />
     <ClInclude Include="..\xrServerEntities\script_value_container.h" />
     <ClInclude Include="..\xrServerEntities\script_value_container_impl.h" />
+    <ClInclude Include="..\xrServerEntities\script_value_inline.h" />
+    <ClInclude Include="..\xrServerEntities\script_value_wrapper.h" />
+    <ClInclude Include="..\xrServerEntities\script_value_wrapper_inline.h" />
     <ClInclude Include="..\xrServerEntities\ShapeData.h" />
     <ClInclude Include="..\xrServerEntities\shared_data.h" />
     <ClInclude Include="..\xrServerEntities\smart_cast.h" />
@@ -426,6 +431,7 @@
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_danger_inline.h" />
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_rest.h" />
     <ClInclude Include="ai\Monsters\States\monster_state_home_point_rest_inline.h" />
+    <ClInclude Include="ai\monsters\states\monster_state_move.h" />
     <ClInclude Include="ai\Monsters\States\monster_state_panic.h" />
     <ClInclude Include="ai\Monsters\States\monster_state_panic_inline.h" />
     <ClInclude Include="ai\Monsters\States\monster_state_panic_run.h" />
@@ -765,6 +771,7 @@
     <ClInclude Include="hit_immunity_space.h" />
     <ClInclude Include="hit_memory_manager.h" />
     <ClInclude Include="hit_memory_manager_inline.h" />
+    <ClInclude Include="HolderEntityObject.h" />
     <ClInclude Include="holder_custom.h" />
     <ClInclude Include="HUDCrosshair.h" />
     <ClInclude Include="HudItem.h" />
@@ -1316,6 +1323,7 @@
     <ClInclude Include="ui\UIPdaWnd.h" />
     <ClInclude Include="ui\UIRankFaction.h" />
     <ClInclude Include="ui\UIRankIndicator.h" />
+    <ClInclude Include="ui\UIRankingsCoC.h" />
     <ClInclude Include="ui\UIRankingWnd.h" />
     <ClInclude Include="ui\UIScriptWnd.h" />
     <ClInclude Include="ui\UISecondTaskWnd.h" />
@@ -1340,6 +1348,7 @@
     <ClInclude Include="ui\UIVotingCategory.h" />
     <ClInclude Include="ui\UIWarState.h" />
     <ClInclude Include="ui\UIWeightBar.h" />
+    <ClInclude Include="ui\UIWheelMenu.h" />
     <ClInclude Include="ui\UIWpnParams.h" />
     <ClInclude Include="ui\UIXmlInit.h" />
     <ClInclude Include="ui\ui_af_params.h" />
@@ -1356,7 +1365,6 @@
     <ClInclude Include="WeaponBinoculars.h" />
     <ClInclude Include="WeaponBinocularsVision.h" />
     <ClInclude Include="weaponBM16.h" />
-    <ClInclude Include="WeaponCustomPistolAuto.h" />
     <ClInclude Include="WeaponCustomPistol.h" />
     <ClInclude Include="WeaponFN2000.h" />
     <ClInclude Include="WeaponFORT.h" />
@@ -1447,6 +1455,11 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\script_net_packet_script.cpp">
+      <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+    <ClCompile Include="..\xrServerEntities\script_properties_list_helper.cpp" />
+    <ClCompile Include="..\xrServerEntities\script_properties_list_helper_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -2285,6 +2298,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp" />
     <ClCompile Include="holder_custom.cpp" />
     <ClCompile Include="holder_custom_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
@@ -3229,6 +3243,7 @@
     <ClCompile Include="ui\UIPdaWnd.cpp" />
     <ClCompile Include="ui\UIRankFaction.cpp" />
     <ClCompile Include="ui\UIRankIndicator.cpp" />
+    <ClCompile Include="ui\UIRankingsCoC.cpp" />
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3263,6 +3278,7 @@
     <ClCompile Include="ui\UIVotingCategory.cpp" />
     <ClCompile Include="ui\UIWarState.cpp" />
     <ClCompile Include="ui\UIWeightBar.cpp" />
+    <ClCompile Include="ui\UIWheelMenu.cpp" />
     <ClCompile Include="ui\UIWindow_script.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
@@ -3291,7 +3307,6 @@
     <ClCompile Include="WeaponBinoculars.cpp" />
     <ClCompile Include="WeaponBinocularsVision.cpp" />
     <ClCompile Include="weaponBM16.cpp" />
-    <ClCompile Include="WeaponCustomPistolAuto.cpp" />
     <ClCompile Include="WeaponCustomPistol.cpp" />
     <ClCompile Include="WeaponDispersion.cpp" />
     <ClCompile Include="WeaponFire.cpp" />
@@ -3427,14 +3442,14 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\sdl2.nuget.redist.2.30.8\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.30.8\build\native\sdl2.nuget.redist.targets')" />
-    <Import Project="..\packages\sdl2.nuget.2.30.8\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.30.8\build\native\sdl2.nuget.targets')" />
+    <Import Project="..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets" Condition="Exists('..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.30.8\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.30.8\build\native\sdl2.nuget.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\sdl2.nuget.2.30.8\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.30.8\build\native\sdl2.nuget.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets'))" />
   </Target>
 </Project>

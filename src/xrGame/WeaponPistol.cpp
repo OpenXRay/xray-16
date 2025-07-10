@@ -84,11 +84,6 @@ void CWeaponPistol::PlayAnimAim()
         inherited::PlayAnimAim();
 }
 
-void CWeaponPistol::PlayAnimReload()
-{
-    inherited::PlayAnimReload(); //AVO: refactored to use grand-parent (CWeaponMagazined) function
-}
-
 void CWeaponPistol::PlayAnimHide()
 {
     VERIFY(GetState() == eHiding);
@@ -116,10 +111,6 @@ void CWeaponPistol::PlayAnimShoot()
 
 void CWeaponPistol::switch2_Reload() { inherited::switch2_Reload(); }
 void CWeaponPistol::OnAnimationEnd(u32 state) { inherited::OnAnimationEnd(state); }
-void CWeaponPistol::OnShot()
-{
-    inherited::OnShot(); //Alundaio: not changed from inherited, so instead of copying changes from weaponmagazined, we just do this
-}
 
 void CWeaponPistol::UpdateSounds()
 {

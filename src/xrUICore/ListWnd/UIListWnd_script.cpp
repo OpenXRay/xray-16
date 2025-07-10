@@ -43,6 +43,10 @@ SCRIPT_EXPORT(CUIListWnd, (CUIWindow),
             .def("GetSize", &CUIListWnd::GetItemsCount)
             .def("ScrollToBegin", &CUIListWnd::ScrollToBegin)
             .def("ScrollToEnd", &CUIListWnd::ScrollToEnd)
+            .def("ScrollToPos", +[](CUIListWnd* self, int position)
+            {
+                self->ScrollToPos(position, 0.0f);
+            })
             .def("ScrollToPos", &CUIListWnd::ScrollToPos)
             .def("SetWidth", &CUIListWnd::SetWidth)
             .def("SetTextColor", &CUIListWnd::SetTextColor)

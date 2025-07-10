@@ -5,18 +5,22 @@
 #include "SkeletonCustom.h"
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
-int psSkeletonUpdate = 32;
-Lock UCalc_Mutex
-#ifdef CONFIG_PROFILE_LOCKS
-    (MUTEX_PROFILE_ID(UCalc_Mutex))
-#endif // CONFIG_PROFILE_LOCKS
-    ;
+#include "xrCDB/Intersect.hpp"
 
 #ifndef _EDITOR
 #include "xrServerEntities/smart_cast.h"
 #else
 #include "Include/xrAPI/xrAPI.h"
 #endif
+
+namespace xray::render::RENDER_NAMESPACE
+{
+int psSkeletonUpdate = 32;
+Lock UCalc_Mutex
+#ifdef CONFIG_PROFILE_LOCKS
+    (MUTEX_PROFILE_ID(UCalc_Mutex))
+#endif // CONFIG_PROFILE_LOCKS
+    ;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -603,7 +607,6 @@ void CKinematics::EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id)
     for (u32 i = 0; i < children.size(); i++)
         LL_GetChild(i)->EnumBoneVertices(C, bone_id);
 }
-#include "xrCDB/Intersect.hpp"
 
 using OBBVec = xr_vector<Fobb>;
 
@@ -748,7 +751,7 @@ void CKinematics::CalculateWallmarks(bool hud)
             {
                 // append wm to WallmarkEngine
                 if (!hud && RImplementation.ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
-                    ::RImplementation.add_SkeletonWallmark(wm);
+                    RImplementation.add_SkeletonWallmark(wm);
             }
             else
             {
@@ -889,3 +892,4 @@ CSkeletonWallmark::~CSkeletonWallmark()
     }
 }
 #endif
+} // namespace xray::render::RENDER_NAMESPACE

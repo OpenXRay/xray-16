@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_deffer_model : public IBlender
 {
 public:
@@ -20,3 +22,4 @@ public:
 private:
     xrP_TOKEN oTessellation;
 };
+} // namespace xray::render::RENDER_NAMESPACE

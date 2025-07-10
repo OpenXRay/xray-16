@@ -3,6 +3,8 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 namespace phase_bloom
 {
 #pragma pack(push, 4)
@@ -536,3 +538,4 @@ void CRenderTarget::phase_bloom()
     // re-enable z-buffer
     RCache.set_Z(true);
 }
+} // namespace xray::render::RENDER_NAMESPACE

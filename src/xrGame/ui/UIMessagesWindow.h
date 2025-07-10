@@ -20,7 +20,7 @@ class CUIMessagesWindow final : public CUIWindow
 public:
     CUIMessagesWindow();
 
-    void AddIconedPdaMessage(GAME_NEWS_DATA* news);
+    void AddIconedPdaMessage(const GAME_NEWS_DATA* news);
 
     void AddLogMessage(const shared_str& msg) const;
     void AddLogMessage(KillMessageStruct& msg) const;

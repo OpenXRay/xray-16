@@ -133,11 +133,9 @@ void CSpaceRestrictionComposition::test_correctness()
     m_test_storage.clear();
 
     {
-        RESTRICTIONS::iterator I = m_restrictions.begin();
-        RESTRICTIONS::iterator E = m_restrictions.end();
-        for (; I != E; ++I)
-            m_test_storage.insert(
-                m_test_storage.end(), (*I)->object().m_test_storage.begin(), (*I)->object().m_test_storage.end());
+        for (const auto& restriction : m_restrictions)
+            m_test_storage.insert(m_test_storage.end(), restriction->object().m_test_storage.begin(),
+                restriction->object().m_test_storage.end());
     }
 
     {
@@ -153,15 +151,20 @@ void CSpaceRestrictionComposition::test_correctness()
 
     xr_vector<u32> nodes;
     {
-        RESTRICTIONS::iterator I = m_restrictions.begin();
-        RESTRICTIONS::iterator E = m_restrictions.end();
-        for (; I != E; ++I)
+        for (const auto& restriction : m_restrictions)
         {
-            VERIFY3(!(*I)->object().m_test_storage.empty(), "Restrictor has no border", *(*I)->object().name());
+            const bool has_border = !restriction->object().m_test_storage.empty();
+            VERIFY3(has_border, "Restrictor has no border", restriction->object().name().c_str());
+            if (!has_border)
+            {
+                m_correct = false;
+                break;
+            }
+
             nodes.clear();
             ai().level_graph().set_mask(border());
-            ai().graph_engine().search(ai().level_graph(), (*I)->object().m_test_storage.back(),
-                (*I)->object().m_test_storage.back(), &nodes, GraphEngineSpace::CFlooder());
+            ai().graph_engine().search(ai().level_graph(), restriction->object().m_test_storage.back(),
+                restriction->object().m_test_storage.back(), &nodes, GraphEngineSpace::CFlooder());
             ai().level_graph().clear_mask(border());
 
             if (nodes.size() == 65535)

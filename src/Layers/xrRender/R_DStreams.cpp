@@ -2,6 +2,9 @@
 #pragma hdrstop
 #include "ResourceManager.h"
 #include "R_DStreams.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -155,3 +158,4 @@ void _IndexStream::reset_end()
     Create();
     //old_pIB = NULL;
 }
+} // namespace xray::render::RENDER_NAMESPACE

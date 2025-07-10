@@ -3,6 +3,8 @@
 
 #include "Blender_BmmD.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 CBlender_BmmD::CBlender_BmmD()
 {
     description.CLS = B_BmmD;
@@ -171,3 +173,4 @@ void CBlender_BmmD::CompileProgrammable(CBlender_Compile& C) const
         break;
     }
 }
+} // namespace xray::render::RENDER_NAMESPACE

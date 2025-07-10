@@ -4,6 +4,8 @@
 
 #include "SkeletonCustom.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 extern int psSkeletonUpdate;
 
 #ifdef DEBUG
@@ -283,3 +285,4 @@ void CKinematics::BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8
     // restore callback
     bi.set_callback(bi.callback_type(), bc, bi.callback_param(), ow);
 }
+} // namespace xray::render::RENDER_NAMESPACE

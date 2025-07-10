@@ -2,10 +2,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_LIGHTTRACK_H__89914D61_AC0B_4C7C_BA8C_D7D810738CE7__INCLUDED_)
-#define AFX_LIGHTTRACK_H__89914D61_AC0B_4C7C_BA8C_D7D810738CE7__INCLUDED_
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 const float lt_inc = 4.f;
 const float lt_dec = 2.f;
 const int lt_hemisamples = 26;
@@ -141,5 +141,4 @@ private:
     void smart_update(IRenderable* O);
 #endif //	RENDER!=R_R1
 };
-
-#endif // !defined(AFX_LIGHTTRACK_H__89914D61_AC0B_4C7C_BA8C_D7D810738CE7__INCLUDED_)
+} // namespace xray::render::RENDER_NAMESPACE

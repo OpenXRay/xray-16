@@ -8,6 +8,49 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
+// Ascii1457's Screen Space Shaders
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
+extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
+extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
+extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
+extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
+extern ENGINE_API float ps_ssfx_gloss_factor;
+extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
+extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
+extern ENGINE_API int ps_ssfx_is_underground;
+extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
+
+//Sneaky debug stuff
+extern ENGINE_API Fvector4 ps_dev_param_1;
+extern ENGINE_API Fvector4 ps_dev_param_2;
+extern ENGINE_API Fvector4 ps_dev_param_3;
+extern ENGINE_API Fvector4 ps_dev_param_4;
+extern ENGINE_API Fvector4 ps_dev_param_5;
+extern ENGINE_API Fvector4 ps_dev_param_6;
+extern ENGINE_API Fvector4 ps_dev_param_7;
+extern ENGINE_API Fvector4 ps_dev_param_8;
+
+extern ENGINE_API float ps_ssfx_hud_hemi;
+extern ENGINE_API Fvector4 ps_ssfx_il;
+extern ENGINE_API Fvector4 ps_ssfx_il_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_ao;
+extern ENGINE_API Fvector4 ps_ssfx_ao_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_water;
+extern ENGINE_API Fvector4 ps_ssfx_water_setup1;
+extern ENGINE_API Fvector4 ps_ssfx_water_setup2;
+extern ENGINE_API Fvector4 ps_ssfx_volumetric;
+extern ENGINE_API Fvector4 ps_ssfx_ssr_2;
+extern ENGINE_API Fvector4 ps_ssfx_terrain_offset;
+extern ENGINE_API Fvector3 ps_ssfx_shadow_bias;
+extern ENGINE_API Fvector4 ps_ssfx_lut;
+extern ENGINE_API Fvector4 ps_ssfx_wind_grass;
+extern ENGINE_API Fvector4 ps_ssfx_wind_trees;
+
+namespace xray::render::RENDER_NAMESPACE
+{
 // matrices
 #define BIND_DECLARE(xf)\
     class cl_xform_##xf : public R_constant_setup\
@@ -362,40 +405,6 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
     void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.hemi.c_entity_data = C; }
 };
 static cl_entity_data binder_entity_data;
-
-// Ascii1457's Screen Space Shaders
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
-extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
-extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
-extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
-extern ENGINE_API float ps_ssfx_gloss_factor;
-extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
-extern ENGINE_API int ps_ssfx_is_underground;
-extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
-
-extern ENGINE_API float ps_ssfx_hud_hemi;
-extern ENGINE_API Fvector4 ps_ssfx_il;
-extern ENGINE_API Fvector4 ps_ssfx_il_setup1;
-extern ENGINE_API Fvector4 ps_ssfx_ao;
-extern ENGINE_API Fvector4 ps_ssfx_ao_setup1;
-extern ENGINE_API Fvector4 ps_ssfx_water;
-extern ENGINE_API Fvector4 ps_ssfx_water_setup1;
-extern ENGINE_API Fvector4 ps_ssfx_water_setup2;
-
-extern ENGINE_API Fvector4 ps_ssfx_volumetric;
-extern ENGINE_API Fvector4 ps_ssfx_ssr_2;
-extern ENGINE_API Fvector4 ps_ssfx_terrain_offset;
-
-extern ENGINE_API Fvector3 ps_ssfx_shadow_bias;
-extern ENGINE_API Fvector4 ps_ssfx_lut;
-extern ENGINE_API Fvector4 ps_ssfx_wind_grass;
-extern ENGINE_API Fvector4 ps_ssfx_wind_trees;
-
 class cl_inv_v : public R_constant_setup
 {
     Fmatrix result;
@@ -452,16 +461,6 @@ class cl_sky_color : public R_constant_setup
     }
 };
 static cl_sky_color binder_sky_color;
-
-//Sneaky debug stuff
-extern ENGINE_API Fvector4 ps_dev_param_1;
-extern ENGINE_API Fvector4 ps_dev_param_2;
-extern ENGINE_API Fvector4 ps_dev_param_3;
-extern ENGINE_API Fvector4 ps_dev_param_4;
-extern ENGINE_API Fvector4 ps_dev_param_5;
-extern ENGINE_API Fvector4 ps_dev_param_6;
-extern ENGINE_API Fvector4 ps_dev_param_7;
-extern ENGINE_API Fvector4 ps_dev_param_8;
 
 static class dev_param_1 : public R_constant_setup
 {
@@ -915,3 +914,4 @@ void CBlender_Compile::SetMapping()
     r_Constant("ssfx_wsetup_trees", &binder_ssfx_wind_trees);
     r_Constant("ssfx_lut", &binder_ssfx_lut);
 }
+} // namespace xray::render::RENDER_NAMESPACE

@@ -1,5 +1,7 @@
 #pragma once
 
+namespace xray::render::RENDER_NAMESPACE
+{
 class CBlender_gasmask_drops : public IBlender
 {
 public:
@@ -9,3 +11,4 @@ public:
     LPCSTR getComment() override;
     void Compile(CBlender_Compile& C) override;
 };
+} // namespace xray::render::RENDER_NAMESPACE

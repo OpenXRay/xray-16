@@ -10,6 +10,8 @@
 #define PRIORITY_NORMAL 8
 #define PRIORITY_LOW 4
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -268,7 +270,7 @@ void CTexture::Load()
                 {
                     // Load another texture
                     u32 mem = 0;
-                    pSurface = ::RImplementation.texture_load(buffer, mem);
+                    pSurface = RImplementation.texture_load(buffer, mem);
                     if (pSurface)
                     {
                         // pSurface->SetPriority	(PRIORITY_LOW);
@@ -284,7 +286,7 @@ void CTexture::Load()
         {
             // Normal texture
             u32 mem = 0;
-            pSurface = ::RImplementation.texture_load(*cName, mem);
+            pSurface = RImplementation.texture_load(*cName, mem);
 
             // Calc memory usage and preload into vid-mem
             if (pSurface)
@@ -363,3 +365,4 @@ BOOL CTexture::video_IsPlaying() const
 {
     return (pTheora) ? pTheora->IsPlaying() : FALSE;
 }
+} // namespace xray::render::RENDER_NAMESPACE

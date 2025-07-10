@@ -15,6 +15,7 @@ IC const CObjectFactory& object_factory()
 {
     if (!g_object_factory)
     {
+        ZoneScopedN("Create object factory");
         g_object_factory = xr_new<CObjectFactory>();
         g_object_factory->init();
 

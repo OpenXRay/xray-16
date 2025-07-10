@@ -155,13 +155,17 @@ void CHitMarker::net_Relcase(IGameObject* obj)
 
 SHitMark::SHitMark(const ui_shader& sh, const Fvector& dir)
 {
+    constexpr Fvector2 SIZE = { UI_BASE_WIDTH / 2.0f, UI_BASE_WIDTH / 2.0f };
+    constexpr float POS_X   = { (UI_BASE_WIDTH  - SIZE.x) / 2.0f };
+    constexpr float POS_Y   = { (UI_BASE_HEIGHT - SIZE.y) / 2.0f };
+
     m_StartTime = Device.fTimeGlobal;
     m_lanim = LALib.FindItem("hud_hit_mark");
     m_HitDirection = dir.getH();
     m_UIStaticItem = xr_new<CUIStaticItem>();
     m_UIStaticItem->SetShader(sh);
-    m_UIStaticItem->SetPos(256.0f, 128.0f);
-    m_UIStaticItem->SetSize(Fvector2().set(512.0f, 512.0f));
+    m_UIStaticItem->SetPos(POS_X, POS_Y);
+    m_UIStaticItem->SetSize(SIZE);
 }
 
 SHitMark::~SHitMark() { xr_delete(m_UIStaticItem); }

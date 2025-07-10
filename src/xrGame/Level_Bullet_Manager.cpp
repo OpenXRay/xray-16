@@ -28,13 +28,13 @@ float const CBulletManager::parent_ignore_distance = 3.f;
 #ifdef DEBUG
 float air_resistance_epsilon = .1f;
 #else // #ifdef DEBUG
-static float const air_resistance_epsilon = .1f;
+constexpr float air_resistance_epsilon = .1f;
 #endif // #ifdef DEBUG
 float g_bullet_time_factor = 1.f;
 
 SBullet::SBullet(const Fvector& position, const Fvector& direction, float starting_speed, float power,
-    /*float power_critical,*/ float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type,
-    float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit)
+    float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
+    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, int iShotNum /*= 0*/)
 {
     bullet_pos = position;
     speed = max_speed = starting_speed;
@@ -65,6 +65,11 @@ SBullet::SBullet(const Fvector& position, const Fvector& direction, float starti
 
     bullet_material_idx = cartridge.bullet_material_idx;
     VERIFY(u16(-1) != bullet_material_idx);
+
+    //Alundaio: Tracer for every 5th bullet
+    if (flags.allow_tracer && cartridge.m_4to1_tracer && iShotNum % 5 != 0)
+        flags.allow_tracer = false;
+    //-Alundaio
 
     flags.allow_tracer = !!cartridge.m_flags.test(CCartridge::cfTracer);
     flags.allow_ricochet = !!cartridge.m_flags.test(CCartridge::cfRicochet);
@@ -173,22 +178,19 @@ void CBulletManager::Clear()
 }
 
 void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction, float starting_speed, float power,
-    //.							   float power_critical,
     float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
-    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet)
+    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet, int iShotNum /*= 0*/)
 {
     // Always called in Primary thread
     // Uncomment below if you will change the behaviour
     // if (!g_mt_config.test(mtBullets))
-#ifdef DEBUG
     VERIFY(m_thread_id == std::this_thread::get_id());
-#endif
 
     VERIFY(u16(-1) != cartridge.bullet_material_idx);
     //	u32 CurID					= Level().CurrentControlEntity()->ID();
     //	u32 OwnerID					= sender_id;
-    SBullet& bullet = m_Bullets.emplace_back(position, direction, starting_speed, power, /*power_critical,*/ impulse, sender_id,
-        sendersweapon_id, e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit);
+    SBullet& bullet = m_Bullets.emplace_back(position, direction, starting_speed, power, impulse, sender_id,
+        sendersweapon_id, e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit, iShotNum);
     //	bullet.frame_num			= Device.dwFrame;
     bullet.flags.aim_bullet = AimBullet;
     if (!IsGameTypeSingle())
@@ -202,9 +204,7 @@ void CBulletManager::UpdateWorkload()
 {
     ZoneScoped;
 
-#ifdef DEBUG
     VERIFY(g_mt_config.test(mtBullets) || m_thread_id == std::this_thread::get_id());
-#endif
 
     rq_storage.r_clear();
 
@@ -561,6 +561,13 @@ static void update_bullet(
     update_bullet_parabolic(bullet, data, gravity, air_resistance);
 }
 
+// callback функция
+//	result.O;		// 0-static else IGameObject*
+//	result.range;	// range from start to element
+//	result.element;	// if (O) "num tri" else "num bone"
+//	params;			// user defined abstract data
+//	Device.Statistic.TEST0.End();
+// return TRUE-продолжить трассировку / FALSE-закончить трассировку
 bool CBulletManager::firetrace_callback(collide::rq_result& result, LPVOID params)
 {
     bullet_test_callback_data& data = *(bullet_test_callback_data*)params;
@@ -848,6 +855,8 @@ void CBulletManager::Render()
     {
         SBullet* bullet = &sbullet;
         if (!bullet->flags.allow_tracer)
+            continue;
+        if (!psActorFlags.test(AF_USE_TRACERS))
             continue;
 
         if (!bullet->CanBeRenderedNow())

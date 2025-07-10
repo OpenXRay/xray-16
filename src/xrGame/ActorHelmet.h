@@ -27,9 +27,9 @@ public:
     virtual void net_Import(NET_Packet& P);
     virtual void OnH_A_Chield();
 
-    float GetDefHitTypeProtection(ALife::EHitType hit_type);
-    float GetHitTypeProtection(ALife::EHitType hit_type, s16 element);
-    float GetBoneArmor(s16 element);
+    [[nodiscard]] float GetDefHitTypeProtection(ALife::EHitType hit_type) const;
+    [[nodiscard]] float GetHitTypeProtection(ALife::EHitType hit_type, s16 element) const;
+    [[nodiscard]] float GetBoneArmor(s16 element) const;
 
     float HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type);
 
@@ -46,7 +46,7 @@ public:
     void AddBonesProtection(LPCSTR bones_section);
 
 protected:
-    HitImmunity::HitTypeSVec m_HitTypeProtection;
+    mutable HitImmunity::HitTypeSVec m_HitTypeProtection;
     SBoneProtections* m_boneProtection;
 
 protected:

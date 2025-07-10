@@ -11,7 +11,10 @@ void CFileStreamReader::construct(pcstr file_name, const size_t& window_size)
     m_file_handle = CreateFile(file_name, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 
     VERIFY(m_file_handle != INVALID_HANDLE_VALUE);
-    const auto file_size = static_cast<size_t>(GetFileSize(m_file_handle, nullptr));
+    LARGE_INTEGER size;
+    BOOL result = GetFileSizeEx(m_file_handle, &size);
+    const auto file_size = static_cast<size_t>(size.QuadPart);
+    R_ASSERT2(result && file_size, xrDebug::ErrorToString(GetLastError()));
 
     const auto file_mapping_handle = CreateFileMapping(m_file_handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
     VERIFY(file_mapping_handle != INVALID_HANDLE_VALUE);

@@ -110,11 +110,11 @@ private:
 
 protected:
     virtual void ChangeStateCallback();
-    void CreateMapLocation(bool on_load);
 
 public:
     void RemoveMapLocations(bool notify);
     void ChangeMapLocation(pcstr new_map_location, u16 new_map_object_id);
+    void CreateMapLocation(bool on_load); // Made public only for Lua export
 
     // for scripting access
     auto GetType_script() const { return m_task_type; }

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "dxUISequenceVideoItem.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 dxUISequenceVideoItem::dxUISequenceVideoItem() { m_texture = nullptr; }
 void dxUISequenceVideoItem::Copy(IUISequenceVideoItem& _in) { *this = *((dxUISequenceVideoItem*)&_in); }
 
@@ -10,3 +12,4 @@ void dxUISequenceVideoItem::CaptureTexture()
     m_texture = RCache.get_ActiveTexture(C ? C->samp.index : 0);
     R_ASSERT(m_texture);
 }
+} // namespace xray::render::RENDER_NAMESPACE

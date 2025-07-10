@@ -9,7 +9,6 @@
 #ifndef xrServer_Objects_AbstractH
 #define xrServer_Objects_AbstractH
 
-#pragma pack(push, 4)
 #include "xrServer_Space.h"
 #include "xrCDB/xrCDB.h"
 #include "ShapeData.h"
@@ -28,6 +27,8 @@ class CDUInterface;
 #include "Include/xrRender/DrawUtils.h"
 #pragma warning(push)
 #pragma warning(disable : 4005)
+
+#pragma pack(push, 4)
 
 class XR_NOVTABLE IServerEntityShape
 {
