@@ -24,6 +24,7 @@ enum ECallbackType : u32
     eMapLocationAdded,
 
     eUseObject,
+    eOnWeaponFired,
 
     eHit,
 
