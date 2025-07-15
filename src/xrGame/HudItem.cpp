@@ -25,6 +25,12 @@ CHudItem::CHudItem()
     m_started_rnd_anim_idx = u8(-1);
 }
 
+// Werasik2aa: Check actual parent is it current actor?
+BOOL CHudItem::ParentIsActor()
+{
+    return g_pGameLevel && object().H_Parent() == Level().CurrentControlEntity();
+}
+
 IFactoryObject* CHudItem::_construct()
 {
     m_object = smart_cast<CPhysicItem*>(this);
@@ -327,15 +333,10 @@ void CHudItem::StopCurrentAnimWithoutCallback()
     m_current_motion_def = NULL;
 }
 
+// Werasik2aa : Check actual actor hud mode
 BOOL CHudItem::GetHUDmode()
 {
-    if (object().H_Parent())
-    {
-        CActor* A = smart_cast<CActor*>(object().H_Parent());
-        return (A && A->HUDview() && HudItemData());
-    }
-    else
-        return FALSE;
+    return g_pGameLevel && object().H_Parent() == Level().CurrentControlEntity() && Actor() && Actor()->HUDview() && HudItemData();
 }
 
 void CHudItem::PlayAnimIdle()
