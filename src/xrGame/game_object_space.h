@@ -65,6 +65,12 @@ namespace GameObject
         eMouseMove,
         eMouseWheel,
 
+        // Controller
+        eControllerPress,
+        eControllerRelease,
+        eControllerHold,
+        eControllerAttitudeChange,
+
         // Inventory
         eItemToBelt,
         eItemToSlot,
@@ -83,7 +89,7 @@ namespace GameObject
         eDetachVehicle,
         eUseVehicle,
         eOnFootStep,
-        // -AVO
+        //-AVO
 
         eOnWeaponLowered,
         eOnWeaponRaised,
