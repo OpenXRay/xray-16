@@ -1,6 +1,6 @@
 #pragma once
 
-namespace GameObject
+namespace GameObject : u32
 {
     enum ECallbackType
     {
