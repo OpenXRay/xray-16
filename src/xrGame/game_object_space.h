@@ -1,8 +1,8 @@
 #pragma once
 
-namespace GameObject : u32
+namespace GameObject
 {
-    enum ECallbackType
+    enum ECallbackType : u32
     {
         eTradeStart = u32(0),
         eTradeStop,
