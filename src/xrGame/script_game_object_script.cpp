@@ -91,23 +91,22 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("task_state", int(GameObject::eTaskStateChange)),
                 value("take_item_from_box", int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo", int(GameObject::eWeaponNoAmmoAvailable)),
-
-                //Alundaio:
+                // Alundaio:
                 value("hud_animation_end", int(GameObject::eActorHudAnimationEnd)),
-                //AVO: custom callbacks
-                // input
+                // AVO: custom callbacks
+                // Input
                 value("key_press", int(GameObject::eKeyPress)),
                 value("key_release", int(GameObject::eKeyRelease)),
                 value("key_hold", int(GameObject::eKeyHold)),
                 value("mouse_move", int(GameObject::eMouseMove)),
                 value("mouse_wheel", int(GameObject::eMouseWheel)),
-                // actor
+                // Actor
                 value("actor_before_death", int(GameObject::eActorBeforeDeath)),
-                // vehicle
+                // Vehicle
                 value("on_attach_vehicle", int(GameObject::eAttachVehicle)),
                 value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
                 value("on_use_vehicle", int(GameObject::eUseVehicle)),
-                //weapon
+                // Weapon
                 value("weapon_fired", int(GameObject::eOnWeaponFired)),
                 value("weapon_jammed", int(GameObject::eOnWeaponJammed)),
                 value("weapon_zoom_in", int(GameObject::eOnWeaponZoomIn)),
@@ -119,9 +118,8 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("item_to_belt", int(GameObject::eItemToBelt)),
                 value("item_to_slot", int(GameObject::eItemToSlot)),
                 value("item_to_ruck", int(GameObject::eItemToRuck)),
-                //-AVO
+                // -AVO
                 value("on_foot_step", int(GameObject::eOnFootStep)),
-
                 value("map_location_added", int(GameObject::eMapLocationAdded))
             ],
 
