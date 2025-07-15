@@ -2,90 +2,90 @@
 
 namespace GameObject
 {
-enum ECallbackType : u32
-{
-    eTradeStart = u32(0),
-    eTradeStop,
-    eTradeSellBuyItem,
-    eTradePerformTradeOperation,
+    enum ECallbackType : u32
+    {
+        eTradeStart = u32(0),
+        eTradeStop,
+        eTradeSellBuyItem,
+        eTradePerformTradeOperation,
 
-    eZoneEnter,
-    eZoneExit,
-    eExitLevelBorder,
-    eEnterLevelBorder,
-    eDeath,
+        eZoneEnter,
+        eZoneExit,
+        eExitLevelBorder,
+        eEnterLevelBorder,
+        eDeath,
 
-    ePatrolPathInPoint,
+        ePatrolPathInPoint,
 
-    eInventoryPda,
-    eInventoryInfo,
-    eArticleInfo,
-    eTaskStateChange,
-    eMapLocationAdded,
+        eInventoryPda,
+        eInventoryInfo,
+        eArticleInfo,
+        eTaskStateChange,
+        eMapLocationAdded,
 
-    eUseObject,
-    eOnWeaponFired,
+        eUseObject,
+        eOnWeaponFired,
 
-    eHit,
+        eHit,
 
-    eSound,
+        eSound,
 
-    eActionTypeMovement,
-    eActionTypeWatch,
-    eActionTypeRemoved,
-    eActionTypeAnimation,
-    eActionTypeSound,
-    eActionTypeParticle,
-    eActionTypeObject,
+        eActionTypeMovement,
+        eActionTypeWatch,
+        eActionTypeRemoved,
+        eActionTypeAnimation,
+        eActionTypeSound,
+        eActionTypeParticle,
+        eActionTypeObject,
 
-    eActorSleep,
+        eActorSleep,
 
-    eHelicopterOnPoint,
-    eHelicopterOnHit,
+        eHelicopterOnPoint,
+        eHelicopterOnHit,
 
-    eOnItemTake,
-    eOnItemDrop,
+        eOnItemTake,
+        eOnItemDrop,
 
-    eScriptAnimation,
+        eScriptAnimation,
 
-    eTraderGlobalAnimationRequest,
-    eTraderHeadAnimationRequest,
-    eTraderSoundEnd,
+        eTraderGlobalAnimationRequest,
+        eTraderHeadAnimationRequest,
+        eTraderSoundEnd,
 
-    eInvBoxItemTake,
-    eWeaponNoAmmoAvailable,
+        eInvBoxItemTake,
+        eWeaponNoAmmoAvailable,
 
-    //Alundaio: added defines
-    eActorHudAnimationEnd,
+        //Alundaio: added defines
+        eActorHudAnimationEnd,
 
-    //AVO: custom callbacks
-    // Input
-    eKeyPress,
-    eKeyRelease,
-    eKeyHold,
-    eMouseMove,
-    eMouseWheel,
-    eControllerPress,
-    eControllerRelease,
-    eControllerHold,
-    eControllerAttitudeChange,
-    // Inventory
-    eItemToBelt,
-    eItemToSlot,
-    eItemToRuck,
-    // weapon
-    eOnWeaponZoomIn,
-    eOnWeaponZoomOut,
-    eOnWeaponJammed,
-    eOnWeaponMagazineEmpty,
-    // Actor
-    eActorBeforeDeath,
-    // vehicle
-    eAttachVehicle,
-    eDetachVehicle,
-    eUseVehicle,
-    //-AVO
+        //AVO: custom callbacks
+        // Input
+        eKeyPress,
+        eKeyRelease,
+        eKeyHold,
+        eMouseMove,
+        eMouseWheel,
+        eControllerPress,
+        eControllerRelease,
+        eControllerHold,
+        eControllerAttitudeChange,
+        // Inventory
+        eItemToBelt,
+        eItemToSlot,
+        eItemToRuck,
+        // weapon
+        eOnWeaponZoomIn,
+        eOnWeaponZoomOut,
+        eOnWeaponJammed,
+        eOnWeaponMagazineEmpty,
+        // Actor
+        eActorBeforeDeath,
+        // vehicle
+        eAttachVehicle,
+        eDetachVehicle,
+        eUseVehicle,
+        //-AVO
 
-    eDummy = u32(-1),
-};
+        eDummy = u32(-1),
+    };
 };
