@@ -2,90 +2,100 @@
 
 namespace GameObject
 {
-    enum ECallbackType : u32
-    {
-        eTradeStart = u32(0),
-        eTradeStop,
-        eTradeSellBuyItem,
-        eTradePerformTradeOperation,
+	enum ECallbackType
+	{
+		eTradeStart = u32(0),
+		eTradeStop,
+		eTradeSellBuyItem,
+		eTradePerformTradeOperation,
 
-        eZoneEnter,
-        eZoneExit,
-        eExitLevelBorder,
-        eEnterLevelBorder,
-        eDeath,
+		eZoneEnter,
+		eZoneExit,
+		eExitLevelBorder,
+		eEnterLevelBorder,
+		eDeath,
 
-        ePatrolPathInPoint,
+		ePatrolPathInPoint,
 
-        eInventoryPda,
-        eInventoryInfo,
-        eArticleInfo,
-        eTaskStateChange,
-        eMapLocationAdded,
+		eInventoryPda,
+		eInventoryInfo,
+		eArticleInfo,
+		eTaskStateChange,
+		eMapLocationAdded,
 
-        eUseObject,
-        eOnWeaponFired,
+		eUseObject,
 
-        eHit,
+		eHit,
 
-        eSound,
+		eSound,
 
-        eActionTypeMovement,
-        eActionTypeWatch,
-        eActionTypeRemoved,
-        eActionTypeAnimation,
-        eActionTypeSound,
-        eActionTypeParticle,
-        eActionTypeObject,
+		eActionTypeMovement,
+		eActionTypeWatch,
+		eActionTypeRemoved,
+		eActionTypeAnimation,
+		eActionTypeSound,
+		eActionTypeParticle,
+		eActionTypeObject,
 
-        eActorSleep,
+		eActorSleep,
 
-        eHelicopterOnPoint,
-        eHelicopterOnHit,
+		eHelicopterOnPoint,
+		eHelicopterOnHit,
 
-        eOnItemTake,
-        eOnItemDrop,
+		eOnItemTake,
+		eOnItemDrop,
 
-        eScriptAnimation,
+		eScriptAnimation,
 
-        eTraderGlobalAnimationRequest,
-        eTraderHeadAnimationRequest,
-        eTraderSoundEnd,
+		eTraderGlobalAnimationRequest,
+		eTraderHeadAnimationRequest,
+		eTraderSoundEnd,
 
-        eInvBoxItemTake,
-        eWeaponNoAmmoAvailable,
-
-        //Alundaio: added defines
-        eActorHudAnimationEnd,
-
-        //AVO: custom callbacks
-        // Input
-        eKeyPress,
-        eKeyRelease,
-        eKeyHold,
+		eInvBoxItemTake,
+		eWeaponNoAmmoAvailable,
+		//Alundaio: added defines
+		eActorHudAnimationEnd,
+		//AVO: custom callbacks
+#ifdef INPUT_CALLBACKS
+		// input
+		eKeyPress,
+		eKeyRelease,
+		eKeyHold,
+#endif
+#ifdef MOUSE_INPUT_CALLBACKS
         eMouseMove,
         eMouseWheel,
-        eControllerPress,
-        eControllerRelease,
-        eControllerHold,
-        eControllerAttitudeChange,
-        // Inventory
-        eItemToBelt,
-        eItemToSlot,
-        eItemToRuck,
-        // weapon
-        eOnWeaponZoomIn,
-        eOnWeaponZoomOut,
-        eOnWeaponJammed,
-        eOnWeaponMagazineEmpty,
-        // Actor
-        eActorBeforeDeath,
-        // vehicle
-        eAttachVehicle,
-        eDetachVehicle,
-        eUseVehicle,
-        //-AVO
+#endif
+#ifdef EXTENDED_ITEM_CALLBACKS
+		// inventory
+		eItemToBelt,
+		eItemToSlot,
+		eItemToRuck,
+#endif
+#ifdef	EXTENDED_WEAPON_CALLBACKS
+		// weapon
+		eOnWeaponZoomIn,
+		eOnWeaponZoomOut,
+		eOnWeaponJammed,
+		eOnWeaponFired,
+		eOnWeaponMagazineEmpty,
+#endif
+		// actor
+#ifdef ACTOR_BEFORE_DEATH_CALLBACK
+		eActorBeforeDeath,
+#endif
+#ifdef ENABLE_CAR
+		// vehicle
+		eAttachVehicle,
+		eDetachVehicle,
+		eUseVehicle,
+#endif
+		eOnFootStep,
+		//-AVO
 
-        eDummy = u32(-1),
-    };
+		eOnWeaponLowered,
+		eOnWeaponRaised,
+
+		eDummy = u32(-1),
+	};
 };
