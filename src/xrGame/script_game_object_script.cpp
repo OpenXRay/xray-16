@@ -114,7 +114,7 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("weapon_magazine_empty", int(GameObject::eOnWeaponMagazineEmpty)),
                 value("weapon_lowered", int(GameObject::eOnWeaponLowered)),
                 value("weapon_raised", int(GameObject::eOnWeaponRaised)),
-                // inventory
+                // Inventory
                 value("item_to_belt", int(GameObject::eItemToBelt)),
                 value("item_to_slot", int(GameObject::eItemToSlot)),
                 value("item_to_ruck", int(GameObject::eItemToRuck)),
