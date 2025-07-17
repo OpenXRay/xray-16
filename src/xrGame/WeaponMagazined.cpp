@@ -131,7 +131,7 @@ void CWeaponMagazined::Load(LPCSTR section)
     }
     LoadSilencerKoeffs();
 }
-
+#include "customsrv/MPGameManager.h"
 void CWeaponMagazined::FireStart()
 {
     if (!IsMisfire())
@@ -140,16 +140,17 @@ void CWeaponMagazined::FireStart()
         {
             if (!IsWorking() || AllowFireWhileWorking())
             {
-                if (GetState() == eReload)
-                    return;
-                if (GetState() == eShowing)
-                    return;
-                if (GetState() == eHiding)
-                    return;
-                if (GetState() == eMisfire)
-                    return;
+                if (GetState() == eReload) return;
+                if (GetState() == eShowing) return;
+                if (GetState() == eHiding) return;
+                if (bMisfire) return;
 
                 inherited::FireStart();
+
+                CGameObject* object = smart_cast<CGameObject*>(Parent);
+                if (object) {
+                    object->callback(GameObject::eOnWeaponFired)(object->lua_game_object(), lua_game_object(), iAmmoElapsed);
+                }
 
                 if (iAmmoElapsed == 0)
                     OnMagazineEmpty();
@@ -166,15 +167,9 @@ void CWeaponMagazined::FireStart()
                 OnMagazineEmpty();
         }
     }
-    else // misfire
+    else
     {
-        // Alundaio
-        if (const auto object = smart_cast<CGameObject*>(H_Parent()))
-        {
-            object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
-        }
-
-        if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
+        if (Level().CurrentViewEntity() == H_Parent())
             CurrentGameUI()->AddCustomStatic("gun_jammed", true);
 
         OnEmptyClick();
@@ -184,29 +179,20 @@ void CWeaponMagazined::FireStart()
 void CWeaponMagazined::FireEnd()
 {
     inherited::FireEnd();
-
-    // XXX: disable autoreload via console
-    CActor* actor = smart_cast<CActor*>(H_Parent());
-    if (m_pInventory && !iAmmoElapsed && actor && GetState() != eReload)
-        Reload();
 }
 
 void CWeaponMagazined::Reload()
 {
     inherited::Reload();
-    TryReload();
+    if (TryReload() && ParentIsActor()) {
+        Actor()->callback(GameObject::eWeaponNoAmmoAvailable)(lua_game_object(), GetSuitableAmmoTotal());
+    }
 }
 
 bool CWeaponMagazined::TryReload()
 {
     if (m_pInventory)
     {
-        if (IsGameTypeSingle() && ParentIsActor())
-        {
-            int AC = GetSuitableAmmoTotal();
-            Actor()->callback(GameObject::eWeaponNoAmmoAvailable)(lua_game_object(), AC);
-        }
-
         m_pCurrentAmmo = smart_cast<CWeaponAmmo*>(m_pInventory->GetAny(m_ammoTypes[m_ammoType].c_str()));
 
         if (IsMisfire() && iAmmoElapsed)
@@ -255,7 +241,7 @@ bool CWeaponMagazined::IsAmmoAvailable()
 
 void CWeaponMagazined::OnMagazineEmpty()
 {
-    if (IsGameTypeSingle() && ParentIsActor())
+    if (ParentIsActor())
     {
         int AC = GetSuitableAmmoTotal();
         Actor()->callback(GameObject::eOnWeaponMagazineEmpty)(lua_game_object(), AC);
@@ -300,7 +286,7 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
 
-    if (IsGameTypeSingle() && ParentIsActor())
+    if (ParentIsActor())
     {
         int AC = GetSuitableAmmoTotal();
         Actor()->callback(GameObject::eOnWeaponMagazineEmpty)(lua_game_object(), AC);
@@ -622,7 +608,7 @@ void CWeaponMagazined::OnShot()
 {
     // Sound
     //Alundaio: LAYERED_SND_SHOOT
-    m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), !!GetHUDmode(), false, (u8)-1);
+    m_layered_sounds.PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), H_Root(), GetHUDmode(), false, (u8)-1);
     //-Alundaio
 
     // Camera
@@ -642,6 +628,11 @@ void CWeaponMagazined::OnShot()
     //дым из ствола
     ForceUpdateFireParticles();
     StartSmokeParticles(get_LastFP(), vel);
+
+    CGameObject* object = smart_cast<CGameObject*>(H_Parent());
+    if (object) {
+        object->callback(GameObject::eOnWeaponFired)(object->lua_game_object(), lua_game_object(), iAmmoElapsed);
+    }
 }
 
 void CWeaponMagazined::OnEmptyClick() { PlaySound("sndEmptyClick", get_LastFP()); }

@@ -116,7 +116,7 @@ public:
         undefined_ammo_type = u8(-1)
     };
 
-    IC BOOL IsValid() const { return iAmmoElapsed; }
+    IC BOOL IsValid() const { return iAmmoElapsed > 0; }
     // Does weapon need's update?
     BOOL IsUpdating();
 
@@ -311,8 +311,8 @@ public:
         return m_current_firedeps.m_FireParticlesXForm;
     }
     virtual void ForceUpdateFireParticles();
-
 protected:
+    virtual void FireStart() { CShootingObject::FireStart(); }
     virtual void SetDefaults();
 
     virtual bool MovingAnimAllowedNow();
@@ -323,7 +323,6 @@ protected:
     virtual void FireTrace(const Fvector& P, const Fvector& D);
     virtual float GetWeaponDeterioration();
 
-    virtual void FireStart() { CShootingObject::FireStart(); }
     virtual void FireEnd();
 
     virtual void Reload();
@@ -496,7 +495,6 @@ public:
     bool show_crosshair();
     bool show_indicators();
     virtual BOOL ParentMayHaveAimBullet();
-    virtual BOOL ParentIsActor();
 
 private:
     virtual bool install_upgrade_ammo_class(LPCSTR section, bool test);
@@ -529,4 +527,6 @@ public:
 
     virtual void DumpActiveParams(shared_str const& section_name, CInifile& dst_ini) const;
     virtual shared_str const GetAnticheatSectionName() const { return cNameSect(); };
+
+    virtual BOOL ParentIsActor() { return inherited::ParentIsActor(); };
 };

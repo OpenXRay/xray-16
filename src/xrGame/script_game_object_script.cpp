@@ -91,19 +91,15 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("task_state", int(GameObject::eTaskStateChange)),
                 value("take_item_from_box", int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo", int(GameObject::eWeaponNoAmmoAvailable)),
-
-                //Alundaio:
+                // Alundaio:
                 value("hud_animation_end", int(GameObject::eActorHudAnimationEnd)),
-                //AVO: custom callbacks
+                // AVO: custom callbacks
                 // Input
                 value("key_press", int(GameObject::eKeyPress)),
                 value("key_release", int(GameObject::eKeyRelease)),
                 value("key_hold", int(GameObject::eKeyHold)),
                 value("mouse_move", int(GameObject::eMouseMove)),
                 value("mouse_wheel", int(GameObject::eMouseWheel)),
-                value("controller_press", int(GameObject::eControllerPress)),
-                value("controller_release", int(GameObject::eControllerRelease)),
-                value("controller_hold", int(GameObject::eControllerHold)),
                 // Actor
                 value("actor_before_death", int(GameObject::eActorBeforeDeath)),
                 // Vehicle
@@ -111,16 +107,19 @@ SCRIPT_EXPORT(CScriptGameObject, (),
                 value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
                 value("on_use_vehicle", int(GameObject::eUseVehicle)),
                 // Weapon
+                value("weapon_fired", int(GameObject::eOnWeaponFired)),
                 value("weapon_jammed", int(GameObject::eOnWeaponJammed)),
                 value("weapon_zoom_in", int(GameObject::eOnWeaponZoomIn)),
                 value("weapon_zoom_out", int(GameObject::eOnWeaponZoomOut)),
                 value("weapon_magazine_empty", int(GameObject::eOnWeaponMagazineEmpty)),
+                value("weapon_lowered", int(GameObject::eOnWeaponLowered)),
+                value("weapon_raised", int(GameObject::eOnWeaponRaised)),
                 // Inventory
                 value("item_to_belt", int(GameObject::eItemToBelt)),
                 value("item_to_slot", int(GameObject::eItemToSlot)),
                 value("item_to_ruck", int(GameObject::eItemToRuck)),
-                //-AVO
-
+                // -AVO
+                value("on_foot_step", int(GameObject::eOnFootStep)),
                 value("map_location_added", int(GameObject::eMapLocationAdded))
             ],
 

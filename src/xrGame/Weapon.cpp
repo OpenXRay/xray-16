@@ -160,7 +160,10 @@ void CWeapon::UpdateXForm()
     }
 
     const CInventoryOwner* parent = smart_cast<const CInventoryOwner*>(E);
-    if (!parent || parent->attached(this))
+    if (!parent || parent->use_simplified_visual())
+        return;
+
+    if (parent->attached(this))
         return;
 
     IKinematics* V = smart_cast<IKinematics*>(E->Visual());
@@ -1836,17 +1839,7 @@ void CWeapon::render_item_ui()
 
 bool CWeapon::unlimited_ammo()
 {
-    if (IsGameTypeSingle())
-    {
-        if (m_pInventory)
-        {
-            return inventory_owner().unlimited_ammo() && m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited);
-        }
-        else
-            return false;
-    }
-
-    return ((GameID() == eGameIDDeathmatch) && m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited));
+    return m_pInventory && inventory_owner().unlimited_ammo() && m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited);
 };
 
 float CWeapon::GetMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
@@ -1898,19 +1891,6 @@ BOOL CWeapon::ParentMayHaveAimBullet()
 {
     IGameObject* O = H_Parent();
     CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
-    return EA->cast_actor() != nullptr;
-}
-
-BOOL CWeapon::ParentIsActor()
-{
-    IGameObject* O = H_Parent();
-    if (!O)
-        return FALSE;
-
-    CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
-    if (!EA)
-        return FALSE;
-
     return EA->cast_actor() != nullptr;
 }
 
