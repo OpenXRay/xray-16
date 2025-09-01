@@ -81,7 +81,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             ID = def().r_u32();
             m_fast->iBase = def().r_u32();
             m_fast->iCount = def().r_u32();
-            m_fast->dwPrimitives = iCount / 3;
+            m_fast->dwPrimitives = m_fast->iCount / 3;
 
             VERIFY(nullptr == m_fast->p_rm_Indices);
             m_fast->p_rm_Indices = RImplementation.getIB(ID, true);
