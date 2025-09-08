@@ -14,6 +14,7 @@ add_subdirectory(luabind)
 add_subdirectory(GameSpy)
 add_subdirectory(OPCODE)
 add_subdirectory(imgui-proj)
+add_subdirectory(doctest EXCLUDE_FROM_ALL)
 
 if (NOT TARGET xrLuabind)
     message(FATAL_ERROR
