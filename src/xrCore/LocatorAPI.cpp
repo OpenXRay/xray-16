@@ -305,7 +305,7 @@ IReader* open_chunk(void* ptr, u32 ID, pcstr archiveName, size_t archiveSize, bo
                 size_t dest_sz = 0;
 
                 if (shouldDecrypt) // Try WW key first
-                    g_trivial_encryptor.decode(src_data, dwSize, src_data);
+                    g_trivial_encryptor.decode(src_data, dwSize, src_data,  trivial_encryptor::key_flag::russian);
 
                 bool result = _decompressLZ(&dest, &dest_sz, src_data, dwSize, archiveSize);
 

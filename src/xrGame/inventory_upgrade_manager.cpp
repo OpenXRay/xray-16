@@ -183,9 +183,7 @@ void Manager::load_all_properties()
     if (!pSettings->section_exist(properties_section) && ShadowOfChernobylMode)
         return;
 
-
-    VERIFY2(
-        pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));
+    VERIFY2(pSettings->section_exist(properties_section), make_string("Section [%s] does not exist !", properties_section));
     VERIFY2(pSettings->line_count(properties_section), make_string("Section [%s] is empty !", properties_section));
 
     CInifile::Sect& inv_section = pSettings->r_section(properties_section);

@@ -79,6 +79,7 @@ public:
     void Show_SecondTaskWnd(bool status);
     void Show_MapWnd(bool status);
     void Show_ContactsWnd(bool status);
+    void DrawUpdatedSections();
 
     void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
     CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }

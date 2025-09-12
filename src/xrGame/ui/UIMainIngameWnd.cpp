@@ -76,7 +76,7 @@ void CUIMainIngameWnd::Init()
     CUIXml uiXml;
     uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, MAININGAME_XML);
 
-    CUIXmlInit::InitWindow(uiXml, "main", 0, this);
+    CUIXmlInit::InitWindow(uiXml, "main", 0, this, !ShadowOfChernobylMode);
 
     Enable(false);
 
@@ -220,7 +220,7 @@ void CUIMainIngameWnd::Init()
         AttachChild(UIMotionIcon);
     }
 
-    UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this);
+    UIStaticDiskIO = UIHelper::CreateStatic(uiXml, "disk_io", this, !ShadowOfChernobylMode);
 
     if (IsGameTypeSingle() && uiXml.NavigateToNode("artefact_panel", 0))
     {
@@ -229,10 +229,12 @@ void CUIMainIngameWnd::Init()
         this->AttachChild(UIArtefactPanel);
     }
 
-    m_ui_hud_states = xr_new<CUIHudStatesWnd>();
-    m_ui_hud_states->SetAutoDelete(true);
-    AttachChild(m_ui_hud_states);
-    m_ui_hud_states->InitFromXml(uiXml, "hud_states");
+    if (!ShadowOfChernobylMode) {
+        m_ui_hud_states = xr_new<CUIHudStatesWnd>();
+        m_ui_hud_states->SetAutoDelete(true);
+        AttachChild(m_ui_hud_states);
+        m_ui_hud_states->InitFromXml(uiXml, "hud_states");
+    }
 
     int i = 0;
     while (true)
@@ -270,13 +272,15 @@ void CUIMainIngameWnd::Draw()
     if (IOActive)
         UIStaticDiskIO_start_time = Device.fTimeGlobal;
 
-    if ((UIStaticDiskIO_start_time + 1.0f) < Device.fTimeGlobal)
-        UIStaticDiskIO->Show(false);
-    else
-    {
-        u32 alpha = clampr(iFloor(255.f * (1.f - (Device.fTimeGlobal - UIStaticDiskIO_start_time) / 1.f)), 0, 255);
-        UIStaticDiskIO->Show(true);
-        UIStaticDiskIO->SetTextureColor(color_rgba(255, 255, 255, alpha));
+    if (UIStaticDiskIO) {
+        if ((UIStaticDiskIO_start_time + 1.0f) < Device.fTimeGlobal)
+            UIStaticDiskIO->Show(false);
+        else
+        {
+            u32 alpha = clampr(iFloor(255.f * (1.f - (Device.fTimeGlobal - UIStaticDiskIO_start_time) / 1.f)), 0, 255);
+            UIStaticDiskIO->Show(true);
+            UIStaticDiskIO->SetTextureColor(color_rgba(255, 255, 255, alpha));
+        }
     }
     FS.dwOpenCounter = 0;
 
