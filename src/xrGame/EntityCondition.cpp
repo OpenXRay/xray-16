@@ -300,7 +300,12 @@ float CEntityCondition::HitOutfitEffect(
     if (!pInvOwner)
         return hit_power;
 
-    CCustomOutfit* pOutfit = (CCustomOutfit*)pInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
+    CCustomOutfit* pOutfit;
+    if (ShadowOfChernobylMode)
+        pOutfit = (CCustomOutfit*)pInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT_SOC);
+    else
+        pOutfit = (CCustomOutfit*)pInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
+
     CHelmet* pHelmet = (CHelmet*)pInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
     if (!pOutfit && !pHelmet)
         return hit_power;
@@ -376,7 +381,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
 
     bool bAddWound = pHDS->add_wound;
 
-    float hit_power_org = pHDS->damage();
+    float hit_power_org = pHDS->power;
     float hit_power = hit_power_org;
     hit_power = HitOutfitEffect(hit_power_org, pHDS->hit_type, pHDS->boneID, pHDS->armor_piercing, bAddWound);
 

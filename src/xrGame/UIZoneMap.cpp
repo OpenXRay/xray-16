@@ -96,7 +96,7 @@ void CUIZoneMap::Init(bool motionIconAttached)
         if (ShadowOfChernobylMode)
         {
             CUIXmlInit::InitStatic(uiXml, "minimap:background:dist_text", 0, &m_Counter_text);
-            m_Counter.AttachChild(&m_Counter_text);
+            m_background.AttachChild(&m_Counter_text);
         }
         else {
             CUIXmlInit::InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter);
