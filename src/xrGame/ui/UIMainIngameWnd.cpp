@@ -229,12 +229,13 @@ void CUIMainIngameWnd::Init()
         this->AttachChild(UIArtefactPanel);
     }
 
-    if (!ShadowOfChernobylMode) {
-        m_ui_hud_states = xr_new<CUIHudStatesWnd>();
-        m_ui_hud_states->SetAutoDelete(true);
-        AttachChild(m_ui_hud_states);
+    m_ui_hud_states = xr_new<CUIHudStatesWnd>();
+    m_ui_hud_states->SetAutoDelete(true);
+    AttachChild(m_ui_hud_states);
+    if (ShadowOfChernobylMode)
+        m_ui_hud_states->InitFromXml(uiXml, NULL);
+    else
         m_ui_hud_states->InitFromXml(uiXml, "hud_states");
-    }
 
     int i = 0;
     while (true)

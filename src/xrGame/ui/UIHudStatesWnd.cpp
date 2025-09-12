@@ -77,14 +77,15 @@ ALife::EInfluenceType CUIHudStatesWnd::get_indik_type(ALife::EHitType hit_type)
 void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
 {
     ZoneScoped;
-
-    CUIXmlInit::InitWindow(xml, path, 0, this);
     XML_NODE stored_root = xml.GetLocalRoot();
+    if (path) {
+        CUIXmlInit::InitWindow(xml, path, 0, this);
 
-    XML_NODE new_root = xml.NavigateToNode(path, 0);
-    xml.SetLocalRoot(new_root);
+        XML_NODE new_root = xml.NavigateToNode(path, 0);
+        xml.SetLocalRoot(new_root);
+    }
 
-    m_back = UIHelper::CreateStatic(xml, "back", this);
+    m_back = UIHelper::CreateStatic(xml, "back", this, !ShadowOfChernobylMode);
     m_back_v = UIHelper::CreateStatic(xml, "back_v", this, false);
 
     // XXX: replace with UIHelper
@@ -136,22 +137,39 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_resist_back[ALife::infl_psi] = UIHelper::CreateStatic(xml, "resist_back_psi", this, false);
     // electra = no has CStatic!!
 
-    m_indik[ALife::infl_rad] = UIHelper::CreateStatic(xml, "indik_rad", this);
-    m_indik[ALife::infl_fire] = UIHelper::CreateStatic(xml, "indik_fire", this);
-    m_indik[ALife::infl_acid] = UIHelper::CreateStatic(xml, "indik_acid", this);
-    m_indik[ALife::infl_psi] = UIHelper::CreateStatic(xml, "indik_psi", this);
+    if (ShadowOfChernobylMode) {
+        m_indik[ALife::infl_rad] = UIHelper::CreateStatic(xml, "radiation_static", this);
+        m_indik[ALife::infl_fire] = UIHelper::CreateStatic(xml, "wound_static", this);
+        m_indik[ALife::infl_acid] = UIHelper::CreateStatic(xml, "starvation_static", this);
+        m_indik[ALife::infl_psi] = UIHelper::CreateStatic(xml, "psy_health_static", this);
+    } else {
+        m_indik[ALife::infl_rad] = UIHelper::CreateStatic(xml, "indik_rad", this);
+        m_indik[ALife::infl_fire] = UIHelper::CreateStatic(xml, "indik_fire", this);
+        m_indik[ALife::infl_acid] = UIHelper::CreateStatic(xml, "indik_acid", this);
+        m_indik[ALife::infl_psi] = UIHelper::CreateStatic(xml, "indik_psi", this);
+    }
 
     m_lanim_name = xml.ReadAttrib("indik_rad", 0, "light_anim", "");
 
     m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", weaponsParent, false);
     //m_ui_weapon_sign_ammo->SetEllipsis( CUIStatic::eepEnd, 2 );
 
-    m_ui_weapon_cur_ammo = UIHelper::CreateStatic(xml, "static_cur_ammo", this, false);
-    m_ui_weapon_fmj_ammo = UIHelper::CreateStatic(xml, "static_fmj_ammo", this, false);
-    m_ui_weapon_ap_ammo = UIHelper::CreateStatic(xml, "static_ap_ammo", this, false);
-    m_ui_weapon_third_ammo = UIHelper::CreateStatic(xml, "static_third_ammo", this, false); //Alundaio: Option to display a third ammo type
-    m_fire_mode = UIHelper::CreateStatic(xml, "static_fire_mode", this);
-    m_ui_grenade = UIHelper::CreateStatic(xml, "static_grenade", this, false);
+    if (ShadowOfChernobylMode)
+    {
+        m_ui_weapon_cur_ammo = UIHelper::CreateStatic(xml, "static_ammo", this, false);
+        m_ui_weapon_fmj_ammo = UIHelper::CreateStatic(xml, "static_ammo", this, false);
+        m_ui_weapon_ap_ammo = UIHelper::CreateStatic(xml, "static_ammo", this, false);
+        m_ui_weapon_third_ammo = UIHelper::CreateStatic(xml, "static_ammo", this, false);
+        m_fire_mode = UIHelper::CreateStatic(xml, "static_weapon", this);
+        m_ui_grenade = UIHelper::CreateStatic(xml, "static_weapon", this, false);
+    } else {
+        m_ui_weapon_cur_ammo = UIHelper::CreateStatic(xml, "static_cur_ammo", this, false);
+        m_ui_weapon_fmj_ammo = UIHelper::CreateStatic(xml, "static_fmj_ammo", this, false);
+        m_ui_weapon_ap_ammo = UIHelper::CreateStatic(xml, "static_ap_ammo", this, false);
+        m_ui_weapon_third_ammo = UIHelper::CreateStatic(xml, "static_third_ammo", this, false); //Alundaio: Option to display a third ammo type
+        m_fire_mode = UIHelper::CreateStatic(xml, "static_fire_mode", this);
+        m_ui_grenade = UIHelper::CreateStatic(xml, "static_grenade", this, false);
+    }
 
     m_ui_weapon_icon = UIHelper::CreateStatic(xml, "static_wpn_icon", weaponsParent);
     m_ui_weapon_icon->SetShader(InventoryUtilities::GetEquipmentIconsShader());
@@ -854,10 +872,11 @@ float CUIHudStatesWnd::get_zone_cur_power(ALife::EHitType hit_type)
 void CUIHudStatesWnd::DrawZoneIndicators()
 {
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor || ShadowOfChernobylMode)
+    if (!actor)
         return;
 
-    UpdateIndicators(actor);
+    if (!ShadowOfChernobylMode)
+        UpdateIndicators(actor);
 
     if (m_indik[ALife::infl_rad]->IsShown())
         m_indik[ALife::infl_rad]->Draw();
