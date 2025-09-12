@@ -1,0 +1,23 @@
+- add S->C event support ("\event\explosion\pos\280 640")
+- save settings (nick, color, prediction, etc.)
+- improve comments
+- slow bouncy lasers
+- map/walls
+- safe spawns
+- better feedback for dedicated server (not just "connecting")
+- sound doesn't worked when launched from debugger but not debugging (Ctrl-F5)
+- add bytes/sec to net graph
+- write filter to analyze byte frequencies
+- show message on server shutdown
+- only send changed values for players/objects
+- assert, darray.c, line 120
+- do prediction at start of frame, then use that for drawing and radar
+- do adjustments based on when a server update should have arrived?
+- second background moving at different speed?
+- position smoothing causes weirdness when respawning
+- cleaner menu setup system?
+- random number and positions for spinner
+- AddRocket, AddMine, etc.
+- smarter server updates
+  - for each object, determine what values are dynamic
+  - pre-determine what values will be sent for each object-type

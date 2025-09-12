@@ -1,0 +1,283 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\gt2test.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\gt2test.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_GT2TEST_DIALOG DIALOGEX 0, 0, 347, 331
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "GameSpy Transport SDK 2 MFC Test"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Create",IDC_CREATE_SOCKET,15,20,35,14
+    PUSHBUTTON      "Close",IDC_CLOSE_SOCKET,15,35,35,14
+    EDITTEXT        IDC_LOCAL_ADDRESS,109,18,86,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_IN_BUFFER_SIZE,109,29,86,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_OUT_BUFFER_SIZE,109,40,86,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Connect",IDC_CONNECT,15,60,35,14
+    EDITTEXT        IDC_REMOTE_ADDRESS,55,60,95,13,ES_AUTOHSCROLL
+    CONTROL         "Blocking",IDC_BLOCKING,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,154,62,41,10
+    PUSHBUTTON      "Close All Connections",IDC_CLOSE_ALL_CONNECTIONS,155,89,
+                    77,14
+    PUSHBUTTON      "Close All Connections Hard",
+                    IDC_CLOSE_ALL_CONNECTIONS_HARD,235,89,97,14
+    PUSHBUTTON      "Think",IDC_THINK,213,18,35,14
+    CONTROL         "Always Think",IDC_ALWAYS_THINK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,260,20,58,10
+    CONTROL         "Listen",IDC_LISTEN,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,213,37,35,14
+    CONTROL         "Accept All",IDC_ACCEPT_ALL,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,259,37,48,10
+    CONTROL         "Reject All",IDC_REJECT_ALL,"Button",BS_AUTORADIOBUTTON,
+                    259,50,46,10
+    CONTROL         "Prompt",IDC_PROMPT,"Button",BS_AUTORADIOBUTTON,259,62,
+                    38,10
+    EDITTEXT        IDC_REJECT_REASON,259,73,73,13,ES_AUTOHSCROLL | WS_GROUP
+    COMBOBOX        IDC_CONNECTIONS,15,123,127,97,CBS_DROPDOWNLIST | 
+                    CBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Connecting",IDC_CONNECTING,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,149,125,52,10
+    CONTROL         "Connected",IDC_CONNECTED,"Button",BS_AUTORADIOBUTTON,
+                    204,125,51,10
+    CONTROL         "Closing",IDC_CLOSING,"Button",BS_AUTORADIOBUTTON,258,
+                    125,39,10
+    CONTROL         "Closed",IDC_CLOSED,"Button",BS_AUTORADIOBUTTON,300,125,
+                    37,10
+    PUSHBUTTON      "Send",IDC_SEND,15,151,35,14,WS_GROUP
+    EDITTEXT        IDC_MESSAGE,55,151,95,13,ES_AUTOHSCROLL
+    CONTROL         "Reliable",IDC_RELIABLE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,155,153,41,10
+    PUSHBUTTON      "Ping",IDC_PING,201,151,35,14
+    PUSHBUTTON      "Close",IDC_CLOSE_CONNECTION,240,151,35,14
+    PUSHBUTTON      "Close Hard",IDC_CLOSE_CONNECTION_HARD,279,151,45,14
+    EDITTEXT        IDC_MESSAGES,15,167,180,81,ES_MULTILINE | ES_READONLY | 
+                    WS_VSCROLL | WS_HSCROLL
+    EDITTEXT        IDC_SEND_DROP_VALUE,220,221,25,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SEND_DELAY_VALUE,220,235,25,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RECEIVE_DROP_VALUE,290,221,25,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RECEIVE_DELAY_VALUE,290,235,25,12,ES_AUTOHSCROLL
+    CONTROL         "IPAddress1",IDC_ADDRESS_IP,"SysIPAddress32",WS_TABSTOP,
+                    15,269,100,12
+    EDITTEXT        IDC_ADDRESS_PORT,117,269,40,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "--->",IDC_ADDRESS_TO,164,269,20,12
+    PUSHBUTTON      "<---",IDC_ADDRESS_FROM,187,269,20,12
+    EDITTEXT        IDC_ADDRESS_STRING,213,269,119,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Get IP Host Info",IDC_GET_IP_HOST_INFO,15,286,38,29,
+                    BS_MULTILINE
+    EDITTEXT        IDC_ADDRESS_HOSTNAME,95,283,194,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_ADDRESS_ALIASES,95,294,194,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_ADDRESS_IPS,95,305,194,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Get String Host Info",IDC_GET_STRING_HOST_INFO,294,286,
+                    38,29,BS_MULTILINE
+    GROUPBOX        "Socket",IDC_STATIC,7,7,333,102
+    GROUPBOX        "Connection",IDC_STATIC,7,112,333,141
+    GROUPBOX        "Address",IDC_STATIC,7,256,333,68
+    LTEXT           "Hostname:",IDC_STATIC,58,286,35,8
+    LTEXT           "Aliases:",IDC_STATIC,58,296,25,8
+    LTEXT           "IPs:",IDC_STATIC,58,307,13,8
+    LTEXT           "Local Address:",IDC_STATIC,55,20,48,8
+    LTEXT           "In Buffer Size:",IDC_STATIC,55,31,45,8
+    LTEXT           "Out Buffer Size:",IDC_STATIC,55,42,50,8
+    LTEXT           "Reject Reason:",IDC_STATIC,206,75,50,8
+    LTEXT           "Send Filters:",IDC_STATIC,200,168,40,8
+    LTEXT           "Receive Filters:",IDC_STATIC,270,168,50,8
+    LTEXT           "drop",IDC_STATIC,200,224,15,8
+    LTEXT           "delay",IDC_STATIC,200,238,18,8
+    LTEXT           "%",IDC_STATIC,247,222,8,8
+    LTEXT           "ms",IDC_STATIC,247,238,10,8
+    LTEXT           "drop",IDC_STATIC,270,224,15,8
+    LTEXT           "delay",IDC_STATIC,270,238,18,8
+    LTEXT           "%",IDC_STATIC,317,222,8,8
+    LTEXT           "ms",IDC_STATIC,317,238,10,8
+    CONTROL         "ROT13",IDC_SEND_ROT13,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,200,182,39,10
+    CONTROL         "Drop",IDC_SEND_DROP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,200,193,31,10
+    CONTROL         "Delay",IDC_SEND_DELAY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,200,206,34,10
+    CONTROL         "ROT13",IDC_RECEIVE_ROT13,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,270,182,39,10
+    CONTROL         "Drop",IDC_RECEIVE_DROP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,270,193,31,10
+    CONTROL         "Delay",IDC_RECEIVE_DELAY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,270,206,34,10
+    EDITTEXT        IDC_CONNECT_MESSAGE,55,80,95,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TIMEOUT,55,91,95,12,ES_AUTOHSCROLL
+    LTEXT           "Message:",IDC_STATIC,15,82,32,8
+    LTEXT           "Timeout:",IDC_STATIC,15,93,28,8
+    LTEXT           "Incoming:",IDC_STATIC,97,139,32,8
+    CONTROL         "Progress1",IDC_INCOMING_BUFFER_PROGRESS,
+                    "msctls_progress32",PBS_SMOOTH | WS_BORDER,129,140,50,7
+    LTEXT           "Space Used in Buffers:",IDC_STATIC,15,139,74,8
+    LTEXT           "55555555",IDC_INCOMING_BUFFER_SIZE,179,139,33,8
+    LTEXT           "Outgoing:",IDC_STATIC,217,139,32,8
+    CONTROL         "Progress1",IDC_OUTGOING_BUFFER_PROGRESS,
+                    "msctls_progress32",PBS_SMOOTH | WS_BORDER,249,140,50,7
+    LTEXT           "55555555",IDC_OUTGOING_BUFFER_SIZE,299,139,33,8
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "gt2test MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "gt2test\0"
+            VALUE "LegalCopyright", "Copyright (C) 2002\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "gt2test.EXE\0"
+            VALUE "ProductName", "gt2test Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_GT2TEST_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 340
+        VERTGUIDE, 15
+        VERTGUIDE, 332
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 324
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\gt2test.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

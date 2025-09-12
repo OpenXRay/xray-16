@@ -1,0 +1,28 @@
+Changelog for: Nitro (Nintendo DS) Common Code
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+05-17-2006  1.00.05  DES  UPDATE   Updated to use gsTestMain
+                     DES  FEATURE  Added gmtime and ctime
+                     DES  FEATURE  Added gsiInterlockedIncrement/Decrement
+11-17-2005  1.00.04  DES  FIX      Updated sample project and common workspace.
+                     DES  CLEANUP  Now using SOC_ instead of SO_.
+09-21-2005  1.00.03  DES  FEATURE  Added support for more backup types
+                     DES  FIX      Updated thread support
+                     DES  FIX      nitrosample now uses the gmtest gamename
+06-03-2005  1.00.02  SN   RELEASE  Releasing to developer site.
+04-28-2005  1.00.02  SN   RELEASE  Releasing to developer site.
+04-27-2005  1.00.02  DES  RELEASE  Limited release to Nintendo DS developers.
+04-27-2005  1.00.02  DES  CLEANUP  The backup code now only checks for flash backup
+                                   if SUPPORT_FLASH is defined.
+                     DES  FEATURE  Cosmetic changes to nitrosample and launcher code.
+                     DES  FIX      Changed SDK_IRQ_STACKSIZE in nitro.lcf files to 4096.
+                     DES  FEATURE  printf()'s can now be directed to the screen and/or the debugger.
+                     DES  FEATURE  Updates to work with the latest NitroInet.
+                     DES  FEATURE  Added nitrocommon.cww, workspace for CW with all test apps.
+04-11-2005  1.00.01  DES  CLEANUP  Removed 232-bit WEP key, which is no longer supported by Nitro.
+                     DES  FEATURE  Show a default network config if no backup memory is detected.
+                     DES  FIX      Fixed bug with showing the failure reason in nitrosample.
+                     DES  FIX      Fixed bug in handling Peer errors in nitrosample.
+04-04-2005  1.00.00  DES  OTHER    Changelog started

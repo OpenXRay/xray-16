@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<?codewarrior exportversion="1.0" ideversion="5.5" success="y" ?>
+
+<!DOCTYPE MWIDEWORKSPACE [
+<!ELEMENT MWIDEWORKSPACE (WINDOW*, COMWINDOW*)>
+<!ELEMENT WINDOW (SESSION, EDOCTYPE, PATH, FRAMELOC, FRAMESIZE, DOCKINFO)>
+<!ELEMENT COMWINDOW (SESSION, CLSID, OWNERPROJECT, DATA, FRAMELOC, FRAMESIZE, DOCKINFO)>
+<!ELEMENT SESSION (#PCDATA)>
+<!ELEMENT EDOCTYPE (#PCDATA)>
+<!ELEMENT DEFAULT (#PCDATA)>
+<!ELEMENT MAXIMIZED (#PCDATA)>
+<!ELEMENT PATH (#PCDATA)>
+<!ATTLIST PATH USERELATIVEPATHS (true | false) "true">
+<!ELEMENT FRAMELOC (X, Y)>
+<!ELEMENT X (#PCDATA)>
+<!ELEMENT Y (#PCDATA)>
+<!ELEMENT FRAMESIZE (W, H)>
+<!ELEMENT W (#PCDATA)>
+<!ELEMENT H (#PCDATA)>
+<!ELEMENT DOCKINFO (STATUS, ROW, COLUMN, DOCKBARID, PCTWIDTH, HGT, GROUPID)>
+<!ELEMENT STATUS (#PCDATA)>
+<!ELEMENT ROW (#PCDATA)>
+<!ELEMENT COLUMN (#PCDATA)>
+<!ELEMENT DOCKBARID (#PCDATA)>
+<!ELEMENT PCTWIDTH (#PCDATA)>
+<!ELEMENT HGT (#PCDATA)>
+<!ELEMENT GROUPID (GIDHIGHPART, GIDLOWPART)>
+<!ELEMENT GIDHIGHPART (#PCDATA)>
+<!ELEMENT GIDLOWPART (#PCDATA)>
+<!ELEMENT CLSID (#PCDATA)>
+<!ELEMENT OWNERPROJECT (#PCDATA)>
+<!ATTLIST OWNERPROJECT USERELATIVEPATHS (true | false) "true">
+<!ELEMENT DATA (#PCDATA)>
+<!ATTLIST DATA BINARYFORMAT (true | false) "true">
+]>
+
+<MWIDEWORKSPACE>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <DEFAULT>true</DEFAULT>
+        <PATH USERELATIVEPATHS = "true">nitrosample\nitrosample.mcp</PATH>
+        <FRAMELOC>
+            <X>604</X>
+            <Y>352</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>400</W>
+            <H>372</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>0</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.162898</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>29705908</GIDHIGHPART>
+                <GIDLOWPART>42137564</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\serverbrowsing\sbctest\sbnitrocw\sbnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>458</X>
+            <Y>315</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>400</W>
+            <H>372</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>2</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.193501</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\qr2\qr2csample\qr2nitrocw\qr2nitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>285</X>
+            <Y>274</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>400</W>
+            <H>379</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>1</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.141566</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\pt\pttestc\ptnitrocw\ptnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>1</ROW>
+            <COLUMN>4</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.165193</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\Peer\peerc\peernitrocw\peernitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>1</ROW>
+            <COLUMN>3</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.172138</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\natneg\simpletest\natnegnitrocw\natnegnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>4</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.174097</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\gt2\gt2testc\gt2nitrocw\gt2nitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>5</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.152819</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\gstats\statstest\gstatsnitrocw\gstatsnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>1</ROW>
+            <COLUMN>1</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.140610</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\gstats\persisttest\persistnitrocw\persistnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>1</ROW>
+            <COLUMN>2</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.191763</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\GP\gptestc\gpnitrocw\gpnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>0</ROW>
+            <COLUMN>3</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.175118</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\ghttp\ghttpc\ghttpnitrocw\ghttpnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>1</ROW>
+            <COLUMN>0</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.163171</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>0</GIDHIGHPART>
+                <GIDLOWPART>0</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-1</SESSION>
+        <EDOCTYPE>0</EDOCTYPE>
+        <PATH USERELATIVEPATHS = "true">..\..\Chat\chatc\chatnitrocw\chatnitrocw.mcp</PATH>
+        <FRAMELOC>
+            <X>457</X>
+            <Y>317</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>392</W>
+            <H>344</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>1</STATUS>
+            <ROW>1</ROW>
+            <COLUMN>5</COLUMN>
+            <DOCKBARID>59420</DOCKBARID>
+            <PCTWIDTH>0.167125</PCTWIDTH>
+            <HGT>378</HGT>
+            <GROUPID>
+                <GIDHIGHPART>29736291</GIDHIGHPART>
+                <GIDLOWPART>974026480</GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>1073741824</SESSION>
+        <EDOCTYPE>35</EDOCTYPE>
+        <FRAMELOC>
+            <X>540</X>
+            <Y>75</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>387</W>
+            <H>279</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>0</STATUS>
+            <ROW></ROW>
+            <COLUMN></COLUMN>
+            <DOCKBARID></DOCKBARID>
+            <PCTWIDTH></PCTWIDTH>
+            <HGT></HGT>
+            <GROUPID>
+                <GIDHIGHPART></GIDHIGHPART>
+                <GIDLOWPART></GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+        <DEBUGCONTEXT>GlobalSession, cpuARMLittle, osCWDS</DEBUGCONTEXT>
+        <DEBUGTARGETNAME>C:\gamespy\GOA\GP\gptestc\gpnitrocw\bin\ARM9-TS\Debug\main.nef</DEBUGTARGETNAME>
+            <MEMORYWININDEX>1</MEMORYWININDEX>
+            <MEMORYWINSETTINGS EXPRSTRING = "GPConnectionManagerHostname" SPACEINDEX = "1" VIEWINDEX = "1" WORDSIZE = "3" SNAP16 = "0" SWAPENDIAN = "0" ASCIISHOWN = "1"/>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-2147483648</SESSION>
+        <EDOCTYPE>34</EDOCTYPE>
+        <FRAMELOC>
+            <X>4</X>
+            <Y>23</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>528</W>
+            <H>334</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>0</STATUS>
+            <ROW></ROW>
+            <COLUMN></COLUMN>
+            <DOCKBARID></DOCKBARID>
+            <PCTWIDTH></PCTWIDTH>
+            <HGT></HGT>
+            <GROUPID>
+                <GIDHIGHPART></GIDHIGHPART>
+                <GIDLOWPART></GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-2147483648</SESSION>
+        <EDOCTYPE>37</EDOCTYPE>
+        <FRAMELOC>
+            <X>4</X>
+            <Y>22</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>358</W>
+            <H>327</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>0</STATUS>
+            <ROW></ROW>
+            <COLUMN></COLUMN>
+            <DOCKBARID></DOCKBARID>
+            <PCTWIDTH></PCTWIDTH>
+            <HGT></HGT>
+            <GROUPID>
+                <GIDHIGHPART></GIDHIGHPART>
+                <GIDLOWPART></GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+    <WINDOW>
+        <SESSION>-2147483648</SESSION>
+        <EDOCTYPE>24</EDOCTYPE>
+        <FRAMELOC>
+            <X>6</X>
+            <Y>81</Y>
+        </FRAMELOC>
+        <FRAMESIZE>
+            <W>566</W>
+            <H>477</H>
+        </FRAMESIZE>
+        <DOCKINFO>
+            <STATUS>0</STATUS>
+            <ROW></ROW>
+            <COLUMN></COLUMN>
+            <DOCKBARID></DOCKBARID>
+            <PCTWIDTH></PCTWIDTH>
+            <HGT></HGT>
+            <GROUPID>
+                <GIDHIGHPART></GIDHIGHPART>
+                <GIDLOWPART></GIDLOWPART>
+            </GROUPID>
+        </DOCKINFO>
+    </WINDOW>
+</MWIDEWORKSPACE>

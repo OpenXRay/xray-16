@@ -1,0 +1,133 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "gt2"=.\gt2.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2", PSNCAAAA
+    .
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2action"=.\gt2action\gt2action.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2action", DQOCAAAA
+    .\gt2action
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2hostmig"=.\gt2hostmig\gt2hostmig.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2hostmig", AQOCAAAA
+    .\gt2hostmig
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2nat"=.\gt2nat\gt2nat.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2nat", TTOCAAAA
+    .\gt2nat
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2proxy"=.\gt2proxy\gt2proxy.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2proxy", RSOCAAAA
+    .\gt2proxy
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2test"=.\gt2test\gt2test.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2test", IBOCAAAA
+    .\gt2test
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2testc"=.\gt2testc\gt2testc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2testc", LPOCAAAA
+    .\gt2testc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2", PSNCAAAA
+    .
+    end source code control
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

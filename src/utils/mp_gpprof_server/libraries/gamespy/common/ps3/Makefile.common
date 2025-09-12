@@ -1,0 +1,31 @@
+#GameSpy.net PS3 Makefile
+#Included from sample-specific Makefiles                              
+
+CELL_TARGET_PATH    = $(CELL_SDK)/target-ceb
+CELL_HOST_BIN_PATH  = $(HOST_PATH)/bin
+
+LIBDIR      = $(CELL_TARGET_PATH)/ppu/lib
+
+CFLAGS      = -g -O0 -Wall -Werror -Wa,-al -fno-common -I$(GAMESPY_DIR) -DGSI_COMMON_DEBUG -D_PS3 $(SDK_CFLAGS)
+ASFLAGS     = -c -xassembler-with-cpp -Wa,-al
+LDFLAGS     = -lm
+INCDIR      = -I$(CELL_SDK)/target-ceb/ppu/include/network
+
+LIBS        = $(SDK_LIBS) \
+              $(LIBDIR)/libnet.a \
+              $(LIBDIR)/libio.a 
+
+AS          = ppu-lv2-as
+CC          = ppu-lv2-gcc
+LD          = ppu-lv2-g++
+
+.SUFFIXES: .c
+
+$(TARGET).elf: $(OBJS)
+	$(LD) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCDIR) -c $< -o $*.o > /dev/null
+
+clean:
+	$(RM) $(OBJS) *.o $(TARGET).elf

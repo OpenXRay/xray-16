@@ -1,0 +1,245 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "Voice2Test"=..\..\Voice2\Voice2Test\Voice2Test.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/Voice2/Voice2Test", MPNDAAAA
+    ..\..\voice2\voice2test
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "chatc"=..\..\Chat\chatc\chatc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/Chat/chatc", RRUAAAAA
+    ..\..\chat\chatc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gcdkeyclient"=..\..\gcdkey\gcdkeyclient.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gcdkey", JIGAAAAA
+    ..\..\gcdkey
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gcdkeyserver"=..\..\gcdkey\gcdkeyserver.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gcdkey", JIGAAAAA
+    ..\..\gcdkey
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "ghttpc"=..\..\ghttp\ghttpc\ghttpc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/ghttp/ghttpc", BUZAAAAA
+    ..\..\ghttp\ghttpc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gptestc"=..\..\GP\gptestc\gptestc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/GP/gptestc", ZHJAAAAA
+    ..\..\gp\gptestc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gstats"=..\..\gstats\gstats.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats", BSGAAAAA
+    ..\..\gstats
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "gt2testc"=..\..\gt2\gt2testc\gt2testc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gt2/gt2testc", LPOCAAAA
+    ..\..\gt2\gt2testc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "peerc"=..\..\Peer\peerc\peerc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/Peer/peerc", GSUAAAAA
+    ..\..\peer\peerc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "persisttest"=..\..\gstats\persisttest\persisttest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/gstats/persisttest", BBVAAAAA
+    ..\..\gstats\persisttest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "pttestc"=..\..\pt\pttestc\pttestc.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/pt/pttestc", KCGBAAAA
+    ..\..\pt\pttestc
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "qr2csample"=..\..\qr2\qr2csample\qr2csample.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/qr2/qr2csample
+    ..\..\qr2\qr2csample
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "sbctest"=..\..\serverbrowsing\sbctest\sbctest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/serverbrowsing/sbctest
+    ..\..\serverbrowsing\sbctest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "simpletest"=..\..\natneg\simpletest\simpletest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/Gamespy/GOA/natneg/simpletest", HFUCAAAA
+    ..\..\natneg\simpletest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/common/win32
+    .
+    end source code control
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

@@ -1,0 +1,57 @@
+Changelog for: GameSpy SAKE SDK
+--------------------------------------------------------
+
+DATE        VERSION  BY   TYPE     DESCRIPTION
+----------  -------  ---  -------  ---------------------------------------------------------
+12-12-2007  1.04.00  RMV  RELEASE  Released to Developer Site
+12-11-2007  1.03.03  SN   FIX      Removed a check due to compiler warning
+11-16-2007  1.03.02  SAH  FIX      Fixed mem leak in saketest.c from invalid gsCore shutdown, added memleak check
+10-09-2007  1.03.01  SAH  FIX      Fixed mFilter and mTargetFilter to support unicode strings
+                     SAH  OTHER    Added Win32 Unicode Debug & Unicode Release projects to VS2005 solution
+08-06-2007  1.03.00  RMV  RELEASE  Released to Developer Site
+08-03-2007  1.02.08  SAH  FEATURE  Added mCacheFlag for searchForRecords and getRowCount
+07-19-2007  1.02.07  SAH  FIX      Fixed projects to work with new GP changes
+07-03-2007  1.02.06  SAH  FIX      Fixed memory leak in GetRandomRecord 
+06-29-2007  1.02.05  SAH  OTHER    Added SAKEFileResult_SERVER_ERROR to error code list 
+06-20-2007  1.02.04  SAH  FEATURE  Added sakeGetRecordCount
+                     SAH  FEATURE  Added new input data for sakeSearchForRecords for initial leaderboard support
+06-13-2007  1.02.03  SAH  FIX      Fixed memory leak from not freeing BinaryData fields or UnicodeStrings 
+05-29-2007  1.02.02  DES  FEATURE  Updated saketest to include GetRandomRecord test
+03-22-2007  1.02.01  DES  FIX      Allow NULL for mFilter and mSort with SearchForRecords
+                     DES  FEATURE  Added GetRandomRecord
+                     DES  FEATURE  Added special field "my_rating"
+                     DES  FEATURE  Added special filter tags "@rated" and "@unrated"
+03-05-2007  1.02.00  SAH  RELEASE  Released to Developer Site
+01-22-2007  1.01.02  SAH  FIX      Fixed unicode for upload/download URLs and setGameName, added unicode config
+01-17-2007  1.01.01  DES  RELEASE  Limited Release
+01-16-2007  1.01.01  DES  FEATURE  Added X360 support
+12-15-2006  1.01.00  MJW  RELEASE  Released to Developer Site
+12-14-2006  1.00.20  MJW  FIX      Removed tabs from Makefile for linux (was causing it to break)
+11-10-2006  1.00.19  JR   RELEASE  Limited Release
+11-02-2006  1.00.19  SAH  FIX      Fixed bug where all booleans values returned "false", even when true
+10-23-2006  1.00.18  DES  RELEASE  Limited release
+10-12-2006  1.00.18  DES  FIX      Added explicit cast for gsimalloc
+10-11-2006  1.00.17  DES  FIX      Fixed Unicode issue with upload/download URLs
+10-05-2006  1.00.16  SAH  FIX      Updated Mac OSX Makefile
+                     SAH  FIX      Fixed saketest to get rid of compiler warning errors for Mac
+09-29-2006  1.00.15  SAH  FIX      Updated all sake projects to compile with GP (for saketest change)
+09-28-2006  1.00.14  SAH  FIX      Updated saketest application to login to GP and retrieve a loginticket to authenticate sake.
+09-28-2006  1.00.13  SAH  FIX      Fixed PS3 project to work with PS3 095.00x SDK; changed included libaries in linker input.
+09-27-2006  1.00.13  SN   OTHER    Removed function below until development backend is available
+09-20-2006  1.00.12  SN   FEATURE  Added an interface function allow usage of the development environment
+08-04-2006  1.00.11  SN   FIX      Fixed Sake Read requestion function for date and time to use time_t
+08-04-2006  1.00.10  SAH  FIX      Changed DateTime read call to gsXmlReadChildAsDateTimeElement to parse correctly
+08-02-2006  1.00.09  SAH  RELEASE  Releasing to developer site
+08-01-2006  1.00.09  SAH  FIX      Fixed saketest.c so that it won't crash when a specific record does not exist
+                     SAH  OTHER    Added sakelinux makefile - *NOTE: unsupported in current version due to pthreads
+07-31-2006  1.00.08  SAH  FIX      Fixed PS3 project file - added post-build step to create *.SELF for execution
+07-25-2006  1.00.07  SAH  FIX      Fixed NITRO project, include for crt0.o now above others so it add correct file
+07-06-2006  1.00.06  SAH  FIX      Fixed PSP project file to not explicitly include the PSP linker file
+07-06-2006  1.00.05  SAH  FIX      Fixed NITRO project & linker command file (to work with CW 2.0/NitroSDK 3.1)
+07-05-2006  1.00.04  SAH  OTHER    Updated saketest.c to have a larger size upload test (5K by default)
+06-21-2006  1.00.03  DES  FEATURE  sakeSetGame now requires the game's secret key
+05-31-2006  1.00.02  SAH  RELEASE  Releasing to developer site
+05-30-2006  1.00.01  SAH  FIX	   #ifdef PS2 Unicode hack to get rid of PS2 Unicode warnings
+                     SAH  FIX      Added GSI_UNUSED calls, newline at end of files
+05-18-2006  1.00.00  DES  RELEASE  Initial limited release
+

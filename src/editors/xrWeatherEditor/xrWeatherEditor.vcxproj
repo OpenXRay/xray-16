@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configurations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{492D3DFE-9068-4E7E-A008-7C2420A651C0}</ProjectGuid>
+    <RootNamespace>editor</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray_project_configuration.props" />
+  </ImportGroup>
+  <PropertyGroup Label="Configuration">
+    <EnableUnitySupport>false</EnableUnitySupport>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\xray.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="Flobbster.Windows.Forms.PropertyGrid">
+      <HintPath>..\..\..\sdk\binaries\Flobbster.Windows.Forms.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>..\..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking.ThemeVS2015">
+      <HintPath>..\..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="entry_point.cpp" />
+    <ClCompile Include="ide_impl.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="property_boolean.cpp" />
+    <ClCompile Include="property_boolean_reference.cpp" />
+    <ClCompile Include="property_boolean_values_value.cpp" />
+    <ClCompile Include="property_boolean_values_value_reference.cpp" />
+    <ClCompile Include="property_collection.cpp" />
+    <ClCompile Include="property_collection_base.cpp" />
+    <ClCompile Include="property_collection_converter.cpp" />
+    <ClCompile Include="property_collection_editor.cpp" />
+    <ClCompile Include="property_collection_enumerator.cpp" />
+    <ClCompile Include="property_collection_getter.cpp" />
+    <ClCompile Include="property_color.cpp" />
+    <ClCompile Include="property_color_base.cpp" />
+    <ClCompile Include="property_color_reference.cpp" />
+    <ClCompile Include="property_container.cpp" />
+    <ClCompile Include="property_container_converter.cpp" />
+    <ClCompile Include="property_converter_boolean_values.cpp" />
+    <ClCompile Include="property_converter_color.cpp" />
+    <ClCompile Include="property_converter_float.cpp" />
+    <ClCompile Include="property_converter_float_enum.cpp" />
+    <ClCompile Include="property_converter_integer_enum.cpp" />
+    <ClCompile Include="property_converter_integer_values.cpp" />
+    <ClCompile Include="property_converter_string_values.cpp" />
+    <ClCompile Include="property_converter_tree_values.cpp" />
+    <ClCompile Include="property_converter_vec3f.cpp" />
+    <ClCompile Include="property_editor_color.cpp" />
+    <ClCompile Include="property_editor_file_name.cpp" />
+    <ClCompile Include="property_editor_tree_values.cpp" />
+    <ClCompile Include="property_file_name_value.cpp" />
+    <ClCompile Include="property_file_name_value_shared_str.cpp" />
+    <ClCompile Include="property_float.cpp" />
+    <ClCompile Include="property_float_enum_value.cpp" />
+    <ClCompile Include="property_float_enum_value_reference.cpp" />
+    <ClCompile Include="property_float_limited.cpp" />
+    <ClCompile Include="property_float_limited_reference.cpp" />
+    <ClCompile Include="property_float_reference.cpp" />
+    <ClCompile Include="property_holder.cpp" />
+    <ClCompile Include="property_holder_boolean.cpp" />
+    <ClCompile Include="property_holder_collection.cpp" />
+    <ClCompile Include="property_holder_color.cpp" />
+    <ClCompile Include="property_holder_container.cpp" />
+    <ClCompile Include="property_holder_float.cpp" />
+    <ClCompile Include="property_holder_integer.cpp" />
+    <ClCompile Include="property_holder_string.cpp" />
+    <ClCompile Include="property_holder_vec3f.cpp" />
+    <ClCompile Include="property_integer.cpp" />
+    <ClCompile Include="property_integer_enum_value.cpp" />
+    <ClCompile Include="property_integer_enum_value_reference.cpp" />
+    <ClCompile Include="property_integer_limited.cpp" />
+    <ClCompile Include="property_integer_limited_reference.cpp" />
+    <ClCompile Include="property_integer_reference.cpp" />
+    <ClCompile Include="property_integer_values_value.cpp" />
+    <ClCompile Include="property_integer_values_value_getter.cpp" />
+    <ClCompile Include="property_integer_values_value_reference.cpp" />
+    <ClCompile Include="property_integer_values_value_reference_getter.cpp" />
+    <ClCompile Include="property_property_container.cpp" />
+    <ClCompile Include="property_string.cpp" />
+    <ClCompile Include="property_string_shared_str.cpp" />
+    <ClCompile Include="property_string_values_value.cpp" />
+    <ClCompile Include="property_string_values_value_getter.cpp" />
+    <ClCompile Include="property_string_values_value_shared_str.cpp" />
+    <ClCompile Include="property_string_values_value_shared_str_getter.cpp" />
+    <ClCompile Include="property_vec3f.cpp" />
+    <ClCompile Include="property_vec3f_base.cpp" />
+    <ClCompile Include="property_vec3f_reference.cpp" />
+    <ClCompile Include="window_ide.cpp" />
+    <ClCompile Include="window_ide_serialize.cpp" />
+    <ClCompile Include="window_levels.cpp" />
+    <ClCompile Include="window_tree_values.cpp" />
+    <ClCompile Include="window_view.cpp" />
+    <ClCompile Include="window_weather.cpp" />
+    <ClCompile Include="window_weather_editor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\editor\engine.hpp" />
+    <ClInclude Include="..\..\Include\editor\ide.hpp" />
+    <ClInclude Include="..\..\Include\editor\interfaces.hpp" />
+    <ClInclude Include="..\..\Include\editor\property_holder_base.hpp" />
+    <ClInclude Include="engine_include.hpp" />
+    <ClInclude Include="ide_impl.hpp" />
+    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="property_boolean.hpp" />
+    <ClInclude Include="property_boolean_reference.hpp" />
+    <ClInclude Include="property_boolean_values_value.hpp" />
+    <ClInclude Include="property_boolean_values_value_reference.hpp" />
+    <ClInclude Include="property_collection.hpp" />
+    <ClInclude Include="property_collection_base.hpp" />
+    <ClInclude Include="property_collection_converter.hpp" />
+    <ClInclude Include="property_collection_editor.hpp" />
+    <ClInclude Include="property_collection_enumerator.hpp" />
+    <ClInclude Include="property_collection_getter.hpp" />
+    <ClInclude Include="property_color.hpp" />
+    <ClInclude Include="property_color_base.hpp" />
+    <ClInclude Include="property_color_reference.hpp" />
+    <ClInclude Include="property_container.hpp" />
+    <ClInclude Include="property_container_converter.hpp" />
+    <ClInclude Include="property_container_holder.hpp" />
+    <ClInclude Include="property_converter_boolean_values.hpp" />
+    <ClInclude Include="property_converter_color.hpp" />
+    <ClInclude Include="property_converter_float.hpp" />
+    <ClInclude Include="property_converter_float_enum.hpp" />
+    <ClInclude Include="property_converter_integer_enum.hpp" />
+    <ClInclude Include="property_converter_integer_values.hpp" />
+    <ClInclude Include="property_converter_string_values.hpp" />
+    <ClInclude Include="property_converter_tree_values.hpp" />
+    <ClInclude Include="property_converter_vec3f.hpp" />
+    <ClInclude Include="property_editor_color.hpp" />
+    <ClInclude Include="property_editor_file_name.hpp" />
+    <ClInclude Include="property_editor_tree_values.hpp" />
+    <ClInclude Include="property_file_name_value.hpp" />
+    <ClInclude Include="property_file_name_value_base.hpp" />
+    <ClInclude Include="property_file_name_value_shared_str.hpp" />
+    <ClInclude Include="property_float.hpp" />
+    <ClInclude Include="property_float_enum_value.hpp" />
+    <ClInclude Include="property_float_enum_value_reference.hpp" />
+    <ClInclude Include="property_float_limited.hpp" />
+    <ClInclude Include="property_float_limited_reference.hpp" />
+    <ClInclude Include="property_float_reference.hpp" />
+    <ClInclude Include="property_holder.hpp" />
+    <ClInclude Include="property_holder_include.hpp" />
+    <ClInclude Include="property_integer.hpp" />
+    <ClInclude Include="property_integer_enum_value.hpp" />
+    <ClInclude Include="property_integer_enum_value_reference.hpp" />
+    <ClInclude Include="property_integer_limited.hpp" />
+    <ClInclude Include="property_integer_limited_reference.hpp" />
+    <ClInclude Include="property_integer_reference.hpp" />
+    <ClInclude Include="property_integer_values_value.hpp" />
+    <ClInclude Include="property_integer_values_value_base.hpp" />
+    <ClInclude Include="property_integer_values_value_getter.hpp" />
+    <ClInclude Include="property_integer_values_value_reference.hpp" />
+    <ClInclude Include="property_integer_values_value_reference_getter.hpp" />
+    <ClInclude Include="property_property_container.hpp" />
+    <ClInclude Include="property_string.hpp" />
+    <ClInclude Include="property_string_shared_str.hpp" />
+    <ClInclude Include="property_string_values_value.hpp" />
+    <ClInclude Include="property_string_values_value_base.hpp" />
+    <ClInclude Include="property_string_values_value_getter.hpp" />
+    <ClInclude Include="property_string_values_value_shared_str.hpp" />
+    <ClInclude Include="property_string_values_value_shared_str_getter.hpp" />
+    <ClInclude Include="property_vec3f.hpp" />
+    <ClInclude Include="property_vec3f_base.hpp" />
+    <ClInclude Include="property_vec3f_reference.hpp" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="window_ide.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_levels.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_tree_values.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_view.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_weather.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="window_weather_editor.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="images\color_picker.cur" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="xrWeatherEditor.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="window_ide.resx">
+      <DependentUpon>window_ide.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_levels.resx">
+      <DependentUpon>window_levels.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_tree_values.resx">
+      <DependentUpon>window_tree_values.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_view.resx">
+      <DependentUpon>window_view.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_weather.resx">
+      <DependentUpon>window_weather.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="window_weather_editor.resx">
+      <DependentUpon>window_weather_editor.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)editors\xrSdkControls\xrSdkControls.csproj">
+      <Project>{e9dc16a3-d0fa-4924-af6e-f6fdf3ea0661}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrWeatherEngine\xrWeatherEngine.vcxproj">
+      <Project>{fabd5bbf-ea6f-4633-a34f-95cdc553ca36}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\OpenXRay.natvis" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" />
+    <Import Project="..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets'))" />
+    <Error Condition="!Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets'))" />
+  </Target>
+</Project>

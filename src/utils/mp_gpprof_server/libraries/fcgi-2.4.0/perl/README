@@ -1,0 +1,64 @@
+$Id: README,v 1.7 2001/10/04 08:08:34 skimo Exp $
+
+    Copyright (c) 1996 Open Market, Inc.
+    See the file "LICENSE.TERMS" for information on usage and redistribution
+    of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+
+    Copyright (c) 1996-1998 Sven Verdoolaege
+    No additional restrictions/warranties.
+
+This is a Fast CGI module for perl. It's based on the FCGI module
+that comes with Open Market's FastCGI Developer's Kit, but does
+not require you to recompile perl.
+
+It even no longer requires perl to be compiled with sfio.
+To compile with sfio you'll need at least perl 5.003_02 and you'll have
+to have configured it with eg './Configure -Duseperlio -Dusesfio'.
+(See the INSTALL file that comes with the perl distribution.)
+To compile without sfio you'll need an even more recent perl version.
+(perl 5.004 and up should be fine.)
+
+See http://www.fastcgi.com/ for more information about fastcgi.
+Lincoln D. Stein's perl CGI module also contains some information
+about fastcgi programming.
+
+See echo.fpl for an example on how to use this module.
+
+To install, do the usual
+
+perl Makefile.PL
+make
+make install
+
+If you want to use the (experimental) pure perl version, that
+doesn't require a compiler and currently only works on Unix,
+you have to pass the --pure-perl option as in
+"perl Makefile.PL --pure-perl".
+
+Note that the pure version does not support Window's Named Pipes.
+Support for Named Pipes is not a requirement of the FastCGI specification.
+Named Pipes are used by mod_fastcgi and the FastCGI application library as a
+replacement for Unix sockets.  mod_fastcgi uses Named Pipes on Windows (Unix
+sockets on Unix) by default (see the mod_fastcgi docs for more information).
+
+If you want the module to use a previously installed fcgi library
+instead of the included files, use the --use-installed option,
+optionally followed by the name of the directory in which it can 
+be found.
+
+To configure the library Makefile.PL will run ./configure .
+You may want to run it yourself beforehand because its findings
+may not always be correct.
+The configure.readme file describes how to run ./configure (and only that).
+
+If you're on a solaris system and your installed fcgi library is 2.02b
+or earlier, you'll probably want to use the included files.
+
+The old interface of the FCGI module installs die and warn 
+handlers that merely print the error/warning to STDERR (the 
+default handlers print directly to stderr, which isn't redirected 
+in the non sfio case). I'm not very happy with the result. 
+Suggestions welcome.
+
+Sven Verdoolaege
+skimo@kotnet.org

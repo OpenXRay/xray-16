@@ -1,0 +1,53 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "sake"=.\sake.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/sake
+    .
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "saketest"=.\saketest\saketest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/sake/saketest
+    .\saketest
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+    begin source code control
+    $/Gamespy/GOA/sake
+    .
+    end source code control
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

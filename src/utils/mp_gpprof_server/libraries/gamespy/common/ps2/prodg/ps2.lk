@@ -1,0 +1,88 @@
+;       SN Systems default linker script for PS2.
+;       Updated for libraries 1.6.0 by Gil
+
+;       Default libraries. (Supply others on the command line.)
+
+        inclib  libc.a
+        inclib  libkernl.a
+        inclib  libgcc.a
+        inclib  libm.a
+
+
+;      The heap size and stack details are defined here.
+
+_heap_size      equ     0xffffffff
+_stack  equ     0xffffffff
+_stack_size     equ     0x00100000
+
+
+;       Groups represent entries in the output ELF's program headers table.
+;       Each contains one or more sections.
+;       A group only appears in the PHDRS table if it is named and has
+;       nonzero size.
+
+
+;       This group is for the program's code and initialised data.
+
+        org 0x00100000
+
+text    group
+
+        sectalign 8
+        section .text,text
+        section .vutext,text
+
+        sectalign 16
+        section .data,text
+        section.128 .vudata,text
+        section .rodata,text
+        section .rdata,text
+        section .gcc_except_table,text
+
+;       Collect everything else which is part of the image here.
+;       (Subsequent section directives get a chance to collect contents first.)
+
+        section *,text
+
+;       Set the GP register's value.
+;       The total size of these sections (from .lit8 to .scommon) cannot
+;       exceed 64K.
+
+_gp     equ     __lit8_obj+0x7FF0
+
+        section .lit8,text
+        section .lit4,text
+        section .sdata,text
+
+
+;       This group is for uninitialised data
+
+bss     group   bss
+
+
+;       This is the start marker for the startup code's zeroing routine.
+
+_fbss   equ     _bss_obj
+
+;       These sections are to be zeroised by crt0.o.
+
+        section .sbss,bss
+        section .scommon,bss
+        section .bss,bss
+        section.128 .vubss,bss
+
+
+;       This is crt0.o's marker for the start of the heap.
+
+_end    equ     _bss_objend
+
+
+;       This group is for the scratchpad.
+
+        org 0x70000000
+
+spad    group
+
+        sectalign 4
+
+        section .spad,spad

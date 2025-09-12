@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\xray.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <AssemblyName>xrSdkControls</AssemblyName>
+    <RootNamespace>XRay.SdkControls</RootNamespace>
+    <ProjectGuid>{E9DC16A3-D0FA-4924-AF6E-F6FDF3EA0661}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <OutputPath>$(xrBinDir)</OutputPath>
+    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Mixed'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Flobbster.Windows.Forms.PropertyGrid">
+      <HintPath>$(xrSdkDir)binaries\Flobbster.Windows.Forms.PropertyGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\NumericSlider\NumericSlider.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\NumericSlider\NumericSlider.Designer.cs">
+      <DependentUpon>NumericSlider.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MenuButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\ColorPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\ColorPicker.Designer.cs">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\IntegerUpDown\IntegerUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\IntegerUpDown\IntegerUpDownAcceleration.cs" />
+    <Compile Include="Controls\IntegerUpDown\IntegerUpDownAccelerationCollection.cs" />
+    <Compile Include="Controls\ColorSampleBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\IntegerSlider\IntegerSlider.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\IntegerSlider\IntegerSlider.Designer.cs">
+      <DependentUpon>IntegerSlider.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NumericSpinner\NumericSpinner.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\NumericSpinner\NumericSpinner.designer.cs">
+      <DependentUpon>NumericSpinner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PropertyGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeNode\TreeNode.cs" />
+    <Compile Include="Controls\Interfaces\ITreeViewSource.cs" />
+    <Compile Include="Controls\TreeViewFilterPanel\TreeViewFilterPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeViewFilterPanel\TreeViewFilterPanel.Designer.cs">
+      <DependentUpon>TreeViewFilterPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeViewSearchPanel\TreeViewSearchPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeViewSearchPanel\TreeViewSearchPanel.Designer.cs">
+      <DependentUpon>TreeViewSearchPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeViewCallbacks.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeView.Designer.cs">
+      <DependentUpon>TreeView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeViewSelection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Controls\Interfaces\IPropertyContainer.cs" />
+    <Compile Include="Controls\Interfaces\IIncrementable.cs" />
+    <Compile Include="Controls\Interfaces\IMouseListener.cs" />
+    <Compile Include="Controls\Interfaces\IProperty.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\ColorPicker\ColorPicker.resx">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\NumericSlider\NumericSlider.resx">
+      <DependentUpon>NumericSlider.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\IntegerSlider\IntegerSlider.resx">
+      <DependentUpon>IntegerSlider.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\NumericSpinner\NumericSpinner.resx">
+      <DependentUpon>NumericSpinner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TreeViewFilterPanel\TreeViewFilterPanel.resx">
+      <DependentUpon>TreeViewFilterPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TreeViewSearchPanel\TreeViewSearchPanel.resx">
+      <DependentUpon>TreeViewSearchPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
