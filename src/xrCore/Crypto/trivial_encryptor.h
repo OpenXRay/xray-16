@@ -26,11 +26,11 @@ private:
     key m_key;
 
 public:
+    key_flag m_current_key = key_flag::russian;
     const key m_key_russian;
     const key m_key_worldwide;
 
 private:
-    key_flag m_current_key;
 
     type m_alphabet[alphabet_size];
     type m_alphabet_back[alphabet_size];

@@ -78,9 +78,14 @@ void CUIPdaWnd::Init()
 
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
-    UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
-    m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
-    m_caption_const = (m_caption->GetText());
+    UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this, false);
+
+    if (ShadowOfChernobylMode)
+        m_caption = UIHelper::CreateStatic(uiXml, "timer_frame_line:title", this); // no caption tag in SOC
+    else
+        m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this); // no caption tag in SOC
+
+    m_caption_const = m_caption ? m_caption->GetText() : "";
     m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
@@ -91,11 +96,17 @@ void CUIPdaWnd::Init()
         CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, anim_static);
     }
 
-    m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
+    if (ShadowOfChernobylMode)
+        m_btn_close = UIHelper::Create3tButton(uiXml, "off_button", this);
+    else
+        m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
+
     m_btn_close->SetAccelerator(kUI_BACK, false, 2);
     UI().Focus().UnregisterFocusable(m_btn_close);
 
-    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
+
+    if (!ShadowOfChernobylMode)
+        m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
 
     if (IsGameTypeSingle())
     {
@@ -368,8 +379,9 @@ void CUIPdaWnd::DrawHint()
         pUIMapWnd->DrawHint();
     else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
         pUIRankingWnd->DrawHint();
-
-    m_hint_wnd->Draw();
+    
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
 }
 
 bool CUIPdaWnd::NeedCursor() const

@@ -172,8 +172,12 @@ void SFillPropData::load()
     std::sort(character_profiles.begin(), character_profiles.end(), SortStringsByAlphabetPred);
 #endif // AI_COMPILER
 
-    luabind::object table;
+    if (ShadowOfChernobylMode) {
+        Msg("![ERROR] SHADOW OF CHERNOBYL DOESN'T HAVE this smart_covers.descriptions!!!");
+        return;
+    }
 
+    luabind::object table;
     R_ASSERT(GEnv.ScriptEngine->function_object("smart_covers.descriptions", table, LUA_TTABLE));
 
     for (luabind::iterator I(table), E; I != E; ++I)

@@ -854,7 +854,7 @@ float CUIHudStatesWnd::get_zone_cur_power(ALife::EHitType hit_type)
 void CUIHudStatesWnd::DrawZoneIndicators()
 {
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor)
+    if (!actor || ShadowOfChernobylMode)
         return;
 
     UpdateIndicators(actor);
