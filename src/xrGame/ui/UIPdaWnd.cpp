@@ -28,13 +28,14 @@
 #include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIEventsWnd.h"
+#include "UIEncyclopediaWnd.h"
 #include "UIScriptWnd.h"
 
 #define PDA_XML "pda.xml"
 
 u32 g_pda_info_state = 0;
 
-void RearrangeTabButtons(CUITabControl* pTab);
 CDialogHolder* CurrentDialogHolder();
 
 CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
@@ -44,6 +45,8 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUIFactionWarWnd = nullptr;
     pUIActorInfo = nullptr;
     pUIRankingWnd = nullptr;
+    pUIEncyclopediaWnd = nullptr;
+    pUIEventsWnd = nullptr;
     pUILogsWnd = nullptr;
     m_hint_wnd = nullptr;
     Init();
@@ -63,7 +66,12 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUIRankingWnd);
     if (pUILogsWnd)
         delete_data(pUILogsWnd);
-    delete_data(m_hint_wnd);
+    if (pUIEventsWnd)
+        delete_data(pUIEventsWnd);
+    if (pUIEncyclopediaWnd)
+        delete_data(pUIEncyclopediaWnd);
+    if (m_hint_wnd)
+        delete_data(m_hint_wnd);
     if (UINoice)
         delete_data(UINoice);
 }
@@ -81,7 +89,7 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this, false);
 
     if (ShadowOfChernobylMode)
-        m_caption = UIHelper::CreateStatic(uiXml, "timer_frame_line:title", this); // no caption tag in SOC
+        m_caption = UIHelper::CreateStatic(uiXml, "timer_frame_line", this);
     else
         m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this); // no caption tag in SOC
 
@@ -105,34 +113,54 @@ void CUIPdaWnd::Init()
     UI().Focus().UnregisterFocusable(m_btn_close);
 
 
-    if (!ShadowOfChernobylMode)
+    if (ShadowOfChernobylMode)
+        m_hint_wnd = UIHelper::CreateHint(uiXml, "left_frame", false);
+    else
         m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
 
     if (IsGameTypeSingle())
     {
-        pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
-        if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
-            xr_delete(pUIMapWnd);
 
-        pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
-        if (!pUITaskWnd->Init())
-            xr_delete(pUITaskWnd);
+        if (ShadowOfChernobylMode)
+        {
+            pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
+            if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
+                xr_delete(pUIMapWnd);
 
-        pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
-        if (!pUIFactionWarWnd->Init())
-            xr_delete(pUIFactionWarWnd);
+            pUIEventsWnd = xr_new<CUIEventsWnd>();
+            if (!pUIEventsWnd->Init())
+                xr_delete(pUIEventsWnd);
 
-        pUIActorInfo = xr_new<CUIActorInfoWnd>();
-        if (!pUIActorInfo->Init())
-            xr_delete(pUIActorInfo);
+            pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
+            if (!pUIEncyclopediaWnd->Init())
+                xr_delete(pUIEncyclopediaWnd);
+        }
+        else {
 
-        pUIRankingWnd = xr_new<CUIRankingWnd>();
-        if (!pUIRankingWnd->Init())
-            xr_delete(pUIRankingWnd);
+            pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
+            if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
+                xr_delete(pUIMapWnd);
 
-        pUILogsWnd = xr_new<CUILogsWnd>();
-        if (!pUILogsWnd->Init())
-            xr_delete(pUILogsWnd);
+            pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
+            if (!pUITaskWnd->Init())
+                xr_delete(pUITaskWnd);
+
+            pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
+            if (!pUIFactionWarWnd->Init())
+                xr_delete(pUIFactionWarWnd);
+
+            pUIActorInfo = xr_new<CUIActorInfoWnd>();
+            if (!pUIActorInfo->Init())
+                xr_delete(pUIActorInfo);
+
+            pUIRankingWnd = xr_new<CUIRankingWnd>();
+            if (!pUIRankingWnd->Init())
+                xr_delete(pUIRankingWnd);
+
+            pUILogsWnd = xr_new<CUILogsWnd>();
+            if (!pUILogsWnd->Init())
+                xr_delete(pUILogsWnd);
+        }
     }
 
     UITabControl = xr_new<CUITabControl>();
@@ -179,6 +207,7 @@ void CUIPdaWnd::Init()
         RearrangeTabButtons(UITabControl);
 }
 
+
 void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     switch (msg)
@@ -186,24 +215,20 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     case TAB_CHANGED:
     {
         if (pWnd == UITabControl)
-        {
-            const auto& id = UITabControl->GetActiveId();
-            SetActiveSubdialog(id);
-        }
+            SetActiveSubdialog(UITabControl->GetActiveId());
         break;
     }
     case BUTTON_CLICKED:
     {
         if (pWnd == m_btn_close)
-        {
             HideDialog();
-        }
         break;
     }
     default:
     {
         if (m_pActiveDialog)
             m_pActiveDialog->SendMessage(pWnd, msg, pData);
+        break;
     }
     };
 }
@@ -267,12 +292,13 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 
     const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
     {
-        { "eptMap",         pUIMapWnd },
-        { "eptTasks",       pUITaskWnd },
-        { "eptFractionWar", pUIFactionWarWnd },
-        { "eptStatistics",  pUIActorInfo },
-        { "eptRanking",     pUIRankingWnd },
-        { "eptLogs",        pUILogsWnd },
+        { "eptMap",             pUIMapWnd },
+        { "eptTasks",           pUITaskWnd },
+        { "eptFractionWar",     pUIFactionWarWnd },
+        { "eptStatistics",      pUIActorInfo },
+        { "eptRanking",         pUIRankingWnd },
+        { "eptLogs",            pUILogsWnd },
+        { "eptEncyclopedia",    pUIEventsWnd },
     };
 
     for (const auto& [id, wnd] : availableWindowsList)
@@ -398,9 +424,7 @@ void CUIPdaWnd::UpdatePda()
         pUILogsWnd->UpdateNews();
 
     if (m_pActiveDialog == pUITaskWnd && pUITaskWnd)
-    {
         pUITaskWnd->ReloadTaskInfo();
-    }
 }
 
 void CUIPdaWnd::UpdateRankingWnd()
@@ -428,7 +452,7 @@ void CUIPdaWnd::Reset()
 }
 
 void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }
-void RearrangeTabButtons(CUITabControl* pTab)
+void CUIPdaWnd::RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();
 

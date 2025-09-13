@@ -64,7 +64,7 @@ CUIMapWnd::~CUIMapWnd()
     g_map_wnd = NULL;
 }
 
-bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical /*= true*/)
+bool CUIMapWnd::Init(cpcstr xml_name, cpcstr start_from, bool critical)
 {
     CUIXml uiXml;
     if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, xml_name, critical))

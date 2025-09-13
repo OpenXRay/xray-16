@@ -1,5 +1,6 @@
 #pragma once
 #include "UIWindow.h"
+#include "../Static/UIStatic.h"
 
 class XRUICORE_API CUIFrameLineWnd : public CUIWindow, public ITextureOwner
 {
@@ -58,7 +59,8 @@ public:
     pcstr GetDebugType() override { return "CUIFrameLineWnd"; }
     bool FillDebugTree(const CUIDebugState& debugState) override;
     void FillDebugInfo() override;
-
+    CUIStatic* UITitleText;
+    CUIStatic* GetTitleStatic() { return UITitleText; };
 protected:
     bool inc_pos(Frect& rect, int counter, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
     void DrawElements();

@@ -18,6 +18,8 @@ class CUIActorInfoWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
+class CUIEncyclopediaWnd;
+class CUIEventsWnd;
 class UIHint;
 
 class CUIPdaWnd final : public CUIDialogWnd
@@ -45,6 +47,8 @@ public:
     // Поддиалоги PDA
     CUIMapWnd* pUIMapWnd;
     CUITaskWnd* pUITaskWnd;
+    CUIEncyclopediaWnd* pUIEncyclopediaWnd;
+    CUIEventsWnd* pUIEventsWnd;
     CUIFactionWarWnd* pUIFactionWarWnd;
     CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
@@ -80,6 +84,7 @@ public:
     void Show_MapWnd(bool status);
     void Show_ContactsWnd(bool status);
     void DrawUpdatedSections();
+    void RearrangeTabButtons(CUITabControl* pTab);
 
     void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
     CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }
