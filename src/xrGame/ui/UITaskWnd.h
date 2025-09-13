@@ -109,7 +109,6 @@ public:
     virtual void Update();
     virtual void OnMouseScroll(float iDirection);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
-    virtual void MarkSelected(bool b);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
     void Init(CUIXml& uiXml, LPCSTR path);
@@ -144,7 +143,7 @@ public:
     CUITaskRootItem(CUIEventsWnd* w);
     virtual ~CUITaskRootItem();
     virtual void Update();
-    virtual void SetGameTask(CGameTask* gt);
+    virtual void SetGameTask(CGameTask* gt, u16 ob);
     void __stdcall OnSwitchDescriptionClicked(CUIWindow*, void*);
 
     virtual void MarkSelected(bool b);
@@ -170,7 +169,7 @@ public:
     CUITaskSubItem(CUIEventsWnd* w);
     virtual ~CUITaskSubItem();
     virtual void Update();
-    virtual void SetGameTask(CGameTask* gt);
+    virtual void SetGameTask(CGameTask* gt, u16 ob);
     void OnActiveObjectiveClicked();
     void __stdcall OnShowDescriptionClicked(CUIWindow*, void*);
     virtual void MarkSelected(bool b);

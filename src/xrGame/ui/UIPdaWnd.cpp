@@ -134,6 +134,10 @@ void CUIPdaWnd::Init()
             pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
             if (!pUIEncyclopediaWnd->Init())
                 xr_delete(pUIEncyclopediaWnd);
+
+            pUIActorInfo = xr_new<CUIActorInfoWnd>();
+            if (!pUIActorInfo->Init())
+                xr_delete(pUIActorInfo);
         }
         else {
 
@@ -298,7 +302,8 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         { "eptStatistics",      pUIActorInfo },
         { "eptRanking",         pUIRankingWnd },
         { "eptLogs",            pUILogsWnd },
-        { "eptEncyclopedia",    pUIEventsWnd },
+        { "eptEncyclopedia",    pUIEncyclopediaWnd },
+        { "eptContacts", pUIEventsWnd}
     };
 
     for (const auto& [id, wnd] : availableWindowsList)

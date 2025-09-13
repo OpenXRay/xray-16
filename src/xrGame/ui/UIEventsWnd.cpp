@@ -173,12 +173,12 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
             if (i == 0)
             {
                 CUITaskRootItem* pTaskItem = xr_new<CUITaskRootItem>(this);
-                pTaskItem->SetGameTask(task);
+                pTaskItem->SetGameTask(task, i);
                 m_ListWnd->AddWindow(pTaskItem, true);
             }
             else {
                 CUITaskSubItem* pTaskItem = xr_new<CUITaskSubItem>(this);
-                pTaskItem->SetGameTask(task);
+                pTaskItem->SetGameTask(task, i);
                 m_ListWnd->AddWindow(pTaskItem, true);
             }
         }
@@ -201,11 +201,11 @@ bool CUIEventsWnd::Filter(CGameTask* t)
     switch (m_currFilter)
     {
     case CUIEventsWnd::eActiveTask:
-        return task_state == eTaskStateInProgress;
+        return task_state & eTaskStateInProgress;
     case CUIEventsWnd::eAccomplishedTask:
-        return task_state == eTaskStateCompleted;
+        return task_state & eTaskStateCompleted;
     case CUIEventsWnd::eFailedTask:
-        return task_state == eTaskStateFail;
+        return task_state & eTaskStateFail;
     case CUIEventsWnd::eMaxTask:
         return false;
     default:
@@ -289,7 +289,7 @@ void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
     int sz = m_ListWnd->GetSize();
     for (int i = 0; i < sz; ++i)
     {
-        CUITaskItem* itm = (CUITaskItem*)m_ListWnd->GetItem(i);
+        CUITaskSubItem* itm = (CUITaskSubItem*)m_ListWnd->GetItem(i);
         if (itm->OwnerTask() == t && itm->OwnerTask()->ActiveObjective().m_idx == idx)
             itm->MarkSelected(true);
         else

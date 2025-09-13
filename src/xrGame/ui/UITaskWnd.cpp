@@ -487,9 +487,6 @@ void CUITaskItem::Update()
 }
 
 void CUITaskItem::OnMouseScroll(float iDirection) {}
-void CUITaskItem::MarkSelected(bool b) {
-    //m_pStoryLineTaskItem->SetButtonMode(b ? CUIButton::BUTTON_PUSHED : CUIButton::BUTTON_NORMAL);
-}
 bool CUITaskItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     if (inherited::OnMouseAction(x, y, mouse_action))
@@ -566,12 +563,12 @@ void CUITaskRootItem::Init(CUIXml& xml, LPCSTR path)
     xml_init.Init3tButton(uiXml, "task_root_item:switch_description_btn", 0, m_switchDescriptionBtn);
 }
 
-void CUITaskRootItem::SetGameTask(CGameTask* gt)
+void CUITaskRootItem::SetGameTask(CGameTask* gt, u16 obj_id)
 {
     inherited::InitTask(gt);
 
     CStringTable		stbl;
-    SGameTaskObjective obj = OwnerTask()->ActiveObjective();
+    SGameTaskObjective obj = OwnerTask()->Objective(obj_id);
 
     m_taskImage->InitTexture(*OwnerTask()->m_icon_texture_name);
 
@@ -700,7 +697,6 @@ void CUITaskSubItem::Init(CUIXml& xml, LPCSTR path)
 
     AddCallback(m_showDescriptionBtn, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskSubItem::OnShowDescriptionClicked));
 
-
     CUIXmlInit xml_init;
     xml_init.InitWindow(uiXml, "task_sub_item", 0, this);
     xml_init.InitStatic(uiXml, "task_sub_item:state_image", 0, m_stateStatic);
@@ -714,12 +710,12 @@ void CUITaskSubItem::Init(CUIXml& xml, LPCSTR path)
     m_accomplished_color = xml_init.GetColor(uiXml, "task_sub_item:description:text_colors:accomplished", 0, 0x00);
 }
 
-void CUITaskSubItem::SetGameTask(CGameTask* gt)
+void CUITaskSubItem::SetGameTask(CGameTask* gt, u16 obj_id)
 {
     inherited::InitTask(gt);
 
     CStringTable		stbl;
-    SGameTaskObjective obj = OwnerTask()->ActiveObjective();
+    SGameTaskObjective obj = OwnerTask()->Objective(obj_id);
 
     m_descriptionStatic->SetText(*stbl.translate(obj.m_Description));
     m_descriptionStatic->AdjustHeightToText();
