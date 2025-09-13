@@ -293,28 +293,17 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         UIMainPdaFrame->SetKeyboardCapture(nullptr, true);
         m_pActiveDialog->Show(false);
     }
-
-    const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
-    {
-        { "eptMap",             pUIMapWnd },
-        { "eptTasks",           pUITaskWnd },
-        { "eptFractionWar",     pUIFactionWarWnd },
-        { "eptStatistics",      pUIActorInfo },
-        { "eptRanking",         pUIRankingWnd },
-        { "eptLogs",            pUILogsWnd },
-    };
-
-    const std::tuple<shared_str, CUIWindow*> availableWindowsList_SOC[] =
-    {
-        {"eptTasks", pUIEventsWnd},
-        {"eptMap", pUIMapWnd},
-        {"eptDiary", pUIEncyclopediaWnd},
-        {"eptContacts", pUIEncyclopediaWnd},
-        {"eptStalkersRanking", pUIEncyclopediaWnd},
-        {"eptStatistics", pUIActorInfo},
-        {"eptEncyclopedia", pUIEncyclopediaWnd},
-    };
     if (ShadowOfChernobylMode) {
+        const std::tuple<shared_str, CUIWindow*> availableWindowsList_SOC[] =
+        {
+            {"eptTasks", pUIEventsWnd},
+            {"eptMap", pUIMapWnd},
+            {"eptDiary", pUIEncyclopediaWnd},
+            {"eptContacts", pUIEncyclopediaWnd},
+            {"eptStalkersRanking", pUIEncyclopediaWnd},
+            {"eptStatistics", pUIActorInfo},
+            {"eptEncyclopedia", pUIEncyclopediaWnd},
+        };
         for (const auto& [id, wnd] : availableWindowsList_SOC)
         {
             if (section == id && wnd)
@@ -325,6 +314,15 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         }
     }
     else {
+        const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
+        {
+            { "eptMap",             pUIMapWnd },
+            { "eptTasks",           pUITaskWnd },
+            { "eptFractionWar",     pUIFactionWarWnd },
+            { "eptStatistics",      pUIActorInfo },
+            { "eptRanking",         pUIRankingWnd },
+            { "eptLogs",            pUILogsWnd },
+        };
         for (const auto& [id, wnd] : availableWindowsList)
         {
             if (section == id && wnd)

@@ -65,30 +65,27 @@ CInventory::CInventory()
     m_slots.emplace_back(CInventorySlot{});
 
     // Dynamically create as many slots as we may define in system.ltx
-    u16 i = 0;
-    do
+    u32 maxSlot = 0;
+    for (u32 i = 0; i < slotsCount + 1; ++i)
     {
-        ++i;
-
         string256 slot_persistent;
         string256 slot_active;
         xr_sprintf(slot_persistent, "slot_persistent_%d", i);
         xr_sprintf(slot_active,     "slot_active_%d",     i);
 
-        if (!pSettings->line_exist("inventory", slot_persistent))
-        {
-            --i;
-            break;
+        if (pSettings->line_exist("inventory", slot_persistent)) {
+
+            const bool isPersistent = pSettings->r_bool("inventory", slot_persistent);
+            const bool isActive = pSettings->read_if_exists<bool>("inventory", slot_active,
+                ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
+
+            m_slots.emplace_back(CInventorySlot{ nullptr, isPersistent, isActive });
+            maxSlot = i;
         }
+    }
 
-        const bool isPersistent = pSettings->r_bool("inventory", slot_persistent);
-        const bool isActive = pSettings->read_if_exists<bool>("inventory", slot_active,
-            ShadowOfChernobylMode ? defaultSlotActiveness[i] : false);
+    m_iLastSlot = maxSlot;
 
-        m_slots.emplace_back(CInventorySlot{ nullptr, isPersistent, isActive });
-    } while (true);
-
-    m_iLastSlot = i;
 #ifndef MASTER_GOLD
     if (m_iLastSlot != slotsCount)
     {
