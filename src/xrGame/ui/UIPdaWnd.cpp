@@ -302,16 +302,36 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         { "eptStatistics",      pUIActorInfo },
         { "eptRanking",         pUIRankingWnd },
         { "eptLogs",            pUILogsWnd },
-        { "eptEncyclopedia",    pUIEncyclopediaWnd },
-        { "eptContacts", pUIEventsWnd}
     };
 
-    for (const auto& [id, wnd] : availableWindowsList)
+    const std::tuple<shared_str, CUIWindow*> availableWindowsList_SOC[] =
     {
-        if (section == id && wnd)
+        {"eptTasks", pUIEventsWnd},
+        {"eptMap", pUIMapWnd},
+        {"eptDiary", pUIEncyclopediaWnd},
+        {"eptContacts", pUIEncyclopediaWnd},
+        {"eptStalkersRanking", pUIEncyclopediaWnd},
+        {"eptStatistics", pUIActorInfo},
+        {"eptEncyclopedia", pUIEncyclopediaWnd},
+    };
+    if (ShadowOfChernobylMode) {
+        for (const auto& [id, wnd] : availableWindowsList_SOC)
         {
-            m_pActiveDialog = wnd;
-            break;
+            if (section == id && wnd)
+            {
+                m_pActiveDialog = wnd;
+                break;
+            }
+        }
+    }
+    else {
+        for (const auto& [id, wnd] : availableWindowsList)
+        {
+            if (section == id && wnd)
+            {
+                m_pActiveDialog = wnd;
+                break;
+            }
         }
     }
 
