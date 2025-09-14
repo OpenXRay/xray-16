@@ -22,6 +22,9 @@
         dSINGLE;
         WIN32;
         USE_OPENSSL;
+        IMGUI_DISABLE_OBSOLETE_KEYIO;
+        IMGUI_DISABLE_OBSOLETE_FUNCTIONS;
+        IMGUI_DEFINE_MATH_OPERATORS;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
