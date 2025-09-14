@@ -1,294 +1,293 @@
-<?xml version="1.0" encoding="windows-1250" ?>
+<?xml version="1.0" encoding="windows-1252" ?>
 <string_table>
 	<string id="st_unload_magazine_after_pickup">
-		<text>Po sebrání automaticky vyložit zbraň</text>
+		<text>Scarica automaticamente l'arma dopo la raccolta</text>
 	</string>
 	<string id="st_unload_magazine_all">
-		<text>Vyložit všechny zbraně</text>
+		<text>Scarica tutte le armi</text>
 	</string>
 	<string id="st_unequip">
-		<text>Odstranit výbavu</text>
+		<text>Desequipaggia</text>
 	</string>
 	<string id="st_donate">
-		<text>Darovat</text>
+		<text>Donazione</text>
 	</string>
 	<string id="st_loading_lights">
-		<text>Načítání světel</text>
+		<text>Caricamento luci</text>
 	</string>
 	<string id="st_client_connecting_to">
-		<text>KLIENT: Připojování k</text>
+		<text>CLIENT: Connessione a</text>
 	</string>
 	<string id="st_client_spawning">
-		<text>KLIENT: Objevování</text>
+		<text>CLIENT: Generazione</text>
 	</string>
 	<string id="st_client_synchronising">
-		<text>KLIENT: Synchronizace</text>
+		<text>CLIENT: Sincronizzazione</text>
 	</string>
 	<string id="st_creating_new_game">
-		<text>Vytváření nové hry</text>
+		<text>Creazione di una nuova partita</text>
 	</string>
 	<string id="ui_mm_always_active">
-		<text>Nepozastavovat při Alt+Tab</text>
+		<text>Non mettere in pausa con Alt+Tab</text>
 	</string>
 	<string id="ui_mm_detail_radius">
-		<text>Poloměr detailu trávy</text>
+		<text>Raggio dettaglio erba</text>
 	</string>
 	<string id="ui_mm_ui_style">
-		<text>Styl rozhraní</text>
+		<text>Stile interfaccia</text>
 	</string>
 	<string id="ui_style_default">
 		<text>Call of Pripyat</text>
 	</string>
 	<string id="ui_mm_simplified_item_pickup">
-		<text>Zjednodušené sbírání předmětů</text>
+		<text>Raccolta oggetti semplificata</text>
 	</string>
 	<string id="ui_mm_multi_item_pickup">
-		<text>Hromadné sbírání předmětů</text>
+		<text>Raccolta multipla di oggetti</text>
 	</string>
 	<string id="ui_mm_loadingstages">
-		<text>Zobrazit fáze načítání</text>
+		<text>Mostra fasi di caricamento</text>
 	</string>
 	<string id="renderer_rgl">
-		<text>Pokročilé dynamické osvětlení (OpenGL)</text>
+		<text>Illuminazione dinamica avanzata (OpenGL)</text>
 	</string>
 	<string id="ui_mm_window_mode">
-		<text>Režim okna</text>
+		<text>Modalitŕ finestra</text>
 	</string>
 	<string id="st_opt_windowed">
-		<text>Okno</text>
+		<text>Finestra</text>
 	</string>
 	<string id="st_opt_windowed_borderless">
-		<text>Okno bez okrajů</text>
+		<text>Finestra senza bordi</text>
 	</string>
 	<string id="st_opt_fullscreen">
-		<text>Celá obrazovka</text>
+		<text>Schermo intero</text>
 	</string>
 	<string id="st_opt_fullscreen_borderless">
-		<text>Celá obrazovka (rychlé Alt+Tab)</text>
+		<text>Schermo intero (Alt+Tab veloce)</text>
 	</string>
 	<string id="ui_mm_r2_smap_size">
-		<text>Kvalita stínů</text>
+		<text>Qualitŕ ombre</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
-		<text>Blízké mokré povrchy</text>
+		<text>Superfici bagnate vicino</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
-		<text>Vzdálené mokré povrchy</text>
+		<text>Superfici bagnate lontano</text>
 	</string>
 	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
-		<text>Kvalita mokrých povrchů</text>
+		<text>Qualitŕ superfici bagnate</text>
 	</string>
 	<string id="ui_mm_fov">
-		<text>Úhel pohledu</text>
+		<text>Campo visivo (FoV)</text>
 	</string>
 	<string id="ui_mm_hud_fov">
-		<text>Úhel pohledu HUD</text>
+		<text>Angolo di visuale dell'interfaccia (Hud FoV)</text>
 	</string>
 	<string id="ui_mm_localization">
-		<text>Jazyk</text>
+		<text>Lingua</text>
 	</string>
 	<string id="ui_mm_gamepad_setup">
-		<text>Nastavení gamepadu</text>
+		<text>Configurazione gamepad</text>
 	</string>
 	<string id="ui_mm_fps_limit">
-		<text>Limit FPS ve hře</text>
+		<text>Limite FPS in gioco</text>
 	</string>
 	<string id="ui_mm_fps_limit_in_menu">
-		<text>Limit FPS v menu</text>
+		<text>Limite FPS nel menu</text>
 	</string>
 	<string id="ui_mm_shader_preset">
-		<text>Grafický režim</text>
+		<text>Modalitŕ grafica</text>
 	</string>
 	<string id="ui_mm_shader_preset_vanilla">
-		<text>původní</text>
+		<text>originale</text>
 	</string>
 	<string id="ui_mm_shader_preset_enhanced_default">
-		<text>vylepšený (výchozí)</text>
+		<text>migliorata (Predefinita)</text>
 	</string>
 	<string id="ui_mm_shader_preset_enhanced_high">
-		<text>vylepšený (vysoký)</text>
+		<text>migliorata (Alta)</text>
 	</string>
 	<string id="ui_mm_color_grading_preset">
-		<text>Barevná korekce</text>
+		<text>Correzione colore</text>
 	</string>
 	<string id="ui_mm_color_grading_default">
-		<text>výchozí</text>
+		<text>predefinita</text>
 	</string>
 	<string id="ui_mm_color_grading_cold">
-		<text>chladná</text>
+		<text>fredda</text>
 	</string>
 	<string id="ui_mm_color_grading_filmic_01">
-		<text>Filmová 1</text>
+		<text>Cinematica 1</text>
 	</string>
 	<string id="ui_mm_color_grading_filmic_02">
-		<text>Filmová 2</text>
+		<text>Cinematica 2</text>
 	</string>
 	<string id="ui_mm_color_grading_filmic_03">
-		<text>Filmová 3</text>
+		<text>Cinematica 3</text>
 	</string>
 	<string id="ui_mm_color_grading_hollywood">
 		<text>Hollywood</text>
 	</string>
 	<string id="ui_mm_color_grading_vanilla">
-		<text>Původní</text>
+		<text>Originale</text>
 	</string>
 	<string id="ui_mm_color_grading_vibrant">
-		<text>Vibrant</text>
+		<text>Vivace</text>
 	</string>
 	<string id="ui_mm_color_grading_warm">
-		<text>Teplá</text>
+		<text>calda</text>
 	</string>
-	
+
 	<string id="cze">
-    	<text>Čeština (Czech)</text>
+    	<text>Ceco (Czech)</text>
 	</string>
 	<string id="eng">
-		<text>Angličtina (English)</text>
+		<text>Inglese (English)</text>
 	</string>
 	<string id="fra">
-		<text>Francouzština (French)</text>
+		<text>Francese (French)</text>
 	</string>
 	<string id="ger">
-		<text>Němčina (German)</text>
+		<text>Tedesco (German)</text>
 	</string>
 	<string id="ita">
-		<text>Italština (Italian)</text>
+		<text>Italiano (Italian)</text>
 	</string>
 	<string id="jpn">
-		<text>Japonština (Japanese)</text>
+		<text>Giapponese (Japanese)</text>
 	</string>
 	<string id="pol">
-		<text>Polština (Polish)</text>
+		<text>Polacco (Polish)</text>
 	</string>
 	<string id="rus">
-		<text>Ruština (Russian)</text>
+		<text>Russo (Russian)</text>
 	</string>
 	<string id="spa">
-		<text>Španělština (Spanish)</text>
+		<text>Spagnolo (Spanish)</text>
 	</string>
 	<string id="ukr">
-		<text>Ukrajinština (Ukrainian)</text>
+		<text>Ucraino (Ukrainian)</text>
 	</string>
 
 <string id="kb_grp_ui">
-    <text>Rozhraní</text>
+	<text>Interfaccia</text>
 </string>
 <string id="kb_pda_map_move_left">
-    <text>Posunout mapu doleva</text>
+	<text>Sposta mappa a sinistra</text>
 </string>
 <string id="kb_pda_map_move_right">
-    <text>Posunout mapu doprava</text>
+	<text>Sposta mappa a destra</text>
 </string>
 <string id="kb_pda_map_move_up">
-    <text>Posunout mapu nahoru</text>
+	<text>Sposta mappa in alto</text>
 </string>
 <string id="kb_pda_map_move_down">
-    <text>Posunout mapu dolů</text>
+	<text>Sposta mappa in basso</text>
 </string>
 <string id="kb_pda_map_zoom_in">
-    <text>Přiblížit mapu</text>
+	<text>Zoom avanti sulla mappa</text>
 </string>
 <string id="kb_pda_map_zoom_out">
-    <text>Oddálit mapu</text>
+	<text>Zoom indietro sulla mappa</text>
 </string>
 <string id="kb_pda_map_zoom_reset">
-    <text>Výchozí přiblížení</text>
+	<text>Zoom predefinito</text>
 </string>
 <string id="kb_pda_map_show_actor">
-    <text>Přiblížit k hráči</text>
+	<text>Centra sul giocatore</text>
 </string>
 <string id="kb_pda_map_show_legend">
-    <text>Zobrazit legendu</text>
+	<text>Mostra legenda</text>
 </string>
 <string id="kb_pda_filter_toggle">
-    <text>Filtr</text>
+	<text>Filtro</text>
 </string>
 <string id="kb_ui_move_left">
-    <text>Posunout rozhraní doleva</text>
+	<text>Sposta interfaccia a sinistra</text>
 </string>
 <string id="kb_ui_move_right">
-    <text>Posunout rozhraní doprava</text>
+	<text>Sposta interfaccia a destra</text>
 </string>
 <string id="kb_ui_move_up">
-    <text>Posunout rozhraní nahoru</text>
+	<text>Sposta interfaccia in alto</text>
 </string>
 <string id="kb_ui_move_down">
-    <text>Posunout rozhraní dolů</text>
+	<text>Sposta interfaccia in basso</text>
 </string>
 <string id="kb_ui_accept">
-    <text>Přijmout</text>
+	<text>Accetta</text>
 </string>
 <string id="kb_ui_back">
-    <text>Zpět</text>
+	<text>Indietro</text>
 </string>
 <string id="kb_ui_action_1">
-    <text>Akce 1</text>
+	<text>Azione 1</text>
 </string>
 <string id="kb_ui_action_2">
-    <text>Akce 2</text>
+	<text>Azione 2</text>
 </string>
 <string id="kb_ui_tab_prev">
-    <text>Předchozí záložka</text>
+	<text>Tab precedente</text>
 </string>
 <string id="kb_ui_tab_next">
-    <text>Další záložka</text>
+	<text>Tab successivo</text>
 </string>
 <string id="kb_talk_switch_to_trade">
-    <text>Obchod/oprava</text>
+	<text>Commercio / Riparazione</text>
 </string>
 <string id="kb_talk_log_scroll_up">
-    <text>Posunout dialog nahoru</text>
+	<text>Scorri dialogo verso l’alto</text>
 </string>
 <string id="kb_talk_log_scroll_down">
-    <text>Posunout dialog dolů</text>
+	<text>Scorri dialogo verso il basso</text>
 </string>
 <string id="kb_editor">
-    <text>Editor</text>
+	<text>Editor</text>
 </string>
 <string id="kb_cam_1">
-    <text>Pohled z první osoby</text>
+	<text>Visuale in prima persona</text>
 </string>
 <string id="kb_cam_2">
-    <text>Pohled ze třetí osoby</text>
+	<text>Visuale in terza persona</text>
 </string>
 <string id="kb_cam_3">
-    <text>Pohled ze třetí osoby (volný pohled)</text>
+	<text>Visuale in terza persona (libera)</text>
 </string>
 <string id="kb_cam_zoom_in">
-    <text>Přiblížit kameru</text>
+	<text>Avvicina telecamera</text>
 </string>
 <string id="kb_cam_zoom_out">
-    <text>Oddálit kameru</text>
+	<text>Allontana telecamera</text>
 </string>
 <string id="kb_talk_log_scroll">
-    <text>Posunout dialog</text>
+	<text>Scorri dialogo</text>
 </string>
 <string id="kb_pda_map_move">
-    <text>Posunout mapu</text>
+	<text>Sposta mappa</text>
 </string>
 <string id="kb_ui_move">
-    <text>Posunout rozhraní</text>
+	<text>Sposta interfaccia</text>
 </string>
 <string id="kb_ui_move_secondary">
-    <text>Posunout vedlejší rozhraní</text>
+	<text>Sposta interfaccia secondaria</text>
 </string>
 <string id="kb_cam_autoaim">
-    <text>Automatické zaměřování</text>
+	<text>Mira automatica</text>
 </string>
 <string id="kb_ui_click_1">
-    <text>Levý klik</text>
+	<text>Click sinistro</text>
 </string>
 <string id="kb_ui_click_2">
-    <text>Pravý klik</text>
+	<text>Click destro</text>
 </string>
 <string id="gp_look_around">
-    <text>Otáčet kamerou</text>
+	<text>Osservare</text>
 </string>
 <string id="gp_move_around">
-    <text>Pohyb</text>
+	<text>Muoversi</text>
 </string>
 <string id="kb_enter">
-    <text>Přijmout</text>
+	<text>Accetta</text>
 </string>
-
 </string_table>

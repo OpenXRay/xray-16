@@ -135,6 +135,7 @@
 	<string id="ui_mm_color_grading_warm">
 		<text>Ciep³a</text>
 	</string>
+
 	<string id="cze">
     	<text>Czeski (Czech)</text>
 	</string>
@@ -147,11 +148,11 @@
 	<string id="ger">
 		<text>Niemiecki (German)</text>
 	</string>
-	<string id="jpn">
-    	<text>Japoñski (Japanese)</text>
-	</string>
 	<string id="ita">
 		<text>W³oski (Italian)</text>
+	</string>
+	<string id="jpn">
+    	<text>Japoñski (Japanese)</text>
 	</string>
 	<string id="pol">
 		<text>Polski (Polish)</text>
@@ -165,4 +166,125 @@
 	<string id="ukr">
     	<text>Ukraiñski (Ukrainian)</text>
 	</string>
+
+<string id="kb_grp_ui">
+	<text>Interfejs</text>
+</string>
+<string id="kb_pda_map_move_left">
+	<text>Przesuñ mapê w lewo</text>
+</string>
+<string id="kb_pda_map_move_right">
+	<text>Przesuñ mapê w prawo</text>
+</string>
+<string id="kb_pda_map_move_up">
+	<text>Przesuñ mapê w górê</text>
+</string>
+<string id="kb_pda_map_move_down">
+	<text>Przesuñ mapê w dó³</text>
+</string>
+<string id="kb_pda_map_zoom_in">
+	<text>Przybli¿ mapê</text>
+</string>
+<string id="kb_pda_map_zoom_out">
+	<text>Oddal mapê</text>
+</string>
+<string id="kb_pda_map_zoom_reset">
+	<text>Domyœlne przybli¿enie</text>
+</string>
+<string id="kb_pda_map_show_actor">
+	<text>Przybli¿ do gracza</text>
+</string>
+<string id="kb_pda_map_show_legend">
+	<text>Poka¿ legendê</text>
+</string>
+<string id="kb_pda_filter_toggle">
+	<text>Filtr</text>
+</string>
+<string id="kb_ui_move_left">
+	<text>Przesuñ interfejs w lewo</text>
+</string>
+<string id="kb_ui_move_right">
+	<text>Przesuñ interfejs w prawo</text>
+</string>
+<string id="kb_ui_move_up">
+	<text>Przesuñ interfejs w górê</text>
+</string>
+<string id="kb_ui_move_down">
+	<text>Przesuñ interfejs w dó³</text>
+</string>
+<string id="kb_ui_accept">
+	<text>Akceptuj</text>
+</string>
+<string id="kb_ui_back">
+	<text>Wstecz</text>
+</string>
+<string id="kb_ui_action_1">
+	<text>Akcja 1</text>
+</string>
+<string id="kb_ui_action_2">
+	<text>Akcja 2</text>
+</string>
+<string id="kb_ui_tab_prev">
+	<text>Poprzednia zak³adka</text>
+</string>
+<string id="kb_ui_tab_next">
+	<text>Nastêpna zak³adka</text>
+</string>
+<string id="kb_talk_switch_to_trade">
+	<text>Handel / naprawa</text>
+</string>
+<string id="kb_talk_log_scroll_up">
+	<text>Przewiñ dialog w górê</text>
+</string>
+<string id="kb_talk_log_scroll_down">
+	<text>Przewiñ dialog w dó³</text>
+</string>
+<string id="kb_editor">
+	<text>Edytor</text>
+</string>
+<string id="kb_cam_1">
+	<text>Widok z pierwszej osoby</text>
+</string>
+<string id="kb_cam_2">
+	<text>Widok z trzeciej osoby</text>
+</string>
+<string id="kb_cam_3">
+	<text>Widok z trzeciej osoby (wolny obrót)</text>
+</string>
+<string id="kb_cam_zoom_in">
+	<text>Przybli¿ kamerê</text>
+</string>
+<string id="kb_cam_zoom_out">
+	<text>Oddal kamerê</text>
+</string>
+<string id="kb_talk_log_scroll">
+	<text>Przewiñ dialog</text>
+</string>
+<string id="kb_pda_map_move">
+	<text>Przesuñ mapê</text>
+</string>
+<string id="kb_ui_move">
+	<text>Przesuñ interfejs</text>
+</string>
+<string id="kb_ui_move_secondary">
+	<text>Przesuñ dodatkowy interfejs</text>
+</string>
+<string id="kb_cam_autoaim">
+	<text>Auto-celowanie</text>
+</string>
+<string id="kb_ui_click_1">
+	<text>Lewy przycisk myszy</text>
+</string>
+<string id="kb_ui_click_2">
+	<text>Prawy przycisk myszy</text>
+</string>
+<string id="gp_look_around">
+	<text>Obrót kamery</text>
+</string>
+<string id="gp_move_around">
+	<text>Poruszanie siê</text>
+</string>
+<string id="kb_enter">
+	<text>Akceptuj</text>
+</string>
 </string_table>

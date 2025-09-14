@@ -138,6 +138,7 @@
 	<string id="ui_mm_color_grading_warm">
 		<text>warm</text>
 	</string>
+
 	<string id="cze">
     	<text>Czech</text>
 	</string>
@@ -168,4 +169,125 @@
 	<string id="ukr">
 		<text>Ukrainian</text>
 	</string>
+
+<string id="kb_grp_ui">
+	<text>Interface</text>
+</string>
+<string id="kb_pda_map_move_left">
+	<text>Move map left</text>
+</string>
+<string id="kb_pda_map_move_right">
+	<text>Move map right</text>
+</string>
+<string id="kb_pda_map_move_up">
+	<text>Move map up</text>
+</string>
+<string id="kb_pda_map_move_down">
+	<text>Move map down</text>
+</string>
+<string id="kb_pda_map_zoom_in">
+	<text>Zoom in map</text>
+</string>
+<string id="kb_pda_map_zoom_out">
+	<text>Zoom out map</text>
+</string>
+<string id="kb_pda_map_zoom_reset">
+	<text>Default zoom</text>
+</string>
+<string id="kb_pda_map_show_actor">
+	<text>Zoom to player</text>
+</string>
+<string id="kb_pda_map_show_legend">
+	<text>Show legend</text>
+</string>
+<string id="kb_pda_filter_toggle">
+	<text>Filter</text>
+</string>
+<string id="kb_ui_move_left">
+	<text>Move interface left</text>
+</string>
+<string id="kb_ui_move_right">
+	<text>Move interface right</text>
+</string>
+<string id="kb_ui_move_up">
+	<text>Move interface up</text>
+</string>
+<string id="kb_ui_move_down">
+	<text>Move interface down</text>
+</string>
+<string id="kb_ui_accept">
+	<text>Accept</text>
+</string>
+<string id="kb_ui_back">
+	<text>Back</text>
+</string>
+<string id="kb_ui_action_1">
+	<text>Action 1</text>
+</string>
+<string id="kb_ui_action_2">
+	<text>Action 2</text>
+</string>
+<string id="kb_ui_tab_prev">
+	<text>Previous tab</text>
+</string>
+<string id="kb_ui_tab_next">
+	<text>Next tab</text>
+</string>
+<string id="kb_talk_switch_to_trade">
+	<text>Trade / repair</text>
+</string>
+<string id="kb_talk_log_scroll_up">
+	<text>Scroll dialog up</text>
+</string>
+<string id="kb_talk_log_scroll_down">
+	<text>Scroll dialog down</text>
+</string>
+<string id="kb_editor">
+	<text>Editor</text>
+</string>
+<string id="kb_cam_1">
+	<text>First-person view</text>
+</string>
+<string id="kb_cam_2">
+	<text>Third-person view</text>
+</string>
+<string id="kb_cam_3">
+	<text>Third-person view (free look)</text>
+</string>
+<string id="kb_cam_zoom_in">
+	<text>Zoom in camera</text>
+</string>
+<string id="kb_cam_zoom_out">
+	<text>Zoom out camera</text>
+</string>
+<string id="kb_talk_log_scroll">
+	<text>Scroll dialog</text>
+</string>
+<string id="kb_pda_map_move">
+	<text>Move map</text>
+</string>
+<string id="kb_ui_move">
+	<text>Move interface</text>
+</string>
+<string id="kb_ui_move_secondary">
+	<text>Move secondary interface</text>
+</string>
+<string id="kb_cam_autoaim">
+	<text>Auto-aim</text>
+</string>
+<string id="kb_ui_click_1">
+	<text>Left mouse button</text>
+</string>
+<string id="kb_ui_click_2">
+	<text>Right mouse button</text>
+</string>
+<string id="gp_look_around">
+	<text>Look around</text>
+</string>
+<string id="gp_move_around">
+	<text>Movement</text>
+</string>
+<string id="kb_enter">
+	<text>Accept</text>
+</string>
 </string_table>

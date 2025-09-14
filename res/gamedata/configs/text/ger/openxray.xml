@@ -129,6 +129,7 @@
 	<string id="ui_mm_color_grading_warm">
 		<text>warm</text>
 	</string>
+
 	<string id="cze">
     	<text>Tschechisch (Czech)</text>
 	</string>
@@ -143,6 +144,9 @@
 	</string>
 	<string id="ita">
 		<text>Italienisch (Italian)</text>
+	</string>
+	<string id="jpn">
+		<text>Japanisch (Japanese)</text>
 	</string>
 	<string id="pol">
 		<text>Polnisch (Polish)</text>
@@ -159,10 +163,125 @@
 	<string id="ukr">
 		<text>Ukrainisch (Ukrainian)</text>
 	</string>
-	<string id="jpn">
-		<text>Japanisch (Japanese)</text>
-	</string>
-	<string id="ukr">
-		<text>Ukrainische (Ukrainian)</text>
-	</string>
+
+<string id="kb_grp_ui">
+	<text>Benutzeroberfläche</text>
+</string>
+<string id="kb_pda_map_move_left">
+	<text>Karte nach links bewegen</text>
+</string>
+<string id="kb_pda_map_move_right">
+	<text>Karte nach rechts bewegen</text>
+</string>
+<string id="kb_pda_map_move_up">
+	<text>Karte nach oben bewegen</text>
+</string>
+<string id="kb_pda_map_move_down">
+	<text>Karte nach unten bewegen</text>
+</string>
+<string id="kb_pda_map_zoom_in">
+	<text>Karte vergrößern</text>
+</string>
+<string id="kb_pda_map_zoom_out">
+	<text>Karte verkleinern</text>
+</string>
+<string id="kb_pda_map_zoom_reset">
+	<text>Standardzoom</text>
+</string>
+<string id="kb_pda_map_show_actor">
+	<text>Zum Spieler zoomen</text>
+</string>
+<string id="kb_pda_map_show_legend">
+	<text>Legende anzeigen</text>
+</string>
+<string id="kb_pda_filter_toggle">
+	<text>Filter</text>
+</string>
+<string id="kb_ui_move_left">
+	<text>Interface nach links bewegen</text>
+</string>
+<string id="kb_ui_move_right">
+	<text>Interface nach rechts bewegen</text>
+</string>
+<string id="kb_ui_move_up">
+	<text>Interface nach oben bewegen</text>
+</string>
+<string id="kb_ui_move_down">
+	<text>Interface nach unten bewegen</text>
+</string>
+<string id="kb_ui_accept">
+	<text>Bestätigen</text>
+</string>
+<string id="kb_ui_back">
+	<text>Zurück</text>
+</string>
+<string id="kb_ui_action_1">
+	<text>Aktion 1</text>
+</string>
+<string id="kb_ui_action_2">
+	<text>Aktion 2</text>
+</string>
+<string id="kb_ui_tab_prev">
+	<text>Vorheriger Tab</text>
+</string>
+<string id="kb_ui_tab_next">
+	<text>Nächster Tab</text>
+</string>
+<string id="kb_talk_switch_to_trade">
+	<text>Handel / Reparatur</text>
+</string>
+<string id="kb_talk_log_scroll_up">
+	<text>Dialog nach oben scrollen</text>
+</string>
+<string id="kb_talk_log_scroll_down">
+	<text>Dialog nach unten scrollen</text>
+</string>
+<string id="kb_editor">
+	<text>Editor</text>
+</string>
+<string id="kb_cam_1">
+	<text>Sicht aus der ersten Person</text>
+</string>
+<string id="kb_cam_2">
+	<text>Sicht aus der dritten Person</text>
+</string>
+<string id="kb_cam_3">
+	<text>Sicht aus der dritten Person (freier Blick)</text>
+</string>
+<string id="kb_cam_zoom_in">
+	<text>Kamera vergrößern</text>
+</string>
+<string id="kb_cam_zoom_out">
+	<text>Kamera verkleinern</text>
+</string>
+<string id="kb_talk_log_scroll">
+	<text>Dialog scrollen</text>
+</string>
+<string id="kb_pda_map_move">
+	<text>Karte bewegen</text>
+</string>
+<string id="kb_ui_move">
+	<text>Interface bewegen</text>
+</string>
+<string id="kb_ui_move_secondary">
+	<text>Sekundäres Interface bewegen</text>
+</string>
+<string id="kb_cam_autoaim">
+	<text>Autozielen</text>
+</string>
+<string id="kb_ui_click_1">
+	<text>Linke Maustaste</text>
+</string>
+<string id="kb_ui_click_2">
+	<text>Rechte Maustaste</text>
+</string>
+<string id="gp_look_around">
+	<text>Umsehen</text>
+</string>
+<string id="gp_move_around">
+	<text>Bewegen</text>
+</string>
+<string id="kb_enter">
+	<text>Bestätigen</text>
+</string>
 </string_table>

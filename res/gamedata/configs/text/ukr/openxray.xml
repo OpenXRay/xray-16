@@ -144,6 +144,7 @@
 	<string id="ui_mm_color_grading_warm">
 		<text>тепла</text>
 	</string>
+
 	<string id="cze">
     	<text>Чеська (Czech)</text>
 	</string>
@@ -159,6 +160,9 @@
 	<string id="ita">
 		<text>Італійська (Italian)</text>
 	</string>
+	<string id="jpn">
+		<text>Японська (Japanese)</text>
+	</string>
 	<string id="pol">
 		<text>Польська (Polish)</text>
 	</string>
@@ -171,7 +175,125 @@
 	<string id="ukr">
 		<text>Українська (Ukrainian)</text>
 	</string>
-	<string id="jpn">
-		<text>Японська (Japanese)</text>
-	</string>
+
+<string id="kb_grp_ui">
+	<text>Інтерфейс</text>
+</string>
+<string id="kb_pda_map_move_left">
+	<text>Рухати мапу вліво</text>
+</string>
+<string id="kb_pda_map_move_right">
+	<text>Рухати мапу вправо</text>
+</string>
+<string id="kb_pda_map_move_up">
+	<text>Рухати мапу вгору</text>
+</string>
+<string id="kb_pda_map_move_down">
+	<text>Рухати мапу вниз</text>
+</string>
+<string id="kb_pda_map_zoom_in">
+	<text>Наблизити мапу</text>
+</string>
+<string id="kb_pda_map_zoom_out">
+	<text>Віддалити мапу</text>
+</string>
+<string id="kb_pda_map_zoom_reset">
+	<text>Стандартне наближення</text>
+</string>
+<string id="kb_pda_map_show_actor">
+	<text>Наблизити до гравця</text>
+</string>
+<string id="kb_pda_map_show_legend">
+	<text>Показати легенду</text>
+</string>
+<string id="kb_pda_filter_toggle">
+	<text>Фільтр</text>
+</string>
+<string id="kb_ui_move_left">
+	<text>Рухати інтерфейс вліво</text>
+</string>
+<string id="kb_ui_move_right">
+	<text>Рухати інтерфейс вправо</text>
+</string>
+<string id="kb_ui_move_up">
+	<text>Рухати інтерфейс вгору</text>
+</string>
+<string id="kb_ui_move_down">
+	<text>Рухати інтерфейс вниз</text>
+</string>
+<string id="kb_ui_accept">
+	<text>Прийняти</text>
+</string>
+<string id="kb_ui_back">
+	<text>Назад</text>
+</string>
+<string id="kb_ui_action_1">
+	<text>Дія 1</text>
+</string>
+<string id="kb_ui_action_2">
+	<text>Дія 2</text>
+</string>
+<string id="kb_ui_tab_prev">
+	<text>Попередня вкладка</text>
+</string>
+<string id="kb_ui_tab_next">
+	<text>Наступна вкладка</text>
+</string>
+<string id="kb_talk_switch_to_trade">
+	<text>Торгівля / ремонт</text>
+</string>
+<string id="kb_talk_log_scroll_up">
+	<text>Гортати діалог вгору</text>
+</string>
+<string id="kb_talk_log_scroll_down">
+	<text>Гортати діалог вниз</text>
+</string>
+<string id="kb_editor">
+	<text>Редактор</text>
+</string>
+<string id="kb_cam_1">
+	<text>Вид від першої особи</text>
+</string>
+<string id="kb_cam_2">
+	<text>Вид від третьої особи</text>
+</string>
+<string id="kb_cam_3">
+	<text>Вид від третьої особи (вільний огляд)</text>
+</string>
+<string id="kb_cam_zoom_in">
+	<text>Наблизити камеру</text>
+</string>
+<string id="kb_cam_zoom_out">
+	<text>Віддалити камеру</text>
+</string>
+<string id="kb_talk_log_scroll">
+	<text>Гортати діалог</text>
+</string>
+<string id="kb_pda_map_move">
+	<text>Рухати мапу</text>
+</string>
+<string id="kb_ui_move">
+	<text>Рухати інтерфейс</text>
+</string>
+<string id="kb_ui_move_secondary">
+	<text>Рухати другорядний інтерфейс</text>
+</string>
+<string id="kb_cam_autoaim">
+	<text>Автоприцілювання</text>
+</string>
+<string id="kb_ui_click_1">
+	<text>Ліва кнопка миші</text>
+</string>
+<string id="kb_ui_click_2">
+	<text>Права кнопка миші</text>
+</string>
+<string id="gp_look_around">
+	<text>Огляд</text>
+</string>
+<string id="gp_move_around">
+	<text>Пересування</text>
+</string>
+<string id="kb_enter">
+	<text>Прийняти</text>
+</string>
 </string_table>
