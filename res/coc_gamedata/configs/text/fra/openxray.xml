@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<string_table>
+	<string id="st_unload_magazine_after_pickup">
+		<text>Décharger automatiquement l'arme après ramassage</text>
+	</string>
+	<string id="st_unload_magazine_all">
+		<text>Décharger toutes les armes</text>
+	</string>
+	<string id="st_unequip">
+		<text>Déséquiper</text>
+	</string>
+	<string id="st_donate">
+		<text>Don</text>
+	</string>
+	<string id="st_loading_lights">
+		<text>Chargement des lumières</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>CLIENT : Connexion en cours</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>CLIENT : Apparition</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>CLIENT : Synchronisation</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Création d'une nouvelle partie</text>
+	</string>
+	<string id="ui_mm_always_active">
+		<text>Ne pas mettre en pause avec Alt+Tab</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Rayon de détail de l'herbe</text>
+	</string>
+	<string id="ui_mm_ui_style">
+		<text>Style d'interface</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Chernobyl</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Ramassage simplifié des objets</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Ramassage multiple</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Afficher les étapes de chargement</text>
+	</string>
+	<string id="renderer_rgl">
+		<text>Éclairage dynamique avancé (OpenGL)</text>
+	</string>
+	<string id="ui_mm_window_mode">
+		<text>Mode fenêtré</text>
+	</string>
+	<string id="st_opt_windowed">
+		<text>Fenêtré</text>
+	</string>
+	<string id="st_opt_windowed_borderless">
+		<text>Fenêtré sans bordure</text>
+	</string>
+	<string id="st_opt_fullscreen">
+		<text>Plein écran</text>
+	</string>
+	<string id="st_opt_fullscreen_borderless">
+		<text>Plein écran (Alt+Tab rapide)</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Qualité des ombres</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Surfaces mouillées proches</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Surfaces mouillées lointaines</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Qualité des surfaces mouillées</text>
+	</string>
+	<string id="ui_mm_fov">
+		<text>Champ de vision (FoV)</text>
+	</string>
+	<string id="ui_mm_hud_fov">
+		<text>Angle de vue de l'interface (Hud FoV)</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Langue</text>
+	</string>
+	<string id="ui_mm_gamepad_setup">
+		<text>Configuration de la manette</text>
+	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Limite de FPS en jeu</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Limite de FPS dans les menus</text>
+	</string>
+	<string id="ui_mm_shader_preset">
+		<text>Mode graphique</text>
+	</string>
+	<string id="ui_mm_shader_preset_vanilla">
+		<text>Original</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_default">
+		<text>Amélioré (Par défaut)</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_high">
+		<text>Amélioré (Élevé)</text>
+	</string>
+	<string id="ui_mm_color_grading_preset">
+		<text>Correction des couleurs</text>
+	</string>
+	<string id="ui_mm_color_grading_default">
+		<text>Par défaut</text>
+	</string>
+	<string id="ui_mm_color_grading_cold">
+		<text>Froid</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_01">
+		<text>Cinématographique 1</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_02">
+		<text>Cinématographique 2</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_03">
+		<text>Cinématographique 3</text>
+	</string>
+	<string id="ui_mm_color_grading_hollywood">
+		<text>Hollywood</text>
+	</string>
+	<string id="ui_mm_color_grading_vanilla">
+		<text>Original</text>
+	</string>
+	<string id="ui_mm_color_grading_vibrant">
+		<text>Vibrant</text>
+	</string>
+	<string id="ui_mm_color_grading_warm">
+		<text>Chaud</text>
+	</string>
+
+	<string id="cze">
+    	<text>Tchèque (Czech)</text>
+	</string>
+	<string id="eng">
+		<text>Anglais (English)</text>
+	</string>
+	<string id="fra">
+		<text>Français (French)</text>
+	</string>
+	<string id="ger">
+		<text>Allemand (German)</text>
+	</string>
+	<string id="ita">
+		<text>Italien (Italian)</text>
+	</string>
+	<string id="jpn">
+		<text>Japonais (Japanese)</text>
+	</string>
+	<string id="pol">
+		<text>Polonais (Polish)</text>
+	</string>
+	<string id="rus">
+		<text>Russe (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Espagnol (Spanish)</text>
+	</string>
+	<string id="ukr">
+		<text>Ukrainien (Ukrainian)</text>
+	</string>
+
+<string id="kb_grp_ui">
+    <text>Interface</text>
+</string>
+<string id="kb_pda_map_move_left">
+    <text>Déplacer la carte à gauche</text>
+</string>
+<string id="kb_pda_map_move_right">
+    <text>Déplacer la carte à droite</text>
+</string>
+<string id="kb_pda_map_move_up">
+    <text>Déplacer la carte vers le haut</text>
+</string>
+<string id="kb_pda_map_move_down">
+    <text>Déplacer la carte vers le bas</text>
+</string>
+<string id="kb_pda_map_zoom_in">
+    <text>Zoomer sur la carte</text>
+</string>
+<string id="kb_pda_map_zoom_out">
+    <text>Éloigner la carte</text>
+</string>
+<string id="kb_pda_map_zoom_reset">
+    <text>Zoom par défaut</text>
+</string>
+<string id="kb_pda_map_show_actor">
+    <text>Zoom sur le joueur</text>
+</string>
+<string id="kb_pda_map_show_legend">
+    <text>Afficher la légende</text>
+</string>
+<string id="kb_pda_filter_toggle">
+    <text>Filtre</text>
+</string>
+<string id="kb_ui_move_left">
+    <text>Déplacer l'interface à gauche</text>
+</string>
+<string id="kb_ui_move_right">
+    <text>Déplacer l'interface à droite</text>
+</string>
+<string id="kb_ui_move_up">
+    <text>Déplacer l'interface vers le haut</text>
+</string>
+<string id="kb_ui_move_down">
+    <text>Déplacer l'interface vers le bas</text>
+</string>
+<string id="kb_ui_accept">
+    <text>Accepter</text>
+</string>
+<string id="kb_ui_back">
+    <text>Retour</text>
+</string>
+<string id="kb_ui_action_1">
+    <text>Action 1</text>
+</string>
+<string id="kb_ui_action_2">
+    <text>Action 2</text>
+</string>
+<string id="kb_ui_tab_prev">
+    <text>Onglet précédent</text>
+</string>
+<string id="kb_ui_tab_next">
+    <text>Onglet suivant</text>
+</string>
+<string id="kb_talk_switch_to_trade">
+    <text>Commerce / Réparation</text>
+</string>
+<string id="kb_talk_log_scroll_up">
+    <text>Faire défiler le dialogue vers le haut</text>
+</string>
+<string id="kb_talk_log_scroll_down">
+    <text>Faire défiler le dialogue vers le bas</text>
+</string>
+<string id="kb_editor">
+    <text>Éditeur</text>
+</string>
+<string id="kb_cam_1">
+    <text>Vue à la première personne</text>
+</string>
+<string id="kb_cam_2">
+    <text>Vue à la troisième personne</text>
+</string>
+<string id="kb_cam_3">
+    <text>Vue à la troisième personne (libre)</text>
+</string>
+<string id="kb_cam_zoom_in">
+    <text>Zoom caméra</text>
+</string>
+<string id="kb_cam_zoom_out">
+    <text>Dézoomer caméra</text>
+</string>
+<string id="kb_talk_log_scroll">
+    <text>Faire défiler le dialogue</text>
+</string>
+<string id="kb_pda_map_move">
+    <text>Déplacer la carte</text>
+</string>
+<string id="kb_ui_move">
+    <text>Déplacer l'interface</text>
+</string>
+<string id="kb_ui_move_secondary">
+    <text>Déplacer l'interface secondaire</text>
+</string>
+<string id="kb_cam_autoaim">
+    <text>Visée automatique</text>
+</string>
+<string id="kb_ui_click_1">
+    <text>Clic gauche</text>
+</string>
+<string id="kb_ui_click_2">
+    <text>Clic droit</text>
+</string>
+<string id="gp_look_around">
+    <text>Regarder autour</text>
+</string>
+<string id="gp_move_around">
+    <text>Déplacement</text>
+</string>
+<string id="kb_enter">
+    <text>Accepter</text>
+</string>
+</string_table>

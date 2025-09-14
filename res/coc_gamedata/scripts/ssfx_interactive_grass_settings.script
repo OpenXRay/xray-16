@@ -1,0 +1,30 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 16
+-- @ Description: Interactive grass script - Settings
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+-- If you're not using MCM you can customize your settings here --
+
+ssfx_default_settings = 
+{
+	["enable"]				= 1,	-- Enable/Disable interactive grass
+	["enable_player"]		= 1,	-- Enable/Disable Player interaction
+	["enable_mutants"]		= 1,	-- Enable/Disable Mutants shockwaves
+
+	["max_entities"]		= 8,	-- Max quantity of characters/monsters in range and view that interact with grass
+	["max_distance"]		= 2000,	-- Maximum distance to render grass interactions
+
+	["radius"]				= 1,	-- Radius of effect
+	["horizontal_str"]		= 1,	-- Strength of the horizontal displacement
+	["vertical_str"]		= 1,	-- Strength of the vertical displacement
+
+	["explosions_str"]		= 1.0,	-- Strength of the vertical displacement
+	["explosions_speed"]	= 5.0,	-- Shockwave speed
+
+	["shooting_str"]		= 0.3,	-- Strength of the shooting displacement
+	["shooting_range"]		= 2.0,	-- Range of the shooting displacement
+
+	["enable_anomalies"]	= 1,	-- Enable/Disable anomalies interactions
+	["anomalies_distance"]	= 25,	-- Maximum distance to render anomalies interactions
+}
+----------------------------------------------------

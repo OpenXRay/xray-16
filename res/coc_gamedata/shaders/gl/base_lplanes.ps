@@ -1,0 +1,12 @@
+#include "common.h"
+#include "iostructs\p_lplanes.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main ( v2p I )
+{
+	float4	t_base 	= tex2D	(s_base, I.tc0);
+
+	// out
+	return  float4	(t_base.rgb, t_base.a*I.c0.a);
+}

@@ -1,0 +1,262 @@
+#include "anomaly_shaders.h"
+#include "common.h"
+
+#include "lmodel.h"
+#include "hmodel.h"
+
+// Check Addons
+#include "check_screenspace.h"
+
+#ifdef SSFX_BEEFS_NVG
+	#include "night_vision.h"
+#endif
+
+#ifdef SSFX_SSR
+	#include "screenspace_reflections.h"
+#endif
+
+#ifdef SSFX_FOG
+	#include "screenspace_fog.h"
+#endif
+
+Texture2D s_half_depth;
+#include "ssao.ps"
+
+#ifdef HDAO
+#define USE_HDAO 1
+#endif
+
+#ifdef SM_5
+Texture2D<float> s_occ;
+#endif // SM_5
+
+#if SSAO_QUALITY <=3
+#include "ssdo.ps"
+
+#else
+#ifndef USE_HDAO
+#define USE_HDAO
+#endif
+#endif
+
+
+#ifdef USE_HDAO
+#if SSAO_QUALITY > 3
+#include "ssao_hdao_new.ps"
+#endif
+#define USE_HDAO_CODE
+#if SSAO_QUALITY <=3
+#define  g_f2RTSize ( screen_res.xy )
+
+#define g_txDepth s_position
+#define g_txNormal s_position
+
+#include "ssao_hdao.ps"
+#endif
+#else // USE_HDAO
+#ifdef	USE_HBAO
+#include "ssao_hbao.ps"
+#endif	//	USE_HBAO
+#endif // USE_HDAO
+
+
+struct	_input
+{
+	float4	tc0	: TEXCOORD0;	// tc.xy, tc.w = tonemap scale
+	float2	tcJ	: TEXCOORD1;	// jitter coords
+	float4 pos2d : SV_Position;
+};
+
+struct	_out
+{
+	float4	low		: SV_Target0;
+	float4	high	: SV_Target1;
+};
+
+//	TODO:	DX10: Replace Sample with Load
+#ifndef MSAA_OPTIMIZATION
+_out main ( _input I )
+#else
+_out main ( _input I, uint iSample : SV_SAMPLEINDEX )
+#endif
+{
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc0, I.pos2d, ISAMPLE) );
+	
+	// Sample the buffers:
+	float4	P = float4( gbd.P, gbd.mtl );	// position.(mtl or sun)
+	float4	N = float4( gbd.N, gbd.hemi );		// normal.hemi
+	float4	D = float4( gbd.C, gbd.gloss );		// rgb.gloss
+	
+#ifndef USE_MSAA
+	float4	L = s_accumulator.Sample( smp_nofilter, I.tc0);	// diffuse.specular
+#else
+	float4   L = s_accumulator.Load( int3( I.tc0 * screen_res.xy, 0 ), ISAMPLE );
+#endif
+
+#ifndef SSFX_NEWGLOSS
+	if (abs(P.w - MAT_FLORA) <= 0.05) {
+		// Reapply distance factor to fix overtly glossy plants in distance
+		// Unfortunately some trees etc don't seem to use the same detail shader
+		float	fAtten = 1 - smoothstep(0, 50, P.z);
+		D.a	*= (fAtten * fAtten);
+	}
+#endif
+
+	// static sun
+	float mtl = P.w;
+
+#ifdef USE_R2_STATIC_SUN
+	float sun_occ = P.w*2;
+
+	mtl = xmaterial;
+	L += SRGBToLinear(D.rgb * Ldynamic_color.rgb * sun_occ) * plight_infinity	(mtl, P.xyz, N.xyz, D.xyzw, Ldynamic_dir);
+#endif
+
+
+	//  Calculate SSAO
+
+#ifdef USE_MSAA
+	int2	texCoord = I.pos2d;
+#endif
+	
+	float3 occ = float3(1.0,1.0,1.0);
+
+#ifdef USE_HDAO
+#ifdef SM_5
+#if SSAO_QUALITY > 3
+     occ = s_occ.Sample( smp_nofilter, I.tc0);	
+#else // SSAO_QUALITY > 3
+	 occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+#endif // SSAO_QUALITY > 3
+#else // SM_5
+#if SSAO_QUALITY > 3
+	 occ = calc_new_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+#else // SSAO_QUALITY > 3
+	 occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+#endif // SSAO_QUALITY > 3
+#endif // SM_5
+#else // USE_HDAO
+#ifdef USE_HBAO
+	 occ = calc_hbao( P.z, N, I.tc0, I.pos2d );
+#else // USE_HBAO
+	occ = calc_ssdo(P, N, I.tc0, I.pos2d, ISAMPLE);
+#endif
+#endif // USE_HDAO
+
+#ifdef SSAO_QUALITY
+	occ = compute_colored_ao(occ.x, D.xyz);
+#endif
+	
+	//occ.rgb = SRGBToLinear(occ.rgb); 		//gamma correct
+	
+	L.rgb += L.a * SRGBToLinear(D.rgb); //illum in alpha
+	
+	
+	// hemisphere
+	float3 hdiffuse, hspecular;
+	hmodel	(hdiffuse, hspecular, mtl, N.w, D, P.xyz, N.xyz);
+
+	// AO implementation
+#ifdef SSFX_AO
+	hdiffuse *= (1.0f - SRGBToLinear(1.0f - occ) * (1.0f - dot(hdiffuse.rgb, LUMINANCE_VECTOR)));
+#else
+	hdiffuse *= occ;	
+#endif
+	//hspecular *= occ;
+
+		float3       color     = L.rgb + hdiffuse.rgb;
+					 color = LinearTosRGB(color); 			//gamma correct
+
+	// SSR Implementation
+#ifdef SSFX_SSR
+	SSFX_ScreenSpaceReflections(I.tc0, P, N, D.a, color, ISAMPLE);	
+#endif
+
+#ifdef SSFX_BEEFS_NVG
+	//// SOME NVG SHIT ////
+	float lua_param_nvg_generation = floor(shader_param_8.x);			// 1, 2, or 3
+	float lua_param_nvg_num_tubes = frac(shader_param_8.x) * 10.0f;		// 1, 2, 4, 1.1, or 1.2
+	float lua_param_nvg_gain_current = floor(shader_param_8.y) / 10.0f; 
+	float lua_param_vignette_current = floor(shader_param_8.z) / 100.0f;
+
+	// NVG reduces gloss to 0 inside mask	
+	D.a *= (1.0 - compute_lens_mask(aspect_ratio_correction(I.tc0), lua_param_nvg_num_tubes));
+	//// END NVG SHIT ////
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+
+	// here should be distance fog
+#ifdef SSFX_FOG
+	float3 		WorldP			= mul(m_inv_V, float4(P.xyz, 1));
+	float		fog				= SSFX_HEIGHT_FOG(P.xyz, WorldP.y, color);
+#else
+	float		distance		= length		(P.xyz);
+	float		fog				= saturate		(distance*fog_params.w + fog_params.x);
+				color			= lerp			(color,fog_color,fog);
+#endif
+
+	float		skyblend		= saturate		(fog*fog);
+
+	float		tm_scale		= I.tc0.w; // interpolated from VS
+
+	_out		o;
+	
+#ifndef SSFX_BEEFS_NVG
+
+	tonemap(o.low, o.high, color, tm_scale);
+	o.low.a = skyblend;
+	o.high.a = skyblend;
+
+	return o;
+
+#else
+	/////////// BEEFS NVGS CHANGES ///////////
+	if (lua_param_nvg_generation > 0.0f && compute_lens_mask(aspect_ratio_correction(I.tc0), lua_param_nvg_num_tubes) == 1.0f)
+	{
+		float lua_param_nvg_gain_offset = floor(shader_param_8.w) / 10.0f;
+		tonemap(o.low, o.high, color, 10.0f * lua_param_nvg_gain_offset);
+
+		// Turn split tonemapping data to YUV and discard UV
+		o.low.r = dot(o.low.rgb, luma_conversion_coeff);
+		o.high.r = dot(o.high.rgb, luma_conversion_coeff);
+
+		o.low.r *= 4.0f;
+		o.high.r *= 4.0f;
+
+		// Turn s_accumulator data in to YUV and discard UV
+		o.low.g = pow(dot(L.rgb, luma_conversion_coeff),2.0f)*1.3f;
+		o.high.g = o.low.g;
+
+		// Turn albedo into YUV and discard UV
+		o.low.b = dot(D.rgb, luma_conversion_coeff);
+		o.high.b = o.low.b;
+		
+		o.low *= lua_param_nvg_gain_current;
+		o.high *= lua_param_nvg_gain_current;
+			
+		// Extra
+		o.low.a = skyblend;
+		o.high.a = skyblend;
+				
+
+		// APPLY VIGNETTE
+		float vignette = calc_vignette(lua_param_nvg_num_tubes, I.tc0, lua_param_vignette_current+0.02);
+		
+		o.high = clamp(o.high,0.0,1.0);
+		o.low= clamp(o.low,0.0,1.0);
+		
+		o.high.rgb *= vignette;
+		o.low.rgb *= vignette;
+
+	}
+	else
+	{
+		tonemap(o.low, o.high, color, tm_scale);
+		o.low.a = skyblend;
+		o.high.a = skyblend;
+	}		
+	return o;
+#endif
+
+}

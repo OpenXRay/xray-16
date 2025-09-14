@@ -1,0 +1,41 @@
+//#define SM_4_1
+
+#ifdef SM_4_1
+#define sm_gather(tc, offset) textureGatherOffset( s_dmap, tc, offset )
+#else
+float4 sm_gather( float2 tc, int2 offset )
+{
+	const float scale = float( SMAP_size );
+	float2 fc = frac( tc * scale );
+	
+	tc -= fc / scale;
+	
+	float rcp_scale = 1.0 / scale; // you can use SMAP_size in case compiler fails. though, the texel size is different for sm_minmax_gather
+	float s0 = textureLodOffset( s_dmap, rcp_scale * offset + tc, 0, int2( 0, 1 ) ).x;
+	float s1 = textureLodOffset( s_dmap, rcp_scale * offset + tc, 0, int2( 1, 1 ) ).x;
+	float s2 = textureLodOffset( s_dmap, rcp_scale * offset + tc, 0, int2( 1, 0 ) ).x;
+	float s3 = textureLodOffset( s_dmap, rcp_scale * offset + tc, 0, int2( 0, 0 ) ).x;
+	
+	return float4( s0, s1, s2, s3 );
+}
+#endif
+
+#ifdef SM_4_1
+#define sm_minmax_gather(tc, offset) textureGatherOffset(s_smap_minmax, tc, offset)
+#else
+float4 sm_minmax_gather( float2 tc, int2 offset )
+{
+	const float scale = float( SMAP_size ) / 4.0;
+	float2 fc = frac( tc * scale );
+	
+	tc -= fc / scale;
+		
+	float rcp_scale = 1.0 / scale;
+	float s0 = textureLodOffset( s_smap_minmax, rcp_scale * offset + tc, 0, int2(0, 1) ).x;
+	float s1 = textureLodOffset( s_smap_minmax, rcp_scale * offset + tc, 0, int2(1, 1) ).x;
+	float s2 = textureLodOffset( s_smap_minmax, rcp_scale * offset + tc, 0, int2(1, 0) ).x;
+	float s3 = textureLodOffset( s_smap_minmax, rcp_scale * offset + tc, 0, int2(0, 0) ).x;
+	
+	return float4( s0, s1, s2, s3 );
+}
+#endif

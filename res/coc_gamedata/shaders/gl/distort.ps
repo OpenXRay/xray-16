@@ -1,0 +1,20 @@
+#include "common.h"
+
+out vec4 SV_Target;
+
+layout(location = TEXCOORD0) in float2 tc;
+
+uniform sampler2D 	s_distort;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+void main ()
+{
+	float2 distort	= tex2D(s_distort, tc).xy;
+	float2 offset	= (distort-0.5)*def_distort;
+	offset.y		*= -1.0;
+	float3 image	= tex2D(s_base, tc + offset).rgb;
+
+	// out
+	SV_Target		= float4 (image, 1.0);					// +mov
+}

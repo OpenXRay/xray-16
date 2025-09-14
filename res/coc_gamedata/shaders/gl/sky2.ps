@@ -1,0 +1,30 @@
+#include "common.h"
+#include "iostructs\p_sky.h"
+
+TextureCube	s_sky0;
+TextureCube	s_sky1;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+_out _main( v2p I )
+{
+	float3         	s0  	= texCUBE        (s_sky0,I.tc0).rgb;
+	float3         	s1      = texCUBE        (s_sky1,I.tc1).rgb;
+	float3		sky	= I.factor.xyz*lerp( s0, s1, I.factor.w );
+#ifndef USE_SHOC_RESOURCES
+			sky	*= 0.33;
+#endif // !USE_SHOC_RESOURCES
+
+	// final tone-mapping
+	_out		o;
+
+#ifdef USE_VTF
+	o.low        	=	sky.xyzz;
+	o.high        	=	o.low/def_hdr;
+#else // USE_VTF
+	float scale	=	tex2D(s_tonemap, float2(0.5,0.5)).x;
+        tonemap			(o.low, o.high, sky, scale*2.0);
+#endif // USE_VTF
+
+	return        	o;
+}

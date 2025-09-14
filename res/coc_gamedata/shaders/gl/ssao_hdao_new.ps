@@ -1,0 +1,676 @@
+//--------------------------------------------------------------------------------------
+// Gather pattern
+//--------------------------------------------------------------------------------------
+
+//=================================================================================================================================
+// The constant buffer
+//=================================================================================================================================
+
+
+#define  g_f2RTSize ( pos_decompression_params2.xy )
+
+//=================================================================================================================================
+// Textures, Buffers & Samplers
+//=================================================================================================================================
+
+#if ( MSAA_SAMPLES == 2 )
+
+    #define MSAA_SAMPLE_INDEX ( 0 )
+
+#elif ( MSAA_SAMPLES == 4 )
+
+    #define MSAA_SAMPLE_INDEX ( 3 )
+
+#elif ( MSAA_SAMPLES == 8 )
+
+    #define MSAA_SAMPLE_INDEX ( 6 )
+
+#else
+
+    #define MSAA_SAMPLE_INDEX ( 0 )
+
+#endif
+
+#ifdef SM_5_0
+// CS Output buffers
+RWTexture2D<float> g_ResultTexture : register( u0 );
+#endif
+
+#ifdef GBUFFER_OPTIMIZATION
+#define g_txDepth s_position
+#define g_txNormal s_position
+#else
+#define g_txDepth s_position
+#define g_txNormal s_normal
+#endif
+
+// Samplers
+#define g_SamplePoint smp_nofilter
+
+//=================================================================================================================================
+// Hard coded HDAO params
+//=================================================================================================================================
+
+float g_fHDAORejectRadius    = 0.43;	// Camera Z values must fall within the reject and accept radius to be 
+float g_fHDAOAcceptRadius    = 0.0001;  // considered as a valley
+float g_fHDAOIntensity       = 0.5;	    // Simple scaling factor to control the intensity of the occlusion
+float g_fHDAONormalScale     = 0.10;	// Scaling factor to control the effect the normals have 
+float g_fAcceptAngle         = 0.98;	// Used by the ValleyAngle function to determine shallow valleys
+
+//=================================================================================================================================
+// Thread / Group Defines
+//=================================================================================================================================
+
+// Group Defines
+#define GROUP_TEXEL_DIM			( 56 )
+#define GROUP_THREAD_DIM		( 32 ) // 32 * 32 = 1024 threads 
+#define GROUP_TEXEL_OVERLAP		( 12 )
+
+// Texture Op Defines
+#define GATHER_THREADS			( 784 )
+#define GATHER_THREADS_PER_ROW	( 28 )
+#define GATHER_PER_THREAD		( 1 )
+
+// ALU Op Defines
+#define ALU_DIM				    ( 32 )
+
+#ifdef SM_5_0
+
+    //=============================================================================================================================
+    // Group shared memory (LDS)
+    //=============================================================================================================================
+
+    groupshared struct
+    {
+        float fCameraZ[GROUP_TEXEL_DIM][GROUP_TEXEL_DIM];
+    }g_LDS;
+
+
+    //=============================================================================================================================
+    // Helper function to load data from the LDS, given texel coord
+    // NOTE: X and Y are swapped around to ensure horizonatal reading across threads, this avoids
+    // LDS memory bank conflicts
+    //=============================================================================================================================
+    float LoadFromLDS( uint2 u2Texel )
+    {
+	    return g_LDS.fCameraZ[u2Texel.y][u2Texel.x];
+    }
+
+    //=============================================================================================================================
+    // Helper function to store data to the LDS, given texel coord
+    // NOTE: X and Y are swapped around to ensure horizonatal wrting across threads, this avoids
+    // LDS memory bank conflicts
+    //=============================================================================================================================
+    void StoreToLDS( float fValue, uint2 u2Texel )
+    {
+	    g_LDS.fCameraZ[u2Texel.y][u2Texel.x] = fValue;
+    }
+
+#endif
+
+
+//=================================================================================================================================
+// HDAO sample pattern
+//=================================================================================================================================
+
+#if SSAO_QUALITY >= 3
+
+    #define NUM_VALLEYS (48)
+
+    const int2 g_i2HDAOSamplePattern[NUM_VALLEYS] =
+    {
+	    { 0, -11 },
+	    { 2, -10 },
+	    { 0, -9 },
+	    { 5, -9 },
+	    { 2, -8 },
+	    { 7, -8 },
+	    { 0, -7 },
+	    { 5, -7 },
+	    { 2, -6 },
+	    { 7, -6 },
+	    { 8, -6 },
+	    { 0, -5 },
+	    { 5, -5 },
+	    { 10, -5 },
+	    { 2, -4 },
+	    { 7, -4 },
+	    { 0, -3 },
+	    { 5, -3 },
+	    { 10, -3 },
+	    { 2, -2 },
+	    { 7, -2 },
+	    { 0, -1 },
+	    { 5, -1 },
+	    { 10, -1 },
+	    { 2, 0 },
+	    { 7, 0 },
+	    { 5, 1 },
+	    { 10, 1 },
+	    { 2, 2 },
+	    { 7, 2 },
+	    { 5, 3 },
+	    { 10, 3 },
+	    { 2, 4 },
+	    { 7, 4 },
+	    { 5, 5 },
+	    { 10, 5 },
+	    { 2, 6 },
+	    { 7, 6 },
+	    { 5, 7 },
+	    { 6, 7 },
+	    { 10, 7 },
+	    { 2, 8 },
+	    { 7, 8 },
+	    { 5, 9 },
+	    { 2, 10 },
+	    { 7, 10 },
+	    { 5, 11 },
+	    { 2, 12 },
+    };
+
+    const float g_fHDAOSampleWeights[NUM_VALLEYS] = 
+    {
+	    0.1538,
+	    0.2155,
+	    0.3077,
+	    0.2080,
+	    0.3657,
+	    0.1823,
+	    0.4615,
+	    0.3383,
+	    0.5135,
+	    0.2908,
+	    0.2308,
+	    0.6154,
+	    0.4561,
+	    0.1400,
+	    0.6560,
+	    0.3798,
+	    0.7692,
+	    0.5515,
+	    0.1969,
+	    0.7824,
+	    0.4400,
+	    0.9231,
+	    0.6078,
+	    0.2269,
+	    0.8462,
+	    0.4615,
+	    0.6078,
+	    0.2269,
+	    0.7824,
+	    0.4400,
+	    0.5515,
+	    0.1969,
+	    0.6560,
+	    0.3798,
+	    0.4561,
+	    0.1400,
+	    0.5135,
+	    0.2908,
+	    0.3383,
+	    0.2908,
+	    0.0610,
+	    0.3657,
+	    0.1823,
+	    0.2080,
+	    0.2155,
+	    0.0610,
+	    0.0705,
+	    0.0642,
+    };
+
+    float g_fWeightTotal = 18.4198;
+#endif
+
+/*
+#elif SSAO_QUALITY == 2
+
+    #define NUM_VALLEYS (32)
+
+    const int2 g_i2HDAOSamplePattern[NUM_VALLEYS] =
+    {
+	    { 0, -10 },
+	    { 3, -10 },
+	    { 1, -8 },
+	    { 5, -8 },
+	    { 0, -6 },
+	    { 3, -6 },
+	    { 7, -6 },
+	    { 1, -4 },
+	    { 5, -4 },
+	    { 8, -4 },
+	    { 0, -2 },
+	    { 3, -2 },
+	    { 7, -2 },
+	    { 10, -2 },
+	    { 1, 0 },
+	    { 5, 0 },
+	    { 8, 0 },
+	    { 3, 2 },
+	    { 7, 2 },
+	    { 10, 2 },
+	    { 1, 4 },
+	    { 5, 4 },
+	    { 8, 4 },
+	    { 3, 6 },
+	    { 7, 6 },
+	    { 10, 6 },
+	    { 1, 8 },
+	    { 5, 8 },
+	    { 8, 8 },
+	    { 3, 10 },
+	    { 7, 10 },
+	    { 1, 12 },
+    };
+
+    const float g_fHDAOSampleWeights[NUM_VALLEYS] = 
+    {
+	    0.2308,
+	    0.1969,
+	    0.3798,
+	    0.2743,
+	    0.5385,
+	    0.4840,
+	    0.2908,
+	    0.6828,
+	    0.5075,
+	    0.3120,
+	    0.8462,
+	    0.7226,
+	    0.4400,
+	    0.2155,
+	    0.9231,
+	    0.6154,
+	    0.3846,
+	    0.7226,
+	    0.4400,
+	    0.2155,
+	    0.6828,
+	    0.5075,
+	    0.3120,
+	    0.4840,
+	    0.2908,
+	    0.1029,
+	    0.3798,
+	    0.2743,
+	    0.1297,
+	    0.1969,
+	    0.0610,
+	    0.0737,
+    };
+
+    float g_fWeightTotal = 12.9184;
+
+#elif SSAO_QUALITY == 1
+
+    #define NUM_VALLEYS (16)
+    const int2 g_i2HDAOSamplePattern[NUM_VALLEYS] =
+    {
+	    { 0, -9 },
+	    { 4, -9 },
+	    { 2, -6 },
+	    { 6, -6 },
+	    { 0, -3 },
+	    { 4, -3 },
+	    { 8, -3 },
+	    { 2, 0 },
+	    { 6, 0 },
+	    { 10, 0 },
+	    { 4, 3 },
+	    { 8, 3 },
+	    { 2, 6 },
+	    { 6, 6 },
+	    { 10, 6 },
+	    { 4, 9 },
+    };
+
+    const float g_fHDAOSampleWeights[NUM_VALLEYS] = 
+    {
+	    0.3077,
+	    0.2424,
+	    0.5135,
+	    0.3473,
+	    0.7692,
+	    0.6154,
+	    0.3428,
+	    0.8462,
+	    0.5385,
+	    0.2308,
+	    0.6154,
+	    0.3428,
+	    0.5135,
+	    0.3473,
+	    0.1029,
+	    0.2424,
+    };
+
+    float g_fWeightTotal = 6.9179;
+
+#endif
+
+*/
+
+// Used by the valley angle function
+#define NUM_NORMAL_LOADS (4)
+const int2 g_i2NormalLoadPattern[NUM_NORMAL_LOADS] = 
+{
+	{ 0, -9 },
+	{ 6, -6 },
+	{ 10, 0 },
+	{ 8, 9 },
+};
+
+#if SSAO_QUALITY >= 3
+//=================================================================================================================================
+// Computes the general valley angle
+//=================================================================================================================================
+float ValleyAngle( uint2 u2ScreenCoord )
+{
+	float3 f3N1 = float3(0.0);
+	float3 f3N2 = float3(0.0);
+	float fDot;
+	float fSummedDot = 0.0;
+	int2 i2MirrorPattern;
+	int2 i2OffsetScreenCoord;
+	int2 i2MirrorOffsetScreenCoord;
+	
+    #ifdef GBUFFER_OPTIMIZATION
+	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xy );
+	#else
+	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xyz;
+	#endif
+
+	for( int iNormal=0; iNormal<NUM_NORMAL_LOADS; iNormal++ )
+	{
+		i2MirrorPattern = g_i2NormalLoadPattern[iNormal] * int2( -1, -1 );
+		i2OffsetScreenCoord = u2ScreenCoord + g_i2NormalLoadPattern[iNormal];
+		i2MirrorOffsetScreenCoord = u2ScreenCoord + i2MirrorPattern;
+		
+		// Clamp our test to screen coordinates
+		i2OffsetScreenCoord = ( i2OffsetScreenCoord > ( g_f2RTSize - float2( 1.0, 1.0 ) ) ) ? ( g_f2RTSize - float2( 1.0, 1.0 ) ) : ( i2OffsetScreenCoord );
+		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord > ( g_f2RTSize - float2( 1.0, 1.0 ) ) ) ? ( g_f2RTSize - float2( 1.0, 1.0 ) ) : ( i2MirrorOffsetScreenCoord );
+		i2OffsetScreenCoord = ( i2OffsetScreenCoord < 0 ) ? ( 0 ) : ( i2OffsetScreenCoord );
+		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord < 0 ) ? ( 0 ) : ( i2MirrorOffsetScreenCoord );
+						
+    #ifdef GBUFFER_OPTIMIZATION
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;
+		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;				
+		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
+    #else
+		f3N1.xyz  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;
+		f3N2.xyz  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;				
+    #endif
+		
+		fDot = dot( f3N1, N );
+		
+		fSummedDot += ( fDot > g_fAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
+
+		fDot = dot( f3N2, N );
+		
+		fSummedDot += ( fDot > g_fAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
+	}
+
+	fSummedDot /= 8.0;
+	fSummedDot += 0.5;
+	fSummedDot = ( fSummedDot <= 0.5 ) ? ( fSummedDot / 10.0 ) : ( fSummedDot );
+		
+	return fSummedDot;
+}
+#endif
+
+#ifdef SM_5_0
+
+#if SSAO_QUALITY >= 3
+    float ComputeHDAO( uint2 u2CenterTexel, uint2 u2ScreenPos )
+    {
+	    // Locals
+	    float fCenterZ;
+	    float2 f2SamplePos;
+	    float2 f2MirrorSamplePos;
+	    float fOcclusion = 0.0;
+	    float2 f2SampledZ;
+	    float2 f2Diff;
+	    float2 f2Compare;
+	    float fDot;
+
+	    // Get the general valley angle, to scale the result by 
+	    fDot = ValleyAngle( u2ScreenPos );	
+    	
+	    // Sample center texel
+	    fCenterZ = LoadFromLDS( u2CenterTexel ); 
+
+	    // Loop through each valley
+        for( uint uValley = 0; uValley < NUM_VALLEYS; uValley++ )
+	    {
+		    // Sample
+		    f2SampledZ.x = LoadFromLDS( u2CenterTexel + g_i2HDAOSamplePattern[uValley] );
+		    f2SampledZ.y = LoadFromLDS( u2CenterTexel - g_i2HDAOSamplePattern[uValley] );
+    		
+		    // Valley detect
+		    f2Diff     = fCenterZ.xx - f2SampledZ;
+		    f2Compare  = ( f2Diff < g_fHDAORejectRadius.xx ) ? ( 1.0 ) : ( 0.0 );
+		    f2Compare *= ( f2Diff > g_fHDAOAcceptRadius.xx ) ? ( 1.0 ) : ( 0.0 );
+    		
+		    // Weight occlusion
+		    fOcclusion += ( f2Compare.x * f2Compare.y * g_fHDAOSampleWeights[uValley] );	
+	    }
+    	
+	    // Finally calculate the HDAO occlusion value
+	    fOcclusion /= g_fWeightTotal;
+	    fOcclusion *= g_fHDAOIntensity * fDot;
+	    fOcclusion *= fCenterZ < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( fCenterZ - 0.5 ) );
+	    fOcclusion = 1.0 - saturate( fOcclusion );
+    	
+	    return fOcclusion;
+    }
+#endif
+
+    //=============================================================================================================================
+    // HDAO CS: Performs valley detection in Camera Z space, and offsets by the Z 
+    // component of the camera space normal
+    //=============================================================================================================================
+    [numthreads( GROUP_THREAD_DIM, GROUP_THREAD_DIM, 1 )]
+    void main( uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID, uint GI : SV_GroupIndex )
+    #ifndef	SSAO_QUALITY
+    {
+        // Calculate the screen pos
+	    uint2 u2ScreenPos = uint2( Gid.x * ALU_DIM + GTid.x, Gid.y * ALU_DIM + GTid.y );
+    		
+	    // Make sure we don't write outside the target buffer
+	    if( ( u2ScreenPos.x < uint( g_f2RTSize.x ) ) && ( u2ScreenPos.y < uint( g_f2RTSize.y ) ) )
+	    {
+            // Write the data directly to an AO texture:
+            g_ResultTexture[u2ScreenPos.xy] = 1.0;
+        }
+    }
+    #elif SSAO_QUALITY < 3
+    {
+        // Calculate the screen pos
+	    uint2 u2ScreenPos = uint2( Gid.x * ALU_DIM + GTid.x, Gid.y * ALU_DIM + GTid.y );
+    		
+	    // Make sure we don't write outside the target buffer
+	    if( ( u2ScreenPos.x < uint( g_f2RTSize.x ) ) && ( u2ScreenPos.y < uint( g_f2RTSize.y ) ) )
+	    {
+            // Write the data directly to an AO texture:
+            g_ResultTexture[u2ScreenPos.xy] = 1.0;
+        }
+    }
+    #elif SSAO_QUALITY >= 3
+    { 
+	    // Locals
+	    float2 f2ScreenCoord;
+	    float2 f2Coord;
+	    float2 f2InvTextureSize = 1.0 / g_f2RTSize;
+	    float4 f4Depth;
+	    float4 f4Normal;
+        float4 f4LDSValue;
+	    uint uColumn, uRow;
+
+	    if( GI < GATHER_THREADS )
+	    {
+		    // Get the screen position for this threads TEX ops
+		    uColumn = ( GI % GATHER_THREADS_PER_ROW )  * GATHER_PER_THREAD * 2.0;
+		    uRow = ( GI / GATHER_THREADS_PER_ROW ) * 2.0;
+		    f2ScreenCoord = float2( ( float2( Gid.x, Gid.y ) * float2( ALU_DIM, ALU_DIM ) ) - float2( GROUP_TEXEL_OVERLAP, GROUP_TEXEL_OVERLAP ) ) + float2( uColumn, uRow );
+		    
+            #ifndef USE_MSAA
+                
+                // Offset for the use of gather4
+                f2ScreenCoord += float2( 1.0, 1.0 ); 
+
+            #endif
+    		
+		    // Gather from input textures and lay down in the LDS
+            for( uint uGather=0; uGather<GATHER_PER_THREAD; uGather++ )
+		    {
+			    #ifdef USE_MSAA
+
+                    f2Coord    = float2( f2ScreenCoord.x + float( uGather * 2 ), f2ScreenCoord.y );
+                   
+                    f4Depth.x  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).z;
+	                f4Depth.y  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).z;
+	                f4Depth.z  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).z;
+	                f4Depth.w  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).z;
+                    
+                    #ifdef GBUFFER_OPTIMIZATION
+                        f4Normal.x = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).x;
+                        f4Normal.y = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).x;
+	                    f4Normal.z = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).x;
+	                    f4Normal.w = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).x;
+	                #else
+                        f4Normal.x = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).z;
+                        f4Normal.y = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).z;
+	                    f4Normal.z = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).z;
+	                    f4Normal.w = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).z;
+	                #endif
+                #else
+
+                    f2Coord  = float2( f2ScreenCoord.x + float( uGather * 2 ), f2ScreenCoord.y ) * f2InvTextureSize;
+                    f4Depth  = textureGather( g_txDepth, f2Coord, 2 );
+                    #ifdef GBUFFER_OPTIMIZATION
+                        f4Normal = textureGather( g_txNormal, f2Coord, 0 );
+                    #else
+                        f4Normal = textureGather( g_txNormal, f2Coord, 2 );
+                    #endif
+                #endif
+            
+                f4LDSValue = f4Depth + ( f4Normal * g_fHDAONormalScale.xxxx );
+    		
+                StoreToLDS( f4LDSValue.x, uint2( uColumn + ( uGather * 2 ) + 0, uRow + 1 ) );
+                StoreToLDS( f4LDSValue.y, uint2( uColumn + ( uGather * 2 ) + 1, uRow + 1 ) );
+                StoreToLDS( f4LDSValue.z, uint2( uColumn + ( uGather * 2 ) + 1, uRow + 0 ) );
+                StoreToLDS( f4LDSValue.w, uint2( uColumn + ( uGather * 2 ) + 0, uRow + 0 ) );
+       	    }
+	    }
+    	    
+	    // Enforce a group barrier with sync
+	    GroupMemoryBarrierWithGroupSync();
+    	
+        // Calculate the screen pos
+	    uint2 u2ScreenPos = uint2( Gid.x * ALU_DIM + GTid.x, Gid.y * ALU_DIM + GTid.y );
+    		
+	    // Make sure we don't write outside the target buffer
+	    if( ( u2ScreenPos.x < uint( g_f2RTSize.x ) ) && ( u2ScreenPos.y < uint( g_f2RTSize.y ) ) )
+	    {
+            // Write the data directly to an AO texture:
+            g_ResultTexture[u2ScreenPos.xy] = ComputeHDAO( uint2( GTid.x + GROUP_TEXEL_OVERLAP, GTid.y + GROUP_TEXEL_OVERLAP ), u2ScreenPos );
+        }
+    }
+#endif
+
+
+#else
+
+//=================================================================================================================================
+// HDAO PS: Performs valley detection in Camera Z space, and offsets by the Z 
+// component of the camera space normal
+//=================================================================================================================================
+#ifndef USE_MSAA
+#ifdef GBUFFER_OPTIMIZATION
+float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, float4 pos2d )
+#else
+float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ )
+#endif
+#else
+#ifdef GBUFFER_OPTIMIZATION
+float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, float4 pos2d, uint iSample )
+#else
+float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
+#endif
+#endif
+#ifndef	SSAO_QUALITY
+{
+	return 1.0;
+}
+#elif SSAO_QUALITY >= 3
+{
+	// Locals
+	uint2 u2CenterScreenCoord;
+	float2 f2ScreenCoord;
+	float2 f2MirrorScreenCoord;
+	float fCenterZ;
+	float2 f2SampledZ;
+	float2 f2Diff;
+	float2 f2Compare;
+	float fOcclusion = 0.0;
+	int iValley;
+	float fDot;
+								
+	// Compute screen coord, and store off the inverse of the RT Size
+	u2CenterScreenCoord = uint2( floor( tc * g_f2RTSize ) );
+	
+	// Get the general valley angle, to scale the result by 
+	fDot = ValleyAngle( u2CenterScreenCoord );
+
+	// Sample center texel, convert to camera space and add normal
+	float fDepth = texelFetch( g_txDepth, u2CenterScreenCoord, MSAA_SAMPLE_INDEX ).z;
+    #ifdef GBUFFER_OPTIMIZATION
+        fCenterZ = fDepth + ( texelFetch( g_txNormal, u2CenterScreenCoord, MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale );
+    #else
+        fCenterZ = fDepth + ( texelFetch( g_txNormal, u2CenterScreenCoord, MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale );
+    #endif
+	
+	// Loop through each valley
+	for( iValley = 0; iValley < NUM_VALLEYS; iValley ++ )
+	{
+		// Sample depth & convert to camera space
+        f2SampledZ.x = texelFetch( g_txDepth, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z;
+		f2SampledZ.y = texelFetch( g_txDepth, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z;
+
+        // Sample normal and do a scaled add
+        #ifdef GBUFFER_OPTIMIZATION
+	        f2SampledZ.x += ( texelFetch( g_txNormal, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale ); 
+	        f2SampledZ.y += ( texelFetch( g_txNormal, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale );
+	    #else
+	        f2SampledZ.x += ( texelFetch( g_txNormal, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale ); 
+	        f2SampledZ.y += ( texelFetch( g_txNormal, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale );
+	    #endif
+
+		// Detect valleys 
+		f2Diff     = fCenterZ.xx - f2SampledZ;
+		f2Compare  = ( f2Diff < g_fHDAORejectRadius.xx ) ? ( 1.0 ) : ( 0.0 );
+		f2Compare *= ( f2Diff > g_fHDAOAcceptRadius.xx ) ? ( 1.0 ) : ( 0.0 );
+						
+		// Accumulate weighted occlusion
+		fOcclusion += f2Compare.x * f2Compare.y * g_fHDAOSampleWeights[iValley];	
+	}
+					
+	// Finally calculate the HDAO occlusion value
+	fOcclusion /= g_fWeightTotal;
+	fOcclusion *= g_fHDAOIntensity * fDot;
+	fOcclusion *= fCenterZ < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( fCenterZ - 0.5 ) );
+	fOcclusion = 1.0 - saturate( fOcclusion );
+	
+	return fOcclusion;
+}
+#endif
+
+#endif
+
+//=================================================================================================================================
+// EOF
+//=================================================================================================================================
+

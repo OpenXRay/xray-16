@@ -1,0 +1,18 @@
+#include "common.h"
+#include "iostructs\p_simple_color.h"
+
+float4 _main ( float4 C )
+{
+#ifdef USE_VTF
+	return	C;
+#else // USE_VTF
+	float4 result, high;
+
+	float scale	=	tex2D(s_tonemap, float2(0.5,0.5)).x;
+	tonemap			(result, high, C.rgb, scale);
+
+	result.a	= C.a;
+
+	return	result;
+#endif // USE_VTF
+}

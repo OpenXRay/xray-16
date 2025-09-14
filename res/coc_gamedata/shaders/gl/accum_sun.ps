@@ -1,0 +1,44 @@
+#include "common.h"
+#include "lmodel.h"
+#include "shadow.h"
+#include "iostructs\p_aa_AA_sun.h"
+
+#ifdef MSAA_OPTIMIZATION
+#ifdef GBUFFER_OPTIMIZATION
+float4 	_main	( p_aa_AA_sun I, float4 pos2d, uint iSample )
+#else
+float4 	_main	( p_aa_AA_sun I, uint iSample )
+#endif
+#else
+#ifdef GBUFFER_OPTIMIZATION
+float4 	_main	( p_aa_AA_sun I, float4 pos2d )
+#else
+float4 	_main	( p_aa_AA_sun I )
+#endif
+#endif
+{
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, pos2d, ISAMPLE) );
+
+//  float4 _P		= tex2D 	(s_position, 	I.tc); 
+//  float4  _N		= tex2D 	(s_normal,   	I.tc); 
+	float4 	_P	= float4( gbd.P, gbd.mtl );
+	float4	_N	= float4( gbd.N, gbd.hemi );
+
+	// ----- light-model
+	float 	m	= xmaterial	;
+# ifndef USE_R2_STATIC_SUN
+			m 	= _P.w		;
+# endif
+	float4	light	= plight_infinity( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
+
+	// ----- shadow
+	float4 	s_sum;
+		s_sum.x	= tex2D	( s_dmap, I.LT).x;
+		s_sum.y = tex2D	( s_dmap, I.RT).y;
+		s_sum.z	= tex2D	( s_dmap, I.LB).z;
+		s_sum.w = tex2D	( s_dmap, I.RB).w;
+//	float 	s 	= dot	( s_sum, 1.0/4.0);
+	float 	s 	= ((s_sum.x+s_sum.y)+(s_sum.z+s_sum.w))*(1.0/4.0);
+
+	return 		Ldynamic_color * light * s;
+}

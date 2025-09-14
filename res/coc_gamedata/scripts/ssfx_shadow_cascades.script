@@ -1,0 +1,73 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 15
+-- @ Description: Shadow Cascades script
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+-- Shadow Cascades
+local ssfx_shw_cas_size_1 = 0
+local ssfx_shw_cas_size_2 = 0
+local ssfx_shw_cas_size_3 = 0
+
+-- Grass shadows settings
+local ssfx_shw_cas_grass_quality = 0
+local ssfx_shw_cas_grass_distance = 0
+local ssfx_shw_cas_grass_nondir_max_distance = 0
+
+function apply_shadow_cascades_settings()
+
+	get_console():execute("ssfx_shadow_cascades (" .. ssfx_shw_cas_size_1 .. "," .. ssfx_shw_cas_size_2 .. "," .. ssfx_shw_cas_size_3 .. ")")
+	
+	get_console():execute("ssfx_grass_shadows (" .. ssfx_shw_cas_grass_quality .. "," .. ssfx_shw_cas_grass_distance .. "," .. ssfx_shw_cas_grass_nondir_max_distance .. ",0)")
+
+end
+
+function on_option_change()
+	
+	-- Get settings
+	ssfx_shw_cas_size_1 = ssfx_001_mcm.ssfx_get_setting("shw_cascades", "size_1", ssfx_shadow_cascades_settings)
+	ssfx_shw_cas_size_2 = ssfx_001_mcm.ssfx_get_setting("shw_cascades", "size_2", ssfx_shadow_cascades_settings)
+	ssfx_shw_cas_size_3 = ssfx_001_mcm.ssfx_get_setting("shw_cascades", "size_3", ssfx_shadow_cascades_settings)
+
+	ssfx_shw_cas_grass_quality = ssfx_001_mcm.ssfx_get_setting("shw_cascades", "grass_shw_quality", ssfx_shadow_cascades_settings)
+	ssfx_shw_cas_grass_distance = ssfx_001_mcm.ssfx_get_setting("shw_cascades", "grass_shw_distance", ssfx_shadow_cascades_settings) / 100
+	ssfx_shw_cas_grass_nondir_max_distance = ssfx_001_mcm.ssfx_get_setting("shw_cascades", "grass_shw_nondir_maxdistance", ssfx_shadow_cascades_settings)
+
+	-- Clamp Distance 0 ~ 1
+	if (ssfx_shw_cas_grass_distance < 0) then
+		ssfx_shw_cas_grass_distance = 0
+	elseif (ssfx_shw_cas_grass_distance > 1) then
+		ssfx_shw_cas_grass_distance = 1
+	end
+
+	-- Limit cascades sizes to avoid rendering glitches
+	if (ssfx_shw_cas_size_1 < 10) then 
+		ssfx_shw_cas_size_1 = 10
+	elseif (ssfx_shw_cas_size_1 > 30) then 
+		ssfx_shw_cas_size_1 = 30
+	end
+
+	if (ssfx_shw_cas_size_2 < 40) then 
+		ssfx_shw_cas_size_2 = 40
+	elseif (ssfx_shw_cas_size_2 > 110) then 
+		ssfx_shw_cas_size_2 = 110
+	end
+
+	if (ssfx_shw_cas_size_3 < 120) then 
+		ssfx_shw_cas_size_3 = 120
+	elseif (ssfx_shw_cas_size_3 > 300) then 
+		ssfx_shw_cas_size_3 = 300
+	end
+
+	-- Apply settings
+	apply_shadow_cascades_settings()
+
+end
+
+function on_game_start()
+
+	-- General Functions
+	-- RegisterScriptCallback("on_option_change", on_option_change)
+	
+	-- Read and apply settigns
+	on_option_change()
+end

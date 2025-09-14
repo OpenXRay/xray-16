@@ -1,0 +1,343 @@
+//--------------------------------------------------------------------------------------
+// Gather pattern
+//--------------------------------------------------------------------------------------
+
+float g_fHDAOZDispScale = 0.1;			    // SSAO param
+
+#ifdef USE_HDAO_CODE
+
+float g_fSSAORejectRadius      = 0.43;	// SSAO param
+float g_fSSAOIntensity         = 0.85;	// SSAO param
+float g_fSSAOAcceptRadius      = 0.0001;// SSAO param
+float g_fSSAOAcceptAngle       = 0.98;	// Used by the ValleyAngle function to determine shallow valleys
+
+// Gather defines
+#define RING_0	(1)
+#define RING_1	(2)
+#define RING_2	(3)
+#define NUM_RING_0_GATHERS	(2)
+#define NUM_RING_1_GATHERS	(6)
+#define NUM_RING_2_GATHERS	(12)
+
+#if ( MSAA_SAMPLES == 2 )
+
+    #define MSAA_SAMPLE_INDEX ( 0 )
+
+#elif ( MSAA_SAMPLES == 4 )
+
+    #define MSAA_SAMPLE_INDEX ( 3 )
+
+#elif ( MSAA_SAMPLES == 8 )
+
+    #define MSAA_SAMPLE_INDEX ( 6 )
+
+#else
+
+    #define MSAA_SAMPLE_INDEX ( 0 )
+
+#endif
+
+#if SSAO_QUALITY == 3
+const int g_iNumRingGathers = NUM_RING_2_GATHERS;
+const int g_iNumRings 	   = RING_2;
+const int g_iNumNormals     = NUM_RING_0_GATHERS;
+#elif SSAO_QUALITY == 2
+const int g_iNumRingGathers = NUM_RING_1_GATHERS;
+const int g_iNumRings 	   = RING_1;
+const int g_iNumNormals     = NUM_RING_0_GATHERS;
+#elif SSAO_QUALITY == 1
+const int g_iNumRingGathers = NUM_RING_0_GATHERS;
+const int g_iNumRings 	   = RING_0;
+const int g_iNumNormals     = 0;
+#endif
+
+// Ring sample pattern
+const float2 g_f2SSAORingPattern[NUM_RING_2_GATHERS] = float2[]
+(
+	// Ring 0
+	float2( 1, -1 ),
+	float2( 0, 1 ),
+	
+	// Ring 1
+	float2( 0, 3 ),
+	float2( 2, 1 ),
+	float2( 3, -1 ),
+	float2( 1, -3 ),
+		
+	// Ring 2
+	float2( 1, -5 ),
+	float2( 3, -3 ),
+	float2( 5, -1 ),
+	float2( 4, 1 ),
+	float2( 2, 3 ),
+	float2( 0, 5 )
+);
+
+// Ring weights
+const float4 g_f4SSAORingWeight[NUM_RING_2_GATHERS] = float4[]
+(
+	// Ring 0 (Sum = 5.30864)
+	float4( 1.00000, 0.50000, 0.44721, 0.70711 ),
+	float4( 0.50000, 0.44721, 0.70711, 1.00000 ),
+	
+	// Ring 1 (Sum = 6.08746)
+	float4( 0.30000, 0.29104, 0.37947, 0.40000 ),
+	float4( 0.42426, 0.33282, 0.37947, 0.53666 ),
+	float4( 0.40000, 0.30000, 0.29104, 0.37947 ),
+	float4( 0.53666, 0.42426, 0.33282, 0.37947 ),
+	
+	// Ring 2 (Sum = 6.53067)
+	float4( 0.31530, 0.29069, 0.24140, 0.25495 ),
+	float4( 0.36056, 0.29069, 0.26000, 0.30641 ),
+	float4( 0.26000, 0.21667, 0.21372, 0.25495 ),
+	float4( 0.29069, 0.24140, 0.25495, 0.31530 ),
+	float4( 0.29069, 0.26000, 0.30641, 0.36056 ),
+	float4( 0.21667, 0.21372, 0.25495, 0.26000 )
+);
+
+const float g_fRingWeightsTotal[RING_2] = float[]
+(
+	5.30864,
+	11.39610,
+	17.92677
+);
+
+//----------------------------------------------------------------------------------------
+// Helper function to Gather samples in 10.1 and 10.0 modes 
+//----------------------------------------------------------------------------------------
+
+float4 GatherZSamples( float2 f2TexCoord )
+{
+	float4 f4Ret;
+
+	float2 f2InvRTSize = float2(1.0) / pos_decompression_params2.xy;
+	
+#ifdef USE_MSAA
+	f4Ret.x = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
+	f4Ret.y = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,1 ) ).z;
+	f4Ret.z = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,1 ) ).z;
+	f4Ret.w = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,0 ) ).z;
+#else  // !USE_MSAA
+#ifndef SM_5
+	f4Ret.x = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,0 ) ).z;
+	f4Ret.y = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,1 ) ).z;
+	f4Ret.z = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, int2( 0,1 ) ).z;
+	f4Ret.w = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, int2( 0,0 ) ).z;
+#else // !SM_5
+	f4Ret = g_txDepth.GatherBlue( smp_nofilter, f2TexCoord );
+#endif // SM_5
+#endif // USE_MSAA
+
+#ifdef USE_MSAA
+    #ifdef GBUFFER_OPTIMIZATION
+	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).x;
+	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,1 ) ).x;
+	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,1 ) ).x;
+	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,0 ) ).x;
+	#else
+	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
+	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,1 ) ).z;
+	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,1 ) ).z;
+	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,0 ) ).z;
+	#endif
+#else  // !USE_MSAA
+#ifndef SM_5
+    #ifdef GBUFFER_OPTIMIZATION
+	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,0 ) ).x;
+	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,1 ) ).x;
+	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 0,1 ) ).x;
+	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 0,0 ) ).x;
+	#else
+	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,0 ) ).z;
+	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,1 ) ).z;
+	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 0,1 ) ).z;
+	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, int2( 0,0 ) ).z;
+	#endif
+#else // !SM_5
+    #ifdef GBUFFER_OPTIMIZATION
+	f4Ret += g_fHDAOZDispScale * textureGather( g_txNormal, f2TexCoord, 0 );
+	#else
+	f4Ret += g_fHDAOZDispScale * textureGather( g_txNormal, f2TexCoord, 2 );
+	#endif
+#endif // SM_5
+#endif // USE_MSAA
+      
+	return f4Ret;
+}
+
+// Used by the valley angle function
+#define NUM_NORMAL_LOADS (4)
+const int2 g_i2HDAONormalLoadPattern[NUM_NORMAL_LOADS] = int2[]
+(
+	int2( 0, -9 ),
+	int2( 6, -6 ),
+	int2( 10, 0 ),
+	int2( 8, 9 )
+);
+
+#ifdef SSAO_QUALITY
+//=================================================================================================================================
+// Computes the general valley angle
+//=================================================================================================================================
+float HDAOValleyAngle( uint2 u2ScreenCoord )
+{
+	float3 f3N1;
+	float3 f3N2;
+	float fDot;
+	float fSummedDot = 0.0;
+	int2 i2MirrorPattern;
+	int2 i2OffsetScreenCoord;
+	int2 i2MirrorOffsetScreenCoord;
+	
+#ifdef USE_MSAA
+#ifdef GBUFFER_OPTIMIZATION
+	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xy );
+#else
+	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xyz;
+#endif
+#else  // !USE_MSAA
+#ifdef GBUFFER_OPTIMIZATION
+	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), 0 ).xy );
+#else
+	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), 0 ).xyz;
+#endif
+#endif // USE_MSAA
+
+	for( int iNormal=0; iNormal<NUM_NORMAL_LOADS; iNormal++ )
+	{
+		i2MirrorPattern = g_i2HDAONormalLoadPattern[iNormal] * int2( -1, -1 );
+		i2OffsetScreenCoord = int2( u2ScreenCoord ) + g_i2HDAONormalLoadPattern[iNormal];
+		i2MirrorOffsetScreenCoord = int2( u2ScreenCoord ) + i2MirrorPattern;
+		
+		// Clamp our test to screen coordinates
+		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0, 1.0 ) ), greaterThan( i2OffsetScreenCoord, ( g_f2RTSize - float2( 1.0, 1.0 ) ) )));
+		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( g_f2RTSize - float2( 1.0, 1.0 ) ), greaterThan( i2MirrorOffsetScreenCoord, ( g_f2RTSize - float2( 1.0, 1.0 ) ) )));
+		i2OffsetScreenCoord = ivec2(mix( ( i2OffsetScreenCoord ), int2( 0 ), lessThan( i2OffsetScreenCoord, int2( 0 ) )));
+		i2MirrorOffsetScreenCoord = ivec2(mix( ( i2MirrorOffsetScreenCoord ), int2( 0 ), lessThan( i2MirrorOffsetScreenCoord, int2( 0 ) )));
+		
+#ifdef USE_MSAA
+#ifdef GBUFFER_OPTIMIZATION
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;
+		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;				
+		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
+#else
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;				
+#endif
+#else  // !USE_MSAA
+#ifdef GBUFFER_OPTIMIZATION
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, 0 ).xy;
+		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, 0 ).xy;				
+		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
+#else
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, 0 ).xy;
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, 0 ).xy;				
+#endif
+#endif // USE_MSAA
+		
+		fDot = dot( f3N1, N );
+		
+		fSummedDot += ( fDot > g_fSSAOAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
+
+		fDot = dot( f3N2, N );
+		
+		fSummedDot += ( fDot > g_fSSAOAcceptAngle ) ? ( 0.0 ) : ( 1.0 - ( abs( fDot ) * 0.25 ) );
+	}
+
+	fSummedDot /= 8.0;
+	fSummedDot += 0.5;
+	fSummedDot = ( fSummedDot <= 0.5 ) ? ( fSummedDot / 10.0 ) : ( fSummedDot );
+		
+	return fSummedDot;
+}
+#endif
+
+#ifndef USE_MSAA
+#ifdef GBUFFER_OPTIMIZATION
+float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, float4 pos2d )
+#else
+float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ )
+#endif
+#else
+#ifdef GBUFFER_OPTIMIZATION
+float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, float4 pos2d, uint iSample )
+#else
+float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
+#endif
+#endif
+#ifndef	SSAO_QUALITY
+{
+	return 1.0;
+}
+#else
+{ 
+	// Locals
+	int2   i2ScreenCoord;
+	float2 f2ScreenCoord;
+	float2 f2MirrorScreenCoord;
+	float2 f2TexCoord;
+	float2 f2MirrorTexCoord;
+	float2 f2InvRTSize;
+	float4 f4PosZ;
+	float  ZDisp;
+	float4 f4Diff;
+	float4 f4Compare[2];
+	float4 f4Occlusion = float4(0.0);
+	float  fOcclusion = 0.0;
+			
+	// Compute integer screen coord, and store off the inverse of the RT Size
+	f2InvRTSize	  = float2(1.0) / (g_f2RTSize.xy);
+	f2ScreenCoord = tc * (g_f2RTSize.xy);
+	i2ScreenCoord = int2( f2ScreenCoord );
+
+	// Get the general valley angle, to scale the result by 
+	float fDot = HDAOValleyAngle( i2ScreenCoord );
+	
+	ZDisp = P.z + g_fHDAOZDispScale * N.z;
+	
+	// For Gather we need to snap the screen coords
+#ifndef USE_MSAA
+#ifdef SM_4_1
+	f2ScreenCoord = float2( i2ScreenCoord );
+#endif
+#endif
+
+	// Sample the center pixel for camera Z
+	f2TexCoord = float2( f2ScreenCoord * f2InvRTSize );
+
+	// Loop through each gather location, and compare with its mirrored location
+	for( int iGather=0; iGather<g_iNumRingGathers; ++iGather )
+	{
+		f2MirrorScreenCoord = ( g_f2SSAORingPattern[iGather] + float2( 1.0, 1.0 ) ) * float2( -1.0, -1.0 );
+		
+		#ifdef SM_4_1
+			f2TexCoord = float2( ( f2ScreenCoord + ( g_f2SSAORingPattern[iGather] + float2( 1.0, 1.0 ) ) ) * f2InvRTSize );
+			f2MirrorTexCoord = float2( ( f2ScreenCoord + ( f2MirrorScreenCoord + float2( 1.0, 1.0 ) ) ) * f2InvRTSize );
+		#else
+			f2TexCoord = float2( ( f2ScreenCoord + g_f2SSAORingPattern[iGather] ) * f2InvRTSize );
+			f2MirrorTexCoord = float2( ( f2ScreenCoord + ( f2MirrorScreenCoord ) ) * f2InvRTSize );
+		#endif	
+		
+		f4PosZ		  = GatherZSamples( f2TexCoord );
+		f4Diff		  = float4(ZDisp) - f4PosZ;
+		f4Compare[0]  = mix(float4( 0.0 ), float4( 1.0 ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
+		f4Compare[0] *= mix(float4( 0.0 ), float4( 1.0 ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
+		
+		f4PosZ		  = GatherZSamples( f2MirrorTexCoord );
+		f4Diff		  = float4(ZDisp) - f4PosZ;
+		f4Compare[1]  = mix(float4( 0.0 ), float4( 1.0 ), lessThan( f4Diff, float4(g_fSSAORejectRadius) ));
+		f4Compare[1] *= mix(float4( 0.0 ), float4( 1.0 ), greaterThan( f4Diff, float4(g_fSSAOAcceptRadius) ));
+
+		f4Occlusion.xyzw += g_f4SSAORingWeight[iGather].xyzw * ( f4Compare[0].xyzw * f4Compare[1].zwxy );
+	}
+	
+	fOcclusion  = dot( f4Occlusion, float4(g_fSSAOIntensity) ) / ( 2.0 * g_fRingWeightsTotal[g_iNumRings-1] );
+	fOcclusion *= fDot;
+	fOcclusion *= P.z < 0.5 ? 0.0 : lerp( 0.0, 1.0, saturate( P.z - 0.5 ) );
+	fOcclusion  = 1.0 - saturate( fOcclusion );
+	return fOcclusion;
+}
+#endif
+#endif

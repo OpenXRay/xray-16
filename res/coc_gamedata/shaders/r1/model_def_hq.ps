@@ -1,0 +1,37 @@
+#include "common.h"
+
+struct 	v2p
+{
+ 	half2 	tc0: 	TEXCOORD0;	// base
+ 	half2 	tc1: 	TEXCOORD1;	// lmap
+#ifdef T_DETAILS
+	half2 	tcd: 	TEXCOORD2;	// details
+#endif
+  	half3	c0:		COLOR0;		// sun
+	half4	c1:		COLOR1;		// xyz=lq-color,w=factor
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+half4 main_ps_1_1(v2p I) : COLOR
+{
+	half4 t_base 	= tex2D(s_base,I.tc0);
+	half4 t_lmap 	= tex2D(s_lmap,I.tc1);
+
+	// lighting
+	half3 l_base 	= t_lmap.rgb;				// base light-map (lmap color, ambient, hemi, etc - inside)
+	half3 l_sun 	= I.c0*t_lmap.a;			// sun color
+	half3 light		= lerp(l_base + l_sun, I.c1, I.c1.w);
+
+	// final-color
+	half3 final 	= light*t_base*2;
+
+#ifdef T_DETAILS
+	// calc D-texture
+	half3 detail 	= tex2D(s_detail,I.tcd).xyz;
+		  final    *= detail*2;
+#endif
+	
+	// out
+	return half4(final,t_base.a);
+}

@@ -1,0 +1,40 @@
+#include "common.h"
+#include "lmodel.h"
+#include "iostructs\p_accum.h"
+
+//	TODO: DX10: Move to Load
+#ifdef MSAA_OPTIMIZATION
+#ifdef GBUFFER_OPTIMIZATION
+float4 _main ( float4 tc, float4 pos2d, uint iSample )
+#else
+float4 _main ( float4 tc, uint iSample )
+#endif
+#else
+#ifdef GBUFFER_OPTIMIZATION
+float4 _main ( float4 tc, float4 pos2d )
+#else
+float4 _main ( float4 tc )
+#endif
+#endif
+{
+	const float bias_mul 	= 0.999;
+
+ 	// Sample the fat framebuffer:
+//	float4 _P		= tex2Dproj 	(s_position, tc); 
+//	float4 _N		= tex2Dproj 	(s_normal,   tc); 
+	float2	tcProj	= tc.xy / tc.w;
+
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, ISAMPLE) );
+
+	float4 _P		= float4( gbd.P,gbd.mtl );
+	float4 _N		= float4( gbd.N,gbd.hemi );
+
+	float 	m	= xmaterial	;
+# ifndef USE_R2_STATIC_SUN
+			m 	= _P.w		;
+# endif
+
+	float	rsqr;
+	float4	light 		= plight_local( m, _P.xyz, _N.xyz, Ldynamic_pos.xyz, Ldynamic_pos.w, rsqr );
+	return 	blendp( Ldynamic_color * light, tc);
+}

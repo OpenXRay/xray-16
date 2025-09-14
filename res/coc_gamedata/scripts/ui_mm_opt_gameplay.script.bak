@@ -1,0 +1,33 @@
+class "opt_gameplay" (CUIWindow)
+
+function opt_gameplay:__init() super()
+end
+
+function opt_gameplay:__finalize()
+end
+
+function opt_gameplay:InitControls(x, y, xml, handler)
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+	
+	if (db.actor_binder and db.actor_binder.character_icon) then
+		handler.char_icon = xml:InitStatic("tab_gameplay:char_icon",self)
+		handler.char_icon:InitTexture(db.actor_binder.character_icon)
+	end
+	
+	self.scroll_v = xml:InitScrollView("tab_gameplay:scroll_v", self)
+	handler.gameplay_scroll_v = self.scroll_v
+	
+	handler.gameplay_options["difficulty"] 			= {typ="list", tag="tab_gameplay:list_difficulty"}
+
+	handler.gameplay_options["tips"] 				= {typ="check", tag="tab_gameplay:check_tips"}
+	handler.gameplay_options["show_crosshair"] 		= {typ="check", tag="tab_gameplay:check_crosshair"}
+	handler.gameplay_options["dyn_crosshair"] 		= {typ="check", tag="tab_gameplay:check_dyn_crosshair"}
+	handler.gameplay_options["show_weapon"]			= {typ="check", tag="tab_gameplay:check_show_weapon"}
+	handler.gameplay_options["crosshair_distance"]	= {typ="check", tag="tab_gameplay:check_dist"}
+	handler.gameplay_options["important_save"]		= {typ="check", tag="tab_gameplay:check_important_save"}
+	handler.gameplay_options["crouch_toggle"]		= {typ="check", tag="tab_gameplay:check_crouch_toggle"}
+	handler.gameplay_options["hud_draw"]			= {typ="check", tag="tab_gameplay:check_hud_draw"}
+	handler.gameplay_options["show_tracers"]		= {typ="check", tag="tab_gameplay:check_show_tracers"}
+end

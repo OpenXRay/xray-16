@@ -1,0 +1,35 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 12.3
+-- @ Description: Weapons DOF script - MCM Menu
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+function on_mcm_load()
+
+	op = { id= "wpn_dof", sh=true, text="ui_mcm_ssfx_module_wpn_dof", gr ={
+
+				{id = "title",type= "slide",link= "ui_options_slider_player",text="ui_mcm_ssfx_module_wpn_dof_title",size= {512,50},spacing= 20 },
+					
+				{id = "aim_fadestart_mcm", type = "track", val = 2, min=0.0,max=0.3,step=0.01, def = 0.1},
+				{id = "aim_fadelen_mcm", type = "track", val = 2, min=0.0,max=1.3,step=0.01, def = 0.25},
+				{id = "aim_blur_mcm", type = "track", val = 2, min=0.0,max=2.0,step=0.05, def = 1.6},
+				{id = "aim_edgeblur_mcm", type = "track", val = 2, min=0.0,max=1.0,step=0.1, def = 1.0},
+
+				{ id = "line", type = "line" },
+			
+				{id = "fadestart_mcm", type = "track", val = 2, min=0.0,max=0.3,step=0.01, def = 0.15},
+				{id = "fadelen_mcm", type = "track", val = 2, min=0.0,max=1.3,step=0.01, def = 0.25},
+				{id = "blur_mcm", type = "track", val = 2, min=0.0,max=2.0,step=0.05, def = 1.1},
+				{id = "edgeblur_mcm", type = "track", val = 2, min=0.0,max=1.0,step=0.1, def = 0.3},
+
+				{ id = "line", type = "line" },
+
+				{id = "reloading_mcm", type = "check", val = 1, def=true},
+				{id = "pda_mcm", type = "check", val = 1, def=true},
+				{id = "inventory_mcm", type = "check", val = 1, def=true},
+				{id = "fdda_mcm", type = "check", val = 1, def=true},
+				{id = "looting_mutant_mcm", type = "check", val = 1, def=true},
+			}
+		}
+
+	return op, "ssfx_module"
+end

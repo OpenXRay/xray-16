@@ -1,0 +1,22 @@
+#include "common.h"
+
+out vec4 SV_Target;
+
+layout(location = TEXCOORD0) in float2 uv;
+
+void main()
+{
+	float3	YUV	= tex2D	(s_base, uv).bgr;
+
+	float	Y	= YUV.z;
+	float	U	= YUV.y;
+	float	V	= YUV.x;
+
+	float	c	= 1.16406;
+	float3	_Y	= float3		(c,			c,		c)*Y;
+	float3	_U	= float3		(0.0, 			-0.390625,	+2.01562) * U;
+	float3	_V	= float3		(+1.59765,		-0.8125,	0.0) * V;
+	float3	_S	= float3		(-0.86961,		+0.53076,	-1.0786);
+
+	SV_Target	= float4(_Y+_U+_V+_S,1.0);
+}

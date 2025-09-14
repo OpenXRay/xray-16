@@ -1,0 +1,38 @@
+#include "common.h"
+#include "iostructs\p_volumetric_combine.h"
+
+//	Igor: used for volumetric light
+#ifndef USE_MSAA
+Texture2D s_vollight;
+#else
+Texture2DMS	s_vollight;
+#endif
+
+//	TODO: DX10: Use load instead of sample
+_out _main( _input I )
+{
+	// final tone-mapping
+#ifdef USE_VTF
+	float	tm_scale	= I.tc0.w;	// interpolated from VS
+#else // USE_VTF
+	float	tm_scale	= tex2D(s_tonemap, I.tc0).x;
+#endif // USE_VTF
+
+	_out	o;
+	float4	color;
+
+#ifndef USE_MSAA
+	color = texelFetch(s_vollight, int2(I.tc0.xy*pos_decompression_params2.xy), 0);
+#else // USE_MSAA
+	color = texelFetch(s_vollight, int2(I.tc0.xy*pos_decompression_params2.xy), 0);
+	for(int iSample = 1; iSample < MSAA_SAMPLES; ++iSample)
+	{
+		color	+= texelFetch(s_vollight, int2(float2(I.tc0) * pos_decompression_params2.xy), iSample);
+	}
+	color /= MSAA_SAMPLES;
+#endif // USE_MSAA
+
+	tonemap(o.low, o.high, color.rgb, tm_scale);
+
+	return o;
+}

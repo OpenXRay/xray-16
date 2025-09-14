@@ -1,0 +1,114 @@
+#include "common.h"
+#include "iostructs\p_water.h"
+
+// Used only in ssr.h
+// Should be hidden under (SSR_QUALITY > 0) check, but I'm not sure if it won't crash
+// when engine will try to use s_half_depth when SSLR is off.
+Texture2D   s_half_depth;
+
+#if SSR_QUALITY > 0
+uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
+
+#include "ssr.h"
+#endif
+
+Texture2D	s_nmap;
+TextureCube	s_env0;
+TextureCube	s_env1;
+Texture2D	s_leaves;
+
+#if defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
+uniform float3	water_intensity;
+#endif	// defined(USE_SOFT_WATER) && defined(NEED_SOFT_WATER)
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel
+
+#ifdef GBUFFER_OPTIMIZATION
+float4 _main( v2p I, float4 pos2d )
+#else
+float4 _main( v2p I )
+#endif
+{
+	float4	base	= tex2D (s_base,I.tbase);
+	float3	n0	= tex2D (s_nmap,I.tnorm0).xyz;
+	float3	n1	= tex2D (s_nmap,I.tnorm1).xyz;
+	float3	Navg	= n0 + n1 - 1.0;
+
+	float3	Nw	= mul (float3x3(I.M1, I.M2, I.M3), Navg);
+		Nw	= normalize (Nw);
+	float3	v2point	= normalize (I.v2point);
+	float3	vreflect = reflect(v2point, Nw);
+
+	// true remapping (slow)
+	float3	vreflectabs	=  abs(vreflect);
+	float	vreflectmax	=  max(vreflectabs.x, max(vreflectabs.y, vreflectabs.z));
+		vreflect	/= vreflectmax;
+	if (vreflect.y < 0.999)
+		vreflect.y	= vreflect.y*2.0 - 1.0;     // fake remapping (fast)
+
+	float3	env0	= texCUBE (s_env0, vreflect).rgb;
+	float3	env1	= texCUBE (s_env1, vreflect).rgb;
+	float3	env	= lerp (env0,env1, L_ambient.w);
+#if SSR_QUALITY > 0
+	env = compute_ssr(I.position_w.xyz, Nw, env).xyz;
+#endif
+		env	*= env*2.0;
+
+	float	fresnel	= saturate (dot(vreflect,v2point));
+	float	power	= pow(fresnel,9);
+	float	amount	= 0.15 + 0.25*power;	// 1=full env, 0=no env
+
+	float3	c_reflection	= env*amount;
+	float3	final		= lerp(c_reflection,base.rgb,base.a);
+		final		*= I.c0.rgb*2.0;
+
+#ifdef	NEED_SOFT_WATER
+	float	alpha	= 0.75 + 0.25*power;                        // 1=full env, 0=no env
+
+#ifdef	USE_SOFT_WATER
+	float2 PosTc = I.tctexgen.xy/I.tctexgen.z;
+#ifdef GBUFFER_OPTIMIZATION
+	gbuffer_data gbd = gbuffer_load_data( PosTc, pos2d );
+#else
+	gbuffer_data gbd = gbuffer_load_data( PosTc );
+#endif
+	float4 _P = 	float4( gbd.P, gbd.mtl );
+	float waterDepth = _P.z-I.tctexgen.z;
+
+	//	water fog
+	float fog_exp_intens	= -4.0;
+	float fog		= 1.0-exp(fog_exp_intens*waterDepth);
+	float3 Fc  		= float3( 0.1, 0.1, 0.1) * water_intensity.r;
+	final 			= lerp (Fc, final, alpha);
+
+		alpha 		= min(alpha, saturate(waterDepth));
+		alpha 		= max (fog, alpha);
+
+	//	Leaves
+	float4	leaves		= tex2D (s_leaves, I.tbase);
+		leaves.rgb	*= water_intensity.r;
+
+	float	calc_cos	= -dot(I.M3, normalize(v2point));
+	float	calc_depth	= saturate(waterDepth*calc_cos);
+	float	fLeavesFactor	= smoothstep(0.025, 0.05, calc_depth);
+		fLeavesFactor	*= smoothstep(0.1, 0.075, calc_depth);
+		final		= lerp(final, leaves.rgb, leaves.a*fLeavesFactor);
+		alpha		= lerp(alpha, leaves.a, leaves.a*fLeavesFactor);
+
+#endif	//	USE_SOFT_WATER
+
+	// Fogging
+	final			= lerp(fog_color.rgb, final, I.fog);
+	alpha			*= I.fog*I.fog;
+
+	return  float4 (final, alpha);
+
+#else	//	NEED_SOFT_WATER
+
+	//	Fogging
+	final			= lerp(fog_color.rgb, final, I.fog);
+
+	return	float4 (final, I.fog*I.fog);
+#endif	//	NEED_SOFT_WATER
+}

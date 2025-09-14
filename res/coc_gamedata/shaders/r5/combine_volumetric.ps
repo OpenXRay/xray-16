@@ -1,0 +1,55 @@
+#include "common.h"
+
+//	Igor: used for volumetric light
+#ifndef USE_MSAA
+Texture2D 							s_vollight;
+#else
+	#ifndef SM_5
+		Texture2DMS<float4,MSAA_SAMPLES> s_vollight;
+	#else
+		Texture2DMS<float4>	s_vollight;
+	#endif
+#endif
+
+struct	_input      
+{
+	float4	tc0	: TEXCOORD0;	// tc.xy, tc.w = tonemap scale
+};
+
+struct	_out
+{
+        float4	low		: SV_Target0;
+        float4	high	: SV_Target1;
+};
+
+//	TODO: DX10: Use load instead of sample
+_out main( _input I )
+{
+	// final tone-mapping
+	float          	tm_scale        = I.tc0.w;	// interpolated from VS
+
+	_out	o;
+	float4	color;
+
+#ifndef USE_MSAA
+	color = s_vollight.Load(int3(I.tc0.xy*screen_res.xy, 0));
+#else // USE_MSAA
+	color = s_vollight.Load(int3(I.tc0.xy*screen_res.xy, 0), 0);
+	[unroll] for(int iSample = 1; iSample < MSAA_SAMPLES; ++iSample)
+	{
+		color	+= s_vollight.Load(int3(I.tc0*screen_res.xy, 0), iSample);
+	}
+	color /= MSAA_SAMPLES;
+#endif // USE_MSAA
+	
+	//color.rgb = LinearTosRGB(color.rgb); 			//gamma correct
+	//color.a = LinearTosRGB(color.a); 			//gamma correct
+	
+	tonemap(o.low, o.high, color, tm_scale );
+
+	//o.low.a = 1;
+	//o.low.a = dot(o.low.rgb, LUMINANCE_VECTOR); 			//screen blend
+	//o.high.a = dot(o.high.rgb, LUMINANCE_VECTOR); 			//screen blend
+	
+	return o;
+}

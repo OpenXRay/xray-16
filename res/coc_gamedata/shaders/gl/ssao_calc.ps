@@ -1,0 +1,36 @@
+#include "common.h"
+
+#ifndef ISAMPLE
+#define ISAMPLE uint(0)
+#endif
+
+uniform float3x4	m_v2w;
+Texture2D s_half_depth;
+
+#include "ssao.ps"
+#ifdef	USE_HBAO
+#include "ssao_hbao.ps"
+#endif	//	USE_HBAO
+
+#include "iostructs\p_ssao_calc.h"
+
+#ifndef MSAA_OPTIMIZATION
+float4 _main ( _input I )
+#else
+float4 _main ( _input I, uint iSample )
+#endif
+{
+	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5 * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
+
+	float3	P = gbd0.P.xyz;
+	float3	N = gbd0.N.xyz;
+
+#ifndef USE_HBAO
+	float occ = calc_ssao( CS_P(P, N, I.tc0.xy, I.tcJ.xy, I.pos2d, ISAMPLE) );
+#else
+	//	Is not supported now
+	float occ = 1.0;//hbao_calc(P, N, I.tc0.xy, I.pos2d);
+#endif
+
+	return float4(occ, occ, occ, occ);
+}

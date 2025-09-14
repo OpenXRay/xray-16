@@ -1,0 +1,64 @@
+#ifdef USE_MSAA
+#ifndef USE_HBAO
+Texture2DMS	s_occ;
+#else
+Texture2D	s_occ;
+#endif
+#else
+Texture2D	s_occ;
+#endif
+
+#ifndef USE_MSAA
+float ssao_blur_ps(float2 centerTC)
+#else
+float ssao_blur_ps(int2 centerTC, int iSample)
+#endif
+{
+	// low weight center sample - will be used on edges
+	float  fSumWeight = 0.025;
+#ifndef USE_MSAA
+	float2 centerData = tex2D(s_occ, centerTC).rg;
+#else
+	float2 centerData = texelFetch(s_occ, centerTC, iSample).rg;
+#endif
+
+	float  fOcclusion  = centerData.r * fSumWeight;
+	float  centerDepth = centerData.g;
+
+#ifndef USE_MSAA
+	float2	arrOffsets [4];
+			arrOffsets[0] = float2( 1.0,-1.0);
+			arrOffsets[1] = float2(-1.0,-1.0);
+			arrOffsets[2] = float2( 1.0, 1.0);
+			arrOffsets[3] = float2(-1.0, 1.0);
+#else
+	int2	arrOffsets [4];
+			arrOffsets[0] = int2( 1,-1);
+			arrOffsets[1] = int2(-1,-1);
+			arrOffsets[2] = int2( 1, 1);
+			arrOffsets[3] = int2(-1, 1);
+#endif
+
+	for (int i = 0; i < 4; i++)
+	{
+#ifndef USE_MSAA
+		float2 sampleTC   = centerTC + pos_decompression_params2.zw * arrOffsets[i];
+		float2 sampleData = tex2D(s_occ, sampleTC).rg;
+#else
+		int2	sampleTC   = centerTC + arrOffsets[i];
+		float2 sampleData = texelFetch(s_occ, sampleTC, iSample).rg;
+#endif
+	 
+		float fDepth  = sampleData.g;
+		float fDiff	  = 8*abs(fDepth-centerDepth)/min(fDepth,centerDepth);
+	 	float fWeight = saturate(1-fDiff);
+
+		fOcclusion += sampleData.r * fWeight;
+
+		fSumWeight += fWeight;
+	}
+
+	fOcclusion /= fSumWeight;   
+
+	return fOcclusion;
+}

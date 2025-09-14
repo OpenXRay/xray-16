@@ -1,0 +1,28 @@
+-- @ Version: SCREEN SPACE SHADERS - UPDATE 15
+-- @ Description: Shadow Cascades script - Settings
+-- @ Author: https://www.moddb.com/members/ascii1457
+-- @ Mod: https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders
+
+-- If you're not using MCM you can customize your settings here --
+
+ssfx_default_settings = 
+{
+-- Near Cascade Size. Try to use a lower size value to improve the quality of your sun shadows.
+	["size_1"] = 20,
+	
+-- Mid Cascade Size. Try to use a lower size value to improve the quality of your sun shadows.
+	["size_2"] = 60,
+	
+-- Far Cascade Size. This cascade define the final rendering distance of your sun shadows. Lower values will improve performance, higher values will improve your distant shadows at the cost of performance.
+	["size_3"] = 160,
+	
+-- 0 = Only NEAR cascade render grass shadows | 1 = Extend grass shadows to the mid cascade | 2 = All cascades render grass shadows | 3 = All lights will cast grass shadows
+	["grass_shw_quality"] = 0,
+	
+-- Rendering distance of sun grass shadows. The value is porcentual to your grass rendering distance. Lower values will improve performance. 
+	["grass_shw_distance"] = 35,
+	
+-- This value adjust the rendering distance of grass shadows for non-directional lights. Lower values will improve performance, but you might notice when the shadows stop being rendered.
+	["grass_shw_nondir_maxdistance"] = 30,
+}
+----------------------------------------------------

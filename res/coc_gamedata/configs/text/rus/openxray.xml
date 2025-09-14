@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_unload_magazine_after_pickup">
+		<text>Разряжать ор. при поднятии</text>
+	</string>
+	<string id="st_unload_magazine_all">
+		<text>разрядить всё оружие</text>
+	</string>
+	<string id="st_unequip">
+		<text>убрать в рюкзак</text>
+	</string>
+	<string id="st_donate">
+		<text>Подарить</text>
+	</string>
+	<string id="st_loading_lights">
+		<text>Загрузка освещения</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>Клиент: Соединение с</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>Клиент: Создание</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>Клиент: Синхронизация</text>
+	</string>
+	<string id="st_creating_new_game">
+		<text>Создание новой игры</text>
+	</string>
+	<string id="ui_mm_always_active">
+		<text>Не ставить на паузу при Alt+Tab</text>
+	</string>
+	<string id="ui_mm_detail_radius">
+		<text>Дальность прор. травы</text>
+	</string>
+	<string id="ui_mm_ui_style">
+		<text>Стиль интерфейса</text>
+	</string>
+	<string id="ui_style_default">
+		<text>Call of Chernobyl</text>
+	</string>
+	<string id="ui_mm_simplified_item_pickup">
+		<text>Упр. подбор предметов</text>
+	</string>
+	<string id="ui_mm_multi_item_pickup">
+		<text>Множ. подбор предметов</text>
+	</string>
+	<string id="ui_mm_loadingstages">
+		<text>Стадии загрузки</text>
+	</string>
+	<string id="renderer_rgl">
+		<text>Ул. полное освещение (OpenGL)</text>
+	</string>
+	<string id="ui_mm_window_mode">
+		<text>Режим окна</text>
+	</string>
+	<string id="st_opt_windowed">
+		<text>Оконный</text>
+	</string>
+	<string id="st_opt_windowed_borderless">
+		<text>Оконный без рамок</text>
+	</string>
+	<string id="st_opt_fullscreen">
+		<text>Полноэкранный</text>
+	</string>
+	<string id="st_opt_fullscreen_borderless">
+		<text>Полноэкранный (быстрый Alt+Tab)</text>
+	</string>
+	<string id="ui_mm_r2_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_r2_smap_size">
+		<text>Качество теневых карт</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_opt">
+		<text>Оптимизация намокания</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_near">
+		<text>Намокание вблизи</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_far">
+		<text>Намокание вдали</text>
+	</string>
+	<string id="ui_mm_r3_dynamic_wet_surfaces_sm_res">
+		<text>Качество намокания</text>
+	</string>
+	<string id="ui_mm_fov">
+		<text>Угол обзора</text>
+	</string>
+	<string id="ui_mm_hud_fov">
+		<text>Угол обзора HUD</text>
+	</string>
+	<string id="ui_mm_localization">
+		<text>Язык</text>
+	</string>
+	<string id="ui_mm_gamepad_setup">
+		<text>Настройка геймпада</text>
+	</string>
+	<string id="ui_mm_fps_limit">
+		<text>Ограничение FPS в игре</text>
+	</string>
+	<string id="ui_mm_fps_limit_in_menu">
+		<text>Ограничение FPS в меню</text>
+	</string>
+	<string id="ui_mm_shader_preset">
+		<text>Режим графики</text>
+	</string>
+	<string id="ui_mm_shader_preset_vanilla">
+		<text>оригинальная</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_default">
+		<text>улучшенная (стандарт)</text>
+	</string>
+	<string id="ui_mm_shader_preset_enhanced_high">
+		<text>улучшенная (высоко)</text>
+	</string>
+	<string id="ui_mm_color_grading_preset">
+		<text>Градация цветов</text>
+	</string>
+	<string id="ui_mm_color_grading_default">
+		<text>стандартная</text>
+	</string>
+	<string id="ui_mm_color_grading_cold">
+		<text>холодная</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_01">
+		<text>Filmic 1</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_02">
+		<text>Filmic 2</text>
+	</string>
+	<string id="ui_mm_color_grading_filmic_03">
+		<text>Filmic 3</text>
+	</string>
+	<string id="ui_mm_color_grading_hollywood">
+		<text>Hollywood</text>
+	</string>
+	<string id="ui_mm_color_grading_vanilla">
+		<text>оригинальная</text>
+	</string>
+	<string id="ui_mm_color_grading_vibrant">
+		<text>Vibrant</text>
+	</string>
+	<string id="ui_mm_color_grading_warm">
+		<text>тёплая</text>
+	</string>
+	
+	<string id="cze">
+    	<text>Чешский (Czech)</text>
+	</string>
+	<string id="eng">
+		<text>Английский (English)</text>
+	</string>
+	<string id="fra">
+		<text>Французский (French)</text>
+	</string>
+	<string id="ger">
+		<text>Немецкий (German)</text>
+	</string>
+	<string id="ita">
+		<text>Итальянский (Italian)</text>
+	</string>
+	<string id="jpn">
+    	<text>Японский (Japanese)</text>
+	</string>
+	<string id="pol">
+		<text>Польский (Polish)</text>
+	</string>
+	<string id="rus">
+		<text>Русский (Russian)</text>
+	</string>
+	<string id="spa">
+		<text>Испанский (Spanish)</text>
+	</string>
+	<string id="ukr">
+		<text>Украинский (Ukrainian)</text>
+	</string>
+
+<string id="kb_grp_ui">
+	<text>Интерфейс</text>
+</string>
+<string id="kb_pda_map_move_left">
+	<text>Двигать карту влево</text>
+</string>
+<string id="kb_pda_map_move_right">
+	<text>Двигать карту вправо</text>
+</string>
+<string id="kb_pda_map_move_up">
+	<text>Двигать карту вверх</text>
+</string>
+<string id="kb_pda_map_move_down">
+	<text>Двигать карту вниз</text>
+</string>
+<string id="kb_pda_map_zoom_in">
+	<text>Приблизить карту</text>
+</string>
+<string id="kb_pda_map_zoom_out">
+	<text>Отдалить карту</text>
+</string>
+<string id="kb_pda_map_zoom_reset">
+	<text>Стандартное приближение</text>
+</string>
+<string id="kb_pda_map_show_actor">
+	<text>Приблизить к игроку</text>
+</string>
+<string id="kb_pda_map_show_legend">
+	<text>Показать легенду</text>
+</string>
+<string id="kb_pda_filter_toggle">
+	<text>Фильтр</text>
+</string>
+<string id="kb_ui_move_left">
+	<text>Двигать интерфейс влево</text>
+</string>
+<string id="kb_ui_move_right">
+	<text>Двигать интерфейс вправо</text>
+</string>
+<string id="kb_ui_move_up">
+	<text>Двигать интерфейс вверх</text>
+</string>
+<string id="kb_ui_move_down">
+	<text>Двигать интерфейс вниз</text>
+</string>
+<string id="kb_ui_accept">
+	<text>Принять</text>
+</string>
+<string id="kb_ui_back">
+	<text>Назад</text>
+</string>
+<string id="kb_ui_action_1">
+	<text>Действие 1</text>
+</string>
+<string id="kb_ui_action_2">
+	<text>Действие 2</text>
+</string>
+<string id="kb_ui_tab_prev">
+	<text>Предыдущая вкладка</text>
+</string>
+<string id="kb_ui_tab_next">
+	<text>Следующая вкладка</text>
+</string>
+<string id="kb_talk_switch_to_trade">
+	<text>Торговля / ремонт</text>
+</string>
+<string id="kb_talk_log_scroll_up">
+	<text>Прокручивать диалог вверх</text>
+</string>
+<string id="kb_talk_log_scroll_down">
+	<text>Прокручивать диалог вниз</text>
+</string>
+<string id="kb_editor">
+	<text>Редактор</text>
+</string>
+<string id="kb_cam_1">
+	<text>Вид от первого лица</text>
+</string>
+<string id="kb_cam_2">
+	<text>Вид от третьего лица</text>
+</string>
+<string id="kb_cam_3">
+	<text>Вид от третьего лица (свободный обзор)</text>
+</string>
+<string id="kb_cam_zoom_in">
+	<text>Приблизить камеру</text>
+</string>
+<string id="kb_cam_zoom_out">
+	<text>Отдалить камеру</text>
+</string>
+<string id="kb_talk_log_scroll">
+	<text>Прокручивать диалог</text>
+</string>
+<string id="kb_pda_map_move">
+	<text>Двигать карту</text>
+</string>
+<string id="kb_ui_move">
+	<text>Двигать интерфейс</text>
+</string>
+<string id="kb_ui_move_secondary">
+	<text>Двигать вторичный интерфейс</text>
+</string>
+<string id="kb_cam_autoaim">
+	<text>Автоприцеливание</text>
+</string>
+<string id="kb_ui_click_1">
+	<text>Левая кнопка мыши</text>
+</string>
+<string id="kb_ui_click_2">
+	<text>Правая кнопка мыши</text>
+</string>
+<string id="gp_look_around">
+	<text>Обзор</text>
+</string>
+<string id="gp_move_around">
+	<text>Перемещение</text>
+</string>
+<string id="kb_enter">
+	<text>Принять</text>
+</string>
+</string_table>

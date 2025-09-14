@@ -1,0 +1,85 @@
+--'******************************************************
+--'*  Биндер объекта поля аномалий.
+--'******************************************************
+fields_by_names = {}
+function bind(obj)
+	obj:bind_object(anomaly_field_binder(obj))
+end
+
+class "anomaly_field_binder" (object_binder)
+function anomaly_field_binder:__init(obj) super(obj)
+
+end
+
+function anomaly_field_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function anomaly_field_binder:reinit()
+	object_binder.reinit(self)
+	db.storage[self.object:id()] = {}
+	self.st = db.storage[self.object:id()]
+end
+
+function anomaly_field_binder:net_spawn(server_object)
+	if not object_binder.net_spawn(self, server_object) then
+		return false
+	end
+	db.add_zone(self.object)
+	db.add_obj(self.object)
+	fields_by_names[self.object:name()] = self
+	
+	--[[
+		eDefaultRestrictorTypeNone = u8(0),
+		eDefaultRestrictorTypeOut  = u8(1),
+		eDefaultRestrictorTypeIn   = u8(2),
+		eRestrictorTypeNone		   = u8(3),
+		eRestrictorTypeIn		   = u8(4),
+		eRestrictorTypeOut		   = u8(5),
+	--]]
+	-- don't enable unless you realize that engine AI schemes to deal with anomalies is stupid and will not be supported
+	-- MAY CAUSE HUGE FPS DROP ON COP MAPS
+	--[[
+	if (get_console():get_bool("ai_die_in_anomaly") == true) then
+		-- It causes HUGE fps drop on COP maps which is why it was probably cut
+		local ignore = { 
+					["zaton"] = true,
+					["jupiter"] = true,
+					["pripyat"] = true
+		}
+		if not (ignore[level.name()]) then
+			self.object:set_restrictor_type(3)
+		end
+	end
+	--]]
+	
+	return true
+end
+
+function anomaly_field_binder:net_destroy()
+	db.del_zone( self.object )
+	db.del_obj(self.object)
+	db.storage[self.object:id()] = nil
+	fields_by_names[self.object:name()] = nil
+	object_binder.net_destroy(self)
+end
+
+function anomaly_field_binder:set_enable(bEnable)
+	if(bEnable) then
+		self.object:enable_anomaly()
+	else
+		self.object:disable_anomaly()
+	end
+end
+
+-- oxr
+--[[
+function anomaly_field_binder:update(delta)
+	object_binder.update(self, delta)
+end
+]]
+
+-- Standart function for save
+function anomaly_field_binder:net_save_relevant()
+	return true
+end

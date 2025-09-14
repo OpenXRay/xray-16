@@ -1,0 +1,27 @@
+#include "common.h"
+#include "iostructs\p_postpr.h"
+
+Texture2D 	s_base0;
+Texture2D 	s_base1;
+Texture2D 	s_noise;
+uniform float4 		c_brightness;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 _main( p_postpr I )
+{
+	float3	t_0 	= tex2D		(s_base0,I.Tex0).rgb;
+	float3	t_1 	= tex2D		(s_base1,I.Tex1).rgb;
+	float3 	image	= (t_0+t_1)*0.5;					// add_d2
+	float	gray 	= dot		(image,I.Gray.rgb);			// dp3
+			image 	= lerp 		(float3(gray),image,I.Gray.w);		// mul/mad
+
+	float4	t_noise	= tex2D		(s_noise,I.Tex2);
+	float3 	noised 	= image*t_noise.rgb*2.0;                     		// mul_2x
+			image	= lerp( noised, image, I.Color.w); 	// lrp ?
+			image	= (image * I.Color.rgb + c_brightness.rgb)*2;		// mad
+//		image	= (image + c_brightness) * I.Color;		// mad ?
+
+	// out
+	return  float4(image, 1.0);					// +mov
+}
