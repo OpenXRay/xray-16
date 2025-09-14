@@ -82,13 +82,7 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml, bool 
             return;
         if (includeName == strstr(includeName, comparePath))
         {
-            pcstr fileName = strstr(includeName, comparePath);
-            if (fileName)
-                fileName++;
-            else
-                fileName = includeName;
-
-            shared_str fn = xml->correct_file_name(uiPath, fileName);
+            shared_str fn = xml->correct_file_name(uiPath, strchr(includeName, _DELIMITER) + 1);
             string_path buff;
             strconcat(buff, uiPathDelim, fn.c_str());
             file = FS.r_open(path, buff);
