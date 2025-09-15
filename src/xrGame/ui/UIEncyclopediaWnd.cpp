@@ -21,7 +21,7 @@
 #include "../actor.h"
 
 #define ENCYCLOPEDIA_DIALOG_XML "encyclopedia.xml"
-CUIEncyclopediaWnd::CUIEncyclopediaWnd() : 
+CUIEncyclopediaWnd::CUIEncyclopediaWnd() :
     CUIWindow("CUIEncyclopediaWnd"),
     prevArticlesCount(0),
     UIEncyclopediaIdxBkg(NULL),
@@ -33,7 +33,11 @@ CUIEncyclopediaWnd::CUIEncyclopediaWnd() :
     UIIdxList(NULL),
     UIInfoList(NULL),
     m_pTreeRootFont(NULL),
-    m_pTreeItemFont(NULL)
+    m_pTreeItemFont(NULL),
+    m_flags(eNeedReload),
+    m_uTreeItemColor(color_rgba(255, 255, 255, 255)),
+    m_uTreeRootColor(color_rgba(255, 255, 255, 255))
+
 {
 }
 
@@ -51,7 +55,6 @@ bool CUIEncyclopediaWnd::Init()
         return false;
 
     CUIXmlInit xml_init;
-
     xml_init.InitWindow(uiXml, "main_wnd", 0, this);
 
     // Load xml data - ИСПРАВЛЕНИЕ КОНСТРУКТОРОВ
@@ -115,8 +118,9 @@ void CUIEncyclopediaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     if (UIIdxList == pWnd && LIST_ITEM_CLICKED == msg)
     {
-        CUITreeViewItem* pTVItem = static_cast<CUITreeViewItem*>(pData);
+        CUITreeViewItem* pTVItem = (CUITreeViewItem*)pData;
         R_ASSERT(pTVItem);
+        if (!pTVItem) return;
 
         if (pTVItem->vSubItems.size())
         {
@@ -150,24 +154,19 @@ void CUIEncyclopediaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIEncyclopediaWnd::Draw()
 {
+    if (Actor()->encyclopedia_registry && 
+        (m_flags.test(eNeedReload) || Actor()->encyclopedia_registry->registry().objects().size() > prevArticlesCount))
+    {
+        ARTICLE_VECTOR::const_iterator it = Actor()->encyclopedia_registry->registry().objects().begin();
+        std::advance(it, prevArticlesCount);
 
-    if (m_flags.test(eNeedReload)) {
-        if (Actor()->encyclopedia_registry->registry().objects_ptr() && Actor()->encyclopedia_registry->registry().objects_ptr()->size() > prevArticlesCount)
-        {
-            ARTICLE_VECTOR::const_iterator it = Actor()->encyclopedia_registry->registry().objects_ptr()->begin();
-            std::advance(it, prevArticlesCount);
-            for (; it != Actor()->encyclopedia_registry->registry().objects_ptr()->end(); it++)
-            {
-                if (ARTICLE_DATA::eEncyclopediaArticle == it->article_type)
-                {
-                    AddArticle(it->article_id, it->readed);
-                }
-            }
-            prevArticlesCount = Actor()->encyclopedia_registry->registry().objects_ptr()->size();
-        }
-
+        for (const auto& kv : Actor()->encyclopedia_registry->registry().objects())
+            if (ARTICLE_DATA::eEncyclopediaArticle == kv.article_type)
+                AddArticle(kv.article_id, kv.readed);
+        prevArticlesCount = Actor()->encyclopedia_registry->registry().objects().size();
         m_flags.set(eNeedReload, FALSE);
     }
+
 
     inherited::Draw();
 }
@@ -190,10 +189,9 @@ void CUIEncyclopediaWnd::Show(bool status)
 bool CUIEncyclopediaWnd::HasArticle(shared_str id)
 {
     ReloadArticles();
-    for (std::size_t i = 0; i < m_ArticlesDB.size(); ++i)
-    {
-        if (m_ArticlesDB[i]->Id() == id) return true;
-    }
+    for (const auto& kv : m_ArticlesDB)
+        if (kv->Id() == id)
+            return true;
     return false;
 }
 
@@ -242,10 +240,10 @@ void CUIEncyclopediaWnd::SetCurrentArtice(CUITreeViewItem* pTVItem)
 
 void CUIEncyclopediaWnd::AddArticle(shared_str article_id, bool bReaded)
 {
-    for (std::size_t i = 0; i < m_ArticlesDB.size(); i++)
-    {
-        if (m_ArticlesDB[i]->Id() == article_id) return;
-    }
+
+    for (const auto& kv : m_ArticlesDB)
+        if (kv->Id() == article_id)
+            return;
 
     // Добавляем элемент
     m_ArticlesDB.resize(m_ArticlesDB.size() + 1);
@@ -253,9 +251,7 @@ void CUIEncyclopediaWnd::AddArticle(shared_str article_id, bool bReaded)
     a = xr_new<CEncyclopediaArticle>();
     a->Load(article_id);
 
-
     // Теперь создаем иерархию вещи по заданному пути
-
     CreateTreeBranch(a->data()->group, a->data()->name, UIIdxList, m_ArticlesDB.size() - 1,
         m_pTreeRootFont, m_uTreeRootColor, m_pTreeItemFont, m_uTreeItemColor, bReaded);
 }

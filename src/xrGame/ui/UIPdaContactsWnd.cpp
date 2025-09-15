@@ -11,6 +11,8 @@
 
 #define PDA_CONTACT_HEIGHT 70
 #define PDA_CONTACTS_XML "pda_contacts_new.xml"
+#define PDA_CONTACT_CHAR "pda_character.xml"
+
 extern CSE_ALifeTraderAbstract* ch_info_get_from_id(u16 id);
 
 CUIPdaContactsWnd::CUIPdaContactsWnd() : CUIWindow("UIPdaContactsWnd")
@@ -103,14 +105,12 @@ void CUIPdaContactsWnd::AddContact(CPda* pda)
 {
     VERIFY(pda);
 
-    CUIPdaContactItem* pItem = NULL;
-    pItem = xr_new<CUIPdaContactItem>(this);
+    CUICharacterInfo* pItem = NULL;
+    pItem = xr_new<CUICharacterInfo>();
     UIListWnd->AddWindow(pItem, true);
     VERIFY(pda->GetOriginalOwner());
-    pItem->Init(pda->GetOriginalOwner()->object_id());
-    pItem->SetWidth(UIListWnd->GetWidth());
-    pItem->SetHeight(85);
-    pItem->m_data = pda;
+    pItem->InitCharacterInfo(Fvector2(), Fvector2(UIListWnd->GetWidth(), 85), PDA_CONTACT_CHAR);
+    pItem->InitCharacter(pda->GetOriginalOwner()->object_id());
 }
 
 void CUIPdaContactsWnd::RemoveContact(CPda* pda)

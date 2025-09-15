@@ -32,7 +32,7 @@ void CUIPdaListItem::Init(u16 pizdabol)
     UIInfo = xr_new<CUICharacterInfo>();
     UIInfo->SetAutoDelete(true);
     AttachChild(UIInfo);
-    UIInfo->InitCharacter(pizdabol);
+
 
     CUIXmlInit xml_init;
     if (uiXml.NavigateToNode("mask_frame_window", 0))
