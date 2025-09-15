@@ -19,7 +19,6 @@
 #include "../encyclopedia_article.h"
 #include "../alife_registry_wrappers.h"
 #include "../actor.h"
-#include "Common/object_broker.h"
 
 #define ENCYCLOPEDIA_DIALOG_XML "encyclopedia.xml"
 CUIEncyclopediaWnd::CUIEncyclopediaWnd() : 
@@ -106,8 +105,8 @@ bool CUIEncyclopediaWnd::Init()
     UIEncyclopediaInfoBkg->AttachChild(UIInfoList);
     xml_init.InitScrollView(uiXml, "info_list", 0, UIInfoList);
 
-    xml_init.InitWindow(uiXml, "left_auto_static", 0, UIEncyclopediaInfoBkg);
-    xml_init.InitWindow(uiXml, "right_auto_static", 0, UIEncyclopediaIdxBkg);
+    xml_init.InitAutoStaticGroup(uiXml, "left_auto_static", 0, UIEncyclopediaInfoBkg);
+    xml_init.InitAutoStaticGroup(uiXml, "right_auto_static", 0, UIEncyclopediaIdxBkg);
 
     return true;
 }

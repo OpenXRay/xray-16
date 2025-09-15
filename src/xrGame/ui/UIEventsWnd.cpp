@@ -46,7 +46,8 @@ CUIEventsWnd::CUIEventsWnd() :
     m_UIMapWnd(NULL),
     m_UITaskInfoWnd(NULL),
     m_ListWnd(NULL),
-    m_TaskFilter(NULL)
+    m_TaskFilter(NULL),
+    m_currFilter(ETaskFilters::eActiveTask)
 {
     m_flags.zero();
 }

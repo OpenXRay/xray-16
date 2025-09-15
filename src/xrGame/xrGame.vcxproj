@@ -1319,7 +1319,9 @@
     <ClInclude Include="ui\UIOptConCom.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
     <ClInclude Include="ui\UIOutfitSlot.h" />
+    <ClInclude Include="ui\UIPdaContactsWnd.h" />
     <ClInclude Include="ui\UIPdaKillMessage.h" />
+    <ClInclude Include="ui\UIPdaListItem.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
     <ClInclude Include="ui\UIRankFaction.h" />
@@ -3199,7 +3201,9 @@
     <ClCompile Include="ui\UIOptConCom.cpp" />
     <ClCompile Include="ui\UIOutfitInfo.cpp" />
     <ClCompile Include="ui\UIOutfitSlot.cpp" />
+    <ClCompile Include="ui\UIPdaContactsWnd.cpp" />
     <ClCompile Include="ui\UIPdaKillMessage.cpp" />
+    <ClCompile Include="ui\UIPdaListItem.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
     <ClCompile Include="ui\UIRankFaction.cpp" />

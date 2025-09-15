@@ -18,6 +18,7 @@
 
 #define DIAREYA_INFO "events_new.xml"
 #define DIAREYA_NEWS "news.xml"
+#define DIAREYA_ENCY "encyclopedia_item.xml"
 CUIDiaryWnd::CUIDiaryWnd() : CUIWindow("CUIDiaryWnd"), m_currFilter(eNone)
 {
 
@@ -244,8 +245,9 @@ void CUIDiaryWnd::OnSrcListItemClicked(CUIWindow* w, void* p)
     if (!pSelItem->IsRoot())
     {
         CUIEncyclopediaArticleWnd* article_info = xr_new<CUIEncyclopediaArticleWnd>();
-        article_info->Init("encyclopedia_item.xml", "encyclopedia_wnd:objective_item");
-        article_info->SetArticle(m_ArticlesDB[pSelItem->GetValue()]);
+        article_info->Init(DIAREYA_ENCY, "encyclopedia_wnd:objective_item");
+        CEncyclopediaArticle* mCEItem = m_ArticlesDB[pSelItem->GetValue()];
+        article_info->SetArticle(mCEItem);
         m_DescrView->AddWindow(article_info, true);
     }
 }

@@ -32,6 +32,7 @@
 #include "UIEncyclopediaWnd.h"
 #include "UIScriptWnd.h"
 #include "UIDiaryWnd.h"
+#include "UIPdaContactsWnd.h"
 
 #define PDA_XML "pda.xml"
 
@@ -48,6 +49,7 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUIDiaryWnd = nullptr;
     pUIRankingWnd = nullptr;
     pUIEncyclopediaWnd = nullptr;
+    pUIPdaContactsWnd = nullptr;
     pUIEventsWnd = nullptr;
     pUILogsWnd = nullptr;
     m_hint_wnd = nullptr;
@@ -74,6 +76,8 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUIEventsWnd);
     if (pUIEncyclopediaWnd)
         delete_data(pUIEncyclopediaWnd);
+    if (pUIPdaContactsWnd)
+        delete_data(pUIPdaContactsWnd);
     if (m_hint_wnd)
         delete_data(m_hint_wnd);
     if (UINoice)
@@ -116,15 +120,10 @@ void CUIPdaWnd::Init()
     m_btn_close->SetAccelerator(kUI_BACK, false, 2);
     UI().Focus().UnregisterFocusable(m_btn_close);
 
-
-    if (ShadowOfChernobylMode)
-        m_hint_wnd = UIHelper::CreateHint(uiXml, "left_frame", false);
-    else
-        m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
+    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
 
     if (IsGameTypeSingle())
     {
-
         pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
         if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
             xr_delete(pUIMapWnd);
@@ -156,6 +155,10 @@ void CUIPdaWnd::Init()
         pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
         if (!pUIEncyclopediaWnd->Init())
             xr_delete(pUIEncyclopediaWnd);
+
+        pUIPdaContactsWnd = xr_new<CUIPdaContactsWnd>();
+        if (!pUIPdaContactsWnd->Init())
+            xr_delete(pUIPdaContactsWnd);
 
         pUIDiaryWnd = xr_new<CUIDiaryWnd>();
         if (!pUIDiaryWnd->Init())
@@ -293,7 +296,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
             {"eptTasks", pUIEventsWnd},
             {"eptMap", pUIMapWnd},
             {"eptDiary", pUIDiaryWnd},
-            {"eptContacts", pUIEncyclopediaWnd},
+            {"eptContacts", pUIPdaContactsWnd},
             {"eptStalkersRanking", pUIEncyclopediaWnd},
             {"eptStatistics", pUIActorInfo},
             {"eptEncyclopedia", pUIEncyclopediaWnd},

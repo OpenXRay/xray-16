@@ -271,3 +271,16 @@ void CUIStatic::OnFocusLost()
     if (g_statHint->Owner() == this)
         g_statHint->Discard();
 }
+
+
+void CUIStatic::SetMask(CUIFrameWindow* pMask)
+{
+    DetachChild(m_pMask);
+    m_pMask = pMask;
+    if (m_pMask) {
+        AttachChild(m_pMask);
+        Frect r = GetWndRect();
+        m_pMask->SetWidth(r.right - r.left);
+        m_pMask->SetHeight(r.bottom - r.top);
+    }
+}

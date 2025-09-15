@@ -22,6 +22,7 @@ class CUIEncyclopediaWnd;
 class CUIEventsWnd;
 class UIHint;
 class CUIDiaryWnd;
+class CUIPdaContactsWnd;
 
 class CUIPdaWnd final : public CUIDialogWnd
 {
@@ -49,6 +50,7 @@ public:
     CUIMapWnd* pUIMapWnd;
     CUITaskWnd* pUITaskWnd;
     CUIEncyclopediaWnd* pUIEncyclopediaWnd;
+    CUIPdaContactsWnd* pUIPdaContactsWnd;
     CUIEventsWnd* pUIEventsWnd;
     CUIFactionWarWnd* pUIFactionWarWnd;
     CUIActorInfoWnd* pUIActorInfo;
