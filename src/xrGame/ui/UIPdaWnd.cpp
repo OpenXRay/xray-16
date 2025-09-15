@@ -31,6 +31,7 @@
 #include "UIEventsWnd.h"
 #include "UIEncyclopediaWnd.h"
 #include "UIScriptWnd.h"
+#include "UIDiaryWnd.h"
 
 #define PDA_XML "pda.xml"
 
@@ -44,6 +45,7 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUITaskWnd = nullptr;
     pUIFactionWarWnd = nullptr;
     pUIActorInfo = nullptr;
+    pUIDiaryWnd = nullptr;
     pUIRankingWnd = nullptr;
     pUIEncyclopediaWnd = nullptr;
     pUIEventsWnd = nullptr;
@@ -62,6 +64,8 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUIFactionWarWnd);
     if (pUIActorInfo)
         delete_data(pUIActorInfo);
+    if (pUIDiaryWnd)
+        delete_data(pUIDiaryWnd);
     if (pUIRankingWnd)
         delete_data(pUIRankingWnd);
     if (pUILogsWnd)
@@ -121,50 +125,41 @@ void CUIPdaWnd::Init()
     if (IsGameTypeSingle())
     {
 
-        if (ShadowOfChernobylMode)
-        {
-            pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
-            if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
-                xr_delete(pUIMapWnd);
+        pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
+        if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
+            xr_delete(pUIMapWnd);
 
-            pUIEventsWnd = xr_new<CUIEventsWnd>();
-            if (!pUIEventsWnd->Init())
-                xr_delete(pUIEventsWnd);
+        pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
+        if (!pUITaskWnd->Init())
+            xr_delete(pUITaskWnd);
 
-            pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
-            if (!pUIEncyclopediaWnd->Init())
-                xr_delete(pUIEncyclopediaWnd);
+        pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
+        if (!pUIFactionWarWnd->Init())
+            xr_delete(pUIFactionWarWnd);
 
-            pUIActorInfo = xr_new<CUIActorInfoWnd>();
-            if (!pUIActorInfo->Init())
-                xr_delete(pUIActorInfo);
-        }
-        else {
+        pUIActorInfo = xr_new<CUIActorInfoWnd>();
+        if (!pUIActorInfo->Init())
+            xr_delete(pUIActorInfo);
 
-            pUIMapWnd = xr_new<CUIMapWnd>(m_hint_wnd);
-            if (!pUIMapWnd->Init("pda_map.xml", "map_wnd", false))
-                xr_delete(pUIMapWnd);
+        pUIRankingWnd = xr_new<CUIRankingWnd>();
+        if (!pUIRankingWnd->Init())
+            xr_delete(pUIRankingWnd);
 
-            pUITaskWnd = xr_new<CUITaskWnd>(m_hint_wnd);
-            if (!pUITaskWnd->Init())
-                xr_delete(pUITaskWnd);
+        pUILogsWnd = xr_new<CUILogsWnd>();
+        if (!pUILogsWnd->Init())
+            xr_delete(pUILogsWnd);
 
-            pUIFactionWarWnd = xr_new<CUIFactionWarWnd>(m_hint_wnd);
-            if (!pUIFactionWarWnd->Init())
-                xr_delete(pUIFactionWarWnd);
+        pUIEventsWnd = xr_new<CUIEventsWnd>();
+        if (!pUIEventsWnd->Init())
+            xr_delete(pUIEventsWnd);
 
-            pUIActorInfo = xr_new<CUIActorInfoWnd>();
-            if (!pUIActorInfo->Init())
-                xr_delete(pUIActorInfo);
+        pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
+        if (!pUIEncyclopediaWnd->Init())
+            xr_delete(pUIEncyclopediaWnd);
 
-            pUIRankingWnd = xr_new<CUIRankingWnd>();
-            if (!pUIRankingWnd->Init())
-                xr_delete(pUIRankingWnd);
-
-            pUILogsWnd = xr_new<CUILogsWnd>();
-            if (!pUILogsWnd->Init())
-                xr_delete(pUILogsWnd);
-        }
+        pUIDiaryWnd = xr_new<CUIDiaryWnd>();
+        if (!pUIDiaryWnd->Init())
+            xr_delete(pUIDiaryWnd);
     }
 
     UITabControl = xr_new<CUITabControl>();
@@ -210,7 +205,6 @@ void CUIPdaWnd::Init()
     if (ClearSkyMode)
         RearrangeTabButtons(UITabControl);
 }
-
 
 void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
@@ -298,7 +292,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         {
             {"eptTasks", pUIEventsWnd},
             {"eptMap", pUIMapWnd},
-            {"eptDiary", pUIEncyclopediaWnd},
+            {"eptDiary", pUIDiaryWnd},
             {"eptContacts", pUIEncyclopediaWnd},
             {"eptStalkersRanking", pUIEncyclopediaWnd},
             {"eptStatistics", pUIActorInfo},

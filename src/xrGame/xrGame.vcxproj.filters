@@ -2233,6 +2233,9 @@
     <Filter Include="UI\Common\PDA\Encyclopedia">
       <UniqueIdentifier>{3946c692-4a83-47fe-b1bf-95955dbafe2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Common\PDA\Diary">
+      <UniqueIdentifier>{e608d3d0-db12-46e0-a811-94ca1a5b7938}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6326,6 +6329,9 @@
     <ClInclude Include="ui\UIEncyclopediaArticleWnd.h">
       <Filter>UI\Common\PDA\Encyclopedia</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIDiaryWnd.h">
+      <Filter>UI\Common\PDA\Diary</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9524,6 +9530,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIEncyclopediaWnd.cpp">
       <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIDiaryWnd.cpp">
+      <Filter>UI\Common\PDA\Diary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

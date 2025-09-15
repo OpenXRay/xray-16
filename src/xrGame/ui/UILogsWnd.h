@@ -31,6 +31,7 @@ class CUILogsWnd final : public CUIWindow, public CUIWndCallback
 {
 private:
     typedef CUIWindow inherited;
+    CUIXml m_uiXml;
 
     CUICharacterInfo* m_actor_ch_info{};
 
@@ -59,8 +60,6 @@ private:
 
     CUIWindow* CreateItem();
     CUIWindow* ItemFromCache();
-    //	void				ItemToCache			(CUIWindow* w);
-    CUIXml m_uiXml;
 
 public:
     CUILogsWnd();

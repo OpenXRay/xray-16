@@ -22,7 +22,6 @@
 #include "Common/object_broker.h"
 
 #define ENCYCLOPEDIA_DIALOG_XML "encyclopedia.xml"
-#define ALL_PDA_HEADER_PREFIX "# ";
 CUIEncyclopediaWnd::CUIEncyclopediaWnd() : 
     CUIWindow("CUIEncyclopediaWnd"),
     prevArticlesCount(0),
@@ -124,7 +123,7 @@ void CUIEncyclopediaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         {
             CEncyclopediaArticle* A = m_ArticlesDB[pTVItem->vSubItems[0]->GetValue()];
 
-            xr_string caption = ALL_PDA_HEADER_PREFIX;
+            xr_string caption = "# ";
             caption += "/";
             caption += CStringTable().translate(A->data()->group).c_str();
 
@@ -135,7 +134,7 @@ void CUIEncyclopediaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         else
         {
             CEncyclopediaArticle* A = m_ArticlesDB[pTVItem->GetValue()];
-            xr_string caption = ALL_PDA_HEADER_PREFIX;
+            xr_string caption = "# ";
             caption += "/";
             caption += CStringTable().translate(A->data()->group).c_str();
             caption += "/";

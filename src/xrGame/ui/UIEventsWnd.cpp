@@ -60,7 +60,7 @@ CUIEventsWnd::~CUIEventsWnd()
 bool CUIEventsWnd::Init()
 {
     CUIXml xml;
-    if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_EVENTS_XML, false))
+    if (!xml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_EVENTS_XML, ShadowOfChernobylMode))
         return false;
 
     CUIXmlInit xml_init;

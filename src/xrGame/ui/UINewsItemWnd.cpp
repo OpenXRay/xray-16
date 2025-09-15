@@ -11,6 +11,19 @@ CUINewsItemWnd::CUINewsItemWnd() : CUIWindow("CUINewsItemWnd") {}
 
 void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
 {
+    if (ShadowOfChernobylMode)
+    {
+        string512 pth;
+        CUIXmlInit xml_init;
+        strconcat(sizeof pth, pth, start_from, "list");
+        xml_init.InitWindow(uiXml, pth, 0, this);
+        m_UIScrollView = xr_new<CUIScrollView>();
+        m_UIScrollView->SetAutoDelete(true);
+        AttachChild(m_UIScrollView);
+        xml_init.InitScrollView(uiXml, pth, 0, m_UIScrollView);
+        return;
+    }
+
     CUIXmlInit::InitWindow(uiXml, start_from, 0, this);
 
     XML_NODE stored_root = uiXml.GetLocalRoot();
