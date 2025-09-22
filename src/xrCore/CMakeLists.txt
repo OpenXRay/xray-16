@@ -448,22 +448,42 @@ target_include_directories(xrCore
 
 target_link_libraries(xrCore
     PUBLIC
-    pthread
-    $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
-    SDL2::SDL2
-
-    PRIVATE
     xrMiscMath
-    $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
-    $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
-    LZO::LZO
 )
 
-if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD" AND NOT WIN32)
+if (WIN32)
     target_link_libraries(xrCore
+        PUBLIC
+        Winmm
+
         PRIVATE
-        dl
+        xray::BugTrap
+        OpenSSL::Crypto
+        LZO::LZO
+        JPEG::JPEG
+        $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
+        DbgHelp
+        FaultRep
     )
+else()
+    target_link_libraries(xrCore
+        PUBLIC
+        pthread
+        $<$<PLATFORM_ID:FreeBSD,OpenBSD,NetBSD,DragonFlyBSD>:execinfo>
+        SDL2::SDL2
+
+        PRIVATE
+        $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
+        $<$<BOOL:${JPEG_FOUND}>:JPEG::JPEG>
+        LZO::LZO
+    )
+
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND NOT CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+        target_link_libraries(xrCore
+            PRIVATE
+            dl
+        )
+    endif()
 endif()
 
 target_compile_definitions(xrCore

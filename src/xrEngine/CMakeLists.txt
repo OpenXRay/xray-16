@@ -432,8 +432,19 @@ target_link_libraries(xrEngine
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
-    SDL2::SDL2
 )
+
+if (WIN32)
+    target_link_libraries(xrEngine
+        PRIVATE
+        Vfw32
+    )
+else()
+    target_link_libraries(xrEngine
+        PRIVATE
+        SDL2::SDL2
+    )
+endif()
 
 target_compile_definitions(xrEngine
     PRIVATE

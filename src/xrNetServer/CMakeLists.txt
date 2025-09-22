@@ -38,6 +38,13 @@ target_link_libraries(xrNetServer
     xrCore
 )
 
+if (WIN32)
+    target_link_libraries(xrNetServer
+        PRIVATE
+        Ws2_32
+    )
+endif()
+
 target_compile_definitions(xrNetServer
     PRIVATE
     XR_NETSERVER_EXPORTS

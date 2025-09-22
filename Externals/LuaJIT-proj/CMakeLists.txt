@@ -67,25 +67,31 @@ if (APPLE)
 endif()
 
 # Clean unnecessary files in LuaJIT source directory
-execute_process(
-    COMMAND make clean
-    WORKING_DIRECTORY ${LUAJIT_DIR}
-)
+if (NOT MSVC)
+    execute_process(
+        COMMAND make clean
+        WORKING_DIRECTORY ${LUAJIT_DIR}
+    )
+endif()
 
 add_library(xrLuaJIT)
 
 # Compiler options
-set(CCOPT_OPT_LEVEL "-O3")
-
-set(CCOPT "${CMAKE_C_FLAGS} ${CCOPT_OPT_LEVEL}")
-
-if (XRAY_USE_ASAN)
-    set(CCOPT "${CCOPT} -fno-stack-protector")
+if (MSVC)
+    set(CCOPT_OPT_LEVEL "/O2")
+    set(CCOPT "${CMAKE_C_FLAGS} ${CCOPT_OPT_LEVEL}")
 else()
-    set(CCOPT "${CCOPT} -fomit-frame-pointer -fno-stack-protector")
-endif()
+    set(CCOPT_OPT_LEVEL "-O3")
+    set(CCOPT "${CMAKE_C_FLAGS} ${CCOPT_OPT_LEVEL}")
 
-set(CCOPT "${CCOPT} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
+    if (XRAY_USE_ASAN)
+        set(CCOPT "${CCOPT} -fno-stack-protector")
+    else()
+        set(CCOPT "${CCOPT} -fomit-frame-pointer -fno-stack-protector")
+    endif()
+
+    set(CCOPT "${CCOPT} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -U_FORTIFY_SOURCE")
+endif()
 
 string(REPLACE " " ";" CCOPT "${CCOPT}")
 
@@ -136,15 +142,59 @@ set(CCOPTIONS "${CCOPT};${XCFLAGS}")
 
 target_compile_options(xrLuaJIT PRIVATE ${CCOPTIONS})
 
-execute_process(
-    COMMAND ${CMAKE_C_COMPILER} ${CCOPTIONS} -E lj_arch.h -dM
-    WORKING_DIRECTORY "${LUAJIT_DIR}"
-    OUTPUT_VARIABLE TESTARCH_OUTPUT
-    ERROR_VARIABLE TESTARCH_ERROR
-)
+if (MSVC)
+    set(_luajit_detect_src "${CMAKE_CURRENT_BINARY_DIR}/luajit_detect_arch.c")
 
-if(NOT "${TESTARCH_ERROR}" STREQUAL "")
-    message("TESTARCH_ERROR=${TESTARCH_ERROR}")
+    file(WRITE "${_luajit_detect_src}" "#include <stdio.h>\n#include \"lj_arch.h\"\nint main(void) {\n#ifdef LJ_TARGET_X64\n    printf(\"LJ_TARGET_X64 %d\\n\", LJ_TARGET_X64);\n#endif\n#ifdef LJ_TARGET_X86\n    printf(\"LJ_TARGET_X86 %d\\n\", LJ_TARGET_X86);\n#endif\n#ifdef LJ_TARGET_ARM64\n    printf(\"LJ_TARGET_ARM64 %d\\n\", LJ_TARGET_ARM64);\n#endif\n#ifdef LJ_TARGET_ARM\n    printf(\"LJ_TARGET_ARM %d\\n\", LJ_TARGET_ARM);\n#endif\n#ifdef LJ_TARGET_PPC\n    printf(\"LJ_TARGET_PPC %d\\n\", LJ_TARGET_PPC);\n#endif\n#ifdef LJ_TARGET_MIPS\n    printf(\"LJ_TARGET_MIPS %d\\n\", LJ_TARGET_MIPS);\n#endif\n#ifdef LJ_TARGET_MIPS64\n    printf(\"LJ_TARGET_MIPS64 %d\\n\", LJ_TARGET_MIPS64);\n#endif\n#ifdef LJ_TARGET_E2K\n    printf(\"LJ_TARGET_E2K %d\\n\", LJ_TARGET_E2K);\n#endif\n#ifdef LJ_TARGET_MIPSR6\n    printf(\"LJ_TARGET_MIPSR6 %d\\n\", LJ_TARGET_MIPSR6);\n#endif\n#ifdef __MIPSEL__\n    printf(\"__MIPSEL__ 1\\n\");\n#endif\n#ifdef __AARCH64EB__\n    printf(\"__AARCH64EB__ 1\\n\");\n#endif\n#ifdef LJ_LE\n    printf(\"LJ_LE %d\\n\", LJ_LE);\n#endif\n#ifdef LJ_ARCH_BITS\n    printf(\"LJ_ARCH_BITS %d\\n\", LJ_ARCH_BITS);\n#endif\n#ifdef LJ_HASJIT\n    printf(\"LJ_HASJIT %d\\n\", LJ_HASJIT);\n#endif\n#ifdef LJ_HASFFI\n    printf(\"LJ_HASFFI %d\\n\", LJ_HASFFI);\n#endif\n#ifdef LJ_DUALNUM\n    printf(\"LJ_DUALNUM %d\\n\", LJ_DUALNUM);\n#endif\n#ifdef LJ_ARCH_HASFPU\n    printf(\"LJ_ARCH_HASFPU %d\\n\", LJ_ARCH_HASFPU);\n#endif\n#ifdef LJ_ABI_SOFTFP\n    printf(\"LJ_ABI_SOFTFP %d\\n\", LJ_ABI_SOFTFP);\n#endif\n#ifdef LJ_NO_UNWIND\n    printf(\"LJ_NO_UNWIND %d\\n\", LJ_NO_UNWIND);\n#endif\n#ifdef LJ_ARCH_VERSION\n    printf(\"LJ_ARCH_VERSION %d\\n\", LJ_ARCH_VERSION);\n#endif\n#ifdef LJ_ARCH_SQRT\n    printf(\"LJ_ARCH_SQRT %d\\n\", LJ_ARCH_SQRT);\n#endif\n#ifdef LJ_ARCH_ROUND\n    printf(\"LJ_ARCH_ROUND %d\\n\", LJ_ARCH_ROUND);\n#endif\n#ifdef LJ_ARCH_PPC32ON64\n    printf(\"LJ_ARCH_PPC32ON64 %d\\n\", LJ_ARCH_PPC32ON64);\n#endif\n#ifdef LJ_FR2\n    printf(\"LJ_FR2 %d\\n\", LJ_FR2);\n#endif\n    return 0;\n}\n")
+
+    set(_saved_try_compile_config ${CMAKE_TRY_COMPILE_CONFIGURATION})
+    if (CMAKE_CONFIGURATION_TYPES)
+        set(CMAKE_TRY_COMPILE_CONFIGURATION Release)
+    endif()
+
+    try_run(_luajit_arch_run _luajit_arch_compile
+        "${CMAKE_CURRENT_BINARY_DIR}/luajit_detect"
+        "${_luajit_detect_src}"
+        CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${LUAJIT_DIR}"
+        RUN_OUTPUT_VARIABLE TESTARCH_OUTPUT
+        COMPILE_OUTPUT_VARIABLE TESTARCH_COMPILE_OUTPUT
+    )
+
+    if (CMAKE_CONFIGURATION_TYPES)
+        set(CMAKE_TRY_COMPILE_CONFIGURATION ${_saved_try_compile_config})
+    endif()
+
+    if (NOT _luajit_arch_compile OR NOT _luajit_arch_run EQUAL 0)
+        message(FATAL_ERROR "Failed to detect LuaJIT architecture with MSVC.\n${TESTARCH_COMPILE_OUTPUT}")
+    endif()
+
+    unset(_luajit_detect_src)
+    unset(_luajit_arch_run)
+    unset(_luajit_arch_compile)
+    unset(_saved_try_compile_config)
+else()
+    set(_LUAJIT_TESTARCH_COMMAND ${CMAKE_C_COMPILER})
+
+    list(APPEND _LUAJIT_TESTARCH_COMMAND ${CCOPTIONS})
+
+    foreach(_dir ${CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES})
+        list(APPEND _LUAJIT_TESTARCH_COMMAND "-I${_dir}")
+    endforeach()
+
+    list(APPEND _LUAJIT_TESTARCH_COMMAND -E lj_arch.h -dM)
+
+    execute_process(
+        COMMAND ${_LUAJIT_TESTARCH_COMMAND}
+        WORKING_DIRECTORY "${LUAJIT_DIR}"
+        OUTPUT_VARIABLE TESTARCH_OUTPUT
+        ERROR_VARIABLE TESTARCH_ERROR
+    )
+
+    unset(_LUAJIT_TESTARCH_COMMAND)
+
+    if(NOT "${TESTARCH_ERROR}" STREQUAL "")
+        message("TESTARCH_ERROR=${TESTARCH_ERROR}")
+    endif()
 endif()
 
 if ("${TESTARCH_OUTPUT}" MATCHES "LJ_TARGET_X64")
@@ -186,10 +236,12 @@ string(APPEND TARGET_ARCH "-DLUAJIT_TARGET=LUAJIT_ARCH_${TARGET_LJARCH}")
 if (WIN32)
     #string(APPEND TARGET_STRIP "--strip-unneeded")
 
-    target_link_options(xrLuaJIT
-        PRIVATE
-        " -shared -Wl,--out-implib,libluajit-${ABIVER}.dll.a"
-    )
+    if (NOT MSVC)
+        target_link_options(xrLuaJIT
+            PRIVATE
+            " -shared -Wl,--out-implib,libluajit-${ABIVER}.dll.a"
+        )
+    endif()
 
     if (LUAJIT_BUILD_STATIC_LIB)
         string(APPEND HOST_XCFLAGS " -DLUA_BUILD_AS_DLL")
