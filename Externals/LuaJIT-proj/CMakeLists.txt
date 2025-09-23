@@ -243,6 +243,10 @@ if (WIN32)
         )
     endif()
 
+    # Export the public API symbols when building the DLL so MSVC generates
+    # an import library (xrLuaJIT.lib).
+    target_compile_definitions(xrLuaJIT PRIVATE LUA_BUILD_AS_DLL)
+
     if (LUAJIT_BUILD_STATIC_LIB)
         string(APPEND HOST_XCFLAGS " -DLUA_BUILD_AS_DLL")
     endif()
@@ -376,9 +380,32 @@ set(DASM_DASC "${LUAJIT_DIR}/vm_${DASM_ARCH}.dasc")
 set(DASM "${LUAJIT_DIR}/../dynasm/dynasm.lua")
 set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 
+set(_luajit_host_build_config Release)
+if (NOT CMAKE_CONFIGURATION_TYPES)
+    set(_luajit_host_cfg_subdir "")
+else()
+    set(_luajit_host_cfg_subdir "${_luajit_host_build_config}")
+endif()
+
+if (_luajit_host_cfg_subdir)
+    set(_luajit_host_cfg_path "/${_luajit_host_cfg_subdir}")
+else()
+    set(_luajit_host_cfg_path "")
+endif()
+
+set(_luajit_build_config_args)
+if (CMAKE_CONFIGURATION_TYPES)
+    list(APPEND _luajit_build_config_args --config ${_luajit_host_build_config})
+endif()
+
 # Generate buildvm arch header
 set(MINILUA_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/minilua")
-set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua")
+set(MINILUA_BUILD_OUTPUT "${MINILUA_BINARY_DIR}${_luajit_host_cfg_path}/minilua${CMAKE_EXECUTABLE_SUFFIX}")
+set(MINILUA_FILE "${MINILUA_BINARY_DIR}/minilua${CMAKE_EXECUTABLE_SUFFIX}")
+set(_luajit_copy_minilua_command "")
+if (NOT MINILUA_BUILD_OUTPUT STREQUAL MINILUA_FILE)
+    set(_luajit_copy_minilua_command COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MINILUA_BUILD_OUTPUT}" "${MINILUA_FILE}")
+endif()
 
 add_custom_command(
     OUTPUT "${MINILUA_FILE}"
@@ -393,7 +420,8 @@ add_custom_command(
         -DLUA_USE_POSIX=${LUA_USE_POSIX}
         -DHOST_ACFLAGS="${HOST_ACFLAGS}"
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
-    COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} --config Release --verbose
+    COMMAND ${CMAKE_COMMAND} --build ${MINILUA_BINARY_DIR} ${_luajit_build_config_args} --verbose
+    ${_luajit_copy_minilua_command}
 )
 
 add_custom_command(OUTPUT ${BUILDVM_ARCH}
@@ -411,7 +439,12 @@ set_target_properties(buildvm_arch PROPERTIES
 
 # Buildvm
 set(BUILDVM_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/HostBuildTools/buildvm")
-set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/buildvm")
+set(BUILDVM_BUILD_OUTPUT "${BUILDVM_BINARY_DIR}${_luajit_host_cfg_path}/buildvm${CMAKE_EXECUTABLE_SUFFIX}")
+set(BUILDVM_FILE "${BUILDVM_BINARY_DIR}/buildvm${CMAKE_EXECUTABLE_SUFFIX}")
+set(_luajit_copy_buildvm_command "")
+if (NOT BUILDVM_BUILD_OUTPUT STREQUAL BUILDVM_FILE)
+    set(_luajit_copy_buildvm_command COMMAND ${CMAKE_COMMAND} -E copy_if_different "${BUILDVM_BUILD_OUTPUT}" "${BUILDVM_FILE}")
+endif()
 
 add_custom_command(
     OUTPUT "${BUILDVM_FILE}"
@@ -425,7 +458,8 @@ add_custom_command(
         -DBUILDVM_ARCH=${BUILDVM_ARCH}
         -DHOST_ACFLAGS="${HOST_ACFLAGS}"
         -DHOST_ALDFLAGS="${HOST_ALDFLAGS}"
-    COMMAND ${CMAKE_COMMAND} --build ${BUILDVM_BINARY_DIR} --config Release --verbose
+    COMMAND ${CMAKE_COMMAND} --build ${BUILDVM_BINARY_DIR} ${_luajit_build_config_args} --verbose
+    ${_luajit_copy_buildvm_command}
 )
 
 add_custom_target(buildvm
@@ -627,7 +661,7 @@ target_link_libraries(xrLuaJIT
 
 target_compile_options(xrLuaJIT
     PRIVATE
-    -Wno-comment
+    $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-comment>
 )
 
 set_target_properties(xrLuaJIT PROPERTIES

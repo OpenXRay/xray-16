@@ -139,16 +139,16 @@ target_sources_grouped(
     xrDebug_macros.h
 )
 
-#target_sources_grouped(
-#    TARGET xrCore
-#    NAME "Debug core\\DxErr"
-#    FILES
-#    Debug/dxerr.cpp
-#    Debug/dxerr.h
-#    Debug/DXGetErrorDescription.inl
-#    Debug/DXGetErrorString.inl
-#    Debug/DXTrace.inl
-#)
+target_sources_grouped(
+    TARGET xrCore
+    NAME "Debug core\\DxErr"
+    FILES
+    Debug/dxerr.cpp
+    Debug/dxerr.h
+    Debug/DXGetErrorDescription.inl
+    Debug/DXGetErrorString.inl
+    Debug/DXTrace.inl
+)
 
 target_sources_grouped(
     TARGET xrCore
@@ -449,12 +449,14 @@ target_include_directories(xrCore
 target_link_libraries(xrCore
     PUBLIC
     xrMiscMath
+    xrAPI
 )
 
 if (WIN32)
     target_link_libraries(xrCore
         PUBLIC
         Winmm
+        SDL2::SDL2
 
         PRIVATE
         xray::BugTrap
@@ -464,6 +466,7 @@ if (WIN32)
         $<$<STREQUAL:${MEMORY_ALLOCATOR},mimalloc>:mimalloc>
         DbgHelp
         FaultRep
+        SDL2::SDL2main
     )
 else()
     target_link_libraries(xrCore

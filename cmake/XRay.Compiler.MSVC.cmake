@@ -14,8 +14,11 @@ add_compile_options($<$<NOT:$<CONFIG:ReleaseMasterGold>>:/EHsc>)
 # Disable MS STL exceptions on ReleaseMasterGold
 add_compile_definitions($<$<CONFIG:ReleaseMasterGold>:_HAS_EXCEPTIONS=0>)
 
-# Enable debug information for all configurations
-add_compile_options(/Zi)
+# Enable debug information for all configurations and allow parallel PDB writes
+add_compile_options(
+    /Zi
+    /FS
+)
 
 # Enable SSE2 for 32-bit build
 # (on x64 it's always enabled and produces error if try to to enable it)
@@ -36,7 +39,6 @@ set(XRAY_DISABLE_WARNINGS "/w")
 
 set(XRAY_ENABLE_WARNINGS
     /W3
-    /WX
 )
 
 add_compile_definitions(
@@ -47,6 +49,7 @@ add_compile_definitions(
     IMGUI_DISABLE_OBSOLETE_KEYIO
     IMGUI_DISABLE_OBSOLETE_FUNCTIONS
     IMGUI_DEFINE_MATH_OPERATORS
+    _CRT_SECURE_NO_WARNINGS
 )
 
 set(_xray_vs_platform "")
@@ -188,5 +191,19 @@ if (NOT TARGET xray::BugTrap)
     xray_define_imported_library(xray::BugTrap
         PATH "${XRAY_SDK_LIBRARY_DIR}/BugTrap.lib"
         INCLUDE_DIRS "${XRAY_SDK_INCLUDE_DIR}"
+    )
+endif()
+
+if (NOT TARGET SDL2::SDL2)
+    xray_define_imported_library(SDL2::SDL2
+        PATH "${XRAY_SDK_LIBRARY_DIR}/SDL2.lib"
+        INCLUDE_DIRS "${XRAY_SDK_INCLUDE_DIR}/SDL2"
+    )
+endif()
+
+if (NOT TARGET SDL2::SDL2main)
+    xray_define_imported_library(SDL2::SDL2main
+        PATH "${XRAY_SDK_LIBRARY_DIR}/SDL2main.lib"
+        INCLUDE_DIRS "${XRAY_SDK_INCLUDE_DIR}/SDL2"
     )
 endif()
