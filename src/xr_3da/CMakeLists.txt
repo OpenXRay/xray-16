@@ -42,6 +42,20 @@ if (WIN32)
     set_target_properties(xr_3da PROPERTIES
         WIN32_EXECUTABLE ON
     )
+
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_xr_runtime_dir "${CMAKE_SOURCE_DIR}/sdk/binaries/x64")
+    else()
+        set(_xr_runtime_dir "${CMAKE_SOURCE_DIR}/sdk/binaries/x86")
+    endif()
+
+    add_custom_command(TARGET xr_3da POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${_xr_runtime_dir}"
+            "$<TARGET_FILE_DIR:xr_3da>"
+        COMMENT "Copying Windows runtime dependencies"
+        VERBATIM
+    )
 endif()
 
 set_target_properties(xr_3da PROPERTIES
