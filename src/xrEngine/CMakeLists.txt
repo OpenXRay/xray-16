@@ -439,7 +439,6 @@ target_link_libraries(xrEngine
     xrScriptEngine
     xrNetServer
     xrImGui
-    DiscordGameSDK
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
@@ -449,6 +448,7 @@ if (WIN32)
     target_link_libraries(xrEngine
         PRIVATE
         Vfw32
+        DiscordGameSDK
     )
 else()
     target_link_libraries(xrEngine

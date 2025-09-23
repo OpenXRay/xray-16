@@ -53,6 +53,8 @@ target_include_directories(xrRenderPC_R4
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRenderDX11"
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
+    "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK/ags_lib/inc"
     "${CMAKE_SOURCE_DIR}/src/packages/directxtex_desktop_2019.2024.10.29.1/include"
 )
 

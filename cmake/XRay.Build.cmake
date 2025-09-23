@@ -55,8 +55,6 @@ endif()
 if (WIN32)
     include_directories("${XRAY_SDK_INCLUDE_DIR}")
     include_directories("${XRAY_SDK_INCLUDE_DIR}/SDL2")
-    include_directories("${XRAY_SDK_INCLUDE_DIR}/nvapi")
-    include_directories("${XRAY_SDK_INCLUDE_DIR}/AGS_SDK/ags_lib/inc")
 endif()
 
 # https://gitlab.kitware.com/cmake/cmake/-/issues/25650

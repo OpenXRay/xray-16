@@ -8,7 +8,10 @@ add_subdirectory(luabind)
 add_subdirectory(xrLuaFix)
 add_subdirectory(OPCODE)
 add_subdirectory(ode)
-add_subdirectory(DiscordGameSDK)
+
+if (WIN32)
+    add_subdirectory(DiscordGameSDK)
+endif()
 
 # Silence all warnings for external libraries
 add_compile_options(${XRAY_DISABLE_WARNINGS})

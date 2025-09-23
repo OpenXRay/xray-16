@@ -247,8 +247,8 @@ target_sources(xrGame PRIVATE
     animation_script_callback.h
     animation_utils.cpp
     animation_utils.h
-    #AnselManager.cpp
-    #AnselManager.h
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:AnselManager.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:AnselManager.h>
     anticheat_dumpable_object.h
     antirad.cpp
     antirad.h
@@ -2496,6 +2496,7 @@ target_link_libraries(xrGame
     xrSound
     xrScriptEngine
     xrGameSpy
+    GameSpy-oxr
     xrCDB
     xrPhysics
     xrNetServer

@@ -386,10 +386,11 @@ set(DASM "${LUAJIT_DIR}/../dynasm/dynasm.lua")
 set(BUILDVM_ARCH "${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h")
 
 set(_luajit_host_build_config Release)
-if (NOT CMAKE_CONFIGURATION_TYPES)
-    set(_luajit_host_cfg_subdir "")
-else()
+get_property(_luajit_is_multi GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (_luajit_is_multi)
     set(_luajit_host_cfg_subdir "${_luajit_host_build_config}")
+else()
+    set(_luajit_host_cfg_subdir "")
 endif()
 
 if (_luajit_host_cfg_subdir)
@@ -399,7 +400,7 @@ else()
 endif()
 
 set(_luajit_build_config_args)
-if (CMAKE_CONFIGURATION_TYPES)
+if (_luajit_is_multi)
     list(APPEND _luajit_build_config_args --config ${_luajit_host_build_config})
 endif()
 
