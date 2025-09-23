@@ -96,6 +96,10 @@ set_target_properties(xrODE PROPERTIES
     UNITY_BUILD OFF
 )
 
+if (MSVC AND BUILD_SHARED_LIBS)
+    set_target_properties(xrODE PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 if (BUILD_SHARED_LIBS)
     install(TARGETS xrODE LIBRARY
         DESTINATION "${CMAKE_INSTALL_LIBDIR}"

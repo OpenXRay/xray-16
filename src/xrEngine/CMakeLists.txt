@@ -332,8 +332,8 @@ target_sources_grouped(
     TARGET xrEngine
     NAME "Render\\Execution & 3D\\Shaders\\Textures"
     FILES
-    #tntQAVI.cpp
-    #tntQAVI.h
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:tntQAVI.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:tntQAVI.h>
     xrImage_Resampler.cpp
     xrImage_Resampler.h
     xrTheora_Stream.cpp
@@ -408,6 +408,14 @@ target_sources(xrEngine
     TODO.txt
 )
 
+if (WIN32)
+    target_sources(xrEngine
+        PRIVATE
+        Text_Console.cpp
+        Text_Console_WndProc.cpp
+    )
+endif()
+
 target_include_directories(xrEngine
     PUBLIC
     "${CMAKE_SOURCE_DIR}/src"
@@ -431,6 +439,7 @@ target_link_libraries(xrEngine
     xrScriptEngine
     xrNetServer
     xrImGui
+    DiscordGameSDK
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
@@ -445,6 +454,22 @@ else()
     target_link_libraries(xrEngine
         PRIVATE
         SDL2::SDL2
+    )
+endif()
+
+if (WIN32)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_discord_sdk_dll "${CMAKE_SOURCE_DIR}/sdk/binaries/x64/discord_game_sdk.dll")
+    else()
+        set(_discord_sdk_dll "${CMAKE_SOURCE_DIR}/sdk/binaries/x86/discord_game_sdk.dll")
+    endif()
+
+    add_custom_command(TARGET xrEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${_discord_sdk_dll}"
+            "$<TARGET_FILE_DIR:xrEngine>/discord_game_sdk.dll"
+        COMMENT "Copying Discord Game SDK runtime"
+        VERBATIM
     )
 endif()
 

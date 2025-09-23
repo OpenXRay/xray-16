@@ -17,10 +17,43 @@ target_sources(xrRenderPC_R4 PRIVATE
     xrRender_R4.cpp
 )
 
+file(GLOB XR_RENDERPC_R4_SHARED_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender/*.cpp"
+)
+
+# Exclude the legacy DirectX 9 texture sources – the DirectX 11 specific
+# implementations live under xrRenderDX11 and would otherwise clash with the
+# shared versions (and pull in d3dx9 headers that are unavailable with the
+# modern Windows SDK).
+list(REMOVE_ITEM XR_RENDERPC_R4_SHARED_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender/SH_Texture.cpp"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender/Texture.cpp"
+)
+
+file(GLOB XR_RENDERPC_R4_DX11_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRenderDX11/*.cpp"
+)
+
+file(GLOB XR_RENDERPC_R4_R2_SOURCES
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2/*.cpp"
+)
+
+target_sources(xrRenderPC_R4 PRIVATE
+    ${XR_RENDERPC_R4_SHARED_SOURCES}
+    ${XR_RENDERPC_R4_DX11_SOURCES}
+    ${XR_RENDERPC_R4_R2_SOURCES}
+)
+
 target_include_directories(xrRenderPC_R4
     PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_SOURCE_DIR}/src"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRender"
+    "${CMAKE_SOURCE_DIR}/src/Layers/xrRenderDX11"
     "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${CMAKE_SOURCE_DIR}/src/packages/directxtex_desktop_2019.2024.10.29.1/include"
 )
 
 target_link_libraries(xrRenderPC_R4
@@ -38,6 +71,7 @@ target_compile_definitions(xrRenderPC_R4
     PRIVATE
     XRRENDER_R4_EXPORTS
     USE_DX11
+    RENDER_NAMESPACE=render_r4
 )
 
 set_target_properties(xrRenderPC_R4 PROPERTIES
