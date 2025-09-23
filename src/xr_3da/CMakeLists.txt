@@ -33,6 +33,17 @@ target_link_libraries(xr_3da
     xrGame
 )
 
+if (WIN32)
+    target_link_libraries(xr_3da
+        PRIVATE
+        xrRenderPC_R4
+    )
+
+    set_target_properties(xr_3da PROPERTIES
+        WIN32_EXECUTABLE ON
+    )
+endif()
+
 set_target_properties(xr_3da PROPERTIES
     PREFIX ""
 )

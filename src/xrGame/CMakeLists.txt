@@ -2502,6 +2502,19 @@ target_link_libraries(xrGame
     xrNetServer
 )
 
+if (MSVC)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_xr_ansel_lib "${CMAKE_SOURCE_DIR}/sdk/libraries/x64/AnselSDK64.lib")
+    else()
+        set(_xr_ansel_lib "${CMAKE_SOURCE_DIR}/sdk/libraries/x86/AnselSDK32.lib")
+    endif()
+
+    target_link_libraries(xrGame
+        PRIVATE
+        ${_xr_ansel_lib}
+    )
+endif()
+
 target_compile_definitions(xrGame
     PUBLIC
     DECLARE_SPECIALIZATION
