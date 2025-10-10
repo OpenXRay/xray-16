@@ -207,7 +207,13 @@
     <ClInclude Include="..\xrRender\DetailManager.h">
       <Filter>Details</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\DetailManager_Compute.h">
+      <Filter>Details</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\DetailModel.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h">
       <Filter>Details</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\NvTriStrip.h">
@@ -771,6 +777,12 @@
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\DetailModel.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_Compute.cpp">
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp">

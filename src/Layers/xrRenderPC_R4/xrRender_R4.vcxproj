@@ -115,7 +115,9 @@
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h" />
     <ClInclude Include="..\xrRender\DetailFormat.h" />
     <ClInclude Include="..\xrRender\DetailManager.h" />
+    <ClInclude Include="..\xrRender\DetailManager_Compute.h" />
     <ClInclude Include="..\xrRender\DetailModel.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h" />
     <ClInclude Include="..\xrRender\du_box.h" />
     <ClInclude Include="..\xrRender\du_cone.h" />
     <ClInclude Include="..\xrRender\du_cylinder.h" />
@@ -249,6 +251,8 @@
     <ClCompile Include="..\xrRender\blenders\dx11RainBlender.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_Compute.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11HW.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp" />
