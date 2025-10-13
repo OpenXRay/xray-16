@@ -7,12 +7,14 @@ struct GAME_NEWS_DATA;
 
 class CUINewsItemWnd final : public CUIWindow
 {
+protected:
     typedef CUIWindow inherited;
 
     CUIStatic* m_UIDate;
     CUIStatic* m_UICaption;
     CUIStatic* m_UIText;
     CUIStatic* m_UIImage;
+    CUIScrollView* m_UIScrollView;
 
 public:
     CUINewsItemWnd();
@@ -20,6 +22,6 @@ public:
     void Init(CUIXml& uiXml, LPCSTR start_from);
     void Setup(GAME_NEWS_DATA& news_data);
     virtual void Update(){};
-
+    void AddNews() {  }
     pcstr GetDebugType() override { return "CUINewsItemWnd"; }
 };

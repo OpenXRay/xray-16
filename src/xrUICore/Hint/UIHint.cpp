@@ -29,14 +29,24 @@ void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
     m_background = xr_new<CUIFrameWindow>("Background");
     AttachChild(m_background);
     m_background->SetAutoDelete(true);
-    CUIXmlInitBase::InitFrameWindow(xml, "background", 0, m_background);
+    if (ShadowOfChernobylMode)
+        CUIXmlInitBase::InitFrameWindow(xml, "background_static", 0, m_background);
+    else
+        CUIXmlInitBase::InitFrameWindow(xml, "background", 0, m_background);
 
     m_text = xr_new<CUIStatic>("Text");
     AttachChild(m_text);
     m_text->SetAutoDelete(true);
-    CUIXmlInitBase::InitStatic(xml, "text", 0, m_text);
 
-    m_border = xml.ReadAttribFlt("background", 0, "border", 0.0f);
+    if (ShadowOfChernobylMode)
+        CUIXmlInitBase::InitStatic(xml, "timer_frame_line:title", 0, m_text);
+    else
+        CUIXmlInitBase::InitStatic(xml, "text", 0, m_text);
+
+    if (ShadowOfChernobylMode)
+        m_border = xml.ReadAttribFlt("mbbackground_frame_line", 0, "border", 0.0f);
+    else
+        m_border = xml.ReadAttribFlt("background", 0, "border", 0.0f);
 
     xml.SetLocalRoot(stored_root);
     m_visible = false;

@@ -242,6 +242,9 @@
     <ClCompile Include="ui_debug.cpp" />
     <ClCompile Include="ui_focus.cpp" />
     <ClCompile Include="ui_export_script.cpp" />
+    <ClCompile Include="ScrollView\UITreeViewItem.cpp">
+      <Filter>ScrollView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arrow\ui_arrow.h">
@@ -419,6 +422,9 @@
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_debug.h" />
     <ClInclude Include="ui_focus.h" />
+    <ClInclude Include="ScrollView\UITreeViewItem.h">
+      <Filter>ScrollView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />

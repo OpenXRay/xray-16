@@ -1861,12 +1861,6 @@
     <Filter Include="UI\Common\PDA\Tasks">
       <UniqueIdentifier>{ddf96ea9-ef48-422b-9ac9-d1c7aafa5cd6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Common\PDA\logs">
-      <UniqueIdentifier>{88b2008c-d91b-4387-b903-9223e6800188}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI\Common\PDA\logs\News">
-      <UniqueIdentifier>{f21f213a-d49e-4bc4-88eb-c2c3da37b244}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI\Common\ui-item-infos">
       <UniqueIdentifier>{39ccfc67-3565-45a8-a2f8-8580cd504d0e}</UniqueIdentifier>
     </Filter>
@@ -2226,6 +2220,24 @@
     </Filter>
     <Filter Include="AI\AMonsters\common\monster states\Move">
       <UniqueIdentifier>{8ca91267-ead8-4233-af9a-9771664b4be5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Events">
+      <UniqueIdentifier>{df96536d-0741-421a-864e-d0f2b39a10ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Encyclopedia">
+      <UniqueIdentifier>{3946c692-4a83-47fe-b1bf-95955dbafe2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Diary">
+      <UniqueIdentifier>{e608d3d0-db12-46e0-a811-94ca1a5b7938}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Contacts">
+      <UniqueIdentifier>{4d1f97bc-e355-4d23-929d-844c10d4f4dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Logs">
+      <UniqueIdentifier>{88b2008c-d91b-4387-b903-9223e6800188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Logs\News">
+      <UniqueIdentifier>{f21f213a-d49e-4bc4-88eb-c2c3da37b244}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -5740,10 +5752,10 @@
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
     <ClInclude Include="ui\UILogsWnd.h">
-      <Filter>UI\Common\PDA\logs</Filter>
+      <Filter>UI\Common\PDA\Logs</Filter>
     </ClInclude>
     <ClInclude Include="ui\UINewsItemWnd.h">
-      <Filter>UI\Common\PDA\logs\News</Filter>
+      <Filter>UI\Common\PDA\Logs\News</Filter>
     </ClInclude>
     <ClInclude Include="ui\ui_af_params.h">
       <Filter>UI\Common\ui-item-infos</Filter>
@@ -6307,6 +6319,27 @@
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\object_factory_spawner.h">
       <Filter>Core\Common\ObjectFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEventsWnd.h">
+      <Filter>UI\Common\PDA\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UITaskDescrWnd.h">
+      <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEncyclopediaWnd.h">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEncyclopediaArticleWnd.h">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIDiaryWnd.h">
+      <Filter>UI\Common\PDA\Diary</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIPdaListItem.h">
+      <Filter>UI\Common\PDA\Contacts</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIPdaContactsWnd.h">
+      <Filter>UI\Common\PDA\Contacts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8909,10 +8942,10 @@
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="ui\UILogsWnd.cpp">
-      <Filter>UI\Common\PDA\logs</Filter>
+      <Filter>UI\Common\PDA\Logs</Filter>
     </ClCompile>
     <ClCompile Include="ui\UINewsItemWnd.cpp">
-      <Filter>UI\Common\PDA\logs\News</Filter>
+      <Filter>UI\Common\PDA\Logs\News</Filter>
     </ClCompile>
     <ClCompile Include="ui\ui_af_params.cpp">
       <Filter>UI\Common\ui-item-infos</Filter>
@@ -9494,6 +9527,27 @@
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\object_factory_spawner.cpp">
       <Filter>Core\Common\ObjectFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEventsWnd.cpp">
+      <Filter>UI\Common\PDA\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UITaskDescrWnd.cpp">
+      <Filter>UI\Common\PDA\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEncyclopediaWnd.cpp">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIDiaryWnd.cpp">
+      <Filter>UI\Common\PDA\Diary</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPdaListItem.cpp">
+      <Filter>UI\Common\PDA\Contacts</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPdaContactsWnd.cpp">
+      <Filter>UI\Common\PDA\Contacts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

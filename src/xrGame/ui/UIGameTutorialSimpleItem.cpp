@@ -304,7 +304,7 @@ void CUISequenceSimpleItem::Start()
             bShowPda = true;
         }
 
-        if ((!pda.IsShown() && bShowPda) || (pda.IsShown() && !bShowPda))
+        if (pda.IsShown() != bShowPda)
         {
             isTimeDilatedInPDA = TimeDilator()->GetModeEnability(UITimeDilator::Pda);
             TimeDilator()->SetModeEnability(UITimeDilator::Pda, false);

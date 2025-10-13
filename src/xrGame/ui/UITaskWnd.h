@@ -4,6 +4,7 @@
 #include "xrUICore/Callbacks/UIWndCallback.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "GameTaskDefs.h"
+#include "UIPdaWnd.h"
 
 class CUIMapWnd;
 class CUIMapFilters;
@@ -17,6 +18,7 @@ class CUIFrameWindow;
 class UITaskListWnd;
 class UIMapLegend;
 class UIHint;
+class CUIEventsWnd;
 
 class CUITaskWnd final : public CUIWindow, public CUIWndCallback
 {
@@ -91,7 +93,7 @@ private:
     void OnTask2DbClicked(CUIWindow*, void*);
 };
 
-class CUITaskItem final : public CUIWindow
+class CUITaskItem : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -114,11 +116,62 @@ public:
     CGameTask* OwnerTask() const { return m_owner; }
 
     pcstr GetDebugType() override { return "CUITaskItem"; }
-
+    IC TASK_OBJECTIVE_ID ObjectiveIdx();
 public:
     bool show_hint_can{};
     bool show_hint{};
-
 protected:
     u32 m_hint_wt;
+};
+
+
+class CUITaskRootItem :public CUITaskItem, public CUIWndCallback
+{
+private:
+    typedef CUITaskItem inherited;
+    typedef CUIWndCallback inheriteda;
+protected:
+    CUIStatic* m_taskImage;
+    CUIStatic* m_captionStatic;
+    CUIStatic* m_captionTime;
+    CUIStatic* m_remTimeStatic;
+    CUIEventsWnd* m_EventsWnd;
+    CUI3tButton* m_switchDescriptionBtn;
+    bool m_curr_descr_mode;
+    virtual void Init(CUIXml& xml, LPCSTR path);
+public:
+    CUITaskRootItem(CUIEventsWnd* w);
+    virtual ~CUITaskRootItem();
+    virtual void Update();
+    virtual void SetGameTask(CGameTask* gt, u16 ob);
+    void __stdcall OnSwitchDescriptionClicked(CUIWindow*, void*);
+
+    virtual void MarkSelected(bool b);
+    virtual bool OnDbClick();
+};
+
+class CUITaskSubItem :public CUITaskItem, public CUIWndCallback
+{
+private:
+    typedef CUITaskItem inherited;
+    typedef CUIWndCallback inheriteda;
+    u32 m_active_color;
+    u32 m_failed_color;
+    u32 m_accomplished_color;
+protected:
+    CUIStatic* m_ActiveObjectiveStatic;
+    CUI3tButton* m_showDescriptionBtn;
+    CUIStatic* m_descriptionStatic;
+    CUIEventsWnd* m_EventsWnd;
+    CUIStatic* m_stateStatic;
+    virtual void Init(CUIXml& xml, LPCSTR path);
+public:
+    CUITaskSubItem(CUIEventsWnd* w);
+    virtual ~CUITaskSubItem();
+    virtual void Update();
+    virtual void SetGameTask(CGameTask* gt, u16 ob);
+    void OnActiveObjectiveClicked();
+    void __stdcall OnShowDescriptionClicked(CUIWindow*, void*);
+    virtual void MarkSelected(bool b);
+    virtual bool OnDbClick();
 };

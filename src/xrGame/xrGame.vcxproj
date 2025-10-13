@@ -1271,9 +1271,13 @@
     <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIDemoPlayControl.h" />
     <ClInclude Include="ui\UIDialogWnd.h" />
+    <ClInclude Include="ui\UIDiaryWnd.h" />
     <ClInclude Include="ui\UIDragDropListEx.h" />
     <ClInclude Include="ui\UIDragDropReferenceList.h" />
     <ClInclude Include="ui\UIEditKeyBind.h" />
+    <ClInclude Include="ui\UIEncyclopediaArticleWnd.h" />
+    <ClInclude Include="ui\UIEncyclopediaWnd.h" />
+    <ClInclude Include="ui\UIEventsWnd.h" />
     <ClInclude Include="ui\UIFactionWarWnd.h" />
     <ClInclude Include="ui\UIGameLog.h" />
     <ClInclude Include="ui\UIGameTutorial.h" />
@@ -1315,7 +1319,9 @@
     <ClInclude Include="ui\UIOptConCom.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
     <ClInclude Include="ui\UIOutfitSlot.h" />
+    <ClInclude Include="ui\UIPdaContactsWnd.h" />
     <ClInclude Include="ui\UIPdaKillMessage.h" />
+    <ClInclude Include="ui\UIPdaListItem.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
     <ClInclude Include="ui\UIRankFaction.h" />
@@ -1337,6 +1343,7 @@
     <ClInclude Include="ui\UITabButtonMP.h" />
     <ClInclude Include="ui\UITalkDialogWnd.h" />
     <ClInclude Include="ui\UITalkWnd.h" />
+    <ClInclude Include="ui\UITaskDescrWnd.h" />
     <ClInclude Include="ui\UITaskWnd.h" />
     <ClInclude Include="ui\UITextVote.h" />
     <ClInclude Include="ui\UITradeBar.h" />
@@ -3103,9 +3110,13 @@
     </ClCompile>
     <ClCompile Include="ui\UIDemoPlayControl.cpp" />
     <ClCompile Include="ui\UIDialogWnd.cpp" />
+    <ClCompile Include="ui\UIDiaryWnd.cpp" />
     <ClCompile Include="ui\UIDragDropListEx.cpp" />
     <ClCompile Include="ui\UIDragDropReferenceList.cpp" />
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
+    <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp" />
+    <ClCompile Include="ui\UIEncyclopediaWnd.cpp" />
+    <ClCompile Include="ui\UIEventsWnd.cpp" />
     <ClCompile Include="ui\UIFactionWarWnd.cpp" />
     <ClCompile Include="ui\UIGameLog.cpp" />
     <ClCompile Include="ui\UIGameTutorial.cpp">
@@ -3190,7 +3201,9 @@
     <ClCompile Include="ui\UIOptConCom.cpp" />
     <ClCompile Include="ui\UIOutfitInfo.cpp" />
     <ClCompile Include="ui\UIOutfitSlot.cpp" />
+    <ClCompile Include="ui\UIPdaContactsWnd.cpp" />
     <ClCompile Include="ui\UIPdaKillMessage.cpp" />
+    <ClCompile Include="ui\UIPdaListItem.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
     <ClCompile Include="ui\UIRankFaction.cpp" />
@@ -3222,6 +3235,7 @@
     <ClCompile Include="ui\UITabButtonMP.cpp" />
     <ClCompile Include="ui\UITalkDialogWnd.cpp" />
     <ClCompile Include="ui\UITalkWnd.cpp" />
+    <ClCompile Include="ui\UITaskDescrWnd.cpp" />
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
     <ClCompile Include="ui\UITradeBar.cpp" />

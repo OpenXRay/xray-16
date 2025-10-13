@@ -300,14 +300,14 @@ float CEntityCondition::HitOutfitEffect(
     if (!pInvOwner)
         return hit_power;
 
-    CCustomOutfit* pOutfit = (CCustomOutfit*)pInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
+    CCustomOutfit* pOutfit = pInvOwner->GetOutfit();
     CHelmet* pHelmet = (CHelmet*)pInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
     if (!pOutfit && !pHelmet)
         return hit_power;
 
     float new_hit_power = hit_power;
     if (pOutfit)
-        new_hit_power = pOutfit->HitThroughArmor(hit_power, element, ap, add_wound, hit_type);
+        new_hit_power =pOutfit->HitThroughArmor(hit_power, element, ap, add_wound, hit_type);
 
     if (pHelmet)
         new_hit_power = pHelmet->HitThroughArmor(new_hit_power, element, ap, add_wound, hit_type);
@@ -376,7 +376,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
 
     bool bAddWound = pHDS->add_wound;
 
-    float hit_power_org = pHDS->damage();
+    float hit_power_org = pHDS->power;
     float hit_power = hit_power_org;
     hit_power = HitOutfitEffect(hit_power_org, pHDS->hit_type, pHDS->boneID, pHDS->armor_piercing, bAddWound);
 

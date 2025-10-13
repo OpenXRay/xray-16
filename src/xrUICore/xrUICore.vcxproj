@@ -95,6 +95,7 @@
     <ClInclude Include="ScrollBar\UIScrollBar.h" />
     <ClInclude Include="ScrollBar\UIScrollBox.h" />
     <ClInclude Include="ScrollView\UIScrollView.h" />
+    <ClInclude Include="ScrollView\UITreeViewItem.h" />
     <ClInclude Include="SpinBox\UICustomSpin.h" />
     <ClInclude Include="SpinBox\UISpinNum.h" />
     <ClInclude Include="SpinBox\UISpinText.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="ScrollBar\UIScrollBar.cpp" />
     <ClCompile Include="ScrollBar\UIScrollBox.cpp" />
     <ClCompile Include="ScrollView\UIScrollView.cpp" />
+    <ClCompile Include="ScrollView\UITreeViewItem.cpp" />
     <ClCompile Include="SpinBox\UICustomSpin.cpp" />
     <ClCompile Include="SpinBox\UISpinNum.cpp" />
     <ClCompile Include="SpinBox\UISpinText.cpp" />

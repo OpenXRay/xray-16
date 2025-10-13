@@ -11,6 +11,19 @@ CUINewsItemWnd::CUINewsItemWnd() : CUIWindow("CUINewsItemWnd") {}
 
 void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
 {
+    if (ShadowOfChernobylMode)
+    {
+        string512 pth;
+        CUIXmlInit xml_init;
+        strconcat(sizeof pth, pth, start_from, "list");
+        xml_init.InitWindow(uiXml, pth, 0, this);
+        m_UIScrollView = xr_new<CUIScrollView>();
+        m_UIScrollView->SetAutoDelete(true);
+        AttachChild(m_UIScrollView);
+        xml_init.InitScrollView(uiXml, pth, 0, m_UIScrollView);
+        return;
+    }
+
     CUIXmlInit::InitWindow(uiXml, start_from, 0, this);
 
     XML_NODE stored_root = uiXml.GetLocalRoot();
@@ -18,7 +31,10 @@ void CUINewsItemWnd::Init(CUIXml& uiXml, LPCSTR start_from)
     uiXml.SetLocalRoot(node);
 
     m_UIImage = UIHelper::CreateStatic(uiXml, "image", this);
-    m_UICaption = UIHelper::CreateStatic(uiXml, "caption_static", this, false); // no caption tag in SOC
+    if (ShadowOfChernobylMode)
+        m_UICaption = UIHelper::CreateStatic(uiXml, "caption_static", this, false); // no caption tag in SOC
+    else
+        m_UICaption = UIHelper::CreateStatic(uiXml, "updated_section_static", this, false); // no caption tag in SOC 
 
     m_UIText = UIHelper::CreateStatic(uiXml, "text_static", this, false);
     m_UIDate = UIHelper::CreateStatic(uiXml, "date_static", this, false);

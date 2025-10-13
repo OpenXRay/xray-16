@@ -28,13 +28,16 @@
 #include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIEventsWnd.h"
+#include "UIEncyclopediaWnd.h"
 #include "UIScriptWnd.h"
+#include "UIDiaryWnd.h"
+#include "UIPdaContactsWnd.h"
 
 #define PDA_XML "pda.xml"
 
 u32 g_pda_info_state = 0;
 
-void RearrangeTabButtons(CUITabControl* pTab);
 CDialogHolder* CurrentDialogHolder();
 
 CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
@@ -43,7 +46,11 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUITaskWnd = nullptr;
     pUIFactionWarWnd = nullptr;
     pUIActorInfo = nullptr;
+    pUIDiaryWnd = nullptr;
     pUIRankingWnd = nullptr;
+    pUIEncyclopediaWnd = nullptr;
+    pUIPdaContactsWnd = nullptr;
+    pUIEventsWnd = nullptr;
     pUILogsWnd = nullptr;
     m_hint_wnd = nullptr;
     Init();
@@ -59,11 +66,20 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUIFactionWarWnd);
     if (pUIActorInfo)
         delete_data(pUIActorInfo);
+    if (pUIDiaryWnd)
+        delete_data(pUIDiaryWnd);
     if (pUIRankingWnd)
         delete_data(pUIRankingWnd);
     if (pUILogsWnd)
         delete_data(pUILogsWnd);
-    delete_data(m_hint_wnd);
+    if (pUIEventsWnd)
+        delete_data(pUIEventsWnd);
+    if (pUIEncyclopediaWnd)
+        delete_data(pUIEncyclopediaWnd);
+    if (pUIPdaContactsWnd)
+        delete_data(pUIPdaContactsWnd);
+    if (m_hint_wnd)
+        delete_data(m_hint_wnd);
     if (UINoice)
         delete_data(UINoice);
 }
@@ -78,9 +94,14 @@ void CUIPdaWnd::Init()
 
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
-    UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
-    m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
-    m_caption_const = (m_caption->GetText());
+    UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this, false);
+
+    if (ShadowOfChernobylMode)
+        m_caption = UIHelper::CreateStatic(uiXml, "timer_frame_line", this);
+    else
+        m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this); // no caption tag in SOC
+
+    m_caption_const = m_caption ? m_caption->GetText() : "";
     m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
 
     if (uiXml.NavigateToNode("anim_static")) // XXX: Replace with UIHelper
@@ -91,11 +112,15 @@ void CUIPdaWnd::Init()
         CUIXmlInit::InitAnimatedStatic(uiXml, "anim_static", 0, anim_static);
     }
 
-    m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
+    if (ShadowOfChernobylMode)
+        m_btn_close = UIHelper::Create3tButton(uiXml, "off_button", this);
+    else
+        m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
+
     m_btn_close->SetAccelerator(kUI_BACK, false, 2);
     UI().Focus().UnregisterFocusable(m_btn_close);
 
-    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
+    m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd", false);
 
     if (IsGameTypeSingle())
     {
@@ -122,6 +147,22 @@ void CUIPdaWnd::Init()
         pUILogsWnd = xr_new<CUILogsWnd>();
         if (!pUILogsWnd->Init())
             xr_delete(pUILogsWnd);
+
+        pUIEventsWnd = xr_new<CUIEventsWnd>();
+        if (!pUIEventsWnd->Init())
+            xr_delete(pUIEventsWnd);
+
+        pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
+        if (!pUIEncyclopediaWnd->Init())
+            xr_delete(pUIEncyclopediaWnd);
+
+        pUIPdaContactsWnd = xr_new<CUIPdaContactsWnd>();
+        if (!pUIPdaContactsWnd->Init())
+            xr_delete(pUIPdaContactsWnd);
+
+        pUIDiaryWnd = xr_new<CUIDiaryWnd>();
+        if (!pUIDiaryWnd->Init())
+            xr_delete(pUIDiaryWnd);
     }
 
     UITabControl = xr_new<CUITabControl>();
@@ -175,24 +216,20 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     case TAB_CHANGED:
     {
         if (pWnd == UITabControl)
-        {
-            const auto& id = UITabControl->GetActiveId();
-            SetActiveSubdialog(id);
-        }
+            SetActiveSubdialog(UITabControl->GetActiveId());
         break;
     }
     case BUTTON_CLICKED:
     {
         if (pWnd == m_btn_close)
-        {
             HideDialog();
-        }
         break;
     }
     default:
     {
         if (m_pActiveDialog)
             m_pActiveDialog->SendMessage(pWnd, msg, pData);
+        break;
     }
     };
 }
@@ -253,23 +290,43 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         UIMainPdaFrame->SetKeyboardCapture(nullptr, true);
         m_pActiveDialog->Show(false);
     }
-
-    const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
-    {
-        { "eptMap",         pUIMapWnd },
-        { "eptTasks",       pUITaskWnd },
-        { "eptFractionWar", pUIFactionWarWnd },
-        { "eptStatistics",  pUIActorInfo },
-        { "eptRanking",     pUIRankingWnd },
-        { "eptLogs",        pUILogsWnd },
-    };
-
-    for (const auto& [id, wnd] : availableWindowsList)
-    {
-        if (section == id && wnd)
+    if (ShadowOfChernobylMode) {
+        const std::tuple<shared_str, CUIWindow*> availableWindowsList_SOC[] =
         {
-            m_pActiveDialog = wnd;
-            break;
+            {"eptTasks", pUIEventsWnd},
+            {"eptMap", pUIMapWnd},
+            {"eptDiary", pUIDiaryWnd},
+            {"eptContacts", pUIPdaContactsWnd},
+            {"eptStalkersRanking", pUIEncyclopediaWnd},
+            {"eptStatistics", pUIActorInfo},
+            {"eptEncyclopedia", pUIEncyclopediaWnd},
+        };
+        for (const auto& [id, wnd] : availableWindowsList_SOC)
+        {
+            if (section == id && wnd)
+            {
+                m_pActiveDialog = wnd;
+                break;
+            }
+        }
+    }
+    else {
+        const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
+        {
+            { "eptMap",             pUIMapWnd },
+            { "eptTasks",           pUITaskWnd },
+            { "eptFractionWar",     pUIFactionWarWnd },
+            { "eptStatistics",      pUIActorInfo },
+            { "eptRanking",         pUIRankingWnd },
+            { "eptLogs",            pUILogsWnd },
+        };
+        for (const auto& [id, wnd] : availableWindowsList)
+        {
+            if (section == id && wnd)
+            {
+                m_pActiveDialog = wnd;
+                break;
+            }
         }
     }
 
@@ -368,8 +425,9 @@ void CUIPdaWnd::DrawHint()
         pUIMapWnd->DrawHint();
     else if (m_pActiveDialog == pUIRankingWnd && pUIRankingWnd)
         pUIRankingWnd->DrawHint();
-
-    m_hint_wnd->Draw();
+    
+    if (m_hint_wnd)
+        m_hint_wnd->Draw();
 }
 
 bool CUIPdaWnd::NeedCursor() const
@@ -386,9 +444,7 @@ void CUIPdaWnd::UpdatePda()
         pUILogsWnd->UpdateNews();
 
     if (m_pActiveDialog == pUITaskWnd && pUITaskWnd)
-    {
         pUITaskWnd->ReloadTaskInfo();
-    }
 }
 
 void CUIPdaWnd::UpdateRankingWnd()
@@ -416,7 +472,7 @@ void CUIPdaWnd::Reset()
 }
 
 void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }
-void RearrangeTabButtons(CUITabControl* pTab)
+void CUIPdaWnd::RearrangeTabButtons(CUITabControl* pTab)
 {
     const auto& buttons = *pTab->GetButtonsVector();
 

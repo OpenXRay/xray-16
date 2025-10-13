@@ -18,12 +18,16 @@ class CUIActorInfoWnd;
 class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
+class CUIEncyclopediaWnd;
+class CUIEventsWnd;
 class UIHint;
+class CUIDiaryWnd;
+class CUIPdaContactsWnd;
 
 class CUIPdaWnd final : public CUIDialogWnd
 {
+private:
     typedef CUIDialogWnd inherited;
-
 protected:
     CUITabControl* UITabControl;
     CUI3tButton* m_btn_close;
@@ -45,9 +49,13 @@ public:
     // Поддиалоги PDA
     CUIMapWnd* pUIMapWnd;
     CUITaskWnd* pUITaskWnd;
+    CUIEncyclopediaWnd* pUIEncyclopediaWnd;
+    CUIPdaContactsWnd* pUIPdaContactsWnd;
+    CUIEventsWnd* pUIEventsWnd;
     CUIFactionWarWnd* pUIFactionWarWnd;
     CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
+    CUIDiaryWnd* pUIDiaryWnd;
     CUILogsWnd* pUILogsWnd;
 
     virtual void Reset();
@@ -79,6 +87,7 @@ public:
     void Show_SecondTaskWnd(bool status);
     void Show_MapWnd(bool status);
     void Show_ContactsWnd(bool status);
+    void RearrangeTabButtons(CUITabControl* pTab);
 
     void SetActiveDialog(CUIWindow* wnd) { m_pActiveDialog = wnd; }
     CUIWindow* GetActiveDialog() const { return m_pActiveDialog; }

@@ -91,6 +91,7 @@ public:
     void AdjustWidthToText();
 
     void SetShader(const ui_shader& sh);
+    void SetMask(CUIFrameWindow* pMask);
     CUIStaticItem& GetUIStaticItem() { return m_UIStaticItem; }
     void SetStretchTexture(bool stretch_texture) { m_bStretchTexture = stretch_texture; }
     bool GetStretchTexture() { return m_bStretchTexture; }
@@ -109,7 +110,9 @@ public:
 protected:
     CUILines* m_pTextControl{};
 
+    CUIFrameWindow* m_pMask;
     CUIStaticItem m_UIStaticItem;
+
     Fvector2 m_TextureOffset;
     bool m_bStretchTexture{};
     bool m_bTextureEnable{ true };
