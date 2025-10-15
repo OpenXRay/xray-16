@@ -47,6 +47,7 @@ using ID3DShaderResourceView        = ID3D11ShaderResourceView;
 using ID3DQuery                     = ID3D11Query;
 using ID3DDevice                    = ID3D11Device;
 using ID3DDeviceContext             = ID3D11DeviceContext;
+using ID3DUnorderedAccessView = ID3D11UnorderedAccessView;
 
 constexpr auto D3D_COMMONSHADER_SAMPLER_SLOT_COUNT = D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT;
 
