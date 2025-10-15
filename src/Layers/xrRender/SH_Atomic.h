@@ -113,7 +113,14 @@ struct ECORE_API SCS : public xr_resource_named
     R_constant_table constants;
     ~SCS();
 };
-typedef resptr_core<SCS, resptr_base<SCS>> ref_cs;
+
+struct ECORE_API resptrcode_cs : public resptr_base<SCS>
+{
+    void create(LPCSTR name);
+    void destroy() { _set(nullptr); }
+};
+
+typedef resptr_core<SCS, resptrcode_cs> ref_cs;
 
 #if defined(USE_OGL)
 struct ECORE_API SPP : public xr_resource_named

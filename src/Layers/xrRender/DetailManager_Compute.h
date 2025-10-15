@@ -11,7 +11,7 @@ struct DetailInstanceGPU
     Fvector position;
     float scale;
     float rotation_y;
-    float padding0[3];
+    float padding0[7];
 
     float c_hemi;
     float c_sun;

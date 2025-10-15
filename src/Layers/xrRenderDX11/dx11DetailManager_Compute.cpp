@@ -5,6 +5,8 @@
 namespace xray::render::RENDER_NAMESPACE
 {
 
+extern float r_ssaDISCARD;
+
 DetailComputeManager::DetailComputeManager()
     : m_instance_count(0)
     , m_max_instances(0)
