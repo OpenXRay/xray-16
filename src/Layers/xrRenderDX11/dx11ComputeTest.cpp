@@ -219,7 +219,7 @@ bool ComputeTest::RunComputeShader()
     context->CSSetConstantBuffers(0, 1, &s_params_cb);
     context->CSSetShaderResources(0, 1, &s_input_srv);
 
-    ID3D11UnorderedAccessView* uavs[2] = { s_output_uav, s_counter_uav };
+    ID3DUnorderedAccessView* uavs[2] = { s_output_uav, s_counter_uav };
     context->CSSetUnorderedAccessViews(0, 2, uavs, nullptr);
 
     // Dispatch
@@ -230,8 +230,8 @@ bool ComputeTest::RunComputeShader()
     context->Dispatch(num_groups, 1, 1);
 
     // Unbind resources
-    ID3D11ShaderResourceView* null_srv[1] = { nullptr };
-    ID3D11UnorderedAccessView* null_uav[2] = { nullptr, nullptr };
+    ID3DShaderResourceView* null_srv[1] = { nullptr };
+    ID3DUnorderedAccessView* null_uav[2] = { nullptr, nullptr };
     context->CSSetShaderResources(0, 1, null_srv);
     context->CSSetUnorderedAccessViews(0, 2, null_uav, nullptr);
 

@@ -34,7 +34,7 @@ public:
     ID3DDepthStencilView* pZRT[R__NUM_CONTEXTS]{};
     ID3DDepthStencilView* dsv_all{};
     xr_vector<ID3DDepthStencilView*> dsv_per_slice;
-    ID3D11UnorderedAccessView* pUAView{};
+    ID3DUnorderedAccessView* pUAView{};
 #elif defined(USE_OGL)
     GLuint pRT{};
     GLuint pZRT{};

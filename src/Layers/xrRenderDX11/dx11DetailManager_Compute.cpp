@@ -414,7 +414,7 @@ void DetailComputeManager::DispatchCulling(CBackend& cmd_list, const Fmatrix& vi
     context->CSSetShaderResources(0, 1, &m_gpu.instance_buffer_srv);
 
     // Bind output UAVs
-    ID3D11UnorderedAccessView* uavs[5] = {
+    ID3DUnorderedAccessView* uavs[5] = {
         m_gpu.visible_indices_uav[0], // still
         m_gpu.visible_indices_uav[1], // wave1
         m_gpu.visible_indices_uav[2], // wave2
@@ -434,8 +434,8 @@ void DetailComputeManager::DispatchCulling(CBackend& cmd_list, const Fmatrix& vi
     // ===========================
     // Unbind resources
     // ===========================
-    ID3D11ShaderResourceView* null_srv[1] = { nullptr };
-    ID3D11UnorderedAccessView* null_uav[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+    ID3DShaderResourceView* null_srv[1] = { nullptr };
+    ID3DUnorderedAccessView* null_uav[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
     context->CSSetShaderResources(0, 1, null_srv);
     context->CSSetUnorderedAccessViews(0, 5, null_uav, nullptr);
 

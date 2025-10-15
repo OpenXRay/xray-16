@@ -23,8 +23,8 @@ void CRenderTarget::phase_hdao()
 
         // set the cs shader output
         u32 UAVInitialCounts = 1;
-        ID3D11UnorderedAccessView* uav[1] = {0};
-        ID3D11ShaderResourceView* srv[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        ID3DUnorderedAccessView* uav[1] = {0};
+        ID3DShaderResourceView* srv[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         // ID3D11ShaderResourceView* new_srv[2]={rt_ssao_temp1->pTexture->m_pSRView,rt_ssao_temp2->pTexture->m_pSRView};
         // HW.pContext->CSSetShaderResources( 0, 2, new_srv );
         HW.get_context(CHW::IMM_CTX_ID)->CSSetUnorderedAccessViews(0, 1, &rt_ssao_temp->pUAView, &UAVInitialCounts); // TODO: id
