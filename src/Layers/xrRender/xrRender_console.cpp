@@ -574,18 +574,81 @@ public:
 };
 
 #if defined(USE_DX11)
-class CCC_TestCompute final : public IConsole_Command
+class CCC_TestComputeVector final : public IConsole_Command
 {
 public:
-    CCC_TestCompute(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+    CCC_TestComputeVector(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
 
-    void Execute(pcstr /*args*/) override
+    void Execute(pcstr args) override
     {
-        bool success = ComputeTest::RunTest();
+        int iteration_count = 10;  // Default: 10 cycles per thread
+        if (args && args[0])
+        {
+            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
+            {
+                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_vector <N>");
+                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
+                return;
+            }
+        }
+
+        Msg("=== [COMPUTE TEST VECTOR] Running with %d computation cycles per thread ===", iteration_count);
+        bool success = ComputeTest::RunTest(iteration_count);
+
         if (success)
-            Msg("* [COMPUTE TEST] PASSED - All validations successful");
+            Msg("* [COMPUTE TEST VECTOR] PASSED");
         else
-            Msg("! [COMPUTE TEST] FAILED - Check output above for details");
+            Msg("! [COMPUTE TEST VECTOR] FAILED");
+    }
+};
+
+class CCC_TestComputeMatrices final : public IConsole_Command
+{
+public:
+    CCC_TestComputeMatrices(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
+
+    void Execute(pcstr args) override
+    {
+        int iterations = 1;
+        if (args && args[0])
+        {
+            if (sscanf(args, "%d", &iterations) != 1 || iterations < 1)
+            {
+                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_matrices <N>");
+                Msg("! [COMPUTE TEST] N = number of test iterations (default: 1)");
+                return;
+            }
+        }
+
+        Msg("=== [COMPUTE TEST MATRICES] Running %d iteration(s) ===", iterations);
+        Msg("! [COMPUTE TEST MATRICES] Matrix compute test not yet implemented");
+        Msg("! [COMPUTE TEST MATRICES] This will test 4x4 matrix multiplication on GPU");
+        // TODO: Implement matrix test variant
+    }
+};
+
+class CCC_TestComputeSIMD final : public IConsole_Command
+{
+public:
+    CCC_TestComputeSIMD(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
+
+    void Execute(pcstr args) override
+    {
+        int iterations = 1;
+        if (args && args[0])
+        {
+            if (sscanf(args, "%d", &iterations) != 1 || iterations < 1)
+            {
+                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_simd <N>");
+                Msg("! [COMPUTE TEST] N = number of test iterations (default: 1)");
+                return;
+            }
+        }
+
+        Msg("=== [COMPUTE TEST SIMD] Running %d iteration(s) ===", iterations);
+        Msg("! [COMPUTE TEST SIMD] SIMD compute test not yet implemented");
+        Msg("! [COMPUTE TEST SIMD] This will test SIMD intrinsics and wave operations");
+        // TODO: Implement SIMD test variant
     }
 };
 #endif

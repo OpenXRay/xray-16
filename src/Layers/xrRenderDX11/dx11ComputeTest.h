@@ -18,18 +18,19 @@ public:
 
     struct TestParams
     {
-        u32 element_count;
-        float multiplier;
-        float pad0;
-        float pad1;
+        u32 element_count;     // 4 bytes
+        u32 iteration_count;   // 4 bytes - number of computation cycles
+        float multiplier;      // 4 bytes
+        float padding;         // 4 bytes (total: 16 bytes)
     };
 
     // Run the test and return true if successful
-    static bool RunTest();
+    // iteration_count: number of computation cycles to run in the shader (default: 10)
+    static bool RunTest(u32 iteration_count = 10);
 
 private:
     static bool CreateTestBuffers(u32 element_count);
-    static bool RunComputeShader();
+    static bool RunComputeShader(u32 iteration_count);
     static bool ValidateResults();
     static void DestroyTestBuffers();
 
@@ -48,6 +49,12 @@ private:
 
     static xr_vector<TestData> s_input_data;
     static u32 s_element_count;
+    static u32 s_iteration_count;
+
+    // GPU timing
+    static ID3D11Query* s_timestamp_disjoint;
+    static ID3D11Query* s_timestamp_start;
+    static ID3D11Query* s_timestamp_end;
 };
 
 } // namespace xray::render::RENDER_NAMESPACE
