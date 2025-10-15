@@ -103,6 +103,15 @@ IC void dx11ConstantBuffer::set(R_constant* C, R_constant_load& L, int A)
     // c_f.dirty	(L.index,L.index+1);
 }
 
+IC void dx11ConstantBuffer::set(R_constant* C, R_constant_load& L, u32 A)
+{
+    VERIFY(RC_uint == C->type);
+    VERIFY(RC_1x1 == L.cls);
+    u32* it = (u32*)Access(L.index);
+    VERIFY(u32((u32)L.index + sizeof(u32)) <= m_uiBufferSize);
+    *it = A;
+}
+
 IC void dx11ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const Fmatrix& A)
 {
     //	TEST

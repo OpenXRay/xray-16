@@ -38,15 +38,36 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         // LPCSTR   name        =   LPCSTR(ptr+it->Name);
         LPCSTR name = VarDesc.Name;
 
+        // TypeInfo + class
+        // D3DXSHADER_TYPEINFO* T   = (D3DXSHADER_TYPEINFO*)(ptr+it->TypeInfo);
+        BOOL bSkip = FALSE;
+
+        if (TypeDesc.Class == D3D_SVC_STRUCT || TypeDesc.Class == D3D_SVC_OBJECT)
+        {
+            bSkip = TRUE;
+        }
+
         // Type
         // u16      type        =   RC_float;
         u16 type = u16(-1);
-        switch (TypeDesc.Type)
+
+        if (!bSkip)
         {
-        case D3D_SVT_FLOAT: type = RC_float; break;
-        case D3D_SVT_BOOL: type = RC_bool; break;
-        case D3D_SVT_INT: type = RC_int; break;
-        default: fatal("R_constant_table::parse: unexpected shader variable type.");
+            switch (TypeDesc.Type)
+            {
+            case D3D_SVT_FLOAT: type = RC_float; break;
+            case D3D_SVT_BOOL: type = RC_bool; break;
+            case D3D_SVT_INT: type = RC_int; break;
+            case D3D_SVT_UINT: type = RC_uint; break;
+            case D3D_SVT_VOID: bSkip = TRUE; break;
+            default:
+            {
+                string512 msg;
+                xr_sprintf(msg, "R_constant_table::parse: unexpected shader variable type. Name='%s', Type=%d, Class=%d",
+                           name, TypeDesc.Type, TypeDesc.Class);
+                fatal(msg);
+            }
+            }
         }
 
         // Rindex,Rcount
@@ -56,10 +77,8 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         u16 r_index = u16(VarDesc.StartOffset);
         u16 r_type = u16(-1);
 
-        // TypeInfo + class
-        // D3DXSHADER_TYPEINFO* T   = (D3DXSHADER_TYPEINFO*)(ptr+it->TypeInfo);
-        BOOL bSkip = FALSE;
         // switch (T->Class)
+        if (!bSkip)
         switch (TypeDesc.Class)
         {
         case D3D_SVC_SCALAR: r_type = RC_1x1; break;
@@ -108,49 +127,6 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
         }
         break;
         case D3D_SVC_MATRIX_COLUMNS: fatal("Pclass MATRIX_COLUMNS unsupported"); break;
-        case D3D_SVC_STRUCT: fatal("Pclass D3DXPC_STRUCT unsupported"); break;
-        case D3D_SVC_OBJECT:
-        {
-            //  TODO: DX11:
-            VERIFY(!"Implement shader object parsing.");
-            /*
-            switch (T->Type)
-            {
-            case D3DXPT_SAMPLER:
-            case D3DXPT_SAMPLER1D:
-            case D3DXPT_SAMPLER2D:
-            case D3DXPT_SAMPLER3D:
-            case D3DXPT_SAMPLERCUBE:
-            {
-            // ***Register sampler***
-            // We have determined all valuable info, search if constant already created
-            ref_constant    C       =   get (name);
-            if (!C) {
-            C                   =   new R_constant();//.g_constant_allocator.create();
-            C->name             =   name;
-            C->destination      =   RC_dest_sampler;
-            C->type             =   RC_sampler;
-            R_constant_load& L  =   C->samp;
-            L.index             =   u16(r_index + ( (destination&1)? 0 : D3DVERTEXTEXTURESAMPLER0 ));
-            L.cls               =   RC_sampler  ;
-            table.push_back     (C);
-            } else {
-            R_ASSERT            (C->destination ==  RC_dest_sampler);
-            R_ASSERT            (C->type        ==  RC_sampler);
-            R_constant_load& L  =   C->samp;
-            R_ASSERT            (L.index        ==  r_index);
-            R_ASSERT            (L.cls          ==  RC_sampler);
-            }
-            }
-            break;
-            default:
-            fatal       ("Pclass D3DXPC_OBJECT - object isn't of 'sampler' type");
-            break;
-            }
-            */
-        }
-            bSkip = TRUE;
-            break;
         default: bSkip = TRUE; break;
         }
         if (bSkip)
@@ -194,6 +170,12 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
         case D3D_SIT_TEXTURE: type = RC_dx11texture; break;
         case D3D_SIT_SAMPLER: type = RC_sampler; break;
         case D3D_SIT_UAV_RWTYPED: type = RC_dx11UAV; break;
+        case D3D_SIT_STRUCTURED: type = RC_dx11texture; break;
+        case D3D_SIT_UAV_RWSTRUCTURED: type = RC_dx11UAV; break;
+        case D3D_SIT_BYTEADDRESS: type = RC_dx11texture; break;
+        case D3D_SIT_UAV_RWBYTEADDRESS: type = RC_dx11UAV; break;
+        case D3D_SIT_UAV_APPEND_STRUCTURED: type = RC_dx11UAV; break;
+        case D3D_SIT_UAV_CONSUME_STRUCTURED: type = RC_dx11UAV; break;
         default: continue;
         }
 
@@ -306,6 +288,14 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             pTable = pReflection->GetConstantBufferByIndex(iBuf);
             if (pTable)
             {
+                D3D_SHADER_BUFFER_DESC bufferDesc;
+                pTable->GetDesc(&bufferDesc);
+
+                if (bufferDesc.Type != D3D_CT_CBUFFER)
+                {
+                    continue;
+                }
+
                 //  Encode buffer index into destination
                 u32 updatedDest = destination;
                 updatedDest |= iBuf << dest_to_shift_value(destination); /*((destination&RC_dest_pixel)

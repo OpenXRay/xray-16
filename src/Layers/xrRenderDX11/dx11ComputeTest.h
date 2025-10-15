@@ -17,16 +17,16 @@ public:
     struct TestParams
     {
         u32 element_count;
+        u32 iteration_count;
         float multiplier;
-        float pad0;
-        float pad1;
+        float padding;
     };
 
-    static bool RunTest();
+    static bool RunTest(u32 iteration_count = 10);
 
 private:
     static bool CreateTestBuffers(u32 element_count);
-    static bool RunComputeShader();
+    static bool RunComputeShader(u32 iteration_count);
     static bool ValidateResults();
     static void DestroyTestBuffers();
 
@@ -44,6 +44,11 @@ private:
 
     static xr_vector<TestData> s_input_data;
     static u32 s_element_count;
+    static u32 s_iteration_count;
+
+    static ID3D11Query* s_timestamp_disjoint;
+    static ID3D11Query* s_timestamp_start;
+    static ID3D11Query* s_timestamp_end;
 };
 
 }
