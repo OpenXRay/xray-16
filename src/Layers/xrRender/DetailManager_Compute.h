@@ -21,7 +21,7 @@ struct DetailInstanceGPU
     Fvector position;        // World position (12 bytes)
     float scale;             // Uniform scale (4 bytes)
     float rotation_y;        // Y-axis rotation in radians (4 bytes)
-    float padding0[3];       // Alignment padding (12 bytes)
+    float padding0[7];       // Alignment padding (28 bytes)
 
     // Rendering data (32 bytes)
     float c_hemi;            // Hemispherical lighting [0..1] (4 bytes)

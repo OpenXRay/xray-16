@@ -7,6 +7,8 @@
 namespace xray::render::RENDER_NAMESPACE
 {
 
+extern float r_ssaDISCARD;
+
 // ===========================
 // Constructor / Destructor
 // ===========================
