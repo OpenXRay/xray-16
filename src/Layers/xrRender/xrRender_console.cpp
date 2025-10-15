@@ -15,6 +15,8 @@
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
 #include "Layers/xrRenderDX11/dx11ComputeTest.h"
+#include "Layers/xrRenderDX11/dx11ComputeTest_Matrices.h"
+#include "Layers/xrRenderDX11/dx11ComputeTest_SIMD.h"
 #endif
 
 #if (RENDER == R_R3) || (RENDER == R_R4)
@@ -609,21 +611,24 @@ public:
 
     void Execute(pcstr args) override
     {
-        int iterations = 1;
+        int iteration_count = 10;  // Default: 10 cycles per thread
         if (args && args[0])
         {
-            if (sscanf(args, "%d", &iterations) != 1 || iterations < 1)
+            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
             {
                 Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_matrices <N>");
-                Msg("! [COMPUTE TEST] N = number of test iterations (default: 1)");
+                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
                 return;
             }
         }
 
-        Msg("=== [COMPUTE TEST MATRICES] Running %d iteration(s) ===", iterations);
-        Msg("! [COMPUTE TEST MATRICES] Matrix compute test not yet implemented");
-        Msg("! [COMPUTE TEST MATRICES] This will test 4x4 matrix multiplication on GPU");
-        // TODO: Implement matrix test variant
+        Msg("=== [COMPUTE TEST MATRICES] Running with %d computation cycles per thread ===", iteration_count);
+        bool success = ComputeTest_Matrices::RunTest(iteration_count);
+
+        if (success)
+            Msg("* [COMPUTE TEST MATRICES] PASSED");
+        else
+            Msg("! [COMPUTE TEST MATRICES] FAILED");
     }
 };
 
@@ -634,21 +639,24 @@ public:
 
     void Execute(pcstr args) override
     {
-        int iterations = 1;
+        int iteration_count = 10;  // Default: 10 cycles per thread
         if (args && args[0])
         {
-            if (sscanf(args, "%d", &iterations) != 1 || iterations < 1)
+            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
             {
                 Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_simd <N>");
-                Msg("! [COMPUTE TEST] N = number of test iterations (default: 1)");
+                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
                 return;
             }
         }
 
-        Msg("=== [COMPUTE TEST SIMD] Running %d iteration(s) ===", iterations);
-        Msg("! [COMPUTE TEST SIMD] SIMD compute test not yet implemented");
-        Msg("! [COMPUTE TEST SIMD] This will test SIMD intrinsics and wave operations");
-        // TODO: Implement SIMD test variant
+        Msg("=== [COMPUTE TEST SIMD] Running with %d computation cycles per thread ===", iteration_count);
+        bool success = ComputeTest_SIMD::RunTest(iteration_count);
+
+        if (success)
+            Msg("* [COMPUTE TEST SIMD] PASSED");
+        else
+            Msg("! [COMPUTE TEST SIMD] FAILED");
     }
 };
 #endif

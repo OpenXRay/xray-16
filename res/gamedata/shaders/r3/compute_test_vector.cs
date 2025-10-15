@@ -54,14 +54,24 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     // Simulate complex computation - N iterations of heavy math
     float3 vec = float3(input_data.x, input_data.y, input_data.z);
 
+    // Thread-specific offset to prevent convergence at high iteration counts
+    float thread_offset = float(idx) * 0.0001;
+
     // Run g_iteration_count cycles of complex math operations
     // Note: Can't unroll dynamic loop count, but that's fine - we want to test actual iteration overhead
     for (uint i = 0; i < g_iteration_count; ++i)
     {
+        // Thread-specific variation to prevent convergence
+        float3 offset = float3(
+            0.01 + thread_offset,
+            0.02 + thread_offset * 2.0,
+            0.03 + thread_offset * 3.0
+        );
+
         // Complex vector operations
-        vec = normalize(vec + float3(0.01, 0.02, 0.03));
+        vec = normalize(vec + offset);
         vec *= g_multiplier;
-        vec = abs(sin(vec * 3.14159265f));
+        vec = abs(sin(vec * 3.14159265f + thread_offset));
         vec = sqrt(vec + 0.001f);
 
         // Mix in some data dependency
@@ -69,6 +79,16 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         vec = vec / max(len, 0.001f);
         vec = vec * vec; // square each component
         vec = vec + float3(input_data.x, input_data.y, input_data.z) * 0.001f;
+
+        // Re-inject thread variation periodically to fight convergence
+        if ((i % 100) == 0)
+        {
+            vec += float3(
+                thread_offset * sin(float(i) * 0.01),
+                thread_offset * cos(float(i) * 0.01),
+                thread_offset * sin(float(i) * 0.02)
+            );
+        }
     }
 
     output_data.x = vec.x;
