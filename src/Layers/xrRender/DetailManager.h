@@ -228,6 +228,10 @@ public:
     void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
     void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
 
+#ifdef USE_DX11
+    void hw_Render_FullLevel(CBackend& cmd_list);
+#endif
+
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);
 
