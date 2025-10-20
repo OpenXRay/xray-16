@@ -35,8 +35,6 @@ void CDetailManager::hw_Load_Shaders()
         float scale;
         Fvector pos;
         float hemi;
-        u32 object_id;
-        u32 padding[3];
     };
 
     D3D11_BUFFER_DESC bufferDesc = {};
@@ -71,6 +69,8 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     ZoneScoped;
     using namespace detail_manager;
+
+    RImplementation.BasicStats.DetailCount = 0;
 
     // Render-prepare
     //	Update timer
@@ -119,15 +119,11 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         float scale;
         Fvector pos;
         float hemi;
-        u32 object_id;
-        u32 padding[3];
     };
 
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
-
-    RImplementation.BasicStats.DetailCount = 0;
 
     vis_list& list = m_visibles[var_id];
 
@@ -138,15 +134,10 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
 
     cmd_list.SRVSManager.SetVSResource(0, currentSRV);
-
     cmd_list.set_Geometry(vis_unified_geom[var_id]);
-
     cmd_list.set_c(strConsts, consts);
     cmd_list.set_c(strWave, wave);
     cmd_list.set_c(strDir2D, wind);
-
-    u32 totalDrawCalls = 0;
-    u32 instance_base = 0;
 
     for (u32 O = 0; O < objects.size(); O++)
     {
@@ -163,11 +154,11 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
             continue;
 
         u32 bufferSize = detailBufferSize_vis[var_id];
-        if (instance_base + objectInstanceCount > bufferSize)
+        if (objectInstanceCount > bufferSize)
         {
-            Msg("! [DetailManager] Buffer overflow for vis_id=%u, object=%u. Skipping remaining instances.",
-                var_id, O);
-            break;
+            Msg("! [DetailManager] Too many instances for vis_id=%u, object=%u: need %u, have %u. Clamping.",
+                var_id, O, objectInstanceCount, bufferSize);
+            objectInstanceCount = bufferSize;
         }
 
         D3D11_MAPPED_SUBRESOURCE pSubRes;
@@ -192,10 +183,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 c_storage[instanceIdx].scale = Instance.scale_calculated;
                 c_storage[instanceIdx].pos = M.c;
                 c_storage[instanceIdx].hemi = Instance.c_hemi;
-                c_storage[instanceIdx].object_id = O;
-                c_storage[instanceIdx].padding[0] = 0;
-                c_storage[instanceIdx].padding[1] = 0;
-                c_storage[instanceIdx].padding[2] = 0;
 
                 instanceIdx++;
                 RImplementation.BasicStats.DetailCount++;
@@ -207,15 +194,13 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         cmd_list.set_Element(Object.shader->E[lod_id], 0);
         cmd_list.apply_lmaterial();
 
-        u32 baseVertex = vis_geometry_vertex_offsets[var_id][O];
         u32 baseIndex = vis_geometry_index_offsets[var_id][O];
         u32 numVertices = Object.number_vertices;
         u32 numIndices = Object.number_indices;
 
         cmd_list.RenderInstancedIndexed(
             D3DPT_TRIANGLELIST,
-            baseVertex,
-            0,
+            0, 0,
             numVertices,
             baseIndex,
             numIndices / 3,
@@ -223,14 +208,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
             0);
 
         cmd_list.stat.r.s_details.add(numVertices * objectInstanceCount);
-        instance_base += objectInstanceCount;
-        totalDrawCalls++;
-    }
-
-    if (totalDrawCalls > 0)
-    {
-        Msg("* [DetailManager] vis_id=%u: %u objects drawn with %u draw calls (unified geometry)",
-            var_id, totalDrawCalls, totalDrawCalls);
     }
 
     cmd_list.set_CullMode(CULL_CCW);

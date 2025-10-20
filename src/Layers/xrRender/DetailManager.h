@@ -203,6 +203,8 @@ public:
     u32 detailBufferSize_vis[3];
 
     ref_geom vis_unified_geom[3];
+    VertexStagingBuffer vis_unified_VB[3];
+    IndexStagingBuffer vis_unified_IB[3];
     xr_vector<u32> vis_geometry_vertex_offsets[3];
     xr_vector<u32> vis_geometry_index_offsets[3];
     xr_vector<u32> vis_object_indices[3];

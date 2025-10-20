@@ -25,6 +25,21 @@ struct vertHW
 };
 #pragma pack(pop)
 
+#ifdef USE_DX11
+static VertexElement dwDecl_unified[] =
+{
+    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+    {0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+    D3DDECL_END()
+};
+
+struct vertHW_unified
+{
+    Fvector4 pos_frac;
+    Fvector2 uv;
+};
+#endif
+
 short QC(float v)
 {
     int t = iFloor(v * float(quant));
@@ -111,8 +126,6 @@ void CDetailManager::hw_Load_Geom()
     hw_Geom.create(dwDecl, hw_VB, hw_IB);
 #else
 
-    u32 vSize = sizeof(vertHW);
-
     for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
         vis_geometry_vertex_offsets[vis_id].clear();
@@ -139,33 +152,35 @@ void CDetailManager::hw_Load_Geom()
         Msg("* [DETAILS] vis_id=%u: %u objects, %u vertices, %u indices",
             vis_id, objects.size(), total_verts, total_indices);
 
-        VertexStagingBuffer vis_VB;
-        vis_VB.Create(total_verts * vSize);
+        u32 vSize_unified = sizeof(vertHW_unified);
+        vis_unified_VB[vis_id].Create(total_verts * vSize_unified);
         {
-            vertHW* pV = static_cast<vertHW*>(vis_VB.Map());
+            vertHW_unified* pV = static_cast<vertHW_unified*>(vis_unified_VB[vis_id].Map());
             for (u32 o = 0; o < objects.size(); o++)
             {
                 const CDetail& D = *objects[o];
+
+                float height_range = D.bv_bb.vMax.y - D.bv_bb.vMin.y;
+                if (height_range < 0.001f) height_range = 1.0f;
+
                 for (u32 v = 0; v < D.number_vertices; v++)
                 {
                     const Fvector& vP = D.vertices[v].P;
-                    pV->x = vP.x;
-                    pV->y = vP.y;
-                    pV->z = vP.z;
-                    pV->u = QC(D.vertices[v].u);
-                    pV->v = QC(D.vertices[v].v);
-                    pV->t = QC(vP.y / (D.bv_bb.vMax.y - D.bv_bb.vMin.y));
-                    pV->mid = 0;
+                    pV->pos_frac.x = vP.x;
+                    pV->pos_frac.y = vP.y;
+                    pV->pos_frac.z = vP.z;
+                    pV->pos_frac.w = vP.y / height_range;
+                    pV->uv.x = D.vertices[v].u;
+                    pV->uv.y = D.vertices[v].v;
                     pV++;
                 }
             }
-            vis_VB.Unmap(true);
+            vis_unified_VB[vis_id].Unmap(true);
         }
 
-        IndexStagingBuffer vis_IB;
-        vis_IB.Create(total_indices * sizeof(u16));
+        vis_unified_IB[vis_id].Create(total_indices * sizeof(u16));
         {
-            u16* pI = static_cast<u16*>(vis_IB.Map());
+            u16* pI = static_cast<u16*>(vis_unified_IB[vis_id].Map());
             for (u32 o = 0; o < objects.size(); o++)
             {
                 const CDetail& D = *objects[o];
@@ -176,10 +191,10 @@ void CDetailManager::hw_Load_Geom()
                     *pI++ = u16(D.indices[i] + vertex_offset);
                 }
             }
-            vis_IB.Unmap(true);
+            vis_unified_IB[vis_id].Unmap(true);
         }
 
-        vis_unified_geom[vis_id].create(dwDecl, vis_VB, vis_IB);
+        vis_unified_geom[vis_id].create(dwDecl_unified, vis_unified_VB[vis_id], vis_unified_IB[vis_id]);
     }
 
     Msg("* [DETAILS] Phase 1.2: Created 3 unified geometries (one per vis_id)");
@@ -203,6 +218,10 @@ void CDetailManager::hw_Unload()
 
         if (vis_unified_geom[vis_id])
             vis_unified_geom[vis_id].destroy();
+        if (vis_unified_VB[vis_id])
+            vis_unified_VB[vis_id].Release();
+        if (vis_unified_IB[vis_id])
+            vis_unified_IB[vis_id].Release();
 
         vis_geometry_vertex_offsets[vis_id].clear();
         vis_geometry_index_offsets[vis_id].clear();
