@@ -10,6 +10,7 @@ extern const int quant = 16384;
 extern const int c_hdr = 10;
 const int c_size = 4;
 
+// Original vertex format for DX9/GL batching
 static VertexElement dwDecl[] =
 {
     {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
@@ -24,6 +25,22 @@ struct vertHW
     short u, v, t, mid;
 };
 #pragma pack(pop)
+
+#ifdef USE_DX11
+// Phase 1, Milestone 1.2: Use same vertex format as per-object geometry (CDetail)
+static VertexElement dwDecl_unified[] =
+{
+    {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos.frac
+    {0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
+    D3DDECL_END()
+};
+
+struct vertHW_unified
+{
+    Fvector4 pos_frac; // position.xyz, frac (normalized height)
+    Fvector2 uv;       // texture coordinates
+};
+#endif
 
 short QC(float v)
 {
@@ -114,8 +131,6 @@ void CDetailManager::hw_Load_Geom()
     // DX11: Phase 1, Milestone 1.2 - Create unified geometry per vis_id
     // Each vis_id gets one unified VB/IB containing all objects that can appear with that vis_id
 
-    u32 vSize = sizeof(vertHW);
-
     // For simplicity in Milestone 1.2, we'll include ALL objects in each vis_id's unified geometry
     // (Later optimization: only include objects that actually appear in that vis_id)
     // This allows any object to be rendered with any animation type
@@ -148,35 +163,37 @@ void CDetailManager::hw_Load_Geom()
         Msg("* [DETAILS] vis_id=%u: %u objects, %u vertices, %u indices",
             vis_id, objects.size(), total_verts, total_indices);
 
-        // Create VB for this vis_id
-        VertexStagingBuffer vis_VB;
-        vis_VB.Create(total_verts * vSize);
+        // Create VB for this vis_id (use persistent member buffer)
+        u32 vSize_unified = sizeof(vertHW_unified);
+        vis_unified_VB[vis_id].Create(total_verts * vSize_unified);
         {
-            vertHW* pV = static_cast<vertHW*>(vis_VB.Map());
+            vertHW_unified* pV = static_cast<vertHW_unified*>(vis_unified_VB[vis_id].Map());
             for (u32 o = 0; o < objects.size(); o++)
             {
                 const CDetail& D = *objects[o];
+
+                float height_range = D.bv_bb.vMax.y - D.bv_bb.vMin.y;
+                if (height_range < 0.001f) height_range = 1.0f; // Avoid division by zero
+
                 for (u32 v = 0; v < D.number_vertices; v++)
                 {
                     const Fvector& vP = D.vertices[v].P;
-                    pV->x = vP.x;
-                    pV->y = vP.y;
-                    pV->z = vP.z;
-                    pV->u = QC(D.vertices[v].u);
-                    pV->v = QC(D.vertices[v].v);
-                    pV->t = QC(vP.y / (D.bv_bb.vMax.y - D.bv_bb.vMin.y));
-                    pV->mid = 0;  // Not used for instanced rendering
+                    pV->pos_frac.x = vP.x;
+                    pV->pos_frac.y = vP.y;
+                    pV->pos_frac.z = vP.z;
+                    pV->pos_frac.w = vP.y / height_range; // Normalized height for wave animation
+                    pV->uv.x = D.vertices[v].u;
+                    pV->uv.y = D.vertices[v].v;
                     pV++;
                 }
             }
-            vis_VB.Unmap(true);
+            vis_unified_VB[vis_id].Unmap(true);
         }
 
-        // Create IB for this vis_id
-        IndexStagingBuffer vis_IB;
-        vis_IB.Create(total_indices * sizeof(u16));
+        // Create IB for this vis_id (use persistent member buffer)
+        vis_unified_IB[vis_id].Create(total_indices * sizeof(u16));
         {
-            u16* pI = static_cast<u16*>(vis_IB.Map());
+            u16* pI = static_cast<u16*>(vis_unified_IB[vis_id].Map());
             for (u32 o = 0; o < objects.size(); o++)
             {
                 const CDetail& D = *objects[o];
@@ -187,11 +204,11 @@ void CDetailManager::hw_Load_Geom()
                     *pI++ = u16(D.indices[i] + vertex_offset);
                 }
             }
-            vis_IB.Unmap(true);
+            vis_unified_IB[vis_id].Unmap(true);
         }
 
-        // Create geometry for this vis_id
-        vis_unified_geom[vis_id].create(dwDecl, vis_VB, vis_IB);
+        // Create geometry for this vis_id (now buffers persist!)
+        vis_unified_geom[vis_id].create(dwDecl_unified, vis_unified_VB[vis_id], vis_unified_IB[vis_id]);
     }
 
     Msg("* [DETAILS] Phase 1.2: Created 3 unified geometries (one per vis_id)");
@@ -215,9 +232,13 @@ void CDetailManager::hw_Unload()
         _RELEASE(detailBuffer_vis[vis_id]);
         _RELEASE(detailSRV_vis[vis_id]);
 
-        // Phase 1, Milestone 1.2: Release unified geometries
+        // Phase 1, Milestone 1.2: Release unified geometries and buffers
         if (vis_unified_geom[vis_id])
             vis_unified_geom[vis_id].destroy();
+        if (vis_unified_VB[vis_id])
+            vis_unified_VB[vis_id].Release();
+        if (vis_unified_IB[vis_id])
+            vis_unified_IB[vis_id].Release();
 
         // Clear offset tracking arrays
         vis_geometry_vertex_offsets[vis_id].clear();

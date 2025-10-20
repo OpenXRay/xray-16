@@ -32,15 +32,12 @@ void CDetailManager::hw_Load_Shaders()
     const u32 initialBufferSize = 256 * 256;
 
     // Instance data structure (must match shader)
-    // Phase 1, Milestone 1.2: Added object_id for unified geometry
     struct InstanceData
     {
         Fvector hpb;    // Heading, pitch, bank rotation
         float scale;    // Scale factor
         Fvector pos;    // Position
         float hemi;     // Hemisphere lighting
-        u32 object_id;  // Index into geometry offset table
-        u32 padding[3]; // Pad to 16-byte alignment
     };
 
     D3D11_BUFFER_DESC bufferDesc = {};
@@ -78,6 +75,9 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     ZoneScoped;
     using namespace detail_manager;
+
+    // Reset detail count once per frame, not per vis_id
+    RImplementation.BasicStats.DetailCount = 0;
 
     // Render-prepare
     //	Update timer
@@ -121,22 +121,17 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     ZoneScoped;
 
     // Instance data structure (must match shader)
-    // Phase 1, Milestone 1.2: Added object_id for unified geometry
     struct InstanceData
     {
         Fvector hpb;    // Heading, pitch, bank rotation
         float scale;    // Scale factor
         Fvector pos;    // Position
         float hemi;     // Hemisphere lighting
-        u32 object_id;  // Index into geometry offset table
-        u32 padding[3]; // Pad to 16-byte alignment
     };
 
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
-
-    RImplementation.BasicStats.DetailCount = 0;
 
     vis_list& list = m_visibles[var_id];
 
@@ -144,27 +139,15 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
 
-    // Phase 1, Milestone 1.2: Use unified geometry with per-object draws
-    // This is a transitional implementation - we use unified geometry but still draw each object separately
-    // In Milestone 1.3, we'll implement proper multi-object shader support for true 3-draw-call rendering
-
-    // Get buffer for this vis_id
+    // Phase 1, Milestone 1.2: Use unified geometry per vis_id
     ID3DBuffer* currentBuffer = detailBuffer_vis[var_id];
     ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
 
-    // Bind the structured buffer SRV to slot 0
     cmd_list.SRVSManager.SetVSResource(0, currentSRV);
-
-    // Set unified geometry for this vis_id (shared across all objects)
     cmd_list.set_Geometry(vis_unified_geom[var_id]);
-
-    // Bind CBuffers (same for all objects)
     cmd_list.set_c(strConsts, consts);
     cmd_list.set_c(strWave, wave);
     cmd_list.set_c(strDir2D, wind);
-
-    u32 totalDrawCalls = 0;
-    u32 instance_base = 0;  // Tracks base instance offset in buffer
 
     // Draw each object type that has visible instances
     for (u32 O = 0; O < objects.size(); O++)
@@ -182,13 +165,13 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         if (objectInstanceCount == 0)
             continue;
 
-        // Check buffer capacity
+        // Check buffer capacity - we map/discard the buffer for each object
         u32 bufferSize = detailBufferSize_vis[var_id];
-        if (instance_base + objectInstanceCount > bufferSize)
+        if (objectInstanceCount > bufferSize)
         {
-            Msg("! [DetailManager] Buffer overflow for vis_id=%u, object=%u. Skipping remaining instances.",
-                var_id, O);
-            break;
+            Msg("! [DetailManager] Too many instances for vis_id=%u, object=%u: need %u, have %u. Clamping.",
+                var_id, O, objectInstanceCount, bufferSize);
+            objectInstanceCount = bufferSize;
         }
 
         // Fill instance buffer for this object's instances
@@ -216,10 +199,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 c_storage[instanceIdx].scale = Instance.scale_calculated;
                 c_storage[instanceIdx].pos = M.c;
                 c_storage[instanceIdx].hemi = Instance.c_hemi;
-                c_storage[instanceIdx].object_id = O;  // For future use in Milestone 1.3
-                c_storage[instanceIdx].padding[0] = 0;
-                c_storage[instanceIdx].padding[1] = 0;
-                c_storage[instanceIdx].padding[2] = 0;
 
                 instanceIdx++;
                 RImplementation.BasicStats.DetailCount++;
@@ -232,17 +211,14 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         cmd_list.set_Element(Object.shader->E[lod_id], 0);
         cmd_list.apply_lmaterial();
 
-        // Draw this object's instances using the unified geometry with proper offsets
-        // NOTE: We're using the unified VB/IB but only drawing this object's portion
-        u32 baseVertex = vis_geometry_vertex_offsets[var_id][O];
+        // Draw using unified geometry with proper offsets
         u32 baseIndex = vis_geometry_index_offsets[var_id][O];
         u32 numVertices = Object.number_vertices;
         u32 numIndices = Object.number_indices;
 
         cmd_list.RenderInstancedIndexed(
             D3DPT_TRIANGLELIST,
-            baseVertex,
-            0,
+            0, 0,
             numVertices,
             baseIndex,
             numIndices / 3,
@@ -250,14 +226,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
             0);
 
         cmd_list.stat.r.s_details.add(numVertices * objectInstanceCount);
-        instance_base += objectInstanceCount;
-        totalDrawCalls++;
-    }
-
-    if (totalDrawCalls > 0)
-    {
-        Msg("* [DetailManager] vis_id=%u: %u objects drawn with %u draw calls (unified geometry)",
-            var_id, totalDrawCalls, totalDrawCalls);
     }
 
     cmd_list.set_CullMode(CULL_CCW);

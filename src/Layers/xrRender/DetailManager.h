@@ -194,6 +194,8 @@ public:
 
     // Phase 1, Milestone 1.2: Unified geometry per vis_id
     ref_geom vis_unified_geom[3];  // One unified geometry per vis_id
+    VertexStagingBuffer vis_unified_VB[3];  // Persistent VBs for unified geometry
+    IndexStagingBuffer vis_unified_IB[3];   // Persistent IBs for unified geometry
     xr_vector<u32> vis_geometry_vertex_offsets[3];  // Per-object vertex offsets within unified buffer
     xr_vector<u32> vis_geometry_index_offsets[3];   // Per-object index offsets within unified buffer
     xr_vector<u32> vis_object_indices[3];           // Map from local object index to global object index
