@@ -48,6 +48,7 @@ void CDetailManager::hw_Load_Geom()
     clamp<size_t>(hw_BatchSize, 0, 64);
     Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", u32(HW.Caps.geometry.dwRegisters), hw_BatchSize);
 
+#ifndef USE_DX11
     // Pre-process objects
     u32 dwVerts = 0;
     u32 dwIndices = 0;
@@ -108,6 +109,81 @@ void CDetailManager::hw_Load_Geom()
 
     // Declare geometry
     hw_Geom.create(dwDecl, hw_VB, hw_IB);
+#else
+
+    u32 vSize = sizeof(vertHW);
+
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
+    {
+        vis_geometry_vertex_offsets[vis_id].clear();
+        vis_geometry_index_offsets[vis_id].clear();
+        vis_object_indices[vis_id].clear();
+
+        u32 total_verts = 0;
+        u32 total_indices = 0;
+
+        for (u32 o = 0; o < objects.size(); o++)
+        {
+            const CDetail& D = *objects[o];
+            vis_object_indices[vis_id].push_back(o);
+            vis_geometry_vertex_offsets[vis_id].push_back(total_verts);
+            vis_geometry_index_offsets[vis_id].push_back(total_indices);
+
+            total_verts += D.number_vertices;
+            total_indices += D.number_indices;
+        }
+
+        vis_total_vertices[vis_id] = total_verts;
+        vis_total_indices[vis_id] = total_indices;
+
+        Msg("* [DETAILS] vis_id=%u: %u objects, %u vertices, %u indices",
+            vis_id, objects.size(), total_verts, total_indices);
+
+        VertexStagingBuffer vis_VB;
+        vis_VB.Create(total_verts * vSize);
+        {
+            vertHW* pV = static_cast<vertHW*>(vis_VB.Map());
+            for (u32 o = 0; o < objects.size(); o++)
+            {
+                const CDetail& D = *objects[o];
+                for (u32 v = 0; v < D.number_vertices; v++)
+                {
+                    const Fvector& vP = D.vertices[v].P;
+                    pV->x = vP.x;
+                    pV->y = vP.y;
+                    pV->z = vP.z;
+                    pV->u = QC(D.vertices[v].u);
+                    pV->v = QC(D.vertices[v].v);
+                    pV->t = QC(vP.y / (D.bv_bb.vMax.y - D.bv_bb.vMin.y));
+                    pV->mid = 0;
+                    pV++;
+                }
+            }
+            vis_VB.Unmap(true);
+        }
+
+        IndexStagingBuffer vis_IB;
+        vis_IB.Create(total_indices * sizeof(u16));
+        {
+            u16* pI = static_cast<u16*>(vis_IB.Map());
+            for (u32 o = 0; o < objects.size(); o++)
+            {
+                const CDetail& D = *objects[o];
+                u32 vertex_offset = vis_geometry_vertex_offsets[vis_id][o];
+
+                for (u32 i = 0; i < D.number_indices; i++)
+                {
+                    *pI++ = u16(D.indices[i] + vertex_offset);
+                }
+            }
+            vis_IB.Unmap(true);
+        }
+
+        vis_unified_geom[vis_id].create(dwDecl, vis_VB, vis_IB);
+    }
+
+    Msg("* [DETAILS] Phase 1.2: Created 3 unified geometries (one per vis_id)");
+#endif
 }
 
 void CDetailManager::hw_Unload()
@@ -124,6 +200,13 @@ void CDetailManager::hw_Unload()
     {
         _RELEASE(detailBuffer_vis[vis_id]);
         _RELEASE(detailSRV_vis[vis_id]);
+
+        if (vis_unified_geom[vis_id])
+            vis_unified_geom[vis_id].destroy();
+
+        vis_geometry_vertex_offsets[vis_id].clear();
+        vis_geometry_index_offsets[vis_id].clear();
+        vis_object_indices[vis_id].clear();
     }
 #endif
 }

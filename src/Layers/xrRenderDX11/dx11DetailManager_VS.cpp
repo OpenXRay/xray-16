@@ -35,6 +35,8 @@ void CDetailManager::hw_Load_Shaders()
         float scale;
         Fvector pos;
         float hemi;
+        u32 object_id;
+        u32 padding[3];
     };
 
     D3D11_BUFFER_DESC bufferDesc = {};
@@ -117,6 +119,8 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         float scale;
         Fvector pos;
         float hemi;
+        u32 object_id;
+        u32 padding[3];
     };
 
     static shared_str strConsts("consts");
@@ -130,6 +134,20 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
 
+    ID3DBuffer* currentBuffer = detailBuffer_vis[var_id];
+    ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
+
+    cmd_list.SRVSManager.SetVSResource(0, currentSRV);
+
+    cmd_list.set_Geometry(vis_unified_geom[var_id]);
+
+    cmd_list.set_c(strConsts, consts);
+    cmd_list.set_c(strWave, wave);
+    cmd_list.set_c(strDir2D, wind);
+
+    u32 totalDrawCalls = 0;
+    u32 instance_base = 0;
+
     for (u32 O = 0; O < objects.size(); O++)
     {
         CDetail& Object = *objects[O];
@@ -137,49 +155,30 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         if (vis.empty())
             continue;
 
-        u32 totalInstances = 0;
+        u32 objectInstanceCount = 0;
         for (SlotItemVec* items : vis)
-            totalInstances += items->size();
+            objectInstanceCount += items->size();
 
-        if (totalInstances == 0)
+        if (objectInstanceCount == 0)
             continue;
 
         u32 bufferSize = detailBufferSize_vis[var_id];
-        if (totalInstances > bufferSize)
+        if (instance_base + objectInstanceCount > bufferSize)
         {
-            Msg("! [DetailManager] Buffer too small for vis_id=%u: need %u, have %u. Clamping to buffer size.",
-                var_id, totalInstances, bufferSize);
-            totalInstances = bufferSize;
+            Msg("! [DetailManager] Buffer overflow for vis_id=%u, object=%u. Skipping remaining instances.",
+                var_id, O);
+            break;
         }
-
-        ID3DBuffer* currentBuffer = detailBuffer_vis[var_id];
-        ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
-
-        cmd_list.SRVSManager.SetVSResource(0, currentSRV);
-
-        cmd_list.set_Geometry(Object.hw_Geom);
-
-        cmd_list.set_Element(Object.shader->E[lod_id], 0);
-        cmd_list.apply_lmaterial();
-
-        cmd_list.set_c(strConsts, consts);
-        cmd_list.set_c(strWave, wave);
-        cmd_list.set_c(strDir2D, wind);
-
-        u32 instanceCount = 0;
-        InstanceData* c_storage = nullptr;
 
         D3D11_MAPPED_SUBRESOURCE pSubRes;
         CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
-        c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
+        InstanceData* c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
 
+        u32 instanceIdx = 0;
         for (SlotItemVec* items : vis)
         {
             for (SlotItem* item : *items)
             {
-                if (instanceCount >= bufferSize)
-                    break;
-
                 SlotItem& Instance = *item;
 
                 Fmatrix& M = Instance.mRotY;
@@ -189,31 +188,49 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 hpb.y = 0.0f;
                 hpb.z = 0.0f;
 
-                c_storage[instanceCount].hpb = hpb;
-                c_storage[instanceCount].scale = Instance.scale_calculated;
-                c_storage[instanceCount].pos = M.c;
-                c_storage[instanceCount].hemi = Instance.c_hemi;
+                c_storage[instanceIdx].hpb = hpb;
+                c_storage[instanceIdx].scale = Instance.scale_calculated;
+                c_storage[instanceIdx].pos = M.c;
+                c_storage[instanceIdx].hemi = Instance.c_hemi;
+                c_storage[instanceIdx].object_id = O;
+                c_storage[instanceIdx].padding[0] = 0;
+                c_storage[instanceIdx].padding[1] = 0;
+                c_storage[instanceIdx].padding[2] = 0;
 
-                instanceCount++;
+                instanceIdx++;
+                RImplementation.BasicStats.DetailCount++;
             }
         }
 
         HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
 
-        if (instanceCount > 0)
-        {
-            cmd_list.RenderInstancedIndexed(
-                D3DPT_TRIANGLELIST,
-                0, 0,
-                Object.number_vertices,
-                0,
-                Object.number_indices / 3,
-                instanceCount,
-                0);
+        cmd_list.set_Element(Object.shader->E[lod_id], 0);
+        cmd_list.apply_lmaterial();
 
-            cmd_list.stat.r.s_details.add(Object.number_vertices * instanceCount);
-            RImplementation.BasicStats.DetailCount += instanceCount;
-        }
+        u32 baseVertex = vis_geometry_vertex_offsets[var_id][O];
+        u32 baseIndex = vis_geometry_index_offsets[var_id][O];
+        u32 numVertices = Object.number_vertices;
+        u32 numIndices = Object.number_indices;
+
+        cmd_list.RenderInstancedIndexed(
+            D3DPT_TRIANGLELIST,
+            baseVertex,
+            0,
+            numVertices,
+            baseIndex,
+            numIndices / 3,
+            objectInstanceCount,
+            0);
+
+        cmd_list.stat.r.s_details.add(numVertices * objectInstanceCount);
+        instance_base += objectInstanceCount;
+        totalDrawCalls++;
+    }
+
+    if (totalDrawCalls > 0)
+    {
+        Msg("* [DetailManager] vis_id=%u: %u objects drawn with %u draw calls (unified geometry)",
+            var_id, totalDrawCalls, totalDrawCalls);
     }
 
     cmd_list.set_CullMode(CULL_CCW);

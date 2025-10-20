@@ -201,6 +201,13 @@ public:
     ID3DShaderResourceView* detailSRV_vis[3];
     ID3DBuffer* detailBuffer_vis[3];
     u32 detailBufferSize_vis[3];
+
+    ref_geom vis_unified_geom[3];
+    xr_vector<u32> vis_geometry_vertex_offsets[3];
+    xr_vector<u32> vis_geometry_index_offsets[3];
+    xr_vector<u32> vis_object_indices[3];
+    u32 vis_total_vertices[3];
+    u32 vis_total_indices[3];
 #endif
 
     ref_constant hwc_consts;
