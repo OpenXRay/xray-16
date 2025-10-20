@@ -216,6 +216,7 @@ public:
     void hw_Unload();
     void hw_Render(CBackend& cmd_list);
     void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+    void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
 
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);

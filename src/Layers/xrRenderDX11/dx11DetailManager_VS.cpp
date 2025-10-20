@@ -38,6 +38,8 @@ void CDetailManager::hw_Load_Shaders()
         float scale;    // Scale factor
         Fvector pos;    // Position
         float hemi;     // Hemisphere lighting
+        u32 vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
+        u32 padding;    // Alignment padding
     };
 
     D3D11_BUFFER_DESC bufferDesc = {};
@@ -98,25 +100,26 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     dir1.set(_sin(tm_rot1), 0, _cos(tm_rot1), 0).normalize().mul(swing_current.amp1);
     dir2.set(_sin(tm_rot2), 0, _cos(tm_rot2), 0).normalize().mul(swing_current.amp2);
 
-    // Wave0
+    // Phase 1.3: Simplified unified rendering
+    // Use single wave parameters for now (will be handled per-instance in future phase)
     float scale = 1.f / float(quant);
     Fvector4 wave;
     Fvector4 consts;
     consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
     wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir1, 1, 0);
 
-    // Wave1
-    wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 2, 0);
-
-    // Still
-    consts.set(scale, scale, scale, 1.f);
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1);
+    // Loop over objects, rendering all instances (still + wave1 + wave2) per object
+    for (u32 O = 0; O < objects.size(); O++)
+    {
+        hw_Render_object(cmd_list, consts, wave.div(PI_MUL_2), dir1, O);
+    }
 }
 
 void CDetailManager::hw_Render_dump(CBackend& cmd_list,
-    const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id)
+    const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id) {}
+
+void CDetailManager::hw_Render_object(CBackend& cmd_list,
+    const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id)
 {
     ZoneScoped;
 
@@ -127,66 +130,61 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         float scale;    // Scale factor
         Fvector pos;    // Position
         float hemi;     // Hemisphere lighting
+        u32 vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
+        u32 padding;    // Alignment padding
     };
 
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
 
-    vis_list& list = m_visibles[var_id];
+    CDetail& Object = *objects[object_id];
 
-    // Set shader constants (only once per pass, not per object)
-    cmd_list.set_CullMode(CULL_NONE);
-    cmd_list.set_xform_world(Fidentity);
-
-    // Phase 1, Milestone 1.2: Use unified geometry per vis_id
-    ID3DBuffer* currentBuffer = detailBuffer_vis[var_id];
-    ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
-
-    cmd_list.SRVSManager.SetVSResource(0, currentSRV);
-    cmd_list.set_Geometry(vis_unified_geom[var_id]);
-    cmd_list.set_c(strConsts, consts);
-    cmd_list.set_c(strWave, wave);
-    cmd_list.set_c(strDir2D, wind);
-
-    // Draw each object type that has visible instances
-    for (u32 O = 0; O < objects.size(); O++)
+    // Phase 1.3: Gather instances from all 3 vis_ids for this object
+    // Count total instances across all vis_ids
+    u32 totalInstanceCount = 0;
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
-        CDetail& Object = *objects[O];
-        xr_vector<SlotItemVec*>& vis = list[O];
-        if (vis.empty())
-            continue;
-
-        // Count instances for this object
-        u32 objectInstanceCount = 0;
+        vis_list& list = m_visibles[vis_id];
+        xr_vector<SlotItemVec*>& vis = list[object_id];
         for (SlotItemVec* items : vis)
-            objectInstanceCount += items->size();
+            totalInstanceCount += items->size();
+    }
 
-        if (objectInstanceCount == 0)
-            continue;
+    if (totalInstanceCount == 0)
+        return;
 
-        // Check buffer capacity - we map/discard the buffer for each object
-        u32 bufferSize = detailBufferSize_vis[var_id];
-        if (objectInstanceCount > bufferSize)
-        {
-            Msg("! [DetailManager] Too many instances for vis_id=%u, object=%u: need %u, have %u. Clamping.",
-                var_id, O, objectInstanceCount, bufferSize);
-            objectInstanceCount = bufferSize;
-        }
+    // Use first buffer for unified rendering (all vis_ids share same buffer)
+    ID3DBuffer* currentBuffer = detailBuffer_vis[0];
+    ID3DShaderResourceView* currentSRV = detailSRV_vis[0];
+    u32 bufferSize = detailBufferSize_vis[0];
 
-        // Fill instance buffer for this object's instances
-        D3D11_MAPPED_SUBRESOURCE pSubRes;
-        CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
-        InstanceData* c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
+    if (totalInstanceCount > bufferSize)
+    {
+        Msg("! [DetailManager] Too many instances for object=%u: need %u, have %u. Clamping.",
+            object_id, totalInstanceCount, bufferSize);
+        totalInstanceCount = bufferSize;
+    }
 
-        u32 instanceIdx = 0;
+    // Fill instance buffer with all instances from all vis_ids
+    D3D11_MAPPED_SUBRESOURCE pSubRes;
+    CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
+    InstanceData* c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
+
+    u32 instanceIdx = 0;
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
+    {
+        vis_list& list = m_visibles[vis_id];
+        xr_vector<SlotItemVec*>& vis = list[object_id];
+
         for (SlotItemVec* items : vis)
         {
             for (SlotItem* item : *items)
             {
-                SlotItem& Instance = *item;
+                if (instanceIdx >= totalInstanceCount)
+                    break;
 
-                // Extract data from matrix
+                SlotItem& Instance = *item;
                 Fmatrix& M = Instance.mRotY;
 
                 // Extract heading from Y-rotation matrix
@@ -199,34 +197,45 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 c_storage[instanceIdx].scale = Instance.scale_calculated;
                 c_storage[instanceIdx].pos = M.c;
                 c_storage[instanceIdx].hemi = Instance.c_hemi;
+                c_storage[instanceIdx].vis_id = vis_id;
+                c_storage[instanceIdx].padding = 0;
 
                 instanceIdx++;
                 RImplementation.BasicStats.DetailCount++;
             }
         }
-
-        HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
-
-        // Set shader for this object
-        cmd_list.set_Element(Object.shader->E[lod_id], 0);
-        cmd_list.apply_lmaterial();
-
-        // Draw using unified geometry with proper offsets
-        u32 baseIndex = vis_geometry_index_offsets[var_id][O];
-        u32 numVertices = Object.number_vertices;
-        u32 numIndices = Object.number_indices;
-
-        cmd_list.RenderInstancedIndexed(
-            D3DPT_TRIANGLELIST,
-            0, 0,
-            numVertices,
-            baseIndex,
-            numIndices / 3,
-            objectInstanceCount,
-            0);
-
-        cmd_list.stat.r.s_details.add(numVertices * objectInstanceCount);
     }
+
+    HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
+
+    // Set shader constants and state
+    cmd_list.set_CullMode(CULL_NONE);
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.SRVSManager.SetVSResource(0, currentSRV);
+    cmd_list.set_Geometry(vis_unified_geom[0]);
+    cmd_list.set_c(strConsts, consts);
+    cmd_list.set_c(strWave, wave);
+    cmd_list.set_c(strDir2D, wind);
+
+    // Set shader for this object (use lod_id=0 for wave shader)
+    cmd_list.set_Element(Object.shader->E[0], 0);
+    cmd_list.apply_lmaterial();
+
+    // Draw using unified geometry with proper offsets
+    u32 baseIndex = vis_geometry_index_offsets[0][object_id];
+    u32 numVertices = Object.number_vertices;
+    u32 numIndices = Object.number_indices;
+
+    cmd_list.RenderInstancedIndexed(
+        D3DPT_TRIANGLELIST,
+        0, 0,
+        numVertices,
+        baseIndex,
+        numIndices / 3,
+        instanceIdx,  // Use actual instance count written
+        0);
+
+    cmd_list.stat.r.s_details.add(numVertices * instanceIdx);
 
     cmd_list.set_CullMode(CULL_CCW);
 }
