@@ -201,6 +201,16 @@ public:
     xr_vector<u32> vis_object_indices[3];           // Map from local object index to global object index
     u32 vis_total_vertices[3];     // Total vertices in unified buffer
     u32 vis_total_indices[3];      // Total indices in unified buffer
+
+    // Phase 2.0: Full level decompression
+    struct SlotItemWithObject
+    {
+        SlotItem item;      // Original slot item data
+        u32 object_id;      // Which grass object type (0-63)
+    };
+    xr_vector<SlotItemWithObject> all_level_instances;  // ALL instances for entire level
+    u32 total_instance_count;
+    bool full_level_loaded;
 #endif
 
     ref_constant hwc_consts;
@@ -227,6 +237,11 @@ public:
     Slot* cache_Query(int sx, int sz);
     void cache_Decompress(Slot* D);
     BOOL cache_Validate();
+
+#ifdef USE_DX11
+    // Phase 2.0: Full level decompression
+    void DecompressAllSlots();
+#endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
     int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }

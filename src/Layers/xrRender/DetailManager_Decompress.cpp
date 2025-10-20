@@ -301,4 +301,108 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
     D.vis.box.set(Bounds);
     D.vis.box.getsphere(D.vis.sphere.P, D.vis.sphere.R);
 }
+
+#ifdef USE_DX11
+// Phase 2.0.2: Full level decompression
+void CDetailManager::DecompressAllSlots()
+{
+    Msg("* [DetailManager] Decompressing entire level...");
+
+    all_level_instances.clear();
+    total_instance_count = 0;
+    full_level_loaded = false;
+
+    // Calculate total number of slots to decompress
+    u32 total_slots = dtH.x_size() * dtH.z_size();
+    u32 processed_slots = 0;
+
+    Msg("* [DetailManager] Level has %u x %u = %u slots to decompress",
+        dtH.x_size(), dtH.z_size(), total_slots);
+
+    // Iterate all level slots (in database coordinate space)
+    for (u32 db_z = 0; db_z < dtH.z_size(); db_z++)
+    {
+        for (u32 db_x = 0; db_x < dtH.x_size(); db_x++)
+        {
+            // Convert database coordinates to world slot coordinates
+            int sx = int(db_x) - dtH.x_offs();
+            int sz = int(db_z) - dtH.z_offs();
+
+            // Query database for this slot
+            DetailSlot& DS = QueryDB(sx, sz);
+
+            // Check if slot is empty
+            bool is_empty = (DS.id0 == DetailSlot::ID_Empty) &&
+                           (DS.id1 == DetailSlot::ID_Empty) &&
+                           (DS.id2 == DetailSlot::ID_Empty) &&
+                           (DS.id3 == DetailSlot::ID_Empty);
+
+            if (is_empty)
+                continue;
+
+            // Set up temporary slot (skip cache_Task to avoid cache_task queue overflow)
+            Slot temp_slot;
+            temp_slot.type = stPending;
+            temp_slot.sx = sx;
+            temp_slot.sz = sz;
+            temp_slot.empty = false;
+
+            // Set up visibility box
+            temp_slot.vis.box.vMin.set(sx * dm_slot_size, DS.r_ybase(), sz * dm_slot_size);
+            temp_slot.vis.box.vMax.set(temp_slot.vis.box.vMin.x + dm_slot_size,
+                                       DS.r_ybase() + DS.r_yheight(),
+                                       temp_slot.vis.box.vMin.z + dm_slot_size);
+            temp_slot.vis.box.grow(EPS_L);
+
+            // Initialize slot object IDs
+            for (u32 i = 0; i < dm_obj_in_slot; i++)
+            {
+                temp_slot.G[i].id = DS.r_id(i);
+            }
+
+            // Decompress the slot (this does the expensive raytracing)
+            cache_Decompress(&temp_slot);
+
+            // Copy instances to master list with object_id tracking
+            for (u32 obj_idx = 0; obj_idx < dm_obj_in_slot; obj_idx++)
+            {
+                SlotPart& part = temp_slot.G[obj_idx];
+                u32 object_id = part.id;
+
+                for (SlotItem* item : part.items)
+                {
+                    SlotItemWithObject instance;
+                    instance.item = *item;
+                    instance.object_id = object_id;
+                    all_level_instances.push_back(instance);
+
+                    // Clean up pooled item
+                    poolSI.destroy(item);
+                }
+
+                part.items.clear();
+            }
+
+            processed_slots++;
+        }
+
+        // Progress update every 10 rows
+        if (db_z % 10 == 0 || db_z == dtH.z_size() - 1)
+        {
+            Msg("  ... processed %u/%u slots, %u instances so far",
+                processed_slots, total_slots, all_level_instances.size());
+        }
+    }
+
+    total_instance_count = all_level_instances.size();
+    full_level_loaded = true;
+
+    float memory_mb = (total_instance_count * sizeof(SlotItemWithObject)) / (1024.0f * 1024.0f);
+
+    Msg("* [DetailManager] Decompression complete:");
+    Msg("  - Total instances: %u", total_instance_count);
+    Msg("  - Memory (CPU): %.2f MB", memory_mb);
+    Msg("  - Processed slots: %u/%u", processed_slots, total_slots);
+}
+#endif
 } // namespace xray::render::RENDER_NAMESPACE
