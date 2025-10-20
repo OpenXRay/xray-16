@@ -11,12 +11,15 @@ struct v_detail_instanced
 };
 
 // Instance data structure (must match C++ InstanceData)
+// Phase 1, Milestone 1.2: Added object_id for unified geometry (not used yet)
 struct InstanceData
 {
 	float3 hpb;      // Heading, pitch, bank rotation
 	float scale;     // Scale factor
 	float3 pos;      // Position
 	float hemi;      // Hemisphere lighting
+	uint object_id;  // Index into geometry offset table (for Milestone 1.3)
+	uint3 padding;   // Pad to 16-byte alignment
 };
 
 // Structured buffer bound to slot 0

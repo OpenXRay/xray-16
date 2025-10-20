@@ -191,6 +191,14 @@ public:
     ID3DShaderResourceView* detailSRV_vis[3];
     ID3DBuffer* detailBuffer_vis[3];
     u32 detailBufferSize_vis[3];  // Track allocated size for each buffer
+
+    // Phase 1, Milestone 1.2: Unified geometry per vis_id
+    ref_geom vis_unified_geom[3];  // One unified geometry per vis_id
+    xr_vector<u32> vis_geometry_vertex_offsets[3];  // Per-object vertex offsets within unified buffer
+    xr_vector<u32> vis_geometry_index_offsets[3];   // Per-object index offsets within unified buffer
+    xr_vector<u32> vis_object_indices[3];           // Map from local object index to global object index
+    u32 vis_total_vertices[3];     // Total vertices in unified buffer
+    u32 vis_total_indices[3];      // Total indices in unified buffer
 #endif
 
     ref_constant hwc_consts;
