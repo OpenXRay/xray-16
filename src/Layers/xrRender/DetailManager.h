@@ -207,6 +207,10 @@ public:
     xr_vector<SlotItemWithObject> all_level_instances;
     u32 total_instance_count;
     bool full_level_loaded;
+
+    ID3DBuffer* persistent_instance_buffer;
+    ID3DShaderResourceView* persistent_instance_srv;
+    u32 persistent_buffer_capacity;
 #endif
 
     ref_constant hwc_consts;
@@ -236,6 +240,7 @@ public:
 
 #ifdef USE_DX11
     void DecompressAllSlots();
+    void CreatePersistentInstanceBuffer();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

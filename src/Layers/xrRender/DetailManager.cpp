@@ -114,6 +114,10 @@ CDetailManager::CDetailManager() : xrc("detail manager")
 #ifdef USE_DX11
     total_instance_count = 0;
     full_level_loaded = false;
+
+    persistent_instance_buffer = nullptr;
+    persistent_instance_srv = nullptr;
+    persistent_buffer_capacity = 0;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -226,6 +230,8 @@ void CDetailManager::Load()
     if (UseVS())
     {
         DecompressAllSlots();
+
+        CreatePersistentInstanceBuffer();
     }
 #endif
 
