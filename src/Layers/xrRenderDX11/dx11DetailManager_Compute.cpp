@@ -327,7 +327,7 @@ void DetailComputeManager::DispatchCulling(CBackend& cmd_list, const Fmatrix& vi
 
     FrustumGPU frustum = BuildFrustumGPU(view_proj);
     for (int i = 0; i < 6; ++i)
-        params.padding[i] = 0.0f;
+        params.frustum_planes[i] = frustum.planes[i];
 
     {
         D3D11_MAPPED_SUBRESOURCE mapped;

@@ -52,7 +52,9 @@ struct DetailCullParams
     u32 instance_count;
     u32 frame_number;
 
-    float padding[4];
+    Fvector4 frustum_planes[6];
+
+    float padding[8];
 };
 
 struct IndirectDrawArgs

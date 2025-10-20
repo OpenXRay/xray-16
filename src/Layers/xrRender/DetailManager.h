@@ -211,6 +211,19 @@ public:
     ID3DBuffer* persistent_instance_buffer;
     ID3DShaderResourceView* persistent_instance_srv;
     u32 persistent_buffer_capacity;
+
+    ref_cs cull_compute_shader;
+    ID3DBuffer* cull_constant_buffer;
+
+    static const u32 max_gpu_culled_objects = 16;
+    ID3DBuffer* gpu_visible_buffers[max_gpu_culled_objects];
+    ID3DShaderResourceView* gpu_visible_srvs[max_gpu_culled_objects];
+    ID3DUnorderedAccessView* gpu_visible_uavs[max_gpu_culled_objects];
+    u32 gpu_visible_buffer_capacity;
+
+    ID3DBuffer* gpu_visible_counts_buffer;
+    ID3DUnorderedAccessView* gpu_visible_counts_uav;
+    ID3DBuffer* gpu_visible_counts_readback;
 #endif
 
     ref_constant hwc_consts;
@@ -245,6 +258,9 @@ public:
 #ifdef USE_DX11
     void DecompressAllSlots();
     void CreatePersistentInstanceBuffer();
+
+    void CreateGPUCullingBuffers();
+    void DispatchGPUCulling(CBackend& cmd_list);
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
