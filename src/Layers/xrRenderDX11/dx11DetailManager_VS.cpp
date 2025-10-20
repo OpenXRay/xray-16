@@ -29,7 +29,7 @@ void CDetailManager::hw_Load_Shaders()
 
     // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
     // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
-    const u32 initialBufferSize = 256 * 256;
+    const u32 initialBufferSize = 2048 * 2048;
 
     // Instance data structure (must match shader)
     // Phase 2.0.3: Updated to include object_id instead of padding
@@ -110,7 +110,7 @@ void CDetailManager::CreatePersistentInstanceBuffer()
         dst.hpb.y = 0.0f;
         dst.hpb.z = 0.0f;
 
-        dst.scale = src.item.scale_calculated;
+        dst.scale = src.item.scale;
         dst.pos = M.c;
         dst.hemi = src.item.c_hemi;
         dst.vis_id = src.item.vis_ID;
@@ -150,10 +150,153 @@ void CDetailManager::CreatePersistentInstanceBuffer()
     Msg("  - Per-instance size: %u bytes", sizeof(InstanceData));
 }
 
+// Phase 2.0.4: Render all instances from full level decompression (no culling)
+void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
+{
+    ZoneScoped;
+    using namespace detail_manager;
+
+    // Reset detail count
+    RImplementation.BasicStats.DetailCount = 0;
+
+    // Update animation timers (same as old code)
+    float fDelta = Device.fTimeGlobal - m_global_time_old;
+    if ((fDelta < 0) || (fDelta > 1))
+        fDelta = 0.03f;
+    m_global_time_old = Device.fTimeGlobal;
+
+    m_time_rot_1 += (PI_MUL_2 * fDelta / swing_current.rot1);
+    m_time_rot_2 += (PI_MUL_2 * fDelta / swing_current.rot2);
+    m_time_pos += fDelta * swing_current.speed;
+
+    float tm_rot1 = m_time_rot_1;
+    float tm_rot2 = m_time_rot_2;
+
+    Fvector4 dir1, dir2;
+    dir1.set(_sin(tm_rot1), 0, _cos(tm_rot1), 0).normalize().mul(swing_current.amp1);
+    dir2.set(_sin(tm_rot2), 0, _cos(tm_rot2), 0).normalize().mul(swing_current.amp2);
+
+    float scale = 1.f / float(quant);
+    Fvector4 wave;
+    Fvector4 consts;
+    consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
+
+    // Instance data structure
+    struct InstanceData
+    {
+        Fvector hpb;
+        float scale;
+        Fvector pos;
+        float hemi;
+        u32 vis_id;
+        u32 object_id;
+    };
+
+    static shared_str strConsts("consts");
+    static shared_str strWave("wave");
+    static shared_str strDir2D("dir2D");
+
+    // Render each object by gathering all its instances from all_level_instances
+    for (u32 O = 0; O < objects.size(); O++)
+    {
+        CDetail& Object = *objects[O];
+
+        // Count instances for this object
+        u32 instanceCount = 0;
+        for (u32 i = 0; i < total_instance_count; i++)
+        {
+            if (all_level_instances[i].object_id == O)
+                instanceCount++;
+        }
+
+        if (instanceCount == 0)
+            continue;
+
+        // Use first buffer for rendering
+        ID3DBuffer* currentBuffer = detailBuffer_vis[0];
+        ID3DShaderResourceView* currentSRV = detailSRV_vis[0];
+        u32 bufferSize = detailBufferSize_vis[0];
+
+        if (instanceCount > bufferSize)
+        {
+            Msg("! [DetailManager] Too many instances for object=%u: need %u, have %u. Clamping.",
+                O, instanceCount, bufferSize);
+            instanceCount = bufferSize;
+        }
+
+        // Map and fill buffer
+        D3D11_MAPPED_SUBRESOURCE pSubRes;
+        CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
+        InstanceData* c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
+
+        u32 written = 0;
+        for (u32 i = 0; i < total_instance_count && written < instanceCount; i++)
+        {
+            const SlotItemWithObject& src = all_level_instances[i];
+            if (src.object_id != O)
+                continue;
+
+            const Fmatrix& M = src.item.mRotY;
+
+            c_storage[written].hpb.x = atan2f(M._13, M._11);
+            c_storage[written].hpb.y = 0.0f;
+            c_storage[written].hpb.z = 0.0f;
+            c_storage[written].scale = src.item.scale;
+            c_storage[written].pos = M.c;
+            c_storage[written].hemi = src.item.c_hemi;
+            c_storage[written].vis_id = src.item.vis_ID;
+            c_storage[written].object_id = O;
+
+            written++;
+            RImplementation.BasicStats.DetailCount++;
+        }
+
+        HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
+
+        // Set shader state and draw
+        cmd_list.set_CullMode(CULL_NONE);
+        cmd_list.set_xform_world(Fidentity);
+        cmd_list.SRVSManager.SetVSResource(0, currentSRV);
+        cmd_list.set_Geometry(vis_unified_geom[0]);
+        cmd_list.set_c(strConsts, consts);
+        cmd_list.set_c(strWave, wave.div(PI_MUL_2));
+        cmd_list.set_c(strDir2D, dir1);
+
+        cmd_list.set_Element(Object.shader->E[0], 0);
+        cmd_list.apply_lmaterial();
+
+        u32 baseIndex = vis_geometry_index_offsets[0][O];
+        u32 numVertices = Object.number_vertices;
+        u32 numIndices = Object.number_indices;
+
+        cmd_list.RenderInstancedIndexed(
+            D3DPT_TRIANGLELIST,
+            0, 0,
+            numVertices,
+            baseIndex,
+            numIndices / 3,
+            written,
+            0);
+
+        cmd_list.stat.r.s_details.add(numVertices * written);
+        cmd_list.set_CullMode(CULL_CCW);
+    }
+}
+
 void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     ZoneScoped;
     using namespace detail_manager;
+
+#ifdef USE_DX11
+    // Phase 2.0.4: Use full-level rendering if available
+    if (full_level_loaded)
+    {
+        hw_Render_FullLevel(cmd_list);
+        return;
+    }
+#endif
 
     // Reset detail count once per frame, not per vis_id
     RImplementation.BasicStats.DetailCount = 0;
@@ -272,7 +415,7 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
                 hpb.z = 0.0f;                   // bank
 
                 c_storage[instanceIdx].hpb = hpb;
-                c_storage[instanceIdx].scale = Instance.scale_calculated;
+                c_storage[instanceIdx].scale = Instance.scale;
                 c_storage[instanceIdx].pos = M.c;
                 c_storage[instanceIdx].hemi = Instance.c_hemi;
                 c_storage[instanceIdx].vis_id = vis_id;
