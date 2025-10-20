@@ -53,7 +53,7 @@ struct FrustumGPU
     Fvector4 planes[6];  // Left, Right, Top, Bottom, Near, Far
 };
 
-// Culling parameters passed to compute shader (64 bytes)
+// Culling parameters passed to compute shader (192 bytes)
 struct DetailCullParams
 {
     Fvector camera_pos;         // Camera world position (12 bytes)
@@ -67,7 +67,10 @@ struct DetailCullParams
     u32 instance_count;         // Total number of instances to process (4 bytes)
     u32 frame_number;           // Current frame for temporal throttling (4 bytes)
 
-    float padding[4];           // Alignment to 64 bytes (16 bytes)
+    // Frustum planes for culling (96 bytes)
+    Fvector4 frustum_planes[6]; // Left, Right, Top, Bottom, Near, Far (6 * 16 = 96 bytes)
+
+    float padding[8];           // Alignment to 16-byte boundary (32 bytes)
 };
 
 // Indirect draw arguments structure (must match D3D11_DRAW_INDEXED_ARGUMENTS)

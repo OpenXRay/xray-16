@@ -150,7 +150,211 @@ void CDetailManager::CreatePersistentInstanceBuffer()
     Msg("  - Per-instance size: %u bytes", sizeof(InstanceData));
 }
 
-// Phase 2.0.4: Render all instances from full level decompression (no culling)
+// Phase 2.1: Create GPU culling buffers and infrastructure
+void CDetailManager::CreateGPUCullingBuffers()
+{
+    VERIFY(full_level_loaded);
+    VERIFY(total_instance_count > 0);
+
+    Msg("* [DetailManager] Creating GPU culling infrastructure...");
+
+    // Load compute shader
+    cull_compute_shader.create("detail_cull");
+
+    // Estimate max visible instances per object (conservative: average instances per object / 2)
+    gpu_visible_buffer_capacity = 2048 * 2048;
+    if (gpu_visible_buffer_capacity < 10000)
+        gpu_visible_buffer_capacity = 10000;  // Minimum 10K per object
+
+    struct InstanceData
+    {
+        Fvector hpb;
+        float scale;
+        Fvector pos;
+        float hemi;
+        u32 vis_id;
+        u32 object_id;
+    };
+
+    // Create per-object visible instance buffers
+    for (u32 i = 0; i < max_gpu_culled_objects; i++)
+    {
+        D3D11_BUFFER_DESC desc = {};
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+        desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+        desc.StructureByteStride = sizeof(InstanceData);
+        desc.ByteWidth = gpu_visible_buffer_capacity * sizeof(InstanceData);
+
+        CHK_DX(HW.pDevice->CreateBuffer(&desc, nullptr, &gpu_visible_buffers[i]));
+
+        // Create SRV
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+        srvDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
+        CHK_DX(HW.pDevice->CreateShaderResourceView(gpu_visible_buffers[i], &srvDesc, &gpu_visible_srvs[i]));
+
+        // Create UAV
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+        uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+        uavDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
+        CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_buffers[i], &uavDesc, &gpu_visible_uavs[i]));
+    }
+
+    // Create counter buffer (one u32 per object, up to 64 objects)
+    D3D11_BUFFER_DESC counterDesc = {};
+    counterDesc.Usage = D3D11_USAGE_DEFAULT;
+    counterDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    counterDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+    counterDesc.ByteWidth = dm_max_objects * sizeof(u32);
+    CHK_DX(HW.pDevice->CreateBuffer(&counterDesc, nullptr, &gpu_visible_counts_buffer));
+
+    D3D11_UNORDERED_ACCESS_VIEW_DESC counterUavDesc = {};
+    counterUavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+    counterUavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    counterUavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+    counterUavDesc.Buffer.NumElements = dm_max_objects;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_counts_buffer, &counterUavDesc, &gpu_visible_counts_uav));
+
+    // Create readback buffer for CPU access
+    D3D11_BUFFER_DESC readbackDesc = counterDesc;
+    readbackDesc.Usage = D3D11_USAGE_STAGING;
+    readbackDesc.BindFlags = 0;
+    readbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    readbackDesc.MiscFlags = 0;
+    CHK_DX(HW.pDevice->CreateBuffer(&readbackDesc, nullptr, &gpu_visible_counts_readback));
+
+    // Create constant buffer for culling parameters
+    D3D11_BUFFER_DESC cbDesc = {};
+    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cbDesc.ByteWidth = 256;  // Generous size for alignment
+    CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &cull_constant_buffer));
+
+    float vram_mb = (max_gpu_culled_objects * gpu_visible_buffer_capacity * sizeof(InstanceData)) / (1024.0f * 1024.0f);
+
+    Msg("* [DetailManager] GPU culling infrastructure created:");
+    Msg("  - Per-object buffer capacity: %u instances", gpu_visible_buffer_capacity);
+    Msg("  - Object buffers: %u (first %u objects)", max_gpu_culled_objects, max_gpu_culled_objects);
+    Msg("  - VRAM for output buffers: %.2f MB", vram_mb);
+}
+
+// Phase 2.1: Dispatch GPU culling compute shader
+void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
+{
+    ZoneScoped;
+
+    auto context = HW.get_context(cmd_list.context_id);
+
+    // Constant buffer structure (must match shader)
+    struct DetailCullParams
+    {
+        Fmatrix view_proj;            // 64 bytes
+        Fvector3 camera_pos;            // 12 bytes
+        float fade_distance_sqr;        // 4 bytes
+        Fvector4 frustum_planes[6];     // 96 bytes
+        u32 total_instance_count;       // 4 bytes
+        u32 object_count;               // 4 bytes
+        u32 pad0;                       // 4 bytes
+        u32 pad1;                       // 4 bytes
+    };
+
+    // Extract frustum planes from view-projection matrix
+    // NOTE: Use same planes as old cache system (LRTB + FAR, no NEAR plane)
+    // This prevents culling grass that's close to camera
+    CFrustum frustum;
+    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+
+    // Setup constant buffer
+    DetailCullParams params = {};
+    params.view_proj = Device.mFullTransform;
+    params.camera_pos = Device.vCameraPosition;
+
+    // Use actual fade distance (from r__detail_radius cvar)
+    // fade_distance is initialized in DetailManager constructor
+    params.fade_distance_sqr = fade_distance * fade_distance;
+    params.total_instance_count = total_instance_count;
+    params.object_count = objects.size();
+
+    // Copy frustum planes (5 planes: LRTB + FAR, no NEAR)
+    // Initialize all planes to disable them (pointing away)
+    for (u32 i = 0; i < 6; i++)
+        params.frustum_planes[i].set(0, 0, 0, 1000000.0f);  // Very far away
+
+    // Copy actual planes from frustum
+    for (u32 i = 0; i < frustum.p_count && i < 6; i++)
+    {
+        params.frustum_planes[i].set(frustum.planes[i].n.x, frustum.planes[i].n.y,
+                                      frustum.planes[i].n.z, frustum.planes[i].d);
+    }
+
+    // DEBUG: Log first time
+    static bool logged = false;
+    if (!logged)
+    {
+        Msg("! [DetailManager] GPU Culling Setup:");
+        Msg("  - fade_distance: %.2f", fade_distance);
+        Msg("  - fade_distance_sqr: %.2f", params.fade_distance_sqr);
+        Msg("  - camera_pos: %.2f, %.2f, %.2f",
+            params.camera_pos.x, params.camera_pos.y, params.camera_pos.z);
+        Msg("  - total_instance_count: %u", total_instance_count);
+        Msg("  - Frustum planes (%u active):", frustum.p_count);
+        for (u32 i = 0; i < frustum.p_count; i++)
+        {
+            Msg("    Plane %u: n=(%.3f, %.3f, %.3f), d=%.3f", i,
+                params.frustum_planes[i].x, params.frustum_planes[i].y,
+                params.frustum_planes[i].z, params.frustum_planes[i].w);
+        }
+        logged = true;
+    }
+
+    // Update constant buffer
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    CHK_DX(context->Map(cull_constant_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
+    memcpy(mapped.pData, &params, sizeof(params));
+    context->Unmap(cull_constant_buffer, 0);
+
+    // Clear counter buffer to zero
+    UINT zero[64] = {0};
+    context->ClearUnorderedAccessViewUint(gpu_visible_counts_uav, zero);
+
+    // Bind constant buffer
+    context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
+
+    // Bind input: persistent instance buffer
+    context->CSSetShaderResources(0, 1, &persistent_instance_srv);
+
+    // Bind outputs: per-object visible buffers + counter buffer
+    ID3DUnorderedAccessView* uavs[17];
+    for (u32 i = 0; i < max_gpu_culled_objects; i++)
+        uavs[i] = gpu_visible_uavs[i];
+    uavs[16] = gpu_visible_counts_uav;  // Counter buffer at u16
+
+    context->CSSetUnorderedAccessViews(0, 17, uavs, nullptr);
+
+    // Bind compute shader
+    context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
+
+    // Dispatch compute shader (256 threads per group)
+    u32 num_groups = (total_instance_count + 255) / 256;
+    context->Dispatch(num_groups, 1, 1);
+
+    // Unbind UAVs (prepare for rendering)
+    ID3DUnorderedAccessView* null_uavs[17] = {nullptr};
+    context->CSSetUnorderedAccessViews(0, 17, null_uavs, nullptr);
+
+    // Unbind SRVs
+    ID3DShaderResourceView* null_srvs[1] = {nullptr};
+    context->CSSetShaderResources(0, 1, null_srvs);
+
+    // Copy counter buffer to readback for CPU access
+    context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
+}
+
+// Phase 2.1: Render using GPU-culled instances
 void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
 {
     ZoneScoped;
@@ -159,7 +363,10 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     // Reset detail count
     RImplementation.BasicStats.DetailCount = 0;
 
-    // Update animation timers (same as old code)
+    // Phase 2.1: Dispatch GPU culling compute shader
+    DispatchGPUCulling(cmd_list);
+
+    // Update animation timers
     float fDelta = Device.fTimeGlobal - m_global_time_old;
     if ((fDelta < 0) || (fDelta > 1))
         fDelta = 0.03f;
@@ -182,82 +389,61 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
     wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
 
-    // Instance data structure
-    struct InstanceData
-    {
-        Fvector hpb;
-        float scale;
-        Fvector pos;
-        float hemi;
-        u32 vis_id;
-        u32 object_id;
-    };
-
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
 
-    // Render each object by gathering all its instances from all_level_instances
-    for (u32 O = 0; O < objects.size(); O++)
+    // Read back GPU-culled instance counts
+    auto context = HW.get_context(cmd_list.context_id);
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    CHK_DX(context->Map(gpu_visible_counts_readback, 0, D3D11_MAP_READ, 0, &mapped));
+    u32* counts = (u32*)mapped.pData;
+
+    // DEBUG: Log culling results (first frame only)
+    static bool first_frame = true;
+    if (first_frame)
     {
-        CDetail& Object = *objects[O];
+        u32 total_visible = 0;
+        for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
+            total_visible += counts[i];
 
-        // Count instances for this object
-        u32 instanceCount = 0;
-        for (u32 i = 0; i < total_instance_count; i++)
+        Msg("! [DetailManager] GPU Culling Results:");
+        Msg("  - Total instances: %u", total_instance_count);
+        Msg("  - Visible instances: %u (%.1f%%)", total_visible,
+            (total_visible * 100.0f) / total_instance_count);
+        Msg("  - Fade distance: %.2f", fade_distance);
+        Msg("  - Camera pos: %.2f, %.2f, %.2f",
+            Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
+
+        for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
         {
-            if (all_level_instances[i].object_id == O)
-                instanceCount++;
+            if (counts[i] > 0)
+                Msg("  - Object %u: %u instances", i, counts[i]);
         }
+        first_frame = false;
+    }
 
+    // Render each object using GPU-culled instances
+    u32 objects_to_render = _min(objects.size(), max_gpu_culled_objects);
+    for (u32 O = 0; O < objects_to_render; O++)
+    {
+        u32 instanceCount = counts[O];
         if (instanceCount == 0)
             continue;
 
-        // Use first buffer for rendering
-        ID3DBuffer* currentBuffer = detailBuffer_vis[0];
-        ID3DShaderResourceView* currentSRV = detailSRV_vis[0];
-        u32 bufferSize = detailBufferSize_vis[0];
-
-        if (instanceCount > bufferSize)
+        if (instanceCount > gpu_visible_buffer_capacity)
         {
-            Msg("! [DetailManager] Too many instances for object=%u: need %u, have %u. Clamping.",
-                O, instanceCount, bufferSize);
-            instanceCount = bufferSize;
+            Msg("! [DetailManager] GPU culling overflow for object %u: %u instances (capacity %u)",
+                O, instanceCount, gpu_visible_buffer_capacity);
+            instanceCount = gpu_visible_buffer_capacity;
         }
 
-        // Map and fill buffer
-        D3D11_MAPPED_SUBRESOURCE pSubRes;
-        CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
-        InstanceData* c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
+        CDetail& Object = *objects[O];
 
-        u32 written = 0;
-        for (u32 i = 0; i < total_instance_count && written < instanceCount; i++)
-        {
-            const SlotItemWithObject& src = all_level_instances[i];
-            if (src.object_id != O)
-                continue;
-
-            const Fmatrix& M = src.item.mRotY;
-
-            c_storage[written].hpb.x = atan2f(M._13, M._11);
-            c_storage[written].hpb.y = 0.0f;
-            c_storage[written].hpb.z = 0.0f;
-            c_storage[written].scale = src.item.scale;
-            c_storage[written].pos = M.c;
-            c_storage[written].hemi = src.item.c_hemi;
-            c_storage[written].vis_id = src.item.vis_ID;
-            c_storage[written].object_id = O;
-
-            written++;
-            RImplementation.BasicStats.DetailCount++;
-        }
-
-        HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
-
-        // Set shader state and draw
+        // Use GPU-culled buffer directly (already in InstanceData format!)
         cmd_list.set_CullMode(CULL_NONE);
         cmd_list.set_xform_world(Fidentity);
-        cmd_list.SRVSManager.SetVSResource(0, currentSRV);
+        cmd_list.SRVSManager.SetVSResource(0, gpu_visible_srvs[O]);
         cmd_list.set_Geometry(vis_unified_geom[0]);
         cmd_list.set_c(strConsts, consts);
         cmd_list.set_c(strWave, wave.div(PI_MUL_2));
@@ -276,12 +462,15 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
             numVertices,
             baseIndex,
             numIndices / 3,
-            written,
+            instanceCount,
             0);
 
-        cmd_list.stat.r.s_details.add(numVertices * written);
+        cmd_list.stat.r.s_details.add(numVertices * instanceCount);
+        RImplementation.BasicStats.DetailCount += instanceCount;
         cmd_list.set_CullMode(CULL_CCW);
     }
+
+    context->Unmap(gpu_visible_counts_readback, 0);
 }
 
 void CDetailManager::hw_Render(CBackend& cmd_list)

@@ -1,5 +1,5 @@
 // detail_cull.cs - GPU-driven frustum culling for detail objects
-// Processes all detail instances and outputs visible indices for indirect drawing
+// Phase 2.1: Processes all level instances and outputs visible instances per object
 //
 #define SM_5_0
 #include "common.h"
@@ -8,121 +8,62 @@
 // Structures (must match C++)
 // ===========================
 
-struct DetailInstanceGPU
+// Phase 2.0.3: InstanceData structure (32 bytes)
+struct InstanceData
 {
-    // Transform data (48 bytes)
-    float3 position;
-    float scale;
-    float rotation_y;
-    float3 padding0;
-
-    // Rendering data (32 bytes)
-    float c_hemi;
-    float c_sun;
-    uint object_id;
-    uint vis_id;
-    float3 color_rgb;
-    float padding1;
-
-    // Bounding data (32 bytes)
-    float3 bounds_min;
-    float bounds_radius;
-    float3 bounds_max;
-    float padding2;
-
-    // Metadata (16 bytes)
-    uint slot_x;
-    uint slot_z;
-    uint flags;
-    float fade_distance_sqr;
-};
-
-struct FrustumPlane
-{
-    float4 plane;  // xyz = normal, w = distance
-};
-
-struct IndirectDrawArgs
-{
-    uint index_count;
-    uint instance_count;
-    uint start_index;
-    int base_vertex;
-    uint start_instance;
+    float3 hpb;         // Heading, pitch, bank (12 bytes)
+    float scale;        // Scale factor (4 bytes)
+    float3 pos;         // World position (12 bytes)
+    float hemi;         // Hemisphere lighting (4 bytes)
+    uint vis_id;        // Animation type (4 bytes)
+    uint object_id;     // Grass object type (4 bytes)
 };
 
 // ===========================
 // Input Buffers
 // ===========================
 
-cbuffer CullParams : register(b0)
+// Must match C++ DetailCullParams struct in dx11DetailManager_VS.cpp exactly!
+cbuffer DetailCullParams : register(b0)
 {
-    float3 g_camera_pos;
-    float g_fade_limit_sqr;
-
-    float3 g_camera_dir;
-    float g_fade_start_sqr;
-
-    float g_r_ssa_discard;
-    float g_r_ssa_cheap;
-    uint g_instance_count;
-    uint g_frame_number;
-
-    float4 g_frustum_planes[6];  // Left, Right, Top, Bottom, Near, Far
+    float4x4 g_view_proj;           // View-projection matrix (64 bytes)
+    float3 g_camera_pos;            // Camera position (12 bytes)
+    float g_fade_distance_sqr;      // Max distance squared (4 bytes)
+    float4 g_frustum_planes[6];     // Frustum planes (6 * 16 = 96 bytes)
+    uint g_total_instance_count;    // Total instances to process (4 bytes)
+    uint g_object_count;            // Number of grass object types (4 bytes)
+    uint g_pad0;                    // Padding (4 bytes)
+    uint g_pad1;                    // Padding (4 bytes)
 };
 
-// All instances (input, read-only)
-StructuredBuffer<DetailInstanceGPU> g_instances : register(t0);
+// Input: All level instances (immutable persistent buffer)
+StructuredBuffer<InstanceData> g_all_instances : register(t0);
 
 // ===========================
-// Output Buffers
+// Output Buffers (Phase 2.1: Per-Object)
 // ===========================
 
-// Visible instance indices per vis_id (output, append)
-RWStructuredBuffer<uint> g_visible_still : register(u0);     // vis_id = 0
-RWStructuredBuffer<uint> g_visible_wave1 : register(u1);     // vis_id = 1
-RWStructuredBuffer<uint> g_visible_wave2 : register(u2);     // vis_id = 2
+// For now: hardcode first 16 object types (can expand to 64 later)
+RWStructuredBuffer<InstanceData> g_visible_obj0 : register(u0);
+RWStructuredBuffer<InstanceData> g_visible_obj1 : register(u1);
+RWStructuredBuffer<InstanceData> g_visible_obj2 : register(u2);
+RWStructuredBuffer<InstanceData> g_visible_obj3 : register(u3);
+RWStructuredBuffer<InstanceData> g_visible_obj4 : register(u4);
+RWStructuredBuffer<InstanceData> g_visible_obj5 : register(u5);
+RWStructuredBuffer<InstanceData> g_visible_obj6 : register(u6);
+RWStructuredBuffer<InstanceData> g_visible_obj7 : register(u7);
 
-// Atomic counters for each vis_id
-RWStructuredBuffer<uint> g_counters : register(u3);  // [0]=still, [1]=wave1, [2]=wave2
+RWStructuredBuffer<InstanceData> g_visible_obj8 : register(u8);
+RWStructuredBuffer<InstanceData> g_visible_obj9 : register(u9);
+RWStructuredBuffer<InstanceData> g_visible_obj10 : register(u10);
+RWStructuredBuffer<InstanceData> g_visible_obj11 : register(u11);
+RWStructuredBuffer<InstanceData> g_visible_obj12 : register(u12);
+RWStructuredBuffer<InstanceData> g_visible_obj13 : register(u13);
+RWStructuredBuffer<InstanceData> g_visible_obj14 : register(u14);
+RWStructuredBuffer<InstanceData> g_visible_obj15 : register(u15);
 
-// Indirect draw arguments per vis_id
-RWStructuredBuffer<IndirectDrawArgs> g_indirect_args : register(u4);
-
-// ===========================
-// Culling Functions
-// ===========================
-
-// Test if a sphere intersects or is inside a frustum plane
-bool SphereInsidePlane(float3 center, float radius, float4 plane)
-{
-    float distance = dot(plane.xyz, center) + plane.w;
-    return distance > -radius;
-}
-
-// Frustum culling: test sphere against all 6 planes
-bool FrustumCullSphere(float3 center, float radius)
-{
-    [unroll]
-    for (uint i = 0; i < 6; ++i)
-    {
-        if (!SphereInsidePlane(center, radius, g_frustum_planes[i]))
-            return false;  // Outside frustum
-    }
-    return true;  // Inside or intersecting
-}
-
-// Compute Screen Space Area (SSA) for LOD selection
-float ComputeSSA(float3 world_pos, float radius, float scale)
-{
-    float dist_sqr = dot(world_pos - g_camera_pos, world_pos - g_camera_pos);
-    if (dist_sqr < 0.001f)
-        return 1e6f;  // Very close, assume visible
-
-    // SSA = (scale * radius)^2 / distance^2
-    float scaled_radius = scale * radius;
-    return (scaled_radius * scaled_radius) / dist_sqr;
-}
+// Atomic counter buffer (one u32 per object type, up to 64 objects)
+RWByteAddressBuffer g_visible_counts : register(u16);
 
 // ===========================
 // Compute Shader Entry Point
@@ -131,72 +72,84 @@ float ComputeSSA(float3 world_pos, float radius, float scale)
 [numthreads(256, 1, 1)]
 void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 {
-    uint instance_idx = dispatch_thread_id.x;
+    uint idx = dispatch_thread_id.x;
 
     // Early exit if beyond instance count
-    if (instance_idx >= g_instance_count)
+    if (idx >= g_total_instance_count)
         return;
 
     // Load instance data
-    DetailInstanceGPU inst = g_instances[instance_idx];
+    InstanceData inst = g_all_instances[idx];
 
     // =========================
     // Distance Culling
     // =========================
-    float3 to_camera = g_camera_pos - inst.position;
-    float dist_sqr = dot(to_camera, to_camera);
+    float3 delta = inst.pos - g_camera_pos;
+    float dist_sqr = dot(delta, delta);
 
-    // Fade limit culling
-    if (dist_sqr > g_fade_limit_sqr)
-        return;  // Too far, cull
+    if (dist_sqr > g_fade_distance_sqr)
+        return;  // Too far, culled
 
     // =========================
     // Frustum Culling
     // =========================
-    // Use bounding sphere for conservative culling
-    float world_radius = inst.bounds_radius * inst.scale;
-    if (!FrustumCullSphere(inst.position, world_radius))
-        return;  // Outside frustum, cull
+    // Estimate grass bounds (typically ~1m tall, affected by scale)
+    float bounds_radius = inst.scale * 0.75f;
 
-    // =========================
-    // SSA (Screen Space Area) Culling
-    // =========================
-    float ssa = ComputeSSA(inst.position, inst.bounds_radius, inst.scale);
-    if (ssa < g_r_ssa_discard)
-        return;  // Too small, cull
-
-    // =========================
-    // Fade Factor (for future use)
-    // =========================
-    float fade_alpha = 1.0f;
-    if (dist_sqr > g_fade_start_sqr)
+    // Frustum culling (only test first 5 planes - LRTB + FAR, no NEAR)
+    // The 6th plane is unused/dummy
+    // X-Ray plane format: dot(n, p) + d >= 0 for inside (confirmed in _plane.h:65)
+    // BUT: Planes seem to be inverted, so test with POSITIVE side outside
+    [unroll]
+    for (uint i = 0; i < 5; ++i)
     {
-        float fade_range = g_fade_limit_sqr - g_fade_start_sqr;
-        fade_alpha = 1.0f - ((dist_sqr - g_fade_start_sqr) / fade_range);
+        float dist = dot(g_frustum_planes[i].xyz, inst.pos) + g_frustum_planes[i].w;
+        if (dist > bounds_radius)
+            return;  // Outside frustum, culled
     }
 
     // =========================
-    // Append to Visible List
+    // Append to Per-Object Visible List
     // =========================
-    uint output_idx = 0;
+    uint object_id = inst.object_id;
+    uint output_idx;
 
-    // Determine which output buffer based on vis_id
-    if (inst.vis_id == 0)
-    {
-        // Still (no animation)
-        InterlockedAdd(g_counters[0], 1, output_idx);
-        g_visible_still[output_idx] = instance_idx;
-    }
-    else if (inst.vis_id == 1)
-    {
-        // Wave 1
-        InterlockedAdd(g_counters[1], 1, output_idx);
-        g_visible_wave1[output_idx] = instance_idx;
-    }
-    else // inst.vis_id == 2
-    {
-        // Wave 2
-        InterlockedAdd(g_counters[2], 1, output_idx);
-        g_visible_wave2[output_idx] = instance_idx;
-    }
+    // Atomic increment count for this object
+    g_visible_counts.InterlockedAdd(object_id * 4, 1, output_idx);
+
+    // Write to appropriate output buffer based on object_id
+    // TODO: This is hardcoded for first 16 objects, can be expanded
+    if (object_id == 0)
+        g_visible_obj0[output_idx] = inst;
+    else if (object_id == 1)
+        g_visible_obj1[output_idx] = inst;
+    else if (object_id == 2)
+        g_visible_obj2[output_idx] = inst;
+    else if (object_id == 3)
+        g_visible_obj3[output_idx] = inst;
+    else if (object_id == 4)
+        g_visible_obj4[output_idx] = inst;
+    else if (object_id == 5)
+        g_visible_obj5[output_idx] = inst;
+    else if (object_id == 6)
+        g_visible_obj6[output_idx] = inst;
+    else if (object_id == 7)
+        g_visible_obj7[output_idx] = inst;
+    else if (object_id == 8)
+        g_visible_obj8[output_idx] = inst;
+    else if (object_id == 9)
+        g_visible_obj9[output_idx] = inst;
+    else if (object_id == 10)
+        g_visible_obj10[output_idx] = inst;
+    else if (object_id == 11)
+        g_visible_obj11[output_idx] = inst;
+    else if (object_id == 12)
+        g_visible_obj12[output_idx] = inst;
+    else if (object_id == 13)
+        g_visible_obj13[output_idx] = inst;
+    else if (object_id == 14)
+        g_visible_obj14[output_idx] = inst;
+    else if (object_id == 15)
+        g_visible_obj15[output_idx] = inst;
+    // Objects 16+ will be ignored for now (can expand to 64 later with more UAV slots)
 }

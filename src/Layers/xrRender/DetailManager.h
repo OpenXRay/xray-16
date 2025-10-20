@@ -216,6 +216,22 @@ public:
     ID3DBuffer* persistent_instance_buffer;
     ID3DShaderResourceView* persistent_instance_srv;
     u32 persistent_buffer_capacity;
+
+    // Phase 2.1: GPU culling infrastructure
+    ref_cs cull_compute_shader;  // detail_cull.cs compute shader
+    ID3DBuffer* cull_constant_buffer;  // Culling parameters (camera, frustum, etc)
+
+    // Per-object visible instance buffers (output from compute shader)
+    static const u32 max_gpu_culled_objects = 16;  // Hardcoded for first 16 objects
+    ID3DBuffer* gpu_visible_buffers[max_gpu_culled_objects];
+    ID3DShaderResourceView* gpu_visible_srvs[max_gpu_culled_objects];
+    ID3DUnorderedAccessView* gpu_visible_uavs[max_gpu_culled_objects];
+    u32 gpu_visible_buffer_capacity;  // Max instances per object buffer
+
+    // Counter buffer (one u32 per object type)
+    ID3DBuffer* gpu_visible_counts_buffer;
+    ID3DUnorderedAccessView* gpu_visible_counts_uav;
+    ID3DBuffer* gpu_visible_counts_readback;  // CPU readback for counts
 #endif
 
     ref_constant hwc_consts;
@@ -252,6 +268,10 @@ public:
     // Phase 2.0: Full level decompression
     void DecompressAllSlots();
     void CreatePersistentInstanceBuffer();
+
+    // Phase 2.1: GPU culling
+    void CreateGPUCullingBuffers();
+    void DispatchGPUCulling(CBackend& cmd_list);
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

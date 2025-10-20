@@ -389,10 +389,10 @@ void DetailComputeManager::DispatchCulling(CBackend& cmd_list, const Fmatrix& vi
     params.instance_count = m_instance_count;
     params.frame_number = Device.dwFrame;
 
-    // Extract frustum planes
+    // Extract frustum planes and copy to params
     FrustumGPU frustum = BuildFrustumGPU(view_proj);
     for (int i = 0; i < 6; ++i)
-        params.padding[i] = 0.0f; // Will store frustum elsewhere if needed
+        params.frustum_planes[i] = frustum.planes[i];
 
     // Map and update CB
     {

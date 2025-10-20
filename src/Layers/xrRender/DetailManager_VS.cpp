@@ -250,6 +250,20 @@ void CDetailManager::hw_Unload()
     _RELEASE(persistent_instance_buffer);
     _RELEASE(persistent_instance_srv);
     persistent_buffer_capacity = 0;
+
+    // Phase 2.1: Release GPU culling buffers
+    if (cull_compute_shader)
+        cull_compute_shader.destroy();
+    _RELEASE(cull_constant_buffer);
+    _RELEASE(gpu_visible_counts_buffer);
+    _RELEASE(gpu_visible_counts_uav);
+    _RELEASE(gpu_visible_counts_readback);
+    for (u32 i = 0; i < max_gpu_culled_objects; i++)
+    {
+        _RELEASE(gpu_visible_buffers[i]);
+        _RELEASE(gpu_visible_srvs[i]);
+        _RELEASE(gpu_visible_uavs[i]);
+    }
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

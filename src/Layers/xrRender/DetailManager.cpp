@@ -119,6 +119,19 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     persistent_instance_buffer = nullptr;
     persistent_instance_srv = nullptr;
     persistent_buffer_capacity = 0;
+
+    // Phase 2.1: GPU culling
+    cull_constant_buffer = nullptr;
+    gpu_visible_counts_buffer = nullptr;
+    gpu_visible_counts_uav = nullptr;
+    gpu_visible_counts_readback = nullptr;
+    gpu_visible_buffer_capacity = 0;
+    for (u32 i = 0; i < max_gpu_culled_objects; i++)
+    {
+        gpu_visible_buffers[i] = nullptr;
+        gpu_visible_srvs[i] = nullptr;
+        gpu_visible_uavs[i] = nullptr;
+    }
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -235,6 +248,9 @@ void CDetailManager::Load()
 
         // Phase 2.0.3: Upload to persistent GPU buffer
         CreatePersistentInstanceBuffer();
+
+        // Phase 2.1: Create GPU culling infrastructure
+        CreateGPUCullingBuffers();
     }
 #endif
 
