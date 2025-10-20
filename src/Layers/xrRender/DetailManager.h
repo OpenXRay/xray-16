@@ -240,7 +240,8 @@ public:
 
     ref_constant hwc_consts;
     ref_constant hwc_wave;
-    ref_constant hwc_wind;
+    ref_constant hwc_wind;  // dir1 for vis_id=1 (wave1)
+    ref_constant hwc_wind2; // dir2 for vis_id=2 (wave2)
     ref_constant hwc_array;
     ref_constant hwc_s_consts;
     ref_constant hwc_s_xform;

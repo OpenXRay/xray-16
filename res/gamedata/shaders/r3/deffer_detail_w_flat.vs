@@ -1,8 +1,9 @@
 #include "common.h"
 
 uniform float4 consts; // {1/quant,1/quant,diffusescale,ambient}
-uniform float4 wave;   // cx,cy,cz,tm
-uniform float4 dir2D;
+uniform float4 wave;   // cx,cy,cz,tm - for wave1
+uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
+uniform float4 dir2D_2; // dir2 - for wave2 (vis_id=2)
 
 // New vertex structure for instanced details
 struct v_detail_instanced
@@ -60,28 +61,42 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 	float4 m1 = float4(mmhpb[1] * det.scale, det.pos.y);
 	float4 m2 = float4(mmhpb[2] * det.scale, det.pos.z);
 
-	float4 pos, pos_old;
+	float4 pos;
 	pos.x = dot(m0, float4(I.pos.xyz, 1.0));
 	pos.y = dot(m1, float4(I.pos.xyz, 1.0));
 	pos.z = dot(m2, float4(I.pos.xyz, 1.0));
 	pos.w = 1.0f;
-	pos_old = pos;
 
-#ifdef USE_TREEWAVE
-	float H = I.pos.y * length(m1.xyz);
+	// Apply wave animation based on vis_id
+	// vis_id 0 = still (no wave)
+	// vis_id 1 = wave1 (uses wave(1/5, 1/7, 1/3) and dir1)
+	// vis_id 2 = wave2 (uses wave(1/3, 1/7, 1/5) and dir2)
+	if (det.vis_id > 0)
+	{
+		float H = I.pos.y * length(m1.xyz);
 
-	float dp = calc_cyclic(dot(pos, wave));
-	float inten = H * dp;
+		// Choose wave pattern and wind direction based on vis_id
+		float4 current_wave;
+		float2 wind_dir;
 
-	pos.xz += calc_xz_wave(dir2D.xz * inten, I.pos.w);
+		if (det.vis_id == 1)
+		{
+			// Wave1: use standard wave(1/5, 1/7, 1/3) and dir1
+			current_wave = wave;
+			wind_dir = dir2D.xz;
+		}
+		else // vis_id == 2
+		{
+			// Wave2: swap wave frequencies (1/3, 1/7, 1/5) and use dir2
+			current_wave = float4(wave.z, wave.y, wave.x, wave.w);
+			wind_dir = dir2D_2.xz;
+		}
 
-	#ifndef DETAIL_SHADOW_PASS
-		float dp_old = calc_cyclic(dot(pos_old, wave_old));
-		float inten_old = H * dp_old;
+		float dp = calc_cyclic(dot(pos, current_wave));
+		float inten = H * dp;
 
-		pos_old.xz += calc_xz_wave(dir2D_old.xz * inten_old, I.pos.w);
-	#endif
-#endif
+		pos.xz += calc_xz_wave(wind_dir * inten, I.pos.w);
+	}
 
 	float3 Pe = mul(m_WV, pos);
 
