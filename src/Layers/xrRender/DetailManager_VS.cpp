@@ -112,12 +112,21 @@ void CDetailManager::hw_Load_Geom()
 
 void CDetailManager::hw_Unload()
 {
-    // Destroy VS/VB/IB
+#ifndef USE_DX11
     if (hw_Geom)
         hw_Geom.destroy();
     if (hw_IB)
         hw_IB.Release();
     if (hw_VB)
         hw_VB.Release();
+#else
+    for (auto& it : detailBuffer_map)
+        _RELEASE(it.second);
+    detailBuffer_map.clear();
+
+    for (auto& it : detailSRV_map)
+        _RELEASE(it.second);
+    detailSRV_map.clear();
+#endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

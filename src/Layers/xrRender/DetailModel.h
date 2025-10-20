@@ -9,6 +9,10 @@ class ECORE_API CDetail : public IRender_DetailModel
 private:
     void transfer_indices(u16* iDest, u32 iOffset);
 public:
+    ref_geom hw_Geom;
+    VertexStagingBuffer hw_VB;
+    IndexStagingBuffer hw_IB;
+
     void Load(IReader* S);
     void Optimize();
     virtual void Unload();
