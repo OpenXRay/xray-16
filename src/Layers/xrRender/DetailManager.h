@@ -232,6 +232,7 @@ public:
     ref_constant hwc_consts;
     ref_constant hwc_wave;
     ref_constant hwc_wind;
+    ref_constant hwc_wind2;
     ref_constant hwc_array;
     ref_constant hwc_s_consts;
     ref_constant hwc_s_xform;

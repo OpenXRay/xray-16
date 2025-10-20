@@ -22,6 +22,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_consts = T0.get("consts");
     hwc_wave = T0.get("wave");
     hwc_wind = T0.get("dir2D");
+    hwc_wind2 = T0.get("dir2D_2");
     hwc_array = T0.get("array");
     hwc_s_consts = T1.get("consts");
     hwc_s_xform = T1.get("xform");
@@ -414,6 +415,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
+    static shared_str strDir2D_2("dir2D_2");
 
     auto context = HW.get_context(cmd_list.context_id);
 
@@ -456,6 +458,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         cmd_list.set_c(strConsts, consts);
         cmd_list.set_c(strWave, wave.div(PI_MUL_2));
         cmd_list.set_c(strDir2D, dir1);
+        cmd_list.set_c(strDir2D_2, dir2);
 
         cmd_list.set_Element(Object.shader->E[0], 0);
         cmd_list.apply_lmaterial();
