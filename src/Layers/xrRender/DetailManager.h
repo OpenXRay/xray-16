@@ -68,18 +68,6 @@ public:
 
     using SlotItemVec = xr_vector<SlotItem*>;
 
-    // Items of one slot part to render, with the bounds of their slot.
-    struct VisibleItems
-    {
-        SlotItemVec* items;
-        const Fsphere* sphere;
-
-        bool intersects(const Fsphere* bounds) const
-        {
-            return !bounds || sphere->intersect(*bounds);
-        }
-    };
-
     struct SlotPart
     { //
         u32 id; // ID модельки
@@ -127,7 +115,7 @@ public:
         }
     };
 
-    typedef xr_vector<xr_vector<VisibleItems>> vis_list;
+    typedef xr_vector<xr_vector<SlotItemVec*>> vis_list;
     typedef svector<CDetail*, dm_max_objects> DetailVec;
     typedef DetailVec::iterator DetailIt;
     typedef poolSS<SlotItem, 4096> PSS;
@@ -188,7 +176,7 @@ public:
     ref_geom soft_Geom;
     void soft_Load();
     void soft_Unload();
-    void soft_Render(const Fsphere* bounds);
+    void soft_Render();
 
     // Hardware processor
     size_t hw_BatchSize;
@@ -223,9 +211,9 @@ public:
     void hw_Load_Geom();
     void hw_Load_Shaders();
     void hw_Unload();
-    void hw_Render(CBackend& cmd_list, const Fsphere* bounds);
-    void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id,
-        const Fsphere* bounds);
+    void hw_Render(CBackend& cmd_list);
+    void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+    void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
 
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);
@@ -244,8 +232,7 @@ public:
     int w2cg_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
     void Load();
     void Unload();
-    // Renders the visible details; with bounds, only those of the slots that intersect them.
-    void Render(CBackend& cmd_list, const Fsphere* bounds = nullptr);
+    void Render(CBackend& cmd_list);
 
     /// MT stuff
     Task* m_calc_task{};
