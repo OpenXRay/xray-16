@@ -245,6 +245,11 @@ void CDetailManager::hw_Unload()
         vis_geometry_index_offsets[vis_id].clear();
         vis_object_indices[vis_id].clear();
     }
+
+    // Phase 2.0.3: Release persistent GPU buffers
+    _RELEASE(persistent_instance_buffer);
+    _RELEASE(persistent_instance_srv);
+    persistent_buffer_capacity = 0;
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

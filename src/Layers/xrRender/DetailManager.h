@@ -211,6 +211,11 @@ public:
     xr_vector<SlotItemWithObject> all_level_instances;  // ALL instances for entire level
     u32 total_instance_count;
     bool full_level_loaded;
+
+    // Phase 2.0.3: Persistent GPU buffers
+    ID3DBuffer* persistent_instance_buffer;
+    ID3DShaderResourceView* persistent_instance_srv;
+    u32 persistent_buffer_capacity;
 #endif
 
     ref_constant hwc_consts;
@@ -241,6 +246,7 @@ public:
 #ifdef USE_DX11
     // Phase 2.0: Full level decompression
     void DecompressAllSlots();
+    void CreatePersistentInstanceBuffer();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

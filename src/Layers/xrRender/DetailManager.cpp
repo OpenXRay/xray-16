@@ -114,6 +114,11 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     // Phase 2.0: Full level decompression
     total_instance_count = 0;
     full_level_loaded = false;
+
+    // Phase 2.0.3: Persistent GPU buffers
+    persistent_instance_buffer = nullptr;
+    persistent_instance_srv = nullptr;
+    persistent_buffer_capacity = 0;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -227,6 +232,9 @@ void CDetailManager::Load()
     if (UseVS())  // Only for DX11/hardware rendering
     {
         DecompressAllSlots();
+
+        // Phase 2.0.3: Upload to persistent GPU buffer
+        CreatePersistentInstanceBuffer();
     }
 #endif
 
