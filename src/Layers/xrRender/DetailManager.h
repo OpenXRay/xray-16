@@ -232,6 +232,10 @@ public:
     ID3DBuffer* gpu_visible_counts_buffer;
     ID3DUnorderedAccessView* gpu_visible_counts_uav;
     ID3DBuffer* gpu_visible_counts_readback;  // CPU readback for counts
+
+    // Phase 2.2: Indirect draw args buffers (one per object)
+    ID3DBuffer* gpu_indirect_args[max_gpu_culled_objects];
+    ID3DUnorderedAccessView* gpu_indirect_args_uavs[max_gpu_culled_objects];
 #endif
 
     ref_constant hwc_consts;

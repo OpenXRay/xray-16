@@ -65,6 +65,27 @@ RWStructuredBuffer<InstanceData> g_visible_obj15 : register(u15);
 // Atomic counter buffer (one u32 per object type, up to 64 objects)
 RWByteAddressBuffer g_visible_counts : register(u16);
 
+// Phase 2.2.1: Indirect draw args buffers (one per object)
+// D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS:
+// struct { u32 IndexCount; u32 InstanceCount; u32 StartIndex; s32 BaseVertex; u32 StartInstance; }
+// We only write to InstanceCount field (offset 4 bytes)
+RWByteAddressBuffer g_indirect_args0 : register(u17);
+RWByteAddressBuffer g_indirect_args1 : register(u18);
+RWByteAddressBuffer g_indirect_args2 : register(u19);
+RWByteAddressBuffer g_indirect_args3 : register(u20);
+RWByteAddressBuffer g_indirect_args4 : register(u21);
+RWByteAddressBuffer g_indirect_args5 : register(u22);
+RWByteAddressBuffer g_indirect_args6 : register(u23);
+RWByteAddressBuffer g_indirect_args7 : register(u24);
+RWByteAddressBuffer g_indirect_args8 : register(u25);
+RWByteAddressBuffer g_indirect_args9 : register(u26);
+RWByteAddressBuffer g_indirect_args10 : register(u27);
+RWByteAddressBuffer g_indirect_args11 : register(u28);
+RWByteAddressBuffer g_indirect_args12 : register(u29);
+RWByteAddressBuffer g_indirect_args13 : register(u30);
+RWByteAddressBuffer g_indirect_args14 : register(u31);
+RWByteAddressBuffer g_indirect_args15 : register(u32);
+
 // ===========================
 // Compute Shader Entry Point
 // ===========================
@@ -114,42 +135,91 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     uint object_id = inst.object_id;
     uint output_idx;
 
-    // Atomic increment count for this object
+    // Atomic increment count for this object (legacy counter buffer, kept for debugging)
     g_visible_counts.InterlockedAdd(object_id * 4, 1, output_idx);
 
-    // Write to appropriate output buffer based on object_id
-    // TODO: This is hardcoded for first 16 objects, can be expanded
+    // Phase 2.2.1: Also increment InstanceCount in indirect args buffer
+    // InstanceCount field is at offset 4 bytes (second u32)
+    uint dummy;
     if (object_id == 0)
+    {
         g_visible_obj0[output_idx] = inst;
+        g_indirect_args0.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 1)
+    {
         g_visible_obj1[output_idx] = inst;
+        g_indirect_args1.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 2)
+    {
         g_visible_obj2[output_idx] = inst;
+        g_indirect_args2.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 3)
+    {
         g_visible_obj3[output_idx] = inst;
+        g_indirect_args3.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 4)
+    {
         g_visible_obj4[output_idx] = inst;
+        g_indirect_args4.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 5)
+    {
         g_visible_obj5[output_idx] = inst;
+        g_indirect_args5.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 6)
+    {
         g_visible_obj6[output_idx] = inst;
+        g_indirect_args6.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 7)
+    {
         g_visible_obj7[output_idx] = inst;
+        g_indirect_args7.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 8)
+    {
         g_visible_obj8[output_idx] = inst;
+        g_indirect_args8.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 9)
+    {
         g_visible_obj9[output_idx] = inst;
+        g_indirect_args9.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 10)
+    {
         g_visible_obj10[output_idx] = inst;
+        g_indirect_args10.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 11)
+    {
         g_visible_obj11[output_idx] = inst;
+        g_indirect_args11.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 12)
+    {
         g_visible_obj12[output_idx] = inst;
+        g_indirect_args12.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 13)
+    {
         g_visible_obj13[output_idx] = inst;
+        g_indirect_args13.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 14)
+    {
         g_visible_obj14[output_idx] = inst;
+        g_indirect_args14.InterlockedAdd(4, 1, dummy);
+    }
     else if (object_id == 15)
+    {
         g_visible_obj15[output_idx] = inst;
+        g_indirect_args15.InterlockedAdd(4, 1, dummy);
+    }
     // Objects 16+ will be ignored for now (can expand to 64 later with more UAV slots)
 }

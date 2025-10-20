@@ -234,12 +234,60 @@ void CDetailManager::CreateGPUCullingBuffers()
     cbDesc.ByteWidth = 256;  // Generous size for alignment
     CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &cull_constant_buffer));
 
+    // Phase 2.2.1: Create indirect draw args buffers
+    // D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS structure:
+    struct IndirectDrawArgs
+    {
+        u32 IndexCountPerInstance;
+        u32 InstanceCount;         // Written by compute shader
+        u32 StartIndexLocation;
+        s32 BaseVertexLocation;
+        u32 StartInstanceLocation;
+    };
+
+    for (u32 i = 0; i < max_gpu_culled_objects && i < objects.size(); i++)
+    {
+        CDetail& obj = *objects[i];
+
+        // Initialize args with static values
+        IndirectDrawArgs initial_args = {};
+        initial_args.IndexCountPerInstance = obj.number_indices;
+        initial_args.InstanceCount = 0;  // Will be written by compute shader
+        initial_args.StartIndexLocation = vis_geometry_index_offsets[0][i];
+        initial_args.BaseVertexLocation = 0;
+        initial_args.StartInstanceLocation = 0;
+
+        // Create buffer with DRAWINDIRECT_ARGS and RAW flags
+        D3D11_BUFFER_DESC argsDesc = {};
+        argsDesc.Usage = D3D11_USAGE_DEFAULT;
+        argsDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+        argsDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+        argsDesc.ByteWidth = sizeof(IndirectDrawArgs);
+
+        D3D11_SUBRESOURCE_DATA initData = {};
+        initData.pSysMem = &initial_args;
+
+        CHK_DX(HW.pDevice->CreateBuffer(&argsDesc, &initData, &gpu_indirect_args[i]));
+
+        // Create RAW UAV for compute shader to write InstanceCount (RWByteAddressBuffer requires RAW)
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+        uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+        uavDesc.Buffer.FirstElement = 0;
+        uavDesc.Buffer.NumElements = 5;  // 5 u32s in IndirectDrawArgs
+        uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+
+        CHK_DX(HW.pDevice->CreateUnorderedAccessView(
+            gpu_indirect_args[i], &uavDesc, &gpu_indirect_args_uavs[i]));
+    }
+
     float vram_mb = (max_gpu_culled_objects * gpu_visible_buffer_capacity * sizeof(InstanceData)) / (1024.0f * 1024.0f);
 
     Msg("* [DetailManager] GPU culling infrastructure created:");
     Msg("  - Per-object buffer capacity: %u instances", gpu_visible_buffer_capacity);
     Msg("  - Object buffers: %u (first %u objects)", max_gpu_culled_objects, max_gpu_culled_objects);
     Msg("  - VRAM for output buffers: %.2f MB", vram_mb);
+    Msg("  - Indirect args buffers: %u created", _min(max_gpu_culled_objects, objects.size()));
 }
 
 // Phase 2.1: Dispatch GPU culling compute shader
@@ -317,9 +365,34 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     memcpy(mapped.pData, &params, sizeof(params));
     context->Unmap(cull_constant_buffer, 0);
 
-    // Clear counter buffer to zero
-    UINT zero[64] = {0};
-    context->ClearUnorderedAccessViewUint(gpu_visible_counts_uav, zero);
+    // Phase 2.2.1: Reset indirect args buffers (InstanceCount to 0, keep static fields)
+    struct IndirectDrawArgs
+    {
+        u32 IndexCountPerInstance;
+        u32 InstanceCount;         // Reset to 0 each frame
+        u32 StartIndexLocation;
+        s32 BaseVertexLocation;
+        u32 StartInstanceLocation;
+    };
+
+    for (u32 i = 0; i < max_gpu_culled_objects && i < objects.size(); i++)
+    {
+        CDetail& obj = *objects[i];
+
+        IndirectDrawArgs args = {};
+        args.IndexCountPerInstance = obj.number_indices;
+        args.InstanceCount = 0;  // Reset to 0
+        args.StartIndexLocation = vis_geometry_index_offsets[0][i];
+        args.BaseVertexLocation = 0;
+        args.StartInstanceLocation = 0;
+
+        // Update the args buffer (small upload: 20 bytes)
+        context->UpdateSubresource(gpu_indirect_args[i], 0, nullptr, &args, 0, 0);
+    }
+
+    // Clear counter buffer to zero (still used for debugging/validation)
+    UINT zero_counts[64] = {0};
+    context->ClearUnorderedAccessViewUint(gpu_visible_counts_uav, zero_counts);
 
     // Bind constant buffer
     context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
@@ -327,13 +400,18 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     // Bind input: persistent instance buffer
     context->CSSetShaderResources(0, 1, &persistent_instance_srv);
 
-    // Bind outputs: per-object visible buffers + counter buffer
-    ID3DUnorderedAccessView* uavs[17];
+    // Bind outputs: per-object visible buffers + counter buffer + indirect args
+    // u0-u15: visible instance buffers
+    // u16: counter buffer
+    // u17-u32: indirect args buffers
+    ID3DUnorderedAccessView* uavs[33];
     for (u32 i = 0; i < max_gpu_culled_objects; i++)
         uavs[i] = gpu_visible_uavs[i];
     uavs[16] = gpu_visible_counts_uav;  // Counter buffer at u16
+    for (u32 i = 0; i < max_gpu_culled_objects; i++)
+        uavs[17 + i] = gpu_indirect_args_uavs[i];  // Indirect args at u17-u32
 
-    context->CSSetUnorderedAccessViews(0, 17, uavs, nullptr);
+    context->CSSetUnorderedAccessViews(0, 33, uavs, nullptr);
 
     // Bind compute shader
     context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
@@ -343,12 +421,15 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     context->Dispatch(num_groups, 1, 1);
 
     // Unbind UAVs (prepare for rendering)
-    ID3DUnorderedAccessView* null_uavs[17] = {nullptr};
-    context->CSSetUnorderedAccessViews(0, 17, null_uavs, nullptr);
+    ID3DUnorderedAccessView* null_uavs[33] = {nullptr};
+    context->CSSetUnorderedAccessViews(0, 33, null_uavs, nullptr);
 
     // Unbind SRVs
     ID3DShaderResourceView* null_srvs[1] = {nullptr};
     context->CSSetShaderResources(0, 1, null_srvs);
+
+    // Unbind compute shader
+    context->CSSetShader(nullptr, nullptr, 0);
 
     // Copy counter buffer to readback for CPU access
     context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
@@ -393,54 +474,44 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
 
-    // Read back GPU-culled instance counts
     auto context = HW.get_context(cmd_list.context_id);
-    D3D11_MAPPED_SUBRESOURCE mapped;
-    CHK_DX(context->Map(gpu_visible_counts_readback, 0, D3D11_MAP_READ, 0, &mapped));
-    u32* counts = (u32*)mapped.pData;
 
-    // DEBUG: Log culling results (first frame only)
+    // Phase 2.2.2: Optional DEBUG logging (read back counts for validation)
+    // This can be removed once indirect draw is confirmed working
     static bool first_frame = true;
     if (first_frame)
     {
+        context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        CHK_DX(context->Map(gpu_visible_counts_readback, 0, D3D11_MAP_READ, 0, &mapped));
+        u32* counts = (u32*)mapped.pData;
+
         u32 total_visible = 0;
         for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
             total_visible += counts[i];
 
-        Msg("! [DetailManager] GPU Culling Results:");
+        Msg("! [DetailManager] GPU Indirect Draw - First Frame:");
         Msg("  - Total instances: %u", total_instance_count);
         Msg("  - Visible instances: %u (%.1f%%)", total_visible,
             (total_visible * 100.0f) / total_instance_count);
-        Msg("  - Fade distance: %.2f", fade_distance);
-        Msg("  - Camera pos: %.2f, %.2f, %.2f",
-            Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
 
         for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
         {
             if (counts[i] > 0)
                 Msg("  - Object %u: %u instances", i, counts[i]);
         }
+
+        context->Unmap(gpu_visible_counts_readback, 0);
         first_frame = false;
     }
 
-    // Render each object using GPU-culled instances
+    // Phase 2.2.2: Render using DrawIndexedInstancedIndirect (GPU controls instance count)
     u32 objects_to_render = _min(objects.size(), max_gpu_culled_objects);
     for (u32 O = 0; O < objects_to_render; O++)
     {
-        u32 instanceCount = counts[O];
-        if (instanceCount == 0)
-            continue;
-
-        if (instanceCount > gpu_visible_buffer_capacity)
-        {
-            Msg("! [DetailManager] GPU culling overflow for object %u: %u instances (capacity %u)",
-                O, instanceCount, gpu_visible_buffer_capacity);
-            instanceCount = gpu_visible_buffer_capacity;
-        }
-
         CDetail& Object = *objects[O];
 
-        // Use GPU-culled buffer directly (already in InstanceData format!)
+        // Set rendering state
         cmd_list.set_CullMode(CULL_NONE);
         cmd_list.set_xform_world(Fidentity);
         cmd_list.SRVSManager.SetVSResource(0, gpu_visible_srvs[O]);
@@ -452,25 +523,23 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         cmd_list.set_Element(Object.shader->E[0], 0);
         cmd_list.apply_lmaterial();
 
-        u32 baseIndex = vis_geometry_index_offsets[0][O];
-        u32 numVertices = Object.number_vertices;
-        u32 numIndices = Object.number_indices;
+        // Phase 2.2.2: DrawIndexedInstancedIndirect
+        // The GPU determines instance count from the indirect args buffer
+        cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLELIST, gpu_indirect_args[O], 0);
 
-        cmd_list.RenderInstancedIndexed(
-            D3DPT_TRIANGLELIST,
-            0, 0,
-            numVertices,
-            baseIndex,
-            numIndices / 3,
-            instanceCount,
-            0);
-
-        cmd_list.stat.r.s_details.add(numVertices * instanceCount);
-        RImplementation.BasicStats.DetailCount += instanceCount;
+        // Note: We can't accurately update stats without CPU readback
+        // For now, just increment draw call count
         cmd_list.set_CullMode(CULL_CCW);
     }
 
-    context->Unmap(gpu_visible_counts_readback, 0);
+    // Phase 2.2.2: Clean up - unbind our resources to avoid affecting subsequent draws
+    cmd_list.SRVSManager.SetVSResource(0, nullptr);
+    // Clear any PS resources that might have been set by the detail shader
+    for (u32 i = 0; i < 16; i++)
+        cmd_list.SRVSManager.SetPSResource(i, nullptr);
+
+    // Update basic stats (instance count is now GPU-driven, so we use total as estimate)
+    RImplementation.BasicStats.DetailCount = total_instance_count;
 }
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
