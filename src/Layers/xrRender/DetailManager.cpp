@@ -110,6 +110,12 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     dm_fade = dm_current_fade;
     ps_r__Detail_density = ps_current_detail_density;
     ps_current_detail_height = ps_r__Detail_height;
+
+#ifdef USE_DX11
+    total_instance_count = 0;
+    full_level_loaded = false;
+#endif
+
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
     for (u32 i = 0; i < dm_cache1_line; ++i)
     {
@@ -215,6 +221,13 @@ void CDetailManager::Load()
         hw_Load();
     else
         soft_Load();
+
+#ifdef USE_DX11
+    if (UseVS())
+    {
+        DecompressAllSlots();
+    }
+#endif
 
     // swing desc
     // normal

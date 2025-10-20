@@ -198,6 +198,15 @@ public:
     xr_vector<u32> vis_object_indices[3];
     u32 vis_total_vertices[3];
     u32 vis_total_indices[3];
+
+    struct SlotItemWithObject
+    {
+        SlotItem item;
+        u32 object_id;
+    };
+    xr_vector<SlotItemWithObject> all_level_instances;
+    u32 total_instance_count;
+    bool full_level_loaded;
 #endif
 
     ref_constant hwc_consts;
@@ -224,6 +233,10 @@ public:
     Slot* cache_Query(int sx, int sz);
     void cache_Decompress(Slot* D);
     BOOL cache_Validate();
+
+#ifdef USE_DX11
+    void DecompressAllSlots();
+#endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
     int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
