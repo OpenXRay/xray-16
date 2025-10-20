@@ -337,6 +337,32 @@ IC void CBackend::RenderInstancedIndexed(D3DPRIMITIVETYPE T, u32 baseV, u32 star
 
     PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
 }
+
+IC void CBackend::RenderIndexedInstancedIndirect(D3DPRIMITIVETYPE T, ID3DBuffer* pBufferForArgs, u32 AlignedByteOffsetForArgs)
+{
+    D3D_PRIMITIVE_TOPOLOGY Topology = TranslateTopology(T);
+
+    if (hs != 0 || ds != 0)
+    {
+        R_ASSERT(Topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        Topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+    }
+
+    stat.render.calls++;
+
+    ApplyPrimitieTopology(Topology);
+
+    SRVSManager.Apply(context_id);
+    ApplyRTandZB();
+    ApplyVertexLayout();
+    StateManager.Apply();
+    //  State manager may alter constants
+    constants.flush();
+
+    HW.get_context(context_id)->DrawIndexedInstancedIndirect(pBufferForArgs, AlignedByteOffsetForArgs);
+
+    PGO(Msg("PGO:DIP:Indirect"));
+}
 #endif
 
 IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)
@@ -377,7 +403,6 @@ IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, 
     ApplyRTandZB();
     ApplyVertexLayout();
     StateManager.Apply();
-    //  State manager may alter constants
     constants.flush();
     //  Msg("DrawIndexed: Start");
     //  Msg("iIndexCount=%d, startI=%d, baseV=%d", iIndexCount, startI, baseV);

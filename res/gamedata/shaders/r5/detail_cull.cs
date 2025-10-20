@@ -46,6 +46,23 @@ RWStructuredBuffer<InstanceData> g_visible_obj15 : register(u15);
 
 RWByteAddressBuffer g_visible_counts : register(u16);
 
+RWByteAddressBuffer g_indirect_args0 : register(u17);
+RWByteAddressBuffer g_indirect_args1 : register(u18);
+RWByteAddressBuffer g_indirect_args2 : register(u19);
+RWByteAddressBuffer g_indirect_args3 : register(u20);
+RWByteAddressBuffer g_indirect_args4 : register(u21);
+RWByteAddressBuffer g_indirect_args5 : register(u22);
+RWByteAddressBuffer g_indirect_args6 : register(u23);
+RWByteAddressBuffer g_indirect_args7 : register(u24);
+RWByteAddressBuffer g_indirect_args8 : register(u25);
+RWByteAddressBuffer g_indirect_args9 : register(u26);
+RWByteAddressBuffer g_indirect_args10 : register(u27);
+RWByteAddressBuffer g_indirect_args11 : register(u28);
+RWByteAddressBuffer g_indirect_args12 : register(u29);
+RWByteAddressBuffer g_indirect_args13 : register(u30);
+RWByteAddressBuffer g_indirect_args14 : register(u31);
+RWByteAddressBuffer g_indirect_args15 : register(u32);
+
 [numthreads(256, 1, 1)]
 void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 {
@@ -77,36 +94,85 @@ uint output_idx;
 
 g_visible_counts.InterlockedAdd(object_id * 4, 1, output_idx);
 
+uint dummy;
 if (object_id == 0)
+{
     g_visible_obj0[output_idx] = inst;
+    g_indirect_args0.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 1)
+{
     g_visible_obj1[output_idx] = inst;
+    g_indirect_args1.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 2)
+{
     g_visible_obj2[output_idx] = inst;
+    g_indirect_args2.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 3)
+{
     g_visible_obj3[output_idx] = inst;
+    g_indirect_args3.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 4)
+{
     g_visible_obj4[output_idx] = inst;
+    g_indirect_args4.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 5)
+{
     g_visible_obj5[output_idx] = inst;
+    g_indirect_args5.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 6)
+{
     g_visible_obj6[output_idx] = inst;
+    g_indirect_args6.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 7)
+{
     g_visible_obj7[output_idx] = inst;
+    g_indirect_args7.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 8)
+{
     g_visible_obj8[output_idx] = inst;
+    g_indirect_args8.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 9)
+{
     g_visible_obj9[output_idx] = inst;
+    g_indirect_args9.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 10)
+{
     g_visible_obj10[output_idx] = inst;
+    g_indirect_args10.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 11)
+{
     g_visible_obj11[output_idx] = inst;
+    g_indirect_args11.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 12)
+{
     g_visible_obj12[output_idx] = inst;
+    g_indirect_args12.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 13)
+{
     g_visible_obj13[output_idx] = inst;
+    g_indirect_args13.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 14)
+{
     g_visible_obj14[output_idx] = inst;
+    g_indirect_args14.InterlockedAdd(4, 1, dummy);
+}
 else if (object_id == 15)
+{
     g_visible_obj15[output_idx] = inst;
+    g_indirect_args15.InterlockedAdd(4, 1, dummy);
+}
 }
