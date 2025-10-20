@@ -307,6 +307,36 @@ IC void CBackend::Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 Thre
     constants.flush();
     HW.get_context(context_id)->Dispatch(ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
 }
+
+IC void CBackend::RenderInstancedIndexed(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, u32 instanceCount, u32 startInstanceLocation)
+{
+    D3D_PRIMITIVE_TOPOLOGY Topology = TranslateTopology(T);
+    u32 iIndexCount = GetIndexCount(T, PC);
+
+    //!!! HACK !!!
+    if (hs != 0 || ds != 0)
+    {
+        R_ASSERT(Topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        Topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+    }
+
+    stat.render.calls++;
+    stat.render.verts += countV * instanceCount;
+    stat.render.polys += PC * instanceCount;
+
+    ApplyPrimitieTopology(Topology);
+
+    SRVSManager.Apply(context_id);
+    ApplyRTandZB();
+    ApplyVertexLayout();
+    StateManager.Apply();
+    //  State manager may alter constants
+    constants.flush();
+
+    HW.get_context(context_id)->DrawIndexedInstanced(iIndexCount, instanceCount, startI, baseV, startInstanceLocation);
+
+    PGO(Msg("PGO:DIP:%dv/%df", countV, PC));
+}
 #endif
 
 IC void CBackend::Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC)

@@ -179,11 +179,17 @@ public:
     void soft_Render();
 
     // Hardware processor
-    ref_geom hw_Geom;
     size_t hw_BatchSize;
 
+    ref_geom hw_Geom;
     VertexStagingBuffer hw_VB;
     IndexStagingBuffer hw_IB;
+
+#ifdef USE_DX11
+    // Structured buffers for instancing (keyed by buffer size)
+    xr_map<u32, ID3DShaderResourceView*> detailSRV_map;
+    xr_map<u32, ID3DBuffer*> detailBuffer_map;
+#endif
 
     ref_constant hwc_consts;
     ref_constant hwc_wave;
