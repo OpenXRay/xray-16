@@ -186,9 +186,11 @@ public:
     IndexStagingBuffer hw_IB;
 
 #ifdef USE_DX11
-    // Structured buffers for instancing (keyed by buffer size)
-    xr_map<u32, ID3DShaderResourceView*> detailSRV_map;
-    xr_map<u32, ID3DBuffer*> detailBuffer_map;
+    // Structured buffers for instancing (one per vis_id: still, wave1, wave2)
+    // Phase 1, Milestone 1.1: Organize buffers by vis_id instead of size
+    ID3DShaderResourceView* detailSRV_vis[3];
+    ID3DBuffer* detailBuffer_vis[3];
+    u32 detailBufferSize_vis[3];  // Track allocated size for each buffer
 #endif
 
     ref_constant hwc_consts;

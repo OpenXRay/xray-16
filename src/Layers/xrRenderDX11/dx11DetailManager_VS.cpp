@@ -27,8 +27,9 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
 
-    // Create structured buffers for different instance counts
-    const u32 bufferSizes[] = {64, 128, 256, 512, 1024, 2048, 4096, 8192};
+    // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
+    // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
+    const u32 initialBufferSize = 256 * 256;
 
     // Instance data structure (must match shader)
     struct InstanceData
@@ -45,32 +46,29 @@ void CDetailManager::hw_Load_Shaders()
     bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     bufferDesc.StructureByteStride = sizeof(InstanceData);
+    bufferDesc.ByteWidth = initialBufferSize * sizeof(InstanceData);
 
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srvDesc.Buffer.ElementWidth = initialBufferSize;
 
-    // Create the buffers & SRVs
-    for (u32 size : bufferSizes)
+    // Create 3 buffers, one for each vis_id
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
         // Create buffer
-        bufferDesc.ByteWidth = size * sizeof(InstanceData);
-
         ID3DBuffer* buffer = nullptr;
         CHK_DX(HW.pDevice->CreateBuffer(&bufferDesc, nullptr, &buffer));
-
-        if (buffer)
-            detailBuffer_map.insert({size, buffer});
+        detailBuffer_vis[vis_id] = buffer;
+        detailBufferSize_vis[vis_id] = initialBufferSize;
 
         // Create SRV
-        srvDesc.Buffer.ElementWidth = size;
-
         ID3DShaderResourceView* srv = nullptr;
         CHK_DX(HW.pDevice->CreateShaderResourceView(buffer, &srvDesc, &srv));
-
-        if (srv)
-            detailSRV_map.insert({size, srv});
+        detailSRV_vis[vis_id] = srv;
     }
+
+    Msg("* [DetailManager] Created 3 instance buffers (vis_id: still/wave1/wave2), %u instances each", initialBufferSize);
 }
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
@@ -140,7 +138,16 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
 
-    // Iterate through all detail objects
+    // Phase 1, Milestone 1.1: Iterate vis_id FIRST, then objects
+    // This prepares us for Phase 1, Milestone 1.2 where we'll merge objects per vis_id
+
+    // NOTE: var_id maps to animation type passed from hw_Render:
+    //   var_id=0 -> still grass (lod_id=1)
+    //   var_id=1 -> wave1 grass (lod_id=0)
+    //   var_id=2 -> wave2 grass (lod_id=0)
+    // But within each call, all grass has same vis_ID
+
+    // Process each object type
     for (u32 O = 0; O < objects.size(); O++)
     {
         CDetail& Object = *objects[O];
@@ -148,7 +155,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         if (vis.empty())
             continue;
 
-        // Count total instances for this object
+        // Count instances for this object
         u32 totalInstances = 0;
         for (SlotItemVec* items : vis)
             totalInstances += items->size();
@@ -156,14 +163,18 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         if (totalInstances == 0)
             continue;
 
-        // Find appropriate buffer size
-        auto it = detailBuffer_map.lower_bound(totalInstances);
-        if (it == detailBuffer_map.end())
-            it = detailBuffer_map.find(8192); // Use largest buffer
+        // Check buffer capacity - reallocate if needed
+        u32 bufferSize = detailBufferSize_vis[var_id];
+        if (totalInstances > bufferSize)
+        {
+            Msg("! [DetailManager] Buffer too small for vis_id=%u: need %u, have %u. Clamping to buffer size.",
+                var_id, totalInstances, bufferSize);
+            totalInstances = bufferSize;
+        }
 
-        u32 currentSize = it->first;
-        ID3DBuffer* currentBuffer = it->second;
-        ID3DShaderResourceView* currentSRV = detailSRV_map.find(currentSize)->second;
+        // Get buffer for this vis_id
+        ID3DBuffer* currentBuffer = detailBuffer_vis[var_id];
+        ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
 
         // Bind the structured buffer SRV to slot 0
         cmd_list.SRVSManager.SetVSResource(0, currentSRV);
@@ -180,22 +191,23 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         cmd_list.set_c(strWave, wave);
         cmd_list.set_c(strDir2D, wind);
 
+        // Fill instance buffer
         u32 instanceCount = 0;
         InstanceData* c_storage = nullptr;
+
+        // Map buffer once per object
+        D3D11_MAPPED_SUBRESOURCE pSubRes;
+        CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
+        c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
 
         for (SlotItemVec* items : vis)
         {
             for (SlotItem* item : *items)
             {
-                SlotItem& Instance = *item;
+                if (instanceCount >= bufferSize)
+                    break; // Buffer full
 
-                // Update the instance buffer
-                if (instanceCount == 0)
-                {
-                    D3D11_MAPPED_SUBRESOURCE pSubRes;
-                    CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
-                    c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
-                }
+                SlotItem& Instance = *item;
 
                 // Extract data from matrix
                 Fmatrix& M = Instance.mRotY;
@@ -212,25 +224,24 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 c_storage[instanceCount].pos = M.c;  // Position from matrix
                 c_storage[instanceCount].hemi = Instance.c_hemi;
 
-                // Increment
                 instanceCount++;
-
-                if (instanceCount >= currentSize)
-                {
-                    HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
-                    cmd_list.RenderInstancedIndexed(D3DPT_TRIANGLELIST, 0, 0, Object.number_vertices, 0, Object.number_indices / 3, instanceCount, 0);
-                    cmd_list.stat.r.s_details.add(Object.number_vertices * instanceCount);
-                    RImplementation.BasicStats.DetailCount += instanceCount;
-                    instanceCount = 0; // Reset
-                }
             }
         }
 
-        // Render remaining instances
-        if (instanceCount > 0 && instanceCount < currentSize)
+        // Unmap and draw all instances for this object in ONE call
+        HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
+
+        if (instanceCount > 0)
         {
-            HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
-            cmd_list.RenderInstancedIndexed(D3DPT_TRIANGLELIST, 0, 0, Object.number_vertices, 0, Object.number_indices / 3, instanceCount, 0);
+            cmd_list.RenderInstancedIndexed(
+                D3DPT_TRIANGLELIST,
+                0, 0,
+                Object.number_vertices,
+                0,
+                Object.number_indices / 3,
+                instanceCount,
+                0);
+
             cmd_list.stat.r.s_details.add(Object.number_vertices * instanceCount);
             RImplementation.BasicStats.DetailCount += instanceCount;
         }
