@@ -120,13 +120,11 @@ void CDetailManager::hw_Unload()
     if (hw_VB)
         hw_VB.Release();
 #else
-    for (auto& it : detailBuffer_map)
-        _RELEASE(it.second);
-    detailBuffer_map.clear();
-
-    for (auto& it : detailSRV_map)
-        _RELEASE(it.second);
-    detailSRV_map.clear();
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
+    {
+        _RELEASE(detailBuffer_vis[vis_id]);
+        _RELEASE(detailSRV_vis[vis_id]);
+    }
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

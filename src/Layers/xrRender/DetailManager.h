@@ -198,8 +198,9 @@ public:
     IndexStagingBuffer hw_IB;
 
 #ifdef USE_DX11
-    xr_map<u32, ID3DShaderResourceView*> detailSRV_map;
-    xr_map<u32, ID3DBuffer*> detailBuffer_map;
+    ID3DShaderResourceView* detailSRV_vis[3];
+    ID3DBuffer* detailBuffer_vis[3];
+    u32 detailBufferSize_vis[3];
 #endif
 
     ref_constant hwc_consts;

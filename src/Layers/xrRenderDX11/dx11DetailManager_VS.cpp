@@ -27,7 +27,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
 
-    const u32 bufferSizes[] = {64, 128, 256, 512, 1024, 2048, 4096, 8192};
+    const u32 initialBufferSize = 256 * 256;
 
     struct InstanceData
     {
@@ -43,29 +43,26 @@ void CDetailManager::hw_Load_Shaders()
     bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     bufferDesc.StructureByteStride = sizeof(InstanceData);
+    bufferDesc.ByteWidth = initialBufferSize * sizeof(InstanceData);
 
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srvDesc.Buffer.ElementWidth = initialBufferSize;
 
-    for (u32 size : bufferSizes)
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
-        bufferDesc.ByteWidth = size * sizeof(InstanceData);
-
         ID3DBuffer* buffer = nullptr;
         CHK_DX(HW.pDevice->CreateBuffer(&bufferDesc, nullptr, &buffer));
-
-        if (buffer)
-            detailBuffer_map.insert({size, buffer});
-
-        srvDesc.Buffer.ElementWidth = size;
+        detailBuffer_vis[vis_id] = buffer;
+        detailBufferSize_vis[vis_id] = initialBufferSize;
 
         ID3DShaderResourceView* srv = nullptr;
         CHK_DX(HW.pDevice->CreateShaderResourceView(buffer, &srvDesc, &srv));
-
-        if (srv)
-            detailSRV_map.insert({size, srv});
+        detailSRV_vis[vis_id] = srv;
     }
+
+    Msg("* [DetailManager] Created 3 instance buffers (vis_id: still/wave1/wave2), %u instances each", initialBufferSize);
 }
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
@@ -147,13 +144,16 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         if (totalInstances == 0)
             continue;
 
-        auto it = detailBuffer_map.lower_bound(totalInstances);
-        if (it == detailBuffer_map.end())
-            it = detailBuffer_map.find(8192);
+        u32 bufferSize = detailBufferSize_vis[var_id];
+        if (totalInstances > bufferSize)
+        {
+            Msg("! [DetailManager] Buffer too small for vis_id=%u: need %u, have %u. Clamping to buffer size.",
+                var_id, totalInstances, bufferSize);
+            totalInstances = bufferSize;
+        }
 
-        u32 currentSize = it->first;
-        ID3DBuffer* currentBuffer = it->second;
-        ID3DShaderResourceView* currentSRV = detailSRV_map.find(currentSize)->second;
+        ID3DBuffer* currentBuffer = detailBuffer_vis[var_id];
+        ID3DShaderResourceView* currentSRV = detailSRV_vis[var_id];
 
         cmd_list.SRVSManager.SetVSResource(0, currentSRV);
 
@@ -169,18 +169,18 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
         u32 instanceCount = 0;
         InstanceData* c_storage = nullptr;
 
+        D3D11_MAPPED_SUBRESOURCE pSubRes;
+        CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
+        c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
+
         for (SlotItemVec* items : vis)
         {
             for (SlotItem* item : *items)
             {
-                SlotItem& Instance = *item;
+                if (instanceCount >= bufferSize)
+                    break;
 
-                if (instanceCount == 0)
-                {
-                    D3D11_MAPPED_SUBRESOURCE pSubRes;
-                    CHK_DX(HW.get_context(cmd_list.context_id)->Map(currentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pSubRes));
-                    c_storage = reinterpret_cast<InstanceData*>(pSubRes.pData);
-                }
+                SlotItem& Instance = *item;
 
                 Fmatrix& M = Instance.mRotY;
 
@@ -195,22 +195,22 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list,
                 c_storage[instanceCount].hemi = Instance.c_hemi;
 
                 instanceCount++;
-
-                if (instanceCount >= currentSize)
-                {
-                    HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
-                    cmd_list.RenderInstancedIndexed(D3DPT_TRIANGLELIST, 0, 0, Object.number_vertices, 0, Object.number_indices / 3, instanceCount, 0);
-                    cmd_list.stat.r.s_details.add(Object.number_vertices * instanceCount);
-                    RImplementation.BasicStats.DetailCount += instanceCount;
-                    instanceCount = 0;
-                }
             }
         }
 
-        if (instanceCount > 0 && instanceCount < currentSize)
+        HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
+
+        if (instanceCount > 0)
         {
-            HW.get_context(cmd_list.context_id)->Unmap(currentBuffer, 0);
-            cmd_list.RenderInstancedIndexed(D3DPT_TRIANGLELIST, 0, 0, Object.number_vertices, 0, Object.number_indices / 3, instanceCount, 0);
+            cmd_list.RenderInstancedIndexed(
+                D3DPT_TRIANGLELIST,
+                0, 0,
+                Object.number_vertices,
+                0,
+                Object.number_indices / 3,
+                instanceCount,
+                0);
+
             cmd_list.stat.r.s_details.add(Object.number_vertices * instanceCount);
             RImplementation.BasicStats.DetailCount += instanceCount;
         }
