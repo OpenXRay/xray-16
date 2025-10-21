@@ -223,6 +223,25 @@ public:
 
     ID3DBuffer* gpu_indirect_args[max_gpu_culled_objects];
     ID3DUnorderedAccessView* gpu_indirect_args_uavs[max_gpu_culled_objects];
+
+    struct SlotAABB
+    {
+        Fvector3 aabb_min;
+        float padding0;
+        Fvector3 aabb_max;
+        float padding1;
+        u32 instance_base;
+        u32 instance_count;
+        int slot_x;
+        int slot_z;
+        Fvector4 padding2;
+    };
+    static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes for GPU alignment");
+
+    xr_vector<SlotAABB> slot_aabbs;
+    u32 slot_count;
+    ID3DBuffer* slot_aabb_buffer;
+    ID3DShaderResourceView* slot_aabb_srv;
 #endif
 
     ref_constant hwc_consts;
@@ -261,6 +280,10 @@ public:
 
     void CreateGPUCullingBuffers();
     void DispatchGPUCulling(CBackend& cmd_list);
+
+    void ComputeSlotAABBs();
+    void CreateSlotAABBBuffer();
+    void DestroySlotAABBBuffer();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

@@ -130,6 +130,10 @@ CDetailManager::CDetailManager() : xrc("detail manager")
         gpu_visible_srvs[i] = nullptr;
         gpu_visible_uavs[i] = nullptr;
     }
+
+    slot_count = 0;
+    slot_aabb_buffer = nullptr;
+    slot_aabb_srv = nullptr;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -244,6 +248,8 @@ void CDetailManager::Load()
         DecompressAllSlots();
 
         CreatePersistentInstanceBuffer();
+
+        CreateSlotAABBBuffer();
 
         CreateGPUCullingBuffers();
     }

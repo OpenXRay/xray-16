@@ -232,6 +232,8 @@ void CDetailManager::hw_Unload()
     _RELEASE(persistent_instance_srv);
     persistent_buffer_capacity = 0;
 
+    DestroySlotAABBBuffer();
+
     if (cull_compute_shader)
         cull_compute_shader.destroy();
     _RELEASE(cull_constant_buffer);
