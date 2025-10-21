@@ -68,7 +68,7 @@ void CDetailManager::cache_Task(int gx, int gz, Slot* D)
     {
         D->G[i].id = DS.r_id(i);
         for (u32 clr = 0; clr < D->G[i].items.size(); clr++)
-            poolSI.destroy(D->G[i].items[clr]);
+            delete D->G[i].items[clr];
         D->G[i].items.clear();
     }
 
