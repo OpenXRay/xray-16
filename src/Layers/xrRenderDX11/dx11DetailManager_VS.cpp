@@ -322,9 +322,9 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
         float fade_distance_sqr;
         Fvector4 frustum_planes[6];
         u32 total_instance_count;
+        u32 total_slot_count;
         u32 object_count;
         u32 pad0;
-        u32 pad1;
     };
 
     CFrustum frustum;
@@ -333,9 +333,9 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     DetailCullParams params = {};
     params.view_proj = Device.mFullTransform;
     params.camera_pos = Device.vCameraPosition;
-
     params.fade_distance_sqr = fade_distance * fade_distance;
     params.total_instance_count = total_instance_count;
+    params.total_slot_count = slot_count;
     params.object_count = objects.size();
 
     for (u32 i = 0; i < 6; i++)
@@ -399,7 +399,8 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
 
     context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
 
-    context->CSSetShaderResources(0, 1, &persistent_instance_srv);
+    ID3DShaderResourceView* srvs[2] = {slot_aabb_srv, persistent_instance_srv};
+    context->CSSetShaderResources(0, 2, srvs);
 
     ID3DUnorderedAccessView* uavs[33];
     for (u32 i = 0; i < max_gpu_culled_objects; i++)
@@ -412,14 +413,14 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
 
     context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
 
-    u32 num_groups = (total_instance_count + 255) / 256;
+    u32 num_groups = (slot_count + 255) / 256;
     context->Dispatch(num_groups, 1, 1);
 
     ID3DUnorderedAccessView* null_uavs[33] = {nullptr};
     context->CSSetUnorderedAccessViews(0, 33, null_uavs, nullptr);
 
-    ID3DShaderResourceView* null_srvs[1] = {nullptr};
-    context->CSSetShaderResources(0, 1, null_srvs);
+    ID3DShaderResourceView* null_srvs[2] = {nullptr, nullptr};
+    context->CSSetShaderResources(0, 2, null_srvs);
 
     context->CSSetShader(nullptr, nullptr, 0);
 
