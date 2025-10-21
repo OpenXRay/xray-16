@@ -4,9 +4,12 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
-#include "xrCore/Threading/ParallelFor.hpp"
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCore/Threading/ScopeLock.hpp"
+#include "xrCore/FTimer.h"
+#include <atomic>
+#include <thread>
+#include <sstream>
 
 #ifdef DEBUG
 #include "dxDebugRender.h"
@@ -355,17 +358,37 @@ void CDetailManager::DecompressAllSlots()
 
     Msg("  - Found %u non-empty slots to process", slots_to_process.size());
 
-    // Thread-safe synchronization
-    Lock instances_lock;
-    Lock progress_lock;
-    u32 processed_count = 0;
-    u32 last_reported = 0;
+    Lock results_lock;
+    xr_vector<xr_vector<SlotItemWithObject>*> thread_results;
 
-    // Process slots in parallel using engine's threading system
-    xr_parallel_for(TaskRange<size_t>(0, slots_to_process.size()), [&](const TaskRange<size_t>& range)
+    // Progress tracking (lock-free with atomics)
+    std::atomic<u32> processed_count{0};
+    std::atomic<u32> total_instances{0};
+
+    CTimer decompress_timer;
+    decompress_timer.Start();
+
+    u32 num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) num_threads = 8;  // Fallback
+    if (num_threads > 16) num_threads = 16;  // Cap at 16 for memory reasons
+
+    thread_results.resize(num_threads);
+    for (u32 i = 0; i < num_threads; i++)
     {
-        // Process each slot in this range
-        for (size_t slot_idx = range.begin(); slot_idx != range.end(); ++slot_idx)
+        thread_results[i] = new xr_vector<SlotItemWithObject>();
+        thread_results[i]->reserve(slots_to_process.size() / num_threads * 50);  // Estimate ~50 instances per slot
+    }
+
+    auto worker_func = [&](u32 thread_id, size_t start_idx, size_t end_idx)
+    {
+        std::thread::id this_thread_id = std::this_thread::get_id();
+        std::stringstream ss;
+        ss << this_thread_id;
+
+        xr_vector<SlotItemWithObject>* my_results = thread_results[thread_id];
+
+        // Process each slot in this thread's range (completely lock-free!)
+        for (size_t slot_idx = start_idx; slot_idx < end_idx; ++slot_idx)
         {
             const auto& slot_info = slots_to_process[slot_idx];
             DetailSlot& DS = QueryDB(slot_info.sx, slot_info.sz);
@@ -391,8 +414,8 @@ void CDetailManager::DecompressAllSlots()
             // Decompress the slot
             cache_Decompress(&temp_slot);
 
-            // Collect instances from this slot
-            xr_vector<SlotItemWithObject> slot_instances;
+            // Collect instances from this slot into thread-local vector
+            u32 slot_instance_count = 0;
             for (u32 obj_idx = 0; obj_idx < dm_obj_in_slot; obj_idx++)
             {
                 SlotPart& part = temp_slot.G[obj_idx];
@@ -403,46 +426,82 @@ void CDetailManager::DecompressAllSlots()
                     SlotItemWithObject instance;
                     instance.item = *item;
                     instance.object_id = object_id;
-                    slot_instances.push_back(instance);
+                    my_results->push_back(instance);  // No lock!
+                    slot_instance_count++;
 
-                    // Free heap-allocated item (no lock needed!)
                     delete item;
                 }
                 part.items.clear();
             }
 
-            // Add to global list (thread-safe)
-            {
-                ScopeLock lock(&instances_lock);
-                all_level_instances.insert(all_level_instances.end(), slot_instances.begin(), slot_instances.end());
-            }
+            // Update counters (lock-free atomics)
+            u32 current_processed = processed_count.fetch_add(1) + 1;
+            total_instances.fetch_add(slot_instance_count);
 
-            // Progress update (thread-safe)
+            // Progress reporting every 1000 slots
+            if (current_processed % 1000 == 0)
             {
-                ScopeLock lock(&progress_lock);
-                processed_count++;
-                if (processed_count % 100 == 0 || processed_count == slots_to_process.size())
-                {
-                    if (processed_count != last_reported)
-                    {
-                        Msg("  ... processed %u/%u slots (%u instances)",
-                            processed_count, (u32)slots_to_process.size(), (u32)all_level_instances.size());
-                        last_reported = processed_count;
-                    }
-                }
+                u32 current_total = total_instances.load();
+                float progress = 100.0f * current_processed / slots_to_process.size();
+                float elapsed = decompress_timer.GetElapsed_sec();
             }
         }
-    });
+    };
+
+    xr_vector<std::thread> workers;
+    workers.reserve(num_threads);
+    size_t slots_per_thread = slots_to_process.size() / num_threads;
+    size_t remainder = slots_to_process.size() % num_threads;
+
+    size_t current_start = 0;
+    for (u32 i = 0; i < num_threads; i++)
+    {
+        size_t current_end = current_start + slots_per_thread + (i < remainder ? 1 : 0);
+
+        if (current_start < slots_to_process.size())
+        {
+            workers.emplace_back(worker_func, i, current_start, current_end);
+        }
+
+        current_start = current_end;
+    }
+
+    for (auto& thread : workers)
+        thread.join();
+
+    float decompress_time = decompress_timer.GetElapsed_sec();
+
+    CTimer merge_timer;
+    merge_timer.Start();
+
+    size_t total_size = 0;
+    for (u32 i = 0; i < num_threads; i++)
+        total_size += thread_results[i]->size();
+
+    all_level_instances.reserve(total_size);
+
+    for (u32 i = 0; i < num_threads; i++)
+    {
+        all_level_instances.insert(all_level_instances.end(), thread_results[i]->begin(), thread_results[i]->end());
+        delete thread_results[i];
+    }
+
+    float merge_time = merge_timer.GetElapsed_sec();
 
     total_instance_count = all_level_instances.size();
     full_level_loaded = true;
 
     float memory_mb = (total_instance_count * sizeof(SlotItemWithObject)) / (1024.0f * 1024.0f);
+    float total_time = decompress_time + merge_time;
+    float slots_per_sec = slots_to_process.size() / decompress_time;
 
     Msg("* [DetailManager] Decompression complete:");
+    Msg("  - Total time: %.2f sec (decompress: %.2f, merge: %.2f)", total_time, decompress_time, merge_time);
+    Msg("  - Performance: %.0f slots/sec (%.0f slots/sec/thread)", slots_per_sec, slots_per_sec / num_threads);
     Msg("  - Total instances: %u", total_instance_count);
     Msg("  - Memory (CPU): %.2f MB", memory_mb);
     Msg("  - Processed slots: %u/%u", (u32)slots_to_process.size(), total_slots);
+    Msg("  - Threads used: %u (true parallel execution)", num_threads);
 }
 #endif
 } // namespace xray::render::RENDER_NAMESPACE
