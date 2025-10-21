@@ -250,6 +250,9 @@ void CDetailManager::Load()
         CreatePersistentInstanceBuffer();
 
         CreateSlotAABBBuffer();
+#ifdef DEBUG
+        ValidateSlotAABBs();
+#endif
 
         CreateGPUCullingBuffers();
     }
