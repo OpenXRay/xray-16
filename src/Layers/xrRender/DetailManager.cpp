@@ -256,6 +256,9 @@ void CDetailManager::Load()
 
         // Phase 4A.2: Create slot AABB GPU buffer
         CreateSlotAABBBuffer();
+#ifdef DEBUG
+        ValidateSlotAABBs();
+#endif
 
         // Phase 2.1: Create GPU culling infrastructure
         CreateGPUCullingBuffers();

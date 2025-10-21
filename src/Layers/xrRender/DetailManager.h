@@ -298,6 +298,7 @@ public:
     void ComputeSlotAABBs();
     void CreateSlotAABBBuffer();
     void DestroySlotAABBBuffer();
+    void ValidateSlotAABBs();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

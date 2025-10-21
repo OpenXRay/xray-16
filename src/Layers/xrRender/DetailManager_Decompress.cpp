@@ -616,5 +616,230 @@ void CDetailManager::ComputeSlotAABBs()
             total_instances_in_slots, total_instance_count);
     }
 }
+void CDetailManager::ValidateSlotAABBs()
+{
+    Msg("* [DetailManager] Validating slot AABBs...");
+
+    CTimer timer;
+    timer.Start();
+
+    u32 errors = 0;
+    u32 warnings = 0;
+
+    // Statistics
+    float min_aabb_size = FLT_MAX;
+    float max_aabb_size = -FLT_MAX;
+    float avg_aabb_size = 0.0f;
+    u32 min_instances_per_slot = UINT_MAX;
+    u32 max_instances_per_slot = 0;
+    float avg_instances_per_slot = 0.0f;
+
+    // Create mapping from slot coordinates to slot AABB index
+    struct SlotKey
+    {
+        int sx, sz;
+        bool operator<(const SlotKey& other) const
+        {
+            if (sx != other.sx) return sx < other.sx;
+            return sz < other.sz;
+        }
+    };
+
+    std::map<SlotKey, u32> slot_to_aabb_index;
+    for (u32 i = 0; i < slot_aabbs.size(); i++)
+    {
+        SlotKey key = { (int)slot_aabbs[i].slot_x, (int)slot_aabbs[i].slot_z };
+        slot_to_aabb_index[key] = i;
+    }
+
+    // Validate each instance is contained within its slot's AABB
+    u32 skipped_instances = 0;
+    for (u32 i = 0; i < all_level_instances.size(); i++)
+    {
+        const SlotItemWithObject& inst = all_level_instances[i];
+        Fvector pos = inst.item.mRotY.c;
+        float scale = inst.item.scale;  // Use 'scale', not 'scale_calculated'!
+
+        // Skip instances with zero or invalid scale (same as AABB computation)
+        if (scale <= 0.0f || !std::isfinite(scale))
+        {
+            skipped_instances++;
+            continue;
+        }
+
+        // Find which slot this instance belongs to
+        int sx = iFloor(pos.x / dm_slot_size);
+        int sz = iFloor(pos.z / dm_slot_size);
+        SlotKey key = { sx, sz };
+
+        auto it = slot_to_aabb_index.find(key);
+        if (it == slot_to_aabb_index.end())
+        {
+            Msg("! [AABB Validation] ERROR: Instance %u at (%.2f, %.2f, %.2f) with scale %.3f belongs to slot (%d, %d) which has no AABB!",
+                i, pos.x, pos.y, pos.z, scale, sx, sz);
+            errors++;
+            continue;
+        }
+
+        const SlotAABB& slot_aabb = slot_aabbs[it->second];
+
+        // Compute instance bounds (MUST match AABB computation exactly!)
+        u32 object_id = inst.object_id;
+
+        VERIFY(object_id < objects.size());
+        float model_radius = objects[object_id]->bv_sphere.R;
+        float instance_radius = model_radius * scale;  // Scale the model radius
+
+        // Use bounding sphere (same as AABB computation)
+        Fvector inst_min, inst_max;
+        inst_min.set(pos.x - instance_radius, pos.y - instance_radius, pos.z - instance_radius);
+        inst_max.set(pos.x + instance_radius, pos.y + instance_radius, pos.z + instance_radius);
+
+        // Check if instance is fully contained within slot AABB
+        bool contained = true;
+        if (inst_min.x < slot_aabb.aabb_min.x - 0.01f ||
+            inst_min.y < slot_aabb.aabb_min.y - 0.01f ||
+            inst_min.z < slot_aabb.aabb_min.z - 0.01f ||
+            inst_max.x > slot_aabb.aabb_max.x + 0.01f ||
+            inst_max.y > slot_aabb.aabb_max.y + 0.01f ||
+            inst_max.z > slot_aabb.aabb_max.z + 0.01f)
+        {
+            contained = false;
+        }
+
+        if (!contained)
+        {
+            Msg("! [AABB Validation] ERROR: Instance %u NOT contained in slot (%d, %d) AABB!", i, sx, sz);
+            Msg("    Instance bounds: (%.2f, %.2f, %.2f) - (%.2f, %.2f, %.2f)",
+                inst_min.x, inst_min.y, inst_min.z, inst_max.x, inst_max.y, inst_max.z);
+            Msg("    Slot AABB:       (%.2f, %.2f, %.2f) - (%.2f, %.2f, %.2f)",
+                slot_aabb.aabb_min.x, slot_aabb.aabb_min.y, slot_aabb.aabb_min.z,
+                slot_aabb.aabb_max.x, slot_aabb.aabb_max.y, slot_aabb.aabb_max.z);
+            errors++;
+
+            if (errors >= 10)
+            {
+                Msg("  ... stopping error reporting (too many errors)");
+                break;
+            }
+        }
+    }
+
+    // Compute statistics for each slot AABB
+    for (const auto& slot_aabb : slot_aabbs)
+    {
+        // AABB size (diagonal length)
+        Fvector size;
+        size.x = slot_aabb.aabb_max.x - slot_aabb.aabb_min.x;
+        size.y = slot_aabb.aabb_max.y - slot_aabb.aabb_min.y;
+        size.z = slot_aabb.aabb_max.z - slot_aabb.aabb_min.z;
+        float diagonal = sqrt(size.x * size.x + size.y * size.y + size.z * size.z);
+
+        min_aabb_size = std::min(min_aabb_size, diagonal);
+        max_aabb_size = std::max(max_aabb_size, diagonal);
+        avg_aabb_size += diagonal;
+
+        // Instance counts
+        min_instances_per_slot = std::min(min_instances_per_slot, slot_aabb.instance_count);
+        max_instances_per_slot = std::max(max_instances_per_slot, slot_aabb.instance_count);
+        avg_instances_per_slot += slot_aabb.instance_count;
+
+        // Check for truly degenerate AABBs (exactly zero volume - indicates uninitialized)
+        // Note: Very small but non-zero AABBs are valid (single instance with tiny scale)
+        if (size.x == 0.0f && size.y == 0.0f && size.z == 0.0f)
+        {
+            Msg("! [AABB Validation] ERROR: Slot (%d, %d) has exactly zero volume AABB - uninitialized!",
+                slot_aabb.slot_x, slot_aabb.slot_z);
+            errors++;
+        }
+        else if (size.x < 0.001f || size.y < 0.001f || size.z < 0.001f)
+        {
+            // Just count tiny AABBs, don't spam log (they're valid, just small)
+            warnings++;
+        }
+
+        // Check for unreasonably large AABBs (> 5x slot size diagonal)
+        // Note: Normal grass can be 2-3m tall, so AABB diagonal of 4-6m is expected!
+        // Slot size = 2m, so diagonal of 2m×3m×2m box = sqrt(4+9+4) = 4.1m
+        float max_reasonable_size = dm_slot_size * 5.0f;  // 10m diagonal
+        if (diagonal > max_reasonable_size)
+        {
+            // Only log first 10 truly unreasonable AABBs to avoid spam
+            if (warnings < 10)
+            {
+                Msg("! [AABB Validation] WARNING: Slot (%d, %d) has unusually large AABB: %.2fm (expected < %.2fm)",
+                    slot_aabb.slot_x, slot_aabb.slot_z, diagonal, max_reasonable_size);
+            }
+            warnings++;
+        }
+
+        // Check instance_base and instance_count are valid
+        if (slot_aabb.instance_base >= all_level_instances.size())
+        {
+            Msg("! [AABB Validation] ERROR: Slot (%d, %d) instance_base %u >= total instances %u",
+                slot_aabb.slot_x, slot_aabb.slot_z, slot_aabb.instance_base, all_level_instances.size());
+            errors++;
+        }
+
+        if (slot_aabb.instance_base + slot_aabb.instance_count > all_level_instances.size())
+        {
+            Msg("! [AABB Validation] ERROR: Slot (%d, %d) instance range [%u, %u) exceeds total instances %u",
+                slot_aabb.slot_x, slot_aabb.slot_z,
+                slot_aabb.instance_base, slot_aabb.instance_base + slot_aabb.instance_count,
+                all_level_instances.size());
+            errors++;
+        }
+    }
+
+    if (slot_aabbs.size() > 0)
+    {
+        avg_aabb_size /= slot_aabbs.size();
+        avg_instances_per_slot /= slot_aabbs.size();
+    }
+
+    float elapsed = timer.GetElapsed_sec();
+
+    // Report results
+    Msg("* [DetailManager] AABB Validation complete (%.3f sec):", elapsed);
+    Msg("  - Total slots validated: %u", slot_aabbs.size());
+    Msg("  - Total instances: %u", all_level_instances.size());
+    Msg("  - Valid instances checked: %u", all_level_instances.size() - skipped_instances);
+    Msg("  - Skipped instances (zero/invalid scale): %u", skipped_instances);
+    Msg("  - Errors: %u", errors);
+    Msg("  - Warnings: %u", warnings);
+    Msg("");
+    Msg("  AABB Size Statistics:");
+    Msg("    Min diagonal: %.2f m", min_aabb_size);
+    Msg("    Max diagonal: %.2f m", max_aabb_size);
+    Msg("    Avg diagonal: %.2f m", avg_aabb_size);
+    Msg("");
+    Msg("  Instance Distribution:");
+    Msg("    Min instances/slot: %u", min_instances_per_slot);
+    Msg("    Max instances/slot: %u", max_instances_per_slot);
+    Msg("    Avg instances/slot: %.1f", avg_instances_per_slot);
+
+    if (errors > 0)
+    {
+        Msg("");
+        Msg("! [AABB Validation] FAILED with %u errors!", errors);
+        R_ASSERT2(false, "Slot AABB validation failed - see log for details");
+    }
+    else if (warnings > 0)
+    {
+        Msg("");
+        Msg("* [AABB Validation] PASSED with %u warnings", warnings);
+        if (warnings > 10)
+            Msg("  (Most warnings are about tiny AABBs or slightly oversized AABBs - both are valid)");
+        if (skipped_instances > 0)
+            Msg("  (Note: %u instances skipped due to zero/invalid scale)", skipped_instances);
+    }
+    else
+    {
+        Msg("");
+        Msg("* [AABB Validation] PASSED - All AABBs perfect!");
+        if (skipped_instances > 0)
+            Msg("  (Note: %u instances skipped due to zero/invalid scale)", skipped_instances);
+    }
+}
 #endif
 } // namespace xray::render::RENDER_NAMESPACE
