@@ -502,6 +502,119 @@ void CDetailManager::DecompressAllSlots()
     Msg("  - Memory (CPU): %.2f MB", memory_mb);
     Msg("  - Processed slots: %u/%u", (u32)slots_to_process.size(), total_slots);
     Msg("  - Threads used: %u (true parallel execution)", num_threads);
+
+    // Phase 4A.1: Compute slot AABBs for hierarchical culling
+    ComputeSlotAABBs();
+}
+
+// Phase 4A.1: Compute slot AABBs for hierarchical culling
+void CDetailManager::ComputeSlotAABBs()
+{
+    Msg("* [DetailManager] Computing slot AABBs for hierarchical culling...");
+
+    CTimer timer;
+    timer.Start();
+
+    slot_aabbs.clear();
+
+    // We need to organize instances by slot
+    // Create a map of slot coordinates to instance indices
+    struct SlotKey
+    {
+        int sx, sz;
+        bool operator<(const SlotKey& other) const
+        {
+            if (sx != other.sx) return sx < other.sx;
+            return sz < other.sz;
+        }
+    };
+
+    // Map from slot coordinates to list of instance indices
+    std::map<SlotKey, xr_vector<u32>> slot_to_instances;
+
+    // Assign each instance to its slot based on world position
+    for (u32 i = 0; i < all_level_instances.size(); i++)
+    {
+        const SlotItemWithObject& inst = all_level_instances[i];
+        Fvector pos = inst.item.mRotY.c;
+
+        // Determine which slot this instance belongs to
+        int sx = iFloor(pos.x / dm_slot_size);
+        int sz = iFloor(pos.z / dm_slot_size);
+
+        SlotKey key = {sx, sz};
+        slot_to_instances[key].push_back(i);
+    }
+
+    Msg("  - Instances distributed across %u slots", (u32)slot_to_instances.size());
+
+    // Now compute AABB for each slot
+    slot_aabbs.reserve(slot_to_instances.size());
+
+    for (const auto& pair : slot_to_instances)
+    {
+        const SlotKey& key = pair.first;
+        const xr_vector<u32>& instance_indices = pair.second;
+
+        if (instance_indices.empty())
+            continue;
+
+        SlotAABB aabb;
+        aabb.aabb_min.set(FLT_MAX, FLT_MAX, FLT_MAX);
+        aabb.aabb_max.set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+        aabb.instance_base = instance_indices.front();  // First instance index
+        aabb.instance_count = instance_indices.size();
+        aabb.slot_x = key.sx;
+        aabb.slot_z = key.sz;
+
+        // Compute AABB from all instances in this slot
+        for (u32 inst_idx : instance_indices)
+        {
+            const SlotItemWithObject& inst = all_level_instances[inst_idx];
+            Fvector pos = inst.item.mRotY.c;
+            float scale = inst.item.scale;
+            u32 object_id = inst.object_id;
+
+            VERIFY(object_id < objects.size());
+            float model_radius = objects[object_id]->bv_sphere.R;
+            float instance_radius = model_radius * scale;
+
+            Fvector inst_min, inst_max;
+            inst_min.set(pos.x - instance_radius, pos.y - instance_radius, pos.z - instance_radius);
+            inst_max.set(pos.x + instance_radius, pos.y + instance_radius, pos.z + instance_radius);
+
+            // Expand slot AABB
+            aabb.aabb_min.x = std::min(aabb.aabb_min.x, inst_min.x);
+            aabb.aabb_min.y = std::min(aabb.aabb_min.y, inst_min.y);
+            aabb.aabb_min.z = std::min(aabb.aabb_min.z, inst_min.z);
+
+            aabb.aabb_max.x = std::max(aabb.aabb_max.x, inst_max.x);
+            aabb.aabb_max.y = std::max(aabb.aabb_max.y, inst_max.y);
+            aabb.aabb_max.z = std::max(aabb.aabb_max.z, inst_max.z);
+        }
+
+        slot_aabbs.push_back(aabb);
+    }
+
+    slot_count = slot_aabbs.size();
+
+    float elapsed = timer.GetElapsed_sec();
+    float memory_kb = (slot_count * sizeof(SlotAABB)) / 1024.0f;
+
+    Msg("* [DetailManager] Slot AABB computation complete:");
+    Msg("  - Computed %u slot AABBs in %.3f sec", slot_count, elapsed);
+    Msg("  - Memory (CPU): %.2f KB", memory_kb);
+
+    // Validation: check total instances
+    u32 total_instances_in_slots = 0;
+    for (const auto& aabb : slot_aabbs)
+        total_instances_in_slots += aabb.instance_count;
+
+    if (total_instances_in_slots != total_instance_count)
+    {
+        Msg("! [DetailManager] WARNING: Instance count mismatch! Slots contain %u instances, but total is %u",
+            total_instances_in_slots, total_instance_count);
+    }
 }
 #endif
 } // namespace xray::render::RENDER_NAMESPACE

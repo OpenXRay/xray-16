@@ -132,6 +132,11 @@ CDetailManager::CDetailManager() : xrc("detail manager")
         gpu_visible_srvs[i] = nullptr;
         gpu_visible_uavs[i] = nullptr;
     }
+
+    // Phase 4A: BVH spatial culling
+    slot_count = 0;
+    slot_aabb_buffer = nullptr;
+    slot_aabb_srv = nullptr;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -248,6 +253,9 @@ void CDetailManager::Load()
 
         // Phase 2.0.3: Upload to persistent GPU buffer
         CreatePersistentInstanceBuffer();
+
+        // Phase 4A.2: Create slot AABB GPU buffer
+        CreateSlotAABBBuffer();
 
         // Phase 2.1: Create GPU culling infrastructure
         CreateGPUCullingBuffers();

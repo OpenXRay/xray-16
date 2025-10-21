@@ -151,6 +151,55 @@ void CDetailManager::CreatePersistentInstanceBuffer()
     Msg("  - Per-instance size: %u bytes", sizeof(InstanceData));
 }
 
+// Phase 4A.2: Create GPU slot AABB buffer
+void CDetailManager::CreateSlotAABBBuffer()
+{
+    VERIFY(slot_count > 0);
+    VERIFY(!slot_aabb_buffer);
+
+    Msg("* [DetailManager] Creating GPU slot AABB buffer...");
+
+    // Create structured buffer
+    D3D11_BUFFER_DESC desc = {};
+    desc.Usage = D3D11_USAGE_IMMUTABLE;  // Never changes after upload
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    desc.StructureByteStride = sizeof(SlotAABB);
+    desc.ByteWidth = slot_count * sizeof(SlotAABB);
+
+    // Initial data
+    D3D11_SUBRESOURCE_DATA init_data = {};
+    init_data.pSysMem = slot_aabbs.data();
+
+    HRESULT hr = HW.pDevice->CreateBuffer(&desc, &init_data, &slot_aabb_buffer);
+    CHK_DX(hr);
+
+    // Create SRV
+    D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.Format = DXGI_FORMAT_UNKNOWN;
+    srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srv_desc.Buffer.FirstElement = 0;
+    srv_desc.Buffer.NumElements = slot_count;
+
+    hr = HW.pDevice->CreateShaderResourceView(slot_aabb_buffer, &srv_desc, &slot_aabb_srv);
+    CHK_DX(hr);
+
+    float memory_kb = (slot_count * sizeof(SlotAABB)) / 1024.0f;
+
+    Msg("* [DetailManager] Slot AABB buffer created:");
+    Msg("  - Slots: %u", slot_count);
+    Msg("  - VRAM usage: %.2f KB", memory_kb);
+    Msg("  - Per-slot size: %u bytes", sizeof(SlotAABB));
+}
+
+void CDetailManager::DestroySlotAABBBuffer()
+{
+    _RELEASE(slot_aabb_srv);
+    _RELEASE(slot_aabb_buffer);
+    slot_count = 0;
+    slot_aabbs.clear();
+}
+
 // Phase 2.1: Create GPU culling buffers and infrastructure
 void CDetailManager::CreateGPUCullingBuffers()
 {

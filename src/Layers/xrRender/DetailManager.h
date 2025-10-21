@@ -232,6 +232,26 @@ public:
     // Phase 2.2: Indirect draw args buffers (one per object)
     ID3DBuffer* gpu_indirect_args[max_gpu_culled_objects];
     ID3DUnorderedAccessView* gpu_indirect_args_uavs[max_gpu_culled_objects];
+
+    // Phase 4A: Spatial culling with BVH
+    struct SlotAABB
+    {
+        Fvector3 aabb_min;          // Minimum corner of bounding box
+        float padding0;             // Align to 16 bytes
+        Fvector3 aabb_max;          // Maximum corner of bounding box
+        float padding1;             // Align to 16 bytes
+        u32 instance_base;          // First instance index in persistent buffer
+        u32 instance_count;         // Number of instances in this slot
+        int slot_x;                 // Grid X coordinate (for debugging)
+        int slot_z;                 // Grid Z coordinate (for debugging)
+        Fvector4 padding2;
+    };
+    static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes for GPU alignment");
+
+    xr_vector<SlotAABB> slot_aabbs;     // CPU copy of slot AABBs
+    u32 slot_count;                     // Total number of slots with instances
+    ID3DBuffer* slot_aabb_buffer;       // GPU buffer for slot AABBs
+    ID3DShaderResourceView* slot_aabb_srv;  // SRV for slot AABB buffer
 #endif
 
     ref_constant hwc_consts;
@@ -273,6 +293,11 @@ public:
     // Phase 2.1: GPU culling
     void CreateGPUCullingBuffers();
     void DispatchGPUCulling(CBackend& cmd_list);
+
+    // Phase 4A: BVH spatial culling
+    void ComputeSlotAABBs();
+    void CreateSlotAABBBuffer();
+    void DestroySlotAABBBuffer();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

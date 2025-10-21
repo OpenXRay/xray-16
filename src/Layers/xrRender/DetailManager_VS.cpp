@@ -251,6 +251,9 @@ void CDetailManager::hw_Unload()
     _RELEASE(persistent_instance_srv);
     persistent_buffer_capacity = 0;
 
+    // Phase 4A: Release slot AABB buffers
+    DestroySlotAABBBuffer();
+
     // Phase 2.1: Release GPU culling buffers
     if (cull_compute_shader)
         cull_compute_shader.destroy();
