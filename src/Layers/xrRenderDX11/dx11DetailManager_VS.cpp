@@ -347,17 +347,16 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
 
     auto context = HW.get_context(cmd_list.context_id);
 
-    // Constant buffer structure (must match shader)
     struct DetailCullParams
     {
-        Fmatrix view_proj;            // 64 bytes
-        Fvector3 camera_pos;            // 12 bytes
-        float fade_distance_sqr;        // 4 bytes
-        Fvector4 frustum_planes[6];     // 96 bytes
-        u32 total_instance_count;       // 4 bytes
-        u32 object_count;               // 4 bytes
-        u32 pad0;                       // 4 bytes
-        u32 pad1;                       // 4 bytes
+        Fmatrix view_proj;
+        Fvector3 camera_pos;
+        float fade_distance_sqr;
+        Fvector4 frustum_planes[6];
+        u32 total_instance_count;
+        u32 total_slot_count;
+        u32 object_count;
+        u32 pad0;
     };
 
     // Extract frustum planes from view-projection matrix
@@ -366,15 +365,12 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     CFrustum frustum;
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
 
-    // Setup constant buffer
     DetailCullParams params = {};
     params.view_proj = Device.mFullTransform;
     params.camera_pos = Device.vCameraPosition;
-
-    // Use actual fade distance (from r__detail_radius cvar)
-    // fade_distance is initialized in DetailManager constructor
     params.fade_distance_sqr = fade_distance * fade_distance;
     params.total_instance_count = total_instance_count;
+    params.total_slot_count = slot_count;
     params.object_count = objects.size();
 
     // Copy frustum planes (5 planes: LRTB + FAR, no NEAR)
@@ -447,8 +443,8 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     // Bind constant buffer
     context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
 
-    // Bind input: persistent instance buffer
-    context->CSSetShaderResources(0, 1, &persistent_instance_srv);
+    ID3DShaderResourceView* srvs[2] = {slot_aabb_srv, persistent_instance_srv};
+    context->CSSetShaderResources(0, 2, srvs);
 
     // Bind outputs: per-object visible buffers + counter buffer + indirect args
     // u0-u15: visible instance buffers
@@ -463,20 +459,17 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
 
     context->CSSetUnorderedAccessViews(0, 33, uavs, nullptr);
 
-    // Bind compute shader
     context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
 
-    // Dispatch compute shader (256 threads per group)
-    u32 num_groups = (total_instance_count + 255) / 256;
+    u32 num_groups = (slot_count + 255) / 256;
     context->Dispatch(num_groups, 1, 1);
 
     // Unbind UAVs (prepare for rendering)
     ID3DUnorderedAccessView* null_uavs[33] = {nullptr};
     context->CSSetUnorderedAccessViews(0, 33, null_uavs, nullptr);
 
-    // Unbind SRVs
-    ID3DShaderResourceView* null_srvs[1] = {nullptr};
-    context->CSSetShaderResources(0, 1, null_srvs);
+    ID3DShaderResourceView* null_srvs[2] = {nullptr, nullptr};
+    context->CSSetShaderResources(0, 2, null_srvs);
 
     // Unbind compute shader
     context->CSSetShader(nullptr, nullptr, 0);

@@ -1,43 +1,46 @@
 // detail_cull.cs - GPU-driven frustum culling for detail objects
-// Phase 2.1: Processes all level instances and outputs visible instances per object
+// Phase 4A.3: Hierarchical culling - test slot AABBs first, then instances within visible slots
 //
 #define SM_5_0
 #include "common.h"
 
-// ===========================
-// Structures (must match C++)
-// ===========================
-
-// Phase 2.0.3: InstanceData structure (32 bytes)
 struct InstanceData
 {
-    float3 hpb;         // Heading, pitch, bank (12 bytes)
-    float scale;        // Scale factor (4 bytes)
-    float3 pos;         // World position (12 bytes)
-    float hemi;         // Hemisphere lighting (4 bytes)
-    uint vis_id;        // Animation type (4 bytes)
-    uint object_id;     // Grass object type (4 bytes)
+    float3 hpb;
+    float scale;
+    float3 pos;
+    float hemi;
+    uint vis_id;
+    uint object_id;
 };
 
-// ===========================
-// Input Buffers
-// ===========================
+struct SlotAABB
+{
+    float3 aabb_min;
+    float padding0;
+    float3 aabb_max;
+    float padding1;
+    uint instance_base;
+    uint instance_count;
+    int slot_x;
+    int slot_z;
+    float4 padding2;
+};
 
-// Must match C++ DetailCullParams struct in dx11DetailManager_VS.cpp exactly!
 cbuffer DetailCullParams : register(b0)
 {
-    float4x4 g_view_proj;           // View-projection matrix (64 bytes)
-    float3 g_camera_pos;            // Camera position (12 bytes)
-    float g_fade_distance_sqr;      // Max distance squared (4 bytes)
-    float4 g_frustum_planes[6];     // Frustum planes (6 * 16 = 96 bytes)
-    uint g_total_instance_count;    // Total instances to process (4 bytes)
-    uint g_object_count;            // Number of grass object types (4 bytes)
-    uint g_pad0;                    // Padding (4 bytes)
-    uint g_pad1;                    // Padding (4 bytes)
+    float4x4 g_view_proj;
+    float3 g_camera_pos;
+    float g_fade_distance_sqr;
+    float4 g_frustum_planes[6];
+    uint g_total_instance_count;
+    uint g_total_slot_count;
+    uint g_object_count;
+    uint g_pad0;
 };
 
-// Input: All level instances (immutable persistent buffer)
-StructuredBuffer<InstanceData> g_all_instances : register(t0);
+StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
+StructuredBuffer<InstanceData> g_all_instances : register(t1);
 
 // ===========================
 // Output Buffers (Phase 2.1: Per-Object)
@@ -86,60 +89,28 @@ RWByteAddressBuffer g_indirect_args13 : register(u30);
 RWByteAddressBuffer g_indirect_args14 : register(u31);
 RWByteAddressBuffer g_indirect_args15 : register(u32);
 
-// ===========================
-// Compute Shader Entry Point
-// ===========================
 
-[numthreads(256, 1, 1)]
-void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
+bool AABBDistanceTest(float3 aabb_min, float3 aabb_max, float3 camera_pos, float max_dist_sqr)
 {
-    uint idx = dispatch_thread_id.x;
+    float3 closest = clamp(camera_pos, aabb_min, aabb_max);
+    float dist_sqr = dot(closest - camera_pos, closest - camera_pos);
+    return dist_sqr < max_dist_sqr;
+}
 
-    // Early exit if beyond instance count
-    if (idx >= g_total_instance_count)
-        return;
-
-    // Load instance data
-    InstanceData inst = g_all_instances[idx];
-
-    // =========================
-    // Distance Culling
-    // =========================
-    float3 delta = inst.pos - g_camera_pos;
-    float dist_sqr = dot(delta, delta);
-
-    if (dist_sqr > g_fade_distance_sqr)
-        return;  // Too far, culled
-
-    // =========================
-    // Frustum Culling
-    // =========================
-    // Estimate grass bounds (typically ~1m tall, affected by scale)
-    float bounds_radius = inst.scale * 0.75f;
-
-    // Frustum culling (only test first 5 planes - LRTB + FAR, no NEAR)
-    // The 6th plane is unused/dummy
-    // X-Ray plane format: dot(n, p) + d >= 0 for inside (confirmed in _plane.h:65)
-    // BUT: Planes seem to be inverted, so test with POSITIVE side outside
+bool SphereFrustumTest(float3 center, float radius, float4 planes[6])
+{
     [unroll]
     for (uint i = 0; i < 5; ++i)
     {
-        float dist = dot(g_frustum_planes[i].xyz, inst.pos) + g_frustum_planes[i].w;
-        if (dist > bounds_radius)
-            return;  // Outside frustum, culled
+        float dist = dot(planes[i].xyz, center) + planes[i].w;
+        if (dist > radius)
+            return false;
     }
+    return true;
+}
 
-    // =========================
-    // Append to Per-Object Visible List
-    // =========================
-    uint object_id = inst.object_id;
-    uint output_idx;
-
-    // Atomic increment count for this object (legacy counter buffer, kept for debugging)
-    g_visible_counts.InterlockedAdd(object_id * 4, 1, output_idx);
-
-    // Phase 2.2.1: Also increment InstanceCount in indirect args buffer
-    // InstanceCount field is at offset 4 bytes (second u32)
+void AppendInstance(uint object_id, InstanceData inst, uint output_idx)
+{
     uint dummy;
     if (object_id == 0)
     {
@@ -221,5 +192,62 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         g_visible_obj15[output_idx] = inst;
         g_indirect_args15.InterlockedAdd(4, 1, dummy);
     }
-    // Objects 16+ will be ignored for now (can expand to 64 later with more UAV slots)
+}
+
+[numthreads(256, 1, 1)]
+void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
+{
+    uint slot_idx = dispatch_thread_id.x;
+
+    if (slot_idx >= g_total_slot_count)
+        return;
+
+    SlotAABB slot = g_slot_aabbs[slot_idx];
+
+    if (slot.instance_count == 0)
+        return;
+
+    [unroll]
+    for (uint i = 0; i < 5; ++i)
+    {
+        float3 plane_normal = g_frustum_planes[i].xyz;
+        float plane_dist = g_frustum_planes[i].w;
+
+        float3 negative_vertex = float3(
+            plane_normal.x < 0.0 ? slot.aabb_max.x : slot.aabb_min.x,
+            plane_normal.y < 0.0 ? slot.aabb_max.y : slot.aabb_min.y,
+            plane_normal.z < 0.0 ? slot.aabb_max.z : slot.aabb_min.z
+        );
+
+        float dist = dot(plane_normal, negative_vertex) + plane_dist;
+
+        if (dist > 2.0)
+            return;
+    }
+
+    if (!AABBDistanceTest(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
+        return;
+
+    for (uint i = 0; i < slot.instance_count; i++)
+    {
+        uint inst_idx = slot.instance_base + i;
+        InstanceData inst = g_all_instances[inst_idx];
+
+        float bounds_radius = inst.scale * 0.75f;
+
+        if (!SphereFrustumTest(inst.pos, bounds_radius, g_frustum_planes))
+            continue;
+
+        float3 delta = inst.pos - g_camera_pos;
+        float dist_sqr = dot(delta, delta);
+        if (dist_sqr > g_fade_distance_sqr)
+            continue;
+
+        uint object_id = inst.object_id;
+        uint output_idx;
+
+        g_visible_counts.InterlockedAdd(object_id * 4, 1, output_idx);
+
+        AppendInstance(object_id, inst, output_idx);
+    }
 }
