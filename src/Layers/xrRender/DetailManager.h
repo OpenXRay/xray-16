@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "xrCore/xrPool.h"
 #include "DetailFormat.h"
 #include "DetailModel.h"
 
@@ -118,7 +117,6 @@ public:
     typedef xr_vector<xr_vector<SlotItemVec*>> vis_list;
     typedef svector<CDetail*, dm_max_objects> DetailVec;
     typedef DetailVec::iterator DetailIt;
-    typedef poolSS<SlotItem, 4096> PSS;
 
     int dither[16][16];
 
@@ -158,8 +156,6 @@ public:
 
     int cache_cx;
     int cache_cz;
-
-    PSS poolSI; // pool из которого выделяются SlotItem
 
     Fvector EYE;
 

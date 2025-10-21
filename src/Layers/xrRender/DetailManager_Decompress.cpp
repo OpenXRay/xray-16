@@ -2,7 +2,11 @@
 #pragma hdrstop
 #include "DetailManager.h"
 #include "xrCDB/Intersect.hpp"
+#include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
+#include "xrCore/Threading/ParallelFor.hpp"
+#include "xrCore/Threading/Lock.hpp"
+#include "xrCore/Threading/ScopeLock.hpp"
 
 #ifdef DEBUG
 #include "dxDebugRender.h"
@@ -85,8 +89,9 @@ void CDetailManager::cache_Decompress(Slot* S)
     Fvector bC, bD;
     D.vis.box.get_CD(bC, bD);
 
-    xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
-    const auto triCount = xrc.r_count();
+    thread_local xrXRC thread_xrc;
+    thread_xrc.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), bC, bD);
+    const auto triCount = thread_xrc.r_count();
     CDB::TRI* tris = g_pGameLevel->ObjectSpace.GetStaticTris();
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
 
@@ -173,7 +178,8 @@ void CDetailManager::cache_Decompress(Slot* S)
 #endif
 
             CDetail* Dobj = objects[DS.r_id(index)];
-            SlotItem* ItemP = poolSI.create();
+
+            SlotItem* ItemP = new SlotItem();
             SlotItem& Item = *ItemP;
 
             // Position (XZ)
@@ -195,7 +201,7 @@ void CDetailManager::cache_Decompress(Slot* S)
             float r_u, r_v, r_range;
             for (size_t tid = 0; tid < triCount; tid++)
             {
-                CDB::TRI& T = tris[xrc.r_begin()[tid].id];
+                CDB::TRI& T = tris[thread_xrc.r_begin()[tid].id];
                 SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
                 if (mtl->Flags.test(SGameMtl::flPassable))
                     continue;
@@ -305,17 +311,24 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
 #ifdef USE_DX11
 void CDetailManager::DecompressAllSlots()
 {
-    Msg("* [DetailManager] Decompressing entire level...");
+    Msg("* [DetailManager] Decompressing entire level (multithreaded)...");
 
     all_level_instances.clear();
     total_instance_count = 0;
     full_level_loaded = false;
 
     u32 total_slots = dtH.x_size() * dtH.z_size();
-    u32 processed_slots = 0;
 
     Msg("* [DetailManager] Level has %u x %u = %u slots to decompress",
         dtH.x_size(), dtH.z_size(), total_slots);
+
+    struct SlotToProcess
+    {
+        int sx, sz;
+        u32 db_x, db_z;
+    };
+    xr_vector<SlotToProcess> slots_to_process;
+    slots_to_process.reserve(total_slots / 2);
 
     for (u32 db_z = 0; db_z < dtH.z_size(); db_z++)
     {
@@ -323,7 +336,6 @@ void CDetailManager::DecompressAllSlots()
         {
             int sx = int(db_x) - dtH.x_offs();
             int sz = int(db_z) - dtH.z_offs();
-
             DetailSlot& DS = QueryDB(sx, sz);
 
             bool is_empty = (DS.id0 == DetailSlot::ID_Empty) &&
@@ -331,28 +343,43 @@ void CDetailManager::DecompressAllSlots()
                            (DS.id2 == DetailSlot::ID_Empty) &&
                            (DS.id3 == DetailSlot::ID_Empty);
 
-            if (is_empty)
-                continue;
+            if (!is_empty)
+                slots_to_process.push_back({sx, sz, db_x, db_z});
+        }
+    }
+
+    Msg("  - Found %u non-empty slots to process", slots_to_process.size());
+
+    Lock instances_lock;
+    Lock progress_lock;
+    u32 processed_count = 0;
+    u32 last_reported = 0;
+
+    xr_parallel_for(TaskRange<size_t>(0, slots_to_process.size()), [&](const TaskRange<size_t>& range)
+    {
+        for (size_t slot_idx = range.begin(); slot_idx != range.end(); ++slot_idx)
+        {
+            const auto& slot_info = slots_to_process[slot_idx];
+            DetailSlot& DS = QueryDB(slot_info.sx, slot_info.sz);
 
             Slot temp_slot;
             temp_slot.type = stPending;
-            temp_slot.sx = sx;
-            temp_slot.sz = sz;
+            temp_slot.sx = slot_info.sx;
+            temp_slot.sz = slot_info.sz;
             temp_slot.empty = false;
 
-            temp_slot.vis.box.vMin.set(sx * dm_slot_size, DS.r_ybase(), sz * dm_slot_size);
+            temp_slot.vis.box.vMin.set(slot_info.sx * dm_slot_size, DS.r_ybase(), slot_info.sz * dm_slot_size);
             temp_slot.vis.box.vMax.set(temp_slot.vis.box.vMin.x + dm_slot_size,
                                        DS.r_ybase() + DS.r_yheight(),
                                        temp_slot.vis.box.vMin.z + dm_slot_size);
             temp_slot.vis.box.grow(EPS_L);
 
             for (u32 i = 0; i < dm_obj_in_slot; i++)
-            {
                 temp_slot.G[i].id = DS.r_id(i);
-            }
 
             cache_Decompress(&temp_slot);
 
+            xr_vector<SlotItemWithObject> slot_instances;
             for (u32 obj_idx = 0; obj_idx < dm_obj_in_slot; obj_idx++)
             {
                 SlotPart& part = temp_slot.G[obj_idx];
@@ -363,23 +390,33 @@ void CDetailManager::DecompressAllSlots()
                     SlotItemWithObject instance;
                     instance.item = *item;
                     instance.object_id = object_id;
-                    all_level_instances.push_back(instance);
+                    slot_instances.push_back(instance);
 
-                    poolSI.destroy(item);
+                    delete item;
                 }
-
                 part.items.clear();
             }
 
-            processed_slots++;
-        }
+            {
+                ScopeLock lock(&instances_lock);
+                all_level_instances.insert(all_level_instances.end(), slot_instances.begin(), slot_instances.end());
+            }
 
-        if (db_z % 10 == 0 || db_z == dtH.z_size() - 1)
-        {
-            Msg("  ... processed %u/%u slots, %u instances so far",
-                processed_slots, total_slots, all_level_instances.size());
+            {
+                ScopeLock lock(&progress_lock);
+                processed_count++;
+                if (processed_count % 100 == 0 || processed_count == slots_to_process.size())
+                {
+                    if (processed_count != last_reported)
+                    {
+                        Msg("  ... processed %u/%u slots (%u instances)",
+                            processed_count, (u32)slots_to_process.size(), (u32)all_level_instances.size());
+                        last_reported = processed_count;
+                    }
+                }
+            }
         }
-    }
+    });
 
     total_instance_count = all_level_instances.size();
     full_level_loaded = true;
@@ -389,7 +426,7 @@ void CDetailManager::DecompressAllSlots()
     Msg("* [DetailManager] Decompression complete:");
     Msg("  - Total instances: %u", total_instance_count);
     Msg("  - Memory (CPU): %.2f MB", memory_mb);
-    Msg("  - Processed slots: %u/%u", processed_slots, total_slots);
+    Msg("  - Processed slots: %u/%u", (u32)slots_to_process.size(), total_slots);
 }
 #endif
 } // namespace xray::render::RENDER_NAMESPACE
