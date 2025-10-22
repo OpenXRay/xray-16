@@ -200,6 +200,17 @@ public:
         SlotItem item;
         u32 object_id;
     };
+    struct InstanceData
+    {
+        Fvector m0;
+        float scale;
+        Fvector m1;
+        float hemi;
+        Fvector m2;
+        u32 vis_id;
+        Fvector pos;
+        u32 object_id;
+    };
     xr_vector<SlotItemWithObject> all_level_instances;
     u32 total_instance_count;
     bool full_level_loaded;
@@ -279,8 +290,21 @@ public:
     ID3DBuffer* wind_constant_buffer;
     Fvector2 wind_direction;
     float wind_speed;
-    u32 wind_frame_skip;
-    u32 wind_frame_counter;
+
+    struct WindParams
+    {
+        float time;
+        Fvector2 wind_direction;
+        float wind_speed;
+        u32 octaves;
+        float lacunarity;
+        float gain;
+        float padding1;
+        Fvector2 scroll_speed;
+        u32 texture_size;
+        u32 pad[3];
+    };
+
 #endif
 
     ref_constant hwc_consts;
@@ -292,6 +316,7 @@ public:
     ref_constant hwc_s_xform;
     ref_constant hwc_s_array;
     ref_constant hwc_detail_params;
+    ref_constant hwc_grass_wind_displacement;
     void hw_Load();
     void hw_Load_Geom();
     void hw_Load_Shaders();

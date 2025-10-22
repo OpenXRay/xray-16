@@ -8,6 +8,12 @@
 
 #include "editor_helper.h"
 
+ENGINE_API float ps_r3_grass_wind_multiplier = 1.0f;
+ENGINE_API float ps_r3_grass_wind_min = 0.1f;
+ENGINE_API float ps_r3_grass_wind_lerp_rate = 2.0f;
+ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;
+ENGINE_API u32 ps_r3_grass_wind_octaves = 5;
+
 #ifndef MASTER_GOLD
 namespace
 {
@@ -237,6 +243,34 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
             wind_direction = deg2rad(direction);
 
         ImGui::DragFloat("wind velocity", &wind_velocity, 1.0f, 0.0f, 1000.0f);
+
+        if (ImGui::TreeNode("Grass Wind"))
+        {
+            extern float ps_r3_grass_wind_multiplier;
+            extern float ps_r3_grass_wind_min;
+            extern float ps_r3_grass_wind_lerp_rate;
+            extern float ps_r3_grass_wind_displacement;
+            extern u32 ps_r3_grass_wind_octaves;
+
+            ImGui::DragFloat("Wind strength multiplier", &ps_r3_grass_wind_multiplier, 0.01f, 0.0f, 5.0f);
+            ItemHelp("Multiplies environment wind strength for grass displacement");
+
+            ImGui::DragFloat("Minimum wind speed", &ps_r3_grass_wind_min, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Minimum wind speed - even in calm weather, grass moves slightly");
+
+            ImGui::DragFloat("Transition speed", &ps_r3_grass_wind_lerp_rate, 0.1f, 0.1f, 10.0f);
+            ItemHelp("How quickly grass wind adapts to environment changes (higher = faster)");
+
+            ImGui::DragFloat("Displacement strength", &ps_r3_grass_wind_displacement, 0.1f, 0.0f, 10.0f);
+            ItemHelp("Vertex displacement strength in world units");
+
+            int octaves = (int)ps_r3_grass_wind_octaves;
+            if (ImGui::SliderInt("FBM quality (octaves)", &octaves, 1, 8))
+                ps_r3_grass_wind_octaves = (u32)octaves;
+            ItemHelp("Number of noise octaves for wind generation (higher = more detail, slower)");
+
+            ImGui::TreePop();
+        }
     }
 #endif
 }
