@@ -204,6 +204,18 @@ public:
         SlotItem item;      // Original slot item data
         u32 object_id;      // Which grass object type (0-63)
     };
+    // Instance data structure matching shader
+    struct InstanceData
+    {
+        Fvector m0;  // First column of rotation matrix (X-axis)
+        float scale;
+        Fvector m1;  // Second column of rotation matrix (Y-axis)
+        float hemi;
+        Fvector m2;  // Third column of rotation matrix (Z-axis)
+        u32 vis_id;
+        Fvector pos; // Position
+        u32 object_id;
+    };
     xr_vector<SlotItemWithObject> all_level_instances;  // ALL instances for entire level
     u32 total_instance_count;
     bool full_level_loaded;
@@ -294,8 +306,21 @@ public:
     ID3DBuffer* wind_constant_buffer;
     Fvector2 wind_direction;                       // Current wind direction
     float wind_speed;                              // Current wind speed
-    u32 wind_frame_skip;                           // Update wind every N frames (default: 2)
-    u32 wind_frame_counter;
+
+    struct WindParams
+    {
+        float time;              // 0-3
+        Fvector2 wind_direction; // 4-11
+        float wind_speed;        // 12-15
+        u32 octaves;             // 16-19
+        float lacunarity;        // 20-23
+        float gain;              // 24-27
+        float padding1;          // 28-31 (align scroll_speed to 16-byte boundary)
+        Fvector2 scroll_speed;   // 32-39
+        u32 texture_size;        // 40-43
+        u32 pad[3];              // 44-55
+    };
+
 #endif
 
     ref_constant hwc_consts;
@@ -307,6 +332,7 @@ public:
     ref_constant hwc_s_xform;
     ref_constant hwc_s_array;
     ref_constant hwc_detail_params;  // Phase 5: slot grid parameters (x_size, z_size, x_offs, z_offs)
+    ref_constant hwc_grass_wind_displacement;  // Phase 5: wind displacement strength
     void hw_Load();
     void hw_Load_Geom();
     void hw_Load_Shaders();

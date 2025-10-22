@@ -163,8 +163,6 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     wind_texture_size = 0;
     wind_speed = 0.3f;
     wind_direction.set(1.0f, 0.0f);
-    wind_frame_skip = 2;
-    wind_frame_counter = 0;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -510,7 +508,7 @@ void CDetailManager::Render(CBackend& cmd_list)
         // Phase 5: Update interactive grass system
         UpdateInteractiveEntities();
         UpdateWind(cmd_list);
-        RenderInteractions(cmd_list);
+        //RenderInteractions(cmd_list);
 #endif
         hw_Render(cmd_list);
     }

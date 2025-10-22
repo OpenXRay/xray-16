@@ -4,6 +4,13 @@
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
 
+// Phase 5: Grass wind tuning parameters (defined in xrEngine, accessed here)
+extern ENGINE_API float ps_r3_grass_wind_multiplier;     // Multiplier for environment wind strength
+extern ENGINE_API float ps_r3_grass_wind_min;            // Minimum wind speed
+extern ENGINE_API float ps_r3_grass_wind_lerp_rate;      // Speed of wind transitions
+extern ENGINE_API float ps_r3_grass_wind_displacement;   // Vertex displacement strength
+extern ENGINE_API u32 ps_r3_grass_wind_octaves;          // FBM octave count
+
 namespace xray::render::RENDER_NAMESPACE
 {
 namespace detail_manager
@@ -28,22 +35,11 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
     hwc_detail_params = T0.get("detail_params");  // Phase 5: slot grid parameters
+    hwc_grass_wind_displacement = T0.get("grass_wind_displacement");  // Phase 5: wind displacement strength
 
     // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
     // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
     const u32 initialBufferSize = 2048 * 2048;
-
-    // Instance data structure (must match shader)
-    // Phase 2.0.3: Updated to include object_id instead of padding
-    struct InstanceData
-    {
-        Fvector hpb;    // Heading, pitch, bank rotation
-        float scale;    // Scale factor
-        Fvector pos;    // Position
-        float hemi;     // Hemisphere lighting
-        u32 vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
-        u32 object_id;  // Which grass object type (0-63)
-    };
 
     D3D11_BUFFER_DESC bufferDesc = {};
     bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -98,17 +94,6 @@ void CDetailManager::CreatePersistentInstanceBuffer()
 
     Msg("* [DetailManager] Creating persistent GPU instance buffer...");
 
-    // Instance data structure matching shader
-    struct InstanceData
-    {
-        Fvector hpb;
-        float scale;
-        Fvector pos;
-        float hemi;
-        u32 vis_id;
-        u32 object_id;
-    };
-
     persistent_buffer_capacity = total_instance_count;
 
     // Prepare instance data for upload
@@ -120,11 +105,11 @@ void CDetailManager::CreatePersistentInstanceBuffer()
         const SlotItemWithObject& src = all_level_instances[i];
         InstanceData dst = {};
 
-        // Extract rotation from matrix
+        // Pass full rotation matrix (preserves all rotations)
         const Fmatrix& M = src.item.mRotY;
-        dst.hpb.x = atan2f(M._13, M._11);  // heading
-        dst.hpb.y = 0.0f;
-        dst.hpb.z = 0.0f;
+        dst.m0.set(M._11, M._21, M._31);  // First column
+        dst.m1.set(M._12, M._22, M._32);  // Second column
+        dst.m2.set(M._13, M._23, M._33);  // Third column
 
         dst.scale = src.item.scale;
         dst.pos = M.c;
@@ -230,16 +215,6 @@ void CDetailManager::CreateGPUCullingBuffers()
     gpu_visible_buffer_capacity = 2048 * 2048;
     if (gpu_visible_buffer_capacity < 10000)
         gpu_visible_buffer_capacity = 10000;  // Minimum 10K per object
-
-    struct InstanceData
-    {
-        Fvector hpb;
-        float scale;
-        Fvector pos;
-        float hemi;
-        u32 vis_id;
-        u32 object_id;
-    };
 
     // Create per-object visible instance buffers
     for (u32 i = 0; i < max_gpu_culled_objects; i++)
@@ -587,6 +562,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         detail_params_vec.z = (float)dtH.x_offs();
         detail_params_vec.w = (float)dtH.z_offs();
         cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
+        cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
 
         cmd_list.set_Element(Object.shader->E[0], 0);
         cmd_list.apply_lmaterial();
@@ -680,18 +656,6 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
 {
     ZoneScoped;
 
-    // Instance data structure (must match shader)
-    // Phase 2.0.3: Updated to include object_id instead of padding
-    struct InstanceData
-    {
-        Fvector hpb;    // Heading, pitch, bank rotation
-        float scale;    // Scale factor
-        Fvector pos;    // Position
-        float hemi;     // Hemisphere lighting
-        u32 vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
-        u32 object_id;  // Which grass object type (0-63)
-    };
-
     static shared_str strConsts("consts");
     static shared_str strWave("wave");
     static shared_str strDir2D("dir2D");
@@ -751,7 +715,9 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
                 hpb.y = 0.0f;                   // pitch
                 hpb.z = 0.0f;                   // bank
 
-                c_storage[instanceIdx].hpb = hpb;
+                c_storage[instanceIdx].m0.set(M._11, M._21, M._31);  // First column
+                c_storage[instanceIdx].m1.set(M._12, M._22, M._32);  // Second column
+                c_storage[instanceIdx].m2.set(M._13, M._23, M._33);  // Third column
                 c_storage[instanceIdx].scale = Instance.scale;
                 c_storage[instanceIdx].pos = M.c;
                 c_storage[instanceIdx].hemi = Instance.c_hemi;
@@ -782,6 +748,7 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     detail_params_vec.z = (float)dtH.x_offs();
     detail_params_vec.w = (float)dtH.z_offs();
     cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
+    cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
 
     // Set shader for this object (use lod_id=0 for wave shader)
     cmd_list.set_Element(Object.shader->E[0], 0);
@@ -1032,8 +999,6 @@ void CDetailManager::CreateWindTexture()
     VERIFY(!wind_texture);
 
     wind_texture_size = 512;  // 512x512 wind field
-    wind_frame_skip = 2;      // Update every 2 frames
-    wind_frame_counter = 100; // Force wind generation on first render (counter will wrap)
 
     Msg("* [DetailManager] Creating wind texture...");
 
@@ -1214,7 +1179,7 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
         first_run = false;
     }
 
-    auto context = HW.get_context(CHW::IMM_CTX_ID);
+    auto context = HW.get_context(cmd_list.context_id);
 
     // Set compute shader
     context->CSSetShader(interaction_compute_shader->sh, nullptr, 0);
@@ -1270,70 +1235,34 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
 // Milestone 5.4: Update wind (dispatch wind FBM compute shader)
 void CDetailManager::UpdateWind(CBackend& cmd_list)
 {
-    Msg("* [DetailManager] UpdateWind CALLED");
-
-    if (!wind_texture)
-    {
-        Msg("! [DetailManager] UpdateWind: wind_texture is NULL!");
-        return;
-    }
-
-    if (!wind_compute_shader)
-    {
-        Msg("! [DetailManager] UpdateWind: wind_compute_shader is NULL!");
-        return;
-    }
-
-    // Update wind parameters from environment
-    #ifndef _EDITOR
     if (g_pGamePersistent)
     {
-        wind_speed = g_pGamePersistent->Environment().wind_strength_factor;
+        // Get target wind speed from environment
+        wind_speed = _max(g_pGamePersistent->Environment().CurrentEnv.wind_velocity * ps_r3_grass_wind_multiplier, ps_r3_grass_wind_min);
+
+        // Get wind direction and convert from degrees to normalized 2D vector
+        const float envDir = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+        float wind_rad = deg2rad(envDir);
+        wind_direction = { cosf(wind_rad), sinf(wind_rad) };
     }
     else
     {
         wind_speed = 0.5f;  // Default wind speed
+        wind_direction.set(1.0f, 0.0f);  // East
     }
-    #else
-    wind_speed = 0.5f;  // Editor default
-    #endif
 
-    // Use default wind direction (east) - TODO: Get from environment if available
-    wind_direction.set(1.0f, 0.0f);
-
-    // TEMPORARILY DISABLED: Frame skip logic - update every frame for testing
-    // wind_frame_counter++;
-    // if (wind_frame_counter < wind_frame_skip)
-    //     return;
-    // wind_frame_counter = 0;
-
-    auto context = HW.get_context(CHW::IMM_CTX_ID);
+    auto context = HW.get_context(cmd_list.context_id);
 
     // Set compute shader
     context->CSSetShader(wind_compute_shader->sh, nullptr, 0);
 
     // Update constant buffer
-    // IMPORTANT: Match HLSL constant buffer packing rules (16-byte alignment)
-    struct WindParams
-    {
-        float time;              // 0-3
-        Fvector2 wind_direction; // 4-11
-        float wind_speed;        // 12-15
-        u32 octaves;             // 16-19
-        float lacunarity;        // 20-23
-        float gain;              // 24-27
-        float padding1;          // 28-31 (align scroll_speed to 16-byte boundary)
-        Fvector2 scroll_speed;   // 32-39
-        u32 texture_size;        // 40-43
-        u32 pad[3];              // 44-55
-    };
-
     WindParams params;
     memset(&params, 0, sizeof(params));  // Zero initialize
     params.time = Device.fTimeGlobal;
     params.wind_direction = wind_direction;
     params.wind_speed = wind_speed;
-    params.octaves = 5;
+    params.octaves = ps_r3_grass_wind_octaves;  // Use tunable octave count
     params.lacunarity = 2.0f;
     params.gain = 0.5f;
     params.scroll_speed.x = wind_direction.x * wind_speed * 5.0f;  // Increased from 0.1 to 5.0 for visible movement
@@ -1354,27 +1283,10 @@ void CDetailManager::UpdateWind(CBackend& cmd_list)
     u32 num_groups = (wind_texture_size + 15) / 16;
     context->Dispatch(num_groups, num_groups, 1);
 
-    // DEBUG: Log once per second to verify continuous updates
-    static u32 last_log_frame = 0;
-    if (Device.dwFrame - last_log_frame > 60)  // Every ~1 second at 60fps
-    {
-        Msg("* [DetailManager] UpdateWind: Dispatched at frame %u, time=%.2f", Device.dwFrame, Device.fTimeGlobal);
-        last_log_frame = Device.dwFrame;
-    }
-
     // Unbind resources
     ID3DUnorderedAccessView* nullUAV[1] = {nullptr};
     context->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
     context->CSSetShader(nullptr, nullptr, 0);
-
-    // Debug: Log wind update
-    static u32 wind_update_count = 0;
-    wind_update_count++;
-    if (wind_update_count % 60 == 0)  // Log every 60 updates
-    {
-        Msg("* [DetailManager] UpdateWind: Generating FBM wind (speed=%.2f, dir=(%.2f, %.2f))",
-            wind_speed, wind_direction.x, wind_direction.y);
-    }
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

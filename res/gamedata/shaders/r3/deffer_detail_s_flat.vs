@@ -5,6 +5,7 @@ uniform float4 wave;   // cx,cy,cz,tm - for wave1
 uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
 uniform float4 dir2D_2; // dir2 - for wave2 (vis_id=2)
 uniform float4 detail_params; // Phase 5: x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
+uniform float grass_wind_displacement; // Phase 5: Wind displacement strength (tunable via ImGui)
 
 // Phase 5: Interactive grass textures
 // Note: Slot t0 = instance buffer, so we use t1, t2, t3 (engine limit is 4 VS texture slots)
@@ -23,35 +24,18 @@ struct v_detail_instanced
 // Instance data structure (must match C++ InstanceData)
 struct InstanceData
 {
-	float3 hpb;      // Heading, pitch, bank rotation
+	float3 m0;       // First column of rotation matrix (X-axis)
 	float scale;     // Scale factor
-	float3 pos;      // Position
+	float3 m1;       // Second column of rotation matrix (Y-axis)
 	float hemi;      // Hemisphere lighting
+	float3 m2;       // Third column of rotation matrix (Z-axis)
 	uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
-	uint padding;    // Alignment padding
+	float3 pos;      // Position
+	uint object_id;  // Which grass object type (0-63)
 };
 
 // Structured buffer bound to slot 0
 StructuredBuffer<InstanceData> detail_buffer : register(t0);
-
-float3x3 setMatrix(float3 hpb)
-{
-	float _ch, _cp, _cb, _sh, _sp, _sb, _cc, _cs, _sc, _ss;
-
-	sincos(hpb.x, _sh, _ch);
-	sincos(hpb.y, _sp, _cp);
-	sincos(hpb.z, _sb, _cb);
-
-	_cc = _cb * _ch;
-	_cs = _cb * _sh;
-	_sc = _sb * _ch;
-	_ss = _sb * _sh;
-
-	return float3x3(
-		_cp * _ch, _sp * _sc - _cs, _sp * _cc + _ss,
-		_cp * _sh, _sp * _ss + _cc, _sp * _cs - _sc,
-		-_sp, _cp * _sb, _cp * _cb);
-}
 
 v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 {
@@ -60,7 +44,8 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 	// Read instance data from structured buffer
 	InstanceData det = detail_buffer[instance_id];
 
-	float3x3 mmhpb = setMatrix(det.hpb);
+	// Use matrix columns directly (no reconstruction needed!)
+	float3x3 mmhpb = float3x3(det.m0, det.m1, det.m2);
 
 	float hemi = abs(det.hemi);
 	float sun = sign(det.hemi) * 0.25f + 0.25f;
@@ -133,7 +118,7 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 		// pos.xz += interaction_displacement * 0.5;  // Scale down for subtlety
 
 		// Apply wind displacement (amplified for testing)
-		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * 2.0;  // Increased from 0.2 to 2.0
+		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * grass_wind_displacement;  // Increased from 0.2 to 2.0
 		pos.xz += wind_displacement;
 	}
 
