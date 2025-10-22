@@ -20,8 +20,7 @@
 
 #include "xrCore/Threading/TaskManager.hpp"
 
-#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) \
-    || defined(XR_ARCHITECTURE_PPC64) || defined(XR_ARCHITECTURE_WASM64) || defined(XR_ARCHITECTURE_WASM32)
+#if defined(XR_ARCHITECTURE_X86) || defined(XR_ARCHITECTURE_X64) || defined(XR_ARCHITECTURE_E2K) || defined(XR_ARCHITECTURE_PPC64)
 #include <xmmintrin.h>
 #elif defined(XR_ARCHITECTURE_ARM) || defined(XR_ARCHITECTURE_ARM64)
 #include "sse2neon/sse2neon.h"
@@ -134,6 +133,33 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     slot_count = 0;
     slot_aabb_buffer = nullptr;
     slot_aabb_srv = nullptr;
+
+    interaction_atlas = nullptr;
+    interaction_rtv = nullptr;
+    interaction_srv = nullptr;
+    interaction_uav = nullptr;
+    slot_atlas_uv_buffer = nullptr;
+    slot_atlas_uv_srv = nullptr;
+    atlas_width = 0;
+    atlas_height = 0;
+    slot_texture_size = 0;
+
+    entity_buffer = nullptr;
+    entity_srv = nullptr;
+    max_entities = 0;
+    entity_count_this_frame = 0;
+
+    interaction_constant_buffer = nullptr;
+
+    wind_texture = nullptr;
+    wind_srv = nullptr;
+    wind_uav = nullptr;
+    wind_constant_buffer = nullptr;
+    wind_texture_size = 0;
+    wind_speed = 0.3f;
+    wind_direction.set(1.0f, 0.0f);
+    wind_frame_skip = 2;
+    wind_frame_counter = 0;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -255,6 +281,10 @@ void CDetailManager::Load()
 #endif
 
         CreateGPUCullingBuffers();
+
+        CreateInteractionAtlas();
+        CreateEntityTrackingBuffers();
+        CreateWindTexture();
     }
 #endif
 
@@ -417,15 +447,15 @@ void CDetailManager::UpdateVisibleM()
                         continue;
                     if (!sp.r_items[0].empty())
                     {
-                        m_visibles[0][sp.id].push_back({ &sp.r_items[0], &S.vis.sphere });
+                        m_visibles[0][sp.id].push_back(&sp.r_items[0]);
                     }
                     if (!sp.r_items[1].empty())
                     {
-                        m_visibles[1][sp.id].push_back({ &sp.r_items[1], &S.vis.sphere });
+                        m_visibles[1][sp.id].push_back(&sp.r_items[1]);
                     }
                     if (!sp.r_items[2].empty())
                     {
-                        m_visibles[2][sp.id].push_back({ &sp.r_items[2], &S.vis.sphere });
+                        m_visibles[2][sp.id].push_back(&sp.r_items[2]);
                     }
                 }
             }
@@ -439,7 +469,7 @@ bool CDetailManager::UseVS() const
     return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
 }
 
-void CDetailManager::Render(CBackend& cmd_list, const Fsphere* bounds)
+void CDetailManager::Render(CBackend& cmd_list)
 {
 #ifndef _EDITOR
     if (nullptr == dtFS)
@@ -465,9 +495,16 @@ void CDetailManager::Render(CBackend& cmd_list, const Fsphere* bounds)
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
     if (UseVS())
-        hw_Render(cmd_list, bounds);
+    {
+#ifdef USE_DX11
+        UpdateInteractiveEntities();
+        UpdateWind(cmd_list);
+        RenderInteractions(cmd_list);
+#endif
+        hw_Render(cmd_list);
+    }
     else
-        soft_Render(bounds);
+        soft_Render();
     cmd_list.set_CullMode(CULL_CCW);
 
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 0.0f; //--#SM+#-- Флаг конца рендера травы [end of grass render]

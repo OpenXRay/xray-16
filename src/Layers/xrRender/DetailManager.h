@@ -242,6 +242,45 @@ public:
     u32 slot_count;
     ID3DBuffer* slot_aabb_buffer;
     ID3DShaderResourceView* slot_aabb_srv;
+
+    ID3D11Texture2D* interaction_atlas;
+    ID3D11RenderTargetView* interaction_rtv;
+    ID3D11ShaderResourceView* interaction_srv;
+    ID3D11UnorderedAccessView* interaction_uav;
+    u32 atlas_width;
+    u32 atlas_height;
+    u32 slot_texture_size;
+    ID3DBuffer* slot_atlas_uv_buffer;
+    ID3DShaderResourceView* slot_atlas_uv_srv;
+    ID3D11SamplerState* interaction_sampler;
+
+    struct InteractiveEntity
+    {
+        Fvector position;
+        float radius;
+        Fvector velocity;
+        float weight;
+        float padding[2];
+    };
+    xr_vector<InteractiveEntity> interactive_entities;
+    u32 max_entities;
+    ID3DBuffer* entity_buffer;
+    ID3DShaderResourceView* entity_srv;
+    u32 entity_count_this_frame;
+
+    ref_cs interaction_compute_shader;
+    ID3DBuffer* interaction_constant_buffer;
+
+    ID3D11Texture2D* wind_texture;
+    ID3D11ShaderResourceView* wind_srv;
+    ID3D11UnorderedAccessView* wind_uav;
+    u32 wind_texture_size;
+    ref_cs wind_compute_shader;
+    ID3DBuffer* wind_constant_buffer;
+    Fvector2 wind_direction;
+    float wind_speed;
+    u32 wind_frame_skip;
+    u32 wind_frame_counter;
 #endif
 
     ref_constant hwc_consts;
@@ -252,6 +291,7 @@ public:
     ref_constant hwc_s_consts;
     ref_constant hwc_s_xform;
     ref_constant hwc_s_array;
+    ref_constant hwc_detail_params;
     void hw_Load();
     void hw_Load_Geom();
     void hw_Load_Shaders();
@@ -285,6 +325,16 @@ public:
     void CreateSlotAABBBuffer();
     void DestroySlotAABBBuffer();
     void ValidateSlotAABBs();
+
+    void CreateInteractionAtlas();
+    void DestroyInteractionAtlas();
+    void CreateEntityTrackingBuffers();
+    void DestroyEntityTrackingBuffers();
+    void UpdateInteractiveEntities();
+    void CreateWindTexture();
+    void DestroyWindTexture();
+    void RenderInteractions(CBackend& cmd_list);
+    void UpdateWind(CBackend& cmd_list);
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

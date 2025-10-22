@@ -246,6 +246,16 @@ void CDetailManager::hw_Unload()
         _RELEASE(gpu_visible_srvs[i]);
         _RELEASE(gpu_visible_uavs[i]);
     }
+
+    DestroyInteractionAtlas();
+    DestroyEntityTrackingBuffers();
+    DestroyWindTexture();
+    if (interaction_compute_shader)
+        interaction_compute_shader.destroy();
+    if (wind_compute_shader)
+        wind_compute_shader.destroy();
+    _RELEASE(interaction_constant_buffer);
+    _RELEASE(wind_constant_buffer);
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE
