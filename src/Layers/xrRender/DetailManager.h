@@ -252,6 +252,50 @@ public:
     u32 slot_count;                     // Total number of slots with instances
     ID3DBuffer* slot_aabb_buffer;       // GPU buffer for slot AABBs
     ID3DShaderResourceView* slot_aabb_srv;  // SRV for slot AABB buffer
+
+    // Phase 5: Interactive Grass System
+    // Milestone 5.1: Interaction texture atlas
+    ID3D11Texture2D* interaction_atlas;           // 2048x2048, stores displacement per slot
+    ID3D11RenderTargetView* interaction_rtv;
+    ID3D11ShaderResourceView* interaction_srv;
+    ID3D11UnorderedAccessView* interaction_uav;
+    u32 atlas_width;                              // Default: 2048
+    u32 atlas_height;                             // Default: 2048
+    u32 slot_texture_size;                        // Default: 32 (32x32 per slot)
+    ID3DBuffer* slot_atlas_uv_buffer;             // GPU buffer for UV mapping
+    ID3DShaderResourceView* slot_atlas_uv_srv;
+    ID3D11SamplerState* interaction_sampler;      // Sampler for interaction/wind textures
+
+    // Milestone 5.2: Entity tracking
+    struct InteractiveEntity
+    {
+        Fvector position;
+        float radius;              // Interaction radius
+        Fvector velocity;          // Movement direction/speed
+        float weight;              // 0-1, affects displacement strength
+        float padding[2];          // Align to 32 bytes
+    };
+    xr_vector<InteractiveEntity> interactive_entities;
+    u32 max_entities;                              // Default: 256
+    ID3DBuffer* entity_buffer;
+    ID3DShaderResourceView* entity_srv;
+    u32 entity_count_this_frame;
+
+    // Milestone 5.3: Interaction compute shader
+    ref_cs interaction_compute_shader;             // detail_interaction.cs
+    ID3DBuffer* interaction_constant_buffer;
+
+    // Milestone 5.4: Wind system
+    ID3D11Texture2D* wind_texture;                 // 512x512 FBM wind field
+    ID3D11ShaderResourceView* wind_srv;
+    ID3D11UnorderedAccessView* wind_uav;
+    u32 wind_texture_size;                         // Default: 512
+    ref_cs wind_compute_shader;                    // detail_wind_fbm.cs
+    ID3DBuffer* wind_constant_buffer;
+    Fvector2 wind_direction;                       // Current wind direction
+    float wind_speed;                              // Current wind speed
+    u32 wind_frame_skip;                           // Update wind every N frames (default: 2)
+    u32 wind_frame_counter;
 #endif
 
     ref_constant hwc_consts;
@@ -262,6 +306,7 @@ public:
     ref_constant hwc_s_consts;
     ref_constant hwc_s_xform;
     ref_constant hwc_s_array;
+    ref_constant hwc_detail_params;  // Phase 5: slot grid parameters (x_size, z_size, x_offs, z_offs)
     void hw_Load();
     void hw_Load_Geom();
     void hw_Load_Shaders();
@@ -299,6 +344,17 @@ public:
     void CreateSlotAABBBuffer();
     void DestroySlotAABBBuffer();
     void ValidateSlotAABBs();
+
+    // Phase 5: Interactive Grass System
+    void CreateInteractionAtlas();
+    void DestroyInteractionAtlas();
+    void CreateEntityTrackingBuffers();
+    void DestroyEntityTrackingBuffers();
+    void UpdateInteractiveEntities();
+    void CreateWindTexture();
+    void DestroyWindTexture();
+    void RenderInteractions(CBackend& cmd_list);
+    void UpdateWind(CBackend& cmd_list);
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

@@ -4,6 +4,14 @@ uniform float4 consts; // {1/quant,1/quant,diffusescale,ambient}
 uniform float4 wave;   // cx,cy,cz,tm - for wave1
 uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
 uniform float4 dir2D_2; // dir2 - for wave2 (vis_id=2)
+uniform float4 detail_params; // Phase 5: x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
+
+// Phase 5: Interactive grass textures
+// Note: Slot t0 = instance buffer, so we use t1, t2, t3 (engine limit is 4 VS texture slots)
+Texture2D interaction_atlas : register(t1);  // RG=displacement XZ, B=bend, A=age
+Texture2D wind_texture : register(t2);       // RGB=wind vector, A=strength
+Buffer<float4> slot_atlas_uvs : register(t3);  // xy=min UV, zw=max UV for each slot
+SamplerState interaction_sampler : register(s0);
 
 // New vertex structure for instanced details
 struct v_detail_instanced
@@ -67,35 +75,66 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 	pos.z = dot(m2, float4(I.pos.xyz, 1.0));
 	pos.w = 1.0f;
 
-	// Apply wave animation based on vis_id
-	// vis_id 0 = still (no wave)
-	// vis_id 1 = wave1 (uses wave(1/5, 1/7, 1/3) and dir1)
-	// vis_id 2 = wave2 (uses wave(1/3, 1/7, 1/5) and dir2)
-	if (det.vis_id > 0)
+	// Phase 5: Apply interactive displacement (entity interaction + FBM wind)
+	// Replaces old calc_cyclic wave animation with natural FBM wind for all grass types
 	{
-		float H = I.pos.y * length(m1.xyz);
+		// Calculate vertex height factor (0 at base, 1 at top)
+		float vertex_height = I.pos.y * length(m1.xyz);
+		float vertex_height_factor = saturate(vertex_height / det.scale);
 
-		// Choose wave pattern and wind direction based on vis_id
-		float4 current_wave;
-		float2 wind_dir;
+		// Calculate slot index from world position
+		// Detail slot size is 2m (DETAIL_SLOT_SIZE)
+		const float slot_size = 2.0;
+		int slot_x = int(floor(pos.x / slot_size));
+		int slot_z = int(floor(pos.z / slot_size));
 
-		if (det.vis_id == 1)
-		{
-			// Wave1: use standard wave(1/5, 1/7, 1/3) and dir1
-			current_wave = wave;
-			wind_dir = dir2D.xz;
-		}
-		else // vis_id == 2
-		{
-			// Wave2: swap wave frequencies (1/3, 1/7, 1/5) and use dir2
-			current_wave = float4(wave.z, wave.y, wave.x, wave.w);
-			wind_dir = dir2D_2.xz;
-		}
+		// Map slot coordinates to slot array index
+		// Slots are stored in row-major order: (sz + z_offs) * x_size + (sx + x_offs)
+		uint x_size = uint(detail_params.x);
+		uint z_size = uint(detail_params.y);
+		int x_offs = int(detail_params.z);
+		int z_offs = int(detail_params.w);
 
-		float dp = calc_cyclic(dot(pos, current_wave));
-		float inten = H * dp;
+		// Bounds check and compute index
+		int sx_local = slot_x + x_offs;
+		int sz_local = slot_z + z_offs;
 
-		pos.xz += calc_xz_wave(wind_dir * inten, I.pos.w);
+		// Clamp to valid range
+		sx_local = clamp(sx_local, 0, int(x_size) - 1);
+		sz_local = clamp(sz_local, 0, int(z_size) - 1);
+
+		uint slot_idx = uint(sz_local) * x_size + uint(sx_local);
+
+		// Wrap to atlas capacity (4096 slots for 2048x2048 atlas with 32x32 per slot)
+		// This allows large levels to work - only nearby slots get accurate interaction
+		const uint max_atlas_slots = 4096;
+		slot_idx = slot_idx % max_atlas_slots;
+
+		// Sample interaction atlas
+		// Get slot UVs from lookup buffer
+		float4 slot_uv = slot_atlas_uvs.Load(slot_idx);
+
+		// Compute UV within slot based on position within slot
+		float2 slot_local = frac(pos.xz / slot_size);  // 0-1 within slot
+		float2 atlas_uv = lerp(slot_uv.xy, slot_uv.zw, slot_local);
+
+		float4 interaction = interaction_atlas.SampleLevel(interaction_sampler, atlas_uv, 0);
+
+		// Sample wind texture (world-space tiling)
+		float2 wind_uv = pos.xz * 0.001;  // 1km tile size
+		float4 wind = wind_texture.SampleLevel(interaction_sampler, wind_uv, 0);
+
+		// Decode wind direction from [0,1] to [-1,1]
+		float2 wind_direction = wind.xz * 2.0 - 1.0;
+		float wind_strength = wind.a;
+
+		// DISABLED: Apply interaction displacement (radial push from entities)
+		// float2 interaction_displacement = interaction.rg * interaction.b * vertex_height_factor;
+		// pos.xz += interaction_displacement * 0.5;  // Scale down for subtlety
+
+		// Apply wind displacement (amplified for testing)
+		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * 2.0;  // Increased from 0.2 to 2.0
+		pos.xz += wind_displacement;
 	}
 
 	float3 Pe = mul(m_WV, pos);

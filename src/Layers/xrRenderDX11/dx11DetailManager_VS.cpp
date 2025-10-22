@@ -27,6 +27,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_consts = T1.get("consts");
     hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
+    hwc_detail_params = T0.get("detail_params");  // Phase 5: slot grid parameters
 
     // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
     // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
@@ -73,6 +74,20 @@ void CDetailManager::hw_Load_Shaders()
     }
 
     Msg("* [DetailManager] Created 3 instance buffers (vis_id: still/wave1/wave2), %u instances each", initialBufferSize);
+
+    // Phase 5: Load compute shaders for interactive grass
+    interaction_compute_shader.create("detail_interaction");
+    wind_compute_shader.create("detail_wind_fbm");
+
+    if (interaction_compute_shader && interaction_compute_shader->sh)
+        Msg("* [DetailManager] Loaded interaction compute shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load interaction compute shader!");
+
+    if (wind_compute_shader && wind_compute_shader->sh)
+        Msg("* [DetailManager] Loaded wind compute shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load wind compute shader!");
 }
 
 // Phase 2.0.3: Create persistent GPU buffer for all level instances
@@ -565,8 +580,27 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         cmd_list.set_c(strDir2D, dir1);    // dir1 for wave1 (vis_id=1)
         cmd_list.set_c(strDir2D_2, dir2);   // dir2 for wave2 (vis_id=2)
 
+        // Phase 5: Set slot grid parameters
+        Fvector4 detail_params_vec;
+        detail_params_vec.x = (float)dtH.x_size();
+        detail_params_vec.y = (float)dtH.z_size();
+        detail_params_vec.z = (float)dtH.x_offs();
+        detail_params_vec.w = (float)dtH.z_offs();
+        cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
+
         cmd_list.set_Element(Object.shader->E[0], 0);
         cmd_list.apply_lmaterial();
+
+        // Phase 5: Bind interactive grass textures (AFTER apply_lmaterial to avoid being unbound)
+        // Bind to slots 1, 2, 3 to match shader registers (t1, t2, t3)
+        if (interaction_srv)
+            cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
+        if (wind_srv)
+            cmd_list.SRVSManager.SetVSResource(2, wind_srv);
+        if (slot_atlas_uv_srv)
+            cmd_list.SRVSManager.SetVSResource(3, slot_atlas_uv_srv);
+        if (interaction_sampler)
+            HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
 
         // Phase 2.2.2: DrawIndexedInstancedIndirect
         // The GPU determines instance count from the indirect args buffer
@@ -741,9 +775,28 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     cmd_list.set_c(strWave, wave);
     cmd_list.set_c(strDir2D, wind);
 
+    // Phase 5: Set slot grid parameters
+    Fvector4 detail_params_vec;
+    detail_params_vec.x = (float)dtH.x_size();
+    detail_params_vec.y = (float)dtH.z_size();
+    detail_params_vec.z = (float)dtH.x_offs();
+    detail_params_vec.w = (float)dtH.z_offs();
+    cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
+
     // Set shader for this object (use lod_id=0 for wave shader)
     cmd_list.set_Element(Object.shader->E[0], 0);
     cmd_list.apply_lmaterial();
+
+    // Phase 5: Bind interactive grass textures (AFTER apply_lmaterial to avoid being unbound)
+    // Bind to slots 1, 2, 3 to match shader registers (t1, t2, t3)
+    if (interaction_srv)
+        cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
+    if (wind_srv)
+        cmd_list.SRVSManager.SetVSResource(2, wind_srv);
+    if (slot_atlas_uv_srv)
+        cmd_list.SRVSManager.SetVSResource(3, slot_atlas_uv_srv);
+    if (interaction_sampler)
+        HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
 
     // Draw using unified geometry with proper offsets
     u32 baseIndex = vis_geometry_index_offsets[0][object_id];
@@ -763,4 +816,565 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
 
     cmd_list.set_CullMode(CULL_CCW);
 }
+
+//-----------------------------------------------------------------------------
+// Phase 5: Interactive Grass System
+//-----------------------------------------------------------------------------
+
+// Milestone 5.1: Create interaction texture atlas
+void CDetailManager::CreateInteractionAtlas()
+{
+    VERIFY(!interaction_atlas);
+    VERIFY(slot_count > 0);
+
+    Msg("* [DetailManager] Creating interaction atlas...");
+
+    // Set atlas parameters
+    atlas_width = 2048;
+    atlas_height = 2048;
+    slot_texture_size = 32;  // 32x32 pixels per slot
+
+    // We don't need to track ALL slots - only those near the camera
+    // Use a fixed-size atlas and dynamically map visible slots to atlas space
+    // For now, just use the atlas size and modulo wrap slot indices
+    u32 slots_per_row = atlas_width / slot_texture_size;
+    u32 max_atlas_slots = slots_per_row * (atlas_height / slot_texture_size);
+
+    if (slot_count > max_atlas_slots)
+    {
+        Msg("! [DetailManager] WARNING: %u world slots exceeds atlas capacity %u", slot_count, max_atlas_slots);
+        Msg("! [DetailManager] Using modulo wrapping - only slots near camera will have accurate interaction");
+        Msg("! [DetailManager] This is expected for large levels (atlas tracks ~%u slots at a time)", max_atlas_slots);
+    }
+
+    // Create 2D texture for interaction atlas
+    D3D11_TEXTURE2D_DESC tex_desc = {};
+    tex_desc.Width = atlas_width;
+    tex_desc.Height = atlas_height;
+    tex_desc.MipLevels = 1;
+    tex_desc.ArraySize = 1;
+    tex_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;  // High precision for displacement
+    tex_desc.SampleDesc.Count = 1;
+    tex_desc.SampleDesc.Quality = 0;
+    tex_desc.Usage = D3D11_USAGE_DEFAULT;
+    tex_desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    tex_desc.CPUAccessFlags = 0;
+    tex_desc.MiscFlags = 0;
+
+    CHK_DX(HW.pDevice->CreateTexture2D(&tex_desc, nullptr, &interaction_atlas));
+
+    // Create RTV
+    D3D11_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+    rtv_desc.Format = tex_desc.Format;
+    rtv_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    rtv_desc.Texture2D.MipSlice = 0;
+    CHK_DX(HW.pDevice->CreateRenderTargetView(interaction_atlas, &rtv_desc, &interaction_rtv));
+
+    // Create SRV
+    D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.Format = tex_desc.Format;
+    srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Texture2D.MostDetailedMip = 0;
+    srv_desc.Texture2D.MipLevels = 1;
+    CHK_DX(HW.pDevice->CreateShaderResourceView(interaction_atlas, &srv_desc, &interaction_srv));
+
+    // Create UAV
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc = {};
+    uav_desc.Format = tex_desc.Format;
+    uav_desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    uav_desc.Texture2D.MipSlice = 0;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(interaction_atlas, &uav_desc, &interaction_uav));
+
+    // Clear atlas to zero
+    float clear_color[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    HW.get_context(CHW::IMM_CTX_ID)->ClearRenderTargetView(interaction_rtv, clear_color);
+
+    // Compute UV mapping for atlas slots
+    // We only need UV mappings for the atlas capacity, not all world slots
+    xr_vector<Fvector4> slot_uvs;
+    u32 uv_buffer_size = std::min(slot_count, max_atlas_slots);
+    slot_uvs.resize(uv_buffer_size);
+
+    for (u32 i = 0; i < uv_buffer_size; i++)
+    {
+        u32 slot_x = i % slots_per_row;
+        u32 slot_z = i / slots_per_row;
+
+        float u_min = (slot_x * slot_texture_size) / (float)atlas_width;
+        float v_min = (slot_z * slot_texture_size) / (float)atlas_height;
+        float u_max = ((slot_x + 1) * slot_texture_size) / (float)atlas_width;
+        float v_max = ((slot_z + 1) * slot_texture_size) / (float)atlas_height;
+
+        slot_uvs[i].set(u_min, v_min, u_max, v_max);
+    }
+
+    // Create GPU buffer for slot UV mapping
+    D3D11_BUFFER_DESC buf_desc = {};
+    buf_desc.Usage = D3D11_USAGE_IMMUTABLE;
+    buf_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    buf_desc.ByteWidth = uv_buffer_size * sizeof(Fvector4);
+    buf_desc.StructureByteStride = 0;  // Not a structured buffer
+
+    D3D11_SUBRESOURCE_DATA init_data = {};
+    init_data.pSysMem = slot_uvs.data();
+
+    CHK_DX(HW.pDevice->CreateBuffer(&buf_desc, &init_data, &slot_atlas_uv_buffer));
+
+    // Create SRV for UV buffer
+    D3D11_SHADER_RESOURCE_VIEW_DESC uv_srv_desc = {};
+    uv_srv_desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    uv_srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    uv_srv_desc.Buffer.FirstElement = 0;
+    uv_srv_desc.Buffer.NumElements = uv_buffer_size;
+    CHK_DX(HW.pDevice->CreateShaderResourceView(slot_atlas_uv_buffer, &uv_srv_desc, &slot_atlas_uv_srv));
+
+    // Create sampler state for interaction and wind textures
+    D3D11_SAMPLER_DESC sampler_desc = {};
+    sampler_desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;  // Bilinear filtering
+    sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampler_desc.MipLODBias = 0.0f;
+    sampler_desc.MaxAnisotropy = 1;
+    sampler_desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampler_desc.MinLOD = 0;
+    sampler_desc.MaxLOD = 0;
+    CHK_DX(HW.pDevice->CreateSamplerState(&sampler_desc, &interaction_sampler));
+
+    float memory_mb = (atlas_width * atlas_height * 8) / (1024.0f * 1024.0f);  // RGBA16F = 8 bytes/pixel
+
+    Msg("* [DetailManager] Interaction atlas created:");
+    Msg("  - Resolution: %ux%u", atlas_width, atlas_height);
+    Msg("  - Slot texture size: %ux%u", slot_texture_size, slot_texture_size);
+    Msg("  - Atlas capacity: %u slots", max_atlas_slots);
+    Msg("  - World slots: %u (wrapping enabled for large levels)", slot_count);
+    Msg("  - VRAM usage: %.2f MB", memory_mb);
+}
+
+void CDetailManager::DestroyInteractionAtlas()
+{
+    _RELEASE(interaction_uav);
+    _RELEASE(interaction_srv);
+    _RELEASE(interaction_rtv);
+    _RELEASE(interaction_atlas);
+    _RELEASE(slot_atlas_uv_srv);
+    _RELEASE(slot_atlas_uv_buffer);
+    _RELEASE(interaction_sampler);
+}
+
+// Milestone 5.2: Create entity tracking buffers
+void CDetailManager::CreateEntityTrackingBuffers()
+{
+    VERIFY(!entity_buffer);
+
+    max_entities = 256;  // Default max entities
+
+    Msg("* [DetailManager] Creating entity tracking buffers...");
+
+    // Create dynamic structured buffer for entities
+    D3D11_BUFFER_DESC desc = {};
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    desc.StructureByteStride = sizeof(InteractiveEntity);
+    desc.ByteWidth = max_entities * sizeof(InteractiveEntity);
+
+    CHK_DX(HW.pDevice->CreateBuffer(&desc, nullptr, &entity_buffer));
+
+    // Create SRV
+    D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.Format = DXGI_FORMAT_UNKNOWN;
+    srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srv_desc.Buffer.FirstElement = 0;
+    srv_desc.Buffer.NumElements = max_entities;
+    CHK_DX(HW.pDevice->CreateShaderResourceView(entity_buffer, &srv_desc, &entity_srv));
+
+    entity_count_this_frame = 0;
+
+    Msg("* [DetailManager] Entity tracking buffers created (max %u entities)", max_entities);
+
+    // Create constant buffer for interaction compute shader
+    D3D11_BUFFER_DESC cb_desc = {};
+    cb_desc.Usage = D3D11_USAGE_DYNAMIC;
+    cb_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cb_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    struct InteractionParams
+    {
+        u32 entity_count;
+        float time;
+        float delta_time;
+        float decay_rate;
+        u32 slot_count;
+        u32 slots_per_row;
+        u32 slot_texture_size;
+        u32 atlas_width;
+    };
+    static_assert(sizeof(InteractionParams) == 32, "InteractionParams size check");
+    // D3D11 constant buffers must be multiples of 16 bytes (this one is already 32 = 16*2)
+    cb_desc.ByteWidth = ((sizeof(InteractionParams) + 15) / 16) * 16;  // Round up to next multiple of 16
+    CHK_DX(HW.pDevice->CreateBuffer(&cb_desc, nullptr, &interaction_constant_buffer));
+
+    Msg("* [DetailManager] Interaction constant buffer created");
+}
+
+void CDetailManager::DestroyEntityTrackingBuffers()
+{
+    _RELEASE(entity_srv);
+    _RELEASE(entity_buffer);
+    interactive_entities.clear();
+}
+
+// Milestone 5.4: Create wind texture
+void CDetailManager::CreateWindTexture()
+{
+    VERIFY(!wind_texture);
+
+    wind_texture_size = 512;  // 512x512 wind field
+    wind_frame_skip = 2;      // Update every 2 frames
+    wind_frame_counter = 100; // Force wind generation on first render (counter will wrap)
+
+    Msg("* [DetailManager] Creating wind texture...");
+
+    // Create 2D texture for wind field
+    D3D11_TEXTURE2D_DESC tex_desc = {};
+    tex_desc.Width = wind_texture_size;
+    tex_desc.Height = wind_texture_size;
+    tex_desc.MipLevels = 1;
+    tex_desc.ArraySize = 1;
+    tex_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;  // XYZW = wind vector + strength
+    tex_desc.SampleDesc.Count = 1;
+    tex_desc.SampleDesc.Quality = 0;
+    tex_desc.Usage = D3D11_USAGE_DEFAULT;
+    tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    tex_desc.CPUAccessFlags = 0;
+    tex_desc.MiscFlags = 0;
+
+    CHK_DX(HW.pDevice->CreateTexture2D(&tex_desc, nullptr, &wind_texture));
+
+    // Create SRV
+    D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.Format = tex_desc.Format;
+    srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Texture2D.MostDetailedMip = 0;
+    srv_desc.Texture2D.MipLevels = 1;
+    CHK_DX(HW.pDevice->CreateShaderResourceView(wind_texture, &srv_desc, &wind_srv));
+
+    // Create UAV
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc = {};
+    uav_desc.Format = tex_desc.Format;
+    uav_desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    uav_desc.Texture2D.MipSlice = 0;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(wind_texture, &uav_desc, &wind_uav));
+
+    float memory_mb = (wind_texture_size * wind_texture_size * 8) / (1024.0f * 1024.0f);
+
+    Msg("* [DetailManager] Wind texture created:");
+    Msg("  - Resolution: %ux%u", wind_texture_size, wind_texture_size);
+    Msg("  - VRAM usage: %.2f MB", memory_mb);
+
+    // Create constant buffer for wind compute shader
+    D3D11_BUFFER_DESC cb_desc = {};
+    cb_desc.Usage = D3D11_USAGE_DYNAMIC;
+    cb_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cb_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    struct WindParams
+    {
+        float time;              // 0-3
+        Fvector2 wind_direction; // 4-11
+        float wind_speed;        // 12-15
+        u32 octaves;             // 16-19
+        float lacunarity;        // 20-23
+        float gain;              // 24-27
+        float padding1;          // 28-31 (align scroll_speed to 16-byte boundary)
+        Fvector2 scroll_speed;   // 32-39
+        u32 texture_size;        // 40-43
+        u32 pad[3];              // 44-55
+    };
+    static_assert(sizeof(WindParams) == 56, "WindParams size check");
+    // D3D11 constant buffers must be multiples of 16 bytes
+    cb_desc.ByteWidth = ((sizeof(WindParams) + 15) / 16) * 16;  // Round up to next multiple of 16
+    CHK_DX(HW.pDevice->CreateBuffer(&cb_desc, nullptr, &wind_constant_buffer));
+
+    Msg("* [DetailManager] Wind constant buffer created");
+}
+
+void CDetailManager::DestroyWindTexture()
+{
+    _RELEASE(wind_uav);
+    _RELEASE(wind_srv);
+    _RELEASE(wind_texture);
+}
+
+// Milestone 5.2: Update entity tracking (gather entities and upload to GPU)
+void CDetailManager::UpdateInteractiveEntities()
+{
+    if (!entity_buffer)
+        return;
+
+    interactive_entities.clear();
+
+    // Track camera/player with velocity
+    static Fvector last_camera_pos = Device.vCameraPosition;
+    Fvector camera_velocity;
+    camera_velocity.sub(Device.vCameraPosition, last_camera_pos);
+    camera_velocity.mul(1.0f / Device.fTimeDelta);  // Convert to velocity (m/s)
+    last_camera_pos = Device.vCameraPosition;
+
+    InteractiveEntity camera_entity;
+    camera_entity.position = Device.vCameraPosition;
+    camera_entity.radius = 0.8f;      // 0.8m interaction radius
+    camera_entity.velocity = camera_velocity;
+    camera_entity.weight = 1.0f;      // Full weight
+    camera_entity.padding[0] = 0.0f;
+    camera_entity.padding[1] = 0.0f;
+
+    interactive_entities.push_back(camera_entity);
+
+    // TODO: Expand to full game object tracking
+    // To implement:
+    // 1. Get player entity: g_pGameLevel->CurrentViewEntity() or similar
+    // 2. Query nearby objects: g_pGameLevel->ObjectSpace.GetNearest(...)
+    // 3. Filter to NPCs, physics objects, etc.
+    // 4. Extract position, velocity, mass for each
+    // Example pseudocode:
+    /*
+    if (g_pGameLevel)
+    {
+        // Get all objects within grass render distance
+        xr_vector<CObject*> nearby_objects;
+        g_pGameLevel->ObjectSpace.GetNearest(
+            nearby_objects,
+            Device.vCameraPosition,
+            fade_distance,
+            nullptr
+        );
+
+        for (CObject* obj : nearby_objects)
+        {
+            if (CGameObject* go = smart_cast<CGameObject*>(obj))
+            {
+                // Filter to interactive types (actors, NPCs, physics)
+                if (go->getEnabled() &&
+                    (go->CLS_ID == CLSID_OBJECT_ACTOR ||
+                     go->CLS_ID == CLSID_OBJECT_PHYSIC ||
+                     go->CLS_ID == CLSID_AI_STALKER))
+                {
+                    InteractiveEntity e;
+                    e.position = go->Position();
+                    e.radius = go->Radius();
+                    e.velocity = go->velocity();
+                    e.weight = std::min(go->GetMass() / 100.0f, 1.0f);
+                    e.padding[0] = 0.0f;
+                    e.padding[1] = 0.0f;
+                    interactive_entities.push_back(e);
+
+                    if (interactive_entities.size() >= max_entities)
+                        break;
+                }
+            }
+        }
+    }
+    */
+
+    entity_count_this_frame = interactive_entities.size();
+
+    // Upload to GPU
+    if (entity_count_this_frame > 0 && entity_count_this_frame <= max_entities)
+    {
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        HRESULT hr = HW.get_context(CHW::IMM_CTX_ID)->Map(entity_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+        if (SUCCEEDED(hr))
+        {
+            memcpy(mapped.pData, interactive_entities.data(),
+                   entity_count_this_frame * sizeof(InteractiveEntity));
+            HW.get_context(CHW::IMM_CTX_ID)->Unmap(entity_buffer, 0);
+        }
+    }
+}
+
+// Milestone 5.3: Render interactions (dispatch interaction compute shader)
+void CDetailManager::RenderInteractions(CBackend& cmd_list)
+{
+    if (!interaction_atlas || entity_count_this_frame == 0)
+        return;
+
+    if (!interaction_compute_shader)
+    {
+        Msg("! [DetailManager] Interaction compute shader not loaded!");
+        return;
+    }
+
+    static bool first_run = true;
+    if (first_run)
+    {
+        Msg("* [DetailManager] RenderInteractions: %u entities, %u slots", entity_count_this_frame, slot_count);
+        first_run = false;
+    }
+
+    auto context = HW.get_context(CHW::IMM_CTX_ID);
+
+    // Set compute shader
+    context->CSSetShader(interaction_compute_shader->sh, nullptr, 0);
+
+    // Update constant buffer
+    struct InteractionParams
+    {
+        u32 entity_count;
+        float time;
+        float delta_time;
+        float decay_rate;
+        u32 slot_count;
+        u32 slots_per_row;
+        u32 slot_texture_size;
+        u32 atlas_width;
+    };
+
+    InteractionParams params;
+    params.entity_count = entity_count_this_frame;
+    params.time = Device.fTimeGlobal;
+    params.delta_time = Device.fTimeDelta;
+    params.decay_rate = powf(0.05f, Device.fTimeDelta);  // 95% remaining per second
+    params.slot_count = slot_count;
+    params.slots_per_row = atlas_width / slot_texture_size;
+    params.slot_texture_size = slot_texture_size;
+    params.atlas_width = atlas_width;
+
+    // Upload constant buffer
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    CHK_DX(context->Map(interaction_constant_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
+    memcpy(mapped.pData, &params, sizeof(params));
+    context->Unmap(interaction_constant_buffer, 0);
+
+    // Bind resources
+    context->CSSetConstantBuffers(0, 1, &interaction_constant_buffer);
+    context->CSSetShaderResources(0, 1, &entity_srv);
+    context->CSSetShaderResources(1, 1, &slot_aabb_srv);
+    context->CSSetUnorderedAccessViews(0, 1, &interaction_uav, nullptr);
+
+    // Dispatch: Cover entire atlas texture with 32×32 thread groups
+    u32 num_groups_x = (atlas_width + 31) / 32;
+    u32 num_groups_y = (atlas_height + 31) / 32;
+    context->Dispatch(num_groups_x, num_groups_y, 1);
+
+    // Unbind resources
+    ID3DShaderResourceView* nullSRV[2] = {nullptr, nullptr};
+    ID3DUnorderedAccessView* nullUAV[1] = {nullptr};
+    context->CSSetShaderResources(0, 2, nullSRV);
+    context->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
+    context->CSSetShader(nullptr, nullptr, 0);
+}
+
+// Milestone 5.4: Update wind (dispatch wind FBM compute shader)
+void CDetailManager::UpdateWind(CBackend& cmd_list)
+{
+    Msg("* [DetailManager] UpdateWind CALLED");
+
+    if (!wind_texture)
+    {
+        Msg("! [DetailManager] UpdateWind: wind_texture is NULL!");
+        return;
+    }
+
+    if (!wind_compute_shader)
+    {
+        Msg("! [DetailManager] UpdateWind: wind_compute_shader is NULL!");
+        return;
+    }
+
+    // Update wind parameters from environment
+    #ifndef _EDITOR
+    if (g_pGamePersistent)
+    {
+        wind_speed = g_pGamePersistent->Environment().wind_strength_factor;
+    }
+    else
+    {
+        wind_speed = 0.5f;  // Default wind speed
+    }
+    #else
+    wind_speed = 0.5f;  // Editor default
+    #endif
+
+    // Use default wind direction (east) - TODO: Get from environment if available
+    wind_direction.set(1.0f, 0.0f);
+
+    // TEMPORARILY DISABLED: Frame skip logic - update every frame for testing
+    // wind_frame_counter++;
+    // if (wind_frame_counter < wind_frame_skip)
+    //     return;
+    // wind_frame_counter = 0;
+
+    auto context = HW.get_context(CHW::IMM_CTX_ID);
+
+    // Set compute shader
+    context->CSSetShader(wind_compute_shader->sh, nullptr, 0);
+
+    // Update constant buffer
+    // IMPORTANT: Match HLSL constant buffer packing rules (16-byte alignment)
+    struct WindParams
+    {
+        float time;              // 0-3
+        Fvector2 wind_direction; // 4-11
+        float wind_speed;        // 12-15
+        u32 octaves;             // 16-19
+        float lacunarity;        // 20-23
+        float gain;              // 24-27
+        float padding1;          // 28-31 (align scroll_speed to 16-byte boundary)
+        Fvector2 scroll_speed;   // 32-39
+        u32 texture_size;        // 40-43
+        u32 pad[3];              // 44-55
+    };
+
+    WindParams params;
+    memset(&params, 0, sizeof(params));  // Zero initialize
+    params.time = Device.fTimeGlobal;
+    params.wind_direction = wind_direction;
+    params.wind_speed = wind_speed;
+    params.octaves = 5;
+    params.lacunarity = 2.0f;
+    params.gain = 0.5f;
+    params.scroll_speed.x = wind_direction.x * wind_speed * 5.0f;  // Increased from 0.1 to 5.0 for visible movement
+    params.scroll_speed.y = wind_direction.y * wind_speed * 5.0f;
+    params.texture_size = wind_texture_size;
+
+    // Upload constant buffer
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    CHK_DX(context->Map(wind_constant_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
+    memcpy(mapped.pData, &params, sizeof(params));
+    context->Unmap(wind_constant_buffer, 0);
+
+    // Bind resources
+    context->CSSetConstantBuffers(0, 1, &wind_constant_buffer);
+    context->CSSetUnorderedAccessViews(0, 1, &wind_uav, nullptr);
+
+    // Dispatch: 16×16 thread groups to cover 512×512 texture
+    u32 num_groups = (wind_texture_size + 15) / 16;
+    context->Dispatch(num_groups, num_groups, 1);
+
+    // DEBUG: Log once per second to verify continuous updates
+    static u32 last_log_frame = 0;
+    if (Device.dwFrame - last_log_frame > 60)  // Every ~1 second at 60fps
+    {
+        Msg("* [DetailManager] UpdateWind: Dispatched at frame %u, time=%.2f", Device.dwFrame, Device.fTimeGlobal);
+        last_log_frame = Device.dwFrame;
+    }
+
+    // Unbind resources
+    ID3DUnorderedAccessView* nullUAV[1] = {nullptr};
+    context->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
+    context->CSSetShader(nullptr, nullptr, 0);
+
+    // Debug: Log wind update
+    static u32 wind_update_count = 0;
+    wind_update_count++;
+    if (wind_update_count % 60 == 0)  // Log every 60 updates
+    {
+        Msg("* [DetailManager] UpdateWind: Generating FBM wind (speed=%.2f, dir=(%.2f, %.2f))",
+            wind_speed, wind_direction.x, wind_direction.y);
+    }
+}
+
 } // namespace xray::render::RENDER_NAMESPACE

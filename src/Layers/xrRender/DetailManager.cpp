@@ -137,6 +137,34 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     slot_count = 0;
     slot_aabb_buffer = nullptr;
     slot_aabb_srv = nullptr;
+
+    // Phase 5: Interactive grass system
+    interaction_atlas = nullptr;
+    interaction_rtv = nullptr;
+    interaction_srv = nullptr;
+    interaction_uav = nullptr;
+    slot_atlas_uv_buffer = nullptr;
+    slot_atlas_uv_srv = nullptr;
+    atlas_width = 0;
+    atlas_height = 0;
+    slot_texture_size = 0;
+
+    entity_buffer = nullptr;
+    entity_srv = nullptr;
+    max_entities = 0;
+    entity_count_this_frame = 0;
+
+    interaction_constant_buffer = nullptr;
+
+    wind_texture = nullptr;
+    wind_srv = nullptr;
+    wind_uav = nullptr;
+    wind_constant_buffer = nullptr;
+    wind_texture_size = 0;
+    wind_speed = 0.3f;
+    wind_direction.set(1.0f, 0.0f);
+    wind_frame_skip = 2;
+    wind_frame_counter = 0;
 #endif
 
     cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
@@ -262,6 +290,11 @@ void CDetailManager::Load()
 
         // Phase 2.1: Create GPU culling infrastructure
         CreateGPUCullingBuffers();
+
+        // Phase 5: Create interactive grass buffers
+        CreateInteractionAtlas();
+        CreateEntityTrackingBuffers();
+        CreateWindTexture();
     }
 #endif
 
@@ -472,7 +505,15 @@ void CDetailManager::Render(CBackend& cmd_list)
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
     if (UseVS())
+    {
+#ifdef USE_DX11
+        // Phase 5: Update interactive grass system
+        UpdateInteractiveEntities();
+        UpdateWind(cmd_list);
+        RenderInteractions(cmd_list);
+#endif
         hw_Render(cmd_list);
+    }
     else
         soft_Render();
     cmd_list.set_CullMode(CULL_CCW);
