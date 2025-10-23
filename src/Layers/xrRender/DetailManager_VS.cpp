@@ -279,8 +279,11 @@ void CDetailManager::hw_Unload()
     _RELEASE(interaction_constant_buffer);
     _RELEASE(wind_constant_buffer);
 
-    // Phase 6: Shutdown page table (NEW)
+    // Phase 6: Shutdown page table
     ShutdownPageTable();
+
+    // Phase 6B: Shutdown visibility readback
+    ShutdownVisibilityReadback();
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -296,6 +296,9 @@ void CDetailManager::Load()
 
         // Phase 6: Initialize page table (NEW)
         InitializePageTable();
+
+        // Phase 6B: Initialize visibility readback
+        InitializeVisibilityReadback();
     }
 #endif
 

@@ -70,6 +70,10 @@ RWStructuredBuffer<InstanceData> g_visible_obj15 : register(u15);
 // Atomic counter buffer (one u32 per object type, up to 64 objects)
 RWByteAddressBuffer g_visible_counts : register(u16);
 
+// Phase 6B: Output buffer for visible slot IDs (for page table system)
+RWStructuredBuffer<uint> g_visible_slot_ids : register(u33);  // Append visible slots here
+RWByteAddressBuffer g_visible_slot_counter : register(u34);  // Atomic counter (ByteAddressBuffer for InterlockedAdd)
+
 // Phase 2.2.1: Indirect draw args buffers (one per object)
 // D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS:
 // struct { u32 IndexCount; u32 InstanceCount; u32 StartIndex; s32 BaseVertex; u32 StartInstance; }
@@ -229,6 +233,15 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
     if (!AABBDistanceTest(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
         return;
+
+    // Phase 6B: Record that this slot is visible (for page table system)
+    uint insert_index = 0;
+    g_visible_slot_counter.InterlockedAdd(0, 1, insert_index);
+
+    if (insert_index < 8192)  // MAX_VISIBLE_SLOTS guard
+    {
+        g_visible_slot_ids[insert_index] = slot_idx;
+    }
 
     for (uint i = 0; i < slot.instance_count; i++)
     {

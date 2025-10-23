@@ -367,6 +367,38 @@ public:
         uint32_t current_resident;
     } page_table_stats;
 
+    // Phase 6B: Visibility-driven page requests
+    ID3D11Buffer* visible_slots_readback;
+    ID3D11Query* readback_query;
+
+    static const uint32_t MAX_VISIBLE_SLOTS = 8192;  // Conservative estimate
+    xr_vector<uint32_t> visible_slots_cache;         // CPU copy of visible slots
+    uint32_t visible_slot_count;                      // How many visible this frame
+
+    // Upload queue for page promotion
+    struct PageUploadRequest {
+        uint32_t logical_slot;
+        uint8_t priority;           // 0-255, higher = more urgent
+        uint64_t request_frame;
+
+        bool operator<(const PageUploadRequest& other) const {
+            return priority < other.priority;  // Priority queue sorts by highest
+        }
+    };
+    std::priority_queue<PageUploadRequest> upload_queue;
+    uint32_t max_uploads_per_frame;  // Default: 16
+
+    // GPU-side visible slot tracking
+    ID3D11Buffer* visible_slot_ids_gpu;          // GPU output buffer
+    ID3D11UnorderedAccessView* visible_slot_ids_uav;
+    ID3D11Buffer* visible_slot_counter_gpu;      // Atomic counter
+    ID3D11UnorderedAccessView* visible_slot_counter_uav;
+
+    // Upload pipeline (data transfer CPU→GPU)
+    static const uint32_t STAGING_BUFFER_SIZE = 2 * 1024 * 1024;  // 2 MB
+    ID3D11Buffer* upload_staging_buffer;
+    uint8_t* staging_buffer_mapped;  // Persistent map pointer
+
 #endif
 
     ref_constant hwc_consts;
@@ -441,6 +473,14 @@ public:
     void UpdateIndirectionBuffer(CBackend& cmd_list);
     void ResetPageTableStats();
     void PrintPageTableStats();
+
+    // Phase 6B: Visibility integration
+    void InitializeVisibilityReadback();
+    void ShutdownVisibilityReadback();
+    void ReadVisibleSlotsFromGPU();
+    void ProcessUploadQueue();
+    void RequestVisiblePages();
+    void RequestPageWithPriority(uint32_t logical_slot, uint8_t priority);
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
