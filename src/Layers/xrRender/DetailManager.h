@@ -400,6 +400,63 @@ public:
     ID3D11Buffer* upload_staging_buffer;
     uint8_t* staging_buffer_mapped;  // Persistent map pointer
 
+    // Phase 3 (Week 5-6): A-Life integration with deferred updates
+    struct PendingInteractionUpdate {
+        uint32_t logical_slot;        // 4 bytes
+        Fvector world_position;       // 12 bytes (3 floats)
+        float radius;                 // 4 bytes
+        float strength;               // 4 bytes
+        uint64_t timestamp;           // 8 bytes (8-byte aligned)
+        uint8_t interaction_type;     // 1 byte
+        uint8_t padding[7];           // Pad to 40 bytes (8-byte alignment)
+    };
+    static_assert(sizeof(PendingInteractionUpdate) == 40, "PendingInteractionUpdate size check");
+
+    xr_vector<PendingInteractionUpdate> pending_updates;
+    uint32_t max_pending_updates;    // Default: 4096
+
+    // Thread-safe queue for A-Life requests from other threads
+    struct ThreadSafeInteractionRequest {
+        Fvector world_position;
+        float radius;
+        float strength;
+        uint8_t type;
+        uint8_t padding[3];
+    };
+    xr_vector<ThreadSafeInteractionRequest> threadsafe_request_queue;
+    Lock threadsafe_queue_lock;
+
+    // Priority thresholds
+    static const uint8_t PRIORITY_VISIBLE = 255;      // Visible slots
+    static const uint8_t PRIORITY_DIRTY = 128;        // Slots with pending updates
+    static const uint8_t PRIORITY_PREFETCH = 64;      // Adjacent to visible
+    static const uint8_t PRIORITY_ALIFE = 32;         // Generic A-Life activity
+
+    // Statistics
+    struct ALifeUpdateStats {
+        uint64_t total_updates_requested;
+        uint64_t immediate_updates;      // Slot was resident
+        uint64_t deferred_updates;       // Slot not resident
+        uint64_t applied_deferred;       // Deferred update later applied
+        uint64_t expired_updates;        // Too old, discarded
+    } alife_stats;
+
+    // Interaction update compute shader
+    ref_cs interaction_update_cs;
+
+    struct InteractionUpdateCB {
+        Fvector2 world_center;        // 8 bytes (2 floats)
+        float radius;                 // 4 bytes
+        float strength;               // 4 bytes
+        uint32_t physical_page;       // 4 bytes
+        float slot_size;              // 4 bytes
+        float atlas_width;            // 4 bytes
+        float slot_texture_size;      // 4 bytes
+    };
+    static_assert(sizeof(InteractionUpdateCB) == 32, "InteractionUpdateCB size check");
+
+    ID3D11Buffer* interaction_update_cb;
+
 #endif
 
     ref_constant hwc_consts;
@@ -482,7 +539,21 @@ public:
     void ProcessUploadQueue();
     void RequestVisiblePages();
     void RequestPageWithPriority(uint32_t logical_slot, uint8_t priority);
+
+    // Phase 3 (Week 5-6): A-Life interaction
+
+    void ProcessThreadSafeRequests(); // Called on render thread
+    void ProcessPendingUpdates();
+    void ApplyPendingUpdatesToSlot(uint32_t logical_slot);
+    void ExpireOldPendingUpdates(uint64_t max_age_frames);
+    void ApplyInteractionUpdateGPU(uint32_t physical_page, const Fvector& world_center, float radius, float strength);
+    bool IsSlotDirty(uint32_t logical_slot) const;
+    void ResetALifeStats();
+    void PrintALifeStats();
 #endif
+    void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0); // Main thread only
+    void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0); // Thread-safe version
+
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
     int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }

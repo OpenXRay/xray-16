@@ -114,8 +114,8 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
     float4 current = g_interaction_atlas[atlas_pixel];
 
     // Decay existing displacement
-    current.rg *= g_decay_rate;
-    current.b *= g_decay_rate;
+    // current.rg *= g_decay_rate;
+    // current.b *= g_decay_rate;
     current.a += g_delta_time;  // Age tracker
 
     // Apply entity interactions

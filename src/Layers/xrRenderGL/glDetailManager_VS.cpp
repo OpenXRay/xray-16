@@ -211,4 +211,20 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
         iOffset += hw_BatchSize * Object.number_indices;
     }
 }
+
+void CDetailManager::RequestInteractionUpdate(
+    const Fvector& world_pos,
+    float radius,
+    float strength,
+    uint8_t type)
+{
+}
+
+void CDetailManager::RequestInteractionUpdateThreadSafe(
+    const Fvector& world_pos,
+    float radius,
+    float strength,
+    uint8_t type)
+{
+}
 } // namespace xray::render::RENDER_NAMESPACE

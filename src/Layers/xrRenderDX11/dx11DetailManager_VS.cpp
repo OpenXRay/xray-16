@@ -87,6 +87,23 @@ void CDetailManager::hw_Load_Shaders()
         Msg("* [DetailManager] Loaded wind compute shader: OK");
     else
         Msg("! [DetailManager] Failed to load wind compute shader!");
+
+    // Phase 3: Load interaction update shader (for deferred A-Life updates)
+    interaction_update_cs.create("detail_interaction_apply");
+
+    if (interaction_update_cs && interaction_update_cs->sh)
+        Msg("* [DetailManager] Loaded interaction update shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load interaction update shader!");
+
+    // Create constant buffer for interaction updates
+    D3D11_BUFFER_DESC cbDesc = {};
+    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cbDesc.ByteWidth = sizeof(InteractionUpdateCB);
+
+    CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &interaction_update_cb));
 }
 
 // Phase 2.0.3: Create persistent GPU buffer for all level instances
@@ -487,6 +504,9 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
 
     // Reset detail count
     RImplementation.BasicStats.DetailCount = 0;
+
+    // Phase 3: Process thread-safe interaction requests from A-Life thread (NEW)
+    ProcessThreadSafeRequests();
 
     // Phase 6: Update page table each frame (NEW)
     UpdatePageTable();
@@ -953,6 +973,10 @@ void CDetailManager::DestroyInteractionAtlas()
     _RELEASE(slot_atlas_uv_srv);
     _RELEASE(slot_atlas_uv_buffer);
     _RELEASE(interaction_sampler);
+
+    // Phase 3: Release interaction update resources
+    interaction_update_cs.destroy();
+    _RELEASE(interaction_update_cb);
 }
 
 // Milestone 5.2: Create entity tracking buffers
@@ -1480,8 +1504,14 @@ void CDetailManager::InitializeVisibilityReadback()
     CHK_DX(HW.get_context(CHW::IMM_CTX_ID)->Map(upload_staging_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
     staging_buffer_mapped = (uint8_t*)mapped.pData;
 
+    // Phase 3: Initialize A-Life integration
+    pending_updates.reserve(4096);
+    max_pending_updates = 4096;
+    ResetALifeStats();
+
     Msg("* [DetailManager] Visibility readback initialized (max %u slots, %u MB staging)",
         MAX_VISIBLE_SLOTS, STAGING_BUFFER_SIZE / (1024*1024));
+    Msg("* [DetailManager] A-Life integration initialized (max %u pending updates)", max_pending_updates);
 }
 
 void CDetailManager::ShutdownVisibilityReadback()
@@ -1512,7 +1542,12 @@ void CDetailManager::ShutdownVisibilityReadback()
         upload_queue.pop();
     }
 
+    // Phase 3: Clear pending updates
+    pending_updates.clear();
+    pending_updates.shrink_to_fit();
+
     Msg("* [DetailManager] Visibility readback shutdown complete");
+    Msg("* [DetailManager] A-Life integration shutdown complete");
 }
 
 void CDetailManager::ReadVisibleSlotsFromGPU()
@@ -1804,6 +1839,9 @@ void CDetailManager::PromotePage(uint32_t logical_slot, uint16_t physical_page)
     // TODO Phase 2: Upload slot data from disk/warm cache
     // For now, just allocate the page (will be zero/garbage)
 
+    // Phase 3: Apply any pending A-Life updates for this slot
+    ApplyPendingUpdatesToSlot(logical_slot);
+
     // Msg("* [DetailManager] Promoted slot %u to physical page %u", logical_slot, physical_page);
 }
 
@@ -1911,7 +1949,6 @@ void CDetailManager::UpdatePageTable()
 
     // 3. IMPORTANT: Also request pages for slots containing interactive entities
     // (entities may be behind camera, not visible, but still need interaction pages loaded)
-    const float slot_size = 2.0f;  // DETAIL_SLOT_SIZE
     int x_offs = dtH.x_offs();
     int z_offs = dtH.z_offs();
     uint32_t x_size = dtH.x_size();
@@ -1919,8 +1956,8 @@ void CDetailManager::UpdatePageTable()
 
     for (const auto& entity : interactive_entities) {
         // Calculate which slot this entity is in
-        int slot_x = int(floorf(entity.position.x / slot_size));
-        int slot_z = int(floorf(entity.position.z / slot_size));
+        int slot_x = int(floorf(entity.position.x / DETAIL_SLOT_SIZE));
+        int slot_z = int(floorf(entity.position.z / DETAIL_SLOT_SIZE));
 
         // Convert to slot array index
         int sx_local = slot_x + x_offs;
@@ -1934,6 +1971,9 @@ void CDetailManager::UpdatePageTable()
             }
         }
     }
+
+    // Phase 3: Process pending A-Life updates
+    ProcessPendingUpdates();
 
     // 4. Process upload queue (promote up to N pages this frame)
     ProcessUploadQueue();
@@ -1956,6 +1996,308 @@ void CDetailManager::UpdatePageTable()
 
         last_log_frame = Device.dwFrame;
         last_visible_count = visible_slot_count;
+    }
+}
+
+// ===========================================================================================
+// Phase 3 (Week 5-6): A-Life Integration with Deferred Updates
+// ===========================================================================================
+
+void CDetailManager::ResetALifeStats()
+{
+    alife_stats.total_updates_requested = 0;
+    alife_stats.immediate_updates = 0;
+    alife_stats.deferred_updates = 0;
+    alife_stats.applied_deferred = 0;
+    alife_stats.expired_updates = 0;
+}
+
+void CDetailManager::PrintALifeStats()
+{
+    Msg("=== A-Life Integration Statistics ===");
+    Msg("Total Requests:   %llu", alife_stats.total_updates_requested);
+    Msg("Immediate:        %llu (%.1f%%)",
+        alife_stats.immediate_updates,
+        100.0f * alife_stats.immediate_updates / std::max(1ull, alife_stats.total_updates_requested));
+    Msg("Deferred:         %llu (%.1f%%)",
+        alife_stats.deferred_updates,
+        100.0f * alife_stats.deferred_updates / std::max(1ull, alife_stats.total_updates_requested));
+    Msg("Applied Deferred: %llu", alife_stats.applied_deferred);
+    Msg("Expired:          %llu", alife_stats.expired_updates);
+    Msg("Pending Queue:    %zu", pending_updates.size());
+    Msg("====================================");
+}
+
+bool CDetailManager::IsSlotDirty(uint32_t logical_slot) const
+{
+    if (logical_slot >= slot_count) return false;
+
+    // Check page table dirty bit
+    if (IsPageResident(logical_slot) && page_table[logical_slot].dirty_bit) {
+        return true;
+    }
+
+    // Check pending updates queue
+    for (const auto& update : pending_updates) {
+        if (update.logical_slot == logical_slot) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void CDetailManager::RequestInteractionUpdate(
+    const Fvector& world_pos,
+    float radius,
+    float strength,
+    uint8_t type)
+{
+    alife_stats.total_updates_requested++;
+
+    // 1. Compute which slot this position is in
+    // Note: using your existing slot_size and slot grid setup
+    const float slot_half = DETAIL_SLOT_SIZE_2;
+    uint32_t slot_x = uint32_t((world_pos.x + slot_half) / DETAIL_SLOT_SIZE);
+    uint32_t slot_z = uint32_t((world_pos.z + slot_half) / DETAIL_SLOT_SIZE);
+
+    // Convert to slot index (Note: adapt this based on your actual slot indexing)
+    // This assumes slots are indexed row-major: slot_idx = slot_z * width + slot_x
+    // You may need to adjust based on how slot_aabbs are indexed
+    uint32_t logical_slot = slot_z * 600 + slot_x;  // FIXME: Use actual world grid dimensions
+
+    if (logical_slot >= slot_count) {
+        return;  // Out of bounds
+    }
+
+    // 2. Check if slot is resident
+    if (IsPageResident(logical_slot)) {
+        // Immediate update - slot is in atlas
+        alife_stats.immediate_updates++;
+
+        // Get physical page
+        uint16_t physical_page = page_table[logical_slot].physical_page;
+
+        // Apply update via GPU compute shader
+        ApplyInteractionUpdateGPU(physical_page, world_pos, radius, strength);
+
+        // Mark page dirty (needs writeback eventually)
+        page_table[logical_slot].dirty_bit = 1;
+
+        Msg("* [A-Life] IMMEDIATE update at slot %u (phys page %u) - pos (%.1f, %.1f, %.1f) r=%.2f s=%.2f",
+            logical_slot, physical_page, world_pos.x, world_pos.y, world_pos.z, radius, strength);
+
+    } else {
+        // Deferred update - slot not resident yet
+        alife_stats.deferred_updates++;
+
+        // Add to pending queue
+        PendingInteractionUpdate pending;
+        pending.logical_slot = logical_slot;
+        pending.world_position = world_pos;
+        pending.radius = radius;
+        pending.strength = strength;
+        pending.timestamp = Device.dwFrame;
+        pending.interaction_type = type;
+
+        pending_updates.push_back(pending);
+
+        // Trim queue if too large (FIFO)
+        if (pending_updates.size() > max_pending_updates) {
+            pending_updates.erase(pending_updates.begin());
+            alife_stats.expired_updates++;
+        }
+
+        // Request page with DIRTY priority (higher than normal, lower than visible)
+        RequestPageWithPriority(logical_slot, PRIORITY_DIRTY);
+
+        Msg("* [A-Life] DEFERRED update queued for slot %u - pos (%.1f, %.1f, %.1f) r=%.2f s=%.2f (queue size: %zu)",
+            logical_slot, world_pos.x, world_pos.y, world_pos.z, radius, strength, pending_updates.size());
+    }
+}
+
+void CDetailManager::ExpireOldPendingUpdates(uint64_t max_age_frames)
+{
+    uint64_t current_frame = Device.dwFrame;
+    uint32_t expired_count = 0;
+
+    auto it = pending_updates.begin();
+    while (it != pending_updates.end()) {
+        uint64_t age = current_frame - it->timestamp;
+
+        if (age > max_age_frames) {
+            // Too old - discard
+            alife_stats.expired_updates++;
+            expired_count++;
+            it = pending_updates.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    if (expired_count > 0) {
+        Msg("* [A-Life] Expired %u old pending updates (age > %llu frames, queue remaining: %zu)",
+            expired_count, max_age_frames, pending_updates.size());
+    }
+}
+
+void CDetailManager::ApplyPendingUpdatesToSlot(uint32_t logical_slot)
+{
+    if (!IsPageResident(logical_slot)) {
+        return;  // Can't apply - slot not loaded yet
+    }
+
+    // Get physical page
+    uint16_t physical_page = page_table[logical_slot].physical_page;
+
+    // Find all pending updates for this slot
+    uint32_t applied_count = 0;
+    auto it = pending_updates.begin();
+    while (it != pending_updates.end()) {
+        if (it->logical_slot == logical_slot) {
+            // Found matching update - apply it
+            ApplyInteractionUpdateGPU(
+                physical_page,
+                it->world_position,
+                it->radius,
+                it->strength);
+
+            alife_stats.applied_deferred++;
+            applied_count++;
+
+            Msg("* [A-Life] APPLIED deferred update #%u to slot %u (phys page %u) - pos (%.1f, %.1f, %.1f)",
+                applied_count, logical_slot, physical_page,
+                it->world_position.x, it->world_position.y, it->world_position.z);
+
+            // Remove from pending queue
+            it = pending_updates.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    // Mark page dirty if we applied anything
+    if (applied_count > 0) {
+        page_table[logical_slot].dirty_bit = 1;
+        Msg("* [A-Life] Applied %u deferred updates to slot %u (queue remaining: %zu)",
+            applied_count, logical_slot, pending_updates.size());
+    }
+}
+
+void CDetailManager::ProcessPendingUpdates()
+{
+    // 1. Expire old pending updates (>30 seconds = ~1800 frames at 60fps)
+    ExpireOldPendingUpdates(1800);
+
+    // 2. Request pages for dirty slots (if not already in queue)
+    // Use a set to get unique dirty slots
+    xr_set<uint32_t> dirty_slots;
+    for (const auto& update : pending_updates) {
+        dirty_slots.insert(update.logical_slot);
+    }
+
+    for (uint32_t slot : dirty_slots) {
+        if (!IsPageResident(slot)) {
+            // Request with DIRTY priority (lower than visible, but still important)
+            RequestPageWithPriority(slot, PRIORITY_DIRTY);
+        }
+    }
+}
+
+void CDetailManager::ApplyInteractionUpdateGPU(
+    uint32_t physical_page,
+    const Fvector& world_center,
+    float radius,
+    float strength)
+{
+    if (!interaction_update_cs || !interaction_update_cs->sh) {
+        return;  // Shader not loaded
+    }
+
+    if (!interaction_atlas || !interaction_uav) {
+        return;  // Atlas not created
+    }
+
+    // 1. Fill constant buffer
+    InteractionUpdateCB cb_data;
+    cb_data.world_center = Fvector2().set(world_center.x, world_center.z);
+    cb_data.radius = radius;
+    cb_data.strength = strength;
+    cb_data.physical_page = physical_page;
+    cb_data.slot_size = DETAIL_SLOT_SIZE;  // Your existing member (DETAIL_SLOT_SIZE = 2.0)
+    cb_data.atlas_width = (float)atlas_width;  // 2048
+    cb_data.slot_texture_size = (float)slot_texture_size;  // 32
+
+    // 2. Map and update constant buffer
+    auto* context = HW.get_context(CHW::IMM_CTX_ID);
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    HRESULT hr = context->Map(interaction_update_cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+    if (FAILED(hr)) {
+        Msg("! [A-Life] Failed to map interaction update CB");
+        return;
+    }
+
+    memcpy(mapped.pData, &cb_data, sizeof(cb_data));
+    context->Unmap(interaction_update_cb, 0);
+
+    // 3. Bind resources
+    ID3D11ComputeShader* cs = interaction_update_cs->sh;
+    context->CSSetShader(cs, nullptr, 0);
+    context->CSSetConstantBuffers(0, 1, &interaction_update_cb);
+    context->CSSetUnorderedAccessViews(0, 1, &interaction_uav, nullptr);
+
+    // 4. Dispatch (4×4 thread groups for 32×32 slot with 8×8 threads per group)
+    context->Dispatch(4, 4, 1);
+
+    // 5. Unbind UAV (important - grass shaders will sample this as SRV)
+    ID3D11UnorderedAccessView* null_uav = nullptr;
+    context->CSSetUnorderedAccessViews(0, 1, &null_uav, nullptr);
+
+    // Optional: Add debug logging (disabled by default for performance)
+    // Msg("* [A-Life] Applied GPU interaction update to physical page %u", physical_page);
+}
+
+// ===========================================================================================
+// Thread-Safe A-Life Integration (for calls from A-Life thread)
+// ===========================================================================================
+
+void CDetailManager::RequestInteractionUpdateThreadSafe(
+    const Fvector& world_pos,
+    float radius,
+    float strength,
+    uint8_t type)
+{
+    // Queue the request to be processed on the render thread
+    ThreadSafeInteractionRequest request;
+    request.world_position = world_pos;
+    request.radius = radius;
+    request.strength = strength;
+    request.type = type;
+
+    threadsafe_queue_lock.Enter();
+    threadsafe_request_queue.push_back(request);
+    threadsafe_queue_lock.Leave();
+}
+
+void CDetailManager::ProcessThreadSafeRequests()
+{
+    // Called on render thread - process all queued requests
+    if (threadsafe_request_queue.empty())
+        return;
+
+    threadsafe_queue_lock.Enter();
+
+    // Copy and clear the queue
+    xr_vector<ThreadSafeInteractionRequest> requests_copy;
+    requests_copy.swap(threadsafe_request_queue);
+
+    threadsafe_queue_lock.Leave();
+
+    // Process all requests (now safe - we're on render thread)
+    for (const auto& req : requests_copy)
+    {
+        RequestInteractionUpdate(req.world_position, req.radius, req.strength, req.type);
     }
 }
 

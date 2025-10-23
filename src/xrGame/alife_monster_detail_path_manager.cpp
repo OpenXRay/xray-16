@@ -206,6 +206,18 @@ void CALifeMonsterDetailPathManager::follow_path(const ALife::_TIME_ID& time_del
         m_walked_distance = 0.f;
         object().get_object().m_tNodeID = m_destination.m_level_vertex_id;
         object().get_object().o_Position = m_destination.m_position;
+
+        // Phase 3: Offline A-Life grass interaction
+        // When an offline entity reaches its destination, notify the grass system
+        if (GEnv.Render)
+        {
+            // Estimate entity radius from bounding box (conservative estimate)
+            float radius = 0.5f; // Default footprint radius for offline entities
+            float strength = 0.6f; // Reduced strength for offline entities (not as impactful as online)
+
+            GEnv.Render->RequestGrassInteraction(m_destination.m_position, radius, strength, 0);
+        }
+
 #ifdef DEBUG
         object().m_fDistanceFromPoint = 0.f;
         object().m_fDistanceToPoint = 0.f;
@@ -248,6 +260,17 @@ void CALifeMonsterDetailPathManager::follow_path(const ALife::_TIME_ID& time_del
 
         object().on_location_change();
         VERIFY(m_path.back() == object().get_object().m_tGraphID);
+
+        // Phase 3: Offline A-Life grass interaction during path movement
+        // When entity changes graph vertex, notify grass system at new position
+        if (GEnv.Render)
+        {
+            const Fvector& current_pos = object().get_object().o_Position;
+            float radius = 0.5f;
+            float strength = 0.4f; // Even lighter for intermediate waypoints
+
+            GEnv.Render->RequestGrassInteraction(current_pos, radius, strength, 0);
+        }
     }
 }
 

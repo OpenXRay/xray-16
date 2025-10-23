@@ -511,6 +511,13 @@ public:
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 
+    // Phase 3: A-Life grass interaction wrapper (thread-safe)
+    void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) override
+    {
+        if (Details)
+            Details->RequestInteractionUpdateThreadSafe(world_pos, radius, strength, type);
+    }
+
 private:
 #if defined(USE_DX11)
     xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
