@@ -57,6 +57,7 @@
     <ClInclude Include="Feel_Touch.h" />
     <ClInclude Include="Feel_Vision.h" />
     <ClInclude Include="GameFont.h" />
+    <ClInclude Include="GrassInteractionCollector.h" />
     <ClInclude Include="ICollidable.h" />
     <ClInclude Include="IGameFont.hpp" />
     <ClInclude Include="IGame_Level.h" />
@@ -143,6 +144,7 @@
     <ClCompile Include="Feel_Touch.cpp" />
     <ClCompile Include="Feel_Vision.cpp" />
     <ClCompile Include="GameFont.cpp" />
+    <ClCompile Include="GrassInteractionCollector.cpp" />
     <ClCompile Include="ICollidable.cpp" />
     <ClCompile Include="IGame_Level.cpp" />
     <ClCompile Include="IGame_Level_check_textures.cpp" />

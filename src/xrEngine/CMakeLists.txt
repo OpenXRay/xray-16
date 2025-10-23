@@ -209,6 +209,8 @@ target_sources_grouped(
     xr_object.h
     xr_object_list.cpp
     xr_object_list.h
+    GrassInteractionCollector.cpp
+    GrassInteractionCollector.h
 )
 
 target_sources_grouped(

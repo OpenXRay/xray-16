@@ -3,6 +3,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
+#include "xrEngine/GrassInteractionCollector.h"
 
 extern ENGINE_API float ps_r3_grass_wind_multiplier;
 extern ENGINE_API float ps_r3_grass_wind_min;
@@ -978,21 +979,24 @@ void CDetailManager::UpdateInteractiveEntities(CBackend& cmd_list)
 
     interactive_entities.clear();
 
-    static Fvector last_camera_pos = Device.vCameraPosition;
-    Fvector camera_velocity;
-    camera_velocity.sub(Device.vCameraPosition, last_camera_pos);
-    camera_velocity.mul(1.0f / Device.fTimeDelta);
-    last_camera_pos = Device.vCameraPosition;
+    xr_vector<GrassInteractionEntity> game_entities;
+    g_GrassInteractionCollector.GetEntitiesForFrame(game_entities);
 
-    InteractiveEntity camera_entity;
-    camera_entity.position = Device.vCameraPosition;
-    camera_entity.radius = 1.0f;
-    camera_entity.velocity = camera_velocity;
-    camera_entity.weight = 1.0f;
-    camera_entity.padding[0] = 0.0f;
-    camera_entity.padding[1] = 0.0f;
+    for (const auto& game_entity : game_entities)
+    {
+        InteractiveEntity render_entity;
+        render_entity.position = game_entity.position;
+        render_entity.velocity = game_entity.velocity;
+        render_entity.radius = game_entity.radius;
+        render_entity.weight = game_entity.weight;
+        render_entity.padding[0] = 0.0f;
+        render_entity.padding[1] = 0.0f;
 
-    interactive_entities.push_back(camera_entity);
+        interactive_entities.push_back(render_entity);
+
+        if (interactive_entities.size() >= max_entities)
+            break;
+    }
 
     entity_count_this_frame = interactive_entities.size();
 
