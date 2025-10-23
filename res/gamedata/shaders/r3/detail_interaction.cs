@@ -44,6 +44,7 @@ struct SlotAABB
 // Input buffers
 StructuredBuffer<InteractiveEntity> g_entities : register(t0);
 StructuredBuffer<SlotAABB> g_slots : register(t1);
+Buffer<uint> g_physical_to_logical : register(t2);  // Maps physical page → logical slot index
 
 // Output: Interaction atlas (RG=displacement XZ, B=bend amount, A=age)
 RWTexture2D<float4> g_interaction_atlas : register(u0);
@@ -70,25 +71,34 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
     if (atlas_pixel.x >= g_atlas_width || atlas_pixel.y >= g_atlas_width)
         return;
 
-    // Compute slot index from atlas pixel coordinates
-    // NOTE: Atlas can only hold 4096 slots (64×64) but level has 359K+ slots
-    // With Phase 6 virtual texturing, we use indirection to map visible slots to atlas
+    // Compute physical atlas slot index from pixel coordinates
     uint slot_x_in_atlas = atlas_pixel.x / g_slot_texture_size;
     uint slot_z_in_atlas = atlas_pixel.y / g_slot_texture_size;
 
-    // Calculate atlas slot index (0-4095)
+    // Calculate physical page index (0-4095)
     uint atlas_slots_per_row = g_atlas_width / g_slot_texture_size;  // 64
-    uint slot_idx = slot_z_in_atlas * atlas_slots_per_row + slot_x_in_atlas;
+    uint physical_page = slot_z_in_atlas * atlas_slots_per_row + slot_x_in_atlas;
 
     // Only process slots that fit in the atlas
-    if (slot_idx >= 4096 || slot_idx >= g_slot_count)
+    if (physical_page >= 4096)
         return;
 
-    SlotAABB slot = g_slots[slot_idx];
+    // Phase 6: Map physical page to logical world slot
+    uint logical_slot = g_physical_to_logical.Load(physical_page);
 
-    // Skip empty slots (no grass instances)
-    if (slot.instance_count == 0)
+    // Check if page is not resident
+    if (logical_slot == 0xFFFFFFFF)
+        return;  // Empty/not promoted yet
+
+    // Bounds check logical slot
+    if (logical_slot >= g_slot_count)
         return;
+
+    SlotAABB slot = g_slots[logical_slot];
+
+    // TEMPORARILY DISABLED: Don't skip empty slots - process all slots for debugging
+    // if (slot.instance_count == 0)
+    //     return;
 
     // Compute local pixel within slot (0-31, 0-31)
     uint2 local_pixel;
@@ -126,14 +136,17 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
         // Direction away from entity (radial push)
         float2 push_dir = normalize(to_grass.xz + float2(0.001, 0.001));  // Add epsilon to avoid NaN
 
-        // Displacement strength based on velocity and weight
-        float velocity_strength = length(entity.velocity.xz) * 0.5;
-        float displacement_strength = (velocity_strength + entity.weight * 0.5) * influence;
+        // DEBUG: Write influence directly to see falloff pattern
+        current.rgb = influence;  // White = close to entity, black = far away
+        current.a = 1.0;
 
-        // Apply displacement
-        current.rg += push_dir * displacement_strength;
-        current.b = max(current.b, influence);  // Bend amount (max of all influences)
-        current.a = 0.0;  // Reset age (fresh interaction)
+        // COMMENTED OUT - Will restore after verification
+        // float velocity_strength = length(entity.velocity.xz) * 0.5;
+        // float base_strength = velocity_strength + entity.weight * 2.0;
+        // float displacement_strength = base_strength * influence * 10.0;
+        // current.rg += push_dir * displacement_strength;
+        // current.b = max(current.b, influence);
+        // current.a = 0.0;
     }
 
     // Clamp displacement to reasonable range

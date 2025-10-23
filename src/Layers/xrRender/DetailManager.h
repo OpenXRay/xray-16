@@ -342,11 +342,10 @@ public:
     };
 
     // Phase 6: Virtual Texturing System
-    static const uint32_t TOTAL_WORLD_SLOTS = 359101;  // From your level
     static const uint16_t PHYSICAL_PAGES = 4096;       // 64×64 atlas slots
     static const uint16_t INVALID_PAGE = 0xFFFF;
 
-    xr_vector<PageTableEntry> page_table;              // [TOTAL_WORLD_SLOTS]
+    xr_vector<PageTableEntry> page_table;              // [slot_count] - dynamically sized
     std::array<PhysicalPageInfo, PHYSICAL_PAGES> physical_pages;
     uint16_t clock_hand;                                // Current position for Clock algorithm
     uint32_t resident_page_count;                       // How many pages currently in use
@@ -354,6 +353,10 @@ public:
     // Indirection buffer (replaces slot_atlas_uvs)
     ID3DBuffer* indirection_buffer;
     ID3DShaderResourceView* indirection_srv;
+
+    // Reverse mapping: physical page → logical slot (for compute shader)
+    ID3DBuffer* physical_to_logical_buffer;
+    ID3DShaderResourceView* physical_to_logical_srv;
 
     // Statistics
     struct PageTableStats {

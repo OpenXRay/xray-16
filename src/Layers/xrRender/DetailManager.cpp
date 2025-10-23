@@ -293,6 +293,9 @@ void CDetailManager::Load()
         CreateInteractionAtlas();
         CreateEntityTrackingBuffers();
         CreateWindTexture();
+
+        // Phase 6: Initialize page table (NEW)
+        InitializePageTable();
     }
 #endif
 
