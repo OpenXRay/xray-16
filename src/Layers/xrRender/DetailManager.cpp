@@ -494,10 +494,6 @@ void CDetailManager::Render(CBackend& cmd_list)
     cmd_list.set_xform_world(Fidentity);
     if (UseVS())
     {
-#ifdef USE_DX11
-        UpdateInteractiveEntities();
-        UpdateWind(cmd_list);
-#endif
         hw_Render(cmd_list);
     }
     else

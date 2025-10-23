@@ -12,6 +12,7 @@ ENGINE_API float ps_r3_grass_wind_multiplier = 1.0f;
 ENGINE_API float ps_r3_grass_wind_min = 0.1f;
 ENGINE_API float ps_r3_grass_wind_lerp_rate = 2.0f;
 ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;
+ENGINE_API float ps_r3_grass_interaction_displacement = 0.5f;
 ENGINE_API u32 ps_r3_grass_wind_octaves = 5;
 
 #ifndef MASTER_GOLD

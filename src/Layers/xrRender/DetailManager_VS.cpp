@@ -256,6 +256,8 @@ void CDetailManager::hw_Unload()
         wind_compute_shader.destroy();
     _RELEASE(interaction_constant_buffer);
     _RELEASE(wind_constant_buffer);
+
+    ShutdownPageTable();
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

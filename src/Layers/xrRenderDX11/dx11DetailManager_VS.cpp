@@ -8,6 +8,7 @@ extern ENGINE_API float ps_r3_grass_wind_multiplier;
 extern ENGINE_API float ps_r3_grass_wind_min;
 extern ENGINE_API float ps_r3_grass_wind_lerp_rate;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
+extern ENGINE_API float ps_r3_grass_interaction_displacement;
 extern ENGINE_API u32 ps_r3_grass_wind_octaves;
 
 namespace xray::render::RENDER_NAMESPACE
@@ -35,6 +36,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
     hwc_detail_params = T0.get("detail_params");
     hwc_grass_wind_displacement = T0.get("grass_wind_displacement");
+    hwc_grass_interaction_displacement = T0.get("grass_interaction_displacement");
 
     const u32 initialBufferSize = 2048 * 2048;
 
@@ -77,6 +79,8 @@ void CDetailManager::hw_Load_Shaders()
         Msg("* [DetailManager] Loaded wind compute shader: OK");
     else
         Msg("! [DetailManager] Failed to load wind compute shader!");
+
+    InitializePageTable();
 }
 
 void CDetailManager::CreatePersistentInstanceBuffer()
@@ -425,6 +429,14 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
 
     RImplementation.BasicStats.DetailCount = 0;
 
+    UpdatePageTable();
+
+    UpdateIndirectionBuffer(cmd_list);
+
+    UpdateInteractiveEntities(cmd_list);
+    UpdateWind(cmd_list);
+    RenderInteractions(cmd_list);
+
     DispatchGPUCulling(cmd_list);
 
     float fDelta = Device.fTimeGlobal - m_global_time_old;
@@ -504,6 +516,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         detail_params_vec.w = (float)dtH.z_offs();
         cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
         cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+        cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
         cmd_list.set_Element(Object.shader->E[0], 0);
         cmd_list.apply_lmaterial();
@@ -512,8 +525,8 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
             cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
         if (wind_srv)
             cmd_list.SRVSManager.SetVSResource(2, wind_srv);
-        if (slot_atlas_uv_srv)
-            cmd_list.SRVSManager.SetVSResource(3, slot_atlas_uv_srv);
+        if (indirection_srv)
+            cmd_list.SRVSManager.SetVSResource(3, indirection_srv);
         if (interaction_sampler)
             HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
 
@@ -669,6 +682,7 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     detail_params_vec.w = (float)dtH.z_offs();
     cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
     cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+    cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
     cmd_list.set_Element(Object.shader->E[0], 0);
     cmd_list.apply_lmaterial();
@@ -677,8 +691,8 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
         cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
     if (wind_srv)
         cmd_list.SRVSManager.SetVSResource(2, wind_srv);
-    if (slot_atlas_uv_srv)
-        cmd_list.SRVSManager.SetVSResource(3, slot_atlas_uv_srv);
+    if (indirection_srv)
+        cmd_list.SRVSManager.SetVSResource(3, indirection_srv);
     if (interaction_sampler)
         HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
 
@@ -959,7 +973,7 @@ void CDetailManager::DestroyWindTexture()
     _RELEASE(wind_texture);
 }
 
-void CDetailManager::UpdateInteractiveEntities()
+void CDetailManager::UpdateInteractiveEntities(CBackend& cmd_list)
 {
     if (!entity_buffer)
         return;
@@ -974,7 +988,7 @@ void CDetailManager::UpdateInteractiveEntities()
 
     InteractiveEntity camera_entity;
     camera_entity.position = Device.vCameraPosition;
-    camera_entity.radius = 0.8f;
+    camera_entity.radius = 50.0f;
     camera_entity.velocity = camera_velocity;
     camera_entity.weight = 1.0f;
     camera_entity.padding[0] = 0.0f;
@@ -986,13 +1000,14 @@ void CDetailManager::UpdateInteractiveEntities()
 
     if (entity_count_this_frame > 0 && entity_count_this_frame <= max_entities)
     {
+        auto context = HW.get_context(cmd_list.context_id);
         D3D11_MAPPED_SUBRESOURCE mapped;
-        HRESULT hr = HW.get_context(CHW::IMM_CTX_ID)->Map(entity_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+        HRESULT hr = context->Map(entity_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
         if (SUCCEEDED(hr))
         {
             memcpy(mapped.pData, interactive_entities.data(),
                    entity_count_this_frame * sizeof(InteractiveEntity));
-            HW.get_context(CHW::IMM_CTX_ID)->Unmap(entity_buffer, 0);
+            context->Unmap(entity_buffer, 0);
         }
     }
 }
@@ -1009,9 +1024,18 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
     }
 
     static bool first_run = true;
-    if (first_run)
+    static u32 frame_counter = 0;
+    if (first_run || (frame_counter++ % 60 == 0))
     {
-        Msg("* [DetailManager] RenderInteractions: %u entities, %u slots", entity_count_this_frame, slot_count);
+        Msg("* [DetailManager] RenderInteractions: entities=%u, slots=%u, atlas=%ux%u, slot_size=%u",
+            entity_count_this_frame, slot_count, atlas_width, atlas_height, slot_texture_size);
+        if (entity_count_this_frame > 0)
+        {
+            Msg("  Entity[0]: pos=(%.1f, %.1f, %.1f), radius=%.2f, vel=(%.2f, %.2f, %.2f)",
+                interactive_entities[0].position.x, interactive_entities[0].position.y, interactive_entities[0].position.z,
+                interactive_entities[0].radius,
+                interactive_entities[0].velocity.x, interactive_entities[0].velocity.y, interactive_entities[0].velocity.z);
+        }
         first_run = false;
     }
 
@@ -1053,6 +1077,11 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
 
     u32 num_groups_x = (atlas_width + 31) / 32;
     u32 num_groups_y = (atlas_height + 31) / 32;
+
+    if (frame_counter < 120)
+        Msg("* [DetailManager] Dispatching interaction compute: groups=%ux%u, threads=%ux%u",
+            num_groups_x, num_groups_y, num_groups_x * 32, num_groups_y * 32);
+
     context->Dispatch(num_groups_x, num_groups_y, 1);
 
     ID3DShaderResourceView* nullSRV[2] = {nullptr, nullptr};
@@ -1108,6 +1137,260 @@ void CDetailManager::UpdateWind(CBackend& cmd_list)
     ID3DUnorderedAccessView* nullUAV[1] = {nullptr};
     context->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
     context->CSSetShader(nullptr, nullptr, 0);
+}
+
+void CDetailManager::InitializePageTable()
+{
+    Msg("* [DetailManager] Initializing virtual page table...");
+
+    page_table.resize(TOTAL_WORLD_SLOTS);
+
+    for (uint32_t i = 0; i < TOTAL_WORLD_SLOTS; i++) {
+        page_table[i].physical_page = INVALID_PAGE;
+        page_table[i].mip_level = 0;
+        page_table[i].reference_bit = 0;
+        page_table[i].dirty_bit = 0;
+        page_table[i].locked_bit = 0;
+        page_table[i].last_access_frame = 0;
+    }
+
+    for (uint16_t i = 0; i < PHYSICAL_PAGES; i++) {
+        physical_pages[i].logical_slot = UINT32_MAX;
+        physical_pages[i].reference_bit = 0;
+        physical_pages[i].locked = 0;
+    }
+
+    clock_hand = 0;
+    resident_page_count = 0;
+
+    D3D11_BUFFER_DESC bufferDesc = {};
+    bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    bufferDesc.MiscFlags = 0;
+    bufferDesc.ByteWidth = TOTAL_WORLD_SLOTS * sizeof(uint32_t);
+
+    xr_vector<uint32_t> initial_data(TOTAL_WORLD_SLOTS, 0xFFFFFFFF);
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = initial_data.data();
+
+    CHK_DX(HW.pDevice->CreateBuffer(&bufferDesc, &initData, &indirection_buffer));
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R32_UINT;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srvDesc.Buffer.FirstElement = 0;
+    srvDesc.Buffer.NumElements = TOTAL_WORLD_SLOTS;
+
+    CHK_DX(HW.pDevice->CreateShaderResourceView(indirection_buffer, &srvDesc, &indirection_srv));
+
+    ResetPageTableStats();
+
+    Msg("* [DetailManager] Page table initialized: %u logical slots -> %u physical pages",
+        TOTAL_WORLD_SLOTS, PHYSICAL_PAGES);
+}
+
+void CDetailManager::ShutdownPageTable()
+{
+    Msg("* [DetailManager] Shutting down page table...");
+
+    _RELEASE(indirection_srv);
+    _RELEASE(indirection_buffer);
+
+    page_table.clear();
+    page_table.shrink_to_fit();
+
+    Msg("* [DetailManager] Page table shutdown complete");
+}
+
+void CDetailManager::ResetPageTableStats()
+{
+    page_table_stats.total_requests = 0;
+    page_table_stats.cache_hits = 0;
+    page_table_stats.cache_misses = 0;
+    page_table_stats.evictions = 0;
+    page_table_stats.current_resident = 0;
+}
+
+void CDetailManager::PrintPageTableStats()
+{
+    float hit_rate = 0.0f;
+    if (page_table_stats.total_requests > 0) {
+        hit_rate = 100.0f * float(page_table_stats.cache_hits) / float(page_table_stats.total_requests);
+    }
+
+    Msg("=== Page Table Statistics ===");
+    Msg("Total Requests:   %llu", page_table_stats.total_requests);
+    Msg("Cache Hits:       %llu (%.1f%%)", page_table_stats.cache_hits, hit_rate);
+    Msg("Cache Misses:     %llu", page_table_stats.cache_misses);
+    Msg("Evictions:        %llu", page_table_stats.evictions);
+    Msg("Resident Pages:   %u / %u", resident_page_count, PHYSICAL_PAGES);
+    Msg("===========================");
+}
+
+bool CDetailManager::IsPageResident(uint32_t logical_slot) const
+{
+    if (logical_slot >= TOTAL_WORLD_SLOTS)
+        return false;
+
+    return page_table[logical_slot].physical_page != INVALID_PAGE;
+}
+
+uint16_t CDetailManager::FindVictimPage()
+{
+    int attempts = 0;
+    const int max_attempts = PHYSICAL_PAGES * 2;
+
+    while (attempts < max_attempts) {
+        PhysicalPageInfo& page = physical_pages[clock_hand];
+
+        if (page.locked) {
+            clock_hand = (clock_hand + 1) % PHYSICAL_PAGES;
+            attempts++;
+            continue;
+        }
+
+        if (page.logical_slot == UINT32_MAX) {
+            uint16_t victim = clock_hand;
+            clock_hand = (clock_hand + 1) % PHYSICAL_PAGES;
+            return victim;
+        }
+
+        if (page.reference_bit) {
+            page.reference_bit = 0;
+            clock_hand = (clock_hand + 1) % PHYSICAL_PAGES;
+            attempts++;
+        } else {
+            uint16_t victim = clock_hand;
+            clock_hand = (clock_hand + 1) % PHYSICAL_PAGES;
+            return victim;
+        }
+    }
+
+    Msg("! [DetailManager] WARNING: Clock algorithm failed, using fallback eviction");
+
+    uint16_t oldest = 0;
+    uint64_t oldest_frame = UINT64_MAX;
+    for (uint16_t i = 0; i < PHYSICAL_PAGES; i++) {
+        if (!physical_pages[i].locked && physical_pages[i].logical_slot != UINT32_MAX) {
+            uint32_t logical = physical_pages[i].logical_slot;
+            if (page_table[logical].last_access_frame < oldest_frame) {
+                oldest_frame = page_table[logical].last_access_frame;
+                oldest = i;
+            }
+        }
+    }
+
+    return oldest;
+}
+
+void CDetailManager::EvictPage(uint16_t physical_page)
+{
+    VERIFY(physical_page < PHYSICAL_PAGES);
+
+    PhysicalPageInfo& page = physical_pages[physical_page];
+
+    if (page.logical_slot == UINT32_MAX)
+        return;
+
+    uint32_t logical_slot = page.logical_slot;
+    VERIFY(logical_slot < TOTAL_WORLD_SLOTS);
+
+    page_table[logical_slot].physical_page = INVALID_PAGE;
+    page_table[logical_slot].reference_bit = 0;
+    page_table[logical_slot].dirty_bit = 0;
+
+    page.logical_slot = UINT32_MAX;
+    page.reference_bit = 0;
+
+    resident_page_count--;
+    page_table_stats.evictions++;
+
+}
+
+void CDetailManager::PromotePage(uint32_t logical_slot, uint16_t physical_page)
+{
+    VERIFY(logical_slot < TOTAL_WORLD_SLOTS);
+    VERIFY(physical_page < PHYSICAL_PAGES);
+
+    if (physical_pages[physical_page].logical_slot != UINT32_MAX) {
+        EvictPage(physical_page);
+    }
+
+    physical_pages[physical_page].logical_slot = logical_slot;
+    physical_pages[physical_page].reference_bit = 1;
+
+    page_table[logical_slot].physical_page = physical_page;
+    page_table[logical_slot].reference_bit = 1;
+    page_table[logical_slot].last_access_frame = Device.dwFrame;
+    page_table[logical_slot].dirty_bit = 0;
+
+    resident_page_count++;
+
+}
+
+uint16_t CDetailManager::RequestPage(uint32_t logical_slot, uint8_t priority)
+{
+    VERIFY(logical_slot < TOTAL_WORLD_SLOTS);
+
+    page_table_stats.total_requests++;
+
+    if (page_table[logical_slot].physical_page != INVALID_PAGE) {
+        uint16_t physical_page = page_table[logical_slot].physical_page;
+
+        page_table[logical_slot].reference_bit = 1;
+        page_table[logical_slot].last_access_frame = Device.dwFrame;
+        physical_pages[physical_page].reference_bit = 1;
+
+        page_table_stats.cache_hits++;
+        return physical_page;
+    }
+
+    page_table_stats.cache_misses++;
+
+    uint16_t physical_page = FindVictimPage();
+
+    PromotePage(logical_slot, physical_page);
+
+    return physical_page;
+}
+
+void CDetailManager::UpdateIndirectionBuffer(CBackend& cmd_list)
+{
+    if (!indirection_buffer)
+        return;
+
+    auto context = HW.get_context(cmd_list.context_id);
+
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    HRESULT hr = context->Map(indirection_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+    if (FAILED(hr)) {
+        Msg("! [DetailManager] Failed to map indirection buffer");
+        return;
+    }
+
+    uint32_t* data = (uint32_t*)mapped.pData;
+
+    for (uint32_t i = 0; i < TOTAL_WORLD_SLOTS; i++) {
+        uint32_t packed = page_table[i].physical_page;
+        packed |= (uint32_t(page_table[i].mip_level) << 16);
+
+        data[i] = packed;
+    }
+
+    context->Unmap(indirection_buffer, 0);
+
+}
+
+void CDetailManager::UpdatePageTable()
+{
+
+    const uint32_t test_slot_count = std::min(4096u, slot_count);
+
+    for (uint32_t i = 0; i < test_slot_count; i++) {
+        RequestPage(i, 255);
+    }
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

@@ -249,6 +249,25 @@ public:
     };
     static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes for GPU alignment");
 
+    struct PageTableEntry {
+        uint16_t physical_page;
+        uint8_t  mip_level;
+        uint8_t  reference_bit : 1;
+        uint8_t  dirty_bit : 1;
+        uint8_t  locked_bit : 1;
+        uint8_t  padding : 5;
+        uint64_t last_access_frame;
+    };
+    static_assert(sizeof(PageTableEntry) == 16, "PageTableEntry packing check");
+
+    struct PhysicalPageInfo {
+        uint32_t logical_slot;
+        uint8_t  reference_bit;
+        uint8_t  locked;
+        uint16_t padding;
+    };
+    static_assert(sizeof(PhysicalPageInfo) == 8, "PhysicalPageInfo packing check");
+
     xr_vector<SlotAABB> slot_aabbs;
     u32 slot_count;
     ID3DBuffer* slot_aabb_buffer;
@@ -305,6 +324,26 @@ public:
         u32 pad[3];
     };
 
+    static const uint32_t TOTAL_WORLD_SLOTS = 359101;
+    static const uint16_t PHYSICAL_PAGES = 4096;
+    static const uint16_t INVALID_PAGE = 0xFFFF;
+
+    xr_vector<PageTableEntry> page_table;
+    std::array<PhysicalPageInfo, PHYSICAL_PAGES> physical_pages;
+    uint16_t clock_hand;
+    uint32_t resident_page_count;
+
+    ID3DBuffer* indirection_buffer;
+    ID3DShaderResourceView* indirection_srv;
+
+    struct PageTableStats {
+        uint64_t total_requests;
+        uint64_t cache_hits;
+        uint64_t cache_misses;
+        uint64_t evictions;
+        uint32_t current_resident;
+    } page_table_stats;
+
 #endif
 
     ref_constant hwc_consts;
@@ -317,6 +356,7 @@ public:
     ref_constant hwc_s_array;
     ref_constant hwc_detail_params;
     ref_constant hwc_grass_wind_displacement;
+    ref_constant hwc_grass_interaction_displacement;
     void hw_Load();
     void hw_Load_Geom();
     void hw_Load_Shaders();
@@ -355,11 +395,23 @@ public:
     void DestroyInteractionAtlas();
     void CreateEntityTrackingBuffers();
     void DestroyEntityTrackingBuffers();
-    void UpdateInteractiveEntities();
+    void UpdateInteractiveEntities(CBackend& cmd_list);
     void CreateWindTexture();
     void DestroyWindTexture();
     void RenderInteractions(CBackend& cmd_list);
     void UpdateWind(CBackend& cmd_list);
+
+    void InitializePageTable();
+    void ShutdownPageTable();
+    void UpdatePageTable();
+    uint16_t RequestPage(uint32_t logical_slot, uint8_t priority);
+    uint16_t FindVictimPage();
+    void EvictPage(uint16_t physical_page);
+    void PromotePage(uint32_t logical_slot, uint16_t physical_page);
+    bool IsPageResident(uint32_t logical_slot) const;
+    void UpdateIndirectionBuffer(CBackend& cmd_list);
+    void ResetPageTableStats();
+    void PrintPageTableStats();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
