@@ -1116,11 +1116,11 @@ void CDetailManager::UpdateInteractiveEntities(CBackend& cmd_list)
     {
         InteractiveEntity render_entity;
         render_entity.position = game_entity.position;
-        render_entity.velocity = game_entity.velocity;
         render_entity.radius = game_entity.radius;
+        render_entity.velocity = game_entity.velocity;
         render_entity.weight = game_entity.weight;
-        render_entity.padding[0] = 0.0f;
-        render_entity.padding[1] = 0.0f;
+        render_entity.direction = game_entity.direction;
+        render_entity.padding = 0.0f;
 
         interactive_entities.push_back(render_entity);
 

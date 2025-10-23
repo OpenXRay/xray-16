@@ -5,13 +5,18 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCore/Threading/Lock.hpp"
 
+// Forward declaration
+class IGameObject;
+class CEntity;
+
 // Simple structure matching renderer's InteractiveEntity format
 struct GrassInteractionEntity
 {
     Fvector position;
-    Fvector velocity;
     float radius;
+    Fvector velocity;
     float weight; // 0-1, affects displacement
+    Fvector direction; // Entity facing direction (normalized)
     u16 object_id; // For debugging
     u16 padding;
 };
@@ -23,7 +28,8 @@ public:
     static const u32 MAX_ENTITIES = 256;
 
     // Called by game logic thread during object updates
-    void AddEntity(u16 id, const Fvector& pos, const Fvector& vel, float radius, float weight);
+    // Computes interaction parameters from entity properties (bounding box, mass, etc.)
+    void AddEntity(IGameObject* obj);
 
     // Called by render thread to get snapshot
     void GetEntitiesForFrame(xr_vector<GrassInteractionEntity>& out_entities);

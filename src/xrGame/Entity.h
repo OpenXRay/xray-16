@@ -110,6 +110,8 @@ public:
     void set_death_time();
     virtual void set_ready_to_save();
 
+    virtual float GetPhysicsMass() { return cast_physics_shell_holder()->GetMass(); }
+
 private:
     ALife::_OBJECT_ID m_killer_id;
 

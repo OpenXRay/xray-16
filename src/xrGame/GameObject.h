@@ -379,6 +379,7 @@ public:
     virtual void set_nonscript_usable(bool usable) override;
     virtual CScriptBinderObject* GetScriptBinderObject() override { return scriptBinder.object(); }
     virtual void SetScriptBinderObject(CScriptBinderObject* object) override { scriptBinder.set_object(object); }
+    virtual float GetPhysicsMass() { return 0.f; }
 
 protected:
     virtual void spawn_supplies();

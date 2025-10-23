@@ -24,7 +24,8 @@ struct InteractiveEntity
     float radius;              // Interaction radius
     float3 velocity;           // Movement direction/speed
     float weight;              // 0-1, affects displacement strength
-    float2 padding;
+    float3 direction;          // Entity facing direction (normalized)
+    float padding;
 };
 
 // Slot AABB structure (matches C++)
@@ -123,30 +124,44 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
         InteractiveEntity entity = g_entities[i];
 
         float3 to_grass = world_pos - entity.position;
-        float dist = length(to_grass.xz);
+        float dist_xz = length(to_grass.xz);
 
-        // Early out if outside radius
-        if (dist >= entity.radius)
+        // Early out if outside horizontal radius
+        if (dist_xz >= entity.radius)
             continue;
 
-        // Compute influence falloff
-        float influence = 1.0 - saturate(dist / entity.radius);  // 1 at center, 0 at edge
-        influence = pow(influence, 2.0);  // Smooth falloff (quadratic)
+        // Height limit: grass closer to entity's vertical position bends more
+        float height_diff = abs(to_grass.y);
+        float height_limit = 1.0 - saturate(height_diff / (entity.radius * 2.0));
 
-        // Direction away from entity (radial push)
-        float2 push_dir = normalize(to_grass.xz + float2(0.001, 0.001));  // Add epsilon to avoid NaN
+        // Distance falloff (0 at edge, 1 at center)
+        float bend_strength = 1.0 - saturate(dist_xz / (entity.radius + 0.001));
+        bend_strength = pow(bend_strength, 1.5);  // Smoother falloff
 
-        // DEBUG: Write influence directly to see falloff pattern
-        current.rgb = influence;  // White = close to entity, black = far away
-        current.a = 1.0;
+        // Direction from entity to grass (radial push)
+        float3 bend_dir = normalize(to_grass + float3(0.001, 0.001, 0.001));  // Add epsilon
 
-        // COMMENTED OUT - Will restore after verification
-        // float velocity_strength = length(entity.velocity.xz) * 0.5;
-        // float base_strength = velocity_strength + entity.weight * 2.0;
-        // float displacement_strength = base_strength * influence * 10.0;
-        // current.rg += push_dir * displacement_strength;
-        // current.b = max(current.b, influence);
-        // current.a = 0.0;
+        // Directional limiting: grass only bends in entity's facing direction
+        // Use dot product to check if grass is in front of entity
+        float dir_limit = 1.0;
+        if (length(entity.direction.xz) > 0.1)  // Only if direction is valid
+        {
+            float facing_dot = dot(normalize(bend_dir.xz), normalize(entity.direction.xz));
+            dir_limit = saturate(facing_dot * 5.0);  // Sharpen the limit
+        }
+
+        // Combine all factors
+        float final_strength = bend_strength * height_limit * dir_limit * entity.weight;
+
+        // Horizontal displacement (radial push)
+        float2 horiz_disp = bend_dir.xz * final_strength * 2.0;
+        current.rg += horiz_disp;
+
+        // Bend amount (for vertical displacement in vertex shader)
+        current.b = max(current.b, final_strength);
+
+        // Reset age when interacted with
+        current.a = 0.0;
     }
 
     // Clamp displacement to reasonable range

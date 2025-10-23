@@ -305,7 +305,8 @@ public:
         float radius;              // Interaction radius
         Fvector velocity;          // Movement direction/speed
         float weight;              // 0-1, affects displacement strength
-        float padding[2];          // Align to 32 bytes
+        Fvector direction;         // Entity facing direction (normalized)
+        float padding;             // Align to 48 bytes
     };
     xr_vector<InteractiveEntity> interactive_entities;
     u32 max_entities;                              // Default: 256

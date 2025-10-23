@@ -147,36 +147,10 @@ void CObjectList::SingleUpdate(IGameObject* O)
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", O->cName().c_str());
 
     // Phase 1.5: Collect grass interaction data for tracked objects
-    // For now, track all active objects - we can add filtering by CLASS_ID later
-    if (!O->H_Parent()) // Don't track attached objects (weapons, etc)
+    // Collector computes interaction parameters from entity properties (bounding box, mass, etc.)
+    if (!O->H_Parent() && O->cast_entity()) // Don't track attached objects (weapons, etc)
     {
-        // Get object position
-        Fvector pos = O->Position();
-
-        // Calculate velocity from position delta
-        static xr_map<u16, Fvector> last_positions;
-        Fvector vel;
-        vel.set(0, 0, 0); // Default zero velocity
-
-        auto it = last_positions.find(O->ID());
-        if (it != last_positions.end() && Device.fTimeDelta > 0.0001f)
-        {
-            vel.sub(pos, it->second);
-            vel.mul(1.0f / Device.fTimeDelta);
-        }
-        last_positions[O->ID()] = pos;
-
-        // Default parameters - can be refined per object type later
-        float radius = 0.5f;  // Default interaction radius
-        float weight = 1.0f;  // Default weight (0-1)
-
-        // Add to collector
-        g_GrassInteractionCollector.AddEntity(
-            O->ID(),
-            pos,
-            vel,
-            radius,
-            weight);
+        g_GrassInteractionCollector.AddEntity(O);
     }
 
 #if 0 // ndef DEBUG

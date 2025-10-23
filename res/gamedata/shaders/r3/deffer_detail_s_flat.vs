@@ -137,8 +137,12 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 		float wind_strength = wind.a;
 
 		// Apply interaction displacement (radial push from entities)
-		float2 interaction_displacement = interaction.rg * interaction.b * vertex_height_factor;
+		float2 interaction_displacement = interaction.rg;
 		pos.xz += interaction_displacement * grass_interaction_displacement;
+
+		// Apply vertical displacement (grass bends DOWN when trampled)
+		float bend_amount = interaction.b;  // 0-1, from compute shader
+		pos.y -= bend_amount * 0.6 * det.scale * grass_interaction_displacement;
 
 		// Apply wind displacement
 		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * grass_wind_displacement;
