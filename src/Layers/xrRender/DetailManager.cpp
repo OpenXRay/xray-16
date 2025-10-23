@@ -285,6 +285,8 @@ void CDetailManager::Load()
         CreateWindTexture();
 
         InitializePageTable();
+
+        InitializeVisibilityReadback();
     }
 #endif
 

@@ -258,6 +258,8 @@ void CDetailManager::hw_Unload()
     _RELEASE(wind_constant_buffer);
 
     ShutdownPageTable();
+
+    ShutdownVisibilityReadback();
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -391,27 +391,32 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     UINT zero_counts[64] = {0};
     context->ClearUnorderedAccessViewUint(gpu_visible_counts_uav, zero_counts);
 
+    uint32_t zero = 0;
+    context->UpdateSubresource(visible_slot_counter_gpu, 0, nullptr, &zero, 0, 0);
+
     context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
 
     ID3DShaderResourceView* srvs[2] = {slot_aabb_srv, persistent_instance_srv};
     context->CSSetShaderResources(0, 2, srvs);
 
-    ID3DUnorderedAccessView* uavs[33];
+    ID3DUnorderedAccessView* uavs[35];
     for (u32 i = 0; i < max_gpu_culled_objects; i++)
         uavs[i] = gpu_visible_uavs[i];
     uavs[16] = gpu_visible_counts_uav;
     for (u32 i = 0; i < max_gpu_culled_objects; i++)
         uavs[17 + i] = gpu_indirect_args_uavs[i];
+    uavs[33] = visible_slot_ids_uav;
+    uavs[34] = visible_slot_counter_uav;
 
-    context->CSSetUnorderedAccessViews(0, 33, uavs, nullptr);
+    context->CSSetUnorderedAccessViews(0, 35, uavs, nullptr);
 
     context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
 
     u32 num_groups = (slot_count + 255) / 256;
     context->Dispatch(num_groups, 1, 1);
 
-    ID3DUnorderedAccessView* null_uavs[33] = {nullptr};
-    context->CSSetUnorderedAccessViews(0, 33, null_uavs, nullptr);
+    ID3DUnorderedAccessView* null_uavs[35] = {nullptr};
+    context->CSSetUnorderedAccessViews(0, 35, null_uavs, nullptr);
 
     ID3DShaderResourceView* null_srvs[2] = {nullptr, nullptr};
     context->CSSetShaderResources(0, 2, null_srvs);
@@ -1229,6 +1234,225 @@ void CDetailManager::ShutdownPageTable()
     Msg("* [DetailManager] Page table shutdown complete");
 }
 
+void CDetailManager::InitializeVisibilityReadback()
+{
+    Msg("* [DetailManager] Initializing visibility readback...");
+
+    D3D11_BUFFER_DESC readbackDesc = {};
+    readbackDesc.Usage = D3D11_USAGE_STAGING;
+    readbackDesc.BindFlags = 0;
+    readbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    readbackDesc.MiscFlags = 0;
+    readbackDesc.ByteWidth = MAX_VISIBLE_SLOTS * sizeof(uint32_t);
+
+    CHK_DX(HW.pDevice->CreateBuffer(&readbackDesc, nullptr, &visible_slots_readback));
+
+    D3D11_QUERY_DESC queryDesc = {};
+    queryDesc.Query = D3D11_QUERY_EVENT;
+    CHK_DX(HW.pDevice->CreateQuery(&queryDesc, &readback_query));
+
+    visible_slots_cache.reserve(MAX_VISIBLE_SLOTS);
+    visible_slot_count = 0;
+
+    max_uploads_per_frame = 16;
+
+    D3D11_BUFFER_DESC visibleSlotsDesc = {};
+    visibleSlotsDesc.Usage = D3D11_USAGE_DEFAULT;
+    visibleSlotsDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    visibleSlotsDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    visibleSlotsDesc.StructureByteStride = sizeof(uint32_t);
+    visibleSlotsDesc.ByteWidth = MAX_VISIBLE_SLOTS * sizeof(uint32_t);
+
+    CHK_DX(HW.pDevice->CreateBuffer(&visibleSlotsDesc, nullptr, &visible_slot_ids_gpu));
+
+    D3D11_UNORDERED_ACCESS_VIEW_DESC visibleSlotsUAVDesc = {};
+    visibleSlotsUAVDesc.Format = DXGI_FORMAT_UNKNOWN;
+    visibleSlotsUAVDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    visibleSlotsUAVDesc.Buffer.FirstElement = 0;
+    visibleSlotsUAVDesc.Buffer.NumElements = MAX_VISIBLE_SLOTS;
+
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(
+        visible_slot_ids_gpu, &visibleSlotsUAVDesc, &visible_slot_ids_uav));
+
+    D3D11_BUFFER_DESC counterDesc = {};
+    counterDesc.Usage = D3D11_USAGE_DEFAULT;
+    counterDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    counterDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+    counterDesc.ByteWidth = sizeof(uint32_t);
+
+    uint32_t zero = 0;
+    D3D11_SUBRESOURCE_DATA counterInitData = {};
+    counterInitData.pSysMem = &zero;
+
+    CHK_DX(HW.pDevice->CreateBuffer(&counterDesc, &counterInitData, &visible_slot_counter_gpu));
+
+    D3D11_UNORDERED_ACCESS_VIEW_DESC counterUAVDesc = {};
+    counterUAVDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+    counterUAVDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    counterUAVDesc.Buffer.FirstElement = 0;
+    counterUAVDesc.Buffer.NumElements = 1;
+    counterUAVDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(
+        visible_slot_counter_gpu, &counterUAVDesc, &visible_slot_counter_uav));
+
+    D3D11_BUFFER_DESC stagingDesc = {};
+    stagingDesc.Usage = D3D11_USAGE_DYNAMIC;
+    stagingDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    stagingDesc.ByteWidth = STAGING_BUFFER_SIZE;
+
+    CHK_DX(HW.pDevice->CreateBuffer(&stagingDesc, nullptr, &upload_staging_buffer));
+
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    CHK_DX(HW.get_context(CHW::IMM_CTX_ID)->Map(upload_staging_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
+    staging_buffer_mapped = (uint8_t*)mapped.pData;
+
+    Msg("* [DetailManager] Visibility readback initialized (max %u slots, %u MB staging)",
+        MAX_VISIBLE_SLOTS, STAGING_BUFFER_SIZE / (1024*1024));
+}
+
+void CDetailManager::ShutdownVisibilityReadback()
+{
+    Msg("* [DetailManager] Shutting down visibility readback...");
+
+    if (upload_staging_buffer) {
+        HW.get_context(CHW::IMM_CTX_ID)->Unmap(upload_staging_buffer, 0);
+        staging_buffer_mapped = nullptr;
+    }
+
+    _RELEASE(upload_staging_buffer);
+    _RELEASE(visible_slot_counter_uav);
+    _RELEASE(visible_slot_counter_gpu);
+    _RELEASE(visible_slot_ids_uav);
+    _RELEASE(visible_slot_ids_gpu);
+    _RELEASE(readback_query);
+    _RELEASE(visible_slots_readback);
+
+    visible_slots_cache.clear();
+    visible_slots_cache.shrink_to_fit();
+
+    while (!upload_queue.empty()) {
+        upload_queue.pop();
+    }
+
+    Msg("* [DetailManager] Visibility readback shutdown complete");
+}
+
+void CDetailManager::ReadVisibleSlotsFromGPU()
+{
+    uint32_t counter_value = 0;
+    D3D11_BOX counterBox = { 0, 0, 0, sizeof(uint32_t), 1, 1 };
+    HW.get_context(CHW::IMM_CTX_ID)->CopySubresourceRegion(
+        visible_slots_readback, 0, 0, 0, 0,
+        visible_slot_counter_gpu, 0, &counterBox);
+
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    HRESULT hr = HW.get_context(CHW::IMM_CTX_ID)->Map(visible_slots_readback, 0, D3D11_MAP_READ, 0, &mapped);
+    if (SUCCEEDED(hr)) {
+        counter_value = *(uint32_t*)mapped.pData;
+        HW.get_context(CHW::IMM_CTX_ID)->Unmap(visible_slots_readback, 0);
+    }
+
+    visible_slot_count = std::min(counter_value, MAX_VISIBLE_SLOTS);
+
+    if (visible_slot_count == 0) {
+        return;
+    }
+
+    HW.get_context(CHW::IMM_CTX_ID)->CopyResource(visible_slots_readback, visible_slot_ids_gpu);
+
+    HW.get_context(CHW::IMM_CTX_ID)->End(readback_query);
+
+    BOOL data_ready = FALSE;
+    hr = HW.get_context(CHW::IMM_CTX_ID)->GetData(readback_query, &data_ready, sizeof(BOOL), 0);
+    if (SUCCEEDED(hr) && data_ready) {
+        hr = HW.get_context(CHW::IMM_CTX_ID)->Map(visible_slots_readback, 0, D3D11_MAP_READ, 0, &mapped);
+        if (SUCCEEDED(hr)) {
+            visible_slots_cache.clear();
+            uint32_t* slot_ids = (uint32_t*)mapped.pData;
+
+            for (uint32_t i = 0; i < visible_slot_count; i++) {
+                visible_slots_cache.push_back(slot_ids[i]);
+            }
+
+            HW.get_context(CHW::IMM_CTX_ID)->Unmap(visible_slots_readback, 0);
+        }
+    }
+}
+
+void CDetailManager::RequestVisiblePages()
+{
+    for (uint32_t slot_id : visible_slots_cache) {
+        if (slot_id >= slot_count) continue;
+
+        RequestPageWithPriority(slot_id, 255);
+    }
+}
+
+void CDetailManager::RequestPageWithPriority(uint32_t logical_slot, uint8_t priority)
+{
+    if (logical_slot >= slot_count) return;
+
+    if (IsPageResident(logical_slot)) {
+        PageTableEntry& entry = page_table[logical_slot];
+        entry.reference_bit = 1;
+        entry.last_access_frame = Device.dwFrame;
+
+        PhysicalPageInfo& phys = physical_pages[entry.physical_page];
+        phys.reference_bit = 1;
+
+        page_table_stats.cache_hits++;
+        return;
+    }
+
+    page_table_stats.cache_misses++;
+
+    PageUploadRequest request;
+    request.logical_slot = logical_slot;
+    request.priority = priority;
+    request.request_frame = Device.dwFrame;
+
+    upload_queue.push(request);
+}
+
+void CDetailManager::ProcessUploadQueue()
+{
+    uint32_t uploads_this_frame = 0;
+
+    while (!upload_queue.empty() && uploads_this_frame < max_uploads_per_frame) {
+        PageUploadRequest request = upload_queue.top();
+        upload_queue.pop();
+
+        uint32_t logical_slot = request.logical_slot;
+
+        if (IsPageResident(logical_slot)) {
+            continue;
+        }
+
+        uint16_t physical_page;
+        if (resident_page_count < PHYSICAL_PAGES) {
+            for (uint16_t i = 0; i < PHYSICAL_PAGES; i++) {
+                if (physical_pages[i].logical_slot == UINT32_MAX) {
+                    physical_page = i;
+                    break;
+                }
+            }
+        } else {
+            physical_page = FindVictimPage();
+            EvictPage(physical_page);
+        }
+
+        PromotePage(logical_slot, physical_page);
+
+        uploads_this_frame++;
+    }
+
+    if (uploads_this_frame > 0) {
+        Msg("* [PageTable] Processed %u page uploads this frame", uploads_this_frame);
+    }
+}
+
 void CDetailManager::ResetPageTableStats()
 {
     page_table_stats.total_requests = 0;
@@ -1245,13 +1469,23 @@ void CDetailManager::PrintPageTableStats()
         hit_rate = 100.0f * float(page_table_stats.cache_hits) / float(page_table_stats.total_requests);
     }
 
-    Msg("=== Page Table Statistics ===");
-    Msg("Total Requests:   %llu", page_table_stats.total_requests);
-    Msg("Cache Hits:       %llu (%.1f%%)", page_table_stats.cache_hits, hit_rate);
-    Msg("Cache Misses:     %llu", page_table_stats.cache_misses);
-    Msg("Evictions:        %llu", page_table_stats.evictions);
-    Msg("Resident Pages:   %u / %u", resident_page_count, PHYSICAL_PAGES);
-    Msg("===========================");
+    float atlas_usage = 100.0f * float(resident_page_count) / float(PHYSICAL_PAGES);
+    float cull_percent = 100.0f * (1.0f - float(visible_slot_count) / float(slot_count));
+
+    Msg("=== Page Table & GPU Culling Statistics ===");
+    Msg("GPU Culling:");
+    Msg("  Visible Slots:    %u / %u (%.1f%% culled)", visible_slot_count, slot_count, cull_percent);
+    Msg("  Total Slots:      %u", slot_count);
+    Msg("");
+    Msg("Page Table:");
+    Msg("  Total Requests:   %llu", page_table_stats.total_requests);
+    Msg("  Cache Hits:       %llu (%.1f%%)", page_table_stats.cache_hits, hit_rate);
+    Msg("  Cache Misses:     %llu", page_table_stats.cache_misses);
+    Msg("  Evictions:        %llu", page_table_stats.evictions);
+    Msg("  Resident Pages:   %u / %u (%.1f%% full)", resident_page_count, PHYSICAL_PAGES, atlas_usage);
+    Msg("  Upload Queue:     %zu pending", upload_queue.size());
+    Msg("  Max Uploads/Frame: %u", max_uploads_per_frame);
+    Msg("===========================================");
 }
 
 bool CDetailManager::IsPageResident(uint32_t logical_slot) const
@@ -1435,35 +1669,50 @@ void CDetailManager::UpdateIndirectionBuffer(CBackend& cmd_list)
 void CDetailManager::UpdatePageTable()
 {
 
-    const float slot_size = 2.0f;
-    int cam_slot_x = int(floorf(Device.vCameraPosition.x / slot_size));
-    int cam_slot_z = int(floorf(Device.vCameraPosition.z / slot_size));
+    ReadVisibleSlotsFromGPU();
 
+    RequestVisiblePages();
+
+    const float slot_size = 2.0f;
     int x_offs = dtH.x_offs();
     int z_offs = dtH.z_offs();
     uint32_t x_size = dtH.x_size();
     uint32_t z_size = dtH.z_size();
 
-    int sx_local = cam_slot_x + x_offs;
-    int sz_local = cam_slot_z + z_offs;
+    for (const auto& entity : interactive_entities) {
+        int slot_x = int(floorf(entity.position.x / slot_size));
+        int slot_z = int(floorf(entity.position.z / slot_size));
 
-    const int radius = 2;
-    for (int dz = -radius; dz <= radius; dz++) {
-        for (int dx = -radius; dx <= radius; dx++) {
-            int test_x = sx_local + dx;
-            int test_z = sz_local + dz;
+        int sx_local = slot_x + x_offs;
+        int sz_local = slot_z + z_offs;
 
-            if (test_x >= 0 && test_x < (int)x_size && test_z >= 0 && test_z < (int)z_size) {
-                uint32_t slot_idx = test_z * x_size + test_x;
-                if (slot_idx < slot_count) {
-                    RequestPage(slot_idx, 255);
-                }
+        if (sx_local >= 0 && sx_local < (int)x_size && sz_local >= 0 && sz_local < (int)z_size) {
+            uint32_t slot_idx = sz_local * x_size + sx_local;
+            if (slot_idx < slot_count) {
+                RequestPageWithPriority(slot_idx, 255);
             }
         }
     }
 
-    Msg("* [DetailManager] Camera at slot (%d, %d), requesting 5x5 grid around slot index %d",
-        cam_slot_x, cam_slot_z, (sz_local >= 0 && sx_local >= 0) ? (sz_local * x_size + sx_local) : -1);
+    ProcessUploadQueue();
+
+    page_table_stats.total_requests += visible_slot_count;
+    page_table_stats.current_resident = resident_page_count;
+
+    static u32 last_log_frame = 0;
+    static u32 last_visible_count = 0;
+
+    if (Device.dwFrame - last_log_frame >= 60) {
+        float cull_percent = 100.0f * (1.0f - float(visible_slot_count) / float(slot_count));
+        int delta = int(visible_slot_count) - int(last_visible_count);
+
+        Msg("* [GPU Culling] Visible: %u / %u (%.1f%% culled, %+d), Resident: %u / %u, Queue: %zu",
+            visible_slot_count, slot_count, cull_percent, delta,
+            resident_page_count, PHYSICAL_PAGES, upload_queue.size());
+
+        last_log_frame = Device.dwFrame;
+        last_visible_count = visible_slot_count;
+    }
 }
 
 } // namespace xray::render::RENDER_NAMESPACE
