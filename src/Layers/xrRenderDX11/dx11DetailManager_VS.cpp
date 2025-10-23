@@ -3,6 +3,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
+#include "xrEngine/GrassInteractionCollector.h"
 
 // Phase 5: Grass wind tuning parameters (defined in xrEngine, accessed here)
 extern ENGINE_API float ps_r3_grass_wind_multiplier;     // Multiplier for environment wind strength
@@ -1098,68 +1099,26 @@ void CDetailManager::UpdateInteractiveEntities(CBackend& cmd_list)
 
     interactive_entities.clear();
 
-    // Track camera/player with velocity
-    static Fvector last_camera_pos = Device.vCameraPosition;
-    Fvector camera_velocity;
-    camera_velocity.sub(Device.vCameraPosition, last_camera_pos);
-    camera_velocity.mul(1.0f / Device.fTimeDelta);  // Convert to velocity (m/s)
-    last_camera_pos = Device.vCameraPosition;
+    // Phase 1.5: Get entities from game logic collector
+    xr_vector<GrassInteractionEntity> game_entities;
+    g_GrassInteractionCollector.GetEntitiesForFrame(game_entities);
 
-    InteractiveEntity camera_entity;
-    camera_entity.position = Device.vCameraPosition;
-    camera_entity.radius = 1.0f;     // 50m radius around camera
-    camera_entity.velocity = camera_velocity;
-    camera_entity.weight = 1.0f;      // Full weight
-    camera_entity.padding[0] = 0.0f;
-    camera_entity.padding[1] = 0.0f;
-
-    interactive_entities.push_back(camera_entity);
-
-    // TODO: Expand to full game object tracking
-    // To implement:
-    // 1. Get player entity: g_pGameLevel->CurrentViewEntity() or similar
-    // 2. Query nearby objects: g_pGameLevel->ObjectSpace.GetNearest(...)
-    // 3. Filter to NPCs, physics objects, etc.
-    // 4. Extract position, velocity, mass for each
-    // Example pseudocode:
-    /*
-    if (g_pGameLevel)
+    // Convert to renderer format and add to buffer
+    for (const auto& game_entity : game_entities)
     {
-        // Get all objects within grass render distance
-        xr_vector<CObject*> nearby_objects;
-        g_pGameLevel->ObjectSpace.GetNearest(
-            nearby_objects,
-            Device.vCameraPosition,
-            fade_distance,
-            nullptr
-        );
+        InteractiveEntity render_entity;
+        render_entity.position = game_entity.position;
+        render_entity.velocity = game_entity.velocity;
+        render_entity.radius = game_entity.radius;
+        render_entity.weight = game_entity.weight;
+        render_entity.padding[0] = 0.0f;
+        render_entity.padding[1] = 0.0f;
 
-        for (CObject* obj : nearby_objects)
-        {
-            if (CGameObject* go = smart_cast<CGameObject*>(obj))
-            {
-                // Filter to interactive types (actors, NPCs, physics)
-                if (go->getEnabled() &&
-                    (go->CLS_ID == CLSID_OBJECT_ACTOR ||
-                     go->CLS_ID == CLSID_OBJECT_PHYSIC ||
-                     go->CLS_ID == CLSID_AI_STALKER))
-                {
-                    InteractiveEntity e;
-                    e.position = go->Position();
-                    e.radius = go->Radius();
-                    e.velocity = go->velocity();
-                    e.weight = std::min(go->GetMass() / 100.0f, 1.0f);
-                    e.padding[0] = 0.0f;
-                    e.padding[1] = 0.0f;
-                    interactive_entities.push_back(e);
+        interactive_entities.push_back(render_entity);
 
-                    if (interactive_entities.size() >= max_entities)
-                        break;
-                }
-            }
-        }
+        if (interactive_entities.size() >= max_entities)
+            break;
     }
-    */
 
     entity_count_this_frame = interactive_entities.size();
 
