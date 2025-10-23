@@ -146,31 +146,9 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", O->cName().c_str());
 
-    if (!O->H_Parent())
+    if (!O->H_Parent() && O->cast_entity())
     {
-        Fvector pos = O->Position();
-
-        static xr_map<u16, Fvector> last_positions;
-        Fvector vel;
-        vel.set(0, 0, 0);
-
-        auto it = last_positions.find(O->ID());
-        if (it != last_positions.end() && Device.fTimeDelta > 0.0001f)
-        {
-            vel.sub(pos, it->second);
-            vel.mul(1.0f / Device.fTimeDelta);
-        }
-        last_positions[O->ID()] = pos;
-
-        float radius = 0.5f;
-        float weight = 1.0f;
-
-        g_GrassInteractionCollector.AddEntity(
-            O->ID(),
-            pos,
-            vel,
-            radius,
-            weight);
+        g_GrassInteractionCollector.AddEntity(O);
     }
 
 #if 0 // ndef DEBUG

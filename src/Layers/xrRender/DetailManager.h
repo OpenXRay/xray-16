@@ -290,7 +290,8 @@ public:
         float radius;
         Fvector velocity;
         float weight;
-        float padding[2];
+        Fvector direction;
+        float padding;
     };
     xr_vector<InteractiveEntity> interactive_entities;
     u32 max_entities;
