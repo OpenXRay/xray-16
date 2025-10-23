@@ -283,6 +283,8 @@ void CDetailManager::Load()
         CreateInteractionAtlas();
         CreateEntityTrackingBuffers();
         CreateWindTexture();
+
+        InitializePageTable();
     }
 #endif
 

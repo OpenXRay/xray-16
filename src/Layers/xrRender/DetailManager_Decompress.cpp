@@ -525,9 +525,30 @@ void CDetailManager::ComputeSlotAABBs()
         slot_to_instances[key].push_back(i);
     }
 
-    Msg("  - Instances distributed across %u slots", (u32)slot_to_instances.size());
+    Msg("  - Instances distributed across %u non-empty slots", (u32)slot_to_instances.size());
 
-    slot_aabbs.reserve(slot_to_instances.size());
+    u32 total_grid_slots = dtH.x_size() * dtH.z_size();
+    slot_aabbs.resize(total_grid_slots);
+
+    Msg("  - Allocating dense grid: %u x %u = %u total slots", dtH.x_size(), dtH.z_size(), total_grid_slots);
+
+    for (u32 db_z = 0; db_z < dtH.z_size(); db_z++)
+    {
+        for (u32 db_x = 0; db_x < dtH.x_size(); db_x++)
+        {
+            int sx = int(db_x) - dtH.x_offs();
+            int sz = int(db_z) - dtH.z_offs();
+            u32 slot_idx = db_z * dtH.x_size() + db_x;
+
+            SlotAABB& aabb = slot_aabbs[slot_idx];
+            aabb.slot_x = sx;
+            aabb.slot_z = sz;
+            aabb.instance_base = 0;
+            aabb.instance_count = 0;
+            aabb.aabb_min.set(sx * dm_slot_size, 0, sz * dm_slot_size);
+            aabb.aabb_max.set((sx + 1) * dm_slot_size, 0, (sz + 1) * dm_slot_size);
+        }
+    }
 
     for (const auto& pair : slot_to_instances)
     {
@@ -537,7 +558,13 @@ void CDetailManager::ComputeSlotAABBs()
         if (instance_indices.empty())
             continue;
 
-        SlotAABB aabb;
+        int db_x = key.sx + dtH.x_offs();
+        int db_z = key.sz + dtH.z_offs();
+        u32 slot_idx = db_z * dtH.x_size() + db_x;
+
+        VERIFY(slot_idx < total_grid_slots);
+
+        SlotAABB& aabb = slot_aabbs[slot_idx];
         aabb.aabb_min.set(FLT_MAX, FLT_MAX, FLT_MAX);
         aabb.aabb_max.set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
         aabb.instance_base = instance_indices.front();
@@ -568,11 +595,10 @@ void CDetailManager::ComputeSlotAABBs()
             aabb.aabb_max.y = std::max(aabb.aabb_max.y, inst_max.y);
             aabb.aabb_max.z = std::max(aabb.aabb_max.z, inst_max.z);
         }
-
-        slot_aabbs.push_back(aabb);
     }
 
     slot_count = slot_aabbs.size();
+    VERIFY(slot_count == total_grid_slots);
 
     float elapsed = timer.GetElapsed_sec();
     float memory_kb = (slot_count * sizeof(SlotAABB)) / 1024.0f;

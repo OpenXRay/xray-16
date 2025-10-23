@@ -79,8 +79,6 @@ void CDetailManager::hw_Load_Shaders()
         Msg("* [DetailManager] Loaded wind compute shader: OK");
     else
         Msg("! [DetailManager] Failed to load wind compute shader!");
-
-    InitializePageTable();
 }
 
 void CDetailManager::CreatePersistentInstanceBuffer()
@@ -988,7 +986,7 @@ void CDetailManager::UpdateInteractiveEntities(CBackend& cmd_list)
 
     InteractiveEntity camera_entity;
     camera_entity.position = Device.vCameraPosition;
-    camera_entity.radius = 50.0f;
+    camera_entity.radius = 1.0f;
     camera_entity.velocity = camera_velocity;
     camera_entity.weight = 1.0f;
     camera_entity.padding[0] = 0.0f;
@@ -1073,6 +1071,7 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
     context->CSSetConstantBuffers(0, 1, &interaction_constant_buffer);
     context->CSSetShaderResources(0, 1, &entity_srv);
     context->CSSetShaderResources(1, 1, &slot_aabb_srv);
+    context->CSSetShaderResources(2, 1, &physical_to_logical_srv);
     context->CSSetUnorderedAccessViews(0, 1, &interaction_uav, nullptr);
 
     u32 num_groups_x = (atlas_width + 31) / 32;
@@ -1084,9 +1083,9 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
 
     context->Dispatch(num_groups_x, num_groups_y, 1);
 
-    ID3DShaderResourceView* nullSRV[2] = {nullptr, nullptr};
+    ID3DShaderResourceView* nullSRV[3] = {nullptr, nullptr, nullptr};
     ID3DUnorderedAccessView* nullUAV[1] = {nullptr};
-    context->CSSetShaderResources(0, 2, nullSRV);
+    context->CSSetShaderResources(0, 3, nullSRV);
     context->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
     context->CSSetShader(nullptr, nullptr, 0);
 }
@@ -1143,9 +1142,9 @@ void CDetailManager::InitializePageTable()
 {
     Msg("* [DetailManager] Initializing virtual page table...");
 
-    page_table.resize(TOTAL_WORLD_SLOTS);
+    page_table.resize(slot_count);
 
-    for (uint32_t i = 0; i < TOTAL_WORLD_SLOTS; i++) {
+    for (uint32_t i = 0; i < slot_count; i++) {
         page_table[i].physical_page = INVALID_PAGE;
         page_table[i].mip_level = 0;
         page_table[i].reference_bit = 0;
@@ -1168,9 +1167,9 @@ void CDetailManager::InitializePageTable()
     bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     bufferDesc.MiscFlags = 0;
-    bufferDesc.ByteWidth = TOTAL_WORLD_SLOTS * sizeof(uint32_t);
+    bufferDesc.ByteWidth = slot_count * sizeof(uint32_t);
 
-    xr_vector<uint32_t> initial_data(TOTAL_WORLD_SLOTS, 0xFFFFFFFF);
+    xr_vector<uint32_t> initial_data(slot_count, 0xFFFFFFFF);
     D3D11_SUBRESOURCE_DATA initData = {};
     initData.pSysMem = initial_data.data();
 
@@ -1180,14 +1179,35 @@ void CDetailManager::InitializePageTable()
     srvDesc.Format = DXGI_FORMAT_R32_UINT;
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
     srvDesc.Buffer.FirstElement = 0;
-    srvDesc.Buffer.NumElements = TOTAL_WORLD_SLOTS;
+    srvDesc.Buffer.NumElements = slot_count;
 
     CHK_DX(HW.pDevice->CreateShaderResourceView(indirection_buffer, &srvDesc, &indirection_srv));
+
+    D3D11_BUFFER_DESC revmapDesc = {};
+    revmapDesc.Usage = D3D11_USAGE_DYNAMIC;
+    revmapDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    revmapDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    revmapDesc.MiscFlags = 0;
+    revmapDesc.ByteWidth = PHYSICAL_PAGES * sizeof(uint32_t);
+
+    xr_vector<uint32_t> revmap_data(PHYSICAL_PAGES, 0xFFFFFFFF);
+    D3D11_SUBRESOURCE_DATA revmapInitData = {};
+    revmapInitData.pSysMem = revmap_data.data();
+
+    CHK_DX(HW.pDevice->CreateBuffer(&revmapDesc, &revmapInitData, &physical_to_logical_buffer));
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC revmapSrvDesc = {};
+    revmapSrvDesc.Format = DXGI_FORMAT_R32_UINT;
+    revmapSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    revmapSrvDesc.Buffer.FirstElement = 0;
+    revmapSrvDesc.Buffer.NumElements = PHYSICAL_PAGES;
+
+    CHK_DX(HW.pDevice->CreateShaderResourceView(physical_to_logical_buffer, &revmapSrvDesc, &physical_to_logical_srv));
 
     ResetPageTableStats();
 
     Msg("* [DetailManager] Page table initialized: %u logical slots -> %u physical pages",
-        TOTAL_WORLD_SLOTS, PHYSICAL_PAGES);
+        slot_count, PHYSICAL_PAGES);
 }
 
 void CDetailManager::ShutdownPageTable()
@@ -1196,6 +1216,8 @@ void CDetailManager::ShutdownPageTable()
 
     _RELEASE(indirection_srv);
     _RELEASE(indirection_buffer);
+    _RELEASE(physical_to_logical_srv);
+    _RELEASE(physical_to_logical_buffer);
 
     page_table.clear();
     page_table.shrink_to_fit();
@@ -1230,7 +1252,7 @@ void CDetailManager::PrintPageTableStats()
 
 bool CDetailManager::IsPageResident(uint32_t logical_slot) const
 {
-    if (logical_slot >= TOTAL_WORLD_SLOTS)
+    if (logical_slot >= slot_count)
         return false;
 
     return page_table[logical_slot].physical_page != INVALID_PAGE;
@@ -1294,7 +1316,7 @@ void CDetailManager::EvictPage(uint16_t physical_page)
         return;
 
     uint32_t logical_slot = page.logical_slot;
-    VERIFY(logical_slot < TOTAL_WORLD_SLOTS);
+    VERIFY(logical_slot < slot_count);
 
     page_table[logical_slot].physical_page = INVALID_PAGE;
     page_table[logical_slot].reference_bit = 0;
@@ -1310,7 +1332,7 @@ void CDetailManager::EvictPage(uint16_t physical_page)
 
 void CDetailManager::PromotePage(uint32_t logical_slot, uint16_t physical_page)
 {
-    VERIFY(logical_slot < TOTAL_WORLD_SLOTS);
+    VERIFY(logical_slot < slot_count);
     VERIFY(physical_page < PHYSICAL_PAGES);
 
     if (physical_pages[physical_page].logical_slot != UINT32_MAX) {
@@ -1331,7 +1353,7 @@ void CDetailManager::PromotePage(uint32_t logical_slot, uint16_t physical_page)
 
 uint16_t CDetailManager::RequestPage(uint32_t logical_slot, uint8_t priority)
 {
-    VERIFY(logical_slot < TOTAL_WORLD_SLOTS);
+    VERIFY(logical_slot < slot_count);
 
     page_table_stats.total_requests++;
 
@@ -1372,7 +1394,7 @@ void CDetailManager::UpdateIndirectionBuffer(CBackend& cmd_list)
 
     uint32_t* data = (uint32_t*)mapped.pData;
 
-    for (uint32_t i = 0; i < TOTAL_WORLD_SLOTS; i++) {
+    for (uint32_t i = 0; i < slot_count; i++) {
         uint32_t packed = page_table[i].physical_page;
         packed |= (uint32_t(page_table[i].mip_level) << 16);
 
@@ -1381,16 +1403,63 @@ void CDetailManager::UpdateIndirectionBuffer(CBackend& cmd_list)
 
     context->Unmap(indirection_buffer, 0);
 
+    if (physical_to_logical_buffer)
+    {
+        D3D11_MAPPED_SUBRESOURCE revmap_mapped;
+        hr = context->Map(physical_to_logical_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &revmap_mapped);
+
+        if (SUCCEEDED(hr)) {
+            uint32_t* revmap_data = (uint32_t*)revmap_mapped.pData;
+
+            for (uint16_t i = 0; i < PHYSICAL_PAGES; i++) {
+                revmap_data[i] = 0xFFFFFFFF;
+            }
+
+            for (uint16_t phys_page = 0; phys_page < PHYSICAL_PAGES; phys_page++) {
+                uint32_t logical_slot = physical_pages[phys_page].logical_slot;
+                if (logical_slot != UINT32_MAX) {
+                    revmap_data[phys_page] = logical_slot;
+                }
+            }
+
+            context->Unmap(physical_to_logical_buffer, 0);
+        }
+    }
+
 }
 
 void CDetailManager::UpdatePageTable()
 {
 
-    const uint32_t test_slot_count = std::min(4096u, slot_count);
+    const float slot_size = 2.0f;
+    int cam_slot_x = int(floorf(Device.vCameraPosition.x / slot_size));
+    int cam_slot_z = int(floorf(Device.vCameraPosition.z / slot_size));
 
-    for (uint32_t i = 0; i < test_slot_count; i++) {
-        RequestPage(i, 255);
+    int x_offs = dtH.x_offs();
+    int z_offs = dtH.z_offs();
+    uint32_t x_size = dtH.x_size();
+    uint32_t z_size = dtH.z_size();
+
+    int sx_local = cam_slot_x + x_offs;
+    int sz_local = cam_slot_z + z_offs;
+
+    const int radius = 2;
+    for (int dz = -radius; dz <= radius; dz++) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            int test_x = sx_local + dx;
+            int test_z = sz_local + dz;
+
+            if (test_x >= 0 && test_x < (int)x_size && test_z >= 0 && test_z < (int)z_size) {
+                uint32_t slot_idx = test_z * x_size + test_x;
+                if (slot_idx < slot_count) {
+                    RequestPage(slot_idx, 255);
+                }
+            }
+        }
     }
+
+    Msg("* [DetailManager] Camera at slot (%d, %d), requesting 5x5 grid around slot index %d",
+        cam_slot_x, cam_slot_z, (sz_local >= 0 && sx_local >= 0) ? (sz_local * x_size + sx_local) : -1);
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

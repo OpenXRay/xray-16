@@ -324,7 +324,6 @@ public:
         u32 pad[3];
     };
 
-    static const uint32_t TOTAL_WORLD_SLOTS = 359101;
     static const uint16_t PHYSICAL_PAGES = 4096;
     static const uint16_t INVALID_PAGE = 0xFFFF;
 
@@ -335,6 +334,9 @@ public:
 
     ID3DBuffer* indirection_buffer;
     ID3DShaderResourceView* indirection_srv;
+
+    ID3DBuffer* physical_to_logical_buffer;
+    ID3DShaderResourceView* physical_to_logical_srv;
 
     struct PageTableStats {
         uint64_t total_requests;
