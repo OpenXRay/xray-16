@@ -80,6 +80,21 @@ void CDetailManager::hw_Load_Shaders()
         Msg("* [DetailManager] Loaded wind compute shader: OK");
     else
         Msg("! [DetailManager] Failed to load wind compute shader!");
+
+    interaction_update_cs.create("detail_interaction_apply");
+
+    if (interaction_update_cs && interaction_update_cs->sh)
+        Msg("* [DetailManager] Loaded interaction update shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load interaction update shader!");
+
+    D3D11_BUFFER_DESC cbDesc = {};
+    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cbDesc.ByteWidth = sizeof(InteractionUpdateCB);
+
+    CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &interaction_update_cb));
 }
 
 void CDetailManager::CreatePersistentInstanceBuffer()
@@ -432,6 +447,8 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     using namespace detail_manager;
 
     RImplementation.BasicStats.DetailCount = 0;
+
+    ProcessThreadSafeRequests();
 
     UpdatePageTable();
 
@@ -842,6 +859,9 @@ void CDetailManager::DestroyInteractionAtlas()
     _RELEASE(slot_atlas_uv_srv);
     _RELEASE(slot_atlas_uv_buffer);
     _RELEASE(interaction_sampler);
+
+    interaction_update_cs.destroy();
+    _RELEASE(interaction_update_cb);
 }
 
 void CDetailManager::CreateEntityTrackingBuffers()
@@ -1308,8 +1328,13 @@ void CDetailManager::InitializeVisibilityReadback()
     CHK_DX(HW.get_context(CHW::IMM_CTX_ID)->Map(upload_staging_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped));
     staging_buffer_mapped = (uint8_t*)mapped.pData;
 
+    pending_updates.reserve(4096);
+    max_pending_updates = 4096;
+    ResetALifeStats();
+
     Msg("* [DetailManager] Visibility readback initialized (max %u slots, %u MB staging)",
         MAX_VISIBLE_SLOTS, STAGING_BUFFER_SIZE / (1024*1024));
+    Msg("* [DetailManager] A-Life integration initialized (max %u pending updates)", max_pending_updates);
 }
 
 void CDetailManager::ShutdownVisibilityReadback()
@@ -1336,7 +1361,11 @@ void CDetailManager::ShutdownVisibilityReadback()
         upload_queue.pop();
     }
 
+    pending_updates.clear();
+    pending_updates.shrink_to_fit();
+
     Msg("* [DetailManager] Visibility readback shutdown complete");
+    Msg("* [DetailManager] A-Life integration shutdown complete");
 }
 
 void CDetailManager::ReadVisibleSlotsFromGPU()
@@ -1587,6 +1616,8 @@ void CDetailManager::PromotePage(uint32_t logical_slot, uint16_t physical_page)
 
     resident_page_count++;
 
+    ApplyPendingUpdatesToSlot(logical_slot);
+
 }
 
 uint16_t CDetailManager::RequestPage(uint32_t logical_slot, uint8_t priority)
@@ -1673,15 +1704,14 @@ void CDetailManager::UpdatePageTable()
 
     RequestVisiblePages();
 
-    const float slot_size = 2.0f;
     int x_offs = dtH.x_offs();
     int z_offs = dtH.z_offs();
     uint32_t x_size = dtH.x_size();
     uint32_t z_size = dtH.z_size();
 
     for (const auto& entity : interactive_entities) {
-        int slot_x = int(floorf(entity.position.x / slot_size));
-        int slot_z = int(floorf(entity.position.z / slot_size));
+        int slot_x = int(floorf(entity.position.x / DETAIL_SLOT_SIZE));
+        int slot_z = int(floorf(entity.position.z / DETAIL_SLOT_SIZE));
 
         int sx_local = slot_x + x_offs;
         int sz_local = slot_z + z_offs;
@@ -1693,6 +1723,8 @@ void CDetailManager::UpdatePageTable()
             }
         }
     }
+
+    ProcessPendingUpdates();
 
     ProcessUploadQueue();
 
@@ -1712,6 +1744,263 @@ void CDetailManager::UpdatePageTable()
 
         last_log_frame = Device.dwFrame;
         last_visible_count = visible_slot_count;
+    }
+}
+
+void CDetailManager::ResetALifeStats()
+{
+    alife_stats.total_updates_requested = 0;
+    alife_stats.immediate_updates = 0;
+    alife_stats.deferred_updates = 0;
+    alife_stats.applied_deferred = 0;
+    alife_stats.expired_updates = 0;
+}
+
+void CDetailManager::PrintALifeStats()
+{
+    Msg("=== A-Life Integration Statistics ===");
+    Msg("Total Requests:   %llu", alife_stats.total_updates_requested);
+    Msg("Immediate:        %llu (%.1f%%)",
+        alife_stats.immediate_updates,
+        100.0f * alife_stats.immediate_updates / std::max(1ull, alife_stats.total_updates_requested));
+    Msg("Deferred:         %llu (%.1f%%)",
+        alife_stats.deferred_updates,
+        100.0f * alife_stats.deferred_updates / std::max(1ull, alife_stats.total_updates_requested));
+    Msg("Applied Deferred: %llu", alife_stats.applied_deferred);
+    Msg("Expired:          %llu", alife_stats.expired_updates);
+    Msg("Pending Queue:    %zu", pending_updates.size());
+    Msg("====================================");
+}
+
+bool CDetailManager::IsSlotDirty(uint32_t logical_slot) const
+{
+    if (logical_slot >= slot_count) return false;
+
+    if (IsPageResident(logical_slot) && page_table[logical_slot].dirty_bit) {
+        return true;
+    }
+
+    for (const auto& update : pending_updates) {
+        if (update.logical_slot == logical_slot) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void CDetailManager::RequestInteractionUpdate(
+    const Fvector& world_pos,
+    float radius,
+    float strength,
+    uint8_t type)
+{
+    alife_stats.total_updates_requested++;
+
+    const float slot_half = DETAIL_SLOT_SIZE_2;
+    uint32_t slot_x = uint32_t((world_pos.x + slot_half) / DETAIL_SLOT_SIZE);
+    uint32_t slot_z = uint32_t((world_pos.z + slot_half) / DETAIL_SLOT_SIZE);
+
+    uint32_t logical_slot = slot_z * 600 + slot_x;
+
+    if (logical_slot >= slot_count) {
+        return;
+    }
+
+    if (IsPageResident(logical_slot)) {
+        alife_stats.immediate_updates++;
+
+        uint16_t physical_page = page_table[logical_slot].physical_page;
+
+        ApplyInteractionUpdateGPU(physical_page, world_pos, radius, strength);
+
+        page_table[logical_slot].dirty_bit = 1;
+
+        Msg("* [A-Life] IMMEDIATE update at slot %u (phys page %u) - pos (%.1f, %.1f, %.1f) r=%.2f s=%.2f",
+            logical_slot, physical_page, world_pos.x, world_pos.y, world_pos.z, radius, strength);
+
+    } else {
+        alife_stats.deferred_updates++;
+
+        PendingInteractionUpdate pending;
+        pending.logical_slot = logical_slot;
+        pending.world_position = world_pos;
+        pending.radius = radius;
+        pending.strength = strength;
+        pending.timestamp = Device.dwFrame;
+        pending.interaction_type = type;
+
+        pending_updates.push_back(pending);
+
+        if (pending_updates.size() > max_pending_updates) {
+            pending_updates.erase(pending_updates.begin());
+            alife_stats.expired_updates++;
+        }
+
+        RequestPageWithPriority(logical_slot, PRIORITY_DIRTY);
+
+        Msg("* [A-Life] DEFERRED update queued for slot %u - pos (%.1f, %.1f, %.1f) r=%.2f s=%.2f (queue size: %zu)",
+            logical_slot, world_pos.x, world_pos.y, world_pos.z, radius, strength, pending_updates.size());
+    }
+}
+
+void CDetailManager::ExpireOldPendingUpdates(uint64_t max_age_frames)
+{
+    uint64_t current_frame = Device.dwFrame;
+    uint32_t expired_count = 0;
+
+    auto it = pending_updates.begin();
+    while (it != pending_updates.end()) {
+        uint64_t age = current_frame - it->timestamp;
+
+        if (age > max_age_frames) {
+            alife_stats.expired_updates++;
+            expired_count++;
+            it = pending_updates.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    if (expired_count > 0) {
+        Msg("* [A-Life] Expired %u old pending updates (age > %llu frames, queue remaining: %zu)",
+            expired_count, max_age_frames, pending_updates.size());
+    }
+}
+
+void CDetailManager::ApplyPendingUpdatesToSlot(uint32_t logical_slot)
+{
+    if (!IsPageResident(logical_slot)) {
+        return;
+    }
+
+    uint16_t physical_page = page_table[logical_slot].physical_page;
+
+    uint32_t applied_count = 0;
+    auto it = pending_updates.begin();
+    while (it != pending_updates.end()) {
+        if (it->logical_slot == logical_slot) {
+            ApplyInteractionUpdateGPU(
+                physical_page,
+                it->world_position,
+                it->radius,
+                it->strength);
+
+            alife_stats.applied_deferred++;
+            applied_count++;
+
+            Msg("* [A-Life] APPLIED deferred update #%u to slot %u (phys page %u) - pos (%.1f, %.1f, %.1f)",
+                applied_count, logical_slot, physical_page,
+                it->world_position.x, it->world_position.y, it->world_position.z);
+
+            it = pending_updates.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    if (applied_count > 0) {
+        page_table[logical_slot].dirty_bit = 1;
+        Msg("* [A-Life] Applied %u deferred updates to slot %u (queue remaining: %zu)",
+            applied_count, logical_slot, pending_updates.size());
+    }
+}
+
+void CDetailManager::ProcessPendingUpdates()
+{
+    ExpireOldPendingUpdates(1800);
+
+    xr_set<uint32_t> dirty_slots;
+    for (const auto& update : pending_updates) {
+        dirty_slots.insert(update.logical_slot);
+    }
+
+    for (uint32_t slot : dirty_slots) {
+        if (!IsPageResident(slot)) {
+            RequestPageWithPriority(slot, PRIORITY_DIRTY);
+        }
+    }
+}
+
+void CDetailManager::ApplyInteractionUpdateGPU(
+    uint32_t physical_page,
+    const Fvector& world_center,
+    float radius,
+    float strength)
+{
+    if (!interaction_update_cs || !interaction_update_cs->sh) {
+        return;
+    }
+
+    if (!interaction_atlas || !interaction_uav) {
+        return;
+    }
+
+    InteractionUpdateCB cb_data;
+    cb_data.world_center = Fvector2().set(world_center.x, world_center.z);
+    cb_data.radius = radius;
+    cb_data.strength = strength;
+    cb_data.physical_page = physical_page;
+    cb_data.slot_size = DETAIL_SLOT_SIZE;
+    cb_data.atlas_width = (float)atlas_width;
+    cb_data.slot_texture_size = (float)slot_texture_size;
+
+    auto* context = HW.get_context(CHW::IMM_CTX_ID);
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    HRESULT hr = context->Map(interaction_update_cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+    if (FAILED(hr)) {
+        Msg("! [A-Life] Failed to map interaction update CB");
+        return;
+    }
+
+    memcpy(mapped.pData, &cb_data, sizeof(cb_data));
+    context->Unmap(interaction_update_cb, 0);
+
+    ID3D11ComputeShader* cs = interaction_update_cs->sh;
+    context->CSSetShader(cs, nullptr, 0);
+    context->CSSetConstantBuffers(0, 1, &interaction_update_cb);
+    context->CSSetUnorderedAccessViews(0, 1, &interaction_uav, nullptr);
+
+    context->Dispatch(4, 4, 1);
+
+    ID3D11UnorderedAccessView* null_uav = nullptr;
+    context->CSSetUnorderedAccessViews(0, 1, &null_uav, nullptr);
+
+}
+
+void CDetailManager::RequestInteractionUpdateThreadSafe(
+    const Fvector& world_pos,
+    float radius,
+    float strength,
+    uint8_t type)
+{
+    ThreadSafeInteractionRequest request;
+    request.world_position = world_pos;
+    request.radius = radius;
+    request.strength = strength;
+    request.type = type;
+
+    threadsafe_queue_lock.Enter();
+    threadsafe_request_queue.push_back(request);
+    threadsafe_queue_lock.Leave();
+}
+
+void CDetailManager::ProcessThreadSafeRequests()
+{
+    if (threadsafe_request_queue.empty())
+        return;
+
+    threadsafe_queue_lock.Enter();
+
+    xr_vector<ThreadSafeInteractionRequest> requests_copy;
+    requests_copy.swap(threadsafe_request_queue);
+
+    threadsafe_queue_lock.Leave();
+
+    for (const auto& req : requests_copy)
+    {
+        RequestInteractionUpdate(req.world_position, req.radius, req.strength, req.type);
     }
 }
 

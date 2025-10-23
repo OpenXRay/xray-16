@@ -396,4 +396,6 @@ public:
 
     virtual RenderContext GetCurrentContext() const = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
+
+    virtual void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) = 0;
 };

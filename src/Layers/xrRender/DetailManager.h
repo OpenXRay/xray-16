@@ -375,6 +375,58 @@ public:
     ID3D11Buffer* upload_staging_buffer;
     uint8_t* staging_buffer_mapped;
 
+    struct PendingInteractionUpdate {
+        uint32_t logical_slot;
+        Fvector world_position;
+        float radius;
+        float strength;
+        uint64_t timestamp;
+        uint8_t interaction_type;
+        uint8_t padding[7];
+    };
+    static_assert(sizeof(PendingInteractionUpdate) == 40, "PendingInteractionUpdate size check");
+
+    xr_vector<PendingInteractionUpdate> pending_updates;
+    uint32_t max_pending_updates;
+
+    struct ThreadSafeInteractionRequest {
+        Fvector world_position;
+        float radius;
+        float strength;
+        uint8_t type;
+        uint8_t padding[3];
+    };
+    xr_vector<ThreadSafeInteractionRequest> threadsafe_request_queue;
+    Lock threadsafe_queue_lock;
+
+    static const uint8_t PRIORITY_VISIBLE = 255;
+    static const uint8_t PRIORITY_DIRTY = 128;
+    static const uint8_t PRIORITY_PREFETCH = 64;
+    static const uint8_t PRIORITY_ALIFE = 32;
+
+    struct ALifeUpdateStats {
+        uint64_t total_updates_requested;
+        uint64_t immediate_updates;
+        uint64_t deferred_updates;
+        uint64_t applied_deferred;
+        uint64_t expired_updates;
+    } alife_stats;
+
+    ref_cs interaction_update_cs;
+
+    struct InteractionUpdateCB {
+        Fvector2 world_center;
+        float radius;
+        float strength;
+        uint32_t physical_page;
+        float slot_size;
+        float atlas_width;
+        float slot_texture_size;
+    };
+    static_assert(sizeof(InteractionUpdateCB) == 32, "InteractionUpdateCB size check");
+
+    ID3D11Buffer* interaction_update_cb;
+
 #endif
 
     ref_constant hwc_consts;
@@ -450,7 +502,19 @@ public:
     void ProcessUploadQueue();
     void RequestVisiblePages();
     void RequestPageWithPriority(uint32_t logical_slot, uint8_t priority);
+
+    void ProcessThreadSafeRequests();
+    void ProcessPendingUpdates();
+    void ApplyPendingUpdatesToSlot(uint32_t logical_slot);
+    void ExpireOldPendingUpdates(uint64_t max_age_frames);
+    void ApplyInteractionUpdateGPU(uint32_t physical_page, const Fvector& world_center, float radius, float strength);
+    bool IsSlotDirty(uint32_t logical_slot) const;
+    void ResetALifeStats();
+    void PrintALifeStats();
 #endif
+    void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
+    void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
+
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }
     int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
