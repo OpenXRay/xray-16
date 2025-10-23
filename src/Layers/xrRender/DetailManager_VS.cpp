@@ -278,6 +278,9 @@ void CDetailManager::hw_Unload()
         wind_compute_shader.destroy();
     _RELEASE(interaction_constant_buffer);
     _RELEASE(wind_constant_buffer);
+
+    // Phase 6: Shutdown page table (NEW)
+    ShutdownPageTable();
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

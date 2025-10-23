@@ -260,6 +260,26 @@ public:
     };
     static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes for GPU alignment");
 
+    // Phase 6: Virtual texturing page table structures
+    struct PageTableEntry {
+        uint16_t physical_page;      // 0-4095 or 0xFFFF (not resident)
+        uint8_t  mip_level;          // Reserved for future LOD (default: 0)
+        uint8_t  reference_bit : 1;  // For Clock algorithm
+        uint8_t  dirty_bit : 1;      // Needs writeback
+        uint8_t  locked_bit : 1;     // In-flight upload, can't evict
+        uint8_t  padding : 5;
+        uint64_t last_access_frame;  // For age tracking
+    };
+    static_assert(sizeof(PageTableEntry) == 16, "PageTableEntry packing check");
+
+    struct PhysicalPageInfo {
+        uint32_t logical_slot;       // Which world slot occupies this page (UINT32_MAX = free)
+        uint8_t  reference_bit;      // For Clock algorithm
+        uint8_t  locked;             // Can't evict (in-flight upload)
+        uint16_t padding;
+    };
+    static_assert(sizeof(PhysicalPageInfo) == 8, "PhysicalPageInfo packing check");
+
     xr_vector<SlotAABB> slot_aabbs;     // CPU copy of slot AABBs
     u32 slot_count;                     // Total number of slots with instances
     ID3DBuffer* slot_aabb_buffer;       // GPU buffer for slot AABBs
@@ -321,6 +341,29 @@ public:
         u32 pad[3];              // 44-55
     };
 
+    // Phase 6: Virtual Texturing System
+    static const uint32_t TOTAL_WORLD_SLOTS = 359101;  // From your level
+    static const uint16_t PHYSICAL_PAGES = 4096;       // 64×64 atlas slots
+    static const uint16_t INVALID_PAGE = 0xFFFF;
+
+    xr_vector<PageTableEntry> page_table;              // [TOTAL_WORLD_SLOTS]
+    std::array<PhysicalPageInfo, PHYSICAL_PAGES> physical_pages;
+    uint16_t clock_hand;                                // Current position for Clock algorithm
+    uint32_t resident_page_count;                       // How many pages currently in use
+
+    // Indirection buffer (replaces slot_atlas_uvs)
+    ID3DBuffer* indirection_buffer;
+    ID3DShaderResourceView* indirection_srv;
+
+    // Statistics
+    struct PageTableStats {
+        uint64_t total_requests;
+        uint64_t cache_hits;
+        uint64_t cache_misses;
+        uint64_t evictions;
+        uint32_t current_resident;
+    } page_table_stats;
+
 #endif
 
     ref_constant hwc_consts;
@@ -333,6 +376,7 @@ public:
     ref_constant hwc_s_array;
     ref_constant hwc_detail_params;  // Phase 5: slot grid parameters (x_size, z_size, x_offs, z_offs)
     ref_constant hwc_grass_wind_displacement;  // Phase 5: wind displacement strength
+    ref_constant hwc_grass_interaction_displacement;  // Phase 5: interaction displacement strength
     void hw_Load();
     void hw_Load_Geom();
     void hw_Load_Shaders();
@@ -376,11 +420,24 @@ public:
     void DestroyInteractionAtlas();
     void CreateEntityTrackingBuffers();
     void DestroyEntityTrackingBuffers();
-    void UpdateInteractiveEntities();
+    void UpdateInteractiveEntities(CBackend& cmd_list);
     void CreateWindTexture();
     void DestroyWindTexture();
     void RenderInteractions(CBackend& cmd_list);
     void UpdateWind(CBackend& cmd_list);
+
+    // Phase 6: Virtual texturing management
+    void InitializePageTable();
+    void ShutdownPageTable();
+    void UpdatePageTable();  // Called each frame
+    uint16_t RequestPage(uint32_t logical_slot, uint8_t priority);
+    uint16_t FindVictimPage();
+    void EvictPage(uint16_t physical_page);
+    void PromotePage(uint32_t logical_slot, uint16_t physical_page);
+    bool IsPageResident(uint32_t logical_slot) const;
+    void UpdateIndirectionBuffer(CBackend& cmd_list);
+    void ResetPageTableStats();
+    void PrintPageTableStats();
 #endif
     // cache grid to world
     int cg2w_X(int x) { return cache_cx - dm_size + x; }

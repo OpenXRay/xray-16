@@ -6,12 +6,14 @@ uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
 uniform float4 dir2D_2; // dir2 - for wave2 (vis_id=2)
 uniform float4 detail_params; // Phase 5: x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
 uniform float grass_wind_displacement; // Phase 5: Wind displacement strength (tunable via ImGui)
+uniform float grass_interaction_displacement; // Phase 5: Interaction displacement strength (tunable via ImGui)
 
 // Phase 5: Interactive grass textures
 // Note: Slot t0 = instance buffer, so we use t1, t2, t3 (engine limit is 4 VS texture slots)
 Texture2D interaction_atlas : register(t1);  // RG=displacement XZ, B=bend, A=age
 Texture2D wind_texture : register(t2);       // RGB=wind vector, A=strength
-Buffer<float4> slot_atlas_uvs : register(t3);  // xy=min UV, zw=max UV for each slot
+// Phase 6: Virtual texturing indirection table (NEW)
+Buffer<uint> slot_indirection : register(t3);  // Packed: physical_page (16) | mip (8) | flags (8)
 SamplerState interaction_sampler : register(s0);
 
 // New vertex structure for instanced details
@@ -90,20 +92,41 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 
 		uint slot_idx = uint(sz_local) * x_size + uint(sx_local);
 
-		// Wrap to atlas capacity (4096 slots for 2048x2048 atlas with 32x32 per slot)
-		// This allows large levels to work - only nearby slots get accurate interaction
-		const uint max_atlas_slots = 4096;
-		slot_idx = slot_idx % max_atlas_slots;
+		// Phase 6: Virtual texturing with indirection table
+		// No more modulo - use proper indirection lookup
 
-		// Sample interaction atlas
-		// Get slot UVs from lookup buffer
-		float4 slot_uv = slot_atlas_uvs.Load(slot_idx);
+		// Lookup indirection table entry
+		uint packed_indirection = slot_indirection.Load(slot_idx);
+		uint physical_page = packed_indirection & 0xFFFF;  // Lower 16 bits
+		uint mip_level = (packed_indirection >> 16) & 0xFF;  // Bits 16-23
 
-		// Compute UV within slot based on position within slot
-		float2 slot_local = frac(pos.xz / slot_size);  // 0-1 within slot
-		float2 atlas_uv = lerp(slot_uv.xy, slot_uv.zw, slot_local);
+		float4 interaction;
 
-		float4 interaction = interaction_atlas.SampleLevel(interaction_sampler, atlas_uv, 0);
+		// Check if page is resident
+		if (physical_page == 0xFFFF) {
+			// Slot not resident in atlas - use fallback (no interaction)
+			interaction = float4(0, 0, 0, 0);
+		} else {
+			// Compute atlas UV from physical page index
+			const uint pages_per_row = 64;  // 2048 / 32 = 64 pages per row
+			uint page_x = physical_page % pages_per_row;
+			uint page_y = physical_page / pages_per_row;
+
+			// Each page is 32×32 pixels in a 2048×2048 atlas
+			const float page_size_uv = 32.0 / 2048.0;  // 0.015625
+
+			// Base UV for this page
+			float2 page_base_uv = float2(page_x, page_y) * page_size_uv;
+
+			// Local position within slot (0-1)
+			float2 slot_local = frac(pos.xz / slot_size);
+
+			// Final atlas UV
+			float2 atlas_uv = page_base_uv + slot_local * page_size_uv;
+
+			// Sample interaction atlas
+			interaction = interaction_atlas.SampleLevel(interaction_sampler, atlas_uv, 0);
+		}
 
 		// Sample wind texture (world-space tiling)
 		float2 wind_uv = pos.xz * 0.001;  // 1km tile size
@@ -113,12 +136,12 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 		float2 wind_direction = wind.xz * 2.0 - 1.0;
 		float wind_strength = wind.a;
 
-		// DISABLED: Apply interaction displacement (radial push from entities)
-		// float2 interaction_displacement = interaction.rg * interaction.b * vertex_height_factor;
-		// pos.xz += interaction_displacement * 0.5;  // Scale down for subtlety
+		// Apply interaction displacement (radial push from entities)
+		float2 interaction_displacement = interaction.rg * interaction.b * vertex_height_factor;
+		pos.xz += interaction_displacement * grass_interaction_displacement;
 
-		// Apply wind displacement (amplified for testing)
-		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * grass_wind_displacement;  // Increased from 0.2 to 2.0
+		// Apply wind displacement
+		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * grass_wind_displacement;
 		pos.xz += wind_displacement;
 	}
 

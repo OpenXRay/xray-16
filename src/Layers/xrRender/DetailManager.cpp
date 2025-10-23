@@ -504,12 +504,6 @@ void CDetailManager::Render(CBackend& cmd_list)
     cmd_list.set_xform_world(Fidentity);
     if (UseVS())
     {
-#ifdef USE_DX11
-        // Phase 5: Update interactive grass system
-        UpdateInteractiveEntities();
-        UpdateWind(cmd_list);
-        //RenderInteractions(cmd_list);
-#endif
         hw_Render(cmd_list);
     }
     else

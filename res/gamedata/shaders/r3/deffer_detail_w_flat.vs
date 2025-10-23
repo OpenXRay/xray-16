@@ -6,6 +6,7 @@ uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
 uniform float4 dir2D_2; // dir2 - for wave2 (vis_id=2)
 uniform float4 detail_params; // Phase 5: x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
 uniform float grass_wind_displacement; // Phase 5: Wind displacement strength (tunable via ImGui)
+uniform float grass_interaction_displacement; // Phase 5: Interaction displacement strength (tunable via ImGui)
 
 // Phase 5: Interactive grass textures
 // Note: Slot t0 = instance buffer, so we use t1, t2, t3 (engine limit is 4 VS texture slots)
@@ -113,12 +114,12 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 		float2 wind_direction = wind.xz * 2.0 - 1.0;
 		float wind_strength = wind.a;
 
-		// DISABLED: Apply interaction displacement (radial push from entities)
-		// float2 interaction_displacement = interaction.rg * interaction.b * vertex_height_factor;
-		// pos.xz += interaction_displacement * 0.5;  // Scale down for subtlety
+		// Apply interaction displacement (radial push from entities)
+		float2 interaction_displacement = interaction.rg * interaction.b * vertex_height_factor;
+		pos.xz += interaction_displacement * grass_interaction_displacement;
 
-		// Apply wind displacement (amplified for testing)
-		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * grass_wind_displacement;  // Increased from 0.2 to 2.0
+		// Apply wind displacement
+		float2 wind_displacement = wind_direction * wind_strength * vertex_height_factor * grass_wind_displacement;
 		pos.xz += wind_displacement;
 	}
 

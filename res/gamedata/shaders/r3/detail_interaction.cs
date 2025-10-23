@@ -71,17 +71,22 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
         return;
 
     // Compute slot index from atlas pixel coordinates
+    // NOTE: Atlas can only hold 4096 slots (64×64) but level has 359K+ slots
+    // With Phase 6 virtual texturing, we use indirection to map visible slots to atlas
     uint slot_x_in_atlas = atlas_pixel.x / g_slot_texture_size;
     uint slot_z_in_atlas = atlas_pixel.y / g_slot_texture_size;
-    uint slot_idx = slot_z_in_atlas * g_slots_per_row + slot_x_in_atlas;
 
-    // Skip if this slot index is beyond our slot count (atlas may be larger than needed)
-    if (slot_idx >= g_slot_count)
+    // Calculate atlas slot index (0-4095)
+    uint atlas_slots_per_row = g_atlas_width / g_slot_texture_size;  // 64
+    uint slot_idx = slot_z_in_atlas * atlas_slots_per_row + slot_x_in_atlas;
+
+    // Only process slots that fit in the atlas
+    if (slot_idx >= 4096 || slot_idx >= g_slot_count)
         return;
 
     SlotAABB slot = g_slots[slot_idx];
 
-    // Skip empty slots
+    // Skip empty slots (no grass instances)
     if (slot.instance_count == 0)
         return;
 
