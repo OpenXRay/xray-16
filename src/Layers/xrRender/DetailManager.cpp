@@ -33,6 +33,7 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+extern int ps_r__detail_gpu;
 const float dbgOffset = 0.f;
 const int dbgItems = 128;
 
@@ -269,26 +270,40 @@ void CDetailManager::Load()
 #ifdef USE_DX11
     if (UseVS())
     {
-        DecompressAllSlots();
+        if (ps_r__detail_gpu)
+        {
+            Msg("* [DetailManager] Initializing GPU rendering path...");
 
-        CreatePersistentInstanceBuffer();
+            DecompressAllSlots();
 
-        CreateSlotAABBBuffer();
+            CreatePersistentInstanceBuffer();
+
+            CreateSlotAABBBuffer();
 #ifdef DEBUG
-        ValidateSlotAABBs();
+            ValidateSlotAABBs();
 #endif
 
-        CreateGPUCullingBuffers();
+            CreateGPUCullingBuffers();
 
-        CreateInteractionAtlas();
-        CreateEntityTrackingBuffers();
-        CreateWindTexture();
+            CreateInteractionAtlas();
+            CreateEntityTrackingBuffers();
+            CreateWindTexture();
 
-        InitializePageTable();
+            InitializePageTable();
 
-        InitializeVisibilityReadback();
+            InitializeVisibilityReadback();
 
-        InitializeWarmCache();
+            InitializeWarmCache();
+
+            Msg("* [DetailManager] GPU path ready");
+        }
+        else
+        {
+            Msg("* [DetailManager] Using Vanilla CPU rendering");
+            Msg("  - Slot-based visibility (CPU)");
+            Msg("  - Memory pool allocation (poolSI)");
+            Msg("  - Constant buffer instancing");
+        }
     }
 #endif
 
@@ -314,6 +329,43 @@ void CDetailManager::Unload()
         hw_Unload();
     else
         soft_Unload();
+
+#ifdef USE_DX11
+    if (ps_r__detail_gpu && UseVS())
+    {
+        Msg("* [DetailManager] Cleaning up GPU rendering path...");
+
+        ShutdownPersistence();
+        ShutdownWarmCache();
+        ShutdownReadbackPipeline();
+        ShutdownVisibilityReadback();
+        ShutdownPageTable();
+        DestroyWindTexture();
+        DestroyEntityTrackingBuffers();
+        DestroyInteractionAtlas();
+        DestroySlotAABBBuffer();
+
+        _RELEASE(persistent_instance_srv);
+        _RELEASE(persistent_instance_buffer);
+
+        _RELEASE(gpu_visible_counts_readback);
+        _RELEASE(gpu_visible_counts_uav);
+        _RELEASE(gpu_visible_counts_buffer);
+        _RELEASE(cull_constant_buffer);
+
+        for (u32 i = 0; i < max_gpu_culled_objects; i++)
+        {
+            _RELEASE(gpu_visible_uavs[i]);
+            _RELEASE(gpu_visible_srvs[i]);
+            _RELEASE(gpu_visible_buffers[i]);
+        }
+
+        all_level_instances.clear();
+        full_level_loaded = false;
+
+        Msg("* [DetailManager] GPU cleanup complete");
+    }
+#endif
 
     for (CDetail* detailObject : objects)
     {

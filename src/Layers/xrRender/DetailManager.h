@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "xrCore/xrPool.h"
 #include "DetailFormat.h"
 #include "DetailModel.h"
 
@@ -52,6 +53,11 @@ extern float ps_current_detail_height;
 class ECORE_API CDetailManager
 {
 public:
+
+    float fade_distance = 99999;
+    Fvector light_position;
+    void details_clear();
+
     struct SlotItem
     { // один кустик
         float scale;
@@ -117,6 +123,7 @@ public:
     typedef xr_vector<xr_vector<SlotItemVec*>> vis_list;
     typedef svector<CDetail*, dm_max_objects> DetailVec;
     typedef DetailVec::iterator DetailIt;
+    typedef poolSS<SlotItem, 4096> PSS;
 
     int dither[16][16];
 
@@ -157,6 +164,8 @@ public:
     int cache_cx;
     int cache_cz;
 
+    PSS poolSI; // pool из которого выделяются SlotItem
+
     Fvector EYE;
 
     void UpdateVisibleM();
@@ -175,16 +184,51 @@ public:
     void soft_Render();
 
     // Hardware processor
+    ref_geom hw_Geom;
     size_t hw_BatchSize;
 
-    ref_geom hw_Geom;
     VertexStagingBuffer hw_VB;
     IndexStagingBuffer hw_IB;
 
-#ifdef USE_DX11
-    ID3DShaderResourceView* detailSRV_vis[3];
-    ID3DBuffer* detailBuffer_vis[3];
-    u32 detailBufferSize_vis[3];
+    ref_constant hwc_consts;
+    ref_constant hwc_wave;
+    ref_constant hwc_wind;
+    ref_constant hwc_array;
+    ref_constant hwc_s_consts;
+    ref_constant hwc_s_xform;
+    ref_constant hwc_s_array;
+    void hw_Load();
+    void hw_Load_Geom();
+    void hw_Load_Shaders();
+    void hw_Unload();
+    void hw_Render(CBackend& cmd_list);
+    void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+
+    // get unpacked slot
+    DetailSlot& QueryDB(int sx, int sz);
+
+    void cache_Initialize();
+    void cache_Update(int sx, int sz, Fvector& view);
+    void cache_Task(int gx, int gz, Slot* D);
+    Slot* cache_Query(int sx, int sz);
+    void cache_Decompress(Slot* D);
+    BOOL cache_Validate();
+
+    // cache grid to world
+    int cg2w_X(int x) { return cache_cx - dm_size + x; }
+    int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
+    // world to cache grid
+    int w2cg_X(int x) { return x - cache_cx + dm_size; }
+    int w2cg_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
+
+    void Load();
+    void Unload();
+    void Render(CBackend& cmd_list);
+
+    /// MT stuff
+    Task* m_calc_task{};
+
+    void DispatchMTCalc();
 
     ref_geom vis_unified_geom[3];
     VertexStagingBuffer vis_unified_VB[3];
@@ -195,11 +239,17 @@ public:
     u32 vis_total_vertices[3];
     u32 vis_total_indices[3];
 
+#ifdef USE_DX11
+    ID3DShaderResourceView* detailSRV_vis[3];
+    ID3DBuffer* detailBuffer_vis[3];
+    u32 detailBufferSize_vis[3];
+
     struct SlotItemWithObject
     {
         SlotItem item;
         u32 object_id;
     };
+
     struct InstanceData
     {
         Fvector m0;
@@ -211,6 +261,7 @@ public:
         Fvector pos;
         u32 object_id;
     };
+
     xr_vector<SlotItemWithObject> all_level_instances;
     u32 total_instance_count;
     bool full_level_loaded;
@@ -248,25 +299,6 @@ public:
         Fvector4 padding2;
     };
     static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes for GPU alignment");
-
-    struct PageTableEntry {
-        uint16_t physical_page;
-        uint8_t  mip_level;
-        uint8_t  reference_bit : 1;
-        uint8_t  dirty_bit : 1;
-        uint8_t  locked_bit : 1;
-        uint8_t  padding : 5;
-        uint64_t last_access_frame;
-    };
-    static_assert(sizeof(PageTableEntry) == 16, "PageTableEntry packing check");
-
-    struct PhysicalPageInfo {
-        uint32_t logical_slot;
-        uint8_t  reference_bit;
-        uint8_t  locked;
-        uint16_t padding;
-    };
-    static_assert(sizeof(PhysicalPageInfo) == 8, "PhysicalPageInfo packing check");
 
     xr_vector<SlotAABB> slot_aabbs;
     u32 slot_count;
@@ -328,6 +360,25 @@ public:
         u32 texture_size;
         u32 pad[3];
     };
+
+    struct PageTableEntry {
+        uint16_t physical_page;
+        uint8_t  mip_level;
+        uint8_t  reference_bit : 1;
+        uint8_t  dirty_bit : 1;
+        uint8_t  locked_bit : 1;
+        uint8_t  padding : 5;
+        uint64_t last_access_frame;
+    };
+    static_assert(sizeof(PageTableEntry) == 16, "PageTableEntry packing check");
+
+    struct PhysicalPageInfo {
+        uint32_t logical_slot;
+        uint8_t  reference_bit;
+        uint8_t  locked;
+        uint16_t padding;
+    };
+    static_assert(sizeof(PhysicalPageInfo) == 8, "PhysicalPageInfo packing check");
 
     static const uint16_t PHYSICAL_PAGES = 4096;
     static const uint16_t INVALID_PAGE = 0xFFFF;
@@ -475,42 +526,14 @@ public:
     std::mutex save_mutex;
     xr_vector<uint32_t> slots_pending_save;
 
-#endif
-
-    ref_constant hwc_consts;
-    ref_constant hwc_wave;
-    ref_constant hwc_wind;
     ref_constant hwc_wind2;
-    ref_constant hwc_array;
-    ref_constant hwc_s_consts;
-    ref_constant hwc_s_xform;
-    ref_constant hwc_s_array;
     ref_constant hwc_detail_params;
     ref_constant hwc_grass_wind_displacement;
     ref_constant hwc_grass_interaction_displacement;
-    void hw_Load();
-    void hw_Load_Geom();
-    void hw_Load_Shaders();
-    void hw_Unload();
-    void hw_Render(CBackend& cmd_list);
-    void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+
     void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
-
-#ifdef USE_DX11
     void hw_Render_FullLevel(CBackend& cmd_list);
-#endif
 
-    // get unpacked slot
-    DetailSlot& QueryDB(int sx, int sz);
-
-    void cache_Initialize();
-    void cache_Update(int sx, int sz, Fvector& view);
-    void cache_Task(int gx, int gz, Slot* D);
-    Slot* cache_Query(int sx, int sz);
-    void cache_Decompress(Slot* D);
-    BOOL cache_Validate();
-
-#ifdef USE_DX11
     void DecompressAllSlots();
     void CreatePersistentInstanceBuffer();
 
@@ -585,24 +608,10 @@ public:
     void QueueSlotForSave(uint32_t logical_slot);
     void FlushPendingSaves();
     void UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* data);
+
 #endif
     void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
     void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
-
-    // cache grid to world
-    int cg2w_X(int x) { return cache_cx - dm_size + x; }
-    int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
-    // world to cache grid
-    int w2cg_X(int x) { return x - cache_cx + dm_size; }
-    int w2cg_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
-    void Load();
-    void Unload();
-    void Render(CBackend& cmd_list);
-
-    /// MT stuff
-    Task* m_calc_task{};
-
-    void DispatchMTCalc();
 
     CDetailManager();
     virtual ~CDetailManager();
