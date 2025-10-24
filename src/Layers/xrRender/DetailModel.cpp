@@ -125,6 +125,8 @@ void CDetail::Load(IReader* S)
         bv_bb.modify(vertices[i].P);
     bv_bb.getsphere(bv_sphere.P, bv_sphere.R);
 
+    bv_sphere.R *= 1.2f;
+
 #if !defined(_EDITOR) && defined(USE_DX11)
     Optimize();
 

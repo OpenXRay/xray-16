@@ -247,6 +247,8 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
                         MS.empty = FALSE;
                 }
                 MS.vis.box.getsphere(MS.vis.sphere.P, MS.vis.sphere.R);
+
+                MS.vis.sphere.R *= 1.2f;
             }
         }
     }

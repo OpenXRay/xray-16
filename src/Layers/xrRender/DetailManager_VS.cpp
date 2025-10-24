@@ -257,6 +257,8 @@ void CDetailManager::hw_Unload()
     _RELEASE(interaction_constant_buffer);
     _RELEASE(wind_constant_buffer);
 
+    ShutdownWarmCache();
+
     ShutdownPageTable();
 
     ShutdownVisibilityReadback();

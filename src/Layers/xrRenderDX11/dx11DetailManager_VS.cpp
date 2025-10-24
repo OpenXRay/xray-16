@@ -793,6 +793,12 @@ void CDetailManager::CreateInteractionAtlas()
     float clear_color[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.get_context(CHW::IMM_CTX_ID)->ClearRenderTargetView(interaction_rtv, clear_color);
 
+    {
+        ref_texture user_tex = RImplementation.Resources->_CreateTexture("$user$interaction_atlas");
+        user_tex->surface_set(interaction_atlas);
+        Msg("* [DetailManager] Registered interaction atlas as $user$interaction_atlas for shader access");
+    }
+
     xr_vector<Fvector4> slot_uvs;
     u32 uv_buffer_size = std::min(slot_count, max_atlas_slots);
     slot_uvs.resize(uv_buffer_size);
@@ -841,6 +847,40 @@ void CDetailManager::CreateInteractionAtlas()
     CHK_DX(HW.pDevice->CreateSamplerState(&sampler_desc, &interaction_sampler));
 
     float memory_mb = (atlas_width * atlas_height * 8) / (1024.0f * 1024.0f);
+
+    {
+        D3D11_BUFFER_DESC dirty_desc = {};
+        dirty_desc.ByteWidth = slot_count * sizeof(uint32_t);
+        dirty_desc.Usage = D3D11_USAGE_DEFAULT;
+        dirty_desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+        dirty_desc.CPUAccessFlags = 0;
+        dirty_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+        dirty_desc.StructureByteStride = sizeof(uint32_t);
+
+        xr_vector<uint32_t> init_dirty(slot_count, 0);
+        D3D11_SUBRESOURCE_DATA dirty_init = {};
+        dirty_init.pSysMem = init_dirty.data();
+
+        CHK_DX(HW.pDevice->CreateBuffer(&dirty_desc, &dirty_init, &page_dirty_bits_buffer));
+
+        D3D11_UNORDERED_ACCESS_VIEW_DESC dirty_uav_desc = {};
+        dirty_uav_desc.Format = DXGI_FORMAT_UNKNOWN;
+        dirty_uav_desc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+        dirty_uav_desc.Buffer.FirstElement = 0;
+        dirty_uav_desc.Buffer.NumElements = slot_count;
+        dirty_uav_desc.Buffer.Flags = 0;
+        CHK_DX(HW.pDevice->CreateUnorderedAccessView(page_dirty_bits_buffer, &dirty_uav_desc, &page_dirty_bits_uav));
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC dirty_srv_desc = {};
+        dirty_srv_desc.Format = DXGI_FORMAT_UNKNOWN;
+        dirty_srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+        dirty_srv_desc.Buffer.FirstElement = 0;
+        dirty_srv_desc.Buffer.NumElements = slot_count;
+        CHK_DX(HW.pDevice->CreateShaderResourceView(page_dirty_bits_buffer, &dirty_srv_desc, &page_dirty_bits_srv));
+
+        Msg("* [DetailManager] Created dirty bits buffer (%u slots, %.2f KB)",
+            slot_count, (slot_count * sizeof(uint32_t)) / 1024.0f);
+    }
 
     Msg("* [DetailManager] Interaction atlas created:");
     Msg("  - Resolution: %ux%u", atlas_width, atlas_height);
@@ -1585,9 +1625,12 @@ void CDetailManager::EvictPage(uint16_t physical_page)
     uint32_t logical_slot = page.logical_slot;
     VERIFY(logical_slot < slot_count);
 
+    if (page_table[logical_slot].dirty_bit) {
+        RequestSlotReadback(logical_slot);
+    }
+
     page_table[logical_slot].physical_page = INVALID_PAGE;
     page_table[logical_slot].reference_bit = 0;
-    page_table[logical_slot].dirty_bit = 0;
 
     page.logical_slot = UINT32_MAX;
     page.reference_bit = 0;
@@ -1615,6 +1658,32 @@ void CDetailManager::PromotePage(uint32_t logical_slot, uint16_t physical_page)
     page_table[logical_slot].dirty_bit = 0;
 
     resident_page_count++;
+
+    bool data_loaded = false;
+
+    if (LoadSlotFromWarmCache(logical_slot, compression_work_buffer)) {
+        data_loaded = true;
+        Msg("* [PageTable] Loaded slot %u from warm cache", logical_slot);
+    }
+    else {
+        size_t loaded_size = 0;
+        uint8_t compressed_buffer[1024];
+
+        if (LoadSlotFromDisk(logical_slot, compressed_buffer, &loaded_size)) {
+            DecompressSlotData(compressed_buffer, loaded_size, compression_work_buffer);
+            data_loaded = true;
+
+            SaveSlotToWarmCache(logical_slot, compression_work_buffer, UNCOMPRESSED_SLOT_SIZE);
+
+            Msg("* [PageTable] Loaded slot %u from disk", logical_slot);
+        }
+    }
+
+    if (!data_loaded) {
+        memset(compression_work_buffer, 0, UNCOMPRESSED_SLOT_SIZE);
+    }
+
+    UploadSlotDataToGPU(physical_page, compression_work_buffer);
 
     ApplyPendingUpdatesToSlot(logical_slot);
 
@@ -1727,6 +1796,8 @@ void CDetailManager::UpdatePageTable()
     ProcessPendingUpdates();
 
     ProcessUploadQueue();
+
+    ProcessReadbackQueue();
 
     page_table_stats.total_requests += visible_slot_count;
     page_table_stats.current_resident = resident_page_count;
@@ -2002,6 +2073,752 @@ void CDetailManager::ProcessThreadSafeRequests()
     {
         RequestInteractionUpdate(req.world_position, req.radius, req.strength, req.type);
     }
+}
+
+void CDetailManager::InitializeWarmCache()
+{
+    Msg("* [DetailManager] Initializing warm cache...");
+
+    warm_cache.resize(WARM_CACHE_SLOTS);
+
+    warm_cache_free_list.reserve(WARM_CACHE_SLOTS);
+    for (uint32_t i = 0; i < WARM_CACHE_SLOTS; i++) {
+        warm_cache[i].world_slot_id = UINT32_MAX;
+        warm_cache[i].last_access_frame = 0;
+        warm_cache[i].dirty_flag = 0;
+        warm_cache[i].compressed_size = 0;
+
+        warm_cache_free_list.push_back(i);
+    }
+
+    world_to_warm_index.clear();
+
+    compression_work_buffer = (uint8_t*)xr_malloc(UNCOMPRESSED_SLOT_SIZE);
+
+    Msg("* [DetailManager] Warm cache initialized: %u slots (%.1f MB)",
+        WARM_CACHE_SLOTS,
+        (WARM_CACHE_SLOTS * sizeof(WarmCacheEntry)) / (1024.0f * 1024.0f));
+
+    InitializeReadbackPipeline();
+
+    InitializePersistence();
+}
+
+void CDetailManager::ShutdownWarmCache()
+{
+    Msg("* [DetailManager] Shutting down warm cache...");
+
+    ShutdownReadbackPipeline();
+
+    ShutdownPersistence();
+
+    xr_free(compression_work_buffer);
+    compression_work_buffer = nullptr;
+
+    warm_cache.clear();
+    warm_cache.shrink_to_fit();
+    world_to_warm_index.clear();
+    warm_cache_free_list.clear();
+
+    Msg("* [DetailManager] Warm cache shutdown complete");
+}
+
+uint32_t CDetailManager::FindWarmCacheLRUVictim()
+{
+    uint32_t lru_idx = 0;
+    uint64_t oldest_frame = UINT64_MAX;
+
+    for (uint32_t i = 0; i < WARM_CACHE_SLOTS; i++) {
+        if (warm_cache[i].world_slot_id == UINT32_MAX) {
+            continue;
+        }
+
+        if (warm_cache[i].last_access_frame < oldest_frame) {
+            oldest_frame = warm_cache[i].last_access_frame;
+            lru_idx = i;
+        }
+    }
+
+    return lru_idx;
+}
+
+void CDetailManager::EvictFromWarmCache(uint32_t logical_slot)
+{
+    auto it = world_to_warm_index.find(logical_slot);
+    if (it == world_to_warm_index.end()) {
+        return;
+    }
+
+    uint32_t warm_idx = it->second;
+    WarmCacheEntry& entry = warm_cache[warm_idx];
+
+    if (entry.dirty_flag) {
+        QueueSlotForSave(logical_slot);
+    }
+
+    entry.world_slot_id = UINT32_MAX;
+    entry.dirty_flag = 0;
+    entry.compressed_size = 0;
+
+    warm_cache_free_list.push_back(warm_idx);
+
+    world_to_warm_index.erase(it);
+}
+
+static void CompressDXT5Block(const uint8_t* block, uint8_t* out)
+{
+    uint8_t alpha_min = 255, alpha_max = 0;
+
+    for (int i = 0; i < 16; i++) {
+        uint8_t a = block[i * 4 + 3];
+        if (a < alpha_min) alpha_min = a;
+        if (a > alpha_max) alpha_max = a;
+    }
+
+    out[0] = alpha_max;
+    out[1] = alpha_min;
+
+    uint64_t alpha_bits = 0;
+    for (int i = 0; i < 16; i++) {
+        uint8_t a = block[i * 4 + 3];
+        int index;
+        if (alpha_max > alpha_min) {
+            index = (int)(((a - alpha_min) * 7.0f) / (alpha_max - alpha_min));
+            index = std::min(std::max(index, 0), 7);
+        } else {
+            index = 0;
+        }
+        alpha_bits |= ((uint64_t)index << (i * 3));
+    }
+
+    for (int i = 0; i < 6; i++) {
+        out[2 + i] = (uint8_t)((alpha_bits >> (i * 8)) & 0xFF);
+    }
+
+    uint8_t r_min = 255, r_max = 0, g_min = 255, g_max = 0, b_min = 255, b_max = 0;
+
+    for (int i = 0; i < 16; i++) {
+        uint8_t r = block[i * 4 + 0];
+        uint8_t g = block[i * 4 + 1];
+        uint8_t b = block[i * 4 + 2];
+        if (r < r_min) r_min = r;
+        if (r > r_max) r_max = r;
+        if (g < g_min) g_min = g;
+        if (g > g_max) g_max = g;
+        if (b < b_min) b_min = b;
+        if (b > b_max) b_max = b;
+    }
+
+    uint16_t color0 = ((r_max >> 3) << 11) | ((g_max >> 2) << 5) | (b_max >> 3);
+    uint16_t color1 = ((r_min >> 3) << 11) | ((g_min >> 2) << 5) | (b_min >> 3);
+
+    out[8] = (uint8_t)(color0 & 0xFF);
+    out[9] = (uint8_t)((color0 >> 8) & 0xFF);
+    out[10] = (uint8_t)(color1 & 0xFF);
+    out[11] = (uint8_t)((color1 >> 8) & 0xFF);
+
+    uint32_t color_indices = 0;
+    for (int i = 0; i < 16; i++) {
+        uint8_t r = block[i * 4 + 0];
+        uint8_t g = block[i * 4 + 1];
+        uint8_t b = block[i * 4 + 2];
+        int luma = (r + g + b) / 3;
+        int index = (luma > 128) ? 0 : 1;
+        color_indices |= (index << (i * 2));
+    }
+
+    out[12] = (uint8_t)(color_indices & 0xFF);
+    out[13] = (uint8_t)((color_indices >> 8) & 0xFF);
+    out[14] = (uint8_t)((color_indices >> 16) & 0xFF);
+    out[15] = (uint8_t)((color_indices >> 24) & 0xFF);
+}
+
+void CDetailManager::CompressSlotData(
+    const uint8_t* uncompressed,
+    uint8_t* compressed,
+    size_t* out_size)
+{
+
+    const uint32_t block_size = 4;
+    const uint32_t blocks_x = 32 / block_size;
+    const uint32_t blocks_y = 32 / block_size;
+
+    uint8_t* dst = compressed;
+
+    for (uint32_t by = 0; by < blocks_y; by++) {
+        for (uint32_t bx = 0; bx < blocks_x; bx++) {
+            uint8_t block[64];
+
+            for (uint32_t py = 0; py < block_size; py++) {
+                for (uint32_t px = 0; px < block_size; px++) {
+                    uint32_t sx = bx * block_size + px;
+                    uint32_t sy = by * block_size + py;
+                    uint32_t src_offset = (sy * 32 + sx) * 4;
+                    uint32_t dst_offset = (py * block_size + px) * 4;
+
+                    block[dst_offset + 0] = uncompressed[src_offset + 0];
+                    block[dst_offset + 1] = uncompressed[src_offset + 1];
+                    block[dst_offset + 2] = uncompressed[src_offset + 2];
+                    block[dst_offset + 3] = uncompressed[src_offset + 3];
+                }
+            }
+
+            CompressDXT5Block(block, dst);
+            dst += 16;
+        }
+    }
+
+    *out_size = 1024;
+}
+
+static void DecompressDXT5Block(const uint8_t* in, uint8_t* block)
+{
+    uint8_t alpha0 = in[0];
+    uint8_t alpha1 = in[1];
+
+    uint64_t alpha_bits = 0;
+    for (int i = 0; i < 6; i++) {
+        alpha_bits |= ((uint64_t)in[2 + i] << (i * 8));
+    }
+
+    uint8_t alpha_palette[8];
+    alpha_palette[0] = alpha0;
+    alpha_palette[1] = alpha1;
+    if (alpha0 > alpha1) {
+        for (int i = 1; i < 7; i++) {
+            alpha_palette[i + 1] = (uint8_t)(((7 - i) * alpha0 + i * alpha1) / 7);
+        }
+    } else {
+        for (int i = 1; i < 5; i++) {
+            alpha_palette[i + 1] = (uint8_t)(((5 - i) * alpha0 + i * alpha1) / 5);
+        }
+        alpha_palette[6] = 0;
+        alpha_palette[7] = 255;
+    }
+
+    for (int i = 0; i < 16; i++) {
+        int index = (int)((alpha_bits >> (i * 3)) & 0x7);
+        block[i * 4 + 3] = alpha_palette[index];
+    }
+
+    uint16_t color0 = in[8] | (in[9] << 8);
+    uint16_t color1 = in[10] | (in[11] << 8);
+
+    uint8_t r0 = (uint8_t)(((color0 >> 11) & 0x1F) << 3);
+    uint8_t g0 = (uint8_t)(((color0 >> 5) & 0x3F) << 2);
+    uint8_t b0 = (uint8_t)((color0 & 0x1F) << 3);
+
+    uint8_t r1 = (uint8_t)(((color1 >> 11) & 0x1F) << 3);
+    uint8_t g1 = (uint8_t)(((color1 >> 5) & 0x3F) << 2);
+    uint8_t b1 = (uint8_t)((color1 & 0x1F) << 3);
+
+    uint8_t color_palette[12];
+    color_palette[0] = r0; color_palette[1] = g0; color_palette[2] = b0;
+    color_palette[3] = r1; color_palette[4] = g1; color_palette[5] = b1;
+    color_palette[6] = (2 * r0 + r1) / 3; color_palette[7] = (2 * g0 + g1) / 3; color_palette[8] = (2 * b0 + b1) / 3;
+    color_palette[9] = (r0 + 2 * r1) / 3; color_palette[10] = (g0 + 2 * g1) / 3; color_palette[11] = (b0 + 2 * b1) / 3;
+
+    uint32_t color_indices = in[12] | (in[13] << 8) | (in[14] << 16) | (in[15] << 24);
+
+    for (int i = 0; i < 16; i++) {
+        int index = (color_indices >> (i * 2)) & 0x3;
+        block[i * 4 + 0] = color_palette[index * 3 + 0];
+        block[i * 4 + 1] = color_palette[index * 3 + 1];
+        block[i * 4 + 2] = color_palette[index * 3 + 2];
+    }
+}
+
+void CDetailManager::DecompressSlotData(
+    const uint8_t* compressed,
+    size_t compressed_size,
+    uint8_t* uncompressed)
+{
+    if (compressed_size != 1024) {
+        Msg("! [Compression] Invalid compressed size: %zu (expected 1024)", compressed_size);
+        memset(uncompressed, 0, UNCOMPRESSED_SLOT_SIZE);
+        return;
+    }
+
+    const uint32_t block_size = 4;
+    const uint32_t blocks_x = 8;
+    const uint32_t blocks_y = 8;
+
+    const uint8_t* src = compressed;
+
+    for (uint32_t by = 0; by < blocks_y; by++) {
+        for (uint32_t bx = 0; bx < blocks_x; bx++) {
+            uint8_t block[64];
+            DecompressDXT5Block(src, block);
+
+            for (uint32_t py = 0; py < block_size; py++) {
+                for (uint32_t px = 0; px < block_size; px++) {
+                    uint32_t dx = bx * block_size + px;
+                    uint32_t dy = by * block_size + py;
+                    uint32_t dst_offset = (dy * 32 + dx) * 4;
+                    uint32_t src_offset = (py * block_size + px) * 4;
+
+                    uncompressed[dst_offset + 0] = block[src_offset + 0];
+                    uncompressed[dst_offset + 1] = block[src_offset + 1];
+                    uncompressed[dst_offset + 2] = block[src_offset + 2];
+                    uncompressed[dst_offset + 3] = block[src_offset + 3];
+                }
+            }
+
+            src += 16;
+        }
+    }
+}
+
+void CDetailManager::SaveSlotToWarmCache(
+    uint32_t logical_slot,
+    const uint8_t* data,
+    size_t size)
+{
+    if (size != UNCOMPRESSED_SLOT_SIZE) {
+        Msg("! [WarmCache] Invalid data size: %zu", size);
+        return;
+    }
+
+    auto it = world_to_warm_index.find(logical_slot);
+    uint32_t warm_idx;
+
+    if (it != world_to_warm_index.end()) {
+        warm_idx = it->second;
+    } else {
+        if (warm_cache_free_list.empty()) {
+            warm_idx = FindWarmCacheLRUVictim();
+            EvictFromWarmCache(warm_cache[warm_idx].world_slot_id);
+        } else {
+            warm_idx = warm_cache_free_list.back();
+            warm_cache_free_list.pop_back();
+        }
+
+        world_to_warm_index[logical_slot] = warm_idx;
+    }
+
+    WarmCacheEntry& entry = warm_cache[warm_idx];
+    entry.world_slot_id = logical_slot;
+    entry.last_access_frame = Device.dwFrame;
+
+    size_t compressed_size = 0;
+    CompressSlotData(data, entry.compressed_data, &compressed_size);
+    entry.compressed_size = (uint16_t)compressed_size;
+
+    entry.dirty_flag = 1;
+
+    Msg("* [WarmCache] Saved slot %u (compressed %u bytes)", logical_slot, entry.compressed_size);
+}
+
+bool CDetailManager::LoadSlotFromWarmCache(uint32_t logical_slot, uint8_t* out_data)
+{
+    auto it = world_to_warm_index.find(logical_slot);
+    if (it == world_to_warm_index.end()) {
+        return false;
+    }
+
+    uint32_t warm_idx = it->second;
+    WarmCacheEntry& entry = warm_cache[warm_idx];
+
+    entry.last_access_frame = Device.dwFrame;
+
+    DecompressSlotData(entry.compressed_data, entry.compressed_size, out_data);
+
+    Msg("* [WarmCache] Loaded slot %u from cache", logical_slot);
+    return true;
+}
+
+void CDetailManager::InitializeReadbackPipeline()
+{
+    Msg("* [DetailManager] Initializing readback pipeline...");
+
+    const uint32_t slot_byte_size = 32 * 32 * 4 * sizeof(uint16_t);
+    const uint32_t staging_size = slot_byte_size * MAX_READBACKS_PER_FRAME;
+
+    for (int i = 0; i < 2; i++) {
+        D3D11_BUFFER_DESC stagingDesc = {};
+        stagingDesc.Usage = D3D11_USAGE_STAGING;
+        stagingDesc.BindFlags = 0;
+        stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        stagingDesc.ByteWidth = staging_size;
+
+        CHK_DX(HW.pDevice->CreateBuffer(&stagingDesc, nullptr, &readback_staging_buffers[i]));
+
+        D3D11_QUERY_DESC queryDesc = {};
+        queryDesc.Query = D3D11_QUERY_EVENT;
+        CHK_DX(HW.pDevice->CreateQuery(&queryDesc, &readback_queries[i]));
+    }
+
+    readback_buffer_index = 0;
+
+    D3D11_TEXTURE2D_DESC stagingTexDesc = {};
+    stagingTexDesc.Width = 32;
+    stagingTexDesc.Height = 32;
+    stagingTexDesc.MipLevels = 1;
+    stagingTexDesc.ArraySize = 1;
+    stagingTexDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    stagingTexDesc.SampleDesc.Count = 1;
+    stagingTexDesc.Usage = D3D11_USAGE_STAGING;
+    stagingTexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+    CHK_DX(HW.pDevice->CreateTexture2D(&stagingTexDesc, nullptr, &readback_staging_texture));
+
+    Msg("* [DetailManager] Readback pipeline initialized (%u KB per buffer, staging texture 32×32 RGBA16F)",
+        staging_size / 1024);
+}
+
+void CDetailManager::ShutdownReadbackPipeline()
+{
+    Msg("* [DetailManager] Shutting down readback pipeline...");
+
+    for (int i = 0; i < 2; i++) {
+        _RELEASE(readback_queries[i]);
+        _RELEASE(readback_staging_buffers[i]);
+        pending_readbacks[i].clear();
+    }
+
+    _RELEASE(readback_staging_texture);
+    readback_queue.clear();
+
+    Msg("* [DetailManager] Readback pipeline shutdown complete");
+}
+
+void CDetailManager::RequestSlotReadback(uint32_t logical_slot)
+{
+    if (logical_slot >= slot_count) return;
+
+    if (!IsPageResident(logical_slot)) return;
+
+    const PageTableEntry& entry = page_table[logical_slot];
+    if (!entry.dirty_bit) return;
+
+    ReadbackRequest request;
+    request.logical_slot = logical_slot;
+    request.physical_page = entry.physical_page;
+    request.request_frame = Device.dwFrame;
+
+    readback_queue.push_back(request);
+}
+
+void CDetailManager::ReadbackSlotFromGPU(uint32_t logical_slot, uint16_t physical_page)
+{
+    auto context = HW.get_context(CHW::IMM_CTX_ID);
+
+    uint32_t page_x = physical_page % 64;
+    uint32_t page_y = physical_page / 64;
+
+    D3D11_BOX sourceBox = {};
+    sourceBox.left = page_x * 32;
+    sourceBox.top = page_y * 32;
+    sourceBox.right = sourceBox.left + 32;
+    sourceBox.bottom = sourceBox.top + 32;
+    sourceBox.front = 0;
+    sourceBox.back = 1;
+
+    context->CopySubresourceRegion(
+        readback_staging_texture,
+        0,
+        0, 0, 0,
+        interaction_atlas,
+        0,
+        &sourceBox);
+
+    uint32_t current_buffer = readback_buffer_index;
+    PendingReadback pending;
+    pending.logical_slot = logical_slot;
+    pending.physical_page = physical_page;
+    pending_readbacks[current_buffer].push_back(pending);
+
+    context->End(readback_queries[current_buffer]);
+}
+
+float CDetailManager::HalfToFloat(uint16_t h)
+{
+    uint32_t sign = (h >> 15) & 0x1;
+    uint32_t exponent = (h >> 10) & 0x1F;
+    uint32_t mantissa = h & 0x3FF;
+
+    if (exponent == 0) {
+        if (mantissa == 0) return sign ? -0.0f : 0.0f;
+        exponent = 1;
+    } else if (exponent == 31) {
+        if (sign)
+            return -std::numeric_limits<float>::infinity();
+        else
+            return std::numeric_limits<float>::infinity();
+    }
+
+    uint32_t f_exp = exponent - 15 + 127;
+    uint32_t f_mantissa = mantissa << 13;
+    uint32_t f_bits = (sign << 31) | (f_exp << 23) | f_mantissa;
+
+    return *(float*)&f_bits;
+}
+
+uint16_t CDetailManager::FloatToHalf(float f)
+{
+    uint32_t x = *(uint32_t*)&f;
+    uint32_t sign = (x >> 31) & 0x1;
+    uint32_t exponent = (x >> 23) & 0xFF;
+    uint32_t mantissa = x & 0x7FFFFF;
+
+    int exp_half = (int)exponent - 127 + 15;
+    if (exp_half <= 0) return (uint16_t)(sign << 15);
+    if (exp_half >= 31) return (uint16_t)((sign << 15) | 0x7C00);
+
+    uint32_t mant_half = mantissa >> 13;
+
+    return (uint16_t)((sign << 15) | ((uint32_t)exp_half << 10) | mant_half);
+}
+
+void CDetailManager::ProcessReadbackQueue()
+{
+    auto context = HW.get_context(CHW::IMM_CTX_ID);
+
+    uint32_t prev_buffer = (readback_buffer_index + 1) % 2;
+
+    BOOL data_ready = FALSE;
+    HRESULT hr = context->GetData(readback_queries[prev_buffer], &data_ready, sizeof(BOOL),
+                                   D3D11_ASYNC_GETDATA_DONOTFLUSH);
+
+    if (SUCCEEDED(hr) && data_ready && !pending_readbacks[prev_buffer].empty()) {
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        hr = context->Map(readback_staging_texture, 0, D3D11_MAP_READ, 0, &mapped);
+
+        if (SUCCEEDED(hr)) {
+            for (const auto& pending : pending_readbacks[prev_buffer]) {
+                const uint8_t* src = (const uint8_t*)mapped.pData;
+
+                uint16_t* src_16f = (uint16_t*)src;
+                uint8_t* dst_8 = compression_work_buffer;
+
+                for (uint32_t i = 0; i < 32 * 32; i++) {
+                    for (int c = 0; c < 4; c++) {
+                        float val = HalfToFloat(src_16f[i * 4 + c]);
+                        dst_8[i * 4 + c] = (uint8_t)std::min(std::max(val * 255.0f, 0.0f), 255.0f);
+                    }
+                }
+
+                SaveSlotToWarmCache(pending.logical_slot, compression_work_buffer, UNCOMPRESSED_SLOT_SIZE);
+
+                page_table[pending.logical_slot].dirty_bit = 0;
+            }
+
+            context->Unmap(readback_staging_texture, 0);
+
+            Msg("* [Readback] Processed %zu slot readbacks", pending_readbacks[prev_buffer].size());
+        }
+
+        pending_readbacks[prev_buffer].clear();
+    }
+
+    uint32_t readbacks_this_frame = 0;
+    auto it = readback_queue.begin();
+
+    while (it != readback_queue.end() && readbacks_this_frame < MAX_READBACKS_PER_FRAME) {
+        ReadbackSlotFromGPU(it->logical_slot, it->physical_page);
+        it = readback_queue.erase(it);
+        readbacks_this_frame++;
+    }
+
+    readback_buffer_index = (readback_buffer_index + 1) % 2;
+}
+
+void CDetailManager::InitializePersistence()
+{
+    Msg("* [DetailManager] Initializing disk persistence...");
+
+    FS.update_path(db_path, "$app_data_root$", "grass_interaction.dat");
+
+    if (FS.exist(db_path)) {
+        Msg("* [Persistence] Found existing save file: %s", db_path);
+    } else {
+        Msg("* [Persistence] No existing save file, will create new");
+    }
+
+    save_thread_running = true;
+    save_thread = std::thread([this]() { this->BackgroundSaveThread(); });
+
+    Msg("* [DetailManager] Disk persistence initialized: %s", db_path);
+}
+
+void CDetailManager::ShutdownPersistence()
+{
+    Msg("* [DetailManager] Shutting down disk persistence...");
+
+    save_thread_running = false;
+    if (save_thread.joinable()) {
+        save_thread.join();
+    }
+
+    FlushPendingSaves();
+
+    Msg("* [DetailManager] Disk persistence shutdown complete");
+}
+
+void CDetailManager::SaveSlotToDisk(uint32_t logical_slot, const uint8_t* data, size_t size)
+{
+
+    try {
+        IWriter* W = FS.w_open_ex(db_path);
+        if (W) {
+            W->w_u32(logical_slot);
+            W->w_u16((u16)size);
+            W->w(data, size);
+            FS.w_close(W);
+        } else {
+            Msg("! [Persistence] Failed to open file for writing: %s", db_path);
+            save_thread_running = false;
+        }
+    } catch (...) {
+        Msg("! [Persistence] Exception while saving slot %u - disabling persistence", logical_slot);
+        save_thread_running = false;
+    }
+}
+
+bool CDetailManager::LoadSlotFromDisk(uint32_t logical_slot, uint8_t* out_data, size_t* out_size)
+{
+    if (!FS.exist(db_path)) {
+        return false;
+    }
+
+    try {
+        IReader* R = FS.r_open(db_path);
+        if (!R) return false;
+
+        while (!R->eof()) {
+            u32 file_slot_id = R->r_u32();
+            u16 data_size = R->r_u16();
+
+            if (file_slot_id == logical_slot) {
+                *out_size = data_size;
+                R->r(out_data, data_size);
+                FS.r_close(R);
+                return true;
+            } else {
+                R->advance(data_size);
+            }
+        }
+
+        FS.r_close(R);
+    } catch (...) {
+        Msg("! [Persistence] Exception while loading slot %u", logical_slot);
+    }
+
+    return false;
+}
+
+void CDetailManager::BackgroundSaveThread()
+{
+    Msg("* [Persistence] Background save thread started");
+
+    while (save_thread_running) {
+        std::this_thread::sleep_for(std::chrono::seconds(30));
+
+        if (!save_thread_running) break;
+
+        xr_vector<uint32_t> slots_to_save;
+        {
+            std::lock_guard<std::mutex> lock(save_mutex);
+            slots_to_save = slots_pending_save;
+            slots_pending_save.clear();
+        }
+
+        for (uint32_t slot : slots_to_save) {
+            auto it = world_to_warm_index.find(slot);
+            if (it != world_to_warm_index.end()) {
+                uint32_t warm_idx = it->second;
+                WarmCacheEntry& entry = warm_cache[warm_idx];
+
+                if (entry.dirty_flag) {
+                    SaveSlotToDisk(slot, entry.compressed_data, entry.compressed_size);
+                    entry.dirty_flag = 0;
+                }
+            }
+        }
+
+        if (!slots_to_save.empty()) {
+            Msg("* [Persistence] Saved %zu slots to disk", slots_to_save.size());
+        }
+    }
+
+    Msg("* [Persistence] Background save thread stopped");
+}
+
+void CDetailManager::QueueSlotForSave(uint32_t logical_slot)
+{
+    std::lock_guard<std::mutex> lock(save_mutex);
+
+    if (std::find(slots_pending_save.begin(), slots_pending_save.end(), logical_slot) == slots_pending_save.end()) {
+        slots_pending_save.push_back(logical_slot);
+    }
+}
+
+void CDetailManager::FlushPendingSaves()
+{
+    xr_vector<uint32_t> slots_to_save;
+    {
+        std::lock_guard<std::mutex> lock(save_mutex);
+        slots_to_save = slots_pending_save;
+        slots_pending_save.clear();
+    }
+
+    for (uint32_t slot : slots_to_save) {
+        auto it = world_to_warm_index.find(slot);
+        if (it != world_to_warm_index.end()) {
+            uint32_t warm_idx = it->second;
+            WarmCacheEntry& entry = warm_cache[warm_idx];
+
+            if (entry.dirty_flag) {
+                SaveSlotToDisk(slot, entry.compressed_data, entry.compressed_size);
+                entry.dirty_flag = 0;
+            }
+        }
+    }
+
+    Msg("* [Persistence] Flushed %zu pending saves", slots_to_save.size());
+}
+
+void CDetailManager::UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* data)
+{
+    auto context = HW.get_context(CHW::IMM_CTX_ID);
+
+    uint32_t page_x = physical_page % 64;
+    uint32_t page_y = physical_page / 64;
+
+    D3D11_BOX destBox = {};
+    destBox.left = page_x * 32;
+    destBox.top = page_y * 32;
+    destBox.right = destBox.left + 32;
+    destBox.bottom = destBox.top + 32;
+    destBox.front = 0;
+    destBox.back = 1;
+
+    const uint32_t upload_size = 32 * 32 * 4 * sizeof(uint16_t);
+    uint16_t* upload_data_16f = (uint16_t*)xr_malloc(upload_size);
+    const uint8_t* src_8 = data;
+
+    for (uint32_t i = 0; i < 32 * 32; i++) {
+        float r = src_8[i * 4 + 0] / 255.0f;
+        float g = src_8[i * 4 + 1] / 255.0f;
+        float b = src_8[i * 4 + 2] / 255.0f;
+        float a = src_8[i * 4 + 3] / 255.0f;
+
+        upload_data_16f[i * 4 + 0] = FloatToHalf(r);
+        upload_data_16f[i * 4 + 1] = FloatToHalf(g);
+        upload_data_16f[i * 4 + 2] = FloatToHalf(b);
+        upload_data_16f[i * 4 + 3] = FloatToHalf(a);
+    }
+
+    context->UpdateSubresource(
+        interaction_atlas,
+        0,
+        &destBox,
+        upload_data_16f,
+        32 * 4 * sizeof(uint16_t),
+        0);
+
+    xr_free(upload_data_16f);
+
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

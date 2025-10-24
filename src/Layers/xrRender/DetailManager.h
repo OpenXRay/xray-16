@@ -302,6 +302,10 @@ public:
     ref_cs interaction_compute_shader;
     ID3DBuffer* interaction_constant_buffer;
 
+    ID3D11Buffer* page_dirty_bits_buffer;
+    ID3D11UnorderedAccessView* page_dirty_bits_uav;
+    ID3D11ShaderResourceView* page_dirty_bits_srv;
+
     ID3D11Texture2D* wind_texture;
     ID3D11ShaderResourceView* wind_srv;
     ID3D11UnorderedAccessView* wind_uav;
@@ -427,6 +431,50 @@ public:
 
     ID3D11Buffer* interaction_update_cb;
 
+    struct WarmCacheEntry {
+        uint32_t world_slot_id;
+        uint64_t last_access_frame;
+        uint16_t dirty_flag;
+        uint16_t compressed_size;
+        uint8_t compressed_data[1024];
+    };
+    static_assert(sizeof(WarmCacheEntry) <= 1064, "WarmCacheEntry size check");
+
+    static const uint32_t WARM_CACHE_SLOTS = 65536;
+    xr_vector<WarmCacheEntry> warm_cache;
+    xr_map<uint32_t, uint32_t> world_to_warm_index;
+    xr_vector<uint32_t> warm_cache_free_list;
+
+    uint8_t* compression_work_buffer;
+    static const uint32_t UNCOMPRESSED_SLOT_SIZE = 32 * 32 * 4;
+
+    static const uint32_t MAX_READBACKS_PER_FRAME = 8;
+    struct ReadbackRequest {
+        uint32_t logical_slot;
+        uint16_t physical_page;
+        uint64_t request_frame;
+    };
+    xr_vector<ReadbackRequest> readback_queue;
+
+    ID3D11Buffer* readback_staging_buffers[2];
+    uint32_t readback_buffer_index;
+    ID3D11Query* readback_queries[2];
+
+    struct PendingReadback {
+        uint32_t logical_slot;
+        uint16_t physical_page;
+    };
+    xr_vector<PendingReadback> pending_readbacks[2];
+
+    ID3D11Texture2D* readback_staging_texture;
+
+    string_path db_path;
+
+    std::thread save_thread;
+    std::atomic<bool> save_thread_running;
+    std::mutex save_mutex;
+    xr_vector<uint32_t> slots_pending_save;
+
 #endif
 
     ref_constant hwc_consts;
@@ -511,6 +559,32 @@ public:
     bool IsSlotDirty(uint32_t logical_slot) const;
     void ResetALifeStats();
     void PrintALifeStats();
+
+    void InitializeWarmCache();
+    void ShutdownWarmCache();
+    bool LoadSlotFromWarmCache(uint32_t logical_slot, uint8_t* out_data);
+    void SaveSlotToWarmCache(uint32_t logical_slot, const uint8_t* data, size_t size);
+    void EvictFromWarmCache(uint32_t logical_slot);
+    uint32_t FindWarmCacheLRUVictim();
+    void CompressSlotData(const uint8_t* uncompressed, uint8_t* compressed, size_t* out_size);
+    void DecompressSlotData(const uint8_t* compressed, size_t compressed_size, uint8_t* uncompressed);
+
+    void InitializeReadbackPipeline();
+    void ShutdownReadbackPipeline();
+    void RequestSlotReadback(uint32_t logical_slot);
+    void ProcessReadbackQueue();
+    void ReadbackSlotFromGPU(uint32_t logical_slot, uint16_t physical_page);
+    float HalfToFloat(uint16_t h);
+    uint16_t FloatToHalf(float f);
+
+    void InitializePersistence();
+    void ShutdownPersistence();
+    void SaveSlotToDisk(uint32_t logical_slot, const uint8_t* data, size_t size);
+    bool LoadSlotFromDisk(uint32_t logical_slot, uint8_t* out_data, size_t* out_size);
+    void BackgroundSaveThread();
+    void QueueSlotForSave(uint32_t logical_slot);
+    void FlushPendingSaves();
+    void UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* data);
 #endif
     void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
     void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);

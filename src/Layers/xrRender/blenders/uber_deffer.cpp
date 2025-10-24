@@ -208,6 +208,8 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         C.r_dx11Texture("s_hemi", C.L_textures[2]);
         C.r_dx11Sampler("smp_rtlinear");
     }
+
+    C.r_dx11Texture("s_interaction_atlas", "$user$interaction_atlas");
 #elif defined(USE_OGL)
     C.r_Pass(vs, ps, FALSE);
     VERIFY(C.L_textures[0].size());

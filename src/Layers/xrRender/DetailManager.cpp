@@ -287,6 +287,8 @@ void CDetailManager::Load()
         InitializePageTable();
 
         InitializeVisibilityReadback();
+
+        InitializeWarmCache();
     }
 #endif
 
