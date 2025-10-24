@@ -40,11 +40,7 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 
 #ifdef USE_DX11
-    // === GPU COMPUTE PATH SHADER SETUP (always initialized for mode switching) ===
-    hwc_wind2 = T0.get("dir2D_2"); // dir2 for wave2 (GPU path)
-    hwc_detail_params = T0.get("detail_params");  // Phase 5: slot grid parameters
-    hwc_grass_wind_displacement = T0.get("grass_wind_displacement");  // Phase 5: wind displacement strength
-    hwc_grass_interaction_displacement = T0.get("grass_interaction_displacement");  // Phase 5: interaction displacement strength
+    // Note: GPU constants will be initialized from gpu_detail_shader after it's created
 
     // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
     // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
@@ -124,6 +120,13 @@ void CDetailManager::hw_Load_Shaders()
     else
     {
         Msg("* [DetailManager] GPU instancing shader created successfully");
+
+        // Initialize GPU constant handles from gpu_detail_shader
+        R_constant_table& GPU_T0 = *(gpu_detail_shader->E[0]->passes[0]->constants);
+        gpu_wind2 = GPU_T0.get("dir2D_2");
+        gpu_detail_params = GPU_T0.get("detail_params");
+        gpu_grass_wind_displacement = GPU_T0.get("grass_wind_displacement");
+        gpu_grass_interaction_displacement = GPU_T0.get("grass_interaction_displacement");
     }
 #endif
 }
@@ -625,9 +628,9 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         detail_params_vec.y = (float)dtH.z_size();
         detail_params_vec.z = (float)dtH.x_offs();
         detail_params_vec.w = (float)dtH.z_offs();
-        cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
-        cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
-        cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+        cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
+        cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+        cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
         // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
         if (gpu_detail_shader)
@@ -999,13 +1002,14 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     detail_params_vec.y = (float)dtH.z_size();
     detail_params_vec.z = (float)dtH.x_offs();
     detail_params_vec.w = (float)dtH.z_offs();
-    cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
-    cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
-    cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+    cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
+    cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+    cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
     // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
     if (gpu_detail_shader)
     {
+        //cmd_list.set_Element(Object.shader->E[0], 0);
         cmd_list.set_Element(gpu_detail_shader->E[0], 0);
         cmd_list.apply_lmaterial();
     }

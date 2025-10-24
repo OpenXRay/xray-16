@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "Blender_Detail_GPU.h"
+#include "uber_deffer.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -31,13 +32,12 @@ void CBlender_Detail_GPU::Compile(CBlender_Compile& C)
         C.r_Pass("detail_gpu", "detail_gpu", FALSE);
         C.r_dx11Texture("s_base", texture_path);
         C.r_dx11Sampler("smp_base");
+        C.r_dx11Sampler("smp_linear");
 
         C.r_dx11Texture("s_interaction_atlas", "$user$interaction_atlas");
         C.r_dx11Texture("interaction_atlas", "$user$interaction_atlas");     // t1
         C.r_dx11Texture("wind_texture", "$user$wind");                 // t2
         C.r_dx11Texture("slot_indirection", "$user$indirection");      // t3
-
-        C.r_dx11Sampler("smp_linear");
 
         if (C.iElement != -1)
         {
