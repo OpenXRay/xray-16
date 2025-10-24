@@ -101,7 +101,7 @@ void CDetailManager::hw_Load_Shaders()
     CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &interaction_update_cb));
 
     b_detail_gpu = xr_new<CBlender_Detail_GPU>();
-    gpu_detail_shader.create(b_detail_gpu, nullptr, "detail_gpu");
+    gpu_detail_shader.create(b_detail_gpu, nullptr, "build_details");
 
     if (!gpu_detail_shader)
     {
@@ -560,7 +560,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
 
         if (gpu_detail_shader)
         {
-            cmd_list.set_Element(gpu_detail_shader->E[1], 0);
+            cmd_list.set_Element(gpu_detail_shader->E[0], 0);
             cmd_list.apply_lmaterial();
         }
         else
@@ -909,7 +909,7 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
 
     if (gpu_detail_shader)
     {
-        cmd_list.set_Element(gpu_detail_shader->E[1], 0);
+        cmd_list.set_Element(gpu_detail_shader->E[0], 0);
         cmd_list.apply_lmaterial();
     }
     else
