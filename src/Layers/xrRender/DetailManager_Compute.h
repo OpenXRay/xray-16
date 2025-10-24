@@ -167,17 +167,17 @@ inline FrustumGPU BuildFrustumGPU(const Fmatrix& view_proj)
     );
 
     frustum.planes[4].set(
-        view_proj._14 + view_proj._13,
-        view_proj._24 + view_proj._23,
-        view_proj._34 + view_proj._33,
-        view_proj._44 + view_proj._43
-    );
-
-    frustum.planes[5].set(
         view_proj._14 - view_proj._13,
         view_proj._24 - view_proj._23,
         view_proj._34 - view_proj._33,
         view_proj._44 - view_proj._43
+    );
+
+    frustum.planes[5].set(
+        view_proj._14 + view_proj._13,
+        view_proj._24 + view_proj._23,
+        view_proj._34 + view_proj._33,
+        view_proj._44 + view_proj._43
     );
 
     for (int i = 0; i < 6; ++i)
