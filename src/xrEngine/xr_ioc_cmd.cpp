@@ -556,6 +556,12 @@ virtual void Save (IWriter *F) {};
 
 ENGINE_API bool renderer_allow_override = false;
 
+ENGINE_API float ps_r3_dyn_wet_surf_near = 10.f;
+ENGINE_API float ps_r3_dyn_wet_surf_far  = 30.f;
+ENGINE_API int ps_r3_dyn_wet_surf_sm_res = 128;
+
+int ps_disable_lens_flare = 1;
+
 class CCC_renderer : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -771,7 +777,7 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_stats", &psDeviceFlags, rsStatistic);
     CMD3(CCC_Mask, "rs_fps", &psDeviceFlags, rsShowFPS);
     CMD3(CCC_Mask, "rs_fps_graph", &psDeviceFlags, rsShowFPSGraph);
-    CMD4(CCC_Float, "rs_vis_distance", &psVisDistance, 0.4f, 1.5f);
+    CMD4(CCC_Float, "rs_vis_distance", &psVisDistance, 0.4f, 15.0f);
 
     CMD3(CCC_Mask, "rs_cam_pos", &psDeviceFlags, rsCameraPos);
 #ifdef DEBUG
@@ -881,4 +887,7 @@ void CCC_Register()
 
     extern int ps_disable_lens_flare;
     CMD4(CCC_Integer, "disable_lens_flare", &ps_disable_lens_flare, 0, 1);
+
+    // Debug utilities toggle (Weather Editor, HUD Tuning)
+    CMD4(CCC_Integer, "g_debug_utils", &g_debug_utils, 0, 1);
 };

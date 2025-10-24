@@ -26,6 +26,9 @@
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 
+// Detail manager debug
+extern ENGINE_API int dm_debug_trails;
+
 namespace xray::render::RENDER_NAMESPACE
 {
 u32 ps_Preset = 2;
@@ -853,8 +856,8 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
 
-    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.1f, 0.99f);
-    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 300);
+    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density/*&ps_r__Detail_density*/, 0.01f, 0.99f);
+    CMD4(CCC_detail_radius, "r__detail_radius", &ps_r__detail_radius, 49, 600);
     CMD4(CCC_Float, "r__detail_height", &ps_r__Detail_height, 1, 2);
 
 #ifdef DEBUG
@@ -1071,6 +1074,14 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r2_mt_calculate",    &ps_r2_mt_calculate, 0, 1);
 #if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
+#endif
+
+    // Detail Manager debug
+    CMD4(CCC_Integer, "dm_debug_trails", &dm_debug_trails, 0, 1);
+#if defined(USE_DX11) && !defined(MASTER_GOLD)
+    CMD1(CCC_TestComputeVector, "test_compute_vector");
+    CMD1(CCC_TestComputeMatrices, "test_compute_matrices");
+    CMD1(CCC_TestComputeSIMD, "test_compute_simd");
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

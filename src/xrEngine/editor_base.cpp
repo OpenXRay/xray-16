@@ -103,8 +103,13 @@ void ide::ShowMain()
             }
             ImGui::EndMenu();
         }
-#ifndef MASTER_GOLD
-        if (ImGui::BeginMenu("Tools"))
+        extern int g_debug_utils;
+#ifdef MASTER_GOLD
+        const bool show_tools = g_debug_utils != 0;
+#else
+        const bool show_tools = true;  // Always available on non-MASTER_GOLD builds
+#endif
+        if (show_tools && ImGui::BeginMenu("Tools"))
         {
             if (m_tool_added)
             {
@@ -120,7 +125,6 @@ void ide::ShowMain()
             }
             ImGui::EndMenu();
         }
-#endif
         if (ImGui::BeginMenu("About"))
         {
 #ifndef MASTER_GOLD

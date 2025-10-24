@@ -74,7 +74,11 @@ void CUIDebugger::OnUIReset()
 
 void CUIDebugger::on_tool_frame()
 {
-#ifndef MASTER_GOLD
+#ifdef MASTER_GOLD
+    extern int g_debug_utils;
+    if (!g_debug_utils)
+        return;
+#endif
     if (!get_open_state())
         return;
 
@@ -176,7 +180,6 @@ void CUIDebugger::on_tool_frame()
         }
     }
     ImGui::End();
-#endif
 }
 
 void CUIDebugger::reset_settings()

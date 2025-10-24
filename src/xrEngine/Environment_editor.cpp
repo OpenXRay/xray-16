@@ -16,7 +16,6 @@ ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;   // Vertex displacement 
 ENGINE_API float ps_r3_grass_interaction_displacement = 0.5f;  // Interaction displacement strength
 ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 
-#ifndef MASTER_GOLD
 namespace
 {
 bool window_weather_cycle = false;
@@ -90,11 +89,9 @@ bool ConfigStyleSelector(pcstr label, bool& soc_style)
     return result;
 }
 }
-#endif
 
 void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     ImGui::PushID(m_identifier.c_str());
@@ -295,12 +292,10 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
         }
     }
     ImGui::PopID();
-#endif
 }
 
 void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     CEnvDescriptor::ed_show_params(env);
@@ -318,12 +313,10 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog far", &fog_far);
     }
     ImGui::PopID();
-#endif
 }
 
 void CEffect_Thunderbolt::ED_ShowParams()
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     float altitude[2] = { rad2deg(p_var_alt.x) , rad2deg(p_var_alt.y) };
@@ -345,12 +338,15 @@ void CEffect_Thunderbolt::ED_ShowParams()
     ImGui::DragFloat("sky color", &p_sky_color, 0.001f, 0.0f, 1.0f);
     ImGui::DragFloat("sun color", &p_sun_color, 0.001f, 0.0f, 1.0f);
     ImGui::DragFloat("fog color", &p_fog_color, 0.001f, 0.0f, 1.0f);
-#endif
 }
 
 void CEnvironment::on_tool_frame()
 {
-#ifndef MASTER_GOLD
+#ifdef MASTER_GOLD
+    extern int g_debug_utils;
+    if (!g_debug_utils)
+        return;
+#endif
     if (!get_open_state())
         return;
 
@@ -553,7 +549,6 @@ void CEnvironment::on_tool_frame()
         } // if (ImGui::CollapsingHeader("Live edit", ImGuiTreeNodeFlags_DefaultOpen))
     }
     ImGui::End();
-#endif
 }
 
 #ifndef MASTER_GOLD
