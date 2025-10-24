@@ -38,10 +38,6 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 
 #ifdef USE_DX11
-    hwc_wind2 = T0.get("dir2D_2");
-    hwc_detail_params = T0.get("detail_params");
-    hwc_grass_wind_displacement = T0.get("grass_wind_displacement");
-    hwc_grass_interaction_displacement = T0.get("grass_interaction_displacement");
 
     const u32 initialBufferSize = 2048 * 2048;
 
@@ -112,6 +108,12 @@ void CDetailManager::hw_Load_Shaders()
     else
     {
         Msg("* [DetailManager] GPU instancing shader created successfully");
+
+        R_constant_table& GPU_T0 = *(gpu_detail_shader->E[0]->passes[0]->constants);
+        gpu_wind2 = GPU_T0.get("dir2D_2");
+        gpu_detail_params = GPU_T0.get("detail_params");
+        gpu_grass_wind_displacement = GPU_T0.get("grass_wind_displacement");
+        gpu_grass_interaction_displacement = GPU_T0.get("grass_interaction_displacement");
     }
 #endif
 }
@@ -554,9 +556,9 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         detail_params_vec.y = (float)dtH.z_size();
         detail_params_vec.z = (float)dtH.x_offs();
         detail_params_vec.w = (float)dtH.z_offs();
-        cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
-        cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
-        cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+        cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
+        cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+        cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
         if (gpu_detail_shader)
         {
@@ -903,9 +905,9 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     detail_params_vec.y = (float)dtH.z_size();
     detail_params_vec.z = (float)dtH.x_offs();
     detail_params_vec.w = (float)dtH.z_offs();
-    cmd_list.set_c(hwc_detail_params._get(), detail_params_vec);
-    cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
-    cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+    cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
+    cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+    cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
     if (gpu_detail_shader)
     {

@@ -529,10 +529,10 @@ public:
     std::mutex save_mutex;
     xr_vector<uint32_t> slots_pending_save;
 
-    ref_constant hwc_wind2;
-    ref_constant hwc_detail_params;
-    ref_constant hwc_grass_wind_displacement;
-    ref_constant hwc_grass_interaction_displacement;
+    ref_constant gpu_wind2;
+    ref_constant gpu_detail_params;
+    ref_constant gpu_grass_wind_displacement;
+    ref_constant gpu_grass_interaction_displacement;
 
     void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
     void hw_Render_FullLevel(CBackend& cmd_list);
