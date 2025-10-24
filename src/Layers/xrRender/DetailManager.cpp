@@ -556,7 +556,8 @@ void CDetailManager::Render(CBackend& cmd_list)
 
     ZoneScoped;
 
-    TaskScheduler->Wait(*m_calc_task);
+    if (!ps_r__detail_gpu && m_calc_task)
+        TaskScheduler->Wait(*m_calc_task);
 
     RImplementation.BasicStats.DetailRender.Begin();
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
@@ -584,6 +585,9 @@ void CDetailManager::Render(CBackend& cmd_list)
 
 void CDetailManager::DispatchMTCalc()
 {
+    if (ps_r__detail_gpu)
+        return;
+
     m_calc_task = &TaskScheduler->AddTask([this]
     {
 #ifndef _EDITOR
