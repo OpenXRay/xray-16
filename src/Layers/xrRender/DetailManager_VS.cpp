@@ -4,6 +4,7 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+extern int ps_r__detail_gpu;;
 namespace detail_manager
 {
 extern const int quant = 16384;
@@ -26,7 +27,6 @@ struct vertHW
 };
 #pragma pack(pop)
 
-#ifdef USE_DX11
 // Phase 1, Milestone 1.2: Use same vertex format as per-object geometry (CDetail)
 static VertexElement dwDecl_unified[] =
 {
@@ -40,7 +40,6 @@ struct vertHW_unified
     Fvector4 pos_frac; // position.xyz, frac (normalized height)
     Fvector2 uv;       // texture coordinates
 };
-#endif
 
 short QC(float v)
 {
@@ -65,8 +64,6 @@ void CDetailManager::hw_Load_Geom()
     clamp<size_t>(hw_BatchSize, 0, 64);
     Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", u32(HW.Caps.geometry.dwRegisters), hw_BatchSize);
 
-#ifndef USE_DX11
-    // DX9/GL: Original path - single unified geometry for batching
     // Pre-process objects
     u32 dwVerts = 0;
     u32 dwIndices = 0;
@@ -127,7 +124,8 @@ void CDetailManager::hw_Load_Geom()
 
     // Declare geometry
     hw_Geom.create(dwDecl, hw_VB, hw_IB);
-#else
+
+    // === GPU COMPUTE PATH (DX11) ===
     // DX11: Phase 1, Milestone 1.2 - Create unified geometry per vis_id
     // Each vis_id gets one unified VB/IB containing all objects that can appear with that vis_id
 
@@ -212,20 +210,29 @@ void CDetailManager::hw_Load_Geom()
     }
 
     Msg("* [DETAILS] Phase 1.2: Created 3 unified geometries (one per vis_id)");
-#endif
 }
 
 void CDetailManager::hw_Unload()
 {
-#ifndef USE_DX11
-    // Destroy VS/VB/IB (DX9/GL only - DX11 uses per-object buffers)
-    if (hw_Geom)
-        hw_Geom.destroy();
-    if (hw_IB)
-        hw_IB.Release();
-    if (hw_VB)
-        hw_VB.Release();
-#else
+#ifdef USE_DX11
+    extern int ps_r__detail_gpu;
+
+    if (!ps_r__detail_gpu)
+    {
+        // === VANILLA CPU PATH CLEANUP (DX11 build) ===
+        // Destroy VS/VB/IB
+        if (hw_Geom)
+            hw_Geom.destroy();
+        if (hw_IB)
+            hw_IB.Release();
+        if (hw_VB)
+            hw_VB.Release();
+
+        Msg("* [DETAILS] Vanilla CPU path cleanup complete");
+        return;
+    }
+
+    // === GPU COMPUTE PATH CLEANUP (DX11) ===
     // Phase 1, Milestone 1.1: Release 3 vis_id-based structured buffers (DX11)
     for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
@@ -287,6 +294,16 @@ void CDetailManager::hw_Unload()
 
     // Phase 6B: Shutdown visibility readback
     ShutdownVisibilityReadback();
+
+    Msg("* [DETAILS] GPU compute path cleanup complete");
+#else
+    // DX9/GL: Destroy vanilla VS/VB/IB
+    if (hw_Geom)
+        hw_Geom.destroy();
+    if (hw_IB)
+        hw_IB.Release();
+    if (hw_VB)
+        hw_VB.Release();
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "xrCore/xrPool.h"
 #include "DetailFormat.h"
 #include "DetailModel.h"
 
@@ -52,6 +53,16 @@ extern float ps_current_detail_height;
 class ECORE_API CDetailManager
 {
 public:
+    // ===================================================================
+    // VANILLA CPU PATH MEMBERS
+    // These members are from the original X-Ray engine (dev branch)
+    // They are used for slot-based CPU visibility and rendering
+    // ===================================================================
+
+    float fade_distance = 99999;
+    Fvector light_position;
+    void details_clear();
+
     struct SlotItem
     { // один кустик
         float scale;
@@ -117,6 +128,7 @@ public:
     typedef xr_vector<xr_vector<SlotItemVec*>> vis_list;
     typedef svector<CDetail*, dm_max_objects> DetailVec;
     typedef DetailVec::iterator DetailIt;
+    typedef poolSS<SlotItem, 4096> PSS;
 
     int dither[16][16];
 
@@ -157,6 +169,8 @@ public:
     int cache_cx;
     int cache_cz;
 
+    PSS poolSI; // pool из которого выделяются SlotItem
+
     Fvector EYE;
 
     void UpdateVisibleM();
@@ -175,18 +189,57 @@ public:
     void soft_Render();
 
     // Hardware processor
+    ref_geom hw_Geom;
     size_t hw_BatchSize;
 
-    ref_geom hw_Geom;
     VertexStagingBuffer hw_VB;
     IndexStagingBuffer hw_IB;
 
-#ifdef USE_DX11
-    // Structured buffers for instancing (one per vis_id: still, wave1, wave2)
-    // Phase 1, Milestone 1.1: Organize buffers by vis_id instead of size
-    ID3DShaderResourceView* detailSRV_vis[3];
-    ID3DBuffer* detailBuffer_vis[3];
-    u32 detailBufferSize_vis[3];  // Track allocated size for each buffer
+    ref_constant hwc_consts;
+    ref_constant hwc_wave;
+    ref_constant hwc_wind;
+    ref_constant hwc_array;
+    ref_constant hwc_s_consts;
+    ref_constant hwc_s_xform;
+    ref_constant hwc_s_array;
+    void hw_Load();
+    void hw_Load_Geom();
+    void hw_Load_Shaders();
+    void hw_Unload();
+    void hw_Render(CBackend& cmd_list);
+    void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+
+    // get unpacked slot
+    DetailSlot& QueryDB(int sx, int sz);
+
+    void cache_Initialize();
+    void cache_Update(int sx, int sz, Fvector& view);
+    void cache_Task(int gx, int gz, Slot* D);
+    Slot* cache_Query(int sx, int sz);
+    void cache_Decompress(Slot* D);
+    BOOL cache_Validate();
+
+    // cache grid to world
+    int cg2w_X(int x) { return cache_cx - dm_size + x; }
+    int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
+    // world to cache grid
+    int w2cg_X(int x) { return x - cache_cx + dm_size; }
+    int w2cg_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
+
+    void Load();
+    void Unload();
+    void Render(CBackend& cmd_list);
+
+    /// MT stuff
+    Task* m_calc_task{};
+
+    void DispatchMTCalc();
+
+    // ===================================================================
+    // GPU COMPUTE PATH ADDITIONS (ps_r__detail_gpu = 1)
+    // These members and functions are ONLY used when GPU compute path is active
+    // They are added to the bottom to clearly separate from vanilla code
+    // ===================================================================
 
     // Phase 1, Milestone 1.2: Unified geometry per vis_id
     ref_geom vis_unified_geom[3];  // One unified geometry per vis_id
@@ -198,12 +251,19 @@ public:
     u32 vis_total_vertices[3];     // Total vertices in unified buffer
     u32 vis_total_indices[3];      // Total indices in unified buffer
 
+#ifdef USE_DX11
+    // Phase 1, Milestone 1.1: Structured buffers for GPU instancing (one per vis_id: still, wave1, wave2)
+    ID3DShaderResourceView* detailSRV_vis[3];
+    ID3DBuffer* detailBuffer_vis[3];
+    u32 detailBufferSize_vis[3];  // Track allocated size for each buffer
+
     // Phase 2.0: Full level decompression
     struct SlotItemWithObject
     {
         SlotItem item;      // Original slot item data
         u32 object_id;      // Which grass object type (0-63)
     };
+
     // Instance data structure matching shader
     struct InstanceData
     {
@@ -216,6 +276,7 @@ public:
         Fvector pos; // Position
         u32 object_id;
     };
+
     xr_vector<SlotItemWithObject> all_level_instances;  // ALL instances for entire level
     u32 total_instance_count;
     bool full_level_loaded;
@@ -260,33 +321,12 @@ public:
     };
     static_assert(sizeof(SlotAABB) == 64, "SlotAABB must be 64 bytes for GPU alignment");
 
-    // Phase 6: Virtual texturing page table structures
-    struct PageTableEntry {
-        uint16_t physical_page;      // 0-4095 or 0xFFFF (not resident)
-        uint8_t  mip_level;          // Reserved for future LOD (default: 0)
-        uint8_t  reference_bit : 1;  // For Clock algorithm
-        uint8_t  dirty_bit : 1;      // Needs writeback
-        uint8_t  locked_bit : 1;     // In-flight upload, can't evict
-        uint8_t  padding : 5;
-        uint64_t last_access_frame;  // For age tracking
-    };
-    static_assert(sizeof(PageTableEntry) == 16, "PageTableEntry packing check");
-
-    struct PhysicalPageInfo {
-        uint32_t logical_slot;       // Which world slot occupies this page (UINT32_MAX = free)
-        uint8_t  reference_bit;      // For Clock algorithm
-        uint8_t  locked;             // Can't evict (in-flight upload)
-        uint16_t padding;
-    };
-    static_assert(sizeof(PhysicalPageInfo) == 8, "PhysicalPageInfo packing check");
-
     xr_vector<SlotAABB> slot_aabbs;     // CPU copy of slot AABBs
     u32 slot_count;                     // Total number of slots with instances
     ID3DBuffer* slot_aabb_buffer;       // GPU buffer for slot AABBs
     ID3DShaderResourceView* slot_aabb_srv;  // SRV for slot AABB buffer
 
-    // Phase 5: Interactive Grass System
-    // Milestone 5.1: Interaction texture atlas
+    // Phase 5: Interactive Grass System - Milestone 5.1: Interaction texture atlas
     ID3D11Texture2D* interaction_atlas;           // 2048x2048, stores displacement per slot
     ID3D11RenderTargetView* interaction_rtv;
     ID3D11ShaderResourceView* interaction_srv;
@@ -346,6 +386,26 @@ public:
         u32 texture_size;        // 40-43
         u32 pad[3];              // 44-55
     };
+
+    // Phase 6: Virtual texturing page table structures
+    struct PageTableEntry {
+        uint16_t physical_page;      // 0-4095 or 0xFFFF (not resident)
+        uint8_t  mip_level;          // Reserved for future LOD (default: 0)
+        uint8_t  reference_bit : 1;  // For Clock algorithm
+        uint8_t  dirty_bit : 1;      // Needs writeback
+        uint8_t  locked_bit : 1;     // In-flight upload, can't evict
+        uint8_t  padding : 5;
+        uint64_t last_access_frame;  // For age tracking
+    };
+    static_assert(sizeof(PageTableEntry) == 16, "PageTableEntry packing check");
+
+    struct PhysicalPageInfo {
+        uint32_t logical_slot;       // Which world slot occupies this page (UINT32_MAX = free)
+        uint8_t  reference_bit;      // For Clock algorithm
+        uint8_t  locked;             // Can't evict (in-flight upload)
+        uint16_t padding;
+    };
+    static_assert(sizeof(PhysicalPageInfo) == 8, "PhysicalPageInfo packing check");
 
     // Phase 6: Virtual Texturing System
     static const uint16_t PHYSICAL_PAGES = 4096;       // 64×64 atlas slots
@@ -514,58 +574,27 @@ public:
     std::mutex save_mutex;
     xr_vector<uint32_t> slots_pending_save;
 
-#endif
-
-    ref_constant hwc_consts;
-    ref_constant hwc_wave;
-    ref_constant hwc_wind;  // dir1 for vis_id=1 (wave1)
-    ref_constant hwc_wind2; // dir2 for vis_id=2 (wave2)
-    ref_constant hwc_array;
-    ref_constant hwc_s_consts;
-    ref_constant hwc_s_xform;
-    ref_constant hwc_s_array;
+    // GPU-only shader constants (Phase 5 additions)
+    ref_constant hwc_wind2; // dir2 for vis_id=2 (wave2) - GPU only
     ref_constant hwc_detail_params;  // Phase 5: slot grid parameters (x_size, z_size, x_offs, z_offs)
     ref_constant hwc_grass_wind_displacement;  // Phase 5: wind displacement strength
     ref_constant hwc_grass_interaction_displacement;  // Phase 5: interaction displacement strength
-    void hw_Load();
-    void hw_Load_Geom();
-    void hw_Load_Shaders();
-    void hw_Unload();
-    void hw_Render(CBackend& cmd_list);
-    void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+
+    // GPU-only function declarations
     void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
-
-#ifdef USE_DX11
-    // Phase 2.0.4: Render from full level decompression
     void hw_Render_FullLevel(CBackend& cmd_list);
-#endif
 
-    // get unpacked slot
-    DetailSlot& QueryDB(int sx, int sz);
-
-    void cache_Initialize();
-    void cache_Update(int sx, int sz, Fvector& view);
-    void cache_Task(int gx, int gz, Slot* D);
-    Slot* cache_Query(int sx, int sz);
-    void cache_Decompress(Slot* D);
-    BOOL cache_Validate();
-
-#ifdef USE_DX11
-    // Phase 2.0: Full level decompression
     void DecompressAllSlots();
     void CreatePersistentInstanceBuffer();
 
-    // Phase 2.1: GPU culling
     void CreateGPUCullingBuffers();
     void DispatchGPUCulling(CBackend& cmd_list);
 
-    // Phase 4A: BVH spatial culling
     void ComputeSlotAABBs();
     void CreateSlotAABBBuffer();
     void DestroySlotAABBBuffer();
     void ValidateSlotAABBs();
 
-    // Phase 5: Interactive Grass System
     void CreateInteractionAtlas();
     void DestroyInteractionAtlas();
     void CreateEntityTrackingBuffers();
@@ -576,7 +605,6 @@ public:
     void RenderInteractions(CBackend& cmd_list);
     void UpdateWind(CBackend& cmd_list);
 
-    // Phase 6: Virtual texturing management
     void InitializePageTable();
     void ShutdownPageTable();
     void UpdatePageTable();  // Called each frame
@@ -589,15 +617,12 @@ public:
     void ResetPageTableStats();
     void PrintPageTableStats();
 
-    // Phase 6B: Visibility integration
     void InitializeVisibilityReadback();
     void ShutdownVisibilityReadback();
     void ReadVisibleSlotsFromGPU();
     void ProcessUploadQueue();
     void RequestVisiblePages();
     void RequestPageWithPriority(uint32_t logical_slot, uint8_t priority);
-
-    // Phase 3 (Week 5-6): A-Life interaction
 
     void ProcessThreadSafeRequests(); // Called on render thread
     void ProcessPendingUpdates();
@@ -608,7 +633,6 @@ public:
     void ResetALifeStats();
     void PrintALifeStats();
 
-    // Phase 5: Warm cache management
     void InitializeWarmCache();
     void ShutdownWarmCache();
     bool LoadSlotFromWarmCache(uint32_t logical_slot, uint8_t* out_data);
@@ -618,7 +642,6 @@ public:
     void CompressSlotData(const uint8_t* uncompressed, uint8_t* compressed, size_t* out_size);
     void DecompressSlotData(const uint8_t* compressed, size_t compressed_size, uint8_t* uncompressed);
 
-    // Phase 5: GPU readback pipeline
     void InitializeReadbackPipeline();
     void ShutdownReadbackPipeline();
     void RequestSlotReadback(uint32_t logical_slot);
@@ -627,7 +650,6 @@ public:
     float HalfToFloat(uint16_t h);
     uint16_t FloatToHalf(float f);
 
-    // Phase 5: Disk persistence
     void InitializePersistence();
     void ShutdownPersistence();
     void SaveSlotToDisk(uint32_t logical_slot, const uint8_t* data, size_t size);
@@ -636,24 +658,10 @@ public:
     void QueueSlotForSave(uint32_t logical_slot);
     void FlushPendingSaves();
     void UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* data);
+
 #endif
     void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0); // Main thread only
     void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0); // Thread-safe version
-
-    // cache grid to world
-    int cg2w_X(int x) { return cache_cx - dm_size + x; }
-    int cg2w_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
-    // world to cache grid
-    int w2cg_X(int x) { return x - cache_cx + dm_size; }
-    int w2cg_Z(int z) { return cache_cz - dm_size + (dm_cache_line - 1 - z); }
-    void Load();
-    void Unload();
-    void Render(CBackend& cmd_list);
-
-    /// MT stuff
-    Task* m_calc_task{};
-
-    void DispatchMTCalc();
 
     CDetailManager();
     virtual ~CDetailManager();
