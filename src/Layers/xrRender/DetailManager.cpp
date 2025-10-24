@@ -299,6 +299,9 @@ void CDetailManager::Load()
 
         // Phase 6B: Initialize visibility readback
         InitializeVisibilityReadback();
+
+        // Phase 5: Initialize warm cache (Persistence Layer)
+        InitializeWarmCache();
     }
 #endif
 

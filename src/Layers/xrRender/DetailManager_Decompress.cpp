@@ -311,6 +311,9 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
     D.vis.clear();
     D.vis.box.set(Bounds);
     D.vis.box.getsphere(D.vis.sphere.P, D.vis.sphere.R);
+
+    // Add safety margin to prevent aggressive culling of thin grass meshes at screen edges
+    D.vis.sphere.R *= 1.2f;
 }
 
 #ifdef USE_DX11

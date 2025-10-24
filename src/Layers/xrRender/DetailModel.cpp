@@ -126,6 +126,11 @@ void CDetail::Load(IReader* S)
         bv_bb.modify(vertices[i].P);
     bv_bb.getsphere(bv_sphere.P, bv_sphere.R);
 
+    // Add safety margin to bounding sphere to prevent aggressive culling of thin/flat meshes
+    // Grass meshes (especially billboards) can be very thin, causing premature culling
+    // when viewed near screen edges. A 20% margin prevents this without significant overhead.
+    bv_sphere.R *= 1.2f;
+
 #if !defined(_EDITOR) && defined(USE_DX11)
     Optimize();
 

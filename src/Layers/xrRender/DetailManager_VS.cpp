@@ -279,6 +279,9 @@ void CDetailManager::hw_Unload()
     _RELEASE(interaction_constant_buffer);
     _RELEASE(wind_constant_buffer);
 
+    // Phase 5: Shutdown warm cache (Persistence Layer)
+    ShutdownWarmCache();
+
     // Phase 6: Shutdown page table
     ShutdownPageTable();
 

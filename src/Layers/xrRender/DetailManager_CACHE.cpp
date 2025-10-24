@@ -247,6 +247,9 @@ void CDetailManager::cache_Update(int v_x, int v_z, Fvector& view)
                         MS.empty = FALSE;
                 }
                 MS.vis.box.getsphere(MS.vis.sphere.P, MS.vis.sphere.R);
+
+                // Add safety margin to prevent aggressive culling of thin grass meshes at screen edges
+                MS.vis.sphere.R *= 1.2f;
             }
         }
     }

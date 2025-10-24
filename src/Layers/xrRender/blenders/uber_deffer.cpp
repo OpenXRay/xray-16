@@ -208,6 +208,10 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
         C.r_dx11Texture("s_hemi", C.L_textures[2]);
         C.r_dx11Sampler("smp_rtlinear");
     }
+
+    // Phase 5: Bind interaction atlas for grass (alpha-ref materials like grass)
+    C.r_dx11Texture("s_interaction_atlas", "$user$interaction_atlas");
+    // Note: Uses smp_base sampler which is already bound
 #elif defined(USE_OGL)
     C.r_Pass(vs, ps, FALSE);
     VERIFY(C.L_textures[0].size());
