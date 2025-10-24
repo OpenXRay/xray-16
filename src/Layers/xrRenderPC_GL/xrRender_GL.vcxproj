@@ -47,6 +47,7 @@
     <ClCompile Include="..\xrRenderGL\glr_screenshot.cpp" />
     <ClCompile Include="..\xrRenderGL\glTexture.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />
@@ -246,6 +247,7 @@
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
     <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />

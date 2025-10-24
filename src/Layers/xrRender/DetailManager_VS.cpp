@@ -4,7 +4,7 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
-extern int ps_r__detail_gpu;;
+extern int ps_r__detail_gpu;
 namespace detail_manager
 {
 extern const int quant = 16384;
@@ -199,23 +199,14 @@ void CDetailManager::hw_Load_Geom()
 
 void CDetailManager::hw_Unload()
 {
+    if (hw_Geom)
+        hw_Geom.destroy();
+    if (hw_IB)
+        hw_IB.Release();
+    if (hw_VB)
+        hw_VB.Release();
+
 #ifdef USE_DX11
-    extern int ps_r__detail_gpu;
-
-    if (!ps_r__detail_gpu)
-    {
-        // Destroy VS/VB/IB
-        if (hw_Geom)
-            hw_Geom.destroy();
-        if (hw_IB)
-            hw_IB.Release();
-        if (hw_VB)
-            hw_VB.Release();
-
-        Msg("* [DETAILS] Vanilla CPU path cleanup complete");
-        return;
-    }
-
     for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
         _RELEASE(detailBuffer_vis[vis_id]);
@@ -268,14 +259,9 @@ void CDetailManager::hw_Unload()
 
     ShutdownVisibilityReadback();
 
-    Msg("* [DETAILS] GPU compute path cleanup complete");
-#else
-    if (hw_Geom)
-        hw_Geom.destroy();
-    if (hw_IB)
-        hw_IB.Release();
-    if (hw_VB)
-        hw_VB.Release();
+    if (gpu_detail_shader)
+        gpu_detail_shader.destroy();
+    xr_delete(b_detail_gpu);
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

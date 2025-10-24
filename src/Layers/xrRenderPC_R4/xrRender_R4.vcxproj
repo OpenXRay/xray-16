@@ -79,6 +79,9 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h" />
+    <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer_impl.h" />
@@ -246,6 +249,7 @@
     <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
+    <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Model_EbB_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Particle_deferred.cpp" />

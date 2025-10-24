@@ -482,6 +482,9 @@ public:
 
     ID3D11Buffer* interaction_update_cb;
 
+    IBlender* b_detail_gpu{nullptr};
+    ref_shader gpu_detail_shader;
+
     struct WarmCacheEntry {
         uint32_t world_slot_id;
         uint64_t last_access_frame;
