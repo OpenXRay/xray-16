@@ -62,6 +62,9 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 	pos.z = dot(m2, float4(I.pos.xyz, 1.0));
 	pos.w = 1.0f;
 
+	// Phase 5: Declare atlas_uv outside scope for pixel shader debug
+	float2 atlas_uv = float2(0, 0);
+
 	// Phase 5: Apply interactive displacement (entity interaction + FBM wind)
 	// Replaces old calc_cyclic wave animation with natural FBM wind for all grass types
 	{
@@ -122,7 +125,7 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 			float2 slot_local = frac(pos.xz / slot_size);
 
 			// Final atlas UV
-			float2 atlas_uv = page_base_uv + slot_local * page_size_uv;
+			atlas_uv = page_base_uv + slot_local * page_size_uv;
 
 			// Sample interaction atlas
 			interaction = interaction_atlas.SampleLevel(interaction_sampler, atlas_uv, 0);
@@ -161,6 +164,9 @@ v2p_flat main(v_detail_instanced I, uint instance_id : SV_InstanceID)
 
 	N.xyz = mul((float3x3)m_WV, N.xyz);
 	O.N = N.xyz;
+
+	// Phase 5: Pass atlas UV for grass interaction debug visualization
+	O.interaction_uv = atlas_uv;  // Pass the correct atlas UV computed with indirection table
 
 	O.hpos = mul(m_WVP, pos);
 	return O;

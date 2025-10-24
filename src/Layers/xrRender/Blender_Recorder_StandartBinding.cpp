@@ -8,6 +8,9 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
+// Detail Manager debug
+extern ENGINE_API int dm_debug_trails;
+
 namespace xray::render::RENDER_NAMESPACE
 {
 // matrices
@@ -444,5 +447,9 @@ void CBlender_Compile::SetMapping()
         std::pair<shared_str, R_constant_setup*> cs = RImplementation.Resources->v_constant_setup[it];
         r_Constant(cs.first.c_str(), cs.second);
     }
+
+    // Detail Manager debug
+    r_Constant("dm_debug_trails", &dm_debug_trails_binder);
+
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -5,12 +5,38 @@
 #include "common.h"
 #include "sload.h"
 
+// Phase 5: Grass interaction debug visualization
+Texture2D s_interaction_atlas;  // Interaction atlas texture
+uniform int dm_debug_trails;
+
+// Sample grass interaction using pre-computed atlas UV from vertex shader
+float SampleGrassInteraction(float2 atlas_uv)
+{
+    // Sample the interaction atlas using the UV computed in vertex shader
+    // The vertex shader already handles:
+    // - World position to slot mapping
+    // - Indirection table lookup (virtual texturing)
+    // - Physical page to atlas UV conversion
+    float4 interaction = s_interaction_atlas.Sample(smp_base, atlas_uv);
+
+    return interaction.r; // Red channel = trampling intensity
+}
+
 #ifdef	ATOC
 
 float4 	main	( p_flat I ) : SV_Target
 {
 	float4 D 	= tbase	 	(I.tcdh);
 	D.w = (D.w-def_aref*0.5f)/(1-def_aref*0.5f);
+
+	// Phase 5: Debug visualization - tint grass red based on interaction
+	if (dm_debug_trails > 0)
+	{
+		float interaction_strength = SampleGrassInteraction(I.interaction_uv);
+		// Apply red tint based on interaction strength
+		D.rgb = lerp(D.rgb, float3(1.0f, 0.0f, 0.0f), interaction_strength);
+	}
+
 	return D;
 }
 
@@ -85,6 +111,13 @@ f_deffer 	main	( p_flat I )
 		 	ms	= I.tcdh.w		;
 # endif
 #endif
+
+  // Phase 5: Debug visualization - tint grass red based on interaction
+  if (dm_debug_trails > 0)
+  {
+      float interaction_strength = SampleGrassInteraction(I.interaction_uv);
+      D.rgb = lerp(D.rgb, float3(1.0f, 0.0f, 0.0f), interaction_strength);
+  }
 
   // 2. Standart output
   float4 Ne     = float4	(normalize((float3)I.N.xyz), 					h			);

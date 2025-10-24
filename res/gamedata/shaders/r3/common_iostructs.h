@@ -1,3 +1,4 @@
+
 #ifndef	common_iostructs_h_included
 #define	common_iostructs_h_included
 
@@ -386,6 +387,7 @@ struct	v2p_flat
 #ifdef USE_LM_HEMI
     float2	lmh : TEXCOORD4;	// lm-hemi
 #endif
+    float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
     float4	hpos : SV_Position;
 };
 
@@ -404,6 +406,7 @@ struct	p_flat
 #ifdef USE_LM_HEMI
     float2	lmh : TEXCOORD4;	// lm-hemi
 #endif
+    float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
 };
 
 ////////////////////////////////////////////////////////////////

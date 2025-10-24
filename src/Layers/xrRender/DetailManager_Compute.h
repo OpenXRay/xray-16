@@ -50,7 +50,7 @@ static_assert(sizeof(DetailInstanceGPU) == 128, "DetailInstanceGPU must be 128 b
 // GPU-friendly frustum planes (64 bytes)
 struct FrustumGPU
 {
-    Fvector4 planes[6];  // Left, Right, Top, Bottom, Near, Far
+    Fvector4 planes[6];  // Left, Right, Top, Bottom, Far, Near (shader tests 0-4, skips Near at 5)
 };
 
 // Culling parameters passed to compute shader (192 bytes)
@@ -211,20 +211,20 @@ inline FrustumGPU BuildFrustumGPU(const Fmatrix& view_proj)
         view_proj._44 + view_proj._42
     );
 
-    // Near: row4 + row3
+    // Far: row4 - row3 (at index 4 so shader tests it)
     frustum.planes[4].set(
-        view_proj._14 + view_proj._13,
-        view_proj._24 + view_proj._23,
-        view_proj._34 + view_proj._33,
-        view_proj._44 + view_proj._43
-    );
-
-    // Far: row4 - row3
-    frustum.planes[5].set(
         view_proj._14 - view_proj._13,
         view_proj._24 - view_proj._23,
         view_proj._34 - view_proj._33,
         view_proj._44 - view_proj._43
+    );
+
+    // Near: row4 + row3 (at index 5 so shader skips it)
+    frustum.planes[5].set(
+        view_proj._14 + view_proj._13,
+        view_proj._24 + view_proj._23,
+        view_proj._34 + view_proj._33,
+        view_proj._44 + view_proj._43
     );
 
     // Normalize planes
