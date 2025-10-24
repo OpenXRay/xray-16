@@ -4,7 +4,7 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
-extern int ps_r__detail_gpu;;
+extern int ps_r__detail_gpu;
 namespace detail_manager
 {
 extern const int quant = 16384;
@@ -214,25 +214,16 @@ void CDetailManager::hw_Load_Geom()
 
 void CDetailManager::hw_Unload()
 {
+    // === ALWAYS CLEANUP VANILLA GEOMETRY (both paths need it) ===
+    if (hw_Geom)
+        hw_Geom.destroy();
+    if (hw_IB)
+        hw_IB.Release();
+    if (hw_VB)
+        hw_VB.Release();
+
 #ifdef USE_DX11
-    extern int ps_r__detail_gpu;
-
-    if (!ps_r__detail_gpu)
-    {
-        // === VANILLA CPU PATH CLEANUP (DX11 build) ===
-        // Destroy VS/VB/IB
-        if (hw_Geom)
-            hw_Geom.destroy();
-        if (hw_IB)
-            hw_IB.Release();
-        if (hw_VB)
-            hw_VB.Release();
-
-        Msg("* [DETAILS] Vanilla CPU path cleanup complete");
-        return;
-    }
-
-    // === GPU COMPUTE PATH CLEANUP (DX11) ===
+    // === ALWAYS CLEANUP GPU GEOMETRY (both paths need it for switching) ===
     // Phase 1, Milestone 1.1: Release 3 vis_id-based structured buffers (DX11)
     for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
@@ -295,15 +286,10 @@ void CDetailManager::hw_Unload()
     // Phase 6B: Shutdown visibility readback
     ShutdownVisibilityReadback();
 
-    Msg("* [DETAILS] GPU compute path cleanup complete");
-#else
-    // DX9/GL: Destroy vanilla VS/VB/IB
-    if (hw_Geom)
-        hw_Geom.destroy();
-    if (hw_IB)
-        hw_IB.Release();
-    if (hw_VB)
-        hw_VB.Release();
+    // Destroy GPU rendering shader and blender
+    if (gpu_detail_shader)
+        gpu_detail_shader.destroy();
+    xr_delete(b_detail_gpu);
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

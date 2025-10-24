@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Layers/xrRender/DetailManager.h"
+#include "Layers/xrRender/blenders/Blender_Detail_GPU.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 #include "Layers/xrRender/BufferUtils.h"
@@ -39,78 +40,90 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_array = T1.get("array");
 
 #ifdef USE_DX11
-    if (ps_r__detail_gpu)
+    // === GPU COMPUTE PATH SHADER SETUP (always initialized for mode switching) ===
+    hwc_wind2 = T0.get("dir2D_2"); // dir2 for wave2 (GPU path)
+    hwc_detail_params = T0.get("detail_params");  // Phase 5: slot grid parameters
+    hwc_grass_wind_displacement = T0.get("grass_wind_displacement");  // Phase 5: wind displacement strength
+    hwc_grass_interaction_displacement = T0.get("grass_interaction_displacement");  // Phase 5: interaction displacement strength
+
+    // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
+    // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
+    const u32 initialBufferSize = 2048 * 2048;
+
+    D3D11_BUFFER_DESC bufferDesc = {};
+    bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    bufferDesc.StructureByteStride = sizeof(InstanceData);
+    bufferDesc.ByteWidth = initialBufferSize * sizeof(InstanceData);
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srvDesc.Buffer.ElementWidth = initialBufferSize;
+
+    // Create 3 buffers, one for each vis_id
+    for (u32 vis_id = 0; vis_id < 3; vis_id++)
     {
-        // === GPU COMPUTE PATH SHADER SETUP ===
-        hwc_wind2 = T0.get("dir2D_2"); // dir2 for wave2 (GPU path)
-        hwc_detail_params = T0.get("detail_params");  // Phase 5: slot grid parameters
-        hwc_grass_wind_displacement = T0.get("grass_wind_displacement");  // Phase 5: wind displacement strength
-        hwc_grass_interaction_displacement = T0.get("grass_interaction_displacement");  // Phase 5: interaction displacement strength
+        // Create buffer
+        ID3DBuffer* buffer = nullptr;
+        CHK_DX(HW.pDevice->CreateBuffer(&bufferDesc, nullptr, &buffer));
+        detailBuffer_vis[vis_id] = buffer;
+        detailBufferSize_vis[vis_id] = initialBufferSize;
 
-        // Phase 1, Milestone 1.1: Create 3 structured buffers (one per vis_id: still, wave1, wave2)
-        // Use 32K instances per buffer (we've seen up to ~22K for vis_id=0 still grass)
-        const u32 initialBufferSize = 2048 * 2048;
+        // Create SRV
+        ID3DShaderResourceView* srv = nullptr;
+        CHK_DX(HW.pDevice->CreateShaderResourceView(buffer, &srvDesc, &srv));
+        detailSRV_vis[vis_id] = srv;
+    }
 
-        D3D11_BUFFER_DESC bufferDesc = {};
-        bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-        bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-        bufferDesc.StructureByteStride = sizeof(InstanceData);
-        bufferDesc.ByteWidth = initialBufferSize * sizeof(InstanceData);
+    Msg("* [DetailManager] Created 3 instance buffers (vis_id: still/wave1/wave2), %u instances each", initialBufferSize);
 
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-        srvDesc.Buffer.ElementWidth = initialBufferSize;
+    // Phase 5: Load compute shaders for interactive grass
+    interaction_compute_shader.create("detail_interaction");
+    wind_compute_shader.create("detail_wind_fbm");
 
-        // Create 3 buffers, one for each vis_id
-        for (u32 vis_id = 0; vis_id < 3; vis_id++)
-        {
-            // Create buffer
-            ID3DBuffer* buffer = nullptr;
-            CHK_DX(HW.pDevice->CreateBuffer(&bufferDesc, nullptr, &buffer));
-            detailBuffer_vis[vis_id] = buffer;
-            detailBufferSize_vis[vis_id] = initialBufferSize;
+    if (interaction_compute_shader && interaction_compute_shader->sh)
+        Msg("* [DetailManager] Loaded interaction compute shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load interaction compute shader!");
 
-            // Create SRV
-            ID3DShaderResourceView* srv = nullptr;
-            CHK_DX(HW.pDevice->CreateShaderResourceView(buffer, &srvDesc, &srv));
-            detailSRV_vis[vis_id] = srv;
-        }
+    if (wind_compute_shader && wind_compute_shader->sh)
+        Msg("* [DetailManager] Loaded wind compute shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load wind compute shader!");
 
-        Msg("* [DetailManager] Created 3 instance buffers (vis_id: still/wave1/wave2), %u instances each", initialBufferSize);
+    // Phase 3: Load interaction update shader (for deferred A-Life updates)
+    interaction_update_cs.create("detail_interaction_apply");
 
-        // Phase 5: Load compute shaders for interactive grass
-        interaction_compute_shader.create("detail_interaction");
-        wind_compute_shader.create("detail_wind_fbm");
+    if (interaction_update_cs && interaction_update_cs->sh)
+        Msg("* [DetailManager] Loaded interaction update shader: OK");
+    else
+        Msg("! [DetailManager] Failed to load interaction update shader!");
 
-        if (interaction_compute_shader && interaction_compute_shader->sh)
-            Msg("* [DetailManager] Loaded interaction compute shader: OK");
-        else
-            Msg("! [DetailManager] Failed to load interaction compute shader!");
+    // Create constant buffer for interaction updates
+    D3D11_BUFFER_DESC cbDesc = {};
+    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cbDesc.ByteWidth = sizeof(InteractionUpdateCB);
 
-        if (wind_compute_shader && wind_compute_shader->sh)
-            Msg("* [DetailManager] Loaded wind compute shader: OK");
-        else
-            Msg("! [DetailManager] Failed to load wind compute shader!");
+    CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &interaction_update_cb));
 
-        // Phase 3: Load interaction update shader (for deferred A-Life updates)
-        interaction_update_cs.create("detail_interaction_apply");
+    // === GPU RENDERING SHADER (always initialized for mode switching) ===
+    b_detail_gpu = xr_new<CBlender_Detail_GPU>();
+    gpu_detail_shader.create(b_detail_gpu, nullptr, "detail_gpu");
 
-        if (interaction_update_cs && interaction_update_cs->sh)
-            Msg("* [DetailManager] Loaded interaction update shader: OK");
-        else
-            Msg("! [DetailManager] Failed to load interaction update shader!");
-
-        // Create constant buffer for interaction updates
-        D3D11_BUFFER_DESC cbDesc = {};
-        cbDesc.Usage = D3D11_USAGE_DYNAMIC;
-        cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        cbDesc.ByteWidth = sizeof(InteractionUpdateCB);
-
-        CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &interaction_update_cb));
+    if (!gpu_detail_shader)
+    {
+        Msg("! [DetailManager] Failed to create GPU instancing shader");
+        Msg("  GPU shaders: detail_gpu.vs, detail_gpu.ps might be missing");
+        xr_delete(b_detail_gpu);
+    }
+    else
+    {
+        Msg("* [DetailManager] GPU instancing shader created successfully");
     }
 #endif
 }
@@ -616,8 +629,19 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
         cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
-        cmd_list.set_Element(Object.shader->E[0], 0);
-        cmd_list.apply_lmaterial();
+        // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
+        // Element 1 = normal pass, Element 0 = ATOC pass
+        if (gpu_detail_shader)
+        {
+            cmd_list.set_Element(gpu_detail_shader->E[1], 0);
+            cmd_list.apply_lmaterial();
+        }
+        else
+        {
+            // Fallback to vanilla shader if GPU shader failed to load
+            cmd_list.set_Element(Object.shader->E[0], 0);
+            cmd_list.apply_lmaterial();
+        }
 
         // Phase 5: Bind interactive grass textures (AFTER apply_lmaterial to avoid being unbound)
         // Bind to slots 1, 2, 3 to match shader registers (t1, t2, t3)
@@ -980,9 +1004,19 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     cmd_list.set_c(hwc_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
     cmd_list.set_c(hwc_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
 
-    // Set shader for this object (use lod_id=0 for wave shader)
-    cmd_list.set_Element(Object.shader->E[0], 0);
-    cmd_list.apply_lmaterial();
+    // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
+    // Element 1 = normal pass, Element 0 = ATOC pass
+    if (gpu_detail_shader)
+    {
+        cmd_list.set_Element(gpu_detail_shader->E[1], 0);
+        cmd_list.apply_lmaterial();
+    }
+    else
+    {
+        // Fallback to vanilla shader if GPU shader failed to load
+        cmd_list.set_Element(Object.shader->E[0], 0);
+        cmd_list.apply_lmaterial();
+    }
 
     // Phase 5: Bind interactive grass textures (AFTER apply_lmaterial to avoid being unbound)
     // Bind to slots 1, 2, 3 to match shader registers (t1, t2, t3)

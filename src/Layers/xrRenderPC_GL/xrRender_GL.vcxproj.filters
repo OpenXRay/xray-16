@@ -708,6 +708,9 @@
     <ClCompile Include="..\..\..\sdk\include\glad\gl.c">
       <Filter>Refactored\HW\glad</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1177,6 +1180,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\sdk\include\KHR\khrplatform.h">
       <Filter>Refactored\HW\KHR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h">
+      <Filter>Shading templates</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

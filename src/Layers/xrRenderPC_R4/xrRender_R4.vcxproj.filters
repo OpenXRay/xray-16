@@ -735,6 +735,9 @@
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1339,6 +1342,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp">
       <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp">
+      <Filter>Shading templates</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

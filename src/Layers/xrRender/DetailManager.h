@@ -522,6 +522,10 @@ public:
 
     ID3D11Buffer* interaction_update_cb;
 
+    // GPU rendering shader (separate from vanilla)
+    IBlender* b_detail_gpu{nullptr};    // GPU blender class
+    ref_shader gpu_detail_shader;       // GPU shader (detail_gpu.vs + detail_gpu.ps)
+
     // Phase 5: Warm cache (RAM-based recently-accessed slots)
     struct WarmCacheEntry {
         uint32_t world_slot_id;          // Which logical slot
