@@ -15,7 +15,6 @@ ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;
 ENGINE_API float ps_r3_grass_interaction_displacement = 0.5f;
 ENGINE_API u32 ps_r3_grass_wind_octaves = 5;
 
-#ifndef MASTER_GOLD
 namespace
 {
 bool window_weather_cycle = false;
@@ -60,11 +59,9 @@ bool ConfigStyleSelector(pcstr label, bool& soc_style)
         "(look at the environment color in the mixer category)");
 }
 } // namespace
-#endif
 
 void CEnvDescriptor::ed_show_params(const CEnvironment& env)
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     ScopeID scope(this);
@@ -273,12 +270,10 @@ void CEnvDescriptor::ed_show_params(const CEnvironment& env)
             ImGui::TreePop();
         }
     }
-#endif
 }
 
 void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     CEnvDescriptor::ed_show_params(env);
@@ -295,12 +290,15 @@ void CEnvDescriptorMixer::ed_show_params(const CEnvironment& env)
         ImGui::DragFloat("fog near", &fog_near);
         ImGui::DragFloat("fog far", &fog_far);
     }
-#endif
 }
 
 void CEnvironment::on_tool_frame()
 {
-#ifndef MASTER_GOLD
+#ifdef MASTER_GOLD
+    extern int g_debug_utils;
+    if (!g_debug_utils)
+        return;
+#endif
     if (!get_open_state())
         return;
 
@@ -501,7 +499,6 @@ void CEnvironment::on_tool_frame()
         } // if (ImGui::CollapsingHeader("Live edit", ImGuiTreeNodeFlags_DefaultOpen))
     }
     ImGui::End();
-#endif
 }
 
 #ifndef MASTER_GOLD

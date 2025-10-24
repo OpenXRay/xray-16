@@ -336,7 +336,6 @@ void CEffect_Thunderbolt::Render()
 
 void CEffect_Thunderbolt::ED_ShowParams()
 {
-#ifndef MASTER_GOLD
     using namespace xray::imgui;
 
     ImGui::SeparatorText("Common");
@@ -359,7 +358,6 @@ void CEffect_Thunderbolt::ED_ShowParams()
     ImGui::DragFloat("sky color", &p_sky_color, 0.001f, 0.0f, 1.0f);
     ImGui::DragFloat("sun color", &p_sun_color, 0.001f, 0.0f, 1.0f);
     ImGui::DragFloat("fog color", &p_fog_color, 0.001f, 0.0f, 1.0f);
-#endif
 }
 
 void SThunderboltDesc::SFlare::ed_show_params()

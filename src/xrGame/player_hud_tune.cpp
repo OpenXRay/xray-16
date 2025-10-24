@@ -64,7 +64,11 @@ void CHudTuner::UpdateValues()
 
 void CHudTuner::on_tool_frame()
 {
-#ifndef MASTER_GOLD
+#ifdef MASTER_GOLD
+    extern int g_debug_utils;
+    if (!g_debug_utils)
+        return;
+#endif
     if (!get_open_state())
         return;
 
@@ -316,5 +320,4 @@ void CHudTuner::on_tool_frame()
         }
     }
     ImGui::End();
-#endif
 }
