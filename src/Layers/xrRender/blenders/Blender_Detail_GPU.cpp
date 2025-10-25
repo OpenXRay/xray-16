@@ -38,6 +38,7 @@ void CBlender_Detail_GPU::Compile(CBlender_Compile& C)
         C.r_dx11Texture("interaction_atlas", "$user$interaction_atlas");
         C.r_dx11Texture("wind_texture", "$user$wind");
         C.r_dx11Texture("slot_indirection", "$user$indirection");
+        C.r_dx11Texture("s_grass_vein", "shaders\\grass_vein");
 
         if (C.iElement != -1)
         {
