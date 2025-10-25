@@ -230,7 +230,7 @@ void CDetailManager::CreateSDF_BladeGeometry()
     xr_vector<BladeVertex> blade_verts;
     xr_vector<u16> blade_indices;
 
-    GenerateGrassBlade(blade_verts, blade_indices, 6);
+    GenerateGrassBlade(blade_verts, blade_indices, 8);
 
     static const VertexElement blade_decl[] = {
         {0, 0,  D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},

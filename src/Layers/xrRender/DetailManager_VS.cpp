@@ -346,9 +346,9 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
 
     const float blade_height = 0.5f * 2.f;
     const float blade_width = 0.02f * 2.f;
-    const float tilt = 0.05f;
+    const float tilt = 0.125f;
     const float bend = 0.125f;
-    const float curve_bias = 0.5f;
+    const float curve_bias = 0.8f;
 
     Fvector p0;
     p0.set(0.0f, 0.0f, 0.0f);
