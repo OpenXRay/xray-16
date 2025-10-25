@@ -349,202 +349,44 @@ void CDetailManager::hw_Unload()
 }
 
 
-// Remove all the SDF functions - we don't need them anymore!
-// Replace with Bezier curve evaluation:
-
-// Cubic Bezier curve evaluation
-Fvector EvaluateBezier(const Fvector& p0, const Fvector& p1, const Fvector& p2, const Fvector& p3, float t)
-{
-    float u = 1.0f - t;
-    float tt = t * t;
-    float uu = u * u;
-    float uuu = uu * u;
-    float ttt = tt * t;
-
-    Fvector result;
-    result.x = uuu * p0.x + 3.0f * uu * t * p1.x + 3.0f * u * tt * p2.x + ttt * p3.x;
-    result.y = uuu * p0.y + 3.0f * uu * t * p1.y + 3.0f * u * tt * p2.y + ttt * p3.y;
-    result.z = uuu * p0.z + 3.0f * uu * t * p1.z + 3.0f * u * tt * p2.z + ttt * p3.z;
-
-    return result;
-}
-
-// Bezier derivative (tangent)
-Fvector EvaluateBezierDerivative(const Fvector& p0, const Fvector& p1, const Fvector& p2, const Fvector& p3, float t)
-{
-    float u = 1.0f - t;
-    float uu = u * u;
-    float tt = t * t;
-
-    Fvector result;
-    result.x = 3.0f * uu * (p1.x - p0.x) + 6.0f * u * t * (p2.x - p1.x) + 3.0f * tt * (p3.x - p2.x);
-    result.y = 3.0f * uu * (p1.y - p0.y) + 6.0f * u * t * (p2.y - p1.y) + 3.0f * tt * (p3.y - p2.y);
-    result.z = 3.0f * uu * (p1.z - p0.z) + 6.0f * u * t * (p2.z - p1.z) + 3.0f * tt * (p3.z - p2.z);
-
-    return result;
-}
+// Blade mesh generation now creates simple straight geometry
+// All Bezier curve evaluation and bending happens in the vertex shader (detail_gpu.vs)
+// This matches Ghost of Tsushima's GPU-driven approach
 
 void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments)
 {
     vertices.clear();
     indices.clear();
 
-    Msg("! [Bezier Blade] Generating blade mesh using cubic Bezier curves");
+    Msg("! [Straight Blade] Generating straight vertical blade mesh");
+    Msg("! [Straight Blade] Bezier curve evaluation and bending happens in vertex shader");
 
-    // Artist-controllable blade parameters (like Ghost of Tsushima)
-    const float blade_height = 0.5f * 2.f;      // Total blade height
-    const float blade_width = 0.02f * 2.f;      // Base width
-    const float tilt = 0.125f;             // Lean angle (radians)
-    const float bend = 0.125f;              // Forward curve amount
-    const float curve_bias = 0.8f;        // Where the curve peaks (0-1)
+    // Simple straight blade - all shape is computed in vertex shader
+    const float blade_height = 1.0f;      // Normalized height (scaled by instance)
+    const float blade_width = 0.04f;       // Base width
 
-    // Calculate Bezier control points
-    // P0: Root at origin
-    Fvector p0;
-    p0.set(0.0f, 0.0f, 0.0f);
-
-    // P3: Tip, offset by tilt
-    Fvector facing;
-    facing.x = sinf(tilt);
-    facing.y = cosf(tilt);
-    facing.z = 0.0f;
-
-    Fvector p3;
-    p3.x = facing.x * blade_height * 0.2f;
-    p3.y = blade_height;
-    p3.z = facing.z * blade_height * 0.2f;
-
-    // Calculate midpoint and bend direction
-    Fvector midpoint;
-    midpoint.x = (p0.x + p3.x) * 0.5f;
-    midpoint.y = (p0.y + p3.y) * 0.5f;
-    midpoint.z = (p0.z + p3.z) * 0.5f;
-
-    // Bend direction (perpendicular to facing, in XZ plane)
-    Fvector bend_dir;
-    bend_dir.x = -facing.z;
-    bend_dir.y = 0.0f;
-    bend_dir.z = facing.x;
-    float len = sqrtf(bend_dir.x * bend_dir.x + bend_dir.z * bend_dir.z);
-    if (len > 0.001f) {
-        bend_dir.x /= len;
-        bend_dir.z /= len;
-    }
-
-    // P1 and P2: Control points that create the curve
-    Fvector p1, p2;
-    p1.x = p0.x + (midpoint.x - p0.x) * curve_bias + bend_dir.x * bend * 0.3f;
-    p1.y = p0.y + (midpoint.y - p0.y) * curve_bias;
-    p1.z = p0.z + (midpoint.z - p0.z) * curve_bias + bend_dir.z * bend * 0.3f;
-
-    p2.x = midpoint.x + (p3.x - midpoint.x) * curve_bias + bend_dir.x * bend * 0.7f;
-    p2.y = midpoint.y + (p3.y - midpoint.y) * curve_bias;
-    p2.z = midpoint.z + (p3.z - midpoint.z) * curve_bias + bend_dir.z * bend * 0.7f;
-
-    Msg("! [Bezier Blade] Control points:");
-    Msg("!   P0 (root):  (%.3f, %.3f, %.3f)", p0.x, p0.y, p0.z);
-    Msg("!   P1 (ctrl1): (%.3f, %.3f, %.3f)", p1.x, p1.y, p1.z);
-    Msg("!   P2 (ctrl2): (%.3f, %.3f, %.3f)", p2.x, p2.y, p2.z);
-    Msg("!   P3 (tip):   (%.3f, %.3f, %.3f)", p3.x, p3.y, p3.z);
-
-    // Generate triangle strip vertices along the Bezier curve
+    // Generate triangle strip vertices along a straight vertical line
     for (int i = 0; i <= segments; i++)
     {
         float t = float(i) / float(segments);
 
-        // Evaluate curve position and tangent
-        Fvector curve_pos = EvaluateBezier(p0, p1, p2, p3, t);
-        Fvector tangent = EvaluateBezierDerivative(p0, p1, p2, p3, t);
-
-        // Normalize tangent
-        float tangent_len = tangent.magnitude();
-        if (tangent_len > 0.001f) {
-            tangent.x /= tangent_len;
-            tangent.y /= tangent_len;
-            tangent.z /= tangent_len;
-        }
+        // Straight vertical position (Y-up)
+        Fvector pos;
+        pos.x = 0.0f;
+        pos.y = t * blade_height;  // Straight up
+        pos.z = 0.0f;
 
         // Width tapers from base to tip (keeps some width at tip to avoid degenerate triangles)
         float width_scale = 1.0f - t * 0.85f;  // Tapers to 15% of base width
         float segment_width = blade_width * width_scale;
 
-        // ========== GRAM-SCHMIDT ORTHOGONALIZATION FOR ROBUST RIGHT VECTOR ==========
-        Fvector up;
-        up.set(0.0f, 1.0f, 0.0f);
-
+        // Right vector is simply X-axis for a straight vertical blade
         Fvector right;
-
-        // Step 1: Remove component of 'up' that's parallel to tangent
-        // This gives us a vector perpendicular to tangent
-        float dot_tangent_up = tangent.x * up.x + tangent.y * up.y + tangent.z * up.z;
-        Fvector projection;
-        projection.x = tangent.x * dot_tangent_up;
-        projection.y = tangent.y * dot_tangent_up;
-        projection.z = tangent.z * dot_tangent_up;
-
-        right.x = up.x - projection.x;
-        right.y = up.y - projection.y;
-        right.z = up.z - projection.z;
-
-        // Step 2: Normalize the perpendicular component
-        float right_len = right.magnitude();
-        if (right_len < 0.001f)
-        {
-            // Degenerate case: tangent is parallel to up (vertical blade segment)
-            // Use a fallback axis - try X axis
-            Fvector fallback_axis;
-            fallback_axis.set(1.0f, 0.0f, 0.0f);
-
-            // Cross product: tangent × fallback_axis
-            right.crossproduct(tangent, fallback_axis);
-            right_len = right.magnitude();
-
-            if (right_len < 0.001f)
-            {
-                // Still degenerate (tangent parallel to X axis too)
-                // Try Z axis instead
-                fallback_axis.set(0.0f, 0.0f, 1.0f);
-                right.crossproduct(tangent, fallback_axis);
-                right_len = right.magnitude();
-
-                if (right_len < 0.001f)
-                {
-                    // Extremely rare case - use fixed right vector
-                    right.set(1.0f, 0.0f, 0.0f);
-                    right_len = 1.0f;
-                }
-            }
-        }
-
-        // Normalize right vector
-        if (right_len > 0.001f)
-        {
-            right.x /= right_len;
-            right.y /= right_len;
-            right.z /= right_len;
-        }
-
-        // Step 3: Ensure right is truly perpendicular using cross product
-        // This creates a proper orthonormal basis: (tangent, right_final, forward)
-        Fvector right_final;
-        right_final.crossproduct(tangent, right);
-        float right_final_len = right_final.magnitude();
-
-        if (right_final_len > 0.001f)
-        {
-            right_final.x /= right_final_len;
-            right_final.y /= right_final_len;
-            right_final.z /= right_final_len;
-
-            // Use the finalized perpendicular vector
-            right = right_final;
-        }
-        // else: keep the original right vector if cross product failed
-        // ============================================================================
+        right.set(1.0f, 0.0f, 0.0f);
 
         if (i % 2 == 0) {
-            Msg("! [Bezier Blade] Segment %d/%d: t=%.2f, pos(%.3f,%.3f,%.3f), width=%.3f",
-                i, segments, t, curve_pos.x, curve_pos.y, curve_pos.z, segment_width);
+            Msg("! [Straight Blade] Segment %d/%d: t=%.2f, y=%.3f, width=%.3f",
+                i, segments, t, pos.y, segment_width);
         }
 
         // Generate left and right vertices (except for the final tip vertex)
@@ -552,9 +394,9 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
         {
             // Left vertex
             BladeVertex vtx_left;
-            vtx_left.pos.x = curve_pos.x - right.x * segment_width;
-            vtx_left.pos.y = curve_pos.y - right.y * segment_width;
-            vtx_left.pos.z = curve_pos.z - right.z * segment_width;
+            vtx_left.pos.x = pos.x - right.x * segment_width;
+            vtx_left.pos.y = pos.y;
+            vtx_left.pos.z = pos.z;
             vtx_left.uv.set(0.0f, t);
             vtx_left.t = t;
             vtx_left.width_scale = segment_width;
@@ -562,9 +404,9 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
 
             // Right vertex
             BladeVertex vtx_right;
-            vtx_right.pos.x = curve_pos.x + right.x * segment_width;
-            vtx_right.pos.y = curve_pos.y + right.y * segment_width;
-            vtx_right.pos.z = curve_pos.z + right.z * segment_width;
+            vtx_right.pos.x = pos.x + right.x * segment_width;
+            vtx_right.pos.y = pos.y;
+            vtx_right.pos.z = pos.z;
             vtx_right.uv.set(1.0f, t);
             vtx_right.t = t;
             vtx_right.width_scale = segment_width;
@@ -574,7 +416,7 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
         {
             // Final tip vertex (centered)
             BladeVertex vtx_tip;
-            vtx_tip.pos = curve_pos;
+            vtx_tip.pos = pos;
             vtx_tip.uv.set(0.5f, 1.0f);
             vtx_tip.t = 1.0f;
             vtx_tip.width_scale = segment_width;

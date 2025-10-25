@@ -9,6 +9,9 @@
 static const float3 youngGrassCol = float3(0.35, 0.45, 0.18);  // Brighter, more vibrant
 static const float3 oldGrassCol = float3(0.28, 0.38, 0.15);    // Slightly duller brown-green
 
+// Phase 6: Grass vein detail texture
+Texture2D s_grass_vein;
+
 // Phase 5: Grass interaction debug visualization
 Texture2D s_interaction_atlas;
 uniform int dm_debug_trails;
@@ -59,6 +62,17 @@ f_deffer main(p_flat I)
     // Per-blade variation using world position hash
     float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
     grassAlbedo *= lerp(0.85, 1.15, hash);  // ±15% color variation per blade
+
+    // ===== GHOST OF TSUSHIMA: VEIN DETAIL TEXTURE =====
+    // GoT doc: "Vein detail: 1D texture lookup"
+    // We use UV coordinates to sample vein pattern overlay
+    // The vein texture adds organic detail and breaks up the procedural look
+    float4 vein_detail = s_grass_vein.Sample(smp_base, I.tcdh.xy);
+
+    // Overlay vein detail on base color
+    // The vein texture is semi-transparent - use alpha to blend
+    // Darken areas where veins are present for realistic grass blade structure
+    grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, vein_detail.a * 0.15);
 
     // Extract hemi and sun from vertex shader output
     // Standard X-Ray approach: hemi is in position.w, sun depends on defines
