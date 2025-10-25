@@ -389,6 +389,8 @@ struct	v2p_flat
 #endif
     float	heightParam : TEXCOORD5;	// Phase 6: Height for AO (0=base, 1=tip)
     float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
+    float3	rotatedNormal1 : TEXCOORD7;	// Phase 6: Rotated normal for rounded blade effect
+    float3	rotatedNormal2 : TEXCOORD8;	// Phase 6: Rotated normal for rounded blade effect
     float4	hpos : SV_Position;
 };
 
@@ -409,6 +411,8 @@ struct	p_flat
 #endif
     float	heightParam : TEXCOORD5;	// Phase 6: Height for AO (0=base, 1=tip)
     float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
+    float3	rotatedNormal1 : TEXCOORD7;	// Phase 6: Rotated normal for rounded blade effect
+    float3	rotatedNormal2 : TEXCOORD8;	// Phase 6: Rotated normal for rounded blade effect
 };
 
 ////////////////////////////////////////////////////////////////

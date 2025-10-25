@@ -254,7 +254,7 @@ void CDetailManager::CreateSDF_BladeGeometry()
     xr_vector<u16> blade_indices;
 
     // Generate mesh from SDF samples (6 segments = good quality/performance balance)
-    GenerateGrassBlade(blade_verts, blade_indices, 6);
+    GenerateGrassBlade(blade_verts, blade_indices, 8);
 
     // Define vertex declaration for blade geometry
     static const VertexElement blade_decl[] = {

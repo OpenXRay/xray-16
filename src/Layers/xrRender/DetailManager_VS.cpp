@@ -394,9 +394,9 @@ void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vec
     // Artist-controllable blade parameters (like Ghost of Tsushima)
     const float blade_height = 0.5f * 2.f;      // Total blade height
     const float blade_width = 0.02f * 2.f;      // Base width
-    const float tilt = 0.05f;             // Lean angle (radians)
+    const float tilt = 0.125f;             // Lean angle (radians)
     const float bend = 0.125f;              // Forward curve amount
-    const float curve_bias = 0.5f;        // Where the curve peaks (0-1)
+    const float curve_bias = 0.8f;        // Where the curve peaks (0-1)
 
     // Calculate Bezier control points
     // P0: Root at origin

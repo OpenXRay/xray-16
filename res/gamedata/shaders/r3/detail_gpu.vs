@@ -1,5 +1,25 @@
 #include "common.h"
 
+// ========================================
+// GHOST OF TSUSHIMA-INSPIRED GRASS RENDERING
+// ========================================
+// This shader implements grass rendering based on the approach described in:
+// "Ghost of Tsushima's procedural grass system" (GDC 2021, Eric Wohllaib)
+//
+// KEY TECHNIQUES IMPLEMENTED:
+// 1. GPU-driven instancing with structured buffers (detail_buffer)
+// 2. Arc-based blade bending (simplified alternative to Bezier curves)
+// 3. Normal calculation from tangent × facing (GoT lines 172-183)
+// 4. Height-based AO passed to pixel shader (minimal G-buffer writes)
+// 5. Interactive grass with virtual texture indirection
+// 6. FBM wind animation with scrolling noise
+//
+// DIFFERENCES FROM GOT:
+// - GoT generates Bezier curves per-blade on GPU; we use pre-generated triangle strips
+// - GoT uses compute shader for culling; we use CPU BVH + GPU instancing
+// - Same visual result, optimized for X-Ray engine's deferred pipeline
+// ========================================
+
 uniform float4 consts; // {1/quant,1/quant,diffusescale,ambient}
 uniform float4 wave;   // cx,cy,cz,tm - for wave1
 uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
@@ -50,13 +70,41 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	// ===== PHASE 6: Transform blade to world space =====
 
-	// Construct rotation matrix from instance data
+	// Sample wind at instance base position to get prevailing wind direction
+	float2 base_wind_uv = det.pos.xz * 0.001;
+	float4 base_wind = wind_texture.SampleLevel(interaction_sampler, base_wind_uv, 0);
+	float2 base_wind_dir = base_wind.xz * 2.0 - 1.0;
+	float base_wind_len = length(base_wind_dir);
+	if (base_wind_len > 0.001)
+	{
+		base_wind_dir = base_wind_dir / base_wind_len;
+	}
+
+	// Construct base rotation matrix from instance data
 	float3x3 rotation = float3x3(det.m0, det.m1, det.m2);
+
+	// Apply wind lean by rotating the blade around Y-axis towards wind direction
+	// Create a rotation matrix that tilts the blade ~10-15 degrees towards wind
+	float lean_angle = 0.2;  // ~11 degrees lean towards wind
+
+	// Build rotation matrix around Y-axis for wind lean
+	// Rotate the blade's forward direction (Z-axis) towards wind
+	float3 wind_dir_3d = float3(base_wind_dir.x, 0.0, base_wind_dir.y);
+
+	// Tilt the up vector (Y-axis) slightly towards wind direction
+	float3 tilted_up = normalize(float3(wind_dir_3d.x * lean_angle, 1.0, wind_dir_3d.z * lean_angle));
+
+	// Recompute orthonormal basis with tilted up vector
+	float3 right = normalize(cross(tilted_up, rotation[2]));  // Cross with original forward
+	float3 forward = normalize(cross(right, tilted_up));
+
+	// Build final rotation matrix with wind lean
+	rotation = float3x3(right, tilted_up, forward);
 
 	// Scale blade by instance scale
 	float3 local_pos = I.pos * det.scale;
 
-	// Rotate to instance orientation
+	// Rotate to wind-leaning orientation
 	float3 rotated_pos = mul(rotation, local_pos);
 
 	// Translate to world position
@@ -135,10 +183,20 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	float4 wind = wind_texture.SampleLevel(interaction_sampler, wind_uv, 0);
 
 	// Decode wind direction from [0,1] to [-1,1]
+	// This contains both the global wind direction and local FBM turbulence
 	float2 wind_direction = wind.xz * 2.0 - 1.0;
 	float wind_strength = wind.a;
 
+	// Normalize wind direction for consistent leaning
+	float wind_dir_length = length(wind_direction);
+	if (wind_dir_length > 0.001)
+	{
+		wind_direction = wind_direction / wind_dir_length;
+	}
+
     // === INTERACTION BENDING (trampling/pushing) ===
+    // Ghost of Tsushima uses Bezier curve control points for bending
+    // We achieve similar results with arc-based displacement (simpler, pre-generated geometry)
     // RG channels contain the direction the grass should bend
     float2 interaction_push_dir = interaction.rg * 2.0 - 1.0;  // Decode from [0,1] to [-1,1]
     float interaction_strength = length(interaction_push_dir);
@@ -158,6 +216,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
         // Bend factor: 0 at base (no movement), increasing to 1 at tip
         // Use cubic curve for more natural grass bend (tips bend easier)
+        // Similar to GoT's parabolic distribution: bendAmount = pow(t, CURVE_POWER)
         float bend_curve = vertex_height_factor * vertex_height_factor * vertex_height_factor;
 
         // CRITICAL: Limit maximum bend angle to prevent flat grass
@@ -166,11 +225,8 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
         float actual_bend = interaction_strength * max_bend_angle;
 
         // Calculate arc-based displacement (maintains natural curve)
+        // Ghost of Tsushima modifies Bezier control points; we offset vertices
         float blade_length = det.scale;  // Actual blade height
-
-        // Horizontal displacement follows arc
-        float horizontal_bend = blade_length * sin(actual_bend) * bend_curve;
-        pos.xz += interaction_push_dir * horizontal_bend * grass_interaction_displacement;
 
         // Vertical drop follows arc (maintains height even when bent)
         // cos(60°) = 0.5, so grass at 60 degrees still retains 50% height
@@ -179,63 +235,114 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
     }
 
     // === WIND ANIMATION ===
-    // Wind applies similarly but with gentler curve
+    // Ghost of Tsushima approach: wind affects blade bending
+    // IMPORTANT: Grass blades are ROOTED - base stays fixed, only tips move
     float wind_bend_curve = vertex_height_factor * vertex_height_factor;
 
     // Horizontal wind sway
     wind_displacement = wind_direction * wind_strength * wind_bend_curve * grass_wind_displacement;
     pos.xz += wind_displacement;
 
-    // Vertical oscillation from wind (grass waves gently up/down)
-    float wind_vertical_wave = sin(wind_strength * 6.28318) * 0.05 * wind_bend_curve;
-    pos.y += wind_vertical_wave * det.scale * grass_wind_displacement;
+    // Vertical drop from horizontal bending (arc physics, like interaction)
+    // When blade bends horizontally, tip naturally drops slightly
+    // Calculate bend amount from horizontal displacement
+    float horizontal_bend_amount = length(wind_displacement);
+    if (horizontal_bend_amount > 0.001)
+    {
+        // Natural vertical drop from bending (grass doesn't stay at full height when bent)
+        // This is geometric: if tip moves horizontally, it must drop vertically
+        float max_drop = horizontal_bend_amount * 0.2;  // Slight drop, grass is flexible
+        pos.y -= max_drop * wind_bend_curve;  // Only tips drop significantly
+    }
 
-	// ===== PHASE 6: Calculate proper blade normal =====
+	// ===== GHOST OF TSUSHIMA: Calculate blade normal from tangent and facing =====
+	// GoT approach from doc (lines 172-183):
+	// "Tangent along blade (from Bezier derivative)"
+	// "Facing direction (perpendicular in world space)"
+	// "Surface normal perpendicular to both"
 
 	float hemi = abs(det.hemi);
 	float sun = sign(det.hemi) * 0.25f + 0.25f;
 
-	// Blade tangent (up direction after rotation)
-	float3 blade_up = normalize(rotation[1]);  // Y-axis of rotation matrix
+	// Tangent = direction along blade length (vertical component after rotation)
+	// For our pre-generated geometry, the blade grows along Y-axis
+	// IMPORTANT: Do NOT modify tangent based on displacement - vertices are already bent!
+	// Modifying tangent causes normal flipping as camera moves
+	float3 tangent = normalize(rotation[1]);  // Up direction of blade
 
-	// Blade right (across width)
-	float3 blade_right = normalize(rotation[0]);  // X-axis of rotation matrix
+	// Facing = blade orientation in XZ plane (which way the blade "looks")
+	// This is the forward direction the blade faces (perpendicular to its width)
+	float3 facing = normalize(rotation[2]);  // Z-axis of rotation matrix (forward)
+	facing.y = 0.0;  // Project to XZ plane
+	facing = normalize(facing);
 
-	// Normal points forward (perpendicular to blade surface)
-	float3 blade_normal = normalize(cross(blade_up, blade_right));
+	// Normal = perpendicular to blade surface
+	// Ghost of Tsushima: normal = cross(tangent, facing)
+	// This gives us a stable normal that doesn't flip as displacement changes
+	float3 blade_normal = normalize(cross(tangent, facing));
 
-	// === CRITICAL: Ensure normal faces camera for edge-on blades ===
-	// This prevents dark edges when viewing grass blades side-on
-	float3 view_dir = normalize(det.pos - float3(eye_position.xyz));
-	float facing = dot(blade_normal, view_dir);
-
-	// Flip normal if facing away from camera (two-sided lighting helper)
-	if (facing > 0.0)
+	// Two-sided lighting: ensure normal faces camera
+	// GoT doc mentions "glancing angle adjustments" for edge-on blades
+	// CRITICAL: Use actual vertex position (pos.xyz), NOT instance base (det.pos)!
+	// Using det.pos causes normals to flip segment-by-segment as camera moves
+	float3 view_dir = normalize(rotated_pos.xyz - eye_position.xyz);
+	if (dot(blade_normal, view_dir) > 0.0)
 	{
 		blade_normal = -blade_normal;
 	}
 
-	// Adjust normal based on wind bend (more realistic)
-	if (length(wind_displacement) > 0.01)
-	{
-		float3 wind_dir_3d = normalize(float3(wind_displacement.x, 0, wind_displacement.y));
+	// ===== GHOST OF TSUSHIMA: ROUNDED BLADE NORMALS =====
+	// Generate rotated normals for cylindrical blade appearance
+	// The fragment shader will interpolate between these based on width position
+	// Reference: GoT presentation screenshot - creates illusion of rounded cross-section
 
-		// Blend normal toward wind direction at blade tips
-		float wind_influence = vertex_height_factor * vertex_height_factor;  // Quadratic falloff
-		blade_normal = normalize(lerp(blade_normal, wind_dir_3d, wind_influence * 0.4));
-	}
+	// Helper function: rotate vector around axis
+	// Rodrigues' rotation formula: v_rot = v*cos(θ) + (k×v)*sin(θ) + k*(k·v)*(1-cos(θ))
+	float rotationAngle = 3.14159 * 0.3;  // ±30 degrees (PI * 0.3)
+
+	float cosTheta = cos(rotationAngle);
+	float sinTheta = sin(rotationAngle);
+
+	// Rotate around tangent (blade's up direction)
+	float3 axis = tangent;
+
+	// Rotated normal 1: rotate by +angle
+	float3 rotatedNormal1 = blade_normal * cosTheta
+	                      + cross(axis, blade_normal) * sinTheta
+	                      + axis * dot(axis, blade_normal) * (1.0 - cosTheta);
+
+	// Rotated normal 2: rotate by -angle
+	float3 rotatedNormal2 = blade_normal * cosTheta
+	                      + cross(axis, blade_normal) * (-sinTheta)
+	                      + axis * dot(axis, blade_normal) * (1.0 - cosTheta);
 
 	// ===== OUTPUT =====
 
 	// Transform to view space
 	float3 Pe = mul(m_WV, pos);
 	float3 view_normal = mul((float3x3)m_WV, blade_normal);
+	float3 view_rotatedNormal1 = mul((float3x3)m_WV, rotatedNormal1);
+	float3 view_rotatedNormal2 = mul((float3x3)m_WV, rotatedNormal2);
 
 	// Pack output
+	// Standard X-Ray approach for v2p_flat:
+	// - tcdh.xy = texture coordinates
+	// - tcdh.zw = hemi, sun (only if USE_R2_STATIC_SUN && !USE_LM_HEMI)
+	// - position.xyz = view-space position
+	// - position.w = hemi
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh = float4(I.tc.xy, hemi, sun);
-	O.position = float4(Pe, 1.0f);
+#else
+	O.tcdh = I.tc.xy;
+#endif
+
+	O.position = float4(Pe, hemi);  // Pack hemi in position.w
 	O.N = view_normal;
 	O.heightParam = I.t;  // Phase 6: Pass height parameter for AO calculation
+
+	// Phase 6: Pass rotated normals for rounded blade effect
+	O.rotatedNormal1 = view_rotatedNormal1;
+	O.rotatedNormal2 = view_rotatedNormal2;
 
 	// Phase 5: Pass atlas UV for grass interaction debug visualization
 	O.interaction_uv = atlas_uv;  // Pass the correct atlas UV computed with indirection table
