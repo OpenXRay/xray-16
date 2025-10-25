@@ -387,6 +387,7 @@ struct	v2p_flat
 #ifdef USE_LM_HEMI
     float2	lmh : TEXCOORD4;	// lm-hemi
 #endif
+    float	heightParam : TEXCOORD5;	// Phase 6: Height for AO (0=base, 1=tip)
     float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
     float4	hpos : SV_Position;
 };
@@ -406,6 +407,7 @@ struct	p_flat
 #ifdef USE_LM_HEMI
     float2	lmh : TEXCOORD4;	// lm-hemi
 #endif
+    float	heightParam : TEXCOORD5;	// Phase 6: Height for AO (0=base, 1=tip)
     float2	interaction_uv : TEXCOORD6;	// Phase 5: Atlas UV for interaction sampling (pre-computed with indirection table)
 };
 

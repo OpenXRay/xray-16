@@ -300,6 +300,9 @@ void CDetailManager::Load()
             CreateEntityTrackingBuffers();
             CreateWindTexture();
 
+            // Phase 6: Create Bezier curve bladegeometry
+            CreateSDF_BladeGeometry();
+
             // Phase 6: Initialize page table (NEW)
             InitializePageTable();
 
@@ -362,6 +365,14 @@ void CDetailManager::Unload()
         DestroyEntityTrackingBuffers();
         DestroyInteractionAtlas();
         DestroySlotAABBBuffer();
+
+        // Phase 6: Release blade geometry
+        if (blade_geom)
+            blade_geom.destroy();
+        if (blade_ib)
+            blade_ib.Release();
+        if (blade_vb)
+            blade_vb.Release();
 
         _RELEASE(persistent_instance_srv);
         _RELEASE(persistent_instance_buffer);

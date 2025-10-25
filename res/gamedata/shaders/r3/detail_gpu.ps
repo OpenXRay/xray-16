@@ -1,139 +1,147 @@
-#if ( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1) )
-#define EXTEND_F_DEFFER
-#endif
-
 #include "common.h"
 #include "sload.h"
 
+// Phase 6: Shadertoy-inspired lighting parameters
+static const float3 youngGrassCol = float3(0.35, 0.45, 0.18);  // Brighter, more vibrant
+static const float3 oldGrassCol = float3(0.28, 0.38, 0.15);    // Slightly duller
+static const float3 sunCol = float3(1.0, 0.95, 0.85);          // Warm sunlight
+static const float3 skyCol = float3(0.4, 0.5, 0.65);           // Cool sky
+
+// Phase 6: Calculate height-based AO with improved curve
+float CalculateGrassAO(float t)
+{
+    // Smoother AO transition from base to tip
+    // Base (t=0) is darker, tip (t=1) is fully lit
+    float ao_base = 0.4;  // Not too dark at base
+    float ao_range = 0.6; // Range to full brightness
+    return ao_base + ao_range * pow(saturate(t), 0.4);  // Gentler curve
+}
+
+// Phase 6: Two-sided diffuse with wrap lighting (subsurface scattering approximation)
+float CalculateWrappedDiffuse(float3 N, float3 L)
+{
+    // Wrap lighting simulates subsurface scattering
+    // Grass is translucent and lights from both sides
+    float NdotL = dot(N, L);
+    float wrap = 0.5;  // Wrap amount (0.5 = moderate subsurface)
+    return saturate((NdotL + wrap) / (1.0 + wrap));
+}
+
+// Phase 6: Specular highlight (grass has subtle sheen when wet or healthy)
+float CalculateGrassSpecular(float3 N, float3 L, float3 V, float ao)
+{
+    float3 H = normalize(L + V);
+    float NdotH = saturate(dot(N, H));
+
+    // Anisotropic-style specular (grass blades have directional highlights)
+    float roughness = 0.6;  // Moderate roughness
+    float spec_power = 1.0 / (roughness * roughness + 0.0001);
+    float spec = pow(NdotH, spec_power);
+
+    // Specular is stronger at tips (fresher, healthier grass)
+    return spec * ao * 0.15;  // Subtle specular contribution
+}
+
+// Phase 6: Improved fresnel with proper view-dependent rim lighting
+float3 CalculateFresnel(float3 N, float3 V, float ao)
+{
+    // Fresnel for rim lighting (edges catch more sky light)
+    float fresnel_term = pow(saturate(1.0 - dot(N, V)), 2.5);
+
+    // Greenish-blue rim from sky
+    float3 rim_color = float3(0.15, 0.25, 0.18);
+    return rim_color * ao * fresnel_term * 0.8;
+}
+
+// Phase 6: Hemisphere ambient lighting (sky + ground bounce)
+float3 CalculateAmbient(float3 N, float ao)
+{
+    // Sky contribution (from above)
+    float sky_amount = saturate(N.y * 0.5 + 0.5);
+    float3 sky_ambient = skyCol * sky_amount * 0.3;
+
+    // Ground bounce (from below) - brown/earth tone
+    float ground_amount = saturate(-N.y * 0.5 + 0.5);
+    float3 ground_color = float3(0.25, 0.20, 0.15);
+    float3 ground_ambient = ground_color * ground_amount * 0.15;
+
+    return (sky_ambient + ground_ambient) * ao;
+}
+
 // Phase 5: Grass interaction debug visualization
-Texture2D s_interaction_atlas;  // Interaction atlas texture
+Texture2D s_interaction_atlas;
 uniform int dm_debug_trails;
 
-// Sample grass interaction using pre-computed atlas UV from vertex shader
 float SampleGrassInteraction(float2 atlas_uv)
 {
-    // Sample the interaction atlas using the UV computed in vertex shader
-    // The vertex shader already handles:
-    // - World position to slot mapping
-    // - Indirection table lookup (virtual texturing)
-    // - Physical page to atlas UV conversion
     float4 interaction = s_interaction_atlas.Sample(smp_base, atlas_uv);
-
-    return interaction.r; // Red channel = trampling intensity
+    return interaction.r;
 }
 
-#ifdef	ATOC
-
-float4 	main	( p_flat I ) : SV_Target
+f_deffer main(p_flat I)
 {
-	float4 D 	= tbase	 	(I.tcdh);
-	D.w = (D.w-def_aref*0.5f)/(1-def_aref*0.5f);
+    f_deffer O;
 
-	// Phase 5: Debug visualization - tint grass red based on interaction
-	if (dm_debug_trails > 0)
-	{
-		float interaction_strength = SampleGrassInteraction(I.interaction_uv);
-		// Apply red tint based on interaction strength
-		D.rgb = lerp(D.rgb, float3(1.0f, 0.0f, 0.0f), interaction_strength);
-	}
+    // ===== PHASE 6: Enhanced Grass Lighting =====
 
-	return D;
+    // Normalize inputs
+    float3 N = normalize(I.N);
+    float3 V = normalize(-I.position.xyz);
+    float3 L = normalize(mul((float3x3)m_V, L_sun_dir_w));
+
+    // Height-based AO and color variation
+    float t = I.heightParam;
+    float ao = CalculateGrassAO(t);
+
+    // Color variation: mix young/old grass based on height and position
+    // Higher parts of blade are younger (greener), lower parts older
+    float color_blend = smoothstep(0.3, 0.7, t);
+    float3 grassCol = lerp(oldGrassCol, youngGrassCol, color_blend);
+
+    // Add subtle per-blade variation using world position hash
+    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
+    grassCol *= lerp(0.9, 1.1, hash);  // ±10% color variation
+
+    // === LIGHTING COMPONENTS ===
+
+    // 1. Wrapped diffuse (subsurface scattering approximation)
+    float wrapped_diffuse = CalculateWrappedDiffuse(N, L);
+    float3 diffuse = grassCol * sunCol * wrapped_diffuse;
+
+    // 2. Specular highlight (subtle sheen)
+    float specular = CalculateGrassSpecular(N, L, V, ao);
+    float3 spec_contrib = sunCol * specular;
+
+    // 3. Ambient lighting (sky + ground)
+    float3 ambient = CalculateAmbient(N, ao);
+
+    // 4. Fresnel rim lighting
+    float3 fresnel = CalculateFresnel(N, V, ao);
+
+    // === FINAL COMPOSITION ===
+
+    // Combine all lighting components
+    float3 finalColor = diffuse * ao           // Main diffuse with AO
+                      + spec_contrib            // Specular highlights
+                      + ambient                 // Hemisphere ambient
+                      + fresnel;                // Rim lighting
+
+    // Exposure and tonemapping adjustment
+    finalColor *= 1.1;  // Slight brightness boost
+    finalColor = pow(finalColor, 0.9);  // Subtle gamma adjustment for richness
+
+    // Phase 5: Debug visualization
+    if (dm_debug_trails > 0)
+    {
+        float interaction_strength = SampleGrassInteraction(I.interaction_uv);
+        finalColor = lerp(finalColor, float3(1.0, 0.0, 0.0), interaction_strength);
+    }
+
+    O = pack_gbuffer(
+        float4(N, 0.5),
+        float4(I.position.xyz, 0.5),
+        float4(finalColor, 0.5)
+    );
+
+    return O;
 }
-
-#else	//	ATOC
-
-#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-f_deffer 	main	( p_flat I, float4 pos2d : SV_Position )
-#else	//	MSAA_ALPHATEST_DX10_1_ATOC
-f_deffer 	main	( p_flat I )
-#endif	//	MSAA_ALPHATEST_DX10_1_ATOC
-{
-  f_deffer	O;
-
-  // 1. Base texture + kill pixels with low alpha
-
-#if !defined(MSAA_ALPHATEST_DX10_1)
-
-  float4 D 	= tbase	 	(I.tcdh);
-
-#if	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_0_ATOC) )
-	clip					(D.w-def_aref);
-#endif	//	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1_ATOC) )
-#ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
-	float alpha = (D.w-def_aref*0.5f)/(1-def_aref*0.5f);
-	uint mask = alpha_to_coverage ( alpha, pos2d );
-#endif	//	MSAA_ALPHATEST_DX10_1_ATOC
-
-#else
-  uint mask = 0x0;
-  float2 ddx_base = ddx( I.tcdh );
-  float2 ddy_base = ddy( I.tcdh );
-
-  float2 pixeloffset = MSAAOffsets[0]*(1.0/16.0);
-
-  float2 texeloffset =  pixeloffset.x * ddx_base + pixeloffset.y * ddy_base;
-
-  float4 D 	= tbase(I.tcdh+texeloffset);
-
-  if( D.w-def_aref >= 0 ) mask |= 0x1;
-
-  [unroll] for( int i = 1; i < MSAA_SAMPLES; ++i )
-  {
-	pixeloffset = MSAAOffsets[i]*(1.0/16.0);
-	texeloffset =  pixeloffset.x * ddx_base + pixeloffset.y * ddy_base;
-	float4 DI 	= tbase(I.tcdh+texeloffset);
-	if( DI.w-def_aref >= 0 ) mask |= ( uint(0x1) << i );
-  }
-
-  if( mask == 0x0 )
-	discard;
-#endif
-
-#ifdef	USE_TDETAIL
-//	D.rgb	= 2*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
-	D.rgb	= 2*D.rgb * s_detail.Sample( smp_base, I.tcdbump ).rgb;
-#endif
-
-	// hemi,sun,material
-	float 	ms	= xmaterial		;
-#ifdef USE_LM_HEMI
-//	float4	lm 	= tex2D			(s_hemi, I.lmh);
-	float4	lm 	= s_hemi.Sample( smp_rtlinear, I.lmh);
-//	float 	h  	= dot			(lm.rgb,1.h/3.h);
-	float 	h  	= get_hemi(lm);
-# ifdef USE_R2_STATIC_SUN
-//		 	ms 	= lm.w			;
-			ms 	= get_sun(lm);
-# endif
-#else
-	float 	h	= I.position.w	;
-# ifdef USE_R2_STATIC_SUN
-		 	ms	= I.tcdh.w		;
-# endif
-#endif
-
-  // Phase 5: Debug visualization - tint grass red based on interaction
-  if (dm_debug_trails > 0)
-  {
-      float interaction_strength = SampleGrassInteraction(I.interaction_uv);
-      D.rgb = lerp(D.rgb, float3(1.0f, 0.0f, 0.0f), interaction_strength);
-  }
-
-  // 2. Standart output
-  float4 Ne     = float4	(normalize((float3)I.N.xyz), 					h			);
-#if !( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1) )
-  O				= pack_gbuffer(
-  								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.h	, 	ms			),
-								float4	(D.rgb,											def_gloss	) );
-#else
-  O				= pack_gbuffer(
-  								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.h	, 	ms			),
-								float4	(D.rgb,											def_gloss	),
-								mask );
-#endif
-  return O;
-}
-
-#endif	//	ATOC

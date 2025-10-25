@@ -663,9 +663,27 @@ public:
     void FlushPendingSaves();
     void UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* data);
 
+
 #endif
     void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0); // Main thread only
     void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0); // Thread-safe version
+
+    // Phase 6: Bezier curve blademesh generation
+    struct BladeVertex
+    {
+        Fvector pos;         // Local position (Y-up)
+        Fvector2 uv;         // Texture coordinates
+        float t;             // Height parameter (0=base, 1=tip) for AO
+        float width_scale;   // Width at this height (for debugging)
+    };
+    void CreateSDF_BladeGeometry();
+    void GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 6);
+
+    ref_geom blade_geom;                // Bezier curve bladegeometry
+    VertexStagingBuffer blade_vb;       // Blade vertex buffer
+    IndexStagingBuffer blade_ib;        // Blade index buffer
+    u32 blade_vertex_count;             // Number of vertices in blade mesh
+    u32 blade_index_count;              // Number of indices in blade mesh
 
     CDetailManager();
     virtual ~CDetailManager();

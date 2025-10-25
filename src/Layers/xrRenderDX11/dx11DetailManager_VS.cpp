@@ -109,7 +109,7 @@ void CDetailManager::hw_Load_Shaders()
 
     // === GPU RENDERING SHADER (always initialized for mode switching) ===
     b_detail_gpu = xr_new<CBlender_Detail_GPU>();
-    gpu_detail_shader.create(b_detail_gpu, nullptr, "build_details");
+    gpu_detail_shader.create(b_detail_gpu, nullptr, nullptr);
 
     if (!gpu_detail_shader)
     {
@@ -245,6 +245,60 @@ void CDetailManager::DestroySlotAABBBuffer()
     slot_aabbs.clear();
 }
 
+// Phase 6: Create Bezier curve bladegeometry buffers
+void CDetailManager::CreateSDF_BladeGeometry()
+{
+    Msg("* [PHASE 6] Creating Bezier curve bladegeometry...");
+
+    xr_vector<BladeVertex> blade_verts;
+    xr_vector<u16> blade_indices;
+
+    // Generate mesh from SDF samples (6 segments = good quality/performance balance)
+    GenerateGrassBlade(blade_verts, blade_indices, 6);
+
+    // Define vertex declaration for blade geometry
+    static const VertexElement blade_decl[] = {
+        {0, 0,  D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},  // pos
+        {0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},  // uv
+        {0, 20, D3DDECLTYPE_FLOAT1, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},  // t
+        {0, 24, D3DDECLTYPE_FLOAT1, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2},  // width_scale
+        D3DDECL_END()
+    };
+
+    // Create vertex buffer
+    u32 vb_size = blade_verts.size() * sizeof(BladeVertex);
+    blade_vb.Create(vb_size);
+    {
+        BladeVertex* pV = static_cast<BladeVertex*>(blade_vb.Map());
+        memcpy(pV, blade_verts.data(), vb_size);
+        blade_vb.Unmap(true);
+    }
+
+    // Create index buffer
+    u32 ib_size = blade_indices.size() * sizeof(u16);
+    blade_ib.Create(ib_size);
+    {
+        u16* pI = static_cast<u16*>(blade_ib.Map());
+        memcpy(pI, blade_indices.data(), ib_size);
+        blade_ib.Unmap(true);
+    }
+
+    // Create geometry
+    blade_geom.create(blade_decl, blade_vb, blade_ib);
+
+    blade_vertex_count = blade_verts.size();
+    blade_index_count = blade_indices.size();
+
+    float vram_kb = (vb_size + ib_size) / 1024.0f;
+
+    Msg("* [PHASE 6] Blade geometry created:");
+    Msg("  - Vertices: %u (%u bytes each)", blade_vertex_count, sizeof(BladeVertex));
+    Msg("  - Indices: %u", blade_index_count);
+    Msg("  - Triangles: %u", blade_index_count / 3);
+    Msg("  - VRAM usage: %.2f KB", vram_kb);
+    Msg("* [PHASE 6] Ready for Shadertoy-quality rendering!");
+}
+
 // Phase 2.1: Create GPU culling buffers and infrastructure
 void CDetailManager::CreateGPUCullingBuffers()
 {
@@ -334,11 +388,11 @@ void CDetailManager::CreateGPUCullingBuffers()
     {
         CDetail& obj = *objects[i];
 
-        // Initialize args with static values
+        // Phase 6: Initialize args with Bezier curve bladegeometry
         IndirectDrawArgs initial_args = {};
-        initial_args.IndexCountPerInstance = obj.number_indices;
+        initial_args.IndexCountPerInstance = blade_index_count;  // All objects use same blade geometry
         initial_args.InstanceCount = 0;  // Will be written by compute shader
-        initial_args.StartIndexLocation = vis_geometry_index_offsets[0][i];
+        initial_args.StartIndexLocation = 0;  // Blade geometry starts at index 0
         initial_args.BaseVertexLocation = 0;
         initial_args.StartInstanceLocation = 0;
 
@@ -460,10 +514,11 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     {
         CDetail& obj = *objects[i];
 
+        // Phase 6: Use Bezier curve bladegeometry for all objects
         IndirectDrawArgs args = {};
-        args.IndexCountPerInstance = obj.number_indices;
+        args.IndexCountPerInstance = blade_index_count;  // All objects use same blade geometry
         args.InstanceCount = 0;  // Reset to 0
-        args.StartIndexLocation = vis_geometry_index_offsets[0][i];
+        args.StartIndexLocation = 0;  // Blade geometry starts at index 0
         args.BaseVertexLocation = 0;
         args.StartInstanceLocation = 0;
 
@@ -616,7 +671,8 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         cmd_list.set_CullMode(CULL_NONE);
         cmd_list.set_xform_world(Fidentity);
         cmd_list.SRVSManager.SetVSResource(0, gpu_visible_srvs[O]);
-        cmd_list.set_Geometry(vis_unified_geom[0]);
+        // Phase 6: Use Bezier curve bladegeometry instead of old billboard quads
+        cmd_list.set_Geometry(blade_geom);
         cmd_list.set_c(strConsts, consts);
         cmd_list.set_c(strWave, wave.div(PI_MUL_2));
         cmd_list.set_c(strDir2D, dir1);    // dir1 for wave1 (vis_id=1)
@@ -659,7 +715,7 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
 
         // Phase 2.2.2: DrawIndexedInstancedIndirect
         // The GPU determines instance count from the indirect args buffer
-        cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLELIST, gpu_indirect_args[O], 0);
+        cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLESTRIP, gpu_indirect_args[O], 0);
 
         // Note: We can't accurately update stats without CPU readback
         // For now, just increment draw call count
@@ -991,7 +1047,8 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     cmd_list.set_CullMode(CULL_NONE);
     cmd_list.set_xform_world(Fidentity);
     cmd_list.SRVSManager.SetVSResource(0, currentSRV);
-    cmd_list.set_Geometry(vis_unified_geom[0]);
+    // Phase 6: Use Bezier curve bladegeometry instead of old billboard quads
+    cmd_list.set_Geometry(blade_geom);
     cmd_list.set_c(strConsts, consts);
     cmd_list.set_c(strWave, wave);
     cmd_list.set_c(strDir2D, wind);
