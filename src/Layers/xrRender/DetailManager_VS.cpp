@@ -47,6 +47,47 @@ short QC(float v)
 }
 } // namespace detail_manager
 
+float sdCircle(Fvector2 p, float r)
+{
+    return sqrtf(p.x * p.x + p.y * p.y) - r;
+}
+
+float opSubtraction(float d1, float d2)
+{
+    return _max(d1, -d2);
+}
+
+float sdGrassBlade2d(Fvector2 p)
+{
+
+    Fvector2 p_offset1;
+    p_offset1.x = p.x - 1.7f;
+    p_offset1.y = p.y - (-1.3f);
+    float dist = sdCircle(p_offset1, 2.0f);
+
+    Fvector2 p_offset2;
+    p_offset2.x = p.x - 1.7f;
+    p_offset2.y = p.y - (-1.0f);
+    dist = opSubtraction(dist, sdCircle(p_offset2, 1.8f));
+
+    dist = opSubtraction(dist, p.y + 1.0f);
+
+    dist = opSubtraction(dist, -p.x + 1.7f);
+
+    return dist;
+}
+
+float sdGrassBlade(Fvector p, float thickness)
+{
+    p.y -= 1.0f;
+
+    Fvector2 p_2d = { p.x, p.y };
+    float dist2d = sdGrassBlade2d(p_2d);
+    dist2d = _max(0.0f, dist2d);
+
+    return sqrtf(dist2d * dist2d + p.z * p.z) - thickness;
+}
+
 void CDetailManager::hw_Load()
 {
     hw_Load_Geom();
@@ -263,5 +304,235 @@ void CDetailManager::hw_Unload()
         gpu_detail_shader.destroy();
     xr_delete(b_detail_gpu);
 #endif
+}
+
+
+Fvector EvaluateBezier(const Fvector& p0, const Fvector& p1, const Fvector& p2, const Fvector& p3, float t)
+{
+    float u = 1.0f - t;
+    float tt = t * t;
+    float uu = u * u;
+    float uuu = uu * u;
+    float ttt = tt * t;
+
+    Fvector result;
+    result.x = uuu * p0.x + 3.0f * uu * t * p1.x + 3.0f * u * tt * p2.x + ttt * p3.x;
+    result.y = uuu * p0.y + 3.0f * uu * t * p1.y + 3.0f * u * tt * p2.y + ttt * p3.y;
+    result.z = uuu * p0.z + 3.0f * uu * t * p1.z + 3.0f * u * tt * p2.z + ttt * p3.z;
+
+    return result;
+}
+
+Fvector EvaluateBezierDerivative(const Fvector& p0, const Fvector& p1, const Fvector& p2, const Fvector& p3, float t)
+{
+    float u = 1.0f - t;
+    float uu = u * u;
+    float tt = t * t;
+
+    Fvector result;
+    result.x = 3.0f * uu * (p1.x - p0.x) + 6.0f * u * t * (p2.x - p1.x) + 3.0f * tt * (p3.x - p2.x);
+    result.y = 3.0f * uu * (p1.y - p0.y) + 6.0f * u * t * (p2.y - p1.y) + 3.0f * tt * (p3.y - p2.y);
+    result.z = 3.0f * uu * (p1.z - p0.z) + 6.0f * u * t * (p2.z - p1.z) + 3.0f * tt * (p3.z - p2.z);
+
+    return result;
+}
+
+void CDetailManager::GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments)
+{
+    vertices.clear();
+    indices.clear();
+
+    Msg("! [Bezier Blade] Generating blade mesh using cubic Bezier curves");
+
+    const float blade_height = 0.5f * 2.f;
+    const float blade_width = 0.02f * 2.f;
+    const float tilt = 0.05f;
+    const float bend = 0.125f;
+    const float curve_bias = 0.5f;
+
+    Fvector p0;
+    p0.set(0.0f, 0.0f, 0.0f);
+
+    Fvector facing;
+    facing.x = sinf(tilt);
+    facing.y = cosf(tilt);
+    facing.z = 0.0f;
+
+    Fvector p3;
+    p3.x = facing.x * blade_height * 0.2f;
+    p3.y = blade_height;
+    p3.z = facing.z * blade_height * 0.2f;
+
+    Fvector midpoint;
+    midpoint.x = (p0.x + p3.x) * 0.5f;
+    midpoint.y = (p0.y + p3.y) * 0.5f;
+    midpoint.z = (p0.z + p3.z) * 0.5f;
+
+    Fvector bend_dir;
+    bend_dir.x = -facing.z;
+    bend_dir.y = 0.0f;
+    bend_dir.z = facing.x;
+    float len = sqrtf(bend_dir.x * bend_dir.x + bend_dir.z * bend_dir.z);
+    if (len > 0.001f) {
+        bend_dir.x /= len;
+        bend_dir.z /= len;
+    }
+
+    Fvector p1, p2;
+    p1.x = p0.x + (midpoint.x - p0.x) * curve_bias + bend_dir.x * bend * 0.3f;
+    p1.y = p0.y + (midpoint.y - p0.y) * curve_bias;
+    p1.z = p0.z + (midpoint.z - p0.z) * curve_bias + bend_dir.z * bend * 0.3f;
+
+    p2.x = midpoint.x + (p3.x - midpoint.x) * curve_bias + bend_dir.x * bend * 0.7f;
+    p2.y = midpoint.y + (p3.y - midpoint.y) * curve_bias;
+    p2.z = midpoint.z + (p3.z - midpoint.z) * curve_bias + bend_dir.z * bend * 0.7f;
+
+    Msg("! [Bezier Blade] Control points:");
+    Msg("!   P0 (root):  (%.3f, %.3f, %.3f)", p0.x, p0.y, p0.z);
+    Msg("!   P1 (ctrl1): (%.3f, %.3f, %.3f)", p1.x, p1.y, p1.z);
+    Msg("!   P2 (ctrl2): (%.3f, %.3f, %.3f)", p2.x, p2.y, p2.z);
+    Msg("!   P3 (tip):   (%.3f, %.3f, %.3f)", p3.x, p3.y, p3.z);
+
+    for (int i = 0; i <= segments; i++)
+    {
+        float t = float(i) / float(segments);
+
+        Fvector curve_pos = EvaluateBezier(p0, p1, p2, p3, t);
+        Fvector tangent = EvaluateBezierDerivative(p0, p1, p2, p3, t);
+
+        float tangent_len = tangent.magnitude();
+        if (tangent_len > 0.001f) {
+            tangent.x /= tangent_len;
+            tangent.y /= tangent_len;
+            tangent.z /= tangent_len;
+        }
+
+        float width_scale = 1.0f - t * 0.85f;
+        float segment_width = blade_width * width_scale;
+
+        Fvector up;
+        up.set(0.0f, 1.0f, 0.0f);
+
+        Fvector right;
+
+        float dot_tangent_up = tangent.x * up.x + tangent.y * up.y + tangent.z * up.z;
+        Fvector projection;
+        projection.x = tangent.x * dot_tangent_up;
+        projection.y = tangent.y * dot_tangent_up;
+        projection.z = tangent.z * dot_tangent_up;
+
+        right.x = up.x - projection.x;
+        right.y = up.y - projection.y;
+        right.z = up.z - projection.z;
+
+        float right_len = right.magnitude();
+        if (right_len < 0.001f)
+        {
+            Fvector fallback_axis;
+            fallback_axis.set(1.0f, 0.0f, 0.0f);
+
+            right.crossproduct(tangent, fallback_axis);
+            right_len = right.magnitude();
+
+            if (right_len < 0.001f)
+            {
+                fallback_axis.set(0.0f, 0.0f, 1.0f);
+                right.crossproduct(tangent, fallback_axis);
+                right_len = right.magnitude();
+
+                if (right_len < 0.001f)
+                {
+                    right.set(1.0f, 0.0f, 0.0f);
+                    right_len = 1.0f;
+                }
+            }
+        }
+
+        if (right_len > 0.001f)
+        {
+            right.x /= right_len;
+            right.y /= right_len;
+            right.z /= right_len;
+        }
+
+        Fvector right_final;
+        right_final.crossproduct(tangent, right);
+        float right_final_len = right_final.magnitude();
+
+        if (right_final_len > 0.001f)
+        {
+            right_final.x /= right_final_len;
+            right_final.y /= right_final_len;
+            right_final.z /= right_final_len;
+
+            right = right_final;
+        }
+
+        if (i % 2 == 0) {
+            Msg("! [Bezier Blade] Segment %d/%d: t=%.2f, pos(%.3f,%.3f,%.3f), width=%.3f",
+                i, segments, t, curve_pos.x, curve_pos.y, curve_pos.z, segment_width);
+        }
+
+        if (i < segments)
+        {
+            BladeVertex vtx_left;
+            vtx_left.pos.x = curve_pos.x - right.x * segment_width;
+            vtx_left.pos.y = curve_pos.y - right.y * segment_width;
+            vtx_left.pos.z = curve_pos.z - right.z * segment_width;
+            vtx_left.uv.set(0.0f, t);
+            vtx_left.t = t;
+            vtx_left.width_scale = segment_width;
+            vertices.push_back(vtx_left);
+
+            BladeVertex vtx_right;
+            vtx_right.pos.x = curve_pos.x + right.x * segment_width;
+            vtx_right.pos.y = curve_pos.y + right.y * segment_width;
+            vtx_right.pos.z = curve_pos.z + right.z * segment_width;
+            vtx_right.uv.set(1.0f, t);
+            vtx_right.t = t;
+            vtx_right.width_scale = segment_width;
+            vertices.push_back(vtx_right);
+        }
+        else
+        {
+            BladeVertex vtx_tip;
+            vtx_tip.pos = curve_pos;
+            vtx_tip.uv.set(0.5f, 1.0f);
+            vtx_tip.t = 1.0f;
+            vtx_tip.width_scale = segment_width;
+            vertices.push_back(vtx_tip);
+        }
+    }
+
+    Msg("! [Bezier Blade] Generated %d vertices", vertices.size());
+
+    for (size_t i = 0; i < vertices.size(); i++)
+    {
+        indices.push_back(static_cast<u16>(i));
+    }
+
+    Msg("! [Bezier Blade] Generated %d indices for triangle strip", indices.size());
+
+    Fvector bbox_min(FLT_MAX, FLT_MAX, FLT_MAX);
+    Fvector bbox_max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+    for (const auto& v : vertices)
+    {
+        bbox_min.x = _min(bbox_min.x, v.pos.x);
+        bbox_min.y = _min(bbox_min.y, v.pos.y);
+        bbox_min.z = _min(bbox_min.z, v.pos.z);
+        bbox_max.x = _max(bbox_max.x, v.pos.x);
+        bbox_max.y = _max(bbox_max.y, v.pos.y);
+        bbox_max.z = _max(bbox_max.z, v.pos.z);
+    }
+
+    Fvector size;
+    size.sub(bbox_max, bbox_min);
+
+    Msg("! [Bezier Blade] Bounding box: (%.3f,%.3f,%.3f) to (%.3f,%.3f,%.3f)",
+        bbox_min.x, bbox_min.y, bbox_min.z, bbox_max.x, bbox_max.y, bbox_max.z);
+    Msg("! [Bezier Blade] Blade dimensions: %.3f wide x %.3f tall x %.3f thick",
+        size.x, size.y, size.z);
+    Msg("! [Bezier Blade] Mesh generation complete!");
 }
 } // namespace xray::render::RENDER_NAMESPACE

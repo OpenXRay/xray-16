@@ -612,9 +612,26 @@ public:
     void FlushPendingSaves();
     void UploadSlotDataToGPU(uint32_t physical_page, const uint8_t* data);
 
+
 #endif
     void RequestInteractionUpdate(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
     void RequestInteractionUpdateThreadSafe(const Fvector& world_pos, float radius, float strength, uint8_t type = 0);
+
+    struct BladeVertex
+    {
+        Fvector pos;
+        Fvector2 uv;
+        float t;
+        float width_scale;
+    };
+    void CreateSDF_BladeGeometry();
+    void GenerateGrassBlade(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 6);
+
+    ref_geom blade_geom;
+    VertexStagingBuffer blade_vb;
+    IndexStagingBuffer blade_ib;
+    u32 blade_vertex_count;
+    u32 blade_index_count;
 
     CDetailManager();
     virtual ~CDetailManager();

@@ -289,6 +289,8 @@ void CDetailManager::Load()
             CreateEntityTrackingBuffers();
             CreateWindTexture();
 
+            CreateSDF_BladeGeometry();
+
             InitializePageTable();
 
             InitializeVisibilityReadback();
@@ -344,6 +346,13 @@ void CDetailManager::Unload()
         DestroyEntityTrackingBuffers();
         DestroyInteractionAtlas();
         DestroySlotAABBBuffer();
+
+        if (blade_geom)
+            blade_geom.destroy();
+        if (blade_ib)
+            blade_ib.Release();
+        if (blade_vb)
+            blade_vb.Release();
 
         _RELEASE(persistent_instance_srv);
         _RELEASE(persistent_instance_buffer);
