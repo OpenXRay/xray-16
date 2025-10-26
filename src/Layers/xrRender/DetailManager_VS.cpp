@@ -274,15 +274,14 @@ void CDetailManager::hw_Unload()
     if (cull_compute_shader)
         cull_compute_shader.destroy();
     _RELEASE(cull_constant_buffer);
-    _RELEASE(gpu_visible_counts_buffer);
-    _RELEASE(gpu_visible_counts_uav);
-    _RELEASE(gpu_visible_counts_readback);
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-    {
-        _RELEASE(gpu_visible_buffers[i]);
-        _RELEASE(gpu_visible_srvs[i]);
-        _RELEASE(gpu_visible_uavs[i]);
-    }
+    _RELEASE(gpu_visible_count_buffer);
+    _RELEASE(gpu_visible_count_uav);
+    _RELEASE(gpu_visible_count_readback);
+    _RELEASE(gpu_visible_unified_buffer);
+    _RELEASE(gpu_visible_unified_srv);
+    _RELEASE(gpu_visible_unified_uav);
+    _RELEASE(gpu_indirect_args_unified);
+    _RELEASE(gpu_indirect_args_unified_uav);
 
     DestroyInteractionAtlas();
     DestroyEntityTrackingBuffers();

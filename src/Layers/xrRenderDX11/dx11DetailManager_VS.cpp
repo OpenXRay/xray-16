@@ -278,54 +278,51 @@ void CDetailManager::CreateGPUCullingBuffers()
 
     cull_compute_shader.create("detail_cull");
 
-    gpu_visible_buffer_capacity = 2048 * 2048;
+    gpu_visible_buffer_capacity = total_instance_count / 2;
     if (gpu_visible_buffer_capacity < 10000)
         gpu_visible_buffer_capacity = 10000;
 
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-    {
-        D3D11_BUFFER_DESC desc = {};
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-        desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-        desc.StructureByteStride = sizeof(InstanceData);
-        desc.ByteWidth = gpu_visible_buffer_capacity * sizeof(InstanceData);
+    D3D11_BUFFER_DESC desc = {};
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    desc.StructureByteStride = sizeof(InstanceData);
+    desc.ByteWidth = gpu_visible_buffer_capacity * sizeof(InstanceData);
 
-        CHK_DX(HW.pDevice->CreateBuffer(&desc, nullptr, &gpu_visible_buffers[i]));
+    CHK_DX(HW.pDevice->CreateBuffer(&desc, nullptr, &gpu_visible_unified_buffer));
 
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-        srvDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
-        CHK_DX(HW.pDevice->CreateShaderResourceView(gpu_visible_buffers[i], &srvDesc, &gpu_visible_srvs[i]));
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srvDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
+    CHK_DX(HW.pDevice->CreateShaderResourceView(gpu_visible_unified_buffer, &srvDesc, &gpu_visible_unified_srv));
 
-        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-        uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uavDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
-        CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_buffers[i], &uavDesc, &gpu_visible_uavs[i]));
-    }
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+    uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    uavDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_unified_buffer, &uavDesc, &gpu_visible_unified_uav));
 
     D3D11_BUFFER_DESC counterDesc = {};
     counterDesc.Usage = D3D11_USAGE_DEFAULT;
     counterDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
     counterDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
-    counterDesc.ByteWidth = dm_max_objects * sizeof(u32);
-    CHK_DX(HW.pDevice->CreateBuffer(&counterDesc, nullptr, &gpu_visible_counts_buffer));
+    counterDesc.ByteWidth = sizeof(u32);
+    CHK_DX(HW.pDevice->CreateBuffer(&counterDesc, nullptr, &gpu_visible_count_buffer));
 
     D3D11_UNORDERED_ACCESS_VIEW_DESC counterUavDesc = {};
     counterUavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
     counterUavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
     counterUavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-    counterUavDesc.Buffer.NumElements = dm_max_objects;
-    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_counts_buffer, &counterUavDesc, &gpu_visible_counts_uav));
+    counterUavDesc.Buffer.NumElements = 1;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_count_buffer, &counterUavDesc, &gpu_visible_count_uav));
 
     D3D11_BUFFER_DESC readbackDesc = counterDesc;
     readbackDesc.Usage = D3D11_USAGE_STAGING;
     readbackDesc.BindFlags = 0;
     readbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     readbackDesc.MiscFlags = 0;
-    CHK_DX(HW.pDevice->CreateBuffer(&readbackDesc, nullptr, &gpu_visible_counts_readback));
+    CHK_DX(HW.pDevice->CreateBuffer(&readbackDesc, nullptr, &gpu_visible_count_readback));
 
     D3D11_BUFFER_DESC cbDesc = {};
     cbDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -343,46 +340,40 @@ void CDetailManager::CreateGPUCullingBuffers()
         u32 StartInstanceLocation;
     };
 
-    for (u32 i = 0; i < max_gpu_culled_objects && i < objects.size(); i++)
-    {
-        CDetail& obj = *objects[i];
+    IndirectDrawArgs initial_args = {};
+    initial_args.IndexCountPerInstance = blade_index_count;
+    initial_args.InstanceCount = 0;
+    initial_args.StartIndexLocation = 0;
+    initial_args.BaseVertexLocation = 0;
+    initial_args.StartInstanceLocation = 0;
 
-        IndirectDrawArgs initial_args = {};
-        initial_args.IndexCountPerInstance = blade_index_count;
-        initial_args.InstanceCount = 0;
-        initial_args.StartIndexLocation = 0;
-        initial_args.BaseVertexLocation = 0;
-        initial_args.StartInstanceLocation = 0;
+    D3D11_BUFFER_DESC argsDesc = {};
+    argsDesc.Usage = D3D11_USAGE_DEFAULT;
+    argsDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    argsDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+    argsDesc.ByteWidth = sizeof(IndirectDrawArgs);
 
-        D3D11_BUFFER_DESC argsDesc = {};
-        argsDesc.Usage = D3D11_USAGE_DEFAULT;
-        argsDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
-        argsDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
-        argsDesc.ByteWidth = sizeof(IndirectDrawArgs);
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = &initial_args;
 
-        D3D11_SUBRESOURCE_DATA initData = {};
-        initData.pSysMem = &initial_args;
+    CHK_DX(HW.pDevice->CreateBuffer(&argsDesc, &initData, &gpu_indirect_args_unified));
 
-        CHK_DX(HW.pDevice->CreateBuffer(&argsDesc, &initData, &gpu_indirect_args[i]));
+    D3D11_UNORDERED_ACCESS_VIEW_DESC argsUavDesc = {};
+    argsUavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+    argsUavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    argsUavDesc.Buffer.FirstElement = 0;
+    argsUavDesc.Buffer.NumElements = 5;
+    argsUavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
 
-        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-        uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uavDesc.Buffer.FirstElement = 0;
-        uavDesc.Buffer.NumElements = 5;
-        uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(
+        gpu_indirect_args_unified, &argsUavDesc, &gpu_indirect_args_unified_uav));
 
-        CHK_DX(HW.pDevice->CreateUnorderedAccessView(
-            gpu_indirect_args[i], &uavDesc, &gpu_indirect_args_uavs[i]));
-    }
+    float vram_mb = (gpu_visible_buffer_capacity * sizeof(InstanceData)) / (1024.0f * 1024.0f);
 
-    float vram_mb = (max_gpu_culled_objects * gpu_visible_buffer_capacity * sizeof(InstanceData)) / (1024.0f * 1024.0f);
-
-    Msg("* [DetailManager] GPU culling infrastructure created:");
-    Msg("  - Per-object buffer capacity: %u instances", gpu_visible_buffer_capacity);
-    Msg("  - Object buffers: %u (first %u objects)", max_gpu_culled_objects, max_gpu_culled_objects);
-    Msg("  - VRAM for output buffers: %.2f MB", vram_mb);
-    Msg("  - Indirect args buffers: %u created", _min(max_gpu_culled_objects, objects.size()));
+    Msg("* [DetailManager] UNIFIED GPU culling infrastructure created:");
+    Msg("  - Buffer capacity: %u total instances", gpu_visible_buffer_capacity);
+    Msg("  - VRAM for output buffer: %.2f MB", vram_mb);
+    Msg("  - Draw calls: 1 (unified)");
 }
 
 void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
@@ -456,37 +447,30 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
         u32 StartInstanceLocation;
     };
 
-    for (u32 i = 0; i < max_gpu_culled_objects && i < objects.size(); i++)
-    {
-        CDetail& obj = *objects[i];
+    IndirectDrawArgs args = {};
+    args.IndexCountPerInstance = blade_index_count;
+    args.InstanceCount = 0;
+    args.StartIndexLocation = 0;
+    args.BaseVertexLocation = 0;
+    args.StartInstanceLocation = 0;
 
-        IndirectDrawArgs args = {};
-        args.IndexCountPerInstance = blade_index_count;
-        args.InstanceCount = 0;
-        args.StartIndexLocation = 0;
-        args.BaseVertexLocation = 0;
-        args.StartInstanceLocation = 0;
+    context->UpdateSubresource(gpu_indirect_args_unified, 0, nullptr, &args, 0, 0);
 
-        context->UpdateSubresource(gpu_indirect_args[i], 0, nullptr, &args, 0, 0);
-    }
+    UINT zero = 0;
+    context->ClearUnorderedAccessViewUint(gpu_visible_count_uav, &zero);
 
-    UINT zero_counts[64] = {0};
-    context->ClearUnorderedAccessViewUint(gpu_visible_counts_uav, zero_counts);
-
-    uint32_t zero = 0;
-    context->UpdateSubresource(visible_slot_counter_gpu, 0, nullptr, &zero, 0, 0);
+    uint32_t zero_u32 = 0;
+    context->UpdateSubresource(visible_slot_counter_gpu, 0, nullptr, &zero_u32, 0, 0);
 
     context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
 
     ID3DShaderResourceView* srvs[2] = {slot_aabb_srv, persistent_instance_srv};
     context->CSSetShaderResources(0, 2, srvs);
 
-    ID3DUnorderedAccessView* uavs[35];
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-        uavs[i] = gpu_visible_uavs[i];
-    uavs[16] = gpu_visible_counts_uav;
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-        uavs[17 + i] = gpu_indirect_args_uavs[i];
+    ID3DUnorderedAccessView* uavs[35] = {nullptr};
+    uavs[0] = gpu_visible_unified_uav;
+    uavs[1] = gpu_visible_count_uav;
+    uavs[2] = gpu_indirect_args_unified_uav;
     uavs[33] = visible_slot_ids_uav;
     uavs[34] = visible_slot_counter_uav;
 
@@ -505,7 +489,7 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
 
     context->CSSetShader(nullptr, nullptr, 0);
 
-    context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
+    context->CopyResource(gpu_visible_count_readback, gpu_visible_count_buffer);
 }
 
 void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
@@ -559,79 +543,94 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     static bool first_frame = true;
     if (first_frame)
     {
-        context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
+        context->CopyResource(gpu_visible_count_readback, gpu_visible_count_buffer);
         D3D11_MAPPED_SUBRESOURCE mapped;
-        CHK_DX(context->Map(gpu_visible_counts_readback, 0, D3D11_MAP_READ, 0, &mapped));
-        u32* counts = (u32*)mapped.pData;
-
-        u32 total_visible = 0;
-        for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
-            total_visible += counts[i];
-
-        Msg("! [DetailManager] GPU Indirect Draw - First Frame:");
+        CHK_DX(context->Map(gpu_visible_count_readback, 0, D3D11_MAP_READ, 0, &mapped));
+        u32 total_visible = *(u32*)mapped.pData;
+        Msg("! [DetailManager] UNIFIED GPU Indirect Draw - First Frame:");
         Msg("  - Total instances: %u", total_instance_count);
         Msg("  - Visible instances: %u (%.1f%%)", total_visible,
             (total_visible * 100.0f) / total_instance_count);
-
-        for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
-        {
-            if (counts[i] > 0)
-                Msg("  - Object %u: %u instances", i, counts[i]);
-        }
-
-        context->Unmap(gpu_visible_counts_readback, 0);
+        context->Unmap(gpu_visible_count_readback, 0);
         first_frame = false;
     }
 
-    u32 objects_to_render = _min(objects.size(), max_gpu_culled_objects);
-    for (u32 O = 0; O < objects_to_render; O++)
+    cmd_list.set_CullMode(CULL_NONE);
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.SRVSManager.SetVSResource(0, gpu_visible_unified_srv);
+    cmd_list.set_Geometry(blade_geom);
+
+    if (gpu_detail_shader)
     {
-        CDetail& Object = *objects[O];
-
-        cmd_list.set_CullMode(CULL_NONE);
-        cmd_list.set_xform_world(Fidentity);
-        cmd_list.SRVSManager.SetVSResource(0, gpu_visible_srvs[O]);
-        cmd_list.set_Geometry(blade_geom);
-        cmd_list.set_c(strConsts, consts);
-        cmd_list.set_c(strWave, wave.div(PI_MUL_2));
-        cmd_list.set_c(strDir2D, dir1);
-        cmd_list.set_c(strDir2D_2, dir2);
-
-        Fvector4 detail_params_vec;
-        detail_params_vec.x = (float)dtH.x_size();
-        detail_params_vec.y = (float)dtH.z_size();
-        detail_params_vec.z = (float)dtH.x_offs();
-        detail_params_vec.w = (float)dtH.z_offs();
-        cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
-        cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
-        cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
-        const float wind_angle_deg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
-        cmd_list.set_c(g_wind_direction._get(), wind_angle_deg, 0.0f, 0.0f, 0.0f);
-
-        if (gpu_detail_shader)
-        {
-            cmd_list.set_Element(gpu_detail_shader->E[0], 0);
-            cmd_list.apply_lmaterial();
-        }
-        else
-        {
-            cmd_list.set_Element(Object.shader->E[0], 0);
-            cmd_list.apply_lmaterial();
-        }
-
-        if (interaction_srv)
-            cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
-        if (wind_srv)
-            cmd_list.SRVSManager.SetVSResource(2, wind_srv);
-        if (indirection_srv)
-            cmd_list.SRVSManager.SetVSResource(3, indirection_srv);
-        if (interaction_sampler)
-            HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
-
-        cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLESTRIP, gpu_indirect_args[O], 0);
-
-        cmd_list.set_CullMode(CULL_CCW);
+        cmd_list.set_Element(gpu_detail_shader->E[0], 0);
+        cmd_list.apply_lmaterial();
     }
+    else if (objects.size() > 0)
+    {
+        cmd_list.set_Element(objects[0]->shader->E[0], 0);
+        cmd_list.apply_lmaterial();
+    }
+
+    cmd_list.set_c(strConsts, consts);
+    cmd_list.set_c(strWave, wave.div(PI_MUL_2));
+    cmd_list.set_c(strDir2D, dir1);
+    cmd_list.set_c(strDir2D_2, dir2);
+
+    Fvector4 detail_params_vec;
+    detail_params_vec.x = (float)dtH.x_size();
+    detail_params_vec.y = (float)dtH.z_size();
+    detail_params_vec.z = (float)dtH.x_offs();
+    detail_params_vec.w = (float)dtH.z_offs();
+    cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
+    cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+    cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+    const float wind_angle_deg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+    cmd_list.set_c(g_wind_direction._get(), wind_angle_deg, 0.0f, 0.0f, 0.0f);
+
+    if (interaction_srv)
+        cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
+    if (wind_srv)
+        cmd_list.SRVSManager.SetVSResource(2, wind_srv);
+    if (indirection_srv)
+        cmd_list.SRVSManager.SetVSResource(3, indirection_srv);
+    if (interaction_sampler)
+        HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
+
+    static bool logged_draw = false;
+    if (!logged_draw)
+    {
+        D3D11_BUFFER_DESC argsDesc = {};
+        argsDesc.ByteWidth = 20;
+        argsDesc.Usage = D3D11_USAGE_STAGING;
+        argsDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+        ID3D11Buffer* readback = nullptr;
+        HW.pDevice->CreateBuffer(&argsDesc, nullptr, &readback);
+
+        auto ctx = HW.get_context(cmd_list.context_id);
+        ctx->CopyResource(readback, gpu_indirect_args_unified);
+
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        ctx->Map(readback, 0, D3D11_MAP_READ, 0, &mapped);
+        u32* args = (u32*)mapped.pData;
+
+        Msg("! [DetailManager] UNIFIED Draw Call Indirect Args:");
+        Msg("  - IndexCountPerInstance: %u", args[0]);
+        Msg("  - InstanceCount: %u", args[1]);
+        Msg("  - StartIndexLocation: %u", args[2]);
+        Msg("  - BaseVertexLocation: %d", (s32)args[3]);
+        Msg("  - StartInstanceLocation: %u", args[4]);
+        Msg("  - Blade index count: %u", blade_index_count);
+        Msg("  - Unified SRV bound: %s", gpu_visible_unified_srv ? "YES" : "NO");
+
+        ctx->Unmap(readback, 0);
+        _RELEASE(readback);
+        logged_draw = true;
+    }
+
+    cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLESTRIP, gpu_indirect_args_unified, 0);
+
+    cmd_list.set_CullMode(CULL_CCW);
 
     cmd_list.SRVSManager.SetVSResource(0, nullptr);
     for (u32 i = 0; i < 16; i++)

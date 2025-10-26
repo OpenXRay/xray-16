@@ -272,18 +272,17 @@ public:
     ref_cs cull_compute_shader;
     ID3DBuffer* cull_constant_buffer;
 
-    static const u32 max_gpu_culled_objects = 16;
-    ID3DBuffer* gpu_visible_buffers[max_gpu_culled_objects];
-    ID3DShaderResourceView* gpu_visible_srvs[max_gpu_culled_objects];
-    ID3DUnorderedAccessView* gpu_visible_uavs[max_gpu_culled_objects];
+    ID3DBuffer* gpu_visible_unified_buffer;
+    ID3DShaderResourceView* gpu_visible_unified_srv;
+    ID3DUnorderedAccessView* gpu_visible_unified_uav;
     u32 gpu_visible_buffer_capacity;
 
-    ID3DBuffer* gpu_visible_counts_buffer;
-    ID3DUnorderedAccessView* gpu_visible_counts_uav;
-    ID3DBuffer* gpu_visible_counts_readback;
+    ID3DBuffer* gpu_visible_count_buffer;
+    ID3DUnorderedAccessView* gpu_visible_count_uav;
+    ID3DBuffer* gpu_visible_count_readback;
 
-    ID3DBuffer* gpu_indirect_args[max_gpu_culled_objects];
-    ID3DUnorderedAccessView* gpu_indirect_args_uavs[max_gpu_culled_objects];
+    ID3DBuffer* gpu_indirect_args_unified;
+    ID3DUnorderedAccessView* gpu_indirect_args_unified_uav;
 
     struct SlotAABB
     {
