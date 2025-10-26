@@ -28,7 +28,7 @@ uniform float4 detail_params; // Phase 5: x=slot_x_size, y=slot_z_size, z=slot_x
 uniform float grass_wind_displacement; // Phase 5: Wind displacement strength (tunable via ImGui)
 uniform float grass_interaction_displacement; // Phase 5: Interaction displacement strength (tunable via ImGui)
 uniform float4 g_wind_direction; // Phase 6: Wind angle in degrees (X component only) WindParams
-const float M_PI = 3.1415926;
+static const float M_PI = 3.1415926;
 
 // Phase 5: Interactive grass textures
 // Note: Slot t0 = instance buffer, so we use t1, t2, t3 (engine limit is 4 VS texture slots)
@@ -254,20 +254,14 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
 	float3 bezier_pos = mt3 * P0 + 3.0 * mt2 * t * P1 + 3.0 * mt * t2 * P2 + t3 * P3;
 
-	// Apply width offset (blade has width in X direction in local space)
-	float3 width_offset = float3(I.pos.x * det.scale, 0, 0);
-
-	// Final position
-	float4 pos = float4(bezier_pos + width_offset, 1.0);
-
-	// ===== GHOST OF TSUSHIMA: Calculate blade normal from Bezier derivative =====
-	float hemi = abs(det.hemi);
-	float sun = sign(det.hemi) * 0.25f + 0.25f;
+	// ===== CALCULATE TANGENT =====
 	// TANGENT = Bezier curve derivative at parameter t
 	// B'(t) = 3(1-t)²(P₁-P₀) + 6(1-t)t(P₂-P₁) + 3t²(P₃-P₂)
 	// GoT doc (lines 72-76): "The first derivative (tangent vector)"
 	float3 tangent = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
 	tangent = normalize(tangent);
+
+	// ===== CALCULATE FACING DIRECTION =====
 	// FACING = blade orientation in world space (perpendicular to blade width)
 	// GoT doc (lines 178-179): facing is a fixed per-blade direction, NOT derived from tangent
 	// This ensures normals remain stable even when the blade bends heavily
@@ -275,9 +269,50 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
 	float3 facing = normalize(float3(sin(wind_angle_rad), 0.0, cos(wind_angle_rad)));
 
+	// ===== GHOST OF TSUSHIMA: GLANCING ANGLE ADJUSTMENT =====
+	// GoT doc (lines 185-186): "vertices rotate slightly about the tangent to maintain visibility"
+	// When blade is perpendicular to camera, rotate it to face the camera
+
+	// Calculate view direction
+	float3 view_dir = normalize(bezier_pos - eye_position);
+
+	// Calculate right vector for blade width
+	// Normally this would be perpendicular to tangent and facing
+	float3 right = normalize(cross(tangent, facing));
+
+	// Calculate how edge-on the blade is to the camera
+	// dot(view_dir, right) = 0 when camera is perpendicular to blade face
+	// dot(view_dir, right) = ±1 when camera is aligned with blade face
+	float edge_on_factor = abs(dot(view_dir, right));
+
+	// When edge_on_factor is close to 1 (edge-on), rotate blade to face camera
+	// Blend the right vector toward camera-facing direction
+	if (edge_on_factor > 0.8)  // Only adjust at steep angles
+	{
+		// Camera-facing right vector (perpendicular to tangent and view)
+		float3 camera_right = normalize(cross(tangent, view_dir));
+
+		// Blend between natural right and camera-facing right
+		// More edge-on = more camera-facing
+		float blend = (edge_on_factor - 0.8) / 0.2;  // 0.8-1.0 -> 0-1
+		right = normalize(lerp(right, camera_right, blend * 0.5));  // Max 50% blend
+	}
+
+	// Apply width offset using adjusted right vector
+	float3 width_offset = right * (I.pos.x * det.scale);
+
+	// Final position
+	float4 pos = float4(bezier_pos + width_offset, 1.0);
+
+	// ===== GHOST OF TSUSHIMA: Calculate blade normal =====
+	float hemi = abs(det.hemi);
+	float sun = sign(det.hemi) * 0.25f + 0.25f;
+
 	// NORMAL = perpendicular to blade surface
-	// Ghost of Tsushima: normal = cross(tangent, facing)
-	float3 blade_normal = normalize(cross(tangent, facing));
+	// Ghost of Tsushima: normal = cross(tangent, right)
+	// Note: We use the adjusted 'right' vector from glancing angle adjustment
+	// This ensures normals match the adjusted blade geometry
+	float3 blade_normal = normalize(cross(tangent, right));
 
 	// ===== GHOST OF TSUSHIMA: ROUNDED BLADE NORMALS =====
 	float rotationAngle = 3.14159 * 0.3;  // ±30 degrees (PI * 0.3)

@@ -43,55 +43,24 @@ StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
 StructuredBuffer<InstanceData> g_all_instances : register(t1);
 
 // ===========================
-// Output Buffers (Phase 2.1: Per-Object)
+// Output Buffers (UNIFIED - Single draw call optimization)
 // ===========================
 
-// For now: hardcode first 16 object types (can expand to 64 later)
-RWStructuredBuffer<InstanceData> g_visible_obj0 : register(u0);
-RWStructuredBuffer<InstanceData> g_visible_obj1 : register(u1);
-RWStructuredBuffer<InstanceData> g_visible_obj2 : register(u2);
-RWStructuredBuffer<InstanceData> g_visible_obj3 : register(u3);
-RWStructuredBuffer<InstanceData> g_visible_obj4 : register(u4);
-RWStructuredBuffer<InstanceData> g_visible_obj5 : register(u5);
-RWStructuredBuffer<InstanceData> g_visible_obj6 : register(u6);
-RWStructuredBuffer<InstanceData> g_visible_obj7 : register(u7);
+// UNIFIED: All grass types use same shader/geometry, so merge into one buffer
+RWStructuredBuffer<InstanceData> g_visible_unified : register(u0);
 
-RWStructuredBuffer<InstanceData> g_visible_obj8 : register(u8);
-RWStructuredBuffer<InstanceData> g_visible_obj9 : register(u9);
-RWStructuredBuffer<InstanceData> g_visible_obj10 : register(u10);
-RWStructuredBuffer<InstanceData> g_visible_obj11 : register(u11);
-RWStructuredBuffer<InstanceData> g_visible_obj12 : register(u12);
-RWStructuredBuffer<InstanceData> g_visible_obj13 : register(u13);
-RWStructuredBuffer<InstanceData> g_visible_obj14 : register(u14);
-RWStructuredBuffer<InstanceData> g_visible_obj15 : register(u15);
-
-// Atomic counter buffer (one u32 per object type, up to 64 objects)
-RWByteAddressBuffer g_visible_counts : register(u16);
+// Single atomic counter for all visible instances
+RWByteAddressBuffer g_visible_count : register(u1);
 
 // Phase 6B: Output buffer for visible slot IDs (for page table system)
 RWStructuredBuffer<uint> g_visible_slot_ids : register(u33);  // Append visible slots here
 RWByteAddressBuffer g_visible_slot_counter : register(u34);  // Atomic counter (ByteAddressBuffer for InterlockedAdd)
 
-// Phase 2.2.1: Indirect draw args buffers (one per object)
+// Phase 2.2.1: UNIFIED indirect draw args buffer
 // D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS:
 // struct { u32 IndexCount; u32 InstanceCount; u32 StartIndex; s32 BaseVertex; u32 StartInstance; }
 // We only write to InstanceCount field (offset 4 bytes)
-RWByteAddressBuffer g_indirect_args0 : register(u17);
-RWByteAddressBuffer g_indirect_args1 : register(u18);
-RWByteAddressBuffer g_indirect_args2 : register(u19);
-RWByteAddressBuffer g_indirect_args3 : register(u20);
-RWByteAddressBuffer g_indirect_args4 : register(u21);
-RWByteAddressBuffer g_indirect_args5 : register(u22);
-RWByteAddressBuffer g_indirect_args6 : register(u23);
-RWByteAddressBuffer g_indirect_args7 : register(u24);
-RWByteAddressBuffer g_indirect_args8 : register(u25);
-RWByteAddressBuffer g_indirect_args9 : register(u26);
-RWByteAddressBuffer g_indirect_args10 : register(u27);
-RWByteAddressBuffer g_indirect_args11 : register(u28);
-RWByteAddressBuffer g_indirect_args12 : register(u29);
-RWByteAddressBuffer g_indirect_args13 : register(u30);
-RWByteAddressBuffer g_indirect_args14 : register(u31);
-RWByteAddressBuffer g_indirect_args15 : register(u32);
+RWByteAddressBuffer g_indirect_args_unified : register(u2);
 
 
 bool AABBDistanceTest(float3 aabb_min, float3 aabb_max, float3 camera_pos, float max_dist_sqr)
@@ -113,89 +82,20 @@ bool SphereFrustumTest(float3 center, float radius, float4 planes[6])
     return true;
 }
 
-void AppendInstance(uint object_id, InstanceData inst, uint output_idx)
+// UNIFIED: Single buffer append (replaces 16-way branch)
+void AppendInstance(InstanceData inst)
 {
+    // Atomically allocate slot in unified buffer
+    uint output_idx = 0;
+    g_visible_count.InterlockedAdd(0, 1, output_idx);
+
+    // Write instance to unified buffer
+    // object_id is already stored in inst, so shader can handle variation if needed
+    g_visible_unified[output_idx] = inst;
+
+    // Update indirect draw args (InstanceCount at offset 4)
     uint dummy;
-    if (object_id == 0)
-    {
-        g_visible_obj0[output_idx] = inst;
-        g_indirect_args0.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 1)
-    {
-        g_visible_obj1[output_idx] = inst;
-        g_indirect_args1.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 2)
-    {
-        g_visible_obj2[output_idx] = inst;
-        g_indirect_args2.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 3)
-    {
-        g_visible_obj3[output_idx] = inst;
-        g_indirect_args3.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 4)
-    {
-        g_visible_obj4[output_idx] = inst;
-        g_indirect_args4.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 5)
-    {
-        g_visible_obj5[output_idx] = inst;
-        g_indirect_args5.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 6)
-    {
-        g_visible_obj6[output_idx] = inst;
-        g_indirect_args6.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 7)
-    {
-        g_visible_obj7[output_idx] = inst;
-        g_indirect_args7.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 8)
-    {
-        g_visible_obj8[output_idx] = inst;
-        g_indirect_args8.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 9)
-    {
-        g_visible_obj9[output_idx] = inst;
-        g_indirect_args9.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 10)
-    {
-        g_visible_obj10[output_idx] = inst;
-        g_indirect_args10.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 11)
-    {
-        g_visible_obj11[output_idx] = inst;
-        g_indirect_args11.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 12)
-    {
-        g_visible_obj12[output_idx] = inst;
-        g_indirect_args12.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 13)
-    {
-        g_visible_obj13[output_idx] = inst;
-        g_indirect_args13.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 14)
-    {
-        g_visible_obj14[output_idx] = inst;
-        g_indirect_args14.InterlockedAdd(4, 1, dummy);
-    }
-    else if (object_id == 15)
-    {
-        g_visible_obj15[output_idx] = inst;
-        g_indirect_args15.InterlockedAdd(4, 1, dummy);
-    }
+    g_indirect_args_unified.InterlockedAdd(4, 1, dummy);
 }
 
 [numthreads(256, 1, 1)]
@@ -256,11 +156,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         if (dist_sqr > g_fade_distance_sqr)
             continue;
 
-        uint object_id = inst.object_id;
-        uint output_idx;
-
-        g_visible_counts.InterlockedAdd(object_id * 4, 1, output_idx);
-
-        AppendInstance(object_id, inst, output_idx);
+        // UNIFIED: Append to single buffer (object_id already in inst)
+        AppendInstance(inst);
     }
 }

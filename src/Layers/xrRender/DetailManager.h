@@ -289,21 +289,20 @@ public:
     ref_cs cull_compute_shader;  // detail_cull.cs compute shader
     ID3DBuffer* cull_constant_buffer;  // Culling parameters (camera, frustum, etc)
 
-    // Per-object visible instance buffers (output from compute shader)
-    static const u32 max_gpu_culled_objects = 16;  // Hardcoded for first 16 objects
-    ID3DBuffer* gpu_visible_buffers[max_gpu_culled_objects];
-    ID3DShaderResourceView* gpu_visible_srvs[max_gpu_culled_objects];
-    ID3DUnorderedAccessView* gpu_visible_uavs[max_gpu_culled_objects];
-    u32 gpu_visible_buffer_capacity;  // Max instances per object buffer
+    // UNIFIED: Single buffer for all visible instances (all grass types use same shader)
+    ID3DBuffer* gpu_visible_unified_buffer;
+    ID3DShaderResourceView* gpu_visible_unified_srv;
+    ID3DUnorderedAccessView* gpu_visible_unified_uav;
+    u32 gpu_visible_buffer_capacity;  // Max total visible instances
 
-    // Counter buffer (one u32 per object type)
-    ID3DBuffer* gpu_visible_counts_buffer;
-    ID3DUnorderedAccessView* gpu_visible_counts_uav;
-    ID3DBuffer* gpu_visible_counts_readback;  // CPU readback for counts
+    // UNIFIED: Single atomic counter for all visible instances
+    ID3DBuffer* gpu_visible_count_buffer;
+    ID3DUnorderedAccessView* gpu_visible_count_uav;
+    ID3DBuffer* gpu_visible_count_readback;  // CPU readback for count
 
-    // Phase 2.2: Indirect draw args buffers (one per object)
-    ID3DBuffer* gpu_indirect_args[max_gpu_culled_objects];
-    ID3DUnorderedAccessView* gpu_indirect_args_uavs[max_gpu_culled_objects];
+    // UNIFIED: Single indirect draw args buffer
+    ID3DBuffer* gpu_indirect_args_unified;
+    ID3DUnorderedAccessView* gpu_indirect_args_unified_uav;
 
     // Phase 4A: Spatial culling with BVH
     struct SlotAABB

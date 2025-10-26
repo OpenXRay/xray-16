@@ -121,18 +121,17 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     persistent_instance_srv = nullptr;
     persistent_buffer_capacity = 0;
 
-    // Phase 2.1: GPU culling
+    // Phase 2.1: GPU culling (UNIFIED buffers)
     cull_constant_buffer = nullptr;
-    gpu_visible_counts_buffer = nullptr;
-    gpu_visible_counts_uav = nullptr;
-    gpu_visible_counts_readback = nullptr;
+    gpu_visible_unified_buffer = nullptr;
+    gpu_visible_unified_srv = nullptr;
+    gpu_visible_unified_uav = nullptr;
+    gpu_visible_count_buffer = nullptr;
+    gpu_visible_count_uav = nullptr;
+    gpu_visible_count_readback = nullptr;
     gpu_visible_buffer_capacity = 0;
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-    {
-        gpu_visible_buffers[i] = nullptr;
-        gpu_visible_srvs[i] = nullptr;
-        gpu_visible_uavs[i] = nullptr;
-    }
+    gpu_indirect_args_unified = nullptr;
+    gpu_indirect_args_unified_uav = nullptr;
 
     // Phase 4A: BVH spatial culling
     slot_count = 0;
@@ -377,18 +376,16 @@ void CDetailManager::Unload()
         _RELEASE(persistent_instance_srv);
         _RELEASE(persistent_instance_buffer);
 
-        // GPU culling buffers
-        _RELEASE(gpu_visible_counts_readback);
-        _RELEASE(gpu_visible_counts_uav);
-        _RELEASE(gpu_visible_counts_buffer);
+        // UNIFIED: GPU culling buffers
+        _RELEASE(gpu_visible_count_readback);
+        _RELEASE(gpu_visible_count_uav);
+        _RELEASE(gpu_visible_count_buffer);
+        _RELEASE(gpu_visible_unified_uav);
+        _RELEASE(gpu_visible_unified_srv);
+        _RELEASE(gpu_visible_unified_buffer);
+        _RELEASE(gpu_indirect_args_unified_uav);
+        _RELEASE(gpu_indirect_args_unified);
         _RELEASE(cull_constant_buffer);
-
-        for (u32 i = 0; i < max_gpu_culled_objects; i++)
-        {
-            _RELEASE(gpu_visible_uavs[i]);
-            _RELEASE(gpu_visible_srvs[i]);
-            _RELEASE(gpu_visible_buffers[i]);
-        }
 
         // Clear instance data
         all_level_instances.clear();

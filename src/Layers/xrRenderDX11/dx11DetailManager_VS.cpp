@@ -308,52 +308,49 @@ void CDetailManager::CreateGPUCullingBuffers()
     // Load compute shader
     cull_compute_shader.create("detail_cull");
 
-    // Estimate max visible instances per object (conservative: average instances per object / 2)
-    gpu_visible_buffer_capacity = 2048 * 2048;
+    // UNIFIED: Estimate max visible instances across ALL grass (conservative: total / 2)
+    gpu_visible_buffer_capacity = total_instance_count / 2;
     if (gpu_visible_buffer_capacity < 10000)
-        gpu_visible_buffer_capacity = 10000;  // Minimum 10K per object
+        gpu_visible_buffer_capacity = 10000;  // Minimum safety buffer
 
-    // Create per-object visible instance buffers
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-    {
-        D3D11_BUFFER_DESC desc = {};
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-        desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-        desc.StructureByteStride = sizeof(InstanceData);
-        desc.ByteWidth = gpu_visible_buffer_capacity * sizeof(InstanceData);
+    // UNIFIED: Create single visible instance buffer for all grass types
+    D3D11_BUFFER_DESC desc = {};
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+    desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    desc.StructureByteStride = sizeof(InstanceData);
+    desc.ByteWidth = gpu_visible_buffer_capacity * sizeof(InstanceData);
 
-        CHK_DX(HW.pDevice->CreateBuffer(&desc, nullptr, &gpu_visible_buffers[i]));
+    CHK_DX(HW.pDevice->CreateBuffer(&desc, nullptr, &gpu_visible_unified_buffer));
 
-        // Create SRV
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-        srvDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
-        CHK_DX(HW.pDevice->CreateShaderResourceView(gpu_visible_buffers[i], &srvDesc, &gpu_visible_srvs[i]));
+    // Create SRV
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    srvDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
+    CHK_DX(HW.pDevice->CreateShaderResourceView(gpu_visible_unified_buffer, &srvDesc, &gpu_visible_unified_srv));
 
-        // Create UAV
-        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-        uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uavDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
-        CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_buffers[i], &uavDesc, &gpu_visible_uavs[i]));
-    }
+    // Create UAV
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+    uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    uavDesc.Buffer.NumElements = gpu_visible_buffer_capacity;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_unified_buffer, &uavDesc, &gpu_visible_unified_uav));
 
-    // Create counter buffer (one u32 per object, up to 64 objects)
+    // UNIFIED: Create single atomic counter (1 u32 total)
     D3D11_BUFFER_DESC counterDesc = {};
     counterDesc.Usage = D3D11_USAGE_DEFAULT;
     counterDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
     counterDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
-    counterDesc.ByteWidth = dm_max_objects * sizeof(u32);
-    CHK_DX(HW.pDevice->CreateBuffer(&counterDesc, nullptr, &gpu_visible_counts_buffer));
+    counterDesc.ByteWidth = sizeof(u32);  // Single counter
+    CHK_DX(HW.pDevice->CreateBuffer(&counterDesc, nullptr, &gpu_visible_count_buffer));
 
     D3D11_UNORDERED_ACCESS_VIEW_DESC counterUavDesc = {};
     counterUavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
     counterUavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
     counterUavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-    counterUavDesc.Buffer.NumElements = dm_max_objects;
-    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_counts_buffer, &counterUavDesc, &gpu_visible_counts_uav));
+    counterUavDesc.Buffer.NumElements = 1;  // Single u32
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(gpu_visible_count_buffer, &counterUavDesc, &gpu_visible_count_uav));
 
     // Create readback buffer for CPU access
     D3D11_BUFFER_DESC readbackDesc = counterDesc;
@@ -361,7 +358,7 @@ void CDetailManager::CreateGPUCullingBuffers()
     readbackDesc.BindFlags = 0;
     readbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     readbackDesc.MiscFlags = 0;
-    CHK_DX(HW.pDevice->CreateBuffer(&readbackDesc, nullptr, &gpu_visible_counts_readback));
+    CHK_DX(HW.pDevice->CreateBuffer(&readbackDesc, nullptr, &gpu_visible_count_readback));
 
     // Create constant buffer for culling parameters
     D3D11_BUFFER_DESC cbDesc = {};
@@ -371,7 +368,7 @@ void CDetailManager::CreateGPUCullingBuffers()
     cbDesc.ByteWidth = 256;  // Generous size for alignment
     CHK_DX(HW.pDevice->CreateBuffer(&cbDesc, nullptr, &cull_constant_buffer));
 
-    // Phase 2.2.1: Create indirect draw args buffers
+    // UNIFIED: Create single indirect draw args buffer
     // D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS structure:
     struct IndirectDrawArgs
     {
@@ -382,49 +379,43 @@ void CDetailManager::CreateGPUCullingBuffers()
         u32 StartInstanceLocation;
     };
 
-    for (u32 i = 0; i < max_gpu_culled_objects && i < objects.size(); i++)
-    {
-        CDetail& obj = *objects[i];
+    // Phase 6: Initialize args with Bezier curve blade geometry
+    IndirectDrawArgs initial_args = {};
+    initial_args.IndexCountPerInstance = blade_index_count;  // All grass uses same blade geometry
+    initial_args.InstanceCount = 0;  // Will be written by compute shader
+    initial_args.StartIndexLocation = 0;  // Blade geometry starts at index 0
+    initial_args.BaseVertexLocation = 0;
+    initial_args.StartInstanceLocation = 0;
 
-        // Phase 6: Initialize args with Bezier curve bladegeometry
-        IndirectDrawArgs initial_args = {};
-        initial_args.IndexCountPerInstance = blade_index_count;  // All objects use same blade geometry
-        initial_args.InstanceCount = 0;  // Will be written by compute shader
-        initial_args.StartIndexLocation = 0;  // Blade geometry starts at index 0
-        initial_args.BaseVertexLocation = 0;
-        initial_args.StartInstanceLocation = 0;
+    // Create buffer with DRAWINDIRECT_ARGS and RAW flags
+    D3D11_BUFFER_DESC argsDesc = {};
+    argsDesc.Usage = D3D11_USAGE_DEFAULT;
+    argsDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    argsDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+    argsDesc.ByteWidth = sizeof(IndirectDrawArgs);
 
-        // Create buffer with DRAWINDIRECT_ARGS and RAW flags
-        D3D11_BUFFER_DESC argsDesc = {};
-        argsDesc.Usage = D3D11_USAGE_DEFAULT;
-        argsDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
-        argsDesc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
-        argsDesc.ByteWidth = sizeof(IndirectDrawArgs);
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = &initial_args;
 
-        D3D11_SUBRESOURCE_DATA initData = {};
-        initData.pSysMem = &initial_args;
+    CHK_DX(HW.pDevice->CreateBuffer(&argsDesc, &initData, &gpu_indirect_args_unified));
 
-        CHK_DX(HW.pDevice->CreateBuffer(&argsDesc, &initData, &gpu_indirect_args[i]));
+    // Create RAW UAV for compute shader to write InstanceCount (RWByteAddressBuffer requires RAW)
+    D3D11_UNORDERED_ACCESS_VIEW_DESC argsUavDesc = {};
+    argsUavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+    argsUavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+    argsUavDesc.Buffer.FirstElement = 0;
+    argsUavDesc.Buffer.NumElements = 5;  // 5 u32s in IndirectDrawArgs
+    argsUavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
 
-        // Create RAW UAV for compute shader to write InstanceCount (RWByteAddressBuffer requires RAW)
-        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-        uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uavDesc.Buffer.FirstElement = 0;
-        uavDesc.Buffer.NumElements = 5;  // 5 u32s in IndirectDrawArgs
-        uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+    CHK_DX(HW.pDevice->CreateUnorderedAccessView(
+        gpu_indirect_args_unified, &argsUavDesc, &gpu_indirect_args_unified_uav));
 
-        CHK_DX(HW.pDevice->CreateUnorderedAccessView(
-            gpu_indirect_args[i], &uavDesc, &gpu_indirect_args_uavs[i]));
-    }
+    float vram_mb = (gpu_visible_buffer_capacity * sizeof(InstanceData)) / (1024.0f * 1024.0f);
 
-    float vram_mb = (max_gpu_culled_objects * gpu_visible_buffer_capacity * sizeof(InstanceData)) / (1024.0f * 1024.0f);
-
-    Msg("* [DetailManager] GPU culling infrastructure created:");
-    Msg("  - Per-object buffer capacity: %u instances", gpu_visible_buffer_capacity);
-    Msg("  - Object buffers: %u (first %u objects)", max_gpu_culled_objects, max_gpu_culled_objects);
-    Msg("  - VRAM for output buffers: %.2f MB", vram_mb);
-    Msg("  - Indirect args buffers: %u created", _min(max_gpu_culled_objects, objects.size()));
+    Msg("* [DetailManager] UNIFIED GPU culling infrastructure created:");
+    Msg("  - Buffer capacity: %u total instances", gpu_visible_buffer_capacity);
+    Msg("  - VRAM for output buffer: %.2f MB", vram_mb);
+    Msg("  - Draw calls: 1 (unified)");
 }
 
 // Phase 2.1: Dispatch GPU culling compute shader
@@ -498,7 +489,7 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     memcpy(mapped.pData, &params, sizeof(params));
     context->Unmap(cull_constant_buffer, 0);
 
-    // Phase 2.2.1: Reset indirect args buffers (InstanceCount to 0, keep static fields)
+    // UNIFIED: Reset single indirect args buffer (InstanceCount to 0, keep static fields)
     struct IndirectDrawArgs
     {
         u32 IndexCountPerInstance;
@@ -508,29 +499,24 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
         u32 StartInstanceLocation;
     };
 
-    for (u32 i = 0; i < max_gpu_culled_objects && i < objects.size(); i++)
-    {
-        CDetail& obj = *objects[i];
+    // Phase 6: Use Bezier curve blade geometry for all grass
+    IndirectDrawArgs args = {};
+    args.IndexCountPerInstance = blade_index_count;  // All grass uses same blade geometry
+    args.InstanceCount = 0;  // Reset to 0 (compute shader will write this)
+    args.StartIndexLocation = 0;  // Blade geometry starts at index 0
+    args.BaseVertexLocation = 0;
+    args.StartInstanceLocation = 0;
 
-        // Phase 6: Use Bezier curve bladegeometry for all objects
-        IndirectDrawArgs args = {};
-        args.IndexCountPerInstance = blade_index_count;  // All objects use same blade geometry
-        args.InstanceCount = 0;  // Reset to 0
-        args.StartIndexLocation = 0;  // Blade geometry starts at index 0
-        args.BaseVertexLocation = 0;
-        args.StartInstanceLocation = 0;
+    // Update the unified args buffer (small upload: 20 bytes)
+    context->UpdateSubresource(gpu_indirect_args_unified, 0, nullptr, &args, 0, 0);
 
-        // Update the args buffer (small upload: 20 bytes)
-        context->UpdateSubresource(gpu_indirect_args[i], 0, nullptr, &args, 0, 0);
-    }
-
-    // Clear counter buffer to zero (still used for debugging/validation)
-    UINT zero_counts[64] = {0};
-    context->ClearUnorderedAccessViewUint(gpu_visible_counts_uav, zero_counts);
+    // UNIFIED: Clear single counter buffer to zero
+    UINT zero = 0;
+    context->ClearUnorderedAccessViewUint(gpu_visible_count_uav, &zero);
 
     // Phase 6B: Clear visible slot counter to 0 before culling
-    uint32_t zero = 0;
-    context->UpdateSubresource(visible_slot_counter_gpu, 0, nullptr, &zero, 0, 0);
+    uint32_t zero_u32 = 0;
+    context->UpdateSubresource(visible_slot_counter_gpu, 0, nullptr, &zero_u32, 0, 0);
 
     // Bind constant buffer
     context->CSSetConstantBuffers(0, 1, &cull_constant_buffer);
@@ -538,20 +524,18 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     ID3DShaderResourceView* srvs[2] = {slot_aabb_srv, persistent_instance_srv};
     context->CSSetShaderResources(0, 2, srvs);
 
-    // Bind outputs: per-object visible buffers + counter buffer + indirect args + visible slots
-    // u0-u15: visible instance buffers
-    // u16: counter buffer
-    // u17-u32: indirect args buffers
-    // u33: visible slot IDs (Phase 6B)
-    // u34: visible slot counter (Phase 6B)
-    ID3DUnorderedAccessView* uavs[35];
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-        uavs[i] = gpu_visible_uavs[i];
-    uavs[16] = gpu_visible_counts_uav;  // Counter buffer at u16
-    for (u32 i = 0; i < max_gpu_culled_objects; i++)
-        uavs[17 + i] = gpu_indirect_args_uavs[i];  // Indirect args at u17-u32
-    uavs[33] = visible_slot_ids_uav;       // Phase 6B: Visible slot IDs
-    uavs[34] = visible_slot_counter_uav;   // Phase 6B: Visible slot counter
+    // UNIFIED: Bind UAVs (3 unified buffers + 2 page table buffers)
+    // u0: Unified visible instances
+    // u1: Single counter (RAW)
+    // u2: Unified indirect args (RAW)
+    // u33: Visible slot IDs (Phase 6B)
+    // u34: Visible slot counter (Phase 6B)
+    ID3DUnorderedAccessView* uavs[35] = {nullptr};  // Initialize all to null
+    uavs[0] = gpu_visible_unified_uav;
+    uavs[1] = gpu_visible_count_uav;
+    uavs[2] = gpu_indirect_args_unified_uav;
+    uavs[33] = visible_slot_ids_uav;
+    uavs[34] = visible_slot_counter_uav;
 
     context->CSSetUnorderedAccessViews(0, 35, uavs, nullptr);
 
@@ -571,7 +555,7 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
     context->CSSetShader(nullptr, nullptr, 0);
 
     // Copy counter buffer to readback for CPU access
-    context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
+    context->CopyResource(gpu_visible_count_readback, gpu_visible_count_buffer);
 }
 
 // Phase 2.1: Render using GPU-culled instances
@@ -635,92 +619,110 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
     static bool first_frame = true;
     if (first_frame)
     {
-        context->CopyResource(gpu_visible_counts_readback, gpu_visible_counts_buffer);
+        context->CopyResource(gpu_visible_count_readback, gpu_visible_count_buffer);
         D3D11_MAPPED_SUBRESOURCE mapped;
-        CHK_DX(context->Map(gpu_visible_counts_readback, 0, D3D11_MAP_READ, 0, &mapped));
-        u32* counts = (u32*)mapped.pData;
-
-        u32 total_visible = 0;
-        for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
-            total_visible += counts[i];
-
-        Msg("! [DetailManager] GPU Indirect Draw - First Frame:");
+        CHK_DX(context->Map(gpu_visible_count_readback, 0, D3D11_MAP_READ, 0, &mapped));
+        u32 total_visible = *(u32*)mapped.pData;  // Dereference pointer to read value
+        Msg("! [DetailManager] UNIFIED GPU Indirect Draw - First Frame:");
         Msg("  - Total instances: %u", total_instance_count);
         Msg("  - Visible instances: %u (%.1f%%)", total_visible,
             (total_visible * 100.0f) / total_instance_count);
-
-        for (u32 i = 0; i < objects.size() && i < max_gpu_culled_objects; i++)
-        {
-            if (counts[i] > 0)
-                Msg("  - Object %u: %u instances", i, counts[i]);
-        }
-
-        context->Unmap(gpu_visible_counts_readback, 0);
+        context->Unmap(gpu_visible_count_readback, 0);
         first_frame = false;
     }
 
-    // Phase 2.2.2: Render using DrawIndexedInstancedIndirect (GPU controls instance count)
-    u32 objects_to_render = _min(objects.size(), max_gpu_culled_objects);
-    for (u32 O = 0; O < objects_to_render; O++)
+    // UNIFIED: Single draw call for all grass (16 → 1 draw calls!)
+    // Set rendering state
+    cmd_list.set_CullMode(CULL_NONE);
+    cmd_list.set_xform_world(Fidentity);
+    cmd_list.SRVSManager.SetVSResource(0, gpu_visible_unified_srv);
+    // Phase 6: Use Bezier curve blade geometry
+    cmd_list.set_Geometry(blade_geom);
+
+    // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
+    if (gpu_detail_shader)
     {
-        CDetail& Object = *objects[O];
-
-        // Set rendering state
-        cmd_list.set_CullMode(CULL_NONE);
-        cmd_list.set_xform_world(Fidentity);
-        cmd_list.SRVSManager.SetVSResource(0, gpu_visible_srvs[O]);
-        // Phase 6: Use Bezier curve bladegeometry instead of old billboard quads
-        cmd_list.set_Geometry(blade_geom);
-        cmd_list.set_c(strConsts, consts);
-        cmd_list.set_c(strWave, wave.div(PI_MUL_2));
-        cmd_list.set_c(strDir2D, dir1);    // dir1 for wave1 (vis_id=1)
-        cmd_list.set_c(strDir2D_2, dir2);   // dir2 for wave2 (vis_id=2)
-
-        // Phase 5: Set slot grid parameters
-        Fvector4 detail_params_vec;
-        detail_params_vec.x = (float)dtH.x_size();
-        detail_params_vec.y = (float)dtH.z_size();
-        detail_params_vec.z = (float)dtH.x_offs();
-        detail_params_vec.w = (float)dtH.z_offs();
-        cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
-        cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
-        cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
-        const float wind_angle_deg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
-        cmd_list.set_c(g_wind_direction._get(), wind_angle_deg, 0.0f, 0.0f, 0.0f);
-
-        // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
-        if (gpu_detail_shader)
-        {
-            cmd_list.set_Element(gpu_detail_shader->E[0], 0);
-            cmd_list.apply_lmaterial();
-        }
-        else
-        {
-            // Fallback to vanilla shader if GPU shader failed to load
-            cmd_list.set_Element(Object.shader->E[0], 0);
-            cmd_list.apply_lmaterial();
-        }
-
-        // Phase 5: Bind interactive grass textures (AFTER apply_lmaterial to avoid being unbound)
-        // Bind to slots 1, 2, 3 to match shader registers (t1, t2, t3)
-        if (interaction_srv)
-            cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
-        if (wind_srv)
-            cmd_list.SRVSManager.SetVSResource(2, wind_srv);
-        // Phase 6: Bind indirection buffer instead of slot_atlas_uv_srv (NEW)
-        if (indirection_srv)
-            cmd_list.SRVSManager.SetVSResource(3, indirection_srv);
-        if (interaction_sampler)
-            HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
-
-        // Phase 2.2.2: DrawIndexedInstancedIndirect
-        // The GPU determines instance count from the indirect args buffer
-        cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLESTRIP, gpu_indirect_args[O], 0);
-
-        // Note: We can't accurately update stats without CPU readback
-        // For now, just increment draw call count
-        cmd_list.set_CullMode(CULL_CCW);
+        cmd_list.set_Element(gpu_detail_shader->E[0], 0);
+        cmd_list.apply_lmaterial();
     }
+    else if (objects.size() > 0)
+    {
+        // Fallback to first object's shader if GPU shader failed to load
+        cmd_list.set_Element(objects[0]->shader->E[0], 0);
+        cmd_list.apply_lmaterial();
+    }
+
+    // IMPORTANT: Set constants AFTER apply_lmaterial() to avoid being reset!
+    cmd_list.set_c(strConsts, consts);
+    cmd_list.set_c(strWave, wave.div(PI_MUL_2));
+    cmd_list.set_c(strDir2D, dir1);
+    cmd_list.set_c(strDir2D_2, dir2);
+
+    // Phase 5: Set slot grid parameters
+    Fvector4 detail_params_vec;
+    detail_params_vec.x = (float)dtH.x_size();
+    detail_params_vec.y = (float)dtH.z_size();
+    detail_params_vec.z = (float)dtH.x_offs();
+    detail_params_vec.w = (float)dtH.z_offs();
+    cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
+    cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
+    cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+    const float wind_angle_deg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+    cmd_list.set_c(g_wind_direction._get(), wind_angle_deg, 0.0f, 0.0f, 0.0f);
+
+    // Phase 5: Bind interactive grass textures (AFTER apply_lmaterial to avoid being unbound)
+    // Bind to slots 1, 2, 3 to match shader registers (t1, t2, t3)
+    if (interaction_srv)
+        cmd_list.SRVSManager.SetVSResource(1, interaction_srv);
+    if (wind_srv)
+        cmd_list.SRVSManager.SetVSResource(2, wind_srv);
+    // Phase 6: Bind indirection buffer
+    if (indirection_srv)
+        cmd_list.SRVSManager.SetVSResource(3, indirection_srv);
+    if (interaction_sampler)
+        HW.get_context(cmd_list.context_id)->VSSetSamplers(0, 1, &interaction_sampler);
+
+    // UNIFIED: Single DrawIndexedInstancedIndirect call for ALL grass!
+    // The GPU determines instance count from the unified indirect args buffer
+    // Use D3DPT_TRIANGLELIST because we generate indexed triangles (blade clumps)
+
+    // DEBUG: Read back indirect args to verify InstanceCount
+    static bool logged_draw = false;
+    if (!logged_draw)
+    {
+        // Create staging buffer for readback
+        D3D11_BUFFER_DESC argsDesc = {};
+        argsDesc.ByteWidth = 20; // sizeof(IndirectDrawArgs)
+        argsDesc.Usage = D3D11_USAGE_STAGING;
+        argsDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+        ID3D11Buffer* readback = nullptr;
+        HW.pDevice->CreateBuffer(&argsDesc, nullptr, &readback);
+
+        auto ctx = HW.get_context(cmd_list.context_id);
+        ctx->CopyResource(readback, gpu_indirect_args_unified);
+
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        ctx->Map(readback, 0, D3D11_MAP_READ, 0, &mapped);
+        u32* args = (u32*)mapped.pData;
+
+        Msg("! [DetailManager] UNIFIED Draw Call Indirect Args:");
+        Msg("  - IndexCountPerInstance: %u", args[0]);
+        Msg("  - InstanceCount: %u", args[1]);
+        Msg("  - StartIndexLocation: %u", args[2]);
+        Msg("  - BaseVertexLocation: %d", (s32)args[3]);
+        Msg("  - StartInstanceLocation: %u", args[4]);
+        Msg("  - Blade index count: %u", blade_index_count);
+        Msg("  - Unified SRV bound: %s", gpu_visible_unified_srv ? "YES" : "NO");
+
+        ctx->Unmap(readback, 0);
+        _RELEASE(readback);
+        logged_draw = true;
+    }
+
+    cmd_list.RenderIndexedInstancedIndirect(D3DPT_TRIANGLESTRIP, gpu_indirect_args_unified, 0);
+
+    cmd_list.set_CullMode(CULL_CCW);
 
     // Phase 2.2.2: Clean up - unbind our resources to avoid affecting subsequent draws
     cmd_list.SRVSManager.SetVSResource(0, nullptr);
