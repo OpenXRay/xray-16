@@ -104,8 +104,6 @@ f_deffer main(p_flat I)
     float4 position = float4(I.position.xyz, sun);  // View-space position + sun occlusion
     float4 albedo = float4(grassAlbedo, gloss);  // Albedo color + gloss
 
-    albedo = Ne;
-
     O = pack_gbuffer(Ne, position, albedo);
 
     return O;

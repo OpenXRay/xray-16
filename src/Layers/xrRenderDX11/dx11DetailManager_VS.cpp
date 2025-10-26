@@ -151,17 +151,14 @@ void CDetailManager::CreatePersistentInstanceBuffer()
         const SlotItemWithObject& src = all_level_instances[i];
         InstanceData dst = {};
 
-        // Pass full rotation matrix (preserves all rotations)
+        // Extract position from rotation matrix
         const Fmatrix& M = src.item.mRotY;
-        dst.m0.set(M._11, M._21, M._31);  // First column
-        dst.m1.set(M._12, M._22, M._32);  // Second column
-        dst.m2.set(M._13, M._23, M._33);  // Third column
-
-        dst.scale = src.item.scale;
         dst.pos = M.c;
+        dst.scale = src.item.scale;
         dst.hemi = src.item.c_hemi;
         dst.vis_id = src.item.vis_ID;
         dst.object_id = src.object_id;
+        dst.padding = 0.0f;
 
         upload_data.push_back(dst);
     }
@@ -1023,20 +1020,12 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
                 SlotItem& Instance = *item;
                 Fmatrix& M = Instance.mRotY;
 
-                // Extract heading from Y-rotation matrix
-                Fvector3 hpb;
-                hpb.x = atan2f(M._13, M._11);  // heading (rotation around Y)
-                hpb.y = 0.0f;                   // pitch
-                hpb.z = 0.0f;                   // bank
-
-                c_storage[instanceIdx].m0.set(M._11, M._21, M._31);  // First column
-                c_storage[instanceIdx].m1.set(M._12, M._22, M._32);  // Second column
-                c_storage[instanceIdx].m2.set(M._13, M._23, M._33);  // Third column
-                c_storage[instanceIdx].scale = Instance.scale;
                 c_storage[instanceIdx].pos = M.c;
+                c_storage[instanceIdx].scale = Instance.scale;
                 c_storage[instanceIdx].hemi = Instance.c_hemi;
                 c_storage[instanceIdx].vis_id = vis_id;
                 c_storage[instanceIdx].object_id = object_id;
+                c_storage[instanceIdx].padding = 0.0f;
 
                 instanceIdx++;
                 RImplementation.BasicStats.DetailCount++;

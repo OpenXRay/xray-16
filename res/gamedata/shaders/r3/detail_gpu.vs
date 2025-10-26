@@ -49,14 +49,12 @@ struct v_blade_sdf
 // Instance data structure (must match C++ InstanceData)
 struct InstanceData
 {
-	float3 m0;       // First column of rotation matrix (X-axis)
-	float scale;     // Scale factor
-	float3 m1;       // Second column of rotation matrix (Y-axis)
-	float hemi;      // Hemisphere lighting
-	float3 m2;       // Third column of rotation matrix (Z-axis)
-	uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
-	float3 pos;      // Position
-	uint object_id;  // Which grass object type (0-63)
+	float3 pos;      // Position (12 bytes)
+	float scale;     // Scale factor (4 bytes)
+	float hemi;      // Hemisphere lighting (4 bytes)
+	uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2) (4 bytes)
+	uint object_id;  // Which grass object type (0-63) (4 bytes)
+	float padding;   // Padding to align to 16 bytes (4 bytes) = 32 bytes total
 };
 
 // Structured buffer bound to slot 0
@@ -270,18 +268,12 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// GoT doc (lines 72-76): "The first derivative (tangent vector)"
 	float3 tangent = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
 	tangent = normalize(tangent);
-	// FACING = blade orientation in XZ plane (perpendicular to blade width)
-	// For grass normals, we want consistency across blades, not per-instance randomness
-	// Use the blade's local right direction (perpendicular to tangent in XZ plane)
-	// This creates normals that point outward from the blade consistently
-
-	// Project tangent to XZ plane to get horizontal component
-	float3 tangent_xz = float3(tangent.x, 0.0, tangent.z);
-	float tangent_xz_len = length(tangent_xz);
-
-	float3 facing;
-	tangent_xz = tangent_xz / tangent_xz_len;
-	facing = float3(-tangent_xz.z, 0.0, tangent_xz.x);  // Rotate 90° ccw in XZ
+	// FACING = blade orientation in world space (perpendicular to blade width)
+	// GoT doc (lines 178-179): facing is a fixed per-blade direction, NOT derived from tangent
+	// This ensures normals remain stable even when the blade bends heavily
+	// Use global wind direction (all grass faces the same way in procedural system)
+	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
+	float3 facing = normalize(float3(sin(wind_angle_rad), 0.0, cos(wind_angle_rad)));
 
 	// NORMAL = perpendicular to blade surface
 	// Ghost of Tsushima: normal = cross(tangent, facing)

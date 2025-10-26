@@ -6,14 +6,12 @@
 
 struct InstanceData
 {
-    float3 m0;       // First column of rotation matrix (X-axis)
-    float scale;     // Scale factor
-    float3 m1;       // Second column of rotation matrix (Y-axis)
-    float hemi;      // Hemisphere lighting
-    float3 m2;       // Third column of rotation matrix (Z-axis)
-    uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2)
-    float3 pos;      // Position
-    uint object_id;  // Which grass object type (0-63)
+    float3 pos;      // Position (12 bytes)
+    float scale;     // Scale factor (4 bytes)
+    float hemi;      // Hemisphere lighting (4 bytes)
+    uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2) (4 bytes)
+    uint object_id;  // Which grass object type (0-63) (4 bytes)
+    float padding;   // Padding to align to 16 bytes (4 bytes) = 32 bytes total
 };
 
 struct SlotAABB

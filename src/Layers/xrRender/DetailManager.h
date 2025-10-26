@@ -267,15 +267,14 @@ public:
     // Instance data structure matching shader
     struct InstanceData
     {
-        Fvector m0;  // First column of rotation matrix (X-axis)
-        float scale;
-        Fvector m1;  // Second column of rotation matrix (Y-axis)
-        float hemi;
-        Fvector m2;  // Third column of rotation matrix (Z-axis)
-        u32 vis_id;
-        Fvector pos; // Position
-        u32 object_id;
+        Fvector pos;     // Position (12 bytes)
+        float scale;     // Scale factor (4 bytes)
+        float hemi;      // Hemisphere lighting (4 bytes)
+        u32 vis_id;      // Visibility/animation type (4 bytes)
+        u32 object_id;   // Which grass object type (4 bytes)
+        float padding;   // Padding to align to 16 bytes (4 bytes) = 32 bytes total
     };
+    static_assert(sizeof(InstanceData) == 32, "InstanceData must be 32 bytes");
 
     xr_vector<SlotItemWithObject> all_level_instances;  // ALL instances for entire level
     u32 total_instance_count;
