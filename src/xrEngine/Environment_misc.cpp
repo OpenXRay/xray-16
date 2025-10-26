@@ -559,7 +559,7 @@ void CEnvDescriptorMixer::lerp(CEnvironment& parent, CEnvDescriptor& A, CEnvDesc
     bolt_duration = fi * A.bolt_duration + f * B.bolt_duration;
     // wind
     wind_velocity = fi * A.wind_velocity + f * B.wind_velocity;
-    wind_direction = fi * A.wind_direction + f * B.wind_direction;
+    //wind_direction = fi * A.wind_direction + f * B.wind_direction;
 
 #ifdef DEBUG
     if (SunshaftsIntensity > 0.f)

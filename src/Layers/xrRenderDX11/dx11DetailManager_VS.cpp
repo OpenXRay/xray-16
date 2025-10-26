@@ -127,6 +127,7 @@ void CDetailManager::hw_Load_Shaders()
         gpu_detail_params = GPU_T0.get("detail_params");
         gpu_grass_wind_displacement = GPU_T0.get("grass_wind_displacement");
         gpu_grass_interaction_displacement = GPU_T0.get("grass_interaction_displacement");
+        g_wind_direction = GPU_T0.get("g_wind_direction");
     }
 #endif
 }
@@ -687,6 +688,8 @@ void CDetailManager::hw_Render_FullLevel(CBackend& cmd_list)
         cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
         cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
         cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+        const float wind_angle_deg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+        cmd_list.set_c(g_wind_direction._get(), wind_angle_deg, 0.0f, 0.0f, 0.0f);
 
         // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
         if (gpu_detail_shader)
@@ -1062,6 +1065,8 @@ void CDetailManager::hw_Render_object(CBackend& cmd_list,
     cmd_list.set_c(gpu_detail_params._get(), detail_params_vec);
     cmd_list.set_c(gpu_grass_wind_displacement._get(), ps_r3_grass_wind_displacement);
     cmd_list.set_c(gpu_grass_interaction_displacement._get(), ps_r3_grass_interaction_displacement);
+    const float wind_angle_deg = g_pGamePersistent->Environment().CurrentEnv.wind_direction;
+    cmd_list.set_c(g_wind_direction._get(), wind_angle_deg, 0.0f, 0.0f, 0.0f);
 
     // === USE GPU SHADER (detail_gpu.vs + detail_gpu.ps) ===
     if (gpu_detail_shader)

@@ -583,6 +583,7 @@ public:
     ref_constant gpu_detail_params;  // Phase 5: slot grid parameters (x_size, z_size, x_offs, z_offs)
     ref_constant gpu_grass_wind_displacement;  // Phase 5: wind displacement strength
     ref_constant gpu_grass_interaction_displacement;  // Phase 5: interaction displacement strength
+    ref_constant g_wind_direction;  // Phase 6: Global wind direction (XY normalized) - matches compute shader
 
     // GPU-only function declarations
     void hw_Render_object(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 object_id);
