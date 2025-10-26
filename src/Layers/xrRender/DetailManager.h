@@ -252,15 +252,14 @@ public:
 
     struct InstanceData
     {
-        Fvector m0;
-        float scale;
-        Fvector m1;
-        float hemi;
-        Fvector m2;
-        u32 vis_id;
         Fvector pos;
+        float scale;
+        float hemi;
+        u32 vis_id;
         u32 object_id;
+        float padding;
     };
+    static_assert(sizeof(InstanceData) == 32, "InstanceData must be 32 bytes");
 
     xr_vector<SlotItemWithObject> all_level_instances;
     u32 total_instance_count;
