@@ -75,6 +75,12 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Save base position before any modifications for normal calculations
 	float3 base_world_pos = P0;
 
+	// ===== CALCULATE FACING DIRECTION (EARLY) =====
+	// Each blade gets a unique random rotation based on its position
+	// This must be calculated early since we need it for wind influence calculation
+	float blade_rotation = frac(P0.x * 12.9898 + P0.z * 78.233) * 2.0 * M_PI;  // Random 0-2π
+	float3 facing = normalize(float3(sin(blade_rotation), 0.0, cos(blade_rotation)));
+
 	// ===== BEZIER CURVE EVALUATION HELPER =====
 	// Cubic Bezier: B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
 	// GoT doc (lines 60-70): Efficient shader evaluation
@@ -153,8 +159,20 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Sample wind texture at blade base for strength/turbulence variation
 	float2 wind_uv = P0.xz * 0.001;  // Use base position for sampling
 	float4 wind = wind_texture.SampleLevel(smp_linear, wind_uv, 0);
-	float2 fbm_wind_factor = wind.xz * 2.0 - 1.0;
+
+	// Extract wind strength and turbulence from texture
+	// wind.a = base wind strength (0-1)
+	// wind.r = turbulence variation (0-1)
 	float fbm_wind_strength = wind.a;
+	float fbm_turbulence = (wind.r * 2.0 - 1.0) * 0.3;  // ±30% turbulence
+
+	// Calculate global wind direction from g_wind_direction
+	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
+	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
+
+	// Add turbulence perpendicular to wind direction
+	float2 perpendicular_dir = float2(-global_wind_dir.y, global_wind_dir.x);
+	float2 wind_dir_with_turbulence = normalize(global_wind_dir + perpendicular_dir * fbm_turbulence);
 
 	// Get interaction data
 	float2 interaction_push_dir = interaction.rg * 2.0 - 1.0;
@@ -169,11 +187,11 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Higher control points bend more (parabolic distribution)
 
 	// Calculate displacement for control points
-	// P1 gets 30% of the effect, P2 gets 70% (tips bend more)
+	// Wind direction comes from g_wind_direction, strength from FBM texture
 	float3 wind_offset = float3(
-		fbm_wind_factor.x,
+		wind_dir_with_turbulence.x,
 		0.0,  // Wind is horizontal
-		fbm_wind_factor.y
+		wind_dir_with_turbulence.y
 	) * fbm_wind_strength * grass_wind_displacement;
 
 	float3 interaction_offset = float3(
@@ -185,60 +203,95 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Combine wind and interaction
 	float3 total_offset = wind_offset + interaction_offset;
 
-	// ===== BEZIER CURVE BENDING: TIP FOLLOWS WIND =====
-	// Key: P3 (tip) should point TOWARD the wind/interaction direction
-	// P1, P2 create the arc from P0 (base) to P3 (tip)
+	// ===== BEZIER CURVE BENDING: ALL GRASS BENDS WITH WIND =====
+	// Physics: Wind pushes ALL grass in the wind direction, regardless of facing
+	// Facing only affects HOW MUCH the grass bends (resistance), not WHICH WAY
+	//
+	// Examples (wind blowing EAST):
+	//   - Blade facing EAST:  low resistance → bends easily eastward
+	//   - Blade facing WEST:  high resistance → bends less, but still eastward
+	//   - Blade facing NORTH: medium resistance → moderate eastward bend
+	//
+	// All grass ultimately bends in the wind direction!
 
-	// Calculate total bend amount and direction
-	float horizontal_bend = length(total_offset.xz);
+	float2 facing_dir_xz = facing.xz;  // Blade's facing direction (normalized)
+	float2 wind_dir_xz = normalize(float2(wind_dir_with_turbulence.x, wind_dir_with_turbulence.y));
 
-	if (horizontal_bend > 0.001)
+	// Calculate alignment: dot product between blade facing and wind direction
+	// Result: +1 = aligned with wind, 0 = perpendicular, -1 = against wind
+	float alignment = dot(wind_dir_xz, facing_dir_xz);
+
+	// Resistance factor: grass facing INTO wind bends more easily than grass facing AWAY
+	// We use abs(alignment) so perpendicular grass has medium resistance
+	// Scale from 0.3 (high resistance, facing away) to 1.0 (low resistance, aligned)
+	float resistance = lerp(0.3, 1.0, abs(alignment));
+
+	// Wind influence: ALL grass bends in wind direction, modulated by resistance
+	float wind_bend_strength = fbm_wind_strength * grass_wind_displacement * resistance;
+
+	// Interaction: also bends in push direction with resistance
+	float interaction_bend_strength = 0.0;
+	float3 interaction_bend_dir = float3(0, 0, 0);
+	if (interaction_strength > 0.001)
 	{
-		// Normalize bend direction (where grass should point)
-		float2 bend_dir_xz = total_offset.xz / horizontal_bend;
-		float3 bend_dir_3d = float3(bend_dir_xz.x, 0.0, bend_dir_xz.y);
+		float2 interaction_dir_xz = normalize(interaction_push_dir);
+		float interaction_alignment = dot(interaction_dir_xz, facing_dir_xz);
+		float interaction_resistance = lerp(0.3, 1.0, abs(interaction_alignment));
+		interaction_bend_strength = interaction_strength * grass_interaction_displacement * interaction_resistance;
+		interaction_bend_dir = float3(interaction_dir_xz.x, 0.0, interaction_dir_xz.y);
+	}
 
-		// Calculate how much the blade should bend (angle in radians)
-		// More wind/interaction = more bending
-		float max_bend_displacement = det.scale * 0.8;  // Blade can bend up to 80% of height horizontally
-		float bend_ratio = saturate(horizontal_bend / max_bend_displacement);
-		float bend_angle = bend_ratio * 1.2;  // Max ~70 degrees
+	// Wind bend direction (all grass bends WITH the wind)
+	float3 wind_bend_dir = float3(wind_dir_xz.x, 0.0, wind_dir_xz.y);
 
+	// Combine wind and interaction bending
+	float3 total_bend_force = wind_bend_dir * wind_bend_strength + interaction_bend_dir * interaction_bend_strength;
+	float total_bend_strength = length(total_bend_force);
+
+	// Normalize to get final bend direction
+	float3 bend_dir = float3(0, 0, 0);
+	if (total_bend_strength > 0.001)
+	{
+		bend_dir = normalize(total_bend_force);
+	}
+
+	// Calculate bend angle
+	float max_bend_displacement = det.scale * 0.8;
+	float bend_ratio = saturate(total_bend_strength / max_bend_displacement);
+	float bend_angle = bend_ratio * 1.2;  // Max ~70 degrees
+
+	if (total_bend_strength > 0.001)
+	{
 		// P3 (tip): Position it at the end of the arc
-		// Horizontal: Full displacement in wind direction
-		// Vertical: Natural drop due to arc geometry
 		float tip_horizontal = det.scale * sin(bend_angle);
 		float tip_vertical_drop = det.scale * (1.0 - cos(bend_angle));
 
-		P3.x += bend_dir_3d.x * tip_horizontal;
+		P3 += bend_dir * tip_horizontal;
 		P3.y -= tip_vertical_drop;
-		P3.z += bend_dir_3d.z * tip_horizontal;
 
-		// P1 (lower control point): 1/3 along arc from base to bent tip
-		// Creates smooth curve
+		// P1 (lower control point): 1/3 along arc
 		float p1_angle = bend_angle * 0.33;
 		float p1_horizontal = det.scale * 0.33 * sin(p1_angle);
 		float p1_drop = det.scale * 0.33 * (1.0 - cos(p1_angle));
 
-		P1.x += bend_dir_3d.x * p1_horizontal;
+		P1 += bend_dir * p1_horizontal;
 		P1.y -= p1_drop;
-		P1.z += bend_dir_3d.z * p1_horizontal;
 
-		// P2 (upper control point): 2/3 along arc from base to bent tip
+		// P2 (upper control point): 2/3 along arc
 		float p2_angle = bend_angle * 0.67;
 		float p2_horizontal = det.scale * 0.67 * sin(p2_angle);
 		float p2_drop = det.scale * 0.67 * (1.0 - cos(p2_angle));
 
-		P2.x += bend_dir_3d.x * p2_horizontal;
+		P2 += bend_dir * p2_horizontal;
 		P2.y -= p2_drop;
-		P2.z += bend_dir_3d.z * p2_horizontal;
 
 		// Add interaction vertical offset if present (trampling pushes down)
-		if (total_offset.y < -0.01)
+		float interaction_vertical = interaction.b * grass_interaction_displacement * -0.5;
+		if (abs(interaction_vertical) > 0.01)
 		{
-			P1.y += total_offset.y * 0.33;
-			P2.y += total_offset.y * 0.67;
-			P3.y += total_offset.y;
+			P1.y += interaction_vertical * 0.33;
+			P2.y += interaction_vertical * 0.67;
+			P3.y += interaction_vertical;
 		}
 	}
 
@@ -260,14 +313,6 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// GoT doc (lines 72-76): "The first derivative (tangent vector)"
 	float3 tangent = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
 	tangent = normalize(tangent);
-
-	// ===== CALCULATE FACING DIRECTION =====
-	// FACING = blade orientation in world space (perpendicular to blade width)
-	// GoT doc (lines 178-179): facing is a fixed per-blade direction, NOT derived from tangent
-	// This ensures normals remain stable even when the blade bends heavily
-	// Use global wind direction (all grass faces the same way in procedural system)
-	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
-	float3 facing = normalize(float3(sin(wind_angle_rad), 0.0, cos(wind_angle_rad)));
 
 	// ===== GHOST OF TSUSHIMA: GLANCING ANGLE ADJUSTMENT =====
 	// GoT doc (lines 185-186): "vertices rotate slightly about the tangent to maintain visibility"

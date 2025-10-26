@@ -532,7 +532,7 @@ void CEnvironment::on_tool_frame()
             ImGui::DragFloat("Wind strength multiplier", &ps_r3_grass_wind_multiplier, 0.01f, 0.0f, 5.0f);
             ItemHelp("Multiplies environment wind strength for grass displacement");
 
-            ImGui::DragFloat("Minimum wind speed", &ps_r3_grass_wind_min, 0.01f, 0.0f, 1.0f);
+            ImGui::DragFloat("Minimum wind speed", &ps_r3_grass_wind_min, 0.01f, 0.0f, 10.0f);
             ItemHelp("Minimum wind speed - even in calm weather, grass moves slightly");
 
             ImGui::DragFloat("Transition speed", &ps_r3_grass_wind_lerp_rate, 0.1f, 0.1f, 10.0f);
