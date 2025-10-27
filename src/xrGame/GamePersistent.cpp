@@ -231,7 +231,7 @@ void CGamePersistent::WeathersUpdate()
         CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
         BOOL bIndoor = TRUE;
         if (actor)
-            bIndoor = g_pGamePersistent->IsActorInHideout() && (actor->renderable_ROS()->get_luminocity_hemi() < 0.05f);
+            bIndoor = actor->renderable_ROS()->get_luminocity_hemi() < 0.05f;
 
         if (CEnvAmbient* env_amb = Environment().CurrentEnv.env_ambient)
         {
