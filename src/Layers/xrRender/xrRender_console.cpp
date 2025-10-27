@@ -1021,8 +1021,6 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
 
-    CMD4(CCC_Integer, "r__nightvision", &ps_r2_nightvision, 0, 3); //For beef's nightvision shader or other stuff
-
     // Screen Space Shaders
     Fvector4 tw2_min = { -100.f, -100.f, -100.f, -100.f };
     Fvector4 tw2_max = { 100.f, 100.f, 100.f, 100.f };
