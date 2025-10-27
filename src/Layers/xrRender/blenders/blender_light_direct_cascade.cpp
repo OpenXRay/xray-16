@@ -50,7 +50,6 @@ void CBlender_accum_direct_cascade::Compile(CBlender_Compile& C)
         // 			C.i_Address		(s, D3DTADDRESS_BORDER);
         // 			C.i_BorderColor	(s, D3DCOLOR_ARGB(255, 255, 255, 255));
         // 		}
-        C.r_Sampler_rtf("s_diffuse", r2_RT_albedo);
         C.r_End();
         break;
     case SE_SUN_FAR: // far pass, only stencil clipping performed
@@ -75,7 +74,6 @@ void CBlender_accum_direct_cascade::Compile(CBlender_Compile& C)
             C.i_Address(s, D3DTADDRESS_BORDER);
             C.i_BorderColor(s, D3DCOLOR_ARGB(255, 255, 255, 255));
         }
-        C.r_Sampler_rtf("s_diffuse", r2_RT_albedo);
         C.r_End();
         break;
     }
