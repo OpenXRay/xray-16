@@ -304,7 +304,6 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
 
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
-float ps_r2_gloss_min = 0.0f;
 //- Mad Max
 
 //AVO: detail draw radius
@@ -872,8 +871,7 @@ void xrRender_initconsole()
 
     //- Mad Max
     CMD4(CCC_Float, "r2_gloss_factor", &ps_r2_gloss_factor, .0f, 10.f);
-    CMD4(CCC_Float, "r2_gloss_min", &ps_r2_gloss_min, .0f, 1.f);
-    //- Mad Max
+//- Mad Max
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "r2_use_nvdbt", &ps_r2_ls_flags, R2FLAG_USE_NVDBT);
