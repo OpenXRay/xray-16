@@ -1,0 +1,1 @@
+#define SSFX_NEWGLOSS

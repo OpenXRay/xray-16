@@ -1,0 +1,30 @@
+#include "common.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+float4 main( p_build I ) : SV_Target
+{
+    
+	float2 ratio = float2( 1/screen_res.x,1/screen_res.y).xy;  
+	
+    ratio.x = 1;  
+    //ratio.y = 1.77;  
+    //ratio.y = 0.5625;  
+    ratio.y = screen_res.x/screen_res.y;  
+	
+	float2	UVavg	= (I.Tex0+I.Tex1+I.Tex2+I.Tex3)/4;
+	
+	//adjust for aspect ratio
+	I.Tex0 = UVavg + ((I.Tex0 - UVavg) * ratio);
+	I.Tex1 = UVavg + ((I.Tex1 - UVavg) * ratio);
+	I.Tex2 = UVavg + ((I.Tex2 - UVavg) * ratio);
+	I.Tex3 = UVavg + ((I.Tex3 - UVavg) * ratio);
+	
+	float4	t_0	= s_image.Sample( smp_rtlinear, I.Tex0);
+	float4	t_1	= s_image.Sample( smp_rtlinear, I.Tex1);
+	float4	t_2	= s_image.Sample( smp_rtlinear, I.Tex2);
+	float4	t_3	= s_image.Sample( smp_rtlinear, I.Tex3);
+
+    // out
+	return  ( (t_0+t_1) + (t_2+t_3) ) / 4;
+}

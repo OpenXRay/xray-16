@@ -1,0 +1,34 @@
+#include "common.h"
+#include "lmodel.h"
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Pixel
+// Note: this is a float-sphere
+float3 direction;
+
+#ifdef MSAA_OPTIMIZATION
+float4 main ( float4 tc:TEXCOORD0, float4 pos2d : SV_Position, uint iSample : SV_SAMPLEINDEX ) : SV_Target
+#else
+float4 main ( float4 tc:TEXCOORD0, float4 pos2d : SV_Position ) : SV_Target
+#endif
+{
+	float2	tcProj			= tc.xy / tc.w;
+
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, ISAMPLE) );
+
+	float4	_P				= float4( gbd.P, gbd.mtl );
+	float4	_N				= float4( gbd.N, gbd.hemi );
+	float4 _C = float4(gbd.C, gbd.gloss );
+
+	float3	L2P 	= _P.xyz - Ldynamic_pos.xyz;			// light2point
+	float3 	L2P_N 	= normalize	( L2P );					// light2point
+	float	rsqr	= dot		( L2P, L2P );				// distance 2 light (squared)
+	float  	att 	= saturate	( 1 - rsqr*Ldynamic_pos.w );// q-linear attenuate
+	float  	light	= saturate	( dot( -L2P_N, _N.xyz ) );
+	float	hemi 	= saturate	( dot( L2P_N, direction ) );
+
+  // Final color
+	float3 result =	SRGBToLinear(att) * hemi;
+	result *=	SRGBToLinear(_C.rgb) * SRGBToLinear(Ldynamic_color.rgb) * light;
+	return 	float4(result, 0);
+}
