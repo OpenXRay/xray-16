@@ -334,9 +334,6 @@ protected:
     void cam_UnsetLadder();
     float currentFOV();
 
-    void UpdateVisorRainDrops();
-    void UpdateVisor();
-
     // Cameras
     CCameraBase* cameras[eacMaxCam];
     EActorCameras cam_active;

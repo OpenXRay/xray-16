@@ -126,8 +126,6 @@ public:
 
     bool m_isInHideout{};
 
-    bool IsActorInHideout();
-
 public:
     void destroy_particles(const bool& all_particles);
 
