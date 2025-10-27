@@ -50,10 +50,7 @@ static int facetable[6][4] =
 
 void render_rain::init()
 {
-    if (ps_ssfx_gloss_method == 0)
-        rain_factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
-    else
-        rain_factor = g_pGamePersistent->Environment().wetness_factor;
+    rain_factor = g_pGamePersistent->Environment().CurrentEnv.rain_density;
 
     o.active  = ps_r2_ls_flags.test(R3FLAG_DYN_WET_SURF);
     o.active &= rain_factor >= EPS_L;
