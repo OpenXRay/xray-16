@@ -73,7 +73,6 @@ public:
         bool visible; // visible/invisible
         bool pending; // test is still pending
         u16 smap_ID;
-        float distance;
     } vis;
 
     union _xform

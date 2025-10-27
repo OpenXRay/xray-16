@@ -89,10 +89,6 @@ public:
     ref_texture t_noise_mipped;
 
     ref_texture t_base;
-
-    // Anomaly
-    ref_rt rt_Generic_temp;
-
 private:
     // OCCq
     ref_shader s_occq;

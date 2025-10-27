@@ -283,8 +283,6 @@ public:
     float wind_strength_factor{};
     float wind_gust_factor{};
 
-    float wetness_factor{};
-
     // wind blast params
     float wind_blast_strength{};
     Fvector wind_blast_direction{};

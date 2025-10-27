@@ -213,7 +213,6 @@ void CPseudoGigant::on_activate_control(ControlCom::EControlType type)
     }
 }
 
-extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 void CPseudoGigant::on_threaten_execute()
 {
     // разбросить объекты
@@ -239,9 +238,6 @@ void CPseudoGigant::on_threaten_execute()
     pos.set(Position());
     pos.y += 0.1f;
     m_sound_threaten_hit.play_at_pos(this, pos);
-
-    // Interactive Grass FX
-    g_pGamePersistent->GrassBendersAddExplosion(ID(), pos, Fvector().set(0, -99, 0), 1.33f, 5.0f, ps_ssfx_grass_interactive.w, 20);
 
     // играть партиклы
     PlayParticles(m_kick_particles, pos, Direction());

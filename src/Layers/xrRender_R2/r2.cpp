@@ -637,9 +637,12 @@ void CRender::OnFrame()
 
     if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
         return;
-
-    if (Details)
-        g_pGamePersistent->GrassBendersUpdateAnimations();
+    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
+    {
+        // MT-details (@front)
+        Device.seqParallel.insert(
+            Device.seqParallel.begin(), fastdelegate::FastDelegate0<>(Details, &CDetailManager::MT_CALC));
+    }
 }
 
 #ifdef USE_OGL

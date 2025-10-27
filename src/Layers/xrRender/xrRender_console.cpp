@@ -306,6 +306,33 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
 float ps_r2_gloss_factor = 4.0f;
 //- Mad Max
 
+class CCC_ssfx_cascades : public CCC_Vector3
+{
+public:
+    void apply()
+    {
+#if defined(USE_DX10) || defined(USE_DX11)
+        RImplementation.r_sun.init_cascades();
+#endif
+    }
+
+    CCC_ssfx_cascades(LPCSTR N, Fvector3* V, const Fvector3 _min, const Fvector3 _max) : CCC_Vector3(N, V, _min, _max)
+    {
+    };
+
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Vector3::Execute(args);
+        apply();
+    }
+
+    virtual void GetStatus(TStatus& S)
+    {
+        CCC_Vector3::GetStatus(S);
+        apply();
+    }
+};
+
 //AVO: detail draw radius
 class CCC_detail_radius : public CCC_Integer
 {
@@ -793,10 +820,7 @@ void xrRender_initconsole()
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
 
-    // Anomaly
-    CMD4(CCC_Float, "r__exposure", &ps_r2_img_exposure, 0.5f, 4.0f);
-    CMD4(CCC_Float, "r__gamma", &ps_r2_img_gamma, 0.5f, 2.2f);
-    CMD4(CCC_Float, "r__saturation", &ps_r2_img_saturation, 0.0f, 2.0f);
+    Fvector tw_min, tw_max;
 
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);
@@ -1020,17 +1044,5 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     CMD4(CCC_Integer, "r2_mt_render",       &ps_r2_mt_render,    0, 1);
 #endif
-
-    // Screen Space Shaders
-    Fvector4 tw2_min = { -100.f, -100.f, -100.f, -100.f };
-    Fvector4 tw2_max = { 100.f, 100.f, 100.f, 100.f };
-    CMD4(CCC_Integer, "r__screen_space_shaders", &ps_screen_space_shaders, 0, 1);
-    CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4().set(0, 0, 0, 0), Fvector4().set(3, 1, 100, 100));
-    CMD4(CCC_ssfx_cascades, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, Fvector3().set(1.0f, 1.0f, 1.0f), Fvector3().set(300, 300, 300));
-    CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, Fvector4().set(0, 0, 0, 0), Fvector4().set(1, 15, 5000, 1));
-    CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 5, 5, 60));
-    CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, Fvector4().set(0, 0, 0, 0), Fvector4().set(5, 20, 1, 5));
-    CMD4(CCC_Vector4, "ssfx_wpn_dof_1", &ps_ssfx_wpn_dof_1, tw2_min, tw2_max);
-    CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0, 1);
 }
 } // namespace xray::render::RENDER_NAMESPACE
