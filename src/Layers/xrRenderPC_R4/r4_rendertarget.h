@@ -123,12 +123,10 @@ private:
     ref_shader s_accum_volume;
     ref_shader s_accum_volume_msaa[8];
 
-    //Anomaly
-    ref_shader s_blur;
-    ref_shader s_dof;
-    ref_shader s_gasmask_drops;
-    ref_shader s_gasmask_dudv;
-    ref_shader s_nightvision;
+	//Anomaly
+	ref_shader s_blur;	
+	ref_shader s_dof;
+	ref_shader s_nightvision;
 
     //	generate min/max
     ref_shader s_create_minmax_sm;
@@ -289,12 +287,10 @@ public:
     void phase_accumulator(CBackend& cmd_list);
     void phase_vol_accumulator(CBackend& cmd_list);
 
-    //Anomaly renderphases
-    void phase_blur();
-    void phase_dof();
-    void phase_gasmask_drops();
-    void phase_gasmask_dudv();
-    void phase_nightvision();
+	//Anomaly renderphases
+	void phase_blur();
+	void phase_dof();
+	void phase_nightvision();
 
     //	Generates min/max sm
     void create_minmax_SM(CBackend& cmd_list);

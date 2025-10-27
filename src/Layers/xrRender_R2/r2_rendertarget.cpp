@@ -21,11 +21,9 @@
 
 //Anomaly blenders
 #if defined(USE_DX11)
-    #include "Layers/xrRender/blenders/Blender_Blur.h"
-    #include "Layers/xrRender/blenders/blender_dof.h"
-    #include "Layers/xrRender/blenders/blender_nightvision.h"
-    #include "Layers/xrRender/blenders/blender_gasmask_drops.h"
-    #include "Layers/xrRender/blenders/blender_gasmask_dudv.h"
+	#   include "Layers/xrRender/blenders/Blender_Blur.h"
+	#   include "Layers/xrRender/blenders/blender_dof.h"
+	#   include "Layers/xrRender/blenders/blender_nightvision.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -347,12 +345,10 @@ CRenderTarget::CRenderTarget()
         //Base resolution
         u32 w = Device.dwWidth, h = Device.dwHeight;
 
-        //Blenders
-        CBlender_Blur b_blur;
-        CBlender_dof b_dof;
-        CBlender_gasmask_drops b_gasmask_drops;
-        CBlender_gasmask_dudv b_gasmask_dudv;
-        CBlender_nightvision b_nightvision;
+		//Blenders
+		b_blur = xr_new<CBlender_Blur>();
+		b_dof = xr_new<CBlender_dof>();
+		b_nightvision = xr_new<CBlender_nightvision>();
 
         //Rendertargets
         rt_dof.create(r2_RT_dof, w, h, D3DFMT_A8R8G8B8);
@@ -366,13 +362,11 @@ CRenderTarget::CRenderTarget()
         rt_blur_h_8.create(r2_RT_blur_h_8, u32(w / 8), u32(h / 8), D3DFMT_A8R8G8B8);
         rt_blur_8.create(r2_RT_blur_8, u32(w / 8), u32(h / 8), D3DFMT_A8R8G8B8);
 
-        //Shader
-        s_blur.create(&b_blur, "r2\\blur");
-        s_dof.create(&b_dof, "r2\\dof");
-        s_gasmask_drops.create(&b_gasmask_drops, "r2\\gasmask_drops");
-        s_gasmask_dudv.create(&b_gasmask_dudv, "r2\\gasmask_dudv");
-        s_nightvision.create(&b_nightvision, "r2\\nightvision");
-    }
+		//Shader
+		s_blur.create(b_blur, "r2\\blur");
+		s_dof.create(b_dof, "r2\\dof");
+		s_nightvision.create(b_nightvision, "r2\\nightvision");
+	}
 #endif
 
     // OCCLUSION
@@ -793,6 +787,16 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_accum_volumetric_msaa[i]);
         }
     }
+#endif
+
+	//Anomaly blenders
+#if RENDER == R_R4
+	xr_delete(b_blur);
+	xr_delete(b_dof);
+    xr_delete(b_gasmask_drops);
+    xr_delete(b_gasmask_dudv);
+	xr_delete(b_nightvision);
+#endif
 }
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)
