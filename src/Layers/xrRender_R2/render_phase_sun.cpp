@@ -330,20 +330,10 @@ void render_sun::render()
                 dsgraph.cmd_list.set_xform_view(Fidentity);
                 dsgraph.cmd_list.set_xform_project(sun->X.D[cascade_ind].combine);
                 dsgraph.render_graph(0);
-                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) && cascade_ind <= ps_ssfx_grass_shadows.x)
                 {
-                    if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
-                    {
-                        if (cascade_ind <= ps_ssfx_grass_shadows.x)
-                        {
-                            RImplementation.Details->fade_distance = dm_fade * dm_fade * ps_ssfx_grass_shadows.y;
-                            RImplementation.Details->Render(dsgraph.cmd_list);
-                        }
-                    }
-                    else
-                    {
-                        RImplementation.Details->Render(dsgraph.cmd_list);
-                    }
+                    RImplementation.Details->fade_distance = dm_fade * dm_fade * ps_ssfx_grass_shadows.y;
+                    RImplementation.Details->Render(dsgraph.cmd_list);
                 }
                 sun->X.D[cascade_ind].transluent = FALSE;
                 if (bSpecial)

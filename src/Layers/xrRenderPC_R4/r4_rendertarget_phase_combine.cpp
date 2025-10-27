@@ -288,24 +288,21 @@ void CRenderTarget::phase_combine()
 
     RCache.set_Stencil(FALSE);
 
-    if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
+	//(Anomaly) Compute blur textures
+	phase_blur();
+
+	//(Anomaly) Compute depth of field effect
+	if (ps_r2_ls_flags.test(R2FLAG_DOF))
+		phase_dof();
+
+    //(Anomaly) Compute night vision effect
+    if (ps_r2_nightvision > 0)
+        phase_nightvision();
+
+    if (ps_r2_mask_control.x > 0)
     {
-        //(Anomaly) Compute blur textures
-        phase_blur();
-
-        //(Anomaly) Compute depth of field effect
-        if (ps_r2_ls_flags.test(R2FLAG_DOF))
-            phase_dof();
-
-        //(Anomaly) Compute night vision effect
-        if (ps_r2_nightvision > 0)
-            phase_nightvision();
-
-        if (ps_r2_mask_control.x > 0)
-        {
-            phase_gasmask_dudv();
-            phase_gasmask_drops();
-        }
+        phase_gasmask_dudv();
+        phase_gasmask_drops();
     }
 
     // PP enabled ?
