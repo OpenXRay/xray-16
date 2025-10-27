@@ -392,7 +392,9 @@ static cl_entity_data binder_entity_data;
 
 class cl_inv_v : public R_constant_setup
 {
-    Fmatrix result;
+    u32    marker;
+    Fmatrix    result;
+
     void setup(CBackend& cmd_list, R_constant* C) override
     {
         result.invert(Device.mView);
@@ -403,10 +405,14 @@ static cl_inv_v binder_inv_v;
 
 class cl_rain_params : public R_constant_setup
 {
+    u32 marker;
+    Fvector4 result;
+
     void setup(CBackend& cmd_list, R_constant* C) override
     {
         float rainDensity = g_pGamePersistent->Environment().CurrentEnv.rain_density;
         float rainWetness = g_pGamePersistent->Environment().wetness_factor;
+
         cmd_list.set_c(C, rainDensity, rainWetness, 0.0f, 0.0f);
     }
 };
