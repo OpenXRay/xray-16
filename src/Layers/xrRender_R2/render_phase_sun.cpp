@@ -9,7 +9,7 @@ void render_sun::init()
 {
     float fBias = -0.0000025f;
 
-    if (RImplementation.o.new_shader_support)
+    if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
     {
         m_sun_cascades[0].reset_chain = true;
         m_sun_cascades[0].size = ps_ssfx_shadow_cascades.x;
@@ -160,7 +160,7 @@ void render_sun::calculate()
         float map_size = m_sun_cascades[cascade_ind].size;
 #if defined(USE_OGL)
         XRMatrixOrthoOffCenterLH(&mdir_Project, -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
-            map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
+                                   map_size * 0.5f, 0.1f, dist + /*sqrt(2)*/1.41421f * map_size);
 #else
         XMStoreFloat4x4((XMFLOAT4X4*)&mdir_Project, XMMatrixOrthographicOffCenterLH(
             -map_size * 0.5f, map_size * 0.5f, -map_size * 0.5f,
@@ -332,7 +332,7 @@ void render_sun::render()
                 dsgraph.render_graph(0);
                 if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
                 {
-                    if (RImplementation.o.new_shader_support)
+                    if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
                     {
                         if (cascade_ind <= ps_ssfx_grass_shadows.x)
                         {

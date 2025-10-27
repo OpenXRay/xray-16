@@ -288,7 +288,7 @@ void CRenderTarget::phase_combine()
 
     RCache.set_Stencil(FALSE);
 
-    if (RImplementation.o.new_shader_support)
+    if (ps_r2_ls_flags_ext.test(R4FLAGEXT_NEW_SHADER_SUPPORT))
     {
         //(Anomaly) Compute blur textures
         phase_blur();

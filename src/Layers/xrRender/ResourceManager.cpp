@@ -175,7 +175,7 @@ Shader* CResourceManager::_cpp_Create(
     _ParseList(C.L_matrices, s_matrices);
 
 #if defined(USE_DX11)
-    if (RImplementation.hud_loading && RImplementation.o.new_shader_support)
+    if (RImplementation.hud_loading && RImplementation.o.ssfx_hud_raindrops)
     {
         C.HudElement = true;
     }
