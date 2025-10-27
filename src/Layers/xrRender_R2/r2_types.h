@@ -137,16 +137,8 @@ extern float ps_r2_gloss_min;
 
 IC float u_diffuse2s(float x, float y, float z)
 {
-	if (ps_ssfx_gloss_method == 0)
-	{
-		float v = (x + y + z) / 3.f;
-		return ps_r2_gloss_min + ps_r2_gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
-	}
-	else
-	{
-		// Remove sun from the equation and clamp value.
-		return ps_ssfx_gloss_minmax.x + clampr(ps_ssfx_gloss_minmax.y - ps_ssfx_gloss_minmax.x, 0.0f, 1.0f) * ps_ssfx_gloss_factor;
-	}
+    float v = (x + y + z) / 3.f;
+    return ps_r2_gloss_min + ps_r2_gloss_factor * ((v < 1) ? powf(v, 2.f / 3.f) : v);
 }
 
 IC float u_diffuse2s(Fvector3& c)

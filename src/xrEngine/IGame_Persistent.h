@@ -123,10 +123,10 @@ public:
     } grass_shader_data{};
 
     u32 m_last_ray_pick_time{};
+
     bool m_isInHideout{};
-    bool IsActorInHideout() const;
-    void UpdateHudRaindrops() const;
-    void UpdateRainGloss() const;
+
+    bool IsActorInHideout();
 
 public:
     void destroy_particles(const bool& all_particles);
@@ -264,8 +264,6 @@ extern ENGINE_API Fvector4 ps_dev_param_8;
 // Ascii's shaders
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
 extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1_cfg;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2_cfg;
 extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
 extern ENGINE_API Fvector4 ps_ssfx_rain_1;
 extern ENGINE_API Fvector4 ps_ssfx_rain_2;
@@ -275,15 +273,6 @@ extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
 extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
 extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
-
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
-extern ENGINE_API float ps_ssfx_gloss_factor;
-extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
-extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
-
-extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
-extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 extern ENGINE_API IGame_Persistent* g_pGamePersistent;
 #endif // IGame_PersistentH

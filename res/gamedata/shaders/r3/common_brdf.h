@@ -17,8 +17,8 @@
 #define MAT_FLORA_ELIPSON 0.04f
 
 // Simple subsurface scattering
-float3 SSS(float3 N, float3 V, float3 L)
+float SSS(float3 N, float3 V, float3 L)
 {
-	float S = saturate(dot(V, -(L + N))) * ssfx_florafixes_2.x;
-	return S * lerp(float3(1.0f, 1.0f, 1.0f), L_sun_color.rgb, ssfx_florafixes_2.y);
+	float S = saturate(dot(V, -(L + N))) * G_SSS_INTENSITY;
+	return S;
 }

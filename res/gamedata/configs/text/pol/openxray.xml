@@ -93,52 +93,10 @@
 	<string id="ui_mm_fps_limit_in_menu">
 		<text>Limit FPS w menu</text>
 	</string>
-	<string id="ui_mm_shader_preset">
-		<text>Tryb graficzny</text>
-	</string>
-	<string id="ui_mm_shader_preset_vanilla">
-		<text>Vanilla</text>
-	</string>
-	<string id="ui_mm_shader_preset_enhanced_default">
-		<text>Rozszerzany (Domyœlny)</text>
-	</string>
-	<string id="ui_mm_shader_preset_enhanced_high">
-		<text>Rozszerzany (Wysoki)</text>
-	</string>
-	<string id="ui_mm_color_grading_preset">
-		<text>Kolorystyka</text>
-	</string>
-	<string id="ui_mm_color_grading_default">
-		<text>Domyœlna</text>
-	</string>
-	<string id="ui_mm_color_grading_cold">
-		<text>Ch³odna</text>
-	</string>
-	<string id="ui_mm_color_grading_filmic_01">
-		<text>Filmic 1</text>
-	</string>
-	<string id="ui_mm_color_grading_filmic_02">
-		<text>Filmic 2</text>
-	</string>
-	<string id="ui_mm_color_grading_filmic_03">
-		<text>Filmic 3</text>
-	</string>
-	<string id="ui_mm_color_grading_hollywood">
-		<text>Hollywood</text>
-	</string>
-	<string id="ui_mm_color_grading_vanilla">
-		<text>Vanilla</text>
-	</string>
-	<string id="ui_mm_color_grading_vibrant">
-		<text>Vibrant</text>
-	</string>
-	<string id="ui_mm_color_grading_warm">
-		<text>Ciep³a</text>
-	</string>
-	<string id="cze">
-    	<text>Czeski (Czech)</text>
-	</string>
-	<string id="eng">
+  <string id="cze">
+    <text>Czeski (Czech)</text>
+  </string
+  <string id="eng">
 		<text>Angielski (English)</text>
 	</string>
 	<string id="fra">

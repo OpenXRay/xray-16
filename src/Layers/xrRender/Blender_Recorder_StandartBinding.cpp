@@ -556,69 +556,6 @@ class ssfx_hud_drops_2 : public R_constant_setup
 };
 static ssfx_hud_drops_2 binder_ssfx_hud_drops_2;
 
-class ssfx_lightsetup_1 : public R_constant_setup
-{
-    void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, ps_ssfx_lightsetup_1);
-	}
-};
-static ssfx_lightsetup_1 binder_ssfx_lightsetup_1;
-
-class ssfx_is_underground : public R_constant_setup
-{
-	void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, (float)ps_ssfx_is_underground, 0.f, 0.f, 0.f);
-	}
-};
-static ssfx_is_underground binder_ssfx_is_underground;
-
-class ssfx_wetsurfaces_1 : public R_constant_setup
-{
-	void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, ps_ssfx_wetsurfaces_1);
-	}
-};
-static ssfx_wetsurfaces_1 binder_ssfx_wetsurfaces_1;
-
-class ssfx_wetsurfaces_2 : public R_constant_setup
-{
-	void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, ps_ssfx_wetsurfaces_2);
-	}
-};
-static ssfx_wetsurfaces_2 binder_ssfx_wetsurfaces_2;
-
-class ssfx_gloss : public R_constant_setup
-{
-	void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, ps_ssfx_gloss_minmax.x, ps_ssfx_gloss_minmax.y, ps_ssfx_gloss_factor, 0.f);
-	}
-};
-static ssfx_gloss binder_ssfx_gloss;
-
-class ssfx_florafixes_1 : public R_constant_setup
-{
-	void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, ps_ssfx_florafixes_1);
-	}
-};
-static ssfx_florafixes_1 binder_ssfx_florafixes_1;
-
-class ssfx_florafixes_2 : public R_constant_setup
-{
-	void setup(CBackend& cmd_list, R_constant* C) override
-	{
-		cmd_list.set_c(C, ps_ssfx_florafixes_2);
-	}
-};
-static ssfx_florafixes_2 binder_ssfx_florafixes_2;
-
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
@@ -721,12 +658,5 @@ void CBlender_Compile::SetMapping()
     r_Constant("ssfx_blood_decals", &binder_ssfx_blood_decals);
     r_Constant("ssfx_hud_drops_1", &binder_ssfx_hud_drops_1);
     r_Constant("ssfx_hud_drops_2", &binder_ssfx_hud_drops_2);
-	r_Constant("ssfx_lightsetup_1", &binder_ssfx_lightsetup_1);
-	r_Constant("ssfx_is_underground", &binder_ssfx_is_underground);
-	r_Constant("ssfx_wetsurfaces_1", &binder_ssfx_wetsurfaces_1);
-	r_Constant("ssfx_wetsurfaces_2", &binder_ssfx_wetsurfaces_2);
-	r_Constant("ssfx_gloss", &binder_ssfx_gloss);
-	r_Constant("ssfx_florafixes_1", &binder_ssfx_florafixes_1);
-	r_Constant("ssfx_florafixes_2", &binder_ssfx_florafixes_2);
 }
 } // namespace xray::render::RENDER_NAMESPACE
