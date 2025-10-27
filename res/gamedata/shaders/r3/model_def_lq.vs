@@ -1,7 +1,5 @@
 #include "common.h"
 #include "skin.h"
-#include "screenspace_fog.h"
-
 /*
 struct vf
 {
@@ -32,7 +30,6 @@ v2p _main(v_model v)
 	o.tc0		= v.tc.xy;					// copy tc
 	o.c0 		= calc_model_lq_lighting( norm_w );
 	o.fog 		= saturate(calc_fogging( float4( pos_w, 1 ) ));	// fog, input in world coords
-	o.fog		= SSFX_FOGGING(1.0 - o.fog, pos.y);	// Add SSFX Fog
 
 	return o;
 }
