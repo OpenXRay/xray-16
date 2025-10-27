@@ -406,3 +406,4 @@ void render_sun::accumulate_cascade(u32 cascade_ind)
     dsgraph.cmd_list.submit(); // TODO: move into release (rename to submit?)
     RImplementation.release_context(dsgraph.context_id);
 }
+}

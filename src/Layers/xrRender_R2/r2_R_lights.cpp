@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+namespace xray::render::RENDER_NAMESPACE
+{
 void CRender::render_lights(light_Package& LP)
 {
     ZoneScoped;

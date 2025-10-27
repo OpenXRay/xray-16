@@ -8,31 +8,6 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
-// Ascii1457's Screen Space Shaders
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
-extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
-extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
-extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
-extern ENGINE_API float ps_ssfx_gloss_factor;
-extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
-extern ENGINE_API int ps_ssfx_is_underground;
-extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
-
-//Sneaky debug stuff
-extern ENGINE_API Fvector4 ps_dev_param_1;
-extern ENGINE_API Fvector4 ps_dev_param_2;
-extern ENGINE_API Fvector4 ps_dev_param_3;
-extern ENGINE_API Fvector4 ps_dev_param_4;
-extern ENGINE_API Fvector4 ps_dev_param_5;
-extern ENGINE_API Fvector4 ps_dev_param_6;
-extern ENGINE_API Fvector4 ps_dev_param_7;
-extern ENGINE_API Fvector4 ps_dev_param_8;
-
 namespace xray::render::RENDER_NAMESPACE
 {
 // matrices

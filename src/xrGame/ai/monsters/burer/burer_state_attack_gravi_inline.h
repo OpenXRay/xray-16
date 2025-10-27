@@ -88,10 +88,6 @@ void CStateBurerAttackGravi<Object>::execute()
         this->object->StopGraviPrepare();
         this->object->sound().play(CBurer::eMonsterSoundGraviAttack);
 
-        // Interactive Grass FX
-        g_pGamePersistent->GrassBendersAddExplosion(this->object->ID(), from_pos, this->object->Direction(),
-            1.33f, 3.0f, ps_ssfx_grass_interactive.w, 13.0f);
-
         m_action = ACTION_WAIT_ANIM_END;
         break;
     }

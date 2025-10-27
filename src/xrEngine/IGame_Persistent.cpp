@@ -58,7 +58,6 @@ IGame_Persistent::~IGame_Persistent()
     Engine.Event.Handler_Detach(eStart, this);
     Engine.Event.Handler_Detach(eStartMPDemo, this);
 
-    xr_delete(PerlinNoise1D);
 #ifndef _EDITOR
     xr_delete(pEnvironment);
 #endif

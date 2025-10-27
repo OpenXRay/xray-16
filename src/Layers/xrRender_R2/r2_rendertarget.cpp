@@ -19,6 +19,8 @@
 #    include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
 #endif
 
+extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)
@@ -748,14 +750,6 @@ CRenderTarget::~CRenderTarget()
             xr_delete(b_accum_volumetric_msaa[i]);
         }
     }
-#endif
-
-	//Anomaly blenders
-#if RENDER == R_R4
-	xr_delete(b_blur);
-	xr_delete(b_dof);
-	xr_delete(b_nightvision);
-#endif
 }
 
 void CRenderTarget::reset_light_marker(CBackend& cmd_list, bool bResetStencil)

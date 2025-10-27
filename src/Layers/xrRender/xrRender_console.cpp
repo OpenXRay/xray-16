@@ -22,50 +22,9 @@
 #   endif // MASTER_GOLD
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
-// Anomaly
-extern ENGINE_API float ps_r2_img_exposure; // r2-only
-extern ENGINE_API float ps_r2_img_gamma; // r2-only
-extern ENGINE_API float ps_r2_img_saturation; // r2-only
-extern ENGINE_API Fvector ps_r2_img_cg; // r2-only
-extern ENGINE_API Fvector4 ps_r2_mask_control; // r2-only
-extern ENGINE_API Fvector ps_r2_drops_control; // r2-only
-extern ENGINE_API int ps_r2_nightvision;
-
-// Ascii1457's Screen Space Shaders
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_1_cfg;
-extern ENGINE_API Fvector4 ps_ssfx_hud_drops_2_cfg;
-extern ENGINE_API Fvector4 ps_ssfx_blood_decals;
-extern ENGINE_API Fvector4 ps_ssfx_rain_1;
-extern ENGINE_API Fvector4 ps_ssfx_rain_2;
-extern ENGINE_API Fvector4 ps_ssfx_rain_3;
-extern ENGINE_API Fvector3 ps_ssfx_shadow_cascades;
-extern ENGINE_API Fvector4 ps_ssfx_grass_shadows;
-extern ENGINE_API Fvector4 ps_ssfx_grass_interactive;
-extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_1;
-extern ENGINE_API Fvector4 ps_ssfx_int_grass_params_2;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_1;
-extern ENGINE_API Fvector4 ps_ssfx_wpn_dof_2;
-extern ENGINE_API Fvector4 ps_ssfx_florafixes_1;
-extern ENGINE_API Fvector4 ps_ssfx_florafixes_2;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_1;
-extern ENGINE_API Fvector4 ps_ssfx_wetsurfaces_2;
-extern ENGINE_API int ps_ssfx_is_underground;
-extern ENGINE_API int ps_ssfx_gloss_method;
-extern ENGINE_API float ps_ssfx_gloss_factor;
-extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
-extern ENGINE_API Fvector4 ps_ssfx_lightsetup_1;
-
-//debug
-extern ENGINE_API Fvector4 ps_dev_param_1;
-extern ENGINE_API Fvector4 ps_dev_param_2;
-extern ENGINE_API Fvector4 ps_dev_param_3;
-extern ENGINE_API Fvector4 ps_dev_param_4;
-extern ENGINE_API Fvector4 ps_dev_param_5;
-extern ENGINE_API Fvector4 ps_dev_param_6;
-extern ENGINE_API Fvector4 ps_dev_param_7;
-extern ENGINE_API Fvector4 ps_dev_param_8;
+extern ENGINE_API float ps_r3_dyn_wet_surf_near; // 10.0f
+extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
+extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -305,33 +264,6 @@ xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
 //- Mad Max
 float ps_r2_gloss_factor = 4.0f;
 //- Mad Max
-
-class CCC_ssfx_cascades : public CCC_Vector3
-{
-public:
-    void apply()
-    {
-#if defined(USE_DX10) || defined(USE_DX11)
-        RImplementation.r_sun.init_cascades();
-#endif
-    }
-
-    CCC_ssfx_cascades(LPCSTR N, Fvector3* V, const Fvector3 _min, const Fvector3 _max) : CCC_Vector3(N, V, _min, _max)
-    {
-    };
-
-    virtual void Execute(LPCSTR args)
-    {
-        CCC_Vector3::Execute(args);
-        apply();
-    }
-
-    virtual void GetStatus(TStatus& S)
-    {
-        CCC_Vector3::GetStatus(S);
-        apply();
-    }
-};
 
 //AVO: detail draw radius
 class CCC_detail_radius : public CCC_Integer
@@ -819,8 +751,6 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
-
-    Fvector tw_min, tw_max;
 
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 0.1f, 2.f);
     //CMD4(CCC_Float, "r__geometry_lod_pow", &ps_r__LOD_Power, 0, 2);

@@ -458,3 +458,4 @@ void CDetailManager::DispatchMTCalc()
         UpdateVisibleM();
     });
 }
+}

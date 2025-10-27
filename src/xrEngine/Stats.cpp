@@ -27,6 +27,8 @@ ENGINE_API CStatTimer gTestTimer3;
 //////////////////////////////////////////////////////////////////////
 ENGINE_API bool g_bDisableRedText = false;
 int g_bShowRedText = 1;
+ENGINE_API int ps_disable_lens_flare = 0;
+
 CStats::CStats()
 {
     statsFont = nullptr;

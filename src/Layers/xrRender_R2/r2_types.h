@@ -1,9 +1,5 @@
 #pragma once
 
-extern ENGINE_API int ps_ssfx_gloss_method;
-extern ENGINE_API float ps_ssfx_gloss_factor;
-extern ENGINE_API Fvector3 ps_ssfx_gloss_minmax;
-
 namespace xray::render::RENDER_NAMESPACE
 {
 // Base targets
