@@ -1079,11 +1079,13 @@ void xrRender_initconsole()
 #endif
 
     // Detail Manager debug
+#if defined(USE_DX11)
     CMD4(CCC_Integer, "dm_debug_trails", &dm_debug_trails, 0, 1);
-#if defined(USE_DX11) && !defined(MASTER_GOLD)
+#if !defined(MASTER_GOLD)
     CMD1(CCC_TestComputeVector, "test_compute_vector");
     CMD1(CCC_TestComputeMatrices, "test_compute_matrices");
     CMD1(CCC_TestComputeSIMD, "test_compute_simd");
+#endif
 #endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -368,6 +368,17 @@ class cl_entity_data : public R_constant_setup //--#SM+#--
 };
 static cl_entity_data binder_entity_data;
 
+class cl_dm_debug_trails_binder : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+#ifdef USE_DX11
+        cmd_list.set_c(C, Fvector4((float)dm_debug_trails, 0.f, 0.f, 0.f));
+#endif
+    }
+};
+static cl_dm_debug_trails_binder dm_debug_trails_binder;
+
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
