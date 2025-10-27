@@ -23,6 +23,5 @@ private:
     // Visualization	(drops)
     IRender_DetailModel* DM_Drop;
     ref_geom hGeom_Drops;
-    ref_shader SH_Splash;
 };
 } // namespace xray::render::RENDER_NAMESPACE
