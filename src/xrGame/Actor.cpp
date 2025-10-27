@@ -1328,7 +1328,6 @@ void CActor::UpdateCL()
     if (psActorFlags.test(AF_MULTI_ITEM_PICKUP))
         m_bPickupMode = false;
 
-    UpdateHudRainDrops();
     UpdateVisorRainDrops();
     UpdateVisor();
 }
