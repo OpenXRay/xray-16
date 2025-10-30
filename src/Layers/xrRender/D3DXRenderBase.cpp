@@ -75,6 +75,17 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
 void D3DXRenderBase::Destroy()
 {
+#if defined(USE_DX11) && RENDER >= R_R4
+    // Cleanup NVRHI before destroying D3D11 device
+    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+    if (render.m_nvrhiDevice)
+    {
+        render.m_nvrhiDevice->Shutdown();
+        xr_delete(render.m_nvrhiDevice);
+        render.m_nvrhiDevice = nullptr;
+    }
+#endif
+
     xr_delete(Resources);
     HW.DestroyDevice();
 }
@@ -207,6 +218,25 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
 #endif
 
     HW.CreateDevice(hWnd);
+
+#if defined(USE_DX11) && RENDER >= R_R4
+    // Initialize NVRHI wrapper after D3D11 device creation
+    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+    render.m_nvrhiDevice = xr_new<xray::render::r4::nvrhi_wrapper::NVRHIDevice>();
+
+    const bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
+
+    if (!nvrhiSuccess)
+    {
+        Msg("! [CRender] NVRHI initialization failed - modern rendering path disabled");
+        xr_delete(render.m_nvrhiDevice);
+        render.m_nvrhiDevice = nullptr;
+    }
+    else
+    {
+        Msg("~ [CRender] NVRHI initialized - modern rendering path available");
+    }
+#endif
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
 

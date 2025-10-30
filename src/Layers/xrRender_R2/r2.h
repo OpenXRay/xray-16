@@ -23,6 +23,11 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
+namespace xray::render::r4::nvrhi_wrapper
+{
+class NVRHIDevice;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class CRenderTarget;
@@ -528,6 +533,12 @@ private:
 #endif
 
     IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
+
+#if defined(USE_DX11) && RENDER >= R_R4
+    // NVRHI integration (R4+ only)
+    xray::render::r4::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
+    bool m_nvrhiTestMode{ false };
+#endif
 };
 
 extern CRender RImplementation;
