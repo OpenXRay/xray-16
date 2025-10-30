@@ -15,6 +15,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     stdafx.cpp
     stdafx.h
     xrRender_R4.cpp
+
+    # NVRHI wrapper
+    NVRHI/NVRHIDevice.h
+    NVRHI/NVRHIDevice.cpp
 )
 
 target_include_directories(xrRenderPC_R4
