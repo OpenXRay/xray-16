@@ -28,3 +28,6 @@
 [submodule "Externals/sse2rvv"]
 	path = Externals/sse2rvv
 	url = https://github.com/pattonkan/sse2rvv.git
+[submodule "Externals/nvrhi"]
+	path = Externals/nvrhi
+	url = https://github.com/NVIDIAGameWorks/nvrhi.git
