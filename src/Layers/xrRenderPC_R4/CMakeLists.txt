@@ -21,6 +21,7 @@ target_include_directories(xrRenderPC_R4
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
 )
 
 target_link_libraries(xrRenderPC_R4
@@ -32,6 +33,8 @@ target_link_libraries(xrRenderPC_R4
     xrScriptEngine
     xrAPI
     xrMiscMath
+    nvrhi
+    nvrhi-d3d11
 )
 
 target_compile_definitions(xrRenderPC_R4
