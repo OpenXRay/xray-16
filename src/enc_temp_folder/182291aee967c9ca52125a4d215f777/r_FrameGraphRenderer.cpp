@@ -230,24 +230,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        // Get mesh interface based on visual type
-        // IRender_Mesh is not polymorphic, so we must cast to concrete types
-        IRender_Mesh* meshVisual = nullptr;
-
-        switch (visual->getType()) {
-            case MT_NORMAL:           // Static mesh
-                meshVisual = static_cast<Fvisual*>(visual);
-                break;
-            case MT_TREE_ST:          // SpeedTree static
-            case MT_TREE_PM:          // SpeedTree progressive mesh
-                meshVisual = static_cast<FTreeVisual*>(visual);
-                break;
-            // MT_HIERRARHY, MT_SKELETON_*, MT_PARTICLE_GROUP, MT_LOD don't have direct mesh data
-            default:
-                notFvisual++;
-                continue;
-        }
-
+        // Cast to IRender_Mesh to access geometry (works for all mesh types: Fvisual, FTreeVisual, etc)
+        IRender_Mesh* meshVisual = dynamic_cast<IRender_Mesh*>(visual);
         if (!meshVisual) {
             notFvisual++;
             continue;
