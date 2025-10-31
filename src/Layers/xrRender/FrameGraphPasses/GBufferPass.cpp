@@ -30,19 +30,31 @@ bool GBufferPass::LoadShaders()
 {
     ShaderLoader loader(m_device);
 
-    m_vertexShader = loader.LoadVertexShader("gbuffer");
-    if (!m_vertexShader)
+    m_vertexShaderNative = loader.LoadVertexShader("gbuffer");
+    if (!m_vertexShaderNative)
     {
         Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
         return false;
     }
 
-    m_pixelShader = loader.LoadPixelShader("gbuffer");
-    if (!m_pixelShader)
+    m_pixelShaderNative = loader.LoadPixelShader("gbuffer");
+    if (!m_pixelShaderNative)
     {
         Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
         return false;
     }
+
+    m_vertexShader = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Vertex,
+        m_vertexShaderNative,
+        "gbuffer.vs"
+    );
+
+    m_pixelShader = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Pixel,
+        m_pixelShaderNative,
+        "gbuffer.ps"
+    );
 
     Msg("  ✓ G-Buffer shaders loaded successfully");
     return true;
@@ -53,53 +65,50 @@ bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph
     VERIFY(m_vertexShader != nullptr);
     VERIFY(m_pixelShader != nullptr);
 
-    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    ng::PipelineStateDesc psoDesc;
 
-    pipelineDesc.VS = m_vertexShader;
-    pipelineDesc.PS = m_pixelShader;
+    psoDesc.vertexShader = m_vertexShader.get();
+    psoDesc.pixelShader = m_pixelShader.get();
 
-    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-    nvrhi::VertexAttributeDesc attributes[] = {
-        { "POSITION",  0, nvrhi::Format::RGB32_FLOAT, 0, 0, false },
-        { "NORMAL",    0, nvrhi::Format::RGB32_FLOAT, 0, 12, false },
-        { "TEXCOORD",  0, nvrhi::Format::RG32_FLOAT,  0, 24, false },
-        { "TANGENT",   0, nvrhi::Format::RGB32_FLOAT, 0, 32, false },
-        { "BINORMAL",  0, nvrhi::Format::RGB32_FLOAT, 0, 44, false },
+    psoDesc.vertexAttributes = {
+        { "POSITION", 0, nvrhi::Format::RGB32_FLOAT, 0,  0, false },
+        { "NORMAL",   0, nvrhi::Format::RGB32_FLOAT, 0, 12, false },
+        { "TEXCOORD", 0, nvrhi::Format::RG32_FLOAT,  0, 24, false },
+        { "TANGENT",  0, nvrhi::Format::RGB32_FLOAT, 0, 32, false },
+        { "BINORMAL", 0, nvrhi::Format::RGB32_FLOAT, 0, 44, false },
     };
 
-    pipelineDesc.inputLayout = attributes;
+    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 
-    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
-    rasterState.cullMode = nvrhi::RasterCullMode::Back;
-    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
-    rasterState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
+    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
 
-    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
     for (int i = 0; i < 3; ++i)
     {
-        blendState.targets[i].enableBlend = false;
-        blendState.targets[i].colorWriteMask = nvrhi::ColorMask::All;
+        psoDesc.blendState.renderTargets[i].blendEnable = false;
+        psoDesc.blendState.renderTargets[i].writeMask = ng::ColorWriteMask::All;
     }
 
-    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
-    depthState.depthTestEnable = true;
-    depthState.depthWriteEnable = true;
-    depthState.depthFunc = nvrhi::ComparisonFunc::Less;
-    depthState.stencilEnable = false;
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthWriteEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+    psoDesc.depthStencilState.stencilEnable = false;
 
     nvrhi::ITexture* albedo = fg.GetPhysicalTexture(outputs.albedo);
     nvrhi::ITexture* normal = fg.GetPhysicalTexture(outputs.normal);
     nvrhi::ITexture* material = fg.GetPhysicalTexture(outputs.material);
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(outputs.depth);
 
-    pipelineDesc.renderState.targetCount = 3;
-    pipelineDesc.renderState.renderTargetFormats[0] = albedo->getDesc().format;
-    pipelineDesc.renderState.renderTargetFormats[1] = normal->getDesc().format;
-    pipelineDesc.renderState.renderTargetFormats[2] = material->getDesc().format;
-    pipelineDesc.renderState.depthStencilFormat = depth->getDesc().format;
+    psoDesc.renderTargetFormats[0] = albedo->getDesc().format;
+    psoDesc.renderTargetFormats[1] = normal->getDesc().format;
+    psoDesc.renderTargetFormats[2] = material->getDesc().format;
+    psoDesc.depthStencilFormat = depth->getDesc().format;
+    psoDesc.renderTargetCount = 3;
 
-    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+    psoDesc.debugName = "GBufferPass";
+
+    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {
