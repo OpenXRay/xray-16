@@ -143,6 +143,14 @@ void FrameGraph::Compile() {
 
     Msg("~ [FrameGraph] Compiling graph...");
 
+    BuildDependencyGraph();
+
+    TopologicalSort();
+
+    CullUnusedPasses();
+
+    ComputeResourceLifetimes();
+
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
     m_stats.numResources = static_cast<u32>(m_resources.size());
@@ -250,15 +258,212 @@ bool FrameGraph::HasCyclicDependency() const {
 }
 
 void FrameGraph::BuildDependencyGraph() {
+    for (auto& pass : m_passes) {
+        pass.dependsOn.clear();
+        pass.dependents.clear();
+    }
+
+    xr_map<u32, PassNode*> lastWriter;
+
+    for (auto& pass : m_passes) {
+        xr_vector<VirtualResourceHandle> readResources;
+        pass.GetReadResources(readResources);
+
+        for (const auto& resource : readResources) {
+            auto it = lastWriter.find(resource.index);
+            if (it != lastWriter.end()) {
+                PassNode* producer = it->second;
+
+                if (!pass.DependsOn(producer)) {
+                    pass.dependsOn.push_back(producer);
+                    producer->dependents.push_back(&pass);
+                }
+            }
+        }
+
+        xr_vector<VirtualResourceHandle> writeResources;
+        pass.GetWriteResources(writeResources);
+
+        for (const auto& resource : writeResources) {
+            lastWriter[resource.index] = &pass;
+        }
+    }
+
+    Msg("~ [FrameGraph] Built dependency graph: %u passes, %u edges",
+        m_passes.size(),
+        [this]() {
+            u32 edgeCount = 0;
+            for (const auto& pass : m_passes) {
+                edgeCount += static_cast<u32>(pass.dependsOn.size());
+            }
+            return edgeCount;
+        }());
 }
 
 void FrameGraph::TopologicalSort() {
+    m_sortedPasses.clear();
+    m_sortedPasses.reserve(m_passes.size());
+
+    xr_map<PassNode*, u32> inDegree;
+    for (auto& pass : m_passes) {
+        inDegree[&pass] = static_cast<u32>(pass.dependsOn.size());
+    }
+
+    xr_vector<PassNode*> queue;
+    for (auto& pass : m_passes) {
+        if (inDegree[&pass] == 0) {
+            queue.push_back(&pass);
+        }
+    }
+
+    u32 executionOrder = 0;
+    while (!queue.empty()) {
+        PassNode* current = queue.back();
+        queue.pop_back();
+
+        current->executionOrder = executionOrder++;
+        m_sortedPasses.push_back(current);
+
+        for (PassNode* dependent : current->dependents) {
+            inDegree[dependent]--;
+
+            if (inDegree[dependent] == 0) {
+                queue.push_back(dependent);
+            }
+        }
+    }
+
+    if (m_sortedPasses.size() != m_passes.size()) {
+        Msg("! [FrameGraph] Cycle detected in dependency graph!");
+        Msg("! [FrameGraph] Processed %u/%u passes",
+            m_sortedPasses.size(), m_passes.size());
+
+        for (auto& pass : m_passes) {
+            if (pass.executionOrder == INVALID_INDEX) {
+                Msg("! [FrameGraph]   Pass in cycle: %s", pass.name.c_str());
+            }
+        }
+
+        VERIFY2(false, "FrameGraph has cyclic dependencies");
+    }
+
+    Msg("~ [FrameGraph] Topological sort complete: %u passes ordered",
+        m_sortedPasses.size());
 }
 
 void FrameGraph::CullUnusedPasses() {
+    for (auto& pass : m_passes) {
+        pass.culled = true;
+    }
+
+    xr_vector<PassNode*> terminalPasses;
+
+    for (auto& pass : m_passes) {
+        for (const auto& access : pass.resourceAccesses) {
+            if (access.IsWrite()) {
+                const ResourceNode* resource = GetResourceNode(access.resource);
+                if (resource && (resource->desc.isImported || resource->isPersistent)) {
+                    terminalPasses.push_back(&pass);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (terminalPasses.empty()) {
+        Msg("~ [FrameGraph] No terminal passes found - keeping all passes");
+        for (auto& pass : m_passes) {
+            pass.culled = false;
+        }
+        return;
+    }
+
+    xr_vector<PassNode*> queue = terminalPasses;
+
+    while (!queue.empty()) {
+        PassNode* current = queue.back();
+        queue.pop_back();
+
+        if (current->culled) {
+            current->culled = false;
+
+            for (PassNode* dependency : current->dependsOn) {
+                if (dependency->culled) {
+                    queue.push_back(dependency);
+                }
+            }
+        }
+    }
+
+    u32 culledCount = 0;
+    for (const auto& pass : m_passes) {
+        if (pass.culled) {
+            culledCount++;
+            Msg("~ [FrameGraph] Culling unused pass: %s", pass.name.c_str());
+        }
+    }
+
+    auto it = std::remove_if(m_sortedPasses.begin(), m_sortedPasses.end(),
+        [](const PassNode* pass) { return pass->culled; });
+    m_sortedPasses.erase(it, m_sortedPasses.end());
+
+    m_stats.numCulledPasses = culledCount;
+
+    Msg("~ [FrameGraph] Pass culling complete: %u/%u passes culled",
+        culledCount, m_passes.size());
 }
 
 void FrameGraph::ComputeResourceLifetimes() {
+    for (auto& resource : m_resources) {
+        resource.firstUsedPass = INVALID_INDEX;
+        resource.lastUsedPass = INVALID_INDEX;
+        resource.refCount = 0;
+    }
+
+    for (const PassNode* pass : m_sortedPasses) {
+        if (pass->culled) continue;
+
+        u32 passIndex = pass->executionOrder;
+
+        for (const auto& access : pass->resourceAccesses) {
+            if (!access.resource.is_valid()) continue;
+
+            ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) continue;
+
+            if (resource->firstUsedPass == INVALID_INDEX) {
+                resource->firstUsedPass = passIndex;
+            }
+
+            resource->lastUsedPass = passIndex;
+
+            resource->refCount++;
+        }
+    }
+
+    u32 unusedCount = 0;
+    for (const auto& resource : m_resources) {
+        if (resource.firstUsedPass == INVALID_INDEX) {
+            unusedCount++;
+            if (resource.desc.debugName.size() > 0) {
+                Msg("~ [FrameGraph] Unused resource: %s", resource.desc.debugName.c_str());
+            }
+        } else {
+            u32 lifetime = resource.GetLifetimeSpan();
+            const char* name = (resource.desc.debugName.size() > 0) ? resource.desc.debugName.c_str() : "<unnamed>";
+            Msg("~ [FrameGraph] Resource '%s': passes [%u-%u], lifetime=%u, refs=%u",
+                name,
+                resource.firstUsedPass,
+                resource.lastUsedPass,
+                lifetime,
+                resource.refCount);
+        }
+    }
+
+    m_stats.numCulledResources = unusedCount;
+
+    Msg("~ [FrameGraph] Resource lifetime computation complete: %u/%u resources unused",
+        unusedCount, m_resources.size());
 }
 
 void FrameGraph::AllocateResources() {
