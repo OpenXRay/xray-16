@@ -1,10 +1,14 @@
 // xrRender/r_FrameGraphRenderer.cpp
 #include "stdafx.h"
 #include "r_FrameGraphRenderer.h"
+#include "FBasicVisual.h"
 #include "FVisual.h"
 #include "Shader.h"
 
 namespace xray::render {
+
+using namespace RENDER_NAMESPACE;
+
 
 FrameGraphRenderer::FrameGraphRenderer() {
     Msg("* [FrameGraphRenderer] Created");
