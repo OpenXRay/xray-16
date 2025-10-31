@@ -203,7 +203,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 submittedCount = 0;
     u32 notRenderable = 0;
     u32 noVisual = 0;
-    u32 wrongType = 0;
     u32 notFvisual = 0;
     u32 noGeometry = 0;
     u32 noBuffers = 0;
@@ -231,14 +230,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        // Only handle simple mesh visuals for now (type MT_NORMAL)
-        if (visual->getType() != MT_NORMAL) {
-            wrongType++;
-            continue;
-        }
-
-        // Cast to Fvisual to access geometry
-        Fvisual* meshVisual = dynamic_cast<Fvisual*>(visual);
+        // Cast to IRender_Mesh to access geometry (works for all mesh types)
+        IRender_Mesh* meshVisual = dynamic_cast<IRender_Mesh*>(visual);
         if (!meshVisual) {
             notFvisual++;
             continue;
@@ -322,8 +315,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         submittedCount++;
     }
 
-    Msg("  [FrameGraph] Filtering: %u not renderable, %u no visual, %u wrong type, %u not Fvisual, %u no geom, %u no buffers",
-        notRenderable, noVisual, wrongType, notFvisual, noGeometry, noBuffers);
+    Msg("  [FrameGraph] Filtering: %u not renderable, %u no visual, %u not Fvisual, %u no geom, %u no buffers",
+        notRenderable, noVisual, notFvisual, noGeometry, noBuffers);
     Msg("  [FrameGraph] Submitted %u/%u objects to collector",
         submittedCount, (u32)spatialObjects.size());
 }
