@@ -170,7 +170,13 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(renderable->renderable_ROS());
+        IRenderVisual* iVisual = renderable->GetRenderData().visual;
+        if (!iVisual) {
+            noVisual++;
+            continue;
+        }
+
+        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(iVisual);
         if (!visual) {
             noVisual++;
             continue;
