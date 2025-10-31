@@ -206,26 +206,32 @@ MaterialPSO* MaterialCache::CreatePSO(
     Msg("  Created VS/PS shaders from bytecode");
 
     // ═══════════════════════════════════════════════════════
-    //  WRAP SHADERS IN RCSHADER OBJECTS
+    //  GET RCSHADER OBJECTS FROM HANDLES
     // ═══════════════════════════════════════════════════════
 
-    auto rcVS = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        vsHandle,
-        pso->vertexShader->cName.c_str());
+    ng::RCShader* rcVS = m_device->GetShader(vsHandle);
+    if (!rcVS) {
+        Msg("! [MaterialCache] Failed to get VS from handle");
+        m_device->DestroyShader(vsHandle);
+        m_device->DestroyShader(psHandle);
+        return nullptr;
+    }
 
-    auto rcPS = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        psHandle,
-        pso->pixelShader->cName.c_str());
+    ng::RCShader* rcPS = m_device->GetShader(psHandle);
+    if (!rcPS) {
+        Msg("! [MaterialCache] Failed to get PS from handle");
+        m_device->DestroyShader(vsHandle);
+        m_device->DestroyShader(psHandle);
+        return nullptr;
+    }
 
     // ═══════════════════════════════════════════════════════
     //  BUILD PIPELINE STATE DESCRIPTOR
     // ═══════════════════════════════════════════════════════
 
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = rcVS.get();
-    psoDesc.pixelShader = rcPS.get();
+    psoDesc.vertexShader = rcVS;
+    psoDesc.pixelShader = rcPS;
 
     // Set up vertex attributes (TODO: extract from vertex shader input signature)
     // For now, use a basic position+normal+texcoord layout
