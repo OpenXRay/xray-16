@@ -6,6 +6,7 @@
 
 namespace xray::render {
     struct GeometryBatch;  // Forward declaration
+    class MaterialCache;   // Forward declaration
 }
 
 namespace xray::render::passes {
@@ -86,7 +87,10 @@ private:
     GBufferPassConfig m_config;
     Stats m_stats;
 
-    // Shaders
+    // Material system
+    xr_unique_ptr<MaterialCache> m_materialCache;
+
+    // Shaders (legacy - will be replaced by MaterialCache)
     nvrhi::ShaderHandle m_vertexShaderNative;
     nvrhi::ShaderHandle m_pixelShaderNative;
     xr_unique_ptr<ng::RCShader> m_vertexShader;
