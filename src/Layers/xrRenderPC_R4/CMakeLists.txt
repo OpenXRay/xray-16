@@ -23,6 +23,15 @@ target_sources(xrRenderPC_R4 PRIVATE
     # RenderContext (Phase 1)
     RenderContext/RenderContext.h
     RenderContext/RenderContext.cpp
+
+    # FrameGraph (Phase 2)
+    FrameGraph/FGTypes.h
+    FrameGraph/FGResource.h
+    FrameGraph/FGResource.cpp
+    FrameGraph/FGPass.h
+    FrameGraph/FGPass.cpp
+    FrameGraph/FrameGraph.h
+    FrameGraph/FrameGraph.cpp
 )
 
 target_include_directories(xrRenderPC_R4
