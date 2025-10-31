@@ -198,38 +198,46 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        ng::BufferDesc vbDesc;
+        nvrhi::BufferDesc vbDesc;
         vbDesc.debugName = "VisibleMesh_VB";
         vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
         vbDesc.isVertexBuffer = true;
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
 
-        ng::BufferHandle nvrhiVB = m_device->CreateBufferFromD3D11(geom->vb, vbDesc);
-        if (!nvrhiVB.IsValid()) {
+        nvrhi::BufferHandle nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->vb), vbDesc);
+
+        if (!nvrhiVB) {
             Msg("! [FrameGraph] Failed to wrap VB");
             continue;
         }
 
-        ng::BufferDesc ibDesc;
+        nvrhi::BufferDesc ibDesc;
         ibDesc.debugName = "VisibleMesh_IB";
         ibDesc.byteSize = meshVisual->iCount * sizeof(u16);
         ibDesc.isIndexBuffer = true;
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
-        ng::BufferHandle nvrhiIB = m_device->CreateBufferFromD3D11(geom->ib, ibDesc);
-        if (!nvrhiIB.IsValid()) {
+        nvrhi::BufferHandle nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->ib), ibDesc);
+
+        if (!nvrhiIB) {
             Msg("! [FrameGraph] Failed to wrap IB");
             continue;
         }
 
         GeometryBatch batch;
-        batch.vertexBuffer = nvrhiVB;
-        batch.indexBuffer = nvrhiIB;
+
+        batch.vertexBuffer = ng::BufferHandle(nvrhiVB);
+        batch.indexBuffer = ng::BufferHandle(nvrhiIB);
+
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
         batch.baseVertex = meshVisual->vBase;
 
-        Fmatrix worldMatrix;
-        renderable->renderable_Xform(worldMatrix);
-        batch.worldMatrix = worldMatrix;
+        batch.worldMatrix = renderable->GetRenderData().xform;
 
         batch.pipeline = m_gbufferPass->GetPipeline();
         batch.bindingSet = nullptr;
