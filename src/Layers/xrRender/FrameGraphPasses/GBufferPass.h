@@ -55,6 +55,10 @@ public:
 
     const Stats& GetStats() const { return m_stats; }
 
+    nvrhi::IGraphicsPipeline* GetPipeline() const {
+        return m_pipeline ? m_pipeline->GetNativePipeline() : nullptr;
+    }
+
 private:
     ng::RenderDevice* m_device;
     GBufferPassConfig m_config;
