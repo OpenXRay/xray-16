@@ -21,6 +21,94 @@ struct TextureHandle {
     bool IsValid() const { return index != 0; }
 };
 
+struct BindingLayoutHandle {
+    u32 index = 0;
+    bool IsValid() const { return index != 0; }
+};
+
+struct BindingSetHandle {
+    u32 index = 0;
+    bool IsValid() const { return index != 0; }
+};
+
+// Binding layout description (what resources a shader expects)
+struct BindingLayoutItem {
+    nvrhi::ResourceType type;  // Texture, Sampler, ConstantBuffer, etc.
+    u32 slot;                  // Binding slot in shader
+    u32 size;                  // Array size (1 for single resource)
+
+    BindingLayoutItem()
+        : type(nvrhi::ResourceType::None)
+        , slot(0)
+        , size(1)
+    {}
+};
+
+struct BindingLayoutDesc {
+    BindingLayoutItem items[32];       // Max 32 bindings per layout
+    u32 numItems = 0;
+    nvrhi::ShaderType visibility = nvrhi::ShaderType::All;  // Which shader stages can see this layout
+    u32 registerSpace = 0;             // DX12/Vulkan register space
+
+    BindingLayoutDesc() : numItems(0) {}
+
+    void AddItem(nvrhi::ResourceType type, u32 slot, u32 size = 1) {
+        VERIFY(numItems < 32);
+        items[numItems].type = type;
+        items[numItems].slot = slot;
+        items[numItems].size = size;
+        numItems++;
+    }
+
+    void SetVisibility(nvrhi::ShaderType stages) {
+        visibility = stages;
+    }
+};
+
+// Binding set description (actual resources to bind)
+struct BindingSetItem {
+    u32 slot;                              // Must match layout slot
+    u32 arrayElement = 0;                  // Index in binding array (usually 0)
+    nvrhi::ResourceType type;              // Must match layout type
+    nvrhi::IResource* resource = nullptr;  // Texture, Buffer, or Sampler
+    nvrhi::Format format = nvrhi::Format::UNKNOWN;           // For typed buffers/textures
+    nvrhi::TextureDimension dimension = nvrhi::TextureDimension::Unknown;  // For textures
+
+    BindingSetItem() : slot(0), type(nvrhi::ResourceType::None) {}
+};
+
+struct BindingSetDesc {
+    nvrhi::IBindingLayout* layout = nullptr;  // Binding layout to use
+    BindingSetItem items[32];                 // Max 32 resources
+    u32 numItems = 0;
+
+    BindingSetDesc() : numItems(0) {}
+
+    void AddTexture(u32 slot, nvrhi::ITexture* texture) {
+        VERIFY(numItems < 32);
+        items[numItems].slot = slot;
+        items[numItems].type = nvrhi::ResourceType::Texture_SRV;
+        items[numItems].resource = texture;
+        numItems++;
+    }
+
+    void AddSampler(u32 slot, nvrhi::ISampler* sampler) {
+        VERIFY(numItems < 32);
+        items[numItems].slot = slot;
+        items[numItems].type = nvrhi::ResourceType::Sampler;
+        items[numItems].resource = sampler;
+        numItems++;
+    }
+
+    void AddConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
+        VERIFY(numItems < 32);
+        items[numItems].slot = slot;
+        items[numItems].type = nvrhi::ResourceType::ConstantBuffer;
+        items[numItems].resource = buffer;
+        numItems++;
+    }
+};
+
 // Render pass description
 struct RenderPassDesc {
     nvrhi::TextureHandle renderTargets[8] = {};
@@ -121,6 +209,22 @@ public:
 
     void SetConstantBuffer(u32 slot, BufferHandle buffer);
     void SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer);  // Direct
+
+    // ═══════════════════════════════════════════════════════
+    //  BINDING LAYOUTS & DESCRIPTOR SETS
+    // ═══════════════════════════════════════════════════════
+
+    // Create binding layout (describes what resources shader expects)
+    nvrhi::BindingLayoutHandle CreateBindingLayout(const BindingLayoutDesc& desc);
+    BindingLayoutHandle CreateBindingLayout(const BindingLayoutDesc& desc, bool useHandle);  // Future
+
+    // Create binding set (actual resources to bind)
+    nvrhi::BindingSetHandle CreateBindingSet(const BindingSetDesc& desc);
+    BindingSetHandle CreateBindingSet(const BindingSetDesc& desc, bool useHandle);  // Future
+
+    // Bind resources to shader (sets must match pipeline's expected layouts)
+    void SetBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet);
+    void SetBindingSet(u32 slot, BindingSetHandle bindingSet);  // Future
 
     // ═══════════════════════════════════════════════════════
     //  DRAW CALLS

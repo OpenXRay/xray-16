@@ -235,6 +235,141 @@ void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
 }
 
 // ═══════════════════════════════════════════════════════
+//  BINDING LAYOUTS & DESCRIPTOR SETS
+// ═══════════════════════════════════════════════════════
+
+nvrhi::BindingLayoutHandle RenderContext::CreateBindingLayout(const BindingLayoutDesc& desc) {
+    VERIFY(m_device != nullptr);
+    VERIFY2(desc.numItems > 0, "Binding layout must have at least one item");
+
+    // Convert our descriptor to NVRHI's binding layout descriptor
+    nvrhi::BindingLayoutDesc nvrhiDesc;
+
+    // Set visibility for all bindings in this layout
+    nvrhiDesc.visibility = desc.visibility;
+    nvrhiDesc.registerSpace = desc.registerSpace;
+
+    // Add all binding items
+    for (u32 i = 0; i < desc.numItems; i++) {
+        const auto& item = desc.items[i];
+
+        nvrhi::BindingLayoutItem nvrhiItem;
+        nvrhiItem.slot = item.slot;
+        nvrhiItem.type = item.type;
+        nvrhiItem.size = item.size;  // Array size
+
+        nvrhiDesc.bindings.push_back(nvrhiItem);
+    }
+
+    // Create the binding layout
+    nvrhi::BindingLayoutHandle layout = m_device->createBindingLayout(nvrhiDesc);
+
+    if (!layout) {
+        Msg("! [RenderContext] Failed to create binding layout");
+        return nullptr;
+    }
+
+    Msg("~ [RenderContext] Created binding layout with %d bindings", desc.numItems);
+    return layout;
+}
+
+BindingLayoutHandle RenderContext::CreateBindingLayout(const BindingLayoutDesc& desc, bool useHandle) {
+    // TODO: Implement once we have resource manager
+    VERIFY2(false, "Binding layout handle support not yet implemented");
+    BindingLayoutHandle handle;
+    return handle;
+}
+
+nvrhi::BindingSetHandle RenderContext::CreateBindingSet(const BindingSetDesc& desc) {
+    VERIFY(m_device != nullptr);
+    VERIFY2(desc.layout != nullptr, "BindingSet requires a valid layout");
+    VERIFY2(desc.numItems > 0, "BindingSet must have at least one item");
+
+    // Convert our descriptor to NVRHI's binding set descriptor
+    nvrhi::BindingSetDesc nvrhiDesc;
+
+    for (u32 i = 0; i < desc.numItems; i++) {
+        const auto& item = desc.items[i];
+
+        nvrhi::BindingSetItem nvrhiItem = {};
+        nvrhiItem.resourceHandle = item.resource;
+        nvrhiItem.slot = item.slot;
+        nvrhiItem.arrayElement = item.arrayElement;
+        nvrhiItem.type = item.type;
+        nvrhiItem.format = item.format;
+        nvrhiItem.dimension = item.dimension;
+
+        // Set dimension for textures if not already set
+        if ((item.type == nvrhi::ResourceType::Texture_SRV ||
+             item.type == nvrhi::ResourceType::Texture_UAV) &&
+            item.dimension == nvrhi::TextureDimension::Unknown) {
+            // Try to infer dimension from texture
+            auto* texture = static_cast<nvrhi::ITexture*>(item.resource);
+            if (texture) {
+                const auto& texDesc = texture->getDesc();
+                nvrhiItem.dimension = texDesc.dimension;
+            }
+        }
+
+        // For buffers with ranges, use default whole buffer range
+        if (item.type == nvrhi::ResourceType::ConstantBuffer ||
+            item.type == nvrhi::ResourceType::TypedBuffer_SRV ||
+            item.type == nvrhi::ResourceType::TypedBuffer_UAV ||
+            item.type == nvrhi::ResourceType::StructuredBuffer_SRV ||
+            item.type == nvrhi::ResourceType::StructuredBuffer_UAV ||
+            item.type == nvrhi::ResourceType::RawBuffer_SRV ||
+            item.type == nvrhi::ResourceType::RawBuffer_UAV) {
+            // Use entire buffer (default BufferRange)
+            nvrhiItem.range = nvrhi::BufferRange();
+        }
+
+        // For textures with subresources, use all subresources
+        if (item.type == nvrhi::ResourceType::Texture_SRV ||
+            item.type == nvrhi::ResourceType::Texture_UAV) {
+            nvrhiItem.subresources = nvrhi::AllSubresources;
+        }
+
+        nvrhiDesc.bindings.push_back(nvrhiItem);
+    }
+
+    // Create the binding set
+    nvrhi::BindingSetHandle bindingSet = m_device->createBindingSet(nvrhiDesc, desc.layout);
+
+    if (!bindingSet) {
+        Msg("! [RenderContext] Failed to create binding set");
+        return nullptr;
+    }
+
+    Msg("~ [RenderContext] Created binding set with %d resources", desc.numItems);
+    return bindingSet;
+}
+
+BindingSetHandle RenderContext::CreateBindingSet(const BindingSetDesc& desc, bool useHandle) {
+    // TODO: Implement once we have resource manager
+    VERIFY2(false, "Binding set handle support not yet implemented");
+    BindingSetHandle handle;
+    return handle;
+}
+
+void RenderContext::SetBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(bindingSet != nullptr);
+    VERIFY2(slot < 6, "NVRHI supports up to 6 binding set slots (0-5)");
+
+    // Add binding set to graphics state
+    // NVRHI stores binding sets in an array
+    m_currentState.bindings.resize(slot + 1);
+    m_currentState.bindings[slot] = bindingSet;
+
+    // Don't call setGraphicsState yet - batch state changes
+}
+
+void RenderContext::SetBindingSet(u32 slot, BindingSetHandle bindingSet) {
+    // TODO: Implement once we have resource manager
+    VERIFY2(false, "Binding set handle support not yet implemented");
+}
+
+// ═══════════════════════════════════════════════════════
 //  DRAW CALLS
 // ═══════════════════════════════════════════════════════
 
