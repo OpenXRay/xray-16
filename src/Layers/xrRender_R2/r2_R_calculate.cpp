@@ -86,6 +86,7 @@ void CRender::Calculate()
     }
 
     // Skip Calculate() if FrameGraph renderer is active
+    // FrameGraph has its own visibility/culling system
     if (ps_r4_use_framegraph && m_framegraphRenderer)
     {
         return;

@@ -116,8 +116,8 @@ void FrameGraphRenderer::SetupFrame() {
     // Begin geometry collection
     m_geometryCollector->BeginFrame();
 
-    // TODO: Collect visible geometry from scene
-    // For now, this will be handled by legacy renderer or manual submission
+    // Collect visible geometry (CPU culling for now, GPU later)
+    CollectVisibleGeometry();
 
     // End geometry collection (sorts batches)
     m_geometryCollector->EndFrame();
@@ -165,6 +165,49 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");
+}
+
+// ═══════════════════════════════════════════════════════
+//  VISIBILITY & CULLING
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::CollectVisibleGeometry() {
+    // Query spatial database for visible renderables
+    // For now, do simple frustum culling on CPU
+    // TODO: Move to GPU compute culling in future phases
+
+    if (!g_pGamePersistent)
+        return;
+
+    // Get camera frustum
+    CFrustum frustum;
+    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+    // Query spatial database for renderable objects
+    xr_vector<ISpatial*> spatialObjects;
+    g_pGamePersistent->SpatialSpace.q_frustum(
+        spatialObjects,
+        0,  // Only query objects in immediate portals
+        STYPE_RENDERABLE,  // Only renderables
+        frustum
+    );
+
+    Msg("  [FrameGraph] Found %u potentially visible objects", (u32)spatialObjects.size());
+
+    // TODO: For each visible object:
+    // 1. Get its Visual (geometry)
+    // 2. Extract vertex/index buffers
+    // 3. Create GeometryBatch
+    // 4. Submit to m_geometryCollector
+    //
+    // This is complex because we need to:
+    // - Access Visual's geometry (rm_geom)
+    // - Convert to NVRHI buffer handles
+    // - Create proper PSO for the material
+    // - Set up binding sets for textures
+    //
+    // For now, we'll leave this as a stub and implement
+    // a test triangle first to verify the pipeline works.
 }
 
 } // namespace xray::render

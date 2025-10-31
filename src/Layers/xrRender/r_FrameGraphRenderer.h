@@ -66,6 +66,9 @@ private:
     // Frame setup
     void SetupFrame();
     void BuildFrameGraph();
+
+    // Visibility & culling (CPU-based for now, will move to GPU later)
+    void CollectVisibleGeometry();
 };
 
 } // namespace xray::render
