@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GBufferPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 namespace xray::render::passes {
 
@@ -126,7 +127,39 @@ void GBufferPass::Execute(
     scissor.height = m_config.height;
     ctx.SetScissor(scissor);
 
-    Msg("  (Geometry rendering not yet implemented)");
+    if (g_geometryCollector != nullptr) {
+        const auto& batches = g_geometryCollector->GetBatches();
+        m_stats.numObjects = static_cast<u32>(batches.size());
+
+        Msg("  Rendering %u geometry batches", m_stats.numObjects);
+
+        nvrhi::IGraphicsPipeline* currentPipeline = nullptr;
+        nvrhi::IBindingSet* currentBindingSet = nullptr;
+
+        for (const auto& batch : batches) {
+            if (batch.pipeline != currentPipeline) {
+                ctx.SetPipeline(batch.pipeline);
+                currentPipeline = batch.pipeline;
+            }
+
+            UpdatePerObjectConstants(ctx, batch);
+
+            if (batch.bindingSet != currentBindingSet) {
+                ctx.SetBindingSet(0, batch.bindingSet);
+                currentBindingSet = batch.bindingSet;
+            }
+
+            ctx.SetVertexBuffer(0, batch.vertexBuffer, 0);
+            ctx.SetIndexBuffer(batch.indexBuffer, nvrhi::Format::R32_UINT, 0);
+
+            ctx.DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+
+            m_stats.numDrawCalls++;
+            m_stats.numTriangles += batch.indexCount / 3;
+        }
+    } else {
+        Msg("  (No geometry collector available)");
+    }
 
     ctx.EndRenderPass();
 
@@ -139,9 +172,35 @@ void GBufferPass::Execute(
     m_stats.numDrawCalls = ctxStats.numDrawCalls;
     m_stats.numTriangles = 0;
 
-    Msg("  ✓ G-Buffer pass complete: %u draws, %.2f ms",
+    Msg("  ✓ G-Buffer pass complete: %u draws, %u tris, %.2f ms",
         m_stats.numDrawCalls,
+        m_stats.numTriangles,
         m_stats.cpuTimeMs);
+}
+
+void GBufferPass::UpdatePerObjectConstants(
+    ng::RenderContext& ctx,
+    const GeometryBatch& batch
+) {
+    struct PerObjectConstants {
+        Fmatrix worldViewProj;
+        Fmatrix world;
+        Fmatrix worldIT;
+    };
+
+    PerObjectConstants constants;
+
+    Fmatrix viewProj;
+    viewProj.mul(Device.mView, Device.mProject);
+
+    constants.worldViewProj.mul(batch.worldMatrix, viewProj);
+
+    constants.world = batch.worldMatrix;
+
+    Fmatrix temp;
+    temp.invert(batch.worldMatrix);
+    constants.worldIT.transpose(temp);
+
 }
 
 }

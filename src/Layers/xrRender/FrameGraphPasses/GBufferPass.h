@@ -3,6 +3,10 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
+namespace xray::render {
+    struct GeometryBatch;
+}
+
 namespace xray::render::passes {
 
 struct GBufferPassConfig {
@@ -57,6 +61,8 @@ private:
 
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
                 const GBufferOutputs& outputs);
+
+    void UpdatePerObjectConstants(ng::RenderContext& ctx, const GeometryBatch& batch);
 };
 
 }
