@@ -735,6 +735,26 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
+    <ClInclude Include="..\xrRender\NVRHI\NVRHIDevice.h" />
+    <ClInclude Include="..\xrRender\RenderContext\ResourceHandle.h" />
+    <ClInclude Include="..\xrRender\RenderContext\RCShader.h" />
+    <ClInclude Include="..\xrRender\RenderContext\PipelineState.h" />
+    <ClInclude Include="..\xrRender\RenderContext\RenderDevice.h" />
+    <ClInclude Include="..\xrRender\RenderContext\RenderContext.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGTypes.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGResource.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\LightingPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPass.h" />
+    <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
+    <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h" />
+    <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
+    <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1340,6 +1360,24 @@
     <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
+    <ClCompile Include="..\xrRender\NVRHI\NVRHIDevice.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\RCShader.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\PipelineState.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\RenderDevice.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\RenderContext.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\LightingPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPass.cpp" />
+    <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
+    <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp" />
+    <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
+    <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
