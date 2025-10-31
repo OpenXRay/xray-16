@@ -52,6 +52,78 @@ bool GBufferPass::LoadShaders()
     return true;
 }
 
+bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph& fg)
+{
+    VERIFY(m_vertexShader != nullptr);
+    VERIFY(m_pixelShader != nullptr);
+
+    // Create graphics pipeline descriptor
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+    // Shaders
+    pipelineDesc.VS = m_vertexShader;
+    pipelineDesc.PS = m_pixelShader;
+
+    // Vertex input layout
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    // Define vertex attributes matching gbuffer.vs input
+    nvrhi::VertexAttributeDesc attributes[] = {
+        { "POSITION",  0, nvrhi::Format::RGB32_FLOAT, 0, 0, false },      // float3 position
+        { "NORMAL",    0, nvrhi::Format::RGB32_FLOAT, 0, 12, false },     // float3 normal
+        { "TEXCOORD",  0, nvrhi::Format::RG32_FLOAT,  0, 24, false },     // float2 texcoord
+        { "TANGENT",   0, nvrhi::Format::RGB32_FLOAT, 0, 32, false },     // float3 tangent
+        { "BINORMAL",  0, nvrhi::Format::RGB32_FLOAT, 0, 44, false },     // float3 binormal
+    };
+
+    pipelineDesc.inputLayout = attributes;
+
+    // Render state
+    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
+    rasterState.cullMode = nvrhi::RasterCullMode::Back;  // Backface culling
+    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+    rasterState.frontCounterClockwise = false;
+
+    // Blend state - no blending (opaque geometry)
+    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
+    for (int i = 0; i < 3; ++i)  // 3 MRTs
+    {
+        blendState.targets[i].enableBlend = false;
+        blendState.targets[i].colorWriteMask = nvrhi::ColorMask::All;
+    }
+
+    // Depth/stencil state - enable depth testing and writing
+    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
+    depthState.depthTestEnable = true;
+    depthState.depthWriteEnable = true;
+    depthState.depthFunc = nvrhi::ComparisonFunc::Less;
+    depthState.stencilEnable = false;
+
+    // Framebuffer info (MRT: Albedo, Normal, Material + Depth)
+    nvrhi::ITexture* albedo = fg.GetPhysicalTexture(outputs.albedo);
+    nvrhi::ITexture* normal = fg.GetPhysicalTexture(outputs.normal);
+    nvrhi::ITexture* material = fg.GetPhysicalTexture(outputs.material);
+    nvrhi::ITexture* depth = fg.GetPhysicalTexture(outputs.depth);
+
+    pipelineDesc.renderState.targetCount = 3;
+    pipelineDesc.renderState.renderTargetFormats[0] = albedo->getDesc().format;
+    pipelineDesc.renderState.renderTargetFormats[1] = normal->getDesc().format;
+    pipelineDesc.renderState.renderTargetFormats[2] = material->getDesc().format;
+    pipelineDesc.renderState.depthStencilFormat = depth->getDesc().format;
+
+    // Create pipeline
+    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+
+    if (!m_pipeline)
+    {
+        Msg("! [GBufferPass] Failed to create graphics pipeline");
+        return false;
+    }
+
+    Msg("  ✓ GBufferPass pipeline created successfully (MRT: 3 targets + depth)");
+    return true;
+}
+
 GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     Msg("~ [GBufferPass] Setting up in FrameGraph");
 
@@ -151,6 +223,16 @@ void GBufferPass::Execute(
     nvrhi::ITexture* normal = fg.GetPhysicalTexture(outputs.normal);
     nvrhi::ITexture* material = fg.GetPhysicalTexture(outputs.material);
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(outputs.depth);
+
+    // Create pipeline if needed (once per frame, using actual G-Buffer formats)
+    if (!m_pipeline)
+    {
+        if (!CreatePipeline(outputs, fg))
+        {
+            Msg("! [GBufferPass] Failed to create pipeline");
+            return;
+        }
+    }
 
     // ═══════════════════════════════════════════════════════
     //  SET RENDER STATE
