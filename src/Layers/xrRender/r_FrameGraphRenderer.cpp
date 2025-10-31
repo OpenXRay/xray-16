@@ -27,6 +27,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     g_geometryCollector = m_geometryCollector.get();
 
+    m_renderContext.reset(device->CreateContext());
+    if (!m_renderContext)
+    {
+        Msg("! [FrameGraphRenderer] Failed to create RenderContext");
+        return false;
+    }
+
     Msg("  ✓ FrameGraphRenderer initialized");
 
     return true;
@@ -39,6 +46,7 @@ void FrameGraphRenderer::Shutdown() {
 
     g_geometryCollector = nullptr;
 
+    m_renderContext.reset();
     m_geometryCollector.reset();
     m_tonemapPass.reset();
     m_lightingPass.reset();
@@ -60,6 +68,9 @@ void FrameGraphRenderer::Render() {
     BuildFrameGraph();
 
     m_framegraph->Compile();
+
+    m_framegraph->SetRenderContext(m_renderContext.get());
+
     m_framegraph->Execute();
 
     auto frameEnd = std::chrono::high_resolution_clock::now();
@@ -89,7 +100,7 @@ void FrameGraphRenderer::BuildFrameGraph() {
     backbufferDesc.height = 1080;
     backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
     backbufferDesc.isRenderTarget = true;
-    backbufferDesc.isImported = true;
+    backbufferDesc.isTransient = true;
     backbufferDesc.debugName = "Backbuffer";
 
     framegraph::VirtualResourceHandle backbuffer =

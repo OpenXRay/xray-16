@@ -45,6 +45,8 @@ private:
 
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
+    xr_unique_ptr<ng::RenderContext> m_renderContext;
+
     Stats m_stats;
 
     void SetupFrame();

@@ -94,7 +94,7 @@ void LightingPass::Execute(
     scissor.height = m_config.height;
     ctx.SetScissor(scissor);
 
-    ctx.Draw(3, 0);
+    Msg("  (Skipping lighting draw - pipeline not yet implemented)");
 
     ctx.EndRenderPass();
 

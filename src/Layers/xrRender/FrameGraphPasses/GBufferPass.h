@@ -16,7 +16,7 @@ struct GBufferPassConfig {
     nvrhi::Format albedoFormat = nvrhi::Format::RGBA8_UNORM;
     nvrhi::Format normalFormat = nvrhi::Format::RGBA16_FLOAT;
     nvrhi::Format materialFormat = nvrhi::Format::R32_FLOAT;
-    nvrhi::Format depthFormat = nvrhi::Format::D24S8;
+    nvrhi::Format depthFormat = nvrhi::Format::D32;
 
     float clearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     float clearDepth = 1.0f;

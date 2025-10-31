@@ -70,7 +70,7 @@ void TonemapPass::Execute(
     scissor.height = desc.height;
     ctx.SetScissor(scissor);
 
-    ctx.Draw(3, 0);
+    Msg("  (Skipping tonemap draw - pipeline not yet implemented)");
 
     ctx.EndRenderPass();
 

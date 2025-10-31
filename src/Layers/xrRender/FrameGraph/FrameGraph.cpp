@@ -759,7 +759,8 @@ void FrameGraph::AllocateResources() {
             texDesc.isShaderResource = true;
 
             if (resource.desc.isDepthStencil) {
-                texDesc.isRenderTarget = false;
+                texDesc.isRenderTarget = true;
+                texDesc.isTypeless = true;
                 texDesc.useClearValue = true;
                 texDesc.clearValue = nvrhi::Color(1.0f);
             }
