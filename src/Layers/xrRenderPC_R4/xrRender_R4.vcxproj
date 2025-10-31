@@ -238,6 +238,10 @@
     <ClInclude Include="r4_rendertarget.h" />
     <ClInclude Include="R_Backend_LOD.h" />
     <ClInclude Include="NVRHI\NVRHIDevice.h" />
+    <ClInclude Include="RenderContext\ResourceHandle.h" />
+    <ClInclude Include="RenderContext\RCShader.h" />
+    <ClInclude Include="RenderContext\PipelineState.h" />
+    <ClInclude Include="RenderContext\RenderDevice.h" />
     <ClInclude Include="RenderContext\RenderContext.h" />
     <ClInclude Include="FrameGraph\FGTypes.h" />
     <ClInclude Include="FrameGraph\FGResource.h" />
@@ -448,6 +452,9 @@
     <ClCompile Include="r4_shaders.cpp" />
     <ClCompile Include="R_Backend_LOD.cpp" />
     <ClCompile Include="NVRHI\NVRHIDevice.cpp" />
+    <ClCompile Include="RenderContext\RCShader.cpp" />
+    <ClCompile Include="RenderContext\PipelineState.cpp" />
+    <ClCompile Include="RenderContext\RenderDevice.cpp" />
     <ClCompile Include="RenderContext\RenderContext.cpp" />
     <ClCompile Include="FrameGraph\FGResource.cpp" />
     <ClCompile Include="FrameGraph\FGPass.cpp" />

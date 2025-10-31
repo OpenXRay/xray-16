@@ -26,7 +26,7 @@ FrameGraph::~FrameGraph() {
     Reset();
 
     Msg("* [FrameGraph] Destroyed");
-}
+};
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  SETUP PHASE - RESOURCE CREATION

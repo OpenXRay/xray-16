@@ -21,6 +21,13 @@ target_sources(xrRenderPC_R4 PRIVATE
     NVRHI/NVRHIDevice.cpp
 
     # RenderContext (Phase 1)
+    RenderContext/ResourceHandle.h
+    RenderContext/RCShader.h
+    RenderContext/RCShader.cpp
+    RenderContext/PipelineState.h
+    RenderContext/PipelineState.cpp
+    RenderContext/RenderDevice.h
+    RenderContext/RenderDevice.cpp
     RenderContext/RenderContext.h
     RenderContext/RenderContext.cpp
 

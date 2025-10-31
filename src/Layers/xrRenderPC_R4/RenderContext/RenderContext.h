@@ -1,35 +1,11 @@
 #pragma once
 
+#include "ResourceHandle.h"
+
 namespace xray::render::ng {
 
 // Forward declarations
 class ResourceManager;
-
-// Handle types (will be defined later)
-struct PipelineStateHandle {
-    u32 index = 0;
-    bool IsValid() const { return index != 0; }
-};
-
-struct BufferHandle {
-    u32 index = 0;
-    bool IsValid() const { return index != 0; }
-};
-
-struct TextureHandle {
-    u32 index = 0;
-    bool IsValid() const { return index != 0; }
-};
-
-struct BindingLayoutHandle {
-    u32 index = 0;
-    bool IsValid() const { return index != 0; }
-};
-
-struct BindingSetHandle {
-    u32 index = 0;
-    bool IsValid() const { return index != 0; }
-};
 
 // Binding layout description (what resources a shader expects)
 struct BindingLayoutItem {
