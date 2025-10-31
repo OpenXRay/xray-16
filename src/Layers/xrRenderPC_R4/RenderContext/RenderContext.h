@@ -19,6 +19,92 @@ struct TextureHandle {
     bool IsValid() const { return index != 0; }
 };
 
+struct BindingLayoutHandle {
+    u32 index = 0;
+    bool IsValid() const { return index != 0; }
+};
+
+struct BindingSetHandle {
+    u32 index = 0;
+    bool IsValid() const { return index != 0; }
+};
+
+struct BindingLayoutItem {
+    nvrhi::ResourceType type;
+    u32 slot;
+    u32 size;
+
+    BindingLayoutItem()
+        : type(nvrhi::ResourceType::None)
+        , slot(0)
+        , size(1)
+    {}
+};
+
+struct BindingLayoutDesc {
+    BindingLayoutItem items[32];
+    u32 numItems = 0;
+    nvrhi::ShaderType visibility = nvrhi::ShaderType::All;
+    u32 registerSpace = 0;
+
+    BindingLayoutDesc() : numItems(0) {}
+
+    void AddItem(nvrhi::ResourceType type, u32 slot, u32 size = 1) {
+        VERIFY(numItems < 32);
+        items[numItems].type = type;
+        items[numItems].slot = slot;
+        items[numItems].size = size;
+        numItems++;
+    }
+
+    void SetVisibility(nvrhi::ShaderType stages) {
+        visibility = stages;
+    }
+};
+
+struct BindingSetItem {
+    u32 slot;
+    u32 arrayElement = 0;
+    nvrhi::ResourceType type;
+    nvrhi::IResource* resource = nullptr;
+    nvrhi::Format format = nvrhi::Format::UNKNOWN;
+    nvrhi::TextureDimension dimension = nvrhi::TextureDimension::Unknown;
+
+    BindingSetItem() : slot(0), type(nvrhi::ResourceType::None) {}
+};
+
+struct BindingSetDesc {
+    nvrhi::IBindingLayout* layout = nullptr;
+    BindingSetItem items[32];
+    u32 numItems = 0;
+
+    BindingSetDesc() : numItems(0) {}
+
+    void AddTexture(u32 slot, nvrhi::ITexture* texture) {
+        VERIFY(numItems < 32);
+        items[numItems].slot = slot;
+        items[numItems].type = nvrhi::ResourceType::Texture_SRV;
+        items[numItems].resource = texture;
+        numItems++;
+    }
+
+    void AddSampler(u32 slot, nvrhi::ISampler* sampler) {
+        VERIFY(numItems < 32);
+        items[numItems].slot = slot;
+        items[numItems].type = nvrhi::ResourceType::Sampler;
+        items[numItems].resource = sampler;
+        numItems++;
+    }
+
+    void AddConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
+        VERIFY(numItems < 32);
+        items[numItems].slot = slot;
+        items[numItems].type = nvrhi::ResourceType::ConstantBuffer;
+        items[numItems].resource = buffer;
+        numItems++;
+    }
+};
+
 struct RenderPassDesc {
     nvrhi::TextureHandle renderTargets[8] = {};
     u32 numRenderTargets = 0;
@@ -83,6 +169,15 @@ public:
 
     void SetConstantBuffer(u32 slot, BufferHandle buffer);
     void SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer);
+
+    nvrhi::BindingLayoutHandle CreateBindingLayout(const BindingLayoutDesc& desc);
+    BindingLayoutHandle CreateBindingLayout(const BindingLayoutDesc& desc, bool useHandle);
+
+    nvrhi::BindingSetHandle CreateBindingSet(const BindingSetDesc& desc);
+    BindingSetHandle CreateBindingSet(const BindingSetDesc& desc, bool useHandle);
+
+    void SetBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet);
+    void SetBindingSet(u32 slot, BindingSetHandle bindingSet);
 
     void Draw(u32 vertexCount, u32 startVertex = 0);
     void DrawIndexed(u32 indexCount, u32 startIndex = 0, int baseVertex = 0);

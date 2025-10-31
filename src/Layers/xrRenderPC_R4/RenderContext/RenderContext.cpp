@@ -190,6 +190,120 @@ void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
     VERIFY2(false, "Buffer handle support not yet implemented");
 }
 
+nvrhi::BindingLayoutHandle RenderContext::CreateBindingLayout(const BindingLayoutDesc& desc) {
+    VERIFY(m_device != nullptr);
+    VERIFY2(desc.numItems > 0, "Binding layout must have at least one item");
+
+    nvrhi::BindingLayoutDesc nvrhiDesc;
+
+    nvrhiDesc.visibility = desc.visibility;
+    nvrhiDesc.registerSpace = desc.registerSpace;
+
+    for (u32 i = 0; i < desc.numItems; i++) {
+        const auto& item = desc.items[i];
+
+        nvrhi::BindingLayoutItem nvrhiItem;
+        nvrhiItem.slot = item.slot;
+        nvrhiItem.type = item.type;
+        nvrhiItem.size = item.size;
+
+        nvrhiDesc.bindings.push_back(nvrhiItem);
+    }
+
+    nvrhi::BindingLayoutHandle layout = m_device->createBindingLayout(nvrhiDesc);
+
+    if (!layout) {
+        Msg("! [RenderContext] Failed to create binding layout");
+        return nullptr;
+    }
+
+    Msg("~ [RenderContext] Created binding layout with %d bindings", desc.numItems);
+    return layout;
+}
+
+BindingLayoutHandle RenderContext::CreateBindingLayout(const BindingLayoutDesc& desc, bool useHandle) {
+    VERIFY2(false, "Binding layout handle support not yet implemented");
+    BindingLayoutHandle handle;
+    return handle;
+}
+
+nvrhi::BindingSetHandle RenderContext::CreateBindingSet(const BindingSetDesc& desc) {
+    VERIFY(m_device != nullptr);
+    VERIFY2(desc.layout != nullptr, "BindingSet requires a valid layout");
+    VERIFY2(desc.numItems > 0, "BindingSet must have at least one item");
+
+    nvrhi::BindingSetDesc nvrhiDesc;
+
+    for (u32 i = 0; i < desc.numItems; i++) {
+        const auto& item = desc.items[i];
+
+        nvrhi::BindingSetItem nvrhiItem = {};
+        nvrhiItem.resourceHandle = item.resource;
+        nvrhiItem.slot = item.slot;
+        nvrhiItem.arrayElement = item.arrayElement;
+        nvrhiItem.type = item.type;
+        nvrhiItem.format = item.format;
+        nvrhiItem.dimension = item.dimension;
+
+        if ((item.type == nvrhi::ResourceType::Texture_SRV ||
+             item.type == nvrhi::ResourceType::Texture_UAV) &&
+            item.dimension == nvrhi::TextureDimension::Unknown) {
+            auto* texture = static_cast<nvrhi::ITexture*>(item.resource);
+            if (texture) {
+                const auto& texDesc = texture->getDesc();
+                nvrhiItem.dimension = texDesc.dimension;
+            }
+        }
+
+        if (item.type == nvrhi::ResourceType::ConstantBuffer ||
+            item.type == nvrhi::ResourceType::TypedBuffer_SRV ||
+            item.type == nvrhi::ResourceType::TypedBuffer_UAV ||
+            item.type == nvrhi::ResourceType::StructuredBuffer_SRV ||
+            item.type == nvrhi::ResourceType::StructuredBuffer_UAV ||
+            item.type == nvrhi::ResourceType::RawBuffer_SRV ||
+            item.type == nvrhi::ResourceType::RawBuffer_UAV) {
+            nvrhiItem.range = nvrhi::BufferRange();
+        }
+
+        if (item.type == nvrhi::ResourceType::Texture_SRV ||
+            item.type == nvrhi::ResourceType::Texture_UAV) {
+            nvrhiItem.subresources = nvrhi::AllSubresources;
+        }
+
+        nvrhiDesc.bindings.push_back(nvrhiItem);
+    }
+
+    nvrhi::BindingSetHandle bindingSet = m_device->createBindingSet(nvrhiDesc, desc.layout);
+
+    if (!bindingSet) {
+        Msg("! [RenderContext] Failed to create binding set");
+        return nullptr;
+    }
+
+    Msg("~ [RenderContext] Created binding set with %d resources", desc.numItems);
+    return bindingSet;
+}
+
+BindingSetHandle RenderContext::CreateBindingSet(const BindingSetDesc& desc, bool useHandle) {
+    VERIFY2(false, "Binding set handle support not yet implemented");
+    BindingSetHandle handle;
+    return handle;
+}
+
+void RenderContext::SetBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(bindingSet != nullptr);
+    VERIFY2(slot < 6, "NVRHI supports up to 6 binding set slots (0-5)");
+
+    m_currentState.bindings.resize(slot + 1);
+    m_currentState.bindings[slot] = bindingSet;
+
+}
+
+void RenderContext::SetBindingSet(u32 slot, BindingSetHandle bindingSet) {
+    VERIFY2(false, "Binding set handle support not yet implemented");
+}
+
 void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
 
