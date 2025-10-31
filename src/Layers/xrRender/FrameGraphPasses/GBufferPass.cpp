@@ -297,14 +297,18 @@ void GBufferPass::Execute(
         //  RENDER GEOMETRY BATCHES
         // ═══════════════════════════════════════════════════════
 
-        nvrhi::IGraphicsPipeline* currentPipeline = nullptr;
+        ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
         for (const auto& batch : batches) {
             // Set pipeline (if changed)
-            if (batch.pipeline != currentPipeline) {
-                ctx.SetPipeline(batch.pipeline);
-                currentPipeline = batch.pipeline;
+            // For now, all batches use the pass's default pipeline
+            // TODO: Create per-material pipelines from visual->shader
+            ng::PipelineState* pipelineToUse = m_pipeline;
+
+            if (pipelineToUse != currentPipeline) {
+                ctx.SetPipeline(pipelineToUse->GetNativePipeline());
+                currentPipeline = pipelineToUse;
             }
 
             // Update per-object constants

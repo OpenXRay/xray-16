@@ -44,7 +44,7 @@ void GeometryCollector::Submit(const GeometryBatch& batch) {
     VERIFY(batch.vertexBuffer != nullptr);  // nvrhi::BufferHandle is a smart pointer
     VERIFY(batch.indexBuffer != nullptr);
     VERIFY(batch.indexCount > 0);
-    VERIFY(batch.pipeline != nullptr);
+    // NOTE: pipeline can be nullptr during collection, will be set later from visual->shader
 
     m_batches.push_back(batch);
 }
@@ -66,8 +66,10 @@ u64 GeometryCollector::ComputeSortKey(const GeometryBatch& batch) {
     u64 key = 0;
 
     // Bits 48-63: Pipeline (most important - avoid PSO changes)
-    u64 pipelineHash = reinterpret_cast<u64>(batch.pipeline) >> 4;
-    key |= (pipelineHash & 0xFFFF) << 48;
+    if (batch.pipeline) {
+        u64 pipelineHash = reinterpret_cast<u64>(batch.pipeline) >> 4;
+        key |= (pipelineHash & 0xFFFF) << 48;
+    }
 
     // Bits 32-47: Material ID
     key |= (static_cast<u64>(batch.materialID) & 0xFFFF) << 32;

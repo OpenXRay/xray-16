@@ -7,7 +7,14 @@
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
+// Forward declarations
+struct Fmatrix;
+namespace xray::render::RENDER_NAMESPACE {
+    class dxRender_Visual;
+}
+
 namespace xray::render {
+using RENDER_NAMESPACE::dxRender_Visual;
 
 // ══════════════════════════════════════════════════════════
 //  FRAMEGRAPH RENDERER
@@ -69,6 +76,10 @@ private:
 
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();
+
+    // Helper functions for geometry collection
+    bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
+    void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 };
 
 } // namespace xray::render
