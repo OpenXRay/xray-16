@@ -31,6 +31,12 @@ class NVRHIDevice;
 namespace xray::render::ng
 {
 class RenderContext;
+class RenderDevice;
+}
+
+namespace xray::render
+{
+class FrameGraphRenderer;
 }
 
 namespace xray::render::RENDER_NAMESPACE
@@ -550,6 +556,10 @@ public:
     // RenderContext testing (Phase 1)
     bool m_renderContextTestMode{ false };
     xray::render::ng::RenderContext* m_renderContext{ nullptr };
+    xray::render::ng::RenderDevice* m_renderDevice{ nullptr };
+
+    // FrameGraph Renderer (Phase 3)
+    xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
 
     // Test resources for triangle
     nvrhi::BufferHandle m_testVertexBuffer;
