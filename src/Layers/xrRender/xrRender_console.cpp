@@ -28,6 +28,7 @@
 #if RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/FrameGraph/FGTest.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #endif
 
 // Detail manager debug
@@ -639,6 +640,64 @@ public:
         // Run two-pass test
         Msg("~ [FrameGraph] Running two-pass test...");
         TestTwoPassRender(device, render.m_renderContext, backbuffer);
+#endif
+    }
+};
+
+// Phase 3: Complete deferred rendering test
+class CCC_FrameGraphTestPhase3 : public IConsole_Command
+{
+public:
+    CCC_FrameGraphTestPhase3(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/)
+    {
+#if defined(USE_DX11)
+        auto& render = static_cast<CRender&>(RImplementation);
+
+        // Check if RenderDevice is initialized
+        if (!render.m_renderDevice || !render.m_renderDevice->IsInitialized())
+        {
+            Msg("! [FrameGraph Phase 3] RenderDevice not initialized - run r4_rendercontext_test first");
+            return;
+        }
+
+        Msg("═══════════════════════════════════════");
+        Msg("  FrameGraph Phase 3: Complete Pipeline Test");
+        Msg("═══════════════════════════════════════");
+
+        // Create FrameGraphRenderer if not already created
+        using namespace xray::render;
+        auto fgRenderer = xr_make_unique<FrameGraphRenderer>();
+
+        if (!fgRenderer->Initialize(render.m_renderDevice))
+        {
+            Msg("! [FrameGraph Phase 3] Failed to initialize FrameGraphRenderer");
+            return;
+        }
+
+        Msg("  ✓ FrameGraphRenderer initialized");
+
+        // Enable rendering
+        fgRenderer->SetEnabled(true);
+
+        // Render a frame
+        Msg("~ [FrameGraph Phase 3] Rendering frame with complete pipeline...");
+        fgRenderer->Render();
+
+        // Print statistics
+        fgRenderer->PrintStats();
+
+        Msg("═══════════════════════════════════════");
+        Msg("  ✓ Phase 3 Test Complete!");
+        Msg("═══════════════════════════════════════");
+        Msg("");
+        Msg("Pipeline executed:");
+        Msg("  1. G-Buffer Pass (Albedo+Metal, Normal+Rough, Material, Depth)");
+        Msg("  2. Lighting Pass (PBR with Cook-Torrance BRDF)");
+        Msg("  3. Tonemap Pass (ACES filmic + gamma correction)");
+        Msg("");
+        Msg("Note: No geometry submitted yet - outputs will be clear colors");
+        Msg("      To see actual rendering, hook up geometry submission");
 #endif
     }
 };
@@ -1321,6 +1380,8 @@ void xrRender_initconsole()
     // FrameGraph test commands (Phase 2)
     CMD1(CCC_FrameGraphTestSimple, "r4_framegraph_test");
     CMD1(CCC_FrameGraphTestTwoPass, "r4_framegraph_test2");
+    // FrameGraph Phase 3 test command
+    CMD1(CCC_FrameGraphTestPhase3, "r4_framegraph_test_phase3");
 #endif
 #endif
 }
