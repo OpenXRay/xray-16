@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "r_FrameGraphRenderer.h"
+#include "FVisual.h"
+#include "Shader.h"
 
 namespace xray::render {
 
@@ -148,6 +150,37 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     Msg("  [FrameGraph] Found %u potentially visible objects", (u32)spatialObjects.size());
 
+    u32 submittedCount = 0;
+
+    for (ISpatial* spatial : spatialObjects)
+    {
+        IRenderable* renderable = spatial->dcast_Renderable();
+        if (!renderable)
+            continue;
+
+        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(renderable->renderable_ROS());
+        if (!visual)
+            continue;
+
+        if (visual->getType() != MT_NORMAL)
+            continue;
+
+        Fvisual* meshVisual = dynamic_cast<Fvisual*>(visual);
+        if (!meshVisual)
+            continue;
+
+        if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+            continue;
+
+        SGeometry* geom = meshVisual->rm_geom._get();
+        if (!geom->vb || !geom->ib)
+            continue;
+
+        submittedCount++;
+    }
+
+    Msg("  [FrameGraph] Submitted %u/%u objects to collector",
+        submittedCount, (u32)spatialObjects.size());
 }
 
 }
