@@ -63,9 +63,18 @@ private:
     // Statistics
     Stats m_stats;
 
+    // Test geometry (temporary - for pipeline verification)
+    ng::BufferHandle m_testVertexBuffer;
+    ng::BufferHandle m_testIndexBuffer;
+    bool m_testGeometryCreated = false;
+
     // Frame setup
     void SetupFrame();
     void BuildFrameGraph();
+
+    // Test geometry
+    void CreateTestGeometry();
+    void SubmitTestGeometry();
 };
 
 } // namespace xray::render

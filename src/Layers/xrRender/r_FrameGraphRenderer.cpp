@@ -116,6 +116,9 @@ void FrameGraphRenderer::SetupFrame() {
     // Begin geometry collection
     m_geometryCollector->BeginFrame();
 
+    // Submit test triangle for pipeline verification
+    SubmitTestGeometry();
+
     // TODO: Collect visible geometry from scene
     // For now, this will be handled by legacy renderer or manual submission
 
@@ -165,6 +168,110 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");
+}
+
+// ═══════════════════════════════════════════════════════
+//  TEST GEOMETRY (TEMPORARY)
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::CreateTestGeometry() {
+    if (m_testGeometryCreated)
+        return;
+
+    Msg("* [FrameGraphRenderer] Creating test triangle geometry");
+
+    // Define vertex structure matching GBufferPass layout
+    struct TestVertex {
+        Fvector position;   // float3
+        Fvector normal;     // float3
+        Fvector2 texcoord;  // float2
+        Fvector tangent;    // float3
+        Fvector binormal;   // float3
+    };
+
+    // Create triangle vertices (counter-clockwise winding)
+    TestVertex vertices[3] = {
+        // Bottom-left (red debug color via normal)
+        { { -0.5f, -0.5f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+        // Top (green debug color via normal)
+        { {  0.0f,  0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+        // Bottom-right (blue debug color via normal)
+        { {  0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } }
+    };
+
+    // Create indices
+    u32 indices[3] = { 0, 1, 2 };
+
+    // Create vertex buffer with initial data
+    nvrhi::BufferDesc vbDesc;
+    vbDesc.byteSize = sizeof(vertices);
+    vbDesc.debugName = "TestTriangleVB";
+    vbDesc.isVertexBuffer = true;
+    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    vbDesc.keepInitialState = true;
+
+    m_testVertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
+    if (!m_testVertexBuffer) {
+        Msg("! [FrameGraphRenderer] Failed to create test vertex buffer");
+        return;
+    }
+
+    // Create index buffer with initial data
+    nvrhi::BufferDesc ibDesc;
+    ibDesc.byteSize = sizeof(indices);
+    ibDesc.debugName = "TestTriangleIB";
+    ibDesc.isIndexBuffer = true;
+    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
+
+    m_testIndexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
+    if (!m_testIndexBuffer) {
+        Msg("! [FrameGraphRenderer] Failed to create test index buffer");
+        return;
+    }
+
+    // Open command list to upload data
+    m_renderContext->GetNativeCommandList()->open();
+
+    // Upload data
+    m_renderContext->GetNativeCommandList()->writeBuffer(m_testVertexBuffer, vertices, sizeof(vertices));
+    m_renderContext->GetNativeCommandList()->writeBuffer(m_testIndexBuffer, indices, sizeof(indices));
+
+    // Close and execute
+    m_renderContext->GetNativeCommandList()->close();
+    m_device->GetNVRHIDevice()->executeCommandList(m_renderContext->GetNativeCommandList());
+
+    m_testGeometryCreated = true;
+    Msg("  ✓ Test triangle geometry created");
+}
+
+void FrameGraphRenderer::SubmitTestGeometry() {
+    if (!m_testGeometryCreated)
+        CreateTestGeometry();
+
+    if (!m_testGeometryCreated)
+        return;
+
+    // Create geometry batch for test triangle
+    GeometryBatch batch;
+    batch.vertexBuffer = m_testVertexBuffer;
+    batch.indexBuffer = m_testIndexBuffer;
+    batch.indexCount = 3;
+    batch.startIndex = 0;
+    batch.baseVertex = 0;
+    batch.materialID = 0;
+
+    // Set identity world matrix
+    batch.worldMatrix.identity();
+
+    // Pipeline and binding set will be set by GBufferPass
+    batch.pipeline = nullptr;
+    batch.bindingSet = nullptr;
+
+    batch.debugName = "TestTriangle";
+
+    // Submit to collector
+    m_geometryCollector->Submit(batch);
 }
 
 } // namespace xray::render
