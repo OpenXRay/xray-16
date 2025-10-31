@@ -19,6 +19,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     # NVRHI wrapper
     NVRHI/NVRHIDevice.h
     NVRHI/NVRHIDevice.cpp
+
+    # RenderContext (Phase 1)
+    RenderContext/RenderContext.h
+    RenderContext/RenderContext.cpp
 )
 
 target_include_directories(xrRenderPC_R4
