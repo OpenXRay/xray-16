@@ -45,9 +45,9 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
     }
 
     // Create framebuffer (NVRHI caches these)
-    nvrhi::FramebufferHandle framebuffer = m_device->createFramebuffer(fbDesc);
+    m_currentFramebuffer = m_device->createFramebuffer(fbDesc);
 
-    if (!framebuffer) {
+    if (!m_currentFramebuffer) {
         Msg("! [RenderContext] Failed to create framebuffer");
         return;
     }
@@ -55,13 +55,23 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
     // Begin render pass in command list
     m_commandList->beginMarker("RenderPass");  // Debug marker
 
+    // Initialize current graphics state with framebuffer
+    m_currentState = nvrhi::GraphicsState();
+    m_currentState.framebuffer = m_currentFramebuffer;
+
     // Clear if requested
     if (desc.clearColor) {
         for (u32 i = 0; i < desc.numRenderTargets; i++) {
+            nvrhi::Color clearColor(
+                desc.clearValue.color[0],
+                desc.clearValue.color[1],
+                desc.clearValue.color[2],
+                desc.clearValue.color[3]
+            );
             m_commandList->clearTextureFloat(
                 desc.renderTargets[i],
                 nvrhi::AllSubresources,
-                nvrhi::Color(desc.clearValue.color)
+                clearColor
             );
         }
     }
@@ -98,11 +108,8 @@ void RenderContext::SetPipeline(nvrhi::IGraphicsPipeline* pipeline) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(pipeline != nullptr);
 
-    nvrhi::GraphicsState state;
-    state.pipeline = pipeline;
-    state.framebuffer = m_commandList->getCurrentFramebuffer();
-
-    m_commandList->setGraphicsState(state);
+    m_currentState.pipeline = pipeline;
+    // Don't call setGraphicsState yet - batch state changes
 }
 
 void RenderContext::SetPipeline(PipelineStateHandle pso) {
@@ -125,9 +132,8 @@ void RenderContext::SetViewport(const Viewport& viewport) {
     nvrhiViewport.minZ = viewport.minDepth;
     nvrhiViewport.maxZ = viewport.maxDepth;
 
-    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
-    state.viewport.addViewportAndScissorRect(nvrhiViewport);
-    m_commandList->setGraphicsState(state);
+    m_currentState.viewport.addViewportAndScissorRect(nvrhiViewport);
+    // Don't call setGraphicsState yet - batch state changes
 }
 
 void RenderContext::SetViewport(float x, float y, float width, float height) {
@@ -148,9 +154,8 @@ void RenderContext::SetScissor(const Rect& scissor) {
     nvrhiRect.maxX = scissor.x + scissor.width;
     nvrhiRect.maxY = scissor.y + scissor.height;
 
-    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
-    state.viewport.addScissorRect(nvrhiRect);
-    m_commandList->setGraphicsState(state);
+    m_currentState.viewport.addScissorRect(nvrhiRect);
+    // Don't call setGraphicsState yet - batch state changes
 }
 
 // ═══════════════════════════════════════════════════════
@@ -161,12 +166,11 @@ void RenderContext::SetVertexBuffer(u32 slot, nvrhi::IBuffer* buffer, u64 offset
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer != nullptr);
 
-    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
-    state.vertexBuffers.resize(slot + 1);
-    state.vertexBuffers[slot].buffer = buffer;
-    state.vertexBuffers[slot].slot = slot;
-    state.vertexBuffers[slot].offset = offset;
-    m_commandList->setGraphicsState(state);
+    m_currentState.vertexBuffers.resize(slot + 1);
+    m_currentState.vertexBuffers[slot].buffer = buffer;
+    m_currentState.vertexBuffers[slot].slot = slot;
+    m_currentState.vertexBuffers[slot].offset = offset;
+    // Don't call setGraphicsState yet - batch state changes
 }
 
 void RenderContext::SetVertexBuffer(u32 slot, BufferHandle buffer, u64 offset) {
@@ -180,11 +184,10 @@ void RenderContext::SetIndexBuffer(nvrhi::IBuffer* buffer,
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer != nullptr);
 
-    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
-    state.indexBuffer.buffer = buffer;
-    state.indexBuffer.format = format;
-    state.indexBuffer.offset = offset;
-    m_commandList->setGraphicsState(state);
+    m_currentState.indexBuffer.buffer = buffer;
+    m_currentState.indexBuffer.format = format;
+    m_currentState.indexBuffer.offset = offset;
+    // Don't call setGraphicsState yet - batch state changes
 }
 
 void RenderContext::SetIndexBuffer(BufferHandle buffer,
@@ -238,6 +241,9 @@ void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
 void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
 
+    // Apply all batched state changes before draw
+    m_commandList->setGraphicsState(m_currentState);
+
     nvrhi::DrawArguments args;
     args.vertexCount = vertexCount;
     args.startVertexLocation = startVertex;
@@ -245,8 +251,11 @@ void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
     m_commandList->draw(args);
 }
 
-void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, i32 baseVertex) {
+void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // Apply all batched state changes before draw
+    m_commandList->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
     args.vertexCount = indexCount;  // Actually index count for indexed draws
@@ -260,6 +269,9 @@ void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
                                   u32 startVertex, u32 startInstance) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
 
+    // Apply all batched state changes before draw
+    m_commandList->setGraphicsState(m_currentState);
+
     nvrhi::DrawArguments args;
     args.vertexCount = vertexCount;
     args.instanceCount = instanceCount;
@@ -270,9 +282,12 @@ void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
 }
 
 void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
-                                         u32 startIndex, i32 baseVertex,
+                                         u32 startIndex, int baseVertex,
                                          u32 startInstance) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // Apply all batched state changes before draw
+    m_commandList->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
     args.vertexCount = indexCount;

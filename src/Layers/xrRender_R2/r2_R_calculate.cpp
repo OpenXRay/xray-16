@@ -77,6 +77,12 @@ void CRender::Calculate()
     {
         return;
     }
+
+    // Skip Calculate() if RenderContext test mode is active
+    if (m_renderContextTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
+    {
+        return;
+    }
 #endif
 
     // Transfer to global space to avoid deep pointer access

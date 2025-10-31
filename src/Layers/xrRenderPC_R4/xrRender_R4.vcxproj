@@ -238,6 +238,7 @@
     <ClInclude Include="r4_rendertarget.h" />
     <ClInclude Include="R_Backend_LOD.h" />
     <ClInclude Include="NVRHI\NVRHIDevice.h" />
+    <ClInclude Include="RenderContext\RenderContext.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -442,6 +443,7 @@
     <ClCompile Include="r4_shaders.cpp" />
     <ClCompile Include="R_Backend_LOD.cpp" />
     <ClCompile Include="NVRHI\NVRHIDevice.cpp" />
+    <ClCompile Include="RenderContext\RenderContext.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

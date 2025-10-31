@@ -343,7 +343,7 @@ void D3DXRenderBase::End()
     // Skip normal End() cleanup if NVRHI test mode is active
     // (TestNVRHI_Render already called Present)
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    if (render.m_nvrhiTestMode && render.m_nvrhiDevice && render.m_nvrhiDevice->IsInitialized())
+    if (render.m_nvrhiTestMode || render.m_renderContextTestMode)
     {
         return; // Skip normal cleanup and present
     }

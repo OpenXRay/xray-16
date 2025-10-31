@@ -462,6 +462,38 @@ public:
 #endif
     }
 };
+
+// RenderContext test command (Phase 1)
+class CCC_RenderContextTest : public IConsole_Command
+{
+public:
+    CCC_RenderContextTest(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/)
+    {
+#if defined(USE_DX11)
+        auto& render = static_cast<CRender&>(RImplementation);
+
+        // Check if NVRHI is initialized
+        if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
+        {
+            Msg("! [RenderContext] NVRHI not initialized - run r4_nvrhi_test first");
+            return;
+        }
+
+        // Toggle test mode
+        render.m_renderContextTestMode = !render.m_renderContextTestMode;
+
+        if (render.m_renderContextTestMode)
+        {
+            Msg("~ [RenderContext] Test mode ENABLED - will render colored triangle");
+        }
+        else
+        {
+            Msg("~ [RenderContext] Test mode DISABLED - normal rendering");
+        }
+#endif
+    }
+};
 #endif // RENDER == R_R4
 
 class CCC_SSAO_Mode : public CCC_Token
@@ -1136,6 +1168,8 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     // NVRHI test command
     CMD1(CCC_NVRHITest, "r4_nvrhi_test");
+    // RenderContext test command (Phase 1)
+    CMD1(CCC_RenderContextTest, "r4_rendercontext_test");
 #endif
 #endif
 }

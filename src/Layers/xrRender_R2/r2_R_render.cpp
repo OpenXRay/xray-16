@@ -10,6 +10,7 @@
 
 #if defined(USE_DX11) && RENDER == R_R4
 #include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRenderPC_R4/RenderContext/RenderContext.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -107,6 +108,13 @@ void CRender::Render()
     if (m_nvrhiTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
     {
         TestNVRHI_Render();
+        return;
+    }
+
+    // RenderContext test mode - render colored triangle
+    if (m_renderContextTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
+    {
+        TestRenderContext_Triangle();
         return;
     }
 #endif
@@ -495,6 +503,341 @@ void CRender::TestNVRHI_Render()
     catch (const std::exception& e)
     {
         Msg("! [NVRHI Test] Exception: %s", e.what());
+    }
+}
+
+// Helper function to compile shader from file
+static xr_vector<u8> CompileShaderFromFile(LPCSTR path, LPCSTR entryPoint, LPCSTR target)
+{
+    xr_vector<u8> result;
+
+    // Read shader source file
+    IReader* file = FS.r_open("$game_shaders$", path);
+    if (!file)
+    {
+        Msg("! [ShaderCompiler] Failed to open shader: %s", path);
+        return result;
+    }
+
+    // Prepare source
+    xr_string source;
+    source.assign((const char*)file->pointer(), file->length());
+    FS.r_close(file);
+
+    // Compile shader
+    ID3DBlob* shaderBlob = nullptr;
+    ID3DBlob* errorBlob = nullptr;
+
+    HRESULT hr = D3DCompile(
+        source.c_str(),
+        source.length(),
+        path,
+        nullptr,  // Defines
+        D3D_COMPILE_STANDARD_FILE_INCLUDE,  // Include handler
+        entryPoint,
+        target,
+        D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+        0,
+        &shaderBlob,
+        &errorBlob
+    );
+
+    if (FAILED(hr))
+    {
+        if (errorBlob)
+        {
+            Msg("! [ShaderCompiler] Compilation failed for %s:", path);
+            Msg("  %s", (const char*)errorBlob->GetBufferPointer());
+            errorBlob->Release();
+        }
+        else
+        {
+            Msg("! [ShaderCompiler] Compilation failed for %s with HRESULT 0x%08X", path, hr);
+        }
+
+        if (shaderBlob)
+            shaderBlob->Release();
+
+        return result;
+    }
+
+    if (errorBlob)
+        errorBlob->Release();
+
+    // Copy to result vector
+    result.resize(shaderBlob->GetBufferSize());
+    memcpy(result.data(), shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize());
+    shaderBlob->Release();
+
+    Msg("~ [ShaderCompiler] Successfully compiled: %s", path);
+
+    return result;
+}
+
+void CRender::TestRenderContext_Triangle()
+{
+    VERIFY(m_nvrhiDevice && m_nvrhiDevice->IsInitialized());
+
+    using namespace xray::render::ng;
+
+    nvrhi::IDevice* device = m_nvrhiDevice->GetDevice();
+    nvrhi::ICommandList* cmd = m_nvrhiDevice->GetCommandList();
+
+    // Create resources once
+    if (!m_testVertexBuffer)
+    {
+        // Define triangle vertices (colored)
+        struct Vertex {
+            float pos[3];
+            float color[4];
+        };
+
+        Vertex vertices[] = {
+            // Position (x, y, z)     // Color (r, g, b, a)
+            {{ 0.0f,  0.5f, 0.0f},   {1.0f, 0.0f, 0.0f, 1.0f}}, // Top (red)
+            {{ 0.5f, -0.5f, 0.0f},   {0.0f, 1.0f, 0.0f, 1.0f}}, // Right (green)
+            {{-0.5f, -0.5f, 0.0f},   {0.0f, 0.0f, 1.0f, 1.0f}}  // Left (blue)
+        };
+
+        // Create vertex buffer
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.byteSize = sizeof(vertices);
+        vbDesc.isVertexBuffer = true;
+        vbDesc.debugName = "TestTriangle_VB";
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+
+        m_testVertexBuffer = device->createBuffer(vbDesc);
+
+        // Upload data
+        cmd->open();
+        cmd->beginMarker("UploadTriangleVB");
+        cmd->writeBuffer(m_testVertexBuffer, vertices, sizeof(vertices));
+        cmd->endMarker();
+        cmd->close();
+        m_nvrhiDevice->ExecuteCommandList(cmd);
+
+        Msg("~ [TestRenderContext] Created vertex buffer");
+    }
+
+    if (!m_testIndexBuffer)
+    {
+        // Define triangle indices
+        u16 indices[] = {0, 1, 2};
+
+        // Create index buffer
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.byteSize = sizeof(indices);
+        ibDesc.isIndexBuffer = true;
+        ibDesc.debugName = "TestTriangle_IB";
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+
+        m_testIndexBuffer = device->createBuffer(ibDesc);
+
+        // Upload data
+        cmd->open();
+        cmd->beginMarker("UploadTriangleIB");
+        cmd->writeBuffer(m_testIndexBuffer, indices, sizeof(indices));
+        cmd->endMarker();
+        cmd->close();
+        m_nvrhiDevice->ExecuteCommandList(cmd);
+
+        Msg("~ [TestRenderContext] Created index buffer");
+    }
+
+    if (!m_testVS || !m_testPS)
+    {
+        // Compile shaders
+        xr_vector<u8> vsBlob = CompileShaderFromFile(
+            "r3\\test_triangle.vs", "main", "vs_5_0"
+        );
+
+        xr_vector<u8> psBlob = CompileShaderFromFile(
+            "r3\\test_triangle.ps", "main", "ps_5_0"
+        );
+
+        if (vsBlob.empty() || psBlob.empty())
+        {
+            Msg("! [TestRenderContext] Failed to compile shaders");
+            return;
+        }
+
+        // Create shader objects
+        nvrhi::ShaderDesc vsDesc;
+        vsDesc.shaderType = nvrhi::ShaderType::Vertex;
+        vsDesc.debugName = "TestTriangle_VS";
+
+        m_testVS = device->createShader(vsDesc, vsBlob.data(), vsBlob.size());
+
+        nvrhi::ShaderDesc psDesc;
+        psDesc.shaderType = nvrhi::ShaderType::Pixel;
+        psDesc.debugName = "TestTriangle_PS";
+
+        m_testPS = device->createShader(psDesc, psBlob.data(), psBlob.size());
+
+        Msg("~ [TestRenderContext] Compiled shaders");
+    }
+
+    if (!m_testPipeline)
+    {
+        // Create graphics pipeline
+        nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+        // Shaders
+        pipelineDesc.VS = m_testVS;
+        pipelineDesc.PS = m_testPS;
+
+        // Create input layout
+        nvrhi::VertexAttributeDesc attributes[] = {
+            nvrhi::VertexAttributeDesc()
+                .setName("POSITION")
+                .setFormat(nvrhi::Format::RGB32_FLOAT)
+                .setOffset(0)
+                .setBufferIndex(0)
+                .setElementStride(sizeof(float) * 7),
+            nvrhi::VertexAttributeDesc()
+                .setName("COLOR")
+                .setFormat(nvrhi::Format::RGBA32_FLOAT)
+                .setOffset(sizeof(float) * 3)
+                .setBufferIndex(0)
+                .setElementStride(sizeof(float) * 7)
+        };
+
+        nvrhi::InputLayoutHandle inputLayout = device->createInputLayout(
+            attributes,
+            2,  // attribute count
+            m_testVS.Get()  // vertex shader
+        );
+
+        pipelineDesc.inputLayout = inputLayout;
+
+        // Render state
+        pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+        pipelineDesc.renderState.depthStencilState.depthTestEnable = false;
+        pipelineDesc.renderState.depthStencilState.depthWriteEnable = false;
+
+        pipelineDesc.renderState.rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+        pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
+
+        pipelineDesc.renderState.blendState.targets[0].enableBlend();
+
+        // Note: We'll set the actual framebuffer when we begin the render pass
+        // For now, create a temporary dummy texture and framebuffer for pipeline creation
+        nvrhi::TextureDesc dummyTexDesc;
+        dummyTexDesc.width = Device.dwWidth;
+        dummyTexDesc.height = Device.dwHeight;
+        dummyTexDesc.format = nvrhi::Format::RGBA8_UNORM;
+        dummyTexDesc.isRenderTarget = true;
+        dummyTexDesc.debugName = "DummyRT_ForPipelineCreation";
+        dummyTexDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+        dummyTexDesc.keepInitialState = true;
+
+        nvrhi::TextureHandle dummyTexture = device->createTexture(dummyTexDesc);
+
+        nvrhi::FramebufferDesc tempFbDesc;
+        tempFbDesc.addColorAttachment(dummyTexture);
+        nvrhi::FramebufferHandle tempFramebuffer = device->createFramebuffer(tempFbDesc);
+
+        m_testPipeline = device->createGraphicsPipeline(pipelineDesc, tempFramebuffer);
+
+        if (!m_testPipeline)
+        {
+            Msg("! [TestRenderContext] Failed to create pipeline");
+            return;
+        }
+
+        Msg("~ [TestRenderContext] Created pipeline");
+    }
+
+    // Create RenderContext if needed
+    if (!m_renderContext)
+    {
+        m_renderContext = xr_new<xray::render::ng::RenderContext>(device, cmd);
+    }
+
+    // === RENDER USING RENDERCONTEXT ===
+
+    try
+    {
+        // Open command list
+        cmd->open();
+
+        // Get backbuffer
+        ID3D11RenderTargetView* backbufferRTV = Target->get_base_rt();
+        if (!backbufferRTV)
+        {
+            Msg("! [TestRenderContext] No backbuffer RTV");
+            cmd->close();
+            return;
+        }
+
+        ID3D11Resource* backbufferRes = nullptr;
+        backbufferRTV->GetResource(&backbufferRes);
+
+        nvrhi::TextureDesc backbufferDesc;
+        backbufferDesc.width = Device.dwWidth;
+        backbufferDesc.height = Device.dwHeight;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.debugName = "Backbuffer";
+        backbufferDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        backbufferDesc.keepInitialState = true;
+        backbufferDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+
+        nvrhi::TextureHandle backbuffer = device->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::D3D11_Resource,
+            nvrhi::Object(backbufferRes),
+            backbufferDesc
+        );
+
+        backbufferRes->Release();
+
+        // Begin render pass
+        RenderPassDesc passDesc;
+        passDesc.renderTargets[0] = backbuffer;
+        passDesc.numRenderTargets = 1;
+        passDesc.clearColor = true;
+        passDesc.clearValue.color[0] = 0.2f;  // Dark gray background
+        passDesc.clearValue.color[1] = 0.2f;
+        passDesc.clearValue.color[2] = 0.2f;
+        passDesc.clearValue.color[3] = 1.0f;
+
+        m_renderContext->BeginRenderPass(passDesc);
+
+        // Set pipeline FIRST - NVRHI requires valid pipeline for setGraphicsState
+        m_renderContext->SetPipeline(m_testPipeline.Get());
+
+        // Set viewport
+        m_renderContext->SetViewport(0, 0,
+                                    (float)Device.dwWidth,
+                                    (float)Device.dwHeight);
+
+        // Set vertex buffer
+        m_renderContext->SetVertexBuffer(0, m_testVertexBuffer.Get(), 0);
+
+        // Set index buffer
+        m_renderContext->SetIndexBuffer(m_testIndexBuffer.Get(),
+                                       nvrhi::Format::R16_UINT, 0);
+
+        // Draw triangle!
+        m_renderContext->DrawIndexed(3, 0, 0);
+
+        // End render pass
+        m_renderContext->EndRenderPass();
+
+        // Close command list
+        cmd->close();
+
+        // Execute
+        m_nvrhiDevice->ExecuteCommandList(cmd);
+
+        // Present
+        HW.Present();
+
+    }
+    catch (const std::exception& e)
+    {
+        Msg("! [TestRenderContext] Exception: %s", e.what());
     }
 }
 #endif
