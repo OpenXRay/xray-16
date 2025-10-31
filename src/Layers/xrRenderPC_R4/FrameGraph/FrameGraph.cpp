@@ -19,7 +19,7 @@ FrameGraph::~FrameGraph() {
     Reset();
 
     Msg("* [FrameGraph] Destroyed");
-}
+};
 
 VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const ResourceDesc& desc) {
     VERIFY(!m_compiled && "Cannot create resources after compile");
