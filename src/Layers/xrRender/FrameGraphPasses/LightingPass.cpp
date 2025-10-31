@@ -32,20 +32,33 @@ bool LightingPass::LoadShaders()
     ShaderLoader loader(m_device);
 
     // Load fullscreen vertex shader (same as tonemap)
-    m_vertexShader = loader.LoadVertexShader("fullscreen");
-    if (!m_vertexShader)
+    m_vertexShaderNative = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShaderNative)
     {
         Msg("! [LightingPass] Failed to load fullscreen vertex shader");
         return false;
     }
 
     // Load lighting pixel shader
-    m_pixelShader = loader.LoadPixelShader("lighting");
-    if (!m_pixelShader)
+    m_pixelShaderNative = loader.LoadPixelShader("lighting");
+    if (!m_pixelShaderNative)
     {
         Msg("! [LightingPass] Failed to load lighting pixel shader");
         return false;
     }
+
+    // Wrap shaders in RCShader for our abstraction layer
+    m_vertexShader = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Vertex,
+        m_vertexShaderNative,
+        "fullscreen.vs"
+    );
+
+    m_pixelShader = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Pixel,
+        m_pixelShaderNative,
+        "lighting.ps"
+    );
 
     Msg("  ✓ Lighting shaders loaded successfully");
     return true;
@@ -57,40 +70,39 @@ bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
     VERIFY(m_pixelShader != nullptr);
     VERIFY(hdrTexture != nullptr);
 
-    // Create graphics pipeline descriptor
-    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    // Create pipeline descriptor using our abstraction
+    ng::PipelineStateDesc psoDesc;
 
     // Shaders
-    pipelineDesc.VS = m_vertexShader;
-    pipelineDesc.PS = m_pixelShader;
+    psoDesc.vertexShader = m_vertexShader.get();
+    psoDesc.pixelShader = m_pixelShader.get();
 
     // Vertex input - none (fullscreen triangle uses SV_VertexID)
-    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 
-    // Render state
-    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
-    rasterState.cullMode = nvrhi::RasterCullMode::None;
-    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
-    rasterState.frontCounterClockwise = false;
+    // Rasterizer state
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
 
     // Blend state - no blending (opaque)
-    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
-    blendState.targets[0].enableBlend = false;
-    blendState.targets[0].colorWriteMask = nvrhi::ColorMask::All;
+    psoDesc.blendState.renderTargets[0].blendEnable = false;
+    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::All;
 
     // Depth/stencil state - no depth (fullscreen)
-    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
-    depthState.depthTestEnable = false;
-    depthState.depthWriteEnable = false;
-    depthState.stencilEnable = false;
+    psoDesc.depthStencilState.depthTestEnable = false;
+    psoDesc.depthStencilState.depthWriteEnable = false;
+    psoDesc.depthStencilState.stencilEnable = false;
 
-    // Framebuffer info (HDR render target)
+    // Render target formats
     auto hdrDesc = hdrTexture->getDesc();
-    pipelineDesc.renderState.targetCount = 1;
-    pipelineDesc.renderState.renderTargetFormats[0] = hdrDesc.format;
+    psoDesc.renderTargetFormats[0] = hdrDesc.format;
+    psoDesc.renderTargetCount = 1;
 
-    // Create pipeline
-    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+    psoDesc.debugName = "LightingPass";
+
+    // Get or create pipeline through cache
+    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {
@@ -217,7 +229,7 @@ void LightingPass::Execute(
     // ═══════════════════════════════════════════════════════
 
     // Set pipeline
-    ctx.SetPipeline(m_pipeline.Get());
+    ctx.SetPipeline(m_pipeline->GetNativePipeline());
 
     // TODO: Bind G-Buffer textures as shader resources
     // ctx.SetTexture(0, albedo);

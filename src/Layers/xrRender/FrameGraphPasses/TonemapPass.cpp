@@ -33,20 +33,33 @@ bool TonemapPass::LoadShaders()
     ShaderLoader loader(m_device);
 
     // Load fullscreen vertex shader
-    m_vertexShader = loader.LoadVertexShader("fullscreen");
-    if (!m_vertexShader)
+    m_vertexShaderNative = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShaderNative)
     {
         Msg("! [TonemapPass] Failed to load fullscreen vertex shader");
         return false;
     }
 
     // Load tonemap pixel shader
-    m_pixelShader = loader.LoadPixelShader("tonemap");
-    if (!m_pixelShader)
+    m_pixelShaderNative = loader.LoadPixelShader("tonemap");
+    if (!m_pixelShaderNative)
     {
         Msg("! [TonemapPass] Failed to load tonemap pixel shader");
         return false;
     }
+
+    // Wrap shaders in RCShader for our abstraction layer
+    m_vertexShader = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Vertex,
+        m_vertexShaderNative,
+        "fullscreen.vs"
+    );
+
+    m_pixelShader = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Pixel,
+        m_pixelShaderNative,
+        "tonemap.ps"
+    );
 
     Msg("  ✓ Tonemap shaders loaded successfully");
     return true;
@@ -58,40 +71,39 @@ bool TonemapPass::CreatePipeline(nvrhi::ITexture* backbufferTexture)
     VERIFY(m_pixelShader != nullptr);
     VERIFY(backbufferTexture != nullptr);
 
-    // Create graphics pipeline descriptor
-    nvrhi::GraphicsPipelineDesc pipelineDesc;
+    // Create pipeline descriptor using our abstraction
+    ng::PipelineStateDesc psoDesc;
 
     // Shaders
-    pipelineDesc.VS = m_vertexShader;
-    pipelineDesc.PS = m_pixelShader;
+    psoDesc.vertexShader = m_vertexShader.get();
+    psoDesc.pixelShader = m_pixelShader.get();
 
     // Vertex input - none (fullscreen triangle uses SV_VertexID)
-    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 
-    // Render state
-    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
-    rasterState.cullMode = nvrhi::RasterCullMode::None;
-    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
-    rasterState.frontCounterClockwise = false;
+    // Rasterizer state
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
 
     // Blend state - no blending (opaque)
-    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
-    blendState.targets[0].enableBlend = false;
-    blendState.targets[0].colorWriteMask = nvrhi::ColorMask::All;
+    psoDesc.blendState.renderTargets[0].blendEnable = false;
+    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::All;
 
     // Depth/stencil state - no depth (fullscreen)
-    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
-    depthState.depthTestEnable = false;
-    depthState.depthWriteEnable = false;
-    depthState.stencilEnable = false;
+    psoDesc.depthStencilState.depthTestEnable = false;
+    psoDesc.depthStencilState.depthWriteEnable = false;
+    psoDesc.depthStencilState.stencilEnable = false;
 
-    // Framebuffer info
+    // Render target formats
     auto backbufferDesc = backbufferTexture->getDesc();
-    pipelineDesc.renderState.targetCount = 1;
-    pipelineDesc.renderState.renderTargetFormats[0] = backbufferDesc.format;
+    psoDesc.renderTargetFormats[0] = backbufferDesc.format;
+    psoDesc.renderTargetCount = 1;
 
-    // Create pipeline
-    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+    psoDesc.debugName = "TonemapPass";
+
+    // Get or create pipeline through cache
+    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {
@@ -189,7 +201,7 @@ void TonemapPass::Execute(
     // ═══════════════════════════════════════════════════════
 
     // Set pipeline
-    ctx.SetPipeline(m_pipeline.Get());
+    ctx.SetPipeline(m_pipeline->GetNativePipeline());
 
     // TODO: Bind HDR texture as shader resource
     // ctx.SetTexture(0, hdr);

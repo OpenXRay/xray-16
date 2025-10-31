@@ -68,9 +68,11 @@ private:
     Stats m_stats;
 
     // Shaders
-    nvrhi::IShader* m_vertexShader = nullptr;
-    nvrhi::IShader* m_pixelShader = nullptr;
-    nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::IShader* m_vertexShaderNative = nullptr;
+    nvrhi::IShader* m_pixelShaderNative = nullptr;
+    xr_unique_ptr<ng::RCShader> m_vertexShader;
+    xr_unique_ptr<ng::RCShader> m_pixelShader;
+    ng::PipelineState* m_pipeline = nullptr;
 
     // Load shaders
     bool LoadShaders();
