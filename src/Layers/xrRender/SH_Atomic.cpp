@@ -85,6 +85,7 @@ SGS::~SGS()
 {
 #   if defined(USE_DX11)
     _RELEASE(sh);
+    _RELEASE(bytecode);
 #   elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -101,6 +102,7 @@ SHS::~SHS()
 {
 #   if defined(USE_DX11)
     _RELEASE(sh);
+    _RELEASE(bytecode);
 #   elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -117,6 +119,7 @@ SDS::~SDS()
 {
 #   if defined(USE_DX11)
     _RELEASE(sh);
+    _RELEASE(bytecode);
 #   elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -131,6 +134,7 @@ SCS::~SCS()
 {
 #    if defined(USE_DX11)
     _RELEASE(sh);
+    _RELEASE(bytecode);
 #    elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
