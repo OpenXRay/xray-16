@@ -189,12 +189,12 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     CFrustum frustum;
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    // Query spatial database for renderable objects
+    // Query spatial database for renderable objects (same as legacy dsgraph)
     xr_vector<ISpatial*> spatialObjects;
     g_pGamePersistent->SpatialSpace.q_frustum(
         spatialObjects,
-        0,  // Only query objects in immediate portals
-        STYPE_RENDERABLE,  // Only renderables
+        0,  // spatial_traverse_flags (0 = no special flags)
+        STYPE_RENDERABLE,  // Only renderables (not COLLIDEABLE!)
         frustum
     );
 
@@ -230,7 +230,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        // Cast to IRender_Mesh to access geometry (works for all mesh types)
+        // Cast to IRender_Mesh to access geometry (works for all mesh types: Fvisual, FTreeVisual, etc)
         IRender_Mesh* meshVisual = dynamic_cast<IRender_Mesh*>(visual);
         if (!meshVisual) {
             notFvisual++;
