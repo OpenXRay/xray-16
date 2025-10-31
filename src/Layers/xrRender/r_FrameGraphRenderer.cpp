@@ -181,7 +181,21 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        IRender_Mesh* meshVisual = dynamic_cast<IRender_Mesh*>(visual);
+        IRender_Mesh* meshVisual = nullptr;
+
+        switch (visual->getType()) {
+            case MT_NORMAL:
+                meshVisual = static_cast<Fvisual*>(visual);
+                break;
+            case MT_TREE_ST:
+            case MT_TREE_PM:
+                meshVisual = static_cast<FTreeVisual*>(visual);
+                break;
+            default:
+                notFvisual++;
+                continue;
+        }
+
         if (!meshVisual) {
             notFvisual++;
             continue;
