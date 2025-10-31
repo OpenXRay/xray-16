@@ -167,10 +167,52 @@ void FrameGraph::Compile() {
 
 void FrameGraph::Execute() {
     VERIFY(m_compiled && "Must compile before execute");
+    VERIFY(m_context != nullptr && "RenderContext required for execution");
 
-    Msg("~ [FrameGraph] Executing graph...");
+    Msg("~ [FrameGraph] Executing %u passes...", m_sortedPasses.size());
 
-    Msg("~ [FrameGraph] Execution complete");
+    u32 passesExecuted = 0;
+
+    for (PassNode* pass : m_sortedPasses) {
+        if (pass->culled) {
+            continue;
+        }
+
+        if (!pass->executeCallback) {
+            Msg("! [FrameGraph] Pass '%s' has no execute callback - skipping",
+                pass->name.c_str());
+            continue;
+        }
+
+        Msg("~ [FrameGraph] Executing pass '%s' [%u]",
+            pass->name.c_str(), pass->executionOrder);
+
+        if (!pass->barriersBeforePass.empty()) {
+            Msg("~ [FrameGraph]   Applying %u barriers...",
+                pass->barriersBeforePass.size());
+
+            for (const auto& barrier : pass->barriersBeforePass) {
+                ResourceNode* resource = GetResourceNode(barrier.resource);
+                if (!resource || !resource->nvrhiTexture) {
+                    continue;
+                }
+
+                nvrhi::ResourceStates nvrhiBefore = ConvertToNVRHIState(barrier.stateBefore);
+                nvrhi::ResourceStates nvrhiAfter = ConvertToNVRHIState(barrier.stateAfter);
+
+                Msg("~ [FrameGraph]     Barrier: %s -> %s",
+                    ResourceStateToString(barrier.stateBefore),
+                    ResourceStateToString(barrier.stateAfter));
+            }
+        }
+
+        pass->executeCallback(*m_context, *this);
+
+        passesExecuted++;
+    }
+
+    Msg("~ [FrameGraph] Execution complete: %u/%u passes executed",
+        passesExecuted, m_sortedPasses.size());
 }
 
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
@@ -194,6 +236,23 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 }
 
 void FrameGraph::Reset() {
+    for (auto& resource : m_resources) {
+        if (resource.desc.isImported) {
+            continue;
+        }
+
+        if (resource.nvrhiTexture) {
+            Msg("~ [FrameGraph] Releasing texture '%s'",
+                resource.desc.debugName.c_str());
+            resource.nvrhiTexture = nullptr;
+        }
+
+        if (resource.nvrhiBuffer) {
+            Msg("~ [FrameGraph] Releasing buffer '%s'",
+                resource.desc.debugName.c_str());
+            resource.nvrhiBuffer = nullptr;
+        }
+    }
 
     m_resources.clear();
     m_passes.clear();
@@ -201,6 +260,8 @@ void FrameGraph::Reset() {
     m_compiled = false;
 
     memset(&m_stats, 0, sizeof(m_stats));
+
+    Msg("~ [FrameGraph] Reset complete");
 }
 
 void FrameGraph::ExportVisualization(const char* htmlPath) const {
@@ -701,6 +762,33 @@ void FrameGraph::OptimizeMemoryAliasing() {
     Msg("~ [FrameGraph] Peak memory usage: %.2f MB (reduced from %.2f MB)",
         m_stats.peakMemoryUsage / (1024.0f * 1024.0f),
         m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
+}
+
+nvrhi::ResourceStates FrameGraph::ConvertToNVRHIState(ResourceState state) {
+    switch (state) {
+        case ResourceState::Undefined:
+            return nvrhi::ResourceStates::Common;
+        case ResourceState::RenderTarget:
+            return nvrhi::ResourceStates::RenderTarget;
+        case ResourceState::DepthStencilWrite:
+            return nvrhi::ResourceStates::DepthWrite;
+        case ResourceState::DepthStencilRead:
+            return nvrhi::ResourceStates::DepthRead;
+        case ResourceState::ShaderResource:
+            return nvrhi::ResourceStates::ShaderResource;
+        case ResourceState::UnorderedAccess:
+            return nvrhi::ResourceStates::UnorderedAccess;
+        case ResourceState::CopySource:
+            return nvrhi::ResourceStates::CopySource;
+        case ResourceState::CopyDest:
+            return nvrhi::ResourceStates::CopyDest;
+        case ResourceState::Present:
+            return nvrhi::ResourceStates::Present;
+        case ResourceState::Common:
+            return nvrhi::ResourceStates::Common;
+        default:
+            return nvrhi::ResourceStates::Common;
+    }
 }
 
 }

@@ -42,6 +42,8 @@ public:
 
     void SetPassCallback(PassHandle pass, PassExecuteCallback callback);
 
+    void SetRenderContext(ng::RenderContext* context) { m_context = context; }
+
     void Compile();
 
     void Execute();
@@ -108,6 +110,8 @@ private:
 
     PassNode* FindProducer(VirtualResourceHandle resource);
     bool HasCyclicDependency() const;
+
+    static nvrhi::ResourceStates ConvertToNVRHIState(ResourceState state);
 };
 
 }
