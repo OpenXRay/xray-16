@@ -19,6 +19,7 @@ namespace xray::render {
 
 namespace ng {
     class PipelineState;
+    struct PipelineStateDesc;
 }
 
 namespace passes {
