@@ -237,17 +237,18 @@
     <ClInclude Include="..\xrRender\light_smapvis.h" />
     <ClInclude Include="r4_rendertarget.h" />
     <ClInclude Include="R_Backend_LOD.h" />
-    <ClInclude Include="NVRHI\NVRHIDevice.h" />
-    <ClInclude Include="RenderContext\ResourceHandle.h" />
-    <ClInclude Include="RenderContext\RCShader.h" />
-    <ClInclude Include="RenderContext\PipelineState.h" />
-    <ClInclude Include="RenderContext\RenderDevice.h" />
-    <ClInclude Include="RenderContext\RenderContext.h" />
-    <ClInclude Include="FrameGraph\FGTypes.h" />
-    <ClInclude Include="FrameGraph\FGResource.h" />
-    <ClInclude Include="FrameGraph\FGPass.h" />
-    <ClInclude Include="FrameGraph\FrameGraph.h" />
-    <ClInclude Include="FrameGraph\FGTest.h" />
+    <ClInclude Include="..\xrRender\NVRHI\NVRHIDevice.h" />
+    <ClInclude Include="..\xrRender\RenderContext\ResourceHandle.h" />
+    <ClInclude Include="..\xrRender\RenderContext\RCShader.h" />
+    <ClInclude Include="..\xrRender\RenderContext\PipelineState.h" />
+    <ClInclude Include="..\xrRender\RenderContext\RenderDevice.h" />
+    <ClInclude Include="..\xrRender\RenderContext\RenderContext.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGTypes.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGResource.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPass.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -451,15 +452,16 @@
     <ClCompile Include="r4_rendertarget_phase_hdao.cpp" />
     <ClCompile Include="r4_shaders.cpp" />
     <ClCompile Include="R_Backend_LOD.cpp" />
-    <ClCompile Include="NVRHI\NVRHIDevice.cpp" />
-    <ClCompile Include="RenderContext\RCShader.cpp" />
-    <ClCompile Include="RenderContext\PipelineState.cpp" />
-    <ClCompile Include="RenderContext\RenderDevice.cpp" />
-    <ClCompile Include="RenderContext\RenderContext.cpp" />
-    <ClCompile Include="FrameGraph\FGResource.cpp" />
-    <ClCompile Include="FrameGraph\FGPass.cpp" />
-    <ClCompile Include="FrameGraph\FrameGraph.cpp" />
-    <ClCompile Include="FrameGraph\FGTest.cpp" />
+    <ClCompile Include="..\xrRender\NVRHI\NVRHIDevice.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\RCShader.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\PipelineState.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\RenderDevice.cpp" />
+    <ClCompile Include="..\xrRender\RenderContext\RenderContext.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

@@ -16,31 +16,35 @@ target_sources(xrRenderPC_R4 PRIVATE
     stdafx.h
     xrRender_R4.cpp
 
-    # NVRHI wrapper
-    NVRHI/NVRHIDevice.h
-    NVRHI/NVRHIDevice.cpp
+    # NVRHI wrapper - Renderer agnostic
+    ../xrRender/NVRHI/NVRHIDevice.h
+    ../xrRender/NVRHI/NVRHIDevice.cpp
 
-    # RenderContext (Phase 1)
-    RenderContext/ResourceHandle.h
-    RenderContext/RCShader.h
-    RenderContext/RCShader.cpp
-    RenderContext/PipelineState.h
-    RenderContext/PipelineState.cpp
-    RenderContext/RenderDevice.h
-    RenderContext/RenderDevice.cpp
-    RenderContext/RenderContext.h
-    RenderContext/RenderContext.cpp
+    # RenderContext (Phase 1) - Renderer agnostic
+    ../xrRender/RenderContext/ResourceHandle.h
+    ../xrRender/RenderContext/RCShader.h
+    ../xrRender/RenderContext/RCShader.cpp
+    ../xrRender/RenderContext/PipelineState.h
+    ../xrRender/RenderContext/PipelineState.cpp
+    ../xrRender/RenderContext/RenderDevice.h
+    ../xrRender/RenderContext/RenderDevice.cpp
+    ../xrRender/RenderContext/RenderContext.h
+    ../xrRender/RenderContext/RenderContext.cpp
 
-    # FrameGraph (Phase 2)
-    FrameGraph/FGTypes.h
-    FrameGraph/FGResource.h
-    FrameGraph/FGResource.cpp
-    FrameGraph/FGPass.h
-    FrameGraph/FGPass.cpp
-    FrameGraph/FrameGraph.h
-    FrameGraph/FrameGraph.cpp
-    FrameGraph/FGTest.h
-    FrameGraph/FGTest.cpp
+    # FrameGraph (Phase 2) - Renderer agnostic
+    ../xrRender/FrameGraph/FGTypes.h
+    ../xrRender/FrameGraph/FGResource.h
+    ../xrRender/FrameGraph/FGResource.cpp
+    ../xrRender/FrameGraph/FGPass.h
+    ../xrRender/FrameGraph/FGPass.cpp
+    ../xrRender/FrameGraph/FrameGraph.h
+    ../xrRender/FrameGraph/FrameGraph.cpp
+    ../xrRender/FrameGraph/FGTest.h
+    ../xrRender/FrameGraph/FGTest.cpp
+
+    # FrameGraph Passes (Phase 3) - Renderer agnostic
+    ../xrRender/FrameGraphPasses/GBufferPass.h
+    ../xrRender/FrameGraphPasses/GBufferPass.cpp
 )
 
 target_include_directories(xrRenderPC_R4
