@@ -20,6 +20,15 @@ RenderContext::~RenderContext() {
         EndRenderPass();
     }
 
+    // Log final statistics
+    Msg("~ [RenderContext] Stats: %d draws, %d pipeline changes, %d redundant calls avoided",
+        m_stats.numDrawCalls + m_stats.numDrawIndexedCalls +
+        m_stats.numDrawInstancedCalls + m_stats.numDrawIndexedInstancedCalls,
+        m_stats.numPipelineChanges,
+        m_stats.numRedundantPipeline + m_stats.numRedundantViewport +
+        m_stats.numRedundantVertexBuffer + m_stats.numRedundantIndexBuffer +
+        m_stats.numRedundantBindingSet);
+
     Msg("~ [RenderContext] Destroyed");
 }
 
@@ -29,6 +38,9 @@ RenderContext::~RenderContext() {
 
 void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
     VERIFY2(!m_inRenderPass, "Already in render pass!");
+
+    // Reset state cache for new render pass
+    m_stateCache.Reset();
 
     // Store current render pass
     m_currentRenderPass = desc;
@@ -108,6 +120,16 @@ void RenderContext::SetPipeline(nvrhi::IGraphicsPipeline* pipeline) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(pipeline != nullptr);
 
+    // Check cache - skip if already set
+    if (m_stateCache.pipeline == pipeline) {
+        m_stats.numRedundantPipeline++;
+        return;
+    }
+
+    // Update cache
+    m_stateCache.pipeline = pipeline;
+    m_stats.numPipelineChanges++;
+
     m_currentState.pipeline = pipeline;
     // Don't call setGraphicsState yet - batch state changes
 }
@@ -123,6 +145,23 @@ void RenderContext::SetPipeline(PipelineStateHandle pso) {
 
 void RenderContext::SetViewport(const Viewport& viewport) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // Check cache - compare viewport values
+    if (m_stateCache.viewportSet &&
+        m_stateCache.viewport.x == viewport.x &&
+        m_stateCache.viewport.y == viewport.y &&
+        m_stateCache.viewport.width == viewport.width &&
+        m_stateCache.viewport.height == viewport.height &&
+        m_stateCache.viewport.minDepth == viewport.minDepth &&
+        m_stateCache.viewport.maxDepth == viewport.maxDepth) {
+        m_stats.numRedundantViewport++;
+        return;
+    }
+
+    // Update cache
+    m_stateCache.viewport = viewport;
+    m_stateCache.viewportSet = true;
+    m_stats.numViewportChanges++;
 
     nvrhi::Viewport nvrhiViewport;
     nvrhiViewport.minX = viewport.x;
@@ -165,6 +204,19 @@ void RenderContext::SetScissor(const Rect& scissor) {
 void RenderContext::SetVertexBuffer(u32 slot, nvrhi::IBuffer* buffer, u64 offset) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer != nullptr);
+    VERIFY2(slot < 8, "Vertex buffer slot out of range");
+
+    // Check cache - compare buffer and offset
+    if (m_stateCache.vertexBuffers[slot] == buffer &&
+        m_stateCache.vertexBufferOffsets[slot] == offset) {
+        m_stats.numRedundantVertexBuffer++;
+        return;
+    }
+
+    // Update cache
+    m_stateCache.vertexBuffers[slot] = buffer;
+    m_stateCache.vertexBufferOffsets[slot] = offset;
+    m_stats.numVertexBufferChanges++;
 
     m_currentState.vertexBuffers.resize(slot + 1);
     m_currentState.vertexBuffers[slot].buffer = buffer;
@@ -183,6 +235,20 @@ void RenderContext::SetIndexBuffer(nvrhi::IBuffer* buffer,
                                    u64 offset) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer != nullptr);
+
+    // Check cache - compare buffer, format, and offset
+    if (m_stateCache.indexBuffer == buffer &&
+        m_stateCache.indexBufferFormat == format &&
+        m_stateCache.indexBufferOffset == offset) {
+        m_stats.numRedundantIndexBuffer++;
+        return;
+    }
+
+    // Update cache
+    m_stateCache.indexBuffer = buffer;
+    m_stateCache.indexBufferFormat = format;
+    m_stateCache.indexBufferOffset = offset;
+    m_stats.numIndexBufferChanges++;
 
     m_currentState.indexBuffer.buffer = buffer;
     m_currentState.indexBuffer.format = format;
@@ -356,6 +422,16 @@ void RenderContext::SetBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet) {
     VERIFY(bindingSet != nullptr);
     VERIFY2(slot < 6, "NVRHI supports up to 6 binding set slots (0-5)");
 
+    // Check cache - compare binding set
+    if (m_stateCache.bindingSets[slot] == bindingSet) {
+        m_stats.numRedundantBindingSet++;
+        return;
+    }
+
+    // Update cache
+    m_stateCache.bindingSets[slot] = bindingSet;
+    m_stats.numBindingSetChanges++;
+
     // Add binding set to graphics state
     // NVRHI stores binding sets in an array
     m_currentState.bindings.resize(slot + 1);
@@ -376,6 +452,9 @@ void RenderContext::SetBindingSet(u32 slot, BindingSetHandle bindingSet) {
 void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
 
+    // Track draw call
+    m_stats.numDrawCalls++;
+
     // Apply all batched state changes before draw
     m_commandList->setGraphicsState(m_currentState);
 
@@ -388,6 +467,9 @@ void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
 
 void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // Track draw call
+    m_stats.numDrawIndexedCalls++;
 
     // Apply all batched state changes before draw
     m_commandList->setGraphicsState(m_currentState);
@@ -403,6 +485,9 @@ void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) 
 void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
                                   u32 startVertex, u32 startInstance) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // Track draw call
+    m_stats.numDrawInstancedCalls++;
 
     // Apply all batched state changes before draw
     m_commandList->setGraphicsState(m_currentState);
@@ -420,6 +505,9 @@ void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
                                          u32 startIndex, int baseVertex,
                                          u32 startInstance) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // Track draw call
+    m_stats.numDrawIndexedInstancedCalls++;
 
     // Apply all batched state changes before draw
     m_commandList->setGraphicsState(m_currentState);

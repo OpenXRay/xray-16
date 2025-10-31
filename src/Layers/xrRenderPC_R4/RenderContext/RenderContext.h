@@ -246,6 +246,54 @@ public:
     void ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stencil);
 
     // ═══════════════════════════════════════════════════════
+    //  STATISTICS & PERFORMANCE
+    // ═══════════════════════════════════════════════════════
+
+    struct RenderStats {
+        // Draw call counts
+        u32 numDrawCalls = 0;
+        u32 numDrawIndexedCalls = 0;
+        u32 numDrawInstancedCalls = 0;
+        u32 numDrawIndexedInstancedCalls = 0;
+
+        // State change counts (redundancy tracking)
+        u32 numPipelineChanges = 0;
+        u32 numViewportChanges = 0;
+        u32 numScissorChanges = 0;
+        u32 numVertexBufferChanges = 0;
+        u32 numIndexBufferChanges = 0;
+        u32 numBindingSetChanges = 0;
+
+        // Redundant call tracking (skipped due to cache)
+        u32 numRedundantPipeline = 0;
+        u32 numRedundantViewport = 0;
+        u32 numRedundantVertexBuffer = 0;
+        u32 numRedundantIndexBuffer = 0;
+        u32 numRedundantBindingSet = 0;
+
+        void Reset() {
+            numDrawCalls = 0;
+            numDrawIndexedCalls = 0;
+            numDrawInstancedCalls = 0;
+            numDrawIndexedInstancedCalls = 0;
+            numPipelineChanges = 0;
+            numViewportChanges = 0;
+            numScissorChanges = 0;
+            numVertexBufferChanges = 0;
+            numIndexBufferChanges = 0;
+            numBindingSetChanges = 0;
+            numRedundantPipeline = 0;
+            numRedundantViewport = 0;
+            numRedundantVertexBuffer = 0;
+            numRedundantIndexBuffer = 0;
+            numRedundantBindingSet = 0;
+        }
+    };
+
+    const RenderStats& GetStats() const { return m_stats; }
+    void ResetStats() { m_stats.Reset(); }
+
+    // ═══════════════════════════════════════════════════════
     //  STATE QUERY
     // ═══════════════════════════════════════════════════════
 
@@ -267,6 +315,40 @@ private:
     RenderPassDesc m_currentRenderPass;
     nvrhi::FramebufferHandle m_currentFramebuffer;
     nvrhi::GraphicsState m_currentState;  // Track current graphics state
+
+    // State cache for redundancy elimination
+    struct StateCache {
+        nvrhi::IGraphicsPipeline* pipeline = nullptr;
+        nvrhi::IBuffer* vertexBuffers[8] = {};
+        u64 vertexBufferOffsets[8] = {};
+        nvrhi::IBuffer* indexBuffer = nullptr;
+        nvrhi::Format indexBufferFormat = nvrhi::Format::UNKNOWN;
+        u64 indexBufferOffset = 0;
+        nvrhi::IBindingSet* bindingSets[6] = {};  // NVRHI supports up to 6
+        Viewport viewport;
+        Rect scissor;
+        bool viewportSet = false;
+        bool scissorSet = false;
+
+        void Reset() {
+            pipeline = nullptr;
+            for (int i = 0; i < 8; i++) {
+                vertexBuffers[i] = nullptr;
+                vertexBufferOffsets[i] = 0;
+            }
+            indexBuffer = nullptr;
+            indexBufferFormat = nvrhi::Format::UNKNOWN;
+            indexBufferOffset = 0;
+            for (int i = 0; i < 6; i++) {
+                bindingSets[i] = nullptr;
+            }
+            viewportSet = false;
+            scissorSet = false;
+        }
+    } m_stateCache;
+
+    // Statistics tracking
+    RenderStats m_stats;
 
     // Prevent copying
     RenderContext(const RenderContext&) = delete;
