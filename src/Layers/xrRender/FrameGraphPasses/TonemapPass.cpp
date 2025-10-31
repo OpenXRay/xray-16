@@ -48,6 +48,49 @@ bool TonemapPass::LoadShaders()
     return true;
 }
 
+bool TonemapPass::CreatePipeline(nvrhi::ITexture* backbufferTexture)
+{
+    VERIFY(m_vertexShader != nullptr);
+    VERIFY(m_pixelShader != nullptr);
+    VERIFY(backbufferTexture != nullptr);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+    pipelineDesc.VS = m_vertexShader;
+    pipelineDesc.PS = m_pixelShader;
+
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
+    rasterState.cullMode = nvrhi::RasterCullMode::None;
+    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+    rasterState.frontCounterClockwise = false;
+
+    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
+    blendState.targets[0].enableBlend = false;
+    blendState.targets[0].colorWriteMask = nvrhi::ColorMask::All;
+
+    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
+    depthState.depthTestEnable = false;
+    depthState.depthWriteEnable = false;
+    depthState.stencilEnable = false;
+
+    auto backbufferDesc = backbufferTexture->getDesc();
+    pipelineDesc.renderState.targetCount = 1;
+    pipelineDesc.renderState.renderTargetFormats[0] = backbufferDesc.format;
+
+    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+
+    if (!m_pipeline)
+    {
+        Msg("! [TonemapPass] Failed to create graphics pipeline");
+        return false;
+    }
+
+    Msg("  ✓ TonemapPass pipeline created successfully");
+    return true;
+}
+
 void TonemapPass::Setup(
     FrameGraph& fg,
     VirtualResourceHandle hdrInput,
@@ -83,6 +126,16 @@ void TonemapPass::Execute(
     nvrhi::ITexture* hdr = fg.GetPhysicalTexture(hdrInput);
     nvrhi::ITexture* output = fg.GetPhysicalTexture(backbuffer);
 
+    if (!m_pipeline)
+    {
+        if (!CreatePipeline(output))
+        {
+            Msg("! [TonemapPass] Failed to create pipeline");
+            ctx.EndRenderPass();
+            return;
+        }
+    }
+
     ng::RenderPassDesc passDesc;
     passDesc.renderTargets[0] = output;
     passDesc.numRenderTargets = 1;
@@ -100,14 +153,11 @@ void TonemapPass::Execute(
     scissor.height = desc.height;
     ctx.SetScissor(scissor);
 
-    if (m_vertexShader && m_pixelShader)
-    {
-        Msg("  (Shaders loaded but pipeline not yet created)");
-    }
-    else
-    {
-        Msg("  (Skipping tonemap draw - shaders not loaded)");
-    }
+    ctx.SetPipeline(m_pipeline.Get());
+
+    ctx.Draw(3, 0);
+
+    Msg("  ✓ Tonemap draw complete (3 vertices)");
 
     ctx.EndRenderPass();
 
