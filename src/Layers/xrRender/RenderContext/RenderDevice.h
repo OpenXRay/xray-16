@@ -197,6 +197,12 @@ public:
         size_t bytecodeSize,
         const char* debugName);
 
+    // Wrap existing D3D11 shader object
+    ShaderHandle CreateShaderFromD3D11(
+        ShaderStage stage,
+        IUnknown* d3d11Shader,
+        const char* debugName);
+
     void DestroyShader(ShaderHandle handle);
 
     RCShader* GetShader(ShaderHandle handle);

@@ -3,13 +3,20 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
-// Forward declarations
-class Shader;
-struct ShaderElement;
-struct SPass;
-class dxRender_Visual;
-struct SVS;
-struct SPS;
+// Forward declarations - must be in RENDER_NAMESPACE
+// Note: RENDER_NAMESPACE is defined as render_r4 in preprocessor
+namespace xray::render::RENDER_NAMESPACE {
+    struct Shader;
+    struct ShaderElement;
+    struct SPass;
+    class dxRender_Visual;
+    struct SVS;
+    struct SPS;
+}
+
+namespace xray::render::framegraph {
+    class FrameGraph;
+}
 
 namespace xray::render {
 
@@ -21,6 +28,14 @@ namespace ng {
 namespace passes {
     struct GBufferOutputs;
 }
+
+// Bring RENDER_NAMESPACE types into scope for easier usage
+using RENDER_NAMESPACE::Shader;
+using RENDER_NAMESPACE::ShaderElement;
+using RENDER_NAMESPACE::SPass;
+using RENDER_NAMESPACE::dxRender_Visual;
+using RENDER_NAMESPACE::SVS;
+using RENDER_NAMESPACE::SPS;
 
 // ══════════════════════════════════════════════════════════
 //  MATERIAL KEY (FOR PSO CACHE LOOKUP)
@@ -100,7 +115,7 @@ public:
     MaterialPSO* GetOrCreatePSO(
         dxRender_Visual* visual,
         const passes::GBufferOutputs& outputs,
-        framegraph::FrameGraph& fg);
+        xray::render::framegraph::FrameGraph& fg);
 
     // Clear cache
     void Clear();
@@ -126,7 +141,7 @@ private:
         ShaderElement* elem,
         SPass* pass,
         const passes::GBufferOutputs& outputs,
-        framegraph::FrameGraph& fg);
+        xray::render::framegraph::FrameGraph& fg);
 
     // Extract textures from SPass
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);

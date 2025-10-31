@@ -9,6 +9,7 @@
 namespace xray::render {
 
 using namespace passes;
+using namespace xray::render::RENDER_NAMESPACE;  // For Shader types (STextureList, etc.)
 
 // ══════════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -32,8 +33,8 @@ MaterialCache::~MaterialCache() {
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
-    const GBufferOutputs& outputs,
-    framegraph::FrameGraph& fg)
+    const passes::GBufferOutputs& outputs,
+    xray::render::framegraph::FrameGraph& fg)
 {
     if (!visual) {
         Msg("! [MaterialCache] NULL visual passed to GetOrCreatePSO");
@@ -103,12 +104,11 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     m_stats.numCacheMisses++;
 
-    Msg("~ [MaterialCache] Creating PSO for shader '%s' (hash: texture=0x%llX, state=0x%llX)",
-        shader->cName.c_str(), textureHash, stateHash);
+    Msg("~ [MaterialCache] Creating PSO (hash: texture=0x%llX, state=0x%llX)", textureHash, stateHash);
 
     MaterialPSO* pso = CreatePSO(elem, pass, outputs, fg);
     if (!pso) {
-        Msg("! [MaterialCache] Failed to create PSO for shader '%s'", shader->cName.c_str());
+        Msg("! [MaterialCache] Failed to create PSO");
         return nullptr;
     }
 
@@ -128,8 +128,8 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 MaterialPSO* MaterialCache::CreatePSO(
     ShaderElement* elem,
     SPass* pass,
-    const GBufferOutputs& outputs,
-    framegraph::FrameGraph& fg)
+    const passes::GBufferOutputs& outputs,
+    xray::render::framegraph::FrameGraph& fg)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -164,19 +164,45 @@ MaterialPSO* MaterialCache::CreatePSO(
     Msg("  Created binding layout");
 
     // ═══════════════════════════════════════════════════════
+    //  WRAP SHADERS
+    // ═══════════════════════════════════════════════════════
+
+    ng::ShaderHandle vsHandle = m_device->CreateShaderFromD3D11(
+        ng::ShaderStage::Vertex,
+        pso->vertexShader->sh,
+        pso->vertexShader->cName.c_str());
+
+    if (!vsHandle.IsValid()) {
+        Msg("! [MaterialCache] Failed to wrap vertex shader");
+        return nullptr;
+    }
+
+    ng::ShaderHandle psHandle = m_device->CreateShaderFromD3D11(
+        ng::ShaderStage::Pixel,
+        pso->pixelShader->sh,
+        pso->pixelShader->cName.c_str());
+
+    if (!psHandle.IsValid()) {
+        Msg("! [MaterialCache] Failed to wrap pixel shader");
+        m_device->DestroyShader(vsHandle);
+        return nullptr;
+    }
+
+    Msg("  Wrapped VS/PS shaders");
+
+    // ═══════════════════════════════════════════════════════
     //  CREATE PSO
     // ═══════════════════════════════════════════════════════
 
-    // TODO: Implement PSO creation with extracted shaders
-    // For now, this is a placeholder
-    // We need to:
-    // 1. Load shader bytecode from ref_vs/ref_ps
-    // 2. Create NVRHI shader objects
-    // 3. Create pipeline desc with shaders + binding layout
-    // 4. Create framebuffer from outputs
-    // 5. Call device->CreateGraphicsPipeline()
+    // TODO: Create PipelineState with these shaders + binding layout
+    // For now, store the shader handles
+    // Full PSO creation will be implemented in the next step
 
-    Msg("  ! PSO creation not yet implemented - placeholder PSO");
+    Msg("  ! PSO creation not fully implemented yet");
+
+    // Clean up shader handles (temporary until PSO creation is complete)
+    m_device->DestroyShader(vsHandle);
+    m_device->DestroyShader(psHandle);
 
     m_stats.totalPSOCreations++;
 
