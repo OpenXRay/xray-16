@@ -20,11 +20,21 @@ RenderContext::~RenderContext() {
         EndRenderPass();
     }
 
+    Msg("~ [RenderContext] Stats: %d draws, %d pipeline changes, %d redundant calls avoided",
+        m_stats.numDrawCalls + m_stats.numDrawIndexedCalls +
+        m_stats.numDrawInstancedCalls + m_stats.numDrawIndexedInstancedCalls,
+        m_stats.numPipelineChanges,
+        m_stats.numRedundantPipeline + m_stats.numRedundantViewport +
+        m_stats.numRedundantVertexBuffer + m_stats.numRedundantIndexBuffer +
+        m_stats.numRedundantBindingSet);
+
     Msg("~ [RenderContext] Destroyed");
 }
 
 void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
     VERIFY2(!m_inRenderPass, "Already in render pass!");
+
+    m_stateCache.Reset();
 
     m_currentRenderPass = desc;
 
@@ -94,6 +104,14 @@ void RenderContext::SetPipeline(nvrhi::IGraphicsPipeline* pipeline) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(pipeline != nullptr);
 
+    if (m_stateCache.pipeline == pipeline) {
+        m_stats.numRedundantPipeline++;
+        return;
+    }
+
+    m_stateCache.pipeline = pipeline;
+    m_stats.numPipelineChanges++;
+
     m_currentState.pipeline = pipeline;
 }
 
@@ -103,6 +121,21 @@ void RenderContext::SetPipeline(PipelineStateHandle pso) {
 
 void RenderContext::SetViewport(const Viewport& viewport) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    if (m_stateCache.viewportSet &&
+        m_stateCache.viewport.x == viewport.x &&
+        m_stateCache.viewport.y == viewport.y &&
+        m_stateCache.viewport.width == viewport.width &&
+        m_stateCache.viewport.height == viewport.height &&
+        m_stateCache.viewport.minDepth == viewport.minDepth &&
+        m_stateCache.viewport.maxDepth == viewport.maxDepth) {
+        m_stats.numRedundantViewport++;
+        return;
+    }
+
+    m_stateCache.viewport = viewport;
+    m_stateCache.viewportSet = true;
+    m_stats.numViewportChanges++;
 
     nvrhi::Viewport nvrhiViewport;
     nvrhiViewport.minX = viewport.x;
@@ -139,6 +172,17 @@ void RenderContext::SetScissor(const Rect& scissor) {
 void RenderContext::SetVertexBuffer(u32 slot, nvrhi::IBuffer* buffer, u64 offset) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer != nullptr);
+    VERIFY2(slot < 8, "Vertex buffer slot out of range");
+
+    if (m_stateCache.vertexBuffers[slot] == buffer &&
+        m_stateCache.vertexBufferOffsets[slot] == offset) {
+        m_stats.numRedundantVertexBuffer++;
+        return;
+    }
+
+    m_stateCache.vertexBuffers[slot] = buffer;
+    m_stateCache.vertexBufferOffsets[slot] = offset;
+    m_stats.numVertexBufferChanges++;
 
     m_currentState.vertexBuffers.resize(slot + 1);
     m_currentState.vertexBuffers[slot].buffer = buffer;
@@ -155,6 +199,18 @@ void RenderContext::SetIndexBuffer(nvrhi::IBuffer* buffer,
                                    u64 offset) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer != nullptr);
+
+    if (m_stateCache.indexBuffer == buffer &&
+        m_stateCache.indexBufferFormat == format &&
+        m_stateCache.indexBufferOffset == offset) {
+        m_stats.numRedundantIndexBuffer++;
+        return;
+    }
+
+    m_stateCache.indexBuffer = buffer;
+    m_stateCache.indexBufferFormat = format;
+    m_stateCache.indexBufferOffset = offset;
+    m_stats.numIndexBufferChanges++;
 
     m_currentState.indexBuffer.buffer = buffer;
     m_currentState.indexBuffer.format = format;
@@ -295,6 +351,14 @@ void RenderContext::SetBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet) {
     VERIFY(bindingSet != nullptr);
     VERIFY2(slot < 6, "NVRHI supports up to 6 binding set slots (0-5)");
 
+    if (m_stateCache.bindingSets[slot] == bindingSet) {
+        m_stats.numRedundantBindingSet++;
+        return;
+    }
+
+    m_stateCache.bindingSets[slot] = bindingSet;
+    m_stats.numBindingSetChanges++;
+
     m_currentState.bindings.resize(slot + 1);
     m_currentState.bindings[slot] = bindingSet;
 
@@ -307,6 +371,8 @@ void RenderContext::SetBindingSet(u32 slot, BindingSetHandle bindingSet) {
 void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
 
+    m_stats.numDrawCalls++;
+
     m_commandList->setGraphicsState(m_currentState);
 
     nvrhi::DrawArguments args;
@@ -318,6 +384,8 @@ void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
 
 void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    m_stats.numDrawIndexedCalls++;
 
     m_commandList->setGraphicsState(m_currentState);
 
@@ -332,6 +400,8 @@ void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, int baseVertex) 
 void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
                                   u32 startVertex, u32 startInstance) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    m_stats.numDrawInstancedCalls++;
 
     m_commandList->setGraphicsState(m_currentState);
 
@@ -348,6 +418,8 @@ void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
                                          u32 startIndex, int baseVertex,
                                          u32 startInstance) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    m_stats.numDrawIndexedInstancedCalls++;
 
     m_commandList->setGraphicsState(m_currentState);
 
