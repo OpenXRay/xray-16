@@ -471,47 +471,6 @@ ShaderHandle RenderDevice::CreateShader(
     return handle;
 }
 
-ShaderHandle RenderDevice::CreateShaderFromD3D11(
-    ShaderStage stage,
-    IUnknown* d3d11Shader,
-    const char* debugName) {
-
-    VERIFY(m_initialized);
-    VERIFY(d3d11Shader);
-
-    // Convert to NVRHI shader descriptor
-    nvrhi::ShaderDesc nvrhiDesc = ConvertShaderDesc(stage, debugName);
-
-    // Wrap D3D11 shader in NVRHI handle
-    nvrhi::ShaderHandle nvrhiShader = GetNativeDevice()->createHandleForNativeShader(
-        nvrhi::ObjectTypes::D3D11_Resource,
-        nvrhi::Object(d3d11Shader),
-        nvrhiDesc);
-
-    if (!nvrhiShader) {
-        Msg("! [RenderDevice] Failed to wrap D3D11 shader: %s", debugName);
-        return ShaderHandle{};
-    }
-
-    // Allocate handle
-    ShaderHandle handle = AllocateShaderHandle();
-
-    // Create RCShader wrapper
-    xr_unique_ptr<RCShader> shader = xr_make_unique<RCShader>(stage, nvrhiShader, debugName);
-
-    // Store shader info
-    ShaderInfo& info = m_shaders[handle.index];
-    info.shader = std::move(shader);
-
-    // Update statistics
-    m_stats.shadersAlive++;
-    m_stats.shadersCreated++;
-
-    Msg("~ [RenderDevice] Wrapped D3D11 shader: %s", debugName);
-
-    return handle;
-}
-
 void RenderDevice::DestroyShader(ShaderHandle handle) {
     if (!ValidateShaderHandle(handle)) {
         Msg("! [RenderDevice] DestroyShader: Invalid handle");

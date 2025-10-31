@@ -29,6 +29,7 @@ struct ECORE_API SVS : public xr_resource_named
 {
 #if defined(USE_DX11)
     ID3DVertexShader* sh;
+    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -48,6 +49,7 @@ struct ECORE_API SPS : public xr_resource_named
 {
 #if defined(USE_DX11)
     ID3DPixelShader* sh;
+    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
 #elif defined(USE_OGL)
     GLuint sh;
 #else

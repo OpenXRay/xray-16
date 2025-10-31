@@ -30,6 +30,19 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
     }
 #endif
 
+    // Store shader bytecode for NVRHI/FrameGraph renderer
+#if defined(USE_DX11)
+    _hr = D3DCreateBlob(buffer_size, &result->bytecode);
+    if (SUCCEEDED(_hr) && result->bytecode)
+    {
+        CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
+    }
+    else
+    {
+        Msg("! Failed to create bytecode blob for %s", file_name);
+    }
+#endif
+
     ID3DShaderReflection* pReflection = 0;
     _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 

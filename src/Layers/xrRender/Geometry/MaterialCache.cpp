@@ -164,31 +164,44 @@ MaterialPSO* MaterialCache::CreatePSO(
     Msg("  Created binding layout");
 
     // ═══════════════════════════════════════════════════════
-    //  WRAP SHADERS
+    //  CREATE SHADERS FROM BYTECODE
     // ═══════════════════════════════════════════════════════
 
-    ng::ShaderHandle vsHandle = m_device->CreateShaderFromD3D11(
-        ng::ShaderStage::Vertex,
-        pso->vertexShader->sh,
-        pso->vertexShader->cName.c_str());
-
-    if (!vsHandle.IsValid()) {
-        Msg("! [MaterialCache] Failed to wrap vertex shader");
+    if (!pso->vertexShader->bytecode) {
+        Msg("! [MaterialCache] Vertex shader has no bytecode");
         return nullptr;
     }
 
-    ng::ShaderHandle psHandle = m_device->CreateShaderFromD3D11(
-        ng::ShaderStage::Pixel,
-        pso->pixelShader->sh,
-        pso->pixelShader->cName.c_str());
+    ng::ShaderHandle vsHandle = m_device->CreateShader(
+        ng::ShaderStage::Vertex,
+        pso->vertexShader->bytecode->GetBufferPointer(),
+        pso->vertexShader->bytecode->GetBufferSize(),
+        pso->vertexShader->cName.c_str());
 
-    if (!psHandle.IsValid()) {
-        Msg("! [MaterialCache] Failed to wrap pixel shader");
+    if (!vsHandle.IsValid()) {
+        Msg("! [MaterialCache] Failed to create vertex shader");
+        return nullptr;
+    }
+
+    if (!pso->pixelShader->bytecode) {
+        Msg("! [MaterialCache] Pixel shader has no bytecode");
         m_device->DestroyShader(vsHandle);
         return nullptr;
     }
 
-    Msg("  Wrapped VS/PS shaders");
+    ng::ShaderHandle psHandle = m_device->CreateShader(
+        ng::ShaderStage::Pixel,
+        pso->pixelShader->bytecode->GetBufferPointer(),
+        pso->pixelShader->bytecode->GetBufferSize(),
+        pso->pixelShader->cName.c_str());
+
+    if (!psHandle.IsValid()) {
+        Msg("! [MaterialCache] Failed to create pixel shader");
+        m_device->DestroyShader(vsHandle);
+        return nullptr;
+    }
+
+    Msg("  Created VS/PS shaders from bytecode");
 
     // ═══════════════════════════════════════════════════════
     //  CREATE PSO

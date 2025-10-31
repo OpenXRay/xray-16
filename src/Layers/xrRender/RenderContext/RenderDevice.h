@@ -197,11 +197,8 @@ public:
         size_t bytecodeSize,
         const char* debugName);
 
-    // Wrap existing D3D11 shader object
-    ShaderHandle CreateShaderFromD3D11(
-        ShaderStage stage,
-        IUnknown* d3d11Shader,
-        const char* debugName);
+    // Note: NVRHI doesn't support wrapping native shader objects (only textures/buffers)
+    // To use X-Ray shaders, we need access to the original bytecode
 
     void DestroyShader(ShaderHandle handle);
 

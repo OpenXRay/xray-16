@@ -44,6 +44,9 @@ SVS::~SVS()
     // XXX: check just in case
     //_RELEASE(signature);
     //	Now it is release automatically
+
+    // Release shader bytecode
+    _RELEASE(bytecode);
 #endif
 
 #if defined(USE_DX11)
@@ -64,6 +67,8 @@ SPS::~SPS()
 {
 #if defined(USE_DX11)
     _RELEASE(sh);
+    // Release shader bytecode
+    _RELEASE(bytecode);
 #elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
