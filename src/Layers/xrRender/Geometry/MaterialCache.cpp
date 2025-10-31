@@ -152,19 +152,25 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     Msg("  Created VS/PS shaders from bytecode");
 
-    auto rcVS = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        vsHandle,
-        pso->vertexShader->cName.c_str());
+    ng::RCShader* rcVS = m_device->GetShader(vsHandle);
+    if (!rcVS) {
+        Msg("! [MaterialCache] Failed to get VS from handle");
+        m_device->DestroyShader(vsHandle);
+        m_device->DestroyShader(psHandle);
+        return nullptr;
+    }
 
-    auto rcPS = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        psHandle,
-        pso->pixelShader->cName.c_str());
+    ng::RCShader* rcPS = m_device->GetShader(psHandle);
+    if (!rcPS) {
+        Msg("! [MaterialCache] Failed to get PS from handle");
+        m_device->DestroyShader(vsHandle);
+        m_device->DestroyShader(psHandle);
+        return nullptr;
+    }
 
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = rcVS.get();
-    psoDesc.pixelShader = rcPS.get();
+    psoDesc.vertexShader = rcVS;
+    psoDesc.pixelShader = rcPS;
 
     SetupVertexAttributes(psoDesc);
 
