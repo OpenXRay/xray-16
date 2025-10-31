@@ -81,8 +81,8 @@ VirtualResourceHandle FrameGraph::ImportTexture(
     // Create imported resource node
     ResourceNode node(desc);
     node.handle.index = static_cast<u32>(m_resources.size());
-    // Note: We'll need to store the NVRHI texture pointer differently
-    // For now, mark as imported
+    // Store the imported NVRHI texture
+    node.nvrhiTexture = physicalTexture;
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
@@ -106,7 +106,8 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
     // Create imported resource node
     ResourceNode node(desc);
     node.handle.index = static_cast<u32>(m_resources.size());
-    // Note: We'll need to store the NVRHI buffer pointer differently
+    // Store the imported NVRHI buffer
+    node.nvrhiBuffer = physicalBuffer;
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
@@ -323,8 +324,19 @@ void FrameGraph::Reset() {
     m_sortedPasses.clear();
     m_compiled = false;
 
-    // Reset statistics
-    memset(&m_stats, 0, sizeof(m_stats));
+    // Reset statistics (don't use memset - contains non-trivial types!)
+    m_stats.numPasses = 0;
+    m_stats.numResources = 0;
+    m_stats.numCulledPasses = 0;
+    m_stats.numCulledResources = 0;
+    m_stats.compileTimeMs = 0.0f;
+    m_stats.totalMemoryAllocated = 0;
+    m_stats.peakMemoryUsage = 0;
+    m_stats.numAliasedResources = 0;
+    m_stats.memoryReduced = 0;
+    m_stats.executeTimeMs = 0.0f;
+    m_stats.totalGPUTimeMs = 0.0f;
+    m_stats.passTimings.clear();  // Properly clear the map
 
     Msg("~ [FrameGraph] Reset complete");
 }
