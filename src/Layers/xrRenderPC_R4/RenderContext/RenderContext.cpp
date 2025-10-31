@@ -1,0 +1,311 @@
+#include "stdafx.h"
+#include "RenderContext.h"
+
+namespace xray::render::ng {
+
+RenderContext::RenderContext(nvrhi::IDevice* device,
+                             nvrhi::ICommandList* commandList)
+    : m_device(device)
+    , m_commandList(commandList)
+{
+    VERIFY(m_device != nullptr);
+    VERIFY(m_commandList != nullptr);
+
+    Msg("~ [RenderContext] Created");
+}
+
+RenderContext::~RenderContext() {
+    if (m_inRenderPass) {
+        Msg("! [RenderContext] Destroying while in render pass - forcing end");
+        EndRenderPass();
+    }
+
+    Msg("~ [RenderContext] Destroyed");
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER PASS MANAGEMENT
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
+    VERIFY2(!m_inRenderPass, "Already in render pass!");
+
+    // Store current render pass
+    m_currentRenderPass = desc;
+
+    // Build NVRHI framebuffer descriptor
+    nvrhi::FramebufferDesc fbDesc;
+
+    for (u32 i = 0; i < desc.numRenderTargets; i++) {
+        fbDesc.addColorAttachment(desc.renderTargets[i]);
+    }
+
+    if (desc.depthStencil) {
+        fbDesc.setDepthAttachment(desc.depthStencil);
+    }
+
+    // Create framebuffer (NVRHI caches these)
+    nvrhi::FramebufferHandle framebuffer = m_device->createFramebuffer(fbDesc);
+
+    if (!framebuffer) {
+        Msg("! [RenderContext] Failed to create framebuffer");
+        return;
+    }
+
+    // Begin render pass in command list
+    m_commandList->beginMarker("RenderPass");  // Debug marker
+
+    // Clear if requested
+    if (desc.clearColor) {
+        for (u32 i = 0; i < desc.numRenderTargets; i++) {
+            m_commandList->clearTextureFloat(
+                desc.renderTargets[i],
+                nvrhi::AllSubresources,
+                nvrhi::Color(desc.clearValue.color)
+            );
+        }
+    }
+
+    if (desc.clearDepth || desc.clearStencil) {
+        if (desc.depthStencil) {
+            m_commandList->clearDepthStencilTexture(
+                desc.depthStencil,
+                nvrhi::AllSubresources,
+                desc.clearDepth,
+                desc.clearValue.depth,
+                desc.clearStencil,
+                desc.clearValue.stencil
+            );
+        }
+    }
+
+    m_inRenderPass = true;
+}
+
+void RenderContext::EndRenderPass() {
+    VERIFY2(m_inRenderPass, "Not in render pass!");
+
+    m_commandList->endMarker();  // End debug marker
+
+    m_inRenderPass = false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PIPELINE STATE
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::SetPipeline(nvrhi::IGraphicsPipeline* pipeline) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(pipeline != nullptr);
+
+    nvrhi::GraphicsState state;
+    state.pipeline = pipeline;
+    state.framebuffer = m_commandList->getCurrentFramebuffer();
+
+    m_commandList->setGraphicsState(state);
+}
+
+void RenderContext::SetPipeline(PipelineStateHandle pso) {
+    // TODO: Implement once we have pipeline state cache
+    VERIFY2(false, "Pipeline handle support not yet implemented");
+}
+
+// ═══════════════════════════════════════════════════════
+//  VIEWPORT & SCISSOR
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::SetViewport(const Viewport& viewport) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    nvrhi::Viewport nvrhiViewport;
+    nvrhiViewport.minX = viewport.x;
+    nvrhiViewport.maxX = viewport.x + viewport.width;
+    nvrhiViewport.minY = viewport.y;
+    nvrhiViewport.maxY = viewport.y + viewport.height;
+    nvrhiViewport.minZ = viewport.minDepth;
+    nvrhiViewport.maxZ = viewport.maxDepth;
+
+    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
+    state.viewport.addViewportAndScissorRect(nvrhiViewport);
+    m_commandList->setGraphicsState(state);
+}
+
+void RenderContext::SetViewport(float x, float y, float width, float height) {
+    Viewport vp;
+    vp.x = x;
+    vp.y = y;
+    vp.width = width;
+    vp.height = height;
+    SetViewport(vp);
+}
+
+void RenderContext::SetScissor(const Rect& scissor) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    nvrhi::Rect nvrhiRect;
+    nvrhiRect.minX = scissor.x;
+    nvrhiRect.minY = scissor.y;
+    nvrhiRect.maxX = scissor.x + scissor.width;
+    nvrhiRect.maxY = scissor.y + scissor.height;
+
+    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
+    state.viewport.addScissorRect(nvrhiRect);
+    m_commandList->setGraphicsState(state);
+}
+
+// ═══════════════════════════════════════════════════════
+//  VERTEX & INDEX BUFFERS
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::SetVertexBuffer(u32 slot, nvrhi::IBuffer* buffer, u64 offset) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(buffer != nullptr);
+
+    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
+    state.vertexBuffers.resize(slot + 1);
+    state.vertexBuffers[slot].buffer = buffer;
+    state.vertexBuffers[slot].slot = slot;
+    state.vertexBuffers[slot].offset = offset;
+    m_commandList->setGraphicsState(state);
+}
+
+void RenderContext::SetVertexBuffer(u32 slot, BufferHandle buffer, u64 offset) {
+    // TODO: Implement once we have buffer manager
+    VERIFY2(false, "Buffer handle support not yet implemented");
+}
+
+void RenderContext::SetIndexBuffer(nvrhi::IBuffer* buffer,
+                                   nvrhi::Format format,
+                                   u64 offset) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(buffer != nullptr);
+
+    nvrhi::GraphicsState state = m_commandList->getCurrentGraphicsState();
+    state.indexBuffer.buffer = buffer;
+    state.indexBuffer.format = format;
+    state.indexBuffer.offset = offset;
+    m_commandList->setGraphicsState(state);
+}
+
+void RenderContext::SetIndexBuffer(BufferHandle buffer,
+                                   nvrhi::Format format,
+                                   u64 offset) {
+    // TODO: Implement once we have buffer manager
+    VERIFY2(false, "Buffer handle support not yet implemented");
+}
+
+// ═══════════════════════════════════════════════════════
+//  TEXTURES & SAMPLERS
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::SetTexture(u32 slot, nvrhi::ITexture* texture) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // TODO: Bind via descriptor sets once we have binding system
+    // For now, just store and apply before draw
+}
+
+void RenderContext::SetTexture(u32 slot, TextureHandle texture) {
+    // TODO: Implement once we have texture manager
+    VERIFY2(false, "Texture handle support not yet implemented");
+}
+
+void RenderContext::SetSampler(u32 slot, nvrhi::ISampler* sampler) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // TODO: Bind via descriptor sets
+}
+
+// ═══════════════════════════════════════════════════════
+//  CONSTANT BUFFERS
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    // TODO: Bind via descriptor sets
+}
+
+void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
+    // TODO: Implement once we have buffer manager
+    VERIFY2(false, "Buffer handle support not yet implemented");
+}
+
+// ═══════════════════════════════════════════════════════
+//  DRAW CALLS
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::Draw(u32 vertexCount, u32 startVertex) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    nvrhi::DrawArguments args;
+    args.vertexCount = vertexCount;
+    args.startVertexLocation = startVertex;
+
+    m_commandList->draw(args);
+}
+
+void RenderContext::DrawIndexed(u32 indexCount, u32 startIndex, i32 baseVertex) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    nvrhi::DrawArguments args;
+    args.vertexCount = indexCount;  // Actually index count for indexed draws
+    args.startIndexLocation = startIndex;
+    args.startVertexLocation = baseVertex;
+
+    m_commandList->drawIndexed(args);
+}
+
+void RenderContext::DrawInstanced(u32 vertexCount, u32 instanceCount,
+                                  u32 startVertex, u32 startInstance) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    nvrhi::DrawArguments args;
+    args.vertexCount = vertexCount;
+    args.instanceCount = instanceCount;
+    args.startVertexLocation = startVertex;
+    args.startInstanceLocation = startInstance;
+
+    m_commandList->draw(args);
+}
+
+void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
+                                         u32 startIndex, i32 baseVertex,
+                                         u32 startInstance) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+
+    nvrhi::DrawArguments args;
+    args.vertexCount = indexCount;
+    args.instanceCount = instanceCount;
+    args.startIndexLocation = startIndex;
+    args.startVertexLocation = baseVertex;
+    args.startInstanceLocation = startInstance;
+
+    m_commandList->drawIndexed(args);
+}
+
+// ═══════════════════════════════════════════════════════
+//  CLEAR OPERATIONS
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::ClearRenderTarget(nvrhi::ITexture* rt, const float color[4]) {
+    VERIFY(rt != nullptr);
+
+    nvrhi::Color clearColor(color[0], color[1], color[2], color[3]);
+    m_commandList->clearTextureFloat(rt, nvrhi::AllSubresources, clearColor);
+}
+
+void RenderContext::ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stencil) {
+    VERIFY(ds != nullptr);
+
+    m_commandList->clearDepthStencilTexture(
+        ds,
+        nvrhi::AllSubresources,
+        true,  // Clear depth
+        depth,
+        true,  // Clear stencil
+        stencil
+    );
+}
+
+} // namespace xray::render::ng
