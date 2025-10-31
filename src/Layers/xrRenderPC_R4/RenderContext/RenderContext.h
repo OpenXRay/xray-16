@@ -36,19 +36,23 @@ struct RenderPassDesc {
 };
 
 struct Viewport {
-    float x = 0;
-    float y = 0;
-    float width = 0;
-    float height = 0;
-    float minDepth = 0.0f;
-    float maxDepth = 1.0f;
+    float x;
+    float y;
+    float width;
+    float height;
+    float minDepth;
+    float maxDepth;
+
+    Viewport() : x(0), y(0), width(0), height(0), minDepth(0.0f), maxDepth(1.0f) {}
 };
 
 struct Rect {
-    i32 x = 0;
-    i32 y = 0;
-    u32 width = 0;
-    u32 height = 0;
+    int x;
+    int y;
+    u32 width;
+    u32 height;
+
+    Rect() : x(0), y(0), width(0), height(0) {}
 };
 
 class RenderContext {
@@ -81,11 +85,11 @@ public:
     void SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer);
 
     void Draw(u32 vertexCount, u32 startVertex = 0);
-    void DrawIndexed(u32 indexCount, u32 startIndex = 0, i32 baseVertex = 0);
+    void DrawIndexed(u32 indexCount, u32 startIndex = 0, int baseVertex = 0);
     void DrawInstanced(u32 vertexCount, u32 instanceCount,
                       u32 startVertex = 0, u32 startInstance = 0);
     void DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
-                             u32 startIndex = 0, i32 baseVertex = 0,
+                             u32 startIndex = 0, int baseVertex = 0,
                              u32 startInstance = 0);
 
     void ClearRenderTarget(nvrhi::ITexture* rt, const float color[4]);
@@ -102,6 +106,8 @@ private:
 
     bool m_inRenderPass = false;
     RenderPassDesc m_currentRenderPass;
+    nvrhi::FramebufferHandle m_currentFramebuffer;
+    nvrhi::GraphicsState m_currentState;
 
     RenderContext(const RenderContext&) = delete;
     RenderContext& operator=(const RenderContext&) = delete;

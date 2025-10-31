@@ -28,6 +28,11 @@ namespace xray::render::r4::nvrhi_wrapper
 class NVRHIDevice;
 }
 
+namespace xray::render::ng
+{
+class RenderContext;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class CRenderTarget;
@@ -539,6 +544,17 @@ public:
     bool m_nvrhiTestMode{ false };
 
     void TestNVRHI_Render();
+
+    bool m_renderContextTestMode{ false };
+    xray::render::ng::RenderContext* m_renderContext{ nullptr };
+
+    nvrhi::BufferHandle m_testVertexBuffer;
+    nvrhi::BufferHandle m_testIndexBuffer;
+    nvrhi::ShaderHandle m_testVS;
+    nvrhi::ShaderHandle m_testPS;
+    nvrhi::GraphicsPipelineHandle m_testPipeline;
+
+    void TestRenderContext_Triangle();
 #endif
 };
 

@@ -338,7 +338,7 @@ void D3DXRenderBase::End()
 {
 #if defined(USE_DX11) && RENDER == R_R4
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    if (render.m_nvrhiTestMode && render.m_nvrhiDevice && render.m_nvrhiDevice->IsInitialized())
+    if (render.m_nvrhiTestMode || render.m_renderContextTestMode)
     {
         return;
     }

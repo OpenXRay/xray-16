@@ -76,6 +76,11 @@ void CRender::Calculate()
     {
         return;
     }
+
+    if (m_renderContextTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
+    {
+        return;
+    }
 #endif
 
     // Transfer to global space to avoid deep pointer access
