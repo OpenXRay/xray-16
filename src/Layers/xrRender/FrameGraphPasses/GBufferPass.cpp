@@ -71,11 +71,11 @@ bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph
     psoDesc.pixelShader = m_pixelShader.get();
 
     psoDesc.vertexAttributes = {
-        { "POSITION", 0, nvrhi::Format::RGB32_FLOAT, 0,  0, false },
-        { "NORMAL",   0, nvrhi::Format::RGB32_FLOAT, 0, 12, false },
-        { "TEXCOORD", 0, nvrhi::Format::RG32_FLOAT,  0, 24, false },
-        { "TANGENT",  0, nvrhi::Format::RGB32_FLOAT, 0, 32, false },
-        { "BINORMAL", 0, nvrhi::Format::RGB32_FLOAT, 0, 44, false },
+        { "POSITION", 0, nvrhi::Format::RGB32_FLOAT,  0, 0, false },
+        { "NORMAL",   0, nvrhi::Format::RGB32_FLOAT, 12, 0, false },
+        { "TEXCOORD", 0, nvrhi::Format::RG32_FLOAT,  24, 0, false },
+        { "TANGENT",  0, nvrhi::Format::RGB32_FLOAT, 32, 0, false },
+        { "BINORMAL", 0, nvrhi::Format::RGB32_FLOAT, 44, 0, false },
     };
 
     psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
