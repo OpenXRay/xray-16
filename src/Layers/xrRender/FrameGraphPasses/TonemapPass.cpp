@@ -2,23 +2,54 @@
 #include "stdafx.h"
 #include "TonemapPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::passes {
 
 using namespace framegraph;
 
-TonemapPass::TonemapPass(const TonemapPassConfig& config)
-    : m_config(config)
+TonemapPass::TonemapPass(ng::RenderDevice* device, const TonemapPassConfig& config)
+    : m_device(device)
+    , m_config(config)
 {
+    VERIFY(m_device != nullptr);
+
     Msg("* [TonemapPass] Created (exposure: %.2f, gamma: %.2f)",
         config.exposure, config.gamma);
 
-    // TODO: Load and compile shaders
-    // LoadShaders();
+    // Load shaders
+    if (!LoadShaders())
+    {
+        Msg("! [TonemapPass] Failed to load shaders");
+    }
 }
 
 TonemapPass::~TonemapPass() {
     Msg("* [TonemapPass] Destroyed");
+}
+
+bool TonemapPass::LoadShaders()
+{
+    ShaderLoader loader(m_device);
+
+    // Load fullscreen vertex shader
+    m_vertexShader = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShader)
+    {
+        Msg("! [TonemapPass] Failed to load fullscreen vertex shader");
+        return false;
+    }
+
+    // Load tonemap pixel shader
+    m_pixelShader = loader.LoadPixelShader("tonemap");
+    if (!m_pixelShader)
+    {
+        Msg("! [TonemapPass] Failed to load tonemap pixel shader");
+        return false;
+    }
+
+    Msg("  ✓ Tonemap shaders loaded successfully");
+    return true;
 }
 
 void TonemapPass::Setup(
@@ -105,10 +136,18 @@ void TonemapPass::Execute(
     // ctx.UpdateConstantBuffer(0, &m_config, sizeof(m_config));
 
     // Draw fullscreen triangle
-    // TODO: Skip drawing until pipeline is set up
+    // TODO: Need to set up pipeline, textures, and constants
+    // For now, skip drawing until pipeline is created
     // ctx.Draw(3, 0);
 
-    Msg("  (Skipping tonemap draw - pipeline not yet implemented)");
+    if (m_vertexShader && m_pixelShader)
+    {
+        Msg("  (Shaders loaded but pipeline not yet created)");
+    }
+    else
+    {
+        Msg("  (Skipping tonemap draw - shaders not loaded)");
+    }
 
     ctx.EndRenderPass();
 

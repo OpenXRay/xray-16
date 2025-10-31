@@ -21,10 +21,10 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // Create FrameGraph (needs NVRHI device)
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
 
-    // Create passes
+    // Create passes (pass device for shader loading)
     m_gbufferPass = xr_make_unique<passes::GBufferPass>();
     m_lightingPass = xr_make_unique<passes::LightingPass>();
-    m_tonemapPass = xr_make_unique<passes::TonemapPass>();
+    m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
     // Create geometry collector
     m_geometryCollector = xr_make_unique<GeometryCollector>();
