@@ -4,7 +4,7 @@
 #include "xrCore/Threading/TaskManager.hpp"
 
 #if defined(USE_DX11) && RENDER == R_R4
-#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE

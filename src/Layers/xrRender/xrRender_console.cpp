@@ -26,8 +26,8 @@
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
 #if RENDER == R_R4
-#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
-#include "Layers/xrRenderPC_R4/FrameGraph/FGTest.h"
+#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRender/FrameGraph/FGTest.h"
 #endif
 
 // Detail manager debug
