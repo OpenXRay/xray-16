@@ -4,6 +4,8 @@
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/RenderContext/PipelineState.h"
+#include "Layers/xrRender/RenderContext/RCShader.h"
 
 namespace xray::render {
 
@@ -150,10 +152,45 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     Msg("  Created VS/PS shaders from bytecode");
 
-    Msg("  ! PSO creation not fully implemented yet");
+    auto rcVS = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Vertex,
+        vsHandle,
+        pso->vertexShader->cName.c_str());
 
-    m_device->DestroyShader(vsHandle);
-    m_device->DestroyShader(psHandle);
+    auto rcPS = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Pixel,
+        psHandle,
+        pso->pixelShader->cName.c_str());
+
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = rcVS.get();
+    psoDesc.pixelShader = rcPS.get();
+
+    SetupVertexAttributes(psoDesc);
+
+    SetupRenderStates(pass, psoDesc);
+
+    SetupRenderTargets(outputs, fg, psoDesc);
+
+    psoDesc.debugName = pso->debugName;
+
+    Msg("  Built PSO descriptor");
+
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        Msg("! [MaterialCache] Pipeline cache is NULL");
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreatePipelineState(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache] Failed to create pipeline state");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    Msg("  ✓ Pipeline state created");
 
     m_stats.totalPSOCreations++;
 
@@ -341,6 +378,77 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     u32 hash = crc32(&statePtr, sizeof(statePtr), 0);
 
     return static_cast<u64>(hash);
+}
+
+void MaterialCache::SetupVertexAttributes(ng::PipelineStateDesc& psoDesc)
+{
+
+    psoDesc.vertexAttributes.clear();
+
+    ng::VertexAttribute posAttr;
+    posAttr.semanticName = "POSITION";
+    posAttr.semanticIndex = 0;
+    posAttr.format = nvrhi::Format::RGB32_FLOAT;
+    posAttr.offset = 0;
+    posAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(posAttr);
+
+    ng::VertexAttribute normAttr;
+    normAttr.semanticName = "NORMAL";
+    normAttr.semanticIndex = 0;
+    normAttr.format = nvrhi::Format::RGB32_FLOAT;
+    normAttr.offset = 12;
+    normAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(normAttr);
+
+    ng::VertexAttribute texAttr;
+    texAttr.semanticName = "TEXCOORD";
+    texAttr.semanticIndex = 0;
+    texAttr.format = nvrhi::Format::RG32_FLOAT;
+    texAttr.offset = 24;
+    texAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(texAttr);
+
+    ng::VertexAttribute tangAttr;
+    tangAttr.semanticName = "TANGENT";
+    tangAttr.semanticIndex = 0;
+    tangAttr.format = nvrhi::Format::RGB32_FLOAT;
+    tangAttr.offset = 32;
+    tangAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(tangAttr);
+}
+
+void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
+{
+
+    psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
+    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.depthClipEnable = true;
+
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthWriteEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    psoDesc.blendState.renderTargets[0].blendEnable = false;
+    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::All;
+}
+
+void MaterialCache::SetupRenderTargets(
+    const passes::GBufferOutputs& outputs,
+    xray::render::framegraph::FrameGraph& fg,
+    ng::PipelineStateDesc& psoDesc)
+{
+    psoDesc.renderTargetCount = 3;
+
+    psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
+
+    psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
+
+    psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
+
+    psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
 }
 
 void MaterialCache::Clear()

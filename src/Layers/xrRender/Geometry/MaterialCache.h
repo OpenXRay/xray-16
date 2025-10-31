@@ -129,6 +129,13 @@ private:
     static u64 ComputeTextureHash(const xr_vector<ng::TextureHandle>& textures);
 
     static u64 ComputeStateHash(SPass* pass);
+
+    void SetupVertexAttributes(ng::PipelineStateDesc& psoDesc);
+    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+    void SetupRenderTargets(
+        const passes::GBufferOutputs& outputs,
+        xray::render::framegraph::FrameGraph& fg,
+        ng::PipelineStateDesc& psoDesc);
 };
 
 }
