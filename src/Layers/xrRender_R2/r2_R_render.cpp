@@ -572,12 +572,13 @@ void CRender::TestRenderContext_Triangle()
         struct Vertex {
             float pos[3];
             float color[4];
+            float uv[2];
         };
 
         Vertex vertices[] = {
-            {{ 0.0f,  0.5f, 0.0f},   {1.0f, 0.0f, 0.0f, 1.0f}},
-            {{ 0.5f, -0.5f, 0.0f},   {0.0f, 1.0f, 0.0f, 1.0f}},
-            {{-0.5f, -0.5f, 0.0f},   {0.0f, 0.0f, 1.0f, 1.0f}}
+            {{ 0.0f,  0.5f, 0.0f},   {1.0f, 1.0f, 1.0f, 1.0f},   {0.5f, 0.0f}},
+            {{ 0.5f, -0.5f, 0.0f},   {1.0f, 1.0f, 1.0f, 1.0f},   {1.0f, 1.0f}},
+            {{-0.5f, -0.5f, 0.0f},   {1.0f, 1.0f, 1.0f, 1.0f},   {0.0f, 1.0f}}
         };
 
         nvrhi::BufferDesc vbDesc;
@@ -651,6 +652,73 @@ void CRender::TestRenderContext_Triangle()
         Msg("~ [TestRenderContext] Compiled shaders");
     }
 
+    if (!m_testTexture)
+    {
+        const u32 size = 64;
+        u32 pixels[size * size];
+
+        for (u32 y = 0; y < size; y++)
+        {
+            for (u32 x = 0; x < size; x++)
+            {
+                bool checker = ((x / 8) + (y / 8)) % 2 == 0;
+                pixels[y * size + x] = checker ? 0xFFFFFFFF : 0xFFFF0000;
+            }
+        }
+
+        nvrhi::TextureDesc texDesc;
+        texDesc.width = size;
+        texDesc.height = size;
+        texDesc.mipLevels = 1;
+        texDesc.format = nvrhi::Format::RGBA8_UNORM;
+        texDesc.debugName = "TestCheckerboard";
+        texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        texDesc.keepInitialState = true;
+        texDesc.isShaderResource = true;
+
+        m_testTexture = device->createTexture(texDesc);
+
+        cmd->open();
+        cmd->beginMarker("UploadCheckerboard");
+        cmd->writeTexture(m_testTexture, 0, 0, pixels, size * 4);
+        cmd->endMarker();
+        cmd->close();
+        m_nvrhiDevice->ExecuteCommandList(cmd);
+
+        Msg("~ [TestRenderContext] Created checkerboard texture");
+    }
+
+    if (!m_testSampler)
+    {
+        nvrhi::SamplerDesc samplerDesc;
+        samplerDesc.setAllFilters(true);
+        samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+
+        m_testSampler = device->createSampler(samplerDesc);
+
+        Msg("~ [TestRenderContext] Created sampler");
+    }
+
+    if (!m_testBindingLayout)
+    {
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Pixel;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem{}.setSlot(0).setType(nvrhi::ResourceType::Texture_SRV),
+            nvrhi::BindingLayoutItem{}.setSlot(0).setType(nvrhi::ResourceType::Sampler)
+        };
+
+        m_testBindingLayout = device->createBindingLayout(layoutDesc);
+
+        if (!m_testBindingLayout)
+        {
+            Msg("! [TestRenderContext] Failed to create binding layout");
+            return;
+        }
+
+        Msg("~ [TestRenderContext] Created binding layout");
+    }
+
     if (!m_testPipeline)
     {
         nvrhi::GraphicsPipelineDesc pipelineDesc;
@@ -664,18 +732,24 @@ void CRender::TestRenderContext_Triangle()
                 .setFormat(nvrhi::Format::RGB32_FLOAT)
                 .setOffset(0)
                 .setBufferIndex(0)
-                .setElementStride(sizeof(float) * 7),
+                .setElementStride(sizeof(float) * 9),
             nvrhi::VertexAttributeDesc()
                 .setName("COLOR")
                 .setFormat(nvrhi::Format::RGBA32_FLOAT)
                 .setOffset(sizeof(float) * 3)
                 .setBufferIndex(0)
-                .setElementStride(sizeof(float) * 7)
+                .setElementStride(sizeof(float) * 9),
+            nvrhi::VertexAttributeDesc()
+                .setName("TEXCOORD")
+                .setFormat(nvrhi::Format::RG32_FLOAT)
+                .setOffset(sizeof(float) * 7)
+                .setBufferIndex(0)
+                .setElementStride(sizeof(float) * 9)
         };
 
         nvrhi::InputLayoutHandle inputLayout = device->createInputLayout(
             attributes,
-            2,
+            3,
             m_testVS.Get()
         );
 
@@ -690,6 +764,8 @@ void CRender::TestRenderContext_Triangle()
         pipelineDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
 
         pipelineDesc.renderState.blendState.targets[0].enableBlend();
+
+        pipelineDesc.bindingLayouts = { m_testBindingLayout };
 
         nvrhi::TextureDesc dummyTexDesc;
         dummyTexDesc.width = Device.dwWidth;
@@ -720,6 +796,26 @@ void CRender::TestRenderContext_Triangle()
     if (!m_renderContext)
     {
         m_renderContext = xr_new<xray::render::ng::RenderContext>(device, cmd);
+    }
+
+    if (!m_testBindingSet)
+    {
+        using namespace xray::render::ng;
+
+        BindingSetDesc setDesc;
+        setDesc.layout = m_testBindingLayout.Get();
+        setDesc.AddTexture(0, m_testTexture.Get());
+        setDesc.AddSampler(0, m_testSampler.Get());
+
+        m_testBindingSet = m_renderContext->CreateBindingSet(setDesc);
+
+        if (!m_testBindingSet)
+        {
+            Msg("! [TestRenderContext] Failed to create binding set");
+            return;
+        }
+
+        Msg("~ [TestRenderContext] Created binding set");
     }
 
     try
@@ -776,6 +872,8 @@ void CRender::TestRenderContext_Triangle()
 
         m_renderContext->SetIndexBuffer(m_testIndexBuffer.Get(),
                                        nvrhi::Format::R16_UINT, 0);
+
+        m_renderContext->SetBindingSet(0, m_testBindingSet.Get());
 
         m_renderContext->DrawIndexed(3, 0, 0);
 
