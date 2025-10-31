@@ -32,6 +32,14 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // Set global geometry collector pointer
     g_geometryCollector = m_geometryCollector.get();
 
+    // Create RenderContext for execution
+    m_renderContext.reset(device->CreateContext());
+    if (!m_renderContext)
+    {
+        Msg("! [FrameGraphRenderer] Failed to create RenderContext");
+        return false;
+    }
+
     Msg("  ✓ FrameGraphRenderer initialized");
 
     return true;
@@ -45,6 +53,7 @@ void FrameGraphRenderer::Shutdown() {
     // Clear global geometry collector pointer
     g_geometryCollector = nullptr;
 
+    m_renderContext.reset();
     m_geometryCollector.reset();
     m_tonemapPass.reset();
     m_lightingPass.reset();
@@ -78,6 +87,10 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
 
     m_framegraph->Compile();
+
+    // Set RenderContext for execution
+    m_framegraph->SetRenderContext(m_renderContext.get());
+
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
@@ -111,23 +124,17 @@ void FrameGraphRenderer::SetupFrame() {
 }
 
 void FrameGraphRenderer::BuildFrameGraph() {
-    // Import backbuffer (external resource)
-    // TODO: Get actual backbuffer from HW
-    // For now, we'll create a placeholder
+    // Create backbuffer as transient resource for now
+    // TODO: Import actual backbuffer from HW later
     framegraph::ResourceDesc backbufferDesc;
     backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     backbufferDesc.width = 1920;  // TODO: Get from Device
     backbufferDesc.height = 1080;
     backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
     backbufferDesc.isRenderTarget = true;
-    backbufferDesc.isImported = true;
+    backbufferDesc.isTransient = true;  // Let FrameGraph allocate it
     backbufferDesc.debugName = "Backbuffer";
 
-    // TODO: Import actual backbuffer texture
-    // framegraph::VirtualResourceHandle backbuffer =
-    //     m_framegraph->ImportTexture("Backbuffer", physicalBackbuffer, backbufferDesc);
-
-    // For now, create a transient target (will be replaced with actual backbuffer)
     framegraph::VirtualResourceHandle backbuffer =
         m_framegraph->CreateTexture("Backbuffer", backbufferDesc);
 

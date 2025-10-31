@@ -136,7 +136,10 @@ void LightingPass::Execute(
     // ctx.UpdateConstantBuffer(0, &constants, sizeof(constants));
 
     // Draw fullscreen triangle
-    ctx.Draw(3, 0);
+    // TODO: Skip drawing until pipeline is set up
+    // ctx.Draw(3, 0);
+
+    Msg("  (Skipping lighting draw - pipeline not yet implemented)");
 
     ctx.EndRenderPass();
 

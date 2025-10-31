@@ -5,6 +5,7 @@
 
 #if defined(USE_DX11) && RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRender/xrRender_console.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -80,6 +81,12 @@ void CRender::Calculate()
 
     // Skip Calculate() if RenderContext test mode is active
     if (m_renderContextTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
+    {
+        return;
+    }
+
+    // Skip Calculate() if FrameGraph renderer is active
+    if (ps_r4_use_framegraph && m_framegraphRenderer)
     {
         return;
     }

@@ -898,7 +898,8 @@ void FrameGraph::AllocateResources() {
 
             // Depth/stencil handling
             if (resource.desc.isDepthStencil) {
-                texDesc.isRenderTarget = false;  // Depth is separate
+                texDesc.isRenderTarget = true;  // NVRHI uses this flag + format to set BIND_DEPTH_STENCIL
+                texDesc.isTypeless = true;  // CRITICAL: Use typeless format for depth+SRV
                 texDesc.useClearValue = true;
                 texDesc.clearValue = nvrhi::Color(1.0f);  // Default depth clear
             }

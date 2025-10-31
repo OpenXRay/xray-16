@@ -57,6 +57,9 @@ private:
     // Geometry collector
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
+    // RenderContext for execution
+    xr_unique_ptr<ng::RenderContext> m_renderContext;
+
     // Statistics
     Stats m_stats;
 

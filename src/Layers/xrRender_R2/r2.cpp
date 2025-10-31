@@ -15,6 +15,12 @@
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 #endif
 
+#if defined(USE_DX11) && RENDER == R_R4
+#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 CRender RImplementation;
@@ -521,6 +527,37 @@ void CRender::create()
     //	FluidManager.Initialize( 100, 100, 100 );
     FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
 #endif
+
+#if defined(USE_DX11) && RENDER == R_R4
+    // Initialize RenderDevice with HW's D3D11 device and context
+    if (HW.pDevice)
+    {
+        m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
+
+        if (m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
+        {
+            Msg("* RenderDevice initialized successfully");
+
+            // Initialize FrameGraphRenderer
+            m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
+
+            if (m_framegraphRenderer->Initialize(m_renderDevice))
+            {
+                Msg("* FrameGraphRenderer initialized successfully");
+            }
+            else
+            {
+                Msg("! FrameGraphRenderer initialization failed");
+                xr_delete(m_framegraphRenderer);
+            }
+        }
+        else
+        {
+            Msg("! RenderDevice initialization failed");
+            xr_delete(m_renderDevice);
+        }
+    }
+#endif
 }
 
 void CRender::destroy()
@@ -528,6 +565,24 @@ void CRender::destroy()
 #if defined(USE_DX11)
     FluidManager.Destroy();
 #endif
+
+#if defined(USE_DX11) && RENDER == R_R4
+    // Cleanup FrameGraphRenderer and RenderDevice
+    if (m_framegraphRenderer)
+    {
+        m_framegraphRenderer->Shutdown();
+        xr_delete(m_framegraphRenderer);
+        Msg("* FrameGraphRenderer destroyed");
+    }
+
+    if (m_renderDevice)
+    {
+        m_renderDevice->Shutdown();
+        xr_delete(m_renderDevice);
+        Msg("* RenderDevice destroyed");
+    }
+#endif
+
     q_sync_point.Destroy();
     HWOCC.occq_destroy();
     xr_delete(Models);

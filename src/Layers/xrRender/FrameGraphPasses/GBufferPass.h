@@ -23,7 +23,7 @@ struct GBufferPassConfig {
     nvrhi::Format albedoFormat = nvrhi::Format::RGBA8_UNORM;      // Albedo + metallic
     nvrhi::Format normalFormat = nvrhi::Format::RGBA16_FLOAT;     // Normal + roughness
     nvrhi::Format materialFormat = nvrhi::Format::R32_FLOAT;      // Material ID
-    nvrhi::Format depthFormat = nvrhi::Format::D24S8;             // Depth + stencil
+    nvrhi::Format depthFormat = nvrhi::Format::D32;               // Depth (NVRHI handles typeless with proper views)
 
     // Clear values
     float clearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};

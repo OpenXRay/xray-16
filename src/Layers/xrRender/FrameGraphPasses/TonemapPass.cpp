@@ -105,7 +105,10 @@ void TonemapPass::Execute(
     // ctx.UpdateConstantBuffer(0, &m_config, sizeof(m_config));
 
     // Draw fullscreen triangle
-    ctx.Draw(3, 0);
+    // TODO: Skip drawing until pipeline is set up
+    // ctx.Draw(3, 0);
+
+    Msg("  (Skipping tonemap draw - pipeline not yet implemented)");
 
     ctx.EndRenderPass();
 

@@ -11,6 +11,8 @@
 #if defined(USE_DX11) && RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/xrRender_console.h"
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -104,6 +106,19 @@ void CRender::Render()
     }
 
 #if defined(USE_DX11) && RENDER == R_R4
+    // FrameGraph renderer - use new deferred rendering pipeline
+    if (ps_r4_use_framegraph && m_framegraphRenderer)
+    {
+        m_framegraphRenderer->SetEnabled(true);
+        m_framegraphRenderer->Render();
+        return;
+    }
+    else if (m_framegraphRenderer)
+    {
+        // Ensure it's disabled when not using FrameGraph path
+        m_framegraphRenderer->SetEnabled(false);
+    }
+
     // NVRHI test mode - render blue screen instead of normal scene
     if (m_nvrhiTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
     {

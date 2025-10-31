@@ -144,6 +144,8 @@ extern ECORE_API float ps_r2_sun_lumscale_hemi; // 1.0f
 extern ECORE_API float ps_r2_sun_lumscale_amb; // 1.0f
 extern ECORE_API float ps_r2_zfill; // .1f
 
+extern ECORE_API int ps_r4_use_framegraph; // 0=legacy, 1=framegraph
+
 extern ECORE_API float ps_r2_dhemi_sky_scale; // 1.5f
 extern ECORE_API float ps_r2_dhemi_light_scale; // 1.f
 extern ECORE_API float ps_r2_dhemi_light_flow; // .1f
