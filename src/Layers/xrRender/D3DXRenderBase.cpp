@@ -7,7 +7,7 @@
 #include "xrEngine/PerformanceAlert.hpp"
 
 #if defined(USE_DX11) && RENDER == R_R4
-#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #endif
 
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)

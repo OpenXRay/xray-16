@@ -31,6 +31,12 @@ class NVRHIDevice;
 namespace xray::render::ng
 {
 class RenderContext;
+class RenderDevice;
+}
+
+namespace xray::render
+{
+class FrameGraphRenderer;
 }
 
 namespace xray::render::RENDER_NAMESPACE
@@ -547,6 +553,9 @@ public:
 
     bool m_renderContextTestMode{ false };
     xray::render::ng::RenderContext* m_renderContext{ nullptr };
+    xray::render::ng::RenderDevice* m_renderDevice{ nullptr };
+
+    xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
 
     nvrhi::BufferHandle m_testVertexBuffer;
     nvrhi::BufferHandle m_testIndexBuffer;
