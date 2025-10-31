@@ -61,6 +61,9 @@ public:
     //  COMPILE PHASE (ONCE PER FRAME)
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
+    // Set RenderContext for execution (must be called before Execute)
+    void SetRenderContext(ng::RenderContext* context) { m_context = context; }
+
     void Compile();
 
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -168,6 +171,9 @@ private:
 
     PassNode* FindProducer(VirtualResourceHandle resource);
     bool HasCyclicDependency() const;
+
+    // Convert FrameGraph state to NVRHI state
+    static nvrhi::ResourceStates ConvertToNVRHIState(ResourceState state);
 };
 
 } // namespace xray::render::framegraph

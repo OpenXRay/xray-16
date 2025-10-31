@@ -210,12 +210,61 @@ void FrameGraph::Compile() {
 
 void FrameGraph::Execute() {
     VERIFY(m_compiled && "Must compile before execute");
+    VERIFY(m_context != nullptr && "RenderContext required for execution");
 
-    Msg("~ [FrameGraph] Executing graph...");
+    Msg("~ [FrameGraph] Executing %u passes...", m_sortedPasses.size());
 
-    // TODO: Execute passes in sorted order
+    u32 passesExecuted = 0;
 
-    Msg("~ [FrameGraph] Execution complete");
+    // Execute passes in sorted order
+    for (PassNode* pass : m_sortedPasses) {
+        // Skip culled passes
+        if (pass->culled) {
+            continue;
+        }
+
+        // Skip passes without callbacks
+        if (!pass->executeCallback) {
+            Msg("! [FrameGraph] Pass '%s' has no execute callback - skipping",
+                pass->name.c_str());
+            continue;
+        }
+
+        Msg("~ [FrameGraph] Executing pass '%s' [%u]",
+            pass->name.c_str(), pass->executionOrder);
+
+        // Apply resource barriers before this pass
+        if (!pass->barriersBeforePass.empty()) {
+            Msg("~ [FrameGraph]   Applying %u barriers...",
+                pass->barriersBeforePass.size());
+
+            for (const auto& barrier : pass->barriersBeforePass) {
+                ResourceNode* resource = GetResourceNode(barrier.resource);
+                if (!resource || !resource->nvrhiTexture) {
+                    continue;
+                }
+
+                // Convert FrameGraph states to NVRHI states
+                nvrhi::ResourceStates nvrhiBefore = ConvertToNVRHIState(barrier.stateBefore);
+                nvrhi::ResourceStates nvrhiAfter = ConvertToNVRHIState(barrier.stateAfter);
+
+                // Note: Actual barrier insertion would require command list access
+                // For now, we just log the barrier
+                // TODO: Insert actual NVRHI barriers when RenderContext supports it
+                Msg("~ [FrameGraph]     Barrier: %s -> %s",
+                    ResourceStateToString(barrier.stateBefore),
+                    ResourceStateToString(barrier.stateAfter));
+            }
+        }
+
+        // Execute the pass callback
+        pass->executeCallback(*m_context, *this);
+
+        passesExecuted++;
+    }
+
+    Msg("~ [FrameGraph] Execution complete: %u/%u passes executed",
+        passesExecuted, m_sortedPasses.size());
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -247,7 +296,26 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 void FrameGraph::Reset() {
-    // TODO: Destroy allocated resources (except imported)
+    // Destroy allocated resources (except imported)
+    for (auto& resource : m_resources) {
+        // Skip imported resources (we don't own them)
+        if (resource.desc.isImported) {
+            continue;
+        }
+
+        // Release NVRHI resources
+        if (resource.nvrhiTexture) {
+            Msg("~ [FrameGraph] Releasing texture '%s'",
+                resource.desc.debugName.c_str());
+            resource.nvrhiTexture = nullptr;  // RefPtr will release
+        }
+
+        if (resource.nvrhiBuffer) {
+            Msg("~ [FrameGraph] Releasing buffer '%s'",
+                resource.desc.debugName.c_str());
+            resource.nvrhiBuffer = nullptr;  // RefPtr will release
+        }
+    }
 
     // Clear state
     m_resources.clear();
@@ -257,6 +325,8 @@ void FrameGraph::Reset() {
 
     // Reset statistics
     memset(&m_stats, 0, sizeof(m_stats));
+
+    Msg("~ [FrameGraph] Reset complete");
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -839,6 +909,37 @@ void FrameGraph::OptimizeMemoryAliasing() {
     Msg("~ [FrameGraph] Peak memory usage: %.2f MB (reduced from %.2f MB)",
         m_stats.peakMemoryUsage / (1024.0f * 1024.0f),
         m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
+}
+
+// ══════════════════════════════════════════════════════════
+//  STATE CONVERSION
+// ══════════════════════════════════════════════════════════
+
+nvrhi::ResourceStates FrameGraph::ConvertToNVRHIState(ResourceState state) {
+    switch (state) {
+        case ResourceState::Undefined:
+            return nvrhi::ResourceStates::Common;
+        case ResourceState::RenderTarget:
+            return nvrhi::ResourceStates::RenderTarget;
+        case ResourceState::DepthStencilWrite:
+            return nvrhi::ResourceStates::DepthWrite;
+        case ResourceState::DepthStencilRead:
+            return nvrhi::ResourceStates::DepthRead;
+        case ResourceState::ShaderResource:
+            return nvrhi::ResourceStates::ShaderResource;
+        case ResourceState::UnorderedAccess:
+            return nvrhi::ResourceStates::UnorderedAccess;
+        case ResourceState::CopySource:
+            return nvrhi::ResourceStates::CopySource;
+        case ResourceState::CopyDest:
+            return nvrhi::ResourceStates::CopyDest;
+        case ResourceState::Present:
+            return nvrhi::ResourceStates::Present;
+        case ResourceState::Common:
+            return nvrhi::ResourceStates::Common;
+        default:
+            return nvrhi::ResourceStates::Common;
+    }
 }
 
 } // namespace xray::render::framegraph
