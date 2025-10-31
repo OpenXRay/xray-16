@@ -23,6 +23,7 @@ namespace xray::render {
 // Forward declarations
 namespace ng {
     class PipelineState;
+    struct PipelineStateDesc;
 }
 
 namespace passes {

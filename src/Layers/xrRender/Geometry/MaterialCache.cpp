@@ -252,7 +252,7 @@ MaterialPSO* MaterialCache::CreatePSO(
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreatePipelineState(psoDesc);
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache] Failed to create pipeline state");
         return nullptr;
