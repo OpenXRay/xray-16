@@ -41,6 +41,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraph/FrameGraph.cpp
     ../xrRender/FrameGraph/FGTest.h
     ../xrRender/FrameGraph/FGTest.cpp
+    ../xrRender/FrameGraph/ShaderLoader.h
+    ../xrRender/FrameGraph/ShaderLoader.cpp
 
     # FrameGraph Passes (Phase 3) - Renderer agnostic
     ../xrRender/FrameGraphPasses/GBufferPass.h
