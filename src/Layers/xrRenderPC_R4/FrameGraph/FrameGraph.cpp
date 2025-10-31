@@ -351,24 +351,171 @@ void FrameGraph::ExportVisualization(const char* htmlPath) const {
 }
 
 void FrameGraph::PrintStatistics() const {
-    Msg("=== FrameGraph Statistics ===");
-    Msg("Passes: %u total, %u culled", m_stats.numPasses, m_stats.numCulledPasses);
-    Msg("Resources: %u total, %u culled", m_stats.numResources, m_stats.numCulledResources);
-    Msg("Compile time: %.2f ms", m_stats.compileTimeMs);
-    Msg("Execute time: %.2f ms", m_stats.executeTimeMs);
+    Msg("========================================");
+    Msg("  FrameGraph Statistics");
+    Msg("========================================");
+
+    // Passes
+    Msg("Passes:");
+    Msg("  Total: %u", m_stats.numPasses);
+    Msg("  Executed: %u", m_stats.numPasses - m_stats.numCulledPasses);
+    Msg("  Culled: %u", m_stats.numCulledPasses);
+
+    // Resources
+    Msg("Resources:");
+    Msg("  Total: %u", m_stats.numResources);
+    Msg("  Allocated: %u", m_stats.numResources - m_stats.numCulledResources);
+    Msg("  Culled: %u", m_stats.numCulledResources);
+
+    // Memory
+    if (m_stats.totalMemoryAllocated > 0) {
+        Msg("Memory:");
+        Msg("  Total allocated: %.2f MB", m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
+        Msg("  Peak usage: %.2f MB", m_stats.peakMemoryUsage / (1024.0f * 1024.0f));
+
+        if (m_stats.numAliasedResources > 0) {
+            float savingsPercent = 100.0f * m_stats.memoryReduced / (float)m_stats.totalMemoryAllocated;
+            Msg("  Saved via aliasing: %.2f MB (%.1f%%)",
+                m_stats.memoryReduced / (1024.0f * 1024.0f),
+                savingsPercent);
+            Msg("  Aliased resources: %u", m_stats.numAliasedResources);
+        }
+    }
+
+    // Timing
+    Msg("Timing:");
+    Msg("  Compile: %.2f ms", m_stats.compileTimeMs);
+    Msg("  Execute (CPU): %.2f ms", m_stats.executeTimeMs);
+    if (m_stats.totalGPUTimeMs > 0.0f) {
+        Msg("  Execute (GPU): %.2f ms", m_stats.totalGPUTimeMs);
+    }
+
+    // Per-pass timings
+    if (!m_stats.passTimings.empty()) {
+        Msg("Pass Timings:");
+
+        // Sort by time (descending)
+        xr_vector<std::pair<shared_str, float>> sorted;
+        for (const auto& pair : m_stats.passTimings) {
+            sorted.push_back(pair);
+        }
+        std::sort(sorted.begin(), sorted.end(),
+            [](const auto& a, const auto& b) { return a.second > b.second; });
+
+        for (const auto& pair : sorted) {
+            float percent = (m_stats.totalGPUTimeMs > 0.0f)
+                ? (100.0f * pair.second / m_stats.totalGPUTimeMs)
+                : 0.0f;
+            Msg("  %-30s: %6.2f ms (%4.1f%%)",
+                pair.first.c_str(),
+                pair.second,
+                percent);
+        }
+    }
+
+    Msg("========================================");
 }
 
 void FrameGraph::PrintExecutionOrder() const {
-    Msg("=== FrameGraph Execution Order ===");
+    Msg("========================================");
+    Msg("  FrameGraph Execution Order");
+    Msg("========================================");
+
     for (u32 i = 0; i < m_sortedPasses.size(); i++) {
         const PassNode* pass = m_sortedPasses[i];
-        Msg("  [%u] %s", i, pass->name.c_str());
+
+        Msg("[%2u] %-30s (depth %u, %u deps)",
+            i,
+            pass->name.c_str(),
+            pass->depth,
+            static_cast<u32>(pass->dependsOn.size()));
+
+        // Show resource accesses
+        if (!pass->resourceAccesses.empty()) {
+            for (const auto& access : pass->resourceAccesses) {
+                const ResourceNode* resource = GetResourceNode(access.resource);
+                const char* accessType = "?";
+
+                if (access.IsWrite()) {
+                    accessType = access.IsRead() ? "R/W" : "W";
+                } else {
+                    accessType = "R";
+                }
+
+                Msg("     [%s] %s (%s)",
+                    accessType,
+                    resource->desc.debugName.c_str(),
+                    ResourceStateToString(access.state));
+            }
+        }
     }
+
+    Msg("========================================");
 }
 
 bool FrameGraph::ValidateGraph() const {
-    // TODO: Implement validation
-    return true;
+    bool valid = true;
+
+    // Check 1: All passes have callbacks
+    for (const auto& pass : m_passes) {
+        if (pass.culled) continue;
+
+        if (!pass.executeCallback) {
+            Msg("! [FrameGraph] ERROR: Pass '%s' has no execute callback", pass.name.c_str());
+            valid = false;
+        }
+    }
+
+    // Check 2: All resources used by non-culled passes are allocated
+    for (const auto& pass : m_passes) {
+        if (pass.culled) continue;
+
+        for (const auto& access : pass.resourceAccesses) {
+            const ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) {
+                Msg("! [FrameGraph] ERROR: Pass '%s' uses invalid resource handle %u",
+                    pass.name.c_str(), access.resource.index);
+                valid = false;
+                continue;
+            }
+
+            if (!resource->isAllocated && !resource->desc.isImported) {
+                Msg("! [FrameGraph] ERROR: Pass '%s' uses unallocated resource '%s'",
+                    pass.name.c_str(), resource->desc.debugName.c_str());
+                valid = false;
+            }
+        }
+    }
+
+    // Check 3: No cyclic dependencies (should be caught by topological sort)
+    // Already handled by TopologicalSort
+
+    // Check 4: Imported resources have valid handles
+    for (const auto& resource : m_resources) {
+        if (resource.desc.isImported) {
+            if (resource.desc.type == ResourceDesc::Type::Buffer) {
+                if (!resource.nvrhiBuffer) {
+                    Msg("! [FrameGraph] ERROR: Imported buffer '%s' has null handle",
+                        resource.desc.debugName.c_str());
+                    valid = false;
+                }
+            } else {
+                if (!resource.nvrhiTexture) {
+                    Msg("! [FrameGraph] ERROR: Imported texture '%s' has null handle",
+                        resource.desc.debugName.c_str());
+                    valid = false;
+                }
+            }
+        }
+    }
+
+    if (valid) {
+        Msg("~ [FrameGraph] Validation passed");
+    } else {
+        Msg("! [FrameGraph] Validation FAILED");
+    }
+
+    return valid;
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
