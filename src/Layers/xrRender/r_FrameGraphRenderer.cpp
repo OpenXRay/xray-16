@@ -2,11 +2,20 @@
 #include "r_FrameGraphRenderer.h"
 #include "FBasicVisual.h"
 #include "FVisual.h"
+#include "FTreeVisual.h"
+#include "FHierrarhyVisual.h"
+#include "FLOD.h"
 #include "Shader.h"
+#include "r__dsgraph_structure.h"
 
 namespace xray::render {
 
 using namespace RENDER_NAMESPACE;
+
+namespace RENDER_NAMESPACE {
+    class CRender;
+    extern CRender RImplementation;
+}
 
 
 FrameGraphRenderer::FrameGraphRenderer() {
@@ -136,6 +145,109 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("═══════════════════════════════════════");
 }
 
+bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform) {
+    if (!visual)
+        return false;
+
+    IRender_Mesh* meshVisual = nullptr;
+
+    switch (visual->getType()) {
+        case MT_NORMAL:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
+        case MT_TREE_ST:
+        case MT_TREE_PM:
+            meshVisual = static_cast<FTreeVisual*>(visual);
+            break;
+        default:
+            return false;
+    }
+
+    if (!meshVisual)
+        return false;
+
+    if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        return false;
+
+    SGeometry* geom = meshVisual->rm_geom._get();
+    if (!geom->vb || !geom->ib)
+        return false;
+
+    nvrhi::BufferDesc vbDesc;
+    vbDesc.debugName = "VisibleMesh_VB";
+    vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
+    vbDesc.isVertexBuffer = true;
+    vbDesc.keepInitialState = true;
+    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+
+    nvrhi::BufferHandle nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+        nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->vb), vbDesc);
+
+    if (!nvrhiVB)
+        return false;
+
+    nvrhi::BufferDesc ibDesc;
+    ibDesc.debugName = "VisibleMesh_IB";
+    ibDesc.byteSize = meshVisual->iCount * sizeof(u16);
+    ibDesc.isIndexBuffer = true;
+    ibDesc.keepInitialState = true;
+    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+
+    nvrhi::BufferHandle nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+        nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->ib), ibDesc);
+
+    if (!nvrhiIB)
+        return false;
+
+    GeometryBatch batch;
+
+    batch.vertexBuffer = nvrhiVB;
+    batch.indexBuffer = nvrhiIB;
+
+    batch.indexCount = meshVisual->iCount;
+    batch.startIndex = meshVisual->iBase;
+    batch.baseVertex = meshVisual->vBase;
+
+    batch.worldMatrix = worldTransform;
+
+    batch.pipeline = nullptr;
+    batch.bindingSet = nullptr;
+
+    batch.debugName = "VisibleMesh";
+
+    m_geometryCollector->Submit(batch);
+    return true;
+}
+
+void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
+    if (!pVisual)
+        return;
+
+    switch (pVisual->Type) {
+        case MT_HIERRARHY: {
+            FHierrarhyVisual* pV = static_cast<FHierrarhyVisual*>(pVisual);
+            for (auto& child : pV->children) {
+                ExtractStaticLeafVisuals(child, outLeafs);
+            }
+            break;
+        }
+        case MT_LOD: {
+            FLOD* pV = static_cast<FLOD*>(pVisual);
+            for (auto& child : pV->children) {
+                ExtractStaticLeafVisuals(child, outLeafs);
+            }
+            break;
+        }
+        case MT_TREE_ST:
+        case MT_TREE_PM:
+        case MT_NORMAL:
+        default: {
+            outLeafs.push_back(pVisual);
+            break;
+        }
+    }
+}
+
 void FrameGraphRenderer::CollectVisibleGeometry() {
 
     if (!g_pGamePersistent)
@@ -143,6 +255,24 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     CFrustum frustum;
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+    xr_vector<dxRender_Visual*> staticVisuals;
+
+    auto& dsgraph = RImplementation.get_imm_context();
+
+    if (!dsgraph.Sectors.empty()) {
+        Fvector camPos = Device.vCameraPosition;
+        auto sectorID = dsgraph.detect_sector(camPos);
+
+        if (sectorID != IRender_Sector::INVALID_SECTOR_ID) {
+            CSector* sector = static_cast<CSector*>(dsgraph.Sectors[sectorID]);
+            if (sector && sector->root()) {
+                ExtractStaticLeafVisuals(sector->root(), staticVisuals);
+            }
+        }
+    }
+
+    Msg("  [FrameGraph] Found %u static visuals from sectors", (u32)staticVisuals.size());
 
     xr_vector<ISpatial*> spatialObjects;
     g_pGamePersistent->SpatialSpace.q_frustum(
@@ -152,14 +282,45 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         frustum
     );
 
-    Msg("  [FrameGraph] Found %u potentially visible objects", (u32)spatialObjects.size());
+    Msg("  [FrameGraph] Found %u dynamic objects from spatial DB", (u32)spatialObjects.size());
 
-    u32 submittedCount = 0;
+    u32 submittedStatic = 0;
+    u32 notFvisual_static = 0;
+    u32 noGeometry_static = 0;
+    u32 noBuffers_static = 0;
+
+    for (dxRender_Visual* visual : staticVisuals) {
+        if (ProcessVisualGeometry(visual, Fidentity)) {
+            submittedStatic++;
+        } else {
+            IRender_Mesh* meshVisual = nullptr;
+            switch (visual->getType()) {
+                case MT_NORMAL:
+                    meshVisual = static_cast<Fvisual*>(visual);
+                    break;
+                case MT_TREE_ST:
+                case MT_TREE_PM:
+                    meshVisual = static_cast<FTreeVisual*>(visual);
+                    break;
+                default:
+                    notFvisual_static++;
+                    continue;
+            }
+
+            if (!meshVisual || !meshVisual->rm_geom || !meshVisual->rm_geom._get()) {
+                noGeometry_static++;
+            } else if (!meshVisual->rm_geom._get()->vb || !meshVisual->rm_geom._get()->ib) {
+                noBuffers_static++;
+            }
+        }
+    }
+
+    Msg("  [FrameGraph] Static: submitted %u/%u (filtered: %u not mesh, %u no geom, %u no buffers)",
+        submittedStatic, (u32)staticVisuals.size(), notFvisual_static, noGeometry_static, noBuffers_static);
+
+    u32 submittedDynamic = 0;
     u32 notRenderable = 0;
     u32 noVisual = 0;
-    u32 notFvisual = 0;
-    u32 noGeometry = 0;
-    u32 noBuffers = 0;
 
     for (ISpatial* spatial : spatialObjects)
     {
@@ -181,91 +342,14 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        IRender_Mesh* meshVisual = nullptr;
-
-        switch (visual->getType()) {
-            case MT_NORMAL:
-                meshVisual = static_cast<Fvisual*>(visual);
-                break;
-            case MT_TREE_ST:
-            case MT_TREE_PM:
-                meshVisual = static_cast<FTreeVisual*>(visual);
-                break;
-            default:
-                notFvisual++;
-                continue;
+        if (ProcessVisualGeometry(visual, renderable->GetRenderData().xform)) {
+            submittedDynamic++;
         }
-
-        if (!meshVisual) {
-            notFvisual++;
-            continue;
-        }
-
-        if (!meshVisual->rm_geom || !meshVisual->rm_geom._get()) {
-            noGeometry++;
-            continue;
-        }
-
-        SGeometry* geom = meshVisual->rm_geom._get();
-        if (!geom->vb || !geom->ib) {
-            noBuffers++;
-            continue;
-        }
-
-        nvrhi::BufferDesc vbDesc;
-        vbDesc.debugName = "VisibleMesh_VB";
-        vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
-        vbDesc.isVertexBuffer = true;
-        vbDesc.keepInitialState = true;
-        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-
-        nvrhi::BufferHandle nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->vb), vbDesc);
-
-        if (!nvrhiVB) {
-            Msg("! [FrameGraph] Failed to wrap VB");
-            continue;
-        }
-
-        nvrhi::BufferDesc ibDesc;
-        ibDesc.debugName = "VisibleMesh_IB";
-        ibDesc.byteSize = meshVisual->iCount * sizeof(u16);
-        ibDesc.isIndexBuffer = true;
-        ibDesc.keepInitialState = true;
-        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-
-        nvrhi::BufferHandle nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->ib), ibDesc);
-
-        if (!nvrhiIB) {
-            Msg("! [FrameGraph] Failed to wrap IB");
-            continue;
-        }
-
-        GeometryBatch batch;
-
-        batch.vertexBuffer = nvrhiVB;
-        batch.indexBuffer = nvrhiIB;
-
-        batch.indexCount = meshVisual->iCount;
-        batch.startIndex = meshVisual->iBase;
-        batch.baseVertex = meshVisual->vBase;
-
-        batch.worldMatrix = renderable->GetRenderData().xform;
-
-        batch.pipeline = m_gbufferPass->GetPipeline();
-        batch.bindingSet = nullptr;
-
-        batch.debugName = "VisibleMesh";
-
-        m_geometryCollector->Submit(batch);
-        submittedCount++;
     }
 
-    Msg("  [FrameGraph] Filtering: %u not renderable, %u no visual, %u not Fvisual, %u no geom, %u no buffers",
-        notRenderable, noVisual, notFvisual, noGeometry, noBuffers);
-    Msg("  [FrameGraph] Submitted %u/%u objects to collector",
-        submittedCount, (u32)spatialObjects.size());
+    Msg("  [FrameGraph] Dynamic: submitted %u/%u (filtered: %u not renderable, %u no visual)",
+        submittedDynamic, (u32)spatialObjects.size(), notRenderable, noVisual);
+    Msg("  [FrameGraph] TOTAL: %u geometry batches submitted", submittedStatic + submittedDynamic);
 }
 
 }

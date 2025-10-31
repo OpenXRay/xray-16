@@ -6,7 +6,13 @@
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
+struct Fmatrix;
+namespace xray::render::RENDER_NAMESPACE {
+    class dxRender_Visual;
+}
+
 namespace xray::render {
+using RENDER_NAMESPACE::dxRender_Visual;
 
 class FrameGraphRenderer {
 public:
@@ -53,6 +59,9 @@ private:
     void BuildFrameGraph();
 
     void CollectVisibleGeometry();
+
+    bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
+    void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 };
 
 }

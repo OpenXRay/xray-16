@@ -38,7 +38,6 @@ void GeometryCollector::Submit(const GeometryBatch& batch) {
     VERIFY(batch.vertexBuffer != nullptr);
     VERIFY(batch.indexBuffer != nullptr);
     VERIFY(batch.indexCount > 0);
-    VERIFY(batch.pipeline != nullptr);
 
     m_batches.push_back(batch);
 }
@@ -56,8 +55,10 @@ void GeometryCollector::Sort() {
 u64 GeometryCollector::ComputeSortKey(const GeometryBatch& batch) {
     u64 key = 0;
 
-    u64 pipelineHash = reinterpret_cast<u64>(batch.pipeline) >> 4;
-    key |= (pipelineHash & 0xFFFF) << 48;
+    if (batch.pipeline) {
+        u64 pipelineHash = reinterpret_cast<u64>(batch.pipeline) >> 4;
+        key |= (pipelineHash & 0xFFFF) << 48;
+    }
 
     key |= (static_cast<u64>(batch.materialID) & 0xFFFF) << 32;
 

@@ -245,13 +245,15 @@ void GBufferPass::Execute(
 
         Msg("  Rendering %u geometry batches", m_stats.numObjects);
 
-        nvrhi::IGraphicsPipeline* currentPipeline = nullptr;
+        ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
         for (const auto& batch : batches) {
-            if (batch.pipeline != currentPipeline) {
-                ctx.SetPipeline(batch.pipeline);
-                currentPipeline = batch.pipeline;
+            ng::PipelineState* pipelineToUse = m_pipeline;
+
+            if (pipelineToUse != currentPipeline) {
+                ctx.SetPipeline(pipelineToUse->GetNativePipeline());
+                currentPipeline = pipelineToUse;
             }
 
             UpdatePerObjectConstants(ctx, batch);
