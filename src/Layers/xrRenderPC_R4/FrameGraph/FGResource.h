@@ -80,6 +80,9 @@ struct ResourceNode {
     xray::render::ng::TextureHandle physicalTexture;
     xray::render::ng::BufferHandle physicalBuffer;
 
+    nvrhi::TextureHandle nvrhiTexture;
+    nvrhi::BufferHandle nvrhiBuffer;
+
     bool canAlias = true;
     u32 aliasedWith = INVALID_INDEX;
     u64 memoryOffset = 0;

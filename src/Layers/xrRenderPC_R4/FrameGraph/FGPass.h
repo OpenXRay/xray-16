@@ -42,11 +42,27 @@ struct ResourceAccess {
     bool IsWrite() const { return accessType == Type::Write || accessType == Type::ReadWrite; }
 };
 
+struct ResourceBarrier {
+    VirtualResourceHandle resource;
+    ResourceState stateBefore;
+    ResourceState stateAfter;
+
+    ResourceBarrier() = default;
+
+    ResourceBarrier(VirtualResourceHandle _resource, ResourceState _before, ResourceState _after)
+        : resource(_resource)
+        , stateBefore(_before)
+        , stateAfter(_after)
+    {}
+};
+
 struct PassNode {
     PassHandle handle;
     shared_str name;
 
     xr_vector<ResourceAccess> resourceAccesses;
+
+    xr_vector<ResourceBarrier> barriersBeforePass;
 
     xr_vector<PassNode*> dependsOn;
     xr_vector<PassNode*> dependents;
