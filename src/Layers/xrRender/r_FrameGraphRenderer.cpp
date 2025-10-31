@@ -1,6 +1,8 @@
 // xrRender/r_FrameGraphRenderer.cpp
 #include "stdafx.h"
 #include "r_FrameGraphRenderer.h"
+#include "FVisual.h"
+#include "Shader.h"
 
 namespace xray::render {
 
@@ -194,20 +196,48 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     Msg("  [FrameGraph] Found %u potentially visible objects", (u32)spatialObjects.size());
 
-    // TODO: For each visible object:
-    // 1. Get its Visual (geometry)
-    // 2. Extract vertex/index buffers
-    // 3. Create GeometryBatch
-    // 4. Submit to m_geometryCollector
-    //
-    // This is complex because we need to:
-    // - Access Visual's geometry (rm_geom)
-    // - Convert to NVRHI buffer handles
-    // - Create proper PSO for the material
-    // - Set up binding sets for textures
-    //
-    // For now, we'll leave this as a stub and implement
-    // a test triangle first to verify the pipeline works.
+    u32 submittedCount = 0;
+
+    // Extract geometry from each visible object
+    for (ISpatial* spatial : spatialObjects)
+    {
+        // Get the renderable object
+        IRenderable* renderable = spatial->dcast_Renderable();
+        if (!renderable)
+            continue;
+
+        // Get the visual (geometry)
+        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(renderable->renderable_ROS());
+        if (!visual)
+            continue;
+
+        // Only handle simple mesh visuals for now (type MT_NORMAL)
+        if (visual->getType() != MT_NORMAL)
+            continue;
+
+        // Cast to Fvisual to access geometry
+        Fvisual* meshVisual = dynamic_cast<Fvisual*>(visual);
+        if (!meshVisual)
+            continue;
+
+        // Check if geometry is valid
+        if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+            continue;
+
+        SGeometry* geom = meshVisual->rm_geom._get();
+        if (!geom->vb || !geom->ib)
+            continue;
+
+        // TODO: Wrap D3D11 buffers as NVRHI handles
+        // TODO: Create PSO for material
+        // TODO: Create binding set for textures
+        // TODO: Build GeometryBatch and submit
+
+        submittedCount++;
+    }
+
+    Msg("  [FrameGraph] Submitted %u/%u objects to collector",
+        submittedCount, (u32)spatialObjects.size());
 }
 
 } // namespace xray::render
