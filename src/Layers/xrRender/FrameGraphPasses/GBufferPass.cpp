@@ -301,15 +301,10 @@ void GBufferPass::Execute(
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
         for (const auto& batch : batches) {
-            // Use batch pipeline if provided, otherwise use pass default
-            nvrhi::IGraphicsPipeline* pipelineToUse = batch.pipeline
-                ? batch.pipeline
-                : m_pipeline->GetNativePipeline();
-
             // Set pipeline (if changed)
-            if (pipelineToUse != currentPipeline) {
-                ctx.SetPipeline(pipelineToUse);
-                currentPipeline = pipelineToUse;
+            if (batch.pipeline != currentPipeline) {
+                ctx.SetPipeline(batch.pipeline);
+                currentPipeline = batch.pipeline;
             }
 
             // Update per-object constants
