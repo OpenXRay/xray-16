@@ -30,19 +30,16 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
     }
 #endif
 
-    // Store shader bytecode for NVRHI/FrameGraph renderer (only for VS/PS)
+    // Store shader bytecode for NVRHI/FrameGraph renderer
 #if defined(USE_DX11)
-    if constexpr (std::is_same_v<T, SVS> || std::is_same_v<T, SPS>)
+    _hr = D3DCreateBlob(buffer_size, &result->bytecode);
+    if (SUCCEEDED(_hr) && result->bytecode)
     {
-        _hr = D3DCreateBlob(buffer_size, &result->bytecode);
-        if (SUCCEEDED(_hr) && result->bytecode)
-        {
-            CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
-        }
-        else
-        {
-            Msg("! Failed to create bytecode blob for %s", file_name);
-        }
+        CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
+    }
+    else
+    {
+        Msg("! Failed to create bytecode blob for %s", file_name);
     }
 #endif
 
