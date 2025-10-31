@@ -19,6 +19,10 @@ RenderDevice::~RenderDevice() {
     Shutdown();
 }
 
+nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
+    return m_nvrhiDevice ? m_nvrhiDevice->GetDevice() : nullptr;
+}
+
 // ═══════════════════════════════════════════════════
 //  INITIALIZATION
 // ═══════════════════════════════════════════════════

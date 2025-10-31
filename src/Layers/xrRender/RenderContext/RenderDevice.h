@@ -28,6 +28,9 @@ public:
 
     bool IsInitialized() const { return m_initialized; }
 
+    // Get the underlying NVRHI device
+    nvrhi::IDevice* GetNVRHIDevice() const;
+
     // ═══════════════════════════════════════════════════
     //  TEXTURE CREATION
     // ═══════════════════════════════════════════════════

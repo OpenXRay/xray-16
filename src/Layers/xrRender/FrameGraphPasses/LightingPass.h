@@ -1,0 +1,83 @@
+// xrRender/FrameGraphPasses/LightingPass.h
+#pragma once
+
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "GBufferPass.h"
+
+namespace xray::render::passes {
+
+// ══════════════════════════════════════════════════════════
+//  LIGHTING PASS CONFIGURATION
+// ══════════════════════════════════════════════════════════
+
+struct LightingPassConfig {
+    // Output resolution
+    u32 width = 1920;
+    u32 height = 1080;
+
+    // HDR format
+    nvrhi::Format hdrFormat = nvrhi::Format::RGBA16_FLOAT;
+
+    // Lighting options
+    bool enableAmbient = true;
+    bool enableDirectional = true;
+    float ambientIntensity = 0.1f;
+
+    // Debug
+    bool visualizeLighting = false;
+};
+
+// ══════════════════════════════════════════════════════════
+//  LIGHTING PASS OUTPUT
+// ══════════════════════════════════════════════════════════
+
+struct LightingPassOutput {
+    framegraph::VirtualResourceHandle hdrColor;  // Lit scene
+};
+
+// ══════════════════════════════════════════════════════════
+//  LIGHTING PASS
+// ══════════════════════════════════════════════════════════
+
+class LightingPass {
+public:
+    LightingPass(const LightingPassConfig& config = LightingPassConfig());
+    ~LightingPass();
+
+    // Setup pass in FrameGraph
+    LightingPassOutput Setup(
+        framegraph::FrameGraph& fg,
+        const GBufferOutputs& gbuffer
+    );
+
+    // Get configuration
+    const LightingPassConfig& GetConfig() const { return m_config; }
+
+    // Statistics
+    struct Stats {
+        float cpuTimeMs = 0.0f;
+        float gpuTimeMs = 0.0f;
+        u32 numLights = 0;
+    };
+
+    const Stats& GetStats() const { return m_stats; }
+
+private:
+    LightingPassConfig m_config;
+    Stats m_stats;
+
+    // Shaders (TODO: will be loaded later)
+    nvrhi::IShader* m_vertexShader = nullptr;
+    nvrhi::IShader* m_pixelShader = nullptr;
+    nvrhi::GraphicsPipelineHandle m_pipeline;
+
+    // Execution
+    void Execute(
+        ng::RenderContext& ctx,
+        const framegraph::FrameGraph& fg,
+        const GBufferOutputs& gbuffer,
+        const LightingPassOutput& output
+    );
+};
+
+} // namespace xray::render::passes
