@@ -57,6 +57,9 @@ private:
     // Load shaders
     bool LoadShaders();
 
+    // Create pipeline state object
+    bool CreatePipeline(nvrhi::ITexture* backbufferTexture);
+
     void Execute(
         ng::RenderContext& ctx,
         const framegraph::FrameGraph& fg,

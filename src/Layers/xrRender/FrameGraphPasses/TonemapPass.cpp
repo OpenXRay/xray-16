@@ -52,6 +52,57 @@ bool TonemapPass::LoadShaders()
     return true;
 }
 
+bool TonemapPass::CreatePipeline(nvrhi::ITexture* backbufferTexture)
+{
+    VERIFY(m_vertexShader != nullptr);
+    VERIFY(m_pixelShader != nullptr);
+    VERIFY(backbufferTexture != nullptr);
+
+    // Create graphics pipeline descriptor
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+    // Shaders
+    pipelineDesc.VS = m_vertexShader;
+    pipelineDesc.PS = m_pixelShader;
+
+    // Vertex input - none (fullscreen triangle uses SV_VertexID)
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    // Render state
+    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
+    rasterState.cullMode = nvrhi::RasterCullMode::None;
+    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+    rasterState.frontCounterClockwise = false;
+
+    // Blend state - no blending (opaque)
+    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
+    blendState.targets[0].enableBlend = false;
+    blendState.targets[0].colorWriteMask = nvrhi::ColorMask::All;
+
+    // Depth/stencil state - no depth (fullscreen)
+    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
+    depthState.depthTestEnable = false;
+    depthState.depthWriteEnable = false;
+    depthState.stencilEnable = false;
+
+    // Framebuffer info
+    auto backbufferDesc = backbufferTexture->getDesc();
+    pipelineDesc.renderState.targetCount = 1;
+    pipelineDesc.renderState.renderTargetFormats[0] = backbufferDesc.format;
+
+    // Create pipeline
+    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+
+    if (!m_pipeline)
+    {
+        Msg("! [TonemapPass] Failed to create graphics pipeline");
+        return false;
+    }
+
+    Msg("  ✓ TonemapPass pipeline created successfully");
+    return true;
+}
+
 void TonemapPass::Setup(
     FrameGraph& fg,
     VirtualResourceHandle hdrInput,
@@ -99,6 +150,17 @@ void TonemapPass::Execute(
     nvrhi::ITexture* hdr = fg.GetPhysicalTexture(hdrInput);
     nvrhi::ITexture* output = fg.GetPhysicalTexture(backbuffer);
 
+    // Create pipeline if needed (once per frame, using actual backbuffer format)
+    if (!m_pipeline)
+    {
+        if (!CreatePipeline(output))
+        {
+            Msg("! [TonemapPass] Failed to create pipeline");
+            ctx.EndRenderPass();
+            return;
+        }
+    }
+
     // ═══════════════════════════════════════════════════════
     //  SETUP RENDER PASS
     // ═══════════════════════════════════════════════════════
@@ -123,31 +185,22 @@ void TonemapPass::Execute(
     ctx.SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  BIND TEXTURES & DRAW
+    //  BIND PIPELINE & DRAW
     // ═══════════════════════════════════════════════════════
 
-    // TODO: Bind HDR texture
-    // ctx.SetTexture(0, hdr);
+    // Set pipeline
+    ctx.SetPipeline(m_pipeline.Get());
 
-    // TODO: Set pipeline
-    // ctx.SetPipeline(m_pipeline);
+    // TODO: Bind HDR texture as shader resource
+    // ctx.SetTexture(0, hdr);
 
     // TODO: Update constants (exposure, gamma)
     // ctx.UpdateConstantBuffer(0, &m_config, sizeof(m_config));
 
     // Draw fullscreen triangle
-    // TODO: Need to set up pipeline, textures, and constants
-    // For now, skip drawing until pipeline is created
-    // ctx.Draw(3, 0);
+    ctx.Draw(3, 0);
 
-    if (m_vertexShader && m_pixelShader)
-    {
-        Msg("  (Shaders loaded but pipeline not yet created)");
-    }
-    else
-    {
-        Msg("  (Skipping tonemap draw - shaders not loaded)");
-    }
+    Msg("  ✓ Tonemap draw complete (3 vertices)");
 
     ctx.EndRenderPass();
 
