@@ -27,8 +27,9 @@ bool NVRHIDevice::Initialize(ID3D11Device* d3d11Device, ID3D11DeviceContext* d3d
         Msg("~ [NVRHI] Initializing device wrapper...");
 
         nvrhi::d3d11::DeviceDesc deviceDesc;
-        deviceDesc.device = d3d11Device;
         deviceDesc.context = d3d11Context;
+        deviceDesc.messageCallback = nullptr;
+        deviceDesc.aftermathEnabled = false;
 
         m_device = nvrhi::d3d11::createDevice(deviceDesc);
 
@@ -52,9 +53,9 @@ bool NVRHIDevice::Initialize(ID3D11Device* d3d11Device, ID3D11DeviceContext* d3d
 
         m_initialized = true;
 
-        const nvrhi::DeviceDesc& desc = m_device->getDeviceDesc();
+        const nvrhi::GraphicsAPI api = m_device->getGraphicsAPI();
         Msg("~ [NVRHI] Device initialized");
-        Msg("~   Graphics API: %s", desc.graphicsAPI == nvrhi::GraphicsAPI::D3D11 ? "D3D11" : "Unknown");
+        Msg("~   Graphics API: %s", api == nvrhi::GraphicsAPI::D3D11 ? "D3D11" : "Unknown");
 
         return true;
     }

@@ -533,9 +533,12 @@ private:
 
     IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 
-#if defined(USE_DX11) && RENDER >= R_R4
+public:
+#if defined(USE_DX11) && RENDER == R_R4
     xray::render::r4::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
     bool m_nvrhiTestMode{ false };
+
+    void TestNVRHI_Render();
 #endif
 };
 

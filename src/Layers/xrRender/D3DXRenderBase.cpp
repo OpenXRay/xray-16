@@ -6,6 +6,10 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
+#if defined(USE_DX11) && RENDER == R_R4
+#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#endif
+
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #   ifndef MASTER_GOLD
 #       define USE_RENDERDOC
@@ -75,7 +79,7 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
 void D3DXRenderBase::Destroy()
 {
-#if defined(USE_DX11) && RENDER >= R_R4
+#if defined(USE_DX11) && RENDER == R_R4
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
     if (render.m_nvrhiDevice)
     {
@@ -218,7 +222,7 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
 
     HW.CreateDevice(hWnd);
 
-#if defined(USE_DX11) && RENDER >= R_R4
+#if defined(USE_DX11) && RENDER == R_R4
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
     render.m_nvrhiDevice = xr_new<xray::render::r4::nvrhi_wrapper::NVRHIDevice>();
 
@@ -294,6 +298,14 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 }
 void D3DXRenderBase::Begin()
 {
+#if defined(USE_DX11) && RENDER == R_R4
+    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+    if (render.m_nvrhiTestMode && render.m_nvrhiDevice && render.m_nvrhiDevice->IsInitialized())
+    {
+        return;
+    }
+#endif
+
     HW.BeginScene();
 #if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
@@ -324,6 +336,14 @@ void D3DXRenderBase::Clear()
 
 void D3DXRenderBase::End()
 {
+#if defined(USE_DX11) && RENDER == R_R4
+    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+    if (render.m_nvrhiTestMode && render.m_nvrhiDevice && render.m_nvrhiDevice->IsInitialized())
+    {
+        return;
+    }
+#endif
+
     if (HW.Caps.SceneMode)
         overdrawEnd();
  #if RENDER == R_R4
