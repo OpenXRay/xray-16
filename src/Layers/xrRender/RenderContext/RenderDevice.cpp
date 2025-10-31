@@ -392,6 +392,25 @@ void RenderDevice::DestroySampler(SamplerHandle handle) {
     Msg("~ [RenderDevice] Destroyed sampler: %s", info.desc.debugName.c_str());
 }
 
+// ═══════════════════════════════════════════════════════
+//  BINDING LAYOUTS & SETS
+// ═══════════════════════════════════════════════════════
+
+nvrhi::BindingLayoutHandle RenderDevice::CreateBindingLayout(const nvrhi::BindingLayoutDesc& desc) {
+    VERIFY(m_initialized);
+    return GetNativeDevice()->createBindingLayout(desc);
+}
+
+nvrhi::BindingSetHandle RenderDevice::CreateBindingSet(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout) {
+    VERIFY(m_initialized);
+    return GetNativeDevice()->createBindingSet(desc, layout);
+}
+
+nvrhi::FramebufferHandle RenderDevice::CreateFramebuffer(const nvrhi::FramebufferDesc& desc) {
+    VERIFY(m_initialized);
+    return GetNativeDevice()->createFramebuffer(desc);
+}
+
 nvrhi::ISampler* RenderDevice::GetNativeSampler(SamplerHandle handle) {
     if (!ValidateSamplerHandle(handle))
         return nullptr;
@@ -495,7 +514,8 @@ RenderContext* RenderDevice::CreateContext() {
         return nullptr;
     }
 
-    RenderContext* context = new RenderContext(GetNativeDevice(), cmdList);
+    // Pass 'this' RenderDevice so RenderContext can resolve BufferHandles and other handles
+    RenderContext* context = new RenderContext(this, cmdList);
     m_stats.contextsAlive++;
 
     Msg("~ [RenderDevice] Created render context");

@@ -61,6 +61,26 @@ bool GBufferPass::LoadShaders()
         "gbuffer.ps"
     );
 
+    // Create per-object constant buffer through our abstraction layer
+    // Matches shader cbuffer PerObject : register(b0)
+    struct PerObjectConstants {
+        Fmatrix worldViewProj;
+        Fmatrix world;
+        Fmatrix worldIT;  // Inverse transpose for normals
+    };
+
+    ng::RenderDevice::BufferDesc cbDesc;
+    cbDesc.byteSize = sizeof(PerObjectConstants);
+    cbDesc.isConstantBuffer = true;
+    cbDesc.isVolatile = true;  // Updated every draw call
+    cbDesc.debugName = "PerObjectCB";
+
+    m_perObjectCB = m_device->CreateBuffer(cbDesc);
+    if (!m_perObjectCB.IsValid()) {
+        Msg("! [GBufferPass] Failed to create per-object constant buffer");
+        return false;
+    }
+
     Msg("  ✓ G-Buffer shaders loaded successfully");
     return true;
 }
@@ -322,7 +342,7 @@ void GBufferPass::Execute(
 
             // Bind vertex/index buffers (convert nvrhi::BufferHandle to IBuffer*)
             ctx.SetVertexBuffer(0, batch.vertexBuffer.Get(), 0);
-            ctx.SetIndexBuffer(batch.indexBuffer.Get(), nvrhi::Format::R32_UINT, 0);
+            ctx.SetIndexBuffer(batch.indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);  // X-Ray uses 16-bit indices
 
             // Draw
             ctx.DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
@@ -386,10 +406,12 @@ void GBufferPass::UpdatePerObjectConstants(
     temp.invert(batch.worldMatrix);
     constants.worldIT.transpose(temp);
 
-    // Update constant buffer
-    // TODO: Create and bind constant buffer properly
-    // For now, this is a placeholder
-    // ctx.UpdateConstantBuffer(0, &constants, sizeof(constants));
+    // Update constant buffer through our abstraction layer
+    VERIFY(m_perObjectCB.IsValid());
+    m_device->UpdateBuffer(m_perObjectCB, &constants, sizeof(constants));
+
+    // Bind constant buffer to slot b0 (using our abstraction layer)
+    ctx.SetConstantBuffer(0, m_perObjectCB);
 }
 
 } // namespace xray::render::passes

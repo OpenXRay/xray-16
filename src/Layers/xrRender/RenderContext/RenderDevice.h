@@ -175,6 +175,19 @@ public:
     bool IsSamplerValid(SamplerHandle handle) const;
 
     // ═══════════════════════════════════════════════════
+    //  BINDING LAYOUTS & SETS (for descriptor bindings)
+    // ═══════════════════════════════════════════════════
+
+    // Create binding layout (what resources a shader expects)
+    nvrhi::BindingLayoutHandle CreateBindingLayout(const nvrhi::BindingLayoutDesc& desc);
+
+    // Create binding set (actual resources to bind)
+    nvrhi::BindingSetHandle CreateBindingSet(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout);
+
+    // Create framebuffer (render targets + depth)
+    nvrhi::FramebufferHandle CreateFramebuffer(const nvrhi::FramebufferDesc& desc);
+
+    // ═══════════════════════════════════════════════════
     //  SHADER CREATION
     // ═══════════════════════════════════════════════════
 

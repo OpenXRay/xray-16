@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "RenderContext.h"
+#include "RenderDevice.h"
 
 namespace xray::render::ng {
 
-RenderContext::RenderContext(nvrhi::IDevice* device,
+RenderContext::RenderContext(RenderDevice* device,
                              nvrhi::ICommandList* commandList)
     : m_device(device)
     , m_commandList(commandList)
@@ -56,8 +57,8 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
         fbDesc.setDepthAttachment(desc.depthStencil);
     }
 
-    // Create framebuffer (NVRHI caches these)
-    m_currentFramebuffer = m_device->createFramebuffer(fbDesc);
+    // Create framebuffer through our abstraction layer
+    m_currentFramebuffer = m_device->CreateFramebuffer(fbDesc);
 
     if (!m_currentFramebuffer) {
         Msg("! [RenderContext] Failed to create framebuffer");
@@ -291,13 +292,51 @@ void RenderContext::SetSampler(u32 slot, nvrhi::ISampler* sampler) {
 
 void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(buffer != nullptr);
+    VERIFY(m_commandList != nullptr);
 
-    // TODO: Bind via descriptor sets
+    // Step 1: Create binding layout (describes what we're binding)
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::All;
+    layoutDesc.bindings = {
+        nvrhi::BindingLayoutItem::ConstantBuffer(slot)
+    };
+
+    nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
+    if (!layout) {
+        Msg("! [RenderContext] Failed to create binding layout for constant buffer");
+        return;
+    }
+
+    // Step 2: Create binding set (binds actual buffer resource)
+    nvrhi::BindingSetDesc bindingDesc;
+    bindingDesc.bindings = {
+        nvrhi::BindingSetItem::ConstantBuffer(slot, buffer)
+    };
+
+    nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(bindingDesc, layout);
+    if (!bindingSet) {
+        Msg("! [RenderContext] Failed to create binding set for constant buffer");
+        return;
+    }
+
+    // Step 3: Set graphics state with binding set
+    // NVRHI caches state, so we only need to set what changes
+    nvrhi::GraphicsState state;
+    state.addBindingSet(bindingSet);
+    m_commandList->setGraphicsState(state);
 }
 
 void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
-    // TODO: Implement once we have buffer manager
-    VERIFY2(false, "Buffer handle support not yet implemented");
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(buffer.IsValid());
+
+    // Resolve handle to native buffer through our abstraction layer
+    nvrhi::IBuffer* nativeBuffer = m_device->GetNativeBuffer(buffer);
+    VERIFY(nativeBuffer != nullptr);
+
+    // Use the direct buffer path
+    SetConstantBuffer(slot, nativeBuffer);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -327,8 +366,8 @@ nvrhi::BindingLayoutHandle RenderContext::CreateBindingLayout(const BindingLayou
         nvrhiDesc.bindings.push_back(nvrhiItem);
     }
 
-    // Create the binding layout
-    nvrhi::BindingLayoutHandle layout = m_device->createBindingLayout(nvrhiDesc);
+    // Create the binding layout through our abstraction layer
+    nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(nvrhiDesc);
 
     if (!layout) {
         Msg("! [RenderContext] Failed to create binding layout");
@@ -398,8 +437,8 @@ nvrhi::BindingSetHandle RenderContext::CreateBindingSet(const BindingSetDesc& de
         nvrhiDesc.bindings.push_back(nvrhiItem);
     }
 
-    // Create the binding set
-    nvrhi::BindingSetHandle bindingSet = m_device->createBindingSet(nvrhiDesc, desc.layout);
+    // Create the binding set through our abstraction layer
+    nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(nvrhiDesc, desc.layout);
 
     if (!bindingSet) {
         Msg("! [RenderContext] Failed to create binding set");

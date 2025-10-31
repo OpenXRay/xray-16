@@ -93,6 +93,9 @@ private:
     xr_unique_ptr<ng::RCShader> m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
+    // Per-object constant buffer (using our abstraction layer)
+    ng::BufferHandle m_perObjectCB;
+
     // Load shaders
     bool LoadShaders();
 

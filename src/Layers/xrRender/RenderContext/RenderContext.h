@@ -133,9 +133,12 @@ struct Rect {
  * - Clear, readable API
  * - Future-proof for DX12/Vulkan
  */
+// Forward declaration
+class RenderDevice;
+
 class RenderContext {
 public:
-    RenderContext(nvrhi::IDevice* device, nvrhi::ICommandList* commandList);
+    RenderContext(RenderDevice* device, nvrhi::ICommandList* commandList);
     ~RenderContext();
 
     // ═══════════════════════════════════════════════════════
@@ -282,7 +285,7 @@ public:
     nvrhi::ICommandList* GetCommandList() const { return m_commandList; }
 
 private:
-    nvrhi::IDevice* m_device;
+    RenderDevice* m_device;  // Our abstraction layer device
     nvrhi::ICommandList* m_commandList;
     ResourceManager* m_resourceManager = nullptr;  // Set later
 
