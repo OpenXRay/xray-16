@@ -144,7 +144,7 @@ ID3DBlob* ShaderLoader::CompileShader(
     return shaderBlob;
 }
 
-nvrhi::IShader* ShaderLoader::LoadVertexShader(const char* name, const char* entryPoint)
+nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(const char* name, const char* entryPoint)
 {
     string_path shaderPath;
     strconcat(sizeof(shaderPath), shaderPath, "r3" DELIMITER, name, ".vs");
@@ -159,7 +159,7 @@ nvrhi::IShader* ShaderLoader::LoadVertexShader(const char* name, const char* ent
     desc.debugName = name;
 
     // Create NVRHI shader from bytecode
-    nvrhi::IShader* shader = m_device->GetNVRHIDevice()->createShader(
+    nvrhi::ShaderHandle shader = m_device->GetNVRHIDevice()->createShader(
         desc,
         bytecode->GetBufferPointer(),
         bytecode->GetBufferSize()
@@ -177,7 +177,7 @@ nvrhi::IShader* ShaderLoader::LoadVertexShader(const char* name, const char* ent
     return shader;
 }
 
-nvrhi::IShader* ShaderLoader::LoadPixelShader(const char* name, const char* entryPoint)
+nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(const char* name, const char* entryPoint)
 {
     string_path shaderPath;
     strconcat(sizeof(shaderPath), shaderPath, "r3" DELIMITER, name, ".ps");
@@ -192,7 +192,7 @@ nvrhi::IShader* ShaderLoader::LoadPixelShader(const char* name, const char* entr
     desc.debugName = name;
 
     // Create NVRHI shader from bytecode
-    nvrhi::IShader* shader = m_device->GetNVRHIDevice()->createShader(
+    nvrhi::ShaderHandle shader = m_device->GetNVRHIDevice()->createShader(
         desc,
         bytecode->GetBufferPointer(),
         bytecode->GetBufferSize()
