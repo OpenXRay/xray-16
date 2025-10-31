@@ -90,6 +90,8 @@ void FrameGraphRenderer::Render() {
 void FrameGraphRenderer::SetupFrame() {
     m_geometryCollector->BeginFrame();
 
+    CollectVisibleGeometry();
+
     m_geometryCollector->EndFrame();
 }
 
@@ -126,6 +128,26 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");
+}
+
+void FrameGraphRenderer::CollectVisibleGeometry() {
+
+    if (!g_pGamePersistent)
+        return;
+
+    CFrustum frustum;
+    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+    xr_vector<ISpatial*> spatialObjects;
+    g_pGamePersistent->SpatialSpace.q_frustum(
+        spatialObjects,
+        0,
+        STYPE_RENDERABLE,
+        frustum
+    );
+
+    Msg("  [FrameGraph] Found %u potentially visible objects", (u32)spatialObjects.size());
+
 }
 
 }

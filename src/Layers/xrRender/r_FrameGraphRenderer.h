@@ -51,6 +51,8 @@ private:
 
     void SetupFrame();
     void BuildFrameGraph();
+
+    void CollectVisibleGeometry();
 };
 
 }
