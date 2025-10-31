@@ -5,6 +5,8 @@
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/RenderContext/PipelineState.h"
+#include "Layers/xrRender/RenderContext/RCShader.h"
 
 namespace xray::render {
 
@@ -204,18 +206,61 @@ MaterialPSO* MaterialCache::CreatePSO(
     Msg("  Created VS/PS shaders from bytecode");
 
     // ═══════════════════════════════════════════════════════
-    //  CREATE PSO
+    //  WRAP SHADERS IN RCSHADER OBJECTS
     // ═══════════════════════════════════════════════════════
 
-    // TODO: Create PipelineState with these shaders + binding layout
-    // For now, store the shader handles
-    // Full PSO creation will be implemented in the next step
+    auto rcVS = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Vertex,
+        vsHandle,
+        pso->vertexShader->cName.c_str());
 
-    Msg("  ! PSO creation not fully implemented yet");
+    auto rcPS = xr_make_unique<ng::RCShader>(
+        ng::ShaderStage::Pixel,
+        psHandle,
+        pso->pixelShader->cName.c_str());
 
-    // Clean up shader handles (temporary until PSO creation is complete)
-    m_device->DestroyShader(vsHandle);
-    m_device->DestroyShader(psHandle);
+    // ═══════════════════════════════════════════════════════
+    //  BUILD PIPELINE STATE DESCRIPTOR
+    // ═══════════════════════════════════════════════════════
+
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = rcVS.get();
+    psoDesc.pixelShader = rcPS.get();
+
+    // Set up vertex attributes (TODO: extract from vertex shader input signature)
+    // For now, use a basic position+normal+texcoord layout
+    SetupVertexAttributes(psoDesc);
+
+    // Set up render states from X-Ray pass
+    SetupRenderStates(pass, psoDesc);
+
+    // Set up render target formats from GBufferOutputs
+    SetupRenderTargets(outputs, fg, psoDesc);
+
+    // Set debug name
+    psoDesc.debugName = pso->debugName;
+
+    Msg("  Built PSO descriptor");
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE PIPELINE STATE
+    // ═══════════════════════════════════════════════════════
+
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        Msg("! [MaterialCache] Pipeline cache is NULL");
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreatePipelineState(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache] Failed to create pipeline state");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    Msg("  ✓ Pipeline state created");
 
     m_stats.totalPSOCreations++;
 
@@ -479,6 +524,105 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     u32 hash = crc32(&statePtr, sizeof(statePtr), 0);
 
     return static_cast<u64>(hash);
+}
+
+// ══════════════════════════════════════════════════════════
+//  SETUP VERTEX ATTRIBUTES
+// ══════════════════════════════════════════════════════════
+
+void MaterialCache::SetupVertexAttributes(ng::PipelineStateDesc& psoDesc)
+{
+    // TODO: Extract actual vertex attributes from vertex shader input signature
+    // For now, use a common vertex layout: Position, Normal, TexCoord, Tangent
+
+    psoDesc.vertexAttributes.clear();
+
+    // Position (POSITION0) - float3 at offset 0
+    ng::VertexAttribute posAttr;
+    posAttr.semanticName = "POSITION";
+    posAttr.semanticIndex = 0;
+    posAttr.format = nvrhi::Format::RGB32_FLOAT;
+    posAttr.offset = 0;
+    posAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(posAttr);
+
+    // Normal (NORMAL0) - float3 at offset 12
+    ng::VertexAttribute normAttr;
+    normAttr.semanticName = "NORMAL";
+    normAttr.semanticIndex = 0;
+    normAttr.format = nvrhi::Format::RGB32_FLOAT;
+    normAttr.offset = 12;
+    normAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(normAttr);
+
+    // TexCoord (TEXCOORD0) - float2 at offset 24
+    ng::VertexAttribute texAttr;
+    texAttr.semanticName = "TEXCOORD";
+    texAttr.semanticIndex = 0;
+    texAttr.format = nvrhi::Format::RG32_FLOAT;
+    texAttr.offset = 24;
+    texAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(texAttr);
+
+    // Tangent (TANGENT0) - float3 at offset 32
+    ng::VertexAttribute tangAttr;
+    tangAttr.semanticName = "TANGENT";
+    tangAttr.semanticIndex = 0;
+    tangAttr.format = nvrhi::Format::RGB32_FLOAT;
+    tangAttr.offset = 32;
+    tangAttr.bufferIndex = 0;
+    psoDesc.vertexAttributes.push_back(tangAttr);
+}
+
+// ══════════════════════════════════════════════════════════
+//  SETUP RENDER STATES
+// ══════════════════════════════════════════════════════════
+
+void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
+{
+    // TODO: Extract actual render states from X-Ray SPass->state
+    // For now, use default GBuffer rendering states
+
+    // Rasterizer state
+    psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
+    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.depthClipEnable = true;
+
+    // Depth/Stencil state
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthWriteEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    // Blend state (opaque rendering for GBuffer)
+    psoDesc.blendState.renderTargets[0].blendEnable = false;
+    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::All;
+}
+
+// ══════════════════════════════════════════════════════════
+//  SETUP RENDER TARGETS
+// ══════════════════════════════════════════════════════════
+
+void MaterialCache::SetupRenderTargets(
+    const passes::GBufferOutputs& outputs,
+    xray::render::framegraph::FrameGraph& fg,
+    ng::PipelineStateDesc& psoDesc)
+{
+    // GBuffer has 3 render targets + depth
+    psoDesc.renderTargetCount = 3;
+
+    // RT0: Albedo.rgb + Metallic.a (RGBA8)
+    psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
+
+    // RT1: Normal.xyz + Roughness.a (RGBA8_SNORM for normals)
+    psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
+
+    // RT2: Material ID (R16_UINT)
+    psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
+
+    // Depth/Stencil: D24S8
+    psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
 }
 
 // ══════════════════════════════════════════════════════════

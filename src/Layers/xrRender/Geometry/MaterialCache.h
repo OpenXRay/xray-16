@@ -162,6 +162,14 @@ private:
 
     // Compute state hash
     static u64 ComputeStateHash(SPass* pass);
+
+    // Setup PSO descriptor helpers
+    void SetupVertexAttributes(ng::PipelineStateDesc& psoDesc);
+    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+    void SetupRenderTargets(
+        const passes::GBufferOutputs& outputs,
+        xray::render::framegraph::FrameGraph& fg,
+        ng::PipelineStateDesc& psoDesc);
 };
 
 } // namespace xray::render
