@@ -1,0 +1,71 @@
+// xrRender/Shaders/gbuffer_visualize.ps.hlsl
+
+// ══════════════════════════════════════════════════════════
+//  G-BUFFER INPUTS
+// ══════════════════════════════════════════════════════════
+
+Texture2D t_albedo : register(t0);
+Texture2D t_normal : register(t1);
+Texture2D t_material : register(t2);
+Texture2D t_depth : register(t3);
+
+SamplerState s_point : register(s0);
+
+// ══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════════════════
+
+cbuffer Params : register(b0) {
+    uint g_Mode;  // Visualization mode
+    float3 _padding;
+};
+
+// ══════════════════════════════════════════════════════════
+//  INPUT/OUTPUT
+// ══════════════════════════════════════════════════════════
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+// ══════════════════════════════════════════════════════════
+//  PIXEL SHADER
+// ══════════════════════════════════════════════════════════
+
+float4 main(PS_INPUT input) : SV_TARGET {
+    // Sample G-Buffer
+    float4 albedo = t_albedo.Sample(s_point, input.texcoord);
+    float4 normal = t_normal.Sample(s_point, input.texcoord);
+    float material = t_material.Sample(s_point, input.texcoord).r;
+    float depth = t_depth.Sample(s_point, input.texcoord).r;
+
+    // Visualization modes
+    switch (g_Mode) {
+        case 1: // Albedo
+            return float4(albedo.rgb, 1.0);
+
+        case 2: // Normal
+            return float4(normal.rgb, 1.0);
+
+        case 3: // Depth (linearized for visibility)
+            return float4(depth, depth, depth, 1.0);
+
+        case 4: // Metallic
+            return float4(albedo.a, albedo.a, albedo.a, 1.0);
+
+        case 5: // Roughness
+            return float4(normal.a, normal.a, normal.a, 1.0);
+
+        case 6: // Material ID (colorized)
+            float3 color = float3(
+                frac(material * 0.3),
+                frac(material * 0.7),
+                frac(material * 1.1)
+            );
+            return float4(color, 1.0);
+
+        default: // Off
+            return float4(0, 0, 0, 1);
+    }
+}

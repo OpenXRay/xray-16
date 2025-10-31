@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "GBufferPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 namespace xray::render::passes {
 
@@ -155,13 +156,53 @@ void GBufferPass::Execute(
     ctx.SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  RENDER GEOMETRY
+    //  GET GEOMETRY TO RENDER
     // ═══════════════════════════════════════════════════════
 
-    // TODO: Will be implemented in Task 49.2
-    // For now, just clear - geometry rendering comes next
+    // Access global geometry collector (defined in GeometryBatch.cpp)
 
-    Msg("  (Geometry rendering not yet implemented)");
+    if (g_geometryCollector != nullptr) {
+        const auto& batches = g_geometryCollector->GetBatches();
+        m_stats.numObjects = static_cast<u32>(batches.size());
+
+        Msg("  Rendering %u geometry batches", m_stats.numObjects);
+
+        // ═══════════════════════════════════════════════════════
+        //  RENDER GEOMETRY BATCHES
+        // ═══════════════════════════════════════════════════════
+
+        nvrhi::IGraphicsPipeline* currentPipeline = nullptr;
+        nvrhi::IBindingSet* currentBindingSet = nullptr;
+
+        for (const auto& batch : batches) {
+            // Set pipeline (if changed)
+            if (batch.pipeline != currentPipeline) {
+                ctx.SetPipeline(batch.pipeline);
+                currentPipeline = batch.pipeline;
+            }
+
+            // Update per-object constants
+            UpdatePerObjectConstants(ctx, batch);
+
+            // Bind textures (if changed)
+            if (batch.bindingSet != currentBindingSet) {
+                ctx.SetBindingSet(0, batch.bindingSet);
+                currentBindingSet = batch.bindingSet;
+            }
+
+            // Bind vertex/index buffers
+            ctx.SetVertexBuffer(0, batch.vertexBuffer, 0);
+            ctx.SetIndexBuffer(batch.indexBuffer, nvrhi::Format::R32_UINT, 0);
+
+            // Draw
+            ctx.DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+
+            m_stats.numDrawCalls++;
+            m_stats.numTriangles += batch.indexCount / 3;
+        }
+    } else {
+        Msg("  (No geometry collector available)");
+    }
 
     // End render pass
     ctx.EndRenderPass();
@@ -181,9 +222,44 @@ void GBufferPass::Execute(
     // Note: numTriangles not in RenderStats yet
     m_stats.numTriangles = 0;
 
-    Msg("  ✓ G-Buffer pass complete: %u draws, %.2f ms",
+    Msg("  ✓ G-Buffer pass complete: %u draws, %u tris, %.2f ms",
         m_stats.numDrawCalls,
+        m_stats.numTriangles,
         m_stats.cpuTimeMs);
+}
+
+void GBufferPass::UpdatePerObjectConstants(
+    ng::RenderContext& ctx,
+    const GeometryBatch& batch
+) {
+    // Update world matrix constant buffer
+    struct PerObjectConstants {
+        Fmatrix worldViewProj;
+        Fmatrix world;
+        Fmatrix worldIT;  // Inverse transpose for normals
+    };
+
+    PerObjectConstants constants;
+
+    // Get view-projection matrix from device
+    Fmatrix viewProj;
+    viewProj.mul(Device.mView, Device.mProject);
+
+    // Compute world-view-projection
+    constants.worldViewProj.mul(batch.worldMatrix, viewProj);
+
+    // World matrix
+    constants.world = batch.worldMatrix;
+
+    // World inverse transpose (for normals)
+    Fmatrix temp;
+    temp.invert(batch.worldMatrix);
+    constants.worldIT.transpose(temp);
+
+    // Update constant buffer
+    // TODO: Create and bind constant buffer properly
+    // For now, this is a placeholder
+    // ctx.UpdateConstantBuffer(0, &constants, sizeof(constants));
 }
 
 } // namespace xray::render::passes

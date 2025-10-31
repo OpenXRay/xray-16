@@ -4,6 +4,10 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
+namespace xray::render {
+    struct GeometryBatch;  // Forward declaration
+}
+
 namespace xray::render::passes {
 
 // ══════════════════════════════════════════════════════════
@@ -79,6 +83,9 @@ private:
     // Execution callback
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
                 const GBufferOutputs& outputs);
+
+    // Update per-object constant buffer
+    void UpdatePerObjectConstants(ng::RenderContext& ctx, const GeometryBatch& batch);
 };
 
 } // namespace xray::render::passes
