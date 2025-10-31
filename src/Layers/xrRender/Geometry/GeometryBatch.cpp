@@ -35,8 +35,8 @@ void GeometryCollector::EndFrame() {
 }
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {
-    VERIFY(batch.vertexBuffer.IsValid());
-    VERIFY(batch.indexBuffer.IsValid());
+    VERIFY(batch.vertexBuffer != nullptr);
+    VERIFY(batch.indexBuffer != nullptr);
     VERIFY(batch.indexCount > 0);
     VERIFY(batch.pipeline != nullptr);
 

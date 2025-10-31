@@ -230,8 +230,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
         GeometryBatch batch;
 
-        batch.vertexBuffer = ng::BufferHandle(nvrhiVB);
-        batch.indexBuffer = ng::BufferHandle(nvrhiIB);
+        batch.vertexBuffer = nvrhiVB;
+        batch.indexBuffer = nvrhiIB;
 
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;

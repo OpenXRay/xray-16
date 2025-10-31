@@ -5,8 +5,8 @@
 namespace xray::render {
 
 struct GeometryBatch {
-    ng::BufferHandle vertexBuffer;
-    ng::BufferHandle indexBuffer;
+    nvrhi::BufferHandle vertexBuffer;
+    nvrhi::BufferHandle indexBuffer;
 
     u32 indexCount = 0;
     u32 startIndex = 0;
