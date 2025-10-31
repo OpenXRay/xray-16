@@ -78,12 +78,13 @@ bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph
     psoDesc.pixelShader = m_pixelShader.get();
 
     // Vertex input layout - define attributes matching gbuffer.vs
+    // ng::VertexAttribute order: semanticName, semanticIndex, format, offset, bufferIndex, isInstanced
     psoDesc.vertexAttributes = {
-        { "POSITION", 0, nvrhi::Format::RGB32_FLOAT, 0,  0, false },   // float3 position
-        { "NORMAL",   0, nvrhi::Format::RGB32_FLOAT, 0, 12, false },   // float3 normal
-        { "TEXCOORD", 0, nvrhi::Format::RG32_FLOAT,  0, 24, false },   // float2 texcoord
-        { "TANGENT",  0, nvrhi::Format::RGB32_FLOAT, 0, 32, false },   // float3 tangent
-        { "BINORMAL", 0, nvrhi::Format::RGB32_FLOAT, 0, 44, false },   // float3 binormal
+        { "POSITION", 0, nvrhi::Format::RGB32_FLOAT,  0, 0, false },   // float3 position
+        { "NORMAL",   0, nvrhi::Format::RGB32_FLOAT, 12, 0, false },   // float3 normal
+        { "TEXCOORD", 0, nvrhi::Format::RG32_FLOAT,  24, 0, false },   // float2 texcoord
+        { "TANGENT",  0, nvrhi::Format::RGB32_FLOAT, 32, 0, false },   // float3 tangent
+        { "BINORMAL", 0, nvrhi::Format::RGB32_FLOAT, 44, 0, false },   // float3 binormal
     };
 
     psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;

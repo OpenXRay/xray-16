@@ -357,9 +357,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     fbInfo.sampleQuality = desc.sampleQuality;
 
     for (u32 i = 0; i < desc.renderTargetCount; i++) {
-        nvrhi::FramebufferAttachment attachment;
-        attachment.format = desc.renderTargetFormats[i];
-        fbInfo.colorFormats[i] = desc.renderTargetFormats[i];
+        fbInfo.colorFormats.push_back(desc.renderTargetFormats[i]);
     }
     fbInfo.depthFormat = desc.depthStencilFormat;
 
