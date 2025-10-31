@@ -218,8 +218,14 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        // Get the visual (geometry)
-        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(renderable->renderable_ROS());
+        // Get the visual (geometry) - stored in RenderData, not ROS
+        IRenderVisual* iVisual = renderable->GetRenderData().visual;
+        if (!iVisual) {
+            noVisual++;
+            continue;
+        }
+
+        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(iVisual);
         if (!visual) {
             noVisual++;
             continue;
