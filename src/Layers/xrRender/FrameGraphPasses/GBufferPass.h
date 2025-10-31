@@ -70,6 +70,8 @@ private:
     xr_unique_ptr<ng::RCShader> m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
+    ng::BufferHandle m_perObjectCB;
+
     bool LoadShaders();
 
     bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);

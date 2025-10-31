@@ -332,6 +332,21 @@ void RenderDevice::DestroySampler(SamplerHandle handle) {
     Msg("~ [RenderDevice] Destroyed sampler: %s", info.desc.debugName.c_str());
 }
 
+nvrhi::BindingLayoutHandle RenderDevice::CreateBindingLayout(const nvrhi::BindingLayoutDesc& desc) {
+    VERIFY(m_initialized);
+    return GetNativeDevice()->createBindingLayout(desc);
+}
+
+nvrhi::BindingSetHandle RenderDevice::CreateBindingSet(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout) {
+    VERIFY(m_initialized);
+    return GetNativeDevice()->createBindingSet(desc, layout);
+}
+
+nvrhi::FramebufferHandle RenderDevice::CreateFramebuffer(const nvrhi::FramebufferDesc& desc) {
+    VERIFY(m_initialized);
+    return GetNativeDevice()->createFramebuffer(desc);
+}
+
 nvrhi::ISampler* RenderDevice::GetNativeSampler(SamplerHandle handle) {
     if (!ValidateSamplerHandle(handle))
         return nullptr;
@@ -418,7 +433,7 @@ RenderContext* RenderDevice::CreateContext() {
         return nullptr;
     }
 
-    RenderContext* context = new RenderContext(GetNativeDevice(), cmdList);
+    RenderContext* context = new RenderContext(this, cmdList);
     m_stats.contextsAlive++;
 
     Msg("~ [RenderDevice] Created render context");

@@ -118,9 +118,11 @@ struct Rect {
     Rect() : x(0), y(0), width(0), height(0) {}
 };
 
+class RenderDevice;
+
 class RenderContext {
 public:
-    RenderContext(nvrhi::IDevice* device, nvrhi::ICommandList* commandList);
+    RenderContext(RenderDevice* device, nvrhi::ICommandList* commandList);
     ~RenderContext();
 
     void BeginRenderPass(const RenderPassDesc& desc);
@@ -213,7 +215,7 @@ public:
     nvrhi::ICommandList* GetCommandList() const { return m_commandList; }
 
 private:
-    nvrhi::IDevice* m_device;
+    RenderDevice* m_device;
     nvrhi::ICommandList* m_commandList;
     ResourceManager* m_resourceManager = nullptr;
 

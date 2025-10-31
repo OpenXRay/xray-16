@@ -56,6 +56,24 @@ bool GBufferPass::LoadShaders()
         "gbuffer.ps"
     );
 
+    struct PerObjectConstants {
+        Fmatrix worldViewProj;
+        Fmatrix world;
+        Fmatrix worldIT;
+    };
+
+    ng::RenderDevice::BufferDesc cbDesc;
+    cbDesc.byteSize = sizeof(PerObjectConstants);
+    cbDesc.isConstantBuffer = true;
+    cbDesc.isVolatile = true;
+    cbDesc.debugName = "PerObjectCB";
+
+    m_perObjectCB = m_device->CreateBuffer(cbDesc);
+    if (!m_perObjectCB.IsValid()) {
+        Msg("! [GBufferPass] Failed to create per-object constant buffer");
+        return false;
+    }
+
     Msg("  ✓ G-Buffer shaders loaded successfully");
     return true;
 }
@@ -264,7 +282,7 @@ void GBufferPass::Execute(
             }
 
             ctx.SetVertexBuffer(0, batch.vertexBuffer.Get(), 0);
-            ctx.SetIndexBuffer(batch.indexBuffer.Get(), nvrhi::Format::R32_UINT, 0);
+            ctx.SetIndexBuffer(batch.indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
 
             ctx.DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
 
@@ -315,6 +333,10 @@ void GBufferPass::UpdatePerObjectConstants(
     temp.invert(batch.worldMatrix);
     constants.worldIT.transpose(temp);
 
+    VERIFY(m_perObjectCB.IsValid());
+    m_device->UpdateBuffer(m_perObjectCB, &constants, sizeof(constants));
+
+    ctx.SetConstantBuffer(0, m_perObjectCB);
 }
 
 }

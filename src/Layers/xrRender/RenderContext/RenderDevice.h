@@ -141,6 +141,12 @@ public:
     const SamplerDesc* GetSamplerDesc(SamplerHandle handle);
     bool IsSamplerValid(SamplerHandle handle) const;
 
+    nvrhi::BindingLayoutHandle CreateBindingLayout(const nvrhi::BindingLayoutDesc& desc);
+
+    nvrhi::BindingSetHandle CreateBindingSet(const nvrhi::BindingSetDesc& desc, nvrhi::IBindingLayout* layout);
+
+    nvrhi::FramebufferHandle CreateFramebuffer(const nvrhi::FramebufferDesc& desc);
+
     ShaderHandle CreateShader(
         ShaderStage stage,
         const void* bytecode,
