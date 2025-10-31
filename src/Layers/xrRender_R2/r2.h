@@ -558,6 +558,12 @@ public:
     nvrhi::ShaderHandle m_testPS;
     nvrhi::GraphicsPipelineHandle m_testPipeline;
 
+    // Textured triangle test resources
+    nvrhi::TextureHandle m_testTexture;
+    nvrhi::SamplerHandle m_testSampler;
+    nvrhi::BindingLayoutHandle m_testBindingLayout;
+    nvrhi::BindingSetHandle m_testBindingSet;
+
     void TestRenderContext_Triangle();
 #endif
 };

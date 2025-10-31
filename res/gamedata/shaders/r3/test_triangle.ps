@@ -1,10 +1,16 @@
 // Simple pass-through pixel shader for RenderContext testing
 
+Texture2D testTexture : register(t0);
+SamplerState testSampler : register(s0);
+
 struct PSInput {
     float4 position : SV_Position;
     float4 color : COLOR;
+    float2 texcoord : TEXCOORD;
 };
 
 float4 main(PSInput input) : SV_Target {
-    return input.color;
+    // Sample texture and multiply with vertex color
+    float4 texColor = testTexture.Sample(testSampler, input.texcoord);
+    return texColor * input.color;
 }
