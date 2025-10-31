@@ -21,7 +21,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_gbufferPass = xr_make_unique<passes::GBufferPass>();
     m_lightingPass = xr_make_unique<passes::LightingPass>();
-    m_tonemapPass = xr_make_unique<passes::TonemapPass>();
+    m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 

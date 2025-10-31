@@ -12,7 +12,7 @@ struct TonemapPassConfig {
 
 class TonemapPass {
 public:
-    TonemapPass(const TonemapPassConfig& config = TonemapPassConfig());
+    TonemapPass(ng::RenderDevice* device, const TonemapPassConfig& config = TonemapPassConfig());
     ~TonemapPass();
 
     void Setup(
@@ -34,12 +34,15 @@ public:
     const Stats& GetStats() const { return m_stats; }
 
 private:
+    ng::RenderDevice* m_device;
     TonemapPassConfig m_config;
     Stats m_stats;
 
     nvrhi::GraphicsPipelineHandle m_pipeline;
     nvrhi::IShader* m_vertexShader = nullptr;
     nvrhi::IShader* m_pixelShader = nullptr;
+
+    bool LoadShaders();
 
     void Execute(
         ng::RenderContext& ctx,

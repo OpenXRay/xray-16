@@ -1,21 +1,51 @@
 #include "stdafx.h"
 #include "TonemapPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::passes {
 
 using namespace framegraph;
 
-TonemapPass::TonemapPass(const TonemapPassConfig& config)
-    : m_config(config)
+TonemapPass::TonemapPass(ng::RenderDevice* device, const TonemapPassConfig& config)
+    : m_device(device)
+    , m_config(config)
 {
+    VERIFY(m_device != nullptr);
+
     Msg("* [TonemapPass] Created (exposure: %.2f, gamma: %.2f)",
         config.exposure, config.gamma);
 
+    if (!LoadShaders())
+    {
+        Msg("! [TonemapPass] Failed to load shaders");
+    }
 }
 
 TonemapPass::~TonemapPass() {
     Msg("* [TonemapPass] Destroyed");
+}
+
+bool TonemapPass::LoadShaders()
+{
+    ShaderLoader loader(m_device);
+
+    m_vertexShader = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShader)
+    {
+        Msg("! [TonemapPass] Failed to load fullscreen vertex shader");
+        return false;
+    }
+
+    m_pixelShader = loader.LoadPixelShader("tonemap");
+    if (!m_pixelShader)
+    {
+        Msg("! [TonemapPass] Failed to load tonemap pixel shader");
+        return false;
+    }
+
+    Msg("  ✓ Tonemap shaders loaded successfully");
+    return true;
 }
 
 void TonemapPass::Setup(
@@ -70,7 +100,14 @@ void TonemapPass::Execute(
     scissor.height = desc.height;
     ctx.SetScissor(scissor);
 
-    Msg("  (Skipping tonemap draw - pipeline not yet implemented)");
+    if (m_vertexShader && m_pixelShader)
+    {
+        Msg("  (Shaders loaded but pipeline not yet created)");
+    }
+    else
+    {
+        Msg("  (Skipping tonemap draw - shaders not loaded)");
+    }
 
     ctx.EndRenderPass();
 
