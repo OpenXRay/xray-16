@@ -90,8 +90,6 @@ void FrameGraphRenderer::Render() {
 void FrameGraphRenderer::SetupFrame() {
     m_geometryCollector->BeginFrame();
 
-    SubmitTestGeometry();
-
     m_geometryCollector->EndFrame();
 }
 
@@ -128,91 +126,6 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");
-}
-
-void FrameGraphRenderer::CreateTestGeometry() {
-    if (m_testGeometryCreated)
-        return;
-
-    Msg("* [FrameGraphRenderer] Creating test triangle geometry");
-
-    struct TestVertex {
-        Fvector position;
-        Fvector normal;
-        Fvector2 texcoord;
-        Fvector tangent;
-        Fvector binormal;
-    };
-
-    TestVertex vertices[3] = {
-        { { -0.5f, -0.5f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-        { {  0.0f,  0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-        { {  0.5f, -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } }
-    };
-
-    u32 indices[3] = { 0, 1, 2 };
-
-    nvrhi::BufferDesc vbDesc;
-    vbDesc.byteSize = sizeof(vertices);
-    vbDesc.debugName = "TestTriangleVB";
-    vbDesc.isVertexBuffer = true;
-    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = true;
-
-    m_testVertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
-    if (!m_testVertexBuffer) {
-        Msg("! [FrameGraphRenderer] Failed to create test vertex buffer");
-        return;
-    }
-
-    nvrhi::BufferDesc ibDesc;
-    ibDesc.byteSize = sizeof(indices);
-    ibDesc.debugName = "TestTriangleIB";
-    ibDesc.isIndexBuffer = true;
-    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-    ibDesc.keepInitialState = true;
-
-    m_testIndexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
-    if (!m_testIndexBuffer) {
-        Msg("! [FrameGraphRenderer] Failed to create test index buffer");
-        return;
-    }
-
-    m_renderContext->GetNativeCommandList()->open();
-
-    m_renderContext->GetNativeCommandList()->writeBuffer(m_testVertexBuffer, vertices, sizeof(vertices));
-    m_renderContext->GetNativeCommandList()->writeBuffer(m_testIndexBuffer, indices, sizeof(indices));
-
-    m_renderContext->GetNativeCommandList()->close();
-    m_device->GetNVRHIDevice()->executeCommandList(m_renderContext->GetNativeCommandList());
-
-    m_testGeometryCreated = true;
-    Msg("  ✓ Test triangle geometry created");
-}
-
-void FrameGraphRenderer::SubmitTestGeometry() {
-    if (!m_testGeometryCreated)
-        CreateTestGeometry();
-
-    if (!m_testGeometryCreated)
-        return;
-
-    GeometryBatch batch;
-    batch.vertexBuffer = m_testVertexBuffer;
-    batch.indexBuffer = m_testIndexBuffer;
-    batch.indexCount = 3;
-    batch.startIndex = 0;
-    batch.baseVertex = 0;
-    batch.materialID = 0;
-
-    batch.worldMatrix.identity();
-
-    batch.pipeline = nullptr;
-    batch.bindingSet = nullptr;
-
-    batch.debugName = "TestTriangle";
-
-    m_geometryCollector->Submit(batch);
 }
 
 }
