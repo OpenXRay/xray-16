@@ -99,6 +99,10 @@ struct ResourceNode {
     xray::render::ng::TextureHandle physicalTexture;
     xray::render::ng::BufferHandle physicalBuffer;
 
+    // Direct NVRHI handles (until ResourceManager integration)
+    nvrhi::TextureHandle nvrhiTexture;
+    nvrhi::BufferHandle nvrhiBuffer;
+
     // Memory aliasing
     bool canAlias = true;               // Can share memory with others
     u32 aliasedWith = INVALID_INDEX;    // Index of resource we alias with

@@ -187,10 +187,14 @@ void FrameGraph::Compile() {
     // Phase 4: Compute resource lifetimes for aliasing
     ComputeResourceLifetimes();
 
-    // Phase 5-7: TODO Week 10
-    // AllocateResources();
-    // InsertResourceBarriers();
-    // OptimizeMemoryAliasing();
+    // Phase 5: Allocate physical GPU resources
+    AllocateResources();
+
+    // Phase 6: Insert resource barriers for state transitions
+    InsertResourceBarriers();
+
+    // Phase 7: Optimize memory usage through aliasing
+    OptimizeMemoryAliasing();
 
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
@@ -222,16 +226,14 @@ nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) co
     const ResourceNode* node = GetResourceNode(handle);
     VERIFY(node != nullptr);
     VERIFY(node->isAllocated && "Resource not allocated - call Compile first");
-    // TODO: Return actual NVRHI texture
-    return nullptr;
+    return node->nvrhiTexture;
 }
 
 nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) const {
     const ResourceNode* node = GetResourceNode(handle);
     VERIFY(node != nullptr);
     VERIFY(node->isAllocated && "Resource not allocated - call Compile first");
-    // TODO: Return actual NVRHI buffer
-    return nullptr;
+    return node->nvrhiBuffer;
 }
 
 const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) const {
@@ -581,15 +583,262 @@ void FrameGraph::ComputeResourceLifetimes() {
 }
 
 void FrameGraph::AllocateResources() {
-    // TODO: Week 10
+    u64 totalMemoryAllocated = 0;
+
+    for (auto& resource : m_resources) {
+        // Skip unused resources
+        if (resource.firstUsedPass == INVALID_INDEX) {
+            continue;
+        }
+
+        // Skip imported resources (already have physical resources)
+        if (resource.desc.isImported) {
+            resource.isAllocated = true;
+            continue;
+        }
+
+        // Create physical resource based on type
+        if (resource.desc.type == ResourceDesc::Type::Buffer) {
+            // Create buffer
+            nvrhi::BufferDesc bufferDesc;
+            bufferDesc.byteSize = resource.desc.bufferSize;
+            bufferDesc.structStride = resource.desc.structStride;
+            bufferDesc.debugName = resource.desc.debugName.c_str();
+            bufferDesc.initialState = nvrhi::ResourceStates::Common;
+            bufferDesc.keepInitialState = false;
+
+            // Set buffer usage flags
+            if (resource.desc.allowUAV) {
+                bufferDesc.canHaveUAVs = true;
+            }
+            if (resource.desc.structStride > 0) {
+                bufferDesc.isConstantBuffer = false;
+                bufferDesc.structStride = resource.desc.structStride;
+            }
+
+            resource.nvrhiBuffer = m_device->createBuffer(bufferDesc);
+
+            if (resource.nvrhiBuffer) {
+                resource.isAllocated = true;
+                totalMemoryAllocated += resource.memorySize;
+
+                Msg("~ [FrameGraph] Allocated buffer '%s': %.2f MB",
+                    resource.desc.debugName.c_str(),
+                    resource.memorySize / (1024.0f * 1024.0f));
+            } else {
+                Msg("! [FrameGraph] Failed to allocate buffer '%s'",
+                    resource.desc.debugName.c_str());
+            }
+        } else {
+            // Create texture
+            nvrhi::TextureDesc texDesc;
+            texDesc.width = resource.desc.width;
+            texDesc.height = resource.desc.height;
+            texDesc.depth = resource.desc.depth;
+            texDesc.arraySize = resource.desc.arraySize;
+            texDesc.mipLevels = resource.desc.mipLevels;
+            texDesc.sampleCount = resource.desc.sampleCount;
+            texDesc.format = resource.desc.format;
+            texDesc.debugName = resource.desc.debugName.c_str();
+            texDesc.initialState = nvrhi::ResourceStates::Common;
+            texDesc.keepInitialState = false;
+
+            // Set texture type
+            switch (resource.desc.type) {
+                case ResourceDesc::Type::Texture2D:
+                    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
+                    break;
+                case ResourceDesc::Type::Texture3D:
+                    texDesc.dimension = nvrhi::TextureDimension::Texture3D;
+                    break;
+                case ResourceDesc::Type::TextureCube:
+                    texDesc.dimension = nvrhi::TextureDimension::TextureCube;
+                    break;
+                case ResourceDesc::Type::Texture2DArray:
+                    texDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
+                    break;
+                default:
+                    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
+                    break;
+            }
+
+            // Set usage flags
+            texDesc.isRenderTarget = resource.desc.isRenderTarget;
+            texDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+            texDesc.isShaderResource = true;  // Always allow SRV
+
+            // Depth/stencil handling
+            if (resource.desc.isDepthStencil) {
+                texDesc.isRenderTarget = false;  // Depth is separate
+                texDesc.useClearValue = true;
+                texDesc.clearValue = nvrhi::Color(1.0f);  // Default depth clear
+            }
+
+            resource.nvrhiTexture = m_device->createTexture(texDesc);
+
+            if (resource.nvrhiTexture) {
+                resource.isAllocated = true;
+                totalMemoryAllocated += resource.memorySize;
+
+                Msg("~ [FrameGraph] Allocated texture '%s': %ux%ux%u, %.2f MB",
+                    resource.desc.debugName.c_str(),
+                    resource.desc.width,
+                    resource.desc.height,
+                    resource.desc.depth,
+                    resource.memorySize / (1024.0f * 1024.0f));
+            } else {
+                Msg("! [FrameGraph] Failed to allocate texture '%s'",
+                    resource.desc.debugName.c_str());
+            }
+        }
+    }
+
+    m_stats.totalMemoryAllocated = totalMemoryAllocated;
+
+    Msg("~ [FrameGraph] Resource allocation complete: %.2f MB total",
+        totalMemoryAllocated / (1024.0f * 1024.0f));
 }
 
 void FrameGraph::InsertResourceBarriers() {
-    // TODO: Week 10
+    // Track current state of each resource
+    xr_map<u32, ResourceState> currentStates;
+
+    // Initialize all resources to Undefined state
+    for (auto& resource : m_resources) {
+        currentStates[resource.handle.index] = ResourceState::Undefined;
+        resource.currentState = ResourceState::Undefined;
+    }
+
+    u32 totalBarriers = 0;
+
+    // Iterate through sorted passes
+    for (PassNode* pass : m_sortedPasses) {
+        if (pass->culled) continue;
+
+        pass->barriersBeforePass.clear();
+
+        // Check each resource access in this pass
+        for (const auto& access : pass->resourceAccesses) {
+            if (!access.resource.is_valid()) continue;
+
+            ResourceNode* resource = GetResourceNode(access.resource);
+            if (!resource) continue;
+
+            // Get current and required states
+            ResourceState currentState = currentStates[access.resource.index];
+            ResourceState requiredState = access.state;
+
+            // Insert barrier if state transition needed
+            if (currentState != requiredState && currentState != ResourceState::Undefined) {
+                pass->barriersBeforePass.push_back(
+                    ResourceBarrier(access.resource, currentState, requiredState)
+                );
+                totalBarriers++;
+
+                Msg("~ [FrameGraph] Pass '%s': Barrier %s -> %s for resource '%s'",
+                    pass->name.c_str(),
+                    ResourceStateToString(currentState),
+                    ResourceStateToString(requiredState),
+                    resource->desc.debugName.c_str());
+            }
+
+            // Update current state after this access
+            // Write accesses define the new state
+            if (access.IsWrite()) {
+                currentStates[access.resource.index] = requiredState;
+                resource->currentState = requiredState;
+            }
+        }
+    }
+
+    Msg("~ [FrameGraph] Resource barrier insertion complete: %u barriers inserted",
+        totalBarriers);
 }
 
 void FrameGraph::OptimizeMemoryAliasing() {
-    // TODO: Week 10
+    // Collect all transient resources (candidates for aliasing)
+    xr_vector<ResourceNode*> transientResources;
+    for (auto& resource : m_resources) {
+        if (resource.canAlias && resource.firstUsedPass != INVALID_INDEX && !resource.desc.isImported) {
+            transientResources.push_back(&resource);
+        }
+    }
+
+    if (transientResources.empty()) {
+        Msg("~ [FrameGraph] No transient resources to alias");
+        return;
+    }
+
+    // Sort by memory size (largest first) for better packing
+    std::sort(transientResources.begin(), transientResources.end(),
+        [](const ResourceNode* a, const ResourceNode* b) {
+            return a->memorySize > b->memorySize;
+        });
+
+    u32 aliasedCount = 0;
+    u64 memoryReduced = 0;
+
+    // Try to alias each resource with a previous one
+    for (size_t i = 0; i < transientResources.size(); i++) {
+        ResourceNode* current = transientResources[i];
+
+        // Skip if already aliased
+        if (current->aliasedWith != INVALID_INDEX) {
+            continue;
+        }
+
+        // Look for a resource to alias with
+        for (size_t j = 0; j < i; j++) {
+            ResourceNode* candidate = transientResources[j];
+
+            // Check if lifetimes don't overlap
+            if (!current->OverlapsWith(*candidate)) {
+                // Check if they have compatible properties
+                bool compatible = true;
+
+                // Must be same type (texture vs buffer)
+                if (current->desc.type != candidate->desc.type) {
+                    compatible = false;
+                }
+
+                // Must have same format for textures
+                if (current->desc.type != ResourceDesc::Type::Buffer &&
+                    current->desc.format != candidate->desc.format) {
+                    compatible = false;
+                }
+
+                // Candidate must be large enough
+                if (candidate->memorySize < current->memorySize) {
+                    compatible = false;
+                }
+
+                if (compatible) {
+                    // Alias this resource with the candidate
+                    current->aliasedWith = candidate->handle.index;
+                    aliasedCount++;
+                    memoryReduced += current->memorySize;
+
+                    Msg("~ [FrameGraph] Aliased '%s' with '%s' (saved %.2f MB)",
+                        current->desc.debugName.c_str(),
+                        candidate->desc.debugName.c_str(),
+                        current->memorySize / (1024.0f * 1024.0f));
+
+                    break;
+                }
+            }
+        }
+    }
+
+    m_stats.numAliasedResources = aliasedCount;
+    m_stats.memoryReduced = memoryReduced;
+    m_stats.peakMemoryUsage = m_stats.totalMemoryAllocated - memoryReduced;
+
+    Msg("~ [FrameGraph] Memory aliasing complete: %u resources aliased, %.2f MB saved",
+        aliasedCount,
+        memoryReduced / (1024.0f * 1024.0f));
+    Msg("~ [FrameGraph] Peak memory usage: %.2f MB (reduced from %.2f MB)",
+        m_stats.peakMemoryUsage / (1024.0f * 1024.0f),
+        m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
 }
 
 } // namespace xray::render::framegraph

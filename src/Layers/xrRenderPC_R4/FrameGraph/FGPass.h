@@ -56,6 +56,24 @@ struct ResourceAccess {
 };
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+//  RESOURCE BARRIERS
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+
+struct ResourceBarrier {
+    VirtualResourceHandle resource;
+    ResourceState stateBefore;
+    ResourceState stateAfter;
+
+    ResourceBarrier() = default;
+
+    ResourceBarrier(VirtualResourceHandle _resource, ResourceState _before, ResourceState _after)
+        : resource(_resource)
+        , stateBefore(_before)
+        , stateAfter(_after)
+    {}
+};
+
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  PASS NODE (INTERNAL STATE)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
@@ -65,6 +83,9 @@ struct PassNode {
 
     // Resource dependencies
     xr_vector<ResourceAccess> resourceAccesses;
+
+    // Resource barriers (inserted during compilation)
+    xr_vector<ResourceBarrier> barriersBeforePass;
 
     // Computed dependencies (filled during compile)
     xr_vector<PassNode*> dependsOn;      // Passes this depends on
