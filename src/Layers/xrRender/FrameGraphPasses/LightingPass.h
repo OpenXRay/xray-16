@@ -41,7 +41,7 @@ struct LightingPassOutput {
 
 class LightingPass {
 public:
-    LightingPass(const LightingPassConfig& config = LightingPassConfig());
+    LightingPass(ng::RenderDevice* device, const LightingPassConfig& config = LightingPassConfig());
     ~LightingPass();
 
     // Setup pass in FrameGraph
@@ -63,13 +63,17 @@ public:
     const Stats& GetStats() const { return m_stats; }
 
 private:
+    ng::RenderDevice* m_device;
     LightingPassConfig m_config;
     Stats m_stats;
 
-    // Shaders (TODO: will be loaded later)
+    // Shaders
     nvrhi::IShader* m_vertexShader = nullptr;
     nvrhi::IShader* m_pixelShader = nullptr;
     nvrhi::GraphicsPipelineHandle m_pipeline;
+
+    // Load shaders
+    bool LoadShaders();
 
     // Execution
     void Execute(

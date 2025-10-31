@@ -23,7 +23,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     // Create passes (pass device for shader loading)
     m_gbufferPass = xr_make_unique<passes::GBufferPass>();
-    m_lightingPass = xr_make_unique<passes::LightingPass>();
+    m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
     // Create geometry collector

@@ -2,22 +2,53 @@
 #include "stdafx.h"
 #include "LightingPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::passes {
 
 using namespace framegraph;
 
-LightingPass::LightingPass(const LightingPassConfig& config)
-    : m_config(config)
+LightingPass::LightingPass(ng::RenderDevice* device, const LightingPassConfig& config)
+    : m_device(device)
+    , m_config(config)
 {
+    VERIFY(m_device != nullptr);
+
     Msg("* [LightingPass] Created (%ux%u)", config.width, config.height);
 
-    // TODO: Load and compile shaders
-    // LoadShaders();
+    // Load shaders
+    if (!LoadShaders())
+    {
+        Msg("! [LightingPass] Failed to load shaders");
+    }
 }
 
 LightingPass::~LightingPass() {
     Msg("* [LightingPass] Destroyed");
+}
+
+bool LightingPass::LoadShaders()
+{
+    ShaderLoader loader(m_device);
+
+    // Load fullscreen vertex shader (same as tonemap)
+    m_vertexShader = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShader)
+    {
+        Msg("! [LightingPass] Failed to load fullscreen vertex shader");
+        return false;
+    }
+
+    // Load lighting pixel shader
+    m_pixelShader = loader.LoadPixelShader("lighting");
+    if (!m_pixelShader)
+    {
+        Msg("! [LightingPass] Failed to load lighting pixel shader");
+        return false;
+    }
+
+    Msg("  ✓ Lighting shaders loaded successfully");
+    return true;
 }
 
 LightingPassOutput LightingPass::Setup(
@@ -136,10 +167,18 @@ void LightingPass::Execute(
     // ctx.UpdateConstantBuffer(0, &constants, sizeof(constants));
 
     // Draw fullscreen triangle
-    // TODO: Skip drawing until pipeline is set up
+    // TODO: Need to set up pipeline, textures, and constants
+    // For now, skip drawing until pipeline is created
     // ctx.Draw(3, 0);
 
-    Msg("  (Skipping lighting draw - pipeline not yet implemented)");
+    if (m_vertexShader && m_pixelShader)
+    {
+        Msg("  (Shaders loaded but pipeline not yet created)");
+    }
+    else
+    {
+        Msg("  (Skipping lighting draw - shaders not loaded)");
+    }
 
     ctx.EndRenderPass();
 
