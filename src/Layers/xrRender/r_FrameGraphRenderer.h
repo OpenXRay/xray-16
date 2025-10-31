@@ -49,8 +49,15 @@ private:
 
     Stats m_stats;
 
+    ng::BufferHandle m_testVertexBuffer;
+    ng::BufferHandle m_testIndexBuffer;
+    bool m_testGeometryCreated = false;
+
     void SetupFrame();
     void BuildFrameGraph();
+
+    void CreateTestGeometry();
+    void SubmitTestGeometry();
 };
 
 }

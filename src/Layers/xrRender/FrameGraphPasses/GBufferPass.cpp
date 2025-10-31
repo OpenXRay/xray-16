@@ -249,9 +249,13 @@ void GBufferPass::Execute(
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
         for (const auto& batch : batches) {
-            if (batch.pipeline != currentPipeline) {
-                ctx.SetPipeline(batch.pipeline);
-                currentPipeline = batch.pipeline;
+            nvrhi::IGraphicsPipeline* pipelineToUse = batch.pipeline
+                ? batch.pipeline
+                : m_pipeline->GetNativePipeline();
+
+            if (pipelineToUse != currentPipeline) {
+                ctx.SetPipeline(pipelineToUse);
+                currentPipeline = pipelineToUse;
             }
 
             UpdatePerObjectConstants(ctx, batch);
