@@ -201,45 +201,114 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     Msg("  [FrameGraph] Found %u potentially visible objects", (u32)spatialObjects.size());
 
     u32 submittedCount = 0;
+    u32 notRenderable = 0;
+    u32 noVisual = 0;
+    u32 wrongType = 0;
+    u32 notFvisual = 0;
+    u32 noGeometry = 0;
+    u32 noBuffers = 0;
 
     // Extract geometry from each visible object
     for (ISpatial* spatial : spatialObjects)
     {
         // Get the renderable object
         IRenderable* renderable = spatial->dcast_Renderable();
-        if (!renderable)
+        if (!renderable) {
+            notRenderable++;
             continue;
+        }
 
         // Get the visual (geometry)
         dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(renderable->renderable_ROS());
-        if (!visual)
+        if (!visual) {
+            noVisual++;
             continue;
+        }
 
         // Only handle simple mesh visuals for now (type MT_NORMAL)
-        if (visual->getType() != MT_NORMAL)
+        if (visual->getType() != MT_NORMAL) {
+            wrongType++;
             continue;
+        }
 
         // Cast to Fvisual to access geometry
         Fvisual* meshVisual = dynamic_cast<Fvisual*>(visual);
-        if (!meshVisual)
+        if (!meshVisual) {
+            notFvisual++;
             continue;
+        }
 
         // Check if geometry is valid
-        if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        if (!meshVisual->rm_geom || !meshVisual->rm_geom._get()) {
+            noGeometry++;
             continue;
+        }
 
         SGeometry* geom = meshVisual->rm_geom._get();
-        if (!geom->vb || !geom->ib)
+        if (!geom->vb || !geom->ib) {
+            noBuffers++;
             continue;
+        }
 
-        // TODO: Wrap D3D11 buffers as NVRHI handles
-        // TODO: Create PSO for material
-        // TODO: Create binding set for textures
-        // TODO: Build GeometryBatch and submit
+        // ═══════════════════════════════════════════════════════
+        //  WRAP D3D11 BUFFERS AS NVRHI HANDLES
+        // ═══════════════════════════════════════════════════════
 
+        // Wrap vertex buffer
+        ng::BufferDesc vbDesc;
+        vbDesc.debugName = "VisibleMesh_VB";
+        vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
+        vbDesc.isVertexBuffer = true;
+
+        ng::BufferHandle nvrhiVB = m_device->CreateBufferFromD3D11(geom->vb, vbDesc);
+        if (!nvrhiVB.IsValid()) {
+            Msg("! [FrameGraph] Failed to wrap VB");
+            continue;
+        }
+
+        // Wrap index buffer
+        ng::BufferDesc ibDesc;
+        ibDesc.debugName = "VisibleMesh_IB";
+        ibDesc.byteSize = meshVisual->iCount * sizeof(u16); // Assuming 16-bit indices
+        ibDesc.isIndexBuffer = true;
+
+        ng::BufferHandle nvrhiIB = m_device->CreateBufferFromD3D11(geom->ib, ibDesc);
+        if (!nvrhiIB.IsValid()) {
+            Msg("! [FrameGraph] Failed to wrap IB");
+            continue;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        //  CREATE GEOMETRY BATCH
+        // ═══════════════════════════════════════════════════════
+
+        GeometryBatch batch;
+        batch.vertexBuffer = nvrhiVB;
+        batch.indexBuffer = nvrhiIB;
+        batch.indexCount = meshVisual->iCount;
+        batch.startIndex = meshVisual->iBase;
+        batch.baseVertex = meshVisual->vBase;
+
+        // Get world matrix from renderable
+        Fmatrix worldMatrix;
+        renderable->renderable_Xform(worldMatrix);
+        batch.worldMatrix = worldMatrix;
+
+        // TODO: Create PSO from visual->shader
+        // TODO: Create binding set from textures
+        // For now, use the GBufferPass's PSO
+        batch.pipeline = m_gbufferPass->GetPipeline();
+        batch.bindingSet = nullptr; // TODO
+
+        batch.debugName = "VisibleMesh";
+
+        // Submit to collector
+        m_geometryCollector->Submit(batch);
         submittedCount++;
     }
 
+    Msg("  [FrameGraph] Filtering: %u not renderable, %u no visual, %u wrong type, %u not Fvisual, %u no geom, %u no buffers",
+        notRenderable, noVisual, wrongType, notFvisual, noGeometry, noBuffers);
     Msg("  [FrameGraph] Submitted %u/%u objects to collector",
         submittedCount, (u32)spatialObjects.size());
 }
