@@ -8,6 +8,10 @@
 
 #include "Layers/xrRender/FBasicVisual.h"
 
+#if defined(USE_DX11) && RENDER == R_R4
+#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRender::RenderMenu()
@@ -97,6 +101,15 @@ void CRender::Render()
         Target->u_setrt(RCache, Device.dwWidth, Device.dwHeight, Target->get_base_rt(), 0, 0, Target->get_base_zb());
         return;
     }
+
+#if defined(USE_DX11) && RENDER == R_R4
+    // NVRHI test mode - render blue screen instead of normal scene
+    if (m_nvrhiTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
+    {
+        TestNVRHI_Render();
+        return;
+    }
+#endif
 
     if (m_bFirstFrameAfterReset)
     {
@@ -406,4 +419,84 @@ void CRender::BeforeWorldRender() {}
 
 // После рендера мира и пост-эффектов --#SM+#--
 void CRender::AfterWorldRender() {}
+
+#if defined(USE_DX11) && RENDER == R_R4
+void CRender::TestNVRHI_Render()
+{
+    VERIFY(m_nvrhiDevice && m_nvrhiDevice->IsInitialized());
+
+    try
+    {
+        // Get NVRHI device and command list
+        nvrhi::IDevice* device = m_nvrhiDevice->GetDevice();
+        nvrhi::ICommandList* cmd = m_nvrhiDevice->GetCommandList();
+
+        // Get current backbuffer from CHW
+        ID3D11RenderTargetView* backbufferRTV = Target->get_base_rt();
+        if (!backbufferRTV)
+        {
+            Msg("! [NVRHI Test] No backbuffer RTV");
+            return;
+        }
+
+        ID3D11Resource* backbufferRes = nullptr;
+        backbufferRTV->GetResource(&backbufferRes);
+
+        if (!backbufferRes)
+        {
+            Msg("! [NVRHI Test] Failed to get backbuffer resource");
+            return;
+        }
+
+        // Wrap backbuffer in NVRHI texture handle
+        nvrhi::TextureDesc backbufferDesc;
+        backbufferDesc.width = Device.dwWidth;
+        backbufferDesc.height = Device.dwHeight;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.isUAV = false;
+        backbufferDesc.debugName = "Backbuffer";
+        backbufferDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        backbufferDesc.keepInitialState = true;
+        backbufferDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+
+        nvrhi::TextureHandle backbuffer = device->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::D3D11_Resource,
+            nvrhi::Object(backbufferRes),
+            backbufferDesc
+        );
+
+        // Release the resource reference
+        backbufferRes->Release();
+
+        if (!backbuffer)
+        {
+            Msg("! [NVRHI Test] Failed to wrap backbuffer");
+            return;
+        }
+
+        // Open command list
+        cmd->open();
+
+        // Clear to blue (R=0.1, G=0.2, B=0.4, A=1.0)
+        nvrhi::Color clearColor(0.1f, 0.2f, 0.4f, 1.0f);
+        cmd->clearTextureFloat(backbuffer, nvrhi::AllSubresources, clearColor);
+
+        // Close command list
+        cmd->close();
+
+        // Execute
+        m_nvrhiDevice->ExecuteCommandList(cmd);
+
+        // Present the frame ourselves since we're bypassing normal rendering
+        HW.Present();
+
+    }
+    catch (const std::exception& e)
+    {
+        Msg("! [NVRHI Test] Exception: %s", e.what());
+    }
+}
+#endif
+
 } // namespace xray::render::RENDER_NAMESPACE

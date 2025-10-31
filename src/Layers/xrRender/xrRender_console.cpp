@@ -25,6 +25,9 @@
 #   endif // MASTER_GOLD
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
+#if RENDER == R_R4
+#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#endif
 
 // Detail manager debug
 extern ENGINE_API int dm_debug_trails;
@@ -417,6 +420,49 @@ public:
     CCC_ModelPoolStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR /*args*/) { RImplementation.Models->dump(); }
 };
+
+#if RENDER == R_R4
+class CCC_NVRHITest : public IConsole_Command
+{
+public:
+    CCC_NVRHITest(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/)
+    {
+#if defined(USE_DX11)
+        auto& render = static_cast<CRender&>(RImplementation);
+
+        // Initialize NVRHI on-demand if not already initialized
+        if (!render.m_nvrhiDevice)
+        {
+            Msg("~ [NVRHI] Initializing on-demand...");
+            render.m_nvrhiDevice = xr_new<xray::render::r4::nvrhi_wrapper::NVRHIDevice>();
+
+            bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
+
+            if (!nvrhiSuccess)
+            {
+                Msg("! [NVRHI] Initialization failed");
+                xr_delete(render.m_nvrhiDevice);
+                render.m_nvrhiDevice = nullptr;
+                return;
+            }
+        }
+
+        // Toggle test mode
+        render.m_nvrhiTestMode = !render.m_nvrhiTestMode;
+
+        if (render.m_nvrhiTestMode)
+        {
+            Msg("~ [NVRHI] Test mode ENABLED - will render blue screen");
+        }
+        else
+        {
+            Msg("~ [NVRHI] Test mode DISABLED - normal rendering");
+        }
+#endif
+    }
+};
+#endif // RENDER == R_R4
 
 class CCC_SSAO_Mode : public CCC_Token
 {
@@ -1085,6 +1131,11 @@ void xrRender_initconsole()
     CMD1(CCC_TestComputeVector, "test_compute_vector");
     CMD1(CCC_TestComputeMatrices, "test_compute_matrices");
     CMD1(CCC_TestComputeSIMD, "test_compute_simd");
+#endif
+
+#if RENDER == R_R4
+    // NVRHI test command
+    CMD1(CCC_NVRHITest, "r4_nvrhi_test");
 #endif
 #endif
 }

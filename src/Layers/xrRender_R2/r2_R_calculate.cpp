@@ -3,6 +3,10 @@
 #include "xrEngine/CustomHUD.h"
 #include "xrCore/Threading/TaskManager.hpp"
 
+#if defined(USE_DX11) && RENDER == R_R4
+#include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 float g_fSCREEN;
@@ -66,6 +70,14 @@ void render_main::render()
 void CRender::Calculate()
 {
     ZoneScopedN("r2_calculate");
+
+#if defined(USE_DX11) && RENDER == R_R4
+    // Skip Calculate() if NVRHI test mode is active
+    if (m_nvrhiTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
+    {
+        return;
+    }
+#endif
 
     // Transfer to global space to avoid deep pointer access
     float fov_factor = _sqr(90.f / Device.fFOV);
