@@ -2,12 +2,18 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
-class Shader;
-struct ShaderElement;
-struct SPass;
-class dxRender_Visual;
-struct SVS;
-struct SPS;
+namespace xray::render::RENDER_NAMESPACE {
+    struct Shader;
+    struct ShaderElement;
+    struct SPass;
+    class dxRender_Visual;
+    struct SVS;
+    struct SPS;
+}
+
+namespace xray::render::framegraph {
+    class FrameGraph;
+}
 
 namespace xray::render {
 
@@ -18,6 +24,13 @@ namespace ng {
 namespace passes {
     struct GBufferOutputs;
 }
+
+using RENDER_NAMESPACE::Shader;
+using RENDER_NAMESPACE::ShaderElement;
+using RENDER_NAMESPACE::SPass;
+using RENDER_NAMESPACE::dxRender_Visual;
+using RENDER_NAMESPACE::SVS;
+using RENDER_NAMESPACE::SPS;
 
 struct MaterialKey {
     Shader* shader;
@@ -78,7 +91,7 @@ public:
     MaterialPSO* GetOrCreatePSO(
         dxRender_Visual* visual,
         const passes::GBufferOutputs& outputs,
-        framegraph::FrameGraph& fg);
+        xray::render::framegraph::FrameGraph& fg);
 
     void Clear();
 
@@ -101,7 +114,7 @@ private:
         ShaderElement* elem,
         SPass* pass,
         const passes::GBufferOutputs& outputs,
-        framegraph::FrameGraph& fg);
+        xray::render::framegraph::FrameGraph& fg);
 
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
 

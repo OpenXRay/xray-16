@@ -8,6 +8,7 @@
 namespace xray::render {
 
 using namespace passes;
+using namespace xray::render::RENDER_NAMESPACE;
 
 MaterialCache::MaterialCache(ng::RenderDevice* device)
     : m_device(device)
@@ -23,8 +24,8 @@ MaterialCache::~MaterialCache() {
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
-    const GBufferOutputs& outputs,
-    framegraph::FrameGraph& fg)
+    const passes::GBufferOutputs& outputs,
+    xray::render::framegraph::FrameGraph& fg)
 {
     if (!visual) {
         Msg("! [MaterialCache] NULL visual passed to GetOrCreatePSO");
@@ -71,12 +72,11 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     m_stats.numCacheMisses++;
 
-    Msg("~ [MaterialCache] Creating PSO for shader '%s' (hash: texture=0x%llX, state=0x%llX)",
-        shader->cName.c_str(), textureHash, stateHash);
+    Msg("~ [MaterialCache] Creating PSO (hash: texture=0x%llX, state=0x%llX)", textureHash, stateHash);
 
     MaterialPSO* pso = CreatePSO(elem, pass, outputs, fg);
     if (!pso) {
-        Msg("! [MaterialCache] Failed to create PSO for shader '%s'", shader->cName.c_str());
+        Msg("! [MaterialCache] Failed to create PSO");
         return nullptr;
     }
 
@@ -91,8 +91,8 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 MaterialPSO* MaterialCache::CreatePSO(
     ShaderElement* elem,
     SPass* pass,
-    const GBufferOutputs& outputs,
-    framegraph::FrameGraph& fg)
+    const passes::GBufferOutputs& outputs,
+    xray::render::framegraph::FrameGraph& fg)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -114,7 +114,33 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     Msg("  Created binding layout");
 
-    Msg("  ! PSO creation not yet implemented - placeholder PSO");
+    ng::ShaderHandle vsHandle = m_device->CreateShaderFromD3D11(
+        ng::ShaderStage::Vertex,
+        pso->vertexShader->sh,
+        pso->vertexShader->cName.c_str());
+
+    if (!vsHandle.IsValid()) {
+        Msg("! [MaterialCache] Failed to wrap vertex shader");
+        return nullptr;
+    }
+
+    ng::ShaderHandle psHandle = m_device->CreateShaderFromD3D11(
+        ng::ShaderStage::Pixel,
+        pso->pixelShader->sh,
+        pso->pixelShader->cName.c_str());
+
+    if (!psHandle.IsValid()) {
+        Msg("! [MaterialCache] Failed to wrap pixel shader");
+        m_device->DestroyShader(vsHandle);
+        return nullptr;
+    }
+
+    Msg("  Wrapped VS/PS shaders");
+
+    Msg("  ! PSO creation not fully implemented yet");
+
+    m_device->DestroyShader(vsHandle);
+    m_device->DestroyShader(psHandle);
 
     m_stats.totalPSOCreations++;
 
