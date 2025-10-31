@@ -53,6 +53,8 @@ private:
 
     bool LoadShaders();
 
+    bool CreatePipeline(nvrhi::ITexture* hdrTexture);
+
     void Execute(
         ng::RenderContext& ctx,
         const framegraph::FrameGraph& fg,

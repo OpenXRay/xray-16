@@ -47,6 +47,49 @@ bool LightingPass::LoadShaders()
     return true;
 }
 
+bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
+{
+    VERIFY(m_vertexShader != nullptr);
+    VERIFY(m_pixelShader != nullptr);
+    VERIFY(hdrTexture != nullptr);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+    pipelineDesc.VS = m_vertexShader;
+    pipelineDesc.PS = m_pixelShader;
+
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
+    rasterState.cullMode = nvrhi::RasterCullMode::None;
+    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+    rasterState.frontCounterClockwise = false;
+
+    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
+    blendState.targets[0].enableBlend = false;
+    blendState.targets[0].colorWriteMask = nvrhi::ColorMask::All;
+
+    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
+    depthState.depthTestEnable = false;
+    depthState.depthWriteEnable = false;
+    depthState.stencilEnable = false;
+
+    auto hdrDesc = hdrTexture->getDesc();
+    pipelineDesc.renderState.targetCount = 1;
+    pipelineDesc.renderState.renderTargetFormats[0] = hdrDesc.format;
+
+    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+
+    if (!m_pipeline)
+    {
+        Msg("! [LightingPass] Failed to create graphics pipeline");
+        return false;
+    }
+
+    Msg("  ✓ LightingPass pipeline created successfully");
+    return true;
+}
+
 LightingPassOutput LightingPass::Setup(
     FrameGraph& fg,
     const GBufferOutputs& gbuffer
@@ -102,6 +145,16 @@ void LightingPass::Execute(
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(gbuffer.depth);
     nvrhi::ITexture* hdr = fg.GetPhysicalTexture(output.hdrColor);
 
+    if (!m_pipeline)
+    {
+        if (!CreatePipeline(hdr))
+        {
+            Msg("! [LightingPass] Failed to create pipeline");
+            ctx.EndRenderPass();
+            return;
+        }
+    }
+
     ng::RenderPassDesc passDesc;
     passDesc.renderTargets[0] = hdr;
     passDesc.numRenderTargets = 1;
@@ -124,14 +177,11 @@ void LightingPass::Execute(
     scissor.height = m_config.height;
     ctx.SetScissor(scissor);
 
-    if (m_vertexShader && m_pixelShader)
-    {
-        Msg("  (Shaders loaded but pipeline not yet created)");
-    }
-    else
-    {
-        Msg("  (Skipping lighting draw - shaders not loaded)");
-    }
+    ctx.SetPipeline(m_pipeline.Get());
+
+    ctx.Draw(3, 0);
+
+    Msg("  ✓ Lighting draw complete (3 vertices)");
 
     ctx.EndRenderPass();
 
