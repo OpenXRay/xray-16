@@ -2,6 +2,7 @@
 #include "GBufferPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::passes {
@@ -15,6 +16,8 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
     VERIFY(m_device != nullptr);
 
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
+
+    m_materialCache = xr_make_unique<MaterialCache>(device);
 
     if (!LoadShaders())
     {

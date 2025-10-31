@@ -5,6 +5,7 @@
 
 namespace xray::render {
     struct GeometryBatch;
+    class MaterialCache;
 }
 
 namespace xray::render::passes {
@@ -63,6 +64,8 @@ private:
     ng::RenderDevice* m_device;
     GBufferPassConfig m_config;
     Stats m_stats;
+
+    xr_unique_ptr<MaterialCache> m_materialCache;
 
     nvrhi::ShaderHandle m_vertexShaderNative;
     nvrhi::ShaderHandle m_pixelShaderNative;
