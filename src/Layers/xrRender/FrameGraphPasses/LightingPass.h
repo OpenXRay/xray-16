@@ -75,6 +75,9 @@ private:
     // Load shaders
     bool LoadShaders();
 
+    // Create pipeline state object
+    bool CreatePipeline(nvrhi::ITexture* hdrTexture);
+
     // Execution
     void Execute(
         ng::RenderContext& ctx,

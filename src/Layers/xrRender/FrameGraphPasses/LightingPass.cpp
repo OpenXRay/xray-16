@@ -51,6 +51,57 @@ bool LightingPass::LoadShaders()
     return true;
 }
 
+bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
+{
+    VERIFY(m_vertexShader != nullptr);
+    VERIFY(m_pixelShader != nullptr);
+    VERIFY(hdrTexture != nullptr);
+
+    // Create graphics pipeline descriptor
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+    // Shaders
+    pipelineDesc.VS = m_vertexShader;
+    pipelineDesc.PS = m_pixelShader;
+
+    // Vertex input - none (fullscreen triangle uses SV_VertexID)
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    // Render state
+    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
+    rasterState.cullMode = nvrhi::RasterCullMode::None;
+    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+    rasterState.frontCounterClockwise = false;
+
+    // Blend state - no blending (opaque)
+    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
+    blendState.targets[0].enableBlend = false;
+    blendState.targets[0].colorWriteMask = nvrhi::ColorMask::All;
+
+    // Depth/stencil state - no depth (fullscreen)
+    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
+    depthState.depthTestEnable = false;
+    depthState.depthWriteEnable = false;
+    depthState.stencilEnable = false;
+
+    // Framebuffer info (HDR render target)
+    auto hdrDesc = hdrTexture->getDesc();
+    pipelineDesc.renderState.targetCount = 1;
+    pipelineDesc.renderState.renderTargetFormats[0] = hdrDesc.format;
+
+    // Create pipeline
+    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+
+    if (!m_pipeline)
+    {
+        Msg("! [LightingPass] Failed to create graphics pipeline");
+        return false;
+    }
+
+    Msg("  ✓ LightingPass pipeline created successfully");
+    return true;
+}
+
 LightingPassOutput LightingPass::Setup(
     FrameGraph& fg,
     const GBufferOutputs& gbuffer
@@ -122,6 +173,17 @@ void LightingPass::Execute(
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(gbuffer.depth);
     nvrhi::ITexture* hdr = fg.GetPhysicalTexture(output.hdrColor);
 
+    // Create pipeline if needed (once per frame, using actual HDR format)
+    if (!m_pipeline)
+    {
+        if (!CreatePipeline(hdr))
+        {
+            Msg("! [LightingPass] Failed to create pipeline");
+            ctx.EndRenderPass();
+            return;
+        }
+    }
+
     // ═══════════════════════════════════════════════════════
     //  SETUP RENDER PASS
     // ═══════════════════════════════════════════════════════
@@ -151,34 +213,25 @@ void LightingPass::Execute(
     ctx.SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  BIND G-BUFFER TEXTURES & DRAW
+    //  BIND PIPELINE & DRAW
     // ═══════════════════════════════════════════════════════
 
-    // TODO: Bind G-Buffer textures through RenderContext
+    // Set pipeline
+    ctx.SetPipeline(m_pipeline.Get());
+
+    // TODO: Bind G-Buffer textures as shader resources
     // ctx.SetTexture(0, albedo);
     // ctx.SetTexture(1, normal);
     // ctx.SetTexture(2, material);
     // ctx.SetTexture(3, depth);
 
-    // TODO: Set pipeline
-    // ctx.SetPipeline(m_pipeline);
-
     // TODO: Update per-frame constants (camera, lights)
     // ctx.UpdateConstantBuffer(0, &constants, sizeof(constants));
 
     // Draw fullscreen triangle
-    // TODO: Need to set up pipeline, textures, and constants
-    // For now, skip drawing until pipeline is created
-    // ctx.Draw(3, 0);
+    ctx.Draw(3, 0);
 
-    if (m_vertexShader && m_pixelShader)
-    {
-        Msg("  (Shaders loaded but pipeline not yet created)");
-    }
-    else
-    {
-        Msg("  (Skipping lighting draw - shaders not loaded)");
-    }
+    Msg("  ✓ Lighting draw complete (3 vertices)");
 
     ctx.EndRenderPass();
 
