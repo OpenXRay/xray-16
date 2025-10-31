@@ -66,6 +66,8 @@ private:
 
     bool LoadShaders();
 
+    bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
+
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
                 const GBufferOutputs& outputs);
 

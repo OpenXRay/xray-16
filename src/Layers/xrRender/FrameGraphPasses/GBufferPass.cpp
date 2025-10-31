@@ -48,6 +48,69 @@ bool GBufferPass::LoadShaders()
     return true;
 }
 
+bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph& fg)
+{
+    VERIFY(m_vertexShader != nullptr);
+    VERIFY(m_pixelShader != nullptr);
+
+    nvrhi::GraphicsPipelineDesc pipelineDesc;
+
+    pipelineDesc.VS = m_vertexShader;
+    pipelineDesc.PS = m_pixelShader;
+
+    pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
+
+    nvrhi::VertexAttributeDesc attributes[] = {
+        { "POSITION",  0, nvrhi::Format::RGB32_FLOAT, 0, 0, false },
+        { "NORMAL",    0, nvrhi::Format::RGB32_FLOAT, 0, 12, false },
+        { "TEXCOORD",  0, nvrhi::Format::RG32_FLOAT,  0, 24, false },
+        { "TANGENT",   0, nvrhi::Format::RGB32_FLOAT, 0, 32, false },
+        { "BINORMAL",  0, nvrhi::Format::RGB32_FLOAT, 0, 44, false },
+    };
+
+    pipelineDesc.inputLayout = attributes;
+
+    nvrhi::RasterState& rasterState = pipelineDesc.renderState.rasterState;
+    rasterState.cullMode = nvrhi::RasterCullMode::Back;
+    rasterState.fillMode = nvrhi::RasterFillMode::Solid;
+    rasterState.frontCounterClockwise = false;
+
+    nvrhi::BlendState& blendState = pipelineDesc.renderState.blendState;
+    for (int i = 0; i < 3; ++i)
+    {
+        blendState.targets[i].enableBlend = false;
+        blendState.targets[i].colorWriteMask = nvrhi::ColorMask::All;
+    }
+
+    nvrhi::DepthStencilState& depthState = pipelineDesc.renderState.depthStencilState;
+    depthState.depthTestEnable = true;
+    depthState.depthWriteEnable = true;
+    depthState.depthFunc = nvrhi::ComparisonFunc::Less;
+    depthState.stencilEnable = false;
+
+    nvrhi::ITexture* albedo = fg.GetPhysicalTexture(outputs.albedo);
+    nvrhi::ITexture* normal = fg.GetPhysicalTexture(outputs.normal);
+    nvrhi::ITexture* material = fg.GetPhysicalTexture(outputs.material);
+    nvrhi::ITexture* depth = fg.GetPhysicalTexture(outputs.depth);
+
+    pipelineDesc.renderState.targetCount = 3;
+    pipelineDesc.renderState.renderTargetFormats[0] = albedo->getDesc().format;
+    pipelineDesc.renderState.renderTargetFormats[1] = normal->getDesc().format;
+    pipelineDesc.renderState.renderTargetFormats[2] = material->getDesc().format;
+    pipelineDesc.renderState.depthStencilFormat = depth->getDesc().format;
+
+    m_pipeline = m_device->GetNVRHIDevice()->createGraphicsPipeline(pipelineDesc, nullptr);
+
+    if (!m_pipeline)
+    {
+        Msg("! [GBufferPass] Failed to create graphics pipeline");
+        return false;
+    }
+
+    Msg("  ✓ GBufferPass pipeline created successfully (MRT: 3 targets + depth)");
+    return true;
+}
+
 GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     Msg("~ [GBufferPass] Setting up in FrameGraph");
 
@@ -128,6 +191,15 @@ void GBufferPass::Execute(
     nvrhi::ITexture* normal = fg.GetPhysicalTexture(outputs.normal);
     nvrhi::ITexture* material = fg.GetPhysicalTexture(outputs.material);
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(outputs.depth);
+
+    if (!m_pipeline)
+    {
+        if (!CreatePipeline(outputs, fg))
+        {
+            Msg("! [GBufferPass] Failed to create pipeline");
+            return;
+        }
+    }
 
     ng::RenderPassDesc passDesc;
     passDesc.renderTargets[0] = albedo;
