@@ -239,6 +239,10 @@
     <ClInclude Include="R_Backend_LOD.h" />
     <ClInclude Include="NVRHI\NVRHIDevice.h" />
     <ClInclude Include="RenderContext\RenderContext.h" />
+    <ClInclude Include="FrameGraph\FGTypes.h" />
+    <ClInclude Include="FrameGraph\FGResource.h" />
+    <ClInclude Include="FrameGraph\FGPass.h" />
+    <ClInclude Include="FrameGraph\FrameGraph.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -444,6 +448,9 @@
     <ClCompile Include="R_Backend_LOD.cpp" />
     <ClCompile Include="NVRHI\NVRHIDevice.cpp" />
     <ClCompile Include="RenderContext\RenderContext.cpp" />
+    <ClCompile Include="FrameGraph\FGResource.cpp" />
+    <ClCompile Include="FrameGraph\FGPass.cpp" />
+    <ClCompile Include="FrameGraph\FrameGraph.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
