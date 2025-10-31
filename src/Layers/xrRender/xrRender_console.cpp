@@ -27,6 +27,7 @@
 
 #if RENDER == R_R4
 #include "Layers/xrRenderPC_R4/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRenderPC_R4/FrameGraph/FGTest.h"
 #endif
 
 extern ENGINE_API int dm_debug_trails;
@@ -488,6 +489,144 @@ public:
 #endif
     }
 };
+
+class CCC_FrameGraphTestSimple : public IConsole_Command
+{
+public:
+    CCC_FrameGraphTestSimple(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/)
+    {
+#if defined(USE_DX11)
+        auto& render = static_cast<CRender&>(RImplementation);
+
+        if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
+        {
+            Msg("! [FrameGraph] NVRHI not initialized - run r4_nvrhi_test first");
+            return;
+        }
+
+        using namespace xray::render::framegraph;
+        using namespace xray::render::ng;
+
+        nvrhi::IDevice* device = render.m_nvrhiDevice->GetDevice();
+
+        if (!render.m_renderContext)
+        {
+            Msg("! [FrameGraph] RenderContext not initialized");
+            return;
+        }
+
+        ID3D11RenderTargetView* backbufferRTV = render.Target->get_base_rt();
+        if (!backbufferRTV)
+        {
+            Msg("! [FrameGraph] No backbuffer RTV");
+            return;
+        }
+
+        ID3D11Resource* backbufferRes = nullptr;
+        backbufferRTV->GetResource(&backbufferRes);
+
+        nvrhi::TextureDesc backbufferDesc;
+        backbufferDesc.width = Device.dwWidth;
+        backbufferDesc.height = Device.dwHeight;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.mipLevels = 1;
+        backbufferDesc.arraySize = 1;
+        backbufferDesc.sampleCount = 1;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.debugName = "Backbuffer";
+        backbufferDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        backbufferDesc.keepInitialState = true;
+        backbufferDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+
+        nvrhi::TextureHandle backbuffer = device->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::D3D11_Resource,
+            nvrhi::Object(backbufferRes),
+            backbufferDesc
+        );
+
+        backbufferRes->Release();
+
+        if (!backbuffer)
+        {
+            Msg("! [FrameGraph] Failed to wrap backbuffer");
+            return;
+        }
+
+        Msg("~ [FrameGraph] Running simple triangle test...");
+        TestSimpleTriangle(device, render.m_renderContext, backbuffer);
+#endif
+    }
+};
+
+class CCC_FrameGraphTestTwoPass : public IConsole_Command
+{
+public:
+    CCC_FrameGraphTestTwoPass(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/)
+    {
+#if defined(USE_DX11)
+        auto& render = static_cast<CRender&>(RImplementation);
+
+        if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
+        {
+            Msg("! [FrameGraph] NVRHI not initialized - run r4_nvrhi_test first");
+            return;
+        }
+
+        using namespace xray::render::framegraph;
+        using namespace xray::render::ng;
+
+        nvrhi::IDevice* device = render.m_nvrhiDevice->GetDevice();
+
+        if (!render.m_renderContext)
+        {
+            Msg("! [FrameGraph] RenderContext not initialized");
+            return;
+        }
+
+        ID3D11RenderTargetView* backbufferRTV = render.Target->get_base_rt();
+        if (!backbufferRTV)
+        {
+            Msg("! [FrameGraph] No backbuffer RTV");
+            return;
+        }
+
+        ID3D11Resource* backbufferRes = nullptr;
+        backbufferRTV->GetResource(&backbufferRes);
+
+        nvrhi::TextureDesc backbufferDesc;
+        backbufferDesc.width = Device.dwWidth;
+        backbufferDesc.height = Device.dwHeight;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.mipLevels = 1;
+        backbufferDesc.arraySize = 1;
+        backbufferDesc.sampleCount = 1;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.debugName = "Backbuffer";
+        backbufferDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        backbufferDesc.keepInitialState = true;
+        backbufferDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+
+        nvrhi::TextureHandle backbuffer = device->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::D3D11_Resource,
+            nvrhi::Object(backbufferRes),
+            backbufferDesc
+        );
+
+        backbufferRes->Release();
+
+        if (!backbuffer)
+        {
+            Msg("! [FrameGraph] Failed to wrap backbuffer");
+            return;
+        }
+
+        Msg("~ [FrameGraph] Running two-pass test...");
+        TestTwoPassRender(device, render.m_renderContext, backbuffer);
+#endif
+    }
+};
 #endif
 
 class CCC_SSAO_Mode : public CCC_Token
@@ -634,7 +773,7 @@ class CCC_MotionsStat final : public IConsole_Command
 public:
     CCC_MotionsStat(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
 
-    void Execute(pcstr /*args*/) override
+    void Execute(pcstr ) override
     {
         g_pMotionsContainer->dump();
     }
@@ -645,7 +784,7 @@ class CCC_TexturesStat final : public IConsole_Command
 public:
     CCC_TexturesStat(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
 
-    void Execute(pcstr /*args*/) override
+    void Execute(pcstr ) override
     {
         RImplementation.Resources->_DumpMemoryUsage();
     }
@@ -1148,6 +1287,8 @@ void xrRender_initconsole()
 #if RENDER == R_R4
     CMD1(CCC_NVRHITest, "r4_nvrhi_test");
     CMD1(CCC_RenderContextTest, "r4_rendercontext_test");
+    CMD1(CCC_FrameGraphTestSimple, "r4_framegraph_test");
+    CMD1(CCC_FrameGraphTestTwoPass, "r4_framegraph_test2");
 #endif
 #endif
 }

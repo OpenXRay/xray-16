@@ -65,6 +65,7 @@ VirtualResourceHandle FrameGraph::ImportTexture(
 
     ResourceNode node(desc);
     node.handle.index = static_cast<u32>(m_resources.size());
+    node.nvrhiTexture = physicalTexture;
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
@@ -86,6 +87,7 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
 
     ResourceNode node(desc);
     node.handle.index = static_cast<u32>(m_resources.size());
+    node.nvrhiBuffer = physicalBuffer;
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
@@ -259,7 +261,18 @@ void FrameGraph::Reset() {
     m_sortedPasses.clear();
     m_compiled = false;
 
-    memset(&m_stats, 0, sizeof(m_stats));
+    m_stats.numPasses = 0;
+    m_stats.numResources = 0;
+    m_stats.numCulledPasses = 0;
+    m_stats.numCulledResources = 0;
+    m_stats.compileTimeMs = 0.0f;
+    m_stats.totalMemoryAllocated = 0;
+    m_stats.peakMemoryUsage = 0;
+    m_stats.numAliasedResources = 0;
+    m_stats.memoryReduced = 0;
+    m_stats.executeTimeMs = 0.0f;
+    m_stats.totalGPUTimeMs = 0.0f;
+    m_stats.passTimings.clear();
 
     Msg("~ [FrameGraph] Reset complete");
 }

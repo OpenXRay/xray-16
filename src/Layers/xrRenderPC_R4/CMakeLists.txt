@@ -32,6 +32,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     FrameGraph/FGPass.cpp
     FrameGraph/FrameGraph.h
     FrameGraph/FrameGraph.cpp
+    FrameGraph/FGTest.h
+    FrameGraph/FGTest.cpp
 )
 
 target_include_directories(xrRenderPC_R4
