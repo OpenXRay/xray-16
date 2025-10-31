@@ -316,9 +316,9 @@ void GBufferPass::Execute(
                 currentBindingSet = batch.bindingSet;
             }
 
-            // Bind vertex/index buffers
-            ctx.SetVertexBuffer(0, batch.vertexBuffer, 0);
-            ctx.SetIndexBuffer(batch.indexBuffer, nvrhi::Format::R32_UINT, 0);
+            // Bind vertex/index buffers (convert nvrhi::BufferHandle to IBuffer*)
+            ctx.SetVertexBuffer(0, batch.vertexBuffer.Get(), 0);
+            ctx.SetIndexBuffer(batch.indexBuffer.Get(), nvrhi::Format::R32_UINT, 0);
 
             // Draw
             ctx.DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);

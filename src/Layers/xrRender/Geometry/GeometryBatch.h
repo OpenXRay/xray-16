@@ -10,9 +10,9 @@ namespace xray::render {
 // ══════════════════════════════════════════════════════════
 
 struct GeometryBatch {
-    // Vertex/index buffers
-    ng::BufferHandle vertexBuffer;
-    ng::BufferHandle indexBuffer;
+    // Vertex/index buffers (NVRHI handles for wrapped legacy buffers)
+    nvrhi::BufferHandle vertexBuffer;
+    nvrhi::BufferHandle indexBuffer;
 
     // Draw parameters
     u32 indexCount = 0;

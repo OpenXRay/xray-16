@@ -292,9 +292,9 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
         GeometryBatch batch;
 
-        // Wrap NVRHI handles in our BufferHandle wrapper
-        batch.vertexBuffer = ng::BufferHandle(nvrhiVB);
-        batch.indexBuffer = ng::BufferHandle(nvrhiIB);
+        // Store NVRHI buffer handles directly
+        batch.vertexBuffer = nvrhiVB;
+        batch.indexBuffer = nvrhiIB;
 
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
