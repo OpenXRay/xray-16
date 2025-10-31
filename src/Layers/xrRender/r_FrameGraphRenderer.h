@@ -1,0 +1,54 @@
+#pragma once
+
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
+#include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
+#include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
+#include "Layers/xrRender/Geometry/GeometryBatch.h"
+
+namespace xray::render {
+
+class FrameGraphRenderer {
+public:
+    FrameGraphRenderer();
+    ~FrameGraphRenderer();
+
+    bool Initialize(ng::RenderDevice* device);
+    void Shutdown();
+
+    void Render();
+
+    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    bool IsEnabled() const { return m_enabled; }
+
+    struct Stats {
+        float totalFrameMs = 0.0f;
+        float gbufferMs = 0.0f;
+        float lightingMs = 0.0f;
+        float tonemapMs = 0.0f;
+        u32 numDrawCalls = 0;
+        u32 numTriangles = 0;
+    };
+
+    const Stats& GetStats() const { return m_stats; }
+    void PrintStats() const;
+
+private:
+    bool m_enabled = false;
+    ng::RenderDevice* m_device = nullptr;
+
+    xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
+
+    xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
+    xr_unique_ptr<passes::LightingPass> m_lightingPass;
+    xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
+
+    xr_unique_ptr<GeometryCollector> m_geometryCollector;
+
+    Stats m_stats;
+
+    void SetupFrame();
+    void BuildFrameGraph();
+};
+
+}

@@ -45,6 +45,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     # FrameGraph Passes (Phase 3) - Renderer agnostic
     ../xrRender/FrameGraphPasses/GBufferPass.h
     ../xrRender/FrameGraphPasses/GBufferPass.cpp
+    ../xrRender/FrameGraphPasses/LightingPass.h
+    ../xrRender/FrameGraphPasses/LightingPass.cpp
+    ../xrRender/FrameGraphPasses/TonemapPass.h
+    ../xrRender/FrameGraphPasses/TonemapPass.cpp
 
     # Geometry System (Phase 3) - Renderer agnostic
     ../xrRender/Geometry/GeometryBatch.h
@@ -53,6 +57,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     # Debug Tools (Phase 3) - Renderer agnostic
     ../xrRender/Debug/GBufferVisualization.h
     ../xrRender/Debug/GBufferVisualization.cpp
+
+    # FrameGraph Renderer (Phase 3) - Renderer agnostic
+    ../xrRender/r_FrameGraphRenderer.h
+    ../xrRender/r_FrameGraphRenderer.cpp
 )
 
 target_include_directories(xrRenderPC_R4

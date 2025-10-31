@@ -15,6 +15,10 @@ RenderDevice::~RenderDevice() {
     Shutdown();
 }
 
+nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
+    return m_nvrhiDevice ? m_nvrhiDevice->GetDevice() : nullptr;
+}
+
 bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context) {
     VERIFY(device);
     VERIFY(context);

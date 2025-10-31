@@ -19,6 +19,8 @@ public:
 
     bool IsInitialized() const { return m_initialized; }
 
+    nvrhi::IDevice* GetNVRHIDevice() const;
+
     struct TextureDesc {
         u32 width = 0;
         u32 height = 0;

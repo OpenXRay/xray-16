@@ -249,8 +249,11 @@
     <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
     <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\LightingPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPass.h" />
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
     <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h" />
+    <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -464,8 +467,11 @@
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\LightingPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPass.cpp" />
     <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
     <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp" />
+    <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
