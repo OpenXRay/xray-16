@@ -254,26 +254,34 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         //  WRAP D3D11 BUFFERS AS NVRHI HANDLES
         // ═══════════════════════════════════════════════════════
 
-        // Wrap vertex buffer
-        ng::BufferDesc vbDesc;
+        // Wrap vertex buffer using NVRHI directly
+        nvrhi::BufferDesc vbDesc;
         vbDesc.debugName = "VisibleMesh_VB";
         vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
         vbDesc.isVertexBuffer = true;
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
 
-        ng::BufferHandle nvrhiVB = m_device->CreateBufferFromD3D11(geom->vb, vbDesc);
-        if (!nvrhiVB.IsValid()) {
+        nvrhi::BufferHandle nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->vb), vbDesc);
+
+        if (!nvrhiVB) {
             Msg("! [FrameGraph] Failed to wrap VB");
             continue;
         }
 
-        // Wrap index buffer
-        ng::BufferDesc ibDesc;
+        // Wrap index buffer using NVRHI directly
+        nvrhi::BufferDesc ibDesc;
         ibDesc.debugName = "VisibleMesh_IB";
         ibDesc.byteSize = meshVisual->iCount * sizeof(u16); // Assuming 16-bit indices
         ibDesc.isIndexBuffer = true;
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
-        ng::BufferHandle nvrhiIB = m_device->CreateBufferFromD3D11(geom->ib, ibDesc);
-        if (!nvrhiIB.IsValid()) {
+        nvrhi::BufferHandle nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->ib), ibDesc);
+
+        if (!nvrhiIB) {
             Msg("! [FrameGraph] Failed to wrap IB");
             continue;
         }
@@ -283,16 +291,17 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         // ═══════════════════════════════════════════════════════
 
         GeometryBatch batch;
-        batch.vertexBuffer = nvrhiVB;
-        batch.indexBuffer = nvrhiIB;
+
+        // Wrap NVRHI handles in our BufferHandle wrapper
+        batch.vertexBuffer = ng::BufferHandle(nvrhiVB);
+        batch.indexBuffer = ng::BufferHandle(nvrhiIB);
+
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
         batch.baseVertex = meshVisual->vBase;
 
         // Get world matrix from renderable
-        Fmatrix worldMatrix;
-        renderable->renderable_Xform(worldMatrix);
-        batch.worldMatrix = worldMatrix;
+        batch.worldMatrix = renderable->GetRenderData().xform;
 
         // TODO: Create PSO from visual->shader
         // TODO: Create binding set from textures
