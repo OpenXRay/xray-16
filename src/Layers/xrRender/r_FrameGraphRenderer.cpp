@@ -22,7 +22,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
 
     // Create passes (pass device for shader loading)
-    m_gbufferPass = xr_make_unique<passes::GBufferPass>();
+    m_gbufferPass = xr_make_unique<passes::GBufferPass>(device);
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 

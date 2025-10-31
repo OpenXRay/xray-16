@@ -3,19 +3,53 @@
 #include "GBufferPass.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::passes {
 
 using namespace framegraph;
 
-GBufferPass::GBufferPass(const GBufferPassConfig& config)
-    : m_config(config)
+GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config)
+    : m_device(device)
+    , m_config(config)
 {
+    VERIFY(m_device != nullptr);
+
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
+
+    // Load shaders
+    if (!LoadShaders())
+    {
+        Msg("! [GBufferPass] Failed to load shaders");
+    }
 }
 
 GBufferPass::~GBufferPass() {
     Msg("* [GBufferPass] Destroyed");
+}
+
+bool GBufferPass::LoadShaders()
+{
+    ShaderLoader loader(m_device);
+
+    // Load G-Buffer vertex shader
+    m_vertexShader = loader.LoadVertexShader("gbuffer");
+    if (!m_vertexShader)
+    {
+        Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
+        return false;
+    }
+
+    // Load G-Buffer pixel shader
+    m_pixelShader = loader.LoadPixelShader("gbuffer");
+    if (!m_pixelShader)
+    {
+        Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
+        return false;
+    }
+
+    Msg("  ✓ G-Buffer shaders loaded successfully");
+    return true;
 }
 
 GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {

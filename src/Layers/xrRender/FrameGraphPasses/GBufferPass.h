@@ -56,7 +56,7 @@ struct GBufferOutputs {
 
 class GBufferPass {
 public:
-    GBufferPass(const GBufferPassConfig& config = GBufferPassConfig());
+    GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config = GBufferPassConfig());
     ~GBufferPass();
 
     // Setup pass in FrameGraph
@@ -77,8 +77,17 @@ public:
     const Stats& GetStats() const { return m_stats; }
 
 private:
+    ng::RenderDevice* m_device;
     GBufferPassConfig m_config;
     Stats m_stats;
+
+    // Shaders
+    nvrhi::IShader* m_vertexShader = nullptr;
+    nvrhi::IShader* m_pixelShader = nullptr;
+    nvrhi::GraphicsPipelineHandle m_pipeline;
+
+    // Load shaders
+    bool LoadShaders();
 
     // Execution callback
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
