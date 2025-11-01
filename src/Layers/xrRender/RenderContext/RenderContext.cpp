@@ -321,6 +321,8 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
     }
 
     // Step 3: Update current state (don't apply yet - batch with other state changes)
+    // static_vector has fixed capacity but dynamic size - resize to make slot accessible
+    m_currentState.bindings.resize(slot + 1);
     m_currentState.bindings[slot] = bindingSet.Get();
 
     // Don't call setGraphicsState yet - batch state changes
