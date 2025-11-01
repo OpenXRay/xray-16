@@ -67,14 +67,19 @@ bool GBufferPass::LoadShaders()
 
     // Create per-object constant buffer through our abstraction layer
     // Matches shader cbuffer PerObject : register(b0)
+    // NOTE: Size must accommodate largest shader CB requirement (X-Ray shaders need 224 bytes)
+    //       Using 256 bytes (aligned to CB alignment requirement)
     struct PerObjectConstants {
-        Fmatrix worldViewProj;
-        Fmatrix world;
-        Fmatrix worldIT;  // Inverse transpose for normals
+        Fmatrix worldViewProj;  // 64 bytes
+        Fmatrix world;          // 64 bytes
+        Fmatrix worldIT;        // 64 bytes
+        // Total: 192 bytes - but X-Ray shaders expect 224!
+        // Padding to 256 bytes for safety and alignment
+        u8 padding[64];
     };
 
     ng::RenderDevice::BufferDesc cbDesc;
-    cbDesc.byteSize = sizeof(PerObjectConstants);
+    cbDesc.byteSize = 256;  // Aligned size, enough for all X-Ray shaders
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;  // Updated every draw call
     cbDesc.debugName = "PerObjectCB";
@@ -325,8 +330,7 @@ void GBufferPass::Execute(
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
         // Keep binding sets alive for the duration of rendering
-        xr_vector<nvrhi::BindingSetHandle> tempBindingSets;
-        tempBindingSets.reserve(batches.size());
+        // NOTE: No longer need tempBindingSets - binding sets are now cached in MaterialPSO!
 
         for (const auto& batch : batches) {
             // Get per-material PSO from MaterialCache
@@ -350,22 +354,42 @@ void GBufferPass::Execute(
                 currentPipeline = pipelineToUse;
             }
 
-            // Update per-object constants and create complete binding set
+            // Update per-object constants using VCB + get/create cached binding set
             if (matPSO) {
-                // Update constants first
-                UpdatePerObjectConstantsData(batch);
+                // Step 1: Write VCB data inline in command list (proper NVRHI pattern)
+                // MUST be done BEFORE setGraphicsState/SetBindingSet that uses the VCB!
+                struct PerObjectConstants {
+                    Fmatrix worldViewProj;
+                    Fmatrix world;
+                    Fmatrix worldIT;
+                };
+                PerObjectConstants constants;
 
-                // Create binding set with CB + textures for this material
+                // Get view-projection matrix from device
+                Fmatrix viewProj;
+                viewProj.mul(Device.mView, Device.mProject);
+
+                // Compute matrices
+                constants.worldViewProj.mul(batch.worldMatrix, viewProj);
+                constants.world = batch.worldMatrix;
+
+                Fmatrix temp;
+                temp.invert(batch.worldMatrix);
+                constants.worldIT.transpose(temp);
+
                 VERIFY(m_perObjectCB.IsValid());
-                nvrhi::IBuffer* cbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
-                nvrhi::BindingSetHandle fullBindingSet = m_materialCache->CreateBindingSet(matPSO, cbBuffer);
+                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
+
+                // Write VCB within render pass command list (NVRHI handles versioning)
+                ctx.WriteBuffer(vcbBuffer, &constants, sizeof(constants));
+
+                // Step 2: Get or create cached binding set (created once, reused!)
+                nvrhi::BindingSetHandle fullBindingSet =
+                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer);
 
                 if (fullBindingSet) {
                     ctx.SetBindingSet(0, fullBindingSet.Get());
                     currentBindingSet = fullBindingSet.Get();
-
-                    // Keep the binding set alive (NVRHI uses reference counting)
-                    tempBindingSets.push_back(fullBindingSet);
                 }
             } else {
                 // Fallback to old path

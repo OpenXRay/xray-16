@@ -500,9 +500,34 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     // Store debug names
     matPSO->debugName = vs->cName;
 
-    // TODO: Extract actual bytecode from SVS/SPS
-    // The bytecode is stored in vs->sh/ps->sh (ID3D11VertexShader/ID3D11PixelShader)
-    // We may need to reflect on these to get input layout and other metadata
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT CONSTANT BUFFER SIZE from VS (slot b0)
+    // ═══════════════════════════════════════════════════════
+
+    // Get per-object CB size from vertex shader's constant table
+    // X-Ray stores CB info in vs->constants.m_CBTable
+    if (!vs->constants.m_CBTable[0].empty()) {
+        // Get first CB (per-object constants at b0)
+        const auto& cbRecord = vs->constants.m_CBTable[0][0];
+        dx11ConstantBuffer* cb = cbRecord.second._get();
+        if (cb) {
+            // Get actual CB size from shader reflection
+            ID3DBuffer* d3dBuffer = cb->GetBuffer();
+            if (d3dBuffer) {
+                D3D11_BUFFER_DESC bufDesc;
+                d3dBuffer->GetDesc(&bufDesc);
+                matPSO->perObjectCBSize = bufDesc.ByteWidth;
+                Msg("  [MaterialCache] Extracted CB size: %u bytes from shader '%s'",
+                    matPSO->perObjectCBSize, vs->cName.c_str());
+            }
+        }
+    }
+
+    // Fallback if CB size not found
+    if (matPSO->perObjectCBSize == 0) {
+        Msg("! [MaterialCache] Failed to extract CB size from shader, using default 224 bytes");
+        matPSO->perObjectCBSize = 224;  // Default size
+    }
 
     return true;
 }
@@ -522,9 +547,10 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
 
-    // Slot 0: Per-object constant buffer (b0)
+    // Slot 0: Per-object VOLATILE constant buffer (b0)
+    // Using VolatileConstantBuffer allows efficient per-draw updates via writeBuffer()
     layoutDesc.bindings.push_back(
-        nvrhi::BindingLayoutItem::ConstantBuffer(0));
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0));
 
     // Slots 1+: Textures (t0, t1, t2, ...)
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
@@ -587,16 +613,25 @@ nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPS
 }
 
 // ══════════════════════════════════════════════════════════
-//  CREATE BINDING SET (with per-object CB)
+//  GET OR CREATE CACHED BINDING SET (with per-object VCB)
 // ══════════════════════════════════════════════════════════
 
-nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
-    const MaterialPSO* matPSO,
-    nvrhi::IBuffer* perObjectCB)
+nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
+    MaterialPSO* matPSO,
+    nvrhi::IBuffer* perObjectVCB)
 {
     VERIFY(matPSO);
-    VERIFY(perObjectCB);
+    VERIFY(perObjectVCB);
     VERIFY(matPSO->bindingLayout);
+
+    // ═══════════════════════════════════════════════════════
+    //  CHECK CACHE - Return existing binding set if already created
+    // ═══════════════════════════════════════════════════════
+
+    if (matPSO->bindingSet) {
+        // Already cached - reuse it!
+        return matPSO->bindingSet;
+    }
 
     // ═══════════════════════════════════════════════════════
     //  BUILD BINDING SET DESCRIPTOR
@@ -604,9 +639,10 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
 
     nvrhi::BindingSetDesc bindingDesc;
 
-    // Bind constant buffer at slot 0 (b0)
+    // Bind volatile constant buffer at slot 0 (b0)
+    // Note: Use ConstantBuffer() for binding SET (volatile is in the binding LAYOUT)
     bindingDesc.bindings.push_back(
-        nvrhi::BindingSetItem::ConstantBuffer(0, perObjectCB));
+        nvrhi::BindingSetItem::ConstantBuffer(0, perObjectVCB));
 
     // Bind textures at slots t0, t1, t2, etc.
     Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
@@ -651,7 +687,7 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
     //  CREATE BINDING SET
     // ═══════════════════════════════════════════════════════
 
-    Msg("  [MaterialCache] About to call CreateBindingSet");
+    Msg("  [MaterialCache] Creating NEW binding set (will be cached)");
     nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
         bindingDesc,
         matPSO->bindingLayout);
@@ -661,7 +697,13 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
         return nullptr;
     }
 
-    Msg("  [MaterialCache] Successfully created binding set");
+    // ═══════════════════════════════════════════════════════
+    //  CACHE IN MaterialPSO for reuse
+    // ═══════════════════════════════════════════════════════
+
+    matPSO->bindingSet = bindingSet;
+    Msg("  [MaterialCache] Successfully created and cached binding set");
+
     return bindingSet;
 }
 

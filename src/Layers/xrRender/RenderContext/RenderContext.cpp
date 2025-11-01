@@ -334,6 +334,20 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
     // Don't call setGraphicsState yet - batch state changes
 }
 
+// Write data to buffer within command list (for Volatile Constant Buffers)
+// IMPORTANT: For VCBs, this MUST be called BEFORE setGraphicsState() that references the VCB!
+void RenderContext::WriteBuffer(nvrhi::IBuffer* buffer, const void* data, size_t dataSize, u64 offset) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(buffer != nullptr);
+    VERIFY(data != nullptr);
+    VERIFY(dataSize > 0);
+    VERIFY(m_commandList != nullptr);
+
+    // Write buffer data inline in the command list
+    // For VCBs, NVRHI handles versioning automatically - each write creates a new version
+    m_commandList->writeBuffer(buffer, data, dataSize, offset);
+}
+
 void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer.IsValid());

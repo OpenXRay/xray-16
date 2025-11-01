@@ -91,6 +91,9 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
+    // Constant buffer size (extracted from shader reflection)
+    u32 perObjectCBSize = 0;
+
     // Shader references (for debugging)
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
@@ -157,10 +160,11 @@ private:
     // Create material binding set (textures only, no CB)
 public:
     nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
-    // Create binding set for material (with per-object CB)
-    nvrhi::BindingSetHandle CreateBindingSet(
-        const MaterialPSO* matPSO,
-        nvrhi::IBuffer* perObjectCB);
+    // Get or create cached binding set for material (with per-object VCB)
+    // Cached per MaterialPSO for reuse across draws - only creates once!
+    nvrhi::BindingSetHandle GetOrCreateBindingSet(
+        MaterialPSO* matPSO,  // Non-const to allow caching
+        nvrhi::IBuffer* perObjectVCB);
 private:
 
     // Compute texture hash from SPass

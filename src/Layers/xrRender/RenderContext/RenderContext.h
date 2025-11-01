@@ -189,6 +189,10 @@ public:
     void SetConstantBuffer(u32 slot, BufferHandle buffer);
     void SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer);  // Direct
 
+    // Write data to buffer (for Volatile Constant Buffers within render pass)
+    // NOTE: For VCBs, this MUST be called before setGraphicsState() that uses the VCB
+    void WriteBuffer(nvrhi::IBuffer* buffer, const void* data, size_t dataSize, u64 offset = 0);
+
     // ═══════════════════════════════════════════════════════
     //  BINDING LAYOUTS & DESCRIPTOR SETS
     // ═══════════════════════════════════════════════════════
