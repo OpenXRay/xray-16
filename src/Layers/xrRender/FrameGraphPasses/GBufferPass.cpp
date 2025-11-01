@@ -359,11 +359,13 @@ void GBufferPass::Execute(
                 // Step 1: Write VCB data inline in command list (proper NVRHI pattern)
                 // MUST be done BEFORE setGraphicsState/SetBindingSet that uses the VCB!
 
-                // Use the CB size from the material shader (extracted from shader reflection)
-                u32 cbSize = matPSO->perObjectCBSize > 0 ? matPSO->perObjectCBSize : 256;
+                // IMPORTANT: We MUST write the FULL VCB size (256 bytes) to avoid partial updates!
+                // D3D11 constant buffers do NOT support partial updates (UpdateSubresource with pDstBox)
+                // If we write less than the buffer size, NVRHI will try a partial update and fail.
+                constexpr u32 VCB_SIZE = 256;  // Must match VCB creation size!
 
-                // Allocate buffer on stack (max 256 bytes for CB alignment)
-                u8 cbData[256] = {};  // Zero-initialized!
+                // Allocate buffer on stack (256 bytes for VCB)
+                u8 cbData[VCB_SIZE] = {};  // Zero-initialized!
 
                 // Fill in the matrices we actually use
                 Fmatrix* pWorldViewProj = reinterpret_cast<Fmatrix*>(cbData + 0);
@@ -386,8 +388,8 @@ void GBufferPass::Execute(
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
 
                 // Write VCB within render pass command list (NVRHI handles versioning)
-                // Write the FULL CB size (including padding) to match shader expectations!
-                ctx.WriteBuffer(vcbBuffer, cbData, cbSize);
+                // CRITICAL: Write the FULL buffer size (256 bytes) to avoid partial update errors!
+                ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
 
                 // Step 2: Get or create cached binding set (created once, reused!)
                 nvrhi::BindingSetHandle fullBindingSet =

@@ -33,6 +33,15 @@ public:
 private:
     typedef dx11SamplerStateCache::HArray tSamplerHArray;
 
+public:
+    // Sampler accessors
+    const tSamplerHArray& GetVSSamplers() const { return m_VSSamplers; }
+    const tSamplerHArray& GetPSSamplers() const { return m_PSSamplers; }
+    const tSamplerHArray& GetGSSamplers() const { return m_GSSamplers; }
+    const tSamplerHArray& GetCSSamplers() const { return m_CSSamplers; }
+    const tSamplerHArray& GetHSSamplers() const { return m_HSSamplers; }
+    const tSamplerHArray& GetDSSamplers() const { return m_DSSamplers; }
+
 private:
     static void InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& state_code, int iBaseSamplerIndex);
 

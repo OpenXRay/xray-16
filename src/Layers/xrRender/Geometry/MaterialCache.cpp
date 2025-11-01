@@ -14,6 +14,7 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"  // For sampler extraction
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"  // For CB size extraction
 #include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion"
 #endif
@@ -242,6 +243,12 @@ MaterialPSO* MaterialCache::CreatePSO(
         Msg("! [MaterialCache] Failed to extract shaders");
         return nullptr;
     }
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT SAMPLERS
+    // ═══════════════════════════════════════════════════════
+
+    ExtractSamplers(pass, pso.get());
 
     // ═══════════════════════════════════════════════════════
     //  CREATE BINDING LAYOUT
@@ -521,10 +528,16 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                 shaderName, contextIdx, cbTable.size());
 
             for (const auto& cbRecord : cbTable) {
-                u32 slot = cbRecord.first;
+                u32 encodedSlot = cbRecord.first;
                 dx11ConstantBuffer* cb = cbRecord.second._get();
 
-                Msg("  [MaterialCache]   Checking slot %u in context %u", slot, contextIdx);
+                // Decode the slot to get shader type and binding slot
+                u32 shaderType = dx11ConstantBuffer::DecodeShaderType(encodedSlot);
+                u32 bindingSlot = dx11ConstantBuffer::DecodeBindingSlot(encodedSlot);
+                const char* shaderTypeName = dx11ConstantBuffer::GetShaderTypeName(shaderType);
+
+                Msg("  [MaterialCache]   Checking encoded slot 0x%02X (%s b%u) in context %u",
+                    encodedSlot, shaderTypeName, bindingSlot, contextIdx);
 
                 if (cb) {
                     ID3DBuffer* d3dBuffer = cb->GetBuffer();
@@ -532,44 +545,48 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                         D3D11_BUFFER_DESC bufDesc;
                         d3dBuffer->GetDesc(&bufDesc);
 
-                        Msg("  [MaterialCache]   CB at slot %u: %u bytes", slot, bufDesc.ByteWidth);
+                        Msg("  [MaterialCache]   CB at %s b%u: %u bytes",
+                            shaderTypeName, bindingSlot, bufDesc.ByteWidth);
 
-                    // Check if we already have this slot (could be in both VS and PS)
+                    // Check if we already have this binding slot (could be in both VS and PS)
                     bool found = false;
                     for (const auto& existing : matPSO->constantBuffers) {
-                        if (existing.slot == slot) {
+                        if (existing.slot == bindingSlot) {
                             found = true;
                             break;
                         }
                     }
 
                     if (!found) {
-                        // Wrap the X-Ray D3D11 buffer in NVRHI (similar to texture wrapping)
+                        // Wrap the X-Ray D3D11 buffer in NVRHI
+                        // NOTE: Buffers use D3D11_Buffer, textures use D3D11_Resource!
                         nvrhi::BufferDesc nvrhiDesc;
                         nvrhiDesc.byteSize = bufDesc.ByteWidth;
                         nvrhiDesc.isConstantBuffer = true;
                         nvrhiDesc.debugName = "XRay_CB";
-                        nvrhiDesc.isVolatile = false;
+                        nvrhiDesc.keepInitialState = true;
+                        nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
                         nvrhi::BufferHandle wrappedBuffer =
                             m_device->GetNativeDevice()->createHandleForNativeBuffer(
-                                nvrhi::ObjectTypes::D3D11_Resource,
+                                nvrhi::ObjectTypes::D3D11_Buffer,  // Use D3D11_Buffer for buffers!
                                 nvrhi::Object(d3dBuffer),
                                 nvrhiDesc);
 
                         if (wrappedBuffer) {
                             MaterialPSO::ConstantBufferInfo cbInfo;
-                            cbInfo.slot = slot;
+                            cbInfo.slot = bindingSlot;  // Use DECODED slot for NVRHI binding!
                             cbInfo.nvrhiBuffer = wrappedBuffer;
                             cbInfo.size = bufDesc.ByteWidth;
-                            cbInfo.isPerObject = (slot == 0);
+                            cbInfo.isPerObject = (bindingSlot == 0);  // Check decoded slot 0
 
                             matPSO->constantBuffers.push_back(cbInfo);
 
-                            Msg("  [MaterialCache]   SUCCESS: Added CB to PSO at slot %u: %u bytes (isPerObject=%d)",
-                                slot, cbInfo.size, cbInfo.isPerObject);
+                            Msg("  [MaterialCache]   SUCCESS: Added CB to PSO at %s b%u: %u bytes (isPerObject=%d)",
+                                shaderTypeName, bindingSlot, cbInfo.size, cbInfo.isPerObject);
                         } else {
-                            Msg("! [MaterialCache]   FAILED: Could not wrap D3D11 buffer at slot %u", slot);
+                            Msg("! [MaterialCache]   FAILED: Could not wrap D3D11 buffer at %s b%u (encoded=0x%02X)",
+                                shaderTypeName, bindingSlot, encodedSlot);
                         }
                     }
                 }
@@ -599,6 +616,90 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     }
 
     return true;
+}
+
+// ══════════════════════════════════════════════════════════
+//  EXTRACT SAMPLERS
+// ══════════════════════════════════════════════════════════
+
+void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
+{
+    VERIFY(pass);
+    VERIFY(matPSO);
+
+#if defined(USE_DX11)
+    // Get X-Ray's render state from the pass
+    void* statePtr = pass->state._get();
+    if (!statePtr) {
+        Msg("! [MaterialCache] Pass has NULL state");
+        return;
+    }
+
+    dx11State* xrState = static_cast<dx11State*>(statePtr);
+
+    // Extract pixel shader samplers (most common)
+    // NOTE: X-Ray's sampler arrays are sparse - most slots are invalid
+    // D3D11 has max 16 sampler slots per stage, so only check those
+    const auto& psSamplers = xrState->GetPSSamplers();
+    u32 maxSamplerSlots = std::min<u32>(psSamplers.size(), D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT);
+
+    for (u32 slot = 0; slot < maxSamplerSlots; ++slot) {
+        auto samplerHandle = psSamplers[slot];
+        if (samplerHandle == dx11SamplerStateCache::hInvalidHandle)
+            continue;
+
+        // Get the D3D11 sampler state from SSManager
+        ID3DSamplerState* d3dSampler = SSManager.GetSamplerState(samplerHandle);
+        if (!d3dSampler) {
+            Msg("! [MaterialCache] Failed to get D3D11 sampler for PS slot %u", slot);
+            continue;
+        }
+
+        // Get sampler desc for debugging
+        D3D11_SAMPLER_DESC samplerDesc;
+        d3dSampler->GetDesc(&samplerDesc);
+
+        // Wrap X-Ray's D3D11 sampler in NVRHI
+        nvrhi::SamplerDesc nvrhiDesc;
+        nvrhiDesc.setMinFilter(samplerDesc.Filter != D3D11_FILTER_MIN_MAG_MIP_POINT);
+        nvrhiDesc.setMagFilter(samplerDesc.Filter != D3D11_FILTER_MIN_MAG_MIP_POINT);
+        nvrhiDesc.setMipFilter(samplerDesc.Filter != D3D11_FILTER_MIN_MAG_MIP_POINT);
+
+        // Convert address modes
+        auto convertAddressMode = [](D3D11_TEXTURE_ADDRESS_MODE mode) {
+            switch (mode) {
+                case D3D11_TEXTURE_ADDRESS_WRAP: return nvrhi::SamplerAddressMode::Wrap;
+                case D3D11_TEXTURE_ADDRESS_CLAMP: return nvrhi::SamplerAddressMode::Clamp;
+                case D3D11_TEXTURE_ADDRESS_MIRROR: return nvrhi::SamplerAddressMode::Mirror;
+                case D3D11_TEXTURE_ADDRESS_BORDER: return nvrhi::SamplerAddressMode::Border;
+                default: return nvrhi::SamplerAddressMode::Wrap;
+            }
+        };
+
+        nvrhiDesc.setAddressU(convertAddressMode(samplerDesc.AddressU));
+        nvrhiDesc.setAddressV(convertAddressMode(samplerDesc.AddressV));
+        nvrhiDesc.setAddressW(convertAddressMode(samplerDesc.AddressW));
+        nvrhiDesc.setMaxAnisotropy(static_cast<float>(samplerDesc.MaxAnisotropy));
+        nvrhiDesc.setMipBias(samplerDesc.MipLODBias);
+
+        nvrhi::SamplerHandle nvrhiSampler = m_device->GetNativeDevice()->createSampler(nvrhiDesc);
+        if (nvrhiSampler) {
+            MaterialPSO::SamplerInfo samplerInfo;
+            samplerInfo.slot = slot;
+            samplerInfo.nvrhiSampler = nvrhiSampler;
+            matPSO->samplers.push_back(samplerInfo);
+
+            Msg("  [MaterialCache] Extracted PS sampler at slot %u (aniso=%.1f)",
+                slot, nvrhiDesc.maxAnisotropy);
+        } else {
+            Msg("! [MaterialCache] Failed to create NVRHI sampler for PS slot %u", slot);
+        }
+    }
+
+    // TODO: Extract VS, GS, CS, HS, DS samplers if needed
+
+    Msg("  [MaterialCache] Extracted %u samplers", matPSO->samplers.size());
+#endif
 }
 
 // ══════════════════════════════════════════════════════════
@@ -635,7 +736,11 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
             nvrhi::BindingLayoutItem::Texture_SRV(i));
     }
 
-    // TODO: Add sampler binding
+    // Samplers (s0, s1, s2, ...)
+    for (const auto& samplerInfo : matPSO->samplers) {
+        layoutDesc.bindings.push_back(
+            nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
+    }
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
@@ -773,6 +878,15 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
             bindingDesc.bindings.push_back(item);
         } else {
             Msg("! [MaterialCache] Texture %u is NULL when creating binding set", i);
+        }
+    }
+
+    // Bind samplers at slots s0, s1, s2, etc.
+    for (const auto& samplerInfo : matPSO->samplers) {
+        if (samplerInfo.nvrhiSampler) {
+            bindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::Sampler(samplerInfo.slot, samplerInfo.nvrhiSampler));
+            Msg("  [MaterialCache] Binding sampler at slot %u", samplerInfo.slot);
         }
     }
 

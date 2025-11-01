@@ -101,6 +101,13 @@ struct MaterialPSO {
     xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;  // Size of slot 0 CB (for convenience)
 
+    // Samplers (extracted from X-Ray state)
+    struct SamplerInfo {
+        u32 slot;                    // Binding slot (s0, s1, s2, etc.)
+        nvrhi::SamplerHandle nvrhiSampler;  // NVRHI wrapped sampler
+    };
+    xr_vector<SamplerInfo> samplers;
+
     // Shader references (for debugging)
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
@@ -160,6 +167,9 @@ private:
 
     // Extract shader bytecode from SPass
     bool ExtractShaders(SPass* pass, MaterialPSO* matPSO);
+
+    // Extract samplers from SPass state
+    void ExtractSamplers(SPass* pass, MaterialPSO* matPSO);
 
     // Create binding layout for material
     nvrhi::BindingLayoutHandle CreateBindingLayout(const MaterialPSO* matPSO);
