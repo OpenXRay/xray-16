@@ -391,6 +391,19 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     return static_cast<u64>(hash);
 }
 
+static bool IsIACompatibleFormat(DXGI_FORMAT dxgiFormat) {
+
+    switch (dxgiFormat) {
+        case DXGI_FORMAT_B4G4R4A4_UNORM:
+        case DXGI_FORMAT_B5G6R5_UNORM:
+        case DXGI_FORMAT_B5G5R5A1_UNORM:
+            return false;
+
+        default:
+            return true;
+    }
+}
+
 void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc)
 {
     psoDesc.vertexAttributes.clear();
@@ -449,6 +462,12 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         }
 
         attr.semanticIndex = d3dElem.SemanticIndex;
+
+        if (!IsIACompatibleFormat(d3dElem.Format)) {
+            Msg("  Skipping vertex element '%s%d' with IA-incompatible format %u",
+                d3dElem.SemanticName, d3dElem.SemanticIndex, d3dElem.Format);
+            continue;
+        }
 
         attr.format = static_cast<nvrhi::Format>(d3dElem.Format);
 
