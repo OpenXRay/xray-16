@@ -266,9 +266,8 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
         return;
     }
 
-    nvrhi::GraphicsState state;
-    state.addBindingSet(bindingSet);
-    m_commandList->setGraphicsState(state);
+    m_currentState.bindings[slot] = bindingSet.Get();
+
 }
 
 void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
