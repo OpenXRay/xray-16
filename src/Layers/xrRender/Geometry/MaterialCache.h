@@ -139,6 +139,7 @@ private:
 
     // Create new PSO from shader element
     MaterialPSO* CreatePSO(
+        dxRender_Visual* visual,
         ShaderElement* elem,
         SPass* pass,
         const passes::GBufferOutputs& outputs,
@@ -165,7 +166,7 @@ private:
     static u64 ComputeStateHash(SPass* pass);
 
     // Setup PSO descriptor helpers
-    void SetupVertexAttributes(ng::PipelineStateDesc& psoDesc);
+    void SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         const passes::GBufferOutputs& outputs,
