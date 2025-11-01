@@ -275,6 +275,16 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
 
 }
 
+void RenderContext::WriteBuffer(nvrhi::IBuffer* buffer, const void* data, size_t dataSize, u64 offset) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(buffer != nullptr);
+    VERIFY(data != nullptr);
+    VERIFY(dataSize > 0);
+    VERIFY(m_commandList != nullptr);
+
+    m_commandList->writeBuffer(buffer, data, dataSize, offset);
+}
+
 void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
     VERIFY2(m_inRenderPass, "Must be in render pass!");
     VERIFY(buffer.IsValid());

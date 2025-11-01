@@ -63,10 +63,11 @@ bool GBufferPass::LoadShaders()
         Fmatrix worldViewProj;
         Fmatrix world;
         Fmatrix worldIT;
+        u8 padding[64];
     };
 
     ng::RenderDevice::BufferDesc cbDesc;
-    cbDesc.byteSize = sizeof(PerObjectConstants);
+    cbDesc.byteSize = 256;
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
     cbDesc.debugName = "PerObjectCB";
@@ -269,9 +270,6 @@ void GBufferPass::Execute(
         ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
-        xr_vector<nvrhi::BindingSetHandle> tempBindingSets;
-        tempBindingSets.reserve(batches.size());
-
         for (const auto& batch : batches) {
             ng::PipelineState* pipelineToUse = m_pipeline;
             MaterialPSO* matPSO = nullptr;
@@ -293,17 +291,34 @@ void GBufferPass::Execute(
             }
 
             if (matPSO) {
-                UpdatePerObjectConstantsData(batch);
+                struct PerObjectConstants {
+                    Fmatrix worldViewProj;
+                    Fmatrix world;
+                    Fmatrix worldIT;
+                };
+                PerObjectConstants constants;
+
+                Fmatrix viewProj;
+                viewProj.mul(Device.mView, Device.mProject);
+
+                constants.worldViewProj.mul(batch.worldMatrix, viewProj);
+                constants.world = batch.worldMatrix;
+
+                Fmatrix temp;
+                temp.invert(batch.worldMatrix);
+                constants.worldIT.transpose(temp);
 
                 VERIFY(m_perObjectCB.IsValid());
-                nvrhi::IBuffer* cbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
-                nvrhi::BindingSetHandle fullBindingSet = m_materialCache->CreateBindingSet(matPSO, cbBuffer);
+                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
+
+                ctx.WriteBuffer(vcbBuffer, &constants, sizeof(constants));
+
+                nvrhi::BindingSetHandle fullBindingSet =
+                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer);
 
                 if (fullBindingSet) {
                     ctx.SetBindingSet(0, fullBindingSet.Get());
                     currentBindingSet = fullBindingSet.Get();
-
-                    tempBindingSets.push_back(fullBindingSet);
                 }
             } else {
                 UpdatePerObjectConstants(ctx, batch);

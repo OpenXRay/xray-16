@@ -149,6 +149,8 @@ public:
     void SetConstantBuffer(u32 slot, BufferHandle buffer);
     void SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer);
 
+    void WriteBuffer(nvrhi::IBuffer* buffer, const void* data, size_t dataSize, u64 offset = 0);
+
     nvrhi::BindingLayoutHandle CreateBindingLayout(const BindingLayoutDesc& desc);
     BindingLayoutHandle CreateBindingLayout(const BindingLayoutDesc& desc, bool useHandle);
 

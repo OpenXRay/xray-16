@@ -75,6 +75,8 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
+    u32 perObjectCBSize = 0;
+
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
 
@@ -126,9 +128,9 @@ private:
 
 public:
     nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
-    nvrhi::BindingSetHandle CreateBindingSet(
-        const MaterialPSO* matPSO,
-        nvrhi::IBuffer* perObjectCB);
+    nvrhi::BindingSetHandle GetOrCreateBindingSet(
+        MaterialPSO* matPSO,
+        nvrhi::IBuffer* perObjectVCB);
 private:
 
     static u64 ComputeTextureHash(SPass* pass);

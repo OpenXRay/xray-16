@@ -381,6 +381,26 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->debugName = vs->cName;
 
+    if (!vs->constants.m_CBTable[0].empty()) {
+        const auto& cbRecord = vs->constants.m_CBTable[0][0];
+        dx11ConstantBuffer* cb = cbRecord.second._get();
+        if (cb) {
+            ID3DBuffer* d3dBuffer = cb->GetBuffer();
+            if (d3dBuffer) {
+                D3D11_BUFFER_DESC bufDesc;
+                d3dBuffer->GetDesc(&bufDesc);
+                matPSO->perObjectCBSize = bufDesc.ByteWidth;
+                Msg("  [MaterialCache] Extracted CB size: %u bytes from shader '%s'",
+                    matPSO->perObjectCBSize, vs->cName.c_str());
+            }
+        }
+    }
+
+    if (matPSO->perObjectCBSize == 0) {
+        Msg("! [MaterialCache] Failed to extract CB size from shader, using default 224 bytes");
+        matPSO->perObjectCBSize = 224;
+    }
+
     return true;
 }
 
@@ -392,7 +412,7 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
     layoutDesc.visibility = nvrhi::ShaderType::All;
 
     layoutDesc.bindings.push_back(
-        nvrhi::BindingLayoutItem::ConstantBuffer(0));
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0));
 
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
         layoutDesc.bindings.push_back(
@@ -435,18 +455,22 @@ nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPS
     return bindingSet;
 }
 
-nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
-    const MaterialPSO* matPSO,
-    nvrhi::IBuffer* perObjectCB)
+nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
+    MaterialPSO* matPSO,
+    nvrhi::IBuffer* perObjectVCB)
 {
     VERIFY(matPSO);
-    VERIFY(perObjectCB);
+    VERIFY(perObjectVCB);
     VERIFY(matPSO->bindingLayout);
+
+    if (matPSO->bindingSet) {
+        return matPSO->bindingSet;
+    }
 
     nvrhi::BindingSetDesc bindingDesc;
 
     bindingDesc.bindings.push_back(
-        nvrhi::BindingSetItem::ConstantBuffer(0, perObjectCB));
+        nvrhi::BindingSetItem::ConstantBuffer(0, perObjectVCB));
 
     Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
@@ -482,7 +506,7 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
         }
     }
 
-    Msg("  [MaterialCache] About to call CreateBindingSet");
+    Msg("  [MaterialCache] Creating NEW binding set (will be cached)");
     nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
         bindingDesc,
         matPSO->bindingLayout);
@@ -492,7 +516,9 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
         return nullptr;
     }
 
-    Msg("  [MaterialCache] Successfully created binding set");
+    matPSO->bindingSet = bindingSet;
+    Msg("  [MaterialCache] Successfully created and cached binding set");
+
     return bindingSet;
 }
 
