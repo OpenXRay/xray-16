@@ -82,6 +82,8 @@ private:
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
                 const GBufferOutputs& outputs);
 
+    void UpdatePerObjectConstantsData(const GeometryBatch& batch);
+
     void UpdatePerObjectConstants(ng::RenderContext& ctx, const GeometryBatch& batch);
 };
 

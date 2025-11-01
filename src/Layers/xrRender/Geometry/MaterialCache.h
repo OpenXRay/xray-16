@@ -124,11 +124,14 @@ private:
 
     nvrhi::BindingLayoutHandle CreateBindingLayout(const MaterialPSO* matPSO);
 
+public:
+    nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
     nvrhi::BindingSetHandle CreateBindingSet(
         const MaterialPSO* matPSO,
         nvrhi::IBuffer* perObjectCB);
+private:
 
-    static u64 ComputeTextureHash(const xr_vector<ng::TextureHandle>& textures);
+    static u64 ComputeTextureHash(SPass* pass);
 
     static u64 ComputeStateHash(SPass* pass);
 

@@ -8,7 +8,6 @@ namespace xray::render::ng {
 RenderDevice::RenderDevice()
     : m_initialized(false)
 {
-    Msg("! [RenderDevice] Constructor");
 }
 
 RenderDevice::~RenderDevice() {
@@ -22,8 +21,6 @@ nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
 bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context) {
     VERIFY(device);
     VERIFY(context);
-
-    Msg("! [RenderDevice] Initializing from D3D11 device...");
 
     m_nvrhiDevice = xr_make_unique<nvrhi_wrapper::NVRHIDevice>();
     if (!m_nvrhiDevice->Initialize(device, context)) {
@@ -40,14 +37,11 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
 
     m_initialized = true;
 
-    Msg("! [RenderDevice] Initialization successful");
     return true;
 }
 
 void RenderDevice::Shutdown() {
     if (!m_initialized) return;
-
-    Msg("! [RenderDevice] Shutting down...");
 
     if (m_stats.texturesAlive > 0) {
         Msg("! [RenderDevice] WARNING: %u textures leaked", m_stats.texturesAlive);
@@ -72,8 +66,6 @@ void RenderDevice::Shutdown() {
     m_nvrhiDevice.reset();
 
     m_initialized = false;
-
-    Msg("! [RenderDevice] Shutdown complete");
 }
 
 TextureHandle RenderDevice::CreateTexture(
@@ -114,11 +106,6 @@ TextureHandle RenderDevice::CreateTexture(
     m_stats.texturesCreated++;
     m_stats.textureMemory += memorySize;
 
-    Msg("~ [RenderDevice] Created texture: %s (%ux%u, %.2f MB)",
-        desc.debugName.c_str(),
-        desc.width, desc.height,
-        memorySize / (1024.0f * 1024.0f));
-
     return handle;
 }
 
@@ -151,8 +138,6 @@ TextureHandle RenderDevice::CreateTextureFromD3D11(
     m_stats.texturesAlive++;
     m_stats.texturesCreated++;
 
-    Msg("~ [RenderDevice] Wrapped D3D11 texture: %s", desc.debugName.c_str());
-
     return handle;
 }
 
@@ -176,8 +161,6 @@ void RenderDevice::DestroyTexture(TextureHandle handle) {
     info.nvrhiHandle = nullptr;
 
     FreeTextureHandle(handle);
-
-    Msg("~ [RenderDevice] Destroyed texture: %s", info.desc.debugName.c_str());
 }
 
 nvrhi::ITexture* RenderDevice::GetNativeTexture(TextureHandle handle) {
@@ -229,9 +212,6 @@ BufferHandle RenderDevice::CreateBuffer(
     m_stats.buffersCreated++;
     m_stats.bufferMemory += desc.byteSize;
 
-    Msg("~ [RenderDevice] Created buffer: %s (%llu bytes)",
-        desc.debugName.c_str(), desc.byteSize);
-
     return handle;
 }
 
@@ -249,8 +229,6 @@ void RenderDevice::DestroyBuffer(BufferHandle handle) {
     info.nvrhiHandle = nullptr;
 
     FreeBufferHandle(handle);
-
-    Msg("~ [RenderDevice] Destroyed buffer: %s", info.desc.debugName.c_str());
 }
 
 void RenderDevice::UpdateBuffer(
@@ -310,8 +288,6 @@ SamplerHandle RenderDevice::CreateSampler(const SamplerDesc& desc) {
     m_stats.samplersAlive++;
     m_stats.samplersCreated++;
 
-    Msg("~ [RenderDevice] Created sampler: %s", desc.debugName.c_str());
-
     return handle;
 }
 
@@ -328,8 +304,6 @@ void RenderDevice::DestroySampler(SamplerHandle handle) {
     info.nvrhiHandle = nullptr;
 
     FreeSamplerHandle(handle);
-
-    Msg("~ [RenderDevice] Destroyed sampler: %s", info.desc.debugName.c_str());
 }
 
 nvrhi::BindingLayoutHandle RenderDevice::CreateBindingLayout(const nvrhi::BindingLayoutDesc& desc) {
@@ -392,8 +366,6 @@ ShaderHandle RenderDevice::CreateShader(
     m_stats.shadersAlive++;
     m_stats.shadersCreated++;
 
-    Msg("~ [RenderDevice] Created shader: %s", debugName);
-
     return handle;
 }
 
@@ -410,8 +382,6 @@ void RenderDevice::DestroyShader(ShaderHandle handle) {
     info.shader.reset();
 
     FreeShaderHandle(handle);
-
-    Msg("~ [RenderDevice] Destroyed shader");
 }
 
 RCShader* RenderDevice::GetShader(ShaderHandle handle) {
@@ -436,7 +406,6 @@ RenderContext* RenderDevice::CreateContext() {
     RenderContext* context = new RenderContext(this, cmdList);
     m_stats.contextsAlive++;
 
-    Msg("~ [RenderDevice] Created render context");
     return context;
 }
 
@@ -445,8 +414,6 @@ void RenderDevice::DestroyContext(RenderContext* context) {
 
     delete context;
     m_stats.contextsAlive--;
-
-    Msg("~ [RenderDevice] Destroyed render context");
 }
 
 void RenderDevice::ExecuteContext(RenderContext* context) {

@@ -11,21 +11,92 @@
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#include "../Externals/nvrhi/src/common/dxgi-format.h"
+#endif
+
 namespace xray::render {
 
 using namespace passes;
 using namespace xray::render::RENDER_NAMESPACE;
 
+
+nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
+    for (uint32_t i = 0; i < uint32_t(nvrhi::Format::COUNT); i++) {
+        nvrhi::Format nvrhiFormat = static_cast<nvrhi::Format>(i);
+        const nvrhi::DxgiFormatMapping& mapping = nvrhi::getDxgiFormatMapping(nvrhiFormat);
+
+        if (mapping.resourceFormat == dxgiFormat ||
+            mapping.srvFormat == dxgiFormat ||
+            mapping.rtvFormat == dxgiFormat) {
+            return nvrhiFormat;
+        }
+    }
+
+    Msg("! [MaterialCache] Failed to convert DXGI_FORMAT %u to nvrhi::Format", dxgiFormat);
+    return nvrhi::Format::UNKNOWN;
+}
+
+nvrhi::Format ConvertVertexFormat(DXGI_FORMAT dxgiFormat) {
+    switch (dxgiFormat) {
+    case DXGI_FORMAT_R32G32B32A32_FLOAT: return nvrhi::Format::RGBA32_FLOAT;
+    case DXGI_FORMAT_R32G32B32_FLOAT:    return nvrhi::Format::RGB32_FLOAT;
+    case DXGI_FORMAT_R32G32_FLOAT:       return nvrhi::Format::RG32_FLOAT;
+    case DXGI_FORMAT_R32_FLOAT:          return nvrhi::Format::R32_FLOAT;
+
+    case DXGI_FORMAT_R16G16B16A16_FLOAT: return nvrhi::Format::RGBA16_FLOAT;
+    case DXGI_FORMAT_R16G16_FLOAT:       return nvrhi::Format::RG16_FLOAT;
+    case DXGI_FORMAT_R16_FLOAT:          return nvrhi::Format::R16_FLOAT;
+
+    case DXGI_FORMAT_R16G16B16A16_UNORM: return nvrhi::Format::RGBA16_UNORM;
+    case DXGI_FORMAT_R16G16B16A16_SNORM: return nvrhi::Format::RGBA16_SNORM;
+    case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
+    case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
+
+    case DXGI_FORMAT_R16G16_UNORM:       return nvrhi::Format::RG16_UNORM;
+    case DXGI_FORMAT_R16G16_SNORM:       return nvrhi::Format::RG16_SNORM;
+    case DXGI_FORMAT_R16G16_UINT:        return nvrhi::Format::RG16_UINT;
+    case DXGI_FORMAT_R16G16_SINT:        return nvrhi::Format::RG16_SINT;
+
+    case DXGI_FORMAT_R8G8B8A8_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+    case DXGI_FORMAT_R8G8B8A8_SNORM:     return nvrhi::Format::RGBA8_SNORM;
+    case DXGI_FORMAT_R8G8B8A8_UINT:      return nvrhi::Format::RGBA8_UINT;
+    case DXGI_FORMAT_R8G8B8A8_SINT:      return nvrhi::Format::RGBA8_SINT;
+
+    case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
+    case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
+    case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
+    case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
+
+    case DXGI_FORMAT_R10G10B10A2_UNORM:  return nvrhi::Format::R10G10B10A2_UNORM;
+    case DXGI_FORMAT_R10G10B10A2_UINT:   return nvrhi::Format::RGBA16_UINT;
+    case DXGI_FORMAT_R11G11B10_FLOAT:    return nvrhi::Format::R11G11B10_FLOAT;
+
+    case DXGI_FORMAT_B4G4R4A4_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+    case DXGI_FORMAT_B5G6R5_UNORM:       return nvrhi::Format::RGBA8_UNORM;
+    case DXGI_FORMAT_B5G5R5A1_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+        return nvrhi::Format::BGRA8_UNORM;
+
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+        return nvrhi::Format::BGRA8_UNORM;
+
+    default:
+        Msg("! [MaterialCache] Unknown DXGI format %d, defaulting to RGBA32_FLOAT", dxgiFormat);
+        return nvrhi::Format::RGBA32_FLOAT;
+    }
+}
+
 MaterialCache::MaterialCache(ng::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);
-    Msg("* [MaterialCache] Created");
 }
 
 MaterialCache::~MaterialCache() {
     Clear();
-    Msg("* [MaterialCache] Destroyed");
 }
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
@@ -62,13 +133,15 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
         return nullptr;
     }
 
-    auto tempPSO = xr_make_unique<MaterialPSO>();
-    ExtractTextures(pass, tempPSO.get());
-
-    u64 textureHash = ComputeTextureHash(tempPSO->textures);
+    u64 textureHash = ComputeTextureHash(pass);
     u64 stateHash = ComputeStateHash(pass);
 
     MaterialKey key(shader, textureHash, stateHash);
+
+    const char* shaderName = "unknown";
+    if (pass->vs._get() && pass->vs._get()->cName.c_str()) {
+        shaderName = pass->vs._get()->cName.c_str();
+    }
 
     auto it = m_cache.find(key);
     if (it != m_cache.end()) {
@@ -77,8 +150,8 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     }
 
     m_stats.numCacheMisses++;
-
-    Msg("~ [MaterialCache] Creating PSO (hash: texture=0x%llX, state=0x%llX)", textureHash, stateHash);
+    Msg("! [MaterialCache] Cache MISS - creating PSO for '%s' (hash: tex=0x%llX, state=0x%llX) [hits=%u, misses=%u]",
+        shaderName, textureHash, stateHash, m_stats.numCacheHits, m_stats.numCacheMisses);
 
     MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
     if (!pso) {
@@ -88,8 +161,6 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
     m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
-
-    Msg("  ✓ PSO created and cached (%u total PSOs)", m_stats.numCachedPSOs);
 
     return pso;
 }
@@ -104,22 +175,17 @@ MaterialPSO* MaterialCache::CreatePSO(
     auto pso = xr_make_unique<MaterialPSO>();
 
     ExtractTextures(pass, pso.get());
-    Msg("  Extracted %u textures", pso->textures.size());
 
     if (!ExtractShaders(pass, pso.get())) {
         Msg("! [MaterialCache] Failed to extract shaders");
         return nullptr;
     }
 
-    Msg("  Extracted VS/PS shaders");
-
     pso->bindingLayout = CreateBindingLayout(pso.get());
     if (!pso->bindingLayout) {
         Msg("! [MaterialCache] Failed to create binding layout");
         return nullptr;
     }
-
-    Msg("  Created binding layout");
 
     if (!pso->vertexShader->bytecode) {
         Msg("! [MaterialCache] Vertex shader has no bytecode");
@@ -155,8 +221,6 @@ MaterialPSO* MaterialCache::CreatePSO(
         return nullptr;
     }
 
-    Msg("  Created VS/PS shaders from bytecode");
-
     ng::RCShader* rcVS = m_device->GetShader(vsHandle);
     if (!rcVS) {
         Msg("! [MaterialCache] Failed to get VS from handle");
@@ -185,8 +249,6 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     psoDesc.debugName = pso->debugName;
 
-    Msg("  Built PSO descriptor");
-
     ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache] Pipeline cache is NULL");
@@ -200,8 +262,6 @@ MaterialPSO* MaterialCache::CreatePSO(
     }
 
     pso->pso = nvrhiPSO;
-
-    Msg("  ✓ Pipeline state created");
 
     m_stats.totalPSOCreations++;
 
@@ -237,6 +297,9 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        srv->GetDesc(&srvDesc);
+
         ID3D11Resource* d3dResource = nullptr;
         srv->GetResource(&d3dResource);
         if (!d3dResource) {
@@ -257,17 +320,33 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         d3dTex2D->GetDesc(&d3dDesc);
         d3dTex2D->Release();
 
+        if (srvDesc.Format != d3dDesc.Format) {
+            Msg("! [MaterialCache] Format mismatch for texture '%s': Resource=0x%x (%u), SRV=0x%x (%u)",
+                tex->cName.c_str(),
+                d3dDesc.Format, d3dDesc.Format,
+                srvDesc.Format, srvDesc.Format);
+        }
+
         ng::RenderDevice::TextureDesc texDesc;
         texDesc.width = d3dDesc.Width;
         texDesc.height = d3dDesc.Height;
         texDesc.mipLevels = d3dDesc.MipLevels;
         texDesc.arraySize = d3dDesc.ArraySize;
-        texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
-        texDesc.format = nvrhi::Format::RGBA8_UNORM;
+
+        if (d3dDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
+            texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+        } else if (d3dDesc.ArraySize > 1) {
+            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
+        } else {
+            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+        }
+
+        texDesc.format = ConvertDxgiFormatToNvrhi(d3dDesc.Format);
         texDesc.isRenderTarget = false;
         texDesc.isUAV = false;
         texDesc.debugName = tex->cName.c_str();
 
+        Msg("  [MaterialCache] Wrapping texture '%s' with format %u", tex->cName.c_str(), texDesc.format);
         ng::TextureHandle nvrhiTex = m_device->CreateTextureFromD3D11(d3dResource, texDesc);
         d3dResource->Release();
 
@@ -276,9 +355,8 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
+        Msg("  [MaterialCache] Successfully wrapped texture '%s'", tex->cName.c_str());
         matPSO->textures.push_back(nvrhiTex);
-
-        Msg("    Texture[%u]: '%s' (wrapped)", stage, tex->cName.c_str());
     }
 }
 
@@ -303,8 +381,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->debugName = vs->cName;
 
-    Msg("    VS: '%s', PS: '%s'", vs->cName.c_str(), ps->cName.c_str());
-
     return true;
 }
 
@@ -323,8 +399,6 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
             nvrhi::BindingLayoutItem::Texture_SRV(i));
     }
 
-    Msg("    Creating binding layout: 1 CB + %u textures", matPSO->textures.size());
-
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
         Msg("! [MaterialCache] Failed to create binding layout");
@@ -332,6 +406,33 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
     }
 
     return layout;
+}
+
+nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPSO* matPSO)
+{
+    VERIFY(matPSO);
+    VERIFY(matPSO->bindingLayout);
+
+    nvrhi::BindingSetDesc bindingDesc;
+
+    for (u32 i = 0; i < matPSO->textures.size(); i++) {
+        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(matPSO->textures[i]);
+        if (nativeTex) {
+            bindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::Texture_SRV(i, nativeTex));
+        }
+    }
+
+    nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
+        bindingDesc,
+        matPSO->bindingLayout);
+
+    if (!bindingSet) {
+        Msg("! [MaterialCache] Failed to create material binding set");
+        return nullptr;
+    }
+
+    return bindingSet;
 }
 
 nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
@@ -347,14 +448,41 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
     bindingDesc.bindings.push_back(
         nvrhi::BindingSetItem::ConstantBuffer(0, perObjectCB));
 
+    Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
         nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(matPSO->textures[i]);
         if (nativeTex) {
-            bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::Texture_SRV(i, nativeTex));
+            const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
+            Msg("  [MaterialCache] Binding texture %u: format=%u (0x%x), dimension=%u, arraySize=%u, mipLevels=%u",
+                i, texDesc.format, texDesc.format, texDesc.dimension, texDesc.arraySize, texDesc.mipLevels);
+
+            nvrhi::BindingSetItem item = {};
+            item.resourceHandle = nativeTex;
+            item.slot = i;
+            item.type = nvrhi::ResourceType::Texture_SRV;
+            item.format = texDesc.format;
+
+            Msg("  [MaterialCache] Set item.format = %u (0x%x)", item.format, item.format);
+
+            if (texDesc.dimension == nvrhi::TextureDimension::TextureCube) {
+                item.dimension = nvrhi::TextureDimension::TextureCube;
+            } else if (texDesc.dimension == nvrhi::TextureDimension::Texture2DArray) {
+                item.dimension = nvrhi::TextureDimension::Texture2DArray;
+            } else if (texDesc.dimension == nvrhi::TextureDimension::Texture3D) {
+                item.dimension = nvrhi::TextureDimension::Texture3D;
+            } else {
+                item.dimension = nvrhi::TextureDimension::Texture2D;
+            }
+
+            item.subresources = nvrhi::AllSubresources;
+
+            bindingDesc.bindings.push_back(item);
+        } else {
+            Msg("! [MaterialCache] Texture %u is NULL when creating binding set", i);
         }
     }
 
+    Msg("  [MaterialCache] About to call CreateBindingSet");
     nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
         bindingDesc,
         matPSO->bindingLayout);
@@ -364,17 +492,26 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
         return nullptr;
     }
 
+    Msg("  [MaterialCache] Successfully created binding set");
     return bindingSet;
 }
 
-u64 MaterialCache::ComputeTextureHash(const xr_vector<ng::TextureHandle>& textures)
+u64 MaterialCache::ComputeTextureHash(SPass* pass)
 {
-    if (textures.empty())
+    if (!pass)
+        return 0;
+
+    STextureList* texList = pass->T._get();
+    if (!texList || texList->empty())
         return 0;
 
     u32 hash = 0;
-    for (const auto& tex : textures) {
-        hash = crc32(&tex.index, sizeof(tex.index), hash);
+    for (const auto& texPair : *texList) {
+        CTexture* tex = texPair.second._get();
+        if (tex) {
+            void* texPtr = tex;
+            hash = crc32(&texPtr, sizeof(texPtr), hash);
+        }
     }
 
     return static_cast<u64>(hash);
@@ -389,64 +526,6 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     u32 hash = crc32(&statePtr, sizeof(statePtr), 0);
 
     return static_cast<u64>(hash);
-}
-
-namespace {
-    nvrhi::Format ConvertVertexFormat(DXGI_FORMAT dxgiFormat) {
-        switch (dxgiFormat) {
-            case DXGI_FORMAT_R32G32B32A32_FLOAT: return nvrhi::Format::RGBA32_FLOAT;
-            case DXGI_FORMAT_R32G32B32_FLOAT:    return nvrhi::Format::RGB32_FLOAT;
-            case DXGI_FORMAT_R32G32_FLOAT:       return nvrhi::Format::RG32_FLOAT;
-            case DXGI_FORMAT_R32_FLOAT:          return nvrhi::Format::R32_FLOAT;
-
-            case DXGI_FORMAT_R16G16B16A16_FLOAT: return nvrhi::Format::RGBA16_FLOAT;
-            case DXGI_FORMAT_R16G16_FLOAT:       return nvrhi::Format::RG16_FLOAT;
-            case DXGI_FORMAT_R16_FLOAT:          return nvrhi::Format::R16_FLOAT;
-
-            case DXGI_FORMAT_R8G8B8A8_UNORM:     return nvrhi::Format::RGBA8_UNORM;
-            case DXGI_FORMAT_R8G8B8A8_SNORM:     return nvrhi::Format::RGBA8_SNORM;
-            case DXGI_FORMAT_R8G8B8A8_UINT:      return nvrhi::Format::RGBA8_UINT;
-            case DXGI_FORMAT_R8G8B8A8_SINT:      return nvrhi::Format::RGBA8_SINT;
-
-            case DXGI_FORMAT_R16G16B16A16_UNORM: return nvrhi::Format::RGBA16_UNORM;
-            case DXGI_FORMAT_R16G16B16A16_SNORM: return nvrhi::Format::RGBA16_SNORM;
-            case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
-            case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
-
-            case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
-            case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
-            case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
-            case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
-
-            case DXGI_FORMAT_R10G10B10A2_UNORM:  return nvrhi::Format::R10G10B10A2_UNORM;
-            case DXGI_FORMAT_R10G10B10A2_UINT:
-                Msg("  [MaterialCache] Converting R10G10B10A2_UINT → RGBA16_UINT for compatibility");
-                return nvrhi::Format::RGBA16_UINT;
-            case DXGI_FORMAT_R11G11B10_FLOAT:    return nvrhi::Format::R11G11B10_FLOAT;
-
-            case DXGI_FORMAT_B4G4R4A4_UNORM:
-                Msg("  [MaterialCache] Converting B4G4R4A4_UNORM → RGBA8_UNORM for IA compatibility");
-                return nvrhi::Format::RGBA8_UNORM;
-
-            case DXGI_FORMAT_B5G6R5_UNORM:
-                Msg("  [MaterialCache] Converting B5G6R5_UNORM → RGBA8_UNORM for IA compatibility");
-                return nvrhi::Format::RGBA8_UNORM;
-
-            case DXGI_FORMAT_B5G5R5A1_UNORM:
-                Msg("  [MaterialCache] Converting B5G5R5A1_UNORM → RGBA8_UNORM for IA compatibility");
-                return nvrhi::Format::RGBA8_UNORM;
-
-            case DXGI_FORMAT_B8G8R8A8_UNORM:
-                return nvrhi::Format::BGRA8_UNORM;
-
-            case DXGI_FORMAT_B8G8R8X8_UNORM:
-                return nvrhi::Format::BGRA8_UNORM;
-
-            default:
-                Msg("! [MaterialCache] Unknown DXGI format %d, defaulting to RGBA32_FLOAT", dxgiFormat);
-                return nvrhi::Format::RGBA32_FLOAT;
-        }
-    }
 }
 
 void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc)
@@ -537,25 +616,167 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
         psoDesc.vertexAttributes.push_back(attr);
     }
+}
 
-    Msg("  Extracted %u vertex attributes from geometry", psoDesc.vertexAttributes.size());
+namespace {
+    ng::CullMode ConvertCullMode(D3D11_CULL_MODE d3dCull) {
+        switch (d3dCull) {
+            case D3D11_CULL_NONE: return ng::CullMode::None;
+            case D3D11_CULL_FRONT: return ng::CullMode::Front;
+            case D3D11_CULL_BACK: return ng::CullMode::Back;
+            default: return ng::CullMode::Back;
+        }
+    }
+
+    ng::FillMode ConvertFillMode(D3D11_FILL_MODE d3dFill) {
+        switch (d3dFill) {
+            case D3D11_FILL_WIREFRAME: return ng::FillMode::Wireframe;
+            case D3D11_FILL_SOLID: return ng::FillMode::Solid;
+            default: return ng::FillMode::Solid;
+        }
+    }
+
+    ng::ComparisonFunc ConvertComparisonFunc(D3D11_COMPARISON_FUNC d3dFunc) {
+        switch (d3dFunc) {
+            case D3D11_COMPARISON_NEVER: return ng::ComparisonFunc::Never;
+            case D3D11_COMPARISON_LESS: return ng::ComparisonFunc::Less;
+            case D3D11_COMPARISON_EQUAL: return ng::ComparisonFunc::Equal;
+            case D3D11_COMPARISON_LESS_EQUAL: return ng::ComparisonFunc::LessEqual;
+            case D3D11_COMPARISON_GREATER: return ng::ComparisonFunc::Greater;
+            case D3D11_COMPARISON_NOT_EQUAL: return ng::ComparisonFunc::NotEqual;
+            case D3D11_COMPARISON_GREATER_EQUAL: return ng::ComparisonFunc::GreaterEqual;
+            case D3D11_COMPARISON_ALWAYS: return ng::ComparisonFunc::Always;
+            default: return ng::ComparisonFunc::Less;
+        }
+    }
+
+    ng::BlendFactor ConvertBlendFactor(D3D11_BLEND d3dBlend) {
+        switch (d3dBlend) {
+            case D3D11_BLEND_ZERO: return ng::BlendFactor::Zero;
+            case D3D11_BLEND_ONE: return ng::BlendFactor::One;
+            case D3D11_BLEND_SRC_COLOR: return ng::BlendFactor::SrcColor;
+            case D3D11_BLEND_INV_SRC_COLOR: return ng::BlendFactor::InvSrcColor;
+            case D3D11_BLEND_SRC_ALPHA: return ng::BlendFactor::SrcAlpha;
+            case D3D11_BLEND_INV_SRC_ALPHA: return ng::BlendFactor::InvSrcAlpha;
+            case D3D11_BLEND_DEST_ALPHA: return ng::BlendFactor::DstAlpha;
+            case D3D11_BLEND_INV_DEST_ALPHA: return ng::BlendFactor::InvDstAlpha;
+            case D3D11_BLEND_DEST_COLOR: return ng::BlendFactor::DstColor;
+            case D3D11_BLEND_INV_DEST_COLOR: return ng::BlendFactor::InvDstColor;
+            case D3D11_BLEND_SRC_ALPHA_SAT: return ng::BlendFactor::SrcAlphaSat;
+            case D3D11_BLEND_BLEND_FACTOR: return ng::BlendFactor::BlendFactor;
+            case D3D11_BLEND_INV_BLEND_FACTOR: return ng::BlendFactor::InvBlendFactor;
+            default: return ng::BlendFactor::One;
+        }
+    }
+
+    ng::BlendOp ConvertBlendOp(D3D11_BLEND_OP d3dOp) {
+        switch (d3dOp) {
+            case D3D11_BLEND_OP_ADD: return ng::BlendOp::Add;
+            case D3D11_BLEND_OP_SUBTRACT: return ng::BlendOp::Subtract;
+            case D3D11_BLEND_OP_REV_SUBTRACT: return ng::BlendOp::RevSubtract;
+            case D3D11_BLEND_OP_MIN: return ng::BlendOp::Min;
+            case D3D11_BLEND_OP_MAX: return ng::BlendOp::Max;
+            default: return ng::BlendOp::Add;
+        }
+    }
+
+    ng::ColorWriteMask ConvertColorWriteMask(u8 d3dMask) {
+        ng::ColorWriteMask mask = ng::ColorWriteMask::None;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_RED)   mask = mask | ng::ColorWriteMask::Red;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_GREEN) mask = mask | ng::ColorWriteMask::Green;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_BLUE)  mask = mask | ng::ColorWriteMask::Blue;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_ALPHA) mask = mask | ng::ColorWriteMask::Alpha;
+        return mask;
+    }
 }
 
 void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
 {
+    VERIFY(pass);
 
-    psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
-    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
-    psoDesc.rasterizerState.frontCounterClockwise = false;
-    psoDesc.rasterizerState.depthClipEnable = true;
+    SState* xrState = pass->state._get();
+    if (!xrState || !xrState->state) {
+        psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
+        psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.blendState.renderTargets[0].blendEnable = false;
+        return;
+    }
 
-    psoDesc.depthStencilState.depthTestEnable = true;
-    psoDesc.depthStencilState.depthWriteEnable = true;
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
-    psoDesc.depthStencilState.stencilEnable = false;
+#if defined(USE_DX11)
+    dx11State* d3dState = static_cast<dx11State*>(xrState->state);
 
-    psoDesc.blendState.renderTargets[0].blendEnable = false;
-    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::All;
+    ID3DRasterizerState* rasterizerState = d3dState->GetRasterizerState();
+    if (rasterizerState) {
+        D3D11_RASTERIZER_DESC rsDesc;
+        rasterizerState->GetDesc(&rsDesc);
+
+        psoDesc.rasterizerState.cullMode = ConvertCullMode(rsDesc.CullMode);
+        psoDesc.rasterizerState.fillMode = ConvertFillMode(rsDesc.FillMode);
+        psoDesc.rasterizerState.frontCounterClockwise = rsDesc.FrontCounterClockwise;
+        psoDesc.rasterizerState.depthClipEnable = rsDesc.DepthClipEnable;
+        psoDesc.rasterizerState.depthBias = rsDesc.DepthBias;
+        psoDesc.rasterizerState.slopeScaledDepthBias = rsDesc.SlopeScaledDepthBias;
+        psoDesc.rasterizerState.scissorEnable = rsDesc.ScissorEnable;
+    }
+
+    ID3DDepthStencilState* depthStencilState = d3dState->GetDepthStencilState();
+    if (depthStencilState) {
+        D3D11_DEPTH_STENCIL_DESC dsDesc;
+        depthStencilState->GetDesc(&dsDesc);
+
+        psoDesc.depthStencilState.depthTestEnable = dsDesc.DepthEnable;
+        psoDesc.depthStencilState.depthWriteEnable = (dsDesc.DepthWriteMask == D3D11_DEPTH_WRITE_MASK_ALL);
+        psoDesc.depthStencilState.depthFunc = ConvertComparisonFunc(dsDesc.DepthFunc);
+        psoDesc.depthStencilState.stencilEnable = dsDesc.StencilEnable;
+
+        if (dsDesc.StencilEnable) {
+            psoDesc.depthStencilState.stencilReadMask = dsDesc.StencilReadMask;
+            psoDesc.depthStencilState.stencilWriteMask = dsDesc.StencilWriteMask;
+
+            psoDesc.depthStencilState.frontFace.compareFunc = ConvertComparisonFunc(dsDesc.FrontFace.StencilFunc);
+            psoDesc.depthStencilState.backFace.compareFunc = ConvertComparisonFunc(dsDesc.BackFace.StencilFunc);
+        }
+    }
+
+    ID3DBlendState* blendState = d3dState->GetBlendState();
+    if (blendState) {
+        D3D11_BLEND_DESC blendDesc;
+        blendState->GetDesc(&blendDesc);
+
+        psoDesc.blendState.alphaToCoverageEnable = blendDesc.AlphaToCoverageEnable;
+
+        if (blendDesc.IndependentBlendEnable) {
+            for (int i = 0; i < 3; ++i) {
+                const D3D11_RENDER_TARGET_BLEND_DESC& rtBlend = blendDesc.RenderTarget[i];
+
+                psoDesc.blendState.renderTargets[i].blendEnable = rtBlend.BlendEnable;
+                psoDesc.blendState.renderTargets[i].srcBlend = ConvertBlendFactor(rtBlend.SrcBlend);
+                psoDesc.blendState.renderTargets[i].dstBlend = ConvertBlendFactor(rtBlend.DestBlend);
+                psoDesc.blendState.renderTargets[i].blendOp = ConvertBlendOp(rtBlend.BlendOp);
+                psoDesc.blendState.renderTargets[i].srcBlendAlpha = ConvertBlendFactor(rtBlend.SrcBlendAlpha);
+                psoDesc.blendState.renderTargets[i].dstBlendAlpha = ConvertBlendFactor(rtBlend.DestBlendAlpha);
+                psoDesc.blendState.renderTargets[i].blendOpAlpha = ConvertBlendOp(rtBlend.BlendOpAlpha);
+                psoDesc.blendState.renderTargets[i].writeMask = ConvertColorWriteMask(rtBlend.RenderTargetWriteMask);
+            }
+        } else {
+            const D3D11_RENDER_TARGET_BLEND_DESC& rtBlend = blendDesc.RenderTarget[0];
+
+            for (int i = 0; i < 3; ++i) {
+                psoDesc.blendState.renderTargets[i].blendEnable = rtBlend.BlendEnable;
+                psoDesc.blendState.renderTargets[i].srcBlend = ConvertBlendFactor(rtBlend.SrcBlend);
+                psoDesc.blendState.renderTargets[i].dstBlend = ConvertBlendFactor(rtBlend.DestBlend);
+                psoDesc.blendState.renderTargets[i].blendOp = ConvertBlendOp(rtBlend.BlendOp);
+                psoDesc.blendState.renderTargets[i].srcBlendAlpha = ConvertBlendFactor(rtBlend.SrcBlendAlpha);
+                psoDesc.blendState.renderTargets[i].dstBlendAlpha = ConvertBlendFactor(rtBlend.DestBlendAlpha);
+                psoDesc.blendState.renderTargets[i].blendOpAlpha = ConvertBlendOp(rtBlend.BlendOpAlpha);
+                psoDesc.blendState.renderTargets[i].writeMask = ConvertColorWriteMask(rtBlend.RenderTargetWriteMask);
+            }
+        }
+    }
+#endif
 }
 
 void MaterialCache::SetupRenderTargets(
@@ -563,20 +784,29 @@ void MaterialCache::SetupRenderTargets(
     const xray::render::framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
 {
+    nvrhi::ITexture* albedoTex = fg.GetPhysicalTexture(outputs.albedo);
+    nvrhi::ITexture* normalTex = fg.GetPhysicalTexture(outputs.normal);
+    nvrhi::ITexture* materialTex = fg.GetPhysicalTexture(outputs.material);
+    nvrhi::ITexture* depthTex = fg.GetPhysicalTexture(outputs.depth);
+
+    if (!albedoTex || !normalTex || !materialTex || !depthTex) {
+        psoDesc.renderTargetCount = 3;
+        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
+        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
+        psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
+        psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
+        return;
+    }
+
     psoDesc.renderTargetCount = 3;
-
-    psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
-
-    psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
-
-    psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
-
-    psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
+    psoDesc.renderTargetFormats[0] = albedoTex->getDesc().format;
+    psoDesc.renderTargetFormats[1] = normalTex->getDesc().format;
+    psoDesc.renderTargetFormats[2] = materialTex->getDesc().format;
+    psoDesc.depthStencilFormat = depthTex->getDesc().format;
 }
 
 void MaterialCache::Clear()
 {
-    Msg("~ [MaterialCache] Clearing cache (%u PSOs)", m_stats.numCachedPSOs);
     m_cache.clear();
     m_stats = Stats{};
 }

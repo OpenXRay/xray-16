@@ -34,7 +34,8 @@ public:
             Texture1D,
             Texture2D,
             Texture3D,
-            TextureCube
+            TextureCube,
+            Texture2DArray,
         };
         Dimension dimension = Texture2D;
 

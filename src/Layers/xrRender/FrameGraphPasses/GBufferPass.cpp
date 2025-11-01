@@ -269,11 +269,15 @@ void GBufferPass::Execute(
         ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
+        xr_vector<nvrhi::BindingSetHandle> tempBindingSets;
+        tempBindingSets.reserve(batches.size());
+
         for (const auto& batch : batches) {
             ng::PipelineState* pipelineToUse = m_pipeline;
+            MaterialPSO* matPSO = nullptr;
 
             if (batch.visual && m_materialCache) {
-                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(
+                matPSO = m_materialCache->GetOrCreatePSO(
                     batch.visual,
                     outputs,
                     fg);
@@ -288,11 +292,26 @@ void GBufferPass::Execute(
                 currentPipeline = pipelineToUse;
             }
 
-            UpdatePerObjectConstants(ctx, batch);
+            if (matPSO) {
+                UpdatePerObjectConstantsData(batch);
 
-            if (batch.bindingSet != currentBindingSet) {
-                ctx.SetBindingSet(0, batch.bindingSet);
-                currentBindingSet = batch.bindingSet;
+                VERIFY(m_perObjectCB.IsValid());
+                nvrhi::IBuffer* cbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
+                nvrhi::BindingSetHandle fullBindingSet = m_materialCache->CreateBindingSet(matPSO, cbBuffer);
+
+                if (fullBindingSet) {
+                    ctx.SetBindingSet(0, fullBindingSet.Get());
+                    currentBindingSet = fullBindingSet.Get();
+
+                    tempBindingSets.push_back(fullBindingSet);
+                }
+            } else {
+                UpdatePerObjectConstants(ctx, batch);
+
+                if (batch.bindingSet != currentBindingSet) {
+                    ctx.SetBindingSet(0, batch.bindingSet);
+                    currentBindingSet = batch.bindingSet;
+                }
             }
 
             ctx.SetVertexBuffer(0, batch.vertexBuffer.Get(), 0);
@@ -324,10 +343,8 @@ void GBufferPass::Execute(
         m_stats.cpuTimeMs);
 }
 
-void GBufferPass::UpdatePerObjectConstants(
-    ng::RenderContext& ctx,
-    const GeometryBatch& batch
-) {
+void GBufferPass::UpdatePerObjectConstantsData(const GeometryBatch& batch)
+{
     struct PerObjectConstants {
         Fmatrix worldViewProj;
         Fmatrix world;
@@ -349,6 +366,13 @@ void GBufferPass::UpdatePerObjectConstants(
 
     VERIFY(m_perObjectCB.IsValid());
     m_device->UpdateBuffer(m_perObjectCB, &constants, sizeof(constants));
+}
+
+void GBufferPass::UpdatePerObjectConstants(
+    ng::RenderContext& ctx,
+    const GeometryBatch& batch
+) {
+    UpdatePerObjectConstantsData(batch);
 
     ctx.SetConstantBuffer(0, m_perObjectCB);
 }
