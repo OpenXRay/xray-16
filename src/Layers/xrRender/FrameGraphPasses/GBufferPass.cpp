@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GBufferPass.h"
+#include "ShaderConstants.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -232,6 +233,22 @@ void GBufferPass::Execute(
         }
     }
 
+    GlobalConstants globalCB = {};
+    FillGlobalConstants(globalCB);
+
+    ID3D11Device* d3dDevice = static_cast<ID3D11Device*>(
+        m_device->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
+    VERIFY(d3dDevice);
+
+    ID3D11DeviceContext* d3dContext = nullptr;
+    d3dDevice->GetImmediateContext(&d3dContext);
+    VERIFY(d3dContext);
+
+    xr_set<ID3D11Buffer*> updatedBuffers;
+
+    Msg("  [GBufferPass] Prepared global CB with custom data (eye=%.1f,%.1f,%.1f)",
+        globalCB.eye_position.x, globalCB.eye_position.y, globalCB.eye_position.z);
+
     ng::RenderPassDesc passDesc;
     passDesc.renderTargets[0] = albedo;
     passDesc.renderTargets[1] = normal;
@@ -282,6 +299,23 @@ void GBufferPass::Execute(
 
                 if (matPSO && matPSO->pso) {
                     pipelineToUse = matPSO->pso;
+
+                    for (const auto& cbInfo : matPSO->constantBuffers) {
+                        if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
+                            nvrhi::ObjectType objType = nvrhi::ObjectTypes::D3D11_Buffer;
+                            ID3D11Buffer* d3dBuffer = static_cast<ID3D11Buffer*>(
+                                cbInfo.nvrhiBuffer->getNativeObject(objType).pointer);
+
+                            if (d3dBuffer && updatedBuffers.find(d3dBuffer) == updatedBuffers.end()) {
+                                u32 sizeToWrite = std::min<u32>(sizeof(GlobalConstants), cbInfo.size);
+                                d3dContext->UpdateSubresource(d3dBuffer, 0, nullptr, &globalCB, 0, 0);
+
+                                updatedBuffers.insert(d3dBuffer);
+                                Msg("  [GBufferPass] Updated global CB slot %u (%u bytes)",
+                                    cbInfo.slot, cbInfo.size);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -344,6 +378,10 @@ void GBufferPass::Execute(
     }
 
     ctx.EndRenderPass();
+
+    if (d3dContext) {
+        d3dContext->Release();
+    }
 
     auto executeEnd = std::chrono::high_resolution_clock::now();
     m_stats.cpuTimeMs = std::chrono::duration<float, std::milli>(
