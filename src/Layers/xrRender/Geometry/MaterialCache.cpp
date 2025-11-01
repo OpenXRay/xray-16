@@ -13,6 +13,7 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #include "../Externals/nvrhi/src/common/dxgi-format.h"
 #endif
 
