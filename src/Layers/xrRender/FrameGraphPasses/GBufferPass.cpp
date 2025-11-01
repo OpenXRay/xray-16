@@ -393,7 +393,7 @@ void GBufferPass::Execute(
 
                 // Step 2: Get or create cached binding set (created once, reused!)
                 nvrhi::BindingSetHandle fullBindingSet =
-                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer);
+                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
                 if (fullBindingSet) {
                     ctx.SetBindingSet(0, fullBindingSet.Get());

@@ -87,7 +87,11 @@ struct MaterialPSO {
     nvrhi::BindingSetHandle bindingSet;
 
     // Extracted data for quick access
-    xr_vector<ng::TextureHandle> textures;  // Wrapped textures (using our abstraction)
+    struct TextureSlot {
+        u32 slot;                    // Binding slot (t0, t1, t2, etc.)
+        ng::TextureHandle handle;     // Wrapped texture
+    };
+    xr_vector<TextureSlot> textures;  // Textures with their binding slots
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
@@ -111,6 +115,7 @@ struct MaterialPSO {
     // Shader references (for debugging)
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
+    SPass* pass = nullptr;  // Store pass for SRV extraction
 
     // Debug name
     shared_str debugName;
@@ -181,7 +186,8 @@ public:
     // Cached per MaterialPSO for reuse across draws - only creates once!
     nvrhi::BindingSetHandle GetOrCreateBindingSet(
         MaterialPSO* matPSO,  // Non-const to allow caching
-        nvrhi::IBuffer* perObjectVCB);
+        nvrhi::IBuffer* perObjectVCB,
+        SPass* pass);  // For extracting X-Ray's SRVs
 private:
 
     // Compute texture hash from SPass

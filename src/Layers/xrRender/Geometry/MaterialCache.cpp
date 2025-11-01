@@ -16,7 +16,8 @@
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"  // For sampler extraction
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"  // For CB size extraction
-#include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion"
+#include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion
+#include "../Externals/nvrhi/src/d3d11/d3d11-backend.h"  // For D3D11 BindingSet access
 #endif
 
 namespace xray::render {
@@ -229,6 +230,9 @@ MaterialPSO* MaterialCache::CreatePSO(
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
+    // Store the pass for later use (SRV extraction during binding)
+    pso->pass = pass;
+
     // ═══════════════════════════════════════════════════════
     //  EXTRACT TEXTURES
     // ═══════════════════════════════════════════════════════
@@ -428,6 +432,13 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         d3dTex2D->GetDesc(&d3dDesc);
         d3dTex2D->Release();
 
+        // Debug: Check if texture has BIND_SHADER_RESOURCE flag
+        bool hasBindSRV = (d3dDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0;
+        if (!hasBindSRV) {
+            Msg("! [MaterialCache] WARNING: Texture '%s' does NOT have D3D11_BIND_SHADER_RESOURCE flag! BindFlags=0x%x",
+                tex->cName.c_str(), d3dDesc.BindFlags);
+        }
+
         // Debug logging for format mismatches
         if (srvDesc.Format != d3dDesc.Format) {
             Msg("! [MaterialCache] Format mismatch for texture '%s': Resource=0x%x (%u), SRV=0x%x (%u)",
@@ -469,8 +480,11 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        Msg("  [MaterialCache] Successfully wrapped texture '%s'", tex->cName.c_str());
-        matPSO->textures.push_back(nvrhiTex);
+        Msg("  [MaterialCache] Successfully wrapped texture '%s' at slot %u", tex->cName.c_str(), stage);
+        MaterialPSO::TextureSlot texSlot;
+        texSlot.slot = stage;
+        texSlot.handle = nvrhiTex;
+        matPSO->textures.push_back(texSlot);
     }
 }
 
@@ -730,10 +744,10 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
         }
     }
 
-    // Textures (t0, t1, t2, ...)
-    for (u32 i = 0; i < matPSO->textures.size(); i++) {
+    // Textures (t0, t1, t2, ...) - use actual texture slots from X-Ray
+    for (const auto& texSlot : matPSO->textures) {
         layoutDesc.bindings.push_back(
-            nvrhi::BindingLayoutItem::Texture_SRV(i));
+            nvrhi::BindingLayoutItem::Texture_SRV(texSlot.slot));
     }
 
     // Samplers (s0, s1, s2, ...)
@@ -766,12 +780,12 @@ nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPS
 
     nvrhi::BindingSetDesc bindingDesc;
 
-    // Bind textures at slots t0, t1, t2, etc.
-    for (u32 i = 0; i < matPSO->textures.size(); i++) {
-        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(matPSO->textures[i]);
+    // Bind textures at their actual slots from X-Ray
+    for (const auto& texSlot : matPSO->textures) {
+        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(texSlot.handle);
         if (nativeTex) {
             bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::Texture_SRV(i, nativeTex));
+                nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nativeTex));
         }
     }
 
@@ -800,7 +814,8 @@ nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPS
 
 nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
     MaterialPSO* matPSO,
-    nvrhi::IBuffer* perObjectVCB)
+    nvrhi::IBuffer* perObjectVCB,
+    SPass* pass)
 {
     VERIFY(matPSO);
     VERIFY(perObjectVCB);
@@ -842,20 +857,20 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
         }
     }
 
-    // Bind textures at slots t0, t1, t2, etc.
+    // Bind textures at their actual slots from X-Ray
     Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
-    for (u32 i = 0; i < matPSO->textures.size(); i++) {
-        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(matPSO->textures[i]);
+    for (const auto& texSlot : matPSO->textures) {
+        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(texSlot.handle);
         if (nativeTex) {
             // Get texture descriptor
             const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
-            Msg("  [MaterialCache] Binding texture %u: format=%u (0x%x), dimension=%u, arraySize=%u, mipLevels=%u",
-                i, texDesc.format, texDesc.format, texDesc.dimension, texDesc.arraySize, texDesc.mipLevels);
+            Msg("  [MaterialCache] Binding texture at slot %u: format=%u (0x%x), dimension=%u, arraySize=%u, mipLevels=%u",
+                texSlot.slot, texDesc.format, texDesc.format, texDesc.dimension, texDesc.arraySize, texDesc.mipLevels);
 
             // Create binding item with proper dimension
             nvrhi::BindingSetItem item = {};  // Zero-initialize to avoid garbage
             item.resourceHandle = nativeTex;
-            item.slot = i;
+            item.slot = texSlot.slot;  // Use actual slot from X-Ray!
             item.type = nvrhi::ResourceType::Texture_SRV;
             item.format = texDesc.format;
 
@@ -877,7 +892,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
             bindingDesc.bindings.push_back(item);
         } else {
-            Msg("! [MaterialCache] Texture %u is NULL when creating binding set", i);
+            Msg("! [MaterialCache] Texture at slot %u is NULL when creating binding set", texSlot.slot);
         }
     }
 
@@ -903,6 +918,64 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
         Msg("! [MaterialCache] Failed to create binding set");
         return nullptr;
     }
+
+    // ═══════════════════════════════════════════════════════
+    //  WORKAROUND: Manually set SRVs from X-Ray textures
+    // ═══════════════════════════════════════════════════════
+    // NVRHI's createBindingSet tries to create new SRVs from wrapped resources,
+    // but this fails because we only wrapped the resource, not the SRV.
+    // X-Ray already has SRVs, so we'll use those directly!
+
+#if defined(USE_DX11)
+    nvrhi::d3d11::BindingSet* d3d11Set = static_cast<nvrhi::d3d11::BindingSet*>(bindingSet.Get());
+    if (d3d11Set && pass) {
+        // Get X-Ray's texture list from the pass
+        STextureList* texList = pass->T._get();
+        if (texList && texList->size() > 0) {
+            Msg("  [MaterialCache] Manually setting SRVs from X-Ray textures...");
+
+            // Set SRVs for each texture slot
+            // NOTE: texList is a vector of (stage, texture) pairs where stage is the slot number!
+            for (u32 i = 0; i < texList->size(); i++) {
+                const auto& texPair = (*texList)[i];
+                u32 stage = texPair.first;  // Actual SRV slot (t0, t1, t2, etc.)
+                CTexture* tex = texPair.second._get();
+
+                // Validate slot range
+                if (stage >= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT) {
+                    Msg("  ! Texture '%s' has invalid slot %u (max %u)",
+                        tex ? tex->cName.c_str() : "NULL", stage, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT);
+                    continue;
+                }
+
+                if (tex) {
+                    ID3DShaderResourceView* xraySRV = tex->get_SRView();
+                    if (xraySRV) {
+                        // CRITICAL: AddRef the SRV to keep it alive!
+                        // The binding set stores raw pointers, so we must increment the ref count
+                        // to prevent X-Ray from releasing the SRV while we're using it.
+                        xraySRV->AddRef();
+
+                        d3d11Set->SRVs[stage] = xraySRV;  // Use STAGE, not i!
+                        Msg("    Set SRV at slot %u: %p (from X-Ray texture '%s', AddRef'd)",
+                            stage, xraySRV, tex->cName.c_str());
+
+                        // Update min/max range
+                        if (d3d11Set->minSRVSlot > stage)
+                            d3d11Set->minSRVSlot = stage;
+                        if (d3d11Set->maxSRVSlot < stage)
+                            d3d11Set->maxSRVSlot = stage;
+                    } else {
+                        Msg("  ! Texture '%s' has NULL SRV at slot %u", tex->cName.c_str(), stage);
+                    }
+                }
+            }
+
+            Msg("  [MaterialCache] SRV range: [%u, %u]",
+                d3d11Set->minSRVSlot, d3d11Set->maxSRVSlot);
+        }
+    }
+#endif
 
     // ═══════════════════════════════════════════════════════
     //  CACHE IN MaterialPSO for reuse
