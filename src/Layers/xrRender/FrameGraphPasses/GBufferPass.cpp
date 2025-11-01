@@ -316,7 +316,7 @@ void GBufferPass::Execute(
                 ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
 
                 nvrhi::BindingSetHandle fullBindingSet =
-                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer);
+                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
                 if (fullBindingSet) {
                     ctx.SetBindingSet(0, fullBindingSet.Get());

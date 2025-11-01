@@ -71,7 +71,11 @@ struct MaterialPSO {
     nvrhi::BindingLayoutHandle bindingLayout;
     nvrhi::BindingSetHandle bindingSet;
 
-    xr_vector<ng::TextureHandle> textures;
+    struct TextureSlot {
+        u32 slot;
+        ng::TextureHandle handle;
+    };
+    xr_vector<TextureSlot> textures;
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
@@ -92,6 +96,7 @@ struct MaterialPSO {
 
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
+    SPass* pass = nullptr;
 
     shared_str debugName;
 
@@ -145,7 +150,8 @@ public:
     nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
     nvrhi::BindingSetHandle GetOrCreateBindingSet(
         MaterialPSO* matPSO,
-        nvrhi::IBuffer* perObjectVCB);
+        nvrhi::IBuffer* perObjectVCB,
+        SPass* pass);
 private:
 
     static u64 ComputeTextureHash(SPass* pass);
