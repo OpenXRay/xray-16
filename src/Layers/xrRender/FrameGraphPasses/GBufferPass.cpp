@@ -291,27 +291,29 @@ void GBufferPass::Execute(
             }
 
             if (matPSO) {
-                struct PerObjectConstants {
-                    Fmatrix worldViewProj;
-                    Fmatrix world;
-                    Fmatrix worldIT;
-                };
-                PerObjectConstants constants;
+
+                u32 cbSize = matPSO->perObjectCBSize > 0 ? matPSO->perObjectCBSize : 256;
+
+                u8 cbData[256] = {};
+
+                Fmatrix* pWorldViewProj = reinterpret_cast<Fmatrix*>(cbData + 0);
+                Fmatrix* pWorld = reinterpret_cast<Fmatrix*>(cbData + 64);
+                Fmatrix* pWorldIT = reinterpret_cast<Fmatrix*>(cbData + 128);
 
                 Fmatrix viewProj;
                 viewProj.mul(Device.mView, Device.mProject);
 
-                constants.worldViewProj.mul(batch.worldMatrix, viewProj);
-                constants.world = batch.worldMatrix;
+                pWorldViewProj->mul(batch.worldMatrix, viewProj);
+                *pWorld = batch.worldMatrix;
 
                 Fmatrix temp;
                 temp.invert(batch.worldMatrix);
-                constants.worldIT.transpose(temp);
+                pWorldIT->transpose(temp);
 
                 VERIFY(m_perObjectCB.IsValid());
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
 
-                ctx.WriteBuffer(vcbBuffer, &constants, sizeof(constants));
+                ctx.WriteBuffer(vcbBuffer, cbData, cbSize);
 
                 nvrhi::BindingSetHandle fullBindingSet =
                     m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer);

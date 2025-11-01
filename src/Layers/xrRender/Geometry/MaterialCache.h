@@ -75,6 +75,13 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
+    struct ConstantBufferInfo {
+        u32 slot;
+        nvrhi::BufferHandle nvrhiBuffer;
+        u32 size;
+        bool isPerObject;
+    };
+    xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;
 
     SVS* vertexShader = nullptr;

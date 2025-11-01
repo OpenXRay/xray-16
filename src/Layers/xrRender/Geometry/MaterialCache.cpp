@@ -382,24 +382,88 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->debugName = vs->cName;
 
-    if (!vs->constants.m_CBTable[0].empty()) {
-        const auto& cbRecord = vs->constants.m_CBTable[0][0];
-        dx11ConstantBuffer* cb = cbRecord.second._get();
-        if (cb) {
-            ID3DBuffer* d3dBuffer = cb->GetBuffer();
-            if (d3dBuffer) {
-                D3D11_BUFFER_DESC bufDesc;
-                d3dBuffer->GetDesc(&bufDesc);
-                matPSO->perObjectCBSize = bufDesc.ByteWidth;
-                Msg("  [MaterialCache] Extracted CB size: %u bytes from shader '%s'",
-                    matPSO->perObjectCBSize, vs->cName.c_str());
+    matPSO->constantBuffers.clear();
+
+    auto extractCBsFromShader = [&](R_constant_table& constTable, const char* shaderName) {
+        for (u32 contextIdx = 0; contextIdx < R__NUM_CONTEXTS; contextIdx++) {
+            const auto& cbTable = constTable.m_CBTable[contextIdx];
+
+            if (cbTable.empty())
+                continue;
+
+            Msg("  [MaterialCache] Shader '%s' context %u has %u CBs",
+                shaderName, contextIdx, cbTable.size());
+
+            for (const auto& cbRecord : cbTable) {
+                u32 slot = cbRecord.first;
+                dx11ConstantBuffer* cb = cbRecord.second._get();
+
+                Msg("  [MaterialCache]   Checking slot %u in context %u", slot, contextIdx);
+
+                if (cb) {
+                    ID3DBuffer* d3dBuffer = cb->GetBuffer();
+                    if (d3dBuffer) {
+                        D3D11_BUFFER_DESC bufDesc;
+                        d3dBuffer->GetDesc(&bufDesc);
+
+                        Msg("  [MaterialCache]   CB at slot %u: %u bytes", slot, bufDesc.ByteWidth);
+
+                    bool found = false;
+                    for (const auto& existing : matPSO->constantBuffers) {
+                        if (existing.slot == slot) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        nvrhi::BufferDesc nvrhiDesc;
+                        nvrhiDesc.byteSize = bufDesc.ByteWidth;
+                        nvrhiDesc.isConstantBuffer = true;
+                        nvrhiDesc.debugName = "XRay_CB";
+                        nvrhiDesc.isVolatile = false;
+
+                        nvrhi::BufferHandle wrappedBuffer =
+                            m_device->GetNativeDevice()->createHandleForNativeBuffer(
+                                nvrhi::ObjectTypes::D3D11_Resource,
+                                nvrhi::Object(d3dBuffer),
+                                nvrhiDesc);
+
+                        if (wrappedBuffer) {
+                            MaterialPSO::ConstantBufferInfo cbInfo;
+                            cbInfo.slot = slot;
+                            cbInfo.nvrhiBuffer = wrappedBuffer;
+                            cbInfo.size = bufDesc.ByteWidth;
+                            cbInfo.isPerObject = (slot == 0);
+
+                            matPSO->constantBuffers.push_back(cbInfo);
+
+                            Msg("  [MaterialCache]   SUCCESS: Added CB to PSO at slot %u: %u bytes (isPerObject=%d)",
+                                slot, cbInfo.size, cbInfo.isPerObject);
+                        } else {
+                            Msg("! [MaterialCache]   FAILED: Could not wrap D3D11 buffer at slot %u", slot);
+                        }
+                    }
+                }
             }
+            }
+        }
+    };
+
+    extractCBsFromShader(vs->constants, vs->cName.c_str());
+
+    extractCBsFromShader(ps->constants, ps->cName.c_str());
+
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        if (cbInfo.isPerObject) {
+            matPSO->perObjectCBSize = cbInfo.size;
+            break;
         }
     }
 
     if (matPSO->perObjectCBSize == 0) {
-        Msg("! [MaterialCache] Failed to extract CB size from shader, using default 224 bytes");
-        matPSO->perObjectCBSize = 224;
+        Msg("! [MaterialCache] No slot 0 CB found, using default 256 bytes");
+        matPSO->perObjectCBSize = 256;
     }
 
     return true;
@@ -412,8 +476,15 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
 
-    layoutDesc.bindings.push_back(
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0));
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        if (cbInfo.isPerObject) {
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
+        } else {
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
+        }
+    }
 
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
         layoutDesc.bindings.push_back(
@@ -470,8 +541,23 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
     nvrhi::BindingSetDesc bindingDesc;
 
-    bindingDesc.bindings.push_back(
-        nvrhi::BindingSetItem::ConstantBuffer(0, perObjectVCB));
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        nvrhi::IBuffer* bufferToBind = nullptr;
+
+        if (cbInfo.isPerObject) {
+            bufferToBind = perObjectVCB;
+        } else {
+            if (cbInfo.nvrhiBuffer) {
+                bufferToBind = cbInfo.nvrhiBuffer.Get();
+            }
+        }
+
+        if (bufferToBind) {
+            bindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, bufferToBind));
+            Msg("  [MaterialCache] Binding CB at slot %u (%u bytes)", cbInfo.slot, cbInfo.size);
+        }
+    }
 
     Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
