@@ -14,6 +14,7 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#include "Layers/xrRenderDX11/dx11ConstantBuffer.h"  // For CB size extraction
 #include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion"
 #endif
 
