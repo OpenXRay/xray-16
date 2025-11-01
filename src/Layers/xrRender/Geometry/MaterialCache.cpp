@@ -27,7 +27,7 @@ MaterialCache::~MaterialCache() {
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
     const passes::GBufferOutputs& outputs,
-    xray::render::framegraph::FrameGraph& fg)
+    const xray::render::framegraph::FrameGraph& fg)
 {
     if (!visual) {
         Msg("! [MaterialCache] NULL visual passed to GetOrCreatePSO");
@@ -94,7 +94,7 @@ MaterialPSO* MaterialCache::CreatePSO(
     ShaderElement* elem,
     SPass* pass,
     const passes::GBufferOutputs& outputs,
-    xray::render::framegraph::FrameGraph& fg)
+    const xray::render::framegraph::FrameGraph& fg)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -443,7 +443,7 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
 
 void MaterialCache::SetupRenderTargets(
     const passes::GBufferOutputs& outputs,
-    xray::render::framegraph::FrameGraph& fg,
+    const xray::render::framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
 {
     psoDesc.renderTargetCount = 3;

@@ -92,7 +92,7 @@ public:
     MaterialPSO* GetOrCreatePSO(
         dxRender_Visual* visual,
         const passes::GBufferOutputs& outputs,
-        xray::render::framegraph::FrameGraph& fg);
+        const xray::render::framegraph::FrameGraph& fg);
 
     void Clear();
 
@@ -115,7 +115,7 @@ private:
         ShaderElement* elem,
         SPass* pass,
         const passes::GBufferOutputs& outputs,
-        xray::render::framegraph::FrameGraph& fg);
+        const xray::render::framegraph::FrameGraph& fg);
 
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
 
@@ -135,7 +135,7 @@ private:
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         const passes::GBufferOutputs& outputs,
-        xray::render::framegraph::FrameGraph& fg,
+        const xray::render::framegraph::FrameGraph& fg,
         ng::PipelineStateDesc& psoDesc);
 };
 
