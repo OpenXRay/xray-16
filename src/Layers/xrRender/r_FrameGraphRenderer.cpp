@@ -210,6 +210,8 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     batch.worldMatrix = worldTransform;
 
+    batch.visual = visual;
+
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 

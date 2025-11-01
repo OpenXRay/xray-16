@@ -2,7 +2,13 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
+namespace xray::render::RENDER_NAMESPACE {
+    class dxRender_Visual;
+}
+
 namespace xray::render {
+
+using RENDER_NAMESPACE::dxRender_Visual;
 
 struct GeometryBatch {
     nvrhi::BufferHandle vertexBuffer;
@@ -22,6 +28,8 @@ struct GeometryBatch {
 
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
+
+    dxRender_Visual* visual = nullptr;
 
     shared_str debugName;
 };

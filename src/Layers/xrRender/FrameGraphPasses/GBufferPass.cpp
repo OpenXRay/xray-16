@@ -272,6 +272,17 @@ void GBufferPass::Execute(
         for (const auto& batch : batches) {
             ng::PipelineState* pipelineToUse = m_pipeline;
 
+            if (batch.visual && m_materialCache) {
+                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(
+                    batch.visual,
+                    outputs,
+                    fg);
+
+                if (matPSO && matPSO->pso) {
+                    pipelineToUse = matPSO->pso;
+                }
+            }
+
             if (pipelineToUse != currentPipeline) {
                 ctx.SetPipeline(pipelineToUse->GetNativePipeline());
                 currentPipeline = pipelineToUse;
