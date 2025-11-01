@@ -266,6 +266,7 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
         return;
     }
 
+    m_currentState.bindings.resize(slot + 1);
     m_currentState.bindings[slot] = bindingSet.Get();
 
 }
