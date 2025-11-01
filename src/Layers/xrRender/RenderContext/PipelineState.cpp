@@ -279,16 +279,61 @@ PipelineState* PipelineStateCache::CreatePipelineState(
 
     // ─── Vertex Input Layout ───
     if (!desc.vertexAttributes.empty()) {
-        xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
+        // Group attributes by semantic name to properly handle semantic indices
+        // NVRHI uses arraySize for consecutive semantic indices (TEXCOORD0, TEXCOORD1, etc.)
+        std::map<std::string, std::vector<const VertexAttribute*>> semanticGroups;
+
         for (const auto& attr : desc.vertexAttributes) {
-            nvrhi::VertexAttributeDesc nvrhiAttr;
-            nvrhiAttr.name = attr.semanticName;
-            nvrhiAttr.format = attr.format;
-            nvrhiAttr.offset = attr.offset;
-            nvrhiAttr.bufferIndex = attr.bufferIndex;
-            nvrhiAttr.isInstanced = attr.isInstanced;
-            nvrhiAttrs.push_back(nvrhiAttr);
+            if (!attr.semanticName)
+                continue;
+            semanticGroups[attr.semanticName].push_back(&attr);
         }
+
+        xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
+
+        for (auto& [semanticName, attrs] : semanticGroups) {
+            // Sort by semantic index to ensure proper ordering
+            std::sort(attrs.begin(), attrs.end(),
+                [](const VertexAttribute* a, const VertexAttribute* b) {
+                    return a->semanticIndex < b->semanticIndex;
+                });
+
+            // Check if semantic indices are consecutive starting from 0
+            bool isConsecutive = (attrs[0]->semanticIndex == 0);
+            if (isConsecutive) {
+                for (size_t i = 1; i < attrs.size(); ++i) {
+                    if (attrs[i]->semanticIndex != i) {
+                        isConsecutive = false;
+                        break;
+                    }
+                }
+            }
+
+            if (isConsecutive && attrs.size() > 1) {
+                // Use arraySize for consecutive indices (e.g., TEXCOORD0, TEXCOORD1)
+                nvrhi::VertexAttributeDesc nvrhiAttr;
+                nvrhiAttr.name = semanticName;
+                nvrhiAttr.format = attrs[0]->format;
+                nvrhiAttr.offset = attrs[0]->offset;
+                nvrhiAttr.bufferIndex = attrs[0]->bufferIndex;
+                nvrhiAttr.isInstanced = attrs[0]->isInstanced;
+                nvrhiAttr.arraySize = static_cast<uint32_t>(attrs.size());
+                nvrhiAttrs.push_back(nvrhiAttr);
+            } else {
+                // Create separate attributes for non-consecutive or single elements
+                for (const auto* attr : attrs) {
+                    nvrhi::VertexAttributeDesc nvrhiAttr;
+                    nvrhiAttr.name = semanticName;
+                    nvrhiAttr.format = attr->format;
+                    nvrhiAttr.offset = attr->offset;
+                    nvrhiAttr.bufferIndex = attr->bufferIndex;
+                    nvrhiAttr.isInstanced = attr->isInstanced;
+                    nvrhiAttr.arraySize = 1;
+                    nvrhiAttrs.push_back(nvrhiAttr);
+                }
+            }
+        }
+
         nvrhiDesc.inputLayout = m_device->GetNativeDevice()->createInputLayout(
             nvrhiAttrs.data(), (uint32_t)nvrhiAttrs.size(), desc.vertexShader->GetNativeShader());
     }

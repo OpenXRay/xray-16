@@ -564,19 +564,15 @@ namespace {
             case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
             case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
 
-            case DXGI_FORMAT_R16G16_UNORM:       return nvrhi::Format::RG16_UNORM;
-            case DXGI_FORMAT_R16G16_SNORM:       return nvrhi::Format::RG16_SNORM;
-            case DXGI_FORMAT_R16G16_UINT:        return nvrhi::Format::RG16_UINT;
-            case DXGI_FORMAT_R16G16_SINT:        return nvrhi::Format::RG16_SINT;
-
             case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
             case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
             case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
             case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
 
             case DXGI_FORMAT_R10G10B10A2_UNORM:  return nvrhi::Format::R10G10B10A2_UNORM;
-            case DXGI_FORMAT_R10G10B10A2_UINT:   return nvrhi::Format::R10G10B10A2_UNORM;
-
+            case DXGI_FORMAT_R10G10B10A2_UINT:
+                Msg("  [MaterialCache] Converting R10G10B10A2_UINT → RGBA16_UINT for compatibility");
+                return nvrhi::Format::RGBA16_UINT;
             case DXGI_FORMAT_R11G11B10_FLOAT:    return nvrhi::Format::R11G11B10_FLOAT;
 
             // IA-incompatible formats - convert to compatible equivalents
@@ -638,12 +634,6 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
     SDeclaration* decl = geom->dcl._get();
 
-    // Validate the vertex declaration
-    if (decl->dx11_dcl_code.empty()) {
-        Msg("! [MaterialCache] Empty vertex declaration");
-        return;
-    }
-
     // Track seen semantics to avoid duplicates (which cause CreateInputLayout to fail)
     struct SemanticKey {
         xr_string name;
@@ -656,14 +646,7 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
     std::set<SemanticKey> seenSemantics;
 
     // Convert X-Ray's D3D11 input elements to NVRHI format
-    size_t elementCount = 0;
     for (const auto& d3dElem : decl->dx11_dcl_code) {
-        // Safety check - stop if we're reading too many elements
-        if (elementCount >= 16) {
-            Msg("! [MaterialCache] Too many vertex elements (%zu), stopping", elementCount);
-            break;
-        }
-        elementCount++;
         // Skip invalid elements
         if (!d3dElem.SemanticName) {
             Msg("! [MaterialCache] Skipping vertex element with NULL semantic name");
