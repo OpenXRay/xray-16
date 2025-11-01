@@ -325,10 +325,20 @@ void GBufferPass::Execute(
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
         for (const auto& batch : batches) {
-            // Set pipeline (if changed)
-            // For now, all batches use the pass's default pipeline
-            // TODO: Create per-material pipelines from visual->shader
-            ng::PipelineState* pipelineToUse = m_pipeline;
+            // Get per-material PSO from MaterialCache
+            ng::PipelineState* pipelineToUse = m_pipeline;  // Default fallback
+
+            if (batch.visual && m_materialCache) {
+                // Get or create PSO for this material
+                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(
+                    batch.visual,
+                    outputs,
+                    fg);
+
+                if (matPSO && matPSO->pso) {
+                    pipelineToUse = matPSO->pso;
+                }
+            }
 
             if (pipelineToUse != currentPipeline) {
                 ctx.SetPipeline(pipelineToUse->GetNativePipeline());

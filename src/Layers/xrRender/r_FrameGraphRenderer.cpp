@@ -269,9 +269,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Set world matrix
     batch.worldMatrix = worldTransform;
 
-    // TODO: Create PSO from visual->shader
-    // TODO: Create binding set from textures
-    batch.pipeline = nullptr; // Will be set from visual->shader later
+    // Store visual for material system
+    batch.visual = visual;
+
+    // PSO and binding set will be created by MaterialCache in GBufferPass
+    batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
     batch.debugName = "VisibleMesh";

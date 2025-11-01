@@ -3,7 +3,13 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 
+namespace xray::render::RENDER_NAMESPACE {
+    class dxRender_Visual;  // Forward declaration
+}
+
 namespace xray::render {
+
+using RENDER_NAMESPACE::dxRender_Visual;
 
 // ══════════════════════════════════════════════════════════
 //  GEOMETRY BATCH (SINGLE DRAW CALL)
@@ -33,6 +39,9 @@ struct GeometryBatch {
     // Shader
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
+
+    // Source visual (for material system)
+    dxRender_Visual* visual = nullptr;
 
     // Debug
     shared_str debugName;
