@@ -22,6 +22,13 @@ public:
     //	DX11 specific
     void UpdateStencilRef(u32 Ref) { m_uiStencilRef = Ref; }
     void UpdateAlphaRef(u32 Ref) { m_uiAlphaRef = Ref; }
+
+    // Accessors for NVRHI/FrameGraph integration
+    ID3DRasterizerState* GetRasterizerState() const { return m_pRasterizerState; }
+    ID3DDepthStencilState* GetDepthStencilState() const { return m_pDepthStencilState; }
+    ID3DBlendState* GetBlendState() const { return m_pBlendState; }
+    u32 GetStencilRef() const { return m_uiStencilRef; }
+
     //	User restricted interface
 private:
     typedef dx11SamplerStateCache::HArray tSamplerHArray;

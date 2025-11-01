@@ -324,13 +324,18 @@ void GBufferPass::Execute(
         ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
+        // Keep binding sets alive for the duration of rendering
+        xr_vector<nvrhi::BindingSetHandle> tempBindingSets;
+        tempBindingSets.reserve(batches.size());
+
         for (const auto& batch : batches) {
             // Get per-material PSO from MaterialCache
             ng::PipelineState* pipelineToUse = m_pipeline;  // Default fallback
+            MaterialPSO* matPSO = nullptr;
 
             if (batch.visual && m_materialCache) {
                 // Get or create PSO for this material
-                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(
+                matPSO = m_materialCache->GetOrCreatePSO(
                     batch.visual,
                     outputs,
                     fg);
@@ -345,13 +350,31 @@ void GBufferPass::Execute(
                 currentPipeline = pipelineToUse;
             }
 
-            // Update per-object constants
-            UpdatePerObjectConstants(ctx, batch);
+            // Update per-object constants and create complete binding set
+            if (matPSO) {
+                // Update constants first
+                UpdatePerObjectConstantsData(batch);
 
-            // Bind textures (if changed)
-            if (batch.bindingSet != currentBindingSet) {
-                ctx.SetBindingSet(0, batch.bindingSet);
-                currentBindingSet = batch.bindingSet;
+                // Create binding set with CB + textures for this material
+                VERIFY(m_perObjectCB.IsValid());
+                nvrhi::IBuffer* cbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
+                nvrhi::BindingSetHandle fullBindingSet = m_materialCache->CreateBindingSet(matPSO, cbBuffer);
+
+                if (fullBindingSet) {
+                    ctx.SetBindingSet(0, fullBindingSet.Get());
+                    currentBindingSet = fullBindingSet.Get();
+
+                    // Keep the binding set alive (NVRHI uses reference counting)
+                    tempBindingSets.push_back(fullBindingSet);
+                }
+            } else {
+                // Fallback to old path
+                UpdatePerObjectConstants(ctx, batch);
+
+                if (batch.bindingSet != currentBindingSet) {
+                    ctx.SetBindingSet(0, batch.bindingSet);
+                    currentBindingSet = batch.bindingSet;
+                }
             }
 
             // Bind vertex/index buffers (convert nvrhi::BufferHandle to IBuffer*)
@@ -392,11 +415,9 @@ void GBufferPass::Execute(
         m_stats.cpuTimeMs);
 }
 
-void GBufferPass::UpdatePerObjectConstants(
-    ng::RenderContext& ctx,
-    const GeometryBatch& batch
-) {
-    // Update world matrix constant buffer
+void GBufferPass::UpdatePerObjectConstantsData(const GeometryBatch& batch)
+{
+    // Update world matrix constant buffer DATA only (no binding)
     struct PerObjectConstants {
         Fmatrix worldViewProj;
         Fmatrix world;
@@ -423,6 +444,14 @@ void GBufferPass::UpdatePerObjectConstants(
     // Update constant buffer through our abstraction layer
     VERIFY(m_perObjectCB.IsValid());
     m_device->UpdateBuffer(m_perObjectCB, &constants, sizeof(constants));
+}
+
+void GBufferPass::UpdatePerObjectConstants(
+    ng::RenderContext& ctx,
+    const GeometryBatch& batch
+) {
+    // Update buffer data
+    UpdatePerObjectConstantsData(batch);
 
     // Bind constant buffer to slot b0 (using our abstraction layer)
     ctx.SetConstantBuffer(0, m_perObjectCB);

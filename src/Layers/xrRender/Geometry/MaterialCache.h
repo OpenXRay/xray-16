@@ -154,13 +154,17 @@ private:
     // Create binding layout for material
     nvrhi::BindingLayoutHandle CreateBindingLayout(const MaterialPSO* matPSO);
 
-    // Create binding set for material
+    // Create material binding set (textures only, no CB)
+public:
+    nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
+    // Create binding set for material (with per-object CB)
     nvrhi::BindingSetHandle CreateBindingSet(
         const MaterialPSO* matPSO,
         nvrhi::IBuffer* perObjectCB);
+private:
 
-    // Compute texture hash
-    static u64 ComputeTextureHash(const xr_vector<ng::TextureHandle>& textures);
+    // Compute texture hash from SPass
+    static u64 ComputeTextureHash(SPass* pass);
 
     // Compute state hash
     static u64 ComputeStateHash(SPass* pass);

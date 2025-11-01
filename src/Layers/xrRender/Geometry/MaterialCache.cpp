@@ -12,10 +12,96 @@
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion"
+#endif
+
 namespace xray::render {
 
 using namespace passes;
 using namespace xray::render::RENDER_NAMESPACE;  // For Shader types (STextureList, etc.)
+
+
+// ══════════════════════════════════════════════════════════
+//  FORMAT CONVERSION HELPER
+// ══════════════════════════════════════════════════════════
+
+// Convert DXGI_FORMAT to nvrhi::Format for textures
+// IMPORTANT: Do NOT use static_cast! DXGI_FORMAT and nvrhi::Format have different enum values!
+// We need to search NVRHI's format mapping table to find the correct conversion.
+nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
+    // Search through all NVRHI formats to find one that matches this DXGI format
+    for (uint32_t i = 0; i < uint32_t(nvrhi::Format::COUNT); i++) {
+        nvrhi::Format nvrhiFormat = static_cast<nvrhi::Format>(i);
+        const nvrhi::DxgiFormatMapping& mapping = nvrhi::getDxgiFormatMapping(nvrhiFormat);
+
+        // Check if any of the DXGI formats in the mapping match our input
+        if (mapping.resourceFormat == dxgiFormat ||
+            mapping.srvFormat == dxgiFormat ||
+            mapping.rtvFormat == dxgiFormat) {
+            return nvrhiFormat;
+        }
+    }
+
+    // Not found - return UNKNOWN
+    Msg("! [MaterialCache] Failed to convert DXGI_FORMAT %u to nvrhi::Format", dxgiFormat);
+    return nvrhi::Format::UNKNOWN;
+}
+
+// Convert DXGI_FORMAT to NVRHI format, handling IA-incompatible formats
+nvrhi::Format ConvertVertexFormat(DXGI_FORMAT dxgiFormat) {
+    switch (dxgiFormat) {
+        // Direct mappings (IA-compatible)
+    case DXGI_FORMAT_R32G32B32A32_FLOAT: return nvrhi::Format::RGBA32_FLOAT;
+    case DXGI_FORMAT_R32G32B32_FLOAT:    return nvrhi::Format::RGB32_FLOAT;
+    case DXGI_FORMAT_R32G32_FLOAT:       return nvrhi::Format::RG32_FLOAT;
+    case DXGI_FORMAT_R32_FLOAT:          return nvrhi::Format::R32_FLOAT;
+
+    case DXGI_FORMAT_R16G16B16A16_FLOAT: return nvrhi::Format::RGBA16_FLOAT;
+    case DXGI_FORMAT_R16G16_FLOAT:       return nvrhi::Format::RG16_FLOAT;
+    case DXGI_FORMAT_R16_FLOAT:          return nvrhi::Format::R16_FLOAT;
+
+    case DXGI_FORMAT_R16G16B16A16_UNORM: return nvrhi::Format::RGBA16_UNORM;
+    case DXGI_FORMAT_R16G16B16A16_SNORM: return nvrhi::Format::RGBA16_SNORM;
+    case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
+    case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
+
+    case DXGI_FORMAT_R16G16_UNORM:       return nvrhi::Format::RG16_UNORM;
+    case DXGI_FORMAT_R16G16_SNORM:       return nvrhi::Format::RG16_SNORM;
+    case DXGI_FORMAT_R16G16_UINT:        return nvrhi::Format::RG16_UINT;
+    case DXGI_FORMAT_R16G16_SINT:        return nvrhi::Format::RG16_SINT;
+
+    case DXGI_FORMAT_R8G8B8A8_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+    case DXGI_FORMAT_R8G8B8A8_SNORM:     return nvrhi::Format::RGBA8_SNORM;
+    case DXGI_FORMAT_R8G8B8A8_UINT:      return nvrhi::Format::RGBA8_UINT;
+    case DXGI_FORMAT_R8G8B8A8_SINT:      return nvrhi::Format::RGBA8_SINT;
+
+    case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
+    case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
+    case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
+    case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
+
+    case DXGI_FORMAT_R10G10B10A2_UNORM:  return nvrhi::Format::R10G10B10A2_UNORM;
+    case DXGI_FORMAT_R10G10B10A2_UINT:   return nvrhi::Format::RGBA16_UINT;
+    case DXGI_FORMAT_R11G11B10_FLOAT:    return nvrhi::Format::R11G11B10_FLOAT;
+
+        // IA-incompatible formats - convert to compatible equivalents
+    case DXGI_FORMAT_B4G4R4A4_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+    case DXGI_FORMAT_B5G6R5_UNORM:       return nvrhi::Format::RGBA8_UNORM;
+    case DXGI_FORMAT_B5G5R5A1_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+
+    case DXGI_FORMAT_B8G8R8A8_UNORM:     // BGRA → RGBA
+        return nvrhi::Format::BGRA8_UNORM;
+
+    case DXGI_FORMAT_B8G8R8X8_UNORM:     // BGRX → BGRA
+        return nvrhi::Format::BGRA8_UNORM;
+
+    default:
+        Msg("! [MaterialCache] Unknown DXGI format %d, defaulting to RGBA32_FLOAT", dxgiFormat);
+        return nvrhi::Format::RGBA32_FLOAT;
+    }
+}
 
 // ══════════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -25,12 +111,10 @@ MaterialCache::MaterialCache(ng::RenderDevice* device)
     : m_device(device)
 {
     VERIFY(m_device);
-    Msg("* [MaterialCache] Created");
 }
 
 MaterialCache::~MaterialCache() {
     Clear();
-    Msg("* [MaterialCache] Destroyed");
 }
 
 // ══════════════════════════════════════════════════════════
@@ -85,14 +169,17 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     //  COMPUTE MATERIAL KEY
     // ═══════════════════════════════════════════════════════
 
-    // For now, create temporary MaterialPSO to extract textures for hashing
-    auto tempPSO = xr_make_unique<MaterialPSO>();
-    ExtractTextures(pass, tempPSO.get());
-
-    u64 textureHash = ComputeTextureHash(tempPSO->textures);
+    // Compute hash based on X-Ray texture pointers (stable across frames)
+    u64 textureHash = ComputeTextureHash(pass);
     u64 stateHash = ComputeStateHash(pass);
 
     MaterialKey key(shader, textureHash, stateHash);
+
+    // Get shader name for logging
+    const char* shaderName = "unknown";
+    if (pass->vs._get() && pass->vs._get()->cName.c_str()) {
+        shaderName = pass->vs._get()->cName.c_str();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  CHECK CACHE
@@ -101,6 +188,8 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     auto it = m_cache.find(key);
     if (it != m_cache.end()) {
         m_stats.numCacheHits++;
+        // Msg("  [MaterialCache] Cache HIT for '%s' (hits=%u, misses=%u)",
+        //     shaderName, m_stats.numCacheHits, m_stats.numCacheMisses);
         return it->second.get();
     }
 
@@ -109,8 +198,8 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     // ═══════════════════════════════════════════════════════
 
     m_stats.numCacheMisses++;
-
-    Msg("~ [MaterialCache] Creating PSO (hash: texture=0x%llX, state=0x%llX)", textureHash, stateHash);
+    Msg("! [MaterialCache] Cache MISS - creating PSO for '%s' (hash: tex=0x%llX, state=0x%llX) [hits=%u, misses=%u]",
+        shaderName, textureHash, stateHash, m_stats.numCacheHits, m_stats.numCacheMisses);
 
     MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
     if (!pso) {
@@ -121,8 +210,6 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     // Store in cache
     m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
     m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
-
-    Msg("  ✓ PSO created and cached (%u total PSOs)", m_stats.numCachedPSOs);
 
     return pso;
 }
@@ -145,7 +232,6 @@ MaterialPSO* MaterialCache::CreatePSO(
     // ═══════════════════════════════════════════════════════
 
     ExtractTextures(pass, pso.get());
-    Msg("  Extracted %u textures", pso->textures.size());
 
     // ═══════════════════════════════════════════════════════
     //  EXTRACT SHADERS
@@ -155,8 +241,6 @@ MaterialPSO* MaterialCache::CreatePSO(
         Msg("! [MaterialCache] Failed to extract shaders");
         return nullptr;
     }
-
-    Msg("  Extracted VS/PS shaders");
 
     // ═══════════════════════════════════════════════════════
     //  CREATE BINDING LAYOUT
@@ -168,7 +252,8 @@ MaterialPSO* MaterialCache::CreatePSO(
         return nullptr;
     }
 
-    Msg("  Created binding layout");
+    // Note: We don't create the binding set here because it includes the per-object CB
+    // which changes every draw. We'll create it on-demand in GBufferPass with the CB.
 
     // ═══════════════════════════════════════════════════════
     //  CREATE SHADERS FROM BYTECODE
@@ -207,8 +292,6 @@ MaterialPSO* MaterialCache::CreatePSO(
         m_device->DestroyShader(vsHandle);
         return nullptr;
     }
-
-    Msg("  Created VS/PS shaders from bytecode");
 
     // ═══════════════════════════════════════════════════════
     //  GET RCSHADER OBJECTS FROM HANDLES
@@ -250,8 +333,6 @@ MaterialPSO* MaterialCache::CreatePSO(
     // Set debug name
     psoDesc.debugName = pso->debugName;
 
-    Msg("  Built PSO descriptor");
-
     // ═══════════════════════════════════════════════════════
     //  CREATE PIPELINE STATE
     // ═══════════════════════════════════════════════════════
@@ -269,8 +350,6 @@ MaterialPSO* MaterialCache::CreatePSO(
     }
 
     pso->pso = nvrhiPSO;
-
-    Msg("  ✓ Pipeline state created");
 
     m_stats.totalPSOCreations++;
 
@@ -315,6 +394,10 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
+        // Debug: Check SRV format vs resource format
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        srv->GetDesc(&srvDesc);
+
         // Get underlying D3D11 resource
         ID3D11Resource* d3dResource = nullptr;
         srv->GetResource(&d3dResource);
@@ -337,20 +420,39 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         d3dTex2D->GetDesc(&d3dDesc);
         d3dTex2D->Release();
 
-        // Build TextureDesc
+        // Debug logging for format mismatches
+        if (srvDesc.Format != d3dDesc.Format) {
+            Msg("! [MaterialCache] Format mismatch for texture '%s': Resource=0x%x (%u), SRV=0x%x (%u)",
+                tex->cName.c_str(),
+                d3dDesc.Format, d3dDesc.Format,
+                srvDesc.Format, srvDesc.Format);
+        }
+
+        // Build TextureDesc - use resource format and let NVRHI handle SRV creation
         ng::RenderDevice::TextureDesc texDesc;
         texDesc.width = d3dDesc.Width;
         texDesc.height = d3dDesc.Height;
         texDesc.mipLevels = d3dDesc.MipLevels;
         texDesc.arraySize = d3dDesc.ArraySize;
-        texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
-        // Format conversion would go here - for now assume RGBA8
-        texDesc.format = nvrhi::Format::RGBA8_UNORM;  // TODO: Convert DXGI_FORMAT
+
+        // Detect texture dimension (2D vs Cube vs Array)
+        if (d3dDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
+            texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+        } else if (d3dDesc.ArraySize > 1) {
+            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
+        } else {
+            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+        }
+
+        // Convert DXGI format to NVRHI format using proper lookup
+        // DO NOT use static_cast - the enum values are completely different!
+        texDesc.format = ConvertDxgiFormatToNvrhi(d3dDesc.Format);
         texDesc.isRenderTarget = false;
         texDesc.isUAV = false;
         texDesc.debugName = tex->cName.c_str();
 
         // Wrap in NVRHI handle using device abstraction
+        Msg("  [MaterialCache] Wrapping texture '%s' with format %u", tex->cName.c_str(), texDesc.format);
         ng::TextureHandle nvrhiTex = m_device->CreateTextureFromD3D11(d3dResource, texDesc);
         d3dResource->Release();  // Release our ref, NVRHI holds its own
 
@@ -359,9 +461,8 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
+        Msg("  [MaterialCache] Successfully wrapped texture '%s'", tex->cName.c_str());
         matPSO->textures.push_back(nvrhiTex);
-
-        Msg("    Texture[%u]: '%s' (wrapped)", stage, tex->cName.c_str());
     }
 }
 
@@ -399,8 +500,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     // Store debug names
     matPSO->debugName = vs->cName;
 
-    Msg("    VS: '%s', PS: '%s'", vs->cName.c_str(), ps->cName.c_str());
-
     // TODO: Extract actual bytecode from SVS/SPS
     // The bytecode is stored in vs->sh/ps->sh (ID3D11VertexShader/ID3D11PixelShader)
     // We may need to reflect on these to get input layout and other metadata
@@ -433,15 +532,7 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
             nvrhi::BindingLayoutItem::Texture_SRV(i));  // t0, t1, t2...
     }
 
-    // Slot N: Sampler (s0)
     // TODO: Add sampler binding
-    // For now, we assume a default linear sampler
-
-    Msg("    Creating binding layout: 1 CB + %u textures", matPSO->textures.size());
-
-    // ═══════════════════════════════════════════════════════
-    //  CREATE BINDING LAYOUT
-    // ═══════════════════════════════════════════════════════
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
@@ -453,7 +544,50 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
 }
 
 // ══════════════════════════════════════════════════════════
-//  CREATE BINDING SET
+//  CREATE MATERIAL BINDING SET (textures only)
+// ══════════════════════════════════════════════════════════
+
+nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPSO* matPSO)
+{
+    VERIFY(matPSO);
+    VERIFY(matPSO->bindingLayout);
+
+    // ═══════════════════════════════════════════════════════
+    //  BUILD BINDING SET DESCRIPTOR (textures only)
+    // ═══════════════════════════════════════════════════════
+
+    nvrhi::BindingSetDesc bindingDesc;
+
+    // Bind textures at slots t0, t1, t2, etc.
+    for (u32 i = 0; i < matPSO->textures.size(); i++) {
+        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(matPSO->textures[i]);
+        if (nativeTex) {
+            bindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::Texture_SRV(i, nativeTex));
+        }
+    }
+
+    // TODO: Add sampler bindings (s0, s1, etc.)
+    // For now, rely on default samplers
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE BINDING SET
+    // ═══════════════════════════════════════════════════════
+
+    nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
+        bindingDesc,
+        matPSO->bindingLayout);
+
+    if (!bindingSet) {
+        Msg("! [MaterialCache] Failed to create material binding set");
+        return nullptr;
+    }
+
+    return bindingSet;
+}
+
+// ══════════════════════════════════════════════════════════
+//  CREATE BINDING SET (with per-object CB)
 // ══════════════════════════════════════════════════════════
 
 nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
@@ -470,16 +604,46 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
 
     nvrhi::BindingSetDesc bindingDesc;
 
-    // Bind constant buffer at slot 0
+    // Bind constant buffer at slot 0 (b0)
     bindingDesc.bindings.push_back(
         nvrhi::BindingSetItem::ConstantBuffer(0, perObjectCB));
 
-    // Bind textures at slots 1+
+    // Bind textures at slots t0, t1, t2, etc.
+    Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
         nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(matPSO->textures[i]);
         if (nativeTex) {
-            bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::Texture_SRV(i, nativeTex));
+            // Get texture descriptor
+            const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
+            Msg("  [MaterialCache] Binding texture %u: format=%u (0x%x), dimension=%u, arraySize=%u, mipLevels=%u",
+                i, texDesc.format, texDesc.format, texDesc.dimension, texDesc.arraySize, texDesc.mipLevels);
+
+            // Create binding item with proper dimension
+            nvrhi::BindingSetItem item = {};  // Zero-initialize to avoid garbage
+            item.resourceHandle = nativeTex;
+            item.slot = i;
+            item.type = nvrhi::ResourceType::Texture_SRV;
+            item.format = texDesc.format;
+
+            Msg("  [MaterialCache] Set item.format = %u (0x%x)", item.format, item.format);
+
+            // Set dimension based on texture type
+            if (texDesc.dimension == nvrhi::TextureDimension::TextureCube) {
+                item.dimension = nvrhi::TextureDimension::TextureCube;
+            } else if (texDesc.dimension == nvrhi::TextureDimension::Texture2DArray) {
+                item.dimension = nvrhi::TextureDimension::Texture2DArray;
+            } else if (texDesc.dimension == nvrhi::TextureDimension::Texture3D) {
+                item.dimension = nvrhi::TextureDimension::Texture3D;
+            } else {
+                item.dimension = nvrhi::TextureDimension::Texture2D;
+            }
+
+            // Set subresource range (all mips and array slices)
+            item.subresources = nvrhi::AllSubresources;
+
+            bindingDesc.bindings.push_back(item);
+        } else {
+            Msg("! [MaterialCache] Texture %u is NULL when creating binding set", i);
         }
     }
 
@@ -487,6 +651,7 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
     //  CREATE BINDING SET
     // ═══════════════════════════════════════════════════════
 
+    Msg("  [MaterialCache] About to call CreateBindingSet");
     nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
         bindingDesc,
         matPSO->bindingLayout);
@@ -496,6 +661,7 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
         return nullptr;
     }
 
+    Msg("  [MaterialCache] Successfully created binding set");
     return bindingSet;
 }
 
@@ -503,19 +669,28 @@ nvrhi::BindingSetHandle MaterialCache::CreateBindingSet(
 //  COMPUTE TEXTURE HASH
 // ══════════════════════════════════════════════════════════
 
-u64 MaterialCache::ComputeTextureHash(const xr_vector<ng::TextureHandle>& textures)
+u64 MaterialCache::ComputeTextureHash(SPass* pass)
 {
-    if (textures.empty())
+    if (!pass)
         return 0;
 
-    // Hash all texture handles using CRC32
+    // Get texture list from pass
+    STextureList* texList = pass->T._get();
+    if (!texList || texList->empty())
+        return 0;
+
+    // Hash X-Ray CTexture pointers (stable across frames)
+    // We hash the actual CTexture pointer, NOT the wrapped NVRHI handle
     u32 hash = 0;
-    for (const auto& tex : textures) {
-        // Hash the handle index
-        hash = crc32(&tex.index, sizeof(tex.index), hash);
+    for (const auto& texPair : *texList) {
+        CTexture* tex = texPair.second._get();
+        if (tex) {
+            // Hash the CTexture pointer (identifies the texture uniquely)
+            void* texPtr = tex;
+            hash = crc32(&texPtr, sizeof(texPtr), hash);
+        }
     }
 
-    // Extend to 64-bit (for consistency with hash type)
     return static_cast<u64>(hash);
 }
 
@@ -534,71 +709,6 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     u32 hash = crc32(&statePtr, sizeof(statePtr), 0);
 
     return static_cast<u64>(hash);
-}
-
-// ══════════════════════════════════════════════════════════
-//  FORMAT CONVERSION HELPER
-// ══════════════════════════════════════════════════════════
-
-namespace {
-    // Convert DXGI_FORMAT to NVRHI format, handling IA-incompatible formats
-    nvrhi::Format ConvertVertexFormat(DXGI_FORMAT dxgiFormat) {
-        switch (dxgiFormat) {
-            // Direct mappings (IA-compatible)
-            case DXGI_FORMAT_R32G32B32A32_FLOAT: return nvrhi::Format::RGBA32_FLOAT;
-            case DXGI_FORMAT_R32G32B32_FLOAT:    return nvrhi::Format::RGB32_FLOAT;
-            case DXGI_FORMAT_R32G32_FLOAT:       return nvrhi::Format::RG32_FLOAT;
-            case DXGI_FORMAT_R32_FLOAT:          return nvrhi::Format::R32_FLOAT;
-
-            case DXGI_FORMAT_R16G16B16A16_FLOAT: return nvrhi::Format::RGBA16_FLOAT;
-            case DXGI_FORMAT_R16G16_FLOAT:       return nvrhi::Format::RG16_FLOAT;
-            case DXGI_FORMAT_R16_FLOAT:          return nvrhi::Format::R16_FLOAT;
-
-            case DXGI_FORMAT_R8G8B8A8_UNORM:     return nvrhi::Format::RGBA8_UNORM;
-            case DXGI_FORMAT_R8G8B8A8_SNORM:     return nvrhi::Format::RGBA8_SNORM;
-            case DXGI_FORMAT_R8G8B8A8_UINT:      return nvrhi::Format::RGBA8_UINT;
-            case DXGI_FORMAT_R8G8B8A8_SINT:      return nvrhi::Format::RGBA8_SINT;
-
-            case DXGI_FORMAT_R16G16B16A16_UNORM: return nvrhi::Format::RGBA16_UNORM;
-            case DXGI_FORMAT_R16G16B16A16_SNORM: return nvrhi::Format::RGBA16_SNORM;
-            case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
-            case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
-
-            case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
-            case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
-            case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
-            case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
-
-            case DXGI_FORMAT_R10G10B10A2_UNORM:  return nvrhi::Format::R10G10B10A2_UNORM;
-            case DXGI_FORMAT_R10G10B10A2_UINT:
-                Msg("  [MaterialCache] Converting R10G10B10A2_UINT → RGBA16_UINT for compatibility");
-                return nvrhi::Format::RGBA16_UINT;
-            case DXGI_FORMAT_R11G11B10_FLOAT:    return nvrhi::Format::R11G11B10_FLOAT;
-
-            // IA-incompatible formats - convert to compatible equivalents
-            case DXGI_FORMAT_B4G4R4A4_UNORM:     // 4-bit per channel → 8-bit per channel
-                Msg("  [MaterialCache] Converting B4G4R4A4_UNORM → RGBA8_UNORM for IA compatibility");
-                return nvrhi::Format::RGBA8_UNORM;
-
-            case DXGI_FORMAT_B5G6R5_UNORM:       // 16-bit RGB → RGBA8
-                Msg("  [MaterialCache] Converting B5G6R5_UNORM → RGBA8_UNORM for IA compatibility");
-                return nvrhi::Format::RGBA8_UNORM;
-
-            case DXGI_FORMAT_B5G5R5A1_UNORM:     // 16-bit RGBA → RGBA8
-                Msg("  [MaterialCache] Converting B5G5R5A1_UNORM → RGBA8_UNORM for IA compatibility");
-                return nvrhi::Format::RGBA8_UNORM;
-
-            case DXGI_FORMAT_B8G8R8A8_UNORM:     // BGRA → RGBA
-                return nvrhi::Format::BGRA8_UNORM;
-
-            case DXGI_FORMAT_B8G8R8X8_UNORM:     // BGRX → BGRA
-                return nvrhi::Format::BGRA8_UNORM;
-
-            default:
-                Msg("! [MaterialCache] Unknown DXGI format %d, defaulting to RGBA32_FLOAT", dxgiFormat);
-                return nvrhi::Format::RGBA32_FLOAT;
-        }
-    }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -703,8 +813,88 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
         psoDesc.vertexAttributes.push_back(attr);
     }
+}
 
-    Msg("  Extracted %u vertex attributes from geometry", psoDesc.vertexAttributes.size());
+// ══════════════════════════════════════════════════════════
+//  STATE CONVERSION HELPERS
+// ══════════════════════════════════════════════════════════
+
+namespace {
+    // Convert D3D11 cull mode to NVRHI
+    ng::CullMode ConvertCullMode(D3D11_CULL_MODE d3dCull) {
+        switch (d3dCull) {
+            case D3D11_CULL_NONE: return ng::CullMode::None;
+            case D3D11_CULL_FRONT: return ng::CullMode::Front;
+            case D3D11_CULL_BACK: return ng::CullMode::Back;
+            default: return ng::CullMode::Back;
+        }
+    }
+
+    // Convert D3D11 fill mode to NVRHI
+    ng::FillMode ConvertFillMode(D3D11_FILL_MODE d3dFill) {
+        switch (d3dFill) {
+            case D3D11_FILL_WIREFRAME: return ng::FillMode::Wireframe;
+            case D3D11_FILL_SOLID: return ng::FillMode::Solid;
+            default: return ng::FillMode::Solid;
+        }
+    }
+
+    // Convert D3D11 comparison func to our abstraction
+    ng::ComparisonFunc ConvertComparisonFunc(D3D11_COMPARISON_FUNC d3dFunc) {
+        switch (d3dFunc) {
+            case D3D11_COMPARISON_NEVER: return ng::ComparisonFunc::Never;
+            case D3D11_COMPARISON_LESS: return ng::ComparisonFunc::Less;
+            case D3D11_COMPARISON_EQUAL: return ng::ComparisonFunc::Equal;
+            case D3D11_COMPARISON_LESS_EQUAL: return ng::ComparisonFunc::LessEqual;
+            case D3D11_COMPARISON_GREATER: return ng::ComparisonFunc::Greater;
+            case D3D11_COMPARISON_NOT_EQUAL: return ng::ComparisonFunc::NotEqual;
+            case D3D11_COMPARISON_GREATER_EQUAL: return ng::ComparisonFunc::GreaterEqual;
+            case D3D11_COMPARISON_ALWAYS: return ng::ComparisonFunc::Always;
+            default: return ng::ComparisonFunc::Less;
+        }
+    }
+
+    // Convert D3D11 blend factor to our abstraction
+    ng::BlendFactor ConvertBlendFactor(D3D11_BLEND d3dBlend) {
+        switch (d3dBlend) {
+            case D3D11_BLEND_ZERO: return ng::BlendFactor::Zero;
+            case D3D11_BLEND_ONE: return ng::BlendFactor::One;
+            case D3D11_BLEND_SRC_COLOR: return ng::BlendFactor::SrcColor;
+            case D3D11_BLEND_INV_SRC_COLOR: return ng::BlendFactor::InvSrcColor;
+            case D3D11_BLEND_SRC_ALPHA: return ng::BlendFactor::SrcAlpha;
+            case D3D11_BLEND_INV_SRC_ALPHA: return ng::BlendFactor::InvSrcAlpha;
+            case D3D11_BLEND_DEST_ALPHA: return ng::BlendFactor::DstAlpha;
+            case D3D11_BLEND_INV_DEST_ALPHA: return ng::BlendFactor::InvDstAlpha;
+            case D3D11_BLEND_DEST_COLOR: return ng::BlendFactor::DstColor;
+            case D3D11_BLEND_INV_DEST_COLOR: return ng::BlendFactor::InvDstColor;
+            case D3D11_BLEND_SRC_ALPHA_SAT: return ng::BlendFactor::SrcAlphaSat;
+            case D3D11_BLEND_BLEND_FACTOR: return ng::BlendFactor::BlendFactor;
+            case D3D11_BLEND_INV_BLEND_FACTOR: return ng::BlendFactor::InvBlendFactor;
+            default: return ng::BlendFactor::One;
+        }
+    }
+
+    // Convert D3D11 blend op to our abstraction
+    ng::BlendOp ConvertBlendOp(D3D11_BLEND_OP d3dOp) {
+        switch (d3dOp) {
+            case D3D11_BLEND_OP_ADD: return ng::BlendOp::Add;
+            case D3D11_BLEND_OP_SUBTRACT: return ng::BlendOp::Subtract;
+            case D3D11_BLEND_OP_REV_SUBTRACT: return ng::BlendOp::RevSubtract;
+            case D3D11_BLEND_OP_MIN: return ng::BlendOp::Min;
+            case D3D11_BLEND_OP_MAX: return ng::BlendOp::Max;
+            default: return ng::BlendOp::Add;
+        }
+    }
+
+    // Convert D3D11 color write mask to NVRHI
+    ng::ColorWriteMask ConvertColorWriteMask(u8 d3dMask) {
+        ng::ColorWriteMask mask = ng::ColorWriteMask::None;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_RED)   mask = mask | ng::ColorWriteMask::Red;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_GREEN) mask = mask | ng::ColorWriteMask::Green;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_BLUE)  mask = mask | ng::ColorWriteMask::Blue;
+        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_ALPHA) mask = mask | ng::ColorWriteMask::Alpha;
+        return mask;
+    }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -713,24 +903,111 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
 void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
 {
-    // TODO: Extract actual render states from X-Ray SPass->state
-    // For now, use default GBuffer rendering states
+    VERIFY(pass);
 
-    // Rasterizer state
-    psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
-    psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
-    psoDesc.rasterizerState.frontCounterClockwise = false;
-    psoDesc.rasterizerState.depthClipEnable = true;
+    // Get X-Ray state object
+    SState* xrState = pass->state._get();
+    if (!xrState || !xrState->state) {
+        // Fallback to safe defaults if no state
+        psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
+        psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.blendState.renderTargets[0].blendEnable = false;
+        return;
+    }
 
-    // Depth/Stencil state
-    psoDesc.depthStencilState.depthTestEnable = true;
-    psoDesc.depthStencilState.depthWriteEnable = true;
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
-    psoDesc.depthStencilState.stencilEnable = false;
+#if defined(USE_DX11)
+    dx11State* d3dState = static_cast<dx11State*>(xrState->state);
 
-    // Blend state (opaque rendering for GBuffer)
-    psoDesc.blendState.renderTargets[0].blendEnable = false;
-    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::All;
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT RASTERIZER STATE
+    // ═══════════════════════════════════════════════════════
+
+    ID3DRasterizerState* rasterizerState = d3dState->GetRasterizerState();
+    if (rasterizerState) {
+        D3D11_RASTERIZER_DESC rsDesc;
+        rasterizerState->GetDesc(&rsDesc);
+
+        psoDesc.rasterizerState.cullMode = ConvertCullMode(rsDesc.CullMode);
+        psoDesc.rasterizerState.fillMode = ConvertFillMode(rsDesc.FillMode);
+        psoDesc.rasterizerState.frontCounterClockwise = rsDesc.FrontCounterClockwise;
+        psoDesc.rasterizerState.depthClipEnable = rsDesc.DepthClipEnable;
+        psoDesc.rasterizerState.depthBias = rsDesc.DepthBias;
+        psoDesc.rasterizerState.slopeScaledDepthBias = rsDesc.SlopeScaledDepthBias;
+        psoDesc.rasterizerState.scissorEnable = rsDesc.ScissorEnable;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT DEPTH/STENCIL STATE
+    // ═══════════════════════════════════════════════════════
+
+    ID3DDepthStencilState* depthStencilState = d3dState->GetDepthStencilState();
+    if (depthStencilState) {
+        D3D11_DEPTH_STENCIL_DESC dsDesc;
+        depthStencilState->GetDesc(&dsDesc);
+
+        psoDesc.depthStencilState.depthTestEnable = dsDesc.DepthEnable;
+        psoDesc.depthStencilState.depthWriteEnable = (dsDesc.DepthWriteMask == D3D11_DEPTH_WRITE_MASK_ALL);
+        psoDesc.depthStencilState.depthFunc = ConvertComparisonFunc(dsDesc.DepthFunc);
+        psoDesc.depthStencilState.stencilEnable = dsDesc.StencilEnable;
+
+        if (dsDesc.StencilEnable) {
+            // Front face stencil
+            psoDesc.depthStencilState.stencilReadMask = dsDesc.StencilReadMask;
+            psoDesc.depthStencilState.stencilWriteMask = dsDesc.StencilWriteMask;
+
+            // Note: Stencil ref is set separately in D3D11, not part of PSO
+            // It's stored in dx11State but applied at draw time
+            psoDesc.depthStencilState.frontFace.compareFunc = ConvertComparisonFunc(dsDesc.FrontFace.StencilFunc);
+            psoDesc.depthStencilState.backFace.compareFunc = ConvertComparisonFunc(dsDesc.BackFace.StencilFunc);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT BLEND STATE
+    // ═══════════════════════════════════════════════════════
+
+    ID3DBlendState* blendState = d3dState->GetBlendState();
+    if (blendState) {
+        D3D11_BLEND_DESC blendDesc;
+        blendState->GetDesc(&blendDesc);
+
+        // D3D11 can have independent blend per RT or same for all
+        psoDesc.blendState.alphaToCoverageEnable = blendDesc.AlphaToCoverageEnable;
+
+        if (blendDesc.IndependentBlendEnable) {
+            // Independent blend for each RT (MRT support)
+            for (int i = 0; i < 3; ++i) {  // GBuffer has 3 RTs
+                const D3D11_RENDER_TARGET_BLEND_DESC& rtBlend = blendDesc.RenderTarget[i];
+
+                psoDesc.blendState.renderTargets[i].blendEnable = rtBlend.BlendEnable;
+                psoDesc.blendState.renderTargets[i].srcBlend = ConvertBlendFactor(rtBlend.SrcBlend);
+                psoDesc.blendState.renderTargets[i].dstBlend = ConvertBlendFactor(rtBlend.DestBlend);
+                psoDesc.blendState.renderTargets[i].blendOp = ConvertBlendOp(rtBlend.BlendOp);
+                psoDesc.blendState.renderTargets[i].srcBlendAlpha = ConvertBlendFactor(rtBlend.SrcBlendAlpha);
+                psoDesc.blendState.renderTargets[i].dstBlendAlpha = ConvertBlendFactor(rtBlend.DestBlendAlpha);
+                psoDesc.blendState.renderTargets[i].blendOpAlpha = ConvertBlendOp(rtBlend.BlendOpAlpha);
+                psoDesc.blendState.renderTargets[i].writeMask = ConvertColorWriteMask(rtBlend.RenderTargetWriteMask);
+            }
+        } else {
+            // Same blend state for all RTs
+            const D3D11_RENDER_TARGET_BLEND_DESC& rtBlend = blendDesc.RenderTarget[0];
+
+            for (int i = 0; i < 3; ++i) {
+                psoDesc.blendState.renderTargets[i].blendEnable = rtBlend.BlendEnable;
+                psoDesc.blendState.renderTargets[i].srcBlend = ConvertBlendFactor(rtBlend.SrcBlend);
+                psoDesc.blendState.renderTargets[i].dstBlend = ConvertBlendFactor(rtBlend.DestBlend);
+                psoDesc.blendState.renderTargets[i].blendOp = ConvertBlendOp(rtBlend.BlendOp);
+                psoDesc.blendState.renderTargets[i].srcBlendAlpha = ConvertBlendFactor(rtBlend.SrcBlendAlpha);
+                psoDesc.blendState.renderTargets[i].dstBlendAlpha = ConvertBlendFactor(rtBlend.DestBlendAlpha);
+                psoDesc.blendState.renderTargets[i].blendOpAlpha = ConvertBlendOp(rtBlend.BlendOpAlpha);
+                psoDesc.blendState.renderTargets[i].writeMask = ConvertColorWriteMask(rtBlend.RenderTargetWriteMask);
+            }
+        }
+    }
+#endif // USE_DX11
 }
 
 // ══════════════════════════════════════════════════════════
@@ -742,20 +1019,28 @@ void MaterialCache::SetupRenderTargets(
     const xray::render::framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
 {
-    // GBuffer has 3 render targets + depth
+    // Extract actual formats from FrameGraph resources
+    nvrhi::ITexture* albedoTex = fg.GetPhysicalTexture(outputs.albedo);
+    nvrhi::ITexture* normalTex = fg.GetPhysicalTexture(outputs.normal);
+    nvrhi::ITexture* materialTex = fg.GetPhysicalTexture(outputs.material);
+    nvrhi::ITexture* depthTex = fg.GetPhysicalTexture(outputs.depth);
+
+    if (!albedoTex || !normalTex || !materialTex || !depthTex) {
+        // Fallback to hardcoded formats
+        psoDesc.renderTargetCount = 3;
+        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
+        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
+        psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
+        psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
+        return;
+    }
+
+    // Get actual formats from textures
     psoDesc.renderTargetCount = 3;
-
-    // RT0: Albedo.rgb + Metallic.a (RGBA8)
-    psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
-
-    // RT1: Normal.xyz + Roughness.a (RGBA8_SNORM for normals)
-    psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
-
-    // RT2: Material ID (R16_UINT)
-    psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
-
-    // Depth/Stencil: D24S8
-    psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
+    psoDesc.renderTargetFormats[0] = albedoTex->getDesc().format;
+    psoDesc.renderTargetFormats[1] = normalTex->getDesc().format;
+    psoDesc.renderTargetFormats[2] = materialTex->getDesc().format;
+    psoDesc.depthStencilFormat = depthTex->getDesc().format;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -764,7 +1049,6 @@ void MaterialCache::SetupRenderTargets(
 
 void MaterialCache::Clear()
 {
-    Msg("~ [MaterialCache] Clearing cache (%u PSOs)", m_stats.numCachedPSOs);
     m_cache.clear();
     m_stats = Stats{};
 }

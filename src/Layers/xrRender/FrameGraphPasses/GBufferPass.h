@@ -110,7 +110,10 @@ private:
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
                 const GBufferOutputs& outputs);
 
-    // Update per-object constant buffer
+    // Update per-object constant buffer data only (no binding)
+    void UpdatePerObjectConstantsData(const GeometryBatch& batch);
+
+    // Update per-object constant buffer and bind it
     void UpdatePerObjectConstants(ng::RenderContext& ctx, const GeometryBatch& batch);
 };
 
