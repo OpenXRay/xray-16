@@ -537,6 +537,28 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
 }
 
 // ══════════════════════════════════════════════════════════
+//  HELPER: Convert DXGI format to IA-compatible format
+// ══════════════════════════════════════════════════════════
+
+static bool IsIACompatibleFormat(DXGI_FORMAT dxgiFormat) {
+    // The Input Assembler only supports specific vertex formats
+    // Packed formats like B4G4R4A4, B5G6R5, etc. are NOT supported
+
+    switch (dxgiFormat) {
+        // These packed formats are NOT supported by IA
+        case DXGI_FORMAT_B4G4R4A4_UNORM:
+        case DXGI_FORMAT_B5G6R5_UNORM:
+        case DXGI_FORMAT_B5G5R5A1_UNORM:
+            return false;
+
+        // All other formats are assumed compatible
+        // (D3D11 will validate and fail if they're not)
+        default:
+            return true;
+    }
+}
+
+// ══════════════════════════════════════════════════════════
 //  SETUP VERTEX ATTRIBUTES
 // ══════════════════════════════════════════════════════════
 
@@ -606,7 +628,14 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
         attr.semanticIndex = d3dElem.SemanticIndex;
 
-        // Convert DXGI format to NVRHI format
+        // Check if format is IA-compatible
+        if (!IsIACompatibleFormat(d3dElem.Format)) {
+            Msg("  Skipping vertex element '%s%d' with IA-incompatible format %u",
+                d3dElem.SemanticName, d3dElem.SemanticIndex, d3dElem.Format);
+            continue;
+        }
+
+        // Convert DXGI format to NVRHI format (no conversion needed, just cast)
         attr.format = static_cast<nvrhi::Format>(d3dElem.Format);
 
         attr.offset = d3dElem.AlignedByteOffset;
