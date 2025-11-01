@@ -224,6 +224,8 @@ private:
     nvrhi::FramebufferHandle m_currentFramebuffer;
     nvrhi::GraphicsState m_currentState;
 
+    xr_vector<nvrhi::BindingSetHandle> m_tempBindingSets;
+
     struct StateCache {
         nvrhi::IGraphicsPipeline* pipeline = nullptr;
         nvrhi::IBuffer* vertexBuffers[8] = {};

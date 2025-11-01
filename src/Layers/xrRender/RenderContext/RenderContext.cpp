@@ -98,6 +98,8 @@ void RenderContext::EndRenderPass() {
 
     m_commandList->endMarker();
 
+    m_tempBindingSets.clear();
+
     m_inRenderPass = false;
 }
 
@@ -268,6 +270,8 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
 
     m_currentState.bindings.resize(slot + 1);
     m_currentState.bindings[slot] = bindingSet.Get();
+
+    m_tempBindingSets.push_back(bindingSet);
 
 }
 
