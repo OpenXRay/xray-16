@@ -1,6 +1,7 @@
 // xrRender/FrameGraphPasses/GBufferPass.cpp
 #include "stdafx.h"
 #include "GBufferPass.h"
+#include "ShaderConstants.h"  // CB layout definitions
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -277,6 +278,33 @@ void GBufferPass::Execute(
     //  SET RENDER STATE
     // ═══════════════════════════════════════════════════════
 
+    // ═══════════════════════════════════════════════════════
+    //  UPDATE GLOBAL CONSTANT BUFFERS (BEFORE RENDER PASS!)
+    // ═══════════════════════════════════════════════════════
+    // Global CBs (slot 1+) contain view/projection matrices, lighting, fog, etc.
+    // We must update them BEFORE the render pass since they're not volatile.
+    // Using direct buffer writes with our own CB layout definitions.
+
+    // Fill global constants from Device state
+    GlobalConstants globalCB = {};
+    FillGlobalConstants(globalCB);
+
+    // Get D3D11 device context for UpdateSubresource calls
+    // NO RCache usage - get directly from NVRHI device!
+    ID3D11Device* d3dDevice = static_cast<ID3D11Device*>(
+        m_device->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
+    VERIFY(d3dDevice);
+
+    ID3D11DeviceContext* d3dContext = nullptr;
+    d3dDevice->GetImmediateContext(&d3dContext);
+    VERIFY(d3dContext);
+
+    // Track unique CB buffers to avoid duplicate updates
+    xr_set<ID3D11Buffer*> updatedBuffers;
+
+    Msg("  [GBufferPass] Prepared global CB with custom data (eye=%.1f,%.1f,%.1f)",
+        globalCB.eye_position.x, globalCB.eye_position.y, globalCB.eye_position.z);
+
     // Setup render pass descriptor
     ng::RenderPassDesc passDesc;
     passDesc.renderTargets[0] = albedo;
@@ -346,6 +374,29 @@ void GBufferPass::Execute(
 
                 if (matPSO && matPSO->pso) {
                     pipelineToUse = matPSO->pso;
+
+                    // Update global CB buffers (slot 1+) with our custom data
+                    // Do this once per unique buffer, not per draw
+                    for (const auto& cbInfo : matPSO->constantBuffers) {
+                        if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
+                            // This is a global CB (slot 1+), update it with our global state
+                            // Get D3D11 buffer from NVRHI handle
+                            nvrhi::ObjectType objType = nvrhi::ObjectTypes::D3D11_Buffer;
+                            ID3D11Buffer* d3dBuffer = static_cast<ID3D11Buffer*>(
+                                cbInfo.nvrhiBuffer->getNativeObject(objType).pointer);
+
+                            if (d3dBuffer && updatedBuffers.find(d3dBuffer) == updatedBuffers.end()) {
+                                // Update this buffer with globalCB data
+                                // Note: Only write up to the CB's actual size to avoid errors
+                                u32 sizeToWrite = std::min<u32>(sizeof(GlobalConstants), cbInfo.size);
+                                d3dContext->UpdateSubresource(d3dBuffer, 0, nullptr, &globalCB, 0, 0);
+
+                                updatedBuffers.insert(d3dBuffer);
+                                Msg("  [GBufferPass] Updated global CB slot %u (%u bytes)",
+                                    cbInfo.slot, cbInfo.size);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -425,6 +476,11 @@ void GBufferPass::Execute(
 
     // End render pass
     ctx.EndRenderPass();
+
+    // Release D3D11 context (GetImmediateContext AddRefs it)
+    if (d3dContext) {
+        d3dContext->Release();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  STATISTICS
