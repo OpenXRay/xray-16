@@ -84,6 +84,12 @@ struct MaterialPSO {
     xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;
 
+    struct SamplerInfo {
+        u32 slot;
+        nvrhi::SamplerHandle nvrhiSampler;
+    };
+    xr_vector<SamplerInfo> samplers;
+
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
 
@@ -130,6 +136,8 @@ private:
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
 
     bool ExtractShaders(SPass* pass, MaterialPSO* matPSO);
+
+    void ExtractSamplers(SPass* pass, MaterialPSO* matPSO);
 
     nvrhi::BindingLayoutHandle CreateBindingLayout(const MaterialPSO* matPSO);
 

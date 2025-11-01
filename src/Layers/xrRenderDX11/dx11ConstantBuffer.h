@@ -13,11 +13,36 @@ public:
 
     bool Similar(dx11ConstantBuffer& _in);
     ID3DBuffer* GetBuffer() { return m_pBuffer; }
-    pcstr GetBufferName() const { return m_strBufferName.c_str(); }
     void Flush(u32 context_id);
 
-    // Context registry the buffer belongs to
-    u32 m_context_id{ u32(-1) };
+    static u32 DecodeShaderType(u32 encodedSlot)
+    {
+        return encodedSlot & 0x70;
+    }
+
+    static u32 DecodeBufferIndex(u32 encodedSlot)
+    {
+        return encodedSlot & 0xF;
+    }
+
+    static u32 DecodeBindingSlot(u32 encodedSlot)
+    {
+        return DecodeBufferIndex(encodedSlot);
+    }
+
+    static const char* GetShaderTypeName(u32 shaderType)
+    {
+        switch (shaderType)
+        {
+        case 0x10: return "PS";
+        case 0x20: return "VS";
+        case 0x30: return "GS";
+        case 0x40: return "HS";
+        case 0x50: return "DS";
+        case 0x60: return "CS";
+        default: return "Unknown";
+        }
+    }
 
     //	Set copy data into constant buffer
     //	Plain buffer member

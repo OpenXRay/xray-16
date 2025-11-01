@@ -292,9 +292,9 @@ void GBufferPass::Execute(
 
             if (matPSO) {
 
-                u32 cbSize = matPSO->perObjectCBSize > 0 ? matPSO->perObjectCBSize : 256;
+                constexpr u32 VCB_SIZE = 256;
 
-                u8 cbData[256] = {};
+                u8 cbData[VCB_SIZE] = {};
 
                 Fmatrix* pWorldViewProj = reinterpret_cast<Fmatrix*>(cbData + 0);
                 Fmatrix* pWorld = reinterpret_cast<Fmatrix*>(cbData + 64);
@@ -313,7 +313,7 @@ void GBufferPass::Execute(
                 VERIFY(m_perObjectCB.IsValid());
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
 
-                ctx.WriteBuffer(vcbBuffer, cbData, cbSize);
+                ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
 
                 nvrhi::BindingSetHandle fullBindingSet =
                     m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer);

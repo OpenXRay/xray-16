@@ -32,6 +32,13 @@ public:
     void SetMaxAnisotropy(u32 uiMaxAniso);
     void SetMipLODBias(float uiMipLODBias);
 
+    ID3DSamplerState* GetSamplerState(SHandle handle) const
+    {
+        if (handle == hInvalidHandle || handle >= m_StateArray.size())
+            return nullptr;
+        return m_StateArray[handle].m_pState;
+    }
+
 private:
     typedef ID3DSamplerState IDeviceState;
     typedef D3D_SAMPLER_DESC StateDecs;
