@@ -502,32 +502,100 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     matPSO->debugName = vs->cName;
 
     // ═══════════════════════════════════════════════════════
-    //  EXTRACT CONSTANT BUFFER SIZE from VS (slot b0)
+    //  EXTRACT ALL CONSTANT BUFFERS from VS and PS
     // ═══════════════════════════════════════════════════════
 
-    // Get per-object CB size from vertex shader's constant table
-    // X-Ray stores CB info in vs->constants.m_CBTable
-    if (!vs->constants.m_CBTable[0].empty()) {
-        // Get first CB (per-object constants at b0)
-        const auto& cbRecord = vs->constants.m_CBTable[0][0];
-        dx11ConstantBuffer* cb = cbRecord.second._get();
-        if (cb) {
-            // Get actual CB size from shader reflection
-            ID3DBuffer* d3dBuffer = cb->GetBuffer();
-            if (d3dBuffer) {
-                D3D11_BUFFER_DESC bufDesc;
-                d3dBuffer->GetDesc(&bufDesc);
-                matPSO->perObjectCBSize = bufDesc.ByteWidth;
-                Msg("  [MaterialCache] Extracted CB size: %u bytes from shader '%s'",
-                    matPSO->perObjectCBSize, vs->cName.c_str());
+    matPSO->constantBuffers.clear();
+
+    // Helper lambda to extract CBs from a shader's constant table
+    auto extractCBsFromShader = [&](R_constant_table& constTable, const char* shaderName) {
+        // X-Ray has multiple rendering contexts (R__NUM_CONTEXTS = 5)
+        // Check all contexts to find constant buffers
+        for (u32 contextIdx = 0; contextIdx < R__NUM_CONTEXTS; contextIdx++) {
+            const auto& cbTable = constTable.m_CBTable[contextIdx];
+
+            if (cbTable.empty())
+                continue;
+
+            Msg("  [MaterialCache] Shader '%s' context %u has %u CBs",
+                shaderName, contextIdx, cbTable.size());
+
+            for (const auto& cbRecord : cbTable) {
+                u32 slot = cbRecord.first;
+                dx11ConstantBuffer* cb = cbRecord.second._get();
+
+                Msg("  [MaterialCache]   Checking slot %u in context %u", slot, contextIdx);
+
+                if (cb) {
+                    ID3DBuffer* d3dBuffer = cb->GetBuffer();
+                    if (d3dBuffer) {
+                        D3D11_BUFFER_DESC bufDesc;
+                        d3dBuffer->GetDesc(&bufDesc);
+
+                        Msg("  [MaterialCache]   CB at slot %u: %u bytes", slot, bufDesc.ByteWidth);
+
+                    // Check if we already have this slot (could be in both VS and PS)
+                    bool found = false;
+                    for (const auto& existing : matPSO->constantBuffers) {
+                        if (existing.slot == slot) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        // Wrap the X-Ray D3D11 buffer in NVRHI (similar to texture wrapping)
+                        nvrhi::BufferDesc nvrhiDesc;
+                        nvrhiDesc.byteSize = bufDesc.ByteWidth;
+                        nvrhiDesc.isConstantBuffer = true;
+                        nvrhiDesc.debugName = "XRay_CB";
+                        nvrhiDesc.isVolatile = false;
+
+                        nvrhi::BufferHandle wrappedBuffer =
+                            m_device->GetNativeDevice()->createHandleForNativeBuffer(
+                                nvrhi::ObjectTypes::D3D11_Resource,
+                                nvrhi::Object(d3dBuffer),
+                                nvrhiDesc);
+
+                        if (wrappedBuffer) {
+                            MaterialPSO::ConstantBufferInfo cbInfo;
+                            cbInfo.slot = slot;
+                            cbInfo.nvrhiBuffer = wrappedBuffer;
+                            cbInfo.size = bufDesc.ByteWidth;
+                            cbInfo.isPerObject = (slot == 0);
+
+                            matPSO->constantBuffers.push_back(cbInfo);
+
+                            Msg("  [MaterialCache]   SUCCESS: Added CB to PSO at slot %u: %u bytes (isPerObject=%d)",
+                                slot, cbInfo.size, cbInfo.isPerObject);
+                        } else {
+                            Msg("! [MaterialCache]   FAILED: Could not wrap D3D11 buffer at slot %u", slot);
+                        }
+                    }
+                }
             }
+            }  // end for cbRecord
+        }  // end for contextIdx
+    };
+
+    // Extract from vertex shader
+    extractCBsFromShader(vs->constants, vs->cName.c_str());
+
+    // Extract from pixel shader
+    extractCBsFromShader(ps->constants, ps->cName.c_str());
+
+    // Store per-object CB size for convenience
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        if (cbInfo.isPerObject) {
+            matPSO->perObjectCBSize = cbInfo.size;
+            break;
         }
     }
 
-    // Fallback if CB size not found
+    // Fallback if no slot 0 CB found
     if (matPSO->perObjectCBSize == 0) {
-        Msg("! [MaterialCache] Failed to extract CB size from shader, using default 224 bytes");
-        matPSO->perObjectCBSize = 224;  // Default size
+        Msg("! [MaterialCache] No slot 0 CB found, using default 256 bytes");
+        matPSO->perObjectCBSize = 256;
     }
 
     return true;
@@ -548,15 +616,23 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO*
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
 
-    // Slot 0: Per-object VOLATILE constant buffer (b0)
-    // Using VolatileConstantBuffer allows efficient per-draw updates via writeBuffer()
-    layoutDesc.bindings.push_back(
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0));
+    // Add ALL constant buffers from shader reflection
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        if (cbInfo.isPerObject) {
+            // Slot 0: Per-object VOLATILE constant buffer (updated per-draw)
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
+        } else {
+            // Other slots: Regular constant buffers (global state, updated per-frame)
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
+        }
+    }
 
-    // Slots 1+: Textures (t0, t1, t2, ...)
+    // Textures (t0, t1, t2, ...)
     for (u32 i = 0; i < matPSO->textures.size(); i++) {
         layoutDesc.bindings.push_back(
-            nvrhi::BindingLayoutItem::Texture_SRV(i));  // t0, t1, t2...
+            nvrhi::BindingLayoutItem::Texture_SRV(i));
     }
 
     // TODO: Add sampler binding
@@ -640,10 +716,26 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
     nvrhi::BindingSetDesc bindingDesc;
 
-    // Bind volatile constant buffer at slot 0 (b0)
-    // Note: Use ConstantBuffer() for binding SET (volatile is in the binding LAYOUT)
-    bindingDesc.bindings.push_back(
-        nvrhi::BindingSetItem::ConstantBuffer(0, perObjectVCB));
+    // Bind ALL constant buffers from shader
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        nvrhi::IBuffer* bufferToBind = nullptr;
+
+        if (cbInfo.isPerObject) {
+            // Slot 0: Use the per-object VCB passed in (updated per-draw)
+            bufferToBind = perObjectVCB;
+        } else {
+            // Other slots: Use X-Ray's global CB (already wrapped during PSO creation)
+            if (cbInfo.nvrhiBuffer) {
+                bufferToBind = cbInfo.nvrhiBuffer.Get();
+            }
+        }
+
+        if (bufferToBind) {
+            bindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, bufferToBind));
+            Msg("  [MaterialCache] Binding CB at slot %u (%u bytes)", cbInfo.slot, cbInfo.size);
+        }
+    }
 
     // Bind textures at slots t0, t1, t2, etc.
     Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());

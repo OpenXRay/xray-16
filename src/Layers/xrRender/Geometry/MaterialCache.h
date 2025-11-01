@@ -91,8 +91,15 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
-    // Constant buffer size (extracted from shader reflection)
-    u32 perObjectCBSize = 0;
+    // Constant buffers (extracted from shader reflection)
+    struct ConstantBufferInfo {
+        u32 slot;                    // Binding slot (b0, b1, b2, etc.)
+        nvrhi::BufferHandle nvrhiBuffer;  // NVRHI wrapped buffer
+        u32 size;                    // Size in bytes
+        bool isPerObject;            // True if slot 0 (per-object CB)
+    };
+    xr_vector<ConstantBufferInfo> constantBuffers;
+    u32 perObjectCBSize = 0;  // Size of slot 0 CB (for convenience)
 
     // Shader references (for debugging)
     SVS* vertexShader = nullptr;

@@ -358,30 +358,36 @@ void GBufferPass::Execute(
             if (matPSO) {
                 // Step 1: Write VCB data inline in command list (proper NVRHI pattern)
                 // MUST be done BEFORE setGraphicsState/SetBindingSet that uses the VCB!
-                struct PerObjectConstants {
-                    Fmatrix worldViewProj;
-                    Fmatrix world;
-                    Fmatrix worldIT;
-                };
-                PerObjectConstants constants;
+
+                // Use the CB size from the material shader (extracted from shader reflection)
+                u32 cbSize = matPSO->perObjectCBSize > 0 ? matPSO->perObjectCBSize : 256;
+
+                // Allocate buffer on stack (max 256 bytes for CB alignment)
+                u8 cbData[256] = {};  // Zero-initialized!
+
+                // Fill in the matrices we actually use
+                Fmatrix* pWorldViewProj = reinterpret_cast<Fmatrix*>(cbData + 0);
+                Fmatrix* pWorld = reinterpret_cast<Fmatrix*>(cbData + 64);
+                Fmatrix* pWorldIT = reinterpret_cast<Fmatrix*>(cbData + 128);
 
                 // Get view-projection matrix from device
                 Fmatrix viewProj;
                 viewProj.mul(Device.mView, Device.mProject);
 
                 // Compute matrices
-                constants.worldViewProj.mul(batch.worldMatrix, viewProj);
-                constants.world = batch.worldMatrix;
+                pWorldViewProj->mul(batch.worldMatrix, viewProj);
+                *pWorld = batch.worldMatrix;
 
                 Fmatrix temp;
                 temp.invert(batch.worldMatrix);
-                constants.worldIT.transpose(temp);
+                pWorldIT->transpose(temp);
 
                 VERIFY(m_perObjectCB.IsValid());
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
 
                 // Write VCB within render pass command list (NVRHI handles versioning)
-                ctx.WriteBuffer(vcbBuffer, &constants, sizeof(constants));
+                // Write the FULL CB size (including padding) to match shader expectations!
+                ctx.WriteBuffer(vcbBuffer, cbData, cbSize);
 
                 // Step 2: Get or create cached binding set (created once, reused!)
                 nvrhi::BindingSetHandle fullBindingSet =
