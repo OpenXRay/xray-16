@@ -4,6 +4,9 @@
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/FTreeVisual.h"
+#include "Layers/xrRender/SH_Atomic.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 
@@ -76,7 +79,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     Msg("~ [MaterialCache] Creating PSO (hash: texture=0x%llX, state=0x%llX)", textureHash, stateHash);
 
-    MaterialPSO* pso = CreatePSO(elem, pass, outputs, fg);
+    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
     if (!pso) {
         Msg("! [MaterialCache] Failed to create PSO");
         return nullptr;
@@ -91,6 +94,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 }
 
 MaterialPSO* MaterialCache::CreatePSO(
+    dxRender_Visual* visual,
     ShaderElement* elem,
     SPass* pass,
     const passes::GBufferOutputs& outputs,
@@ -172,7 +176,7 @@ MaterialPSO* MaterialCache::CreatePSO(
     psoDesc.vertexShader = rcVS;
     psoDesc.pixelShader = rcPS;
 
-    SetupVertexAttributes(psoDesc);
+    SetupVertexAttributes(visual, psoDesc);
 
     SetupRenderStates(pass, psoDesc);
 
@@ -386,42 +390,48 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     return static_cast<u64>(hash);
 }
 
-void MaterialCache::SetupVertexAttributes(ng::PipelineStateDesc& psoDesc)
+void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc)
 {
-
     psoDesc.vertexAttributes.clear();
 
-    ng::VertexAttribute posAttr;
-    posAttr.semanticName = "POSITION";
-    posAttr.semanticIndex = 0;
-    posAttr.format = nvrhi::Format::RGB32_FLOAT;
-    posAttr.offset = 0;
-    posAttr.bufferIndex = 0;
-    psoDesc.vertexAttributes.push_back(posAttr);
+    IRender_Mesh* meshVisual = nullptr;
+    switch (visual->getType()) {
+        case MT_NORMAL:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
+        case MT_TREE_ST:
+        case MT_TREE_PM:
+            meshVisual = static_cast<FTreeVisual*>(visual);
+            break;
+        default:
+            Msg("! [MaterialCache] Unknown visual type for vertex layout extraction");
+            return;
+    }
 
-    ng::VertexAttribute normAttr;
-    normAttr.semanticName = "NORMAL";
-    normAttr.semanticIndex = 0;
-    normAttr.format = nvrhi::Format::RGB32_FLOAT;
-    normAttr.offset = 12;
-    normAttr.bufferIndex = 0;
-    psoDesc.vertexAttributes.push_back(normAttr);
+    if (!meshVisual || !meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        return;
 
-    ng::VertexAttribute texAttr;
-    texAttr.semanticName = "TEXCOORD";
-    texAttr.semanticIndex = 0;
-    texAttr.format = nvrhi::Format::RG32_FLOAT;
-    texAttr.offset = 24;
-    texAttr.bufferIndex = 0;
-    psoDesc.vertexAttributes.push_back(texAttr);
+    SGeometry* geom = meshVisual->rm_geom._get();
+    if (!geom->dcl || !geom->dcl._get())
+        return;
 
-    ng::VertexAttribute tangAttr;
-    tangAttr.semanticName = "TANGENT";
-    tangAttr.semanticIndex = 0;
-    tangAttr.format = nvrhi::Format::RGB32_FLOAT;
-    tangAttr.offset = 32;
-    tangAttr.bufferIndex = 0;
-    psoDesc.vertexAttributes.push_back(tangAttr);
+    SDeclaration* decl = geom->dcl._get();
+
+    for (const auto& d3dElem : decl->dx11_dcl_code) {
+        ng::VertexAttribute attr;
+        attr.semanticName = d3dElem.SemanticName;
+        attr.semanticIndex = d3dElem.SemanticIndex;
+
+        attr.format = static_cast<nvrhi::Format>(d3dElem.Format);
+
+        attr.offset = d3dElem.AlignedByteOffset;
+        attr.bufferIndex = d3dElem.InputSlot;
+        attr.isInstanced = (d3dElem.InputSlotClass == D3D11_INPUT_PER_INSTANCE_DATA);
+
+        psoDesc.vertexAttributes.push_back(attr);
+    }
+
+    Msg("  Extracted %u vertex attributes from geometry", psoDesc.vertexAttributes.size());
 }
 
 void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc)
