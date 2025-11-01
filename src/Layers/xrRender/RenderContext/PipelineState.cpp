@@ -317,6 +317,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
                 nvrhiAttr.offset = attrs[0]->offset;
                 nvrhiAttr.bufferIndex = attrs[0]->bufferIndex;
                 nvrhiAttr.isInstanced = attrs[0]->isInstanced;
+                nvrhiAttr.elementStride = attrs[0]->elementStride;  // CRITICAL: Set stride!
                 nvrhiAttr.arraySize = static_cast<uint32_t>(attrs.size());
                 nvrhiAttrs.push_back(nvrhiAttr);
             } else {
@@ -328,6 +329,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
                     nvrhiAttr.offset = attr->offset;
                     nvrhiAttr.bufferIndex = attr->bufferIndex;
                     nvrhiAttr.isInstanced = attr->isInstanced;
+                    nvrhiAttr.elementStride = attr->elementStride;  // CRITICAL: Set stride!
                     nvrhiAttr.arraySize = 1;
                     nvrhiAttrs.push_back(nvrhiAttr);
                 }

@@ -19,6 +19,7 @@ struct VertexAttribute {
     u32 offset;
     u32 bufferIndex = 0;
     bool isInstanced = false;
+    u32 elementStride = 0;  // Stride of the vertex buffer this attribute belongs to
 };
 
 // ═══════════════════════════════════════════════════
