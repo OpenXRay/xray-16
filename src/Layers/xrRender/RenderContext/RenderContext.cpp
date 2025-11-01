@@ -320,11 +320,10 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
         return;
     }
 
-    // Step 3: Set graphics state with binding set
-    // NVRHI caches state, so we only need to set what changes
-    nvrhi::GraphicsState state;
-    state.addBindingSet(bindingSet);
-    m_commandList->setGraphicsState(state);
+    // Step 3: Update current state (don't apply yet - batch with other state changes)
+    m_currentState.bindings[slot] = bindingSet.Get();
+
+    // Don't call setGraphicsState yet - batch state changes
 }
 
 void RenderContext::SetConstantBuffer(u32 slot, BufferHandle buffer) {
