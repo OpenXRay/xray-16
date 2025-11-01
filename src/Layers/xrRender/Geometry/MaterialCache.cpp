@@ -537,24 +537,61 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
 }
 
 // ══════════════════════════════════════════════════════════
-//  HELPER: Convert DXGI format to IA-compatible format
+//  FORMAT CONVERSION HELPER
 // ══════════════════════════════════════════════════════════
 
-static bool IsIACompatibleFormat(DXGI_FORMAT dxgiFormat) {
-    // The Input Assembler only supports specific vertex formats
-    // Packed formats like B4G4R4A4, B5G6R5, etc. are NOT supported
+namespace {
+    // Convert DXGI_FORMAT to NVRHI format, handling IA-incompatible formats
+    nvrhi::Format ConvertVertexFormat(DXGI_FORMAT dxgiFormat) {
+        switch (dxgiFormat) {
+            // Direct mappings (IA-compatible)
+            case DXGI_FORMAT_R32G32B32A32_FLOAT: return nvrhi::Format::RGBA32_FLOAT;
+            case DXGI_FORMAT_R32G32B32_FLOAT:    return nvrhi::Format::RGB32_FLOAT;
+            case DXGI_FORMAT_R32G32_FLOAT:       return nvrhi::Format::RG32_FLOAT;
+            case DXGI_FORMAT_R32_FLOAT:          return nvrhi::Format::R32_FLOAT;
 
-    switch (dxgiFormat) {
-        // These packed formats are NOT supported by IA
-        case DXGI_FORMAT_B4G4R4A4_UNORM:
-        case DXGI_FORMAT_B5G6R5_UNORM:
-        case DXGI_FORMAT_B5G5R5A1_UNORM:
-            return false;
+            case DXGI_FORMAT_R16G16B16A16_FLOAT: return nvrhi::Format::RGBA16_FLOAT;
+            case DXGI_FORMAT_R16G16_FLOAT:       return nvrhi::Format::RG16_FLOAT;
+            case DXGI_FORMAT_R16_FLOAT:          return nvrhi::Format::R16_FLOAT;
 
-        // All other formats are assumed compatible
-        // (D3D11 will validate and fail if they're not)
-        default:
-            return true;
+            case DXGI_FORMAT_R8G8B8A8_UNORM:     return nvrhi::Format::RGBA8_UNORM;
+            case DXGI_FORMAT_R8G8B8A8_SNORM:     return nvrhi::Format::RGBA8_SNORM;
+            case DXGI_FORMAT_R8G8B8A8_UINT:      return nvrhi::Format::RGBA8_UINT;
+            case DXGI_FORMAT_R8G8B8A8_SINT:      return nvrhi::Format::RGBA8_SINT;
+
+            case DXGI_FORMAT_R16G16B16A16_UNORM: return nvrhi::Format::RGBA16_UNORM;
+            case DXGI_FORMAT_R16G16B16A16_SNORM: return nvrhi::Format::RGBA16_SNORM;
+            case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
+            case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
+
+            case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
+            case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
+            case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
+            case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
+
+            // IA-incompatible formats - convert to compatible equivalents
+            case DXGI_FORMAT_B4G4R4A4_UNORM:     // 4-bit per channel → 8-bit per channel
+                Msg("  [MaterialCache] Converting B4G4R4A4_UNORM → RGBA8_UNORM for IA compatibility");
+                return nvrhi::Format::RGBA8_UNORM;
+
+            case DXGI_FORMAT_B5G6R5_UNORM:       // 16-bit RGB → RGBA8
+                Msg("  [MaterialCache] Converting B5G6R5_UNORM → RGBA8_UNORM for IA compatibility");
+                return nvrhi::Format::RGBA8_UNORM;
+
+            case DXGI_FORMAT_B5G5R5A1_UNORM:     // 16-bit RGBA → RGBA8
+                Msg("  [MaterialCache] Converting B5G5R5A1_UNORM → RGBA8_UNORM for IA compatibility");
+                return nvrhi::Format::RGBA8_UNORM;
+
+            case DXGI_FORMAT_B8G8R8A8_UNORM:     // BGRA → RGBA
+                return nvrhi::Format::BGRA8_UNORM;
+
+            case DXGI_FORMAT_B8G8R8X8_UNORM:     // BGRX → BGRA
+                return nvrhi::Format::BGRA8_UNORM;
+
+            default:
+                Msg("! [MaterialCache] Unknown DXGI format %d, defaulting to RGBA32_FLOAT", dxgiFormat);
+                return nvrhi::Format::RGBA32_FLOAT;
+        }
     }
 }
 
@@ -628,15 +665,8 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
         attr.semanticIndex = d3dElem.SemanticIndex;
 
-        // Check if format is IA-compatible
-        if (!IsIACompatibleFormat(d3dElem.Format)) {
-            Msg("  Skipping vertex element '%s%d' with IA-incompatible format %u",
-                d3dElem.SemanticName, d3dElem.SemanticIndex, d3dElem.Format);
-            continue;
-        }
-
-        // Convert DXGI format to NVRHI format (no conversion needed, just cast)
-        attr.format = static_cast<nvrhi::Format>(d3dElem.Format);
+        // Convert DXGI format to NVRHI format with proper IA compatibility handling
+        attr.format = ConvertVertexFormat(d3dElem.Format);
 
         attr.offset = d3dElem.AlignedByteOffset;
         attr.bufferIndex = d3dElem.InputSlot;
