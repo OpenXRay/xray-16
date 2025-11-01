@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/SH_Atomic.h"
@@ -418,8 +419,35 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
     SDeclaration* decl = geom->dcl._get();
 
     for (const auto& d3dElem : decl->dx11_dcl_code) {
+        if (!d3dElem.SemanticName) {
+            Msg("! [MaterialCache] Skipping vertex element with NULL semantic name");
+            continue;
+        }
+
         ng::VertexAttribute attr;
-        attr.semanticName = d3dElem.SemanticName;
+
+        xr_string semanticStr = d3dElem.SemanticName;
+        if (semanticStr == "POSITION") {
+            attr.semanticName = "POSITION";
+        } else if (semanticStr == "NORMAL") {
+            attr.semanticName = "NORMAL";
+        } else if (semanticStr == "TEXCOORD") {
+            attr.semanticName = "TEXCOORD";
+        } else if (semanticStr == "TANGENT") {
+            attr.semanticName = "TANGENT";
+        } else if (semanticStr == "BINORMAL") {
+            attr.semanticName = "BINORMAL";
+        } else if (semanticStr == "COLOR") {
+            attr.semanticName = "COLOR";
+        } else if (semanticStr == "BLENDWEIGHT") {
+            attr.semanticName = "BLENDWEIGHT";
+        } else if (semanticStr == "BLENDINDICES") {
+            attr.semanticName = "BLENDINDICES";
+        } else {
+            Msg("! [MaterialCache] Unknown semantic: %s", d3dElem.SemanticName);
+            attr.semanticName = d3dElem.SemanticName;
+        }
+
         attr.semanticIndex = d3dElem.SemanticIndex;
 
         attr.format = static_cast<nvrhi::Format>(d3dElem.Format);
