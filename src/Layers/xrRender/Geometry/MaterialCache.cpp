@@ -791,6 +791,39 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     return static_cast<u64>(hash);
 }
 
+static u32 GetFormatSize(DXGI_FORMAT format) {
+    switch (format) {
+        case DXGI_FORMAT_R32G32B32A32_FLOAT: return 16;
+        case DXGI_FORMAT_R32G32B32_FLOAT: return 12;
+        case DXGI_FORMAT_R32G32_FLOAT: return 8;
+        case DXGI_FORMAT_R32_FLOAT: return 4;
+        case DXGI_FORMAT_R16G16B16A16_FLOAT: return 8;
+        case DXGI_FORMAT_R16G16_FLOAT: return 4;
+        case DXGI_FORMAT_R16_FLOAT: return 2;
+        case DXGI_FORMAT_R8G8B8A8_UNORM: return 4;
+        case DXGI_FORMAT_R8G8_UNORM: return 2;
+        case DXGI_FORMAT_R8_UNORM: return 1;
+        case DXGI_FORMAT_R16G16B16A16_SNORM: return 8;
+        case DXGI_FORMAT_R16G16_SNORM: return 4;
+        case DXGI_FORMAT_R16_SNORM: return 2;
+        case DXGI_FORMAT_R8G8B8A8_SNORM: return 4;
+        case DXGI_FORMAT_R8G8_SNORM: return 2;
+        case DXGI_FORMAT_R8_SNORM: return 1;
+        case DXGI_FORMAT_R16G16B16A16_UINT: return 8;
+        case DXGI_FORMAT_R16G16_UINT: return 4;
+        case DXGI_FORMAT_R16_UINT: return 2;
+        case DXGI_FORMAT_R8G8B8A8_UINT: return 4;
+        case DXGI_FORMAT_R8G8_UINT: return 2;
+        case DXGI_FORMAT_R8_UINT: return 1;
+        case DXGI_FORMAT_R32G32B32A32_UINT: return 16;
+        case DXGI_FORMAT_R32G32_UINT: return 8;
+        case DXGI_FORMAT_R32_UINT: return 4;
+        default:
+            Msg("! [MaterialCache] Unknown DXGI format size: %d", format);
+            return 4;
+    }
+}
+
 void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc)
 {
     psoDesc.vertexAttributes.clear();
@@ -817,6 +850,20 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         return;
 
     SDeclaration* decl = geom->dcl._get();
+
+    std::map<u32, u32> bufferStrides;
+
+    for (const auto& d3dElem : decl->dx11_dcl_code) {
+        if (!d3dElem.SemanticName)
+            continue;
+
+        u32 slot = d3dElem.InputSlot;
+        u32 elemSize = GetFormatSize(d3dElem.Format);
+
+        u32 endOffset = d3dElem.AlignedByteOffset + elemSize;
+
+        bufferStrides[slot] = std::max(bufferStrides[slot], endOffset);
+    }
 
     struct SemanticKey {
         xr_string name;
@@ -877,7 +924,13 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         attr.bufferIndex = d3dElem.InputSlot;
         attr.isInstanced = (d3dElem.InputSlotClass == D3D11_INPUT_PER_INSTANCE_DATA);
 
+        attr.elementStride = bufferStrides[d3dElem.InputSlot];
+
         psoDesc.vertexAttributes.push_back(attr);
+    }
+
+    for (const auto& [slot, stride] : bufferStrides) {
+        Msg("  [MaterialCache] Vertex buffer slot %u: stride = %u bytes", slot, stride);
     }
 }
 

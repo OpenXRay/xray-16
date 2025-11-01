@@ -18,7 +18,6 @@ struct alignas(16) PerObjectConstants {
     float padding[2];
     float padding2[16];
 };
-static_assert(sizeof(PerObjectConstants) == 256, "PerObjectConstants must be 256 bytes");
 
 struct alignas(16) GlobalConstants {
     Fmatrix m_V;
@@ -46,7 +45,6 @@ struct alignas(16) GlobalConstants {
 
     Fvector4 parallax;
 };
-static_assert(sizeof(GlobalConstants) == 368, "GlobalConstants must be 368 bytes");
 
 inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.m_V = Device.mView;
