@@ -295,6 +295,10 @@ private:
     nvrhi::FramebufferHandle m_currentFramebuffer;
     nvrhi::GraphicsState m_currentState;  // Track current graphics state
 
+    // Keep binding sets alive (reference counted by NVRHI)
+    // These are temporary binding sets created by SetConstantBuffer, etc.
+    xr_vector<nvrhi::BindingSetHandle> m_tempBindingSets;
+
     // State cache for redundancy elimination
     struct StateCache {
         nvrhi::IGraphicsPipeline* pipeline = nullptr;

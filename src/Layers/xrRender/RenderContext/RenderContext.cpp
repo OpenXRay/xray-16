@@ -110,6 +110,9 @@ void RenderContext::EndRenderPass() {
 
     m_commandList->endMarker();  // End debug marker
 
+    // Clear temporary binding sets (release references)
+    m_tempBindingSets.clear();
+
     m_inRenderPass = false;
 }
 
@@ -324,6 +327,9 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
     // static_vector has fixed capacity but dynamic size - resize to make slot accessible
     m_currentState.bindings.resize(slot + 1);
     m_currentState.bindings[slot] = bindingSet.Get();
+
+    // Keep the handle alive (NVRHI uses reference counting)
+    m_tempBindingSets.push_back(bindingSet);
 
     // Don't call setGraphicsState yet - batch state changes
 }
