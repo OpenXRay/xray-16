@@ -43,12 +43,23 @@ struct ShaderRTBindings {
     xr_vector<InputTexture> inputTextures;
 
     // ─── Output RTs (RTVs) ───
+    enum class RTSemantic {
+        Unknown,
+        Normal,      // World-space or view-space normal
+        Albedo,      // Base color / diffuse
+        Material,    // Material properties (metallic, roughness, AO)
+        Position,    // World-space or view-space position
+        Emissive,    // Emissive color
+        Accumulator  // Lighting accumulation buffer
+    };
+
     struct OutputRT {
         u32 slot;              // SV_Target index
-        shared_str inferredName; // Inferred from phase + signature
+        RTSemantic semantic;   // Inferred semantic meaning
+        shared_str formatDesc; // Format description for debugging
 
-        OutputRT() : slot(0) {}
-        OutputRT(u32 s) : slot(s) {}
+        OutputRT() : slot(0), semantic(RTSemantic::Unknown) {}
+        OutputRT(u32 s) : slot(s), semantic(RTSemantic::Unknown) {}
     };
     xr_vector<OutputRT> outputRTs;
 
@@ -78,6 +89,12 @@ public:
 
     // Get typical RT names for a phase
     static xr_vector<const char*> GetPhaseRTNames(RenderPhase phase);
+
+    // Infer RT semantic from output signature
+    static ShaderRTBindings::RTSemantic InferRTSemantic(
+        u32 slot,
+        u32 componentMask,
+        RenderPhase phase);
 
 private:
     // Helper: check if texture name matches pattern

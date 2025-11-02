@@ -137,6 +137,36 @@ struct MaterialPSO {
         return (u32)rtBindings.outputRTs.size();
     }
 
+    // ─── Dynamic RT Slot Mapping ───
+    // Maps GBuffer RT semantics to shader output slots dynamically
+    // based on shader reflection data
+
+    // Get the SV_Target slot for a given RT semantic
+    // Returns ~0u if this semantic is not written by the shader
+    u32 GetSlotForSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
+        for (const auto& output : rtBindings.outputRTs) {
+            if (output.semantic == semantic) {
+                return output.slot;
+            }
+        }
+        return ~0u;  // Not written by this shader
+    }
+
+    // Check if shader writes to a specific semantic
+    bool WritesSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
+        return GetSlotForSemantic(semantic) != ~0u;
+    }
+
+    // Get all output slots sorted by slot index
+    xr_vector<u32> GetOutputSlots() const {
+        xr_vector<u32> slots;
+        for (const auto& output : rtBindings.outputRTs) {
+            slots.push_back(output.slot);
+        }
+        std::sort(slots.begin(), slots.end());
+        return slots;
+    }
+
     // Debug name
     shared_str debugName;
 
@@ -220,6 +250,7 @@ private:
     void SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
+        MaterialPSO* matPSO,  // Pass MaterialPSO for shader reflection data
         const passes::GBufferOutputs& outputs,
         const xray::render::framegraph::FrameGraph& fg,
         ng::PipelineStateDesc& psoDesc);

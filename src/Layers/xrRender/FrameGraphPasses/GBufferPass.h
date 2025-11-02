@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render {
@@ -53,21 +54,29 @@ struct GBufferOutputs {
 };
 
 // ══════════════════════════════════════════════════════════
-//  G-BUFFER PASS BUILDER
+//  G-BUFFER PASS BUILDER (Week 16: Inherits from IPass)
 // ══════════════════════════════════════════════════════════
 
-class GBufferPass {
+class GBufferPass : public framegraph::IPass {
 public:
     GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config = GBufferPassConfig());
-    ~GBufferPass();
+    ~GBufferPass() override;
 
-    // Setup pass in FrameGraph
-    GBufferOutputs Setup(framegraph::FrameGraph& fg);
+    // ═══════════════════════════════════════════════════
+    //  IPASS INTERFACE (Week 16)
+    // ═══════════════════════════════════════════════════
+
+    void Setup(framegraph::FrameGraph& fg) override;
+    void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) override;
+
+    framegraph::RenderPhase GetPhase() const override {
+        return framegraph::RenderPhase::Geometry;
+    }
 
     // Get configuration
     const GBufferPassConfig& GetConfig() const { return m_config; }
 
-    // Statistics
+    // Statistics (GBufferPass-specific, different from IPass::PassStats)
     struct Stats {
         u32 numDrawCalls = 0;
         u32 numTriangles = 0;
@@ -76,7 +85,14 @@ public:
         float gpuTimeMs = 0.0f;
     };
 
-    const Stats& GetStats() const { return m_stats; }
+    // Non-virtual getter for GBufferPass-specific stats
+    const Stats& GetGBufferStats() const { return m_gbufferStats; }
+
+    // Access GBuffer outputs (for RT registry)
+    const GBufferOutputs& GetOutputs() const { return m_outputs; }
+
+    // Access material cache (for phase detection)
+    MaterialCache* GetMaterialCache() const { return m_materialCache.get(); }
 
     // Get the native pipeline for geometry submission
     nvrhi::IGraphicsPipeline* GetPipeline() const {
@@ -86,7 +102,10 @@ public:
 private:
     ng::RenderDevice* m_device;
     GBufferPassConfig m_config;
-    Stats m_stats;
+    Stats m_gbufferStats;  // GBufferPass-specific stats
+
+    // G-Buffer outputs (stored for RT registry access)
+    GBufferOutputs m_outputs;
 
     // Material system
     xr_unique_ptr<MaterialCache> m_materialCache;
@@ -106,10 +125,6 @@ private:
 
     // Create pipeline state object
     bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
-
-    // Execution callback
-    void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
-                const GBufferOutputs& outputs);
 
     // Update per-object constant buffer data only (no binding)
     void UpdatePerObjectConstantsData(const GeometryBatch& batch);

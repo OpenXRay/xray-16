@@ -171,10 +171,14 @@ bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph
     return true;
 }
 
-GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
+// ═══════════════════════════════════════════════════════
+//  IPASS INTERFACE: SETUP
+// ═══════════════════════════════════════════════════════
+
+void GBufferPass::Setup(FrameGraph& fg) {
     Msg("~ [GBufferPass] Setting up in FrameGraph");
 
-    GBufferOutputs outputs;
+    m_outputs = GBufferOutputs{};
 
     // ═══════════════════════════════════════════════════════
     //  CREATE G-BUFFER RESOURCES
@@ -190,7 +194,7 @@ GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     albedoDesc.isTransient = true;
     albedoDesc.debugName = "GBuffer.Albedo";
 
-    outputs.albedo = fg.CreateTexture("GBuffer.Albedo", albedoDesc);
+    m_outputs.albedo = fg.CreateTexture("GBuffer.Albedo", albedoDesc);
 
     // Normal + Roughness
     ResourceDesc normalDesc;
@@ -202,7 +206,7 @@ GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     normalDesc.isTransient = true;
     normalDesc.debugName = "GBuffer.Normal";
 
-    outputs.normal = fg.CreateTexture("GBuffer.Normal", normalDesc);
+    m_outputs.normal = fg.CreateTexture("GBuffer.Normal", normalDesc);
 
     // Material ID
     ResourceDesc materialDesc;
@@ -214,7 +218,7 @@ GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     materialDesc.isTransient = true;
     materialDesc.debugName = "GBuffer.Material";
 
-    outputs.material = fg.CreateTexture("GBuffer.Material", materialDesc);
+    m_outputs.material = fg.CreateTexture("GBuffer.Material", materialDesc);
 
     // Depth + Stencil
     ResourceDesc depthDesc;
@@ -226,7 +230,7 @@ GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     depthDesc.isTransient = true;
     depthDesc.debugName = "GBuffer.Depth";
 
-    outputs.depth = fg.CreateTexture("GBuffer.Depth", depthDesc);
+    m_outputs.depth = fg.CreateTexture("GBuffer.Depth", depthDesc);
 
     // ═══════════════════════════════════════════════════════
     //  CREATE GBUFFER PASS
@@ -235,46 +239,45 @@ GBufferOutputs GBufferPass::Setup(FrameGraph& fg) {
     PassHandle gbufferPass = fg.AddPass("GBuffer");
 
     // Declare resource writes (render targets)
-    fg.PassWrite(gbufferPass, outputs.albedo, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, outputs.normal, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, outputs.material, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, outputs.depth, ResourceState::DepthStencilWrite);
+    fg.PassWrite(gbufferPass, m_outputs.albedo, ResourceState::RenderTarget);
+    fg.PassWrite(gbufferPass, m_outputs.normal, ResourceState::RenderTarget);
+    fg.PassWrite(gbufferPass, m_outputs.material, ResourceState::RenderTarget);
+    fg.PassWrite(gbufferPass, m_outputs.depth, ResourceState::DepthStencilWrite);
 
     // Set execution callback
-    fg.SetPassCallback(gbufferPass, [this, outputs](ng::RenderContext& ctx, const FrameGraph& fg) {
-        this->Execute(ctx, fg, outputs);
+    // Set execution callback (IPass::Execute will use m_outputs)
+    fg.SetPassCallback(gbufferPass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
+        this->Execute(ctx, fg);
     });
 
     Msg("  ✓ G-Buffer pass configured");
-
-    return outputs;
 }
 
-void GBufferPass::Execute(
-    ng::RenderContext& ctx,
-    const FrameGraph& fg,
-    const GBufferOutputs& outputs
-) {
+// ═══════════════════════════════════════════════════════
+//  IPASS INTERFACE: EXECUTE
+// ═══════════════════════════════════════════════════════
+
+void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     Msg("~ [GBufferPass] Executing");
 
     auto executeStart = std::chrono::high_resolution_clock::now();
 
     // Reset statistics
-    m_stats = Stats{};
+    m_gbufferStats = Stats{};
 
     // ═══════════════════════════════════════════════════════
     //  GET PHYSICAL RESOURCES
     // ═══════════════════════════════════════════════════════
 
-    nvrhi::ITexture* albedo = fg.GetPhysicalTexture(outputs.albedo);
-    nvrhi::ITexture* normal = fg.GetPhysicalTexture(outputs.normal);
-    nvrhi::ITexture* material = fg.GetPhysicalTexture(outputs.material);
-    nvrhi::ITexture* depth = fg.GetPhysicalTexture(outputs.depth);
+    nvrhi::ITexture* albedo = fg.GetPhysicalTexture(m_outputs.albedo);
+    nvrhi::ITexture* normal = fg.GetPhysicalTexture(m_outputs.normal);
+    nvrhi::ITexture* material = fg.GetPhysicalTexture(m_outputs.material);
+    nvrhi::ITexture* depth = fg.GetPhysicalTexture(m_outputs.depth);
 
     // Create pipeline if needed (once per frame, using actual G-Buffer formats)
     if (!m_pipeline)
     {
-        if (!CreatePipeline(outputs, fg))
+        if (!CreatePipeline(m_outputs, fg))
         {
             Msg("! [GBufferPass] Failed to create pipeline");
             return;
@@ -329,13 +332,12 @@ void GBufferPass::Execute(
     // WriteBuffer must be called OUTSIDE render passes!
     // Pre-scan all batches to find unique global CB buffers and update them now
 
-    if (g_geometryCollector != nullptr) {
-        const auto& batches = g_geometryCollector->GetBatches();
+    if (!m_batches.empty()) {
         xr_set<nvrhi::IBuffer*> updatedGlobalBuffers;
 
-        for (const auto& batch : batches) {
-            if (batch.visual && m_materialCache) {
-                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
+        for (const auto* batch : m_batches) {
+            if (batch->visual && m_materialCache) {
+                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(batch->visual, m_outputs, fg);
                 if (matPSO) {
                     for (const auto& cbInfo : matPSO->constantBuffers) {
                         if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
@@ -354,11 +356,23 @@ void GBufferPass::Execute(
         Msg("  [GBufferPass] Pre-updated %u unique global CB buffers", (u32)updatedGlobalBuffers.size());
     }
 
-    // Setup render pass descriptor
+    // ═══════════════════════════════════════════════════════
+    //  SETUP RENDER PASS DESCRIPTOR
+    // ═══════════════════════════════════════════════════════
+    // X-Ray convention (validated from vanilla, inferred by ShaderReflector):
+    // - Slot 0 → Normal   (RTSemantic::Normal)
+    // - Slot 1 → Albedo   (RTSemantic::Albedo)
+    // - Slot 2 → Material (RTSemantic::Material)
+    //
+    // ShaderReflector analyzes each shader and assigns semantics to slots.
+    // MaterialCache::SetupRenderTargets() uses these semantics to configure PSO formats.
+    // We bind physical textures here in the standard slot order.
+    // Shaders write to whichever slots they need based on their reflection data.
+
     ng::RenderPassDesc passDesc;
-    passDesc.renderTargets[0] = albedo;
-    passDesc.renderTargets[1] = normal;
-    passDesc.renderTargets[2] = material;
+    passDesc.renderTargets[0] = normal;    // SV_Target0 (RTSemantic::Normal)
+    passDesc.renderTargets[1] = albedo;    // SV_Target1 (RTSemantic::Albedo)
+    passDesc.renderTargets[2] = material;  // SV_Target2 (RTSemantic::Material)
     passDesc.numRenderTargets = 3;
     passDesc.depthStencil = depth;
     passDesc.clearValue.color[0] = m_config.clearColor[0];
@@ -370,6 +384,11 @@ void GBufferPass::Execute(
     passDesc.clearColor = true;
     passDesc.clearDepth = true;
     passDesc.clearStencil = true;
+
+    Msg("! [GBufferPass] Framebuffer binding (X-Ray convention):");
+    Msg("!   Slot 0 → Normal   (texture %p)", normal);
+    Msg("!   Slot 1 → Albedo   (texture %p)", albedo);
+    Msg("!   Slot 2 → Material (texture %p)", material);
 
     // Begin render pass
     ctx.BeginRenderPass(passDesc);
@@ -391,17 +410,13 @@ void GBufferPass::Execute(
     ctx.SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  GET GEOMETRY TO RENDER
+    //  GET GEOMETRY TO RENDER (Week 16: Use IPass batches)
     // ═══════════════════════════════════════════════════════
 
-    // Access global geometry collector (defined in GeometryBatch.cpp)
+    m_gbufferStats.numObjects = static_cast<u32>(m_batches.size());
+    Msg("  Rendering %u geometry batches (from IPass routing)", m_gbufferStats.numObjects);
 
-    if (g_geometryCollector != nullptr) {
-        const auto& batches = g_geometryCollector->GetBatches();
-        m_stats.numObjects = static_cast<u32>(batches.size());
-
-        Msg("  Rendering %u geometry batches", m_stats.numObjects);
-
+    if (!m_batches.empty()) {
         // ═══════════════════════════════════════════════════════
         //  RENDER GEOMETRY BATCHES
         // ═══════════════════════════════════════════════════════
@@ -412,16 +427,16 @@ void GBufferPass::Execute(
         // Keep binding sets alive for the duration of rendering
         // NOTE: No longer need tempBindingSets - binding sets are now cached in MaterialPSO!
 
-        for (const auto& batch : batches) {
+        for (const auto* batch : m_batches) {
             // Get per-material PSO from MaterialCache
             ng::PipelineState* pipelineToUse = m_pipeline;  // Default fallback
             MaterialPSO* matPSO = nullptr;
 
-            if (batch.visual && m_materialCache) {
+            if (batch->visual && m_materialCache) {
                 // Get or create PSO for this material
                 matPSO = m_materialCache->GetOrCreatePSO(
-                    batch.visual,
-                    outputs,
+                    batch->visual,
+                    m_outputs,
                     fg);
 
                 if (matPSO && matPSO->pso) {
@@ -464,9 +479,9 @@ void GBufferPass::Execute(
                 };
 
                 // Compute matrices
-                Fmatrix xform = batch.worldMatrix;
+                Fmatrix xform = batch->worldMatrix;
                 Fmatrix xform_v;
-                xform_v.mul(batch.worldMatrix, Device.mView);
+                xform_v.mul(batch->worldMatrix, Device.mView);
 
                 // Write as float3x4 (48 bytes each) to match shader layout
                 CopyMatrix3x4(cbData + 0, xform);     // m_xform at offset 0
@@ -490,26 +505,24 @@ void GBufferPass::Execute(
                 }
             } else {
                 // Fallback to old path
-                UpdatePerObjectConstants(ctx, batch);
+                UpdatePerObjectConstants(ctx, *batch);
 
-                if (batch.bindingSet != currentBindingSet) {
-                    ctx.SetBindingSet(0, batch.bindingSet);
-                    currentBindingSet = batch.bindingSet;
+                if (batch->bindingSet != currentBindingSet) {
+                    ctx.SetBindingSet(0, batch->bindingSet);
+                    currentBindingSet = batch->bindingSet;
                 }
             }
 
             // Bind vertex/index buffers (convert nvrhi::BufferHandle to IBuffer*)
-            ctx.SetVertexBuffer(0, batch.vertexBuffer.Get(), 0);
-            ctx.SetIndexBuffer(batch.indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);  // X-Ray uses 16-bit indices
+            ctx.SetVertexBuffer(0, batch->vertexBuffer.Get(), 0);
+            ctx.SetIndexBuffer(batch->indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);  // X-Ray uses 16-bit indices
 
             // Draw
-            ctx.DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+            ctx.DrawIndexed(batch->indexCount, batch->startIndex, batch->baseVertex);
 
-            m_stats.numDrawCalls++;
-            m_stats.numTriangles += batch.indexCount / 3;
+            m_gbufferStats.numDrawCalls++;
+            m_gbufferStats.numTriangles += batch->indexCount / 3;
         }
-    } else {
-        Msg("  (No geometry collector available)");
     }
 
     // End render pass
@@ -525,20 +538,20 @@ void GBufferPass::Execute(
     // ═══════════════════════════════════════════════════════
 
     auto executeEnd = std::chrono::high_resolution_clock::now();
-    m_stats.cpuTimeMs = std::chrono::duration<float, std::milli>(
+    m_gbufferStats.cpuTimeMs = std::chrono::duration<float, std::milli>(
         executeEnd - executeStart
     ).count();
 
     // Copy from RenderContext stats
     const auto& ctxStats = ctx.GetStats();
-    m_stats.numDrawCalls = ctxStats.numDrawCalls;
+    m_gbufferStats.numDrawCalls = ctxStats.numDrawCalls;
     // Note: numTriangles not in RenderStats yet
-    m_stats.numTriangles = 0;
+    m_gbufferStats.numTriangles = 0;
 
     Msg("  ✓ G-Buffer pass complete: %u draws, %u tris, %.2f ms",
-        m_stats.numDrawCalls,
-        m_stats.numTriangles,
-        m_stats.cpuTimeMs);
+        m_gbufferStats.numDrawCalls,
+        m_gbufferStats.numTriangles,
+        m_gbufferStats.cpuTimeMs);
 }
 
 void GBufferPass::UpdatePerObjectConstantsData(const GeometryBatch& batch)

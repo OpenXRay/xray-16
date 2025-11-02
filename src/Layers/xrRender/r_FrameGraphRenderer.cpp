@@ -8,6 +8,7 @@
 #include "FLOD.h"
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
 
 namespace xray::render {
 
@@ -36,6 +37,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     // Create FrameGraph (needs NVRHI device)
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
+
+    // Create shader phase cache (Week 16 - for precompilation phase detection)
+    m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
 
     // Create passes with correct render target resolution (not screen resolution!)
     passes::GBufferPassConfig gbufferConfig;
@@ -78,6 +82,7 @@ void FrameGraphRenderer::Shutdown() {
     m_tonemapPass.reset();
     m_lightingPass.reset();
     m_gbufferPass.reset();
+    m_shaderPhaseCache.reset();
     m_framegraph.reset();
 
     m_device = nullptr;
@@ -128,11 +133,11 @@ void FrameGraphRenderer::Render() {
         frameEnd - frameStart
     ).count();
 
-    m_stats.gbufferMs = m_gbufferPass->GetStats().cpuTimeMs;
+    m_stats.gbufferMs = m_gbufferPass->GetGBufferStats().cpuTimeMs;
     m_stats.lightingMs = m_lightingPass->GetStats().cpuTimeMs;
     m_stats.tonemapMs = m_tonemapPass->GetStats().cpuTimeMs;
-    m_stats.numDrawCalls = m_gbufferPass->GetStats().numDrawCalls;
-    m_stats.numTriangles = m_gbufferPass->GetStats().numTriangles;
+    m_stats.numDrawCalls = m_gbufferPass->GetGBufferStats().numDrawCalls;
+    m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
 
     // Reset for next frame
     m_framegraph->Reset();
@@ -151,51 +156,43 @@ void FrameGraphRenderer::SetupFrame() {
 
 void FrameGraphRenderer::BuildFrameGraph() {
     // ═══════════════════════════════════════════════════════
-    //  WEEK 16: SCAN REQUIRED PHASES
+    //  STEP 1: SETUP RENDER TARGETS FIRST
     // ═══════════════════════════════════════════════════════
+    // Render targets must exist in FrameGraph before MaterialPSO creation!
 
-    xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
-
-    // ═══════════════════════════════════════════════════════
-    //  WEEK 16: CREATE PASSES DYNAMICALLY
-    // ═══════════════════════════════════════════════════════
-
-    for (framegraph::RenderPhase phase : requiredPhases) {
-        CreatePhasePass(phase);
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  WEEK 16: ROUTE BATCHES TO PASSES
-    // ═══════════════════════════════════════════════════════
-
-    RouteBatchesToPasses();
-
-    // ═══════════════════════════════════════════════════════
-    //  SETUP RENDERING PASSES (Hardcoded for now)
-    // ═══════════════════════════════════════════════════════
-
-    // Create backbuffer as transient resource for now
-    // TODO: Import actual backbuffer from HW later
+    // Create backbuffer as transient resource
     framegraph::ResourceDesc backbufferDesc;
     backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     backbufferDesc.width = 1920;  // TODO: Get from Device
     backbufferDesc.height = 1080;
     backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
     backbufferDesc.isRenderTarget = true;
-    backbufferDesc.isTransient = true;  // Let FrameGraph allocate it
+    backbufferDesc.isTransient = true;
     backbufferDesc.debugName = "Backbuffer";
 
     framegraph::VirtualResourceHandle backbuffer =
         m_framegraph->CreateTexture("Backbuffer", backbufferDesc);
 
-    // G-Buffer pass
-    auto gbufferOutputs = m_gbufferPass->Setup(*m_framegraph);
+    // G-Buffer pass - Setup creates render targets in FrameGraph
+    m_gbufferPass->Setup(*m_framegraph);
+    auto gbufferOutputs = m_gbufferPass->GetOutputs();
+
+    // ═══════════════════════════════════════════════════════
+    //  STEP 2: DYNAMIC PASS ROUTING (Week 16)
+    // ═══════════════════════════════════════════════════════
+    // Now that render targets exist, we can scan materials and create PSOs
+
+    // Scan materials and create required passes
+    CreateAllRequiredPasses();
+
+    // Route batches to appropriate passes
+    RouteBatchesToPasses();
 
     // Lighting pass
-    auto lightingOutput = m_lightingPass->Setup(*m_framegraph, gbufferOutputs);
+    //auto lightingOutput = m_lightingPass->Setup(*m_framegraph, gbufferOutputs);
 
-    // Tonemap pass
-    m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
+     //Tonemap pass
+    //m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
 
     // ═══════════════════════════════════════════════════════
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
@@ -240,13 +237,13 @@ void FrameGraphRenderer::BuildFrameGraph() {
     // ─── Lighting Outputs ───
 
     // HDR Color (Lit scene)
-    registry.RegisterRT("rt_HDRColor", lightingOutput.hdrColor);
-    registry.RegisterRT("rt_Accumulator", lightingOutput.hdrColor);  // Legacy name
-    registry.RegisterAliases(lightingOutput.hdrColor, {
-        "s_hdr",
-        "s_accumulator",
-        "s_acc"
-    });
+    //registry.RegisterRT("rt_HDRColor", lightingOutput.hdrColor);
+    //registry.RegisterRT("rt_Accumulator", lightingOutput.hdrColor);  // Legacy name
+    //registry.RegisterAliases(lightingOutput.hdrColor, {
+    //    "s_hdr",
+    //    "s_accumulator",
+    //    "s_acc"
+    //});
 
     // ─── Backbuffer ───
 
@@ -260,7 +257,7 @@ void FrameGraphRenderer::BuildFrameGraph() {
     registry.PrintRegistry();
 
     // Store final output for presenting to backbuffer
-    m_finalOutput = backbuffer;
+    m_finalOutput = gbufferOutputs.albedo;
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -643,90 +640,150 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
     xr_set<framegraph::RenderPhase> phases;
 
-    // Scan all geometry batches to see what phases they need
-    const auto& batches = m_geometryCollector->GetBatches();
-
+    // Get batches and populate phase info
+    auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
     Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
 
-    for (const auto& batch : batches) {
-        // Skip batches without PSO (shouldn't happen, but be safe)
-        if (!batch.pipeline) {
+    // ═══════════════════════════════════════════════════════
+    //  TRUE PHASE DETECTION (Week 16 - with ShaderPhaseCache)
+    // ═══════════════════════════════════════════════════════
+    //
+    // Use ShaderPhaseCache to extract phase info from shader reflection
+    // WITHOUT creating full PSOs. This works because:
+    //
+    // 1. ShaderPhaseCache only runs shader reflection (no RT dependencies)
+    // 2. Phase is determined purely from shader outputs
+    // 3. No physical textures needed - just bytecode analysis
+    // 4. MaterialPSOs still created lazily during Execute() (after Compile)
+    // ═══════════════════════════════════════════════════════
+
+    // Track phase distribution
+    xr_map<framegraph::RenderPhase, u32> phaseCount;
+
+    for (auto& batch : batches) {
+        // Skip batches without visual
+        if (!batch.visual) {
             continue;
         }
 
-        // Get MaterialPSO from the pipeline
-        // TODO: Need access to MaterialPSO from batch
-        // For now, we'll just assume Geometry phase for all batches
-        // This will be improved once we have proper MaterialPSO access
+        // Query shader phase cache (runs reflection if not cached)
+        framegraph::RenderPhase phase = m_shaderPhaseCache->GetPhase(batch.visual);
 
-        phases.insert(framegraph::RenderPhase::Geometry);
+        // Store phase in batch for routing
+        batch.renderPhase = phase;
+
+        // Track for statistics
+        phases.insert(phase);
+        phaseCount[phase]++;
     }
 
-    Msg("! [FrameGraphRenderer] Found %u required phases", phases.size());
-    for (framegraph::RenderPhase phase : phases) {
-        const char* phaseName = "Unknown";
-        switch (phase) {
-            case framegraph::RenderPhase::Geometry: phaseName = "Geometry"; break;
-            case framegraph::RenderPhase::Lighting: phaseName = "Lighting"; break;
-            case framegraph::RenderPhase::Combine: phaseName = "Combine"; break;
-            case framegraph::RenderPhase::PostProcess: phaseName = "PostProcess"; break;
-            case framegraph::RenderPhase::Shadow: phaseName = "Shadow"; break;
-            case framegraph::RenderPhase::Custom: phaseName = "Custom"; break;
-        }
-        Msg("!   - %s", phaseName);
+    // Log phase distribution
+    Msg("! [FrameGraphRenderer] Found %u required phases:", phases.size());
+    for (const auto& [phase, count] : phaseCount) {
+        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
+        Msg("!   %s: %u batches", phaseName, count);
     }
+
+    // Log cache statistics
+    const auto& cacheStats = m_shaderPhaseCache->GetStats();
+    Msg("! [ShaderPhaseCache] Stats: %u cached, %u hits, %u misses",
+        cacheStats.numCached, cacheStats.numHits, cacheStats.numMisses);
 
     return phases;
 }
 
 void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
-    Msg("! [FrameGraphRenderer] Creating pass for phase: %d", (int)phase);
+    const char* phaseName = framegraph::IPass::GetPhaseName(phase);
+    Msg("! [FrameGraphRenderer] Creating pass for phase: %s", phaseName);
 
-    // For now, we already have hardcoded passes created in Initialize()
-    // Week 16 would dynamically create them here based on phase
-    // This is a placeholder for future implementation
+    PassEntry entry;
+    entry.phase = phase;
 
     switch (phase) {
-        case framegraph::RenderPhase::Geometry:
-            // Already created in Initialize()
-            Msg("!   Geometry pass already exists");
-            break;
+        case framegraph::RenderPhase::Geometry: {
+            // For Geometry phase, we already have m_gbufferPass created in Initialize()
+            // Just store a reference to it (not owned by m_activePasses)
+            Msg("!   Using existing GBufferPass instance");
+            // We'll handle this specially in BuildFrameGraph() since we can't move m_gbufferPass
+            return;
+        }
 
         case framegraph::RenderPhase::Lighting:
-            // Already created in Initialize()
-            Msg("!   Lighting pass already exists");
-            break;
-
         case framegraph::RenderPhase::PostProcess:
-            // Tonemap pass already exists
-            Msg("!   PostProcess pass already exists");
-            break;
-
+        case framegraph::RenderPhase::Combine:
+        case framegraph::RenderPhase::Shadow:
+        case framegraph::RenderPhase::Custom:
         default:
-            Msg("!   ⚠️ Unsupported phase: %d", (int)phase);
-            break;
+            Msg("!   ⚠️ Unsupported phase: %s (not yet implemented)", phaseName);
+            return;
     }
+
+    // This code is unreachable for now, but will be used when we add more pass types
+    // m_activePasses.push_back(std::move(entry));
+}
+
+void FrameGraphRenderer::CreateAllRequiredPasses() {
+    // Scan materials to determine which phases are needed
+    xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
+
+    // Create passes for each required phase
+    for (framegraph::RenderPhase phase : requiredPhases) {
+        CreatePhasePass(phase);
+    }
+
+    Msg("! [FrameGraphRenderer] Created %u passes", m_activePasses.size());
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
     Msg("! [FrameGraphRenderer] Routing batches to passes...");
 
+    // Get all batches
+    auto& batches = m_geometryCollector->GetBatchesMutable();
+
+    // ═══════════════════════════════════════════════════════
+    //  TRUE PHASE-BASED ROUTING (Week 16)
+    // ═══════════════════════════════════════════════════════
+    //
+    // Use cached phase info from ScanRequiredPhases().
+    // Each batch has a renderPhase field populated from ShaderPhaseCache.
+    //
+    // MaterialPSOs are still created lazily during Execute()
+    // (after FrameGraph compilation).
+    // ═══════════════════════════════════════════════════════
+
     // Group batches by phase
-    const auto& batches = m_geometryCollector->GetBatches();
+    xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
 
-    u32 geometryBatches = 0;
-    u32 lightingBatches = 0;
-    u32 otherBatches = 0;
-
-    for (const auto& batch : batches) {
-        // For now, all batches go to Geometry phase
-        // TODO: Route based on MaterialPSO->GetPhase()
-        geometryBatches++;
+    for (auto& batch : batches) {
+        // Use cached phase from batch (populated in ScanRequiredPhases)
+        batchesByPhase[batch.renderPhase].push_back(&batch);
     }
 
-    Msg("!   Geometry: %u batches", geometryBatches);
-    Msg("!   Lighting: %u batches", lightingBatches);
-    Msg("!   Other: %u batches", otherBatches);
+    // Assign batches to pass instances
+    for (const auto& [phase, phaseBatches] : batchesByPhase) {
+        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
+
+        switch (phase) {
+            case framegraph::RenderPhase::Geometry:
+                // Assign to GBufferPass
+                m_gbufferPass->SetBatches(phaseBatches);
+                Msg("!   %s: %u batches assigned to GBufferPass",
+                    phaseName, phaseBatches.size());
+                break;
+
+            case framegraph::RenderPhase::Lighting:
+            case framegraph::RenderPhase::PostProcess:
+            case framegraph::RenderPhase::Combine:
+            case framegraph::RenderPhase::Shadow:
+            case framegraph::RenderPhase::Custom:
+            default:
+                Msg("!   %s: %u batches (no pass implemented yet)",
+                    phaseName, phaseBatches.size());
+                break;
+        }
+    }
+
+    Msg("! [FrameGraphRenderer] Batch routing complete");
 }
 
 } // namespace xray::render

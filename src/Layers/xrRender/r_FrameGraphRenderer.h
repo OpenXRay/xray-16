@@ -2,7 +2,9 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
@@ -57,6 +59,9 @@ private:
     // FrameGraph
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 
+    // Shader phase cache (Week 16 - for precompilation phase detection)
+    xr_unique_ptr<framegraph::ShaderPhaseCache> m_shaderPhaseCache;
+
     // Final output texture (for copying to backbuffer)
     framegraph::VirtualResourceHandle m_finalOutput;
 
@@ -92,6 +97,16 @@ private:
     //  DYNAMIC PASS ROUTING (Week 16)
     // ═══════════════════════════════════════════════════
 
+    // Pass registry entry
+    struct PassEntry {
+        framegraph::RenderPhase phase;
+        xr_unique_ptr<framegraph::IPass> pass;
+        xr_vector<GeometryBatch*> assignedBatches;
+    };
+
+    // Active passes for this frame (dynamically created)
+    xr_vector<PassEntry> m_activePasses;
+
     // Scan materials to determine required phases
     xr_set<framegraph::RenderPhase> ScanRequiredPhases() const;
 
@@ -100,6 +115,9 @@ private:
 
     // Route batches to appropriate passes
     void RouteBatchesToPasses();
+
+    // Create all required passes dynamically
+    void CreateAllRequiredPasses();
 };
 
 } // namespace xray::render

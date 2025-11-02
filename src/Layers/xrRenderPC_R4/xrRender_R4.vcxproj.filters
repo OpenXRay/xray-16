@@ -757,6 +757,7 @@
     <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderPhaseCache.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1381,6 +1382,7 @@
     <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp" />
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
     <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderPhaseCache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

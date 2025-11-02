@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For RenderPhase
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;  // Forward declaration
@@ -10,6 +11,8 @@ namespace xray::render::RENDER_NAMESPACE {
 namespace xray::render {
 
 using RENDER_NAMESPACE::dxRender_Visual;
+
+struct MaterialPSO;  // Forward declaration
 
 // ══════════════════════════════════════════════════════════
 //  GEOMETRY BATCH (SINGLE DRAW CALL)
@@ -40,8 +43,25 @@ struct GeometryBatch {
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
 
+    // ═══════════════════════════════════════════════════
+    //  WEEK 16: DYNAMIC ROUTING DATA
+    // ═══════════════════════════════════════════════════
+
+    // MaterialPSO contains shader RT bindings and full PSO
+    // Created lazily during Execute() (after FrameGraph compilation)
+    MaterialPSO* materialPSO = nullptr;
+
+    // Rendering phase (from shader reflection via ShaderPhaseCache)
+    // Populated during ScanRequiredPhases() (before compilation)
+    // Used by routing system to assign batches to correct pass
+    framegraph::RenderPhase renderPhase = framegraph::RenderPhase::Geometry;
+
     // Source visual (for material system)
     dxRender_Visual* visual = nullptr;
+
+    // Visibility/culling (for front-to-back sorting)
+    bool isVisible = true;
+    float distanceToCamera = 0.0f;
 
     // Debug
     shared_str debugName;
@@ -63,8 +83,11 @@ public:
     // Submit geometry for rendering
     void Submit(const GeometryBatch& batch);
 
-    // Get batches for rendering
+    // Get batches for rendering (const)
     const xr_vector<GeometryBatch>& GetBatches() const { return m_batches; }
+
+    // Get batches for routing (non-const, for Week 16 dynamic routing)
+    xr_vector<GeometryBatch>& GetBatchesMutable() { return m_batches; }
 
     // Sort batches for optimal rendering
     void Sort();

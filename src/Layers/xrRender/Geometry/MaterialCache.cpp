@@ -339,8 +339,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     // Set up render states from X-Ray pass
     SetupRenderStates(pass, psoDesc);
 
-    // Set up render target formats from GBufferOutputs
-    SetupRenderTargets(outputs, fg, psoDesc);
+    // Set up render target formats from GBufferOutputs (using shader reflection)
+    SetupRenderTargets(pso.get(), outputs, fg, psoDesc);
 
     // Set debug name
     psoDesc.debugName = pso->debugName;
@@ -1529,6 +1529,7 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
 // ══════════════════════════════════════════════════════════
 
 void MaterialCache::SetupRenderTargets(
+    MaterialPSO* matPSO,
     const passes::GBufferOutputs& outputs,
     const xray::render::framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
@@ -1540,20 +1541,75 @@ void MaterialCache::SetupRenderTargets(
     nvrhi::ITexture* depthTex = fg.GetPhysicalTexture(outputs.depth);
 
     if (!albedoTex || !normalTex || !materialTex || !depthTex) {
-        // Fallback to hardcoded formats
+        // Fallback to hardcoded formats (X-Ray convention: slot0=normal, slot1=albedo, slot2=material)
         psoDesc.renderTargetCount = 3;
-        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
-        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
-        psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
+        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_SNORM;   // Normal
+        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_UNORM;   // Albedo
+        psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;      // Material
         psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
         return;
     }
 
-    // Get actual formats from textures
-    psoDesc.renderTargetCount = 3;
-    psoDesc.renderTargetFormats[0] = albedoTex->getDesc().format;
-    psoDesc.renderTargetFormats[1] = normalTex->getDesc().format;
-    psoDesc.renderTargetFormats[2] = materialTex->getDesc().format;
+    // ═══════════════════════════════════════════════════════
+    //  USE SHADER REFLECTION TO MAP RTS TO CORRECT SLOTS DYNAMICALLY
+    // ═══════════════════════════════════════════════════════
+    // Use semantic information from shader reflection to determine
+    // which physical texture goes in which slot
+
+    psoDesc.renderTargetCount = static_cast<u32>(matPSO->rtBindings.outputRTs.size());
+
+    // Clear all slots first
+    for (u32 i = 0; i < 8; i++) {
+        psoDesc.renderTargetFormats[i] = nvrhi::Format::UNKNOWN;
+    }
+
+    // Map each RT semantic to its shader output slot dynamically
+    using RTSemantic = framegraph::ShaderRTBindings::RTSemantic;
+
+    for (const auto& outputRT : matPSO->rtBindings.outputRTs) {
+        u32 slot = outputRT.slot;
+        nvrhi::Format format = nvrhi::Format::UNKNOWN;
+        const char* rtName = "Unknown";
+
+        // Determine which physical GBuffer texture to use based on semantic
+        switch (outputRT.semantic) {
+            case RTSemantic::Normal:
+                format = normalTex->getDesc().format;
+                rtName = "Normal";
+                break;
+
+            case RTSemantic::Albedo:
+                format = albedoTex->getDesc().format;
+                rtName = "Albedo";
+                break;
+
+            case RTSemantic::Material:
+                format = materialTex->getDesc().format;
+                rtName = "Material";
+                break;
+
+            case RTSemantic::Position:
+                // X-Ray doesn't use position RT in GBuffer (reconstructed from depth)
+                Msg("! [MaterialCache] Warning: Shader writes Position RT (slot %u)", slot);
+                continue;
+
+            case RTSemantic::Emissive:
+                Msg("! [MaterialCache] Warning: Shader writes Emissive RT (slot %u)", slot);
+                continue;
+
+            case RTSemantic::Accumulator:
+                Msg("! [MaterialCache] Warning: Shader writes Accumulator RT (slot %u)", slot);
+                continue;
+
+            default:
+                Msg("! [MaterialCache] Unknown RT semantic for slot %u", slot);
+                continue;
+        }
+
+        psoDesc.renderTargetFormats[slot] = format;
+        Msg("! [MaterialCache] RT slot %u → %s (format %u)", slot, rtName, (u32)format);
+    }
+
     psoDesc.depthStencilFormat = depthTex->getDesc().format;
 }
 
