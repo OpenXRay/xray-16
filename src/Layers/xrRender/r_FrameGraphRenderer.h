@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
@@ -86,6 +87,19 @@ private:
     // Helper functions for geometry collection
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
+
+    // ═══════════════════════════════════════════════════
+    //  DYNAMIC PASS ROUTING (Week 16)
+    // ═══════════════════════════════════════════════════
+
+    // Scan materials to determine required phases
+    xr_set<framegraph::RenderPhase> ScanRequiredPhases() const;
+
+    // Create passes based on required phases
+    void CreatePhasePass(framegraph::RenderPhase phase);
+
+    // Route batches to appropriate passes
+    void RouteBatchesToPasses();
 };
 
 } // namespace xray::render
