@@ -20,8 +20,7 @@ struct alignas(16) PerObjectConstants {
 };
 
 struct alignas(16) GlobalConstants {
-    float m_V[3][4];
-
+    Fmatrix m_V;
     Fmatrix m_P;
     Fmatrix m_VP;
 
@@ -48,14 +47,12 @@ struct alignas(16) GlobalConstants {
 };
 
 inline void FillGlobalConstants(GlobalConstants& cb) {
-    const Fmatrix& view = Device.mView;
-    cb.m_V[0][0] = view._11; cb.m_V[0][1] = view._12; cb.m_V[0][2] = view._13; cb.m_V[0][3] = view._14;
-    cb.m_V[1][0] = view._21; cb.m_V[1][1] = view._22; cb.m_V[1][2] = view._23; cb.m_V[1][3] = view._24;
-    cb.m_V[2][0] = view._31; cb.m_V[2][1] = view._32; cb.m_V[2][2] = view._33; cb.m_V[2][3] = view._34;
+    cb.m_V.transpose(Device.mView);
+    cb.m_P.transpose(Device.mProject);
 
-    cb.m_P = Device.mProject;
-
-    cb.m_VP.mul(Device.mView, Device.mProject);
+    Fmatrix tempVP;
+    tempVP.mul(Device.mProject, Device.mView);
+    cb.m_VP.transpose(tempVP);
 
     cb.timers.set(
         Device.fTimeGlobal,

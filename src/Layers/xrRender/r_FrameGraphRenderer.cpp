@@ -292,7 +292,24 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 noBuffers_static = 0;
 
     for (dxRender_Visual* visual : staticVisuals) {
-        if (ProcessVisualGeometry(visual, Fidentity)) {
+        Fmatrix xform;
+        switch (visual->getType())
+        {
+            case MT_TREE_ST:
+            case MT_TREE_PM:
+            {
+                FTreeVisual* treeVisual = dynamic_cast<FTreeVisual*>(visual);
+                if (treeVisual)
+                    xform = treeVisual->xform;
+                break;
+            }
+            case MT_NORMAL:
+            default:
+                xform = Fidentity;
+                continue;
+        }
+
+        if (ProcessVisualGeometry(visual, xform)) {
             submittedStatic++;
         } else {
             IRender_Mesh* meshVisual = nullptr;

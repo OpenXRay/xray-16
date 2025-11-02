@@ -246,8 +246,44 @@ void GBufferPass::Execute(
 
     xr_set<ID3D11Buffer*> updatedBuffers;
 
-    Msg("  [GBufferPass] Prepared global CB with custom data (eye=%.1f,%.1f,%.1f)",
-        globalCB.eye_position.x, globalCB.eye_position.y, globalCB.eye_position.z);
+    Msg("  [GBufferPass] Global CB matrices:");
+    Msg("    m_V:  [%.3f, %.3f, %.3f]", globalCB.m_V.i.x, globalCB.m_V.i.y, globalCB.m_V.i.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_V.j.x, globalCB.m_V.j.y, globalCB.m_V.j.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_V.k.x, globalCB.m_V.k.y, globalCB.m_V.k.z);
+    Msg("    m_P:  [%.3f, %.3f, %.3f]", globalCB.m_P.i.x, globalCB.m_P.i.y, globalCB.m_P.i.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_P.j.x, globalCB.m_P.j.y, globalCB.m_P.j.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_P.k.x, globalCB.m_P.k.y, globalCB.m_P.k.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_P.c.x, globalCB.m_P.c.y, globalCB.m_P.c.z);
+    Msg("    m_VP: [%.3f, %.3f, %.3f]", globalCB.m_VP.i.x, globalCB.m_VP.i.y, globalCB.m_VP.i.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_VP.j.x, globalCB.m_VP.j.y, globalCB.m_VP.j.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_VP.k.x, globalCB.m_VP.k.y, globalCB.m_VP.k.z);
+    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_VP.c.x, globalCB.m_VP.c.y, globalCB.m_VP.c.z);
+    Msg("    eye:  (%.1f, %.1f, %.1f)", globalCB.eye_position.x, globalCB.eye_position.y, globalCB.eye_position.z);
+
+    if (g_geometryCollector != nullptr) {
+        const auto& batches = g_geometryCollector->GetBatches();
+        xr_set<nvrhi::IBuffer*> updatedGlobalBuffers;
+
+        for (const auto& batch : batches) {
+            if (batch.visual && m_materialCache) {
+                MaterialPSO* matPSO = m_materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
+                if (matPSO) {
+                    for (const auto& cbInfo : matPSO->constantBuffers) {
+                        if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
+                            if (updatedGlobalBuffers.find(cbInfo.nvrhiBuffer.Get()) == updatedGlobalBuffers.end()) {
+                                u32 sizeToWrite = std::min<u32>(sizeof(GlobalConstants), cbInfo.size);
+                                Msg("  [GBufferPass] Pre-updating global CB slot %u (%u bytes) BEFORE render pass",
+                                    cbInfo.slot, sizeToWrite);
+                                ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &globalCB, sizeToWrite);
+                                updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Msg("  [GBufferPass] Pre-updated %u unique global CB buffers", (u32)updatedGlobalBuffers.size());
+    }
 
     ng::RenderPassDesc passDesc;
     passDesc.renderTargets[0] = albedo;
@@ -299,23 +335,6 @@ void GBufferPass::Execute(
 
                 if (matPSO && matPSO->pso) {
                     pipelineToUse = matPSO->pso;
-
-                    for (const auto& cbInfo : matPSO->constantBuffers) {
-                        if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
-                            nvrhi::ObjectType objType = nvrhi::ObjectTypes::D3D11_Buffer;
-                            ID3D11Buffer* d3dBuffer = static_cast<ID3D11Buffer*>(
-                                cbInfo.nvrhiBuffer->getNativeObject(objType).pointer);
-
-                            if (d3dBuffer && updatedBuffers.find(d3dBuffer) == updatedBuffers.end()) {
-                                u32 sizeToWrite = std::min<u32>(sizeof(GlobalConstants), cbInfo.size);
-                                d3dContext->UpdateSubresource(d3dBuffer, 0, nullptr, &globalCB, 0, 0);
-
-                                updatedBuffers.insert(d3dBuffer);
-                                Msg("  [GBufferPass] Updated global CB slot %u (%u bytes)",
-                                    cbInfo.slot, cbInfo.size);
-                            }
-                        }
-                    }
                 }
             }
 
@@ -330,19 +349,18 @@ void GBufferPass::Execute(
 
                 u8 cbData[VCB_SIZE] = {};
 
-                Fmatrix* pWorldViewProj = reinterpret_cast<Fmatrix*>(cbData + 0);
-                Fmatrix* pWorld = reinterpret_cast<Fmatrix*>(cbData + 64);
-                Fmatrix* pWorldIT = reinterpret_cast<Fmatrix*>(cbData + 128);
+                auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
+                    memcpy(dest, &src.i, 16);
+                    memcpy(dest + 16, &src.j, 16);
+                    memcpy(dest + 32, &src.k, 16);
+                };
 
-                Fmatrix viewProj;
-                viewProj.mul(Device.mView, Device.mProject);
+                Fmatrix xform = batch.worldMatrix;
+                Fmatrix xform_v;
+                xform_v.mul(batch.worldMatrix, Device.mView);
 
-                pWorldViewProj->mul(batch.worldMatrix, viewProj);
-                *pWorld = batch.worldMatrix;
-
-                Fmatrix temp;
-                temp.invert(batch.worldMatrix);
-                pWorldIT->transpose(temp);
+                CopyMatrix3x4(cbData + 0, xform);
+                CopyMatrix3x4(cbData + 48, xform_v);
 
                 VERIFY(m_perObjectCB.IsValid());
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);

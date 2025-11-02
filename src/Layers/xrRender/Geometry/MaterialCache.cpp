@@ -438,25 +438,52 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     }
 
                     if (!found) {
-                        nvrhi::BufferDesc nvrhiDesc;
-                        nvrhiDesc.byteSize = bufDesc.ByteWidth;
-                        nvrhiDesc.isConstantBuffer = true;
-                        nvrhiDesc.debugName = "XRay_CB";
-                        nvrhiDesc.keepInitialState = true;
-                        nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+                        nvrhi::BufferHandle bufferHandle;
 
-                        nvrhi::BufferHandle wrappedBuffer =
-                            m_device->GetNativeDevice()->createHandleForNativeBuffer(
+                        if (bindingSlot == 0) {
+                            nvrhi::BufferDesc nvrhiDesc;
+                            nvrhiDesc.byteSize = bufDesc.ByteWidth;
+                            nvrhiDesc.isConstantBuffer = true;
+                            nvrhiDesc.debugName = "XRay_PerObject_CB";
+                            nvrhiDesc.keepInitialState = true;
+                            nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+                            bufferHandle = m_device->GetNativeDevice()->createHandleForNativeBuffer(
                                 nvrhi::ObjectTypes::D3D11_Buffer,
                                 nvrhi::Object(d3dBuffer),
                                 nvrhiDesc);
+                        } else {
+                            nvrhi::BufferDesc nvrhiDesc;
+                            nvrhiDesc.byteSize = bufDesc.ByteWidth;
+                            nvrhiDesc.isConstantBuffer = true;
+                            nvrhiDesc.debugName = "FrameGraph_Global_CB";
+                            nvrhiDesc.keepInitialState = false;
+                            nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
-                        if (wrappedBuffer) {
+                            bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
+                            Msg("  [MaterialCache]   Created NEW global CB for slot %u (%u bytes)",
+                                bindingSlot, bufDesc.ByteWidth);
+                        }
+
+                        if (bufferHandle) {
                             MaterialPSO::ConstantBufferInfo cbInfo;
                             cbInfo.slot = bindingSlot;
-                            cbInfo.nvrhiBuffer = wrappedBuffer;
+                            cbInfo.nvrhiBuffer = bufferHandle;
                             cbInfo.size = bufDesc.ByteWidth;
                             cbInfo.isPerObject = (bindingSlot == 0);
+
+                            #if 0
+                            if (bindingSlot > 0) {
+                                void* xrayData = cb->GetBufferData();
+                                u32 xraySize = cb->GetBufferSize();
+
+                                if (xrayData && xraySize > 0 && xraySize == bufDesc.ByteWidth) {
+                                    cbInfo.initialData.resize(xraySize);
+                                    memcpy(cbInfo.initialData.data(), xrayData, xraySize);
+                                    Msg("  [MaterialCache]   Extracted %u bytes of global CB data", xraySize);
+                                }
+                            }
+                            #endif
 
                             matPSO->constantBuffers.push_back(cbInfo);
 
@@ -641,20 +668,18 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
     nvrhi::BindingSetDesc bindingDesc;
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
-        nvrhi::IBuffer* bufferToBind = nullptr;
-
         if (cbInfo.isPerObject) {
-            bufferToBind = perObjectVCB;
+            bindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
+            Msg("  [MaterialCache] Adding per-object CB to bindingDesc at slot %u (%u bytes)",
+                cbInfo.slot, cbInfo.size);
         } else {
             if (cbInfo.nvrhiBuffer) {
-                bufferToBind = cbInfo.nvrhiBuffer.Get();
+                bindingDesc.bindings.push_back(
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                Msg("  [MaterialCache] Adding global CB to bindingDesc at slot %u (%u bytes)",
+                    cbInfo.slot, cbInfo.size);
             }
-        }
-
-        if (bufferToBind) {
-            bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, bufferToBind));
-            Msg("  [MaterialCache] Binding CB at slot %u (%u bytes)", cbInfo.slot, cbInfo.size);
         }
     }
 
@@ -712,10 +737,23 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
 #if defined(USE_DX11)
     nvrhi::d3d11::BindingSet* d3d11Set = static_cast<nvrhi::d3d11::BindingSet*>(bindingSet.Get());
-    if (d3d11Set && pass) {
-        STextureList* texList = pass->T._get();
-        if (texList && texList->size() > 0) {
-            Msg("  [MaterialCache] Manually setting SRVs from X-Ray textures...");
+    if (d3d11Set) {
+        d3d11Set->minSRVSlot = 0;
+        d3d11Set->maxSRVSlot = 0;
+        d3d11Set->minSamplerSlot = 0;
+        d3d11Set->maxSamplerSlot = 0;
+        d3d11Set->minConstantBufferSlot = 0;
+        d3d11Set->maxConstantBufferSlot = 0;
+        d3d11Set->minUAVSlot = 0;
+        d3d11Set->maxUAVSlot = 0;
+
+        if (pass) {
+            STextureList* texList = pass->T._get();
+            if (texList && texList->size() > 0) {
+                Msg("  [MaterialCache] Manually setting SRVs from X-Ray textures...");
+
+                d3d11Set->minSRVSlot = UINT_MAX;
+            }
 
             for (u32 i = 0; i < texList->size(); i++) {
                 const auto& texPair = (*texList)[i];
@@ -731,8 +769,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
                 if (tex) {
                     ID3DShaderResourceView* xraySRV = tex->get_SRView();
                     if (xraySRV) {
-                        xraySRV->AddRef();
-
                         d3d11Set->SRVs[stage] = xraySRV;
                         Msg("    Set SRV at slot %u: %p (from X-Ray texture '%s', AddRef'd)",
                             stage, xraySRV, tex->cName.c_str());
@@ -749,6 +785,46 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
             Msg("  [MaterialCache] SRV range: [%u, %u]",
                 d3d11Set->minSRVSlot, d3d11Set->maxSRVSlot);
+        }
+
+        if (!matPSO->constantBuffers.empty()) {
+            Msg("  [MaterialCache] Manually setting %u constant buffers in D3D11 binding set...",
+                (u32)matPSO->constantBuffers.size());
+
+            d3d11Set->minConstantBufferSlot = UINT_MAX;
+
+            for (const auto& cbInfo : matPSO->constantBuffers) {
+                nvrhi::IBuffer* nvrhiBufferToUse = nullptr;
+
+                if (cbInfo.isPerObject) {
+                    nvrhiBufferToUse = perObjectVCB;
+                    Msg("    Setting slot %u to VCB (per-object)", cbInfo.slot);
+                } else {
+                    nvrhiBufferToUse = cbInfo.nvrhiBuffer.Get();
+                    Msg("    Setting slot %u to custom global CB", cbInfo.slot);
+                }
+
+                if (nvrhiBufferToUse) {
+                    ID3D11Buffer* d3dBuffer = static_cast<ID3D11Buffer*>(
+                        nvrhiBufferToUse->getNativeObject(nvrhi::ObjectTypes::D3D11_Buffer).pointer);
+
+                    if (d3dBuffer) {
+                        d3d11Set->constantBuffers[cbInfo.slot] = d3dBuffer;
+
+                        Msg("    Set CB at slot %u: %p (%u bytes, %s)",
+                            cbInfo.slot, d3dBuffer, cbInfo.size,
+                            cbInfo.isPerObject ? "per-object" : "global");
+
+                        if (d3d11Set->minConstantBufferSlot > cbInfo.slot)
+                            d3d11Set->minConstantBufferSlot = cbInfo.slot;
+                        if (d3d11Set->maxConstantBufferSlot < cbInfo.slot)
+                            d3d11Set->maxConstantBufferSlot = cbInfo.slot;
+                    }
+                }
+            }
+
+            Msg("  [MaterialCache] CB range: [%u, %u]",
+                d3d11Set->minConstantBufferSlot, d3d11Set->maxConstantBufferSlot);
         }
     }
 #endif
@@ -818,6 +894,15 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
         case DXGI_FORMAT_R32G32B32A32_UINT: return 16;
         case DXGI_FORMAT_R32G32_UINT: return 8;
         case DXGI_FORMAT_R32_UINT: return 4;
+        case DXGI_FORMAT_R16G16B16A16_SINT: return 8;
+        case DXGI_FORMAT_R16G16_SINT: return 4;
+        case DXGI_FORMAT_R16_SINT: return 2;
+        case DXGI_FORMAT_R8G8B8A8_SINT: return 4;
+        case DXGI_FORMAT_R8G8_SINT: return 2;
+        case DXGI_FORMAT_R8_SINT: return 1;
+        case DXGI_FORMAT_R32G32B32A32_SINT: return 16;
+        case DXGI_FORMAT_R32G32_SINT: return 8;
+        case DXGI_FORMAT_R32_SINT: return 4;
         default:
             Msg("! [MaterialCache] Unknown DXGI format size: %d", format);
             return 4;
