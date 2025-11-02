@@ -19,6 +19,7 @@ private:
 protected:
     _5color c_scale;
     _5color c_bias;
+public:
     Fmatrix xform;
 
 public:

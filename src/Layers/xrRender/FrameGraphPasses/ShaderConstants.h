@@ -32,10 +32,8 @@ struct alignas(16) PerObjectConstants {
 // Slot 1: Global/Static Constants (368 bytes minimum, often 512 bytes allocated)
 // Contains view/projection matrices, lighting, fog, etc.
 struct alignas(16) GlobalConstants {
-    // View matrix: 3x4 affine transform (48 bytes, NOT 64!)
-    // Shader declares this as float3x4, not float4x4
-    float m_V[3][4];           // 0-48:   View matrix (3x4, row-major)
-
+    // View and projection matrices
+    Fmatrix m_V;               // 0-48:   View matrix (3x4)
     Fmatrix m_P;               // 48-112: Projection matrix (4x4)
     Fmatrix m_VP;              // 112-176: View-Projection matrix (4x4)
 
@@ -70,18 +68,16 @@ struct alignas(16) GlobalConstants {
 
 // Helper function to fill GlobalConstants from Device state
 inline void FillGlobalConstants(GlobalConstants& cb) {
-    // View matrix: Copy as 3x4 (omit 4th row which is always [0,0,0,1])
-    // X-Ray shaders use float3x4 for affine transforms to save space
-    const Fmatrix& view = Device.mView;
-    cb.m_V[0][0] = view._11; cb.m_V[0][1] = view._12; cb.m_V[0][2] = view._13; cb.m_V[0][3] = view._14;
-    cb.m_V[1][0] = view._21; cb.m_V[1][1] = view._22; cb.m_V[1][2] = view._23; cb.m_V[1][3] = view._24;
-    cb.m_V[2][0] = view._31; cb.m_V[2][1] = view._32; cb.m_V[2][2] = view._33; cb.m_V[2][3] = view._34;
+    // View/Projection matrices
+    // CRITICAL: HLSL expects row-major float3x4/float4x4, but X-Ray stores column-major
+    // We must TRANSPOSE the matrices when copying to CB!
+    cb.m_V.transpose(Device.mView);
+    cb.m_P.transpose(Device.mProject);
 
-    // Projection and view-projection: Full 4x4 matrices
-    cb.m_P = Device.mProject;
-
-    // Compute view-projection (m_VP = m_V * m_P)
-    cb.m_VP.mul(Device.mView, Device.mProject);
+    // Compute view-projection (m_VP = m_V * m_P) AFTER transposing
+    Fmatrix tempVP;
+    tempVP.mul(Device.mProject, Device.mView);
+    cb.m_VP.transpose(tempVP);
 
     // Timers
     cb.timers.set(

@@ -381,8 +381,24 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 noBuffers_static = 0;
 
     for (dxRender_Visual* visual : staticVisuals) {
-        // Process static visual (uses identity matrix since position is baked)
-        if (ProcessVisualGeometry(visual, Fidentity)) {
+        Fmatrix xform;
+        switch (visual->getType())
+        {
+            case MT_TREE_ST:
+            case MT_TREE_PM:
+            {
+                FTreeVisual* treeVisual = dynamic_cast<FTreeVisual*>(visual);
+                if (treeVisual)
+                    xform = treeVisual->xform;
+                break;
+            }
+            case MT_NORMAL:
+            default:
+                xform = Fidentity;
+                continue;
+        }
+
+        if (ProcessVisualGeometry(visual, xform)) {
             submittedStatic++;
         } else {
             // Track failure reasons

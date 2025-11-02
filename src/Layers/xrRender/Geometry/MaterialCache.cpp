@@ -572,27 +572,59 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     }
 
                     if (!found) {
-                        // Wrap the X-Ray D3D11 buffer in NVRHI
-                        // NOTE: Buffers use D3D11_Buffer, textures use D3D11_Resource!
-                        nvrhi::BufferDesc nvrhiDesc;
-                        nvrhiDesc.byteSize = bufDesc.ByteWidth;
-                        nvrhiDesc.isConstantBuffer = true;
-                        nvrhiDesc.debugName = "XRay_CB";
-                        nvrhiDesc.keepInitialState = true;
-                        nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+                        nvrhi::BufferHandle bufferHandle;
 
-                        nvrhi::BufferHandle wrappedBuffer =
-                            m_device->GetNativeDevice()->createHandleForNativeBuffer(
-                                nvrhi::ObjectTypes::D3D11_Buffer,  // Use D3D11_Buffer for buffers!
+                        if (bindingSlot == 0) {
+                            // Slot 0 (per-object): Wrap X-Ray's buffer (it's managed per-draw)
+                            nvrhi::BufferDesc nvrhiDesc;
+                            nvrhiDesc.byteSize = bufDesc.ByteWidth;
+                            nvrhiDesc.isConstantBuffer = true;
+                            nvrhiDesc.debugName = "XRay_PerObject_CB";
+                            nvrhiDesc.keepInitialState = true;
+                            nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+                            bufferHandle = m_device->GetNativeDevice()->createHandleForNativeBuffer(
+                                nvrhi::ObjectTypes::D3D11_Buffer,
                                 nvrhi::Object(d3dBuffer),
                                 nvrhiDesc);
+                        } else {
+                            // Slot 1+ (global): Create NEW buffer that WE control
+                            // Don't wrap X-Ray's buffer because RCache might clear/reset it
+                            // Use DEFAULT usage to support UpdateSubresource (no CPU access needed)
+                            nvrhi::BufferDesc nvrhiDesc;
+                            nvrhiDesc.byteSize = bufDesc.ByteWidth;
+                            nvrhiDesc.isConstantBuffer = true;
+                            nvrhiDesc.debugName = "FrameGraph_Global_CB";
+                            nvrhiDesc.keepInitialState = false;
+                            nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+                            // Don't set cpuAccess - we'll use UpdateSubresource which works with DEFAULT usage
 
-                        if (wrappedBuffer) {
+                            bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
+                            Msg("  [MaterialCache]   Created NEW global CB for slot %u (%u bytes)",
+                                bindingSlot, bufDesc.ByteWidth);
+                        }
+
+                        if (bufferHandle) {
                             MaterialPSO::ConstantBufferInfo cbInfo;
                             cbInfo.slot = bindingSlot;  // Use DECODED slot for NVRHI binding!
-                            cbInfo.nvrhiBuffer = wrappedBuffer;
+                            cbInfo.nvrhiBuffer = bufferHandle;
                             cbInfo.size = bufDesc.ByteWidth;
                             cbInfo.isPerObject = (bindingSlot == 0);  // Check decoded slot 0
+
+                            // DISABLED: CB data extraction causes memory corruption
+                            // TODO: Debug why this corrupts the heap
+                            #if 0
+                            if (bindingSlot > 0) {
+                                void* xrayData = cb->GetBufferData();
+                                u32 xraySize = cb->GetBufferSize();
+
+                                if (xrayData && xraySize > 0 && xraySize == bufDesc.ByteWidth) {
+                                    cbInfo.initialData.resize(xraySize);
+                                    memcpy(cbInfo.initialData.data(), xrayData, xraySize);
+                                    Msg("  [MaterialCache]   Extracted %u bytes of global CB data", xraySize);
+                                }
+                            }
+                            #endif
 
                             matPSO->constantBuffers.push_back(cbInfo);
 
@@ -836,24 +868,23 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
     nvrhi::BindingSetDesc bindingDesc;
 
-    // Bind ALL constant buffers from shader
+    // Bind ALL CBs to bindingDesc so NVRHI keeps them alive
+    // We'll also manually set them in D3D11 binding set to ensure correct binding
     for (const auto& cbInfo : matPSO->constantBuffers) {
-        nvrhi::IBuffer* bufferToBind = nullptr;
-
         if (cbInfo.isPerObject) {
-            // Slot 0: Use the per-object VCB passed in (updated per-draw)
-            bufferToBind = perObjectVCB;
-        } else {
-            // Other slots: Use X-Ray's global CB (already wrapped during PSO creation)
-            if (cbInfo.nvrhiBuffer) {
-                bufferToBind = cbInfo.nvrhiBuffer.Get();
-            }
-        }
-
-        if (bufferToBind) {
+            // Slot 0: Use the per-object VCB passed in (updated per-draw via WriteBuffer)
             bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, bufferToBind));
-            Msg("  [MaterialCache] Binding CB at slot %u (%u bytes)", cbInfo.slot, cbInfo.size);
+                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
+            Msg("  [MaterialCache] Adding per-object CB to bindingDesc at slot %u (%u bytes)",
+                cbInfo.slot, cbInfo.size);
+        } else {
+            // Slots 1+: Add global CBs to keep them alive
+            if (cbInfo.nvrhiBuffer) {
+                bindingDesc.bindings.push_back(
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                Msg("  [MaterialCache] Adding global CB to bindingDesc at slot %u (%u bytes)",
+                    cbInfo.slot, cbInfo.size);
+            }
         }
     }
 
@@ -928,11 +959,27 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
 #if defined(USE_DX11)
     nvrhi::d3d11::BindingSet* d3d11Set = static_cast<nvrhi::d3d11::BindingSet*>(bindingSet.Get());
-    if (d3d11Set && pass) {
-        // Get X-Ray's texture list from the pass
-        STextureList* texList = pass->T._get();
-        if (texList && texList->size() > 0) {
-            Msg("  [MaterialCache] Manually setting SRVs from X-Ray textures...");
+    if (d3d11Set) {
+        // CRITICAL: Initialize ALL min/max ranges immediately after creation
+        // NVRHI uses these values in VSSetShaderResources/etc, must not be garbage!
+        d3d11Set->minSRVSlot = 0;
+        d3d11Set->maxSRVSlot = 0;
+        d3d11Set->minSamplerSlot = 0;
+        d3d11Set->maxSamplerSlot = 0;
+        d3d11Set->minConstantBufferSlot = 0;
+        d3d11Set->maxConstantBufferSlot = 0;
+        d3d11Set->minUAVSlot = 0;
+        d3d11Set->maxUAVSlot = 0;
+
+        if (pass) {
+            // Get X-Ray's texture list from the pass
+            STextureList* texList = pass->T._get();
+            if (texList && texList->size() > 0) {
+                Msg("  [MaterialCache] Manually setting SRVs from X-Ray textures...");
+
+                // Reset min to UINT_MAX so we can find the actual minimum
+                d3d11Set->minSRVSlot = UINT_MAX;
+            }
 
             // Set SRVs for each texture slot
             // NOTE: texList is a vector of (stage, texture) pairs where stage is the slot number!
@@ -951,11 +998,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
                 if (tex) {
                     ID3DShaderResourceView* xraySRV = tex->get_SRView();
                     if (xraySRV) {
-                        // CRITICAL: AddRef the SRV to keep it alive!
-                        // The binding set stores raw pointers, so we must increment the ref count
-                        // to prevent X-Ray from releasing the SRV while we're using it.
-                        xraySRV->AddRef();
-
+                        // Don't AddRef - NVRHI and X-Ray manage lifetimes
                         d3d11Set->SRVs[stage] = xraySRV;  // Use STAGE, not i!
                         Msg("    Set SRV at slot %u: %p (from X-Ray texture '%s', AddRef'd)",
                             stage, xraySRV, tex->cName.c_str());
@@ -973,6 +1016,58 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
             Msg("  [MaterialCache] SRV range: [%u, %u]",
                 d3d11Set->minSRVSlot, d3d11Set->maxSRVSlot);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        //  MANUALLY SET CONSTANT BUFFERS IN BINDING SET
+        // ═══════════════════════════════════════════════════════
+        // NVRHI's createBindingSet doesn't properly handle our new global CB buffers,
+        // so we need to manually set ALL CBs (including slot 0) in the D3D11 binding set
+        if (!matPSO->constantBuffers.empty()) {
+            Msg("  [MaterialCache] Manually setting %u constant buffers in D3D11 binding set...",
+                (u32)matPSO->constantBuffers.size());
+
+            // Reset min to find actual minimum
+            d3d11Set->minConstantBufferSlot = UINT_MAX;
+
+            for (const auto& cbInfo : matPSO->constantBuffers) {
+                nvrhi::IBuffer* nvrhiBufferToUse = nullptr;
+
+                if (cbInfo.isPerObject) {
+                    // Slot 0: Use the VCB passed in (same as in BindingSetDesc)
+                    nvrhiBufferToUse = perObjectVCB;
+                    Msg("    Setting slot %u to VCB (per-object)", cbInfo.slot);
+                } else {
+                    // Slots 1+: Use our custom global CB
+                    nvrhiBufferToUse = cbInfo.nvrhiBuffer.Get();
+                    Msg("    Setting slot %u to custom global CB", cbInfo.slot);
+                }
+
+                if (nvrhiBufferToUse) {
+                    // Get D3D11 buffer from NVRHI handle
+                    ID3D11Buffer* d3dBuffer = static_cast<ID3D11Buffer*>(
+                        nvrhiBufferToUse->getNativeObject(nvrhi::ObjectTypes::D3D11_Buffer).pointer);
+
+                    if (d3dBuffer) {
+                        // Don't AddRef - NVRHI manages buffer lifetimes
+                        // Set in the D3D11 binding set's constant buffer array
+                        d3d11Set->constantBuffers[cbInfo.slot] = d3dBuffer;
+
+                        Msg("    Set CB at slot %u: %p (%u bytes, %s)",
+                            cbInfo.slot, d3dBuffer, cbInfo.size,
+                            cbInfo.isPerObject ? "per-object" : "global");
+
+                        // Update CB range
+                        if (d3d11Set->minConstantBufferSlot > cbInfo.slot)
+                            d3d11Set->minConstantBufferSlot = cbInfo.slot;
+                        if (d3d11Set->maxConstantBufferSlot < cbInfo.slot)
+                            d3d11Set->maxConstantBufferSlot = cbInfo.slot;
+                    }
+                }
+            }
+
+            Msg("  [MaterialCache] CB range: [%u, %u]",
+                d3d11Set->minConstantBufferSlot, d3d11Set->maxConstantBufferSlot);
         }
     }
 #endif
@@ -1061,6 +1156,16 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
         case DXGI_FORMAT_R32G32B32A32_UINT: return 16;
         case DXGI_FORMAT_R32G32_UINT: return 8;
         case DXGI_FORMAT_R32_UINT: return 4;
+        // SINT formats (signed integers)
+        case DXGI_FORMAT_R16G16B16A16_SINT: return 8;
+        case DXGI_FORMAT_R16G16_SINT: return 4;
+        case DXGI_FORMAT_R16_SINT: return 2;
+        case DXGI_FORMAT_R8G8B8A8_SINT: return 4;
+        case DXGI_FORMAT_R8G8_SINT: return 2;
+        case DXGI_FORMAT_R8_SINT: return 1;
+        case DXGI_FORMAT_R32G32B32A32_SINT: return 16;
+        case DXGI_FORMAT_R32G32_SINT: return 8;
+        case DXGI_FORMAT_R32_SINT: return 4;
         default:
             Msg("! [MaterialCache] Unknown DXGI format size: %d", format);
             return 4;  // Default fallback

@@ -13,6 +13,8 @@ public:
 
     bool Similar(dx11ConstantBuffer& _in);
     ID3DBuffer* GetBuffer() { return m_pBuffer; }
+    void* GetBufferData() { return m_pBufferData; }
+    u32 GetBufferSize() const { return m_uiBufferSize; }
     void Flush(u32 context_id);
 
     // CB Slot Decoding Helpers
