@@ -322,6 +322,7 @@ void FrameGraph::Reset() {
     m_resources.clear();
     m_passes.clear();
     m_sortedPasses.clear();
+    m_rtRegistry.Clear();  // Clear RT registry
     m_compiled = false;
 
     // Reset statistics (don't use memset - contains non-trivial types!)

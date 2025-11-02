@@ -755,6 +755,7 @@
     <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h" />
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
     <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -177,6 +177,68 @@ void FrameGraphRenderer::BuildFrameGraph() {
     // Tonemap pass
     m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
 
+    // ═══════════════════════════════════════════════════════
+    //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
+    // ═══════════════════════════════════════════════════════
+
+    Msg("! [FrameGraphRenderer] Registering render targets in RT registry...");
+    auto& registry = m_framegraph->GetRTRegistry();
+
+    // ─── G-Buffer Outputs ───
+
+    // Albedo RT (RT0: Albedo.rgb + Metallic.a)
+    registry.RegisterRT("rt_Albedo", gbufferOutputs.albedo);
+    registry.RegisterRT("rt_Color", gbufferOutputs.albedo);  // Alias
+    registry.RegisterAliases(gbufferOutputs.albedo, {
+        "s_albedo",
+        "s_diffuse",
+        "s_image",
+        "s_base"
+    });
+
+    // Normal RT (RT1: Normal.xyz + Roughness.a)
+    registry.RegisterRT("rt_Normal", gbufferOutputs.normal);
+    registry.RegisterAliases(gbufferOutputs.normal, {
+        "s_normal",
+        "s_nmap"
+    });
+
+    // Material RT (RT2: Material ID)
+    registry.RegisterRT("rt_Material", gbufferOutputs.material);
+    registry.RegisterAliases(gbufferOutputs.material, {
+        "s_material",
+        "s_mat"
+    });
+
+    // Depth/Stencil
+    registry.RegisterRT("rt_Depth", gbufferOutputs.depth);
+    registry.RegisterAliases(gbufferOutputs.depth, {
+        "s_depth",
+        "s_position"  // Some shaders use depth to reconstruct position
+    });
+
+    // ─── Lighting Outputs ───
+
+    // HDR Color (Lit scene)
+    registry.RegisterRT("rt_HDRColor", lightingOutput.hdrColor);
+    registry.RegisterRT("rt_Accumulator", lightingOutput.hdrColor);  // Legacy name
+    registry.RegisterAliases(lightingOutput.hdrColor, {
+        "s_hdr",
+        "s_accumulator",
+        "s_acc"
+    });
+
+    // ─── Backbuffer ───
+
+    registry.RegisterRT("rt_Backbuffer", backbuffer);
+    registry.RegisterAliases(backbuffer, {
+        "s_backbuffer",
+        "s_screen"
+    });
+
+    // Print registry for debugging
+    registry.PrintRegistry();
+
     // Store final output for presenting to backbuffer
     m_finalOutput = backbuffer;
 }
