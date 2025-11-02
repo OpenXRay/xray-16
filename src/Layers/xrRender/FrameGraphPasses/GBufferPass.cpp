@@ -303,17 +303,17 @@ void GBufferPass::Execute(
     xr_set<ID3D11Buffer*> updatedBuffers;
 
     Msg("  [GBufferPass] Global CB matrices:");
-    Msg("    m_V:  [%.3f, %.3f, %.3f]", globalCB.m_V.i.x, globalCB.m_V.i.y, globalCB.m_V.i.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_V.j.x, globalCB.m_V.j.y, globalCB.m_V.j.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_V.k.x, globalCB.m_V.k.y, globalCB.m_V.k.z);
-    Msg("    m_P:  [%.3f, %.3f, %.3f]", globalCB.m_P.i.x, globalCB.m_P.i.y, globalCB.m_P.i.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_P.j.x, globalCB.m_P.j.y, globalCB.m_P.j.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_P.k.x, globalCB.m_P.k.y, globalCB.m_P.k.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_P.c.x, globalCB.m_P.c.y, globalCB.m_P.c.z);
-    Msg("    m_VP: [%.3f, %.3f, %.3f]", globalCB.m_VP.i.x, globalCB.m_VP.i.y, globalCB.m_VP.i.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_VP.j.x, globalCB.m_VP.j.y, globalCB.m_VP.j.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_VP.k.x, globalCB.m_VP.k.y, globalCB.m_VP.k.z);
-    Msg("          [%.3f, %.3f, %.3f]", globalCB.m_VP.c.x, globalCB.m_VP.c.y, globalCB.m_VP.c.z);
+    Msg("    m_V:  [%.3f, %.3f, %.3f, %.3f]", globalCB.m_V[0], globalCB.m_V[1], globalCB.m_V[2], globalCB.m_V[3]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_V[4], globalCB.m_V[5], globalCB.m_V[6], globalCB.m_V[7]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_V[8], globalCB.m_V[9], globalCB.m_V[10], globalCB.m_V[11]);
+    Msg("    m_P:  [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[0], globalCB.m_P[1], globalCB.m_P[2], globalCB.m_P[3]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[4], globalCB.m_P[5], globalCB.m_P[6], globalCB.m_P[7]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[8], globalCB.m_P[9], globalCB.m_P[10], globalCB.m_P[11]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[12], globalCB.m_P[13], globalCB.m_P[14], globalCB.m_P[15]);
+    Msg("    m_VP: [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[0], globalCB.m_VP[1], globalCB.m_VP[2], globalCB.m_VP[3]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[4], globalCB.m_VP[5], globalCB.m_VP[6], globalCB.m_VP[7]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[8], globalCB.m_VP[9], globalCB.m_VP[10], globalCB.m_VP[11]);
+    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[12], globalCB.m_VP[13], globalCB.m_VP[14], globalCB.m_VP[15]);
     Msg("    eye:  (%.1f, %.1f, %.1f)", globalCB.eye_position.x, globalCB.eye_position.y, globalCB.eye_position.z);
 
     // ═══════════════════════════════════════════════════════
@@ -441,11 +441,19 @@ void GBufferPass::Execute(
                 // Allocate buffer on stack (256 bytes for VCB)
                 u8 cbData[VCB_SIZE] = {};  // Zero-initialized!
 
-                // Helper to copy float3x4 (first 3 rows of 4x4 matrix, 48 bytes)
+                // Helper to copy Fmatrix as HLSL float3x4 (row-major, 48 bytes)
+                // CRITICAL: Fmatrix is column-major, HLSL expects row-major
+                // float3x4 = 3 rows of 4 floats, including translation in 4th column
                 auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
-                    memcpy(dest, &src.i, 16);      // Row 0
-                    memcpy(dest + 16, &src.j, 16); // Row 1
-                    memcpy(dest + 32, &src.k, 16); // Row 2
+                    // Transpose: Fmatrix columns become HLSL rows
+                    Fmatrix transposed;
+                    transposed.transpose(src);
+
+                    // Copy first 3 rows (12 floats = 48 bytes)
+                    float* destF = reinterpret_cast<float*>(dest);
+                    destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
+                    destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
+                    destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
                 };
 
                 // Compute matrices

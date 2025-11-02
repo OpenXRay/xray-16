@@ -31,11 +31,18 @@ struct alignas(16) PerObjectConstants {
 
 // Slot 1: Global/Static Constants (368 bytes minimum, often 512 bytes allocated)
 // Contains view/projection matrices, lighting, fog, etc.
+// CRITICAL: HLSL float3x4 = 48 bytes (3 rows), float4x4 = 64 bytes (4 rows)
+// We CANNOT use Fmatrix (64 bytes) for float3x4 - it would shift all offsets!
 struct alignas(16) GlobalConstants {
     // View and projection matrices
-    Fmatrix m_V;               // 0-48:   View matrix (3x4)
-    Fmatrix m_P;               // 48-112: Projection matrix (4x4)
-    Fmatrix m_VP;              // 112-176: View-Projection matrix (4x4)
+    // m_V is float3x4 in HLSL = 48 bytes (3 rows of float4)
+    float m_V[12];             // 0-48:   View matrix (3x4 row-major)
+
+    // m_P is float4x4 in HLSL = 64 bytes (4 rows of float4)
+    float m_P[16];             // 48-112: Projection matrix (4x4 row-major)
+
+    // m_VP is float4x4 in HLSL = 64 bytes (4 rows of float4)
+    float m_VP[16];            // 112-176: View-Projection matrix (4x4 row-major)
 
     // Timing
     Fvector4 timers;           // 176-192: x=game time, y=frame time, z=sin(time), w=cos(time)
@@ -71,13 +78,32 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     // View/Projection matrices
     // CRITICAL: HLSL expects row-major float3x4/float4x4, but X-Ray stores column-major
     // We must TRANSPOSE the matrices when copying to CB!
-    cb.m_V.transpose(Device.mView);
-    cb.m_P.transpose(Device.mProject);
 
-    // Compute view-projection (m_VP = m_V * m_P) AFTER transposing
+    // m_V is float3x4 (12 floats: 3 rows of 4 floats)
+    // X-Ray's mView is column-major, HLSL expects row-major, so transpose
+    Fmatrix viewT;
+    viewT.transpose(Device.mView);
+    cb.m_V[0]  = viewT._11; cb.m_V[1]  = viewT._12; cb.m_V[2]  = viewT._13; cb.m_V[3]  = viewT._14;
+    cb.m_V[4]  = viewT._21; cb.m_V[5]  = viewT._22; cb.m_V[6]  = viewT._23; cb.m_V[7]  = viewT._24;
+    cb.m_V[8]  = viewT._31; cb.m_V[9]  = viewT._32; cb.m_V[10] = viewT._33; cb.m_V[11] = viewT._34;
+
+    // m_P is float4x4 (16 floats: 4 rows of 4 floats)
+    Fmatrix projT;
+    projT.transpose(Device.mProject);
+    cb.m_P[0]  = projT._11; cb.m_P[1]  = projT._12; cb.m_P[2]  = projT._13; cb.m_P[3]  = projT._14;
+    cb.m_P[4]  = projT._21; cb.m_P[5]  = projT._22; cb.m_P[6]  = projT._23; cb.m_P[7]  = projT._24;
+    cb.m_P[8]  = projT._31; cb.m_P[9]  = projT._32; cb.m_P[10] = projT._33; cb.m_P[11] = projT._34;
+    cb.m_P[12] = projT._41; cb.m_P[13] = projT._42; cb.m_P[14] = projT._43; cb.m_P[15] = projT._44;
+
+    // m_VP is float4x4 (16 floats: 4 rows of 4 floats)
     Fmatrix tempVP;
     tempVP.mul(Device.mProject, Device.mView);
-    cb.m_VP.transpose(tempVP);
+    Fmatrix vpT;
+    vpT.transpose(tempVP);
+    cb.m_VP[0]  = vpT._11; cb.m_VP[1]  = vpT._12; cb.m_VP[2]  = vpT._13; cb.m_VP[3]  = vpT._14;
+    cb.m_VP[4]  = vpT._21; cb.m_VP[5]  = vpT._22; cb.m_VP[6]  = vpT._23; cb.m_VP[7]  = vpT._24;
+    cb.m_VP[8]  = vpT._31; cb.m_VP[9]  = vpT._32; cb.m_VP[10] = vpT._33; cb.m_VP[11] = vpT._34;
+    cb.m_VP[12] = vpT._41; cb.m_VP[13] = vpT._42; cb.m_VP[14] = vpT._43; cb.m_VP[15] = vpT._44;
 
     // Timers
     cb.timers.set(
