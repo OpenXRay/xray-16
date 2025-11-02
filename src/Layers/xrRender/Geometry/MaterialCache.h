@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 
 // Forward declarations - must be in RENDER_NAMESPACE
 // Note: RENDER_NAMESPACE is defined as render_r4 in preprocessor
@@ -117,6 +118,24 @@ struct MaterialPSO {
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
     SPass* pass = nullptr;  // Store pass for SRV extraction
+
+    // ─── RT Bindings (Extracted from Shader - Week 15) ───
+    framegraph::ShaderRTBindings rtBindings;
+
+    // ─── Phase (Determines which pass to use) ───
+    framegraph::RenderPhase GetPhase() const {
+        return rtBindings.phase;
+    }
+
+    // ─── Required Input RTs ───
+    const xr_vector<framegraph::ShaderRTBindings::InputTexture>& GetInputTextures() const {
+        return rtBindings.inputTextures;
+    }
+
+    // ─── Output RT Count ───
+    u32 GetOutputRTCount() const {
+        return (u32)rtBindings.outputRTs.size();
+    }
 
     // Debug name
     shared_str debugName;

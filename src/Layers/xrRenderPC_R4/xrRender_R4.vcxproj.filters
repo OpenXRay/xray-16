@@ -756,6 +756,7 @@
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
     <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1370,6 +1371,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />

@@ -153,6 +153,7 @@
     <ClInclude Include="..\xrRender\FLOD.h" />
     <ClInclude Include="..\xrRender\FProgressive.h" />
     <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
     <ClInclude Include="..\xrRender\FSkinned.h" />
     <ClInclude Include="..\xrRender\FSkinnedTypes.h" />
     <ClInclude Include="..\xrRender\FTreeVisual.h" />
@@ -469,6 +470,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />

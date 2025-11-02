@@ -522,6 +522,31 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     // Store debug names
     matPSO->debugName = vs->cName;
 
+    // ═══════════════════════════════════════════════════
+    //  SHADER REFLECTION (Week 15)
+    // ═══════════════════════════════════════════════════
+
+    // Try to analyze pixel shader via D3D reflection
+    // X-Ray's SPS structure has: sh (ID3D11PixelShader*), bytecode (ID3DBlob*)
+    if (ps->sh && ps->bytecode) {
+        Msg("! [MaterialCache] Performing shader reflection on PS '%s'", ps->cName.c_str());
+
+        // Analyze pixel shader using SPS's bytecode directly
+        matPSO->rtBindings = framegraph::ShaderReflector::AnalyzePixelShader(
+            ps->sh,
+            ps->bytecode
+        );
+
+        matPSO->rtBindings.shaderName = ps->cName;
+
+        Msg("! [MaterialCache] Shader reflection complete:");
+        Msg("!   Phase: %d", (int)matPSO->rtBindings.phase);
+        Msg("!   Input textures: %u", matPSO->rtBindings.inputTextures.size());
+        Msg("!   Output RTs: %u", matPSO->rtBindings.outputRTs.size());
+    } else {
+        Msg("! [MaterialCache] Cannot perform shader reflection - no bytecode available");
+    }
+
     // ═══════════════════════════════════════════════════════
     //  EXTRACT ALL CONSTANT BUFFERS from VS and PS
     // ═══════════════════════════════════════════════════════
