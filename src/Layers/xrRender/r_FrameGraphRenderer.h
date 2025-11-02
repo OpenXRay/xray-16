@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
@@ -66,6 +67,12 @@ private:
 
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
+
+    xr_set<framegraph::RenderPhase> ScanRequiredPhases() const;
+
+    void CreatePhasePass(framegraph::RenderPhase phase);
+
+    void RouteBatchesToPasses();
 };
 
 }

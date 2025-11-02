@@ -117,6 +117,15 @@ void FrameGraphRenderer::SetupFrame() {
 }
 
 void FrameGraphRenderer::BuildFrameGraph() {
+
+    xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
+
+    for (framegraph::RenderPhase phase : requiredPhases) {
+        CreatePhasePass(phase);
+    }
+
+    RouteBatchesToPasses();
+
     framegraph::ResourceDesc backbufferDesc;
     backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     backbufferDesc.width = 1920;
@@ -489,6 +498,78 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     Msg("  [FrameGraph] Dynamic: submitted %u/%u (filtered: %u not renderable, %u no visual)",
         submittedDynamic, (u32)spatialObjects.size(), notRenderable, noVisual);
     Msg("  [FrameGraph] TOTAL: %u geometry batches submitted", submittedStatic + submittedDynamic);
+}
+
+xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
+    xr_set<framegraph::RenderPhase> phases;
+
+    const auto& batches = m_geometryCollector->GetBatches();
+
+    Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
+
+    for (const auto& batch : batches) {
+        if (!batch.pipeline) {
+            continue;
+        }
+
+        phases.insert(framegraph::RenderPhase::Geometry);
+    }
+
+    Msg("! [FrameGraphRenderer] Found %u required phases", phases.size());
+    for (framegraph::RenderPhase phase : phases) {
+        const char* phaseName = "Unknown";
+        switch (phase) {
+            case framegraph::RenderPhase::Geometry: phaseName = "Geometry"; break;
+            case framegraph::RenderPhase::Lighting: phaseName = "Lighting"; break;
+            case framegraph::RenderPhase::Combine: phaseName = "Combine"; break;
+            case framegraph::RenderPhase::PostProcess: phaseName = "PostProcess"; break;
+            case framegraph::RenderPhase::Shadow: phaseName = "Shadow"; break;
+            case framegraph::RenderPhase::Custom: phaseName = "Custom"; break;
+        }
+        Msg("!   - %s", phaseName);
+    }
+
+    return phases;
+}
+
+void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
+    Msg("! [FrameGraphRenderer] Creating pass for phase: %d", (int)phase);
+
+    switch (phase) {
+        case framegraph::RenderPhase::Geometry:
+            Msg("!   Geometry pass already exists");
+            break;
+
+        case framegraph::RenderPhase::Lighting:
+            Msg("!   Lighting pass already exists");
+            break;
+
+        case framegraph::RenderPhase::PostProcess:
+            Msg("!   PostProcess pass already exists");
+            break;
+
+        default:
+            Msg("!   ⚠️ Unsupported phase: %d", (int)phase);
+            break;
+    }
+}
+
+void FrameGraphRenderer::RouteBatchesToPasses() {
+    Msg("! [FrameGraphRenderer] Routing batches to passes...");
+
+    const auto& batches = m_geometryCollector->GetBatches();
+
+    u32 geometryBatches = 0;
+    u32 lightingBatches = 0;
+    u32 otherBatches = 0;
+
+    for (const auto& batch : batches) {
+        geometryBatches++;
+    }
+
+    Msg("!   Geometry: %u batches", geometryBatches);
+    Msg("!   Lighting: %u batches", lightingBatches);
+    Msg("!   Other: %u batches", otherBatches);
 }
 
 }
