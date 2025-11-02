@@ -52,59 +52,7 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
     return nvrhi::Format::UNKNOWN;
 }
 
-// Convert DXGI_FORMAT to NVRHI format, handling IA-incompatible formats
-nvrhi::Format ConvertVertexFormat(DXGI_FORMAT dxgiFormat) {
-    switch (dxgiFormat) {
-        // Direct mappings (IA-compatible)
-    case DXGI_FORMAT_R32G32B32A32_FLOAT: return nvrhi::Format::RGBA32_FLOAT;
-    case DXGI_FORMAT_R32G32B32_FLOAT:    return nvrhi::Format::RGB32_FLOAT;
-    case DXGI_FORMAT_R32G32_FLOAT:       return nvrhi::Format::RG32_FLOAT;
-    case DXGI_FORMAT_R32_FLOAT:          return nvrhi::Format::R32_FLOAT;
-
-    case DXGI_FORMAT_R16G16B16A16_FLOAT: return nvrhi::Format::RGBA16_FLOAT;
-    case DXGI_FORMAT_R16G16_FLOAT:       return nvrhi::Format::RG16_FLOAT;
-    case DXGI_FORMAT_R16_FLOAT:          return nvrhi::Format::R16_FLOAT;
-
-    case DXGI_FORMAT_R16G16B16A16_UNORM: return nvrhi::Format::RGBA16_UNORM;
-    case DXGI_FORMAT_R16G16B16A16_SNORM: return nvrhi::Format::RGBA16_SNORM;
-    case DXGI_FORMAT_R16G16B16A16_UINT:  return nvrhi::Format::RGBA16_UINT;
-    case DXGI_FORMAT_R16G16B16A16_SINT:  return nvrhi::Format::RGBA16_SINT;
-
-    case DXGI_FORMAT_R16G16_UNORM:       return nvrhi::Format::RG16_UNORM;
-    case DXGI_FORMAT_R16G16_SNORM:       return nvrhi::Format::RG16_SNORM;
-    case DXGI_FORMAT_R16G16_UINT:        return nvrhi::Format::RG16_UINT;
-    case DXGI_FORMAT_R16G16_SINT:        return nvrhi::Format::RG16_SINT;
-
-    case DXGI_FORMAT_R8G8B8A8_UNORM:     return nvrhi::Format::RGBA8_UNORM;
-    case DXGI_FORMAT_R8G8B8A8_SNORM:     return nvrhi::Format::RGBA8_SNORM;
-    case DXGI_FORMAT_R8G8B8A8_UINT:      return nvrhi::Format::RGBA8_UINT;
-    case DXGI_FORMAT_R8G8B8A8_SINT:      return nvrhi::Format::RGBA8_SINT;
-
-    case DXGI_FORMAT_R32G32B32A32_UINT:  return nvrhi::Format::RGBA32_UINT;
-    case DXGI_FORMAT_R32G32B32A32_SINT:  return nvrhi::Format::RGBA32_SINT;
-    case DXGI_FORMAT_R32G32_UINT:        return nvrhi::Format::RG32_UINT;
-    case DXGI_FORMAT_R32G32_SINT:        return nvrhi::Format::RG32_SINT;
-
-    case DXGI_FORMAT_R10G10B10A2_UNORM:  return nvrhi::Format::R10G10B10A2_UNORM;
-    case DXGI_FORMAT_R10G10B10A2_UINT:   return nvrhi::Format::RGBA16_UINT;
-    case DXGI_FORMAT_R11G11B10_FLOAT:    return nvrhi::Format::R11G11B10_FLOAT;
-
-        // IA-incompatible formats - convert to compatible equivalents
-    case DXGI_FORMAT_B4G4R4A4_UNORM:     return nvrhi::Format::RGBA8_UNORM;
-    case DXGI_FORMAT_B5G6R5_UNORM:       return nvrhi::Format::RGBA8_UNORM;
-    case DXGI_FORMAT_B5G5R5A1_UNORM:     return nvrhi::Format::RGBA8_UNORM;
-
-    case DXGI_FORMAT_B8G8R8A8_UNORM:     // BGRA → RGBA
-        return nvrhi::Format::BGRA8_UNORM;
-
-    case DXGI_FORMAT_B8G8R8X8_UNORM:     // BGRX → BGRA
-        return nvrhi::Format::BGRA8_UNORM;
-
-    default:
-        Msg("! [MaterialCache] Unknown DXGI format %d, defaulting to RGBA32_FLOAT", dxgiFormat);
-        return nvrhi::Format::RGBA32_FLOAT;
-    }
-}
+// Deleted ConvertVertexFormat - use ConvertDxgiFormatToNvrhi instead
 
 // ══════════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -1235,6 +1183,9 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
     // Stride = total size of all elements in this buffer slot
     std::map<u32, u32> bufferStrides;  // slot -> stride in bytes
 
+    Msg("! [MaterialCache] Computing vertex stride for visual '%s'", visual->dbg_name.c_str());
+    Msg("!   Declaration has %u elements", (u32)decl->dx11_dcl_code.size());
+
     for (const auto& d3dElem : decl->dx11_dcl_code) {
         if (!d3dElem.SemanticName)
             continue;
@@ -1245,8 +1196,16 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         // Calculate end offset of this element
         u32 endOffset = d3dElem.AlignedByteOffset + elemSize;
 
+        Msg("!   Element: %s%d @ slot %u, offset %u, format %u, size %u → endOffset %u",
+            d3dElem.SemanticName, d3dElem.SemanticIndex,
+            slot, d3dElem.AlignedByteOffset, d3dElem.Format, elemSize, endOffset);
+
         // Update stride to be at least this large
         bufferStrides[slot] = std::max(bufferStrides[slot], endOffset);
+    }
+
+    for (const auto& [slot, stride] : bufferStrides) {
+        Msg("!   → Buffer slot %u: stride = %u bytes", slot, stride);
     }
 
     // Track seen semantics to avoid duplicates (which cause CreateInputLayout to fail)
@@ -1309,8 +1268,8 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
 
         attr.semanticIndex = d3dElem.SemanticIndex;
 
-        // Convert DXGI format to NVRHI format with proper IA compatibility handling
-        attr.format = ConvertVertexFormat(d3dElem.Format);
+        // Convert DXGI format to NVRHI format
+        attr.format = ConvertDxgiFormatToNvrhi(d3dElem.Format);
 
         attr.offset = d3dElem.AlignedByteOffset;
         attr.bufferIndex = d3dElem.InputSlot;
@@ -1321,6 +1280,11 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         attr.elementStride = bufferStrides[d3dElem.InputSlot];
 
         psoDesc.vertexAttributes.push_back(attr);
+
+        Msg("!   → Added to PSO at index %u: %s%d (format=%u, offset=%u, bufferIndex=%u, stride=%u)",
+            (u32)psoDesc.vertexAttributes.size() - 1,
+            attr.semanticName, attr.semanticIndex,
+            (u32)attr.format, attr.offset, attr.bufferIndex, attr.elementStride);
     }
 
     // Debug: Log computed strides

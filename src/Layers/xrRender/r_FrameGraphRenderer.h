@@ -76,6 +76,9 @@ private:
     // RenderContext for execution
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 
+    // Buffer handle cache (D3D11 buffer ptr → NVRHI handle)
+    xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;
+
     // Statistics
     Stats m_stats;
 

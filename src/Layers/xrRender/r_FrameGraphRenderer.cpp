@@ -144,6 +144,9 @@ void FrameGraphRenderer::Render() {
 }
 
 void FrameGraphRenderer::SetupFrame() {
+    // Clear buffer handle cache (X-Ray may recreate buffers each frame)
+    m_bufferHandleCache.clear();
+
     // Begin geometry collection
     m_geometryCollector->BeginFrame();
 
@@ -388,33 +391,66 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     //  WRAP D3D11 BUFFERS AS NVRHI HANDLES
     // ═══════════════════════════════════════════════════════
 
-    // Wrap vertex buffer using NVRHI directly
-    nvrhi::BufferDesc vbDesc;
-    vbDesc.debugName = "VisibleMesh_VB";
-    vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
-    vbDesc.isVertexBuffer = true;
-    vbDesc.keepInitialState = true;
-    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    // Wrap buffers with caching - geom->vb and geom->ib are SHARED buffers used by many meshes!
+    // Check cache first to avoid creating duplicate NVRHI handles
+    ID3D11Buffer* d3dVB = geom->vb;
+    ID3D11Buffer* d3dIB = geom->ib;
 
-    nvrhi::BufferHandle nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-        nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->vb), vbDesc);
+    Msg("! [ProcessVisualGeometry] Visual '%s': D3D VB=%p, IB=%p, vBase=%d, iBase=%d, vCount=%d, iCount=%d",
+        visual->dbg_name.c_str(), d3dVB, d3dIB,
+        meshVisual->vBase, meshVisual->iBase, meshVisual->vCount, meshVisual->iCount);
 
-    if (!nvrhiVB)
-        return false;
+    // Get or create vertex buffer handle
+    nvrhi::BufferHandle nvrhiVB;
+    auto vbIt = m_bufferHandleCache.find(d3dVB);
+    if (vbIt != m_bufferHandleCache.end()) {
+        nvrhiVB = vbIt->second;
+    } else {
+        // First time seeing this buffer - wrap it
+        D3D11_BUFFER_DESC d3dVBDesc;
+        d3dVB->GetDesc(&d3dVBDesc);
 
-    // Wrap index buffer using NVRHI directly
-    nvrhi::BufferDesc ibDesc;
-    ibDesc.debugName = "VisibleMesh_IB";
-    ibDesc.byteSize = meshVisual->iCount * sizeof(u16); // Assuming 16-bit indices
-    ibDesc.isIndexBuffer = true;
-    ibDesc.keepInitialState = true;
-    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.debugName = "Shared_VB";
+        vbDesc.byteSize = d3dVBDesc.ByteWidth;
+        vbDesc.isVertexBuffer = true;
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
 
-    nvrhi::BufferHandle nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-        nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->ib), ibDesc);
+        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
 
-    if (!nvrhiIB)
-        return false;
+        if (!nvrhiVB)
+            return false;
+
+        m_bufferHandleCache[d3dVB] = nvrhiVB;
+    }
+
+    // Get or create index buffer handle
+    nvrhi::BufferHandle nvrhiIB;
+    auto ibIt = m_bufferHandleCache.find(d3dIB);
+    if (ibIt != m_bufferHandleCache.end()) {
+        nvrhiIB = ibIt->second;
+    } else {
+        // First time seeing this buffer - wrap it
+        D3D11_BUFFER_DESC d3dIBDesc;
+        d3dIB->GetDesc(&d3dIBDesc);
+
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.debugName = "Shared_IB";
+        ibDesc.byteSize = d3dIBDesc.ByteWidth;
+        ibDesc.isIndexBuffer = true;
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+
+        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
+
+        if (!nvrhiIB)
+            return false;
+
+        m_bufferHandleCache[d3dIB] = nvrhiIB;
+    }
 
     // ═══════════════════════════════════════════════════════
     //  CREATE GEOMETRY BATCH
@@ -559,7 +595,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             case MT_NORMAL:
             default:
                 xform = Fidentity;
-                continue;
+                continue; // TODO: break so that we can render more than just trees
         }
 
         if (ProcessVisualGeometry(visual, xform)) {
