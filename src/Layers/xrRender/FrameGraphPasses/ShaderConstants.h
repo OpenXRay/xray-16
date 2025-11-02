@@ -20,9 +20,11 @@ struct alignas(16) PerObjectConstants {
 };
 
 struct alignas(16) GlobalConstants {
-    Fmatrix m_V;
-    Fmatrix m_P;
-    Fmatrix m_VP;
+    float m_V[12];
+
+    float m_P[16];
+
+    float m_VP[16];
 
     Fvector4 timers;
 
@@ -47,12 +49,28 @@ struct alignas(16) GlobalConstants {
 };
 
 inline void FillGlobalConstants(GlobalConstants& cb) {
-    cb.m_V.transpose(Device.mView);
-    cb.m_P.transpose(Device.mProject);
+
+    Fmatrix viewT;
+    viewT.transpose(Device.mView);
+    cb.m_V[0]  = viewT._11; cb.m_V[1]  = viewT._12; cb.m_V[2]  = viewT._13; cb.m_V[3]  = viewT._14;
+    cb.m_V[4]  = viewT._21; cb.m_V[5]  = viewT._22; cb.m_V[6]  = viewT._23; cb.m_V[7]  = viewT._24;
+    cb.m_V[8]  = viewT._31; cb.m_V[9]  = viewT._32; cb.m_V[10] = viewT._33; cb.m_V[11] = viewT._34;
+
+    Fmatrix projT;
+    projT.transpose(Device.mProject);
+    cb.m_P[0]  = projT._11; cb.m_P[1]  = projT._12; cb.m_P[2]  = projT._13; cb.m_P[3]  = projT._14;
+    cb.m_P[4]  = projT._21; cb.m_P[5]  = projT._22; cb.m_P[6]  = projT._23; cb.m_P[7]  = projT._24;
+    cb.m_P[8]  = projT._31; cb.m_P[9]  = projT._32; cb.m_P[10] = projT._33; cb.m_P[11] = projT._34;
+    cb.m_P[12] = projT._41; cb.m_P[13] = projT._42; cb.m_P[14] = projT._43; cb.m_P[15] = projT._44;
 
     Fmatrix tempVP;
     tempVP.mul(Device.mProject, Device.mView);
-    cb.m_VP.transpose(tempVP);
+    Fmatrix vpT;
+    vpT.transpose(tempVP);
+    cb.m_VP[0]  = vpT._11; cb.m_VP[1]  = vpT._12; cb.m_VP[2]  = vpT._13; cb.m_VP[3]  = vpT._14;
+    cb.m_VP[4]  = vpT._21; cb.m_VP[5]  = vpT._22; cb.m_VP[6]  = vpT._23; cb.m_VP[7]  = vpT._24;
+    cb.m_VP[8]  = vpT._31; cb.m_VP[9]  = vpT._32; cb.m_VP[10] = vpT._33; cb.m_VP[11] = vpT._34;
+    cb.m_VP[12] = vpT._41; cb.m_VP[13] = vpT._42; cb.m_VP[14] = vpT._43; cb.m_VP[15] = vpT._44;
 
     cb.timers.set(
         Device.fTimeGlobal,
