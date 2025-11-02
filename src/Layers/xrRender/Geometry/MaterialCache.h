@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     struct Shader;
@@ -97,6 +98,20 @@ struct MaterialPSO {
     SVS* vertexShader = nullptr;
     SPS* pixelShader = nullptr;
     SPass* pass = nullptr;
+
+    framegraph::ShaderRTBindings rtBindings;
+
+    framegraph::RenderPhase GetPhase() const {
+        return rtBindings.phase;
+    }
+
+    const xr_vector<framegraph::ShaderRTBindings::InputTexture>& GetInputTextures() const {
+        return rtBindings.inputTextures;
+    }
+
+    u32 GetOutputRTCount() const {
+        return (u32)rtBindings.outputRTs.size();
+    }
 
     shared_str debugName;
 

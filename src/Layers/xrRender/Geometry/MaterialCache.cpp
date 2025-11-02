@@ -397,6 +397,24 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->debugName = vs->cName;
 
+    if (ps->sh && ps->bytecode) {
+        Msg("! [MaterialCache] Performing shader reflection on PS '%s'", ps->cName.c_str());
+
+        matPSO->rtBindings = framegraph::ShaderReflector::AnalyzePixelShader(
+            ps->sh,
+            ps->bytecode
+        );
+
+        matPSO->rtBindings.shaderName = ps->cName;
+
+        Msg("! [MaterialCache] Shader reflection complete:");
+        Msg("!   Phase: %d", (int)matPSO->rtBindings.phase);
+        Msg("!   Input textures: %u", matPSO->rtBindings.inputTextures.size());
+        Msg("!   Output RTs: %u", matPSO->rtBindings.outputRTs.size());
+    } else {
+        Msg("! [MaterialCache] Cannot perform shader reflection - no bytecode available");
+    }
+
     matPSO->constantBuffers.clear();
 
     auto extractCBsFromShader = [&](R_constant_table& constTable, const char* shaderName) {
