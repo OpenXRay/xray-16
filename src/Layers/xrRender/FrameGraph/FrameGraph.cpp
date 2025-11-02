@@ -259,6 +259,7 @@ void FrameGraph::Reset() {
     m_resources.clear();
     m_passes.clear();
     m_sortedPasses.clear();
+    m_rtRegistry.Clear();
     m_compiled = false;
 
     m_stats.numPasses = 0;

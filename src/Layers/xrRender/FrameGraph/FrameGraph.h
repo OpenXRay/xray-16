@@ -3,6 +3,7 @@
 #include "FGTypes.h"
 #include "FGResource.h"
 #include "FGPass.h"
+#include "RenderTargetRegistry.h"
 #include "../RenderContext/RenderContext.h"
 
 namespace xray::render::framegraph {
@@ -55,6 +56,13 @@ public:
 
     const ResourceDesc& GetResourceDesc(VirtualResourceHandle handle) const;
 
+    RenderTargetRegistry& GetRTRegistry() { return m_rtRegistry; }
+    const RenderTargetRegistry& GetRTRegistry() const { return m_rtRegistry; }
+
+    VirtualResourceHandle GetResourceByName(const char* name) const {
+        return m_rtRegistry.GetRT(name);
+    }
+
     void ExportVisualization(const char* htmlPath) const;
     void PrintStatistics() const;
     void PrintExecutionOrder() const;
@@ -85,6 +93,8 @@ private:
 
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
+
+    RenderTargetRegistry m_rtRegistry;
 
     xr_vector<ResourceNode> m_resources;
     xr_vector<PassNode> m_passes;

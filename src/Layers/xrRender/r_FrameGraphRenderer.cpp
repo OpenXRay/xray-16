@@ -135,6 +135,52 @@ void FrameGraphRenderer::BuildFrameGraph() {
 
     m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
 
+    Msg("! [FrameGraphRenderer] Registering render targets in RT registry...");
+    auto& registry = m_framegraph->GetRTRegistry();
+
+    registry.RegisterRT("rt_Albedo", gbufferOutputs.albedo);
+    registry.RegisterRT("rt_Color", gbufferOutputs.albedo);
+    registry.RegisterAliases(gbufferOutputs.albedo, {
+        "s_albedo",
+        "s_diffuse",
+        "s_image",
+        "s_base"
+    });
+
+    registry.RegisterRT("rt_Normal", gbufferOutputs.normal);
+    registry.RegisterAliases(gbufferOutputs.normal, {
+        "s_normal",
+        "s_nmap"
+    });
+
+    registry.RegisterRT("rt_Material", gbufferOutputs.material);
+    registry.RegisterAliases(gbufferOutputs.material, {
+        "s_material",
+        "s_mat"
+    });
+
+    registry.RegisterRT("rt_Depth", gbufferOutputs.depth);
+    registry.RegisterAliases(gbufferOutputs.depth, {
+        "s_depth",
+        "s_position"
+    });
+
+    registry.RegisterRT("rt_HDRColor", lightingOutput.hdrColor);
+    registry.RegisterRT("rt_Accumulator", lightingOutput.hdrColor);
+    registry.RegisterAliases(lightingOutput.hdrColor, {
+        "s_hdr",
+        "s_accumulator",
+        "s_acc"
+    });
+
+    registry.RegisterRT("rt_Backbuffer", backbuffer);
+    registry.RegisterAliases(backbuffer, {
+        "s_backbuffer",
+        "s_screen"
+    });
+
+    registry.PrintRegistry();
+
     m_finalOutput = backbuffer;
 }
 
