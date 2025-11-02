@@ -181,6 +181,9 @@
     <Filter Include="Tests">
       <UniqueIdentifier>{c8dd4c51-de70-44f7-b29c-7be1a84c5ee9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ResourceManager">
+      <UniqueIdentifier>{f92eda08-e783-402a-936b-f91f09cc3517}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -758,6 +761,15 @@
     <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderPhaseCache.h" />
+    <ClInclude Include="..\xrRender\ResourceManager\DDSLoader.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\ResourceHandle.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\TextureManager.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1383,6 +1395,15 @@
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
     <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderPhaseCache.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager\DDSLoader.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\TestTextureManager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\TextureManager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
