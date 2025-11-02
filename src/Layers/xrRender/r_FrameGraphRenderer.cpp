@@ -92,6 +92,8 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->Execute();
 
+    PresentToBackbuffer();
+
     auto frameEnd = std::chrono::high_resolution_clock::now();
     m_stats.totalFrameMs = std::chrono::duration<float, std::milli>(
         frameEnd - frameStart
@@ -132,6 +134,8 @@ void FrameGraphRenderer::BuildFrameGraph() {
     auto lightingOutput = m_lightingPass->Setup(*m_framegraph, gbufferOutputs);
 
     m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
+
+    m_finalOutput = backbuffer;
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -147,6 +151,72 @@ void FrameGraphRenderer::PrintStats() const {
     Msg("  Draw calls: %u", m_stats.numDrawCalls);
     Msg("  Triangles: %u", m_stats.numTriangles);
     Msg("═══════════════════════════════════════");
+}
+
+void FrameGraphRenderer::PresentToBackbuffer() {
+    VERIFY(m_device != nullptr);
+    VERIFY(m_framegraph != nullptr);
+
+    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+    if (!finalTexture) {
+        Msg("! [FrameGraphRenderer] Failed to get final output texture for present");
+        return;
+    }
+
+    ID3D11RenderTargetView* backbufferRTV = RImplementation.Target->get_base_rt();
+    if (!backbufferRTV) {
+        Msg("! [FrameGraphRenderer] Failed to get game backbuffer RTV");
+        return;
+    }
+
+    ID3D11Resource* d3dBackbufferResource = nullptr;
+    backbufferRTV->GetResource(&d3dBackbufferResource);
+    if (!d3dBackbufferResource) {
+        Msg("! [FrameGraphRenderer] Failed to get backbuffer resource");
+        return;
+    }
+
+    ID3D11Texture2D* d3dBackbufferTex = nullptr;
+    HRESULT hr = d3dBackbufferResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&d3dBackbufferTex);
+    d3dBackbufferResource->Release();
+
+    if (FAILED(hr) || !d3dBackbufferTex) {
+        Msg("! [FrameGraphRenderer] Backbuffer is not a 2D texture");
+        return;
+    }
+
+    nvrhi::TextureDesc backbufferDesc;
+    D3D11_TEXTURE2D_DESC d3dDesc;
+    d3dBackbufferTex->GetDesc(&d3dDesc);
+
+    backbufferDesc.width = d3dDesc.Width;
+    backbufferDesc.height = d3dDesc.Height;
+    backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+    backbufferDesc.isRenderTarget = true;
+    backbufferDesc.debugName = "GameBackbuffer";
+
+    nvrhi::TextureHandle backbufferHandle = m_device->GetNativeDevice()->createHandleForNativeTexture(
+        nvrhi::ObjectTypes::D3D11_Resource,
+        nvrhi::Object(d3dBackbufferTex),
+        backbufferDesc
+    );
+    d3dBackbufferTex->Release();
+
+    if (!backbufferHandle) {
+        Msg("! [FrameGraphRenderer] Failed to wrap backbuffer as NVRHI texture");
+        return;
+    }
+
+    ng::RenderContext* ctx = m_renderContext.get();
+    VERIFY(ctx != nullptr);
+
+    ctx->CopyTexture(
+        backbufferHandle.Get(),
+        finalTexture
+    );
+
+    Msg("  [FrameGraphRenderer] Presented final output to game backbuffer (%ux%u)",
+        d3dDesc.Width, d3dDesc.Height);
 }
 
 bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform) {

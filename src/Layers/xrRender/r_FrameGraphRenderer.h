@@ -45,6 +45,8 @@ private:
 
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 
+    framegraph::VirtualResourceHandle m_finalOutput;
+
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
@@ -57,6 +59,8 @@ private:
 
     void SetupFrame();
     void BuildFrameGraph();
+
+    void PresentToBackbuffer();
 
     void CollectVisibleGeometry();
 

@@ -501,4 +501,17 @@ void RenderContext::ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stenc
     );
 }
 
+void RenderContext::CopyTexture(nvrhi::ITexture* dest, nvrhi::ITexture* src) {
+    VERIFY(dest != nullptr);
+    VERIFY(src != nullptr);
+    VERIFY2(!m_inRenderPass, "Cannot copy textures inside render pass!");
+
+    m_commandList->copyTexture(
+        dest,
+        nvrhi::TextureSlice(),
+        src,
+        nvrhi::TextureSlice()
+    );
+}
+
 }

@@ -171,6 +171,8 @@ public:
     void ClearRenderTarget(nvrhi::ITexture* rt, const float color[4]);
     void ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stencil);
 
+    void CopyTexture(nvrhi::ITexture* dest, nvrhi::ITexture* src);
+
     struct RenderStats {
         u32 numDrawCalls = 0;
         u32 numDrawIndexedCalls = 0;
