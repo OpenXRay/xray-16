@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
@@ -9,6 +10,8 @@ namespace xray::render::RENDER_NAMESPACE {
 namespace xray::render {
 
 using RENDER_NAMESPACE::dxRender_Visual;
+
+struct MaterialPSO;
 
 struct GeometryBatch {
     nvrhi::BufferHandle vertexBuffer;
@@ -29,7 +32,14 @@ struct GeometryBatch {
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
 
+    MaterialPSO* materialPSO = nullptr;
+
+    framegraph::RenderPhase renderPhase = framegraph::RenderPhase::Geometry;
+
     dxRender_Visual* visual = nullptr;
+
+    bool isVisible = true;
+    float distanceToCamera = 0.0f;
 
     shared_str debugName;
 };
@@ -45,6 +55,8 @@ public:
     void Submit(const GeometryBatch& batch);
 
     const xr_vector<GeometryBatch>& GetBatches() const { return m_batches; }
+
+    xr_vector<GeometryBatch>& GetBatchesMutable() { return m_batches; }
 
     void Sort();
 

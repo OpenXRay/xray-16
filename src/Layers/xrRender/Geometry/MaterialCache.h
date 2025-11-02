@@ -113,6 +113,28 @@ struct MaterialPSO {
         return (u32)rtBindings.outputRTs.size();
     }
 
+    u32 GetSlotForSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
+        for (const auto& output : rtBindings.outputRTs) {
+            if (output.semantic == semantic) {
+                return output.slot;
+            }
+        }
+        return ~0u;
+    }
+
+    bool WritesSemantic(framegraph::ShaderRTBindings::RTSemantic semantic) const {
+        return GetSlotForSemantic(semantic) != ~0u;
+    }
+
+    xr_vector<u32> GetOutputSlots() const {
+        xr_vector<u32> slots;
+        for (const auto& output : rtBindings.outputRTs) {
+            slots.push_back(output.slot);
+        }
+        std::sort(slots.begin(), slots.end());
+        return slots;
+    }
+
     shared_str debugName;
 
     ~MaterialPSO() {
@@ -176,6 +198,7 @@ private:
     void SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
+        MaterialPSO* matPSO,
         const passes::GBufferOutputs& outputs,
         const xray::render::framegraph::FrameGraph& fg,
         ng::PipelineStateDesc& psoDesc);

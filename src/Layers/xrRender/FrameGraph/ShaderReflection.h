@@ -27,12 +27,23 @@ struct ShaderRTBindings {
     };
     xr_vector<InputTexture> inputTextures;
 
+    enum class RTSemantic {
+        Unknown,
+        Normal,
+        Albedo,
+        Material,
+        Position,
+        Emissive,
+        Accumulator
+    };
+
     struct OutputRT {
         u32 slot;
-        shared_str inferredName;
+        RTSemantic semantic;
+        shared_str formatDesc;
 
-        OutputRT() : slot(0) {}
-        OutputRT(u32 s) : slot(s) {}
+        OutputRT() : slot(0), semantic(RTSemantic::Unknown) {}
+        OutputRT(u32 s) : slot(s), semantic(RTSemantic::Unknown) {}
     };
     xr_vector<OutputRT> outputRTs;
 
@@ -50,6 +61,11 @@ public:
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);
 
     static xr_vector<const char*> GetPhaseRTNames(RenderPhase phase);
+
+    static ShaderRTBindings::RTSemantic InferRTSemantic(
+        u32 slot,
+        u32 componentMask,
+        RenderPhase phase);
 
 private:
     static bool MatchesPattern(const char* name, const char* pattern);

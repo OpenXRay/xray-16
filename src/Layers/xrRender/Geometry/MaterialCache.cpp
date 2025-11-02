@@ -252,7 +252,7 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     SetupRenderStates(pass, psoDesc);
 
-    SetupRenderTargets(outputs, fg, psoDesc);
+    SetupRenderTargets(pso.get(), outputs, fg, psoDesc);
 
     psoDesc.debugName = pso->debugName;
 
@@ -1199,6 +1199,7 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
 }
 
 void MaterialCache::SetupRenderTargets(
+    MaterialPSO* matPSO,
     const passes::GBufferOutputs& outputs,
     const xray::render::framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
@@ -1210,17 +1211,63 @@ void MaterialCache::SetupRenderTargets(
 
     if (!albedoTex || !normalTex || !materialTex || !depthTex) {
         psoDesc.renderTargetCount = 3;
-        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_UNORM;
-        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_SNORM;
+        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_SNORM;
+        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_UNORM;
         psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
         psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
         return;
     }
 
-    psoDesc.renderTargetCount = 3;
-    psoDesc.renderTargetFormats[0] = albedoTex->getDesc().format;
-    psoDesc.renderTargetFormats[1] = normalTex->getDesc().format;
-    psoDesc.renderTargetFormats[2] = materialTex->getDesc().format;
+    psoDesc.renderTargetCount = static_cast<u32>(matPSO->rtBindings.outputRTs.size());
+
+    for (u32 i = 0; i < 8; i++) {
+        psoDesc.renderTargetFormats[i] = nvrhi::Format::UNKNOWN;
+    }
+
+    using RTSemantic = framegraph::ShaderRTBindings::RTSemantic;
+
+    for (const auto& outputRT : matPSO->rtBindings.outputRTs) {
+        u32 slot = outputRT.slot;
+        nvrhi::Format format = nvrhi::Format::UNKNOWN;
+        const char* rtName = "Unknown";
+
+        switch (outputRT.semantic) {
+            case RTSemantic::Normal:
+                format = normalTex->getDesc().format;
+                rtName = "Normal";
+                break;
+
+            case RTSemantic::Albedo:
+                format = albedoTex->getDesc().format;
+                rtName = "Albedo";
+                break;
+
+            case RTSemantic::Material:
+                format = materialTex->getDesc().format;
+                rtName = "Material";
+                break;
+
+            case RTSemantic::Position:
+                Msg("! [MaterialCache] Warning: Shader writes Position RT (slot %u)", slot);
+                continue;
+
+            case RTSemantic::Emissive:
+                Msg("! [MaterialCache] Warning: Shader writes Emissive RT (slot %u)", slot);
+                continue;
+
+            case RTSemantic::Accumulator:
+                Msg("! [MaterialCache] Warning: Shader writes Accumulator RT (slot %u)", slot);
+                continue;
+
+            default:
+                Msg("! [MaterialCache] Unknown RT semantic for slot %u", slot);
+                continue;
+        }
+
+        psoDesc.renderTargetFormats[slot] = format;
+        Msg("! [MaterialCache] RT slot %u → %s (format %u)", slot, rtName, (u32)format);
+    }
+
     psoDesc.depthStencilFormat = depthTex->getDesc().format;
 }
 

@@ -80,6 +80,35 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
 
     Msg("! [ShaderReflector] Inferred phase: %s", phaseName);
 
+    for (u32 i = 0; i < shaderDesc.OutputParameters; i++) {
+        D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
+        reflection->GetOutputParameterDesc(i, &paramDesc);
+
+        if (xr_strcmp(paramDesc.SemanticName, "SV_Target") == 0) {
+            u32 slot = paramDesc.SemanticIndex;
+
+            for (auto& output : bindings.outputRTs) {
+                if (output.slot == slot) {
+                    output.semantic = InferRTSemantic(slot, paramDesc.Mask, bindings.phase);
+
+                    const char* semanticName = "Unknown";
+                    switch (output.semantic) {
+                        case ShaderRTBindings::RTSemantic::Normal: semanticName = "Normal"; break;
+                        case ShaderRTBindings::RTSemantic::Albedo: semanticName = "Albedo"; break;
+                        case ShaderRTBindings::RTSemantic::Material: semanticName = "Material"; break;
+                        case ShaderRTBindings::RTSemantic::Position: semanticName = "Position"; break;
+                        case ShaderRTBindings::RTSemantic::Emissive: semanticName = "Emissive"; break;
+                        case ShaderRTBindings::RTSemantic::Accumulator: semanticName = "Accumulator"; break;
+                        default: break;
+                    }
+
+                    Msg("!   → Slot %u semantic: %s", slot, semanticName);
+                    break;
+                }
+            }
+        }
+    }
+
     reflection->Release();
 
     return bindings;
@@ -131,6 +160,28 @@ bool ShaderReflector::MatchesPattern(const char* name, const char* pattern) {
     std::transform(patternStr.begin(), patternStr.end(), patternStr.begin(), ::tolower);
 
     return nameStr.find(patternStr) != xr_string::npos;
+}
+
+ShaderRTBindings::RTSemantic ShaderReflector::InferRTSemantic(
+    u32 slot,
+    u32 componentMask,
+    RenderPhase phase)
+{
+
+    if (phase == RenderPhase::Geometry) {
+        switch (slot) {
+            case 0:  return ShaderRTBindings::RTSemantic::Normal;
+            case 1:  return ShaderRTBindings::RTSemantic::Albedo;
+            case 2:  return ShaderRTBindings::RTSemantic::Material;
+            default: return ShaderRTBindings::RTSemantic::Unknown;
+        }
+    }
+
+    if (phase == RenderPhase::Lighting) {
+        return ShaderRTBindings::RTSemantic::Accumulator;
+    }
+
+    return ShaderRTBindings::RTSemantic::Unknown;
 }
 
 xr_vector<const char*> ShaderReflector::GetPhaseRTNames(RenderPhase phase) {

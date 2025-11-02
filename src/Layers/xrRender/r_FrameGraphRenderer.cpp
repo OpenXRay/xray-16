@@ -7,6 +7,7 @@
 #include "FLOD.h"
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
 
 namespace xray::render {
 
@@ -33,6 +34,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     Msg("* [FrameGraphRenderer] Initializing...");
 
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
+
+    m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
 
     passes::GBufferPassConfig gbufferConfig;
     gbufferConfig.width = Device.dwWidth;
@@ -70,6 +73,7 @@ void FrameGraphRenderer::Shutdown() {
     m_tonemapPass.reset();
     m_lightingPass.reset();
     m_gbufferPass.reset();
+    m_shaderPhaseCache.reset();
     m_framegraph.reset();
 
     m_device = nullptr;
@@ -99,11 +103,11 @@ void FrameGraphRenderer::Render() {
         frameEnd - frameStart
     ).count();
 
-    m_stats.gbufferMs = m_gbufferPass->GetStats().cpuTimeMs;
+    m_stats.gbufferMs = m_gbufferPass->GetGBufferStats().cpuTimeMs;
     m_stats.lightingMs = m_lightingPass->GetStats().cpuTimeMs;
     m_stats.tonemapMs = m_tonemapPass->GetStats().cpuTimeMs;
-    m_stats.numDrawCalls = m_gbufferPass->GetStats().numDrawCalls;
-    m_stats.numTriangles = m_gbufferPass->GetStats().numTriangles;
+    m_stats.numDrawCalls = m_gbufferPass->GetGBufferStats().numDrawCalls;
+    m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
 
     m_framegraph->Reset();
 }
@@ -118,14 +122,6 @@ void FrameGraphRenderer::SetupFrame() {
 
 void FrameGraphRenderer::BuildFrameGraph() {
 
-    xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
-
-    for (framegraph::RenderPhase phase : requiredPhases) {
-        CreatePhasePass(phase);
-    }
-
-    RouteBatchesToPasses();
-
     framegraph::ResourceDesc backbufferDesc;
     backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     backbufferDesc.width = 1920;
@@ -138,11 +134,12 @@ void FrameGraphRenderer::BuildFrameGraph() {
     framegraph::VirtualResourceHandle backbuffer =
         m_framegraph->CreateTexture("Backbuffer", backbufferDesc);
 
-    auto gbufferOutputs = m_gbufferPass->Setup(*m_framegraph);
+    m_gbufferPass->Setup(*m_framegraph);
+    auto gbufferOutputs = m_gbufferPass->GetOutputs();
 
-    auto lightingOutput = m_lightingPass->Setup(*m_framegraph, gbufferOutputs);
+    CreateAllRequiredPasses();
 
-    m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
+    RouteBatchesToPasses();
 
     Msg("! [FrameGraphRenderer] Registering render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
@@ -174,14 +171,6 @@ void FrameGraphRenderer::BuildFrameGraph() {
         "s_position"
     });
 
-    registry.RegisterRT("rt_HDRColor", lightingOutput.hdrColor);
-    registry.RegisterRT("rt_Accumulator", lightingOutput.hdrColor);
-    registry.RegisterAliases(lightingOutput.hdrColor, {
-        "s_hdr",
-        "s_accumulator",
-        "s_acc"
-    });
-
     registry.RegisterRT("rt_Backbuffer", backbuffer);
     registry.RegisterAliases(backbuffer, {
         "s_backbuffer",
@@ -190,7 +179,7 @@ void FrameGraphRenderer::BuildFrameGraph() {
 
     registry.PrintRegistry();
 
-    m_finalOutput = backbuffer;
+    m_finalOutput = gbufferOutputs.albedo;
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -503,73 +492,106 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
     xr_set<framegraph::RenderPhase> phases;
 
-    const auto& batches = m_geometryCollector->GetBatches();
-
+    auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
     Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
 
-    for (const auto& batch : batches) {
-        if (!batch.pipeline) {
+    xr_map<framegraph::RenderPhase, u32> phaseCount;
+
+    for (auto& batch : batches) {
+        if (!batch.visual) {
             continue;
         }
 
-        phases.insert(framegraph::RenderPhase::Geometry);
+        framegraph::RenderPhase phase = m_shaderPhaseCache->GetPhase(batch.visual);
+
+        batch.renderPhase = phase;
+
+        phases.insert(phase);
+        phaseCount[phase]++;
     }
 
-    Msg("! [FrameGraphRenderer] Found %u required phases", phases.size());
-    for (framegraph::RenderPhase phase : phases) {
-        const char* phaseName = "Unknown";
-        switch (phase) {
-            case framegraph::RenderPhase::Geometry: phaseName = "Geometry"; break;
-            case framegraph::RenderPhase::Lighting: phaseName = "Lighting"; break;
-            case framegraph::RenderPhase::Combine: phaseName = "Combine"; break;
-            case framegraph::RenderPhase::PostProcess: phaseName = "PostProcess"; break;
-            case framegraph::RenderPhase::Shadow: phaseName = "Shadow"; break;
-            case framegraph::RenderPhase::Custom: phaseName = "Custom"; break;
-        }
-        Msg("!   - %s", phaseName);
+    Msg("! [FrameGraphRenderer] Found %u required phases:", phases.size());
+    for (const auto& [phase, count] : phaseCount) {
+        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
+        Msg("!   %s: %u batches", phaseName, count);
     }
+
+    const auto& cacheStats = m_shaderPhaseCache->GetStats();
+    Msg("! [ShaderPhaseCache] Stats: %u cached, %u hits, %u misses",
+        cacheStats.numCached, cacheStats.numHits, cacheStats.numMisses);
 
     return phases;
 }
 
 void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
-    Msg("! [FrameGraphRenderer] Creating pass for phase: %d", (int)phase);
+    const char* phaseName = framegraph::IPass::GetPhaseName(phase);
+    Msg("! [FrameGraphRenderer] Creating pass for phase: %s", phaseName);
+
+    PassEntry entry;
+    entry.phase = phase;
 
     switch (phase) {
-        case framegraph::RenderPhase::Geometry:
-            Msg("!   Geometry pass already exists");
-            break;
+        case framegraph::RenderPhase::Geometry: {
+            Msg("!   Using existing GBufferPass instance");
+            return;
+        }
 
         case framegraph::RenderPhase::Lighting:
-            Msg("!   Lighting pass already exists");
-            break;
-
         case framegraph::RenderPhase::PostProcess:
-            Msg("!   PostProcess pass already exists");
-            break;
-
+        case framegraph::RenderPhase::Combine:
+        case framegraph::RenderPhase::Shadow:
+        case framegraph::RenderPhase::Custom:
         default:
-            Msg("!   ⚠️ Unsupported phase: %d", (int)phase);
-            break;
+            Msg("!   ⚠️ Unsupported phase: %s (not yet implemented)", phaseName);
+            return;
     }
+
+}
+
+void FrameGraphRenderer::CreateAllRequiredPasses() {
+    xr_set<framegraph::RenderPhase> requiredPhases = ScanRequiredPhases();
+
+    for (framegraph::RenderPhase phase : requiredPhases) {
+        CreatePhasePass(phase);
+    }
+
+    Msg("! [FrameGraphRenderer] Created %u passes", m_activePasses.size());
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
     Msg("! [FrameGraphRenderer] Routing batches to passes...");
 
-    const auto& batches = m_geometryCollector->GetBatches();
+    auto& batches = m_geometryCollector->GetBatchesMutable();
 
-    u32 geometryBatches = 0;
-    u32 lightingBatches = 0;
-    u32 otherBatches = 0;
+    xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
 
-    for (const auto& batch : batches) {
-        geometryBatches++;
+    for (auto& batch : batches) {
+        batchesByPhase[batch.renderPhase].push_back(&batch);
     }
 
-    Msg("!   Geometry: %u batches", geometryBatches);
-    Msg("!   Lighting: %u batches", lightingBatches);
-    Msg("!   Other: %u batches", otherBatches);
+    for (const auto& [phase, phaseBatches] : batchesByPhase) {
+        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
+
+        switch (phase) {
+            case framegraph::RenderPhase::Geometry:
+                m_gbufferPass->SetBatches(phaseBatches);
+                Msg("!   %s: %u batches assigned to GBufferPass",
+                    phaseName, phaseBatches.size());
+                break;
+
+            case framegraph::RenderPhase::Lighting:
+            case framegraph::RenderPhase::PostProcess:
+            case framegraph::RenderPhase::Combine:
+            case framegraph::RenderPhase::Shadow:
+            case framegraph::RenderPhase::Custom:
+            default:
+                Msg("!   %s: %u batches (no pass implemented yet)",
+                    phaseName, phaseBatches.size());
+                break;
+        }
+    }
+
+    Msg("! [FrameGraphRenderer] Batch routing complete");
 }
 
 }

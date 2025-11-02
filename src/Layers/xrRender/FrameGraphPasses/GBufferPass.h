@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render {
@@ -37,12 +38,17 @@ struct GBufferOutputs {
     framegraph::VirtualResourceHandle depth;
 };
 
-class GBufferPass {
+class GBufferPass : public framegraph::IPass {
 public:
     GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config = GBufferPassConfig());
-    ~GBufferPass();
+    ~GBufferPass() override;
 
-    GBufferOutputs Setup(framegraph::FrameGraph& fg);
+    void Setup(framegraph::FrameGraph& fg) override;
+    void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) override;
+
+    framegraph::RenderPhase GetPhase() const override {
+        return framegraph::RenderPhase::Geometry;
+    }
 
     const GBufferPassConfig& GetConfig() const { return m_config; }
 
@@ -54,7 +60,11 @@ public:
         float gpuTimeMs = 0.0f;
     };
 
-    const Stats& GetStats() const { return m_stats; }
+    const Stats& GetGBufferStats() const { return m_gbufferStats; }
+
+    const GBufferOutputs& GetOutputs() const { return m_outputs; }
+
+    MaterialCache* GetMaterialCache() const { return m_materialCache.get(); }
 
     nvrhi::IGraphicsPipeline* GetPipeline() const {
         return m_pipeline ? m_pipeline->GetNativePipeline() : nullptr;
@@ -63,7 +73,9 @@ public:
 private:
     ng::RenderDevice* m_device;
     GBufferPassConfig m_config;
-    Stats m_stats;
+    Stats m_gbufferStats;
+
+    GBufferOutputs m_outputs;
 
     xr_unique_ptr<MaterialCache> m_materialCache;
 
@@ -78,9 +90,6 @@ private:
     bool LoadShaders();
 
     bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
-
-    void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg,
-                const GBufferOutputs& outputs);
 
     void UpdatePerObjectConstantsData(const GeometryBatch& batch);
 

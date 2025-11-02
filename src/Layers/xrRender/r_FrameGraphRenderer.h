@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
@@ -46,6 +48,8 @@ private:
 
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 
+    xr_unique_ptr<framegraph::ShaderPhaseCache> m_shaderPhaseCache;
+
     framegraph::VirtualResourceHandle m_finalOutput;
 
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
@@ -68,11 +72,21 @@ private:
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
+    struct PassEntry {
+        framegraph::RenderPhase phase;
+        xr_unique_ptr<framegraph::IPass> pass;
+        xr_vector<GeometryBatch*> assignedBatches;
+    };
+
+    xr_vector<PassEntry> m_activePasses;
+
     xr_set<framegraph::RenderPhase> ScanRequiredPhases() const;
 
     void CreatePhasePass(framegraph::RenderPhase phase);
 
     void RouteBatchesToPasses();
+
+    void CreateAllRequiredPasses();
 };
 
 }

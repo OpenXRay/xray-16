@@ -1,0 +1,69 @@
+#pragma once
+
+#include "FrameGraph.h"
+#include "ShaderReflection.h"
+
+namespace xray::render {
+    struct GeometryBatch;
+
+    namespace ng {
+        class RenderContext;
+    }
+}
+
+namespace xray::render::framegraph {
+
+class IPass {
+public:
+    virtual ~IPass() = default;
+
+    virtual void Setup(FrameGraph& fg) = 0;
+
+    virtual void Execute(ng::RenderContext& ctx, const FrameGraph& fg) = 0;
+
+    virtual RenderPhase GetPhase() const = 0;
+
+    virtual void SetBatches(const xr_vector<GeometryBatch*>& batches) {
+        m_batches = batches;
+    }
+
+    const xr_vector<GeometryBatch*>& GetBatches() const {
+        return m_batches;
+    }
+
+    u32 GetBatchCount() const {
+        return static_cast<u32>(m_batches.size());
+    }
+
+    struct PassStats {
+        u32 numDrawCalls = 0;
+        u32 numTriangles = 0;
+        u32 numBatches = 0;
+        float cpuTimeMs = 0.0f;
+        float gpuTimeMs = 0.0f;
+    };
+
+    virtual const PassStats& GetStats() const {
+        return m_stats;
+    }
+
+public:
+    static const char* GetPhaseName(RenderPhase phase) {
+        switch (phase) {
+            case RenderPhase::Geometry:    return "Geometry";
+            case RenderPhase::Lighting:    return "Lighting";
+            case RenderPhase::Combine:     return "Combine";
+            case RenderPhase::PostProcess: return "PostProcess";
+            case RenderPhase::Shadow:      return "Shadow";
+            case RenderPhase::Custom:      return "Custom";
+            default:                       return "Unknown";
+        }
+    }
+
+protected:
+    xr_vector<GeometryBatch*> m_batches;
+
+    PassStats m_stats;
+};
+
+}
