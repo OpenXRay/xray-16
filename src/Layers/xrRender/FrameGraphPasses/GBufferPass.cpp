@@ -16,6 +16,12 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 {
     VERIFY(m_device != nullptr);
 
+    if (config.width == 0 || config.height == 0) {
+        Msg("! [GBufferPass] ERROR: Invalid resolution %ux%u! Must set config.width/height to Device.dwWidth/dwHeight!",
+            config.width, config.height);
+        FATAL("GBufferPass created with invalid resolution");
+    }
+
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
 
     m_materialCache = xr_make_unique<MaterialCache>(device);

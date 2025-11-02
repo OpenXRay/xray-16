@@ -11,8 +11,8 @@ namespace xray::render {
 namespace xray::render::passes {
 
 struct GBufferPassConfig {
-    u32 width = 1920;
-    u32 height = 1080;
+    u32 width = 0;
+    u32 height = 0;
 
     nvrhi::Format albedoFormat = nvrhi::Format::RGBA8_UNORM;
     nvrhi::Format normalFormat = nvrhi::Format::RGBA16_FLOAT;
