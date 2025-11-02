@@ -606,4 +606,22 @@ void RenderContext::ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stenc
     );
 }
 
+// ═══════════════════════════════════════════════════════
+//  TEXTURE OPERATIONS
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::CopyTexture(nvrhi::ITexture* dest, nvrhi::ITexture* src) {
+    VERIFY(dest != nullptr);
+    VERIFY(src != nullptr);
+    VERIFY2(!m_inRenderPass, "Cannot copy textures inside render pass!");
+
+    // Copy full mip 0, array slice 0
+    m_commandList->copyTexture(
+        dest,
+        nvrhi::TextureSlice(),  // dest: mip 0, array 0
+        src,
+        nvrhi::TextureSlice()   // src: mip 0, array 0
+    );
+}
+
 } // namespace xray::render::ng

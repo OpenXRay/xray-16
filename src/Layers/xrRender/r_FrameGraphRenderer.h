@@ -56,6 +56,9 @@ private:
     // FrameGraph
     xr_unique_ptr<framegraph::FrameGraph> m_framegraph;
 
+    // Final output texture (for copying to backbuffer)
+    framegraph::VirtualResourceHandle m_finalOutput;
+
     // Passes
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
@@ -73,6 +76,9 @@ private:
     // Frame setup
     void SetupFrame();
     void BuildFrameGraph();
+
+    // Copy final output to game backbuffer
+    void PresentToBackbuffer();
 
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();

@@ -229,6 +229,13 @@ public:
     void ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stencil);
 
     // ═══════════════════════════════════════════════════════
+    //  TEXTURE OPERATIONS
+    // ═══════════════════════════════════════════════════════
+
+    // Copy full texture contents from src to dest (mip 0, array 0)
+    void CopyTexture(nvrhi::ITexture* dest, nvrhi::ITexture* src);
+
+    // ═══════════════════════════════════════════════════════
     //  STATISTICS & PERFORMANCE
     // ═══════════════════════════════════════════════════════
 
