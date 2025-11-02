@@ -16,9 +16,10 @@ namespace xray::render::passes {
 // ══════════════════════════════════════════════════════════
 
 struct GBufferPassConfig {
-    // Output resolution
-    u32 width = 1920;
-    u32 height = 1080;
+    // Output resolution - MUST be set to Device.dwWidth/dwHeight (render target size)
+    // DO NOT use screen resolution! Game may render at lower res than display.
+    u32 width = 0;   // Default 0 = INVALID, must be explicitly set!
+    u32 height = 0;
 
     // G-Buffer formats
     nvrhi::Format albedoFormat = nvrhi::Format::RGBA8_UNORM;      // Albedo + metallic

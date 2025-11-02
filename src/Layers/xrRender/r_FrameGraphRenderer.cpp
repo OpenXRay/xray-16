@@ -37,8 +37,12 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // Create FrameGraph (needs NVRHI device)
     m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
 
-    // Create passes (pass device for shader loading)
-    m_gbufferPass = xr_make_unique<passes::GBufferPass>(device);
+    // Create passes with correct render target resolution (not screen resolution!)
+    passes::GBufferPassConfig gbufferConfig;
+    gbufferConfig.width = Device.dwWidth;   // Game render resolution (e.g., 1280x720)
+    gbufferConfig.height = Device.dwHeight; // NOT screen resolution (1920x1080)!
+
+    m_gbufferPass = xr_make_unique<passes::GBufferPass>(device, gbufferConfig);
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
