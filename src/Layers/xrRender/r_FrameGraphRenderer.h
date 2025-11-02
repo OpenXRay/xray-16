@@ -60,6 +60,8 @@ private:
 
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 
+    xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;
+
     Stats m_stats;
 
     void SetupFrame();

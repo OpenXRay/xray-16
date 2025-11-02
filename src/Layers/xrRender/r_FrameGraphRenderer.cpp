@@ -113,6 +113,8 @@ void FrameGraphRenderer::Render() {
 }
 
 void FrameGraphRenderer::SetupFrame() {
+    m_bufferHandleCache.clear();
+
     m_geometryCollector->BeginFrame();
 
     CollectVisibleGeometry();
@@ -291,31 +293,60 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     if (!geom->vb || !geom->ib)
         return false;
 
-    nvrhi::BufferDesc vbDesc;
-    vbDesc.debugName = "VisibleMesh_VB";
-    vbDesc.byteSize = meshVisual->vCount * geom->vb_stride;
-    vbDesc.isVertexBuffer = true;
-    vbDesc.keepInitialState = true;
-    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    ID3D11Buffer* d3dVB = geom->vb;
+    ID3D11Buffer* d3dIB = geom->ib;
 
-    nvrhi::BufferHandle nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-        nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->vb), vbDesc);
+    Msg("! [ProcessVisualGeometry] Visual '%s': D3D VB=%p, IB=%p, vBase=%d, iBase=%d, vCount=%d, iCount=%d",
+        visual->dbg_name.c_str(), d3dVB, d3dIB,
+        meshVisual->vBase, meshVisual->iBase, meshVisual->vCount, meshVisual->iCount);
 
-    if (!nvrhiVB)
-        return false;
+    nvrhi::BufferHandle nvrhiVB;
+    auto vbIt = m_bufferHandleCache.find(d3dVB);
+    if (vbIt != m_bufferHandleCache.end()) {
+        nvrhiVB = vbIt->second;
+    } else {
+        D3D11_BUFFER_DESC d3dVBDesc;
+        d3dVB->GetDesc(&d3dVBDesc);
 
-    nvrhi::BufferDesc ibDesc;
-    ibDesc.debugName = "VisibleMesh_IB";
-    ibDesc.byteSize = meshVisual->iCount * sizeof(u16);
-    ibDesc.isIndexBuffer = true;
-    ibDesc.keepInitialState = true;
-    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.debugName = "Shared_VB";
+        vbDesc.byteSize = d3dVBDesc.ByteWidth;
+        vbDesc.isVertexBuffer = true;
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
 
-    nvrhi::BufferHandle nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-        nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(geom->ib), ibDesc);
+        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
 
-    if (!nvrhiIB)
-        return false;
+        if (!nvrhiVB)
+            return false;
+
+        m_bufferHandleCache[d3dVB] = nvrhiVB;
+    }
+
+    nvrhi::BufferHandle nvrhiIB;
+    auto ibIt = m_bufferHandleCache.find(d3dIB);
+    if (ibIt != m_bufferHandleCache.end()) {
+        nvrhiIB = ibIt->second;
+    } else {
+        D3D11_BUFFER_DESC d3dIBDesc;
+        d3dIB->GetDesc(&d3dIBDesc);
+
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.debugName = "Shared_IB";
+        ibDesc.byteSize = d3dIBDesc.ByteWidth;
+        ibDesc.isIndexBuffer = true;
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+
+        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
+
+        if (!nvrhiIB)
+            return false;
+
+        m_bufferHandleCache[d3dIB] = nvrhiIB;
+    }
 
     GeometryBatch batch;
 
