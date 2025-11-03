@@ -80,8 +80,18 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
+    enum class ShaderStage : u8 {
+        Vertex = 0,
+        Pixel = 1,
+        Geometry = 2,
+        Hull = 3,
+        Domain = 4,
+        Compute = 5
+    };
+
     struct ConstantBufferInfo {
         u32 slot;
+        ShaderStage stage;
         nvrhi::BufferHandle nvrhiBuffer;
         u32 size;
         bool isPerObject;
@@ -92,6 +102,8 @@ struct MaterialPSO {
 
     struct SamplerInfo {
         u32 slot;
+        ShaderStage stage;
+        shared_str name;
         nvrhi::SamplerHandle nvrhiSampler;
     };
     xr_vector<SamplerInfo> samplers;

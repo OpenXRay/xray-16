@@ -368,7 +368,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->constantBuffers.clear();
 
-    auto extractCBsFromShader = [&](R_constant_table& constTable, const char* shaderName) {
+    auto extractCBsFromShader = [&](R_constant_table& constTable, const char* shaderName, MaterialPSO::ShaderStage stage) {
         for (u32 contextIdx = 0; contextIdx < R__NUM_CONTEXTS; contextIdx++) {
             const auto& cbTable = constTable.m_CBTable[contextIdx];
 
@@ -400,7 +400,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
                     bool found = false;
                     for (const auto& existing : matPSO->constantBuffers) {
-                        if (existing.slot == bindingSlot) {
+                        if (existing.slot == bindingSlot && existing.stage == stage) {
                             found = true;
                             break;
                         }
@@ -436,6 +436,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                         if (bufferHandle) {
                             MaterialPSO::ConstantBufferInfo cbInfo;
                             cbInfo.slot = bindingSlot;
+                            cbInfo.stage = stage;
                             cbInfo.nvrhiBuffer = bufferHandle;
                             cbInfo.size = bufDesc.ByteWidth;
                             cbInfo.isPerObject = isPerObjectCB;
@@ -469,9 +470,9 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
         }
     };
 
-    extractCBsFromShader(vs->constants, vs->cName.c_str());
+    extractCBsFromShader(vs->constants, vs->cName.c_str(), MaterialPSO::ShaderStage::Vertex);
 
-    extractCBsFromShader(ps->constants, ps->cName.c_str());
+    extractCBsFromShader(ps->constants, ps->cName.c_str(), MaterialPSO::ShaderStage::Pixel);
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.isPerObject) {
@@ -501,21 +502,12 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
     }
 
     dx11State* xrState = static_cast<dx11State*>(statePtr);
-
     const auto& psSamplers = xrState->GetPSSamplers();
-    u32 maxSamplerSlots = std::min<u32>(psSamplers.size(), D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT);
 
-    for (u32 slot = 0; slot < maxSamplerSlots; ++slot) {
-        auto samplerHandle = psSamplers[slot];
-        if (samplerHandle == dx11SamplerStateCache::hInvalidHandle)
-            continue;
+    Msg("  [MaterialCache] Extracting samplers using shader reflection...");
+    Msg("  [MaterialCache]   Shader declares %u samplers", matPSO->rtBindings.samplers.size());
 
-        ID3DSamplerState* d3dSampler = SSManager.GetSamplerState(samplerHandle);
-        if (!d3dSampler) {
-            Msg("! [MaterialCache] Failed to get D3D11 sampler for PS slot %u", slot);
-            continue;
-        }
-
+    auto createNVRHISampler = [&](ID3DSamplerState* d3dSampler) -> nvrhi::SamplerHandle {
         D3D11_SAMPLER_DESC samplerDesc;
         d3dSampler->GetDesc(&samplerDesc);
 
@@ -540,17 +532,52 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
         nvrhiDesc.setMaxAnisotropy(static_cast<float>(samplerDesc.MaxAnisotropy));
         nvrhiDesc.setMipBias(samplerDesc.MipLODBias);
 
-        nvrhi::SamplerHandle nvrhiSampler = m_device->GetNativeDevice()->createSampler(nvrhiDesc);
-        if (nvrhiSampler) {
-            MaterialPSO::SamplerInfo samplerInfo;
-            samplerInfo.slot = slot;
-            samplerInfo.nvrhiSampler = nvrhiSampler;
-            matPSO->samplers.push_back(samplerInfo);
+        return m_device->GetNativeDevice()->createSampler(nvrhiDesc);
+    };
 
-            Msg("  [MaterialCache] Extracted PS sampler at slot %u (aniso=%.1f)",
-                slot, nvrhiDesc.maxAnisotropy);
+    auto createDefaultSampler = [&]() -> nvrhi::SamplerHandle {
+        nvrhi::SamplerDesc nvrhiDesc;
+        nvrhiDesc.setMinFilter(true);
+        nvrhiDesc.setMagFilter(true);
+        nvrhiDesc.setMipFilter(true);
+        nvrhiDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        nvrhiDesc.setMaxAnisotropy(8.0f);
+
+        return m_device->GetNativeDevice()->createSampler(nvrhiDesc);
+    };
+
+    for (const auto& samplerDecl : matPSO->rtBindings.samplers) {
+        u32 slot = samplerDecl.slot;
+        const char* samplerName = samplerDecl.name.c_str();
+
+        MaterialPSO::SamplerInfo samplerInfo;
+        samplerInfo.slot = slot;
+        samplerInfo.stage = MaterialPSO::ShaderStage::Pixel;
+        samplerInfo.name = samplerName;
+
+        if (slot < psSamplers.size()) {
+            auto samplerHandle = psSamplers[slot];
+            if (samplerHandle != dx11SamplerStateCache::hInvalidHandle) {
+                ID3DSamplerState* d3dSampler = SSManager.GetSamplerState(samplerHandle);
+                if (d3dSampler) {
+                    samplerInfo.nvrhiSampler = createNVRHISampler(d3dSampler);
+                    Msg("  [MaterialCache]   ✓ Sampler '%s' at s%u (from X-Ray state)",
+                        samplerName, slot);
+                }
+            }
+        }
+
+        if (!samplerInfo.nvrhiSampler) {
+            samplerInfo.nvrhiSampler = createDefaultSampler();
+            Msg("  [MaterialCache]   ⚠ Sampler '%s' at s%u (using default - not bound in X-Ray)",
+                samplerName, slot);
+        }
+
+        if (samplerInfo.nvrhiSampler) {
+            matPSO->samplers.push_back(samplerInfo);
         } else {
-            Msg("! [MaterialCache] Failed to create NVRHI sampler for PS slot %u", slot);
+            Msg("! [MaterialCache]   ❌ Failed to create sampler '%s' at s%u",
+                samplerName, slot);
         }
     }
 

@@ -27,6 +27,15 @@ struct ShaderRTBindings {
     };
     xr_vector<InputTexture> inputTextures;
 
+    struct Sampler {
+        shared_str name;
+        u32 slot;
+
+        Sampler() : slot(0) {}
+        Sampler(const char* n, u32 s) : name(n), slot(s) {}
+    };
+    xr_vector<Sampler> samplers;
+
     enum class RTSemantic {
         Unknown,
         Normal,

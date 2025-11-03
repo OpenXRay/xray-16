@@ -46,6 +46,16 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
             Msg("!   Input texture: %s (slot t%u)",
                 input.name.c_str(), input.slot);
         }
+        else if (bindDesc.Type == D3D_SIT_SAMPLER) {
+            ShaderRTBindings::Sampler sampler;
+            sampler.name = bindDesc.Name;
+            sampler.slot = bindDesc.BindPoint;
+
+            bindings.samplers.push_back(sampler);
+
+            Msg("!   Sampler: %s (slot s%u)",
+                sampler.name.c_str(), sampler.slot);
+        }
     }
 
     for (u32 i = 0; i < shaderDesc.OutputParameters; i++) {
