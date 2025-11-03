@@ -776,6 +776,9 @@
     <ClInclude Include="..\xrRender\ResourceManager\TextureStreaming.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\AsyncIO.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\ResourceManager\BufferManager.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
@@ -1420,6 +1423,9 @@
       <Filter>ResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager\TextureStreaming.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\AsyncIO.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager\BufferManager.cpp">

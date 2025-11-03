@@ -8,9 +8,12 @@ namespace xray::render::resources {
 StreamingManager::StreamingManager(xray::render::ng::RenderDevice* device, TextureManager* texManager)
     : m_device(device)
     , m_texManager(texManager)
+    , m_asyncIO(nullptr)
 {
     VERIFY(m_device);
     VERIFY(m_texManager);
+
+    m_asyncIO = xr_new<AsyncIOManager>();
 
     Msg("! [StreamingManager] Created (max concurrent: %u, bandwidth: %llu MB/frame)",
         m_maxConcurrentStreams,
@@ -20,10 +23,14 @@ StreamingManager::StreamingManager(xray::render::ng::RenderDevice* device, Textu
 StreamingManager::~StreamingManager() {
     for (auto& request : m_activeRequests) {
         if (request.ioHandle) {
+            u32 requestID = (u32)(uintptr_t)request.ioHandle;
+            m_asyncIO->CancelRequest(requestID);
         }
     }
 
     PrintStatistics();
+
+    xr_delete(m_asyncIO);
 }
 
 void StreamingManager::RequestMips(
@@ -95,6 +102,8 @@ bool StreamingManager::HasPendingRequest(TextureHandle handle) const {
 void StreamingManager::Update(float deltaTime) {
     m_stats.bytesStreamedThisFrame = 0;
 
+    m_asyncIO->ProcessCompletedRequests();
+
     ProcessActiveRequests();
 
     ProcessPendingRequests();
@@ -126,12 +135,24 @@ void StreamingManager::ProcessActiveRequests() {
                 break;
 
             case StreamingRequest::InProgress:
-                if (LoadMipsFromDisk(request)) {
-                    request.status = StreamingRequest::Uploading;
+                if (request.ioHandle) {
+                    u32 requestID = (u32)(uintptr_t)request.ioHandle;
+
+                    if (m_asyncIO->IsRequestComplete(requestID)) {
+                        if (!request.stagingBuffer.empty()) {
+                            request.status = StreamingRequest::Uploading;
+                        } else {
+                            FailRequest(request, "Async I/O failed or returned empty buffer");
+                            it = m_activeRequests.erase(it);
+                            continue;
+                        }
+                    }
                 } else {
-                    FailRequest(request, "Failed to load from disk");
-                    it = m_activeRequests.erase(it);
-                    continue;
+                    if (!LoadMipsFromDisk(request)) {
+                        FailRequest(request, "Failed to start async load");
+                        it = m_activeRequests.erase(it);
+                        continue;
+                    }
                 }
                 ++it;
                 break;
@@ -170,36 +191,31 @@ bool StreamingManager::LoadMipsFromDisk(StreamingRequest& request) {
         return false;
     }
 
-    Msg("! [StreamingManager] Loading mips from disk: %s", meta->filePath.c_str());
+    if (!request.ioHandle) {
 
-    DDSData ddsData;
+        Msg("! [StreamingManager] Starting async load: %s", meta->filePath.c_str());
 
-    if (!DDSLoader::LoadFromFile(meta->filePath.c_str(), ddsData)) {
-        return false;
-    }
+        IReader* reader = FS.r_open(meta->filePath.c_str());
+        if (!reader) {
+            return false;
+        }
 
-    u32 startMip = request.currentMips;
-    u32 endMip = request.targetMips;
+        u64 size = reader->length();
+        FS.r_close(reader);
 
-    request.stagingBuffer.clear();
-
-    for (u32 mip = startMip; mip < endMip; mip++) {
-        if (mip >= ddsData.mipLevels.size()) break;
-
-        const DDSMipLevel& mipData = ddsData.mipLevels[mip];
-
-        u32 offset = (u32)request.stagingBuffer.size();
-        request.stagingBuffer.resize(offset + mipData.size);
-        memcpy(
-            request.stagingBuffer.data() + offset,
-            mipData.data,
-            mipData.size
+        u32 requestID = m_asyncIO->ReadAsync(
+            meta->filePath.c_str(),
+            0,
+            size,
+            [this, handle = request.handle](AsyncIORequest& ioRequest) {
+                this->OnAsyncLoadComplete(handle, ioRequest);
+            },
+            (void*)(uintptr_t)request.handle.index
         );
-    }
 
-    Msg("! [StreamingManager] Loaded %u mips (%llu KB)",
-        endMip - startMip,
-        request.stagingBuffer.size() / 1024);
+        request.ioHandle = (void*)(uintptr_t)requestID;
+        return true;
+    }
 
     return true;
 }
@@ -278,6 +294,63 @@ void StreamingManager::FailRequest(StreamingRequest& request, const char* reason
 
     m_stats.requestsInProgress--;
     m_stats.requestsFailed++;
+}
+
+void StreamingManager::OnAsyncLoadComplete(
+    TextureHandle handle,
+    AsyncIORequest& ioRequest)
+{
+    Msg("! [StreamingManager] Async load complete: handle=%u.%u, status=%d",
+        handle.index, handle.generation, (int)ioRequest.status);
+
+    if (ioRequest.status == IOStatus::Complete) {
+        for (auto& request : m_activeRequests) {
+            if (request.handle == handle) {
+                DDSData ddsData;
+
+                const TextureMetadata* meta = m_texManager->GetMetadata(handle);
+                if (meta && DDSLoader::LoadFromFile(meta->filePath.c_str(), ddsData)) {
+                    u32 startMip = request.currentMips;
+                    u32 endMip = request.targetMips;
+
+                    request.stagingBuffer.clear();
+
+                    for (u32 mip = startMip; mip < endMip; mip++) {
+                        if (mip >= ddsData.mipLevels.size()) break;
+
+                        const DDSMipLevel& mipData = ddsData.mipLevels[mip];
+
+                        u32 offset = (u32)request.stagingBuffer.size();
+                        request.stagingBuffer.resize(offset + mipData.size);
+                        memcpy(
+                            request.stagingBuffer.data() + offset,
+                            mipData.data,
+                            mipData.size
+                        );
+                    }
+
+                    Msg("! [StreamingManager] Extracted %u mips (%llu KB)",
+                        endMip - startMip,
+                        request.stagingBuffer.size() / 1024);
+
+                    request.status = StreamingRequest::Uploading;
+                } else {
+                    Msg("! [StreamingManager] ❌ Failed to parse DDS data");
+                    request.status = StreamingRequest::Failed;
+                }
+                break;
+            }
+        }
+    } else {
+        for (auto& request : m_activeRequests) {
+            if (request.handle == handle) {
+                request.status = StreamingRequest::Failed;
+                Msg("! [StreamingManager] ❌ Async I/O failed: %s",
+                    ioRequest.errorMessage.c_str());
+                break;
+            }
+        }
+    }
 }
 
 void StreamingManager::PrintStatistics() const {

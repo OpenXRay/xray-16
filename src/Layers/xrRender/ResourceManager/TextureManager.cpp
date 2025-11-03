@@ -625,6 +625,60 @@ void TextureManager::PrintStatistics() const {
         stats.texturesEvicted);
 }
 
+TextureHandle TextureManager::LoadTextureThreadSafe(
+    const char* path,
+    TexturePriority priority)
+{
+    shared_str pathStr = path;
+
+    {
+        std::lock_guard<std::mutex> lock(m_pathLookupMutex);
+
+        auto it = m_pathToHandle.find(pathStr);
+        if (it != m_pathToHandle.end()) {
+            TextureHandle existing = it->second;
+
+            if (ValidateHandleThreadSafe(existing)) {
+                AddRef(existing);
+                return existing;
+            }
+        }
+    }
+
+    TextureHandle handle = AllocateHandleThreadSafe();
+
+    {
+        std::lock_guard<std::mutex> lock(m_texturesMutex);
+
+        TextureMetadata& meta = m_textures[handle.index];
+        meta.filePath = pathStr;
+        meta.state = TextureState::Unloaded;
+        meta.priority = priority;
+        meta.isAlive = true;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(m_pathLookupMutex);
+        m_pathToHandle[pathStr] = handle;
+    }
+
+    m_streamingManager->RequestMips(handle, 999, priority);
+
+    Msg("! [TextureManager] LoadTextureThreadSafe: %s", path);
+
+    return handle;
+}
+
+TextureHandle TextureManager::AllocateHandleThreadSafe() {
+    std::lock_guard<std::mutex> lock(m_texturesMutex);
+    return AllocateHandle();
+}
+
+bool TextureManager::ValidateHandleThreadSafe(TextureHandle handle) const {
+    std::lock_guard<std::mutex> lock(m_texturesMutex);
+    return ValidateHandle(handle);
+}
+
 const char* TextureStateToString(TextureState state) {
     switch (state) {
         case TextureState::Unloaded: return "Unloaded";

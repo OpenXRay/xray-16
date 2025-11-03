@@ -2,6 +2,7 @@
 
 #include "ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
+#include <mutex>
 
 namespace xray::render::ng {
     class RenderDevice;
@@ -113,6 +114,11 @@ public:
         TexturePriority priority = TexturePriority::Medium
     );
 
+    TextureHandle LoadTextureThreadSafe(
+        const char* path,
+        TexturePriority priority = TexturePriority::Medium
+    );
+
     TextureHandle CreateTexture(
         const TextureDesc& desc,
         const void* initialData = nullptr
@@ -195,6 +201,12 @@ private:
     bool EnforceMemoryBudget(u64 requiredBytes);
     bool EvictTextures(u64 bytesNeeded);
     void EvictTextureInternal(TextureHandle handle);
+
+    mutable std::mutex m_texturesMutex;
+    mutable std::mutex m_pathLookupMutex;
+
+    TextureHandle AllocateHandleThreadSafe();
+    bool ValidateHandleThreadSafe(TextureHandle handle) const;
 
     mutable Statistics m_stats;
 };

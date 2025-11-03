@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TextureManager.h"
+#include "AsyncIO.h"
 
 namespace xray::render::ng {
     class RenderDevice;
@@ -71,6 +72,7 @@ public:
 private:
     xray::render::ng::RenderDevice* m_device;
     TextureManager* m_texManager;
+    AsyncIOManager* m_asyncIO;
 
     xr_vector<StreamingRequest> m_pendingRequests;
     xr_vector<StreamingRequest> m_activeRequests;
@@ -88,6 +90,8 @@ private:
 
     bool LoadMipsFromDisk(StreamingRequest& request);
     bool UploadMipsToGPU(StreamingRequest& request);
+
+    void OnAsyncLoadComplete(TextureHandle handle, AsyncIORequest& ioRequest);
 
     mutable Statistics m_stats;
 };
