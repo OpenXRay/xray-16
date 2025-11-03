@@ -137,9 +137,9 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     ExtractSamplers(pass, pso.get());
 
-    pso->bindingLayout = CreateBindingLayout(pso.get());
-    if (!pso->bindingLayout) {
-        Msg("! [MaterialCache] Failed to create binding layout");
+    CreateBindingLayouts(pso.get());
+    if (!pso->vsBindingLayout || !pso->psBindingLayout) {
+        Msg("! [MaterialCache] Failed to create binding layouts");
         return nullptr;
     }
 
@@ -585,67 +585,81 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
 #endif
 }
 
-nvrhi::BindingLayoutHandle MaterialCache::CreateBindingLayout(const MaterialPSO* matPSO)
+void MaterialCache::CreateBindingLayouts(MaterialPSO* matPSO)
+{
+    VERIFY(matPSO);
+
+    matPSO->vsBindingLayout = CreateStageBindingLayout(
+        matPSO, MaterialPSO::ShaderStage::Vertex, nvrhi::ShaderType::Vertex);
+
+    matPSO->psBindingLayout = CreateStageBindingLayout(
+        matPSO, MaterialPSO::ShaderStage::Pixel, nvrhi::ShaderType::Pixel);
+
+    if (matPSO->vsBindingLayout && matPSO->psBindingLayout) {
+        Msg("! [MaterialCache] Created per-stage binding layouts:");
+        Msg("!   VS Layout: %p", matPSO->vsBindingLayout.Get());
+        Msg("!   PS Layout: %p", matPSO->psBindingLayout.Get());
+    }
+}
+
+nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
+    const MaterialPSO* matPSO,
+    MaterialPSO::ShaderStage stage,
+    nvrhi::ShaderType nvrhiStage)
 {
     VERIFY(matPSO);
 
     nvrhi::BindingLayoutDesc layoutDesc;
-    layoutDesc.visibility = nvrhi::ShaderType::All;
+    layoutDesc.visibility = nvrhiStage;
 
+    const char* stageName = (stage == MaterialPSO::ShaderStage::Vertex) ? "VS" : "PS";
+    Msg("! [MaterialCache] Creating %s binding layout...", stageName);
+
+    u32 cbCount = 0;
     for (const auto& cbInfo : matPSO->constantBuffers) {
-        if (cbInfo.isPerObject) {
-            layoutDesc.bindings.push_back(
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
-        } else {
-            layoutDesc.bindings.push_back(
-                nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
+        if (cbInfo.stage == stage) {
+            if (cbInfo.isPerObject) {
+                layoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
+                Msg("!   + Volatile CB at slot %u (%u bytes) - %s", cbInfo.slot, cbInfo.size, cbInfo.name.c_str());
+            } else {
+                layoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
+                Msg("!   + CB at slot %u (%u bytes) - %s", cbInfo.slot, cbInfo.size, cbInfo.name.c_str());
+            }
+            cbCount++;
         }
     }
 
-    for (const auto& texSlot : matPSO->textures) {
-        layoutDesc.bindings.push_back(
-            nvrhi::BindingLayoutItem::Texture_SRV(texSlot.slot));
+    u32 texCount = 0;
+    if (stage == MaterialPSO::ShaderStage::Pixel) {
+        for (const auto& texSlot : matPSO->textures) {
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::Texture_SRV(texSlot.slot));
+            texCount++;
+        }
     }
 
-    for (const auto& samplerInfo : matPSO->samplers) {
-        layoutDesc.bindings.push_back(
-            nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
+    u32 samplerCount = 0;
+    if (stage == MaterialPSO::ShaderStage::Pixel) {
+        for (const auto& samplerInfo : matPSO->samplers) {
+            if (samplerInfo.stage == stage) {
+                layoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
+                samplerCount++;
+            }
+        }
     }
+
+    Msg("!   Total: %u CBs, %u textures, %u samplers", cbCount, texCount, samplerCount);
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {
-        Msg("! [MaterialCache] Failed to create binding layout");
+        Msg("! [MaterialCache] Failed to create %s binding layout", stageName);
         return nullptr;
     }
 
     return layout;
-}
-
-nvrhi::BindingSetHandle MaterialCache::CreateMaterialBindingSet(const MaterialPSO* matPSO)
-{
-    VERIFY(matPSO);
-    VERIFY(matPSO->bindingLayout);
-
-    nvrhi::BindingSetDesc bindingDesc;
-
-    for (const auto& texSlot : matPSO->textures) {
-        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(texSlot.handle);
-        if (nativeTex) {
-            bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nativeTex));
-        }
-    }
-
-    nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
-        bindingDesc,
-        matPSO->bindingLayout);
-
-    if (!bindingSet) {
-        Msg("! [MaterialCache] Failed to create material binding set");
-        return nullptr;
-    }
-
-    return bindingSet;
 }
 
 nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
@@ -655,36 +669,59 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 {
     VERIFY(matPSO);
     VERIFY(perObjectVCB);
-    VERIFY(matPSO->bindingLayout);
+    VERIFY(matPSO->vsBindingLayout);
+    VERIFY(matPSO->psBindingLayout);
 
-    if (matPSO->bindingSet) {
-        return matPSO->bindingSet;
+    if (matPSO->vsBindingSet && matPSO->psBindingSet) {
+        return matPSO->vsBindingSet;
     }
 
-    nvrhi::BindingSetDesc bindingDesc;
+    nvrhi::BindingSetDesc vsBindingDesc;
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
-        if (cbInfo.isPerObject) {
-            bindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
-            Msg("  [MaterialCache] Adding per-object CB to bindingDesc at slot %u (%u bytes)",
-                cbInfo.slot, cbInfo.size);
-        } else {
-            if (cbInfo.nvrhiBuffer) {
-                bindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
-                Msg("  [MaterialCache] Adding global CB to bindingDesc at slot %u (%u bytes)",
+        if (cbInfo.stage == MaterialPSO::ShaderStage::Vertex) {
+            if (cbInfo.isPerObject) {
+                vsBindingDesc.bindings.push_back(
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
+                Msg("  [MaterialCache] VS: Adding per-object CB at slot %u (%u bytes)",
                     cbInfo.slot, cbInfo.size);
+            } else {
+                if (cbInfo.nvrhiBuffer) {
+                    vsBindingDesc.bindings.push_back(
+                        nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                    Msg("  [MaterialCache] VS: Adding global CB at slot %u (%u bytes)",
+                        cbInfo.slot, cbInfo.size);
+                }
             }
         }
     }
 
-    Msg("  [MaterialCache] Creating binding set with %u textures", matPSO->textures.size());
+    nvrhi::BindingSetDesc psBindingDesc;
+
+    for (const auto& cbInfo : matPSO->constantBuffers) {
+        if (cbInfo.stage == MaterialPSO::ShaderStage::Pixel) {
+            if (cbInfo.isPerObject) {
+                psBindingDesc.bindings.push_back(
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
+                Msg("  [MaterialCache] PS: Adding per-object CB at slot %u (%u bytes)",
+                    cbInfo.slot, cbInfo.size);
+            } else {
+                if (cbInfo.nvrhiBuffer) {
+                    psBindingDesc.bindings.push_back(
+                        nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                    Msg("  [MaterialCache] PS: Adding global CB at slot %u (%u bytes)",
+                        cbInfo.slot, cbInfo.size);
+                }
+            }
+        }
+    }
+
+    Msg("  [MaterialCache] PS: Adding %u textures", matPSO->textures.size());
     for (const auto& texSlot : matPSO->textures) {
         nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(texSlot.handle);
         if (nativeTex) {
             const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
-            Msg("  [MaterialCache] Binding texture at slot %u: format=%u (0x%x), dimension=%u, arraySize=%u, mipLevels=%u",
+            Msg("  [MaterialCache] PS: Binding texture at slot %u: format=%u (0x%x), dimension=%u, arraySize=%u, mipLevels=%u",
                 texSlot.slot, texDesc.format, texDesc.format, texDesc.dimension, texDesc.arraySize, texDesc.mipLevels);
 
             nvrhi::BindingSetItem item = {};
@@ -692,8 +729,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
             item.slot = texSlot.slot;
             item.type = nvrhi::ResourceType::Texture_SRV;
             item.format = texDesc.format;
-
-            Msg("  [MaterialCache] Set item.format = %u (0x%x)", item.format, item.format);
 
             if (texDesc.dimension == nvrhi::TextureDimension::TextureCube) {
                 item.dimension = nvrhi::TextureDimension::TextureCube;
@@ -707,98 +742,65 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
             item.subresources = nvrhi::AllSubresources;
 
-            bindingDesc.bindings.push_back(item);
+            psBindingDesc.bindings.push_back(item);
         } else {
-            Msg("! [MaterialCache] Texture at slot %u is NULL when creating binding set", texSlot.slot);
+            Msg("! [MaterialCache] PS: Texture at slot %u is NULL when creating binding set", texSlot.slot);
         }
     }
 
     for (const auto& samplerInfo : matPSO->samplers) {
         if (samplerInfo.nvrhiSampler) {
-            bindingDesc.bindings.push_back(
+            psBindingDesc.bindings.push_back(
                 nvrhi::BindingSetItem::Sampler(samplerInfo.slot, samplerInfo.nvrhiSampler));
-            Msg("  [MaterialCache] Binding sampler at slot %u", samplerInfo.slot);
+            Msg("  [MaterialCache] PS: Binding sampler at slot %u", samplerInfo.slot);
         }
     }
 
-    Msg("  [MaterialCache] Creating NEW binding set (will be cached)");
-    nvrhi::BindingSetHandle bindingSet = m_device->CreateBindingSet(
-        bindingDesc,
-        matPSO->bindingLayout);
+    Msg("  [MaterialCache] Creating VS binding set (will be cached)");
+    matPSO->vsBindingSet = m_device->CreateBindingSet(
+        vsBindingDesc,
+        matPSO->vsBindingLayout);
 
-    if (!bindingSet) {
-        Msg("! [MaterialCache] Failed to create binding set");
+    if (!matPSO->vsBindingSet) {
+        Msg("! [MaterialCache] Failed to create VS binding set");
+        return nullptr;
+    }
+
+    Msg("  [MaterialCache] Creating PS binding set (will be cached)");
+    matPSO->psBindingSet = m_device->CreateBindingSet(
+        psBindingDesc,
+        matPSO->psBindingLayout);
+
+    if (!matPSO->psBindingSet) {
+        Msg("! [MaterialCache] Failed to create PS binding set");
         return nullptr;
     }
 
 #if defined(USE_DX11)
-    nvrhi::d3d11::BindingSet* d3d11Set = static_cast<nvrhi::d3d11::BindingSet*>(bindingSet.Get());
-    if (d3d11Set) {
-        d3d11Set->minSRVSlot = 0;
-        d3d11Set->maxSRVSlot = 0;
-        d3d11Set->minSamplerSlot = 0;
-        d3d11Set->maxSamplerSlot = 0;
-        d3d11Set->minConstantBufferSlot = 0;
-        d3d11Set->maxConstantBufferSlot = 0;
-        d3d11Set->minUAVSlot = 0;
-        d3d11Set->maxUAVSlot = 0;
+    nvrhi::d3d11::BindingSet* vsD3D11Set = static_cast<nvrhi::d3d11::BindingSet*>(matPSO->vsBindingSet.Get());
+    if (vsD3D11Set) {
+        vsD3D11Set->minSRVSlot = 0;
+        vsD3D11Set->maxSRVSlot = 0;
+        vsD3D11Set->minSamplerSlot = 0;
+        vsD3D11Set->maxSamplerSlot = 0;
+        vsD3D11Set->minConstantBufferSlot = 0;
+        vsD3D11Set->maxConstantBufferSlot = 0;
+        vsD3D11Set->minUAVSlot = 0;
+        vsD3D11Set->maxUAVSlot = 0;
 
-        if (pass) {
-            STextureList* texList = pass->T._get();
-            if (texList && texList->size() > 0) {
-                Msg("  [MaterialCache] Manually setting SRVs from X-Ray textures...");
+        Msg("  [MaterialCache] VS: Manually setting constant buffers...");
+        vsD3D11Set->minConstantBufferSlot = UINT_MAX;
 
-                d3d11Set->minSRVSlot = UINT_MAX;
-            }
-
-            for (u32 i = 0; i < texList->size(); i++) {
-                const auto& texPair = (*texList)[i];
-                u32 stage = texPair.first;
-                CTexture* tex = texPair.second._get();
-
-                if (stage >= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT) {
-                    Msg("  ! Texture '%s' has invalid slot %u (max %u)",
-                        tex ? tex->cName.c_str() : "NULL", stage, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT);
-                    continue;
-                }
-
-                if (tex) {
-                    ID3DShaderResourceView* xraySRV = tex->get_SRView();
-                    if (xraySRV) {
-                        xraySRV->AddRef();
-                        d3d11Set->SRVs[stage] = xraySRV;
-                        Msg("    Set SRV at slot %u: %p (from X-Ray texture '%s', AddRef'd)",
-                            stage, xraySRV, tex->cName.c_str());
-
-                        if (d3d11Set->minSRVSlot > stage)
-                            d3d11Set->minSRVSlot = stage;
-                        if (d3d11Set->maxSRVSlot < stage)
-                            d3d11Set->maxSRVSlot = stage;
-                    } else {
-                        Msg("  ! Texture '%s' has NULL SRV at slot %u", tex->cName.c_str(), stage);
-                    }
-                }
-            }
-
-            Msg("  [MaterialCache] SRV range: [%u, %u]",
-                d3d11Set->minSRVSlot, d3d11Set->maxSRVSlot);
-        }
-
-        if (!matPSO->constantBuffers.empty()) {
-            Msg("  [MaterialCache] Manually setting %u constant buffers in D3D11 binding set...",
-                (u32)matPSO->constantBuffers.size());
-
-            d3d11Set->minConstantBufferSlot = UINT_MAX;
-
-            for (const auto& cbInfo : matPSO->constantBuffers) {
+        for (const auto& cbInfo : matPSO->constantBuffers) {
+            if (cbInfo.stage == MaterialPSO::ShaderStage::Vertex) {
                 nvrhi::IBuffer* nvrhiBufferToUse = nullptr;
 
                 if (cbInfo.isPerObject) {
                     nvrhiBufferToUse = perObjectVCB;
-                    Msg("    Setting slot %u to VCB (per-object)", cbInfo.slot);
+                    Msg("    VS: Setting slot %u to VCB (per-object)", cbInfo.slot);
                 } else {
                     nvrhiBufferToUse = cbInfo.nvrhiBuffer.Get();
-                    Msg("    Setting slot %u to custom global CB", cbInfo.slot);
+                    Msg("    VS: Setting slot %u to custom global CB", cbInfo.slot);
                 }
 
                 if (nvrhiBufferToUse) {
@@ -806,30 +808,113 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
                         nvrhiBufferToUse->getNativeObject(nvrhi::ObjectTypes::D3D11_Buffer).pointer);
 
                     if (d3dBuffer) {
-                        d3d11Set->constantBuffers[cbInfo.slot] = d3dBuffer;
+                        vsD3D11Set->constantBuffers[cbInfo.slot] = d3dBuffer;
+                        Msg("    VS: Set CB at slot %u: %p (%u bytes)", cbInfo.slot, d3dBuffer, cbInfo.size);
 
-                        Msg("    Set CB at slot %u: %p (%u bytes, %s)",
-                            cbInfo.slot, d3dBuffer, cbInfo.size,
-                            cbInfo.isPerObject ? "per-object" : "global");
-
-                        if (d3d11Set->minConstantBufferSlot > cbInfo.slot)
-                            d3d11Set->minConstantBufferSlot = cbInfo.slot;
-                        if (d3d11Set->maxConstantBufferSlot < cbInfo.slot)
-                            d3d11Set->maxConstantBufferSlot = cbInfo.slot;
+                        if (vsD3D11Set->minConstantBufferSlot > cbInfo.slot)
+                            vsD3D11Set->minConstantBufferSlot = cbInfo.slot;
+                        if (vsD3D11Set->maxConstantBufferSlot < cbInfo.slot)
+                            vsD3D11Set->maxConstantBufferSlot = cbInfo.slot;
                     }
                 }
             }
-
-            Msg("  [MaterialCache] CB range: [%u, %u]",
-                d3d11Set->minConstantBufferSlot, d3d11Set->maxConstantBufferSlot);
         }
+
+        Msg("  [MaterialCache] VS CB range: [%u, %u]",
+            vsD3D11Set->minConstantBufferSlot, vsD3D11Set->maxConstantBufferSlot);
+    }
+
+    nvrhi::d3d11::BindingSet* psD3D11Set = static_cast<nvrhi::d3d11::BindingSet*>(matPSO->psBindingSet.Get());
+    if (psD3D11Set) {
+        psD3D11Set->minSRVSlot = 0;
+        psD3D11Set->maxSRVSlot = 0;
+        psD3D11Set->minSamplerSlot = 0;
+        psD3D11Set->maxSamplerSlot = 0;
+        psD3D11Set->minConstantBufferSlot = 0;
+        psD3D11Set->maxConstantBufferSlot = 0;
+        psD3D11Set->minUAVSlot = 0;
+        psD3D11Set->maxUAVSlot = 0;
+
+        if (pass) {
+            STextureList* texList = pass->T._get();
+            if (texList && texList->size() > 0) {
+                Msg("  [MaterialCache] PS: Manually setting SRVs from X-Ray textures...");
+                psD3D11Set->minSRVSlot = UINT_MAX;
+
+                for (u32 i = 0; i < texList->size(); i++) {
+                    const auto& texPair = (*texList)[i];
+                    u32 stage = texPair.first;
+                    CTexture* tex = texPair.second._get();
+
+                    if (stage >= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT) {
+                        Msg("  ! PS: Texture '%s' has invalid slot %u (max %u)",
+                            tex ? tex->cName.c_str() : "NULL", stage, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT);
+                        continue;
+                    }
+
+                    if (tex) {
+                        ID3DShaderResourceView* xraySRV = tex->get_SRView();
+                        if (xraySRV) {
+                            xraySRV->AddRef();
+                            psD3D11Set->SRVs[stage] = xraySRV;
+                            Msg("    PS: Set SRV at slot %u: %p (from X-Ray texture '%s', AddRef'd)",
+                                stage, xraySRV, tex->cName.c_str());
+
+                            if (psD3D11Set->minSRVSlot > stage)
+                                psD3D11Set->minSRVSlot = stage;
+                            if (psD3D11Set->maxSRVSlot < stage)
+                                psD3D11Set->maxSRVSlot = stage;
+                        } else {
+                            Msg("  ! PS: Texture '%s' has NULL SRV at slot %u", tex->cName.c_str(), stage);
+                        }
+                    }
+                }
+
+                Msg("  [MaterialCache] PS SRV range: [%u, %u]",
+                    psD3D11Set->minSRVSlot, psD3D11Set->maxSRVSlot);
+            }
+        }
+
+        Msg("  [MaterialCache] PS: Manually setting constant buffers...");
+        psD3D11Set->minConstantBufferSlot = UINT_MAX;
+
+        for (const auto& cbInfo : matPSO->constantBuffers) {
+            if (cbInfo.stage == MaterialPSO::ShaderStage::Pixel) {
+                nvrhi::IBuffer* nvrhiBufferToUse = nullptr;
+
+                if (cbInfo.isPerObject) {
+                    nvrhiBufferToUse = perObjectVCB;
+                    Msg("    PS: Setting slot %u to VCB (per-object)", cbInfo.slot);
+                } else {
+                    nvrhiBufferToUse = cbInfo.nvrhiBuffer.Get();
+                    Msg("    PS: Setting slot %u to custom global CB", cbInfo.slot);
+                }
+
+                if (nvrhiBufferToUse) {
+                    ID3D11Buffer* d3dBuffer = static_cast<ID3D11Buffer*>(
+                        nvrhiBufferToUse->getNativeObject(nvrhi::ObjectTypes::D3D11_Buffer).pointer);
+
+                    if (d3dBuffer) {
+                        psD3D11Set->constantBuffers[cbInfo.slot] = d3dBuffer;
+                        Msg("    PS: Set CB at slot %u: %p (%u bytes)", cbInfo.slot, d3dBuffer, cbInfo.size);
+
+                        if (psD3D11Set->minConstantBufferSlot > cbInfo.slot)
+                            psD3D11Set->minConstantBufferSlot = cbInfo.slot;
+                        if (psD3D11Set->maxConstantBufferSlot < cbInfo.slot)
+                            psD3D11Set->maxConstantBufferSlot = cbInfo.slot;
+                    }
+                }
+            }
+        }
+
+        Msg("  [MaterialCache] PS CB range: [%u, %u]",
+            psD3D11Set->minConstantBufferSlot, psD3D11Set->maxConstantBufferSlot);
     }
 #endif
 
-    matPSO->bindingSet = bindingSet;
-    Msg("  [MaterialCache] Successfully created and cached binding set");
+    Msg("  [MaterialCache] Successfully created and cached VS and PS binding sets");
 
-    return bindingSet;
+    return matPSO->vsBindingSet;
 }
 
 u64 MaterialCache::ComputeTextureHash(SPass* pass)

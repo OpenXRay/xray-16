@@ -379,20 +379,11 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
                 ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
 
-                nvrhi::BindingSetHandle fullBindingSet =
-                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
+                m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
-                if (fullBindingSet) {
-                    ctx.SetBindingSet(0, fullBindingSet.Get());
-                    currentBindingSet = fullBindingSet.Get();
-                }
-            } else {
-                UpdatePerObjectConstants(ctx, *batch);
-
-                if (batch->bindingSet != currentBindingSet) {
-                    ctx.SetBindingSet(0, batch->bindingSet);
-                    currentBindingSet = batch->bindingSet;
-                }
+                ctx.SetBindingSet(0, matPSO->vsBindingSet.Get());
+                ctx.SetBindingSet(1, matPSO->psBindingSet.Get());
+                currentBindingSet = matPSO->vsBindingSet.Get();
             }
 
             nvrhi::IBuffer* vb = batch->vertexBuffer.Get();

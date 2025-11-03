@@ -69,8 +69,10 @@ struct MaterialKey {
 struct MaterialPSO {
     ng::PipelineState* pso = nullptr;
 
-    nvrhi::BindingLayoutHandle bindingLayout;
-    nvrhi::BindingSetHandle bindingSet;
+    nvrhi::BindingLayoutHandle vsBindingLayout;
+    nvrhi::BindingLayoutHandle psBindingLayout;
+    nvrhi::BindingSetHandle vsBindingSet;
+    nvrhi::BindingSetHandle psBindingSet;
 
     struct TextureSlot {
         u32 slot;
@@ -194,14 +196,18 @@ private:
 
     void ExtractSamplers(SPass* pass, MaterialPSO* matPSO);
 
-    nvrhi::BindingLayoutHandle CreateBindingLayout(const MaterialPSO* matPSO);
-
 public:
-    nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
+    void CreateBindingLayouts(MaterialPSO* matPSO);
+    nvrhi::BindingLayoutHandle CreateStageBindingLayout(
+        const MaterialPSO* matPSO,
+        MaterialPSO::ShaderStage stage,
+        nvrhi::ShaderType nvrhiStage);
+
     nvrhi::BindingSetHandle GetOrCreateBindingSet(
         MaterialPSO* matPSO,
         nvrhi::IBuffer* perObjectVCB,
         SPass* pass);
+
 private:
 
     static u64 ComputeTextureHash(SPass* pass);
