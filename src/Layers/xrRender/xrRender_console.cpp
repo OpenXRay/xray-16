@@ -28,6 +28,9 @@
 #if RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/FrameGraph/FGTest.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/ResourceManager/ModernResourceManager.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 #ifdef DEBUG
 #include "Layers/xrRender/ResourceManager/TestTextureManager.h"
 #endif
@@ -510,24 +513,59 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
 #if defined(USE_DX11)
+        // Save current render mode and switch to FrameGraph
+        int savedRenderMode = ps_r4_use_framegraph;
+        ps_r4_use_framegraph = 1;
+        Msg("! [TEST] Switched to FrameGraph mode (was: %d)", savedRenderMode);
+
         auto& render = static_cast<CRender&>(RImplementation);
 
         // Check if NVRHI is initialized
         if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
         {
             Msg("! [FrameGraph] NVRHI not initialized - run r4_nvrhi_test first");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
+        }
+
+        // Initialize RenderDevice if needed
+        if (!render.m_renderDevice)
+        {
+            Msg("~ [FrameGraph] Initializing RenderDevice...");
+            render.m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
+            if (!render.m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
+            {
+                Msg("! [FrameGraph] Failed to initialize RenderDevice");
+                xr_delete(render.m_renderDevice);
+                ps_r4_use_framegraph = savedRenderMode;
+                return;
+            }
+        }
+
+        // Initialize FrameGraphRenderer if needed
+        if (!render.m_framegraphRenderer)
+        {
+            Msg("~ [FrameGraph] Initializing FrameGraphRenderer...");
+            render.m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
+            if (!render.m_framegraphRenderer->Initialize(render.m_renderDevice))
+            {
+                Msg("! [FrameGraph] Failed to initialize FrameGraphRenderer");
+                xr_delete(render.m_framegraphRenderer);
+                ps_r4_use_framegraph = savedRenderMode;
+                return;
+            }
         }
 
         using namespace xray::render::framegraph;
         using namespace xray::render::ng;
 
         nvrhi::IDevice* device = render.m_nvrhiDevice->GetDevice();
+        RenderContext* context = render.m_framegraphRenderer->GetRenderContext();
 
-        // Get RenderContext
-        if (!render.m_renderContext)
+        if (!context)
         {
-            Msg("! [FrameGraph] RenderContext not initialized");
+            Msg("! [FrameGraph] RenderContext not available");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
         }
 
@@ -536,6 +574,7 @@ public:
         if (!backbufferRTV)
         {
             Msg("! [FrameGraph] No backbuffer RTV");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
         }
 
@@ -566,12 +605,17 @@ public:
         if (!backbuffer)
         {
             Msg("! [FrameGraph] Failed to wrap backbuffer");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
         }
 
         // Run simple triangle test
         Msg("~ [FrameGraph] Running simple triangle test...");
-        TestSimpleTriangle(device, render.m_renderContext, backbuffer);
+        TestSimpleTriangle(device, context, backbuffer);
+
+        // Restore original render mode
+        ps_r4_use_framegraph = savedRenderMode;
+        Msg("! [TEST] Restored render mode to: %d", savedRenderMode);
 #endif
     }
 };
@@ -583,24 +627,59 @@ public:
     virtual void Execute(LPCSTR /*args*/)
     {
 #if defined(USE_DX11)
+        // Save current render mode and switch to FrameGraph
+        int savedRenderMode = ps_r4_use_framegraph;
+        ps_r4_use_framegraph = 1;
+        Msg("! [TEST] Switched to FrameGraph mode (was: %d)", savedRenderMode);
+
         auto& render = static_cast<CRender&>(RImplementation);
 
         // Check if NVRHI is initialized
         if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
         {
             Msg("! [FrameGraph] NVRHI not initialized - run r4_nvrhi_test first");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
+        }
+
+        // Initialize RenderDevice if needed
+        if (!render.m_renderDevice)
+        {
+            Msg("~ [FrameGraph] Initializing RenderDevice...");
+            render.m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
+            if (!render.m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
+            {
+                Msg("! [FrameGraph] Failed to initialize RenderDevice");
+                xr_delete(render.m_renderDevice);
+                ps_r4_use_framegraph = savedRenderMode;
+                return;
+            }
+        }
+
+        // Initialize FrameGraphRenderer if needed
+        if (!render.m_framegraphRenderer)
+        {
+            Msg("~ [FrameGraph] Initializing FrameGraphRenderer...");
+            render.m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
+            if (!render.m_framegraphRenderer->Initialize(render.m_renderDevice))
+            {
+                Msg("! [FrameGraph] Failed to initialize FrameGraphRenderer");
+                xr_delete(render.m_framegraphRenderer);
+                ps_r4_use_framegraph = savedRenderMode;
+                return;
+            }
         }
 
         using namespace xray::render::framegraph;
         using namespace xray::render::ng;
 
         nvrhi::IDevice* device = render.m_nvrhiDevice->GetDevice();
+        RenderContext* context = render.m_framegraphRenderer->GetRenderContext();
 
-        // Get RenderContext
-        if (!render.m_renderContext)
+        if (!context)
         {
-            Msg("! [FrameGraph] RenderContext not initialized");
+            Msg("! [FrameGraph] RenderContext not available");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
         }
 
@@ -609,6 +688,7 @@ public:
         if (!backbufferRTV)
         {
             Msg("! [FrameGraph] No backbuffer RTV");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
         }
 
@@ -639,12 +719,133 @@ public:
         if (!backbuffer)
         {
             Msg("! [FrameGraph] Failed to wrap backbuffer");
+            ps_r4_use_framegraph = savedRenderMode;
             return;
         }
 
         // Run two-pass test
         Msg("~ [FrameGraph] Running two-pass test...");
-        TestTwoPassRender(device, render.m_renderContext, backbuffer);
+        TestTwoPassRender(device, context, backbuffer);
+
+        // Restore original render mode
+        ps_r4_use_framegraph = savedRenderMode;
+        Msg("! [TEST] Restored render mode to: %d", savedRenderMode);
+#endif
+    }
+};
+
+class CCC_FrameGraphTestAliasing : public IConsole_Command
+{
+public:
+    CCC_FrameGraphTestAliasing(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+    virtual void Execute(LPCSTR /*args*/)
+    {
+#if defined(USE_DX11)
+        // Save current render mode and switch to FrameGraph
+        int savedRenderMode = ps_r4_use_framegraph;
+        ps_r4_use_framegraph = 1;
+        Msg("! [TEST] Switched to FrameGraph mode (was: %d)", savedRenderMode);
+
+        auto& render = static_cast<CRender&>(RImplementation);
+
+        // Check if NVRHI is initialized
+        if (!render.m_nvrhiDevice || !render.m_nvrhiDevice->IsInitialized())
+        {
+            Msg("! [FrameGraph] NVRHI not initialized - run r4_nvrhi_test first");
+            ps_r4_use_framegraph = savedRenderMode;
+            return;
+        }
+
+        // Initialize RenderDevice if needed
+        if (!render.m_renderDevice)
+        {
+            Msg("~ [FrameGraph] Initializing RenderDevice...");
+            render.m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
+            if (!render.m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
+            {
+                Msg("! [FrameGraph] Failed to initialize RenderDevice");
+                xr_delete(render.m_renderDevice);
+                ps_r4_use_framegraph = savedRenderMode;
+                return;
+            }
+        }
+
+        // Initialize FrameGraphRenderer if needed
+        if (!render.m_framegraphRenderer)
+        {
+            Msg("~ [FrameGraph] Initializing FrameGraphRenderer...");
+            render.m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
+            if (!render.m_framegraphRenderer->Initialize(render.m_renderDevice))
+            {
+                Msg("! [FrameGraph] Failed to initialize FrameGraphRenderer");
+                xr_delete(render.m_framegraphRenderer);
+                ps_r4_use_framegraph = savedRenderMode;
+                return;
+            }
+        }
+
+        using namespace xray::render::framegraph;
+        using namespace xray::render::ng;
+        using namespace xray::render::resources;
+
+        nvrhi::IDevice* device = render.m_nvrhiDevice->GetDevice();
+        ModernResourceManager* resourceManager = render.m_renderDevice->GetModernResourceManager();
+        RenderContext* context = render.m_framegraphRenderer->GetRenderContext();
+
+        if (!context)
+        {
+            Msg("! [FrameGraph] RenderContext not available");
+            ps_r4_use_framegraph = savedRenderMode;
+            return;
+        }
+
+        // Get backbuffer
+        ID3D11RenderTargetView* backbufferRTV = render.Target->get_base_rt();
+        if (!backbufferRTV)
+        {
+            Msg("! [FrameGraph] No backbuffer RTV");
+            ps_r4_use_framegraph = savedRenderMode;
+            return;
+        }
+
+        ID3D11Resource* backbufferRes = nullptr;
+        backbufferRTV->GetResource(&backbufferRes);
+
+        nvrhi::TextureDesc backbufferDesc;
+        backbufferDesc.width = Device.dwWidth;
+        backbufferDesc.height = Device.dwHeight;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.mipLevels = 1;
+        backbufferDesc.arraySize = 1;
+        backbufferDesc.sampleCount = 1;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.debugName = "Backbuffer";
+        backbufferDesc.dimension = nvrhi::TextureDimension::Texture2D;
+        backbufferDesc.keepInitialState = true;
+        backbufferDesc.initialState = nvrhi::ResourceStates::RenderTarget;
+
+        nvrhi::TextureHandle backbuffer = device->createHandleForNativeTexture(
+            nvrhi::ObjectTypes::D3D11_Resource,
+            nvrhi::Object(backbufferRes),
+            backbufferDesc
+        );
+
+        backbufferRes->Release();
+
+        if (!backbuffer)
+        {
+            Msg("! [FrameGraph] Failed to wrap backbuffer");
+            ps_r4_use_framegraph = savedRenderMode;
+            return;
+        }
+
+        // Run resource aliasing test
+        Msg("~ [FrameGraph] Running resource aliasing test...");
+        TestResourceAliasing(device, context, backbuffer, resourceManager);
+
+        // Restore original render mode
+        ps_r4_use_framegraph = savedRenderMode;
+        Msg("! [TEST] Restored render mode to: %d", savedRenderMode);
 #endif
     }
 };
@@ -1328,6 +1529,7 @@ void xrRender_initconsole()
     // FrameGraph test commands (Phase 2)
     CMD1(CCC_FrameGraphTestSimple, "r4_framegraph_test");
     CMD1(CCC_FrameGraphTestTwoPass, "r4_framegraph_test2");
+    CMD1(CCC_FrameGraphTestAliasing, "r4_framegraph_test_aliasing");
     // FrameGraph renderer toggle (Phase 3)
     CMD4(CCC_Integer, "r4_use_framegraph", &ps_r4_use_framegraph, 0, 1);
 

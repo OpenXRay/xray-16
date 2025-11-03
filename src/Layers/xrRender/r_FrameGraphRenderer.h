@@ -39,6 +39,9 @@ public:
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsEnabled() const { return m_enabled; }
 
+    // Access RenderContext
+    ng::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
+
     // Statistics
     struct Stats {
         float totalFrameMs = 0.0f;

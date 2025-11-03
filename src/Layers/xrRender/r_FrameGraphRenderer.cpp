@@ -598,7 +598,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             case MT_NORMAL:
             default:
                 xform = Fidentity;
-                break; // TODO: break so that we can render more than just trees
+                continue; // TODO: break so that we can render more than just trees
         }
 
         if (ProcessVisualGeometry(visual, xform)) {
