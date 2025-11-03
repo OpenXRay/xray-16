@@ -83,9 +83,14 @@ struct MaterialPSO {
     // Graphics pipeline
     ng::PipelineState* pso = nullptr;
 
-    // Binding layout and set
-    nvrhi::BindingLayoutHandle bindingLayout;
-    nvrhi::BindingSetHandle bindingSet;
+    // Binding layouts and sets (PER-STAGE to handle VS/PS having different slots)
+    // VS: b0=$Globals, b1=dynamic_transforms, b2=static_globals
+    // PS: b0=dynamic_transforms, b1=static_globals
+    // NVRHI requires separate layouts per stage when slots differ!
+    nvrhi::BindingLayoutHandle vsBindingLayout;   // Vertex shader resources
+    nvrhi::BindingLayoutHandle psBindingLayout;   // Pixel shader resources
+    nvrhi::BindingSetHandle vsBindingSet;         // Cached VS binding set
+    nvrhi::BindingSetHandle psBindingSet;         // Cached PS binding set
 
     // Extracted data for quick access
     struct TextureSlot {
@@ -241,18 +246,21 @@ private:
     // Extract samplers from SPass state
     void ExtractSamplers(SPass* pass, MaterialPSO* matPSO);
 
-    // Create binding layout for material
-    nvrhi::BindingLayoutHandle CreateBindingLayout(const MaterialPSO* matPSO);
-
-    // Create material binding set (textures only, no CB)
 public:
-    nvrhi::BindingSetHandle CreateMaterialBindingSet(const MaterialPSO* matPSO);
+    // Create binding layouts for material (separate VS and PS)
+    void CreateBindingLayouts(MaterialPSO* matPSO);
+    nvrhi::BindingLayoutHandle CreateStageBindingLayout(
+        const MaterialPSO* matPSO,
+        MaterialPSO::ShaderStage stage,
+        nvrhi::ShaderType nvrhiStage);
+
     // Get or create cached binding set for material (with per-object VCB)
     // Cached per MaterialPSO for reuse across draws - only creates once!
     nvrhi::BindingSetHandle GetOrCreateBindingSet(
         MaterialPSO* matPSO,  // Non-const to allow caching
         nvrhi::IBuffer* perObjectVCB,
         SPass* pass);  // For extracting X-Ray's SRVs
+
 private:
 
     // Compute texture hash from SPass

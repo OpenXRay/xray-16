@@ -502,22 +502,16 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                 // CRITICAL: Write the FULL buffer size (256 bytes) to avoid partial update errors!
                 ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
 
-                // Step 2: Get or create cached binding set (created once, reused!)
-                nvrhi::BindingSetHandle fullBindingSet =
-                    m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
+                // Step 2: Get or create cached binding sets (VS and PS - created once, reused!)
+                // GetOrCreateBindingSet creates BOTH vsBindingSet and psBindingSet
+                m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
-                if (fullBindingSet) {
-                    ctx.SetBindingSet(0, fullBindingSet.Get());
-                    currentBindingSet = fullBindingSet.Get();
-                }
-            } else {
-                // Fallback to old path
-                UpdatePerObjectConstants(ctx, *batch);
-
-                if (batch->bindingSet != currentBindingSet) {
-                    ctx.SetBindingSet(0, batch->bindingSet);
-                    currentBindingSet = batch->bindingSet;
-                }
+                // Bind BOTH per-stage binding sets:
+                // Slot 0: VS binding set (VS constant buffers)
+                // Slot 1: PS binding set (PS constant buffers + textures + samplers)
+                ctx.SetBindingSet(0, matPSO->vsBindingSet.Get());
+                ctx.SetBindingSet(1, matPSO->psBindingSet.Get());
+                currentBindingSet = matPSO->vsBindingSet.Get();
             }
 
             // Bind vertex/index buffers (convert nvrhi::BufferHandle to IBuffer*)
