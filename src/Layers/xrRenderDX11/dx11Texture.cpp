@@ -3,6 +3,13 @@
 
 #include <DirectXTex.h>
 
+// Week 6: FrameGraph texture loading integration
+#include "Layers/xrRender/xrRender_console.h"                    // ps_r4_use_framegraph
+#include "Layers/xrRender/RenderContext/RenderDevice.h"          // RenderDevice
+#include "Layers/xrRender/ResourceManager/ModernResourceManager.h" // ModernResourceManager
+#include "Layers/xrRender/ResourceManager/TextureManager.h"      // TextureManager
+#include <nvrhi/nvrhi.h>                                         // getNativeObject
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void fix_texture_name(pstr fn)
@@ -98,6 +105,77 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
+
+    // ═══════════════════════════════════════════════════
+    //  WEEK 6: FRAMEGRAPH MODE - ROUTE THROUGH TEXTUREMANAGER
+    // ═══════════════════════════════════════════════════
+    if (ps_r4_use_framegraph && m_renderDevice && m_renderDevice->GetModernResourceManager())
+    {
+        using namespace xray::render::ng;
+        using namespace xray::render::resources;
+
+        // Fix texture name (remove extension)
+        string_path fname;
+        xr_strcpy(fname, fRName);
+        fix_texture_name(fname);
+
+        // Build VFS path for DDS texture
+        string_path vfsPath;
+        xr_sprintf(vfsPath, "$game_textures$\\%s", fname);
+
+        Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
+
+        // Load through ModernResourceManager
+        ModernResourceManager* resourceMgr = m_renderDevice->GetModernResourceManager();
+        TextureManager* texManager = resourceMgr->GetTextureManager();
+
+        // Load texture and get handle
+        TextureHandle handle = texManager->LoadTexture(vfsPath, TexturePriority::High);
+        if (!handle.IsValid())
+        {
+            Msg("! [FrameGraph] Failed to load texture through TextureManager: %s", fname);
+            // Fall back to legacy path
+            goto _LEGACY_PATH;
+        }
+
+        // Get NVRHI texture
+        nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
+        if (!nvrhiTexture)
+        {
+            Msg("! [FrameGraph] Failed to get NVRHI texture: %s", fname);
+            // Fall back to legacy path
+            goto _LEGACY_PATH;
+        }
+
+        // Extract D3D11 texture from NVRHI (for compatibility with legacy code)
+        ID3D11Texture2D* d3d11Texture = static_cast<ID3D11Texture2D*>(
+            nvrhiTexture->getNativeObject(nvrhi::ObjectTypes::D3D11_Resource).pointer
+        );
+
+        if (!d3d11Texture)
+        {
+            Msg("! [FrameGraph] Failed to get D3D11 texture from NVRHI: %s", fname);
+            // Fall back to legacy path
+            goto _LEGACY_PATH;
+        }
+
+        // Get texture metadata for memory size
+        const TextureMetadata* meta = texManager->GetMetadata(handle);
+        if (meta)
+        {
+            ret_msize = (u32)meta->memoryUsed;
+        }
+
+        Msg("* [FrameGraph] Successfully loaded texture: %s (NVRHI-owned)", fname);
+
+        // Return D3D11 texture (NVRHI still owns it, but we expose D3D11 interface for legacy code)
+        return d3d11Texture;
+    }
+
+_LEGACY_PATH:
+    // ═══════════════════════════════════════════════════
+    //  LEGACY PATH: Original D3D11 texture loading
+    // ═══════════════════════════════════════════════════
 
     ID3DBaseTexture* pTexture2D{};
     string_path fn;
