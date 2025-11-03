@@ -611,7 +611,7 @@ public:
 
         // Run simple triangle test
         Msg("~ [FrameGraph] Running simple triangle test...");
-        TestSimpleTriangle(device, context, backbuffer);
+        TestSimpleTriangle(render.m_renderDevice, context, backbuffer);
 
         // Restore original render mode
         ps_r4_use_framegraph = savedRenderMode;
@@ -725,7 +725,7 @@ public:
 
         // Run two-pass test
         Msg("~ [FrameGraph] Running two-pass test...");
-        TestTwoPassRender(device, context, backbuffer);
+        TestTwoPassRender(render.m_renderDevice, context, backbuffer);
 
         // Restore original render mode
         ps_r4_use_framegraph = savedRenderMode;
@@ -841,7 +841,7 @@ public:
 
         // Run resource aliasing test
         Msg("~ [FrameGraph] Running resource aliasing test...");
-        TestResourceAliasing(device, context, backbuffer, resourceManager);
+        TestResourceAliasing(render.m_renderDevice, context, backbuffer);
 
         // Restore original render mode
         ps_r4_use_framegraph = savedRenderMode;

@@ -13,11 +13,11 @@ namespace ng = xray::render::ng;
 //  SIMPLE TRIANGLE TEST
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Triangle Test ===");
 
-    // Create FrameGraph (without ResourceManager for now - tests will use direct NVRHI)
-    FrameGraph fg(device, nullptr);
+    // Create FrameGraph
+    FrameGraph fg(renderDevice);
     fg.SetRenderContext(context);
 
     // Get backbuffer dimensions
@@ -102,11 +102,10 @@ void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrh
 //  TWO-PASS TEST (SIMPLE G-BUFFER STYLE)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Two-Pass Test ===");
 
-    // Create FrameGraph (without ResourceManager for now - tests will use direct NVRHI)
-    FrameGraph fg(device, nullptr);
+    FrameGraph fg(renderDevice);
     fg.SetRenderContext(context);
 
     // Get backbuffer dimensions
@@ -206,13 +205,10 @@ void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi
 //  ALIASING TEST (Multiple Transient Resources)
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-void TestResourceAliasing(nvrhi::IDevice* device, ng::RenderContext* context,
-                          nvrhi::ITexture* backbuffer,
-                          resources::ModernResourceManager* resourceManager) {
+void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Resource Aliasing Test ===");
 
-    // Create FrameGraph WITH ResourceManager to enable aliasing
-    FrameGraph fg(device, resourceManager);
+    FrameGraph fg(renderDevice);
     fg.SetRenderContext(context);
 
     // Get backbuffer dimensions

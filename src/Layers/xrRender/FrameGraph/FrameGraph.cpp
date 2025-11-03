@@ -1,6 +1,7 @@
 // xrRender/FrameGraph/FrameGraph.cpp
 #include "stdafx.h"
 #include "FrameGraph.h"
+#include "../RenderContext/RenderDevice.h"
 
 namespace xray::render::framegraph {
 
@@ -8,11 +9,13 @@ namespace xray::render::framegraph {
 //  CONSTRUCTOR / DESTRUCTOR
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-FrameGraph::FrameGraph(nvrhi::IDevice* device, resources::ModernResourceManager* resourceManager)
-    : m_device(device)
-    , m_resourceManager(resourceManager)
+FrameGraph::FrameGraph(ng::RenderDevice* renderDevice)
+    : m_renderDevice(renderDevice)
+    , m_device(renderDevice->GetNVRHIDevice())
+    , m_resourceManager(renderDevice->GetModernResourceManager())
 {
-    VERIFY(device != nullptr);
+    VERIFY(renderDevice != nullptr);
+    VERIFY(m_device != nullptr);
 
     // Create resource pool for aliasing (if ResourceManager available)
     if (m_resourceManager) {
@@ -219,8 +222,16 @@ void FrameGraph::Compile() {
 void FrameGraph::Execute() {
     VERIFY(m_compiled && "Must compile before execute");
     VERIFY(m_context != nullptr && "RenderContext required for execution");
+    VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
 
     Msg("~ [FrameGraph] Executing %u passes...", m_sortedPasses.size());
+
+    // ═══════════════════════════════════════════════════════
+    //  OPEN COMMAND LIST (CRITICAL: Required by NVRHI)
+    // ═══════════════════════════════════════════════════════
+    nvrhi::ICommandList* cmdList = m_context->GetCommandList();
+    VERIFY(cmdList != nullptr);
+    cmdList->open();
 
     u32 passesExecuted = 0;
 
@@ -270,6 +281,12 @@ void FrameGraph::Execute() {
 
         passesExecuted++;
     }
+
+    // ═══════════════════════════════════════════════════════
+    //  CLOSE AND EXECUTE COMMAND LIST (CRITICAL: Submit to GPU)
+    // ═══════════════════════════════════════════════════════
+    cmdList->close();
+    m_renderDevice->ExecuteContext(m_context);
 
     Msg("~ [FrameGraph] Execution complete: %u/%u passes executed",
         passesExecuted, m_sortedPasses.size());

@@ -971,7 +971,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
                 if (tex) {
                     ID3DShaderResourceView* xraySRV = tex->get_SRView();
                     if (xraySRV) {
-                        // Don't AddRef - NVRHI and X-Ray manage lifetimes
+                        xraySRV->AddRef();
                         d3d11Set->SRVs[stage] = xraySRV;  // Use STAGE, not i!
                         Msg("    Set SRV at slot %u: %p (from X-Ray texture '%s', AddRef'd)",
                             stage, xraySRV, tex->cName.c_str());
