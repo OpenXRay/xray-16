@@ -160,26 +160,65 @@ void FrameGraphRenderer::SetupFrame() {
     m_geometryCollector->EndFrame();
 }
 
+// ═══════════════════════════════════════════════════════
+//  HELPER: CREATE RENDER TARGET (DRY)
+// ═══════════════════════════════════════════════════════
+
+framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
+    const char* name,
+    u32 width,
+    u32 height,
+    nvrhi::Format format,
+    bool isDepthStencil)
+{
+    framegraph::ResourceDesc desc;
+    desc.type = framegraph::ResourceDesc::Type::Texture2D;
+    desc.width = width;
+    desc.height = height;
+    desc.format = format;
+    desc.isRenderTarget = !isDepthStencil;
+    desc.isDepthStencil = isDepthStencil;
+    desc.isTransient = true;
+    desc.debugName = name;
+
+    return m_framegraph->CreateTexture(name, desc);
+}
+
 void FrameGraphRenderer::BuildFrameGraph() {
     // ═══════════════════════════════════════════════════════
-    //  STEP 1: SETUP RENDER TARGETS FIRST
+    //  STEP 1: CREATE ALL VANILLA X-RAY RENDER TARGETS
     // ═══════════════════════════════════════════════════════
-    // Render targets must exist in FrameGraph before MaterialPSO creation!
+    // Week 14: Create all vanilla RTs that X-Ray shaders expect
+    // These are created BEFORE passes, so shader reflection can route to them
 
-    // Create backbuffer as transient resource
-    framegraph::ResourceDesc backbufferDesc;
-    backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    backbufferDesc.width = 1920;  // TODO: Get from Device
-    backbufferDesc.height = 1080;
-    backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
-    backbufferDesc.isRenderTarget = true;
-    backbufferDesc.isTransient = true;
-    backbufferDesc.debugName = "Backbuffer";
+    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets...");
 
-    framegraph::VirtualResourceHandle backbuffer =
-        m_framegraph->CreateTexture("Backbuffer", backbufferDesc);
+    u32 w = Device.dwWidth;
+    u32 h = Device.dwHeight;
 
-    // G-Buffer pass - Setup creates render targets in FrameGraph
+    // ─── G-Buffer Targets (Deferred Geometry Phase) ───
+    auto rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);   // r2_RT_P
+    auto rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);       // r2_RT_N
+    auto rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);        // r2_RT_albedo
+    auto rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);          // r2_RT_base_depth
+
+    // ─── Lighting Targets ───
+    auto rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
+
+    // ─── Post-Processing Targets ───
+    auto rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic0
+    auto rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic1
+    auto rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);      // r2_RT_generic2 (HDR)
+
+    auto backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);     // TODO: Get from Device
+
+    Msg("  ✓ Created %d vanilla render targets", 8);  // Position, Normal, Albedo, Depth, Accumulator, Generic0/1/2
+
+    // ═══════════════════════════════════════════════════════
+    //  STEP 2: SETUP PASSES (they will use vanilla RTs)
+    // ═══════════════════════════════════════════════════════
+
+    // G-Buffer pass - Setup creates PROTOTYPE render targets (will be replaced with vanilla RTs in Week 15-16)
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
 
@@ -204,54 +243,73 @@ void FrameGraphRenderer::BuildFrameGraph() {
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
     // ═══════════════════════════════════════════════════════
 
-    Msg("! [FrameGraphRenderer] Registering render targets in RT registry...");
+    Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
 
-    // ─── G-Buffer Outputs ───
+    // ─── VANILLA G-BUFFER TARGETS ───
 
-    // Albedo RT (RT0: Albedo.rgb + Metallic.a)
-    registry.RegisterRT("rt_Albedo", gbufferOutputs.albedo);
-    registry.RegisterRT("rt_Color", gbufferOutputs.albedo);  // Alias
-    registry.RegisterAliases(gbufferOutputs.albedo, {
-        "s_albedo",
+    // rt_Position (r2_RT_P) - World space position
+    registry.RegisterRT("rt_Position", rt_Position);
+    registry.RegisterAliases(rt_Position, {
+        "$user$position",  // Shader output target name
+        "s_position"       // Shader input sampler name
+    });
+
+    // rt_Normal (r2_RT_N) - View space normal
+    registry.RegisterRT("rt_Normal", rt_Normal);
+    registry.RegisterAliases(rt_Normal, {
+        "s_normal",
+        "s_nmap"
+    });
+
+    // rt_Albedo (r2_RT_albedo) - Diffuse color
+    registry.RegisterRT("rt_Albedo", rt_Albedo);
+    registry.RegisterRT("rt_Color", rt_Albedo);  // Legacy alias
+    registry.RegisterAliases(rt_Albedo, {
+        "$user$albedo",    // Shader output target name
+        "s_albedo",        // Shader input sampler name
         "s_diffuse",
         "s_image",
         "s_base"
     });
 
-    // Normal RT (RT1: Normal.xyz + Roughness.a)
-    registry.RegisterRT("rt_Normal", gbufferOutputs.normal);
-    registry.RegisterAliases(gbufferOutputs.normal, {
-        "s_normal",
-        "s_nmap"
+    // rt_Depth (r2_RT_base_depth) - Depth/stencil
+    registry.RegisterRT("rt_Depth", rt_Depth);
+    registry.RegisterAliases(rt_Depth, {
+        "$user$base_depth",  // Shader output target name
+        "s_depth"            // Shader input sampler name
     });
 
-    // Material RT (RT2: Material ID)
-    registry.RegisterRT("rt_Material", gbufferOutputs.material);
-    registry.RegisterAliases(gbufferOutputs.material, {
-        "s_material",
-        "s_mat"
+    // ─── VANILLA LIGHTING TARGETS ───
+
+    // rt_Accumulator (r2_RT_accum) - HDR lighting accumulation
+    registry.RegisterRT("rt_Accumulator", rt_Accumulator);
+    registry.RegisterAliases(rt_Accumulator, {
+        "s_accumulator",
+        "s_acc"
     });
 
-    // Depth/Stencil
-    registry.RegisterRT("rt_Depth", gbufferOutputs.depth);
-    registry.RegisterAliases(gbufferOutputs.depth, {
-        "s_depth",
-        "s_position"  // Some shaders use depth to reconstruct position
+    // ─── VANILLA POST-PROCESSING TARGETS ───
+
+    // rt_Generic_0/1/2 (r2_RT_generic0/1/2) - Generic targets for combine/post-processing
+    registry.RegisterRT("rt_Generic_0", rt_Generic_0);
+    registry.RegisterAliases(rt_Generic_0, {
+        "$user$generic0",  // Shader output target name
+        "s_generic0"       // Shader input sampler name
     });
 
-    // ─── Lighting Outputs ───
+    registry.RegisterRT("rt_Generic_1", rt_Generic_1);
+    registry.RegisterAliases(rt_Generic_1, {
+        "$user$generic1",  // Shader output target name
+        "s_generic1"       // Shader input sampler name
+    });
 
-    // HDR Color (Lit scene)
-    //registry.RegisterRT("rt_HDRColor", lightingOutput.hdrColor);
-    //registry.RegisterRT("rt_Accumulator", lightingOutput.hdrColor);  // Legacy name
-    //registry.RegisterAliases(lightingOutput.hdrColor, {
-    //    "s_hdr",
-    //    "s_accumulator",
-    //    "s_acc"
-    //});
+    registry.RegisterRT("rt_Generic_2", rt_Generic_2);
+    registry.RegisterAliases(rt_Generic_2, {
+        "s_generic2"
+    });
 
-    // ─── Backbuffer ───
+    // ─── BACKBUFFER ───
 
     registry.RegisterRT("rt_Backbuffer", backbuffer);
     registry.RegisterAliases(backbuffer, {
@@ -259,10 +317,18 @@ void FrameGraphRenderer::BuildFrameGraph() {
         "s_screen"
     });
 
+    // ─── PROTOTYPE GBUFFER (TEMPORARY - Week 15-16 will remove) ───
+
+    // Keep prototype GBufferPass outputs registered for now (used by current test rendering)
+    registry.RegisterRT("GBuffer.Albedo", gbufferOutputs.albedo);
+    registry.RegisterRT("GBuffer.Normal", gbufferOutputs.normal);
+    registry.RegisterRT("GBuffer.Material", gbufferOutputs.material);
+    registry.RegisterRT("GBuffer.Depth", gbufferOutputs.depth);
+
     // Print registry for debugging
     registry.PrintRegistry();
 
-    // Store final output for presenting to backbuffer
+    // Store final output for presenting to backbuffer (use prototype for now)
     m_finalOutput = gbufferOutputs.albedo;
 }
 

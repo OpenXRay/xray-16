@@ -95,6 +95,15 @@ private:
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();
 
+    // Helper: Create render target (DRY helper for BuildFrameGraph)
+    framegraph::VirtualResourceHandle CreateRT(
+        const char* name,
+        u32 width,
+        u32 height,
+        nvrhi::Format format,
+        bool isDepthStencil = false
+    );
+
     // Helper functions for geometry collection
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
