@@ -14,7 +14,7 @@ namespace ng = xray::render::ng;
 
 class FrameGraph {
 public:
-    FrameGraph(nvrhi::IDevice* device, resources::ModernResourceManager* resourceManager);
+    FrameGraph(ng::RenderDevice* renderDevice);
     ~FrameGraph();
 
     VirtualResourceHandle CreateTexture(const char* name, const ResourceDesc& desc);
@@ -95,6 +95,7 @@ public:
 
 private:
 
+    ng::RenderDevice* m_renderDevice;
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
     resources::ModernResourceManager* m_resourceManager;

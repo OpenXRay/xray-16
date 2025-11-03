@@ -1,13 +1,16 @@
 #include "stdafx.h"
 #include "FrameGraph.h"
+#include "../RenderContext/RenderDevice.h"
 
 namespace xray::render::framegraph {
 
-FrameGraph::FrameGraph(nvrhi::IDevice* device, resources::ModernResourceManager* resourceManager)
-    : m_device(device)
-    , m_resourceManager(resourceManager)
+FrameGraph::FrameGraph(ng::RenderDevice* renderDevice)
+    : m_renderDevice(renderDevice)
+    , m_device(renderDevice->GetNVRHIDevice())
+    , m_resourceManager(renderDevice->GetModernResourceManager())
 {
-    VERIFY(device != nullptr);
+    VERIFY(renderDevice != nullptr);
+    VERIFY(m_device != nullptr);
 
     if (m_resourceManager) {
         m_resourcePool = xr_make_unique<FGResourcePool>(m_resourceManager);
@@ -176,8 +179,13 @@ void FrameGraph::Compile() {
 void FrameGraph::Execute() {
     VERIFY(m_compiled && "Must compile before execute");
     VERIFY(m_context != nullptr && "RenderContext required for execution");
+    VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
 
     Msg("~ [FrameGraph] Executing %u passes...", m_sortedPasses.size());
+
+    nvrhi::ICommandList* cmdList = m_context->GetCommandList();
+    VERIFY(cmdList != nullptr);
+    cmdList->open();
 
     u32 passesExecuted = 0;
 
@@ -218,6 +226,9 @@ void FrameGraph::Execute() {
 
         passesExecuted++;
     }
+
+    cmdList->close();
+    m_renderDevice->ExecuteContext(m_context);
 
     Msg("~ [FrameGraph] Execution complete: %u/%u passes executed",
         passesExecuted, m_sortedPasses.size());

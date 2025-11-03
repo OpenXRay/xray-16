@@ -6,10 +6,10 @@ namespace xray::render::framegraph {
 
 namespace ng = xray::render::ng;
 
-void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Triangle Test ===");
 
-    FrameGraph fg(device, nullptr);
+    FrameGraph fg(renderDevice);
     fg.SetRenderContext(context);
 
     const nvrhi::TextureDesc& bbDesc = backbuffer->getDesc();
@@ -76,10 +76,10 @@ void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrh
     Msg("=== FrameGraph Triangle Test Complete ===");
 }
 
-void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
+void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Two-Pass Test ===");
 
-    FrameGraph fg(device, nullptr);
+    FrameGraph fg(renderDevice);
     fg.SetRenderContext(context);
 
     const nvrhi::TextureDesc& bbDesc = backbuffer->getDesc();
@@ -164,12 +164,10 @@ void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi
     Msg("=== FrameGraph Two-Pass Test Complete ===");
 }
 
-void TestResourceAliasing(nvrhi::IDevice* device, ng::RenderContext* context,
-                          nvrhi::ITexture* backbuffer,
-                          resources::ModernResourceManager* resourceManager) {
+void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Resource Aliasing Test ===");
 
-    FrameGraph fg(device, resourceManager);
+    FrameGraph fg(renderDevice);
     fg.SetRenderContext(context);
 
     const nvrhi::TextureDesc& bbDesc = backbuffer->getDesc();

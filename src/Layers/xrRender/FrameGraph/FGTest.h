@@ -4,6 +4,7 @@
 
 namespace xray::render::ng {
     class RenderContext;
+    class RenderDevice;
 }
 
 namespace xray::render::resources {
@@ -12,12 +13,10 @@ namespace xray::render::resources {
 
 namespace xray::render::framegraph {
 
-void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
+void TestSimpleTriangle(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
 
-void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
+void TestTwoPassRender(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
 
-void TestResourceAliasing(nvrhi::IDevice* device, ng::RenderContext* context,
-                          nvrhi::ITexture* backbuffer,
-                          resources::ModernResourceManager* resourceManager);
+void TestResourceAliasing(ng::RenderDevice* renderDevice, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
 
 }
