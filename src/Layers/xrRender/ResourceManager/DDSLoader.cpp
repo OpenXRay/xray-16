@@ -139,19 +139,82 @@ bool DDSLoader::LoadFromMemory(
         desc.mipLevels = 1;
     }
 
+    Msg("~ [DDSLoader] Header: %ux%u, %u mips, arraySize=%u, depth=%u",
+        desc.width, desc.height, desc.mipLevels, desc.arraySize, desc.depth);
+
     // Format conversion
     if (header.ddspf.dwFlags & DDPF_FOURCC) {
         if (header.ddspf.dwFourCC == FOURCC_DX10) {
             // Use DX10 header for format
             desc.format = GetFormatFromDXGI(headerDX10.dxgiFormat);
+            Msg("~ [DDSLoader] Format: DX10 DXGI=%u → NVRHI=%d", (u32)headerDX10.dxgiFormat, (int)desc.format);
         } else {
             // Use FourCC for format
             desc.format = GetFormatFromFourCC(header.ddspf.dwFourCC);
+            Msg("~ [DDSLoader] Format: FourCC=0x%08X (%.4s) → NVRHI=%d",
+                header.ddspf.dwFourCC, (const char*)&header.ddspf.dwFourCC, (int)desc.format);
         }
     } else {
-        // Uncompressed RGB/RGBA format
-        // For now, assume RGBA8_UNORM (can be extended)
-        desc.format = nvrhi::Format::RGBA8_UNORM;
+        // Uncompressed format - detect from bit count and flags
+        u32 bpp = header.ddspf.dwRGBBitCount;
+        u32 flags = header.ddspf.dwFlags;
+
+        // Detect format from bit depth and flags
+        if (flags & DDPF_ALPHA) {
+            // Alpha-only texture
+            if (bpp == 8) {
+                desc.format = nvrhi::Format::R8_UNORM;  // Use R8 for alpha
+            } else {
+                Msg("! [DDSLoader] Unsupported alpha format: %u bpp", bpp);
+                desc.format = nvrhi::Format::UNKNOWN;
+            }
+        } else if (flags & DDPF_LUMINANCE) {
+            // Luminance texture
+            if (bpp == 8) {
+                desc.format = nvrhi::Format::R8_UNORM;  // Luminance as R8
+            } else if (bpp == 16 && (flags & DDPF_ALPHAPIXELS)) {
+                desc.format = nvrhi::Format::RG8_UNORM;  // Luminance-Alpha as RG8
+            } else {
+                Msg("! [DDSLoader] Unsupported luminance format: %u bpp, flags=0x%X", bpp, flags);
+                desc.format = nvrhi::Format::UNKNOWN;
+            }
+        } else if (flags & DDPF_RGB) {
+            // RGB/RGBA texture
+            if (bpp == 8) {
+                desc.format = nvrhi::Format::R8_UNORM;
+            } else if (bpp == 16) {
+                if (flags & DDPF_ALPHAPIXELS) {
+                    desc.format = nvrhi::Format::RG8_UNORM;  // Assume RG8
+                } else {
+                    desc.format = nvrhi::Format::R16_UNORM;  // Or R16
+                }
+            } else if (bpp == 32) {
+                // Check channel masks to determine RGBA vs BGRA
+                if (header.ddspf.dwRBitMask == 0x000000ff &&
+                    header.ddspf.dwGBitMask == 0x0000ff00 &&
+                    header.ddspf.dwBBitMask == 0x00ff0000 &&
+                    header.ddspf.dwABitMask == 0xff000000) {
+                    desc.format = nvrhi::Format::RGBA8_UNORM;
+                } else if (header.ddspf.dwRBitMask == 0x00ff0000 &&
+                           header.ddspf.dwGBitMask == 0x0000ff00 &&
+                           header.ddspf.dwBBitMask == 0x000000ff &&
+                           header.ddspf.dwABitMask == 0xff000000) {
+                    desc.format = nvrhi::Format::BGRA8_UNORM;
+                } else {
+                    // Default to RGBA8
+                    desc.format = nvrhi::Format::RGBA8_UNORM;
+                }
+            } else {
+                Msg("! [DDSLoader] Unsupported RGB format: %u bpp", bpp);
+                desc.format = nvrhi::Format::UNKNOWN;
+            }
+        } else {
+            Msg("! [DDSLoader] Unknown uncompressed format: flags=0x%X, bpp=%u", flags, bpp);
+            desc.format = nvrhi::Format::UNKNOWN;
+        }
+
+        Msg("~ [DDSLoader] Format: Uncompressed (flags=0x%X, bpp=%u) → NVRHI=%d",
+            flags, bpp, (int)desc.format);
     }
 
     // Debug name
@@ -328,6 +391,12 @@ u32 DDSLoader::CalculateMipSize(u32 width, u32 height, u32 depth, nvrhi::Format 
             break;
 
         case nvrhi::Format::RG8_UNORM:
+            mipSize = w * h * 2;
+            break;
+
+        case nvrhi::Format::R16_UNORM:
+        case nvrhi::Format::R16_SNORM:
+        case nvrhi::Format::R16_FLOAT:
             mipSize = w * h * 2;
             break;
 
