@@ -36,6 +36,7 @@ struct TextureDesc {
     enum Type {
         Texture1D,
         Texture2D,
+        Texture2DArray,
         Texture3D,
         TextureCube
     };

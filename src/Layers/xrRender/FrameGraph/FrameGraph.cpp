@@ -805,7 +805,7 @@ void FrameGraph::AllocateResources() {
                         rmTexDesc.type = resources::TextureDesc::TextureCube;
                         break;
                     case ResourceDesc::Type::Texture2DArray:
-                        rmTexDesc.type = resources::TextureDesc::Texture2D;
+                        rmTexDesc.type = resources::TextureDesc::Texture2DArray;
                         break;
                     default:
                         rmTexDesc.type = resources::TextureDesc::Texture2D;
