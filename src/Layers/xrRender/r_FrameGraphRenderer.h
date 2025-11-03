@@ -54,6 +54,16 @@ private:
 
     framegraph::VirtualResourceHandle m_finalOutput;
 
+    framegraph::VirtualResourceHandle m_rt_Position;
+    framegraph::VirtualResourceHandle m_rt_Normal;
+    framegraph::VirtualResourceHandle m_rt_Albedo;
+    framegraph::VirtualResourceHandle m_rt_Depth;
+    framegraph::VirtualResourceHandle m_rt_Accumulator;
+    framegraph::VirtualResourceHandle m_rt_Generic_0;
+    framegraph::VirtualResourceHandle m_rt_Generic_1;
+    framegraph::VirtualResourceHandle m_rt_Generic_2;
+    framegraph::VirtualResourceHandle m_backbuffer;
+
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
@@ -67,7 +77,10 @@ private:
     Stats m_stats;
 
     void SetupFrame();
-    void BuildFrameGraph();
+
+    void BuildFrameGraphStructure();
+
+    void SetupFrameGraphPasses();
 
     void PresentToBackbuffer();
 

@@ -414,10 +414,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         executeEnd - executeStart
     ).count();
 
-    const auto& ctxStats = ctx.GetStats();
-    m_gbufferStats.numDrawCalls = ctxStats.numDrawCalls;
-    m_gbufferStats.numTriangles = 0;
-
     Msg("  ✓ G-Buffer pass complete: %u draws, %u tris, %.2f ms",
         m_gbufferStats.numDrawCalls,
         m_gbufferStats.numTriangles,

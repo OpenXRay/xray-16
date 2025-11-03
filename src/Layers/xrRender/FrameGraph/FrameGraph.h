@@ -51,6 +51,8 @@ public:
 
     void Execute();
 
+    void ResetForNextFrame();
+
     void Reset();
 
     nvrhi::ITexture* GetPhysicalTexture(VirtualResourceHandle handle) const;

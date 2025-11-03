@@ -243,6 +243,20 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
     return node->desc;
 }
 
+void FrameGraph::ResetForNextFrame() {
+    Msg("~ [FrameGraph] Resetting for next frame...");
+
+    m_sortedPasses.clear();
+    m_compiled = false;
+
+    m_stats.compileTimeMs = 0.0f;
+    m_stats.executeTimeMs = 0.0f;
+    m_stats.totalGPUTimeMs = 0.0f;
+    m_stats.passTimings.clear();
+
+    Msg("~ [FrameGraph] Ready for next frame");
+}
+
 void FrameGraph::Reset() {
     if (m_resourceManager) {
         resources::TextureManager* texManager = m_resourceManager->GetTextureManager();

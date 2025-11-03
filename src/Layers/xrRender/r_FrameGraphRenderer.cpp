@@ -59,6 +59,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         return false;
     }
 
+    BuildFrameGraphStructure();
+
     Msg("  ✓ FrameGraphRenderer initialized");
 
     return true;
@@ -91,7 +93,7 @@ void FrameGraphRenderer::Render() {
 
     SetupFrame();
 
-    BuildFrameGraph();
+    SetupFrameGraphPasses();
 
     m_framegraph->Compile();
 
@@ -112,7 +114,7 @@ void FrameGraphRenderer::Render() {
     m_stats.numDrawCalls = m_gbufferPass->GetGBufferStats().numDrawCalls;
     m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
 
-    m_framegraph->Reset();
+    m_framegraph->ResetForNextFrame();
 }
 
 void FrameGraphRenderer::SetupFrame() {
@@ -145,53 +147,49 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
     return m_framegraph->CreateTexture(name, desc);
 }
 
-void FrameGraphRenderer::BuildFrameGraph() {
+void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets...");
 
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    auto rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);
-    auto rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);
-    auto rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);
-    auto rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);
+    m_rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);
+    m_rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);
+    m_rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);
+    m_rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);
 
-    auto rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
+    m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
 
-    auto rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);
-    auto rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);
-    auto rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);
+    m_rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);
+    m_rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);
+    m_rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);
 
-    auto backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);
+    m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);
 
     Msg("  ✓ Created %d vanilla render targets", 8);
 
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
 
-    CreateAllRequiredPasses();
-
-    RouteBatchesToPasses();
-
     Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
 
-    registry.RegisterRT("rt_Position", rt_Position);
-    registry.RegisterAliases(rt_Position, {
+    registry.RegisterRT("rt_Position", m_rt_Position);
+    registry.RegisterAliases(m_rt_Position, {
         "$user$position",
         "s_position"
     });
 
-    registry.RegisterRT("rt_Normal", rt_Normal);
-    registry.RegisterAliases(rt_Normal, {
+    registry.RegisterRT("rt_Normal", m_rt_Normal);
+    registry.RegisterAliases(m_rt_Normal, {
         "s_normal",
         "s_nmap"
     });
 
-    registry.RegisterRT("rt_Albedo", rt_Albedo);
-    registry.RegisterRT("rt_Color", rt_Albedo);
-    registry.RegisterAliases(rt_Albedo, {
+    registry.RegisterRT("rt_Albedo", m_rt_Albedo);
+    registry.RegisterRT("rt_Color", m_rt_Albedo);
+    registry.RegisterAliases(m_rt_Albedo, {
         "$user$albedo",
         "s_albedo",
         "s_diffuse",
@@ -199,37 +197,37 @@ void FrameGraphRenderer::BuildFrameGraph() {
         "s_base"
     });
 
-    registry.RegisterRT("rt_Depth", rt_Depth);
-    registry.RegisterAliases(rt_Depth, {
+    registry.RegisterRT("rt_Depth", m_rt_Depth);
+    registry.RegisterAliases(m_rt_Depth, {
         "$user$base_depth",
         "s_depth"
     });
 
-    registry.RegisterRT("rt_Accumulator", rt_Accumulator);
-    registry.RegisterAliases(rt_Accumulator, {
+    registry.RegisterRT("rt_Accumulator", m_rt_Accumulator);
+    registry.RegisterAliases(m_rt_Accumulator, {
         "s_accumulator",
         "s_acc"
     });
 
-    registry.RegisterRT("rt_Generic_0", rt_Generic_0);
-    registry.RegisterAliases(rt_Generic_0, {
+    registry.RegisterRT("rt_Generic_0", m_rt_Generic_0);
+    registry.RegisterAliases(m_rt_Generic_0, {
         "$user$generic0",
         "s_generic0"
     });
 
-    registry.RegisterRT("rt_Generic_1", rt_Generic_1);
-    registry.RegisterAliases(rt_Generic_1, {
+    registry.RegisterRT("rt_Generic_1", m_rt_Generic_1);
+    registry.RegisterAliases(m_rt_Generic_1, {
         "$user$generic1",
         "s_generic1"
     });
 
-    registry.RegisterRT("rt_Generic_2", rt_Generic_2);
-    registry.RegisterAliases(rt_Generic_2, {
+    registry.RegisterRT("rt_Generic_2", m_rt_Generic_2);
+    registry.RegisterAliases(m_rt_Generic_2, {
         "s_generic2"
     });
 
-    registry.RegisterRT("rt_Backbuffer", backbuffer);
-    registry.RegisterAliases(backbuffer, {
+    registry.RegisterRT("rt_Backbuffer", m_backbuffer);
+    registry.RegisterAliases(m_backbuffer, {
         "s_backbuffer",
         "s_screen"
     });
@@ -242,6 +240,14 @@ void FrameGraphRenderer::BuildFrameGraph() {
     registry.PrintRegistry();
 
     m_finalOutput = gbufferOutputs.albedo;
+}
+
+void FrameGraphRenderer::SetupFrameGraphPasses() {
+
+    CreateAllRequiredPasses();
+
+    RouteBatchesToPasses();
+
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -355,10 +361,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     ID3D11Buffer* d3dVB = geom->vb;
     ID3D11Buffer* d3dIB = geom->ib;
-
-    Msg("! [ProcessVisualGeometry] Visual '%s': D3D VB=%p, IB=%p, vBase=%d, iBase=%d, vCount=%d, iCount=%d",
-        visual->dbg_name.c_str(), d3dVB, d3dIB,
-        meshVisual->vBase, meshVisual->iBase, meshVisual->vCount, meshVisual->iCount);
 
     nvrhi::BufferHandle nvrhiVB;
     auto vbIt = m_bufferHandleCache.find(d3dVB);
@@ -500,7 +502,14 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 noGeometry_static = 0;
     u32 noBuffers_static = 0;
 
+    u32 culledStatic = 0;
+
     for (dxRender_Visual* visual : staticVisuals) {
+        if (!frustum.testSphere_dirty(visual->vis.sphere.P, visual->vis.sphere.R)) {
+            culledStatic++;
+            continue;
+        }
+
         Fmatrix xform;
         switch (visual->getType())
         {

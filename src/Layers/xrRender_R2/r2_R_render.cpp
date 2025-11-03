@@ -90,6 +90,21 @@ void CRender::Render()
 #endif
     PIX_EVENT(CRender_Render);
 
+#ifdef USE_DX11
+    if (ps_r4_use_framegraph && m_framegraphRenderer)
+    {
+        if (!m_framegraphRenderer->IsEnabled())
+            m_framegraphRenderer->SetEnabled(true);
+
+        m_framegraphRenderer->Render();
+        return;
+    }
+    else if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
+    {
+        m_framegraphRenderer->SetEnabled(false);
+    }
+#endif
+
     g_r = 1;
 
     rmNormal(RCache);
@@ -106,17 +121,6 @@ void CRender::Render()
     }
 
 #if defined(USE_DX11) && RENDER == R_R4
-    if (ps_r4_use_framegraph && m_framegraphRenderer)
-    {
-        m_framegraphRenderer->SetEnabled(true);
-        m_framegraphRenderer->Render();
-        return;
-    }
-    else if (m_framegraphRenderer)
-    {
-        m_framegraphRenderer->SetEnabled(false);
-    }
-
     if (m_nvrhiTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
     {
         TestNVRHI_Render();
