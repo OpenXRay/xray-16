@@ -551,11 +551,8 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         executeEnd - executeStart
     ).count();
 
-    // Copy from RenderContext stats
-    const auto& ctxStats = ctx.GetStats();
-    m_gbufferStats.numDrawCalls = ctxStats.numDrawCalls;
-    // Note: numTriangles not in RenderStats yet
-    m_gbufferStats.numTriangles = 0;
+    // Stats are already accumulated in the draw loop (lines 532-533)
+    // Do NOT overwrite them here!
 
     Msg("  ✓ G-Buffer pass complete: %u draws, %u tris, %.2f ms",
         m_gbufferStats.numDrawCalls,

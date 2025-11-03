@@ -67,6 +67,14 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         return false;
     }
 
+    // ═══════════════════════════════════════════════════════
+    //  BUILD FRAMEGRAPH STRUCTURE (ONCE)
+    // ═══════════════════════════════════════════════════════
+    // Create all vanilla RTs and register them once at startup
+    // Passes will be set up per-frame (dynamic routing in Week 16)
+
+    BuildFrameGraphStructure();
+
     Msg("  ✓ FrameGraphRenderer initialized");
 
     return true;
@@ -99,16 +107,16 @@ void FrameGraphRenderer::Render() {
     auto frameStart = std::chrono::high_resolution_clock::now();
 
     // ═══════════════════════════════════════════════════════
-    //  SETUP FRAME
+    //  SETUP FRAME (PER-FRAME: Collect geometry)
     // ═══════════════════════════════════════════════════════
 
     SetupFrame();
 
     // ═══════════════════════════════════════════════════════
-    //  BUILD FRAMEGRAPH
+    //  SETUP PASSES (PER-FRAME: Route geometry to passes)
     // ═══════════════════════════════════════════════════════
 
-    BuildFrameGraph();
+    SetupFrameGraphPasses();
 
     // ═══════════════════════════════════════════════════════
     //  COMPILE & EXECUTE
@@ -142,8 +150,8 @@ void FrameGraphRenderer::Render() {
     m_stats.numDrawCalls = m_gbufferPass->GetGBufferStats().numDrawCalls;
     m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
 
-    // Reset for next frame
-    m_framegraph->Reset();
+    // Reset per-frame state for next frame (keeps structure: RTs, passes, registry)
+    m_framegraph->ResetForNextFrame();
 }
 
 void FrameGraphRenderer::SetupFrame() {
@@ -184,12 +192,16 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
     return m_framegraph->CreateTexture(name, desc);
 }
 
-void FrameGraphRenderer::BuildFrameGraph() {
+// ═══════════════════════════════════════════════════════
+//  BUILD FRAMEGRAPH STRUCTURE (CALLED ONCE IN INITIALIZE)
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::BuildFrameGraphStructure() {
     // ═══════════════════════════════════════════════════════
-    //  STEP 1: CREATE ALL VANILLA X-RAY RENDER TARGETS
+    //  CREATE ALL VANILLA X-RAY RENDER TARGETS (ONCE)
     // ═══════════════════════════════════════════════════════
     // Week 14: Create all vanilla RTs that X-Ray shaders expect
-    // These are created BEFORE passes, so shader reflection can route to them
+    // These are created ONCE at startup and persist across frames
 
     Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets...");
 
@@ -197,47 +209,31 @@ void FrameGraphRenderer::BuildFrameGraph() {
     u32 h = Device.dwHeight;
 
     // ─── G-Buffer Targets (Deferred Geometry Phase) ───
-    auto rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);   // r2_RT_P
-    auto rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);       // r2_RT_N
-    auto rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);        // r2_RT_albedo
-    auto rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);          // r2_RT_base_depth
+    m_rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);   // r2_RT_P
+    m_rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);       // r2_RT_N
+    m_rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);        // r2_RT_albedo
+    m_rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);          // r2_RT_base_depth
 
     // ─── Lighting Targets ───
-    auto rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
+    m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
 
     // ─── Post-Processing Targets ───
-    auto rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic0
-    auto rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic1
-    auto rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);      // r2_RT_generic2 (HDR)
+    m_rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic0
+    m_rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic1
+    m_rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);      // r2_RT_generic2 (HDR)
 
-    auto backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);     // TODO: Get from Device
+    m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);     // TODO: Get from Device
 
     Msg("  ✓ Created %d vanilla render targets", 8);  // Position, Normal, Albedo, Depth, Accumulator, Generic0/1/2
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 2: SETUP PASSES (they will use vanilla RTs)
+    //  SETUP PASSES (ONCE) - PROTOTYPE FOR NOW
     // ═══════════════════════════════════════════════════════
+    // NOTE: This creates prototype GBuffer pass with its own RTs
+    // Week 15-16 will make this dynamic and use vanilla RTs
 
-    // G-Buffer pass - Setup creates PROTOTYPE render targets (will be replaced with vanilla RTs in Week 15-16)
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
-
-    // ═══════════════════════════════════════════════════════
-    //  STEP 2: DYNAMIC PASS ROUTING (Week 16)
-    // ═══════════════════════════════════════════════════════
-    // Now that render targets exist, we can scan materials and create PSOs
-
-    // Scan materials and create required passes
-    CreateAllRequiredPasses();
-
-    // Route batches to appropriate passes
-    RouteBatchesToPasses();
-
-    // Lighting pass
-    //auto lightingOutput = m_lightingPass->Setup(*m_framegraph, gbufferOutputs);
-
-     //Tonemap pass
-    //m_tonemapPass->Setup(*m_framegraph, lightingOutput.hdrColor, backbuffer);
 
     // ═══════════════════════════════════════════════════════
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
@@ -249,23 +245,23 @@ void FrameGraphRenderer::BuildFrameGraph() {
     // ─── VANILLA G-BUFFER TARGETS ───
 
     // rt_Position (r2_RT_P) - World space position
-    registry.RegisterRT("rt_Position", rt_Position);
-    registry.RegisterAliases(rt_Position, {
+    registry.RegisterRT("rt_Position", m_rt_Position);
+    registry.RegisterAliases(m_rt_Position, {
         "$user$position",  // Shader output target name
         "s_position"       // Shader input sampler name
     });
 
     // rt_Normal (r2_RT_N) - View space normal
-    registry.RegisterRT("rt_Normal", rt_Normal);
-    registry.RegisterAliases(rt_Normal, {
+    registry.RegisterRT("rt_Normal", m_rt_Normal);
+    registry.RegisterAliases(m_rt_Normal, {
         "s_normal",
         "s_nmap"
     });
 
     // rt_Albedo (r2_RT_albedo) - Diffuse color
-    registry.RegisterRT("rt_Albedo", rt_Albedo);
-    registry.RegisterRT("rt_Color", rt_Albedo);  // Legacy alias
-    registry.RegisterAliases(rt_Albedo, {
+    registry.RegisterRT("rt_Albedo", m_rt_Albedo);
+    registry.RegisterRT("rt_Color", m_rt_Albedo);  // Legacy alias
+    registry.RegisterAliases(m_rt_Albedo, {
         "$user$albedo",    // Shader output target name
         "s_albedo",        // Shader input sampler name
         "s_diffuse",
@@ -274,8 +270,8 @@ void FrameGraphRenderer::BuildFrameGraph() {
     });
 
     // rt_Depth (r2_RT_base_depth) - Depth/stencil
-    registry.RegisterRT("rt_Depth", rt_Depth);
-    registry.RegisterAliases(rt_Depth, {
+    registry.RegisterRT("rt_Depth", m_rt_Depth);
+    registry.RegisterAliases(m_rt_Depth, {
         "$user$base_depth",  // Shader output target name
         "s_depth"            // Shader input sampler name
     });
@@ -283,8 +279,8 @@ void FrameGraphRenderer::BuildFrameGraph() {
     // ─── VANILLA LIGHTING TARGETS ───
 
     // rt_Accumulator (r2_RT_accum) - HDR lighting accumulation
-    registry.RegisterRT("rt_Accumulator", rt_Accumulator);
-    registry.RegisterAliases(rt_Accumulator, {
+    registry.RegisterRT("rt_Accumulator", m_rt_Accumulator);
+    registry.RegisterAliases(m_rt_Accumulator, {
         "s_accumulator",
         "s_acc"
     });
@@ -292,27 +288,27 @@ void FrameGraphRenderer::BuildFrameGraph() {
     // ─── VANILLA POST-PROCESSING TARGETS ───
 
     // rt_Generic_0/1/2 (r2_RT_generic0/1/2) - Generic targets for combine/post-processing
-    registry.RegisterRT("rt_Generic_0", rt_Generic_0);
-    registry.RegisterAliases(rt_Generic_0, {
+    registry.RegisterRT("rt_Generic_0", m_rt_Generic_0);
+    registry.RegisterAliases(m_rt_Generic_0, {
         "$user$generic0",  // Shader output target name
         "s_generic0"       // Shader input sampler name
     });
 
-    registry.RegisterRT("rt_Generic_1", rt_Generic_1);
-    registry.RegisterAliases(rt_Generic_1, {
+    registry.RegisterRT("rt_Generic_1", m_rt_Generic_1);
+    registry.RegisterAliases(m_rt_Generic_1, {
         "$user$generic1",  // Shader output target name
         "s_generic1"       // Shader input sampler name
     });
 
-    registry.RegisterRT("rt_Generic_2", rt_Generic_2);
-    registry.RegisterAliases(rt_Generic_2, {
+    registry.RegisterRT("rt_Generic_2", m_rt_Generic_2);
+    registry.RegisterAliases(m_rt_Generic_2, {
         "s_generic2"
     });
 
     // ─── BACKBUFFER ───
 
-    registry.RegisterRT("rt_Backbuffer", backbuffer);
-    registry.RegisterAliases(backbuffer, {
+    registry.RegisterRT("rt_Backbuffer", m_backbuffer);
+    registry.RegisterAliases(m_backbuffer, {
         "s_backbuffer",
         "s_screen"
     });
@@ -330,6 +326,26 @@ void FrameGraphRenderer::BuildFrameGraph() {
 
     // Store final output for presenting to backbuffer (use prototype for now)
     m_finalOutput = gbufferOutputs.albedo;
+}
+
+// ═══════════════════════════════════════════════════════
+//  SETUP FRAMEGRAPH PASSES (CALLED PER-FRAME)
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::SetupFrameGraphPasses() {
+    // ═══════════════════════════════════════════════════════
+    //  DYNAMIC PASS ROUTING (Week 16)
+    // ═══════════════════════════════════════════════════════
+    // Scan materials and route batches to appropriate passes
+
+    // Scan materials and create required passes
+    CreateAllRequiredPasses();
+
+    // Route batches to appropriate passes
+    RouteBatchesToPasses();
+
+    // TODO: Week 15-16 will add dynamic pass creation here
+    // For now, we just route to existing GBufferPass
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -465,9 +481,9 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     ID3D11Buffer* d3dVB = geom->vb;
     ID3D11Buffer* d3dIB = geom->ib;
 
-    Msg("! [ProcessVisualGeometry] Visual '%s': D3D VB=%p, IB=%p, vBase=%d, iBase=%d, vCount=%d, iCount=%d",
-        visual->dbg_name.c_str(), d3dVB, d3dIB,
-        meshVisual->vBase, meshVisual->iBase, meshVisual->vCount, meshVisual->iCount);
+    //Msg("! [ProcessVisualGeometry] Visual '%s': D3D VB=%p, IB=%p, vBase=%d, iBase=%d, vCount=%d, iCount=%d",
+    //    visual->dbg_name.c_str(), d3dVB, d3dIB,
+    //    meshVisual->vBase, meshVisual->iBase, meshVisual->vCount, meshVisual->iCount);
 
     // Get or create vertex buffer handle
     nvrhi::BufferHandle nvrhiVB;
@@ -649,7 +665,18 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 noGeometry_static = 0;
     u32 noBuffers_static = 0;
 
+    u32 culledStatic = 0;
+
     for (dxRender_Visual* visual : staticVisuals) {
+        // ═══════════════════════════════════════════════════════
+        //  FRUSTUM CULLING FOR STATIC GEOMETRY
+        // ═══════════════════════════════════════════════════════
+        // Use visual's bounding sphere for culling
+        if (!frustum.testSphere_dirty(visual->vis.sphere.P, visual->vis.sphere.R)) {
+            culledStatic++;
+            continue;  // Outside frustum, skip this visual
+        }
+
         Fmatrix xform;
         switch (visual->getType())
         {

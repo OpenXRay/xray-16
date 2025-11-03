@@ -303,6 +303,36 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 //  RESET
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
+// ════════════════════════════════════════════════════════════
+//  RESET FOR NEXT FRAME (KEEPS STRUCTURE)
+// ════════════════════════════════════════════════════════════
+
+void FrameGraph::ResetForNextFrame() {
+    Msg("~ [FrameGraph] Resetting for next frame...");
+
+    // Only clear per-frame execution state:
+    // - Sorted passes (recomputed each frame)
+    // - Compiled flag (allows recompilation)
+    // - Statistics (per-frame metrics)
+
+    m_sortedPasses.clear();
+    m_compiled = false;
+
+    // Reset per-frame statistics
+    m_stats.compileTimeMs = 0.0f;
+    m_stats.executeTimeMs = 0.0f;
+    m_stats.totalGPUTimeMs = 0.0f;
+    m_stats.passTimings.clear();
+
+    // Keep: m_resources, m_passes, m_rtRegistry (persistent structure)
+
+    Msg("~ [FrameGraph] Ready for next frame");
+}
+
+// ════════════════════════════════════════════════════════════
+//  FULL RESET (CLEARS EVERYTHING INCLUDING STRUCTURE)
+// ════════════════════════════════════════════════════════════
+
 void FrameGraph::Reset() {
     // Release ResourceManager handles first (before resetting pool)
     if (m_resourceManager) {

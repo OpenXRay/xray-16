@@ -79,6 +79,10 @@ public:
     //  RESET (FOR NEXT FRAME)
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
+    // Reset per-frame execution state (keeps structure: RTs, passes, registry)
+    void ResetForNextFrame();
+
+    // Full reset - clears everything including structure
     void Reset();
 
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

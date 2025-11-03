@@ -68,6 +68,17 @@ private:
     // Final output texture (for copying to backbuffer)
     framegraph::VirtualResourceHandle m_finalOutput;
 
+    // Vanilla RT handles (created once in BuildFrameGraphStructure)
+    framegraph::VirtualResourceHandle m_rt_Position;
+    framegraph::VirtualResourceHandle m_rt_Normal;
+    framegraph::VirtualResourceHandle m_rt_Albedo;
+    framegraph::VirtualResourceHandle m_rt_Depth;
+    framegraph::VirtualResourceHandle m_rt_Accumulator;
+    framegraph::VirtualResourceHandle m_rt_Generic_0;
+    framegraph::VirtualResourceHandle m_rt_Generic_1;
+    framegraph::VirtualResourceHandle m_rt_Generic_2;
+    framegraph::VirtualResourceHandle m_backbuffer;
+
     // Passes
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
@@ -87,7 +98,12 @@ private:
 
     // Frame setup
     void SetupFrame();
-    void BuildFrameGraph();
+
+    // FrameGraph structure (called once in Initialize)
+    void BuildFrameGraphStructure();
+
+    // FrameGraph passes (called per-frame in Render)
+    void SetupFrameGraphPasses();
 
     // Copy final output to game backbuffer
     void PresentToBackbuffer();
