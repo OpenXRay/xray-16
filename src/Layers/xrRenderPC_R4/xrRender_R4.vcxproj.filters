@@ -776,6 +776,15 @@
     <ClInclude Include="..\xrRender\ResourceManager\TextureStreaming.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\BufferManager.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\SamplerCache.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\ModernResourceManager.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1411,6 +1420,15 @@
       <Filter>ResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager\TextureStreaming.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\BufferManager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\SamplerCache.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\ModernResourceManager.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
   </ItemGroup>

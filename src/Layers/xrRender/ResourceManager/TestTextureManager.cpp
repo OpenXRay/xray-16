@@ -119,6 +119,9 @@ bool Test_HandleValidation() {
     staleHandle.generation += 1;  // Corrupt generation
     TEST_ASSERT(!texManager.IsResident(staleHandle), "Stale handle should be invalid");
 
+    // Clean up
+    texManager.Release(validHandle);
+
     TEST_PASS();
 }
 
@@ -221,6 +224,10 @@ bool Test_TextureDeduplication() {
     TEST_ASSERT(meta != nullptr, "Metadata should exist");
     TEST_ASSERT(meta->refCount == 2, "Reference count should be 2");
 
+    // Clean up
+    texManager.Release(handle1);
+    texManager.Release(handle2);
+
     TEST_PASS();
 }
 
@@ -248,6 +255,9 @@ bool Test_ReferenceCounting() {
 
     texManager.Release(handle);
     TEST_ASSERT(meta->refCount == 1, "refCount should be 1 after second Release");
+
+    // Clean up - release the original reference
+    texManager.Release(handle);
 
     TEST_PASS();
 }
