@@ -63,6 +63,27 @@ public:
     const TextureDesc* GetTextureDesc(TextureHandle handle);
     bool IsTextureValid(TextureHandle handle) const;
 
+    void UploadTextureData(
+        TextureHandle handle,
+        u32 arraySlice,
+        u32 mipLevel,
+        const void* data,
+        size_t dataSize
+    );
+
+    struct TextureSliceData {
+        u32 arraySlice;
+        u32 mipLevel;
+        const void* data;
+        size_t dataSize;
+    };
+
+    void UploadTextureData(
+        TextureHandle handle,
+        const TextureSliceData* slices,
+        u32 sliceCount
+    );
+
     struct BufferDesc {
         u64 byteSize = 0;
         u32 structStride = 0;

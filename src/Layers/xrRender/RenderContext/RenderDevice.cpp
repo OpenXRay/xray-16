@@ -179,6 +179,93 @@ bool RenderDevice::IsTextureValid(TextureHandle handle) const {
     return ValidateTextureHandle(handle);
 }
 
+void RenderDevice::UploadTextureData(
+    TextureHandle handle,
+    u32 arraySlice,
+    u32 mipLevel,
+    const void* data,
+    size_t dataSize
+) {
+    if (!ValidateTextureHandle(handle)) {
+        Msg("! [RenderDevice] UploadTextureData: Invalid texture handle");
+        return;
+    }
+
+    TextureInfo& info = m_textures[handle.index];
+    nvrhi::ITexture* nvrhiTexture = info.nvrhiHandle;
+
+    if (!nvrhiTexture) {
+        Msg("! [RenderDevice] UploadTextureData: Texture has no NVRHI handle");
+        return;
+    }
+
+    nvrhi::ICommandList* cmdList = GetNativeDevice()->createCommandList();
+    cmdList->open();
+
+    const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
+    u32 mipWidth = (info.desc.width >> mipLevel) > 0 ? (info.desc.width >> mipLevel) : 1;
+
+    u32 rowPitch;
+    if (formatInfo.blockSize > 1) {
+        rowPitch = ((mipWidth + 3) / 4) * formatInfo.bytesPerBlock;
+    } else {
+        rowPitch = mipWidth * formatInfo.bytesPerBlock;
+    }
+
+    cmdList->writeTexture(nvrhiTexture, arraySlice, mipLevel, data, rowPitch);
+
+    cmdList->close();
+    GetNativeDevice()->executeCommandList(cmdList);
+}
+
+void RenderDevice::UploadTextureData(
+    TextureHandle handle,
+    const TextureSliceData* slices,
+    u32 sliceCount
+) {
+    if (!ValidateTextureHandle(handle)) {
+        Msg("! [RenderDevice] UploadTextureData: Invalid texture handle");
+        return;
+    }
+
+    if (!slices || sliceCount == 0) {
+        return;
+    }
+
+    TextureInfo& info = m_textures[handle.index];
+    nvrhi::ITexture* nvrhiTexture = info.nvrhiHandle;
+
+    if (!nvrhiTexture) {
+        Msg("! [RenderDevice] UploadTextureData: Texture has no NVRHI handle");
+        return;
+    }
+
+    nvrhi::ICommandList* cmdList = GetNativeDevice()->createCommandList();
+    cmdList->open();
+
+    const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
+
+    for (u32 i = 0; i < sliceCount; ++i) {
+        const TextureSliceData& slice = slices[i];
+
+        u32 mipWidth = (info.desc.width >> slice.mipLevel) > 0 ?
+                       (info.desc.width >> slice.mipLevel) : 1;
+
+        u32 rowPitch;
+        if (formatInfo.blockSize > 1) {
+            rowPitch = ((mipWidth + 3) / 4) * formatInfo.bytesPerBlock;
+        } else {
+            rowPitch = mipWidth * formatInfo.bytesPerBlock;
+        }
+
+        cmdList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
+                             slice.data, rowPitch);
+    }
+
+    cmdList->close();
+    GetNativeDevice()->executeCommandList(cmdList);
+}
+
 BufferHandle RenderDevice::CreateBuffer(
     const BufferDesc& desc,
     const void* initialData) {

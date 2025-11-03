@@ -770,6 +770,9 @@
     <ClInclude Include="..\xrRender\ResourceManager\TextureManager.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\TestTextureManager.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

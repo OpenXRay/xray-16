@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TextureManager.h"
+#include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
 
 namespace xray::render::resources {
@@ -216,6 +217,8 @@ TextureHandle TextureManager::LoadTexture(
 
     m_stats.texturesTotal++;
 
+    LoadTextureSync(handle);
+
     return handle;
 }
 
@@ -335,7 +338,14 @@ void TextureManager::Release(TextureHandle handle) {
         meta.refCount--;
     }
 
-    if (meta.refCount == 0 && meta.priority >= TexturePriority::Low) {
+    if (meta.refCount == 0) {
+        if (meta.nvrhiTexture) {
+            m_memoryUsed -= meta.memoryUsed;
+            meta.nvrhiTexture = nullptr;
+            meta.memoryUsed = 0;
+        }
+
+        FreeHandle(handle);
     }
 }
 
@@ -359,6 +369,89 @@ void TextureManager::Update(float deltaTime) {
 }
 
 void TextureManager::LoadTextureSync(TextureHandle handle) {
+    if (!ValidateHandle(handle)) {
+        Msg("! [TextureManager] LoadTextureSync: Invalid handle");
+        return;
+    }
+
+    TextureMetadata& meta = m_textures[handle.index];
+
+    if (meta.state == TextureState::Resident) {
+        return;
+    }
+
+    meta.state = TextureState::Loading;
+
+    DDSData ddsData;
+    if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
+        Msg("! [TextureManager] Failed to load DDS: %s", meta.filePath.c_str());
+        meta.state = TextureState::Unloaded;
+        return;
+    }
+
+    ng::RenderDevice::TextureDesc deviceDesc;
+    deviceDesc.width = ddsData.desc.width;
+    deviceDesc.height = ddsData.desc.height;
+    deviceDesc.depth = ddsData.desc.depth;
+    deviceDesc.arraySize = ddsData.desc.arraySize;
+    deviceDesc.mipLevels = ddsData.desc.mipLevels;
+    deviceDesc.format = ddsData.desc.format;
+    deviceDesc.debugName = meta.filePath;
+
+    switch (ddsData.desc.type) {
+        case TextureDesc::Texture1D:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture1D;
+            break;
+        case TextureDesc::Texture2D:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+            break;
+        case TextureDesc::Texture3D:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture3D;
+            break;
+        case TextureDesc::TextureCube:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+            break;
+    }
+
+    ng::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
+    if (!deviceHandle.IsValid()) {
+        Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
+        meta.state = TextureState::Unloaded;
+        return;
+    }
+
+    xr_vector<ng::RenderDevice::TextureSliceData> slices;
+    slices.reserve(ddsData.mipLevels.size());
+
+    for (const DDSMipLevel& mip : ddsData.mipLevels) {
+        ng::RenderDevice::TextureSliceData slice;
+
+        u32 totalMips = ddsData.desc.mipLevels;
+        u32 mipIndex = (u32)(&mip - &ddsData.mipLevels[0]);
+
+        slice.arraySlice = mipIndex / totalMips;
+        slice.mipLevel = mipIndex % totalMips;
+        slice.data = mip.data;
+        slice.dataSize = mip.size;
+
+        slices.push_back(slice);
+    }
+
+    m_device->UploadTextureData(deviceHandle, slices.data(), (u32)slices.size());
+
+    meta.nvrhiTexture = m_device->GetNativeTexture(deviceHandle);
+
+    meta.state = TextureState::Resident;
+    meta.residentMips = ddsData.desc.mipLevels;
+    meta.totalMips = ddsData.desc.mipLevels;
+    meta.requestedMips = ddsData.desc.mipLevels;
+    meta.memoryUsed = ddsData.totalDataSize;
+
+    m_memoryUsed += meta.memoryUsed;
+
+    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu)",
+        meta.filePath.c_str(), meta.residentMips, meta.memoryUsed,
+        m_memoryUsed, m_memoryBudget);
 }
 
 void TextureManager::LoadTextureAsync(TextureHandle handle) {
