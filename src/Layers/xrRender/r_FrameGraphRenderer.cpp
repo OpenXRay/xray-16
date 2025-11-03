@@ -458,7 +458,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             case MT_NORMAL:
             default:
                 xform = Fidentity;
-                break;
+                continue;
         }
 
         if (ProcessVisualGeometry(visual, xform)) {

@@ -30,6 +30,8 @@ public:
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsEnabled() const { return m_enabled; }
 
+    ng::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
+
     struct Stats {
         float totalFrameMs = 0.0f;
         float gbufferMs = 0.0f;
