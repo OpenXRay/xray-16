@@ -517,11 +517,11 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             nvrhi::IBuffer* vb = batch->vertexBuffer.Get();
             nvrhi::IBuffer* ib = batch->indexBuffer.Get();
 
-            Msg("! [GBufferPass] Draw %u: VB=%p (size=%u, stride from PSO), IB=%p (size=%u), indexCount=%u, startIndex=%u, baseVertex=%d",
-                m_gbufferStats.numDrawCalls,
-                vb, vb ? vb->getDesc().byteSize : 0,
-                ib, ib ? ib->getDesc().byteSize : 0,
-                batch->indexCount, batch->startIndex, batch->baseVertex);
+            //Msg("! [GBufferPass] Draw %u: VB=%p (size=%u, stride from PSO), IB=%p (size=%u), indexCount=%u, startIndex=%u, baseVertex=%d",
+            //    m_gbufferStats.numDrawCalls,
+            //    vb, vb ? vb->getDesc().byteSize : 0,
+            //    ib, ib ? ib->getDesc().byteSize : 0,
+            //    batch->indexCount, batch->startIndex, batch->baseVertex);
 
             ctx.SetVertexBuffer(0, vb, 0);
             ctx.SetIndexBuffer(ib, nvrhi::Format::R16_UINT, 0);  // X-Ray uses 16-bit indices

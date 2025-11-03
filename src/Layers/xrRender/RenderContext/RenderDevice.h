@@ -81,6 +81,30 @@ public:
     const TextureDesc* GetTextureDesc(TextureHandle handle);
     bool IsTextureValid(TextureHandle handle) const;
 
+    // Upload texture data (for streaming/loading)
+    // Uploads data to specific mip level and array slice
+    void UploadTextureData(
+        TextureHandle handle,
+        u32 arraySlice,
+        u32 mipLevel,
+        const void* data,
+        size_t dataSize
+    );
+
+    // Upload multiple mip levels at once (more efficient)
+    struct TextureSliceData {
+        u32 arraySlice;
+        u32 mipLevel;
+        const void* data;
+        size_t dataSize;
+    };
+
+    void UploadTextureData(
+        TextureHandle handle,
+        const TextureSliceData* slices,
+        u32 sliceCount
+    );
+
     // ═══════════════════════════════════════════════════
     //  BUFFER CREATION
     // ═══════════════════════════════════════════════════

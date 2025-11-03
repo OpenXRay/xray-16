@@ -181,6 +181,7 @@
     <ClInclude Include="..\xrRender\ResourceManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\DDSLoader.h" />
     <ClInclude Include="..\xrRender\ResourceManager\ResourceHandle.h" />
+    <ClInclude Include="..\xrRender\ResourceManager\TestTextureManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\TextureManager.h" />
     <ClInclude Include="..\xrRender\R_Backend.h" />
     <ClInclude Include="..\xrRender\R_Backend_hemi.h" />

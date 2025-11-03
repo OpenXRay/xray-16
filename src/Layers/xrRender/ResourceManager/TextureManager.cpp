@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "TextureManager.h"
+#include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
 
 // Modern Texture Manager Implementation
-// Week 1 - Day 1: Task 1.4
+// Week 1 - Day 1-2: Tasks 1.4, 2.2
 
 namespace xray::render::resources {
 
@@ -250,10 +251,11 @@ TextureHandle TextureManager::LoadTexture(
     Msg("! [TextureManager] Registered texture: %s (handle=%u.%u)",
         path, handle.index, handle.generation);
 
-    // TODO: Kick off async load (Week 3)
-    // For Week 1, we'll implement LoadTextureSync in Day 2
-
     m_stats.texturesTotal++;
+
+    // Load synchronously (Week 1)
+    // Week 3 will add async loading
+    LoadTextureSync(handle);
 
     return handle;
 }
@@ -396,9 +398,17 @@ void TextureManager::Release(TextureHandle handle) {
         meta.refCount--;
     }
 
-    // If no more references and not high priority, consider evicting
-    if (meta.refCount == 0 && meta.priority >= TexturePriority::Low) {
-        // Mark as evictable (will be handled by Update() in Week 2)
+    // If no more references, free the handle immediately
+    if (meta.refCount == 0) {
+        // Release GPU resources
+        if (meta.nvrhiTexture) {
+            m_memoryUsed -= meta.memoryUsed;
+            meta.nvrhiTexture = nullptr;
+            meta.memoryUsed = 0;
+        }
+
+        // Free the handle slot for reuse
+        FreeHandle(handle);
     }
 }
 
@@ -433,7 +443,102 @@ void TextureManager::Update(float deltaTime) {
 // ═══════════════════════════════════════════════════
 
 void TextureManager::LoadTextureSync(TextureHandle handle) {
-    // TODO: Implement in Day 2
+    if (!ValidateHandle(handle)) {
+        Msg("! [TextureManager] LoadTextureSync: Invalid handle");
+        return;
+    }
+
+    TextureMetadata& meta = m_textures[handle.index];
+
+    // Already loaded?
+    if (meta.state == TextureState::Resident) {
+        return;
+    }
+
+    // Mark as loading
+    meta.state = TextureState::Loading;
+
+    // Load DDS file from disk
+    DDSData ddsData;
+    if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
+        Msg("! [TextureManager] Failed to load DDS: %s", meta.filePath.c_str());
+        meta.state = TextureState::Unloaded;
+        return;
+    }
+
+    // Create NVRHI texture (without initial data)
+    ng::RenderDevice::TextureDesc deviceDesc;
+    deviceDesc.width = ddsData.desc.width;
+    deviceDesc.height = ddsData.desc.height;
+    deviceDesc.depth = ddsData.desc.depth;
+    deviceDesc.arraySize = ddsData.desc.arraySize;
+    deviceDesc.mipLevels = ddsData.desc.mipLevels;
+    deviceDesc.format = ddsData.desc.format;
+    deviceDesc.debugName = meta.filePath;
+
+    // Determine dimension
+    switch (ddsData.desc.type) {
+        case TextureDesc::Texture1D:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture1D;
+            break;
+        case TextureDesc::Texture2D:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+            break;
+        case TextureDesc::Texture3D:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::Texture3D;
+            break;
+        case TextureDesc::TextureCube:
+            deviceDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+            break;
+    }
+
+    // Create texture (no initial data - we'll upload separately)
+    ng::TextureHandle deviceHandle = m_device->CreateTexture(deviceDesc, nullptr);
+    if (!deviceHandle.IsValid()) {
+        Msg("! [TextureManager] Failed to create NVRHI texture: %s", meta.filePath.c_str());
+        meta.state = TextureState::Unloaded;
+        return;
+    }
+
+    // Upload all mip levels using RenderDevice's upload API
+    xr_vector<ng::RenderDevice::TextureSliceData> slices;
+    slices.reserve(ddsData.mipLevels.size());
+
+    for (const DDSMipLevel& mip : ddsData.mipLevels) {
+        ng::RenderDevice::TextureSliceData slice;
+
+        // Calculate which array slice and mip this belongs to
+        // DDS stores: [slice0_mip0, slice0_mip1, ..., slice1_mip0, slice1_mip1, ...]
+        u32 totalMips = ddsData.desc.mipLevels;
+        u32 mipIndex = (u32)(&mip - &ddsData.mipLevels[0]);
+
+        slice.arraySlice = mipIndex / totalMips;
+        slice.mipLevel = mipIndex % totalMips;
+        slice.data = mip.data;
+        slice.dataSize = mip.size;
+
+        slices.push_back(slice);
+    }
+
+    // Upload all slices in one command list
+    m_device->UploadTextureData(deviceHandle, slices.data(), (u32)slices.size());
+
+    // Store NVRHI handle
+    meta.nvrhiTexture = m_device->GetNativeTexture(deviceHandle);
+
+    // Update metadata
+    meta.state = TextureState::Resident;
+    meta.residentMips = ddsData.desc.mipLevels;
+    meta.totalMips = ddsData.desc.mipLevels;
+    meta.requestedMips = ddsData.desc.mipLevels;
+    meta.memoryUsed = ddsData.totalDataSize;
+
+    // Update memory tracking
+    m_memoryUsed += meta.memoryUsed;
+
+    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu)",
+        meta.filePath.c_str(), meta.residentMips, meta.memoryUsed,
+        m_memoryUsed, m_memoryBudget);
 }
 
 void TextureManager::LoadTextureAsync(TextureHandle handle) {
@@ -525,7 +630,7 @@ void TextureManager::PrintStatistics() const {
 }
 
 // ═══════════════════════════════════════════════════
-//  HELPERS
+//  HELPER STRING CONVERSIONS
 // ═══════════════════════════════════════════════════
 
 const char* TextureStateToString(TextureState state) {

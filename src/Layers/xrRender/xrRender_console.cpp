@@ -28,6 +28,9 @@
 #if RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/FrameGraph/FGTest.h"
+#ifdef DEBUG
+#include "Layers/xrRender/ResourceManager/TestTextureManager.h"
+#endif
 #endif
 
 // Detail manager debug
@@ -1327,7 +1330,53 @@ void xrRender_initconsole()
     CMD1(CCC_FrameGraphTestTwoPass, "r4_framegraph_test2");
     // FrameGraph renderer toggle (Phase 3)
     CMD4(CCC_Integer, "r4_use_framegraph", &ps_r4_use_framegraph, 0, 1);
-#endif
-#endif
+
+#ifdef DEBUG
+    // TextureManager unit tests (Week 1 Day 2)
+    using namespace xray::render::resources::test;
+
+    class CCC_TestTextureManager : public IConsole_Command {
+    public:
+        CCC_TestTextureManager(LPCSTR N) : IConsole_Command(N) {
+            bEmptyArgsHandled = true;
+        }
+
+        virtual void Execute(LPCSTR args) {
+            // Save current render mode and switch to FrameGraph
+            int savedRenderMode = ps_r4_use_framegraph;
+            ps_r4_use_framegraph = 1;
+            Msg("! [TEST] Switched to FrameGraph mode (was: %d)", savedRenderMode);
+
+            // Run tests
+            if (!args || !args[0] || EQ(args, "all")) {
+                RunAllTests();
+            } else if (EQ(args, "handles")) {
+                RunHandleTests();
+            } else if (EQ(args, "dds")) {
+                RunDDSTests();
+            } else if (EQ(args, "manager")) {
+                RunTextureManagerTests();
+            } else {
+                Msg("! Usage: test_texture_manager [handles|dds|manager|all]");
+                Msg("!   handles - Test handle allocation and validation");
+                Msg("!   dds     - Test DDS file loader");
+                Msg("!   manager - Test TextureManager functionality");
+                Msg("!   all     - Run all tests (default)");
+            }
+
+            // Restore original render mode
+            ps_r4_use_framegraph = savedRenderMode;
+            Msg("! [TEST] Restored render mode to: %d", savedRenderMode);
+        }
+
+        virtual void Info(TInfo& I) {
+            xr_strcpy(I, "[handles|dds|manager|all]");
+        }
+    };
+
+    CMD1(CCC_TestTextureManager, "test_texture_manager");
+#endif // DEBUG
+#endif // RENDER == R_R4
+#endif // USE_DX11
 }
 } // namespace xray::render::RENDER_NAMESPACE
