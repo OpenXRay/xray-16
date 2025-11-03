@@ -7,6 +7,10 @@ namespace xray::render::ng {
     class RenderContext;
 }
 
+namespace xray::render::resources {
+    class ModernResourceManager;
+}
+
 namespace xray::render::framegraph {
 
 // Simple triangle test - single pass clear + render
@@ -14,5 +18,10 @@ void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrh
 
 // Two-pass test - HDR render → Tonemap
 void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer);
+
+// Resource aliasing test - Multiple transient resources with non-overlapping lifetimes
+void TestResourceAliasing(nvrhi::IDevice* device, ng::RenderContext* context,
+                          nvrhi::ITexture* backbuffer,
+                          resources::ModernResourceManager* resourceManager);
 
 } // namespace xray::render::framegraph

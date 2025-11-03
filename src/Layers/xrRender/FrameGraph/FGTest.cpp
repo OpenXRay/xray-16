@@ -202,4 +202,139 @@ void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi
     Msg("=== FrameGraph Two-Pass Test Complete ===");
 }
 
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+//  ALIASING TEST (Multiple Transient Resources)
+// PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+
+void TestResourceAliasing(nvrhi::IDevice* device, ng::RenderContext* context,
+                          nvrhi::ITexture* backbuffer,
+                          resources::ModernResourceManager* resourceManager) {
+    Msg("=== FrameGraph Resource Aliasing Test ===");
+
+    // Create FrameGraph WITH ResourceManager to enable aliasing
+    FrameGraph fg(device, resourceManager);
+    fg.SetRenderContext(context);
+
+    // Get backbuffer dimensions
+    const nvrhi::TextureDesc& bbDesc = backbuffer->getDesc();
+
+    // Import backbuffer
+    ResourceDesc backbufferDesc;
+    backbufferDesc.type = ResourceDesc::Type::Texture2D;
+    backbufferDesc.width = bbDesc.width;
+    backbufferDesc.height = bbDesc.height;
+    backbufferDesc.format = bbDesc.format;
+    backbufferDesc.isRenderTarget = true;
+    backbufferDesc.isImported = true;
+    backbufferDesc.isTransient = false;
+    backbufferDesc.debugName = "Backbuffer";
+
+    auto backbufferHandle = fg.ImportTexture("Backbuffer", backbuffer, backbufferDesc);
+
+    // Create multiple transient intermediate textures
+    // These will have non-overlapping lifetimes, enabling aliasing
+
+    // Intermediate texture 1: Used in Pass 1 only (NOT a render target to allow aliasing)
+    ResourceDesc temp1Desc;
+    temp1Desc.type = ResourceDesc::Type::Texture2D;
+    temp1Desc.width = bbDesc.width;
+    temp1Desc.height = bbDesc.height;
+    temp1Desc.format = nvrhi::Format::RGBA16_FLOAT;
+    temp1Desc.isRenderTarget = false;  // Mark as non-RT to allow aliasing
+    temp1Desc.isUAV = true;            // Use UAV instead
+    temp1Desc.isTransient = true;
+    temp1Desc.debugName = "Temp1_BlurH";
+
+    auto temp1 = fg.CreateTexture("Temp1", temp1Desc);
+
+    // Intermediate texture 2: Used in Pass 2 only
+    ResourceDesc temp2Desc;
+    temp2Desc.type = ResourceDesc::Type::Texture2D;
+    temp2Desc.width = bbDesc.width;
+    temp2Desc.height = bbDesc.height;
+    temp2Desc.format = nvrhi::Format::RGBA16_FLOAT;
+    temp2Desc.isRenderTarget = false;
+    temp2Desc.isUAV = true;
+    temp2Desc.isTransient = true;
+    temp2Desc.debugName = "Temp2_BlurV";
+
+    auto temp2 = fg.CreateTexture("Temp2", temp2Desc);
+
+    // Intermediate texture 3: Used in Pass 3 only
+    ResourceDesc temp3Desc;
+    temp3Desc.type = ResourceDesc::Type::Texture2D;
+    temp3Desc.width = bbDesc.width;
+    temp3Desc.height = bbDesc.height;
+    temp3Desc.format = nvrhi::Format::RGBA16_FLOAT;
+    temp3Desc.isRenderTarget = false;
+    temp3Desc.isUAV = true;
+    temp3Desc.isTransient = true;
+    temp3Desc.debugName = "Temp3_Bloom";
+
+    auto temp3 = fg.CreateTexture("Temp3", temp3Desc);
+
+    // Pass 1: Read backbuffer, write temp1 (horizontal blur)
+    auto pass1 = fg.AddPass("HorizontalBlur");
+    fg.PassRead(pass1, backbufferHandle, ResourceState::ShaderResource);
+    fg.PassWrite(pass1, temp1, ResourceState::UnorderedAccess);
+    fg.SetPassCallback(pass1, [](ng::RenderContext& ctx, const FrameGraph& fg) {
+        Msg("  ~ Pass 1: Horizontal Blur (compute shader would go here)");
+    });
+
+    // Pass 2: Read temp1, write temp2 (vertical blur)
+    // temp1 lifetime ends here, so its memory can be reused
+    auto pass2 = fg.AddPass("VerticalBlur");
+    fg.PassRead(pass2, temp1, ResourceState::ShaderResource);
+    fg.PassWrite(pass2, temp2, ResourceState::UnorderedAccess);
+    fg.SetPassCallback(pass2, [](ng::RenderContext& ctx, const FrameGraph& fg) {
+        Msg("  ~ Pass 2: Vertical Blur");
+    });
+
+    // Pass 3: Read temp2, write temp3 (bloom threshold)
+    // temp2 lifetime ends here, so its memory can be reused
+    auto pass3 = fg.AddPass("BloomThreshold");
+    fg.PassRead(pass3, temp2, ResourceState::ShaderResource);
+    fg.PassWrite(pass3, temp3, ResourceState::UnorderedAccess);
+    fg.SetPassCallback(pass3, [](ng::RenderContext& ctx, const FrameGraph& fg) {
+        Msg("  ~ Pass 3: Bloom Threshold");
+    });
+
+    // Pass 4: Read temp3 and backbuffer, write to backbuffer (final composite)
+    // temp3 lifetime ends here
+    auto pass4 = fg.AddPass("Composite");
+    fg.PassRead(pass4, temp3, ResourceState::ShaderResource);
+    fg.PassRead(pass4, backbufferHandle, ResourceState::RenderTarget);
+    fg.PassWrite(pass4, backbufferHandle, ResourceState::RenderTarget);
+    fg.SetPassCallback(pass4, [backbufferHandle](ng::RenderContext& ctx, const FrameGraph& fg) {
+        nvrhi::ITexture* rt = fg.GetPhysicalTexture(backbufferHandle);
+
+        ng::RenderPassDesc passDesc;
+        passDesc.renderTargets[0] = rt;
+        passDesc.numRenderTargets = 1;
+        passDesc.clearColor = false;
+
+        ctx.BeginRenderPass(passDesc);
+        Msg("  ~ Pass 4: Composite (final output)");
+        ctx.EndRenderPass();
+    });
+
+    // Compile
+    Msg("~ Compiling FrameGraph with aliasing enabled...");
+    fg.Compile();
+
+    // Print execution order and resource lifetimes
+    fg.PrintExecutionOrder();
+
+    // Execute
+    Msg("~ Executing FrameGraph...");
+    fg.Execute();
+
+    // Print statistics - should show aliasing savings!
+    fg.PrintStatistics();
+
+    Msg("=== FrameGraph Resource Aliasing Test Complete ===");
+    Msg("! Expected: temp1, temp2, temp3 should alias (reuse same memory)");
+    Msg("! Memory saved = ~2x texture size (3 textures using 1 allocation)");
+}
+
 } // namespace xray::render::framegraph

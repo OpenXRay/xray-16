@@ -300,6 +300,9 @@ TextureHandle TextureManager::CreateTexture(
         case TextureDesc::Texture2D:
             nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
             break;
+        case TextureDesc::Texture2DArray:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
+            break;
         case TextureDesc::Texture3D:
             nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
             break;
