@@ -773,6 +773,9 @@
     <ClInclude Include="..\xrRender\ResourceManager\TestTextureManager.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\TextureStreaming.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1405,6 +1408,9 @@
       <Filter>ResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager\TextureManager.cpp">
+      <Filter>ResourceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\TextureStreaming.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
   </ItemGroup>

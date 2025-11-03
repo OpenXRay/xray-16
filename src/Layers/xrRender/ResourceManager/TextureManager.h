@@ -9,6 +9,8 @@ namespace xray::render::ng {
 
 namespace xray::render::resources {
 
+class StreamingManager;
+
 enum class TextureState : u8 {
     Unloaded,
     Loading,
@@ -166,6 +168,8 @@ public:
     Statistics GetStatistics() const;
     void PrintStatistics() const;
 
+    StreamingManager* GetStreamingManager() { return m_streamingManager.get(); }
+
 private:
     xray::render::ng::RenderDevice* m_device;
 
@@ -177,6 +181,8 @@ private:
     u64 m_memoryBudget = 2ULL * 1024 * 1024 * 1024;
     u64 m_memoryUsed = 0;
 
+    xr_unique_ptr<StreamingManager> m_streamingManager;
+
     TextureHandle AllocateHandle();
     void FreeHandle(TextureHandle handle);
     bool ValidateHandle(TextureHandle handle) const;
@@ -185,7 +191,9 @@ private:
     void LoadTextureAsync(TextureHandle handle);
     void StreamMips(TextureHandle handle, u32 targetMips);
 
-    void EvictTextures(u64 bytesNeeded);
+    bool CheckMemoryBudget(u64 requiredBytes) const;
+    bool EnforceMemoryBudget(u64 requiredBytes);
+    bool EvictTextures(u64 bytesNeeded);
     void EvictTextureInternal(TextureHandle handle);
 
     mutable Statistics m_stats;

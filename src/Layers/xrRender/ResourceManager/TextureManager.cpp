@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TextureManager.h"
 #include "DDSLoader.h"
+#include "TextureStreaming.h"
 #include "../RenderContext/RenderDevice.h"
 
 namespace xray::render::resources {
@@ -116,6 +117,8 @@ TextureManager::TextureManager(RenderDevice* device)
     VERIFY(m_device);
 
     m_textures.reserve(1024);
+
+    m_streamingManager = xr_make_unique<StreamingManager>(device, this);
 
     Msg("! [TextureManager] Created with budget: %llu MB",
         m_memoryBudget / (1024 * 1024));
@@ -302,9 +305,12 @@ void TextureManager::SetMemoryBudget(u64 bytes) {
 void TextureManager::RequestMips(TextureHandle handle, u32 mipCount) {
     if (!ValidateHandle(handle)) return;
 
-    TextureMetadata& meta = m_textures[handle.index];
-    meta.requestedMips = std::min(mipCount, meta.totalMips);
+    const TextureMetadata& meta = m_textures[handle.index];
+    u32 targetMips = std::min(mipCount, meta.totalMips);
 
+    m_textures[handle.index].requestedMips = targetMips;
+
+    m_streamingManager->RequestMips(handle, targetMips, meta.priority);
 }
 
 void TextureManager::SetPriority(TextureHandle handle, TexturePriority priority) {
@@ -360,11 +366,123 @@ void TextureManager::Evict(TextureHandle handle) {
     }
 }
 
-void TextureManager::Update(float deltaTime) {
+bool TextureManager::CheckMemoryBudget(u64 requiredBytes) const {
+    return (m_memoryUsed + requiredBytes) <= m_memoryBudget;
+}
 
+bool TextureManager::EnforceMemoryBudget(u64 requiredBytes) {
+    if (CheckMemoryBudget(requiredBytes)) {
+        return true;
+    }
+
+    u64 bytesNeeded = (m_memoryUsed + requiredBytes) - m_memoryBudget;
+
+    Msg("! [TextureManager] Over budget! Need to free %llu MB",
+        bytesNeeded / (1024 * 1024));
+
+    return EvictTextures(bytesNeeded);
+}
+
+bool TextureManager::EvictTextures(u64 bytesNeeded) {
+    u64 bytesFreed = 0;
+
+    struct EvictionCandidate {
+        TextureHandle handle;
+        float score;
+        u64 memoryUsed;
+
+        bool operator<(const EvictionCandidate& other) const {
+            return score > other.score;
+        }
+    };
+
+    xr_vector<EvictionCandidate> candidates;
+
+    for (u32 i = 0; i < m_textures.size(); i++) {
+        const TextureMetadata& meta = m_textures[i];
+
+        if (!meta.isAlive) continue;
+        if (!meta.CanEvict()) continue;
+
+        float score = 0.0f;
+
+        score += meta.lastAccessTime * 10.0f;
+
+        score += (float)meta.priority * 100.0f;
+
+        score -= (float)meta.accessCount * 0.1f;
+
+        score += (float)meta.memoryUsed / (1024.0f * 1024.0f);
+
+        EvictionCandidate candidate;
+        candidate.handle = TextureHandle(i, meta.generation);
+        candidate.score = score;
+        candidate.memoryUsed = meta.memoryUsed;
+
+        candidates.push_back(candidate);
+    }
+
+    std::sort(candidates.begin(), candidates.end());
+
+    Msg("! [TextureManager] Found %u eviction candidates", candidates.size());
+
+    for (const auto& candidate : candidates) {
+        if (bytesFreed >= bytesNeeded) {
+            break;
+        }
+
+        const TextureMetadata* meta = GetMetadata(candidate.handle);
+
+        Msg("!   Evicting: %s (score=%.2f, %llu KB)",
+            meta->filePath.c_str(),
+            candidate.score,
+            candidate.memoryUsed / 1024);
+
+        EvictTextureInternal(candidate.handle);
+
+        bytesFreed += candidate.memoryUsed;
+    }
+
+    Msg("! [TextureManager] Freed %llu MB (needed %llu MB)",
+        bytesFreed / (1024 * 1024),
+        bytesNeeded / (1024 * 1024));
+
+    return bytesFreed >= bytesNeeded;
+}
+
+void TextureManager::EvictTextureInternal(TextureHandle handle) {
+    if (!ValidateHandle(handle)) return;
+
+    TextureMetadata& meta = m_textures[handle.index];
+
+    if (meta.state != TextureState::Resident) {
+        return;
+    }
+
+    if (meta.nvrhiTexture) {
+        meta.nvrhiTexture = nullptr;
+    }
+
+    meta.state = TextureState::Evicted;
+    meta.residentMips = 0;
+
+    m_memoryUsed -= meta.memoryUsed;
+    meta.memoryUsed = 0;
+
+    Msg("! [TextureManager] Evicted: %s", meta.filePath.c_str());
+}
+
+void TextureManager::Update(float deltaTime) {
     for (auto& meta : m_textures) {
         if (!meta.isAlive) continue;
         meta.lastAccessTime += deltaTime;
+    }
+
+    m_streamingManager->Update(deltaTime);
+
+    if (m_memoryUsed > m_memoryBudget) {
+        u64 excess = m_memoryUsed - m_memoryBudget;
+        EvictTextures(excess);
     }
 }
 
@@ -458,31 +576,7 @@ void TextureManager::LoadTextureAsync(TextureHandle handle) {
 }
 
 void TextureManager::StreamMips(TextureHandle handle, u32 targetMips) {
-}
-
-void TextureManager::EvictTextures(u64 bytesNeeded) {
-}
-
-void TextureManager::EvictTextureInternal(TextureHandle handle) {
-    if (!ValidateHandle(handle)) return;
-
-    TextureMetadata& meta = m_textures[handle.index];
-
-    if (meta.state != TextureState::Resident) {
-        return;
-    }
-
-    if (meta.nvrhiTexture) {
-        meta.nvrhiTexture = nullptr;
-    }
-
-    meta.state = TextureState::Evicted;
-    meta.residentMips = 0;
-
-    m_memoryUsed -= meta.memoryUsed;
-    meta.memoryUsed = 0;
-
-    Msg("! [TextureManager] Evicted: %s", meta.filePath.c_str());
+    m_streamingManager->RequestMips(handle, targetMips, TexturePriority::Medium);
 }
 
 TextureManager::Statistics TextureManager::GetStatistics() const {
