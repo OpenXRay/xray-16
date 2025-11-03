@@ -782,6 +782,7 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
         meta.state = TextureState::Unloaded;
         meta.priority = priority;
         meta.isAlive = true;
+        meta.refCount = 1;  // Initial reference
     }
 
     // Register path
@@ -790,10 +791,10 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
         m_pathToHandle[pathStr] = handle;
     }
 
-    // Kick off async load via streaming manager
-    m_streamingManager->RequestMips(handle, 999, priority);
-
     Msg("! [TextureManager] LoadTextureThreadSafe: %s", path);
+
+    // Load synchronously (thread-safe mutex protection above ensures correctness)
+    LoadTextureSync(handle);
 
     return handle;
 }
