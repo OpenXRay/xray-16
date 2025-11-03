@@ -2,6 +2,7 @@
 #include "RenderDevice.h"
 #include "RenderContext.h"
 #include "../NVRHI/NVRHIDevice.h"
+#include "../ResourceManager/ModernResourceManager.h"
 
 namespace xray::render::ng {
 
@@ -40,6 +41,10 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     // Create pipeline state cache
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
 
+    // Create modern resource manager (Week 2-3)
+    m_modernResourceManager = xr_make_unique<xray::render::resources::ModernResourceManager>(this);
+    Msg("* [RenderDevice] ModernResourceManager initialized");
+
     // Reserve initial capacity
     m_textures.reserve(256);
     m_buffers.reserve(512);
@@ -70,6 +75,9 @@ void RenderDevice::Shutdown() {
 
     // Clear pipeline cache
     m_pipelineCache.reset();
+
+    // Shutdown modern resource manager
+    m_modernResourceManager.reset();
 
     // Clear all resources
     m_textures.clear();

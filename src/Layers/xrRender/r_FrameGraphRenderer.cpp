@@ -35,8 +35,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     Msg("* [FrameGraphRenderer] Initializing...");
 
-    // Create FrameGraph (needs NVRHI device)
-    m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
+    // Create FrameGraph with ModernResourceManager integration
+    m_framegraph = xr_make_unique<framegraph::FrameGraph>(
+        device->GetNVRHIDevice(),
+        device->GetModernResourceManager()
+    );
 
     // Create shader phase cache (Week 16 - for precompilation phase detection)
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
@@ -595,7 +598,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             case MT_NORMAL:
             default:
                 xform = Fidentity;
-                continue; // TODO: break so that we can render more than just trees
+                break; // TODO: break so that we can render more than just trees
         }
 
         if (ProcessVisualGeometry(visual, xform)) {

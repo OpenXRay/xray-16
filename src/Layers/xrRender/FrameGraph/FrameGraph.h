@@ -5,7 +5,9 @@
 #include "FGResource.h"
 #include "FGPass.h"
 #include "RenderTargetRegistry.h"
+#include "FGResourcePool.h"
 #include "../RenderContext/RenderContext.h"
+#include "../ResourceManager/ModernResourceManager.h"
 
 namespace xray::render::framegraph {
 
@@ -18,7 +20,7 @@ namespace ng = xray::render::ng;
 
 class FrameGraph {
 public:
-    explicit FrameGraph(nvrhi::IDevice* device);
+    FrameGraph(nvrhi::IDevice* device, resources::ModernResourceManager* resourceManager);
     ~FrameGraph();
 
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -149,6 +151,8 @@ private:
 
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
+    resources::ModernResourceManager* m_resourceManager;
+    xr_unique_ptr<FGResourcePool> m_resourcePool;
 
     // Render target registry
     RenderTargetRegistry m_rtRegistry;

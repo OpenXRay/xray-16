@@ -3,6 +3,7 @@
 
 #include "FGTypes.h"
 #include "../RenderContext/RenderContext.h"
+#include "../ResourceManager/ResourceHandle.h"
 
 namespace xray::render::framegraph {
 
@@ -95,11 +96,11 @@ struct ResourceNode {
     u32 lastUsedPass = INVALID_INDEX;   // Last pass that accesses this
     u32 refCount = 0;                   // Number of passes using this
 
-    // Physical resource (allocated during compile)
-    xray::render::ng::TextureHandle physicalTexture;
-    xray::render::ng::BufferHandle physicalBuffer;
+    // ModernResourceManager handles (Week 4 integration)
+    xray::render::resources::TextureHandle resourceTexture;
+    xray::render::resources::BufferHandle resourceBuffer;
 
-    // Direct NVRHI handles (until ResourceManager integration)
+    // Direct NVRHI handles (cached for immediate access)
     nvrhi::TextureHandle nvrhiTexture;
     nvrhi::BufferHandle nvrhiBuffer;
 

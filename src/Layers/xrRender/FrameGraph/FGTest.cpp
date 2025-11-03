@@ -16,8 +16,8 @@ namespace ng = xray::render::ng;
 void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Triangle Test ===");
 
-    // Create FrameGraph
-    FrameGraph fg(device);
+    // Create FrameGraph (without ResourceManager for now - tests will use direct NVRHI)
+    FrameGraph fg(device, nullptr);
     fg.SetRenderContext(context);
 
     // Get backbuffer dimensions
@@ -105,8 +105,8 @@ void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrh
 void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Two-Pass Test ===");
 
-    // Create FrameGraph
-    FrameGraph fg(device);
+    // Create FrameGraph (without ResourceManager for now - tests will use direct NVRHI)
+    FrameGraph fg(device, nullptr);
     fg.SetRenderContext(context);
 
     // Get backbuffer dimensions

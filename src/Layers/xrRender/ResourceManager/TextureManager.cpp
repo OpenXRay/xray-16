@@ -280,7 +280,70 @@ TextureHandle TextureManager::CreateTexture(
     meta.isAlive = true;
     meta.refCount = 1;
 
-    // TODO: Create NVRHI texture (Day 2)
+    // Create NVRHI texture immediately for runtime textures
+    nvrhi::TextureDesc nvrhiDesc;
+    nvrhiDesc.width = desc.width;
+    nvrhiDesc.height = desc.height;
+    nvrhiDesc.depth = desc.depth;
+    nvrhiDesc.arraySize = desc.arraySize;
+    nvrhiDesc.mipLevels = desc.mipLevels;
+    nvrhiDesc.format = desc.format;
+    nvrhiDesc.debugName = desc.debugName.c_str();
+    nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
+    nvrhiDesc.keepInitialState = false;
+
+    // Set dimension
+    switch (desc.type) {
+        case TextureDesc::Texture1D:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture1D;
+            break;
+        case TextureDesc::Texture2D:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+            break;
+        case TextureDesc::Texture3D:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+            break;
+        case TextureDesc::TextureCube:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
+            break;
+        default:
+            nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+            break;
+    }
+
+    // Set usage flags
+    nvrhiDesc.isRenderTarget = desc.isRenderTarget;
+    nvrhiDesc.isUAV = desc.isUAV;
+    nvrhiDesc.isShaderResource = true;
+
+    // Depth/stencil handling
+    if (desc.isDepthStencil) {
+        nvrhiDesc.isRenderTarget = true;
+        nvrhiDesc.isTypeless = true;
+        nvrhiDesc.useClearValue = true;
+        nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+    }
+
+    // Create texture
+    meta.nvrhiTexture = m_device->GetNVRHIDevice()->createTexture(nvrhiDesc);
+
+    if (meta.nvrhiTexture) {
+        meta.state = TextureState::Resident;
+        meta.residentMips = desc.mipLevels;
+        meta.requestedMips = desc.mipLevels;
+
+        // Calculate memory
+        meta.memoryUsed = desc.CalculateMemorySize();
+        m_stats.texturesResident++;
+        m_stats.totalMemoryUsed += meta.memoryUsed;
+
+        Msg("~ [TextureManager] Created runtime texture '%s': %ux%ux%u, %.2f MB",
+            desc.debugName.c_str(),
+            desc.width, desc.height, desc.depth,
+            meta.memoryUsed / (1024.0f * 1024.0f));
+    } else {
+        Msg("! [TextureManager] Failed to create NVRHI texture '%s'", desc.debugName.c_str());
+    }
 
     m_stats.texturesTotal++;
 

@@ -4,6 +4,11 @@
 #include "PipelineState.h"
 #include <nvrhi/nvrhi.h>
 
+// Forward declare ModernResourceManager (outside ng namespace!)
+namespace xray::render::resources {
+    class ModernResourceManager;
+}
+
 namespace xray::render::ng {
 
 // Forward declarations
@@ -247,6 +252,12 @@ public:
     PipelineStateCache* GetPipelineCache() { return m_pipelineCache.get(); }
 
     // ═══════════════════════════════════════════════════
+    //  RESOURCE MANAGER ACCESS
+    // ═══════════════════════════════════════════════════
+
+    xray::render::resources::ModernResourceManager* GetModernResourceManager() { return m_modernResourceManager.get(); }
+
+    // ═══════════════════════════════════════════════════
     //  DEVICE ACCESS (for low-level code)
     // ═══════════════════════════════════════════════════
 
@@ -281,6 +292,9 @@ private:
 
     // Pipeline state cache
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
+
+    // Modern resource manager (Week 2-3)
+    xr_unique_ptr<xray::render::resources::ModernResourceManager> m_modernResourceManager;
 
     // Initialization state
     bool m_initialized = false;
