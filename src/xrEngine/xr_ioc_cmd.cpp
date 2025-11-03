@@ -22,6 +22,7 @@ const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 ENGINE_API int dm_debug_trails = 0;
 ENGINE_API int g_debug_utils = 0;
 ENGINE_API bool renderer_allow_override = false;
+ENGINE_API int ps_r4_use_framegraph = 0;
 extern int ps_disable_lens_flare;
 
 void IConsole_Command::InvalidSyntax()

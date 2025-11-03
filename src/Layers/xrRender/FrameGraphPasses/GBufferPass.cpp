@@ -26,7 +26,7 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
 
-    // Create material cache
+    // Create material cache (accesses ModernResourceManager via device when needed)
     m_materialCache = xr_make_unique<MaterialCache>(device);
 
     // Load shaders (legacy - will be removed once MaterialCache is fully integrated)
@@ -295,9 +295,21 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // We must update them BEFORE the render pass since they're not volatile.
     // Using direct buffer writes with our own CB layout definitions.
 
-    // Fill global constants from Device state
-    GlobalConstants globalCB = {};
-    FillGlobalConstants(globalCB);
+    // Fill constant buffers from Device/RCache state
+    StaticGlobals staticGlobalsCB = {};
+    FillGlobalConstants(staticGlobalsCB);
+
+    DynamicTransforms dynamicTransformsCB = {};
+    FillDynamicTransforms(dynamicTransformsCB);
+
+    // Debug: Print first few values of dynamic_transforms
+    Msg("  [GBufferPass] DynamicTransforms computed:");
+    Msg("    m_WVP[0-3]: %.3f, %.3f, %.3f, %.3f",
+        dynamicTransformsCB.m_WVP[0], dynamicTransformsCB.m_WVP[1],
+        dynamicTransformsCB.m_WVP[2], dynamicTransformsCB.m_WVP[3]);
+    Msg("    m_W[0-3]:   %.3f, %.3f, %.3f, %.3f",
+        dynamicTransformsCB.m_W[0], dynamicTransformsCB.m_W[1],
+        dynamicTransformsCB.m_W[2], dynamicTransformsCB.m_W[3]);
 
     // Get D3D11 device context for UpdateSubresource calls
     // NO RCache usage - get directly from NVRHI device!
@@ -312,25 +324,15 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // Track unique CB buffers to avoid duplicate updates
     xr_set<ID3D11Buffer*> updatedBuffers;
 
-    Msg("  [GBufferPass] Global CB matrices:");
-    Msg("    m_V:  [%.3f, %.3f, %.3f, %.3f]", globalCB.m_V[0], globalCB.m_V[1], globalCB.m_V[2], globalCB.m_V[3]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_V[4], globalCB.m_V[5], globalCB.m_V[6], globalCB.m_V[7]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_V[8], globalCB.m_V[9], globalCB.m_V[10], globalCB.m_V[11]);
-    Msg("    m_P:  [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[0], globalCB.m_P[1], globalCB.m_P[2], globalCB.m_P[3]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[4], globalCB.m_P[5], globalCB.m_P[6], globalCB.m_P[7]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[8], globalCB.m_P[9], globalCB.m_P[10], globalCB.m_P[11]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_P[12], globalCB.m_P[13], globalCB.m_P[14], globalCB.m_P[15]);
-    Msg("    m_VP: [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[0], globalCB.m_VP[1], globalCB.m_VP[2], globalCB.m_VP[3]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[4], globalCB.m_VP[5], globalCB.m_VP[6], globalCB.m_VP[7]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[8], globalCB.m_VP[9], globalCB.m_VP[10], globalCB.m_VP[11]);
-    Msg("          [%.3f, %.3f, %.3f, %.3f]", globalCB.m_VP[12], globalCB.m_VP[13], globalCB.m_VP[14], globalCB.m_VP[15]);
-    Msg("    eye:  (%.1f, %.1f, %.1f)", globalCB.eye_position.x, globalCB.eye_position.y, globalCB.eye_position.z);
+    Msg("  [GBufferPass] Filled constant buffers:");
+    Msg("    static_globals: m_V, m_P, m_VP, lighting, fog, etc.");
+    Msg("    dynamic_transforms: m_W, m_WV, m_WVP from RCache.xforms");
 
     // ═══════════════════════════════════════════════════════
     //  UPDATE ALL GLOBAL CBS BEFORE RENDER PASS
     // ═══════════════════════════════════════════════════════
     // WriteBuffer must be called OUTSIDE render passes!
-    // Pre-scan all batches to find unique global CB buffers and update them now
+    // Pre-scan all batches to find unique CB buffers and update them by name.
 
     if (!m_batches.empty()) {
         xr_set<nvrhi::IBuffer*> updatedGlobalBuffers;
@@ -342,11 +344,16 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     for (const auto& cbInfo : matPSO->constantBuffers) {
                         if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
                             if (updatedGlobalBuffers.find(cbInfo.nvrhiBuffer.Get()) == updatedGlobalBuffers.end()) {
-                                u32 sizeToWrite = std::min<u32>(sizeof(GlobalConstants), cbInfo.size);
-                                Msg("  [GBufferPass] Pre-updating global CB slot %u (%u bytes) BEFORE render pass",
-                                    cbInfo.slot, sizeToWrite);
-                                ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &globalCB, sizeToWrite);
-                                updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
+                                // Fill buffer based on CB name
+                                if (cbInfo.name == "static_globals") {
+                                    u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                                    ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                                    updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
+                                } else if (cbInfo.name == "dynamic_transforms") {
+                                    u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                                    ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicTransformsCB, sizeToWrite);
+                                    updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
+                                }
                             }
                         }
                     }

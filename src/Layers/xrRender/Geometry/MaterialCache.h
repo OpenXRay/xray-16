@@ -102,6 +102,7 @@ struct MaterialPSO {
         nvrhi::BufferHandle nvrhiBuffer;  // NVRHI wrapped buffer
         u32 size;                    // Size in bytes
         bool isPerObject;            // True if slot 0 (per-object CB)
+        shared_str name;
         // NOTE: initialData removed - causes memory corruption
     };
     xr_vector<ConstantBufferInfo> constantBuffers;

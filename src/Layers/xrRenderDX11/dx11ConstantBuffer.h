@@ -15,6 +15,7 @@ public:
     ID3DBuffer* GetBuffer() { return m_pBuffer; }
     void* GetBufferData() { return m_pBufferData; }
     u32 GetBufferSize() const { return m_uiBufferSize; }
+    const char* GetBufferName() const { return m_strBufferName.c_str(); }
     void Flush(u32 context_id);
 
     // CB Slot Decoding Helpers

@@ -10,6 +10,8 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"      // TextureManager
 #include <nvrhi/nvrhi.h>                                         // getNativeObject
 
+extern ENGINE_API int ps_r4_use_framegraph;
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void fix_texture_name(pstr fn)

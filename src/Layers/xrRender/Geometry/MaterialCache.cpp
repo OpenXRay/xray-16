@@ -405,9 +405,11 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         // Detect texture dimension (2D vs Cube vs Array)
         if (d3dDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
             texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
-        } else if (d3dDesc.ArraySize > 1) {
+        }
+        else if (d3dDesc.ArraySize > 1) {
             texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
-        } else {
+        }
+        else {
             texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
         }
 
@@ -545,36 +547,30 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     }
 
                     if (!found) {
+                        const char* cbName = cb->GetBufferName();
+                        bool isPerObjectCB = (cbName && xr_strcmp(cbName, "$Globals") == 0);
                         nvrhi::BufferHandle bufferHandle;
 
-                        if (bindingSlot == 0) {
-                            // Slot 0 (per-object): Wrap X-Ray's buffer (it's managed per-draw)
+                        if (isPerObjectCB) {
                             nvrhi::BufferDesc nvrhiDesc;
                             nvrhiDesc.byteSize = bufDesc.ByteWidth;
                             nvrhiDesc.isConstantBuffer = true;
                             nvrhiDesc.debugName = "XRay_PerObject_CB";
                             nvrhiDesc.keepInitialState = true;
                             nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-
                             bufferHandle = m_device->GetNativeDevice()->createHandleForNativeBuffer(
                                 nvrhi::ObjectTypes::D3D11_Buffer,
                                 nvrhi::Object(d3dBuffer),
                                 nvrhiDesc);
                         } else {
-                            // Slot 1+ (global): Create NEW buffer that WE control
-                            // Don't wrap X-Ray's buffer because RCache might clear/reset it
-                            // Use DEFAULT usage to support UpdateSubresource (no CPU access needed)
                             nvrhi::BufferDesc nvrhiDesc;
                             nvrhiDesc.byteSize = bufDesc.ByteWidth;
                             nvrhiDesc.isConstantBuffer = true;
                             nvrhiDesc.debugName = "FrameGraph_Global_CB";
                             nvrhiDesc.keepInitialState = false;
                             nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-                            // Don't set cpuAccess - we'll use UpdateSubresource which works with DEFAULT usage
 
                             bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
-                            Msg("  [MaterialCache]   Created NEW global CB for slot %u (%u bytes)",
-                                bindingSlot, bufDesc.ByteWidth);
                         }
 
                         if (bufferHandle) {
@@ -582,7 +578,8 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                             cbInfo.slot = bindingSlot;  // Use DECODED slot for NVRHI binding!
                             cbInfo.nvrhiBuffer = bufferHandle;
                             cbInfo.size = bufDesc.ByteWidth;
-                            cbInfo.isPerObject = (bindingSlot == 0);  // Check decoded slot 0
+                            cbInfo.isPerObject = isPerObjectCB;  // Check decoded slot 0
+                            cbInfo.name = cbName;
 
                             // DISABLED: CB data extraction causes memory corruption
                             // TODO: Debug why this corrupts the heap
@@ -924,17 +921,15 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
     }
 
     // ═══════════════════════════════════════════════════════
-    //  WORKAROUND: Manually set SRVs from X-Ray textures
+    //  MANUALLY SET SRVs IN BINDING SET
     // ═══════════════════════════════════════════════════════
-    // NVRHI's createBindingSet tries to create new SRVs from wrapped resources,
-    // but this fails because we only wrapped the resource, not the SRV.
-    // X-Ray already has SRVs, so we'll use those directly!
+    // NVRHI can't automatically create SRVs from wrapped D3D11 resources,
+    // so we manually set our own SRVs that we created in ExtractTextures.
 
 #if defined(USE_DX11)
     nvrhi::d3d11::BindingSet* d3d11Set = static_cast<nvrhi::d3d11::BindingSet*>(bindingSet.Get());
     if (d3d11Set) {
-        // CRITICAL: Initialize ALL min/max ranges immediately after creation
-        // NVRHI uses these values in VSSetShaderResources/etc, must not be garbage!
+        // CRITICAL: Initialize ALL min/max ranges
         d3d11Set->minSRVSlot = 0;
         d3d11Set->maxSRVSlot = 0;
         d3d11Set->minSamplerSlot = 0;

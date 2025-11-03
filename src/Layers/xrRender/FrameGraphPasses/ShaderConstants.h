@@ -29,11 +29,29 @@ struct alignas(16) PerObjectConstants {
 };
 //static_assert(sizeof(PerObjectConstants) == 256, "PerObjectConstants must be 256 bytes");
 
-// Slot 1: Global/Static Constants (368 bytes minimum, often 512 bytes allocated)
-// Contains view/projection matrices, lighting, fog, etc.
+// Slot 1: Dynamic Transforms (224 bytes minimum)
+// UPDATED PER-DRAW! Contains world/view/projection for current object.
+// For static geometry: m_W = identity, for dynamic: m_W = object's world matrix
+// CRITICAL: HLSL float3x4 = 48 bytes (3 rows), float4x4 = 64 bytes (4 rows)
+struct alignas(16) DynamicTransforms {
+    // Combined matrices (computed per-draw)
+    float m_WVP[16];           // 0-64:   World-View-Projection (float4x4)
+    float m_WV[12];            // 64-112: World-View (float3x4)
+    float m_W[12];             // 112-160: World matrix (float3x4)
+                               //         IDENTITY for static geometry!
+
+    // Material/lighting per-draw params
+    Fvector4 L_material;       // 160-176: Material params (0,0,0,mid)
+    Fvector4 hemi_cube_pos_faces;  // 176-192: Hemisphere cube pos faces
+    Fvector4 hemi_cube_neg_faces;  // 192-208: Hemisphere cube neg faces
+    Fvector4 dt_params;        // 208-224: Detail texture params
+};
+
+// Slot 2: Static Globals (368 bytes minimum, often 512 bytes allocated)
+// UPDATED ONCE PER FRAME! Contains view/projection matrices, lighting, fog, etc.
 // CRITICAL: HLSL float3x4 = 48 bytes (3 rows), float4x4 = 64 bytes (4 rows)
 // We CANNOT use Fmatrix (64 bytes) for float3x4 - it would shift all offsets!
-struct alignas(16) GlobalConstants {
+struct alignas(16) StaticGlobals {
     // View and projection matrices
     // m_V is float3x4 in HLSL = 48 bytes (3 rows of float4)
     float m_V[12];             // 0-48:   View matrix (3x4 row-major)
@@ -71,7 +89,10 @@ struct alignas(16) GlobalConstants {
     // Misc
     Fvector4 parallax;         // 352-368: Parallax mapping parameters
 };
-//static_assert(sizeof(GlobalConstants) == 368, "GlobalConstants must be 368 bytes");
+//static_assert(sizeof(StaticGlobals) == 368, "StaticGlobals must be 368 bytes");
+
+// Legacy alias for compatibility
+using GlobalConstants = StaticGlobals;
 
 // Helper function to fill GlobalConstants from Device state
 inline void FillGlobalConstants(GlobalConstants& cb) {
@@ -139,6 +160,41 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.padding1 = 0.0f;
     cb.padding2 = 0.0f;
     cb.padding3 = 0.0f;
+}
+
+inline void FillDynamicTransforms(DynamicTransforms& cb) {
+    Fmatrix identity, wv, wvp;
+    identity.identity();
+    wv.set(Device.mView);  // WV = View * Identity = View
+    wvp.mul(Device.mProject, Device.mView);  // WVP = Projection * View
+
+    // Transpose for HLSL (column-major -> row-major)
+    Fmatrix wvpT, wvT, wT;
+    wvpT.transpose(wvp);
+    wvT.transpose(wv);
+    wT.transpose(identity);  // World = identity for static geometry
+
+    // m_WVP (float4x4, 64 bytes)
+    cb.m_WVP[0]  = wvpT._11; cb.m_WVP[1]  = wvpT._12; cb.m_WVP[2]  = wvpT._13; cb.m_WVP[3]  = wvpT._14;
+    cb.m_WVP[4]  = wvpT._21; cb.m_WVP[5]  = wvpT._22; cb.m_WVP[6]  = wvpT._23; cb.m_WVP[7]  = wvpT._24;
+    cb.m_WVP[8]  = wvpT._31; cb.m_WVP[9]  = wvpT._32; cb.m_WVP[10] = wvpT._33; cb.m_WVP[11] = wvpT._34;
+    cb.m_WVP[12] = wvpT._41; cb.m_WVP[13] = wvpT._42; cb.m_WVP[14] = wvpT._43; cb.m_WVP[15] = wvpT._44;
+
+    // m_WV (float3x4, 48 bytes)
+    cb.m_WV[0]  = wvT._11; cb.m_WV[1]  = wvT._12; cb.m_WV[2]  = wvT._13; cb.m_WV[3]  = wvT._14;
+    cb.m_WV[4]  = wvT._21; cb.m_WV[5]  = wvT._22; cb.m_WV[6]  = wvT._23; cb.m_WV[7]  = wvT._24;
+    cb.m_WV[8]  = wvT._31; cb.m_WV[9]  = wvT._32; cb.m_WV[10] = wvT._33; cb.m_WV[11] = wvT._34;
+
+    // m_W (float3x4, 48 bytes)
+    cb.m_W[0]  = wT._11; cb.m_W[1]  = wT._12; cb.m_W[2]  = wT._13; cb.m_W[3]  = wT._14;
+    cb.m_W[4]  = wT._21; cb.m_W[5]  = wT._22; cb.m_W[6]  = wT._23; cb.m_W[7]  = wT._24;
+    cb.m_W[8]  = wT._31; cb.m_W[9]  = wT._32; cb.m_W[10] = wT._33; cb.m_W[11] = wT._34;
+
+    // Material/lighting params (TODO: Get from X-Ray's material/environment system)
+    cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);  // Vanilla values from RenderDoc
+    cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
+    cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
+    cb.dt_params.set(300.0f, 300.0f, 300.0f, 0.02f);  // Detail texture tiling
 }
 
 } // namespace xray::render::passes
