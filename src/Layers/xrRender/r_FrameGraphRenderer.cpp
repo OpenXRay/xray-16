@@ -125,19 +125,47 @@ void FrameGraphRenderer::SetupFrame() {
     m_geometryCollector->EndFrame();
 }
 
+framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
+    const char* name,
+    u32 width,
+    u32 height,
+    nvrhi::Format format,
+    bool isDepthStencil)
+{
+    framegraph::ResourceDesc desc;
+    desc.type = framegraph::ResourceDesc::Type::Texture2D;
+    desc.width = width;
+    desc.height = height;
+    desc.format = format;
+    desc.isRenderTarget = !isDepthStencil;
+    desc.isDepthStencil = isDepthStencil;
+    desc.isTransient = true;
+    desc.debugName = name;
+
+    return m_framegraph->CreateTexture(name, desc);
+}
+
 void FrameGraphRenderer::BuildFrameGraph() {
 
-    framegraph::ResourceDesc backbufferDesc;
-    backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    backbufferDesc.width = 1920;
-    backbufferDesc.height = 1080;
-    backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
-    backbufferDesc.isRenderTarget = true;
-    backbufferDesc.isTransient = true;
-    backbufferDesc.debugName = "Backbuffer";
+    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets...");
 
-    framegraph::VirtualResourceHandle backbuffer =
-        m_framegraph->CreateTexture("Backbuffer", backbufferDesc);
+    u32 w = Device.dwWidth;
+    u32 h = Device.dwHeight;
+
+    auto rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);
+    auto rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);
+    auto rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);
+    auto rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);
+
+    auto rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
+
+    auto rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);
+    auto rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);
+    auto rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);
+
+    auto backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);
+
+    Msg("  ✓ Created %d vanilla render targets", 8);
 
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
@@ -146,34 +174,58 @@ void FrameGraphRenderer::BuildFrameGraph() {
 
     RouteBatchesToPasses();
 
-    Msg("! [FrameGraphRenderer] Registering render targets in RT registry...");
+    Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
 
-    registry.RegisterRT("rt_Albedo", gbufferOutputs.albedo);
-    registry.RegisterRT("rt_Color", gbufferOutputs.albedo);
-    registry.RegisterAliases(gbufferOutputs.albedo, {
+    registry.RegisterRT("rt_Position", rt_Position);
+    registry.RegisterAliases(rt_Position, {
+        "$user$position",
+        "s_position"
+    });
+
+    registry.RegisterRT("rt_Normal", rt_Normal);
+    registry.RegisterAliases(rt_Normal, {
+        "s_normal",
+        "s_nmap"
+    });
+
+    registry.RegisterRT("rt_Albedo", rt_Albedo);
+    registry.RegisterRT("rt_Color", rt_Albedo);
+    registry.RegisterAliases(rt_Albedo, {
+        "$user$albedo",
         "s_albedo",
         "s_diffuse",
         "s_image",
         "s_base"
     });
 
-    registry.RegisterRT("rt_Normal", gbufferOutputs.normal);
-    registry.RegisterAliases(gbufferOutputs.normal, {
-        "s_normal",
-        "s_nmap"
+    registry.RegisterRT("rt_Depth", rt_Depth);
+    registry.RegisterAliases(rt_Depth, {
+        "$user$base_depth",
+        "s_depth"
     });
 
-    registry.RegisterRT("rt_Material", gbufferOutputs.material);
-    registry.RegisterAliases(gbufferOutputs.material, {
-        "s_material",
-        "s_mat"
+    registry.RegisterRT("rt_Accumulator", rt_Accumulator);
+    registry.RegisterAliases(rt_Accumulator, {
+        "s_accumulator",
+        "s_acc"
     });
 
-    registry.RegisterRT("rt_Depth", gbufferOutputs.depth);
-    registry.RegisterAliases(gbufferOutputs.depth, {
-        "s_depth",
-        "s_position"
+    registry.RegisterRT("rt_Generic_0", rt_Generic_0);
+    registry.RegisterAliases(rt_Generic_0, {
+        "$user$generic0",
+        "s_generic0"
+    });
+
+    registry.RegisterRT("rt_Generic_1", rt_Generic_1);
+    registry.RegisterAliases(rt_Generic_1, {
+        "$user$generic1",
+        "s_generic1"
+    });
+
+    registry.RegisterRT("rt_Generic_2", rt_Generic_2);
+    registry.RegisterAliases(rt_Generic_2, {
+        "s_generic2"
     });
 
     registry.RegisterRT("rt_Backbuffer", backbuffer);
@@ -181,6 +233,11 @@ void FrameGraphRenderer::BuildFrameGraph() {
         "s_backbuffer",
         "s_screen"
     });
+
+    registry.RegisterRT("GBuffer.Albedo", gbufferOutputs.albedo);
+    registry.RegisterRT("GBuffer.Normal", gbufferOutputs.normal);
+    registry.RegisterRT("GBuffer.Material", gbufferOutputs.material);
+    registry.RegisterRT("GBuffer.Depth", gbufferOutputs.depth);
 
     registry.PrintRegistry();
 

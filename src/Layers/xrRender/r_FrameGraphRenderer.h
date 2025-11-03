@@ -73,6 +73,14 @@ private:
 
     void CollectVisibleGeometry();
 
+    framegraph::VirtualResourceHandle CreateRT(
+        const char* name,
+        u32 width,
+        u32 height,
+        nvrhi::Format format,
+        bool isDepthStencil = false
+    );
+
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
