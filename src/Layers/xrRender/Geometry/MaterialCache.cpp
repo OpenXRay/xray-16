@@ -297,9 +297,11 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
         if (d3dDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
             texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
-        } else if (d3dDesc.ArraySize > 1) {
+        }
+        else if (d3dDesc.ArraySize > 1) {
             texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
-        } else {
+        }
+        else {
             texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
         }
 
@@ -405,16 +407,17 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     }
 
                     if (!found) {
+                        const char* cbName = cb->GetBufferName();
+                        bool isPerObjectCB = (cbName && xr_strcmp(cbName, "$Globals") == 0);
                         nvrhi::BufferHandle bufferHandle;
 
-                        if (bindingSlot == 0) {
+                        if (isPerObjectCB) {
                             nvrhi::BufferDesc nvrhiDesc;
                             nvrhiDesc.byteSize = bufDesc.ByteWidth;
                             nvrhiDesc.isConstantBuffer = true;
                             nvrhiDesc.debugName = "XRay_PerObject_CB";
                             nvrhiDesc.keepInitialState = true;
                             nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-
                             bufferHandle = m_device->GetNativeDevice()->createHandleForNativeBuffer(
                                 nvrhi::ObjectTypes::D3D11_Buffer,
                                 nvrhi::Object(d3dBuffer),
@@ -428,8 +431,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                             nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
                             bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
-                            Msg("  [MaterialCache]   Created NEW global CB for slot %u (%u bytes)",
-                                bindingSlot, bufDesc.ByteWidth);
                         }
 
                         if (bufferHandle) {
@@ -437,7 +438,8 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                             cbInfo.slot = bindingSlot;
                             cbInfo.nvrhiBuffer = bufferHandle;
                             cbInfo.size = bufDesc.ByteWidth;
-                            cbInfo.isPerObject = (bindingSlot == 0);
+                            cbInfo.isPerObject = isPerObjectCB;
+                            cbInfo.name = cbName;
 
                             #if 0
                             if (bindingSlot > 0) {

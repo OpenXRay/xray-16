@@ -38,6 +38,8 @@
 
 extern ENGINE_API int dm_debug_trails;
 
+extern ENGINE_API int ps_r4_use_framegraph;
+
 namespace xray::render::RENDER_NAMESPACE
 {
 u32 ps_Preset = 2;
@@ -165,8 +167,6 @@ int ps_r__tf_Anisotropic = 8;
 float ps_r__tf_Mipbias = 0.0f;
 
 int ps_r__clear_models_on_unload = 0; // Alundaio
-
-int ps_r4_use_framegraph = 0;
 
 // R1
 float ps_r1_ssaLOD_A = 64.f;

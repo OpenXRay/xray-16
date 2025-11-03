@@ -85,6 +85,7 @@ struct MaterialPSO {
         nvrhi::BufferHandle nvrhiBuffer;
         u32 size;
         bool isPerObject;
+        shared_str name;
     };
     xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;

@@ -19,7 +19,18 @@ struct alignas(16) PerObjectConstants {
     float padding2[16];
 };
 
-struct alignas(16) GlobalConstants {
+struct alignas(16) DynamicTransforms {
+    float m_WVP[16];
+    float m_WV[12];
+    float m_W[12];
+
+    Fvector4 L_material;
+    Fvector4 hemi_cube_pos_faces;
+    Fvector4 hemi_cube_neg_faces;
+    Fvector4 dt_params;
+};
+
+struct alignas(16) StaticGlobals {
     float m_V[12];
 
     float m_P[16];
@@ -47,6 +58,8 @@ struct alignas(16) GlobalConstants {
 
     Fvector4 parallax;
 };
+
+using GlobalConstants = StaticGlobals;
 
 inline void FillGlobalConstants(GlobalConstants& cb) {
 
@@ -98,6 +111,36 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.padding1 = 0.0f;
     cb.padding2 = 0.0f;
     cb.padding3 = 0.0f;
+}
+
+inline void FillDynamicTransforms(DynamicTransforms& cb) {
+    Fmatrix identity, wv, wvp;
+    identity.identity();
+    wv.set(Device.mView);
+    wvp.mul(Device.mProject, Device.mView);
+
+    Fmatrix wvpT, wvT, wT;
+    wvpT.transpose(wvp);
+    wvT.transpose(wv);
+    wT.transpose(identity);
+
+    cb.m_WVP[0]  = wvpT._11; cb.m_WVP[1]  = wvpT._12; cb.m_WVP[2]  = wvpT._13; cb.m_WVP[3]  = wvpT._14;
+    cb.m_WVP[4]  = wvpT._21; cb.m_WVP[5]  = wvpT._22; cb.m_WVP[6]  = wvpT._23; cb.m_WVP[7]  = wvpT._24;
+    cb.m_WVP[8]  = wvpT._31; cb.m_WVP[9]  = wvpT._32; cb.m_WVP[10] = wvpT._33; cb.m_WVP[11] = wvpT._34;
+    cb.m_WVP[12] = wvpT._41; cb.m_WVP[13] = wvpT._42; cb.m_WVP[14] = wvpT._43; cb.m_WVP[15] = wvpT._44;
+
+    cb.m_WV[0]  = wvT._11; cb.m_WV[1]  = wvT._12; cb.m_WV[2]  = wvT._13; cb.m_WV[3]  = wvT._14;
+    cb.m_WV[4]  = wvT._21; cb.m_WV[5]  = wvT._22; cb.m_WV[6]  = wvT._23; cb.m_WV[7]  = wvT._24;
+    cb.m_WV[8]  = wvT._31; cb.m_WV[9]  = wvT._32; cb.m_WV[10] = wvT._33; cb.m_WV[11] = wvT._34;
+
+    cb.m_W[0]  = wT._11; cb.m_W[1]  = wT._12; cb.m_W[2]  = wT._13; cb.m_W[3]  = wT._14;
+    cb.m_W[4]  = wT._21; cb.m_W[5]  = wT._22; cb.m_W[6]  = wT._23; cb.m_W[7]  = wT._24;
+    cb.m_W[8]  = wT._31; cb.m_W[9]  = wT._32; cb.m_W[10] = wT._33; cb.m_W[11] = wT._34;
+
+    cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);
+    cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
+    cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
+    cb.dt_params.set(300.0f, 300.0f, 300.0f, 0.02f);
 }
 
 }

@@ -8,6 +8,8 @@
 #include "Layers/xrRender/xrRender_console.h"
 #endif
 
+extern ENGINE_API int ps_r4_use_framegraph;
+
 namespace xray::render::RENDER_NAMESPACE
 {
 float g_fSCREEN;
