@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "TextureManager.h"
 #include "DDSLoader.h"
+#include "TextureStreaming.h"
 #include "../RenderContext/RenderDevice.h"
 
 // Modern Texture Manager Implementation
 // Week 1 - Day 1-2: Tasks 1.4, 2.2
+// Week 2 - Day 3: Task 3.3-3.4 (Streaming integration)
 
 namespace xray::render::resources {
 
@@ -135,6 +137,9 @@ TextureManager::TextureManager(RenderDevice* device)
 
     // Pre-allocate some capacity
     m_textures.reserve(1024);
+
+    // Create streaming manager
+    m_streamingManager = xr_make_unique<StreamingManager>(device, this);
 
     Msg("! [TextureManager] Created with budget: %llu MB",
         m_memoryBudget / (1024 * 1024));
@@ -357,10 +362,14 @@ void TextureManager::SetMemoryBudget(u64 bytes) {
 void TextureManager::RequestMips(TextureHandle handle, u32 mipCount) {
     if (!ValidateHandle(handle)) return;
 
-    TextureMetadata& meta = m_textures[handle.index];
-    meta.requestedMips = std::min(mipCount, meta.totalMips);
+    const TextureMetadata& meta = m_textures[handle.index];
+    u32 targetMips = std::min(mipCount, meta.totalMips);
 
-    // TODO: Forward to streaming manager (Week 2)
+    // Update requested count
+    m_textures[handle.index].requestedMips = targetMips;
+
+    // Forward to streaming manager
+    m_streamingManager->RequestMips(handle, targetMips, meta.priority);
 }
 
 void TextureManager::SetPriority(TextureHandle handle, TexturePriority priority) {
@@ -413,7 +422,6 @@ void TextureManager::Release(TextureHandle handle) {
 }
 
 void TextureManager::Evict(TextureHandle handle) {
-    // TODO: Implement in Week 2
     if (!ValidateHandle(handle)) return;
 
     TextureMetadata& meta = m_textures[handle.index];
@@ -425,16 +433,153 @@ void TextureManager::Evict(TextureHandle handle) {
 }
 
 // ═══════════════════════════════════════════════════
-//  UPDATE (Stub)
+//  MEMORY BUDGET ENFORCEMENT (Week 2 - Day 3)
+// ═══════════════════════════════════════════════════
+
+bool TextureManager::CheckMemoryBudget(u64 requiredBytes) const {
+    return (m_memoryUsed + requiredBytes) <= m_memoryBudget;
+}
+
+bool TextureManager::EnforceMemoryBudget(u64 requiredBytes) {
+    if (CheckMemoryBudget(requiredBytes)) {
+        return true;  // Within budget
+    }
+
+    u64 bytesNeeded = (m_memoryUsed + requiredBytes) - m_memoryBudget;
+
+    Msg("! [TextureManager] Over budget! Need to free %llu MB",
+        bytesNeeded / (1024 * 1024));
+
+    // Evict textures to make room
+    return EvictTextures(bytesNeeded);
+}
+
+bool TextureManager::EvictTextures(u64 bytesNeeded) {
+    u64 bytesFreed = 0;
+
+    // ═══════════════════════════════════════════════════
+    //  BUILD EVICTION CANDIDATES (LRU + Priority)
+    // ═══════════════════════════════════════════════════
+
+    struct EvictionCandidate {
+        TextureHandle handle;
+        float score;  // Higher = evict first
+        u64 memoryUsed;
+
+        bool operator<(const EvictionCandidate& other) const {
+            return score > other.score;  // Descending order
+        }
+    };
+
+    xr_vector<EvictionCandidate> candidates;
+
+    for (u32 i = 0; i < m_textures.size(); i++) {
+        const TextureMetadata& meta = m_textures[i];
+
+        if (!meta.isAlive) continue;
+        if (!meta.CanEvict()) continue;  // Check priority, refCount
+
+        // Calculate eviction score
+        // Higher score = more likely to evict
+        float score = 0.0f;
+
+        // Factor 1: Time since last access (LRU)
+        score += meta.lastAccessTime * 10.0f;
+
+        // Factor 2: Priority (low priority = evict first)
+        score += (float)meta.priority * 100.0f;
+
+        // Factor 3: Access count (less used = evict first)
+        score -= (float)meta.accessCount * 0.1f;
+
+        // Factor 4: Memory used (larger = prefer to evict for space)
+        score += (float)meta.memoryUsed / (1024.0f * 1024.0f);
+
+        EvictionCandidate candidate;
+        candidate.handle = TextureHandle(i, meta.generation);
+        candidate.score = score;
+        candidate.memoryUsed = meta.memoryUsed;
+
+        candidates.push_back(candidate);
+    }
+
+    // Sort by score
+    std::sort(candidates.begin(), candidates.end());
+
+    Msg("! [TextureManager] Found %u eviction candidates", candidates.size());
+
+    // ═══════════════════════════════════════════════════
+    //  EVICT UNTIL WE HAVE ENOUGH SPACE
+    // ═══════════════════════════════════════════════════
+
+    for (const auto& candidate : candidates) {
+        if (bytesFreed >= bytesNeeded) {
+            break;  // Freed enough
+        }
+
+        const TextureMetadata* meta = GetMetadata(candidate.handle);
+
+        Msg("!   Evicting: %s (score=%.2f, %llu KB)",
+            meta->filePath.c_str(),
+            candidate.score,
+            candidate.memoryUsed / 1024);
+
+        EvictTextureInternal(candidate.handle);
+
+        bytesFreed += candidate.memoryUsed;
+    }
+
+    Msg("! [TextureManager] Freed %llu MB (needed %llu MB)",
+        bytesFreed / (1024 * 1024),
+        bytesNeeded / (1024 * 1024));
+
+    return bytesFreed >= bytesNeeded;
+}
+
+void TextureManager::EvictTextureInternal(TextureHandle handle) {
+    if (!ValidateHandle(handle)) return;
+
+    TextureMetadata& meta = m_textures[handle.index];
+
+    if (meta.state != TextureState::Resident) {
+        return;  // Already evicted
+    }
+
+    // Release NVRHI texture
+    if (meta.nvrhiTexture) {
+        // NVRHI will destroy when ref count reaches zero
+        meta.nvrhiTexture = nullptr;
+    }
+
+    // Update state
+    meta.state = TextureState::Evicted;
+    meta.residentMips = 0;
+
+    // Update memory tracking
+    m_memoryUsed -= meta.memoryUsed;
+    meta.memoryUsed = 0;
+
+    Msg("! [TextureManager] Evicted: %s", meta.filePath.c_str());
+}
+
+// ═══════════════════════════════════════════════════
+//  UPDATE (Week 2 - Integrated Streaming)
 // ═══════════════════════════════════════════════════
 
 void TextureManager::Update(float deltaTime) {
-    // TODO: Implement streaming and eviction in Week 2
-    // For now, just update timers
-
+    // Update timers
     for (auto& meta : m_textures) {
         if (!meta.isAlive) continue;
         meta.lastAccessTime += deltaTime;
+    }
+
+    // Update streaming
+    m_streamingManager->Update(deltaTime);
+
+    // Check if over budget (trigger eviction)
+    if (m_memoryUsed > m_memoryBudget) {
+        u64 excess = m_memoryUsed - m_memoryBudget;
+        EvictTextures(excess);
     }
 }
 
@@ -546,37 +691,8 @@ void TextureManager::LoadTextureAsync(TextureHandle handle) {
 }
 
 void TextureManager::StreamMips(TextureHandle handle, u32 targetMips) {
-    // TODO: Implement in Week 2
-}
-
-void TextureManager::EvictTextures(u64 bytesNeeded) {
-    // TODO: Implement in Week 2
-}
-
-void TextureManager::EvictTextureInternal(TextureHandle handle) {
-    if (!ValidateHandle(handle)) return;
-
-    TextureMetadata& meta = m_textures[handle.index];
-
-    if (meta.state != TextureState::Resident) {
-        return;  // Already evicted
-    }
-
-    // Release NVRHI texture
-    if (meta.nvrhiTexture) {
-        // NVRHI will destroy when ref count reaches zero
-        meta.nvrhiTexture = nullptr;
-    }
-
-    // Update state
-    meta.state = TextureState::Evicted;
-    meta.residentMips = 0;
-
-    // Update memory tracking
-    m_memoryUsed -= meta.memoryUsed;
-    meta.memoryUsed = 0;
-
-    Msg("! [TextureManager] Evicted: %s", meta.filePath.c_str());
+    // Forward to streaming manager
+    m_streamingManager->RequestMips(handle, targetMips, TexturePriority::Medium);
 }
 
 // ═══════════════════════════════════════════════════

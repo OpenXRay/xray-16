@@ -12,6 +12,8 @@ namespace xray::render::ng {
 
 namespace xray::render::resources {
 
+class StreamingManager;  // Forward declaration
+
 // ═══════════════════════════════════════════════════
 //  TEXTURE STATE TRACKING
 // ═══════════════════════════════════════════════════
@@ -238,6 +240,12 @@ public:
     Statistics GetStatistics() const;
     void PrintStatistics() const;
 
+    // ═══════════════════════════════════════════════════
+    //  STREAMING (Week 2)
+    // ═══════════════════════════════════════════════════
+
+    StreamingManager* GetStreamingManager() { return m_streamingManager.get(); }
+
 private:
     xray::render::ng::RenderDevice* m_device;
 
@@ -259,6 +267,12 @@ private:
     u64 m_memoryUsed = 0;
 
     // ═══════════════════════════════════════════════════
+    //  STREAMING (Week 2)
+    // ═══════════════════════════════════════════════════
+
+    xr_unique_ptr<StreamingManager> m_streamingManager;
+
+    // ═══════════════════════════════════════════════════
     //  INTERNAL METHODS
     // ═══════════════════════════════════════════════════
 
@@ -273,7 +287,9 @@ private:
     void StreamMips(TextureHandle handle, u32 targetMips);  // Week 2
 
     // Eviction (Week 2)
-    void EvictTextures(u64 bytesNeeded);
+    bool CheckMemoryBudget(u64 requiredBytes) const;
+    bool EnforceMemoryBudget(u64 requiredBytes);
+    bool EvictTextures(u64 bytesNeeded);
     void EvictTextureInternal(TextureHandle handle);
 
     // Statistics
