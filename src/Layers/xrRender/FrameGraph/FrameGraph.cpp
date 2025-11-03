@@ -3,16 +3,22 @@
 
 namespace xray::render::framegraph {
 
-FrameGraph::FrameGraph(nvrhi::IDevice* device)
+FrameGraph::FrameGraph(nvrhi::IDevice* device, resources::ModernResourceManager* resourceManager)
     : m_device(device)
+    , m_resourceManager(resourceManager)
 {
     VERIFY(device != nullptr);
+
+    if (m_resourceManager) {
+        m_resourcePool = xr_make_unique<FGResourcePool>(m_resourceManager);
+        Msg("* [FrameGraph] Initialized with ResourceManager");
+    } else {
+        Msg("* [FrameGraph] Initialized without ResourceManager (direct NVRHI mode)");
+    }
 
     m_resources.reserve(256);
     m_passes.reserve(128);
     m_sortedPasses.reserve(128);
-
-    Msg("* [FrameGraph] Initialized");
 }
 
 FrameGraph::~FrameGraph() {
@@ -238,20 +244,41 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 }
 
 void FrameGraph::Reset() {
+    if (m_resourceManager) {
+        resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+        resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
+
+        for (auto& resource : m_resources) {
+            if (resource.desc.isImported) {
+                continue;
+            }
+
+            if (resource.resourceTexture.IsValid()) {
+                texManager->Release(resource.resourceTexture);
+                resource.resourceTexture = resources::TextureHandle();
+            }
+
+            if (resource.resourceBuffer.IsValid()) {
+                bufManager->Release(resource.resourceBuffer);
+                resource.resourceBuffer = resources::BufferHandle();
+            }
+        }
+    }
+
+    if (m_resourcePool) {
+        m_resourcePool->Reset();
+    }
+
     for (auto& resource : m_resources) {
         if (resource.desc.isImported) {
             continue;
         }
 
         if (resource.nvrhiTexture) {
-            Msg("~ [FrameGraph] Releasing texture '%s'",
-                resource.desc.debugName.c_str());
             resource.nvrhiTexture = nullptr;
         }
 
         if (resource.nvrhiBuffer) {
-            Msg("~ [FrameGraph] Releasing buffer '%s'",
-                resource.desc.debugName.c_str());
             resource.nvrhiBuffer = nullptr;
         }
     }
@@ -685,6 +712,12 @@ void FrameGraph::ComputeResourceLifetimes() {
 void FrameGraph::AllocateResources() {
     u64 totalMemoryAllocated = 0;
 
+    if (m_resourcePool) {
+        Msg("~ [FrameGraph] Allocating resources via FGResourcePool...");
+    } else {
+        Msg("~ [FrameGraph] Allocating resources directly via NVRHI...");
+    }
+
     for (auto& resource : m_resources) {
         if (resource.firstUsedPass == INVALID_INDEX) {
             continue;
@@ -695,91 +728,181 @@ void FrameGraph::AllocateResources() {
             continue;
         }
 
+        bool usePersistent = resource.isPersistent || resource.desc.isRenderTarget || resource.desc.isDepthStencil;
+
         if (resource.desc.type == ResourceDesc::Type::Buffer) {
-            nvrhi::BufferDesc bufferDesc;
-            bufferDesc.byteSize = resource.desc.bufferSize;
-            bufferDesc.structStride = resource.desc.structStride;
-            bufferDesc.debugName = resource.desc.debugName.c_str();
-            bufferDesc.initialState = nvrhi::ResourceStates::Common;
-            bufferDesc.keepInitialState = false;
+            if (m_resourcePool) {
+                resources::BufferDesc rmBufferDesc;
+                rmBufferDesc.type = resources::BufferType::Structured;
+                rmBufferDesc.usage = resources::BufferUsage::Static;
+                rmBufferDesc.size = resource.desc.bufferSize;
+                rmBufferDesc.stride = resource.desc.structStride;
+                rmBufferDesc.gpuWrite = resource.desc.allowUAV;
+                rmBufferDesc.cpuAccess = false;
+                rmBufferDesc.debugName = resource.desc.debugName;
 
-            if (resource.desc.allowUAV) {
-                bufferDesc.canHaveUAVs = true;
-            }
-            if (resource.desc.structStride > 0) {
-                bufferDesc.isConstantBuffer = false;
-                bufferDesc.structStride = resource.desc.structStride;
+                resources::BufferHandle rmHandle = m_resourcePool->AllocateBuffer(rmBufferDesc);
+
+                if (rmHandle.IsValid()) {
+                    resource.resourceBuffer = rmHandle;
+
+                    resources::BufferManager* bufManager = m_resourceManager->GetBufferManager();
+                    resource.nvrhiBuffer = bufManager->GetNVRHIBuffer(rmHandle);
+                    resource.isAllocated = (resource.nvrhiBuffer != nullptr);
+                    totalMemoryAllocated += resource.memorySize;
+
+                    Msg("~ [FrameGraph] Allocated buffer '%s' via ResourceManager: %.2f MB",
+                        resource.desc.debugName.c_str(),
+                        resource.memorySize / (1024.0f * 1024.0f));
+
+                    continue;
+                } else {
+                    Msg("! [FrameGraph] Failed to allocate buffer '%s' via ResourceManager, falling back to NVRHI",
+                        resource.desc.debugName.c_str());
+                }
             }
 
-            resource.nvrhiBuffer = m_device->createBuffer(bufferDesc);
+            nvrhi::BufferDesc nvrhiDesc;
+            nvrhiDesc.byteSize = resource.desc.bufferSize;
+            nvrhiDesc.structStride = resource.desc.structStride;
+            nvrhiDesc.debugName = resource.desc.debugName.c_str();
+            nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
+            nvrhiDesc.keepInitialState = false;
+            nvrhiDesc.canHaveUAVs = resource.desc.allowUAV;
+
+            resource.nvrhiBuffer = m_device->createBuffer(nvrhiDesc);
 
             if (resource.nvrhiBuffer) {
                 resource.isAllocated = true;
                 totalMemoryAllocated += resource.memorySize;
 
-                Msg("~ [FrameGraph] Allocated buffer '%s': %.2f MB",
+                Msg("~ [FrameGraph] Allocated buffer '%s' directly: %.2f MB",
                     resource.desc.debugName.c_str(),
                     resource.memorySize / (1024.0f * 1024.0f));
             } else {
-                Msg("! [FrameGraph] Failed to allocate buffer '%s'",
+                Msg("! [FrameGraph] Failed to create NVRHI buffer '%s'",
                     resource.desc.debugName.c_str());
             }
         } else {
-            nvrhi::TextureDesc texDesc;
-            texDesc.width = resource.desc.width;
-            texDesc.height = resource.desc.height;
-            texDesc.depth = resource.desc.depth;
-            texDesc.arraySize = resource.desc.arraySize;
-            texDesc.mipLevels = resource.desc.mipLevels;
-            texDesc.sampleCount = resource.desc.sampleCount;
-            texDesc.format = resource.desc.format;
-            texDesc.debugName = resource.desc.debugName.c_str();
-            texDesc.initialState = nvrhi::ResourceStates::Common;
-            texDesc.keepInitialState = false;
+            if (m_resourcePool) {
+                resources::TextureDesc rmTexDesc;
+                rmTexDesc.width = resource.desc.width;
+                rmTexDesc.height = resource.desc.height;
+                rmTexDesc.depth = resource.desc.depth;
+                rmTexDesc.arraySize = resource.desc.arraySize;
+                rmTexDesc.mipLevels = resource.desc.mipLevels;
+                rmTexDesc.format = resource.desc.format;
+                rmTexDesc.debugName = resource.desc.debugName;
 
-            switch (resource.desc.type) {
-                case ResourceDesc::Type::Texture2D:
-                    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
-                    break;
-                case ResourceDesc::Type::Texture3D:
-                    texDesc.dimension = nvrhi::TextureDimension::Texture3D;
-                    break;
-                case ResourceDesc::Type::TextureCube:
-                    texDesc.dimension = nvrhi::TextureDimension::TextureCube;
-                    break;
-                case ResourceDesc::Type::Texture2DArray:
-                    texDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
-                    break;
-                default:
-                    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
-                    break;
+                switch (resource.desc.type) {
+                    case ResourceDesc::Type::Texture2D:
+                        rmTexDesc.type = resources::TextureDesc::Texture2D;
+                        break;
+                    case ResourceDesc::Type::Texture3D:
+                        rmTexDesc.type = resources::TextureDesc::Texture3D;
+                        break;
+                    case ResourceDesc::Type::TextureCube:
+                        rmTexDesc.type = resources::TextureDesc::TextureCube;
+                        break;
+                    case ResourceDesc::Type::Texture2DArray:
+                        rmTexDesc.type = resources::TextureDesc::Texture2D;
+                        break;
+                    default:
+                        rmTexDesc.type = resources::TextureDesc::Texture2D;
+                        break;
+                }
+
+                rmTexDesc.isRenderTarget = resource.desc.isRenderTarget;
+                rmTexDesc.isDepthStencil = resource.desc.isDepthStencil;
+                rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+
+                resources::TextureHandle rmHandle;
+                if (usePersistent) {
+                    rmHandle = m_resourcePool->AllocatePersistentTexture(rmTexDesc);
+                } else {
+                    rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
+                }
+
+                if (rmHandle.IsValid()) {
+                    resource.resourceTexture = rmHandle;
+
+                    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+                    resource.nvrhiTexture = texManager->GetNVRHITexture(rmHandle);
+                    resource.isAllocated = (resource.nvrhiTexture != nullptr);
+                    totalMemoryAllocated += resource.memorySize;
+
+                    Msg("~ [FrameGraph] Allocated texture '%s' via ResourceManager%s: %ux%ux%u, %.2f MB",
+                        resource.desc.debugName.c_str(),
+                        !usePersistent ? " (transient)" : "",
+                        resource.desc.width,
+                        resource.desc.height,
+                        resource.desc.depth,
+                        resource.memorySize / (1024.0f * 1024.0f));
+
+                    continue;
+                } else {
+                    Msg("! [FrameGraph] Failed to allocate texture '%s' via ResourceManager, falling back to NVRHI",
+                        resource.desc.debugName.c_str());
+                }
             }
 
-            texDesc.isRenderTarget = resource.desc.isRenderTarget;
-            texDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
-            texDesc.isShaderResource = true;
+            nvrhi::TextureDesc nvrhiDesc;
+                nvrhiDesc.width = resource.desc.width;
+                nvrhiDesc.height = resource.desc.height;
+                nvrhiDesc.depth = resource.desc.depth;
+                nvrhiDesc.arraySize = resource.desc.arraySize;
+                nvrhiDesc.mipLevels = resource.desc.mipLevels;
+                nvrhiDesc.sampleCount = resource.desc.sampleCount;
+                nvrhiDesc.format = resource.desc.format;
+                nvrhiDesc.debugName = resource.desc.debugName.c_str();
+                nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
+                nvrhiDesc.keepInitialState = false;
 
-            if (resource.desc.isDepthStencil) {
-                texDesc.isRenderTarget = true;
-                texDesc.isTypeless = true;
-                texDesc.useClearValue = true;
-                texDesc.clearValue = nvrhi::Color(1.0f);
-            }
+                switch (resource.desc.type) {
+                    case ResourceDesc::Type::Texture2D:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+                        break;
+                    case ResourceDesc::Type::Texture3D:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture3D;
+                        break;
+                    case ResourceDesc::Type::TextureCube:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::TextureCube;
+                        break;
+                    case ResourceDesc::Type::Texture2DArray:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
+                        break;
+                    default:
+                        nvrhiDesc.dimension = nvrhi::TextureDimension::Texture2D;
+                        break;
+                }
 
-            resource.nvrhiTexture = m_device->createTexture(texDesc);
+                nvrhiDesc.isRenderTarget = resource.desc.isRenderTarget;
+                nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
+                nvrhiDesc.isShaderResource = true;
+
+                if (resource.desc.isDepthStencil) {
+                    nvrhiDesc.isRenderTarget = true;
+                    nvrhiDesc.isTypeless = true;
+                    nvrhiDesc.useClearValue = true;
+                    nvrhiDesc.clearValue = nvrhi::Color(1.0f);
+                }
+
+            resource.nvrhiTexture = m_device->createTexture(nvrhiDesc);
 
             if (resource.nvrhiTexture) {
                 resource.isAllocated = true;
                 totalMemoryAllocated += resource.memorySize;
 
-                Msg("~ [FrameGraph] Allocated texture '%s': %ux%ux%u, %.2f MB",
+                Msg("~ [FrameGraph] Allocated texture '%s'%s%s: %ux%ux%u, %.2f MB",
                     resource.desc.debugName.c_str(),
+                    m_resourcePool ? " via pool" : "",
+                    (m_resourcePool && !usePersistent) ? " (transient)" : "",
                     resource.desc.width,
                     resource.desc.height,
                     resource.desc.depth,
                     resource.memorySize / (1024.0f * 1024.0f));
             } else {
-                Msg("! [FrameGraph] Failed to allocate texture '%s'",
+                Msg("! [FrameGraph] Failed to create NVRHI texture '%s'",
                     resource.desc.debugName.c_str());
             }
         }
@@ -789,6 +912,10 @@ void FrameGraph::AllocateResources() {
 
     Msg("~ [FrameGraph] Resource allocation complete: %.2f MB total",
         totalMemoryAllocated / (1024.0f * 1024.0f));
+
+    if (m_resourcePool) {
+        m_resourcePool->PrintStatistics();
+    }
 }
 
 void FrameGraph::InsertResourceBarriers() {

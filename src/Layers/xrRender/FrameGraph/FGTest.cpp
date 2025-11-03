@@ -9,7 +9,7 @@ namespace ng = xray::render::ng;
 void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Triangle Test ===");
 
-    FrameGraph fg(device);
+    FrameGraph fg(device, nullptr);
     fg.SetRenderContext(context);
 
     const nvrhi::TextureDesc& bbDesc = backbuffer->getDesc();
@@ -79,7 +79,7 @@ void TestSimpleTriangle(nvrhi::IDevice* device, ng::RenderContext* context, nvrh
 void TestTwoPassRender(nvrhi::IDevice* device, ng::RenderContext* context, nvrhi::ITexture* backbuffer) {
     Msg("=== FrameGraph Two-Pass Test ===");
 
-    FrameGraph fg(device);
+    FrameGraph fg(device, nullptr);
     fg.SetRenderContext(context);
 
     const nvrhi::TextureDesc& bbDesc = backbuffer->getDesc();

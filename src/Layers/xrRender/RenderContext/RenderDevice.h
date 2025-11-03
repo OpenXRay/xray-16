@@ -4,6 +4,10 @@
 #include "PipelineState.h"
 #include <nvrhi/nvrhi.h>
 
+namespace xray::render::resources {
+    class ModernResourceManager;
+}
+
 namespace xray::render::ng {
 
 class RenderContext;
@@ -187,6 +191,8 @@ public:
 
     PipelineStateCache* GetPipelineCache() { return m_pipelineCache.get(); }
 
+    xray::render::resources::ModernResourceManager* GetModernResourceManager() { return m_modernResourceManager.get(); }
+
     nvrhi::IDevice* GetNativeDevice() const;
 
     struct Statistics {
@@ -212,6 +218,8 @@ private:
     xr_unique_ptr<nvrhi_wrapper::NVRHIDevice> m_nvrhiDevice;
 
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
+
+    xr_unique_ptr<xray::render::resources::ModernResourceManager> m_modernResourceManager;
 
     bool m_initialized = false;
 

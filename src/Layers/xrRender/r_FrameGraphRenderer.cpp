@@ -33,7 +33,10 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     Msg("* [FrameGraphRenderer] Initializing...");
 
-    m_framegraph = xr_make_unique<framegraph::FrameGraph>(device->GetNVRHIDevice());
+    m_framegraph = xr_make_unique<framegraph::FrameGraph>(
+        device->GetNVRHIDevice(),
+        device->GetModernResourceManager()
+    );
 
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
 
@@ -455,7 +458,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             case MT_NORMAL:
             default:
                 xform = Fidentity;
-                continue;
+                break;
         }
 
         if (ProcessVisualGeometry(visual, xform)) {

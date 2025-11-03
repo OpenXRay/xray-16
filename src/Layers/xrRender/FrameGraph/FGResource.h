@@ -2,6 +2,7 @@
 
 #include "FGTypes.h"
 #include "../RenderContext/RenderContext.h"
+#include "../ResourceManager/ResourceHandle.h"
 
 namespace xray::render::framegraph {
 
@@ -77,8 +78,8 @@ struct ResourceNode {
     u32 lastUsedPass = INVALID_INDEX;
     u32 refCount = 0;
 
-    xray::render::ng::TextureHandle physicalTexture;
-    xray::render::ng::BufferHandle physicalBuffer;
+    xray::render::resources::TextureHandle resourceTexture;
+    xray::render::resources::BufferHandle resourceBuffer;
 
     nvrhi::TextureHandle nvrhiTexture;
     nvrhi::BufferHandle nvrhiBuffer;
