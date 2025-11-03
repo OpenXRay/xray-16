@@ -2,9 +2,11 @@
 
 #include "ResourceHandle.h"
 #include <nvrhi/nvrhi.h>
+#include <mutex>
 
 // Modern Texture Manager
 // Week 1 - Day 1: Tasks 1.2-1.3
+// Week 3 - Day 5: Task 5.4 - Thread safety
 
 namespace xray::render::ng {
     class RenderDevice;  // Forward declaration
@@ -153,6 +155,12 @@ public:
         TexturePriority priority = TexturePriority::Medium
     );
 
+    // Thread-safe loading (for background threads) - Week 3
+    TextureHandle LoadTextureThreadSafe(
+        const char* path,
+        TexturePriority priority = TexturePriority::Medium
+    );
+
     // Create runtime texture (not from disk)
     TextureHandle CreateTexture(
         const TextureDesc& desc,
@@ -291,6 +299,17 @@ private:
     bool EnforceMemoryBudget(u64 requiredBytes);
     bool EvictTextures(u64 bytesNeeded);
     void EvictTextureInternal(TextureHandle handle);
+
+    // ═══════════════════════════════════════════════════
+    //  THREAD SAFETY (Week 3)
+    // ═══════════════════════════════════════════════════
+
+    mutable std::mutex m_texturesMutex;     // Protects m_textures
+    mutable std::mutex m_pathLookupMutex;   // Protects m_pathToHandle
+
+    // Thread-safe handle operations
+    TextureHandle AllocateHandleThreadSafe();
+    bool ValidateHandleThreadSafe(TextureHandle handle) const;
 
     // Statistics
     mutable Statistics m_stats;

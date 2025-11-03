@@ -1,9 +1,11 @@
 #pragma once
 
 #include "TextureManager.h"
+#include "AsyncIO.h"
 
 // Texture Streaming System
 // Week 2 - Day 3: Task 3.1
+// Week 3 - Day 5: Task 5.3 - Async I/O integration
 
 namespace xray::render::ng {
     class RenderDevice;  // Forward declaration
@@ -106,6 +108,7 @@ public:
 private:
     xray::render::ng::RenderDevice* m_device;
     TextureManager* m_texManager;
+    AsyncIOManager* m_asyncIO;  // Async I/O manager
 
     // ═══════════════════════════════════════════════════
     //  REQUEST QUEUE (Priority-based)
@@ -137,6 +140,9 @@ private:
     // Mip loading
     bool LoadMipsFromDisk(StreamingRequest& request);
     bool UploadMipsToGPU(StreamingRequest& request);
+
+    // Async I/O callback
+    void OnAsyncLoadComplete(TextureHandle handle, AsyncIORequest& ioRequest);
 
     // Statistics
     mutable Statistics m_stats;

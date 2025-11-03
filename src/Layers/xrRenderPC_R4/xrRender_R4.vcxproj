@@ -184,6 +184,7 @@
     <ClInclude Include="..\xrRender\ResourceManager\TestTextureManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\TextureManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\TextureStreaming.h" />
+    <ClInclude Include="..\xrRender\ResourceManager\AsyncIO.h" />
     <ClInclude Include="..\xrRender\ResourceManager\BufferManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\SamplerCache.h" />
     <ClInclude Include="..\xrRender\ResourceManager\ModernResourceManager.h" />
@@ -378,6 +379,7 @@
     <ClCompile Include="..\xrRender\ResourceManager\TestTextureManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\TextureManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\TextureStreaming.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager\AsyncIO.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\BufferManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\SamplerCache.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\ModernResourceManager.cpp" />

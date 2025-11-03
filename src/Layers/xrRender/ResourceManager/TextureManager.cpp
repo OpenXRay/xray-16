@@ -746,7 +746,68 @@ void TextureManager::PrintStatistics() const {
 }
 
 // ═══════════════════════════════════════════════════
-//  HELPER STRING CONVERSIONS
+//  THREAD-SAFE OPERATIONS (Week 3)
+// ═══════════════════════════════════════════════════
+
+TextureHandle TextureManager::LoadTextureThreadSafe(
+    const char* path,
+    TexturePriority priority)
+{
+    shared_str pathStr = path;
+
+    // Check if already loaded (thread-safe)
+    {
+        std::lock_guard<std::mutex> lock(m_pathLookupMutex);
+
+        auto it = m_pathToHandle.find(pathStr);
+        if (it != m_pathToHandle.end()) {
+            TextureHandle existing = it->second;
+
+            if (ValidateHandleThreadSafe(existing)) {
+                AddRef(existing);
+                return existing;
+            }
+        }
+    }
+
+    // Allocate handle (thread-safe)
+    TextureHandle handle = AllocateHandleThreadSafe();
+
+    // Setup metadata
+    {
+        std::lock_guard<std::mutex> lock(m_texturesMutex);
+
+        TextureMetadata& meta = m_textures[handle.index];
+        meta.filePath = pathStr;
+        meta.state = TextureState::Unloaded;
+        meta.priority = priority;
+        meta.isAlive = true;
+    }
+
+    // Register path
+    {
+        std::lock_guard<std::mutex> lock(m_pathLookupMutex);
+        m_pathToHandle[pathStr] = handle;
+    }
+
+    // Kick off async load via streaming manager
+    m_streamingManager->RequestMips(handle, 999, priority);
+
+    Msg("! [TextureManager] LoadTextureThreadSafe: %s", path);
+
+    return handle;
+}
+
+TextureHandle TextureManager::AllocateHandleThreadSafe() {
+    std::lock_guard<std::mutex> lock(m_texturesMutex);
+    return AllocateHandle();  // Use existing non-thread-safe version under lock
+}
+
+bool TextureManager::ValidateHandleThreadSafe(TextureHandle handle) const {
+    std::lock_guard<std::mutex> lock(m_texturesMutex);
+    return ValidateHandle(handle);  // Use existing non-thread-safe version under lock
+}
+
 // ═══════════════════════════════════════════════════
 
 const char* TextureStateToString(TextureState state) {
