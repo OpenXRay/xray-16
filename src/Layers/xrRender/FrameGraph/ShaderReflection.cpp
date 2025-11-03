@@ -42,14 +42,14 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     Msg("!   Output parameters: %u", shaderDesc.OutputParameters);
 
     // ═══════════════════════════════════════════════════
-    //  ENUMERATE INPUT RESOURCES (Textures)
+    //  ENUMERATE INPUT RESOURCES (Textures + Samplers)
     // ═══════════════════════════════════════════════════
 
     for (u32 i = 0; i < shaderDesc.BoundResources; i++) {
         D3D11_SHADER_INPUT_BIND_DESC bindDesc;
         reflection->GetResourceBindingDesc(i, &bindDesc);
 
-        // Only care about textures (SRVs)
+        // Textures (SRVs)
         if (bindDesc.Type == D3D_SIT_TEXTURE) {
             ShaderRTBindings::InputTexture input;
             input.name = bindDesc.Name;  // "s_position", "s_normal", etc.
@@ -59,6 +59,17 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
 
             Msg("!   Input texture: %s (slot t%u)",
                 input.name.c_str(), input.slot);
+        }
+        // Samplers
+        else if (bindDesc.Type == D3D_SIT_SAMPLER) {
+            ShaderRTBindings::Sampler sampler;
+            sampler.name = bindDesc.Name;  // "smp_base", "smp_rtlinear", etc.
+            sampler.slot = bindDesc.BindPoint;  // s0, s1, ...
+
+            bindings.samplers.push_back(sampler);
+
+            Msg("!   Sampler: %s (slot s%u)",
+                sampler.name.c_str(), sampler.slot);
         }
     }
 

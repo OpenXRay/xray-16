@@ -97,20 +97,34 @@ struct MaterialPSO {
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
     // Constant buffers (extracted from shader reflection)
+    // PER-STAGE to handle VS/PS having different CBs at same slot
+    enum class ShaderStage : u8 {
+        Vertex = 0,
+        Pixel = 1,
+        Geometry = 2,
+        Hull = 3,
+        Domain = 4,
+        Compute = 5
+    };
+
     struct ConstantBufferInfo {
         u32 slot;                    // Binding slot (b0, b1, b2, etc.)
+        ShaderStage stage;           // Which shader stage (VS/PS/etc)
         nvrhi::BufferHandle nvrhiBuffer;  // NVRHI wrapped buffer
         u32 size;                    // Size in bytes
-        bool isPerObject;            // True if slot 0 (per-object CB)
-        shared_str name;
+        bool isPerObject;            // True if $Globals CB
+        shared_str name;             // CB name from reflection
         // NOTE: initialData removed - causes memory corruption
     };
     xr_vector<ConstantBufferInfo> constantBuffers;
-    u32 perObjectCBSize = 0;  // Size of slot 0 CB (for convenience)
+    u32 perObjectCBSize = 0;  // Size of $Globals CB (for convenience)
 
-    // Samplers (extracted from X-Ray state)
+    // Samplers (extracted from shader reflection + X-Ray state)
+    // PER-STAGE to handle VS/PS having different samplers
     struct SamplerInfo {
         u32 slot;                    // Binding slot (s0, s1, s2, etc.)
+        ShaderStage stage;           // Which shader stage (VS/PS/etc)
+        shared_str name;             // Sampler name from reflection (e.g. "smp_base")
         nvrhi::SamplerHandle nvrhiSampler;  // NVRHI wrapped sampler
     };
     xr_vector<SamplerInfo> samplers;
