@@ -655,6 +655,7 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
         meta.state = TextureState::Unloaded;
         meta.priority = priority;
         meta.isAlive = true;
+        meta.refCount = 1;
     }
 
     {
@@ -662,9 +663,9 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
         m_pathToHandle[pathStr] = handle;
     }
 
-    m_streamingManager->RequestMips(handle, 999, priority);
-
     Msg("! [TextureManager] LoadTextureThreadSafe: %s", path);
+
+    LoadTextureSync(handle);
 
     return handle;
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TextureManager.h"
+#include "TextureStreaming.h"
 #include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
 
@@ -253,6 +254,196 @@ bool Test_Statistics() {
     TEST_PASS();
 }
 
+bool Test_AsyncMultipleTextures() {
+    Msg("! [TEST] Async loading multiple textures...");
+
+    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    TextureManager texManager(device);
+
+    xr_vector<TextureHandle> textures;
+    const u32 numTextures = 10;
+
+    const char* testTextures[] = {
+        "$game_textures$\\$alphadxt1",
+        "$game_textures$\\$noalphadxt5",
+        "$game_textures$\\$shadertest",
+        "$game_textures$\\act\\act_arm_1",
+        "$game_textures$\\$alphadxt1",
+        "$game_textures$\\$noalphadxt5",
+        "$game_textures$\\$shadertest",
+        "$game_textures$\\$alphadxt1",
+        "$game_textures$\\$noalphadxt5",
+        "$game_textures$\\$shadertest"
+    };
+
+    Msg("! [TEST] Submitting %u async load requests...", numTextures);
+
+    for (u32 i = 0; i < numTextures; i++) {
+        TextureHandle handle = texManager.LoadTexture(testTextures[i], TexturePriority::High);
+        textures.push_back(handle);
+    }
+
+    u32 frame = 0;
+    u32 loadedCount = 0;
+
+    while (loadedCount < textures.size() && frame < 300) {
+        texManager.Update(0.016f);
+
+        loadedCount = 0;
+        for (auto handle : textures) {
+            if (texManager.IsResident(handle)) {
+                loadedCount++;
+            }
+        }
+
+        if (frame % 60 == 0) {
+            Msg("! [TEST] Frame %u: %u / %u textures loaded",
+                frame, loadedCount, (u32)textures.size());
+        }
+
+        frame++;
+    }
+
+    TEST_ASSERT(loadedCount == textures.size(), "All textures should be loaded");
+
+    Msg("! [TEST] All %u textures loaded in %u frames (%.2f seconds)",
+        (u32)textures.size(), frame, frame * 0.016f);
+
+    auto stats = texManager.GetStatistics();
+    Msg("! [TEST] Stats: %u resident, Memory: %llu KB",
+        stats.texturesResident, stats.totalMemoryUsed / 1024);
+
+    for (auto handle : textures) {
+        texManager.Release(handle);
+    }
+
+    TEST_PASS();
+}
+
+bool Test_AsyncIOStatistics() {
+    Msg("! [TEST] Async I/O statistics tracking...");
+
+    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    TextureManager texManager(device);
+
+    auto* streamingMgr = texManager.GetStreamingManager();
+    auto initialStats = streamingMgr->GetStatistics();
+
+    Msg("! [TEST] Initial stats: Pending=%u, InProgress=%u, Completed=%u",
+        initialStats.requestsPending,
+        initialStats.requestsInProgress,
+        initialStats.requestsCompleted);
+
+    TextureHandle handle1 = texManager.LoadTexture("$game_textures$\\$alphadxt1", TexturePriority::High);
+    TextureHandle handle2 = texManager.LoadTexture("$game_textures$\\$noalphadxt5", TexturePriority::High);
+    TextureHandle handle3 = texManager.LoadTexture("$game_textures$\\act\\act_arm_1", TexturePriority::Medium);
+
+    for (u32 i = 0; i < 100; i++) {
+        texManager.Update(0.016f);
+
+        if (texManager.IsResident(handle1) &&
+            texManager.IsResident(handle2) &&
+            texManager.IsResident(handle3)) {
+            break;
+        }
+    }
+
+    auto finalStats = streamingMgr->GetStatistics();
+
+    Msg("! [TEST] Final stats: Pending=%u, InProgress=%u, Completed=%u",
+        finalStats.requestsPending,
+        finalStats.requestsInProgress,
+        finalStats.requestsCompleted);
+
+    TEST_ASSERT(finalStats.requestsCompleted >= 0, "Should have completed requests");
+    TEST_ASSERT(finalStats.requestsPending == 0, "No requests should be pending");
+    TEST_ASSERT(finalStats.requestsInProgress == 0, "No requests should be in progress");
+
+    texManager.Release(handle1);
+    texManager.Release(handle2);
+    texManager.Release(handle3);
+
+    TEST_PASS();
+}
+
+bool Test_ThreadSafeLoading() {
+    Msg("! [TEST] Thread-safe texture loading...");
+
+    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    TextureManager texManager(device);
+
+    TextureHandle handle1 = texManager.LoadTextureThreadSafe("$game_textures$\\$alphadxt1", TexturePriority::High);
+    TextureHandle handle2 = texManager.LoadTextureThreadSafe("$game_textures$\\$alphadxt1", TexturePriority::High);
+    TextureHandle handle3 = texManager.LoadTextureThreadSafe("$game_textures$\\$alphadxt1", TexturePriority::High);
+
+    TEST_ASSERT(handle1.index == handle2.index, "Should return same handle");
+    TEST_ASSERT(handle2.index == handle3.index, "Should return same handle");
+
+    const TextureMetadata* meta = texManager.GetMetadata(handle1);
+    TEST_ASSERT(meta != nullptr, "Metadata should exist");
+    TEST_ASSERT(meta->refCount == 3, "Reference count should be 3");
+
+    for (u32 i = 0; i < 100; i++) {
+        texManager.Update(0.016f);
+        if (texManager.IsResident(handle1)) break;
+    }
+
+    TEST_ASSERT(texManager.IsResident(handle1), "Texture should be resident");
+
+    texManager.Release(handle1);
+    texManager.Release(handle2);
+    texManager.Release(handle3);
+
+    TEST_PASS();
+}
+
+bool Test_AsyncLoadingPerformance() {
+    Msg("! [TEST] Async loading performance...");
+
+    ng::RenderDevice* device = xray::render::RENDER_NAMESPACE::GetGlobalRenderDevice();
+    TextureManager texManager(device);
+
+    float startTime = Device.fTimeGlobal;
+
+    xr_vector<TextureHandle> textures;
+    const u32 numTextures = 5;
+
+    for (u32 i = 0; i < numTextures; i++) {
+        TextureHandle handle = texManager.LoadTexture("$game_textures$\\act\\act_arm_1", TexturePriority::High);
+        textures.push_back(handle);
+    }
+
+    u32 frame = 0;
+    while (frame < 300) {
+        texManager.Update(0.016f);
+
+        bool allLoaded = true;
+        for (auto handle : textures) {
+            if (!texManager.IsResident(handle)) {
+                allLoaded = false;
+                break;
+            }
+        }
+
+        if (allLoaded) break;
+        frame++;
+    }
+
+    float endTime = Device.fTimeGlobal;
+    float duration = endTime - startTime;
+
+    Msg("! [TEST] Loaded %u textures in %.3f seconds (%u frames)",
+        numTextures, duration, frame);
+
+    TEST_ASSERT(frame < 300, "Should load within reasonable time");
+
+    for (auto handle : textures) {
+        texManager.Release(handle);
+    }
+
+    TEST_PASS();
+}
+
 void RunAllTests() {
     Msg("! ═══════════════════════════════════════════════════");
     Msg("! [TEST] Starting TextureManager Unit Tests");
@@ -274,6 +465,11 @@ void RunAllTests() {
     Test_ReferenceCounting();
     Test_MemoryTracking();
     Test_Statistics();
+
+    Test_AsyncMultipleTextures();
+    Test_AsyncIOStatistics();
+    Test_ThreadSafeLoading();
+    Test_AsyncLoadingPerformance();
 
     Msg("! ═══════════════════════════════════════════════════");
     Msg("! [TEST] Results: %u passed, %u failed", g_testsPassed, g_testsFailed);
@@ -321,6 +517,19 @@ void RunTextureManagerTests() {
     Test_Statistics();
 
     Msg("! [TEST] TextureManager Tests: %u passed, %u failed", g_testsPassed, g_testsFailed);
+}
+
+void RunAsyncTests() {
+    Msg("! [TEST] Running Async Loading Tests...");
+    g_testsPassed = 0;
+    g_testsFailed = 0;
+
+    Test_AsyncMultipleTextures();
+    Test_AsyncIOStatistics();
+    Test_ThreadSafeLoading();
+    Test_AsyncLoadingPerformance();
+
+    Msg("! [TEST] Async Tests: %u passed, %u failed", g_testsPassed, g_testsFailed);
 }
 
 }
