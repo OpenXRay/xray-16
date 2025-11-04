@@ -76,6 +76,8 @@ private:
 
     Stats m_stats;
 
+    xr_vector<ISpatial*> m_lstRenderables;
+
     void SetupFrame();
 
     void BuildFrameGraphStructure();

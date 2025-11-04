@@ -1,10 +1,15 @@
 #include "stdafx.h"
 #include "r_FrameGraphRenderer.h"
-#include "FBasicVisual.h"
-#include "FVisual.h"
-#include "FTreeVisual.h"
+#include "xrCore/FMesh.hpp"
 #include "FHierrarhyVisual.h"
+#include "SkeletonAnimated.h"
+#include "FVisual.h"
+#include "FProgressive.h"
+#include "FSkinned.h"
 #include "FLOD.h"
+#include "FTreeVisual.h"
+#include "ParticleGroup.h"
+#include "ParticleEffect.h"
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -116,6 +121,26 @@ void FrameGraphRenderer::Render() {
 
 void FrameGraphRenderer::SetupFrame() {
     m_bufferHandleCache.clear();
+
+    m_lstRenderables.clear();
+
+    if (g_pGamePersistent)
+    {
+        CFrustum view_frustum;
+        view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+
+        u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;
+        u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
+
+        g_pGamePersistent->SpatialSpace.q_frustum(
+            m_lstRenderables,
+            spatial_traverse_flags,
+            spatial_types,
+            view_frustum
+        );
+
+        Msg("  [FrameGraph] Spatial query: %u objects cached (renderables + lights)", (u32)m_lstRenderables.size());
+    }
 
     m_geometryCollector->BeginFrame();
 
@@ -338,9 +363,18 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         case MT_NORMAL:
             meshVisual = static_cast<Fvisual*>(visual);
             break;
+        case MT_PROGRESSIVE:
+            meshVisual = static_cast<FProgressive*>(visual);
+            break;
         case MT_TREE_ST:
         case MT_TREE_PM:
             meshVisual = static_cast<FTreeVisual*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
         default:
             return false;
@@ -454,6 +488,37 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
             }
             break;
         }
+        case MT_SKELETON_ANIM:
+        case MT_SKELETON_RIGID: {
+            CKinematics* pV = static_cast<CKinematics*>(pVisual);
+            for (auto& child : pV->children) {
+                ExtractStaticLeafVisuals(child, outLeafs);
+            }
+            break;
+        }
+        case MT_SKELETON_GEOMDEF_PM:
+        case MT_SKELETON_GEOMDEF_ST: {
+            outLeafs.push_back(pVisual);
+            break;
+        }
+        case MT_PROGRESSIVE: {
+            outLeafs.push_back(pVisual);
+            break;
+        }
+        case MT_PARTICLE_GROUP: {
+            PS::CParticleGroup* pG = static_cast<PS::CParticleGroup*>(pVisual);
+            for (auto& item : pG->items) {
+                xr_vector<dxRender_Visual*> visuals;
+                item.GetVisuals(visuals);
+                for (auto* v : visuals) {
+                    ExtractStaticLeafVisuals(v, outLeafs);
+                }
+            }
+            break;
+        }
+        case MT_PARTICLE_EFFECT:
+            outLeafs.push_back(pVisual);
+            break;
         case MT_TREE_ST:
         case MT_TREE_PM:
         case MT_NORMAL:
@@ -481,24 +546,28 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         auto sectorID = dsgraph.detect_sector(camPos);
 
         if (sectorID != IRender_Sector::INVALID_SECTOR_ID) {
-            CSector* sector = static_cast<CSector*>(dsgraph.Sectors[sectorID]);
-            if (sector && sector->root()) {
-                ExtractStaticLeafVisuals(sector->root(), staticVisuals);
+            dsgraph.PortalTraverser.traverse(
+                dsgraph.Sectors[sectorID],
+                frustum,
+                camPos,
+                Device.mFullTransform,
+                CPortalTraverser::VQ_SSA
+            );
+
+            for (CSector* sector : dsgraph.PortalTraverser.r_sectors) {
+                if (sector && sector->root()) {
+                    ExtractStaticLeafVisuals(sector->root(), staticVisuals);
+                }
             }
+
+            Msg("  [FrameGraph] Portal traversal: %u visible sectors",
+                (u32)dsgraph.PortalTraverser.r_sectors.size());
         }
     }
 
     Msg("  [FrameGraph] Found %u static visuals from sectors", (u32)staticVisuals.size());
 
-    xr_vector<ISpatial*> spatialObjects;
-    g_pGamePersistent->SpatialSpace.q_frustum(
-        spatialObjects,
-        0,
-        STYPE_RENDERABLE,
-        frustum
-    );
-
-    Msg("  [FrameGraph] Found %u dynamic objects from spatial DB", (u32)spatialObjects.size());
+    Msg("  [FrameGraph] Processing %u dynamic objects from cached spatial query", (u32)m_lstRenderables.size());
 
     u32 submittedStatic = 0;
     u32 notFvisual_static = 0;
@@ -513,18 +582,21 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        Fmatrix xform;
+        Fmatrix xform = Fidentity;
+
         switch (visual->getType())
         {
             case MT_TREE_ST:
             case MT_TREE_PM:
             {
-                FTreeVisual* treeVisual = dynamic_cast<FTreeVisual*>(visual);
-                if (treeVisual)
-                    xform = treeVisual->xform;
+                FTreeVisual* treeVisual = static_cast<FTreeVisual*>(visual);
+                xform = treeVisual->xform;
                 break;
             }
             case MT_NORMAL:
+            case MT_PROGRESSIVE:
+            case MT_SKELETON_GEOMDEF_ST:
+            case MT_SKELETON_GEOMDEF_PM:
             default:
                 xform = Fidentity;
                 break;
@@ -562,8 +634,41 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     u32 notRenderable = 0;
     u32 noVisual = 0;
 
-    for (ISpatial* spatial : spatialObjects)
+    u32 portalTraversalMarker = dsgraph.PortalTraverser.i_marker;
+
+    for (ISpatial* spatial : m_lstRenderables)
     {
+        const auto& data = spatial->GetSpatialData();
+        const auto sector_id = data.sector_id;
+
+        if (sector_id == IRender_Sector::INVALID_SECTOR_ID) {
+            notRenderable++;
+            continue;
+        }
+
+        if (data.type & STYPE_LIGHTSOURCE) {
+            notRenderable++;
+            continue;
+        }
+
+        CSector* sector = static_cast<CSector*>(dsgraph.Sectors[sector_id]);
+        if (portalTraversalMarker != sector->r_marker) {
+            notRenderable++;
+            continue;
+        }
+
+        bool passedFrustumTest = false;
+        for (const CFrustum& sectorFrustum : sector->r_frustums) {
+            if (sectorFrustum.testSphere_dirty(data.sphere.P, data.sphere.R)) {
+                passedFrustumTest = true;
+                break;
+            }
+        }
+        if (!passedFrustumTest) {
+            notRenderable++;
+            continue;
+        }
+
         IRenderable* renderable = spatial->dcast_Renderable();
         if (!renderable) {
             notRenderable++;
@@ -588,7 +693,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     }
 
     Msg("  [FrameGraph] Dynamic: submitted %u/%u (filtered: %u not renderable, %u no visual)",
-        submittedDynamic, (u32)spatialObjects.size(), notRenderable, noVisual);
+        submittedDynamic, (u32)m_lstRenderables.size(), notRenderable, noVisual);
     Msg("  [FrameGraph] TOTAL: %u geometry batches submitted", submittedStatic + submittedDynamic);
 }
 
