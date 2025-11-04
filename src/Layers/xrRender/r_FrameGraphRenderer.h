@@ -96,6 +96,12 @@ private:
     // Statistics
     Stats m_stats;
 
+    // ═══════════════════════════════════════════════════
+    //  CACHED SPATIAL QUERIES (like R_dsgraph_structure)
+    // ═══════════════════════════════════════════════════
+    // Populated once per frame, reused across passes
+    xr_vector<ISpatial*> m_lstRenderables;
+
     // Frame setup
     void SetupFrame();
 

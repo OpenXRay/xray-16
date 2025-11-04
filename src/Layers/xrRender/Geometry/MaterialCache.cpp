@@ -6,7 +6,9 @@
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/FProgressive.h"
 #include "Layers/xrRender/FTreeVisual.h"
+#include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
@@ -1139,13 +1141,22 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
         case MT_NORMAL:
             meshVisual = static_cast<Fvisual*>(visual);
             break;
+        case MT_PROGRESSIVE:
+            meshVisual = static_cast<FProgressive*>(visual);
+            break;
         case MT_TREE_ST:
         case MT_TREE_PM:
             meshVisual = static_cast<FTreeVisual*>(visual);
             break;
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
+            break;
         default:
             // Fallback to hardcoded layout
-            Msg("! [MaterialCache] Unknown visual type for vertex layout extraction");
+            Msg("! [MaterialCache] Unknown visual type %d for vertex layout extraction", visual->getType());
             return;
     }
 
