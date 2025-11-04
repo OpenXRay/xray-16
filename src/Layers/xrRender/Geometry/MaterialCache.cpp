@@ -646,17 +646,23 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
 
 #if defined(USE_DX11)
     // Get X-Ray's render state from the pass
-    void* statePtr = pass->state._get();
-    if (!statePtr) {
-        Msg("! [MaterialCache] Pass has NULL state");
+    // IMPORTANT: pass->state returns SState*, NOT dx11State* directly!
+    SState* xrState = pass->state._get();
+    if (!xrState || !xrState->state) {
+        Msg("! [MaterialCache] Pass has NULL state - cannot extract samplers");
         return;
     }
 
-    dx11State* xrState = static_cast<dx11State*>(statePtr);
-    const auto& psSamplers = xrState->GetPSSamplers();
+    // The actual dx11State is inside xrState->state
+    dx11State* d3dState = static_cast<dx11State*>(xrState->state);
+    if (!d3dState) {
+        Msg("! [MaterialCache] dx11State is NULL - cannot extract samplers");
+        return;
+    }
 
-    Msg("  [MaterialCache] Extracting samplers using shader reflection...");
-    Msg("  [MaterialCache]   Shader declares %u samplers", matPSO->rtBindings.samplers.size());
+    const auto& psSamplers = d3dState->GetPSSamplers();
+
+    Msg("  [MaterialCache]   X-Ray has %u PS sampler slots (valid)", psSamplers.size());
 
     // Helper to create NVRHI sampler from D3D11 sampler
     auto createNVRHISampler = [&](ID3DSamplerState* d3dSampler) -> nvrhi::SamplerHandle {

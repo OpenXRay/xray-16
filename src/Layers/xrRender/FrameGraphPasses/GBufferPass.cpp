@@ -317,10 +317,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         m_device->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
     VERIFY(d3dDevice);
 
-    ID3D11DeviceContext* d3dContext = nullptr;
-    d3dDevice->GetImmediateContext(&d3dContext);
-    VERIFY(d3dContext);
-
     // Track unique CB buffers to avoid duplicate updates
     xr_set<ID3D11Buffer*> updatedBuffers;
 
@@ -537,11 +533,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
     // End render pass
     ctx.EndRenderPass();
-
-    // Release D3D11 context (GetImmediateContext AddRefs it)
-    if (d3dContext) {
-        d3dContext->Release();
-    }
 
     // ═══════════════════════════════════════════════════════
     //  STATISTICS
