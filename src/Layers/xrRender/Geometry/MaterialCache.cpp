@@ -188,6 +188,21 @@ MaterialPSO* MaterialCache::CreatePSO(
     ExtractTextures(pass, pso.get());
 
     // ═══════════════════════════════════════════════════════
+    //  GET DETAIL TEXTURE SCALE FROM METADATA
+    // ═══════════════════════════════════════════════════════
+    // Legacy X-Ray: C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
+    // We query the base texture (slot 0) to get its detail scale from .thm metadata
+
+    if (pass && pass->T && !pass->T->empty()) {
+        // Get base texture (usually slot 0)
+        CTexture* baseTex = (*pass->T)[0].second._get();
+        if (baseTex && baseTex->cName.size()) {
+            // Query our cache first
+            pso->detail_scale = GetDetailScale(baseTex->cName);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  EXTRACT SHADERS
     // ═══════════════════════════════════════════════════════
 
@@ -1552,8 +1567,31 @@ void MaterialCache::Clear()
 {
     m_cache.clear();
     m_textureWrapperCache.clear();
+    m_detailScaleCache.clear();
     m_stats = Stats{};
     Msg("* [MaterialCache] Cleared PSO cache and texture wrapper cache");
+}
+
+// ══════════════════════════════════════════════════════════
+//  GET DETAIL SCALE FROM TEXTURE METADATA
+// ══════════════════════════════════════════════════════════
+
+float MaterialCache::GetDetailScale(const shared_str& textureName)
+{
+    // Check cache first
+    auto cacheIt = m_detailScaleCache.find(textureName.c_str());
+    if (cacheIt != m_detailScaleCache.end()) {
+        return cacheIt->second;
+    }
+
+    // Query TextureDescrManager via clean public API
+    // This internally queries m_detail_scalers map (populated from .ltx files)
+    float scale = RImplementation.Resources->m_textures_description.GetDetailScale(textureName);
+
+    // Cache for next time
+    m_detailScaleCache[textureName.c_str()] = scale;
+
+    return scale;
 }
 
 } // namespace xray::render

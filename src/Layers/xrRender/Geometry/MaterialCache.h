@@ -102,6 +102,10 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
+    // Detail texture scale (from .thm metadata via CTextureDescrMngr)
+    // Used to update dt_params in DynamicTransforms CB per-material
+    float detail_scale = 1.0f;  // Default 1.0 if no detail texture
+
     // Constant buffers (extracted from shader reflection)
     // PER-STAGE to handle VS/PS having different CBs at same slot
     enum class ShaderStage : u8 {
@@ -238,6 +242,14 @@ private:
     // We use texture name (string) instead of CTexture* because X-Ray may recreate
     // CTexture objects at different addresses for the same logical texture
     xr_map<xr_string, ng::TextureHandle> m_textureWrapperCache;
+
+    // Detail scale cache: Maps texture name -> detail scale value (from .thm metadata)
+    // Mirrors TextureDescrManager's m_detail_scalers for clean access
+    // Cached to avoid repeated queries and avoid casting R_constant_setup*
+    xr_map<xr_string, float> m_detailScaleCache;
+
+    // Helper: Get detail scale for texture (queries TextureDescrManager and caches result)
+    float GetDetailScale(const shared_str& textureName);
 
     // Create new PSO from shader element
     MaterialPSO* CreatePSO(

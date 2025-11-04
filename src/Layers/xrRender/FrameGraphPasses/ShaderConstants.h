@@ -5,6 +5,13 @@
 #include "xrCore/_vector3d.h"
 #include "xrCore/_matrix.h"
 
+// Forward declarations of X-Ray engine globals
+namespace xray::render {
+    namespace RENDER_NAMESPACE {
+        extern float r__dtex_range;  // Detail texture range (defined in TextureDescrManager.cpp)
+    }
+}
+
 namespace xray::render::passes {
 
 // ══════════════════════════════════════════════════════════
@@ -233,7 +240,15 @@ inline void FillDynamicTransforms(DynamicTransforms& cb) {
     cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);  // Vanilla values from RenderDoc
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
-    cb.dt_params.set(300.0f, 300.0f, 300.0f, 0.02f);  // Detail texture tiling
+
+    // Detail texture params: (scale, scale, scale, 1/range)
+    // Legacy X-Ray: RCache.set_c(C, scale, scale, scale, 1 / r__dtex_range);
+    // where scale comes from texture's .thm metadata via cl_dt_scaler
+    // NOTE: This is a global default. Per-material detail scale is handled in GBufferPass
+    // by querying RImplementation.Resources->m_textures_description.GetDetailTexture()
+    const float default_detail_scale = 1.0f;  // Fallback if no detail texture metadata
+    cb.dt_params.set(default_detail_scale, default_detail_scale, default_detail_scale,
+                     1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
 }
 
 } // namespace xray::render::passes

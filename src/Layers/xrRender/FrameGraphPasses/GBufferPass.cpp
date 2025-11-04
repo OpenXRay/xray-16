@@ -6,6 +6,9 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/ResourceManager.h"  // For texture description manager
+#include "Layers/xrRender/TextureDescrManager.h"  // For GetDetailTexture
+#include "xrEngine/Render.h"  // For RImplementation
 
 namespace xray::render::passes {
 
@@ -448,6 +451,9 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
+        // Track last detail scale to avoid redundant CB updates
+        float lastDetailScale = -1.0f;  // Start with invalid value to force first update
+
         // Keep binding sets alive for the duration of rendering
         // NOTE: No longer need tempBindingSets - binding sets are now cached in MaterialPSO!
 
@@ -472,6 +478,34 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             if (pipelineToUse != currentPipeline) {
                 ctx.SetPipeline(pipelineToUse->GetNativePipeline());
                 currentPipeline = pipelineToUse;
+            }
+
+            // ═══════════════════════════════════════════════════════
+            //  UPDATE PER-MATERIAL DYNAMIC CONSTANTS
+            // ═══════════════════════════════════════════════════════
+            // dt_params is per-material (comes from texture .thm metadata)
+            // We need to update DynamicTransforms CB with the material's detail scale
+
+            if (matPSO && matPSO->detail_scale != lastDetailScale) {
+                // Recompute DynamicTransforms with new detail scale
+                DynamicTransforms dynamicCB = {};
+                FillDynamicTransforms(dynamicCB);
+
+                // Override dt_params with per-material detail scale
+                extern float r__dtex_range;  // Defined in TextureDescrManager.cpp
+                dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
+                                       1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
+
+                // Update DynamicTransforms CB (Slot 1) for this material
+                for (const auto& cbInfo : matPSO->constantBuffers) {
+                    if (cbInfo.name == "dynamic_transforms") {
+                        u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                        ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
+                        break;
+                    }
+                }
+
+                lastDetailScale = matPSO->detail_scale;
             }
 
             // Update per-object constants using VCB + get/create cached binding set
@@ -510,7 +544,27 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                 // Write as float3x4 (48 bytes each) to match shader layout
                 CopyMatrix3x4(cbData + 0, xform);     // m_xform at offset 0
                 CopyMatrix3x4(cbData + 48, xform_v);  // m_xform_v at offset 48
-                // Rest stays zero (consts, c_scale, c_bias, wind, wave, c_sun, etc.)
+
+                // Write consts at offset 96 (Fvector4 consts; in PerObjectConstants)
+                // For trees: (scale, scale, 0, 0) where scale comes from FTreeVisual::tvs.scale
+                // For static geometry: (1.0, 1.0, 0, 0) - texture coordinate dequant factor
+                // Legacy X-Ray: cmd_list.tree.set_consts(tvs.scale, tvs.scale, 0, 0);
+
+                // Attempt to get scale from visual if it's a tree
+                float tc_scale = 1.0f;  // Default for static geometry
+                if (batch->visual) {
+                    // TODO: Check visual type and cast to FTreeVisual* to get tvs.scale
+                    // For now, use default 1.0 for all geometry (trees need their actual scale)
+                    // FTreeVisual has m_tree_scale, need to expose it or use visual type checking
+                }
+
+                float* constsPtr = reinterpret_cast<float*>(cbData + 96);
+                constsPtr[0] = tc_scale;  // x: U coordinate scale (1/quant for SHORT2 texcoords)
+                constsPtr[1] = tc_scale;  // y: V coordinate scale
+                constsPtr[2] = 0.0f;      // z: unused
+                constsPtr[3] = 0.0f;      // w: unused
+
+                // Rest stays zero (c_scale, c_bias, wind, wave, c_sun, etc.)
 
                 VERIFY(m_perObjectCB.IsValid());
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);

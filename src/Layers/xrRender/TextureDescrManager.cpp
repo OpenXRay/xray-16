@@ -332,4 +332,14 @@ BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res
     }
     return FALSE;
 }
+
+float CTextureDescrMngr::GetDetailScale(const shared_str& tex_name) const
+{
+    auto it = m_detail_scalers.find(tex_name);
+    if (it != m_detail_scalers.end() && it->second) {
+        return it->second->scale;
+    }
+    return 1.0f;  // Default scale
+}
+
 } // namespace xray::render::RENDER_NAMESPACE
