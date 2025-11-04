@@ -58,6 +58,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     BuildFrameGraphStructure();
 
+    m_framegraph->Compile();
+
     Msg("  ✓ FrameGraphRenderer initialized");
 
     return true;
@@ -91,8 +93,6 @@ void FrameGraphRenderer::Render() {
     SetupFrame();
 
     SetupFrameGraphPasses();
-
-    m_framegraph->Compile();
 
     m_framegraph->SetRenderContext(m_renderContext.get());
 

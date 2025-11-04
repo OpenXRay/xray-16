@@ -221,6 +221,8 @@ private:
 
     xr_unique_ptr<xray::render::resources::ModernResourceManager> m_modernResourceManager;
 
+    nvrhi::CommandListHandle m_uploadCommandList;
+
     bool m_initialized = false;
 
     struct TextureInfo {

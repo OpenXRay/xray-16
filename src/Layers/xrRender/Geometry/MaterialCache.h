@@ -10,6 +10,7 @@ namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
     struct SVS;
     struct SPS;
+    class CTexture;
 }
 
 namespace xray::render::framegraph {
@@ -182,6 +183,8 @@ private:
     ng::RenderDevice* m_device;
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
     Stats m_stats;
+
+    xr_map<xr_string, ng::TextureHandle> m_textureWrapperCache;
 
     MaterialPSO* CreatePSO(
         dxRender_Visual* visual,

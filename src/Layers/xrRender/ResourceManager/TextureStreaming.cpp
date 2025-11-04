@@ -266,6 +266,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
     cmdList->close();
     m_device->GetNativeDevice()->executeCommandList(cmdList);
+    cmdList->Release();
 
     meta->residentMips = request.targetMips;
 
