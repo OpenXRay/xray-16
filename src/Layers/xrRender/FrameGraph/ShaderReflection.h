@@ -100,6 +100,49 @@ struct ShaderRTBindings {
 };
 
 // ═══════════════════════════════════════════════════
+//  CONSTANT BUFFER INFO
+// ═══════════════════════════════════════════════════
+//
+// Information about a constant buffer used by a shader.
+// Used to determine required VCB sizes for different object types.
+//
+struct ConstantBufferInfo {
+    shared_str name;      // "PerObject", "PerFrame", etc.
+    u32 slot;             // Register slot (b0, b1, ...)
+    u32 size;             // Size in bytes
+
+    ConstantBufferInfo() : slot(0), size(0) {}
+    ConstantBufferInfo(const char* n, u32 s, u32 sz) : name(n), slot(s), size(sz) {}
+};
+
+// ═══════════════════════════════════════════════════
+//  SHADER CONSTANT BUFFER LAYOUT
+// ═══════════════════════════════════════════════════
+//
+// Collection of all constant buffers used by a shader.
+// Can be used to identify unique CB layouts and create appropriate VCBs.
+//
+struct ShaderConstantBuffers {
+    xr_vector<ConstantBufferInfo> buffers;
+
+    // Helper: Get CB by slot
+    const ConstantBufferInfo* GetBySlot(u32 slot) const {
+        for (const auto& cb : buffers) {
+            if (cb.slot == slot) return &cb;
+        }
+        return nullptr;
+    }
+
+    // Helper: Get CB by name
+    const ConstantBufferInfo* GetByName(const char* name) const {
+        for (const auto& cb : buffers) {
+            if (xr_strcmp(cb.name.c_str(), name) == 0) return &cb;
+        }
+        return nullptr;
+    }
+};
+
+// ═══════════════════════════════════════════════════
 //  SHADER REFLECTOR
 // ═══════════════════════════════════════════════════
 //
@@ -117,6 +160,9 @@ public:
     static ShaderRTBindings AnalyzePixelShader(
         ID3D11PixelShader* ps,
         ID3DBlob* bytecode);
+
+    // Analyze shader constant buffers (works for VS/PS/CS)
+    static ShaderConstantBuffers AnalyzeConstantBuffers(ID3DBlob* bytecode);
 
     // Infer render phase from shader bindings
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);

@@ -60,10 +60,12 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
 //  CONSTRUCTOR / DESTRUCTOR
 // ══════════════════════════════════════════════════════════
 
-MaterialCache::MaterialCache(ng::RenderDevice* device)
+MaterialCache::MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool)
     : m_device(device)
+    , m_vcbPool(vcbPool)
 {
     VERIFY(m_device);
+    // VCB pool is optional - can be null for legacy code
 }
 
 MaterialCache::~MaterialCache() {
@@ -288,6 +290,56 @@ MaterialPSO* MaterialCache::CreatePSO(
         m_device->DestroyShader(vsHandle);
         m_device->DestroyShader(psHandle);
         return nullptr;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  ANALYZE CONSTANT BUFFERS & REGISTER WITH VCB POOL
+    // ═══════════════════════════════════════════════════════
+
+    if (m_vcbPool) {
+        // Analyze vertex shader CBs
+        auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(pso->vertexShader->bytecode);
+        for (const auto& cbInfo : vsCBs.buffers) {
+            // Create CB layout and register with pool
+            framegraph::VolatileConstantBufferPool::CBLayout layout(
+                cbInfo.name.c_str(),
+                cbInfo.slot,
+                cbInfo.size
+            );
+
+            // Get or create VCB from pool
+            ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+
+            // Store requirement in MaterialPSO
+            MaterialPSO::VCBRequirement req;
+            req.slot = cbInfo.slot;
+            req.size = cbInfo.size;
+            req.name = cbInfo.name;
+            req.vcbHandle = vcbHandle;
+            pso->vcbRequirements.push_back(req);
+        }
+
+        // Analyze pixel shader CBs
+        auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(pso->pixelShader->bytecode);
+        for (const auto& cbInfo : psCBs.buffers) {
+            // Create CB layout and register with pool
+            framegraph::VolatileConstantBufferPool::CBLayout layout(
+                cbInfo.name.c_str(),
+                cbInfo.slot,
+                cbInfo.size
+            );
+
+            // Get or create VCB from pool
+            ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+
+            // Store requirement in MaterialPSO
+            MaterialPSO::VCBRequirement req;
+            req.slot = cbInfo.slot;
+            req.size = cbInfo.size;
+            req.name = cbInfo.name;
+            req.vcbHandle = vcbHandle;
+            pso->vcbRequirements.push_back(req);
+        }
     }
 
     // ═══════════════════════════════════════════════════════

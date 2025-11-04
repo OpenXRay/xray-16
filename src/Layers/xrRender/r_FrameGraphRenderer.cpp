@@ -468,7 +468,7 @@ void FrameGraphRenderer::PresentToBackbuffer() {
 // ═══════════════════════════════════════════════════════
 
 // Helper to process a visual and submit geometry batch (returns true if submitted)
-bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform) {
+bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
     if (!visual)
         return false;
 
@@ -594,6 +594,9 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Store visual for material system
     batch.visual = visual;
 
+    // Store renderable (for skeletons - provides bone data)
+    batch.renderable = renderable;
+
     // PSO and binding set will be created by MaterialCache in GBufferPass
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
@@ -637,11 +640,16 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
         case MT_SKELETON_ANIM:
         case MT_SKELETON_RIGID: {
             // Skeletons have children meshes (FHierrarhyVisual base)
-            // Extract children - these are the actual renderable meshes
+            // CRITICAL: Must calculate bones BEFORE extracting children!
+            // Bone matrices are needed by skinned mesh children for rendering
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
+            pV->CalculateBones(TRUE);  // Compute bone transformation matrices
+
+            // Extract children - these are the actual renderable skinned meshes
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);
             }
+
             // Also check for LOD model
             //if (pV->m_lod) {
                 //outLeafs.push_back(pV->m_lod);
@@ -893,9 +901,16 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        // Process dynamic visual with its transform
-        if (ProcessVisualGeometry(visual, renderable->GetRenderData().xform)) {
-            submittedDynamic++;
+        // Extract leaf visuals from dynamic object (handles skeletons, hierarchies, LODs, etc.)
+        xr_vector<dxRender_Visual*> dynamicLeafs;
+        ExtractStaticLeafVisuals(visual, dynamicLeafs);
+
+        // Process all extracted leaf visuals with the object's transform
+        // IMPORTANT: Pass the renderable so skinned meshes can access parent skeleton bone data
+        for (dxRender_Visual* leafVisual : dynamicLeafs) {
+            if (ProcessVisualGeometry(leafVisual, renderable->GetRenderData().xform, renderable)) {
+                submittedDynamic++;
+            }
         }
     }
 

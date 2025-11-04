@@ -127,7 +127,7 @@ private:
     );
 
     // Helper functions for geometry collection
-    bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform);
+    bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
     // ═══════════════════════════════════════════════════

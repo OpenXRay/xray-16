@@ -6,8 +6,11 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For CB analysis
 #include "Layers/xrRender/ResourceManager.h"  // For texture description manager
 #include "Layers/xrRender/TextureDescrManager.h"  // For GetDetailTexture
+#include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics (skeleton bones)
+#include "Layers/xrRender/FSkinned.h"  // For CSkeletonX (skinned mesh parent pointer)
 #include "xrEngine/Render.h"  // For RImplementation
 
 namespace xray::render::passes {
@@ -29,8 +32,11 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
 
-    // Create material cache (accesses ModernResourceManager via device when needed)
-    m_materialCache = xr_make_unique<MaterialCache>(device);
+    // Create VCB pool for dynamic constant buffer management
+    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
+
+    // Create material cache (with VCB pool for dynamic CB sizing)
+    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
 
     // Load shaders (legacy - will be removed once MaterialCache is fully integrated)
     if (!LoadShaders())
@@ -40,6 +46,15 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 }
 
 GBufferPass::~GBufferPass() {
+    // Clean up shader bytecode
+    if (m_vertexShaderBytecode) {
+        m_vertexShaderBytecode->Release();
+        m_vertexShaderBytecode = nullptr;
+    }
+    if (m_pixelShaderBytecode) {
+        m_pixelShaderBytecode->Release();
+        m_pixelShaderBytecode = nullptr;
+    }
     Msg("* [GBufferPass] Destroyed");
 }
 
@@ -47,21 +62,64 @@ bool GBufferPass::LoadShaders()
 {
     ShaderLoader loader(m_device);
 
-    // Load G-Buffer vertex shader
-    m_vertexShaderNative = loader.LoadVertexShader("gbuffer");
+    // Load G-Buffer vertex shader (with bytecode for reflection)
+    m_vertexShaderNative = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
     if (!m_vertexShaderNative)
     {
         Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
         return false;
     }
 
-    // Load G-Buffer pixel shader
-    m_pixelShaderNative = loader.LoadPixelShader("gbuffer");
+    // Load G-Buffer pixel shader (with bytecode for reflection)
+    m_pixelShaderNative = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
     if (!m_pixelShaderNative)
     {
         Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
         return false;
     }
+
+    // ═══════════════════════════════════════════════════
+    //  ANALYZE CONSTANT BUFFERS & REGISTER WITH VCB POOL
+    // ═══════════════════════════════════════════════════
+
+    Msg("* [GBufferPass] Analyzing constant buffer requirements...");
+
+    // Analyze vertex shader CBs
+    if (m_vertexShaderBytecode) {
+        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode);
+        Msg("  → Vertex shader has %u constant buffers", vsCBs.buffers.size());
+
+        // Register each CB layout with the VCB pool
+        for (const auto& cbInfo : vsCBs.buffers) {
+            VolatileConstantBufferPool::CBLayout layout(cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
+            m_vcbPool->GetOrCreateVCB(layout);
+
+            // Save layout for later use (if it's a per-object CB)
+            if (xr_strcmp(cbInfo.name.c_str(), "dynamic_transforms") == 0) {
+                m_dynamicTransformsLayout = layout;
+            }
+        }
+    }
+
+    // Analyze pixel shader CBs
+    if (m_pixelShaderBytecode) {
+        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode);
+        Msg("  → Pixel shader has %u constant buffers", psCBs.buffers.size());
+
+        // Register each CB layout with the VCB pool
+        for (const auto& cbInfo : psCBs.buffers) {
+            VolatileConstantBufferPool::CBLayout layout(cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
+            m_vcbPool->GetOrCreateVCB(layout);
+
+            // Save layout for later use
+            if (xr_strcmp(cbInfo.name.c_str(), "Material") == 0) {
+                m_materialLayout = layout;
+            }
+        }
+    }
+
+    // Log VCB pool statistics
+    m_vcbPool->LogStats();
 
     // Wrap shaders in RCShader for our abstraction layer
     m_vertexShader = xr_make_unique<ng::RCShader>(
@@ -76,30 +134,9 @@ bool GBufferPass::LoadShaders()
         "gbuffer.ps"
     );
 
-    // Create per-object constant buffer through our abstraction layer
-    // Matches shader cbuffer PerObject : register(b0)
-    // NOTE: Size must accommodate largest shader CB requirement (X-Ray shaders need 224 bytes)
-    //       Using 256 bytes (aligned to CB alignment requirement)
-    struct PerObjectConstants {
-        Fmatrix worldViewProj;  // 64 bytes
-        Fmatrix world;          // 64 bytes
-        Fmatrix worldIT;        // 64 bytes
-        // Total: 192 bytes - but X-Ray shaders expect 224!
-        // Padding to 256 bytes for safety and alignment
-        u8 padding[64];
-    };
-
-    ng::RenderDevice::BufferDesc cbDesc;
-    cbDesc.byteSize = 256;  // Aligned size, enough for all X-Ray shaders
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;  // Updated every draw call
-    cbDesc.debugName = "PerObjectCB";
-
-    m_perObjectCB = m_device->CreateBuffer(cbDesc);
-    if (!m_perObjectCB.IsValid()) {
-        Msg("! [GBufferPass] Failed to create per-object constant buffer");
-        return false;
-    }
+    // LEGACY: Old static per-object constant buffer creation (now handled by VCB pool)
+    // The VCB pool dynamically creates appropriately-sized VCBs based on shader requirements.
+    // This avoids wasting ring buffer space with oversized allocations.
 
     Msg("  ✓ G-Buffer shaders loaded successfully");
     return true;
@@ -566,12 +603,27 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
                 // Rest stays zero (c_scale, c_bias, wind, wave, c_sun, etc.)
 
-                VERIFY(m_perObjectCB.IsValid());
-                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
+                // Get appropriate VCB from MaterialPSO (each material knows its CB requirements)
+                ng::BufferHandle vcbHandle;
+                if (!matPSO->vcbRequirements.empty()) {
+                    // Use the first VCB requirement (typically b0 for per-object data)
+                    // TODO: Handle multiple VCBs if needed
+                    vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                }
+
+                if (!vcbHandle.IsValid()) {
+                    Msg("! [GBufferPass] Material has no valid VCB");
+                    continue;
+                }
+
+                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+
+                // Get the VCB size from material requirements
+                u32 vcbSize = matPSO->vcbRequirements[0].size;
 
                 // Write VCB within render pass command list (NVRHI handles versioning)
-                // CRITICAL: Write the FULL buffer size (256 bytes) to avoid partial update errors!
-                ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
+                // CRITICAL: Write the FULL buffer size to avoid partial update errors!
+                ctx.WriteBuffer(vcbBuffer, cbData, vcbSize);
 
                 // Step 2: Get or create cached binding sets (VS and PS - created once, reused!)
                 // GetOrCreateBindingSet creates BOTH vsBindingSet and psBindingSet
@@ -635,48 +687,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         m_gbufferStats.numDrawCalls,
         m_gbufferStats.numTriangles,
         m_gbufferStats.cpuTimeMs);
-}
-
-void GBufferPass::UpdatePerObjectConstantsData(const GeometryBatch& batch)
-{
-    // Update world matrix constant buffer DATA only (no binding)
-    struct PerObjectConstants {
-        Fmatrix worldViewProj;
-        Fmatrix world;
-        Fmatrix worldIT;  // Inverse transpose for normals
-    };
-
-    PerObjectConstants constants;
-
-    // Get view-projection matrix from device
-    Fmatrix viewProj;
-    viewProj.mul(Device.mView, Device.mProject);
-
-    // Compute world-view-projection
-    constants.worldViewProj.mul(batch.worldMatrix, viewProj);
-
-    // World matrix
-    constants.world = batch.worldMatrix;
-
-    // World inverse transpose (for normals)
-    Fmatrix temp;
-    temp.invert(batch.worldMatrix);
-    constants.worldIT.transpose(temp);
-
-    // Update constant buffer through our abstraction layer
-    VERIFY(m_perObjectCB.IsValid());
-    m_device->UpdateBuffer(m_perObjectCB, &constants, sizeof(constants));
-}
-
-void GBufferPass::UpdatePerObjectConstants(
-    ng::RenderContext& ctx,
-    const GeometryBatch& batch
-) {
-    // Update buffer data
-    UpdatePerObjectConstantsData(batch);
-
-    // Bind constant buffer to slot b0 (using our abstraction layer)
-    ctx.SetConstantBuffer(0, m_perObjectCB);
 }
 
 } // namespace xray::render::passes

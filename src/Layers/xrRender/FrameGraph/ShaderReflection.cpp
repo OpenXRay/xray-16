@@ -110,6 +110,103 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
 }
 
 // ═══════════════════════════════════════════════════
+//  ANALYZE CONSTANT BUFFERS
+// ═══════════════════════════════════════════════════
+
+ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(ID3DBlob* bytecode) {
+    VERIFY(bytecode);
+
+    ShaderConstantBuffers result;
+
+    // ═══════════════════════════════════════════════════
+    //  GET SHADER REFLECTION INTERFACE
+    // ═══════════════════════════════════════════════════
+
+    ID3D11ShaderReflection* reflection = nullptr;
+    HRESULT hr = D3DReflect(
+        bytecode->GetBufferPointer(),
+        bytecode->GetBufferSize(),
+        IID_ID3D11ShaderReflection,
+        (void**)&reflection
+    );
+
+    if (FAILED(hr)) {
+        Msg("! [ShaderReflector] Failed to create reflection interface for CB analysis (HRESULT: 0x%08X)", hr);
+        return result;
+    }
+
+    D3D11_SHADER_DESC shaderDesc;
+    reflection->GetDesc(&shaderDesc);
+
+    Msg("! [ShaderReflector] Analyzing constant buffers...");
+    Msg("!   Constant buffers: %u", shaderDesc.ConstantBuffers);
+
+    // ═══════════════════════════════════════════════════
+    //  ENUMERATE CONSTANT BUFFERS
+    // ═══════════════════════════════════════════════════
+
+    for (u32 i = 0; i < shaderDesc.ConstantBuffers; i++) {
+        ID3D11ShaderReflectionConstantBuffer* cbReflection = reflection->GetConstantBufferByIndex(i);
+        if (!cbReflection) {
+            Msg("! [ShaderReflector] Failed to get CB at index %u", i);
+            continue;
+        }
+
+        D3D11_SHADER_BUFFER_DESC cbDesc;
+        hr = cbReflection->GetDesc(&cbDesc);
+        if (FAILED(hr)) {
+            Msg("! [ShaderReflector] Failed to get CB desc at index %u", i);
+            continue;
+        }
+
+        // Get the binding point for this CB
+        u32 bindPoint = 0;
+        bool foundBinding = false;
+
+        // Search through bound resources to find this CB's binding point
+        for (u32 j = 0; j < shaderDesc.BoundResources; j++) {
+            D3D11_SHADER_INPUT_BIND_DESC bindDesc;
+            hr = reflection->GetResourceBindingDesc(j, &bindDesc);
+            if (FAILED(hr)) continue;
+
+            if (bindDesc.Type == D3D_SIT_CBUFFER && xr_strcmp(bindDesc.Name, cbDesc.Name) == 0) {
+                bindPoint = bindDesc.BindPoint;
+                foundBinding = true;
+                break;
+            }
+        }
+
+        if (!foundBinding) {
+            Msg("! [ShaderReflector] Warning: Could not find binding point for CB '%s'", cbDesc.Name);
+        }
+
+        ConstantBufferInfo cbInfo(cbDesc.Name, bindPoint, cbDesc.Size);
+        result.buffers.push_back(cbInfo);
+
+        Msg("!   CB[%u]: %s (slot b%u, size %u bytes)", i, cbDesc.Name, bindPoint, cbDesc.Size);
+
+        // Optional: Log variables within CB for debugging
+        if (cbDesc.Variables > 0) {
+            Msg("!     Variables: %u", cbDesc.Variables);
+            for (u32 v = 0; v < cbDesc.Variables; v++) {
+                ID3D11ShaderReflectionVariable* varReflection = cbReflection->GetVariableByIndex(v);
+                if (!varReflection) continue;
+
+                D3D11_SHADER_VARIABLE_DESC varDesc;
+                if (SUCCEEDED(varReflection->GetDesc(&varDesc))) {
+                    Msg("!       [%u] %s (offset: %u, size: %u)", v, varDesc.Name, varDesc.StartOffset, varDesc.Size);
+                }
+            }
+        }
+    }
+
+    reflection->Release();
+
+    Msg("! [ShaderReflector] Extracted %u constant buffers", result.buffers.size());
+    return result;
+}
+
+// ═══════════════════════════════════════════════════
 //  ANALYZE PIXEL SHADER
 // ═══════════════════════════════════════════════════
 

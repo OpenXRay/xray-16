@@ -144,7 +144,7 @@ ID3DBlob* ShaderLoader::CompileShader(
     return shaderBlob;
 }
 
-nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(const char* name, const char* entryPoint)
+nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(const char* name, const char* entryPoint, ID3DBlob** outBytecode)
 {
     string_path shaderPath;
     strconcat(sizeof(shaderPath), shaderPath, "r3" DELIMITER, name, ".vs");
@@ -165,19 +165,25 @@ nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(const char* name, const char*
         bytecode->GetBufferSize()
     );
 
-    bytecode->Release();
-
     if (!shader)
     {
         Msg("! [ShaderLoader] Failed to create NVRHI vertex shader: %s", name);
+        bytecode->Release();
         return nullptr;
+    }
+
+    // Store bytecode if caller requested it (for reflection)
+    if (outBytecode) {
+        *outBytecode = bytecode;  // Caller takes ownership
+    } else {
+        bytecode->Release();
     }
 
     Msg("  ✓ Loaded vertex shader: %s", name);
     return shader;
 }
 
-nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(const char* name, const char* entryPoint)
+nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(const char* name, const char* entryPoint, ID3DBlob** outBytecode)
 {
     string_path shaderPath;
     strconcat(sizeof(shaderPath), shaderPath, "r3" DELIMITER, name, ".ps");
@@ -198,12 +204,18 @@ nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(const char* name, const char* 
         bytecode->GetBufferSize()
     );
 
-    bytecode->Release();
-
     if (!shader)
     {
         Msg("! [ShaderLoader] Failed to create NVRHI pixel shader: %s", name);
+        bytecode->Release();
         return nullptr;
+    }
+
+    // Store bytecode if caller requested it (for reflection)
+    if (outBytecode) {
+        *outBytecode = bytecode;  // Caller takes ownership
+    } else {
+        bytecode->Release();
     }
 
     Msg("  ✓ Loaded pixel shader: %s", name);

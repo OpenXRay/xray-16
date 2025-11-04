@@ -18,6 +18,7 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::framegraph {
     class FrameGraph;
+    class VolatileConstantBufferPool;
 }
 
 namespace xray::render {
@@ -129,6 +130,15 @@ struct MaterialPSO {
     xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;  // Size of $Globals CB (for convenience)
 
+    // VCB requirements (from shader reflection - for dynamic VCB pool selection)
+    struct VCBRequirement {
+        u32 slot;                     // CB slot (b0, b1, etc.)
+        u32 size;                     // Required size in bytes
+        shared_str name;              // CB name (e.g. "dynamic_transforms", "$Globals")
+        ng::BufferHandle vcbHandle;   // VCB from pool (filled after registration)
+    };
+    xr_vector<VCBRequirement> vcbRequirements;
+
     // Samplers (extracted from shader reflection + X-Ray state)
     // PER-STAGE to handle VS/PS having different samplers
     struct SamplerInfo {
@@ -209,7 +219,7 @@ struct MaterialPSO {
 
 class MaterialCache {
 public:
-    MaterialCache(ng::RenderDevice* device);
+    MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool = nullptr);
     ~MaterialCache();
 
     // Get or create PSO for a visual
@@ -234,6 +244,7 @@ public:
 
 private:
     ng::RenderDevice* m_device;
+    framegraph::VolatileConstantBufferPool* m_vcbPool;  // VCB pool for dynamic CB management
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
     Stats m_stats;
 

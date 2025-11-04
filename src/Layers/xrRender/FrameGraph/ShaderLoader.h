@@ -18,8 +18,9 @@ public:
     // Load and compile shader from res/gamedata/shaders/r3/
     // name: shader name without extension (e.g. "gbuffer", "lighting")
     // Returns handle (null on failure)
-    nvrhi::ShaderHandle LoadVertexShader(const char* name, const char* entryPoint = "main");
-    nvrhi::ShaderHandle LoadPixelShader(const char* name, const char* entryPoint = "main");
+    // Optional: outBytecode - if provided, stores bytecode for reflection (caller must Release)
+    nvrhi::ShaderHandle LoadVertexShader(const char* name, const char* entryPoint = "main", ID3DBlob** outBytecode = nullptr);
+    nvrhi::ShaderHandle LoadPixelShader(const char* name, const char* entryPoint = "main", ID3DBlob** outBytecode = nullptr);
 
     // Compile HLSL source to bytecode
     // Returns bytecode blob (caller must Release it)

@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render {
@@ -117,20 +118,25 @@ private:
     xr_unique_ptr<ng::RCShader> m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
-    // Per-object constant buffer (using our abstraction layer)
-    ng::BufferHandle m_perObjectCB;
+    // Shader bytecode (for reflection and analysis)
+    ID3DBlob* m_vertexShaderBytecode = nullptr;
+    ID3DBlob* m_pixelShaderBytecode = nullptr;
+
+    // Volatile constant buffer pool (dynamically creates VCBs on-demand with deduplication)
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
+
+    // CB layouts discovered from shader reflection
+    framegraph::VolatileConstantBufferPool::CBLayout m_dynamicTransformsLayout;  // For trees, static meshes
+    framegraph::VolatileConstantBufferPool::CBLayout m_materialLayout;           // For pixel shader materials
+
+    // Legacy: Per-object constant buffer (will be replaced by VCB pool)
+    // ng::BufferHandle m_perObjectCB;
 
     // Load shaders
     bool LoadShaders();
 
     // Create pipeline state object
     bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
-
-    // Update per-object constant buffer data only (no binding)
-    void UpdatePerObjectConstantsData(const GeometryBatch& batch);
-
-    // Update per-object constant buffer and bind it
-    void UpdatePerObjectConstants(ng::RenderContext& ctx, const GeometryBatch& batch);
 };
 
 } // namespace xray::render::passes
