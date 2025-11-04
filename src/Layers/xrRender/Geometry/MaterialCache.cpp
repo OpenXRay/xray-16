@@ -282,7 +282,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     psoDesc.pixelShader = rcPS;
 
     // Extract vertex attributes from visual's geometry declaration
-    SetupVertexAttributes(visual, psoDesc);
+    // CRITICAL: Use shader's input signature to determine correct order!
+    SetupVertexAttributes(visual, pso.get(), psoDesc);
 
     // Set up render states from X-Ray pass
     SetupRenderStates(pass, psoDesc);
@@ -495,7 +496,23 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     //  SHADER REFLECTION (Week 15)
     // ═══════════════════════════════════════════════════
 
-    // Try to analyze pixel shader via D3D reflection
+    // Analyze VERTEX shader to extract input signature (CRITICAL FOR INPUT LAYOUT!)
+    // X-Ray's SVS structure has: sh (ID3D11VertexShader*), bytecode (ID3DBlob*)
+    if (vs->sh && vs->bytecode) {
+        Msg("! [MaterialCache] Extracting VS input signature from '%s'", vs->cName.c_str());
+
+        matPSO->vsInputSignature = framegraph::ShaderReflector::AnalyzeVertexShader(
+            vs->sh,
+            vs->bytecode
+        );
+
+        Msg("! [MaterialCache] VS input signature extracted: %u elements in shader-expected order",
+            matPSO->vsInputSignature.elements.size());
+    } else {
+        Msg("! [MaterialCache] WARNING: Cannot extract VS input signature - no bytecode available!");
+    }
+
+    // Analyze PIXEL shader via D3D reflection
     // X-Ray's SPS structure has: sh (ID3D11PixelShader*), bytecode (ID3DBlob*)
     if (ps->sh && ps->bytecode) {
         Msg("! [MaterialCache] Performing shader reflection on PS '%s'", ps->cName.c_str());
@@ -1097,7 +1114,7 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
 //  SETUP VERTEX ATTRIBUTES
 // ══════════════════════════════════════════════════════════
 
-void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc)
+void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc)
 {
     psoDesc.vertexAttributes.clear();
 
@@ -1125,6 +1142,24 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         return;
 
     SDeclaration* decl = geom->dcl._get();
+
+    // ═══════════════════════════════════════════════════════
+    //  USE SHADER INPUT SIGNATURE FOR CORRECT ORDERING
+    // ═══════════════════════════════════════════════════════
+    //
+    // CRITICAL: We MUST create the input layout in the EXACT order the shader
+    // expects! D3D11 CreateInputLayout requires the elements to match the
+    // shader's input signature order, otherwise vertex data gets mismatched.
+    //
+    // The shader's input signature is extracted from VS bytecode reflection
+    // and stored in matPSO->vsInputSignature in shader-expected order.
+
+    if (!matPSO || matPSO->vsInputSignature.elements.empty()) {
+        Msg("! [MaterialCache] ERROR: No VS input signature available! Falling back to vertex decl order (WRONG!)");
+        // Fallback to old behavior (will likely be wrong order)
+    } else {
+        Msg("! [MaterialCache] Using VS input signature to build input layout in shader-expected order");
+    }
 
     // CRITICAL: Compute stride for each buffer slot!
     // D3D11_INPUT_ELEMENT_DESC doesn't have stride - we must calculate it
@@ -1156,83 +1191,67 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineS
         Msg("!   → Buffer slot %u: stride = %u bytes", slot, stride);
     }
 
-    // Track seen semantics to avoid duplicates (which cause CreateInputLayout to fail)
-    struct SemanticKey {
-        xr_string name;
-        u32 index;
-        bool operator<(const SemanticKey& other) const {
-            if (name != other.name) return name < other.name;
-            return index < other.index;
+    // ═══════════════════════════════════════════════════════
+    //  BUILD INPUT LAYOUT IN SHADER-EXPECTED ORDER
+    // ═══════════════════════════════════════════════════════
+    //
+    // Iterate through the shader's input signature (in order!), and for each
+    // element, find the matching element in the vertex declaration to get the
+    // actual format and byte offset.
+
+    if (matPSO && !matPSO->vsInputSignature.elements.empty()) {
+        // NEW CODE PATH: Use shader input signature order (CORRECT!)
+        Msg("! [MaterialCache] Building input layout in shader-expected order (%u elements)",
+            matPSO->vsInputSignature.elements.size());
+
+        for (u32 shaderIdx = 0; shaderIdx < matPSO->vsInputSignature.elements.size(); ++shaderIdx) {
+            const auto& shaderElem = matPSO->vsInputSignature.elements[shaderIdx];
+
+            Msg("!   Shader element [%u]: %s%d",
+                shaderIdx, shaderElem.semanticName.c_str(), shaderElem.semanticIndex);
+
+            // Find matching element in vertex declaration
+            const D3D11_INPUT_ELEMENT_DESC* matchingDeclElem = nullptr;
+            for (const auto& d3dElem : decl->dx11_dcl_code) {
+                if (!d3dElem.SemanticName)
+                    continue;
+
+                if (xr_strcmp(d3dElem.SemanticName, shaderElem.semanticName.c_str()) == 0 &&
+                    d3dElem.SemanticIndex == shaderElem.semanticIndex) {
+                    matchingDeclElem = &d3dElem;
+                    Msg("!     → Matched to vertex decl: %s%d (offset=%u)",
+                        d3dElem.SemanticName, d3dElem.SemanticIndex, d3dElem.AlignedByteOffset);
+                    break;
+                }
+            }
+
+            if (!matchingDeclElem) {
+                Msg("! [MaterialCache] WARNING: Shader expects %s%d but vertex decl doesn't have it!",
+                    shaderElem.semanticName.c_str(), shaderElem.semanticIndex);
+                continue;
+            }
+
+            // Create vertex attribute using:
+            // - Shader element ORDER (iteration order determines final order)
+            // - Vertex decl's semantic name, index, format, and offset (actual data layout)
+            ng::VertexAttribute attr;
+            attr.semanticName = matchingDeclElem->SemanticName;
+            attr.semanticIndex = matchingDeclElem->SemanticIndex;  // Use decl's index (TEXCOORD0 vs TEXCOORD1)
+            attr.format = ConvertDxgiFormatToNvrhi(matchingDeclElem->Format);
+            attr.offset = matchingDeclElem->AlignedByteOffset;
+            attr.bufferIndex = matchingDeclElem->InputSlot;
+            attr.isInstanced = (matchingDeclElem->InputSlotClass == D3D11_INPUT_PER_INSTANCE_DATA);
+            attr.elementStride = bufferStrides[matchingDeclElem->InputSlot];
+
+            psoDesc.vertexAttributes.push_back(attr);
+
+            Msg("!   [%u] %s%d: offset=%u, format=%u (from decl), stride=%u",
+                shaderIdx, attr.semanticName, attr.semanticIndex,
+                attr.offset, (u32)matchingDeclElem->Format, attr.elementStride);
         }
-    };
-    std::set<SemanticKey> seenSemantics;
 
-    // Convert X-Ray's D3D11 input elements to NVRHI format
-    for (const auto& d3dElem : decl->dx11_dcl_code) {
-        // Skip invalid elements
-        if (!d3dElem.SemanticName) {
-            Msg("! [MaterialCache] Skipping vertex element with NULL semantic name");
-            continue;
-        }
-
-        // Check for duplicates
-        SemanticKey key;
-        key.name = d3dElem.SemanticName;
-        key.index = d3dElem.SemanticIndex;
-
-        if (seenSemantics.find(key) != seenSemantics.end()) {
-            Msg("! [MaterialCache] Skipping duplicate semantic: %s%d",
-                d3dElem.SemanticName, d3dElem.SemanticIndex);
-            continue;
-        }
-        seenSemantics.insert(key);
-
-        ng::VertexAttribute attr;
-
-        // Map semantic name to persistent string literal
-        // D3D11 semantic names might be temporary, so we need persistent pointers
-        xr_string semanticStr = d3dElem.SemanticName;
-        if (semanticStr == "POSITION") {
-            attr.semanticName = "POSITION";
-        } else if (semanticStr == "NORMAL") {
-            attr.semanticName = "NORMAL";
-        } else if (semanticStr == "TEXCOORD") {
-            attr.semanticName = "TEXCOORD";
-        } else if (semanticStr == "TANGENT") {
-            attr.semanticName = "TANGENT";
-        } else if (semanticStr == "BINORMAL") {
-            attr.semanticName = "BINORMAL";
-        } else if (semanticStr == "COLOR") {
-            attr.semanticName = "COLOR";
-        } else if (semanticStr == "BLENDWEIGHT") {
-            attr.semanticName = "BLENDWEIGHT";
-        } else if (semanticStr == "BLENDINDICES") {
-            attr.semanticName = "BLENDINDICES";
-        } else {
-            // Unknown semantic - use the original but warn
-            Msg("! [MaterialCache] Unknown semantic: %s", d3dElem.SemanticName);
-            attr.semanticName = d3dElem.SemanticName;
-        }
-
-        attr.semanticIndex = d3dElem.SemanticIndex;
-
-        // Convert DXGI format to NVRHI format
-        attr.format = ConvertDxgiFormatToNvrhi(d3dElem.Format);
-
-        attr.offset = d3dElem.AlignedByteOffset;
-        attr.bufferIndex = d3dElem.InputSlot;
-        attr.isInstanced = (d3dElem.InputSlotClass == D3D11_INPUT_PER_INSTANCE_DATA);
-
-        // CRITICAL: Set the element stride for this buffer slot!
-        // This is what NVRHI uses to bind vertex buffers with correct stride
-        attr.elementStride = bufferStrides[d3dElem.InputSlot];
-
-        psoDesc.vertexAttributes.push_back(attr);
-
-        Msg("!   → Added to PSO at index %u: %s%d (format=%u, offset=%u, bufferIndex=%u, stride=%u)",
-            (u32)psoDesc.vertexAttributes.size() - 1,
-            attr.semanticName, attr.semanticIndex,
-            (u32)attr.format, attr.offset, attr.bufferIndex, attr.elementStride);
+        Msg("! [MaterialCache] Input layout created with %u elements in shader-expected order",
+            psoDesc.vertexAttributes.size());
     }
 
     // Debug: Log computed strides

@@ -265,6 +265,27 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // Reset statistics
     m_gbufferStats = Stats{};
 
+    // DEBUG: Check buffer state at start of Execute
+    Msg("  [GBufferPass] Checking %u batches for buffer validity...", m_batches.size());
+    u32 nullVBCount = 0, nullIBCount = 0;
+    for (u32 i = 0; i < m_batches.size(); ++i) {
+        const auto* batch = m_batches[i];
+        if (!batch->vertexBuffer) {
+            nullVBCount++;
+            if (i < 5) Msg("!   Batch %u: VB is NULL! (debugName='%s')", i, batch->debugName.c_str());
+        }
+        if (!batch->indexBuffer) {
+            nullIBCount++;
+            if (i < 5) Msg("!   Batch %u: IB is NULL! (debugName='%s')", i, batch->debugName.c_str());
+        }
+    }
+    if (nullVBCount > 0 || nullIBCount > 0) {
+        Msg("! [GBufferPass] ERROR: Found %u batches with null VB, %u with null IB (total %u batches)",
+            nullVBCount, nullIBCount, m_batches.size());
+    } else {
+        Msg("  [GBufferPass] All batches have valid buffers");
+    }
+
     // ═══════════════════════════════════════════════════════
     //  GET PHYSICAL RESOURCES
     // ═══════════════════════════════════════════════════════
@@ -513,6 +534,16 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             // Bind vertex/index buffers (convert nvrhi::BufferHandle to IBuffer*)
             nvrhi::IBuffer* vb = batch->vertexBuffer.Get();
             nvrhi::IBuffer* ib = batch->indexBuffer.Get();
+
+            // DEFENSIVE: Check for null buffers before binding
+            if (!vb || !ib) {
+                Msg("! [GBufferPass] ERROR: Batch %u has null buffers! VB=%p, IB=%p, visual=%p, debugName='%s'",
+                    m_gbufferStats.numDrawCalls,
+                    vb, ib, batch->visual, batch->debugName.c_str());
+                Msg("!   vertexBuffer handle valid: %s", batch->vertexBuffer ? "YES" : "NO");
+                Msg("!   indexBuffer handle valid: %s", batch->indexBuffer ? "YES" : "NO");
+                continue;  // Skip this batch
+            }
 
             //Msg("! [GBufferPass] Draw %u: VB=%p (size=%u, stride from PSO), IB=%p (size=%u), indexCount=%u, startIndex=%u, baseVertex=%d",
             //    m_gbufferStats.numDrawCalls,

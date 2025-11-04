@@ -143,6 +143,9 @@ struct MaterialPSO {
     // ─── RT Bindings (Extracted from Shader - Week 15) ───
     framegraph::ShaderRTBindings rtBindings;
 
+    // ─── Vertex Input Signature (Extracted from VS - shader-expected order!) ───
+    framegraph::VertexInputSignature vsInputSignature;
+
     // ─── Phase (Determines which pass to use) ───
     framegraph::RenderPhase GetPhase() const {
         return rtBindings.phase;
@@ -277,7 +280,7 @@ private:
     static u64 ComputeStateHash(SPass* pass);
 
     // Setup PSO descriptor helpers
-    void SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc);
+    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,  // Pass MaterialPSO for shader reflection data

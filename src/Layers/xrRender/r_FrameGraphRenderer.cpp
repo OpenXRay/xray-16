@@ -558,7 +558,14 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
-    batch.debugName = "VisibleMesh";
+    batch.debugName = visual->dbg_name.c_str();
+
+    // DEBUG: Verify buffers are valid before submit
+    if (!nvrhiVB || !nvrhiIB) {
+        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p, D3DVB=%p, D3DIB=%p",
+            nvrhiVB.Get(), nvrhiIB.Get(), d3dVB, d3dIB);
+        return false;
+    }
 
     // Submit to collector
     m_geometryCollector->Submit(batch);
@@ -868,6 +875,19 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
 
     // Get all batches
     auto& batches = m_geometryCollector->GetBatchesMutable();
+
+    // DEBUG: Check if batches have valid buffers before routing
+    u32 nullVBCount = 0, nullIBCount = 0;
+    for (const auto& batch : batches) {
+        if (!batch.vertexBuffer) nullVBCount++;
+        if (!batch.indexBuffer) nullIBCount++;
+    }
+    if (nullVBCount > 0 || nullIBCount > 0) {
+        Msg("! [RouteBatches] BEFORE ROUTING: %u batches with null VB, %u with null IB (total %u)",
+            nullVBCount, nullIBCount, batches.size());
+    } else {
+        Msg("  [RouteBatches] All %u batches have valid buffers before routing", batches.size());
+    }
 
     // ═══════════════════════════════════════════════════════
     //  TRUE PHASE-BASED ROUTING (Week 16)

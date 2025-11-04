@@ -149,9 +149,48 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     // Camera position
     cb.eye_position = Device.vCameraPosition;
 
+    /*
+    static class cl_pos_decompress_params : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+#if defined(USE_DX11)
+        const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
+        const float HorzTan = -VertTan / Device.fASPECT;
+#elif defined(USE_OGL)
+        const float VertTan = tanf(deg2rad(Device.fFOV / 2.0f));
+        const float HorzTan = VertTan / Device.fASPECT;
+#else
+#   error No graphics API selected or enabled!
+#endif
+        cmd_list.set_c(
+            C, HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
+    }
+} binder_pos_decompress_params;
+
+static class cl_pos_decompress_params2 : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override
+    {
+        cmd_list.set_c(C, (float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth,
+            1.0f / (float)Device.dwHeight);
+    }
+} binder_pos_decompress_params2;
+    */
+
+#if defined(USE_DX11)
+    const float VertTan = -1.0f * tanf(deg2rad(Device.fFOV / 2.0f));
+    const float HorzTan = -VertTan / Device.fASPECT;
+#elif defined(USE_OGL)
+    const float VertTan = tanf(deg2rad(Device.fFOV / 2.0f));
+    const float HorzTan = VertTan / Device.fASPECT;
+#else
+#   error No graphics API selected or enabled!
+#endif
+
     // Vertex decompression (used for quantized positions)
-    cb.pos_decompression_params.set(1.0f, 1.0f, 1.0f, 1.0f);
-    cb.pos_decompression_params2.set(0.0f, 0.0f, 0.0f, 0.0f);
+    cb.pos_decompression_params.set(HorzTan, VertTan, (2.0f * HorzTan) / (float)Device.dwWidth, (2.0f * VertTan) / (float)Device.dwHeight);
+    cb.pos_decompression_params2.set((float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth, 1.0f / (float)Device.dwHeight);
 
     // Parallax mapping
     cb.parallax.set(0.02f, -0.01f, 0.0f, 0.0f);  // height scale, min samples, max samples, unused
