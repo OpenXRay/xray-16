@@ -251,10 +251,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         m_device->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
     VERIFY(d3dDevice);
 
-    ID3D11DeviceContext* d3dContext = nullptr;
-    d3dDevice->GetImmediateContext(&d3dContext);
-    VERIFY(d3dContext);
-
     xr_set<ID3D11Buffer*> updatedBuffers;
 
     Msg("  [GBufferPass] Filled constant buffers:");
@@ -400,10 +396,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     }
 
     ctx.EndRenderPass();
-
-    if (d3dContext) {
-        d3dContext->Release();
-    }
 
     auto executeEnd = std::chrono::high_resolution_clock::now();
     m_gbufferStats.cpuTimeMs = std::chrono::duration<float, std::milli>(
