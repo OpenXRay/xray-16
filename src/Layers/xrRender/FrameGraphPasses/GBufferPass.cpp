@@ -5,8 +5,11 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/TextureDescrManager.h"
+#include "Layers/xrRender/SkeletonCustom.h"
+#include "Layers/xrRender/FSkinned.h"
 #include "xrEngine/Render.h"
 
 namespace xray::render::passes {
@@ -27,7 +30,9 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
 
-    m_materialCache = xr_make_unique<MaterialCache>(device);
+    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
+
+    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
 
     if (!LoadShaders())
     {
@@ -36,6 +41,14 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 }
 
 GBufferPass::~GBufferPass() {
+    if (m_vertexShaderBytecode) {
+        m_vertexShaderBytecode->Release();
+        m_vertexShaderBytecode = nullptr;
+    }
+    if (m_pixelShaderBytecode) {
+        m_pixelShaderBytecode->Release();
+        m_pixelShaderBytecode = nullptr;
+    }
     Msg("* [GBufferPass] Destroyed");
 }
 
@@ -43,19 +56,51 @@ bool GBufferPass::LoadShaders()
 {
     ShaderLoader loader(m_device);
 
-    m_vertexShaderNative = loader.LoadVertexShader("gbuffer");
+    m_vertexShaderNative = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
     if (!m_vertexShaderNative)
     {
         Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
         return false;
     }
 
-    m_pixelShaderNative = loader.LoadPixelShader("gbuffer");
+    m_pixelShaderNative = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
     if (!m_pixelShaderNative)
     {
         Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
         return false;
     }
+
+    Msg("* [GBufferPass] Analyzing constant buffer requirements...");
+
+    if (m_vertexShaderBytecode) {
+        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode);
+        Msg("  → Vertex shader has %u constant buffers", vsCBs.buffers.size());
+
+        for (const auto& cbInfo : vsCBs.buffers) {
+            VolatileConstantBufferPool::CBLayout layout(cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
+            m_vcbPool->GetOrCreateVCB(layout);
+
+            if (xr_strcmp(cbInfo.name.c_str(), "dynamic_transforms") == 0) {
+                m_dynamicTransformsLayout = layout;
+            }
+        }
+    }
+
+    if (m_pixelShaderBytecode) {
+        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode);
+        Msg("  → Pixel shader has %u constant buffers", psCBs.buffers.size());
+
+        for (const auto& cbInfo : psCBs.buffers) {
+            VolatileConstantBufferPool::CBLayout layout(cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
+            m_vcbPool->GetOrCreateVCB(layout);
+
+            if (xr_strcmp(cbInfo.name.c_str(), "Material") == 0) {
+                m_materialLayout = layout;
+            }
+        }
+    }
+
+    m_vcbPool->LogStats();
 
     m_vertexShader = xr_make_unique<ng::RCShader>(
         ng::ShaderStage::Vertex,
@@ -68,25 +113,6 @@ bool GBufferPass::LoadShaders()
         m_pixelShaderNative,
         "gbuffer.ps"
     );
-
-    struct PerObjectConstants {
-        Fmatrix worldViewProj;
-        Fmatrix world;
-        Fmatrix worldIT;
-        u8 padding[64];
-    };
-
-    ng::RenderDevice::BufferDesc cbDesc;
-    cbDesc.byteSize = 256;
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.debugName = "PerObjectCB";
-
-    m_perObjectCB = m_device->CreateBuffer(cbDesc);
-    if (!m_perObjectCB.IsValid()) {
-        Msg("! [GBufferPass] Failed to create per-object constant buffer");
-        return false;
-    }
 
     Msg("  ✓ G-Buffer shaders loaded successfully");
     return true;
@@ -424,10 +450,21 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                 constsPtr[2] = 0.0f;
                 constsPtr[3] = 0.0f;
 
-                VERIFY(m_perObjectCB.IsValid());
-                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);
+                ng::BufferHandle vcbHandle;
+                if (!matPSO->vcbRequirements.empty()) {
+                    vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                }
 
-                ctx.WriteBuffer(vcbBuffer, cbData, VCB_SIZE);
+                if (!vcbHandle.IsValid()) {
+                    Msg("! [GBufferPass] Material has no valid VCB");
+                    continue;
+                }
+
+                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+
+                u32 vcbSize = matPSO->vcbRequirements[0].size;
+
+                ctx.WriteBuffer(vcbBuffer, cbData, vcbSize);
 
                 m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
@@ -469,40 +506,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         m_gbufferStats.numDrawCalls,
         m_gbufferStats.numTriangles,
         m_gbufferStats.cpuTimeMs);
-}
-
-void GBufferPass::UpdatePerObjectConstantsData(const GeometryBatch& batch)
-{
-    struct PerObjectConstants {
-        Fmatrix worldViewProj;
-        Fmatrix world;
-        Fmatrix worldIT;
-    };
-
-    PerObjectConstants constants;
-
-    Fmatrix viewProj;
-    viewProj.mul(Device.mView, Device.mProject);
-
-    constants.worldViewProj.mul(batch.worldMatrix, viewProj);
-
-    constants.world = batch.worldMatrix;
-
-    Fmatrix temp;
-    temp.invert(batch.worldMatrix);
-    constants.worldIT.transpose(temp);
-
-    VERIFY(m_perObjectCB.IsValid());
-    m_device->UpdateBuffer(m_perObjectCB, &constants, sizeof(constants));
-}
-
-void GBufferPass::UpdatePerObjectConstants(
-    ng::RenderContext& ctx,
-    const GeometryBatch& batch
-) {
-    UpdatePerObjectConstantsData(batch);
-
-    ctx.SetConstantBuffer(0, m_perObjectCB);
 }
 
 }

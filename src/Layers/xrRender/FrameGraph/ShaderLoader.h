@@ -10,8 +10,8 @@ public:
     ShaderLoader(ng::RenderDevice* device);
     ~ShaderLoader();
 
-    nvrhi::ShaderHandle LoadVertexShader(const char* name, const char* entryPoint = "main");
-    nvrhi::ShaderHandle LoadPixelShader(const char* name, const char* entryPoint = "main");
+    nvrhi::ShaderHandle LoadVertexShader(const char* name, const char* entryPoint = "main", ID3DBlob** outBytecode = nullptr);
+    nvrhi::ShaderHandle LoadPixelShader(const char* name, const char* entryPoint = "main", ID3DBlob** outBytecode = nullptr);
 
     ID3DBlob* CompileShader(
         const char* shaderPath,

@@ -353,7 +353,7 @@ void FrameGraphRenderer::PresentToBackbuffer() {
         d3dDesc.Width, d3dDesc.Height);
 }
 
-bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform) {
+bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
     if (!visual)
         return false;
 
@@ -454,6 +454,8 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     batch.visual = visual;
 
+    batch.renderable = renderable;
+
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
@@ -491,9 +493,12 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
         case MT_SKELETON_ANIM:
         case MT_SKELETON_RIGID: {
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
+            pV->CalculateBones(TRUE);
+
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);
             }
+
             break;
         }
         case MT_SKELETON_GEOMDEF_PM:
@@ -687,8 +692,13 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
             continue;
         }
 
-        if (ProcessVisualGeometry(visual, renderable->GetRenderData().xform)) {
-            submittedDynamic++;
+        xr_vector<dxRender_Visual*> dynamicLeafs;
+        ExtractStaticLeafVisuals(visual, dynamicLeafs);
+
+        for (dxRender_Visual* leafVisual : dynamicLeafs) {
+            if (ProcessVisualGeometry(leafVisual, renderable->GetRenderData().xform, renderable)) {
+                submittedDynamic++;
+            }
         }
     }
 

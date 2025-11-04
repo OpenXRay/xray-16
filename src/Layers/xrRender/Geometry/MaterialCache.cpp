@@ -43,8 +43,9 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
     return nvrhi::Format::UNKNOWN;
 }
 
-MaterialCache::MaterialCache(ng::RenderDevice* device)
+MaterialCache::MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool)
     : m_device(device)
+    , m_vcbPool(vcbPool)
 {
     VERIFY(m_device);
 }
@@ -200,6 +201,44 @@ MaterialPSO* MaterialCache::CreatePSO(
         m_device->DestroyShader(vsHandle);
         m_device->DestroyShader(psHandle);
         return nullptr;
+    }
+
+    if (m_vcbPool) {
+        auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(pso->vertexShader->bytecode);
+        for (const auto& cbInfo : vsCBs.buffers) {
+            framegraph::VolatileConstantBufferPool::CBLayout layout(
+                cbInfo.name.c_str(),
+                cbInfo.slot,
+                cbInfo.size
+            );
+
+            ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+
+            MaterialPSO::VCBRequirement req;
+            req.slot = cbInfo.slot;
+            req.size = cbInfo.size;
+            req.name = cbInfo.name;
+            req.vcbHandle = vcbHandle;
+            pso->vcbRequirements.push_back(req);
+        }
+
+        auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(pso->pixelShader->bytecode);
+        for (const auto& cbInfo : psCBs.buffers) {
+            framegraph::VolatileConstantBufferPool::CBLayout layout(
+                cbInfo.name.c_str(),
+                cbInfo.slot,
+                cbInfo.size
+            );
+
+            ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+
+            MaterialPSO::VCBRequirement req;
+            req.slot = cbInfo.slot;
+            req.size = cbInfo.size;
+            req.name = cbInfo.name;
+            req.vcbHandle = vcbHandle;
+            pso->vcbRequirements.push_back(req);
+        }
     }
 
     ng::PipelineStateDesc psoDesc;

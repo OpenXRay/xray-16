@@ -73,6 +73,33 @@ struct ShaderRTBindings {
     shared_str shaderName;
 };
 
+struct ConstantBufferInfo {
+    shared_str name;
+    u32 slot;
+    u32 size;
+
+    ConstantBufferInfo() : slot(0), size(0) {}
+    ConstantBufferInfo(const char* n, u32 s, u32 sz) : name(n), slot(s), size(sz) {}
+};
+
+struct ShaderConstantBuffers {
+    xr_vector<ConstantBufferInfo> buffers;
+
+    const ConstantBufferInfo* GetBySlot(u32 slot) const {
+        for (const auto& cb : buffers) {
+            if (cb.slot == slot) return &cb;
+        }
+        return nullptr;
+    }
+
+    const ConstantBufferInfo* GetByName(const char* name) const {
+        for (const auto& cb : buffers) {
+            if (xr_strcmp(cb.name.c_str(), name) == 0) return &cb;
+        }
+        return nullptr;
+    }
+};
+
 class ShaderReflector {
 public:
     static VertexInputSignature AnalyzeVertexShader(
@@ -82,6 +109,8 @@ public:
     static ShaderRTBindings AnalyzePixelShader(
         ID3D11PixelShader* ps,
         ID3DBlob* bytecode);
+
+    static ShaderConstantBuffers AnalyzeConstantBuffers(ID3DBlob* bytecode);
 
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);
 

@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render {
@@ -85,15 +86,17 @@ private:
     xr_unique_ptr<ng::RCShader> m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
-    ng::BufferHandle m_perObjectCB;
+    ID3DBlob* m_vertexShaderBytecode = nullptr;
+    ID3DBlob* m_pixelShaderBytecode = nullptr;
+
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
+
+    framegraph::VolatileConstantBufferPool::CBLayout m_dynamicTransformsLayout;
+    framegraph::VolatileConstantBufferPool::CBLayout m_materialLayout;
 
     bool LoadShaders();
 
     bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
-
-    void UpdatePerObjectConstantsData(const GeometryBatch& batch);
-
-    void UpdatePerObjectConstants(ng::RenderContext& ctx, const GeometryBatch& batch);
 };
 
 }

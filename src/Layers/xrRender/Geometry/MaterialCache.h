@@ -15,6 +15,7 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::framegraph {
     class FrameGraph;
+    class VolatileConstantBufferPool;
 }
 
 namespace xray::render {
@@ -105,6 +106,14 @@ struct MaterialPSO {
     xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;
 
+    struct VCBRequirement {
+        u32 slot;
+        u32 size;
+        shared_str name;
+        ng::BufferHandle vcbHandle;
+    };
+    xr_vector<VCBRequirement> vcbRequirements;
+
     struct SamplerInfo {
         u32 slot;
         ShaderStage stage;
@@ -163,7 +172,7 @@ struct MaterialPSO {
 
 class MaterialCache {
 public:
-    MaterialCache(ng::RenderDevice* device);
+    MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool = nullptr);
     ~MaterialCache();
 
     MaterialPSO* GetOrCreatePSO(
@@ -185,6 +194,7 @@ public:
 
 private:
     ng::RenderDevice* m_device;
+    framegraph::VolatileConstantBufferPool* m_vcbPool;
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
     Stats m_stats;
 
