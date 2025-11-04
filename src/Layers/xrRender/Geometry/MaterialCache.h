@@ -13,6 +13,7 @@ namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
     struct SVS;
     struct SPS;
+    class CTexture;  // For texture wrapper cache
 }
 
 namespace xray::render::framegraph {
@@ -228,6 +229,12 @@ private:
     ng::RenderDevice* m_device;
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
     Stats m_stats;
+
+    // Texture wrapper cache: Maps texture NAME to NVRHI TextureHandle
+    // Prevents wrapping the same texture multiple times (massive leak!)
+    // We use texture name (string) instead of CTexture* because X-Ray may recreate
+    // CTexture objects at different addresses for the same logical texture
+    xr_map<xr_string, ng::TextureHandle> m_textureWrapperCache;
 
     // Create new PSO from shader element
     MaterialPSO* CreatePSO(

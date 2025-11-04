@@ -198,6 +198,7 @@ BufferHandle BufferManager::CreateBuffer(
         cmd->writeBuffer(meta.nvrhiBuffer, initialData, desc.size);
         cmd->close();
         m_device->GetNativeDevice()->executeCommandList(cmd);
+        cmd->Release();  // CRITICAL: Release to avoid leak!
     }
 
     Msg("! [BufferManager] Created buffer: %s (%llu KB)",
@@ -225,6 +226,7 @@ void BufferManager::UpdateBuffer(
     cmd->writeBuffer(meta.nvrhiBuffer, data, size, offset);
     cmd->close();
     m_device->GetNativeDevice()->executeCommandList(cmd);
+    cmd->Release();  // CRITICAL: Release to avoid leak!
 
     meta.lastAccessTime = 0.0f;
 }

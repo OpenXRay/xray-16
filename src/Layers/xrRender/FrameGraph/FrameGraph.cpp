@@ -325,15 +325,13 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 // ════════════════════════════════════════════════════════════
 
 void FrameGraph::ResetForNextFrame() {
-    Msg("~ [FrameGraph] Resetting for next frame...");
-
     // Only clear per-frame execution state:
-    // - Sorted passes (recomputed each frame)
-    // - Compiled flag (allows recompilation)
     // - Statistics (per-frame metrics)
-
-    m_sortedPasses.clear();
-    m_compiled = false;
+    //
+    // DO NOT clear:
+    // - m_compiled (keep resources allocated!)
+    // - m_sortedPasses (reuse execution order)
+    // - m_resources, m_passes, m_rtRegistry (persistent structure)
 
     // Reset per-frame statistics
     m_stats.compileTimeMs = 0.0f;
@@ -341,9 +339,9 @@ void FrameGraph::ResetForNextFrame() {
     m_stats.totalGPUTimeMs = 0.0f;
     m_stats.passTimings.clear();
 
-    // Keep: m_resources, m_passes, m_rtRegistry (persistent structure)
-
-    Msg("~ [FrameGraph] Ready for next frame");
+    // CRITICAL: DO NOT set m_compiled = false here!
+    // That causes recompilation every frame, reallocating GBuffer textures
+    // and leaking 400-500MB per frame. Only recompile when graph structure changes.
 }
 
 // ════════════════════════════════════════════════════════════

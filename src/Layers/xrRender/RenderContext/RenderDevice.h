@@ -296,6 +296,10 @@ private:
     // Modern resource manager (Week 2-3)
     xr_unique_ptr<xray::render::resources::ModernResourceManager> m_modernResourceManager;
 
+    // Persistent command list for upload operations (texture/buffer uploads)
+    // Created once during Init(), reused for all uploads, released in destructor
+    nvrhi::CommandListHandle m_uploadCommandList;
+
     // Initialization state
     bool m_initialized = false;
 

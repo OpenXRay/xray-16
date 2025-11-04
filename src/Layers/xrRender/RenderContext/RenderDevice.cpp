@@ -45,6 +45,14 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     m_modernResourceManager = xr_make_unique<xray::render::resources::ModernResourceManager>(this);
     Msg("* [RenderDevice] ModernResourceManager initialized");
 
+    // Create persistent upload command list (reused for texture/buffer uploads)
+    m_uploadCommandList = GetNativeDevice()->createCommandList();
+    if (!m_uploadCommandList) {
+        Msg("! [RenderDevice] Failed to create upload command list");
+        return false;
+    }
+    Msg("* [RenderDevice] Created persistent upload command list");
+
     // Reserve initial capacity
     m_textures.reserve(256);
     m_buffers.reserve(512);
@@ -72,6 +80,10 @@ void RenderDevice::Shutdown() {
     if (m_stats.shadersAlive > 0) {
         Msg("! [RenderDevice] WARNING: %u shaders leaked", m_stats.shadersAlive);
     }
+
+    // Release upload command list
+    m_uploadCommandList = nullptr;
+    Msg("* [RenderDevice] Released upload command list");
 
     // Clear pipeline cache
     m_pipelineCache.reset();
@@ -242,9 +254,9 @@ void RenderDevice::UploadTextureData(
         return;
     }
 
-    // Get command list
-    nvrhi::ICommandList* cmdList = GetNativeDevice()->createCommandList();
-    cmdList->open();
+    // Use persistent upload command list (reused, not recreated)
+    VERIFY(m_uploadCommandList && "Upload command list not initialized");
+    m_uploadCommandList->open();
 
     // Calculate row pitch based on format
     const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
@@ -261,11 +273,12 @@ void RenderDevice::UploadTextureData(
     }
 
     // Write texture data
-    cmdList->writeTexture(nvrhiTexture, arraySlice, mipLevel, data, rowPitch);
+    m_uploadCommandList->writeTexture(nvrhiTexture, arraySlice, mipLevel, data, rowPitch);
 
     // Execute immediately
-    cmdList->close();
-    GetNativeDevice()->executeCommandList(cmdList);
+    m_uploadCommandList->close();
+    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+    // Note: Command list is reused, not released - it's persistent!
 }
 
 void RenderDevice::UploadTextureData(
@@ -290,9 +303,9 @@ void RenderDevice::UploadTextureData(
         return;
     }
 
-    // Get command list
-    nvrhi::ICommandList* cmdList = GetNativeDevice()->createCommandList();
-    cmdList->open();
+    // Use persistent upload command list (reused, not recreated)
+    VERIFY(m_uploadCommandList && "Upload command list not initialized");
+    m_uploadCommandList->open();
 
     // Upload all slices
     const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
@@ -315,13 +328,14 @@ void RenderDevice::UploadTextureData(
         }
 
         // Write this slice
-        cmdList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
+        m_uploadCommandList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
                              slice.data, rowPitch);
     }
 
     // Execute immediately
-    cmdList->close();
-    GetNativeDevice()->executeCommandList(cmdList);
+    m_uploadCommandList->close();
+    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+    // Note: Command list is reused, not released - it's persistent!
 }
 
 // ═══════════════════════════════════════════════════

@@ -326,6 +326,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
     cmdList->close();
     m_device->GetNativeDevice()->executeCommandList(cmdList);
+    cmdList->Release();  // CRITICAL: Release to avoid massive leak during streaming!
 
     // Update metadata
     meta->residentMips = request.targetMips;
