@@ -15,6 +15,18 @@ enum class RenderPhase {
     Custom
 };
 
+struct VertexInputSignature {
+    struct InputElement {
+        shared_str semanticName;
+        u32 semanticIndex;
+        DXGI_FORMAT format;
+        u32 inputSlot;
+
+        InputElement() : semanticIndex(0), format(DXGI_FORMAT_UNKNOWN), inputSlot(0) {}
+    };
+    xr_vector<InputElement> elements;
+};
+
 struct ShaderRTBindings {
     RenderPhase phase = RenderPhase::Custom;
 
@@ -63,6 +75,10 @@ struct ShaderRTBindings {
 
 class ShaderReflector {
 public:
+    static VertexInputSignature AnalyzeVertexShader(
+        ID3D11VertexShader* vs,
+        ID3DBlob* bytecode);
+
     static ShaderRTBindings AnalyzePixelShader(
         ID3D11PixelShader* ps,
         ID3DBlob* bytecode);

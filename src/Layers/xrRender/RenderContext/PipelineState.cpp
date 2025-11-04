@@ -246,51 +246,55 @@ PipelineState* PipelineStateCache::CreatePipelineState(
         nvrhiDesc.DS = desc.domainShader->GetNativeShader();
 
     if (!desc.vertexAttributes.empty()) {
-        std::map<std::string, std::vector<const VertexAttribute*>> semanticGroups;
+
+        xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
+        xr_set<const char*> processedSemantics;
 
         for (const auto& attr : desc.vertexAttributes) {
             if (!attr.semanticName)
                 continue;
-            semanticGroups[attr.semanticName].push_back(&attr);
-        }
 
-        xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
+            if (processedSemantics.find(attr.semanticName) != processedSemantics.end())
+                continue;
 
-        for (auto& [semanticName, attrs] : semanticGroups) {
-            std::sort(attrs.begin(), attrs.end(),
-                [](const VertexAttribute* a, const VertexAttribute* b) {
-                    return a->semanticIndex < b->semanticIndex;
-                });
+            processedSemantics.insert(attr.semanticName);
 
-            bool isConsecutive = (attrs[0]->semanticIndex == 0);
-            if (isConsecutive) {
-                for (size_t i = 1; i < attrs.size(); ++i) {
-                    if (attrs[i]->semanticIndex != i) {
+            xr_vector<const VertexAttribute*> sameSemanticAttrs;
+            for (const auto& checkAttr : desc.vertexAttributes) {
+                if (checkAttr.semanticName && xr_strcmp(checkAttr.semanticName, attr.semanticName) == 0) {
+                    sameSemanticAttrs.push_back(&checkAttr);
+                }
+            }
+
+            bool isConsecutive = !sameSemanticAttrs.empty() && (sameSemanticAttrs[0]->semanticIndex == 0);
+            if (isConsecutive && sameSemanticAttrs.size() > 1) {
+                for (size_t i = 1; i < sameSemanticAttrs.size(); ++i) {
+                    if (sameSemanticAttrs[i]->semanticIndex != i) {
                         isConsecutive = false;
                         break;
                     }
                 }
             }
 
-            if (isConsecutive && attrs.size() > 1) {
+            if (isConsecutive && sameSemanticAttrs.size() > 1) {
                 nvrhi::VertexAttributeDesc nvrhiAttr;
-                nvrhiAttr.name = semanticName;
-                nvrhiAttr.format = attrs[0]->format;
-                nvrhiAttr.offset = attrs[0]->offset;
-                nvrhiAttr.bufferIndex = attrs[0]->bufferIndex;
-                nvrhiAttr.isInstanced = attrs[0]->isInstanced;
-                nvrhiAttr.elementStride = attrs[0]->elementStride;
-                nvrhiAttr.arraySize = static_cast<uint32_t>(attrs.size());
+                nvrhiAttr.name = attr.semanticName;
+                nvrhiAttr.format = sameSemanticAttrs[0]->format;
+                nvrhiAttr.offset = sameSemanticAttrs[0]->offset;
+                nvrhiAttr.bufferIndex = sameSemanticAttrs[0]->bufferIndex;
+                nvrhiAttr.isInstanced = sameSemanticAttrs[0]->isInstanced;
+                nvrhiAttr.elementStride = sameSemanticAttrs[0]->elementStride;
+                nvrhiAttr.arraySize = static_cast<uint32_t>(sameSemanticAttrs.size());
                 nvrhiAttrs.push_back(nvrhiAttr);
             } else {
-                for (const auto* attr : attrs) {
+                for (const auto* semAttr : sameSemanticAttrs) {
                     nvrhi::VertexAttributeDesc nvrhiAttr;
-                    nvrhiAttr.name = semanticName;
-                    nvrhiAttr.format = attr->format;
-                    nvrhiAttr.offset = attr->offset;
-                    nvrhiAttr.bufferIndex = attr->bufferIndex;
-                    nvrhiAttr.isInstanced = attr->isInstanced;
-                    nvrhiAttr.elementStride = attr->elementStride;
+                    nvrhiAttr.name = attr.semanticName;
+                    nvrhiAttr.format = semAttr->format;
+                    nvrhiAttr.offset = semAttr->offset;
+                    nvrhiAttr.bufferIndex = semAttr->bufferIndex;
+                    nvrhiAttr.isInstanced = semAttr->isInstanced;
+                    nvrhiAttr.elementStride = semAttr->elementStride;
                     nvrhiAttr.arraySize = 1;
                     nvrhiAttrs.push_back(nvrhiAttr);
                 }

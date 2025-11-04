@@ -3,6 +3,89 @@
 
 namespace xray::render::framegraph {
 
+VertexInputSignature ShaderReflector::AnalyzeVertexShader(
+    ID3D11VertexShader* vs,
+    ID3DBlob* bytecode) {
+
+    VERIFY(vs);
+    VERIFY(bytecode);
+
+    VertexInputSignature signature;
+
+    ID3D11ShaderReflection* reflection = nullptr;
+    HRESULT hr = D3DReflect(
+        bytecode->GetBufferPointer(),
+        bytecode->GetBufferSize(),
+        IID_ID3D11ShaderReflection,
+        (void**)&reflection
+    );
+
+    if (FAILED(hr)) {
+        Msg("! [ShaderReflector] Failed to create VS reflection interface (HRESULT: 0x%08X)", hr);
+        return signature;
+    }
+
+    D3D11_SHADER_DESC shaderDesc;
+    reflection->GetDesc(&shaderDesc);
+
+    Msg("! [ShaderReflector] Analyzing vertex shader input signature...");
+    Msg("!   Input parameters: %u", shaderDesc.InputParameters);
+
+    for (u32 i = 0; i < shaderDesc.InputParameters; i++) {
+        D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
+        hr = reflection->GetInputParameterDesc(i, &paramDesc);
+
+        if (FAILED(hr)) {
+            Msg("! [ShaderReflector] Failed to get input parameter %u", i);
+            continue;
+        }
+
+        if (paramDesc.SystemValueType != D3D_NAME_UNDEFINED) {
+            Msg("!   Skipping system value: %s (SV type: %d)",
+                paramDesc.SemanticName, paramDesc.SystemValueType);
+            continue;
+        }
+
+        VertexInputSignature::InputElement elem;
+        elem.semanticName = paramDesc.SemanticName;
+        elem.semanticIndex = paramDesc.SemanticIndex;
+
+        if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+            u32 numComponents = 0;
+            if (paramDesc.Mask & 0x1) numComponents++;
+            if (paramDesc.Mask & 0x2) numComponents++;
+            if (paramDesc.Mask & 0x4) numComponents++;
+            if (paramDesc.Mask & 0x8) numComponents++;
+
+            switch (numComponents) {
+                case 1: elem.format = DXGI_FORMAT_R32_FLOAT; break;
+                case 2: elem.format = DXGI_FORMAT_R32G32_FLOAT; break;
+                case 3: elem.format = DXGI_FORMAT_R32G32B32_FLOAT; break;
+                case 4: elem.format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+                default: elem.format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+            }
+        } else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+            elem.format = DXGI_FORMAT_R32G32B32A32_UINT;
+        } else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+            elem.format = DXGI_FORMAT_R32G32B32A32_SINT;
+        } else {
+            elem.format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        }
+
+        elem.inputSlot = 0;
+
+        signature.elements.push_back(elem);
+
+        Msg("!   Input[%u]: %s%d (format inferred: %d, mask: 0x%X)",
+            i, elem.semanticName.c_str(), elem.semanticIndex, elem.format, paramDesc.Mask);
+    }
+
+    reflection->Release();
+
+    Msg("! [ShaderReflector] Extracted %u input elements in shader order", signature.elements.size());
+    return signature;
+}
+
 ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     ID3D11PixelShader* ps,
     ID3DBlob* bytecode) {

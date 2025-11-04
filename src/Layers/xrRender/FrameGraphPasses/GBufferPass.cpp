@@ -219,6 +219,26 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
     m_gbufferStats = Stats{};
 
+    Msg("  [GBufferPass] Checking %u batches for buffer validity...", m_batches.size());
+    u32 nullVBCount = 0, nullIBCount = 0;
+    for (u32 i = 0; i < m_batches.size(); ++i) {
+        const auto* batch = m_batches[i];
+        if (!batch->vertexBuffer) {
+            nullVBCount++;
+            if (i < 5) Msg("!   Batch %u: VB is NULL! (debugName='%s')", i, batch->debugName.c_str());
+        }
+        if (!batch->indexBuffer) {
+            nullIBCount++;
+            if (i < 5) Msg("!   Batch %u: IB is NULL! (debugName='%s')", i, batch->debugName.c_str());
+        }
+    }
+    if (nullVBCount > 0 || nullIBCount > 0) {
+        Msg("! [GBufferPass] ERROR: Found %u batches with null VB, %u with null IB (total %u batches)",
+            nullVBCount, nullIBCount, m_batches.size());
+    } else {
+        Msg("  [GBufferPass] All batches have valid buffers");
+    }
+
     nvrhi::ITexture* albedo = fg.GetPhysicalTexture(m_outputs.albedo);
     nvrhi::ITexture* normal = fg.GetPhysicalTexture(m_outputs.normal);
     nvrhi::ITexture* material = fg.GetPhysicalTexture(m_outputs.material);
@@ -384,6 +404,15 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
             nvrhi::IBuffer* vb = batch->vertexBuffer.Get();
             nvrhi::IBuffer* ib = batch->indexBuffer.Get();
+
+            if (!vb || !ib) {
+                Msg("! [GBufferPass] ERROR: Batch %u has null buffers! VB=%p, IB=%p, visual=%p, debugName='%s'",
+                    m_gbufferStats.numDrawCalls,
+                    vb, ib, batch->visual, batch->debugName.c_str());
+                Msg("!   vertexBuffer handle valid: %s", batch->vertexBuffer ? "YES" : "NO");
+                Msg("!   indexBuffer handle valid: %s", batch->indexBuffer ? "YES" : "NO");
+                continue;
+            }
 
             ctx.SetVertexBuffer(0, vb, 0);
             ctx.SetIndexBuffer(ib, nvrhi::Format::R16_UINT, 0);

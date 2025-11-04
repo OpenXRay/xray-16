@@ -423,7 +423,13 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
-    batch.debugName = "VisibleMesh";
+    batch.debugName = visual->dbg_name.c_str();
+
+    if (!nvrhiVB || !nvrhiIB) {
+        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p, D3DVB=%p, D3DIB=%p",
+            nvrhiVB.Get(), nvrhiIB.Get(), d3dVB, d3dIB);
+        return false;
+    }
 
     m_geometryCollector->Submit(batch);
     return true;
@@ -659,6 +665,18 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     Msg("! [FrameGraphRenderer] Routing batches to passes...");
 
     auto& batches = m_geometryCollector->GetBatchesMutable();
+
+    u32 nullVBCount = 0, nullIBCount = 0;
+    for (const auto& batch : batches) {
+        if (!batch.vertexBuffer) nullVBCount++;
+        if (!batch.indexBuffer) nullIBCount++;
+    }
+    if (nullVBCount > 0 || nullIBCount > 0) {
+        Msg("! [RouteBatches] BEFORE ROUTING: %u batches with null VB, %u with null IB (total %u)",
+            nullVBCount, nullIBCount, batches.size());
+    } else {
+        Msg("  [RouteBatches] All %u batches have valid buffers before routing", batches.size());
+    }
 
     xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
 

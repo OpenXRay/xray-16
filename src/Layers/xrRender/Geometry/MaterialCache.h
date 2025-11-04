@@ -117,6 +117,8 @@ struct MaterialPSO {
 
     framegraph::ShaderRTBindings rtBindings;
 
+    framegraph::VertexInputSignature vsInputSignature;
+
     framegraph::RenderPhase GetPhase() const {
         return rtBindings.phase;
     }
@@ -217,7 +219,7 @@ private:
 
     static u64 ComputeStateHash(SPass* pass);
 
-    void SetupVertexAttributes(dxRender_Visual* visual, ng::PipelineStateDesc& psoDesc);
+    void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,
