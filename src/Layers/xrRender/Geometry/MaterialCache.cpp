@@ -130,6 +130,13 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     ExtractTextures(pass, pso.get());
 
+    if (pass && pass->T && !pass->T->empty()) {
+        CTexture* baseTex = (*pass->T)[0].second._get();
+        if (baseTex && baseTex->cName.size()) {
+            pso->detail_scale = GetDetailScale(baseTex->cName);
+        }
+    }
+
     if (!ExtractShaders(pass, pso.get())) {
         Msg("! [MaterialCache] Failed to extract shaders");
         return nullptr;
@@ -1216,8 +1223,23 @@ void MaterialCache::Clear()
 {
     m_cache.clear();
     m_textureWrapperCache.clear();
+    m_detailScaleCache.clear();
     m_stats = Stats{};
     Msg("* [MaterialCache] Cleared PSO cache and texture wrapper cache");
+}
+
+float MaterialCache::GetDetailScale(const shared_str& textureName)
+{
+    auto cacheIt = m_detailScaleCache.find(textureName.c_str());
+    if (cacheIt != m_detailScaleCache.end()) {
+        return cacheIt->second;
+    }
+
+    float scale = RImplementation.Resources->m_textures_description.GetDetailScale(textureName);
+
+    m_detailScaleCache[textureName.c_str()] = scale;
+
+    return scale;
 }
 
 }

@@ -83,6 +83,8 @@ struct MaterialPSO {
     u32 vertexStride = 0;
     nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
 
+    float detail_scale = 1.0f;
+
     enum class ShaderStage : u8 {
         Vertex = 0,
         Pixel = 1,
@@ -187,6 +189,10 @@ private:
     Stats m_stats;
 
     xr_map<xr_string, ng::TextureHandle> m_textureWrapperCache;
+
+    xr_map<xr_string, float> m_detailScaleCache;
+
+    float GetDetailScale(const shared_str& textureName);
 
     MaterialPSO* CreatePSO(
         dxRender_Visual* visual,

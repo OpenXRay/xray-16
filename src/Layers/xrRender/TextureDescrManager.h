@@ -55,5 +55,7 @@ public:
     void GetTextureUsage(const shared_str& tex_name, bool& bDiffuse, bool& bBump) const;
     BOOL GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const;
     BOOL UseSteepParallax(const shared_str& tex_name) const;
+
+    float GetDetailScale(const shared_str& tex_name) const;
 };
 } // namespace xray::render::RENDER_NAMESPACE

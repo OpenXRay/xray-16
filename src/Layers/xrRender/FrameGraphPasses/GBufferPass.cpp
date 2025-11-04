@@ -5,6 +5,9 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/ResourceManager.h"
+#include "Layers/xrRender/TextureDescrManager.h"
+#include "xrEngine/Render.h"
 
 namespace xray::render::passes {
 
@@ -347,6 +350,8 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         ng::PipelineState* currentPipeline = nullptr;
         nvrhi::IBindingSet* currentBindingSet = nullptr;
 
+        float lastDetailScale = -1.0f;
+
         for (const auto* batch : m_batches) {
             ng::PipelineState* pipelineToUse = m_pipeline;
             MaterialPSO* matPSO = nullptr;
@@ -365,6 +370,25 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             if (pipelineToUse != currentPipeline) {
                 ctx.SetPipeline(pipelineToUse->GetNativePipeline());
                 currentPipeline = pipelineToUse;
+            }
+
+            if (matPSO && matPSO->detail_scale != lastDetailScale) {
+                DynamicTransforms dynamicCB = {};
+                FillDynamicTransforms(dynamicCB);
+
+                extern float r__dtex_range;
+                dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
+                                       1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
+
+                for (const auto& cbInfo : matPSO->constantBuffers) {
+                    if (cbInfo.name == "dynamic_transforms") {
+                        u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                        ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
+                        break;
+                    }
+                }
+
+                lastDetailScale = matPSO->detail_scale;
             }
 
             if (matPSO) {
@@ -389,6 +413,16 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
                 CopyMatrix3x4(cbData + 0, xform);
                 CopyMatrix3x4(cbData + 48, xform_v);
+
+                float tc_scale = 1.0f;
+                if (batch->visual) {
+                }
+
+                float* constsPtr = reinterpret_cast<float*>(cbData + 96);
+                constsPtr[0] = tc_scale;
+                constsPtr[1] = tc_scale;
+                constsPtr[2] = 0.0f;
+                constsPtr[3] = 0.0f;
 
                 VERIFY(m_perObjectCB.IsValid());
                 nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(m_perObjectCB);

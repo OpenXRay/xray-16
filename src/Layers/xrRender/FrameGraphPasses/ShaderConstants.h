@@ -4,6 +4,12 @@
 #include "xrCore/_vector3d.h"
 #include "xrCore/_matrix.h"
 
+namespace xray::render {
+    namespace RENDER_NAMESPACE {
+        extern float r__dtex_range;
+    }
+}
+
 namespace xray::render::passes {
 
 struct alignas(16) PerObjectConstants {
@@ -150,7 +156,10 @@ inline void FillDynamicTransforms(DynamicTransforms& cb) {
     cb.L_material.set(0.01903f, 0.74998f, 0.0f, 0.25f);
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
-    cb.dt_params.set(300.0f, 300.0f, 300.0f, 0.02f);
+
+    const float default_detail_scale = 1.0f;
+    cb.dt_params.set(default_detail_scale, default_detail_scale, default_detail_scale,
+                     1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
 }
 
 }
