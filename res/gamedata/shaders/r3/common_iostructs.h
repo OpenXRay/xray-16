@@ -339,7 +339,7 @@ struct v2p_bumped
 #else
     float2	tcdh : TEXCOORD0;	// Texture coordinates
 #endif
-    float4	position : TEXCOORD1;	// position + hemi
+    float4	position : BLENDINDICES; // blend indices
     float3	M1 : TEXCOORD2;	// nmap 2 eye - 1
     float3	M2 : TEXCOORD3;	// nmap 2 eye - 2
     float3	M3 : TEXCOORD4;	// nmap 2 eye - 3
@@ -359,7 +359,7 @@ struct p_bumped
 #else
     float2	tcdh : TEXCOORD0;	// Texture coordinates
 #endif
-    float4	position : TEXCOORD1;	// position + hemi
+    float4	position : BLENDINDICES; // blend indices
     float3	M1 : TEXCOORD2;	// nmap 2 eye - 1
     float3	M2 : TEXCOORD3;	// nmap 2 eye - 2
     float3	M3 : TEXCOORD4;	// nmap 2 eye - 3
