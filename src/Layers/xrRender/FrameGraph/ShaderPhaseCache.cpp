@@ -4,6 +4,7 @@
 #include "IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/ShaderKey.h"
 
 namespace xray::render::framegraph {
 
@@ -28,8 +29,11 @@ RenderPhase ShaderPhaseCache::GetPhase(dxRender_Visual* visual) {
         return RenderPhase::Geometry;
     }
 
-    CacheKey key;
-    key.shaderName = visual->dbg_name;
+    ShaderKey key;
+    if (!RENDER_NAMESPACE::ExtractShaderKey(visual, key)) {
+        Msg("! [ShaderPhaseCache] Failed to extract shader key from visual");
+        return RenderPhase::Geometry;
+    }
 
     auto it = m_cache.find(key);
     if (it != m_cache.end()) {
@@ -62,31 +66,35 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
         return RenderPhase::Geometry;
     }
 
+    ShaderKey key;
+    RENDER_NAMESPACE::ExtractShaderKey(visual, key);
+    std::string shaderName = key.ToString();
+
     auto* ps = pass->ps._get();
     if (!ps) {
-        Msg("! [ShaderPhaseCache] No pixel shader for visual '%s'",
-            visual->dbg_name.c_str());
+        Msg("! [ShaderPhaseCache] No pixel shader for shader '%s'",
+            shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
     ID3D11PixelShader* d3dPS = ps->sh;
     if (!d3dPS) {
-        Msg("! [ShaderPhaseCache] Failed to get D3D11 pixel shader for visual '%s'",
-            visual->dbg_name.c_str());
+        Msg("! [ShaderPhaseCache] Failed to get D3D11 pixel shader for shader '%s'",
+            shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
     ID3DBlob* bytecode = ps->bytecode;
     if (!bytecode) {
         Msg("! [ShaderPhaseCache] No bytecode for pixel shader '%s'",
-            visual->dbg_name.c_str());
+            shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
     ShaderRTBindings bindings = ShaderReflector::AnalyzePixelShader(d3dPS, bytecode);
 
-    Msg("! [ShaderPhaseCache] Extracted phase for '%s': %s",
-        visual->dbg_name.c_str(),
+    Msg("! [ShaderPhaseCache] Extracted phase for shader '%s': %s",
+        shaderName.c_str(),
         IPass::GetPhaseName(bindings.phase));
 
     return bindings.phase;

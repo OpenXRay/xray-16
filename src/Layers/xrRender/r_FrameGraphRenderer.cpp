@@ -13,6 +13,7 @@
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/ShaderKey.h"
 
 namespace xray::render {
 
@@ -459,7 +460,14 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
-    batch.debugName = visual->dbg_name.c_str();
+    RENDER_NAMESPACE::ShaderKey shaderKey;
+    if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
+        static thread_local std::string s_debugNameBuffer;
+        s_debugNameBuffer = shaderKey.ToString();
+        batch.debugName = s_debugNameBuffer.c_str();
+    } else {
+        batch.debugName = "<unknown_shader>";
+    }
 
     if (!nvrhiVB || !nvrhiIB) {
         Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p, D3DVB=%p, D3DIB=%p",
