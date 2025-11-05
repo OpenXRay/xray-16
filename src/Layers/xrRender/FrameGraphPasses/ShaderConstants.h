@@ -22,8 +22,9 @@ struct alignas(16) PerObjectConstants {
     Fvector4 wave;
     Fvector2 c_sun;
     float padding[2];
-    float padding2[16];
+    float padding2[8];
 };
+static_assert(sizeof(PerObjectConstants) == 256, "PerObjectConstants must be 256 bytes");
 
 struct alignas(16) DynamicTransforms {
     float m_WVP[16];
@@ -129,16 +130,17 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.padding3 = 0.0f;
 }
 
-inline void FillDynamicTransforms(DynamicTransforms& cb) {
-    Fmatrix identity, wv, wvp;
-    identity.identity();
-    wv.set(Device.mView);
-    wvp.mul(Device.mProject, Device.mView);
+inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity, float dtParamScale = 1.f) {
+    Fmatrix wv, wvp;
+    wv.mul_43(Device.mView, m_W);
+    wvp.mul(Device.mProject, wv);
 
     Fmatrix wvpT, wvT, wT;
     wvpT.transpose(wvp);
     wvT.transpose(wv);
-    wT.transpose(identity);
+
+    wT.identity();
+    wT.transpose(m_W);
 
     cb.m_WVP[0]  = wvpT._11; cb.m_WVP[1]  = wvpT._12; cb.m_WVP[2]  = wvpT._13; cb.m_WVP[3]  = wvpT._14;
     cb.m_WVP[4]  = wvpT._21; cb.m_WVP[5]  = wvpT._22; cb.m_WVP[6]  = wvpT._23; cb.m_WVP[7]  = wvpT._24;
@@ -157,8 +159,7 @@ inline void FillDynamicTransforms(DynamicTransforms& cb) {
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
 
-    const float default_detail_scale = 1.0f;
-    cb.dt_params.set(default_detail_scale, default_detail_scale, default_detail_scale,
+    cb.dt_params.set(dtParamScale, dtParamScale, dtParamScale,
                      1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
 }
 

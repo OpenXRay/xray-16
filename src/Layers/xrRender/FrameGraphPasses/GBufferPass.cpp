@@ -418,41 +418,11 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             }
 
             if (matPSO) {
-
-                constexpr u32 VCB_SIZE = 256;
-
-                u8 cbData[VCB_SIZE] = {};
-
-                auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
-                    Fmatrix transposed;
-                    transposed.transpose(src);
-
-                    float* destF = reinterpret_cast<float*>(dest);
-                    destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
-                    destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
-                    destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
-                };
-
-                Fmatrix xform = batch->worldMatrix;
-                Fmatrix xform_v;
-                xform_v.mul(batch->worldMatrix, Device.mView);
-
-                CopyMatrix3x4(cbData + 0, xform);
-                CopyMatrix3x4(cbData + 48, xform_v);
-
-                float tc_scale = 1.0f;
-                if (batch->visual) {
-                }
-
-                float* constsPtr = reinterpret_cast<float*>(cbData + 96);
-                constsPtr[0] = tc_scale;
-                constsPtr[1] = tc_scale;
-                constsPtr[2] = 0.0f;
-                constsPtr[3] = 0.0f;
-
                 ng::BufferHandle vcbHandle;
+                u32 vcbSize = 0;
                 if (!matPSO->vcbRequirements.empty()) {
                     vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                    vcbSize = matPSO->vcbRequirements[0].size;
                 }
 
                 if (!vcbHandle.IsValid()) {
@@ -460,9 +430,99 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     continue;
                 }
 
-                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+                constexpr u32 MAX_CB_SIZE = 4096;
+                if (vcbSize > MAX_CB_SIZE) {
+                    Msg("! [GBufferPass] VCB size %u exceeds maximum %u", vcbSize, MAX_CB_SIZE);
+                    continue;
+                }
 
-                u32 vcbSize = matPSO->vcbRequirements[0].size;
+                u8 cbData[MAX_CB_SIZE];
+                ZeroMemory(cbData, vcbSize);
+
+                auto CopyBoneMatrix = [](u8* dest, const Fmatrix& M) {
+                    float* destF = reinterpret_cast<float*>(dest);
+                    destF[0]  = M._11; destF[1]  = M._21; destF[2]  = M._31; destF[3]  = M._41;
+                    destF[4]  = M._12; destF[5]  = M._22; destF[6]  = M._32; destF[7]  = M._42;
+                    destF[8]  = M._13; destF[9]  = M._23; destF[10] = M._33; destF[11] = M._43;
+                };
+
+                auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
+                    Fmatrix transposed;
+                    transposed.transpose(src);
+                    float* destF = reinterpret_cast<float*>(dest);
+                    destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
+                    destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
+                    destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
+                };
+
+                bool isSkeleton = false;
+                if (batch->visual && batch->renderable) {
+                    auto visualType = batch->visual->getType();
+                    isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+                }
+
+                if (isSkeleton) {
+
+                    DynamicTransforms dynamicCB = {};
+                    FillDynamicTransforms(dynamicCB, batch->worldMatrix, 0.f);
+                    for (const auto& cbInfo : matPSO->constantBuffers) {
+                        if (cbInfo.name == "dynamic_transforms") {
+                            u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                            ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
+                            break;
+                        }
+                    }
+
+                    IRenderVisual* renderableVisual = batch->renderable->GetRenderData().visual;
+                    RENDER_NAMESPACE::CKinematics* Parent = dynamic_cast<RENDER_NAMESPACE::CKinematics*>(renderableVisual);
+
+                    if (Parent) {
+                        Parent->CalculateBones(TRUE);
+
+                        u32 count = Parent->LL_BoneCount();
+                        u32 maxBones = vcbSize / 48;
+                        count = std::min(count, maxBones);
+
+                        float* array = reinterpret_cast<float*>(cbData);
+                        for (u32 mid = 0; mid < count; mid++)
+                        {
+                            Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
+                            u32 id = mid * 3;
+                            array[(id + 0) * 4 + 0] = M._11;
+                            array[(id + 0) * 4 + 1] = M._21;
+                            array[(id + 0) * 4 + 2] = M._31;
+                            array[(id + 0) * 4 + 3] = M._41;
+                            array[(id + 1) * 4 + 0] = M._12;
+                            array[(id + 1) * 4 + 1] = M._22;
+                            array[(id + 1) * 4 + 2] = M._32;
+                            array[(id + 1) * 4 + 3] = M._42;
+                            array[(id + 2) * 4 + 0] = M._13;
+                            array[(id + 2) * 4 + 1] = M._23;
+                            array[(id + 2) * 4 + 2] = M._33;
+                            array[(id + 2) * 4 + 3] = M._43;
+                        }
+                    }
+                } else {
+
+                    Fmatrix xform = batch->worldMatrix;
+                    Fmatrix xform_v;
+                    xform_v.mul(batch->worldMatrix, Device.mView);
+
+                    CopyMatrix3x4(cbData + 0, xform);
+                    CopyMatrix3x4(cbData + 48, xform_v);
+
+                    float tc_scale = 1.0f;
+                    if (batch->visual) {
+                    }
+
+                    float* constsPtr = reinterpret_cast<float*>(cbData + 96);
+                    constsPtr[0] = tc_scale;
+                    constsPtr[1] = tc_scale;
+                    constsPtr[2] = 0.0f;
+                    constsPtr[3] = 0.0f;
+                }
+
+                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
 
                 ctx.WriteBuffer(vcbBuffer, cbData, vcbSize);
 

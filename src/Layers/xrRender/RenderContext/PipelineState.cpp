@@ -246,59 +246,27 @@ PipelineState* PipelineStateCache::CreatePipelineState(
         nvrhiDesc.DS = desc.domainShader->GetNativeShader();
 
     if (!desc.vertexAttributes.empty()) {
-
         xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
-        xr_set<const char*> processedSemantics;
 
+        xr_map<xr_string, xr_vector<const VertexAttribute*>> semanticGroups;
         for (const auto& attr : desc.vertexAttributes) {
-            if (!attr.semanticName)
-                continue;
-
-            if (processedSemantics.find(attr.semanticName) != processedSemantics.end())
-                continue;
-
-            processedSemantics.insert(attr.semanticName);
-
-            xr_vector<const VertexAttribute*> sameSemanticAttrs;
-            for (const auto& checkAttr : desc.vertexAttributes) {
-                if (checkAttr.semanticName && xr_strcmp(checkAttr.semanticName, attr.semanticName) == 0) {
-                    sameSemanticAttrs.push_back(&checkAttr);
-                }
+            if (attr.semanticName) {
+                semanticGroups[attr.semanticName].push_back(&attr);
             }
+        }
 
-            bool isConsecutive = !sameSemanticAttrs.empty() && (sameSemanticAttrs[0]->semanticIndex == 0);
-            if (isConsecutive && sameSemanticAttrs.size() > 1) {
-                for (size_t i = 1; i < sameSemanticAttrs.size(); ++i) {
-                    if (sameSemanticAttrs[i]->semanticIndex != i) {
-                        isConsecutive = false;
-                        break;
-                    }
-                }
-            }
+        for (const auto& [semName, attrs] : semanticGroups) {
+            const VertexAttribute* firstAttr = attrs[0];
 
-            if (isConsecutive && sameSemanticAttrs.size() > 1) {
-                nvrhi::VertexAttributeDesc nvrhiAttr;
-                nvrhiAttr.name = attr.semanticName;
-                nvrhiAttr.format = sameSemanticAttrs[0]->format;
-                nvrhiAttr.offset = sameSemanticAttrs[0]->offset;
-                nvrhiAttr.bufferIndex = sameSemanticAttrs[0]->bufferIndex;
-                nvrhiAttr.isInstanced = sameSemanticAttrs[0]->isInstanced;
-                nvrhiAttr.elementStride = sameSemanticAttrs[0]->elementStride;
-                nvrhiAttr.arraySize = static_cast<uint32_t>(sameSemanticAttrs.size());
-                nvrhiAttrs.push_back(nvrhiAttr);
-            } else {
-                for (const auto* semAttr : sameSemanticAttrs) {
-                    nvrhi::VertexAttributeDesc nvrhiAttr;
-                    nvrhiAttr.name = attr.semanticName;
-                    nvrhiAttr.format = semAttr->format;
-                    nvrhiAttr.offset = semAttr->offset;
-                    nvrhiAttr.bufferIndex = semAttr->bufferIndex;
-                    nvrhiAttr.isInstanced = semAttr->isInstanced;
-                    nvrhiAttr.elementStride = semAttr->elementStride;
-                    nvrhiAttr.arraySize = 1;
-                    nvrhiAttrs.push_back(nvrhiAttr);
-                }
-            }
+            nvrhi::VertexAttributeDesc nvrhiAttr;
+            nvrhiAttr.name = firstAttr->semanticName;
+            nvrhiAttr.format = firstAttr->format;
+            nvrhiAttr.offset = firstAttr->offset;
+            nvrhiAttr.bufferIndex = firstAttr->bufferIndex;
+            nvrhiAttr.isInstanced = firstAttr->isInstanced;
+            nvrhiAttr.elementStride = firstAttr->elementStride;
+            nvrhiAttr.arraySize = (uint32_t)attrs.size();
+            nvrhiAttrs.push_back(nvrhiAttr);
         }
 
         nvrhiDesc.inputLayout = m_device->GetNativeDevice()->createInputLayout(

@@ -37,6 +37,7 @@ struct GeometryBatch {
     framegraph::RenderPhase renderPhase = framegraph::RenderPhase::Geometry;
 
     dxRender_Visual* visual = nullptr;
+    IRenderable* renderable = nullptr;
 
     bool isVisible = true;
     float distanceToCamera = 0.0f;

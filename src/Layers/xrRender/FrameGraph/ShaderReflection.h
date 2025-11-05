@@ -19,10 +19,10 @@ struct VertexInputSignature {
     struct InputElement {
         shared_str semanticName;
         u32 semanticIndex;
-        DXGI_FORMAT format;
+        nvrhi::Format format;
         u32 inputSlot;
 
-        InputElement() : semanticIndex(0), format(DXGI_FORMAT_UNKNOWN), inputSlot(0) {}
+        InputElement() : semanticIndex(0), format(nvrhi::Format::UNKNOWN), inputSlot(0) {}
     };
     xr_vector<InputElement> elements;
 };
