@@ -118,7 +118,6 @@ LightingPassOutput LightingPass::Setup(
     FrameGraph& fg,
     const GBufferOutputs& gbuffer
 ) {
-    Msg("~ [LightingPass] Setting up in FrameGraph");
 
     LightingPassOutput output;
 
@@ -168,7 +167,6 @@ void LightingPass::Execute(
     const GBufferOutputs& gbuffer,
     const LightingPassOutput& output
 ) {
-    Msg("~ [LightingPass] Executing");
 
     auto executeStart = std::chrono::high_resolution_clock::now();
 

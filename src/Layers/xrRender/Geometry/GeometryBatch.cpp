@@ -34,10 +34,6 @@ void GeometryCollector::EndFrame() {
     for (const auto& batch : m_batches) {
         m_stats.numTriangles += batch.indexCount / 3;
     }
-
-    Msg("~ [GeometryCollector] Frame complete: %u batches, %u tris",
-        m_stats.numBatches,
-        m_stats.numTriangles);
 }
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {
