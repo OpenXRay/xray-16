@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "FHierrarhyVisual.h"
+#include "OzzKinematicsVisual.h"
 #include "SkeletonCustom.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 #include "xrEngine/CustomHUD.h"
@@ -327,6 +328,16 @@ void R_dsgraph_structure::add_leafs_dynamic(IRenderable* root, dxRender_Visual* 
         }
     }
         return;
+    case MT_OZZ_STATIC:
+    case MT_OZZ_ANIMATED:
+    {
+        auto* visual = static_cast<COzzKinematicsVisual*>(pVisual);
+        visual->Kinematics()->CalculateBones(TRUE);
+        visual->EnsureSkinningPalette();
+        for (auto& child : visual->children)
+            add_leafs_dynamic(root, child, xform);
+    }
+        return;
     default:
     {
         // General type of visual
@@ -395,7 +406,17 @@ void R_dsgraph_structure::add_leafs_static(dxRender_Visual* pVisual)
             add_leafs_static(i);
         }
     }
-    return;
+        return;
+    case MT_OZZ_STATIC:
+    case MT_OZZ_ANIMATED:
+    {
+        auto* visual = static_cast<COzzKinematicsVisual*>(pVisual);
+        visual->Kinematics()->CalculateBones(TRUE);
+        visual->EnsureSkinningPalette();
+        for (auto& child : visual->children)
+            insert_static(child);
+    }
+        return;
     case MT_LOD:
     {
         FLOD* pV = (FLOD*)pVisual;

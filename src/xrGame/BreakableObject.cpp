@@ -37,7 +37,7 @@ bool CBreakableObject::net_Spawn(CSE_Abstract* DC)
     VERIFY(!CForm);
     CForm = xr_new<CCF_Skeleton>(this);
     // set bone id
-    R_ASSERT(Visual() && smart_cast<IKinematics*>(Visual()));
+    R_ASSERT(Visual() && Visual()->dcast_PKinematics());
     //	IKinematics* K			= smart_cast<IKinematics*>(Visual());
     fHealth = obj->m_health;
     processing_deactivate();
@@ -135,7 +135,7 @@ void CBreakableObject::CreateBroken()
     phys_shell_verify_object_model(*this);
     processing_activate();
     m_Shell = P_create_splited_Shell();
-    m_Shell->preBuild_FromKinematics(smart_cast<IKinematics*>(Visual()));
+    m_Shell->preBuild_FromKinematics(Visual()->dcast_PKinematics());
     m_Shell->mXFORM.set(XFORM());
     // m_Shell->SetAirResistance(0.002f*skel_airr_lin_factor,
     //	0.3f*skel_airr_ang_factor);
@@ -156,7 +156,7 @@ void CBreakableObject::CreateBroken()
 void CBreakableObject::ActivateBroken()
 {
     m_pPhysicsShell = m_Shell;
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = Visual()->dcast_PKinematics();
     m_pPhysicsShell->set_Kinematics(K);
     m_pPhysicsShell->RunSimulation();
     m_pPhysicsShell->SetCallbacks();

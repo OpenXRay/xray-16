@@ -633,6 +633,7 @@ public:
     virtual void SetDefaultVisualOutfit(shared_str DefaultOutfit) { m_DefaultVisualOutfit = DefaultOutfit; };
     virtual void UpdateAnimation() { g_SetAnimation(mstate_real); };
     virtual void ChangeVisual(shared_str NewVisual);
+    virtual void OnBeforeChangeVisual() override;
     virtual void OnChangeVisual();
 
     virtual void RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& IndShader);

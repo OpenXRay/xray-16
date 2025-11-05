@@ -41,7 +41,7 @@ void CObjectHandler::reinit(CAI_Stalker* object)
     inherited::reinit();
     m_hammer_is_clutched = false;
     planner().setup(object);
-    IKinematics* kinematics = smart_cast<IKinematics*>(planner().m_object->Visual());
+    IKinematics* kinematics = planner().m_object->Visual()->dcast_PKinematics();
     m_r_hand = kinematics->LL_BoneID(pSettings->r_string(*planner().m_object->cNameSect(), "weapon_bone0"));
     m_l_finger1 = kinematics->LL_BoneID(pSettings->r_string(*planner().m_object->cNameSect(), "weapon_bone1"));
     m_r_finger2 = kinematics->LL_BoneID(pSettings->r_string(*planner().m_object->cNameSect(), "weapon_bone2"));
@@ -163,7 +163,7 @@ void CObjectHandler::weapon_bones(int& b0, int& b1, int& b2) const
 
     if (weapon->ID() != m_strap_object_id)
     {
-        IKinematics* kinematics = smart_cast<IKinematics*>(planner().m_object->Visual());
+        IKinematics* kinematics = planner().m_object->Visual()->dcast_PKinematics();
         m_strap_bone0 = kinematics->LL_BoneID(weapon->strap_bone0());
         m_strap_bone1 = kinematics->LL_BoneID(weapon->strap_bone1());
         m_strap_object_id = weapon->ID();

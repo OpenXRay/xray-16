@@ -4,6 +4,7 @@
 
 #include "xrEngine/IGame_Persistent.h"
 #include "player_hud_tune.h"
+#include "ozz_animation_utility.h"
 
 class Task;
 class CMainMenu;
@@ -43,6 +44,9 @@ private:
 
     // hud tuner
     CHudTuner m_hudTuner;
+
+    // ozz animation utility
+    COzzAnimationUtility m_ozzAnimationUtility;
 
     void start_logo_intro();
     void update_logo_intro();

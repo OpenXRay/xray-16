@@ -5,7 +5,7 @@
 bool CControlAnimationBase::AddAnim(EMotionAnim ma, pcstr tn, int s_id, SVelocityParam* vel, EPState p_s,
     const SAnimItem::Effects& fxs, bool required /*= true*/)
 {
-    const auto visual = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    const auto visual = m_object->Visual()->dcast_PKinematicsAnimated();
     VERIFY(visual);
 
     if (!required)

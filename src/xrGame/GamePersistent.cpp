@@ -1,7 +1,9 @@
 #include "pch_script.h"
 #include "GamePersistent.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCore/xrCore.h"
 #include "xrEngine/XR_IOConsole.h"
+#include "xrEngine/Render.h"
 #include "xrMaterialSystem/GameMtlLib.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/profiler.h"
@@ -17,6 +19,7 @@
 #include "ActorEffector.h"
 #include "Actor.h"
 #include "Spectator.h"
+#include "Actor_Flags.h"
 
 #include "xrUICore/XML/UITextureMaster.h"
 
@@ -45,6 +48,8 @@
 #endif // _EDITOR
 
 #include "xrEngine/xr_level_controller.h"
+
+#include "xrAnimation/StartupConversionInventory.h"
 
 CGamePersistent::CGamePersistent()
 {
@@ -175,6 +180,82 @@ void CGamePersistent::OnGameStart()
 {
     inherited::OnGameStart();
     UpdateGameType();
+
+    if (GEnv.isDedicatedServer)
+        return;
+
+    using namespace XRay::Animation;
+
+    LegacyAssetInventory inventory = BuildDefaultLegacyAssetInventory();
+    const xr_string stored_digest = LoadInventoryDigestFromUserConfig();
+    const xr_string computed_digest = ComputeLegacyAssetInventoryDigest(inventory);
+
+    StartupConversionParams conversion_params;
+    const bool digest_matches = xr_strcmp(stored_digest.c_str(), computed_digest.c_str()) == 0;
+    const bool outputs_valid = digest_matches && VerifyConvertedOutputs(inventory, conversion_params);
+
+    if (digest_matches && outputs_valid)
+    {
+        Msg("[ozz] Startup inventory unchanged; cached digest %s", computed_digest.c_str());
+        return;
+    }
+
+    StartupConversionStats conversion_stats;
+    const bool show_loading_stage = psActorFlags.test(AF_LOADING_STAGES);
+
+    if (show_loading_stage)
+        LoadTitle("st_converting_ozz_assets", false);
+
+    const xr_string stored_display = stored_digest.empty() ? xr_string("<none>") : stored_digest;
+    Msg("[ozz] Startup conversion refreshing missing assets (cached=%s, computed=%s)",
+        stored_display.c_str(), computed_digest.c_str());
+
+    auto progress_callback = [show_loading_stage](const ConversionProgress& progress) {
+        if (show_loading_stage && progress.total_assets > 0)
+        {
+            const int percent = static_cast<int>(progress.GetProgress() * 100.0f);
+            string256 msg;
+            xr_sprintf(msg, "Converting ozz assets %zu/%zu (%d%%)",
+                      progress.completed_assets, progress.total_assets, percent);
+            g_pGamePersistent->LoadTitle(msg, false);
+        }
+    };
+
+    bool didConvert = ConvertInventoryToOzz(inventory, conversion_params, conversion_stats, progress_callback);
+
+    if (!didConvert)
+    {
+        Msg("! [ozz] Startup conversion failed (%zu failure%s)",
+            conversion_stats.failures,
+            conversion_stats.failures == 1 ? "" : "s");
+        return;
+    }
+
+    if (didConvert)
+    {
+        Msg("[ozz] Refreshing model pool after startup conversion");
+        FS_Path* mesh_path = FS.get_path("$game_meshes$"); // yohji TODO - this rescan doesn't work -> ModelPool.cpp l59
+        FS.rescan_path(mesh_path->m_Path, TRUE);
+        if (g_player_hud)
+            g_player_hud->detach_kinematics();
+        GEnv.Render->models_Rebuild();
+        if (g_player_hud)
+            g_player_hud->reload();
+    }
+
+
+    if (!StoreInventoryDigestInUserConfig(computed_digest))
+    {
+        Msg("! [ozz] Failed to persist startup inventory digest to user.ltx");
+    }
+    else
+    {
+        Msg("[ozz] Startup conversion complete: bundles written=%zu (skipped=%zu), motions written=%zu (skipped=%zu)",
+            conversion_stats.bundles_written,
+            conversion_stats.bundles_skipped,
+            conversion_stats.motions_written,
+            conversion_stats.motions_skipped);
+    }
 }
 
 LPCSTR GameTypeToString(EGameIDs gt, bool bShort)

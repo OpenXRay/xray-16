@@ -15,12 +15,13 @@
 #ifdef DEBUG
 #include "PHDebug.h"
 #endif // DEBUG
+#include "xrCore/FMesh.hpp"
 
 CIKLimbsController::CIKLimbsController()
 #ifdef DEBUG
-    : m_legs_blend(nullptr), m_object(nullptr), anim_name(nullptr), anim_set_name(nullptr) {}
+    : m_legs_blend(nullptr), m_object(nullptr), m_supports_ozz(false), m_pending_legacy_teardown(false), anim_name(nullptr), anim_set_name(nullptr) {}
 #else
-    : m_legs_blend(nullptr), m_object(nullptr) {}
+    : m_legs_blend(nullptr), m_object(nullptr), m_supports_ozz(false), m_pending_legacy_teardown(false) {}
 #endif
 
 void CIKLimbsController::Create(CGameObject* O)
@@ -30,7 +31,36 @@ void CIKLimbsController::Create(CGameObject* O)
 
     IKinematics* K = smart_cast<IKinematics*>(O->Visual());
     m_object = O;
+
+    IRenderVisual* visual = m_object->Visual();
+    if (visual)
+    {
+        const u8 type = visual->getType();
+        m_supports_ozz = (type == MT_OZZ_STATIC || type == MT_OZZ_ANIMATED);
+    }
+    else
+    {
+        m_supports_ozz = false;
+    }
+    m_pending_legacy_teardown = false;
+
+    if (!K)
+    {
+        m_supports_ozz = true;
+    }
+
+    if (m_supports_ozz)
+    {
+#ifdef DEBUG
+        Msg("[ik] skipping limb controller for '%s' (visual '%s') due to missing IKinematicsAnimated",
+            m_object->cName().c_str(), m_object->cNameVisual().c_str());
+#endif
+        _bone_chains.clear();
+        return;
+    }
+
     VERIFY(K);
+
     u16 sz = 2;
     if (K->LL_UserData() && K->LL_UserData()->section_exist("ik"))
         sz = K->LL_UserData()->r_u16("ik", "num_limbs");
@@ -49,6 +79,9 @@ void CIKLimbsController::Create(CGameObject* O)
 
 void CIKLimbsController::LimbSetup()
 {
+    if (m_supports_ozz)
+        return;
+
     _bone_chains.push_back(CIKLimb());
 
     IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
@@ -58,15 +91,27 @@ void CIKLimbsController::LimbSetup()
 
 void CIKLimbsController::LimbCalculate(SCalculateData& cd)
 {
-    cd.do_collide = m_legs_blend &&
-        !cd.m_limb->KinematicsAnimated()->LL_GetMotionDef(m_legs_blend->motionID)->marks.empty(); // m_legs_blend->;
+    if (m_supports_ozz)
+    {
+        cd.do_collide = FALSE;
+        return;
+    }
+
+    auto* motion_def = m_legs_blend ? cd.m_limb->KinematicsAnimated()->LL_GetMotionDef(m_legs_blend->motionID) : nullptr;
+    cd.do_collide = (m_legs_blend != nullptr) && (motion_def != nullptr) && !motion_def->marks.empty();
     cd.m_limb->ApplyState(cd);
 }
 
 void CIKLimbsController::LimbUpdate(CIKLimb& L)
 {
-    [[maybe_unused]] auto skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
-    VERIFY(skeleton_animated);
+    if (m_supports_ozz)
+        return;
+
+    if (!m_object->Visual() || (m_object->Visual() && !m_object->Visual()->dcast_PKinematicsAnimated()))
+    {
+        SwitchToOzzMode();
+        return;
+    }
     L.Update(m_object, m_legs_blend, _pose_extrapolation);
 }
 
@@ -214,7 +259,6 @@ void CIKLimbsController::ObjectShift(float static_shift, const SCalculateData cd
 void CIKLimbsController::ShiftObject(const SCalculateData cd[max_size])
 {
     IKinematics* skeleton_animated = m_object->Visual()->dcast_PKinematics();
-    VERIFY(skeleton_animated);
     //	u16 root = skeleton_animated->LL_GetBoneRoot( ) ;
 
     // CBoneData &BD=skeleton_animated->LL_GetData(root);
@@ -238,7 +282,26 @@ void CIKLimbsController::ShiftObject(const SCalculateData cd[max_size])
 int ik_shift_object = 1;
 void CIKLimbsController::Calculate()
 {
+    if (m_supports_ozz)
+    {
+        TeardownLegacyLimbs();
+        return;
+    }
+
+    if (!m_object->Visual() || (m_object->Visual() && !m_object->Visual()->dcast_PKinematicsAnimated()))
+    {
+        SwitchToOzzMode();
+        TeardownLegacyLimbs();
+        return;
+    }
+
     update_blend(m_legs_blend);
+
+    if (GEnv.Render && GEnv.Render->LegacyBindPoseForced())
+    {
+        _object_shift.set_taget(0.f, 0.f);
+        return;
+    }
 
     Fmatrix& obj = m_object->XFORM();
 #ifdef DEBUG
@@ -249,10 +312,21 @@ void CIKLimbsController::Calculate()
     SCalculateData cd[max_size];
 
     xr_vector<CIKLimb>::iterator i, b = _bone_chains.begin(), e = _bone_chains.end();
+    if (!m_object->Visual() || (m_object->Visual() && !m_object->Visual()->dcast_PKinematicsAnimated()))
+    {
+        SwitchToOzzMode();
+        TeardownLegacyLimbs();
+        return;
+    }
     for (i = b; e != i; ++i)
     {
         cd[i - b] = SCalculateData(*i, obj);
         LimbCalculate(cd[i - b]);
+        if (m_supports_ozz)
+        {
+            TeardownLegacyLimbs();
+            return;
+        }
     }
 
     IKinematics* K = m_object->Visual()->dcast_PKinematics();
@@ -305,11 +379,57 @@ void CIKLimbsController::Destroy(CGameObject* O)
     VERIFY(ik == this);
 #endif
 
-    O->remove_visual_callback(IKVisualCallback);
-    xr_vector<CIKLimb>::iterator i = _bone_chains.begin(), e = _bone_chains.end();
-    for (; e != i; ++i)
-        i->Destroy();
+    if (!m_supports_ozz)
+    {
+        O->remove_visual_callback(IKVisualCallback);
+        xr_vector<CIKLimb>::iterator i = _bone_chains.begin(), e = _bone_chains.end();
+        for (; e != i; ++i)
+            i->Destroy();
+        _bone_chains.clear();
+    }
+    else
+    {
+        TeardownLegacyLimbs();
+    }
+
+    m_supports_ozz = false;
+    m_pending_legacy_teardown = false;
+}
+
+void CIKLimbsController::SwitchToOzzMode()
+{
+    if (m_supports_ozz)
+        return;
+
+    m_supports_ozz = true;
+    m_pending_legacy_teardown = true;
+    m_legs_blend = nullptr;
+
+    for (auto& limb : _bone_chains)
+        limb.Destroy();
+
+    if (m_object)
+    {
+        auto& callbacks = m_object->visual_callbacks();
+        auto it = std::find(callbacks.begin(), callbacks.end(), IKVisualCallback);
+        if (it != callbacks.end())
+            m_object->remove_visual_callback(IKVisualCallback);
+    }
+
+#ifdef DEBUG
+    if (m_object)
+        Msg("[ik] disabling limb controller for '%s' (visual '%s') due to missing IKinematicsAnimated",
+            m_object->cName().c_str(), m_object->cNameVisual().c_str());
+#endif
+}
+
+void CIKLimbsController::TeardownLegacyLimbs()
+{
+    if (!m_pending_legacy_teardown)
+        return;
+
     _bone_chains.clear();
+    m_pending_legacy_teardown = false;
 }
 
 void CIKLimbsController::IKVisualCallback(IKinematics* K)
@@ -332,10 +452,22 @@ void CIKLimbsController::IKVisualCallback(IKinematics* K)
 
 void CIKLimbsController::PlayLegs(CBlend* b)
 {
+    if (m_supports_ozz)
+    {
+        m_legs_blend = nullptr;
+        TeardownLegacyLimbs();
+        return;
+    }
+
     m_legs_blend = b;
+    [[maybe_unused]] IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
+    if (!skeleton_animated)
+    {
+        SwitchToOzzMode();
+        TeardownLegacyLimbs();
+        return;
+    }
 #ifdef DEBUG
-    IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
-    VERIFY(skeleton_animated);
     anim_name = skeleton_animated->LL_MotionDefName_dbg(b->motionID).first;
     anim_set_name = skeleton_animated->LL_MotionDefName_dbg(b->motionID).second;
 
@@ -350,16 +482,36 @@ void CIKLimbsController::Update()
     if (ph_dbg_draw_mask1.test(phDbgIKOff))
         return;
 #endif
+    if (m_supports_ozz)
+    {
+        TeardownLegacyLimbs();
+        return;
+    }
     IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
-    VERIFY(skeleton_animated);
+    if (!skeleton_animated)
+    {
+        SwitchToOzzMode();
+        TeardownLegacyLimbs();
+        return;
+    }
 
     skeleton_animated->UpdateTracks();
     update_blend(m_legs_blend);
 
+    if (GEnv.Render && GEnv.Render->LegacyBindPoseForced())
+        return;
+
     _pose_extrapolation.update(m_object->XFORM());
     xr_vector<CIKLimb>::iterator i = _bone_chains.begin(), e = _bone_chains.end();
     for (; e != i; ++i)
+    {
         LimbUpdate(*i);
+        if (m_supports_ozz)
+        {
+            TeardownLegacyLimbs();
+            return;
+        }
+    }
 
     /*
     Fmatrix predict;

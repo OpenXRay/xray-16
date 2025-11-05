@@ -164,6 +164,7 @@ protected:
     void Visibility_Update();
 
     void LL_Validate();
+    void DumpDebugBonePalette() const;
 
 public:
     UpdateCallback Update_Callback;

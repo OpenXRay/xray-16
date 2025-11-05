@@ -130,7 +130,7 @@ protected:
     u32 mask;
 
 public:
-    CCC_Mask(pcstr N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M){};
+    CCC_Mask(pcstr N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) {};
     bool GetValue() const { return value->test(mask); }
     virtual void Execute(pcstr args)
     {
@@ -188,7 +188,7 @@ protected:
     const xr_token* tokens;
 
 public:
-    CCC_Token(pcstr N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T){}
+    CCC_Token(pcstr N, u32* V, const xr_token* T) : IConsole_Command(N), value(V), tokens(T) {}
 
     virtual void Execute(pcstr args)
     {
@@ -286,7 +286,8 @@ protected:
 
 public:
     CCC_Float(pcstr N, float* V, float _min = 0, float _max = 1)
-        : IConsole_Command(N), value(V), min(_min), max(_max){}
+        : IConsole_Command(N), value(V), min(_min), max(_max) {
+    }
     float GetValue() const { return *value; }
     void GetBounds(float& fmin, float& fmax) const
     {
@@ -297,7 +298,7 @@ public:
     virtual void Execute(pcstr args)
     {
         float v = float(atof(args));
-        if (v < (min - EPS) || v > (max + EPS))
+        if (v < (min - EPS) || v >(max + EPS))
             InvalidSyntax();
         else
             *value = v;
@@ -378,7 +379,8 @@ protected:
 
 public:
     CCC_Vector4(pcstr name, Fvector4* val, const Fvector4 _min, const Fvector4 _max)
-        : IConsole_Command(name), value(val), min(_min), max(_max) {}
+        : IConsole_Command(name), value(val), min(_min), max(_max) {
+    }
 
     [[nodiscard]]
     Fvector4 GetValue() const { return *value; }
@@ -447,7 +449,7 @@ public:
         imax = max;
     }
 
-    CCC_Integer(pcstr N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max){}
+    CCC_Integer(pcstr N, int* V, int _min = 0, int _max = 999) : IConsole_Command(N), value(V), min(_min), max(_max) {}
 
     virtual void Execute(pcstr args)
     {

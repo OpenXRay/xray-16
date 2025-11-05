@@ -16,6 +16,7 @@ enum
     RC_float = 0,
     RC_int = 1,
     RC_bool = 2,
+    RC_uint = 3, // Unsigned integer (DX11 compute shaders)
     RC_sampler = 99, // DX9 shares index for sampler and texture
     RC_dx11texture = 100, // For DX11 sampler and texture are different resources
     RC_dx11UAV = 101

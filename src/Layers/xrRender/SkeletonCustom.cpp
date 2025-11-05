@@ -15,6 +15,7 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+int psSkeletonForceBindPose = 0;
 int psSkeletonUpdate = 32;
 Lock UCalc_Mutex
 #ifdef CONFIG_PROFILE_LOCKS
@@ -585,6 +586,32 @@ void CKinematics::LL_GetBindTransform(xr_vector<Fmatrix>& matrices)
 {
     matrices.resize(LL_BoneCount());
     RecursiveBindTransform(this, matrices, iRoot, Fidentity);
+}
+
+void CKinematics::DumpDebugBonePalette() const
+{
+    if (!AcquirePaletteDumpTicket())
+        return;
+
+    if (!bone_instances)
+        return;
+
+    const u16 count = LL_BoneCount();
+    if (count == 0)
+        return;
+
+    static xr_vector<Fmatrix> palette;
+    palette.resize(count);
+    for (u16 idx = 0; idx < count; ++idx)
+        palette[idx] = bone_instances[idx].mTransform;
+
+#ifdef DEBUG
+    const char* label = dbg_name.size() ? dbg_name.c_str() : "<ogf_visual>";
+#else
+    const char* label = "<ogf_visual>";
+#endif
+
+    DumpPaletteLog("ogf", label, palette);
 }
 
 void BuildMatrix(Fmatrix& mView, float invsz, const Fvector norm, const Fvector& from)

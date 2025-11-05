@@ -32,6 +32,8 @@ private:
     void ObjectShift(float static_shift, const SCalculateData cd[max_size]);
     void LimbUpdate(CIKLimb& L);
     void LimbSetup();
+    void SwitchToOzzMode();
+    void TeardownLegacyLimbs();
 
 private:
     static void IKVisualCallback(IKinematics* K);
@@ -42,6 +44,8 @@ private:
     xr_vector<CIKLimb> _bone_chains;
     object_shift _object_shift;
     extrapolation::points _pose_extrapolation;
+    bool m_supports_ozz{};
+    bool m_pending_legacy_teardown{};
 
 #ifdef DEBUG
     LPCSTR anim_name;

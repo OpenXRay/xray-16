@@ -23,6 +23,9 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
+#include <atomic>
+#include <filesystem>
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class CRenderTarget;
@@ -472,6 +475,7 @@ public:
     void model_Logging(bool bEnable) override { Models->Logging(bEnable); }
     void models_Prefetch() override;
     void models_Clear(bool b_complete) override;
+    void models_Rebuild() override;
 
     // Occlusion culling
     bool occ_visible(vis_data& V) override;
@@ -480,6 +484,15 @@ public:
 
     // Main
     void OnCameraUpdated() override;
+
+    void EnableOzzPaletteDebugDump(bool enabled) override;
+    bool IsOzzPaletteDebugDumpEnabled() const override;
+    void RequestOzzPaletteDebugDump() override;
+    bool LoadOzzAnimation(IRenderVisual* visual, const std::filesystem::path& path) override;
+    void StopOzzAnimation(IRenderVisual* visual) override;
+    bool PlayOzzMotion(IRenderVisual* visual, const xr_string& motion_name) override;
+    bool GetOzzAvailableMotions(IRenderVisual* visual, xr_vector<xr_string>& out_names) override;
+    bool ConsumeOzzPaletteDebugDumpRequest() override;
 
     void Calculate() override;
     void Render() override;
@@ -518,6 +531,9 @@ private:
 #else
 #   error No graphics API selected or enabled!
 #endif
+
+    std::atomic<bool> m_ozzDumpOnce{ false };
+    std::atomic<bool> m_ozzDumpContinuous{ false };
 
     IRender_Sector::sector_id_t largest_sector_id{ IRender_Sector::INVALID_SECTOR_ID };
 };

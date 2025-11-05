@@ -26,7 +26,7 @@ namespace smart_cover
 animation_selector::animation_selector(CAI_Stalker* object)
     : m_object(object)
 {
-    m_skeleton_animated = smart_cast<IKinematicsAnimated*>(object->Visual());
+    m_skeleton_animated = object->Visual()->dcast_PKinematicsAnimated();
     VERIFY(m_skeleton_animated);
     m_planner = xr_new<animation_planner>(object, "animation planner");
 }

@@ -12,7 +12,7 @@ void CPHShellSimpleCreator::CreatePhysicsShell()
     if (!owner->Visual())
         return;
 
-    IKinematics* pKinematics = smart_cast<IKinematics*>(owner->Visual());
+    IKinematics* pKinematics = owner->Visual()->dcast_PKinematics();
     VERIFY(pKinematics);
 
     if (owner->PPhysicsShell())

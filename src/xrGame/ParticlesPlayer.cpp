@@ -141,7 +141,7 @@ void CParticlesPlayer::StartParticles(
     IGameObject* object = m_self_object;
     VERIFY(object);
 
-    SBoneInfo* pBoneInfo = get_nearest_bone_info(smart_cast<IKinematics*>(object->Visual()), bone_num);
+    SBoneInfo* pBoneInfo = get_nearest_bone_info(object->Visual()->dcast_PKinematics(), bone_num);
     if (!pBoneInfo)
         return;
 
@@ -303,7 +303,7 @@ void CParticlesPlayer::UpdateParticles()
 void CParticlesPlayer::GetBonePos(IGameObject* pObject, u16 bone_id, const Fvector& offset, Fvector& result)
 {
     VERIFY(pObject);
-    IKinematics* pKinematics = smart_cast<IKinematics*>(pObject->Visual());
+    IKinematics* pKinematics = pObject->Visual()->dcast_PKinematics();
     VERIFY(pKinematics);
     CBoneInstance& l_tBoneInstance = pKinematics->LL_GetBoneInstance(bone_id);
 

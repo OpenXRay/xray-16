@@ -21,6 +21,7 @@ public:
     void set(R_constant* C, R_constant_load& L, const Fvector4& A);
     void set(R_constant* C, R_constant_load& L, float A);
     void set(R_constant* C, R_constant_load& L, int A);
+    void set(R_constant* C, R_constant_load& L, u32 A);
     //	Array buffer member
     void seta(R_constant* C, R_constant_load& L, u32 e, const Fmatrix& A);
     void seta(R_constant* C, R_constant_load& L, u32 e, const Fvector4& A);

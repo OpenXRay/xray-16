@@ -14,7 +14,7 @@ bool CVisualZone::net_Spawn(CSE_Abstract* DC)
 
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeZoneVisual* Z = smart_cast<CSE_ALifeZoneVisual*>(e);
-    IKinematicsAnimated* SA = smart_cast<IKinematicsAnimated*>(Visual());
+    IKinematicsAnimated* SA = Visual()->dcast_PKinematicsAnimated();
     m_attack_animation = SA->ID_Cycle_Safe(Z->attack_animation);
     R_ASSERT2(m_attack_animation.valid(), make_string("object[%s]: cannot find attack animation[%s] in model[%s]",
                                               cName().c_str(), Z->attack_animation.c_str(), cNameVisual().c_str()));
@@ -34,8 +34,8 @@ void CVisualZone::SwitchZoneState(EZoneState new_state)
 {
     if (m_eZoneState == eZoneStateBlowout && new_state != eZoneStateBlowout)
     {
-        //	IKinematicsAnimated*	SA=smart_cast<IKinematicsAnimated*>(Visual());
-        smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(m_idle_animation);
+        //	IKinematicsAnimated*	SA=Visual()->dcast_PKinematicsAnimated();
+        Visual()->dcast_PKinematicsAnimated()->PlayCycle(m_idle_animation);
     }
 
     inherited::SwitchZoneState(new_state);
@@ -53,8 +53,8 @@ void CVisualZone::UpdateBlowout()
 {
     inherited::UpdateBlowout();
     if (m_dwAttackAnimaionStart >= (u32)m_iPreviousStateTime && m_dwAttackAnimaionStart < (u32)m_iStateTime)
-        smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(m_attack_animation);
+        Visual()->dcast_PKinematicsAnimated()->PlayCycle(m_attack_animation);
 
     if (m_dwAttackAnimaionEnd >= (u32)m_iPreviousStateTime && m_dwAttackAnimaionEnd < (u32)m_iStateTime)
-        smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(m_idle_animation);
+        Visual()->dcast_PKinematicsAnimated()->PlayCycle(m_idle_animation);
 }

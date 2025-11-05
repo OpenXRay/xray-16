@@ -761,6 +761,13 @@ public:
 ENGINE_API float g_fov = 67.5f;
 ENGINE_API float psHUD_FOV = 0.45f;
 
+// Animation system globals (used by xrAnimation, xrRender, xrGame)
+namespace XRay::Animation
+{
+    class OzzMotionsContainer;
+    ENGINE_API OzzMotionsContainer* g_pOzzMotionsContainer = nullptr;
+}
+
 // extern int psSkeletonUpdate;
 extern int rsDVB_Size;
 extern int rsDIB_Size;

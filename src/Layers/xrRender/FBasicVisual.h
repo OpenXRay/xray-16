@@ -73,10 +73,20 @@ public:
     virtual void Spawn(){};
     virtual void Depart(){};
 
+    void DebugDumpPalette(const xr_vector<Fmatrix>& palette) const override;
+
+    xray::render::RENDER_NAMESPACE::COzzKinematicsVisual* dcast_OzzKinematics() override { return nullptr; }
+
+protected:
+    static bool AcquirePaletteDumpTicket();
+    void DumpPaletteLog(const char* tag, const char* label, const xr_vector<Fmatrix>& palette) const;
+    static constexpr u32 kPaletteDumpMaxBones = 47;
+
     //	virtual	CKinematics*		dcast_PKinematics			()				{ return 0;	}
     //	virtual	CKinematicsAnimated*dcast_PKinematicsAnimated	()				{ return 0;	}
     //	virtual IParticleCustom*	dcast_ParticleCustom		()				{ return 0;	}
 
+public:
     virtual vis_data& getVisData() { return vis; }
     u32 getType() const override { return Type; }
     dxRender_Visual();

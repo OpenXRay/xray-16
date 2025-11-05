@@ -58,7 +58,9 @@ bool CHolderEntityObject::net_Spawn(CSE_Abstract* DC)
     if (!inheritedPH::net_Spawn(DC))
         return false;
 
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IRenderVisual* visual = Visual();
+    IKinematics* K = visual ? visual->dcast_PKinematics() : nullptr;
+    VERIFY(K);
     xr_vector<u16> fixed_bones;
     fixed_bones.push_back(K->LL_GetBoneRoot());
     PPhysicsShell() = P_build_Shell(this, false, fixed_bones);

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Shaders">
+      <UniqueIdentifier>{8E3F3D4F-8B7A-4C08-8B7A-83BB121AAD02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{F7E3D4F8-8B7A-4C08-8B7A-83BB121AAD03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+
+  <!-- Source Files -->
+  <ItemGroup>
+    <ClCompile Include="ozz_animation_viewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleObjLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+
+    <!-- Renderer Sources -->
+    <ClCompile Include="renderer\VMAImplementation.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\VulkanDevice.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\VulkanBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\VulkanCommandBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\VulkanDescriptors.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\VulkanPipeline.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\MeshData.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\InstancedSkeletonRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\InstancedMeshRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\DebugRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\Camera.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer\VulkanRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\ozz-animation\samples\framework\mesh.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+
+    <!-- ImGui Sources -->
+    <ClCompile Include="..\..\..\Externals\imgui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\imgui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\imgui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\imgui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\imgui\backends\imgui_impl_glfw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\imgui\backends\imgui_impl_vulkan.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+  </ItemGroup>
+
+  <!-- Header Files -->
+  <ItemGroup>
+    <ClInclude Include="SimpleObjLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\Camera.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\DebugRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\InstancedMeshRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\InstancedSkeletonRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\MeshData.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\VulkanBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\VulkanCommandBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\VulkanDescriptors.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\VulkanDevice.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\VulkanPipeline.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer\VulkanRenderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+  </ItemGroup>
+
+  <!-- Shader Files -->
+  <ItemGroup>
+    <None Include="renderer\shaders\triangle.vert">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\triangle.frag">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\skeleton_instanced.vert">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\skeleton_instanced.frag">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\debug_lines.vert">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\debug_lines.frag">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\shaded_bone.vert">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\shaded_bone.frag">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\skinned_mesh_instanced.vert">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+    <None Include="renderer\shaders\skinned_mesh_instanced.frag">
+      <Filter>Renderer\Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

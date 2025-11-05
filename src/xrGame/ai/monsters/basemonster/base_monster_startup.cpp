@@ -525,7 +525,8 @@ void CBaseMonster::fill_bones_body_parts(LPCSTR body_part, CriticalWoundType wou
 {
     LPCSTR body_parts_section = pSettings->r_string(cNameSect(), body_part);
 
-    IKinematics* kinematics = smart_cast<IKinematics*>(Visual());
+    IRenderVisual* visual = Visual();
+    IKinematics* kinematics = visual ? visual->dcast_PKinematics() : nullptr;
     VERIFY(kinematics);
 
     CInifile::Sect& body_part_section = pSettings->r_section(body_parts_section);

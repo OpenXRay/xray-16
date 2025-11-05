@@ -11,6 +11,14 @@ include(XRay.Configurations)
 
 include(utils)
 
+if (CMAKE_GENERATOR_PLATFORM AND NOT WIN32)
+    message(WARNING
+        "Generator '${CMAKE_GENERATOR}' ignores platform '${CMAKE_GENERATOR_PLATFORM}'. "
+        "Clearing CMAKE_GENERATOR_PLATFORM to avoid configuration failures."
+    )
+    unset(CMAKE_GENERATOR_PLATFORM CACHE)
+endif()
+
 if (CMAKE_BUILD_TYPE STREQUAL "ReleaseMasterGold")
     set(BUILD_SHARED_LIBS_DEFAULT_VALUE OFF)
 else()

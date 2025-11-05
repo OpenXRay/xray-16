@@ -247,8 +247,8 @@ target_sources(xrGame PRIVATE
     animation_script_callback.h
     animation_utils.cpp
     animation_utils.h
-    #AnselManager.cpp
-    #AnselManager.h
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:AnselManager.cpp>
+    $<$<STREQUAL:$<PLATFORM_ID>,Windows>:AnselManager.h>
     anticheat_dumpable_object.h
     antirad.cpp
     antirad.h
@@ -942,6 +942,8 @@ target_sources(xrGame PRIVATE
     player_hud.h
     player_hud_tune.cpp
     player_hud_tune.h
+    ozz_animation_utility.cpp
+    ozz_animation_utility.h
     player_name_modifyer.cpp
     player_name_modifyer.h
     pose_extrapolation.cpp
@@ -2481,12 +2483,15 @@ target_include_directories(xrGame
     "${CMAKE_SOURCE_DIR}/Externals/ode/include"
     "${CMAKE_SOURCE_DIR}/Externals/OpenAutomate/inc"
     "${CMAKE_SOURCE_DIR}/sdk/include"
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/include"
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples"
 )
 
 target_link_libraries(xrGame
     PRIVATE
     xrCore
     xrEngine
+    xrAnimation
     xrMaterialSystem
     xrMiscMath
     xrImGui
@@ -2496,10 +2501,24 @@ target_link_libraries(xrGame
     xrSound
     xrScriptEngine
     xrGameSpy
+    GameSpy-oxr
     xrCDB
     xrPhysics
     xrNetServer
 )
+
+if (MSVC)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_xr_ansel_lib "${CMAKE_SOURCE_DIR}/sdk/libraries/x64/AnselSDK64.lib")
+    else()
+        set(_xr_ansel_lib "${CMAKE_SOURCE_DIR}/sdk/libraries/x86/AnselSDK32.lib")
+    endif()
+
+    target_link_libraries(xrGame
+        PRIVATE
+        ${_xr_ansel_lib}
+    )
+endif()
 
 target_compile_definitions(xrGame
     PUBLIC
@@ -2507,6 +2526,7 @@ target_compile_definitions(xrGame
     PURE_DYNAMIC_CAST
 
     PRIVATE
+    RENDER_NAMESPACE=render_gl
     XRGAME_EXPORTS
 )
 

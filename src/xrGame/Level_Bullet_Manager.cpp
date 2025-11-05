@@ -598,7 +598,7 @@ bool CBulletManager::firetrace_callback(collide::rq_result& result, LPVOID param
 
     //динамический объект
     VERIFY(!(result.O->ID() == bullet.parent_id && bullet.fly_dist < parent_ignore_distance));
-    IKinematics* const kinematics = smart_cast<IKinematics*>(result.O->Visual());
+    IKinematics* const kinematics = result.O->Visual()->dcast_PKinematics();
     if (!kinematics)
         return (FALSE);
 

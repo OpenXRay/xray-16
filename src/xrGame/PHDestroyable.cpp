@@ -223,8 +223,8 @@ void CPHDestroyable::NotificatePart(CPHDestroyableNotificate* dn)
 {
     CPhysicsShell* own_shell = PPhysicsShellHolder()->PPhysicsShell();
     CPhysicsShell* new_shell = dn->PPhysicsShellHolder()->PPhysicsShell();
-    IKinematics* own_K = smart_cast<IKinematics*>(PPhysicsShellHolder()->Visual());
-    IKinematics* new_K = smart_cast<IKinematics*>(dn->PPhysicsShellHolder()->Visual());
+    IKinematics* own_K = PPhysicsShellHolder()->Visual()->dcast_PKinematics();
+    IKinematics* new_K = dn->PPhysicsShellHolder()->Visual()->dcast_PKinematics();
     VERIFY(own_K && new_K && own_shell && new_shell);
     CInifile* own_ini = own_K->LL_UserData();
     CInifile* new_ini = new_K->LL_UserData();

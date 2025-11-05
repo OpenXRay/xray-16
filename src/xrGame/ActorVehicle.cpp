@@ -37,9 +37,9 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
     m_holder=vehicle;
 
     IRenderVisual* pVis = Visual();
-    IKinematicsAnimated* V = smart_cast<IKinematicsAnimated*>(pVis);
+    IKinematicsAnimated* V = pVis->dcast_PKinematicsAnimated();
     R_ASSERT(V);
-    IKinematics* pK = smart_cast<IKinematics*>(pVis);
+    IKinematics* pK = pVis->dcast_PKinematics();
 
     if (!m_holder->attach_Actor(this))
     {
@@ -103,7 +103,7 @@ void CActor::detach_Vehicle()
     r_model_yaw_dest = r_model_yaw;
     m_holder = NULL;
     SetCallbacks();
-    IKinematicsAnimated* V = smart_cast<IKinematicsAnimated*>(Visual());
+    IKinematicsAnimated* V = Visual()->dcast_PKinematicsAnimated();
     R_ASSERT(V);
     V->PlayCycle(m_anims->m_normal.legs_idle);
     V->PlayCycle(m_anims->m_normal.m_torso_idle);

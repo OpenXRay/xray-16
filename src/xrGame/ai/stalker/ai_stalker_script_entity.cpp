@@ -88,8 +88,8 @@ bool CAI_Stalker::bfAssignWatch(CScriptEntityAction* tpEntityAction)
         else
         {
             CBoneInstance& l_tBoneInstance =
-                smart_cast<IKinematics*>(l_tWatchAction.m_tpObjectToWatch->Visual())
-                    ->LL_GetBoneInstance(smart_cast<IKinematics*>(l_tWatchAction.m_tpObjectToWatch->Visual())
+                l_tWatchAction.m_tpObjectToWatch->Visual()->dcast_PKinematics()
+                    ->LL_GetBoneInstance(l_tWatchAction.m_tpObjectToWatch->Visual()->dcast_PKinematics()
                                              ->LL_BoneID(l_tWatchAction.m_bone_to_watch));
             Fmatrix l_tMatrix;
 

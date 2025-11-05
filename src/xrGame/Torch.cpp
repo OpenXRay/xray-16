@@ -201,7 +201,8 @@ void CTorch::Switch(bool light_on)
 
     if (light_trace_bone.c_str())
     {
-        IKinematics* pVisual = smart_cast<IKinematics*>(Visual());
+        IRenderVisual* visual = Visual();
+        IKinematics* pVisual = visual ? visual->dcast_PKinematics() : nullptr;
         VERIFY(pVisual);
         u16 bi = pVisual->LL_BoneID(light_trace_bone);
 
@@ -218,7 +219,9 @@ bool CTorch::net_Spawn(CSE_Abstract* DC)
     cNameVisual_set(torch->get_visual());
 
     R_ASSERT(!GetCForm());
-    R_ASSERT(smart_cast<IKinematics*>(Visual()));
+    IRenderVisual* visual = Visual();
+    IKinematics* torchKinematics = visual ? visual->dcast_PKinematics() : nullptr;
+    R_ASSERT(torchKinematics);
     CForm = xr_new<CCF_Skeleton>(this);
 
     if (!inherited::net_Spawn(DC))
@@ -226,7 +229,7 @@ bool CTorch::net_Spawn(CSE_Abstract* DC)
 
     bool b_r2 = GEnv.Render->GenerationIsR2OrHigher();
 
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = torchKinematics;
     CInifile* pUserData = K->LL_UserData();
     R_ASSERT3(pUserData, "Empty Torch user data!", torch->get_visual());
     lanim = LALib.FindItem(pUserData->r_string(TORCH_DEFINITION, "color_animator"));
@@ -316,20 +319,29 @@ void CTorch::UpdateCL()
     if (!m_switched_on)
         return;
 
-    CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(guid_bone);
+    IRenderVisual* visual = Visual();
+    IKinematics* torchKinematics = visual ? visual->dcast_PKinematics() : nullptr;
+    VERIFY(torchKinematics);
+    CBoneInstance& BI = torchKinematics->LL_GetBoneInstance(guid_bone);
     Fmatrix M;
 
     if (H_Parent())
     {
         CActor* actor = smart_cast<CActor*>(H_Parent());
+        IRenderVisual* parentVisual = H_Parent()->Visual();
+        IKinematics* parentKinematics = parentVisual ? parentVisual->dcast_PKinematics() : nullptr;
         if (actor)
-            smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
+        {
+            VERIFY(parentKinematics);
+            parentKinematics->CalculateBones_Invalidate();
+        }
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE) ||
             GameID() != eGameIDSingle)
         {
             // near camera
-            smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones();
+            VERIFY(parentKinematics);
+            parentKinematics->CalculateBones();
             M.mul_43(XFORM(), BI.mTransform);
         }
         else

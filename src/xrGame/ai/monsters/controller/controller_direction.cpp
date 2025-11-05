@@ -28,7 +28,7 @@ void CControllerDirection::bone_callback(CBoneInstance* B)
 void CControllerDirection::assign_bones()
 {
     // Установка callback на кости
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_controller->Visual());
+    IKinematics* kinematics = m_controller->Visual()->dcast_PKinematics();
 
     m_bone_spine = &kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_spine"));
     m_bone_head = &kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_head"));

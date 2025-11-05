@@ -29,7 +29,7 @@ void read_bones(IKinematics* K, LPCSTR S, xr_vector<u16>& bones)
 }
 void CCarDamageParticles::Init(CCar* car)
 {
-    IKinematics* K = smart_cast<IKinematics*>(car->Visual());
+    IKinematics* K = car->Visual()->dcast_PKinematics();
     CInifile* ini = K->LL_UserData();
     if (ini->section_exist("damage_particles"))
     {

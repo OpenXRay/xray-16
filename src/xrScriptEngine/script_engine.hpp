@@ -9,6 +9,7 @@
 #pragma once
 
 #include "xrCommon/xr_unordered_map.h"
+#include "xrCommon/xr_string.h"
 
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "xrCore/Threading/Lock.hpp"
@@ -77,6 +78,9 @@ private:
     char* scriptBuffer = nullptr;
     size_t scriptBufferSize = 0;
     bool m_is_editor;
+    xr_string m_lastLoadedChunk;
+    xr_string m_lastLoadedNamespace;
+    xr_string m_lastExecutingChunk;
 
 protected:
     CScriptProcessStorage m_script_processes;
@@ -87,9 +91,10 @@ protected:
 #ifdef USE_DEBUGGER
     CScriptDebugger* m_scriptDebugger{};
 #endif
+public:
+    static CScriptEngine* GetInstance(lua_State* state);
 
 private:
-    static CScriptEngine* GetInstance(lua_State* state);
     static bool RegisterState(lua_State* state, CScriptEngine* scriptEngine);
     static bool UnregisterState(lua_State* state);
     bool no_file_exists(pcstr file_name, size_t string_length);
@@ -194,9 +199,11 @@ public:
 
 private:
     static void print_error(lua_State* L, int iErrorCode);
+    static void LogMemoryUsage(lua_State* state, pcstr reason);
 
 public:
     static void on_error(lua_State* state);
+    void OnLuaAssertion(lua_State* state, pcstr file, int line, pcstr func, pcstr message);
 
     void flush_log();
     void print_stack(lua_State* L = nullptr);

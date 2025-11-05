@@ -215,11 +215,11 @@ void CPhysicsShellHolder::activate_physic_shell()
     m_pPhysicsShell->Activate(l_p1, 0, l_p2);
     if (H_Parent() && H_Parent()->Visual())
     {
-        smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
-        smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones(TRUE);
+        smart_cast<IKinematics*>(H_Parent()->Visual()->dcast_PKinematics())->CalculateBones_Invalidate();
+        smart_cast<IKinematics*>(H_Parent()->Visual()->dcast_PKinematics())->CalculateBones(TRUE);
     }
-    smart_cast<IKinematics*>(Visual())->CalculateBones_Invalidate();
-    smart_cast<IKinematics*>(Visual())->CalculateBones(TRUE);
+    smart_cast<IKinematics*>(Visual()->dcast_PKinematics())->CalculateBones_Invalidate();
+    smart_cast<IKinematics*>(Visual()->dcast_PKinematics())->CalculateBones(TRUE);
     if (!IsGameTypeSingle())
     {
         if (!smart_cast<CCustomRocket*>(this) && !smart_cast<CGrenade*>(this))
@@ -241,8 +241,8 @@ void CPhysicsShellHolder::activate_physic_shell()
 
     if (H_Parent() && H_Parent()->Visual())
     {
-        smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
-        smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones(TRUE);
+        smart_cast<IKinematics*>(H_Parent()->Visual()->dcast_PKinematics())->CalculateBones_Invalidate();
+        smart_cast<IKinematics*>(H_Parent()->Visual()->dcast_PKinematics())->CalculateBones(TRUE);
     }
     CPhysicsShellHolder* P = smart_cast<CPhysicsShellHolder*>(H_Parent());
     if (P)
@@ -254,8 +254,8 @@ void CPhysicsShellHolder::setup_physic_shell()
     VERIFY(!m_pPhysicsShell);
     create_physic_shell();
     m_pPhysicsShell->Activate(XFORM(), 0, XFORM());
-    smart_cast<IKinematics*>(Visual())->CalculateBones_Invalidate();
-    smart_cast<IKinematics*>(Visual())->CalculateBones(TRUE);
+    smart_cast<IKinematics*>(Visual()->dcast_PKinematics())->CalculateBones_Invalidate();
+    smart_cast<IKinematics*>(Visual()->dcast_PKinematics())->CalculateBones(TRUE);
 
     ApplySpawnIniToPhysicShell(spawn_ini(), PPhysicsShell(), false);
     correct_spawn_pos();
@@ -367,7 +367,7 @@ void CPhysicsShellHolder::load(IReader& input_packet)
 void CPhysicsShellHolder::PHSaveState(NET_Packet& P)
 {
     // CPhysicsShell* pPhysicsShell=PPhysicsShell();
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = smart_cast<IKinematics*>(Visual()->dcast_PKinematics());
     // Flags8 lflags;
     // if(pPhysicsShell&&pPhysicsShell->isActive())
     // lflags.set(CSE_PHSkeleton::flActive,pPhysicsShell->isEnabled());
@@ -430,7 +430,7 @@ void CPhysicsShellHolder::PHSaveState(NET_Packet& P)
 void CPhysicsShellHolder::PHLoadState(IReader& P)
 {
     //	Flags8 lflags;
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = smart_cast<IKinematics*>(Visual()->dcast_PKinematics());
     //	P.r_u8 (lflags.flags);
     if (K)
     {

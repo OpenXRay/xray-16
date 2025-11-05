@@ -92,8 +92,8 @@ void character_hit_animation_controller::PlayHitMotion(
     const Fvector& dir, const Fvector& bone_pos, u16 bi, CEntityAlive& ea) const
 {
     IRenderVisual* pV = ea.Visual();
-    IKinematicsAnimated* CA = smart_cast<IKinematicsAnimated*>(pV);
-    IKinematics* K = smart_cast<IKinematics*>(pV);
+    IKinematicsAnimated* CA = pV->dcast_PKinematicsAnimated();
+    IKinematics* K = pV->dcast_PKinematics();
 
     // play_cycle(CA,all_shift_down,1,block_times[6],1) ;
     if (!(K->LL_BoneCount() > bi))
@@ -175,6 +175,6 @@ bool character_hit_animation_controller::IsEffected(u16 bi, IKinematics& ca) con
 
 void character_hit_animation_controller::GetBaseMatrix(Fmatrix& m, CEntityAlive& ea) const
 {
-    IKinematics* CA = smart_cast<IKinematics*>(ea.Visual());
+    IKinematics* CA = ea.Visual()->dcast_PKinematics();
     m.mul_43(ea.XFORM(), CA->LL_GetTransform(base_bone));
 }

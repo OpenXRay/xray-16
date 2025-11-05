@@ -6,6 +6,7 @@
 #include "FBasicVisual.h"
 #include "SkeletonCustom.h"
 #include "FLOD.h"
+#include "OzzKinematicsVisual.h"
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -33,7 +34,8 @@ bool cmp_pass(const T& left, const T& right)
 {
     if (left->first->equal(*right->first))
         return false;
-    return left->second.ssa >= right->second.ssa;
+
+    return left->second.ssa > right->second.ssa;
 }
 
 void R_dsgraph_structure::render_graph(u32 _priority)
@@ -384,6 +386,19 @@ void R_dsgraph_structure::render_R1_box(IRender_Sector::sector_id_t sector_id, F
                 dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
                     lstVisuals.push_back(T);
+            }
+        }
+        break;
+        case MT_OZZ_STATIC:
+        case MT_OZZ_ANIMATED:
+        {
+            auto* pV = static_cast<COzzKinematicsVisual*>(V);
+            pV->Kinematics()->CalculateBones(TRUE);
+            pV->EnsureSkinningPalette();
+            for (auto& child : pV->children)
+            {
+                if (BB.intersect(child->vis.box))
+                    lstVisuals.push_back(child);
             }
         }
         break;

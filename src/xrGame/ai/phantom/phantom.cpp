@@ -96,7 +96,7 @@ bool CPhantom::net_Spawn(CSE_Abstract* DC)
     XFORM().k.getHP(vHP.x, vHP.y);
 
     // set animation
-    IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
+    IKinematicsAnimated* K = Visual()->dcast_PKinematicsAnimated();
     m_state_data[stBirth].motion = K->ID_Cycle("birth_0");
     m_state_data[stFly].motion = K->ID_Cycle("fly_0");
     m_state_data[stContact].motion = K->ID_Cycle("contact_0");
@@ -144,7 +144,7 @@ void CPhantom::SwitchToState_internal(EState new_state)
 
     if (new_state != m_CurState)
     {
-        IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
+        IKinematicsAnimated* K = Visual()->dcast_PKinematicsAnimated();
         Fmatrix xform = XFORM_center();
         UpdateEvent = 0;
         // after event
@@ -272,7 +272,7 @@ void CPhantom::shedule_Update(u32 DT)
 
     inherited::shedule_Update(DT);
 
-    IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
+    IKinematicsAnimated* K = Visual()->dcast_PKinematicsAnimated();
     K->UpdateTracks();
 }
 

@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Master Gold|x64">
+      <Configuration>Master Gold</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{E8F3F0B2-1D4C-4A5E-9F7A-8D3C4B5E6F7A}</ProjectGuid>
+    <RootNamespace>ozz_animation_viewer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Master Gold|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Master Gold|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+
+  <PropertyGroup Label="UserMacros" />
+
+  <PropertyGroup>
+    <!-- Root paths -->
+    <OpenXRayRoot>$(ProjectDir)..\..\..</OpenXRayRoot>
+    <ExternalsDir>$(OpenXRayRoot)\Externals</ExternalsDir>
+
+    <!-- External dependencies -->
+    <VulkanSDK>$(VULKAN_SDK)</VulkanSDK>
+    <GLFWRoot Condition="'$(GLFWRoot)'==''">$(ExternalsDir)\glfw</GLFWRoot>
+    <OzzRoot>$(ExternalsDir)\ozz-animation</OzzRoot>
+    <ImGuiRoot>$(ExternalsDir)\imgui</ImGuiRoot>
+    <VMARoot>$(ExternalsDir)\vma</VMARoot>
+
+    <!-- GLFW build configuration -->
+    <GLFWBuildConfig Condition="'$(Configuration)'=='Mixed'">Release</GLFWBuildConfig>
+    <GLFWBuildConfig Condition="'$(GLFWBuildConfig)'==''">$(Configuration)</GLFWBuildConfig>
+    <GLFWBuildDir>$(GLFWRoot)\build</GLFWBuildDir>
+    <GLFWLibDir Condition="'$(GLFWLibDir)'==''">$(GLFWBuildDir)\src\$(GLFWBuildConfig)</GLFWLibDir>
+
+    <!-- Build output paths -->
+    <OutDir>$(OpenXRayRoot)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(OpenXRayRoot)\intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ShaderOutputDir>$(OutDir)shaders\</ShaderOutputDir>
+
+    <!-- Shader path for C++ (normalized to forward slashes) -->
+    <ShaderBinaryPath>$(OutDir)shaders/</ShaderBinaryPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Master Gold|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <!-- Compiler Settings -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;OZZ_SHADER_BINARY_DIR=R"($(ShaderBinaryPath))";VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>
+        $(ProjectDir);
+        $(ProjectDir)\renderer;
+        $(OpenXRayRoot)\src;
+        $(OpenXRayRoot)\src\xrAnimation;
+        $(OpenXRayRoot)\src\xrAnimation\Include;
+        $(OzzRoot)\include;
+        $(OzzRoot)\samples;
+        $(ImGuiRoot);
+        $(ImGuiRoot)\backends;
+        $(VMARoot);
+        $(ExternalsDir)\entt\single_include;
+        $(ExternalsDir)\tracy\public;
+        $(OpenXRayRoot)\sdk\include\SDL2;
+        $(VulkanSDK)\Include;
+        $(GLFWRoot)\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+        $(VulkanSDK)\Lib;
+        $(GLFWLibDir);
+        $(GLFWRoot)\lib-vc2022;
+        $(OpenXRayRoot)\build\lib\$(Platform)\$(Configuration);
+        $(OpenXRayRoot)\src\intermediate\$(Configuration)\$(Platform)\ozz-animation;
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+        vulkan-1.lib;
+        glfw3.lib;
+        xrAnimation.lib;
+        xrCore.lib;
+        ozz-animation.lib;
+        advapi32.lib;
+        dwmapi.lib;
+        gdi32.lib;
+        imm32.lib;
+        ole32.lib;
+        shell32.lib;
+        user32.lib;
+        version.lib;
+        winmm.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>DEBUG;MIXED;TRACY_ENABLE;TRACY_NO_FRAME_IMAGE;_CONSOLE;OZZ_SHADER_BINARY_DIR=R"($(ShaderBinaryPath))";VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>
+        $(ProjectDir);
+        $(ProjectDir)\renderer;
+        $(OpenXRayRoot)\src;
+        $(OpenXRayRoot)\src\xrAnimation;
+        $(OpenXRayRoot)\src\xrAnimation\Include;
+        $(OzzRoot)\include;
+        $(OzzRoot)\samples;
+        $(ImGuiRoot);
+        $(ImGuiRoot)\backends;
+        $(VMARoot);
+        $(ExternalsDir)\entt\single_include;
+        $(ExternalsDir)\tracy\public;
+        $(OpenXRayRoot)\sdk\include\SDL2;
+        $(VulkanSDK)\Include;
+        $(GLFWRoot)\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+        $(VulkanSDK)\Lib;
+        $(GLFWLibDir);
+        $(GLFWRoot)\lib-vc2022;
+        $(OpenXRayRoot)\build\lib\$(Platform)\$(Configuration);
+        $(OpenXRayRoot)\src\intermediate\$(Configuration)\$(Platform)\ozz-animation;
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+        vulkan-1.lib;
+        glfw3.lib;
+        xrAnimation.lib;
+        xrCore.lib;
+        ozz-animation.lib;
+        advapi32.lib;
+        dwmapi.lib;
+        gdi32.lib;
+        imm32.lib;
+        ole32.lib;
+        shell32.lib;
+        user32.lib;
+        version.lib;
+        winmm.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;OZZ_SHADER_BINARY_DIR=R"($(ShaderBinaryPath))";VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>
+        $(ProjectDir);
+        $(ProjectDir)\renderer;
+        $(OpenXRayRoot)\src;
+        $(OpenXRayRoot)\src\xrAnimation;
+        $(OpenXRayRoot)\src\xrAnimation\Include;
+        $(OzzRoot)\include;
+        $(OzzRoot)\samples;
+        $(ImGuiRoot);
+        $(ImGuiRoot)\backends;
+        $(VMARoot);
+        $(ExternalsDir)\entt\single_include;
+        $(ExternalsDir)\tracy\public;
+        $(OpenXRayRoot)\sdk\include\SDL2;
+        $(VulkanSDK)\Include;
+        $(GLFWRoot)\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+        $(VulkanSDK)\Lib;
+        $(GLFWLibDir);
+        $(GLFWRoot)\lib-vc2022;
+        $(OpenXRayRoot)\build\lib\$(Platform)\$(Configuration);
+        $(OpenXRayRoot)\src\intermediate\$(Configuration)\$(Platform)\ozz-animation;
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+        vulkan-1.lib;
+        glfw3.lib;
+        xrAnimation.lib;
+        xrCore.lib;
+        ozz-animation.lib;
+        advapi32.lib;
+        dwmapi.lib;
+        gdi32.lib;
+        imm32.lib;
+        ole32.lib;
+        shell32.lib;
+        user32.lib;
+        version.lib;
+        winmm.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Master Gold|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>XRAY_STATIC_BUILD;MASTER_GOLD;dNODEBUG;NDEBUG;_CONSOLE;OZZ_SHADER_BINARY_DIR=R"($(ShaderBinaryPath))";VK_USE_PLATFORM_WIN32_KHR;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>
+        $(ProjectDir);
+        $(ProjectDir)\renderer;
+        $(OpenXRayRoot)\src;
+        $(OpenXRayRoot)\src\xrAnimation;
+        $(OpenXRayRoot)\src\xrAnimation\Include;
+        $(OzzRoot)\include;
+        $(OzzRoot)\samples;
+        $(ImGuiRoot);
+        $(ImGuiRoot)\backends;
+        $(VMARoot);
+        $(ExternalsDir)\entt\single_include;
+        $(ExternalsDir)\tracy\public;
+        $(OpenXRayRoot)\sdk\include\SDL2;
+        $(VulkanSDK)\Include;
+        $(GLFWRoot)\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ExceptionHandling>false</ExceptionHandling>
+      <DisableSpecificWarnings>4530;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+        $(VulkanSDK)\Lib;
+        $(GLFWLibDir);
+        $(GLFWRoot)\lib-vc2022;
+        $(OpenXRayRoot)\build\lib\$(Platform)\$(Configuration);
+        $(OpenXRayRoot)\src\intermediate\$(Configuration)\$(Platform)\ozz-animation;
+        %(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+        vulkan-1.lib;
+        glfw3.lib;
+        xrAnimation.lib;
+        xrCore.lib;
+        ozz-animation.lib;
+        advapi32.lib;
+        dwmapi.lib;
+        gdi32.lib;
+        imm32.lib;
+        ole32.lib;
+        shell32.lib;
+        user32.lib;
+        version.lib;
+        winmm.lib;
+        %(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- Source Files -->
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ozz_animation_viewer.cpp" />
+    <ClCompile Include="SimpleObjLoader.cpp" />
+
+    <!-- Renderer -->
+    <ClCompile Include="renderer\VMAImplementation.cpp" />
+    <ClCompile Include="renderer\VulkanDevice.cpp" />
+    <ClCompile Include="renderer\VulkanBuffer.cpp" />
+    <ClCompile Include="renderer\VulkanCommandBuffer.cpp" />
+    <ClCompile Include="renderer\VulkanDescriptors.cpp" />
+    <ClCompile Include="renderer\VulkanPipeline.cpp" />
+    <ClCompile Include="renderer\MeshData.cpp" />
+    <ClCompile Include="renderer\InstancedSkeletonRenderer.cpp" />
+    <ClCompile Include="renderer\InstancedMeshRenderer.cpp" />
+    <ClCompile Include="renderer\DebugRenderer.cpp" />
+    <ClCompile Include="renderer\Camera.cpp" />
+    <ClCompile Include="renderer\VulkanRenderer.cpp" />
+    <ClCompile Include="$(OzzRoot)\samples\framework\mesh.cc">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+
+    <!-- ImGui (external, no precompiled header) -->
+    <ClCompile Include="$(ImGuiRoot)\imgui.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(ImGuiRoot)\imgui_draw.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(ImGuiRoot)\imgui_tables.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(ImGuiRoot)\imgui_widgets.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(ImGuiRoot)\backends\imgui_impl_glfw.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(ImGuiRoot)\backends\imgui_impl_vulkan.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+
+  <!-- Header Files -->
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SimpleObjLoader.h" />
+    <ClInclude Include="renderer\Camera.h" />
+    <ClInclude Include="renderer\DebugRenderer.h" />
+    <ClInclude Include="renderer\InstancedMeshRenderer.h" />
+    <ClInclude Include="renderer\InstancedSkeletonRenderer.h" />
+    <ClInclude Include="renderer\MeshData.h" />
+    <ClInclude Include="renderer\VulkanBuffer.h" />
+    <ClInclude Include="renderer\VulkanCommandBuffer.h" />
+    <ClInclude Include="renderer\VulkanDescriptors.h" />
+    <ClInclude Include="renderer\VulkanDevice.h" />
+    <ClInclude Include="renderer\VulkanPipeline.h" />
+    <ClInclude Include="renderer\VulkanRenderer.h" />
+  </ItemGroup>
+
+  <!-- Project References -->
+  <ItemGroup>
+    <ProjectReference Include="$(OpenXRayRoot)\src\xrCore\xrCore.vcxproj">
+      <Project>{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(OpenXRayRoot)\src\xrAnimation\xrAnimation.vcxproj">
+      <Project>{A5B2C3D4-E5F6-7890-ABCD-EF1234567890}</Project>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Shader Files -->
+  <ItemGroup>
+    <None Include="renderer\shaders\triangle.vert" />
+    <None Include="renderer\shaders\triangle.frag" />
+    <None Include="renderer\shaders\skeleton_instanced.vert" />
+    <None Include="renderer\shaders\skeleton_instanced.frag" />
+    <None Include="renderer\shaders\debug_lines.vert" />
+    <None Include="renderer\shaders\debug_lines.frag" />
+    <None Include="renderer\shaders\shaded_bone.vert" />
+    <None Include="renderer\shaders\shaded_bone.frag" />
+    <None Include="renderer\shaders\skinned_mesh_instanced.vert" />
+    <None Include="renderer\shaders\skinned_mesh_instanced.frag" />
+  </ItemGroup>
+
+  <!-- Custom Build: Compile Shaders -->
+  <Target Name="CompileShaders" BeforeTargets="ClCompile">
+    <PropertyGroup>
+      <GlslcExecutable Condition="'$(GlslcExecutable)'==''">$(GLSLC)</GlslcExecutable>
+      <GlslcExecutable Condition="'$(GlslcExecutable)'==''">$(VulkanSDK)\Bin\glslc.exe</GlslcExecutable>
+    </PropertyGroup>
+    <Error Condition="'$(GlslcExecutable)'==''" Text="glslc path not configured. Set VULKAN_SDK environment variable (or define GlslcExecutable/GLSLC) before building ozz_animation_viewer." />
+    <Error Condition="!Exists('$(GlslcExecutable)')" Text="glslc not found at &quot;$(GlslcExecutable)&quot;. Update VULKAN_SDK or set GlslcExecutable to the Vulkan shader compiler." />
+    <MakeDir Directories="$(ShaderOutputDir)" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\triangle.vert&quot; -o &quot;$(ShaderOutputDir)triangle.vert.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\triangle.frag&quot; -o &quot;$(ShaderOutputDir)triangle.frag.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\skeleton_instanced.vert&quot; -o &quot;$(ShaderOutputDir)skeleton_instanced.vert.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\skeleton_instanced.frag&quot; -o &quot;$(ShaderOutputDir)skeleton_instanced.frag.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\debug_lines.vert&quot; -o &quot;$(ShaderOutputDir)debug_lines.vert.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\debug_lines.frag&quot; -o &quot;$(ShaderOutputDir)debug_lines.frag.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\shaded_bone.vert&quot; -o &quot;$(ShaderOutputDir)shaded_bone.vert.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\shaded_bone.frag&quot; -o &quot;$(ShaderOutputDir)shaded_bone.frag.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\skinned_mesh_instanced.vert&quot; -o &quot;$(ShaderOutputDir)skinned_mesh_instanced.vert.spv&quot;" />
+    <Exec Command="&quot;$(GlslcExecutable)&quot; &quot;$(ProjectDir)renderer\shaders\skinned_mesh_instanced.frag&quot; -o &quot;$(ShaderOutputDir)skinned_mesh_instanced.frag.spv&quot;" />
+  </Target>
+
+  <Target Name="EnsureGlfw" BeforeTargets="ClCompile">
+    <PropertyGroup>
+      <_GlfwLib>$(GLFWLibDir)\glfw3.lib</_GlfwLib>
+    </PropertyGroup>
+    <Message Condition="!Exists('$(_GlfwLib)')" Importance="high" Text="Building GLFW dependency (configuration: $(GLFWBuildConfig))" />
+    <Exec Condition="!Exists('$(GLFWBuildDir)\CMakeCache.txt')"
+          Command="cmake -S &quot;$(GLFWRoot)&quot; -B &quot;$(GLFWBuildDir)&quot; -G &quot;Visual Studio 17 2022&quot; -A x64 -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_DOCS=OFF" />
+    <Exec Condition="!Exists('$(_GlfwLib)')"
+          Command="cmake --build &quot;$(GLFWBuildDir)&quot; --config $(GLFWBuildConfig)" />
+    <Error Condition="!Exists('$(_GlfwLib)')" Text="glfw3.lib not found after build attempt (expected: $(_GlfwLib))" />
+  </Target>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

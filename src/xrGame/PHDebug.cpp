@@ -803,7 +803,7 @@ static void DBG_DrawTarckObj()
     if (!v)
         return;
     DBG_OutText("visual name: %s ", trace_object->cNameVisual().c_str());
-    IKinematics* k = smart_cast<IKinematics*>(v);
+    IKinematics* k = v->dcast_PKinematics();
     if (!k)
         return;
     IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(k);
@@ -838,7 +838,8 @@ void DBG_DrawBones(const Fmatrix& xform, IKinematics* K)
 }
 void DBG_DrawBones(IGameObject& O)
 {
-    IKinematics* K = smart_cast<IKinematics*>(O.Visual());
+    IRenderVisual* visual = O.Visual();
+    IKinematics* K = visual ? visual->dcast_PKinematics() : nullptr;
 
     // K->CalculateBones_Invalidate();
     // K->CalculateBones();
@@ -867,7 +868,8 @@ void DBG_PhysBones(IGameObject& O)
 
 void DBG_DrawBind(IGameObject& O)
 {
-    IKinematics* K = smart_cast<IKinematics*>(O.Visual());
+    IRenderVisual* visual = O.Visual();
+    IKinematics* K = visual ? visual->dcast_PKinematics() : nullptr;
 
     u16 nbb = K->LL_BoneCount();
     xr_vector<Fmatrix> binds;

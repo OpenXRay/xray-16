@@ -148,7 +148,7 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
 
     if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound])
     {
-        IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
+        IKinematics* ikv = actor->Visual()->dcast_PKinematics();
         VERIFY(ikv);
         u16 spine_bone = ikv->LL_BoneID("bip01_spine");
 
@@ -208,7 +208,7 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
 
     if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound])
     {
-        IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
+        IKinematics* ikv = actor->Visual()->dcast_PKinematics();
         VERIFY(ikv);
         const u16 spine_bone = ikv->LL_BoneID("bip01_head");
 

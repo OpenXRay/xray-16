@@ -123,6 +123,9 @@ target_sources(xrRender_GL PRIVATE
     ../xrRender/light_vis.cpp
     ../xrRender/ModelPool.cpp
     ../xrRender/ModelPool.h
+    ../xrRender/OzzKinematicsVisual.cpp
+    ../xrRender/OzzKinematicsVisual.h
+    ../../../Externals/ozz-animation/samples/framework/mesh.cc
     ../xrRender/NvTriStrip.cpp
     ../xrRender/NvTriStrip.h
     ../xrRender/NvTriStripObjects.cpp
@@ -397,9 +400,13 @@ target_include_directories(xrRender_GL
     "${CMAKE_SOURCE_DIR}/src/Layers/xrRender_R2"
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/sdk/include/DirectXMesh"
+    "${CMAKE_SOURCE_DIR}/sdk/include/nvapi"
     "${CMAKE_SOURCE_DIR}/Externals"
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/include"
+    "${CMAKE_SOURCE_DIR}/Externals/ozz-animation/samples"
     "${CMAKE_SOURCE_DIR}/Externals/gli"
     "${CMAKE_SOURCE_DIR}/Externals/gli/external"
+    "${CMAKE_SOURCE_DIR}/Externals/AGS_SDK/ags_lib/inc"
 )
 
 target_link_libraries(xrRender_GL
@@ -412,6 +419,11 @@ target_link_libraries(xrRender_GL
     xrParticles
     xrScriptEngine
     xrImGui
+    xrAnimation
+    ozz_animation
+    ozz_animation_offline
+    ozz_base
+    ozz_animation_tools
 )
 
 target_compile_definitions(xrRender_GL

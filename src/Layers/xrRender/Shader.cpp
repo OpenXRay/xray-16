@@ -39,6 +39,11 @@ void resptrcode_geom::create(const VertexElement* decl, VertexBufferHandle vb, I
     _set(RImplementation.Resources->CreateGeom(decl, vb, ib));
 }
 
+//////////////////////////////////////////////////////////////////////////
+void resptrcode_cs::create(LPCSTR name)
+{
+    _set(RImplementation.Resources->_CreateCS(name));
+}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

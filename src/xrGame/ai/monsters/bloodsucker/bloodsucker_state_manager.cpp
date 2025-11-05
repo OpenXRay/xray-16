@@ -44,7 +44,7 @@ void CStateManagerBloodsucker::drag_object()
         return;
     }
 
-    IKinematics* const kinematics = smart_cast<IKinematics*>(ph_obj->Visual());
+    IKinematics* const kinematics = ph_obj->Visual()->dcast_PKinematics();
     if (!kinematics)
     {
         return;

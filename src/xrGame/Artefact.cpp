@@ -89,7 +89,7 @@ bool CArtefact::net_Spawn(CSE_Abstract* DC)
 
     StartLights();
     m_CarringBoneID = u16(-1);
-    IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
+    IKinematicsAnimated* K = Visual()->dcast_PKinematicsAnimated();
     if (K && K->ID_Cycle_Safe("idle"))
         K->PlayCycle("idle");
 
@@ -124,7 +124,7 @@ void CArtefact::OnH_A_Chield()
     }
     else
     {
-        IKinematics* K = smart_cast<IKinematics*>(H_Parent()->Visual());
+        IKinematics* K = H_Parent()->Visual()->dcast_PKinematics();
         if (K)
             m_CarringBoneID = K->LL_BoneID("bip01_head");
         else
@@ -343,7 +343,7 @@ void CArtefact::UpdateXForm()
         if (!E)
             return;
 
-        IKinematics* V = smart_cast<IKinematics*>(E->Visual());
+        IKinematics* V = E->Visual()->dcast_PKinematics();
         VERIFY(V);
         if (CAttachableItem::enabled())
             return;
@@ -505,7 +505,7 @@ void SArtefactDetectorsSupport::SetVisible(bool b)
         LPCSTR curr =
             pSettings->r_string(m_parent->cNameSect().c_str(), (b) ? "det_show_particles" : "det_hide_particles");
 
-        IKinematics* K = smart_cast<IKinematics*>(m_parent->Visual());
+        IKinematics* K = m_parent->Visual()->dcast_PKinematics();
         R_ASSERT2(K, m_parent->cNameSect().c_str());
         LPCSTR bone = pSettings->r_string(m_parent->cNameSect().c_str(), "particles_bone");
         u16 bone_id = K->LL_BoneID(bone);
@@ -526,7 +526,7 @@ void SArtefactDetectorsSupport::Blink()
 {
     LPCSTR curr = pSettings->r_string(m_parent->cNameSect().c_str(), "det_show_particles");
 
-    IKinematics* K = smart_cast<IKinematics*>(m_parent->Visual());
+    IKinematics* K = m_parent->Visual()->dcast_PKinematics();
     R_ASSERT2(K, m_parent->cNameSect().c_str());
     LPCSTR bone = pSettings->r_string(m_parent->cNameSect().c_str(), "particles_bone");
     u16 bone_id = K->LL_BoneID(bone);

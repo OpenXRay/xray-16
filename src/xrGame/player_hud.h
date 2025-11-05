@@ -127,8 +127,9 @@ class player_hud
 public:
     player_hud() = default;
     ~player_hud();
-    void load(const shared_str& model_name);
+    void load(const shared_str& model_name, bool forceReload = false);
     void load_default() { load("actor_hud_05"); };
+    void reload();
     void update(const Fmatrix& trans);
     void render_hud(u32 context_id, IRenderable* root);
     void render_item_ui() const;
@@ -140,6 +141,7 @@ public:
     void attach_item(CHudItem* item);
     bool allow_activation(CHudItem* item) const;
     attachable_hud_item* attached_item(u16 item_idx) { return m_attached_items[item_idx]; };
+    IKinematicsAnimated* hands_model() { return m_model; };
     void detach_item_idx(u16 idx);
     void detach_item(CHudItem* item);
     void detach_all_items()
@@ -153,6 +155,10 @@ public:
     u32 motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel) const;
     u32 motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md);
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd) const;
+    void detach_kinematics()
+    {
+        m_model = nullptr;
+    }
 
 private:
     void load_ancors();

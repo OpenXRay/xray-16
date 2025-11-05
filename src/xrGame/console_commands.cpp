@@ -41,6 +41,8 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrNetServer/NET_Messages.h"
 
+#include "xrEngine/Render.h"
+
 #include "CameraLook.h"
 #include "character_hit_animations_params.h"
 #include "inventory_upgrade_manager.h"
@@ -50,6 +52,10 @@
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
 #include "GametaskManager.h"
+
+
+#include <algorithm>
+#include <filesystem>
 
 #ifdef DEBUG
 #include "PHDebug.h"
@@ -1747,7 +1753,7 @@ public:
         }
 
         IRenderVisual* visual = GEnv.Render->model_Create(arguments);
-        IKinematics* kinematics = smart_cast<IKinematics*>(visual);
+        IKinematics* kinematics = visual->dcast_PKinematics();
         if (!kinematics)
         {
             GEnv.Render->model_Delete(visual);
@@ -1762,6 +1768,296 @@ public:
         GEnv.Render->model_Delete(visual);
     }
 };
+
+class CCC_ToggleOzzPaletteDump : public IConsole_Command
+{
+public:
+	CCC_ToggleOzzPaletteDump(LPCSTR N) : IConsole_Command(N)
+	{
+		bEmptyArgsHandled = true;
+	}
+
+	void Execute(LPCSTR arguments) override
+	{
+		if (!GEnv.Render)
+			return;
+
+		bool enable = !GEnv.Render->IsOzzPaletteDebugDumpEnabled();
+		if (arguments && *arguments)
+			enable = int(atoi(arguments)) != 0;
+
+		GEnv.Render->EnableOzzPaletteDebugDump(enable);
+		Msg("[ozz] palette dump %s", enable ? "enabled" : "disabled");
+	}
+
+	void GetStatus(TStatus& S) override
+	{
+		const bool enabled = GEnv.Render && GEnv.Render->IsOzzPaletteDebugDumpEnabled();
+		xr_sprintf(S, sizeof(S), "%d", enabled ? 1 : 0);
+	}
+
+	void Info(TInfo& I) override
+	{
+		xr_strcpy(I, "toggle continuous COzzKinematicsVisual palette logging (0/1)");
+	}
+};
+
+class CCC_RequestOzzPaletteDump : public IConsole_Command
+{
+public:
+	CCC_RequestOzzPaletteDump(LPCSTR N) : IConsole_Command(N)
+	{
+		bEmptyArgsHandled = true;
+	}
+
+	void Execute(LPCSTR /*arguments*/) override
+	{
+		if (GEnv.Render)
+			GEnv.Render->RequestOzzPaletteDebugDump();
+		Msg("[ozz] palette snapshot requested");
+	}
+
+	void Info(TInfo& I) override
+	{
+		xr_strcpy(I, "dump COzzKinematicsVisual palette on next update");
+	}
+};
+
+class CCC_SwitchDevOzzActor : public IConsole_Command
+{
+public:
+	CCC_SwitchDevOzzActor(LPCSTR N) : IConsole_Command(N)
+	{
+		bEmptyArgsHandled = true;
+	}
+
+	void Execute(LPCSTR /*arguments*/) override
+	{
+		CActor* actor = Actor();
+		if (!actor)
+		{
+			Msg("[ozz] no active actor to replace visual");
+			return;
+		}
+
+		psActorFlags.set(AF_USE_OZZ_VISUALS, TRUE);
+		shared_str dev_visual("actors\\dev_stalker.ozzx");
+		actor->cNameVisual_set(dev_visual);
+
+		if (GEnv.Render)
+			GEnv.Render->RequestOzzPaletteDebugDump();
+		Msg("[ozz] actor visual forced to %s", dev_visual.c_str());
+	}
+
+	void Info(TInfo& I) override
+	{
+		xr_strcpy(I, "swap player visual to dev_stalker.ozzx and request palette snapshot");
+	}
+};
+
+class CCC_SetDevOzzAnimation : public IConsole_Command
+{
+public:
+	CCC_SetDevOzzAnimation(LPCSTR N) : IConsole_Command(N) {}
+
+	void Execute(LPCSTR arguments) override
+	{
+		if (!arguments || !*arguments)
+		{
+			Msg("[ozz] animation path required");
+			return;
+		}
+
+		CActor* actor = Actor();
+		if (!actor)
+		{
+			Msg("[ozz] no active actor to load animation");
+			return;
+		}
+
+		IRenderVisual* visual = actor->Visual();
+		if (!visual)
+		{
+			Msg("[ozz] actor has no visual");
+			return;
+		}
+
+		if (!GEnv.Render)
+			return;
+
+		auto trim_input = [](std::string_view value) -> std::string
+		{
+			const auto begin = value.find_first_not_of(" \t");
+			if (begin == std::string_view::npos)
+				return {};
+			const auto end = value.find_last_not_of(" \t");
+			return std::string(value.substr(begin, end - begin + 1));
+		};
+
+		const std::string trimmed = trim_input(arguments);
+		if (trimmed.empty())
+		{
+			Msg("[ozz] animation identifier required");
+			return;
+		}
+
+		std::filesystem::path requested(trimmed);
+		std::string extension;
+		if (requested.has_extension())
+		{
+			extension = requested.extension().string();
+			std::transform(extension.begin(), extension.end(), extension.begin(),
+			    [](unsigned char ch)
+			    {
+			        return static_cast<char>(std::tolower(ch));
+			    });
+		}
+
+		if (extension == ".ozz")
+		{
+			std::filesystem::path resolved_path;
+			if (requested.is_absolute())
+			{
+				resolved_path = requested;
+			}
+			else
+			{
+				string_path buffer;
+				if (!FS.exist(buffer, "$game_anims$", trimmed.c_str()))
+				{
+					Msg("[ozz] animation '%s' not found under $game_anims$", trimmed.c_str());
+					return;
+				}
+				resolved_path = buffer;
+			}
+
+			if (GEnv.Render->LoadOzzAnimation(visual, resolved_path))
+				Msg("[ozz] loaded animation %s", resolved_path.string().c_str());
+			else
+				Msg("[ozz] failed to load animation %s", resolved_path.string().c_str());
+			return;
+		}
+
+		if (GEnv.Render->PlayOzzMotion(visual, xr_string(trimmed.c_str())))
+		{
+			Msg("[ozz] playing motion '%s'", trimmed.c_str());
+			return;
+		}
+
+		xr_vector<xr_string> available;
+		if (!GEnv.Render->GetOzzAvailableMotions(visual, available) || available.empty())
+		{
+			Msg("[ozz] no motions available");
+			return;
+		}
+
+		const size_t preview_count = std::min<size_t>(available.size(), 8);
+		Msg("[ozz] available motions (%zu of %zu):", preview_count, available.size());
+		std::sort(available.begin(), available.end(),
+		    [](const xr_string& lhs, const xr_string& rhs)
+		    {
+		        return xr_stricmp(lhs.c_str(), rhs.c_str()) < 0;
+		    });
+		for (size_t idx = 0; idx < preview_count; ++idx)
+			Msg("    %s", available[idx].c_str());
+		if (available.size() > preview_count)
+			Msg("    ...");
+	}
+
+	void Info(TInfo& I) override
+	{
+		xr_strcpy(I, "play a .ozz clip or motion name on the current Ozz actor");
+	}
+};
+
+class CCC_StopDevOzzAnimation : public IConsole_Command
+{
+public:
+	CCC_StopDevOzzAnimation(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+
+	void Execute(LPCSTR /*arguments*/) override
+	{
+		CActor* actor = Actor();
+		if (!actor)
+		{
+			Msg("[ozz] no active actor to stop animation");
+			return;
+		}
+
+		IRenderVisual* visual = actor->Visual();
+		if (!visual)
+		{
+			Msg("[ozz] actor has no visual");
+			return;
+		}
+
+		if (!GEnv.Render)
+			return;
+
+		GEnv.Render->StopOzzAnimation(visual);
+		Msg("[ozz] stopped Ozz animation");
+	}
+
+	void Info(TInfo& I) override
+	{
+		xr_strcpy(I, "stop the currently playing .ozz animation for the actor");
+	}
+};
+
+class CCC_ListDevOzzAnimations : public IConsole_Command
+{
+public:
+	CCC_ListDevOzzAnimations(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; }
+
+	void Execute(LPCSTR /*arguments*/) override
+	{
+		CActor* actor = Actor();
+		if (!actor)
+		{
+			Msg("[ozz] no active actor to inspect animations");
+			return;
+		}
+
+		IRenderVisual* visual = actor->Visual();
+		if (!visual)
+		{
+			Msg("[ozz] actor has no visual");
+			return;
+		}
+
+		if (!GEnv.Render)
+			return;
+
+		xr_vector<xr_string> names;
+		if (!GEnv.Render->GetOzzAvailableMotions(visual, names))
+		{
+			Msg("[ozz] actor visual is not an Ozz bundle");
+			return;
+		}
+
+		if (names.empty())
+		{
+			Msg("[ozz] no motions available");
+			return;
+		}
+
+		std::sort(names.begin(), names.end(),
+		    [](const xr_string& lhs, const xr_string& rhs)
+		    {
+		        return xr_stricmp(lhs.c_str(), rhs.c_str()) < 0;
+		    });
+
+		Msg("[ozz] available motions (%zu):", names.size());
+		for (const auto& name : names)
+			Msg("    %s", name.c_str());
+	}
+
+	void Info(TInfo& I) override
+	{
+		xr_strcpy(I, "list motions available on the current Ozz actor");
+	}
+};
+
 
 extern void show_animation_stats();
 
@@ -2298,6 +2594,8 @@ void CCC_RegisterCommands()
 /////////////////////////////////////////////HIT ANIMATION END////////////////////////////////////////////////////
 
     CMD1(CCC_DumpModelBones, "debug_dump_model_bones");
+    CMD1(CCC_RequestOzzPaletteDump, "debug_dump_ozz_palette");
+    CMD1(CCC_ToggleOzzPaletteDump, "debug_dump_ozz_palette_toggle");
 
     CMD1(CCC_DrawGameGraphAll, "ai_draw_game_graph_all");
     CMD1(CCC_DrawGameGraphCurrent, "ai_draw_game_graph_current_level");
@@ -2317,6 +2615,10 @@ void CCC_RegisterCommands()
     CMD1(CCC_TuneAttachableItem, "dbg_adjust_attachable_item");
 
     CMD1(CCC_ShowAnimationStats, "ai_show_animation_stats");
+    CMD1(CCC_SwitchDevOzzActor, "g_dev_ozz_actor");
+    CMD1(CCC_SetDevOzzAnimation, "g_dev_ozz_animation");
+    CMD1(CCC_StopDevOzzAnimation, "g_dev_ozz_animation_stop");
+    CMD1(CCC_ListDevOzzAnimations, "g_dev_ozz_animation_list");
 #endif // DEBUG
 
 #ifndef MASTER_GOLD
@@ -2354,6 +2656,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_loading_stages", &psActorFlags, AF_LOADING_STAGES);
     CMD3(CCC_Mask, "g_always_use_attitude_sensors", &psActorFlags, AF_ALWAYS_USE_ATTITUDE_SENSORS);
     CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);
+    CMD3(CCC_Mask, "g_use_ozz_visuals", &psActorFlags, AF_USE_OZZ_VISUALS);
 
     CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
     CMD4(CCC_Integer, "g_first_person_death", &g_first_person_death, 0, 1);

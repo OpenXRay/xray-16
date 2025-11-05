@@ -14,6 +14,9 @@
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11SamplerStateCache.h"
+#include "Layers/xrRenderDX11/dx11ComputeTest.h"
+#include "Layers/xrRenderDX11/dx11ComputeTest_Matrices.h"
+#include "Layers/xrRenderDX11/dx11ComputeTest_SIMD.h"
 #endif
 
 #if (RENDER == R_R3) || (RENDER == R_R4)
@@ -188,6 +191,7 @@ const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autod
 
 // Common
 extern int psSkeletonUpdate;
+extern int psSkeletonForceBindPose;
 extern float r__dtex_range;
 
 Flags32 ps_r__common_flags = { RFLAG_ACTOR_SHADOW }; // All renders
@@ -690,6 +694,92 @@ public:
     }
 };
 
+#if defined(USE_DX11)
+class CCC_TestComputeVector final : public IConsole_Command
+{
+public:
+    CCC_TestComputeVector(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
+
+    void Execute(pcstr args) override
+    {
+        int iteration_count = 10;  // Default: 10 cycles per thread
+        if (args && args[0])
+        {
+            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
+            {
+                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_vector <N>");
+                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
+                return;
+            }
+        }
+
+        Msg("=== [COMPUTE TEST VECTOR] Running with %d computation cycles per thread ===", iteration_count);
+        bool success = ComputeTest::RunTest(iteration_count);
+
+        if (success)
+            Msg("* [COMPUTE TEST VECTOR] PASSED");
+        else
+            Msg("! [COMPUTE TEST VECTOR] FAILED");
+    }
+};
+
+class CCC_TestComputeMatrices final : public IConsole_Command
+{
+public:
+    CCC_TestComputeMatrices(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
+
+    void Execute(pcstr args) override
+    {
+        int iteration_count = 10;  // Default: 10 cycles per thread
+        if (args && args[0])
+        {
+            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
+            {
+                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_matrices <N>");
+                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
+                return;
+            }
+        }
+
+        Msg("=== [COMPUTE TEST MATRICES] Running with %d computation cycles per thread ===", iteration_count);
+        bool success = ComputeTest_Matrices::RunTest(iteration_count);
+
+        if (success)
+            Msg("* [COMPUTE TEST MATRICES] PASSED");
+        else
+            Msg("! [COMPUTE TEST MATRICES] FAILED");
+    }
+};
+
+class CCC_TestComputeSIMD final : public IConsole_Command
+{
+public:
+    CCC_TestComputeSIMD(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = false; }
+
+    void Execute(pcstr args) override
+    {
+        int iteration_count = 10;  // Default: 10 cycles per thread
+        if (args && args[0])
+        {
+            if (sscanf(args, "%d", &iteration_count) != 1 || iteration_count < 1)
+            {
+                Msg("! [COMPUTE TEST] Invalid argument. Usage: test_compute_simd <N>");
+                Msg("! [COMPUTE TEST] N = number of computation cycles per thread (default: 10)");
+                return;
+            }
+        }
+
+        Msg("=== [COMPUTE TEST SIMD] Running with %d computation cycles per thread ===", iteration_count);
+        bool success = ComputeTest_SIMD::RunTest(iteration_count);
+
+        if (success)
+            Msg("* [COMPUTE TEST SIMD] PASSED");
+        else
+            Msg("! [COMPUTE TEST SIMD] FAILED");
+    }
+};
+#endif
+
 #if RENDER != R_R1
 class CCC_BuildSSA : public IConsole_Command
 {
@@ -855,6 +945,7 @@ void xrRender_initconsole()
     CMD3(CCC_ColorGrading_Preset, "_colorgrading_preset", &ps_ColorGradingPreset, qcolorgrading_preset_token);
 
     CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128);
+    CMD4(CCC_Integer, "rs_skeleton_force_bind_pose", &psSkeletonForceBindPose, 0, 1);
 #ifndef MASTER_GOLD
     CMD1(CCC_DumpResources, "dump_resources");
     CMD1(CCC_MotionsStat, "stat_motions");
@@ -1161,5 +1252,11 @@ void xrRender_initconsole()
     tw_min.set(0, 0, 0);
     tw_max.set(1, 1, 1);
     CMD4(CCC_Vector3, "r__color_grading", &ps_r2_img_cg, tw_min, tw_max);
+
+#if defined(USE_DX11) && !defined(MASTER_GOLD)
+    CMD1(CCC_TestComputeVector, "test_compute_vector");
+    CMD1(CCC_TestComputeMatrices, "test_compute_matrices");
+    CMD1(CCC_TestComputeSIMD, "test_compute_simd");
+#endif
 }
 } // namespace xray::render::RENDER_NAMESPACE

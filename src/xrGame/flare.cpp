@@ -180,7 +180,9 @@ void CFlare::FirePoint(Fvector& _fp)
     else
     {
         _fp.set(0, 0, 0);
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
+        IRenderVisual* visual = Visual();
+        IKinematics* K = visual ? visual->dcast_PKinematics() : nullptr;
+        VERIFY(K);
         Fmatrix& fire_mat = K->LL_GetTransform(K->LL_BoneID("flare_point"));
         fire_mat.transform_tiny(_fp);
         XFORM().transform_tiny(_fp);

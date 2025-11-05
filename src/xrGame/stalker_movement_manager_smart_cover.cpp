@@ -170,7 +170,10 @@ void stalker_movement_manager_smart_cover::modify_animation(CBlend* blend)
     if (!blend)
         return;
 
-    CMotionDef* motion_def = smart_cast<IKinematicsAnimated*>(object().Visual())->LL_GetMotionDef(blend->motionID);
+    IRenderVisual* visual = object().Visual();
+    IKinematicsAnimated* kinematics = visual ? visual->dcast_PKinematicsAnimated() : nullptr;
+    VERIFY(kinematics);
+    CMotionDef* motion_def = kinematics->LL_GetMotionDef(blend->motionID);
     VERIFY(motion_def);
     blend->speed = motion_def->Speed() * g_smart_cover_animation_speed_factor;
 }
@@ -289,8 +292,10 @@ void stalker_movement_manager_smart_cover::reach_enter_location(u32 const& time_
     VERIFY(m_enter_cover_id != "");
     VERIFY(m_enter_loophole_id != "");
 
-    m_enter_animation =
-        smart_cast<IKinematicsAnimated*>(object().Visual())->ID_Cycle(current_transition().animation().animation_id());
+    IRenderVisual* visual = object().Visual();
+    IKinematicsAnimated* kinematics = visual ? visual->dcast_PKinematicsAnimated() : nullptr;
+    VERIFY(kinematics);
+    m_enter_animation = kinematics->ID_Cycle(current_transition().animation().animation_id());
 
     CStalkerAnimationManager& animation = object().animation();
 

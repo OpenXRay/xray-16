@@ -182,21 +182,29 @@ void CUIFocusSystem::Update(const CUIWindow* root)
     // temp vector allows to prevent calling for IsFocusValuable twice.
     buffer_vector<const CUIWindow*> temp{ xr_alloca(sizeof(CUIWindow*) * m_valuable.size()), m_valuable.size() };
 
-    for (auto it = m_valuable.begin(); it != m_valuable.end(); ++it)
+    for (auto it = m_valuable.begin(); it != m_valuable.end();)
     {
         if ((*it)->IsFocusValuable(root, m_focus_locker))
+        {
+            ++it;
             continue;
+        }
+
         temp.push_back(*it);
-        it = m_valuable.erase(it);
 
         if (*it == m_current_focused)
             m_current_focused = nullptr;
+
+        it = m_valuable.erase(it);
     }
 
-    for (auto it = m_non_valuable.begin(); it != m_non_valuable.end(); ++it)
+    for (auto it = m_non_valuable.begin(); it != m_non_valuable.end();)
     {
         if (!(*it)->IsFocusValuable(root, m_focus_locker))
+        {
+            ++it;
             continue;
+        }
         m_valuable.emplace_back(*it);
         it = m_non_valuable.erase(it);
     }

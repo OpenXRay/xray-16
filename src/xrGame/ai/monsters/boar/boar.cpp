@@ -130,8 +130,8 @@ bool CAI_Boar::net_Spawn(CSE_Abstract* DC)
 
     if (!PPhysicsShell()) //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
     {
-        CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(
-            smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));
+        IKinematics* const kinematics = Visual()->dcast_PKinematics();
+        CBoneInstance& BI = kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_head"));
         BI.set_callback(bctCustom, BoneCallback, this);
     }
 

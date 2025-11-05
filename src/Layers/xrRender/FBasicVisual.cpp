@@ -8,6 +8,8 @@
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
 
+#include <algorithm>
+
 namespace xray::render::RENDER_NAMESPACE
 {
 //////////////////////////////////////////////////////////////////////
@@ -83,5 +85,56 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
 #ifdef DEBUG
     PCOPY(dbg_name);
 #endif
+}
+
+bool dxRender_Visual::AcquirePaletteDumpTicket()
+{
+    if (!GEnv.Render)
+        return false;
+
+    if (GEnv.Render->IsOzzPaletteDebugDumpEnabled())
+        return true;
+
+    return GEnv.Render->ConsumeOzzPaletteDebugDumpRequest();
+}
+
+void dxRender_Visual::DumpPaletteLog(const char* tag, const char* label, const xr_vector<Fmatrix>& palette) const
+{
+    if (!tag)
+        tag = "visual";
+
+    const u32 bone_count = static_cast<u32>(palette.size());
+
+    const char* visual_label = label;
+#ifdef DEBUG
+    if ((!visual_label || !visual_label[0]) && dbg_name.size())
+        visual_label = dbg_name.c_str();
+#endif
+    if (!visual_label || !visual_label[0])
+        visual_label = "<visual>";
+
+    Msg("[%s][palette] visual=%s bones=%u", tag, visual_label, bone_count);
+
+    const u32 print_count = std::min(bone_count, kPaletteDumpMaxBones);
+    for (u32 idx = 0; idx < print_count; ++idx)
+    {
+        const Fmatrix& bone = palette[idx];
+        Msg("[%s][palette] bone[%u] i(%.3f %.3f %.3f) j(%.3f %.3f %.3f) k(%.3f %.3f %.3f) c(%.3f %.3f %.3f)", tag, idx,
+            bone.i.x, bone.i.y, bone.i.z,
+            bone.j.x, bone.j.y, bone.j.z,
+            bone.k.x, bone.k.y, bone.k.z,
+            bone.c.x, bone.c.y, bone.c.z);
+    }
+
+    if (bone_count > print_count)
+        Msg("[%s][palette] ... (omitted %u bones)", tag, bone_count - print_count);
+}
+
+void dxRender_Visual::DebugDumpPalette(const xr_vector<Fmatrix>& palette) const
+{
+    if (!AcquirePaletteDumpTicket())
+        return;
+
+    DumpPaletteLog("visual", nullptr, palette);
 }
 } // namespace xray::render::RENDER_NAMESPACE

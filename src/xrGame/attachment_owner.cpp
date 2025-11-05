@@ -30,7 +30,12 @@ void CAttachmentOwner::reload(LPCSTR section)
         m_attach_item_sections[i] = _GetItem(attached_sections, i, current_item_section);
 }
 
-void CAttachmentOwner::reinit() { VERIFY(m_attached_objects.empty()); }
+void CAttachmentOwner::reinit()
+{
+    VERIFY(m_attached_objects.empty());
+    m_attachment_callback_active = false;
+    m_attachment_callback_suspended = false;
+}
 void CAttachmentOwner::net_Destroy()
 {
 #ifdef DEBUG
@@ -44,6 +49,8 @@ void CAttachmentOwner::net_Destroy()
     }
 #endif
     R_ASSERT(attached_objects().empty());
+    m_attachment_callback_active = false;
+    m_attachment_callback_suspended = false;
 }
 
 void CAttachmentOwner::renderable_Render(u32 context_id, IRenderable* root)
@@ -63,7 +70,11 @@ void AttachmentCallback(IKinematics* tpKinematics)
     CAttachmentOwner* attachment_owner = smart_cast<CAttachmentOwner*>(game_object);
     VERIFY(attachment_owner);
 
-    IKinematics* kinematics = smart_cast<IKinematics*>(game_object->Visual());
+    IKinematics* kinematics = game_object->Visual()->dcast_PKinematics();
+    if (!kinematics)
+        return;
+    if (!kinematics)
+        return;
 
     xr_vector<CAttachableItem*>::const_iterator I = attachment_owner->attached_objects().begin();
     xr_vector<CAttachableItem*>::const_iterator E = attachment_owner->attached_objects().end();
@@ -92,11 +103,18 @@ void CAttachmentOwner::attach(CInventoryItem* inventory_item)
         VERIFY(attachable_item);
         CGameObject* game_object = smart_cast<CGameObject*>(this);
         VERIFY(game_object && game_object->Visual());
-        if (m_attached_objects.empty())
+        const bool should_activate_callback =
+            m_attached_objects.empty() && !m_attachment_callback_active && !m_attachment_callback_suspended;
+        if (should_activate_callback)
+        {
             game_object->add_visual_callback(AttachmentCallback);
+            m_attachment_callback_active = true;
+        }
         attachable_item->set_bone_id(
-            smart_cast<IKinematics*>(game_object->Visual())->LL_BoneID(attachable_item->bone_name()));
+            game_object->Visual()->dcast_PKinematics()->LL_BoneID(attachable_item->bone_name()));
         m_attached_objects.push_back(smart_cast<CAttachableItem*>(inventory_item));
+        if (should_activate_callback)
+            m_attachment_callback_suspended = false;
 
         inventory_item->object().setVisible(true);
         attachable_item->afterAttach();
@@ -118,7 +136,12 @@ void CAttachmentOwner::detach(CInventoryItem* inventory_item)
             {
                 CGameObject* game_object = smart_cast<CGameObject*>(this);
                 VERIFY(game_object && game_object->Visual());
-                game_object->remove_visual_callback(AttachmentCallback);
+                if (m_attachment_callback_active)
+                {
+                    game_object->remove_visual_callback(AttachmentCallback);
+                    m_attachment_callback_active = false;
+                }
+                m_attachment_callback_suspended = false;
 
                 inventory_item->object().setVisible(false);
             }
@@ -163,8 +186,54 @@ void CAttachmentOwner::reattach_items()
         CAttachableItem* attachable_item = *I;
         VERIFY(attachable_item);
         attachable_item->set_bone_id(
-            smart_cast<IKinematics*>(game_object->Visual())->LL_BoneID(attachable_item->bone_name()));
+            game_object->Visual()->dcast_PKinematics()->LL_BoneID(attachable_item->bone_name()));
     }
+}
+
+void CAttachmentOwner::suspend_attachment_callbacks()
+{
+    if (m_attached_objects.empty())
+        return;
+
+    if (!m_attachment_callback_active)
+    {
+        m_attachment_callback_suspended = true;
+        return;
+    }
+
+    CGameObject* game_object = smart_cast<CGameObject*>(this);
+    if (!game_object)
+        return;
+
+    game_object->remove_visual_callback(AttachmentCallback);
+    m_attachment_callback_active = false;
+    m_attachment_callback_suspended = true;
+}
+
+void CAttachmentOwner::resume_attachment_callbacks()
+{
+    if (m_attached_objects.empty())
+    {
+        m_attachment_callback_suspended = false;
+        return;
+    }
+
+    CGameObject* game_object = smart_cast<CGameObject*>(this);
+    if (!game_object || !game_object->Visual())
+        return;
+
+    if (!m_attachment_callback_active)
+    {
+        game_object->add_visual_callback(AttachmentCallback);
+        m_attachment_callback_active = true;
+    }
+
+    if (m_attachment_callback_active && game_object->Visual()->dcast_PKinematics())
+    {
+        reattach_items();
+    }
+
+    m_attachment_callback_suspended = false;
 }
 
 CAttachableItem* CAttachmentOwner::attachedItem(CLASS_ID clsid) const

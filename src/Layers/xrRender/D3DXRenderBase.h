@@ -9,6 +9,8 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+extern int psSkeletonForceBindPose;
+
 // Common part of interface implementation for all D3D renderers
 class D3DXRenderBase : public IRender, public pureFrame
 {
@@ -18,6 +20,8 @@ public:
     RenderStatistics BasicStats;
 
 public:
+    bool LegacyBindPoseForced() const override { return psSkeletonForceBindPose != 0; }
+
     //	Gamma correction functions
     virtual void setGamma(float fGamma) override;
     virtual void setBrightness(float fGamma) override;

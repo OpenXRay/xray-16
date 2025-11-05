@@ -462,7 +462,7 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     if (bDebug && !is_special_hit_2_self)
     {
         Msg("%s hitted in %s with %f[%f]", m_object->Name(),
-            smart_cast<IKinematics*>(m_object->Visual())->LL_BoneName_dbg(pHDS->boneID), m_fHealthLost * 100.0f,
+            m_object->Visual()->dcast_PKinematics()->LL_BoneName_dbg(pHDS->boneID), m_fHealthLost * 100.0f,
             hit_power_org);
     }
     //раны добавляются только живому

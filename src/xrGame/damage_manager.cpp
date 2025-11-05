@@ -60,7 +60,7 @@ void CDamageManager::reload(LPCSTR section, LPCSTR line, CInifile const* ini)
 
 void CDamageManager::init_bones(LPCSTR section, CInifile const* ini)
 {
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_object->Visual());
+    IKinematics* kinematics = m_object->Visual()->dcast_PKinematics();
     VERIFY(kinematics);
     for (u16 i = 0; i < kinematics->LL_BoneCount(); i++)
     {
@@ -73,7 +73,7 @@ void CDamageManager::init_bones(LPCSTR section, CInifile const* ini)
 void CDamageManager::load_section(LPCSTR section, CInifile const* ini)
 {
     string32 buffer;
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_object->Visual());
+    IKinematics* kinematics = m_object->Visual()->dcast_PKinematics();
     CInifile::Sect& damages = ini->r_section(section);
     for (const auto & i : damages.Data)
     {
@@ -115,7 +115,7 @@ void CDamageManager::HitScale(const int element, float& hit_scale, float& wound_
         return;
     }
 
-    IKinematics* V = smart_cast<IKinematics*>(m_object->Visual());
+    IKinematics* V = m_object->Visual()->dcast_PKinematics();
     VERIFY(V);
     // get hit scale
     float scale = 0.f;

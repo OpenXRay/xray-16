@@ -150,8 +150,8 @@ bool CHelicopter::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeHelicopter* heli = smart_cast<CSE_ALifeHelicopter*>(abstract);
     VERIFY(heli);
 
-    R_ASSERT(Visual() && smart_cast<IKinematics*>(Visual()));
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    R_ASSERT(Visual() && Visual()->dcast_PKinematics());
+    IKinematics* K = Visual()->dcast_PKinematics();
     CInifile* pUserData = K->LL_UserData();
 
     m_rotate_x_bone = K->LL_BoneID(pUserData->r_string("helicopter_definition", "wpn_rotate_x_bone"));
@@ -183,9 +183,9 @@ bool CHelicopter::net_Spawn(CSE_Abstract* DC)
         }
     }
 
-    CBoneInstance& biX = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(m_rotate_x_bone);
+    CBoneInstance& biX = Visual()->dcast_PKinematics()->LL_GetBoneInstance(m_rotate_x_bone);
     biX.set_callback(bctCustom, BoneMGunCallbackX, this);
-    CBoneInstance& biY = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(m_rotate_y_bone);
+    CBoneInstance& biY = Visual()->dcast_PKinematics()->LL_GetBoneInstance(m_rotate_y_bone);
     biY.set_callback(bctCustom, BoneMGunCallbackY, this);
     CBoneData& bdX = K->LL_GetData(m_rotate_x_bone);
     VERIFY(bdX.IK_data.type == jtJoint);
@@ -379,7 +379,7 @@ void CHelicopter::UpdateCL()
     {
         PPhysicsShell()->InterpolateGlobalTransform(&XFORM());
 
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
+        IKinematics* K = Visual()->dcast_PKinematics();
         K->CalculateBones();
         // smoke
         UpdateHeliParticles();
@@ -422,7 +422,7 @@ void CHelicopter::UpdateCL()
     UpdateWeapons();
     UpdateHeliParticles();
 
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = Visual()->dcast_PKinematics();
     K->CalculateBones();
 }
 

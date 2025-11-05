@@ -12,7 +12,7 @@ void CControlRotationJump::reinit()
     inherited::reinit();
 
     m_time_next_rotation_jump = 0;
-    m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    m_skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
 }
 
 void CControlRotationJump::activate()

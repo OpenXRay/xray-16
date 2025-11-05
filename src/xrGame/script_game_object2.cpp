@@ -135,7 +135,7 @@ void CScriptGameObject::set_item(
 
 void CScriptGameObject::play_cycle(LPCSTR anim, bool mix_in)
 {
-    IKinematicsAnimated* sa = smart_cast<IKinematicsAnimated*>(object().Visual());
+    IKinematicsAnimated* sa = object().Visual()->dcast_PKinematicsAnimated();
     if (sa)
     {
         MotionID m = sa->ID_Cycle(anim);
@@ -165,8 +165,7 @@ void CScriptGameObject::Hit(CScriptHit* tpLuaHit)
     HS.weaponID = 0; //	P.w_u16			(0);
     HS.dir = tLuaHit.m_tDirection; //	P.w_dir			(tLuaHit.m_tDirection);
     HS.power = tLuaHit.m_fPower; //	P.w_float		(tLuaHit.m_fPower);
-    IKinematics* V = smart_cast<IKinematics*>(
-        object().Visual()); //	IKinematics		*V = smart_cast<IKinematics*>(object().Visual());
+    IKinematics* V = object().Visual()->dcast_PKinematics(); //	IKinematics		*V = object().Visual()->dcast_PKinematics();
     VERIFY(V); //	VERIFY			(V);
     if (xr_strlen(tLuaHit.m_caBoneName)) //	if (xr_strlen	(tLuaHit.m_caBoneName))
         HS.boneID = (V->LL_BoneID(tLuaHit.m_caBoneName)); //		P.w_s16		(V->LL_BoneID(tLuaHit.m_caBoneName));

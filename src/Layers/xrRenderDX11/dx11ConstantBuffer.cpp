@@ -48,6 +48,17 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
 
     m_uiMembersCRC = crc32(&m_MembersList[0], Desc.Variables * sizeof(m_MembersList[0]));
 
+    // Debug: Check for undersized constant buffers
+    if (Desc.Size % 16 != 0)
+    {
+        Msg("! [ConstantBuffer] WARNING: Buffer '%s' size=%d is not multiple of 16 (Variables=%d)",
+            Desc.Name, Desc.Size, Desc.Variables);
+        for (u32 i = 0; i < Desc.Variables; ++i)
+        {
+            Msg("  Variable[%d]: %s", i, m_MembersNames[i].c_str());
+        }
+    }
+
     R_CHK(BufferUtils::CreateConstantBuffer(&m_pBuffer, Desc.Size));
     VERIFY(m_pBuffer);
     m_pBufferData = xr_malloc(Desc.Size);

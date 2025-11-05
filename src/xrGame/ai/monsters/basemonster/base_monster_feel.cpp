@@ -112,9 +112,9 @@ void CBaseMonster::HitEntity(
         HS.weaponID = (ID()); //		l_P.w_u16	(ID());
         HS.dir = (hit_dir); //		l_P.w_dir	(hit_dir);
         HS.power = (fDamage); //		l_P.w_float	(fDamage);
-        HS.boneID = (smart_cast<IKinematics*>(pEntityNC->Visual())
-                         ->LL_GetBoneRoot()); //		l_P.w_s16
-                                              //(smart_cast<IKinematics*>(pEntityNC->Visual())->LL_GetBoneRoot());
+        HS.boneID = pEntityNC->Visual()->dcast_PKinematics()
+                        ->LL_GetBoneRoot(); //		l_P.w_s16
+                                            //(pEntityNC->Visual()->dcast_PKinematics()->LL_GetBoneRoot());
         HS.p_in_bone_space = (position_in_bone_space); //		l_P.w_vec3	(position_in_bone_space);
         HS.impulse = (impulse); //		l_P.w_float	(impulse);
         HS.hit_type = hit_type; //		l_P.w_u16	( u16(ALife::eHitTypeWound) );
@@ -332,9 +332,8 @@ void CBaseMonster::Hit_Wound(IGameObject* object, float value, const Fvector& di
     HS.weaponID = (ID()); //	P.w_u16		(ID());
     HS.dir = (dir); //	P.w_dir		(dir);
     HS.power = (value); //	P.w_float	(value);
-    HS.boneID =
-        (smart_cast<IKinematics*>(object->Visual())
-                ->LL_GetBoneRoot()); //	P.w_s16		(smart_cast<IKinematics*>(object->Visual())->LL_GetBoneRoot());
+    HS.boneID = object->Visual()->dcast_PKinematics()
+                    ->LL_GetBoneRoot(); //	P.w_s16		(object->Visual()->dcast_PKinematics()->LL_GetBoneRoot());
     HS.p_in_bone_space = (Fvector().set(0.f, 0.f, 0.f)); //	P.w_vec3	(Fvector().set(0.f,0.f,0.f));
     HS.impulse = (impulse); //	P.w_float	(impulse);
     HS.hit_type = (ALife::eHitTypeWound); //	P.w_u16		(u16(ALife::eHitTypeWound));

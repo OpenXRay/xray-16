@@ -88,7 +88,7 @@ CCF_Skeleton::CCF_Skeleton(IGameObject* O) : ICollisionForm(O, cftObject)
 {
     // getVisData
     IRenderVisual* pVisual = O->Visual();
-    VERIFY3(PKinematics(pVisual), "Can't create skeleton without Kinematics.", O->cNameVisual().c_str());
+    VERIFY3(pVisual && pVisual->dcast_PKinematics(), "Can't create skeleton without Kinematics.", O->cNameVisual().c_str());
     // bv_box.set (K->vis.box);
     bv_box.set(pVisual->getVisData().box);
     bv_box.getsphere(bv_sphere.P, bv_sphere.R);
@@ -99,7 +99,7 @@ void CCF_Skeleton::BuildState()
 {
     dwFrame = Device.dwFrame;
     IRenderVisual* pVisual = owner->Visual();
-    IKinematics* K = PKinematics(pVisual);
+    IKinematics* K = pVisual->dcast_PKinematics();
     K->CalculateBones();
     const Fmatrix& L2W = owner->XFORM();
 
@@ -224,7 +224,7 @@ bool CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
         BuildState();
     else
     {
-        IKinematics* K = PKinematics(owner->Visual());
+        IKinematics* K = owner->Visual()->dcast_PKinematics();
         if (K->LL_GetBonesVisible() != vis_mask)
         {
             // Model changed between ray-picks

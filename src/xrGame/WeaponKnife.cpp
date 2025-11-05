@@ -618,7 +618,7 @@ static bool intersect(Fcylinder const& bone, Fsphere const& query)
 void CWeaponKnife::GetVictimPos(CEntityAlive* victim, Fvector& pos_dest)
 {
     /*VERIFY(victim);
-    IKinematics*	tmp_kinem	= smart_cast<IKinematics*>(victim->Visual());
+    IKinematics*	tmp_kinem	= victim->Visual()->dcast_PKinematics();
     u16 hit_bone_id				= tmp_kinem->LL_BoneID(m_SplashHitBone);
     if (hit_bone_id != BI_NONE)
     {
@@ -664,7 +664,7 @@ u32 CWeaponKnife::get_entity_bones_count(CEntityAlive const* entity)
     VERIFY(entity);
     if (!entity)
         return 0;
-    IKinematics* tmp_kinem = smart_cast<IKinematics*>(entity->Visual());
+    IKinematics* tmp_kinem = entity->Visual()->dcast_PKinematics();
     if (!tmp_kinem)
         return 0;
 

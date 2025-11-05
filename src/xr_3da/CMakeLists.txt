@@ -29,9 +29,54 @@ target_link_libraries(xr_3da
     xrCore
     xrAPI
     xrEngine
-    xrRender_GL
     xrGame
+    xrRender_GL
 )
+
+if (WIN32)
+    target_link_libraries(xr_3da
+        PRIVATE
+        xrRenderPC_R4
+    )
+
+    set_target_properties(xr_3da PROPERTIES
+        WIN32_EXECUTABLE ON
+    )
+
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_xr_runtime_dir "${CMAKE_SOURCE_DIR}/sdk/binaries/x64")
+    else()
+        set(_xr_runtime_dir "${CMAKE_SOURCE_DIR}/sdk/binaries/x86")
+    endif()
+
+    add_custom_command(TARGET xr_3da POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${_xr_runtime_dir}"
+            "$<TARGET_FILE_DIR:xr_3da>"
+        COMMENT "Copying Windows runtime dependencies"
+        VERBATIM
+    )
+
+    if (TARGET ozz_animation)
+        add_custom_command(TARGET xr_3da POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:ozz_animation>"
+                "$<TARGET_FILE_DIR:xr_3da>/"
+            COMMENT "Copying ozz_animation runtime"
+            VERBATIM
+        )
+    endif()
+
+    if (TARGET ozz_base)
+        add_custom_command(TARGET xr_3da POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:ozz_base>"
+                "$<TARGET_FILE_DIR:xr_3da>/"
+            COMMENT "Copying ozz_base runtime"
+            VERBATIM
+        )
+    endif()
+endif()
 
 set_target_properties(xr_3da PROPERTIES
     PREFIX ""

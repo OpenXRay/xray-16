@@ -30,6 +30,7 @@
 #include <luabind/class_info.hpp>
 
 #include <stdarg.h>
+#include <limits>
 
 Flags32 g_LuaDebug;
 int g_LuaDumpDepth = 0;
@@ -140,8 +141,11 @@ void CScriptEngine::reinit()
         file_header = file_header_new;
     else
         file_header = file_header_old;
-    scriptBufferSize = 1024 * 1024;
+    constexpr size_t kInitialScriptBufferSize = 1024 * 1024 + 1;
+    scriptBufferSize = kInitialScriptBufferSize;
     scriptBuffer = xr_alloc<char>(scriptBufferSize);
+    if (scriptBuffer)
+        scriptBuffer[0] = '\0';
 
     if (m_profiler)
         m_profiler->OnReinit(m_virtual_machine);
@@ -313,6 +317,9 @@ bool CScriptEngine::parse_namespace(pcstr caNamespaceName, pstr b, size_t b_size
 bool CScriptEngine::load_buffer(
 lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameSpaceName)
 {
+    m_lastLoadedChunk = caScriptName ? caScriptName : "<unnamed chunk>";
+    m_lastLoadedNamespace = caNameSpaceName ? caNameSpaceName : GlobalNamespace;
+
     int l_iErrorCode;
     if (caNameSpaceName && xr_strcmp(GlobalNamespace, caNameSpaceName))
     {
@@ -323,14 +330,35 @@ lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameS
         xr_sprintf(insert, header, caNameSpaceName, a, b);
         const size_t str_len = xr_strlen(insert);
         const size_t total_size = str_len + tSize;
-        if (total_size >= scriptBufferSize)
+        if (total_size < str_len)
         {
-            scriptBufferSize = total_size;
-            scriptBuffer = (char*)xr_realloc(scriptBuffer, scriptBufferSize);
+            script_log(LuaMessageType::Error, "script namespace header overflow for %s", caScriptName);
+            on_error(L);
+            return false;
         }
-        xr_strcpy(scriptBuffer, total_size, insert);
-        CopyMemory(scriptBuffer + str_len, caBuffer, tSize);
-        l_iErrorCode = luaL_loadbuffer(L, scriptBuffer, tSize + str_len, caScriptName);
+        if (total_size > std::numeric_limits<size_t>::max() - 1)
+        {
+            script_log(LuaMessageType::Error, "script buffer size overflow for %s", caScriptName);
+            on_error(L);
+            return false;
+        }
+        const size_t required_size = total_size + 1; // extra byte for sentinel '\0'
+        if (required_size > scriptBufferSize)
+        {
+            scriptBufferSize = required_size;
+            scriptBuffer = static_cast<char*>(xr_realloc(scriptBuffer, scriptBufferSize));
+            if (!scriptBuffer)
+            {
+                script_log(LuaMessageType::Error, "out of memory while resizing script buffer for %s", caScriptName);
+                on_error(L);
+                return false;
+            }
+        }
+        xr_strcpy(scriptBuffer, scriptBufferSize, insert);
+        if (tSize > 0)
+            CopyMemory(scriptBuffer + str_len, caBuffer, tSize);
+        scriptBuffer[total_size] = '\0';
+        l_iErrorCode = luaL_loadbuffer(L, scriptBuffer, total_size, caScriptName);
     }
     else
         l_iErrorCode = luaL_loadbuffer(L, caBuffer, tSize, caScriptName);
@@ -370,6 +398,7 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
     if (debugger())
         errFuncId = debugger()->PrepareLua(lua());
 #endif
+    m_lastExecutingChunk = caScriptName ? caScriptName : "<unnamed chunk>";
     if (0) //.
     {
         for (int i = 0; lua_type(lua(), -i - 1); i++)
@@ -572,18 +601,28 @@ void CScriptEngine::print_error(lua_State* L, int iErrorCode)
     {
     case LUA_ERRRUN:
         scriptEngine->script_log(LuaMessageType::Error, "SCRIPT RUNTIME ERROR");
+        scriptEngine->print_stack(L);
+        LogMemoryUsage(L, "runtime error");
         break;
     case LUA_ERRMEM:
         scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (memory allocation)");
+        scriptEngine->print_stack(L);
+        LogMemoryUsage(L, "memory error");
         break;
     case LUA_ERRERR:
         scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (while running the error handler function)");
+        scriptEngine->print_stack(L);
+        LogMemoryUsage(L, "error handler failure");
         break;
     case LUA_ERRFILE:
         scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (while running file)");
+        scriptEngine->print_stack(L);
+        LogMemoryUsage(L, "file error");
         break;
     case LUA_ERRSYNTAX:
         scriptEngine->script_log(LuaMessageType::Error, "SCRIPT SYNTAX ERROR");
+        scriptEngine->print_stack(L);
+        LogMemoryUsage(L, "syntax error");
         break;
     case LUA_YIELD:
         scriptEngine->script_log(LuaMessageType::Info, "Thread is yielded");
@@ -600,6 +639,24 @@ void CScriptEngine::flush_log()
     m_output.save_to(log_file_name);
 }
 
+void CScriptEngine::LogMemoryUsage(lua_State* state, pcstr reason)
+{
+    if (!state)
+        return;
+
+    CScriptEngine* engine = GetInstance(state);
+    if (!engine)
+        return;
+
+    const int kb = lua_gc(state, LUA_GCCOUNT, 0);
+    const int bytes = lua_gc(state, LUA_GCCOUNTB, 0);
+    const int total_bytes = kb * 1024 + bytes;
+
+    const pcstr tag = reason ? reason : "unknown";
+    Msg("[LUA][memory] %s : %d KB + %d B (total %d bytes)", tag, kb, bytes, total_bytes);
+    engine->script_log(LuaMessageType::Info, "[memory] %s : %d KB + %d B (total %d bytes)", tag, kb, bytes, total_bytes);
+}
+
 CScriptEngine::CScriptEngine(bool is_editor, bool is_with_profiler)
 {
     luabind::allocator = &luabind_allocator;
@@ -611,6 +668,9 @@ CScriptEngine::CScriptEngine(bool is_editor, bool is_with_profiler)
     m_reload_modules = false;
     m_last_no_file_length = 0;
     *m_last_no_file = 0;
+    m_lastLoadedChunk.clear();
+    m_lastLoadedNamespace = GlobalNamespace;
+    m_lastExecutingChunk.clear();
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
     static_assert(false, "Do not define USE_LUA_STUDIO macro without USE_DEBUGGER macro");
@@ -1145,4 +1205,38 @@ void CScriptEngine::DestroyScriptThread(const CScriptThread* thread)
 bool CScriptEngine::is_editor()
 {
     return m_is_editor;
+}
+
+void CScriptEngine::OnLuaAssertion(lua_State* state, pcstr file, int line, pcstr func, pcstr message)
+{
+    const pcstr loadedChunk = m_lastLoadedChunk.empty() ? "<none>" : m_lastLoadedChunk.c_str();
+    const pcstr namespaceName = m_lastLoadedNamespace.empty() ? GlobalNamespace : m_lastLoadedNamespace.c_str();
+    const pcstr executingChunk = m_lastExecutingChunk.empty() ? loadedChunk : m_lastExecutingChunk.c_str();
+
+    Msg("! [LuaJIT] ASSERT %s:%d (%s): %s", file ? file : "<unknown>", line,
+        func ? func : "<unknown>", (message && message[0]) ? message : "<no message>");
+    Msg("! [LuaJIT] last loaded chunk: %s (namespace: %s)", loadedChunk, namespaceName);
+    Msg("! [LuaJIT] last executing chunk: %s", executingChunk);
+
+#ifdef DEBUG
+    const bool reenter = logReenterability;
+    logReenterability = true;
+    if (state)
+        print_stack(state);
+    logReenterability = reenter;
+#else
+    (void)state;
+#endif
+}
+
+extern "C" XRSCRIPTENGINE_API void xr_LuaAssertionHandler(lua_State* state, const char* file, int line, const char* func, const char* message)
+{
+    if (!state)
+        return;
+
+    CScriptEngine* engine = CScriptEngine::GetInstance(state);
+    if (!engine)
+        return;
+
+    engine->OnLuaAssertion(state, file, line, func, message);
 }

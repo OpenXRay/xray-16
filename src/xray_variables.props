@@ -4,6 +4,7 @@
     <xrPlatform Condition="'$(Platform)'=='Win32'">x86</xrPlatform>
     <xrPlatform Condition="'$(Platform)'=='x86'">x86</xrPlatform>
     <xrPlatform Condition="'$(Platform)'=='x64'">x64</xrPlatform>
+    <xrPlatform Condition="'$(Platform)'=='AMD64'">AMD64</xrPlatform>
     <xrPlatform Condition="'$(xrPlatform)'==''">$(Platform)</xrPlatform>
 
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>

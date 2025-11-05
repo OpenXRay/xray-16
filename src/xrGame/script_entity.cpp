@@ -344,7 +344,7 @@ bool CScriptEntity::bfAssignAnimation(CScriptEntityAction* tpEntityAction)
     if (!xr_strlen(GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay))
         return (true);
 
-    IKinematicsAnimated& tVisualObject = *(smart_cast<IKinematicsAnimated*>(object().Visual()));
+    IKinematicsAnimated& tVisualObject = *(object().Visual()->dcast_PKinematicsAnimated());
     m_tpNextAnimation = tVisualObject.ID_Cycle_Safe(*GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay);
     m_use_animation_movement_controller = GetCurrentAction()->m_tAnimationAction.m_use_animation_movement_controller;
     return (true);
@@ -360,8 +360,9 @@ const Fmatrix CScriptEntity::GetUpdatedMatrix(
 
     if (xr_strlen(caBoneName))
     {
-        CBoneInstance& l_tBoneInstance = smart_cast<IKinematics*>(
-            object().Visual())->LL_GetBoneInstance(smart_cast<IKinematics*>(object().Visual())->LL_BoneID(caBoneName));
+        CBoneInstance& l_tBoneInstance =
+            object().Visual()->dcast_PKinematics()->LL_GetBoneInstance(
+                object().Visual()->dcast_PKinematics()->LL_BoneID(caBoneName));
         l_tMatrix.mulA_43(l_tBoneInstance.mTransform);
         l_tMatrix.mulA_43(object().XFORM());
     }
@@ -626,7 +627,7 @@ bool CScriptEntity::bfScriptAnimation()
 //%s",Device.dwTimeGlobal,*GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay, *object().cName());
 #endif
         m_tpScriptAnimation = m_tpNextAnimation;
-        IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(object().Visual());
+        IKinematicsAnimated* skeleton_animated = object().Visual()->dcast_PKinematicsAnimated();
         LPCSTR animation_id = *GetCurrentAction()->m_tAnimationAction.m_caAnimationToPlay;
         MotionID animation = skeleton_animated->ID_Cycle(animation_id);
         CBlend* result = 0;

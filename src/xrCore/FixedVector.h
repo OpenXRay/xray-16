@@ -33,7 +33,7 @@ public:
     IC void resize(size_t c)
     {
         VERIFY(c <= dim);
-        count = c;
+        count = static_cast<u32>(c);
     }
 
     IC void reserve(size_t c) {}
@@ -102,7 +102,7 @@ public:
     {
         VERIFY(c > 0 && c <= dim);
         CopyMemory(array, p, c * sizeof(value_type));
-        count = c;
+        count = static_cast<u32>(c);
     }
     IC bool equal(const svector<value_type, dim>& base) const
     {

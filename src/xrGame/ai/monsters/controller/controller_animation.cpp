@@ -101,7 +101,7 @@ void CControllerAnimation::update_frame()
 
 void CControllerAnimation::load()
 {
-    IKinematicsAnimated* skeleton = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    IKinematicsAnimated* skeleton = m_object->Visual()->dcast_PKinematicsAnimated();
 
     m_legs[eLegsStand] = skeleton->ID_Cycle_Safe("new_idle_0");
     m_legs[eLegsSteal] = skeleton->ID_Cycle_Safe("new_cr_idle_0");

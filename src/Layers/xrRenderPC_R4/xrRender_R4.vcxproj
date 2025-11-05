@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)ozz-animation\include;ozz-animation\samples;$(xrExternals)ozz-animation\samples;$(xrExternals)imgui;$(xrExternals)entt\single_include;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -71,6 +71,7 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
+    <ClInclude Include="..\..\xrAnimation\LegacyOmfConverter.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidData.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.h" />
@@ -79,6 +80,8 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidObstacles.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.h" />
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_Blur.h" />
     <ClInclude Include="..\xrRender\blenders\blender_dof.h" />
     <ClInclude Include="..\xrRender\blenders\blender_gasmask_drops.h" />
@@ -114,13 +117,16 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Screen_SET.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_tree.h" />
     <ClInclude Include="..\xrRender\BufferUtils.h" />
+    <ClInclude Include="..\xrRender\OzzKinematicsVisual.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
     <ClInclude Include="..\xrRender\Debug\dxPixEventWrapper.h" />
     <ClInclude Include="..\xrRender\DetailFormat.h" />
     <ClInclude Include="..\xrRender\DetailManager.h" />
+    <ClInclude Include="..\xrRender\DetailManager_Compute.h" />
     <ClInclude Include="..\xrRender\DetailModel.h" />
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h" />
     <ClInclude Include="..\xrRender\du_box.h" />
     <ClInclude Include="..\xrRender\du_cone.h" />
     <ClInclude Include="..\xrRender\du_cylinder.h" />
@@ -235,6 +241,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\xrAnimation\LegacyOmfConverter.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidBlenders.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidData.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidEmitters.cpp" />
@@ -244,6 +251,8 @@
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidRenderer.cpp" />
     <ClCompile Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.cpp" />
     <ClCompile Include="..\xrRenderDX11\Blender_Recorder_R3.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_Matrices.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Blur.cpp" />
@@ -259,6 +268,8 @@
     <ClCompile Include="..\xrRender\blenders\dx11RainBlender.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11BufferUtils.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11ConstantBuffer.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp" />
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_Compute.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11HW.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11HWCaps.cpp" />
@@ -375,6 +386,10 @@
     <ClCompile Include="..\xrRender\SkeletonXSkinXW_SSE.cpp" />
     <ClCompile Include="..\xrRender\stats_manager.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
+    <ClCompile Include="..\..\..\Externals\ozz-animation\samples\framework\mesh.cc">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\OzzKinematicsVisual.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp" />
     <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp" />
@@ -453,6 +468,9 @@
     <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrAnimation\xrAnimation.vcxproj">
+      <Project>{A5B2C3D4-E5F6-7890-ABCD-EF1234567890}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrParticles\xrParticles.vcxproj">
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df97}</Project>
     </ProjectReference>
@@ -477,8 +495,14 @@
     <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\ozz-animation.vcxproj">
+      <Project>{E4D8B27C-0A5E-4A7F-8B8F-D3A9C2B1E0F3}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
       <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)../Externals/ozz-animation.vcxproj">
+      <Project>{E4D8B27C-0A5E-4A7F-8B8F-D3A9C2B1E0F3}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,18 @@
+; File system configuration for tests
+
+[path]
+$fs_root$       = false | false | $fs_root$
+$game_data$     = false | true  | $fs_root$ | gamedata\
+$game_meshes$   = false | true  | $game_data$ | meshes\
+$game_textures$ = false | true  | $game_data$ | textures\
+$logs$          = false | false | $fs_root$ | logs\
+$screenshots$   = false | false | $fs_root$ | screenshots\
+$downloads$     = false | false | $fs_root$ | downloads\
+$temp$          = false | false | $fs_root$ | temp\
+
+[file_systems]
+; Add paths that should be mounted
+$fs_root$ = ./
+$game_data$ = ./gamedata/
+$logs$ = ./logs/
+$temp$ = ./temp/

@@ -594,7 +594,7 @@ BOOL CCustomMonster::feel_visible_isRelevant(IGameObject* O)
 void CCustomMonster::eye_pp_s0()
 {
     // Eye matrix
-    IKinematics* V = smart_cast<IKinematics*>(Visual());
+    IKinematics* V = Visual()->dcast_PKinematics();
     V->CalculateBones();
     Fmatrix& mEye = V->LL_GetTransform(u16(eye_bone));
     Fmatrix X;
@@ -758,7 +758,7 @@ bool CCustomMonster::net_Spawn(CSE_Abstract* DC)
     }
 
     // Eyes
-    eye_bone = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(cNameSect(), "bone_head"));
+    eye_bone = Visual()->dcast_PKinematics()->LL_BoneID(pSettings->r_string(cNameSect(), "bone_head"));
 
     // weapons
     if (Local())
@@ -1174,7 +1174,7 @@ void CCustomMonster::OnRender()
             character_physics_support()->movement()->dbg_Draw();
 
     if (bDebug)
-        smart_cast<IKinematics*>(Visual())->DebugRender(XFORM());
+        Visual()->dcast_PKinematics()->DebugRender(XFORM());
 
 #if 0
 	DBG().get_text_tree().clear			();

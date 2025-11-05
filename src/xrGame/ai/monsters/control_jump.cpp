@@ -416,8 +416,9 @@ void CControlJump::stop() { m_man->notify(ControlCom::eventJumpEnd, 0); }
 // Get target point in world space
 Fvector CControlJump::get_target(IGameObject* obj)
 {
-    u16 bone_id = smart_cast<IKinematics*>(obj->Visual())->LL_GetBoneRoot();
-    CBoneInstance& bone = smart_cast<IKinematics*>(obj->Visual())->LL_GetBoneInstance(bone_id);
+    IKinematics* kinematics = obj->Visual()->dcast_PKinematics();
+    u16 bone_id = kinematics->LL_GetBoneRoot();
+    CBoneInstance& bone = kinematics->LL_GetBoneInstance(bone_id);
 
     Fmatrix global_transform;
     global_transform.mul(obj->XFORM(), bone.mTransform);

@@ -103,10 +103,10 @@ void CZombie::BoneCallback(CBoneInstance* B)
 void CZombie::vfAssignBones()
 {
     // Установка callback на кости
-    bone_spine = &smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(
-        smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine"));
-    bone_head = &smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(
-        smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));
+    bone_spine = &Visual()->dcast_PKinematics()->LL_GetBoneInstance(
+        Visual()->dcast_PKinematics()->LL_BoneID("bip01_spine"));
+    bone_head = &Visual()->dcast_PKinematics()->LL_GetBoneInstance(
+        Visual()->dcast_PKinematics()->LL_BoneID("bip01_head"));
     // if(!PPhysicsShell())//нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
     //{
     // bone_spine->set_callback(BoneCallback,this);

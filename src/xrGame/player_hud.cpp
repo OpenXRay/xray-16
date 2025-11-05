@@ -68,30 +68,36 @@ void player_hud_motion_container::load(IKinematicsAnimated* model, const shared_
 
                 _GetItem(anm.c_str(), 2, str_item);
                 pm.m_anim_speed = xr_strlen(str_item) > 0 ? atof(str_item) : 1.f;
-            }
-
-            // and load all motions for it
-            for (u32 i = 0; i <= 8; ++i)
-            {
-                string512 buff;
-                if (i == 0)
-                    xr_strcpy(buff, pm.m_base_name.c_str());
-                else
-                    xr_sprintf(buff, "%s%d", pm.m_base_name.c_str(), i);
-
-                MotionID motion_ID = model->ID_Cycle_Safe(buff);
-                if (motion_ID.valid())
-                {
-                    pm.m_animations.emplace_back(motion_descr{ std::move(motion_ID), buff });
-#ifdef DEBUG
-//					Msg(" alias=[%s] base=[%s] name=[%s]",pm.m_alias_name.c_str(), pm.m_base_name.c_str(), buff);
-#endif // #ifdef DEBUG
-                }
-            }
-            R_ASSERT2(!pm.m_animations.empty(), make_string("motion not found [%s]", pm.m_base_name.c_str()).c_str());
-
-            m_anims.emplace(name, std::move(pm));
         }
+
+        // and load all motions for it
+        for (u32 i = 0; i <= 8; ++i)
+        {
+            string512 buff;
+            if (i == 0)
+                xr_strcpy(buff, pm.m_base_name.c_str());
+            else
+                xr_sprintf(buff, "%s%d", pm.m_base_name.c_str(), i);
+
+            MotionID motion_ID = model->ID_Cycle_Safe(buff);
+            if (motion_ID.valid())
+            {
+                pm.m_animations.emplace_back(motion_descr{ std::move(motion_ID), buff });
+#ifdef DEBUG
+                Msg("base=[%s] name=[%s]", pm.m_base_name.c_str(), buff);
+#endif // #ifdef DEBUG
+            }
+#ifdef DEBUG
+            else
+            {
+                Msg("[player_hud] missing motion '%s' in section '%s'", buff, sect.c_str());
+            }
+#endif
+        }
+        R_ASSERT2(!pm.m_animations.empty(), make_string("motion not found [%s]", pm.m_base_name.c_str()).c_str());
+
+        m_anims.emplace(name, std::move(pm));
+    }
     }
 }
 
@@ -112,6 +118,9 @@ Fvector& attachable_hud_item::hands_offset_rot()
 
 void attachable_hud_item::set_bone_visible(const shared_str& bone_name, BOOL bVisibility, BOOL bSilent)
 {
+    if (!m_model)
+        return;
+
     const u16 bone_id = m_model->LL_BoneID(bone_name);
     if (bone_id == BI_NONE)
     {
@@ -141,6 +150,9 @@ void attachable_hud_item::update(bool bForce)
 
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
     m_upd_firedeps_frame = Device.dwFrame;
+
+    if (!m_model)
+        return;
 
     if (IKinematicsAnimated* ka = m_model->dcast_PKinematicsAnimated())
     {
@@ -203,6 +215,9 @@ bool attachable_hud_item::need_renderable() const { return m_parent_hud_item->ne
 
 void attachable_hud_item::render(u32 context_id, IRenderable* root)
 {
+    if (!m_model)
+        return;
+
     GEnv.Render->add_Visual(context_id, root, m_model->dcast_RenderVisual(), m_item_transform);
     m_parent_hud_item->render_hud_mode();
 }
@@ -230,7 +245,7 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
 
     shared_str bone_name;
     m_prop_flags.set(e_fire_point, pSettings->line_exist(sect_name, "fire_bone"));
-    if (m_prop_flags.test(e_fire_point))
+    if (m_prop_flags.test(e_fire_point) && K)
     {
         bone_name = pSettings->r_string(sect_name, "fire_bone");
         m_fire_bone = K->LL_BoneID(bone_name);
@@ -240,7 +255,7 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         m_fire_point_offset = {};
 
     m_prop_flags.set(e_fire_point2, pSettings->line_exist(sect_name, "fire_bone2"));
-    if (m_prop_flags.test(e_fire_point2))
+    if (m_prop_flags.test(e_fire_point2) && K)
     {
         bone_name = pSettings->r_string(sect_name, "fire_bone2");
         m_fire_bone2 = K->LL_BoneID(bone_name);
@@ -250,7 +265,7 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         m_fire_point2_offset = {};
 
     m_prop_flags.set(e_shell_point, pSettings->line_exist(sect_name, "shell_bone"));
-    if (m_prop_flags.test(e_shell_point))
+    if (m_prop_flags.test(e_shell_point) && K)
     {
         bone_name = pSettings->r_string(sect_name, "shell_bone");
         m_shell_bone = K->LL_BoneID(bone_name);
@@ -395,7 +410,7 @@ attachable_hud_item::attachable_hud_item(player_hud* parent, const shared_str& s
     }
     R_ASSERT3(!m_visual_name.empty(), "Missing 'item_visual' from weapon hud section.", m_sect_name.c_str());
     GEnv.Render->hud_loading = true;
-    m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(m_visual_name.c_str()));
+    m_model = smart_cast<IKinematics*>(GEnv.Render->model_Create(m_visual_name.c_str())->dcast_PKinematics());
     GEnv.Render->hud_loading = false;
     m_attach_place_idx = pSettings->read_if_exists<u16>(m_sect_name, "attach_place_idx", 0);
 
@@ -431,10 +446,13 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
 
     const float speed = CalcMotionSpeed(anm->m_base_name, anm->m_anim_speed);
 
-    rnd_idx = (u8)Random.randI(anm->m_animations.size());
+    rnd_idx = (u8)Random.randI(_max(anm->m_animations.size(), 1));
     const motion_descr& M = anm->m_animations[rnd_idx];
 
-    IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(m_model);
+    if (!m_model)
+        return 0;
+
+    IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(m_model->dcast_PKinematicsAnimated());
     const u32 ret = m_parent->anim_play(m_attach_place_idx, M.mid, bMixIn, md, speed, m_monolithic ? ka : nullptr);
 
     if (ka)
@@ -517,9 +535,14 @@ player_hud::~player_hud()
     m_pool.clear();
 }
 
-void player_hud::load(const shared_str& player_hud_sect)
+void player_hud::reload()
 {
-    if (player_hud_sect == m_sect_name)
+    load(m_sect_name, true);
+}
+
+void player_hud::load(const shared_str& player_hud_sect, bool forceReload)
+{
+    if (player_hud_sect == m_sect_name && !forceReload)
         return;
 
     m_sect_name = player_hud_sect;
@@ -547,7 +570,7 @@ void player_hud::load(const shared_str& player_hud_sect)
 
     const shared_str& model_name = pSettings->r_string(m_sect_name, "visual");
     GEnv.Render->hud_loading = true;
-    m_model = smart_cast<IKinematicsAnimated*>(GEnv.Render->model_Create(model_name.c_str()));
+    m_model = smart_cast<IKinematicsAnimated*>(GEnv.Render->model_Create(model_name.c_str())->dcast_PKinematicsAnimated());
     GEnv.Render->hud_loading = false;
     load_ancors();
     // Msg("hands visual changed to [%s] [%s] [%s]", model_name.c_str(), b_reload ? "R" : "", m_attached_items[0] ? "Y" : "");
@@ -637,15 +660,28 @@ u32 player_hud::motion_length(const shared_str& anim_name, const shared_str& hud
         return 100; // ms TEMPORARY
     R_ASSERT2(pm,
         make_string("hudItem model [%s] has no motion with alias [%s]", hud_name.c_str(), anim_name.c_str()).c_str());
-    IKinematicsAnimated* model = pi->m_monolithic ? smart_cast<IKinematicsAnimated*>(pi->m_model) : nullptr;
+    IKinematicsAnimated* model = pi->m_monolithic ? smart_cast<IKinematicsAnimated*>(pi->m_model->dcast_PKinematicsAnimated()) : nullptr;
+
+    if (!model) // weird case for OzzKinematicsAnimated- yohji TODO: fix
+        model = m_model;
+
+    if (!model)
+        return 0;
+
     return motion_length(pm->m_animations[0].mid, md, speed, model);
 }
 
 u32 player_hud::motion_length(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel) const
 {
     IKinematicsAnimated* model = itemModel ? itemModel : m_model;
+    if (!model || !M.valid())
+        return 0;
+
     md = model->LL_GetMotionDef(M);
-    VERIFY(md);
+
+    if (!md)
+        return 0;
+
     if (md->flags & esmStopAtEnd)
     {
         CMotion* motion = model->LL_GetRootMotion(M);
@@ -938,7 +974,7 @@ void player_hud::detach_item(CHudItem* item)
 void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result) const
 {
     const attachable_hud_item* item = m_attached_items[attach_slot_idx];
-    if (item && !item->m_monolithic)
+    if (item && !item->m_monolithic && m_model)
     {
         IKinematics* k = smart_cast<IKinematics*>(m_model);
         const Fmatrix ancor_m = k->LL_GetTransform(m_ancors[attach_slot_idx]);

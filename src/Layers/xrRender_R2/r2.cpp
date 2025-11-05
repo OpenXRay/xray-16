@@ -10,10 +10,13 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/OzzKinematicsVisual.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidManager.h"
 #endif
+
+#include <filesystem>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -626,6 +629,83 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
+void CRender::EnableOzzPaletteDebugDump(bool enabled)
+{
+    m_ozzDumpContinuous.store(enabled, std::memory_order_release);
+    if (!enabled)
+        m_ozzDumpOnce.store(false, std::memory_order_release);
+}
+
+bool CRender::IsOzzPaletteDebugDumpEnabled() const
+{
+    return m_ozzDumpContinuous.load(std::memory_order_acquire);
+}
+
+void CRender::RequestOzzPaletteDebugDump()
+{
+    m_ozzDumpOnce.store(true, std::memory_order_release);
+}
+
+bool CRender::LoadOzzAnimation(IRenderVisual* visual, const std::filesystem::path& path)
+{
+    if (!visual)
+        return false;
+
+    const u8 type = visual->getType();
+    if (type != MT_OZZ_STATIC && type != MT_OZZ_ANIMATED)
+        return false;
+
+    auto* ozz_visual = static_cast<COzzKinematicsVisual*>(visual);
+    return ozz_visual->LoadAnimationFromFile(path);
+}
+
+void CRender::StopOzzAnimation(IRenderVisual* visual)
+{
+    if (!visual)
+        return;
+
+    const u8 type = visual->getType();
+    if (type != MT_OZZ_STATIC && type != MT_OZZ_ANIMATED)
+        return;
+
+    auto* ozz_visual = static_cast<COzzKinematicsVisual*>(visual);
+    ozz_visual->StopAnimation();
+}
+
+bool CRender::PlayOzzMotion(IRenderVisual* visual, const xr_string& motion_name)
+{
+    if (!visual)
+        return false;
+
+    const u8 type = visual->getType();
+    if (type != MT_OZZ_STATIC && type != MT_OZZ_ANIMATED)
+        return false;
+
+    auto* ozz_visual = static_cast<COzzKinematicsVisual*>(visual);
+    return ozz_visual->PlayMotion(motion_name);
+}
+
+bool CRender::GetOzzAvailableMotions(IRenderVisual* visual, xr_vector<xr_string>& out_names)
+{
+    out_names.clear();
+    if (!visual)
+        return false;
+
+    const u8 type = visual->getType();
+    if (type != MT_OZZ_STATIC && type != MT_OZZ_ANIMATED)
+        return false;
+
+    auto* ozz_visual = static_cast<COzzKinematicsVisual*>(visual);
+    out_names = ozz_visual->GetAvailableMotions();
+    return true;
+}
+
+bool CRender::ConsumeOzzPaletteDebugDumpRequest()
+{
+    bool expected = true;
+    return m_ozzDumpOnce.compare_exchange_strong(expected, false, std::memory_order_acq_rel);
+}
+
 void CRender::OnCameraUpdated()
 {
     ZoneScoped;
@@ -718,6 +798,7 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 }
 void CRender::models_Prefetch() { Models->Prefetch(); }
 void CRender::models_Clear(bool b_complete) { Models->ClearPool(b_complete); }
+void CRender::models_Rebuild() { Models->Rebuild(); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));

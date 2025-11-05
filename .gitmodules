@@ -28,3 +28,12 @@
 [submodule "Externals/sse2rvv"]
 	path = Externals/sse2rvv
 	url = https://github.com/pattonkan/sse2rvv.git
+[submodule "Externals/ozz-animation"]
+	path = Externals/ozz-animation
+	url = https://github.com/guillaumeblanc/ozz-animation.git
+[submodule "Externals/entt"]
+	path = Externals/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "Externals/glfw"]
+	path = Externals/glfw
+	url = https://github.com/glfw/glfw.git

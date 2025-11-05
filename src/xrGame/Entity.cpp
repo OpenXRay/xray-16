@@ -222,7 +222,7 @@ bool CEntity::net_Spawn(CSE_Abstract* DC)
         return (FALSE);
 
     //	SetfHealth			(E->fHealth);
-    IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
+    IKinematics* pKinematics = Visual()->dcast_PKinematics();
     CInifile* ini = NULL;
 
     if (pKinematics)

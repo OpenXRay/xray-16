@@ -282,8 +282,7 @@ void CPseudoGigant::on_threaten_execute()
     HS.weaponID = (ID()); //	l_P.w_u16	(ID());
     HS.dir = (Fvector().set(0.f, 1.f, 0.f)); //	l_P.w_dir	(Fvector().set(0.f,1.f,0.f));
     HS.power = (hit_value); //	l_P.w_float	(m_kick_damage);
-    HS.boneID = (smart_cast<IKinematics*>(
-        pA->Visual())->LL_GetBoneRoot()); //	l_P.w_s16	(smart_cast<IKinematics*>(pA->Visual())->LL_GetBoneRoot());
+    HS.boneID = (pA->Visual()->dcast_PKinematics()->LL_GetBoneRoot()); //	l_P.w_s16	(pA->Visual()->dcast_PKinematics()->LL_GetBoneRoot());
     HS.p_in_bone_space = (Fvector().set(0.f, 0.f, 0.f)); //	l_P.w_vec3	(Fvector().set(0.f,0.f,0.f));
     HS.impulse = (80 * pA->character_physics_support()->movement()->GetMass()); //	l_P.w_float	(20 *
                                                                                 //pA->movement_control()->GetMass());

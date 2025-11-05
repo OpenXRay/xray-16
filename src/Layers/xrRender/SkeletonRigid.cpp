@@ -7,6 +7,7 @@
 namespace xray::render::RENDER_NAMESPACE
 {
 extern int psSkeletonUpdate;
+extern int psSkeletonForceBindPose;
 
 #ifdef DEBUG
 void check_kinematics(CKinematics* _k, LPCSTR s);
@@ -41,6 +42,21 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 #endif
 
     Bone_Calculate(bones->at(iRoot), &Fidentity);
+
+    if (psSkeletonForceBindPose != 0)
+    {
+        static xr_vector<Fmatrix> bindTransforms;
+        LL_GetBindTransform(bindTransforms);
+        VERIFY(bindTransforms.size() == bones->size());
+
+        const u32 count = static_cast<u32>(bindTransforms.size());
+        for (u32 i = 0; i < count; ++i)
+        {
+            CBoneInstance& instance = bone_instances[i];
+            instance.mTransform = bindTransforms[i];
+            instance.mRenderTransform.mul_43(instance.mTransform, (*bones)[i]->m2b_transform);
+        }
+    }
 #ifdef DEBUG
     check_kinematics(this, dbg_name.c_str());
     RImplementation.BasicStats.Animation.End();
@@ -124,6 +140,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     //
     if (Update_Callback)
         Update_Callback(this);
+
+    DumpDebugBonePalette();
 }
 
 #ifdef DEBUG

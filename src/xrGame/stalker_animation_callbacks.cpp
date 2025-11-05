@@ -110,7 +110,7 @@ static void callback_rotation_blend(CBoneInstance* const bone)
 
 void CStalkerAnimationManager::assign_bone_callbacks()
 {
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_visual);
+    IKinematics* kinematics = m_visual->dcast_PKinematics();
     VERIFY(kinematics);
 
 #ifdef DEBUG
@@ -150,7 +150,7 @@ void CStalkerAnimationManager::assign_bone_callbacks()
 
 void CStalkerAnimationManager::assign_bone_blend_callbacks(bool const& forward_direction)
 {
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_visual);
+    IKinematics* kinematics = m_visual->dcast_PKinematics();
     VERIFY(kinematics);
 
 #ifdef DEBUG
@@ -191,7 +191,7 @@ void CStalkerAnimationManager::assign_bone_blend_callbacks(bool const& forward_d
 
 void CStalkerAnimationManager::remove_bone_callbacks()
 {
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_visual);
+    IKinematics* kinematics = m_visual->dcast_PKinematics();
     VERIFY(kinematics);
 
 #ifdef DEBUG

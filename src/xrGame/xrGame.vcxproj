@@ -24,7 +24,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)ode/include;$(xrExternals)GameSpy\src;$(xrExternals)OpenAutomate\inc;$(xrExternals)ozz-animation\include;$(xrExternals)entt\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -34,11 +34,11 @@
     </ClCompile>
     <Link>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;xrAnimation.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <DelayLoadDLLs>AnselSDK$(PlatformArchitecture).dll;</DelayLoadDLLs>
-      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AnselSDK$(PlatformArchitecture).lib;xrAnimation.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -947,6 +947,7 @@
     <ClInclude Include="player_account.h" />
     <ClInclude Include="player_hud.h" />
     <ClInclude Include="player_hud_tune.h" />
+    <ClInclude Include="ozz_animation_utility.h" />
     <ClInclude Include="player_name_modifyer.h" />
     <ClInclude Include="poses_blending.h" />
     <ClInclude Include="pose_extrapolation.h" />
@@ -2547,6 +2548,7 @@
     <ClCompile Include="player_account.cpp" />
     <ClCompile Include="player_hud.cpp" />
     <ClCompile Include="player_hud_tune.cpp" />
+    <ClCompile Include="ozz_animation_utility.cpp" />
     <ClCompile Include="player_name_modifyer.cpp" />
     <ClCompile Include="poses_blending.cpp" />
     <ClCompile Include="pose_extrapolation.cpp" />
@@ -3374,6 +3376,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrUICore\xrUICore.vcxproj">
       <Project>{37b3642c-b706-4c93-bc54-badadc8fc9b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrAnimation\xrAnimation.vcxproj">
+      <Project>{A5B2C3D4-E5F6-7890-ABCD-EF1234567890}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Externals\imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>

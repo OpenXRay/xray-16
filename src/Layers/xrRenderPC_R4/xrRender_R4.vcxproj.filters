@@ -178,6 +178,9 @@
     <Filter Include="Interface implementations\ImGuiRender">
       <UniqueIdentifier>{2adbf225-d2a8-40e6-a2d1-6a70b5224355}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{c8dd4c51-de70-44f7-b29c-7be1a84c5ee9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -205,6 +208,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\DetailManager.h">
+      <Filter>Details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\DetailManager_Compute.h">
       <Filter>Details</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\DetailModel.h">
@@ -738,6 +744,17 @@
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h">
       <Filter>Lights</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\OzzKinematicsVisual.h" />
+    <ClInclude Include="..\..\xrAnimation\LegacyOmfConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -789,6 +806,9 @@
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\DetailModel.cpp">
+      <Filter>Details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11DetailManager_Compute.cpp">
       <Filter>Details</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11DetailManager_VS.cpp">
@@ -1364,6 +1384,18 @@
     <ClCompile Include="..\xrRender\rendertarget_phase_gasmask_dudv.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_Matrices.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\ozz-animation\samples\framework\mesh.cc" />
+    <ClCompile Include="..\xrRender\OzzKinematicsVisual.cpp" />
+    <ClCompile Include="..\..\xrAnimation\LegacyOmfConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

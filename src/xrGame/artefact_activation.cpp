@@ -147,7 +147,7 @@ void SArtefactActivation::ChangeEffects()
     };
     if (state_def.m_animation.size())
     {
-        IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(m_af->Visual());
+        IKinematicsAnimated* K = m_af->Visual()->dcast_PKinematicsAnimated();
         if (K)
             K->PlayCycle(state_def.m_animation.c_str());
     }

@@ -123,7 +123,7 @@ bool CControlAnimationBase::get_animation_info(EMotionAnim anim, u32 index, Moti
     char* animation_name_buffer;
     STRCONCAT(animation_name_buffer, anim_it->target_name, xr_itoa(index, index_string_buffer, 10));
 
-    IKinematicsAnimated* animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    IKinematicsAnimated* animated = m_object->Visual()->dcast_PKinematicsAnimated();
     if (!animated)
     {
         return false;
@@ -197,20 +197,24 @@ void CControlAnimationBase::select_animation(bool anim_end)
         VERIFY(m_override_animation_index < anim_it->count);
         index = m_override_animation_index;
     }
-    else if (anim_it->spec_id != -1)
+    else if (anim_it && anim_it->spec_id != -1)
     {
         index = anim_it->spec_id;
     }
-    else
+    else if (anim_it)
     {
         VERIFY(anim_it->count != 0);
         index = ::Random.randI(anim_it->count);
     }
 
+    if (!anim_it)
+        return;
+
     // установить анимацию
     string128 s1, s2;
-    MotionID cur_anim = smart_cast<IKinematicsAnimated*>(
-        m_object->Visual())->ID_Cycle_Safe(strconcat(sizeof(s2), s2, anim_it->target_name.c_str(), xr_itoa(index, s1, 10)));
+    MotionID cur_anim = m_object->Visual()
+                            ->dcast_PKinematicsAnimated()
+                            ->ID_Cycle_Safe(strconcat(sizeof(s2), s2, anim_it->target_name.c_str(), xr_itoa(index, s1, 10)));
     if (!cur_anim.valid())
         FATAL(s2);
 
@@ -302,7 +306,7 @@ void CControlAnimationBase::CheckReplacedAnim()
 SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 {
     // искать текущую анимацию в AA_VECTOR
-    MotionID motion = smart_cast<IKinematicsAnimated*>(m_object->Visual())->LL_MotionID(anim_name);
+    MotionID motion = m_object->Visual()->dcast_PKinematicsAnimated()->LL_MotionID(anim_name);
 
     for (auto it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
     {
@@ -359,7 +363,7 @@ void CControlAnimationBase::FX_Play(EHitSide side, float amount)
 
     if (fx && fx[0])
     {
-        smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(fx, amount);
+        m_object->Visual()->dcast_PKinematicsAnimated()->PlayFX(fx, amount);
     }
 
     fx_time_last_play = m_object->m_dwCurrentTime;
@@ -494,7 +498,7 @@ void CControlAnimationBase::ValidateAnimation()
 ///////////////////////////////////////////////////////////////////////////////////////
 void CControlAnimationBase::UpdateAnimCount()
 {
-    IKinematicsAnimated* skel = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    IKinematicsAnimated* skel = m_object->Visual()->dcast_PKinematicsAnimated();
     xr_vector<size_t> subjectsToDelete;
 
     for (auto it = m_anim_storage.begin(); it != m_anim_storage.end(); ++it)
@@ -561,7 +565,7 @@ void CControlAnimationBase::SetCurAnim(EMotionAnim a) { cur_anim_info().set_moti
 CMotionDef* CControlAnimationBase::get_motion_def(SAnimItem* it, u32 index) const
 {
     string128 s1, s2;
-    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
     const MotionID& motion_id =
         skeleton_animated->ID_Cycle_Safe(strconcat(sizeof(s2), s2, it->target_name.c_str(), xr_itoa(index, s1, 10)));
     return (skeleton_animated->LL_GetMotionDef(motion_id));
@@ -586,7 +590,8 @@ MotionID CControlAnimationBase::get_motion_id(EMotionAnim a, u32 index) const
     }
 
     string128 s1, s2;
-    return (smart_cast<IKinematicsAnimated*>(m_object->Visual())
+    return (m_object->Visual()
+                ->dcast_PKinematicsAnimated()
                 ->ID_Cycle_Safe(strconcat(sizeof(s2), s2, anim_it->target_name.c_str(), xr_itoa(index, s1, 10))));
 }
 
@@ -693,7 +698,7 @@ void CControlAnimationBase::AA_reload(LPCSTR section)
     SAAParam anim;
     LPCSTR anim_name, val;
 
-    IKinematicsAnimated* skel_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    IKinematicsAnimated* skel_animated = m_object->Visual()->dcast_PKinematicsAnimated();
 
     for (u32 i = 0; pSettings->r_line(section, i, &anim_name, &val); ++i)
     {

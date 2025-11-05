@@ -158,8 +158,8 @@ void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
     m_sv_hit = SHit();
     CPHDestroyable::Init(); // this zerows colbacks !!;
     IRenderVisual* pVisual = m_EntityAlife.Visual();
-    IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(pVisual);
-    IKinematics* pK = smart_cast<IKinematics*>(pVisual);
+    IKinematicsAnimated* ka = pVisual->dcast_PKinematicsAnimated();
+    IKinematics* pK = pVisual->dcast_PKinematics();
     VERIFY(&e->spawn_ini());
     m_death_anims.setup(ka, e->s_name.c_str(), pSettings);
     if (!m_EntityAlife.g_Alive())
@@ -191,7 +191,7 @@ void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
     }
     if (Type() == etStalker)
     {
-        m_hit_animations.SetupHitMotions(*smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual()));
+        m_hit_animations.SetupHitMotions(*smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual()->dcast_PKinematicsAnimated()));
     }
     anim_mov_state.init();
 
@@ -524,7 +524,8 @@ IC void CCharacterPhysicsSupport::UpdateDeathAnims()
             m_interactive_motion)) //! m_flags.test(fl_use_death_motion)//!b_death_anim_on&&m_pPhysicsShell->isFullActive()
     {
         DestroyIKController();
-        smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual())->PlayCycle("death_init");
+        if (const auto kinematics = smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual()->dcast_PKinematicsAnimated()))
+            kinematics->PlayCycle("death_init");
         m_flags.set(fl_death_anim_on, TRUE);
     }
 }
@@ -638,7 +639,7 @@ void CCharacterPhysicsSupport::CreateSkeleton(CPhysicsShell*& pShell)
 #endif
     pShell = P_create_Shell();
 
-    IKinematics* k = smart_cast<IKinematics*>(m_EntityAlife.Visual());
+    IKinematics* k = m_EntityAlife.Visual()->dcast_PKinematics();
 
     phys_shell_verify_object_model(m_EntityAlife);
     pShell->preBuild_FromKinematics(k);
@@ -648,7 +649,7 @@ void CCharacterPhysicsSupport::CreateSkeleton(CPhysicsShell*& pShell)
     pShell->SmoothElementsInertia(0.3f);
     pShell->set_PhysicsRefObject(&m_EntityAlife);
     SAllDDOParams disable_params;
-    disable_params.Load(smart_cast<IKinematics*>(m_EntityAlife.Visual())->LL_UserData());
+    disable_params.Load(m_EntityAlife.Visual()->dcast_PKinematics()->LL_UserData());
     pShell->set_DisableParams(disable_params);
 
     pShell->Build();
@@ -1005,7 +1006,7 @@ void CCharacterPhysicsSupport::CreateShell(IGameObject* who, Fvector& dp, Fvecto
     xr_delete(m_interactive_animation);
     destroy_animation_collision();
     // DestroyIKController( );
-    IKinematics* K = smart_cast<IKinematics*>(m_EntityAlife.Visual());
+    IKinematics* K = m_EntityAlife.Visual()->dcast_PKinematics();
     // animation movement controller issues
     bool anim_mov_ctrl = m_EntityAlife.animation_movement_controlled();
     CBoneInstance& BR = K->LL_GetBoneInstance(K->LL_GetBoneRoot());
@@ -1177,7 +1178,7 @@ void CCharacterPhysicsSupport::EndActivateFreeShell(
     //	m_pPhysicsShell->AnimToVelocityState( Device.fTimeDelta, 2 * default_l_limit, 10.f * default_w_limit );
     //	mXFORM.set( sv_xform );
     //}
-    IKinematics* K = smart_cast<IKinematics*>(m_EntityAlife.Visual());
+    IKinematics* K = m_EntityAlife.Visual()->dcast_PKinematics();
     // u16 root =K->LL_GetBoneRoot();
     // if( root!=0 )
     //{

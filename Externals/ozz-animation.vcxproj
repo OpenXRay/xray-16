@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{E4D8B27C-0A5E-4A7F-8B8F-D3A9C2B1E0F3}</ProjectGuid>
+    <RootNamespace>ozz_animation</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <OutDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <OutDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(Configuration)\$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>ozz-animation\include;ozz-animation\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>ozz-animation\include;ozz-animation\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>ozz-animation\include;ozz-animation\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>ozz-animation\include;ozz-animation\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;MIXED;DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>ozz-animation\include;ozz-animation\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>MIXED;DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>ozz-animation\include;ozz-animation\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ozz-animation\src\animation\offline\additive_animation_builder.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\animation_builder.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\animation_optimizer.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\motion_extractor.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_animation.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_animation_archive.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_animation_utils.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_skeleton.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_skeleton_archive.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_track.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\raw_track_utils.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\skeleton_builder.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\track_builder.cc" />
+    <ClCompile Include="ozz-animation\src\animation\offline\track_optimizer.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\animation.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\animation_utils.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\blending_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\ik_aim_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\ik_two_bone_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\local_to_model_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\motion_blending_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\sampling_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\skeleton.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\skeleton_utils.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\track.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\track_sampling_job.cc" />
+    <ClCompile Include="ozz-animation\src\animation\runtime\track_triggering_job.cc" />
+    <ClCompile Include="ozz-animation\src\base\containers\string_archive.cc" />
+    <ClCompile Include="ozz-animation\src\base\encode\group_varint.cc" />
+    <ClCompile Include="ozz-animation\src\base\io\archive.cc" />
+    <ClCompile Include="ozz-animation\src\base\io\stream.cc" />
+    <ClCompile Include="ozz-animation\src\base\log.cc" />
+    <ClCompile Include="ozz-animation\src\base\maths\box.cc" />
+    <ClCompile Include="ozz-animation\src\base\maths\math_archive.cc" />
+    <ClCompile Include="ozz-animation\src\base\maths\simd_math.cc" />
+    <ClCompile Include="ozz-animation\src\base\maths\simd_math_archive.cc" />
+    <ClCompile Include="ozz-animation\src\base\maths\soa_math_archive.cc" />
+    <ClCompile Include="ozz-animation\src\base\memory\allocator.cc" />
+    <ClCompile Include="ozz-animation\src\base\platform.cc" />
+    <ClCompile Include="ozz-animation\src\geometry\runtime\skinning_job.cc" />
+    <ClCompile Include="ozz-animation\src\options\options.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\additive_animation_builder.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\animation_builder.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\animation_optimizer.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\export.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\motion_extractor.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\raw_animation.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\raw_animation_utils.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\raw_skeleton.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\raw_track.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\raw_track_utils.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\skeleton_builder.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\track_builder.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\offline\track_optimizer.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\animation.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\animation_utils.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\blending_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\export.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\ik_aim_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\ik_two_bone_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\local_to_model_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\motion_blending_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\sampling_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\skeleton.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\skeleton_utils.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\track.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\track_sampling_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\animation\runtime\track_triggering_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\containers\array.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\containers\vector.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\export.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\io\archive.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\io\stream.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\log.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\box.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\math_constant.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\math_ex.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\quaternion.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\simd_math.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\soa_float.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\soa_float4x4.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\soa_quaternion.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\soa_transform.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\transform.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\maths\vec_float.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\memory\allocator.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\platform.h" />
+    <ClInclude Include="ozz-animation\include\ozz\base\span.h" />
+    <ClInclude Include="ozz-animation\include\ozz\geometry\runtime\skinning_job.h" />
+    <ClInclude Include="ozz-animation\include\ozz\options\options.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

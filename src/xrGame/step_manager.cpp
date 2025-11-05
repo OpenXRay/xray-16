@@ -44,9 +44,18 @@ void CStepManager::reload(LPCSTR section)
     LPCSTR anim_name, val;
     string16 cur_elem;
 
-    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
 
-    VERIFY3(skeleton_animated, "object is not animated", m_object->cNameVisual().c_str());
+    if (!skeleton_animated)
+    {
+#ifdef DEBUG
+        Msg("[steps] skipping step manager setup for '%s' (visual '%s') due to missing IKinematicsAnimated",
+            m_object->cName().c_str(), m_object->cNameVisual().c_str());
+#endif
+        m_steps_map.clear();
+        m_step_info.disable = true;
+        return;
+    }
 #ifdef DEBUG
     if (debug_step_info_load)
         Msg("loading step_params for object :%s, visual: %s, section: %s, step_params section: %s  ",
@@ -74,7 +83,7 @@ void CStepManager::reload(LPCSTR section)
         {
 #ifdef DEBUG
 
-            IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+            IKinematicsAnimated* KA = m_object->Visual()->dcast_PKinematicsAnimated();
             VERIFY(KA);
 
             Msg("! (CStepManager::reload) no anim :%s object:%s, visual: %s, step_params section: %s ", anim_name,
@@ -86,7 +95,7 @@ void CStepManager::reload(LPCSTR section)
 #ifdef DEBUG
         if (debug_step_info_load)
         {
-            IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+            IKinematicsAnimated* KA = m_object->Visual()->dcast_PKinematicsAnimated();
             VERIFY(KA);
             std::pair<LPCSTR, LPCSTR> anim_name = KA->LL_MotionDefName_dbg(motion_id);
             Msg("step_params loaded for object :%s, visual: %s, motion: %s, anim set: %s  ", m_object->cName().c_str(),
@@ -116,6 +125,12 @@ void CStepManager::on_animation_start(MotionID motion_id, CBlend* blend)
     if (!m_blend)
         return;
 
+    if (!m_object->Visual() || (m_object->Visual() && !m_object->Visual()->dcast_PKinematicsAnimated()))
+    {
+        m_step_info.disable = true;
+        return;
+    }
+
     if (m_object->character_ik_controller())
         m_object->character_ik_controller()->PlayLegs(blend);
 
@@ -128,7 +143,7 @@ void CStepManager::on_animation_start(MotionID motion_id, CBlend* blend)
 #ifdef DEBUG
         if (debug_step_info)
         {
-            IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+            IKinematicsAnimated* KA = m_object->Visual()->dcast_PKinematicsAnimated();
             VERIFY(KA);
             std::pair<LPCSTR, LPCSTR> anim_name = KA->LL_MotionDefName_dbg(motion_id);
             Msg("! no step_params found for object :%s, visual: %s, motion: %s, anim set: %s  ",
@@ -258,7 +273,7 @@ Fvector CStepManager::get_foot_position(ELegType leg_type)
 {
     R_ASSERT2(m_foot_bones[leg_type] != BI_NONE, "foot bone had not been set");
 
-    IKinematics* pK = smart_cast<IKinematics*>(m_object->Visual());
+    IKinematics* pK = m_object->Visual()->dcast_PKinematics();
     const Fmatrix& bone_transform = pK->LL_GetBoneInstance(m_foot_bones[leg_type]).mTransform;
 
     Fmatrix global_transform;
@@ -273,7 +288,7 @@ void CStepManager::load_foot_bones(CInifile::Sect& data)
     {
         const CInifile::Item& item = *I;
 
-        u16 index = smart_cast<IKinematics*>(m_object->Visual())->LL_BoneID(*item.second);
+        u16 index = m_object->Visual()->dcast_PKinematics()->LL_BoneID(*item.second);
         VERIFY3(index != BI_NONE, "foot bone not found", *item.second);
 
         if (xr_strcmp(*item.first, "front_left") == 0)
@@ -289,7 +304,7 @@ void CStepManager::load_foot_bones(CInifile::Sect& data)
 
 void CStepManager::reload_foot_bones()
 {
-    CInifile* ini = smart_cast<IKinematics*>(m_object->Visual())->LL_UserData();
+    CInifile* ini = m_object->Visual()->dcast_PKinematics()->LL_UserData();
     if (ini && ini->section_exist("foot_bones"))
     {
         load_foot_bones(ini->r_section("foot_bones"));

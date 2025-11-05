@@ -451,6 +451,16 @@ public:
     SJointIKData IK_data;
     float mass;
     Fvector center_of_mass;
+    float rest_length;
+    Fvector dominant_axis;
+    Fvector local_aabb_min;
+    Fvector local_aabb_max;
+    Fmatrix inverse_global_transform;
+    Fvector inertia_tensor;
+    float volume;
+    Flags32 collision_layers;
+    bool ground_contact_candidate;
+    bool weapon_anchor_candidate;
 
     vecBones children; // bones which are slaves to this
 
@@ -458,7 +468,20 @@ public:
     using ChildFacesVec = xr_vector<FacesVec>;
     ChildFacesVec child_faces; // shared
 
-    explicit CBoneData(u16 ID) : SelfID(ID) { VERIFY(SelfID != BI_NONE); }
+    explicit CBoneData(u16 ID) : SelfID(ID)
+    {
+        VERIFY(SelfID != BI_NONE);
+        rest_length = 0.f;
+        dominant_axis.set(0.f, 1.f, 0.f);
+        local_aabb_min.set(0.f, 0.f, 0.f);
+        local_aabb_max.set(0.f, 0.f, 0.f);
+        inverse_global_transform.identity();
+        inertia_tensor.set(0.f, 0.f, 0.f);
+        volume = 0.f;
+        collision_layers.zero();
+        ground_contact_candidate = false;
+        weapon_anchor_candidate = false;
+    }
     virtual ~CBoneData() = default;
 #ifdef DEBUG
     typedef svector<int, 128> BoneDebug;

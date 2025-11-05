@@ -93,14 +93,14 @@ public:
 
     [[nodiscard]] u32 mem_usage()
     {
-        u32 sz = sizeof(*this);
+        size_t sz = sizeof(*this);
         if (_keysR.size())
             sz += _keysR.size() * sizeof(CKeyQR) / _keysR.ref_count();
         if (_keysT8.size())
             sz += _keysT8.size() * sizeof(CKeyQT8) / _keysT8.ref_count();
         if (_keysT16.size())
             sz += _keysT16.size() * sizeof(CKeyQT16) / _keysT16.ref_count();
-        return sz;
+        return static_cast<u32>(sz);
     }
 };
 
@@ -178,7 +178,11 @@ public:
     CPartDef() : Name(0){};
 
     [[nodiscard]]
-    u32 mem_usage() const { return sizeof(*this) + bones.size() * sizeof(u32) + sizeof(Name); }
+    u32 mem_usage() const
+    {
+        const size_t total = sizeof(*this) + bones.size() * sizeof(u32) + sizeof(Name);
+        return static_cast<u32>(total);
+    }
 };
 class XRCORE_API CPartition
 {
@@ -219,13 +223,13 @@ struct XRCORE_API motions_value
 
     u32 mem_usage()
     {
-        u32 sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
+        size_t sz = sizeof(*this) + m_motion_map.size() * 6 + m_partition.mem_usage();
         for (auto it = m_mdefs.begin(); it != m_mdefs.end(); ++it)
             sz += it->mem_usage();
         for (auto bm_it = m_motions.begin(); bm_it != m_motions.end(); ++bm_it)
             for (auto m_it = bm_it->second.begin(); m_it != bm_it->second.end(); ++m_it)
                 sz += m_it->mem_usage();
-        return sz;
+        return static_cast<u32>(sz);
     }
 };
 

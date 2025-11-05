@@ -327,7 +327,7 @@ Fvector CSightManager::aiming_position() const
 
 #if 0
     Fmatrix								player_head;
-    IKinematics* actor_kinematics		= smart_cast<IKinematics*>(Actor()->Visual());
+    IKinematics* actor_kinematics		= Actor()->Visual()->dcast_PKinematics();
     actor_kinematics->Bone_GetAnimPos	(player_head, actor_kinematics->LL_BoneID("bip01_head"), 1, false);
     player_head.mulA_43					(Actor()->XFORM());
     return								( player_head.c );

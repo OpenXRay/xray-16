@@ -176,7 +176,7 @@ ICF static bool grenade_hit_callback(collide::rq_result& result, LPVOID params)
     if (result.O)
     {
         IKinematics* V = 0;
-        if (0 != (V = smart_cast<IKinematics*>(result.O->Visual())))
+        if (0 != (V = result.O->Visual()->dcast_PKinematics()))
         {
             CBoneData& B = V->LL_GetData((u16)result.element);
             mtl_idx = B.game_mtl_idx;

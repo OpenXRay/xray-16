@@ -28,10 +28,53 @@
 #include "IGame_Persistent.h"
 #endif
 
+#include "OzzKinematicsVisual.h"
+#include "ModelNaming.h"
+#include "xrAnimation/OzzSharedMotions.hpp"
+
+#include <filesystem>
+#include <optional>
+#include <system_error>
+
 extern bool ENGINE_API g_bRendering;
 
 namespace xray::render::RENDER_NAMESPACE
 {
+using xray::render::detail::NormalizeModelIdentifier;
+
+namespace
+{
+constexpr pcstr kOzzBundleExtension = ".ozzx";
+
+std::optional<std::filesystem::path> ResolveOzzBundlePath(const shared_str& identifier)
+{
+    xr_string candidate = identifier.c_str();
+    if (candidate.length() < xr_strlen(kOzzBundleExtension) ||
+        candidate.compare(candidate.length() - xr_strlen(kOzzBundleExtension),
+                           xr_strlen(kOzzBundleExtension), kOzzBundleExtension) != 0)
+    {
+        candidate += kOzzBundleExtension;
+    }
+
+    // .ozzx bundles are managed outside the FS cache, so we use std::filesystem
+    // to check for actual file existence rather than FS.exist() which only checks the cache
+    const char* search_paths[] = { "$game_meshes$", "$level$" };
+    for (const char* path_alias : search_paths)
+    {
+        string_path resolved;
+        if (!FS.update_path(resolved, path_alias, candidate.c_str(), false))
+            continue;
+
+        std::error_code ec;
+        std::filesystem::path bundle_path(resolved);
+        if (std::filesystem::exists(bundle_path, ec) && !ec)
+            return bundle_path;
+    }
+
+    return std::nullopt;
+}
+} // namespace
+
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
     dxRender_Visual* V = nullptr;
@@ -50,6 +93,8 @@ dxRender_Visual* CModelPool::Instance_Create(u32 type)
     case MT_SKELETON_RIGID: V = xr_new<CKinematics>(); break;
     case MT_SKELETON_GEOMDEF_PM: V = xr_new<CSkeletonX_PM>(); break;
     case MT_SKELETON_GEOMDEF_ST: V = xr_new<CSkeletonX_ST>(); break;
+    case MT_OZZ_STATIC:
+    case MT_OZZ_ANIMATED: V = xr_new<COzzKinematicsVisual>(); break;
     case MT_PARTICLE_EFFECT: V = xr_new<PS::CParticleEffect>(); break;
     case MT_PARTICLE_GROUP: V = xr_new<PS::CParticleGroup>(); break;
 #ifndef _EDITOR
@@ -85,11 +130,62 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
     string_path fn;
     string_path name;
 
+    auto load_bundle_from_path = [&](const std::filesystem::path& bundle_path) -> dxRender_Visual*
+    {
+        // Create with animated type - will be updated from bundle
+        auto* visual = static_cast<COzzKinematicsVisual*>(Instance_Create(MT_OZZ_ANIMATED));
+        if (!visual->LoadFromBundle(N, bundle_path))
+        {
+            xr_delete(visual);
+            return nullptr;
+        }
+
+        if (allow_register)
+            Instance_Register(N, visual);
+
+        return visual;
+    };
+
     // Add default ext if no ext at all
     if (nullptr == strext(N))
         strconcat(sizeof(name), name, N, ".ogf");
     else
         xr_strcpy(name, sizeof(name), N);
+
+    const char* requested_ext = strext(name);
+    if (!requested_ext || 0 == xr_stricmp(requested_ext, ".ogf"))
+    {
+        string_path bundle_name;
+        xr_strcpy(bundle_name, name);
+        if (requested_ext)
+            bundle_name[requested_ext - name] = 0;
+        xr_strcat(bundle_name, ".ozzx");
+
+        if (FS.exist(fn, "$level$", bundle_name))
+        {
+            if (auto* bundle_visual = load_bundle_from_path(std::filesystem::path(fn)))
+            {
+                Msg("Replacing direct .ogf load with .ozzx bundle: %s", fn);
+            }
+            else
+            {
+                Msg("Failed to replace direct .ogf load with .ozzx bundle: %s", fn);
+            }
+        }
+
+        if (FS.exist(fn, "$game_meshes$", bundle_name))
+        {
+            if (auto* bundle_visual = load_bundle_from_path(std::filesystem::path(fn)))
+            {
+                Msg("Replacing direct .ogf load with .ozzx bundle: %s", fn);
+                return bundle_visual;
+            }
+            else
+            {
+                Msg("Failed to replace direct .ogf load with .ozzx bundle: %s", fn);
+            }
+        }
+    }
 
     // Load data from MESHES or LEVEL
     if (!FS.exist(N))
@@ -108,6 +204,28 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
     else
     {
         xr_strcpy(fn, N);
+
+        if (const char* direct_ext = strext(fn))
+        {
+            if (0 == xr_stricmp(direct_ext, ".ogf"))
+            {
+                std::filesystem::path direct_bundle(fn);
+                direct_bundle.replace_extension(kOzzBundleExtension);
+                std::error_code ec;
+                if (std::filesystem::exists(direct_bundle, ec) && !ec)
+                {
+                    if (auto* bundle_visual = load_bundle_from_path(direct_bundle))
+                    {
+                        Msg("Replacing direct .ogf load with .ozzx bundle: %s", fn);
+                        return bundle_visual;
+                    }
+                    else
+                    {
+                        Msg("Failed to replace ogf with ossx bundle: %s", fn);
+                    }
+                }
+            }
+        }
     }
 
 // Actual loading
@@ -128,6 +246,8 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
     {
     case MT_SKELETON_ANIM:
     case MT_SKELETON_RIGID:
+    case MT_OZZ_STATIC:
+    case MT_OZZ_ANIMATED:
     {
         const u16 def_idx = GMLib.GetMaterialIdx("default_object");
         R_ASSERT2(GMLib.GetMaterialByIdx(def_idx)->Flags.is(SGameMtl::flDynamic), "'default_object' - must be dynamic");
@@ -210,6 +330,10 @@ void CModelPool::Destroy()
 
     // cleanup motions container
     g_pMotionsContainer->clean(false);
+
+    // cleanup ozz motions container
+    if (XRay::Animation::g_pOzzMotionsContainer)
+        XRay::Animation::g_pOzzMotionsContainer->Clean(false);
 }
 
 CModelPool::CModelPool()
@@ -218,12 +342,63 @@ CModelPool::CModelPool()
     bForceDiscard = FALSE;
     bAllowChildrenDuplicate = TRUE;
     g_pMotionsContainer = xr_new<motions_container>();
+    XRay::Animation::g_pOzzMotionsContainer = xr_new<XRay::Animation::OzzMotionsContainer>();  // NEW!
+    Msg("[ModelPool] Initialized with OzzMotionsContainer support");
 }
 
 CModelPool::~CModelPool()
 {
     Destroy();
     xr_delete(g_pMotionsContainer);
+    xr_delete(XRay::Animation::g_pOzzMotionsContainer);  // NEW!
+}
+
+void CModelPool::Rebuild()
+{
+    VERIFY(!g_bRendering);
+
+    xr_vector<shared_str> paths_to_reload;
+    for (auto& entry : Models)
+    {
+        paths_to_reload.push_back(entry.name.c_str());
+    }
+
+    Destroy();
+
+    xr_vector<shared_str> reloaded_bundles;
+    xr_vector<shared_str> failed_bundles;
+
+    for (auto& entry : paths_to_reload)
+    {
+        auto bundle_path = ResolveOzzBundlePath(entry);
+        if (!bundle_path)
+        {
+            Msg("! [ozz] ModelPool::Rebuild: unable to resolve bundle path for '%s'", entry);
+            failed_bundles.push_back(entry);
+            continue;
+        }
+
+        reloaded_bundles.push_back(entry);
+    }
+
+    g_pMotionsContainer->clean(false);
+
+    for (auto& entry : reloaded_bundles)
+    {
+        Create(entry.c_str());
+    }
+
+    if (!reloaded_bundles.empty())
+    {
+        Msg("[ozz] ModelPool rebuilt %zu bundle visual%s", reloaded_bundles.size(),
+            reloaded_bundles.size() == 1 ? "" : "s");
+    }
+
+    if (!failed_bundles.empty())
+    {
+        for (const auto& identifier : failed_bundles)
+            Msg("! [ozz] ModelPool::Rebuild: bundle reload failed for '%s'", identifier.c_str());
+    }
 }
 
 dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
@@ -248,11 +423,13 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
         return 0;
 #endif
     string_path low_name;
+    VERIFY(name);
     VERIFY(xr_strlen(name) < sizeof(low_name));
-    xr_strcpy(low_name, name);
-    xr_strlwr(low_name);
-    if (strext(low_name))
-        *strext(low_name) = 0;
+
+    const xr_string normalized = NormalizeModelIdentifier(name);
+    VERIFY(normalized.size() < sizeof(low_name));
+    xr_strcpy(low_name, normalized.c_str());
+    const char* ext = strext(name);
     //	Msg						("-CREATE %s",low_name);
 
     // 0. Search POOL
@@ -272,13 +449,33 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 
         if (nullptr == Base)
         {
-            // 2. If not found
-            bAllowChildrenDuplicate = FALSE;
-            if (data)
-                Base = Instance_Load(low_name, data, TRUE);
+            const shared_str bundle_identifier(normalized.c_str());
+            std::optional<std::filesystem::path> bundle_path{ ResolveOzzBundlePath(bundle_identifier) };
+            if (bundle_path.has_value())
+            {
+                // Create with animated type - will be updated from bundle
+                auto* bundle_visual = static_cast<COzzKinematicsVisual*>(Instance_Create(MT_OZZ_ANIMATED));
+                if (!bundle_visual->LoadFromBundle(bundle_identifier.c_str(), *bundle_path))
+                {
+                    xr_delete(bundle_visual);
+                }
+                else
+                {
+                    Instance_Register(bundle_identifier.c_str(), bundle_visual);
+                    Base = bundle_visual;
+                }
+            }
             else
-                Base = Instance_Load(low_name, TRUE);
-            bAllowChildrenDuplicate = TRUE;
+            {
+                // 2. If not found
+                bAllowChildrenDuplicate = FALSE;
+                if (data)
+                    Base = Instance_Load(low_name, data, TRUE);
+                else
+                    Base = Instance_Load(low_name, TRUE);
+                bAllowChildrenDuplicate = TRUE;
+            }
+
 #ifdef _EDITOR
             if (!Base)
                 return 0;
@@ -294,11 +491,12 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 dxRender_Visual* CModelPool::CreateChild(LPCSTR name, IReader* data)
 {
     string256 low_name;
-    VERIFY(xr_strlen(name) < 256);
-    xr_strcpy(low_name, name);
-    xr_strlwr(low_name);
-    if (strext(low_name))
-        *strext(low_name) = 0;
+    VERIFY(name);
+    VERIFY(xr_strlen(name) < sizeof(low_name));
+
+    const xr_string normalized = NormalizeModelIdentifier(name);
+    VERIFY(normalized.size() < sizeof(low_name));
+    xr_strcpy(low_name, normalized.c_str());
 
     // 1. Search for already loaded model
     dxRender_Visual* Base = Instance_Find(low_name);

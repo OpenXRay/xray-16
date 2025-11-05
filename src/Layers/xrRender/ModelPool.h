@@ -50,6 +50,7 @@ class ECORE_API CModelPool
 public:
     CModelPool();
     virtual ~CModelPool();
+    void Rebuild();
     dxRender_Visual* Instance_Create(u32 Type);
     dxRender_Visual* Instance_Duplicate(dxRender_Visual* V);
     dxRender_Visual* Instance_Load(LPCSTR N, BOOL allow_register);

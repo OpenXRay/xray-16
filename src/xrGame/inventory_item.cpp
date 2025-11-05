@@ -1233,7 +1233,7 @@ void CInventoryItem::UpdateXForm()
         return;
 
     R_ASSERT(E);
-    IKinematics* V = smart_cast<IKinematics*>(E->Visual());
+    IKinematics* V = smart_cast<IKinematics*>(E->Visual()->dcast_PKinematics());
     VERIFY(V);
 
     // Get matrices

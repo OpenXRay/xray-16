@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Converters">
+      <UniqueIdentifier>{F9A5E3C6-B8D7-4E2A-9F1B-C3E4D5F6A7B8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation System">
+      <UniqueIdentifier>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{123f6e41-d6f6-436e-8c4c-7f44fe6e5ce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{86460191-d4f8-4bcf-93a6-a690c66e3b92}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xrAnimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OzzBundle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OzzConversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LegacyOgfConverter.h">
+      <Filter>Converters</Filter>
+    </ClInclude>
+    <ClInclude Include="LegacyOmfConverter.h">
+      <Filter>Converters</Filter>
+    </ClInclude>
+    <ClInclude Include="StartupConversionInventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OzzKinematics.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="OzzKinematicsCore.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="OzzKinematicsAnimated.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_Components.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_IK.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_DebugRender.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="IDebugDrawContext.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_Registry.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_Systems.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_ParallelSystems.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationECS_Performance.h">
+      <Filter>Animation System</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xrAnimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\ozz_animation_viewer.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="tools\xray_to_ozz_converter.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\ozz_kinematics_parity_tests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\ozz_kinematics_test_main.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\test_converter.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="OzzBundle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LegacyOmfConverter.cpp">
+      <Filter>Converters</Filter>
+    </ClCompile>
+    <ClCompile Include="LegacyOgfConverter.cpp">
+      <Filter>Converters</Filter>
+    </ClCompile>
+    <ClCompile Include="StartupConversionInventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Externals\ozz-animation\samples\framework\mesh.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Externals\ozz-animation\samples\framework\utils.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationECS_IK.cpp">
+      <Filter>Animation System</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationECS_DebugRender.cpp">
+      <Filter>Animation System</Filter>
+    </ClCompile>
+    <ClCompile Include="OzzKinematics.cpp">
+      <Filter>Animation System</Filter>
+    </ClCompile>
+    <ClCompile Include="OzzKinematicsAnimated.cpp">
+      <Filter>Animation System</Filter>
+    </ClCompile>
+    <ClCompile Include="OzzKinematicsCore.cpp">
+      <Filter>Animation System</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+    <Text Include="tools\CMakeLists.txt">
+      <Filter>Tools</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

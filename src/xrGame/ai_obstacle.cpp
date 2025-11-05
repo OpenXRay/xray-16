@@ -64,7 +64,7 @@ IC bool ai_obstacle::inside(const u32& vertex_id) const
 
 void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
 {
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_object->Visual());
+    IKinematics* kinematics = m_object->Visual()->dcast_PKinematics();
     VERIFY(kinematics);
     u16 bone_count = kinematics->LL_BoneCount();
     VERIFY(bone_count);

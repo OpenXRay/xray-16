@@ -36,7 +36,7 @@ void CHangingLamp::RespawnInit()
     Init();
     if (Visual())
     {
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
+        IKinematics* K = Visual()->dcast_PKinematics();
         K->LL_SetBonesVisible(u64(-1));
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
@@ -81,8 +81,8 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
     xr_delete(CForm);
     if (Visual())
     {
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
-        R_ASSERT(Visual() && smart_cast<IKinematics*>(Visual()));
+        IKinematics* K = Visual()->dcast_PKinematics();
+        R_ASSERT(Visual() && Visual()->dcast_PKinematics());
         light_bone = K->LL_BoneID(*lamp->light_main_bone);
         VERIFY(light_bone != BI_NONE);
         ambient_bone = K->LL_BoneID(*lamp->light_ambient_bone);
@@ -136,10 +136,10 @@ bool CHangingLamp::net_Spawn(CSE_Abstract* DC)
     CPHSkeleton::Spawn(e);
     if (smart_cast<IKinematicsAnimated*>(Visual()))
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle("idle");
-    if (smart_cast<IKinematics*>(Visual()))
+    if (Visual() && Visual()->dcast_PKinematics())
     {
-        smart_cast<IKinematics*>(Visual())->CalculateBones_Invalidate();
-        smart_cast<IKinematics*>(Visual())->CalculateBones(TRUE);
+        Visual()->dcast_PKinematics()->CalculateBones_Invalidate();
+        Visual()->dcast_PKinematics()->CalculateBones(TRUE);
         //.intepolate_pos
     }
     if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPhysic) && !Visual())
@@ -164,10 +164,10 @@ void CHangingLamp::SpawnInitPhysics(CSE_Abstract* D)
     CSE_ALifeObjectHangingLamp* lamp = smart_cast<CSE_ALifeObjectHangingLamp*>(D);
     if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPhysic))
         CreateBody(lamp);
-    if (smart_cast<IKinematics*>(Visual()))
+    if (Visual() && Visual()->dcast_PKinematics())
     {
-        smart_cast<IKinematics*>(Visual())->CalculateBones_Invalidate();
-        smart_cast<IKinematics*>(Visual())->CalculateBones(TRUE);
+        Visual()->dcast_PKinematics()->CalculateBones_Invalidate();
+        Visual()->dcast_PKinematics()->CalculateBones(TRUE);
         //.intepolate_pos
     }
 }
@@ -175,7 +175,7 @@ void CHangingLamp::SpawnInitPhysics(CSE_Abstract* D)
 void CHangingLamp::CopySpawnInit()
 {
     CPHSkeleton::CopySpawnInit();
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = Visual()->dcast_PKinematics();
     if (!K->LL_GetBoneVisible(light_bone))
         TurnOff();
 }
@@ -219,7 +219,7 @@ void CHangingLamp::UpdateCL()
         Fmatrix xf;
         if (light_bone != BI_NONE)
         {
-            Fmatrix& M = smart_cast<IKinematics*>(Visual())->LL_GetTransform(light_bone);
+            Fmatrix& M = Visual()->dcast_PKinematics()->LL_GetTransform(light_bone);
             xf.mul(XFORM(), M);
             VERIFY(!fis_zero(DET(xf)));
         }
@@ -239,7 +239,7 @@ void CHangingLamp::UpdateCL()
             {
                 if (ambient_bone != BI_NONE)
                 {
-                    Fmatrix& M = smart_cast<IKinematics*>(Visual())->LL_GetTransform(ambient_bone);
+                    Fmatrix& M = Visual()->dcast_PKinematics()->LL_GetTransform(ambient_bone);
                     xf.mul(XFORM(), M);
                     VERIFY(!fis_zero(DET(xf)));
                 }
@@ -291,7 +291,7 @@ void CHangingLamp::TurnOn()
     }
     if (Visual())
     {
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
+        IKinematics* K = Visual()->dcast_PKinematics();
         K->LL_SetBoneVisible(light_bone, TRUE, TRUE);
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
@@ -313,7 +313,7 @@ void CHangingLamp::TurnOff()
         light_ambient->set_active(false);
     if (Visual())
     {
-        IKinematics* K = smart_cast<IKinematics*>(Visual());
+        IKinematics* K = Visual()->dcast_PKinematics();
         VERIFY(K);
         K->LL_SetBoneVisible(light_bone, FALSE, TRUE);
         VERIFY2(K->LL_GetBonesVisible() != 0,
@@ -353,7 +353,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
     if (m_pPhysicsShell)
         return;
 
-    IKinematics* pKinematics = smart_cast<IKinematics*>(Visual());
+    IKinematics* pKinematics = Visual()->dcast_PKinematics();
 
     m_pPhysicsShell = P_create_Shell();
 
@@ -398,7 +398,7 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
     m_pPhysicsShell->mXFORM.set(XFORM());
     m_pPhysicsShell->SetAirResistance(0.001f, 0.02f);
     SAllDDOParams disable_params;
-    disable_params.Load(smart_cast<IKinematics*>(Visual())->LL_UserData());
+    disable_params.Load(Visual()->dcast_PKinematics()->LL_UserData());
     m_pPhysicsShell->set_DisableParams(disable_params);
     ApplySpawnIniToPhysicShell(&lamp->spawn_ini(), m_pPhysicsShell, fixed_bones[0] != '\0');
 }

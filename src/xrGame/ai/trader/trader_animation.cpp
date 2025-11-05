@@ -18,7 +18,10 @@ void CTraderAnimation::reinit()
     m_anim_global = 0;
     m_anim_head = 0;
 
-    m_head = smart_cast<IKinematics*>(m_trader->Visual())->LL_BoneID("bip01_head");
+    IRenderVisual* visual = m_trader->Visual();
+    IKinematics* kinematics = visual ? visual->dcast_PKinematics() : nullptr;
+    VERIFY(kinematics);
+    m_head = kinematics->LL_BoneID("bip01_head");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +46,9 @@ void CTraderAnimation::set_animation(LPCSTR anim)
 {
     m_anim_global = anim;
 
-    IKinematicsAnimated* kinematics_animated = smart_cast<IKinematicsAnimated*>(m_trader->Visual());
+    IRenderVisual* visual = m_trader->Visual();
+    IKinematicsAnimated* kinematics_animated = visual ? visual->dcast_PKinematicsAnimated() : nullptr;
+    VERIFY(kinematics_animated);
     m_motion_global = kinematics_animated->ID_Cycle(m_anim_global);
     kinematics_animated->PlayCycle(m_motion_global, TRUE, global_callback, this);
 }
@@ -53,7 +58,9 @@ void CTraderAnimation::set_head_animation(LPCSTR anim)
     m_anim_head = anim;
 
     // назначить анимацию головы
-    IKinematicsAnimated* kinematics_animated = smart_cast<IKinematicsAnimated*>(m_trader->Visual());
+    IRenderVisual* visual = m_trader->Visual();
+    IKinematicsAnimated* kinematics_animated = visual ? visual->dcast_PKinematicsAnimated() : nullptr;
+    VERIFY(kinematics_animated);
     m_motion_head = kinematics_animated->ID_Cycle(m_anim_head);
     kinematics_animated->PlayCycle(m_motion_head, TRUE, head_callback, this);
 }
@@ -141,7 +148,9 @@ void CTraderAnimation::external_sound_stop()
 
 Fvector CTraderAnimation::sound_position()
 {
-    IKinematics* kinematics = smart_cast<IKinematics*>(m_trader->Visual());
+    IRenderVisual* visual = m_trader->Visual();
+    IKinematics* kinematics = visual ? visual->dcast_PKinematics() : nullptr;
+    VERIFY(kinematics);
     Fmatrix l_tMatrix;
     l_tMatrix.mul_43(m_trader->XFORM(), kinematics->LL_GetBoneInstance(m_head).mTransform);
     return l_tMatrix.c;

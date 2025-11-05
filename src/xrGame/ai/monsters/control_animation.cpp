@@ -14,7 +14,7 @@ void CControlAnimation::reinit()
 {
     inherited::reinit();
 
-    m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual()->dcast_PKinematicsAnimated());
 
     m_anim_events.clear();
 
@@ -236,7 +236,7 @@ void CControlAnimation::restart(SAnimationPart& part, PlayCallback callback)
 
 void CControlAnimation::restart()
 {
-    m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
+    m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual()->dcast_PKinematicsAnimated());
 
     if (m_data.global.blend)
         restart(m_data.global, global_animation_end_callback);
@@ -291,7 +291,7 @@ void CControlAnimation::unfreeze()
 // get motion time, when just MotionID available
 float CControlAnimation::motion_time(MotionID motion_id, IRenderVisual* visual)
 {
-    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(visual);
+    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(visual->dcast_PKinematicsAnimated());
     VERIFY(skeleton_animated);
     CMotionDef* motion_def = skeleton_animated->LL_GetMotionDef(motion_id);
     VERIFY(motion_def);

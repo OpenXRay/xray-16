@@ -105,7 +105,8 @@ Flags32 psActorFlags =
     AF_RUN_BACKWARD |
     AF_IMPORTANT_SAVE |
     AF_MULTI_ITEM_PICKUP |
-    AF_USE_TRACERS
+    AF_USE_TRACERS |
+    AF_LOADING_STAGES
 };
 
 float psLookIntensityMin  = 15.f;
@@ -830,8 +831,8 @@ void CActor::HitSignal(float perc, Fvector& vLocalDir, IGameObject* who, s16 ele
         float yaw, pitch;
         D.getHP(yaw, pitch);
         IRenderVisual* pV = Visual();
-        IKinematicsAnimated* tpKinematics = smart_cast<IKinematicsAnimated*>(pV);
-        IKinematics* pK = smart_cast<IKinematics*>(pV);
+        IKinematicsAnimated* tpKinematics = pV->dcast_PKinematicsAnimated();
+        IKinematics* pK = pV->dcast_PKinematics();
         VERIFY(tpKinematics);
 #pragma todo("Dima to Dima : forward-back bone impulse direction has been determined incorrectly!")
         MotionID motion_ID = m_anims->m_normal.m_damage[iFloor(pK->LL_GetBoneInstance(element).get_param(1) +
@@ -1611,6 +1612,9 @@ void CActor::shedule_Update(u32 DT)
 #include "debug_renderer.h"
 void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
+    IRenderVisual* vis = Visual();
+    IKinematics* kin = vis ? vis->dcast_PKinematics() : nullptr;
+
     VERIFY(_valid(XFORM()));
     inherited::renderable_Render(context_id, root);
     CInventoryOwner::renderable_Render(context_id, root);
@@ -1667,9 +1671,9 @@ void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& 
 
     GEnv.UIRender->StartPrimitive(4, IUIRender::ptTriStrip, IUIRender::pttLIT);
 
-    CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
+    CBoneInstance& BI = Visual()->dcast_PKinematics()->LL_GetBoneInstance(u16(m_head));
     Fmatrix M;
-    smart_cast<IKinematics*>(Visual())->CalculateBones();
+    Visual()->dcast_PKinematics()->CalculateBones();
     M.mul(XFORM(), BI.mTransform);
 
     Fvector pos = M.c;
@@ -1720,9 +1724,9 @@ void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
     if (!g_Alive())
         return;
 
-    CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
+    CBoneInstance& BI = Visual()->dcast_PKinematics()->LL_GetBoneInstance(u16(m_head));
     Fmatrix M;
-    smart_cast<IKinematics*>(Visual())->CalculateBones();
+    Visual()->dcast_PKinematics()->CalculateBones();
     M.mul(XFORM(), BI.mTransform);
     //------------------------------------------------
     Fvector v0, v1;

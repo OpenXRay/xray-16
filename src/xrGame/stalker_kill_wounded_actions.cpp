@@ -330,7 +330,11 @@ void CStalkerActionKillWounded::execute()
     HS.weaponID = weapon_to_kill(&object())->object().ID();
     HS.dir = Fvector().set(0.f, 0.f, 1.f);
     HS.power = 1.f;
-    HS.boneID = smart_cast<IKinematics*>((const_cast<CEntityAlive*>(enemy))->Visual())->LL_GetBoneRoot();
+    CEntityAlive* mutableEnemy = const_cast<CEntityAlive*>(enemy);
+    IRenderVisual* visual = mutableEnemy->Visual();
+    IKinematics* kinematics = visual ? visual->dcast_PKinematics() : nullptr;
+    VERIFY(kinematics);
+    HS.boneID = kinematics->LL_GetBoneRoot();
     HS.p_in_bone_space = Fvector().set(0.f, 0.f, 0.f);
     HS.impulse = 1.f;
     HS.hit_type = ALife::eHitTypeWound;

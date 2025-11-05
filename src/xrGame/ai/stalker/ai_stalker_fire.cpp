@@ -346,7 +346,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
 
                 // IKinematicsAnimated		*tpKinematics = smart_cast<IKinematicsAnimated*>(Visual());
 #ifdef DEBUG
-                IKinematics* tpKinematics = smart_cast<IKinematics*>(Visual());
+                IKinematics* tpKinematics = Visual()->dcast_PKinematics();
                 tpKinematics->LL_GetBoneInstance(HDS.bone());
                 if (HDS.bone() >= tpKinematics->LL_BoneCount())
                 {

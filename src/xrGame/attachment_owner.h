@@ -17,6 +17,8 @@ class CAttachmentOwner
 protected:
     xr_vector<shared_str> m_attach_item_sections;
     xr_vector<CAttachableItem*> m_attached_objects;
+    bool m_attachment_callback_active = false;
+    bool m_attachment_callback_suspended = false;
 
 public:
     virtual CGameObject* cast_game_object() = 0;
@@ -34,6 +36,8 @@ public:
     bool attached(const CInventoryItem* inventory_item) const;
     bool attached(shared_str sect_name) const;
     virtual void reattach_items();
+    void suspend_attachment_callbacks();
+    void resume_attachment_callbacks();
     const xr_vector<CAttachableItem*>& attached_objects() const { return (m_attached_objects); }
 
     CAttachableItem* attachedItem(CLASS_ID clsid) const;

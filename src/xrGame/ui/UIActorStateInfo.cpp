@@ -185,7 +185,7 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
         woun_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeWound);
         shoc_value += outfit->GetDefHitTypeProtection(ALife::eHitTypeShock);
 
-        IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
+        IKinematics* ikv = actor->Visual()->dcast_PKinematics();
         VERIFY(ikv);
         const auto spine_bone = ikv->LL_BoneID("bip01_spine");
 
@@ -214,7 +214,7 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
         woun_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeWound);
         shoc_value += helmet->GetDefHitTypeProtection(ALife::eHitTypeShock);
 
-        IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
+        IKinematics* ikv = actor->Visual()->dcast_PKinematics();
         VERIFY(ikv);
         const auto head_bone = ikv->LL_BoneID("bip01_head");
         fwou_value += helmet->GetBoneArmor(head_bone) * helmet->GetCondition();

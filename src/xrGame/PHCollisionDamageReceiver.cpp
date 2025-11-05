@@ -16,7 +16,7 @@ void CPHCollisionDamageReceiver::BoneInsert(u16 id, float k)
 void CPHCollisionDamageReceiver::Init()
 {
     CPhysicsShellHolder* sh = PPhysicsShellHolder();
-    IKinematics* K = smart_cast<IKinematics*>(sh->Visual());
+    IKinematics* K = sh->Visual()->dcast_PKinematics();
     CInifile* ini = K->LL_UserData();
     if (ini->section_exist("collision_damage"))
     {

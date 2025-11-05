@@ -708,6 +708,9 @@
     <ClCompile Include="..\..\..\sdk\include\glad\gl.c">
       <Filter>Refactored\HW\glad</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Externals\ozz-animation\samples\framework\mesh.cc" />
+    <ClCompile Include="..\xrRender\OzzKinematicsVisual.cpp" />
+    <ClCompile Include="..\..\xrAnimation\LegacyOmfConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -1178,6 +1181,8 @@
     <ClInclude Include="..\..\..\sdk\include\KHR\khrplatform.h">
       <Filter>Refactored\HW\KHR</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\OzzKinematicsVisual.h" />
+    <ClInclude Include="..\..\xrAnimation\LegacyOmfConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\OpenXRay.natvis" />

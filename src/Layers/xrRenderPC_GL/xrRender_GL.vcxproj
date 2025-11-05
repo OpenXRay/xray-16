@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrSdkDir)include\DirectXMesh;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrExternals)gli;$(xrExternals)gli\external;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)ozz-animation\include;ozz-animation\samples;$(xrExternals)ozz-animation\samples;$(xrSdkDir)include\DirectXMesh;$(xrExternals)imgui;$(xrExternals)entt\single_include;$(xrExternals)OpenAutomate\inc;$(xrExternals)gli;$(xrExternals)gli\external;$(xrExternals)AGS_SDK;$(xrExternals)glslang\glslang\Public;$(xrExternals)sse2neon\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_GL_EXPORTS;USE_OGL;RENDER_NAMESPACE=render_gl;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -40,6 +40,7 @@
     <ClCompile Include="..\..\..\sdk\include\glad\gl.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\xrAnimation\LegacyOmfConverter.cpp" />
     <ClCompile Include="..\xrRenderGL\Blender_Recorder_GL.cpp" />
     <ClCompile Include="..\xrRenderGL\glResourceManager_Resources.cpp" />
     <ClCompile Include="..\xrRenderGL\glResourceManager_Scripting.cpp" />
@@ -206,6 +207,10 @@
     <ClCompile Include="..\xrRender\SkeletonRigid.cpp" />
     <ClCompile Include="..\xrRender\SkeletonX.cpp" />
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
+    <ClCompile Include="..\..\..\Externals\ozz-animation\samples\framework\mesh.cc">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\OzzKinematicsVisual.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp" />
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp" />
@@ -245,6 +250,7 @@
     <ClInclude Include="..\..\Include\xrRender\UIShader.h" />
     <ClInclude Include="..\..\Include\xrRender\WallMarkArray.h" />
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
+    <ClInclude Include="..\..\xrAnimation\LegacyOmfConverter.h" />
     <ClInclude Include="..\xrRenderGL\CommonTypes.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MinMaxSMBlender.h" />
     <ClInclude Include="..\xrRender\blenders\dx11MSAABlender.h" />
@@ -256,6 +262,7 @@
     <ClInclude Include="..\xrRenderGL\glStateUtils.h" />
     <ClInclude Include="..\xrRenderGL\glTextureUtils.h" />
     <ClInclude Include="..\xrRender\BufferUtils.h" />
+    <ClInclude Include="..\xrRender\OzzKinematicsVisual.h" />
     <ClInclude Include="..\xrRender\ColorMapManager.h" />
     <ClInclude Include="..\xrRender\D3DUtils.h" />
     <ClInclude Include="..\xrRender\D3DXRenderBase.h" />
@@ -405,11 +412,20 @@
     <ProjectReference Include="..\..\..\Externals\imgui.vcxproj">
       <Project>{c8fbc3ce-d6de-4fc3-bc15-7b647614db09}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\ozz-animation.vcxproj">
+      <Project>{E4D8B27C-0A5E-4A7F-8B8F-D3A9C2B1E0F3}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrMaterialSystem\xrMaterialSystem.vcxproj">
       <Project>{2c419512-6eee-4707-bc51-2e834855552e}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)../Externals/ozz-animation.vcxproj">
+      <Project>{E4D8B27C-0A5E-4A7F-8B8F-D3A9C2B1E0F3}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)xrAnimation\xrAnimation.vcxproj">
+      <Project>{A5B2C3D4-E5F6-7890-ABCD-EF1234567890}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

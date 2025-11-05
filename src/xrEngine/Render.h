@@ -6,6 +6,10 @@
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"
 #include "xrCore/xr_resource.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_string.h"
+
+#include <filesystem>
 
 class IUIShader;
 typedef FactoryPtr<IUIShader> wm_shader;
@@ -262,11 +266,22 @@ public:
     bool GenerationIsR1() const { return GetGeneration() == GENERATION_R1; }
     bool GenerationIsR2() const { return GetGeneration() == GENERATION_R2; }
     bool GenerationIsR2OrHigher() const { return GetGeneration() >= GENERATION_R2; }
+    virtual bool LegacyBindPoseForced() const = 0;
 
     virtual BackendAPI GetBackendAPI() const = 0;
 
     virtual bool is_sun_static() = 0;
     virtual u32 get_dx_level() = 0;
+
+    // Ozz debug helpers
+    virtual void EnableOzzPaletteDebugDump(bool enabled) = 0;
+    virtual bool IsOzzPaletteDebugDumpEnabled() const = 0;
+    virtual void RequestOzzPaletteDebugDump() = 0;
+    virtual bool ConsumeOzzPaletteDebugDumpRequest() = 0;
+    virtual bool LoadOzzAnimation(IRenderVisual* visual, const std::filesystem::path& path) = 0;
+    virtual void StopOzzAnimation(IRenderVisual* visual) = 0;
+    virtual bool PlayOzzMotion(IRenderVisual* visual, const xr_string& motion_name) = 0;
+    virtual bool GetOzzAvailableMotions(IRenderVisual* visual, xr_vector<xr_string>& out_names) = 0;
 
     // Loading / Unloading
     virtual void create() = 0;
@@ -330,6 +345,7 @@ public:
     virtual void model_Logging(bool bEnable) = 0;
     virtual void models_Prefetch() = 0;
     virtual void models_Clear(bool b_complete) = 0;
+    virtual void models_Rebuild() = 0;
 
     // Occlusion culling
     virtual bool occ_visible(vis_data& V) = 0;

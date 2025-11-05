@@ -27,7 +27,7 @@ bool CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 void CPhysicsSkeletonObject::SpawnInitPhysics(CSE_Abstract* D)
 {
     CreatePhysicsShell(D);
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    IKinematics* K = Visual()->dcast_PKinematics();
     if (K)
     {
         K->CalculateBones_Invalidate();

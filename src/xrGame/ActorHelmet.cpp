@@ -75,7 +75,7 @@ void CHelmet::ReloadBonesProtection()
         parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
-        m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
+        m_boneProtection->reload(m_BonesProtectionSect, parent->Visual()->dcast_PKinematics());
 }
 
 bool CHelmet::net_Spawn(CSE_Abstract* DC)
@@ -238,7 +238,7 @@ void CHelmet::AddBonesProtection(LPCSTR bones_section)
         parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
-        m_boneProtection->add(bones_section, smart_cast<IKinematics*>(parent->Visual()));
+        m_boneProtection->add(bones_section, parent->Visual()->dcast_PKinematics());
 }
 
 float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type)
