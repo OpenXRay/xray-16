@@ -11,6 +11,7 @@
 #include "Layers/xrRender/TextureDescrManager.h"  // For GetDetailTexture
 #include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics (skeleton bones)
 #include "Layers/xrRender/FSkinned.h"  // For CSkeletonX (skinned mesh parent pointer)
+#include "Layers/xrRender/FTreeVisual.h"  // For FTreeVisual_quant constant
 #include "xrEngine/Render.h"  // For RImplementation
 
 namespace xray::render::passes {
@@ -670,14 +671,14 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     CopyMatrix3x4(cbData + 48, xform_v);  // m_xform_v at offset 48
 
                     // Write consts at offset 96
-                    float tc_scale = 1.0f;
-                    if (batch->visual) {
-                        // TODO: Get actual scale from FTreeVisual
-                    }
+                    // For trees: consts.xy = tree scale = 1.0 / FTreeVisual_quant
+                    // Use constants from FTreeVisual.h
+                    using namespace xray::render::RENDER_NAMESPACE;
+                    float tree_scale = 1.0f / float(FTreeVisual_quant);
 
                     float* constsPtr = reinterpret_cast<float*>(cbData + 96);
-                    constsPtr[0] = tc_scale;
-                    constsPtr[1] = tc_scale;
+                    constsPtr[0] = tree_scale;
+                    constsPtr[1] = tree_scale;
                     constsPtr[2] = 0.0f;
                     constsPtr[3] = 0.0f;
                 }

@@ -330,7 +330,9 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     auto& bs = nvrhiDesc.renderState.blendState;
     bs.alphaToCoverageEnable = desc.blendState.alphaToCoverageEnable;
 
-    for (u32 i = 0; i < desc.renderTargetCount; i++) {
+    // Initialize ALL 8 render targets to avoid uninitialized memory
+    // NVRHI will use all 8 RTs when creating the D3D11 blend state
+    for (u32 i = 0; i < 8; i++) {
         const auto& srcRT = desc.blendState.renderTargets[i];
         auto& dstRT = bs.targets[i];
 
