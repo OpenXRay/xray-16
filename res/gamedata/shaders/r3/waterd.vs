@@ -9,7 +9,6 @@ struct	v_vert
 	float4 	T		: TANGENT;
 	float4 	B		: BINORMAL;
 	float4	color	: COLOR0;		// (r,g,b,dir-occlusion)
-//	float2 	uv		: TEXCOORD0;	// (u0,v0)
 	int2 	uv		: TEXCOORD0;	// (u0,v0)
 };
 
@@ -20,9 +19,9 @@ struct vf
 	float2 tdist1	: TEXCOORD2;
 #ifdef	USE_SOFT_WATER
 #ifdef	NEED_SOFT_WATER
-	float4	tctexgen: TEXCOORD3;
+	float4	tctexgen: XRDEPTHGEN;	// depth gen (changed from TEXCOORD3 to avoid type conflicts)
 #endif	//	USE_SOFT_WATER
-#endif	//	NEED_SOFT_WATER	
+#endif	//	NEED_SOFT_WATER
 	float4 hpos		: SV_Position;
 };
 

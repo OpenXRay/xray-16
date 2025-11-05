@@ -7,7 +7,7 @@ struct vf
   	float4	c0	: COLOR0;		// color
 //	Igor: for additional depth dest
 #ifdef	USE_SOFT_PARTICLES
-	float4 tctexgen	: TEXCOORD1;
+	float4 tctexgen	: XRDEPTHGEN;	// depth gen (changed from TEXCOORD1 to avoid type conflicts)
 #endif	//	USE_SOFT_PARTICLES
 	float4	hpos: SV_Position;
 };

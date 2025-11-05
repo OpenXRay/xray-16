@@ -9,7 +9,6 @@ struct        v_vert
 	float4	T		: TANGENT;
 	float4	B		: BINORMAL;
 	float4	color	: COLOR0;		// (r,g,b,dir-occlusion)
-//	float2	uv		: TEXCOORD0;	// (u0,v0)
 	int2	uv		: TEXCOORD0;	// (u0,v0)
 };
 
@@ -18,15 +17,15 @@ struct   vf
 	float2	tbase	: TEXCOORD0;	// base
 	float2	tnorm0	: TEXCOORD1;	// nm0
 	float2	tnorm1	: TEXCOORD2;	// nm1
-	float3	M1		: TEXCOORD3;
-	float3	M2		: TEXCOORD4;
-	float3	M3		: TEXCOORD5;
-	float3	v2point	: TEXCOORD6;
+	float3	M1		: POSITION0;	// tangent to eye matrix (changed from TEXCOORD3 to avoid type conflicts)
+	float3	M2		: POSITION1;	// tangent to eye matrix (changed from TEXCOORD4 to avoid type conflicts)
+	float3	M3		: POSITION2;	// tangent to eye matrix (changed from TEXCOORD5 to avoid type conflicts)
+	float3	v2point	: POSITION3;	// eye vector (changed from TEXCOORD6 to avoid type conflicts)
 #ifdef	USE_SOFT_WATER
 #ifdef	NEED_SOFT_WATER
-	float4	tctexgen: TEXCOORD7;
+	float4	tctexgen: XRDEPTHGEN;	// depth gen (changed from TEXCOORD7 to avoid type conflicts)
 #endif	//	USE_SOFT_WATER
-#endif	//	NEED_SOFT_WATER	
+#endif	//	NEED_SOFT_WATER
 	float4	c0		: COLOR0;
 	float	fog		: FOG;
 	float4	hpos	: SV_Position;

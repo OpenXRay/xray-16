@@ -70,8 +70,8 @@ float2         calc_detail                (float3 w_pos)      {
 struct         v_shadow_direct_aref
 {
         float4      hpos:        POSITION;       // Clip-space position         (for rasterization)
-        float       depth:         TEXCOORD0;     // Depth
-        float2      tc0:        TEXCOORD1;       // Diffuse map for aref
+        float       depth:       XRDEPTH;        // Depth (changed from TEXCOORD0 to avoid type conflicts)
+        float2      tc0:         TEXCOORD1;      // Diffuse map for aref
 };
 struct         v_shadow_direct
 {

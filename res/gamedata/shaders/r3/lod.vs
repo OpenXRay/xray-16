@@ -8,13 +8,13 @@ struct vv
 	float3 n1	: NORMAL1	;
 	float2 tc0	: TEXCOORD0	;
 	float2 tc1	: TEXCOORD1	;
-	float4 rgbh0	: TEXCOORD2;	// rgb.h
-	float4 rgbh1	: TEXCOORD3;	// rgb.h
+	float4 rgbh0	: COLOR1;	// rgb.h (changed from TEXCOORD2 to avoid type conflicts)
+	float4 rgbh1	: COLOR2;	// rgb.h (changed from TEXCOORD3 to avoid type conflicts)
 	float4 sun_af	: COLOR0;	// x=sun_0, y=sun_1, z=alpha, w=factor
 };
 struct vf
 {
-	float3	Pe	: TEXCOORD0	;
+	float3	Pe	: POSITION	;	// eye position (changed from TEXCOORD0 to avoid type conflicts)
  	float2 	tc0	: TEXCOORD1	;	// base0
  	float2 	tc1	: TEXCOORD2	;	// base1
 	float4 	af	: COLOR1	;	// alpha&factor
