@@ -775,9 +775,12 @@ void CLevel::script_register(lua_State* luaState)
         def("get_time_minutes", get_time_minutes),
         def("change_game_time", change_game_time),
 
-        def("high_cover_in_direction", high_cover_in_direction), def("low_cover_in_direction", low_cover_in_direction),
-        def("vertex_in_direction", vertex_in_direction), def("rain_factor", rain_factor),
-        def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position),
+        def("high_cover_in_direction", high_cover_in_direction),
+        def("low_cover_in_direction", low_cover_in_direction),
+        def("vertex_in_direction", vertex_in_direction),
+        def("rain_factor", rain_factor),
+        def("patrol_path_exists", patrol_path_exists),
+        def("vertex_position", vertex_position),
         def("name", +[]() { return Level().name().c_str(); }),
         def("prefetch_sound", prefetch_sound),
 

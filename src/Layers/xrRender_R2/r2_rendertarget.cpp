@@ -19,8 +19,6 @@
 #    include "Layers/xrRender/blenders/dx11HDAOCSBlender.h"
 #endif
 
-extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
-
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRenderTarget::u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM)

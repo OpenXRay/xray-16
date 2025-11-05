@@ -30,7 +30,7 @@
 #define BLEND_INC_SPEED 8.0f
 #define BLEND_DEC_SPEED 4.0f
 
-extern ENGINE_API int ps_disable_lens_flare;
+int ps_disable_lens_flare = 0;
 
 //------------------------------------------------------------------------------
 void CLensFlareDescriptor::SetSource(float fRadius, bool ign_color, pcstr tex_name, pcstr sh_name)

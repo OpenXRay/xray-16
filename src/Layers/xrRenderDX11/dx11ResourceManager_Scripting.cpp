@@ -24,6 +24,12 @@ public:
     {
         return RImplementation.o.msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
+
+    LPCSTR _get_level()
+    {
+        const shared_str level_name = g_pGameLevel->name();
+        return level_name.c_str();
+    }
 };
 
 // wrapper
@@ -288,6 +294,11 @@ public:
         C->r_StencilRef(Ref);
         return *this;
     }
+    adopt_compiler& _dx10CullMode(u32 Ref)
+    {
+        C->r_CullMode((D3DCULL)Ref);
+        return *this;
+    }
     adopt_compiler& _dx10ATOC(bool Enable)
     {
         C->RS.SetRS(XRDX11RS_ALPHATOCOVERAGE, Enable);
@@ -331,6 +342,7 @@ void CResourceManager::LS_Load()
         [
             class_<adopt_dx10options>("_dx10options")
                .def("dx10_msaa_alphatest_atoc", &adopt_dx10options::_dx10_msaa_alphatest_atoc)
+			   .def("getLevel", &adopt_dx10options::_get_level)
                //.def("",					&adopt_dx10options::_dx10Options		),	// returns options-object
             ,
 
@@ -376,6 +388,7 @@ void CResourceManager::LS_Load()
                 .def("dx10texture",            &adopt_compiler::_dx10texture,        return_reference_to<1>())
                 .def("dx10stencil",            &adopt_compiler::_dx10Stencil,        return_reference_to<1>())
                 .def("dx10stencil_ref",        &adopt_compiler::_dx10StencilRef,     return_reference_to<1>())
+                .def("dx10cullmode",           &adopt_compiler::_dx10CullMode,       return_reference_to<1>())
                 .def("dx10atoc",               &adopt_compiler::_dx10ATOC,           return_reference_to<1>())
                 .def("dx10zfunc",              &adopt_compiler::_dx10ZFunc,          return_reference_to<1>())
 

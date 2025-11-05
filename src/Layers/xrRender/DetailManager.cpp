@@ -458,4 +458,4 @@ void CDetailManager::DispatchMTCalc()
         UpdateVisibleM();
     });
 }
-}
+} // namespace xray::render::RENDER_NAMESPACE

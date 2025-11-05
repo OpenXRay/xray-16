@@ -32,8 +32,6 @@ IGame_Persistent::IGame_Persistent()
     Device.seqAppActivate.Add(this);
     Device.seqAppDeactivate.Add(this);
 
-    m_pMainMenu = nullptr;
-
     pEnvironment = xr_new<CEnvironment>();
 
     m_pGShaderConstants = xr_new<ShadersExternalData>(); //--#SM+#--

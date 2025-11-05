@@ -204,7 +204,6 @@ target_sources_grouped(
     IGame_ObjectPool.h
     IGame_Persistent.cpp
     IGame_Persistent.h
-    IGame_Persistent_Effects.cpp
     pure_relcase.cpp
     pure_relcase.h
     xr_object.h

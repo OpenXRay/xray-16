@@ -22,14 +22,19 @@
 #   endif // MASTER_GOLD
 #endif // (RENDER == R_R3) || (RENDER == R_R4)
 
-extern ENGINE_API float ps_r3_dyn_wet_surf_near; // 10.0f
-extern ENGINE_API float ps_r3_dyn_wet_surf_far; // 30.0f
-extern ENGINE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
 namespace xray::render::RENDER_NAMESPACE
 {
 u32 ps_Preset = 2;
-const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
+const xr_token qpreset_token[] =
+{
+    { "Minimum", 0 },
+    { "Low", 1 },
+    { "Default", 2 },
+    { "High", 3 },
+    { "Extreme", 4 },
+    { nullptr, 0 }
+};
 
 u32 ps_r2_smapsize = 2048;
 const xr_token qsmapsize_token[] =
@@ -236,6 +241,10 @@ float ps_r2_slight_fade = 0.5f; // 1.f
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
 float ps_r2_dof_sky = 30; //    distance to sky
 float ps_r2_dof_kernel_size = 5.0f; //  7.0f
+
+float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
+float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
+int ps_r3_dyn_wet_surf_sm_res = 256; // 256
 
 u32 ps_steep_parallax = 0;
 int ps_r__detail_radius = 49;

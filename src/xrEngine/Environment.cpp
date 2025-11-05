@@ -44,10 +44,6 @@ CEnvironment::CEnvironment()
 
     fTimeFactor = 12.f;
 
-    wind_strength_factor = 0.f;
-    wind_gust_factor = 0.f;
-
-    wind_blast_strength = 0.f;
     wind_blast_direction.set(1.f, 0.f, 0.f);
 
     // fill clouds hemi verts & faces

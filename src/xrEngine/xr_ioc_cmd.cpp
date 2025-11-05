@@ -19,11 +19,6 @@ extern xr_map<u32, xr_vector<xr_token>> vid_mode_token;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 
-ENGINE_API float ps_r3_dyn_wet_surf_near = 10.f;
-ENGINE_API float ps_r3_dyn_wet_surf_far = 30.f;
-ENGINE_API int ps_r3_dyn_wet_surf_sm_res = 128;
-extern int ps_disable_lens_flare;
-
 void IConsole_Command::InvalidSyntax()
 {
     TInfo I;
@@ -883,5 +878,7 @@ void CCC_Register()
     extern int g_bShowRedText;
     CMD4(CCC_Integer, "debug_show_red_text", &g_bShowRedText, 0, 1);
 #endif
+
+    extern int ps_disable_lens_flare;
     CMD4(CCC_Integer, "disable_lens_flare", &ps_disable_lens_flare, 0, 1);
 };
