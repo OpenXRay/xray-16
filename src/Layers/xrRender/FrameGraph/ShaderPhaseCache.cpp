@@ -5,6 +5,7 @@
 #include "IPass.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/ShaderKey.h"
 
 namespace xray::render::framegraph {
 
@@ -30,9 +31,12 @@ RenderPhase ShaderPhaseCache::GetPhase(dxRender_Visual* visual) {
         return RenderPhase::Geometry;  // Default fallback
     }
 
-    // Create cache key using visual's debug name (includes shader info)
-    CacheKey key;
-    key.shaderName = visual->dbg_name;
+    // Create cache key using shader names (production-safe)
+    ShaderKey key;
+    if (!RENDER_NAMESPACE::ExtractShaderKey(visual, key)) {
+        Msg("! [ShaderPhaseCache] Failed to extract shader key from visual");
+        return RenderPhase::Geometry;
+    }
 
     // Check cache
     auto it = m_cache.find(key);
@@ -73,19 +77,24 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
     //  RUN SHADER REFLECTION ON PIXEL SHADER
     // ═══════════════════════════════════════════════════════
 
+    // Extract shader key for logging
+    ShaderKey key;
+    RENDER_NAMESPACE::ExtractShaderKey(visual, key);
+    std::string shaderName = key.ToString();
+
     // Get pixel shader (ref_ps is a smart pointer, use _get())
     auto* ps = pass->ps._get();
     if (!ps) {
-        Msg("! [ShaderPhaseCache] No pixel shader for visual '%s'",
-            visual->dbg_name.c_str());
+        Msg("! [ShaderPhaseCache] No pixel shader for shader '%s'",
+            shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
     // Get D3D11 pixel shader
     ID3D11PixelShader* d3dPS = ps->sh;
     if (!d3dPS) {
-        Msg("! [ShaderPhaseCache] Failed to get D3D11 pixel shader for visual '%s'",
-            visual->dbg_name.c_str());
+        Msg("! [ShaderPhaseCache] Failed to get D3D11 pixel shader for shader '%s'",
+            shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
@@ -93,7 +102,7 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
     ID3DBlob* bytecode = ps->bytecode;
     if (!bytecode) {
         Msg("! [ShaderPhaseCache] No bytecode for pixel shader '%s'",
-            visual->dbg_name.c_str());
+            shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
@@ -101,8 +110,8 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
     ShaderRTBindings bindings = ShaderReflector::AnalyzePixelShader(d3dPS, bytecode);
 
     // Log result
-    Msg("! [ShaderPhaseCache] Extracted phase for '%s': %s",
-        visual->dbg_name.c_str(),
+    Msg("! [ShaderPhaseCache] Extracted phase for shader '%s': %s",
+        shaderName.c_str(),
         IPass::GetPhaseName(bindings.phase));
 
     return bindings.phase;

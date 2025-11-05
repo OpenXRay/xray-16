@@ -88,7 +88,6 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     // Check if visual has shader
     if (!visual->shader || !visual->shader._get()) {
-        Msg("! [MaterialCache] Visual '%s' has no shader", visual->dbg_name.c_str());
         return nullptr;
     }
 
@@ -1244,7 +1243,6 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
     // Stride = total size of all elements in this buffer slot
     std::map<u32, u32> bufferStrides;  // slot -> stride in bytes
 
-    Msg("! [MaterialCache] Computing vertex stride for visual '%s'", visual->dbg_name.c_str());
     Msg("!   Declaration has %u elements", (u32)decl->dx11_dcl_code.size());
 
     for (const auto& d3dElem : decl->dx11_dcl_code) {

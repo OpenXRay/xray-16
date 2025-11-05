@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ShaderReflection.h"
-#include "xrCore/xrstring.h"
+#include "Layers/xrRender/ShaderKey.h"
 
 // Forward declarations
 namespace xray::render::RENDER_NAMESPACE {
@@ -18,6 +18,7 @@ using RENDER_NAMESPACE::Shader;
 using RENDER_NAMESPACE::ShaderElement;
 using RENDER_NAMESPACE::SPass;
 using RENDER_NAMESPACE::dxRender_Visual;
+using RENDER_NAMESPACE::ShaderKey;
 
 // ═══════════════════════════════════════════════════
 //  SHADER PHASE CACHE
@@ -57,22 +58,13 @@ public:
     void ResetStats() { m_stats.numHits = 0; m_stats.numMisses = 0; }
 
 private:
-    // Cache key: shader name
-    struct CacheKey {
-        shared_str shaderName;
-
-        bool operator<(const CacheKey& other) const {
-            return shaderName < other.shaderName;
-        }
-    };
-
     // Cache entry: just the phase
     struct CacheEntry {
         RenderPhase phase;
     };
 
-    // Cache storage
-    xr_map<CacheKey, CacheEntry> m_cache;
+    // Cache storage (using ShaderKey as key)
+    xr_map<ShaderKey, CacheEntry> m_cache;
     Stats m_stats;
 
     // Extract phase from shader (runs reflection)
