@@ -8,9 +8,9 @@ struct v2p
 	float2 tdist1	: TEXCOORD2;
 #ifdef	USE_SOFT_WATER
 #ifdef	NEED_SOFT_WATER
-	float4	tctexgen: TEXCOORD3;
+	float4	tctexgen: XRDEPTHGEN;	// depth gen (changed from TEXCOORD3 to match VS output)
 #endif	//	USE_SOFT_WATER
-#endif	//	NEED_SOFT_WATER	
+#endif	//	NEED_SOFT_WATER
 	float4 hpos		: SV_Position;
 };
 
