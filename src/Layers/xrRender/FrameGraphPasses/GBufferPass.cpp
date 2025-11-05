@@ -547,68 +547,12 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
             // Update per-object constants using VCB + get/create cached binding set
             if (matPSO) {
-                // Step 1: Write VCB data inline in command list (proper NVRHI pattern)
-                // MUST be done BEFORE setGraphicsState/SetBindingSet that uses the VCB!
-
-                // IMPORTANT: We MUST write the FULL VCB size (256 bytes) to avoid partial updates!
-                // D3D11 constant buffers do NOT support partial updates (UpdateSubresource with pDstBox)
-                // If we write less than the buffer size, NVRHI will try a partial update and fail.
-                constexpr u32 VCB_SIZE = 256;  // Must match VCB creation size!
-
-                // Allocate buffer on stack (256 bytes for VCB)
-                u8 cbData[VCB_SIZE] = {};  // Zero-initialized!
-
-                // Helper to copy Fmatrix as HLSL float3x4 (row-major, 48 bytes)
-                // CRITICAL: Fmatrix is column-major, HLSL expects row-major
-                // float3x4 = 3 rows of 4 floats, including translation in 4th column
-                auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
-                    // Transpose: Fmatrix columns become HLSL rows
-                    Fmatrix transposed;
-                    transposed.transpose(src);
-
-                    // Copy first 3 rows (12 floats = 48 bytes)
-                    float* destF = reinterpret_cast<float*>(dest);
-                    destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
-                    destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
-                    destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
-                };
-
-                // Compute matrices
-                Fmatrix xform = batch->worldMatrix;
-                Fmatrix xform_v;
-                xform_v.mul(batch->worldMatrix, Device.mView);
-
-                // Write as float3x4 (48 bytes each) to match shader layout
-                CopyMatrix3x4(cbData + 0, xform);     // m_xform at offset 0
-                CopyMatrix3x4(cbData + 48, xform_v);  // m_xform_v at offset 48
-
-                // Write consts at offset 96 (Fvector4 consts; in PerObjectConstants)
-                // For trees: (scale, scale, 0, 0) where scale comes from FTreeVisual::tvs.scale
-                // For static geometry: (1.0, 1.0, 0, 0) - texture coordinate dequant factor
-                // Legacy X-Ray: cmd_list.tree.set_consts(tvs.scale, tvs.scale, 0, 0);
-
-                // Attempt to get scale from visual if it's a tree
-                float tc_scale = 1.0f;  // Default for static geometry
-                if (batch->visual) {
-                    // TODO: Check visual type and cast to FTreeVisual* to get tvs.scale
-                    // For now, use default 1.0 for all geometry (trees need their actual scale)
-                    // FTreeVisual has m_tree_scale, need to expose it or use visual type checking
-                }
-
-                float* constsPtr = reinterpret_cast<float*>(cbData + 96);
-                constsPtr[0] = tc_scale;  // x: U coordinate scale (1/quant for SHORT2 texcoords)
-                constsPtr[1] = tc_scale;  // y: V coordinate scale
-                constsPtr[2] = 0.0f;      // z: unused
-                constsPtr[3] = 0.0f;      // w: unused
-
-                // Rest stays zero (c_scale, c_bias, wind, wave, c_sun, etc.)
-
-                // Get appropriate VCB from MaterialPSO (each material knows its CB requirements)
+                // Step 1: Get VCB size from material requirements
                 ng::BufferHandle vcbHandle;
+                u32 vcbSize = 0;
                 if (!matPSO->vcbRequirements.empty()) {
-                    // Use the first VCB requirement (typically b0 for per-object data)
-                    // TODO: Handle multiple VCBs if needed
                     vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                    vcbSize = matPSO->vcbRequirements[0].size;
                 }
 
                 if (!vcbHandle.IsValid()) {
@@ -616,10 +560,129 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     continue;
                 }
 
-                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+                // Allocate buffer for CB data
+                // Max size: 3744 bytes for skeleton (78 bones * 48 bytes/bone)
+                constexpr u32 MAX_CB_SIZE = 4096;
+                if (vcbSize > MAX_CB_SIZE) {
+                    Msg("! [GBufferPass] VCB size %u exceeds maximum %u", vcbSize, MAX_CB_SIZE);
+                    continue;
+                }
 
-                // Get the VCB size from material requirements
-                u32 vcbSize = matPSO->vcbRequirements[0].size;
+                u8 cbData[MAX_CB_SIZE];
+                ZeroMemory(cbData, vcbSize);
+
+                // Helper to copy Fmatrix as sbones_array format (3 float4s, column-major)
+                // Layout matches vanilla: each bone = 3 float4s = 48 bytes
+                // float4[0]: Column 0 + X translation (M._11, M._21, M._31, M._41)
+                // float4[1]: Column 1 + Y translation (M._12, M._22, M._32, M._42)
+                // float4[2]: Column 2 + Z translation (M._13, M._23, M._33, M._43)
+                auto CopyBoneMatrix = [](u8* dest, const Fmatrix& M) {
+                    float* destF = reinterpret_cast<float*>(dest);
+                    destF[0]  = M._11; destF[1]  = M._21; destF[2]  = M._31; destF[3]  = M._41;  // Column 0
+                    destF[4]  = M._12; destF[5]  = M._22; destF[6]  = M._32; destF[7]  = M._42;  // Column 1
+                    destF[8]  = M._13; destF[9]  = M._23; destF[10] = M._33; destF[11] = M._43;  // Column 2
+                };
+
+                // Helper for tree/regular meshes (transposed 3x4)
+                auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
+                    Fmatrix transposed;
+                    transposed.transpose(src);
+                    float* destF = reinterpret_cast<float*>(dest);
+                    destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
+                    destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
+                    destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
+                };
+
+                // ═══════════════════════════════════════════════════
+                //  FILL VCB BASED ON VISUAL TYPE
+                // ═══════════════════════════════════════════════════
+
+                bool isSkeleton = false;
+                if (batch->visual && batch->renderable) {
+                    auto visualType = batch->visual->getType();
+                    isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+                }
+
+                if (isSkeleton) {
+                    // ─────────────────────────────────────────────────
+                    //  SKELETON VCB: sbones_array - EXACT vanilla logic
+                    // ─────────────────────────────────────────────────
+
+                    // IMPORTANT: Update global dynamic_transforms CB with skeleton's world matrix
+                    // Vanilla does: cmd_list.set_xform_world(item.Matrix) before rendering
+                    // This updates the global CB so skeleton shader can use world transforms
+                    DynamicTransforms dynamicCB = {};
+                    FillDynamicTransforms(dynamicCB, batch->worldMatrix, 0.f);
+                    for (const auto& cbInfo : matPSO->constantBuffers) {
+                        if (cbInfo.name == "dynamic_transforms") {
+                            u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                            ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
+                            break;
+                        }
+                    }
+
+                    IRenderVisual* renderableVisual = batch->renderable->GetRenderData().visual;
+                    RENDER_NAMESPACE::CKinematics* Parent = dynamic_cast<RENDER_NAMESPACE::CKinematics*>(renderableVisual);
+
+                    if (Parent) {
+                        // CRITICAL: Calculate bones BEFORE accessing transforms!
+                        Parent->CalculateBones(TRUE);
+
+                        // Fill sbones_array - EXACT copy of vanilla code from SkeletonX.cpp:74-83
+                        u32 count = Parent->LL_BoneCount();
+                        u32 maxBones = vcbSize / 48;
+                        count = std::min(count, maxBones);
+
+                        float* array = reinterpret_cast<float*>(cbData);
+                        for (u32 mid = 0; mid < count; mid++)
+                        {
+                            Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
+                            u32 id = mid * 3;
+                            // array[id + 0] = float4(M._11, M._21, M._31, M._41)
+                            array[(id + 0) * 4 + 0] = M._11;
+                            array[(id + 0) * 4 + 1] = M._21;
+                            array[(id + 0) * 4 + 2] = M._31;
+                            array[(id + 0) * 4 + 3] = M._41;
+                            // array[id + 1] = float4(M._12, M._22, M._32, M._42)
+                            array[(id + 1) * 4 + 0] = M._12;
+                            array[(id + 1) * 4 + 1] = M._22;
+                            array[(id + 1) * 4 + 2] = M._32;
+                            array[(id + 1) * 4 + 3] = M._42;
+                            // array[id + 2] = float4(M._13, M._23, M._33, M._43)
+                            array[(id + 2) * 4 + 0] = M._13;
+                            array[(id + 2) * 4 + 1] = M._23;
+                            array[(id + 2) * 4 + 2] = M._33;
+                            array[(id + 2) * 4 + 3] = M._43;
+                        }
+                    }
+                } else {
+                    // ─────────────────────────────────────────────────
+                    //  TREE/REGULAR VCB: m_xform, m_xform_v, consts
+                    // ─────────────────────────────────────────────────
+
+                    // Compute matrices
+                    Fmatrix xform = batch->worldMatrix;
+                    Fmatrix xform_v;
+                    xform_v.mul(batch->worldMatrix, Device.mView);
+
+                    // Write transforms
+                    CopyMatrix3x4(cbData + 0, xform);     // m_xform at offset 0
+                    CopyMatrix3x4(cbData + 48, xform_v);  // m_xform_v at offset 48
+
+                    // Write consts at offset 96
+                    float tc_scale = 1.0f;
+                    if (batch->visual) {
+                        // TODO: Get actual scale from FTreeVisual
+                    }
+
+                    float* constsPtr = reinterpret_cast<float*>(cbData + 96);
+                    constsPtr[0] = tc_scale;
+                    constsPtr[1] = tc_scale;
+                    constsPtr[2] = 0.0f;
+                    constsPtr[3] = 0.0f;
+                }
+
+                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
 
                 // Write VCB within render pass command list (NVRHI handles versioning)
                 // CRITICAL: Write the FULL buffer size to avoid partial update errors!

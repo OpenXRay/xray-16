@@ -33,10 +33,10 @@ struct VertexInputSignature {
     struct InputElement {
         shared_str semanticName;   // "POSITION", "TEXCOORD", etc.
         u32 semanticIndex;          // 0, 1, 2, etc.
-        DXGI_FORMAT format;         // R32G32B32_FLOAT, R8G8B8A8_UNORM, etc.
+        nvrhi::Format format;         // R32G32B32_FLOAT, R8G8B8A8_UNORM, etc.
         u32 inputSlot;              // Buffer slot (usually 0)
 
-        InputElement() : semanticIndex(0), format(DXGI_FORMAT_UNKNOWN), inputSlot(0) {}
+        InputElement() : semanticIndex(0), format(nvrhi::Format::UNKNOWN), inputSlot(0) {}
     };
     xr_vector<InputElement> elements;  // In shader-expected order!
 };

@@ -8,6 +8,47 @@ namespace xray::render::framegraph {
 //  ANALYZE VERTEX SHADER INPUT SIGNATURE
 // ═══════════════════════════════════════════════════
 
+nvrhi::Format GetFormatFromSignature(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc) {
+    // Count components from mask
+    u32 componentCount = 0;
+    if (paramDesc.Mask & 0x1) componentCount++;  // x
+    if (paramDesc.Mask & 0x2) componentCount++;  // y
+    if (paramDesc.Mask & 0x4) componentCount++;  // z
+    if (paramDesc.Mask & 0x8) componentCount++;  // w
+
+    switch (paramDesc.ComponentType) {
+    case D3D_REGISTER_COMPONENT_UINT32:
+        switch (componentCount) {
+        case 1: return nvrhi::Format::R32_UINT;
+        case 2: return nvrhi::Format::RG32_UINT;
+        case 3: return nvrhi::Format::RGB32_UINT;
+        case 4: return nvrhi::Format::RGBA32_UINT;
+        }
+        break;
+
+    case D3D_REGISTER_COMPONENT_SINT32:
+        switch (componentCount) {
+        case 1: return nvrhi::Format::R32_SINT;
+        case 2: return nvrhi::Format::RG32_SINT;
+        case 3: return nvrhi::Format::RGB32_SINT;
+        case 4: return nvrhi::Format::RGBA32_SINT;
+        }
+        break;
+
+    case D3D_REGISTER_COMPONENT_FLOAT32:
+        switch (componentCount) {
+        case 1: return nvrhi::Format::R32_FLOAT;
+        case 2: return nvrhi::Format::RG32_FLOAT;
+        case 3: return nvrhi::Format::RGB32_FLOAT;
+        case 4: return nvrhi::Format::RGBA32_FLOAT;
+        }
+        break;
+    }
+
+    Msg("! [ShaderReflector] Unknown component type %d with %d components",
+        paramDesc.ComponentType, componentCount);
+    return nvrhi::Format::UNKNOWN;
+}
 VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     ID3D11VertexShader* vs,
     ID3DBlob* bytecode) {
@@ -67,40 +108,13 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
         VertexInputSignature::InputElement elem;
         elem.semanticName = paramDesc.SemanticName;
         elem.semanticIndex = paramDesc.SemanticIndex;
-
-        // Infer DXGI format from component type and mask
-        // This is a simplified version - real impl needs more cases
-        if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
-            u32 numComponents = 0;
-            if (paramDesc.Mask & 0x1) numComponents++;
-            if (paramDesc.Mask & 0x2) numComponents++;
-            if (paramDesc.Mask & 0x4) numComponents++;
-            if (paramDesc.Mask & 0x8) numComponents++;
-
-            switch (numComponents) {
-                case 1: elem.format = DXGI_FORMAT_R32_FLOAT; break;
-                case 2: elem.format = DXGI_FORMAT_R32G32_FLOAT; break;
-                case 3: elem.format = DXGI_FORMAT_R32G32B32_FLOAT; break;
-                case 4: elem.format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
-                default: elem.format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
-            }
-        } else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
-            // Handle UINT formats (used for packed data)
-            elem.format = DXGI_FORMAT_R32G32B32A32_UINT;
-        } else if (paramDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
-            // Handle SINT formats (used for indices, short texcoords)
-            elem.format = DXGI_FORMAT_R32G32B32A32_SINT;
-        } else {
-            // Unknown - default to float4
-            elem.format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-        }
-
+        elem.format = GetFormatFromSignature(paramDesc);
         elem.inputSlot = 0;  // Default to slot 0 (will be overridden from vertex decl)
 
         signature.elements.push_back(elem);
 
-        Msg("!   Input[%u]: %s%d (format inferred: %d, mask: 0x%X)",
-            i, elem.semanticName.c_str(), elem.semanticIndex, elem.format, paramDesc.Mask);
+        Msg("!   Input[%u]: %s%d (format will be set from vertex decl, component type: %d, mask: 0x%X)",
+            i, elem.semanticName.c_str(), elem.semanticIndex, paramDesc.ComponentType, paramDesc.Mask);
     }
 
     reflection->Release();

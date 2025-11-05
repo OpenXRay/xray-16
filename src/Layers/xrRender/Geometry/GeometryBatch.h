@@ -58,6 +58,7 @@ struct GeometryBatch {
 
     // Source visual (for material system)
     dxRender_Visual* visual = nullptr;
+    IRenderable* renderable = nullptr; // For skinned meshes
 
     // Visibility/culling (for front-to-back sorting)
     bool isVisible = true;

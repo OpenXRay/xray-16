@@ -279,67 +279,33 @@ PipelineState* PipelineStateCache::CreatePipelineState(
 
     // ─── Vertex Input Layout ───
     if (!desc.vertexAttributes.empty()) {
-        // CRITICAL: NVRHI expects semantics to be grouped by name with arraySize for indices!
-        // BUT we must preserve the ORDER from shader reflection, not alphabetical!
-        // Solution: Group manually while preserving input order
-
         xr_vector<nvrhi::VertexAttributeDesc> nvrhiAttrs;
-        xr_set<const char*> processedSemantics;  // Track which semantic names we've already processed
 
+        // NVRHI uses arraySize to handle multiple semantic indices!
+        // If we have TEXCOORD0 and TEXCOORD1, we pass name="TEXCOORD" with arraySize=2
+        // NVRHI will create D3D11 elements with SemanticIndex 0 and 1
+
+        // Group attributes by semantic name
+        xr_map<xr_string, xr_vector<const VertexAttribute*>> semanticGroups;
         for (const auto& attr : desc.vertexAttributes) {
-            if (!attr.semanticName)
-                continue;
-
-            // Skip if we already processed this semantic name
-            if (processedSemantics.find(attr.semanticName) != processedSemantics.end())
-                continue;
-
-            processedSemantics.insert(attr.semanticName);
-
-            // Find ALL attributes with this semantic name IN ORDER
-            xr_vector<const VertexAttribute*> sameSemanticAttrs;
-            for (const auto& checkAttr : desc.vertexAttributes) {
-                if (checkAttr.semanticName && xr_strcmp(checkAttr.semanticName, attr.semanticName) == 0) {
-                    sameSemanticAttrs.push_back(&checkAttr);
-                }
+            if (attr.semanticName) {
+                semanticGroups[attr.semanticName].push_back(&attr);
             }
+        }
 
-            // Check if semantic indices are consecutive starting from 0
-            bool isConsecutive = !sameSemanticAttrs.empty() && (sameSemanticAttrs[0]->semanticIndex == 0);
-            if (isConsecutive && sameSemanticAttrs.size() > 1) {
-                for (size_t i = 1; i < sameSemanticAttrs.size(); ++i) {
-                    if (sameSemanticAttrs[i]->semanticIndex != i) {
-                        isConsecutive = false;
-                        break;
-                    }
-                }
-            }
+        // For each semantic name, create one NVRHI attribute with arraySize
+        for (const auto& [semName, attrs] : semanticGroups) {
+            const VertexAttribute* firstAttr = attrs[0];
 
-            if (isConsecutive && sameSemanticAttrs.size() > 1) {
-                // Use arraySize for consecutive indices (TEXCOORD0, TEXCOORD1 → arraySize=2)
-                nvrhi::VertexAttributeDesc nvrhiAttr;
-                nvrhiAttr.name = attr.semanticName;
-                nvrhiAttr.format = sameSemanticAttrs[0]->format;
-                nvrhiAttr.offset = sameSemanticAttrs[0]->offset;
-                nvrhiAttr.bufferIndex = sameSemanticAttrs[0]->bufferIndex;
-                nvrhiAttr.isInstanced = sameSemanticAttrs[0]->isInstanced;
-                nvrhiAttr.elementStride = sameSemanticAttrs[0]->elementStride;
-                nvrhiAttr.arraySize = static_cast<uint32_t>(sameSemanticAttrs.size());
-                nvrhiAttrs.push_back(nvrhiAttr);
-            } else {
-                // Single or non-consecutive - create separate entries
-                for (const auto* semAttr : sameSemanticAttrs) {
-                    nvrhi::VertexAttributeDesc nvrhiAttr;
-                    nvrhiAttr.name = attr.semanticName;
-                    nvrhiAttr.format = semAttr->format;
-                    nvrhiAttr.offset = semAttr->offset;
-                    nvrhiAttr.bufferIndex = semAttr->bufferIndex;
-                    nvrhiAttr.isInstanced = semAttr->isInstanced;
-                    nvrhiAttr.elementStride = semAttr->elementStride;
-                    nvrhiAttr.arraySize = 1;
-                    nvrhiAttrs.push_back(nvrhiAttr);
-                }
-            }
+            nvrhi::VertexAttributeDesc nvrhiAttr;
+            nvrhiAttr.name = firstAttr->semanticName;
+            nvrhiAttr.format = firstAttr->format;
+            nvrhiAttr.offset = firstAttr->offset;
+            nvrhiAttr.bufferIndex = firstAttr->bufferIndex;
+            nvrhiAttr.isInstanced = firstAttr->isInstanced;
+            nvrhiAttr.elementStride = firstAttr->elementStride;
+            nvrhiAttr.arraySize = (uint32_t)attrs.size();  // Number of indices (e.g., TEXCOORD0, TEXCOORD1 = size 2)
+            nvrhiAttrs.push_back(nvrhiAttr);
         }
 
         nvrhiDesc.inputLayout = m_device->GetNativeDevice()->createInputLayout(

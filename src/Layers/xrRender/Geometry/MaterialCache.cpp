@@ -1257,9 +1257,17 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
         // Calculate end offset of this element
         u32 endOffset = d3dElem.AlignedByteOffset + elemSize;
 
-        Msg("!   Element: %s%d @ slot %u, offset %u, format %u, size %u → endOffset %u",
+        // Format name for debugging
+        const char* formatName = "UNKNOWN";
+        if (d3dElem.Format == DXGI_FORMAT_R8G8B8A8_UNORM) formatName = "R8G8B8A8_UNORM";
+        else if (d3dElem.Format == DXGI_FORMAT_R32G32_FLOAT) formatName = "R32G32_FLOAT";
+        else if (d3dElem.Format == DXGI_FORMAT_R32G32B32_FLOAT) formatName = "R32G32B32_FLOAT";
+        else if (d3dElem.Format == DXGI_FORMAT_R32G32B32A32_FLOAT) formatName = "R32G32B32A32_FLOAT";
+        else if (d3dElem.Format == DXGI_FORMAT_R16G16_SINT) formatName = "R16G16_SINT";
+
+        Msg("!   Element: %s%d @ slot %u, offset %u, format %u (%s), size %u → endOffset %u",
             d3dElem.SemanticName, d3dElem.SemanticIndex,
-            slot, d3dElem.AlignedByteOffset, d3dElem.Format, elemSize, endOffset);
+            slot, d3dElem.AlignedByteOffset, d3dElem.Format, formatName, elemSize, endOffset);
 
         // Update stride to be at least this large
         bufferStrides[slot] = std::max(bufferStrides[slot], endOffset);
@@ -1297,8 +1305,8 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
                 if (xr_strcmp(d3dElem.SemanticName, shaderElem.semanticName.c_str()) == 0 &&
                     d3dElem.SemanticIndex == shaderElem.semanticIndex) {
                     matchingDeclElem = &d3dElem;
-                    Msg("!     → Matched to vertex decl: %s%d (offset=%u)",
-                        d3dElem.SemanticName, d3dElem.SemanticIndex, d3dElem.AlignedByteOffset);
+                    Msg("!     → Matched to vertex decl: %s%d (offset=%u, format=%u [DXGI])",
+                        d3dElem.SemanticName, d3dElem.SemanticIndex, d3dElem.AlignedByteOffset, (u32)d3dElem.Format);
                     break;
                 }
             }
@@ -1323,9 +1331,9 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
 
             psoDesc.vertexAttributes.push_back(attr);
 
-            Msg("!   [%u] %s%d: offset=%u, format=%u (from decl), stride=%u",
+            Msg("!   [%u] %s%d: offset=%u, DXGI format=%u, NVRHI format=%u, stride=%u",
                 shaderIdx, attr.semanticName, attr.semanticIndex,
-                attr.offset, (u32)matchingDeclElem->Format, attr.elementStride);
+                attr.offset, (u32)matchingDeclElem->Format, (u32)attr.format, attr.elementStride);
         }
 
         Msg("! [MaterialCache] Input layout created with %u elements in shader-expected order",
