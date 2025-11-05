@@ -82,7 +82,11 @@ void CRender::Calculate()
     // Configure
     o.distortion    = o.distortion_enabled;
     o.mt_calculate  = ps_r2_mt_calculate > 0;
+#ifdef USE_DX11
     o.mt_render     = ps_r2_mt_render > 0;
+#else
+    o.mt_render     = 0; // OpenGL does not support parallel draw calls
+#endif
 
     if (m_bFirstFrameAfterReset)
         return;

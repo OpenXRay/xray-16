@@ -217,11 +217,33 @@ XML_NODE XMLDocument::NavigateToNode(CONST_XML_NODE start_node, pcstr path, cons
     buf_str[0] = 0;
     xr_strcpy(buf_str, path);
 
-    const char seps[] = ":";
     size_t tmp = 0;
 
-    //разбить путь на отдельные подпути
-    char* token = strtok(buf_str, seps);
+    char* cursor = buf_str;
+
+    // Thread-safe tokenization over ':'
+    auto next_token = [](char*& cur) -> char*
+    {
+        if (!cur || *cur == '\0')
+            return nullptr;
+
+        char* start = cur;
+        char* sep = strchr(cur, ':');
+        if (sep)
+        {
+            *sep = '\0';
+            cur = sep + 1;
+        }
+        else
+        {
+            cur = nullptr;
+        }
+
+        return start;
+    };
+
+    // разбить путь на отдельные подпути
+    char* token = next_token(cursor);
 
     if (token != nullptr)
     {
@@ -234,7 +256,7 @@ XML_NODE XMLDocument::NavigateToNode(CONST_XML_NODE start_node, pcstr path, cons
     while (token)
     {
         // Get next token:
-        token = strtok(nullptr, seps);
+        token = next_token(cursor);
 
         if (token != nullptr)
             if (node)

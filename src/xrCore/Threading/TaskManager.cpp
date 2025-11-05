@@ -197,10 +197,11 @@ TaskManager::~TaskManager()
 void TaskManager::RegisterThisThreadAsWorker()
 {
     ZoneScoped;
+    std::lock_guard guard{ workersLock };
+
     R_ASSERT2(workers.size() < std::thread::hardware_concurrency(),
         "You must change OTHER_THREADS_COUNT if you want to register more custom threads.");
 
-    std::lock_guard guard{ workersLock };
     s_tl_worker.id = workers.size();
     workers.emplace_back(&s_tl_worker);
 }
