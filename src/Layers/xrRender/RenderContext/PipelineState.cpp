@@ -289,7 +289,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     auto& bs = nvrhiDesc.renderState.blendState;
     bs.alphaToCoverageEnable = desc.blendState.alphaToCoverageEnable;
 
-    for (u32 i = 0; i < desc.renderTargetCount; i++) {
+    for (u32 i = 0; i < 8; i++) {
         const auto& srcRT = desc.blendState.renderTargets[i];
         auto& dstRT = bs.targets[i];
 

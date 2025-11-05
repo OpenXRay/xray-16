@@ -10,6 +10,7 @@
 #include "Layers/xrRender/TextureDescrManager.h"
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/FSkinned.h"
+#include "Layers/xrRender/FTreeVisual.h"
 #include "xrEngine/Render.h"
 
 namespace xray::render::passes {
@@ -511,13 +512,12 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     CopyMatrix3x4(cbData + 0, xform);
                     CopyMatrix3x4(cbData + 48, xform_v);
 
-                    float tc_scale = 1.0f;
-                    if (batch->visual) {
-                    }
+                    using namespace xray::render::RENDER_NAMESPACE;
+                    float tree_scale = 1.0f / float(FTreeVisual_quant);
 
                     float* constsPtr = reinterpret_cast<float*>(cbData + 96);
-                    constsPtr[0] = tc_scale;
-                    constsPtr[1] = tc_scale;
+                    constsPtr[0] = tree_scale;
+                    constsPtr[1] = tree_scale;
                     constsPtr[2] = 0.0f;
                     constsPtr[3] = 0.0f;
                 }

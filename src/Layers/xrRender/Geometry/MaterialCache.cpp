@@ -1060,6 +1060,20 @@ namespace {
         }
     }
 
+    ng::StencilOp ConvertStencilOp(D3D11_STENCIL_OP d3dOp) {
+        switch (d3dOp) {
+            case D3D11_STENCIL_OP_KEEP: return ng::StencilOp::Keep;
+            case D3D11_STENCIL_OP_ZERO: return ng::StencilOp::Zero;
+            case D3D11_STENCIL_OP_REPLACE: return ng::StencilOp::Replace;
+            case D3D11_STENCIL_OP_INCR_SAT: return ng::StencilOp::IncrementSaturate;
+            case D3D11_STENCIL_OP_DECR_SAT: return ng::StencilOp::DecrementSaturate;
+            case D3D11_STENCIL_OP_INVERT: return ng::StencilOp::Invert;
+            case D3D11_STENCIL_OP_INCR: return ng::StencilOp::Increment;
+            case D3D11_STENCIL_OP_DECR: return ng::StencilOp::Decrement;
+            default: return ng::StencilOp::Keep;
+        }
+    }
+
     ng::ComparisonFunc ConvertComparisonFunc(D3D11_COMPARISON_FUNC d3dFunc) {
         switch (d3dFunc) {
             case D3D11_COMPARISON_NEVER: return ng::ComparisonFunc::Never;
@@ -1120,6 +1134,7 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
 
     SState* xrState = pass->state._get();
     if (!xrState || !xrState->state) {
+        Msg("! [MaterialCache] WARNING: Pass has no state object, using defaults!");
         psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
         psoDesc.rasterizerState.fillMode = ng::FillMode::Solid;
         psoDesc.depthStencilState.depthTestEnable = true;
@@ -1128,6 +1143,8 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
         psoDesc.blendState.renderTargets[0].blendEnable = false;
         return;
     }
+
+    Msg("! [MaterialCache] Extracting render states from X-Ray material...");
 
 #if defined(USE_DX11)
     dx11State* d3dState = static_cast<dx11State*>(xrState->state);
@@ -1156,19 +1173,39 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
         psoDesc.depthStencilState.depthFunc = ConvertComparisonFunc(dsDesc.DepthFunc);
         psoDesc.depthStencilState.stencilEnable = dsDesc.StencilEnable;
 
+        Msg("!   Depth: test=%d write=%d func=%d | Stencil: enable=%d",
+            dsDesc.DepthEnable, (dsDesc.DepthWriteMask == D3D11_DEPTH_WRITE_MASK_ALL),
+            dsDesc.DepthFunc, dsDesc.StencilEnable);
+
         if (dsDesc.StencilEnable) {
             psoDesc.depthStencilState.stencilReadMask = dsDesc.StencilReadMask;
             psoDesc.depthStencilState.stencilWriteMask = dsDesc.StencilWriteMask;
 
+            psoDesc.depthStencilState.frontFace.failOp = ConvertStencilOp(dsDesc.FrontFace.StencilFailOp);
+            psoDesc.depthStencilState.frontFace.depthFailOp = ConvertStencilOp(dsDesc.FrontFace.StencilDepthFailOp);
+            psoDesc.depthStencilState.frontFace.passOp = ConvertStencilOp(dsDesc.FrontFace.StencilPassOp);
             psoDesc.depthStencilState.frontFace.compareFunc = ConvertComparisonFunc(dsDesc.FrontFace.StencilFunc);
+
+            psoDesc.depthStencilState.backFace.failOp = ConvertStencilOp(dsDesc.BackFace.StencilFailOp);
+            psoDesc.depthStencilState.backFace.depthFailOp = ConvertStencilOp(dsDesc.BackFace.StencilDepthFailOp);
+            psoDesc.depthStencilState.backFace.passOp = ConvertStencilOp(dsDesc.BackFace.StencilPassOp);
             psoDesc.depthStencilState.backFace.compareFunc = ConvertComparisonFunc(dsDesc.BackFace.StencilFunc);
+
+            Msg("!   Stencil ops: failOp=%d depthFailOp=%d passOp=%d",
+                dsDesc.FrontFace.StencilFailOp, dsDesc.FrontFace.StencilDepthFailOp, dsDesc.FrontFace.StencilPassOp);
+
         }
+    } else {
+        Msg("!   WARNING: No depth/stencil state found!");
     }
 
     ID3DBlendState* blendState = d3dState->GetBlendState();
     if (blendState) {
         D3D11_BLEND_DESC blendDesc;
         blendState->GetDesc(&blendDesc);
+
+        Msg("!   Blend: AlphaToCoverage=%d IndependentBlend=%d",
+            blendDesc.AlphaToCoverageEnable, blendDesc.IndependentBlendEnable);
 
         psoDesc.blendState.alphaToCoverageEnable = blendDesc.AlphaToCoverageEnable;
 
@@ -1188,6 +1225,10 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
         } else {
             const D3D11_RENDER_TARGET_BLEND_DESC& rtBlend = blendDesc.RenderTarget[0];
 
+            Msg("!   RT0: blendEnable=%d srcBlend=%d dstBlend=%d writeMask=0x%02X (D3D11=0x%02X)",
+                rtBlend.BlendEnable, rtBlend.SrcBlend, rtBlend.DestBlend,
+                (u8)rtBlend.RenderTargetWriteMask, rtBlend.RenderTargetWriteMask);
+
             for (int i = 0; i < 3; ++i) {
                 psoDesc.blendState.renderTargets[i].blendEnable = rtBlend.BlendEnable;
                 psoDesc.blendState.renderTargets[i].srcBlend = ConvertBlendFactor(rtBlend.SrcBlend);
@@ -1199,6 +1240,8 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
                 psoDesc.blendState.renderTargets[i].writeMask = ConvertColorWriteMask(rtBlend.RenderTargetWriteMask);
             }
         }
+    } else {
+        Msg("!   WARNING: No blend state found!");
     }
 #endif
 }
