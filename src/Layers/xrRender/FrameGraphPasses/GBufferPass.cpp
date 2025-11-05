@@ -180,7 +180,6 @@ bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph
 }
 
 void GBufferPass::Setup(FrameGraph& fg) {
-    Msg("~ [GBufferPass] Setting up in FrameGraph");
 
     m_outputs = GBufferOutputs{};
 
@@ -243,13 +242,11 @@ void GBufferPass::Setup(FrameGraph& fg) {
 }
 
 void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
-    Msg("~ [GBufferPass] Executing");
 
     auto executeStart = std::chrono::high_resolution_clock::now();
 
     m_gbufferStats = Stats{};
 
-    Msg("  [GBufferPass] Checking %u batches for buffer validity...", m_batches.size());
     u32 nullVBCount = 0, nullIBCount = 0;
     for (u32 i = 0; i < m_batches.size(); ++i) {
         const auto* batch = m_batches[i];
@@ -266,7 +263,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         Msg("! [GBufferPass] ERROR: Found %u batches with null VB, %u with null IB (total %u batches)",
             nullVBCount, nullIBCount, m_batches.size());
     } else {
-        Msg("  [GBufferPass] All batches have valid buffers");
     }
 
     nvrhi::ITexture* albedo = fg.GetPhysicalTexture(m_outputs.albedo);
@@ -289,7 +285,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     DynamicTransforms dynamicTransformsCB = {};
     FillDynamicTransforms(dynamicTransformsCB);
 
-    Msg("  [GBufferPass] DynamicTransforms computed:");
     Msg("    m_WVP[0-3]: %.3f, %.3f, %.3f, %.3f",
         dynamicTransformsCB.m_WVP[0], dynamicTransformsCB.m_WVP[1],
         dynamicTransformsCB.m_WVP[2], dynamicTransformsCB.m_WVP[3]);
@@ -303,7 +298,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
     xr_set<ID3D11Buffer*> updatedBuffers;
 
-    Msg("  [GBufferPass] Filled constant buffers:");
     Msg("    static_globals: m_V, m_P, m_VP, lighting, fog, etc.");
     Msg("    dynamic_transforms: m_W, m_WV, m_WVP from RCache.xforms");
 
@@ -332,7 +326,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                 }
             }
         }
-        Msg("  [GBufferPass] Pre-updated %u unique global CB buffers", (u32)updatedGlobalBuffers.size());
     }
 
     ng::RenderPassDesc passDesc;

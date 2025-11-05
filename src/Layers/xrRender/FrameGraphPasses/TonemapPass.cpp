@@ -107,7 +107,6 @@ void TonemapPass::Setup(
     VirtualResourceHandle hdrInput,
     VirtualResourceHandle backbuffer
 ) {
-    Msg("~ [TonemapPass] Setting up in FrameGraph");
 
     PassHandle tonemapPass = fg.AddPass("Tonemap");
 
@@ -128,7 +127,6 @@ void TonemapPass::Execute(
     VirtualResourceHandle hdrInput,
     VirtualResourceHandle backbuffer
 ) {
-    Msg("~ [TonemapPass] Executing");
 
     auto executeStart = std::chrono::high_resolution_clock::now();
 
