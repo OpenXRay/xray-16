@@ -18,7 +18,7 @@ struct v2p
 #define	DEPTH_EPSILON	0.1h
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
-float4 main( v2p I ) : SV_Target
+float4 main( v2p I ) : SV_Target1
 {
 //	float4 result = I.c*tex2D	(s_base,I.tc0);
 	float4 result = I.c * s_base.Sample( smp_base, I.tc0);
