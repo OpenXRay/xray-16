@@ -49,6 +49,10 @@ target_sources(xrRenderPC_R4 PRIVATE
     # FrameGraph Passes (Phase 3) - Renderer agnostic
     ../xrRender/FrameGraphPasses/GBufferPass.h
     ../xrRender/FrameGraphPasses/GBufferPass.cpp
+    ../xrRender/FrameGraphPasses/HUDPass.h
+    ../xrRender/FrameGraphPasses/HUDPass.cpp
+    ../xrRender/FrameGraphPasses/ParticlePass.h
+    ../xrRender/FrameGraphPasses/ParticlePass.cpp
     ../xrRender/FrameGraphPasses/LightingPass.h
     ../xrRender/FrameGraphPasses/LightingPass.cpp
     ../xrRender/FrameGraphPasses/TonemapPass.h

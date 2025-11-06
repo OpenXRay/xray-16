@@ -61,6 +61,12 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     hudConfig.height = Device.dwHeight;
     m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
 
+    // Create particle pass (renders billboards/sprites for world+HUD particles)
+    passes::ParticlePassConfig particleConfig;
+    particleConfig.width = Device.dwWidth;
+    particleConfig.height = Device.dwHeight;
+    m_particlePass = xr_make_unique<passes::ParticlePass>(device, particleConfig);
+
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
@@ -205,6 +211,10 @@ void FrameGraphRenderer::SetupFrame() {
     // Clear HUD batches from previous frame
     m_hudBatches.clear();
 
+    // Clear particle batches from previous frame
+    m_worldParticleBatches.clear();
+    m_hudParticleBatches.clear();
+
     // Collect visible geometry (CPU culling for now, GPU later)
     CollectVisibleGeometry();
 
@@ -289,6 +299,11 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_hudPass->SetOutputs(gbufferOutputs);
     m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
     m_hudPass->Setup(*m_framegraph);
+
+    // Setup Particle pass (always registered, renders after HUD)
+    // Particles share GBuffer outputs, render both world and HUD particles
+    m_particlePass->SetOutputs(gbufferOutputs);
+    m_particlePass->Setup(*m_framegraph);
 
     // ═══════════════════════════════════════════════════════
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
@@ -406,6 +421,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // Just set batches here - pass will skip execution if empty
 
     m_hudPass->SetHUDBatches(&m_hudBatches);
+
+    // ═══════════════════════════════════════════════════════
+    //  PARTICLE PASS SETUP (PER-FRAME)
+    // ═══════════════════════════════════════════════════════
+    // Particle pass is always registered (in BuildFrameGraphStructure)
+    // Set both world and HUD particle batches - pass will skip execution if both empty
+
+    m_particlePass->SetWorldParticleBatches(&m_worldParticleBatches);
+    m_particlePass->SetHUDParticleBatches(&m_hudParticleBatches);
 
     // TODO: Week 15-16 will add dynamic pass creation here
     // For now, we just route to existing GBufferPass
@@ -547,14 +571,14 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
             break;
 
         // ═══════════════════════════════════════════════════════
-        //  PARTICLES - Special handling needed
+        //  PARTICLES - Collected separately for ParticlePass
         // ═══════════════════════════════════════════════════════
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
-            // TODO: Particles use a different rendering path (billboards/sprites)
+            // Particles use a different rendering path (billboards/sprites)
             // They don't have traditional mesh geometry (vb/ib)
-            // For now, skip them - they need to be rendered in a separate particle pass
-            return false;
+            // Collect them in separate particle batches for ParticlePass
+            return ProcessParticleGeometry(visual, worldTransform, renderable, false);
 
         // MT_HIERRARHY, MT_SKELETON_ANIM, MT_SKELETON_RIGID, MT_LOD are containers, not leaf meshes
         // They should have been unpacked by ExtractStaticLeafVisuals
@@ -721,7 +745,8 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
             break;
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
-            return false;  // Particles not supported in HUD yet
+            // HUD particles need special FOV handling - collect them separately
+            return ProcessParticleGeometry(visual, worldTransform, renderable, true);
         default:
             return false;
     }
@@ -816,6 +841,56 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 
     // Add to HUD batch list (NOT to world geometry collector)
     m_hudBatches.push_back(batch);
+    return true;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROCESS PARTICLE GEOMETRY (billboards/sprites)
+// ═══════════════════════════════════════════════════════
+// Particles use dynamic vertex buffers and billboard rendering.
+// They don't have traditional static mesh geometry (vb/ib).
+// Collected separately for ParticlePass to render.
+//
+// World particles: Normal rendering, depth test against world geometry
+// HUD particles: Apply hud_transform_helper FOV adjustment
+//
+bool FrameGraphRenderer::ProcessParticleGeometry(
+    dxRender_Visual* visual,
+    const Fmatrix& worldTransform,
+    IRenderable* renderable,
+    bool isHUD)
+{
+    if (!visual)
+        return false;
+
+    // Verify this is actually a particle system
+    u32 vType = visual->getType();
+    if (vType != MT_PARTICLE_EFFECT && vType != MT_PARTICLE_GROUP)
+        return false;
+
+    // Check if this particle has HUD mode flag set (for CParticleEffect)
+    bool isHUDParticle = isHUD;
+    if (vType == MT_PARTICLE_EFFECT) {
+        RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
+            static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
+        // Override with actual HUD mode from particle
+        isHUDParticle = pEffect->GetHudMode();
+    }
+
+    // Create particle batch
+    passes::ParticleBatch batch;
+    batch.visual = visual;
+    batch.worldMatrix = worldTransform;
+    batch.renderable = renderable;
+    batch.isHUDMode = isHUDParticle;
+
+    // Add to appropriate list (world or HUD)
+    if (isHUDParticle) {
+        m_hudParticleBatches.push_back(batch);
+    } else {
+        m_worldParticleBatches.push_back(batch);
+    }
+
     return true;
 }
 

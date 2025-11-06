@@ -30,7 +30,7 @@ using RENDER_NAMESPACE::CSkeletonX_PM;
 // This creates the visual effect of different FOV without changing projection matrix
 // (so lighting and shadows still work correctly in world space)
 //
-// Based on Unreal Engine's viewmodel FOV technique:
+// Based on Unreal Engine's viewmodel FOV technique, source: https://sahildhanju.com/posts/render-first-person-fov/
 // AdjustedWorld = View^-1 * FOVScale * View * World
 //
 // The FOV scale is applied in view space (where perspective happens),
@@ -39,8 +39,6 @@ using RENDER_NAMESPACE::CSkeletonX_PM;
 static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 {
     // FOV scale factor (psHUD_FOV = 0.45 default, range 0.1 to 1.0)
-    // Lower psHUD_FOV = narrower FOV = weapon appears larger/closer
-    // So we INVERT: scale = 1.0 / psHUD_FOV
     // Example: psHUD_FOV=0.45 -> scale=2.22x larger (closer)
     //          psHUD_FOV=1.0  -> scale=1.0x (normal)
     float fovScale = 1.0f / psHUD_FOV;
