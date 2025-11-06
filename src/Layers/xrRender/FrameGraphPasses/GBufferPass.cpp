@@ -143,7 +143,7 @@ bool GBufferPass::LoadShaders()
     return true;
 }
 
-bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph& fg)
+bool GBufferPass::CreatePipeline(const framegraph::DefaultOutputLayout& outputs, const FrameGraph& fg)
 {
     VERIFY(m_vertexShader != nullptr);
     VERIFY(m_pixelShader != nullptr);
@@ -218,7 +218,7 @@ bool GBufferPass::CreatePipeline(const GBufferOutputs& outputs, const FrameGraph
 
 void GBufferPass::Setup(FrameGraph& fg) {
 
-    m_outputs = GBufferOutputs{};
+    m_outputs = framegraph::DefaultOutputLayout{};
 
     // ═══════════════════════════════════════════════════════
     //  CREATE G-BUFFER RESOURCES

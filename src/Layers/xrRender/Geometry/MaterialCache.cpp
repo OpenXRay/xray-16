@@ -77,8 +77,8 @@ MaterialCache::~MaterialCache() {
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
-    const passes::GBufferOutputs& outputs,
-    const xray::render::framegraph::FrameGraph& fg)
+    const framegraph::DefaultOutputLayout& outputs,
+    const framegraph::FrameGraph& fg)
 {
     if (!visual) {
         return nullptr;
@@ -167,8 +167,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     dxRender_Visual* visual,
     ShaderElement* elem,
     SPass* pass,
-    const passes::GBufferOutputs& outputs,
-    const xray::render::framegraph::FrameGraph& fg)
+    const framegraph::DefaultOutputLayout& outputs,
+    const framegraph::FrameGraph& fg)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -339,7 +339,7 @@ MaterialPSO* MaterialCache::CreatePSO(
     // Set up render states from X-Ray pass
     SetupRenderStates(pass, psoDesc);
 
-    // Set up render target formats from GBufferOutputs (using shader reflection)
+    // Set up render target formats from DefaultOutputLayout (using shader reflection)
     SetupRenderTargets(pso.get(), outputs, fg, psoDesc);
 
     // Set debug name
@@ -1450,8 +1450,8 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
 
 void MaterialCache::SetupRenderTargets(
     MaterialPSO* matPSO,
-    const passes::GBufferOutputs& outputs,
-    const xray::render::framegraph::FrameGraph& fg,
+    const framegraph::DefaultOutputLayout& outputs,
+    const framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
 {
     // Extract actual formats from FrameGraph resources

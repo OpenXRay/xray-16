@@ -44,17 +44,6 @@ struct GBufferPassConfig {
 };
 
 // ══════════════════════════════════════════════════════════
-//  G-BUFFER PASS OUTPUTS
-// ══════════════════════════════════════════════════════════
-
-struct GBufferOutputs {
-    framegraph::VirtualResourceHandle albedo;    // RT0: Albedo.rgb + Metallic.a
-    framegraph::VirtualResourceHandle normal;    // RT1: Normal.xyz + Roughness.a
-    framegraph::VirtualResourceHandle material;  // RT2: Material ID
-    framegraph::VirtualResourceHandle depth;     // Depth/Stencil
-};
-
-// ══════════════════════════════════════════════════════════
 //  G-BUFFER PASS BUILDER (Week 16: Inherits from IPass)
 // ══════════════════════════════════════════════════════════
 
@@ -90,7 +79,7 @@ public:
     const Stats& GetGBufferStats() const { return m_gbufferStats; }
 
     // Access GBuffer outputs (for RT registry)
-    const GBufferOutputs& GetOutputs() const { return m_outputs; }
+    const framegraph::DefaultOutputLayout& GetOutputs() const { return m_outputs; }
 
     // Access material cache (for phase detection)
     MaterialCache* GetMaterialCache() const { return m_materialCache.get(); }
@@ -105,8 +94,8 @@ private:
     GBufferPassConfig m_config;
     Stats m_gbufferStats;  // GBufferPass-specific stats
 
-    // G-Buffer outputs (stored for RT registry access)
-    GBufferOutputs m_outputs;
+    // G-Buffer outputs (uses framegraph::DefaultOutputLayout shared with HUDPass)
+    framegraph::DefaultOutputLayout m_outputs;
 
     // Material system
     xr_unique_ptr<MaterialCache> m_materialCache;
@@ -136,7 +125,7 @@ private:
     bool LoadShaders();
 
     // Create pipeline state object
-    bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
+    bool CreatePipeline(const framegraph::DefaultOutputLayout& outputs, const framegraph::FrameGraph& fg);
 };
 
 } // namespace xray::render::passes

@@ -54,6 +54,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     gbufferConfig.height = Device.dwHeight; // NOT screen resolution (1920x1080)!
 
     m_gbufferPass = xr_make_unique<passes::GBufferPass>(device, gbufferConfig);
+
+    // Create HUD pass (renders HUD in world space with depth range)
+    passes::HUDPassConfig hudConfig;
+    hudConfig.width = Device.dwWidth;
+    hudConfig.height = Device.dwHeight;
+    m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
+
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
@@ -201,22 +208,13 @@ void FrameGraphRenderer::SetupFrame() {
     // Collect visible geometry (CPU culling for now, GPU later)
     CollectVisibleGeometry();
 
-    // ═══════════════════════════════════════════════════════
-    //  TEMPORARY: Add HUD batches to world geometry for testing
-    // ═══════════════════════════════════════════════════════
-    // TODO: Render HUD with separate projection matrix later
-    // For now, just render in world space to test collection
-    if (!m_hudBatches.empty()) {
-        Msg("! [FrameGraphRenderer] Collected %u HUD batches, adding to world geometry for testing", (u32)m_hudBatches.size());
-
-        // Add HUD batches to geometry collector
-        for (const auto& hudBatch : m_hudBatches) {
-            m_geometryCollector->Submit(hudBatch);
-        }
-    }
-
     // End geometry collection (sorts batches)
     m_geometryCollector->EndFrame();
+
+    // Log HUD batch count
+    if (!m_hudBatches.empty()) {
+        Msg("! [FrameGraphRenderer] Collected %u HUD batches (will render in HUDPass)", (u32)m_hudBatches.size());
+    }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -395,6 +393,26 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // Route batches to appropriate passes
     RouteBatchesToPasses();
 
+    // ═══════════════════════════════════════════════════════
+    //  HUD PASS SETUP
+    // ═══════════════════════════════════════════════════════
+    // HUD renders after world geometry but before lighting
+    // This allows HUD to participate in deferred lighting
+
+    if (!m_hudBatches.empty()) {
+        // Give HUD batches to HUD pass
+        m_hudPass->SetHUDBatches(&m_hudBatches);
+
+        // Share MaterialCache with HUD pass (same materials as world geometry)
+        m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
+
+        // Share render target outputs (HUD writes to same G-Buffer as world)
+        m_hudPass->SetOutputs(m_gbufferPass->GetOutputs());
+
+        // Setup HUD pass (registers with framegraph)
+        m_hudPass->Setup(*m_framegraph);
+    }
+
     // TODO: Week 15-16 will add dynamic pass creation here
     // For now, we just route to existing GBufferPass
 }
@@ -498,32 +516,9 @@ void FrameGraphRenderer::PresentToBackbuffer() {
 // Original engine: hud_transform_helper + mapHUD/mapHUDSorted/mapHUDEmissive
 
 void FrameGraphRenderer::RenderHUD() {
-    if (m_hudBatches.empty()) {
-        return;  // No HUD items this frame
-    }
-
-    // TODO (Week 17+): Full HUD rendering implementation
-    //
-    // Requirements:
-    // 1. Create HUD projection matrix with psHUD_FOV and HUD_VIEWPORT_NEAR
-    // 2. Bind rt_Accumulator + rt_Base_Depth (same targets as world geometry)
-    // 3. Render HUD batches with MaterialCache (same as GBufferPass)
-    // 4. Restore original projection matrix
-    //
-    // Options:
-    // A) Create separate HUDPass that reuses GBufferPass logic
-    // B) Add HUD rendering directly in GBufferPass with projection matrix override
-    // C) Render HUD outside FrameGraph using direct NVRHI commands
-    //
-    // For now, just log that we collected HUD geometry:
-
-    static bool warned = false;
-    if (!warned) {
-        Msg("! [FrameGraphRenderer] HUD rendering not fully implemented yet");
-        Msg("!   Collected %u HUD batches but skipping render", (u32)m_hudBatches.size());
-        Msg("!   TODO: Implement HUD projection matrix + rendering pass");
-        warned = true;
-    }
+    // HUD rendering is now handled by HUDPass in the FrameGraph pipeline
+    // This function is kept as a stub for future HUD-specific post-processing
+    // (e.g., HUD-only effects, UI overlays, etc.)
 }
 
 // ═══════════════════════════════════════════════════════

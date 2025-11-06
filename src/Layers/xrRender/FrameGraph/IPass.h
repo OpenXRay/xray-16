@@ -15,6 +15,19 @@ namespace xray::render {
 namespace xray::render::framegraph {
 
 // ═══════════════════════════════════════════════════
+//  OUTPUT LAYOUTS (Render Target Structures)
+// ═══════════════════════════════════════════════════
+// Shared render target layouts used by multiple passes.
+// Future: Add LightingOutputLayout, PostProcessOutputLayout, etc.
+
+struct DefaultOutputLayout {
+    VirtualResourceHandle albedo;    // RT0: Albedo.rgb + Metallic.a
+    VirtualResourceHandle normal;    // RT1: Normal.xyz + Roughness.a
+    VirtualResourceHandle material;  // RT2: Material ID
+    VirtualResourceHandle depth;     // Depth/Stencil
+};
+
+// ═══════════════════════════════════════════════════
 //  PASS INTERFACE (All passes inherit from this)
 // ═══════════════════════════════════════════════════
 //
@@ -24,7 +37,7 @@ namespace xray::render::framegraph {
 //
 // Usage:
 //   class MyPass : public IPass {
-//       GBufferOutputs Setup(FrameGraph& fg) override {
+//       void Setup(FrameGraph& fg) override {
 //           // Declare resources
 //       }
 //       void Execute(ng::RenderContext& ctx, const FrameGraph& fg) override {

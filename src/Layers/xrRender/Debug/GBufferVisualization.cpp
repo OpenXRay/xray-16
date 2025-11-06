@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "GBufferVisualization.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 
 namespace xray::render::debug {
 
@@ -20,7 +21,7 @@ GBufferVisualizer::~GBufferVisualizer() {
 
 void GBufferVisualizer::Setup(
     FrameGraph& fg,
-    const passes::GBufferOutputs& gbuffer,
+    const framegraph::DefaultOutputLayout& gbuffer,
     VirtualResourceHandle backbuffer
 ) {
     // Only setup visualization pass if mode is not Off
@@ -54,7 +55,7 @@ void GBufferVisualizer::Setup(
 void GBufferVisualizer::Execute(
     ng::RenderContext& ctx,
     const FrameGraph& fg,
-    const passes::GBufferOutputs& gbuffer,
+    const framegraph::DefaultOutputLayout& gbuffer,
     VirtualResourceHandle backbuffer
 ) {
     Msg("~ [GBufferVisualizer] Executing (mode: %s)", GetModeName(m_mode));

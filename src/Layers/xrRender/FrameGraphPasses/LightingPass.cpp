@@ -116,7 +116,7 @@ bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
 
 LightingPassOutput LightingPass::Setup(
     FrameGraph& fg,
-    const GBufferOutputs& gbuffer
+    const framegraph::DefaultOutputLayout& gbuffer
 ) {
 
     LightingPassOutput output;
@@ -164,7 +164,7 @@ LightingPassOutput LightingPass::Setup(
 void LightingPass::Execute(
     ng::RenderContext& ctx,
     const FrameGraph& fg,
-    const GBufferOutputs& gbuffer,
+    const framegraph::DefaultOutputLayout& gbuffer,
     const LightingPassOutput& output
 ) {
 

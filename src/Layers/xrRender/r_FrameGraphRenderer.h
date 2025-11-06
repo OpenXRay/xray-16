@@ -6,6 +6,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
+#include "Layers/xrRender/FrameGraphPasses/HUDPass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
@@ -81,6 +82,7 @@ private:
 
     // Passes
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
+    xr_unique_ptr<passes::HUDPass> m_hudPass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
 

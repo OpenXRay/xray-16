@@ -47,7 +47,7 @@ public:
     // Setup pass in FrameGraph
     LightingPassOutput Setup(
         framegraph::FrameGraph& fg,
-        const GBufferOutputs& gbuffer
+        const framegraph::DefaultOutputLayout& gbuffer
     );
 
     // Get configuration
@@ -84,7 +84,7 @@ private:
     void Execute(
         ng::RenderContext& ctx,
         const framegraph::FrameGraph& fg,
-        const GBufferOutputs& gbuffer,
+        const framegraph::DefaultOutputLayout& gbuffer,
         const LightingPassOutput& output
     );
 };
