@@ -16,11 +16,34 @@
 #include "Layers/xrRender/SkeletonX.h"
 #include "xrEngine/Render.h"
 
+extern ENGINE_API float psHUD_FOV;
 namespace xray::render::passes {
 
 using namespace framegraph;
 using RENDER_NAMESPACE::CSkeletonX_ST;
 using RENDER_NAMESPACE::CSkeletonX_PM;
+
+static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
+{
+    float fovScale = 1.0f / psHUD_FOV;
+
+    Fmatrix viewMatrix = Device.mView;
+    Fmatrix invView;
+    invView.invert(viewMatrix);
+
+    Fmatrix fovScaleMatrix;
+    fovScaleMatrix.identity();
+    fovScaleMatrix._11 = fovScale;
+    fovScaleMatrix._22 = fovScale;
+    fovScaleMatrix._33 = 1.0f;
+
+    Fmatrix temp1, temp2, result;
+    temp1.mul(viewMatrix, worldMatrix);
+    temp2.mul(fovScaleMatrix, temp1);
+    result.mul(invView, temp2);
+
+    return result;
+}
 
 HUDPass::HUDPass(ng::RenderDevice* device, const HUDPassConfig& config)
     : m_device(device)
@@ -118,9 +141,11 @@ void HUDPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             currentPipeline = matPSO->pso;
         }
 
+        Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
+
         if (matPSO->detail_scale != lastDetailScale) {
             DynamicTransforms dynamicCB = {};
-            FillDynamicTransforms(dynamicCB);
+            FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
 
             extern float r__dtex_range;
             dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
@@ -170,7 +195,7 @@ void HUDPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
             if (isSkeleton) {
                 DynamicTransforms dynamicCB = {};
-                FillDynamicTransforms(dynamicCB, batch.worldMatrix, 0.f);
+                FillDynamicTransforms(dynamicCB, adjustedWorldMatrix, 0.f);
                 for (const auto& cbInfo : matPSO->constantBuffers) {
                     if (cbInfo.name == "dynamic_transforms") {
                         u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
