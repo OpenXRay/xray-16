@@ -44,7 +44,7 @@ void pvInitializeStatics(void)
 
 u16 pvCompress(const Fvector& vec)
 {
-    if (vec.x == 0.f && vec.y == 0.f && vec.z == 0.f)
+    if (fis_zero(vec.x) && fis_zero(vec.y) && fis_zero(vec.z))
         return 0;
 
     // save copy
