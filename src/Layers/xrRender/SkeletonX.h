@@ -19,6 +19,8 @@ class Fvisual;
 
 class CSkeletonX
 {
+public:
+    CKinematics* GetParent() { return Parent; }
 protected:
     enum
     {

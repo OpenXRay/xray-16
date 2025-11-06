@@ -815,7 +815,31 @@ bool CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 bool CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m)
 {
-    // TODO: this whole function should be replaced by a list of renderables+xforms returned from `renderable_Render` call
+#if defined(USE_DX11) && RENDER == R_R4
+    // ═══════════════════════════════════════════════════════
+    //  FRAMEGRAPH INTEGRATION
+    // ═══════════════════════════════════════════════════════
+    // When FrameGraph is active, route geometry collection through FrameGraph renderer
+    // This allows game objects to add their visuals via renderable_Render() callbacks
+    // without going through legacy dsgraph
+    //
+    // This is CRITICAL for rendering:
+    // - NPCs with their weapons/equipment
+    // - Player weapons and attachments
+    // - HUD items
+    // - Dynamic objects with sub-objects
+    // ═══════════════════════════════════════════════════════
+
+    extern ENGINE_API int ps_r4_use_framegraph;
+
+    if (ps_r4_use_framegraph && m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
+    {
+        m_framegraphRenderer->add_Visual(root, V, m);
+        return;
+    }
+#endif
+
+    // Legacy path: use dsgraph
     auto& dsgraph = get_context(context_id);
     dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }

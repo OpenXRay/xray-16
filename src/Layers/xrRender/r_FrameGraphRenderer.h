@@ -87,6 +87,9 @@ private:
     // Geometry collector
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
+    // HUD geometry (separate from world geometry)
+    xr_vector<GeometryBatch> m_hudBatches;
+
     // RenderContext for execution
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 
@@ -117,6 +120,9 @@ private:
     // Visibility & culling (CPU-based for now, will move to GPU later)
     void CollectVisibleGeometry();
 
+    // HUD rendering (after world geometry, with special projection)
+    void RenderHUD();
+
     // Helper: Create render target (DRY helper for BuildFrameGraph)
     framegraph::VirtualResourceHandle CreateRT(
         const char* name,
@@ -128,6 +134,7 @@ private:
 
     // Helper functions for geometry collection
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
+    bool ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
     // ═══════════════════════════════════════════════════
@@ -155,6 +162,15 @@ private:
 
     // Create all required passes dynamically
     void CreateAllRequiredPasses();
+
+    public:
+
+        // ═══════════════════════════════════════════════════
+        //  GAME OBJECT RENDERING CALLBACK INTEGRATION
+        // ═══════════════════════════════════════════════════
+        // Called by game objects via CRender::add_Visual() during renderable_Render()
+        // This is the bridge that allows game objects to add their visuals, attachments, and HUD items
+        void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform);
 };
 
 } // namespace xray::render

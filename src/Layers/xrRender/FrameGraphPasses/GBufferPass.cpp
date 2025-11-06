@@ -615,8 +615,27 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                         }
                     }
 
-                    IRenderVisual* renderableVisual = batch->renderable->GetRenderData().visual;
-                    RENDER_NAMESPACE::CKinematics* Parent = dynamic_cast<RENDER_NAMESPACE::CKinematics*>(renderableVisual);
+                    // ═══════════════════════════════════════════════════
+                    //  FIX: Get Parent from skinned mesh visual itself!
+                    // ═══════════════════════════════════════════════════
+                    // For attachments (weapons), batch->renderable is the ACTOR,
+                    // not the weapon skeleton! We need to get the Parent pointer
+                    // from the skinned mesh visual (batch->visual), which stores
+                    // a pointer to its parent CKinematics skeleton.
+                    //
+                    // CSkeletonX has: CKinematics* Parent (SkeletonX.h:42)
+                    // This is set during skeleton loading via AfterLoad()
+                    RENDER_NAMESPACE::CKinematics* Parent = nullptr;
+
+                    // Try to cast the visual to CSkeletonX_ST or CSkeletonX_PM
+                    auto visualType = batch->visual->getType();
+                    if (visualType == MT_SKELETON_GEOMDEF_ST) {
+                        auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_ST*>(batch->visual);
+                        Parent = skeletonMesh->GetParent();
+                    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+                        auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_PM*>(batch->visual);
+                        Parent = skeletonMesh->GetParent();
+                    }
 
                     if (Parent) {
                         // CRITICAL: Calculate bones BEFORE accessing transforms!
@@ -648,6 +667,9 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                             array[(id + 2) * 4 + 2] = M._33;
                             array[(id + 2) * 4 + 3] = M._43;
                         }
+                    } else {
+                        Msg("! [GBufferPass] WARNING: Skeleton visual has no Parent! visual=%s",
+                            batch->visual->dbg_name.c_str());
                     }
                 } else {
                     // ─────────────────────────────────────────────────

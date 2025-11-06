@@ -15,6 +15,7 @@
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/ShaderKey.h"
+#include "xrEngine/CustomHUD.h"
 
 namespace xray::render {
 
@@ -133,6 +134,12 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
+    //  RENDER HUD (after world geometry, before present)
+    // ═══════════════════════════════════════════════════════
+
+    RenderHUD();
+
+    // ═══════════════════════════════════════════════════════
     //  PRESENT TO BACKBUFFER
     // ═══════════════════════════════════════════════════════
 
@@ -183,15 +190,30 @@ void FrameGraphRenderer::SetupFrame() {
             spatial_types,
             view_frustum
         );
-
-        Msg("  [FrameGraph] Spatial query: %u objects cached (renderables + lights)", (u32)m_lstRenderables.size());
     }
 
     // Begin geometry collection
     m_geometryCollector->BeginFrame();
 
+    // Clear HUD batches from previous frame
+    m_hudBatches.clear();
+
     // Collect visible geometry (CPU culling for now, GPU later)
     CollectVisibleGeometry();
+
+    // ═══════════════════════════════════════════════════════
+    //  TEMPORARY: Add HUD batches to world geometry for testing
+    // ═══════════════════════════════════════════════════════
+    // TODO: Render HUD with separate projection matrix later
+    // For now, just render in world space to test collection
+    if (!m_hudBatches.empty()) {
+        Msg("! [FrameGraphRenderer] Collected %u HUD batches, adding to world geometry for testing", (u32)m_hudBatches.size());
+
+        // Add HUD batches to geometry collector
+        for (const auto& hudBatch : m_hudBatches) {
+            m_geometryCollector->Submit(hudBatch);
+        }
+    }
 
     // End geometry collection (sorts batches)
     m_geometryCollector->EndFrame();
@@ -465,6 +487,46 @@ void FrameGraphRenderer::PresentToBackbuffer() {
 }
 
 // ═══════════════════════════════════════════════════════
+//  HUD RENDERING
+// ═══════════════════════════════════════════════════════
+//
+// HUD items use special rendering state:
+// - psHUD_FOV projection matrix (wider FOV)
+// - HUD_VIEWPORT_NEAR near plane (closer to camera)
+// - Optional custom culling for left-handed mode
+//
+// Original engine: hud_transform_helper + mapHUD/mapHUDSorted/mapHUDEmissive
+
+void FrameGraphRenderer::RenderHUD() {
+    if (m_hudBatches.empty()) {
+        return;  // No HUD items this frame
+    }
+
+    // TODO (Week 17+): Full HUD rendering implementation
+    //
+    // Requirements:
+    // 1. Create HUD projection matrix with psHUD_FOV and HUD_VIEWPORT_NEAR
+    // 2. Bind rt_Accumulator + rt_Base_Depth (same targets as world geometry)
+    // 3. Render HUD batches with MaterialCache (same as GBufferPass)
+    // 4. Restore original projection matrix
+    //
+    // Options:
+    // A) Create separate HUDPass that reuses GBufferPass logic
+    // B) Add HUD rendering directly in GBufferPass with projection matrix override
+    // C) Render HUD outside FrameGraph using direct NVRHI commands
+    //
+    // For now, just log that we collected HUD geometry:
+
+    static bool warned = false;
+    if (!warned) {
+        Msg("! [FrameGraphRenderer] HUD rendering not fully implemented yet");
+        Msg("!   Collected %u HUD batches but skipping render", (u32)m_hudBatches.size());
+        Msg("!   TODO: Implement HUD projection matrix + rendering pass");
+        warned = true;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
 //  VISIBILITY & CULLING
 // ═══════════════════════════════════════════════════════
 
@@ -494,7 +556,19 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         case MT_SKELETON_GEOMDEF_PM:  // Skinned mesh (progressive)
             meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
-        // MT_HIERRARHY, MT_SKELETON_ANIM, MT_SKELETON_RIGID, MT_PARTICLE_*, MT_LOD are containers, not leaf meshes
+
+        // ═══════════════════════════════════════════════════════
+        //  PARTICLES - Special handling needed
+        // ═══════════════════════════════════════════════════════
+        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_GROUP:
+            // TODO: Particles use a different rendering path (billboards/sprites)
+            // They don't have traditional mesh geometry (vb/ib)
+            // For now, skip them - they need to be rendered in a separate particle pass
+            return false;
+
+        // MT_HIERRARHY, MT_SKELETON_ANIM, MT_SKELETON_RIGID, MT_LOD are containers, not leaf meshes
+        // They should have been unpacked by ExtractStaticLeafVisuals
         default:
             return false;
     }
@@ -625,6 +699,137 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     return true;
 }
 
+// ═══════════════════════════════════════════════════════
+//  PROCESS HUD GEOMETRY (separate from world geometry)
+// ═══════════════════════════════════════════════════════
+// HUD geometry is rendered with:
+// - Different projection matrix (psHUD_FOV instead of regular FOV)
+// - Different near plane (HUD_VIEWPORT_NEAR instead of VIEWPORT_NEAR)
+// - Separate depth buffer or depth range
+// - Custom culling for left-handed mode
+//
+// Original engine uses: mapHUD, mapHUDSorted, mapHUDEmissive
+
+bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
+    if (!visual)
+        return false;
+
+    // Get mesh interface based on visual type (same logic as world geometry)
+    IRender_Mesh* meshVisual = nullptr;
+
+    switch (visual->getType()) {
+        case MT_NORMAL:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
+        case MT_PROGRESSIVE:
+            meshVisual = static_cast<FProgressive*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
+            break;
+        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_GROUP:
+            return false;  // Particles not supported in HUD yet
+        default:
+            return false;
+    }
+
+    if (!meshVisual)
+        return false;
+
+    // Check if geometry is valid
+    if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        return false;
+
+    SGeometry* geom = meshVisual->rm_geom._get();
+    if (!geom->vb || !geom->ib)
+        return false;
+
+    // Wrap D3D11 buffers (same caching logic as world geometry)
+    ID3D11Buffer* d3dVB = geom->vb;
+    ID3D11Buffer* d3dIB = geom->ib;
+
+    // Get or create vertex buffer handle
+    nvrhi::BufferHandle nvrhiVB;
+    auto vbIt = m_bufferHandleCache.find(d3dVB);
+    if (vbIt != m_bufferHandleCache.end()) {
+        nvrhiVB = vbIt->second;
+    } else {
+        D3D11_BUFFER_DESC d3dVBDesc;
+        d3dVB->GetDesc(&d3dVBDesc);
+
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.debugName = "HUD_VB";
+        vbDesc.byteSize = d3dVBDesc.ByteWidth;
+        vbDesc.isVertexBuffer = true;
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+
+        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
+
+        if (!nvrhiVB)
+            return false;
+
+        m_bufferHandleCache[d3dVB] = nvrhiVB;
+    }
+
+    // Get or create index buffer handle
+    nvrhi::BufferHandle nvrhiIB;
+    auto ibIt = m_bufferHandleCache.find(d3dIB);
+    if (ibIt != m_bufferHandleCache.end()) {
+        nvrhiIB = ibIt->second;
+    } else {
+        D3D11_BUFFER_DESC d3dIBDesc;
+        d3dIB->GetDesc(&d3dIBDesc);
+
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.debugName = "HUD_IB";
+        ibDesc.byteSize = d3dIBDesc.ByteWidth;
+        ibDesc.isIndexBuffer = true;
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+
+        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
+
+        if (!nvrhiIB)
+            return false;
+
+        m_bufferHandleCache[d3dIB] = nvrhiIB;
+    }
+
+    // Create HUD batch
+    GeometryBatch batch;
+    batch.vertexBuffer = nvrhiVB;
+    batch.indexBuffer = nvrhiIB;
+    batch.indexCount = meshVisual->iCount;
+    batch.startIndex = meshVisual->iBase;
+    batch.baseVertex = meshVisual->vBase;
+    batch.worldMatrix = worldTransform;
+    batch.visual = visual;
+    batch.renderable = renderable;
+    batch.pipeline = nullptr;
+    batch.bindingSet = nullptr;
+
+    // Extract shader key for debug name
+    RENDER_NAMESPACE::ShaderKey shaderKey;
+    if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
+        static thread_local std::string s_hudDebugNameBuffer;
+        s_hudDebugNameBuffer = "HUD_" + shaderKey.ToString();
+        batch.debugName = s_hudDebugNameBuffer.c_str();
+    } else {
+        batch.debugName = "<hud_unknown_shader>";
+    }
+
+    // Add to HUD batch list (NOT to world geometry collector)
+    m_hudBatches.push_back(batch);
+    return true;
+}
+
 // Helper to recursively extract leaf visuals from static hierarchy
 void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
     if (!pVisual)
@@ -750,20 +955,14 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                 }
             }
 
-            Msg("  [FrameGraph] Portal traversal: %u visible sectors",
-                (u32)dsgraph.PortalTraverser.r_sectors.size());
         }
     }
-
-    Msg("  [FrameGraph] Found %u static visuals from sectors", (u32)staticVisuals.size());
 
     // ═══════════════════════════════════════════════════════
     //  COLLECT DYNAMIC GEOMETRY FROM SPATIAL DATABASE
     // ═══════════════════════════════════════════════════════
     // Use cached m_lstRenderables (populated once in SetupFrame)
     // This is MUCH more efficient than querying spatial DB again!
-
-    Msg("  [FrameGraph] Processing %u dynamic objects from cached spatial query", (u32)m_lstRenderables.size());
 
     // ═══════════════════════════════════════════════════════
     //  PROCESS STATIC GEOMETRY
@@ -837,8 +1036,6 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         }
     }
 
-    Msg("  [FrameGraph] Static: submitted %u/%u (filtered: %u not mesh, %u no geom, %u no buffers)",
-        submittedStatic, (u32)staticVisuals.size(), notFvisual_static, noGeometry_static, noBuffers_static);
 
     // ═══════════════════════════════════════════════════════
     //  PROCESS DYNAMIC GEOMETRY
@@ -846,87 +1043,101 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     u32 submittedDynamic = 0;
     u32 notRenderable = 0;
-    u32 noVisual = 0;
 
-    // Extract geometry from each visible dynamic object (from cached list)
-    // CRITICAL: Filter by sector visibility (r__dsgraph_build.cpp:861-867)
+    // Process each visible dynamic object (from cached list)
     u32 portalTraversalMarker = dsgraph.PortalTraverser.i_marker;
 
     for (ISpatial* spatial : m_lstRenderables)
     {
-        // Get spatial data
         const auto& data = spatial->GetSpatialData();
         const auto sector_id = data.sector_id;
-
-        // Skip if object is not associated with any sector
-        if (sector_id == IRender_Sector::INVALID_SECTOR_ID) {
-            notRenderable++;
-            continue;
-        }
+        IRenderable* renderable = spatial->dcast_Renderable();
 
         // Skip lights for now (we'll handle them later)
         if (data.type & STYPE_LIGHTSOURCE) {
             notRenderable++;
             continue;
         }
-
-        // CRITICAL CHECK: Only process objects in sectors touched by portal traversal!
-        // This is the key filter we were missing (r__dsgraph_build.cpp:861-862)
-        CSector* sector = static_cast<CSector*>(dsgraph.Sectors[sector_id]);
-        if (portalTraversalMarker != sector->r_marker) {
-            notRenderable++;  // Inactive sector, skip
-            continue;
-        }
-
-        // Test against sector frustums (r__dsgraph_build.cpp:866)
-        bool passedFrustumTest = false;
-        for (const CFrustum& sectorFrustum : sector->r_frustums) {
-            if (sectorFrustum.testSphere_dirty(data.sphere.P, data.sphere.R)) {
-                passedFrustumTest = true;
-                break;
-            }
-        }
-        if (!passedFrustumTest) {
-            notRenderable++;
-            continue;
-        }
-
         // Get the renderable object
-        IRenderable* renderable = spatial->dcast_Renderable();
         if (!renderable) {
             notRenderable++;
             continue;
         }
 
-        // Get the visual (geometry) - stored in RenderData, not ROS
-        IRenderVisual* iVisual = renderable->GetRenderData().visual;
-        if (!iVisual) {
-            noVisual++;
-            continue;
-        }
-
-        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(iVisual);
-        if (!visual) {
-            noVisual++;
-            continue;
-        }
-
-        // Extract leaf visuals from dynamic object (handles skeletons, hierarchies, LODs, etc.)
-        xr_vector<dxRender_Visual*> dynamicLeafs;
-        ExtractStaticLeafVisuals(visual, dynamicLeafs);
-
-        // Process all extracted leaf visuals with the object's transform
-        // IMPORTANT: Pass the renderable so skinned meshes can access parent skeleton bone data
-        for (dxRender_Visual* leafVisual : dynamicLeafs) {
-            if (ProcessVisualGeometry(leafVisual, renderable->GetRenderData().xform, renderable)) {
-                submittedDynamic++;
-            }
-        }
+        renderable->renderable_Render(0, renderable);
+        submittedDynamic++;  // Count objects that got a chance to render
     }
 
-    Msg("  [FrameGraph] Dynamic: submitted %u/%u (filtered: %u not renderable, %u no visual)",
-        submittedDynamic, (u32)m_lstRenderables.size(), notRenderable, noVisual);
-    Msg("  [FrameGraph] TOTAL: %u geometry batches submitted", submittedStatic + submittedDynamic);
+    // ═══════════════════════════════════════════════════════
+    //  HUD RENDERING (after dynamic objects)
+    // ═══════════════════════════════════════════════════════
+
+    if (g_pGameLevel && g_pGameLevel->pHUD) {
+        g_pGameLevel->pHUD->Render_Last(0);  // context_id = 0 (not using legacy contexts)
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+//  GAME OBJECT RENDERING CALLBACK INTEGRATION
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform) {
+    // This method is called by game objects during their renderable_Render() callbacks
+    // via CRender::add_Visual() -> FrameGraphRenderer::add_Visual()
+    //
+    // This allows game objects to add:
+    // - Their main visual
+    // - Attachments (weapons, items, equipment)
+    // - HUD items (if renderable_HUD() is true)
+    // - Any custom sub-objects
+    //
+    // This is CRITICAL for rendering NPCs, weapons, attachments, HUD items, etc.
+
+    if (!V) {
+        return;  // No visual to add
+    }
+
+    dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(V);
+    if (!visual) {
+        return;  // Not a valid visual type
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  HUD FILTERING (original engine: r__dsgraph_build.cpp:83-96)
+    // ═══════════════════════════════════════════════════════
+    // HUD items are rendered in a separate pass with:
+    // - Special projection matrix (psHUD_FOV)
+    // - Different near plane (HUD_VIEWPORT_NEAR)
+    // - Custom culling mode (for left-handed mode)
+    //
+    // Original code: if (root && root->renderable_HUD()) { add to mapHUD; return; }
+    bool isHUD = (root && root->renderable_HUD());
+
+    // Extract leaf visuals from the visual hierarchy
+    // This handles:
+    // - Hierarchical visuals (FHierrarhyVisual)
+    // - Skinned meshes (CKinematics)
+    // - LOD meshes (FLOD)
+    // - Progressive meshes (FProgressive)
+    xr_vector<dxRender_Visual*> leafVisuals;
+    ExtractStaticLeafVisuals(visual, leafVisuals);
+
+    // Route to appropriate processor based on HUD flag
+    u32 processed = 0;
+    for (dxRender_Visual* leafVisual : leafVisuals) {
+        bool success = false;
+        if (isHUD) {
+            // HUD geometry - separate processing with different projection/culling
+            success = ProcessHudGeometry(leafVisual, xform, root);
+        } else {
+            // World geometry - standard processing
+            success = ProcessVisualGeometry(leafVisual, xform, root);
+        }
+
+        if (success) {
+            processed++;
+        }
+    }
 }
 
 // ═══════════════════════════════════════════════════════
