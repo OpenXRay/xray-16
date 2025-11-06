@@ -170,6 +170,8 @@ struct MaterialPSO {
     }
 };
 
+nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
+
 class MaterialCache {
 public:
     MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool = nullptr);
@@ -229,6 +231,12 @@ public:
         nvrhi::IBuffer* perObjectVCB,
         SPass* pass);
 
+    xr_map<shared_str, ng::ShaderHandle> m_shaderHandles;
+
+    ng::ShaderHandle GetOrCreateShaderVS(SVS* vs);
+    ng::ShaderHandle GetOrCreateShaderPS(SPS* ps);
+    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+
 private:
 
     static u64 ComputeTextureHash(SPass* pass);
@@ -236,7 +244,6 @@ private:
     static u64 ComputeStateHash(SPass* pass);
 
     void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
-    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,
         const framegraph::DefaultOutputLayout& outputs,

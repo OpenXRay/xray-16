@@ -12,6 +12,14 @@ namespace xray::render::RENDER_NAMESPACE {
     }
 }
 
+namespace xray::render::ng {
+    class PipelineState;
+}
+
+namespace xray::render {
+    class MaterialCache;
+}
+
 namespace xray::render::passes {
 
 using namespace framegraph;
@@ -30,7 +38,7 @@ struct ParticlePassConfig {
 
 class ParticlePass : public framegraph::IPass {
 public:
-    ParticlePass(ng::RenderDevice* device, const ParticlePassConfig& config);
+    ParticlePass(ng::RenderDevice* device, MaterialCache* materialCache, const ParticlePassConfig& config);
     ~ParticlePass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -51,6 +59,7 @@ public:
 
 private:
     ng::RenderDevice* m_device = nullptr;
+    MaterialCache* m_materialCache = nullptr;
     ParticlePassConfig m_config;
 
     const xr_vector<ParticleBatch>* m_worldParticleBatches = nullptr;
@@ -64,7 +73,28 @@ private:
     nvrhi::BufferHandle m_quadIB;
     u32 m_maxQuads = 0;
 
-    xr_map<shared_str, ng::PipelineState*> m_particlePSOCache;
+    struct ParticleBindingCache {
+        nvrhi::BindingSetHandle vsBindingSet;
+        nvrhi::BindingSetHandle psBindingSet;
+
+        nvrhi::BindingLayoutHandle vsBindingLayout;
+        nvrhi::BindingLayoutHandle psBindingLayout;
+
+        xr_vector<nvrhi::SamplerHandle> samplers;
+        xr_vector<ng::TextureHandle> textures;
+        xr_vector<nvrhi::BufferHandle> constantBuffers;
+
+        struct CBInfo {
+            u32 slot;
+            u32 size;
+            xr_string name;
+            bool isPerObject;
+            bool isVertexShader;
+            nvrhi::BufferHandle buffer;
+        };
+        xr_vector<CBInfo> cbInfos;
+    };
+    xr_map<shared_str, ParticleBindingCache> m_bindingCache;
 
     Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix);
 
@@ -73,9 +103,13 @@ private:
     void EnsureParticleVertexBuffer(u32 sizeBytes);
 
     ng::PipelineState* GetOrCreateParticlePSO(
-        RENDER_NAMESPACE::Shader* shader,
+        RENDER_NAMESPACE::SPass* pass,
         const RENDER_NAMESPACE::PS::CPEDef* pDef,
         const framegraph::FrameGraph& fg
+    );
+
+    ParticleBindingCache* CreateParticleBindingSet(
+        RENDER_NAMESPACE::SPass* pass
     );
 
     bool RenderParticleSystem(
