@@ -29,7 +29,7 @@ public:
 
     LightingPassOutput Setup(
         framegraph::FrameGraph& fg,
-        const GBufferOutputs& gbuffer
+        const framegraph::DefaultOutputLayout& gbuffer
     );
 
     const LightingPassConfig& GetConfig() const { return m_config; }
@@ -60,7 +60,7 @@ private:
     void Execute(
         ng::RenderContext& ctx,
         const framegraph::FrameGraph& fg,
-        const GBufferOutputs& gbuffer,
+        const framegraph::DefaultOutputLayout& gbuffer,
         const LightingPassOutput& output
     );
 };

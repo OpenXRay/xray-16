@@ -25,8 +25,8 @@ namespace ng {
     struct PipelineStateDesc;
 }
 
-namespace passes {
-    struct GBufferOutputs;
+namespace framegraph {
+    struct DefaultOutputLayout;
 }
 
 using RENDER_NAMESPACE::Shader;
@@ -177,8 +177,8 @@ public:
 
     MaterialPSO* GetOrCreatePSO(
         dxRender_Visual* visual,
-        const passes::GBufferOutputs& outputs,
-        const xray::render::framegraph::FrameGraph& fg);
+        const framegraph::DefaultOutputLayout& outputs,
+        const framegraph::FrameGraph& fg);
 
     void Clear();
 
@@ -208,8 +208,8 @@ private:
         dxRender_Visual* visual,
         ShaderElement* elem,
         SPass* pass,
-        const passes::GBufferOutputs& outputs,
-        const xray::render::framegraph::FrameGraph& fg);
+        const framegraph::DefaultOutputLayout& outputs,
+        const framegraph::FrameGraph& fg);
 
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
 
@@ -239,8 +239,8 @@ private:
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,
-        const passes::GBufferOutputs& outputs,
-        const xray::render::framegraph::FrameGraph& fg,
+        const framegraph::DefaultOutputLayout& outputs,
+        const framegraph::FrameGraph& fg,
         ng::PipelineStateDesc& psoDesc);
 };
 

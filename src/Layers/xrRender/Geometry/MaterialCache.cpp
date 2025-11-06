@@ -55,8 +55,8 @@ MaterialCache::~MaterialCache() {
 
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
-    const passes::GBufferOutputs& outputs,
-    const xray::render::framegraph::FrameGraph& fg)
+    const framegraph::DefaultOutputLayout& outputs,
+    const framegraph::FrameGraph& fg)
 {
     if (!visual) {
         return nullptr;
@@ -115,8 +115,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     dxRender_Visual* visual,
     ShaderElement* elem,
     SPass* pass,
-    const passes::GBufferOutputs& outputs,
-    const xray::render::framegraph::FrameGraph& fg)
+    const framegraph::DefaultOutputLayout& outputs,
+    const framegraph::FrameGraph& fg)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -1110,8 +1110,8 @@ void MaterialCache::SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDes
 
 void MaterialCache::SetupRenderTargets(
     MaterialPSO* matPSO,
-    const passes::GBufferOutputs& outputs,
-    const xray::render::framegraph::FrameGraph& fg,
+    const framegraph::DefaultOutputLayout& outputs,
+    const framegraph::FrameGraph& fg,
     ng::PipelineStateDesc& psoDesc)
 {
     nvrhi::ITexture* albedoTex = fg.GetPhysicalTexture(outputs.albedo);

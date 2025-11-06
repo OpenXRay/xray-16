@@ -49,6 +49,12 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     gbufferConfig.height = Device.dwHeight;
 
     m_gbufferPass = xr_make_unique<passes::GBufferPass>(device, gbufferConfig);
+
+    passes::HUDPassConfig hudConfig;
+    hudConfig.width = Device.dwWidth;
+    hudConfig.height = Device.dwHeight;
+    m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
+
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
@@ -150,15 +156,11 @@ void FrameGraphRenderer::SetupFrame() {
 
     CollectVisibleGeometry();
 
-    if (!m_hudBatches.empty()) {
-        Msg("! [FrameGraphRenderer] Collected %u HUD batches, adding to world geometry for testing", (u32)m_hudBatches.size());
-
-        for (const auto& hudBatch : m_hudBatches) {
-            m_geometryCollector->Submit(hudBatch);
-        }
-    }
-
     m_geometryCollector->EndFrame();
+
+    if (!m_hudBatches.empty()) {
+        Msg("! [FrameGraphRenderer] Collected %u HUD batches (will render in HUDPass)", (u32)m_hudBatches.size());
+    }
 }
 
 framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
@@ -282,6 +284,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     RouteBatchesToPasses();
 
+    if (!m_hudBatches.empty()) {
+        m_hudPass->SetHUDBatches(&m_hudBatches);
+
+        m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
+
+        m_hudPass->SetOutputs(m_gbufferPass->GetOutputs());
+
+        m_hudPass->Setup(*m_framegraph);
+    }
+
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -366,17 +378,6 @@ void FrameGraphRenderer::PresentToBackbuffer() {
 }
 
 void FrameGraphRenderer::RenderHUD() {
-    if (m_hudBatches.empty()) {
-        return;
-    }
-
-    static bool warned = false;
-    if (!warned) {
-        Msg("! [FrameGraphRenderer] HUD rendering not fully implemented yet");
-        Msg("!   Collected %u HUD batches but skipping render", (u32)m_hudBatches.size());
-        Msg("!   TODO: Implement HUD projection matrix + rendering pass");
-        warned = true;
-    }
 }
 
 bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {

@@ -13,6 +13,13 @@ namespace xray::render {
 
 namespace xray::render::framegraph {
 
+struct DefaultOutputLayout {
+    VirtualResourceHandle albedo;
+    VirtualResourceHandle normal;
+    VirtualResourceHandle material;
+    VirtualResourceHandle depth;
+};
+
 class IPass {
 public:
     virtual ~IPass() = default;

@@ -22,7 +22,7 @@ public:
 
     void Setup(
         framegraph::FrameGraph& fg,
-        const passes::GBufferOutputs& gbuffer,
+        const framegraph::DefaultOutputLayout& gbuffer,
         framegraph::VirtualResourceHandle backbuffer
     );
 
@@ -43,7 +43,7 @@ private:
     void Execute(
         ng::RenderContext& ctx,
         const framegraph::FrameGraph& fg,
-        const passes::GBufferOutputs& gbuffer,
+        const framegraph::DefaultOutputLayout& gbuffer,
         framegraph::VirtualResourceHandle backbuffer
     );
 };

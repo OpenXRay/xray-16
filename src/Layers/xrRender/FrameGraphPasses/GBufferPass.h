@@ -32,13 +32,6 @@ struct GBufferPassConfig {
     bool visualizeDepth = false;
 };
 
-struct GBufferOutputs {
-    framegraph::VirtualResourceHandle albedo;
-    framegraph::VirtualResourceHandle normal;
-    framegraph::VirtualResourceHandle material;
-    framegraph::VirtualResourceHandle depth;
-};
-
 class GBufferPass : public framegraph::IPass {
 public:
     GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config = GBufferPassConfig());
@@ -63,7 +56,7 @@ public:
 
     const Stats& GetGBufferStats() const { return m_gbufferStats; }
 
-    const GBufferOutputs& GetOutputs() const { return m_outputs; }
+    const framegraph::DefaultOutputLayout& GetOutputs() const { return m_outputs; }
 
     MaterialCache* GetMaterialCache() const { return m_materialCache.get(); }
 
@@ -76,7 +69,7 @@ private:
     GBufferPassConfig m_config;
     Stats m_gbufferStats;
 
-    GBufferOutputs m_outputs;
+    framegraph::DefaultOutputLayout m_outputs;
 
     xr_unique_ptr<MaterialCache> m_materialCache;
 
@@ -96,7 +89,7 @@ private:
 
     bool LoadShaders();
 
-    bool CreatePipeline(const GBufferOutputs& outputs, const framegraph::FrameGraph& fg);
+    bool CreatePipeline(const framegraph::DefaultOutputLayout& outputs, const framegraph::FrameGraph& fg);
 };
 
 }
