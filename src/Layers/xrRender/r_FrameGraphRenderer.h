@@ -6,6 +6,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/FrameGraphPasses/HUDPass.h"
+#include "Layers/xrRender/FrameGraphPasses/ParticlePass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
@@ -67,12 +68,16 @@ private:
 
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::HUDPass> m_hudPass;
+    xr_unique_ptr<passes::ParticlePass> m_particlePass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
 
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
     xr_vector<GeometryBatch> m_hudBatches;
+
+    xr_vector<passes::ParticleBatch> m_worldParticleBatches;
+    xr_vector<passes::ParticleBatch> m_hudParticleBatches;
 
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 
@@ -104,6 +109,7 @@ private:
 
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
     bool ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
+    bool ProcessParticleGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr, bool isHUD = false);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
     struct PassEntry {

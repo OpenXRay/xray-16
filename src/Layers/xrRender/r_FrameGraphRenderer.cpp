@@ -55,6 +55,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     hudConfig.height = Device.dwHeight;
     m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
 
+    passes::ParticlePassConfig particleConfig;
+    particleConfig.width = Device.dwWidth;
+    particleConfig.height = Device.dwHeight;
+    m_particlePass = xr_make_unique<passes::ParticlePass>(device, particleConfig);
+
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
@@ -154,6 +159,9 @@ void FrameGraphRenderer::SetupFrame() {
 
     m_hudBatches.clear();
 
+    m_worldParticleBatches.clear();
+    m_hudParticleBatches.clear();
+
     CollectVisibleGeometry();
 
     m_geometryCollector->EndFrame();
@@ -211,6 +219,9 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_hudPass->SetOutputs(gbufferOutputs);
     m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
     m_hudPass->Setup(*m_framegraph);
+
+    m_particlePass->SetOutputs(gbufferOutputs);
+    m_particlePass->Setup(*m_framegraph);
 
     Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
@@ -289,6 +300,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     RouteBatchesToPasses();
 
     m_hudPass->SetHUDBatches(&m_hudBatches);
+
+    m_particlePass->SetWorldParticleBatches(&m_worldParticleBatches);
+    m_particlePass->SetHUDParticleBatches(&m_hudParticleBatches);
 
 }
 
@@ -402,7 +416,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
-            return false;
+            return ProcessParticleGeometry(visual, worldTransform, renderable, false);
 
         default:
             return false;
@@ -527,7 +541,7 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
             break;
         case MT_PARTICLE_EFFECT:
         case MT_PARTICLE_GROUP:
-            return false;
+            return ProcessParticleGeometry(visual, worldTransform, renderable, true);
         default:
             return false;
     }
@@ -615,6 +629,41 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     }
 
     m_hudBatches.push_back(batch);
+    return true;
+}
+
+bool FrameGraphRenderer::ProcessParticleGeometry(
+    dxRender_Visual* visual,
+    const Fmatrix& worldTransform,
+    IRenderable* renderable,
+    bool isHUD)
+{
+    if (!visual)
+        return false;
+
+    u32 vType = visual->getType();
+    if (vType != MT_PARTICLE_EFFECT && vType != MT_PARTICLE_GROUP)
+        return false;
+
+    bool isHUDParticle = isHUD;
+    if (vType == MT_PARTICLE_EFFECT) {
+        RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
+            static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
+        isHUDParticle = pEffect->GetHudMode();
+    }
+
+    passes::ParticleBatch batch;
+    batch.visual = visual;
+    batch.worldMatrix = worldTransform;
+    batch.renderable = renderable;
+    batch.isHUDMode = isHUDParticle;
+
+    if (isHUDParticle) {
+        m_hudParticleBatches.push_back(batch);
+    } else {
+        m_worldParticleBatches.push_back(batch);
+    }
+
     return true;
 }
 
