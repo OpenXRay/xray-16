@@ -13,6 +13,7 @@
 #include "Layers/xrRender/ResourceManager.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
+#include "Layers/xrRender/RenderContext/RenderStateConversion.h"  // State conversion helpers
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -223,36 +224,16 @@ MaterialPSO* MaterialCache::CreatePSO(
     // which changes every draw. We'll create them on-demand in GBufferPass with the CB.
 
     // ═══════════════════════════════════════════════════════
-    //  CREATE SHADERS FROM BYTECODE
+    //  GET OR CREATE CACHED SHADERS
     // ═══════════════════════════════════════════════════════
 
-    if (!pso->vertexShader->bytecode) {
-        return nullptr;
-    }
-
-    ng::ShaderHandle vsHandle = m_device->CreateShader(
-        ng::ShaderStage::Vertex,
-        pso->vertexShader->bytecode->GetBufferPointer(),
-        pso->vertexShader->bytecode->GetBufferSize(),
-        pso->vertexShader->cName.c_str());
-
+    ng::ShaderHandle vsHandle = GetOrCreateShaderVS(pso->vertexShader);
     if (!vsHandle.IsValid()) {
         return nullptr;
     }
 
-    if (!pso->pixelShader->bytecode) {
-        m_device->DestroyShader(vsHandle);
-        return nullptr;
-    }
-
-    ng::ShaderHandle psHandle = m_device->CreateShader(
-        ng::ShaderStage::Pixel,
-        pso->pixelShader->bytecode->GetBufferPointer(),
-        pso->pixelShader->bytecode->GetBufferSize(),
-        pso->pixelShader->cName.c_str());
-
+    ng::ShaderHandle psHandle = GetOrCreateShaderPS(pso->pixelShader);
     if (!psHandle.IsValid()) {
-        m_device->DestroyShader(vsHandle);
         return nullptr;
     }
 
@@ -1227,99 +1208,7 @@ void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* 
 // ══════════════════════════════════════════════════════════
 //  STATE CONVERSION HELPERS
 // ══════════════════════════════════════════════════════════
-
-namespace {
-    // Convert D3D11 cull mode to NVRHI
-    ng::CullMode ConvertCullMode(D3D11_CULL_MODE d3dCull) {
-        switch (d3dCull) {
-            case D3D11_CULL_NONE: return ng::CullMode::None;
-            case D3D11_CULL_FRONT: return ng::CullMode::Front;
-            case D3D11_CULL_BACK: return ng::CullMode::Back;
-            default: return ng::CullMode::Back;
-        }
-    }
-
-    // Convert D3D11 fill mode to NVRHI
-    ng::FillMode ConvertFillMode(D3D11_FILL_MODE d3dFill) {
-        switch (d3dFill) {
-            case D3D11_FILL_WIREFRAME: return ng::FillMode::Wireframe;
-            case D3D11_FILL_SOLID: return ng::FillMode::Solid;
-            default: return ng::FillMode::Solid;
-        }
-    }
-
-    // Convert D3D11 stencil op to our abstraction
-    ng::StencilOp ConvertStencilOp(D3D11_STENCIL_OP d3dOp) {
-        switch (d3dOp) {
-            case D3D11_STENCIL_OP_KEEP: return ng::StencilOp::Keep;
-            case D3D11_STENCIL_OP_ZERO: return ng::StencilOp::Zero;
-            case D3D11_STENCIL_OP_REPLACE: return ng::StencilOp::Replace;
-            case D3D11_STENCIL_OP_INCR_SAT: return ng::StencilOp::IncrementSaturate;
-            case D3D11_STENCIL_OP_DECR_SAT: return ng::StencilOp::DecrementSaturate;
-            case D3D11_STENCIL_OP_INVERT: return ng::StencilOp::Invert;
-            case D3D11_STENCIL_OP_INCR: return ng::StencilOp::Increment;
-            case D3D11_STENCIL_OP_DECR: return ng::StencilOp::Decrement;
-            default: return ng::StencilOp::Keep;
-        }
-    }
-
-    // Convert D3D11 comparison func to our abstraction
-    ng::ComparisonFunc ConvertComparisonFunc(D3D11_COMPARISON_FUNC d3dFunc) {
-        switch (d3dFunc) {
-            case D3D11_COMPARISON_NEVER: return ng::ComparisonFunc::Never;
-            case D3D11_COMPARISON_LESS: return ng::ComparisonFunc::Less;
-            case D3D11_COMPARISON_EQUAL: return ng::ComparisonFunc::Equal;
-            case D3D11_COMPARISON_LESS_EQUAL: return ng::ComparisonFunc::LessEqual;
-            case D3D11_COMPARISON_GREATER: return ng::ComparisonFunc::Greater;
-            case D3D11_COMPARISON_NOT_EQUAL: return ng::ComparisonFunc::NotEqual;
-            case D3D11_COMPARISON_GREATER_EQUAL: return ng::ComparisonFunc::GreaterEqual;
-            case D3D11_COMPARISON_ALWAYS: return ng::ComparisonFunc::Always;
-            default: return ng::ComparisonFunc::Less;
-        }
-    }
-
-    // Convert D3D11 blend factor to our abstraction
-    ng::BlendFactor ConvertBlendFactor(D3D11_BLEND d3dBlend) {
-        switch (d3dBlend) {
-            case D3D11_BLEND_ZERO: return ng::BlendFactor::Zero;
-            case D3D11_BLEND_ONE: return ng::BlendFactor::One;
-            case D3D11_BLEND_SRC_COLOR: return ng::BlendFactor::SrcColor;
-            case D3D11_BLEND_INV_SRC_COLOR: return ng::BlendFactor::InvSrcColor;
-            case D3D11_BLEND_SRC_ALPHA: return ng::BlendFactor::SrcAlpha;
-            case D3D11_BLEND_INV_SRC_ALPHA: return ng::BlendFactor::InvSrcAlpha;
-            case D3D11_BLEND_DEST_ALPHA: return ng::BlendFactor::DstAlpha;
-            case D3D11_BLEND_INV_DEST_ALPHA: return ng::BlendFactor::InvDstAlpha;
-            case D3D11_BLEND_DEST_COLOR: return ng::BlendFactor::DstColor;
-            case D3D11_BLEND_INV_DEST_COLOR: return ng::BlendFactor::InvDstColor;
-            case D3D11_BLEND_SRC_ALPHA_SAT: return ng::BlendFactor::SrcAlphaSat;
-            case D3D11_BLEND_BLEND_FACTOR: return ng::BlendFactor::BlendFactor;
-            case D3D11_BLEND_INV_BLEND_FACTOR: return ng::BlendFactor::InvBlendFactor;
-            default: return ng::BlendFactor::One;
-        }
-    }
-
-    // Convert D3D11 blend op to our abstraction
-    ng::BlendOp ConvertBlendOp(D3D11_BLEND_OP d3dOp) {
-        switch (d3dOp) {
-            case D3D11_BLEND_OP_ADD: return ng::BlendOp::Add;
-            case D3D11_BLEND_OP_SUBTRACT: return ng::BlendOp::Subtract;
-            case D3D11_BLEND_OP_REV_SUBTRACT: return ng::BlendOp::RevSubtract;
-            case D3D11_BLEND_OP_MIN: return ng::BlendOp::Min;
-            case D3D11_BLEND_OP_MAX: return ng::BlendOp::Max;
-            default: return ng::BlendOp::Add;
-        }
-    }
-
-    // Convert D3D11 color write mask to NVRHI
-    ng::ColorWriteMask ConvertColorWriteMask(u8 d3dMask) {
-        ng::ColorWriteMask mask = ng::ColorWriteMask::None;
-        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_RED)   mask = mask | ng::ColorWriteMask::Red;
-        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_GREEN) mask = mask | ng::ColorWriteMask::Green;
-        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_BLUE)  mask = mask | ng::ColorWriteMask::Blue;
-        if (d3dMask & D3D11_COLOR_WRITE_ENABLE_ALPHA) mask = mask | ng::ColorWriteMask::Alpha;
-        return mask;
-    }
-}
+// Now located in RenderStateConversion.h (shared with ParticlePass)
 
 // ══════════════════════════════════════════════════════════
 //  SETUP RENDER STATES
@@ -1537,7 +1426,78 @@ void MaterialCache::Clear()
     m_cache.clear();
     m_textureWrapperCache.clear();
     m_detailScaleCache.clear();
+    m_shaderHandles.clear();  // Clear shader handle cache
     m_stats = Stats{};
+}
+
+// ══════════════════════════════════════════════════════════
+//  SHADER HANDLE CACHING (STAGE-AWARE)
+// ══════════════════════════════════════════════════════════
+
+ng::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
+{
+    if (!vs || !vs->bytecode) {
+        return ng::ShaderHandle();  // Invalid handle
+    }
+
+    // CRITICAL: Include stage in cache key! VS and PS can have same name!
+    xr_string vsKeyStr = xr_string("VS_") + vs->cName.c_str();
+    shared_str vsKey = vsKeyStr.c_str();
+
+    // Check cache
+    auto it = m_shaderHandles.find(vsKey);
+    if (it != m_shaderHandles.end()) {
+        return it->second;  // Return cached handle
+    }
+
+    // Create new shader
+    ng::ShaderHandle vsHandle = m_device->CreateShader(
+        ng::ShaderStage::Vertex,
+        vs->bytecode->GetBufferPointer(),
+        vs->bytecode->GetBufferSize(),
+        vs->cName.c_str());
+
+    if (!vsHandle.IsValid()) {
+        Msg("! [MaterialCache] ERROR: Failed to create VS '%s'", vs->cName.c_str());
+        return ng::ShaderHandle();
+    }
+
+    // Cache and return
+    m_shaderHandles[vsKey] = vsHandle;
+    return vsHandle;
+}
+
+ng::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
+{
+    if (!ps || !ps->bytecode) {
+        return ng::ShaderHandle();  // Invalid handle
+    }
+
+    // CRITICAL: Include stage in cache key! VS and PS can have same name!
+    xr_string psKeyStr = xr_string("PS_") + ps->cName.c_str();
+    shared_str psKey = psKeyStr.c_str();
+
+    // Check cache
+    auto it = m_shaderHandles.find(psKey);
+    if (it != m_shaderHandles.end()) {
+        return it->second;  // Return cached handle
+    }
+
+    // Create new shader
+    ng::ShaderHandle psHandle = m_device->CreateShader(
+        ng::ShaderStage::Pixel,
+        ps->bytecode->GetBufferPointer(),
+        ps->bytecode->GetBufferSize(),
+        ps->cName.c_str());
+
+    if (!psHandle.IsValid()) {
+        Msg("! [MaterialCache] ERROR: Failed to create PS '%s'", ps->cName.c_str());
+        return ng::ShaderHandle();
+    }
+
+    // Cache and return
+    m_shaderHandles[psKey] = psHandle;
+    return psHandle;
 }
 
 // ══════════════════════════════════════════════════════════

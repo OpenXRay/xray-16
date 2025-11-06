@@ -4,13 +4,23 @@
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For CB analysis
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/RenderContext/RenderStateConversion.h"  // State conversion helpers
 #include "Layers/xrRender/ParticleEffect.h"
 #include "Layers/xrRender/ParticleEffectDef.h"
 #include "Layers/xrRender/ParticleGroup.h"
 #include "Layers/xrRender/PSLibrary.h"
+#include "Layers/xrRender/SH_Texture.h"
+#include "Layers/xrRender/ResourceManager.h"
 #include "xrEngine/Render.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+
+#if defined(USE_DX11)
+#include "Layers/xrRenderDX11/StateManager/dx11State.h"
+#include "../Externals/nvrhi/src/common/dxgi-format.h"  // For DXGI <-> NVRHI format conversion
+#endif
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -53,11 +63,13 @@ Fmatrix ParticlePass::ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
     return result;
 }
 
-ParticlePass::ParticlePass(ng::RenderDevice* device, const ParticlePassConfig& config)
+ParticlePass::ParticlePass(ng::RenderDevice* device, MaterialCache* materialCache, const ParticlePassConfig& config)
     : m_device(device)
+    , m_materialCache(materialCache)
     , m_config(config)
 {
     VERIFY(m_device != nullptr);
+    VERIFY(m_materialCache != nullptr);
 
     if (config.width == 0 || config.height == 0) {
         Msg("! [ParticlePass] ERROR: Invalid resolution %ux%u", config.width, config.height);
@@ -65,6 +77,7 @@ ParticlePass::ParticlePass(ng::RenderDevice* device, const ParticlePassConfig& c
 }
 
 ParticlePass::~ParticlePass() {
+    // Shader handles are now managed by MaterialCache, no cleanup needed here
     // Buffers will be automatically released by nvrhi smart pointers
 }
 
@@ -138,7 +151,6 @@ void ParticlePass::EnsureQuadIndexBuffer(u32 maxQuads) {
     m_device->GetNVRHIDevice()->executeCommandList(cmdList);
 
     m_maxQuads = maxQuads;
-    Msg("  [ParticlePass] Created quad IB for %u quads (%u indices)", maxQuads, numIndices);
 }
 
 void ParticlePass::EnsureParticleVertexBuffer(u32 sizeBytes) {
@@ -149,13 +161,14 @@ void ParticlePass::EnsureParticleVertexBuffer(u32 sizeBytes) {
     // Round up to 64KB chunks for efficiency
     u32 allocSize = ((sizeBytes + 65535) / 65536) * 65536;
 
-    // Create dynamic vertex buffer
+    // Create vertex buffer (NVRHI will handle uploads via staging internally)
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = allocSize;
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "ParticleDynamicVB";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;  // CPU writable for dynamic updates
+    vbDesc.keepInitialState = false;  // Allow state transitions
+    // Note: Don't set cpuAccess - let NVRHI use staging buffers via writeBuffer()
 
     m_particleVB = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
     if (!m_particleVB) {
@@ -164,7 +177,6 @@ void ParticlePass::EnsureParticleVertexBuffer(u32 sizeBytes) {
     }
 
     m_particleVBSize = allocSize;
-    Msg("  [ParticlePass] Created particle VB: %u bytes", allocSize);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -257,9 +269,6 @@ void ParticlePass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         return;
     }
 
-    Msg("! [ParticlePass] Rendering %u world + %u HUD particles",
-        totalWorldParticles, totalHUDParticles);
-
     // Get physical render targets
     nvrhi::ITexture* normal = fg.GetPhysicalTexture(m_outputs.normal);
     nvrhi::ITexture* albedo = fg.GetPhysicalTexture(m_outputs.albedo);
@@ -306,7 +315,6 @@ void ParticlePass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // ═══════════════════════════════════════════════════════
 
     if (m_worldParticleBatches && !m_worldParticleBatches->empty()) {
-        Msg("! [ParticlePass] TODO: Render %u world particles", (u32)m_worldParticleBatches->size());
 
         // TODO: Port particle rendering from legacy CBackend to NVRHI
         // Original implementation in ParticleEffect::Render() uses:
@@ -334,7 +342,6 @@ void ParticlePass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // ═══════════════════════════════════════════════════════
 
     if (m_hudParticleBatches && !m_hudParticleBatches->empty()) {
-        Msg("! [ParticlePass] TODO: Render %u HUD particles with FOV adjustment", (u32)m_hudParticleBatches->size());
 
         // TODO: Apply hud_transform_helper FOV adjustment
         // Original engine temporarily modifies Device.mProject:
@@ -358,72 +365,79 @@ void ParticlePass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
 
     auto execEnd = std::chrono::high_resolution_clock::now();
     m_stats.cpuTimeMs = std::chrono::duration<float, std::milli>(execEnd - execStart).count();
-
-    Msg("! [ParticlePass] Complete: %u draws, %u batches, %.2f ms",
-        m_stats.numDrawCalls, m_stats.numBatches, m_stats.cpuTimeMs);
 }
 
 ng::PipelineState* ParticlePass::GetOrCreateParticlePSO(
-    RENDER_NAMESPACE::Shader* shader,
+    RENDER_NAMESPACE::SPass* pass,
     const RENDER_NAMESPACE::PS::CPEDef* pDef,
     const framegraph::FrameGraph& fg)
 {
-    if (!shader || !pDef)
+    if (!pass || !pDef)
         return nullptr;
 
-    // Get first pass from shader
-    if (shader->passes.empty())
+    // Validate shaders
+    if (!pass->vs || !pass->ps)
         return nullptr;
 
-    RENDER_NAMESPACE::SPass* pass = shader->passes.front()._get();
-    if (!pass || !pass->vs || !pass->ps)
+    RENDER_NAMESPACE::SVS* vs = pass->vs._get();
+    RENDER_NAMESPACE::SPS* ps = pass->ps._get();
+    if (!vs || !ps)
         return nullptr;
 
-    // Check cache first
-    shared_str shaderKey = pass->vs->cName;
-    auto it = m_particlePSOCache.find(shaderKey);
-    if (it != m_particlePSOCache.end()) {
-        return it->second;
-    }
+    // Check if we have bytecode
+    if (!vs->bytecode || !ps->bytecode)
+        return nullptr;
 
     // ═══════════════════════════════════════════════════════
     //  CREATE PARTICLE PSO
     // ═══════════════════════════════════════════════════════
 
-    Msg("  [ParticlePass] Creating PSO for particle shader '%s'", shaderKey.c_str());
-
     ng::PipelineStateDesc psoDesc;
-    psoDesc.debugName = shaderKey.c_str();
 
-    // ─── Vertex Shader ───
-    psoDesc.vs = framegraph::LoadShader(
-        m_device->GetNVRHIDevice(),
-        pass->vs->vs,
-        nvrhi::ShaderType::Vertex);
+    // Build unique debug name from BOTH shaders to avoid cache collisions
+    // Store in shared_str so it persists beyond this scope
+    xr_string debugNameStr = xr_string(vs->cName.c_str()) + "_" + xr_string(ps->cName.c_str());
+    shared_str debugName = debugNameStr.c_str();
+    psoDesc.debugName = debugName.c_str();
 
-    if (!psoDesc.vs) {
-        Msg("! [ParticlePass] ERROR: Failed to load VS '%s'", pass->vs->cName.c_str());
+    // ─── Get or Create Cached Shaders (via MaterialCache) ───
+    ng::ShaderHandle vsHandle = m_materialCache->GetOrCreateShaderVS(vs);
+    if (!vsHandle.IsValid()) {
+        Msg("! [ParticlePass] ERROR: Failed to get VS '%s'", vs->cName.c_str());
         return nullptr;
     }
 
-    // ─── Pixel Shader ───
-    psoDesc.ps = framegraph::LoadShader(
-        m_device->GetNVRHIDevice(),
-        pass->ps->ps,
-        nvrhi::ShaderType::Pixel);
-
-    if (!psoDesc.ps) {
-        Msg("! [ParticlePass] ERROR: Failed to load PS '%s'", pass->ps->cName.c_str());
+    ng::ShaderHandle psHandle = m_materialCache->GetOrCreateShaderPS(ps);
+    if (!psHandle.IsValid()) {
+        Msg("! [ParticlePass] ERROR: Failed to get PS '%s'", ps->cName.c_str());
         return nullptr;
     }
+
+    ng::RCShader* rcVS = m_device->GetShader(vsHandle);
+    if (!rcVS) {
+        Msg("! [ParticlePass] ERROR: rcVS is NULL for handle %u", vs->cName.c_str());
+        m_device->DestroyShader(vsHandle);
+        return nullptr;
+    }
+
+    ng::RCShader* rcPS = m_device->GetShader(psHandle);
+    if (!rcPS) {
+        Msg("! [ParticlePass] ERROR: rcPS is NULL for handle %u", ps->cName.c_str());
+        m_device->DestroyShader(psHandle);
+        return nullptr;
+    }
+
+    psoDesc.vertexShader = rcVS;
+    psoDesc.pixelShader = rcPS;
 
     // ─── Input Layout (FVF::LIT format) ───
     // ParticleVertex: position (float3), color (uint32), texcoord (float2)
     psoDesc.vertexAttributes.clear();
 
     // Position (POSITION semantic)
-    ng::VertexAttributeDesc posAttr;
-    posAttr.name = "POSITION";
+    ng::VertexAttribute posAttr;
+    posAttr.semanticName = "POSITION";
+    posAttr.semanticIndex = 0;
     posAttr.format = nvrhi::Format::RGB32_FLOAT;
     posAttr.offset = 0;
     posAttr.bufferIndex = 0;
@@ -431,8 +445,9 @@ ng::PipelineState* ParticlePass::GetOrCreateParticlePSO(
     psoDesc.vertexAttributes.push_back(posAttr);
 
     // Color (COLOR semantic)
-    ng::VertexAttributeDesc colorAttr;
-    colorAttr.name = "COLOR";
+    ng::VertexAttribute colorAttr;
+    colorAttr.semanticName = "COLOR";
+    colorAttr.semanticIndex = 0;
     colorAttr.format = nvrhi::Format::RGBA8_UNORM;  // u32 color -> RGBA8
     colorAttr.offset = 12;  // After position (3 floats)
     colorAttr.bufferIndex = 0;
@@ -440,86 +455,387 @@ ng::PipelineState* ParticlePass::GetOrCreateParticlePSO(
     psoDesc.vertexAttributes.push_back(colorAttr);
 
     // Texcoord (TEXCOORD semantic)
-    ng::VertexAttributeDesc texAttr;
-    texAttr.name = "TEXCOORD";
+    ng::VertexAttribute texAttr;
+    texAttr.semanticName = "TEXCOORD";
+    texAttr.semanticIndex = 0;
     texAttr.format = nvrhi::Format::RG32_FLOAT;
     texAttr.offset = 16;  // After position + color
     texAttr.bufferIndex = 0;
     texAttr.elementStride = sizeof(ParticleVertex);
     psoDesc.vertexAttributes.push_back(texAttr);
 
-    // ─── Render Targets ───
+    // ─── Render Target Formats ───
     nvrhi::ITexture* albedo = fg.GetPhysicalTexture(m_outputs.albedo);
     nvrhi::ITexture* normal = fg.GetPhysicalTexture(m_outputs.normal);
     nvrhi::ITexture* material = fg.GetPhysicalTexture(m_outputs.material);
     nvrhi::ITexture* depth = fg.GetPhysicalTexture(m_outputs.depth);
 
-    psoDesc.renderTargets.clear();
-    psoDesc.renderTargets.push_back(albedo);
-    psoDesc.renderTargets.push_back(normal);
-    psoDesc.renderTargets.push_back(material);
-    psoDesc.depthStencil = depth;
+    psoDesc.renderTargetFormats[0] = albedo->getDesc().format;
+    psoDesc.renderTargetFormats[1] = normal->getDesc().format;
+    psoDesc.renderTargetFormats[2] = material->getDesc().format;
+    psoDesc.depthStencilFormat = depth->getDesc().format;
+    psoDesc.renderTargetCount = 3;
 
-    // ─── Blend State (Alpha Blending) ───
-    psoDesc.blendDesc.alphaToCoverageEnable = false;
-    psoDesc.blendDesc.independentBlendEnable = false;
+    // ─── Extract Render States from Shader Pass ───
+    // Use MaterialCache to extract blend, depth, and rasterizer state from pass->state
+    // This fixes the blend state bug (was hardcoded to alpha blending, should be additive from shader)
+    m_materialCache->SetupRenderStates(pass, psoDesc);
 
-    // RT0: Albedo - enable alpha blending
-    auto& rt0 = psoDesc.blendDesc.targets[0];
-    rt0.blendEnable = true;
-    rt0.srcBlend = nvrhi::BlendFactor::SrcAlpha;
-    rt0.destBlend = nvrhi::BlendFactor::InvSrcAlpha;
-    rt0.blendOp = nvrhi::BlendOp::Add;
-    rt0.srcBlendAlpha = nvrhi::BlendFactor::One;
-    rt0.destBlendAlpha = nvrhi::BlendFactor::InvSrcAlpha;
-    rt0.blendOpAlpha = nvrhi::BlendOp::Add;
-    rt0.colorWriteMask = nvrhi::ColorMask::All;
-
-    // RT1, RT2: Disable for particles (they don't write normals/material)
-    psoDesc.blendDesc.targets[1].colorWriteMask = nvrhi::ColorMask::None;
-    psoDesc.blendDesc.targets[2].colorWriteMask = nvrhi::ColorMask::None;
-
-    // ─── Depth/Stencil State (Test but no write) ───
-    psoDesc.depthStencilDesc.depthTestEnable = true;
-    psoDesc.depthStencilDesc.depthWriteEnable = false;  // Transparent particles don't write depth
-    psoDesc.depthStencilDesc.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-    psoDesc.depthStencilDesc.stencilEnable = false;
-
-    // ─── Rasterizer State ───
-    psoDesc.rasterizerDesc.fillMode = nvrhi::RasterFillMode::Solid;
-    psoDesc.rasterizerDesc.cullMode = nvrhi::RasterCullMode::None;  // Particles are double-sided by default
-
-    // Check particle definition for culling
+    // ─── Override Culling for Particles ───
+    // Particles have special culling requirements based on CPEDef flags, override after extraction
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;  // Default: double-sided
     if (pDef->m_Flags.is(RENDER_NAMESPACE::PS::CPEDef::dfCulling)) {
         if (pDef->m_Flags.is(RENDER_NAMESPACE::PS::CPEDef::dfCullCCW)) {
-            psoDesc.rasterizerDesc.cullMode = nvrhi::RasterCullMode::Front;
+            psoDesc.rasterizerState.cullMode = ng::CullMode::Front;
         } else {
-            psoDesc.rasterizerDesc.cullMode = nvrhi::RasterCullMode::Back;
+            psoDesc.rasterizerState.cullMode = ng::CullMode::Back;
         }
     }
 
-    psoDesc.rasterizerDesc.frontCounterClockwise = false;
-    psoDesc.rasterizerDesc.depthClipEnable = true;
-    psoDesc.rasterizerDesc.scissorEnable = false;
-    psoDesc.rasterizerDesc.multisampleEnable = false;
-    psoDesc.rasterizerDesc.antialiasedLineEnable = false;
+    // ─── Configure RT Write Masks for Particles ───
+    psoDesc.blendState.renderTargets[0].writeMask = ng::ColorWriteMask::None;  // Disable normal
+    psoDesc.blendState.renderTargets[2].writeMask = ng::ColorWriteMask::None;  // Disable material
+    psoDesc.rasterizerState.scissorEnable = false;
+    psoDesc.rasterizerState.multisampleEnable = false;
+    psoDesc.rasterizerState.antialiasedLineEnable = false;
 
     // ─── Topology ───
-    psoDesc.primType = nvrhi::PrimitiveType::TriangleList;
+    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 
-    // ─── Create PSO ───
-    ng::PipelineState* pso = m_device->CreatePipelineState(psoDesc);
+    // ─── Create PSO via Pipeline Cache ───
+    ng::PipelineState* pso = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
     if (!pso) {
-        Msg("! [ParticlePass] ERROR: Failed to create PSO for '%s'", shaderKey.c_str());
+        Msg("! [ParticlePass] ERROR: Failed to create PSO for '%s'", vs->cName.c_str());
         return nullptr;
     }
 
-    // Cache and return
-    m_particlePSOCache[shaderKey] = pso;
-
-    Msg("  ✓ Created particle PSO for shader '%s'", shaderKey.c_str());
 
     return pso;
+}
+
+ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
+    RENDER_NAMESPACE::SPass* pass)
+{
+    if (!pass)
+        return nullptr;
+
+    // Generate cache key from BOTH shaders + texture list (like MaterialCache does)
+    RENDER_NAMESPACE::SVS* vs = pass->vs._get();
+    RENDER_NAMESPACE::SPS* ps = pass->ps._get();
+    if (!vs || !ps)
+        return nullptr;
+
+    // Validate bytecode exists
+    if (!vs->bytecode || !ps->bytecode)
+        return nullptr;
+
+    // Build cache key: "VS_name|PS_name|tex0|tex1|tex2..."
+    xr_string cacheKeyStr;
+    cacheKeyStr.append(vs->cName.c_str());
+    cacheKeyStr.append("|");
+    cacheKeyStr.append(ps->cName.c_str());
+
+    // Add texture names to key (so different textures = different cache entry)
+    RENDER_NAMESPACE::STextureList* texList = pass->T._get();
+    if (texList && !texList->empty()) {
+        for (size_t i = 0; i < texList->size(); i++) {
+            const auto& texPair = (*texList)[i];
+            RENDER_NAMESPACE::CTexture* xrayTex = texPair.second._get();
+            if (xrayTex) {
+                cacheKeyStr.append("|");
+                cacheKeyStr.append(xrayTex->cName.c_str());
+            }
+        }
+    }
+
+    shared_str cacheKey = cacheKeyStr.c_str();
+
+    // ═══════════════════════════════════════════════════════
+    //  CHECK CACHE - Return existing binding cache if found
+    // ═══════════════════════════════════════════════════════
+
+    auto it = m_bindingCache.find(cacheKey);
+    if (it != m_bindingCache.end()) {
+        return &it->second;  // Return pointer to cached entry
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE NEW BINDING CACHE ENTRY
+    // ═══════════════════════════════════════════════════════
+
+    ParticlePass::ParticleBindingCache cacheEntry;
+
+    // ═══════════════════════════════════════════════════════
+    //  ANALYZE SHADER CONSTANT BUFFERS (like MaterialCache)
+    // ═══════════════════════════════════════════════════════
+
+
+    // Analyze VS constant buffers
+    auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(vs->bytecode);
+    for (const auto& cbInfo : vsCBs.buffers) {
+        // Determine if this is a per-object CB (slot 0) or global (slot 1+)
+        bool isPerObject = (cbInfo.slot == 0);
+
+        // Create NVRHI buffer
+        nvrhi::BufferDesc bufDesc;
+        bufDesc.byteSize = cbInfo.size;
+        bufDesc.isConstantBuffer = true;
+        bufDesc.debugName = cbInfo.name.c_str();
+        bufDesc.keepInitialState = false;
+        bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+        nvrhi::BufferHandle buffer = m_device->GetNVRHIDevice()->createBuffer(bufDesc);
+        if (buffer) {
+            // Store CB info
+            ParticlePass::ParticleBindingCache::CBInfo info;
+            info.slot = cbInfo.slot;
+            info.size = cbInfo.size;
+            info.name = cbInfo.name.c_str();
+            info.isPerObject = isPerObject;
+            info.isVertexShader = true;
+            info.buffer = buffer;
+            cacheEntry.cbInfos.push_back(info);
+            cacheEntry.constantBuffers.push_back(buffer);
+
+            Msg("    VS CB[%u]: '%s' (%u bytes, %s)", cbInfo.slot, cbInfo.name.c_str(),
+                cbInfo.size, isPerObject ? "per-object" : "global");
+        }
+    }
+
+    // Analyze PS constant buffers
+    auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(ps->bytecode);
+    for (const auto& cbInfo : psCBs.buffers) {
+        bool isPerObject = (cbInfo.slot == 0);
+
+        nvrhi::BufferDesc bufDesc;
+        bufDesc.byteSize = cbInfo.size;
+        bufDesc.isConstantBuffer = true;
+        bufDesc.debugName = cbInfo.name.c_str();
+        bufDesc.keepInitialState = false;
+        bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+        nvrhi::BufferHandle buffer = m_device->GetNVRHIDevice()->createBuffer(bufDesc);
+        if (buffer) {
+            ParticlePass::ParticleBindingCache::CBInfo info;
+            info.slot = cbInfo.slot;
+            info.size = cbInfo.size;
+            info.name = cbInfo.name.c_str();
+            info.isPerObject = isPerObject;
+            info.isVertexShader = false;
+            info.buffer = buffer;
+            cacheEntry.cbInfos.push_back(info);
+            cacheEntry.constantBuffers.push_back(buffer);
+
+            Msg("    PS CB[%u]: '%s' (%u bytes, %s)", cbInfo.slot, cbInfo.name.c_str(),
+                cbInfo.size, isPerObject ? "per-object" : "global");
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE VS BINDING LAYOUT (CBs only)
+    // ═══════════════════════════════════════════════════════
+
+    nvrhi::BindingLayoutDesc vsLayoutDesc;
+    vsLayoutDesc.visibility = nvrhi::ShaderType::Vertex;
+    vsLayoutDesc.registerSpace = 0;
+
+    for (const auto& cbInfo : cacheEntry.cbInfos) {
+        if (cbInfo.isVertexShader) {
+            if (cbInfo.isPerObject) {
+                vsLayoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
+            } else {
+                vsLayoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
+            }
+        }
+    }
+
+    cacheEntry.vsBindingLayout = m_device->GetNVRHIDevice()->createBindingLayout(vsLayoutDesc);
+    if (!cacheEntry.vsBindingLayout) {
+        Msg("! [ParticlePass] ERROR: Failed to create VS binding layout");
+        return nullptr;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE PS BINDING LAYOUT (CBs + Textures + Samplers)
+    // ═══════════════════════════════════════════════════════
+
+    nvrhi::BindingLayoutDesc psLayoutDesc;
+    psLayoutDesc.visibility = nvrhi::ShaderType::Pixel;
+    psLayoutDesc.registerSpace = 0;
+
+    // Add PS constant buffers
+    for (const auto& cbInfo : cacheEntry.cbInfos) {
+        if (!cbInfo.isVertexShader) {
+            if (cbInfo.isPerObject) {
+                psLayoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
+            } else {
+                psLayoutDesc.bindings.push_back(
+                    nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
+            }
+        }
+    }
+
+    // Add texture slots (t0, t1, t2, etc.)
+    u32 numTextures = 0;
+    if (texList && !texList->empty()) {
+        numTextures = (u32)texList->size();
+        for (u32 i = 0; i < numTextures; i++) {
+            psLayoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::Texture_SRV(i));
+        }
+    }
+
+    // Add sampler slots (s0, s1, s2, etc.)
+    for (u32 i = 0; i < numTextures; i++) {
+        psLayoutDesc.bindings.push_back(
+            nvrhi::BindingLayoutItem::Sampler(i));
+    }
+
+    cacheEntry.psBindingLayout = m_device->GetNVRHIDevice()->createBindingLayout(psLayoutDesc);
+    if (!cacheEntry.psBindingLayout) {
+        Msg("! [ParticlePass] ERROR: Failed to create PS binding layout");
+        return nullptr;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE VS BINDING SET (CBs only)
+    // ═══════════════════════════════════════════════════════
+
+    nvrhi::BindingSetDesc vsBindingDesc;
+
+    for (const auto& cbInfo : cacheEntry.cbInfos) {
+        if (cbInfo.isVertexShader) {
+            vsBindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.buffer));
+        }
+    }
+
+    cacheEntry.vsBindingSet = m_device->GetNVRHIDevice()->createBindingSet(
+        vsBindingDesc, cacheEntry.vsBindingLayout);
+    if (!cacheEntry.vsBindingSet) {
+        Msg("! [ParticlePass] ERROR: Failed to create VS binding set");
+        return nullptr;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE PS BINDING SET (CBs + Textures + Samplers)
+    // ═══════════════════════════════════════════════════════
+
+    nvrhi::BindingSetDesc psBindingDesc;
+
+    // Bind PS constant buffers
+    for (const auto& cbInfo : cacheEntry.cbInfos) {
+        if (!cbInfo.isVertexShader) {
+            psBindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.buffer));
+        }
+    }
+
+    // Bind textures (same as before, but now in PS binding set)
+    if (texList && !texList->empty()) {
+        for (size_t i = 0; i < texList->size(); i++) {
+            const auto& texPair = (*texList)[i];
+            u32 slot = texPair.first;
+            RENDER_NAMESPACE::CTexture* xrayTex = texPair.second._get();
+
+            if (xrayTex) {
+                auto* d3dTex = xrayTex->surface_get();
+                if (d3dTex) {
+                    ID3D11Resource* resource = nullptr;
+                    d3dTex->QueryInterface(__uuidof(ID3D11Resource), (void**)&resource);
+
+                    if (resource) {
+                        D3D11_RESOURCE_DIMENSION dimension;
+                        resource->GetType(&dimension);
+
+                        ng::RenderDevice::TextureDesc texDesc;
+                        texDesc.debugName = xrayTex->cName.c_str();
+
+                        if (dimension == D3D11_RESOURCE_DIMENSION_TEXTURE2D) {
+                            ID3D11Texture2D* tex2d = nullptr;
+                            resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&tex2d);
+                            if (tex2d) {
+                                D3D11_TEXTURE2D_DESC desc;
+                                tex2d->GetDesc(&desc);
+
+                                texDesc.width = desc.Width;
+                                texDesc.height = desc.Height;
+                                texDesc.mipLevels = desc.MipLevels;
+                                texDesc.arraySize = desc.ArraySize;
+
+                                if (desc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
+                                    texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
+                                } else if (desc.ArraySize > 1) {
+                                    texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
+                                } else {
+                                    texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
+                                }
+
+                                texDesc.format = ConvertDxgiFormatToNvrhi(desc.Format);
+                                texDesc.isRenderTarget = false;
+                                texDesc.isUAV = false;
+
+                                tex2d->Release();
+                            }
+                        }
+
+                        ng::TextureHandle nvrhiTex = m_device->CreateTextureFromD3D11(resource, texDesc);
+                        resource->Release();
+
+                        if (nvrhiTex.IsValid()) {
+                            cacheEntry.textures.push_back(nvrhiTex);
+
+                            nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(nvrhiTex);
+                            if (nativeTex) {
+                                nvrhi::TextureDimension nvrhiDim = nvrhi::TextureDimension::Texture2D;
+                                if (texDesc.dimension == ng::RenderDevice::TextureDesc::TextureCube) {
+                                    nvrhiDim = nvrhi::TextureDimension::TextureCube;
+                                } else if (texDesc.dimension == ng::RenderDevice::TextureDesc::Texture2DArray) {
+                                    nvrhiDim = nvrhi::TextureDimension::Texture2DArray;
+                                }
+
+                                psBindingDesc.bindings.push_back(
+                                    nvrhi::BindingSetItem::Texture_SRV(
+                                        slot, nativeTex,
+                                        nvrhi::Format::UNKNOWN,
+                                        nvrhi::AllSubresources,
+                                        nvrhiDim));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Create samplers
+    for (u32 i = 0; i < numTextures; i++) {
+        nvrhi::SamplerDesc samplerDesc;
+        samplerDesc.setAllFilters(true);
+        samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        samplerDesc.setMaxAnisotropy(8.0f);
+
+        nvrhi::SamplerHandle sampler = m_device->GetNVRHIDevice()->createSampler(samplerDesc);
+        if (sampler) {
+            cacheEntry.samplers.push_back(sampler);
+            psBindingDesc.bindings.push_back(
+                nvrhi::BindingSetItem::Sampler(i, sampler));
+        }
+    }
+
+    cacheEntry.psBindingSet = m_device->GetNVRHIDevice()->createBindingSet(
+        psBindingDesc, cacheEntry.psBindingLayout);
+    if (!cacheEntry.psBindingSet) {
+        Msg("! [ParticlePass] ERROR: Failed to create PS binding set");
+        return nullptr;
+    }
+
+    // Store cache entry and return pointer to it
+    m_bindingCache[cacheKey] = std::move(cacheEntry);
+    return &m_bindingCache[cacheKey];
 }
 
 bool ParticlePass::RenderParticleSystem(
@@ -627,19 +943,29 @@ bool ParticlePass::RenderParticleSystem(
         //  GET PARTICLE SHADER
         // ═══════════════════════════════════════════════════════
 
-        // Particles store their shader in the geometry or effect definition
-        RENDER_NAMESPACE::Shader* particleShader = nullptr;
-
-        if (pEffect->geom && pEffect->geom->ps) {
-            // Get shader from geometry (preferred - set during OnDeviceCreate)
-            particleShader = pEffect->geom->ps;
-        } else if (pDef->m_CachedShader) {
-            // Fallback: get cached shader from definition
-            particleShader = pDef->m_CachedShader;
-        }
+        // Particles store their shader in the effect definition
+        RENDER_NAMESPACE::Shader* particleShader = pDef->m_CachedShader._get();
 
         if (!particleShader) {
             Msg("! [ParticlePass] WARNING: No shader for particle effect '%s'", pDef->m_Name.c_str());
+            return false;
+        }
+
+        // Get first element and first pass
+        RENDER_NAMESPACE::ShaderElement* element = particleShader->E[0]._get();
+        if (!element) {
+            Msg("! [ParticlePass] WARNING: Shader has no elements for particle effect '%s'", pDef->m_Name.c_str());
+            return false;
+        }
+
+        if (element->passes.empty()) {
+            Msg("! [ParticlePass] WARNING: Shader element has no passes for particle effect '%s'", pDef->m_Name.c_str());
+            return false;
+        }
+
+        RENDER_NAMESPACE::SPass* pass = element->passes[0]._get();
+        if (!pass) {
+            Msg("! [ParticlePass] WARNING: Invalid pass for particle effect '%s'", pDef->m_Name.c_str());
             return false;
         }
 
@@ -647,22 +973,91 @@ bool ParticlePass::RenderParticleSystem(
         //  GET OR CREATE PSO
         // ═══════════════════════════════════════════════════════
 
-        ng::PipelineState* particlePSO = GetOrCreateParticlePSO(particleShader, pDef, fg);
+        ng::PipelineState* particlePSO = GetOrCreateParticlePSO(pass, pDef, fg);
 
         if (!particlePSO) {
-            // PSO system not implemented yet - log and skip
-            Msg("! [ParticlePass] Generated %u billboard quads for effect '%s' (shader=%s, HUD=%d) - NO PSO",
-                particleCount, pDef->m_Name.c_str(),
-                particleShader->passes.front().vs->cName.c_str(), batch.isHUDMode);
+            return false;
+        }
+
+
+        // ═══════════════════════════════════════════════════════
+        //  CREATE BINDING SETS (VS + PS with CBs, textures, samplers)
+        // ═══════════════════════════════════════════════════════
+
+        ParticlePass::ParticleBindingCache* bindingCache = CreateParticleBindingSet(pass);
+        if (!bindingCache) {
+            Msg("! [ParticlePass] WARNING: Failed to create binding sets for effect '%s'", pDef->m_Name.c_str());
             return false;
         }
 
         // ═══════════════════════════════════════════════════════
-        //  RENDER PARTICLES
+        //  BIND PIPELINE FIRST (before any resource bindings!)
+        // ═══════════════════════════════════════════════════════
+        // CRITICAL: SetPipeline() must come BEFORE resource bindings!
+        // Setting a pipeline clears previously bound resources, so we must:
+        // 1. SetPipeline() FIRST
+        // 2. Update constant buffers
+        // 3. Bind binding sets
+        // 4. Bind vertex/index buffers
+        // 5. Draw
+
+        nvrhi::IGraphicsPipeline* nativePipeline = particlePSO->GetNativePipeline();
+        ctx.SetPipeline(nativePipeline);
+
+        // ═══════════════════════════════════════════════════════
+        //  UPDATE CONSTANT BUFFERS (after pipeline is set!)
         // ═══════════════════════════════════════════════════════
 
-        // Bind pipeline
-        ctx.SetPipeline(particlePSO->GetNativePipeline());
+        // Fill global constant data
+        StaticGlobals staticGlobalsCB = {};
+        FillGlobalConstants(staticGlobalsCB);
+
+        // Fill per-object transform data
+        DynamicTransforms dynamicTransformsCB = {};
+        FillDynamicTransforms(dynamicTransformsCB);
+
+        // Fill per-object CB slot 0 for VS (mVPTexgen matrix)
+        // Particle shaders use mVPTexgen to transform world-space positions to clip space
+        // This is the View-Projection matrix
+        struct ParticlePerFrame {
+            Fmatrix mVPTexgen;  // VP matrix for transforming particles to clip space
+        };
+        ParticlePerFrame perFrameCB = {};
+
+        // Compute View-Projection matrix (same as vanilla X-Ray does for particles)
+        Fmatrix mVP;
+        mVP.mul(Device.mProject, Device.mView);
+
+        // HLSL expects row-major, X-Ray stores column-major, so transpose
+        perFrameCB.mVPTexgen.transpose(mVP);
+
+        // Update all constant buffers (pipeline is already set, so these will stick)
+        for (const auto& cbInfo : bindingCache->cbInfos) {
+            // Determine which data to write based on CB name
+            if (cbInfo.name == "static_globals") {
+                u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                ctx.WriteBuffer(cbInfo.buffer.Get(), &staticGlobalsCB, sizeToWrite);
+            }
+            else if (cbInfo.name == "dynamic_transforms") {
+                u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                ctx.WriteBuffer(cbInfo.buffer.Get(), &dynamicTransformsCB, sizeToWrite);
+            }
+            else if (cbInfo.isPerObject && cbInfo.isVertexShader) {
+                // Per-object VS CB (slot 0) - likely "per_frame" or similar
+                u32 sizeToWrite = std::min<u32>(sizeof(ParticlePerFrame), cbInfo.size);
+                ctx.WriteBuffer(cbInfo.buffer.Get(), &perFrameCB, sizeToWrite);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        //  BIND RESOURCES (after pipeline + CB updates)
+        // ═══════════════════════════════════════════════════════
+
+        // Bind BOTH binding sets (like GBufferPass does)
+        // Slot 0: VS binding set (VS constant buffers)
+        // Slot 1: PS binding set (PS constant buffers + textures + samplers)
+        ctx.SetBindingSet(0, bindingCache->vsBindingSet.Get());
+        ctx.SetBindingSet(1, bindingCache->psBindingSet.Get());
 
         // Bind vertex buffer
         ctx.SetVertexBuffer(0, m_particleVB.Get(), 0);
@@ -673,10 +1068,6 @@ bool ParticlePass::RenderParticleSystem(
         // Draw particles (each particle = 2 triangles = 6 indices)
         u32 indexCount = particleCount * 6;
         ctx.DrawIndexed(indexCount, 0, 0);
-
-        Msg("! [ParticlePass] Rendered %u billboard quads for effect '%s' (shader=%s, HUD=%d)",
-            particleCount, pDef->m_Name.c_str(),
-            particleShader->passes.front().vs->cName.c_str(), batch.isHUDMode);
 
         return true;
     }
@@ -693,9 +1084,6 @@ bool ParticlePass::RenderParticleSystem(
         if (particleCount == 0) {
             return false;
         }
-
-        Msg("! [ParticlePass] TODO: Render particle group with %u particles (HUD=%d)",
-            particleCount, batch.isHUDMode);
 
         return false;
     }

@@ -216,6 +216,7 @@ struct MaterialPSO {
 // ══════════════════════════════════════════════════════════
 //  MATERIAL CACHE (PSO MANAGER)
 // ══════════════════════════════════════════════════════════
+nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
 
 class MaterialCache {
 public:
@@ -295,6 +296,15 @@ public:
         nvrhi::IBuffer* perObjectVCB,
         SPass* pass);  // For extracting X-Ray's SRVs
 
+    // Shader handle cache (shared across all materials to avoid recreating identical shaders)
+    // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages
+    xr_map<shared_str, ng::ShaderHandle> m_shaderHandles;
+
+    // Get or create cached shader handle (stage-aware caching)
+    ng::ShaderHandle GetOrCreateShaderVS(SVS* vs);
+    ng::ShaderHandle GetOrCreateShaderPS(SPS* ps);
+    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+
 private:
 
     // Compute texture hash from SPass
@@ -305,7 +315,6 @@ private:
 
     // Setup PSO descriptor helpers
     void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
-    void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,  // Pass MaterialPSO for shader reflection data
         const framegraph::DefaultOutputLayout& outputs,

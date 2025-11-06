@@ -62,10 +62,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
 
     // Create particle pass (renders billboards/sprites for world+HUD particles)
+    // Shares MaterialCache with GBufferPass for shader caching and render state extraction
     passes::ParticlePassConfig particleConfig;
     particleConfig.width = Device.dwWidth;
     particleConfig.height = Device.dwHeight;
-    m_particlePass = xr_make_unique<passes::ParticlePass>(device, particleConfig);
+    m_particlePass = xr_make_unique<passes::ParticlePass>(device, m_gbufferPass->GetMaterialCache(), particleConfig);
 
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);

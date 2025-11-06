@@ -662,9 +662,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                             array[(id + 2) * 4 + 2] = M._33;
                             array[(id + 2) * 4 + 3] = M._43;
                         }
-                    } else {
-                        Msg("! [GBufferPass] WARNING: Skeleton visual has no Parent! visual=%s",
-                            batch->visual->dbg_name.c_str());
                     }
                 } else {
                     // ─────────────────────────────────────────────────

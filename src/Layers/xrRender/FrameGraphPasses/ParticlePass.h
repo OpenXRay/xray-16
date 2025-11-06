@@ -13,6 +13,14 @@ namespace xray::render::RENDER_NAMESPACE {
     }
 }
 
+namespace xray::render::ng {
+    class PipelineState;
+}
+
+namespace xray::render {
+    class MaterialCache;  // Forward declaration
+}
+
 namespace xray::render::passes {
 
 using namespace framegraph;
@@ -56,7 +64,8 @@ struct ParticlePassConfig {
 //
 class ParticlePass : public framegraph::IPass {
 public:
-    ParticlePass(ng::RenderDevice* device, const ParticlePassConfig& config);
+    // Requires MaterialCache for shader caching and render state extraction
+    ParticlePass(ng::RenderDevice* device, MaterialCache* materialCache, const ParticlePassConfig& config);
     ~ParticlePass() override;
 
     // ═══════════════════════════════════════════════════
@@ -88,6 +97,7 @@ public:
 
 private:
     ng::RenderDevice* m_device = nullptr;
+    MaterialCache* m_materialCache = nullptr;  // For shader caching and render state extraction
     ParticlePassConfig m_config;
 
     // Particle batches (provided by FrameGraphRenderer)
@@ -105,8 +115,34 @@ private:
     nvrhi::BufferHandle m_quadIB;
     u32 m_maxQuads = 0;  // Max number of quads supported by IB
 
-    // Particle PSO cache (shader name -> PSO)
-    xr_map<shared_str, ng::PipelineState*> m_particlePSOCache;
+    // Binding set cache - stores binding sets per shader so they persist
+    // Key: shader name, Value: binding set with textures & samplers & constant buffers
+    struct ParticleBindingCache {
+        // Separate binding sets for VS and PS (like MaterialCache)
+        nvrhi::BindingSetHandle vsBindingSet;
+        nvrhi::BindingSetHandle psBindingSet;
+
+        // Binding layouts (what the shader expects)
+        nvrhi::BindingLayoutHandle vsBindingLayout;
+        nvrhi::BindingLayoutHandle psBindingLayout;
+
+        // Resource lifetime management
+        xr_vector<nvrhi::SamplerHandle> samplers;      // Keep samplers alive
+        xr_vector<ng::TextureHandle> textures;         // Keep texture handles alive
+        xr_vector<nvrhi::BufferHandle> constantBuffers; // Keep CBs alive
+
+        // Constant buffer metadata (slot, size, name, isPerObject)
+        struct CBInfo {
+            u32 slot;
+            u32 size;
+            xr_string name;
+            bool isPerObject;
+            bool isVertexShader;  // true=VS, false=PS
+            nvrhi::BufferHandle buffer;
+        };
+        xr_vector<CBInfo> cbInfos;
+    };
+    xr_map<shared_str, ParticleBindingCache> m_bindingCache;
 
     // ═══════════════════════════════════════════════════
     //  Rendering Helpers
@@ -121,11 +157,17 @@ private:
     // Create or resize dynamic particle vertex buffer
     void EnsureParticleVertexBuffer(u32 sizeBytes);
 
-    // Get or create PSO for particle shader
+    // Get or create PSO for particle shader (returns PSO from device's pipeline cache)
     ng::PipelineState* GetOrCreateParticlePSO(
-        RENDER_NAMESPACE::Shader* shader,
+        RENDER_NAMESPACE::SPass* pass,
         const RENDER_NAMESPACE::PS::CPEDef* pDef,
         const framegraph::FrameGraph& fg
+    );
+
+    // Create binding sets for particle shader resources (CBs, textures, samplers)
+    // Returns pointer to cached binding entry (VS + PS binding sets)
+    ParticleBindingCache* CreateParticleBindingSet(
+        RENDER_NAMESPACE::SPass* pass
     );
 
     // Render a single particle system (effect or group)
