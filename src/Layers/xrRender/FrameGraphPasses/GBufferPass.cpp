@@ -227,16 +227,13 @@ void GBufferPass::Setup(FrameGraph& fg) {
 
     m_outputs.depth = fg.CreateTexture("GBuffer.Depth", depthDesc);
 
-    PassHandle gbufferPass = fg.AddPass("GBuffer");
+    PassIO io;
+    io.writes.push_back({m_outputs.albedo, ResourceState::RenderTarget});
+    io.writes.push_back({m_outputs.normal, ResourceState::RenderTarget});
+    io.writes.push_back({m_outputs.material, ResourceState::RenderTarget});
+    io.writes.push_back({m_outputs.depth, ResourceState::DepthStencilWrite});
 
-    fg.PassWrite(gbufferPass, m_outputs.albedo, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, m_outputs.normal, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, m_outputs.material, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, m_outputs.depth, ResourceState::DepthStencilWrite);
-
-    fg.SetPassCallback(gbufferPass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
-        this->Execute(ctx, fg);
-    });
+    RegisterPass(fg, "GBuffer", io);
 
     Msg("  ✓ G-Buffer pass configured");
 }

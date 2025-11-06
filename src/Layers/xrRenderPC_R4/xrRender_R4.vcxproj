@@ -266,6 +266,7 @@
     <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
     <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\LightingPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPass.h" />
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
@@ -499,6 +500,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\LightingPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPass.cpp" />
     <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />

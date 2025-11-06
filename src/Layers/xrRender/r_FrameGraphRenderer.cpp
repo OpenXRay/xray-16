@@ -208,6 +208,10 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
 
+    m_hudPass->SetOutputs(gbufferOutputs);
+    m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
+    m_hudPass->Setup(*m_framegraph);
+
     Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
 
@@ -284,15 +288,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     RouteBatchesToPasses();
 
-    if (!m_hudBatches.empty()) {
-        m_hudPass->SetHUDBatches(&m_hudBatches);
-
-        m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
-
-        m_hudPass->SetOutputs(m_gbufferPass->GetOutputs());
-
-        m_hudPass->Setup(*m_framegraph);
-    }
+    m_hudPass->SetHUDBatches(&m_hudBatches);
 
 }
 

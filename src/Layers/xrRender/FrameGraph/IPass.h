@@ -42,6 +42,31 @@ public:
         return static_cast<u32>(m_batches.size());
     }
 
+protected:
+
+    struct PassIO {
+        xr_vector<std::pair<VirtualResourceHandle, ResourceState>> reads;
+        xr_vector<std::pair<VirtualResourceHandle, ResourceState>> writes;
+    };
+
+    void RegisterPass(FrameGraph& fg, const char* name, const PassIO& io) {
+        PassHandle pass = fg.AddPass(name);
+
+        for (const auto& [resource, state] : io.reads) {
+            fg.PassRead(pass, resource, state);
+        }
+
+        for (const auto& [resource, state] : io.writes) {
+            fg.PassWrite(pass, resource, state);
+        }
+
+        fg.SetPassCallback(pass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
+            this->Execute(ctx, fg);
+        });
+    }
+
+public:
+
     struct PassStats {
         u32 numDrawCalls = 0;
         u32 numTriangles = 0;
