@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
         int i;
         if(argc > 1)
         {
-            size_t sum = 0;
+            size_t sum = 1;
             for(i = 1; i < argc; ++i)
-                sum += strlen(argv[i]) + strlen(" \0");
+                sum += strlen(argv[i]) + 1;
 
             commandLine = (char*)xr_malloc(sum);
             ZeroMemory(commandLine, sum);
