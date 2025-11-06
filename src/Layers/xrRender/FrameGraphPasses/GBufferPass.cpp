@@ -273,22 +273,17 @@ void GBufferPass::Setup(FrameGraph& fg) {
     m_outputs.depth = fg.CreateTexture("GBuffer.Depth", depthDesc);
 
     // ═══════════════════════════════════════════════════════
-    //  CREATE GBUFFER PASS
+    //  REGISTER GBUFFER PASS WITH FRAMEGRAPH
     // ═══════════════════════════════════════════════════════
 
-    PassHandle gbufferPass = fg.AddPass("GBuffer");
+    // Register pass using IPass helper (auto-registers AddPass, PassWrite, SetPassCallback)
+    PassIO io;
+    io.writes.push_back({m_outputs.albedo, ResourceState::RenderTarget});
+    io.writes.push_back({m_outputs.normal, ResourceState::RenderTarget});
+    io.writes.push_back({m_outputs.material, ResourceState::RenderTarget});
+    io.writes.push_back({m_outputs.depth, ResourceState::DepthStencilWrite});
 
-    // Declare resource writes (render targets)
-    fg.PassWrite(gbufferPass, m_outputs.albedo, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, m_outputs.normal, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, m_outputs.material, ResourceState::RenderTarget);
-    fg.PassWrite(gbufferPass, m_outputs.depth, ResourceState::DepthStencilWrite);
-
-    // Set execution callback
-    // Set execution callback (IPass::Execute will use m_outputs)
-    fg.SetPassCallback(gbufferPass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
-        this->Execute(ctx, fg);
-    });
+    RegisterPass(fg, "GBuffer", io);
 
     Msg("  ✓ G-Buffer pass configured");
 }

@@ -284,6 +284,12 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
 
+    // Setup HUD pass (always registered, even if no HUD batches yet)
+    // HUD shares GBuffer outputs and MaterialCache (set per-frame in SetupFrameGraphPasses)
+    m_hudPass->SetOutputs(gbufferOutputs);
+    m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
+    m_hudPass->Setup(*m_framegraph);
+
     // ═══════════════════════════════════════════════════════
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
     // ═══════════════════════════════════════════════════════
@@ -394,24 +400,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     RouteBatchesToPasses();
 
     // ═══════════════════════════════════════════════════════
-    //  HUD PASS SETUP
+    //  HUD PASS SETUP (PER-FRAME)
     // ═══════════════════════════════════════════════════════
-    // HUD renders after world geometry but before lighting
-    // This allows HUD to participate in deferred lighting
+    // HUD pass is always registered (in BuildFrameGraphStructure)
+    // Just set batches here - pass will skip execution if empty
 
-    if (!m_hudBatches.empty()) {
-        // Give HUD batches to HUD pass
-        m_hudPass->SetHUDBatches(&m_hudBatches);
-
-        // Share MaterialCache with HUD pass (same materials as world geometry)
-        m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
-
-        // Share render target outputs (HUD writes to same G-Buffer as world)
-        m_hudPass->SetOutputs(m_gbufferPass->GetOutputs());
-
-        // Setup HUD pass (registers with framegraph)
-        m_hudPass->Setup(*m_framegraph);
-    }
+    m_hudPass->SetHUDBatches(&m_hudBatches);
 
     // TODO: Week 15-16 will add dynamic pass creation here
     // For now, we just route to existing GBufferPass

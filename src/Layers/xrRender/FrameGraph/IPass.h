@@ -83,6 +83,40 @@ public:
         return static_cast<u32>(m_batches.size());
     }
 
+protected:
+    // ═══════════════════════════════════════════════════
+    //  PASS REGISTRATION HELPERS
+    // ═══════════════════════════════════════════════════
+
+    // Resource I/O declaration for pass registration
+    struct PassIO {
+        xr_vector<std::pair<VirtualResourceHandle, ResourceState>> reads;
+        xr_vector<std::pair<VirtualResourceHandle, ResourceState>> writes;
+    };
+
+    // Auto-register pass with framegraph
+    // This handles AddPass(), PassRead/Write(), and SetPassCallback()
+    void RegisterPass(FrameGraph& fg, const char* name, const PassIO& io) {
+        // Create pass
+        PassHandle pass = fg.AddPass(name);
+
+        // Declare reads
+        for (const auto& [resource, state] : io.reads) {
+            fg.PassRead(pass, resource, state);
+        }
+
+        // Declare writes
+        for (const auto& [resource, state] : io.writes) {
+            fg.PassWrite(pass, resource, state);
+        }
+
+        // Set execution callback (calls derived class's Execute())
+        fg.SetPassCallback(pass, [this](ng::RenderContext& ctx, const FrameGraph& fg) {
+            this->Execute(ctx, fg);
+        });
+    }
+
+public:
     // ═══════════════════════════════════════════════════
     //  STATISTICS
     // ═══════════════════════════════════════════════════
