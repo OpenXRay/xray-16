@@ -14,6 +14,7 @@
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/ShaderKey.h"
+#include "xrEngine/CustomHUD.h"
 
 namespace xray::render {
 
@@ -104,6 +105,8 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->Execute();
 
+    RenderHUD();
+
     PresentToBackbuffer();
 
     auto frameEnd = std::chrono::high_resolution_clock::now();
@@ -139,13 +142,21 @@ void FrameGraphRenderer::SetupFrame() {
             spatial_types,
             view_frustum
         );
-
-        Msg("  [FrameGraph] Spatial query: %u objects cached (renderables + lights)", (u32)m_lstRenderables.size());
     }
 
     m_geometryCollector->BeginFrame();
 
+    m_hudBatches.clear();
+
     CollectVisibleGeometry();
+
+    if (!m_hudBatches.empty()) {
+        Msg("! [FrameGraphRenderer] Collected %u HUD batches, adding to world geometry for testing", (u32)m_hudBatches.size());
+
+        for (const auto& hudBatch : m_hudBatches) {
+            m_geometryCollector->Submit(hudBatch);
+        }
+    }
 
     m_geometryCollector->EndFrame();
 }
@@ -354,6 +365,20 @@ void FrameGraphRenderer::PresentToBackbuffer() {
         d3dDesc.Width, d3dDesc.Height);
 }
 
+void FrameGraphRenderer::RenderHUD() {
+    if (m_hudBatches.empty()) {
+        return;
+    }
+
+    static bool warned = false;
+    if (!warned) {
+        Msg("! [FrameGraphRenderer] HUD rendering not fully implemented yet");
+        Msg("!   Collected %u HUD batches but skipping render", (u32)m_hudBatches.size());
+        Msg("!   TODO: Implement HUD projection matrix + rendering pass");
+        warned = true;
+    }
+}
+
 bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
     if (!visual)
         return false;
@@ -377,6 +402,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         case MT_SKELETON_GEOMDEF_PM:
             meshVisual = static_cast<CSkeletonX_PM*>(visual);
             break;
+
+        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_GROUP:
+            return false;
+
         default:
             return false;
     }
@@ -479,6 +509,118 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     return true;
 }
 
+bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
+    if (!visual)
+        return false;
+
+    IRender_Mesh* meshVisual = nullptr;
+
+    switch (visual->getType()) {
+        case MT_NORMAL:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
+        case MT_PROGRESSIVE:
+            meshVisual = static_cast<FProgressive*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
+            break;
+        case MT_PARTICLE_EFFECT:
+        case MT_PARTICLE_GROUP:
+            return false;
+        default:
+            return false;
+    }
+
+    if (!meshVisual)
+        return false;
+
+    if (!meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        return false;
+
+    SGeometry* geom = meshVisual->rm_geom._get();
+    if (!geom->vb || !geom->ib)
+        return false;
+
+    ID3D11Buffer* d3dVB = geom->vb;
+    ID3D11Buffer* d3dIB = geom->ib;
+
+    nvrhi::BufferHandle nvrhiVB;
+    auto vbIt = m_bufferHandleCache.find(d3dVB);
+    if (vbIt != m_bufferHandleCache.end()) {
+        nvrhiVB = vbIt->second;
+    } else {
+        D3D11_BUFFER_DESC d3dVBDesc;
+        d3dVB->GetDesc(&d3dVBDesc);
+
+        nvrhi::BufferDesc vbDesc;
+        vbDesc.debugName = "HUD_VB";
+        vbDesc.byteSize = d3dVBDesc.ByteWidth;
+        vbDesc.isVertexBuffer = true;
+        vbDesc.keepInitialState = true;
+        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+
+        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
+
+        if (!nvrhiVB)
+            return false;
+
+        m_bufferHandleCache[d3dVB] = nvrhiVB;
+    }
+
+    nvrhi::BufferHandle nvrhiIB;
+    auto ibIt = m_bufferHandleCache.find(d3dIB);
+    if (ibIt != m_bufferHandleCache.end()) {
+        nvrhiIB = ibIt->second;
+    } else {
+        D3D11_BUFFER_DESC d3dIBDesc;
+        d3dIB->GetDesc(&d3dIBDesc);
+
+        nvrhi::BufferDesc ibDesc;
+        ibDesc.debugName = "HUD_IB";
+        ibDesc.byteSize = d3dIBDesc.ByteWidth;
+        ibDesc.isIndexBuffer = true;
+        ibDesc.keepInitialState = true;
+        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+
+        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
+            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
+
+        if (!nvrhiIB)
+            return false;
+
+        m_bufferHandleCache[d3dIB] = nvrhiIB;
+    }
+
+    GeometryBatch batch;
+    batch.vertexBuffer = nvrhiVB;
+    batch.indexBuffer = nvrhiIB;
+    batch.indexCount = meshVisual->iCount;
+    batch.startIndex = meshVisual->iBase;
+    batch.baseVertex = meshVisual->vBase;
+    batch.worldMatrix = worldTransform;
+    batch.visual = visual;
+    batch.renderable = renderable;
+    batch.pipeline = nullptr;
+    batch.bindingSet = nullptr;
+
+    RENDER_NAMESPACE::ShaderKey shaderKey;
+    if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
+        static thread_local std::string s_hudDebugNameBuffer;
+        s_hudDebugNameBuffer = "HUD_" + shaderKey.ToString();
+        batch.debugName = s_hudDebugNameBuffer.c_str();
+    } else {
+        batch.debugName = "<hud_unknown_shader>";
+    }
+
+    m_hudBatches.push_back(batch);
+    return true;
+}
+
 void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs) {
     if (!pVisual)
         return;
@@ -573,14 +715,8 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                 }
             }
 
-            Msg("  [FrameGraph] Portal traversal: %u visible sectors",
-                (u32)dsgraph.PortalTraverser.r_sectors.size());
         }
     }
-
-    Msg("  [FrameGraph] Found %u static visuals from sectors", (u32)staticVisuals.size());
-
-    Msg("  [FrameGraph] Processing %u dynamic objects from cached spatial query", (u32)m_lstRenderables.size());
 
     u32 submittedStatic = 0;
     u32 notFvisual_static = 0;
@@ -640,12 +776,9 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
         }
     }
 
-    Msg("  [FrameGraph] Static: submitted %u/%u (filtered: %u not mesh, %u no geom, %u no buffers)",
-        submittedStatic, (u32)staticVisuals.size(), notFvisual_static, noGeometry_static, noBuffers_static);
 
     u32 submittedDynamic = 0;
     u32 notRenderable = 0;
-    u32 noVisual = 0;
 
     u32 portalTraversalMarker = dsgraph.PortalTraverser.i_marker;
 
@@ -653,66 +786,55 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     {
         const auto& data = spatial->GetSpatialData();
         const auto sector_id = data.sector_id;
-
-        if (sector_id == IRender_Sector::INVALID_SECTOR_ID) {
-            notRenderable++;
-            continue;
-        }
+        IRenderable* renderable = spatial->dcast_Renderable();
 
         if (data.type & STYPE_LIGHTSOURCE) {
             notRenderable++;
             continue;
         }
-
-        CSector* sector = static_cast<CSector*>(dsgraph.Sectors[sector_id]);
-        if (portalTraversalMarker != sector->r_marker) {
-            notRenderable++;
-            continue;
-        }
-
-        bool passedFrustumTest = false;
-        for (const CFrustum& sectorFrustum : sector->r_frustums) {
-            if (sectorFrustum.testSphere_dirty(data.sphere.P, data.sphere.R)) {
-                passedFrustumTest = true;
-                break;
-            }
-        }
-        if (!passedFrustumTest) {
-            notRenderable++;
-            continue;
-        }
-
-        IRenderable* renderable = spatial->dcast_Renderable();
         if (!renderable) {
             notRenderable++;
             continue;
         }
 
-        IRenderVisual* iVisual = renderable->GetRenderData().visual;
-        if (!iVisual) {
-            noVisual++;
-            continue;
-        }
-
-        dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(iVisual);
-        if (!visual) {
-            noVisual++;
-            continue;
-        }
-
-        xr_vector<dxRender_Visual*> dynamicLeafs;
-        ExtractStaticLeafVisuals(visual, dynamicLeafs);
-
-        for (dxRender_Visual* leafVisual : dynamicLeafs) {
-            if (ProcessVisualGeometry(leafVisual, renderable->GetRenderData().xform, renderable)) {
-                submittedDynamic++;
-            }
-        }
+        renderable->renderable_Render(0, renderable);
+        submittedDynamic++;
     }
 
-    Msg("  [FrameGraph] Dynamic: submitted %u/%u (filtered: %u not renderable, %u no visual)",
-        submittedDynamic, (u32)m_lstRenderables.size(), notRenderable, noVisual);
-    Msg("  [FrameGraph] TOTAL: %u geometry batches submitted", submittedStatic + submittedDynamic);
+    if (g_pGameLevel && g_pGameLevel->pHUD) {
+        g_pGameLevel->pHUD->Render_Last(0);
+    }
+}
+
+void FrameGraphRenderer::add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform) {
+
+    if (!V) {
+        return;
+    }
+
+    dxRender_Visual* visual = dynamic_cast<dxRender_Visual*>(V);
+    if (!visual) {
+        return;
+    }
+
+    bool isHUD = (root && root->renderable_HUD());
+
+    xr_vector<dxRender_Visual*> leafVisuals;
+    ExtractStaticLeafVisuals(visual, leafVisuals);
+
+    u32 processed = 0;
+    for (dxRender_Visual* leafVisual : leafVisuals) {
+        bool success = false;
+        if (isHUD) {
+            success = ProcessHudGeometry(leafVisual, xform, root);
+        } else {
+            success = ProcessVisualGeometry(leafVisual, xform, root);
+        }
+
+        if (success) {
+            processed++;
+        }
+    }
 }
 
 xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {

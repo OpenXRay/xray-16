@@ -70,6 +70,8 @@ private:
 
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
+    xr_vector<GeometryBatch> m_hudBatches;
+
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 
     xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;
@@ -88,6 +90,8 @@ private:
 
     void CollectVisibleGeometry();
 
+    void RenderHUD();
+
     framegraph::VirtualResourceHandle CreateRT(
         const char* name,
         u32 width,
@@ -97,6 +101,7 @@ private:
     );
 
     bool ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
+    bool ProcessHudGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable = nullptr);
     void ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_vector<dxRender_Visual*>& outLeafs);
 
     struct PassEntry {
@@ -114,6 +119,10 @@ private:
     void RouteBatchesToPasses();
 
     void CreateAllRequiredPasses();
+
+    public:
+
+        void add_Visual(IRenderable* root, IRenderVisual* V, Fmatrix& xform);
 };
 
 }

@@ -467,8 +467,16 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                         }
                     }
 
-                    IRenderVisual* renderableVisual = batch->renderable->GetRenderData().visual;
-                    RENDER_NAMESPACE::CKinematics* Parent = dynamic_cast<RENDER_NAMESPACE::CKinematics*>(renderableVisual);
+                    RENDER_NAMESPACE::CKinematics* Parent = nullptr;
+
+                    auto visualType = batch->visual->getType();
+                    if (visualType == MT_SKELETON_GEOMDEF_ST) {
+                        auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_ST*>(batch->visual);
+                        Parent = skeletonMesh->GetParent();
+                    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+                        auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_PM*>(batch->visual);
+                        Parent = skeletonMesh->GetParent();
+                    }
 
                     if (Parent) {
                         Parent->CalculateBones(TRUE);
@@ -495,6 +503,9 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                             array[(id + 2) * 4 + 2] = M._33;
                             array[(id + 2) * 4 + 3] = M._43;
                         }
+                    } else {
+                        Msg("! [GBufferPass] WARNING: Skeleton visual has no Parent! visual=%s",
+                            batch->visual->dbg_name.c_str());
                     }
                 } else {
 
