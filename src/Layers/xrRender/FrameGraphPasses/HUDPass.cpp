@@ -17,11 +17,56 @@
 #include "Layers/xrRender/SkeletonX.h"  // For CSkeletonX_ST, CSkeletonX_PM
 #include "xrEngine/Render.h"
 
+extern ENGINE_API float psHUD_FOV;
 namespace xray::render::passes {
 
 using namespace framegraph;
 using RENDER_NAMESPACE::CSkeletonX_ST;
 using RENDER_NAMESPACE::CSkeletonX_PM;
+
+// HUD FOV parameter (from console command "hud_fov")
+
+// Apply HUD FOV adjustment to world matrix
+// This creates the visual effect of different FOV without changing projection matrix
+// (so lighting and shadows still work correctly in world space)
+//
+// Based on Unreal Engine's viewmodel FOV technique:
+// AdjustedWorld = View^-1 * FOVScale * View * World
+//
+// The FOV scale is applied in view space (where perspective happens),
+// then transformed back to world space. This keeps all world-space
+// rendering benefits while adjusting apparent FOV.
+static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
+{
+    // FOV scale factor (psHUD_FOV = 0.45 default, range 0.1 to 1.0)
+    // Lower psHUD_FOV = narrower FOV = weapon appears larger/closer
+    // So we INVERT: scale = 1.0 / psHUD_FOV
+    // Example: psHUD_FOV=0.45 -> scale=2.22x larger (closer)
+    //          psHUD_FOV=1.0  -> scale=1.0x (normal)
+    float fovScale = 1.0f / psHUD_FOV;
+
+    // Get view and inverse view matrices
+    Fmatrix viewMatrix = Device.mView;
+    Fmatrix invView;
+    invView.invert(viewMatrix);
+
+    // Create FOV scale matrix in view space
+    // Scale X and Y (perspective components), but not Z (depth) or translation
+    Fmatrix fovScaleMatrix;
+    fovScaleMatrix.identity();
+    fovScaleMatrix._11 = fovScale;  // Scale X
+    fovScaleMatrix._22 = fovScale;  // Scale Y
+    fovScaleMatrix._33 = 1.0f;      // Don't scale Z (depth)
+
+    // Apply transformation: World -> View -> Scale -> World
+    // Result = V^-1 * S * V * W
+    Fmatrix temp1, temp2, result;
+    temp1.mul(viewMatrix, worldMatrix);       // V * W
+    temp2.mul(fovScaleMatrix, temp1);         // S * V * W
+    result.mul(invView, temp2);               // V^-1 * S * V * W
+
+    return result;
+}
 
 HUDPass::HUDPass(ng::RenderDevice* device, const HUDPassConfig& config)
     : m_device(device)
@@ -134,10 +179,13 @@ void HUDPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             currentPipeline = matPSO->pso;
         }
 
+        // Apply HUD FOV adjustment to batch world matrix
+        Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
+
         // Update DynamicTransforms CB with per-material detail scale
         if (matPSO->detail_scale != lastDetailScale) {
             DynamicTransforms dynamicCB = {};
-            FillDynamicTransforms(dynamicCB);
+            FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
 
             // Override dt_params with per-material detail scale
             extern float r__dtex_range;
@@ -190,9 +238,9 @@ void HUDPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
             }
 
             if (isSkeleton) {
-                // Update DynamicTransforms CB with skeleton's world matrix
+                // Update DynamicTransforms CB with FOV-adjusted world matrix
                 DynamicTransforms dynamicCB = {};
-                FillDynamicTransforms(dynamicCB, batch.worldMatrix, 0.f);
+                FillDynamicTransforms(dynamicCB, adjustedWorldMatrix, 0.f);
                 for (const auto& cbInfo : matPSO->constantBuffers) {
                     if (cbInfo.name == "dynamic_transforms") {
                         u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
