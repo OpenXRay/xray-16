@@ -154,6 +154,7 @@
     <ClInclude Include="..\xrRender\FLOD.h" />
     <ClInclude Include="..\xrRender\FProgressive.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuUIPass.h" />
     <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderPhaseCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
@@ -369,6 +370,7 @@
     <ClCompile Include="..\xrRender\FLOD.cpp" />
     <ClCompile Include="..\xrRender\FProgressive.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuUIPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderPhaseCache.cpp" />
     <ClCompile Include="..\xrRender\FSkinned.cpp" />
     <ClCompile Include="..\xrRender\FTreeVisual.cpp" />

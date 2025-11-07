@@ -66,6 +66,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
+    passes::MenuUIPassConfig menuUIConfig;
+    menuUIConfig.width = Device.dwWidth;
+    menuUIConfig.height = Device.dwHeight;
+    m_menuUIPass = xr_make_unique<passes::MenuUIPass>(device, menuUIConfig);
+
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 
     g_geometryCollector = m_geometryCollector.get();
@@ -101,7 +106,10 @@ void FrameGraphRenderer::Shutdown() {
     m_geometryCollector.reset();
     m_tonemapPass.reset();
     m_lightingPass.reset();
+    m_particlePass.reset();
+    m_hudPass.reset();
     m_gbufferPass.reset();
+    m_menuUIPass.reset();
     m_shaderPhaseCache.reset();
     m_framegraph.reset();
 
@@ -162,20 +170,16 @@ void FrameGraphRenderer::RenderMenu() {
 
     Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 
-    {
-        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-        if (finalTexture)
-        {
-            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+    m_framegraph->SetRenderContext(m_renderContext.get());
 
-            if (cmdList)
-            {
-                cmdList->open();
-                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.1f, 0.1f, 0.1f, 1.0f));
-                cmdList->close();
-                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-            }
-        }
+    m_menuUIPass->Execute(*m_renderContext, *m_framegraph);
+
+    nvrhi::ITexture* menuMainTexture = m_framegraph->GetPhysicalTexture(m_rt_MenuMain);
+    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+
+    if (menuMainTexture && finalTexture) {
+        m_renderContext->CopyTexture(finalTexture, menuMainTexture);
+        Msg("  [RenderMenu] Copied rt_MenuMain to final output");
     }
 
     ImGui::Render();
@@ -319,6 +323,34 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     Msg("  ✓ Created 4 native G-Buffer RTs (Position, Normal, Albedo, Depth)");
 
+    m_native_MenuMain = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuMain");
+    m_native_MenuDistort = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuDistort");
+
+    nvrhi::ITexture* physicalMenuMain = textureMgr->GetNVRHITexture(m_native_MenuMain);
+    nvrhi::ITexture* physicalMenuDistort = textureMgr->GetNVRHITexture(m_native_MenuDistort);
+
+    VERIFY(physicalMenuMain && physicalMenuDistort);
+
+    framegraph::ResourceDesc menuMainDesc;
+    menuMainDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    menuMainDesc.width = w;
+    menuMainDesc.height = h;
+    menuMainDesc.format = nvrhi::Format::RGBA8_UNORM;
+    menuMainDesc.isRenderTarget = true;
+    menuMainDesc.debugName = "rt_MenuMain";
+    m_rt_MenuMain = m_framegraph->ImportTexture("rt_MenuMain", physicalMenuMain, menuMainDesc);
+
+    framegraph::ResourceDesc menuDistortDesc;
+    menuDistortDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    menuDistortDesc.width = w;
+    menuDistortDesc.height = h;
+    menuDistortDesc.format = nvrhi::Format::RGBA8_UNORM;
+    menuDistortDesc.isRenderTarget = true;
+    menuDistortDesc.debugName = "rt_MenuDistort";
+    m_rt_MenuDistort = m_framegraph->ImportTexture("rt_MenuDistort", physicalMenuDistort, menuDistortDesc);
+
+    Msg("  ✓ Created 2 native Menu RTs (MenuMain, MenuDistort)");
+
     m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
 
     m_rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);
@@ -328,7 +360,7 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);
 
     Msg("  ✓ Created remaining legacy RTs (Accumulator, Generic0/1/2, Backbuffer)");
-    Msg("  ✓ Total: 8 vanilla render targets (4 native, 4 legacy)");
+    Msg("  ✓ Total: 10 render targets (6 native: G-Buffer + Menu, 4 legacy)");
 
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();
@@ -339,6 +371,9 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     m_particlePass->SetOutputs(gbufferOutputs);
     m_particlePass->Setup(*m_framegraph);
+
+    m_menuUIPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_menuUIPass->Setup(*m_framegraph);
 
     Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
@@ -392,6 +427,18 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     registry.RegisterRT("rt_Generic_2", m_rt_Generic_2);
     registry.RegisterAliases(m_rt_Generic_2, {
         "s_generic2"
+    });
+
+    registry.RegisterRT("rt_MenuMain", m_rt_MenuMain);
+    registry.RegisterAliases(m_rt_MenuMain, {
+        "$user$menu_main",
+        "s_menu_main"
+    });
+
+    registry.RegisterRT("rt_MenuDistort", m_rt_MenuDistort);
+    registry.RegisterAliases(m_rt_MenuDistort, {
+        "$user$menu_distort",
+        "s_menu_distort"
     });
 
     registry.RegisterRT("rt_Backbuffer", m_backbuffer);

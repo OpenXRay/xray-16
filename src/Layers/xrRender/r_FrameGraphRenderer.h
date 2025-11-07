@@ -10,6 +10,7 @@
 #include "Layers/xrRender/FrameGraphPasses/ParticlePass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
+#include "Layers/xrRender/FrameGraphPasses/MenuUIPass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 struct Fmatrix;
@@ -76,6 +77,9 @@ private:
     ng::TextureHandle m_native_Generic_1;
     ng::TextureHandle m_native_Generic_2;
 
+    ng::TextureHandle m_native_MenuMain;
+    ng::TextureHandle m_native_MenuDistort;
+
     framegraph::VirtualResourceHandle m_rt_Position;
     framegraph::VirtualResourceHandle m_rt_Normal;
     framegraph::VirtualResourceHandle m_rt_Albedo;
@@ -86,11 +90,16 @@ private:
     framegraph::VirtualResourceHandle m_rt_Generic_2;
     framegraph::VirtualResourceHandle m_backbuffer;
 
+    framegraph::VirtualResourceHandle m_rt_MenuMain;
+    framegraph::VirtualResourceHandle m_rt_MenuDistort;
+
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::HUDPass> m_hudPass;
     xr_unique_ptr<passes::ParticlePass> m_particlePass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
+
+    xr_unique_ptr<passes::MenuUIPass> m_menuUIPass;
 
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
