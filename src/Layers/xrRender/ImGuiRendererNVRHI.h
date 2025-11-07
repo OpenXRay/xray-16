@@ -63,6 +63,7 @@ private:
     void ProcessTextureRequests(ImDrawData* drawData);
     bool CreateShaders();
     bool CreatePipelineState();
+    bool CreateResourceBindings();
     bool CreateBuffers(size_t vtxSize, size_t idxSize);
     bool ResizeBuffers(size_t vtxSize, size_t idxSize);
 

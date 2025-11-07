@@ -171,8 +171,7 @@ void dxFontRender::OnRender(CGameFont& owner)
         RImplementation.Vertex.Unlock(vCount, pGeom.stride());
         if (vCount)
         {
-            RCache.set_Geometry(pGeom);
-            RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
+
         }
     }
 }

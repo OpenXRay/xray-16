@@ -45,13 +45,13 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
             .setBufferIndex(0)
             .setElementStride(sizeof(ImDrawVert)),
         nvrhi::VertexAttributeDesc()
-            .setName("TEXCOORD0")
+            .setName("TEXCOORD")
             .setFormat(nvrhi::Format::RG32_FLOAT)
             .setOffset(offsetof(ImDrawVert, uv))
             .setBufferIndex(0)
             .setElementStride(sizeof(ImDrawVert)),
         nvrhi::VertexAttributeDesc()
-            .setName("COLOR0")
+            .setName("COLOR")
             .setFormat(nvrhi::Format::RGBA8_UNORM)
             .setOffset(offsetof(ImDrawVert, col))
             .setBufferIndex(0)
@@ -112,11 +112,31 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
     pipelineDesc.setRenderState(m_renderState);
     pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
 
-    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, nullptr);
+    nvrhi::FramebufferInfoEx framebufferInfo;
+    framebufferInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
+
+    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, framebufferInfo);
 
     if (!m_pipeline)
     {
         Msg("! Failed to create ImGui graphics pipeline");
+        return false;
+    }
+
+    return true;
+}
+
+bool ImGuiRendererNVRHI::CreateResourceBindings()
+{
+    if (!m_fontTexture)
+    {
+        Msg("! CreateResourceBindings called without font texture");
+        return false;
+    }
+
+    if (!m_bindingLayout)
+    {
+        Msg("! CreateResourceBindings called without binding layout");
         return false;
     }
 
@@ -135,6 +155,7 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
         return false;
     }
 
+    Msg("* ImGui resource bindings created successfully");
     return true;
 }
 

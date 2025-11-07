@@ -25,6 +25,8 @@ public:
 
     nvrhi::IDevice* GetNVRHIDevice() const;
 
+    nvrhi::ICommandList* GetImmediateCommandList() const;
+
     void UploadTextureDataToNVRHI(
         nvrhi::ITexture* texture,
         u32 arraySlice,

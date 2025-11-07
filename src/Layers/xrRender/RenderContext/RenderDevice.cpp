@@ -19,6 +19,10 @@ nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
     return m_nvrhiDevice ? m_nvrhiDevice->GetDevice() : nullptr;
 }
 
+nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
+    return m_nvrhiDevice ? m_nvrhiDevice->GetCommandList() : nullptr;
+}
+
 bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context) {
     VERIFY(device);
     VERIFY(context);
@@ -316,7 +320,9 @@ void RenderDevice::UploadTextureDataToNVRHI(
     m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch);
 
     m_uploadCommandList->close();
-    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+    GetNVRHIDevice()->executeCommandList(m_uploadCommandList);
+
+    GetNVRHIDevice()->waitForIdle();
 }
 
 BufferHandle RenderDevice::CreateBuffer(

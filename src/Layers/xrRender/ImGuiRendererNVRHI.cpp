@@ -27,22 +27,22 @@ void ImGuiRendererNVRHI::Frame()
 
 void ImGuiRendererNVRHI::Render(ImDrawData* data)
 {
-    if (!data)
+    if (!data || data->TotalVtxCount == 0 || data->TotalIdxCount == 0)
         return;
 
     ProcessTextureRequests(data);
 
-    if (data->TotalVtxCount == 0)
-        return;
-
-    nvrhi::ICommandList* cmdList = nullptr;
-    if (!cmdList)
+    if (!m_pipeline || !m_resourceBindings)
     {
-        Msg("! ImGuiRendererNVRHI::Render - No command list available");
         return;
     }
 
-    RenderDrawData(data, cmdList);
+    static bool logged = false;
+    if (!logged && m_resourceBindings)
+    {
+        Msg("* ImGui NVRHI renderer ready - waiting for framebuffer integration");
+        logged = true;
+    }
 }
 
 void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)
@@ -154,7 +154,6 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
 {
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = vtxSize * sizeof(ImDrawVert);
-    vbDesc.structStride = sizeof(ImDrawVert);
     vbDesc.isVertexBuffer = true;
     vbDesc.isVolatile = true;
     vbDesc.debugName = "ImGui Vertex Buffer";
@@ -243,6 +242,11 @@ void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
                     {
                         m_fontTexture = texture;
                         Msg("* ImGui font texture created (%dx%d)", texData->Width, texData->Height);
+
+                        if (!m_resourceBindings && !CreateResourceBindings())
+                        {
+                            Msg("! Failed to create ImGui resource bindings after font texture creation");
+                        }
                     }
                 }
                 else

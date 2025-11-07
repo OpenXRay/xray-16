@@ -220,6 +220,8 @@ std::pair<u32, u32> CGameFont::get_actions_text_length(pcstr s)
 
 void CGameFont::OnRender()
 {
+    return;
+
     if (!strings.empty())
     {
         pFontRender->OnRender(*this);
