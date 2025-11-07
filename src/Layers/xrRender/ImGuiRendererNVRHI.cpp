@@ -128,9 +128,7 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     samplerDesc.setMinFilter(true);
     samplerDesc.setMagFilter(true);
     samplerDesc.setMipFilter(true);
-    samplerDesc.setAddressU(nvrhi::SamplerAddressMode::Wrap);
-    samplerDesc.setAddressV(nvrhi::SamplerAddressMode::Wrap);
-    samplerDesc.setAddressW(nvrhi::SamplerAddressMode::Wrap);
+    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
     m_fontSampler = m_device->createSampler(samplerDesc);
 
     nvrhi::BufferDesc cbDesc;

@@ -65,13 +65,12 @@ void ImGuiRendererNVRHI::UpdateTextureBinding(ImTextureID textureId)
 
 void ImGuiRendererNVRHI::SetupRenderState(ImDrawData* drawData, nvrhi::ICommandList* cmdList)
 {
-    nvrhi::Viewport viewport;
-    viewport.minX = 0.0f;
-    viewport.minY = 0.0f;
-    viewport.maxX = drawData->DisplaySize.x * drawData->FramebufferScale.x;
-    viewport.maxY = drawData->DisplaySize.y * drawData->FramebufferScale.y;
-    viewport.minZ = 0.0f;
-    viewport.maxZ = 1.0f;
+    m_viewport.minX = 0.0f;
+    m_viewport.minY = 0.0f;
+    m_viewport.maxX = drawData->DisplaySize.x * drawData->FramebufferScale.x;
+    m_viewport.maxY = drawData->DisplaySize.y * drawData->FramebufferScale.y;
+    m_viewport.minZ = 0.0f;
+    m_viewport.maxZ = 1.0f;
 
     float L = drawData->DisplayPos.x;
     float R = drawData->DisplayPos.x + drawData->DisplaySize.x;
@@ -114,6 +113,7 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     nvrhi::GraphicsState graphicsState;
     graphicsState.pipeline = m_pipeline;
     graphicsState.framebuffer = m_currentFramebuffer;
+    graphicsState.viewport.addViewport(m_viewport);
     graphicsState.bindings = { m_resourceBindings };
     graphicsState.vertexBuffers = {
         { m_vertexBuffer, 0, 0 }
@@ -166,6 +166,8 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
                     scissor.maxX = (int)clipRect.z;
                     scissor.maxY = (int)clipRect.w;
 
+                    graphicsState.viewport.addScissorRect(scissor);
+
                     ImTextureID texId = pcmd->GetTexID();
                     if (texId != lastTextureId)
                     {
@@ -173,8 +175,9 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
                         lastTextureId = texId;
 
                         graphicsState.bindings = { m_resourceBindings };
-                        cmdList->setGraphicsState(graphicsState);
                     }
+
+                    cmdList->setGraphicsState(graphicsState);
 
                     nvrhi::DrawArguments args;
                     args.setVertexCount(pcmd->ElemCount);

@@ -52,6 +52,8 @@ private:
 
     nvrhi::IFramebuffer* m_currentFramebuffer = nullptr;
 
+    nvrhi::Viewport m_viewport;
+
     struct ImGuiConstants {
         float mvpMatrix[4][4];
     };
