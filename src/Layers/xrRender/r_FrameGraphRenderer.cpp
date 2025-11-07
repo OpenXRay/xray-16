@@ -71,6 +71,16 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     menuUIConfig.height = Device.dwHeight;
     m_menuUIPass = xr_make_unique<passes::MenuUIPass>(device, menuUIConfig);
 
+    passes::MenuDistortPassConfig menuDistortConfig;
+    menuDistortConfig.width = Device.dwWidth;
+    menuDistortConfig.height = Device.dwHeight;
+    m_menuDistortPass = xr_make_unique<passes::MenuDistortPass>(device, menuDistortConfig);
+
+    passes::MenuCompositePassConfig menuCompositeConfig;
+    menuCompositeConfig.width = Device.dwWidth;
+    menuCompositeConfig.height = Device.dwHeight;
+    m_menuCompositePass = xr_make_unique<passes::MenuCompositePass>(device, menuCompositeConfig);
+
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 
     g_geometryCollector = m_geometryCollector.get();
@@ -109,6 +119,8 @@ void FrameGraphRenderer::Shutdown() {
     m_particlePass.reset();
     m_hudPass.reset();
     m_gbufferPass.reset();
+    m_menuCompositePass.reset();
+    m_menuDistortPass.reset();
     m_menuUIPass.reset();
     m_shaderPhaseCache.reset();
     m_framegraph.reset();
@@ -173,14 +185,10 @@ void FrameGraphRenderer::RenderMenu() {
     m_framegraph->SetRenderContext(m_renderContext.get());
 
     m_menuUIPass->Execute(*m_renderContext, *m_framegraph);
+    m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
+    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
 
-    nvrhi::ITexture* menuMainTexture = m_framegraph->GetPhysicalTexture(m_rt_MenuMain);
-    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-
-    if (menuMainTexture && finalTexture) {
-        m_renderContext->CopyTexture(finalTexture, menuMainTexture);
-        Msg("  [RenderMenu] Copied rt_MenuMain to final output");
-    }
+    Msg("  [RenderMenu] 3-step menu pipeline complete (UI → Distort → Composite)");
 
     ImGui::Render();
 
@@ -374,6 +382,13 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     m_menuUIPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
     m_menuUIPass->Setup(*m_framegraph);
+
+    m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
+    m_menuDistortPass->Setup(*m_framegraph);
+
+    m_menuCompositePass->SetInputs(m_rt_MenuMain, m_rt_MenuDistort);
+    m_menuCompositePass->SetOutput(gbufferOutputs.albedo);
+    m_menuCompositePass->Setup(*m_framegraph);
 
     Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
     auto& registry = m_framegraph->GetRTRegistry();
