@@ -202,18 +202,21 @@ void FrameGraphRenderer::SetupFrame() {
 
     if (g_pGamePersistent && g_pGameLevel)
     {
-        CFrustum view_frustum;
-        view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->SpatialSpace.IsEmpty())
+        {
+            CFrustum view_frustum;
+            view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-        u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;
-        u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
+            u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;
+            u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;
 
-        g_pGamePersistent->SpatialSpace.q_frustum(
-            m_lstRenderables,
-            spatial_traverse_flags,
-            spatial_types,
-            view_frustum
-        );
+            g_pGamePersistent->SpatialSpace.q_frustum(
+                m_lstRenderables,
+                spatial_traverse_flags,
+                spatial_types,
+                view_frustum
+            );
+        }
     }
 
     m_geometryCollector->BeginFrame();
