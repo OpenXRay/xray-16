@@ -286,7 +286,7 @@ void FrameGraphRenderer::SetupFrame() {
         // Setup frustum (same as render_main)
         // Safety check: Ensure spatial database is initialized
         // SpatialSpace isn't ready during early level loading
-        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->SpatialSpace.IsEmpty())
+        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->IsLoadingScreenShown())
         {
             CFrustum view_frustum;
             view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);

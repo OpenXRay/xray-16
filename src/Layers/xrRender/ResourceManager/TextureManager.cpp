@@ -685,7 +685,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     deviceDesc.arraySize = ddsData.desc.arraySize;
     deviceDesc.mipLevels = ddsData.desc.mipLevels;
     deviceDesc.format = ddsData.desc.format;
-    deviceDesc.debugName = meta.filePath;
+    deviceDesc.debugName = ddsData.filePath.c_str();
 
     // Determine dimension
     switch (ddsData.desc.type) {
