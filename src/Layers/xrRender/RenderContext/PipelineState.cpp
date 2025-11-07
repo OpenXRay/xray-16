@@ -234,10 +234,24 @@ PipelineState* PipelineStateCache::CreatePipelineState(
 
     nvrhi::GraphicsPipelineDesc nvrhiDesc;
 
-    if (desc.vertexShader)
+    if (desc.vertexShader) {
         nvrhiDesc.VS = desc.vertexShader->GetNativeShader();
-    if (desc.pixelShader)
+        if (!nvrhiDesc.VS) {
+            Msg("! [PipelineStateCache] Vertex shader has null native shader!");
+        }
+    } else {
+        Msg("! [PipelineStateCache] No vertex shader provided!");
+    }
+
+    if (desc.pixelShader) {
         nvrhiDesc.PS = desc.pixelShader->GetNativeShader();
+        if (!nvrhiDesc.PS) {
+            Msg("! [PipelineStateCache] Pixel shader has null native shader!");
+        }
+    } else {
+        Msg("! [PipelineStateCache] No pixel shader provided!");
+    }
+
     if (desc.geometryShader)
         nvrhiDesc.GS = desc.geometryShader->GetNativeShader();
     if (desc.hullShader)
@@ -334,12 +348,24 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     }
     fbInfo.depthFormat = desc.depthStencilFormat;
 
+    Msg("  [PipelineStateCache] Creating PSO: %s", desc.debugName.c_str());
+    Msg("    - VS: %s", nvrhiDesc.VS ? "valid" : "NULL");
+    Msg("    - PS: %s", nvrhiDesc.PS ? "valid" : "NULL");
+    Msg("    - Primitive type: %d", (int)nvrhiDesc.primType);
+    Msg("    - RT count: %d", fbInfo.colorFormats.size());
+
+    if (!nvrhiDesc.VS) {
+        Msg("! [PipelineStateCache] Cannot create pipeline without vertex shader!");
+        return nullptr;
+    }
+
     nvrhi::GraphicsPipelineHandle nvrhiPipeline =
         m_device->GetNativeDevice()->createGraphicsPipeline(nvrhiDesc, fbInfo);
 
     if (!nvrhiPipeline) {
         Msg("! [PipelineStateCache] ❌ Failed to create PSO: %s",
             desc.debugName.c_str());
+        Msg("! Check D3D11 debug layer for detailed error");
         return nullptr;
     }
 

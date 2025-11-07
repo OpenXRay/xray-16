@@ -90,11 +90,21 @@ bool TonemapPass::CreatePipeline(nvrhi::ITexture* backbufferTexture)
 
     psoDesc.debugName = "TonemapPass";
 
-    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        Msg("! [TonemapPass] Pipeline cache is null!");
+        return false;
+    }
+
+    m_pipeline = psoCache->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {
         Msg("! [TonemapPass] Failed to create graphics pipeline");
+        Msg("  - Vertex shader: %s", m_vertexShader ? "valid" : "null");
+        Msg("  - Pixel shader: %s", m_pixelShader ? "valid" : "null");
+        Msg("  - Primitive topology: %d", (int)psoDesc.primitiveTopology);
+        Msg("  - RT count: %d", psoDesc.renderTargetCount);
         return false;
     }
 
@@ -140,7 +150,6 @@ void TonemapPass::Execute(
         if (!CreatePipeline(output))
         {
             Msg("! [TonemapPass] Failed to create pipeline");
-            ctx.EndRenderPass();
             return;
         }
     }
@@ -162,7 +171,20 @@ void TonemapPass::Execute(
     scissor.height = desc.height;
     ctx.SetScissor(scissor);
 
-    ctx.SetPipeline(m_pipeline->GetNativePipeline());
+    if (!m_pipeline) {
+        Msg("! [TonemapPass] Pipeline is null! Cannot draw");
+        ctx.EndRenderPass();
+        return;
+    }
+
+    nvrhi::IGraphicsPipeline* nativePipeline = m_pipeline->GetNativePipeline();
+    if (!nativePipeline) {
+        Msg("! [TonemapPass] Native pipeline is null! Cannot draw");
+        ctx.EndRenderPass();
+        return;
+    }
+
+    ctx.SetPipeline(nativePipeline);
 
     ctx.Draw(3, 0);
 
