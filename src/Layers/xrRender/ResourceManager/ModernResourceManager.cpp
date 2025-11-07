@@ -13,8 +13,9 @@ ModernResourceManager::ModernResourceManager(xray::render::ng::RenderDevice* dev
     m_textureManager = xr_make_unique<TextureManager>(device);
     m_bufferManager = xr_make_unique<BufferManager>(device);
     m_samplerCache = xr_make_unique<SamplerCache>(device);
+    m_rtFactory = xr_make_unique<NativeRTFactory>(device, m_textureManager.get());
 
-    Msg("! [ModernResourceManager] ✅ Created");
+    Msg("! [ModernResourceManager] ✅ Created with Native RT Factory");
 }
 
 ModernResourceManager::~ModernResourceManager() {
@@ -38,6 +39,7 @@ ModernResourceManager::Statistics ModernResourceManager::GetStatistics() const {
     Statistics stats;
     stats.textures = m_textureManager->GetStatistics();
     stats.buffers = m_bufferManager->GetStatistics();
+    stats.renderTargets = m_rtFactory->GetStatistics();
     stats.samplersCached = m_samplerCache->GetCacheSize();
     return stats;
 }
@@ -46,6 +48,7 @@ void ModernResourceManager::PrintStatistics() const {
     Msg("! [ModernResourceManager] === Statistics ===");
     m_textureManager->PrintStatistics();
     m_bufferManager->PrintStatistics();
+    m_rtFactory->PrintStatistics();
     Msg("!   Samplers cached: %u", m_samplerCache->GetCacheSize());
     Msg("! [ModernResourceManager] Total Memory: %llu MB",
         GetStatistics().totalMemoryUsed() / (1024 * 1024));
