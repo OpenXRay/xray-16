@@ -233,6 +233,8 @@ private:
 
     nvrhi::CommandListHandle m_uploadCommandList;
 
+    std::mutex m_uploadMutex;
+
     bool m_initialized = false;
 
     struct TextureInfo {

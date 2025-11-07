@@ -261,6 +261,9 @@ void RenderDevice::UploadTextureData(
     }
 
     VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    std::lock_guard<std::mutex> lock(m_uploadMutex);
+
     m_uploadCommandList->open();
 
     const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
@@ -298,6 +301,8 @@ void RenderDevice::UploadTextureDataToNVRHI(
     VERIFY(data != nullptr);
     VERIFY(dataSize > 0);
     VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    std::lock_guard<std::mutex> lock(m_uploadMutex);
 
     m_uploadCommandList->open();
 
