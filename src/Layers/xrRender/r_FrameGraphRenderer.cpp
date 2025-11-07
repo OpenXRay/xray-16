@@ -74,11 +74,21 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
-    // Create menu rendering pass
+    // Create menu rendering passes (3-step pipeline)
     passes::MenuUIPassConfig menuUIConfig;
     menuUIConfig.width = Device.dwWidth;
     menuUIConfig.height = Device.dwHeight;
     m_menuUIPass = xr_make_unique<passes::MenuUIPass>(device, menuUIConfig);
+
+    passes::MenuDistortPassConfig menuDistortConfig;
+    menuDistortConfig.width = Device.dwWidth;
+    menuDistortConfig.height = Device.dwHeight;
+    m_menuDistortPass = xr_make_unique<passes::MenuDistortPass>(device, menuDistortConfig);
+
+    passes::MenuCompositePassConfig menuCompositeConfig;
+    menuCompositeConfig.width = Device.dwWidth;
+    menuCompositeConfig.height = Device.dwHeight;
+    m_menuCompositePass = xr_make_unique<passes::MenuCompositePass>(device, menuCompositeConfig);
 
     // Create geometry collector
     m_geometryCollector = xr_make_unique<GeometryCollector>();
@@ -131,6 +141,8 @@ void FrameGraphRenderer::Shutdown() {
     m_particlePass.reset();
     m_hudPass.reset();
     m_gbufferPass.reset();
+    m_menuCompositePass.reset();
+    m_menuDistortPass.reset();
     m_menuUIPass.reset();
     m_shaderPhaseCache.reset();
     m_framegraph.reset();
@@ -239,27 +251,21 @@ void FrameGraphRenderer::RenderMenu() {
     Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 
     // ═══════════════════════════════════════════════════════
-    //  EXECUTE MENU UI PASS (Phase 3: Render to rt_MenuMain)
+    //  EXECUTE 3-STEP MENU PIPELINE (Phase 3-5)
     // ═══════════════════════════════════════════════════════
-    // MenuUIPass will:
-    // 1. Clear rt_MenuMain to black
-    // 2. (Phase 6) Render legacy UI dialogs via bridge
-    // 3. Output to rt_MenuMain
+    // Step 1: MenuUIPass - Render UI dialogs to rt_MenuMain
+    // Step 2: MenuDistortPass - Render distortion mask to rt_MenuDistort
+    // Step 3: MenuCompositePass - Composite both to final output
 
     // Set RenderContext for execution
     m_framegraph->SetRenderContext(m_renderContext.get());
 
-    // Execute MenuUIPass
+    // Execute all three passes in sequence
     m_menuUIPass->Execute(*m_renderContext, *m_framegraph);
+    m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
+    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
 
-    // For now, copy rt_MenuMain to final output (Phase 5 will composite instead)
-    nvrhi::ITexture* menuMainTexture = m_framegraph->GetPhysicalTexture(m_rt_MenuMain);
-    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-
-    if (menuMainTexture && finalTexture) {
-        m_renderContext->CopyTexture(finalTexture, menuMainTexture);
-        Msg("  [RenderMenu] Copied rt_MenuMain to final output");
-    }
+    Msg("  [RenderMenu] 3-step menu pipeline complete (UI → Distort → Composite)");
 
     // ═══════════════════════════════════════════════════════
     //  RENDER IMGUI (Menu UI overlay)
@@ -504,10 +510,19 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_particlePass->SetOutputs(gbufferOutputs);
     m_particlePass->Setup(*m_framegraph);
 
-    // Setup Menu UI pass (renders legacy UI to rt_MenuMain)
-    // Uses rt_MenuMain as output, rt_Depth for depth testing
+    // Setup Menu rendering passes (3-step pipeline)
+    // Step 1: Render UI dialogs to rt_MenuMain
     m_menuUIPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
     m_menuUIPass->Setup(*m_framegraph);
+
+    // Step 2: Render distortion mask to rt_MenuDistort
+    m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
+    m_menuDistortPass->Setup(*m_framegraph);
+
+    // Step 3: Composite rt_MenuMain + rt_MenuDistort to final output
+    m_menuCompositePass->SetInputs(m_rt_MenuMain, m_rt_MenuDistort);
+    m_menuCompositePass->SetOutput(gbufferOutputs.albedo);  // Use GBuffer albedo as temp final output
+    m_menuCompositePass->Setup(*m_framegraph);
 
     // ═══════════════════════════════════════════════════════
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)

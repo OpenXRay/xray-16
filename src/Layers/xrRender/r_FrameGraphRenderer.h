@@ -12,6 +12,8 @@
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/FrameGraphPasses/MenuUIPass.h"
+#include "Layers/xrRender/FrameGraphPasses/MenuDistortPass.h"
+#include "Layers/xrRender/FrameGraphPasses/MenuCompositePass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 // Forward declarations
@@ -124,8 +126,10 @@ private:
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
 
-    // Menu rendering passes
-    xr_unique_ptr<passes::MenuUIPass> m_menuUIPass;
+    // Menu rendering passes (3-step pipeline)
+    xr_unique_ptr<passes::MenuUIPass> m_menuUIPass;           // Step 1: Render UI dialogs
+    xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass; // Step 2: Render distortion mask
+    xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass; // Step 3: Composite to output
 
     // Geometry collector
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
