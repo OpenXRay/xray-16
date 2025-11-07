@@ -1455,6 +1455,12 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
 
     // Render ImGui onto final output (pass raw pointer from handle)
     imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
+
+    // CRITICAL: Close and execute the immediate command list to ensure ImGui draws before present
+    // Without this, ImGui commands are queued but not submitted to GPU
+    cmdList->close();
+    m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+    cmdList->open(); // Reopen for subsequent operations
 }
 
 } // namespace xray::render

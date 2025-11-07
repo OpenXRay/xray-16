@@ -87,16 +87,13 @@ void ImGuiRendererNVRHI::UpdateTextureBinding(ImTextureID textureId)
 
 void ImGuiRendererNVRHI::SetupRenderState(ImDrawData* drawData, nvrhi::ICommandList* cmdList)
 {
-    // Setup viewport
-    nvrhi::Viewport viewport;
-    viewport.minX = 0.0f;
-    viewport.minY = 0.0f;
-    viewport.maxX = drawData->DisplaySize.x * drawData->FramebufferScale.x;
-    viewport.maxY = drawData->DisplaySize.y * drawData->FramebufferScale.y;
-    viewport.minZ = 0.0f;
-    viewport.maxZ = 1.0f;
-
-    // TODO: Set viewport state through graphics state
+    // Setup viewport (store in member so it can be used in graphics state)
+    m_viewport.minX = 0.0f;
+    m_viewport.minY = 0.0f;
+    m_viewport.maxX = drawData->DisplaySize.x * drawData->FramebufferScale.x;
+    m_viewport.maxY = drawData->DisplaySize.y * drawData->FramebufferScale.y;
+    m_viewport.minZ = 0.0f;
+    m_viewport.maxZ = 1.0f;
 
     // Setup orthographic projection matrix
     float L = drawData->DisplayPos.x;
@@ -145,13 +142,14 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     nvrhi::GraphicsState graphicsState;
     graphicsState.pipeline = m_pipeline;
     graphicsState.framebuffer = m_currentFramebuffer;  // Use the framebuffer passed to Render()
+    graphicsState.viewport.addViewport(m_viewport);    // Set viewport calculated in SetupRenderState()
     graphicsState.bindings = { m_resourceBindings };
     graphicsState.vertexBuffers = {
         { m_vertexBuffer, 0, 0 }
     };
     graphicsState.indexBuffer = { m_indexBuffer, nvrhi::Format::R16_UINT, 0 };
 
-    // Will apply additional state later
+    // Apply complete graphics state
     cmdList->setGraphicsState(graphicsState);
 
     // Render command lists
@@ -202,7 +200,9 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
                     scissor.minY = (int)clipRect.y;
                     scissor.maxX = (int)clipRect.z;
                     scissor.maxY = (int)clipRect.w;
-                    // TODO: Set scissor rect through graphics state
+
+                    // Set scissor rect in graphics state
+                    graphicsState.viewport.addScissorRect(scissor);
 
                     // Bind texture if changed
                     ImTextureID texId = pcmd->GetTexID();
@@ -213,8 +213,10 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
 
                         // Update graphics state with new bindings
                         graphicsState.bindings = { m_resourceBindings };
-                        cmdList->setGraphicsState(graphicsState);
                     }
+
+                    // Update graphics state (with scissor and possibly new bindings)
+                    cmdList->setGraphicsState(graphicsState);
 
                     // Draw
                     nvrhi::DrawArguments args;

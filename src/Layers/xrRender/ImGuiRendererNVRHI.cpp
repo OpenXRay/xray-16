@@ -154,14 +154,12 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     // Font texture creation is now handled through ProcessTextureRequests
     // with the modern ImGui 1.92+ API (ImGuiBackendFlags_RendererHasTextures)
 
-    // Create sampler for font texture
+    // Create sampler for font texture (matches vanilla imgui_impl_dx11.cpp sampler state)
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setMinFilter(true);  // Enable linear filtering
     samplerDesc.setMagFilter(true);  // Enable linear filtering
     samplerDesc.setMipFilter(true);  // Enable linear filtering
-    samplerDesc.setAddressU(nvrhi::SamplerAddressMode::Wrap);
-    samplerDesc.setAddressV(nvrhi::SamplerAddressMode::Wrap);
-    samplerDesc.setAddressW(nvrhi::SamplerAddressMode::Wrap);
+    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);  // ClampToEdge for UVW
     m_fontSampler = m_device->createSampler(samplerDesc);
 
     // Create constant buffer for projection matrix

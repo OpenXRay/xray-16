@@ -1,7 +1,7 @@
 // ImGui Vertex Shader
-// Simple vertex shader for ImGui rendering with NVRHI
+// Canonical HLSL from imgui_impl_dx11.cpp
 
-cbuffer ImGuiConstants : register(b0)
+cbuffer vertexBuffer : register(b0)
 {
     float4x4 ProjectionMatrix;
 };
@@ -9,22 +9,22 @@ cbuffer ImGuiConstants : register(b0)
 struct VS_INPUT
 {
     float2 pos : POSITION;
-    float2 uv  : TEXCOORD;
-    float4 col : COLOR;
+    float4 col : COLOR0;
+    float2 uv : TEXCOORD0;
 };
 
-struct VS_OUTPUT
+struct PS_INPUT
 {
     float4 pos : SV_POSITION;
-    float4 col : COLOR;
-    float2 uv  : TEXCOORD;
+    float4 col : COLOR0;
+    float2 uv : TEXCOORD0;
 };
 
-VS_OUTPUT main(VS_INPUT input)
+PS_INPUT main(VS_INPUT input)
 {
-    VS_OUTPUT output;
-    output.pos = mul(ProjectionMatrix, float4(input.pos.xy, 0.0f, 1.0f));
+    PS_INPUT output;
+    output.pos = mul(ProjectionMatrix, float4(input.pos.xy, 0.f, 1.f));
     output.col = input.col;
-    output.uv  = input.uv;
+    output.uv = input.uv;
     return output;
 }

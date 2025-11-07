@@ -62,6 +62,9 @@ private:
     // Current framebuffer (set during Render() call)
     nvrhi::IFramebuffer* m_currentFramebuffer = nullptr;
 
+    // Viewport (set during SetupRenderState)
+    nvrhi::Viewport m_viewport;
+
     // Constants structure for projection matrix
     struct ImGuiConstants {
         float mvpMatrix[4][4];
