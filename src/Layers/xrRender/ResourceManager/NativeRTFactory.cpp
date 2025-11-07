@@ -26,7 +26,7 @@ NativeRTFactory::~NativeRTFactory() {
     // Release all managed RTs
     for (auto& rt : m_managedRTs) {
         if (rt.handle.IsValid()) {
-            m_textureManager->ReleaseTexture(rt.handle);
+            m_textureManager->Release(rt.handle);
         }
     }
 
@@ -57,7 +57,7 @@ TextureHandle NativeRTFactory::CreateAlbedoBuffer(u32 width, u32 height, bool sR
         name, width, height, sRGB ? "true" : "false");
 
     // Use RGBA8 for albedo/diffuse color
-    nvrhi::Format format = sRGB ? nvrhi::Format::RGBA8_SRGB : nvrhi::Format::RGBA8_UNORM;
+    nvrhi::Format format = sRGB ? nvrhi::Format::SRGBA8_UNORM : nvrhi::Format::RGBA8_UNORM;
     return CreateGBufferRT(width, height, format, name);
 }
 
@@ -259,7 +259,7 @@ void NativeRTFactory::ResizeRenderTargets(u32 newWidth, u32 newHeight) {
     for (auto& rt : m_managedRTs) {
         if (rt.handle.IsValid()) {
             // Release old RT
-            m_textureManager->ReleaseTexture(rt.handle);
+            m_textureManager->Release(rt.handle);
 
             // Recreate with new size
             rt.handle = CreateRenderTargetInternal(
@@ -294,7 +294,7 @@ void NativeRTFactory::ReleaseRenderTarget(TextureHandle& handle) {
     }
 
     // Release through texture manager
-    m_textureManager->ReleaseTexture(handle);
+    m_textureManager->Release(handle);
     handle = TextureHandle();
 }
 
