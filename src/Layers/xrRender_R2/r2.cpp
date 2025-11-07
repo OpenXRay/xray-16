@@ -19,6 +19,11 @@
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+
+// Forward declaration for ImGui initialization
+namespace xray::render {
+    void InitializeImGuiRenderer(ng::RenderDevice* renderDevice);
+}
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -537,6 +542,9 @@ void CRender::create()
         if (m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
         {
             Msg("* RenderDevice initialized successfully");
+
+            // Initialize ImGui renderer with NVRHI backend
+            xray::render::InitializeImGuiRenderer(m_renderDevice);
 
             // Initialize FrameGraphRenderer
             m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();

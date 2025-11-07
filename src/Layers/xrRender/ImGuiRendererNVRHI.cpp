@@ -37,7 +37,14 @@ void ImGuiRendererNVRHI::Frame()
 
 void ImGuiRendererNVRHI::Render(ImDrawData* data)
 {
-    if (!data || data->TotalVtxCount == 0)
+    if (!data)
+        return;
+
+    // Process texture requests first (modern ImGui 1.92+ API)
+    ProcessTextureRequests(data);
+
+    // Early out if there's nothing to render
+    if (data->TotalVtxCount == 0)
         return;
 
     // Get command list from somewhere - this needs integration with renderer
@@ -71,7 +78,8 @@ void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)
 
     ImGuiIO& io = ImGui::GetIO();
     io.BackendRendererName = "xrRender_NVRHI";
-    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset; // We support ImDrawCmd::VtxOffset
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We support ImDrawCmd::VtxOffset
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;   // We handle texture management (ImGui 1.92+)
 
     // Create all device objects
     if (!CreateDeviceObjects())
@@ -114,12 +122,8 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
         return false;
     }
 
-    // Create font texture and sampler
-    if (!CreateFontsTexture())
-    {
-        Msg("! Failed to create ImGui font texture");
-        return false;
-    }
+    // Font texture creation is now handled through ProcessTextureRequests
+    // with the modern ImGui 1.92+ API (ImGuiBackendFlags_RendererHasTextures)
 
     // Create sampler for font texture
     nvrhi::SamplerDesc samplerDesc;
@@ -158,10 +162,14 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
 
 void ImGuiRendererNVRHI::DestroyDeviceObjects()
 {
+    // Clear all textures (including font texture)
+    m_textures.clear();
+    m_fontTexture = nullptr;
+
+    // Clear other resources
     m_vertexBuffer = nullptr;
     m_indexBuffer = nullptr;
     m_constantBuffer = nullptr;
-    m_fontTexture = nullptr;
     m_fontSampler = nullptr;
     m_vertexShader = nullptr;
     m_pixelShader = nullptr;
@@ -217,71 +225,136 @@ bool ImGuiRendererNVRHI::ResizeBuffers(size_t vtxSize, size_t idxSize)
     return CreateBuffers(vtxSize, idxSize);
 }
 
-bool ImGuiRendererNVRHI::CreateFontsTexture()
+void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
 {
-    ImGuiIO& io = ImGui::GetIO();
-    // Get font texture data from ImGui using modern API
-    // After building, the atlas creates TexData
-    if (!io.Fonts->TexData)
+    if (!drawData || !drawData->Textures)
+        return;
+
+    // Process texture requests from ImGui (modern 1.92+ API)
+    ImVector<ImTextureData*>* textures = drawData->Textures;
+    for (int i = 0; i < textures->Size; i++)
     {
-        Msg("! Font atlas TexData is null after build");
-        return false;
+        ImTextureData* texData = (*textures)[i];
+        if (!texData)
+            continue;
+
+        // Handle texture state requests
+        switch (texData->Status)
+        {
+        case ImTextureStatus_WantCreate:
+            {
+                // ImGui is requesting us to create a texture
+                Msg("* ImGui requesting texture creation: %dx%d", texData->Width, texData->Height);
+
+                // Create NVRHI texture
+                nvrhi::TextureDesc texDesc;
+                texDesc.setWidth(texData->Width);
+                texDesc.setHeight(texData->Height);
+                texDesc.setDepth(1);
+                texDesc.setArraySize(1);
+                texDesc.setMipLevels(1);
+                texDesc.setDimension(nvrhi::TextureDimension::Texture2D);
+
+                // Determine format based on ImGui's texture format
+                nvrhi::Format nvrhiFormat = nvrhi::Format::RGBA8_UNORM;
+                if (texData->Format == ImTextureFormat_Alpha8)
+                    nvrhiFormat = nvrhi::Format::R8_UNORM;
+
+                texDesc.setFormat(nvrhiFormat);
+                texDesc.setDebugName("ImGui Texture");
+
+                nvrhi::TextureHandle texture = m_device->createTexture(texDesc);
+                if (texture)
+                {
+                    // Upload initial pixel data if provided
+                    if (texData->Pixels && m_renderDevice)
+                    {
+                        size_t dataSize = texData->Width * texData->Height * texData->BytesPerPixel;
+                        m_renderDevice->UploadTextureDataToNVRHI(
+                            texture.Get(),
+                            0, 0,  // Array slice 0, Mip level 0
+                            texData->Pixels,
+                            dataSize
+                        );
+                    }
+
+                    // Store texture in our map and set the ID for ImGui
+                    m_textures[(ImTextureID)(intptr_t)texture.Get()] = texture;
+                    texData->SetTexID((ImTextureID)(intptr_t)texture.Get());
+                    texData->SetStatus(ImTextureStatus_OK);
+
+                    // Store as font texture if this is the first texture
+                    if (!m_fontTexture)
+                    {
+                        m_fontTexture = texture;
+                        Msg("* ImGui font texture created (%dx%d)", texData->Width, texData->Height);
+                    }
+                }
+                else
+                {
+                    Msg("! Failed to create ImGui texture");
+                    // Leave status as WantCreate so it will be retried
+                }
+            }
+            break;
+
+        case ImTextureStatus_WantUpdates:
+            {
+                // ImGui wants to update parts of the texture
+                ImTextureID texId = texData->GetTexID();
+                auto it = m_textures.find(texId);
+                if (it != m_textures.end() && m_renderDevice)
+                {
+                    // Process texture updates
+                    for (int j = 0; j < texData->Updates.Size; j++)
+                    {
+                        const ImTextureRect& update = texData->Updates[j];
+
+                        // Calculate data pointer and size for this update region
+                        const void* updateData = (const u8*)texData->Pixels +
+                            (update.y * texData->Width + update.x) * texData->BytesPerPixel;
+
+                        // Note: This is a simplified update - proper implementation would handle
+                        // partial texture updates more efficiently
+                        size_t dataSize = update.w * update.h * texData->BytesPerPixel;
+
+                        // For now, re-upload the entire texture
+                        // TODO: Implement partial texture updates
+                        size_t fullDataSize = texData->Width * texData->Height * texData->BytesPerPixel;
+                        m_renderDevice->UploadTextureDataToNVRHI(
+                            it->second.Get(),
+                            0, 0,
+                            texData->Pixels,
+                            fullDataSize
+                        );
+                    }
+                    texData->SetStatus(ImTextureStatus_OK);
+                }
+            }
+            break;
+
+        case ImTextureStatus_WantDestroy:
+            {
+                // ImGui wants us to destroy this texture
+                ImTextureID texId = texData->GetTexID();
+                auto it = m_textures.find(texId);
+                if (it != m_textures.end())
+                {
+                    // Check if it's the font texture
+                    if (it->second == m_fontTexture)
+                        m_fontTexture = nullptr;
+
+                    // Release the texture
+                    it->second = nullptr;
+                    m_textures.erase(it);
+
+                    texData->SetStatus(ImTextureStatus_Destroyed);
+                    Msg("* ImGui texture destroyed");
+                }
+            }
+            break;
+        }
     }
-
-    unsigned char* pixels = io.Fonts->TexData->Pixels;
-    int width = io.Fonts->TexData->Width;
-    int height = io.Fonts->TexData->Height;
-    int bytesPerPixel = io.Fonts->TexData->BytesPerPixel;
-
-    if (!pixels || width == 0 || height == 0)
-    {
-        Msg("! Font atlas has no pixel data");
-        return false;
-    }
-
-    // Ensure we have RGBA32 format (4 bytes per pixel)
-    if (bytesPerPixel != 4)
-    {
-        Msg("! Font atlas is not in RGBA32 format (has %d bytes per pixel)", bytesPerPixel);
-        return false;
-    }
-
-    // Create texture description
-    nvrhi::TextureDesc texDesc;
-    texDesc.setWidth(width);
-    texDesc.setHeight(height);
-    texDesc.setDepth(1);
-    texDesc.setArraySize(1);
-    texDesc.setMipLevels(1);
-    texDesc.setDimension(nvrhi::TextureDimension::Texture2D);
-    texDesc.setFormat(nvrhi::Format::RGBA8_UNORM);
-    texDesc.setDebugName("ImGui Font Texture");
-    // NVRHI textures are shader resources by default, no need to specify usage
-
-    // Calculate data size
-    size_t dataSize = width * height * 4; // RGBA8
-
-    // Create texture with initial data
-    m_fontTexture = m_device->createTexture(texDesc);
-    if (!m_fontTexture)
-        return false;
-
-    // Upload texture data
-    // Note: This needs proper command list execution
-    // For now, we'll use immediate context if available
-    // TODO: Integrate with proper command list submission
-
-    // Store texture ID for ImGui using modern API
-    io.Fonts->TexData->SetTexID((ImTextureID)(intptr_t)m_fontTexture.Get());
-
-    // In modern ImGui API, texture data lifetime is managed automatically
-    // The CPU-side pixels can be freed if needed via DestroyPixels()
-    if (io.Fonts->TexData->Pixels)
-    {
-        io.Fonts->TexData->DestroyPixels();
-    }
-
-    return true;
 }
 
 //=============================================================================

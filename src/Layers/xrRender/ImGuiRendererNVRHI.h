@@ -4,6 +4,7 @@
 #include "RenderContext/RenderDevice.h"
 #include <nvrhi/nvrhi.h>
 #include <imgui.h>
+#include <map>
 
 namespace xray::render::ng {
 
@@ -52,6 +53,9 @@ private:
     // ImGui context
     ImGuiContext* m_imguiContext = nullptr;
 
+    // Texture management (for modern ImGui 1.92+ API)
+    std::map<ImTextureID, nvrhi::TextureHandle> m_textures;
+
     // Constants structure for projection matrix
     struct ImGuiConstants {
         float mvpMatrix[4][4];
@@ -67,7 +71,7 @@ private:
     // Internal helper methods
     bool CreateDeviceObjects();
     void DestroyDeviceObjects();
-    bool CreateFontsTexture();
+    void ProcessTextureRequests(ImDrawData* drawData);  // Modern ImGui 1.92+ texture handling
     bool CreateShaders();
     bool CreatePipelineState();
     bool CreateBuffers(size_t vtxSize, size_t idxSize);

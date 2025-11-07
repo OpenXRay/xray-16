@@ -1,51 +1,9 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
+#include "FrameGraph/ShaderLoader.h"
+#include <d3dcompiler.h>
 
 namespace xray::render::ng {
-
-// ImGui vertex shader HLSL source
-static const char* s_ImGuiVertexShader = R"(
-cbuffer vertexBuffer : register(b0) {
-    float4x4 ProjectionMatrix;
-};
-
-struct VS_INPUT {
-    float2 pos : POSITION;
-    float2 uv  : TEXCOORD0;
-    float4 col : COLOR0;
-};
-
-struct PS_INPUT {
-    float4 pos : SV_POSITION;
-    float4 col : COLOR0;
-    float2 uv  : TEXCOORD0;
-};
-
-PS_INPUT main(VS_INPUT input) {
-    PS_INPUT output;
-    output.pos = mul(ProjectionMatrix, float4(input.pos.xy, 0.f, 1.f));
-    output.col = input.col;
-    output.uv = input.uv;
-    return output;
-}
-)";
-
-// ImGui pixel shader HLSL source
-static const char* s_ImGuiPixelShader = R"(
-struct PS_INPUT {
-    float4 pos : SV_POSITION;
-    float4 col : COLOR0;
-    float2 uv  : TEXCOORD0;
-};
-
-Texture2D texture0 : register(t0);
-SamplerState sampler0 : register(s0);
-
-float4 main(PS_INPUT input) : SV_Target {
-    float4 out_col = input.col * texture0.Sample(sampler0, input.uv);
-    return out_col;
-}
-)";
 
 //=============================================================================
 // Phase 4: Shader and Pipeline State Creation
@@ -53,48 +11,35 @@ float4 main(PS_INPUT input) : SV_Target {
 
 bool ImGuiRendererNVRHI::CreateShaders()
 {
-    // TODO: Proper shader compilation integration
-    // NVRHI expects precompiled bytecode, not source code
-    // For now, we'll create dummy shaders and integrate with the actual shader system later
+    // Use the FrameGraph ShaderLoader to compile our ImGui shaders
+    framegraph::ShaderLoader shaderLoader(m_renderDevice);
 
-    // Create vertex shader
-    nvrhi::ShaderDesc vsDesc;
-    vsDesc.setDebugName("ImGui Vertex Shader");
-    vsDesc.setEntryName("main");
-
-    // NOTE: This is a placeholder - actual implementation needs to:
-    // 1. Compile HLSL to bytecode using D3DCompile or DXC
-    // 2. Pass the compiled bytecode to createShader
-    // 3. Or integrate with the existing shader system
-
-    // Temporary: Create empty shader (will fail at runtime)
-    const char dummyBytecode[] = { 0x01, 0x02, 0x03, 0x04 };
-    m_vertexShader = m_device->createShader(vsDesc, dummyBytecode, sizeof(dummyBytecode));
+    // Load and compile vertex shader
+    ID3DBlob* vsBytecode = nullptr;
+    m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main", &vsBytecode);
 
     if (!m_vertexShader)
     {
         Msg("! Failed to create ImGui vertex shader");
-        // Don't fail here, we'll fix this later
-        // return false;
+        return false;
     }
 
-    // Create pixel shader
-    nvrhi::ShaderDesc psDesc;
-    psDesc.setDebugName("ImGui Pixel Shader");
-    psDesc.setEntryName("main");
-
-    m_pixelShader = m_device->createShader(psDesc, dummyBytecode, sizeof(dummyBytecode));
+    // Load and compile pixel shader
+    ID3DBlob* psBytecode = nullptr;
+    m_pixelShader = shaderLoader.LoadPixelShader("imgui", "main", &psBytecode);
 
     if (!m_pixelShader)
     {
         Msg("! Failed to create ImGui pixel shader");
-        // Don't fail here, we'll fix this later
-        // return false;
+        if (vsBytecode) vsBytecode->Release();
+        return false;
     }
 
-    // TODO: Implement proper shader compilation
-    Msg("* ImGui shaders need proper compilation integration");
+    // Release bytecode blobs (NVRHI already has them)
+    if (vsBytecode) vsBytecode->Release();
+    if (psBytecode) psBytecode->Release();
 
+    Msg("* ImGui shaders compiled successfully");
     return true;
 }
 

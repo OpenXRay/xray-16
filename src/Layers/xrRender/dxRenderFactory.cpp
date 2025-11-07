@@ -45,7 +45,11 @@ RENDER_FACTORY_IMPLEMENT(ThunderboltRender)
 RENDER_FACTORY_IMPLEMENT(ThunderboltDescRender)
 RENDER_FACTORY_IMPLEMENT(RainRender)
 RENDER_FACTORY_IMPLEMENT(LensFlareRender)
+#if RENDER == R_R4
+// ImGuiRender implementation is in dxRenderFactory_ImGui.cpp for NVRHI support
+#else
 RENDER_FACTORY_IMPLEMENT(ImGuiRender)
+#endif
 RENDER_FACTORY_IMPLEMENT(EnvironmentRender)
 RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
 RENDER_FACTORY_IMPLEMENT(FlareRender)

@@ -36,6 +36,15 @@ public:
     // Get the underlying NVRHI device
     nvrhi::IDevice* GetNVRHIDevice() const;
 
+    // Upload data to a raw NVRHI texture (for ImGui and other external systems)
+    void UploadTextureDataToNVRHI(
+        nvrhi::ITexture* texture,
+        u32 arraySlice,
+        u32 mipLevel,
+        const void* data,
+        size_t dataSize
+    );
+
     // ═══════════════════════════════════════════════════
     //  TEXTURE CREATION
     // ═══════════════════════════════════════════════════

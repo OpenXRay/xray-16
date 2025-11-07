@@ -338,6 +338,48 @@ void RenderDevice::UploadTextureData(
     // Note: Command list is reused, not released - it's persistent!
 }
 
+void RenderDevice::UploadTextureDataToNVRHI(
+    nvrhi::ITexture* texture,
+    u32 arraySlice,
+    u32 mipLevel,
+    const void* data,
+    size_t dataSize)
+{
+    VERIFY(m_initialized);
+    VERIFY(texture != nullptr);
+    VERIFY(data != nullptr);
+    VERIFY(dataSize > 0);
+    VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    m_uploadCommandList->open();
+
+    // Get texture desc to calculate row pitch
+    const auto& desc = texture->getDesc();
+    u32 rowPitch = 0;
+
+    // For uncompressed formats, calculate based on format size
+    switch (desc.format) {
+        case nvrhi::Format::RGBA8_UNORM:
+        case nvrhi::Format::BGRA8_UNORM:
+            rowPitch = desc.width * 4;
+            break;
+        case nvrhi::Format::R8_UNORM:
+            rowPitch = desc.width;
+            break;
+        default:
+            // For other formats, assume dataSize is correct for the entire texture
+            rowPitch = dataSize / desc.height;
+            break;
+    }
+
+    // Write texture data
+    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch);
+
+    // Execute immediately
+    m_uploadCommandList->close();
+    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+}
+
 // ═══════════════════════════════════════════════════
 //  BUFFER CREATION
 // ═══════════════════════════════════════════════════
