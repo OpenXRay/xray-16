@@ -1,5 +1,6 @@
 #pragma once
 
+#include "xrEngine/IFrameGraphRender.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
@@ -25,7 +26,7 @@ namespace xray::render::ng {
 namespace xray::render {
 using RENDER_NAMESPACE::dxRender_Visual;
 
-class FrameGraphRenderer: public pureRender {
+class FrameGraphRenderer: public IFrameGraphRender, public pureRender {
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
@@ -33,14 +34,14 @@ public:
     bool Initialize(ng::RenderDevice* device);
     void Shutdown();
 
-    void Render();
+    void Render() override;
+    void RenderMenu() override;
+    void SetEnabled(bool enabled) override { m_enabled = enabled; }
+    bool IsEnabled() const override { return m_enabled; }
 
     void OnRender();
 
     void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
-
-    void SetEnabled(bool enabled) { m_enabled = enabled; }
-    bool IsEnabled() const { return m_enabled; }
 
     ng::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
 

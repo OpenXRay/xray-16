@@ -123,6 +123,28 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->Execute();
 
+    {
+        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+        if (finalTexture)
+        {
+            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+
+            nvrhi::FramebufferDesc fbDesc;
+            fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
+            nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+
+            if (framebuffer && cmdList)
+            {
+                cmdList->open();
+                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.2f, 0.4f, 1.0f));
+                cmdList->close();
+                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+
+                Msg("* [DEBUG] Cleared final output to blue");
+            }
+        }
+    }
+
     RenderHUD();
 
     ImGui::Render();
@@ -151,6 +173,46 @@ void FrameGraphRenderer::Render() {
     m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
 
     m_framegraph->ResetForNextFrame();
+}
+
+void FrameGraphRenderer::RenderMenu() {
+    if (!m_enabled) return;
+
+    VERIFY(m_framegraph != nullptr);
+
+    Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
+
+    {
+        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+        if (finalTexture)
+        {
+            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+
+            if (cmdList)
+            {
+                cmdList->open();
+                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.1f, 0.1f, 0.1f, 1.0f));
+                cmdList->close();
+                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+            }
+        }
+    }
+
+    ImGui::Render();
+
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    if (imguiRenderer)
+    {
+        ImDrawData* drawData = ImGui::GetDrawData();
+        if (drawData)
+        {
+            RenderImGui(drawData, imguiRenderer);
+        }
+    }
+
+    PresentToBackbuffer();
+
+    Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
 }
 
 void FrameGraphRenderer::SetupFrame() {
@@ -1021,6 +1083,9 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
 
 void FrameGraphRenderer::OnRender() {
     if (!m_enabled) return;
+
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
+        return;
 
     Render();
 }

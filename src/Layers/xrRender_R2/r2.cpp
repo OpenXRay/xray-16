@@ -550,6 +550,8 @@ void CRender::create()
             {
                 Msg("* FrameGraphRenderer initialized successfully");
 
+                GEnv.FrameGraphRenderer = m_framegraphRenderer;
+
                 if (ps_r4_use_framegraph)
                 {
                     m_framegraphRenderer->SetEnabled(true);
@@ -581,6 +583,7 @@ void CRender::destroy()
     if (m_framegraphRenderer)
     {
         m_framegraphRenderer->Shutdown();
+        GEnv.FrameGraphRenderer = nullptr;
         xr_delete(m_framegraphRenderer);
         Msg("* FrameGraphRenderer destroyed");
     }
