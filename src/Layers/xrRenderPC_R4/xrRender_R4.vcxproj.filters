@@ -726,6 +726,9 @@
     <ClInclude Include="..\xrRender\dxImGuiRender.h">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest.h">
       <Filter>Tests</Filter>
     </ClInclude>
@@ -1371,6 +1374,24 @@
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Shaders.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Render.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ImGuiRendererIntegration.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\dxRenderFactory_ImGui.cpp">
+      <Filter>Interface implementations\ImGuiRender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\GlobalRenderDevice.cpp">
       <Filter>Interface implementations\ImGuiRender</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender_R2\render_phase_sun.cpp">
