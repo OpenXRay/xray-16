@@ -158,6 +158,33 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
+    //  DEBUG: CLEAR FINAL OUTPUT (Verify pipeline works)
+    // ═══════════════════════════════════════════════════════
+    // TODO: Remove this once we have actual rendering passes
+    {
+        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+        if (finalTexture)
+        {
+            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+
+            // Create framebuffer for clearing
+            nvrhi::FramebufferDesc fbDesc;
+            fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
+            nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+
+            if (framebuffer && cmdList)
+            {
+                cmdList->open();
+                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.2f, 0.4f, 1.0f));
+                cmdList->close();
+                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+
+                Msg("* [DEBUG] Cleared final output to blue");
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  RENDER HUD (after world geometry, before present)
     // ═══════════════════════════════════════════════════════
 
@@ -205,6 +232,62 @@ void FrameGraphRenderer::Render() {
 
     // Reset per-frame state for next frame (keeps structure: RTs, passes, registry)
     m_framegraph->ResetForNextFrame();
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER MENU (Simplified for Main Menu)
+// ═══════════════════════════════════════════════════════
+// Main menu rendering: No 3D geometry, lighting, or post-process
+// Just clear background + ImGui UI overlay
+
+void FrameGraphRenderer::RenderMenu() {
+    if (!m_enabled) return;
+
+    VERIFY(m_framegraph != nullptr);
+
+    Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
+
+    // ═══════════════════════════════════════════════════════
+    //  CLEAR FINAL OUTPUT (Dark background for menu)
+    // ═══════════════════════════════════════════════════════
+    {
+        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+        if (finalTexture)
+        {
+            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+
+            if (cmdList)
+            {
+                cmdList->open();
+                // Clear to dark grey (menu background)
+                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.1f, 0.1f, 0.1f, 1.0f));
+                cmdList->close();
+                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  RENDER IMGUI (Menu UI overlay)
+    // ═══════════════════════════════════════════════════════
+    ImGui::Render();
+
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    if (imguiRenderer)
+    {
+        ImDrawData* drawData = ImGui::GetDrawData();
+        if (drawData)
+        {
+            RenderImGui(drawData, imguiRenderer);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PRESENT TO BACKBUFFER
+    // ═══════════════════════════════════════════════════════
+    PresentToBackbuffer();
+
+    Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
 }
 
 void FrameGraphRenderer::SetupFrame() {
@@ -1408,7 +1491,11 @@ void FrameGraphRenderer::OnRender() {
     if (!m_enabled) return;
 
     // This is called by Device.seqRender.Process()
-    // Just forward to our internal Render() implementation
+    // Skip if main menu is active or no level loaded (main menu uses RenderMenu() instead)
+    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
+        return;
+
+    // Forward to our internal Render() implementation
     Render();
 }
 

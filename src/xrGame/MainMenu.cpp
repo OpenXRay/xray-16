@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "MainMenu.h"
+#include "Include/xrAPI/xrAPI.h"
+#include "xrEngine/IFrameGraphRender.h"
 #include "ui/UIDialogWnd.h"
 #include "ui/UIMessageBoxEx.h"
 #include "xrEngine/XR_IOConsole.h"
@@ -473,12 +475,21 @@ void CMainMenu::OnRender()
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
-    //GEnv.Render->RenderMenu();
-    //if (!OnRenderPPUI_query())
-    //{
-        //DoRenderDialogs();
-        //UI().RenderFont();
-    //}
+    // Use FrameGraph renderer for main menu
+    if (GEnv.FrameGraphRenderer && GEnv.FrameGraphRenderer->IsEnabled())
+    {
+        GEnv.FrameGraphRenderer->RenderMenu();
+    }
+    else
+    {
+        // Legacy fallback
+        //GEnv.Render->RenderMenu();
+        //if (!OnRenderPPUI_query())
+        //{
+            //DoRenderDialogs();
+            //UI().RenderFont();
+        //}
+    }
 }
 
 void CMainMenu::OnRenderPPUI_main()

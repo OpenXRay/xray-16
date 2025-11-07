@@ -384,6 +384,9 @@
     <ClInclude Include="GrassInteractionCollector.h">
       <Filter>Render\Details</Filter>
     </ClInclude>
+    <ClInclude Include="IFrameGraphRender.h">
+      <Filter>Interfaces\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -622,6 +625,9 @@
     </ClCompile>
     <ClCompile Include="GrassInteractionCollector.cpp">
       <Filter>Render\Details</Filter>
+    </ClCompile>
+    <ClCompile Include="IFrameGraphRender.cpp">
+      <Filter>Interfaces\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -554,6 +554,9 @@ void CRender::create()
             {
                 Msg("* FrameGraphRenderer initialized successfully");
 
+                // Expose through GEnv for global access
+                GEnv.FrameGraphRenderer = m_framegraphRenderer;
+
                 // Enable it if ps_r4_use_framegraph is set
                 if (ps_r4_use_framegraph)
                 {
@@ -587,6 +590,7 @@ void CRender::destroy()
     if (m_framegraphRenderer)
     {
         m_framegraphRenderer->Shutdown();
+        GEnv.FrameGraphRenderer = nullptr;
         xr_delete(m_framegraphRenderer);
         Msg("* FrameGraphRenderer destroyed");
     }

@@ -1,6 +1,7 @@
 // xrRender/r_FrameGraphRenderer.h
 #pragma once
 
+#include "xrEngine/IFrameGraphRender.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
@@ -31,7 +32,7 @@ using RENDER_NAMESPACE::dxRender_Visual;
 //  FRAMEGRAPH RENDERER
 // ══════════════════════════════════════════════════════════
 
-class FrameGraphRenderer: public pureRender {
+class FrameGraphRenderer: public IFrameGraphRender, public pureRender {
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
@@ -40,18 +41,17 @@ public:
     bool Initialize(ng::RenderDevice* device);
     void Shutdown();
 
-    // Main render function (called by internal Execute)
-    void Render();
+    // IFrameGraphRender interface
+    void Render() override;
+    void RenderMenu() override;
+    void SetEnabled(bool enabled) override { m_enabled = enabled; }
+    bool IsEnabled() const override { return m_enabled; }
 
     // seqRender interface (called by Device.seqRender.Process)
     void OnRender();
 
     // Render ImGui onto final output (called after FrameGraph execution)
     void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
-
-    // Toggle FrameGraph rendering
-    void SetEnabled(bool enabled) { m_enabled = enabled; }
-    bool IsEnabled() const { return m_enabled; }
 
     // Access RenderContext
     ng::RenderContext* GetRenderContext() const { return m_renderContext.get(); }
