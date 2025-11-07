@@ -23,6 +23,10 @@ nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
     return m_nvrhiDevice ? m_nvrhiDevice->GetDevice() : nullptr;
 }
 
+nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
+    return m_nvrhiDevice ? m_nvrhiDevice->GetCommandList() : nullptr;
+}
+
 // ═══════════════════════════════════════════════════
 //  INITIALIZATION
 // ═══════════════════════════════════════════════════
@@ -375,9 +379,13 @@ void RenderDevice::UploadTextureDataToNVRHI(
     // Write texture data
     m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch);
 
-    // Execute immediately
+    // Execute immediately and wait for completion
     m_uploadCommandList->close();
-    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+    GetNVRHIDevice()->executeCommandList(m_uploadCommandList);
+
+    // Wait for upload to complete to avoid D3D11 state corruption
+    // (NVRHI command execution can unbind shaders/state)
+    GetNVRHIDevice()->waitForIdle();
 }
 
 // ═══════════════════════════════════════════════════

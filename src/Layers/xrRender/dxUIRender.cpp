@@ -51,7 +51,8 @@ void dxUIRender::FlushTriList()
     std::ptrdiff_t p_cnt		= (pv-start_pv)/3;
     RImplementation.Vertex.Unlock		(u32(pv-start_pv),hGeom_fan.stride());
     RCache.set_Geometry			(hGeom_fan);
-    if (p_cnt!=0)RCache.Render	(D3DPT_TRIANGLELIST,vOffset,u32(p_cnt));
+    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
+    // if (p_cnt!=0)RCache.Render	(D3DPT_TRIANGLELIST,vOffset,u32(p_cnt));
 
     PrimitiveType = ptNone;
 }
@@ -75,7 +76,8 @@ void dxUIRender::FlushTriFan()
     std::ptrdiff_t p_cnt		= pv-start_pv;
     RImplementation.Vertex.Unlock		(u32(p_cnt),hGeom_fan.stride());
     RCache.set_Geometry	 		(hGeom_fan);
-    if (p_cnt>2) RCache.Render	(D3DPT_TRIANGLEFAN,vOffset,u32(p_cnt-2));
+    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
+    // if (p_cnt>2) RCache.Render	(D3DPT_TRIANGLEFAN,vOffset,u32(p_cnt-2));
 
     PrimitiveType = ptNone;
 }
@@ -112,7 +114,8 @@ void dxUIRender::FlushLineStrip()
     std::ptrdiff_t p_cnt		= pv-start_pv;
     RImplementation.Vertex.Unlock		(u32(p_cnt),hGeom_fan.stride());
     RCache.set_Geometry	 		(hGeom_fan);
-    if (p_cnt>1) RCache.Render	(D3DPT_LINESTRIP,vOffset,u32(p_cnt-1));
+    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
+    // if (p_cnt>1) RCache.Render	(D3DPT_LINESTRIP,vOffset,u32(p_cnt-1));
 
     PrimitiveType = ptNone;
 }
@@ -134,7 +137,8 @@ void dxUIRender::FlushLineList()
     std::ptrdiff_t p_cnt		= pv-start_pv;
     RImplementation.Vertex.Unlock		(u32(p_cnt),hGeom_fan.stride());
     RCache.set_Geometry	 		(hGeom_fan);
-    if (p_cnt>1) RCache.Render	(D3DPT_LINELIST,vOffset,u32(p_cnt)/2);
+    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
+    // if (p_cnt>1) RCache.Render	(D3DPT_LINELIST,vOffset,u32(p_cnt)/2);
 
     PrimitiveType = ptNone;
 }
@@ -263,8 +267,9 @@ void dxUIRender::FlushPrimitive()
     default: NODEFAULT;
     }
 
-    if (primCount > 0)
-        RCache.Render(d3dPrimType, vOffset, primCount);
+    // TODO: TEMPORARILY DISABLED - NVRHI texture uploads corrupt D3D11 state
+    // if (primCount > 0)
+    //     RCache.Render(d3dPrimType, vOffset, primCount);
 
     PrimitiveType = ptNone;
     m_PointType = pttNone;

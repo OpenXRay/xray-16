@@ -36,6 +36,9 @@ public:
     // Get the underlying NVRHI device
     nvrhi::IDevice* GetNVRHIDevice() const;
 
+    // Get the immediate command list for direct rendering (e.g., ImGui)
+    nvrhi::ICommandList* GetImmediateCommandList() const;
+
     // Upload data to a raw NVRHI texture (for ImGui and other external systems)
     void UploadTextureDataToNVRHI(
         nvrhi::ITexture* texture,

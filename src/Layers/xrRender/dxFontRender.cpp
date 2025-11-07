@@ -171,8 +171,16 @@ void dxFontRender::OnRender(CGameFont& owner)
         RImplementation.Vertex.Unlock(vCount, pGeom.stride());
         if (vCount)
         {
-            RCache.set_Geometry(pGeom);
-            RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
+            // TODO: TEMPORARILY DISABLED
+            // The legacy font renderer uses RCache which makes raw D3D11 calls.
+            // NVRHI texture upload operations corrupt D3D11 state, causing crashes here.
+            // We need to either:
+            // 1. Port this to use RenderContext for proper NVRHI state management
+            // 2. Save/restore D3D11 state around NVRHI operations
+            // For now, disable to allow testing ImGui renderer
+
+            // RCache.set_Geometry(pGeom);
+            // RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
         }
     }
 }

@@ -241,7 +241,7 @@ void CRenderDevice::DoRender()
         }
 
         CalcFrameStats();
-        Statistic->Show();
+        //Statistic->Show();
 
         ImGui::Render();
         m_imgui_render->Render(ImGui::GetDrawData());

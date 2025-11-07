@@ -56,14 +56,14 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
             .setElementStride(sizeof(ImDrawVert)),
         // UV
         nvrhi::VertexAttributeDesc()
-            .setName("TEXCOORD0")
+            .setName("TEXCOORD")
             .setFormat(nvrhi::Format::RG32_FLOAT)
             .setOffset(offsetof(ImDrawVert, uv))
             .setBufferIndex(0)
             .setElementStride(sizeof(ImDrawVert)),
         // Color
         nvrhi::VertexAttributeDesc()
-            .setName("COLOR0")
+            .setName("COLOR")
             .setFormat(nvrhi::Format::RGBA8_UNORM)
             .setOffset(offsetof(ImDrawVert, col))
             .setBufferIndex(0)
@@ -133,11 +133,15 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
     pipelineDesc.setRenderState(m_renderState);
     pipelineDesc.setPrimType(nvrhi::PrimitiveType::TriangleList);
 
-    // Note: Render target format will be set at render time based on current framebuffer
-    // For now, assume standard format
-    // TODO: Get actual render target format from the framebuffer
+    // Note: ImGui typically renders to the final output render target
+    // which is RGBA8_UNORM format for LDR displays
+    // If we need HDR support, we'd need to create a separate pipeline for RGBA16F
 
-    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, /* framebuffer */ nullptr);
+    // Create a framebuffer info to specify the render target format
+    nvrhi::FramebufferInfoEx framebufferInfo;
+    framebufferInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);  // Standard LDR format
+
+    m_pipeline = m_device->createGraphicsPipeline(pipelineDesc, framebufferInfo);
 
     if (!m_pipeline)
     {
@@ -145,10 +149,30 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
         return false;
     }
 
-    // Create initial resource bindings
+    // Note: Resource bindings will be created after the font texture is requested
+    // by ImGui through the modern texture API (ProcessTextureRequests)
+
+    return true;
+}
+
+bool ImGuiRendererNVRHI::CreateResourceBindings()
+{
+    // This should only be called after we have a valid font texture
+    if (!m_fontTexture)
+    {
+        Msg("! CreateResourceBindings called without font texture");
+        return false;
+    }
+
+    if (!m_bindingLayout)
+    {
+        Msg("! CreateResourceBindings called without binding layout");
+        return false;
+    }
+
+    // Create resource bindings with the actual font texture
     nvrhi::BindingSetDesc bindingSetDesc;
     bindingSetDesc.bindings = {
-        // Will be updated with actual resources during rendering
         nvrhi::BindingSetItem::ConstantBuffer(0, m_constantBuffer),
         nvrhi::BindingSetItem::Texture_SRV(0, m_fontTexture),
         nvrhi::BindingSetItem::Sampler(0, m_fontSampler)
@@ -162,6 +186,7 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
         return false;
     }
 
+    Msg("* ImGui resource bindings created successfully");
     return true;
 }
 

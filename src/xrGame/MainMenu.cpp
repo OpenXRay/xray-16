@@ -473,12 +473,12 @@ void CMainMenu::OnRender()
     if (m_Flags.test(flGameSaveScreenshot))
         return;
 
-    GEnv.Render->RenderMenu();
-    if (!OnRenderPPUI_query())
-    {
-        DoRenderDialogs();
-        UI().RenderFont();
-    }
+    //GEnv.Render->RenderMenu();
+    //if (!OnRenderPPUI_query())
+    //{
+        //DoRenderDialogs();
+        //UI().RenderFont();
+    //}
 }
 
 void CMainMenu::OnRenderPPUI_main()

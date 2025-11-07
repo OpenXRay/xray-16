@@ -74,6 +74,7 @@ private:
     void ProcessTextureRequests(ImDrawData* drawData);  // Modern ImGui 1.92+ texture handling
     bool CreateShaders();
     bool CreatePipelineState();
+    bool CreateResourceBindings(); // Create bindings after font texture is available
     bool CreateBuffers(size_t vtxSize, size_t idxSize);
     bool ResizeBuffers(size_t vtxSize, size_t idxSize);
 

@@ -37,26 +37,47 @@ void ImGuiRendererNVRHI::Frame()
 
 void ImGuiRendererNVRHI::Render(ImDrawData* data)
 {
-    if (!data)
+    if (!data || data->TotalVtxCount == 0 || data->TotalIdxCount == 0)
         return;
 
-    // Process texture requests first (modern ImGui 1.92+ API)
+    // Process texture requests (modern ImGui 1.92+ API)
+    // Note: We added waitForIdle() in UploadTextureDataToNVRHI to prevent state corruption
     ProcessTextureRequests(data);
 
-    // Early out if there's nothing to render
-    if (data->TotalVtxCount == 0)
-        return;
-
-    // Get command list from somewhere - this needs integration with renderer
-    // For now, we'll need to pass it in somehow
-    nvrhi::ICommandList* cmdList = nullptr; // TODO: Get from render context
-    if (!cmdList)
+    // Check if we have all required resources
+    if (!m_pipeline || !m_resourceBindings)
     {
-        Msg("! ImGuiRendererNVRHI::Render - No command list available");
+        // Resource bindings might not be created yet if font texture isn't ready
         return;
     }
 
-    RenderDrawData(data, cmdList);
+    // TODO: NVRHI requires a render pass to be active before drawing
+    // We need to either:
+    // 1. Get the backbuffer framebuffer and call beginRenderPass()
+    // 2. Have the renderer call us during its render pass
+    // 3. Create our own framebuffer for the backbuffer
+    //
+    // For now, rendering is disabled until we have proper framebuffer access
+
+    // Get immediate command list
+    // nvrhi::ICommandList* cmdList = m_renderDevice->GetImmediateCommandList();
+    // if (!cmdList)
+    // {
+    //     Msg("! ImGuiRendererNVRHI::Render - No command list available");
+    //     return;
+    // }
+
+    // // Render ImGui
+    // // Note: For immediate command lists, operations execute immediately
+    // RenderDrawData(data, cmdList);
+
+    // Log that we're ready to render but need framebuffer access
+    static bool logged = false;
+    if (!logged && m_resourceBindings)
+    {
+        Msg("* ImGui NVRHI renderer ready - waiting for framebuffer integration");
+        logged = true;
+    }
 }
 
 void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)
@@ -143,7 +164,12 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     cbDesc.debugName = "ImGui Constants";
     m_constantBuffer = m_device->createBuffer(cbDesc);
 
-    // Create pipeline state
+    // NOTE: With ImGuiBackendFlags_RendererHasTextures, the font texture
+    // will be automatically requested by ImGui through ProcessTextureRequests()
+    // during the first frame. We defer pipeline and binding creation until then.
+
+    // Create pipeline state (without bindings yet - those will be created
+    // after the font texture is available)
     if (!CreatePipelineState())
     {
         Msg("! Failed to create ImGui pipeline state");
@@ -188,7 +214,7 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     // Create dynamic vertex buffer
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = vtxSize * sizeof(ImDrawVert);
-    vbDesc.structStride = sizeof(ImDrawVert);
+    // Don't set structStride for vertex buffers - it makes D3D11 think we want a structured buffer
     vbDesc.isVertexBuffer = true;
     vbDesc.isVolatile = true; // Dynamic buffer, updated every frame
     vbDesc.debugName = "ImGui Vertex Buffer";
@@ -283,11 +309,17 @@ void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
                     texData->SetTexID((ImTextureID)(intptr_t)texture.Get());
                     texData->SetStatus(ImTextureStatus_OK);
 
-                    // Store as font texture if this is the first texture
+                    // If this is the first texture (font texture), store it and create bindings
                     if (!m_fontTexture)
                     {
                         m_fontTexture = texture;
                         Msg("* ImGui font texture created (%dx%d)", texData->Width, texData->Height);
+
+                        // Now that we have the font texture, create the resource bindings
+                        if (!m_resourceBindings && !CreateResourceBindings())
+                        {
+                            Msg("! Failed to create ImGui resource bindings after font texture creation");
+                        }
                     }
                 }
                 else
