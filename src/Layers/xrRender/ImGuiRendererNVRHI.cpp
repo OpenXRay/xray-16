@@ -27,7 +27,12 @@ void ImGuiRendererNVRHI::Frame()
 
 void ImGuiRendererNVRHI::Render(ImDrawData* data)
 {
-    if (!data || data->TotalVtxCount == 0)
+    if (!data)
+        return;
+
+    ProcessTextureRequests(data);
+
+    if (data->TotalVtxCount == 0)
         return;
 
     nvrhi::ICommandList* cmdList = nullptr;
@@ -59,6 +64,7 @@ void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)
     ImGuiIO& io = ImGui::GetIO();
     io.BackendRendererName = "xrRender_NVRHI";
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
     if (!CreateDeviceObjects())
     {
@@ -90,12 +96,6 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     if (!CreateShaders())
     {
         Msg("! Failed to create ImGui shaders");
-        return false;
-    }
-
-    if (!CreateFontsTexture())
-    {
-        Msg("! Failed to create ImGui font texture");
         return false;
     }
 
@@ -132,10 +132,12 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
 
 void ImGuiRendererNVRHI::DestroyDeviceObjects()
 {
+    m_textures.clear();
+    m_fontTexture = nullptr;
+
     m_vertexBuffer = nullptr;
     m_indexBuffer = nullptr;
     m_constantBuffer = nullptr;
-    m_fontTexture = nullptr;
     m_fontSampler = nullptr;
     m_vertexShader = nullptr;
     m_pixelShader = nullptr;
@@ -186,56 +188,117 @@ bool ImGuiRendererNVRHI::ResizeBuffers(size_t vtxSize, size_t idxSize)
     return CreateBuffers(vtxSize, idxSize);
 }
 
-bool ImGuiRendererNVRHI::CreateFontsTexture()
+void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
 {
-    ImGuiIO& io = ImGui::GetIO();
-    if (!io.Fonts->TexData)
+    if (!drawData || !drawData->Textures)
+        return;
+
+    ImVector<ImTextureData*>* textures = drawData->Textures;
+    for (int i = 0; i < textures->Size; i++)
     {
-        Msg("! Font atlas TexData is null after build");
-        return false;
+        ImTextureData* texData = (*textures)[i];
+        if (!texData)
+            continue;
+
+        switch (texData->Status)
+        {
+        case ImTextureStatus_WantCreate:
+            {
+                Msg("* ImGui requesting texture creation: %dx%d", texData->Width, texData->Height);
+
+                nvrhi::TextureDesc texDesc;
+                texDesc.setWidth(texData->Width);
+                texDesc.setHeight(texData->Height);
+                texDesc.setDepth(1);
+                texDesc.setArraySize(1);
+                texDesc.setMipLevels(1);
+                texDesc.setDimension(nvrhi::TextureDimension::Texture2D);
+
+                nvrhi::Format nvrhiFormat = nvrhi::Format::RGBA8_UNORM;
+                if (texData->Format == ImTextureFormat_Alpha8)
+                    nvrhiFormat = nvrhi::Format::R8_UNORM;
+
+                texDesc.setFormat(nvrhiFormat);
+                texDesc.setDebugName("ImGui Texture");
+
+                nvrhi::TextureHandle texture = m_device->createTexture(texDesc);
+                if (texture)
+                {
+                    if (texData->Pixels && m_renderDevice)
+                    {
+                        size_t dataSize = texData->Width * texData->Height * texData->BytesPerPixel;
+                        m_renderDevice->UploadTextureDataToNVRHI(
+                            texture.Get(),
+                            0, 0,
+                            texData->Pixels,
+                            dataSize
+                        );
+                    }
+
+                    m_textures[(ImTextureID)(intptr_t)texture.Get()] = texture;
+                    texData->SetTexID((ImTextureID)(intptr_t)texture.Get());
+                    texData->SetStatus(ImTextureStatus_OK);
+
+                    if (!m_fontTexture)
+                    {
+                        m_fontTexture = texture;
+                        Msg("* ImGui font texture created (%dx%d)", texData->Width, texData->Height);
+                    }
+                }
+                else
+                {
+                    Msg("! Failed to create ImGui texture");
+                }
+            }
+            break;
+
+        case ImTextureStatus_WantUpdates:
+            {
+                ImTextureID texId = texData->GetTexID();
+                auto it = m_textures.find(texId);
+                if (it != m_textures.end() && m_renderDevice)
+                {
+                    for (int j = 0; j < texData->Updates.Size; j++)
+                    {
+                        const ImTextureRect& update = texData->Updates[j];
+
+                        const void* updateData = (const u8*)texData->Pixels +
+                            (update.y * texData->Width + update.x) * texData->BytesPerPixel;
+
+                        size_t dataSize = update.w * update.h * texData->BytesPerPixel;
+
+                        size_t fullDataSize = texData->Width * texData->Height * texData->BytesPerPixel;
+                        m_renderDevice->UploadTextureDataToNVRHI(
+                            it->second.Get(),
+                            0, 0,
+                            texData->Pixels,
+                            fullDataSize
+                        );
+                    }
+                    texData->SetStatus(ImTextureStatus_OK);
+                }
+            }
+            break;
+
+        case ImTextureStatus_WantDestroy:
+            {
+                ImTextureID texId = texData->GetTexID();
+                auto it = m_textures.find(texId);
+                if (it != m_textures.end())
+                {
+                    if (it->second == m_fontTexture)
+                        m_fontTexture = nullptr;
+
+                    it->second = nullptr;
+                    m_textures.erase(it);
+
+                    texData->SetStatus(ImTextureStatus_Destroyed);
+                    Msg("* ImGui texture destroyed");
+                }
+            }
+            break;
+        }
     }
-
-    unsigned char* pixels = io.Fonts->TexData->Pixels;
-    int width = io.Fonts->TexData->Width;
-    int height = io.Fonts->TexData->Height;
-    int bytesPerPixel = io.Fonts->TexData->BytesPerPixel;
-
-    if (!pixels || width == 0 || height == 0)
-    {
-        Msg("! Font atlas has no pixel data");
-        return false;
-    }
-
-    if (bytesPerPixel != 4)
-    {
-        Msg("! Font atlas is not in RGBA32 format (has %d bytes per pixel)", bytesPerPixel);
-        return false;
-    }
-
-    nvrhi::TextureDesc texDesc;
-    texDesc.setWidth(width);
-    texDesc.setHeight(height);
-    texDesc.setDepth(1);
-    texDesc.setArraySize(1);
-    texDesc.setMipLevels(1);
-    texDesc.setDimension(nvrhi::TextureDimension::Texture2D);
-    texDesc.setFormat(nvrhi::Format::RGBA8_UNORM);
-    texDesc.setDebugName("ImGui Font Texture");
-
-    size_t dataSize = width * height * 4;
-
-    m_fontTexture = m_device->createTexture(texDesc);
-    if (!m_fontTexture)
-        return false;
-
-    io.Fonts->TexData->SetTexID((ImTextureID)(intptr_t)m_fontTexture.Get());
-
-    if (io.Fonts->TexData->Pixels)
-    {
-        io.Fonts->TexData->DestroyPixels();
-    }
-
-    return true;
 }
 
 xr_unique_ptr<IImGuiRender> ImGuiRendererFactory::Create(RenderDevice* device)

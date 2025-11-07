@@ -19,6 +19,10 @@
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+
+namespace xray::render {
+    void InitializeImGuiRenderer(ng::RenderDevice* renderDevice);
+}
 #endif
 
 namespace xray::render::RENDER_NAMESPACE
@@ -536,6 +540,8 @@ void CRender::create()
         if (m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
         {
             Msg("* RenderDevice initialized successfully");
+
+            xray::render::InitializeImGuiRenderer(m_renderDevice);
 
             m_framegraphRenderer = xr_new<xray::render::FrameGraphRenderer>();
 

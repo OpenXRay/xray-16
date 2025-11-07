@@ -3,42 +3,32 @@
 #include "dxImGuiRender.h"
 #include "ImGuiRendererNVRHI.h"
 
-namespace xray::render::ng {
-    extern RenderDevice* g_ModernRenderDevice;
-}
-
 namespace xray::render {
-    IImGuiRender* CreateModernImGuiRenderer();
+    IImGuiRender* GetImGuiRenderer();
 }
 
 namespace xray::render::RENDER_NAMESPACE
 {
 
-#ifdef USE_NVRHI_IMGUI
-
 IImGuiRender* dxRenderFactory::CreateImGuiRender()
 {
-    if (ng::g_ModernRenderDevice && ng::g_ModernRenderDevice->IsInitialized())
+    IImGuiRender* existingRenderer = xray::render::GetImGuiRenderer();
+    if (existingRenderer)
     {
-        auto modernRenderer = ng::ImGuiRendererFactory::Create(ng::g_ModernRenderDevice);
-        if (modernRenderer)
-        {
-            Msg("* ImGui: Created NVRHI-based renderer");
-            return modernRenderer.release();
-        }
+        Msg("* ImGui: Using existing renderer");
+        return existingRenderer;
     }
 
-    Msg("* ImGui: Using legacy DX11 renderer");
+    Msg("* ImGui: Creating legacy DX11 renderer");
     return xr_new<dxImGuiRender>();
 }
 
 void dxRenderFactory::DestroyImGuiRender(IImGuiRender* pObject)
 {
-    xr_delete(pObject);
+    if (pObject != xray::render::GetImGuiRenderer())
+    {
+        xr_delete(pObject);
+    }
 }
-
-#else
-
-#endif
 
 }

@@ -25,6 +25,14 @@ public:
 
     nvrhi::IDevice* GetNVRHIDevice() const;
 
+    void UploadTextureDataToNVRHI(
+        nvrhi::ITexture* texture,
+        u32 arraySlice,
+        u32 mipLevel,
+        const void* data,
+        size_t dataSize
+    );
+
     struct TextureDesc {
         u32 width = 0;
         u32 height = 0;

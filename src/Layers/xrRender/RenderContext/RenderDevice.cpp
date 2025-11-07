@@ -282,6 +282,43 @@ void RenderDevice::UploadTextureData(
     GetNativeDevice()->executeCommandList(m_uploadCommandList);
 }
 
+void RenderDevice::UploadTextureDataToNVRHI(
+    nvrhi::ITexture* texture,
+    u32 arraySlice,
+    u32 mipLevel,
+    const void* data,
+    size_t dataSize)
+{
+    VERIFY(m_initialized);
+    VERIFY(texture != nullptr);
+    VERIFY(data != nullptr);
+    VERIFY(dataSize > 0);
+    VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    m_uploadCommandList->open();
+
+    const auto& desc = texture->getDesc();
+    u32 rowPitch = 0;
+
+    switch (desc.format) {
+        case nvrhi::Format::RGBA8_UNORM:
+        case nvrhi::Format::BGRA8_UNORM:
+            rowPitch = desc.width * 4;
+            break;
+        case nvrhi::Format::R8_UNORM:
+            rowPitch = desc.width;
+            break;
+        default:
+            rowPitch = dataSize / desc.height;
+            break;
+    }
+
+    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch);
+
+    m_uploadCommandList->close();
+    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+}
+
 BufferHandle RenderDevice::CreateBuffer(
     const BufferDesc& desc,
     const void* initialData) {

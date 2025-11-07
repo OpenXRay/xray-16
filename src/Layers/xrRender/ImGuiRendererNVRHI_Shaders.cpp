@@ -1,78 +1,37 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
+#include "FrameGraph/ShaderLoader.h"
+#include <d3dcompiler.h>
 
 namespace xray::render::ng {
 
-static const char* s_ImGuiVertexShader = R"(
-cbuffer vertexBuffer : register(b0) {
-    float4x4 ProjectionMatrix;
-};
-
-struct VS_INPUT {
-    float2 pos : POSITION;
-    float2 uv  : TEXCOORD0;
-    float4 col : COLOR0;
-};
-
-struct PS_INPUT {
-    float4 pos : SV_POSITION;
-    float4 col : COLOR0;
-    float2 uv  : TEXCOORD0;
-};
-
-PS_INPUT main(VS_INPUT input) {
-    PS_INPUT output;
-    output.pos = mul(ProjectionMatrix, float4(input.pos.xy, 0.f, 1.f));
-    output.col = input.col;
-    output.uv = input.uv;
-    return output;
-}
-)";
-
-static const char* s_ImGuiPixelShader = R"(
-struct PS_INPUT {
-    float4 pos : SV_POSITION;
-    float4 col : COLOR0;
-    float2 uv  : TEXCOORD0;
-};
-
-Texture2D texture0 : register(t0);
-SamplerState sampler0 : register(s0);
-
-float4 main(PS_INPUT input) : SV_Target {
-    float4 out_col = input.col * texture0.Sample(sampler0, input.uv);
-    return out_col;
-}
-)";
-
 bool ImGuiRendererNVRHI::CreateShaders()
 {
+    framegraph::ShaderLoader shaderLoader(m_renderDevice);
 
-    nvrhi::ShaderDesc vsDesc;
-    vsDesc.setDebugName("ImGui Vertex Shader");
-    vsDesc.setEntryName("main");
-
-    const char dummyBytecode[] = { 0x01, 0x02, 0x03, 0x04 };
-    m_vertexShader = m_device->createShader(vsDesc, dummyBytecode, sizeof(dummyBytecode));
+    ID3DBlob* vsBytecode = nullptr;
+    m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main", &vsBytecode);
 
     if (!m_vertexShader)
     {
         Msg("! Failed to create ImGui vertex shader");
+        return false;
     }
 
-    nvrhi::ShaderDesc psDesc;
-    psDesc.setDebugName("ImGui Pixel Shader");
-    psDesc.setEntryName("main");
-
-    m_pixelShader = m_device->createShader(psDesc, dummyBytecode, sizeof(dummyBytecode));
+    ID3DBlob* psBytecode = nullptr;
+    m_pixelShader = shaderLoader.LoadPixelShader("imgui", "main", &psBytecode);
 
     if (!m_pixelShader)
     {
         Msg("! Failed to create ImGui pixel shader");
+        if (vsBytecode) vsBytecode->Release();
+        return false;
     }
 
-    Msg("* ImGui shaders need proper compilation integration");
+    if (vsBytecode) vsBytecode->Release();
+    if (psBytecode) psBytecode->Release();
 
+    Msg("* ImGui shaders compiled successfully");
     return true;
 }
 
