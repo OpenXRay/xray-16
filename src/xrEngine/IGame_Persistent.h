@@ -181,6 +181,7 @@ public:
 
     void load_draw_internal() const;
     void ShowLoadingScreen(bool show) const;
+    bool IsLoadingScreenShown() const;
 
     ICF u32 GameType() { return m_game_params.m_e_game_type; };
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);

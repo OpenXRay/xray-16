@@ -549,6 +549,11 @@ void IGame_Persistent::ShowLoadingScreen(bool show) const
     m_pLoadingScreen->Show(show);
 }
 
+bool IGame_Persistent::IsLoadingScreenShown() const
+{
+    return m_pLoadingScreen->IsShown();
+}
+
 void IGame_Persistent::OnFrame()
 {
     ZoneScoped;

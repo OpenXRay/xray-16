@@ -202,7 +202,7 @@ void FrameGraphRenderer::SetupFrame() {
 
     if (g_pGamePersistent && g_pGameLevel)
     {
-        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->SpatialSpace.IsEmpty())
+        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->IsLoadingScreenShown())
         {
             CFrustum view_frustum;
             view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
