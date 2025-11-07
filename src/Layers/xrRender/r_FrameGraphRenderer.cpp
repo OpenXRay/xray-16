@@ -158,31 +158,13 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
-    //  DEBUG: CLEAR FINAL OUTPUT (Verify pipeline works)
+    //  RT VISUALIZATION: View what GBufferPass is rendering
     // ═══════════════════════════════════════════════════════
-    // TODO: Remove this once we have actual rendering passes
-    {
-        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-        if (finalTexture)
-        {
-            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+    // For now, m_finalOutput is pointing to gbufferOutputs.albedo (prototype RT)
+    // This should already show the GBuffer rendering if it's working
+    // No additional copy needed - just log what we're presenting
 
-            // Create framebuffer for clearing
-            nvrhi::FramebufferDesc fbDesc;
-            fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
-            nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
-
-            if (framebuffer && cmdList)
-            {
-                cmdList->open();
-                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.2f, 0.4f, 1.0f));
-                cmdList->close();
-                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-
-                Msg("* [DEBUG] Cleared final output to blue");
-            }
-        }
-    }
+    Msg("* [FrameGraphRenderer] Presenting GBuffer albedo to backbuffer");
 
     // ═══════════════════════════════════════════════════════
     //  RENDER HUD (after world geometry, before present)
@@ -372,31 +354,88 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     // ═══════════════════════════════════════════════════════
     //  CREATE ALL VANILLA X-RAY RENDER TARGETS (ONCE)
     // ═══════════════════════════════════════════════════════
-    // Week 14: Create all vanilla RTs that X-Ray shaders expect
-    // These are created ONCE at startup and persist across frames
+    // Phase 1: Create as native NVRHI resources via NativeRTFactory
+    // Then import into FrameGraph as external resources
 
-    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets...");
+    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets (native NVRHI)...");
 
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    // ─── G-Buffer Targets (Deferred Geometry Phase) ───
-    m_rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);   // r2_RT_P
-    m_rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);       // r2_RT_N
-    m_rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);        // r2_RT_albedo
-    m_rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);          // r2_RT_base_depth
+    // Get NativeRTFactory from ModernResourceManager
+    auto* resMgr = m_device->GetModernResourceManager();
+    VERIFY(resMgr);
+    auto* rtFactory = resMgr->GetRTFactory();
+    VERIFY(rtFactory);
+    auto* textureMgr = resMgr->GetTextureManager();
+    VERIFY(textureMgr);
 
-    // ─── Lighting Targets ───
+    // ─── G-Buffer Targets (Deferred Geometry Phase) ───
+    // Create native NVRHI textures
+    m_native_Position = rtFactory->CreatePositionBuffer(w, h, "rt_Position");      // r2_RT_P
+    m_native_Normal = rtFactory->CreateNormalBuffer(w, h, "rt_Normal");            // r2_RT_N
+    m_native_Albedo = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_Albedo");    // r2_RT_albedo (non-sRGB)
+    m_native_Depth = rtFactory->CreateDepthStencil(w, h, false, "rt_Depth");      // r2_RT_base_depth (D24S8)
+
+    // Get physical NVRHI textures from TextureManager
+    nvrhi::ITexture* physicalPosition = textureMgr->GetNVRHITexture(m_native_Position);
+    nvrhi::ITexture* physicalNormal = textureMgr->GetNVRHITexture(m_native_Normal);
+    nvrhi::ITexture* physicalAlbedo = textureMgr->GetNVRHITexture(m_native_Albedo);
+    nvrhi::ITexture* physicalDepth = textureMgr->GetNVRHITexture(m_native_Depth);
+
+    VERIFY(physicalPosition && physicalNormal && physicalAlbedo && physicalDepth);
+
+    // Import into FrameGraph as external resources
+    framegraph::ResourceDesc positionDesc;
+    positionDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    positionDesc.width = w;
+    positionDesc.height = h;
+    positionDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    positionDesc.isRenderTarget = true;
+    positionDesc.debugName = "rt_Position";
+    m_rt_Position = m_framegraph->ImportTexture("rt_Position", physicalPosition, positionDesc);
+
+    framegraph::ResourceDesc normalDesc;
+    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalDesc.width = w;
+    normalDesc.height = h;
+    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    normalDesc.isRenderTarget = true;
+    normalDesc.debugName = "rt_Normal";
+    m_rt_Normal = m_framegraph->ImportTexture("rt_Normal", physicalNormal, normalDesc);
+
+    framegraph::ResourceDesc albedoDesc;
+    albedoDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    albedoDesc.width = w;
+    albedoDesc.height = h;
+    albedoDesc.format = nvrhi::Format::RGBA8_UNORM;
+    albedoDesc.isRenderTarget = true;
+    albedoDesc.debugName = "rt_Albedo";
+    m_rt_Albedo = m_framegraph->ImportTexture("rt_Albedo", physicalAlbedo, albedoDesc);
+
+    framegraph::ResourceDesc depthDesc;
+    depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    depthDesc.width = w;
+    depthDesc.height = h;
+    depthDesc.format = nvrhi::Format::D24S8;
+    depthDesc.isDepthStencil = true;
+    depthDesc.debugName = "rt_Depth";
+    m_rt_Depth = m_framegraph->ImportTexture("rt_Depth", physicalDepth, depthDesc);
+
+    Msg("  ✓ Created 4 native G-Buffer RTs (Position, Normal, Albedo, Depth)");
+
+    // ─── Lighting Targets (still using legacy CreateRT for now) ───
     m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
 
-    // ─── Post-Processing Targets ───
+    // ─── Post-Processing Targets (still using legacy CreateRT for now) ───
     m_rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic0
     m_rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic1
     m_rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);      // r2_RT_generic2 (HDR)
 
     m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);     // TODO: Get from Device
 
-    Msg("  ✓ Created %d vanilla render targets", 8);  // Position, Normal, Albedo, Depth, Accumulator, Generic0/1/2
+    Msg("  ✓ Created remaining legacy RTs (Accumulator, Generic0/1/2, Backbuffer)");
+    Msg("  ✓ Total: 8 vanilla render targets (4 native, 4 legacy)");
 
     // ═══════════════════════════════════════════════════════
     //  SETUP PASSES (ONCE) - PROTOTYPE FOR NOW
