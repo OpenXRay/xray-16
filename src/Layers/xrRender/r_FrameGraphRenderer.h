@@ -14,8 +14,14 @@
 
 // Forward declarations
 struct Fmatrix;
+struct ImDrawData;
+
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
+}
+
+namespace xray::render::ng {
+    class ImGuiRendererNVRHI;
 }
 
 namespace xray::render {
@@ -25,7 +31,7 @@ using RENDER_NAMESPACE::dxRender_Visual;
 //  FRAMEGRAPH RENDERER
 // ══════════════════════════════════════════════════════════
 
-class FrameGraphRenderer {
+class FrameGraphRenderer: public pureRender {
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
@@ -34,8 +40,14 @@ public:
     bool Initialize(ng::RenderDevice* device);
     void Shutdown();
 
-    // Main render function
+    // Main render function (called by internal Execute)
     void Render();
+
+    // seqRender interface (called by Device.seqRender.Process)
+    void OnRender();
+
+    // Render ImGui onto final output (called after FrameGraph execution)
+    void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
 
     // Toggle FrameGraph rendering
     void SetEnabled(bool enabled) { m_enabled = enabled; }

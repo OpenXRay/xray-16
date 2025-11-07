@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
+#include "RenderContext/RenderContext.h"
 #include <backends/imgui_impl_dx11.h> // For ImDrawVert layout reference
+#include <d3d11.h>
+
+// Include CRender for accessing backbuffer
+#include "Layers/xrRender_R2/r2.h"
 
 namespace xray::render::ng {
 
@@ -37,47 +42,50 @@ void ImGuiRendererNVRHI::Frame()
 
 void ImGuiRendererNVRHI::Render(ImDrawData* data)
 {
+    // This is the legacy entry point called from device.cpp
+    // For now, we'll just log that rendering is disabled here
+    // The actual rendering happens inline in FrameGraphRenderer
+
+    static bool logged = false;
+    if (!logged)
+    {
+        Msg("* ImGui legacy Render() called - actual rendering happens inline in FrameGraphRenderer");
+        logged = true;
+    }
+}
+
+void ImGuiRendererNVRHI::Render(ImDrawData* data, nvrhi::IFramebuffer* framebuffer, nvrhi::ICommandList* cmdList)
+{
     if (!data || data->TotalVtxCount == 0 || data->TotalIdxCount == 0)
         return;
 
-    // Process texture requests (modern ImGui 1.92+ API)
-    // Note: We added waitForIdle() in UploadTextureDataToNVRHI to prevent state corruption
+    if (!framebuffer || !cmdList)
+    {
+        Msg("! ImGuiRendererNVRHI::Render - Invalid framebuffer or command list");
+        return;
+    }
+
+    // Process texture requests
     ProcessTextureRequests(data);
 
     // Check if we have all required resources
     if (!m_pipeline || !m_resourceBindings)
     {
-        // Resource bindings might not be created yet if font texture isn't ready
+        Msg("! ImGuiRendererNVRHI::Render - Pipeline or bindings not ready");
         return;
     }
 
-    // TODO: NVRHI requires a render pass to be active before drawing
-    // We need to either:
-    // 1. Get the backbuffer framebuffer and call beginRenderPass()
-    // 2. Have the renderer call us during its render pass
-    // 3. Create our own framebuffer for the backbuffer
-    //
-    // For now, rendering is disabled until we have proper framebuffer access
+    cmdList->beginMarker("ImGui");
 
-    // Get immediate command list
-    // nvrhi::ICommandList* cmdList = m_renderDevice->GetImmediateCommandList();
-    // if (!cmdList)
-    // {
-    //     Msg("! ImGuiRendererNVRHI::Render - No command list available");
-    //     return;
-    // }
+    // Store framebuffer so RenderDrawData can use it in graphics state
+    m_currentFramebuffer = framebuffer;
 
-    // // Render ImGui
-    // // Note: For immediate command lists, operations execute immediately
-    // RenderDrawData(data, cmdList);
+    // Render ImGui draw data
+    RenderDrawData(data, cmdList);
 
-    // Log that we're ready to render but need framebuffer access
-    static bool logged = false;
-    if (!logged && m_resourceBindings)
-    {
-        Msg("* ImGui NVRHI renderer ready - waiting for framebuffer integration");
-        logged = true;
-    }
+    m_currentFramebuffer = nullptr;
+
+    cmdList->endMarker();
 }
 
 void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)

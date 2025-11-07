@@ -243,8 +243,15 @@ void CRenderDevice::DoRender()
         CalcFrameStats();
         //Statistic->Show();
 
-        ImGui::Render();
-        m_imgui_render->Render(ImGui::GetDrawData());
+        // ImGui rendering is handled inline by FrameGraphRenderer when enabled
+        // Only render here for legacy path
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (!ps_r4_use_framegraph)
+        {
+            ImGui::Render();
+            m_imgui_render->Render(ImGui::GetDrawData());
+        }
+
         UpdateViewports();
 
         RenderEnd(); // Present goes here

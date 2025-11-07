@@ -22,6 +22,9 @@ public:
     void OnDeviceResetBegin() override;
     void OnDeviceResetEnd() override;
 
+    // Render with explicit framebuffer and command list (called inline after FrameGraph)
+    void Render(ImDrawData* data, nvrhi::IFramebuffer* framebuffer, nvrhi::ICommandList* cmdList);
+
 private:
     // Core device handles
     RenderDevice* m_renderDevice = nullptr;
@@ -55,6 +58,9 @@ private:
 
     // Texture management (for modern ImGui 1.92+ API)
     std::map<ImTextureID, nvrhi::TextureHandle> m_textures;
+
+    // Current framebuffer (set during Render() call)
+    nvrhi::IFramebuffer* m_currentFramebuffer = nullptr;
 
     // Constants structure for projection matrix
     struct ImGuiConstants {

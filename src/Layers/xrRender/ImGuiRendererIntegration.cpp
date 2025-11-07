@@ -2,6 +2,7 @@
 #include "ImGuiRendererNVRHI.h"
 #include "dxImGuiRender.h"
 #include "RenderContext/RenderDevice.h"
+#include "Layers/xrRender_R2/r2.h"
 
 namespace xray::render {
 
@@ -31,8 +32,12 @@ void InitializeImGuiRenderer(ng::RenderDevice* renderDevice)
     if (renderDevice && renderDevice->IsInitialized())
     {
         // Use NVRHI-based renderer - create as base class pointer
-        IImGuiRender* renderer = xr_new<ng::ImGuiRendererNVRHI>(renderDevice);
-        g_ImGuiRenderer.reset(renderer);
+        ng::ImGuiRendererNVRHI* nvrhiRenderer = xr_new<ng::ImGuiRendererNVRHI>(renderDevice);
+        g_ImGuiRenderer.reset(nvrhiRenderer);
+
+        // Store pointer in RImplementation for FrameGraphRenderer access
+        RENDER_NAMESPACE::RImplementation.m_imguiRendererNVRHI = nvrhiRenderer;
+
         Msg("* ImGui: Using NVRHI renderer (supports DX11/DX12/Vulkan)");
     }
     else

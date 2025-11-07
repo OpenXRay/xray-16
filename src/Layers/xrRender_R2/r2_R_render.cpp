@@ -93,18 +93,12 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
 #ifdef USE_DX11
-    // FrameGraph renderer - use new deferred rendering pipeline
-    if (ps_r4_use_framegraph && m_framegraphRenderer)
+    // FrameGraph renderer is now registered with Device.seqRender
+    // It will be called automatically by Device.seqRender.Process()
+    // If FrameGraph is enabled, skip legacy rendering
+    if (ps_r4_use_framegraph && m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
     {
-        if (!m_framegraphRenderer->IsEnabled())
-            m_framegraphRenderer->SetEnabled(true);
-
-        m_framegraphRenderer->Render();
-        return;
-    }
-    else if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
-    {
-        m_framegraphRenderer->SetEnabled(false);
+        return;  // FrameGraphRenderer::OnRender() handles everything
     }
 #endif
 

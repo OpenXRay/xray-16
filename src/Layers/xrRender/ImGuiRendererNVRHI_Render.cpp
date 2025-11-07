@@ -144,6 +144,7 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     // Set graphics pipeline state
     nvrhi::GraphicsState graphicsState;
     graphicsState.pipeline = m_pipeline;
+    graphicsState.framebuffer = m_currentFramebuffer;  // Use the framebuffer passed to Render()
     graphicsState.bindings = { m_resourceBindings };
     graphicsState.vertexBuffers = {
         { m_vertexBuffer, 0, 0 }

@@ -304,6 +304,7 @@ private:
     xray::editor::ide m_editor;
 
     ImGuiContext* m_imgui_context{};
+public:
     IImGuiRender* m_imgui_render{};
 
 private:

@@ -26,6 +26,7 @@ namespace xray::render {
 }
 #endif
 
+extern ENGINE_API int ps_r4_use_framegraph;
 namespace xray::render::RENDER_NAMESPACE
 {
 CRender RImplementation;
@@ -552,6 +553,13 @@ void CRender::create()
             if (m_framegraphRenderer->Initialize(m_renderDevice))
             {
                 Msg("* FrameGraphRenderer initialized successfully");
+
+                // Enable it if ps_r4_use_framegraph is set
+                if (ps_r4_use_framegraph)
+                {
+                    m_framegraphRenderer->SetEnabled(true);
+                    Msg("* FrameGraphRenderer enabled (ps_r4_use_framegraph=1)");
+                }
             }
             else
             {

@@ -16,6 +16,9 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/ShaderKey.h"
 #include "xrEngine/CustomHUD.h"
+#include "ImGuiRendererNVRHI.h"
+#include "xrEngine/device.h"
+#include <imgui.h>
 
 namespace xray::render {
 
@@ -95,7 +98,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_framegraph->Compile();
 
-    Msg("  ✓ FrameGraphRenderer initialized");
+    // Register with Device render sequencer so OnRender() gets called
+    // Priority 0 = middle of render sequence (after setup, before UI)
+    Device.seqRender.Add(this, 0);
+
+    Msg("  ✓ FrameGraphRenderer initialized and registered with seqRender");
 
     return true;
 }
@@ -104,6 +111,9 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
+
+    // Unregister from Device render sequencer
+    Device.seqRender.Remove(this);
 
     // Clear global geometry collector pointer
     g_geometryCollector = nullptr;
@@ -154,6 +164,25 @@ void FrameGraphRenderer::Render() {
     RenderHUD();
 
     // ═══════════════════════════════════════════════════════
+    //  RENDER IMGUI (inline after framegraph, before present)
+    // ═══════════════════════════════════════════════════════
+    // Render ImGui onto m_finalOutput before presenting to backbuffer
+    // This ensures ImGui is composited onto the framegraph output
+
+    // Generate ImGui draw data (normally done later in device.cpp, but we need it now)
+    ImGui::Render();
+
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    if (imguiRenderer)
+    {
+        ImDrawData* drawData = ImGui::GetDrawData();
+        if (drawData)
+        {
+            RenderImGui(drawData, imguiRenderer);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  PRESENT TO BACKBUFFER
     // ═══════════════════════════════════════════════════════
 
@@ -187,7 +216,7 @@ void FrameGraphRenderer::SetupFrame() {
 
     // Query spatial database ONCE per frame (mimicking render_main::calculate())
     // This populates m_lstRenderables which we reuse throughout the frame
-    if (g_pGamePersistent)
+    if (g_pGamePersistent && g_pGameLevel)
     {
         // Setup frustum (same as render_main)
         CFrustum view_frustum;
@@ -1369,6 +1398,63 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     }
 
     Msg("! [FrameGraphRenderer] Batch routing complete");
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEQRENDER INTERFACE (Device calls this)
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::OnRender() {
+    if (!m_enabled) return;
+
+    // This is called by Device.seqRender.Process()
+    // Just forward to our internal Render() implementation
+    Render();
+}
+
+// ═══════════════════════════════════════════════════════
+//  IMGUI RENDERING (inline, on final output)
+// ═══════════════════════════════════════════════════════
+
+void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer) {
+    if (!drawData || drawData->TotalVtxCount == 0)
+        return;
+
+    if (!imguiRenderer) {
+        static bool warned = false;
+        if (!warned) {
+            Msg("! [FrameGraphRenderer] ImGui renderer not provided");
+            warned = true;
+        }
+        return;
+    }
+
+    // Get the physical texture for m_finalOutput
+    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+    if (!finalTexture) {
+        Msg("! [FrameGraphRenderer] Failed to get final output texture for ImGui");
+        return;
+    }
+
+    // Create framebuffer from final output
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
+
+    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    if (!framebuffer) {
+        Msg("! [FrameGraphRenderer] Failed to create framebuffer for ImGui");
+        return;
+    }
+
+    // Get immediate command list
+    nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+    if (!cmdList) {
+        Msg("! [FrameGraphRenderer] No command list available for ImGui");
+        return;
+    }
+
+    // Render ImGui onto final output (pass raw pointer from handle)
+    imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
 }
 
 } // namespace xray::render
