@@ -15,6 +15,9 @@
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/ShaderKey.h"
 #include "xrEngine/CustomHUD.h"
+#include "ImGuiRendererNVRHI.h"
+#include "xrEngine/device.h"
+#include <imgui.h>
 
 namespace xray::render {
 
@@ -78,7 +81,9 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_framegraph->Compile();
 
-    Msg("  ✓ FrameGraphRenderer initialized");
+    Device.seqRender.Add(this, 0);
+
+    Msg("  ✓ FrameGraphRenderer initialized and registered with seqRender");
 
     return true;
 }
@@ -87,6 +92,8 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
+
+    Device.seqRender.Remove(this);
 
     g_geometryCollector = nullptr;
 
@@ -118,6 +125,18 @@ void FrameGraphRenderer::Render() {
 
     RenderHUD();
 
+    ImGui::Render();
+
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    if (imguiRenderer)
+    {
+        ImDrawData* drawData = ImGui::GetDrawData();
+        if (drawData)
+        {
+            RenderImGui(drawData, imguiRenderer);
+        }
+    }
+
     PresentToBackbuffer();
 
     auto frameEnd = std::chrono::high_resolution_clock::now();
@@ -139,7 +158,7 @@ void FrameGraphRenderer::SetupFrame() {
 
     m_lstRenderables.clear();
 
-    if (g_pGamePersistent)
+    if (g_pGamePersistent && g_pGameLevel)
     {
         CFrustum view_frustum;
         view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
@@ -998,6 +1017,49 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     }
 
     Msg("! [FrameGraphRenderer] Batch routing complete");
+}
+
+void FrameGraphRenderer::OnRender() {
+    if (!m_enabled) return;
+
+    Render();
+}
+
+void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer) {
+    if (!drawData || drawData->TotalVtxCount == 0)
+        return;
+
+    if (!imguiRenderer) {
+        static bool warned = false;
+        if (!warned) {
+            Msg("! [FrameGraphRenderer] ImGui renderer not provided");
+            warned = true;
+        }
+        return;
+    }
+
+    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+    if (!finalTexture) {
+        Msg("! [FrameGraphRenderer] Failed to get final output texture for ImGui");
+        return;
+    }
+
+    nvrhi::FramebufferDesc fbDesc;
+    fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
+
+    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    if (!framebuffer) {
+        Msg("! [FrameGraphRenderer] Failed to create framebuffer for ImGui");
+        return;
+    }
+
+    nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+    if (!cmdList) {
+        Msg("! [FrameGraphRenderer] No command list available for ImGui");
+        return;
+    }
+
+    imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
 }
 
 }

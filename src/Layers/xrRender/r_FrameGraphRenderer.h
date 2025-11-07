@@ -12,14 +12,20 @@
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 struct Fmatrix;
+struct ImDrawData;
+
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
+}
+
+namespace xray::render::ng {
+    class ImGuiRendererNVRHI;
 }
 
 namespace xray::render {
 using RENDER_NAMESPACE::dxRender_Visual;
 
-class FrameGraphRenderer {
+class FrameGraphRenderer: public pureRender {
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
@@ -28,6 +34,10 @@ public:
     void Shutdown();
 
     void Render();
+
+    void OnRender();
+
+    void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
 
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsEnabled() const { return m_enabled; }

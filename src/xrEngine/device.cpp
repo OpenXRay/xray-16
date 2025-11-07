@@ -242,8 +242,13 @@ void CRenderDevice::DoRender()
 
         CalcFrameStats();
 
-        ImGui::Render();
-        m_imgui_render->Render(ImGui::GetDrawData());
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (!ps_r4_use_framegraph)
+        {
+            ImGui::Render();
+            m_imgui_render->Render(ImGui::GetDrawData());
+        }
+
         UpdateViewports();
 
         RenderEnd(); // Present goes here

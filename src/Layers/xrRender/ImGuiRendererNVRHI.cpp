@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
+#include "RenderContext/RenderContext.h"
 #include <backends/imgui_impl_dx11.h>
+#include <d3d11.h>
+
+#include "Layers/xrRender_R2/r2.h"
 
 namespace xray::render::ng {
 
@@ -27,22 +31,43 @@ void ImGuiRendererNVRHI::Frame()
 
 void ImGuiRendererNVRHI::Render(ImDrawData* data)
 {
+
+    static bool logged = false;
+    if (!logged)
+    {
+        Msg("* ImGui legacy Render() called - actual rendering happens inline in FrameGraphRenderer");
+        logged = true;
+    }
+}
+
+void ImGuiRendererNVRHI::Render(ImDrawData* data, nvrhi::IFramebuffer* framebuffer, nvrhi::ICommandList* cmdList)
+{
     if (!data || data->TotalVtxCount == 0 || data->TotalIdxCount == 0)
         return;
+
+    if (!framebuffer || !cmdList)
+    {
+        Msg("! ImGuiRendererNVRHI::Render - Invalid framebuffer or command list");
+        return;
+    }
 
     ProcessTextureRequests(data);
 
     if (!m_pipeline || !m_resourceBindings)
     {
+        Msg("! ImGuiRendererNVRHI::Render - Pipeline or bindings not ready");
         return;
     }
 
-    static bool logged = false;
-    if (!logged && m_resourceBindings)
-    {
-        Msg("* ImGui NVRHI renderer ready - waiting for framebuffer integration");
-        logged = true;
-    }
+    cmdList->beginMarker("ImGui");
+
+    m_currentFramebuffer = framebuffer;
+
+    RenderDrawData(data, cmdList);
+
+    m_currentFramebuffer = nullptr;
+
+    cmdList->endMarker();
 }
 
 void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)

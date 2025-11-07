@@ -93,17 +93,9 @@ void CRender::Render()
     PIX_EVENT(CRender_Render);
 
 #ifdef USE_DX11
-    if (ps_r4_use_framegraph && m_framegraphRenderer)
+    if (ps_r4_use_framegraph && m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
     {
-        if (!m_framegraphRenderer->IsEnabled())
-            m_framegraphRenderer->SetEnabled(true);
-
-        m_framegraphRenderer->Render();
         return;
-    }
-    else if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
-    {
-        m_framegraphRenderer->SetEnabled(false);
     }
 #endif
 

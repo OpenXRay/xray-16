@@ -113,6 +113,7 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
 
     nvrhi::GraphicsState graphicsState;
     graphicsState.pipeline = m_pipeline;
+    graphicsState.framebuffer = m_currentFramebuffer;
     graphicsState.bindings = { m_resourceBindings };
     graphicsState.vertexBuffers = {
         { m_vertexBuffer, 0, 0 }

@@ -32,6 +32,7 @@ namespace xray::render::ng
 {
 class RenderContext;
 class RenderDevice;
+class ImGuiRendererNVRHI;
 }
 
 namespace xray::render
@@ -556,6 +557,9 @@ public:
     xray::render::ng::RenderDevice* m_renderDevice{ nullptr };
 
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
+
+    xray::render::ng::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
+    xray::render::ng::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
 
     nvrhi::BufferHandle m_testVertexBuffer;
     nvrhi::BufferHandle m_testIndexBuffer;

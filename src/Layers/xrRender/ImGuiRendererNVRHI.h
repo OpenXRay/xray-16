@@ -21,6 +21,8 @@ public:
     void OnDeviceResetBegin() override;
     void OnDeviceResetEnd() override;
 
+    void Render(ImDrawData* data, nvrhi::IFramebuffer* framebuffer, nvrhi::ICommandList* cmdList);
+
 private:
     RenderDevice* m_renderDevice = nullptr;
     nvrhi::DeviceHandle m_device;
@@ -47,6 +49,8 @@ private:
     ImGuiContext* m_imguiContext = nullptr;
 
     std::map<ImTextureID, nvrhi::TextureHandle> m_textures;
+
+    nvrhi::IFramebuffer* m_currentFramebuffer = nullptr;
 
     struct ImGuiConstants {
         float mvpMatrix[4][4];
