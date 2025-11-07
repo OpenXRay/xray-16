@@ -1,0 +1,75 @@
+#pragma once
+
+#include "Include/xrRender/ImGuiRender.h"
+#include "RenderContext/RenderDevice.h"
+#include <nvrhi/nvrhi.h>
+#include <imgui.h>
+
+namespace xray::render::ng {
+
+class ImGuiRendererNVRHI : public IImGuiRender {
+public:
+    ImGuiRendererNVRHI(RenderDevice* renderDevice);
+    ~ImGuiRendererNVRHI() override;
+
+    void Copy(IImGuiRender& _in) override;
+    void Frame() override;
+    void Render(ImDrawData* data) override;
+    void OnDeviceCreate(ImGuiContext* context) override;
+    void OnDeviceDestroy() override;
+    void OnDeviceResetBegin() override;
+    void OnDeviceResetEnd() override;
+
+private:
+    RenderDevice* m_renderDevice = nullptr;
+    nvrhi::DeviceHandle m_device;
+
+    nvrhi::TextureHandle m_fontTexture;
+    nvrhi::BufferHandle m_vertexBuffer;
+    nvrhi::BufferHandle m_indexBuffer;
+    nvrhi::BufferHandle m_constantBuffer;
+
+    nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::BindingLayoutHandle m_bindingLayout;
+    nvrhi::BindingSetHandle m_resourceBindings;
+    nvrhi::InputLayoutHandle m_inputLayout;
+    nvrhi::ShaderHandle m_vertexShader;
+    nvrhi::ShaderHandle m_pixelShader;
+    nvrhi::SamplerHandle m_fontSampler;
+
+    nvrhi::RenderState m_renderState;
+
+    size_t m_vertexBufferSize = 0;
+    size_t m_indexBufferSize = 0;
+    u32 m_frameIndex = 0;
+
+    ImGuiContext* m_imguiContext = nullptr;
+
+    struct ImGuiConstants {
+        float mvpMatrix[4][4];
+    };
+
+protected:
+    void SetupRenderState(ImDrawData* drawData, nvrhi::ICommandList* cmdList);
+    void UploadDrawData(ImDrawData* drawData, nvrhi::ICommandList* cmdList);
+    void RenderDrawData(ImDrawData* drawData, nvrhi::ICommandList* cmdList);
+
+private:
+    bool CreateDeviceObjects();
+    void DestroyDeviceObjects();
+    bool CreateFontsTexture();
+    bool CreateShaders();
+    bool CreatePipelineState();
+    bool CreateBuffers(size_t vtxSize, size_t idxSize);
+    bool ResizeBuffers(size_t vtxSize, size_t idxSize);
+
+    nvrhi::ITexture* GetTextureFromImTextureID(ImTextureID id);
+    void UpdateTextureBinding(ImTextureID textureId);
+};
+
+class ImGuiRendererFactory {
+public:
+    static xr_unique_ptr<IImGuiRender> Create(RenderDevice* device);
+};
+
+}

@@ -135,6 +135,7 @@
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
     <ClInclude Include="..\xrRender\dxImGuiRender.h" />
+    <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
     <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
     <ClInclude Include="..\xrRender\dxParticleCustom.h" />
@@ -344,6 +345,12 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
+    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />
+    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Shaders.cpp" />
+    <ClCompile Include="..\xrRender\ImGuiRendererNVRHI_Render.cpp" />
+    <ClCompile Include="..\xrRender\ImGuiRendererIntegration.cpp" />
+    <ClCompile Include="..\xrRender\dxRenderFactory_ImGui.cpp" />
+    <ClCompile Include="..\xrRender\GlobalRenderDevice.cpp" />
     <ClCompile Include="..\xrRender\dxLensFlareRender.cpp" />
     <ClCompile Include="..\xrRender\dxObjectSpaceRender.cpp" />
     <ClCompile Include="..\xrRender\dxParticleCustom.cpp" />

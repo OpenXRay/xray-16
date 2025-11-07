@@ -69,6 +69,17 @@ target_sources(xrRenderPC_R4 PRIVATE
     # FrameGraph Renderer (Phase 3) - Renderer agnostic
     ../xrRender/r_FrameGraphRenderer.h
     ../xrRender/r_FrameGraphRenderer.cpp
+
+    # ImGui NVRHI Renderer - Backend agnostic
+    ../xrRender/dxImGuiRender.h
+    ../xrRender/dxImGuiRender.cpp
+    ../xrRender/ImGuiRendererNVRHI.h
+    ../xrRender/ImGuiRendererNVRHI.cpp
+    ../xrRender/ImGuiRendererNVRHI_Shaders.cpp
+    ../xrRender/ImGuiRendererNVRHI_Render.cpp
+    ../xrRender/ImGuiRendererIntegration.cpp
+    ../xrRender/dxRenderFactory_ImGui.cpp
+    ../xrRender/GlobalRenderDevice.cpp
 )
 
 target_include_directories(xrRenderPC_R4
@@ -95,6 +106,7 @@ target_compile_definitions(xrRenderPC_R4
     PRIVATE
     XRRENDER_R4_EXPORTS
     USE_DX11
+    USE_NVRHI_IMGUI
 )
 
 set_target_properties(xrRenderPC_R4 PROPERTIES
