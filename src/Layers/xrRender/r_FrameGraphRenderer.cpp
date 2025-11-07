@@ -123,27 +123,7 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->Execute();
 
-    {
-        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-        if (finalTexture)
-        {
-            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
-
-            nvrhi::FramebufferDesc fbDesc;
-            fbDesc.addColorAttachment(nvrhi::TextureHandle(finalTexture));
-            nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
-
-            if (framebuffer && cmdList)
-            {
-                cmdList->open();
-                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.2f, 0.4f, 1.0f));
-                cmdList->close();
-                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-
-                Msg("* [DEBUG] Cleared final output to blue");
-            }
-        }
-    }
+    Msg("* [FrameGraphRenderer] Presenting GBuffer albedo to backbuffer");
 
     RenderHUD();
 
@@ -274,15 +254,67 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
 
 void FrameGraphRenderer::BuildFrameGraphStructure() {
 
-    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets...");
+    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets (native NVRHI)...");
 
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    m_rt_Position = CreateRT("rt_Position", w, h, nvrhi::Format::RGBA16_FLOAT);
-    m_rt_Normal = CreateRT("rt_Normal", w, h, nvrhi::Format::RGBA16_FLOAT);
-    m_rt_Albedo = CreateRT("rt_Albedo", w, h, nvrhi::Format::RGBA8_UNORM);
-    m_rt_Depth = CreateRT("rt_Depth", w, h, nvrhi::Format::D24S8, true);
+    auto* resMgr = m_device->GetModernResourceManager();
+    VERIFY(resMgr);
+    auto* rtFactory = resMgr->GetRTFactory();
+    VERIFY(rtFactory);
+    auto* textureMgr = resMgr->GetTextureManager();
+    VERIFY(textureMgr);
+
+    m_native_Position = rtFactory->CreatePositionBuffer(w, h, "rt_Position");
+    m_native_Normal = rtFactory->CreateNormalBuffer(w, h, "rt_Normal");
+    m_native_Albedo = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_Albedo");
+    m_native_Depth = rtFactory->CreateDepthStencil(w, h, false, "rt_Depth");
+
+    nvrhi::ITexture* physicalPosition = textureMgr->GetNVRHITexture(m_native_Position);
+    nvrhi::ITexture* physicalNormal = textureMgr->GetNVRHITexture(m_native_Normal);
+    nvrhi::ITexture* physicalAlbedo = textureMgr->GetNVRHITexture(m_native_Albedo);
+    nvrhi::ITexture* physicalDepth = textureMgr->GetNVRHITexture(m_native_Depth);
+
+    VERIFY(physicalPosition && physicalNormal && physicalAlbedo && physicalDepth);
+
+    framegraph::ResourceDesc positionDesc;
+    positionDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    positionDesc.width = w;
+    positionDesc.height = h;
+    positionDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    positionDesc.isRenderTarget = true;
+    positionDesc.debugName = "rt_Position";
+    m_rt_Position = m_framegraph->ImportTexture("rt_Position", physicalPosition, positionDesc);
+
+    framegraph::ResourceDesc normalDesc;
+    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    normalDesc.width = w;
+    normalDesc.height = h;
+    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    normalDesc.isRenderTarget = true;
+    normalDesc.debugName = "rt_Normal";
+    m_rt_Normal = m_framegraph->ImportTexture("rt_Normal", physicalNormal, normalDesc);
+
+    framegraph::ResourceDesc albedoDesc;
+    albedoDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    albedoDesc.width = w;
+    albedoDesc.height = h;
+    albedoDesc.format = nvrhi::Format::RGBA8_UNORM;
+    albedoDesc.isRenderTarget = true;
+    albedoDesc.debugName = "rt_Albedo";
+    m_rt_Albedo = m_framegraph->ImportTexture("rt_Albedo", physicalAlbedo, albedoDesc);
+
+    framegraph::ResourceDesc depthDesc;
+    depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    depthDesc.width = w;
+    depthDesc.height = h;
+    depthDesc.format = nvrhi::Format::D24S8;
+    depthDesc.isDepthStencil = true;
+    depthDesc.debugName = "rt_Depth";
+    m_rt_Depth = m_framegraph->ImportTexture("rt_Depth", physicalDepth, depthDesc);
+
+    Msg("  ✓ Created 4 native G-Buffer RTs (Position, Normal, Albedo, Depth)");
 
     m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
 
@@ -292,7 +324,8 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);
 
-    Msg("  ✓ Created %d vanilla render targets", 8);
+    Msg("  ✓ Created remaining legacy RTs (Accumulator, Generic0/1/2, Backbuffer)");
+    Msg("  ✓ Total: 8 vanilla render targets (4 native, 4 legacy)");
 
     m_gbufferPass->Setup(*m_framegraph);
     auto gbufferOutputs = m_gbufferPass->GetOutputs();

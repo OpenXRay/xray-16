@@ -67,6 +67,15 @@ private:
 
     framegraph::VirtualResourceHandle m_finalOutput;
 
+    ng::TextureHandle m_native_Position;
+    ng::TextureHandle m_native_Normal;
+    ng::TextureHandle m_native_Albedo;
+    ng::TextureHandle m_native_Depth;
+    ng::TextureHandle m_native_Accumulator;
+    ng::TextureHandle m_native_Generic_0;
+    ng::TextureHandle m_native_Generic_1;
+    ng::TextureHandle m_native_Generic_2;
+
     framegraph::VirtualResourceHandle m_rt_Position;
     framegraph::VirtualResourceHandle m_rt_Normal;
     framegraph::VirtualResourceHandle m_rt_Albedo;
