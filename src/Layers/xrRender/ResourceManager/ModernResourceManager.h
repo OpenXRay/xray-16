@@ -3,9 +3,11 @@
 #include "TextureManager.h"
 #include "BufferManager.h"
 #include "SamplerCache.h"
+#include "NativeRTFactory.h"
 
 // Unified Modern Resource Manager
 // Week 2 - Day 4: Task 4.4
+// Updated: Phase 1 - Native Resource Management
 
 namespace xray::render::ng {
     class RenderDevice;  // Forward declaration
@@ -29,6 +31,7 @@ public:
     TextureManager* GetTextureManager() { return m_textureManager.get(); }
     BufferManager* GetBufferManager() { return m_bufferManager.get(); }
     SamplerCache* GetSamplerCache() { return m_samplerCache.get(); }
+    NativeRTFactory* GetRTFactory() { return m_rtFactory.get(); }  // NEW: Native RT creation
 
     // ═══════════════════════════════════════════════════
     //  FRAME MANAGEMENT
@@ -45,10 +48,11 @@ public:
     struct Statistics {
         TextureManager::Statistics textures;
         BufferManager::Statistics buffers;
+        NativeRTFactory::Statistics renderTargets;
         u32 samplersCached;
 
         u64 totalMemoryUsed() const {
-            return textures.totalMemoryUsed + buffers.totalMemoryUsed;
+            return textures.totalMemoryUsed + buffers.totalMemoryUsed + renderTargets.totalMemoryUsed;
         }
     };
 
@@ -61,6 +65,7 @@ private:
     xr_unique_ptr<TextureManager> m_textureManager;
     xr_unique_ptr<BufferManager> m_bufferManager;
     xr_unique_ptr<SamplerCache> m_samplerCache;
+    xr_unique_ptr<NativeRTFactory> m_rtFactory;
 };
 
 } // namespace xray::render::resources
