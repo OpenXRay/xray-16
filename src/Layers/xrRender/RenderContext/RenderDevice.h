@@ -312,6 +312,9 @@ private:
     // Created once during Init(), reused for all uploads, released in destructor
     nvrhi::CommandListHandle m_uploadCommandList;
 
+    // Thread safety for upload operations (textures loaded in parallel)
+    std::mutex m_uploadMutex;
+
     // Initialization state
     bool m_initialized = false;
 

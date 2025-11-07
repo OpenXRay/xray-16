@@ -309,6 +309,10 @@ void RenderDevice::UploadTextureData(
 
     // Use persistent upload command list (reused, not recreated)
     VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    // Lock for thread safety - textures are loaded in parallel
+    std::lock_guard<std::mutex> lock(m_uploadMutex);
+
     m_uploadCommandList->open();
 
     // Upload all slices
@@ -354,6 +358,9 @@ void RenderDevice::UploadTextureDataToNVRHI(
     VERIFY(data != nullptr);
     VERIFY(dataSize > 0);
     VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    // Lock for thread safety - textures are loaded in parallel
+    std::lock_guard<std::mutex> lock(m_uploadMutex);
 
     m_uploadCommandList->open();
 
