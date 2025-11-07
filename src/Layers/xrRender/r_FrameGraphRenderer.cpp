@@ -284,20 +284,25 @@ void FrameGraphRenderer::SetupFrame() {
     if (g_pGamePersistent && g_pGameLevel)
     {
         // Setup frustum (same as render_main)
-        CFrustum view_frustum;
-        view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+        // Safety check: Ensure spatial database is initialized
+        // SpatialSpace isn't ready during early level loading
+        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->SpatialSpace.IsEmpty())
+        {
+            CFrustum view_frustum;
+            view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-        // Query spatial DB with EXACT same parameters as render_main::calculate()
-        // See: src/Layers/xrRender_R2/r2_R_calculate.cpp lines 54-58
-        u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;  // Front-to-back ordering
-        u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;  // Both renderables AND lights
+            // Query spatial DB with EXACT same parameters as render_main::calculate()
+            // See: src/Layers/xrRender_R2/r2_R_calculate.cpp lines 54-58
+            u32 spatial_traverse_flags = ISpatial_DB::O_ORDERED;  // Front-to-back ordering
+            u32 spatial_types = STYPE_RENDERABLE | STYPE_LIGHTSOURCE;  // Both renderables AND lights
 
-        g_pGamePersistent->SpatialSpace.q_frustum(
-            m_lstRenderables,
-            spatial_traverse_flags,
-            spatial_types,
-            view_frustum
-        );
+            g_pGamePersistent->SpatialSpace.q_frustum(
+                m_lstRenderables,
+                spatial_traverse_flags,
+                spatial_types,
+                view_frustum
+            );
+        }
     }
 
     // Begin geometry collection
