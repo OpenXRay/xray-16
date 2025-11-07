@@ -74,6 +74,12 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
+    // Create menu rendering pass
+    passes::MenuUIPassConfig menuUIConfig;
+    menuUIConfig.width = Device.dwWidth;
+    menuUIConfig.height = Device.dwHeight;
+    m_menuUIPass = xr_make_unique<passes::MenuUIPass>(device, menuUIConfig);
+
     // Create geometry collector
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 
@@ -122,7 +128,10 @@ void FrameGraphRenderer::Shutdown() {
     m_geometryCollector.reset();
     m_tonemapPass.reset();
     m_lightingPass.reset();
+    m_particlePass.reset();
+    m_hudPass.reset();
     m_gbufferPass.reset();
+    m_menuUIPass.reset();
     m_shaderPhaseCache.reset();
     m_framegraph.reset();
 
@@ -230,23 +239,26 @@ void FrameGraphRenderer::RenderMenu() {
     Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 
     // ═══════════════════════════════════════════════════════
-    //  CLEAR FINAL OUTPUT (Dark background for menu)
+    //  EXECUTE MENU UI PASS (Phase 3: Render to rt_MenuMain)
     // ═══════════════════════════════════════════════════════
-    {
-        nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-        if (finalTexture)
-        {
-            nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
+    // MenuUIPass will:
+    // 1. Clear rt_MenuMain to black
+    // 2. (Phase 6) Render legacy UI dialogs via bridge
+    // 3. Output to rt_MenuMain
 
-            if (cmdList)
-            {
-                cmdList->open();
-                // Clear to dark grey (menu background)
-                cmdList->clearTextureFloat(finalTexture, nvrhi::AllSubresources, nvrhi::Color(0.1f, 0.1f, 0.1f, 1.0f));
-                cmdList->close();
-                m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-            }
-        }
+    // Set RenderContext for execution
+    m_framegraph->SetRenderContext(m_renderContext.get());
+
+    // Execute MenuUIPass
+    m_menuUIPass->Execute(*m_renderContext, *m_framegraph);
+
+    // For now, copy rt_MenuMain to final output (Phase 5 will composite instead)
+    nvrhi::ITexture* menuMainTexture = m_framegraph->GetPhysicalTexture(m_rt_MenuMain);
+    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
+
+    if (menuMainTexture && finalTexture) {
+        m_renderContext->CopyTexture(finalTexture, menuMainTexture);
+        Msg("  [RenderMenu] Copied rt_MenuMain to final output");
     }
 
     // ═══════════════════════════════════════════════════════
@@ -429,6 +441,36 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     Msg("  ✓ Created 4 native G-Buffer RTs (Position, Normal, Albedo, Depth)");
 
+    // ─── Menu Targets (native NVRHI for menu rendering pipeline) ───
+    m_native_MenuMain = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuMain");      // Main UI RT (RGBA8)
+    m_native_MenuDistort = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuDistort"); // Distortion mask RT (RGBA8)
+
+    nvrhi::ITexture* physicalMenuMain = textureMgr->GetNVRHITexture(m_native_MenuMain);
+    nvrhi::ITexture* physicalMenuDistort = textureMgr->GetNVRHITexture(m_native_MenuDistort);
+
+    VERIFY(physicalMenuMain && physicalMenuDistort);
+
+    // Import into FrameGraph as external resources
+    framegraph::ResourceDesc menuMainDesc;
+    menuMainDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    menuMainDesc.width = w;
+    menuMainDesc.height = h;
+    menuMainDesc.format = nvrhi::Format::RGBA8_UNORM;
+    menuMainDesc.isRenderTarget = true;
+    menuMainDesc.debugName = "rt_MenuMain";
+    m_rt_MenuMain = m_framegraph->ImportTexture("rt_MenuMain", physicalMenuMain, menuMainDesc);
+
+    framegraph::ResourceDesc menuDistortDesc;
+    menuDistortDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    menuDistortDesc.width = w;
+    menuDistortDesc.height = h;
+    menuDistortDesc.format = nvrhi::Format::RGBA8_UNORM;
+    menuDistortDesc.isRenderTarget = true;
+    menuDistortDesc.debugName = "rt_MenuDistort";
+    m_rt_MenuDistort = m_framegraph->ImportTexture("rt_MenuDistort", physicalMenuDistort, menuDistortDesc);
+
+    Msg("  ✓ Created 2 native Menu RTs (MenuMain, MenuDistort)");
+
     // ─── Lighting Targets (still using legacy CreateRT for now) ───
     m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
 
@@ -440,7 +482,7 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);     // TODO: Get from Device
 
     Msg("  ✓ Created remaining legacy RTs (Accumulator, Generic0/1/2, Backbuffer)");
-    Msg("  ✓ Total: 8 vanilla render targets (4 native, 4 legacy)");
+    Msg("  ✓ Total: 10 render targets (6 native: G-Buffer + Menu, 4 legacy)");
 
     // ═══════════════════════════════════════════════════════
     //  SETUP PASSES (ONCE) - PROTOTYPE FOR NOW
@@ -461,6 +503,11 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     // Particles share GBuffer outputs, render both world and HUD particles
     m_particlePass->SetOutputs(gbufferOutputs);
     m_particlePass->Setup(*m_framegraph);
+
+    // Setup Menu UI pass (renders legacy UI to rt_MenuMain)
+    // Uses rt_MenuMain as output, rt_Depth for depth testing
+    m_menuUIPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_menuUIPass->Setup(*m_framegraph);
 
     // ═══════════════════════════════════════════════════════
     //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
@@ -530,6 +577,22 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     registry.RegisterRT("rt_Generic_2", m_rt_Generic_2);
     registry.RegisterAliases(m_rt_Generic_2, {
         "s_generic2"
+    });
+
+    // ─── MENU TARGETS ───
+
+    // rt_MenuMain - Main menu UI rendering target
+    registry.RegisterRT("rt_MenuMain", m_rt_MenuMain);
+    registry.RegisterAliases(m_rt_MenuMain, {
+        "$user$menu_main",  // Shader output target name
+        "s_menu_main"       // Shader input sampler name
+    });
+
+    // rt_MenuDistort - Menu distortion/post-process mask
+    registry.RegisterRT("rt_MenuDistort", m_rt_MenuDistort);
+    registry.RegisterAliases(m_rt_MenuDistort, {
+        "$user$menu_distort",  // Shader output target name
+        "s_menu_distort"       // Shader input sampler name
     });
 
     // ─── BACKBUFFER ───

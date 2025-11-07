@@ -11,6 +11,7 @@
 #include "Layers/xrRender/FrameGraphPasses/ParticlePass.h"
 #include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
+#include "Layers/xrRender/FrameGraphPasses/MenuUIPass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 // Forward declarations
@@ -97,6 +98,10 @@ private:
     ng::TextureHandle m_native_Generic_1;
     ng::TextureHandle m_native_Generic_2;
 
+    // Menu-specific native RTs (for main menu rendering pipeline)
+    ng::TextureHandle m_native_MenuMain;      // Main UI RT (replaces rt_Generic_0 in menu)
+    ng::TextureHandle m_native_MenuDistort;   // Distortion mask RT (replaces rt_Generic_1 in menu)
+
     // FrameGraph virtual handles (imported from native RTs)
     framegraph::VirtualResourceHandle m_rt_Position;
     framegraph::VirtualResourceHandle m_rt_Normal;
@@ -108,12 +113,19 @@ private:
     framegraph::VirtualResourceHandle m_rt_Generic_2;
     framegraph::VirtualResourceHandle m_backbuffer;
 
+    // Menu-specific virtual handles
+    framegraph::VirtualResourceHandle m_rt_MenuMain;      // Main UI rendering
+    framegraph::VirtualResourceHandle m_rt_MenuDistort;   // Distortion mask
+
     // Passes
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::HUDPass> m_hudPass;
     xr_unique_ptr<passes::ParticlePass> m_particlePass;
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
+
+    // Menu rendering passes
+    xr_unique_ptr<passes::MenuUIPass> m_menuUIPass;
 
     // Geometry collector
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
