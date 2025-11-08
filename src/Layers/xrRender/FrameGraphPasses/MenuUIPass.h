@@ -5,6 +5,20 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
+// Forward declarations
+namespace xray::render {
+    class MaterialCache;
+}
+
+namespace xray::render::framegraph {
+    class VolatileConstantBufferPool;
+}
+
+namespace xray::render::ui {
+    class UIRenderCollector;
+    class NVRHIUIRenderer;
+}
+
 namespace xray::render::passes {
 
 // ══════════════════════════════════════════════════════════
@@ -62,6 +76,15 @@ private:
     // Output render targets
     framegraph::VirtualResourceHandle m_outputRT;      // rt_MenuMain
     framegraph::VirtualResourceHandle m_depthStencil;  // rt_Depth (reuse existing depth buffer)
+
+    // Material system (MenuUIPass owns its own MaterialCache + VCB pool)
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+
+    // NVRHI UI rendering backend
+    xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
+    xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;
+    bool m_nvrhiUIInitialized{false};
 };
 
 } // namespace xray::render::passes

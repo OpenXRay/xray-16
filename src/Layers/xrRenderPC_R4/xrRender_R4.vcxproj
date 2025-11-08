@@ -175,6 +175,7 @@
     <ClInclude Include="..\xrRender\Light_DB.h" />
     <ClInclude Include="..\xrRender\Light_Package.h" />
     <ClInclude Include="..\xrRender\ModelPool.h" />
+    <ClInclude Include="..\xrRender\NVRHIUIRenderer.h" />
     <ClInclude Include="..\xrRender\NvTriStrip.h" />
     <ClInclude Include="..\xrRender\NvTriStripObjects.h" />
     <ClInclude Include="..\xrRender\occRasterizer.h" />
@@ -226,6 +227,8 @@
     <ClInclude Include="..\xrRender\tss.h" />
     <ClInclude Include="..\xrRender\tss_def.h" />
     <ClInclude Include="..\xrRender\blenders\uber_deffer.h" />
+    <ClInclude Include="..\xrRender\UIGeometryBatch.h" />
+    <ClInclude Include="..\xrRender\UIRenderCollector.h" />
     <ClInclude Include="..\xrRender\Utils\dxHashHelper.h" />
     <ClInclude Include="..\xrRender\VertexCache.h" />
     <ClInclude Include="..\xrRender\WallmarksEngine.h" />
@@ -386,6 +389,7 @@
     <ClCompile Include="..\xrRender\Light_DB.cpp" />
     <ClCompile Include="..\xrRender\Light_Package.cpp" />
     <ClCompile Include="..\xrRender\ModelPool.cpp" />
+    <ClCompile Include="..\xrRender\NVRHIUIRenderer.cpp" />
     <ClCompile Include="..\xrRender\NvTriStrip.cpp" />
     <ClCompile Include="..\xrRender\NvTriStripObjects.cpp" />
     <ClCompile Include="..\xrRender\occRasterizer.cpp" />
@@ -439,6 +443,7 @@
     <ClCompile Include="..\xrRender\TextureDescrManager.cpp" />
     <ClCompile Include="..\xrRender\tss_def.cpp" />
     <ClCompile Include="..\xrRender\blenders\uber_deffer.cpp" />
+    <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
     <ClCompile Include="..\xrRender\Utils\dxHashHelper.cpp" />
     <ClCompile Include="..\xrRender\VertexCache.cpp" />
     <ClCompile Include="..\xrRender\WallmarksEngine.cpp" />

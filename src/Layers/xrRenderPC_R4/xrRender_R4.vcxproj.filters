@@ -792,6 +792,17 @@
     <ClInclude Include="..\xrRender\ResourceManager\ModernResourceManager.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuUIPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuDistortPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuCompositePass.h" />
+    <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h" />
+    <ClInclude Include="..\xrRender\ShaderKey.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPass.h" />
+    <ClInclude Include="..\xrRender\NVRHIUIRenderer.h" />
+    <ClInclude Include="..\xrRender\UIRenderCollector.h" />
+    <ClInclude Include="..\xrRender\UIGeometryBatch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1460,6 +1471,16 @@
     <ClCompile Include="..\xrRender\ResourceManager\ModernResourceManager.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuUIPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuDistortPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuCompositePass.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp" />
+    <ClCompile Include="..\xrRender\ShaderKey.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPass.cpp" />
+    <ClCompile Include="..\xrRender\NVRHIUIRenderer.cpp" />
+    <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

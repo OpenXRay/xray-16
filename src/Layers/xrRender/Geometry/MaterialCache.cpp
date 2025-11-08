@@ -377,6 +377,13 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
+        // CRITICAL: UI textures are lazy-loaded! Load them if not loaded yet.
+        // CTexture::get_SRView() will return NULL for unloaded textures
+        if (!tex->flags.bLoaded) {
+            Msg("  [MaterialCache::ExtractTextures] Texture '%s' not loaded, loading now...", tex->cName.c_str());
+            tex->Load();
+        }
+
         // Check texture wrapper cache first - avoid rewrapping the same texture!
         // Use texture NAME as key (not pointer) because CTexture objects may be recreated
         auto cacheIt = m_textureWrapperCache.find(tex->cName.c_str());
@@ -390,9 +397,10 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         }
 
         // Cache MISS - need to wrap this texture
-        // Get D3D11 shader resource view
+        // Get D3D11 shader resource view (should be valid after Load())
         ID3DShaderResourceView* srv = tex->get_SRView();
         if (!srv) {
+            Msg("! [MaterialCache::ExtractTextures] No SRV for texture '%s' even after Load()", tex->cName.c_str());
             continue;
         }
 
@@ -1415,6 +1423,214 @@ void MaterialCache::SetupRenderTargets(
     }
 
     psoDesc.depthStencilFormat = depthTex->getDesc().format;
+}
+
+// ══════════════════════════════════════════════════════════
+//  UI PSO CREATION (Simplified - no visual required)
+// ══════════════════════════════════════════════════════════
+
+MaterialPSO* MaterialCache::GetOrCreateUIPSO(
+    Shader* shader,
+    u32 elementIndex,
+    nvrhi::IFramebuffer* framebuffer)
+{
+    if (!shader || !framebuffer)
+        return nullptr;
+
+    // Extract shader element and pass
+    ShaderElement* elem = shader->E[elementIndex]._get();
+    if (!elem || elem->passes.empty())
+        return nullptr;
+
+    SPass* pass = elem->passes[0]._get();
+    if (!pass)
+        return nullptr;
+
+    // Create cache key (shader + element + framebuffer)
+    MaterialKey key;
+    key.isUIPSO = true;
+    key.shader = shader;
+    key.element = elementIndex;
+    key.framebuffer = framebuffer;
+
+    // Check cache
+    auto it = m_cache.find(key);
+    if (it != m_cache.end()) {
+        m_stats.numCacheHits++;
+        return it->second.get();
+    }
+
+    // Create new UI PSO
+    m_stats.numCacheMisses++;
+    m_stats.totalPSOCreations++;
+
+    MaterialPSO* pso = CreateUIPSO(shader, elem, pass, framebuffer);
+    if (!pso)
+        return nullptr;
+
+    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
+    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
+
+    return pso;
+}
+
+MaterialPSO* MaterialCache::CreateUIPSO(
+    Shader* shader,
+    ShaderElement* elem,
+    SPass* pass,
+    nvrhi::IFramebuffer* framebuffer)
+{
+    auto pso = xr_make_unique<MaterialPSO>();
+    pso->pass = pass;
+
+    // Extract textures and samplers
+    ExtractTextures(pass, pso.get());
+
+    // Extract shaders (THIS MUST COME FIRST - populates rtBindings!)
+    if (!ExtractShaders(pass, pso.get())) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to extract shaders");
+        return nullptr;
+    }
+
+    // ExtractSamplers MUST come after ExtractShaders (relies on rtBindings.samplers)
+    ExtractSamplers(pass, pso.get());
+
+    Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
+        pso->textures.size(), pso->samplers.size());
+
+    // Get RCShader wrappers
+    ng::RCShader* rcVS = m_device->GetShader(GetOrCreateShaderVS(pso->vertexShader));
+    ng::RCShader* rcPS = m_device->GetShader(GetOrCreateShaderPS(pso->pixelShader));
+
+    if (!rcVS || !rcPS) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to get RCShader objects");
+        return nullptr;
+    }
+
+    // Create binding layouts
+    CreateBindingLayouts(pso.get());
+
+    // Build pipeline state descriptor
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = rcVS;
+    psoDesc.pixelShader = rcPS;
+
+    // ═══════════════════════════════════════════════════════
+    //  BUILD VERTEX ATTRIBUTES FROM SHADER REFLECTION
+    // ═══════════════════════════════════════════════════════
+    // Use shader's input signature to determine correct order and formats
+    // UIVertex in-memory layout: float x,y,z,w (16 bytes), u32 color (4 bytes), float u,v (8 bytes)
+    // - POSITIONT: offset 0, RGBA32_FLOAT (float4 - 16 bytes) - shader expects float4!
+    // - COLOR: offset 16, RGBA8_UNORM (u32 - 4 bytes)
+    // - TEXCOORD: offset 20, RG32_FLOAT (float2 - 8 bytes)
+
+    if (pso->vsInputSignature.elements.empty()) {
+        Msg("! [MaterialCache::CreateUIPSO] No vertex input signature from shader reflection!");
+        return nullptr;
+    }
+
+    // Map semantic -> (format, offset) for UIVertex structure
+    struct VertexElement {
+        nvrhi::Format format;
+        u32 offset;
+    };
+
+    std::map<std::string, VertexElement> uiVertexLayout;
+    uiVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};   // float4 at offset 0 (16 bytes) - vanilla uses RGBA32!
+    uiVertexLayout["COLOR"]      = {nvrhi::Format::RGBA8_UNORM, 16};  // u32 at offset 16 (4 bytes)
+    uiVertexLayout["TEXCOORD"]   = {nvrhi::Format::RG32_FLOAT, 20};   // float2 at offset 20 (8 bytes)
+
+    // Build attributes in shader-expected order (WITHOUT stride first)
+    for (const auto& shaderElem : pso->vsInputSignature.elements) {
+        std::string semantic = shaderElem.semanticName.c_str();
+
+        auto it = uiVertexLayout.find(semantic);
+        if (it == uiVertexLayout.end()) {
+            Msg("! [MaterialCache::CreateUIPSO] Unknown UI vertex semantic: %s", semantic.c_str());
+            continue;
+        }
+
+        ng::VertexAttribute attr;
+        attr.semanticName = shaderElem.semanticName.c_str();
+        attr.semanticIndex = shaderElem.semanticIndex;
+        attr.format = it->second.format;
+        attr.offset = it->second.offset;
+        attr.bufferIndex = 0;
+        attr.elementStride = 0;  // Will be set below after calculating stride
+
+        psoDesc.vertexAttributes.push_back(attr);
+    }
+
+    // Calculate vertex stride from vertex attributes (CRITICAL for D3D11!)
+    // Stride = max(offset + size) for all attributes in buffer slot 0
+    u32 calculatedStride = 0;
+    for (const auto& attr : psoDesc.vertexAttributes) {
+        if (attr.bufferIndex == 0) {
+            const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(attr.format);
+            u32 formatSize = formatInfo.bytesPerBlock;
+            u32 endOffset = attr.offset + formatSize;
+            calculatedStride = std::max(calculatedStride, endOffset);
+        }
+    }
+
+    // Now set elementStride for ALL attributes
+    for (auto& attr : psoDesc.vertexAttributes) {
+        attr.elementStride = calculatedStride;
+    }
+
+    pso->vertexStride = calculatedStride;
+    Msg("  [MaterialCache::CreateUIPSO] Calculated vertex stride: %u bytes", pso->vertexStride);
+
+    // Log final attributes with stride
+    for (size_t i = 0; i < psoDesc.vertexAttributes.size(); ++i) {
+        const auto& attr = psoDesc.vertexAttributes[i];
+        Msg("  [MaterialCache::CreateUIPSO] Vertex attribute[%zu]: %s%d -> format=%d, offset=%u, stride=%u",
+            i, attr.semanticName, attr.semanticIndex, (int)attr.format, attr.offset, attr.elementStride);
+    }
+
+    // UI render state (no depth, alpha blending, no culling)
+    psoDesc.depthStencilState.depthTestEnable = false;
+    psoDesc.depthStencilState.depthWriteEnable = false;
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    psoDesc.blendState.renderTargets[0].blendEnable = true;
+    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::One;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
+
+    // Set render target formats from framebuffer
+    const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
+    for (u32 i = 0; i < fbDesc.colorAttachments.size() && i < 8; ++i) {
+        if (fbDesc.colorAttachments[i].texture) {
+            psoDesc.renderTargetFormats[i] = fbDesc.colorAttachments[i].texture->getDesc().format;
+        }
+    }
+    if (fbDesc.depthAttachment.texture) {
+        psoDesc.depthStencilFormat = fbDesc.depthAttachment.texture->getDesc().format;
+    }
+
+    psoDesc.debugName = "UI_PSO";
+
+    // Create pipeline state via cache
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        Msg("! [MaterialCache::CreateUIPSO] No PSO cache");
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to create pipeline state");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    return pso.release();
 }
 
 // ══════════════════════════════════════════════════════════
