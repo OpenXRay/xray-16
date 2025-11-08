@@ -2,6 +2,10 @@
 
 #include "Include/xrRender/UIShader.h"
 
+namespace xray::render::ui {
+    class UIRenderCollector;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class dxUIShader : public IUIShader
@@ -10,6 +14,7 @@ class dxUIShader : public IUIShader
     friend class dxDebugRender;
     friend class dxWallMarkArray;
     friend class CRender;
+    friend class xray::render::ui::UIRenderCollector;
 
 public:
     virtual void Copy(IUIShader& _in);

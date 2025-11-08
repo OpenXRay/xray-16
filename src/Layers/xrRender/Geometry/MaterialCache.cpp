@@ -256,6 +256,11 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
+        if (!tex->flags.bLoaded) {
+            Msg("  [MaterialCache::ExtractTextures] Texture '%s' not loaded, loading now...", tex->cName.c_str());
+            tex->Load();
+        }
+
         auto cacheIt = m_textureWrapperCache.find(tex->cName.c_str());
         if (cacheIt != m_textureWrapperCache.end()) {
             MaterialPSO::TextureSlot texSlot;
@@ -267,6 +272,7 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
         ID3DShaderResourceView* srv = tex->get_SRView();
         if (!srv) {
+            Msg("! [MaterialCache::ExtractTextures] No SRV for texture '%s' even after Load()", tex->cName.c_str());
             continue;
         }
 
@@ -1069,6 +1075,182 @@ void MaterialCache::SetupRenderTargets(
     }
 
     psoDesc.depthStencilFormat = depthTex->getDesc().format;
+}
+
+MaterialPSO* MaterialCache::GetOrCreateUIPSO(
+    Shader* shader,
+    u32 elementIndex,
+    nvrhi::IFramebuffer* framebuffer)
+{
+    if (!shader || !framebuffer)
+        return nullptr;
+
+    ShaderElement* elem = shader->E[elementIndex]._get();
+    if (!elem || elem->passes.empty())
+        return nullptr;
+
+    SPass* pass = elem->passes[0]._get();
+    if (!pass)
+        return nullptr;
+
+    MaterialKey key;
+    key.isUIPSO = true;
+    key.shader = shader;
+    key.element = elementIndex;
+    key.framebuffer = framebuffer;
+
+    auto it = m_cache.find(key);
+    if (it != m_cache.end()) {
+        m_stats.numCacheHits++;
+        return it->second.get();
+    }
+
+    m_stats.numCacheMisses++;
+    m_stats.totalPSOCreations++;
+
+    MaterialPSO* pso = CreateUIPSO(shader, elem, pass, framebuffer);
+    if (!pso)
+        return nullptr;
+
+    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
+    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
+
+    return pso;
+}
+
+MaterialPSO* MaterialCache::CreateUIPSO(
+    Shader* shader,
+    ShaderElement* elem,
+    SPass* pass,
+    nvrhi::IFramebuffer* framebuffer)
+{
+    auto pso = xr_make_unique<MaterialPSO>();
+    pso->pass = pass;
+
+    ExtractTextures(pass, pso.get());
+
+    if (!ExtractShaders(pass, pso.get())) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to extract shaders");
+        return nullptr;
+    }
+
+    ExtractSamplers(pass, pso.get());
+
+    Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
+        pso->textures.size(), pso->samplers.size());
+
+    ng::RCShader* rcVS = m_device->GetShader(GetOrCreateShaderVS(pso->vertexShader));
+    ng::RCShader* rcPS = m_device->GetShader(GetOrCreateShaderPS(pso->pixelShader));
+
+    if (!rcVS || !rcPS) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to get RCShader objects");
+        return nullptr;
+    }
+
+    CreateBindingLayouts(pso.get());
+
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = rcVS;
+    psoDesc.pixelShader = rcPS;
+
+    if (pso->vsInputSignature.elements.empty()) {
+        Msg("! [MaterialCache::CreateUIPSO] No vertex input signature from shader reflection!");
+        return nullptr;
+    }
+
+    struct VertexElement {
+        nvrhi::Format format;
+        u32 offset;
+    };
+
+    std::map<std::string, VertexElement> uiVertexLayout;
+    uiVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};
+    uiVertexLayout["COLOR"]      = {nvrhi::Format::RGBA8_UNORM, 16};
+    uiVertexLayout["TEXCOORD"]   = {nvrhi::Format::RG32_FLOAT, 20};
+
+    for (const auto& shaderElem : pso->vsInputSignature.elements) {
+        std::string semantic = shaderElem.semanticName.c_str();
+
+        auto it = uiVertexLayout.find(semantic);
+        if (it == uiVertexLayout.end()) {
+            Msg("! [MaterialCache::CreateUIPSO] Unknown UI vertex semantic: %s", semantic.c_str());
+            continue;
+        }
+
+        ng::VertexAttribute attr;
+        attr.semanticName = shaderElem.semanticName.c_str();
+        attr.semanticIndex = shaderElem.semanticIndex;
+        attr.format = it->second.format;
+        attr.offset = it->second.offset;
+        attr.bufferIndex = 0;
+        attr.elementStride = 0;
+
+        psoDesc.vertexAttributes.push_back(attr);
+    }
+
+    u32 calculatedStride = 0;
+    for (const auto& attr : psoDesc.vertexAttributes) {
+        if (attr.bufferIndex == 0) {
+            const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(attr.format);
+            u32 formatSize = formatInfo.bytesPerBlock;
+            u32 endOffset = attr.offset + formatSize;
+            calculatedStride = std::max(calculatedStride, endOffset);
+        }
+    }
+
+    for (auto& attr : psoDesc.vertexAttributes) {
+        attr.elementStride = calculatedStride;
+    }
+
+    pso->vertexStride = calculatedStride;
+    Msg("  [MaterialCache::CreateUIPSO] Calculated vertex stride: %u bytes", pso->vertexStride);
+
+    for (size_t i = 0; i < psoDesc.vertexAttributes.size(); ++i) {
+        const auto& attr = psoDesc.vertexAttributes[i];
+        Msg("  [MaterialCache::CreateUIPSO] Vertex attribute[%zu]: %s%d -> format=%d, offset=%u, stride=%u",
+            i, attr.semanticName, attr.semanticIndex, (int)attr.format, attr.offset, attr.elementStride);
+    }
+
+    psoDesc.depthStencilState.depthTestEnable = false;
+    psoDesc.depthStencilState.depthWriteEnable = false;
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    psoDesc.blendState.renderTargets[0].blendEnable = true;
+    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::One;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
+
+    const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
+    for (u32 i = 0; i < fbDesc.colorAttachments.size() && i < 8; ++i) {
+        if (fbDesc.colorAttachments[i].texture) {
+            psoDesc.renderTargetFormats[i] = fbDesc.colorAttachments[i].texture->getDesc().format;
+        }
+    }
+    if (fbDesc.depthAttachment.texture) {
+        psoDesc.depthStencilFormat = fbDesc.depthAttachment.texture->getDesc().format;
+    }
+
+    psoDesc.debugName = "UI_PSO";
+
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        Msg("! [MaterialCache::CreateUIPSO] No PSO cache");
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to create pipeline state");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    return pso.release();
 }
 
 void MaterialCache::Clear()

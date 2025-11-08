@@ -62,6 +62,13 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Geometry/GeometryBatch.h
     ../xrRender/Geometry/GeometryBatch.cpp
 
+    # UI Rendering System (NVRHI-based) - Renderer agnostic
+    ../xrRender/UIGeometryBatch.h
+    ../xrRender/UIRenderCollector.h
+    ../xrRender/UIRenderCollector.cpp
+    ../xrRender/NVRHIUIRenderer.h
+    ../xrRender/NVRHIUIRenderer.cpp
+
     # Debug Tools (Phase 3) - Renderer agnostic
     ../xrRender/Debug/GBufferVisualization.h
     ../xrRender/Debug/GBufferVisualization.cpp

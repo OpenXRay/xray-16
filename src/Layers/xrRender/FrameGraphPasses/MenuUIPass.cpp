@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "MenuUIPass.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "Layers/xrRender/UIRenderCollector.h"
+#include "Layers/xrRender/NVRHIUIRenderer.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 
 namespace xray::render::passes {
 
@@ -12,6 +16,14 @@ MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
     , m_depthStencil{}
 {
     VERIFY(m_device != nullptr);
+
+    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
+
+    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
+
+    m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
+    m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
+
     Msg("* [MenuUIPass] Created (resolution: %ux%u)", config.width, config.height);
 }
 
@@ -63,7 +75,40 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     cmdList->close();
     m_device->GetNVRHIDevice()->executeCommandList(cmdList);
 
-    Msg("  [MenuUIPass::Execute] Cleared rt_MenuMain to black (no legacy UI yet)");
+    if (g_pGamePersistent) {
+        Msg("  [MenuUIPass::Execute] Rendering UI via NVRHI");
+
+        if (!m_nvrhiUIInitialized) {
+            m_uiRenderer->Initialize(m_device, m_materialCache.get());
+            m_nvrhiUIInitialized = true;
+        }
+
+        IUIRender* oldRenderer = GEnv.UIRender;
+        m_uiCollector->Clear();
+        GEnv.UIRender = m_uiCollector.get();
+
+        g_pGamePersistent->OnRenderPPUI_main();
+
+        GEnv.UIRender = oldRenderer;
+
+        Msg("  [MenuUIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
+
+        if (!m_uiCollector->GetBatches().empty()) {
+            m_uiRenderer->RenderBatches(
+                cmdList,
+                m_uiCollector->GetBatches(),
+                framebuffer,
+                m_config.width,
+                m_config.height
+            );
+
+            Msg("  [MenuUIPass::Execute] NVRHI UI rendering complete");
+        } else {
+            Msg("  [MenuUIPass::Execute] No UI geometry collected");
+        }
+    } else {
+        Msg("  [MenuUIPass::Execute] No GamePersistent - clearing to black only");
+    }
 
     auto executeEnd = std::chrono::high_resolution_clock::now();
     m_menuStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();

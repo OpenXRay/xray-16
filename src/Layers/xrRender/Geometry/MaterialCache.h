@@ -41,10 +41,17 @@ struct MaterialKey {
     u64 textureHash;
     u64 stateHash;
 
+    u32 element;
+    nvrhi::IFramebuffer* framebuffer;
+    bool isUIPSO;
+
     MaterialKey()
         : shader(nullptr)
         , textureHash(0)
         , stateHash(0)
+        , element(0)
+        , framebuffer(nullptr)
+        , isUIPSO(false)
     {
     }
 
@@ -52,18 +59,30 @@ struct MaterialKey {
         : shader(s)
         , textureHash(texHash)
         , stateHash(stHash)
+        , element(0)
+        , framebuffer(nullptr)
+        , isUIPSO(false)
     {
     }
 
     bool operator<(const MaterialKey& other) const {
+        if (isUIPSO != other.isUIPSO) return isUIPSO < other.isUIPSO;
         if (shader != other.shader) return shader < other.shader;
+        if (isUIPSO) {
+            if (element != other.element) return element < other.element;
+            return framebuffer < other.framebuffer;
+        }
         if (textureHash != other.textureHash) return textureHash < other.textureHash;
         return stateHash < other.stateHash;
     }
 
     bool operator==(const MaterialKey& other) const {
-        return shader == other.shader &&
-               textureHash == other.textureHash &&
+        if (isUIPSO != other.isUIPSO) return false;
+        if (shader != other.shader) return false;
+        if (isUIPSO) {
+            return element == other.element && framebuffer == other.framebuffer;
+        }
+        return textureHash == other.textureHash &&
                stateHash == other.stateHash;
     }
 };
@@ -182,6 +201,11 @@ public:
         const framegraph::DefaultOutputLayout& outputs,
         const framegraph::FrameGraph& fg);
 
+    MaterialPSO* GetOrCreateUIPSO(
+        Shader* shader,
+        u32 elementIndex,
+        nvrhi::IFramebuffer* framebuffer);
+
     void Clear();
 
     struct Stats {
@@ -212,6 +236,12 @@ private:
         SPass* pass,
         const framegraph::DefaultOutputLayout& outputs,
         const framegraph::FrameGraph& fg);
+
+    MaterialPSO* CreateUIPSO(
+        Shader* shader,
+        ShaderElement* elem,
+        SPass* pass,
+        nvrhi::IFramebuffer* framebuffer);
 
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
 

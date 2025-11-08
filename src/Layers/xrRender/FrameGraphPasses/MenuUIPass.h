@@ -4,6 +4,19 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
+namespace xray::render {
+    class MaterialCache;
+}
+
+namespace xray::render::framegraph {
+    class VolatileConstantBufferPool;
+}
+
+namespace xray::render::ui {
+    class UIRenderCollector;
+    class NVRHIUIRenderer;
+}
+
 namespace xray::render::passes {
 
 struct MenuUIPassConfig {
@@ -43,6 +56,13 @@ private:
 
     framegraph::VirtualResourceHandle m_outputRT;
     framegraph::VirtualResourceHandle m_depthStencil;
+
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+
+    xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
+    xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;
+    bool m_nvrhiUIInitialized{false};
 };
 
 }
