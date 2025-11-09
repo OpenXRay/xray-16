@@ -90,7 +90,7 @@ private:
     // ═══════════════════════════════════════════════════
     // Created once via NativeRTFactory, imported into FrameGraph
 
-    // Native handles (owned by ModernResourceManager)
+    // Native handles (owned by FGResourceManager)
     ng::TextureHandle m_native_Position;
     ng::TextureHandle m_native_Normal;
     ng::TextureHandle m_native_Albedo;

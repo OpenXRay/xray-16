@@ -1,6 +1,8 @@
 // xrRender/Geometry/MaterialCache.cpp
 #include "stdafx.h"
 #include "MaterialCache.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
@@ -60,11 +62,16 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
 //  CONSTRUCTOR / DESTRUCTOR
 // ══════════════════════════════════════════════════════════
 
-MaterialCache::MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool)
+MaterialCache::MaterialCache(
+    ng::RenderDevice* device,
+    resources::FGResourceManager* resourceManager,
+    framegraph::VolatileConstantBufferPool* vcbPool)
     : m_device(device)
+    , m_resourceManager(resourceManager)
     , m_vcbPool(vcbPool)
 {
     VERIFY(m_device);
+    VERIFY(m_resourceManager);
     // VCB pool is optional - can be null for legacy code
 }
 
@@ -366,6 +373,15 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         return;
     }
 
+    // Get TextureManager from FGResourceManager
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+    VERIFY(texManager);
+
+    // ═══════════════════════════════════════════════════
+    //  LOAD TEXTURES NATIVELY VIA TEXTUREMANAGER
+    //  No more D3D11 wrapping! Direct native NVRHI textures!
+    // ═══════════════════════════════════════════════════
+
     // STextureList is a vector of (stage, ref_texture) pairs
     for (size_t i = 0; i < texList->size(); i++) {
         const auto& texPair = (*texList)[i];
@@ -377,18 +393,16 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        // CRITICAL: UI textures are lazy-loaded! Load them if not loaded yet.
-        // CTexture::get_SRView() will return NULL for unloaded textures
-        if (!tex->flags.bLoaded) {
-            Msg("  [MaterialCache::ExtractTextures] Texture '%s' not loaded, loading now...", tex->cName.c_str());
-            tex->Load();
-        }
+        // Get texture name (e.g., "act\\act_glow")
+        const char* textureName = tex->cName.c_str();
 
-        // Check texture wrapper cache first - avoid rewrapping the same texture!
-        // Use texture NAME as key (not pointer) because CTexture objects may be recreated
-        auto cacheIt = m_textureWrapperCache.find(tex->cName.c_str());
-        if (cacheIt != m_textureWrapperCache.end()) {
-            // Cache HIT - reuse existing wrapper
+        // ───────────────────────────────────────────────────
+        //  CHECK CACHE FIRST
+        // ───────────────────────────────────────────────────
+
+        auto cacheIt = m_textureHandleCache.find(textureName);
+        if (cacheIt != m_textureHandleCache.end()) {
+            // Cache HIT - reuse existing handle
             MaterialPSO::TextureSlot texSlot;
             texSlot.slot = stage;
             texSlot.handle = cacheIt->second;
@@ -396,84 +410,34 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        // Cache MISS - need to wrap this texture
-        // Get D3D11 shader resource view (should be valid after Load())
-        ID3DShaderResourceView* srv = tex->get_SRView();
-        if (!srv) {
-            Msg("! [MaterialCache::ExtractTextures] No SRV for texture '%s' even after Load()", tex->cName.c_str());
+        // ───────────────────────────────────────────────────
+        //  CACHE MISS - LOAD VIA TEXTUREMANAGER
+        // ───────────────────────────────────────────────────
+
+        // Load through TextureManager (native NVRHI, with streaming & memory management!)
+        resources::TextureHandle resourceHandle = texManager->LoadTexture(
+            textureName,
+            resources::TexturePriority::High  // UI/material textures are high priority
+        );
+
+        if (!resourceHandle.IsValid()) {
+            Msg("! [MaterialCache] Failed to load texture: %s", textureName);
             continue;
         }
 
-        // Debug: Check SRV format vs resource format
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        srv->GetDesc(&srvDesc);
+        // ───────────────────────────────────────────────────
+        //  CACHE THE HANDLE FOR REUSE
+        // ───────────────────────────────────────────────────
 
-        // Get underlying D3D11 resource
-        ID3D11Resource* d3dResource = nullptr;
-        srv->GetResource(&d3dResource);
-        if (!d3dResource) {
-            continue;
-        }
+        m_textureHandleCache[textureName] = resourceHandle;
 
-        // Query texture properties from D3D11
-        ID3D11Texture2D* d3dTex2D = nullptr;
-        HRESULT hr = d3dResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&d3dTex2D);
-
-        if (FAILED(hr) || !d3dTex2D) {
-            d3dResource->Release();
-            continue;
-        }
-
-        D3D11_TEXTURE2D_DESC d3dDesc;
-        d3dTex2D->GetDesc(&d3dDesc);
-        d3dTex2D->Release();
-
-        // Debug: Check if texture has BIND_SHADER_RESOURCE flag
-        bool hasBindSRV = (d3dDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0;
-        if (!hasBindSRV) {
-        }
-
-        // Build TextureDesc - use resource format and let NVRHI handle SRV creation
-        ng::RenderDevice::TextureDesc texDesc;
-        texDesc.width = d3dDesc.Width;
-        texDesc.height = d3dDesc.Height;
-        texDesc.mipLevels = d3dDesc.MipLevels;
-        texDesc.arraySize = d3dDesc.ArraySize;
-
-        // Detect texture dimension (2D vs Cube vs Array)
-        if (d3dDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
-            texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
-        }
-        else if (d3dDesc.ArraySize > 1) {
-            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
-        }
-        else {
-            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
-        }
-
-        // Convert DXGI format to NVRHI format using proper lookup
-        // DO NOT use static_cast - the enum values are completely different!
-        texDesc.format = ConvertDxgiFormatToNvrhi(d3dDesc.Format);
-        texDesc.isRenderTarget = false;
-        texDesc.isUAV = false;
-        texDesc.debugName = tex->cName.c_str();
-
-        // Wrap in NVRHI handle using device abstraction
-        ng::TextureHandle nvrhiTex = m_device->CreateTextureFromD3D11(d3dResource, texDesc);
-        d3dResource->Release();  // Release our ref, NVRHI holds its own
-
-        if (!nvrhiTex.IsValid()) {
-            continue;
-        }
-
-
-        // Add to cache so we never wrap this texture again!
-        // Use texture NAME as key (not pointer)
-        m_textureWrapperCache[tex->cName.c_str()] = nvrhiTex;
+        // ───────────────────────────────────────────────────
+        //  ADD TO MATERIAL PSO
+        // ───────────────────────────────────────────────────
 
         MaterialPSO::TextureSlot texSlot;
         texSlot.slot = stage;
-        texSlot.handle = nvrhiTex;
+        texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
     }
 }
@@ -922,8 +886,10 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
     // Add textures to PS binding set (textures are only in pixel shader)
     // IMPORTANT: Must add binding items for ALL slots declared in layout, even if NULL!
+    // Now using TextureManager to get native NVRHI textures (no more D3D11 wrapping!)
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     for (const auto& texSlot : matPSO->textures) {
-        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(texSlot.handle);
+        nvrhi::ITexture* nativeTex = texManager->GetNVRHITexture(texSlot.handle);
 
         if (nativeTex) {
             // Get texture descriptor for logging
@@ -1640,7 +1606,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 void MaterialCache::Clear()
 {
     m_cache.clear();
-    m_textureWrapperCache.clear();
+    m_textureHandleCache.clear();  // Updated: uses resource handles now
     m_detailScaleCache.clear();
     m_shaderHandles.clear();  // Clear shader handle cache
     m_stats = Stats{};

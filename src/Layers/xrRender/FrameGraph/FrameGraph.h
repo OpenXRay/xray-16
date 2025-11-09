@@ -7,7 +7,7 @@
 #include "RenderTargetRegistry.h"
 #include "FGResourcePool.h"
 #include "../RenderContext/RenderContext.h"
-#include "../ResourceManager/ModernResourceManager.h"
+#include "../ResourceManager/FGResourceManager.h"
 
 namespace xray::render::framegraph {
 
@@ -156,7 +156,7 @@ private:
     ng::RenderDevice* m_renderDevice;
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
-    resources::ModernResourceManager* m_resourceManager;
+    resources::FGResourceManager* m_resourceManager;
     xr_unique_ptr<FGResourcePool> m_resourcePool;
 
     // Render target registry

@@ -140,6 +140,8 @@ struct DDSMipLevel {
     u32 width;           // Mip width
     u32 height;          // Mip height
     u32 depth;           // Mip depth (for 3D textures)
+    u32 rowPitch;        // Bytes per row (for GPU upload)
+    u32 slicePitch;      // Bytes per slice (for 3D textures / GPU upload)
 };
 
 struct DDSData {
@@ -187,6 +189,15 @@ public:
         size_t dataSize,
         DDSData& outData,
         const char* debugName = nullptr
+    );
+
+    // Load specific mip range (optimization for streaming)
+    // Loads only the specified mip levels instead of the entire file
+    static bool LoadMipRange(
+        const char* filePath,
+        u32 startMip,
+        u32 mipCount,
+        DDSData& outData
     );
 
     // ═══════════════════════════════════════════════════

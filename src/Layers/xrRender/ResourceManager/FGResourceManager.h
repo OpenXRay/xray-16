@@ -5,9 +5,9 @@
 #include "SamplerCache.h"
 #include "NativeRTFactory.h"
 
-// Unified Modern Resource Manager
-// Week 2 - Day 4: Task 4.4
-// Updated: Phase 1 - Native Resource Management
+// FrameGraph Resource Manager
+// Manages all resources (textures, buffers, samplers) for the FrameGraph renderer
+// Provides streaming, memory management, and LRU eviction
 
 namespace xray::render::ng {
     class RenderDevice;  // Forward declaration
@@ -16,13 +16,13 @@ namespace xray::render::ng {
 namespace xray::render::resources {
 
 // ═══════════════════════════════════════════════════
-//  UNIFIED RESOURCE MANAGER
+//  FRAMEGRAPH RESOURCE MANAGER
 // ═══════════════════════════════════════════════════
 
-class ModernResourceManager {
+class FGResourceManager {
 public:
-    explicit ModernResourceManager(xray::render::ng::RenderDevice* device);
-    ~ModernResourceManager();
+    explicit FGResourceManager(xray::render::ng::RenderDevice* device);
+    ~FGResourceManager();
 
     // ═══════════════════════════════════════════════════
     //  SUB-MANAGERS

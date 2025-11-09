@@ -12,7 +12,7 @@ namespace xray::render::framegraph {
 FrameGraph::FrameGraph(ng::RenderDevice* renderDevice)
     : m_renderDevice(renderDevice)
     , m_device(renderDevice->GetNVRHIDevice())
-    , m_resourceManager(renderDevice->GetModernResourceManager())
+    , m_resourceManager(renderDevice->GetFGResourceManager())
 {
     VERIFY(renderDevice != nullptr);
     VERIFY(m_device != nullptr);

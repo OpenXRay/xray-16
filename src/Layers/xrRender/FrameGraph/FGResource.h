@@ -96,7 +96,7 @@ struct ResourceNode {
     u32 lastUsedPass = INVALID_INDEX;   // Last pass that accesses this
     u32 refCount = 0;                   // Number of passes using this
 
-    // ModernResourceManager handles (Week 4 integration)
+    // FGResourceManager handles (Week 4 integration)
     xray::render::resources::TextureHandle resourceTexture;
     xray::render::resources::BufferHandle resourceBuffer;
 

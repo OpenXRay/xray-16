@@ -29,7 +29,7 @@
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/FrameGraph/FGTest.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
-#include "Layers/xrRender/ResourceManager/ModernResourceManager.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #ifdef DEBUG
 #include "Layers/xrRender/ResourceManager/TestTextureManager.h"
@@ -789,7 +789,7 @@ public:
         using namespace xray::render::resources;
 
         nvrhi::IDevice* device = render.m_nvrhiDevice->GetDevice();
-        ModernResourceManager* resourceManager = render.m_renderDevice->GetModernResourceManager();
+        FGResourceManager* resourceManager = render.m_renderDevice->GetFGResourceManager();
         RenderContext* context = render.m_framegraphRenderer->GetRenderContext();
 
         if (!context)

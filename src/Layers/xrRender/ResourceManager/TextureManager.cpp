@@ -391,15 +391,21 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
 
     TextureMetadata& meta = m_textures[handle.index];
 
-    // Touch for LRU
-    meta.lastAccessTime = 0.0f;  // TODO: Use actual time in Week 2
+    // ═══════════════════════════════════════════════════
+    //  AUTO-TOUCH FOR LRU
+    // ═══════════════════════════════════════════════════
+
+    meta.lastAccessTime = 0.0f;  // Reset LRU timer
     meta.accessCount++;
 
-    // TODO: If unloaded, trigger load (Day 2)
-    if (meta.state == TextureState::Unloaded) {
-        Msg("! [TextureManager] ⚠️ Accessing unloaded texture: %s",
+    // ═══════════════════════════════════════════════════
+    //  AUTO-RELOAD IF EVICTED
+    // ═══════════════════════════════════════════════════
+
+    if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
+        Msg("! [TextureManager] ⚠️ Accessing evicted texture: %s - reloading...",
             meta.filePath.c_str());
-        // LoadTextureSync(handle);  // Will implement in Day 2
+        LoadTextureSync(handle);
     }
 
     return meta.nvrhiTexture.Get();
@@ -677,6 +683,22 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         return;
     }
 
+    // ═══════════════════════════════════════════════════
+    //  CHECK MEMORY BUDGET BEFORE ALLOCATING TEXTURE
+    // ═══════════════════════════════════════════════════
+
+    u64 requiredMemory = ddsData.totalDataSize;
+
+    if (!EnforceMemoryBudget(requiredMemory)) {
+        Msg("! [TextureManager] ❌ Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
+            meta.filePath.c_str(),
+            requiredMemory / (1024 * 1024),
+            m_memoryUsed / (1024 * 1024),
+            m_memoryBudget / (1024 * 1024));
+        meta.state = TextureState::Unloaded;
+        return;
+    }
+
     // Create NVRHI texture (without initial data)
     ng::RenderDevice::TextureDesc deviceDesc;
     deviceDesc.width = ddsData.desc.width;
@@ -727,6 +749,8 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         slice.mipLevel = mipIndex % totalMips;
         slice.data = mip.data;
         slice.dataSize = mip.size;
+        slice.rowPitch = mip.rowPitch;      // Use pitch calculated by DDSLoader
+        slice.slicePitch = mip.slicePitch;  // Use pitch calculated by DDSLoader
 
         slices.push_back(slice);
     }

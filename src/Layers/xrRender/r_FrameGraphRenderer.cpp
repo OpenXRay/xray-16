@@ -385,8 +385,8 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    // Get NativeRTFactory from ModernResourceManager
-    auto* resMgr = m_device->GetModernResourceManager();
+    // Get NativeRTFactory from FGResourceManager
+    auto* resMgr = m_device->GetFGResourceManager();
     VERIFY(resMgr);
     auto* rtFactory = resMgr->GetRTFactory();
     VERIFY(rtFactory);

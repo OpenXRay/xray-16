@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/ResourceManager/ResourceHandle.h"  // For TextureHandle definition
 
 // Forward declarations - must be in RENDER_NAMESPACE
 // Note: RENDER_NAMESPACE is defined as render_r4 in preprocessor
@@ -13,7 +14,13 @@ namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
     struct SVS;
     struct SPS;
-    class CTexture;  // For texture wrapper cache
+    class CTexture;  // Legacy - will be replaced by FGResourceManager
+}
+
+// Forward declare FGResourceManager
+namespace xray::render::resources {
+    class FGResourceManager;
+    class TextureManager;
 }
 
 namespace xray::render::framegraph {
@@ -118,8 +125,8 @@ struct MaterialPSO {
 
     // Extracted data for quick access
     struct TextureSlot {
-        u32 slot;                    // Binding slot (t0, t1, t2, etc.)
-        ng::TextureHandle handle;     // Wrapped texture
+        u32 slot;                          // Binding slot (t0, t1, t2, etc.)
+        resources::TextureHandle handle;   // Native resource handle (from FGResourceManager)
     };
     xr_vector<TextureSlot> textures;  // Textures with their binding slots
     u32 vertexStride = 0;
@@ -242,7 +249,11 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
 
 class MaterialCache {
 public:
-    MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool = nullptr);
+    MaterialCache(
+        ng::RenderDevice* device,
+        resources::FGResourceManager* resourceManager,
+        framegraph::VolatileConstantBufferPool* vcbPool = nullptr
+    );
     ~MaterialCache();
 
     // Get or create PSO for a visual (geometry passes with DefaultOutputLayout)
@@ -275,15 +286,14 @@ public:
 
 private:
     ng::RenderDevice* m_device;
+    resources::FGResourceManager* m_resourceManager;  // NEW: Direct access to resource management
     framegraph::VolatileConstantBufferPool* m_vcbPool;  // VCB pool for dynamic CB management
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
     Stats m_stats;
 
-    // Texture wrapper cache: Maps texture NAME to NVRHI TextureHandle
-    // Prevents wrapping the same texture multiple times (massive leak!)
-    // We use texture name (string) instead of CTexture* because X-Ray may recreate
-    // CTexture objects at different addresses for the same logical texture
-    xr_map<xr_string, ng::TextureHandle> m_textureWrapperCache;
+    // Texture handle cache: Maps texture NAME to resources::TextureHandle
+    // Uses FGResourceManager's TextureManager for native NVRHI textures (no wrapping!)
+    xr_map<xr_string, resources::TextureHandle> m_textureHandleCache;
 
     // Detail scale cache: Maps texture name -> detail scale value (from .thm metadata)
     // Mirrors TextureDescrManager's m_detail_scalers for clean access

@@ -193,7 +193,7 @@
     <ClInclude Include="..\xrRender\ResourceManager\AsyncIO.h" />
     <ClInclude Include="..\xrRender\ResourceManager\BufferManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\SamplerCache.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\ModernResourceManager.h" />
+    <ClInclude Include="..\xrRender\ResourceManager\FGResourceManager.h" />
     <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h" />
     <ClInclude Include="..\xrRender\R_Backend.h" />
     <ClInclude Include="..\xrRender\R_Backend_hemi.h" />
@@ -406,7 +406,7 @@
     <ClCompile Include="..\xrRender\ResourceManager\AsyncIO.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\BufferManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\SamplerCache.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\ModernResourceManager.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager\FGResourceManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Loader.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Reset.cpp" />

@@ -6,7 +6,7 @@
 // Week 6: FrameGraph texture loading integration
 #include "Layers/xrRender/xrRender_console.h"                    // ps_r4_use_framegraph
 #include "Layers/xrRender/RenderContext/RenderDevice.h"          // RenderDevice
-#include "Layers/xrRender/ResourceManager/ModernResourceManager.h" // ModernResourceManager
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"   // FGResourceManager (renamed from ModernResourceManager)
 #include "Layers/xrRender/ResourceManager/TextureManager.h"      // TextureManager
 #include <nvrhi/nvrhi.h>                                         // getNativeObject
 
@@ -111,7 +111,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     // ═══════════════════════════════════════════════════
     //  WEEK 6: FRAMEGRAPH MODE - ROUTE THROUGH TEXTUREMANAGER
     // ═══════════════════════════════════════════════════
-    if (ps_r4_use_framegraph && m_renderDevice && m_renderDevice->GetModernResourceManager())
+    if (ps_r4_use_framegraph && m_renderDevice && m_renderDevice->GetFGResourceManager())
     {
         using namespace xray::render::ng;
         using namespace xray::render::resources;
@@ -127,8 +127,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
         Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
 
-        // Load through ModernResourceManager
-        ModernResourceManager* resourceMgr = m_renderDevice->GetModernResourceManager();
+        // Load through FGResourceManager
+        FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
         TextureManager* texManager = resourceMgr->GetTextureManager();
 
         // Load texture and get handle

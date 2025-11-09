@@ -22,7 +22,11 @@ MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
     m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
 
     // Create material cache (MenuUIPass owns its own MaterialCache with VCB pool)
-    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),  // Pass FGResourceManager for native texture loading
+        m_vcbPool.get()
+    );
 
     // Create UI rendering infrastructure
     m_uiCollector = xr_make_unique<ui::UIRenderCollector>();

@@ -307,21 +307,8 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
         const DDSMipLevel& mipData = ddsData.mipLevels[mip];
 
-        // Calculate row pitch for this mip level
-        const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(meta->desc.format);
-        u32 mipWidth = (meta->desc.width >> mip) > 0 ? (meta->desc.width >> mip) : 1;
-
-        u32 rowPitch;
-        if (formatInfo.blockSize > 1) {
-            // Block-compressed format (4x4 blocks)
-            rowPitch = ((mipWidth + 3) / 4) * formatInfo.bytesPerBlock;
-        } else {
-            // Uncompressed format
-            rowPitch = mipWidth * formatInfo.bytesPerBlock;
-        }
-
-        // Write texture data
-        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, rowPitch);
+        // Use pitch values calculated by DDSLoader (DRY principle)
+        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch);
     }
 
     cmdList->close();

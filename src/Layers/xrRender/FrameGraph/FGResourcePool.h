@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ResourceManager/ModernResourceManager.h"
+#include "../ResourceManager/FGResourceManager.h"
 
 // FrameGraph Resource Pool
 // Week 4: FrameGraph Integration with ResourceManager
@@ -14,7 +14,7 @@ namespace xray::render::framegraph {
 
 class FGResourcePool {
 public:
-    FGResourcePool(resources::ModernResourceManager* resourceManager);
+    FGResourcePool(resources::FGResourceManager* resourceManager);
     ~FGResourcePool();
 
     // ═══════════════════════════════════════════════════
@@ -65,7 +65,7 @@ public:
     void PrintStatistics() const;
 
 private:
-    resources::ModernResourceManager* m_resourceManager;
+    resources::FGResourceManager* m_resourceManager;
 
     // ═══════════════════════════════════════════════════
     //  TEXTURE POOL (For Aliasing)

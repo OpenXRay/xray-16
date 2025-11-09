@@ -6,7 +6,7 @@
 
 namespace xray::render::framegraph {
 
-FGResourcePool::FGResourcePool(resources::ModernResourceManager* resourceManager)
+FGResourcePool::FGResourcePool(resources::FGResourceManager* resourceManager)
     : m_resourceManager(resourceManager)
 {
     VERIFY(m_resourceManager);

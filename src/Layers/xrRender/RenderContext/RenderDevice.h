@@ -4,9 +4,9 @@
 #include "PipelineState.h"
 #include <nvrhi/nvrhi.h>
 
-// Forward declare ModernResourceManager (outside ng namespace!)
+// Forward declare FGResourceManager (outside ng namespace!)
 namespace xray::render::resources {
-    class ModernResourceManager;
+    class FGResourceManager;
 }
 
 namespace xray::render::ng {
@@ -114,6 +114,8 @@ public:
         u32 mipLevel;
         const void* data;
         size_t dataSize;
+        u32 rowPitch;      // Bytes per row (calculated by DDSLoader)
+        u32 slicePitch;    // Bytes per slice (calculated by DDSLoader)
     };
 
     void UploadTextureData(
@@ -267,7 +269,7 @@ public:
     //  RESOURCE MANAGER ACCESS
     // ═══════════════════════════════════════════════════
 
-    xray::render::resources::ModernResourceManager* GetModernResourceManager() { return m_modernResourceManager.get(); }
+    xray::render::resources::FGResourceManager* GetFGResourceManager() { return m_modernResourceManager.get(); }
 
     // ═══════════════════════════════════════════════════
     //  DEVICE ACCESS (for low-level code)
@@ -306,7 +308,7 @@ private:
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
 
     // Modern resource manager (Week 2-3)
-    xr_unique_ptr<xray::render::resources::ModernResourceManager> m_modernResourceManager;
+    xr_unique_ptr<xray::render::resources::FGResourceManager> m_modernResourceManager;
 
     // Persistent command list for upload operations (texture/buffer uploads)
     // Created once during Init(), reused for all uploads, released in destructor

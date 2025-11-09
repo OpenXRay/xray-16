@@ -36,8 +36,12 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
     // Create VCB pool for dynamic constant buffer management
     m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
 
-    // Create material cache (with VCB pool for dynamic CB sizing)
-    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
+    // Create material cache (with FGResourceManager for native texture loading + VCB pool)
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),  // Pass FGResourceManager for native texture loading
+        m_vcbPool.get()
+    );
 
     // Load shaders (legacy - will be removed once MaterialCache is fully integrated)
     if (!LoadShaders())
