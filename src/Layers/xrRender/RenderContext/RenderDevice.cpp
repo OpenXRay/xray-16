@@ -104,12 +104,14 @@ TextureHandle RenderDevice::CreateTexture(
     }
 
     if (initialData) {
-        nvrhi::ICommandList* cmdList = m_nvrhiDevice->GetCommandList();
-        cmdList->open();
-        cmdList->writeTexture(nvrhiTexture, 0, 0, initialData,
-                              nvrhiDesc.width * nvrhi::getFormatInfo(nvrhiDesc.format).bytesPerBlock);
-        cmdList->close();
-        m_nvrhiDevice->ExecuteCommandList(cmdList);
+        const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(nvrhiDesc.format);
+        size_t rowPitch = nvrhiDesc.width * formatInfo.bytesPerBlock;
+        size_t depthPitch = rowPitch * nvrhiDesc.height;
+
+        m_uploadCommandList->open();
+        m_uploadCommandList->writeTexture(nvrhiTexture, 0, 0, initialData, rowPitch, depthPitch);
+        m_uploadCommandList->close();
+        GetNativeDevice()->executeCommandList(m_uploadCommandList);
     }
 
     TextureHandle handle = AllocateTextureHandle();
@@ -270,8 +272,13 @@ void RenderDevice::UploadTextureData(
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
 
+        if (i == 0) {
+            Msg("* [RenderDevice] Uploading texture slice: arraySlice=%u, mip=%u, dataSize=%llu, rowPitch=%u, slicePitch=%u, data=%p",
+                slice.arraySlice, slice.mipLevel, slice.dataSize, slice.rowPitch, slice.slicePitch, slice.data);
+        }
+
         m_uploadCommandList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
-                             slice.data, slice.rowPitch);
+                             slice.data, slice.rowPitch, slice.slicePitch);
     }
 
     m_uploadCommandList->close();
@@ -311,7 +318,8 @@ void RenderDevice::UploadTextureDataToNVRHI(
             break;
     }
 
-    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch);
+    size_t depthPitch = rowPitch * desc.height;
+    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, depthPitch);
 
     m_uploadCommandList->close();
     GetNVRHIDevice()->executeCommandList(m_uploadCommandList);

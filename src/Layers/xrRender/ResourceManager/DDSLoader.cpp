@@ -1,8 +1,18 @@
 #include "stdafx.h"
 #include "DDSLoader.h"
 #include "xrCore/FS.h"
+#include "xrEngine/xrTheora_Surface.h"
 
 namespace xray::render::resources {
+
+DDSData::~DDSData() {
+    if (videoState) {
+        if (videoState->theoraSurface) {
+            xr_delete(videoState->theoraSurface);
+        }
+        xr_delete(videoState);
+    }
+}
 
 bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
 
@@ -11,12 +21,29 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
 
     if (FS.exist(resolvedPath, "$game_textures$", filePath, ".dds")) {
         reader = FS.r_open(resolvedPath);
-    }
 
-    if (!reader) {
-        Msg("! [DDSLoader] Failed to open file: %s", filePath);
+        if (!reader) {
+            Msg("! [DDSLoader] Failed to open DDS file: %s", resolvedPath);
+            outData.isValid = false;
+            outData.errorMessage = "DDS file not found";
+            return false;
+        }
+
+    }
+    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".ogm")) {
+        Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
+        return LoadVideoTexture(resolvedPath, outData);
+    }
+    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".avi")) {
+        Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", filePath);
         outData.isValid = false;
-        outData.errorMessage = "File not found";
+        outData.errorMessage = "AVI video textures not yet implemented";
+        return false;
+    }
+    else {
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi)", filePath);
+        outData.isValid = false;
+        outData.errorMessage = "Texture file not found";
         return false;
     }
 
@@ -447,9 +474,24 @@ bool DDSLoader::ParseMipLevels(
 
                 mip.rowPitch = blockWidth * formatInfo.bytesPerBlock;
                 mip.slicePitch = mip.rowPitch * blockHeight;
+
+                if (mipLevel == 0 && arraySlice == 0) {
+                    Msg("* [DDSLoader] Block-compressed: %ux%u → %ux%u blocks, blockSize=%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
+                        mipWidth, mipHeight, blockWidth, blockHeight,
+                        formatInfo.blockSize, formatInfo.bytesPerBlock,
+                        mip.rowPitch, mip.slicePitch);
+                }
             } else {
-                mip.rowPitch = mipWidth * formatInfo.bytesPerBlock;
+                u32 naturalRowPitch = mipWidth * formatInfo.bytesPerBlock;
+
+                mip.rowPitch = naturalRowPitch;
                 mip.slicePitch = mip.rowPitch * mipHeight;
+
+                if (mipLevel == 0 && arraySlice == 0) {
+                    Msg("* [DDSLoader] Uncompressed: %ux%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
+                        mipWidth, mipHeight, formatInfo.bytesPerBlock,
+                        mip.rowPitch, mip.slicePitch);
+                }
             }
 
             if (desc.type == TextureDesc::Texture3D) {
@@ -627,6 +669,136 @@ bool DDSLoader::LoadMipRange(
 
     Msg("* [DDSLoader] LoadMipRange: %s (mips %u→%u, %llu KB)",
         filePath, startMip, startMip + mipCount, totalSize / 1024);
+
+    return true;
+}
+
+bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
+    Msg("* [DDSLoader] Loading video texture: %s", filePath);
+
+    CTheoraSurface* theoraSurface = xr_new<CTheoraSurface>();
+
+    if (!theoraSurface->Load(filePath)) {
+        Msg("! [DDSLoader] Failed to load Theora video: %s", filePath);
+        xr_delete(theoraSurface);
+        outData.isValid = false;
+        outData.errorMessage = "Failed to open Theora video stream";
+        return false;
+    }
+
+    u32 videoWidth = theoraSurface->Width(true);
+    u32 videoHeight = theoraSurface->Height(true);
+    u32 texWidth = theoraSurface->Width(false);
+    u32 texHeight = theoraSurface->Height(false);
+
+    Msg("* [DDSLoader] Video dimensions: %ux%u (texture: %ux%u)",
+        videoWidth, videoHeight, texWidth, texHeight);
+
+    outData.type = DDSData::TextureType::Video;
+    outData.videoState = xr_new<DDSData::VideoState>();
+    outData.videoState->theoraSurface = theoraSurface;
+    outData.videoState->frameWidth = videoWidth;
+    outData.videoState->frameHeight = videoHeight;
+    outData.videoState->textureWidth = texWidth;
+    outData.videoState->textureHeight = texHeight;
+
+    u32 frameBufferSize = texWidth * texHeight;
+    outData.videoState->frameBuffer.resize(frameBufferSize);
+
+    outData.desc.type = TextureDesc::Texture2D;
+    outData.desc.width = texWidth;
+    outData.desc.height = texHeight;
+    outData.desc.depth = 1;
+    outData.desc.mipLevels = 1;
+    outData.desc.arraySize = 1;
+    outData.desc.format = nvrhi::Format::RGBA8_UNORM;
+    outData.desc.debugName = filePath;
+    outData.desc.isRenderTarget = false;
+    outData.desc.isUAV = false;
+
+    DDSMipLevel mip;
+    mip.width = texWidth;
+    mip.height = texHeight;
+    mip.depth = 1;
+    mip.size = frameBufferSize * 4;
+    mip.rowPitch = texWidth * 4;
+    mip.slicePitch = mip.rowPitch * texHeight;
+    mip.data = (const u8*)outData.videoState->frameBuffer.data();
+
+    outData.mipLevels.push_back(mip);
+    outData.totalDataSize = mip.size;
+
+    bool shouldLoop = (strstr(filePath, "intro" DELIMITER) == nullptr) &&
+                      (strstr(filePath, "outro" DELIMITER) == nullptr);
+
+    theoraSurface->Play(shouldLoop, Device.dwTimeContinual);
+
+    Msg("* [DDSLoader] Decoding initial video frame...");
+
+    bool firstFrameDecoded = theoraSurface->Update(Device.dwTimeContinual);
+    if (!firstFrameDecoded) {
+        Sleep(16);
+        firstFrameDecoded = theoraSurface->Update(Device.dwTimeContinual + 16);
+    }
+
+    if (firstFrameDecoded) {
+        int pos = 0;
+        theoraSurface->DecompressFrame(
+            outData.videoState->frameBuffer.data(),
+            texWidth - videoWidth,
+            pos
+        );
+
+        Msg("* [DDSLoader] First frame decoded successfully (pos=%d, expected=%u)",
+            pos, videoHeight * texWidth);
+    } else {
+        Msg("! [DDSLoader] WARNING: Failed to decode initial frame for: %s", filePath);
+        for (u32& pixel : outData.videoState->frameBuffer) {
+            pixel = 0xFFFF00FF;
+        }
+    }
+
+    outData.videoState->needsUpdate = true;
+
+    outData.isValid = true;
+    outData.filePath = filePath;
+
+    Msg("* [DDSLoader] Video texture loaded: %s (%ux%u, loop=%s, initialFrame=%s)",
+        filePath, videoWidth, videoHeight, shouldLoop ? "yes" : "no",
+        firstFrameDecoded ? "OK" : "FAIL");
+
+    return true;
+}
+
+bool DDSLoader::UpdateVideoFrame(DDSData& data, u32 currentTime) {
+    if (data.type != DDSData::TextureType::Video || !data.videoState) {
+        return false;
+    }
+
+    auto* videoState = data.videoState;
+    auto* theora = videoState->theoraSurface;
+
+    if (!theora) {
+        return false;
+    }
+
+    bool frameChanged = theora->Update(currentTime);
+
+    if (!frameChanged) {
+        return false;
+    }
+
+    u32 texWidth = theora->Width(false);
+    u32 videoWidth = theora->Width(true);
+
+    int pos = 0;
+    theora->DecompressFrame(
+        videoState->frameBuffer.data(),
+        texWidth - videoWidth,
+        pos
+    );
+
+    videoState->needsUpdate = true;
 
     return true;
 }

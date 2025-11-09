@@ -541,6 +541,8 @@ void TextureManager::Update(float deltaTime) {
         meta.lastAccessTime += deltaTime;
     }
 
+    UpdateVideoTextures();
+
     m_streamingManager->Update(deltaTime);
 
     if (m_memoryUsed > m_memoryBudget) {
@@ -565,9 +567,14 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     DDSData ddsData;
     if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
-        Msg("! [TextureManager] Failed to load DDS: %s", meta.filePath.c_str());
+        Msg("! [TextureManager] Failed to load texture: %s", meta.filePath.c_str());
         meta.state = TextureState::Unloaded;
         return;
+    }
+
+    bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
+    if (isVideoTexture) {
+        Msg("* [TextureManager] Video texture detected: %s", meta.filePath.c_str());
     }
 
     u64 requiredMemory = ddsData.totalDataSize;
@@ -636,17 +643,24 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     meta.nvrhiTexture = m_device->GetNativeTexture(deviceHandle);
 
+    if (isVideoTexture) {
+        meta.videoTextureData = xr_make_unique<DDSData>();
+        *meta.videoTextureData = std::move(ddsData);
+
+        Msg("* [TextureManager] Video texture state stored for: %s", meta.filePath.c_str());
+    }
+
     meta.state = TextureState::Resident;
-    meta.residentMips = ddsData.desc.mipLevels;
-    meta.totalMips = ddsData.desc.mipLevels;
-    meta.requestedMips = ddsData.desc.mipLevels;
+    meta.residentMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
+    meta.totalMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
+    meta.requestedMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
     meta.memoryUsed = ddsData.totalDataSize;
 
     m_memoryUsed += meta.memoryUsed;
 
-    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu)",
+    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu, video=%s)",
         meta.filePath.c_str(), meta.residentMips, meta.memoryUsed,
-        m_memoryUsed, m_memoryBudget);
+        m_memoryUsed, m_memoryBudget, isVideoTexture ? "yes" : "no");
 }
 
 void TextureManager::LoadTextureAsync(TextureHandle handle) {
@@ -776,6 +790,80 @@ const char* TexturePriorityToString(TexturePriority priority) {
         case TexturePriority::Low: return "Low";
         case TexturePriority::VeryLow: return "VeryLow";
         default: return "Unknown";
+    }
+}
+
+void TextureManager::UpdateVideoTextures() {
+    static int s_frameCount = 0;
+    s_frameCount++;
+
+    int videoTextureCount = 0;
+    int updatedCount = 0;
+
+    for (auto& meta : m_textures) {
+        if (!meta.isAlive || !meta.videoTextureData) {
+            continue;
+        }
+
+        videoTextureCount++;
+
+        bool frameChanged = DDSLoader::UpdateVideoFrame(*meta.videoTextureData, Device.dwTimeContinual);
+
+        if (!frameChanged) {
+            continue;
+        }
+
+        updatedCount++;
+
+        auto* videoState = meta.videoTextureData->videoState;
+        if (!videoState || !videoState->needsUpdate) {
+            Msg("! [TextureManager] Frame changed but needsUpdate=false for: %s", meta.filePath.c_str());
+            continue;
+        }
+
+        nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
+        if (!nvrhiTex) {
+            Msg("! [TextureManager] Video texture has no NVRHI texture: %s", meta.filePath.c_str());
+            continue;
+        }
+
+        nvrhi::ICommandList* cmdList = m_device->GetNVRHIDevice()->createCommandList();
+        if (!cmdList) {
+            Msg("! [TextureManager] Failed to create command list for video texture update");
+            continue;
+        }
+
+        cmdList->open();
+
+        u32 texWidth = videoState->textureWidth;
+        u32 texHeight = videoState->textureHeight;
+        size_t rowPitch = texWidth * 4;
+        size_t depthPitch = rowPitch * texHeight;
+
+        cmdList->writeTexture(
+            nvrhiTex,
+            0,
+            0,
+            videoState->frameBuffer.data(),
+            rowPitch,
+            depthPitch
+        );
+
+        cmdList->close();
+        m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+        cmdList->Release();
+
+        videoState->needsUpdate = false;
+
+        if (s_frameCount % 60 == 0) {
+            Msg("* [TextureManager] Updated video texture: %s (%ux%u)",
+                meta.filePath.c_str(), texWidth, texHeight);
+        }
+    }
+
+    if (s_frameCount % 120 == 0 && videoTextureCount > 0) {
+        Msg("* [TextureManager] UpdateVideoTextures: %d video textures, %d updated this frame",
+            videoTextureCount, updatedCount);
     }
 }
 

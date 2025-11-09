@@ -251,7 +251,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
         const DDSMipLevel& mipData = ddsData.mipLevels[mip];
 
-        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch);
+        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch, mipData.slicePitch);
     }
 
     cmdList->close();

@@ -1169,14 +1169,15 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             i, attr.semanticName, attr.semanticIndex, (int)attr.format, attr.offset, attr.elementStride);
     }
 
-    psoDesc.depthStencilState.depthTestEnable = false;
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Always;
     psoDesc.depthStencilState.depthWriteEnable = false;
-    psoDesc.depthStencilState.stencilEnable = false;
+    psoDesc.depthStencilState.stencilEnable = true;
 
     psoDesc.blendState.renderTargets[0].blendEnable = true;
     psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
     psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::One;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
     psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
 
     psoDesc.rasterizerState.cullMode = ng::CullMode::None;

@@ -124,7 +124,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
         FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
         TextureManager* texManager = resourceMgr->GetTextureManager();
 
-        TextureHandle handle = texManager->LoadTexture(vfsPath, TexturePriority::High);
+        TextureHandle handle = texManager->LoadTexture(fRName, TexturePriority::High);
         if (!handle.IsValid())
         {
             Msg("! [FrameGraph] Failed to load texture through TextureManager: %s", fname);

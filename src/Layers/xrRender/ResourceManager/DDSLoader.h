@@ -136,6 +136,28 @@ struct DDSData {
 
     bool isValid = false;
     shared_str errorMessage;
+
+    enum class TextureType {
+        Static,
+        Video,
+        Sequence
+    };
+
+    TextureType type = TextureType::Static;
+
+    struct VideoState {
+        CTheoraSurface* theoraSurface = nullptr;
+        xr_vector<u32> frameBuffer;
+        u32 frameWidth = 0;
+        u32 frameHeight = 0;
+        u32 textureWidth = 0;
+        u32 textureHeight = 0;
+        bool needsUpdate = false;
+    };
+
+    VideoState* videoState = nullptr;
+
+    ~DDSData();
 };
 
 class DDSLoader {
@@ -158,6 +180,10 @@ public:
         u32 mipCount,
         DDSData& outData
     );
+
+    static bool LoadVideoTexture(const char* filePath, DDSData& outData);
+
+    static bool UpdateVideoFrame(DDSData& data, u32 currentTime);
 
     static nvrhi::Format GetFormatFromFourCC(u32 fourCC);
 

@@ -11,6 +11,7 @@ namespace xray::render::ng {
 namespace xray::render::resources {
 
 class StreamingManager;
+struct DDSData;
 
 enum class TextureState : u8 {
     Unloaded,
@@ -84,6 +85,8 @@ struct TextureMetadata {
     u32 refCount = 0;
 
     nvrhi::TextureHandle nvrhiTexture;
+
+    xr_unique_ptr<DDSData> videoTextureData;
 
     struct LoadRequest {
         bool inProgress = false;
@@ -202,6 +205,8 @@ private:
     bool EnforceMemoryBudget(u64 requiredBytes);
     bool EvictTextures(u64 bytesNeeded);
     void EvictTextureInternal(TextureHandle handle);
+
+    void UpdateVideoTextures();
 
     mutable std::mutex m_texturesMutex;
     mutable std::mutex m_pathLookupMutex;
