@@ -157,6 +157,21 @@ struct DDSData {
 
     VideoState* videoState = nullptr;
 
+    struct SequenceState {
+        xr_vector<DDSMipLevel> frameData;
+        xr_vector<u32> frameBuffer;
+        u32 frameWidth = 0;
+        u32 frameHeight = 0;
+        u32 textureWidth = 0;
+        u32 textureHeight = 0;
+        u32 fps = 0;
+        u32 msPerFrame = 0;
+        bool cycled = false;
+        bool needsUpdate = false;
+    };
+
+    SequenceState* sequenceState = nullptr;
+
     ~DDSData();
 
     DDSData(DDSData&& other) noexcept;
@@ -191,7 +206,11 @@ public:
 
     static bool LoadVideoTexture(const char* filePath, DDSData& outData);
 
+    static bool LoadSequenceTexture(const char* filePath, DDSData& outData);
+
     static bool UpdateVideoFrame(DDSData& data, u32 currentTime);
+
+    static bool UpdateSequenceFrame(DDSData& data, u32 currentFrame);
 
     static nvrhi::Format GetFormatFromFourCC(u32 fourCC);
 

@@ -12,6 +12,10 @@ DDSData::~DDSData() {
         }
         xr_delete(videoState);
     }
+
+    if (sequenceState) {
+        xr_delete(sequenceState);
+    }
 }
 
 DDSData::DDSData(DDSData&& other) noexcept
@@ -24,8 +28,10 @@ DDSData::DDSData(DDSData&& other) noexcept
     , errorMessage(std::move(other.errorMessage))
     , type(other.type)
     , videoState(other.videoState)
+    , sequenceState(other.sequenceState)
 {
     other.videoState = nullptr;
+    other.sequenceState = nullptr;
 }
 
 DDSData& DDSData::operator=(DDSData&& other) noexcept {
@@ -35,6 +41,9 @@ DDSData& DDSData::operator=(DDSData&& other) noexcept {
                 xr_delete(videoState->theoraSurface);
             }
             xr_delete(videoState);
+        }
+        if (sequenceState) {
+            xr_delete(sequenceState);
         }
 
         desc = std::move(other.desc);
@@ -46,8 +55,10 @@ DDSData& DDSData::operator=(DDSData&& other) noexcept {
         errorMessage = std::move(other.errorMessage);
         type = other.type;
         videoState = other.videoState;
+        sequenceState = other.sequenceState;
 
         other.videoState = nullptr;
+        other.sequenceState = nullptr;
     }
     return *this;
 }
@@ -78,6 +89,10 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
         }
 
     }
+    else if (TryFindFile(".seq")) {
+        Msg("* [DDSLoader] Detected sequence texture: %s.seq", filePath);
+        return LoadSequenceTexture(resolvedPath, outData);
+    }
     else if (TryFindFile(".ogm")) {
         Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
         return LoadVideoTexture(resolvedPath, outData);
@@ -89,7 +104,7 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
         return false;
     }
     else {
-        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi in $game_textures$ and $level$)", filePath);
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .seq, .ogm, .avi in $game_textures$ and $level$)", filePath);
         outData.isValid = false;
         outData.errorMessage = "Texture file not found";
         return false;
@@ -810,6 +825,172 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
     return true;
 }
 
+bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
+    Msg("* [DDSLoader] Loading sequence texture: %s", filePath);
+
+    IReader* reader = FS.r_open(filePath);
+    if (!reader) {
+        Msg("! [DDSLoader] Failed to open .seq file: %s", filePath);
+        outData.isValid = false;
+        outData.errorMessage = "Failed to open .seq file";
+        return false;
+    }
+
+    string256 buffer;
+
+    reader->r_string(buffer, sizeof(buffer));
+
+    bool cycled = false;
+    u32 fps = 0;
+
+    if (0 == xr_stricmp(buffer, "cycled")) {
+        cycled = true;
+        reader->r_string(buffer, sizeof(buffer));
+        fps = atoi(buffer);
+    } else {
+        fps = atoi(buffer);
+    }
+
+    if (fps == 0) {
+        Msg("! [DDSLoader] Invalid FPS in .seq file: %s", filePath);
+        FS.r_close(reader);
+        outData.isValid = false;
+        outData.errorMessage = "Invalid FPS in .seq file";
+        return false;
+    }
+
+    xr_vector<shared_str> frameTextureNames;
+    while (!reader->eof()) {
+        reader->r_string(buffer, sizeof(buffer));
+
+        char* start = buffer;
+        while (*start && isspace(*start)) start++;
+        char* end = start + strlen(start) - 1;
+        while (end > start && isspace(*end)) *end-- = '\0';
+
+        if (*start == '\0') continue;
+
+        frameTextureNames.push_back(shared_str(start));
+    }
+
+    FS.r_close(reader);
+
+    if (frameTextureNames.empty()) {
+        Msg("! [DDSLoader] No frames in .seq file: %s", filePath);
+        outData.isValid = false;
+        outData.errorMessage = "No frames in .seq file";
+        return false;
+    }
+
+    Msg("* [DDSLoader] Sequence FPS=%u, cycled=%s, frames=%u",
+        fps, cycled ? "yes" : "no", (u32)frameTextureNames.size());
+
+    outData.type = DDSData::TextureType::Sequence;
+    outData.sequenceState = xr_new<DDSData::SequenceState>();
+    outData.sequenceState->fps = fps;
+    outData.sequenceState->msPerFrame = 1000 / fps;
+    outData.sequenceState->cycled = cycled;
+
+    u32 expectedWidth = 0;
+    u32 expectedHeight = 0;
+    nvrhi::Format expectedFormat = nvrhi::Format::UNKNOWN;
+
+    for (u32 i = 0; i < frameTextureNames.size(); i++) {
+        const char* frameName = frameTextureNames[i].c_str();
+
+        Msg("* [DDSLoader]   Loading frame %u/%u: %s",
+            i + 1, (u32)frameTextureNames.size(), frameName);
+
+        DDSData frameData;
+        if (!LoadFromFile(frameName, frameData)) {
+            Msg("! [DDSLoader] Failed to load frame texture: %s", frameName);
+            xr_delete(outData.sequenceState);
+            outData.isValid = false;
+            outData.errorMessage = "Failed to load frame texture";
+            return false;
+        }
+
+        if (i == 0) {
+            expectedWidth = frameData.desc.width;
+            expectedHeight = frameData.desc.height;
+            expectedFormat = frameData.desc.format;
+        } else {
+            if (frameData.desc.width != expectedWidth ||
+                frameData.desc.height != expectedHeight ||
+                frameData.desc.format != expectedFormat) {
+                Msg("! [DDSLoader] Frame dimension mismatch: %s (%ux%u, format=%d) vs expected (%ux%u, format=%d)",
+                    frameName, frameData.desc.width, frameData.desc.height, (int)frameData.desc.format,
+                    expectedWidth, expectedHeight, (int)expectedFormat);
+                xr_delete(outData.sequenceState);
+                outData.isValid = false;
+                outData.errorMessage = "Frame dimension mismatch";
+                return false;
+            }
+        }
+
+        if (!frameData.mipLevels.empty()) {
+            outData.sequenceState->frameData.push_back(frameData.mipLevels[0]);
+        }
+    }
+
+    Msg("* [DDSLoader] Pre-loaded %u frames (%ux%u, format=%d)",
+        (u32)outData.sequenceState->frameData.size(),
+        expectedWidth, expectedHeight, (int)expectedFormat);
+
+    outData.sequenceState->frameWidth = expectedWidth;
+    outData.sequenceState->frameHeight = expectedHeight;
+    outData.sequenceState->textureWidth = expectedWidth;
+    outData.sequenceState->textureHeight = expectedHeight;
+
+    u32 frameBufferSize = expectedWidth * expectedHeight;
+    outData.sequenceState->frameBuffer.resize(frameBufferSize);
+
+    outData.desc.type = TextureDesc::Texture2D;
+    outData.desc.width = expectedWidth;
+    outData.desc.height = expectedHeight;
+    outData.desc.depth = 1;
+    outData.desc.mipLevels = 1;
+    outData.desc.arraySize = 1;
+    outData.desc.format = expectedFormat;
+    outData.desc.debugName = filePath;
+    outData.desc.isRenderTarget = false;
+    outData.desc.isUAV = false;
+
+    const DDSMipLevel& firstFrame = outData.sequenceState->frameData[0];
+
+    if (expectedFormat == nvrhi::Format::RGBA8_UNORM ||
+        expectedFormat == nvrhi::Format::BGRA8_UNORM ||
+        expectedFormat == nvrhi::Format::SRGBA8_UNORM ||
+        expectedFormat == nvrhi::Format::SBGRA8_UNORM) {
+        memcpy(outData.sequenceState->frameBuffer.data(),
+               firstFrame.data,
+               firstFrame.size);
+    }
+
+    DDSMipLevel mip;
+    mip.width = expectedWidth;
+    mip.height = expectedHeight;
+    mip.depth = 1;
+    mip.size = firstFrame.size;
+    mip.rowPitch = firstFrame.rowPitch;
+    mip.slicePitch = firstFrame.slicePitch;
+    mip.data = (const u8*)outData.sequenceState->frameBuffer.data();
+
+    outData.mipLevels.push_back(mip);
+    outData.totalDataSize = mip.size;
+
+    outData.sequenceState->needsUpdate = true;
+
+    outData.isValid = true;
+    outData.filePath = filePath;
+
+    Msg("* [DDSLoader] Sequence texture loaded: %s (%ux%u, %u frames, %u fps, cycled=%s)",
+        filePath, expectedWidth, expectedHeight,
+        (u32)outData.sequenceState->frameData.size(), fps, cycled ? "yes" : "no");
+
+    return true;
+}
+
 bool DDSLoader::UpdateVideoFrame(DDSData& data, u32 currentTime) {
     if (data.type != DDSData::TextureType::Video || !data.videoState) {
         return false;
@@ -839,6 +1020,33 @@ bool DDSLoader::UpdateVideoFrame(DDSData& data, u32 currentTime) {
     );
 
     videoState->needsUpdate = true;
+
+    return true;
+}
+
+bool DDSLoader::UpdateSequenceFrame(DDSData& data, u32 currentFrame) {
+    if (data.type != DDSData::TextureType::Sequence || !data.sequenceState) {
+        return false;
+    }
+
+    auto* seqState = data.sequenceState;
+
+    if (currentFrame >= seqState->frameData.size()) {
+        return false;
+    }
+
+    const DDSMipLevel& frame = seqState->frameData[currentFrame];
+
+    if (data.desc.format == nvrhi::Format::RGBA8_UNORM ||
+        data.desc.format == nvrhi::Format::BGRA8_UNORM ||
+        data.desc.format == nvrhi::Format::SRGBA8_UNORM ||
+        data.desc.format == nvrhi::Format::SBGRA8_UNORM) {
+        memcpy(seqState->frameBuffer.data(),
+               frame.data,
+               frame.size);
+    }
+
+    seqState->needsUpdate = true;
 
     return true;
 }
