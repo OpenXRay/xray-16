@@ -192,6 +192,9 @@ public:
     // Check if texture is resident
     bool IsResident(TextureHandle handle) const;
 
+    // Find texture by path (returns invalid handle if not found)
+    TextureHandle FindTexture(const char* path) const;
+
     // ═══════════════════════════════════════════════════
     //  STREAMING CONTROL (Week 2)
     // ═══════════════════════════════════════════════════

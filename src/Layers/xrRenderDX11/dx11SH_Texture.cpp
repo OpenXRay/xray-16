@@ -478,6 +478,11 @@ void CTexture::Load()
         if (pSurface)
         {
             flags.MemoryUsage = mem;
+
+            // CRITICAL: Update width/height from D3D11 texture descriptor
+            // This is needed for UI UV calculations to work correctly
+            desc_update();
+
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
         }
     }

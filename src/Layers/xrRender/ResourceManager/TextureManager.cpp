@@ -416,6 +416,16 @@ const TextureMetadata* TextureManager::GetMetadata(TextureHandle handle) const {
     return &m_textures[handle.index];
 }
 
+TextureHandle TextureManager::FindTexture(const char* path) const {
+    auto it = m_pathToHandle.find(shared_str(path));
+    if (it != m_pathToHandle.end()) {
+        TextureHandle handle = it->second;
+        if (ValidateHandle(handle))
+            return handle;
+    }
+    return TextureHandle();  // Invalid handle
+}
+
 bool TextureManager::IsResident(TextureHandle handle) const {
     if (!ValidateHandle(handle)) return false;
     return m_textures[handle.index].IsResident();
