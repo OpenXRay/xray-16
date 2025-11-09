@@ -193,6 +193,17 @@ struct DDSData {
 
     // Destructor must be in .cpp to avoid incomplete type issues with CTheoraSurface
     ~DDSData();
+
+    // Move constructor and move assignment (for proper ownership transfer)
+    DDSData(DDSData&& other) noexcept;
+    DDSData& operator=(DDSData&& other) noexcept;
+
+    // Delete copy constructor and copy assignment (non-copyable due to raw pointers)
+    DDSData(const DDSData&) = delete;
+    DDSData& operator=(const DDSData&) = delete;
+
+    // Default constructor
+    DDSData() = default;
 };
 
 // ═══════════════════════════════════════════════════

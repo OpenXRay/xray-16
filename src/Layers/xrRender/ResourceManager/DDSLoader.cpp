@@ -23,6 +23,50 @@ DDSData::~DDSData() {
     }
 }
 
+// Move constructor - transfer ownership
+DDSData::DDSData(DDSData&& other) noexcept
+    : desc(std::move(other.desc))
+    , mipLevels(std::move(other.mipLevels))
+    , fileDataCopy(std::move(other.fileDataCopy))
+    , filePath(std::move(other.filePath))
+    , totalDataSize(other.totalDataSize)
+    , isValid(other.isValid)
+    , errorMessage(std::move(other.errorMessage))
+    , type(other.type)
+    , videoState(other.videoState)  // Transfer pointer ownership
+{
+    // CRITICAL: Null out the moved-from pointer to prevent double-delete
+    other.videoState = nullptr;
+}
+
+// Move assignment operator - transfer ownership
+DDSData& DDSData::operator=(DDSData&& other) noexcept {
+    if (this != &other) {
+        // Clean up our current state first
+        if (videoState) {
+            if (videoState->theoraSurface) {
+                xr_delete(videoState->theoraSurface);
+            }
+            xr_delete(videoState);
+        }
+
+        // Transfer from other
+        desc = std::move(other.desc);
+        mipLevels = std::move(other.mipLevels);
+        fileDataCopy = std::move(other.fileDataCopy);
+        filePath = std::move(other.filePath);
+        totalDataSize = other.totalDataSize;
+        isValid = other.isValid;
+        errorMessage = std::move(other.errorMessage);
+        type = other.type;
+        videoState = other.videoState;
+
+        // CRITICAL: Null out the moved-from pointer to prevent double-delete
+        other.videoState = nullptr;
+    }
+    return *this;
+}
+
 // ═══════════════════════════════════════════════════
 //  FILE LOADING
 // ═══════════════════════════════════════════════════

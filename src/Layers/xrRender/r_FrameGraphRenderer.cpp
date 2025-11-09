@@ -158,6 +158,14 @@ void FrameGraphRenderer::Render() {
     auto frameStart = std::chrono::high_resolution_clock::now();
 
     // ═══════════════════════════════════════════════════════
+    //  UPDATE RESOURCE MANAGER (Video textures, streaming)
+    // ═══════════════════════════════════════════════════════
+
+    if (m_device && m_device->GetFGResourceManager()) {
+        m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  SETUP FRAME (PER-FRAME: Collect geometry)
     // ═══════════════════════════════════════════════════════
 
@@ -249,6 +257,14 @@ void FrameGraphRenderer::RenderMenu() {
     VERIFY(m_framegraph != nullptr);
 
     Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
+
+    // ═══════════════════════════════════════════════════════
+    //  UPDATE RESOURCE MANAGER (Video textures, streaming)
+    // ═══════════════════════════════════════════════════════
+
+    if (m_device && m_device->GetFGResourceManager()) {
+        m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
+    }
 
     // ═══════════════════════════════════════════════════════
     //  EXECUTE 3-STEP MENU PIPELINE (Phase 3-5)

@@ -995,9 +995,9 @@ void TextureManager::UpdateVideoTextures() {
         }
 
         // ═══════════════════════════════════════════════════
-        //  UPLOAD NEW FRAME TO GPU USING writeTexture()
+        //  UPLOAD NEW FRAME TO GPU (Use RenderDevice's upload path)
         // ═══════════════════════════════════════════════════
-        // This is the NVRHI abstraction that works across DX11/DX12/Vulkan!
+        // This uses the persistent upload command list with proper mutex locking
 
         nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
         if (!nvrhiTex) {
@@ -1005,40 +1005,20 @@ void TextureManager::UpdateVideoTextures() {
             continue;
         }
 
-        // Get active NVRHI command list from device
-        // Note: We need a command list that's currently recording
-        // For now, we'll create a temporary one per frame
-        // TODO: Integrate with FrameGraph's command list system
-        nvrhi::ICommandList* cmdList = m_device->GetNVRHIDevice()->createCommandList();
-        if (!cmdList) {
-            Msg("! [TextureManager] Failed to create command list for video texture update");
-            continue;
-        }
-
-        // Open command list
-        cmdList->open();
-
-        // Upload frame data using writeTexture (NVRHI's per-frame upload API)
-        // Parameters: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
-        // IMPORTANT: Use TEXTURE dimensions (pow2-padded), not frame dimensions!
+        // Calculate data size (RGBA8 format)
         u32 texWidth = videoState->textureWidth;
         u32 texHeight = videoState->textureHeight;
-        size_t rowPitch = texWidth * 4;  // RGBA8 = 4 bytes per pixel
-        size_t depthPitch = rowPitch * texHeight;
+        size_t dataSize = texWidth * texHeight * 4;  // RGBA8 = 4 bytes per pixel
 
-        cmdList->writeTexture(
+        // Upload using RenderDevice's persistent upload command list
+        // This handles command list management, mutex locking, and GPU sync
+        m_device->UploadTextureDataToNVRHI(
             nvrhiTex,
             0,  // arraySlice
             0,  // mipLevel
-            videoState->frameBuffer.data(),  // data pointer
-            rowPitch,
-            depthPitch
+            videoState->frameBuffer.data(),
+            dataSize
         );
-
-        // Close and execute
-        cmdList->close();
-        m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-        cmdList->Release();  // CRITICAL: Release to avoid memory leak!
 
         // Clear the update flag
         videoState->needsUpdate = false;
