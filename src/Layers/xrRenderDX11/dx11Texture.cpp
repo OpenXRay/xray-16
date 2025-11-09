@@ -156,6 +156,8 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
         Msg("* [FrameGraph] Successfully loaded texture: %s (NVRHI-owned)", fname);
 
+        d3d11Texture->AddRef();
+
         return d3d11Texture;
     }
 
