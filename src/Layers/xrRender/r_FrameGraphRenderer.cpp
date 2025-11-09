@@ -274,7 +274,7 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    auto* resMgr = m_device->GetModernResourceManager();
+    auto* resMgr = m_device->GetFGResourceManager();
     VERIFY(resMgr);
     auto* rtFactory = resMgr->GetRTFactory();
     VERIFY(rtFactory);

@@ -251,17 +251,7 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
 
         const DDSMipLevel& mipData = ddsData.mipLevels[mip];
 
-        const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(meta->desc.format);
-        u32 mipWidth = (meta->desc.width >> mip) > 0 ? (meta->desc.width >> mip) : 1;
-
-        u32 rowPitch;
-        if (formatInfo.blockSize > 1) {
-            rowPitch = ((mipWidth + 3) / 4) * formatInfo.bytesPerBlock;
-        } else {
-            rowPitch = mipWidth * formatInfo.bytesPerBlock;
-        }
-
-        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, rowPitch);
+        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch);
     }
 
     cmdList->close();

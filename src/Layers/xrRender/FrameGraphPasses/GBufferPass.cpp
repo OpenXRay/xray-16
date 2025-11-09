@@ -33,7 +33,11 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 
     m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
 
-    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_vcbPool.get()
+    );
 
     if (!LoadShaders())
     {

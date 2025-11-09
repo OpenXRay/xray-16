@@ -5,7 +5,7 @@
 
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
-#include "Layers/xrRender/ResourceManager/ModernResourceManager.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include <nvrhi/nvrhi.h>
 
@@ -107,7 +107,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
-    if (ps_r4_use_framegraph && m_renderDevice && m_renderDevice->GetModernResourceManager())
+    if (ps_r4_use_framegraph && m_renderDevice && m_renderDevice->GetFGResourceManager())
     {
         using namespace xray::render::ng;
         using namespace xray::render::resources;
@@ -121,7 +121,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
         Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
 
-        ModernResourceManager* resourceMgr = m_renderDevice->GetModernResourceManager();
+        FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
         TextureManager* texManager = resourceMgr->GetTextureManager();
 
         TextureHandle handle = texManager->LoadTexture(vfsPath, TexturePriority::High);

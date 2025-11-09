@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../ResourceManager/ModernResourceManager.h"
+#include "../ResourceManager/FGResourceManager.h"
 
 namespace xray::render::framegraph {
 
 class FGResourcePool {
 public:
-    FGResourcePool(resources::ModernResourceManager* resourceManager);
+    FGResourcePool(resources::FGResourceManager* resourceManager);
     ~FGResourcePool();
 
     resources::TextureHandle AllocateTexture(const resources::TextureDesc& desc);
@@ -36,7 +36,7 @@ public:
     void PrintStatistics() const;
 
 private:
-    resources::ModernResourceManager* m_resourceManager;
+    resources::FGResourceManager* m_resourceManager;
 
     struct PooledTexture {
         resources::TextureHandle handle;

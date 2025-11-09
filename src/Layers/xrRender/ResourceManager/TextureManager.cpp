@@ -340,9 +340,10 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
     meta.lastAccessTime = 0.0f;
     meta.accessCount++;
 
-    if (meta.state == TextureState::Unloaded) {
-        Msg("! [TextureManager] ⚠️ Accessing unloaded texture: %s",
+    if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
+        Msg("! [TextureManager] ⚠️ Accessing evicted texture: %s - reloading...",
             meta.filePath.c_str());
+        LoadTextureSync(handle);
     }
 
     return meta.nvrhiTexture.Get();
@@ -569,6 +570,18 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         return;
     }
 
+    u64 requiredMemory = ddsData.totalDataSize;
+
+    if (!EnforceMemoryBudget(requiredMemory)) {
+        Msg("! [TextureManager] ❌ Cannot load %s - out of memory! (need %llu MB, have %llu / %llu MB used)",
+            meta.filePath.c_str(),
+            requiredMemory / (1024 * 1024),
+            m_memoryUsed / (1024 * 1024),
+            m_memoryBudget / (1024 * 1024));
+        meta.state = TextureState::Unloaded;
+        return;
+    }
+
     ng::RenderDevice::TextureDesc deviceDesc;
     deviceDesc.width = ddsData.desc.width;
     deviceDesc.height = ddsData.desc.height;
@@ -613,6 +626,8 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         slice.mipLevel = mipIndex % totalMips;
         slice.data = mip.data;
         slice.dataSize = mip.size;
+        slice.rowPitch = mip.rowPitch;
+        slice.slicePitch = mip.slicePitch;
 
         slices.push_back(slice);
     }

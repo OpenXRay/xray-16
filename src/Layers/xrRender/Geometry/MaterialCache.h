@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     struct Shader;
@@ -11,6 +12,11 @@ namespace xray::render::RENDER_NAMESPACE {
     struct SVS;
     struct SPS;
     class CTexture;
+}
+
+namespace xray::render::resources {
+    class FGResourceManager;
+    class TextureManager;
 }
 
 namespace xray::render::framegraph {
@@ -97,7 +103,7 @@ struct MaterialPSO {
 
     struct TextureSlot {
         u32 slot;
-        ng::TextureHandle handle;
+        resources::TextureHandle handle;
     };
     xr_vector<TextureSlot> textures;
     u32 vertexStride = 0;
@@ -193,7 +199,11 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat);
 
 class MaterialCache {
 public:
-    MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool = nullptr);
+    MaterialCache(
+        ng::RenderDevice* device,
+        resources::FGResourceManager* resourceManager,
+        framegraph::VolatileConstantBufferPool* vcbPool = nullptr
+    );
     ~MaterialCache();
 
     MaterialPSO* GetOrCreatePSO(
@@ -220,11 +230,12 @@ public:
 
 private:
     ng::RenderDevice* m_device;
+    resources::FGResourceManager* m_resourceManager;
     framegraph::VolatileConstantBufferPool* m_vcbPool;
     xr_map<MaterialKey, xr_unique_ptr<MaterialPSO>> m_cache;
     Stats m_stats;
 
-    xr_map<xr_string, ng::TextureHandle> m_textureWrapperCache;
+    xr_map<xr_string, resources::TextureHandle> m_textureHandleCache;
 
     xr_map<xr_string, float> m_detailScaleCache;
 

@@ -19,7 +19,11 @@ MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
 
     m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
 
-    m_materialCache = xr_make_unique<MaterialCache>(device, m_vcbPool.get());
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_vcbPool.get()
+    );
 
     m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
     m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();

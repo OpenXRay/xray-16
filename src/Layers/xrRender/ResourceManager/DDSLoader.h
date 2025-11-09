@@ -119,6 +119,8 @@ struct DDSMipLevel {
     u32 width;
     u32 height;
     u32 depth;
+    u32 rowPitch;
+    u32 slicePitch;
 };
 
 struct DDSData {
@@ -148,6 +150,13 @@ public:
         size_t dataSize,
         DDSData& outData,
         const char* debugName = nullptr
+    );
+
+    static bool LoadMipRange(
+        const char* filePath,
+        u32 startMip,
+        u32 mipCount,
+        DDSData& outData
     );
 
     static nvrhi::Format GetFormatFromFourCC(u32 fourCC);

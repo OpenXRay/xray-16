@@ -11,10 +11,10 @@ namespace xray::render::ng {
 
 namespace xray::render::resources {
 
-class ModernResourceManager {
+class FGResourceManager {
 public:
-    explicit ModernResourceManager(xray::render::ng::RenderDevice* device);
-    ~ModernResourceManager();
+    explicit FGResourceManager(xray::render::ng::RenderDevice* device);
+    ~FGResourceManager();
 
     TextureManager* GetTextureManager() { return m_textureManager.get(); }
     BufferManager* GetBufferManager() { return m_bufferManager.get(); }

@@ -9,25 +9,8 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     string_path resolvedPath;
     IReader* reader = nullptr;
 
-    if (strstr(filePath, "$game_textures$")) {
-        const char* nameStart = strstr(filePath, "$game_textures$");
-        nameStart += strlen("$game_textures$");
-        while (*nameStart == '\\' || *nameStart == '/') nameStart++;
-
-        string_path textureName;
-        xr_strcpy(textureName, nameStart);
-        if (strstr(textureName, ".dds")) {
-            *strstr(textureName, ".dds") = 0;
-        }
-
-        if (FS.exist(resolvedPath, "$game_textures$", textureName, ".dds")) {
-            reader = FS.r_open(resolvedPath);
-        }
-    } else {
-        reader = FS.r_open(filePath);
-        if (reader) {
-            xr_strcpy(resolvedPath, filePath);
-        }
+    if (FS.exist(resolvedPath, "$game_textures$", filePath, ".dds")) {
+        reader = FS.r_open(resolvedPath);
     }
 
     if (!reader) {
@@ -456,6 +439,23 @@ bool DDSLoader::ParseMipLevels(
             mip.height = mipHeight;
             mip.depth = mipDepth;
 
+            const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(desc.format);
+
+            if (formatInfo.blockSize > 1) {
+                u32 blockWidth = (mipWidth + 3) / 4;
+                u32 blockHeight = (mipHeight + 3) / 4;
+
+                mip.rowPitch = blockWidth * formatInfo.bytesPerBlock;
+                mip.slicePitch = mip.rowPitch * blockHeight;
+            } else {
+                mip.rowPitch = mipWidth * formatInfo.bytesPerBlock;
+                mip.slicePitch = mip.rowPitch * mipHeight;
+            }
+
+            if (desc.type == TextureDesc::Texture3D) {
+                mip.slicePitch *= mipDepth;
+            }
+
             outMipLevels.push_back(mip);
 
             dataPtr += mipSize;
@@ -486,6 +486,147 @@ bool DDSLoader::ValidateHeader(const DDS_HEADER& header) {
         Msg("! [DDSLoader] Invalid dimensions: %ux%u", header.dwWidth, header.dwHeight);
         return false;
     }
+
+    return true;
+}
+
+bool DDSLoader::LoadMipRange(
+    const char* filePath,
+    u32 startMip,
+    u32 mipCount,
+    DDSData& outData)
+{
+
+    IReader* reader = FS.r_open(filePath);
+    if (!reader) {
+        Msg("! [DDSLoader] Failed to open file: %s", filePath);
+        outData.isValid = false;
+        outData.errorMessage = "File not found";
+        return false;
+    }
+
+    const u32 fileSize = reader->length();
+    if (fileSize < sizeof(u32) + sizeof(DDS_HEADER)) {
+        FS.r_close(reader);
+        Msg("! [DDSLoader] File too small: %s", filePath);
+        outData.isValid = false;
+        return false;
+    }
+
+    u32 magic;
+    reader->r(&magic, sizeof(u32));
+    if (magic != DDS_MAGIC) {
+        FS.r_close(reader);
+        Msg("! [DDSLoader] Invalid DDS magic: %s", filePath);
+        outData.isValid = false;
+        return false;
+    }
+
+    DDS_HEADER header;
+    reader->r(&header, sizeof(DDS_HEADER));
+
+    if (!ValidateHeader(header)) {
+        FS.r_close(reader);
+        outData.isValid = false;
+        return false;
+    }
+
+    TextureDesc& desc = outData.desc;
+    desc.width = header.dwWidth;
+    desc.height = header.dwHeight;
+    desc.depth = (header.dwCaps2 & DDSCAPS2_VOLUME) ? header.dwDepth : 1;
+    desc.mipLevels = (header.dwFlags & DDSD_MIPMAPCOUNT) ? header.dwMipMapCount : 1;
+    desc.arraySize = (header.dwCaps2 & DDSCAPS2_CUBEMAP) ? 6 : 1;
+
+    if (header.ddspf.dwFlags & DDPF_FOURCC) {
+        desc.format = GetFormatFromFourCC(header.ddspf.dwFourCC);
+    } else {
+        desc.format = nvrhi::Format::RGBA8_UNORM;
+    }
+
+    u64 fileOffset = sizeof(u32) + sizeof(DDS_HEADER);
+    u32 width = desc.width;
+    u32 height = desc.height;
+    u32 depth = desc.depth;
+
+    for (u32 arraySlice = 0; arraySlice < desc.arraySize; ++arraySlice) {
+        for (u32 mip = 0; mip < startMip && mip < desc.mipLevels; ++mip) {
+            u32 mipWidth = std::max(1u, width >> mip);
+            u32 mipHeight = std::max(1u, height >> mip);
+            u32 mipDepth = std::max(1u, depth >> mip);
+
+            u32 mipSize = CalculateMipSize(mipWidth, mipHeight, mipDepth, desc.format);
+            fileOffset += mipSize;
+        }
+    }
+
+    u64 totalSize = 0;
+    for (u32 arraySlice = 0; arraySlice < desc.arraySize; ++arraySlice) {
+        for (u32 mip = 0; mip < mipCount; ++mip) {
+            u32 mipLevel = startMip + mip;
+            if (mipLevel >= desc.mipLevels) break;
+
+            u32 mipWidth = std::max(1u, width >> mipLevel);
+            u32 mipHeight = std::max(1u, height >> mipLevel);
+            u32 mipDepth = std::max(1u, depth >> mipLevel);
+
+            u32 mipSize = CalculateMipSize(mipWidth, mipHeight, mipDepth, desc.format);
+            totalSize += mipSize;
+        }
+    }
+
+    reader->seek(fileOffset);
+
+    outData.fileDataCopy.resize(totalSize);
+    reader->r(outData.fileDataCopy.data(), totalSize);
+
+    FS.r_close(reader);
+
+    outData.mipLevels.clear();
+    const u8* dataPtr = outData.fileDataCopy.data();
+
+    for (u32 arraySlice = 0; arraySlice < desc.arraySize; ++arraySlice) {
+        for (u32 mip = 0; mip < mipCount; ++mip) {
+            u32 mipLevel = startMip + mip;
+            if (mipLevel >= desc.mipLevels) break;
+
+            u32 mipWidth = std::max(1u, width >> mipLevel);
+            u32 mipHeight = std::max(1u, height >> mipLevel);
+            u32 mipDepth = std::max(1u, depth >> mipLevel);
+
+            DDSMipLevel mipData;
+            mipData.data = dataPtr;
+            mipData.width = mipWidth;
+            mipData.height = mipHeight;
+            mipData.depth = mipDepth;
+            mipData.size = CalculateMipSize(mipWidth, mipHeight, mipDepth, desc.format);
+
+            const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(desc.format);
+            if (formatInfo.blockSize > 1) {
+                u32 blockWidth = (mipWidth + 3) / 4;
+                u32 blockHeight = (mipHeight + 3) / 4;
+                mipData.rowPitch = blockWidth * formatInfo.bytesPerBlock;
+                mipData.slicePitch = mipData.rowPitch * blockHeight;
+            } else {
+                mipData.rowPitch = mipWidth * formatInfo.bytesPerBlock;
+                mipData.slicePitch = mipData.rowPitch * mipHeight;
+            }
+
+            if (desc.type == TextureDesc::Texture3D) {
+                mipData.slicePitch *= mipDepth;
+            }
+
+            outData.mipLevels.push_back(mipData);
+            dataPtr += mipData.size;
+        }
+    }
+
+    outData.totalDataSize = totalSize;
+    outData.filePath = filePath;
+    outData.isValid = true;
+
+    Msg("* [DDSLoader] LoadMipRange: %s (mips %u→%u, %llu KB)",
+        filePath, startMip, startMip + mipCount, totalSize / 1024);
 
     return true;
 }

@@ -8,7 +8,7 @@ namespace xray::render::ng {
 }
 
 namespace xray::render::resources {
-    class ModernResourceManager;
+    class FGResourceManager;
 }
 
 namespace xray::render::framegraph {

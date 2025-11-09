@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "MaterialCache.h"
+#include "Layers/xrRender/ResourceManager/FGResourceManager.h"
+#include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
@@ -43,11 +45,16 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
     return nvrhi::Format::UNKNOWN;
 }
 
-MaterialCache::MaterialCache(ng::RenderDevice* device, framegraph::VolatileConstantBufferPool* vcbPool)
+MaterialCache::MaterialCache(
+    ng::RenderDevice* device,
+    resources::FGResourceManager* resourceManager,
+    framegraph::VolatileConstantBufferPool* vcbPool)
     : m_device(device)
+    , m_resourceManager(resourceManager)
     , m_vcbPool(vcbPool)
 {
     VERIFY(m_device);
+    VERIFY(m_resourceManager);
 }
 
 MaterialCache::~MaterialCache() {
@@ -246,6 +253,9 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         return;
     }
 
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+    VERIFY(texManager);
+
     for (size_t i = 0; i < texList->size(); i++) {
         const auto& texPair = (*texList)[i];
         u32 stage = texPair.first;
@@ -256,13 +266,10 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        if (!tex->flags.bLoaded) {
-            Msg("  [MaterialCache::ExtractTextures] Texture '%s' not loaded, loading now...", tex->cName.c_str());
-            tex->Load();
-        }
+        const char* textureName = tex->cName.c_str();
 
-        auto cacheIt = m_textureWrapperCache.find(tex->cName.c_str());
-        if (cacheIt != m_textureWrapperCache.end()) {
+        auto cacheIt = m_textureHandleCache.find(textureName);
+        if (cacheIt != m_textureHandleCache.end()) {
             MaterialPSO::TextureSlot texSlot;
             texSlot.slot = stage;
             texSlot.handle = cacheIt->second;
@@ -270,71 +277,21 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        ID3DShaderResourceView* srv = tex->get_SRView();
-        if (!srv) {
-            Msg("! [MaterialCache::ExtractTextures] No SRV for texture '%s' even after Load()", tex->cName.c_str());
+        resources::TextureHandle resourceHandle = texManager->LoadTexture(
+            textureName,
+            resources::TexturePriority::High
+        );
+
+        if (!resourceHandle.IsValid()) {
+            Msg("! [MaterialCache] Failed to load texture: %s", textureName);
             continue;
         }
 
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        srv->GetDesc(&srvDesc);
-
-        ID3D11Resource* d3dResource = nullptr;
-        srv->GetResource(&d3dResource);
-        if (!d3dResource) {
-            continue;
-        }
-
-        ID3D11Texture2D* d3dTex2D = nullptr;
-        HRESULT hr = d3dResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&d3dTex2D);
-
-        if (FAILED(hr) || !d3dTex2D) {
-            d3dResource->Release();
-            continue;
-        }
-
-        D3D11_TEXTURE2D_DESC d3dDesc;
-        d3dTex2D->GetDesc(&d3dDesc);
-        d3dTex2D->Release();
-
-        bool hasBindSRV = (d3dDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0;
-        if (!hasBindSRV) {
-        }
-
-        ng::RenderDevice::TextureDesc texDesc;
-        texDesc.width = d3dDesc.Width;
-        texDesc.height = d3dDesc.Height;
-        texDesc.mipLevels = d3dDesc.MipLevels;
-        texDesc.arraySize = d3dDesc.ArraySize;
-
-        if (d3dDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
-            texDesc.dimension = ng::RenderDevice::TextureDesc::TextureCube;
-        }
-        else if (d3dDesc.ArraySize > 1) {
-            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2DArray;
-        }
-        else {
-            texDesc.dimension = ng::RenderDevice::TextureDesc::Texture2D;
-        }
-
-        texDesc.format = ConvertDxgiFormatToNvrhi(d3dDesc.Format);
-        texDesc.isRenderTarget = false;
-        texDesc.isUAV = false;
-        texDesc.debugName = tex->cName.c_str();
-
-        ng::TextureHandle nvrhiTex = m_device->CreateTextureFromD3D11(d3dResource, texDesc);
-        d3dResource->Release();
-
-        if (!nvrhiTex.IsValid()) {
-            continue;
-        }
-
-
-        m_textureWrapperCache[tex->cName.c_str()] = nvrhiTex;
+        m_textureHandleCache[textureName] = resourceHandle;
 
         MaterialPSO::TextureSlot texSlot;
         texSlot.slot = stage;
-        texSlot.handle = nvrhiTex;
+        texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
     }
 }
@@ -692,8 +649,9 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
         }
     }
 
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     for (const auto& texSlot : matPSO->textures) {
-        nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(texSlot.handle);
+        nvrhi::ITexture* nativeTex = texManager->GetNVRHITexture(texSlot.handle);
 
         if (nativeTex) {
             const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
@@ -1256,7 +1214,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 void MaterialCache::Clear()
 {
     m_cache.clear();
-    m_textureWrapperCache.clear();
+    m_textureHandleCache.clear();
     m_detailScaleCache.clear();
     m_shaderHandles.clear();
     m_stats = Stats{};

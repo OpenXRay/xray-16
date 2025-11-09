@@ -2,7 +2,7 @@
 #include "RenderDevice.h"
 #include "RenderContext.h"
 #include "../NVRHI/NVRHIDevice.h"
-#include "../ResourceManager/ModernResourceManager.h"
+#include "../ResourceManager/FGResourceManager.h"
 
 namespace xray::render::ng {
 
@@ -35,8 +35,8 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
 
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
 
-    m_modernResourceManager = xr_make_unique<xray::render::resources::ModernResourceManager>(this);
-    Msg("* [RenderDevice] ModernResourceManager initialized");
+    m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
+    Msg("* [RenderDevice] FGResourceManager initialized");
 
     m_uploadCommandList = GetNativeDevice()->createCommandList();
     if (!m_uploadCommandList) {
@@ -212,30 +212,31 @@ void RenderDevice::UploadTextureData(
     }
 
     TextureInfo& info = m_textures[handle.index];
-    nvrhi::ITexture* nvrhiTexture = info.nvrhiHandle;
-
-    if (!nvrhiTexture) {
-        Msg("! [RenderDevice] UploadTextureData: Texture has no NVRHI handle");
-        return;
-    }
-
-    VERIFY(m_uploadCommandList && "Upload command list not initialized");
-    m_uploadCommandList->open();
 
     const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
     u32 mipWidth = (info.desc.width >> mipLevel) > 0 ? (info.desc.width >> mipLevel) : 1;
+    u32 mipHeight = (info.desc.height >> mipLevel) > 0 ? (info.desc.height >> mipLevel) : 1;
 
-    u32 rowPitch;
+    u32 rowPitch, slicePitch;
     if (formatInfo.blockSize > 1) {
-        rowPitch = ((mipWidth + 3) / 4) * formatInfo.bytesPerBlock;
+        u32 blockWidth = (mipWidth + 3) / 4;
+        u32 blockHeight = (mipHeight + 3) / 4;
+        rowPitch = blockWidth * formatInfo.bytesPerBlock;
+        slicePitch = rowPitch * blockHeight;
     } else {
         rowPitch = mipWidth * formatInfo.bytesPerBlock;
+        slicePitch = rowPitch * mipHeight;
     }
 
-    m_uploadCommandList->writeTexture(nvrhiTexture, arraySlice, mipLevel, data, rowPitch);
+    TextureSliceData slice;
+    slice.arraySlice = arraySlice;
+    slice.mipLevel = mipLevel;
+    slice.data = data;
+    slice.dataSize = dataSize;
+    slice.rowPitch = rowPitch;
+    slice.slicePitch = slicePitch;
 
-    m_uploadCommandList->close();
-    GetNativeDevice()->executeCommandList(m_uploadCommandList);
+    UploadTextureData(handle, &slice, 1);
 }
 
 void RenderDevice::UploadTextureData(
@@ -266,23 +267,11 @@ void RenderDevice::UploadTextureData(
 
     m_uploadCommandList->open();
 
-    const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(info.desc.format);
-
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
 
-        u32 mipWidth = (info.desc.width >> slice.mipLevel) > 0 ?
-                       (info.desc.width >> slice.mipLevel) : 1;
-
-        u32 rowPitch;
-        if (formatInfo.blockSize > 1) {
-            rowPitch = ((mipWidth + 3) / 4) * formatInfo.bytesPerBlock;
-        } else {
-            rowPitch = mipWidth * formatInfo.bytesPerBlock;
-        }
-
         m_uploadCommandList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
-                             slice.data, rowPitch);
+                             slice.data, slice.rowPitch);
     }
 
     m_uploadCommandList->close();

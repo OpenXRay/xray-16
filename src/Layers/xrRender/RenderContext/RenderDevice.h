@@ -5,7 +5,7 @@
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::resources {
-    class ModernResourceManager;
+    class FGResourceManager;
 }
 
 namespace xray::render::ng {
@@ -90,6 +90,8 @@ public:
         u32 mipLevel;
         const void* data;
         size_t dataSize;
+        u32 rowPitch;
+        u32 slicePitch;
     };
 
     void UploadTextureData(
@@ -201,7 +203,7 @@ public:
 
     PipelineStateCache* GetPipelineCache() { return m_pipelineCache.get(); }
 
-    xray::render::resources::ModernResourceManager* GetModernResourceManager() { return m_modernResourceManager.get(); }
+    xray::render::resources::FGResourceManager* GetFGResourceManager() { return m_modernResourceManager.get(); }
 
     nvrhi::IDevice* GetNativeDevice() const;
 
@@ -229,7 +231,7 @@ private:
 
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
 
-    xr_unique_ptr<xray::render::resources::ModernResourceManager> m_modernResourceManager;
+    xr_unique_ptr<xray::render::resources::FGResourceManager> m_modernResourceManager;
 
     nvrhi::CommandListHandle m_uploadCommandList;
 
