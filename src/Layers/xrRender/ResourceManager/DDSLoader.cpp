@@ -36,12 +36,29 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     // 1. .dds → Static DDS texture
     // 2. .ogm → Theora video texture
     // 3. .avi → AVI video texture (future)
+    //
+    // We search in multiple VFS directories:
+    // 1. $game_textures$ (general textures)
+    // 2. $level$ (level-specific textures like build_details)
 
     string_path resolvedPath;
     IReader* reader = nullptr;
 
+    // Helper lambda to try finding file in VFS directories
+    auto TryFindFile = [&](const char* ext) -> bool {
+        // Try $game_textures$ first (most common)
+        if (FS.exist(resolvedPath, "$game_textures$", filePath, ext)) {
+            return true;
+        }
+        // Try $level$ (level-specific textures)
+        if (FS.exist(resolvedPath, "$level$", filePath, ext)) {
+            return true;
+        }
+        return false;
+    };
+
     // Try DDS first (most common)
-    if (FS.exist(resolvedPath, "$game_textures$", filePath, ".dds")) {
+    if (TryFindFile(".dds")) {
         reader = FS.r_open(resolvedPath);
 
         if (!reader) {
@@ -54,12 +71,12 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
         // Continue with DDS loading below...
     }
     // Try OGM (Theora video)
-    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".ogm")) {
+    else if (TryFindFile(".ogm")) {
         Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
         return LoadVideoTexture(resolvedPath, outData);
     }
     // Try AVI (future)
-    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".avi")) {
+    else if (TryFindFile(".avi")) {
         Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", filePath);
         outData.isValid = false;
         outData.errorMessage = "AVI video textures not yet implemented";
@@ -67,7 +84,7 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     }
     // Not found
     else {
-        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi)", filePath);
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi in $game_textures$ and $level$)", filePath);
         outData.isValid = false;
         outData.errorMessage = "Texture file not found";
         return false;
@@ -586,10 +603,9 @@ bool DDSLoader::ParseMipLevels(
                 }
             }
 
-            // For 3D textures, multiply by depth
-            if (desc.type == TextureDesc::Texture3D) {
-                mip.slicePitch *= mipDepth;
-            }
+            // NOTE: For 3D textures, slicePitch is the stride between consecutive 2D slices,
+            // NOT the total size of all depth slices. NVRHI/D3D11 use this as the pitch.
+            // Do NOT multiply by mipDepth here!
 
             outMipLevels.push_back(mip);
 
@@ -781,9 +797,8 @@ bool DDSLoader::LoadMipRange(
                 mipData.slicePitch = mipData.rowPitch * mipHeight;
             }
 
-            if (desc.type == TextureDesc::Texture3D) {
-                mipData.slicePitch *= mipDepth;
-            }
+            // NOTE: For 3D textures, slicePitch is the stride between consecutive 2D slices,
+            // NOT the total size of all depth slices. Do NOT multiply by mipDepth!
 
             outData.mipLevels.push_back(mipData);
             dataPtr += mipData.size;

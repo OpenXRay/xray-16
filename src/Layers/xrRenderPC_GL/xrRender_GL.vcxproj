@@ -85,6 +85,7 @@
     <ClCompile Include="..\xrRender\dxThunderboltDescRender.cpp" />
     <ClCompile Include="..\xrRender\dxThunderboltRender.cpp" />
     <ClCompile Include="..\xrRender\dxUIRender.cpp" />
+    <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
     <ClCompile Include="..\xrRender\dxUISequenceVideoItem.cpp" />
     <ClCompile Include="..\xrRender\dxUIShader.cpp" />
     <ClCompile Include="..\xrRender\dxWallMarkArray.cpp" />
