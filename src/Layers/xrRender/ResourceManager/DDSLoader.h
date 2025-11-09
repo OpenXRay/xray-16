@@ -191,6 +191,22 @@ struct DDSData {
 
     VideoState* videoState = nullptr;  // Only allocated for video textures
 
+    // Sequence texture state (only valid if type == Sequence)
+    struct SequenceState {
+        xr_vector<DDSMipLevel> frameData;     // Pre-loaded pixel data for all frames
+        xr_vector<u32> frameBuffer;           // Current frame RGBA data (uploaded to GPU)
+        u32 frameWidth = 0;                   // Frame width
+        u32 frameHeight = 0;                  // Frame height
+        u32 textureWidth = 0;                 // Texture width (may be padded)
+        u32 textureHeight = 0;                // Texture height (may be padded)
+        u32 fps = 0;                          // Frames per second
+        u32 msPerFrame = 0;                   // Milliseconds per frame (1000 / fps)
+        bool cycled = false;                  // Ping-pong animation (forward then reverse)
+        bool needsUpdate = false;             // Frame has changed, need writeTexture
+    };
+
+    SequenceState* sequenceState = nullptr;  // Only allocated for sequence textures
+
     // Destructor must be in .cpp to avoid incomplete type issues with CTheoraSurface
     ~DDSData();
 
@@ -251,10 +267,19 @@ public:
     // Creates a dynamic texture that needs per-frame updates
     static bool LoadVideoTexture(const char* filePath, DDSData& outData);
 
+    // Load sequence texture (.seq format)
+    // Pre-loads all frame textures and sets up frame buffer for updates
+    static bool LoadSequenceTexture(const char* filePath, DDSData& outData);
+
     // Update video texture for current frame
     // Decodes the next frame and marks frameBuffer for GPU upload
     // Returns true if frame changed and needs writeTexture()
     static bool UpdateVideoFrame(DDSData& data, u32 currentTime);
+
+    // Update sequence texture for current frame
+    // Copies frame pixels to frameBuffer and marks for GPU upload
+    // Returns true if frame changed and needs writeTexture()
+    static bool UpdateSequenceFrame(DDSData& data, u32 currentFrame);
 
     // ═══════════════════════════════════════════════════
     //  FORMAT CONVERSION
