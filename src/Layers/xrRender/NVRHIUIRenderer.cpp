@@ -302,6 +302,12 @@ void NVRHIUIRenderer::UploadBatchGeometry(nvrhi::ICommandList* commandList,
     if (batch.vertices.empty() || batch.indices.empty())
         return;
 
+    if (!batch.vertices.empty()) {
+        const UIVertex& v0 = batch.vertices[0];
+        Msg("! [NVRHIUIRenderer] First vertex: pos=(%.2f, %.2f, %.2f, %.2f), color=0x%08X, uv=(%.6f, %.6f)",
+            v0.x, v0.y, v0.z, v0.w, v0.color, v0.u, v0.v);
+    }
+
     const size_t vertexDataSize = batch.vertices.size() * sizeof(UIVertex);
     commandList->writeBuffer(m_vertexBuffer, batch.vertices.data(), vertexDataSize,
                             vertexOffset * sizeof(UIVertex));

@@ -19,7 +19,17 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     string_path resolvedPath;
     IReader* reader = nullptr;
 
-    if (FS.exist(resolvedPath, "$game_textures$", filePath, ".dds")) {
+    auto TryFindFile = [&](const char* ext) -> bool {
+        if (FS.exist(resolvedPath, "$game_textures$", filePath, ext)) {
+            return true;
+        }
+        if (FS.exist(resolvedPath, "$level$", filePath, ext)) {
+            return true;
+        }
+        return false;
+    };
+
+    if (TryFindFile(".dds")) {
         reader = FS.r_open(resolvedPath);
 
         if (!reader) {
@@ -30,18 +40,18 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
         }
 
     }
-    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".ogm")) {
+    else if (TryFindFile(".ogm")) {
         Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
         return LoadVideoTexture(resolvedPath, outData);
     }
-    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".avi")) {
+    else if (TryFindFile(".avi")) {
         Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", filePath);
         outData.isValid = false;
         outData.errorMessage = "AVI video textures not yet implemented";
         return false;
     }
     else {
-        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi)", filePath);
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi in $game_textures$ and $level$)", filePath);
         outData.isValid = false;
         outData.errorMessage = "Texture file not found";
         return false;
@@ -494,10 +504,6 @@ bool DDSLoader::ParseMipLevels(
                 }
             }
 
-            if (desc.type == TextureDesc::Texture3D) {
-                mip.slicePitch *= mipDepth;
-            }
-
             outMipLevels.push_back(mip);
 
             dataPtr += mipSize;
@@ -652,10 +658,6 @@ bool DDSLoader::LoadMipRange(
             } else {
                 mipData.rowPitch = mipWidth * formatInfo.bytesPerBlock;
                 mipData.slicePitch = mipData.rowPitch * mipHeight;
-            }
-
-            if (desc.type == TextureDesc::Texture3D) {
-                mipData.slicePitch *= mipDepth;
             }
 
             outData.mipLevels.push_back(mipData);
