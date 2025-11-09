@@ -140,6 +140,8 @@ public:
 
     bool IsResident(TextureHandle handle) const;
 
+    TextureHandle FindTexture(const char* path) const;
+
     void SetMemoryBudget(u64 bytes);
     u64 GetMemoryBudget() const { return m_memoryBudget; }
 

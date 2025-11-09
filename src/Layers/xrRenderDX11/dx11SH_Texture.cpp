@@ -478,6 +478,9 @@ void CTexture::Load()
         if (pSurface)
         {
             flags.MemoryUsage = mem;
+
+            desc_update();
+
             CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
         }
     }
