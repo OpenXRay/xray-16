@@ -837,31 +837,17 @@ void TextureManager::UpdateVideoTextures() {
             continue;
         }
 
-        nvrhi::ICommandList* cmdList = m_device->GetNVRHIDevice()->createCommandList();
-        if (!cmdList) {
-            Msg("! [TextureManager] Failed to create command list for video texture update");
-            continue;
-        }
-
-        cmdList->open();
-
         u32 texWidth = videoState->textureWidth;
         u32 texHeight = videoState->textureHeight;
-        size_t rowPitch = texWidth * 4;
-        size_t depthPitch = rowPitch * texHeight;
+        size_t dataSize = texWidth * texHeight * 4;
 
-        cmdList->writeTexture(
+        m_device->UploadTextureDataToNVRHI(
             nvrhiTex,
             0,
             0,
             videoState->frameBuffer.data(),
-            rowPitch,
-            depthPitch
+            dataSize
         );
-
-        cmdList->close();
-        m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-        cmdList->Release();
 
         videoState->needsUpdate = false;
 

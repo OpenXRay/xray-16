@@ -135,6 +135,10 @@ void FrameGraphRenderer::Render() {
 
     auto frameStart = std::chrono::high_resolution_clock::now();
 
+    if (m_device && m_device->GetFGResourceManager()) {
+        m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
+    }
+
     SetupFrame();
 
     SetupFrameGraphPasses();
@@ -181,6 +185,10 @@ void FrameGraphRenderer::RenderMenu() {
     VERIFY(m_framegraph != nullptr);
 
     Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
+
+    if (m_device && m_device->GetFGResourceManager()) {
+        m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
+    }
 
     m_framegraph->SetRenderContext(m_renderContext.get());
 

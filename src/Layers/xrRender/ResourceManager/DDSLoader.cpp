@@ -14,6 +14,44 @@ DDSData::~DDSData() {
     }
 }
 
+DDSData::DDSData(DDSData&& other) noexcept
+    : desc(std::move(other.desc))
+    , mipLevels(std::move(other.mipLevels))
+    , fileDataCopy(std::move(other.fileDataCopy))
+    , filePath(std::move(other.filePath))
+    , totalDataSize(other.totalDataSize)
+    , isValid(other.isValid)
+    , errorMessage(std::move(other.errorMessage))
+    , type(other.type)
+    , videoState(other.videoState)
+{
+    other.videoState = nullptr;
+}
+
+DDSData& DDSData::operator=(DDSData&& other) noexcept {
+    if (this != &other) {
+        if (videoState) {
+            if (videoState->theoraSurface) {
+                xr_delete(videoState->theoraSurface);
+            }
+            xr_delete(videoState);
+        }
+
+        desc = std::move(other.desc);
+        mipLevels = std::move(other.mipLevels);
+        fileDataCopy = std::move(other.fileDataCopy);
+        filePath = std::move(other.filePath);
+        totalDataSize = other.totalDataSize;
+        isValid = other.isValid;
+        errorMessage = std::move(other.errorMessage);
+        type = other.type;
+        videoState = other.videoState;
+
+        other.videoState = nullptr;
+    }
+    return *this;
+}
+
 bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
 
     string_path resolvedPath;

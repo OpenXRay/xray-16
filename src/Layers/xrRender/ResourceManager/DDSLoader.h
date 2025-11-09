@@ -158,6 +158,14 @@ struct DDSData {
     VideoState* videoState = nullptr;
 
     ~DDSData();
+
+    DDSData(DDSData&& other) noexcept;
+    DDSData& operator=(DDSData&& other) noexcept;
+
+    DDSData(const DDSData&) = delete;
+    DDSData& operator=(const DDSData&) = delete;
+
+    DDSData() = default;
 };
 
 class DDSLoader {
