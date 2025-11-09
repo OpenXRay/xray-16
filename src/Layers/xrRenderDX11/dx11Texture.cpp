@@ -170,7 +170,12 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
         Msg("* [FrameGraph] Successfully loaded texture: %s (NVRHI-owned)", fname);
 
-        // Return D3D11 texture (NVRHI still owns it, but we expose D3D11 interface for legacy code)
+        // CRITICAL: AddRef() to give CTexture its own COM reference
+        // NVRHI holds one reference, CTexture holds another
+        // When CTexture::Unload() calls Release(), ref count drops from 2→1 (NVRHI still owns it)
+        // When NVRHI releases later, ref count drops from 1→0 (texture properly destroyed)
+        d3d11Texture->AddRef();
+
         return d3d11Texture;
     }
 
