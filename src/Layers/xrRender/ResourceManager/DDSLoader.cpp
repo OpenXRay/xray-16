@@ -1,36 +1,81 @@
 #include "stdafx.h"
 #include "DDSLoader.h"
 #include "xrCore/FS.h"
+#include "xrEngine/xrTheora_Surface.h"
 
 // DDS File Format Loader Implementation
 // Week 1 - Day 2: Task 2.1
+// Week 6: Added video texture support (.ogm/.avi)
 
 namespace xray::render::resources {
+
+// ═══════════════════════════════════════════════════
+//  DDSDATA DESTRUCTOR
+// ═══════════════════════════════════════════════════
+
+DDSData::~DDSData() {
+    // Clean up video state
+    if (videoState) {
+        if (videoState->theoraSurface) {
+            xr_delete(videoState->theoraSurface);
+        }
+        xr_delete(videoState);
+    }
+}
 
 // ═══════════════════════════════════════════════════
 //  FILE LOADING
 // ═══════════════════════════════════════════════════
 
 bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
-    // The filePath may be:
-    // 1. A VFS path like "$game_textures$\texture_name"
-    // 2. A relative path like "textures\texture_name"
-    // 3. An absolute path
+    // ═══════════════════════════════════════════════════
+    //  AUTO-DETECT FILE TYPE AND DISPATCH
+    // ═══════════════════════════════════════════════════
+    // The filePath is a VFS texture name like "ui\video_voroni_crop"
+    // We try to find the file with different extensions:
+    // 1. .dds → Static DDS texture
+    // 2. .ogm → Theora video texture
+    // 3. .avi → AVI video texture (future)
 
     string_path resolvedPath;
     IReader* reader = nullptr;
 
-    // Try to find through VFS
+    // Try DDS first (most common)
     if (FS.exist(resolvedPath, "$game_textures$", filePath, ".dds")) {
         reader = FS.r_open(resolvedPath);
-    }
 
-    if (!reader) {
-        Msg("! [DDSLoader] Failed to open file: %s", filePath);
+        if (!reader) {
+            Msg("! [DDSLoader] Failed to open DDS file: %s", resolvedPath);
+            outData.isValid = false;
+            outData.errorMessage = "DDS file not found";
+            return false;
+        }
+
+        // Continue with DDS loading below...
+    }
+    // Try OGM (Theora video)
+    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".ogm")) {
+        Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
+        return LoadVideoTexture(resolvedPath, outData);
+    }
+    // Try AVI (future)
+    else if (FS.exist(resolvedPath, "$game_textures$", filePath, ".avi")) {
+        Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", filePath);
         outData.isValid = false;
-        outData.errorMessage = "File not found";
+        outData.errorMessage = "AVI video textures not yet implemented";
         return false;
     }
+    // Not found
+    else {
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .ogm, .avi)", filePath);
+        outData.isValid = false;
+        outData.errorMessage = "Texture file not found";
+        return false;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  DDS LOADING (STATIC TEXTURE)
+    // ═══════════════════════════════════════════════════
 
     // Read entire file into memory
     const u32 fileSize = reader->length();
@@ -514,10 +559,31 @@ bool DDSLoader::ParseMipLevels(
 
                 mip.rowPitch = blockWidth * formatInfo.bytesPerBlock;
                 mip.slicePitch = mip.rowPitch * blockHeight;
+
+                // Debug log for first mip only
+                if (mipLevel == 0 && arraySlice == 0) {
+                    Msg("* [DDSLoader] Block-compressed: %ux%u → %ux%u blocks, blockSize=%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
+                        mipWidth, mipHeight, blockWidth, blockHeight,
+                        formatInfo.blockSize, formatInfo.bytesPerBlock,
+                        mip.rowPitch, mip.slicePitch);
+                }
             } else {
                 // Uncompressed formats
-                mip.rowPitch = mipWidth * formatInfo.bytesPerBlock;
+                // CRITICAL: D3D11 requires rowPitch to be aligned to D3D11_TEXTURE_DATA_PITCH_ALIGNMENT (256 bytes for most hardware)
+                // However, for small textures this is often ignored. We calculate the natural pitch first.
+                u32 naturalRowPitch = mipWidth * formatInfo.bytesPerBlock;
+
+                // For UpdateSubresource, we should use the natural pitch WITHOUT padding
+                // The driver will handle alignment internally
+                mip.rowPitch = naturalRowPitch;
                 mip.slicePitch = mip.rowPitch * mipHeight;
+
+                // Debug log for first mip only
+                if (mipLevel == 0 && arraySlice == 0) {
+                    Msg("* [DDSLoader] Uncompressed: %ux%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
+                        mipWidth, mipHeight, formatInfo.bytesPerBlock,
+                        mip.rowPitch, mip.slicePitch);
+                }
             }
 
             // For 3D textures, multiply by depth
@@ -730,6 +796,194 @@ bool DDSLoader::LoadMipRange(
 
     Msg("* [DDSLoader] LoadMipRange: %s (mips %u→%u, %llu KB)",
         filePath, startMip, startMip + mipCount, totalSize / 1024);
+
+    return true;
+}
+
+// ═══════════════════════════════════════════════════
+//  VIDEO TEXTURE LOADING (.OGM FORMAT)
+// ═══════════════════════════════════════════════════
+
+bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
+    Msg("* [DDSLoader] Loading video texture: %s", filePath);
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 1: LOAD THEORA STREAM AND GET METADATA
+    // ═══════════════════════════════════════════════════
+
+    CTheoraSurface* theoraSurface = xr_new<CTheoraSurface>();
+
+    if (!theoraSurface->Load(filePath)) {
+        Msg("! [DDSLoader] Failed to load Theora video: %s", filePath);
+        xr_delete(theoraSurface);
+        outData.isValid = false;
+        outData.errorMessage = "Failed to open Theora video stream";
+        return false;
+    }
+
+    // Get video dimensions
+    u32 videoWidth = theoraSurface->Width(true);   // Actual video width
+    u32 videoHeight = theoraSurface->Height(true); // Actual video height
+    u32 texWidth = theoraSurface->Width(false);    // Pow2 texture width
+    u32 texHeight = theoraSurface->Height(false);  // Pow2 texture height
+
+    Msg("* [DDSLoader] Video dimensions: %ux%u (texture: %ux%u)",
+        videoWidth, videoHeight, texWidth, texHeight);
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 2: CREATE VIDEO STATE
+    // ═══════════════════════════════════════════════════
+
+    outData.type = DDSData::TextureType::Video;
+    outData.videoState = xr_new<DDSData::VideoState>();
+    outData.videoState->theoraSurface = theoraSurface;
+    outData.videoState->frameWidth = videoWidth;
+    outData.videoState->frameHeight = videoHeight;
+    outData.videoState->textureWidth = texWidth;   // Store padded dimensions for pitch calculation
+    outData.videoState->textureHeight = texHeight;
+
+    // Allocate frame buffer (RGBA8 format)
+    u32 frameBufferSize = texWidth * texHeight;
+    outData.videoState->frameBuffer.resize(frameBufferSize);
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 3: SETUP TEXTURE DESCRIPTION
+    // ═══════════════════════════════════════════════════
+
+    outData.desc.type = TextureDesc::Texture2D;
+    outData.desc.width = texWidth;
+    outData.desc.height = texHeight;
+    outData.desc.depth = 1;
+    outData.desc.mipLevels = 1;  // Video textures don't have mipmaps
+    outData.desc.arraySize = 1;
+    outData.desc.format = nvrhi::Format::RGBA8_UNORM;  // Decoded to RGBA
+    outData.desc.debugName = filePath;
+    outData.desc.isRenderTarget = false;
+    outData.desc.isUAV = false;
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 4: CREATE DUMMY MIP LEVEL (FOR NVRHI CREATION)
+    // ═══════════════════════════════════════════════════
+    // We create one mip level pointing to our frame buffer
+    // The actual data will be updated via writeTexture() each frame
+
+    DDSMipLevel mip;
+    mip.width = texWidth;
+    mip.height = texHeight;
+    mip.depth = 1;
+    mip.size = frameBufferSize * 4;  // RGBA8 = 4 bytes per pixel
+    mip.rowPitch = texWidth * 4;
+    mip.slicePitch = mip.rowPitch * texHeight;
+    mip.data = (const u8*)outData.videoState->frameBuffer.data();
+
+    outData.mipLevels.push_back(mip);
+    outData.totalDataSize = mip.size;
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 5: START VIDEO PLAYBACK
+    // ═══════════════════════════════════════════════════
+
+    // Check if this is a looping video (menu videos loop, intros don't)
+    bool shouldLoop = (strstr(filePath, "intro" DELIMITER) == nullptr) &&
+                      (strstr(filePath, "outro" DELIMITER) == nullptr);
+
+    theoraSurface->Play(shouldLoop, Device.dwTimeContinual);
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 6: DECODE INITIAL FRAME
+    // ═══════════════════════════════════════════════════
+    // CRITICAL: We must decode the first frame BEFORE creating the GPU texture
+    // Otherwise the texture will be created with uninitialized/black data!
+
+    Msg("* [DDSLoader] Decoding initial video frame...");
+
+    // Update to get first frame
+    bool firstFrameDecoded = theoraSurface->Update(Device.dwTimeContinual);
+    if (!firstFrameDecoded) {
+        // Force decode by waiting a bit
+        Sleep(16); // Wait one frame
+        firstFrameDecoded = theoraSurface->Update(Device.dwTimeContinual + 16);
+    }
+
+    if (firstFrameDecoded) {
+        // Decompress first frame to our buffer
+        int pos = 0;
+        theoraSurface->DecompressFrame(
+            outData.videoState->frameBuffer.data(),
+            texWidth - videoWidth,  // Padding for pow2 textures
+            pos
+        );
+
+        Msg("* [DDSLoader] First frame decoded successfully (pos=%d, expected=%u)",
+            pos, videoHeight * texWidth);
+    } else {
+        Msg("! [DDSLoader] WARNING: Failed to decode initial frame for: %s", filePath);
+        // Fill with a visible color for debugging (magenta)
+        for (u32& pixel : outData.videoState->frameBuffer) {
+            pixel = 0xFFFF00FF;  // Magenta (ARGB)
+        }
+    }
+
+    // Mark for GPU upload
+    outData.videoState->needsUpdate = true;
+
+    // ═══════════════════════════════════════════════════
+    //  SUCCESS
+    // ═══════════════════════════════════════════════════
+
+    outData.isValid = true;
+    outData.filePath = filePath;
+
+    Msg("* [DDSLoader] Video texture loaded: %s (%ux%u, loop=%s, initialFrame=%s)",
+        filePath, videoWidth, videoHeight, shouldLoop ? "yes" : "no",
+        firstFrameDecoded ? "OK" : "FAIL");
+
+    return true;
+}
+
+// ═══════════════════════════════════════════════════
+//  VIDEO FRAME UPDATE
+// ═══════════════════════════════════════════════════
+
+bool DDSLoader::UpdateVideoFrame(DDSData& data, u32 currentTime) {
+    // Verify this is a video texture
+    if (data.type != DDSData::TextureType::Video || !data.videoState) {
+        return false;
+    }
+
+    auto* videoState = data.videoState;
+    auto* theora = videoState->theoraSurface;
+
+    if (!theora) {
+        return false;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  DECODE NEXT FRAME
+    // ═══════════════════════════════════════════════════
+
+    bool frameChanged = theora->Update(currentTime);
+
+    if (!frameChanged) {
+        return false;  // Same frame, no update needed
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  DECOMPRESS FRAME TO RGBA BUFFER
+    // ═══════════════════════════════════════════════════
+
+    u32 texWidth = theora->Width(false);
+    u32 videoWidth = theora->Width(true);
+
+    int pos = 0;
+    theora->DecompressFrame(
+        videoState->frameBuffer.data(),
+        texWidth - videoWidth,  // Padding for pow2 textures
+        pos
+    );
+
+    // Mark as needing GPU upload
+    videoState->needsUpdate = true;
 
     return true;
 }

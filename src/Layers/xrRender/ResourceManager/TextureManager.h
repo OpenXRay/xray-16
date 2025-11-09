@@ -15,6 +15,7 @@ namespace xray::render::ng {
 namespace xray::render::resources {
 
 class StreamingManager;  // Forward declaration
+struct DDSData;           // Forward declaration for video texture support
 
 // ═══════════════════════════════════════════════════
 //  TEXTURE STATE TRACKING
@@ -113,6 +114,9 @@ struct TextureMetadata {
 
     // Physical resource
     nvrhi::TextureHandle nvrhiTexture;  // May be null if unloaded
+
+    // Video texture support (Week 6)
+    xr_unique_ptr<DDSData> videoTextureData;  // Only set for video textures (.ogm/.avi)
 
     // Async loading
     struct LoadRequest {
@@ -300,6 +304,9 @@ private:
     bool EnforceMemoryBudget(u64 requiredBytes);
     bool EvictTextures(u64 bytesNeeded);
     void EvictTextureInternal(TextureHandle handle);
+
+    // Video texture update (Week 6)
+    void UpdateVideoTextures();
 
     // ═══════════════════════════════════════════════════
     //  THREAD SAFETY (Week 3)

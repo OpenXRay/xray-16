@@ -1554,15 +1554,20 @@ MaterialPSO* MaterialCache::CreateUIPSO(
             i, attr.semanticName, attr.semanticIndex, (int)attr.format, attr.offset, attr.elementStride);
     }
 
-    // UI render state (no depth, alpha blending, no culling)
-    psoDesc.depthStencilState.depthTestEnable = false;
-    psoDesc.depthStencilState.depthWriteEnable = false;
-    psoDesc.depthStencilState.stencilEnable = false;
+    // UI render state - matches vanilla X-Ray:
+    // Depth: enabled, always pass, no write (for stencil support)
+    // Stencil: enabled (used by some UI shaders)
+    // Blend: standard alpha blending for both color and alpha channels
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Always;  // Always pass depth test
+    psoDesc.depthStencilState.depthWriteEnable = false;  // Don't write depth
+    psoDesc.depthStencilState.stencilEnable = true;      // Enable stencil for UI effects
 
+    // Standard premultiplied alpha blending (matches vanilla)
     psoDesc.blendState.renderTargets[0].blendEnable = true;
     psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
     psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::One;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;  // FIXED: was One, should be SrcAlpha!
     psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
 
     psoDesc.rasterizerState.cullMode = ng::CullMode::None;

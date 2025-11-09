@@ -308,7 +308,8 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
         const DDSMipLevel& mipData = ddsData.mipLevels[mip];
 
         // Use pitch values calculated by DDSLoader (DRY principle)
-        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch);
+        // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
+        cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch, mipData.slicePitch);
     }
 
     cmdList->close();

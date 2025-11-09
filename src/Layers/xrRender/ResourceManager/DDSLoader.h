@@ -165,6 +165,34 @@ struct DDSData {
     // Validation
     bool isValid = false;
     shared_str errorMessage;
+
+    // ═══════════════════════════════════════════════════
+    //  DYNAMIC/VIDEO TEXTURE SUPPORT
+    // ═══════════════════════════════════════════════════
+
+    enum class TextureType {
+        Static,      // Normal DDS texture - loaded once
+        Video,       // Video texture (.ogm/.avi) - needs per-frame decode
+        Sequence     // Animated sequence (.seq) - frame-based playback
+    };
+
+    TextureType type = TextureType::Static;
+
+    // Video texture state (only valid if type == Video)
+    struct VideoState {
+        CTheoraSurface* theoraSurface = nullptr;  // Theora decoder (for .ogm)
+        xr_vector<u32> frameBuffer;               // Decoded frame RGBA data
+        u32 frameWidth = 0;                       // Actual video width
+        u32 frameHeight = 0;                      // Actual video height
+        u32 textureWidth = 0;                     // Pow2-padded texture width (for pitch)
+        u32 textureHeight = 0;                    // Pow2-padded texture height (for pitch)
+        bool needsUpdate = false;                 // Frame has changed, need writeTexture
+    };
+
+    VideoState* videoState = nullptr;  // Only allocated for video textures
+
+    // Destructor must be in .cpp to avoid incomplete type issues with CTheoraSurface
+    ~DDSData();
 };
 
 // ═══════════════════════════════════════════════════
@@ -180,7 +208,11 @@ public:
     //  LOADING METHODS
     // ═══════════════════════════════════════════════════
 
-    // Load DDS from file on disk
+    // Load texture from file on disk
+    // Automatically detects file type and loads:
+    // - .dds → Static DDS texture
+    // - .ogm → Theora video texture (dynamic, per-frame decode)
+    // - .avi → AVI video texture (not yet implemented)
     static bool LoadFromFile(const char* filePath, DDSData& outData);
 
     // Load DDS from memory buffer
@@ -199,6 +231,19 @@ public:
         u32 mipCount,
         DDSData& outData
     );
+
+    // ═══════════════════════════════════════════════════
+    //  VIDEO TEXTURE LOADING
+    // ═══════════════════════════════════════════════════
+
+    // Load video texture (.ogm format)
+    // Creates a dynamic texture that needs per-frame updates
+    static bool LoadVideoTexture(const char* filePath, DDSData& outData);
+
+    // Update video texture for current frame
+    // Decodes the next frame and marks frameBuffer for GPU upload
+    // Returns true if frame changed and needs writeTexture()
+    static bool UpdateVideoFrame(DDSData& data, u32 currentTime);
 
     // ═══════════════════════════════════════════════════
     //  FORMAT CONVERSION

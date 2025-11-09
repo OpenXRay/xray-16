@@ -645,6 +645,9 @@ void TextureManager::Update(float deltaTime) {
         meta.lastAccessTime += deltaTime;
     }
 
+    // Update video textures (Week 6)
+    UpdateVideoTextures();
+
     // Update streaming
     m_streamingManager->Update(deltaTime);
 
@@ -675,12 +678,24 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     // Mark as loading
     meta.state = TextureState::Loading;
 
-    // Load DDS file from disk
+    // ═══════════════════════════════════════════════════
+    //  LOAD TEXTURE FILE (AUTO-DETECTS .DDS OR .OGM)
+    // ═══════════════════════════════════════════════════
+    // DDSLoader now automatically detects file type:
+    // - .dds → Static DDS texture
+    // - .ogm → Theora video texture (dynamic, per-frame decode)
+
     DDSData ddsData;
     if (!DDSLoader::LoadFromFile(meta.filePath.c_str(), ddsData)) {
-        Msg("! [TextureManager] Failed to load DDS: %s", meta.filePath.c_str());
+        Msg("! [TextureManager] Failed to load texture: %s", meta.filePath.c_str());
         meta.state = TextureState::Unloaded;
         return;
+    }
+
+    // Check if this is a video texture
+    bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
+    if (isVideoTexture) {
+        Msg("* [TextureManager] Video texture detected: %s", meta.filePath.c_str());
     }
 
     // ═══════════════════════════════════════════════════
@@ -761,19 +776,31 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     // Store NVRHI handle
     meta.nvrhiTexture = m_device->GetNativeTexture(deviceHandle);
 
+    // ═══════════════════════════════════════════════════
+    //  STORE VIDEO TEXTURE STATE (IF APPLICABLE)
+    // ═══════════════════════════════════════════════════
+
+    if (isVideoTexture) {
+        // Move DDSData into metadata so we can update it each frame
+        meta.videoTextureData = xr_make_unique<DDSData>();
+        *meta.videoTextureData = std::move(ddsData);  // Transfer ownership
+
+        Msg("* [TextureManager] Video texture state stored for: %s", meta.filePath.c_str());
+    }
+
     // Update metadata
     meta.state = TextureState::Resident;
-    meta.residentMips = ddsData.desc.mipLevels;
-    meta.totalMips = ddsData.desc.mipLevels;
-    meta.requestedMips = ddsData.desc.mipLevels;
+    meta.residentMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;  // Video textures have 1 mip
+    meta.totalMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
+    meta.requestedMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
     meta.memoryUsed = ddsData.totalDataSize;
 
     // Update memory tracking
     m_memoryUsed += meta.memoryUsed;
 
-    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu)",
+    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu, video=%s)",
         meta.filePath.c_str(), meta.residentMips, meta.memoryUsed,
-        m_memoryUsed, m_memoryBudget);
+        m_memoryUsed, m_memoryBudget, isVideoTexture ? "yes" : "no");
 }
 
 void TextureManager::LoadTextureAsync(TextureHandle handle) {
@@ -920,6 +947,101 @@ const char* TexturePriorityToString(TexturePriority priority) {
         case TexturePriority::Low: return "Low";
         case TexturePriority::VeryLow: return "VeryLow";
         default: return "Unknown";
+    }
+}
+
+// ═══════════════════════════════════════════════════
+//  VIDEO TEXTURE UPDATE (Week 6)
+// ═══════════════════════════════════════════════════
+
+void TextureManager::UpdateVideoTextures() {
+    static int s_frameCount = 0;
+    s_frameCount++;
+
+    // Iterate through all textures and update video textures
+    int videoTextureCount = 0;
+    int updatedCount = 0;
+
+    for (auto& meta : m_textures) {
+        if (!meta.isAlive || !meta.videoTextureData) {
+            continue;  // Not a video texture
+        }
+
+        videoTextureCount++;
+
+        // Decode next frame
+        bool frameChanged = DDSLoader::UpdateVideoFrame(*meta.videoTextureData, Device.dwTimeContinual);
+
+        if (!frameChanged) {
+            continue;  // Same frame, no update needed
+        }
+
+        updatedCount++;
+
+        auto* videoState = meta.videoTextureData->videoState;
+        if (!videoState || !videoState->needsUpdate) {
+            Msg("! [TextureManager] Frame changed but needsUpdate=false for: %s", meta.filePath.c_str());
+            continue;
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  UPLOAD NEW FRAME TO GPU USING writeTexture()
+        // ═══════════════════════════════════════════════════
+        // This is the NVRHI abstraction that works across DX11/DX12/Vulkan!
+
+        nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
+        if (!nvrhiTex) {
+            Msg("! [TextureManager] Video texture has no NVRHI texture: %s", meta.filePath.c_str());
+            continue;
+        }
+
+        // Get active NVRHI command list from device
+        // Note: We need a command list that's currently recording
+        // For now, we'll create a temporary one per frame
+        // TODO: Integrate with FrameGraph's command list system
+        nvrhi::ICommandList* cmdList = m_device->GetNVRHIDevice()->createCommandList();
+        if (!cmdList) {
+            Msg("! [TextureManager] Failed to create command list for video texture update");
+            continue;
+        }
+
+        // Open command list
+        cmdList->open();
+
+        // Upload frame data using writeTexture (NVRHI's per-frame upload API)
+        // Parameters: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
+        // IMPORTANT: Use TEXTURE dimensions (pow2-padded), not frame dimensions!
+        u32 texWidth = videoState->textureWidth;
+        u32 texHeight = videoState->textureHeight;
+        size_t rowPitch = texWidth * 4;  // RGBA8 = 4 bytes per pixel
+        size_t depthPitch = rowPitch * texHeight;
+
+        cmdList->writeTexture(
+            nvrhiTex,
+            0,  // arraySlice
+            0,  // mipLevel
+            videoState->frameBuffer.data(),  // data pointer
+            rowPitch,
+            depthPitch
+        );
+
+        // Close and execute
+        cmdList->close();
+        m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+        cmdList->Release();  // CRITICAL: Release to avoid memory leak!
+
+        // Clear the update flag
+        videoState->needsUpdate = false;
+
+        if (s_frameCount % 60 == 0) {  // Log every 60 frames
+            Msg("* [TextureManager] Updated video texture: %s (%ux%u)",
+                meta.filePath.c_str(), texWidth, texHeight);
+        }
+    }
+
+    if (s_frameCount % 120 == 0 && videoTextureCount > 0) {  // Log every 120 frames
+        Msg("* [TextureManager] UpdateVideoTextures: %d video textures, %d updated this frame",
+            videoTextureCount, updatedCount);
     }
 }
 
