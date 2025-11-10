@@ -4,10 +4,15 @@
 
 #include "xrEngine/GameFont.h"
 
+namespace xray::render::passes {
+    class TextPass;  // Forward declaration
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class dxFontRender : public IFontRender
 {
+    friend class xray::render::passes::TextPass;  // Allow TextPass to access shader
 public:
     dxFontRender() = default;
     ~dxFontRender() override;
@@ -21,5 +26,6 @@ private:
 private:
     ref_shader pShader;
     ref_geom pGeom;
+    shared_str strTextureName;  // Stored texture name for FrameGraph access
 };
 } // namespace xray::render::RENDER_NAMESPACE

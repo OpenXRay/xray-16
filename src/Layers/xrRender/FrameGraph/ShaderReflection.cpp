@@ -53,7 +53,8 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     ID3D11VertexShader* vs,
     ID3DBlob* bytecode) {
 
-    VERIFY(vs);
+    // vs is unused - we only need bytecode for D3DReflect
+    // VERIFY(vs);
     VERIFY(bytecode);
 
     VertexInputSignature signature;
@@ -228,7 +229,8 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     ID3D11PixelShader* ps,
     ID3DBlob* bytecode) {
 
-    VERIFY(ps);
+    // ps is unused - we only need bytecode for D3DReflect
+    // VERIFY(ps);
     VERIFY(bytecode);
 
     ShaderRTBindings bindings;

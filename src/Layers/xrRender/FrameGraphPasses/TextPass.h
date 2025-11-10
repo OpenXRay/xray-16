@@ -8,6 +8,13 @@
 // Forward declarations
 class CGameFont;
 
+namespace xray::render {
+    class MaterialCache;
+    namespace framegraph {
+        class VolatileConstantBufferPool;
+    }
+}
+
 namespace xray::render::resources {
     class FGResourceManager;
     struct TextureHandle;
@@ -76,8 +83,11 @@ private:
     // Collect all text from active CGameFont instances
     void CollectTextGeometry();
 
+    // Extract shader information from CGameFont and initialize pipeline (lazy init)
+    bool InitializeFromFont(CGameFont* font, nvrhi::ICommandList* cmdList);
+
     // Build vertex/index buffers for text quads
-    void BuildTextBuffers();
+    void BuildTextBuffers(nvrhi::ICommandList* cmdList);
 
     // Render text using NVRHI
     void RenderText(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer);
@@ -102,15 +112,30 @@ private:
     nvrhi::BindingLayoutHandle m_bindingLayout;  // Layout for texture + constants
     nvrhi::GraphicsPipelineHandle m_pipeline;     // Cached pipeline state
 
-    bool m_initialized{false};
+    bool m_initialized{false};         // Buffers/vertex layout initialized
+    bool m_pipelineReady{false};       // Shaders/pipeline initialized (lazy)
 
-    // Font texture cache (path -> TextureHandle)
-    xr_map<shared_str, resources::TextureHandle> m_fontTextures;
+    // Font texture (loaded via FGResourceManager)
+    ng::TextureHandle m_fontTextureHandle;
+
+    // Shader reflection results (discovered textures/samplers/CBs)
+    framegraph::ShaderRTBindings m_shaderReflection;
+    framegraph::ShaderConstantBuffers m_vsConstantBuffers;  // Vertex shader CBs
+
+    // Cached samplers (created once, reused every frame)
+    xr_vector<nvrhi::SamplerHandle> m_samplers;
+
+    // Constant buffer for vertex shader (if needed)
+    nvrhi::BufferHandle m_vsConstantBuffer;
+
+    // Default fallback texture (1x1 white) for when font textures aren't loaded
+    nvrhi::TextureHandle m_defaultTexture;
 
     // Vertex format for text rendering
+    // Matches shader input: v_TL { float4 P : POSITION; float2 Tex0 : TEXCOORD0; float4 Color : COLOR; }
     struct TextVertex {
-        float x, y, z;       // Position
-        u32 color;           // RGBA color
+        float x, y, z, w;    // Position (w=1.0 for screen-space quads)
+        u32 color;           // RGBA color (packed BGRA for shader)
         float u, v;          // Texture coordinates
     };
 
