@@ -74,11 +74,16 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
-    // Create menu rendering passes (3-step pipeline)
-    passes::MenuUIPassConfig menuUIConfig;
-    menuUIConfig.width = Device.dwWidth;
-    menuUIConfig.height = Device.dwHeight;
-    m_menuUIPass = xr_make_unique<passes::MenuUIPass>(device, menuUIConfig);
+    // Create UI rendering passes (4-step pipeline - works for menu AND in-game)
+    passes::UIPassConfig uiConfig;
+    uiConfig.width = Device.dwWidth;
+    uiConfig.height = Device.dwHeight;
+    m_uiPass = xr_make_unique<passes::UIPass>(device, uiConfig);
+
+    passes::TextPassConfig textConfig;
+    textConfig.width = Device.dwWidth;
+    textConfig.height = Device.dwHeight;
+    m_textPass = xr_make_unique<passes::TextPass>(device, textConfig);
 
     passes::MenuDistortPassConfig menuDistortConfig;
     menuDistortConfig.width = Device.dwWidth;
@@ -143,7 +148,8 @@ void FrameGraphRenderer::Shutdown() {
     m_gbufferPass.reset();
     m_menuCompositePass.reset();
     m_menuDistortPass.reset();
-    m_menuUIPass.reset();
+    m_textPass.reset();
+    m_uiPass.reset();
     m_shaderPhaseCache.reset();
     m_framegraph.reset();
 
@@ -267,21 +273,23 @@ void FrameGraphRenderer::RenderMenu() {
     }
 
     // ═══════════════════════════════════════════════════════
-    //  EXECUTE 3-STEP MENU PIPELINE (Phase 3-5)
+    //  EXECUTE 4-STEP UI PIPELINE
     // ═══════════════════════════════════════════════════════
-    // Step 1: MenuUIPass - Render UI dialogs to rt_MenuMain
-    // Step 2: MenuDistortPass - Render distortion mask to rt_MenuDistort
-    // Step 3: MenuCompositePass - Composite both to final output
+    // Step 1: UIPass - Render UI sprites/widgets to rt_UIMain
+    // Step 2: TextPass - Render text/fonts on top
+    // Step 3: UIDistortPass - Render distortion mask to rt_UIDistort
+    // Step 4: UICompositePass - Composite all layers to final output
 
     // Set RenderContext for execution
     m_framegraph->SetRenderContext(m_renderContext.get());
 
-    // Execute all three passes in sequence
-    m_menuUIPass->Execute(*m_renderContext, *m_framegraph);
+    // Execute all four passes in sequence
+    m_uiPass->Execute(*m_renderContext, *m_framegraph);
+    m_textPass->Execute(*m_renderContext, *m_framegraph);
     m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
     m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
 
-    Msg("  [RenderMenu] 3-step menu pipeline complete (UI → Distort → Composite)");
+    Msg("  [RenderMenu] 4-step UI pipeline complete (UI → Text → Distort → Composite)");
 
     // ═══════════════════════════════════════════════════════
     //  RENDER IMGUI (Menu UI overlay)
@@ -526,16 +534,20 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_particlePass->SetOutputs(gbufferOutputs);
     m_particlePass->Setup(*m_framegraph);
 
-    // Setup Menu rendering passes (3-step pipeline)
-    // Step 1: Render UI dialogs to rt_MenuMain
-    m_menuUIPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_menuUIPass->Setup(*m_framegraph);
+    // Setup UI rendering passes (4-step pipeline - works for menu AND in-game)
+    // Step 1: Render UI sprites/widgets to rt_MenuMain (TODO: rename to rt_UIMain)
+    m_uiPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_uiPass->Setup(*m_framegraph);
 
-    // Step 2: Render distortion mask to rt_MenuDistort
+    // Step 2: Render text/fonts on top of UI (same RT)
+    m_textPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_textPass->Setup(*m_framegraph);
+
+    // Step 3: Render distortion mask to rt_MenuDistort
     m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
     m_menuDistortPass->Setup(*m_framegraph);
 
-    // Step 3: Composite rt_MenuMain + rt_MenuDistort to final output
+    // Step 4: Composite rt_MenuMain + rt_MenuDistort to final output
     m_menuCompositePass->SetInputs(m_rt_MenuMain, m_rt_MenuDistort);
     m_menuCompositePass->SetOutput(gbufferOutputs.albedo);  // Use GBuffer albedo as temp final output
     m_menuCompositePass->Setup(*m_framegraph);

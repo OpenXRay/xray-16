@@ -1,4 +1,4 @@
-// xrRender/FrameGraphPasses/MenuUIPass.h
+// xrRender/FrameGraphPasses/UIPass.h
 #pragma once
 
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
@@ -22,62 +22,66 @@ namespace xray::render::ui {
 namespace xray::render::passes {
 
 // ══════════════════════════════════════════════════════════
-//  MENU UI PASS CONFIGURATION
+//  UI PASS CONFIGURATION
 // ══════════════════════════════════════════════════════════
 
-struct MenuUIPassConfig {
+struct UIPassConfig {
     u32 width = 0;   // Output RT width (Device.dwWidth)
     u32 height = 0;  // Output RT height (Device.dwHeight)
 
     // Clear values
-    float clearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};  // Black background
+    float clearColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};  // Transparent background
     float clearDepth = 1.0f;
     u8 clearStencil = 0;
 };
 
 // ══════════════════════════════════════════════════════════
-//  MENU UI PASS (Phase 3: Render legacy UI to rt_MenuMain)
+//  UI PASS (Render UI sprites/widgets)
 // ══════════════════════════════════════════════════════════
-// Renders main menu UI elements to rt_MenuMain
-// This is STEP 1 of the 3-step menu rendering pipeline:
-//   1. MenuUIPass:       Render UI dialogs to rt_MenuMain
-//   2. MenuDistortPass:  Render distortion mask to rt_MenuDistort
-//   3. MenuCompositePass: Composite both to final output
+// Renders UI elements (sprites, backgrounds, widgets) to rt_UIMain
+// This is STEP 1 of the 4-step UI rendering pipeline:
+//   1. UIPass:           Render UI sprites/widgets to rt_UIMain
+//   2. TextPass:         Render text/fonts on top
+//   3. UIDistortPass:    Render distortion mask to rt_UIDistort
+//   4. UICompositePass:  Composite all layers to final output
+//
+// This pass runs during BOTH menu and in-game rendering.
+// If no UI geometry is present, it's a fast clear operation.
 
-class MenuUIPass : public framegraph::IPass {
+class UIPass : public framegraph::IPass {
 public:
-    MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config = MenuUIPassConfig());
-    ~MenuUIPass() override;
+    UIPass(ng::RenderDevice* device, const UIPassConfig& config = UIPassConfig());
+    ~UIPass() override;
 
     // IPass interface
     void Setup(framegraph::FrameGraph& fg) override;
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) override;
 
     framegraph::RenderPhase GetPhase() const override {
-        return framegraph::RenderPhase::Custom;  // Menu rendering is a custom phase
+        return framegraph::RenderPhase::Custom;  // UI rendering is a custom phase
     }
 
     // Set output render targets (called by FrameGraphRenderer)
-    void SetOutputs(framegraph::VirtualResourceHandle menuMain, framegraph::VirtualResourceHandle depth);
+    void SetOutputs(framegraph::VirtualResourceHandle uiMain, framegraph::VirtualResourceHandle depth);
 
-    // Menu-specific statistics
-    struct MenuStats {
-        u32 numDialogs = 0;
+    // UI statistics
+    struct UIStats {
+        u32 numBatches = 0;
         float cpuTimeMs = 0.0f;
     };
 
-    const MenuStats& GetMenuStats() const { return m_menuStats; }
+    const UIStats& GetUIStats() const { return m_uiStats; }
 
 private:
     ng::RenderDevice* m_device;
-    MenuUIPassConfig m_config;
-    MenuStats m_menuStats;
+    UIPassConfig m_config;
+    UIStats m_uiStats;
 
     // Output render targets
-    framegraph::VirtualResourceHandle m_outputRT;      // rt_MenuMain
+    framegraph::VirtualResourceHandle m_outputRT;      // rt_UIMain
     framegraph::VirtualResourceHandle m_depthStencil;  // rt_Depth (reuse existing depth buffer)
 
-    // Material system (MenuUIPass owns its own MaterialCache + VCB pool)
+    // Material system (UIPass owns its own MaterialCache + VCB pool)
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
     xr_unique_ptr<MaterialCache> m_materialCache;
 

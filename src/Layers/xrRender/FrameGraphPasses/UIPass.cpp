@@ -1,6 +1,6 @@
-// xrRender/FrameGraphPasses/MenuUIPass.cpp
+// xrRender/FrameGraphPasses/UIPass.cpp
 #include "stdafx.h"
-#include "MenuUIPass.h"
+#include "UIPass.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "Layers/xrRender/UIRenderCollector.h"
 #include "Layers/xrRender/NVRHIUIRenderer.h"
@@ -9,10 +9,10 @@
 
 namespace xray::render::passes {
 
-MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
+UIPass::UIPass(ng::RenderDevice* device, const UIPassConfig& config)
     : m_device(device)
     , m_config(config)
-    , m_menuStats{}
+    , m_uiStats{}
     , m_outputRT{}
     , m_depthStencil{}
 {
@@ -21,7 +21,7 @@ MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
     // Create VCB pool for dynamic constant buffer management
     m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
 
-    // Create material cache (MenuUIPass owns its own MaterialCache with VCB pool)
+    // Create material cache (UIPass owns its own MaterialCache with VCB pool)
     m_materialCache = xr_make_unique<MaterialCache>(
         device,
         device->GetFGResourceManager(),  // Pass FGResourceManager for native texture loading
@@ -32,26 +32,31 @@ MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
     m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
     m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
 
-    Msg("* [MenuUIPass] Created (resolution: %ux%u)", config.width, config.height);
+    Msg("* [UIPass] Created (resolution: %ux%u)", config.width, config.height);
 }
 
-MenuUIPass::~MenuUIPass() {
-    Msg("* [MenuUIPass] Destroyed");
+UIPass::~UIPass() {
+    Msg("* [UIPass] Destroyed");
 }
 
-void MenuUIPass::SetOutputs(framegraph::VirtualResourceHandle menuMain, framegraph::VirtualResourceHandle depth) {
-    m_outputRT = menuMain;
+void UIPass::SetOutputs(framegraph::VirtualResourceHandle uiMain, framegraph::VirtualResourceHandle depth) {
+    m_outputRT = uiMain;
     m_depthStencil = depth;
 }
 
-void MenuUIPass::Setup(framegraph::FrameGraph& fg) {
-    // MenuUIPass uses externally-created resources (rt_MenuMain, rt_Depth)
+void UIPass::Setup(framegraph::FrameGraph& fg) {
+    // UIPass uses externally-created resources (rt_UIMain, rt_Depth)
     // No need to create or declare them - they're already registered in BuildFrameGraphStructure()
-    Msg("  [MenuUIPass::Setup] Registered pass with FrameGraph");
+    Msg("  [UIPass::Setup] Registered pass with FrameGraph");
 }
 
-void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     auto executeStart = std::chrono::high_resolution_clock::now();
+
+    // Get command list for PIX marker
+    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+    VERIFY(cmdList != nullptr);
+    cmdList->beginMarker("UIPass");
 
     // ═══════════════════════════════════════════════════════
     //  GET PHYSICAL RESOURCES
@@ -61,7 +66,8 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     nvrhi::ITexture* depthTexture = fg.GetPhysicalTexture(m_depthStencil);
 
     if (!outputTexture || !depthTexture) {
-        Msg("! [MenuUIPass::Execute] Failed to get physical textures");
+        Msg("! [UIPass::Execute] Failed to get physical textures");
+        cmdList->endMarker();
         return;
     }
 
@@ -75,18 +81,15 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
 
     nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
-        Msg("! [MenuUIPass::Execute] Failed to create framebuffer");
+        Msg("! [UIPass::Execute] Failed to create framebuffer");
+        cmdList->endMarker();
         return;
     }
-
-    // Get command list from RenderContext
-    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
-    VERIFY(cmdList != nullptr);
 
     // Simple clear operation - no render state needed yet
     cmdList->open();
 
-    // Clear render target to black
+    // Clear render target to transparent
     cmdList->clearTextureFloat(outputTexture, nvrhi::AllSubresources,
         nvrhi::Color(m_config.clearColor[0], m_config.clearColor[1],
                      m_config.clearColor[2], m_config.clearColor[3]));
@@ -103,7 +106,7 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     // Use NVRHI-based UI renderer instead of legacy D3D11 path
 
     if (g_pGamePersistent) {
-        Msg("  [MenuUIPass::Execute] Rendering UI via NVRHI");
+        Msg("  [UIPass::Execute] Rendering UI via NVRHI");
 
         // Initialize NVRHI UI renderer on first use
         if (!m_nvrhiUIInitialized) {
@@ -122,7 +125,7 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
         // Restore original renderer
         GEnv.UIRender = oldRenderer;
 
-        Msg("  [MenuUIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
+        Msg("  [UIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
 
         // STEP 2: Render collected geometry via NVRHI
         if (!m_uiCollector->GetBatches().empty()) {
@@ -134,29 +137,26 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
                 m_config.height
             );
 
-            Msg("  [MenuUIPass::Execute] NVRHI UI rendering complete");
+            Msg("  [UIPass::Execute] NVRHI UI rendering complete");
+            m_uiStats.numBatches = static_cast<u32>(m_uiCollector->GetBatches().size());
         } else {
-            Msg("  [MenuUIPass::Execute] No UI geometry collected");
+            Msg("  [UIPass::Execute] No UI geometry collected");
+            m_uiStats.numBatches = 0;
         }
     } else {
-        Msg("  [MenuUIPass::Execute] No GamePersistent - clearing to black only");
+        Msg("  [UIPass::Execute] No GamePersistent - clearing to transparent only");
+        m_uiStats.numBatches = 0;
     }
-
-    // ═══════════════════════════════════════════════════════
-    //  END RENDER PASS
-    // ═══════════════════════════════════════════════════════
-
-    // Nothing more to do for now (Phase 6 will add UI rendering)
 
     // ═══════════════════════════════════════════════════════
     //  STATISTICS
     // ═══════════════════════════════════════════════════════
 
     auto executeEnd = std::chrono::high_resolution_clock::now();
-    m_menuStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
-    m_menuStats.numDialogs = 0;  // TODO: Count from legacy UI system
+    m_uiStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
-    Msg("  [MenuUIPass] Execute complete (%.2f ms)", m_menuStats.cpuTimeMs);
+    cmdList->endMarker();
+    Msg("  [UIPass] Execute complete (%.2f ms, %u batches)", m_uiStats.cpuTimeMs, m_uiStats.numBatches);
 }
 
 } // namespace xray::render::passes

@@ -17,6 +17,10 @@ namespace render_gl
 {
 class dxFontRender;
 }
+namespace passes
+{
+class TextPass;  // FrameGraph text rendering pass
+}
 } // namespace xray::render
 
 class IFontRender;
@@ -25,6 +29,7 @@ class ENGINE_API CGameFont final : public IGameFont
 {
     friend class xray::render::render_r4::dxFontRender;
     friend class xray::render::render_gl::dxFontRender;
+    friend class xray::render::passes::TextPass;  // FrameGraph text rendering
 
 private:
     struct String

@@ -220,10 +220,18 @@ std::pair<u32, u32> CGameFont::get_actions_text_length(pcstr s)
 
 void CGameFont::OnRender()
 {
-    return;
-
     if (!strings.empty())
     {
+        // In FrameGraph mode, TextPass collects and renders font geometry
+        // Don't render or clear strings here - let TextPass handle it
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (ps_r4_use_framegraph)
+        {
+            // Strings will be collected by TextPass and cleared after rendering
+            return;
+        }
+
+        // Legacy path: render immediately and clear
         pFontRender->OnRender(*this);
         strings.clear();
     }

@@ -22,7 +22,6 @@ class XRUICORE_API UICore : public CDeviceResetNotifier, public CUIResetNotifier
 
     bool m_bPostprocess;
 
-    CFontManager* m_pFontManager;
     CUICursor* m_pUICursor;
     CUIDebugger m_debugger;
     CUIFocusSystem m_focusSystem;
@@ -32,6 +31,9 @@ class XRUICORE_API UICore : public CDeviceResetNotifier, public CUIResetNotifier
     Fvector2* m_current_scale;
 
 public:
+    // Public font manager access (for TextPass direct access without linking)
+    CFontManager* m_pFontManager;
+
     xr_stack<Frect> m_Scissors;
 
     UICore();

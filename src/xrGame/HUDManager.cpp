@@ -159,7 +159,13 @@ void CHUDManager::RenderUI()
         if (pUIGame)
             pUIGame->Render();
 
-        UI().RenderFont();
+        // NOTE: In FrameGraph mode, fonts are rendered by TextPass (not here)
+        // This allows TextPass to collect font geometry and render via NVRHI
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (!ps_r4_use_framegraph)
+        {
+            UI().RenderFont();
+        }
     }
 
     m_pHUDTarget->Render();

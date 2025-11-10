@@ -789,11 +789,7 @@
     <ClInclude Include="..\xrRender\ResourceManager\SamplerCache.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\ResourceManager\ModernResourceManager.h">
-      <Filter>ResourceManager</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuUIPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\MenuDistortPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\MenuCompositePass.h" />
     <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h" />
@@ -803,6 +799,9 @@
     <ClInclude Include="..\xrRender\NVRHIUIRenderer.h" />
     <ClInclude Include="..\xrRender\UIRenderCollector.h" />
     <ClInclude Include="..\xrRender\UIGeometryBatch.h" />
+    <ClInclude Include="..\xrRender\ResourceManager\FGResourceManager.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TextPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\UIPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1468,11 +1467,7 @@
     <ClCompile Include="..\xrRender\ResourceManager\SamplerCache.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\ResourceManager\ModernResourceManager.cpp">
-      <Filter>ResourceManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuUIPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\MenuDistortPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\MenuCompositePass.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp" />
@@ -1481,6 +1476,9 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPass.cpp" />
     <ClCompile Include="..\xrRender\NVRHIUIRenderer.cpp" />
     <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
+    <ClCompile Include="..\xrRender\ResourceManager\FGResourceManager.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TextPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\UIPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
