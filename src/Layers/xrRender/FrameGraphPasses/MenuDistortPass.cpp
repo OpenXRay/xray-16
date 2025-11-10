@@ -31,11 +31,16 @@ void MenuDistortPass::Setup(framegraph::FrameGraph& fg) {
 void MenuDistortPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     auto executeStart = std::chrono::high_resolution_clock::now();
 
+    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+    VERIFY(cmdList != nullptr);
+    cmdList->beginMarker("UIDistortPass");
+
     nvrhi::ITexture* outputTexture = fg.GetPhysicalTexture(m_outputRT);
     nvrhi::ITexture* depthTexture = fg.GetPhysicalTexture(m_depthStencil);
 
     if (!outputTexture || !depthTexture) {
         Msg("! [MenuDistortPass::Execute] Failed to get physical textures");
+        cmdList->endMarker();
         return;
     }
 
@@ -46,11 +51,9 @@ void MenuDistortPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGra
     nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
         Msg("! [MenuDistortPass::Execute] Failed to create framebuffer");
+        cmdList->endMarker();
         return;
     }
-
-    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
-    VERIFY(cmdList != nullptr);
 
     cmdList->open();
 
@@ -67,6 +70,7 @@ void MenuDistortPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGra
     m_menuDistortStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
     m_menuDistortStats.numEffects = 0;
 
+    cmdList->endMarker();
     Msg("  [MenuDistortPass] Execute complete (%.2f ms)", m_menuDistortStats.cpuTimeMs);
 }
 

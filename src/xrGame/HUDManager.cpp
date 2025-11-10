@@ -159,7 +159,11 @@ void CHUDManager::RenderUI()
         if (pUIGame)
             pUIGame->Render();
 
-        UI().RenderFont();
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (!ps_r4_use_framegraph)
+        {
+            UI().RenderFont();
+        }
     }
 
     m_pHUDTarget->Render();

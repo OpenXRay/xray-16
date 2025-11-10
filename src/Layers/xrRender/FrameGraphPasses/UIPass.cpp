@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "MenuUIPass.h"
+#include "UIPass.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "Layers/xrRender/UIRenderCollector.h"
 #include "Layers/xrRender/NVRHIUIRenderer.h"
@@ -8,10 +8,10 @@
 
 namespace xray::render::passes {
 
-MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
+UIPass::UIPass(ng::RenderDevice* device, const UIPassConfig& config)
     : m_device(device)
     , m_config(config)
-    , m_menuStats{}
+    , m_uiStats{}
     , m_outputRT{}
     , m_depthStencil{}
 {
@@ -28,30 +28,35 @@ MenuUIPass::MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config)
     m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
     m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
 
-    Msg("* [MenuUIPass] Created (resolution: %ux%u)", config.width, config.height);
+    Msg("* [UIPass] Created (resolution: %ux%u)", config.width, config.height);
 }
 
-MenuUIPass::~MenuUIPass() {
-    Msg("* [MenuUIPass] Destroyed");
+UIPass::~UIPass() {
+    Msg("* [UIPass] Destroyed");
 }
 
-void MenuUIPass::SetOutputs(framegraph::VirtualResourceHandle menuMain, framegraph::VirtualResourceHandle depth) {
-    m_outputRT = menuMain;
+void UIPass::SetOutputs(framegraph::VirtualResourceHandle uiMain, framegraph::VirtualResourceHandle depth) {
+    m_outputRT = uiMain;
     m_depthStencil = depth;
 }
 
-void MenuUIPass::Setup(framegraph::FrameGraph& fg) {
-    Msg("  [MenuUIPass::Setup] Registered pass with FrameGraph");
+void UIPass::Setup(framegraph::FrameGraph& fg) {
+    Msg("  [UIPass::Setup] Registered pass with FrameGraph");
 }
 
-void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     auto executeStart = std::chrono::high_resolution_clock::now();
+
+    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+    VERIFY(cmdList != nullptr);
+    cmdList->beginMarker("UIPass");
 
     nvrhi::ITexture* outputTexture = fg.GetPhysicalTexture(m_outputRT);
     nvrhi::ITexture* depthTexture = fg.GetPhysicalTexture(m_depthStencil);
 
     if (!outputTexture || !depthTexture) {
-        Msg("! [MenuUIPass::Execute] Failed to get physical textures");
+        Msg("! [UIPass::Execute] Failed to get physical textures");
+        cmdList->endMarker();
         return;
     }
 
@@ -61,12 +66,10 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
 
     nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
-        Msg("! [MenuUIPass::Execute] Failed to create framebuffer");
+        Msg("! [UIPass::Execute] Failed to create framebuffer");
+        cmdList->endMarker();
         return;
     }
-
-    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
-    VERIFY(cmdList != nullptr);
 
     cmdList->open();
 
@@ -80,7 +83,7 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     m_device->GetNVRHIDevice()->executeCommandList(cmdList);
 
     if (g_pGamePersistent) {
-        Msg("  [MenuUIPass::Execute] Rendering UI via NVRHI");
+        Msg("  [UIPass::Execute] Rendering UI via NVRHI");
 
         if (!m_nvrhiUIInitialized) {
             m_uiRenderer->Initialize(m_device, m_materialCache.get());
@@ -95,7 +98,7 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
 
         GEnv.UIRender = oldRenderer;
 
-        Msg("  [MenuUIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
+        Msg("  [UIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
 
         if (!m_uiCollector->GetBatches().empty()) {
             m_uiRenderer->RenderBatches(
@@ -106,19 +109,22 @@ void MenuUIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
                 m_config.height
             );
 
-            Msg("  [MenuUIPass::Execute] NVRHI UI rendering complete");
+            Msg("  [UIPass::Execute] NVRHI UI rendering complete");
+            m_uiStats.numBatches = static_cast<u32>(m_uiCollector->GetBatches().size());
         } else {
-            Msg("  [MenuUIPass::Execute] No UI geometry collected");
+            Msg("  [UIPass::Execute] No UI geometry collected");
+            m_uiStats.numBatches = 0;
         }
     } else {
-        Msg("  [MenuUIPass::Execute] No GamePersistent - clearing to black only");
+        Msg("  [UIPass::Execute] No GamePersistent - clearing to transparent only");
+        m_uiStats.numBatches = 0;
     }
 
     auto executeEnd = std::chrono::high_resolution_clock::now();
-    m_menuStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
-    m_menuStats.numDialogs = 0;
+    m_uiStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
-    Msg("  [MenuUIPass] Execute complete (%.2f ms)", m_menuStats.cpuTimeMs);
+    cmdList->endMarker();
+    Msg("  [UIPass] Execute complete (%.2f ms, %u batches)", m_uiStats.cpuTimeMs, m_uiStats.numBatches);
 }
 
 }

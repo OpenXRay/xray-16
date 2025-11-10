@@ -220,10 +220,14 @@ std::pair<u32, u32> CGameFont::get_actions_text_length(pcstr s)
 
 void CGameFont::OnRender()
 {
-    return;
-
     if (!strings.empty())
     {
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (ps_r4_use_framegraph)
+        {
+            return;
+        }
+
         pFontRender->OnRender(*this);
         strings.clear();
     }

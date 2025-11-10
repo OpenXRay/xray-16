@@ -19,19 +19,19 @@ namespace xray::render::ui {
 
 namespace xray::render::passes {
 
-struct MenuUIPassConfig {
+struct UIPassConfig {
     u32 width = 0;
     u32 height = 0;
 
-    float clearColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    float clearColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     float clearDepth = 1.0f;
     u8 clearStencil = 0;
 };
 
-class MenuUIPass : public framegraph::IPass {
+class UIPass : public framegraph::IPass {
 public:
-    MenuUIPass(ng::RenderDevice* device, const MenuUIPassConfig& config = MenuUIPassConfig());
-    ~MenuUIPass() override;
+    UIPass(ng::RenderDevice* device, const UIPassConfig& config = UIPassConfig());
+    ~UIPass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
     void Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) override;
@@ -40,19 +40,19 @@ public:
         return framegraph::RenderPhase::Custom;
     }
 
-    void SetOutputs(framegraph::VirtualResourceHandle menuMain, framegraph::VirtualResourceHandle depth);
+    void SetOutputs(framegraph::VirtualResourceHandle uiMain, framegraph::VirtualResourceHandle depth);
 
-    struct MenuStats {
-        u32 numDialogs = 0;
+    struct UIStats {
+        u32 numBatches = 0;
         float cpuTimeMs = 0.0f;
     };
 
-    const MenuStats& GetMenuStats() const { return m_menuStats; }
+    const UIStats& GetUIStats() const { return m_uiStats; }
 
 private:
     ng::RenderDevice* m_device;
-    MenuUIPassConfig m_config;
-    MenuStats m_menuStats;
+    UIPassConfig m_config;
+    UIStats m_uiStats;
 
     framegraph::VirtualResourceHandle m_outputRT;
     framegraph::VirtualResourceHandle m_depthStencil;

@@ -35,12 +35,17 @@ void MenuCompositePass::Setup(framegraph::FrameGraph& fg) {
 void MenuCompositePass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     auto executeStart = std::chrono::high_resolution_clock::now();
 
+    nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+    VERIFY(cmdList != nullptr);
+    cmdList->beginMarker("UICompositePass");
+
     nvrhi::ITexture* menuMainTexture = fg.GetPhysicalTexture(m_inputMenuMain);
     nvrhi::ITexture* menuDistortTexture = fg.GetPhysicalTexture(m_inputMenuDistort);
     nvrhi::ITexture* outputTexture = fg.GetPhysicalTexture(m_outputRT);
 
     if (!menuMainTexture || !menuDistortTexture || !outputTexture) {
         Msg("! [MenuCompositePass::Execute] Failed to get physical textures");
+        cmdList->endMarker();
         return;
     }
 
@@ -51,6 +56,7 @@ void MenuCompositePass::Execute(ng::RenderContext& ctx, const framegraph::FrameG
     auto executeEnd = std::chrono::high_resolution_clock::now();
     m_menuCompositeStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
+    cmdList->endMarker();
     Msg("  [MenuCompositePass] Execute complete (%.2f ms)", m_menuCompositeStats.cpuTimeMs);
 }
 

@@ -497,7 +497,12 @@ void CMainMenu::OnRenderPPUI_main()
     if (OnRenderPPUI_query())
     {
         DoRenderDialogs();
-        UI().RenderFont();
+
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (!ps_r4_use_framegraph)
+        {
+            UI().RenderFont();
+        }
     }
 
     UI().pp_stop();

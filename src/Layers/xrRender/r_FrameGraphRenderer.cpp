@@ -66,10 +66,15 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
-    passes::MenuUIPassConfig menuUIConfig;
-    menuUIConfig.width = Device.dwWidth;
-    menuUIConfig.height = Device.dwHeight;
-    m_menuUIPass = xr_make_unique<passes::MenuUIPass>(device, menuUIConfig);
+    passes::UIPassConfig uiConfig;
+    uiConfig.width = Device.dwWidth;
+    uiConfig.height = Device.dwHeight;
+    m_uiPass = xr_make_unique<passes::UIPass>(device, uiConfig);
+
+    passes::TextPassConfig textConfig;
+    textConfig.width = Device.dwWidth;
+    textConfig.height = Device.dwHeight;
+    m_textPass = xr_make_unique<passes::TextPass>(device, textConfig);
 
     passes::MenuDistortPassConfig menuDistortConfig;
     menuDistortConfig.width = Device.dwWidth;
@@ -121,7 +126,8 @@ void FrameGraphRenderer::Shutdown() {
     m_gbufferPass.reset();
     m_menuCompositePass.reset();
     m_menuDistortPass.reset();
-    m_menuUIPass.reset();
+    m_textPass.reset();
+    m_uiPass.reset();
     m_shaderPhaseCache.reset();
     m_framegraph.reset();
 
@@ -192,11 +198,12 @@ void FrameGraphRenderer::RenderMenu() {
 
     m_framegraph->SetRenderContext(m_renderContext.get());
 
-    m_menuUIPass->Execute(*m_renderContext, *m_framegraph);
+    m_uiPass->Execute(*m_renderContext, *m_framegraph);
+    m_textPass->Execute(*m_renderContext, *m_framegraph);
     m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
     m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
 
-    Msg("  [RenderMenu] 3-step menu pipeline complete (UI → Distort → Composite)");
+    Msg("  [RenderMenu] 4-step UI pipeline complete (UI → Text → Distort → Composite)");
 
     ImGui::Render();
 
@@ -388,8 +395,11 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_particlePass->SetOutputs(gbufferOutputs);
     m_particlePass->Setup(*m_framegraph);
 
-    m_menuUIPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_menuUIPass->Setup(*m_framegraph);
+    m_uiPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_uiPass->Setup(*m_framegraph);
+
+    m_textPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_textPass->Setup(*m_framegraph);
 
     m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
     m_menuDistortPass->Setup(*m_framegraph);
