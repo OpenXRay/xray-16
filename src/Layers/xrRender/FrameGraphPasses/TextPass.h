@@ -6,6 +6,13 @@
 
 class CGameFont;
 
+namespace xray::render {
+    class MaterialCache;
+    namespace framegraph {
+        class VolatileConstantBufferPool;
+    }
+}
+
 namespace xray::render::resources {
     class FGResourceManager;
     struct TextureHandle;
@@ -44,7 +51,9 @@ private:
 
     void CollectTextGeometry();
 
-    void BuildTextBuffers();
+    bool InitializeFromFont(CGameFont* font, nvrhi::ICommandList* cmdList);
+
+    void BuildTextBuffers(nvrhi::ICommandList* cmdList);
 
     void RenderText(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer);
 
@@ -63,11 +72,21 @@ private:
     nvrhi::GraphicsPipelineHandle m_pipeline;
 
     bool m_initialized{false};
+    bool m_pipelineReady{false};
 
-    xr_map<shared_str, resources::TextureHandle> m_fontTextures;
+    ng::TextureHandle m_fontTextureHandle;
+
+    framegraph::ShaderRTBindings m_shaderReflection;
+    framegraph::ShaderConstantBuffers m_vsConstantBuffers;
+
+    xr_vector<nvrhi::SamplerHandle> m_samplers;
+
+    nvrhi::BufferHandle m_vsConstantBuffer;
+
+    nvrhi::TextureHandle m_defaultTexture;
 
     struct TextVertex {
-        float x, y, z;
+        float x, y, z, w;
         u32 color;
         float u, v;
     };
