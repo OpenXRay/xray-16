@@ -17,6 +17,7 @@ class CRenderTarget
 {
     u32 dwWidth[R__NUM_CONTEXTS];
     u32 dwHeight[R__NUM_CONTEXTS];
+    u32 target[R__NUM_CONTEXTS];
     u32 dwAccumulatorClearMark;
 
 public:
@@ -220,16 +221,18 @@ public:
     void accum_volumetric_geom_create();
     void accum_volumetric_geom_destroy();
 
-    GLuint get_base_rt() { return rt_Base[HW.CurrentBackBuffer]->pRT; }
-    GLuint get_base_zb() { return rt_Base_Depth->pZRT; }
+    [[nodiscard]] ref_rt& get_base_rt() { return rt_Base[HW.CurrentBackBuffer]; }
+    [[nodiscard]] const ref_rt& get_base_zb() const { return rt_Base_Depth; }
 
-    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb);
-    void u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb);
-    void u_setrt(CBackend& cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, GLuint zb);
-    void u_setrt(CBackend& cmd_list, u32 W, u32 H, GLuint _1, GLuint _2, GLuint _3, const ref_rt& _zb)
-    {
-        u_setrt(cmd_list, W, H, _1, _2, _3, _zb ? _zb->pZRT : 0);
-    }
+private:
+    template<bool has1,bool has2,bool has3,bool hasZB>
+    void u_setrtzb(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb);
+public:
+    void u_setrtzb(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _zb);
+    void u_setrtzb(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _zb);
+    void u_setrtzb(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _zb);
+    void u_setrt_(CBackend& cmd_list, const ref_rt& _1);
+    void u_set_zb(CBackend& cmd_list, const ref_rt& _zb);
 
     void u_stencil_optimize(CBackend& cmd_list, eStencilOptimizeMode eSOM = SO_Light);
     void u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& dest);

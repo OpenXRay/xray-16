@@ -234,7 +234,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 
         //	Use for intermediate results
         //	Patch normal
-        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
 
         // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
         cmd_list.set_Element(s_rain->E[1]);
@@ -308,12 +308,12 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         {
             //	Do this in blender!
             // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN | D3D_COLOR_WRITE_ENABLE_BLUE );
-            u_setrt(cmd_list, rt_Normal, nullptr, nullptr, rt_MSAADepth);
+            u_setrtzb(cmd_list, rt_Normal, rt_MSAADepth);
         }
         else
         {
             // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN );
-            u_setrt(cmd_list, rt_Position, nullptr, nullptr, rt_MSAADepth);
+            u_setrtzb(cmd_list, rt_Position, rt_MSAADepth);
         }
 
         if (!RImplementation.o.msaa)
@@ -363,7 +363,7 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 
         //	It is restored automatically by a set_Element call
         // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_ALL );
-        u_setrt(cmd_list, rt_Color, nullptr, nullptr, rt_MSAADepth);
+        u_setrtzb(cmd_list, rt_Color, rt_MSAADepth);
 
         if (!RImplementation.o.msaa)
         {

@@ -121,7 +121,7 @@ void CRenderTarget::accum_reflected(CBackend& cmd_list, light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
         cmd_list.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         cmd_list.set_c("m_texgen", m_Texgen);
         if (!RImplementation.o.msaa)

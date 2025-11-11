@@ -695,7 +695,7 @@ void CRenderTarget::accum_direct_blend(CBackend& cmd_list)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
-        u_setrt(RCache, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        u_setrtzb(RCache, rt_Accumulator, rt_MSAADepth);
 
         //	TODO: DX11: remove half pixel offset
         // Common calc for quad-rendering
@@ -764,7 +764,7 @@ void CRenderTarget::accum_direct_f(CBackend& cmd_list, u32 sub_phase)
         return;
     }
     phase_accumulator(RCache);
-    u_setrt(RCache, rt_Generic_0_r, nullptr, nullptr, rt_MSAADepth);
+    u_setrtzb(RCache, rt_Generic_0_r, rt_MSAADepth);
 
     // *** assume accumulator setted up ***
     light* fuckingsun = (light*)RImplementation.Lights.sun._get();
@@ -860,7 +860,7 @@ void CRenderTarget::accum_direct_f(CBackend& cmd_list, u32 sub_phase)
 
     // Perform lighting
     {
-        u_setrt(RCache, rt_Generic_0_r, nullptr, nullptr, rt_MSAADepth); // ensure RT is set
+        u_setrtzb(RCache, rt_Generic_0_r, rt_MSAADepth); // ensure RT is set
         RCache.set_CullMode(CULL_NONE);
         RCache.set_ColorWriteEnable();
 

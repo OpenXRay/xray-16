@@ -52,6 +52,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/
     target = (SampleCount > 1) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     glGenTextures(1, &pRT);
     CHK_GL(glBindTexture(target, pRT));
+    glObjectLabel(GL_TEXTURE, pRT, -1, Name);
     if (SampleCount > 1)
         CHK_GL(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, SampleCount, glTextureUtils::ConvertTextureFormat(fmt), w,
         h, GL_FALSE));
@@ -85,21 +86,43 @@ void CRT::reset_end()
     create(cName.c_str(), dwWidth, dwHeight, fmt, sampleCount, { dwFlags });
 }
 
-void CRT::resolve_into(CRT& destination) const
+void CRT::resolve_into(ref_rt& destination) const
 {
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glDrawBuffer(GL_COLOR_ATTACHMENT1);
+    PIX_EVENT(resolve_into);
 
-    constexpr GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    RCache.set_RT(pRT, 0);
-    RCache.set_RT(destination.pRT, 1);
+    auto actualFB = RCache.get_FB();
+    RCache.set_FB(HW.pResolveFB);
+    //CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, HW.pResolveFB));
+    CHK_GL(glDisable(GL_DEPTH_TEST));
+    CHK_GL(glDisable(GL_STENCIL_TEST));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, pRT, 0));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE, 0));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_NONE, GL_NONE, 0));
+    CHK_GL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
-    CHK_GL(glDrawBuffers(std::size(buffers), buffers));
+    //Resolve Screen
+    RCache.set_FB(actualFB);
+    //CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, actualFB));
+    CHK_GL(glDisable(GL_DEPTH_TEST));
+    CHK_GL(glDisable(GL_STENCIL_TEST));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, destination->target, destination->pRT, 0));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_NONE, GL_NONE, 0));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_NONE, GL_NONE, 0));
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_NONE, GL_NONE, 0));
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-    CHK_GL(glBlitFramebuffer(0, 0, dwWidth, dwHeight, 0, 0, destination.dwWidth, destination.dwHeight,
-        GL_COLOR_BUFFER_BIT, GL_NEAREST));
+    //CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, HW.pResolveFB));
+    RCache.set_FB(HW.pResolveFB); // hm???
+
+    CHK_GL(glBindFramebuffer(GL_READ_FRAMEBUFFER, HW.pResolveFB));
+    CHK_GL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, actualFB));
+
+    CHK_GL(glBlitFramebuffer(0, 0, dwWidth, dwHeight, 0, 0, destination->dwWidth, destination->dwHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_NONE, GL_NONE, 0));
+
+    RCache.set_FB(actualFB);
 }
 
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount /*= 1*/, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)

@@ -36,7 +36,7 @@ void CBackend::OnFrameBegin()
 #else
         set_FB(HW.pFB);
 #endif
-        set_RT(RImplementation.Target->get_base_rt());
+        set_RT(RImplementation.Target->get_base_rt(), 0);
         set_ZB(RImplementation.Target->get_base_zb());
 #endif
 

@@ -9,9 +9,9 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
     {
         // normal operation - setup
         if (RImplementation.o.fp16_blend)
-            u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+            u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
         else
-            u_setrt(cmd_list, rt_Accumulator_temp, nullptr, nullptr, rt_MSAADepth);
+            u_setrtzb(cmd_list, rt_Accumulator_temp,  rt_MSAADepth);
     }
     else
     {
@@ -19,7 +19,7 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
         dwAccumulatorClearMark = Device.dwFrame;
 
         // clear
-        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+        u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
         // dwLightMarkerID						= 5;					// start from 5, increment in 2 units
         reset_light_marker(cmd_list);
 
@@ -57,7 +57,7 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
 
 void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)
 {
-    u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, rt_MSAADepth);
+    u_setrtzb(cmd_list, rt_Generic_2, rt_MSAADepth);
 
     if (!m_bHasActiveVolumetric)
     {

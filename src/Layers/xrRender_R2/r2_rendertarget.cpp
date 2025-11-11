@@ -639,7 +639,7 @@ CRenderTarget::CRenderTarget()
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
-        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
+        u_setrtzb(RCache, get_base_rt(), get_base_zb());
     }
 
     // COMBINE

@@ -23,37 +23,63 @@ IC void CBackend::set_FB(GLuint FB)
         PGO(Msg("PGO:set_FB"));
         pFB = FB;
         CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+
+        //0 is unset, but its actually unknown after switching FBO
+        std::fill(std::begin(pRT), std::end(pRT), std::numeric_limits<GLuint>::max());
+        pZB = std::numeric_limits<GLuint>::max();
     }
 }
 
-IC void CBackend::set_RT(GLuint RT, u32 ID)
+IC void CBackend::set_RT(const ref_rt& RT, u32 ID)
 {
-    if (RT != pRT[ID])
+    if (RT->pRT != pRT[ID])
     {
         PGO(Msg("PGO:setRT"));
         stat.target_rt++;
-        pRT[ID] = RT;
-        // TODO: OGL: Implement support for multi-sampled render targets
-        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D, RT, 0));
+        pRT[ID] = RT->pRT;
+        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, RT->target, RT->pRT, 0));
     }
 }
 
-IC void CBackend::set_ZB(GLuint ZB)
+IC void CBackend::unset_RT(u32 ID)
 {
-    if (ZB != pZB)
+    if (pRT[ID])
+    {
+        PGO(Msg("PGO:unsetRT"));
+        stat.target_rt++;
+        pRT[ID] = 0;
+        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D, GL_NONE, 0));
+        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D_MULTISAMPLE, GL_NONE, 0));
+    }
+}
+
+IC void CBackend::set_ZB(const ref_rt& ZB)
+{
+    if (ZB->pZRT != pZB)
     {
         PGO(Msg("PGO:setZB"));
         stat.target_zb++;
-        pZB = ZB;
-        // TODO: OGL: Implement support for multi-sampled render targets
-        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, ZB, 0));
+        pZB = ZB->pZRT;
+        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, ZB->target, ZB->pZRT, 0));
     }
 }
 
-IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
+IC void CBackend::unset_ZB()
 {
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+    if (pZB)
+    {
+        PGO(Msg("PGO:setZB"));
+        stat.target_zb++;
+        pZB = 0;
+        //@TODO: track what texture we used
+        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, GL_NONE, 0));
+        CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, GL_NONE, 0));
+    }
+}
+
+IC void CBackend::ClearRT(ref_rt& rt, const Fcolor& color)
+{
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rt->target, rt->pRT, 0));
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glClearColor(color.r, color.g, color.b, color.a);
@@ -61,11 +87,11 @@ IC void CBackend::ClearRT(GLuint rt, const Fcolor& color)
     CHK_GL(glClear(GL_COLOR_BUFFER_BIT));
 }
 
-IC void CBackend::ClearZB(GLuint zb, float depth)
+IC void CBackend::ClearZB(const ref_rt& zb, float depth)
 {
-    VERIFY(pZB == zb); // do not allow to clear unbound depth
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+    VERIFY(pZB == zb->pZRT); // do not allow to clear unbound depth
+
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, zb->target, zb->pZRT, 0));
 
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
@@ -73,11 +99,11 @@ IC void CBackend::ClearZB(GLuint zb, float depth)
     CHK_GL(glClear(GL_DEPTH_BUFFER_BIT));
 }
 
-IC void CBackend::ClearZB(GLuint zb, float depth, u8 stencil)
+IC void CBackend::ClearZB(const ref_rt& zb, float depth, u8 stencil)
 {
-    VERIFY(pZB == zb); // do not allow to clear unbound depth
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
+    VERIFY(pZB == zb->pZRT); // do not allow to clear unbound depth
+
+    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, zb->target, zb->pZRT, 0));
 
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
@@ -491,6 +517,7 @@ IC void CBackend::set_Constants(R_constant_table* C)
         if (Cs->handler) Cs->handler->setup(*this, &*Cs);
 }
 
+//@TODO: get rid of unused ref_rt's
 void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& zb)
 {
     if (_1)
@@ -511,10 +538,23 @@ void CBackend::set_pass_targets(const ref_rt& _1, const ref_rt& _2, const ref_rt
         (GLenum)(_3 ? GL_COLOR_ATTACHMENT2 : GL_NONE)
     };
 
-    set_RT(_1 ? _1->pRT : 0, 0);
-    set_RT(_2 ? _2->pRT : 0, 1);
-    set_RT(_3 ? _3->pRT : 0, 2);
-    set_ZB(zb ? zb->pZRT : 0);
+    if (_1)
+        set_RT(_1, 0);
+    else
+        unset_RT(0);
+
+    if (_2)
+        set_RT(_2, 1);
+    else
+        unset_RT(1);
+    if (_3)
+        set_RT(_3 , 2);
+    else
+        unset_RT(2);
+    if (zb)
+        set_ZB(zb);
+    else
+        unset_ZB();
 
     [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     VERIFY(status == GL_FRAMEBUFFER_COMPLETE);

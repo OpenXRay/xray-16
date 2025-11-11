@@ -125,6 +125,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         if (glDebugMessageCallback)
         {
             CHK_GL(glEnable(GL_DEBUG_OUTPUT));
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
             CHK_GL(glDebugMessageCallback((GLDEBUGPROC)OnDebugCallback, nullptr));
         }
 #endif // DEBUG
@@ -224,9 +225,16 @@ int CHW::MakeContextCurrent(IRender::RenderContext context) const
 
 void CHW::UpdateViews()
 {
-    // Create the default framebuffer
+    /*
+     * mainly for resolve multisample fbo to simple fbo
+     */
+    glGenFramebuffers(1, &pResolveFB);
+    CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pResolveFB));
+    glObjectLabel(GL_FRAMEBUFFER, pResolveFB, -1, "pResolveFBO");
+
     glGenFramebuffers(1, &pFB);
     CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
+    glObjectLabel(GL_FRAMEBUFFER, pFB, -1, "mainFBO");
 
     BackBufferCount = 1;
 }

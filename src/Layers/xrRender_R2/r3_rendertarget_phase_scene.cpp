@@ -22,12 +22,13 @@ void CRenderTarget::phase_scene_prepare()
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
         //	TODO: DX11: Check if we need to set RT here.
-        u_setrt(RCache, Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth);
+        u_setrtzb(RCache, rt_Position, rt_MSAADepth);
 
         const Fcolor color{}; // black
         RCache.ClearRT(rt_Position, color);
         // RCache.ClearRT(rt_Normal, color);
         // RCache.ClearRT(rt_Color, color);
+        //@TODO: do we need this if ?
         if (!RImplementation.o.msaa)
             RCache.ClearZB(get_base_zb(), 1.0f, 0);
         else
@@ -35,13 +36,13 @@ void CRenderTarget::phase_scene_prepare()
             RCache.ClearRT(rt_Color, color);
             RCache.ClearRT(rt_Accumulator, color);
             RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
-            RCache.ClearZB(get_base_zb(), 1.0f, 0);
+            //RCache.ClearZB(get_base_zb(), 1.0f, 0); rt_MSAADepth != get_base_zb()
         }
     }
     else
     {
         //	TODO: DX11: Check if we need to set RT here.
-        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, rt_MSAADepth);
+        u_setrtzb(RCache, get_base_rt(), rt_MSAADepth);
         RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
 
@@ -57,16 +58,16 @@ void CRenderTarget::phase_scene_begin()
     if (!RImplementation.o.gbuffer_opt)
     {
         if (RImplementation.o.albedo_wo)
-            u_setrt(RCache, rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth);
+            u_setrtzb(RCache, rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth);
         else
-            u_setrt(RCache, rt_Position, rt_Normal, rt_Color, rt_MSAADepth);
+            u_setrtzb(RCache, rt_Position, rt_Normal, rt_Color, rt_MSAADepth);
     }
     else
     {
         if (RImplementation.o.albedo_wo)
-            u_setrt(RCache, rt_Position, rt_Accumulator, rt_MSAADepth);
+            u_setrtzb(RCache, rt_Position, rt_Accumulator, rt_MSAADepth);
         else
-            u_setrt(RCache, rt_Position, rt_Color, rt_MSAADepth);
+            u_setrtzb(RCache, rt_Position, rt_Color, rt_MSAADepth);
         // else								u_setrt		(rt_Position,	rt_Color, rt_Normal,		rt_MSAADepth);
     }
 
@@ -98,7 +99,7 @@ void CRenderTarget::phase_scene_end()
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
-    u_setrt(RCache, rt_Color, nullptr, nullptr, rt_MSAADepth);
+    u_setrtzb(RCache, rt_Color, rt_MSAADepth);
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)
