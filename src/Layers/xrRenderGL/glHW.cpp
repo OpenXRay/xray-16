@@ -153,7 +153,9 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 void CHW::DestroyDevice()
 {
     CHK_GL(glDeleteFramebuffers(1, &pFB));
-    pFB = 0;
+    CHK_GL(glDeleteFramebuffers(1, &pResolveFB));
+    pFB = GL_NONE;
+    pResolveFB = GL_NONE;
 
     const auto context = SDL_GL_GetCurrentContext();
     if (context == m_context)
@@ -171,7 +173,9 @@ void CHW::Reset()
     ZoneScoped;
 
     CHK_GL(glDeleteFramebuffers(1, &pFB));
+    CHK_GL(glDeleteFramebuffers(1, &pResolveFB));
     pFB = 0;
+    pResolveFB = 0;
     UpdateViews();
 
     UpdateVSync();
