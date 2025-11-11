@@ -83,14 +83,11 @@ private:
     // Collect all text from active CGameFont instances
     void CollectTextGeometry();
 
-    // Extract shader information from CGameFont and initialize pipeline (lazy init)
-    bool InitializeFromFont(CGameFont* font, nvrhi::ICommandList* cmdList);
-
     // Build vertex/index buffers for text quads
     void BuildTextBuffers(nvrhi::ICommandList* cmdList);
 
-    // Render text using NVRHI
-    void RenderText(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer);
+    // Render text using RenderContext
+    void RenderText(ng::RenderContext& ctx, nvrhi::ITexture* outputTexture, nvrhi::ITexture* depthTexture);
 
     // ═══════════════════════════════════════════════════════
     //  MEMBER VARIABLES
@@ -107,29 +104,13 @@ private:
     // NVRHI resources for text rendering
     nvrhi::BufferHandle m_vertexBuffer;   // Dynamic vertex buffer for text quads
     nvrhi::BufferHandle m_indexBuffer;    // Static index buffer for quads
-    nvrhi::ShaderHandle m_vertexShader;   // Text vertex shader
-    nvrhi::ShaderHandle m_pixelShader;    // Text pixel shader
-    nvrhi::BindingLayoutHandle m_bindingLayout;  // Layout for texture + constants
-    nvrhi::GraphicsPipelineHandle m_pipeline;     // Cached pipeline state
+
+    // Material cache system (handles PSO/binding creation automatically)
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+    nvrhi::BufferHandle m_constantBuffer;  // Constant buffer for screen_res
 
     bool m_initialized{false};         // Buffers/vertex layout initialized
-    bool m_pipelineReady{false};       // Shaders/pipeline initialized (lazy)
-
-    // Font texture (loaded via FGResourceManager)
-    ng::TextureHandle m_fontTextureHandle;
-
-    // Shader reflection results (discovered textures/samplers/CBs)
-    framegraph::ShaderRTBindings m_shaderReflection;
-    framegraph::ShaderConstantBuffers m_vsConstantBuffers;  // Vertex shader CBs
-
-    // Cached samplers (created once, reused every frame)
-    xr_vector<nvrhi::SamplerHandle> m_samplers;
-
-    // Constant buffer for vertex shader (if needed)
-    nvrhi::BufferHandle m_vsConstantBuffer;
-
-    // Default fallback texture (1x1 white) for when font textures aren't loaded
-    nvrhi::TextureHandle m_defaultTexture;
 
     // Vertex format for text rendering
     // Matches shader input: v_TL { float4 P : POSITION; float2 Tex0 : TEXCOORD0; float4 Color : COLOR; }
@@ -139,9 +120,16 @@ private:
         float u, v;          // Texture coordinates
     };
 
-    // Collected text geometry (built each frame)
-    xr_vector<TextVertex> m_vertices;
-    xr_vector<u16> m_indices;
+    // Per-font batch (groups geometry by font for MaterialCache)
+    struct FontBatch {
+        CGameFont* font;              // Font this batch belongs to
+        xr_vector<TextVertex> vertices;
+        xr_vector<u16> indices;
+        u32 numStrings;              // Number of strings in this batch
+    };
+
+    // Collected text geometry (built each frame, grouped by font)
+    xr_vector<FontBatch> m_fontBatches;
 };
 
 } // namespace xray::render::passes
