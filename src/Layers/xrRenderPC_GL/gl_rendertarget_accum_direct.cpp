@@ -1139,9 +1139,9 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     if (RImplementation.o.msaa)
         Element = s_accum_direct_volumetric_msaa[0]->E[0];
 
-    const bool useMinMaxSMThisFrame = use_minmax_sm_this_frame();
+    const bool useMinMaxSMThisFrame = !RImplementation.o.msaa && use_minmax_sm_this_frame();
     // if ( (sub_phase==SE_SUN_NEAR) && use_minmax_sm_this_frame())
-    if (useMinMaxSMThisFrame && !RImplementation.o.msaa)
+    if (useMinMaxSMThisFrame)
         Element = s_accum_direct_volumetric_minmax->E[0];
 
     //	Assume everything was recalculated before this call by accum_direct

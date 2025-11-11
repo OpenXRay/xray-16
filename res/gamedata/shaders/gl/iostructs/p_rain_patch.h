@@ -13,7 +13,7 @@ float4 _main ( float2 tc, float2 tcJ, float4	Color, float4 pos2d );
 #endif
 #else
 #ifdef MSAA_OPTIMIZATION
-float4 _main ( float2 tc, float2 tcJ, uint iSample );
+float4 _main ( float2 tc, float2 tcJ, int iSample );
 #else
 float4 _main ( float2 tc, float2 tcJ );
 #endif

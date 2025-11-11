@@ -205,7 +205,7 @@ void CRenderTarget::phase_combine()
         {
             if (RImplementation.o.msaa_opt)
             {
-                RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
+                //RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
             }
             else
