@@ -123,6 +123,7 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         //  COLLECT MAIN MENU UI (menus, options, credits, etc.)
         // ═══════════════════════════════════════════════════════
         g_pGamePersistent->OnRenderPPUI_main();
+        Msg("  [UIPass] After menu UI: %zu batches", m_uiCollector->GetBatches().size());
 
         // ═══════════════════════════════════════════════════════
         //  COLLECT IN-GAME UI (HUD, inventory, loading screen, etc.)
@@ -137,6 +138,13 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         // - Dialog windows
         // - etc.
         g_pGamePersistent->OnRenderInGameUI();
+        Msg("  [UIPass] After in-game UI: %zu batches", m_uiCollector->GetBatches().size());
+
+        // ═══════════════════════════════════════════════════════
+        //  COLLECT CURSOR (must be last so it renders on top)
+        // ═══════════════════════════════════════════════════════
+        g_pGamePersistent->OnRenderCursor();
+        Msg("  [UIPass] After cursor: %zu batches", m_uiCollector->GetBatches().size());
 
         // Restore original renderer
         GEnv.UIRender = oldRenderer;

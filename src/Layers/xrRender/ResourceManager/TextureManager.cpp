@@ -658,6 +658,9 @@ void TextureManager::Update(float deltaTime) {
     // Update video textures (Week 6)
     UpdateVideoTextures();
 
+    // Update sequence textures (animated .seq)
+    UpdateSequenceTextures(deltaTime);
+
     // Update streaming
     m_streamingManager->Update(deltaTime);
 
@@ -702,10 +705,17 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         return;
     }
 
-    // Check if this is a video texture
+    // Check texture type
     bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
+    bool isSequenceTexture = (ddsData.type == DDSData::TextureType::Sequence);
+
     if (isVideoTexture) {
         Msg("* [TextureManager] Video texture detected: %s", meta.filePath.c_str());
+    }
+    if (isSequenceTexture) {
+        Msg("* [TextureManager] Sequence texture detected: %s (%u frames)",
+            meta.filePath.c_str(),
+            (u32)ddsData.sequenceState->frameTextures.size());
     }
 
     // ═══════════════════════════════════════════════════
@@ -798,11 +808,23 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         Msg("* [TextureManager] Video texture state stored for: %s", meta.filePath.c_str());
     }
 
+    if (isSequenceTexture) {
+        // Move DDSData into metadata so we can animate frames
+        meta.sequenceTextureData = xr_make_unique<DDSData>();
+        *meta.sequenceTextureData = std::move(ddsData);  // Transfer ownership
+
+        // Initialize animation state
+        meta.sequenceTextureData->sequenceState->currentFrame = 0;
+        meta.sequenceTextureData->sequenceState->elapsedTime = 0.0f;
+
+        Msg("* [TextureManager] Sequence texture state stored for: %s", meta.filePath.c_str());
+    }
+
     // Update metadata
     meta.state = TextureState::Resident;
-    meta.residentMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;  // Video textures have 1 mip
-    meta.totalMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
-    meta.requestedMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
+    meta.residentMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;  // Video/sequence textures have 1 mip
+    meta.totalMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
+    meta.requestedMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
     meta.memoryUsed = ddsData.totalDataSize;
 
     // Update memory tracking
@@ -1032,6 +1054,79 @@ void TextureManager::UpdateVideoTextures() {
     if (s_frameCount % 120 == 0 && videoTextureCount > 0) {  // Log every 120 frames
         Msg("* [TextureManager] UpdateVideoTextures: %d video textures, %d updated this frame",
             videoTextureCount, updatedCount);
+    }
+}
+
+void TextureManager::UpdateSequenceTextures(float deltaTime) {
+    // Animate .seq texture sequences (cursor, animated UI elements, etc.)
+
+    for (auto& meta : m_textures) {
+        if (!meta.isAlive || !meta.sequenceTextureData) {
+            continue;  // Not a sequence texture
+        }
+
+        auto* seqState = meta.sequenceTextureData->sequenceState;
+        if (!seqState || seqState->frameTextures.empty()) {
+            continue;
+        }
+
+        // Update animation timer
+        seqState->elapsedTime += deltaTime * 1000.0f;  // Convert to milliseconds
+
+        // Check if we should advance frame
+        if (seqState->elapsedTime >= seqState->msPerFrame) {
+            seqState->elapsedTime -= seqState->msPerFrame;
+
+            // Advance frame
+            u32 nextFrame = seqState->currentFrame + 1;
+
+            // Handle cycling
+            if (nextFrame >= seqState->frameTextures.size()) {
+                if (seqState->cycled) {
+                    nextFrame = 0;  // Loop back to start
+                } else {
+                    nextFrame = seqState->currentFrame;  // Stay on last frame
+                    continue;
+                }
+            }
+
+            // Load next frame texture
+            const char* nextFramePath = seqState->frameTextures[nextFrame].c_str();
+
+            DDSData frameData;
+            if (DDSLoader::LoadFromFile(nextFramePath, frameData)) {
+                // Upload to GPU (reuse existing texture, just update data)
+                // Use the same upload method as video textures
+                nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
+                if (!nvrhiTex) {
+                    Msg("! [TextureManager] Sequence texture has no NVRHI texture: %s", meta.filePath.c_str());
+                    continue;
+                }
+
+                // Upload first mip level (assume sequence textures are single-mip like cursors)
+                if (!frameData.mipLevels.empty()) {
+                    const DDSMipLevel& mip = frameData.mipLevels[0];
+                    m_device->UploadTextureDataToNVRHI(
+                        nvrhiTex,
+                        0,  // arraySlice
+                        0,  // mipLevel
+                        mip.data,
+                        mip.size
+                    );
+                }
+
+                seqState->currentFrame = nextFrame;
+
+                // Log frame advancement occasionally
+                static u32 s_frameAdvanceCount = 0;
+                if (++s_frameAdvanceCount % 60 == 0) {  // Log every 60 frame advances
+                    Msg("* [TextureManager] Advanced .seq frame: %s → %u/%u",
+                        meta.filePath.c_str(), nextFrame + 1, (u32)seqState->frameTextures.size());
+                }
+            } else {
+                Msg("! [TextureManager] Failed to load sequence frame: %s", nextFramePath);
+            }
+        }
     }
 }
 

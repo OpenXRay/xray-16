@@ -1223,6 +1223,9 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
         filePath, expectedWidth, expectedHeight,
         (u32)outData.sequenceState->frameData.size(), fps, cycled ? "yes" : "no");
 
+    Msg("* [DDSLoader] Sequence texture size: %ux%u from first frame",
+        outData.desc.width, outData.desc.height);
+
     return true;
 }
 

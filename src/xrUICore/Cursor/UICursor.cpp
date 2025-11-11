@@ -9,9 +9,23 @@
 void CUICursor::InitInternal()
 {
     m_static = xr_new<CUIStatic>("ui_ani_cursor");
-    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
+    // TEMP: Load first frame directly for testing (bypasses .seq)
+    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor_01", "hud" DELIMITER "cursor");
+    // m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
+
+    // Get actual texture size (like TextPass does for fonts)
+    Fvector2 texSize;
+    if (m_static->GetStaticItem()->hShader) {
+        m_static->GetStaticItem()->hShader->GetBaseTextureResolution(texSize);
+    }
+
+    // If texture size wasn't retrieved, fall back to hardcoded 40x40
+    if (texSize.x <= 0.0f || texSize.y <= 0.0f) {
+        texSize.set(40.0f, 40.0f);
+    }
+
     Frect rect;
-    rect.set(0.0f, 0.0f, 40.0f, 40.0f);
+    rect.set(0.0f, 0.0f, texSize.x, texSize.y);
     m_static->SetTextureRect(rect);
     Fvector2 sz;
     sz.set(rect.rb);
@@ -48,13 +62,16 @@ void CUICursor::OnUIReset()
 CUICursor::CUICursor()
 {
     InitInternal();
-    Device.seqRender.Add(this, -3 /*2*/);
+    // NOTE: Cursor rendering is now handled by FrameGraphRenderer::UIPass
+    // The legacy seqRender callback has been removed to prevent bypassing
+    // the UI geometry batching system
+    // Device.seqRender.Add(this, -3 /*2*/);
 }
 //--------------------------------------------------------------------
 CUICursor::~CUICursor()
 {
     xr_delete(m_static);
-    Device.seqRender.Remove(this);
+    // Device.seqRender.Remove(this);  // No longer added to seqRender
 }
 
 //--------------------------------------------------------------------

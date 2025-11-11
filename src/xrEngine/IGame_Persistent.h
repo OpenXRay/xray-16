@@ -151,6 +151,7 @@ public:
     virtual void OnRenderPPUI_main(){};
     virtual void OnRenderPPUI_PP(){};
     virtual void OnRenderInGameUI(){}; // Render in-game HUD/UI (loading screen, inventory, etc.)
+    virtual void OnRenderCursor(){}; // Render cursor (called once per frame at end of UI collection)
 
     void OnEvent(EVENT E, u64 P1, u64 P2) override;
 

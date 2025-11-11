@@ -786,6 +786,15 @@ void CGamePersistent::OnRenderInGameUI()
             pHUDManager->RenderUI();
         }
     }
+
+    // NOTE: Cursor is rendered once at the end of UIPass::Execute()
+    // to avoid rendering twice per frame (menu + in-game paths)
+}
+
+void CGamePersistent::OnRenderCursor()
+{
+    // Render cursor on top of all UI
+    GetUICursor().OnRender();
 }
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }

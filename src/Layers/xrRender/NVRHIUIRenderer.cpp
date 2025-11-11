@@ -96,10 +96,14 @@ void NVRHIUIRenderer::RenderBatches(
     commandList->writeBuffer(m_constantBuffer, cbData, 256);
 
     // ═══════════════════════════════════════════════════════
-    //  GROUP BATCHES BY SHADER
+    //  RENDER BATCHES IN SUBMISSION ORDER (IMPORTANT FOR Z-ORDER!)
     // ═══════════════════════════════════════════════════════
+    // NOTE: We used to group by shader for efficiency, but that destroys
+    // the submission order (cursor needs to render LAST, not first!).
+    // Now we render in exact submission order, changing PSO as needed.
 
-    xr_map<Shader*, xr_vector<const UIGeometryBatch*>> batchesByShader;
+    Shader* lastShader = nullptr;
+    MaterialPSO* currentPSO = nullptr;
 
     for (const auto& batch : batches)
     {
@@ -110,30 +114,22 @@ void NVRHIUIRenderer::RenderBatches(
         if (!shader)
             continue;
 
-        batchesByShader[shader].push_back(&batch);
-    }
-
-    Msg("  [NVRHIUIRenderer] Grouped into %zu unique shaders", batchesByShader.size());
-
-    // ═══════════════════════════════════════════════════════
-    //  RENDER EACH SHADER GROUP
-    // ═══════════════════════════════════════════════════════
-
-    for (const auto& [shader, shaderBatches] : batchesByShader)
-    {
-        Msg("  [NVRHIUIRenderer] Processing shader group with %zu batches", shaderBatches.size());
-
-        // Get or create PSO for this shader using MaterialCache
-        // UI always uses element 0 (SE_R2_NORMAL_HQ)
-        MaterialPSO* pso = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
-        if (!pso)
+        // Only change PSO when shader changes
+        if (shader != lastShader)
         {
-            Msg("! [NVRHIUIRenderer] Failed to get PSO, skipping shader group");
-            continue;
+            Msg("  [NVRHIUIRenderer] Switching to new shader");
+            currentPSO = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
+            if (!currentPSO)
+            {
+                Msg("! [NVRHIUIRenderer] Failed to get PSO, skipping batch");
+                continue;
+            }
+            lastShader = shader;
         }
 
-        // Render all batches with this shader
-        RenderBatchesWithShader(commandList, shaderBatches, pso, framebuffer, screenWidth, screenHeight);
+        // Render this single batch
+        xr_vector<const UIGeometryBatch*> singleBatch = { &batch };
+        RenderBatchesWithShader(commandList, singleBatch, currentPSO, framebuffer, screenWidth, screenHeight);
     }
 
     Msg("  [NVRHIUIRenderer] Render complete");

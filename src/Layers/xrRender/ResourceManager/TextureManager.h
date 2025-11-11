@@ -118,6 +118,9 @@ struct TextureMetadata {
     // Video texture support (Week 6)
     xr_unique_ptr<DDSData> videoTextureData;  // Only set for video textures (.ogm/.avi)
 
+    // Sequence texture support (animated .seq textures like cursor)
+    xr_unique_ptr<DDSData> sequenceTextureData;  // Only set for sequence textures (.seq)
+
     // Async loading
     struct LoadRequest {
         bool inProgress = false;
@@ -310,6 +313,9 @@ private:
 
     // Video texture update (Week 6)
     void UpdateVideoTextures();
+
+    // Sequence texture animation (.seq files like cursor)
+    void UpdateSequenceTextures(float deltaTime);
 
     // ═══════════════════════════════════════════════════
     //  THREAD SAFETY (Week 3)

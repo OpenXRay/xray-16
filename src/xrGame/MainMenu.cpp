@@ -515,6 +515,9 @@ void CMainMenu::OnRenderPPUI_main()
         }
     }
 
+    // NOTE: Cursor is rendered once at the end of UIPass::Execute()
+    // to avoid rendering twice per frame (menu + in-game paths)
+
     UI().pp_stop();
 }
 

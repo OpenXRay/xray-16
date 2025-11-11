@@ -689,7 +689,8 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
         nvrhiDesc.setMinFilter(true);  // Linear
         nvrhiDesc.setMagFilter(true);  // Linear
         nvrhiDesc.setMipFilter(true);  // Linear
-        nvrhiDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        // UI elements should use Clamp mode to prevent tiling/repeating
+        nvrhiDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
         nvrhiDesc.setMaxAnisotropy(8.0f);
 
         return m_device->GetNativeDevice()->createSampler(nvrhiDesc);
