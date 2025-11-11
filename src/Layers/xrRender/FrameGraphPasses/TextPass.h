@@ -51,11 +51,9 @@ private:
 
     void CollectTextGeometry();
 
-    bool InitializeFromFont(CGameFont* font, nvrhi::ICommandList* cmdList);
-
     void BuildTextBuffers(nvrhi::ICommandList* cmdList);
 
-    void RenderText(nvrhi::ICommandList* cmdList, nvrhi::IFramebuffer* framebuffer);
+    void RenderText(ng::RenderContext& ctx, nvrhi::ITexture* outputTexture, nvrhi::ITexture* depthTexture);
 
     ng::RenderDevice* m_device;
     TextPassConfig m_config;
@@ -66,24 +64,12 @@ private:
 
     nvrhi::BufferHandle m_vertexBuffer;
     nvrhi::BufferHandle m_indexBuffer;
-    nvrhi::ShaderHandle m_vertexShader;
-    nvrhi::ShaderHandle m_pixelShader;
-    nvrhi::BindingLayoutHandle m_bindingLayout;
-    nvrhi::GraphicsPipelineHandle m_pipeline;
+
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+    nvrhi::BufferHandle m_constantBuffer;
 
     bool m_initialized{false};
-    bool m_pipelineReady{false};
-
-    ng::TextureHandle m_fontTextureHandle;
-
-    framegraph::ShaderRTBindings m_shaderReflection;
-    framegraph::ShaderConstantBuffers m_vsConstantBuffers;
-
-    xr_vector<nvrhi::SamplerHandle> m_samplers;
-
-    nvrhi::BufferHandle m_vsConstantBuffer;
-
-    nvrhi::TextureHandle m_defaultTexture;
 
     struct TextVertex {
         float x, y, z, w;
@@ -91,8 +77,14 @@ private:
         float u, v;
     };
 
-    xr_vector<TextVertex> m_vertices;
-    xr_vector<u16> m_indices;
+    struct FontBatch {
+        CGameFont* font;
+        xr_vector<TextVertex> vertices;
+        xr_vector<u16> indices;
+        u32 numStrings;
+    };
+
+    xr_vector<FontBatch> m_fontBatches;
 };
 
 }
