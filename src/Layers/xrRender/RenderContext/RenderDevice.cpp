@@ -390,6 +390,39 @@ void RenderDevice::UploadTextureDataToNVRHI(
     GetNVRHIDevice()->waitForIdle();
 }
 
+void RenderDevice::UploadTextureDataToNVRHI(
+    nvrhi::ITexture* texture,
+    u32 arraySlice,
+    u32 mipLevel,
+    const void* data,
+    size_t dataSize,
+    u32 rowPitch,
+    u32 slicePitch)
+{
+    VERIFY(m_initialized);
+    VERIFY(texture != nullptr);
+    VERIFY(data != nullptr);
+    VERIFY(dataSize > 0);
+    VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    // Lock for thread safety - textures are loaded in parallel
+    std::lock_guard<std::mutex> lock(m_uploadMutex);
+
+    m_uploadCommandList->open();
+
+    // Write texture data with explicit pitch values (for compressed textures)
+    // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
+    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, slicePitch);
+
+    // Execute immediately and wait for completion
+    m_uploadCommandList->close();
+    GetNVRHIDevice()->executeCommandList(m_uploadCommandList);
+
+    // Wait for upload to complete to avoid D3D11 state corruption
+    // (NVRHI command execution can unbind shaders/state)
+    GetNVRHIDevice()->waitForIdle();
+}
+
 // ═══════════════════════════════════════════════════
 //  BUFFER CREATION
 // ═══════════════════════════════════════════════════

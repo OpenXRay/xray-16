@@ -1041,10 +1041,12 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
     // Read first line - either "cycled" or FPS
     reader->r_string(buffer, sizeof(buffer));
 
-    bool cycled = false;
+    bool cycled = true;  // Default to looping (vanilla behavior)
     u32 fps = 0;
 
     if (0 == xr_stricmp(buffer, "cycled")) {
+        // "cycled" means ping-pong animation (forward then reverse)
+        // For now we treat it the same as regular looping
         cycled = true;
         reader->r_string(buffer, sizeof(buffer));
         fps = atoi(buffer);
@@ -1138,9 +1140,21 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
             }
         }
 
-        // Store first mip level (we only support mip 0 for sequences)
+        // Store first mip level metadata and copy pixel data
         if (!frameData.mipLevels.empty()) {
-            outData.sequenceState->frameData.push_back(frameData.mipLevels[0]);
+            const DDSMipLevel& mip = frameData.mipLevels[0];
+
+            // Copy metadata
+            outData.sequenceState->frameData.push_back(mip);
+
+            // Copy actual pixel data into our own buffer
+            xr_vector<u8> pixelData;
+            pixelData.resize(mip.size);
+            memcpy(pixelData.data(), mip.data, mip.size);
+            outData.sequenceState->framePixels.push_back(std::move(pixelData));
+
+            // Update the frameData pointer to point to our owned data
+            outData.sequenceState->frameData.back().data = outData.sequenceState->framePixels.back().data();
         }
     }
 
@@ -1300,15 +1314,16 @@ bool DDSLoader::UpdateSequenceFrame(DDSData& data, u32 currentFrame) {
     const DDSMipLevel& frame = seqState->frameData[currentFrame];
 
     // Copy frame pixels to frame buffer
-    // For RGBA8 formats, we can copy directly
-    if (data.desc.format == nvrhi::Format::RGBA8_UNORM ||
-        data.desc.format == nvrhi::Format::BGRA8_UNORM ||
-        data.desc.format == nvrhi::Format::SRGBA8_UNORM ||
-        data.desc.format == nvrhi::Format::SBGRA8_UNORM) {
-        memcpy(seqState->frameBuffer.data(),
-               frame.data,
-               frame.size);
+    // For both compressed and uncompressed formats, we just copy the raw bytes
+    // The GPU texture was already created with the correct format, so it expects this data layout
+
+    // Ensure frame buffer is sized correctly for this frame
+    u32 requiredSize = (frame.size + sizeof(u32) - 1) / sizeof(u32);  // Round up to u32 count
+    if (seqState->frameBuffer.size() < requiredSize) {
+        seqState->frameBuffer.resize(requiredSize);
     }
+
+    memcpy(seqState->frameBuffer.data(), frame.data, frame.size);
 
     // Mark as needing GPU upload
     seqState->needsUpdate = true;

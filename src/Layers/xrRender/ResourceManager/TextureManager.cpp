@@ -715,7 +715,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     if (isSequenceTexture) {
         Msg("* [TextureManager] Sequence texture detected: %s (%u frames)",
             meta.filePath.c_str(),
-            (u32)ddsData.sequenceState->frameTextures.size());
+            (u32)ddsData.sequenceState->frameData.size());
     }
 
     // ═══════════════════════════════════════════════════
@@ -1059,6 +1059,7 @@ void TextureManager::UpdateVideoTextures() {
 
 void TextureManager::UpdateSequenceTextures(float deltaTime) {
     // Animate .seq texture sequences (cursor, animated UI elements, etc.)
+    // Follows the same pattern as UpdateVideoTextures (OGM-style)
 
     for (auto& meta : m_textures) {
         if (!meta.isAlive || !meta.sequenceTextureData) {
@@ -1066,7 +1067,7 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
         }
 
         auto* seqState = meta.sequenceTextureData->sequenceState;
-        if (!seqState || seqState->frameTextures.empty()) {
+        if (!seqState || seqState->frameData.empty()) {
             continue;
         }
 
@@ -1081,7 +1082,7 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
             u32 nextFrame = seqState->currentFrame + 1;
 
             // Handle cycling
-            if (nextFrame >= seqState->frameTextures.size()) {
+            if (nextFrame >= seqState->frameData.size()) {
                 if (seqState->cycled) {
                     nextFrame = 0;  // Loop back to start
                 } else {
@@ -1090,41 +1091,30 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
                 }
             }
 
-            // Load next frame texture
-            const char* nextFramePath = seqState->frameTextures[nextFrame].c_str();
-
-            DDSData frameData;
-            if (DDSLoader::LoadFromFile(nextFramePath, frameData)) {
+            // Update frame buffer with next frame's pixels (OGM-style pattern)
+            if (DDSLoader::UpdateSequenceFrame(*meta.sequenceTextureData, nextFrame)) {
                 // Upload to GPU (reuse existing texture, just update data)
-                // Use the same upload method as video textures
                 nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
                 if (!nvrhiTex) {
-                    Msg("! [TextureManager] Sequence texture has no NVRHI texture: %s", meta.filePath.c_str());
                     continue;
                 }
 
-                // Upload first mip level (assume sequence textures are single-mip like cursors)
-                if (!frameData.mipLevels.empty()) {
-                    const DDSMipLevel& mip = frameData.mipLevels[0];
-                    m_device->UploadTextureDataToNVRHI(
-                        nvrhiTex,
-                        0,  // arraySlice
-                        0,  // mipLevel
-                        mip.data,
-                        mip.size
-                    );
-                }
+                // Get the actual frame data (has correct rowPitch/slicePitch for compressed formats)
+                const DDSMipLevel& frameData = seqState->frameData[nextFrame];
+
+                // Upload frame buffer with correct pitch for compressed formats
+                m_device->UploadTextureDataToNVRHI(
+                    nvrhiTex,
+                    0,  // arraySlice
+                    0,  // mipLevel
+                    seqState->frameBuffer.data(),
+                    frameData.size,
+                    frameData.rowPitch,
+                    frameData.slicePitch
+                );
 
                 seqState->currentFrame = nextFrame;
-
-                // Log frame advancement occasionally
-                static u32 s_frameAdvanceCount = 0;
-                if (++s_frameAdvanceCount % 60 == 0) {  // Log every 60 frame advances
-                    Msg("* [TextureManager] Advanced .seq frame: %s → %u/%u",
-                        meta.filePath.c_str(), nextFrame + 1, (u32)seqState->frameTextures.size());
-                }
-            } else {
-                Msg("! [TextureManager] Failed to load sequence frame: %s", nextFramePath);
+                seqState->needsUpdate = false;  // Mark as uploaded
             }
         }
     }

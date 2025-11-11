@@ -9,9 +9,8 @@
 void CUICursor::InitInternal()
 {
     m_static = xr_new<CUIStatic>("ui_ani_cursor");
-    // TEMP: Load first frame directly for testing (bypasses .seq)
-    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor_01", "hud" DELIMITER "cursor");
-    // m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
+    // Load animated .seq texture (ui_ani_cursor.seq references multiple frames)
+    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
 
     // Get actual texture size (like TextPass does for fonts)
     Fvector2 texSize;

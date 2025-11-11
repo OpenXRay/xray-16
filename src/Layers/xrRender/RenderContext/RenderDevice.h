@@ -48,6 +48,17 @@ public:
         size_t dataSize
     );
 
+    // Overload with explicit pitch values (for compressed textures)
+    void UploadTextureDataToNVRHI(
+        nvrhi::ITexture* texture,
+        u32 arraySlice,
+        u32 mipLevel,
+        const void* data,
+        size_t dataSize,
+        u32 rowPitch,
+        u32 slicePitch
+    );
+
     // ═══════════════════════════════════════════════════
     //  TEXTURE CREATION
     // ═══════════════════════════════════════════════════

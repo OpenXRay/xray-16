@@ -193,8 +193,9 @@ struct DDSData {
 
     // Sequence texture state (only valid if type == Sequence)
     struct SequenceState {
-        xr_vector<DDSMipLevel> frameData;     // Pre-loaded pixel data for all frames
-        xr_vector<u32> frameBuffer;           // Current frame RGBA data (uploaded to GPU)
+        xr_vector<DDSMipLevel> frameData;     // Metadata for each frame (width, height, pitch)
+        xr_vector<xr_vector<u8>> framePixels; // Actual pixel data for each frame (owned)
+        xr_vector<u32> frameBuffer;           // Current frame data (uploaded to GPU)
         u32 frameWidth = 0;                   // Frame width
         u32 frameHeight = 0;                  // Frame height
         u32 textureWidth = 0;                 // Texture width (may be padded)
@@ -203,6 +204,8 @@ struct DDSData {
         u32 msPerFrame = 0;                   // Milliseconds per frame (1000 / fps)
         bool cycled = false;                  // Ping-pong animation (forward then reverse)
         bool needsUpdate = false;             // Frame has changed, need writeTexture
+        u32 currentFrame = 0;                 // Current frame index
+        float elapsedTime = 0.0f;             // Elapsed time since last frame change (ms)
     };
 
     SequenceState* sequenceState = nullptr;  // Only allocated for sequence textures
