@@ -239,6 +239,37 @@ void TextPass::CollectTextGeometry() {
         CGameFont* font = *fontPtrPtr;
         if (!font || font->strings.empty()) continue;
 
+        if (!(font->uFlags & CGameFont::fsValid)) {
+            auto* fontRender = static_cast<render_r4::dxFontRender*>(font->pFontRender);
+            if (fontRender && fontRender->strTextureName.size() > 0) {
+                resources::FGResourceManager* resMgr = m_device->GetFGResourceManager();
+                resources::TextureManager* texMgr = resMgr->GetTextureManager();
+                ng::TextureHandle texHandle = texMgr->LoadTexture(fontRender->strTextureName.c_str());
+
+                if (texHandle.IsValid()) {
+                    const auto* texMetadata = texMgr->GetMetadata(texHandle);
+                    if (texMetadata) {
+                        Msg("! [TextPass DEBUG] Texture metadata: width=%u, height=%u, state=%s",
+                            texMetadata->desc.width, texMetadata->desc.height,
+                            TextureStateToString(texMetadata->state));
+
+                        nvrhi::ITexture* nvrhiTex = texMgr->GetNVRHITexture(texHandle);
+                        if (nvrhiTex) {
+                            const nvrhi::TextureDesc& desc = nvrhiTex->getDesc();
+                            font->vTS.set((int)desc.width, (int)desc.height);
+                            font->fTCHeight = font->fHeight / float(font->vTS.y);
+                            font->uFlags |= CGameFont::fsValid;
+                            Msg("! [TextPass] Validated font: texture=%s, size=%dx%d",
+                                fontRender->strTextureName.c_str(), font->vTS.x, font->vTS.y);
+                        }
+                        else {
+                            Msg("! [TextPass] Failed to get NVRHI texture for font");
+                        }
+                    }
+                }
+            }
+        }
+
         FontBatch batch;
         batch.font = font;
         batch.numStrings = 0;
