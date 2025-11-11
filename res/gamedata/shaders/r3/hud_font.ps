@@ -10,8 +10,6 @@ struct 	v2p
 // Pixel
 float4 main ( p_TL I ) : SV_Target
 {
-	float4 r 	= s_base.Sample( smp_base, I.Tex0 );
-	r.rgb		= I.Color;
-	r.a			*= I.Color.a;
-	return r;
+	float glyph_alpha = s_base.Sample( smp_base, I.Tex0 ).r;
+	return float4(I.Color.rgb, glyph_alpha * I.Color.a);
 }
