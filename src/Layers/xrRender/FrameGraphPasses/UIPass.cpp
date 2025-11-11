@@ -96,6 +96,8 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
 
         g_pGamePersistent->OnRenderPPUI_main();
 
+        g_pGamePersistent->OnRenderInGameUI();
+
         GEnv.UIRender = oldRenderer;
 
         Msg("  [UIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());

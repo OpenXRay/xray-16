@@ -17,6 +17,7 @@
 #include "ActorEffector.h"
 #include "Actor.h"
 #include "Spectator.h"
+#include "HUDManager.h"
 
 #include "xrUICore/XML/UITextureMaster.h"
 
@@ -770,6 +771,18 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
+
+void CGamePersistent::OnRenderInGameUI()
+{
+    if (g_pGameLevel && g_pGameLevel->pHUD)
+    {
+        CHUDManager* pHUDManager = dynamic_cast<CHUDManager*>(g_pGameLevel->pHUD);
+        if (pHUDManager)
+        {
+            pHUDManager->RenderUI();
+        }
+    }
+}
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)

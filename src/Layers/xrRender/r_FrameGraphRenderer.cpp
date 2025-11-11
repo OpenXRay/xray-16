@@ -157,6 +157,12 @@ void FrameGraphRenderer::Render() {
 
     RenderHUD();
 
+
+    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Distort → Composite)");
+    m_uiPass->Execute(*m_renderContext, *m_framegraph);
+    m_textPass->Execute(*m_renderContext, *m_framegraph);
+    Msg("* [FrameGraphRenderer] In-game UI rendering complete");
+
     ImGui::Render();
 
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
