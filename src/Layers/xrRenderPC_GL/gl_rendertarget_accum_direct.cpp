@@ -96,7 +96,10 @@ void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
         float intensity = 0.3f * fuckingsun->color.r + 0.48f * fuckingsun->color.g + 0.22f * fuckingsun->color.b;
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
-        RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        if (!RImplementation.o.msaa)
+            RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        else
+            RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
         RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
 
         // if (stencil>=1 && aref_pass)	stencil = light_id
@@ -244,7 +247,10 @@ void CRenderTarget::accum_direct(CBackend& cmd_list, u32 sub_phase)
         RCache.set_Geometry(g_combine_2UV);
 
         // setup
-        RCache.set_Element(s_accum_direct->E[uiElementIndex]);
+        if (!RImplementation.o.msaa)
+            RCache.set_Element(s_accum_direct->E[uiElementIndex]);
+        else
+            RCache.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
         RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
@@ -389,7 +395,10 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
         float intensity = 0.3f * fuckingsun->color.r + 0.48f * fuckingsun->color.g + 0.22f * fuckingsun->color.b;
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
-        cmd_list.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        if (!RImplementation.o.msaa)
+            cmd_list.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        else
+            cmd_list.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
         cmd_list.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
 
         // if (stencil>=1 && aref_pass)	stencil = light_id
@@ -558,7 +567,10 @@ void CRenderTarget::accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmat
         cmd_list.set_Geometry(g_combine_cuboid);
 
         // setup
-        cmd_list.set_Element(s_accum_direct->E[uiElementIndex]);
+        if (!RImplementation.o.msaa)
+            cmd_list.set_Element(s_accum_direct->E[uiElementIndex]);
+        else
+            cmd_list.set_Element(s_accum_direct_msaa[0]->E[uiElementIndex]);
         cmd_list.set_c("m_texgen", m_Texgen);
         cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
@@ -724,7 +736,10 @@ void CRenderTarget::accum_direct_blend(CBackend& cmd_list)
         pv++;
         RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
         RCache.set_Geometry(g_combine_2UV);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_2D]);
+        if (!RImplementation.o.msaa)
+            RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_2D]);
+        else
+            RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_2D]);
         if (!RImplementation.o.msaa)
         {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
@@ -811,7 +826,10 @@ void CRenderTarget::accum_direct_f(CBackend& cmd_list, u32 sub_phase)
         float intensity = 0.3f * fuckingsun->color.r + 0.48f * fuckingsun->color.g + 0.22f * fuckingsun->color.b;
         Fvector dir = L_dir;
         dir.normalize().mul(-_sqrt(intensity + EPS));
-        RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        if (!RImplementation.o.msaa)
+            RCache.set_Element(s_accum_mask->E[SE_MASK_DIRECT]); // masker
+        else
+            RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_DIRECT]); // masker
         RCache.set_c("Ldynamic_dir", dir.x, dir.y, dir.z, 0.f);
 
         // if (stencil>=1 && aref_pass)	stencil = light_id
@@ -922,7 +940,10 @@ void CRenderTarget::accum_direct_f(CBackend& cmd_list, u32 sub_phase)
         RCache.set_Geometry(g_combine_2UV);
 
         // setup
-        RCache.set_Element(s_accum_direct->E[sub_phase]);
+        if (!RImplementation.o.msaa)
+            RCache.set_Element(s_accum_direct->E[sub_phase]);
+        else
+            RCache.set_Element(s_accum_direct_msaa[0]->E[sub_phase]);
         RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
         RCache.set_c("m_shadow", m_shadow);
@@ -1061,7 +1082,10 @@ void CRenderTarget::accum_direct_lum(CBackend& cmd_list)
     RCache.set_Geometry(g_aa_AA);
 
     // setup
-    RCache.set_Element(s_accum_direct->E[SE_SUN_LUMINANCE]);
+    if (!RImplementation.o.msaa)
+        RCache.set_Element(s_accum_direct->E[SE_SUN_LUMINANCE]);
+    else
+        RCache.set_Element(s_accum_direct_msaa[0]->E[SE_SUN_LUMINANCE]);
     RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
     RCache.set_c("Ldynamic_color", L_clr.x, L_clr.y, L_clr.z, L_spec);
 
@@ -1112,10 +1136,12 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     RCache.set_ColorWriteEnable();
 
     ref_selement Element = s_accum_direct_volumetric->E[0];
+    if (RImplementation.o.msaa)
+        Element = s_accum_direct_volumetric_msaa[0]->E[0];
 
     const bool useMinMaxSMThisFrame = use_minmax_sm_this_frame();
     // if ( (sub_phase==SE_SUN_NEAR) && use_minmax_sm_this_frame())
-    if (useMinMaxSMThisFrame)
+    if (useMinMaxSMThisFrame && !RImplementation.o.msaa)
         Element = s_accum_direct_volumetric_minmax->E[0];
 
     //	Assume everything was recalculated before this call by accum_direct

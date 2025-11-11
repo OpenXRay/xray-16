@@ -1,15 +1,6 @@
 
 out vec4 SV_Target0;
 out vec4 SV_Target1;
-#ifndef GBUFFER_OPTIMIZATION
-out vec4 SV_Target2;
-#endif
-#ifdef EXTEND_F_DEFFER
-out int gl_SampleMask[];
-#endif
-#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-in vec4 gl_FragCoord;
-#endif
 
 struct 	p_particle
 {
@@ -33,7 +24,7 @@ layout(location = TEXCOORD4)	in float2	p_flat_lmh		; // TEXCOORD4;	// lm-hemi
 #endif
 
 #ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-f_deffer 	_main	( p_particle II, float4 pos2d );
+f_deffer 	_main	( p_particle II, float2 pos2d );
 #else	//	MSAA_ALPHATEST_DX10_1_ATOC
 f_deffer 	_main	( p_particle II );
 #endif	//	MSAA_ALPHATEST_DX10_1_ATOC
@@ -66,6 +57,6 @@ void main()
 	SV_Target2 = O.C;
 #endif
 #ifdef EXTEND_F_DEFFER
-	gl_SampleMask[0] = O.mask;
+	gl_SampleMask[0] = int(O.mask);
 #endif
 }

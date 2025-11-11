@@ -65,10 +65,13 @@ void CRenderTarget::phase_scene_begin()
     else
     {
         if (RImplementation.o.albedo_wo)
+#ifndef USE_OGL
             u_setrtzb(RCache, rt_Position, rt_Accumulator, rt_MSAADepth);
+#else
+            u_setrtzb(RCache, rt_Position, rt_Color, rt_MSAADepth); // CHECK why
+#endif
         else
             u_setrtzb(RCache, rt_Position, rt_Color, rt_MSAADepth);
-        // else								u_setrt		(rt_Position,	rt_Color, rt_Normal,		rt_MSAADepth);
     }
 
     // Stencil - write 0x1 at pixel pos

@@ -80,6 +80,7 @@ IC void CBackend::unset_ZB()
 IC void CBackend::ClearRT(ref_rt& rt, const Fcolor& color)
 {
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rt->target, rt->pRT, 0));
+    pRT[0] = rt->pRT;
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glClearColor(color.r, color.g, color.b, color.a);
@@ -118,6 +119,7 @@ IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, c
 {
     // TODO: OGL: Implement support for multi-sampled render targets
     CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
+    pRT[0] = rt;
 
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 

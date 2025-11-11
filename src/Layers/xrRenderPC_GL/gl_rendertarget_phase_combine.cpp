@@ -249,7 +249,7 @@ void CRenderTarget::phase_combine()
     phase_bloom(); // HDR RT invalidated here
 
     // RImplementation.rmNormal();
-    // u_setrt(rt_Generic_1,0,0,get_base_zb());
+    // u_setrtzb(RCache, rt_Generic_1, get_base_zb());
 
     // Distortion filter
     auto& dsgraph = RImplementation.get_imm_context();
@@ -291,7 +291,7 @@ void CRenderTarget::phase_combine()
     else
     {
         if (PP_Complex)
-            u_setrtzb(RCache, rt_Color,  rt_Base_Depth); // LDR RT
+            u_setrtzb(RCache, rt_Color, rt_Base_Depth); // LDR RT
         else
             u_setrtzb(RCache, get_base_rt(), get_base_zb());
     }

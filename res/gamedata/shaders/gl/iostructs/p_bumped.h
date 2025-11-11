@@ -4,12 +4,6 @@ out vec4 SV_Target1;
 #ifndef GBUFFER_OPTIMIZATION
 out vec4 SV_Target2;
 #endif
-#ifdef EXTEND_F_DEFFER
-out int gl_SampleMask[];
-#endif
-#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-in vec4 gl_FragCoord;
-#endif
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 layout(location = TEXCOORD0)	in float4	p_bumped_tcdh	; // TEXCOORD0;	// Texture coordinates,         w=sun_occlusion
@@ -62,6 +56,6 @@ void main()
 	SV_Target2 = O.C;
 #endif
 #ifdef EXTEND_F_DEFFER
-	gl_SampleMask[0] = O.mask;
+	gl_SampleMask[0] = int(O.mask);
 #endif
 }

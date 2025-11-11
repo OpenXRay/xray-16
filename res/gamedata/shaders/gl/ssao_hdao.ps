@@ -191,9 +191,9 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 	
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
-	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xy );
+	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), int(MSAA_SAMPLE_INDEX) ).xy );
 #else
-	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xyz;
+	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), int(MSAA_SAMPLE_INDEX) ).xyz;
 #endif
 #else  // !USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION

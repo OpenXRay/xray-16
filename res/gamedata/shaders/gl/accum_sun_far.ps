@@ -97,7 +97,7 @@ float4 _main ( v2p_volume I )
 	float 	fac_y 	= 1.0-saturate( ( tc_f.y - border )/(0.5-border));
 	
 	s += ((1.0-s)*(1.0-fac_x*fac_y));
-	//\ Far edge fading code
+	//Far edge fading code
 
 	return 		blend( Ldynamic_color * light * s/*float4( 1.0, 0.2, 0.2, 1.0)*/, I.tc.xy );
 }

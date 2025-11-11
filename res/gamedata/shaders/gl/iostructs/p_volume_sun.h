@@ -1,11 +1,5 @@
 
 out vec4 SV_Target;
-#ifdef GBUFFER_OPTIMIZATION
-in vec4 gl_FragCoord;
-#endif // GBUFFER_OPTIMIZATION
-#ifdef MSAA_OPTIMIZATION
-in int gl_SampleID;
-#endif // MSAA_OPTIMIZATION
 
 layout(location = TEXCOORD0)	in 	float4 	p_volume_tc; // TEXCOORD0;
 #ifdef USE_SJITTER

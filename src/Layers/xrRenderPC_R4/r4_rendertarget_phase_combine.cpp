@@ -184,7 +184,10 @@ void CRenderTarget::phase_combine()
         RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
 
         // Draw
-        RCache.set_Element(s_combine->E[0]);
+        if (!RImplementation.o.msaa)
+            RCache.set_Element(s_combine->E[0]);
+        else
+            RCache.set_Element(s_combine_msaa[0]->E[0]);
         // RCache.set_Geometry			(g_combine_VP		);
         RCache.set_Geometry(g_combine);
 

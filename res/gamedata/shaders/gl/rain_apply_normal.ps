@@ -14,7 +14,7 @@ Texture2DMS	s_patched_normal;
 #endif
 
 #ifdef MSAA_OPTIMIZATION
-float4 _main ( float2 tc, float2 tcJ, uint iSample )
+float4 _main ( float2 tc, float2 tcJ, int iSample )
 #else
 float4 _main ( float2 tc, float2 tcJ )
 #endif
@@ -23,9 +23,9 @@ float4 _main ( float2 tc, float2 tcJ )
 	float3 _N = tex2D( s_patched_normal, tc ).xyz;
 #else
 #ifndef MSAA_OPTIMIZATION
-	float3 _N = float3(texelFetch( s_patched_normal, int2(tc * pos_decompression_params2.xy), ISAMPLE ));
+	float3 _N = float3(texelFetch( s_patched_normal, int2(tc * pos_decompression_params2.xy), int(ISAMPLE) ));
 #else
-	float3 _N = float3(texelFetch( s_patched_normal, int2(tc * pos_decompression_params2.xy), int(iSample) ));
+	float3 _N = float3(texelFetch( s_patched_normal, int2(tc * pos_decompression_params2.xy), iSample ));
 #endif	
 #endif
 
