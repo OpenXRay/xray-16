@@ -214,11 +214,16 @@ void FrameGraphRenderer::Render() {
     // Execute UI/Text passes to render in-game UI elements on top of 3D scene
     // These were originally only called in RenderMenu(), but in-game UI needs them too!
 
-    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Distort → Composite)");
+    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Composite)");
+
+    // Restore composite pass inputs for in-game mode (may have been overridden by RenderMenu)
+    // In-game: composite UI over 3D scene (gbuffer albedo)
+    m_menuCompositePass->SetInputs(m_gbufferPass->GetOutputs().albedo, m_rt_MenuMain);
+    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
+
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
-    //m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
-    //m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
+    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
     Msg("* [FrameGraphRenderer] In-game UI rendering complete");
 
     // ═══════════════════════════════════════════════════════
@@ -296,6 +301,12 @@ void FrameGraphRenderer::RenderMenu() {
 
     // Set RenderContext for execution
     m_framegraph->SetRenderContext(m_renderContext.get());
+
+    // In menu mode, there's no 3D scene to composite over
+    // Reset composite pass to not use scene input (just UI → output directly)
+    framegraph::VirtualResourceHandle invalidHandle; // Default-constructed = invalid
+    m_menuCompositePass->SetInputs(invalidHandle, m_rt_MenuMain);  // No scene, just UI
+    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
 
     // Execute all four passes in sequence
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
@@ -488,11 +499,13 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     // ─── Menu Targets (native NVRHI for menu rendering pipeline) ───
     m_native_MenuMain = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuMain");      // Main UI RT (RGBA8)
     m_native_MenuDistort = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuDistort"); // Distortion mask RT (RGBA8)
+    m_native_FinalComposite = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_FinalComposite"); // Final composited output (RGBA8)
 
     nvrhi::ITexture* physicalMenuMain = textureMgr->GetNVRHITexture(m_native_MenuMain);
     nvrhi::ITexture* physicalMenuDistort = textureMgr->GetNVRHITexture(m_native_MenuDistort);
+    nvrhi::ITexture* physicalFinalComposite = textureMgr->GetNVRHITexture(m_native_FinalComposite);
 
-    VERIFY(physicalMenuMain && physicalMenuDistort);
+    VERIFY(physicalMenuMain && physicalMenuDistort && physicalFinalComposite);
 
     // Import into FrameGraph as external resources
     framegraph::ResourceDesc menuMainDesc;
@@ -513,7 +526,16 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     menuDistortDesc.debugName = "rt_MenuDistort";
     m_rt_MenuDistort = m_framegraph->ImportTexture("rt_MenuDistort", physicalMenuDistort, menuDistortDesc);
 
-    Msg("  ✓ Created 2 native Menu RTs (MenuMain, MenuDistort)");
+    framegraph::ResourceDesc finalCompositeDesc;
+    finalCompositeDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    finalCompositeDesc.width = w;
+    finalCompositeDesc.height = h;
+    finalCompositeDesc.format = nvrhi::Format::RGBA8_UNORM;
+    finalCompositeDesc.isRenderTarget = true;
+    finalCompositeDesc.debugName = "rt_FinalComposite";
+    m_rt_FinalComposite = m_framegraph->ImportTexture("rt_FinalComposite", physicalFinalComposite, finalCompositeDesc);
+
+    Msg("  ✓ Created 3 native Menu RTs (MenuMain, MenuDistort, FinalComposite)");
 
     // ─── Lighting Targets (still using legacy CreateRT for now) ───
     m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
@@ -561,9 +583,10 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
     m_menuDistortPass->Setup(*m_framegraph);
 
-    // Step 4: Composite rt_MenuMain + rt_MenuDistort to final output
-    m_menuCompositePass->SetInputs(m_rt_MenuMain, m_rt_MenuDistort);
-    m_menuCompositePass->SetOutput(gbufferOutputs.albedo);  // Use GBuffer albedo as temp final output
+    // Step 4: Composite UI (rt_MenuMain) over 3D scene (gbuffer albedo) to final output
+    // SetInputs takes (sceneRT, uiRT) - composite UI layer over scene
+    m_menuCompositePass->SetInputs(gbufferOutputs.albedo, m_rt_MenuMain);
+    m_menuCompositePass->SetOutput(m_rt_FinalComposite);  // Output to separate composite RT
     m_menuCompositePass->Setup(*m_framegraph);
 
     // ═══════════════════════════════════════════════════════
@@ -671,8 +694,9 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     // Print registry for debugging
     registry.PrintRegistry();
 
-    // Store final output for presenting to backbuffer (use prototype for now)
-    m_finalOutput = gbufferOutputs.albedo;
+    // Store final output for presenting to backbuffer
+    // Use rt_FinalComposite which will contain scene + UI composited together
+    m_finalOutput = m_rt_FinalComposite;
 }
 
 // ═══════════════════════════════════════════════════════

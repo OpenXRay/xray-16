@@ -25,7 +25,7 @@ struct MenuCompositePassConfig {
 //   2. MenuDistortPass:  Render distortion mask to rt_MenuDistort
 //   3. MenuCompositePass: Composite both to final output
 //
-// Uses s_menu shader (legacy compositor) or custom NVRHI fullscreen quad
+// Uses fullscreen triangle with alpha-blend shader (industry standard optimization)
 
 class MenuCompositePass : public framegraph::IPass {
 public:
@@ -57,11 +57,24 @@ private:
     MenuCompositeStats m_menuCompositeStats;
 
     // Input render targets (textures to sample from)
-    framegraph::VirtualResourceHandle m_inputMenuMain;     // rt_MenuMain (main UI)
-    framegraph::VirtualResourceHandle m_inputMenuDistort;  // rt_MenuDistort (distortion mask)
+    framegraph::VirtualResourceHandle m_inputScene;        // Base 3D scene layer
+    framegraph::VirtualResourceHandle m_inputUI;           // UI layer with alpha
+    framegraph::VirtualResourceHandle m_inputMenuMain;     // Legacy (for compatibility)
+    framegraph::VirtualResourceHandle m_inputMenuDistort;  // Legacy (for compatibility)
 
     // Output render target (composite result)
     framegraph::VirtualResourceHandle m_outputRT;  // Final output
+
+    // Rendering resources for alpha-blend compositing
+    nvrhi::ShaderHandle m_vertexShader;
+    nvrhi::ShaderHandle m_pixelShader;
+    nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::BindingLayoutHandle m_bindingLayout;
+    nvrhi::BindingSetHandle m_bindingSet;  // Updated per-frame with textures
+    nvrhi::SamplerHandle m_linearSampler;
+
+    bool m_initialized = false;
+    bool Initialize();
 };
 
 } // namespace xray::render::passes

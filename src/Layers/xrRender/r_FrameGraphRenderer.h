@@ -104,6 +104,7 @@ private:
     // Menu-specific native RTs (for main menu rendering pipeline)
     ng::TextureHandle m_native_MenuMain;      // Main UI RT (replaces rt_Generic_0 in menu)
     ng::TextureHandle m_native_MenuDistort;   // Distortion mask RT (replaces rt_Generic_1 in menu)
+    ng::TextureHandle m_native_FinalComposite; // Final composited output (scene + UI)
 
     // FrameGraph virtual handles (imported from native RTs)
     framegraph::VirtualResourceHandle m_rt_Position;
@@ -119,6 +120,7 @@ private:
     // Menu-specific virtual handles
     framegraph::VirtualResourceHandle m_rt_MenuMain;      // Main UI rendering
     framegraph::VirtualResourceHandle m_rt_MenuDistort;   // Distortion mask
+    framegraph::VirtualResourceHandle m_rt_FinalComposite; // Final composited output (scene + UI)
 
     // Passes
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
