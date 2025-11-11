@@ -82,6 +82,7 @@ private:
 
     ng::TextureHandle m_native_MenuMain;
     ng::TextureHandle m_native_MenuDistort;
+    ng::TextureHandle m_native_FinalComposite;
 
     framegraph::VirtualResourceHandle m_rt_Position;
     framegraph::VirtualResourceHandle m_rt_Normal;
@@ -95,6 +96,7 @@ private:
 
     framegraph::VirtualResourceHandle m_rt_MenuMain;
     framegraph::VirtualResourceHandle m_rt_MenuDistort;
+    framegraph::VirtualResourceHandle m_rt_FinalComposite;
 
     xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     xr_unique_ptr<passes::HUDPass> m_hudPass;

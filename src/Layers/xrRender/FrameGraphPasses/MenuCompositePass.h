@@ -37,10 +37,22 @@ private:
     MenuCompositePassConfig m_config;
     MenuCompositeStats m_menuCompositeStats;
 
+    framegraph::VirtualResourceHandle m_inputScene;
+    framegraph::VirtualResourceHandle m_inputUI;
     framegraph::VirtualResourceHandle m_inputMenuMain;
     framegraph::VirtualResourceHandle m_inputMenuDistort;
 
     framegraph::VirtualResourceHandle m_outputRT;
+
+    nvrhi::ShaderHandle m_vertexShader;
+    nvrhi::ShaderHandle m_pixelShader;
+    nvrhi::GraphicsPipelineHandle m_pipeline;
+    nvrhi::BindingLayoutHandle m_bindingLayout;
+    nvrhi::BindingSetHandle m_bindingSet;
+    nvrhi::SamplerHandle m_linearSampler;
+
+    bool m_initialized = false;
+    bool Initialize();
 };
 
 }

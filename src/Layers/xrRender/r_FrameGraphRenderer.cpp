@@ -158,9 +158,14 @@ void FrameGraphRenderer::Render() {
     RenderHUD();
 
 
-    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Distort → Composite)");
+    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Composite)");
+
+    m_menuCompositePass->SetInputs(m_gbufferPass->GetOutputs().albedo, m_rt_MenuMain);
+    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
+
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
+    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
     Msg("* [FrameGraphRenderer] In-game UI rendering complete");
 
     ImGui::Render();
@@ -203,6 +208,10 @@ void FrameGraphRenderer::RenderMenu() {
     }
 
     m_framegraph->SetRenderContext(m_renderContext.get());
+
+    framegraph::VirtualResourceHandle invalidHandle;
+    m_menuCompositePass->SetInputs(invalidHandle, m_rt_MenuMain);
+    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
 
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
@@ -354,11 +363,13 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     m_native_MenuMain = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuMain");
     m_native_MenuDistort = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuDistort");
+    m_native_FinalComposite = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_FinalComposite");
 
     nvrhi::ITexture* physicalMenuMain = textureMgr->GetNVRHITexture(m_native_MenuMain);
     nvrhi::ITexture* physicalMenuDistort = textureMgr->GetNVRHITexture(m_native_MenuDistort);
+    nvrhi::ITexture* physicalFinalComposite = textureMgr->GetNVRHITexture(m_native_FinalComposite);
 
-    VERIFY(physicalMenuMain && physicalMenuDistort);
+    VERIFY(physicalMenuMain && physicalMenuDistort && physicalFinalComposite);
 
     framegraph::ResourceDesc menuMainDesc;
     menuMainDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -378,7 +389,16 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     menuDistortDesc.debugName = "rt_MenuDistort";
     m_rt_MenuDistort = m_framegraph->ImportTexture("rt_MenuDistort", physicalMenuDistort, menuDistortDesc);
 
-    Msg("  ✓ Created 2 native Menu RTs (MenuMain, MenuDistort)");
+    framegraph::ResourceDesc finalCompositeDesc;
+    finalCompositeDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    finalCompositeDesc.width = w;
+    finalCompositeDesc.height = h;
+    finalCompositeDesc.format = nvrhi::Format::RGBA8_UNORM;
+    finalCompositeDesc.isRenderTarget = true;
+    finalCompositeDesc.debugName = "rt_FinalComposite";
+    m_rt_FinalComposite = m_framegraph->ImportTexture("rt_FinalComposite", physicalFinalComposite, finalCompositeDesc);
+
+    Msg("  ✓ Created 3 native Menu RTs (MenuMain, MenuDistort, FinalComposite)");
 
     m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
 
@@ -410,8 +430,8 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
     m_menuDistortPass->Setup(*m_framegraph);
 
-    m_menuCompositePass->SetInputs(m_rt_MenuMain, m_rt_MenuDistort);
-    m_menuCompositePass->SetOutput(gbufferOutputs.albedo);
+    m_menuCompositePass->SetInputs(gbufferOutputs.albedo, m_rt_MenuMain);
+    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
     m_menuCompositePass->Setup(*m_framegraph);
 
     Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
@@ -493,7 +513,7 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     registry.PrintRegistry();
 
-    m_finalOutput = gbufferOutputs.albedo;
+    m_finalOutput = m_rt_FinalComposite;
 }
 
 void FrameGraphRenderer::SetupFrameGraphPasses() {
