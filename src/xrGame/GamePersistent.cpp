@@ -782,6 +782,12 @@ void CGamePersistent::OnRenderInGameUI()
             pHUDManager->RenderUI();
         }
     }
+
+}
+
+void CGamePersistent::OnRenderCursor()
+{
+    GetUICursor().OnRender();
 }
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }

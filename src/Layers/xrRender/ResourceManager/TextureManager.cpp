@@ -553,6 +553,8 @@ void TextureManager::Update(float deltaTime) {
 
     UpdateVideoTextures();
 
+    UpdateSequenceTextures(deltaTime);
+
     m_streamingManager->Update(deltaTime);
 
     if (m_memoryUsed > m_memoryBudget) {
@@ -583,8 +585,15 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     }
 
     bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
+    bool isSequenceTexture = (ddsData.type == DDSData::TextureType::Sequence);
+
     if (isVideoTexture) {
         Msg("* [TextureManager] Video texture detected: %s", meta.filePath.c_str());
+    }
+    if (isSequenceTexture) {
+        Msg("* [TextureManager] Sequence texture detected: %s (%u frames)",
+            meta.filePath.c_str(),
+            (u32)ddsData.sequenceState->frameTextures.size());
     }
 
     u64 requiredMemory = ddsData.totalDataSize;
@@ -660,10 +669,20 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         Msg("* [TextureManager] Video texture state stored for: %s", meta.filePath.c_str());
     }
 
+    if (isSequenceTexture) {
+        meta.sequenceTextureData = xr_make_unique<DDSData>();
+        *meta.sequenceTextureData = std::move(ddsData);
+
+        meta.sequenceTextureData->sequenceState->currentFrame = 0;
+        meta.sequenceTextureData->sequenceState->elapsedTime = 0.0f;
+
+        Msg("* [TextureManager] Sequence texture state stored for: %s", meta.filePath.c_str());
+    }
+
     meta.state = TextureState::Resident;
-    meta.residentMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
-    meta.totalMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
-    meta.requestedMips = isVideoTexture ? 1 : ddsData.desc.mipLevels;
+    meta.residentMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
+    meta.totalMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
+    meta.requestedMips = (isVideoTexture || isSequenceTexture) ? 1 : ddsData.desc.mipLevels;
     meta.memoryUsed = ddsData.totalDataSize;
 
     m_memoryUsed += meta.memoryUsed;
@@ -860,6 +879,69 @@ void TextureManager::UpdateVideoTextures() {
     if (s_frameCount % 120 == 0 && videoTextureCount > 0) {
         Msg("* [TextureManager] UpdateVideoTextures: %d video textures, %d updated this frame",
             videoTextureCount, updatedCount);
+    }
+}
+
+void TextureManager::UpdateSequenceTextures(float deltaTime) {
+
+    for (auto& meta : m_textures) {
+        if (!meta.isAlive || !meta.sequenceTextureData) {
+            continue;
+        }
+
+        auto* seqState = meta.sequenceTextureData->sequenceState;
+        if (!seqState || seqState->frameTextures.empty()) {
+            continue;
+        }
+
+        seqState->elapsedTime += deltaTime * 1000.0f;
+
+        if (seqState->elapsedTime >= seqState->msPerFrame) {
+            seqState->elapsedTime -= seqState->msPerFrame;
+
+            u32 nextFrame = seqState->currentFrame + 1;
+
+            if (nextFrame >= seqState->frameTextures.size()) {
+                if (seqState->cycled) {
+                    nextFrame = 0;
+                } else {
+                    nextFrame = seqState->currentFrame;
+                    continue;
+                }
+            }
+
+            const char* nextFramePath = seqState->frameTextures[nextFrame].c_str();
+
+            DDSData frameData;
+            if (DDSLoader::LoadFromFile(nextFramePath, frameData)) {
+                nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
+                if (!nvrhiTex) {
+                    Msg("! [TextureManager] Sequence texture has no NVRHI texture: %s", meta.filePath.c_str());
+                    continue;
+                }
+
+                if (!frameData.mipLevels.empty()) {
+                    const DDSMipLevel& mip = frameData.mipLevels[0];
+                    m_device->UploadTextureDataToNVRHI(
+                        nvrhiTex,
+                        0,
+                        0,
+                        mip.data,
+                        mip.size
+                    );
+                }
+
+                seqState->currentFrame = nextFrame;
+
+                static u32 s_frameAdvanceCount = 0;
+                if (++s_frameAdvanceCount % 60 == 0) {
+                    Msg("* [TextureManager] Advanced .seq frame: %s → %u/%u",
+                        meta.filePath.c_str(), nextFrame + 1, (u32)seqState->frameTextures.size());
+                }
+            } else {
+                Msg("! [TextureManager] Failed to load sequence frame: %s", nextFramePath);
+            }
+        }
     }
 }
 

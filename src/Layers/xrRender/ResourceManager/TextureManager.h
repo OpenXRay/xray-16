@@ -88,6 +88,8 @@ struct TextureMetadata {
 
     xr_unique_ptr<DDSData> videoTextureData;
 
+    xr_unique_ptr<DDSData> sequenceTextureData;
+
     struct LoadRequest {
         bool inProgress = false;
         u32 targetMips = 0;
@@ -209,6 +211,8 @@ private:
     void EvictTextureInternal(TextureHandle handle);
 
     void UpdateVideoTextures();
+
+    void UpdateSequenceTextures(float deltaTime);
 
     mutable std::mutex m_texturesMutex;
     mutable std::mutex m_pathLookupMutex;

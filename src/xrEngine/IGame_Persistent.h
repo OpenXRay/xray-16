@@ -151,6 +151,7 @@ public:
     virtual void OnRenderPPUI_main(){};
     virtual void OnRenderPPUI_PP(){};
     virtual void OnRenderInGameUI(){};
+    virtual void OnRenderCursor(){};
 
     void OnEvent(EVENT E, u64 P1, u64 P2) override;
 

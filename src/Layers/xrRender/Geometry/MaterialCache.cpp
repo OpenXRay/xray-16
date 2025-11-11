@@ -496,7 +496,7 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
         nvrhiDesc.setMinFilter(true);
         nvrhiDesc.setMagFilter(true);
         nvrhiDesc.setMipFilter(true);
-        nvrhiDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        nvrhiDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
         nvrhiDesc.setMaxAnisotropy(8.0f);
 
         return m_device->GetNativeDevice()->createSampler(nvrhiDesc);

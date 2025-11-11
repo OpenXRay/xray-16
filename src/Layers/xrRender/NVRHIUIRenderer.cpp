@@ -89,7 +89,8 @@ void NVRHIUIRenderer::RenderBatches(
 
     commandList->writeBuffer(m_constantBuffer, cbData, 256);
 
-    xr_map<Shader*, xr_vector<const UIGeometryBatch*>> batchesByShader;
+    Shader* lastShader = nullptr;
+    MaterialPSO* currentPSO = nullptr;
 
     for (const auto& batch : batches)
     {
@@ -100,23 +101,20 @@ void NVRHIUIRenderer::RenderBatches(
         if (!shader)
             continue;
 
-        batchesByShader[shader].push_back(&batch);
-    }
-
-    Msg("  [NVRHIUIRenderer] Grouped into %zu unique shaders", batchesByShader.size());
-
-    for (const auto& [shader, shaderBatches] : batchesByShader)
-    {
-        Msg("  [NVRHIUIRenderer] Processing shader group with %zu batches", shaderBatches.size());
-
-        MaterialPSO* pso = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
-        if (!pso)
+        if (shader != lastShader)
         {
-            Msg("! [NVRHIUIRenderer] Failed to get PSO, skipping shader group");
-            continue;
+            Msg("  [NVRHIUIRenderer] Switching to new shader");
+            currentPSO = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
+            if (!currentPSO)
+            {
+                Msg("! [NVRHIUIRenderer] Failed to get PSO, skipping batch");
+                continue;
+            }
+            lastShader = shader;
         }
 
-        RenderBatchesWithShader(commandList, shaderBatches, pso, framebuffer, screenWidth, screenHeight);
+        xr_vector<const UIGeometryBatch*> singleBatch = { &batch };
+        RenderBatchesWithShader(commandList, singleBatch, currentPSO, framebuffer, screenWidth, screenHeight);
     }
 
     Msg("  [NVRHIUIRenderer] Render complete");

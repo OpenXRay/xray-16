@@ -95,8 +95,13 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         GEnv.UIRender = m_uiCollector.get();
 
         g_pGamePersistent->OnRenderPPUI_main();
+        Msg("  [UIPass] After menu UI: %zu batches", m_uiCollector->GetBatches().size());
 
         g_pGamePersistent->OnRenderInGameUI();
+        Msg("  [UIPass] After in-game UI: %zu batches", m_uiCollector->GetBatches().size());
+
+        g_pGamePersistent->OnRenderCursor();
+        Msg("  [UIPass] After cursor: %zu batches", m_uiCollector->GetBatches().size());
 
         GEnv.UIRender = oldRenderer;
 

@@ -95,6 +95,7 @@ public:
     virtual void OnRenderPPUI_main() override;
     virtual void OnRenderPPUI_PP() override;
     virtual void OnRenderInGameUI() override;
+    virtual void OnRenderCursor() override;
 
     virtual bool CanBePaused() override;
 
