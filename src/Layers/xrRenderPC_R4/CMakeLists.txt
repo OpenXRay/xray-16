@@ -57,6 +57,16 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/LightingPass.cpp
     ../xrRender/FrameGraphPasses/TonemapPass.h
     ../xrRender/FrameGraphPasses/TonemapPass.cpp
+    ../xrRender/FrameGraphPasses/UIPass.h
+    ../xrRender/FrameGraphPasses/UIPass.cpp
+    ../xrRender/FrameGraphPasses/TextPass.h
+    ../xrRender/FrameGraphPasses/TextPass.cpp
+    ../xrRender/FrameGraphPasses/CursorPass.h
+    ../xrRender/FrameGraphPasses/CursorPass.cpp
+    ../xrRender/FrameGraphPasses/MenuDistortPass.h
+    ../xrRender/FrameGraphPasses/MenuDistortPass.cpp
+    ../xrRender/FrameGraphPasses/MenuCompositePass.h
+    ../xrRender/FrameGraphPasses/MenuCompositePass.cpp
 
     # Geometry System (Phase 3) - Renderer agnostic
     ../xrRender/Geometry/GeometryBatch.h

@@ -135,6 +135,7 @@
     <ClInclude Include="..\xrRender\dxEnvironmentRender.h" />
     <ClInclude Include="..\xrRender\dxFontRender.h" />
     <ClInclude Include="..\xrRender\dxImGuiRender.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\CursorPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TextPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\UIPass.h" />
     <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
@@ -352,6 +353,7 @@
     <ClCompile Include="..\xrRender\dxEnvironmentRender.cpp" />
     <ClCompile Include="..\xrRender\dxFontRender.cpp" />
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\CursorPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TextPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\UIPass.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />

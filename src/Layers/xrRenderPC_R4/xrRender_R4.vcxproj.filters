@@ -802,6 +802,7 @@
     <ClInclude Include="..\xrRender\ResourceManager\FGResourceManager.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TextPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\UIPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\CursorPass.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1479,6 +1480,7 @@
     <ClCompile Include="..\xrRender\ResourceManager\FGResourceManager.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TextPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\UIPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\CursorPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

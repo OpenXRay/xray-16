@@ -76,6 +76,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     textConfig.height = Device.dwHeight;
     m_textPass = xr_make_unique<passes::TextPass>(device, textConfig);
 
+    passes::CursorPassConfig cursorConfig;
+    cursorConfig.width = Device.dwWidth;
+    cursorConfig.height = Device.dwHeight;
+    m_cursorPass = xr_make_unique<passes::CursorPass>(device, cursorConfig);
+
     passes::MenuDistortPassConfig menuDistortConfig;
     menuDistortConfig.width = Device.dwWidth;
     menuDistortConfig.height = Device.dwHeight;
@@ -158,13 +163,14 @@ void FrameGraphRenderer::Render() {
     RenderHUD();
 
 
-    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Composite)");
+    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Cursor → Composite)");
 
     m_menuCompositePass->SetInputs(m_gbufferPass->GetOutputs().albedo, m_rt_MenuMain);
     m_menuCompositePass->SetOutput(m_rt_FinalComposite);
 
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
+    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
     m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
     Msg("* [FrameGraphRenderer] In-game UI rendering complete");
 
@@ -215,10 +221,11 @@ void FrameGraphRenderer::RenderMenu() {
 
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
+    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
     m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
     m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
 
-    Msg("  [RenderMenu] 4-step UI pipeline complete (UI → Text → Distort → Composite)");
+    Msg("  [RenderMenu] 5-step UI pipeline complete (UI → Text → Cursor → Distort → Composite)");
 
     ImGui::Render();
 
@@ -426,6 +433,9 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
 
     m_textPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
     m_textPass->Setup(*m_framegraph);
+
+    m_cursorPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_cursorPass->Setup(*m_framegraph);
 
     m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
     m_menuDistortPass->Setup(*m_framegraph);

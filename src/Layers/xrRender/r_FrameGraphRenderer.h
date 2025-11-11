@@ -12,6 +12,7 @@
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/FrameGraphPasses/UIPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TextPass.h"
+#include "Layers/xrRender/FrameGraphPasses/CursorPass.h"
 #include "Layers/xrRender/FrameGraphPasses/MenuDistortPass.h"
 #include "Layers/xrRender/FrameGraphPasses/MenuCompositePass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
@@ -106,6 +107,7 @@ private:
 
     xr_unique_ptr<passes::UIPass> m_uiPass;
     xr_unique_ptr<passes::TextPass> m_textPass;
+    xr_unique_ptr<passes::CursorPass> m_cursorPass;
     xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass;
     xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass;
 
