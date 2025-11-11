@@ -159,6 +159,7 @@ struct DDSData {
 
     struct SequenceState {
         xr_vector<DDSMipLevel> frameData;
+        xr_vector<xr_vector<u8>> framePixels;
         xr_vector<u32> frameBuffer;
         u32 frameWidth = 0;
         u32 frameHeight = 0;
@@ -168,6 +169,8 @@ struct DDSData {
         u32 msPerFrame = 0;
         bool cycled = false;
         bool needsUpdate = false;
+        u32 currentFrame = 0;
+        float elapsedTime = 0.0f;
     };
 
     SequenceState* sequenceState = nullptr;

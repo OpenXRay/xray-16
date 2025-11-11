@@ -35,6 +35,16 @@ public:
         size_t dataSize
     );
 
+    void UploadTextureDataToNVRHI(
+        nvrhi::ITexture* texture,
+        u32 arraySlice,
+        u32 mipLevel,
+        const void* data,
+        size_t dataSize,
+        u32 rowPitch,
+        u32 slicePitch
+    );
+
     struct TextureDesc {
         u32 width = 0;
         u32 height = 0;

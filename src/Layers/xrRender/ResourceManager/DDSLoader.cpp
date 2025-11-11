@@ -840,7 +840,7 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
 
     reader->r_string(buffer, sizeof(buffer));
 
-    bool cycled = false;
+    bool cycled = true;
     u32 fps = 0;
 
     if (0 == xr_stricmp(buffer, "cycled")) {
@@ -929,7 +929,16 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
         }
 
         if (!frameData.mipLevels.empty()) {
-            outData.sequenceState->frameData.push_back(frameData.mipLevels[0]);
+            const DDSMipLevel& mip = frameData.mipLevels[0];
+
+            outData.sequenceState->frameData.push_back(mip);
+
+            xr_vector<u8> pixelData;
+            pixelData.resize(mip.size);
+            memcpy(pixelData.data(), mip.data, mip.size);
+            outData.sequenceState->framePixels.push_back(std::move(pixelData));
+
+            outData.sequenceState->frameData.back().data = outData.sequenceState->framePixels.back().data();
         }
     }
 
@@ -1040,14 +1049,12 @@ bool DDSLoader::UpdateSequenceFrame(DDSData& data, u32 currentFrame) {
 
     const DDSMipLevel& frame = seqState->frameData[currentFrame];
 
-    if (data.desc.format == nvrhi::Format::RGBA8_UNORM ||
-        data.desc.format == nvrhi::Format::BGRA8_UNORM ||
-        data.desc.format == nvrhi::Format::SRGBA8_UNORM ||
-        data.desc.format == nvrhi::Format::SBGRA8_UNORM) {
-        memcpy(seqState->frameBuffer.data(),
-               frame.data,
-               frame.size);
+    u32 requiredSize = (frame.size + sizeof(u32) - 1) / sizeof(u32);
+    if (seqState->frameBuffer.size() < requiredSize) {
+        seqState->frameBuffer.resize(requiredSize);
     }
+
+    memcpy(seqState->frameBuffer.data(), frame.data, frame.size);
 
     seqState->needsUpdate = true;
 

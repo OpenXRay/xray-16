@@ -593,7 +593,7 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     if (isSequenceTexture) {
         Msg("* [TextureManager] Sequence texture detected: %s (%u frames)",
             meta.filePath.c_str(),
-            (u32)ddsData.sequenceState->frameTextures.size());
+            (u32)ddsData.sequenceState->frameData.size());
     }
 
     u64 requiredMemory = ddsData.totalDataSize;
@@ -890,7 +890,7 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
         }
 
         auto* seqState = meta.sequenceTextureData->sequenceState;
-        if (!seqState || seqState->frameTextures.empty()) {
+        if (!seqState || seqState->frameData.empty()) {
             continue;
         }
 
@@ -901,7 +901,7 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
 
             u32 nextFrame = seqState->currentFrame + 1;
 
-            if (nextFrame >= seqState->frameTextures.size()) {
+            if (nextFrame >= seqState->frameData.size()) {
                 if (seqState->cycled) {
                     nextFrame = 0;
                 } else {
@@ -910,36 +910,26 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
                 }
             }
 
-            const char* nextFramePath = seqState->frameTextures[nextFrame].c_str();
-
-            DDSData frameData;
-            if (DDSLoader::LoadFromFile(nextFramePath, frameData)) {
+            if (DDSLoader::UpdateSequenceFrame(*meta.sequenceTextureData, nextFrame)) {
                 nvrhi::ITexture* nvrhiTex = meta.nvrhiTexture;
                 if (!nvrhiTex) {
-                    Msg("! [TextureManager] Sequence texture has no NVRHI texture: %s", meta.filePath.c_str());
                     continue;
                 }
 
-                if (!frameData.mipLevels.empty()) {
-                    const DDSMipLevel& mip = frameData.mipLevels[0];
-                    m_device->UploadTextureDataToNVRHI(
-                        nvrhiTex,
-                        0,
-                        0,
-                        mip.data,
-                        mip.size
-                    );
-                }
+                const DDSMipLevel& frameData = seqState->frameData[nextFrame];
+
+                m_device->UploadTextureDataToNVRHI(
+                    nvrhiTex,
+                    0,
+                    0,
+                    seqState->frameBuffer.data(),
+                    frameData.size,
+                    frameData.rowPitch,
+                    frameData.slicePitch
+                );
 
                 seqState->currentFrame = nextFrame;
-
-                static u32 s_frameAdvanceCount = 0;
-                if (++s_frameAdvanceCount % 60 == 0) {
-                    Msg("* [TextureManager] Advanced .seq frame: %s → %u/%u",
-                        meta.filePath.c_str(), nextFrame + 1, (u32)seqState->frameTextures.size());
-                }
-            } else {
-                Msg("! [TextureManager] Failed to load sequence frame: %s", nextFramePath);
+                seqState->needsUpdate = false;
             }
         }
     }

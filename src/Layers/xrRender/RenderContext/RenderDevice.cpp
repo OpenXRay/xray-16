@@ -327,6 +327,33 @@ void RenderDevice::UploadTextureDataToNVRHI(
     GetNVRHIDevice()->waitForIdle();
 }
 
+void RenderDevice::UploadTextureDataToNVRHI(
+    nvrhi::ITexture* texture,
+    u32 arraySlice,
+    u32 mipLevel,
+    const void* data,
+    size_t dataSize,
+    u32 rowPitch,
+    u32 slicePitch)
+{
+    VERIFY(m_initialized);
+    VERIFY(texture != nullptr);
+    VERIFY(data != nullptr);
+    VERIFY(dataSize > 0);
+    VERIFY(m_uploadCommandList && "Upload command list not initialized");
+
+    std::lock_guard<std::mutex> lock(m_uploadMutex);
+
+    m_uploadCommandList->open();
+
+    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, slicePitch);
+
+    m_uploadCommandList->close();
+    GetNVRHIDevice()->executeCommandList(m_uploadCommandList);
+
+    GetNVRHIDevice()->waitForIdle();
+}
+
 BufferHandle RenderDevice::CreateBuffer(
     const BufferDesc& desc,
     const void* initialData) {

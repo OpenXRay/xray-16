@@ -9,7 +9,7 @@
 void CUICursor::InitInternal()
 {
     m_static = xr_new<CUIStatic>("ui_ani_cursor");
-    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor_01", "hud" DELIMITER "cursor");
+    m_static->InitTextureEx("ui" DELIMITER "ui_ani_cursor", "hud" DELIMITER "cursor");
 
     Fvector2 texSize;
     if (m_static->GetStaticItem()->hShader) {
