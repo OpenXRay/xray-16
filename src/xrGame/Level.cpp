@@ -647,8 +647,11 @@ void CLevel::OnRender()
     GEnv.Render->AfterWorldRender(); //--#SM+#-- +SecondVP+
     WorldRendered(true);
 
-    if (!Device.IsAnselActive)
-        HUD().RenderUI();
+    // NOTE: HUD UI rendering is now handled by FrameGraphRenderer::UIPass
+    // The legacy direct call here has been removed to prevent double-rendering
+    // and ensure UI geometry goes through the batching system
+    // if (!Device.IsAnselActive)
+    //     HUD().RenderUI();
 
 #ifdef DEBUG
     physics_world()->OnRender();
