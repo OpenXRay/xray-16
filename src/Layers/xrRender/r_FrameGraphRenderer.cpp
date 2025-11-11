@@ -207,6 +207,20 @@ void FrameGraphRenderer::Render() {
 
     RenderHUD();
 
+
+    // ═══════════════════════════════════════════════════════
+    //  RENDER UI + TEXT
+    // ═══════════════════════════════════════════════════════
+    // Execute UI/Text passes to render in-game UI elements on top of 3D scene
+    // These were originally only called in RenderMenu(), but in-game UI needs them too!
+
+    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Distort → Composite)");
+    m_uiPass->Execute(*m_renderContext, *m_framegraph);
+    m_textPass->Execute(*m_renderContext, *m_framegraph);
+    //m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
+    //m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
+    Msg("* [FrameGraphRenderer] In-game UI rendering complete");
+
     // ═══════════════════════════════════════════════════════
     //  RENDER IMGUI (inline after framegraph, before present)
     // ═══════════════════════════════════════════════════════

@@ -91,11 +91,12 @@ public:
 
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-    virtual bool OnRenderPPUI_query();
-    virtual void OnRenderPPUI_main();
-    virtual void OnRenderPPUI_PP();
+    virtual bool OnRenderPPUI_query() override;
+    virtual void OnRenderPPUI_main() override;
+    virtual void OnRenderPPUI_PP() override;
+    virtual void OnRenderInGameUI() override;
 
-    virtual bool CanBePaused();
+    virtual bool CanBePaused() override;
 
     void SetPickableEffectorDOF(bool bSet);
     void SetEffectorDOF(const Fvector& needed_dof);

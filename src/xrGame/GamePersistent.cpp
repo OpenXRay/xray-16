@@ -17,6 +17,7 @@
 #include "ActorEffector.h"
 #include "Actor.h"
 #include "Spectator.h"
+#include "HUDManager.h"
 
 #include "xrUICore/XML/UITextureMaster.h"
 
@@ -770,6 +771,22 @@ void CGamePersistent::OnRenderPPUI_main()
 }
 
 void CGamePersistent::OnRenderPPUI_PP() { MainMenu()->OnRenderPPUI_PP(); }
+
+void CGamePersistent::OnRenderInGameUI()
+{
+    // Render in-game HUD/UI (loading screen, inventory, quest log, etc.)
+    // Only render if we have an active level and HUD exists
+    if (g_pGameLevel && g_pGameLevel->pHUD)
+    {
+        // pHUD is CCustomHUD* (engine base class), but the actual object is CHUDManager (game-specific)
+        // We need to cast to access game-specific RenderUI() method
+        CHUDManager* pHUDManager = dynamic_cast<CHUDManager*>(g_pGameLevel->pHUD);
+        if (pHUDManager)
+        {
+            pHUDManager->RenderUI();
+        }
+    }
+}
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)

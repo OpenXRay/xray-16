@@ -119,8 +119,24 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         m_uiCollector->Clear();
         GEnv.UIRender = m_uiCollector.get();
 
-        // Call legacy UI rendering - it will record geometry instead of rendering
+        // ═══════════════════════════════════════════════════════
+        //  COLLECT MAIN MENU UI (menus, options, credits, etc.)
+        // ═══════════════════════════════════════════════════════
         g_pGamePersistent->OnRenderPPUI_main();
+
+        // ═══════════════════════════════════════════════════════
+        //  COLLECT IN-GAME UI (HUD, inventory, loading screen, etc.)
+        // ═══════════════════════════════════════════════════════
+        // This is a completely separate rendering path from main menu!
+        // OnRenderInGameUI() calls HUD()->RenderUI() which renders:
+        // - Health/stamina bars
+        // - Inventory UI
+        // - Quest log
+        // - Loading screen
+        // - Pause menu
+        // - Dialog windows
+        // - etc.
+        g_pGamePersistent->OnRenderInGameUI();
 
         // Restore original renderer
         GEnv.UIRender = oldRenderer;
