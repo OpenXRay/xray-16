@@ -74,7 +74,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_lightingPass = xr_make_unique<passes::LightingPass>(device);
     m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
 
-    // Create UI rendering passes (4-step pipeline - works for menu AND in-game)
+    // Create UI rendering passes (5-step pipeline - works for menu AND in-game)
     passes::UIPassConfig uiConfig;
     uiConfig.width = Device.dwWidth;
     uiConfig.height = Device.dwHeight;
@@ -84,6 +84,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     textConfig.width = Device.dwWidth;
     textConfig.height = Device.dwHeight;
     m_textPass = xr_make_unique<passes::TextPass>(device, textConfig);
+
+    passes::CursorPassConfig cursorConfig;
+    cursorConfig.width = Device.dwWidth;
+    cursorConfig.height = Device.dwHeight;
+    m_cursorPass = xr_make_unique<passes::CursorPass>(device, cursorConfig);
 
     passes::MenuDistortPassConfig menuDistortConfig;
     menuDistortConfig.width = Device.dwWidth;
@@ -214,7 +219,7 @@ void FrameGraphRenderer::Render() {
     // Execute UI/Text passes to render in-game UI elements on top of 3D scene
     // These were originally only called in RenderMenu(), but in-game UI needs them too!
 
-    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Composite)");
+    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Cursor → Composite)");
 
     // Restore composite pass inputs for in-game mode (may have been overridden by RenderMenu)
     // In-game: composite UI over 3D scene (gbuffer albedo)
@@ -223,6 +228,7 @@ void FrameGraphRenderer::Render() {
 
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
+    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
     m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
     Msg("* [FrameGraphRenderer] In-game UI rendering complete");
 
@@ -308,13 +314,14 @@ void FrameGraphRenderer::RenderMenu() {
     m_menuCompositePass->SetInputs(invalidHandle, m_rt_MenuMain);  // No scene, just UI
     m_menuCompositePass->SetOutput(m_rt_FinalComposite);
 
-    // Execute all four passes in sequence
+    // Execute all five passes in sequence
     m_uiPass->Execute(*m_renderContext, *m_framegraph);
     m_textPass->Execute(*m_renderContext, *m_framegraph);
+    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
     m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
     m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
 
-    Msg("  [RenderMenu] 4-step UI pipeline complete (UI → Text → Distort → Composite)");
+    Msg("  [RenderMenu] 5-step UI pipeline complete (UI → Text → Cursor → Distort → Composite)");
 
     // ═══════════════════════════════════════════════════════
     //  RENDER IMGUI (Menu UI overlay)
@@ -570,7 +577,7 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_particlePass->SetOutputs(gbufferOutputs);
     m_particlePass->Setup(*m_framegraph);
 
-    // Setup UI rendering passes (4-step pipeline - works for menu AND in-game)
+    // Setup UI rendering passes (5-step pipeline - works for menu AND in-game)
     // Step 1: Render UI sprites/widgets to rt_MenuMain (TODO: rename to rt_UIMain)
     m_uiPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
     m_uiPass->Setup(*m_framegraph);
@@ -579,11 +586,15 @@ void FrameGraphRenderer::BuildFrameGraphStructure() {
     m_textPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
     m_textPass->Setup(*m_framegraph);
 
-    // Step 3: Render distortion mask to rt_MenuDistort
+    // Step 3: Render cursor on top of UI + text (same RT)
+    m_cursorPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
+    m_cursorPass->Setup(*m_framegraph);
+
+    // Step 4: Render distortion mask to rt_MenuDistort
     m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
     m_menuDistortPass->Setup(*m_framegraph);
 
-    // Step 4: Composite UI (rt_MenuMain) over 3D scene (gbuffer albedo) to final output
+    // Step 5: Composite UI (rt_MenuMain) over 3D scene (gbuffer albedo) to final output
     // SetInputs takes (sceneRT, uiRT) - composite UI layer over scene
     m_menuCompositePass->SetInputs(gbufferOutputs.albedo, m_rt_MenuMain);
     m_menuCompositePass->SetOutput(m_rt_FinalComposite);  // Output to separate composite RT

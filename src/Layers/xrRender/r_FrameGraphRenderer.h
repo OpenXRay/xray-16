@@ -13,6 +13,7 @@
 #include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
 #include "Layers/xrRender/FrameGraphPasses/UIPass.h"
 #include "Layers/xrRender/FrameGraphPasses/TextPass.h"
+#include "Layers/xrRender/FrameGraphPasses/CursorPass.h"
 #include "Layers/xrRender/FrameGraphPasses/MenuDistortPass.h"
 #include "Layers/xrRender/FrameGraphPasses/MenuCompositePass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
@@ -129,11 +130,12 @@ private:
     xr_unique_ptr<passes::LightingPass> m_lightingPass;
     xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
 
-    // UI rendering passes (4-step pipeline - works for menu AND in-game)
+    // UI rendering passes (5-step pipeline - works for menu AND in-game)
     xr_unique_ptr<passes::UIPass> m_uiPass;                   // Step 1: Render UI sprites/widgets
     xr_unique_ptr<passes::TextPass> m_textPass;               // Step 2: Render text/fonts on top
-    xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass; // Step 3: Render distortion mask
-    xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass; // Step 4: Composite to output
+    xr_unique_ptr<passes::CursorPass> m_cursorPass;           // Step 3: Render cursor on top of all
+    xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass; // Step 4: Render distortion mask
+    xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass; // Step 5: Composite to output
 
     // Geometry collector
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
