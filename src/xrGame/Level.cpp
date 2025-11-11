@@ -645,9 +645,6 @@ void CLevel::OnRender()
     GEnv.Render->AfterWorldRender(); //--#SM+#-- +SecondVP+
     WorldRendered(true);
 
-    if (!Device.IsAnselActive)
-        HUD().RenderUI();
-
 #ifdef DEBUG
     physics_world()->OnRender();
 #endif

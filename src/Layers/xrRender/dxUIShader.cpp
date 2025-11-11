@@ -87,7 +87,7 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
         {
             TextureManager* texManager = resourceMgr->GetTextureManager();
 
-            TextureHandle handle = texManager->FindTexture(texture->cName.c_str());
+            TextureHandle handle = texManager->LoadTexture(texture->cName.c_str());
             if (handle.IsValid())
             {
                 nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
@@ -97,6 +97,10 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
                     res = { float(desc.width), float(desc.height) };
                     return true;
                 }
+            }
+            else
+            {
+                Msg("! [dxUIShader] FindTexture failed for: '%s'", texture->cName.c_str());
             }
         }
     }
