@@ -336,6 +336,7 @@ void FrameGraphRenderer::RenderMenu() {
 }
 
 void FrameGraphRenderer::SetupFrame() {
+    const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
     // Clear buffer handle cache (X-Ray may recreate buffers each frame)
     m_bufferHandleCache.clear();
 
@@ -344,12 +345,12 @@ void FrameGraphRenderer::SetupFrame() {
 
     // Query spatial database ONCE per frame (mimicking render_main::calculate())
     // This populates m_lstRenderables which we reuse throughout the frame
-    if (g_pGamePersistent && g_pGameLevel)
+    if (levelLoaded)
     {
         // Setup frustum (same as render_main)
         // Safety check: Ensure spatial database is initialized
         // SpatialSpace isn't ready during early level loading
-        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->IsLoadingScreenShown())
+        if (levelLoaded && !g_pGamePersistent->IsLoadingScreenShown())
         {
             CFrustum view_frustum;
             view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
@@ -379,7 +380,8 @@ void FrameGraphRenderer::SetupFrame() {
     m_hudParticleBatches.clear();
 
     // Collect visible geometry (CPU culling for now, GPU later)
-    CollectVisibleGeometry();
+    if (levelLoaded)
+        CollectVisibleGeometry();
 
     // End geometry collection (sorts batches)
     m_geometryCollector->EndFrame();

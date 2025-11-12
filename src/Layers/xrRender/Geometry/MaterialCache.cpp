@@ -1573,6 +1573,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.rasterizerState.cullMode = ng::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.scissorEnable = true;  // Enable scissor for UI clipping (maps, scrollviews, etc.)
 
     // Set render target formats from framebuffer
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();

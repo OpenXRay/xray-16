@@ -206,21 +206,25 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         if (batch->IsEmpty())
             continue;
 
-        // Update scissor rect if batch has one (fonts use scissor)
+        // Update scissor rect for each batch
         if (batch->hasScissor) {
+            // Apply custom scissor rect (for maps, scrollviews, etc.)
             nvrhi::Rect scissor;
             scissor.minX = batch->scissorRect.x1;
             scissor.minY = batch->scissorRect.y1;
             scissor.maxX = batch->scissorRect.x2;
             scissor.maxY = batch->scissorRect.y2;
 
-            // Update viewport state with scissor
             state.viewport = nvrhi::ViewportState()
                 .addViewport(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)))
                 .addScissorRect(scissor);
-
-            commandList->setGraphicsState(state);  // Reapply with new scissor
+        } else {
+            // Reset to full-screen scissor rect
+            state.viewport = nvrhi::ViewportState()
+                .addViewportAndScissorRect(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)));
         }
+
+        commandList->setGraphicsState(state);  // Apply scissor state for this batch
 
         // Upload geometry
         u32 batchVertexOffset = vertexOffset;
