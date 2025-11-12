@@ -22,6 +22,7 @@ UILoadingScreen::UILoadingScreen()
 {
     alwaysShowStage = false;
     UILoadingScreen::Initialize();
+    Show(false);
 }
 
 void UILoadingScreen::Initialize()

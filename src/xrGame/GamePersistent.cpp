@@ -797,6 +797,32 @@ void CGamePersistent::OnRenderCursor()
     GetUICursor().OnRender();
 }
 
+void CGamePersistent::OnRenderSequencers()
+{
+    // Render all active UI sequencers (intro videos, tutorials)
+    // These are pureRender objects that emit UI geometry through GEnv.UIRender
+
+    // 1. Intro sequencer (GSC/THQ logo videos, game intro)
+    if (m_intro && m_intro->IsActive())
+    {
+        m_intro->OnRender();
+    }
+
+    // 2. Primary tutorial sequencer
+    extern CUISequencer* g_tutorial;
+    if (g_tutorial && g_tutorial->IsActive())
+    {
+        g_tutorial->OnRender();
+    }
+
+    // 3. Secondary tutorial sequencer (for chained tutorials)
+    extern CUISequencer* g_tutorial2;
+    if (g_tutorial2 && g_tutorial2->IsActive())
+    {
+        g_tutorial2->OnRender();
+    }
+}
+
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)
 {

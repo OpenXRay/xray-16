@@ -126,19 +126,36 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         Msg("  [UIPass] After menu UI: %zu batches", m_uiCollector->GetBatches().size());
 
         // ═══════════════════════════════════════════════════════
-        //  COLLECT IN-GAME UI (HUD, inventory, loading screen, etc.)
+        //  COLLECT IN-GAME UI (HUD, inventory, etc.)
         // ═══════════════════════════════════════════════════════
         // This is a completely separate rendering path from main menu!
         // OnRenderInGameUI() calls HUD()->RenderUI() which renders:
         // - Health/stamina bars
         // - Inventory UI
         // - Quest log
-        // - Loading screen
         // - Pause menu
         // - Dialog windows
         // - etc.
         g_pGamePersistent->OnRenderInGameUI();
         Msg("  [UIPass] After in-game UI: %zu batches", m_uiCollector->GetBatches().size());
+
+        // ═══════════════════════════════════════════════════════
+        //  COLLECT LOADING SCREEN UI (level loading backgrounds)
+        // ═══════════════════════════════════════════════════════
+        // Loading screen shows during level loading/transitions
+        if (g_pGamePersistent->IsLoadingScreenShown()) {
+            Msg("  [UIPass] Collecting loading screen UI...");
+            g_pGamePersistent->load_draw_internal();
+            Msg("  [UIPass] After loading screen: %zu batches", m_uiCollector->GetBatches().size());
+        }
+
+        // ═══════════════════════════════════════════════════════
+        //  COLLECT UI SEQUENCER GEOMETRY (intro videos, tutorials)
+        // ═══════════════════════════════════════════════════════
+        // Sequencers render .ogm video intros (GSC/THQ logos, game intro)
+        // and in-game tutorials. They emit geometry through GEnv.UIRender.
+        g_pGamePersistent->OnRenderSequencers();
+        Msg("  [UIPass] After sequencers: %zu batches", m_uiCollector->GetBatches().size());
 
         // NOTE: Cursor is no longer collected here!
         // Cursor rendering has been moved to CursorPass (which executes after TextPass)

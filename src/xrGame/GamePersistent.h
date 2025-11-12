@@ -96,6 +96,7 @@ public:
     virtual void OnRenderPPUI_PP() override;
     virtual void OnRenderInGameUI() override;
     virtual void OnRenderCursor() override;
+    virtual void OnRenderSequencers() override; // Render active UI sequencers (intro videos, tutorials)
 
     virtual bool CanBePaused() override;
 
