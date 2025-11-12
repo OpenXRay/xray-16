@@ -71,6 +71,14 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
 void RenderDevice::Shutdown() {
     if (!m_initialized) return;
 
+    // Clear pipeline cache FIRST, before releasing ANY NVRHI resources
+    // This must happen while the device is in a fully functional state
+    if (m_pipelineCache) {
+        m_pipelineCache->Clear();
+        Msg("* [PipelineStateCache] Cleared cache before shutdown");
+    }
+    m_pipelineCache = nullptr;
+
     // Print leak detection
     if (m_stats.texturesAlive > 0) {
         Msg("! [RenderDevice] WARNING: %u textures leaked", m_stats.texturesAlive);
@@ -89,11 +97,8 @@ void RenderDevice::Shutdown() {
     m_uploadCommandList = nullptr;
     Msg("* [RenderDevice] Released upload command list");
 
-    // Clear pipeline cache
-    m_pipelineCache.reset();
-
     // Shutdown modern resource manager
-    m_modernResourceManager.reset();
+    m_modernResourceManager = nullptr;
 
     // Clear all resources
     m_textures.clear();
@@ -102,7 +107,7 @@ void RenderDevice::Shutdown() {
     m_shaders.clear();
 
     // Shutdown NVRHI
-    m_nvrhiDevice.reset();
+    m_nvrhiDevice = nullptr;
 
     m_initialized = false;
 }
@@ -694,7 +699,7 @@ RenderContext* RenderDevice::CreateContext() {
     }
 
     // Pass 'this' RenderDevice so RenderContext can resolve BufferHandles and other handles
-    RenderContext* context = new RenderContext(this, cmdList);
+    RenderContext* context = xr_new<RenderContext>(this, cmdList);
     m_stats.contextsAlive++;
 
     return context;
@@ -703,7 +708,7 @@ RenderContext* RenderDevice::CreateContext() {
 void RenderDevice::DestroyContext(RenderContext* context) {
     if (!context) return;
 
-    delete context;
+    xr_delete(context);
     m_stats.contextsAlive--;
 }
 

@@ -20,7 +20,7 @@ static ng::RenderDevice* g_RenderDevice = nullptr;
 namespace RENDER_NAMESPACE {
     IImGuiRender* CreateLegacyImGuiRendererImpl()
     {
-        return new dxImGuiRender();
+        return xr_new<dxImGuiRender>();
     }
 }
 

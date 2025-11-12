@@ -137,19 +137,19 @@ void FrameGraphRenderer::Shutdown() {
     // Clear global geometry collector pointer
     g_geometryCollector = nullptr;
 
-    m_renderContext.reset();
-    m_geometryCollector.reset();
-    m_tonemapPass.reset();
-    m_lightingPass.reset();
-    m_particlePass.reset();
-    m_hudPass.reset();
-    m_gbufferPass.reset();
-    m_menuCompositePass.reset();
-    m_menuDistortPass.reset();
-    m_textPass.reset();
-    m_uiPass.reset();
-    m_shaderPhaseCache.reset();
-    m_framegraph.reset();
+    m_renderContext = nullptr;
+    m_geometryCollector = nullptr;
+    m_tonemapPass = nullptr;
+    m_lightingPass = nullptr;
+    m_particlePass = nullptr;
+    m_hudPass = nullptr;
+    m_gbufferPass = nullptr;
+    m_menuCompositePass = nullptr;
+    m_menuDistortPass = nullptr;
+    m_textPass = nullptr;
+    m_uiPass = nullptr;
+    m_shaderPhaseCache = nullptr;
+    m_framegraph = nullptr;
 
     m_device = nullptr;
 }
