@@ -100,6 +100,15 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         g_pGamePersistent->OnRenderInGameUI();
         Msg("  [UIPass] After in-game UI: %zu batches", m_uiCollector->GetBatches().size());
 
+        if (g_pGamePersistent->IsLoadingScreenShown()) {
+            Msg("  [UIPass] Collecting loading screen UI...");
+            g_pGamePersistent->load_draw_internal();
+            Msg("  [UIPass] After loading screen: %zu batches", m_uiCollector->GetBatches().size());
+        }
+
+        g_pGamePersistent->OnRenderSequencers();
+        Msg("  [UIPass] After sequencers: %zu batches", m_uiCollector->GetBatches().size());
+
         GEnv.UIRender = oldRenderer;
 
         Msg("  [UIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());

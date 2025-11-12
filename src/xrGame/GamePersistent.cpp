@@ -790,6 +790,27 @@ void CGamePersistent::OnRenderCursor()
     GetUICursor().OnRender();
 }
 
+void CGamePersistent::OnRenderSequencers()
+{
+
+    if (m_intro && m_intro->IsActive())
+    {
+        m_intro->OnRender();
+    }
+
+    extern CUISequencer* g_tutorial;
+    if (g_tutorial && g_tutorial->IsActive())
+    {
+        g_tutorial->OnRender();
+    }
+
+    extern CUISequencer* g_tutorial2;
+    if (g_tutorial2 && g_tutorial2->IsActive())
+    {
+        g_tutorial2->OnRender();
+    }
+}
+
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }
 void CGamePersistent::SetPickableEffectorDOF(bool bSet)
 {
