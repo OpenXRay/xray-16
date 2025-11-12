@@ -182,7 +182,11 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
     // blend-copy
     if (!RImplementation.o.fp16_blend)
     {
+#ifdef USE_OGL
         u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
+#else
+        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+#endif
         cmd_list.set_Element(shader_accum_mask->E[SE_MASK_ACCUM_VOL]);
         cmd_list.set_c("m_texgen", m_Texgen);
 #ifdef USE_DX11

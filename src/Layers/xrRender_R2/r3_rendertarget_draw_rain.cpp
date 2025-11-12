@@ -234,7 +234,11 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 
         //	Use for intermediate results
         //	Patch normal
+#ifdef USE_OGL
         u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
+#else
+        u_setrt(cmd_list, rt_Accumulator, nullptr, nullptr, rt_MSAADepth);
+#endif
 
         // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
         ref_shader shader_rain = s_rain;

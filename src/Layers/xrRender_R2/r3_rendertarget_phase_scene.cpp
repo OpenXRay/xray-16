@@ -22,7 +22,11 @@ void CRenderTarget::phase_scene_prepare()
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
         //	TODO: DX11: Check if we need to set RT here.
-        u_setrtzb(RCache, rt_Position, rt_MSAADepth);
+#ifdef USE_OGL
+        u_setrtzb(RCache, rt_Position,rt_MSAADepth);
+#else
+        u_setrt(RCache, rt_Position, nullptr, nullptr, rt_MSAADepth);
+#endif
 
         const Fcolor color{}; // black
         RCache.ClearRT(rt_Position, color);
@@ -33,6 +37,7 @@ void CRenderTarget::phase_scene_prepare()
             RCache.ClearZB(get_base_zb(), 1.0f, 0);
         else
         {
+            // TODO Clear all at once
             RCache.ClearRT(rt_Color, color);
             RCache.ClearRT(rt_Accumulator, color);
             RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
@@ -42,7 +47,11 @@ void CRenderTarget::phase_scene_prepare()
     else
     {
         //	TODO: DX11: Check if we need to set RT here.
-        u_setrtzb(RCache, get_base_rt(), rt_MSAADepth);
+#ifdef USE_OGL
+        u_setrtzb(RCache, get_base_rt(),rt_MSAADepth);
+#else
+        u_setrt(RCache, get_base_rt(), nullptr, nullptr, rt_MSAADepth);
+#endif
         RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
 
@@ -57,21 +66,21 @@ void CRenderTarget::phase_scene_begin()
     // Targets, use accumulator for temporary storage
     if (!RImplementation.o.gbuffer_opt)
     {
-        if (RImplementation.o.albedo_wo)
-            u_setrtzb(RCache, rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth);
-        else
-            u_setrtzb(RCache, rt_Position, rt_Normal, rt_Color, rt_MSAADepth);
+        auto& _3 = RImplementation.o.albedo_wo ? rt_Accumulator : rt_Color;
+#ifdef USE_OGL
+        u_setrtzb(RCache, rt_Position, rt_Normal, _3, rt_MSAADepth);
+#else
+        u_setrt(RCache, rt_Position, rt_Normal, _3, rt_MSAADepth);
+#endif
     }
     else
     {
-        if (RImplementation.o.albedo_wo)
-#ifndef USE_OGL
-            u_setrtzb(RCache, rt_Position, rt_Accumulator, rt_MSAADepth);
+        auto& _2 = RImplementation.o.albedo_wo ? rt_Accumulator : rt_Color;
+#ifdef USE_OGL
+        u_setrtzb(RCache, rt_Position, _2, rt_MSAADepth);
 #else
-            u_setrtzb(RCache, rt_Position, rt_Color, rt_MSAADepth); // CHECK why
+        u_setrt(RCache, rt_Position, _2, nullptr, rt_MSAADepth);
 #endif
-        else
-            u_setrtzb(RCache, rt_Position, rt_Color, rt_MSAADepth);
     }
 
     // Stencil - write 0x1 at pixel pos
@@ -102,7 +111,12 @@ void CRenderTarget::phase_scene_end()
         return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
+#ifdef USE_OGL
     u_setrtzb(RCache, rt_Color, rt_MSAADepth);
+#else
+    u_setrt(RCache, rt_Color, nullptr, nullptr, rt_MSAADepth);
+#endif
+
     RCache.set_CullMode(CULL_NONE);
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil)

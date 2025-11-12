@@ -274,6 +274,10 @@ public:
     IC void set_ZB(ID3DDepthStencilView* ZB);
     IC ID3DRenderTargetView* get_RT(u32 ID = 0);
     IC ID3DDepthStencilView* get_ZB();
+    IC void unset_RT(u32 ID)
+    {
+        set_RT(nullptr, ID);
+    }
 #elif defined(USE_OGL)
     IC void set_FB(GLuint FB = 0);
     IC void set_RT(const ref_rt& RT, u32 ID);

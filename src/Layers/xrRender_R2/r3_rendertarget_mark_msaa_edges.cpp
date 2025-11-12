@@ -32,10 +32,10 @@ void CRenderTarget::mark_msaa_edges()
 #   error No graphics API selected or enabled!
 #endif
     RImplementation.Vertex.Unlock(4, g_combine_2UV->vb_stride);
-#if defined(USE_DX11) // XXX: remove this difference
-    u_setrt(RCache, nullptr, nullptr, nullptr, rt_MSAADepth);
-#elif defined(USE_OGL)
+#ifdef USE_OGL
     u_set_zb(RCache, rt_MSAADepth);
+#else
+    u_setrt(RCache, nullptr, nullptr, nullptr, rt_MSAADepth);
 #endif
     RCache.set_Element(s_mark_msaa_edges->E[0]);
     RCache.set_Geometry(g_combine_2UV);

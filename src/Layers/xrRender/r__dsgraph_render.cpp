@@ -270,7 +270,6 @@ void R_dsgraph_structure::render_hud_ui()
 
 #if RENDER != R_R1
     // Targets, use accumulator for temporary storage
-    const ref_rt rt_null;
     cmd_list.unset_RT( 1);
     cmd_list.unset_RT( 2);
     auto zb = RImplementation.Target->rt_Base_Depth;
@@ -279,9 +278,14 @@ void R_dsgraph_structure::render_hud_ui()
     if (RImplementation.o.msaa)
         zb = RImplementation.Target->rt_MSAADepth;
 #endif
-
+#ifdef USE_OGL
     RImplementation.Target->u_setrtzb(cmd_list, RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color, zb);
+#else
+    RImplementation.Target->u_setrt(cmd_list,
+        RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color,
+        nullptr, nullptr, zb);
 #endif // RENDER!=R_R1
+#endif
 
     levelHud->RenderActiveItemUI();
 }

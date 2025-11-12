@@ -131,7 +131,12 @@ struct TL_2c3uv
 void CRenderTarget::phase_pp()
 {
     // combination/postprocess
+#ifdef USE_OGL
     u_setrtzb(RCache, get_base_rt(), get_base_zb());
+#else
+    u_setrt(RCache, get_base_rt(), nullptr, nullptr, get_base_zb());
+#endif
+
     //	Element 0 for for normal post-process
     //	Element 4 for color map post-process
     bool bCMap = u_need_CM();

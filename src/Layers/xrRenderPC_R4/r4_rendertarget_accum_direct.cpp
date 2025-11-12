@@ -1,6 +1,4 @@
 #include "stdafx.h"
-
-#include "Layers/xrRender_R2/r2.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
 
@@ -1238,8 +1236,6 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase,
     cmd_list.set_ColorWriteEnable();
 
     ref_selement Element = s_accum_direct_volumetric->E[0];
-    if (RImplementation.o.msaa)
-        Element = s_accum_direct_volumetric_msaa[0]->E[0];
 
     // if ( (sub_phase==SE_SUN_NEAR) && use_minmax_sm_this_frame())
     if (use_minmax_sm_this_frame())
