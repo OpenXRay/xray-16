@@ -195,9 +195,7 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     // For now, m_finalOutput is pointing to gbufferOutputs.albedo (prototype RT)
     // This should already show the GBuffer rendering if it's working
-    // No additional copy needed - just log what we're presenting
-
-    Msg("* [FrameGraphRenderer] Presenting GBuffer albedo to backbuffer");
+    // No additional copy needed
 
     // ═══════════════════════════════════════════════════════
     //  RENDER HUD (after world geometry, before present)
@@ -211,8 +209,6 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     // Execute UI/Text passes to render in-game UI elements on top of 3D scene
     // These were originally only called in RenderMenu(), but in-game UI needs them too!
-
-    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Cursor → Composite)");
 
     // Restore composite pass inputs for in-game mode (may have been overridden by RenderMenu)
     // In-game: composite UI over 3D scene (gbuffer albedo)
@@ -388,10 +384,6 @@ void FrameGraphRenderer::SetupFrame() {
     // End geometry collection (sorts batches)
     m_geometryCollector->EndFrame();
 
-    // Log HUD batch count
-    if (!m_hudBatches.empty()) {
-        Msg("! [FrameGraphRenderer] Collected %u HUD batches (will render in HUDPass)", (u32)m_hudBatches.size());
-    }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1553,25 +1545,10 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
         phaseCount[phase]++;
     }
 
-    // Log phase distribution
-    Msg("! [FrameGraphRenderer] Found %u required phases:", phases.size());
-    for (const auto& [phase, count] : phaseCount) {
-        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
-        Msg("!   %s: %u batches", phaseName, count);
-    }
-
-    // Log cache statistics
-    const auto& cacheStats = m_shaderPhaseCache->GetStats();
-    Msg("! [ShaderPhaseCache] Stats: %u cached, %u hits, %u misses",
-        cacheStats.numCached, cacheStats.numHits, cacheStats.numMisses);
-
     return phases;
 }
 
 void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
-    const char* phaseName = framegraph::IPass::GetPhaseName(phase);
-    Msg("! [FrameGraphRenderer] Creating pass for phase: %s", phaseName);
-
     PassEntry entry;
     entry.phase = phase;
 
@@ -1579,7 +1556,6 @@ void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
         case framegraph::RenderPhase::Geometry: {
             // For Geometry phase, we already have m_gbufferPass created in Initialize()
             // Just store a reference to it (not owned by m_activePasses)
-            Msg("!   Using existing GBufferPass instance");
             // We'll handle this specially in BuildFrameGraph() since we can't move m_gbufferPass
             return;
         }
@@ -1590,7 +1566,6 @@ void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
         case framegraph::RenderPhase::Shadow:
         case framegraph::RenderPhase::Custom:
         default:
-            Msg("!   ⚠️ Unsupported phase: %s (not yet implemented)", phaseName);
             return;
     }
 
@@ -1611,8 +1586,6 @@ void FrameGraphRenderer::CreateAllRequiredPasses() {
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
-    Msg("! [FrameGraphRenderer] Routing batches to passes...");
-
     // Get all batches
     auto& batches = m_geometryCollector->GetBatchesMutable();
 
@@ -1656,8 +1629,6 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
             case framegraph::RenderPhase::Geometry:
                 // Assign to GBufferPass
                 m_gbufferPass->SetBatches(phaseBatches);
-                Msg("!   %s: %u batches assigned to GBufferPass",
-                    phaseName, phaseBatches.size());
                 break;
 
             case framegraph::RenderPhase::Lighting:
@@ -1666,13 +1637,9 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
             case framegraph::RenderPhase::Shadow:
             case framegraph::RenderPhase::Custom:
             default:
-                Msg("!   %s: %u batches (no pass implemented yet)",
-                    phaseName, phaseBatches.size());
                 break;
         }
     }
-
-    Msg("! [FrameGraphRenderer] Batch routing complete");
 }
 
 // ═══════════════════════════════════════════════════════

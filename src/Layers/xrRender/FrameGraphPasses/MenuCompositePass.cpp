@@ -247,8 +247,6 @@ void MenuCompositePass::Execute(ng::RenderContext& ctx, const framegraph::FrameG
 
     ctx.Draw(3, 0);
 
-    Msg("  ✓ Composite draw complete (fullscreen triangle, shader alpha-blend)");
-
     ctx.EndRenderPass();
 
     // ═══════════════════════════════════════════════════════

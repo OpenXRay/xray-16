@@ -233,7 +233,6 @@ TextureHandle TextureManager::LoadTexture(
     if (it != m_pathToHandle.end()) {
         TextureHandle existing = it->second;
         if (ValidateHandle(existing)) {
-            Msg("! [TextureManager] Texture already loaded: %s", path);
             AddRef(existing);
             return existing;
         }

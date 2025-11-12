@@ -442,11 +442,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     passDesc.clearDepth = true;
     passDesc.clearStencil = true;
 
-    Msg("! [GBufferPass] Framebuffer binding (X-Ray convention):");
-    Msg("!   Slot 0 → Normal   (texture %p)", normal);
-    Msg("!   Slot 1 → Albedo   (texture %p)", albedo);
-    Msg("!   Slot 2 → Material (texture %p)", material);
-
     // Begin render pass
     ctx.BeginRenderPass(passDesc);
 
@@ -471,7 +466,6 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // ═══════════════════════════════════════════════════════
 
     m_gbufferStats.numObjects = static_cast<u32>(m_batches.size());
-    Msg("  Rendering %u geometry batches (from IPass routing)", m_gbufferStats.numObjects);
 
     if (!m_batches.empty()) {
         // ═══════════════════════════════════════════════════════

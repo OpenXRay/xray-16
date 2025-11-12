@@ -106,8 +106,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     // Use NVRHI-based UI renderer instead of legacy D3D11 path
 
     if (g_pGamePersistent) {
-        Msg("  [UIPass::Execute] Rendering UI via NVRHI");
-
         // Initialize NVRHI UI renderer on first use
         if (!m_nvrhiUIInitialized) {
             m_uiRenderer->Initialize(m_device, m_materialCache.get());
@@ -123,7 +121,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         //  COLLECT MAIN MENU UI (menus, options, credits, etc.)
         // ═══════════════════════════════════════════════════════
         g_pGamePersistent->OnRenderPPUI_main();
-        Msg("  [UIPass] After menu UI: %zu batches", m_uiCollector->GetBatches().size());
 
         // ═══════════════════════════════════════════════════════
         //  COLLECT IN-GAME UI (HUD, inventory, etc.)
@@ -137,16 +134,13 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         // - Dialog windows
         // - etc.
         g_pGamePersistent->OnRenderInGameUI();
-        Msg("  [UIPass] After in-game UI: %zu batches", m_uiCollector->GetBatches().size());
 
         // ═══════════════════════════════════════════════════════
         //  COLLECT LOADING SCREEN UI (level loading backgrounds)
         // ═══════════════════════════════════════════════════════
         // Loading screen shows during level loading/transitions
         if (g_pGamePersistent->IsLoadingScreenShown()) {
-            Msg("  [UIPass] Collecting loading screen UI...");
             g_pGamePersistent->load_draw_internal();
-            Msg("  [UIPass] After loading screen: %zu batches", m_uiCollector->GetBatches().size());
         }
 
         // ═══════════════════════════════════════════════════════
@@ -155,7 +149,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         // Sequencers render .ogm video intros (GSC/THQ logos, game intro)
         // and in-game tutorials. They emit geometry through GEnv.UIRender.
         g_pGamePersistent->OnRenderSequencers();
-        Msg("  [UIPass] After sequencers: %zu batches", m_uiCollector->GetBatches().size());
 
         // NOTE: Cursor is no longer collected here!
         // Cursor rendering has been moved to CursorPass (which executes after TextPass)
@@ -163,8 +156,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
 
         // Restore original renderer
         GEnv.UIRender = oldRenderer;
-
-        Msg("  [UIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
 
         // STEP 2: Render collected geometry via NVRHI
         if (!m_uiCollector->GetBatches().empty()) {
@@ -176,14 +167,11 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
                 m_config.height
             );
 
-            Msg("  [UIPass::Execute] NVRHI UI rendering complete");
             m_uiStats.numBatches = static_cast<u32>(m_uiCollector->GetBatches().size());
         } else {
-            Msg("  [UIPass::Execute] No UI geometry collected");
             m_uiStats.numBatches = 0;
         }
     } else {
-        Msg("  [UIPass::Execute] No GamePersistent - clearing to transparent only");
         m_uiStats.numBatches = 0;
     }
 
@@ -195,7 +183,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     m_uiStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
     cmdList->endMarker();
-    Msg("  [UIPass] Execute complete (%.2f ms, %u batches)", m_uiStats.cpuTimeMs, m_uiStats.numBatches);
 }
 
 } // namespace xray::render::passes

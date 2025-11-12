@@ -93,8 +93,6 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     // ═══════════════════════════════════════════════════════
 
     if (g_pGamePersistent) {
-        Msg("  [CursorPass::Execute] Collecting cursor geometry");
-
         // Initialize NVRHI UI renderer on first use
         if (!m_nvrhiUIInitialized) {
             m_uiRenderer->Initialize(m_device, m_materialCache.get());

@@ -79,9 +79,6 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     D3D11_SHADER_DESC shaderDesc;
     reflection->GetDesc(&shaderDesc);
 
-    Msg("! [ShaderReflector] Analyzing vertex shader input signature...");
-    Msg("!   Input parameters: %u", shaderDesc.InputParameters);
-
     // ═══════════════════════════════════════════════════
     //  ENUMERATE INPUT PARAMETERS (IN SHADER ORDER!)
     // ═══════════════════════════════════════════════════
@@ -113,14 +110,10 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
         elem.inputSlot = 0;  // Default to slot 0 (will be overridden from vertex decl)
 
         signature.elements.push_back(elem);
-
-        Msg("!   Input[%u]: %s%d (format will be set from vertex decl, component type: %d, mask: 0x%X)",
-            i, elem.semanticName.c_str(), elem.semanticIndex, paramDesc.ComponentType, paramDesc.Mask);
     }
 
     reflection->Release();
 
-    Msg("! [ShaderReflector] Extracted %u input elements in shader order", signature.elements.size());
     return signature;
 }
 
@@ -152,9 +145,6 @@ ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(ID3DBlob* bytecode
 
     D3D11_SHADER_DESC shaderDesc;
     reflection->GetDesc(&shaderDesc);
-
-    Msg("! [ShaderReflector] Analyzing constant buffers...");
-    Msg("!   Constant buffers: %u", shaderDesc.ConstantBuffers);
 
     // ═══════════════════════════════════════════════════
     //  ENUMERATE CONSTANT BUFFERS
@@ -197,27 +187,10 @@ ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(ID3DBlob* bytecode
 
         ConstantBufferInfo cbInfo(cbDesc.Name, bindPoint, cbDesc.Size);
         result.buffers.push_back(cbInfo);
-
-        Msg("!   CB[%u]: %s (slot b%u, size %u bytes)", i, cbDesc.Name, bindPoint, cbDesc.Size);
-
-        // Optional: Log variables within CB for debugging
-        if (cbDesc.Variables > 0) {
-            Msg("!     Variables: %u", cbDesc.Variables);
-            for (u32 v = 0; v < cbDesc.Variables; v++) {
-                ID3D11ShaderReflectionVariable* varReflection = cbReflection->GetVariableByIndex(v);
-                if (!varReflection) continue;
-
-                D3D11_SHADER_VARIABLE_DESC varDesc;
-                if (SUCCEEDED(varReflection->GetDesc(&varDesc))) {
-                    Msg("!       [%u] %s (offset: %u, size: %u)", v, varDesc.Name, varDesc.StartOffset, varDesc.Size);
-                }
-            }
-        }
     }
 
     reflection->Release();
 
-    Msg("! [ShaderReflector] Extracted %u constant buffers", result.buffers.size());
     return result;
 }
 
@@ -255,10 +228,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     D3D11_SHADER_DESC shaderDesc;
     reflection->GetDesc(&shaderDesc);
 
-    Msg("! [ShaderReflector] Analyzing pixel shader...");
-    Msg("!   Bound resources: %u", shaderDesc.BoundResources);
-    Msg("!   Output parameters: %u", shaderDesc.OutputParameters);
-
     // ═══════════════════════════════════════════════════
     //  ENUMERATE INPUT RESOURCES (Textures + Samplers)
     // ═══════════════════════════════════════════════════
@@ -274,9 +243,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
             input.slot = bindDesc.BindPoint;  // t0, t1, ...
 
             bindings.inputTextures.push_back(input);
-
-            Msg("!   Input texture: %s (slot t%u)",
-                input.name.c_str(), input.slot);
         }
         // Samplers
         else if (bindDesc.Type == D3D_SIT_SAMPLER) {
@@ -285,9 +251,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
             sampler.slot = bindDesc.BindPoint;  // s0, s1, ...
 
             bindings.samplers.push_back(sampler);
-
-            Msg("!   Sampler: %s (slot s%u)",
-                sampler.name.c_str(), sampler.slot);
         }
     }
 
@@ -304,12 +267,8 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
             output.slot = paramDesc.SemanticIndex;  // SV_Target0, SV_Target1, ...
 
             bindings.outputRTs.push_back(output);
-
-            Msg("!   Output RT: SV_Target%u", output.slot);
-
         } else if (xr_strcmp(paramDesc.SemanticName, "SV_Depth") == 0) {
             bindings.hasDepthOutput = true;
-            Msg("!   Output: SV_Depth");
         }
     }
 
@@ -318,18 +277,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     // ═══════════════════════════════════════════════════
 
     bindings.phase = InferPhase(bindings);
-
-    const char* phaseName = "Custom";
-    switch (bindings.phase) {
-        case RenderPhase::Geometry: phaseName = "Geometry"; break;
-        case RenderPhase::Lighting: phaseName = "Lighting"; break;
-        case RenderPhase::Combine: phaseName = "Combine"; break;
-        case RenderPhase::PostProcess: phaseName = "PostProcess"; break;
-        case RenderPhase::Shadow: phaseName = "Shadow"; break;
-        default: break;
-    }
-
-    Msg("! [ShaderReflector] Inferred phase: %s", phaseName);
 
     // ═══════════════════════════════════════════════════
     //  INFER RT SEMANTICS BASED ON PHASE AND SLOT ORDER
@@ -347,19 +294,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
             for (auto& output : bindings.outputRTs) {
                 if (output.slot == slot) {
                     output.semantic = InferRTSemantic(slot, paramDesc.Mask, bindings.phase);
-
-                    const char* semanticName = "Unknown";
-                    switch (output.semantic) {
-                        case ShaderRTBindings::RTSemantic::Normal: semanticName = "Normal"; break;
-                        case ShaderRTBindings::RTSemantic::Albedo: semanticName = "Albedo"; break;
-                        case ShaderRTBindings::RTSemantic::Material: semanticName = "Material"; break;
-                        case ShaderRTBindings::RTSemantic::Position: semanticName = "Position"; break;
-                        case ShaderRTBindings::RTSemantic::Emissive: semanticName = "Emissive"; break;
-                        case ShaderRTBindings::RTSemantic::Accumulator: semanticName = "Accumulator"; break;
-                        default: break;
-                    }
-
-                    Msg("!   → Slot %u semantic: %s", slot, semanticName);
                     break;
                 }
             }

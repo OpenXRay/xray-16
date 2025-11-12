@@ -117,7 +117,6 @@ void NVRHIUIRenderer::RenderBatches(
         // Only change PSO when shader changes
         if (shader != lastShader)
         {
-            Msg("  [NVRHIUIRenderer] Switching to new shader");
             currentPSO = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
             if (!currentPSO)
             {
@@ -131,8 +130,6 @@ void NVRHIUIRenderer::RenderBatches(
         xr_vector<const UIGeometryBatch*> singleBatch = { &batch };
         RenderBatchesWithShader(commandList, singleBatch, currentPSO, framebuffer, screenWidth, screenHeight);
     }
-
-    Msg("  [NVRHIUIRenderer] Render complete");
 }
 
 void NVRHIUIRenderer::RenderBatchesWithShader(
@@ -209,9 +206,6 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         if (batch->IsEmpty())
             continue;
 
-        Msg("  [NVRHIUIRenderer] Drawing batch: %zu vertices, %zu indices, scissor=%d",
-            batch->vertices.size(), batch->indices.size(), batch->hasScissor);
-
         // Update scissor rect if batch has one (fonts use scissor)
         if (batch->hasScissor) {
             nvrhi::Rect scissor;
@@ -242,8 +236,6 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
 
         commandList->drawIndexed(drawArgs);
     }
-
-    Msg("  [NVRHIUIRenderer] Drew %zu batches with this shader", batches.size());
 }
 
 bool NVRHIUIRenderer::CreateBuffers()
@@ -347,13 +339,6 @@ void NVRHIUIRenderer::UploadBatchGeometry(nvrhi::ICommandList* commandList,
 {
     if (batch.vertices.empty() || batch.indices.empty())
         return;
-
-    // DEBUG: Log first vertex data
-    if (!batch.vertices.empty()) {
-        const UIVertex& v0 = batch.vertices[0];
-        Msg("! [NVRHIUIRenderer] First vertex: pos=(%.2f, %.2f, %.2f, %.2f), color=0x%08X, uv=(%.6f, %.6f)",
-            v0.x, v0.y, v0.z, v0.w, v0.color, v0.u, v0.v);
-    }
 
     // Upload vertices
     const size_t vertexDataSize = batch.vertices.size() * sizeof(UIVertex);

@@ -224,8 +224,6 @@ void FrameGraph::Execute() {
     VERIFY(m_context != nullptr && "RenderContext required for execution");
     VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
 
-    Msg("~ [FrameGraph] Executing %u passes...", m_sortedPasses.size());
-
     // ═══════════════════════════════════════════════════════
     //  OPEN COMMAND LIST (CRITICAL: Required by NVRHI)
     // ═══════════════════════════════════════════════════════
@@ -249,14 +247,8 @@ void FrameGraph::Execute() {
             continue;
         }
 
-        Msg("~ [FrameGraph] Executing pass '%s' [%u]",
-            pass->name.c_str(), pass->executionOrder);
-
         // Apply resource barriers before this pass
         if (!pass->barriersBeforePass.empty()) {
-            Msg("~ [FrameGraph]   Applying %u barriers...",
-                pass->barriersBeforePass.size());
-
             for (const auto& barrier : pass->barriersBeforePass) {
                 ResourceNode* resource = GetResourceNode(barrier.resource);
                 if (!resource || !resource->nvrhiTexture) {
@@ -270,9 +262,6 @@ void FrameGraph::Execute() {
                 // Note: Actual barrier insertion would require command list access
                 // For now, we just log the barrier
                 // TODO: Insert actual NVRHI barriers when RenderContext supports it
-                Msg("~ [FrameGraph]     Barrier: %s -> %s",
-                    ResourceStateToString(barrier.stateBefore),
-                    ResourceStateToString(barrier.stateAfter));
             }
         }
 
@@ -287,9 +276,6 @@ void FrameGraph::Execute() {
     // ═══════════════════════════════════════════════════════
     cmdList->close();
     m_renderDevice->ExecuteContext(m_context);
-
-    Msg("~ [FrameGraph] Execution complete: %u/%u passes executed",
-        passesExecuted, m_sortedPasses.size());
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
