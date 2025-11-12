@@ -82,7 +82,6 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
         GEnv.UIRender = m_uiCollector.get();
 
         g_pGamePersistent->OnRenderCursor();
-        Msg("  [CursorPass] Collected %zu cursor batches", m_uiCollector->GetBatches().size());
 
         GEnv.UIRender = oldRenderer;
 
@@ -110,7 +109,6 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     m_cursorStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
     cmdList->endMarker();
-    Msg("  [CursorPass] Execute complete (%.2f ms, %u batches)", m_cursorStats.cpuTimeMs, m_cursorStats.numBatches);
 }
 
 }

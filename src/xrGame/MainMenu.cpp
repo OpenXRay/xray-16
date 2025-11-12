@@ -494,7 +494,6 @@ void CMainMenu::OnRenderPPUI_main()
 
     UI().pp_start();
 
-    if (OnRenderPPUI_query())
     {
         DoRenderDialogs();
 
