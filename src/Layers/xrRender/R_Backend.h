@@ -292,6 +292,7 @@ public:
     IC void ClearZB(const ref_rt& zb, float depth, u8 stencil);
     IC bool ClearZBRect(const ref_rt& zb, float depth, size_t numRects, const Irect* rects);
     IC bool ClearRTRect(const ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects);
+    IC void ClearRT(ref_rt& rt, const Fcolor& color);
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -304,9 +305,7 @@ public:
 
     IC bool ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects);
     IC bool ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects);
-#endif
-    ICF void ClearRT(ref_rt& rt, const Fcolor& color);
-#if defined(USE_DX11)
+    ICF void ClearRT(ref_rt& rt, const Fcolor& color) { ClearRT(rt->pRT, color); }
     ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT[context_id], depth); }
     ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT[context_id], depth, stencil); }
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
