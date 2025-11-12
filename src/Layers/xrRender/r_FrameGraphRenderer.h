@@ -31,7 +31,7 @@ namespace xray::render::ng {
 namespace xray::render {
 using RENDER_NAMESPACE::dxRender_Visual;
 
-class FrameGraphRenderer: public IFrameGraphRender, public pureRender {
+class FrameGraphRenderer: public IFrameGraphRender{
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
@@ -43,8 +43,6 @@ public:
     void RenderMenu() override;
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
-
-    void OnRender();
 
     void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
 

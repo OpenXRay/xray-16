@@ -106,9 +106,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_framegraph->Compile();
 
-    Device.seqRender.Add(this, 0);
-
-    Msg("  ✓ FrameGraphRenderer initialized and registered with seqRender");
+    Msg("* [FrameGraphRenderer] initialized");
 
     return true;
 }
@@ -117,8 +115,6 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
-
-    Device.seqRender.Remove(this);
 
     g_geometryCollector = nullptr;
 
@@ -1231,15 +1227,6 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     }
 
     Msg("! [FrameGraphRenderer] Batch routing complete");
-}
-
-void FrameGraphRenderer::OnRender() {
-    if (!m_enabled) return;
-
-    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
-        return;
-
-    Render();
 }
 
 void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer) {

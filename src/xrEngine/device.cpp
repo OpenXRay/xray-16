@@ -13,6 +13,8 @@
 
 #include "xrScriptEngine/script_space.hpp"
 
+#include "IFrameGraphRender.h"
+
 #include <SDL.h>
 
 ENGINE_API CRenderDevice Device;
@@ -30,6 +32,8 @@ bool g_bLoaded = false;
 ref_light precache_light = 0;
 
 using namespace xray;
+
+extern ENGINE_API int ps_r4_use_framegraph;
 
 bool CRenderDevice::RenderBegin()
 {
@@ -235,6 +239,11 @@ void CRenderDevice::DoRender()
     renderTotalReal.Begin();
     if (b_is_Active && RenderBegin())
     {
+        if (ps_r4_use_framegraph)
+        {
+            GEnv.FrameGraphRenderer->Render();
+        }
+        else
         {
             ZoneScopedN("Render process");
             seqRender.Process(); // all rendering is done here
@@ -242,7 +251,6 @@ void CRenderDevice::DoRender()
 
         CalcFrameStats();
 
-        extern ENGINE_API int ps_r4_use_framegraph;
         if (!ps_r4_use_framegraph)
         {
             ImGui::Render();
