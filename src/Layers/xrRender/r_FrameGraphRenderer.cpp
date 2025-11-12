@@ -237,13 +237,14 @@ void FrameGraphRenderer::RenderMenu() {
 }
 
 void FrameGraphRenderer::SetupFrame() {
+    const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
     m_bufferHandleCache.clear();
 
     m_lstRenderables.clear();
 
-    if (g_pGamePersistent && g_pGameLevel)
+    if (levelLoaded)
     {
-        if (g_pGameLevel && g_pGamePersistent && !g_pGamePersistent->IsLoadingScreenShown())
+        if (levelLoaded && !g_pGamePersistent->IsLoadingScreenShown())
         {
             CFrustum view_frustum;
             view_frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
@@ -267,7 +268,8 @@ void FrameGraphRenderer::SetupFrame() {
     m_worldParticleBatches.clear();
     m_hudParticleBatches.clear();
 
-    CollectVisibleGeometry();
+    if (levelLoaded)
+        CollectVisibleGeometry();
 
     m_geometryCollector->EndFrame();
 

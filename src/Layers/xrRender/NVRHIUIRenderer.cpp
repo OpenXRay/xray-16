@@ -178,9 +178,12 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
             state.viewport = nvrhi::ViewportState()
                 .addViewport(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)))
                 .addScissorRect(scissor);
-
-            commandList->setGraphicsState(state);
+        } else {
+            state.viewport = nvrhi::ViewportState()
+                .addViewportAndScissorRect(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)));
         }
+
+        commandList->setGraphicsState(state);
 
         u32 batchVertexOffset = vertexOffset;
         u32 batchIndexOffset = indexOffset;

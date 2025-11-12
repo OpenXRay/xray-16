@@ -1182,6 +1182,7 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.rasterizerState.cullMode = ng::CullMode::None;
     psoDesc.rasterizerState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.scissorEnable = true;
 
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
     for (u32 i = 0; i < fbDesc.colorAttachments.size() && i < 8; ++i) {
