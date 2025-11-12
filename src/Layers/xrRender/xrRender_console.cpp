@@ -31,6 +31,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/Shaders/SlangCompilerTest.h"
 #ifdef DEBUG
 #include "Layers/xrRender/ResourceManager/TestTextureManager.h"
 #endif
@@ -1097,7 +1098,26 @@ public:
             Msg("! [COMPUTE TEST SIMD] FAILED");
     }
 };
-#endif
+
+#if RENDER == R_R4
+class CCC_TestSlangCompiler final : public IConsole_Command
+{
+public:
+    CCC_TestSlangCompiler(pcstr name) : IConsole_Command(name) { bEmptyArgsHandled = true; }
+
+    void Execute(pcstr args) override
+    {
+        Msg("=== [SLANG COMPILER TEST] Running tests ===");
+        bool success = ::render::SlangCompilerTest::RunTest();
+
+        if (success)
+            Msg("* [SLANG COMPILER TEST] ALL TESTS PASSED");
+        else
+            Msg("! [SLANG COMPILER TEST] SOME TESTS FAILED");
+    }
+};
+#endif // RENDER == R_R4
+#endif // USE_DX11
 
 #if RENDER != R_R1
 class CCC_BuildSSA : public IConsole_Command
@@ -1519,6 +1539,9 @@ void xrRender_initconsole()
     CMD1(CCC_TestComputeVector, "test_compute_vector");
     CMD1(CCC_TestComputeMatrices, "test_compute_matrices");
     CMD1(CCC_TestComputeSIMD, "test_compute_simd");
+#endif
+#if RENDER == R_R4
+    CMD1(CCC_TestSlangCompiler, "test_slang_compiler");
 #endif
 
 #if RENDER == R_R4

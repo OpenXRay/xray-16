@@ -46,6 +46,11 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraph/VolatileConstantBufferPool.h
     ../xrRender/FrameGraph/VolatileConstantBufferPool.cpp
 
+    # Shader System (Phase 2) - Slang integration
+    ../xrRender/Shaders/SlangCompiler.h
+    ../xrRender/Shaders/SlangCompiler.cpp
+    ../xrRender/Shaders/SlangCompilerTest.cpp
+
     # FrameGraph Passes (Phase 3) - Renderer agnostic
     ../xrRender/FrameGraphPasses/GBufferPass.h
     ../xrRender/FrameGraphPasses/GBufferPass.cpp

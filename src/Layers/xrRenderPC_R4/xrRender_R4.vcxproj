@@ -276,6 +276,8 @@
     <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
     <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\LightingPass.h" />
@@ -525,6 +527,8 @@
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\LightingPass.cpp" />
