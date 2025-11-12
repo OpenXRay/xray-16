@@ -79,8 +79,7 @@ IC void CBackend::unset_ZB()
 
 IC void CBackend::ClearRT(ref_rt& rt, const Fcolor& color)
 {
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rt->target, rt->pRT, 0));
-    pRT[0] = rt->pRT;
+    set_RT(rt, 0);
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glClearColor(color.r, color.g, color.b, color.a);
@@ -90,9 +89,7 @@ IC void CBackend::ClearRT(ref_rt& rt, const Fcolor& color)
 
 IC void CBackend::ClearZB(const ref_rt& zb, float depth)
 {
-    VERIFY(pZB == zb->pZRT); // do not allow to clear unbound depth
-
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, zb->target, zb->pZRT, 0));
+    set_ZB(zb);
 
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
@@ -102,9 +99,7 @@ IC void CBackend::ClearZB(const ref_rt& zb, float depth)
 
 IC void CBackend::ClearZB(const ref_rt& zb, float depth, u8 stencil)
 {
-    VERIFY(pZB == zb->pZRT); // do not allow to clear unbound depth
-
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, zb->target, zb->pZRT, 0));
+    set_ZB(zb);
 
     glDepthMask(GL_TRUE);
     glClearDepthf(depth);
@@ -115,11 +110,9 @@ IC void CBackend::ClearZB(const ref_rt& zb, float depth, u8 stencil)
     CHK_GL(glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
 
-IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects)
+IC bool CBackend::ClearRTRect(const ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
 {
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt, 0));
-    pRT[0] = rt;
+    set_RT(rt, 0);
 
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 
@@ -144,11 +137,9 @@ IC bool CBackend::ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, c
     return true;
 }
 
-IC bool CBackend::ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects)
+IC bool CBackend::ClearZBRect(const ref_rt& zb, float depth, size_t numRects, const Irect* rects)
 {
-    // TODO: OGL: Implement support for multi-sampled render targets
-    CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, zb, 0));
-
+    set_ZB(zb);
     CHK_GL(glEnable(GL_SCISSOR_TEST));
 
     for (size_t i = 0; i < numRects; ++i, ++rects)

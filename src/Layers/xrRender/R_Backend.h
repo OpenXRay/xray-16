@@ -283,6 +283,11 @@ public:
     IC GLuint get_FB();
     IC GLuint get_RT(u32 ID = 0);
     IC GLuint get_ZB();
+
+    IC void ClearZB(const ref_rt& zb, float depth);
+    IC void ClearZB(const ref_rt& zb, float depth, u8 stencil);
+    IC bool ClearZBRect(const ref_rt& zb, float depth, size_t numRects, const Irect* rects);
+    IC bool ClearRTRect(const ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects);
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -295,35 +300,19 @@ public:
 
     IC bool ClearRTRect(ID3DRenderTargetView* rt, const Fcolor& color, size_t numRects, const Irect* rects);
     IC bool ClearZBRect(ID3DDepthStencilView* zb, float depth, size_t numRects, const Irect* rects);
-#elif defined(USE_OGL)
-    IC bool ClearRTRect(GLuint rt, const Fcolor& color, size_t numRects, const Irect* rects);
-    IC bool ClearZBRect(GLuint zb, float depth, size_t numRects, const Irect* rects);
-#else
-#   error No graphics API selected or enabled!
 #endif
-
     ICF void ClearRT(ref_rt& rt, const Fcolor& color);
-    ICF bool ClearRTRect(ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
-    {
-        return ClearRTRect(rt->pRT, color, numRects, rects);
-    }
-
-#if defined(USE_OGL)
-    ICF void ClearZB(const ref_rt& zb, float depth);
-    ICF void ClearZB(const ref_rt& zb, float depth, u8 stencil);
-    ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
-    {
-        return ClearZBRect(zb->pRT, depth, numRects, rects);
-    }
-#elif defined(USE_DX11)
+#if defined(USE_DX11)
     ICF void ClearZB(ref_rt& zb, float depth) { ClearZB(zb->pZRT[context_id], depth); }
     ICF void ClearZB(ref_rt& zb, float depth, u8 stencil) { ClearZB(zb->pZRT[context_id], depth, stencil); }
     ICF bool ClearZBRect(ref_rt& zb, float depth, size_t numRects, const Irect* rects)
     {
         return ClearZBRect(zb->pZRT[context_id], depth, numRects, rects);
     }
-#else
-#   error No graphics API selected or enabled!
+    ICF bool ClearRTRect(ref_rt& rt, const Fcolor& color, size_t numRects, const Irect* rects)
+    {
+        return ClearRTRect(rt->pRT, color, numRects, rects);
+    }
 #endif
 
     IC void set_Constants(R_constant_table* C);
