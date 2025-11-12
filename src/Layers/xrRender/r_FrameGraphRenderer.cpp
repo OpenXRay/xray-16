@@ -154,12 +154,8 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->Execute();
 
-    Msg("* [FrameGraphRenderer] Presenting GBuffer albedo to backbuffer");
-
     RenderHUD();
 
-
-    Msg("* [FrameGraphRenderer] Rendering in-game UI (UI → Text → Cursor → Composite)");
 
     m_menuCompositePass->SetInputs(m_gbufferPass->GetOutputs().albedo, m_rt_MenuMain);
     m_menuCompositePass->SetOutput(m_rt_FinalComposite);
@@ -275,9 +271,6 @@ void FrameGraphRenderer::SetupFrame() {
 
     m_geometryCollector->EndFrame();
 
-    if (!m_hudBatches.empty()) {
-        Msg("! [FrameGraphRenderer] Collected %u HUD batches (will render in HUDPass)", (u32)m_hudBatches.size());
-    }
 }
 
 framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
@@ -1133,29 +1126,15 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
         phaseCount[phase]++;
     }
 
-    Msg("! [FrameGraphRenderer] Found %u required phases:", phases.size());
-    for (const auto& [phase, count] : phaseCount) {
-        const char* phaseName = framegraph::IPass::GetPhaseName(phase);
-        Msg("!   %s: %u batches", phaseName, count);
-    }
-
-    const auto& cacheStats = m_shaderPhaseCache->GetStats();
-    Msg("! [ShaderPhaseCache] Stats: %u cached, %u hits, %u misses",
-        cacheStats.numCached, cacheStats.numHits, cacheStats.numMisses);
-
     return phases;
 }
 
 void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
-    const char* phaseName = framegraph::IPass::GetPhaseName(phase);
-    Msg("! [FrameGraphRenderer] Creating pass for phase: %s", phaseName);
-
     PassEntry entry;
     entry.phase = phase;
 
     switch (phase) {
         case framegraph::RenderPhase::Geometry: {
-            Msg("!   Using existing GBufferPass instance");
             return;
         }
 
@@ -1165,7 +1144,6 @@ void FrameGraphRenderer::CreatePhasePass(framegraph::RenderPhase phase) {
         case framegraph::RenderPhase::Shadow:
         case framegraph::RenderPhase::Custom:
         default:
-            Msg("!   ⚠️ Unsupported phase: %s (not yet implemented)", phaseName);
             return;
     }
 
@@ -1182,8 +1160,6 @@ void FrameGraphRenderer::CreateAllRequiredPasses() {
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
-    Msg("! [FrameGraphRenderer] Routing batches to passes...");
-
     auto& batches = m_geometryCollector->GetBatchesMutable();
 
     u32 nullVBCount = 0, nullIBCount = 0;
@@ -1210,8 +1186,6 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
         switch (phase) {
             case framegraph::RenderPhase::Geometry:
                 m_gbufferPass->SetBatches(phaseBatches);
-                Msg("!   %s: %u batches assigned to GBufferPass",
-                    phaseName, phaseBatches.size());
                 break;
 
             case framegraph::RenderPhase::Lighting:
@@ -1220,13 +1194,9 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
             case framegraph::RenderPhase::Shadow:
             case framegraph::RenderPhase::Custom:
             default:
-                Msg("!   %s: %u batches (no pass implemented yet)",
-                    phaseName, phaseBatches.size());
                 break;
         }
     }
-
-    Msg("! [FrameGraphRenderer] Batch routing complete");
 }
 
 void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer) {

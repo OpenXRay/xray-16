@@ -75,17 +75,11 @@ void UIRenderCollector::FlushPrimitive()
         return;
     }
 
-    Msg("  [UIRenderCollector::FlushPrimitive] Flushing %zu vertices, primType=%d",
-        m_currentVertices.size(), (int)m_primitiveType);
-
     UIGeometryBatch* batch = GetOrCreateBatch();
     VERIFY(batch);
 
     UIPrimitiveType uiPrimType = ConvertPrimitiveType(m_primitiveType);
     batch->AddPrimitive(m_currentVertices, uiPrimType);
-
-    Msg("  [UIRenderCollector] Batch now has %zu vertices, %zu indices",
-        batch->vertices.size(), batch->indices.size());
 
     m_currentVertices.clear();
     m_primitiveType = ptNone;

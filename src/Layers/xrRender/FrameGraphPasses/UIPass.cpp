@@ -83,8 +83,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     m_device->GetNVRHIDevice()->executeCommandList(cmdList);
 
     if (g_pGamePersistent) {
-        Msg("  [UIPass::Execute] Rendering UI via NVRHI");
-
         if (!m_nvrhiUIInitialized) {
             m_uiRenderer->Initialize(m_device, m_materialCache.get());
             m_nvrhiUIInitialized = true;
@@ -95,23 +93,16 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         GEnv.UIRender = m_uiCollector.get();
 
         g_pGamePersistent->OnRenderPPUI_main();
-        Msg("  [UIPass] After menu UI: %zu batches", m_uiCollector->GetBatches().size());
 
         g_pGamePersistent->OnRenderInGameUI();
-        Msg("  [UIPass] After in-game UI: %zu batches", m_uiCollector->GetBatches().size());
 
         if (g_pGamePersistent->IsLoadingScreenShown()) {
-            Msg("  [UIPass] Collecting loading screen UI...");
             g_pGamePersistent->load_draw_internal();
-            Msg("  [UIPass] After loading screen: %zu batches", m_uiCollector->GetBatches().size());
         }
 
         g_pGamePersistent->OnRenderSequencers();
-        Msg("  [UIPass] After sequencers: %zu batches", m_uiCollector->GetBatches().size());
 
         GEnv.UIRender = oldRenderer;
-
-        Msg("  [UIPass::Execute] Collected %zu UI batches", m_uiCollector->GetBatches().size());
 
         if (!m_uiCollector->GetBatches().empty()) {
             m_uiRenderer->RenderBatches(
@@ -122,14 +113,11 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
                 m_config.height
             );
 
-            Msg("  [UIPass::Execute] NVRHI UI rendering complete");
             m_uiStats.numBatches = static_cast<u32>(m_uiCollector->GetBatches().size());
         } else {
-            Msg("  [UIPass::Execute] No UI geometry collected");
             m_uiStats.numBatches = 0;
         }
     } else {
-        Msg("  [UIPass::Execute] No GamePersistent - clearing to transparent only");
         m_uiStats.numBatches = 0;
     }
 
@@ -137,7 +125,6 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     m_uiStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
     cmdList->endMarker();
-    Msg("  [UIPass] Execute complete (%.2f ms, %u batches)", m_uiStats.cpuTimeMs, m_uiStats.numBatches);
 }
 
 }
