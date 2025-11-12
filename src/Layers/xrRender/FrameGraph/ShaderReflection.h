@@ -154,15 +154,19 @@ public:
     // Analyze vertex shader and extract input signature (in shader-expected order!)
     static VertexInputSignature AnalyzeVertexShader(
         ID3D11VertexShader* vs,
-        ID3DBlob* bytecode);
+        const void* bytecode,
+        size_t bytecodeSize);
 
     // Analyze pixel shader and extract RT bindings
     static ShaderRTBindings AnalyzePixelShader(
         ID3D11PixelShader* ps,
-        ID3DBlob* bytecode);
+        const void* bytecode,
+        size_t bytecodeSize);
 
     // Analyze shader constant buffers (works for VS/PS/CS)
-    static ShaderConstantBuffers AnalyzeConstantBuffers(ID3DBlob* bytecode);
+    static ShaderConstantBuffers AnalyzeConstantBuffers(
+        const void* bytecode,
+        size_t bytecodeSize);
 
     // Infer render phase from shader bindings
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);

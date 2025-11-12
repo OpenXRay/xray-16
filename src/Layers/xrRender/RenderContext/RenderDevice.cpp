@@ -3,6 +3,7 @@
 #include "RenderContext.h"
 #include "../NVRHI/NVRHIDevice.h"
 #include "../ResourceManager/FGResourceManager.h"
+#include "../Shaders/SlangCompiler.h"
 
 namespace xray::render::ng {
 
@@ -27,6 +28,10 @@ nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
     return m_nvrhiDevice ? m_nvrhiDevice->GetCommandList() : nullptr;
 }
 
+xray::render::SlangCompiler* RenderDevice::GetSlangCompiler() const {
+    return m_slangCompiler.get();
+}
+
 // ═══════════════════════════════════════════════════
 //  INITIALIZATION
 // ═══════════════════════════════════════════════════
@@ -44,6 +49,14 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
 
     // Create pipeline state cache
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
+
+    // Create Slang compiler
+    m_slangCompiler = xr_make_unique<xray::render::SlangCompiler>();
+    if (!m_slangCompiler->Initialize()) {
+        Msg("! [RenderDevice] Failed to initialize Slang compiler");
+        return false;
+    }
+    Msg("* [RenderDevice] Slang compiler initialized");
 
     // Create modern resource manager (Week 2-3)
     m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);

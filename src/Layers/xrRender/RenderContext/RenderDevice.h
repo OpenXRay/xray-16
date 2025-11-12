@@ -4,9 +4,13 @@
 #include "PipelineState.h"
 #include <nvrhi/nvrhi.h>
 
-// Forward declare FGResourceManager (outside ng namespace!)
+// Forward declarations
 namespace xray::render::resources {
     class FGResourceManager;
+}
+
+namespace xray::render {
+    class SlangCompiler;
 }
 
 namespace xray::render::ng {
@@ -38,6 +42,9 @@ public:
 
     // Get the immediate command list for direct rendering (e.g., ImGui)
     nvrhi::ICommandList* GetImmediateCommandList() const;
+
+    // Get the Slang shader compiler
+    xray::render::SlangCompiler* GetSlangCompiler() const;
 
     // Upload data to a raw NVRHI texture (for ImGui and other external systems)
     void UploadTextureDataToNVRHI(
@@ -320,6 +327,9 @@ private:
 
     // Modern resource manager (Week 2-3)
     xr_unique_ptr<xray::render::resources::FGResourceManager> m_modernResourceManager;
+
+    // Slang shader compiler
+    xr_unique_ptr<xray::render::SlangCompiler> m_slangCompiler;
 
     // Persistent command list for upload operations (texture/buffer uploads)
     // Created once during Init(), reused for all uploads, released in destructor
