@@ -43,6 +43,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraph/FGTest.cpp
     ../xrRender/FrameGraph/ShaderLoader.h
     ../xrRender/FrameGraph/ShaderLoader.cpp
+    ../xrRender/FrameGraph/ShaderCache.h
+    ../xrRender/FrameGraph/ShaderCache.cpp
     ../xrRender/FrameGraph/VolatileConstantBufferPool.h
     ../xrRender/FrameGraph/VolatileConstantBufferPool.cpp
 

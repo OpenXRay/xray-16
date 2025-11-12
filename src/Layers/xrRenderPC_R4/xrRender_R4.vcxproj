@@ -275,6 +275,7 @@
     <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
     <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
@@ -526,6 +527,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderCache.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />

@@ -45,16 +45,18 @@ nvrhi::Format GetFormatFromSignature(const D3D11_SIGNATURE_PARAMETER_DESC& param
 }
 VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     ID3D11VertexShader* vs,
-    ID3DBlob* bytecode) {
+    const void* bytecode,
+    size_t bytecodeSize) {
 
     VERIFY(bytecode);
+    VERIFY(bytecodeSize > 0);
 
     VertexInputSignature signature;
 
     ID3D11ShaderReflection* reflection = nullptr;
     HRESULT hr = D3DReflect(
-        bytecode->GetBufferPointer(),
-        bytecode->GetBufferSize(),
+        bytecode,
+        bytecodeSize,
         IID_ID3D11ShaderReflection,
         (void**)&reflection
     );
@@ -96,15 +98,18 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     return signature;
 }
 
-ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(ID3DBlob* bytecode) {
+ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(
+    const void* bytecode,
+    size_t bytecodeSize) {
     VERIFY(bytecode);
+    VERIFY(bytecodeSize > 0);
 
     ShaderConstantBuffers result;
 
     ID3D11ShaderReflection* reflection = nullptr;
     HRESULT hr = D3DReflect(
-        bytecode->GetBufferPointer(),
-        bytecode->GetBufferSize(),
+        bytecode,
+        bytecodeSize,
         IID_ID3D11ShaderReflection,
         (void**)&reflection
     );
@@ -161,16 +166,18 @@ ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(ID3DBlob* bytecode
 
 ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     ID3D11PixelShader* ps,
-    ID3DBlob* bytecode) {
+    const void* bytecode,
+    size_t bytecodeSize) {
 
     VERIFY(bytecode);
+    VERIFY(bytecodeSize > 0);
 
     ShaderRTBindings bindings;
 
     ID3D11ShaderReflection* reflection = nullptr;
     HRESULT hr = D3DReflect(
-        bytecode->GetBufferPointer(),
-        bytecode->GetBufferSize(),
+        bytecode,
+        bytecodeSize,
         IID_ID3D11ShaderReflection,
         (void**)&reflection
     );

@@ -1,59 +1,24 @@
 #include "stdafx.h"
 #include "ShaderLoader.h"
 #include "xrCore/FileCRC32.h"
-#include <d3dcompiler.h>
 
 namespace xray::render::framegraph {
 
-class ShaderIncluder : public ID3DInclude {
-public:
-    HRESULT __stdcall Open(
-        D3D10_INCLUDE_TYPE IncludeType,
-        LPCSTR pFileName,
-        LPCVOID pParentData,
-        LPCVOID* ppData,
-        UINT* pBytes) override
-    {
-        string_path pname;
-        strconcat(pname, "r3" DELIMITER, pFileName);
-        IReader* R = FS.r_open("$game_shaders$", pname);
-
-        if (nullptr == R)
-        {
-            R = FS.r_open("$game_shaders$", pFileName);
-            if (nullptr == R)
-                return E_FAIL;
-        }
-
-        const size_t size = R->length();
-        u8* data = xr_alloc<u8>(size + 1);
-        CopyMemory(data, R->pointer(), size);
-        data[size] = 0;
-        FS.r_close(R);
-
-        *ppData = data;
-        *pBytes = size;
-        return D3D_OK;
-    }
-
-    HRESULT __stdcall Close(LPCVOID pData) override
-    {
-        auto mutableData = const_cast<LPVOID>(pData);
-        xr_free(mutableData);
-        return D3D_OK;
-    }
-};
-
-ShaderLoader::ShaderLoader(ng::RenderDevice* device)
+ShaderLoader::ShaderLoader(ng::RenderDevice* device, xray::render::SlangCompiler* slangCompiler)
     : m_device(device)
+    , m_slangCompiler(slangCompiler)
 {
     VERIFY(m_device != nullptr);
-    Msg("* [ShaderLoader] Created");
+    VERIFY(m_slangCompiler != nullptr);
+    VERIFY(m_slangCompiler->IsInitialized());
+    Msg("* [ShaderLoader] Created (using Slang compiler)");
 }
 
 ShaderLoader::~ShaderLoader()
 {
-    Msg("* [ShaderLoader] Destroyed");
+    const auto& stats = m_cache.GetStats();
+    Msg("* [ShaderLoader] Destroyed (Cache - Hits: %u, Misses: %u, Saves: %u)",
+        stats.hits, stats.misses, stats.saves);
 }
 
 IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
@@ -69,80 +34,63 @@ IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
     return R;
 }
 
-ID3DBlob* ShaderLoader::CompileShader(
-    const char* shaderPath,
+bool ShaderLoader::CompileShader(
+    const char* shaderName,
+    const char* extension,
     const char* entryPoint,
-    const char* target)
+    xray::render::SlangCompiler::Stage stage,
+    xr_vector<u8>& outBytecode)
 {
-    Msg("~ [ShaderLoader] Compiling shader: %s (entry: %s, target: %s)",
-        shaderPath, entryPoint, target);
-
-    IReader* fs = FS.r_open("$game_shaders$", shaderPath);
+    IReader* fs = OpenShaderFile(shaderName, extension);
     if (!fs)
+        return false;
+
+    u32 sourceHash = ShaderCache::ComputeHash(
+        (const char*)fs->pointer(),
+        fs->length()
+    );
+
+    if (m_cache.TryLoad(shaderName, extension, sourceHash, outBytecode))
     {
-        Msg("! [ShaderLoader] Failed to open: %s", shaderPath);
-        return nullptr;
+        fs->close();
+        return true;
     }
 
-    UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#ifdef DEBUG
-    flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-    flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#endif
+    Msg("~ [ShaderLoader] Compiling %s%s (entry: %s, stage: %s)",
+        shaderName, extension, entryPoint,
+        xray::render::SlangCompiler::GetStageName(stage));
 
-    D3D_SHADER_MACRO macros[] = {
-        { "SM_5", "1" },
-        { nullptr, nullptr }
-    };
-
-    ShaderIncluder includer;
-    ID3DBlob* shaderBlob = nullptr;
-    ID3DBlob* errorBlob = nullptr;
-
-    HRESULT hr = D3DCompile(
-        fs->pointer(),
-        fs->length(),
-        shaderPath,
-        macros,
-        &includer,
+    auto result = m_slangCompiler->CompileFromSource(
+        (const char*)fs->pointer(),
         entryPoint,
-        target,
-        flags,
-        0,
-        &shaderBlob,
-        &errorBlob
+        stage,
+        xray::render::SlangCompiler::Target::DXBC,
+        shaderName
     );
 
     fs->close();
 
-    if (FAILED(hr))
+    if (!result.IsValid())
     {
-        Msg("! [ShaderLoader] Compilation failed for: %s", shaderPath);
-        if (errorBlob)
-        {
-            Msg("! Error: %s", (const char*)errorBlob->GetBufferPointer());
-            errorBlob->Release();
-        }
-        return nullptr;
+        Msg("! [ShaderLoader] Compilation failed for %s%s", shaderName, extension);
+        if (!result.errorMessage.empty())
+            Msg("! Error: %s", result.errorMessage.c_str());
+        return false;
     }
 
-    if (errorBlob)
-        errorBlob->Release();
+    outBytecode = std::move(result.bytecode);
+    m_cache.Save(shaderName, extension, sourceHash, outBytecode);
 
-    Msg("  ✓ Compiled %s successfully (%u bytes)",
-        shaderPath, (u32)shaderBlob->GetBufferSize());
-
-    return shaderBlob;
+    return true;
 }
 
-nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(const char* name, const char* entryPoint, ID3DBlob** outBytecode)
+nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(
+    const char* name,
+    const char* entryPoint,
+    xr_vector<u8>* outBytecode)
 {
-    string_path shaderPath;
-    strconcat(sizeof(shaderPath), shaderPath, "r3" DELIMITER, name, ".vs");
-
-    ID3DBlob* bytecode = CompileShader(shaderPath, entryPoint, "vs_5_0");
-    if (!bytecode)
+    xr_vector<u8> bytecode;
+    if (!CompileShader(name, ".vs", entryPoint, xray::render::SlangCompiler::Stage::Vertex, bytecode))
         return nullptr;
 
     nvrhi::ShaderDesc desc;
@@ -151,34 +99,30 @@ nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(const char* name, const char*
 
     nvrhi::ShaderHandle shader = m_device->GetNVRHIDevice()->createShader(
         desc,
-        bytecode->GetBufferPointer(),
-        bytecode->GetBufferSize()
+        bytecode.data(),
+        bytecode.size()
     );
 
     if (!shader)
     {
         Msg("! [ShaderLoader] Failed to create NVRHI vertex shader: %s", name);
-        bytecode->Release();
         return nullptr;
     }
 
-    if (outBytecode) {
-        *outBytecode = bytecode;
-    } else {
-        bytecode->Release();
-    }
+    if (outBytecode)
+        *outBytecode = std::move(bytecode);
 
-    Msg("  ✓ Loaded vertex shader: %s", name);
+    Msg("  ✓ Loaded vertex shader: %s (%zu bytes)", name, bytecode.size());
     return shader;
 }
 
-nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(const char* name, const char* entryPoint, ID3DBlob** outBytecode)
+nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(
+    const char* name,
+    const char* entryPoint,
+    xr_vector<u8>* outBytecode)
 {
-    string_path shaderPath;
-    strconcat(sizeof(shaderPath), shaderPath, "r3" DELIMITER, name, ".ps");
-
-    ID3DBlob* bytecode = CompileShader(shaderPath, entryPoint, "ps_5_0");
-    if (!bytecode)
+    xr_vector<u8> bytecode;
+    if (!CompileShader(name, ".ps", entryPoint, xray::render::SlangCompiler::Stage::Pixel, bytecode))
         return nullptr;
 
     nvrhi::ShaderDesc desc;
@@ -187,24 +131,20 @@ nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(const char* name, const char* 
 
     nvrhi::ShaderHandle shader = m_device->GetNVRHIDevice()->createShader(
         desc,
-        bytecode->GetBufferPointer(),
-        bytecode->GetBufferSize()
+        bytecode.data(),
+        bytecode.size()
     );
 
     if (!shader)
     {
         Msg("! [ShaderLoader] Failed to create NVRHI pixel shader: %s", name);
-        bytecode->Release();
         return nullptr;
     }
 
-    if (outBytecode) {
-        *outBytecode = bytecode;
-    } else {
-        bytecode->Release();
-    }
+    if (outBytecode)
+        *outBytecode = std::move(bytecode);
 
-    Msg("  ✓ Loaded pixel shader: %s", name);
+    Msg("  ✓ Loaded pixel shader: %s (%zu bytes)", name, bytecode.size());
     return shader;
 }
 

@@ -8,6 +8,10 @@ namespace xray::render::resources {
     class FGResourceManager;
 }
 
+namespace xray::render {
+    class SlangCompiler;
+}
+
 namespace xray::render::ng {
 
 class RenderContext;
@@ -26,6 +30,8 @@ public:
     nvrhi::IDevice* GetNVRHIDevice() const;
 
     nvrhi::ICommandList* GetImmediateCommandList() const;
+
+    xray::render::SlangCompiler* GetSlangCompiler() const;
 
     void UploadTextureDataToNVRHI(
         nvrhi::ITexture* texture,
@@ -242,6 +248,8 @@ private:
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
 
     xr_unique_ptr<xray::render::resources::FGResourceManager> m_modernResourceManager;
+
+    xr_unique_ptr<xray::render::SlangCompiler> m_slangCompiler;
 
     nvrhi::CommandListHandle m_uploadCommandList;
 

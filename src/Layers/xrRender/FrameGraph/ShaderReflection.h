@@ -104,13 +104,17 @@ class ShaderReflector {
 public:
     static VertexInputSignature AnalyzeVertexShader(
         ID3D11VertexShader* vs,
-        ID3DBlob* bytecode);
+        const void* bytecode,
+        size_t bytecodeSize);
 
     static ShaderRTBindings AnalyzePixelShader(
         ID3D11PixelShader* ps,
-        ID3DBlob* bytecode);
+        const void* bytecode,
+        size_t bytecodeSize);
 
-    static ShaderConstantBuffers AnalyzeConstantBuffers(ID3DBlob* bytecode);
+    static ShaderConstantBuffers AnalyzeConstantBuffers(
+        const void* bytecode,
+        size_t bytecodeSize);
 
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);
 

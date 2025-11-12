@@ -3,6 +3,7 @@
 #include "RenderContext.h"
 #include "../NVRHI/NVRHIDevice.h"
 #include "../ResourceManager/FGResourceManager.h"
+#include "../Shaders/SlangCompiler.h"
 
 namespace xray::render::ng {
 
@@ -23,6 +24,10 @@ nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
     return m_nvrhiDevice ? m_nvrhiDevice->GetCommandList() : nullptr;
 }
 
+xray::render::SlangCompiler* RenderDevice::GetSlangCompiler() const {
+    return m_slangCompiler.get();
+}
+
 bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context) {
     VERIFY(device);
     VERIFY(context);
@@ -34,6 +39,13 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     }
 
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
+
+    m_slangCompiler = xr_make_unique<xray::render::SlangCompiler>();
+    if (!m_slangCompiler->Initialize()) {
+        Msg("! [RenderDevice] Failed to initialize Slang compiler");
+        return false;
+    }
+    Msg("* [RenderDevice] Slang compiler initialized");
 
     m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
     Msg("* [RenderDevice] FGResourceManager initialized");
