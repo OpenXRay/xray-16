@@ -124,11 +124,7 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_framegraph->Compile();
 
-    // Register with Device render sequencer so OnRender() gets called
-    // Priority 0 = middle of render sequence (after setup, before UI)
-    Device.seqRender.Add(this, 0);
-
-    Msg("  ✓ FrameGraphRenderer initialized and registered with seqRender");
+    Msg("* [FrameGraphRenderer] initialized");
 
     return true;
 }
@@ -137,9 +133,6 @@ void FrameGraphRenderer::Shutdown() {
     if (!m_device) return;
 
     Msg("* [FrameGraphRenderer] Shutting down");
-
-    // Unregister from Device render sequencer
-    Device.seqRender.Remove(this);
 
     // Clear global geometry collector pointer
     g_geometryCollector = nullptr;
@@ -1680,22 +1673,6 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     }
 
     Msg("! [FrameGraphRenderer] Batch routing complete");
-}
-
-// ═══════════════════════════════════════════════════════
-//  SEQRENDER INTERFACE (Device calls this)
-// ═══════════════════════════════════════════════════════
-
-void FrameGraphRenderer::OnRender() {
-    if (!m_enabled) return;
-
-    // This is called by Device.seqRender.Process()
-    // Skip if main menu is active or no level loaded (main menu uses RenderMenu() instead)
-    if (g_pGamePersistent->MainMenuActiveOrLevelNotExist())
-        return;
-
-    // Forward to our internal Render() implementation
-    Render();
 }
 
 // ═══════════════════════════════════════════════════════

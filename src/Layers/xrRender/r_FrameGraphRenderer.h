@@ -37,7 +37,7 @@ using RENDER_NAMESPACE::dxRender_Visual;
 //  FRAMEGRAPH RENDERER
 // ══════════════════════════════════════════════════════════
 
-class FrameGraphRenderer: public IFrameGraphRender, public pureRender {
+class FrameGraphRenderer: public IFrameGraphRender{
 public:
     FrameGraphRenderer();
     ~FrameGraphRenderer();
@@ -51,9 +51,6 @@ public:
     void RenderMenu() override;
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
-
-    // seqRender interface (called by Device.seqRender.Process)
-    void OnRender();
 
     // Render ImGui onto final output (called after FrameGraph execution)
     void RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRHI* imguiRenderer);
