@@ -25,29 +25,29 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -577,6 +577,9 @@
     <ProjectReference Include="..\..\..\Externals\nvrhi\vs_build\nvrhi-d3d11.vcxproj" Condition="Exists('..\..\..\Externals\nvrhi\vs_build\nvrhi-d3d11.vcxproj')">
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\slang\vs_build\slang.vcxproj" Condition="Exists('..\..\..\Externals\slang\vs_build\slang.vcxproj')">
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -591,6 +594,26 @@
     <Import Project="..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" />
     <Import Project="..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
+  <Target Name="ConfigureAndBuildSlang" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <SlangBuildDir>$(xrExternals)slang\vs_build</SlangBuildDir>
+      <SlangCMakeOptions>-DSLANG_ENABLE_CUDA=OFF -DSLANG_ENABLE_OPTIX=OFF -DSLANG_ENABLE_NVAPI=OFF -DSLANG_ENABLE_XLIB=OFF -DSLANG_ENABLE_DXIL=ON -DSLANG_ENABLE_GFX=OFF -DSLANG_ENABLE_SLANGD=OFF -DSLANG_ENABLE_SLANGC=OFF -DSLANG_ENABLE_SLANGI=OFF -DSLANG_ENABLE_SLANGRT=OFF -DSLANG_ENABLE_TESTS=OFF -DSLANG_ENABLE_EXAMPLES=OFF -DSLANG_ENABLE_REPLAYER=OFF -DSLANG_ENABLE_PREBUILT_BINARIES=OFF "-DCMAKE_CXX_FLAGS=/MP"</SlangCMakeOptions>
+      <!-- Map OpenXRay configurations to CMake standard configurations -->
+      <SlangConfig Condition="'$(Configuration)'=='Debug'">Debug</SlangConfig>
+      <SlangConfig Condition="'$(Configuration)'=='Mixed'">Release</SlangConfig>
+      <SlangConfig Condition="'$(Configuration)'=='Release'">Release</SlangConfig>
+      <SlangConfig Condition="'$(Configuration)'=='Release Master Gold'">Release</SlangConfig>
+    </PropertyGroup>
+    <!-- Configure Slang with CMake if vs_build doesn't exist -->
+    <Exec Command="cmake -A x64 $(SlangCMakeOptions) -S $(xrExternals)slang -B $(SlangBuildDir)" Condition="!Exists('$(SlangBuildDir)\slang.sln')" />
+    <!-- Build Slang for current configuration with parallel jobs -->
+    <PropertyGroup>
+      <SlangParallelCount>$([System.Environment]::ProcessorCount)</SlangParallelCount>
+    </PropertyGroup>
+    <Message Text="[Slang Build] Processor Count: $(SlangParallelCount)" Importance="high" />
+    <Message Text="[Slang Build] Build Command: cmake --build $(SlangBuildDir) --config $(SlangConfig) --target slang --parallel $(SlangParallelCount)" Importance="high" />
+    <Exec Command="cmake --build $(SlangBuildDir) --config $(SlangConfig) --target slang --parallel $(SlangParallelCount)" Condition="Exists('$(SlangBuildDir)\slang.sln')" />
+  </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>

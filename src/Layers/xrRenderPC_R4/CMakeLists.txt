@@ -104,6 +104,7 @@ target_include_directories(xrRenderPC_R4
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/sdk/include"
     "${CMAKE_SOURCE_DIR}/Externals/nvrhi/include"
+    "${CMAKE_SOURCE_DIR}/Externals/slang/include"
 )
 
 target_link_libraries(xrRenderPC_R4
@@ -117,6 +118,7 @@ target_link_libraries(xrRenderPC_R4
     xrMiscMath
     nvrhi
     nvrhi-d3d11
+    slang
 )
 
 target_compile_definitions(xrRenderPC_R4
