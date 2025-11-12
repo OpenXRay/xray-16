@@ -12,7 +12,7 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
     shader = RImplementation.o.msaa ? L->s_point_msaa[0] : L->s_point;
     shader_accum_mask = RImplementation.o.msaa ? s_accum_mask_msaa[0] : s_accum_mask;
     if (!shader)
-        shader = RImplementation.o.msaa ? s_accum_point : s_accum_point_msaa[0];
+        shader = RImplementation.o.msaa ? s_accum_point_msaa[0]: s_accum_point;
 #else
     shader = L->s_point;
     shader_accum_mask = s_accum_mask;
@@ -186,18 +186,13 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
         u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
         cmd_list.set_Element(shader_accum_mask->E[SE_MASK_ACCUM_VOL]);
         cmd_list.set_c("m_texgen", m_Texgen);
-        if (!RImplementation.o.msaa)
-        {
-            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
-            draw_volume(cmd_list, L);
-        }
-        else // checked Holger
+#ifdef USE_DX11
+        if (RImplementation.o.msaa)
         {
             // per pixel
             cmd_list.set_CullMode(D3DCULL_CW);
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(cmd_list, L);
-#ifdef USE_DX11
             if (RImplementation.o.msaa_opt)
             {
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
@@ -211,7 +206,6 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
             }
             else
-#endif
             {
                 // per sample
                 cmd_list.set_Element(shader_accum_mask->E[SE_MASK_ACCUM_VOL]);
@@ -220,6 +214,12 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
                 draw_volume(cmd_list, L);
             }
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+        }
+        else
+#endif
+        {
+            cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+            draw_volume(cmd_list, L);
         }
     }
 

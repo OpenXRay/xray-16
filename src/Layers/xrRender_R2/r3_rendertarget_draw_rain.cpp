@@ -237,7 +237,11 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         u_setrtzb(cmd_list, rt_Accumulator, rt_MSAADepth);
 
         // u_setrt	(rt_Normal,NULL,NULL,get_base_zb());
-        cmd_list.set_Element(s_rain->E[1]);
+        ref_shader shader_rain = s_rain;
+#ifdef USE_OGL
+        shader_rain = RImplementation.o.msaa ? s_rain_msaa[0] : s_rain;
+#endif
+        cmd_list.set_Element(shader_rain->E[1]);
         cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0.f);
         cmd_list.set_c("WorldZ", W_dirZ.x, W_dirZ.y, W_dirZ.z, 0.f);
@@ -245,12 +249,8 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         cmd_list.set_c("m_sunmask", m_clouds_shadow);
         cmd_list.set_c("RainDensity", fRainFactor, 0.f, 0.f, 0.f);
         cmd_list.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0.f, 0.f);
-        if (!RImplementation.o.msaa)
-        {
-            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
-            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-        }
-        else
+#ifdef USE_DX11
+        if (RImplementation.o.msaa)
         {
             // per pixel execution
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
@@ -273,7 +273,6 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             }
             else
             {
-#if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_rain_msaa[i]->E[0]);
@@ -290,16 +289,17 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
                     cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
-#elif defined(USE_OGL)
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#else
-#   error No graphics API selected or enabled!
-#endif
             }
+        }
+        else
+#endif
+        {
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
         }
 
         //	Apply normal
-        cmd_list.set_Element(s_rain->E[2]);
+        cmd_list.set_Element(shader_rain->E[2]);
         cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("m_shadow", m_shadow);
         cmd_list.set_c("m_sunmask", m_clouds_shadow);
@@ -316,12 +316,8 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             u_setrtzb(cmd_list, rt_Position, rt_MSAADepth);
         }
 
-        if (!RImplementation.o.msaa)
-        {
-            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
-            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-        }
-        else
+#ifdef USE_DX11
+        if (RImplementation.o.msaa)
         {
             // per pixel execution
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
@@ -337,7 +333,6 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             }
             else
             {
-#if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_rain_msaa[i]->E[1]);
@@ -347,16 +342,17 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
                     cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
-#elif defined(USE_OGL)
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#else
-#   error No graphics API selected or enabled!
-#endif
             }
+        }
+        else
+#endif
+        {
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
         }
 
         //	Apply gloss
-        cmd_list.set_Element(s_rain->E[3]);
+        cmd_list.set_Element(shader_rain->E[3]);
         cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("m_shadow", m_shadow);
         cmd_list.set_c("m_sunmask", m_clouds_shadow);
@@ -365,12 +361,8 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_ALL );
         u_setrtzb(cmd_list, rt_Color, rt_MSAADepth);
 
-        if (!RImplementation.o.msaa)
-        {
-            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
-            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
-        }
-        else
+#ifdef USE_DX11
+        if (RImplementation.o.msaa)
         {
             // per pixel execution
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x81, 0);
@@ -385,7 +377,6 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
             }
             else
             {
-#if defined(USE_DX11)
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_rain_msaa[i]->E[2]);
@@ -394,12 +385,13 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
                     cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
                 }
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
-#elif defined(USE_OGL)
-                VERIFY(!"Only optimized MSAA is supported in OpenGL");
-#else
-#   error No graphics API selected or enabled!
-#endif
             }
+        }
+        else
+#endif
+        {
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
+            cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 3, 0, 1);
         }
 
         //	TODO: DX11: Check if DX11 has analog for NV DBT

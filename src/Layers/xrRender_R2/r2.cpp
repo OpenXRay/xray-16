@@ -424,9 +424,13 @@ void CRender::create()
     // TODO: OGL: temporary disabled, need to fix it
     o.msaa = true;
     o.msaa_samples = 4;
-    o.msaa_opt = o.msaa;
-    o.msaa_hybrid = false;
+
     if (!o.msaa) o.msaa_samples = 0;
+    // Important! DX10 related, for OpenGL same as o.msaa
+    // It's messing with shader predefines
+    o.msaa_opt = o.msaa;
+    // Important! DX10 related, for OpenGL always false
+    o.msaa_hybrid = false;
 #else
 #   error No graphics API selected or enabled!
 #endif
