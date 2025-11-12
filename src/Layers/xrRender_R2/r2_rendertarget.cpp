@@ -646,7 +646,7 @@ CRenderTarget::CRenderTarget()
 #ifdef USE_OGL
         u_setrtzb(RCache, get_base_rt(), get_base_zb());
 #else
-        u_setrt(RCache, get_base_rt(), nullptr, nullptr, nullptr, get_base_zb());
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, get_base_zb());
 #endif
     }
 

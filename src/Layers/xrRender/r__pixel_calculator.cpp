@@ -17,7 +17,7 @@ void r_pixel_calculator::begin()
     zb.create("$user$pixel_calculator_zb", rt_dimensions, rt_dimensions, HW.Caps.fDepth, 1, { CRT::CreateSurface });
 
 #ifdef USE_DX11
-    RCache.set_RT(rt);
+    RCache.set_RT(rt->pRT);
     RCache.set_ZB(zb->pZRT[RCache.context_id]);
 #elif defined(USE_OGL)
     RCache.set_RT(rt, 0);

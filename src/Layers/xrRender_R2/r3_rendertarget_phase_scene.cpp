@@ -25,7 +25,7 @@ void CRenderTarget::phase_scene_prepare()
 #ifdef USE_OGL
         u_setrtzb(RCache, rt_Position,rt_MSAADepth);
 #else
-        u_setrt(RCache, rt_Position, nullptr, nullptr, rt_MSAADepth);
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth);
 #endif
 
         const Fcolor color{}; // black
@@ -50,7 +50,7 @@ void CRenderTarget::phase_scene_prepare()
 #ifdef USE_OGL
         u_setrtzb(RCache, get_base_rt(),rt_MSAADepth);
 #else
-        u_setrt(RCache, get_base_rt(), nullptr, nullptr, rt_MSAADepth);
+        u_setrt(RCache, Device.dwWidth, Device.dwHeight, get_base_rt(), 0, 0, rt_MSAADepth);
 #endif
         RCache.ClearZB(rt_MSAADepth, 1.0f, 0);
     }
