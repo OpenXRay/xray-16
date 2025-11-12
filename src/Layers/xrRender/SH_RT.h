@@ -28,7 +28,11 @@ public:
     void set_slice_read(int slice);
     void set_slice_write(u32 context_id, int slice);
 
-    void resolve_into(ref_rt& destination) const; // only RTs with same format supported
+#ifdef USE_OGL
+    void resolve_into(ref_rt& destination) const;
+#else
+    void resolve_into(CRT& destination) const; // only RTs with same format supported
+#endif
 
 public:
 #if defined(USE_DX11)

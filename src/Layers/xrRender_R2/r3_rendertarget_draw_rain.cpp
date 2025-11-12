@@ -312,12 +312,20 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         {
             //	Do this in blender!
             // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN | D3D_COLOR_WRITE_ENABLE_BLUE );
+#ifdef USE_OGL
             u_setrtzb(cmd_list, rt_Normal, rt_MSAADepth);
+#else
+            u_setrt(cmd_list, rt_Normal, nullptr, nullptr, rt_MSAADepth);
+#endif
         }
         else
         {
             // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_RED | D3D_COLOR_WRITE_ENABLE_GREEN );
+#ifdef USE_OGL
             u_setrtzb(cmd_list, rt_Position, rt_MSAADepth);
+#else
+            u_setrt(cmd_list, rt_Position, nullptr, nullptr, rt_MSAADepth);
+#endif
         }
 
 #ifdef USE_DX11
@@ -363,7 +371,11 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
 
         //	It is restored automatically by a set_Element call
         // StateManager.SetColorWriteEnable( D3D_COLOR_WRITE_ENABLE_ALL );
+#ifdef USE_OGL
         u_setrtzb(cmd_list, rt_Color, rt_MSAADepth);
+#else
+        u_setrt(cmd_list, rt_Color, nullptr, nullptr, rt_MSAADepth);
+#endif
 
 #ifdef USE_DX11
         if (RImplementation.o.msaa)

@@ -643,7 +643,11 @@ CRenderTarget::CRenderTarget()
             rt_LUM_pool[it].create(name, 1, 1, D3DFMT_R32F);
             RCache.ClearRT(rt_LUM_pool[it], 0x7f7f7f7f);
         }
+#ifdef USE_OGL
         u_setrtzb(RCache, get_base_rt(), get_base_zb());
+#else
+        u_setrt(RCache, get_base_rt(), nullptr, nullptr, nullptr, get_base_zb());
+#endif
     }
 
     // COMBINE
