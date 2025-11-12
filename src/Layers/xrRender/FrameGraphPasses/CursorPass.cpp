@@ -106,7 +106,6 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
 
         // Collect cursor (must be last so it renders on top)
         g_pGamePersistent->OnRenderCursor();
-        Msg("  [CursorPass] Collected %zu cursor batches", m_uiCollector->GetBatches().size());
 
         // Restore original renderer
         GEnv.UIRender = oldRenderer;
@@ -140,7 +139,6 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     m_cursorStats.cpuTimeMs = std::chrono::duration<float, std::milli>(executeEnd - executeStart).count();
 
     cmdList->endMarker();
-    Msg("  [CursorPass] Execute complete (%.2f ms, %u batches)", m_cursorStats.cpuTimeMs, m_cursorStats.numBatches);
 }
 
 } // namespace xray::render::passes
