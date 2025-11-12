@@ -58,6 +58,12 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
 void RenderDevice::Shutdown() {
     if (!m_initialized) return;
 
+    if (m_pipelineCache) {
+        m_pipelineCache->Clear();
+        Msg("* [PipelineStateCache] Cleared cache before shutdown");
+    }
+    m_pipelineCache = nullptr;
+
     if (m_stats.texturesAlive > 0) {
         Msg("! [RenderDevice] WARNING: %u textures leaked", m_stats.texturesAlive);
     }
@@ -74,16 +80,14 @@ void RenderDevice::Shutdown() {
     m_uploadCommandList = nullptr;
     Msg("* [RenderDevice] Released upload command list");
 
-    m_pipelineCache.reset();
-
-    m_modernResourceManager.reset();
+    m_modernResourceManager = nullptr;
 
     m_textures.clear();
     m_buffers.clear();
     m_samplers.clear();
     m_shaders.clear();
 
-    m_nvrhiDevice.reset();
+    m_nvrhiDevice = nullptr;
 
     m_initialized = false;
 }
@@ -578,7 +582,7 @@ RenderContext* RenderDevice::CreateContext() {
         return nullptr;
     }
 
-    RenderContext* context = new RenderContext(this, cmdList);
+    RenderContext* context = xr_new<RenderContext>(this, cmdList);
     m_stats.contextsAlive++;
 
     return context;
@@ -587,7 +591,7 @@ RenderContext* RenderDevice::CreateContext() {
 void RenderDevice::DestroyContext(RenderContext* context) {
     if (!context) return;
 
-    delete context;
+    xr_delete(context);
     m_stats.contextsAlive--;
 }
 

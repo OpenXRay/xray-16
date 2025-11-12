@@ -369,7 +369,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
         return nullptr;
     }
 
-    return new PipelineState(desc, nvrhiPipeline);
+    return xr_new<PipelineState>(desc, nvrhiPipeline);
 }
 
 void PipelineStateCache::Clear() {
