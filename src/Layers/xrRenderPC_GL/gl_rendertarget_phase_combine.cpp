@@ -485,9 +485,6 @@ void CRenderTarget::phase_combine()
 
 void CRenderTarget::phase_wallmarks()
 {
-    // Targets
-    RCache.unset_RT(2);
-    RCache.unset_RT(1);
     u_setrtzb(RCache, rt_Color, rt_MSAADepth);
     // Stencil	- draw only where stencil >= 0x1
     RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);

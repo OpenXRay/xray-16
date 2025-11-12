@@ -140,7 +140,6 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
         if (RImplementation.o.msaa)
         {
             // per pixel
-
             cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(cmd_list, L);
 
@@ -149,7 +148,7 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
             {
                 cmd_list.set_Element(shader_msaa[0]->E[_id]);
                 cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
-                //cmd_list.set_CullMode(D3DCULL_CW);
+                cmd_list.set_CullMode(D3DCULL_CW);
                 draw_volume(cmd_list, L);
             }
             else // checked Holger
@@ -195,6 +194,14 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
             draw_volume(cmd_list, L);
             if (RImplementation.o.msaa_opt)
             {
+                // per sample
+                cmd_list.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
+                cmd_list.set_CullMode(D3DCULL_CW);
+                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
+                draw_volume(cmd_list, L);
+            }
+            else // checked Holger
+            {
                 for (u32 i = 0; i < RImplementation.o.msaa_samples; ++i)
                 {
                     cmd_list.set_Element(s_accum_mask_msaa[i]->E[SE_MASK_ACCUM_VOL]);
@@ -204,14 +211,6 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
                     draw_volume(cmd_list, L);
                 }
                 cmd_list.StateManager.SetSampleMask(0xffffffff);
-            }
-            else
-            {
-                // per sample
-                cmd_list.set_Element(shader_accum_mask->E[SE_MASK_ACCUM_VOL]);
-                cmd_list.set_CullMode(D3DCULL_CW);
-                cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
-                draw_volume(cmd_list, L);
             }
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }

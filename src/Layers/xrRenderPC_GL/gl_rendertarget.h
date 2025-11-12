@@ -17,7 +17,6 @@ class CRenderTarget
 {
     u32 dwWidth[R__NUM_CONTEXTS];
     u32 dwHeight[R__NUM_CONTEXTS];
-    u32 target[R__NUM_CONTEXTS];
     u32 dwAccumulatorClearMark;
 
 public:
