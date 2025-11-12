@@ -1,0 +1,78 @@
+#pragma once
+
+#include <slang.h>
+#include <slang-com-ptr.h>
+#include "xrCore/xrstring.h"
+
+namespace render
+{
+
+class SlangCompiler
+{
+public:
+    enum class Target
+    {
+        DXBC,
+        DXIL,
+        SPIRV,
+        GLSL
+    };
+
+    enum class Stage
+    {
+        Vertex,
+        Pixel,
+        Compute,
+        Geometry,
+        Hull,
+        Domain
+    };
+
+    struct CompileResult
+    {
+        bool success = false;
+        xr_vector<u8> bytecode;
+        xr_string errorMessage;
+        xr_string warningMessage;
+
+        bool IsValid() const { return success && !bytecode.empty(); }
+    };
+
+public:
+    SlangCompiler();
+    ~SlangCompiler();
+
+    bool Initialize();
+
+    CompileResult CompileFromSource(
+        const char* source,
+        const char* entryPoint,
+        Stage stage,
+        Target target,
+        const char* sourcePath = "shader.hlsl"
+    );
+
+    CompileResult CompileFromFile(
+        const char* filePath,
+        const char* entryPoint,
+        Stage stage,
+        Target target
+    );
+
+    bool IsInitialized() const { return m_globalSession != nullptr; }
+
+    static const char* GetTargetName(Target target);
+
+    static const char* GetStageName(Stage stage);
+
+private:
+    SlangCompileTarget GetSlangTarget(Target target) const;
+
+    SlangStage GetSlangStage(Stage stage) const;
+
+private:
+    Slang::ComPtr<slang::IGlobalSession> m_globalSession;
+    Slang::ComPtr<slang::ISession> m_session;
+};
+
+}
