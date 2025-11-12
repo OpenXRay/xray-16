@@ -31,3 +31,6 @@
 [submodule "Externals/nvrhi"]
 	path = Externals/nvrhi
 	url = https://github.com/NVIDIAGameWorks/nvrhi.git
+[submodule "Externals/slang"]
+	path = Externals/slang
+	url = https://github.com/shader-slang/slang.git

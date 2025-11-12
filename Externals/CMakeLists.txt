@@ -18,6 +18,27 @@ set(NVRHI_WITH_VALIDATION ON CACHE BOOL "Enable validation layer for development
 set(NVRHI_INSTALL OFF CACHE BOOL "Disable NVRHI install rules")
 add_subdirectory(nvrhi)
 
+# Slang shader compiler
+set(SLANG_ENABLE_CUDA OFF CACHE BOOL "Disable CUDA support")
+set(SLANG_ENABLE_OPTIX OFF CACHE BOOL "Disable OptiX support")
+set(SLANG_ENABLE_NVAPI OFF CACHE BOOL "Disable NVAPI support")
+set(SLANG_ENABLE_XLIB OFF CACHE BOOL "Disable Xlib support")
+set(SLANG_ENABLE_DXIL ON CACHE BOOL "Enable DXIL generation for DX12")
+set(SLANG_ENABLE_GFX OFF CACHE BOOL "Disable slang-gfx (we use NVRHI)")
+set(SLANG_ENABLE_SLANGD OFF CACHE BOOL "Disable language server")
+set(SLANG_ENABLE_SLANGC OFF CACHE BOOL "Disable command line tool")
+set(SLANG_ENABLE_SLANGI OFF CACHE BOOL "Disable interpreter")
+set(SLANG_ENABLE_SLANGRT OFF CACHE BOOL "Disable runtime")
+set(SLANG_ENABLE_TESTS OFF CACHE BOOL "Disable Slang tests")
+set(SLANG_ENABLE_EXAMPLES OFF CACHE BOOL "Disable Slang examples")
+set(SLANG_ENABLE_REPLAYER OFF CACHE BOOL "Disable slang-replay tool")
+set(SLANG_ENABLE_PREBUILT_BINARIES OFF CACHE BOOL "Build from source")
+# Enable parallel compilation for MSVC
+if(MSVC)
+    add_compile_options(/MP)
+endif()
+add_subdirectory(slang)
+
 # Silence all warnings for external libraries
 add_compile_options(${XRAY_DISABLE_WARNINGS})
 
