@@ -91,7 +91,10 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
         return RenderPhase::Geometry;
     }
 
-    ShaderRTBindings bindings = ShaderReflector::AnalyzePixelShader(d3dPS, bytecode);
+    ShaderRTBindings bindings = ShaderReflector::AnalyzePixelShader(
+        d3dPS,
+        bytecode->GetBufferPointer(),
+        bytecode->GetBufferSize());
 
     Msg("! [ShaderPhaseCache] Extracted phase for shader '%s': %s",
         shaderName.c_str(),

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace xray::render::r4::nvrhi_wrapper
+namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
 {
 
 class NVRHIDevice

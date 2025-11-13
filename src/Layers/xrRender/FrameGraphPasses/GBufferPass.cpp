@@ -46,20 +46,12 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 }
 
 GBufferPass::~GBufferPass() {
-    if (m_vertexShaderBytecode) {
-        m_vertexShaderBytecode->Release();
-        m_vertexShaderBytecode = nullptr;
-    }
-    if (m_pixelShaderBytecode) {
-        m_pixelShaderBytecode->Release();
-        m_pixelShaderBytecode = nullptr;
-    }
     Msg("* [GBufferPass] Destroyed");
 }
 
 bool GBufferPass::LoadShaders()
 {
-    ShaderLoader loader(m_device);
+    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
     m_vertexShaderNative = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
     if (!m_vertexShaderNative)
@@ -77,8 +69,8 @@ bool GBufferPass::LoadShaders()
 
     Msg("* [GBufferPass] Analyzing constant buffer requirements...");
 
-    if (m_vertexShaderBytecode) {
-        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode);
+    if (!m_vertexShaderBytecode.empty()) {
+        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode.data(), m_vertexShaderBytecode.size());
         Msg("  → Vertex shader has %u constant buffers", vsCBs.buffers.size());
 
         for (const auto& cbInfo : vsCBs.buffers) {
@@ -91,8 +83,8 @@ bool GBufferPass::LoadShaders()
         }
     }
 
-    if (m_pixelShaderBytecode) {
-        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode);
+    if (!m_pixelShaderBytecode.empty()) {
+        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode.data(), m_pixelShaderBytecode.size());
         Msg("  → Pixel shader has %u constant buffers", psCBs.buffers.size());
 
         for (const auto& cbInfo : psCBs.buffers) {

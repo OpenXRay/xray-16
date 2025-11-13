@@ -2,7 +2,7 @@
 #include "SlangCompilerTest.h"
 #include "SlangCompiler.h"
 
-namespace render
+namespace xray::render
 {
 
 static const char* s_testVertexShader = R"(

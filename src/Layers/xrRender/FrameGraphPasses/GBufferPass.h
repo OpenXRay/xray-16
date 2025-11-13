@@ -79,8 +79,8 @@ private:
     xr_unique_ptr<ng::RCShader> m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
-    ID3DBlob* m_vertexShaderBytecode = nullptr;
-    ID3DBlob* m_pixelShaderBytecode = nullptr;
+    xr_vector<u8> m_vertexShaderBytecode;
+    xr_vector<u8> m_pixelShaderBytecode;
 
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
 

@@ -7,10 +7,9 @@ namespace xray::render::ng {
 
 bool ImGuiRendererNVRHI::CreateShaders()
 {
-    framegraph::ShaderLoader shaderLoader(m_renderDevice);
+    framegraph::ShaderLoader shaderLoader(m_renderDevice, m_renderDevice->GetSlangCompiler());
 
-    ID3DBlob* vsBytecode = nullptr;
-    m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main", &vsBytecode);
+    m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main", nullptr);
 
     if (!m_vertexShader)
     {
@@ -18,18 +17,13 @@ bool ImGuiRendererNVRHI::CreateShaders()
         return false;
     }
 
-    ID3DBlob* psBytecode = nullptr;
-    m_pixelShader = shaderLoader.LoadPixelShader("imgui", "main", &psBytecode);
+    m_pixelShader = shaderLoader.LoadPixelShader("imgui", "main", nullptr);
 
     if (!m_pixelShader)
     {
         Msg("! Failed to create ImGui pixel shader");
-        if (vsBytecode) vsBytecode->Release();
         return false;
     }
-
-    if (vsBytecode) vsBytecode->Release();
-    if (psBytecode) psBytecode->Release();
 
     Msg("* ImGui shaders compiled successfully");
     return true;

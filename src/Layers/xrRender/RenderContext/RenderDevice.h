@@ -15,7 +15,7 @@ namespace xray::render {
 namespace xray::render::ng {
 
 class RenderContext;
-namespace nvrhi_wrapper = r4::nvrhi_wrapper;
+namespace nvrhi_wrapper = xray::render::RENDER_NAMESPACE::nvrhi_wrapper;
 
 class RenderDevice {
 public:

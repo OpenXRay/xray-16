@@ -39,7 +39,7 @@ bool MenuCompositePass::Initialize() {
 
     nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
 
-    framegraph::ShaderLoader shaderLoader(m_device);
+    framegraph::ShaderLoader shaderLoader(m_device, m_device->GetSlangCompiler());
 
     m_vertexShader = shaderLoader.LoadVertexShader("ui_composite");
     m_pixelShader = shaderLoader.LoadPixelShader("ui_composite");
