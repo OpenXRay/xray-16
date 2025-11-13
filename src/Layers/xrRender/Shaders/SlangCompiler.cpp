@@ -91,6 +91,12 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         return result;
     }
 
+    string_path shaderPath;
+    FS.update_path(shaderPath, "$game_shaders$", "r3");
+    request->addSearchPath(shaderPath);
+
+    Msg("~ [SlangCompiler] Added search path: %s", shaderPath);
+
     int translationUnitIndex = request->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, sourcePath);
     request->addTranslationUnitSourceString(translationUnitIndex, sourcePath, source);
 

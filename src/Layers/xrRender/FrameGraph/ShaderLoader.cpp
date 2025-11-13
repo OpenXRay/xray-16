@@ -60,8 +60,11 @@ bool ShaderLoader::CompileShader(
         shaderName, extension, entryPoint,
         xray::render::SlangCompiler::GetStageName(stage));
 
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+
     auto result = m_slangCompiler->CompileFromSource(
-        (const char*)fs->pointer(),
+        sourceCode.c_str(),
         entryPoint,
         stage,
         xray::render::SlangCompiler::Target::DXBC,
