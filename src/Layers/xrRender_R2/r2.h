@@ -40,6 +40,11 @@ namespace xray::render
 class FrameGraphRenderer;
 }
 
+namespace xray::render::framegraph
+{
+class ShaderLoader;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class CRenderTarget;
@@ -561,6 +566,9 @@ public:
 
     // FrameGraph Renderer (Phase 3)
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
+
+    // ShaderLoader for FrameGraph (Slang compiler)
+    framegraph::ShaderLoader* m_shaderLoader{ nullptr };
 
     // ImGui NVRHI Renderer
     xray::render::ng::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };

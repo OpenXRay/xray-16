@@ -19,6 +19,7 @@
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 // Forward declaration for ImGui initialization
 namespace xray::render {
@@ -562,6 +563,11 @@ void CRender::create()
                 {
                     m_framegraphRenderer->SetEnabled(true);
                     Msg("* FrameGraphRenderer enabled (ps_r4_use_framegraph=1)");
+
+                    // Initialize ShaderLoader for Slang compilation
+                    m_shaderLoader = xr_new<framegraph::ShaderLoader>(
+                        m_renderDevice, m_renderDevice->GetSlangCompiler());
+                    Msg("* ShaderLoader initialized (Slang compiler active)");
                 }
             }
             else
@@ -586,6 +592,13 @@ void CRender::destroy()
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
+    // Cleanup ShaderLoader
+    if (m_shaderLoader)
+    {
+        xr_delete(m_shaderLoader);
+        Msg("* ShaderLoader destroyed");
+    }
+
     // Cleanup FrameGraphRenderer and RenderDevice
     if (m_framegraphRenderer)
     {

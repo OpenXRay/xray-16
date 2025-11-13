@@ -53,6 +53,11 @@ public:
     /// </summary>
     const ShaderCache::Stats& GetCacheStats() const { return m_cache.GetStats(); }
 
+    /// <summary>
+    /// Get the underlying SlangCompiler (for direct access)
+    /// </summary>
+    xray::render::SlangCompiler* GetSlangCompiler() const { return m_slangCompiler; }
+
 private:
     /// <summary>
     /// Compile shader from source with caching

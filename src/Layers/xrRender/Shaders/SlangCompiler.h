@@ -7,6 +7,9 @@
 namespace xray::render
 {
 
+// Forward declaration
+class SlangVFSAdapter;
+
 /// <summary>
 /// Slang shader compiler wrapper for cross-platform shader compilation
 /// Compiles HLSL shaders to DXBC (DX11), DXIL (DX12), and SPIR-V (Vulkan)
@@ -116,6 +119,7 @@ private:
 private:
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
+    Slang::ComPtr<ISlangFileSystem> m_vfsAdapter;  // X-Ray VFS integration
 };
 
 } // namespace render

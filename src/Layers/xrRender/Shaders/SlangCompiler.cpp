@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SlangCompiler.h"
+#include "SlangVFSAdapter.h"
 #include "xrCore/xrMemory.h"
 
 namespace xray::render
@@ -29,7 +30,15 @@ bool SlangCompiler::Initialize()
         return false;
     }
 
-    Msg("* [SlangCompiler] Initialized successfully");
+    // Create VFS adapter for X-Ray virtual file system integration
+    m_vfsAdapter = xr_new<SlangVFSAdapter>();
+    if (!m_vfsAdapter)
+    {
+        Msg("! [SlangCompiler] Failed to create VFS adapter");
+        return false;
+    }
+
+    Msg("* [SlangCompiler] Initialized successfully (VFS integration active)");
     return true;
 }
 
@@ -77,6 +86,9 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     sessionDesc.targets = &targetDesc;
     sessionDesc.targetCount = 1;
 
+    // Use VFS adapter for file system operations (includes from VFS)
+    sessionDesc.fileSystem = m_vfsAdapter.get();
+
     Slang::ComPtr<slang::ISession> session;
     SlangResult slangResult = m_globalSession->createSession(sessionDesc, session.writeRef());
     if (SLANG_FAILED(slangResult) || !session)
@@ -96,13 +108,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         return result;
     }
 
-    // Add shader include search paths
-    // Shaders use #include "shared/common.h", so we need to add the shader directory
-    string_path shaderPath;
-    FS.update_path(shaderPath, "$game_shaders$", "r3");  // Use r3 shaders for FrameGraph
-    request->addSearchPath(shaderPath);
-
-    Msg("~ [SlangCompiler] Added search path: %s", shaderPath);
+    // Note: File includes are handled by VFS adapter (no need for addSearchPath)
 
     // Add translation unit (source code)
     int translationUnitIndex = request->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, sourcePath);
