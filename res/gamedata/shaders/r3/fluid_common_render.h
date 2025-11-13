@@ -29,9 +29,9 @@ Texture2D	fireTransferFunction;
 // Samplers
 //--------------------------------------------------------------------------------------
 
-sampler	samPointClamp;
-sampler	samLinearClamp;
-sampler	samRepeat;
+SamplerState	samPointClamp;
+SamplerState	samLinearClamp;
+SamplerState	samRepeat;
 
 //--------------------------------------------------------------------------------------
 // Variables

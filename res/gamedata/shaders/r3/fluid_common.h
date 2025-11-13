@@ -29,8 +29,8 @@ Texture3D	Texture_tempvector;
 // Samplers
 //--------------------------------------------------------------------------------------
 
-sampler	samPointClamp;
-sampler	samLinear;
+SamplerState	samPointClamp;
+SamplerState	samLinear;
 
 //--------------------------------------------------------------------------------------
 // Variables
