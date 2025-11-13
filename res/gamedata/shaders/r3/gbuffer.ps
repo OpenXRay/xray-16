@@ -21,7 +21,7 @@ struct PS_INPUT {
 struct PS_OUTPUT {
     float4 albedo : SV_TARGET0;     // RGB: albedo, A: metallic
     float4 normal : SV_TARGET1;     // RGB: world normal, A: roughness
-    float material : SV_TARGET2;     // Material ID
+    float4 material : SV_TARGET2;     // Material ID (stored in R channel)
 };
 
 // ══════════════════════════════════════════════════════════
@@ -91,7 +91,7 @@ PS_OUTPUT main(PS_INPUT input) {
     //  MATERIAL ID
     // ═══════════════════════════════════════════════════════
 
-    output.material = g_MaterialID;
+    output.material = float4(g_MaterialID, 0, 0, 0);
 
     return output;
 }

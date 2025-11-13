@@ -96,6 +96,14 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         return result;
     }
 
+    // Add shader include search paths
+    // Shaders use #include "shared/common.h", so we need to add the shader directory
+    string_path shaderPath;
+    FS.update_path(shaderPath, "$game_shaders$", "r3");  // Use r3 shaders for FrameGraph
+    request->addSearchPath(shaderPath);
+
+    Msg("~ [SlangCompiler] Added search path: %s", shaderPath);
+
     // Add translation unit (source code)
     int translationUnitIndex = request->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, sourcePath);
     request->addTranslationUnitSourceString(translationUnitIndex, sourcePath, source);

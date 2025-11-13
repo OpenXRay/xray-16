@@ -7,48 +7,48 @@
 #define SHARED_COMMON_H
 
 //	Used by VS
-cbuffer	dynamic_transforms
+cbuffer	dynamic_transforms : register(b0)
 {
-	uniform float4x4		m_WVP;		//	World View Projection composition
-	uniform float3x4		m_WV;
-	uniform float3x4	    m_W;
+	float4x4		m_WVP;		//	World View Projection composition
+	float3x4		m_WV;
+	float3x4	    m_W;
 	//	Used by VS only
-	uniform float4		L_material;	// 0,0,0,mid
-	uniform float4          hemi_cube_pos_faces;
-	uniform float4          hemi_cube_neg_faces;
-	uniform	float4 		dt_params;	//	Detail params
-}
+	float4		L_material;	// 0,0,0,mid
+	float4          hemi_cube_pos_faces;
+	float4          hemi_cube_neg_faces;
+	float4 		dt_params;	//	Detail params
+};
 
-cbuffer	shader_params
+cbuffer	shader_params : register(b2)
 {
 	float	m_AlphaRef;
-}
+};
 
-cbuffer	static_globals
+cbuffer	static_globals : register(b3)
 {
-	uniform float3x4		m_V;
-	uniform float4x4 	m_P;
-	uniform float4x4 	m_VP;
+	float3x4		m_V;
+	float4x4 	m_P;
+	float4x4 	m_VP;
 
-	uniform float4		timers;
+	float4		timers;
 
-	uniform float4		fog_plane;
-	uniform float4		fog_params;		// x=near*(1/(far-near)), ?,?, w = -1/(far-near)
-	uniform float4		fog_color;
+	float4		fog_plane;
+	float4		fog_params;		// x=near*(1/(far-near)), ?,?, w = -1/(far-near)
+	float4		fog_color;
 
-	uniform float4		L_ambient;		// L_ambient.w = skynbox-lerp-factor
-	uniform float3		L_sun_color;
-	uniform float3		L_sun_dir_w;
-	uniform float4		L_hemi_color;
+	float4		L_ambient;		// L_ambient.w = skynbox-lerp-factor
+	float3		L_sun_color;
+	float3		L_sun_dir_w;
+	float4		L_hemi_color;
 
-	uniform float3 		eye_position;
+	float3 		eye_position;
 
-	uniform float4 		pos_decompression_params;
-	uniform float4 		pos_decompression_params2;
+	float4 		pos_decompression_params;
+	float4 		pos_decompression_params2;
 
-	uniform float4		parallax;
-//	uniform float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
-}
+	float4		parallax;
+//	float4		screen_res;		// Screen resolution (x-Width,y-Height, zw - 1/resolution)
+};
 
 /*
 //
