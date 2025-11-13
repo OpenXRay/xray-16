@@ -803,6 +803,10 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\TextPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\UIPass.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\CursorPass.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderCache.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1481,6 +1485,10 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\TextPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\UIPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\CursorPass.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderCache.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangVFSAdapter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

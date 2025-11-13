@@ -27,6 +27,8 @@ public:
 
     const ShaderCache::Stats& GetCacheStats() const { return m_cache.GetStats(); }
 
+    xray::render::SlangCompiler* GetSlangCompiler() const { return m_slangCompiler; }
+
 private:
     bool CompileShader(
         const char* shaderName,

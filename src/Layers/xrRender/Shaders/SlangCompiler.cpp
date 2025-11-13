@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SlangCompiler.h"
+#include "SlangVFSAdapter.h"
 #include "xrCore/xrMemory.h"
 
 namespace xray::render
@@ -27,7 +28,14 @@ bool SlangCompiler::Initialize()
         return false;
     }
 
-    Msg("* [SlangCompiler] Initialized successfully");
+    m_vfsAdapter = xr_new<SlangVFSAdapter>();
+    if (!m_vfsAdapter)
+    {
+        Msg("! [SlangCompiler] Failed to create VFS adapter");
+        return false;
+    }
+
+    Msg("* [SlangCompiler] Initialized successfully (VFS integration active)");
     return true;
 }
 
@@ -73,6 +81,8 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     sessionDesc.targets = &targetDesc;
     sessionDesc.targetCount = 1;
 
+    sessionDesc.fileSystem = m_vfsAdapter.get();
+
     Slang::ComPtr<slang::ISession> session;
     SlangResult slangResult = m_globalSession->createSession(sessionDesc, session.writeRef());
     if (SLANG_FAILED(slangResult) || !session)
@@ -90,12 +100,6 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
         return result;
     }
-
-    string_path shaderPath;
-    FS.update_path(shaderPath, "$game_shaders$", "r3");
-    request->addSearchPath(shaderPath);
-
-    Msg("~ [SlangCompiler] Added search path: %s", shaderPath);
 
     int translationUnitIndex = request->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, sourcePath);
     request->addTranslationUnitSourceString(translationUnitIndex, sourcePath, source);

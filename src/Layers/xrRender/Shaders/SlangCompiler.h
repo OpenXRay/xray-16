@@ -7,6 +7,8 @@
 namespace xray::render
 {
 
+class SlangVFSAdapter;
+
 class SlangCompiler
 {
 public:
@@ -73,6 +75,7 @@ private:
 private:
     Slang::ComPtr<slang::IGlobalSession> m_globalSession;
     Slang::ComPtr<slang::ISession> m_session;
+    Slang::ComPtr<ISlangFileSystem> m_vfsAdapter;
 };
 
 }

@@ -52,6 +52,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Shaders/SlangCompiler.h
     ../xrRender/Shaders/SlangCompiler.cpp
     ../xrRender/Shaders/SlangCompilerTest.cpp
+    ../xrRender/Shaders/SlangVFSAdapter.h
+    ../xrRender/Shaders/SlangVFSAdapter.cpp
 
     # FrameGraph Passes (Phase 3) - Renderer agnostic
     ../xrRender/FrameGraphPasses/GBufferPass.h

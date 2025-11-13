@@ -40,6 +40,11 @@ namespace xray::render
 class FrameGraphRenderer;
 }
 
+namespace xray::render::framegraph
+{
+class ShaderLoader;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class CRenderTarget;
@@ -557,6 +562,8 @@ public:
     xray::render::ng::RenderDevice* m_renderDevice{ nullptr };
 
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };
+
+    framegraph::ShaderLoader* m_shaderLoader{ nullptr };
 
     xray::render::ng::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
     xray::render::ng::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }

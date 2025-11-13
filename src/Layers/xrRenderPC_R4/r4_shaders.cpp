@@ -2,6 +2,8 @@
 #include "r2.h"
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
+#include "Layers/xrRender/Shaders/SlangCompiler.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -501,6 +503,88 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     sh_name.finish();
 
     HRESULT _result = E_FAIL;
+
+    extern ENGINE_API int ps_r4_use_framegraph;
+    if (ps_r4_use_framegraph && m_shaderLoader)
+    {
+        Msg("~ [shader_compile] Compiling with Slang: %s (target: %s)", name, pTarget);
+
+        xray::render::SlangCompiler::Stage stage;
+        char extension[3];
+        strncpy_s(extension, pTarget, 2);
+
+        if (strcmp(extension, "vs") == 0)
+            stage = xray::render::SlangCompiler::Stage::Vertex;
+        else if (strcmp(extension, "ps") == 0)
+            stage = xray::render::SlangCompiler::Stage::Pixel;
+        else if (strcmp(extension, "gs") == 0)
+            stage = xray::render::SlangCompiler::Stage::Geometry;
+        else if (strcmp(extension, "hs") == 0)
+            stage = xray::render::SlangCompiler::Stage::Hull;
+        else if (strcmp(extension, "ds") == 0)
+            stage = xray::render::SlangCompiler::Stage::Domain;
+        else if (strcmp(extension, "cs") == 0)
+            stage = xray::render::SlangCompiler::Stage::Compute;
+        else
+        {
+            Msg("! Unknown shader stage: %s", extension);
+            return E_FAIL;
+        }
+
+        xr_string sourceCode;
+        sourceCode.assign((const char*)fs->pointer(), fs->length());
+
+        string_path fullShaderPath;
+        strconcat(sizeof(fullShaderPath), fullShaderPath, RImplementation.getShaderPath(), name);
+
+        if (strcmp(extension, "vs") == 0)
+            xr_strcat(fullShaderPath, ".vs");
+        else if (strcmp(extension, "ps") == 0)
+            xr_strcat(fullShaderPath, ".ps");
+        else if (strcmp(extension, "gs") == 0)
+            xr_strcat(fullShaderPath, ".gs");
+        else if (strcmp(extension, "hs") == 0)
+            xr_strcat(fullShaderPath, ".hs");
+        else if (strcmp(extension, "ds") == 0)
+            xr_strcat(fullShaderPath, ".ds");
+        else if (strcmp(extension, "cs") == 0)
+            xr_strcat(fullShaderPath, ".cs");
+
+        xray::render::SlangCompiler::CompileResult compileResult =
+            m_shaderLoader->GetSlangCompiler()->CompileFromSource(
+                sourceCode.c_str(),
+                pFunctionName,
+                stage,
+                xray::render::SlangCompiler::Target::DXBC,
+                fullShaderPath
+            );
+
+        if (!compileResult.IsValid())
+        {
+            Msg("! [shader_compile] Slang compilation failed: %s", name);
+            if (!compileResult.errorMessage.empty())
+                Msg("! Error: %s", compileResult.errorMessage.c_str());
+            return E_FAIL;
+        }
+
+        _result = create_shader(
+            pTarget,
+            (DWORD*)compileResult.bytecode.data(),
+            compileResult.bytecode.size(),
+            name,
+            result,
+            o.disasm,
+            false
+        );
+
+        if (SUCCEEDED(_result))
+        {
+            Msg("* [shader_compile] Successfully compiled with Slang: %s (%zu bytes)",
+                name, compileResult.bytecode.size());
+        }
+
+        return _result;
+    }
 
     char extension[3];
     strncpy_s(extension, pTarget, 2);

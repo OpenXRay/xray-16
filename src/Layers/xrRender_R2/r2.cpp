@@ -19,6 +19,7 @@
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render {
     void InitializeImGuiRenderer(ng::RenderDevice* renderDevice);
@@ -556,6 +557,10 @@ void CRender::create()
                 {
                     m_framegraphRenderer->SetEnabled(true);
                     Msg("* FrameGraphRenderer enabled (ps_r4_use_framegraph=1)");
+
+                    m_shaderLoader = xr_new<framegraph::ShaderLoader>(
+                        m_renderDevice, m_renderDevice->GetSlangCompiler());
+                    Msg("* ShaderLoader initialized (Slang compiler active)");
                 }
             }
             else
@@ -580,6 +585,12 @@ void CRender::destroy()
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
+    if (m_shaderLoader)
+    {
+        xr_delete(m_shaderLoader);
+        Msg("* ShaderLoader destroyed");
+    }
+
     if (m_framegraphRenderer)
     {
         m_framegraphRenderer->Shutdown();
