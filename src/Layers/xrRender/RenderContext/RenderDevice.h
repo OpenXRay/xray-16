@@ -17,7 +17,7 @@ namespace xray::render::ng {
 
 // Forward declarations
 class RenderContext;
-namespace nvrhi_wrapper = r4::nvrhi_wrapper;
+namespace nvrhi_wrapper = xray::render::RENDER_NAMESPACE::nvrhi_wrapper;
 
 // ═══════════════════════════════════════════════════
 //  RENDER DEVICE (Resource Factory + Manager)

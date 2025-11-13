@@ -4,7 +4,7 @@
 #include <slang-com-ptr.h>
 #include "xrCore/xrstring.h"
 
-namespace render
+namespace xray::render
 {
 
 /// <summary>

@@ -3,8 +3,10 @@
 
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/ResourceHandle.h"
-#include "Layers/xrRender/Shaders/SlangCompiler.h"
 #include "ShaderCache.h"
+
+// Need full include (not just forward decl) since we use SlangCompiler::Stage
+#include "Layers/xrRender/Shaders/SlangCompiler.h"
 
 namespace xray::render::framegraph {
 

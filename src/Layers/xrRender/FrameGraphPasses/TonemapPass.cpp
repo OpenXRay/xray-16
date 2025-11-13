@@ -30,7 +30,7 @@ TonemapPass::~TonemapPass() {
 
 bool TonemapPass::LoadShaders()
 {
-    ShaderLoader loader(m_device);
+    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
     // Load fullscreen vertex shader
     m_vertexShaderNative = loader.LoadVertexShader("fullscreen");

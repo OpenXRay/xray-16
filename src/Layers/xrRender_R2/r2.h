@@ -23,7 +23,7 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
-namespace xray::render::r4::nvrhi_wrapper
+namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
 {
 class NVRHIDevice;
 }
@@ -549,7 +549,7 @@ private:
 public:
 #if defined(USE_DX11) && RENDER == R_R4
     // NVRHI integration (R4 only)
-    xray::render::r4::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
+    xray::render::RENDER_NAMESPACE::nvrhi_wrapper::NVRHIDevice* m_nvrhiDevice{ nullptr };
     bool m_nvrhiTestMode{ false };
 
     void TestNVRHI_Render();

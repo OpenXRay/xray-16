@@ -29,7 +29,7 @@ LightingPass::~LightingPass() {
 
 bool LightingPass::LoadShaders()
 {
-    ShaderLoader loader(m_device);
+    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
     // Load fullscreen vertex shader (same as tonemap)
     m_vertexShaderNative = loader.LoadVertexShader("fullscreen");

@@ -226,7 +226,7 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
 #if defined(USE_DX11) && RENDER == R_R4
     // Initialize NVRHI wrapper after D3D11 device creation
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    render.m_nvrhiDevice = xr_new<xray::render::r4::nvrhi_wrapper::NVRHIDevice>();
+    render.m_nvrhiDevice = xr_new<xray::render::RENDER_NAMESPACE::nvrhi_wrapper::NVRHIDevice>();
 
     const bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
 

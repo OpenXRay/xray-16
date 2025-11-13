@@ -446,7 +446,7 @@ public:
         if (!render.m_nvrhiDevice)
         {
             Msg("~ [NVRHI] Initializing on-demand...");
-            render.m_nvrhiDevice = xr_new<xray::render::r4::nvrhi_wrapper::NVRHIDevice>();
+            render.m_nvrhiDevice = xr_new<xray::render::RENDER_NAMESPACE::nvrhi_wrapper::NVRHIDevice>();
 
             bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
 
@@ -1108,7 +1108,7 @@ public:
     void Execute(pcstr args) override
     {
         Msg("=== [SLANG COMPILER TEST] Running tests ===");
-        bool success = ::render::SlangCompilerTest::RunTest();
+        bool success = xray::render::SlangCompilerTest::RunTest();
 
         if (success)
             Msg("* [SLANG COMPILER TEST] ALL TESTS PASSED");

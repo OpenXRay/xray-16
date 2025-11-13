@@ -108,8 +108,8 @@ private:
     ng::PipelineState* m_pipeline = nullptr;
 
     // Shader bytecode (for reflection and analysis)
-    ID3DBlob* m_vertexShaderBytecode = nullptr;
-    ID3DBlob* m_pixelShaderBytecode = nullptr;
+    xr_vector<u8> m_vertexShaderBytecode;
+    xr_vector<u8> m_pixelShaderBytecode;
 
     // Volatile constant buffer pool (dynamically creates VCBs on-demand with deduplication)
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;

@@ -51,21 +51,13 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 }
 
 GBufferPass::~GBufferPass() {
-    // Clean up shader bytecode
-    if (m_vertexShaderBytecode) {
-        m_vertexShaderBytecode->Release();
-        m_vertexShaderBytecode = nullptr;
-    }
-    if (m_pixelShaderBytecode) {
-        m_pixelShaderBytecode->Release();
-        m_pixelShaderBytecode = nullptr;
-    }
+    // Shader bytecode is now xr_vector<u8> - automatically cleaned up
     Msg("* [GBufferPass] Destroyed");
 }
 
 bool GBufferPass::LoadShaders()
 {
-    ShaderLoader loader(m_device);
+    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
     // Load G-Buffer vertex shader (with bytecode for reflection)
     m_vertexShaderNative = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
@@ -90,8 +82,8 @@ bool GBufferPass::LoadShaders()
     Msg("* [GBufferPass] Analyzing constant buffer requirements...");
 
     // Analyze vertex shader CBs
-    if (m_vertexShaderBytecode) {
-        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode);
+    if (!m_vertexShaderBytecode.empty()) {
+        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode.data(), m_vertexShaderBytecode.size());
         Msg("  → Vertex shader has %u constant buffers", vsCBs.buffers.size());
 
         // Register each CB layout with the VCB pool
@@ -107,8 +99,8 @@ bool GBufferPass::LoadShaders()
     }
 
     // Analyze pixel shader CBs
-    if (m_pixelShaderBytecode) {
-        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode);
+    if (!m_pixelShaderBytecode.empty()) {
+        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode.data(), m_pixelShaderBytecode.size());
         Msg("  → Pixel shader has %u constant buffers", psCBs.buffers.size());
 
         // Register each CB layout with the VCB pool

@@ -268,7 +268,9 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     if (m_vcbPool) {
         // Analyze vertex shader CBs
-        auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(pso->vertexShader->bytecode);
+        auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
+            pso->vertexShader->bytecode->GetBufferPointer(),
+            pso->vertexShader->bytecode->GetBufferSize());
         for (const auto& cbInfo : vsCBs.buffers) {
             // Create CB layout and register with pool
             framegraph::VolatileConstantBufferPool::CBLayout layout(
@@ -290,7 +292,9 @@ MaterialPSO* MaterialCache::CreatePSO(
         }
 
         // Analyze pixel shader CBs
-        auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(pso->pixelShader->bytecode);
+        auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
+            pso->pixelShader->bytecode->GetBufferPointer(),
+            pso->pixelShader->bytecode->GetBufferSize());
         for (const auto& cbInfo : psCBs.buffers) {
             // Create CB layout and register with pool
             framegraph::VolatileConstantBufferPool::CBLayout layout(
@@ -484,7 +488,8 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
         matPSO->vsInputSignature = framegraph::ShaderReflector::AnalyzeVertexShader(
             vs->sh,
-            vs->bytecode
+            vs->bytecode->GetBufferPointer(),
+            vs->bytecode->GetBufferSize()
         );
     }
 
@@ -495,7 +500,8 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
         // Analyze pixel shader using SPS's bytecode directly
         matPSO->rtBindings = framegraph::ShaderReflector::AnalyzePixelShader(
             ps->sh,
-            ps->bytecode
+            ps->bytecode->GetBufferPointer(),
+            ps->bytecode->GetBufferSize()
         );
 
         matPSO->rtBindings.shaderName = ps->cName;

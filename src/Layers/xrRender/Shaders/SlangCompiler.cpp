@@ -2,7 +2,7 @@
 #include "SlangCompiler.h"
 #include "xrCore/xrMemory.h"
 
-namespace render
+namespace xray::render
 {
 
 SlangCompiler::SlangCompiler()

@@ -571,7 +571,8 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
 
 
     // Analyze VS constant buffers
-    auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(vs->bytecode);
+    auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
+        vs->bytecode->GetBufferPointer(), vs->bytecode->GetBufferSize());
     for (const auto& cbInfo : vsCBs.buffers) {
         // Determine if this is a per-object CB (slot 0) or global (slot 1+)
         bool isPerObject = (cbInfo.slot == 0);
@@ -603,7 +604,8 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
     }
 
     // Analyze PS constant buffers
-    auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(ps->bytecode);
+    auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
+        ps->bytecode->GetBufferPointer(), ps->bytecode->GetBufferSize());
     for (const auto& cbInfo : psCBs.buffers) {
         bool isPerObject = (cbInfo.slot == 0);
 

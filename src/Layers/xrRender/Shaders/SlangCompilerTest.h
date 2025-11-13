@@ -1,6 +1,6 @@
 #pragma once
 
-namespace render
+namespace xray::render
 {
 
 /// <summary>
