@@ -24,7 +24,9 @@ void CEnvironment::RenderSky()
         return;
 #endif
 
-    m_pRender->RenderSky(*this);
+    extern ENGINE_API int ps_r4_use_framegraph;
+    if (!ps_r4_use_framegraph)
+        m_pRender->RenderSky(*this);
 }
 
 void CEnvironment::RenderClouds()
@@ -37,7 +39,9 @@ void CEnvironment::RenderClouds()
     if (fis_zero(CurrentEnv.clouds_color.w, EPS_L))
         return;
 
-    m_pRender->RenderClouds(*this);
+    extern ENGINE_API int ps_r4_use_framegraph;
+    if (!ps_r4_use_framegraph)
+        m_pRender->RenderClouds(*this);
 }
 
 void CEnvironment::RenderFlares()
@@ -63,7 +67,9 @@ void CEnvironment::RenderLast()
 
 void CEnvironment::OnDeviceCreate()
 {
-    m_pRender->OnDeviceCreate();
+    extern ENGINE_API int ps_r4_use_framegraph;
+    if (!ps_r4_use_framegraph)
+        m_pRender->OnDeviceCreate();
 
     // weathers
     for (auto& cycle : WeatherCycles)
@@ -85,7 +91,9 @@ void CEnvironment::OnDeviceCreate()
 
 void CEnvironment::OnDeviceDestroy()
 {
-    m_pRender->OnDeviceDestroy();
+    extern ENGINE_API int ps_r4_use_framegraph;
+    if (!ps_r4_use_framegraph)
+        m_pRender->OnDeviceDestroy();
 
     // weathers
     for (auto& cycle : WeatherCycles)
