@@ -21,11 +21,13 @@ void CRenderTarget::phase_scene_prepare()
     if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
                                             ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
+#ifdef USE_DX11
         //	TODO: DX11: Check if we need to set RT here.
-#ifdef USE_OGL
-        u_setrtzb(RCache, rt_Position,rt_MSAADepth);
-#else
         u_setrt(RCache, Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth);
+#else
+        /* TODO investigate: it should be rt_Normal and (maybe) rt_Color
+         * rt_Position should be always single-sampled */
+        u_setrtzb(RCache, rt_Position,rt_MSAADepth);
 #endif
 
         const Fcolor color{}; // black
@@ -64,24 +66,27 @@ void CRenderTarget::phase_scene_prepare()
 void CRenderTarget::phase_scene_begin()
 {
     // Targets, use accumulator for temporary storage
+#ifdef USE_OGL
+    // TODO Investigate should be color always
+    auto& _2 = RImplementation.o.albedo_wo ? rt_Accumulator : rt_Color;
+    u_setrtzb(RCache, rt_Position, _2, rt_MSAADepth);
+#else
     if (!RImplementation.o.gbuffer_opt)
     {
-        auto& _3 = RImplementation.o.albedo_wo ? rt_Accumulator : rt_Color;
-#ifdef USE_OGL
-        u_setrtzb(RCache, rt_Position, rt_Normal, _3, rt_MSAADepth);
-#else
-        u_setrt(RCache, rt_Position, rt_Normal, _3, rt_MSAADepth);
-#endif
+        if (RImplementation.o.albedo_wo)
+            u_setrt(RCache, rt_Position, rt_Normal, rt_Accumulator, rt_MSAADepth);
+        else
+            u_setrt(RCache, rt_Position, rt_Normal, rt_Color, rt_MSAADepth);
     }
     else
     {
-        auto& _2 = RImplementation.o.albedo_wo ? rt_Accumulator : rt_Color;
-#ifdef USE_OGL
-        u_setrtzb(RCache, rt_Position, _2, rt_MSAADepth);
-#else
-        u_setrt(RCache, rt_Position, _2, nullptr, rt_MSAADepth);
-#endif
+        if (RImplementation.o.albedo_wo)
+            u_setrt(RCache, rt_Position, rt_Accumulator, rt_MSAADepth);
+        else
+            u_setrt(RCache, rt_Position, rt_Color, rt_MSAADepth);
+        // else								u_setrt		(rt_Position,	rt_Color, rt_Normal,		rt_MSAADepth);
     }
+#endif
 
     // Stencil - write 0x1 at pixel pos
     RCache.set_Stencil(

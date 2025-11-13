@@ -421,14 +421,15 @@ void CRender::create()
     o.msaa_hybrid = ps_r2_ls_flags.test((u32)R3FLAG_USE_DX10_1);
     o.msaa_hybrid &= !o.msaa_opt && o.msaa && (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1);
 #elif defined(USE_OGL)
-    // TODO: OGL: temporary disabled, need to fix it
-    o.msaa = true;
-    o.msaa_samples = 4;
+    o.msaa_samples = (1 << ps_r3_msaa);
+    o.msaa = o.msaa_samples > 1;
 
     if (!o.msaa) o.msaa_samples = 0;
     // Important! DX10 related, for OpenGL same as o.msaa
     // It's messing with shader predefines
     o.msaa_opt = o.msaa;
+    // DX related ?
+    o.gbuffer_opt = true;
     // Important! DX10 related, for OpenGL always false
     o.msaa_hybrid = false;
 #else

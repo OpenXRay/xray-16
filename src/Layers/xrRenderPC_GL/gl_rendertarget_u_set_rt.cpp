@@ -114,9 +114,7 @@ void CRenderTarget::u_setrtzb(CBackend& cmd_list, const ref_rt& _1, const ref_rt
     else
         cmd_list.unset_ZB();
 
-
-    [[maybe_unused]] GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    VERIFY(status == GL_FRAMEBUFFER_COMPLETE);
+    VERIFY(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     CHK_GL(glDrawBuffers(3, buffers));
 }
 } // namespace xray::render::RENDER_NAMESPACE
