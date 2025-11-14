@@ -339,7 +339,9 @@ void CUITalkWnd::SwitchToUpgrade()
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            UITalkDialogWnd->Hide();
+            // Don't notify scripts that we are hiding the dialog because the CoC inventory_upgrade script will mess up otherwise.
+            // See: https://github.com/OpenXRay/xray-16/issues/1852
+            UITalkDialogWnd->Hide(false);
             StopSnd();
 
             pGameSP->StartUpgrade(m_pOurInvOwner, m_pOthersInvOwner);

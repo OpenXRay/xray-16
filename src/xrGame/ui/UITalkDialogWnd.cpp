@@ -147,10 +147,11 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     }
 }
 
-void CUITalkDialogWnd::Show()
+void CUITalkDialogWnd::Show(const bool notify_scripts /*= true*/)
 {
     InventoryUtilities::SendInfoToActor("ui_talk_show");
-    InventoryUtilities::SendInfoToLuaScripts("ui_talk_show");
+    if (notify_scripts)
+        InventoryUtilities::SendInfoToLuaScripts("ui_talk_show");
     inherited::Show(true);
     inherited::Enable(true);
 
@@ -159,12 +160,13 @@ void CUITalkDialogWnd::Show()
     UI().Focus().LockToWindow(UIQuestionsList);
 }
 
-void CUITalkDialogWnd::Hide()
+void CUITalkDialogWnd::Hide(const bool notify_scripts /*= true*/)
 {
     if (UI().Focus().GetLocker() == UIQuestionsList)
         UI().Focus().Unlock();
     InventoryUtilities::SendInfoToActor("ui_talk_hide");
-    InventoryUtilities::SendInfoToLuaScripts("ui_talk_hide");
+    if (notify_scripts)
+        InventoryUtilities::SendInfoToLuaScripts("ui_talk_hide");
     inherited::Show(false);
     inherited::Enable(false);
     g_btnHint->Discard();

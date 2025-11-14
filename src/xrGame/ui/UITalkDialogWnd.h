@@ -26,8 +26,8 @@ public:
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
-    virtual void Show();
-    virtual void Hide();
+    virtual void Show(bool notify_scripts = true);
+    virtual void Hide(bool notify_scripts = true);
     CUITalkWnd* m_pParent;
     u32 GetHeaderColor() { return m_iNameTextColor; }
     CGameFont* GetHeaderFont() { return m_pNameTextFont; }
