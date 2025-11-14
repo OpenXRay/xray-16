@@ -386,6 +386,7 @@ void VertexStreamBuffer::Destroy()
         return;
 
     glDeleteBuffers(1, &m_DeviceBuffer);
+    m_DeviceBuffer = 0;
 }
 
 void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
@@ -434,6 +435,7 @@ void IndexStreamBuffer::Destroy()
         return;
 
     glDeleteBuffers(1, &m_DeviceBuffer);
+    m_DeviceBuffer = 0;
 }
 
 void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
