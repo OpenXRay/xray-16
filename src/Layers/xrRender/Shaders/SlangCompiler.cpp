@@ -180,6 +180,15 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     std::memcpy(result.bytecode.data(), bytecodeData, bytecodeSize);
     result.success = true;
 
+    slang::IComponentType* program = nullptr;
+    SlangResult getProgramResult = request->getProgram(&program);
+    if (SLANG_SUCCEEDED(getProgramResult) && program)
+    {
+        program->addRef();
+        result.slangProgram = program;
+        result.reflection = program->getLayout();
+    }
+
     Msg("* [SlangCompiler] Successfully compiled %s (entry: %s, stage: %s, target: %s) -> %zu bytes",
         sourcePath, entryPoint, GetStageName(stage), GetTargetName(target), bytecodeSize);
 

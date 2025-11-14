@@ -272,10 +272,10 @@ public:
         nvrhi::IBuffer* perObjectVCB,
         SPass* pass);
 
-    xr_map<shared_str, ng::ShaderHandle> m_shaderHandles;
+    xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 
-    ng::ShaderHandle GetOrCreateShaderVS(SVS* vs);
-    ng::ShaderHandle GetOrCreateShaderPS(SPS* ps);
+    nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
+    nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
 
 private:

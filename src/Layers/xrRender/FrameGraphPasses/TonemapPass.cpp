@@ -30,31 +30,19 @@ bool TonemapPass::LoadShaders()
 {
     ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
-    m_vertexShaderNative = loader.LoadVertexShader("fullscreen");
-    if (!m_vertexShaderNative)
+    m_vertexShader = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShader)
     {
         Msg("! [TonemapPass] Failed to load fullscreen vertex shader");
         return false;
     }
 
-    m_pixelShaderNative = loader.LoadPixelShader("tonemap");
-    if (!m_pixelShaderNative)
+    m_pixelShader = loader.LoadPixelShader("tonemap");
+    if (!m_pixelShader)
     {
         Msg("! [TonemapPass] Failed to load tonemap pixel shader");
         return false;
     }
-
-    m_vertexShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        m_vertexShaderNative,
-        "fullscreen.vs"
-    );
-
-    m_pixelShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        m_pixelShaderNative,
-        "tonemap.ps"
-    );
 
     Msg("  ✓ Tonemap shaders loaded successfully");
     return true;
@@ -68,8 +56,8 @@ bool TonemapPass::CreatePipeline(nvrhi::ITexture* backbufferTexture)
 
     ng::PipelineStateDesc psoDesc;
 
-    psoDesc.vertexShader = m_vertexShader.get();
-    psoDesc.pixelShader = m_pixelShader.get();
+    psoDesc.vertexShader = m_vertexShader.Get();
+    psoDesc.pixelShader = m_pixelShader.Get();
 
     psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 

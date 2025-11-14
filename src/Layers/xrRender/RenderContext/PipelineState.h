@@ -157,11 +157,11 @@ enum class PrimitiveTopology {
 };
 
 struct PipelineStateDesc {
-    RCShader* vertexShader = nullptr;
-    RCShader* pixelShader = nullptr;
-    RCShader* geometryShader = nullptr;
-    RCShader* hullShader = nullptr;
-    RCShader* domainShader = nullptr;
+    nvrhi::IShader* vertexShader = nullptr;
+    nvrhi::IShader* pixelShader = nullptr;
+    nvrhi::IShader* geometryShader = nullptr;
+    nvrhi::IShader* hullShader = nullptr;
+    nvrhi::IShader* domainShader = nullptr;
 
     xr_vector<VertexAttribute> vertexAttributes;
 

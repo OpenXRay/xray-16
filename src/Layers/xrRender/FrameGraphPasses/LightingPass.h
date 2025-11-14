@@ -47,10 +47,8 @@ private:
     LightingPassConfig m_config;
     Stats m_stats;
 
-    nvrhi::ShaderHandle m_vertexShaderNative;
-    nvrhi::ShaderHandle m_pixelShaderNative;
-    xr_unique_ptr<ng::RCShader> m_vertexShader;
-    xr_unique_ptr<ng::RCShader> m_pixelShader;
+    nvrhi::ShaderHandle m_vertexShader;
+    nvrhi::ShaderHandle m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
     bool LoadShaders();

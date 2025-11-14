@@ -29,31 +29,19 @@ bool LightingPass::LoadShaders()
 {
     ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
-    m_vertexShaderNative = loader.LoadVertexShader("fullscreen");
-    if (!m_vertexShaderNative)
+    m_vertexShader = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShader)
     {
         Msg("! [LightingPass] Failed to load fullscreen vertex shader");
         return false;
     }
 
-    m_pixelShaderNative = loader.LoadPixelShader("lighting");
-    if (!m_pixelShaderNative)
+    m_pixelShader = loader.LoadPixelShader("lighting");
+    if (!m_pixelShader)
     {
         Msg("! [LightingPass] Failed to load lighting pixel shader");
         return false;
     }
-
-    m_vertexShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        m_vertexShaderNative,
-        "fullscreen.vs"
-    );
-
-    m_pixelShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        m_pixelShaderNative,
-        "lighting.ps"
-    );
 
     Msg("  ✓ Lighting shaders loaded successfully");
     return true;
@@ -67,8 +55,8 @@ bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
 
     ng::PipelineStateDesc psoDesc;
 
-    psoDesc.vertexShader = m_vertexShader.get();
-    psoDesc.pixelShader = m_pixelShader.get();
+    psoDesc.vertexShader = m_vertexShader.Get();
+    psoDesc.pixelShader = m_pixelShader.Get();
 
     psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 

@@ -215,6 +215,7 @@
     <ClInclude Include="..\xrRender\Shader.h" />
     <ClInclude Include="..\xrRender\ShaderKey.h" />
     <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangReflectionWrapper.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h" />
     <ClInclude Include="..\xrRender\SH_Atomic.h" />
     <ClInclude Include="..\xrRender\SH_Constant.h" />
@@ -438,6 +439,7 @@
     <ClCompile Include="..\xrRender\r__sync_point.cpp" />
     <ClCompile Include="..\xrRender\Shader.cpp" />
     <ClCompile Include="..\xrRender\ShaderKey.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangReflectionWrapper.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangVFSAdapter.cpp" />
     <ClCompile Include="..\xrRender\SH_Atomic.cpp" />
     <ClCompile Include="..\xrRender\SH_Constant.cpp" />

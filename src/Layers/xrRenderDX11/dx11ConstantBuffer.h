@@ -9,6 +9,7 @@ class dx11ConstantBuffer : public xr_resource_named
 {
 public:
     dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTable);
+    dx11ConstantBuffer(const char* name, u32 size);
     ~dx11ConstantBuffer();
 
     bool Similar(dx11ConstantBuffer& _in);

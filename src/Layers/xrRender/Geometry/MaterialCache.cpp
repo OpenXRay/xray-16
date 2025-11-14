@@ -150,27 +150,13 @@ MaterialPSO* MaterialCache::CreatePSO(
         return nullptr;
     }
 
-    ng::ShaderHandle vsHandle = GetOrCreateShaderVS(pso->vertexShader);
-    if (!vsHandle.IsValid()) {
+    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
+    if (!nvrhiVS) {
         return nullptr;
     }
 
-    ng::ShaderHandle psHandle = GetOrCreateShaderPS(pso->pixelShader);
-    if (!psHandle.IsValid()) {
-        return nullptr;
-    }
-
-    ng::RCShader* rcVS = m_device->GetShader(vsHandle);
-    if (!rcVS) {
-        m_device->DestroyShader(vsHandle);
-        m_device->DestroyShader(psHandle);
-        return nullptr;
-    }
-
-    ng::RCShader* rcPS = m_device->GetShader(psHandle);
-    if (!rcPS) {
-        m_device->DestroyShader(vsHandle);
-        m_device->DestroyShader(psHandle);
+    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
+    if (!nvrhiPS) {
         return nullptr;
     }
 
@@ -217,8 +203,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     }
 
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = rcVS;
-    psoDesc.pixelShader = rcPS;
+    psoDesc.vertexShader = nvrhiVS.Get();
+    psoDesc.pixelShader = nvrhiPS.Get();
 
     SetupVertexAttributes(visual, pso.get(), psoDesc);
 
@@ -1123,19 +1109,19 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
         pso->textures.size(), pso->samplers.size());
 
-    ng::RCShader* rcVS = m_device->GetShader(GetOrCreateShaderVS(pso->vertexShader));
-    ng::RCShader* rcPS = m_device->GetShader(GetOrCreateShaderPS(pso->pixelShader));
+    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
+    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
 
-    if (!rcVS || !rcPS) {
-        Msg("! [MaterialCache::CreateUIPSO] Failed to get RCShader objects");
+    if (!nvrhiVS || !nvrhiPS) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to get shader handles");
         return nullptr;
     }
 
     CreateBindingLayouts(pso.get());
 
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = rcVS;
-    psoDesc.pixelShader = rcPS;
+    psoDesc.vertexShader = nvrhiVS.Get();
+    psoDesc.pixelShader = nvrhiPS.Get();
 
     if (pso->vsInputSignature.elements.empty()) {
         Msg("! [MaterialCache::CreateUIPSO] No vertex input signature from shader reflection!");
@@ -1248,10 +1234,10 @@ void MaterialCache::Clear()
     m_stats = Stats{};
 }
 
-ng::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
+nvrhi::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
 {
-    if (!vs || !vs->bytecode) {
-        return ng::ShaderHandle();
+    if (!vs) {
+        return nullptr;
     }
 
     xr_string vsKeyStr = xr_string("VS_") + vs->cName.c_str();
@@ -1262,25 +1248,42 @@ ng::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
         return it->second;
     }
 
-    ng::ShaderHandle vsHandle = m_device->CreateShader(
-        ng::ShaderStage::Vertex,
-        vs->bytecode->GetBufferPointer(),
-        vs->bytecode->GetBufferSize(),
-        vs->cName.c_str());
+    nvrhi::ShaderHandle vsHandle;
 
-    if (!vsHandle.IsValid()) {
-        Msg("! [MaterialCache] ERROR: Failed to create VS '%s'", vs->cName.c_str());
-        return ng::ShaderHandle();
+    if (vs->nvrhiShader)
+    {
+        vsHandle = vs->nvrhiShader;
+    }
+    else if (vs->bytecode)
+    {
+        nvrhi::ShaderDesc desc(nvrhi::ShaderType::Vertex);
+        desc.debugName = vs->cName.c_str();
+        desc.entryName = "main";
+
+        vsHandle = m_device->GetNVRHIDevice()->createShader(
+            desc,
+            vs->bytecode->GetBufferPointer(),
+            vs->bytecode->GetBufferSize());
+    }
+    else
+    {
+        Msg("! [MaterialCache] ERROR: VS '%s' has no nvrhiShader and no bytecode", vs->cName.c_str());
+        return nullptr;
+    }
+
+    if (!vsHandle) {
+        Msg("! [MaterialCache] ERROR: Failed to get/create VS '%s'", vs->cName.c_str());
+        return nullptr;
     }
 
     m_shaderHandles[vsKey] = vsHandle;
     return vsHandle;
 }
 
-ng::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
+nvrhi::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
 {
-    if (!ps || !ps->bytecode) {
-        return ng::ShaderHandle();
+    if (!ps) {
+        return nullptr;
     }
 
     xr_string psKeyStr = xr_string("PS_") + ps->cName.c_str();
@@ -1291,15 +1294,32 @@ ng::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
         return it->second;
     }
 
-    ng::ShaderHandle psHandle = m_device->CreateShader(
-        ng::ShaderStage::Pixel,
-        ps->bytecode->GetBufferPointer(),
-        ps->bytecode->GetBufferSize(),
-        ps->cName.c_str());
+    nvrhi::ShaderHandle psHandle;
 
-    if (!psHandle.IsValid()) {
-        Msg("! [MaterialCache] ERROR: Failed to create PS '%s'", ps->cName.c_str());
-        return ng::ShaderHandle();
+    if (ps->nvrhiShader)
+    {
+        psHandle = ps->nvrhiShader;
+    }
+    else if (ps->bytecode)
+    {
+        nvrhi::ShaderDesc desc(nvrhi::ShaderType::Pixel);
+        desc.debugName = ps->cName.c_str();
+        desc.entryName = "main";
+
+        psHandle = m_device->GetNVRHIDevice()->createShader(
+            desc,
+            ps->bytecode->GetBufferPointer(),
+            ps->bytecode->GetBufferSize());
+    }
+    else
+    {
+        Msg("! [MaterialCache] ERROR: PS '%s' has no nvrhiShader and no bytecode", ps->cName.c_str());
+        return nullptr;
+    }
+
+    if (!psHandle) {
+        Msg("! [MaterialCache] ERROR: Failed to get/create PS '%s'", ps->cName.c_str());
+        return nullptr;
     }
 
     m_shaderHandles[psKey] = psHandle;

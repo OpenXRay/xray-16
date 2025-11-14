@@ -53,15 +53,15 @@ bool GBufferPass::LoadShaders()
 {
     ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
-    m_vertexShaderNative = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
-    if (!m_vertexShaderNative)
+    m_vertexShader = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
+    if (!m_vertexShader)
     {
         Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
         return false;
     }
 
-    m_pixelShaderNative = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
-    if (!m_pixelShaderNative)
+    m_pixelShader = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
+    if (!m_pixelShader)
     {
         Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
         return false;
@@ -99,18 +99,6 @@ bool GBufferPass::LoadShaders()
 
     m_vcbPool->LogStats();
 
-    m_vertexShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        m_vertexShaderNative,
-        "gbuffer.vs"
-    );
-
-    m_pixelShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        m_pixelShaderNative,
-        "gbuffer.ps"
-    );
-
     Msg("  ✓ G-Buffer shaders loaded successfully");
     return true;
 }
@@ -122,8 +110,8 @@ bool GBufferPass::CreatePipeline(const framegraph::DefaultOutputLayout& outputs,
 
     ng::PipelineStateDesc psoDesc;
 
-    psoDesc.vertexShader = m_vertexShader.get();
-    psoDesc.pixelShader = m_pixelShader.get();
+    psoDesc.vertexShader = m_vertexShader.Get();
+    psoDesc.pixelShader = m_pixelShader.Get();
 
     psoDesc.vertexAttributes = {
         { "POSITION", 0, nvrhi::Format::RGB32_FLOAT,  0, 0, false },
