@@ -194,7 +194,22 @@ void CBlender_Compile::PassEnd()
     SetMapping();
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
+
+    Msg("  [r_End] Creating texture list from %zu passTextures entries", passTextures.size());
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
+    if (dest.T && dest.T->size() > 0)
+    {
+        Msg("  [r_End] Created texture list with %zu textures", dest.T->size());
+    }
+    else if (dest.T)
+    {
+        Msg("! [r_End] Created texture list but it's EMPTY (passTextures had %zu)", passTextures.size());
+    }
+    else
+    {
+        Msg("! [r_End] dest.T is NULL!");
+    }
+
     dest.M = RImplementation.Resources->_CreateMatrixList(passMatrices);
     dest.C = RImplementation.Resources->_CreateConstantList(passConstants);
 

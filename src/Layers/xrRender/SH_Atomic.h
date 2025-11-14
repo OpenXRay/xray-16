@@ -9,6 +9,17 @@
 #include "Layers/xrRenderGL/glState.h"
 #endif
 
+// Forward declarations for Slang reflection
+namespace slang {
+    struct ShaderReflection;
+    struct IComponentType;
+}
+
+// Forward declaration for extracted reflection
+namespace xray::render::framegraph {
+    struct ExtractedReflection;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 #pragma pack(push, 4)
@@ -31,6 +42,9 @@ struct ECORE_API SVS : public xr_resource_named
     ID3DVertexShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
     nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+
+    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
+    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -56,6 +70,9 @@ struct ECORE_API SPS : public xr_resource_named
     ID3DPixelShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
     nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+
+    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
+    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -77,6 +94,9 @@ struct ECORE_API SGS : public xr_resource_named
     ID3DGeometryShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
     nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+
+    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
+    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -97,6 +117,9 @@ struct ECORE_API SHS : public xr_resource_named
 	ID3D11HullShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
     nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+
+    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
+    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -117,6 +140,9 @@ struct ECORE_API SDS : public xr_resource_named
     ID3D11DomainShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
     nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+
+    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
+    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -137,6 +163,9 @@ struct ECORE_API SCS : public xr_resource_named
     ID3D11ComputeShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
     nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+
+    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
+    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
 #elif defined(USE_OGL)
     GLuint sh;
 #else

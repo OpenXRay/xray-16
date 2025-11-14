@@ -4,6 +4,10 @@
 #include "SH_Atomic.h"
 #include "ResourceManager.h"
 
+#if defined(USE_DX11)
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"  // For ExtractedReflection
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 // Atomic
@@ -41,12 +45,15 @@ SVS::~SVS()
     RImplementation.Resources->_DeleteVS(this);
 
 #if defined(USE_DX11)
-    // XXX: check just in case
-    //_RELEASE(signature);
-    //	Now it is release automatically
-
     // Release shader bytecode
     _RELEASE(bytecode);
+
+    // Release extracted reflection data
+    if (reflection)
+    {
+        xr_delete(reflection);
+        reflection = nullptr;
+    }
 #endif
 
 #if defined(USE_DX11)
@@ -69,6 +76,13 @@ SPS::~SPS()
     _RELEASE(sh);
     // Release shader bytecode
     _RELEASE(bytecode);
+
+    // Release extracted reflection data
+    if (reflection)
+    {
+        xr_delete(reflection);
+        reflection = nullptr;
+    }
 #elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -89,6 +103,13 @@ SGS::~SGS()
     _RELEASE(sh);
     // Release shader bytecode
     _RELEASE(bytecode);
+
+    // Release extracted reflection data
+    if (reflection)
+    {
+        xr_delete(reflection);
+        reflection = nullptr;
+    }
 #   elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -107,6 +128,13 @@ SHS::~SHS()
     _RELEASE(sh);
     // Release shader bytecode
     _RELEASE(bytecode);
+
+    // Release extracted reflection data
+    if (reflection)
+    {
+        xr_delete(reflection);
+        reflection = nullptr;
+    }
 #   elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -125,6 +153,13 @@ SDS::~SDS()
     _RELEASE(sh);
     // Release shader bytecode
     _RELEASE(bytecode);
+
+    // Release extracted reflection data
+    if (reflection)
+    {
+        xr_delete(reflection);
+        reflection = nullptr;
+    }
 #   elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));
@@ -141,6 +176,13 @@ SCS::~SCS()
     _RELEASE(sh);
     // Release shader bytecode
     _RELEASE(bytecode);
+
+    // Release extracted reflection data
+    if (reflection)
+    {
+        xr_delete(reflection);
+        reflection = nullptr;
+    }
 #    elif defined(USE_OGL)
     if (GLAD_GL_ARB_separate_shader_objects)
         CHK_GL(glDeleteProgram(sh));

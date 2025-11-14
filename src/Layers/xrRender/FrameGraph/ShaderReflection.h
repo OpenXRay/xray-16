@@ -1,8 +1,11 @@
 #pragma once
 
 #include "xrCore/xrstring.h"
-#include <d3d11shader.h>
-#include <d3dcompiler.h>
+
+// Forward declarations for Slang reflection
+namespace slang {
+    struct ShaderReflection;
+}
 
 namespace xray::render::framegraph {
 
@@ -26,7 +29,7 @@ enum class RenderPhase {
 //  VERTEX SHADER INPUT SIGNATURE
 // ═══════════════════════════════════════════════════
 //
-// Extracted from VS bytecode via D3D reflection.
+// Extracted from VS using Slang reflection.
 // Defines the required vertex attributes in shader-expected order.
 //
 struct VertexInputSignature {
@@ -45,7 +48,7 @@ struct VertexInputSignature {
 //  SHADER RT BINDINGS
 // ═══════════════════════════════════════════════════
 //
-// Extracted from shader bytecode via D3D reflection.
+// Extracted from shader using Slang reflection.
 // Contains all texture inputs/outputs for automatic RT binding.
 //
 struct ShaderRTBindings {
@@ -146,27 +149,37 @@ struct ShaderConstantBuffers {
 //  SHADER REFLECTOR
 // ═══════════════════════════════════════════════════
 //
-// Analyzes shader bytecode to extract render target bindings
-// and infer rendering phase.
+// Analyzes shaders using Slang reflection to extract render target bindings,
+// vertex input signatures, and infer rendering phase.
+//
+// NOTE: Now uses Slang reflection directly (cross-platform, no D3DReflect!)
 //
 class ShaderReflector {
 public:
-    // Analyze vertex shader and extract input signature (in shader-expected order!)
-    static VertexInputSignature AnalyzeVertexShader(
-        ID3D11VertexShader* vs,
-        const void* bytecode,
-        size_t bytecodeSize);
+    // ═══════════════════════════════════════════════════
+    //  REFLECTION EXTRACTION (from live Slang compilation)
+    // ═══════════════════════════════════════════════════
 
-    // Analyze pixel shader and extract RT bindings
-    static ShaderRTBindings AnalyzePixelShader(
-        ID3D11PixelShader* ps,
-        const void* bytecode,
-        size_t bytecodeSize);
+    // Extract full reflection data from Slang (call once after compilation)
+    static ExtractedReflection ExtractReflection(
+        slang::ShaderReflection* slangReflection,
+        bool isVertexShader);
 
-    // Analyze shader constant buffers (works for VS/PS/CS)
-    static ShaderConstantBuffers AnalyzeConstantBuffers(
-        const void* bytecode,
-        size_t bytecodeSize);
+    // ═══════════════════════════════════════════════════
+    //  REFLECTION ACCESSORS (from ExtractedReflection)
+    // ═══════════════════════════════════════════════════
+
+    // Get vertex input signature from extracted reflection
+    static const VertexInputSignature& GetVertexInputSignature(
+        const ExtractedReflection* reflection);
+
+    // Get RT bindings from extracted reflection
+    static const ShaderRTBindings& GetRTBindings(
+        const ExtractedReflection* reflection);
+
+    // Get constant buffers from extracted reflection
+    static const ShaderConstantBuffers& GetConstantBuffers(
+        const ExtractedReflection* reflection);
 
     // Infer render phase from shader bindings
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);
@@ -181,6 +194,11 @@ public:
         RenderPhase phase);
 
 private:
+    // Internal helpers (extract data from live Slang reflection)
+    static VertexInputSignature AnalyzeVertexShader(slang::ShaderReflection* reflection);
+    static ShaderRTBindings AnalyzePixelShader(slang::ShaderReflection* reflection);
+    static ShaderConstantBuffers AnalyzeConstantBuffers(slang::ShaderReflection* reflection);
+
     // Helper: check if texture name matches pattern
     static bool MatchesPattern(const char* name, const char* pattern);
 };

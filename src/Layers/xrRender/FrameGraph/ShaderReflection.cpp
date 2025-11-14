@@ -1,6 +1,9 @@
 // xrRender/FrameGraph/ShaderReflection.cpp
 #include "stdafx.h"
 #include "ShaderReflection.h"
+#include "ShaderCache.h"  // For ExtractedReflection definition
+#include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
+#include <slang.h>
 
 namespace xray::render::framegraph {
 
@@ -8,113 +11,161 @@ namespace xray::render::framegraph {
 //  ANALYZE VERTEX SHADER INPUT SIGNATURE
 // ═══════════════════════════════════════════════════
 
-nvrhi::Format GetFormatFromSignature(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc) {
-    // Count components from mask
-    u32 componentCount = 0;
-    if (paramDesc.Mask & 0x1) componentCount++;  // x
-    if (paramDesc.Mask & 0x2) componentCount++;  // y
-    if (paramDesc.Mask & 0x4) componentCount++;  // z
-    if (paramDesc.Mask & 0x8) componentCount++;  // w
+// Helper: Convert Slang type to NVRHI format
+nvrhi::Format GetFormatFromSlangType(slang::TypeReflection* type) {
+    if (!type)
+        return nvrhi::Format::UNKNOWN;
 
-    switch (paramDesc.ComponentType) {
-    case D3D_REGISTER_COMPONENT_UINT32:
-        switch (componentCount) {
-        case 1: return nvrhi::Format::R32_UINT;
-        case 2: return nvrhi::Format::RG32_UINT;
-        case 3: return nvrhi::Format::RGB32_UINT;
-        case 4: return nvrhi::Format::RGBA32_UINT;
-        }
-        break;
+    auto scalarType = type->getScalarType();
+    auto kind = type->getKind();
 
-    case D3D_REGISTER_COMPONENT_SINT32:
-        switch (componentCount) {
-        case 1: return nvrhi::Format::R32_SINT;
-        case 2: return nvrhi::Format::RG32_SINT;
-        case 3: return nvrhi::Format::RGB32_SINT;
-        case 4: return nvrhi::Format::RGBA32_SINT;
-        }
-        break;
+    // Handle vector types
+    if (kind == slang::TypeReflection::Kind::Vector) {
+        u32 elementCount = type->getElementCount();
 
-    case D3D_REGISTER_COMPONENT_FLOAT32:
-        switch (componentCount) {
-        case 1: return nvrhi::Format::R32_FLOAT;
-        case 2: return nvrhi::Format::RG32_FLOAT;
-        case 3: return nvrhi::Format::RGB32_FLOAT;
-        case 4: return nvrhi::Format::RGBA32_FLOAT;
+        switch (scalarType) {
+        case slang::TypeReflection::ScalarType::Float32:
+            switch (elementCount) {
+            case 1: return nvrhi::Format::R32_FLOAT;
+            case 2: return nvrhi::Format::RG32_FLOAT;
+            case 3: return nvrhi::Format::RGB32_FLOAT;
+            case 4: return nvrhi::Format::RGBA32_FLOAT;
+            }
+            break;
+
+        case slang::TypeReflection::ScalarType::UInt32:
+            switch (elementCount) {
+            case 1: return nvrhi::Format::R32_UINT;
+            case 2: return nvrhi::Format::RG32_UINT;
+            case 3: return nvrhi::Format::RGB32_UINT;
+            case 4: return nvrhi::Format::RGBA32_UINT;
+            }
+            break;
+
+        case slang::TypeReflection::ScalarType::Int32:
+            switch (elementCount) {
+            case 1: return nvrhi::Format::R32_SINT;
+            case 2: return nvrhi::Format::RG32_SINT;
+            case 3: return nvrhi::Format::RGB32_SINT;
+            case 4: return nvrhi::Format::RGBA32_SINT;
+            }
+            break;
         }
-        break;
+    }
+    // Handle scalar types (treat as 1-component vector)
+    else if (kind == slang::TypeReflection::Kind::Scalar) {
+        switch (scalarType) {
+        case slang::TypeReflection::ScalarType::Float32: return nvrhi::Format::R32_FLOAT;
+        case slang::TypeReflection::ScalarType::UInt32: return nvrhi::Format::R32_UINT;
+        case slang::TypeReflection::ScalarType::Int32: return nvrhi::Format::R32_SINT;
+        }
     }
 
-    Msg("! [ShaderReflector] Unknown component type %d with %d components",
-        paramDesc.ComponentType, componentCount);
+    Msg("! [ShaderReflector] Unsupported Slang type: kind=%d, scalarType=%d",
+        (int)kind, (int)scalarType);
     return nvrhi::Format::UNKNOWN;
 }
 VertexInputSignature ShaderReflector::AnalyzeVertexShader(
-    ID3D11VertexShader* vs,
-    const void* bytecode,
-    size_t bytecodeSize) {
-
-    // vs is unused - we only need bytecode for D3DReflect
-    // VERIFY(vs);
-    VERIFY(bytecode);
-    VERIFY(bytecodeSize > 0);
+    slang::ShaderReflection* reflection) {
 
     VertexInputSignature signature;
 
-    // ═══════════════════════════════════════════════════
-    //  GET SHADER REFLECTION INTERFACE
-    // ═══════════════════════════════════════════════════
-
-    ID3D11ShaderReflection* reflection = nullptr;
-    HRESULT hr = D3DReflect(
-        bytecode,
-        bytecodeSize,
-        IID_ID3D11ShaderReflection,
-        (void**)&reflection
-    );
-
-    if (FAILED(hr)) {
-        Msg("! [ShaderReflector] Failed to create VS reflection interface (HRESULT: 0x%08X)", hr);
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for vertex shader");
         return signature;
     }
 
-    D3D11_SHADER_DESC shaderDesc;
-    reflection->GetDesc(&shaderDesc);
-
     // ═══════════════════════════════════════════════════
-    //  ENUMERATE INPUT PARAMETERS (IN SHADER ORDER!)
+    //  GET ENTRY POINT AND DRILL INTO INPUT STRUCT
     // ═══════════════════════════════════════════════════
-    //
-    // CRITICAL: GetInputParameterDesc returns parameters in the EXACT order
-    // the shader expects them. We MUST preserve this order when creating
-    // the D3D11 input layout, otherwise vertex data will be mismatched!
+    // With getProgramWithEntryPoints(), vertex inputs are inside the entry
+    // point's input parameter struct. We need to get the entry point,
+    // find its input parameter, and enumerate the struct's fields.
 
-    for (u32 i = 0; i < shaderDesc.InputParameters; i++) {
-        D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
-        hr = reflection->GetInputParameterDesc(i, &paramDesc);
+    if (reflection->getEntryPointCount() == 0) {
+        Msg("! [ShaderReflector] No entry points found in vertex shader");
+        return signature;
+    }
 
-        if (FAILED(hr)) {
-            Msg("! [ShaderReflector] Failed to get input parameter %u", i);
+    auto* entryPoint = reflection->getEntryPointByIndex(0);
+    if (!entryPoint) {
+        Msg("! [ShaderReflector] Failed to get vertex shader entry point");
+        return signature;
+    }
+
+    // Find the VaryingInput parameter (the input struct)
+    u32 paramCount = entryPoint->getParameterCount();
+    Msg("  [ShaderReflector] Entry point has %u parameters", paramCount);
+
+    slang::VariableLayoutReflection* inputParam = nullptr;
+    for (u32 i = 0; i < paramCount; i++) {
+        auto* param = entryPoint->getParameterByIndex(i);
+        if (!param) continue;
+
+        auto* typeLayout = param->getTypeLayout();
+        if (!typeLayout) continue;
+
+        if (typeLayout->getParameterCategory() == slang::ParameterCategory::VaryingInput) {
+            inputParam = param;
+            Msg("  [ShaderReflector] Found input parameter at index %u: '%s'", i, param->getName());
+            break;
+        }
+    }
+
+    if (!inputParam) {
+        Msg("! [ShaderReflector] No VaryingInput parameter found in entry point");
+        return signature;
+    }
+
+    // Get the type of the input parameter (should be a struct)
+    auto* inputTypeLayout = inputParam->getTypeLayout();
+    auto* inputType = inputTypeLayout->getType();
+    if (!inputType) {
+        Msg("! [ShaderReflector] Input parameter has no type");
+        return signature;
+    }
+
+    // Enumerate struct fields (these are the actual vertex inputs with semantics)
+    u32 fieldCount = inputType->getFieldCount();
+    Msg("  [ShaderReflector] Input struct has %u fields", fieldCount);
+
+    for (u32 i = 0; i < fieldCount; i++) {
+        auto* field = inputType->getFieldByIndex(i);
+        auto* fieldLayout = inputTypeLayout->getFieldByIndex(i);
+
+        if (!field || !fieldLayout)
+            continue;
+
+        const char* fieldName = field->getName() ? field->getName() : "<unknown>";
+
+        // Get semantic name (POSITION, TEXCOORD, etc.)
+        const char* semanticName = fieldLayout->getSemanticName();
+        Msg("  [ShaderReflector] Field[%u]: name='%s', semantic='%s'",
+            i, fieldName, semanticName ? semanticName : "<none>");
+
+        if (!semanticName || semanticName[0] == '\0') {
+            Msg("! [ShaderReflector] Skipping field[%u] '%s' - no semantic name", i, fieldName);
             continue;
         }
 
-        // Skip system-value semantics (SV_VertexID, SV_InstanceID, etc.)
-        if (paramDesc.SystemValueType != D3D_NAME_UNDEFINED) {
-            Msg("!   Skipping system value: %s (SV type: %d)",
-                paramDesc.SemanticName, paramDesc.SystemValueType);
-            continue;
-        }
+        // Parse semantic index
+        u32 semanticIndex = fieldLayout->getSemanticIndex();
+
+        // Get format from field type
+        auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+        auto* fieldType = fieldTypeLayout ? fieldTypeLayout->getType() : nullptr;
+        nvrhi::Format format = GetFormatFromSlangType(fieldType);
 
         VertexInputSignature::InputElement elem;
-        elem.semanticName = paramDesc.SemanticName;
-        elem.semanticIndex = paramDesc.SemanticIndex;
-        elem.format = GetFormatFromSignature(paramDesc);
+        elem.semanticName = semanticName;
+        elem.semanticIndex = semanticIndex;
+        elem.format = format;
         elem.inputSlot = 0;  // Default to slot 0 (will be overridden from vertex decl)
 
         signature.elements.push_back(elem);
     }
 
-    reflection->Release();
+    // NOTE: Don't release reflection - it's owned by the shader struct (SVS/SPS)
 
     return signature;
 }
@@ -124,77 +175,34 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
 // ═══════════════════════════════════════════════════
 
 ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(
-    const void* bytecode,
-    size_t bytecodeSize) {
-    VERIFY(bytecode);
-    VERIFY(bytecodeSize > 0);
+    slang::ShaderReflection* reflection) {
 
     ShaderConstantBuffers result;
 
-    // ═══════════════════════════════════════════════════
-    //  GET SHADER REFLECTION INTERFACE
-    // ═══════════════════════════════════════════════════
-
-    ID3D11ShaderReflection* reflection = nullptr;
-    HRESULT hr = D3DReflect(
-        bytecode,
-        bytecodeSize,
-        IID_ID3D11ShaderReflection,
-        (void**)&reflection
-    );
-
-    if (FAILED(hr)) {
-        Msg("! [ShaderReflector] Failed to create reflection interface for CB analysis (HRESULT: 0x%08X)", hr);
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for constant buffer analysis");
         return result;
     }
 
-    D3D11_SHADER_DESC shaderDesc;
-    reflection->GetDesc(&shaderDesc);
-
     // ═══════════════════════════════════════════════════
-    //  ENUMERATE CONSTANT BUFFERS
+    //  USE SLANG REFLECTION WRAPPER
     // ═══════════════════════════════════════════════════
+    //
+    // Much simpler than D3DReflect! Slang gives us bind points directly.
 
-    for (u32 i = 0; i < shaderDesc.ConstantBuffers; i++) {
-        ID3D11ShaderReflectionConstantBuffer* cbReflection = reflection->GetConstantBufferByIndex(i);
-        if (!cbReflection) {
-            Msg("! [ShaderReflector] Failed to get CB at index %u", i);
-            continue;
-        }
+    SlangReflectionWrapper wrapper(reflection);
+    auto constantBuffers = wrapper.GetConstantBuffers();
 
-        D3D11_SHADER_BUFFER_DESC cbDesc;
-        hr = cbReflection->GetDesc(&cbDesc);
-        if (FAILED(hr)) {
-            Msg("! [ShaderReflector] Failed to get CB desc at index %u", i);
-            continue;
-        }
+    for (const auto& cb : constantBuffers) {
+        ConstantBufferInfo info;
+        info.name = cb.name;
+        info.slot = cb.slot;  // Direct from Slang - no searching needed!
+        info.size = cb.size;
 
-        // Get the binding point for this CB
-        u32 bindPoint = 0;
-        bool foundBinding = false;
-
-        // Search through bound resources to find this CB's binding point
-        for (u32 j = 0; j < shaderDesc.BoundResources; j++) {
-            D3D11_SHADER_INPUT_BIND_DESC bindDesc;
-            hr = reflection->GetResourceBindingDesc(j, &bindDesc);
-            if (FAILED(hr)) continue;
-
-            if (bindDesc.Type == D3D_SIT_CBUFFER && xr_strcmp(bindDesc.Name, cbDesc.Name) == 0) {
-                bindPoint = bindDesc.BindPoint;
-                foundBinding = true;
-                break;
-            }
-        }
-
-        if (!foundBinding) {
-            Msg("! [ShaderReflector] Warning: Could not find binding point for CB '%s'", cbDesc.Name);
-        }
-
-        ConstantBufferInfo cbInfo(cbDesc.Name, bindPoint, cbDesc.Size);
-        result.buffers.push_back(cbInfo);
+        result.buffers.push_back(info);
     }
 
-    reflection->Release();
+    // NOTE: Don't release reflection - it's owned by the shader struct (SVS/SPS)
 
     return result;
 }
@@ -204,77 +212,84 @@ ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(
 // ═══════════════════════════════════════════════════
 
 ShaderRTBindings ShaderReflector::AnalyzePixelShader(
-    ID3D11PixelShader* ps,
-    const void* bytecode,
-    size_t bytecodeSize) {
-
-    // ps is unused - we only need bytecode for D3DReflect
-    // VERIFY(ps);
-    VERIFY(bytecode);
-    VERIFY(bytecodeSize > 0);
+    slang::ShaderReflection* reflection) {
 
     ShaderRTBindings bindings;
 
-    // ═══════════════════════════════════════════════════
-    //  GET SHADER REFLECTION INTERFACE
-    // ═══════════════════════════════════════════════════
-
-    ID3D11ShaderReflection* reflection = nullptr;
-    HRESULT hr = D3DReflect(
-        bytecode,
-        bytecodeSize,
-        IID_ID3D11ShaderReflection,
-        (void**)&reflection
-    );
-
-    if (FAILED(hr)) {
-        Msg("! [ShaderReflector] Failed to create reflection interface (HRESULT: 0x%08X)", hr);
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for pixel shader");
         return bindings;
     }
 
-    D3D11_SHADER_DESC shaderDesc;
-    reflection->GetDesc(&shaderDesc);
-
     // ═══════════════════════════════════════════════════
-    //  ENUMERATE INPUT RESOURCES (Textures + Samplers)
+    //  EXTRACT INPUT RESOURCES (Textures + Samplers)
     // ═══════════════════════════════════════════════════
+    //
+    // Much simpler with Slang! Just use the wrapper.
 
-    for (u32 i = 0; i < shaderDesc.BoundResources; i++) {
-        D3D11_SHADER_INPUT_BIND_DESC bindDesc;
-        reflection->GetResourceBindingDesc(i, &bindDesc);
+    SlangReflectionWrapper wrapper(reflection);
 
-        // Textures (SRVs)
-        if (bindDesc.Type == D3D_SIT_TEXTURE) {
-            ShaderRTBindings::InputTexture input;
-            input.name = bindDesc.Name;  // "s_position", "s_normal", etc.
-            input.slot = bindDesc.BindPoint;  // t0, t1, ...
+    // Input textures (SRVs)
+    auto textures = wrapper.GetTextures();
+    for (const auto& tex : textures) {
+        ShaderRTBindings::InputTexture input;
+        input.name = tex.name;
+        input.slot = tex.slot;
+        bindings.inputTextures.push_back(input);
+    }
 
-            bindings.inputTextures.push_back(input);
-        }
-        // Samplers
-        else if (bindDesc.Type == D3D_SIT_SAMPLER) {
-            ShaderRTBindings::Sampler sampler;
-            sampler.name = bindDesc.Name;  // "smp_base", "smp_rtlinear", etc.
-            sampler.slot = bindDesc.BindPoint;  // s0, s1, ...
-
-            bindings.samplers.push_back(sampler);
-        }
+    // Samplers
+    auto samplers = wrapper.GetSamplers();
+    for (const auto& samp : samplers) {
+        ShaderRTBindings::Sampler sampler;
+        sampler.name = samp.name;
+        sampler.slot = samp.slot;
+        bindings.samplers.push_back(sampler);
     }
 
     // ═══════════════════════════════════════════════════
     //  ENUMERATE OUTPUT PARAMETERS (Render Targets)
     // ═══════════════════════════════════════════════════
 
-    for (u32 i = 0; i < shaderDesc.OutputParameters; i++) {
-        D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
-        reflection->GetOutputParameterDesc(i, &paramDesc);
+    if (reflection->getEntryPointCount() == 0) {
+        Msg("! [ShaderReflector] No entry points found in pixel shader");
+        return bindings;
+    }
 
-        if (xr_strcmp(paramDesc.SemanticName, "SV_Target") == 0) {
+    auto* entryPoint = reflection->getEntryPointByIndex(0);
+    if (!entryPoint) {
+        Msg("! [ShaderReflector] Failed to get pixel shader entry point");
+        return bindings;
+    }
+
+    // Enumerate entry point parameters looking for fragment outputs
+    u32 paramCount = entryPoint->getParameterCount();
+    for (u32 i = 0; i < paramCount; i++) {
+        auto* param = entryPoint->getParameterByIndex(i);
+        if (!param)
+            continue;
+
+        auto* typeLayout = param->getTypeLayout();
+        if (!typeLayout)
+            continue;
+
+        // Only interested in fragment outputs (render targets)
+        if (typeLayout->getParameterCategory() != slang::ParameterCategory::FragmentOutput)
+            continue;
+
+        // Get semantic name (should be SV_Target or SV_Depth)
+        const char* semanticName = param->getSemanticName();
+        if (!semanticName)
+            continue;
+
+        // Check for render target outputs (SV_Target)
+        if (xr_strcmp(semanticName, "SV_Target") == 0) {
             ShaderRTBindings::OutputRT output;
-            output.slot = paramDesc.SemanticIndex;  // SV_Target0, SV_Target1, ...
-
+            output.slot = param->getSemanticIndex();  // SV_Target0, SV_Target1, etc.
             bindings.outputRTs.push_back(output);
-        } else if (xr_strcmp(paramDesc.SemanticName, "SV_Depth") == 0) {
+        }
+        // Check for depth output
+        else if (xr_strcmp(semanticName, "SV_Depth") == 0) {
             bindings.hasDepthOutput = true;
         }
     }
@@ -289,29 +304,52 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     //  INFER RT SEMANTICS BASED ON PHASE AND SLOT ORDER
     // ═══════════════════════════════════════════════════
 
-    // Get output parameters again to extract component masks
-    for (u32 i = 0; i < shaderDesc.OutputParameters; i++) {
-        D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
-        reflection->GetOutputParameterDesc(i, &paramDesc);
+    // Second pass: extract component masks for semantic inference
+    for (u32 i = 0; i < paramCount; i++) {
+        auto* param = entryPoint->getParameterByIndex(i);
+        if (!param)
+            continue;
 
-        if (xr_strcmp(paramDesc.SemanticName, "SV_Target") == 0) {
-            u32 slot = paramDesc.SemanticIndex;
+        auto* typeLayout = param->getTypeLayout();
+        if (!typeLayout)
+            continue;
 
-            // Find the OutputRT we created earlier
-            for (auto& output : bindings.outputRTs) {
-                if (output.slot == slot) {
-                    output.semantic = InferRTSemantic(slot, paramDesc.Mask, bindings.phase);
-                    break;
-                }
+        if (typeLayout->getParameterCategory() != slang::ParameterCategory::FragmentOutput)
+            continue;
+
+        const char* semanticName = param->getSemanticName();
+        if (!semanticName || xr_strcmp(semanticName, "SV_Target") != 0)
+            continue;
+
+        u32 slot = param->getSemanticIndex();
+
+        // Get component mask from type
+        auto* type = typeLayout->getType();
+        u32 componentMask = 0;
+        if (type) {
+            auto kind = type->getKind();
+            u32 componentCount = 1;
+
+            if (kind == slang::TypeReflection::Kind::Vector) {
+                componentCount = type->getElementCount();
+            }
+
+            // Build mask: 1=x, 2=y, 4=z, 8=w
+            for (u32 c = 0; c < componentCount && c < 4; c++) {
+                componentMask |= (1 << c);
+            }
+        }
+
+        // Find the OutputRT we created earlier and set semantic
+        for (auto& output : bindings.outputRTs) {
+            if (output.slot == slot) {
+                output.semantic = InferRTSemantic(slot, componentMask, bindings.phase);
+                break;
             }
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    //  CLEANUP
-    // ═══════════════════════════════════════════════════
-
-    reflection->Release();
+    // NOTE: Don't release reflection - it's owned by the shader struct (SVS/SPS)
 
     return bindings;
 }
@@ -452,6 +490,71 @@ xr_vector<const char*> ShaderReflector::GetPhaseRTNames(RenderPhase phase) {
         default:
             return {};
     }
+}
+
+// ═══════════════════════════════════════════════════
+//  EXTRACT REFLECTION (NEW UNIFIED API)
+// ═══════════════════════════════════════════════════
+
+ExtractedReflection ShaderReflector::ExtractReflection(
+    slang::ShaderReflection* slangReflection,
+    bool isVertexShader)
+{
+    ExtractedReflection result;
+
+    if (!slangReflection) {
+        Msg("! [ShaderReflector::ExtractReflection] NULL Slang reflection!");
+        return result;
+    }
+
+    Msg("  [ShaderReflector::ExtractReflection] Extracting %s shader reflection (entryPoints=%u)",
+        isVertexShader ? "vertex" : "pixel",
+        slangReflection->getEntryPointCount());
+
+    // Extract all reflection data using existing Analyze methods
+    if (isVertexShader)
+    {
+        result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
+        Msg("  [ShaderReflector::ExtractReflection] Extracted %u vertex inputs",
+            result.vertexInputSignature.elements.size());
+    }
+    else
+    {
+        result.rtBindings = AnalyzePixelShader(slangReflection);
+        Msg("  [ShaderReflector::ExtractReflection] Extracted %u RT outputs",
+            result.rtBindings.outputRTs.size());
+    }
+
+    result.constantBuffers = AnalyzeConstantBuffers(slangReflection);
+    Msg("  [ShaderReflector::ExtractReflection] Extracted %u constant buffers",
+        result.constantBuffers.buffers.size());
+
+    return result;
+}
+
+// ═══════════════════════════════════════════════════
+//  REFLECTION ACCESSORS
+// ═══════════════════════════════════════════════════
+
+const VertexInputSignature& ShaderReflector::GetVertexInputSignature(
+    const ExtractedReflection* reflection)
+{
+    static VertexInputSignature empty;
+    return reflection ? reflection->vertexInputSignature : empty;
+}
+
+const ShaderRTBindings& ShaderReflector::GetRTBindings(
+    const ExtractedReflection* reflection)
+{
+    static ShaderRTBindings empty;
+    return reflection ? reflection->rtBindings : empty;
+}
+
+const ShaderConstantBuffers& ShaderReflector::GetConstantBuffers(
+    const ExtractedReflection* reflection)
+{
+    static ShaderConstantBuffers empty;
+    return reflection ? reflection->constantBuffers : empty;
 }
 
 } // namespace xray::render::framegraph

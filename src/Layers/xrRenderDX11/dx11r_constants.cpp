@@ -399,6 +399,7 @@ BOOL R_constant_table::parseSlangReflection(slang::ShaderReflection* reflection,
             R_constant_load& L = C->samp;
             L.index = r_index;
             L.cls = RC_dx11texture;
+            Msg("  [parseSlangReflection] Added texture constant '%s' (type=RC_dx11texture, index=%u)", tex.name, r_index);
         }
         else
         {

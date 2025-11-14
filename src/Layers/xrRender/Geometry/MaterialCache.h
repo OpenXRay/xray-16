@@ -3,6 +3,7 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/FrameGraph/GlobalParamsMapper.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"  // For TextureHandle definition
 
 // Forward declarations - must be in RENDER_NAMESPACE
@@ -233,6 +234,10 @@ struct MaterialPSO {
         std::sort(slots.begin(), slots.end());
         return slots;
     }
+
+    // ─── GlobalParams_0 Mapper (Slang-wrapped loose uniforms) ───
+    // Automatically populated from Slang reflection if shader has globalParams_0
+    xr_unique_ptr<GlobalParamsMapper> globalParamsMapper;
 
     // Debug name
     shared_str debugName;

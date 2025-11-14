@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"  // Need full include for ShaderResult
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render {
@@ -100,14 +101,11 @@ private:
     // Material system
     xr_unique_ptr<MaterialCache> m_materialCache;
 
-    // Direct NVRHI shaders (no wrappers! - legacy, will be replaced by MaterialCache)
-    nvrhi::ShaderHandle m_vertexShader;
-    nvrhi::ShaderHandle m_pixelShader;
+    // Shaders WITH Slang reflection (eliminates double-reflection!)
+    // ShaderResult owns: handle, slangProgram, slangReflection, bytecode
+    framegraph::ShaderLoader::ShaderResult m_vertexShader;
+    framegraph::ShaderLoader::ShaderResult m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
-
-    // Shader bytecode (for reflection and analysis)
-    xr_vector<u8> m_vertexShaderBytecode;
-    xr_vector<u8> m_pixelShaderBytecode;
 
     // Volatile constant buffer pool (dynamically creates VCBs on-demand with deduplication)
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;

@@ -514,8 +514,8 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
     if (!vs || !ps)
         return nullptr;
 
-    // Validate bytecode exists
-    if (!vs->bytecode || !ps->bytecode)
+    // Validate extracted reflection exists
+    if (!vs->reflection || !ps->reflection)
         return nullptr;
 
     // Build cache key: "VS_name|PS_name|tex0|tex1|tex2..."
@@ -559,9 +559,8 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
     // ═══════════════════════════════════════════════════════
 
 
-    // Analyze VS constant buffers
-    auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
-        vs->bytecode->GetBufferPointer(), vs->bytecode->GetBufferSize());
+    // Get VS constant buffers from extracted reflection
+    const auto& vsCBs = framegraph::ShaderReflector::GetConstantBuffers(vs->reflection);
     for (const auto& cbInfo : vsCBs.buffers) {
         // Determine if this is a per-object CB (slot 0) or global (slot 1+)
         bool isPerObject = (cbInfo.slot == 0);
@@ -592,9 +591,8 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         }
     }
 
-    // Analyze PS constant buffers
-    auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
-        ps->bytecode->GetBufferPointer(), ps->bytecode->GetBufferSize());
+    // Get PS constant buffers from extracted reflection
+    const auto& psCBs = framegraph::ShaderReflector::GetConstantBuffers(ps->reflection);
     for (const auto& cbInfo : psCBs.buffers) {
         bool isPerObject = (cbInfo.slot == 0);
 

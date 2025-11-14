@@ -164,4 +164,230 @@ nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(
     return shader;
 }
 
+// ═══════════════════════════════════════════════════
+//  NEW: SHADER LOADING WITH SLANG REFLECTION
+// ═══════════════════════════════════════════════════
+
+ShaderLoader::ShaderResult ShaderLoader::LoadVertexShaderWithReflection(
+    const char* name,
+    const char* entryPoint)
+{
+    ShaderResult result;
+
+    // Open shader source file
+    IReader* fs = OpenShaderFile(name, ".vs");
+    if (!fs)
+        return result;  // Empty result
+
+    // Compute hash of shader source
+    u32 sourceHash = ShaderCache::ComputeHash(
+        (const char*)fs->pointer(),
+        fs->length()
+    );
+
+    // Try to load bytecode + reflection from cache
+    ExtractedReflection deserializedReflection;
+    bool cacheHit = m_cache.TryLoad(name, ".vs", sourceHash, result.bytecode, &deserializedReflection);
+
+    if (cacheHit)
+    {
+        // Cache hit - create shader from cached bytecode + deserialized reflection
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Vertex;
+        desc.debugName = name;
+
+        result.handle = m_device->GetNVRHIDevice()->createShader(
+            desc,
+            result.bytecode.data(),
+            result.bytecode.size()
+        );
+
+        fs->close();
+
+        if (!result.handle)
+        {
+            Msg("! [ShaderLoader] Failed to create NVRHI vertex shader from cache: %s", name);
+            return result;
+        }
+
+        // Store deserialized reflection
+        result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
+
+        Msg("  ✓ Loaded vertex shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        return result;
+    }
+
+    // Cache miss - compile with Slang (gets reflection!)
+    Msg("~ [ShaderLoader] Compiling %s.vs (entry: %s)", name, entryPoint);
+
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(),
+        entryPoint,
+        xray::render::SlangCompiler::Stage::Vertex,
+        xray::render::SlangCompiler::Target::DXBC,
+        name
+    );
+
+    fs->close();
+
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.vs", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;  // Empty result
+    }
+
+    // Create NVRHI shader
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Vertex;
+    desc.debugName = name;
+
+    result.handle = m_device->GetNVRHIDevice()->createShader(
+        desc,
+        compileResult.bytecode.data(),
+        compileResult.bytecode.size()
+    );
+
+    if (!result.handle)
+    {
+        Msg("! [ShaderLoader] Failed to create NVRHI vertex shader: %s", name);
+        return result;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  EXTRACT AND STORE REFLECTION
+    // ═══════════════════════════════════════════════════
+    result.bytecode = std::move(compileResult.bytecode);
+
+    // Extract reflection from Slang for storage and caching
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection,
+        true  // isVertexShader
+    );
+
+    // Store extracted reflection in result
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+
+    // Save bytecode + reflection to cache
+    m_cache.Save(name, ".vs", sourceHash, result.bytecode, &extractedReflection);
+
+    Msg("  ✓ Loaded vertex shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    return result;
+}
+
+ShaderLoader::ShaderResult ShaderLoader::LoadPixelShaderWithReflection(
+    const char* name,
+    const char* entryPoint)
+{
+    ShaderResult result;
+
+    // Open shader source file
+    IReader* fs = OpenShaderFile(name, ".ps");
+    if (!fs)
+        return result;  // Empty result
+
+    // Compute hash of shader source
+    u32 sourceHash = ShaderCache::ComputeHash(
+        (const char*)fs->pointer(),
+        fs->length()
+    );
+
+    // Try to load bytecode + reflection from cache
+    ExtractedReflection deserializedReflection;
+    bool cacheHit = m_cache.TryLoad(name, ".ps", sourceHash, result.bytecode, &deserializedReflection);
+
+    if (cacheHit)
+    {
+        // Cache hit - create shader from cached bytecode + deserialized reflection
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Pixel;
+        desc.debugName = name;
+
+        result.handle = m_device->GetNVRHIDevice()->createShader(
+            desc,
+            result.bytecode.data(),
+            result.bytecode.size()
+        );
+
+        fs->close();
+
+        if (!result.handle)
+        {
+            Msg("! [ShaderLoader] Failed to create NVRHI pixel shader from cache: %s", name);
+            return result;
+        }
+
+        // Store deserialized reflection
+        result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
+
+        Msg("  ✓ Loaded pixel shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        return result;
+    }
+
+    // Cache miss - compile with Slang (gets reflection!)
+    Msg("~ [ShaderLoader] Compiling %s.ps (entry: %s)", name, entryPoint);
+
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(),
+        entryPoint,
+        xray::render::SlangCompiler::Stage::Pixel,
+        xray::render::SlangCompiler::Target::DXBC,
+        name
+    );
+
+    fs->close();
+
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.ps", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;  // Empty result
+    }
+
+    // Create NVRHI shader
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Pixel;
+    desc.debugName = name;
+
+    result.handle = m_device->GetNVRHIDevice()->createShader(
+        desc,
+        compileResult.bytecode.data(),
+        compileResult.bytecode.size()
+    );
+
+    if (!result.handle)
+    {
+        Msg("! [ShaderLoader] Failed to create NVRHI pixel shader: %s", name);
+        return result;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  EXTRACT AND STORE REFLECTION
+    // ═══════════════════════════════════════════════════
+    result.bytecode = std::move(compileResult.bytecode);
+
+    // Extract reflection from Slang for storage and caching
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection,
+        false  // isVertexShader (this is pixel shader)
+    );
+
+    // Store extracted reflection in result
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+
+    // Save bytecode + reflection to cache
+    m_cache.Save(name, ".ps", sourceHash, result.bytecode, &extractedReflection);
+
+    Msg("  ✓ Loaded pixel shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    return result;
+}
+
 } // namespace xray::render::framegraph

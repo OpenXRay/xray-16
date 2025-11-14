@@ -202,13 +202,22 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     result.success = true;
 
     // Capture Slang reflection for native NVRHI shader creation
+    // IMPORTANT: Use getProgramWithEntryPoints() to get reflection that includes entry point info!
+    // getProgram() only returns module-level reflection without entry points.
     slang::IComponentType* program = nullptr;
-    SlangResult getProgramResult = request->getProgram(&program);  // Get compiled program
+    SlangResult getProgramResult = request->getProgramWithEntryPoints(&program);  // Get composed program with entry points
     if (SLANG_SUCCEEDED(getProgramResult) && program)
     {
         program->addRef();  // Keep alive for reflection queries
         result.slangProgram = program;
-        result.reflection = program->getLayout();  // Owned by program, don't release separately
+
+        // Get the program layout (reflection) - this now includes entry point reflection!
+        auto* programLayout = program->getLayout();
+        if (programLayout)
+        {
+            Msg("  [SlangCompiler] ProgramLayout has %u entry points", programLayout->getEntryPointCount());
+        }
+        result.reflection = programLayout;  // Owned by program, don't release separately
     }
 
     Msg("* [SlangCompiler] Successfully compiled %s (entry: %s, stage: %s, target: %s) -> %zu bytes",

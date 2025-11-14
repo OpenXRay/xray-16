@@ -43,7 +43,10 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
 
     VERIFY(ResourceName);
     if (!texture)
+    {
+        Msg("! [r_dx11Texture] Texture is NULL for resource '%s'", ResourceName);
         return;
+    }
     //
     string256 TexName;
     xr_strcpy(TexName, texture);
@@ -53,12 +56,17 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     ref_constant C = ctable.get(ResourceName, ctable.dx9compatibility ? RC_dx11texture : u16(-1));
     // VERIFY(C);
     if (!C)
+    {
+        Msg("! [r_dx11Texture] Constant '%s' not found in shader", ResourceName);
         return;
+    }
 
     R_ASSERT(C->type == RC_dx11texture);
     u32 stage = C->samp.index;
 
+    Msg("  [r_dx11Texture] Adding texture '%s' at resource '%s' (stage=%u)", TexName, ResourceName, stage);
     passTextures.emplace_back(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName)));
+    Msg("  [r_dx11Texture] passTextures now has %zu entries", passTextures.size());
 }
 
 void CBlender_Compile::i_dx11FilterAnizo(u32 s, BOOL value)
