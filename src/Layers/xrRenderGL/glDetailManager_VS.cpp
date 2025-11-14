@@ -84,7 +84,7 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     //hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
     hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1);
 }
-
+#include <glm/glm.hpp>
 void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
                                     u32 lod_id)
 {
@@ -148,6 +148,8 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                 VERIFY(c_storage);*/
 
                 u32 dwBatch = 0;
+                std::vector<glm::vec4> uniformBuffer;
+                uniformBuffer.reserve(hw_BatchSize*4);
 
                 for (auto items : vis)
                 {
@@ -158,15 +160,17 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                         // Build matrix ( 3x4 matrix, last row - color )
                         float scale = instance->scale_calculated;
                         Fmatrix& M = instance->mRotY;
-                        cmd_list.set_ca(&*constArray, base + 0, M._11 * scale, M._21 * scale, M._31 * scale, M._41);
-                        cmd_list.set_ca(&*constArray, base + 1, M._12 * scale, M._22 * scale, M._32 * scale, M._42);
-                        cmd_list.set_ca(&*constArray, base + 2, M._13 * scale, M._23 * scale, M._33 * scale, M._43);
+
+                        uniformBuffer.emplace_back(M._11 * scale, M._21 * scale, M._31 * scale, M._41);
+                        uniformBuffer.emplace_back(M._12 * scale, M._22 * scale, M._32 * scale, M._42);
+                        uniformBuffer.emplace_back(M._13 * scale, M._23 * scale, M._33 * scale, M._43);
 
                         // Build color
                         // R2 only needs hemisphere
                         float h = instance->c_hemi;
                         float s = instance->c_sun;
-                        cmd_list.set_ca(&*constArray, base + 3, s, s, s, h);
+                        /*cmd_list.set_ca(&*constArray, base + 3, s, s, s, h);*/
+                        uniformBuffer.emplace_back(s, s, s, h);
                         dwBatch ++;
                         if (dwBatch == hw_BatchSize)
                         {
@@ -176,21 +180,22 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                             u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
                             //RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                             //RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
+
+                            R_constant_load L = constArray->vs;
+                            if (constArray->destination & RC_dest_pixel) { L = constArray->ps; }
+                            if (constArray->destination & RC_dest_vertex) { L = constArray->vs; }
+                            if (constArray->destination & RC_dest_geometry) { L = constArray->gs; }
+                            if (constArray->destination & RC_dest_all) { L = constArray->pp; }
+
+                            CHK_GL(glProgramUniform4fv(L.program, L.location, uniformBuffer.size(), reinterpret_cast<GLfloat*>(uniformBuffer.data())));
+                            //L.location += dwBatch*4;
+
                             cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                             cmd_list.stat.r.s_details.add(dwCNT_verts);
+                            uniformBuffer.clear();
 
                             // restart
                             dwBatch = 0;
-
-                            //	Remap constants to memory directly (just in case anything goes wrong)
-                            /*{
-                                void*	pVData;
-                                RCache.get_ConstantDirect( strArray,
-                                    hw_BatchSize*sizeof(Fvector4)*4,
-                                    &pVData, 0, 0);
-                                c_storage = (Fvector4*) pVData;
-                            }
-                            VERIFY(c_storage);*/
                         }
                     }
                 }
@@ -202,6 +207,15 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                     u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
                     //RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                     //RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
+                    R_constant_load L = constArray->vs;
+                    if (constArray->destination & RC_dest_pixel) { L = constArray->ps; }
+                    if (constArray->destination & RC_dest_vertex) { L = constArray->vs; }
+                    if (constArray->destination & RC_dest_geometry) { L = constArray->gs; }
+                    if (constArray->destination & RC_dest_all) { L = constArray->pp; }
+
+                    CHK_GL(glProgramUniform4fv(L.program, L.location, uniformBuffer.size(), reinterpret_cast<GLfloat*>(uniformBuffer.data())));
+                    //L.location += dwBatch*4;
+
                     cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                     cmd_list.stat.r.s_details.add(dwCNT_verts);
                 }
