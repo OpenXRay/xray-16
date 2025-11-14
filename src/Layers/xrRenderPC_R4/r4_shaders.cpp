@@ -44,40 +44,6 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 
         result->constants.dx9compatibility = false;
 
-        for (const auto& tex : extractedReflection->rtBindings.inputTextures)
-        {
-            u32 destination = ShaderTypeTraits<T>::GetShaderDest();
-            u16 r_index = u16(-1);
-
-            if (destination & RC_dest_pixel)
-                r_index = u16(tex.slot + CTexture::rstPixel);
-            else if (destination & RC_dest_vertex)
-                r_index = u16(tex.slot + CTexture::rstVertex);
-            else if (destination & RC_dest_geometry)
-                r_index = u16(tex.slot + CTexture::rstGeometry);
-            else if (destination & RC_dest_hull)
-                r_index = u16(tex.slot + CTexture::rstHull);
-            else if (destination & RC_dest_domain)
-                r_index = u16(tex.slot + CTexture::rstDomain);
-            else if (destination & RC_dest_compute)
-                r_index = u16(tex.slot + CTexture::rstCompute);
-            else
-                continue;
-
-            ref_constant C = result->constants.get(tex.name, u16(-1));
-            if (!C)
-            {
-                C = result->constants.table.emplace_back(xr_new<R_constant>());
-                C->name = tex.name;
-                C->destination = RC_dest_sampler;
-                C->type = RC_dx11texture;
-                R_constant_load& L = C->samp;
-                L.index = r_index;
-                L.cls = RC_dx11texture;
-                Msg("  [create_shader] Added texture constant '%s' to ctable (index=%u)", tex.name.c_str(), r_index);
-            }
-        }
-
 #if defined(USE_DX11)
         result->reflection = xr_new<xray::render::framegraph::ExtractedReflection>(*extractedReflection);
 

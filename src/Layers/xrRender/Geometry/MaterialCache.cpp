@@ -236,13 +236,17 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->textures.clear();
 
-    STextureList* texList = pass->T._get();
-
-    if (texList && !texList->empty()) {
-        Msg("  [ExtractTextures] Using X-Ray pass texture list (%u textures)", texList->size());
-
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     VERIFY(texManager);
+
+    STextureList* texList = pass->T._get();
+
+    if (!texList || texList->empty()) {
+        Msg("  [ExtractTextures] No textures bound for this shader");
+        return;
+    }
+
+    Msg("  [ExtractTextures] Loading %u textures from pass", texList->size());
 
     for (size_t i = 0; i < texList->size(); i++) {
         const auto& texPair = (*texList)[i];
@@ -282,36 +286,10 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
 
-        Msg("  [ExtractTextures] Added texture '%s' at X-Ray stage=%u (will bind to t%u)",
-            textureName, stage, stage);
+        Msg("  [ExtractTextures] Loaded texture '%s' at slot=%u", textureName, stage);
     }
 
-        Msg("  [ExtractTextures] Total textures from X-Ray pass: %u", matPSO->textures.size());
-        return;
-    }
-
-    Msg("  [ExtractTextures] X-Ray pass->T is empty, using Slang reflection");
-
-    SPS* ps = pass->ps._get();
-    if (!ps || !ps->reflection) {
-        Msg("! [ExtractTextures] No pixel shader reflection available");
-        return;
-    }
-
-    const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
-    Msg("  [ExtractTextures] Found %u texture slots in pixel shader reflection", inputTextures.size());
-
-    for (const auto& texReflection : inputTextures) {
-        MaterialPSO::TextureSlot texSlot;
-        texSlot.slot = texReflection.slot;
-        texSlot.handle = resources::TextureHandle();
-        matPSO->textures.push_back(texSlot);
-
-        Msg("  [ExtractTextures] Added placeholder for '%s' at slot t%u (no texture file assigned)",
-            texReflection.name.c_str(), texReflection.slot);
-    }
-
-    Msg("  [ExtractTextures] Total placeholder texture slots: %u", matPSO->textures.size());
+    Msg("  [ExtractTextures] Total textures loaded: %u", matPSO->textures.size());
 }
 
 bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
