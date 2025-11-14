@@ -401,34 +401,23 @@ ng::PipelineState* ParticlePass::GetOrCreateParticlePSO(
     psoDesc.debugName = debugName.c_str();
 
     // ─── Get or Create Cached Shaders (via MaterialCache) ───
-    ng::ShaderHandle vsHandle = m_materialCache->GetOrCreateShaderVS(vs);
-    if (!vsHandle.IsValid()) {
+    nvrhi::ShaderHandle vsHandle = m_materialCache->GetOrCreateShaderVS(vs);
+    if (!vsHandle) {
         Msg("! [ParticlePass] ERROR: Failed to get VS '%s'", vs->cName.c_str());
         return nullptr;
     }
 
-    ng::ShaderHandle psHandle = m_materialCache->GetOrCreateShaderPS(ps);
-    if (!psHandle.IsValid()) {
+    nvrhi::ShaderHandle psHandle = m_materialCache->GetOrCreateShaderPS(ps);
+    if (!psHandle) {
         Msg("! [ParticlePass] ERROR: Failed to get PS '%s'", ps->cName.c_str());
         return nullptr;
     }
 
-    ng::RCShader* rcVS = m_device->GetShader(vsHandle);
-    if (!rcVS) {
-        Msg("! [ParticlePass] ERROR: rcVS is NULL for handle %u", vs->cName.c_str());
-        m_device->DestroyShader(vsHandle);
-        return nullptr;
-    }
 
-    ng::RCShader* rcPS = m_device->GetShader(psHandle);
-    if (!rcPS) {
-        Msg("! [ParticlePass] ERROR: rcPS is NULL for handle %u", ps->cName.c_str());
-        m_device->DestroyShader(psHandle);
-        return nullptr;
-    }
 
-    psoDesc.vertexShader = rcVS;
-    psoDesc.pixelShader = rcPS;
+    // Assign direct NVRHI shader pointers (no wrappers!)
+    psoDesc.vertexShader = vsHandle.Get();
+    psoDesc.pixelShader = psHandle.Get();
 
     // ─── Input Layout (FVF::LIT format) ───
     // ParticleVertex: position (float3), color (uint32), texcoord (float2)

@@ -233,32 +233,16 @@ MaterialPSO* MaterialCache::CreatePSO(
     // ═══════════════════════════════════════════════════════
     //  GET OR CREATE CACHED SHADERS
     // ═══════════════════════════════════════════════════════
-
-    ng::ShaderHandle vsHandle = GetOrCreateShaderVS(pso->vertexShader);
-    if (!vsHandle.IsValid()) {
-        return nullptr;
-    }
-
-    ng::ShaderHandle psHandle = GetOrCreateShaderPS(pso->pixelShader);
-    if (!psHandle.IsValid()) {
-        return nullptr;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  GET RCSHADER OBJECTS FROM HANDLES
+    //  GET NVRHI SHADER HANDLES (Direct - no wrapper layer!)
     // ═══════════════════════════════════════════════════════
 
-    ng::RCShader* rcVS = m_device->GetShader(vsHandle);
-    if (!rcVS) {
-        m_device->DestroyShader(vsHandle);
-        m_device->DestroyShader(psHandle);
+    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
+    if (!nvrhiVS) {
         return nullptr;
     }
 
-    ng::RCShader* rcPS = m_device->GetShader(psHandle);
-    if (!rcPS) {
-        m_device->DestroyShader(vsHandle);
-        m_device->DestroyShader(psHandle);
+    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
+    if (!nvrhiPS) {
         return nullptr;
     }
 
@@ -321,8 +305,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     // ═══════════════════════════════════════════════════════
 
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = rcVS;
-    psoDesc.pixelShader = rcPS;
+    psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
+    psoDesc.pixelShader = nvrhiPS.Get();   // No wrapper layer!
 
     // Extract vertex attributes from visual's geometry declaration
     // CRITICAL: Use shader's input signature to determine correct order!
@@ -1492,12 +1476,12 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
         pso->textures.size(), pso->samplers.size());
 
-    // Get RCShader wrappers
-    ng::RCShader* rcVS = m_device->GetShader(GetOrCreateShaderVS(pso->vertexShader));
-    ng::RCShader* rcPS = m_device->GetShader(GetOrCreateShaderPS(pso->pixelShader));
+    // Get native NVRHI shaders directly
+    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
+    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
 
-    if (!rcVS || !rcPS) {
-        Msg("! [MaterialCache::CreateUIPSO] Failed to get RCShader objects");
+    if (!nvrhiVS || !nvrhiPS) {
+        Msg("! [MaterialCache::CreateUIPSO] Failed to get shader handles");
         return nullptr;
     }
 
@@ -1506,8 +1490,8 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     // Build pipeline state descriptor
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = rcVS;
-    psoDesc.pixelShader = rcPS;
+    psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
+    psoDesc.pixelShader = nvrhiPS.Get();   // No wrapper layer!
 
     // ═══════════════════════════════════════════════════════
     //  BUILD VERTEX ATTRIBUTES FROM SHADER REFLECTION
@@ -1650,10 +1634,10 @@ void MaterialCache::Clear()
 //  SHADER HANDLE CACHING (STAGE-AWARE)
 // ══════════════════════════════════════════════════════════
 
-ng::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
+nvrhi::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
 {
-    if (!vs || !vs->bytecode) {
-        return ng::ShaderHandle();  // Invalid handle
+    if (!vs) {
+        return nullptr;  // Invalid handle
     }
 
     // CRITICAL: Include stage in cache key! VS and PS can have same name!
@@ -1666,16 +1650,35 @@ ng::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
         return it->second;  // Return cached handle
     }
 
-    // Create new shader
-    ng::ShaderHandle vsHandle = m_device->CreateShader(
-        ng::ShaderStage::Vertex,
-        vs->bytecode->GetBufferPointer(),
-        vs->bytecode->GetBufferSize(),
-        vs->cName.c_str());
+    nvrhi::ShaderHandle vsHandle;
 
-    if (!vsHandle.IsValid()) {
-        Msg("! [MaterialCache] ERROR: Failed to create VS '%s'", vs->cName.c_str());
-        return ng::ShaderHandle();
+    // Use native NVRHI shader directly (no wrapper needed!)
+    if (vs->nvrhiShader)
+    {
+        // Native NVRHI shader - just use it directly!
+        vsHandle = vs->nvrhiShader;
+    }
+    else if (vs->bytecode)
+    {
+        // Legacy path: create NVRHI shader from bytecode
+        nvrhi::ShaderDesc desc(nvrhi::ShaderType::Vertex);
+        desc.debugName = vs->cName.c_str();
+        desc.entryName = "main";
+
+        vsHandle = m_device->GetNVRHIDevice()->createShader(
+            desc,
+            vs->bytecode->GetBufferPointer(),
+            vs->bytecode->GetBufferSize());
+    }
+    else
+    {
+        Msg("! [MaterialCache] ERROR: VS '%s' has no nvrhiShader and no bytecode", vs->cName.c_str());
+        return nullptr;
+    }
+
+    if (!vsHandle) {
+        Msg("! [MaterialCache] ERROR: Failed to get/create VS '%s'", vs->cName.c_str());
+        return nullptr;
     }
 
     // Cache and return
@@ -1683,10 +1686,10 @@ ng::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
     return vsHandle;
 }
 
-ng::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
+nvrhi::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
 {
-    if (!ps || !ps->bytecode) {
-        return ng::ShaderHandle();  // Invalid handle
+    if (!ps) {
+        return nullptr;  // Invalid handle
     }
 
     // CRITICAL: Include stage in cache key! VS and PS can have same name!
@@ -1699,16 +1702,35 @@ ng::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
         return it->second;  // Return cached handle
     }
 
-    // Create new shader
-    ng::ShaderHandle psHandle = m_device->CreateShader(
-        ng::ShaderStage::Pixel,
-        ps->bytecode->GetBufferPointer(),
-        ps->bytecode->GetBufferSize(),
-        ps->cName.c_str());
+    nvrhi::ShaderHandle psHandle;
 
-    if (!psHandle.IsValid()) {
-        Msg("! [MaterialCache] ERROR: Failed to create PS '%s'", ps->cName.c_str());
-        return ng::ShaderHandle();
+    // Use native NVRHI shader directly (no wrapper needed!)
+    if (ps->nvrhiShader)
+    {
+        // Native NVRHI shader - just use it directly!
+        psHandle = ps->nvrhiShader;
+    }
+    else if (ps->bytecode)
+    {
+        // Legacy path: create NVRHI shader from bytecode
+        nvrhi::ShaderDesc desc(nvrhi::ShaderType::Pixel);
+        desc.debugName = ps->cName.c_str();
+        desc.entryName = "main";
+
+        psHandle = m_device->GetNVRHIDevice()->createShader(
+            desc,
+            ps->bytecode->GetBufferPointer(),
+            ps->bytecode->GetBufferSize());
+    }
+    else
+    {
+        Msg("! [MaterialCache] ERROR: PS '%s' has no nvrhiShader and no bytecode", ps->cName.c_str());
+        return nullptr;
+    }
+
+    if (!psHandle) {
+        Msg("! [MaterialCache] ERROR: Failed to get/create PS '%s'", ps->cName.c_str());
+        return nullptr;
     }
 
     // Cache and return

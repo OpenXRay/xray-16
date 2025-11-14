@@ -3,6 +3,7 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "xrCore/FileCRC32.h"
 #include "Layers/xrRender/Shaders/SlangCompiler.h"
+#include "Layers/xrRender/Shaders/SlangReflectionWrapper.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 namespace xray::render::RENDER_NAMESPACE
@@ -18,70 +19,114 @@ void CRender::addShaderOption(const char* name, const char* value)
 
 template <typename T>
 static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    T*& result, bool const dx9compatibility)
+    T*& result, slang::ShaderReflection* slangReflection)
 {
-    HRESULT _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
-    if (!SUCCEEDED(_hr))
+    HRESULT _hr = S_OK;
+
+    // Create native NVRHI shader (new path)
+    if (slangReflection)
     {
-        Log("! Shader: ", file_name);
-        Msg("! CreateHWShader hr == 0x%08x", _hr);
-        return E_FAIL;
+        nvrhi::ShaderDesc shaderDesc(T::GetShaderType());
+        shaderDesc.debugName = file_name;
+        shaderDesc.entryName = "main";
+
+        result->nvrhiShader = RImplementation.m_renderDevice->GetNativeDevice()->createShader(
+            shaderDesc,
+            buffer,
+            buffer_size
+        );
+
+        _hr = result->nvrhiShader ? S_OK : E_FAIL;
+        if (!SUCCEEDED(_hr))
+        {
+            Log("! Shader: ", file_name);
+            Msg("! NVRHI createShader failed");
+            return E_FAIL;
+        }
+
+        // Parse Slang reflection for constants and resources
+        result->constants.dx9compatibility = false;  // Slang shaders are never DX9 compatible
+        result->constants.parseSlangReflection(slangReflection, ShaderTypeTraits<T>::GetShaderDest());
+
+        // Store bytecode for FrameGraph renderer
+#if defined(USE_DX11)
+        _hr = D3DCreateBlob(buffer_size, &result->bytecode);
+        if (SUCCEEDED(_hr) && result->bytecode)
+        {
+            CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
+        }
+        else
+        {
+            Msg("! Failed to create bytecode blob for %s", file_name);
+        }
+#endif
     }
+    else
+    {
+        // Legacy D3DReflect path (for non-Slang shaders)
+        _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
+        if (!SUCCEEDED(_hr))
+        {
+            Log("! Shader: ", file_name);
+            Msg("! CreateHWShader hr == 0x%08x", _hr);
+            return E_FAIL;
+        }
 
 #ifdef DEBUG
-    if (result->sh)
-    {
-        result->sh->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(file_name), file_name);
-    }
+        if (result->sh)
+        {
+            result->sh->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(file_name), file_name);
+        }
 #endif
 
-    // Store shader bytecode for NVRHI/FrameGraph renderer
+        // Store shader bytecode for NVRHI/FrameGraph renderer
 #if defined(USE_DX11)
-    _hr = D3DCreateBlob(buffer_size, &result->bytecode);
-    if (SUCCEEDED(_hr) && result->bytecode)
-    {
-        CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
-    }
-    else
-    {
-        Msg("! Failed to create bytecode blob for %s", file_name);
-    }
+        _hr = D3DCreateBlob(buffer_size, &result->bytecode);
+        if (SUCCEEDED(_hr) && result->bytecode)
+        {
+            CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
+        }
+        else
+        {
+            Msg("! Failed to create bytecode blob for %s", file_name);
+        }
 #endif
 
-    ID3DShaderReflection* pReflection = 0;
-    _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
+        ID3DShaderReflection* pReflection = 0;
+        _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 
-    if (SUCCEEDED(_hr) && pReflection)
-    {
-        result->constants.dx9compatibility = dx9compatibility;
-        // Parse constant table data
-        result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
+        if (SUCCEEDED(_hr) && pReflection)
+        {
+            result->constants.dx9compatibility = false;
+            // Parse constant table data
+            result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
 
-        _RELEASE(pReflection);
-    }
-    else
-    {
-        Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+            _RELEASE(pReflection);
+        }
+        else
+        {
+            Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
+        }
     }
 
     return _hr;
 }
 
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm, bool dx9compatibility)
+    void*& result, bool const disasm, slang::ShaderReflection* slangReflection)
 {
     HRESULT _result = E_FAIL;
     pcstr extension = ".hlsl";
     if (pTarget[0] == 'p')
     {
         extension = ".ps";
-        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result, dx9compatibility);
+        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result, slangReflection);
     }
     else if (pTarget[0] == 'v')
     {
         extension = ".vs";
         SVS* svs_result = (SVS*)result;
-        _result = create_shader(buffer, buffer_size, file_name, svs_result, dx9compatibility);
+        _result = create_shader(buffer, buffer_size, file_name, svs_result, slangReflection);
         if (SUCCEEDED(_result))
         {
             //	Store input signature (need only for VS)
@@ -97,22 +142,22 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
     else if (pTarget[0] == 'g')
     {
         extension = ".gs";
-        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result, dx9compatibility);
+        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result, slangReflection);
     }
     else if (pTarget[0] == 'c')
     {
         extension = ".cs";
-        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result, dx9compatibility);
+        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result, slangReflection);
     }
     else if (pTarget[0] == 'h')
     {
         extension = ".hs";
-        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result, dx9compatibility);
+        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result, slangReflection);
     }
     else if (pTarget[0] == 'd')
     {
         extension = ".ds";
-        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result, dx9compatibility);
+        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result, slangReflection);
     }
     else
     {
@@ -574,7 +619,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 name,
                 result,
                 o.disasm,
-                false  // dx9compatibility
+                nullptr  // No Slang reflection for cached shaders
             );
 
             if (SUCCEEDED(_result))
@@ -668,7 +713,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             return E_FAIL;
         }
 
-        // Create the shader with Slang-compiled bytecode
+        // Create the shader with Slang-compiled bytecode and reflection
         _result = create_shader(
             pTarget,                                      // Shader target (vs_5_0, ps_5_0, etc.)
             (DWORD*)compileResult.bytecode.data(),       // Bytecode buffer
@@ -676,7 +721,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             name,                                         // Shader name
             result,                                       // Output shader object
             o.disasm,                                     // Disassemble flag
-            false                                         // dx9compatibility
+            compileResult.reflection                      // Slang reflection data
         );
 
         if (SUCCEEDED(_result))
@@ -742,7 +787,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 #endif
                     _result =
                         create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(),
-                            filename, result, o.disasm, dx9compatibility);
+                            filename, result, o.disasm, nullptr);
                 }
             }
         }
@@ -786,7 +831,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             Log("- Compile shader:", file_name);
 #endif
             _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-                filename, result, o.disasm, dx9compatibility);
+                filename, result, o.disasm, nullptr);
         }
         else
         {

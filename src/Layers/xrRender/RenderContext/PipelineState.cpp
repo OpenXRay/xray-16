@@ -267,7 +267,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
 
     // ─── Shaders ───
     if (desc.vertexShader) {
-        nvrhiDesc.VS = desc.vertexShader->GetNativeShader();
+        nvrhiDesc.VS = desc.vertexShader;
         if (!nvrhiDesc.VS) {
             Msg("! [PipelineStateCache] Vertex shader has null native shader!");
         }
@@ -276,7 +276,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     }
 
     if (desc.pixelShader) {
-        nvrhiDesc.PS = desc.pixelShader->GetNativeShader();
+        nvrhiDesc.PS = desc.pixelShader;
         if (!nvrhiDesc.PS) {
             Msg("! [PipelineStateCache] Pixel shader has null native shader!");
         }
@@ -285,11 +285,11 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     }
 
     if (desc.geometryShader)
-        nvrhiDesc.GS = desc.geometryShader->GetNativeShader();
+        nvrhiDesc.GS = desc.geometryShader;
     if (desc.hullShader)
-        nvrhiDesc.HS = desc.hullShader->GetNativeShader();
+        nvrhiDesc.HS = desc.hullShader;
     if (desc.domainShader)
-        nvrhiDesc.DS = desc.domainShader->GetNativeShader();
+        nvrhiDesc.DS = desc.domainShader;
 
     // ─── Vertex Input Layout ───
     if (!desc.vertexAttributes.empty()) {
@@ -323,7 +323,7 @@ PipelineState* PipelineStateCache::CreatePipelineState(
         }
 
         nvrhiDesc.inputLayout = m_device->GetNativeDevice()->createInputLayout(
-            nvrhiAttrs.data(), (uint32_t)nvrhiAttrs.size(), desc.vertexShader->GetNativeShader());
+            nvrhiAttrs.data(), (uint32_t)nvrhiAttrs.size(), desc.vertexShader);
     }
 
     // ─── Rasterizer State ───

@@ -59,17 +59,17 @@ bool GBufferPass::LoadShaders()
 {
     ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
-    // Load G-Buffer vertex shader (with bytecode for reflection)
-    m_vertexShaderNative = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
-    if (!m_vertexShaderNative)
+    // Load G-Buffer vertex shader (direct NVRHI handle, with bytecode for reflection)
+    m_vertexShader = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
+    if (!m_vertexShader)
     {
         Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
         return false;
     }
 
-    // Load G-Buffer pixel shader (with bytecode for reflection)
-    m_pixelShaderNative = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
-    if (!m_pixelShaderNative)
+    // Load G-Buffer pixel shader (direct NVRHI handle, with bytecode for reflection)
+    m_pixelShader = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
+    if (!m_pixelShader)
     {
         Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
         return false;
@@ -118,19 +118,6 @@ bool GBufferPass::LoadShaders()
     // Log VCB pool statistics
     m_vcbPool->LogStats();
 
-    // Wrap shaders in RCShader for our abstraction layer
-    m_vertexShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        m_vertexShaderNative,
-        "gbuffer.vs"
-    );
-
-    m_pixelShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        m_pixelShaderNative,
-        "gbuffer.ps"
-    );
-
     // LEGACY: Old static per-object constant buffer creation (now handled by VCB pool)
     // The VCB pool dynamically creates appropriately-sized VCBs based on shader requirements.
     // This avoids wasting ring buffer space with oversized allocations.
@@ -147,9 +134,9 @@ bool GBufferPass::CreatePipeline(const framegraph::DefaultOutputLayout& outputs,
     // Create pipeline descriptor using our abstraction
     ng::PipelineStateDesc psoDesc;
 
-    // Shaders
-    psoDesc.vertexShader = m_vertexShader.get();
-    psoDesc.pixelShader = m_pixelShader.get();
+    // Shaders (direct NVRHI handles)
+    psoDesc.vertexShader = m_vertexShader.Get();
+    psoDesc.pixelShader = m_pixelShader.Get();
 
     // Vertex input layout - define attributes matching gbuffer.vs
     // ng::VertexAttribute order: semanticName, semanticIndex, format, offset, bufferIndex, isInstanced

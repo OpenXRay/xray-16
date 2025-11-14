@@ -184,12 +184,12 @@ enum class PrimitiveTopology {
 // ═══════════════════════════════════════════════════
 
 struct PipelineStateDesc {
-    // ─── Shaders ───
-    RCShader* vertexShader = nullptr;
-    RCShader* pixelShader = nullptr;
-    RCShader* geometryShader = nullptr;
-    RCShader* hullShader = nullptr;     // Tessellation control
-    RCShader* domainShader = nullptr;   // Tessellation evaluation
+    // ─── Shaders (Direct NVRHI - no wrapper!) ───
+    nvrhi::IShader* vertexShader = nullptr;
+    nvrhi::IShader* pixelShader = nullptr;
+    nvrhi::IShader* geometryShader = nullptr;
+    nvrhi::IShader* hullShader = nullptr;     // Tessellation control
+    nvrhi::IShader* domainShader = nullptr;   // Tessellation evaluation
 
     // ─── Vertex Input ───
     xr_vector<VertexAttribute> vertexAttributes;

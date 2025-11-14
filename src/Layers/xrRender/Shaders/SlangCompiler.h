@@ -51,7 +51,21 @@ public:
         xr_string errorMessage;
         xr_string warningMessage;
 
+        // Slang reflection data (for native NVRHI shader creation)
+        slang::IComponentType* slangProgram = nullptr;
+        slang::ShaderReflection* reflection = nullptr;
+
         bool IsValid() const { return success && !bytecode.empty(); }
+
+        ~CompileResult()
+        {
+            if (slangProgram)
+            {
+                slangProgram->release();
+                slangProgram = nullptr;
+            }
+            // Note: reflection is owned by slangProgram, don't release separately
+        }
     };
 
 public:

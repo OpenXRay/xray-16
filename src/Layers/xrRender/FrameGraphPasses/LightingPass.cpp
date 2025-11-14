@@ -31,34 +31,21 @@ bool LightingPass::LoadShaders()
 {
     ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
-    // Load fullscreen vertex shader (same as tonemap)
-    m_vertexShaderNative = loader.LoadVertexShader("fullscreen");
-    if (!m_vertexShaderNative)
+    // Load fullscreen vertex shader (direct NVRHI handle)
+    m_vertexShader = loader.LoadVertexShader("fullscreen");
+    if (!m_vertexShader)
     {
         Msg("! [LightingPass] Failed to load fullscreen vertex shader");
         return false;
     }
 
-    // Load lighting pixel shader
-    m_pixelShaderNative = loader.LoadPixelShader("lighting");
-    if (!m_pixelShaderNative)
+    // Load lighting pixel shader (direct NVRHI handle)
+    m_pixelShader = loader.LoadPixelShader("lighting");
+    if (!m_pixelShader)
     {
         Msg("! [LightingPass] Failed to load lighting pixel shader");
         return false;
     }
-
-    // Wrap shaders in RCShader for our abstraction layer
-    m_vertexShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Vertex,
-        m_vertexShaderNative,
-        "fullscreen.vs"
-    );
-
-    m_pixelShader = xr_make_unique<ng::RCShader>(
-        ng::ShaderStage::Pixel,
-        m_pixelShaderNative,
-        "lighting.ps"
-    );
 
     Msg("  ✓ Lighting shaders loaded successfully");
     return true;
@@ -73,9 +60,9 @@ bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
     // Create pipeline descriptor using our abstraction
     ng::PipelineStateDesc psoDesc;
 
-    // Shaders
-    psoDesc.vertexShader = m_vertexShader.get();
-    psoDesc.pixelShader = m_pixelShader.get();
+    // Shaders (direct NVRHI handles)
+    psoDesc.vertexShader = m_vertexShader.Get();
+    psoDesc.pixelShader = m_pixelShader.Get();
 
     // Vertex input - none (fullscreen triangle uses SV_VertexID)
     psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;

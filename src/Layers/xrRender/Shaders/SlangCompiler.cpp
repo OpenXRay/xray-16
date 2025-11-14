@@ -201,6 +201,16 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     std::memcpy(result.bytecode.data(), bytecodeData, bytecodeSize);
     result.success = true;
 
+    // Capture Slang reflection for native NVRHI shader creation
+    slang::IComponentType* program = nullptr;
+    SlangResult getProgramResult = request->getProgram(&program);  // Get compiled program
+    if (SLANG_SUCCEEDED(getProgramResult) && program)
+    {
+        program->addRef();  // Keep alive for reflection queries
+        result.slangProgram = program;
+        result.reflection = program->getLayout();  // Owned by program, don't release separately
+    }
+
     Msg("* [SlangCompiler] Successfully compiled %s (entry: %s, stage: %s, target: %s) -> %zu bytes",
         sourcePath, entryPoint, GetStageName(stage), GetTargetName(target), bytecodeSize);
 

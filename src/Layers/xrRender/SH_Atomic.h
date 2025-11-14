@@ -30,6 +30,7 @@ struct ECORE_API SVS : public xr_resource_named
 #if defined(USE_DX11)
     ID3DVertexShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
+    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -41,6 +42,10 @@ struct ECORE_API SVS : public xr_resource_named
 #endif
     SVS();
     ~SVS();
+
+#if defined(USE_DX11)
+    static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Vertex; }
+#endif
 };
 typedef resptr_core<SVS, resptr_base<SVS>> ref_vs;
 
@@ -50,6 +55,7 @@ struct ECORE_API SPS : public xr_resource_named
 #if defined(USE_DX11)
     ID3DPixelShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
+    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -57,6 +63,10 @@ struct ECORE_API SPS : public xr_resource_named
 #endif
     R_constant_table constants;
     ~SPS();
+
+#if defined(USE_DX11)
+    static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Pixel; }
+#endif
 };
 typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 
@@ -66,6 +76,7 @@ struct ECORE_API SGS : public xr_resource_named
 #if defined(USE_DX11)
     ID3DGeometryShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
+    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -73,6 +84,10 @@ struct ECORE_API SGS : public xr_resource_named
 #endif
     R_constant_table constants;
     ~SGS();
+
+#if defined(USE_DX11)
+    static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Geometry; }
+#endif
 };
 typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
 
@@ -81,6 +96,7 @@ struct ECORE_API SHS : public xr_resource_named
 #if defined(USE_DX11)
 	ID3D11HullShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
+    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -88,6 +104,10 @@ struct ECORE_API SHS : public xr_resource_named
 #endif
     R_constant_table constants;
     ~SHS();
+
+#if defined(USE_DX11)
+    static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Hull; }
+#endif
 };
 typedef resptr_core<SHS, resptr_base<SHS>> ref_hs;
 
@@ -96,6 +116,7 @@ struct ECORE_API SDS : public xr_resource_named
 #if defined(USE_DX11)
     ID3D11DomainShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
+    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -103,6 +124,10 @@ struct ECORE_API SDS : public xr_resource_named
 #endif
     R_constant_table constants;
     ~SDS();
+
+#if defined(USE_DX11)
+    static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Domain; }
+#endif
 };
 typedef resptr_core<SDS, resptr_base<SDS>> ref_ds;
 
@@ -111,6 +136,7 @@ struct ECORE_API SCS : public xr_resource_named
 #if defined(USE_DX11)
     ID3D11ComputeShader* sh;
     ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
+    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
 #elif defined(USE_OGL)
     GLuint sh;
 #else
@@ -118,6 +144,10 @@ struct ECORE_API SCS : public xr_resource_named
 #endif
     R_constant_table constants;
     ~SCS();
+
+#if defined(USE_DX11)
+    static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Compute; }
+#endif
 };
 
 struct ECORE_API resptrcode_cs : public resptr_base<SCS>

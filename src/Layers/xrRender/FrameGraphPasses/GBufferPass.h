@@ -100,11 +100,9 @@ private:
     // Material system
     xr_unique_ptr<MaterialCache> m_materialCache;
 
-    // Shaders (legacy - will be replaced by MaterialCache)
-    nvrhi::ShaderHandle m_vertexShaderNative;
-    nvrhi::ShaderHandle m_pixelShaderNative;
-    xr_unique_ptr<ng::RCShader> m_vertexShader;
-    xr_unique_ptr<ng::RCShader> m_pixelShader;
+    // Direct NVRHI shaders (no wrappers! - legacy, will be replaced by MaterialCache)
+    nvrhi::ShaderHandle m_vertexShader;
+    nvrhi::ShaderHandle m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
 
     // Shader bytecode (for reflection and analysis)

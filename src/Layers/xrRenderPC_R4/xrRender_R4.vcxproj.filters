@@ -807,6 +807,7 @@
     <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h" />
+    <ClInclude Include="..\xrRender\Shaders\SlangReflectionWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1489,6 +1490,7 @@
     <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangVFSAdapter.cpp" />
+    <ClCompile Include="..\xrRender\Shaders\SlangReflectionWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

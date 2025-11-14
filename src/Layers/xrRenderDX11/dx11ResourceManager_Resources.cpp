@@ -179,6 +179,26 @@ dx11ConstantBuffer* CResourceManager::_CreateConstantBuffer(u32 context_id, ID3D
     return pTempBuffer;
 }
 
+dx11ConstantBuffer* CResourceManager::_CreateConstantBufferSlang(u32 context_id, const char* name, u32 size)
+{
+    VERIFY(name);
+    VERIFY(size > 0);
+    dx11ConstantBuffer* pTempBuffer = xr_new<dx11ConstantBuffer>(name, size);
+
+    for (dx11ConstantBuffer* buf : v_constant_buffer[context_id])
+    {
+        if (pTempBuffer->Similar(*buf))
+        {
+            xr_delete(pTempBuffer);
+            return buf;
+        }
+    }
+
+    pTempBuffer->dwFlags |= xr_resource_flagged::RF_REGISTERED;
+    v_constant_buffer[context_id].emplace_back(pTempBuffer);
+    return pTempBuffer;
+}
+
 void CResourceManager::_DeleteConstantBuffer(u32 context_id, const dx11ConstantBuffer* pBuffer)
 {
     if (0 == (pBuffer->dwFlags & xr_resource_flagged::RF_REGISTERED))

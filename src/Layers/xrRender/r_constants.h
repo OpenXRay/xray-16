@@ -6,6 +6,12 @@
 #include "Layers/xrRenderDX11/dx11ConstantBuffer.h"
 #endif
 
+// Forward declaration for Slang reflection API
+namespace slang
+{
+    struct ShaderReflection;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class CBackend;
@@ -201,6 +207,7 @@ public:
 
     void clear();
     BOOL parse(void* desc, u32 destination);
+    BOOL parseSlangReflection(slang::ShaderReflection* reflection, u32 destination);  // Slang reflection path
     void merge(R_constant_table* C);
     ref_constant get(pcstr name, u16 type = u16(-1)) const; // slow search
     ref_constant get(const shared_str& name, u16 type = u16(-1)) const; // fast search

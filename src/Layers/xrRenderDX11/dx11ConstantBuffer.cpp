@@ -72,6 +72,34 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
 #endif
 }
 
+dx11ConstantBuffer::dx11ConstantBuffer(const char* name, u32 size) : m_bChanged(true)
+{
+    VERIFY(name);
+    VERIFY(size > 0);
+
+    m_strBufferName._set(name);
+    m_eBufferType = D3D_CT_CBUFFER;
+    m_uiBufferSize = size;
+
+    // For Slang-created buffers, we don't have detailed member information
+    // The buffer is created with the total size from Slang reflection
+    m_MembersList.clear();
+    m_MembersNames.clear();
+    m_uiMembersCRC = 0;  // No member CRC for Slang buffers
+
+    R_CHK(BufferUtils::CreateConstantBuffer(&m_pBuffer, size));
+    VERIFY(m_pBuffer);
+    m_pBufferData = xr_malloc(size);
+    VERIFY(m_pBufferData);
+
+#ifdef DEBUG
+    if (m_pBuffer)
+    {
+        m_pBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(name), name);
+    }
+#endif
+}
+
 bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
 {
     if (m_strBufferName._get() != _in.m_strBufferName._get())

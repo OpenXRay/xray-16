@@ -139,6 +139,7 @@ public:
 
 #if defined(USE_DX11)
     dx11ConstantBuffer* _CreateConstantBuffer(u32 context_id, ID3DShaderReflectionConstantBuffer* pTable);
+    dx11ConstantBuffer* _CreateConstantBufferSlang(u32 context_id, const char* name, u32 size);
     void _DeleteConstantBuffer(u32 context_id, const dx11ConstantBuffer* pBuffer);
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);

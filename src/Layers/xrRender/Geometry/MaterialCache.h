@@ -344,11 +344,12 @@ public:
 
     // Shader handle cache (shared across all materials to avoid recreating identical shaders)
     // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages
-    xr_map<shared_str, ng::ShaderHandle> m_shaderHandles;
+    xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;  // Direct NVRHI handles (no wrapper needed)
 
     // Get or create cached shader handle (stage-aware caching)
-    ng::ShaderHandle GetOrCreateShaderVS(SVS* vs);
-    ng::ShaderHandle GetOrCreateShaderPS(SPS* ps);
+    // Returns direct NVRHI handles (no wrapper layer!)
+    nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
+    nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
 
 private:
