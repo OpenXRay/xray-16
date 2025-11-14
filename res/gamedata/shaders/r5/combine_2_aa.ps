@@ -1,0 +1,87 @@
+#include "common.h"
+#include "mblur.h"
+
+Texture2D			s_distort;
+uniform float4 		e_barrier;
+uniform float4 		e_weights;
+uniform float4 		e_kernel;
+
+#ifdef GBUFFER_OPTIMIZATION
+float4 main ( v_aa_AA I, float4 pos2d : SV_POSITION ) : SV_Target
+#else
+float4 main ( v_aa_AA I ) : SV_Target
+#endif
+{
+#ifdef GBUFFER_OPTIMIZATION
+  gbuffer_data gbd0 = gbuffer_load_data(I.Tex0, pos2d);
+  gbuffer_data gbd1 = gbuffer_load_data_offset(I.Tex0,I.Tex1, pos2d);
+  gbuffer_data gbd2 = gbuffer_load_data_offset(I.Tex0,I.Tex2, pos2d);
+  gbuffer_data gbd3 = gbuffer_load_data_offset(I.Tex0,I.Tex3, pos2d);
+  gbuffer_data gbd4 = gbuffer_load_data_offset(I.Tex0,I.Tex4, pos2d);
+#else
+  gbuffer_data gbd0 = gbuffer_load_data(I.Tex0);
+  gbuffer_data gbd1 = gbuffer_load_data(I.Tex1);
+  gbuffer_data gbd2 = gbuffer_load_data(I.Tex2);
+  gbuffer_data gbd3 = gbuffer_load_data(I.Tex3);
+  gbuffer_data gbd4 = gbuffer_load_data(I.Tex4);
+#endif
+  
+	float3 nc		=  gbd0.N;
+  float4 nd;
+	nd.x 		=  dot 		(nc, (float3)( gbd1 ).N);
+	nd.y 		=  dot 		(nc, (float3)( gbd2 ).N);
+	nd.z 		=  dot 		(nc, (float3)( gbd3 ).N);
+	nd.w 		=  dot 		(nc, (float3)( gbd4 ).N);
+	nd 		-= e_barrier.x	;
+	nd 		=  step		(0,nd);
+  float  ne 		=  saturate	(dot(nd,e_weights.x));
+
+  float4 tc5r 		=  I.Tex5.wzyx;
+  float4 tc6r 		=  I.Tex6.wzyx;
+  
+#ifdef GBUFFER_OPTIMIZATION
+  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5, pos2d); 
+  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6, pos2d); 
+  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r, pos2d); 
+  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r, pos2d); 
+#else
+  gbuffer_data gbd5 = gbuffer_load_data(I.Tex5); 
+  gbuffer_data gbd6 = gbuffer_load_data(I.Tex6); 
+  gbuffer_data gbd5r = gbuffer_load_data(tc5r); 
+  gbuffer_data gbd6r = gbuffer_load_data(tc6r); 
+#endif
+
+  float4 dc		=  float4( gbd0.P, gbd0.mtl ); 
+  float4 dd;
+	dd.x 		=  	(float)gbd1.P.z 
+				+	(float)gbd2.P.z;
+	dd.y 		=  	(float)gbd3.P.z 
+				+	(float)gbd4.P.z;
+	dd.z 		=  	(float)gbd5.P.z 
+				+	(float)gbd5r.P.z;
+	dd.w 		=  	(float)gbd6.P.z 
+				+	(float)gbd6r.P.z;
+	dd 		=  abs(2*dc.z-dd)-e_barrier.y;
+	dd 		=  step		(dd,0);
+  float  de 		=  saturate	(dot(dd,e_weights.y));
+
+  float 	w 		=  (1-de*ne)*e_kernel.x;
+
+#ifdef 	USE_DISTORT
+	float4 	distort	= s_distort.Sample( smp_nofilter, I.Tex0);
+	float2	doffs	= (distort.xy-.5h)*def_distort;
+	float2	center	= I.Tex0 + doffs;
+#else
+	float2	center 	= I.Tex0;
+#endif
+
+	float2	offset 	=  center * (1-w);
+	float4	s0	=  s_image.Sample( smp_rtlinear, offset + I.Tex1*w);
+	float4	s1	=  s_image.Sample( smp_rtlinear, offset + I.Tex2*w);
+	float4	s2 	=  s_image.Sample( smp_rtlinear, offset + I.Tex3*w);
+	float4	s3 	=  s_image.Sample( smp_rtlinear, offset + I.Tex4*w);
+
+	float3 	final	=  mblur( center, dc, (s0+s1+s2+s3)/4.h );
+
+	return combine_bloom( final, s_bloom.Sample( smp_rtlinear, I.Tex0));
+}

@@ -1,0 +1,17 @@
+#include "common.h"
+
+struct 	v2p
+{
+ 	float2 	tc0: 		TEXCOORD0;
+  	float3	c0:			COLOR0;
+};
+
+float4 main( v2p I ) : SV_Target
+{
+	float4	t_base 	= s_base.Sample( smp_base, I.tc0 );
+
+	float3	light	= I.c0;
+	float3	final 	= light*t_base*2;
+
+	return  float4	(final.r,final.g,final.b,t_base.a);
+}

@@ -1,0 +1,10 @@
+#include "common.h"
+
+float4 main () : SV_Target
+{
+#ifdef	USE_HWSMAP
+	return 0;
+#else
+	return I.depth;
+#endif
+}
