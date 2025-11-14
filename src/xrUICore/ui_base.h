@@ -24,8 +24,8 @@ class XRUICORE_API UICore : public CDeviceResetNotifier, public CUIResetNotifier
 
     CFontManager* m_pFontManager;
     CUICursor* m_pUICursor;
-    CUIFocusSystem m_focusSystem;
     CUIDebugger m_debugger;
+    CUIFocusSystem m_focusSystem;
 
     Fvector2 m_pp_scale_;
     Fvector2 m_scale_;
