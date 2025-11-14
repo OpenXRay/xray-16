@@ -410,7 +410,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
     if (!vs || !ps)
         return nullptr;
 
-    if (!vs->bytecode || !ps->bytecode)
+    if (!vs->reflection || !ps->reflection)
         return nullptr;
 
     xr_string cacheKeyStr;
@@ -440,8 +440,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
     ParticlePass::ParticleBindingCache cacheEntry;
 
 
-    auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
-        vs->bytecode->GetBufferPointer(), vs->bytecode->GetBufferSize());
+    const auto& vsCBs = framegraph::ShaderReflector::GetConstantBuffers(vs->reflection);
     for (const auto& cbInfo : vsCBs.buffers) {
         bool isPerObject = (cbInfo.slot == 0);
 
@@ -469,8 +468,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         }
     }
 
-    auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
-        ps->bytecode->GetBufferPointer(), ps->bytecode->GetBufferSize());
+    const auto& psCBs = framegraph::ShaderReflector::GetConstantBuffers(ps->reflection);
     for (const auto& cbInfo : psCBs.buffers) {
         bool isPerObject = (cbInfo.slot == 0);
 

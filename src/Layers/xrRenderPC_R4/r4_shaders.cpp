@@ -18,11 +18,11 @@ void CRender::addShaderOption(const char* name, const char* value)
 
 template <typename T>
 static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    T*& result, slang::ShaderReflection* slangReflection)
+    T*& result, xray::render::framegraph::ExtractedReflection* extractedReflection)
 {
     HRESULT _hr = S_OK;
 
-    if (slangReflection)
+    if (extractedReflection)
     {
         nvrhi::ShaderDesc shaderDesc(T::GetShaderType());
         shaderDesc.debugName = file_name;
@@ -43,7 +43,50 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
         }
 
         result->constants.dx9compatibility = false;
-        result->constants.parseSlangReflection(slangReflection, ShaderTypeTraits<T>::GetShaderDest());
+
+        for (const auto& tex : extractedReflection->rtBindings.inputTextures)
+        {
+            u32 destination = ShaderTypeTraits<T>::GetShaderDest();
+            u16 r_index = u16(-1);
+
+            if (destination & RC_dest_pixel)
+                r_index = u16(tex.slot + CTexture::rstPixel);
+            else if (destination & RC_dest_vertex)
+                r_index = u16(tex.slot + CTexture::rstVertex);
+            else if (destination & RC_dest_geometry)
+                r_index = u16(tex.slot + CTexture::rstGeometry);
+            else if (destination & RC_dest_hull)
+                r_index = u16(tex.slot + CTexture::rstHull);
+            else if (destination & RC_dest_domain)
+                r_index = u16(tex.slot + CTexture::rstDomain);
+            else if (destination & RC_dest_compute)
+                r_index = u16(tex.slot + CTexture::rstCompute);
+            else
+                continue;
+
+            ref_constant C = result->constants.get(tex.name, u16(-1));
+            if (!C)
+            {
+                C = result->constants.table.emplace_back(xr_new<R_constant>());
+                C->name = tex.name;
+                C->destination = RC_dest_sampler;
+                C->type = RC_dx11texture;
+                R_constant_load& L = C->samp;
+                L.index = r_index;
+                L.cls = RC_dx11texture;
+                Msg("  [create_shader] Added texture constant '%s' to ctable (index=%u)", tex.name.c_str(), r_index);
+            }
+        }
+
+#if defined(USE_DX11)
+        result->reflection = xr_new<xray::render::framegraph::ExtractedReflection>(*extractedReflection);
+
+        Msg("  [create_shader] Stored reflection for %s: vsInputs=%u, constantBuffers=%u, rtBindings=%u",
+            file_name,
+            result->reflection->vertexInputSignature.elements.size(),
+            result->reflection->constantBuffers.buffers.size(),
+            result->reflection->rtBindings.outputRTs.size());
+#endif
 
 #if defined(USE_DX11)
         _hr = D3DCreateBlob(buffer_size, &result->bytecode);
@@ -107,20 +150,20 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
 }
 
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm, slang::ShaderReflection* slangReflection)
+    void*& result, bool const disasm, xray::render::framegraph::ExtractedReflection* extractedReflection)
 {
     HRESULT _result = E_FAIL;
     pcstr extension = ".hlsl";
     if (pTarget[0] == 'p')
     {
         extension = ".ps";
-        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result, slangReflection);
+        _result = create_shader(buffer, buffer_size, file_name, (SPS*&)result, extractedReflection);
     }
     else if (pTarget[0] == 'v')
     {
         extension = ".vs";
         SVS* svs_result = (SVS*)result;
-        _result = create_shader(buffer, buffer_size, file_name, svs_result, slangReflection);
+        _result = create_shader(buffer, buffer_size, file_name, svs_result, extractedReflection);
         if (SUCCEEDED(_result))
         {
             //	Store input signature (need only for VS)
@@ -136,22 +179,22 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
     else if (pTarget[0] == 'g')
     {
         extension = ".gs";
-        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result, slangReflection);
+        _result = create_shader(buffer, buffer_size, file_name, (SGS*&)result, extractedReflection);
     }
     else if (pTarget[0] == 'c')
     {
         extension = ".cs";
-        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result, slangReflection);
+        _result = create_shader(buffer, buffer_size, file_name, (SCS*&)result, extractedReflection);
     }
     else if (pTarget[0] == 'h')
     {
         extension = ".hs";
-        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result, slangReflection);
+        _result = create_shader(buffer, buffer_size, file_name, (SHS*&)result, extractedReflection);
     }
     else if (pTarget[0] == 'd')
     {
         extension = ".ds";
-        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result, slangReflection);
+        _result = create_shader(buffer, buffer_size, file_name, (SDS*&)result, extractedReflection);
     }
     else
     {
@@ -598,7 +641,10 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         xr_vector<u8> cachedBytecode;
         static xray::render::framegraph::ShaderCache s_cache;
 
-        if (s_cache.TryLoad(name, extension, sourceHash, cachedBytecode))
+        xray::render::framegraph::ExtractedReflection deserializedReflection;
+        bool cacheHit = s_cache.TryLoad(name, extension, sourceHash, cachedBytecode, &deserializedReflection);
+
+        if (cacheHit && !deserializedReflection.IsEmpty())
         {
             _result = create_shader(
                 pTarget,
@@ -607,15 +653,19 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
                 name,
                 result,
                 o.disasm,
-                nullptr
+                &deserializedReflection
             );
 
             if (SUCCEEDED(_result))
             {
-                Msg("  ✓ [shader_compile] Cache HIT: %s (%zu bytes)", name, cachedBytecode.size());
+                Msg("  ✓ [shader_compile] Cache HIT (with reflection): %s (%zu bytes)", name, cachedBytecode.size());
             }
 
             return _result;
+        }
+        else if (cacheHit)
+        {
+            Msg("! [shader_compile] Cache hit but no reflection for %s - recompiling to extract reflection", name);
         }
 
         Msg("~ [shader_compile] Compiling with Slang: %s (target: %s)", name, pTarget);
@@ -688,6 +738,12 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             return E_FAIL;
         }
 
+        bool isVertexShader = (strcmp(extension, "vs") == 0);
+        auto extractedReflection = xray::render::framegraph::ShaderReflector::ExtractReflection(
+            compileResult.reflection,
+            isVertexShader
+        );
+
         _result = create_shader(
             pTarget,
             (DWORD*)compileResult.bytecode.data(),
@@ -695,7 +751,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             name,
             result,
             o.disasm,
-            compileResult.reflection
+            &extractedReflection
         );
 
         if (SUCCEEDED(_result))
@@ -703,7 +759,7 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             Msg("* [shader_compile] Successfully compiled with Slang: %s (%zu bytes)",
                 name, compileResult.bytecode.size());
 
-            s_cache.Save(name, extension, sourceHash, compileResult.bytecode);
+            s_cache.Save(name, extension, sourceHash, compileResult.bytecode, &extractedReflection);
         }
 
         return _result;

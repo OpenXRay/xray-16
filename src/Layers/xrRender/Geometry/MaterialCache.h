@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/FrameGraph/GlobalParamsMapper.h"
 #include "Layers/xrRender/ResourceManager/ResourceHandle.h"
 
 namespace xray::render::RENDER_NAMESPACE {
@@ -188,6 +189,8 @@ struct MaterialPSO {
         std::sort(slots.begin(), slots.end());
         return slots;
     }
+
+    xr_unique_ptr<GlobalParamsMapper> globalParamsMapper;
 
     shared_str debugName;
 

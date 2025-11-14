@@ -53,15 +53,15 @@ bool GBufferPass::LoadShaders()
 {
     ShaderLoader loader(m_device, m_device->GetSlangCompiler());
 
-    m_vertexShader = loader.LoadVertexShader("gbuffer", "main", &m_vertexShaderBytecode);
-    if (!m_vertexShader)
+    m_vertexShader = loader.LoadVertexShaderWithReflection("gbuffer", "main");
+    if (!m_vertexShader.handle)
     {
         Msg("! [GBufferPass] Failed to load gbuffer vertex shader");
         return false;
     }
 
-    m_pixelShader = loader.LoadPixelShader("gbuffer", "main", &m_pixelShaderBytecode);
-    if (!m_pixelShader)
+    m_pixelShader = loader.LoadPixelShaderWithReflection("gbuffer", "main");
+    if (!m_pixelShader.handle)
     {
         Msg("! [GBufferPass] Failed to load gbuffer pixel shader");
         return false;
@@ -69,8 +69,8 @@ bool GBufferPass::LoadShaders()
 
     Msg("* [GBufferPass] Analyzing constant buffer requirements...");
 
-    if (!m_vertexShaderBytecode.empty()) {
-        auto vsCBs = ShaderReflector::AnalyzeConstantBuffers(m_vertexShaderBytecode.data(), m_vertexShaderBytecode.size());
+    if (m_vertexShader.reflection) {
+        const auto& vsCBs = ShaderReflector::GetConstantBuffers(m_vertexShader.reflection);
         Msg("  → Vertex shader has %u constant buffers", vsCBs.buffers.size());
 
         for (const auto& cbInfo : vsCBs.buffers) {
@@ -83,8 +83,8 @@ bool GBufferPass::LoadShaders()
         }
     }
 
-    if (!m_pixelShaderBytecode.empty()) {
-        auto psCBs = ShaderReflector::AnalyzeConstantBuffers(m_pixelShaderBytecode.data(), m_pixelShaderBytecode.size());
+    if (m_pixelShader.reflection) {
+        const auto& psCBs = ShaderReflector::GetConstantBuffers(m_pixelShader.reflection);
         Msg("  → Pixel shader has %u constant buffers", psCBs.buffers.size());
 
         for (const auto& cbInfo : psCBs.buffers) {
@@ -99,19 +99,19 @@ bool GBufferPass::LoadShaders()
 
     m_vcbPool->LogStats();
 
-    Msg("  ✓ G-Buffer shaders loaded successfully");
+    Msg("  ✓ G-Buffer shaders loaded successfully (with Slang reflection)");
     return true;
 }
 
 bool GBufferPass::CreatePipeline(const framegraph::DefaultOutputLayout& outputs, const FrameGraph& fg)
 {
-    VERIFY(m_vertexShader != nullptr);
-    VERIFY(m_pixelShader != nullptr);
+    VERIFY(m_vertexShader.handle != nullptr);
+    VERIFY(m_pixelShader.handle != nullptr);
 
     ng::PipelineStateDesc psoDesc;
 
-    psoDesc.vertexShader = m_vertexShader.Get();
-    psoDesc.pixelShader = m_pixelShader.Get();
+    psoDesc.vertexShader = m_vertexShader.handle.Get();
+    psoDesc.pixelShader = m_pixelShader.handle.Get();
 
     psoDesc.vertexAttributes = {
         { "POSITION", 0, nvrhi::Format::RGB32_FLOAT,  0, 0, false },

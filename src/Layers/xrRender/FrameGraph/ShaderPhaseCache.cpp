@@ -84,17 +84,13 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
         return RenderPhase::Geometry;
     }
 
-    ID3DBlob* bytecode = ps->bytecode;
-    if (!bytecode) {
-        Msg("! [ShaderPhaseCache] No bytecode for pixel shader '%s'",
+    if (!ps->reflection) {
+        Msg("! [ShaderPhaseCache] No reflection for pixel shader '%s'",
             shaderName.c_str());
         return RenderPhase::Geometry;
     }
 
-    ShaderRTBindings bindings = ShaderReflector::AnalyzePixelShader(
-        d3dPS,
-        bytecode->GetBufferPointer(),
-        bytecode->GetBufferSize());
+    const ShaderRTBindings& bindings = ShaderReflector::GetRTBindings(ps->reflection);
 
     Msg("! [ShaderPhaseCache] Extracted phase for shader '%s': %s",
         shaderName.c_str(),

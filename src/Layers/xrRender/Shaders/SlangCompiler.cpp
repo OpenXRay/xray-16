@@ -181,12 +181,18 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     result.success = true;
 
     slang::IComponentType* program = nullptr;
-    SlangResult getProgramResult = request->getProgram(&program);
+    SlangResult getProgramResult = request->getProgramWithEntryPoints(&program);
     if (SLANG_SUCCEEDED(getProgramResult) && program)
     {
         program->addRef();
         result.slangProgram = program;
-        result.reflection = program->getLayout();
+
+        auto* programLayout = program->getLayout();
+        if (programLayout)
+        {
+            Msg("  [SlangCompiler] ProgramLayout has %u entry points", programLayout->getEntryPointCount());
+        }
+        result.reflection = programLayout;
     }
 
     Msg("* [SlangCompiler] Successfully compiled %s (entry: %s, stage: %s, target: %s) -> %zu bytes",

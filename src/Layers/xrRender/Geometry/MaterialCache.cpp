@@ -161,9 +161,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     }
 
     if (m_vcbPool) {
-        auto vsCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
-            pso->vertexShader->bytecode->GetBufferPointer(),
-            pso->vertexShader->bytecode->GetBufferSize());
+        const auto& vsCBs = framegraph::ShaderReflector::GetConstantBuffers(
+            pso->vertexShader->reflection);
         for (const auto& cbInfo : vsCBs.buffers) {
             framegraph::VolatileConstantBufferPool::CBLayout layout(
                 cbInfo.name.c_str(),
@@ -181,9 +180,8 @@ MaterialPSO* MaterialCache::CreatePSO(
             pso->vcbRequirements.push_back(req);
         }
 
-        auto psCBs = framegraph::ShaderReflector::AnalyzeConstantBuffers(
-            pso->pixelShader->bytecode->GetBufferPointer(),
-            pso->pixelShader->bytecode->GetBufferSize());
+        const auto& psCBs = framegraph::ShaderReflector::GetConstantBuffers(
+            pso->pixelShader->reflection);
         for (const auto& cbInfo : psCBs.buffers) {
             framegraph::VolatileConstantBufferPool::CBLayout layout(
                 cbInfo.name.c_str(),
@@ -239,9 +237,9 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
     matPSO->textures.clear();
 
     STextureList* texList = pass->T._get();
-    if (!texList) {
-        return;
-    }
+
+    if (texList && !texList->empty()) {
+        Msg("  [ExtractTextures] Using X-Ray pass texture list (%u textures)", texList->size());
 
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     VERIFY(texManager);
@@ -283,7 +281,37 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         texSlot.slot = stage;
         texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
+
+        Msg("  [ExtractTextures] Added texture '%s' at X-Ray stage=%u (will bind to t%u)",
+            textureName, stage, stage);
     }
+
+        Msg("  [ExtractTextures] Total textures from X-Ray pass: %u", matPSO->textures.size());
+        return;
+    }
+
+    Msg("  [ExtractTextures] X-Ray pass->T is empty, using Slang reflection");
+
+    SPS* ps = pass->ps._get();
+    if (!ps || !ps->reflection) {
+        Msg("! [ExtractTextures] No pixel shader reflection available");
+        return;
+    }
+
+    const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
+    Msg("  [ExtractTextures] Found %u texture slots in pixel shader reflection", inputTextures.size());
+
+    for (const auto& texReflection : inputTextures) {
+        MaterialPSO::TextureSlot texSlot;
+        texSlot.slot = texReflection.slot;
+        texSlot.handle = resources::TextureHandle();
+        matPSO->textures.push_back(texSlot);
+
+        Msg("  [ExtractTextures] Added placeholder for '%s' at slot t%u (no texture file assigned)",
+            texReflection.name.c_str(), texReflection.slot);
+    }
+
+    Msg("  [ExtractTextures] Total placeholder texture slots: %u", matPSO->textures.size());
 }
 
 bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
@@ -305,21 +333,19 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->debugName = vs->cName;
 
-    if (vs->sh && vs->bytecode) {
-
-        matPSO->vsInputSignature = framegraph::ShaderReflector::AnalyzeVertexShader(
-            vs->sh,
-            vs->bytecode->GetBufferPointer(),
-            vs->bytecode->GetBufferSize()
+    Msg("  [MaterialCache] VS '%s' reflection pointer: %p", vs->cName.c_str(), vs->reflection);
+    if (vs->reflection) {
+        Msg("  [MaterialCache] VS reflection has %u input elements", vs->reflection->vertexInputSignature.elements.size());
+        matPSO->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(
+            vs->reflection
         );
+    } else {
+        Msg("! [MaterialCache] VS '%s' has NULL reflection!", vs->cName.c_str());
     }
 
-    if (ps->sh && ps->bytecode) {
-
-        matPSO->rtBindings = framegraph::ShaderReflector::AnalyzePixelShader(
-            ps->sh,
-            ps->bytecode->GetBufferPointer(),
-            ps->bytecode->GetBufferSize()
+    if (ps->reflection) {
+        matPSO->rtBindings = framegraph::ShaderReflector::GetRTBindings(
+            ps->reflection
         );
 
         matPSO->rtBindings.shaderName = ps->cName;
@@ -327,114 +353,65 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->constantBuffers.clear();
 
-    auto extractCBsFromShader = [&](R_constant_table& constTable, const char* shaderName, MaterialPSO::ShaderStage stage) {
-        for (u32 contextIdx = 0; contextIdx < R__NUM_CONTEXTS; contextIdx++) {
-            const auto& cbTable = constTable.m_CBTable[contextIdx];
+    auto extractCBsFromReflection = [&](const framegraph::ExtractedReflection* reflection,
+                                       const char* shaderName,
+                                       MaterialPSO::ShaderStage stage) {
+        if (!reflection) {
+            Msg("! [MaterialCache] No reflection data for %s shader", shaderName);
+            return;
+        }
 
-            if (cbTable.empty())
-                continue;
+        Msg("  [MaterialCache] Extracting %u CBs from %s shader reflection",
+            reflection->constantBuffers.buffers.size(), shaderName);
 
-
-            for (const auto& cbRecord : cbTable) {
-                u32 encodedSlot = cbRecord.first;
-                dx11ConstantBuffer* cb = cbRecord.second._get();
-
-                u32 shaderType = dx11ConstantBuffer::DecodeShaderType(encodedSlot);
-                u32 bindingSlot = dx11ConstantBuffer::DecodeBindingSlot(encodedSlot);
-                const char* shaderTypeName = dx11ConstantBuffer::GetShaderTypeName(shaderType);
-
-
-                if (cb) {
-                    ID3DBuffer* d3dBuffer = cb->GetBuffer();
-                    if (d3dBuffer) {
-                        D3D11_BUFFER_DESC bufDesc;
-                        d3dBuffer->GetDesc(&bufDesc);
-
-
-                    bool found = false;
-                    for (const auto& existing : matPSO->constantBuffers) {
-                        if (existing.slot == bindingSlot && existing.stage == stage) {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        const char* cbName = cb->GetBufferName();
-                        bool isPerObjectCB = (cbName && xr_strcmp(cbName, "$Globals") == 0);
-
-                        Msg("  [MaterialCache] D3DReflect reports CB: name=%s, slot=%d (from shader)",
-                            cbName ? cbName : "NULL", bindingSlot);
-
-                        nvrhi::BufferHandle bufferHandle;
-
-                        if (isPerObjectCB) {
-                            nvrhi::BufferDesc nvrhiDesc;
-                            nvrhiDesc.byteSize = bufDesc.ByteWidth;
-                            nvrhiDesc.isConstantBuffer = true;
-                            nvrhiDesc.debugName = "XRay_PerObject_CB";
-                            nvrhiDesc.keepInitialState = true;
-                            nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-                            bufferHandle = m_device->GetNativeDevice()->createHandleForNativeBuffer(
-                                nvrhi::ObjectTypes::D3D11_Buffer,
-                                nvrhi::Object(d3dBuffer),
-                                nvrhiDesc);
-                        } else {
-                            nvrhi::BufferDesc nvrhiDesc;
-                            nvrhiDesc.byteSize = bufDesc.ByteWidth;
-                            nvrhiDesc.isConstantBuffer = true;
-                            nvrhiDesc.debugName = "FrameGraph_Global_CB";
-                            nvrhiDesc.keepInitialState = false;
-                            nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-
-                            bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
-                            if (bufferHandle) {
-                                Msg("  [MaterialCache] Created CB: name=%s, slot=%d, size=%d bytes, stage=%s",
-                                    cbName ? cbName : "NULL",
-                                    bindingSlot,
-                                    bufDesc.ByteWidth,
-                                    stage == MaterialPSO::ShaderStage::Vertex ? "VS" : "PS");
-                            } else {
-                                Msg("! [MaterialCache] FAILED to create CB: name=%s, slot=%d",
-                                    cbName ? cbName : "NULL", bindingSlot);
-                            }
-                        }
-
-                        if (bufferHandle) {
-                            MaterialPSO::ConstantBufferInfo cbInfo;
-                            cbInfo.slot = bindingSlot;
-                            cbInfo.stage = stage;
-                            cbInfo.nvrhiBuffer = bufferHandle;
-                            cbInfo.size = bufDesc.ByteWidth;
-                            cbInfo.isPerObject = isPerObjectCB;
-                            cbInfo.name = cbName;
-
-                            #if 0
-                            if (bindingSlot > 0) {
-                                void* xrayData = cb->GetBufferData();
-                                u32 xraySize = cb->GetBufferSize();
-
-                                if (xrayData && xraySize > 0 && xraySize == bufDesc.ByteWidth) {
-                                    cbInfo.initialData.resize(xraySize);
-                                    memcpy(cbInfo.initialData.data(), xrayData, xraySize);
-                                }
-                            }
-                            #endif
-
-                            matPSO->constantBuffers.push_back(cbInfo);
-
-                        } else {
-                        }
-                    }
+        for (const auto& cbReflection : reflection->constantBuffers.buffers) {
+            bool found = false;
+            for (const auto& existing : matPSO->constantBuffers) {
+                if (existing.slot == cbReflection.slot && existing.stage == stage) {
+                    found = true;
+                    break;
                 }
             }
+
+            if (!found) {
+                bool isPerObjectCB = (cbReflection.name == "$Globals");
+
+                nvrhi::BufferHandle bufferHandle;
+                nvrhi::BufferDesc nvrhiDesc;
+                nvrhiDesc.byteSize = cbReflection.size;
+                nvrhiDesc.isConstantBuffer = true;
+                nvrhiDesc.debugName = isPerObjectCB ? "XRay_PerObject_CB" : "FrameGraph_Global_CB";
+                nvrhiDesc.keepInitialState = false;
+                nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+                bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
+                if (bufferHandle) {
+                    Msg("  [MaterialCache] Created CB from reflection: name=%s, slot=%d, size=%d bytes, stage=%s",
+                        cbReflection.name.c_str(),
+                        cbReflection.slot,
+                        cbReflection.size,
+                        stage == MaterialPSO::ShaderStage::Vertex ? "VS" : "PS");
+
+                    MaterialPSO::ConstantBufferInfo cbInfo;
+                    cbInfo.slot = cbReflection.slot;
+                    cbInfo.stage = stage;
+                    cbInfo.nvrhiBuffer = bufferHandle;
+                    cbInfo.size = cbReflection.size;
+                    cbInfo.isPerObject = isPerObjectCB;
+                    cbInfo.name = cbReflection.name;
+
+                    matPSO->constantBuffers.push_back(cbInfo);
+                } else {
+                    Msg("! [MaterialCache] FAILED to create CB: name=%s, slot=%d",
+                        cbReflection.name.c_str(), cbReflection.slot);
+                }
             }
         }
     };
 
-    extractCBsFromShader(vs->constants, vs->cName.c_str(), MaterialPSO::ShaderStage::Vertex);
+    extractCBsFromReflection(vs->reflection, vs->cName.c_str(), MaterialPSO::ShaderStage::Vertex);
 
-    extractCBsFromShader(ps->constants, ps->cName.c_str(), MaterialPSO::ShaderStage::Pixel);
+    extractCBsFromReflection(ps->reflection, ps->cName.c_str(), MaterialPSO::ShaderStage::Pixel);
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.isPerObject) {
@@ -662,15 +639,19 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
     }
 
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+    Msg("  [GetOrCreateBindingSet] Adding %u textures to PS binding set", matPSO->textures.size());
     for (const auto& texSlot : matPSO->textures) {
         nvrhi::ITexture* nativeTex = texManager->GetNVRHITexture(texSlot.handle);
 
         if (nativeTex) {
             const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
+            Msg("    [GetOrCreateBindingSet] Adding texture to slot t%u (valid texture, %ux%u)",
+                texSlot.slot, texDesc.width, texDesc.height);
             psBindingDesc.bindings.push_back(
                 nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nativeTex,
                     nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension));
         } else {
+            Msg("!   [GetOrCreateBindingSet] Texture at slot t%u is NULL!", texSlot.slot);
             psBindingDesc.bindings.push_back(
                 nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nullptr));
         }

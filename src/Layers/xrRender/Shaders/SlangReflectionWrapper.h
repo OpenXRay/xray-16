@@ -49,6 +49,16 @@ public:
 
     xr_vector<UAVInfo> GetUAVs() const;
 
+    struct MemberInfo
+    {
+        const char* name;
+        u32 offset;
+        u32 size;
+        slang::TypeReflection::ScalarType scalarType;
+    };
+
+    xr_vector<MemberInfo> GetConstantBufferMembers(const char* cbufferName) const;
+
 private:
     slang::ShaderReflection* m_reflection;
 

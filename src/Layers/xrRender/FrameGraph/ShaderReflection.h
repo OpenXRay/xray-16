@@ -1,8 +1,10 @@
 #pragma once
 
 #include "xrCore/xrstring.h"
-#include <d3d11shader.h>
-#include <d3dcompiler.h>
+
+namespace slang {
+    struct ShaderReflection;
+}
 
 namespace xray::render::framegraph {
 
@@ -102,19 +104,19 @@ struct ShaderConstantBuffers {
 
 class ShaderReflector {
 public:
-    static VertexInputSignature AnalyzeVertexShader(
-        ID3D11VertexShader* vs,
-        const void* bytecode,
-        size_t bytecodeSize);
 
-    static ShaderRTBindings AnalyzePixelShader(
-        ID3D11PixelShader* ps,
-        const void* bytecode,
-        size_t bytecodeSize);
+    static ExtractedReflection ExtractReflection(
+        slang::ShaderReflection* slangReflection,
+        bool isVertexShader);
 
-    static ShaderConstantBuffers AnalyzeConstantBuffers(
-        const void* bytecode,
-        size_t bytecodeSize);
+    static const VertexInputSignature& GetVertexInputSignature(
+        const ExtractedReflection* reflection);
+
+    static const ShaderRTBindings& GetRTBindings(
+        const ExtractedReflection* reflection);
+
+    static const ShaderConstantBuffers& GetConstantBuffers(
+        const ExtractedReflection* reflection);
 
     static RenderPhase InferPhase(const ShaderRTBindings& bindings);
 
@@ -126,6 +128,10 @@ public:
         RenderPhase phase);
 
 private:
+    static VertexInputSignature AnalyzeVertexShader(slang::ShaderReflection* reflection);
+    static ShaderRTBindings AnalyzePixelShader(slang::ShaderReflection* reflection);
+    static ShaderConstantBuffers AnalyzeConstantBuffers(slang::ShaderReflection* reflection);
+
     static bool MatchesPattern(const char* name, const char* pattern);
 };
 

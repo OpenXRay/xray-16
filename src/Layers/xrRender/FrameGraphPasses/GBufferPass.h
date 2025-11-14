@@ -3,6 +3,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 
 namespace xray::render {
@@ -73,12 +74,9 @@ private:
 
     xr_unique_ptr<MaterialCache> m_materialCache;
 
-    nvrhi::ShaderHandle m_vertexShader;
-    nvrhi::ShaderHandle m_pixelShader;
+    framegraph::ShaderLoader::ShaderResult m_vertexShader;
+    framegraph::ShaderLoader::ShaderResult m_pixelShader;
     ng::PipelineState* m_pipeline = nullptr;
-
-    xr_vector<u8> m_vertexShaderBytecode;
-    xr_vector<u8> m_pixelShaderBytecode;
 
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_vcbPool;
 

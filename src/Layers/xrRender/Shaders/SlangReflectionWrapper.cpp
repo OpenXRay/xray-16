@@ -24,9 +24,18 @@ xr_vector<SlangReflectionWrapper::CBInfo> SlangReflectionWrapper::GetConstantBuf
         auto* typeLayout = param->getTypeLayout();
         if (typeLayout)
         {
-            info.size = static_cast<u32>(typeLayout->getSize(slang::ParameterCategory::Uniform));
+            auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+            if (elementTypeLayout)
+            {
+                info.size = static_cast<u32>(elementTypeLayout->getSize(slang::ParameterCategory::Uniform));
+            }
+            else
+            {
+                info.size = static_cast<u32>(typeLayout->getSize(slang::ParameterCategory::Uniform));
+            }
         }
 
+        Msg("      [GetConstantBuffers] Extracted '%s' -> slot=%u, space=%u, size=%u", info.name, info.slot, info.space, info.size);
         result.push_back(info);
     });
 
@@ -44,6 +53,7 @@ xr_vector<SlangReflectionWrapper::TextureInfo> SlangReflectionWrapper::GetTextur
         info.slot = static_cast<u32>(param->getOffset(slang::ParameterCategory::ShaderResource));
         info.space = static_cast<u32>(param->getBindingSpace(slang::ParameterCategory::ShaderResource));
 
+        Msg("      [GetTextures] Extracted '%s' -> slot=%u, space=%u", info.name, info.slot, info.space);
         result.push_back(info);
     });
 
@@ -61,6 +71,7 @@ xr_vector<SlangReflectionWrapper::SamplerInfo> SlangReflectionWrapper::GetSample
         info.slot = static_cast<u32>(param->getOffset(slang::ParameterCategory::SamplerState));
         info.space = static_cast<u32>(param->getBindingSpace(slang::ParameterCategory::SamplerState));
 
+        Msg("      [GetSamplers] Extracted '%s' -> slot=%u, space=%u", info.name, info.slot, info.space);
         result.push_back(info);
     });
 
@@ -84,6 +95,55 @@ xr_vector<SlangReflectionWrapper::UAVInfo> SlangReflectionWrapper::GetUAVs() con
     return result;
 }
 
+xr_vector<SlangReflectionWrapper::MemberInfo> SlangReflectionWrapper::GetConstantBufferMembers(const char* cbufferName) const
+{
+    xr_vector<MemberInfo> members;
+
+    if (!m_reflection || !cbufferName)
+        return members;
+
+    EnumerateParameters(slang::ParameterCategory::ConstantBuffer, [&](slang::VariableLayoutReflection* param)
+    {
+        if (xr_strcmp(param->getName(), cbufferName) == 0)
+        {
+            auto* typeLayout = param->getTypeLayout();
+            if (!typeLayout)
+                return;
+
+            auto* type = typeLayout->getType();
+            if (!type)
+                return;
+
+            u32 fieldCount = type->getFieldCount();
+            for (u32 f = 0; f < fieldCount; ++f)
+            {
+                auto* field = type->getFieldByIndex(f);
+                auto* fieldLayout = typeLayout->getFieldByIndex(f);
+
+                if (!field || !fieldLayout)
+                    continue;
+
+                MemberInfo info = {};
+                info.name = field->getName();
+                info.offset = static_cast<u32>(fieldLayout->getOffset(slang::ParameterCategory::Uniform));
+
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                info.size = fieldTypeLayout ? static_cast<u32>(fieldTypeLayout->getSize()) : 0;
+
+                auto* fieldType = field->getType();
+                if (fieldType)
+                {
+                    info.scalarType = fieldType->getScalarType();
+                }
+
+                members.push_back(info);
+            }
+        }
+    });
+
+    return members;
+}
+
 void SlangReflectionWrapper::EnumerateParameters(
     slang::ParameterCategory category,
     std::function<void(slang::VariableLayoutReflection*)> callback) const
@@ -93,9 +153,14 @@ void SlangReflectionWrapper::EnumerateParameters(
 
     auto* globalParamsLayout = m_reflection->getGlobalParamsTypeLayout();
     if (!globalParamsLayout)
+    {
+        Msg("! [SlangReflectionWrapper] No global params layout");
         return;
+    }
 
     unsigned int fieldCount = globalParamsLayout->getFieldCount();
+    Msg("  [SlangReflectionWrapper] Enumerating category %d: found %u global fields", (int)category, fieldCount);
+
     for (unsigned int i = 0; i < fieldCount; ++i)
     {
         auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
@@ -107,8 +172,12 @@ void SlangReflectionWrapper::EnumerateParameters(
             continue;
 
         slang::ParameterCategory paramCategory = typeLayout->getParameterCategory();
+        Msg("    [SlangReflectionWrapper] Field[%u]: name='%s', category=%d (looking for %d)",
+            i, fieldLayout->getName(), (int)paramCategory, (int)category);
+
         if (paramCategory == category)
         {
+            Msg("      [SlangReflectionWrapper] ✓ Match! Calling callback for '%s'", fieldLayout->getName());
             callback(fieldLayout);
         }
     }
