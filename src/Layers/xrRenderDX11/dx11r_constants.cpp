@@ -307,14 +307,29 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                     continue;
                 }
 
+                // Get the actual register binding point (b0, b1, b2, etc.) from shader reflection
+                // We need to find this CB in the bound resources to get its BindPoint
+                u32 actualBindPoint = iBuf;  // Default to index if we can't find it
+                for (u16 iRes = 0; iRes < ShaderDesc.BoundResources; ++iRes)
+                {
+                    D3D11_SHADER_INPUT_BIND_DESC ResDesc;
+                    pReflection->GetResourceBindingDesc(iRes, &ResDesc);
+                    if (ResDesc.Type == D3D_SIT_CBUFFER &&
+                        xr_strcmp(ResDesc.Name, bufferDesc.Name) == 0)
+                    {
+                        actualBindPoint = ResDesc.BindPoint;
+                        break;
+                    }
+                }
+
                 //  Encode buffer index into destination
                 u32 updatedDest = destination;
-                updatedDest |= iBuf << dest_to_shift_value(destination); /*((destination&RC_dest_pixel)
+                updatedDest |= actualBindPoint << dest_to_shift_value(destination); /*((destination&RC_dest_pixel)
                     ? RC_dest_pixel_cb_index_shift : (destination&RC_dest_vertex)
                     ? RC_dest_vertex_cb_index_shift : RC_dest_geometry_cb_index_shift);*/
 
                 //  Encode bind dest (pixel/vertex buffer) and bind point index
-                u32 uiBufferIndex = iBuf;
+                u32 uiBufferIndex = actualBindPoint;  // USE ACTUAL BIND POINT, NOT LOOP INDEX!
                 uiBufferIndex |= dest_to_cbuf_type(destination); /*(destination&RC_dest_pixel)
                      ? CB_BufferPixelShader : (destination&RC_dest_vertex)
                      ? CB_BufferVertexShader : CB_BufferGeometryShader;*/

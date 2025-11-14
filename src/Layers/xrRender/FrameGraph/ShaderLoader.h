@@ -28,7 +28,7 @@ public:
     ~ShaderLoader();
 
     /// <summary>
-    /// Load and compile vertex shader from res/gamedata/shaders/r3/
+    /// Load and compile vertex shader from res/gamedata/shaders/r5/
     /// </summary>
     /// <param name="name">Shader name without extension (e.g., "gbuffer")</param>
     /// <param name="entryPoint">Entry point function name (default: "main")</param>
@@ -40,7 +40,7 @@ public:
     );
 
     /// <summary>
-    /// Load and compile pixel shader from res/gamedata/shaders/r3/
+    /// Load and compile pixel shader from res/gamedata/shaders/r5/
     /// </summary>
     nvrhi::ShaderHandle LoadPixelShader(
         const char* name,

@@ -112,10 +112,10 @@ SlangVFSAdapter::SlangVFSAdapter()
 
     // Test VFS access for common missing files (try both slashes!)
     const char* testFiles[] = {
-        "r3/common_policies.h",
-        "r3\\common_policies.h",   // Try backslash
-        "r3/common_samplers.h",
-        "r3\\common_samplers.h"    // Try backslash
+        "r5/common_policies.h",
+        "r5\\common_policies.h",   // Try backslash
+        "r5/common_samplers.h",
+        "r5\\common_samplers.h"    // Try backslash
     };
 
     Msg("~ [SlangVFSAdapter] Testing VFS access...");
@@ -210,7 +210,7 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::loadFile(
     IReader* reader = FS.r_open("$game_shaders$", vfsPath.c_str());
     if (!reader)
     {
-        // Fallback: Try without directory prefix (e.g., "common_policies.h" instead of "r3\common_policies.h")
+        // Fallback: Try without directory prefix (e.g., "common_policies.h" instead of "r5\common_policies.h")
         // This matches vanilla D3DCompile behavior for shared includes
         size_t lastSlash = vfsPath.find_last_of("/\\");
         if (lastSlash != xr_string::npos)

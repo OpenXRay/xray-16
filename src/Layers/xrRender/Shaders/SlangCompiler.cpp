@@ -47,7 +47,9 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     const char* entryPoint,
     Stage stage,
     Target target,
-    const char* sourcePath)
+    const char* sourcePath,
+    const Define* defines,
+    size_t defineCount)
 {
     CompileResult result;
 
@@ -56,6 +58,20 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         result.errorMessage = "SlangCompiler not initialized. Call Initialize() first.";
         Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
         return result;
+    }
+
+    // Convert our Define structs to Slang's PreprocessorMacroDesc
+    xr_vector<slang::PreprocessorMacroDesc> slangDefines;
+    if (defines && defineCount > 0)
+    {
+        slangDefines.reserve(defineCount);
+        for (size_t i = 0; i < defineCount; ++i)
+        {
+            slang::PreprocessorMacroDesc macro;
+            macro.name = defines[i].name;
+            macro.value = defines[i].value;
+            slangDefines.push_back(macro);
+        }
     }
 
     // Create session for this compilation
@@ -85,6 +101,29 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 
     sessionDesc.targets = &targetDesc;
     sessionDesc.targetCount = 1;
+
+    // Pass preprocessor defines to session
+    if (!slangDefines.empty())
+    {
+        sessionDesc.preprocessorMacros = slangDefines.data();
+        sessionDesc.preprocessorMacroCount = slangDefines.size();
+    }
+
+    // Configure compiler options to preserve bindings and prevent reordering
+    slang::CompilerOptionEntry compilerOptions[2];
+
+    // Disable name mangling to preserve original resource names
+    compilerOptions[0].name = slang::CompilerOptionName::NoMangle;
+    compilerOptions[0].value.kind = slang::CompilerOptionValueKind::Int;
+    compilerOptions[0].value.intValue0 = 1;
+
+    // Preserve all parameters to prevent constant buffer reordering
+    compilerOptions[1].name = slang::CompilerOptionName::PreserveParameters;
+    compilerOptions[1].value.kind = slang::CompilerOptionValueKind::Int;
+    compilerOptions[1].value.intValue0 = 1;
+
+    sessionDesc.compilerOptionEntries = compilerOptions;
+    sessionDesc.compilerOptionEntryCount = 2;
 
     // Use VFS adapter for file system operations (includes from VFS)
     sessionDesc.fileSystem = m_vfsAdapter.get();

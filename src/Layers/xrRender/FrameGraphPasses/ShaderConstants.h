@@ -95,8 +95,9 @@ struct alignas(16) StaticGlobals {
 
     // Misc
     Fvector4 parallax;         // 352-368: Parallax mapping parameters
+    Fvector4 screen_res;       // 368-384: Screen resolution (x=width, y=height, z=1/width, w=1/height)
 };
-//static_assert(sizeof(StaticGlobals) == 368, "StaticGlobals must be 368 bytes");
+static_assert(sizeof(StaticGlobals) == 384, "StaticGlobals must be 384 bytes");
 
 // Legacy alias for compatibility
 using GlobalConstants = StaticGlobals;
@@ -201,6 +202,14 @@ static class cl_pos_decompress_params2 : public R_constant_setup
 
     // Parallax mapping
     cb.parallax.set(0.02f, -0.01f, 0.0f, 0.0f);  // height scale, min samples, max samples, unused
+
+    // Screen resolution (for UI shaders and other effects)
+    cb.screen_res.set(
+        (float)Device.dwWidth,              // x = width
+        (float)Device.dwHeight,             // y = height
+        1.0f / (float)Device.dwWidth,       // z = 1/width
+        1.0f / (float)Device.dwHeight       // w = 1/height
+    );
 
     // Clear padding to avoid uninitialized memory warnings
     cb.padding1 = 0.0f;

@@ -7,6 +7,9 @@
 
 namespace xray::render::RENDER_NAMESPACE
 {
+// Extern reference to global failed shaders list (defined in r2.cpp)
+extern xr_vector<xr_string> g_failedShaders;
+
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
@@ -507,10 +510,15 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
 
     // Route through Slang if FrameGraph is active
     extern ENGINE_API int ps_r4_use_framegraph;
-    if (ps_r4_use_framegraph && m_shaderLoader)
+    if (ps_r4_use_framegraph)
     {
-        Msg("~ [shader_compile] Compiling with Slang: %s (target: %s)", name, pTarget);
-
+        if (!m_shaderLoader)
+        {
+            Msg("! [shader_compile] FrameGraph enabled but ShaderLoader not initialized!");
+            Msg("! Shader: %s (target: %s)", name, pTarget);
+            R_ASSERT2(false, "ShaderLoader must be initialized before compiling shaders with FrameGraph");
+            return E_FAIL;
+        }
         // Map shader target to stage
         xray::render::SlangCompiler::Stage stage;
         char extension[3];
@@ -534,12 +542,58 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             return E_FAIL;
         }
 
+        // Build a string containing all defines for hash computation
+        xr_string definesStr;
+        for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
+        {
+            definesStr.append(macro->Name);
+            definesStr.append("=");
+            if (macro->Definition)
+                definesStr.append(macro->Definition);
+            definesStr.append(";");
+        }
+
+        // Compute hash of shader source + defines for cache lookup
+        u32 sourceHash = xray::render::framegraph::ShaderCache::ComputeHash(
+            (const char*)fs->pointer(),
+            fs->length(),
+            definesStr.c_str()
+        );
+
+        // Try to load from FrameGraph shader cache
+        xr_vector<u8> cachedBytecode;
+        static xray::render::framegraph::ShaderCache s_cache;  // Static cache instance for r4_shaders
+
+        if (s_cache.TryLoad(name, extension, sourceHash, cachedBytecode))
+        {
+            // Cache hit! Create shader from cached bytecode
+            _result = create_shader(
+                pTarget,
+                (DWORD*)cachedBytecode.data(),
+                cachedBytecode.size(),
+                name,
+                result,
+                o.disasm,
+                false  // dx9compatibility
+            );
+
+            if (SUCCEEDED(_result))
+            {
+                Msg("  ✓ [shader_compile] Cache HIT: %s (%zu bytes)", name, cachedBytecode.size());
+            }
+
+            return _result;
+        }
+
+        // Cache miss - compile with Slang
+        Msg("~ [shader_compile] Compiling with Slang: %s (target: %s)", name, pTarget);
+
         // Copy shader source to null-terminated string (Slang needs C-string)
         xr_string sourceCode;
         sourceCode.assign((const char*)fs->pointer(), fs->length());
 
         // Construct full shader path for Slang (needed for include resolution)
-        // e.g., "r3/simple_color.ps" so includes like "common.h" resolve to "r3/common.h"
+        // e.g., "r5/simple_color.ps" so includes like "common.h" resolve to "r5/common.h"
         string_path fullShaderPath;
         strconcat(sizeof(fullShaderPath), fullShaderPath, RImplementation.getShaderPath(), name);
 
@@ -557,21 +611,60 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         else if (strcmp(extension, "cs") == 0)
             xr_strcat(fullShaderPath, ".cs");
 
-        // Compile with Slang
+        // Convert D3D_SHADER_MACRO to SlangCompiler::Define
+        // Count defines (options.data() is null-terminated array)
+        size_t defineCount = 0;
+        for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
+            defineCount++;
+
+        // Convert to SlangCompiler::Define format
+        xr_vector<xray::render::SlangCompiler::Define> slangDefines;
+        slangDefines.reserve(defineCount);
+        for (size_t i = 0; i < defineCount; ++i)
+        {
+            xray::render::SlangCompiler::Define define;
+            define.name = options.data()[i].Name;
+            define.value = options.data()[i].Definition;
+            slangDefines.push_back(define);
+        }
+
+        // Compile with Slang (with preprocessor defines!)
         xray::render::SlangCompiler::CompileResult compileResult =
             m_shaderLoader->GetSlangCompiler()->CompileFromSource(
                 sourceCode.c_str(),
                 pFunctionName,
                 stage,
                 xray::render::SlangCompiler::Target::DXBC,
-                fullShaderPath  // Pass full path for include resolution
+                fullShaderPath,  // Pass full path for include resolution
+                slangDefines.data(),  // Pass preprocessor defines
+                slangDefines.size()
             );
 
         if (!compileResult.IsValid())
         {
-            Msg("! [shader_compile] Slang compilation failed: %s", name);
+            // Store failed shader info for batch reporting
+            xr_string failedInfo;
+            failedInfo.append("║   - ");
+            failedInfo.append(name);
+            failedInfo.append(" (");
+            failedInfo.append(pTarget);
+            failedInfo.append(")");
             if (!compileResult.errorMessage.empty())
-                Msg("! Error: %s", compileResult.errorMessage.c_str());
+            {
+                failedInfo.append("\n║     Error: ");
+                // Only include first line of error to keep it concise
+                const char* newline = strchr(compileResult.errorMessage.c_str(), '\n');
+                if (newline)
+                    failedInfo.append(compileResult.errorMessage.c_str(), newline - compileResult.errorMessage.c_str());
+                else
+                    failedInfo.append(compileResult.errorMessage.c_str());
+            }
+            g_failedShaders.push_back(failedInfo);
+
+            // Log brief error but continue compiling
+            Msg("! [shader_compile] Failed: %s (target: %s) - continuing...", name, pTarget);
+
+            // Don't assert - just return E_FAIL and let it continue
             return E_FAIL;
         }
 
@@ -590,6 +683,9 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         {
             Msg("* [shader_compile] Successfully compiled with Slang: %s (%zu bytes)",
                 name, compileResult.bytecode.size());
+
+            // Save to FrameGraph shader cache for future runs
+            s_cache.Save(name, extension, sourceHash, compileResult.bytecode);
         }
 
         return _result;

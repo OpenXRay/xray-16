@@ -65,6 +65,15 @@ public:
     bool Initialize();
 
     /// <summary>
+    /// Preprocessor macro definition
+    /// </summary>
+    struct Define
+    {
+        const char* name;
+        const char* value;
+    };
+
+    /// <summary>
     /// Compile HLSL source code to target bytecode format
     /// </summary>
     /// <param name="source">HLSL source code</param>
@@ -72,12 +81,16 @@ public:
     /// <param name="stage">Shader stage (vertex, pixel, etc.)</param>
     /// <param name="target">Target output format (DXBC, DXIL, SPIRV)</param>
     /// <param name="sourcePath">Optional source file path for error messages</param>
+    /// <param name="defines">Optional preprocessor defines</param>
+    /// <param name="defineCount">Number of defines</param>
     CompileResult CompileFromSource(
         const char* source,
         const char* entryPoint,
         Stage stage,
         Target target,
-        const char* sourcePath = "shader.hlsl"
+        const char* sourcePath = "shader.hlsl",
+        const Define* defines = nullptr,
+        size_t defineCount = 0
     );
 
     /// <summary>

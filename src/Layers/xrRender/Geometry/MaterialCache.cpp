@@ -553,6 +553,11 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                     if (!found) {
                         const char* cbName = cb->GetBufferName();
                         bool isPerObjectCB = (cbName && xr_strcmp(cbName, "$Globals") == 0);
+
+                        // DEBUG: Log what D3DReflect reports for this CB
+                        Msg("  [MaterialCache] D3DReflect reports CB: name=%s, slot=%d (from shader)",
+                            cbName ? cbName : "NULL", bindingSlot);
+
                         nvrhi::BufferHandle bufferHandle;
 
                         if (isPerObjectCB) {
@@ -575,6 +580,16 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                             nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
                             bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
+                            if (bufferHandle) {
+                                Msg("  [MaterialCache] Created CB: name=%s, slot=%d, size=%d bytes, stage=%s",
+                                    cbName ? cbName : "NULL",
+                                    bindingSlot,
+                                    bufDesc.ByteWidth,
+                                    stage == MaterialPSO::ShaderStage::Vertex ? "VS" : "PS");
+                            } else {
+                                Msg("! [MaterialCache] FAILED to create CB: name=%s, slot=%d",
+                                    cbName ? cbName : "NULL", bindingSlot);
+                            }
                         }
 
                         if (bufferHandle) {
@@ -858,11 +873,17 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
                 // Slot 0: Use the per-object VCB passed in (updated per-draw via WriteBuffer)
                 vsBindingDesc.bindings.push_back(
                     nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
+                Msg("  [GetOrCreateBindingSet] VS: Added per-object CB at slot %d", cbInfo.slot);
             } else {
                 // Slots 1+: Add global CBs
                 if (cbInfo.nvrhiBuffer) {
                     vsBindingDesc.bindings.push_back(
                         nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                    Msg("  [GetOrCreateBindingSet] VS: Added global CB '%s' at slot %d (size=%d)",
+                        cbInfo.name.empty() ? "EMPTY" : cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
+                } else {
+                    Msg("! [GetOrCreateBindingSet] VS: CB '%s' at slot %d has NULL buffer!",
+                        cbInfo.name.empty() ? "EMPTY" : cbInfo.name.c_str(), cbInfo.slot);
                 }
             }
         }

@@ -14,6 +14,7 @@
 #include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRender/dxFontRender.h"
 #include "xrCore/Text/StringConversion.hpp"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::passes {
 
@@ -568,7 +569,37 @@ void TextPass::RenderText(ng::RenderContext& ctx, nvrhi::ITexture* outputTexture
     ctx.SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  4. RENDER EACH FONT BATCH
+    //  4. UPDATE GLOBAL CONSTANT BUFFERS
+    // ═══════════════════════════════════════════════════════
+    // Font shaders need static_globals for screen_res and other parameters
+
+    StaticGlobals staticGlobalsCB = {};
+    FillGlobalConstants(staticGlobalsCB);
+
+    // Write static_globals to all font PSOs before rendering
+    for (const auto& batch : m_fontBatches) {
+        if (batch.vertices.empty()) continue;
+
+        auto* fontRender = static_cast<render_r4::dxFontRender*>(batch.font->pFontRender);
+        if (!fontRender || !fontRender->pShader) continue;
+
+        Shader* shader = fontRender->pShader._get();
+        if (!shader || !shader->E[0]) continue;
+
+        MaterialPSO* pso = m_materialCache->GetOrCreateUIPSO(shader, 0, framebuffer);
+        if (pso) {
+            for (const auto& cbInfo : pso->constantBuffers) {
+                if (cbInfo.name == "static_globals") {
+                    u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                    ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                    break;
+                }
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  5. RENDER EACH FONT BATCH
     // ═══════════════════════════════════════════════════════
     // Each font has its own shader/texture, so we need separate PSO/bindings
 

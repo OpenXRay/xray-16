@@ -32,6 +32,28 @@ namespace xray::render::RENDER_NAMESPACE
 {
 CRender RImplementation;
 
+// Global storage for failed shader compilation tracking
+xr_vector<xr_string> g_failedShaders;
+
+void CRender::PrintFailedShadersSummary()
+{
+    if (g_failedShaders.empty())
+        return;
+
+    Msg("\n");
+    Msg("╔══════════════════════════════════════════════════════════════");
+    Msg("║ SHADER COMPILATION SUMMARY");
+    Msg("╠══════════════════════════════════════════════════════════════");
+    Msg("║ %zu shader(s) failed to compile:", g_failedShaders.size());
+    Msg("╠══════════════════════════════════════════════════════════════");
+    for (const auto& failedShader : g_failedShaders)
+    {
+        Msg("%s", failedShader.c_str());
+    }
+    Msg("╚══════════════════════════════════════════════════════════════");
+    Msg("\n");
+}
+
 //////////////////////////////////////////////////////////////////////////
 class CGlow : public IRender_Glow
 {
@@ -519,24 +541,9 @@ void CRender::create()
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
 #endif
 
-    Target = xr_new<CRenderTarget>(); // Main target
-
-    Models = xr_new<CModelPool>();
-    PSLibrary.OnCreate();
-    HWOCC.occq_create(occq_size);
-
-    rmNormal(RCache);
-    q_sync_point.Create();
-
-    //	TODO: OGL: Implement FluidManager.
-#if defined(USE_DX11)
-    FluidManager.Initialize(70, 70, 70);
-    //	FluidManager.Initialize( 100, 100, 100 );
-    FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
-#endif
-
 #if defined(USE_DX11) && RENDER == R_R4
-    // Initialize RenderDevice with HW's D3D11 device and context
+    // Initialize RenderDevice with HW's D3D11 device and context BEFORE creating render targets
+    // This ensures ShaderLoader is available for shader compilation during Target creation
     if (HW.pDevice)
     {
         m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
@@ -583,6 +590,29 @@ void CRender::create()
         }
     }
 #endif
+
+    Target = xr_new<CRenderTarget>(); // Main target
+
+    Models = xr_new<CModelPool>();
+    PSLibrary.OnCreate();
+    HWOCC.occq_create(occq_size);
+
+    rmNormal(RCache);
+    q_sync_point.Create();
+
+    //	TODO: OGL: Implement FluidManager.
+#if defined(USE_DX11)
+    FluidManager.Initialize(70, 70, 70);
+    //	FluidManager.Initialize( 100, 100, 100 );
+    FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
+#endif
+
+    // Print summary of any failed shader compilations
+    extern ENGINE_API int ps_r4_use_framegraph;
+    if (ps_r4_use_framegraph)
+    {
+        PrintFailedShadersSummary();
+    }
 }
 
 void CRender::destroy()

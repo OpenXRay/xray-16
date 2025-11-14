@@ -6,6 +6,7 @@
 #include "Layers/xrRender/NVRHIUIRenderer.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::passes {
 
@@ -157,8 +158,35 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
         // Restore original renderer
         GEnv.UIRender = oldRenderer;
 
-        // STEP 2: Render collected geometry via NVRHI
+        // STEP 2: Update global constant buffers before rendering
+        // UI shaders need static_globals for screen_res and other parameters
         if (!m_uiCollector->GetBatches().empty()) {
+            StaticGlobals staticGlobalsCB = {};
+            FillGlobalConstants(staticGlobalsCB);
+
+            // Write static_globals to all UI PSOs
+            // NOTE: We need to do this BEFORE rendering, while OUTSIDE the render pass
+            for (const auto& batch : m_uiCollector->GetBatches()) {
+                if (batch.shader && m_materialCache) {
+                    MaterialPSO* matPSO = m_materialCache->GetOrCreateUIPSO(
+                        batch.shader._get(),
+                        batch.shaderElement,
+                        framebuffer
+                    );
+
+                    if (matPSO) {
+                        for (const auto& cbInfo : matPSO->constantBuffers) {
+                            if (cbInfo.name == "static_globals") {
+                                u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                                ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                                break;  // Only need to update once per PSO
+                            }
+                        }
+                    }
+                }
+            }
+
+            // STEP 3: Render collected geometry via NVRHI
             m_uiRenderer->RenderBatches(
                 cmdList,
                 m_uiCollector->GetBatches(),

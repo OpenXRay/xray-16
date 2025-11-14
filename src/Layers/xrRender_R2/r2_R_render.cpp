@@ -663,11 +663,11 @@ void CRender::TestRenderContext_Triangle()
     {
         // Compile shaders
         xr_vector<u8> vsBlob = CompileShaderFromFile(
-            "r3\\test_triangle.vs", "main", "vs_5_0"
+            "r5\\test_triangle.vs", "main", "vs_5_0"
         );
 
         xr_vector<u8> psBlob = CompileShaderFromFile(
-            "r3\\test_triangle.ps", "main", "ps_5_0"
+            "r5\\test_triangle.ps", "main", "ps_5_0"
         );
 
         if (vsBlob.empty() || psBlob.empty())

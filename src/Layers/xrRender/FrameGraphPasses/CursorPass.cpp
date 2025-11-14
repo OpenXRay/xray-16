@@ -6,6 +6,7 @@
 #include "Layers/xrRender/NVRHIUIRenderer.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::passes {
 
@@ -110,8 +111,34 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
         // Restore original renderer
         GEnv.UIRender = oldRenderer;
 
-        // STEP 2: Render collected geometry via NVRHI
+        // STEP 2: Update global constant buffers before rendering
+        // Cursor shaders need static_globals for screen_res and other parameters
         if (!m_uiCollector->GetBatches().empty()) {
+            StaticGlobals staticGlobalsCB = {};
+            FillGlobalConstants(staticGlobalsCB);
+
+            // Write static_globals to all cursor PSOs
+            for (const auto& batch : m_uiCollector->GetBatches()) {
+                if (batch.shader && m_materialCache) {
+                    MaterialPSO* matPSO = m_materialCache->GetOrCreateUIPSO(
+                        batch.shader._get(),
+                        batch.shaderElement,
+                        framebuffer
+                    );
+
+                    if (matPSO) {
+                        for (const auto& cbInfo : matPSO->constantBuffers) {
+                            if (cbInfo.name == "static_globals") {
+                                u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                                ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // STEP 3: Render collected geometry via NVRHI
             m_uiRenderer->RenderBatches(
                 cmdList,
                 m_uiCollector->GetBatches(),

@@ -419,7 +419,7 @@ public:
 #if defined(USE_DX11)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::D3D11; }
     u32 get_dx_level() override { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
-    pcstr getShaderPath() override { return "r3\\"; }
+    pcstr getShaderPath() override { return "r5\\"; }
 #elif defined(USE_OGL)
     BackendAPI GetBackendAPI() const override { return IRender::BackendAPI::OpenGL; }
     u32 get_dx_level() override { return /*HW.pDevice1?0x000A0001:*/0x000A0000; }
@@ -532,6 +532,7 @@ public:
 
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+    void PrintFailedShadersSummary();
 
     // Phase 3: A-Life grass interaction wrapper (thread-safe)
     void RequestGrassInteraction(const Fvector& world_pos, float radius, float strength, uint8_t type = 0) override

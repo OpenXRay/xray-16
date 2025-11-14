@@ -701,12 +701,26 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 
         FS.r_close(file);
 
-        VERIFY(SUCCEEDED(_hr));
-
-        if (FAILED(_hr) && fallback)
-            goto fallback;
-
-        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
+        // In batch compile mode for Slang shaders, skip assertion and continue
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (FAILED(_hr))
+        {
+            if (ps_r4_use_framegraph)
+            {
+                // Batch mode: log and continue (summary printed elsewhere)
+                if (fallback)
+                    goto fallback;
+                return nullptr;  // Return null shader, let renderer handle gracefully
+            }
+            else
+            {
+                // Normal mode: assert
+                VERIFY(SUCCEEDED(_hr));
+                if (fallback)
+                    goto fallback;
+                CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
+            }
+        }
 
         return sh;
     }

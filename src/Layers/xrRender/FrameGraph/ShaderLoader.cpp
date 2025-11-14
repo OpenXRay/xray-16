@@ -25,7 +25,7 @@ ShaderLoader::~ShaderLoader()
 IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
 {
     string_path filename;
-    strconcat(sizeof(filename), filename, "r3" DELIMITER, name, extension);
+    strconcat(sizeof(filename), filename, "r5" DELIMITER, name, extension);
 
     IReader* R = FS.r_open("$game_shaders$", filename);
     if (!R)
