@@ -5,6 +5,7 @@
 #include "Layers/xrRender/Blender_Recorder.h"
 #include "Layers/xrRender/Blender.h"
 #include "Layers/xrRender/tss.h"
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -34,39 +35,42 @@ void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); 
 void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
 void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
 {
-    if (ctable.dx9compatibility && !recursive)
-    {
-        const u32 stage = r_Sampler(ResourceName, texture);
-        if (stage != u16(-1))
-            return;
-    }
-
     VERIFY(ResourceName);
     if (!texture)
     {
         Msg("! [r_dx11Texture] Texture is NULL for resource '%s'", ResourceName);
         return;
     }
-    //
+
     string256 TexName;
     xr_strcpy(TexName, texture);
     fix_texture_name(TexName);
 
-    // Find index
-    ref_constant C = ctable.get(ResourceName, ctable.dx9compatibility ? RC_dx11texture : u16(-1));
-    // VERIFY(C);
-    if (!C)
+    // Get binding slot directly from pixel shader reflection
+    u32 stage = u32(-1);
+    SPS* ps = dest.ps._get();
+    if (ps && ps->reflection)
     {
-        Msg("! [r_dx11Texture] Constant '%s' not found in shader", ResourceName);
+        const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
+        for (const auto& tex : inputTextures)
+        {
+            if (0 == xr_strcmp(tex.name.c_str(), ResourceName))
+            {
+                // Pixel shader textures use rstPixel offset
+                stage = tex.slot + CTexture::rstPixel;
+                break;
+            }
+        }
+    }
+
+    if (stage == u32(-1))
+    {
+        Msg("! [r_dx11Texture] Texture resource '%s' not found in pixel shader reflection", ResourceName);
         return;
     }
 
-    R_ASSERT(C->type == RC_dx11texture);
-    u32 stage = C->samp.index;
-
-    Msg("  [r_dx11Texture] Adding texture '%s' at resource '%s' (stage=%u)", TexName, ResourceName, stage);
+    Msg("  [r_dx11Texture] Binding texture '%s' at resource '%s' (slot=%u)", TexName, ResourceName, stage);
     passTextures.emplace_back(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName)));
-    Msg("  [r_dx11Texture] passTextures now has %zu entries", passTextures.size());
 }
 
 void CBlender_Compile::i_dx11FilterAnizo(u32 s, BOOL value)

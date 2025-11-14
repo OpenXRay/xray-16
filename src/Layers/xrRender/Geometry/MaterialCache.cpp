@@ -352,22 +352,19 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
     // Clear existing textures
     matPSO->textures.clear();
 
-    // ═══════════════════════════════════════════════════════
-    //  OPTION 1: Try X-Ray legacy texture list first
-    // ═══════════════════════════════════════════════════════
-    STextureList* texList = pass->T._get();
-
-    if (texList && !texList->empty()) {
-        Msg("  [ExtractTextures] Using X-Ray pass texture list (%u textures)", texList->size());
-
     // Get TextureManager from FGResourceManager
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     VERIFY(texManager);
 
-    // ═══════════════════════════════════════════════════
-    //  LOAD TEXTURES NATIVELY VIA TEXTUREMANAGER
-    //  No more D3D11 wrapping! Direct native NVRHI textures!
-    // ═══════════════════════════════════════════════════
+    // Get texture list populated by r_dx11Texture() from script shaders
+    STextureList* texList = pass->T._get();
+
+    if (!texList || texList->empty()) {
+        Msg("  [ExtractTextures] No textures bound for this shader");
+        return;
+    }
+
+    Msg("  [ExtractTextures] Loading %u textures from pass", texList->size());
 
     // STextureList is a vector of (stage, ref_texture) pairs
     for (size_t i = 0; i < texList->size(); i++) {
@@ -383,10 +380,7 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         // Get texture name (e.g., "act\\act_glow")
         const char* textureName = tex->cName.c_str();
 
-        // ───────────────────────────────────────────────────
-        //  CHECK CACHE FIRST
-        // ───────────────────────────────────────────────────
-
+        // Check cache first
         auto cacheIt = m_textureHandleCache.find(textureName);
         if (cacheIt != m_textureHandleCache.end()) {
             // Cache HIT - reuse existing handle
@@ -397,11 +391,7 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        // ───────────────────────────────────────────────────
-        //  CACHE MISS - LOAD VIA TEXTUREMANAGER
-        // ───────────────────────────────────────────────────
-
-        // Load through TextureManager (native NVRHI, with streaming & memory management!)
+        // Cache MISS - load via TextureManager
         resources::TextureHandle resourceHandle = texManager->LoadTexture(
             textureName,
             resources::TexturePriority::High  // UI/material textures are high priority
@@ -412,60 +402,19 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        // ───────────────────────────────────────────────────
-        //  CACHE THE HANDLE FOR REUSE
-        // ───────────────────────────────────────────────────
-
+        // Cache the handle for reuse
         m_textureHandleCache[textureName] = resourceHandle;
 
-        // ───────────────────────────────────────────────────
-        //  ADD TO MATERIAL PSO
-        // ───────────────────────────────────────────────────
-
+        // Add to material PSO
         MaterialPSO::TextureSlot texSlot;
         texSlot.slot = stage;
         texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
 
-        Msg("  [ExtractTextures] Added texture '%s' at X-Ray stage=%u (will bind to t%u)",
-            textureName, stage, stage);
+        Msg("  [ExtractTextures] Loaded texture '%s' at slot=%u", textureName, stage);
     }
 
-        Msg("  [ExtractTextures] Total textures from X-Ray pass: %u", matPSO->textures.size());
-        return;  // Done with X-Ray texture path
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  OPTION 2: Fallback to Slang reflection (for shaders with no pass->T)
-    // ═══════════════════════════════════════════════════════
-    // When pass->T is empty (e.g., UI shaders), use reflection to create
-    // placeholder texture slots. The actual textures will be bound dynamically.
-
-    Msg("  [ExtractTextures] X-Ray pass->T is empty, using Slang reflection");
-
-    // Get pixel shader (textures are always in pixel shader)
-    SPS* ps = pass->ps._get();
-    if (!ps || !ps->reflection) {
-        Msg("! [ExtractTextures] No pixel shader reflection available");
-        return;
-    }
-
-    const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
-    Msg("  [ExtractTextures] Found %u texture slots in pixel shader reflection", inputTextures.size());
-
-    for (const auto& texReflection : inputTextures) {
-        // Create placeholder texture slot
-        // NOTE: handle will be invalid - textures must be bound dynamically by application
-        MaterialPSO::TextureSlot texSlot;
-        texSlot.slot = texReflection.slot;
-        texSlot.handle = resources::TextureHandle();  // Invalid handle = placeholder
-        matPSO->textures.push_back(texSlot);
-
-        Msg("  [ExtractTextures] Added placeholder for '%s' at slot t%u (no texture file assigned)",
-            texReflection.name.c_str(), texReflection.slot);
-    }
-
-    Msg("  [ExtractTextures] Total placeholder texture slots: %u", matPSO->textures.size());
+    Msg("  [ExtractTextures] Total textures loaded: %u", matPSO->textures.size());
 }
 
 // ══════════════════════════════════════════════════════════

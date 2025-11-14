@@ -9,6 +9,10 @@
 #include "Blender_Recorder.h"
 #include "Blender.h"
 
+#ifdef USE_DX11
+#include "FrameGraph/ShaderCache.h"
+#endif
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void fix_texture_name(pstr);
@@ -429,28 +433,57 @@ void CBlender_Compile::SetupSampler(u32 stage, pcstr sampler)
 
 u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str texture)
 {
-    const auto& findResource = [&](pcstr name, u32 type) -> u32
+    const auto& findSamplerResource = [&](pcstr name) -> u32
     {
-        ref_constant C = ctable.get(name, type);
+        ref_constant C = ctable.get(name, RC_sampler);
         if (!C)
         {
             return InvalidStage;
         }
 
-        R_ASSERT(C->type == type);
+        R_ASSERT(C->type == RC_sampler);
         return C->samp.index;
+    };
+
+    const auto& findTextureSlot = [&](pcstr name) -> u32
+    {
+#ifdef USE_DX11
+        // Get texture slot from pixel shader reflection (like r_dx11Texture does)
+        SPS* ps = dest.ps._get();
+        if (ps && ps->reflection)
+        {
+            const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
+            for (const auto& tex : inputTextures)
+            {
+                if (0 == xr_strcmp(tex.name.c_str(), name))
+                {
+                    // Pixel shader textures use rstPixel offset
+                    return tex.slot + CTexture::rstPixel;
+                }
+            }
+        }
+#else
+        // For non-DX11 renderers, fall back to constant table lookup
+        ref_constant C = ctable.get(name, RC_dx11texture);
+        if (C)
+        {
+            R_ASSERT(C->type == RC_dx11texture);
+            return C->samp.index;
+        }
+#endif
+        return InvalidStage;
     };
 
     /* Setup sampler */
     auto samplerName = HW.Caps.useCombinedSamplers ? image : sampler;
-    const u32 samplerStage = findResource(samplerName, RC_sampler);
+    const u32 samplerStage = findSamplerResource(samplerName);
     if (samplerStage != InvalidStage)
     {
         SetupSampler(samplerStage, sampler);
     }
 
     /* Setup assigned texture */
-    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findResource(image, RC_dx11texture);
+    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findTextureSlot(image);
     if (textureStage != InvalidStage && texture.size() != 0)
     {
         string256 name;
@@ -459,6 +492,11 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
 
         ref_texture textureResource = RImplementation.Resources->_CreateTexture(name);
         passTextures.emplace_back(textureStage, textureResource);
+        Msg("  [SampledImage] Binding texture '%s' at image '%s' (slot=%u)", name, image, textureStage);
+    }
+    else if (textureStage == InvalidStage)
+    {
+        Msg("! [SampledImage] Texture resource '%s' not found in pixel shader reflection", image);
     }
 
     return samplerStage;
