@@ -20,7 +20,7 @@ v2p main (v_vert v)
 	o.c			= v.color;
 	o.fog 		= calc_fogging(v.pos);			// fog, input in world coords
 	o.fog 		= saturate(o.fog);
-	o.c.rgb 	= lerp(fog_color, o.c, o.fog);
+	o.c.rgb 	= lerp(fog_color.rgb, o.c.rgb, o.fog);
 
 //	float scale = tex2Dlod	(s_tonemap,float4(.5,.5,.5,.5)).x ;
 	float scale = s_tonemap.Load(int3(0,0,0)).x;

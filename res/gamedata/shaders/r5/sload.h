@@ -84,7 +84,7 @@ void UpdateTC( inout p_bumped I)
 */
 		//	Reconstruct previouse step's data
 		vTexCurrentOffset -= vTexOffsetPerStep;
-		float fPrevHeight = s_bumpX.Sample( smp_base, float3(vTexCurrentOffset.xy,0) ).a;
+		float fPrevHeight = s_bumpX.Sample( smp_base, vTexCurrentOffset.xy ).a;
 
 		//	Smooth tc position between current and previouse step
 		float	fDelta2 = ((fCurrentBound + fStepSize) - fPrevHeight);
@@ -98,7 +98,7 @@ void UpdateTC( inout p_bumped I)
 		I.tcdh = vTexCoord;
 
 #if defined(USE_TDETAIL) && defined(USE_STEEPPARALLAX)
-		I.tcdbump = vTexCoord * dt_params;
+		I.tcdbump = vTexCoord * dt_params.xy;
 #endif
 	}
 
@@ -116,7 +116,7 @@ void UpdateTC( inout p_bumped I)
 			//height  /= 2;
 			//height  *= 0.8;
 			height	= height*(parallax.x) + (parallax.y);	//
-	float2	new_tc  = I.tcdh + height * normalize(eye);	//
+	float2	new_tc  = I.tcdh + height * normalize(eye).xy;	//
 
 	//	Output the result
 	I.tcdh	= new_tc;
@@ -141,7 +141,7 @@ surface_bumped sload_i( p_bumped I)
 	float4 	NuE	= s_bumpX.Sample( smp_base, I.tcdh);	// IN:	normal_error.height
 
 	S.base		= tbase(I.tcdh);				//	IN:  rgb.a
-	S.normal	= Nu.wzy + (NuE.xyz - 1.0h);	//	(Nu.wzyx - .5h) + (E-.5)
+	S.normal	= Nu.wzy + (NuE.xyz - 1.0f);	//	(Nu.wzyx - .5h) + (E-.5)
 	S.gloss		= Nu.x*Nu.x;					//	S.gloss = Nu.x*Nu.x;
 	S.height	= NuE.z;
 	//S.height	= 0;
@@ -152,7 +152,7 @@ surface_bumped sload_i( p_bumped I)
 	float4 NDetailX		= s_detailBumpX.Sample( smp_base, I.tcdbump);
 	S.gloss				= S.gloss * NDetail.x * 2;
 	//S.normal			+= NDetail.wzy-.5;
-	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0h; //	(Nu.wzyx - .5h) + (E-.5)
+	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0f; //	(Nu.wzyx - .5h) + (E-.5)
 
 	float4 detail		= s_detail.Sample( smp_base, I.tcdbump);
 	S.base.rgb			= S.base.rgb * detail.rgb * 2;
@@ -183,7 +183,7 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	float4 	NuE	= s_bumpX.Sample( smp_base, I.tcdh);	// IN:	normal_error.height
 
 	S.base		= tbase(I.tcdh);				//	IN:  rgb.a
-	S.normal	= Nu.wzyx + (NuE.xyz - 1.0h);	//	(Nu.wzyx - .5h) + (E-.5)
+	S.normal	= Nu.wzyx.xyz + (NuE.xyz - 1.0f);	//	(Nu.wzyx - .5h) + (E-.5)
 	S.gloss		= Nu.x*Nu.x;					//	S.gloss = Nu.x*Nu.x;
 	S.height	= NuE.z;
 	//S.height	= 0;
@@ -200,7 +200,7 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	float4 NDetailX		= s_detailBumpX.Sample( smp_base, I.tcdbump);
 	S.gloss				= S.gloss * NDetail.x * 2;
 	//S.normal			+= NDetail.wzy-.5;
-	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0h; //	(Nu.wzyx - .5h) + (E-.5)
+	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0f; //	(Nu.wzyx - .5h) + (E-.5)
 
 	float4 detail		= s_detail.Sample( smp_base, I.tcdbump);
 	S.base.rgb			= S.base.rgb * detail.rgb * 2;

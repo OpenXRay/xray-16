@@ -7,13 +7,13 @@ float4 main( p_fluidsim input ) : SV_Target
     if( IsBoundaryCell(input.texcoords.xyz) )
         return GetObstVelocity(input.texcoords.xyz);
 
-    float pCenter = Texture_pressure.SampleLevel( samPointClamp, input.texcoords, 0 ); 
-    float pL = Texture_pressure.SampleLevel( samPointClamp, LEFTCELL, 0 );
-    float pR = Texture_pressure.SampleLevel( samPointClamp, RIGHTCELL, 0 );
-    float pB = Texture_pressure.SampleLevel( samPointClamp, BOTTOMCELL, 0 );
-    float pT = Texture_pressure.SampleLevel( samPointClamp, TOPCELL, 0 );
-    float pD = Texture_pressure.SampleLevel( samPointClamp, DOWNCELL, 0 );
-    float pU = Texture_pressure.SampleLevel( samPointClamp, UPCELL, 0 );
+    float pCenter = Texture_pressure.SampleLevel( samPointClamp, input.texcoords, 0 ).x;
+    float pL = Texture_pressure.SampleLevel( samPointClamp, LEFTCELL, 0 ).x;
+    float pR = Texture_pressure.SampleLevel( samPointClamp, RIGHTCELL, 0 ).x;
+    float pB = Texture_pressure.SampleLevel( samPointClamp, BOTTOMCELL, 0 ).x;
+    float pT = Texture_pressure.SampleLevel( samPointClamp, TOPCELL, 0 ).x;
+    float pD = Texture_pressure.SampleLevel( samPointClamp, DOWNCELL, 0 ).x;
+    float pU = Texture_pressure.SampleLevel( samPointClamp, UPCELL, 0 ).x;
 
     float4 velocity;
     float3 obstV = float3(0,0,0);

@@ -14,10 +14,10 @@ float4 main( v2p I ) : SV_Target
 {
 //	float4	t_base 	= tex2D		(s_base,I.tc0);
 	float4	t_base = s_base.Sample( smp_base, I.tc0 );
-	float3	final 	= t_base*I.c0*2;
+	float3	final 	= t_base.rgb*I.c0*2;
 
 	//	Fogging
-	final 	= lerp(fog_color, final, I.fog);
+	final 	= lerp(fog_color.rgb, final, I.fog);
 
 	// out
 	return  float4	(final, t_base.a*I.fog*I.fog);

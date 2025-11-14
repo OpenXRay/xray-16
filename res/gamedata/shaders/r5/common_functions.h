@@ -33,9 +33,9 @@ void tonemap( out float4 low, out float4 high, float3 rgb, float scale)
 */
 }
 
-float4 combine_bloom( float3  low, float4 high)	
+float4 combine_bloom( float3  low, float4 high)
 {
-        return float4( low + high*high.a, 1.h );
+        return float4( low + high.rgb*high.a, 1.0 );
 }
 
 float calc_fogging( float4 w_pos )      
@@ -53,14 +53,14 @@ float3 calc_sun_r1( float3 norm_w )
 	return L_sun_color*saturate(dot((norm_w),-L_sun_dir_w));                 
 }
 
-float3 calc_model_hemi_r1( float3 norm_w )    
+float3 calc_model_hemi_r1( float3 norm_w )
 {
- return max(0,norm_w.y)*L_hemi_color;
+ return max(0,norm_w.y)*L_hemi_color.rgb;
 }
 
-float3 calc_model_lq_lighting( float3 norm_w )    
+float3 calc_model_lq_lighting( float3 norm_w )
 {
-	return L_material.x*calc_model_hemi_r1(norm_w) + L_ambient + L_material.y*calc_sun_r1(norm_w);
+	return L_material.x*calc_model_hemi_r1(norm_w) + L_ambient.rgb + L_material.y*calc_sun_r1(norm_w);
 }
 
 float3 	unpack_normal( float3 v )	{ return 2*v-1; }
@@ -92,7 +92,7 @@ float   get_sun( float4 lmh)
 
 float3	v_hemi(float3 n)
 {
-	return L_hemi_color*(.5f + .5f*n.y);                   
+	return L_hemi_color.rgb*(.5f + .5f*n.y);
 }
 
 float3	v_sun(float3 n)                        	
@@ -179,7 +179,7 @@ float gbuf_pack_hemi_mtl( float hemi, float mtl )
    if( ( packed & USABLE_BIT_13 ) == 0 )
       packed |= USABLE_BIT_14;
 
-   if( packed_mtl & uint( 16 ) )
+   if( (packed_mtl & uint( 16 )) != 0 )
       packed |= USABLE_BIT_15;
 
    return asfloat( packed );
@@ -211,7 +211,7 @@ f_deffer pack_gbuffer( float4 norm, float4 pos, float4 col, uint imask )
 	res.Ne			= norm;
 	res.C			   = col;
 #else
-	res.position	= float4( gbuf_pack_normal( norm ), pos.z, gbuf_pack_hemi_mtl( norm.w, pos.w ) );
+	res.position	= float4( gbuf_pack_normal( norm.xyz ), pos.z, gbuf_pack_hemi_mtl( norm.w, pos.w ) );
 	res.C			   = col;
 #endif
 

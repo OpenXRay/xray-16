@@ -28,13 +28,13 @@ float4 main ( v_aa_AA I ) : SV_Target
 #endif
 {
 #ifdef GBUFFER_OPTIMIZATION
-  gbuffer_data gbd0 = gbuffer_load_data(I.Tex0, pos2d);
-  gbuffer_data gbd1 = gbuffer_load_data_offset(I.Tex0,I.Tex1, pos2d);
-  gbuffer_data gbd2 = gbuffer_load_data_offset(I.Tex0,I.Tex2, pos2d);
-  gbuffer_data gbd3 = gbuffer_load_data_offset(I.Tex0,I.Tex3, pos2d);
-  gbuffer_data gbd4 = gbuffer_load_data_offset(I.Tex0,I.Tex4, pos2d);
+  gbuffer_data gbd0 = gbuffer_load_data(I.Tex0, pos2d.xy);
+  gbuffer_data gbd1 = gbuffer_load_data_offset(I.Tex0,I.Tex1, pos2d.xy);
+  gbuffer_data gbd2 = gbuffer_load_data_offset(I.Tex0,I.Tex2, pos2d.xy);
+  gbuffer_data gbd3 = gbuffer_load_data_offset(I.Tex0,I.Tex3, pos2d.xy);
+  gbuffer_data gbd4 = gbuffer_load_data_offset(I.Tex0,I.Tex4, pos2d.xy);
 #else
-  gbuffer_data gbd0 = gbuffer_load_data(I.Tex0);
+  gbuffer_data gbd0 = gbuffer_load_data(I.Tex0.xy);
   gbuffer_data gbd1 = gbuffer_load_data(I.Tex1);
   gbuffer_data gbd2 = gbuffer_load_data(I.Tex2);
   gbuffer_data gbd3 = gbuffer_load_data(I.Tex3);
@@ -62,10 +62,10 @@ float4 main ( v_aa_AA I ) : SV_Target
   float4 tc6r 		=  I.Tex6.wzyx;
   
 #ifdef GBUFFER_OPTIMIZATION
-  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5, pos2d); 
-  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6, pos2d); 
-  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r, pos2d); 
-  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r, pos2d); 
+  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5, pos2d.xy);
+  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6, pos2d.xy);
+  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r, pos2d.xy);
+  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r, pos2d.xy); 
 #else
   gbuffer_data gbd5 = gbuffer_load_data(I.Tex5); 
   gbuffer_data gbd6 = gbuffer_load_data(I.Tex6); 
@@ -98,7 +98,7 @@ float4 main ( v_aa_AA I ) : SV_Target
 
 #ifdef 	USE_DISTORT
 //	float4 	distort	= tex2D		(s_distort, I.tc0);
-	float4 	distort	= s_distort.Sample( smp_nofilter, I.Tex0);
+	float4 	distort	= s_distort.Sample( smp_nofilter, I.Tex0.xy);
 	float2	doffs	= (distort.xy-.5h)*def_distort;
 	float2	center	= I.Tex0 + doffs;
 #else
@@ -121,5 +121,5 @@ float4 main ( v_aa_AA I ) : SV_Target
 	float3 	final	=  mblur( center, dc, (s0+s1+s2+s3)/4.h );
 
 //	return combine_bloom(final,tex2D	(s_bloom, I.tc0));
-	return combine_bloom( final, s_bloom.Sample( smp_rtlinear, I.Tex0));
+	return combine_bloom( final, s_bloom.Sample( smp_rtlinear, I.Tex0.xy));
 }

@@ -21,9 +21,9 @@ v2g_fluidsim_dyn_aabb main( v_fluidsim input)
 	output.velocity = 0;
 
 	{
-		output.velocity = OOBBWorldTranslationVelocity;
+		output.velocity = OOBBWorldTranslationVelocity.xyz;
 
-		float3	r = mul( LocalToWorld, float4(output.cell0,1) ) - MassCenter;
+		float3	r = mul( LocalToWorld, float4(output.cell0,1) ) - MassCenter.xyz;
 
 		float3 AngularVel = cross( OOBBWorldAngularVelocity.xyz, r );
 

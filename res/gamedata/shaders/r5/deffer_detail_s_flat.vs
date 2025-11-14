@@ -33,9 +33,9 @@ v2p_flat 	main (v_detail v)
 	// Final out
 	float4	Pp 	= mul		(m_WVP,	pos				);
 	O.hpos 		= Pp;
-	O.N 		= mul		(m_WV,  normalize(norm)	);
+	O.N 		= mul		((float3x3)m_WV,  normalize(norm)	);
 	float3	Pe	= mul		(m_WV,  pos				);
-	O.tcdh 		= float4	((v.misc * consts).xyyy	);
+	O.tcdh 		= (v.misc * consts).xy;
 
 # if defined(USE_R2_STATIC_SUN)
 	O.tcdh.w	= c0.x;								// (,,,dir-occlusion)

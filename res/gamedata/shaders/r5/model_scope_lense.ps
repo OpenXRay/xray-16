@@ -1,0 +1,61 @@
+#include "common.h"
+
+uniform	float4 		m_hud_params;
+uniform	float4 		m_zoom_deviation;
+
+struct 	v2p
+{
+ 	float2 	tc0: 		TEXCOORD0;	// base
+ 	float3 	tc1: 		TEXCOORD1;	// environment
+  	float4	c0:			COLOR0;		// sun.(fog*fog)
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+float  resize(float input, float factor, float offset)
+{
+	return (input-0.5f+offset) / factor+0.5f-offset;
+}
+
+// Pixel
+Texture2D 	s_vp2;
+//Texture2D s_skymap;
+
+//uniform samplerCUBE	s_env0;
+//uniform samplerCUBE	s_env1;
+
+float random(float2 co)
+{
+      return 0.5+(frac(sin(dot(co.xy ,float2(12.9898,78.233))) * 43758.5453))*0.5;
+};
+
+float4 main( v2p I ) : SV_Target
+{
+	if (m_hud_params.y * m_hud_params.a < 0.0001) return float4 (0,0,0,0);
+	
+	float4	t_base 		= s_base.Sample		( smp_base, I.tc0);		// �������� �����	
+	
+	//����� �� ��������� ������
+	I.tc0.x	= I.tc0.x+m_zoom_deviation.x;
+	I.tc0.y	= I.tc0.y+m_zoom_deviation.y;	
+	
+	// ����������� �������� � ����� ���, ����� �� ����� ���������� ������ ���� ���������� ���������
+	I.tc0.x = resize(I.tc0.x, screen_res.x/screen_res.y, 0);
+	
+	float4	t_vp2	 = s_vp2.Sample	( smp_base, I.tc0);  			// ����������� �� ������� ��������
+
+	float2 offset = distance(I.tc0, float2( .5f, .5f ))*float2(m_hud_params.z, m_hud_params.z);
+	
+	t_vp2.r = s_vp2.Sample	( smp_base, I.tc0+offset).r;
+	t_vp2.b = s_vp2.Sample	( smp_base, I.tc0-offset).b;
+	
+	float3	final	 = float3(0, 0, 0);
+	
+	float3 	base	= lerp	(t_vp2, t_base, t_base.a);		// ����� � ���������
+	final	= base;
+
+		
+	
+	// out
+	return  float4	(final.r, final.g, final.b, min(m_hud_params.y, m_hud_params.a));
+}

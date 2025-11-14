@@ -1,0 +1,28 @@
+// UI Composite Pass - Alpha-Blend Pixel Shader
+// Composites UI layer over scene using alpha-over blending
+
+Texture2D sceneTexture : register(t0);  // Base 3D scene
+Texture2D uiTexture    : register(t1);  // UI layer with alpha
+
+SamplerState linearSampler : register(s0);
+
+struct PS_INPUT
+{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+float4 main(PS_INPUT input) : SV_TARGET
+{
+    // Sample both layers
+    float4 sceneColor = sceneTexture.Sample(linearSampler, input.texcoord);
+    float4 uiColor = uiTexture.Sample(linearSampler, input.texcoord);
+
+    // Alpha-over blend: finalColor = uiColor * uiAlpha + sceneColor * (1 - uiAlpha)
+    // This is the standard Porter-Duff "source over destination" blend
+    float3 blended = lerp(sceneColor.rgb, uiColor.rgb, uiColor.a);
+
+    // Output with scene alpha (for further compositing if needed)
+    return float4(blended, sceneColor.a);
+}
+

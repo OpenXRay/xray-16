@@ -14,7 +14,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 #endif
 {
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy );
 #else
 	gbuffer_data gbd = gbuffer_load_data( tc );
 #endif
@@ -31,7 +31,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 
 //	float 	d 	= sunmask( _P );
 
-	float2 		tc1	= mul( m_sunmask, _P );		//
+	float2 		tc1	= mul( m_sunmask, _P ).xy;		//
 
 //	tc1 /= 10;
 
@@ -55,7 +55,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 
 //	water.y	*= -1;
 
-	water.xyz = mul( m_V, water.xyz );
+	water.xyz = mul( m_V, float4(water.xyz, 0) );
 
 	water *= s;
 
@@ -69,7 +69,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 #endif
 {
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy );
 #else
 	gbuffer_data gbd = gbuffer_load_data( tc );
 #endif

@@ -26,15 +26,15 @@ float4 main( p_filter I ) : SV_Target
 {
 	// sample
 	float4 	accum0;
-		accum0.x =	sample(I.Tex0);
-		accum0.y = 	sample(I.Tex1);
-		accum0.z = 	sample(I.Tex2);
-		accum0.w =	sample(I.Tex3);
+		accum0.x =	sample(I.Tex0.xy);
+		accum0.y = 	sample(I.Tex1.xy);
+		accum0.z = 	sample(I.Tex2.xy);
+		accum0.w =	sample(I.Tex3.xy);
 	float4 	accum1;
-		accum1.x =	sample(I.Tex4);
-		accum1.y = 	sample(I.Tex5);
-		accum1.z = 	sample(I.Tex6);
-		accum1.w =	sample(I.Tex7);
+		accum1.x =	sample(I.Tex4.xy);
+		accum1.y = 	sample(I.Tex5.xy);
+		accum1.z = 	sample(I.Tex6.xy);
+		accum1.w =	sample(I.Tex7.xy);
 	float4 	accum2;
 		accum2.x =	sample(I.Tex0.wz);
 		accum2.y = 	sample(I.Tex1.wz);

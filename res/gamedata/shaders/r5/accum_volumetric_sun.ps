@@ -31,7 +31,6 @@
 
 float4	volume_range;	//	x - near plane, y - far plane
 float4	sun_shafts_intensity;
-uniform	float4	screen_res;
 
 #ifdef MSAA_OPTIMIZATION
 //#ifdef GBUFFER_OPTIMIZATION

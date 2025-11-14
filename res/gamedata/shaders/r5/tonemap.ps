@@ -1,0 +1,43 @@
+// xrRender/Shaders/tonemap.ps.hlsl
+// ACES Filmic tonemap with gamma correction
+
+Texture2D t_hdr : register(t0);
+SamplerState s_linear : register(s0);
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+cbuffer TonemapParams : register(b0) {
+    float g_Exposure;
+    float g_Gamma;
+    float2 _padding;
+};
+
+// ACES Filmic tonemap (Narkowicz 2015)
+float3 ACESFilm(float3 x) {
+    float a = 2.51;
+    float b = 0.03;
+    float c = 2.43;
+    float d = 0.59;
+    float e = 0.14;
+    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+}
+
+float4 main(PS_INPUT input) : SV_TARGET {
+    // Sample HDR color
+    float3 hdr = t_hdr.Sample(s_linear, input.texcoord).rgb;
+
+    // Apply exposure
+    hdr *= g_Exposure;
+
+    // Tonemap (HDR -> LDR)
+    float3 ldr = ACESFilm(hdr);
+
+    // Gamma correction
+    ldr = pow(ldr, 1.0 / g_Gamma);
+
+    return float4(ldr, 1.0);
+}
+

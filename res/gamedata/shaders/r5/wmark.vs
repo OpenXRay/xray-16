@@ -13,8 +13,8 @@ vf main (v_static v)
 {
 	vf 		o;
 
-	float3 	N 	= 	unpack_normal	(v.Nh);
-	float4 	P 	= 	wmark_shift	(v.P,N);
+	float3 	N 	= 	unpack_normal	(v.Nh.xyz);
+	float4 	P 	= 	wmark_shift	(v.P.xyz,N);
 	o.hpos 		= 	mul		(m_VP, P);			// xform, input in world coords
 	o.tc0		= 	unpack_tc_base	(v.tc,v.T.w,v.B.w);		// copy tc
 

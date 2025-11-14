@@ -70,8 +70,8 @@ float2         calc_detail                (float3 w_pos)      {
 struct         v_shadow_direct_aref
 {
         float4      hpos:        POSITION;       // Clip-space position         (for rasterization)
-        float       depth:         TEXCOORD0;     // Depth
-        float2      tc0:        TEXCOORD1;       // Diffuse map for aref
+        float       depth:       XRDEPTH;        // Depth (changed from TEXCOORD0 to avoid type conflicts)
+        float2      tc0:         TEXCOORD1;      // Diffuse map for aref
 };
 struct         v_shadow_direct
 {
@@ -99,7 +99,8 @@ struct  				p_screen                {
 float3	v_hemi_wrap     (float3 n, float w)                	{        return L_hemi_color*(w + (1-w)*n.y);                   }
 float3	v_sun_wrap      (float3 n, float w)                	{        return L_sun_color*(w+(1-w)*dot(n,-L_sun_dir_w));      }
 */
-#define FXPS technique _render{pass _code{PixelShader=compile ps_3_0 main();}}
-#define FXVS technique _render{pass _code{VertexShader=compile vs_3_0 main();}}
+// Legacy DX9 effect framework macros - define as empty for modern HLSL
+#define FXPS
+#define FXVS
 
 #endif

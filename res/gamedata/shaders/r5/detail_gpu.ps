@@ -1,0 +1,110 @@
+#include "common.h"
+#include "sload.h"
+
+// Ghost of Tsushima approach: Minimal pixel shader
+// "The G-buffer pixel shader keeps operations minimal"
+// All lighting is handled by the deferred lighting system
+
+// Procedural grass color parameters
+static const float3 youngGrassCol = float3(0.35, 0.45, 0.18);  // Brighter, more vibrant
+static const float3 oldGrassCol = float3(0.28, 0.38, 0.15);    // Slightly duller brown-green
+
+// Phase 6: Grass vein detail texture
+Texture2D s_grass_vein;
+
+// Phase 5: Grass interaction debug visualization
+Texture2D s_interaction_atlas;
+uniform int dm_debug_trails;
+
+float SampleGrassInteraction(float2 atlas_uv)
+{
+    float4 interaction = s_interaction_atlas.Sample(smp_base, atlas_uv);
+    return interaction.r;
+}
+
+f_deffer main(p_flat I)
+{
+    f_deffer O;
+
+    // ===== GHOST OF TSUSHIMA APPROACH: Minimal G-Buffer Pixel Shader =====
+
+    // ===== ROUNDED BLADE NORMALS =====
+    // Ghost of Tsushima technique: interpolate between rotated normals
+    // Creates illusion of cylindrical/rounded blade cross-section for better lighting
+    // Reference: GoT presentation - "The rotated normals are just generated in the vertex shader"
+
+    // Width position across blade (0 = left edge, 1 = right edge)
+    // Using U texture coordinate as the blend factor
+    float widthPercent = I.tcdh.x;
+
+    // Interpolate between the two rotated normals
+    float3 N = lerp(I.rotatedNormal1, I.rotatedNormal2, widthPercent);
+    N = normalize(N);
+
+    // Height parameter for AO calculation (0=base is darker, 1=tip is brighter)
+    float t = I.heightParam;
+
+    // Simple height-based AO curve
+    // GoT doc: "Translucency/AO: Constant values (no computation)"
+    // We compute AO once based on height, then the lighting system handles the rest
+    float ao_base = 0.5;   // Base darkness at blade bottom
+    float ao_range = 0.5;  // Range to full brightness at tip
+    float ao = ao_base + ao_range * pow(saturate(t), 0.5);  // Smooth curve
+
+    // Procedural grass albedo color
+    // GoT doc: "Color variation: 2D texture lookup"
+    // We're doing procedural color instead of texture (texture overlay comes later)
+
+    // Mix young/old grass based on height (tips are greener, base is browner)
+    float color_blend = smoothstep(0.2, 0.8, t);
+    float3 grassAlbedo = lerp(oldGrassCol, youngGrassCol, color_blend);
+
+    // Per-blade variation using world position hash
+    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
+    grassAlbedo *= lerp(0.85, 1.15, hash);  // ±15% color variation per blade
+
+    // ===== GHOST OF TSUSHIMA: VEIN DETAIL TEXTURE =====
+    // GoT doc: "Vein detail: 1D texture lookup"
+    // We use UV coordinates to sample vein pattern overlay
+    // The vein texture adds organic detail and breaks up the procedural look
+    float4 vein_detail = s_grass_vein.Sample(smp_base, I.tcdh.xy);
+
+    // Overlay vein detail on base color
+    // The vein texture is semi-transparent - use alpha to blend
+    // Darken areas where veins are present for realistic grass blade structure
+    grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, vein_detail.a * 0.15);
+
+    // Extract hemi and sun from vertex shader output
+    // Standard X-Ray approach: hemi is in position.w, sun depends on defines
+    float hemi = I.position.w;
+
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float sun = I.tcdh.w;  // Sun occlusion from static sun
+#else
+    float sun = 0.5;  // Default sun value when not using static sun
+#endif
+
+    // Grass has low gloss (slightly matte surface)
+    // GoT doc: "Gloss: 1D texture lookup"
+    // We use a constant for now, texture can modulate this later
+    float gloss = 0.2;  // Low specular response
+
+    // Phase 5: Debug visualization overlay
+    if (dm_debug_trails > 0)
+    {
+        float interaction_strength = SampleGrassInteraction(I.interaction_uv);
+        grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
+    }
+
+    // ===== WRITE TO G-BUFFER =====
+    // Pack material properties, NOT pre-lit colors
+    // The deferred lighting pass will handle all lighting calculations
+
+    float4 Ne = float4(N, hemi * ao);  // Normal + combined hemi/AO
+    float4 position = float4(I.position.xyz, sun);  // View-space position + sun occlusion
+    float4 albedo = float4(grassAlbedo, gloss);  // Albedo color + gloss
+
+    O = pack_gbuffer(Ne, position, albedo);
+
+    return O;
+}

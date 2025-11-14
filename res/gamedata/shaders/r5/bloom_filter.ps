@@ -25,7 +25,7 @@ float4 main ( p_filter I ) : SV_Target
 {
 	// central
 	//float4 accum 	=	weight[1].w * tex2D	(s_bloom, I.tc0);
-	float4 accum 	=	weight[1].w * s_bloom.Sample(smp_rtlinear, I.Tex0);
+	float4 accum 	=	weight[1].w * s_bloom.Sample(smp_rtlinear, I.Tex0.xy);
 
 	// left (7)
 	// right (7) - no swizles on 'texld', so this is dep-read infact

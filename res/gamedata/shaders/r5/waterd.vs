@@ -37,7 +37,7 @@ vf main (v_vert v)
 	vf 		o;
 
 	float4 	P 	= v.P;
-	float3 	N 	= unpack_normal		(v.N);
+	float3 	N 	= unpack_normal		(v.N.xyz);
 		P 	= watermove		(P);
 
 	o.tbase		= unpack_tc_base	(v.uv,v.T.w,v.B.w);		// copy tc

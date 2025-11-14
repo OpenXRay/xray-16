@@ -19,7 +19,7 @@ v2p_flat main (v_tree I)
 
 	//
 	float 	base 	= m_xform._24;			// take base height from matrix
-	float 	dp		= calc_cyclic  (wave.w+dot(pos,(float3)wave));
+	float 	dp		= calc_cyclic  (wave.w+dot(pos,wave.xyz));
 	float 	H 		= pos.y - base;			// height of vertex (scaled, rotated, etc.)
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
 	float 	inten 	= H * dp;			// intensity
@@ -35,8 +35,8 @@ v2p_flat main (v_tree I)
 	float 	hemi 	= I.Nh.w*c_scale.w + c_bias.w;
     //float 	hemi 	= I.Nh.w;
 	o.hpos			= mul		(m_VP, f_pos				);
-	o.N 			= mul		((float3x3)m_xform_v, unpack_bx2(I.Nh)	);
-	o.tcdh 			= float4	((I.tc * consts).xyyy		);
+	o.N 			= mul		((float3x3)m_xform_v, unpack_bx2(I.Nh.xyz)	);
+	o.tcdh 			= (I.tc * consts).xy;
 	o.position		= float4	(Pe, hemi					);
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)

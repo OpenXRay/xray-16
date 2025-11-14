@@ -18,7 +18,7 @@ v2p_bumped main( v_in I )
 	v2p_bumped 	O;
 	float3	Pe	= mul		(m_WV,  w_pos		);
 	O.hpos 		= mul		(m_WVP,	w_pos		);
-	O.tcdh 		= float4	(tc.xyyy			);
+	O.tcdh 		= tc.xy;
 	O.position	= float4	(Pe, hemi			);
 //	O.position	= float4	(O.hpos.xyz, hemi	);
 
@@ -32,9 +32,9 @@ v2p_bumped main( v_in I )
 	I.Nh			= unpack_D3DCOLOR(I.Nh);
 	I.T				= unpack_D3DCOLOR(I.T);
 	I.B				= unpack_D3DCOLOR(I.B);
-	float3 	N 	= unpack_bx4(I.Nh);	// just scale (assume normal in the -.5f, .5f)
-	float3 	T 	= unpack_bx4(I.T);	// 
-	float3 	B 	= unpack_bx4(I.B);	// 
+	float3 	N 	= unpack_bx4(I.Nh.xyz);	// just scale (assume normal in the -.5f, .5f)
+	float3 	T 	= unpack_bx4(I.T.xyz);	//
+	float3 	B 	= unpack_bx4(I.B.xyz);	// 
 	float3x3 xform	= mul	((float3x3)m_WV, float3x3(
 						T.x,B.x,N.x,
 						T.y,B.y,N.y,
@@ -55,7 +55,7 @@ v2p_bumped main( v_in I )
 	O.M3 			= xform[2]; 
 
 #ifdef 	USE_TDETAIL
-	O.tcdbump		= O.tcdh * dt_params;		// dt tc
+	O.tcdbump		= O.tcdh * dt_params.xy;		// dt tc
 #endif
 
 #ifdef	USE_LM_HEMI

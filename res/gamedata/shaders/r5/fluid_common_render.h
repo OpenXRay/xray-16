@@ -29,9 +29,9 @@ Texture2D	fireTransferFunction;
 // Samplers
 //--------------------------------------------------------------------------------------
 
-sampler	samPointClamp;
-sampler	samLinearClamp;
-sampler	samRepeat;
+SamplerState	samPointClamp;
+SamplerState	samLinearClamp;
+SamplerState	samRepeat;
 
 //--------------------------------------------------------------------------------------
 // Variables
@@ -255,13 +255,13 @@ void DoSample(float weight, float3 O, inout float4 color )
 	float s = colorTex.SampleLevel(samLinearClamp, texcoords, 0).x;
 	s = clamp(s,0,maxValue);
           
-	if(s>threshold)   
-	{   
+	if(s>threshold)
+	{
 		//render fire
 		float lookUpVal = ( (s-threshold)/(maxValue-threshold) );
 		lookUpVal = 1.0 - pow(lookUpVal,RednessFactor);
 		lookUpVal = clamp(lookUpVal,0,1);
-		float3 interpColor = fireTransferFunction.SampleLevel(samLinearClamp,float2(lookUpVal,0),0); 
+		float3 interpColor = fireTransferFunction.SampleLevel(samLinearClamp,float2(lookUpVal,0),0).rgb;
 		float mult = (s-threshold);
 		color += float4(weight*interpColor.rgb,weight*mult*mult*fireAlphaMultiplier); 
 	}

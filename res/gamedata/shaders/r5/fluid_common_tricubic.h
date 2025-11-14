@@ -162,7 +162,7 @@ float4 SampleTricubicGeneric(Texture3D tex, float3 tc, float4 hg_x, float4 hg_y,
 
 float4 SampleTricubic(Texture3D tex, float3 tc)
 {
-    float3 tcTexels = (tc * gridDim) - 0.49;
+    float3 tcTexels = (tc * gridDim.xyz) - 0.49;
 
     float4 hg_x = getHHGG(tcTexels.x);
     float4 hg_y = getHHGG(tcTexels.y);
@@ -173,7 +173,7 @@ float4 SampleTricubic(Texture3D tex, float3 tc)
 
 float4 SampleGradientTricubic(Texture3D tex, float3 tc)
 {
-    float3 tcTexels = (tc * gridDim) - 0.49;
+    float3 tcTexels = (tc * gridDim.xyz) - 0.49;
 
     float4 hg_x   = getHHGG(tcTexels.x);
     float4 hg_y   = getHHGG(tcTexels.y);

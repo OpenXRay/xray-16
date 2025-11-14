@@ -6,13 +6,13 @@
 //uniform	sampler	s_smap	: register(ps,s0);	// 2D/cube shadowmap
 //Texture2D<float>	s_smap;		// 2D/cube shadowmap
 //	Used for RGBA texture too ?!
-Texture2D	s_smap : register(ps,t0);		// 2D/cube shadowmap
+Texture2D	s_smap : register(t0);		// 2D/cube shadowmap
 
 Texture2D<float>	s_smap_minmax;		// 2D/cube shadowmap
 #include "gather.ps"
 
 SamplerComparisonState		smp_smap;	//	Special comare sampler
-sampler		smp_jitter;
+SamplerState		smp_jitter;
 
 Texture2D	jitter0;
 Texture2D	jitter1;
@@ -55,7 +55,7 @@ float shadow_hw( float4 tc )
   	float	s2		= sample_hw_pcf( tc, float4( -1, +1, 0, 0) );
   	float	s3		= sample_hw_pcf( tc, float4( +1, +1, 0, 0) );
 
-	return	(s0+s1+s2+s3)/4.h;
+	return	(s0+s1+s2+s3)/4.0f;
 }
 
 #if SUN_QUALITY>=4
@@ -648,9 +648,9 @@ float4 	test 		(float4 tc, float2 offset)
 	return s_smap.SampleCmpLevelZero( smp_smap, tc.xy, tc.z).x;
 }
 
-/*half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
+/*float 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 {
-	half4	r;
+	float4	r;
 
 	const 	float 	scale 	= (0.5f/float(SMAP_size));
 
@@ -658,8 +658,8 @@ float4 	test 		(float4 tc, float2 offset)
 	float2 	tc_J	= tc.xy/tc.w*texsize/8.0f;
 	float2 	fr 		= frac(tc_J)*.5f;
 	
-//	half4	J0 	= tex2D	(jitter0,fr)*scale;
-//	half4	J1 	= tex2D	(jitter1,fr)*scale*2;
+//	float4	J0 	= tex2D	(jitter0,fr)*scale;
+//	float4	J1 	= tex2D	(jitter1,fr)*scale*2;
 	float4	J0 	= jitter0.Sample( smp_jitter, fr )*scale;
 //	float4	J1 	= jitter1.Sample( smp_jitter, fr )*scale;
 
@@ -670,7 +670,7 @@ float4 	test 		(float4 tc, float2 offset)
  	r.z		= test	(tc,J0.xy+float2(-k, k)).z;
  	r.w		= test	(tc,J0.wz+float2( k, k)).x;
 	
-	half4	f;
+	float4	f;
 	float k1 = 1.5f/float(SMAP_size);
 	f.x 	= test 	(tc,-J0.xy+float2(-k1,0)).x;
 	f.y 	= test 	(tc,-J0.wz+float2( 0,-k1)).y;
@@ -678,12 +678,12 @@ float4 	test 		(float4 tc, float2 offset)
 	f.z		= test	(tc,-J0.xy+float2( k1, 0)).z;
  	f.w		= test	(tc,-J0.wz+float2( 0, k1)).x;
 
-	half res = ( r.x + r.y + r.z + r.w + f.x + f.y + f.z + f.w )*1.h/(4.h + 4.h );
+	float res = ( r.x + r.y + r.z + r.w + f.x + f.y + f.z + f.w )*1.0f/(4.0f + 4.0f );
 	return res;
 }*/
-half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
+float 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 {
-	half4	r;
+	float4	r;
 
 	//	const 	float 	scale 	= (2.0f/float(SMAP_size));
 	const 	float 	scale 	= (0.7f/float(SMAP_size));
@@ -691,18 +691,18 @@ half 	shadowtest_sun 	(float4 tc, float4 tcJ)			// jittered sampling
 
 	float2 	tc_J	= frac(tc.xy/tc.w*SMAP_size/4.0f )*.5f;
 	float4	J0		= jitter0.Sample(smp_jitter,tc_J)*scale;
-	//half4	J1 	= tex2D	(jitter1,tc_J)*scale;
+	//float4	J1 	= tex2D	(jitter1,tc_J)*scale;
 
 	const float k = .5f/float(SMAP_size);
-	r.x 	= test 	(tc, J0.xy+half2(-k,-k)).x;
-	r.y 	= test 	(tc, J0.wz+half2( k,-k)).y;
-	r.z		= test	(tc,-J0.xy+half2(-k, k)).z;
-	r.w		= test	(tc,-J0.wz+half2( k, k)).x;
+	r.x 	= test 	(tc, J0.xy+float2(-k,-k)).x;
+	r.y 	= test 	(tc, J0.wz+float2( k,-k)).y;
+	r.z		= test	(tc,-J0.xy+float2(-k, k)).z;
+	r.w		= test	(tc,-J0.wz+float2( k, k)).x;
 
-	return	dot(r,1.h/4.h);
+	return	dot(r,1.0f/4.0f);
 }
 
-half 	shadow_high 	(float4 tc)			// jittered sampling
+float 	shadow_high 	(float4 tc)			// jittered sampling
 {
 
 	const	float 	scale 	= (0.5f/float(SMAP_size));
@@ -711,23 +711,23 @@ half 	shadow_high 	(float4 tc)			// jittered sampling
 	float4	J0 		=	jitter0.Sample	(smp_jitter,tc_J)*scale;
 
 	const float k = 1.f/float(SMAP_size);
-	half4	r;
-	r.x 	= test 	(tc,J0.xy+half2(-k,-k)).x;
-	r.y 	= test 	(tc,J0.wz+half2( k,-k)).y;
+	float4	r;
+	r.x 	= test 	(tc,J0.xy+float2(-k,-k)).x;
+	r.y 	= test 	(tc,J0.wz+float2( k,-k)).y;
 
-	r.z		= test	(tc,J0.xy+half2(-k, k)).z;
-	r.w		= test	(tc,J0.wz+half2( k, k)).x;
+	r.z		= test	(tc,J0.xy+float2(-k, k)).z;
+	r.w		= test	(tc,J0.wz+float2( k, k)).x;
 
 
 	const float k1 = 1.3f/float(SMAP_size);
-	half4	r1;
-	r1.x 	= test 	(tc,-J0.xy+half2(-k1,0)).x;
-	r1.y 	= test 	(tc,-J0.wz+half2( 0,-k1)).y;
+	float4	r1;
+	r1.x 	= test 	(tc,-J0.xy+float2(-k1,0)).x;
+	r1.y 	= test 	(tc,-J0.wz+float2( 0,-k1)).y;
 
-	r1.z	= test	(tc,-2*J0.xy+half2( k1, 0)).z;
-	r1.w	= test	(tc,-2*J0.wz+half2( 0, k1)).x;
+	r1.z	= test	(tc,-2*J0.xy+float2( k1, 0)).z;
+	r1.w	= test	(tc,-2*J0.wz+float2( 0, k1)).x;
 
-	return ( r.x + r.y + r.z + r.w + r1.x + r1.y + r1.z + r1.w )*1.h/8.h;
+	return ( r.x + r.y + r.z + r.w + r1.x + r1.y + r1.z + r1.w )*1.0f/8.0f;
 }
 
 float shadow( float4 tc ) 
@@ -765,10 +765,10 @@ float shadow_dx10_1( float4 tc, float2 tcJ, float2 pos2d )
    return shadow( tc ); 
 }
 
-float shadow_dx10_1_sunshafts( float4 tc, float2 pos2d ) 
+float shadow_dx10_1_sunshafts( float4 tc, float2 pos2d )
 {
    float3 t         = tc.xyz / tc.w;
-   float minmax     = s_smap_minmax.SampleLevel( smp_nofilter, t, 0 ).x;
+   float minmax     = s_smap_minmax.SampleLevel( smp_nofilter, t.xy, 0 ).x;
    bool   umbra     = ( ( minmax.x < 0 ) && ( t.z > -minmax.x ) );
 
    [branch] if( umbra )
@@ -798,15 +798,15 @@ float 	shadowtest 	(float4 tc, float4 tcJ)				// jittered sampling
 //	float4	J0 	= tex2Dproj	(jitter0,tcJ)*scale;
 //	float4	J1 	= tex2Dproj	(jitter1,tcJ)*scale;
 	tcJ.xy		/=	tcJ.w;
-	float4	J0 	= jitter0.Sample( smp_jitter, tcJ )*scale;
-	float4	J1 	= jitter1.Sample( smp_jitter, tcJ )*scale;
+	float4	J0 	= jitter0.Sample( smp_jitter, tcJ.xy )*scale;
+	float4	J1 	= jitter1.Sample( smp_jitter, tcJ.xy )*scale;
 
 		r.x 	= test 	(tc,J0.xy).x;
 		r.y 	= test 	(tc,J0.wz).y;
 		r.z		= test	(tc,J1.xy).z;
 		r.w		= test	(tc,J1.wz).x;
 
-	return	dot(r,1.h/4.h);
+	return	dot(r,1.0f/4.0f);
 }
 
 float 	shadow_rain 	(float4 tc, float2 tcJ)			// jittered sampling
@@ -831,7 +831,7 @@ float 	shadow_rain 	(float4 tc, float2 tcJ)			// jittered sampling
 //	r.z		= test	(tc,J0.yz).z;
 //	r.w		= test	(tc,J0.xw).x;
 
-	return	dot(r,1.h/4.h);
+	return	dot(r,1.0f/4.0f);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -844,7 +844,7 @@ float sunmask( float4 P )
 	return 		s_lmap.Sample( smp_linear, tc ).w;	// A8 	
 }
 #else
-float sunmask( float4 P ) { return 1.h; }		// 
+float sunmask( float4 P ) { return 1.0f; }		// 
 #endif
 //////////////////////////////////////////////////////////////////////////////////////////
 uniform float4x4	m_shadow;

@@ -3,7 +3,7 @@
 
 float4	watermove	(float4 P)	{
 	float3 	wave1	= float3(0.11f,0.13f,0.07f)*W_POSITION_SHIFT_SPEED	;
-	float 	dh	= sin  	(timers.x+dot((float3)P,wave1))			;
+	float 	dh	= sin  	(timers.x+dot(P.xyz,wave1))			;
 			P.y	+= dh * W_POSITION_SHIFT_HEIGHT	;
 	return 	P	;
 }

@@ -1,0 +1,202 @@
+// xrRender/Shaders/lighting.ps.hlsl
+// Deferred PBR lighting pass
+
+// ══════════════════════════════════════════════════════════
+//  G-BUFFER INPUTS
+// ══════════════════════════════════════════════════════════
+
+Texture2D t_albedo : register(t0);     // RGB: albedo, A: metallic
+Texture2D t_normal : register(t1);     // RGB: normal, A: roughness
+Texture2D t_material : register(t2);   // Material ID
+Texture2D t_depth : register(t3);      // Depth
+
+SamplerState s_point : register(s0);
+
+// ══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════════════════
+
+cbuffer PerFrame : register(b0) {
+    float4x4 g_InvViewProj;  // Inverse view-projection
+    float3 g_CameraPos;
+    float _padding0;
+    float3 g_SunDirection;
+    float _padding1;
+    float3 g_SunColor;
+    float g_SunIntensity;
+    float3 g_AmbientColor;
+    float g_AmbientIntensity;
+};
+
+// ══════════════════════════════════════════════════════════
+//  INPUT/OUTPUT
+// ══════════════════════════════════════════════════════════
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+// ══════════════════════════════════════════════════════════
+//  HELPER FUNCTIONS
+// ══════════════════════════════════════════════════════════
+
+// Reconstruct world position from depth
+float3 ReconstructWorldPos(float2 uv, float depth) {
+    // NDC position
+    float4 ndc = float4(
+        uv.x * 2.0 - 1.0,
+        (1.0 - uv.y) * 2.0 - 1.0,  // Flip Y
+        depth,
+        1.0
+    );
+
+    // Transform to world space
+    float4 worldPos = mul(ndc, g_InvViewProj);
+    worldPos.xyz /= worldPos.w;
+
+    return worldPos.xyz;
+}
+
+// Decode normal from [0,1] to [-1,1]
+float3 DecodeNormal(float3 encodedNormal) {
+    return normalize(encodedNormal * 2.0 - 1.0);
+}
+
+// ══════════════════════════════════════════════════════════
+//  PBR LIGHTING (Cook-Torrance BRDF)
+// ══════════════════════════════════════════════════════════
+
+#define PI 3.14159265359
+
+// Normal Distribution Function (GGX/Trowbridge-Reitz)
+float DistributionGGX(float3 N, float3 H, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return a2 / max(denom, 0.0001);
+}
+
+// Geometry Function (Smith-GGX)
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float GeometrySmith(float3 N, float3 V, float3 L, float roughness) {
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx1 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx2 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+
+// Fresnel (Schlick approximation)
+float3 FresnelSchlick(float cosTheta, float3 F0) {
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+// Calculate PBR lighting
+float3 CalculatePBRLighting(
+    float3 albedo,
+    float3 normal,
+    float metallic,
+    float roughness,
+    float3 worldPos
+) {
+    // View direction
+    float3 V = normalize(g_CameraPos - worldPos);
+
+    // Light direction (sun)
+    float3 L = normalize(-g_SunDirection);
+
+    // Half vector
+    float3 H = normalize(V + L);
+
+    // Dot products
+    float NdotL = max(dot(normal, L), 0.0);
+    float NdotV = max(dot(normal, V), 0.0);
+    float VdotH = max(dot(V, H), 0.0);
+
+    // Base reflectivity (F0) - dielectrics = 0.04, metals use albedo
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+
+    // ═══════════════════════════════════════════════════════
+    //  COOK-TORRANCE BRDF
+    // ═══════════════════════════════════════════════════════
+
+    // Normal Distribution (D)
+    float D = DistributionGGX(normal, H, roughness);
+
+    // Geometry Function (G)
+    float G = GeometrySmith(normal, V, L, roughness);
+
+    // Fresnel (F)
+    float3 F = FresnelSchlick(VdotH, F0);
+
+    // Specular BRDF = (D * G * F) / (4 * NdotV * NdotL)
+    float3 numerator = D * G * F;
+    float denominator = 4.0 * NdotV * NdotL;
+    float3 specular = numerator / max(denominator, 0.001);
+
+    // Energy conservation: kS + kD = 1
+    float3 kS = F;  // Specular contribution
+    float3 kD = (1.0 - kS) * (1.0 - metallic);  // Diffuse contribution (metals have no diffuse)
+
+    // Diffuse (Lambertian)
+    float3 diffuse = kD * albedo / PI;
+
+    // Combine diffuse + specular
+    float3 directLight = (diffuse + specular) * g_SunColor * g_SunIntensity * NdotL;
+
+    // Ambient (very simple, should be IBL in production)
+    float3 ambient = albedo * g_AmbientColor * g_AmbientIntensity;
+
+    return directLight + ambient;
+}
+
+// ══════════════════════════════════════════════════════════
+//  PIXEL SHADER
+// ══════════════════════════════════════════════════════════
+
+float4 main(PS_INPUT input) : SV_TARGET {
+    // Sample G-Buffer
+    float4 albedoSample = t_albedo.Sample(s_point, input.texcoord);
+    float4 normalSample = t_normal.Sample(s_point, input.texcoord);
+    float depth = t_depth.Sample(s_point, input.texcoord).r;
+
+    // Early out if no geometry (sky)
+    if (depth >= 1.0) {
+        return float4(0.5, 0.7, 1.0, 1.0);  // Sky color
+    }
+
+    // Decode G-Buffer
+    float3 albedo = albedoSample.rgb;
+    float metallic = albedoSample.a;
+
+    float3 normal = DecodeNormal(normalSample.rgb);
+    float roughness = normalSample.a;
+
+    // Reconstruct world position
+    float3 worldPos = ReconstructWorldPos(input.texcoord, depth);
+
+    // Calculate lighting
+    float3 color = CalculatePBRLighting(
+        albedo,
+        normal,
+        metallic,
+        roughness,
+        worldPos
+    );
+
+    // Output HDR color
+    return float4(color, 1.0);
+}

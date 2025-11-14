@@ -216,7 +216,7 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
         float3        	pos        		= P.xyz;
         float         	distance		= length		(pos);
         float         	fog				= saturate		(distance*fog_params.w + fog_params.x); //
-                      	color			= lerp     		(color,fog_color,fog);        			//
+                      	color			= lerp     		(color,fog_color.rgb,fog);        			//
         float        	skyblend		= saturate		(fog*fog);
 
 #ifdef         DBG_TMAPPING

@@ -27,7 +27,7 @@ v2p main ( float3 P : POSITION )
 	o.hpos 		= mul			(m_P, vPos);		// xform, input in camera coordinates
 
 	o.lightToPos = vPos.xyz - Ldynamic_pos.xyz;
-	o.vPos = vPos;
+	o.vPos = vPos.xyz;
 
 //	o.fDensity = (vMaxBounds.z-vMinBounds.z)/2000.0h;
 //	o.fDensity = (vMaxBounds.z-vMinBounds.z)/2000.0h*2;

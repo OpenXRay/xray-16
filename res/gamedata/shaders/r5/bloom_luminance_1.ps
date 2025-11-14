@@ -16,10 +16,10 @@ struct 	v2p
 //////////////////////////////////////////////////////////////////////////////////////////
 #define	LUMINANCE_BASE		0.0001h
 
-float	luminance	(float2	tc)	
+float	luminance	(float2	tc)
 {
 	//float3	source 	= tex2D(s_image,tc);
-	float3	source 	= s_image.Sample( smp_rtlinear, tc );
+	float3	source 	= s_image.Sample( smp_rtlinear, tc ).rgb;
 	return 	dot( source, LUMINANCE_VECTOR*def_hdr );
 }
 //////////////////////////////////////////////////////////////////////////////////////////

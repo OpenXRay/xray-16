@@ -68,23 +68,23 @@ float4 main ( v2p I, uint iSample : SV_SAMPLEINDEX ) : SV_Target
 	PS.x += time;
 	//	TODO: DX10: Can use sampler with point mip filter
 	//float4	t_noise	= tex2D(s_noise,PS);
-	float4	t_noise	= s_noise.Sample( smp_linear, PS );
+	float4	t_noise	= s_noise.Sample( smp_linear, PS.xy );
 	PS.x -= time;
 	PS.y -= time*0.70091;
-	//	TODO: DX10: Can use sampler with point mip filter	
+	//	TODO: DX10: Can use sampler with point mip filter
 	//t_noise *= tex2D(s_noise,PS);
-	t_noise *= s_noise.Sample( smp_linear, PS );
+	t_noise *= s_noise.Sample( smp_linear, PS.xy );
 	//t_noise *= 4;
 	t_noise = t_noise*0.5+0.5;
 
 	// out
 	//float maxIntens = 1.0h/100.0h;
-	//float maxIntens = 1.0h/40.0h;	
+	//float maxIntens = 1.0h/40.0h;
 	//float maxIntens = 1.0h/10.0h;
 	float maxIntens = I.fDensity;
 	float3	result = maxIntens * s * att;
-	result *= lightmap;
-	result *= Ldynamic_color * t_noise;
+	result *= lightmap.xyz;
+	result *= Ldynamic_color.xyz * t_noise.xyz;
 
 //	result = maxIntens;
 //	result *= lightmap;

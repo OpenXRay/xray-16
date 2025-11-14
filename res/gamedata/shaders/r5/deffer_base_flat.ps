@@ -6,7 +6,7 @@ f_deffer main( p_flat I )
   f_deffer	O;
 
   // diffuse
-  float3 D	= tbase		(I.tcdh);	// IN:  rgb.a
+  float3 D	= tbase		(I.tcdh).rgb;	// IN:  rgb.a
 
 #ifdef	USE_TDETAIL
 //	D.rgb	= 2*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
@@ -35,7 +35,7 @@ f_deffer main( p_flat I )
   float4 Ne		= float4( normalize((float3)I.N.xyz), h );
   O				= pack_gbuffer(
 								Ne,
-								float4( I.position.xyz + Ne.xyz*def_virtualh/2.h, ms ),
+								float4( I.position.xyz + Ne.xyz*def_virtualh/2.0f, ms ),
 								float4( D.rgb, def_gloss ) );	// OUT: rgb.gloss
 
   return O;

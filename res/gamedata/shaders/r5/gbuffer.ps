@@ -1,0 +1,97 @@
+// xrRender/Shaders/gbuffer.ps.hlsl
+#include "shared/common.h"
+
+// ══════════════════════════════════════════════════════════
+//  INPUT
+// ══════════════════════════════════════════════════════════
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float3 worldPos : TEXCOORD0;
+    float3 worldNormal : TEXCOORD1;
+    float2 texcoord : TEXCOORD2;
+    float3 worldTangent : TEXCOORD3;
+    float3 worldBinormal : TEXCOORD4;
+};
+
+// ══════════════════════════════════════════════════════════
+//  OUTPUT
+// ══════════════════════════════════════════════════════════
+
+struct PS_OUTPUT {
+    float4 albedo : SV_TARGET0;     // RGB: albedo, A: metallic
+    float4 normal : SV_TARGET1;     // RGB: world normal, A: roughness
+    float4 material : SV_TARGET2;     // Material ID (stored in R channel)
+};
+
+// ══════════════════════════════════════════════════════════
+//  TEXTURES
+// ══════════════════════════════════════════════════════════
+
+Texture2D t_albedo : register(t0);
+Texture2D t_normal : register(t1);
+Texture2D t_material : register(t2);  // R: metallic, G: roughness
+
+SamplerState s_linear : register(s0);
+
+// ══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════════════════
+
+cbuffer Material : register(b1) {
+    float4 g_BaseColor;
+    float g_Metallic;
+    float g_Roughness;
+    float g_MaterialID;
+    float _padding;
+};
+
+// ══════════════════════════════════════════════════════════
+//  PIXEL SHADER
+// ══════════════════════════════════════════════════════════
+
+PS_OUTPUT main(PS_INPUT input) {
+    PS_OUTPUT output;
+
+    // ═══════════════════════════════════════════════════════
+    //  SAMPLE TEXTURES
+    // ═══════════════════════════════════════════════════════
+
+    float4 albedoSample = t_albedo.Sample(s_linear, input.texcoord);
+    float3 normalSample = t_normal.Sample(s_linear, input.texcoord).xyz;
+    float2 materialSample = t_material.Sample(s_linear, input.texcoord).rg;
+
+    // ═══════════════════════════════════════════════════════
+    //  ALBEDO + METALLIC
+    // ═══════════════════════════════════════════════════════
+
+    output.albedo.rgb = albedoSample.rgb * g_BaseColor.rgb;
+    output.albedo.a = materialSample.r * g_Metallic;  // Metallic
+
+    // ═══════════════════════════════════════════════════════
+    //  NORMAL + ROUGHNESS
+    // ═══════════════════════════════════════════════════════
+
+    // Transform normal map from tangent space to world space
+    float3 tangentNormal = normalSample * 2.0 - 1.0;  // [0,1] -> [-1,1]
+
+    float3x3 TBN = float3x3(
+        normalize(input.worldTangent),
+        normalize(input.worldBinormal),
+        normalize(input.worldNormal)
+    );
+
+    float3 worldNormal = normalize(mul(tangentNormal, TBN));
+
+    // Encode normal [−1,1] -> [0,1] for storage
+    output.normal.rgb = worldNormal * 0.5 + 0.5;
+    output.normal.a = materialSample.g * g_Roughness;  // Roughness
+
+    // ═══════════════════════════════════════════════════════
+    //  MATERIAL ID
+    // ═══════════════════════════════════════════════════════
+
+    output.material = float4(g_MaterialID, 0, 0, 0);
+
+    return output;
+}

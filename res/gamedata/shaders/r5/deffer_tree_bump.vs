@@ -17,7 +17,7 @@ v2p_bumped 	main 	(v_tree I)
 
 	//
 	float 	base 	= m_xform._24	;		// take base height from matrix
-	float 	dp		= calc_cyclic  	(wave.w+dot(pos,(float3)wave));
+	float 	dp		= calc_cyclic  	(wave.w+dot(pos,wave.xyz));
 	float 	H 		= pos.y - base	;		// height of vertex (scaled, rotated, etc.)
 	float 	frac 	= I.tc.z*consts.x;		// fractional (or rigidity)
 	float 	inten 	= H * dp;				// intensity
@@ -33,7 +33,7 @@ v2p_bumped 	main 	(v_tree I)
 	// Eye-space pos/normal
 	v2p_bumped 		O;
 	float3	Pe		= mul		(m_V,  	w_pos		);
-	O.tcdh 			= float4	(tc.xyyy			);
+	O.tcdh 			= tc.xy;
 	O.hpos 			= mul		(m_VP,	w_pos		);
 	O.position		= float4	(Pe, 	hemi		);
 
@@ -45,9 +45,9 @@ v2p_bumped 	main 	(v_tree I)
 	// Calculate the 3x3 transform from tangent space to eye-space
 	// TangentToEyeSpace = object2eye * tangent2object
 	//		     = object2eye * transpose(object2tangent) (since the inverse of a rotation is its transpose)
-	float3 	N 		= unpack_bx4(I.Nh);	// just scale (assume normal in the -.5f, .5f)
-	float3 	T 		= unpack_bx4(I.T);	//
-	float3 	B 		= unpack_bx4(I.B);	//
+	float3 	N 		= unpack_bx4(I.Nh.xyz);	// just scale (assume normal in the -.5f, .5f)
+	float3 	T 		= unpack_bx4(I.T.xyz);	//
+	float3 	B 		= unpack_bx4(I.B.xyz);	//
 	float3x3 xform	= mul	((float3x3)m_xform_v, float3x3(
 						T.x,B.x,N.x,
 						T.y,B.y,N.y,
@@ -69,7 +69,7 @@ v2p_bumped 	main 	(v_tree I)
 	O.M3 			= xform[2];
 
 #ifdef 	USE_TDETAIL
-	O.tcdbump		= O.tcdh * dt_params;		// dt tc
+	O.tcdbump		= O.tcdh * dt_params.xy;		// dt tc
 #endif
 
 	return O;

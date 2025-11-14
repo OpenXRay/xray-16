@@ -181,8 +181,8 @@ static const int2 g_i2HDAONormalLoadPattern[NUM_NORMAL_LOADS] =
 //=================================================================================================================================
 float HDAOValleyAngle( uint2 u2ScreenCoord )
 {
-	float3 f3N1;
-	float3 f3N2;
+	float3 f3N1 = float3(0.0f, 0.0f, 0.0f);
+	float3 f3N2 = float3(0.0f, 0.0f, 0.0f);
 	float fDot;
 	float fSummedDot = 0.0f;
 	int2 i2MirrorPattern;
@@ -212,10 +212,10 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
 		f3N2.xy  = g_txNormal.Load( int3( i2MirrorOffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xy;				
 		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
-#else
-		f3N1.xy  = g_txNormal.Load( int3( i2OffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;
-		f3N2.xy  = g_txNormal.Load( int3( i2MirrorOffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;				
-#endif
+#else // GBUFFER_OPTIMIZATION
+		f3N1.xyz  = g_txNormal.Load( int3( i2OffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;
+		f3N2.xyz  = g_txNormal.Load( int3( i2MirrorOffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xyz;	
+#endif // GBUFFER_OPTIMIZATION
 		
 		fDot = dot( f3N1, N );
 		
@@ -316,8 +316,8 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	}
 	
 	fOcclusion  = dot( f4Occlusion, g_fSSAOIntensity.xxxx ) / ( 2.0f * g_fRingWeightsTotal[g_iNumRings-1] );
-    fOcclusion *= fDot;
-    fOcclusion *= P.z < 0.5f ? 0.0f : lerp( 0.0f, 1.0f, saturate( P.z - 0.5f ) );
+	fOcclusion *= fDot;
+	fOcclusion *= P.z < 0.5f ? 0.0f : lerp( 0.0f, 1.0f, saturate( P.z - 0.5f ) );
 	fOcclusion  = 1.0f - saturate( fOcclusion );
 	return fOcclusion.xxxx;
 }

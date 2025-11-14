@@ -23,9 +23,9 @@ v2p_shadow_direct main ( v_shadow_direct I )
 	// Transform to world coords
 	float3 	pos	= mul		(m_xform , I.P);
 
-	// 
+	//
 	float 	base 	= m_xform._24;			// take base height from matrix
-	float 	dp		= calc_cyclic  (wave.w+dot(pos,(float3)wave));
+	float 	dp		= calc_cyclic  (wave.w+dot(pos,wave.xyz));
 	float 	H 		= pos.y - base;			// height of vertex (scaled, rotated, etc.)
 	float 	inten 	= H * dp;			// intensity
 	float2 	result;
