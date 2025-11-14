@@ -64,7 +64,9 @@ struct alignas(16) StaticGlobals {
     Fvector4 pos_decompression_params2;
 
     Fvector4 parallax;
+    Fvector4 screen_res;
 };
+static_assert(sizeof(StaticGlobals) == 384, "StaticGlobals must be 384 bytes");
 
 using GlobalConstants = StaticGlobals;
 
@@ -124,6 +126,13 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.pos_decompression_params2.set((float)Device.dwWidth, (float)Device.dwHeight, 1.0f / (float)Device.dwWidth, 1.0f / (float)Device.dwHeight);
 
     cb.parallax.set(0.02f, -0.01f, 0.0f, 0.0f);
+
+    cb.screen_res.set(
+        (float)Device.dwWidth,
+        (float)Device.dwHeight,
+        1.0f / (float)Device.dwWidth,
+        1.0f / (float)Device.dwHeight
+    );
 
     cb.padding1 = 0.0f;
     cb.padding2 = 0.0f;

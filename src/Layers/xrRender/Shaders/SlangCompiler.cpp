@@ -44,7 +44,9 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     const char* entryPoint,
     Stage stage,
     Target target,
-    const char* sourcePath)
+    const char* sourcePath,
+    const Define* defines,
+    size_t defineCount)
 {
     CompileResult result;
 
@@ -53,6 +55,19 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         result.errorMessage = "SlangCompiler not initialized. Call Initialize() first.";
         Msg("! [SlangCompiler] %s", result.errorMessage.c_str());
         return result;
+    }
+
+    xr_vector<slang::PreprocessorMacroDesc> slangDefines;
+    if (defines && defineCount > 0)
+    {
+        slangDefines.reserve(defineCount);
+        for (size_t i = 0; i < defineCount; ++i)
+        {
+            slang::PreprocessorMacroDesc macro;
+            macro.name = defines[i].name;
+            macro.value = defines[i].value;
+            slangDefines.push_back(macro);
+        }
     }
 
     slang::SessionDesc sessionDesc = {};
@@ -80,6 +95,25 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
 
     sessionDesc.targets = &targetDesc;
     sessionDesc.targetCount = 1;
+
+    if (!slangDefines.empty())
+    {
+        sessionDesc.preprocessorMacros = slangDefines.data();
+        sessionDesc.preprocessorMacroCount = slangDefines.size();
+    }
+
+    slang::CompilerOptionEntry compilerOptions[2];
+
+    compilerOptions[0].name = slang::CompilerOptionName::NoMangle;
+    compilerOptions[0].value.kind = slang::CompilerOptionValueKind::Int;
+    compilerOptions[0].value.intValue0 = 1;
+
+    compilerOptions[1].name = slang::CompilerOptionName::PreserveParameters;
+    compilerOptions[1].value.kind = slang::CompilerOptionValueKind::Int;
+    compilerOptions[1].value.intValue0 = 1;
+
+    sessionDesc.compilerOptionEntries = compilerOptions;
+    sessionDesc.compilerOptionEntryCount = 2;
 
     sessionDesc.fileSystem = m_vfsAdapter.get();
 

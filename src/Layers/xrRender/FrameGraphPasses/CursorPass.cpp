@@ -5,6 +5,7 @@
 #include "Layers/xrRender/NVRHIUIRenderer.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::passes {
 
@@ -86,6 +87,29 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
         GEnv.UIRender = oldRenderer;
 
         if (!m_uiCollector->GetBatches().empty()) {
+            StaticGlobals staticGlobalsCB = {};
+            FillGlobalConstants(staticGlobalsCB);
+
+            for (const auto& batch : m_uiCollector->GetBatches()) {
+                if (batch.shader && m_materialCache) {
+                    MaterialPSO* matPSO = m_materialCache->GetOrCreateUIPSO(
+                        batch.shader._get(),
+                        batch.shaderElement,
+                        framebuffer
+                    );
+
+                    if (matPSO) {
+                        for (const auto& cbInfo : matPSO->constantBuffers) {
+                            if (cbInfo.name == "static_globals") {
+                                u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                                ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             m_uiRenderer->RenderBatches(
                 cmdList,
                 m_uiCollector->GetBatches(),

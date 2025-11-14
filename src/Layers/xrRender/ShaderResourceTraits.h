@@ -732,12 +732,23 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 
         FS.r_close(file);
 
-        VERIFY(SUCCEEDED(_hr));
-
-        if (FAILED(_hr) && fallback)
-            goto fallback;
-
-        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (FAILED(_hr))
+        {
+            if (ps_r4_use_framegraph)
+            {
+                if (fallback)
+                    goto fallback;
+                return nullptr;
+            }
+            else
+            {
+                VERIFY(SUCCEEDED(_hr));
+                if (fallback)
+                    goto fallback;
+                CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
+            }
+        }
 
         return sh;
     }

@@ -13,6 +13,7 @@
 #include "Layers/xrRender/SH_Atomic.h"
 #include "Layers/xrRender/dxFontRender.h"
 #include "xrCore/Text/StringConversion.hpp"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::passes {
 
@@ -440,6 +441,30 @@ void TextPass::RenderText(ng::RenderContext& ctx, nvrhi::ITexture* outputTexture
     scissor.width = m_config.width;
     scissor.height = m_config.height;
     ctx.SetScissor(scissor);
+
+    StaticGlobals staticGlobalsCB = {};
+    FillGlobalConstants(staticGlobalsCB);
+
+    for (const auto& batch : m_fontBatches) {
+        if (batch.vertices.empty()) continue;
+
+        auto* fontRender = static_cast<render_r4::dxFontRender*>(batch.font->pFontRender);
+        if (!fontRender || !fontRender->pShader) continue;
+
+        Shader* shader = fontRender->pShader._get();
+        if (!shader || !shader->E[0]) continue;
+
+        MaterialPSO* pso = m_materialCache->GetOrCreateUIPSO(shader, 0, framebuffer);
+        if (pso) {
+            for (const auto& cbInfo : pso->constantBuffers) {
+                if (cbInfo.name == "static_globals") {
+                    u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                    ctx.WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                    break;
+                }
+            }
+        }
+    }
 
     u32 totalQuadsDrawn = 0;
 

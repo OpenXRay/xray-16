@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ImGuiRendererNVRHI.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 namespace xray::render::ng {
 

@@ -46,12 +46,20 @@ public:
 
     bool Initialize();
 
+    struct Define
+    {
+        const char* name;
+        const char* value;
+    };
+
     CompileResult CompileFromSource(
         const char* source,
         const char* entryPoint,
         Stage stage,
         Target target,
-        const char* sourcePath = "shader.hlsl"
+        const char* sourcePath = "shader.hlsl",
+        const Define* defines = nullptr,
+        size_t defineCount = 0
     );
 
     CompileResult CompileFromFile(

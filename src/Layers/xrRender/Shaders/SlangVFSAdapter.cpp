@@ -96,10 +96,10 @@ SlangVFSAdapter::SlangVFSAdapter()
     }
 
     const char* testFiles[] = {
-        "r3/common_policies.h",
-        "r3\\common_policies.h",
-        "r3/common_samplers.h",
-        "r3\\common_samplers.h"
+        "r5/common_policies.h",
+        "r5\\common_policies.h",
+        "r5/common_samplers.h",
+        "r5\\common_samplers.h"
     };
 
     Msg("~ [SlangVFSAdapter] Testing VFS access...");
