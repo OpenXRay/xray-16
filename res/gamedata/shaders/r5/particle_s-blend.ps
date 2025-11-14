@@ -7,7 +7,7 @@ struct 	v2p
 };
 
 
-float4 main ( v2p I ) : SV_Target
+float4 main ( v2p I ) : SV_Target1
 {
 	float4	c 	= I.c * s_base.Sample( smp_base, I.tc0 );
 	float3 	r 	= lerp(float3(1,1,1),c.xyz,c.w);

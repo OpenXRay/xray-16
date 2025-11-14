@@ -1,0 +1,66 @@
+#include "common.h"
+#include "sload.h"
+
+static const float3 youngGrassCol = float3(0.35, 0.45, 0.18);
+static const float3 oldGrassCol = float3(0.28, 0.38, 0.15);
+
+Texture2D s_grass_vein;
+
+Texture2D s_interaction_atlas;
+uniform int dm_debug_trails;
+
+float SampleGrassInteraction(float2 atlas_uv)
+{
+    float4 interaction = s_interaction_atlas.Sample(smp_base, atlas_uv);
+    return interaction.r;
+}
+
+f_deffer main(p_flat I)
+{
+    f_deffer O;
+
+    float widthPercent = I.tcdh.x;
+
+    float3 N = lerp(I.rotatedNormal1, I.rotatedNormal2, widthPercent);
+    N = normalize(N);
+
+    float t = I.heightParam;
+
+    float ao_base = 0.5;
+    float ao_range = 0.5;
+    float ao = ao_base + ao_range * pow(saturate(t), 0.5);
+
+    float color_blend = smoothstep(0.2, 0.8, t);
+    float3 grassAlbedo = lerp(oldGrassCol, youngGrassCol, color_blend);
+
+    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
+    grassAlbedo *= lerp(0.85, 1.15, hash);
+
+    float4 vein_detail = s_grass_vein.Sample(smp_base, I.tcdh.xy);
+
+    grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, vein_detail.a * 0.15);
+
+    float hemi = I.position.w;
+
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+    float sun = I.tcdh.w;
+#else
+    float sun = 0.5;
+#endif
+
+    float gloss = 0.2;
+
+    if (dm_debug_trails > 0)
+    {
+        float interaction_strength = SampleGrassInteraction(I.interaction_uv);
+        grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
+    }
+
+    float4 Ne = float4(N, hemi * ao);
+    float4 position = float4(I.position.xyz, sun);
+    float4 albedo = float4(grassAlbedo, gloss);
+
+    O = pack_gbuffer(Ne, position, albedo);
+
+    return O;
+}

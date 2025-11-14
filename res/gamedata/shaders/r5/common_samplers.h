@@ -4,10 +4,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 // Geometry phase / deferring               	//
 
-sampler 	smp_nofilter;
-sampler 	smp_rtlinear;
-sampler 	smp_linear;
-sampler 	smp_base;
+SamplerState 	smp_nofilter;
+SamplerState 	smp_rtlinear;
+SamplerState 	smp_linear;
+SamplerState 	smp_base;
 
 Texture2D 	s_base;		//	smp_base
 #ifdef USE_MSAA
@@ -38,7 +38,7 @@ Texture2D 	s_dn_a;                	//
 //////////////////////////////////////////////////////////////////////////////////////////
 // Lighting/shadowing phase                     //
 
-sampler 	smp_material;
+SamplerState 	smp_material;
 
 //uniform sampler2D       s_depth;                //
 #ifdef USE_MSAA

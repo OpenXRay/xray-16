@@ -6,7 +6,7 @@ struct vf
   	float2	tc0	: TEXCOORD0;
   	float4	c0	: COLOR0;
 #ifdef	USE_SOFT_PARTICLES
-	float4 tctexgen	: TEXCOORD1;
+	float4 tctexgen	: XRDEPTHGEN;
 #endif
 	float4	hpos: SV_Position;
 };

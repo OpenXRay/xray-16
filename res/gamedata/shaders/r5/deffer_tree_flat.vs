@@ -17,7 +17,7 @@ v2p_flat main (v_tree I)
 	float3 	pos		= mul		(m_xform, I.P);
 
 	float 	base 	= m_xform._24;
-	float 	dp		= calc_cyclic  (wave.w+dot(pos,(float3)wave));
+	float 	dp		= calc_cyclic  (wave.w+dot(pos,wave.xyz));
 	float 	H 		= pos.y - base;
 	float 	frac 	= I.tc.z*consts.x;
 	float 	inten 	= H * dp;
@@ -30,8 +30,8 @@ v2p_flat main (v_tree I)
 	float3	Pe		= mul		(m_V,  f_pos				);
 	float 	hemi 	= I.Nh.w*c_scale.w + c_bias.w;
 	o.hpos			= mul		(m_VP, f_pos				);
-	o.N 			= mul		((float3x3)m_xform_v, unpack_bx2(I.Nh)	);
-	o.tcdh 			= float4	((I.tc * consts).xyyy		);
+	o.N 			= mul		((float3x3)m_xform_v, unpack_bx2(I.Nh.xyz)	);
+	o.tcdh 			= (I.tc * consts).xy;
 	o.position		= float4	(Pe, hemi					);
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)

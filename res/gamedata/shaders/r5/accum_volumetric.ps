@@ -48,16 +48,16 @@ float4 main ( v2p I, uint iSample : SV_SAMPLEINDEX ) : SV_Target
 	float time = timers.z*0.1;	
 	PS.xy /= 3;
 	PS.x += time;
-	float4	t_noise	= s_noise.Sample( smp_linear, PS );
+	float4	t_noise	= s_noise.Sample( smp_linear, PS.xy );
 	PS.x -= time;
 	PS.y -= time*0.70091;
-	t_noise *= s_noise.Sample( smp_linear, PS );
+	t_noise *= s_noise.Sample( smp_linear, PS.xy );
 	t_noise = t_noise*0.5+0.5;
 
 	float maxIntens = I.fDensity;
 	float3	result = maxIntens * s * att;
-	result *= lightmap;
-	result *= Ldynamic_color * t_noise;
+	result *= lightmap.xyz;
+	result *= Ldynamic_color.xyz * t_noise.xyz;
 
 	return  float4( result, 0);
 }

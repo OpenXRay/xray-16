@@ -17,10 +17,10 @@ float4 main ( p_TL I ) : SV_Target
 #endif
 {
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.Tex0, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.Tex0, pos2d.xy, ISAMPLE) );
 
 	float4	NH		= float4( gbd.N, gbd.hemi );
-  	float	L 		= NH.w * dot( Ldynamic_dir, (float3)NH ) + EPS;
+  	float	L 		= NH.w * dot( Ldynamic_dir.xyz, NH.xyz ) + EPS;
 
 	clip(L-CLIP_THRESHOLD);
 

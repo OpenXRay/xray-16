@@ -24,8 +24,8 @@ vf main(v_static v)
 {
 	vf 		o;
 
-	float3 	pos_w	= v.P;
-	float3 	norm_w	= normalize(unpack_normal(v.Nh));
+	float3 	pos_w	= v.P.xyz;
+	float3 	norm_w	= normalize(unpack_normal(v.Nh.xyz));
 	
 	o.hpos 		= mul				(m_VP, v.P);
 	o.tc0		= unpack_tc_base	(v.tc,v.T.w,v.B.w);

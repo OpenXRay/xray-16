@@ -7,7 +7,7 @@ struct 	v2p
 };
 
 
-float4 main (v2p I) : SV_Target
+float4 main (v2p I) : SV_Target1
 {
 	return	I.c.a * s_base.Sample( smp_base, I.tc0 ).a;
 }

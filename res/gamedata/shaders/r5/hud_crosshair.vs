@@ -1,7 +1,5 @@
 #include "common_iostructs.h"
 
-uniform float4		screen_res;
-
 v2p_TL0uv main ( v_TL0uv_positiont I )
 {
 	v2p_TL0uv O;

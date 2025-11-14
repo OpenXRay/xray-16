@@ -36,8 +36,8 @@ float4 main( vf I ) : SV_Target
 #endif
 {
 	float4	base= s_base.Sample( smp_base, I.tbase);
-	float3	n0	= s_nmap.Sample( smp_base, I.tnorm0);
-	float3	n1	= s_nmap.Sample( smp_base, I.tnorm1);
+	float3	n0	= s_nmap.Sample( smp_base, I.tnorm0).rgb;
+	float3	n1	= s_nmap.Sample( smp_base, I.tnorm1).rgb;
 	float3	Navg	= n0 + n1 - 1;
 
 	float3	Nw	= mul (float3x3(I.M1, I.M2, I.M3), Navg);
@@ -46,19 +46,19 @@ float4 main( vf I ) : SV_Target
 	float3	vreflect= reflect(v2point, Nw);
 			vreflect.y= vreflect.y*2-1;
 
-	float3	env0	= s_env0.Sample( smp_rtlinear, vreflect);
-	float3	env1	= s_env1.Sample( smp_rtlinear, vreflect);
+	float3	env0	= s_env0.Sample( smp_rtlinear, vreflect).rgb;
+	float3	env1	= s_env1.Sample( smp_rtlinear, vreflect).rgb;
 	float3	env	= lerp (env0,env1,L_ambient.w);
 			env	*= env*2;
 
 	float	fresnel	= saturate (dot(vreflect,v2point));
 	float	power	= pow(fresnel,9);
-	float	amount	= 0.15h+0.25h*power;
+	float	amount	= 0.15f+0.25f*power;
 
 	float3	c_reflection       = env*amount;
 	float3	final              = lerp(c_reflection,base.rgb,base.a);
 
-			final	*= I.c0*2;
+			final	*= I.c0.rgb*2;
 
 #ifdef        USE_VTF
 #else
@@ -71,7 +71,7 @@ float4 main( vf I ) : SV_Target
 #ifdef	USE_SOFT_WATER
 	float2 PosTc = I.tctexgen.xy/I.tctexgen.z;
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( PosTc, pos2d );
+	gbuffer_data gbd = gbuffer_load_data( PosTc, pos2d.xy );
 #else
 	gbuffer_data gbd = gbuffer_load_data( PosTc );
 #endif
@@ -93,19 +93,19 @@ float4 main( vf I ) : SV_Target
 	half	calc_depth = saturate(waterDepth*calc_cos);
 	half	fLeavesFactor = smoothstep(0.025, 0.05, calc_depth );
 			fLeavesFactor *= smoothstep(0.1, 0.075, calc_depth );
-	final		= lerp(final, leaves, leaves.a*fLeavesFactor);
+	final		= lerp(final, leaves.rgb, leaves.a*fLeavesFactor);
 	alpha		= lerp(alpha, leaves.a, leaves.a*fLeavesFactor);
 
 #endif
 
-	final 		= lerp(fog_color, final, I.fog);
+	final 		= lerp(fog_color.rgb, final, I.fog);
 	alpha		*= I.fog*I.fog;
 
 	return  float4   (final, alpha )                ;
 
 #else
 
-	final 		= lerp(fog_color, final, I.fog);
+	final 		= lerp(fog_color.rgb, final, I.fog);
 	return  float4   (final, I.fog*I.fog )      ;
 
 #endif

@@ -26,7 +26,7 @@ v2p main ( float3 P : POSITION )
 	o.hpos 		= mul			(m_P, vPos);
 
 	o.lightToPos = vPos.xyz - Ldynamic_pos.xyz;
-	o.vPos = vPos;
+	o.vPos = vPos.xyz;
 
 	o.fDensity = 1.0h/40.0h;
 

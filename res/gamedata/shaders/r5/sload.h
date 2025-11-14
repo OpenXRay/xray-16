@@ -70,7 +70,7 @@ void UpdateTC( inout p_bumped I)
 		}
 
 		vTexCurrentOffset -= vTexOffsetPerStep;
-		float fPrevHeight = s_bumpX.Sample( smp_base, float3(vTexCurrentOffset.xy,0) ).a;
+		float fPrevHeight = s_bumpX.Sample( smp_base, vTexCurrentOffset.xy ).a;
 
 		float	fDelta2 = ((fCurrentBound + fStepSize) - fPrevHeight);
 		float	fDelta1 = (fCurrentBound - fCurrHeight);
@@ -82,7 +82,7 @@ void UpdateTC( inout p_bumped I)
 		I.tcdh = vTexCoord;
 
 #if defined(USE_TDETAIL) && defined(USE_STEEPPARALLAX)
-		I.tcdbump = vTexCoord * dt_params;
+		I.tcdbump = vTexCoord * dt_params.xy;
 #endif
 	}
 
@@ -98,7 +98,7 @@ void UpdateTC( inout p_bumped I)
 								 
 	float	height	= s_bumpX.Sample( smp_base, I.tcdh).w;
 			height	= height*(parallax.x) + (parallax.y);
-	float2	new_tc  = I.tcdh + height * normalize(eye);
+	float2	new_tc  = I.tcdh + height * normalize(eye).xy;
 
 	I.tcdh	= new_tc;
 }
@@ -122,7 +122,7 @@ surface_bumped sload_i( p_bumped I)
 	float4 	NuE	= s_bumpX.Sample( smp_base, I.tcdh);
 
 	S.base		= tbase(I.tcdh);
-	S.normal	= Nu.wzy + (NuE.xyz - 1.0h);
+	S.normal	= Nu.wzy + (NuE.xyz - 1.0f);
 	S.gloss		= Nu.x*Nu.x;
 	S.height	= NuE.z;
 
@@ -131,7 +131,7 @@ surface_bumped sload_i( p_bumped I)
 	float4 NDetail		= s_detailBump.Sample( smp_base, I.tcdbump);
 	float4 NDetailX		= s_detailBumpX.Sample( smp_base, I.tcdbump);
 	S.gloss				= S.gloss * NDetail.x * 2;
-	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0h;
+	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0f;
 
 	float4 detail		= s_detail.Sample( smp_base, I.tcdbump);
 	S.base.rgb			= S.base.rgb * detail.rgb * 2;
@@ -160,7 +160,7 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	float4 	NuE	= s_bumpX.Sample( smp_base, I.tcdh);
 
 	S.base		= tbase(I.tcdh);
-	S.normal	= Nu.wzyx + (NuE.xyz - 1.0h);
+	S.normal	= Nu.wzyx.xyz + (NuE.xyz - 1.0f);
 	S.gloss		= Nu.x*Nu.x;
 	S.height	= NuE.z;
 
@@ -175,7 +175,7 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	float4 NDetail		= s_detailBump.Sample( smp_base, I.tcdbump);
 	float4 NDetailX		= s_detailBumpX.Sample( smp_base, I.tcdbump);
 	S.gloss				= S.gloss * NDetail.x * 2;
-	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0h;
+	S.normal			+= NDetail.wzy + NDetailX.xyz - 1.0f;
 
 	float4 detail		= s_detail.Sample( smp_base, I.tcdbump);
 	S.base.rgb			= S.base.rgb * detail.rgb * 2;

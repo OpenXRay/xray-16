@@ -1,7 +1,5 @@
 #include "common_iostructs.h"
 
-uniform float4		screen_res;
-
 v2p_aa_AA main ( v_aa_AA I )
 {
 	v2p_aa_AA	O;

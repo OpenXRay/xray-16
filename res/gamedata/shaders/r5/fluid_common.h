@@ -16,8 +16,8 @@ Texture3D	Texture_pressure;
 Texture3D	Texture_tempscalar;
 Texture3D	Texture_tempvector;
 
-sampler	samPointClamp;
-sampler	samLinear;
+SamplerState	samPointClamp;
+SamplerState	samLinear;
 
 cbuffer FluidSimConfig
 {

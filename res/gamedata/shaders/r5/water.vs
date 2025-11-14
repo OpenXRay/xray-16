@@ -43,18 +43,18 @@ vf main (v_vert v)
         vf                 o;
 
         float4         P         = v.P        ;
-        float3         NN         = unpack_normal        (v.N)        ;
+        float3         NN         = unpack_normal        (v.N.xyz)        ;
                 P         = watermove        (P)        ;
 
-        o.v2point        = P-eye_position        ;
+        o.v2point        = P.xyz-eye_position        ;
         o.tbase                = unpack_tc_base        (v.uv,v.T.w,v.B.w);
         o.tnorm0        = watermove_tc                 (o.tbase*W_DISTORT_BASE_TILE_0, P.xz, W_DISTORT_AMP_0);
         o.tnorm1        = watermove_tc                 (o.tbase*W_DISTORT_BASE_TILE_1, P.xz, W_DISTORT_AMP_1);
 
 
-        float3          N         = unpack_bx2(v.N);
-        float3          T         = unpack_bx2(v.T);
-        float3          B         = unpack_bx2(v.B);
+        float3          N         = unpack_bx2(v.N.xyz);
+        float3          T         = unpack_bx2(v.T.xyz);
+        float3          B         = unpack_bx2(v.B.xyz);
         float3x3 xform        = mul        ((float3x3)m_W, float3x3(
                                                 T.x,B.x,N.x,
                                                 T.y,B.y,N.y,
@@ -68,7 +68,7 @@ vf main (v_vert v)
         float3         L_rgb         = v.color.xyz;
         float3         L_hemi         = v_hemi(N)*v.N.w;
         float3         L_sun         = v_sun(N)*v.color.w;
-        float3         L_final        = L_rgb + L_hemi + L_sun + L_ambient;
+        float3         L_final        = L_rgb + L_hemi + L_sun + L_ambient.rgb;
 
         o.hpos                 = mul                        (m_VP, P);
 		o.fog       = saturate( calc_fogging  (v.P));

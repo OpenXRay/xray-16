@@ -17,7 +17,7 @@
 #  define xmaterial float(L_material.w)
 #endif
 
-#define FXPS technique _render{pass _code{PixelShader=compile ps_3_0 main();}}
-#define FXVS technique _render{pass _code{VertexShader=compile vs_3_0 main();}}
+#define FXPS
+#define FXVS
 
 #endif

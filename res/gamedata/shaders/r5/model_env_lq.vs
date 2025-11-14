@@ -4,7 +4,7 @@
 struct 	vf
 {
 	float2 tc0	: TEXCOORD0;
-	float3 tc1	: TEXCOORD1;
+	float3 tc1	: COLOR1;
 	float3 c0	: COLOR0;
 	float  fog	: FOG;
 	float4 hpos	: SV_Position;

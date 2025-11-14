@@ -21,7 +21,7 @@ v2p_shadow_direct main ( v_shadow_direct I )
 	float3 	pos	= mul		(m_xform , I.P);
 
 	float 	base 	= m_xform._24;
-	float 	dp		= calc_cyclic  (wave.w+dot(pos,(float3)wave));
+	float 	dp		= calc_cyclic  (wave.w+dot(pos,wave.xyz));
 	float 	H 		= pos.y - base;
 	float 	inten 	= H * dp;
 	float2 	result;

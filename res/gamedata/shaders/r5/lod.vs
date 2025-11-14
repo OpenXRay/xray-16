@@ -8,13 +8,13 @@ struct vv
 	float3 n1	: NORMAL1	;
 	float2 tc0	: TEXCOORD0	;
 	float2 tc1	: TEXCOORD1	;
-	float4 rgbh0	: TEXCOORD2;
-	float4 rgbh1	: TEXCOORD3;
+	float4 rgbh0	: COLOR1;
+	float4 rgbh1	: COLOR2;
 	float4 sun_af	: COLOR0;
 };
 struct vf
 {
-	float3	Pe	: TEXCOORD0	;
+	float3	Pe	: POSITION	;
  	float2 	tc0	: TEXCOORD1	;
  	float2 	tc1	: TEXCOORD2	;
 	float4 	af	: COLOR1	;

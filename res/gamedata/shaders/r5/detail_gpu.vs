@@ -1,0 +1,266 @@
+#include "common.h"
+
+uniform float4 consts;
+uniform float4 wave;
+uniform float4 dir2D;
+uniform float4 dir2D_2;
+uniform float4 detail_params;
+uniform float grass_wind_displacement;
+uniform float grass_interaction_displacement;
+uniform float4 g_wind_direction;
+static const float M_PI = 3.1415926;
+
+Texture2D interaction_atlas : register(t1);
+Texture2D wind_texture : register(t2);
+Buffer<uint> slot_indirection : register(t3);
+
+struct v_blade_sdf
+{
+	float3 pos : POSITION;
+	float2 tc : TEXCOORD0;
+	float t : TEXCOORD1;
+	float width_scale : TEXCOORD2;
+};
+
+struct InstanceData
+{
+	float3 pos;
+	float scale;
+	float hemi;
+	uint vis_id;
+	uint object_id;
+	float padding;
+};
+
+StructuredBuffer<InstanceData> detail_buffer : register(t0);
+
+v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
+{
+	v2p_flat O;
+
+	InstanceData det = detail_buffer[instance_id];
+
+	float3 P0 = det.pos;
+	float3 P1 = det.pos + float3(0, det.scale * 0.33, 0);
+	float3 P2 = det.pos + float3(0, det.scale * 0.67, 0);
+	float3 P3 = det.pos + float3(0, det.scale, 0);
+
+	float3 base_world_pos = P0;
+
+	float blade_rotation = frac(P0.x * 12.9898 + P0.z * 78.233) * 2.0 * M_PI;
+	float3 facing = normalize(float3(sin(blade_rotation), 0.0, cos(blade_rotation)));
+
+	float vertex_height_factor = I.t;
+
+	float2 atlas_uv = float2(0, 0);
+
+	const float slot_size = 2.0;
+	int slot_x = int(floor(base_world_pos.x / slot_size));
+	int slot_z = int(floor(base_world_pos.z / slot_size));
+
+	uint x_size = uint(detail_params.x);
+	uint z_size = uint(detail_params.y);
+	int x_offs = int(detail_params.z);
+	int z_offs = int(detail_params.w);
+
+	int sx_local = slot_x + x_offs;
+	int sz_local = slot_z + z_offs;
+
+	sx_local = clamp(sx_local, 0, int(x_size) - 1);
+	sz_local = clamp(sz_local, 0, int(z_size) - 1);
+
+	uint slot_idx = uint(sz_local) * x_size + uint(sx_local);
+
+	uint packed_indirection = slot_indirection.Load(slot_idx);
+	uint physical_page = packed_indirection & 0xFFFF;
+	uint mip_level = (packed_indirection >> 16) & 0xFF;
+
+	float4 interaction;
+
+	if (physical_page == 0xFFFF) {
+		interaction = float4(0, 0, 0, 0);
+	} else {
+		const uint pages_per_row = 64;
+		uint page_x = physical_page % pages_per_row;
+		uint page_y = physical_page / pages_per_row;
+
+		const float page_size_uv = 32.0 / 2048.0;
+
+		float2 page_base_uv = float2(page_x, page_y) * page_size_uv;
+
+		float2 slot_local = frac(base_world_pos.xz / slot_size);
+
+		atlas_uv = page_base_uv + slot_local * page_size_uv;
+
+		interaction = interaction_atlas.SampleLevel(smp_linear, atlas_uv, 0);
+	}
+
+	float2 wind_uv = P0.xz * 0.001;
+	float4 wind = wind_texture.SampleLevel(smp_linear, wind_uv, 0);
+
+	float fbm_wind_strength = wind.a;
+	float fbm_turbulence = (wind.r * 2.0 - 1.0) * 0.3;
+
+	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
+	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
+
+	float2 perpendicular_dir = float2(-global_wind_dir.y, global_wind_dir.x);
+	float2 wind_dir_with_turbulence = normalize(global_wind_dir + perpendicular_dir * fbm_turbulence);
+
+	float2 interaction_push_dir = interaction.rg * 2.0 - 1.0;
+	float interaction_strength = length(interaction_push_dir);
+	if (interaction_strength > 0.001)
+	{
+		interaction_push_dir = interaction_push_dir / interaction_strength;
+	}
+
+	float3 wind_offset = float3(
+		wind_dir_with_turbulence.x,
+		0.0,
+		wind_dir_with_turbulence.y
+	) * fbm_wind_strength * grass_wind_displacement;
+
+	float3 interaction_offset = float3(
+		interaction_push_dir.x,
+		-0.5,
+		interaction_push_dir.y
+	) * interaction_strength * grass_interaction_displacement;
+
+	float3 total_offset = wind_offset + interaction_offset;
+
+	float2 facing_dir_xz = facing.xz;
+	float2 wind_dir_xz = normalize(float2(wind_dir_with_turbulence.x, wind_dir_with_turbulence.y));
+
+	float alignment = dot(wind_dir_xz, facing_dir_xz);
+
+	float resistance = lerp(0.3, 1.0, abs(alignment));
+
+	float wind_bend_strength = fbm_wind_strength * grass_wind_displacement * resistance;
+
+	float interaction_bend_strength = 0.0;
+	float3 interaction_bend_dir = float3(0, 0, 0);
+	if (interaction_strength > 0.001)
+	{
+		float2 interaction_dir_xz = normalize(interaction_push_dir);
+		float interaction_alignment = dot(interaction_dir_xz, facing_dir_xz);
+		float interaction_resistance = lerp(0.3, 1.0, abs(interaction_alignment));
+		interaction_bend_strength = interaction_strength * grass_interaction_displacement * interaction_resistance;
+		interaction_bend_dir = float3(interaction_dir_xz.x, 0.0, interaction_dir_xz.y);
+	}
+
+	float3 wind_bend_dir = float3(wind_dir_xz.x, 0.0, wind_dir_xz.y);
+
+	float3 total_bend_force = wind_bend_dir * wind_bend_strength + interaction_bend_dir * interaction_bend_strength;
+	float total_bend_strength = length(total_bend_force);
+
+	float3 bend_dir = float3(0, 0, 0);
+	if (total_bend_strength > 0.001)
+	{
+		bend_dir = normalize(total_bend_force);
+	}
+
+	float max_bend_displacement = det.scale * 0.8;
+	float bend_ratio = saturate(total_bend_strength / max_bend_displacement);
+	float bend_angle = bend_ratio * 1.2;
+
+	if (total_bend_strength > 0.001)
+	{
+		float tip_horizontal = det.scale * sin(bend_angle);
+		float tip_vertical_drop = det.scale * (1.0 - cos(bend_angle));
+
+		P3 += bend_dir * tip_horizontal;
+		P3.y -= tip_vertical_drop;
+
+		float p1_angle = bend_angle * 0.33;
+		float p1_horizontal = det.scale * 0.33 * sin(p1_angle);
+		float p1_drop = det.scale * 0.33 * (1.0 - cos(p1_angle));
+
+		P1 += bend_dir * p1_horizontal;
+		P1.y -= p1_drop;
+
+		float p2_angle = bend_angle * 0.67;
+		float p2_horizontal = det.scale * 0.67 * sin(p2_angle);
+		float p2_drop = det.scale * 0.67 * (1.0 - cos(p2_angle));
+
+		P2 += bend_dir * p2_horizontal;
+		P2.y -= p2_drop;
+
+		float interaction_vertical = interaction.b * grass_interaction_displacement * -0.5;
+		if (abs(interaction_vertical) > 0.01)
+		{
+			P1.y += interaction_vertical * 0.33;
+			P2.y += interaction_vertical * 0.67;
+			P3.y += interaction_vertical;
+		}
+	}
+
+	float t = vertex_height_factor;
+	float mt = 1.0 - t;
+	float mt2 = mt * mt;
+	float mt3 = mt2 * mt;
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	float3 bezier_pos = mt3 * P0 + 3.0 * mt2 * t * P1 + 3.0 * mt * t2 * P2 + t3 * P3;
+
+	float3 tangent = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
+	tangent = normalize(tangent);
+
+	float3 view_dir = normalize(bezier_pos - eye_position);
+
+	float3 right = normalize(cross(tangent, facing));
+
+	float edge_on_factor = abs(dot(view_dir, right));
+
+	if (edge_on_factor > 0.8)
+	{
+		float3 camera_right = normalize(cross(tangent, view_dir));
+
+		float blend = (edge_on_factor - 0.8) / 0.2;
+		right = normalize(lerp(right, camera_right, blend * 0.5));
+	}
+
+	float3 width_offset = right * (I.pos.x * det.scale);
+
+	float4 pos = float4(bezier_pos + width_offset, 1.0);
+
+	float hemi = abs(det.hemi);
+	float sun = sign(det.hemi) * 0.25f + 0.25f;
+
+	float3 blade_normal = normalize(cross(tangent, right));
+
+	float rotationAngle = 3.14159 * 0.3;
+	float cosTheta = cos(rotationAngle);
+	float sinTheta = sin(rotationAngle);
+	float3 axis = tangent;
+	float3 rotatedNormal1 = blade_normal * cosTheta
+	                      + cross(axis, blade_normal) * sinTheta
+	                      + axis * dot(axis, blade_normal) * (1.0 - cosTheta);
+	float3 rotatedNormal2 = blade_normal * cosTheta
+	                      + cross(axis, blade_normal) * (-sinTheta)
+	                      + axis * dot(axis, blade_normal) * (1.0 - cosTheta);
+
+	float3 Pe = mul(m_WV, pos);
+	float3 view_normal = mul((float3x3)m_WV, blade_normal);
+	float3 view_rotatedNormal1 = mul((float3x3)m_WV, rotatedNormal1);
+	float3 view_rotatedNormal2 = mul((float3x3)m_WV, rotatedNormal2);
+
+#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
+	O.tcdh = float4(I.tc.xy, hemi, sun);
+#else
+	O.tcdh = I.tc.xy;
+#endif
+
+	O.position = float4(Pe, hemi);
+	O.N = view_normal;
+	O.heightParam = I.t;
+
+	O.rotatedNormal1 = view_rotatedNormal1;
+	O.rotatedNormal2 = view_rotatedNormal2;
+
+	O.interaction_uv = atlas_uv;
+
+	O.hpos = mul(m_WVP, pos);
+	return O;
+}
+FXVS;

@@ -5,9 +5,9 @@ float4 main( p_fluidsim input ) : SV_Target
     if( IsNonEmptyCell(input.texcoords.xyz) )
         return 0;
 
-	float dist = length( input.cell0 - center ) * size;
+	float dist = length( input.cell0 - center.xyz ) * size;
     float4 result;
-	result.rgb = splatColor + length(splatColor)*sin(splatColor.rgb*10.0+input.cell0*5.0)*0.2;
+	result.rgb = splatColor.rgb + length(splatColor.rgb)*sin(splatColor.rgb*10.0+input.cell0*5.0)*0.2;
 	result.a = exp( -dist*dist/0.5 );
 
     return result;

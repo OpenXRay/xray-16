@@ -14,8 +14,8 @@ vf main (v_static v)
 	o.hpos 		= mul			(m_WVP, v.P);
 	o.tc0		= unpack_tc_base(v.tc,v.T.w,v.B.w);
 
-	float3  dir_v 	= normalize	(mul(m_WV,v.P));
-	float3 	norm_v 	= normalize (mul(m_WV,unpack_normal(v.Nh).zyx));
+	float3  dir_v 	= normalize	(mul(m_WV,v.P).xyz);
+	float3 	norm_v 	= normalize (mul((float3x3)m_WV,unpack_normal(v.Nh.xyz).zyx));
 	float 	fade 	= abs		(dot(dir_v,norm_v));
 	o.c0		= fade;
 
