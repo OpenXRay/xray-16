@@ -364,7 +364,12 @@ void CRenderTarget::draw_rain(CBackend& cmd_list, light& RainSetup)
         }
 
         //	Apply gloss
+#ifdef USE_DX11
         cmd_list.set_Element(shader_rain->E[3]);
+#else
+        // TODO Should be resolved in blender
+        cmd_list.set_Element(shader_rain->E[RImplementation.o.msaa ? 2 : 3]);
+#endif
         cmd_list.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0.f);
         cmd_list.set_c("m_shadow", m_shadow);
         cmd_list.set_c("m_sunmask", m_clouds_shadow);

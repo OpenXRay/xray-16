@@ -175,6 +175,9 @@ void CRenderTarget::phase_combine()
         RCache.set_c("ssao_noise_tile_factor", fSSAONoise);
         RCache.set_c("ssao_kernel_size", fSSAOKernelSize);
 
+        // bit0 & bit7 nothing
+        // TODO bit7 represent nothing too, check why
+        RCache.set_Stencil(TRUE, D3DCMP_NOTEQUAL, 0, 0x7F);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
 

@@ -266,9 +266,13 @@ void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
         }
         else
-#endif
         {
             cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
+#else
+        {
+            // TODO Investigate: without it there are light artefacts ?
+            cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
+#endif
             draw_volume(cmd_list, L);
         }
 

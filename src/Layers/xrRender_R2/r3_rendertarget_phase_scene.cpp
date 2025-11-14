@@ -25,7 +25,7 @@ void CRenderTarget::phase_scene_prepare()
         //	TODO: DX11: Check if we need to set RT here.
         u_setrt(RCache, Device.dwWidth, Device.dwHeight, rt_Position->pRT, 0, 0, rt_MSAADepth);
 #else
-        /* TODO investigate: it should be rt_Normal and (maybe) rt_Color
+        /* TODO investigate: it should be rt_Normal, (maybe) rt_Color(albedo) and rt_MSAADepth
          * rt_Position should be always single-sampled */
         u_setrtzb(RCache, rt_Position,rt_MSAADepth);
 #endif
