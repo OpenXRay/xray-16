@@ -46,7 +46,6 @@ OpenGL:
 - changed-files:
   - any-glob-to-any-file:
     - src/Layers/xrRenderGL
-    - src/Layers/xrRenderPC_GL
 
 Sound:
 - changed-files:
