@@ -63,10 +63,12 @@ CTexture* dxUIShader::GetBaseTexture() const
     Msg("  [GetBaseTexture] pass.T has %zu textures", textures.size());
     for (size_t i = 0; i < textures.size(); i++)
     {
-        const auto& texPair = textures[i];
-        CTexture* tex = texPair.second._get();
-        Msg("    Texture[%zu]: slot=%u, name='%s'", i, texPair.first, tex ? tex->cName.c_str() : "NULL");
+        const auto& [slot, textureName] = textures[i];
+        Msg("    Texture[%zu]: slot=%u, name='%s'", i, slot,
+            textureName.c_str() ? textureName.c_str() : "NULL");
     }
+
+    const char* baseTextureName = nullptr;
 
 #ifdef USE_DX11
     // Find s_base texture by querying pixel shader reflection
@@ -84,15 +86,17 @@ CTexture* dxUIShader::GetBaseTexture() const
                 Msg("  [GetBaseTexture] Found '%s' in reflection at slot %u, expectedSlot (with offset) = %u",
                     baseTexture.c_str(), tex.slot, expectedSlot);
 
-                for (const auto& texPair : textures)
+                for (const auto& [slot, textureName] : textures)
                 {
-                    if (texPair.first == expectedSlot)
+                    if (slot == expectedSlot)
                     {
                         Msg("  [GetBaseTexture] ✓ MATCH found at expectedSlot %u", expectedSlot);
-                        return texPair.second._get();
+                        baseTextureName = textureName.c_str();
+                        break;
                     }
                 }
-                Msg("! [GetBaseTexture] No texture found at expectedSlot %u", expectedSlot);
+                if (!baseTextureName)
+                    Msg("! [GetBaseTexture] No texture found at expectedSlot %u", expectedSlot);
                 break;
             }
         }
@@ -103,9 +107,21 @@ CTexture* dxUIShader::GetBaseTexture() const
     }
 #endif
 
-    // Fallback: return first texture
-    Msg("  [GetBaseTexture] Falling back to first texture");
-    return textures[0].second._get();
+    // Fallback: use first texture if s_base not found
+    if (!baseTextureName || !baseTextureName[0])
+    {
+        Msg("  [GetBaseTexture] Falling back to first texture");
+        baseTextureName = textures[0].second.c_str();
+    }
+
+    if (!baseTextureName || !baseTextureName[0])
+    {
+        Msg("! [GetBaseTexture] No valid texture name found");
+        return nullptr;
+    }
+
+    // Load the actual CTexture from the texture name
+    return RImplementation.Resources->_CreateTexture(baseTextureName);
 }
 
 xrImTextureData dxUIShader::GetImGuiTextureId()

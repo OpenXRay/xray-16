@@ -354,7 +354,7 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
             xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", lst[0].c_str());
         N = lst[id].c_str();
     }
-    passTextures.emplace_back(Stage(), ref_texture(RImplementation.Resources->_CreateTexture(N)));
+    passTextures.emplace_back(Stage(), shared_str(N));
     //	i_Address				(Stage(),address);
     i_Filter(Stage(), fmin, fmip, fmag);
 }
@@ -488,10 +488,17 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
     {
         string256 name;
         xr_strcpy(name, texture.c_str());
+
+        // Skip if texture name is empty after copying
+        if (!name[0])
+        {
+            Msg("~ [SampledImage] Skipping empty texture for image '%s'", image);
+            return samplerStage;
+        }
+
         fix_texture_name(name);
 
-        ref_texture textureResource = RImplementation.Resources->_CreateTexture(name);
-        passTextures.emplace_back(textureStage, textureResource);
+        passTextures.emplace_back(textureStage, shared_str(name));
         Msg("  [SampledImage] Binding texture '%s' at image '%s' (slot=%u)", name, image, textureStage);
     }
     else if (textureStage == InvalidStage)

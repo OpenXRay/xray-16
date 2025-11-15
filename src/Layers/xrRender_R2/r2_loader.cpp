@@ -82,7 +82,8 @@ void CRender::level_Load(IReader* fs)
 
         // Details
         g_pGamePersistent->LoadTitle("st_loading_details");
-        Details->Load();
+        // yohji TODO: port dx11 dependent logic to use nvrhi abstractions
+        //Details->Load();
     }
 
     // Sectors

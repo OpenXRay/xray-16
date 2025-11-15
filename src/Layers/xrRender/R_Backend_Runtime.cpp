@@ -193,9 +193,12 @@ void CBackend::set_Textures(STextureList* textures_list)
 
     for (; it != end; ++it)
     {
-        std::pair<u32, ref_texture>& loader = *it;
+        const std::pair<u32, shared_str>& loader = *it;
         u32 load_id = loader.first;
-        CTexture* load_surf = loader.second._get();
+        // Get CTexture* from texture name
+        CTexture* load_surf = loader.second.c_str() && loader.second[0]
+            ? RImplementation.Resources->_CreateTexture(loader.second.c_str())
+            : nullptr;
         //if (load_id < 256) {
         if (load_id < CTexture::rstVertex)
         {

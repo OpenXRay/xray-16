@@ -36,9 +36,9 @@ void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)
 void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool recursive /*= false*/)
 {
     VERIFY(ResourceName);
-    if (!texture)
+    if (!texture || !texture[0])
     {
-        Msg("! [r_dx11Texture] Texture is NULL for resource '%s'", ResourceName);
+        Msg("~ [r_dx11Texture] Skipping empty texture for resource '%s'", ResourceName);
         return;
     }
 
@@ -70,7 +70,7 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     }
 
     Msg("  [r_dx11Texture] Binding texture '%s' at resource '%s' (slot=%u)", TexName, ResourceName, stage);
-    passTextures.emplace_back(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName)));
+    passTextures.emplace_back(stage, shared_str(TexName));
 }
 
 void CBlender_Compile::i_dx11FilterAnizo(u32 s, BOOL value)

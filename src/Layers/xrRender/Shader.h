@@ -23,9 +23,12 @@ class IBlender;
 #pragma pack(push, 4)
 
 //////////////////////////////////////////////////////////////////////////
-struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std::pair<u32, ref_texture>>
+// STextureList: Stores texture slot → name mappings for shader passes
+// Note: We store names (shared_str) instead of CTexture* to avoid legacy overhead.
+// Actual TextureHandles are resolved later in MaterialCache via TextureManager.
+struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std::pair<u32, shared_str>>
 {
-    using inherited_vec = xr_vector<std::pair<u32, ref_texture>>;
+    using inherited_vec = xr_vector<std::pair<u32, shared_str>>;
     STextureList() = default;
     ~STextureList();
 

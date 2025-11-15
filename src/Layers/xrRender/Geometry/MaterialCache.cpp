@@ -196,11 +196,11 @@ MaterialPSO* MaterialCache::CreatePSO(
     // We query the base texture (slot 0) to get its detail scale from .thm metadata
 
     if (pass && pass->T && !pass->T->empty()) {
-        // Get base texture (usually slot 0)
-        CTexture* baseTex = (*pass->T)[0].second._get();
-        if (baseTex && baseTex->cName.size()) {
+        // Get base texture name (usually slot 0)
+        const shared_str& baseTexName = (*pass->T)[0].second;
+        if (baseTexName.c_str() && baseTexName[0]) {
             // Query our cache first
-            pso->detail_scale = GetDetailScale(baseTex->cName);
+            pso->detail_scale = GetDetailScale(baseTexName);
         }
     }
 
@@ -366,22 +366,28 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
     Msg("  [ExtractTextures] Loading %u textures from pass", texList->size());
 
-    // STextureList is a vector of (stage, ref_texture) pairs
+    // STextureList is now a vector of (stage, shared_str) pairs - directly stores texture names!
     for (size_t i = 0; i < texList->size(); i++) {
         const auto& texPair = (*texList)[i];
         u32 stage = texPair.first;
-        const ref_texture& texRef = texPair.second;
+        const shared_str& textureName = texPair.second;
 
-        CTexture* tex = texRef._get();
-        if (!tex) {
+        // Skip empty texture names
+        if (!textureName || !textureName[0]) {
             continue;
         }
 
-        // Get texture name (e.g., "act\\act_glow")
-        const char* textureName = tex->cName.c_str();
+        // TODO: Handle $user$ render target textures via RenderTargetRegistry
+        // For now, skip them to avoid disk loading errors
+        if (xr_strlen(textureName.c_str()) > 6 && 0 == strncmp(textureName.c_str(), "$user$", 6))
+        {
+            Msg("~ [ExtractTextures] Skipping render target texture: %s (slot=%u) - RT resolution not yet implemented",
+                textureName.c_str(), stage);
+            continue;
+        }
 
         // Check cache first
-        auto cacheIt = m_textureHandleCache.find(textureName);
+        auto cacheIt = m_textureHandleCache.find(textureName.c_str());
         if (cacheIt != m_textureHandleCache.end()) {
             // Cache HIT - reuse existing handle
             MaterialPSO::TextureSlot texSlot;
@@ -393,17 +399,17 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
         // Cache MISS - load via TextureManager
         resources::TextureHandle resourceHandle = texManager->LoadTexture(
-            textureName,
+            textureName.c_str(),
             resources::TexturePriority::High  // UI/material textures are high priority
         );
 
         if (!resourceHandle.IsValid()) {
-            Msg("! [MaterialCache] Failed to load texture: %s", textureName);
+            Msg("! [MaterialCache] Failed to load texture: %s", textureName.c_str());
             continue;
         }
 
         // Cache the handle for reuse
-        m_textureHandleCache[textureName] = resourceHandle;
+        m_textureHandleCache[textureName.c_str()] = resourceHandle;
 
         // Add to material PSO
         MaterialPSO::TextureSlot texSlot;
@@ -916,15 +922,14 @@ u64 MaterialCache::ComputeTextureHash(SPass* pass)
     if (!texList || texList->empty())
         return 0;
 
-    // Hash X-Ray CTexture pointers (stable across frames)
-    // We hash the actual CTexture pointer, NOT the wrapped NVRHI handle
+    // Hash texture NAMES (stable across frames)
+    // Now we hash the texture name string instead of CTexture pointer
     u32 hash = 0;
     for (const auto& texPair : *texList) {
-        CTexture* tex = texPair.second._get();
-        if (tex) {
-            // Hash the CTexture pointer (identifies the texture uniquely)
-            void* texPtr = tex;
-            hash = crc32(&texPtr, sizeof(texPtr), hash);
+        const shared_str& textureName = texPair.second;
+        if (textureName.c_str() && textureName[0]) {
+            // Hash the texture name string (identifies the texture uniquely)
+            hash = crc32(textureName.c_str(), xr_strlen(textureName.c_str()), hash);
         }
     }
 

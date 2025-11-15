@@ -135,21 +135,17 @@ BOOL Shader::equal(Shader* S)
 
 void STextureList::clear()
 {
-    iterator it = begin();
-    iterator it_e = end();
-    for (; it != it_e; ++it)
-        (*it).second.destroy();
-
+    // shared_str cleans up automatically, just erase all elements
     erase(begin(), end());
 }
 
 u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissing /*= true*/) const
 {
-    for (const auto& [stage, texture] : *this)
+    for (const auto& [stage, textureName] : *this)
     {
-        if (!texture)
+        if (!textureName || !textureName[0])
             continue;
-        if (texture->cName == TexName)
+        if (textureName == TexName)
             return stage;
     }
 
@@ -161,12 +157,12 @@ u32 STextureList::find_texture_stage(const shared_str& TexName, bool warnIfMissi
 
 void STextureList::create_texture(u32 stage, pcstr textureName, bool overrideIfExists)
 {
-    for (auto& loader : *this)
+    for (auto& [existingStage, existingName] : *this)
     {
-        if (loader.first == stage && (!loader.second || overrideIfExists))
+        if (existingStage == stage && (!existingName || !existingName[0] || overrideIfExists))
         {
-            //  Assign correct texture
-            loader.second.create(textureName);
+            // Assign texture name
+            existingName = textureName;
         }
     }
 }

@@ -29,8 +29,25 @@ void CDetailManager::hw_Load_Shaders()
     // Create shader to access constant storage
     ref_shader S;
     S.create("details\\set");
+
+    // Check if shader elements and passes exist
+    if (!S->E[0] || !S->E[0]->passes[0] || !S->E[0]->passes[0]->constants)
+    {
+        Msg("! [CDetailManager] Failed to get constants from details\\set shader E[0]");
+        return;
+    }
+    if (!S->E[1] || !S->E[1]->passes[0] || !S->E[1]->passes[0]->constants)
+    {
+        Msg("! [CDetailManager] Failed to get constants from details\\set shader E[1]");
+        return;
+    }
+
     R_constant_table& T0 = *(S->E[0]->passes[0]->constants);
     R_constant_table& T1 = *(S->E[1]->passes[0]->constants);
+
+    Msg("  [CDetailManager] T0 constant table has %zu entries", T0.table.size());
+    Msg("  [CDetailManager] T1 constant table has %zu entries", T1.table.size());
+
     hwc_consts = T0.get("consts");
     hwc_wave = T0.get("wave");
     hwc_wind = T0.get("dir2D");
@@ -38,6 +55,14 @@ void CDetailManager::hw_Load_Shaders()
     hwc_s_consts = T1.get("consts");
     hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
+
+    if (!hwc_consts) Msg("! [CDetailManager] Failed to find constant 'consts' in T0");
+    if (!hwc_wave) Msg("! [CDetailManager] Failed to find constant 'wave' in T0");
+    if (!hwc_wind) Msg("! [CDetailManager] Failed to find constant 'dir2D' in T0");
+    if (!hwc_array) Msg("! [CDetailManager] Failed to find constant 'array' in T0");
+    if (!hwc_s_consts) Msg("! [CDetailManager] Failed to find constant 'consts' in T1");
+    if (!hwc_s_xform) Msg("! [CDetailManager] Failed to find constant 'xform' in T1");
+    if (!hwc_s_array) Msg("! [CDetailManager] Failed to find constant 'array' in T1");
 
 #ifdef USE_DX11
     // Note: GPU constants will be initialized from gpu_detail_shader after it's created

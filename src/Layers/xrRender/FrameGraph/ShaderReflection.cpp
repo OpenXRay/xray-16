@@ -262,36 +262,86 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
         return bindings;
     }
 
-    // Enumerate entry point parameters looking for fragment outputs
-    u32 paramCount = entryPoint->getParameterCount();
-    for (u32 i = 0; i < paramCount; i++) {
-        auto* param = entryPoint->getParameterByIndex(i);
-        if (!param)
-            continue;
+    // ═══════════════════════════════════════════════════
+    //  CHECK RETURN TYPE FOR RENDER TARGETS
+    // ═══════════════════════════════════════════════════
+    // In HLSL/Slang, pixel shader outputs are typically the return value,
+    // not parameters. We need to examine the return type's fields.
 
-        auto* typeLayout = param->getTypeLayout();
-        if (!typeLayout)
-            continue;
+    auto* resultVarLayout = entryPoint->getResultVarLayout();
+    if (resultVarLayout)
+    {
+        auto* typeLayout = resultVarLayout->getTypeLayout();
+        if (typeLayout)
+        {
+            auto* type = typeLayout->getType();
+            if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+            {
+                // Return type is a struct - enumerate its fields for render targets
+                u32 fieldCount = type->getFieldCount();
+                Msg("  [AnalyzePixelShader] Return struct has %u fields", fieldCount);
 
-        // Only interested in fragment outputs (render targets)
-        if (typeLayout->getParameterCategory() != slang::ParameterCategory::FragmentOutput)
-            continue;
+                for (u32 i = 0; i < fieldCount; i++)
+                {
+                    auto* field = type->getFieldByIndex(i);
+                    if (!field)
+                        continue;
 
-        // Get semantic name (should be SV_Target or SV_Depth)
-        const char* semanticName = param->getSemanticName();
-        if (!semanticName)
-            continue;
+                    const char* fieldName = field->getName();
 
-        // Check for render target outputs (SV_Target)
-        if (xr_strcmp(semanticName, "SV_Target") == 0) {
-            ShaderRTBindings::OutputRT output;
-            output.slot = param->getSemanticIndex();  // SV_Target0, SV_Target1, etc.
-            bindings.outputRTs.push_back(output);
+                    // Get semantic from the field's variable layout in the struct
+                    auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                    if (!fieldLayout)
+                        continue;
+
+                    const char* semantic = fieldLayout->getSemanticName();
+                    u32 semanticIndex = fieldLayout->getSemanticIndex();
+
+                    Msg("  [AnalyzePixelShader] Field[%u]: name='%s', semantic='%s', index=%u",
+                        i, fieldName ? fieldName : "null", semantic ? semantic : "null", semanticIndex);
+
+                    if (semantic)
+                    {
+                        // Check for SV_Target outputs
+                        if (xr_strcmp(semantic, "SV_Target") == 0)
+                        {
+                            ShaderRTBindings::OutputRT output;
+                            output.slot = semanticIndex;
+                            bindings.outputRTs.push_back(output);
+                            Msg("  [AnalyzePixelShader] Added RT output at slot %u", semanticIndex);
+                        }
+                        // Check for depth output
+                        else if (xr_strcmp(semantic, "SV_Depth") == 0)
+                        {
+                            bindings.hasDepthOutput = true;
+                            Msg("  [AnalyzePixelShader] Found depth output");
+                        }
+                    }
+                }
+            }
+            else if (type)
+            {
+                // Return type is a simple type (e.g., float4)
+                // Check if it has a semantic
+                const char* semantic = resultVarLayout->getSemanticName();
+                u32 semanticIndex = resultVarLayout->getSemanticIndex();
+
+                Msg("  [AnalyzePixelShader] Simple return type: semantic='%s', index=%u",
+                    semantic ? semantic : "null", semanticIndex);
+
+                if (semantic && xr_strcmp(semantic, "SV_Target") == 0)
+                {
+                    ShaderRTBindings::OutputRT output;
+                    output.slot = semanticIndex;
+                    bindings.outputRTs.push_back(output);
+                    Msg("  [AnalyzePixelShader] Added RT output at slot %u", semanticIndex);
+                }
+            }
         }
-        // Check for depth output
-        else if (xr_strcmp(semanticName, "SV_Depth") == 0) {
-            bindings.hasDepthOutput = true;
-        }
+    }
+    else
+    {
+        Msg("! [AnalyzePixelShader] No result var layout found");
     }
 
     // ═══════════════════════════════════════════════════
@@ -304,47 +354,56 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     //  INFER RT SEMANTICS BASED ON PHASE AND SLOT ORDER
     // ═══════════════════════════════════════════════════
 
-    // Second pass: extract component masks for semantic inference
-    for (u32 i = 0; i < paramCount; i++) {
-        auto* param = entryPoint->getParameterByIndex(i);
-        if (!param)
-            continue;
-
-        auto* typeLayout = param->getTypeLayout();
-        if (!typeLayout)
-            continue;
-
-        if (typeLayout->getParameterCategory() != slang::ParameterCategory::FragmentOutput)
-            continue;
-
-        const char* semanticName = param->getSemanticName();
-        if (!semanticName || xr_strcmp(semanticName, "SV_Target") != 0)
-            continue;
-
-        u32 slot = param->getSemanticIndex();
-
-        // Get component mask from type
+    // Second pass: extract component masks for semantic inference from return type fields
+    if (resultVarLayout)
+    {
+        auto* typeLayout = resultVarLayout->getTypeLayout();
         auto* type = typeLayout->getType();
-        u32 componentMask = 0;
-        if (type) {
-            auto kind = type->getKind();
-            u32 componentCount = 1;
+        if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+        {
+            u32 fieldCount = type->getFieldCount();
+            for (u32 i = 0; i < fieldCount; i++)
+            {
+                auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                if (!fieldLayout)
+                    continue;
 
-            if (kind == slang::TypeReflection::Kind::Vector) {
-                componentCount = type->getElementCount();
-            }
+                const char* semantic = fieldLayout->getSemanticName();
+                if (!semantic || xr_strcmp(semantic, "SV_Target") != 0)
+                    continue;
 
-            // Build mask: 1=x, 2=y, 4=z, 8=w
-            for (u32 c = 0; c < componentCount && c < 4; c++) {
-                componentMask |= (1 << c);
-            }
-        }
+                u32 slot = fieldLayout->getSemanticIndex();
 
-        // Find the OutputRT we created earlier and set semantic
-        for (auto& output : bindings.outputRTs) {
-            if (output.slot == slot) {
-                output.semantic = InferRTSemantic(slot, componentMask, bindings.phase);
-                break;
+                // Get component mask from field type
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                auto* fieldType = fieldTypeLayout ? fieldTypeLayout->getType() : nullptr;
+                u32 componentMask = 0;
+                if (fieldType)
+                {
+                    auto kind = fieldType->getKind();
+                    u32 componentCount = 1;
+
+                    if (kind == slang::TypeReflection::Kind::Vector)
+                    {
+                        componentCount = fieldType->getElementCount();
+                    }
+
+                    // Build mask: 1=x, 2=y, 4=z, 8=w
+                    for (u32 c = 0; c < componentCount && c < 4; c++)
+                    {
+                        componentMask |= (1 << c);
+                    }
+                }
+
+                // Find the OutputRT we created earlier and set semantic
+                for (auto& output : bindings.outputRTs)
+                {
+                    if (output.slot == slot)
+                    {
+                        output.semantic = InferRTSemantic(slot, componentMask, bindings.phase);
+                        break;
+                    }
+                }
             }
         }
     }
