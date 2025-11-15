@@ -37,8 +37,9 @@ public:
     virtual particles_systems::library_interface const& particles_systems_library();
 
 private:
-    STextureList sky_r_textures;
-    STextureList clouds_r_textures;
+    using RuntimeTextureList = xr_vector<std::pair<u32, ref_texture>>;
+    RuntimeTextureList sky_r_textures;
+    RuntimeTextureList clouds_r_textures;
 
     ref_shader sh_2sky;
     ref_geom sh_2geom;

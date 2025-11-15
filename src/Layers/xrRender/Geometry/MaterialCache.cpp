@@ -133,9 +133,9 @@ MaterialPSO* MaterialCache::CreatePSO(
     ExtractTextures(pass, pso.get());
 
     if (pass && pass->T && !pass->T->empty()) {
-        CTexture* baseTex = (*pass->T)[0].second._get();
-        if (baseTex && baseTex->cName.size()) {
-            pso->detail_scale = GetDetailScale(baseTex->cName);
+        const shared_str& baseTexName = (*pass->T)[0].second;
+        if (baseTexName.c_str() && baseTexName[0]) {
+            pso->detail_scale = GetDetailScale(baseTexName);
         }
     }
 
@@ -251,16 +251,20 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
     for (size_t i = 0; i < texList->size(); i++) {
         const auto& texPair = (*texList)[i];
         u32 stage = texPair.first;
-        const ref_texture& texRef = texPair.second;
+        const shared_str& textureName = texPair.second;
 
-        CTexture* tex = texRef._get();
-        if (!tex) {
+        if (!textureName || !textureName[0]) {
             continue;
         }
 
-        const char* textureName = tex->cName.c_str();
+        if (xr_strlen(textureName.c_str()) > 6 && 0 == strncmp(textureName.c_str(), "$user$", 6))
+        {
+            Msg("~ [ExtractTextures] Skipping render target texture: %s (slot=%u) - RT resolution not yet implemented",
+                textureName.c_str(), stage);
+            continue;
+        }
 
-        auto cacheIt = m_textureHandleCache.find(textureName);
+        auto cacheIt = m_textureHandleCache.find(textureName.c_str());
         if (cacheIt != m_textureHandleCache.end()) {
             MaterialPSO::TextureSlot texSlot;
             texSlot.slot = stage;
@@ -270,16 +274,16 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         }
 
         resources::TextureHandle resourceHandle = texManager->LoadTexture(
-            textureName,
+            textureName.c_str(),
             resources::TexturePriority::High
         );
 
         if (!resourceHandle.IsValid()) {
-            Msg("! [MaterialCache] Failed to load texture: %s", textureName);
+            Msg("! [MaterialCache] Failed to load texture: %s", textureName.c_str());
             continue;
         }
 
-        m_textureHandleCache[textureName] = resourceHandle;
+        m_textureHandleCache[textureName.c_str()] = resourceHandle;
 
         MaterialPSO::TextureSlot texSlot;
         texSlot.slot = stage;
@@ -678,10 +682,9 @@ u64 MaterialCache::ComputeTextureHash(SPass* pass)
 
     u32 hash = 0;
     for (const auto& texPair : *texList) {
-        CTexture* tex = texPair.second._get();
-        if (tex) {
-            void* texPtr = tex;
-            hash = crc32(&texPtr, sizeof(texPtr), hash);
+        const shared_str& textureName = texPair.second;
+        if (textureName.c_str() && textureName[0]) {
+            hash = crc32(textureName.c_str(), xr_strlen(textureName.c_str()), hash);
         }
     }
 

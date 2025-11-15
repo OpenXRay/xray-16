@@ -252,10 +252,10 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.set_Geometry(sh_2geom);
     RCache.set_Shader(sh_2sky);
 #if defined(USE_DX11)
-    RCache.set_Textures(&sky_r_textures);
+    RCache.set_Textures(reinterpret_cast<STextureList*>(&sky_r_textures));
 #elif defined(USE_OGL)
     if (HW.Caps.geometry.bVTF)
-        RCache.set_Textures(&sky_r_textures);
+        RCache.set_Textures(reinterpret_cast<STextureList*>(&sky_r_textures));
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -332,7 +332,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
     RCache.set_xform_world(mXFORM);
     RCache.set_Geometry(clouds_geom);
     RCache.set_Shader(clouds_sh);
-    RCache.set_Textures(&clouds_r_textures);
+    RCache.set_Textures(reinterpret_cast<STextureList*>(&clouds_r_textures));
     RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, env.CloudsVerts.size(), i_offset, env.CloudsIndices.size() / 3);
 
     RImplementation.rmNormal(RCache);

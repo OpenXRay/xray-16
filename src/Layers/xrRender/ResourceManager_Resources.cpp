@@ -367,7 +367,7 @@ void CResourceManager::ED_UpdateConstant(LPCSTR Name, CConstant* data)
     *C = *data;
 }
 
-bool cmp_tl(const std::pair<u32, ref_texture>& _1, const std::pair<u32, ref_texture>& _2)
+bool cmp_tl(const std::pair<u32, shared_str>& _1, const std::pair<u32, shared_str>& _2)
 {
     return _1.first < _2.first;
 }

@@ -23,6 +23,11 @@
 
 extern ENGINE_API float psHUD_FOV;
 
+namespace RENDER_NAMESPACE
+{
+    extern CRender RImplementation;
+}
+
 namespace xray::render::passes {
 
 using namespace framegraph;
@@ -422,10 +427,10 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
     if (texList && !texList->empty()) {
         for (size_t i = 0; i < texList->size(); i++) {
             const auto& texPair = (*texList)[i];
-            RENDER_NAMESPACE::CTexture* xrayTex = texPair.second._get();
-            if (xrayTex) {
+            const shared_str& textureName = texPair.second;
+            if (textureName.c_str() && textureName[0]) {
                 cacheKeyStr.append("|");
-                cacheKeyStr.append(xrayTex->cName.c_str());
+                cacheKeyStr.append(textureName.c_str());
             }
         }
     }
@@ -583,7 +588,11 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         for (size_t i = 0; i < texList->size(); i++) {
             const auto& texPair = (*texList)[i];
             u32 slot = texPair.first;
-            RENDER_NAMESPACE::CTexture* xrayTex = texPair.second._get();
+            const shared_str& textureName = texPair.second;
+
+            RENDER_NAMESPACE::CTexture* xrayTex = (textureName.c_str() && textureName[0])
+                ? RENDER_NAMESPACE::RImplementation.Resources->_CreateTexture(textureName.c_str())
+                : nullptr;
 
             if (xrayTex) {
                 auto* d3dTex = xrayTex->surface_get();

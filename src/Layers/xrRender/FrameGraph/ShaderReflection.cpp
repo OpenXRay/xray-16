@@ -211,72 +211,124 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
         return bindings;
     }
 
-    u32 paramCount = entryPoint->getParameterCount();
-    for (u32 i = 0; i < paramCount; i++) {
-        auto* param = entryPoint->getParameterByIndex(i);
-        if (!param)
-            continue;
+    auto* resultVarLayout = entryPoint->getResultVarLayout();
+    if (resultVarLayout)
+    {
+        auto* typeLayout = resultVarLayout->getTypeLayout();
+        if (typeLayout)
+        {
+            auto* type = typeLayout->getType();
+            if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+            {
+                u32 fieldCount = type->getFieldCount();
+                Msg("  [AnalyzePixelShader] Return struct has %u fields", fieldCount);
 
-        auto* typeLayout = param->getTypeLayout();
-        if (!typeLayout)
-            continue;
+                for (u32 i = 0; i < fieldCount; i++)
+                {
+                    auto* field = type->getFieldByIndex(i);
+                    if (!field)
+                        continue;
 
-        if (typeLayout->getParameterCategory() != slang::ParameterCategory::FragmentOutput)
-            continue;
+                    const char* fieldName = field->getName();
 
-        const char* semanticName = param->getSemanticName();
-        if (!semanticName)
-            continue;
+                    auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                    if (!fieldLayout)
+                        continue;
 
-        if (xr_strcmp(semanticName, "SV_Target") == 0) {
-            ShaderRTBindings::OutputRT output;
-            output.slot = param->getSemanticIndex();
-            bindings.outputRTs.push_back(output);
+                    const char* semantic = fieldLayout->getSemanticName();
+                    u32 semanticIndex = fieldLayout->getSemanticIndex();
+
+                    Msg("  [AnalyzePixelShader] Field[%u]: name='%s', semantic='%s', index=%u",
+                        i, fieldName ? fieldName : "null", semantic ? semantic : "null", semanticIndex);
+
+                    if (semantic)
+                    {
+                        if (xr_strcmp(semantic, "SV_Target") == 0)
+                        {
+                            ShaderRTBindings::OutputRT output;
+                            output.slot = semanticIndex;
+                            bindings.outputRTs.push_back(output);
+                            Msg("  [AnalyzePixelShader] Added RT output at slot %u", semanticIndex);
+                        }
+                        else if (xr_strcmp(semantic, "SV_Depth") == 0)
+                        {
+                            bindings.hasDepthOutput = true;
+                            Msg("  [AnalyzePixelShader] Found depth output");
+                        }
+                    }
+                }
+            }
+            else if (type)
+            {
+                const char* semantic = resultVarLayout->getSemanticName();
+                u32 semanticIndex = resultVarLayout->getSemanticIndex();
+
+                Msg("  [AnalyzePixelShader] Simple return type: semantic='%s', index=%u",
+                    semantic ? semantic : "null", semanticIndex);
+
+                if (semantic && xr_strcmp(semantic, "SV_Target") == 0)
+                {
+                    ShaderRTBindings::OutputRT output;
+                    output.slot = semanticIndex;
+                    bindings.outputRTs.push_back(output);
+                    Msg("  [AnalyzePixelShader] Added RT output at slot %u", semanticIndex);
+                }
+            }
         }
-        else if (xr_strcmp(semanticName, "SV_Depth") == 0) {
-            bindings.hasDepthOutput = true;
-        }
+    }
+    else
+    {
+        Msg("! [AnalyzePixelShader] No result var layout found");
     }
 
     bindings.phase = InferPhase(bindings);
 
-    for (u32 i = 0; i < paramCount; i++) {
-        auto* param = entryPoint->getParameterByIndex(i);
-        if (!param)
-            continue;
-
-        auto* typeLayout = param->getTypeLayout();
-        if (!typeLayout)
-            continue;
-
-        if (typeLayout->getParameterCategory() != slang::ParameterCategory::FragmentOutput)
-            continue;
-
-        const char* semanticName = param->getSemanticName();
-        if (!semanticName || xr_strcmp(semanticName, "SV_Target") != 0)
-            continue;
-
-        u32 slot = param->getSemanticIndex();
-
+    if (resultVarLayout)
+    {
+        auto* typeLayout = resultVarLayout->getTypeLayout();
         auto* type = typeLayout->getType();
-        u32 componentMask = 0;
-        if (type) {
-            auto kind = type->getKind();
-            u32 componentCount = 1;
+        if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
+        {
+            u32 fieldCount = type->getFieldCount();
+            for (u32 i = 0; i < fieldCount; i++)
+            {
+                auto* fieldLayout = typeLayout->getFieldByIndex(i);
+                if (!fieldLayout)
+                    continue;
 
-            if (kind == slang::TypeReflection::Kind::Vector) {
-                componentCount = type->getElementCount();
-            }
+                const char* semantic = fieldLayout->getSemanticName();
+                if (!semantic || xr_strcmp(semantic, "SV_Target") != 0)
+                    continue;
 
-            for (u32 c = 0; c < componentCount && c < 4; c++) {
-                componentMask |= (1 << c);
-            }
-        }
+                u32 slot = fieldLayout->getSemanticIndex();
 
-        for (auto& output : bindings.outputRTs) {
-            if (output.slot == slot) {
-                output.semantic = InferRTSemantic(slot, componentMask, bindings.phase);
-                break;
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                auto* fieldType = fieldTypeLayout ? fieldTypeLayout->getType() : nullptr;
+                u32 componentMask = 0;
+                if (fieldType)
+                {
+                    auto kind = fieldType->getKind();
+                    u32 componentCount = 1;
+
+                    if (kind == slang::TypeReflection::Kind::Vector)
+                    {
+                        componentCount = fieldType->getElementCount();
+                    }
+
+                    for (u32 c = 0; c < componentCount && c < 4; c++)
+                    {
+                        componentMask |= (1 << c);
+                    }
+                }
+
+                for (auto& output : bindings.outputRTs)
+                {
+                    if (output.slot == slot)
+                    {
+                        output.semantic = InferRTSemantic(slot, componentMask, bindings.phase);
+                        break;
+                    }
+                }
             }
         }
     }

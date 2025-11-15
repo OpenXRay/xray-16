@@ -82,7 +82,6 @@ void CRender::level_Load(IReader* fs)
 
         // Details
         g_pGamePersistent->LoadTitle("st_loading_details");
-        Details->Load();
     }
 
     // Sectors
