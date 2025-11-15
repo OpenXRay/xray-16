@@ -29,7 +29,6 @@ target_link_libraries(xr_3da
     xrCore
     xrAPI
     xrEngine
-    xrRender_GL
     xrGame
 )
 

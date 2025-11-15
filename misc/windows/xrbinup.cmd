@@ -79,7 +79,6 @@ call :COPY_FILE xrRender_R1.dll
 call :COPY_FILE xrRender_R2.dll
 call :COPY_FILE xrRender_R3.dll
 call :COPY_FILE xrRender_R4.dll
-call :COPY_FILE xrRender_GL.dll
 if %platform%==Win32 (
   call :COPY_FILE amd_ags_x86.dll
 )
