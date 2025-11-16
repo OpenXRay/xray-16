@@ -287,18 +287,41 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::calcCombinedPath(
     }
 
     // Otherwise, combine with fromPath
+    // X-Ray convention: All #includes are relative to shader root (r5\)
+    // So we extract the root directory (r5\) from fromPath and combine with path
     xr_string combined;
     if (fromPath && fromPath[0])
     {
-        // Extract directory from fromPath
-        xr_string fromDir = fromPath;
-        size_t lastSlash = fromDir.find_last_of("/\\");
-        if (lastSlash != xr_string::npos)
-            fromDir = fromDir.substr(0, lastSlash + 1);
+        // Extract shader root (everything up to and including "r5\")
+        xr_string fromPathStr = fromPath;
+        size_t r5Pos = fromPathStr.find("r5");
+        if (r5Pos != xr_string::npos)
+        {
+            // Find the slash after "r5"
+            size_t slashAfterR5 = fromPathStr.find_first_of("/\\", r5Pos);
+            if (slashAfterR5 != xr_string::npos)
+            {
+                xr_string shaderRoot = fromPathStr.substr(0, slashAfterR5 + 1);
+                combined = shaderRoot + path;
+            }
+            else
+            {
+                // No slash after r5, just use path as-is
+                combined = path;
+            }
+        }
         else
-            fromDir = "";
+        {
+            // No r5 in path, fall back to relative to current file's directory
+            xr_string fromDir = fromPath;
+            size_t lastSlash = fromDir.find_last_of("/\\");
+            if (lastSlash != xr_string::npos)
+                fromDir = fromDir.substr(0, lastSlash + 1);
+            else
+                fromDir = "";
 
-        combined = fromDir + path;
+            combined = fromDir + path;
+        }
     }
     else
     {

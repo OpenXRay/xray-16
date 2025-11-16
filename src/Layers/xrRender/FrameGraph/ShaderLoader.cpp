@@ -2,14 +2,13 @@
 #include "stdafx.h"
 #include "ShaderLoader.h"
 #include "xrCore/FileCRC32.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::framegraph {
 
-ShaderLoader::ShaderLoader(ng::RenderDevice* device, xray::render::SlangCompiler* slangCompiler)
-    : m_device(device)
-    , m_slangCompiler(slangCompiler)
+ShaderLoader::ShaderLoader(xray::render::SlangCompiler* slangCompiler)
+    : m_slangCompiler(slangCompiler)
 {
-    VERIFY(m_device != nullptr);
     VERIFY(m_slangCompiler != nullptr);
     VERIFY(m_slangCompiler->IsInitialized());
     Msg("* [ShaderLoader] Created (using Slang compiler)");
@@ -109,7 +108,7 @@ nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(
     desc.debugName = name;
 
     // Create NVRHI shader from bytecode
-    nvrhi::ShaderHandle shader = m_device->GetNVRHIDevice()->createShader(
+    nvrhi::ShaderHandle shader = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         bytecode.data(),
         bytecode.size()
@@ -144,7 +143,7 @@ nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(
     desc.debugName = name;
 
     // Create NVRHI shader from bytecode
-    nvrhi::ShaderHandle shader = m_device->GetNVRHIDevice()->createShader(
+    nvrhi::ShaderHandle shader = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         bytecode.data(),
         bytecode.size()
@@ -196,7 +195,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShaderWithReflection(
         desc.shaderType = nvrhi::ShaderType::Vertex;
         desc.debugName = name;
 
-        result.handle = m_device->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
             result.bytecode.data(),
             result.bytecode.size()
@@ -246,7 +245,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShaderWithReflection(
     desc.shaderType = nvrhi::ShaderType::Vertex;
     desc.debugName = name;
 
-    result.handle = m_device->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         compileResult.bytecode.data(),
         compileResult.bytecode.size()
@@ -307,7 +306,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShaderWithReflection(
         desc.shaderType = nvrhi::ShaderType::Pixel;
         desc.debugName = name;
 
-        result.handle = m_device->GetNVRHIDevice()->createShader(
+        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
             desc,
             result.bytecode.data(),
             result.bytecode.size()
@@ -357,7 +356,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShaderWithReflection(
     desc.shaderType = nvrhi::ShaderType::Pixel;
     desc.debugName = name;
 
-    result.handle = m_device->GetNVRHIDevice()->createShader(
+    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
         desc,
         compileResult.bytecode.data(),
         compileResult.bytecode.size()

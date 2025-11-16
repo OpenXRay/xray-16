@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 #include "../RenderContext/RenderDevice.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 // Buffer Manager Implementation
 // Week 2 - Day 4: Task 4.2
@@ -19,7 +20,6 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
     , m_cpuAddress(nullptr)
 {
     VERIFY(m_device);
-
     // Create buffer
     nvrhi::BufferDesc desc;
     desc.byteSize = size;

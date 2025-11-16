@@ -93,7 +93,7 @@ v_model skinning_0	(v_model_skinned_0	v)
 	o.N 		= unpack_normal(v.N);
 	o.T 		= unpack_normal(v.T);
 	o.B 		= unpack_normal(v.B);
-	o.tc 		= v.tc;
+	o.tc 		= v.tc.xy;
 	return o;
 }
 v_model skinning_1 	(v_model_skinned_1	v)
@@ -104,7 +104,7 @@ v_model skinning_1 	(v_model_skinned_1	v)
 	v.B.xyz		= v.B.zyx;
 
 	// matrices
-	int 	mid = v.N.w * 255 + 0.3;
+	int 	mid = int(v.N.w * 255.0 + 0.3);
 	float4  m0 	= sbones_array[mid+0];
 	float4  m1 	= sbones_array[mid+1];
 	float4  m2 	= sbones_array[mid+2];
@@ -112,10 +112,10 @@ v_model skinning_1 	(v_model_skinned_1	v)
 	// skinning
 	v_model 	o;
 	o.P 		= skinning_pos(v.P, m0,m1,m2 );
-	o.N 		= skinning_dir(v.N, m0,m1,m2 );
-	o.T 		= skinning_dir(v.T, m0,m1,m2 );
-	o.B 		= skinning_dir(v.B, m0,m1,m2 );
-	o.tc 		= v.tc;
+	o.N 		= skinning_dir(v.N.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.T 		= skinning_dir(v.T.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.B 		= skinning_dir(v.B.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.tc 		= v.tc.xy;
 	return o;
 }
 v_model skinning_2 	(v_model_skinned_2	v)
@@ -126,11 +126,11 @@ v_model skinning_2 	(v_model_skinned_2	v)
 	v.B.xyz		= v.B.zyx;
 
 	// matrices
-	int 	id_0 	= v.tc.z;
+	int 	id_0 	= int(v.tc.z);
 	float4  m0_0 	= sbones_array[id_0+0];
 	float4  m1_0 	= sbones_array[id_0+1];
 	float4  m2_0 	= sbones_array[id_0+2];
-	int 	id_1 	= v.tc.w;
+	int 	id_1 	= int(v.tc.w);
 	float4  m0_1 	= sbones_array[id_1+0];
 	float4  m1_1 	= sbones_array[id_1+1];
 	float4  m2_1 	= sbones_array[id_1+2];
@@ -144,10 +144,10 @@ v_model skinning_2 	(v_model_skinned_2	v)
 	// skinning
 	v_model 	o;
 	o.P 		= skinning_pos(v.P, m0,m1,m2 );
-	o.N 		= skinning_dir(v.N, m0,m1,m2 );
-	o.T 		= skinning_dir(v.T, m0,m1,m2 );
-	o.B 		= skinning_dir(v.B, m0,m1,m2 );
-	o.tc 		= v.tc;
+	o.N 		= skinning_dir(v.N.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.T 		= skinning_dir(v.T.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.B 		= skinning_dir(v.B.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.tc 		= v.tc.xy;
 	return o;
 }
 v_model skinning_3 	(v_model_skinned_3	v)
@@ -158,15 +158,15 @@ v_model skinning_3 	(v_model_skinned_3	v)
 	v.B.xyz		= v.B.zyx;
 
 	// matrices
-	int 	id_0 	= v.tc.z;
+	int 	id_0 	= int(v.tc.z);
 	float4  m0_0 	= sbones_array[id_0+0];
 	float4  m1_0 	= sbones_array[id_0+1];
 	float4  m2_0 	= sbones_array[id_0+2];
-	int 	id_1 	= v.tc.w;
+	int 	id_1 	= int(v.tc.w);
 	float4  m0_1 	= sbones_array[id_1+0];
 	float4  m1_1 	= sbones_array[id_1+1];
 	float4  m2_1 	= sbones_array[id_1+2];
-	int 	id_2 	= v.B.w*255+0.3;
+	int 	id_2 	= int(v.B.w*255.0+0.3);
 	float4  m0_2 	= sbones_array[id_2+0];
 	float4  m1_2 	= sbones_array[id_2+1];
 	float4  m2_2 	= sbones_array[id_2+2];
@@ -190,10 +190,10 @@ v_model skinning_3 	(v_model_skinned_3	v)
 	// skinning
 	v_model 	o;
 	o.P 		= skinning_pos(v.P, m0,m1,m2 );
-	o.N 		= skinning_dir(v.N, m0,m1,m2 );
-	o.T 		= skinning_dir(v.T, m0,m1,m2 );
-	o.B 		= skinning_dir(v.B, m0,m1,m2 );
-	o.tc 		= v.tc;
+	o.N 		= skinning_dir(v.N.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.T 		= skinning_dir(v.T.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.B 		= skinning_dir(v.B.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.tc 		= v.tc.xy;
 #ifdef SKIN_COLOR
 	o.rgb_tint	= float3	(2,0,0)	;
 	if (id_0==id_1)	o.rgb_tint	= float3(1,2,0);
@@ -209,12 +209,12 @@ v_model skinning_4 	(v_model_skinned_4	v)
 	v.ind.xyz	= v.ind.zyx;
 
 	// matrices
-	float	id[4];
+	int	id[4];
 	float4	m[4][3];	//	[bone index][matrix row or column???]
 	[unroll]
 	for (int i=0; i<4; ++i)
 	{
-		id[i] = v.ind[i]*255+0.3;
+		id[i] = int(v.ind[i]*255.0+0.3);
 		[unroll]
 		for (int j=0; j<3; ++j)
 			m[i][j] = sbones_array[id[i]+j];
@@ -242,10 +242,10 @@ v_model skinning_4 	(v_model_skinned_4	v)
 	// skinning
 	v_model 	o;
 	o.P 		= skinning_pos(v.P, m0,m1,m2 );
-	o.N 		= skinning_dir(v.N, m0,m1,m2 );
-	o.T 		= skinning_dir(v.T, m0,m1,m2 );
-	o.B 		= skinning_dir(v.B, m0,m1,m2 );
-	o.tc 		= v.tc;
+	o.N 		= skinning_dir(v.N.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.T 		= skinning_dir(v.T.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.B 		= skinning_dir(v.B.xyz, m0.xyz,m1.xyz,m2.xyz );
+	o.tc 		= v.tc.xy;
 
 	return o;
 }

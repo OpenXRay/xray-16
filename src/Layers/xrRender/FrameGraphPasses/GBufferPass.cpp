@@ -18,12 +18,9 @@ namespace xray::render::passes {
 
 using namespace framegraph;
 
-GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config)
-    : m_device(device)
-    , m_config(config)
+GBufferPass::GBufferPass(const GBufferPassConfig& config)
+    : m_config(config)
 {
-    VERIFY(m_device != nullptr);
-
     // Validate resolution was set correctly
     if (config.width == 0 || config.height == 0) {
         Msg("! [GBufferPass] ERROR: Invalid resolution %ux%u! Must set config.width/height to Device.dwWidth/dwHeight!",
@@ -34,12 +31,11 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
 
     // Create VCB pool for dynamic constant buffer management
-    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
+    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
 
     // Create material cache (with FGResourceManager for native texture loading + VCB pool)
     m_materialCache = xr_make_unique<MaterialCache>(
-        device,
-        device->GetFGResourceManager(),  // Pass FGResourceManager for native texture loading
+        GEnv.FrameGraphRenderer->GetRenderDevice()->GetFGResourceManager(),  // Pass FGResourceManager for native texture loading
         m_vcbPool.get()
     );
 
@@ -57,7 +53,7 @@ GBufferPass::~GBufferPass() {
 
 bool GBufferPass::LoadShaders()
 {
-    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
+    ShaderLoader loader(GEnv.FrameGraphRenderer->GetRenderDevice()->GetSlangCompiler());
 
     // ═══════════════════════════════════════════════════
     //  LOAD SHADERS WITH SLANG REFLECTION
@@ -184,7 +180,7 @@ bool GBufferPass::CreatePipeline(const framegraph::DefaultOutputLayout& outputs,
     psoDesc.debugName = "GBufferPass";
 
     // Get or create pipeline through cache
-    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
+    m_pipeline = GEnv.FrameGraphRenderer->GetRenderDevice()->GetPipelineCache()->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {
@@ -350,7 +346,7 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
     // Get D3D11 device context for UpdateSubresource calls
     // NO RCache usage - get directly from NVRHI device!
     ID3D11Device* d3dDevice = static_cast<ID3D11Device*>(
-        m_device->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
+        GEnv.FrameGraphRenderer->GetRenderDevice()->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
     VERIFY(d3dDevice);
 
     // Track unique CB buffers to avoid duplicate updates
@@ -668,7 +664,7 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     constsPtr[3] = 0.0f;
                 }
 
-                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+                nvrhi::IBuffer* vcbBuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNativeBuffer(vcbHandle);
 
                 // Write VCB within render pass command list (NVRHI handles versioning)
                 // CRITICAL: Write the FULL buffer size to avoid partial update errors!

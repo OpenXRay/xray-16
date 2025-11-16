@@ -311,23 +311,49 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 // ════════════════════════════════════════════════════════════
 
 void FrameGraph::ResetForNextFrame() {
-    // Only clear per-frame execution state:
-    // - Statistics (per-frame metrics)
+    // Lambda-based FrameGraph architecture (Frostbite-style):
+    // - Graph structure rebuilt every frame
+    // - GPU resources reused from pool
     //
-    // DO NOT clear:
-    // - m_compiled (keep resources allocated!)
-    // - m_sortedPasses (reuse execution order)
-    // - m_resources, m_passes, m_rtRegistry (persistent structure)
+
+    // FREE TRANSIENT RESOURCES FIRST (before clearing the vector!)
+    // This returns them to the pool for reuse next frame
+    if (m_resourcePool) {
+        for (auto& resource : m_resources) {
+            // Skip imported resources (we don't own them)
+            if (resource.desc.isImported) {
+                continue;
+            }
+
+            // Free transient textures back to pool for aliasing
+            if (resource.resourceTexture.IsValid()) {
+                m_resourcePool->FreeTexture(resource.resourceTexture);
+            }
+
+            // Free buffers
+            if (resource.resourceBuffer.IsValid()) {
+                m_resourcePool->FreeBuffer(resource.resourceBuffer);
+            }
+        }
+    }
+
+    // Clear graph structure:
+    m_passes.clear();
+    m_resources.clear();
+    m_sortedPasses.clear();
+    m_compiled = false;
+
+    // Clear render target registry
+    m_rtRegistry.Clear();
 
     // Reset per-frame statistics
-    m_stats.compileTimeMs = 0.0f;
-    m_stats.executeTimeMs = 0.0f;
-    m_stats.totalGPUTimeMs = 0.0f;
-    m_stats.passTimings.clear();
+    m_stats = Statistics();
 
-    // CRITICAL: DO NOT set m_compiled = false here!
-    // That causes recompilation every frame, reallocating GBuffer textures
-    // and leaking 400-500MB per frame. Only recompile when graph structure changes.
+    // IMPORTANT: Keep m_resourcePool intact!
+    // The pool persists across frames and reuses GPU memory
+    // This is how Frostbite avoids allocating new textures every frame
+
+    Msg("~ [FrameGraph] Reset complete");
 }
 
 // ════════════════════════════════════════════════════════════
@@ -898,9 +924,9 @@ void FrameGraph::AllocateResources() {
         }
 
         // Determine if resource should use aliasing
-        // Persistent resources (render targets, etc.) don't use aliasing
-        // Transient intermediate resources can be aliased
-        bool usePersistent = resource.isPersistent || resource.desc.isRenderTarget || resource.desc.isDepthStencil;
+        // ONLY imported resources (owned externally) should skip aliasing
+        // All transient resources (created each frame) use the aliasing pool
+        bool skipAliasing = resource.desc.isImported;  // Only imported resources skip the pool
 
         // Create physical resource based on type
         if (resource.desc.type == ResourceDesc::Type::Buffer) {
@@ -1002,7 +1028,7 @@ void FrameGraph::AllocateResources() {
 
                 // Allocate via FGResourcePool (with or without aliasing)
                 resources::TextureHandle rmHandle;
-                if (usePersistent) {
+                if (skipAliasing) {
                     rmHandle = m_resourcePool->AllocatePersistentTexture(rmTexDesc);
                 } else {
                     rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
@@ -1020,7 +1046,7 @@ void FrameGraph::AllocateResources() {
 
                     Msg("~ [FrameGraph] Allocated texture '%s' via ResourceManager%s: %ux%ux%u, %.2f MB",
                         resource.desc.debugName.c_str(),
-                        !usePersistent ? " (transient)" : "",
+                        !skipAliasing ? " (transient)" : "",
                         resource.desc.width,
                         resource.desc.height,
                         resource.desc.depth,
@@ -1088,7 +1114,7 @@ void FrameGraph::AllocateResources() {
                 Msg("~ [FrameGraph] Allocated texture '%s'%s%s: %ux%ux%u, %.2f MB",
                     resource.desc.debugName.c_str(),
                     m_resourcePool ? " via pool" : "",
-                    (m_resourcePool && !usePersistent) ? " (transient)" : "",
+                    (m_resourcePool && !skipAliasing) ? " (transient)" : "",
                     resource.desc.width,
                     resource.desc.height,
                     resource.desc.depth,

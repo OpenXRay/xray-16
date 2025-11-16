@@ -573,7 +573,7 @@ void CRender::create()
 
                     // Initialize ShaderLoader for Slang compilation
                     m_shaderLoader = xr_new<framegraph::ShaderLoader>(
-                        m_renderDevice, m_renderDevice->GetSlangCompiler());
+                        m_renderDevice->GetSlangCompiler());
                     Msg("* ShaderLoader initialized (Slang compiler active)");
                 }
             }

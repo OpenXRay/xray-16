@@ -61,9 +61,25 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         string256 fnT, fnS;
         data->r_stringZ(fnT, sizeof(fnT));
         data->r_stringZ(fnS, sizeof(fnS));
+
         extern ENGINE_API int ps_r4_use_framegraph;
-        if (!ps_r4_use_framegraph)
+        if (ps_r4_use_framegraph) {
+            // FrameGraph: store names for on-demand compilation in MaterialCache
+            // This avoids triggering full upfront compilation with broken tessellation shaders
+            shaderName = fnS;
+            textureName = fnT;
+            Msg("* [FBasicVisual::Load] Stored shader names for FrameGraph: shader='%s', texture='%s' (visual type %u)",
+                fnS, fnT, Type);
+        } else {
+            // Legacy: compile shader upfront (all variants)
             shader.create(fnS, fnT);
+        }
+    } else {
+        extern ENGINE_API int ps_r4_use_framegraph;
+        if (ps_r4_use_framegraph && !shader) {
+            Msg("! [FBasicVisual::Load] No OGF_TEXTURE chunk found, and no header shader (visual type %u, name '%s')",
+                Type, N);
+        }
     }
 
 // desc
@@ -78,6 +94,8 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
 {
     PCOPY(Type);
     PCOPY(shader);
+    PCOPY(shaderName);   // FrameGraph: copy shader name for deferred compilation
+    PCOPY(textureName);  // FrameGraph: copy texture name for deferred compilation
     PCOPY(vis);
 #ifdef _EDITOR
     PCOPY(desc);

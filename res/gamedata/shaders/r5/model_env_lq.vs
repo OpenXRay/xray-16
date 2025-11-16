@@ -16,7 +16,7 @@ vf 	_main (v_model v)
 
 	float4 	pos 	= v.P;
 	float3  pos_w 	= mul			(m_W, pos);
-	float3 	norm_w 	= normalize 		(mul(m_W,v.N));
+	float3 	norm_w 	= normalize 		(mul((float3x3)m_W,v.N.xyz));
 
 	o.hpos 		= mul			(m_WVP, pos);		// xform, input in world coords
 	o.tc0		= v.tc.xy;					// copy tc

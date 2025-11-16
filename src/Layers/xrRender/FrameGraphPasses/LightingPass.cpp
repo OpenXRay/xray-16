@@ -8,7 +8,7 @@ namespace xray::render::passes {
 
 using namespace framegraph;
 
-LightingPass::LightingPass(ng::RenderDevice* device, const LightingPassConfig& config)
+LightingPass::LightingPass(const LightingPassConfig& config)
     : m_device(device)
     , m_config(config)
 {
@@ -29,7 +29,7 @@ LightingPass::~LightingPass() {
 
 bool LightingPass::LoadShaders()
 {
-    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
+    ShaderLoader loader(GEnv.FrameGraphRenderer->GetRenderDevice()->GetSlangCompiler());
 
     // Load fullscreen vertex shader (direct NVRHI handle)
     m_vertexShader = loader.LoadVertexShader("fullscreen");
@@ -89,7 +89,7 @@ bool LightingPass::CreatePipeline(nvrhi::ITexture* hdrTexture)
     psoDesc.debugName = "LightingPass";
 
     // Get or create pipeline through cache
-    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
+    m_pipeline = GEnv.FrameGraphRenderer->GetRenderDevice()->GetPipelineCache()->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {

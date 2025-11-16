@@ -50,7 +50,7 @@ struct GBufferPassConfig {
 
 class GBufferPass : public framegraph::IPass {
 public:
-    GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config = GBufferPassConfig());
+    GBufferPass(const GBufferPassConfig& config = GBufferPassConfig());
     ~GBufferPass() override;
 
     // ═══════════════════════════════════════════════════
@@ -91,7 +91,6 @@ public:
     }
 
 private:
-    ng::RenderDevice* m_device;
     GBufferPassConfig m_config;
     Stats m_gbufferStats;  // GBufferPass-specific stats
 

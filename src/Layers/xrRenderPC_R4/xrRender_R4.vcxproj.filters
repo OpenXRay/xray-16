@@ -184,6 +184,18 @@
     <Filter Include="ResourceManager">
       <UniqueIdentifier>{f92eda08-e783-402a-936b-f91f09cc3517}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framegraph">
+      <UniqueIdentifier>{af78fce9-d594-4028-8430-5e16e7164bb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framegraph\Passes">
+      <UniqueIdentifier>{6aa36c2e-cba5-46c5-a125-6eabb9a0bf2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NVRHI">
+      <UniqueIdentifier>{866d137d-6227-4c9c-aae3-99172ef2ca6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Slang">
+      <UniqueIdentifier>{971dc00e-f646-4c8c-bf38-96d32432d02e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -742,29 +754,6 @@
       <Filter>Shading templates</Filter>
     </ClInclude>
     <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
-    <ClInclude Include="..\xrRender\NVRHI\NVRHIDevice.h" />
-    <ClInclude Include="..\xrRender\RenderContext\ResourceHandle.h" />
-    <ClInclude Include="..\xrRender\RenderContext\RCShader.h" />
-    <ClInclude Include="..\xrRender\RenderContext\PipelineState.h" />
-    <ClInclude Include="..\xrRender\RenderContext\RenderDevice.h" />
-    <ClInclude Include="..\xrRender\RenderContext\RenderContext.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGTypes.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGResource.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGResourcePool.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\LightingPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPass.h" />
-    <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
-    <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h" />
-    <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
-    <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderPhaseCache.h" />
     <ClInclude Include="..\xrRender\ResourceManager\DDSLoader.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
@@ -789,25 +778,114 @@
     <ClInclude Include="..\xrRender\ResourceManager\SamplerCache.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuDistortPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\MenuCompositePass.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h" />
-    <ClInclude Include="..\xrRender\ShaderKey.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPass.h" />
-    <ClInclude Include="..\xrRender\NVRHIUIRenderer.h" />
-    <ClInclude Include="..\xrRender\UIRenderCollector.h" />
-    <ClInclude Include="..\xrRender\UIGeometryBatch.h" />
-    <ClInclude Include="..\xrRender\ResourceManager\FGResourceManager.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\TextPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\UIPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\CursorPass.h" />
-    <ClInclude Include="..\xrRender\FrameGraph\ShaderCache.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h" />
-    <ClInclude Include="..\xrRender\Shaders\SlangReflectionWrapper.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\FGResource.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\FGResourceManager.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\FGResourcePool.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\FGTest.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\FGTypes.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\FGPass.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\NVRHI\NVRHIDevice.h">
+      <Filter>NVRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\NVRHIUIRenderer.h">
+      <Filter>NVRHI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Geometry\MaterialCache.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h">
+      <Filter>Slang</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h">
+      <Filter>Slang</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Shaders\SlangReflectionWrapper.h">
+      <Filter>Slang</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\Shaders\SlangVFSAdapter.h">
+      <Filter>Slang</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\RenderContext\RCShader.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\RenderContext\RenderContext.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\RenderContext\RenderDevice.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\RenderTargetRegistry.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\RenderContext\ResourceHandle.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderCache.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\ShaderKey.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderPhaseCache.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\ShaderReflection.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\UIPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\RenderContext\PipelineState.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\UIGeometryBatch.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\UIRenderCollector.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1432,26 +1510,6 @@
       <Filter>Shading templates</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
-    <ClCompile Include="..\xrRender\NVRHI\NVRHIDevice.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\RCShader.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\PipelineState.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\RenderDevice.cpp" />
-    <ClCompile Include="..\xrRender\RenderContext\RenderContext.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGResourcePool.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\LightingPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPass.cpp" />
-    <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
-    <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp" />
-    <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
-    <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderPhaseCache.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager\DDSLoader.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
@@ -1473,24 +1531,102 @@
     <ClCompile Include="..\xrRender\ResourceManager\SamplerCache.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuDistortPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\MenuCompositePass.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp" />
-    <ClCompile Include="..\xrRender\ShaderKey.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPass.cpp" />
-    <ClCompile Include="..\xrRender\NVRHIUIRenderer.cpp" />
-    <ClCompile Include="..\xrRender\UIRenderCollector.cpp" />
-    <ClCompile Include="..\xrRender\ResourceManager\FGResourceManager.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\TextPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\UIPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\CursorPass.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraph\ShaderCache.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangVFSAdapter.cpp" />
-    <ClCompile Include="..\xrRender\Shaders\SlangReflectionWrapper.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\FGResource.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\FGResourceManager.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\FGResourcePool.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\NVRHI\NVRHIDevice.cpp">
+      <Filter>NVRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\NVRHIUIRenderer.cpp">
+      <Filter>NVRHI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp">
+      <Filter>Slang</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp">
+      <Filter>Slang</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Shaders\SlangReflectionWrapper.cpp">
+      <Filter>Slang</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\Shaders\SlangVFSAdapter.cpp">
+      <Filter>Slang</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\RenderContext\RCShader.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\RenderContext\RenderContext.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\RenderContext\RenderDevice.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderCache.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ShaderKey.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderPhaseCache.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\UIPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\RenderContext\PipelineState.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\UIRenderCollector.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraph\VolatileConstantBufferPool.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

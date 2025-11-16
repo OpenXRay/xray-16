@@ -366,6 +366,9 @@ private:
     static u64 ComputeStateHash(SPass* pass);
 
     // Setup PSO descriptor helpers
+    // Validate that geometry provides all vertex attributes the shader expects
+    bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
+
     void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,  // Pass MaterialPSO for shader reflection data

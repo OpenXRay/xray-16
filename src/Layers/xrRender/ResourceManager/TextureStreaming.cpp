@@ -2,6 +2,7 @@
 #include "TextureStreaming.h"
 #include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 // Texture Streaming System Implementation
 // Week 2 - Day 3: Task 3.2
@@ -14,7 +15,6 @@ StreamingManager::StreamingManager(xray::render::ng::RenderDevice* device, Textu
     , m_texManager(texManager)
     , m_asyncIO(nullptr)
 {
-    VERIFY(m_device);
     VERIFY(m_texManager);
 
     // Create async I/O manager

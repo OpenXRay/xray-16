@@ -65,7 +65,7 @@ struct ParticlePassConfig {
 class ParticlePass : public framegraph::IPass {
 public:
     // Requires MaterialCache for shader caching and render state extraction
-    ParticlePass(ng::RenderDevice* device, MaterialCache* materialCache, const ParticlePassConfig& config);
+    ParticlePass(MaterialCache* materialCache, const ParticlePassConfig& config);
     ~ParticlePass() override;
 
     // ═══════════════════════════════════════════════════
@@ -96,7 +96,6 @@ public:
     }
 
 private:
-    ng::RenderDevice* m_device = nullptr;
     MaterialCache* m_materialCache = nullptr;  // For shader caching and render state extraction
     ParticlePassConfig m_config;
 

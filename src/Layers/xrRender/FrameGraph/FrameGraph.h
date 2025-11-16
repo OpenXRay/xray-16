@@ -60,6 +60,34 @@ public:
     // Set pass execution callback
     void SetPassCallback(PassHandle pass, PassExecuteCallback callback);
 
+    // Template method for lambda-based passes (Frostbite pattern)
+    template<typename PassData>
+    PassData& addCallbackPass(
+        const char* name,
+        std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
+        std::function<void(const PassData&, const FrameGraph&, ng::RenderContext*)> executeFunc)
+    {
+        // Create pass
+        PassHandle passHandle = AddPass(name);
+
+        // Allocate PassData
+        PassData* passData = new PassData();
+
+        // Call setup function (captures by reference, executes inline)
+        // NOW PASSES PassHandle to the setup function
+        setupFunc(*this, passHandle, *passData);
+
+        // Store execute function as callback (captures by value, executes deferred)
+        PassExecuteCallback callback = [passData, executeFunc](ng::RenderContext& ctx, const FrameGraph& fg) {
+            executeFunc(*passData, fg, &ctx);
+            delete passData;  // Clean up after execution
+        };
+
+        SetPassCallback(passHandle, callback);
+
+        return *passData;
+    }
+
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     //  COMPILE PHASE (ONCE PER FRAME)
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

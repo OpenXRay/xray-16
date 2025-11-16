@@ -3,6 +3,7 @@
 #include "dxImGuiRender.h"
 #include "RenderContext/RenderDevice.h"
 #include "Layers/xrRender_R2/r2.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render {
 
@@ -91,8 +92,8 @@ namespace ng {
 class ImGuiRendererNVRHI_Integrated : public ImGuiRendererNVRHI
 {
 public:
-    ImGuiRendererNVRHI_Integrated(RenderDevice* renderDevice)
-        : ImGuiRendererNVRHI(renderDevice)
+    ImGuiRendererNVRHI_Integrated(RenderDevice* device)
+        : ImGuiRendererNVRHI(device)
     {
     }
 

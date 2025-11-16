@@ -33,6 +33,19 @@ namespace xray::render::ng {
 namespace xray::render {
 using RENDER_NAMESPACE::dxRender_Visual;
 
+// Forward declarations
+class GeometryCollector;
+class MaterialCache;
+
+namespace ui {
+    class UIRenderCollector;
+    class NVRHIUIRenderer;
+}
+
+namespace framegraph {
+    class VolatileConstantBufferPool;
+}
+
 // ══════════════════════════════════════════════════════════
 //  FRAMEGRAPH RENDERER
 // ══════════════════════════════════════════════════════════
@@ -70,6 +83,15 @@ public:
 
     const Stats& GetStats() const { return m_stats; }
     void PrintStats() const;
+
+    // Accessors for lambda passes to access shared infrastructure (override IFrameGraphRender)
+    ng::RenderDevice* GetRenderDevice() const override { return m_device; }
+    MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
+    MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
+    ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
+    ui::NVRHIUIRenderer* GetUIRenderer() const override { return m_uiRenderer.get(); }
+    MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
+    framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
 
 private:
     bool m_enabled = false;
@@ -121,21 +143,35 @@ private:
     framegraph::VirtualResourceHandle m_rt_FinalComposite; // Final composited output (scene + UI)
 
     // Passes
-    xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
-    xr_unique_ptr<passes::HUDPass> m_hudPass;
-    xr_unique_ptr<passes::ParticlePass> m_particlePass;
-    xr_unique_ptr<passes::LightingPass> m_lightingPass;
-    xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
+    //xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
+    //xr_unique_ptr<passes::HUDPass> m_hudPass;
+    //xr_unique_ptr<passes::ParticlePass> m_particlePass;
+    //xr_unique_ptr<passes::LightingPass> m_lightingPass;
+    //xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
 
     // UI rendering passes (5-step pipeline - works for menu AND in-game)
-    xr_unique_ptr<passes::UIPass> m_uiPass;                   // Step 1: Render UI sprites/widgets
-    xr_unique_ptr<passes::TextPass> m_textPass;               // Step 2: Render text/fonts on top
-    xr_unique_ptr<passes::CursorPass> m_cursorPass;           // Step 3: Render cursor on top of all
-    xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass; // Step 4: Render distortion mask
-    xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass; // Step 5: Composite to output
+    //xr_unique_ptr<passes::UIPass> m_uiPass;                   // Step 1: Render UI sprites/widgets
+    //xr_unique_ptr<passes::TextPass> m_textPass;               // Step 2: Render text/fonts on top
+    //xr_unique_ptr<passes::CursorPass> m_cursorPass;           // Step 3: Render cursor on top of all
+    //xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass; // Step 4: Render distortion mask
+    //xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass; // Step 5: Composite to output
 
     // Geometry collector
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
+
+    // Material cache (for shader/PSO management)
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+
+    // UI rendering infrastructure (shared by UI/Text/Cursor passes)
+    xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
+    xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_uiVCBPool;
+    xr_unique_ptr<MaterialCache> m_uiMaterialCache;
+
+    // Text rendering infrastructure (shared by TextPass lambda)
+    xr_unique_ptr<MaterialCache> m_textMaterialCache;
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_textVCBPool;
 
     // HUD geometry (separate from world geometry)
     xr_vector<GeometryBatch> m_hudBatches;
@@ -161,9 +197,6 @@ private:
 
     // Frame setup
     void SetupFrame();
-
-    // FrameGraph structure (called once in Initialize)
-    void BuildFrameGraphStructure();
 
     // FrameGraph passes (called per-frame in Render)
     void SetupFrameGraphPasses();

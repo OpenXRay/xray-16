@@ -6,7 +6,7 @@
 
 namespace xray::render::passes {
 
-MenuCompositePass::MenuCompositePass(ng::RenderDevice* device, const MenuCompositePassConfig& config)
+MenuCompositePass::MenuCompositePass(const MenuCompositePassConfig& config)
     : m_device(device)
     , m_config(config)
     , m_menuCompositeStats{}
@@ -41,12 +41,12 @@ void MenuCompositePass::Setup(framegraph::FrameGraph& fg) {
 bool MenuCompositePass::Initialize() {
     Msg("  [MenuCompositePass] Initializing alpha-blend compositing resources...");
 
-    nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
+    nvrhi::IDevice* nvrhiDevice = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice();
 
     // ═══════════════════════════════════════════════════════
     //  LOAD SHADERS
     // ═══════════════════════════════════════════════════════
-    framegraph::ShaderLoader shaderLoader(m_device, m_device->GetSlangCompiler());
+    framegraph::ShaderLoader shaderLoader(GEnv.FrameGraphRenderer->GetRenderDevice()->GetSlangCompiler());
 
     m_vertexShader = shaderLoader.LoadVertexShader("ui_composite");
     m_pixelShader = shaderLoader.LoadPixelShader("ui_composite");
@@ -192,7 +192,7 @@ void MenuCompositePass::Execute(ng::RenderContext& ctx, const framegraph::FrameG
         nvrhi::BindingSetItem::Sampler(0, m_linearSampler)
     };
 
-    m_bindingSet = m_device->GetNVRHIDevice()->createBindingSet(bindingSetDesc, m_bindingLayout);
+    m_bindingSet = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBindingSet(bindingSetDesc, m_bindingLayout);
 
     if (!m_bindingSet) {
         Msg("! [MenuCompositePass] Failed to create binding set");

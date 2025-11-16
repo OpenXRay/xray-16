@@ -41,7 +41,7 @@ private:
         EAligment align;
     };
 
-protected:
+public:
     Fvector2 vHalfPixel;
     Ivector2 vTS;
     EAligment eCurrentAlignment;
@@ -59,7 +59,6 @@ protected:
     Fvector* TCMap{};
     IFontRender* pFontRender;
 
-protected:
     const Fvector& GetCharTC(u16 c) const { return TCMap[c]; }
 
 public:

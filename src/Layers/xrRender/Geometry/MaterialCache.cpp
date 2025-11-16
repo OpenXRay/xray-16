@@ -89,15 +89,38 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     const framegraph::FrameGraph& fg)
 {
     if (!visual) {
+        Msg("! [MaterialCache::GetOrCreatePSO] Visual is NULL");
         return nullptr;
     }
 
-    // Check if visual has shader
-    if (!visual->shader || !visual->shader._get()) {
+    // Get or compile shader
+    Shader* shader = nullptr;
+
+    // Check if visual has pre-compiled shader (legacy path or header-based shaders)
+    if (visual->shader && visual->shader._get()) {
+        shader = visual->shader._get();
+    }
+    // Otherwise, compile from stored names (FrameGraph deferred compilation)
+    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
+             visual->textureName.c_str() && visual->textureName.size() > 0) {
+
+        Msg("* [MaterialCache::GetOrCreatePSO] Compiling shader on-demand: '%s' with texture '%s'",
+            visual->shaderName.c_str(), visual->textureName.c_str());
+
+        // Compile shader now (on first use)
+        // Note: This may fail if blender tries to compile broken tessellation shaders
+        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
+        shader = visual->shader._get();
+
+        if (!shader) {
+            Msg("! [MaterialCache::GetOrCreatePSO] Failed to compile shader '%s' for visual type %u",
+                visual->shaderName.c_str(), visual->getType());
+            return nullptr;
+        }
+    } else {
+        Msg("! [MaterialCache::GetOrCreatePSO] Visual has no shader or shader name (type %u)", visual->getType());
         return nullptr;
     }
-
-    Shader* shader = visual->shader._get();
 
     // ═══════════════════════════════════════════════════════
     //  EXTRACT SHADER ELEMENT (E[0] = DEFERRED RENDERING)
@@ -106,6 +129,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     // E[0] = SE_R2_NORMAL_HQ (deferred rendering mode)
     ShaderElement* elem = shader->E[0]._get();
     if (!elem) {
+        Msg("! [MaterialCache::GetOrCreatePSO] Shader has no element E[0] (visual type %u)", visual->getType());
         return nullptr;
     }
 
@@ -114,11 +138,13 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     // ═══════════════════════════════════════════════════════
 
     if (elem->passes.empty()) {
+        Msg("! [MaterialCache::GetOrCreatePSO] Shader element E[0] has no passes (visual type %u)", visual->getType());
         return nullptr;
     }
 
     SPass* pass = elem->passes[0]._get();
     if (!pass) {
+        Msg("! [MaterialCache::GetOrCreatePSO] Shader element E[0] pass[0] is NULL (visual type %u)", visual->getType());
         return nullptr;
     }
 
@@ -155,8 +181,11 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     m_stats.numCacheMisses++;
 
+    Msg("* [MaterialCache::GetOrCreatePSO] Creating PSO for shader '%s' (cache miss)", shaderName);
+
     MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
     if (!pso) {
+        Msg("! [MaterialCache::GetOrCreatePSO] CreatePSO failed for shader '%s'", shaderName);
         return nullptr;
     }
 
@@ -306,6 +335,18 @@ MaterialPSO* MaterialCache::CreatePSO(
     psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
     psoDesc.pixelShader = nvrhiPS.Get();   // No wrapper layer!
 
+    // ═══════════════════════════════════════════════════════
+    //  VALIDATE VERTEX LAYOUT COMPATIBILITY
+    // ═══════════════════════════════════════════════════════
+    // Check if geometry can satisfy shader's vertex input requirements
+    // BEFORE calling D3D11 CreateInputLayout (which would crash on mismatch)
+
+    if (!ValidateVertexLayoutCompatibility(visual, pso.get())) {
+        Msg("! [MaterialCache::CreatePSO] Vertex layout mismatch for shader '%s' - geometry doesn't provide required attributes",
+            pso->debugName.c_str());
+        return nullptr;
+    }
+
     // Extract vertex attributes from visual's geometry declaration
     // CRITICAL: Use shader's input signature to determine correct order!
     SetupVertexAttributes(visual, pso.get(), psoDesc);
@@ -328,8 +369,27 @@ MaterialPSO* MaterialCache::CreatePSO(
         return nullptr;
     }
 
-    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    ng::PipelineState* nvrhiPSO = nullptr;
+
+    try {
+        nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    }
+    catch (const std::exception& e) {
+        // Catch D3D11 validation errors (e.g., vertex layout mismatches)
+        // This happens when shader expects attributes that geometry doesn't provide
+        Msg("! [MaterialCache::CreatePSO] PSO creation failed for shader '%s': %s",
+            pso->debugName.c_str(), e.what());
+        return nullptr;
+    }
+    catch (...) {
+        Msg("! [MaterialCache::CreatePSO] PSO creation failed for shader '%s': Unknown exception",
+            pso->debugName.c_str());
+        return nullptr;
+    }
+
     if (!nvrhiPSO) {
+        Msg("! [MaterialCache::CreatePSO] PSO creation returned NULL for shader '%s'",
+            pso->debugName.c_str());
         return nullptr;
     }
 
@@ -999,6 +1059,94 @@ static u32 GetFormatSize(DXGI_FORMAT format) {
 // ══════════════════════════════════════════════════════════
 //  SETUP VERTEX ATTRIBUTES
 // ══════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════
+//  VALIDATE VERTEX LAYOUT COMPATIBILITY
+// ══════════════════════════════════════════════════════════
+// Returns true if the visual's geometry provides all attributes the shader expects
+
+bool MaterialCache::ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO)
+{
+    if (!visual || !matPSO) return false;
+
+    // Get geometry from visual
+    IRender_Mesh* meshVisual = nullptr;
+    switch (visual->getType()) {
+        case MT_NORMAL:
+            meshVisual = static_cast<Fvisual*>(visual);
+            break;
+        case MT_PROGRESSIVE:
+            meshVisual = static_cast<FProgressive*>(visual);
+            break;
+        case MT_TREE_ST:
+        case MT_TREE_PM:
+            meshVisual = static_cast<FTreeVisual*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_ST:
+            meshVisual = static_cast<CSkeletonX_ST*>(visual);
+            break;
+        case MT_SKELETON_GEOMDEF_PM:
+            meshVisual = static_cast<CSkeletonX_PM*>(visual);
+            break;
+        default:
+            // Unknown visual type - assume compatible
+            return true;
+    }
+
+    if (!meshVisual || !meshVisual->rm_geom || !meshVisual->rm_geom._get())
+        return true;  // No geometry, assume compatible
+
+    SGeometry* geom = meshVisual->rm_geom._get();
+    if (!geom->dcl || !geom->dcl._get())
+        return true;  // No declaration, assume compatible
+
+    SDeclaration* decl = geom->dcl._get();
+
+    // Check if shader input signature has requirements
+    if (!matPSO->vsInputSignature.elements.empty()) {
+        // DEBUG: Log what the geometry provides
+        Msg("  [MaterialCache::Validate] Geometry provides %u vertex attributes:", decl->dx11_dcl_code.size());
+        for (size_t i = 0; i < decl->dx11_dcl_code.size(); ++i) {
+            const auto& d3dElem = decl->dx11_dcl_code[i];
+            if (d3dElem.SemanticName) {
+                Msg("    [%u] %s%d", i, d3dElem.SemanticName, d3dElem.SemanticIndex);
+            } else {
+                Msg("    [%u] (null semantic)", i);
+            }
+        }
+
+        // DEBUG: Log what the shader expects
+        Msg("  [MaterialCache::Validate] Shader expects %u vertex attributes:", matPSO->vsInputSignature.elements.size());
+        for (const auto& elem : matPSO->vsInputSignature.elements) {
+            Msg("    - %s%d (format %d)", elem.semanticName.c_str(), elem.semanticIndex, (int)elem.format);
+        }
+
+        // Check each shader input requirement
+        for (const auto& shaderElem : matPSO->vsInputSignature.elements) {
+            // Look for matching element in geometry declaration
+            bool found = false;
+            for (const auto& d3dElem : decl->dx11_dcl_code) {
+                if (!d3dElem.SemanticName)
+                    continue;
+
+                if (xr_strcmp(d3dElem.SemanticName, shaderElem.semanticName.c_str()) == 0 &&
+                    d3dElem.SemanticIndex == shaderElem.semanticIndex) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // Shader expects this attribute, but geometry doesn't provide it
+                Msg("! [MaterialCache] Vertex layout validation FAILED: shader expects '%s%d' but geometry doesn't provide it",
+                    shaderElem.semanticName.c_str(), shaderElem.semanticIndex);
+                return false;
+            }
+        }
+    }
+
+    return true;  // All shader requirements satisfied
+}
 
 void MaterialCache::SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc)
 {

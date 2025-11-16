@@ -21,7 +21,7 @@ struct TonemapPassConfig {
 
 class TonemapPass {
 public:
-    TonemapPass(ng::RenderDevice* device, const TonemapPassConfig& config = TonemapPassConfig());
+    TonemapPass(const TonemapPassConfig& config = TonemapPassConfig());
     ~TonemapPass();
 
     // Setup pass
@@ -46,7 +46,6 @@ public:
     const Stats& GetStats() const { return m_stats; }
 
 private:
-    ng::RenderDevice* m_device;
     TonemapPassConfig m_config;
     Stats m_stats;
 

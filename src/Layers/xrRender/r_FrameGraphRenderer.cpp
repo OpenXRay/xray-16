@@ -14,11 +14,20 @@
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/UIRenderCollector.h"
+#include "Layers/xrRender/NVRHIUIRenderer.h"
 #include "Layers/xrRender/ShaderKey.h"
 #include "xrEngine/CustomHUD.h"
 #include "ImGuiRendererNVRHI.h"
 #include "xrEngine/device.h"
 #include <imgui.h>
+
+// Lambda-based pass setup functions
+#include "FrameGraphPasses/GBufferPassSetup.h"
+#include "FrameGraphPasses/HUDPassSetup.h"
+#include "FrameGraphPasses/UIPassSetup.h"
+#include "FrameGraphPasses/ImGuiPassSetup.h"
 
 namespace xray::render {
 
@@ -51,39 +60,39 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // Create shader phase cache (Week 16 - for precompilation phase detection)
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
 
-    // Create passes with correct render target resolution (not screen resolution!)
+    // OLD PASS SYSTEM - DISABLED
+    // All passes now created dynamically with lambda pattern
+    // No need for upfront pass object creation
+
+    /* DISABLED - Using lambda passes instead
     passes::GBufferPassConfig gbufferConfig;
-    gbufferConfig.width = Device.dwWidth;   // Game render resolution (e.g., 1280x720)
-    gbufferConfig.height = Device.dwHeight; // NOT screen resolution (1920x1080)!
+    gbufferConfig.width = Device.dwWidth;
+    gbufferConfig.height = Device.dwHeight;
+    m_gbufferPass = xr_make_unique<passes::GBufferPass>(gbufferConfig);
 
-    m_gbufferPass = xr_make_unique<passes::GBufferPass>(device, gbufferConfig);
-
-    // Create HUD pass (renders HUD in world space with depth range)
     passes::HUDPassConfig hudConfig;
     hudConfig.width = Device.dwWidth;
     hudConfig.height = Device.dwHeight;
-    m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
+    m_hudPass = xr_make_unique<passes::HUDPass>(hudConfig);
 
-    // Create particle pass (renders billboards/sprites for world+HUD particles)
-    // Shares MaterialCache with GBufferPass for shader caching and render state extraction
     passes::ParticlePassConfig particleConfig;
     particleConfig.width = Device.dwWidth;
     particleConfig.height = Device.dwHeight;
-    m_particlePass = xr_make_unique<passes::ParticlePass>(device, m_gbufferPass->GetMaterialCache(), particleConfig);
+    m_particlePass = xr_make_unique<passes::ParticlePass>(m_gbufferPass->GetMaterialCache(), particleConfig);
 
-    m_lightingPass = xr_make_unique<passes::LightingPass>(device);
-    m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
+    // Disabled - using lambda-based passes now
+    // m_lightingPass = xr_make_unique<passes::LightingPass>();
+    // m_tonemapPass = xr_make_unique<passes::TonemapPass>();
 
-    // Create UI rendering passes (5-step pipeline - works for menu AND in-game)
     passes::UIPassConfig uiConfig;
     uiConfig.width = Device.dwWidth;
     uiConfig.height = Device.dwHeight;
-    m_uiPass = xr_make_unique<passes::UIPass>(device, uiConfig);
+    m_uiPass = xr_make_unique<passes::UIPass>(uiConfig);
 
     passes::TextPassConfig textConfig;
     textConfig.width = Device.dwWidth;
     textConfig.height = Device.dwHeight;
-    m_textPass = xr_make_unique<passes::TextPass>(device, textConfig);
+    m_textPass = xr_make_unique<passes::TextPass>(textConfig);
 
     passes::CursorPassConfig cursorConfig;
     cursorConfig.width = Device.dwWidth;
@@ -99,6 +108,40 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     menuCompositeConfig.width = Device.dwWidth;
     menuCompositeConfig.height = Device.dwHeight;
     m_menuCompositePass = xr_make_unique<passes::MenuCompositePass>(device, menuCompositeConfig);
+    */
+
+    // Create VCB pool for geometry rendering
+    m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+
+    // Create material cache for geometry rendering
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_geometryVCBPool.get()
+    );
+
+    // Create UI rendering infrastructure
+    m_uiVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+    m_uiMaterialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_uiVCBPool.get()
+    );
+    m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
+    m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
+    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
+
+    Msg("* [FrameGraphRenderer] UI infrastructure initialized");
+
+    // Create Text rendering infrastructure
+    m_textVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+    m_textMaterialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_textVCBPool.get()
+    );
+
+    Msg("* [FrameGraphRenderer] Text infrastructure initialized");
 
     // Create geometry collector
     m_geometryCollector = xr_make_unique<GeometryCollector>();
@@ -115,14 +158,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     }
 
     // ═══════════════════════════════════════════════════════
-    //  BUILD FRAMEGRAPH STRUCTURE (ONCE)
+    //  TRANSIENT RESOURCES (NEW ARCHITECTURE)
     // ═══════════════════════════════════════════════════════
-    // Create all vanilla RTs and register them once at startup
-    // Passes will be set up per-frame (dynamic routing in Week 16)
+    // Resources now created per-frame in SetupFrameGraphPasses()
+    // No need for BuildFrameGraphStructure() anymore
 
-    BuildFrameGraphStructure();
-
-    m_framegraph->Compile();
+    // BuildFrameGraphStructure();  // REMOVED - Using transient resources
+    // m_framegraph->Compile();     // REMOVED - Compile per-frame now
 
     Msg("* [FrameGraphRenderer] initialized");
 
@@ -139,15 +181,18 @@ void FrameGraphRenderer::Shutdown() {
 
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
-    m_tonemapPass = nullptr;
-    m_lightingPass = nullptr;
-    m_particlePass = nullptr;
-    m_hudPass = nullptr;
-    m_gbufferPass = nullptr;
-    m_menuCompositePass = nullptr;
-    m_menuDistortPass = nullptr;
-    m_textPass = nullptr;
-    m_uiPass = nullptr;
+    m_materialCache = nullptr;
+
+    // Cleanup UI infrastructure
+    m_uiRenderer = nullptr;
+    m_uiCollector = nullptr;
+    m_uiMaterialCache = nullptr;
+    m_uiVCBPool = nullptr;
+
+    // Cleanup Text infrastructure
+    m_textMaterialCache = nullptr;
+    m_textVCBPool = nullptr;
+
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
@@ -176,18 +221,29 @@ void FrameGraphRenderer::Render() {
     SetupFrame();
 
     // ═══════════════════════════════════════════════════════
+    //  RESET FRAMEGRAPH FOR NEW FRAME
+    // ═══════════════════════════════════════════════════════
+    // With lambda-based passes, we rebuild the graph every frame
+    // (Frostbite-style: graph rebuilt, GPU resources reused from pool)
+    m_framegraph->ResetForNextFrame();
+
+    // ═══════════════════════════════════════════════════════
     //  SETUP PASSES (PER-FRAME: Route geometry to passes)
     // ═══════════════════════════════════════════════════════
 
     SetupFrameGraphPasses();
 
     // ═══════════════════════════════════════════════════════
-    //  EXECUTE
+    //  COMPILE & EXECUTE
     // ═══════════════════════════════════════════════════════
 
     // Set RenderContext for execution
     m_framegraph->SetRenderContext(m_renderContext.get());
 
+    // Compile the graph (optimizes passes, calculates lifetimes, etc.)
+    m_framegraph->Compile();
+
+    // Execute the compiled graph (FrameGraph orchestrates all passes)
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
@@ -198,47 +254,11 @@ void FrameGraphRenderer::Render() {
     // No additional copy needed
 
     // ═══════════════════════════════════════════════════════
-    //  RENDER HUD (after world geometry, before present)
+    //  ALL RENDERING NOW HANDLED BY FRAMEGRAPH
     // ═══════════════════════════════════════════════════════
-
-    RenderHUD();
-
-
-    // ═══════════════════════════════════════════════════════
-    //  RENDER UI + TEXT
-    // ═══════════════════════════════════════════════════════
-    // Execute UI/Text passes to render in-game UI elements on top of 3D scene
-    // These were originally only called in RenderMenu(), but in-game UI needs them too!
-
-    // Restore composite pass inputs for in-game mode (may have been overridden by RenderMenu)
-    // In-game: composite UI over 3D scene (gbuffer albedo)
-    m_menuCompositePass->SetInputs(m_gbufferPass->GetOutputs().albedo, m_rt_MenuMain);
-    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
-
-    m_uiPass->Execute(*m_renderContext, *m_framegraph);
-    m_textPass->Execute(*m_renderContext, *m_framegraph);
-    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
-    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
-    Msg("* [FrameGraphRenderer] In-game UI rendering complete");
-
-    // ═══════════════════════════════════════════════════════
-    //  RENDER IMGUI (inline after framegraph, before present)
-    // ═══════════════════════════════════════════════════════
-    // Render ImGui onto m_finalOutput before presenting to backbuffer
-    // This ensures ImGui is composited onto the framegraph output
-
-    // Generate ImGui draw data (normally done later in device.cpp, but we need it now)
-    ImGui::Render();
-
-    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
-    if (imguiRenderer)
-    {
-        ImDrawData* drawData = ImGui::GetDrawData();
-        if (drawData)
-        {
-            RenderImGui(drawData, imguiRenderer);
-        }
-    }
+    // The FrameGraph Execute() above handles all passes:
+    // - GBuffer, HUD, UI, Text, Cursor, Composite, ImGui
+    // No more immediate mode rendering!
 
     // ═══════════════════════════════════════════════════════
     //  PRESENT TO BACKBUFFER
@@ -255,14 +275,16 @@ void FrameGraphRenderer::Render() {
         frameEnd - frameStart
     ).count();
 
-    m_stats.gbufferMs = m_gbufferPass->GetGBufferStats().cpuTimeMs;
-    m_stats.lightingMs = m_lightingPass->GetStats().cpuTimeMs;
-    m_stats.tonemapMs = m_tonemapPass->GetStats().cpuTimeMs;
-    m_stats.numDrawCalls = m_gbufferPass->GetGBufferStats().numDrawCalls;
-    m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
+    // Old pass statistics (disabled - passes are now lambda-based)
+    // TODO: Get statistics from FrameGraph itself
+    m_stats.gbufferMs = 0.0f;
+    m_stats.lightingMs = 0.0f;
+    m_stats.tonemapMs = 0.0f;
+    m_stats.numDrawCalls = 0;
+    m_stats.numTriangles = 0;
 
-    // Reset per-frame state for next frame (keeps structure: RTs, passes, registry)
-    m_framegraph->ResetForNextFrame();
+    // NOTE: We call Reset() at the start of each frame (line 199)
+    // No need to reset here at the end
 }
 
 // ═══════════════════════════════════════════════════════
@@ -287,50 +309,88 @@ void FrameGraphRenderer::RenderMenu() {
     }
 
     // ═══════════════════════════════════════════════════════
-    //  EXECUTE 4-STEP UI PIPELINE
+    //  RESET FRAMEGRAPH FOR NEW FRAME
     // ═══════════════════════════════════════════════════════
-    // Step 1: UIPass - Render UI sprites/widgets to rt_UIMain
-    // Step 2: TextPass - Render text/fonts on top
-    // Step 3: UIDistortPass - Render distortion mask to rt_UIDistort
-    // Step 4: UICompositePass - Composite all layers to final output
-
-    // Set RenderContext for execution
-    m_framegraph->SetRenderContext(m_renderContext.get());
-
-    // In menu mode, there's no 3D scene to composite over
-    // Reset composite pass to not use scene input (just UI → output directly)
-    framegraph::VirtualResourceHandle invalidHandle; // Default-constructed = invalid
-    m_menuCompositePass->SetInputs(invalidHandle, m_rt_MenuMain);  // No scene, just UI
-    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
-
-    // Execute all five passes in sequence
-    m_uiPass->Execute(*m_renderContext, *m_framegraph);
-    m_textPass->Execute(*m_renderContext, *m_framegraph);
-    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
-    m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
-    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
-
-    Msg("  [RenderMenu] 5-step UI pipeline complete (UI → Text → Cursor → Distort → Composite)");
+    m_framegraph->ResetForNextFrame();
 
     // ═══════════════════════════════════════════════════════
-    //  RENDER IMGUI (Menu UI overlay)
+    //  MENU PASS SETUP (LAMBDA-BASED)
     // ═══════════════════════════════════════════════════════
-    ImGui::Render();
+    // For menu, we skip GBuffer/HUD and just render UI
 
-    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
-    if (imguiRenderer)
-    {
-        ImDrawData* drawData = ImGui::GetDrawData();
-        if (drawData)
-        {
-            RenderImGui(drawData, imguiRenderer);
+    const u32 width = Device.dwWidth;
+    const u32 height = Device.dwHeight;
+
+    // 1. Create black background target
+    framegraph::ResourceDesc bgDesc;
+    bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    bgDesc.width = width;
+    bgDesc.height = height;
+    bgDesc.format = nvrhi::Format::RGBA8_UNORM;
+    bgDesc.isRenderTarget = true;
+    bgDesc.debugName = "rt_MenuBackground";
+
+    auto backgroundTarget = m_framegraph->CreateTexture("rt_MenuBackground", bgDesc);
+
+    // Clear background in a simple pass (using manual PassWrite since we need the PassHandle)
+    framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
+    m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
+    m_framegraph->SetPassCallback(clearPass,
+        [backgroundTarget](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+            auto* bgRT = fg.GetPhysicalTexture(backgroundTarget);
+            if (bgRT) {
+                nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+                cmdList->clearTextureFloat(bgRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+            }
         }
-    }
+    );
+
+    // 2. UI Pass - Renders menu UI
+    auto uiTarget = passes::setupUIPass(*m_framegraph, width, height);
+
+    // 3. Text Pass - Renders menu text
+    uiTarget = passes::setupTextPass(*m_framegraph, uiTarget, width, height);
+
+    // 4. Cursor Pass - Renders cursor
+    uiTarget = passes::setupCursorPass(*m_framegraph, uiTarget, width, height);
+
+    // 5. Composite Pass - Combines background with UI
+    auto compositeOutput = passes::setupCompositePass(
+        *m_framegraph,
+        backgroundTarget,  // Black background
+        uiTarget,          // UI layer
+        width,
+        height
+    );
+
+    // 6. ImGui Pass - Debug overlay
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    auto finalOutput = passes::setupImGuiPass(
+        *m_framegraph,
+        compositeOutput,
+        imguiRenderer,
+        width,
+        height
+    );
+
+    // Store final output for presentation
+    m_finalOutput = finalOutput;
+
+    // ═══════════════════════════════════════════════════════
+    //  COMPILE & EXECUTE
+    // ═══════════════════════════════════════════════════════
+
+    m_framegraph->SetRenderContext(m_renderContext.get());
+    m_framegraph->Compile();
+    m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
     //  PRESENT TO BACKBUFFER
     // ═══════════════════════════════════════════════════════
     PresentToBackbuffer();
+
+    // NOTE: We call Reset() at the start of each frame (line 285)
+    // No need to reset here at the end
 
     Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
 }
@@ -413,325 +473,87 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
 }
 
 // ═══════════════════════════════════════════════════════
-//  BUILD FRAMEGRAPH STRUCTURE (CALLED ONCE IN INITIALIZE)
-// ═══════════════════════════════════════════════════════
-
-void FrameGraphRenderer::BuildFrameGraphStructure() {
-    // ═══════════════════════════════════════════════════════
-    //  CREATE ALL VANILLA X-RAY RENDER TARGETS (ONCE)
-    // ═══════════════════════════════════════════════════════
-    // Phase 1: Create as native NVRHI resources via NativeRTFactory
-    // Then import into FrameGraph as external resources
-
-    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets (native NVRHI)...");
-
-    u32 w = Device.dwWidth;
-    u32 h = Device.dwHeight;
-
-    // Get NativeRTFactory from FGResourceManager
-    auto* resMgr = m_device->GetFGResourceManager();
-    VERIFY(resMgr);
-    auto* rtFactory = resMgr->GetRTFactory();
-    VERIFY(rtFactory);
-    auto* textureMgr = resMgr->GetTextureManager();
-    VERIFY(textureMgr);
-
-    // ─── G-Buffer Targets (Deferred Geometry Phase) ───
-    // Create native NVRHI textures
-    m_native_Position = rtFactory->CreatePositionBuffer(w, h, "rt_Position");      // r2_RT_P
-    m_native_Normal = rtFactory->CreateNormalBuffer(w, h, "rt_Normal");            // r2_RT_N
-    m_native_Albedo = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_Albedo");    // r2_RT_albedo (non-sRGB)
-    m_native_Depth = rtFactory->CreateDepthStencil(w, h, false, "rt_Depth");      // r2_RT_base_depth (D24S8)
-
-    // Get physical NVRHI textures from TextureManager
-    nvrhi::ITexture* physicalPosition = textureMgr->GetNVRHITexture(m_native_Position);
-    nvrhi::ITexture* physicalNormal = textureMgr->GetNVRHITexture(m_native_Normal);
-    nvrhi::ITexture* physicalAlbedo = textureMgr->GetNVRHITexture(m_native_Albedo);
-    nvrhi::ITexture* physicalDepth = textureMgr->GetNVRHITexture(m_native_Depth);
-
-    VERIFY(physicalPosition && physicalNormal && physicalAlbedo && physicalDepth);
-
-    // Import into FrameGraph as external resources
-    framegraph::ResourceDesc positionDesc;
-    positionDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    positionDesc.width = w;
-    positionDesc.height = h;
-    positionDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    positionDesc.isRenderTarget = true;
-    positionDesc.debugName = "rt_Position";
-    m_rt_Position = m_framegraph->ImportTexture("rt_Position", physicalPosition, positionDesc);
-
-    framegraph::ResourceDesc normalDesc;
-    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    normalDesc.width = w;
-    normalDesc.height = h;
-    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    normalDesc.isRenderTarget = true;
-    normalDesc.debugName = "rt_Normal";
-    m_rt_Normal = m_framegraph->ImportTexture("rt_Normal", physicalNormal, normalDesc);
-
-    framegraph::ResourceDesc albedoDesc;
-    albedoDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    albedoDesc.width = w;
-    albedoDesc.height = h;
-    albedoDesc.format = nvrhi::Format::RGBA8_UNORM;
-    albedoDesc.isRenderTarget = true;
-    albedoDesc.debugName = "rt_Albedo";
-    m_rt_Albedo = m_framegraph->ImportTexture("rt_Albedo", physicalAlbedo, albedoDesc);
-
-    framegraph::ResourceDesc depthDesc;
-    depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    depthDesc.width = w;
-    depthDesc.height = h;
-    depthDesc.format = nvrhi::Format::D24S8;
-    depthDesc.isDepthStencil = true;
-    depthDesc.debugName = "rt_Depth";
-    m_rt_Depth = m_framegraph->ImportTexture("rt_Depth", physicalDepth, depthDesc);
-
-    Msg("  ✓ Created 4 native G-Buffer RTs (Position, Normal, Albedo, Depth)");
-
-    // ─── Menu Targets (native NVRHI for menu rendering pipeline) ───
-    m_native_MenuMain = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuMain");      // Main UI RT (RGBA8)
-    m_native_MenuDistort = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuDistort"); // Distortion mask RT (RGBA8)
-    m_native_FinalComposite = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_FinalComposite"); // Final composited output (RGBA8)
-
-    nvrhi::ITexture* physicalMenuMain = textureMgr->GetNVRHITexture(m_native_MenuMain);
-    nvrhi::ITexture* physicalMenuDistort = textureMgr->GetNVRHITexture(m_native_MenuDistort);
-    nvrhi::ITexture* physicalFinalComposite = textureMgr->GetNVRHITexture(m_native_FinalComposite);
-
-    VERIFY(physicalMenuMain && physicalMenuDistort && physicalFinalComposite);
-
-    // Import into FrameGraph as external resources
-    framegraph::ResourceDesc menuMainDesc;
-    menuMainDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    menuMainDesc.width = w;
-    menuMainDesc.height = h;
-    menuMainDesc.format = nvrhi::Format::RGBA8_UNORM;
-    menuMainDesc.isRenderTarget = true;
-    menuMainDesc.debugName = "rt_MenuMain";
-    m_rt_MenuMain = m_framegraph->ImportTexture("rt_MenuMain", physicalMenuMain, menuMainDesc);
-
-    framegraph::ResourceDesc menuDistortDesc;
-    menuDistortDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    menuDistortDesc.width = w;
-    menuDistortDesc.height = h;
-    menuDistortDesc.format = nvrhi::Format::RGBA8_UNORM;
-    menuDistortDesc.isRenderTarget = true;
-    menuDistortDesc.debugName = "rt_MenuDistort";
-    m_rt_MenuDistort = m_framegraph->ImportTexture("rt_MenuDistort", physicalMenuDistort, menuDistortDesc);
-
-    framegraph::ResourceDesc finalCompositeDesc;
-    finalCompositeDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    finalCompositeDesc.width = w;
-    finalCompositeDesc.height = h;
-    finalCompositeDesc.format = nvrhi::Format::RGBA8_UNORM;
-    finalCompositeDesc.isRenderTarget = true;
-    finalCompositeDesc.debugName = "rt_FinalComposite";
-    m_rt_FinalComposite = m_framegraph->ImportTexture("rt_FinalComposite", physicalFinalComposite, finalCompositeDesc);
-
-    Msg("  ✓ Created 3 native Menu RTs (MenuMain, MenuDistort, FinalComposite)");
-
-    // ─── Lighting Targets (still using legacy CreateRT for now) ───
-    m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);  // r2_RT_accum
-
-    // ─── Post-Processing Targets (still using legacy CreateRT for now) ───
-    m_rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic0
-    m_rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);       // r2_RT_generic1
-    m_rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);      // r2_RT_generic2 (HDR)
-
-    m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);     // TODO: Get from Device
-
-    Msg("  ✓ Created remaining legacy RTs (Accumulator, Generic0/1/2, Backbuffer)");
-    Msg("  ✓ Total: 10 render targets (6 native: G-Buffer + Menu, 4 legacy)");
-
-    // ═══════════════════════════════════════════════════════
-    //  SETUP PASSES (ONCE) - PROTOTYPE FOR NOW
-    // ═══════════════════════════════════════════════════════
-    // NOTE: This creates prototype GBuffer pass with its own RTs
-    // Week 15-16 will make this dynamic and use vanilla RTs
-
-    m_gbufferPass->Setup(*m_framegraph);
-    auto gbufferOutputs = m_gbufferPass->GetOutputs();
-
-    // Setup HUD pass (always registered, even if no HUD batches yet)
-    // HUD shares GBuffer outputs and MaterialCache (set per-frame in SetupFrameGraphPasses)
-    m_hudPass->SetOutputs(gbufferOutputs);
-    m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
-    m_hudPass->Setup(*m_framegraph);
-
-    // Setup Particle pass (always registered, renders after HUD)
-    // Particles share GBuffer outputs, render both world and HUD particles
-    m_particlePass->SetOutputs(gbufferOutputs);
-    m_particlePass->Setup(*m_framegraph);
-
-    // Setup UI rendering passes (5-step pipeline - works for menu AND in-game)
-    // Step 1: Render UI sprites/widgets to rt_MenuMain (TODO: rename to rt_UIMain)
-    m_uiPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_uiPass->Setup(*m_framegraph);
-
-    // Step 2: Render text/fonts on top of UI (same RT)
-    m_textPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_textPass->Setup(*m_framegraph);
-
-    // Step 3: Render cursor on top of UI + text (same RT)
-    m_cursorPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_cursorPass->Setup(*m_framegraph);
-
-    // Step 4: Render distortion mask to rt_MenuDistort
-    m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
-    m_menuDistortPass->Setup(*m_framegraph);
-
-    // Step 5: Composite UI (rt_MenuMain) over 3D scene (gbuffer albedo) to final output
-    // SetInputs takes (sceneRT, uiRT) - composite UI layer over scene
-    m_menuCompositePass->SetInputs(gbufferOutputs.albedo, m_rt_MenuMain);
-    m_menuCompositePass->SetOutput(m_rt_FinalComposite);  // Output to separate composite RT
-    m_menuCompositePass->Setup(*m_framegraph);
-
-    // ═══════════════════════════════════════════════════════
-    //  REGISTER RENDER TARGETS IN REGISTRY (Week 14)
-    // ═══════════════════════════════════════════════════════
-
-    Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
-    auto& registry = m_framegraph->GetRTRegistry();
-
-    // ─── VANILLA G-BUFFER TARGETS ───
-
-    // rt_Position (r2_RT_P) - World space position
-    registry.RegisterRT("rt_Position", m_rt_Position);
-    registry.RegisterAliases(m_rt_Position, {
-        "$user$position",  // Shader output target name
-        "s_position"       // Shader input sampler name
-    });
-
-    // rt_Normal (r2_RT_N) - View space normal
-    registry.RegisterRT("rt_Normal", m_rt_Normal);
-    registry.RegisterAliases(m_rt_Normal, {
-        "s_normal",
-        "s_nmap"
-    });
-
-    // rt_Albedo (r2_RT_albedo) - Diffuse color
-    registry.RegisterRT("rt_Albedo", m_rt_Albedo);
-    registry.RegisterRT("rt_Color", m_rt_Albedo);  // Legacy alias
-    registry.RegisterAliases(m_rt_Albedo, {
-        "$user$albedo",    // Shader output target name
-        "s_albedo",        // Shader input sampler name
-        "s_diffuse",
-        "s_image",
-        "s_base"
-    });
-
-    // rt_Depth (r2_RT_base_depth) - Depth/stencil
-    registry.RegisterRT("rt_Depth", m_rt_Depth);
-    registry.RegisterAliases(m_rt_Depth, {
-        "$user$base_depth",  // Shader output target name
-        "s_depth"            // Shader input sampler name
-    });
-
-    // ─── VANILLA LIGHTING TARGETS ───
-
-    // rt_Accumulator (r2_RT_accum) - HDR lighting accumulation
-    registry.RegisterRT("rt_Accumulator", m_rt_Accumulator);
-    registry.RegisterAliases(m_rt_Accumulator, {
-        "s_accumulator",
-        "s_acc"
-    });
-
-    // ─── VANILLA POST-PROCESSING TARGETS ───
-
-    // rt_Generic_0/1/2 (r2_RT_generic0/1/2) - Generic targets for combine/post-processing
-    registry.RegisterRT("rt_Generic_0", m_rt_Generic_0);
-    registry.RegisterAliases(m_rt_Generic_0, {
-        "$user$generic0",  // Shader output target name
-        "s_generic0"       // Shader input sampler name
-    });
-
-    registry.RegisterRT("rt_Generic_1", m_rt_Generic_1);
-    registry.RegisterAliases(m_rt_Generic_1, {
-        "$user$generic1",  // Shader output target name
-        "s_generic1"       // Shader input sampler name
-    });
-
-    registry.RegisterRT("rt_Generic_2", m_rt_Generic_2);
-    registry.RegisterAliases(m_rt_Generic_2, {
-        "s_generic2"
-    });
-
-    // ─── MENU TARGETS ───
-
-    // rt_MenuMain - Main menu UI rendering target
-    registry.RegisterRT("rt_MenuMain", m_rt_MenuMain);
-    registry.RegisterAliases(m_rt_MenuMain, {
-        "$user$menu_main",  // Shader output target name
-        "s_menu_main"       // Shader input sampler name
-    });
-
-    // rt_MenuDistort - Menu distortion/post-process mask
-    registry.RegisterRT("rt_MenuDistort", m_rt_MenuDistort);
-    registry.RegisterAliases(m_rt_MenuDistort, {
-        "$user$menu_distort",  // Shader output target name
-        "s_menu_distort"       // Shader input sampler name
-    });
-
-    // ─── BACKBUFFER ───
-
-    registry.RegisterRT("rt_Backbuffer", m_backbuffer);
-    registry.RegisterAliases(m_backbuffer, {
-        "s_backbuffer",
-        "s_screen"
-    });
-
-    // ─── PROTOTYPE GBUFFER (TEMPORARY - Week 15-16 will remove) ───
-
-    // Keep prototype GBufferPass outputs registered for now (used by current test rendering)
-    registry.RegisterRT("GBuffer.Albedo", gbufferOutputs.albedo);
-    registry.RegisterRT("GBuffer.Normal", gbufferOutputs.normal);
-    registry.RegisterRT("GBuffer.Material", gbufferOutputs.material);
-    registry.RegisterRT("GBuffer.Depth", gbufferOutputs.depth);
-
-    // Print registry for debugging
-    registry.PrintRegistry();
-
-    // Store final output for presenting to backbuffer
-    // Use rt_FinalComposite which will contain scene + UI composited together
-    m_finalOutput = m_rt_FinalComposite;
-}
-
-// ═══════════════════════════════════════════════════════
 //  SETUP FRAMEGRAPH PASSES (CALLED PER-FRAME)
 // ═══════════════════════════════════════════════════════
 
 void FrameGraphRenderer::SetupFrameGraphPasses() {
     // ═══════════════════════════════════════════════════════
-    //  DYNAMIC PASS ROUTING (Week 16)
+    //  LAMBDA-BASED PASS SETUP (NEW ARCHITECTURE)
     // ═══════════════════════════════════════════════════════
-    // Scan materials and route batches to appropriate passes
+    // ALL passes now use lambda pattern - executed by FrameGraph
 
-    // Scan materials and create required passes
-    CreateAllRequiredPasses();
+    const u32 width = Device.dwWidth;
+    const u32 height = Device.dwHeight;
 
-    // Route batches to appropriate passes
-    RouteBatchesToPasses();
+    // 1. GBuffer Pass - Renders world geometry
+    framegraph::VirtualResourceHandle depthBuffer;  // Start with no depth (GBuffer creates it)
+    auto gbufferOutputs = passes::setupGBufferPass(
+        *m_framegraph,
+        m_device,
+        depthBuffer,
+        m_geometryCollector.get(),
+        m_materialCache.get(),
+        width,
+        height
+    );
 
-    // ═══════════════════════════════════════════════════════
-    //  HUD PASS SETUP (PER-FRAME)
-    // ═══════════════════════════════════════════════════════
-    // HUD pass is always registered (in BuildFrameGraphStructure)
-    // Just set batches here - pass will skip execution if empty
+    // 2. HUD Pass - TEMPORARILY DISABLED (vertex layout issues to fix)
+    // auto hudOutputs = passes::setupHUDPass(...);
+    // For now, skip HUD and use GBuffer output directly
 
-    m_hudPass->SetHUDBatches(&m_hudBatches);
+    // Skip lighting/postprocess for now (not implemented)
+    // 3. Would be: Lighting Pass
+    // 4. Would be: Tonemap Pass
 
-    // ═══════════════════════════════════════════════════════
-    //  PARTICLE PASS SETUP (PER-FRAME)
-    // ═══════════════════════════════════════════════════════
-    // Particle pass is always registered (in BuildFrameGraphStructure)
-    // Set both world and HUD particle batches - pass will skip execution if both empty
+    // 5. UI Pass - Renders 2D UI to separate target
+    auto uiTarget = passes::setupUIPass(
+        *m_framegraph,
+        width,
+        height
+    );
 
-    m_particlePass->SetWorldParticleBatches(&m_worldParticleBatches);
-    m_particlePass->SetHUDParticleBatches(&m_hudParticleBatches);
+    // 6. Text Pass - Renders text on top of UI
+    uiTarget = passes::setupTextPass(
+        *m_framegraph,
+        uiTarget,
+        width,
+        height
+    );
 
-    // TODO: Week 15-16 will add dynamic pass creation here
-    // For now, we just route to existing GBufferPass
+    // 7. Cursor Pass - Renders cursor on top of UI+Text
+    uiTarget = passes::setupCursorPass(
+        *m_framegraph,
+        uiTarget,
+        width,
+        height
+    );
+
+    // 8. Composite Pass - Combines scene (GBuffer only, no HUD yet) with UI layer
+    auto compositeOutput = passes::setupCompositePass(
+        *m_framegraph,
+        gbufferOutputs.albedo,  // Scene input (GBuffer only for now)
+        uiTarget,               // UI layer
+        width,
+        height
+    );
+
+    // 9. ImGui Pass - Renders debug UI on top of everything
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    auto finalOutput = passes::setupImGuiPass(
+        *m_framegraph,
+        compositeOutput,
+        imguiRenderer,
+        width,
+        height
+    );
+
+    // Store final output for presentation
+    m_finalOutput = finalOutput;
+
+    // OLD SYSTEM - DISABLED
+    // All passes now use lambda pattern, no need for old routing
+    // CreateAllRequiredPasses();  // REMOVED
+    // RouteBatchesToPasses();     // REMOVED
 }
 
 void FrameGraphRenderer::PrintStats() const {
@@ -1629,8 +1451,9 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
 
         switch (phase) {
             case framegraph::RenderPhase::Geometry:
-                // Assign to GBufferPass
-                m_gbufferPass->SetBatches(phaseBatches);
+                // DEPRECATED: Old class-based GBufferPass removed (using lambda-based pass now)
+                // Batches are passed directly to setupGBufferPass() via GeometryCollector
+                //m_gbufferPass->SetBatches(phaseBatches);
                 break;
 
             case framegraph::RenderPhase::Lighting:

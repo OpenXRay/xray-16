@@ -20,7 +20,7 @@ namespace xray::render::framegraph {
 //
 class VolatileConstantBufferPool {
 public:
-    VolatileConstantBufferPool(ng::RenderDevice* device);
+    VolatileConstantBufferPool();
     ~VolatileConstantBufferPool();
 
     // ═══════════════════════════════════════════════════
@@ -79,8 +79,6 @@ public:
     void LogStats() const;
 
 private:
-    ng::RenderDevice* m_device;
-
     // Map from layout to VCB
     xr_map<CBLayout, ng::BufferHandle> m_vcbs;
 

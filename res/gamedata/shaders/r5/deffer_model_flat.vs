@@ -4,21 +4,21 @@
 v2p_flat _main( v_model I )
 {
 	// world-space  N
-	float3 	N_w	= mul( m_W, I.N );
+	float3 	N_w	= mul( (float3x3)m_W, I.N.xyz );
 
 	// Eye-space pos/normal
 	v2p_flat 		O;
 	float3	Pe	= mul( m_WV, I.P );
 	O.hpos 		= mul( m_WVP, I.P );
-	O.N 		= mul( (float3x3)m_WV, (float3)I.N );
+	O.N 		= mul( (float3x3)m_WV, I.N.xyz );
 
-	O.tcdh 		= float4( I.tc.xyyy	);
-	
+	O.tcdh 		= I.tc.xy;
+
 	//  Hemi cube lighting
-	float3	Nw	= mul		((float3x3)m_W, (float3)I.N);
-	float3  hc_pos	= (float3)hemi_cube_pos_faces;
-	float3	hc_neg	= (float3)hemi_cube_neg_faces;
-	float3  hc_mixed= (Nw < 0) ? hc_neg : hc_pos;
+	float3	Nw	= mul( (float3x3)m_W, I.N.xyz );
+	float3  hc_pos	= hemi_cube_pos_faces.xyz;
+	float3	hc_neg	= hemi_cube_neg_faces.xyz;
+	float3  hc_mixed= select(hc_pos, hc_neg, Nw < 0);
 	float	hemi_val= dot( hc_mixed, abs(Nw) );
 	hemi_val	= saturate(hemi_val);
 

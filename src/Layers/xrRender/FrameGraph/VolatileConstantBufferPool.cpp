@@ -1,13 +1,12 @@
 // xrRender/FrameGraph/VolatileConstantBufferPool.cpp
 #include "stdafx.h"
 #include "VolatileConstantBufferPool.h"
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
 
 namespace xray::render::framegraph {
 
-VolatileConstantBufferPool::VolatileConstantBufferPool(ng::RenderDevice* device)
-    : m_device(device)
+VolatileConstantBufferPool::VolatileConstantBufferPool()
 {
-    VERIFY(m_device != nullptr);
     Msg("* [VCBPool] Created");
 }
 
@@ -47,7 +46,7 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     xr_sprintf(debugName, "VCB_%s_b%u_%ub", layout.name.c_str(), layout.slot, layout.size);
     cbDesc.debugName = debugName;
 
-    ng::BufferHandle vcb = m_device->CreateBuffer(cbDesc);
+    ng::BufferHandle vcb = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateBuffer(cbDesc);
 
     if (!vcb.IsValid())
     {

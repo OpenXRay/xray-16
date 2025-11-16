@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SamplerCache.h"
 #include "../RenderContext/RenderDevice.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 // Sampler Cache Implementation
 // Week 2 - Day 4: Task 4.3
@@ -42,6 +43,7 @@ SamplerCache::SamplerCache(xray::render::ng::RenderDevice* device)
 }
 
 SamplerCache::~SamplerCache() {
+    VERIFY(m_device);
     Msg("! [SamplerCache] Destroyed (cached %u samplers)", GetCacheSize());
 }
 
@@ -107,7 +109,8 @@ SamplerHandle SamplerCache::GetSampler(const SamplerDesc& desc) {
         m_device->GetNativeDevice()->createSampler(nvrhiDesc);
 
     if (!nvrhiSampler) {
-        Msg("! [SamplerCache] ❌ Failed to create sampler");
+        VERIFY(m_device);
+    Msg("! [SamplerCache] ❌ Failed to create sampler");
         return SamplerHandle();
     }
 
@@ -118,6 +121,7 @@ SamplerHandle SamplerCache::GetSampler(const SamplerDesc& desc) {
     SamplerHandle handle(index, 0);
     m_cache[hash] = handle;
 
+    VERIFY(m_device);
     Msg("! [SamplerCache] Created sampler (hash=0x%llX, index=%u)", hash, index);
 
     return handle;

@@ -91,7 +91,7 @@ void ComputePatchVertex(float3 P[3], float3 N[3], float3 uvw, in PNPatch patch, 
 			patch.f3N101 * w * v;
 }
 
-sampler 	smp_bump_ds;		//	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
+SamplerState smp_bump_ds;		//	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
 Texture2D 	s_tbump;             	//
 Texture2D 	s_tbumpX;                //
 Texture2D 	s_tdetailBumpX;          //	Error for bump detail

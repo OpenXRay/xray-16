@@ -34,7 +34,7 @@ struct HUDPassConfig {
 
 class HUDPass : public framegraph::IPass {
 public:
-    HUDPass(ng::RenderDevice* device, const HUDPassConfig& config);
+    HUDPass(const HUDPassConfig& config);
     ~HUDPass() override;
 
     // IPass interface
@@ -52,7 +52,6 @@ public:
     void SetOutputs(const framegraph::DefaultOutputLayout& outputs) { m_outputs = outputs; }
 
 private:
-    ng::RenderDevice* m_device = nullptr;
     HUDPassConfig m_config;
 
     // HUD batches (owned by FrameGraphRenderer)
