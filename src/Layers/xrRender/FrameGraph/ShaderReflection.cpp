@@ -6,6 +6,93 @@
 
 namespace xray::render::framegraph {
 
+namespace {
+
+ShaderConstant::Type DetectConstantType(
+    slang::TypeLayoutReflection* typeLayout,
+    u16& outElementSize,
+    u16& outMatrixStride,
+    u16& outArrayCount)
+{
+    if (!typeLayout) {
+        outElementSize = 0;
+        outArrayCount = 1;
+        outMatrixStride = 0;
+        return ShaderConstant::Type::Struct;
+    }
+
+    auto* type = typeLayout->getType();
+    if (!type) {
+        outElementSize = static_cast<u16>(typeLayout->getSize());
+        outArrayCount = 1;
+        outMatrixStride = 0;
+        return ShaderConstant::Type::Struct;
+    }
+
+    slang::TypeReflection::Kind kind = type->getKind();
+
+    switch (kind) {
+        case slang::TypeReflection::Kind::Scalar: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Scalar;
+        }
+
+        case slang::TypeReflection::Kind::Vector: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Vector;
+        }
+
+        case slang::TypeReflection::Kind::Matrix: {
+            auto rowCount = type->getRowCount();
+            auto colCount = type->getColumnCount();
+
+            outMatrixStride = static_cast<u16>(typeLayout->getStride(slang::ParameterCategory::Uniform));
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+
+            if (rowCount == 3 && colCount == 4) {
+                return ShaderConstant::Type::Matrix3x4;
+            } else if (rowCount == 4 && colCount == 4) {
+                return ShaderConstant::Type::Matrix4x4;
+            }
+
+            Msg("! [DetectConstantType] Unsupported matrix dimensions: %dx%d",
+                rowCount, colCount);
+            return ShaderConstant::Type::Struct;
+        }
+
+        case slang::TypeReflection::Kind::Array: {
+            auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+
+            outArrayCount = static_cast<u16>(typeLayout->getElementCount());
+            outElementSize = elementTypeLayout ? static_cast<u16>(elementTypeLayout->getSize()) : 0;
+            outMatrixStride = 0;
+
+            if (elementTypeLayout) {
+                auto* elementType = elementTypeLayout->getType();
+                if (elementType && elementType->getKind() == slang::TypeReflection::Kind::Matrix) {
+                    outMatrixStride = static_cast<u16>(elementTypeLayout->getStride(slang::ParameterCategory::Uniform));
+                }
+            }
+
+            return ShaderConstant::Type::Array;
+        }
+
+        default: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Struct;
+        }
+    }
+}
+
+}
+
 nvrhi::Format GetFormatFromSlangType(slang::TypeReflection* type) {
     if (!type)
         return nvrhi::Format::UNKNOWN;
@@ -315,7 +402,16 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
                 constant.offset = (u32)fieldLayout->getOffset(slang::ParameterCategory::Uniform);
 
                 auto* fieldTypeLayout = fieldLayout->getTypeLayout();
-                constant.size = fieldTypeLayout ? (u32)fieldTypeLayout->getSize() : 0;
+                constant.type = DetectConstantType(
+                    fieldTypeLayout,
+                    constant.elementSize,
+                    constant.matrixStride,
+                    constant.arrayCount
+                );
+
+                constant.size = (constant.arrayCount > 1)
+                    ? (constant.elementSize * constant.arrayCount)
+                    : (fieldTypeLayout ? (u32)fieldTypeLayout->getSize() : 0);
                 constant.cbIndex = cbIdx;
 
                 constant.frequency = InferConstantFrequency(fieldName, cbInfo.name);
@@ -328,6 +424,85 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
         if (!foundMatchingParam) {
             Msg("  [AnalyzeConstantLayout]   WARNING: No matching parameter found for CB '%s'", cbInfo.name);
+        }
+    }
+
+    auto* globalParamsLayout = reflection->getGlobalParamsTypeLayout();
+
+    if (globalParamsLayout) {
+        auto* globalParamsType = globalParamsLayout->getType();
+        if (globalParamsType) {
+            u32 fieldCount = globalParamsType->getFieldCount();
+
+            if (fieldCount > 0) {
+                Msg("  [AnalyzeConstantLayout] Found %u loose constants -> implicit $Globals CB", fieldCount);
+
+                ConstantBufferInfo implicitCB;
+                implicitCB.name = "$Globals";
+
+                auto* globalParamsVar = reflection->getGlobalParamsVarLayout();
+
+                if (globalParamsVar) {
+                    implicitCB.slot = static_cast<u32>(globalParamsVar->getOffset(slang::ParameterCategory::ConstantBuffer));
+                    Msg("    [AnalyzeConstantLayout] $Globals binding: b%u (from reflection)", implicitCB.slot);
+                } else {
+                    implicitCB.slot = 0;
+                    Msg("    [AnalyzeConstantLayout] $Globals binding: b0 (fallback - Slang didn't provide slot)");
+                }
+
+                implicitCB.size = static_cast<u32>(globalParamsLayout->getSize());
+
+                u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
+                layout.constantBuffers.buffers.push_back(implicitCB);
+
+                for (u32 i = 0; i < fieldCount; ++i) {
+                    auto* field = globalParamsType->getFieldByIndex(i);
+                    auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
+
+                    if (!field || !fieldLayout) continue;
+
+                    const char* fieldName = field->getName();
+                    if (!fieldName) continue;
+
+                    ShaderConstant constant;
+                    constant.name = fieldName;
+                    constant.offset = static_cast<u32>(fieldLayout->getOffset(slang::ParameterCategory::Uniform));
+                    constant.cbIndex = cbIndex;
+
+                    auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                    constant.type = DetectConstantType(
+                        fieldTypeLayout,
+                        constant.elementSize,
+                        constant.matrixStride,
+                        constant.arrayCount
+                    );
+
+                    constant.size = (constant.arrayCount > 1)
+                        ? (constant.elementSize * constant.arrayCount)
+                        : static_cast<u32>(fieldTypeLayout ? fieldTypeLayout->getSize() : 0);
+
+                    constant.frequency = InferConstantFrequency(fieldName, "$Globals");
+                    constant.persistence = ConstantPersistence::Volatile;
+
+                    layout.constants.push_back(constant);
+
+                    const char* typeStr = "unknown";
+                    switch (constant.type) {
+                        case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
+                        case ShaderConstant::Type::Vector: typeStr = "vector"; break;
+                        case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
+                        case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
+                        case ShaderConstant::Type::Array: typeStr = "array"; break;
+                        case ShaderConstant::Type::Struct: typeStr = "struct"; break;
+                    }
+
+                    Msg("    [AnalyzeConstantLayout] Loose constant: %s (type=%s, offset=%u, size=%u, freq=%d)",
+                        fieldName, typeStr, constant.offset, constant.size,
+                        static_cast<int>(constant.frequency));
+                }
+            } else {
+                Msg("  [AnalyzeConstantLayout] No loose constants found (shader uses explicit cbuffers)");
+            }
         }
     }
 

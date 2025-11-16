@@ -84,13 +84,29 @@ void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
         return;
     }
 
-    if (constant->size != 64) {
-        Msg("! [FGConstantSystem] Size mismatch for '%s': expected %u, got 64",
-            name, constant->size);
+    if (!constant->IsMatrix()) {
+        Msg("! [FGConstantSystem] Constant '%s' is not a matrix (type=%d)",
+            name, (int)constant->type);
         return;
     }
 
-    WriteConstant(constant, &value, 64);
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+
+    if (constant->IsMatrix3x4()) {
+        WriteMatrix3x4(stagingBuffer + constant->offset, value);
+    } else if (constant->IsMatrix4x4()) {
+        WriteMatrix4x4(stagingBuffer + constant->offset, value);
+    } else {
+        Msg("! [FGConstantSystem] Unknown matrix type for '%s'", name);
+        return;
+    }
+
+    switch (constant->frequency) {
+        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
+        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
+        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
+        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
+    }
 }
 
 void FGConstantSystem::SetStatic(const char* name, float value) {
@@ -154,13 +170,102 @@ void FGConstantSystem::SetStatic(const char* name, const Fmatrix& value) {
         return;
     }
 
-    if (constant->size != 64) {
-        Msg("! [FGConstantSystem::SetStatic] Size mismatch for '%s': expected %u, got 64",
-            name, constant->size);
+    if (!constant->IsMatrix()) {
+        Msg("! [FGConstantSystem::SetStatic] Constant '%s' is not a matrix", name);
         return;
     }
 
-    WriteStaticConstant(constant, &value, 64);
+    if (constant->IsMatrix3x4()) {
+        WriteMatrix3x4(m_staticConstants + constant->offset, value);
+    } else if (constant->IsMatrix4x4()) {
+        WriteMatrix4x4(m_staticConstants + constant->offset, value);
+    }
+
+    m_dirtyStatic = ~0ull;
+}
+
+void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 count) {
+    const ShaderConstant* constant = m_pso->FindConstant(name);
+    if (!constant) {
+        Msg("! [FGConstantSystem] Array constant '%s' not found", name);
+        return;
+    }
+
+    if (!constant->IsArray()) {
+        Msg("! [FGConstantSystem] Constant '%s' is not an array", name);
+        return;
+    }
+
+    if (count > constant->arrayCount) {
+        Msg("! [FGConstantSystem] Array size mismatch for '%s': writing %u, shader expects %u",
+            name, count, constant->arrayCount);
+        count = constant->arrayCount;
+    }
+
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+    u8* dest = stagingBuffer + constant->offset;
+
+    if (constant->elementSize == 48) {
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix3x4(dest, values[i]);
+            dest += 48;
+        }
+    } else if (constant->elementSize == 64) {
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix4x4(dest, values[i]);
+            dest += 64;
+        }
+    } else {
+        Msg("! [FGConstantSystem] Unknown matrix element size %u for array '%s'",
+            constant->elementSize, name);
+        return;
+    }
+
+    switch (constant->frequency) {
+        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
+        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
+        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
+        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
+    }
+}
+
+void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u32 count) {
+    const ShaderConstant* constant = m_pso->FindConstant(name);
+    if (!constant) {
+        Msg("! [FGConstantSystem::SetStaticArray] Array constant '%s' not found", name);
+        return;
+    }
+
+    if (!constant->IsArray()) {
+        Msg("! [FGConstantSystem::SetStaticArray] Constant '%s' is not an array", name);
+        return;
+    }
+
+    if (count > constant->arrayCount) {
+        Msg("! [FGConstantSystem::SetStaticArray] Array size mismatch for '%s': writing %u, shader expects %u",
+            name, count, constant->arrayCount);
+        count = constant->arrayCount;
+    }
+
+    u8* dest = m_staticConstants + constant->offset;
+
+    if (constant->elementSize == 48) {
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix3x4(dest, values[i]);
+            dest += 48;
+        }
+    } else if (constant->elementSize == 64) {
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix4x4(dest, values[i]);
+            dest += 64;
+        }
+    } else {
+        Msg("! [FGConstantSystem::SetStaticArray] Unknown matrix element size %u for array '%s'",
+            constant->elementSize, name);
+        return;
+    }
+
+    m_dirtyStatic = ~0ull;
 }
 
 void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
@@ -338,6 +443,31 @@ void FGConstantSystem::WriteStaticConstant(const ShaderConstant* constant, const
     memcpy(m_staticConstants + constant->offset, data, size);
 
     m_dirtyStatic = ~0ull;
+}
+
+void FGConstantSystem::WriteMatrix3x4(u8* dest, const Fmatrix& src) {
+
+    float* out = (float*)dest;
+
+    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
+
+    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
+
+    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
+
+}
+
+void FGConstantSystem::WriteMatrix4x4(u8* dest, const Fmatrix& src) {
+
+    float* out = (float*)dest;
+
+    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
+
+    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
+
+    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
+
+    out[12] = src._41;  out[13] = src._42;  out[14] = src._43;  out[15] = src._44;
 }
 
 bool FGConstantSystem::ValidateBindings() const {

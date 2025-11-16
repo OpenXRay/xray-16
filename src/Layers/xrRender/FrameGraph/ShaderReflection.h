@@ -215,6 +215,25 @@ struct ShaderConstant {
     ConstantPersistence persistence;
     u16 cbIndex;
 
+    enum class Type : u8 {
+        Scalar,
+        Vector,
+        Matrix3x4,
+        Matrix4x4,
+        Struct,
+        Array
+    };
+
+    Type type = Type::Scalar;
+    u16 arrayCount = 1;
+    u16 elementSize = 0;
+    u16 matrixStride = 0;
+
+    bool IsArray() const { return arrayCount > 1; }
+    bool IsMatrix() const { return type == Type::Matrix3x4 || type == Type::Matrix4x4; }
+    bool IsMatrix3x4() const { return type == Type::Matrix3x4; }
+    bool IsMatrix4x4() const { return type == Type::Matrix4x4; }
+
     ShaderConstant()
         : offset(0), size(0), frequency(UpdateFrequency::Instance)
         , persistence(ConstantPersistence::Volatile), cbIndex(0) {}

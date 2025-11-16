@@ -199,6 +199,11 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
         writer->w_u8(static_cast<u8>(constant.frequency));
         writer->w_u8(static_cast<u8>(constant.persistence));
         writer->w_u16(constant.cbIndex);
+
+        writer->w_u8(static_cast<u8>(constant.type));
+        writer->w_u16(constant.arrayCount);
+        writer->w_u16(constant.elementSize);
+        writer->w_u16(constant.matrixStride);
     }
 
     writer->w_u32(static_cast<u32>(reflection.rtBindings.phase));
@@ -306,6 +311,11 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             constant.frequency = static_cast<UpdateFrequency>(reader->r_u8());
             constant.persistence = static_cast<ConstantPersistence>(reader->r_u8());
             constant.cbIndex = reader->r_u16();
+
+            constant.type = (ShaderConstant::Type)reader->r_u8();
+            constant.arrayCount = reader->r_u16();
+            constant.elementSize = reader->r_u16();
+            constant.matrixStride = reader->r_u16();
         }
 
         outReflection.constantLayout.constantBuffers = outReflection.constantBuffers;

@@ -18,6 +18,8 @@ public:
     void Set(const char* name, const Fvector4& value);
     void Set(const char* name, const Fmatrix& value);
 
+    void SetArray(const char* name, const Fmatrix* values, u32 count);
+
     void CommitEngine(ng::RenderContext* ctx);
     void CommitPass(ng::RenderContext* ctx);
     void CommitMaterial(ng::RenderContext* ctx);
@@ -30,6 +32,8 @@ public:
     void SetStatic(const char* name, const Fvector& value);
     void SetStatic(const char* name, const Fvector4& value);
     void SetStatic(const char* name, const Fmatrix& value);
+
+    void SetStaticArray(const char* name, const Fmatrix* values, u32 count);
 
     void CommitStatic(ng::RenderContext* ctx);
 
@@ -65,6 +69,9 @@ private:
     void SetDirtyBit(UpdateFrequency freq, u32 constantIndex);
 
     void WriteStaticConstant(const ShaderConstant* constant, const void* data, u32 size);
+
+    void WriteMatrix3x4(u8* dest, const Fmatrix& src);
+    void WriteMatrix4x4(u8* dest, const Fmatrix& src);
 };
 
 }

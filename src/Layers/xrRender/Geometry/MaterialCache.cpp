@@ -49,6 +49,190 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
     return nvrhi::Format::UNKNOWN;
 }
 
+#ifdef DEBUG
+static void LogConstantLayout(const framegraph::ShaderConstantLayout& layout, const char* shaderName) {
+    using namespace framegraph;
+
+    Msg("═══════════════════════════════════════════════════");
+    Msg("Shader Constant Layout: %s", shaderName);
+    Msg("═══════════════════════════════════════════════════");
+
+    for (const auto& cb : layout.constantBuffers.buffers) {
+        Msg("  CB: %s (slot=b%u, size=%u bytes)",
+            cb.name.c_str(), cb.slot, cb.size);
+    }
+
+    Msg("---------------------------------------------------");
+
+    for (const auto& constant : layout.constants) {
+        if (constant.cbIndex >= layout.constantBuffers.buffers.size()) {
+            Msg("    - %s: ERROR - invalid cbIndex %u", constant.name.c_str(), constant.cbIndex);
+            continue;
+        }
+
+        const auto& cb = layout.constantBuffers.buffers[constant.cbIndex];
+
+        const char* typeStr = "unknown";
+        switch (constant.type) {
+            case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
+            case ShaderConstant::Type::Vector: typeStr = "vector"; break;
+            case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
+            case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
+            case ShaderConstant::Type::Array: typeStr = "array"; break;
+            case ShaderConstant::Type::Struct: typeStr = "struct"; break;
+        }
+
+        if (constant.IsArray()) {
+            Msg("    - %s[%u]: cb=%s, type=%s, offset=%u, elemSize=%u, totalSize=%u, freq=%d",
+                constant.name.c_str(), constant.arrayCount, cb.name.c_str(),
+                typeStr, constant.offset, constant.elementSize, constant.size,
+                static_cast<int>(constant.frequency));
+        } else if (constant.IsMatrix()) {
+            Msg("    - %s: cb=%s, type=%s, offset=%u, size=%u, stride=%u, freq=%d",
+                constant.name.c_str(), cb.name.c_str(), typeStr,
+                constant.offset, constant.size, constant.matrixStride,
+                static_cast<int>(constant.frequency));
+        } else {
+            Msg("    - %s: cb=%s, type=%s, offset=%u, size=%u, freq=%d",
+                constant.name.c_str(), cb.name.c_str(), typeStr,
+                constant.offset, constant.size, static_cast<int>(constant.frequency));
+        }
+    }
+
+    Msg("═══════════════════════════════════════════════════");
+}
+#endif
+
+
+framegraph::ShaderConstantLayout MergeConstantLayouts(
+    const framegraph::ShaderConstantLayout& vsLayout,
+    const framegraph::ShaderConstantLayout& psLayout)
+{
+    using namespace framegraph;
+
+    ShaderConstantLayout merged;
+
+    struct CBDeduplicationInfo {
+        shared_str name;
+        u32 vsSlot = UINT32_MAX;
+        u32 psSlot = UINT32_MAX;
+        u32 size = 0;
+        u16 mergedIndex = 0;
+    };
+
+    xr_map<shared_str, CBDeduplicationInfo> uniqueCBs;
+
+    for (const auto& cb : vsLayout.constantBuffers.buffers) {
+        auto& unique = uniqueCBs[cb.name];
+        unique.name = cb.name;
+        unique.vsSlot = cb.slot;
+        unique.size = std::max(unique.size, cb.size);
+    }
+
+    for (const auto& cb : psLayout.constantBuffers.buffers) {
+        auto& unique = uniqueCBs[cb.name];
+        unique.name = cb.name;
+        unique.psSlot = cb.slot;
+        unique.size = std::max(unique.size, cb.size);
+    }
+
+    u16 mergedIndex = 0;
+    for (auto& [cbName, cbInfo] : uniqueCBs) {
+        cbInfo.mergedIndex = mergedIndex++;
+
+        ConstantBufferInfo mergedCB;
+        mergedCB.name = cbInfo.name;
+        mergedCB.size = cbInfo.size;
+        mergedCB.slot = (cbInfo.vsSlot != UINT32_MAX) ? cbInfo.vsSlot : cbInfo.psSlot;
+
+        merged.constantBuffers.buffers.push_back(mergedCB);
+
+        Msg("  [MergeConstantLayouts] Merged CB: %s (vsSlot=%s, psSlot=%s, size=%u, mergedIdx=%u)",
+            cbInfo.name.c_str(),
+            (cbInfo.vsSlot != UINT32_MAX) ? make_string("b%u", cbInfo.vsSlot).c_str() : "none",
+            (cbInfo.psSlot != UINT32_MAX) ? make_string("b%u", cbInfo.psSlot).c_str() : "none",
+            cbInfo.size, cbInfo.mergedIndex);
+    }
+
+    xr_map<u16, u16> vsIndexToMerged;
+
+    for (u16 vsIdx = 0; vsIdx < vsLayout.constantBuffers.buffers.size(); ++vsIdx) {
+        const auto& vsCB = vsLayout.constantBuffers.buffers[vsIdx];
+
+        auto it = uniqueCBs.find(vsCB.name);
+        if (it != uniqueCBs.end()) {
+            vsIndexToMerged[vsIdx] = it->second.mergedIndex;
+        }
+    }
+
+    xr_map<u16, u16> psIndexToMerged;
+
+    for (u16 psIdx = 0; psIdx < psLayout.constantBuffers.buffers.size(); ++psIdx) {
+        const auto& psCB = psLayout.constantBuffers.buffers[psIdx];
+
+        auto it = uniqueCBs.find(psCB.name);
+        if (it != uniqueCBs.end()) {
+            psIndexToMerged[psIdx] = it->second.mergedIndex;
+        }
+    }
+
+    for (const auto& vsConstant : vsLayout.constants) {
+        ShaderConstant mergedConstant = vsConstant;
+
+        auto it = vsIndexToMerged.find(vsConstant.cbIndex);
+        if (it != vsIndexToMerged.end()) {
+            mergedConstant.cbIndex = it->second;
+        }
+        else {
+            Msg("! [MergeConstantLayouts] WARNING: VS constant '%s' has unmapped cbIndex %u",
+                vsConstant.name.c_str(), vsConstant.cbIndex);
+        }
+
+        merged.constants.push_back(mergedConstant);
+    }
+
+    for (const auto& psConstant : psLayout.constants) {
+        bool isDuplicate = false;
+        for (const auto& existingConstant : merged.constants) {
+            if (existingConstant.name == psConstant.name) {
+                isDuplicate = true;
+
+                if (existingConstant.offset != psConstant.offset ||
+                    existingConstant.size != psConstant.size) {
+                    Msg("! [MergeConstantLayouts] WARNING: Constant '%s' differs between VS and PS",
+                        psConstant.name.c_str());
+                    Msg("    VS: offset=%u, size=%u", existingConstant.offset, existingConstant.size);
+                    Msg("    PS: offset=%u, size=%u", psConstant.offset, psConstant.size);
+                }
+
+                break;
+            }
+        }
+
+        if (isDuplicate) {
+            continue;
+        }
+
+        ShaderConstant mergedConstant = psConstant;
+
+        auto it = psIndexToMerged.find(psConstant.cbIndex);
+        if (it != psIndexToMerged.end()) {
+            mergedConstant.cbIndex = it->second;
+        }
+        else {
+            Msg("! [MergeConstantLayouts] WARNING: PS constant '%s' has unmapped cbIndex %u",
+                psConstant.name.c_str(), psConstant.cbIndex);
+        }
+
+        merged.constants.push_back(mergedConstant);
+    }
+
+    Msg("  [MergeConstantLayouts] Result: %u unique CBs, %u total constants",
+        merged.constantBuffers.buffers.size(), merged.constants.size());
+
+    return merged;
+}
+
 MaterialCache::MaterialCache(
     ng::RenderDevice* device,
     resources::FGResourceManager* resourceManager,
@@ -229,35 +413,31 @@ MaterialPSO* MaterialCache::CreatePSO(
         }
     }
 
+    framegraph::ShaderConstantLayout vsLayout;
+    framegraph::ShaderConstantLayout psLayout;
+
     if (pso->vertexShader && pso->vertexShader->reflection) {
-        const auto& vsLayout = pso->vertexShader->reflection->constantLayout;
-
-        Msg("  [MaterialCache] VS constantLayout has %u constants", vsLayout.constants.size());
-
-        pso->constantLayout.constantBuffers = vsLayout.constantBuffers;
-        pso->constantLayout.constants = vsLayout.constants;
+        vsLayout = pso->vertexShader->reflection->constantLayout;
+        Msg("  [MaterialCache] VS constantLayout has %u CBs, %u constants",
+            vsLayout.constantBuffers.buffers.size(), vsLayout.constants.size());
     }
 
     if (pso->pixelShader && pso->pixelShader->reflection) {
-        const auto& psLayout = pso->pixelShader->reflection->constantLayout;
-
-        Msg("  [MaterialCache] PS constantLayout has %u constants", psLayout.constants.size());
-
-        for (const auto& psConstant : psLayout.constants) {
-            bool isDuplicate = false;
-            for (const auto& vsConstant : pso->constantLayout.constants) {
-                if (vsConstant.name == psConstant.name) {
-                    isDuplicate = true;
-                    break;
-                }
-            }
-            if (!isDuplicate) {
-                pso->constantLayout.constants.push_back(psConstant);
-            }
-        }
+        psLayout = pso->pixelShader->reflection->constantLayout;
+        Msg("  [MaterialCache] PS constantLayout has %u CBs, %u constants",
+            psLayout.constantBuffers.buffers.size(), psLayout.constants.size());
     }
 
-    Msg("  [MaterialCache] Final PSO constantLayout has %u constants total", pso->constantLayout.constants.size());
+    pso->constantLayout = MergeConstantLayouts(vsLayout, psLayout);
+
+    Msg("  [MaterialCache] Final PSO constantLayout: %u unique CBs, %u total constants",
+        pso->constantLayout.constantBuffers.buffers.size(),
+        pso->constantLayout.constants.size());
+
+#ifdef DEBUG
+    const char* shaderName = pso->vertexShader ? pso->vertexShader->cName.c_str() : "Unknown";
+    LogConstantLayout(pso->constantLayout, shaderName);
+#endif
 
     ng::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();
@@ -417,65 +597,78 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->constantBuffers.clear();
 
-    auto extractCBsFromReflection = [&](const framegraph::ExtractedReflection* reflection,
-                                       const char* shaderName,
-                                       MaterialPSO::ShaderStage stage) {
-        if (!reflection) {
-            Msg("! [MaterialCache] No reflection data for %s shader", shaderName);
-            return;
-        }
-
-        Msg("  [MaterialCache] Extracting %u CBs from %s shader reflection",
-            reflection->constantBuffers.buffers.size(), shaderName);
-
-        for (const auto& cbReflection : reflection->constantBuffers.buffers) {
-            bool found = false;
-            for (const auto& existing : matPSO->constantBuffers) {
-                if (existing.slot == cbReflection.slot && existing.stage == stage) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                bool isPerObjectCB = (cbReflection.name == "$Globals");
-
-                nvrhi::BufferHandle bufferHandle;
-                nvrhi::BufferDesc nvrhiDesc;
-                nvrhiDesc.byteSize = cbReflection.size;
-                nvrhiDesc.isConstantBuffer = true;
-                nvrhiDesc.debugName = isPerObjectCB ? "XRay_PerObject_CB" : "FrameGraph_Global_CB";
-                nvrhiDesc.keepInitialState = false;
-                nvrhiDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
-
-                bufferHandle = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
-                if (bufferHandle) {
-                    Msg("  [MaterialCache] Created CB from reflection: name=%s, slot=%d, size=%d bytes, stage=%s",
-                        cbReflection.name.c_str(),
-                        cbReflection.slot,
-                        cbReflection.size,
-                        stage == MaterialPSO::ShaderStage::Vertex ? "VS" : "PS");
-
-                    MaterialPSO::ConstantBufferInfo cbInfo;
-                    cbInfo.slot = cbReflection.slot;
-                    cbInfo.stage = stage;
-                    cbInfo.nvrhiBuffer = bufferHandle;
-                    cbInfo.size = cbReflection.size;
-                    cbInfo.isPerObject = isPerObjectCB;
-                    cbInfo.name = cbReflection.name;
-
-                    matPSO->constantBuffers.push_back(cbInfo);
-                } else {
-                    Msg("! [MaterialCache] FAILED to create CB: name=%s, slot=%d",
-                        cbReflection.name.c_str(), cbReflection.slot);
-                }
-            }
-        }
+    struct CBRequirement {
+        shared_str name;
+        u32 vsSlot = UINT32_MAX;
+        u32 psSlot = UINT32_MAX;
+        u32 size = 0;
+        bool usedInVS = false;
+        bool usedInPS = false;
     };
 
-    extractCBsFromReflection(vs->reflection, vs->cName.c_str(), MaterialPSO::ShaderStage::Vertex);
+    xr_map<shared_str, CBRequirement> uniqueCBs;
 
-    extractCBsFromReflection(ps->reflection, ps->cName.c_str(), MaterialPSO::ShaderStage::Pixel);
+    if (vs && vs->reflection) {
+        const auto& vsCBs = vs->reflection->constantBuffers.buffers;
+        for (const auto& cb : vsCBs) {
+            auto& unique = uniqueCBs[cb.name];
+            unique.name = cb.name;
+            unique.vsSlot = cb.slot;
+            unique.size = std::max(unique.size, cb.size);
+            unique.usedInVS = true;
+
+            Msg("  [MaterialCache] VS CB: %s (slot=b%u, size=%u)",
+                cb.name.c_str(), cb.slot, cb.size);
+        }
+    }
+
+    if (ps && ps->reflection) {
+        const auto& psCBs = ps->reflection->constantBuffers.buffers;
+        for (const auto& cb : psCBs) {
+            auto& unique = uniqueCBs[cb.name];
+            unique.name = cb.name;
+            unique.psSlot = cb.slot;
+            unique.size = std::max(unique.size, cb.size);
+            unique.usedInPS = true;
+
+            Msg("  [MaterialCache] PS CB: %s (slot=b%u, size=%u)",
+                cb.name.c_str(), cb.slot, cb.size);
+        }
+    }
+
+    for (const auto& [cbName, cbReq] : uniqueCBs) {
+        bool isPerObjectCB = (cbReq.name == "$Globals");
+
+        nvrhi::BufferDesc bufferDesc;
+        bufferDesc.byteSize = cbReq.size;
+        bufferDesc.isConstantBuffer = true;
+        bufferDesc.debugName = isPerObjectCB ? "XRay_PerObject_CB" : make_string("CB_%s", cbReq.name.c_str()).c_str();
+        bufferDesc.keepInitialState = false;
+        bufferDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+        nvrhi::BufferHandle sharedBuffer = m_device->GetNativeDevice()->createBuffer(bufferDesc);
+
+        if (!sharedBuffer) {
+            Msg("! [MaterialCache] FAILED to create shared CB: %s", cbReq.name.c_str());
+            continue;
+        }
+
+        MaterialPSO::ConstantBufferInfo cbInfo;
+        cbInfo.name = cbReq.name;
+        cbInfo.size = cbReq.size;
+        cbInfo.nvrhiBuffer = sharedBuffer;
+        cbInfo.stage = MaterialPSO::ShaderStage::Vertex;
+        cbInfo.slot = cbReq.usedInVS ? cbReq.vsSlot : cbReq.psSlot;
+        cbInfo.isPerObject = isPerObjectCB;
+
+        matPSO->constantBuffers.push_back(cbInfo);
+
+        Msg("  [MaterialCache] ✓ Shared CB: %s (size=%u, vsSlot=%s, psSlot=%s, buffer=0x%p)",
+            cbReq.name.c_str(), cbReq.size,
+            cbReq.usedInVS ? make_string("b%u", cbReq.vsSlot).c_str() : "none",
+            cbReq.usedInPS ? make_string("b%u", cbReq.psSlot).c_str() : "none",
+            sharedBuffer.Get());
+    }
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.isPerObject) {
@@ -1163,33 +1356,31 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
         pso->textures.size(), pso->samplers.size());
 
-    if (pso->vertexShader && pso->vertexShader->reflection) {
-        const auto& vsLayout = pso->vertexShader->reflection->constantLayout;
-        Msg("  [MaterialCache::CreateUIPSO] VS constantLayout has %u constants", vsLayout.constants.size());
+    framegraph::ShaderConstantLayout vsLayout;
+    framegraph::ShaderConstantLayout psLayout;
 
-        pso->constantLayout.constantBuffers = vsLayout.constantBuffers;
-        pso->constantLayout.constants = vsLayout.constants;
+    if (pso->vertexShader && pso->vertexShader->reflection) {
+        vsLayout = pso->vertexShader->reflection->constantLayout;
+        Msg("  [MaterialCache] VS constantLayout has %u CBs, %u constants",
+            vsLayout.constantBuffers.buffers.size(), vsLayout.constants.size());
     }
 
     if (pso->pixelShader && pso->pixelShader->reflection) {
-        const auto& psLayout = pso->pixelShader->reflection->constantLayout;
-        Msg("  [MaterialCache::CreateUIPSO] PS constantLayout has %u constants", psLayout.constants.size());
-
-        for (const auto& psConstant : psLayout.constants) {
-            bool isDuplicate = false;
-            for (const auto& vsConstant : pso->constantLayout.constants) {
-                if (vsConstant.name == psConstant.name) {
-                    isDuplicate = true;
-                    break;
-                }
-            }
-            if (!isDuplicate) {
-                pso->constantLayout.constants.push_back(psConstant);
-            }
-        }
+        psLayout = pso->pixelShader->reflection->constantLayout;
+        Msg("  [MaterialCache] PS constantLayout has %u CBs, %u constants",
+            psLayout.constantBuffers.buffers.size(), psLayout.constants.size());
     }
 
-    Msg("  [MaterialCache::CreateUIPSO] Final PSO constantLayout has %u constants total", pso->constantLayout.constants.size());
+    pso->constantLayout = MergeConstantLayouts(vsLayout, psLayout);
+
+    Msg("  [MaterialCache] Final PSO constantLayout: %u unique CBs, %u total constants",
+        pso->constantLayout.constantBuffers.buffers.size(),
+        pso->constantLayout.constants.size());
+
+#ifdef DEBUG
+    const char* shaderName = pso->vertexShader ? pso->vertexShader->cName.c_str() : "Unknown";
+    LogConstantLayout(pso->constantLayout, shaderName);
+#endif
 
     nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
     nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
