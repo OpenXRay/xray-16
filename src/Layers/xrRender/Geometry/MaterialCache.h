@@ -239,6 +239,14 @@ struct MaterialPSO {
     // Automatically populated from Slang reflection if shader has globalParams_0
     xr_unique_ptr<GlobalParamsMapper> globalParamsMapper;
 
+    // ─── Constant Layout (Full per-constant metadata) ───
+    framegraph::ShaderConstantLayout constantLayout;
+
+    // Helper: Get constant metadata by name
+    const framegraph::ShaderConstant* FindConstant(const char* name) const {
+        return constantLayout.FindConstant(name);
+    }
+
     // Debug name
     shared_str debugName;
 

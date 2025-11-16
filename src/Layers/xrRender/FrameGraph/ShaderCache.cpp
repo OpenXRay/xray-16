@@ -212,6 +212,26 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
     }
 
     // ═══════════════════════════════════════════════════
+    //  SERIALIZE PER-CONSTANT METADATA
+    // ═══════════════════════════════════════════════════
+    writer->w_u32(static_cast<u32>(reflection.constantLayout.constants.size()));
+    for (const auto& constant : reflection.constantLayout.constants)
+    {
+        // Write constant name
+        u32 nameLen = constant.name.size();
+        writer->w_u32(nameLen);
+        if (nameLen > 0)
+            writer->w(constant.name.c_str(), nameLen);
+
+        // Write constant metadata
+        writer->w_u32(constant.offset);
+        writer->w_u32(constant.size);
+        writer->w_u8(static_cast<u8>(constant.frequency));     // UpdateFrequency enum
+        writer->w_u8(static_cast<u8>(constant.persistence));   // ConstantPersistence enum
+        writer->w_u16(constant.cbIndex);
+    }
+
+    // ═══════════════════════════════════════════════════
     //  SERIALIZE RT BINDINGS
     // ═══════════════════════════════════════════════════
     writer->w_u32(static_cast<u32>(reflection.rtBindings.phase));  // RenderPhase enum
@@ -313,6 +333,36 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             cb.slot = reader->r_u32();
             cb.size = reader->r_u32();
         }
+
+        // ═══════════════════════════════════════════════════
+        //  DESERIALIZE PER-CONSTANT METADATA
+        // ═══════════════════════════════════════════════════
+        u32 constantCount = reader->r_u32();
+        outReflection.constantLayout.constants.resize(constantCount);
+        for (u32 i = 0; i < constantCount; ++i)
+        {
+            auto& constant = outReflection.constantLayout.constants[i];
+
+            // Read constant name
+            u32 nameLen = reader->r_u32();
+            if (nameLen > 0)
+            {
+                xr_string name;
+                name.resize(nameLen);
+                reader->r(&name[0], nameLen);
+                constant.name = name.c_str();
+            }
+
+            // Read constant metadata
+            constant.offset = reader->r_u32();
+            constant.size = reader->r_u32();
+            constant.frequency = static_cast<UpdateFrequency>(reader->r_u8());
+            constant.persistence = static_cast<ConstantPersistence>(reader->r_u8());
+            constant.cbIndex = reader->r_u16();
+        }
+
+        // Also populate constantLayout.constantBuffers from reflection.constantBuffers
+        outReflection.constantLayout.constantBuffers = outReflection.constantBuffers;
 
         // ═══════════════════════════════════════════════════
         //  DESERIALIZE RT BINDINGS

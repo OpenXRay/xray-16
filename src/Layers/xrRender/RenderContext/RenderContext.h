@@ -294,6 +294,7 @@ public:
     // ═══════════════════════════════════════════════════════
 
     nvrhi::ICommandList* GetCommandList() const { return m_commandList; }
+    RenderDevice* GetDevice() const { return m_device; }
 
 private:
     RenderDevice* m_device;  // Our abstraction layer device

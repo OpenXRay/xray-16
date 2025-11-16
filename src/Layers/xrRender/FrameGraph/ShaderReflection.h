@@ -119,6 +119,55 @@ struct ConstantBufferInfo {
 };
 
 // ═══════════════════════════════════════════════════
+//  UPDATE FREQUENCY (FOR CONSTANT BINDING OPTIMIZATION)
+// ═══════════════════════════════════════════════════
+//
+// Determines how frequently a constant needs to be updated.
+// Used by FGConstantSystem to batch updates and reduce GPU uploads.
+//
+enum class UpdateFrequency : u8 {
+    Engine = 0,    // Once per frame (samplers, global state)
+    Pass = 1,      // Once per pass (view/proj matrices, pass RTs)
+    Material = 2,  // Once per material (textures, material params)
+    Instance = 3   // Once per instance (world matrix, bones)
+};
+
+// ═══════════════════════════════════════════════════
+//  CONSTANT PERSISTENCE (LIFETIME & ALLOCATION STRATEGY)
+// ═══════════════════════════════════════════════════
+//
+// Determines the lifetime and allocation strategy for constants.
+// Volatile: Per-frame transient (VCB ring buffer)
+// Static: Cross-frame persistent (cached GPU buffer)
+// SemiStatic: Occasional updates (e.g., on resize)
+//
+enum class ConstantPersistence : u8 {
+    Volatile = 0,   // Updated frequently - uses VCB ring buffer
+    Static = 1,     // Set once, cached across frames - uses persistent constantBuffers
+    SemiStatic = 2  // Updated occasionally (e.g., resolution change)
+};
+
+// ═══════════════════════════════════════════════════
+//  SHADER CONSTANT (INDIVIDUAL PARAMETER METADATA)
+// ═══════════════════════════════════════════════════
+//
+// Metadata for a single constant within a constant buffer.
+// Contains type, size, offset, update frequency, and persistence information.
+//
+struct ShaderConstant {
+    shared_str name;                  // "m_World", "m_VP", "dt_params", etc.
+    u32 offset;                       // Byte offset within CB
+    u32 size;                         // Size in bytes (16 for float4, 64 for float4x4, etc.)
+    UpdateFrequency frequency;        // Binding frequency
+    ConstantPersistence persistence;  // Allocation strategy (volatile VCB vs static CB)
+    u16 cbIndex;                      // Which CB contains this constant (index into ShaderConstantBuffers::buffers)
+
+    ShaderConstant()
+        : offset(0), size(0), frequency(UpdateFrequency::Instance)
+        , persistence(ConstantPersistence::Volatile), cbIndex(0) {}
+};
+
+// ═══════════════════════════════════════════════════
 //  SHADER CONSTANT BUFFER LAYOUT
 // ═══════════════════════════════════════════════════
 //
@@ -142,6 +191,35 @@ struct ShaderConstantBuffers {
             if (xr_strcmp(cb.name.c_str(), name) == 0) return &cb;
         }
         return nullptr;
+    }
+};
+
+// ═══════════════════════════════════════════════════
+//  SHADER CONSTANT LAYOUT (FULL CB + INDIVIDUAL CONSTANTS)
+// ═══════════════════════════════════════════════════
+//
+// Extended layout that includes both CB-level metadata and per-constant metadata.
+// Used by FGConstantSystem for type-safe constant binding.
+//
+struct ShaderConstantLayout {
+    ShaderConstantBuffers constantBuffers;  // Existing CB-level metadata
+    xr_vector<ShaderConstant> constants;     // NEW: Per-constant metadata
+
+    // Helper: Find constant by name
+    const ShaderConstant* FindConstant(const char* name) const {
+        for (const auto& c : constants) {
+            if (xr_strcmp(c.name.c_str(), name) == 0) return &c;
+        }
+        return nullptr;
+    }
+
+    // Helper: Get constants for a specific frequency
+    xr_vector<const ShaderConstant*> GetConstantsByFrequency(UpdateFrequency freq) const {
+        xr_vector<const ShaderConstant*> result;
+        for (const auto& c : constants) {
+            if (c.frequency == freq) result.push_back(&c);
+        }
+        return result;
     }
 };
 
@@ -198,6 +276,13 @@ private:
     static VertexInputSignature AnalyzeVertexShader(slang::ShaderReflection* reflection);
     static ShaderRTBindings AnalyzePixelShader(slang::ShaderReflection* reflection);
     static ShaderConstantBuffers AnalyzeConstantBuffers(slang::ShaderReflection* reflection);
+    static ShaderConstantLayout AnalyzeConstantLayout(slang::ShaderReflection* reflection);
+
+    // Helper: Infer constant update frequency from name/CB
+    static UpdateFrequency InferConstantFrequency(const char* constantName, const char* cbName);
+
+    // Helper: Infer constant persistence (static vs volatile) from CB name and frequency
+    static ConstantPersistence InferConstantPersistence(const char* cbName, UpdateFrequency frequency);
 
     // Helper: check if texture name matches pattern
     static bool MatchesPattern(const char* name, const char* pattern);

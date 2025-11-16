@@ -15,6 +15,7 @@ struct ExtractedReflection
     VertexInputSignature vertexInputSignature;
     ShaderConstantBuffers constantBuffers;
     ShaderRTBindings rtBindings;
+    ShaderConstantLayout constantLayout;  // NEW: Full layout with per-constant data
 
     ExtractedReflection() = default;
 
@@ -122,7 +123,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 2;  // Bumped for reflection support
+    static constexpr u32 CACHE_VERSION = 3;  // Bumped for per-constant metadata (constantLayout.constants)
     Stats m_stats;
 };
 

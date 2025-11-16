@@ -435,9 +435,9 @@ void FrameGraphRenderer::SetupFrame() {
     // Clear HUD batches from previous frame
     m_hudBatches.clear();
 
-    // Clear particle batches from previous frame
-    m_worldParticleBatches.clear();
-    m_hudParticleBatches.clear();
+    // Clear particle batches from previous frame - yohji TODO: Re-enable when particles are supported
+    //m_worldParticleBatches.clear();
+    //m_hudParticleBatches.clear();
 
     // Collect visible geometry (CPU culling for now, GPU later)
     if (levelLoaded)
@@ -998,19 +998,19 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
         isHUDParticle = pEffect->GetHudMode();
     }
 
-    // Create particle batch
-    passes::ParticleBatch batch;
-    batch.visual = visual;
-    batch.worldMatrix = worldTransform;
-    batch.renderable = renderable;
-    batch.isHUDMode = isHUDParticle;
+    //// Create particle batch - yohji TODO: Re-enable when particles are supported
+    //passes::ParticleBatch batch;
+    //batch.visual = visual;
+    //batch.worldMatrix = worldTransform;
+    //batch.renderable = renderable;
+    //batch.isHUDMode = isHUDParticle;
 
-    // Add to appropriate list (world or HUD)
-    if (isHUDParticle) {
-        m_hudParticleBatches.push_back(batch);
-    } else {
-        m_worldParticleBatches.push_back(batch);
-    }
+    //// Add to appropriate list (world or HUD)
+    //if (isHUDParticle) {
+    //    m_hudParticleBatches.push_back(batch);
+    //} else {
+    //    m_worldParticleBatches.push_back(batch);
+    //}
 
     return true;
 }

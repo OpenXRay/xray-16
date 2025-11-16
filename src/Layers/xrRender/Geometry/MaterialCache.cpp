@@ -3,7 +3,6 @@
 #include "MaterialCache.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
-#include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FVisual.h"
@@ -16,6 +15,12 @@
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 #include "Layers/xrRender/RenderContext/RenderStateConversion.h"  // State conversion helpers
+#include "Layers/xrRender/RenderContext/RenderDevice.h"  // For RenderDevice definition
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For ShaderConstant, ExtractedReflection
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"  // For ExtractedReflection definition
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"  // For VCB pool
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"  // For FrameGraph definition
+#include "Layers/xrRender/FrameGraph/IPass.h"  // For DefaultOutputLayout
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -27,7 +32,6 @@
 
 namespace xray::render {
 
-using namespace passes;
 using namespace xray::render::RENDER_NAMESPACE;  // For Shader types (STextureList, etc.)
 
 
@@ -326,6 +330,46 @@ MaterialPSO* MaterialCache::CreatePSO(
             pso->vcbRequirements.push_back(req);
         }
     }
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT CONSTANT LAYOUT (CB + PER-CONSTANT METADATA)
+    // ═══════════════════════════════════════════════════════
+
+    // Extract constant layout from vertex shader
+    if (pso->vertexShader && pso->vertexShader->reflection) {
+        // Use the pre-extracted constant layout from reflection
+        const auto& vsLayout = pso->vertexShader->reflection->constantLayout;
+
+        Msg("  [MaterialCache] VS constantLayout has %u constants", vsLayout.constants.size());
+
+        // Merge into material PSO
+        pso->constantLayout.constantBuffers = vsLayout.constantBuffers;
+        pso->constantLayout.constants = vsLayout.constants;
+    }
+
+    // Extract constant layout from pixel shader and merge
+    if (pso->pixelShader && pso->pixelShader->reflection) {
+        // Use the pre-extracted constant layout from reflection
+        const auto& psLayout = pso->pixelShader->reflection->constantLayout;
+
+        Msg("  [MaterialCache] PS constantLayout has %u constants", psLayout.constants.size());
+
+        // Merge PS constants into layout (avoid duplicates)
+        for (const auto& psConstant : psLayout.constants) {
+            bool isDuplicate = false;
+            for (const auto& vsConstant : pso->constantLayout.constants) {
+                if (vsConstant.name == psConstant.name) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                pso->constantLayout.constants.push_back(psConstant);
+            }
+        }
+    }
+
+    Msg("  [MaterialCache] Final PSO constantLayout has %u constants total", pso->constantLayout.constants.size());
 
     // ═══════════════════════════════════════════════════════
     //  BUILD PIPELINE STATE DESCRIPTOR
@@ -1564,6 +1608,41 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
         pso->textures.size(), pso->samplers.size());
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT CONSTANT LAYOUT (CB + PER-CONSTANT METADATA)
+    // ═══════════════════════════════════════════════════════
+
+    // Extract constant layout from vertex shader
+    if (pso->vertexShader && pso->vertexShader->reflection) {
+        const auto& vsLayout = pso->vertexShader->reflection->constantLayout;
+        Msg("  [MaterialCache::CreateUIPSO] VS constantLayout has %u constants", vsLayout.constants.size());
+
+        pso->constantLayout.constantBuffers = vsLayout.constantBuffers;
+        pso->constantLayout.constants = vsLayout.constants;
+    }
+
+    // Extract constant layout from pixel shader and merge
+    if (pso->pixelShader && pso->pixelShader->reflection) {
+        const auto& psLayout = pso->pixelShader->reflection->constantLayout;
+        Msg("  [MaterialCache::CreateUIPSO] PS constantLayout has %u constants", psLayout.constants.size());
+
+        // Merge PS constants into layout (avoid duplicates)
+        for (const auto& psConstant : psLayout.constants) {
+            bool isDuplicate = false;
+            for (const auto& vsConstant : pso->constantLayout.constants) {
+                if (vsConstant.name == psConstant.name) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                pso->constantLayout.constants.push_back(psConstant);
+            }
+        }
+    }
+
+    Msg("  [MaterialCache::CreateUIPSO] Final PSO constantLayout has %u constants total", pso->constantLayout.constants.size());
 
     // Get native NVRHI shaders directly
     nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
