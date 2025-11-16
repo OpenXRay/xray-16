@@ -151,34 +151,80 @@ void SlangReflectionWrapper::EnumerateParameters(
     if (!m_reflection)
         return;
 
-    auto* globalParamsLayout = m_reflection->getGlobalParamsTypeLayout();
-    if (!globalParamsLayout)
+    Msg("  [SlangReflectionWrapper::EnumerateParameters] === DEBUGGING REFLECTION STRUCTURE ===");
+
+    unsigned int shaderParamCount = m_reflection->getParameterCount();
+    Msg("  [SlangReflectionWrapper] Shader has %u parameters (via getParameterCount())", shaderParamCount);
+
+    for (unsigned int i = 0; i < shaderParamCount; ++i)
     {
-        Msg("! [SlangReflectionWrapper] No global params layout");
-        return;
+        auto* param = m_reflection->getParameterByIndex(i);
+        if (param)
+        {
+            const char* paramName = param->getName();
+            auto* paramTypeLayout = param->getTypeLayout();
+            if (paramTypeLayout)
+            {
+                slang::ParameterCategory paramCat = paramTypeLayout->getParameterCategory();
+                Msg("    [SlangReflectionWrapper] Shader Param[%u]: name='%s', category=%d",
+                    i, paramName ? paramName : "NULL", (int)paramCat);
+            }
+        }
     }
 
-    unsigned int fieldCount = globalParamsLayout->getFieldCount();
-    Msg("  [SlangReflectionWrapper] Enumerating category %d: found %u global fields", (int)category, fieldCount);
+    unsigned int entryPointCount = m_reflection->getEntryPointCount();
+    Msg("  [SlangReflectionWrapper] Total entry points: %u", entryPointCount);
 
-    for (unsigned int i = 0; i < fieldCount; ++i)
+    for (unsigned int epIdx = 0; epIdx < entryPointCount; ++epIdx)
     {
-        auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
-        if (!fieldLayout)
+        auto* entryPoint = m_reflection->getEntryPointByIndex(epIdx);
+        if (entryPoint)
+        {
+            Msg("    [SlangReflectionWrapper] EntryPoint[%u]: name='%s'", epIdx, entryPoint->getName());
+
+            auto* entryParamsLayout = entryPoint->getTypeLayout();
+            if (entryParamsLayout)
+            {
+                unsigned int entryFieldCount = entryParamsLayout->getFieldCount();
+                Msg("      [SlangReflectionWrapper] Entry point has %u fields", entryFieldCount);
+
+                for (unsigned int i = 0; i < entryFieldCount; ++i)
+                {
+                    auto* fieldLayout = entryParamsLayout->getFieldByIndex(i);
+                    if (fieldLayout)
+                    {
+                        auto* typeLayout = fieldLayout->getTypeLayout();
+                        if (typeLayout)
+                        {
+                            slang::ParameterCategory paramCat = typeLayout->getParameterCategory();
+                            Msg("        [SlangReflectionWrapper] EntryField[%u]: name='%s', category=%d",
+                                i, fieldLayout->getName(), (int)paramCat);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Msg("  [SlangReflectionWrapper] Enumerating shader parameters (looking for category %d)", (int)category);
+
+    for (unsigned int i = 0; i < shaderParamCount; ++i)
+    {
+        auto* param = m_reflection->getParameterByIndex(i);
+        if (!param)
             continue;
 
-        auto* typeLayout = fieldLayout->getTypeLayout();
+        auto* typeLayout = param->getTypeLayout();
         if (!typeLayout)
             continue;
 
         slang::ParameterCategory paramCategory = typeLayout->getParameterCategory();
-        Msg("    [SlangReflectionWrapper] Field[%u]: name='%s', category=%d (looking for %d)",
-            i, fieldLayout->getName(), (int)paramCategory, (int)category);
 
         if (paramCategory == category)
         {
-            Msg("      [SlangReflectionWrapper] ✓ Match! Calling callback for '%s'", fieldLayout->getName());
-            callback(fieldLayout);
+            Msg("      [SlangReflectionWrapper] ✓ Match! Param[%u]: name='%s', category=%d",
+                i, param->getName(), (int)paramCategory);
+            callback(param);
         }
     }
 }

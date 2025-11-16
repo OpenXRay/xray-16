@@ -186,6 +186,21 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
         writer->w_u32(cb.size);
     }
 
+    writer->w_u32(static_cast<u32>(reflection.constantLayout.constants.size()));
+    for (const auto& constant : reflection.constantLayout.constants)
+    {
+        u32 nameLen = constant.name.size();
+        writer->w_u32(nameLen);
+        if (nameLen > 0)
+            writer->w(constant.name.c_str(), nameLen);
+
+        writer->w_u32(constant.offset);
+        writer->w_u32(constant.size);
+        writer->w_u8(static_cast<u8>(constant.frequency));
+        writer->w_u8(static_cast<u8>(constant.persistence));
+        writer->w_u16(constant.cbIndex);
+    }
+
     writer->w_u32(static_cast<u32>(reflection.rtBindings.phase));
 
     writer->w_u32(static_cast<u32>(reflection.rtBindings.inputTextures.size()));
@@ -270,6 +285,30 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             cb.slot = reader->r_u32();
             cb.size = reader->r_u32();
         }
+
+        u32 constantCount = reader->r_u32();
+        outReflection.constantLayout.constants.resize(constantCount);
+        for (u32 i = 0; i < constantCount; ++i)
+        {
+            auto& constant = outReflection.constantLayout.constants[i];
+
+            u32 nameLen = reader->r_u32();
+            if (nameLen > 0)
+            {
+                xr_string name;
+                name.resize(nameLen);
+                reader->r(&name[0], nameLen);
+                constant.name = name.c_str();
+            }
+
+            constant.offset = reader->r_u32();
+            constant.size = reader->r_u32();
+            constant.frequency = static_cast<UpdateFrequency>(reader->r_u8());
+            constant.persistence = static_cast<ConstantPersistence>(reader->r_u8());
+            constant.cbIndex = reader->r_u16();
+        }
+
+        outReflection.constantLayout.constantBuffers = outReflection.constantBuffers;
 
         outReflection.rtBindings.phase = static_cast<RenderPhase>(reader->r_u32());
 

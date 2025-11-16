@@ -172,6 +172,170 @@ ShaderConstantBuffers ShaderReflector::AnalyzeConstantBuffers(
     return result;
 }
 
+UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const char* cbName) {
+
+    if (strstr(cbName, "static_globals") != nullptr) {
+        return UpdateFrequency::Engine;
+    }
+
+    if (strstr(name, "m_VP") != nullptr ||
+        strstr(name, "m_V") != nullptr ||
+        strstr(name, "m_P") != nullptr ||
+        strstr(name, "eye_position") != nullptr ||
+        strstr(name, "eye_direction") != nullptr) {
+        return UpdateFrequency::Pass;
+    }
+
+    if (strstr(name, "dt_params") != nullptr ||
+        strstr(name, "material") != nullptr ||
+        strstr(cbName, "dynamic_transforms") != nullptr) {
+        return UpdateFrequency::Material;
+    }
+
+    if (strstr(name, "m_World") != nullptr ||
+        strstr(name, "m_WV") != nullptr ||
+        strstr(name, "m_WVP") != nullptr ||
+        strstr(name, "m_xform") != nullptr ||
+        strstr(name, "bones") != nullptr ||
+        strstr(cbName, "$Globals") != nullptr) {
+        return UpdateFrequency::Instance;
+    }
+
+    return UpdateFrequency::Instance;
+}
+
+ConstantPersistence ShaderReflector::InferConstantPersistence(const char* cbName, UpdateFrequency frequency) {
+
+    if (strstr(cbName, "dynamic_transforms") != nullptr ||
+        strstr(cbName, "$Globals") != nullptr) {
+        return ConstantPersistence::Volatile;
+    }
+
+    if (strstr(cbName, "static_globals") != nullptr) {
+        return ConstantPersistence::Static;
+    }
+
+    if (frequency == UpdateFrequency::Engine || frequency == UpdateFrequency::Pass) {
+        return ConstantPersistence::Static;
+    }
+
+    return ConstantPersistence::Volatile;
+}
+
+ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflection* reflection) {
+    ShaderConstantLayout layout;
+
+    if (!reflection) {
+        Msg("! [ShaderReflector] Null Slang reflection for constant layout analysis");
+        return layout;
+    }
+
+    layout.constantBuffers = AnalyzeConstantBuffers(reflection);
+
+    Msg("  [AnalyzeConstantLayout] Found %u constant buffers", layout.constantBuffers.buffers.size());
+
+    SlangReflectionWrapper wrapper(reflection);
+    auto constantBuffers = wrapper.GetConstantBuffers();
+
+    for (u32 cbIdx = 0; cbIdx < constantBuffers.size(); ++cbIdx) {
+        const auto& cbInfo = constantBuffers[cbIdx];
+
+        Msg("  [AnalyzeConstantLayout] Processing CB[%u]: '%s' (size=%u)", cbIdx, cbInfo.name, cbInfo.size);
+
+        u32 paramCount = reflection->getParameterCount();
+        Msg("  [AnalyzeConstantLayout]   Shader has %u parameters total", paramCount);
+
+        bool foundMatchingParam = false;
+        for (u32 paramIdx = 0; paramIdx < paramCount; ++paramIdx) {
+            auto* param = reflection->getParameterByIndex(paramIdx);
+            if (!param) {
+                Msg("  [AnalyzeConstantLayout]   Param[%u]: NULL", paramIdx);
+                continue;
+            }
+
+            const char* paramName = param->getName();
+            Msg("  [AnalyzeConstantLayout]   Param[%u]: '%s'", paramIdx, paramName ? paramName : "NULL");
+
+            auto* typeLayout = param->getTypeLayout();
+            if (!typeLayout) {
+                Msg("  [AnalyzeConstantLayout]     No typeLayout");
+                continue;
+            }
+
+            auto paramCategory = typeLayout->getParameterCategory();
+            if (paramCategory != slang::ParameterCategory::ConstantBuffer) {
+                Msg("  [AnalyzeConstantLayout]     Not a CB (category=%d)", (int)paramCategory);
+                continue;
+            }
+
+            Msg("  [AnalyzeConstantLayout]     IS a constant buffer parameter");
+
+            if (!paramName || xr_strcmp(paramName, cbInfo.name) != 0) {
+                Msg("  [AnalyzeConstantLayout]     Name mismatch: '%s' != '%s'", paramName ? paramName : "NULL", cbInfo.name);
+                continue;
+            }
+
+            foundMatchingParam = true;
+            Msg("  [AnalyzeConstantLayout]     MATCHED! Extracting fields...");
+
+            auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+            if (!elementTypeLayout) {
+                Msg("  [AnalyzeConstantLayout]     ERROR: No elementTypeLayout (CB wrapper is empty?)");
+                continue;
+            }
+
+            auto* cbType = elementTypeLayout->getType();
+            if (!cbType) {
+                Msg("  [AnalyzeConstantLayout]     ERROR: No cbType from element");
+                continue;
+            }
+
+            auto typeKind = cbType->getKind();
+            Msg("  [AnalyzeConstantLayout]     Unwrapped cbType kind: %d (Struct=%d)", (int)typeKind, (int)slang::TypeReflection::Kind::Struct);
+
+            if (typeKind != slang::TypeReflection::Kind::Struct) {
+                Msg("  [AnalyzeConstantLayout]     ERROR: Not a struct type after unwrapping");
+                continue;
+            }
+
+            u32 fieldCount = cbType->getFieldCount();
+            Msg("  [AnalyzeConstantLayout]     Found %u fields in CB struct", fieldCount);
+
+            for (u32 i = 0; i < fieldCount; ++i) {
+                auto* field = cbType->getFieldByIndex(i);
+                auto* fieldLayout = elementTypeLayout->getFieldByIndex(i);
+
+                if (!field || !fieldLayout) continue;
+
+                const char* fieldName = field->getName();
+                if (!fieldName) continue;
+
+                ShaderConstant constant;
+                constant.name = fieldName;
+                constant.offset = (u32)fieldLayout->getOffset(slang::ParameterCategory::Uniform);
+
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                constant.size = fieldTypeLayout ? (u32)fieldTypeLayout->getSize() : 0;
+                constant.cbIndex = cbIdx;
+
+                constant.frequency = InferConstantFrequency(fieldName, cbInfo.name);
+
+                constant.persistence = InferConstantPersistence(cbInfo.name, constant.frequency);
+
+                layout.constants.push_back(constant);
+            }
+        }
+
+        if (!foundMatchingParam) {
+            Msg("  [AnalyzeConstantLayout]   WARNING: No matching parameter found for CB '%s'", cbInfo.name);
+        }
+    }
+
+    Msg("  [AnalyzeConstantLayout] Extracted %u total constants", layout.constants.size());
+
+    return layout;
+}
+
 ShaderRTBindings ShaderReflector::AnalyzePixelShader(
     slang::ShaderReflection* reflection) {
 
@@ -456,6 +620,10 @@ ExtractedReflection ShaderReflector::ExtractReflection(
     result.constantBuffers = AnalyzeConstantBuffers(slangReflection);
     Msg("  [ShaderReflector::ExtractReflection] Extracted %u constant buffers",
         result.constantBuffers.buffers.size());
+
+    result.constantLayout = AnalyzeConstantLayout(slangReflection);
+    Msg("  [ShaderReflector::ExtractReflection] Extracted %u individual constants",
+        result.constantLayout.constants.size());
 
     return result;
 }

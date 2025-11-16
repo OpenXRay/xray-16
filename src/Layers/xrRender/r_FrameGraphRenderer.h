@@ -5,16 +5,6 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
-#include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
-#include "Layers/xrRender/FrameGraphPasses/HUDPass.h"
-#include "Layers/xrRender/FrameGraphPasses/ParticlePass.h"
-#include "Layers/xrRender/FrameGraphPasses/LightingPass.h"
-#include "Layers/xrRender/FrameGraphPasses/TonemapPass.h"
-#include "Layers/xrRender/FrameGraphPasses/UIPass.h"
-#include "Layers/xrRender/FrameGraphPasses/TextPass.h"
-#include "Layers/xrRender/FrameGraphPasses/CursorPass.h"
-#include "Layers/xrRender/FrameGraphPasses/MenuDistortPass.h"
-#include "Layers/xrRender/FrameGraphPasses/MenuCompositePass.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
 struct Fmatrix;
@@ -131,9 +121,6 @@ private:
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_textVCBPool;
 
     xr_vector<GeometryBatch> m_hudBatches;
-
-    xr_vector<passes::ParticleBatch> m_worldParticleBatches;
-    xr_vector<passes::ParticleBatch> m_hudParticleBatches;
 
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 

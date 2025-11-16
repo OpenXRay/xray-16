@@ -2,7 +2,6 @@
 #include "MaterialCache.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
-#include "Layers/xrRender/FrameGraphPasses/GBufferPass.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FVisual.h"
@@ -15,6 +14,12 @@
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RCShader.h"
 #include "Layers/xrRender/RenderContext/RenderStateConversion.h"
+#include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/FrameGraph/ShaderCache.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/IPass.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -26,7 +31,6 @@
 
 namespace xray::render {
 
-using namespace passes;
 using namespace xray::render::RENDER_NAMESPACE;
 
 
@@ -224,6 +228,36 @@ MaterialPSO* MaterialCache::CreatePSO(
             pso->vcbRequirements.push_back(req);
         }
     }
+
+    if (pso->vertexShader && pso->vertexShader->reflection) {
+        const auto& vsLayout = pso->vertexShader->reflection->constantLayout;
+
+        Msg("  [MaterialCache] VS constantLayout has %u constants", vsLayout.constants.size());
+
+        pso->constantLayout.constantBuffers = vsLayout.constantBuffers;
+        pso->constantLayout.constants = vsLayout.constants;
+    }
+
+    if (pso->pixelShader && pso->pixelShader->reflection) {
+        const auto& psLayout = pso->pixelShader->reflection->constantLayout;
+
+        Msg("  [MaterialCache] PS constantLayout has %u constants", psLayout.constants.size());
+
+        for (const auto& psConstant : psLayout.constants) {
+            bool isDuplicate = false;
+            for (const auto& vsConstant : pso->constantLayout.constants) {
+                if (vsConstant.name == psConstant.name) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                pso->constantLayout.constants.push_back(psConstant);
+            }
+        }
+    }
+
+    Msg("  [MaterialCache] Final PSO constantLayout has %u constants total", pso->constantLayout.constants.size());
 
     ng::PipelineStateDesc psoDesc;
     psoDesc.vertexShader = nvrhiVS.Get();
@@ -1193,6 +1227,34 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
         pso->textures.size(), pso->samplers.size());
+
+    if (pso->vertexShader && pso->vertexShader->reflection) {
+        const auto& vsLayout = pso->vertexShader->reflection->constantLayout;
+        Msg("  [MaterialCache::CreateUIPSO] VS constantLayout has %u constants", vsLayout.constants.size());
+
+        pso->constantLayout.constantBuffers = vsLayout.constantBuffers;
+        pso->constantLayout.constants = vsLayout.constants;
+    }
+
+    if (pso->pixelShader && pso->pixelShader->reflection) {
+        const auto& psLayout = pso->pixelShader->reflection->constantLayout;
+        Msg("  [MaterialCache::CreateUIPSO] PS constantLayout has %u constants", psLayout.constants.size());
+
+        for (const auto& psConstant : psLayout.constants) {
+            bool isDuplicate = false;
+            for (const auto& vsConstant : pso->constantLayout.constants) {
+                if (vsConstant.name == psConstant.name) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                pso->constantLayout.constants.push_back(psConstant);
+            }
+        }
+    }
+
+    Msg("  [MaterialCache::CreateUIPSO] Final PSO constantLayout has %u constants total", pso->constantLayout.constants.size());
 
     nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
     nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);

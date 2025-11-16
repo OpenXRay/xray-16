@@ -10,6 +10,7 @@ struct ExtractedReflection
     VertexInputSignature vertexInputSignature;
     ShaderConstantBuffers constantBuffers;
     ShaderRTBindings rtBindings;
+    ShaderConstantLayout constantLayout;
 
     ExtractedReflection() = default;
 
@@ -74,7 +75,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 2;
+    static constexpr u32 CACHE_VERSION = 3;
     Stats m_stats;
 };
 

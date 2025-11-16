@@ -217,6 +217,7 @@ public:
     bool IsInRenderPass() const { return m_inRenderPass; }
 
     nvrhi::ICommandList* GetCommandList() const { return m_commandList; }
+    RenderDevice* GetDevice() const { return m_device; }
 
 private:
     RenderDevice* m_device;

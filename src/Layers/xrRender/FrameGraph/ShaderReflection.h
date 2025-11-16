@@ -84,6 +84,32 @@ struct ConstantBufferInfo {
     ConstantBufferInfo(const char* n, u32 s, u32 sz) : name(n), slot(s), size(sz) {}
 };
 
+enum class UpdateFrequency : u8 {
+    Engine = 0,
+    Pass = 1,
+    Material = 2,
+    Instance = 3
+};
+
+enum class ConstantPersistence : u8 {
+    Volatile = 0,
+    Static = 1,
+    SemiStatic = 2
+};
+
+struct ShaderConstant {
+    shared_str name;
+    u32 offset;
+    u32 size;
+    UpdateFrequency frequency;
+    ConstantPersistence persistence;
+    u16 cbIndex;
+
+    ShaderConstant()
+        : offset(0), size(0), frequency(UpdateFrequency::Instance)
+        , persistence(ConstantPersistence::Volatile), cbIndex(0) {}
+};
+
 struct ShaderConstantBuffers {
     xr_vector<ConstantBufferInfo> buffers;
 
@@ -99,6 +125,26 @@ struct ShaderConstantBuffers {
             if (xr_strcmp(cb.name.c_str(), name) == 0) return &cb;
         }
         return nullptr;
+    }
+};
+
+struct ShaderConstantLayout {
+    ShaderConstantBuffers constantBuffers;
+    xr_vector<ShaderConstant> constants;
+
+    const ShaderConstant* FindConstant(const char* name) const {
+        for (const auto& c : constants) {
+            if (xr_strcmp(c.name.c_str(), name) == 0) return &c;
+        }
+        return nullptr;
+    }
+
+    xr_vector<const ShaderConstant*> GetConstantsByFrequency(UpdateFrequency freq) const {
+        xr_vector<const ShaderConstant*> result;
+        for (const auto& c : constants) {
+            if (c.frequency == freq) result.push_back(&c);
+        }
+        return result;
     }
 };
 
@@ -131,6 +177,11 @@ private:
     static VertexInputSignature AnalyzeVertexShader(slang::ShaderReflection* reflection);
     static ShaderRTBindings AnalyzePixelShader(slang::ShaderReflection* reflection);
     static ShaderConstantBuffers AnalyzeConstantBuffers(slang::ShaderReflection* reflection);
+    static ShaderConstantLayout AnalyzeConstantLayout(slang::ShaderReflection* reflection);
+
+    static UpdateFrequency InferConstantFrequency(const char* constantName, const char* cbName);
+
+    static ConstantPersistence InferConstantPersistence(const char* cbName, UpdateFrequency frequency);
 
     static bool MatchesPattern(const char* name, const char* pattern);
 };

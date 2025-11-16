@@ -264,9 +264,6 @@ void FrameGraphRenderer::SetupFrame() {
 
     m_hudBatches.clear();
 
-    m_worldParticleBatches.clear();
-    m_hudParticleBatches.clear();
-
     if (levelLoaded)
         CollectVisibleGeometry();
 
@@ -695,18 +692,6 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
         RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
             static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
         isHUDParticle = pEffect->GetHudMode();
-    }
-
-    passes::ParticleBatch batch;
-    batch.visual = visual;
-    batch.worldMatrix = worldTransform;
-    batch.renderable = renderable;
-    batch.isHUDMode = isHUDParticle;
-
-    if (isHUDParticle) {
-        m_hudParticleBatches.push_back(batch);
-    } else {
-        m_worldParticleBatches.push_back(batch);
     }
 
     return true;

@@ -192,6 +192,12 @@ struct MaterialPSO {
 
     xr_unique_ptr<GlobalParamsMapper> globalParamsMapper;
 
+    framegraph::ShaderConstantLayout constantLayout;
+
+    const framegraph::ShaderConstant* FindConstant(const char* name) const {
+        return constantLayout.FindConstant(name);
+    }
+
     shared_str debugName;
 
     ~MaterialPSO() {
