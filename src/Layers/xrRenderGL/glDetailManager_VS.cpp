@@ -84,7 +84,7 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     //hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
     hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1);
 }
-#include <glm/glm.hpp>
+
 void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
                                     u32 lod_id)
 {

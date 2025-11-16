@@ -21,9 +21,11 @@
 #include "Layers/xrRenderDX11/StateManager/dx11ShaderResourceStateCache.h"
 #include "Layers/xrRenderDX11/StateManager/dx11StateCache.h"
 #endif
+#ifdef USE_OGL
+#include <glm/glm.hpp>
+#endif
 
 #include "FVF.h"
-#include <glm/glm.hpp>
 
 namespace xray::render::RENDER_NAMESPACE
 {
