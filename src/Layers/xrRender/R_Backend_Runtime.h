@@ -60,27 +60,36 @@ IC const Fmatrix& CBackend::get_xform_view() { return xforms.get_V(); }
 IC const Fmatrix& CBackend::get_xform_project() { return xforms.get_P(); }
 #if defined(USE_DX11)
 IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
+{
+    VERIFY((ID >= 0) && (ID < 4));
+
+    return pRT[ID];
+}
 #elif defined(USE_OGL)
 IC ref_rt& CBackend::get_RT(u32 ID)
-#else
-#   error No graphics API selected or enabled!
-#endif
 {
     VERIFY((ID >= 0) && (ID < 4));
 
     return *pRT[ID];
 }
-
-#if defined(USE_DX11)
-IC ID3DDepthStencilView* CBackend::get_ZB()
-#elif defined(USE_OGL)
-IC ref_rt& CBackend::get_ZB()
 #else
 #   error No graphics API selected or enabled!
 #endif
+
+#if defined(USE_DX11)
+IC ID3DDepthStencilView* CBackend::get_ZB()
+{
+    return pZB;
+}
+#elif defined(USE_OGL)
+IC ref_rt& CBackend::get_ZB()
 {
     return *pZB;
 }
+#else
+#   error No graphics API selected or enabled!
+#endif
+
 ICF void CBackend::set_States(SState* _state)
 {
     PGO(Msg("PGO:state_block"));
