@@ -45,8 +45,118 @@ struct ShaderRTBindings {
         shared_str name;
         u32 slot;
 
+        enum class FilterMode : u8 {
+            Point,
+            Linear,
+            Anisotropic
+        };
+
+        enum class AddressMode : u8 {
+            Wrap,
+            Clamp
+        };
+
+        struct SamplerState {
+            AddressMode addressMode;
+            FilterMode minFilter;
+            FilterMode magFilter;
+            FilterMode mipFilter;
+            u8 maxAnisotropy;
+
+            SamplerState()
+                : addressMode(AddressMode::Wrap)
+                , minFilter(FilterMode::Linear)
+                , magFilter(FilterMode::Linear)
+                , mipFilter(FilterMode::Linear)
+                , maxAnisotropy(1) {}
+        };
+
         Sampler() : slot(0) {}
         Sampler(const char* n, u32 s) : name(n), slot(s) {}
+
+        SamplerState GetExpectedState() const {
+            SamplerState state;
+
+            if (strstr(name.c_str(), "smp_rtlinear") != nullptr) {
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "smp_linear") != nullptr) {
+                state.addressMode = AddressMode::Wrap;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "smp_base") != nullptr ||
+                     strstr(name.c_str(), "smp_material") != nullptr ||
+                     strstr(name.c_str(), "smp_bump") != nullptr) {
+                state.addressMode = AddressMode::Wrap;
+                state.minFilter = FilterMode::Anisotropic;
+                state.magFilter = FilterMode::Anisotropic;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 8;
+            }
+            else if (strstr(name.c_str(), "smp_nofilter") != nullptr ||
+                     strstr(name.c_str(), "smp_smap") != nullptr ||
+                     strstr(name.c_str(), "smp_jitter") != nullptr) {
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Point;
+                state.magFilter = FilterMode::Point;
+                state.mipFilter = FilterMode::Point;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "PointClamp") != nullptr) {
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Point;
+                state.magFilter = FilterMode::Point;
+                state.mipFilter = FilterMode::Point;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "LinearClamp") != nullptr) {
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+            else {
+                state.addressMode = AddressMode::Wrap;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+
+            return state;
+        }
+
+        nvrhi::SamplerHandle CreateNVRHISampler(nvrhi::IDevice* device) const {
+            auto samplerState = GetExpectedState();
+
+            nvrhi::SamplerDesc nvrhiDesc;
+
+            auto isLinearOrAniso = [](FilterMode mode) {
+                return mode == FilterMode::Linear || mode == FilterMode::Anisotropic;
+            };
+
+            nvrhiDesc.setMinFilter(isLinearOrAniso(samplerState.minFilter));
+            nvrhiDesc.setMagFilter(isLinearOrAniso(samplerState.magFilter));
+            nvrhiDesc.setMipFilter(isLinearOrAniso(samplerState.mipFilter));
+
+            nvrhi::SamplerAddressMode nvrhiAddressMode =
+                (samplerState.addressMode == AddressMode::Clamp)
+                    ? nvrhi::SamplerAddressMode::Clamp
+                    : nvrhi::SamplerAddressMode::Wrap;
+            nvrhiDesc.setAllAddressModes(nvrhiAddressMode);
+
+            nvrhiDesc.setMaxAnisotropy(static_cast<float>(samplerState.maxAnisotropy));
+
+            return device->createSampler(nvrhiDesc);
+        }
     };
     xr_vector<Sampler> samplers;
 

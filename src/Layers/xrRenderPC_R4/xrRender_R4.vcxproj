@@ -281,7 +281,6 @@
     <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
-    <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h" />
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -530,7 +529,6 @@
     <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
     <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
-    <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp" />
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
