@@ -94,13 +94,31 @@ void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
         return;
     }
 
-    if (constant->size != 64) {
-        Msg("! [FGConstantSystem] Size mismatch for '%s': expected %u, got 64",
-            name, constant->size);
+    if (!constant->IsMatrix()) {
+        Msg("! [FGConstantSystem] Constant '%s' is not a matrix (type=%d)",
+            name, (int)constant->type);
         return;
     }
 
-    WriteConstant(constant, &value, 64);
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+
+    // Automatic format detection based on shader reflection
+    if (constant->IsMatrix3x4()) {
+        WriteMatrix3x4(stagingBuffer + constant->offset, value);
+    } else if (constant->IsMatrix4x4()) {
+        WriteMatrix4x4(stagingBuffer + constant->offset, value);
+    } else {
+        Msg("! [FGConstantSystem] Unknown matrix type for '%s'", name);
+        return;
+    }
+
+    // Mark dirty
+    switch (constant->frequency) {
+        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
+        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
+        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
+        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
+    }
 }
 
 // ═══════════════════════════════════════════════════
@@ -170,13 +188,116 @@ void FGConstantSystem::SetStatic(const char* name, const Fmatrix& value) {
         return;
     }
 
-    if (constant->size != 64) {
-        Msg("! [FGConstantSystem::SetStatic] Size mismatch for '%s': expected %u, got 64",
-            name, constant->size);
+    if (!constant->IsMatrix()) {
+        Msg("! [FGConstantSystem::SetStatic] Constant '%s' is not a matrix", name);
         return;
     }
 
-    WriteStaticConstant(constant, &value, 64);
+    // Write to static staging buffer
+    if (constant->IsMatrix3x4()) {
+        WriteMatrix3x4(m_staticConstants + constant->offset, value);
+    } else if (constant->IsMatrix4x4()) {
+        WriteMatrix4x4(m_staticConstants + constant->offset, value);
+    }
+
+    m_dirtyStatic = ~0ull;
+}
+
+// ═══════════════════════════════════════════════════
+//  ARRAY SETTERS (FOR BONE TRANSFORMS)
+// ═══════════════════════════════════════════════════
+
+void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 count) {
+    const ShaderConstant* constant = m_pso->FindConstant(name);
+    if (!constant) {
+        Msg("! [FGConstantSystem] Array constant '%s' not found", name);
+        return;
+    }
+
+    if (!constant->IsArray()) {
+        Msg("! [FGConstantSystem] Constant '%s' is not an array", name);
+        return;
+    }
+
+    if (count > constant->arrayCount) {
+        Msg("! [FGConstantSystem] Array size mismatch for '%s': writing %u, shader expects %u",
+            name, count, constant->arrayCount);
+        count = constant->arrayCount;  // Clamp to shader size
+    }
+
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+    u8* dest = stagingBuffer + constant->offset;
+
+    // Detect element type from constant metadata
+    // For bone transforms, shader declares: row_major float3x4 m_xform[64]
+
+    if (constant->elementSize == 48) {
+        // float3x4 array (bone transforms)
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix3x4(dest, values[i]);
+            dest += 48;
+        }
+    } else if (constant->elementSize == 64) {
+        // float4x4 array
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix4x4(dest, values[i]);
+            dest += 64;
+        }
+    } else {
+        Msg("! [FGConstantSystem] Unknown matrix element size %u for array '%s'",
+            constant->elementSize, name);
+        return;
+    }
+
+    // Mark dirty
+    switch (constant->frequency) {
+        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
+        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
+        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
+        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
+    }
+}
+
+void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u32 count) {
+    const ShaderConstant* constant = m_pso->FindConstant(name);
+    if (!constant) {
+        Msg("! [FGConstantSystem::SetStaticArray] Array constant '%s' not found", name);
+        return;
+    }
+
+    if (!constant->IsArray()) {
+        Msg("! [FGConstantSystem::SetStaticArray] Constant '%s' is not an array", name);
+        return;
+    }
+
+    if (count > constant->arrayCount) {
+        Msg("! [FGConstantSystem::SetStaticArray] Array size mismatch for '%s': writing %u, shader expects %u",
+            name, count, constant->arrayCount);
+        count = constant->arrayCount;  // Clamp to shader size
+    }
+
+    u8* dest = m_staticConstants + constant->offset;
+
+    // Detect element type from constant metadata
+    if (constant->elementSize == 48) {
+        // float3x4 array (bone transforms)
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix3x4(dest, values[i]);
+            dest += 48;
+        }
+    } else if (constant->elementSize == 64) {
+        // float4x4 array
+        for (u32 i = 0; i < count; ++i) {
+            WriteMatrix4x4(dest, values[i]);
+            dest += 64;
+        }
+    } else {
+        Msg("! [FGConstantSystem::SetStaticArray] Unknown matrix element size %u for array '%s'",
+            constant->elementSize, name);
+        return;
+    }
+
+    m_dirtyStatic = ~0ull;
 }
 
 // ═══════════════════════════════════════════════════
@@ -388,6 +509,72 @@ void FGConstantSystem::WriteStaticConstant(const ShaderConstant* constant, const
 
     // Mark static as dirty
     m_dirtyStatic = ~0ull;
+}
+
+// ═══════════════════════════════════════════════════
+//  MATRIX CONVERSION HELPERS
+// ═══════════════════════════════════════════════════
+
+void FGConstantSystem::WriteMatrix3x4(u8* dest, const Fmatrix& src) {
+    // ═══════════════════════════════════════════════════
+    // Fmatrix → float3x4 Conversion
+    // ═══════════════════════════════════════════════════
+    //
+    // Fmatrix layout (column-major in memory):
+    //   [_11 _21 _31 _41]  ← Column 0
+    //   [_12 _22 _32 _42]  ← Column 1
+    //   [_13 _23 _33 _43]  ← Column 2
+    //   [_14 _24 _34 _44]  ← Column 3
+    //
+    // HLSL float3x4 (row_major) expected layout:
+    //   Row 0: [_11 _12 _13 _14]  (16 bytes, padded to stride 16)
+    //   Row 1: [_21 _22 _23 _24]  (16 bytes)
+    //   Row 2: [_31 _32 _33 _34]  (16 bytes)
+    //   Total: 48 bytes (no row 3)
+    //
+    // Since Slang shader uses row_major qualifier, we write in row-major order
+    //
+
+    float* out = (float*)dest;
+
+    // Row 0: [_11, _12, _13, _14]
+    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
+
+    // Row 1: [_21, _22, _23, _24]
+    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
+
+    // Row 2: [_31, _32, _33, _34]
+    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
+
+    // Note: Row 3 (_41, _42, _43, _44) is discarded (float3x4 has no 4th row)
+}
+
+void FGConstantSystem::WriteMatrix4x4(u8* dest, const Fmatrix& src) {
+    // ═══════════════════════════════════════════════════
+    // Fmatrix → float4x4 Conversion
+    // ═══════════════════════════════════════════════════
+    //
+    // HLSL float4x4 (row_major) expected layout:
+    //   Row 0: [_11 _12 _13 _14]  (16 bytes)
+    //   Row 1: [_21 _22 _23 _24]  (16 bytes)
+    //   Row 2: [_31 _32 _33 _34]  (16 bytes)
+    //   Row 3: [_41 _42 _43 _44]  (16 bytes)
+    //   Total: 64 bytes
+    //
+
+    float* out = (float*)dest;
+
+    // Row 0
+    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
+
+    // Row 1
+    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
+
+    // Row 2
+    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
+
+    // Row 3
+    out[12] = src._41;  out[13] = src._42;  out[14] = src._43;  out[15] = src._44;
 }
 
 bool FGConstantSystem::ValidateBindings() const {

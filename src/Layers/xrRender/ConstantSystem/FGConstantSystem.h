@@ -41,7 +41,10 @@ public:
     void Set(const char* name, const Fvector2& value);  // float2
     void Set(const char* name, const Fvector& value);   // float3
     void Set(const char* name, const Fvector4& value);  // float4
-    void Set(const char* name, const Fmatrix& value);   // float4x4
+    void Set(const char* name, const Fmatrix& value);   // float4x4 or float3x4 (auto-detected)
+
+    // Matrix arrays - for bone transforms (m_xform[64])
+    void SetArray(const char* name, const Fmatrix* values, u32 count);
 
     // Texture/sampler types (future - for now use MaterialCache binding sets)
     // void Set(const char* name, nvrhi::TextureHandle texture);
@@ -70,6 +73,9 @@ public:
     void SetStatic(const char* name, const Fvector& value);
     void SetStatic(const char* name, const Fvector4& value);
     void SetStatic(const char* name, const Fmatrix& value);
+
+    // Matrix arrays (static)
+    void SetStaticArray(const char* name, const Fmatrix* values, u32 count);
 
     // Commit static constants (upload if dirty, bind always)
     // First frame: Uploads data to GPU
@@ -133,6 +139,10 @@ private:
 
     // Static constant helpers
     void WriteStaticConstant(const ShaderConstant* constant, const void* data, u32 size);
+
+    // Matrix conversion helpers (Fmatrix → HLSL row-major format)
+    void WriteMatrix3x4(u8* dest, const Fmatrix& src);  // 48 bytes (bone transforms)
+    void WriteMatrix4x4(u8* dest, const Fmatrix& src);  // 64 bytes (world/view/proj matrices)
 };
 
 } // namespace xray::render::fgconstants

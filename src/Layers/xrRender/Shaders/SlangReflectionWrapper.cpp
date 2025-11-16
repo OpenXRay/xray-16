@@ -1,5 +1,104 @@
 #include "stdafx.h"
 #include "SlangReflectionWrapper.h"
+#include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+
+namespace {
+
+using namespace xray::render::framegraph;
+
+// ═══════════════════════════════════════════════════
+// Type Detection Helper for Constant Reflection
+// ═══════════════════════════════════════════════════
+
+ShaderConstant::Type DetectConstantType(
+    slang::TypeLayoutReflection* typeLayout,
+    u16& outElementSize,
+    u16& outMatrixStride,
+    u16& outArrayCount)
+{
+    if (!typeLayout) {
+        outElementSize = 0;
+        outArrayCount = 1;
+        outMatrixStride = 0;
+        return ShaderConstant::Type::Struct;
+    }
+
+    auto* type = typeLayout->getType();
+    if (!type) {
+        outElementSize = static_cast<u16>(typeLayout->getSize());
+        outArrayCount = 1;
+        outMatrixStride = 0;
+        return ShaderConstant::Type::Struct;
+    }
+
+    slang::TypeReflection::Kind kind = type->getKind();
+
+    switch (kind) {
+        case slang::TypeReflection::Kind::Scalar: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Scalar;
+        }
+
+        case slang::TypeReflection::Kind::Vector: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Vector;
+        }
+
+        case slang::TypeReflection::Kind::Matrix: {
+            auto rowCount = type->getRowCount();
+            auto colCount = type->getColumnCount();
+
+            // Query stride (accounts for HLSL packing rules - always 16 bytes per row)
+            outMatrixStride = static_cast<u16>(typeLayout->getStride(slang::ParameterCategory::Uniform));
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+
+            if (rowCount == 3 && colCount == 4) {
+                // float3x4: 3 rows × 4 columns = 48 bytes (stride 16 per row)
+                return ShaderConstant::Type::Matrix3x4;
+            } else if (rowCount == 4 && colCount == 4) {
+                // float4x4: 4 rows × 4 columns = 64 bytes (stride 16 per row)
+                return ShaderConstant::Type::Matrix4x4;
+            }
+
+            Msg("! [DetectConstantType] Unsupported matrix dimensions: %dx%d",
+                rowCount, colCount);
+            return ShaderConstant::Type::Struct;
+        }
+
+        case slang::TypeReflection::Kind::Array: {
+            // Get array element type and count
+            auto* elementTypeLayout = typeLayout->getElementTypeLayout();
+
+            outArrayCount = static_cast<u16>(typeLayout->getElementCount());
+            outElementSize = elementTypeLayout ? static_cast<u16>(elementTypeLayout->getSize()) : 0;
+            outMatrixStride = 0;
+
+            // Check if array of matrices
+            if (elementTypeLayout) {
+                auto* elementType = elementTypeLayout->getType();
+                if (elementType && elementType->getKind() == slang::TypeReflection::Kind::Matrix) {
+                    outMatrixStride = static_cast<u16>(elementTypeLayout->getStride(slang::ParameterCategory::Uniform));
+                }
+            }
+
+            return ShaderConstant::Type::Array;
+        }
+
+        default: {
+            outElementSize = static_cast<u16>(typeLayout->getSize());
+            outArrayCount = 1;
+            outMatrixStride = 0;
+            return ShaderConstant::Type::Struct;
+        }
+    }
+}
+
+} // anonymous namespace
 
 namespace xray::render
 {

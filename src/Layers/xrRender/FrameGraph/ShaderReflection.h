@@ -286,6 +286,30 @@ struct ShaderConstant {
     ConstantPersistence persistence;  // Allocation strategy (volatile VCB vs static CB)
     u16 cbIndex;                      // Which CB contains this constant (index into ShaderConstantBuffers::buffers)
 
+    // ═══════════════════════════════════════════════════
+    // NEW: Type Metadata for Matrix/Array Support
+    // ═══════════════════════════════════════════════════
+
+    enum class Type : u8 {
+        Scalar,      // float, int, uint
+        Vector,      // float2, float3, float4
+        Matrix3x4,   // float3x4 (48 bytes) - bone transforms
+        Matrix4x4,   // float4x4 (64 bytes) - world/view/proj matrices
+        Struct,      // Custom struct
+        Array        // Array of any type (float4[], float3x4[], etc.)
+    };
+
+    Type type = Type::Scalar;
+    u16 arrayCount = 1;              // 1 for non-arrays, N for T[N]
+    u16 elementSize = 0;             // Size of single element (for arrays)
+    u16 matrixStride = 0;            // 0 for non-matrices, 16 for matrices
+
+    // Helper predicates
+    bool IsArray() const { return arrayCount > 1; }
+    bool IsMatrix() const { return type == Type::Matrix3x4 || type == Type::Matrix4x4; }
+    bool IsMatrix3x4() const { return type == Type::Matrix3x4; }
+    bool IsMatrix4x4() const { return type == Type::Matrix4x4; }
+
     ShaderConstant()
         : offset(0), size(0), frequency(UpdateFrequency::Instance)
         , persistence(ConstantPersistence::Volatile), cbIndex(0) {}

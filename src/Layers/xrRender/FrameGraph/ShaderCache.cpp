@@ -229,6 +229,12 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
         writer->w_u8(static_cast<u8>(constant.frequency));     // UpdateFrequency enum
         writer->w_u8(static_cast<u8>(constant.persistence));   // ConstantPersistence enum
         writer->w_u16(constant.cbIndex);
+
+        // NEW: Type metadata for matrices/arrays
+        writer->w_u8(static_cast<u8>(constant.type));          // ShaderConstant::Type enum
+        writer->w_u16(constant.arrayCount);
+        writer->w_u16(constant.elementSize);
+        writer->w_u16(constant.matrixStride);
     }
 
     // ═══════════════════════════════════════════════════
@@ -359,6 +365,11 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             constant.frequency = static_cast<UpdateFrequency>(reader->r_u8());
             constant.persistence = static_cast<ConstantPersistence>(reader->r_u8());
             constant.cbIndex = reader->r_u16();
+
+            constant.type = (ShaderConstant::Type)reader->r_u8();
+            constant.arrayCount = reader->r_u16();
+            constant.elementSize = reader->r_u16();
+            constant.matrixStride = reader->r_u16();
         }
 
         // Also populate constantLayout.constantBuffers from reflection.constantBuffers
