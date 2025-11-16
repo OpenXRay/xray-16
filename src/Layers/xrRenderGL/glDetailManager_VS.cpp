@@ -148,7 +148,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                 VERIFY(c_storage);*/
 
                 u32 dwBatch = 0;
-                std::vector<glm::vec4> uniformBuffer;
+                xr_vector<glm::vec4> uniformBuffer;
                 uniformBuffer.reserve(hw_BatchSize*4);
 
                 for (auto items : vis)
@@ -169,7 +169,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                         // R2 only needs hemisphere
                         float h = instance->c_hemi;
                         float s = instance->c_sun;
-                        /*cmd_list.set_ca(&*constArray, base + 3, s, s, s, h);*/
+
                         uniformBuffer.emplace_back(s, s, s, h);
                         dwBatch ++;
                         if (dwBatch == hw_BatchSize)
@@ -181,15 +181,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                             //RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                             //RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
 
-                            R_constant_load L = constArray->vs;
-                            if (constArray->destination & RC_dest_pixel) { L = constArray->ps; }
-                            if (constArray->destination & RC_dest_vertex) { L = constArray->vs; }
-                            if (constArray->destination & RC_dest_geometry) { L = constArray->gs; }
-                            if (constArray->destination & RC_dest_all) { L = constArray->pp; }
-
-                            CHK_GL(glProgramUniform4fv(L.program, L.location, uniformBuffer.size(), reinterpret_cast<GLfloat*>(uniformBuffer.data())));
-                            //L.location += dwBatch*4;
-
+                            cmd_list.set_uniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
                             cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                             cmd_list.stat.r.s_details.add(dwCNT_verts);
                             uniformBuffer.clear();
@@ -207,15 +199,7 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                     u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
                     //RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
                     //RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
-                    R_constant_load L = constArray->vs;
-                    if (constArray->destination & RC_dest_pixel) { L = constArray->ps; }
-                    if (constArray->destination & RC_dest_vertex) { L = constArray->vs; }
-                    if (constArray->destination & RC_dest_geometry) { L = constArray->gs; }
-                    if (constArray->destination & RC_dest_all) { L = constArray->pp; }
-
-                    CHK_GL(glProgramUniform4fv(L.program, L.location, uniformBuffer.size(), reinterpret_cast<GLfloat*>(uniformBuffer.data())));
-                    //L.location += dwBatch*4;
-
+                    cmd_list.set_uniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
                     cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                     cmd_list.stat.r.s_details.add(dwCNT_verts);
                 }

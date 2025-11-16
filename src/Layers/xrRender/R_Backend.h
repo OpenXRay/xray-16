@@ -23,6 +23,7 @@
 #endif
 
 #include "FVF.h"
+#include <glm/glm.hpp>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -100,10 +101,16 @@ private:
     GLuint pFB;
     GLuint pRT[4];
     GLuint pZB;
+
+    template<typename TYPE>
+    void _set_uniforms(GLuint program, GLint location, xr_vector<TYPE>& uniforms);
+
+public:
+    void set_uniforms(GLuint program, GLint location, xr_vector<glm::vec4>& uniforms);
+private:
 #else
 #   error No graphics API selected or enabled!
 #endif
-
     // Vertices/Indices/etc
     SDeclaration* decl;
     VertexBufferHandle vb;

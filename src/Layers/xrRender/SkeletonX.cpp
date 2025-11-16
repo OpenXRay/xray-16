@@ -73,16 +73,30 @@ void CSkeletonX::_Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iO
         // transfer matrices
         ref_constant array = cmd_list.get_c(s_bones_array_const);
         u32 count = RMS_bonecount;
+#ifdef USE_OGL
+        xr_vector<glm::vec4> uniformBuffer;
+        uniformBuffer.reserve(count*3);
+#endif
+
         for (u32 mid = 0; mid < count; mid++)
         {
             Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
+#ifdef USE_OGL
+            uniformBuffer.emplace_back(M._11, M._21, M._31, M._41);
+            uniformBuffer.emplace_back(M._12, M._22, M._32, M._42);
+            uniformBuffer.emplace_back(M._13, M._23, M._33, M._43);
+#else
             u32 id = mid * 3;
             cmd_list.set_ca(&*array, id + 0, M._11, M._21, M._31, M._41);
             cmd_list.set_ca(&*array, id + 1, M._12, M._22, M._32, M._42);
             cmd_list.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
+#endif
         }
 
         // render
+#ifdef USE_OGL
+        cmd_list.set_uniforms(array->vs.program, array->vs.location, uniformBuffer);
+#endif
         cmd_list.set_Geometry(hGeom);
         cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);
         if (RM_SKINNING_1B == RenderMode || RM_SKINNING_1B_HQ == RenderMode)
