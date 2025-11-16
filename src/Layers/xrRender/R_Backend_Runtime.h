@@ -61,25 +61,25 @@ IC const Fmatrix& CBackend::get_xform_project() { return xforms.get_P(); }
 #if defined(USE_DX11)
 IC ID3DRenderTargetView* CBackend::get_RT(u32 ID)
 #elif defined(USE_OGL)
-IC GLuint CBackend::get_RT(u32 ID)
+IC ref_rt& CBackend::get_RT(u32 ID)
 #else
 #   error No graphics API selected or enabled!
 #endif
 {
     VERIFY((ID >= 0) && (ID < 4));
 
-    return pRT[ID];
+    return *pRT[ID];
 }
 
 #if defined(USE_DX11)
 IC ID3DDepthStencilView* CBackend::get_ZB()
 #elif defined(USE_OGL)
-IC GLuint CBackend::get_ZB()
+IC ref_rt& CBackend::get_ZB()
 #else
 #   error No graphics API selected or enabled!
 #endif
 {
-    return pZB;
+    return *pZB;
 }
 ICF void CBackend::set_States(SState* _state)
 {

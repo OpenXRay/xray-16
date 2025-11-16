@@ -231,11 +231,7 @@ void CBackend::dbg_OverdrawEnd()
         D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP);
 
     // Set the background to black
-#ifndef USE_OGL
     RCache.ClearRT(get_RT(), color_xrgb(255, 0, 0)); // XXX: it's red, not black. Check why.
-#else
-    VERIFY(1!=1);
-#endif
 
     OnFrameEnd();
 

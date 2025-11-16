@@ -48,12 +48,7 @@ void CRenderTarget::phase_smap_spot_tsh(CBackend& cmd_list, light* L)
     if (IRender_Light::OMNIPART == L->flags.type)
     {
         // omni-part
-#ifndef USE_OGL
         cmd_list.ClearRT(cmd_list.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f });
-#else
-        VERIFY(1!=1);
-#endif
-
     }
     else
     {

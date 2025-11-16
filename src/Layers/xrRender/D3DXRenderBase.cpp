@@ -287,15 +287,11 @@ void D3DXRenderBase::Begin()
 
 void D3DXRenderBase::Clear()
 {
-#ifndef USE_OGL
     RCache.ClearZB(RCache.get_ZB(), 1.0f, 0);
     if (psDeviceFlags.test(rsClearBB))
     {
         RCache.ClearRT(RCache.get_RT(), {}); // black
     }
-#else
-    VERIFY(1!=1);
-#endif
 }
 
 void D3DXRenderBase::End()
@@ -324,11 +320,7 @@ void D3DXRenderBase::ResourcesDestroyNecessaryTextures()
 }
 void D3DXRenderBase::ClearTarget()
 {
-#ifndef USE_OGL
     RCache.ClearRT(RCache.get_RT(), {}); // black
-#else
-    VERIFY(1!=1);
-#endif
 }
 
 void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)

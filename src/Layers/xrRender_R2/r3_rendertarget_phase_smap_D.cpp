@@ -36,11 +36,6 @@ void CRenderTarget::phase_smap_direct_tsh(CBackend& cmd_list, light *L, u32 sub_
     cmd_list.set_ColorWriteEnable();
     //	Prepare viewport for shadow map rendering
     RImplementation.rmNormal(cmd_list);
-#ifndef USE_OGL
     cmd_list.ClearRT(cmd_list.get_RT(), { 1.0f, 1.0f, 1.0f, 1.0f }); // color_rgba(127, 127, 12, 12);
-#else
-    VERIFY(1!=1);
-#endif
-
 }
 } // namespace xray::render::RENDER_NAMESPACE

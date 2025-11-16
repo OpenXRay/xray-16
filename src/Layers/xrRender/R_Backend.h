@@ -97,9 +97,12 @@ private:
     ID3DRenderTargetView* pRT[4];
     ID3DDepthStencilView* pZB;
 #elif defined(USE_OGL)
+    // TODO make it valid(?), set target as GL_NONE
+    ref_rt ref_invalid{};
+
     GLuint pFB;
-    GLuint pRT[4];
-    GLuint pZB;
+    ref_rt* pRT[4] = {&ref_invalid, &ref_invalid, &ref_invalid, &ref_invalid};
+    ref_rt* pZB = &ref_invalid;
 #else
 #   error No graphics API selected or enabled!
 #endif
@@ -285,8 +288,8 @@ public:
     IC void set_ZB(const ref_rt&  ZB);
     IC void unset_ZB();
     IC GLuint get_FB();
-    IC GLuint get_RT(u32 ID = 0);
-    IC GLuint get_ZB();
+    IC ref_rt& get_RT(u32 ID = 0);
+    IC ref_rt& get_ZB();
 
     IC void ClearZB(const ref_rt& zb, float depth);
     IC void ClearZB(const ref_rt& zb, float depth, u8 stencil);

@@ -24,19 +24,21 @@ IC void CBackend::set_FB(GLuint FB)
         pFB = FB;
         CHK_GL(glBindFramebuffer(GL_FRAMEBUFFER, pFB));
 
-        //0 is unset, but its actually unknown after switching FBO
-        std::fill(std::begin(pRT), std::end(pRT), std::numeric_limits<GLuint>::max());
-        pZB = std::numeric_limits<GLuint>::max();
+        //nullptr is unset, but its actually unknown after switching FBO
+        std::fill(std::begin(pRT), std::end(pRT), &ref_invalid);
+        pZB = &ref_invalid;
     }
 }
 
 IC void CBackend::set_RT(const ref_rt& RT, u32 ID)
 {
-    if (RT->pRT != pRT[ID])
+    VERIFY(RT != ref_invalid);
+
+    if (!pRT[ID] || RT != *pRT[ID])
     {
         PGO(Msg("PGO:setRT"));
         stat.target_rt++;
-        pRT[ID] = RT->pRT;
+        pRT[ID] = const_cast<ref_rt*>(&RT);
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, RT->target, RT->pRT, 0));
     }
 }
@@ -47,7 +49,7 @@ IC void CBackend::unset_RT(u32 ID)
     {
         PGO(Msg("PGO:unsetRT"));
         stat.target_rt++;
-        pRT[ID] = 0;
+        pRT[ID] = nullptr;
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D, GL_NONE, 0));
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ID, GL_TEXTURE_2D_MULTISAMPLE, GL_NONE, 0));
     }
@@ -55,11 +57,13 @@ IC void CBackend::unset_RT(u32 ID)
 
 IC void CBackend::set_ZB(const ref_rt& ZB)
 {
-    if (ZB->pZRT != pZB)
+    VERIFY(ZB != ref_invalid);
+
+    if (!pZB || ZB != *pZB)
     {
         PGO(Msg("PGO:setZB"));
         stat.target_zb++;
-        pZB = ZB->pZRT;
+        pZB = const_cast<ref_rt*>(&ZB);
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, ZB->target, ZB->pZRT, 0));
     }
 }
@@ -70,7 +74,7 @@ IC void CBackend::unset_ZB()
     {
         PGO(Msg("PGO:setZB"));
         stat.target_zb++;
-        pZB = 0;
+        pZB = nullptr;
         //@TODO: track what texture we used
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, GL_NONE, 0));
         CHK_GL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, GL_NONE, 0));

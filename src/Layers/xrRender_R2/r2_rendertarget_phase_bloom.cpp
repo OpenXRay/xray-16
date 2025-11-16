@@ -556,12 +556,7 @@ void CRenderTarget::phase_bloom()
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
     if (_menu_pp)
     {
-#ifndef USE_OGL
         RCache.ClearRT(RCache.get_RT(), {}); // black
-#else
-        VERIFY(1!=1);
-#endif
-
     }
 
     // re-enable z-buffer
