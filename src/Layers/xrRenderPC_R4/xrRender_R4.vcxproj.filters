@@ -823,9 +823,6 @@
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Debug\GBufferVisualization.h">
-      <Filter>Framegraph\Passes</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\ResourceManager\NativeRTFactory.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
@@ -1575,9 +1572,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp">
       <Filter>Framegraph</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\Debug\GBufferVisualization.cpp">
-      <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp">
       <Filter>Framegraph</Filter>

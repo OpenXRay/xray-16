@@ -69,8 +69,132 @@ struct ShaderRTBindings {
         shared_str name;       // "smp_base", "smp_rtlinear", etc.
         u32 slot;              // Sampler slot (s0, s1, ...)
 
+        // Sampler state metadata (from X-Ray naming conventions)
+        // See gamedata/shaders/r5/common_samplers.h for authoritative definitions
+        enum class FilterMode : u8 {
+            Point,        // D3DTEXF_POINT
+            Linear,       // D3DTEXF_LINEAR
+            Anisotropic   // D3DTEXF_ANISOTROPIC
+        };
+
+        enum class AddressMode : u8 {
+            Wrap,   // D3DTADDRESS_WRAP
+            Clamp   // D3DTADDRESS_CLAMP
+        };
+
+        struct SamplerState {
+            AddressMode addressMode;
+            FilterMode minFilter;
+            FilterMode magFilter;
+            FilterMode mipFilter;
+            u8 maxAnisotropy;  // 1, 8, 16, etc.
+
+            SamplerState()
+                : addressMode(AddressMode::Wrap)
+                , minFilter(FilterMode::Linear)
+                , magFilter(FilterMode::Linear)
+                , mipFilter(FilterMode::Linear)
+                , maxAnisotropy(1) {}
+        };
+
         Sampler() : slot(0) {}
         Sampler(const char* n, u32 s) : name(n), slot(s) {}
+
+        // Infer sampler state from X-Ray naming convention
+        // Based on common_samplers.h shader definitions
+        SamplerState GetExpectedState() const {
+            SamplerState state;
+
+            if (strstr(name.c_str(), "smp_rtlinear") != nullptr) {
+                // D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "smp_linear") != nullptr) {
+                // D3DTADDRESS_WRAP, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR
+                state.addressMode = AddressMode::Wrap;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "smp_base") != nullptr ||
+                     strstr(name.c_str(), "smp_material") != nullptr ||
+                     strstr(name.c_str(), "smp_bump") != nullptr) {
+                // D3DTADDRESS_WRAP, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC
+                state.addressMode = AddressMode::Wrap;
+                state.minFilter = FilterMode::Anisotropic;
+                state.magFilter = FilterMode::Anisotropic;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 8;
+            }
+            else if (strstr(name.c_str(), "smp_nofilter") != nullptr ||
+                     strstr(name.c_str(), "smp_smap") != nullptr ||
+                     strstr(name.c_str(), "smp_jitter") != nullptr) {
+                // D3DTADDRESS_CLAMP, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Point;
+                state.magFilter = FilterMode::Point;
+                state.mipFilter = FilterMode::Point;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "PointClamp") != nullptr) {
+                // Fluid sim samplers
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Point;
+                state.magFilter = FilterMode::Point;
+                state.mipFilter = FilterMode::Point;
+                state.maxAnisotropy = 1;
+            }
+            else if (strstr(name.c_str(), "LinearClamp") != nullptr) {
+                state.addressMode = AddressMode::Clamp;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+            else {
+                // Default: linear, wrap
+                state.addressMode = AddressMode::Wrap;
+                state.minFilter = FilterMode::Linear;
+                state.magFilter = FilterMode::Linear;
+                state.mipFilter = FilterMode::Linear;
+                state.maxAnisotropy = 1;
+            }
+
+            return state;
+        }
+
+        // Create NVRHI sampler from reflection metadata
+        nvrhi::SamplerHandle CreateNVRHISampler(nvrhi::IDevice* device) const {
+            auto samplerState = GetExpectedState();
+
+            nvrhi::SamplerDesc nvrhiDesc;
+
+            // Convert filter modes
+            auto isLinearOrAniso = [](FilterMode mode) {
+                return mode == FilterMode::Linear || mode == FilterMode::Anisotropic;
+            };
+
+            nvrhiDesc.setMinFilter(isLinearOrAniso(samplerState.minFilter));
+            nvrhiDesc.setMagFilter(isLinearOrAniso(samplerState.magFilter));
+            nvrhiDesc.setMipFilter(isLinearOrAniso(samplerState.mipFilter));
+
+            // Convert address mode
+            nvrhi::SamplerAddressMode nvrhiAddressMode =
+                (samplerState.addressMode == AddressMode::Clamp)
+                    ? nvrhi::SamplerAddressMode::Clamp
+                    : nvrhi::SamplerAddressMode::Wrap;
+            nvrhiDesc.setAllAddressModes(nvrhiAddressMode);
+
+            // Set anisotropy
+            nvrhiDesc.setMaxAnisotropy(static_cast<float>(samplerState.maxAnisotropy));
+
+            return device->createSampler(nvrhiDesc);
+        }
     };
     xr_vector<Sampler> samplers;
 

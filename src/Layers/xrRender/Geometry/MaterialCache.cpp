@@ -684,94 +684,22 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
     VERIFY(matPSO);
 
 #if defined(USE_DX11)
-    // Get X-Ray's render state from the pass
-    // IMPORTANT: pass->state returns SState*, NOT dx11State* directly!
-    SState* xrState = pass->state._get();
-    if (!xrState || !xrState->state) {
-        return;
-    }
-
-    // The actual dx11State is inside xrState->state
-    dx11State* d3dState = static_cast<dx11State*>(xrState->state);
-    if (!d3dState) {
-        return;
-    }
-
-    const auto& psSamplers = d3dState->GetPSSamplers();
-
-
-    // Helper to create NVRHI sampler from D3D11 sampler
-    auto createNVRHISampler = [&](ID3DSamplerState* d3dSampler) -> nvrhi::SamplerHandle {
-        D3D11_SAMPLER_DESC samplerDesc;
-        d3dSampler->GetDesc(&samplerDesc);
-
-        nvrhi::SamplerDesc nvrhiDesc;
-        nvrhiDesc.setMinFilter(samplerDesc.Filter != D3D11_FILTER_MIN_MAG_MIP_POINT);
-        nvrhiDesc.setMagFilter(samplerDesc.Filter != D3D11_FILTER_MIN_MAG_MIP_POINT);
-        nvrhiDesc.setMipFilter(samplerDesc.Filter != D3D11_FILTER_MIN_MAG_MIP_POINT);
-
-        // Convert address modes
-        auto convertAddressMode = [](D3D11_TEXTURE_ADDRESS_MODE mode) {
-            switch (mode) {
-                case D3D11_TEXTURE_ADDRESS_WRAP: return nvrhi::SamplerAddressMode::Wrap;
-                case D3D11_TEXTURE_ADDRESS_CLAMP: return nvrhi::SamplerAddressMode::Clamp;
-                case D3D11_TEXTURE_ADDRESS_MIRROR: return nvrhi::SamplerAddressMode::Mirror;
-                case D3D11_TEXTURE_ADDRESS_BORDER: return nvrhi::SamplerAddressMode::Border;
-                default: return nvrhi::SamplerAddressMode::Wrap;
-            }
-        };
-
-        nvrhiDesc.setAddressU(convertAddressMode(samplerDesc.AddressU));
-        nvrhiDesc.setAddressV(convertAddressMode(samplerDesc.AddressV));
-        nvrhiDesc.setAddressW(convertAddressMode(samplerDesc.AddressW));
-        nvrhiDesc.setMaxAnisotropy(static_cast<float>(samplerDesc.MaxAnisotropy));
-        nvrhiDesc.setMipBias(samplerDesc.MipLODBias);
-
-        return m_device->GetNativeDevice()->createSampler(nvrhiDesc);
-    };
-
-    // Helper to create default sampler
-    auto createDefaultSampler = [&]() -> nvrhi::SamplerHandle {
-        nvrhi::SamplerDesc nvrhiDesc;
-        nvrhiDesc.setMinFilter(true);  // Linear
-        nvrhiDesc.setMagFilter(true);  // Linear
-        nvrhiDesc.setMipFilter(true);  // Linear
-        // UI elements should use Clamp mode to prevent tiling/repeating
-        nvrhiDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-        nvrhiDesc.setMaxAnisotropy(8.0f);
-
-        return m_device->GetNativeDevice()->createSampler(nvrhiDesc);
-    };
-
-    // Extract samplers based on shader reflection data
+    // Extract samplers based on Slang shader reflection
+    // Sampler state is inferred from X-Ray naming conventions (see ShaderReflection.h)
     for (const auto& samplerDecl : matPSO->rtBindings.samplers) {
-        u32 slot = samplerDecl.slot;
-        const char* samplerName = samplerDecl.name.c_str();
-
         MaterialPSO::SamplerInfo samplerInfo;
-        samplerInfo.slot = slot;
+        samplerInfo.slot = samplerDecl.slot;
         samplerInfo.stage = MaterialPSO::ShaderStage::Pixel;  // Currently only PS samplers
-        samplerInfo.name = samplerName;
+        samplerInfo.name = samplerDecl.name.c_str();
 
-        // Try to get sampler from X-Ray state
-        if (slot < psSamplers.size()) {
-            auto samplerHandle = psSamplers[slot];
-            if (samplerHandle != dx11SamplerStateCache::hInvalidHandle) {
-                ID3DSamplerState* d3dSampler = SSManager.GetSamplerState(samplerHandle);
-                if (d3dSampler) {
-                    samplerInfo.nvrhiSampler = createNVRHISampler(d3dSampler);
-                }
-            }
-        }
-
-        // If not found in X-Ray state, create default sampler
-        if (!samplerInfo.nvrhiSampler) {
-            samplerInfo.nvrhiSampler = createDefaultSampler();
-        }
+        // Create NVRHI sampler directly from reflection metadata
+        samplerInfo.nvrhiSampler = samplerDecl.CreateNVRHISampler(m_device->GetNativeDevice());
 
         if (samplerInfo.nvrhiSampler) {
             matPSO->samplers.push_back(samplerInfo);
+            Msg("  [ExtractSamplers] Created '%s' at slot %u", samplerInfo.name.c_str(), samplerDecl.slot);
         } else {
+            Msg("! [ExtractSamplers] Failed to create sampler '%s'", samplerInfo.name.c_str());
         }
     }
 
