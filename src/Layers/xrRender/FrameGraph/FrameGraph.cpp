@@ -242,11 +242,32 @@ const ResourceDesc& FrameGraph::GetResourceDesc(VirtualResourceHandle handle) co
 
 void FrameGraph::ResetForNextFrame() {
 
-    m_stats.compileTimeMs = 0.0f;
-    m_stats.executeTimeMs = 0.0f;
-    m_stats.totalGPUTimeMs = 0.0f;
-    m_stats.passTimings.clear();
+    if (m_resourcePool) {
+        for (auto& resource : m_resources) {
+            if (resource.desc.isImported) {
+                continue;
+            }
 
+            if (resource.resourceTexture.IsValid()) {
+                m_resourcePool->FreeTexture(resource.resourceTexture);
+            }
+
+            if (resource.resourceBuffer.IsValid()) {
+                m_resourcePool->FreeBuffer(resource.resourceBuffer);
+            }
+        }
+    }
+
+    m_passes.clear();
+    m_resources.clear();
+    m_sortedPasses.clear();
+    m_compiled = false;
+
+    m_rtRegistry.Clear();
+
+    m_stats = Statistics();
+
+    Msg("~ [FrameGraph] Reset complete");
 }
 
 void FrameGraph::Reset() {
@@ -734,7 +755,7 @@ void FrameGraph::AllocateResources() {
             continue;
         }
 
-        bool usePersistent = resource.isPersistent || resource.desc.isRenderTarget || resource.desc.isDepthStencil;
+        bool skipAliasing = resource.desc.isImported;
 
         if (resource.desc.type == ResourceDesc::Type::Buffer) {
             if (m_resourcePool) {
@@ -823,7 +844,7 @@ void FrameGraph::AllocateResources() {
                 rmTexDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
 
                 resources::TextureHandle rmHandle;
-                if (usePersistent) {
+                if (skipAliasing) {
                     rmHandle = m_resourcePool->AllocatePersistentTexture(rmTexDesc);
                 } else {
                     rmHandle = m_resourcePool->AllocateTexture(rmTexDesc);
@@ -839,7 +860,7 @@ void FrameGraph::AllocateResources() {
 
                     Msg("~ [FrameGraph] Allocated texture '%s' via ResourceManager%s: %ux%ux%u, %.2f MB",
                         resource.desc.debugName.c_str(),
-                        !usePersistent ? " (transient)" : "",
+                        !skipAliasing ? " (transient)" : "",
                         resource.desc.width,
                         resource.desc.height,
                         resource.desc.depth,
@@ -902,7 +923,7 @@ void FrameGraph::AllocateResources() {
                 Msg("~ [FrameGraph] Allocated texture '%s'%s%s: %ux%ux%u, %.2f MB",
                     resource.desc.debugName.c_str(),
                     m_resourcePool ? " via pool" : "",
-                    (m_resourcePool && !usePersistent) ? " (transient)" : "",
+                    (m_resourcePool && !skipAliasing) ? " (transient)" : "",
                     resource.desc.width,
                     resource.desc.height,
                     resource.desc.depth,

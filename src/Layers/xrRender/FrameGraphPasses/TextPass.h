@@ -27,7 +27,7 @@ struct TextPassConfig {
 
 class TextPass : public framegraph::IPass {
 public:
-    TextPass(ng::RenderDevice* device, const TextPassConfig& config = TextPassConfig());
+    TextPass(const TextPassConfig& config = TextPassConfig());
     ~TextPass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -55,7 +55,7 @@ private:
 
     void RenderText(ng::RenderContext& ctx, nvrhi::ITexture* outputTexture, nvrhi::ITexture* depthTexture);
 
-    ng::RenderDevice* m_device;
+    
     TextPassConfig m_config;
     TextStats m_textStats;
 

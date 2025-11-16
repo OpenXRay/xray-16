@@ -13,11 +13,19 @@
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
+#include "Layers/xrRender/UIRenderCollector.h"
+#include "Layers/xrRender/NVRHIUIRenderer.h"
 #include "Layers/xrRender/ShaderKey.h"
 #include "xrEngine/CustomHUD.h"
 #include "ImGuiRendererNVRHI.h"
 #include "xrEngine/device.h"
 #include <imgui.h>
+
+#include "FrameGraphPasses/GBufferPassSetup.h"
+#include "FrameGraphPasses/HUDPassSetup.h"
+#include "FrameGraphPasses/UIPassSetup.h"
+#include "FrameGraphPasses/ImGuiPassSetup.h"
 
 namespace xray::render {
 
@@ -47,49 +55,34 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
 
-    passes::GBufferPassConfig gbufferConfig;
-    gbufferConfig.width = Device.dwWidth;
-    gbufferConfig.height = Device.dwHeight;
+    m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
 
-    m_gbufferPass = xr_make_unique<passes::GBufferPass>(device, gbufferConfig);
+    m_materialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_geometryVCBPool.get()
+    );
 
-    passes::HUDPassConfig hudConfig;
-    hudConfig.width = Device.dwWidth;
-    hudConfig.height = Device.dwHeight;
-    m_hudPass = xr_make_unique<passes::HUDPass>(device, hudConfig);
+    m_uiVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+    m_uiMaterialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_uiVCBPool.get()
+    );
+    m_uiCollector = xr_make_unique<ui::UIRenderCollector>();
+    m_uiRenderer = xr_make_unique<ui::NVRHIUIRenderer>();
+    m_uiRenderer->Initialize(device, m_uiMaterialCache.get());
 
-    passes::ParticlePassConfig particleConfig;
-    particleConfig.width = Device.dwWidth;
-    particleConfig.height = Device.dwHeight;
-    m_particlePass = xr_make_unique<passes::ParticlePass>(device, m_gbufferPass->GetMaterialCache(), particleConfig);
+    Msg("* [FrameGraphRenderer] UI infrastructure initialized");
 
-    m_lightingPass = xr_make_unique<passes::LightingPass>(device);
-    m_tonemapPass = xr_make_unique<passes::TonemapPass>(device);
+    m_textVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
+    m_textMaterialCache = xr_make_unique<MaterialCache>(
+        device,
+        device->GetFGResourceManager(),
+        m_textVCBPool.get()
+    );
 
-    passes::UIPassConfig uiConfig;
-    uiConfig.width = Device.dwWidth;
-    uiConfig.height = Device.dwHeight;
-    m_uiPass = xr_make_unique<passes::UIPass>(device, uiConfig);
-
-    passes::TextPassConfig textConfig;
-    textConfig.width = Device.dwWidth;
-    textConfig.height = Device.dwHeight;
-    m_textPass = xr_make_unique<passes::TextPass>(device, textConfig);
-
-    passes::CursorPassConfig cursorConfig;
-    cursorConfig.width = Device.dwWidth;
-    cursorConfig.height = Device.dwHeight;
-    m_cursorPass = xr_make_unique<passes::CursorPass>(device, cursorConfig);
-
-    passes::MenuDistortPassConfig menuDistortConfig;
-    menuDistortConfig.width = Device.dwWidth;
-    menuDistortConfig.height = Device.dwHeight;
-    m_menuDistortPass = xr_make_unique<passes::MenuDistortPass>(device, menuDistortConfig);
-
-    passes::MenuCompositePassConfig menuCompositeConfig;
-    menuCompositeConfig.width = Device.dwWidth;
-    menuCompositeConfig.height = Device.dwHeight;
-    m_menuCompositePass = xr_make_unique<passes::MenuCompositePass>(device, menuCompositeConfig);
+    Msg("* [FrameGraphRenderer] Text infrastructure initialized");
 
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 
@@ -101,10 +94,6 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         Msg("! [FrameGraphRenderer] Failed to create RenderContext");
         return false;
     }
-
-    BuildFrameGraphStructure();
-
-    m_framegraph->Compile();
 
     Msg("* [FrameGraphRenderer] initialized");
 
@@ -120,15 +109,16 @@ void FrameGraphRenderer::Shutdown() {
 
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
-    m_tonemapPass = nullptr;
-    m_lightingPass = nullptr;
-    m_particlePass = nullptr;
-    m_hudPass = nullptr;
-    m_gbufferPass = nullptr;
-    m_menuCompositePass = nullptr;
-    m_menuDistortPass = nullptr;
-    m_textPass = nullptr;
-    m_uiPass = nullptr;
+    m_materialCache = nullptr;
+
+    m_uiRenderer = nullptr;
+    m_uiCollector = nullptr;
+    m_uiMaterialCache = nullptr;
+    m_uiVCBPool = nullptr;
+
+    m_textMaterialCache = nullptr;
+    m_textVCBPool = nullptr;
+
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
@@ -148,35 +138,15 @@ void FrameGraphRenderer::Render() {
 
     SetupFrame();
 
+    m_framegraph->ResetForNextFrame();
+
     SetupFrameGraphPasses();
 
     m_framegraph->SetRenderContext(m_renderContext.get());
 
+    m_framegraph->Compile();
+
     m_framegraph->Execute();
-
-    RenderHUD();
-
-
-    m_menuCompositePass->SetInputs(m_gbufferPass->GetOutputs().albedo, m_rt_MenuMain);
-    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
-
-    m_uiPass->Execute(*m_renderContext, *m_framegraph);
-    m_textPass->Execute(*m_renderContext, *m_framegraph);
-    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
-    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
-    Msg("* [FrameGraphRenderer] In-game UI rendering complete");
-
-    ImGui::Render();
-
-    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
-    if (imguiRenderer)
-    {
-        ImDrawData* drawData = ImGui::GetDrawData();
-        if (drawData)
-        {
-            RenderImGui(drawData, imguiRenderer);
-        }
-    }
 
     PresentToBackbuffer();
 
@@ -185,13 +155,12 @@ void FrameGraphRenderer::Render() {
         frameEnd - frameStart
     ).count();
 
-    m_stats.gbufferMs = m_gbufferPass->GetGBufferStats().cpuTimeMs;
-    m_stats.lightingMs = m_lightingPass->GetStats().cpuTimeMs;
-    m_stats.tonemapMs = m_tonemapPass->GetStats().cpuTimeMs;
-    m_stats.numDrawCalls = m_gbufferPass->GetGBufferStats().numDrawCalls;
-    m_stats.numTriangles = m_gbufferPass->GetGBufferStats().numTriangles;
+    m_stats.gbufferMs = 0.0f;
+    m_stats.lightingMs = 0.0f;
+    m_stats.tonemapMs = 0.0f;
+    m_stats.numDrawCalls = 0;
+    m_stats.numTriangles = 0;
 
-    m_framegraph->ResetForNextFrame();
 }
 
 void FrameGraphRenderer::RenderMenu() {
@@ -205,31 +174,61 @@ void FrameGraphRenderer::RenderMenu() {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
     }
 
-    m_framegraph->SetRenderContext(m_renderContext.get());
+    m_framegraph->ResetForNextFrame();
 
-    framegraph::VirtualResourceHandle invalidHandle;
-    m_menuCompositePass->SetInputs(invalidHandle, m_rt_MenuMain);
-    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
+    const u32 width = Device.dwWidth;
+    const u32 height = Device.dwHeight;
 
-    m_uiPass->Execute(*m_renderContext, *m_framegraph);
-    m_textPass->Execute(*m_renderContext, *m_framegraph);
-    m_cursorPass->Execute(*m_renderContext, *m_framegraph);
-    m_menuDistortPass->Execute(*m_renderContext, *m_framegraph);
-    m_menuCompositePass->Execute(*m_renderContext, *m_framegraph);
+    framegraph::ResourceDesc bgDesc;
+    bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    bgDesc.width = width;
+    bgDesc.height = height;
+    bgDesc.format = nvrhi::Format::RGBA8_UNORM;
+    bgDesc.isRenderTarget = true;
+    bgDesc.debugName = "rt_MenuBackground";
 
-    Msg("  [RenderMenu] 5-step UI pipeline complete (UI → Text → Cursor → Distort → Composite)");
+    auto backgroundTarget = m_framegraph->CreateTexture("rt_MenuBackground", bgDesc);
 
-    ImGui::Render();
+    framegraph::PassHandle clearPass = m_framegraph->AddPass("ClearBackground");
+    m_framegraph->PassWrite(clearPass, backgroundTarget, framegraph::ResourceState::RenderTarget);
+    m_framegraph->SetPassCallback(clearPass,
+        [backgroundTarget](ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
+            auto* bgRT = fg.GetPhysicalTexture(backgroundTarget);
+            if (bgRT) {
+                nvrhi::ICommandList* cmdList = ctx.GetCommandList();
+                cmdList->clearTextureFloat(bgRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f));
+            }
+        }
+    );
+
+    auto uiTarget = passes::setupUIPass(*m_framegraph, width, height);
+
+    uiTarget = passes::setupTextPass(*m_framegraph, uiTarget, width, height);
+
+    uiTarget = passes::setupCursorPass(*m_framegraph, uiTarget, width, height);
+
+    auto compositeOutput = passes::setupCompositePass(
+        *m_framegraph,
+        backgroundTarget,
+        uiTarget,
+        width,
+        height
+    );
 
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
-    if (imguiRenderer)
-    {
-        ImDrawData* drawData = ImGui::GetDrawData();
-        if (drawData)
-        {
-            RenderImGui(drawData, imguiRenderer);
-        }
-    }
+    auto finalOutput = passes::setupImGuiPass(
+        *m_framegraph,
+        compositeOutput,
+        imguiRenderer,
+        width,
+        height
+    );
+
+    m_finalOutput = finalOutput;
+
+    m_framegraph->SetRenderContext(m_renderContext.get());
+    m_framegraph->Compile();
+    m_framegraph->Execute();
 
     PresentToBackbuffer();
 
@@ -295,238 +294,60 @@ framegraph::VirtualResourceHandle FrameGraphRenderer::CreateRT(
     return m_framegraph->CreateTexture(name, desc);
 }
 
-void FrameGraphRenderer::BuildFrameGraphStructure() {
-
-    Msg("! [FrameGraphRenderer] Creating vanilla X-Ray render targets (native NVRHI)...");
-
-    u32 w = Device.dwWidth;
-    u32 h = Device.dwHeight;
-
-    auto* resMgr = m_device->GetFGResourceManager();
-    VERIFY(resMgr);
-    auto* rtFactory = resMgr->GetRTFactory();
-    VERIFY(rtFactory);
-    auto* textureMgr = resMgr->GetTextureManager();
-    VERIFY(textureMgr);
-
-    m_native_Position = rtFactory->CreatePositionBuffer(w, h, "rt_Position");
-    m_native_Normal = rtFactory->CreateNormalBuffer(w, h, "rt_Normal");
-    m_native_Albedo = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_Albedo");
-    m_native_Depth = rtFactory->CreateDepthStencil(w, h, false, "rt_Depth");
-
-    nvrhi::ITexture* physicalPosition = textureMgr->GetNVRHITexture(m_native_Position);
-    nvrhi::ITexture* physicalNormal = textureMgr->GetNVRHITexture(m_native_Normal);
-    nvrhi::ITexture* physicalAlbedo = textureMgr->GetNVRHITexture(m_native_Albedo);
-    nvrhi::ITexture* physicalDepth = textureMgr->GetNVRHITexture(m_native_Depth);
-
-    VERIFY(physicalPosition && physicalNormal && physicalAlbedo && physicalDepth);
-
-    framegraph::ResourceDesc positionDesc;
-    positionDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    positionDesc.width = w;
-    positionDesc.height = h;
-    positionDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    positionDesc.isRenderTarget = true;
-    positionDesc.debugName = "rt_Position";
-    m_rt_Position = m_framegraph->ImportTexture("rt_Position", physicalPosition, positionDesc);
-
-    framegraph::ResourceDesc normalDesc;
-    normalDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    normalDesc.width = w;
-    normalDesc.height = h;
-    normalDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    normalDesc.isRenderTarget = true;
-    normalDesc.debugName = "rt_Normal";
-    m_rt_Normal = m_framegraph->ImportTexture("rt_Normal", physicalNormal, normalDesc);
-
-    framegraph::ResourceDesc albedoDesc;
-    albedoDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    albedoDesc.width = w;
-    albedoDesc.height = h;
-    albedoDesc.format = nvrhi::Format::RGBA8_UNORM;
-    albedoDesc.isRenderTarget = true;
-    albedoDesc.debugName = "rt_Albedo";
-    m_rt_Albedo = m_framegraph->ImportTexture("rt_Albedo", physicalAlbedo, albedoDesc);
-
-    framegraph::ResourceDesc depthDesc;
-    depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    depthDesc.width = w;
-    depthDesc.height = h;
-    depthDesc.format = nvrhi::Format::D24S8;
-    depthDesc.isDepthStencil = true;
-    depthDesc.debugName = "rt_Depth";
-    m_rt_Depth = m_framegraph->ImportTexture("rt_Depth", physicalDepth, depthDesc);
-
-    Msg("  ✓ Created 4 native G-Buffer RTs (Position, Normal, Albedo, Depth)");
-
-    m_native_MenuMain = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuMain");
-    m_native_MenuDistort = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_MenuDistort");
-    m_native_FinalComposite = rtFactory->CreateAlbedoBuffer(w, h, false, "rt_FinalComposite");
-
-    nvrhi::ITexture* physicalMenuMain = textureMgr->GetNVRHITexture(m_native_MenuMain);
-    nvrhi::ITexture* physicalMenuDistort = textureMgr->GetNVRHITexture(m_native_MenuDistort);
-    nvrhi::ITexture* physicalFinalComposite = textureMgr->GetNVRHITexture(m_native_FinalComposite);
-
-    VERIFY(physicalMenuMain && physicalMenuDistort && physicalFinalComposite);
-
-    framegraph::ResourceDesc menuMainDesc;
-    menuMainDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    menuMainDesc.width = w;
-    menuMainDesc.height = h;
-    menuMainDesc.format = nvrhi::Format::RGBA8_UNORM;
-    menuMainDesc.isRenderTarget = true;
-    menuMainDesc.debugName = "rt_MenuMain";
-    m_rt_MenuMain = m_framegraph->ImportTexture("rt_MenuMain", physicalMenuMain, menuMainDesc);
-
-    framegraph::ResourceDesc menuDistortDesc;
-    menuDistortDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    menuDistortDesc.width = w;
-    menuDistortDesc.height = h;
-    menuDistortDesc.format = nvrhi::Format::RGBA8_UNORM;
-    menuDistortDesc.isRenderTarget = true;
-    menuDistortDesc.debugName = "rt_MenuDistort";
-    m_rt_MenuDistort = m_framegraph->ImportTexture("rt_MenuDistort", physicalMenuDistort, menuDistortDesc);
-
-    framegraph::ResourceDesc finalCompositeDesc;
-    finalCompositeDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-    finalCompositeDesc.width = w;
-    finalCompositeDesc.height = h;
-    finalCompositeDesc.format = nvrhi::Format::RGBA8_UNORM;
-    finalCompositeDesc.isRenderTarget = true;
-    finalCompositeDesc.debugName = "rt_FinalComposite";
-    m_rt_FinalComposite = m_framegraph->ImportTexture("rt_FinalComposite", physicalFinalComposite, finalCompositeDesc);
-
-    Msg("  ✓ Created 3 native Menu RTs (MenuMain, MenuDistort, FinalComposite)");
-
-    m_rt_Accumulator = CreateRT("rt_Accumulator", w, h, nvrhi::Format::RGBA16_FLOAT);
-
-    m_rt_Generic_0 = CreateRT("rt_Generic_0", w, h, nvrhi::Format::RGBA8_UNORM);
-    m_rt_Generic_1 = CreateRT("rt_Generic_1", w, h, nvrhi::Format::RGBA8_UNORM);
-    m_rt_Generic_2 = CreateRT("rt_Generic_2", w, h, nvrhi::Format::RGBA16_FLOAT);
-
-    m_backbuffer = CreateRT("Backbuffer", 1920, 1080, nvrhi::Format::RGBA8_UNORM);
-
-    Msg("  ✓ Created remaining legacy RTs (Accumulator, Generic0/1/2, Backbuffer)");
-    Msg("  ✓ Total: 10 render targets (6 native: G-Buffer + Menu, 4 legacy)");
-
-    m_gbufferPass->Setup(*m_framegraph);
-    auto gbufferOutputs = m_gbufferPass->GetOutputs();
-
-    m_hudPass->SetOutputs(gbufferOutputs);
-    m_hudPass->SetMaterialCache(m_gbufferPass->GetMaterialCache());
-    m_hudPass->Setup(*m_framegraph);
-
-    m_particlePass->SetOutputs(gbufferOutputs);
-    m_particlePass->Setup(*m_framegraph);
-
-    m_uiPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_uiPass->Setup(*m_framegraph);
-
-    m_textPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_textPass->Setup(*m_framegraph);
-
-    m_cursorPass->SetOutputs(m_rt_MenuMain, m_rt_Depth);
-    m_cursorPass->Setup(*m_framegraph);
-
-    m_menuDistortPass->SetOutputs(m_rt_MenuDistort, m_rt_Depth);
-    m_menuDistortPass->Setup(*m_framegraph);
-
-    m_menuCompositePass->SetInputs(gbufferOutputs.albedo, m_rt_MenuMain);
-    m_menuCompositePass->SetOutput(m_rt_FinalComposite);
-    m_menuCompositePass->Setup(*m_framegraph);
-
-    Msg("! [FrameGraphRenderer] Registering vanilla render targets in RT registry...");
-    auto& registry = m_framegraph->GetRTRegistry();
-
-    registry.RegisterRT("rt_Position", m_rt_Position);
-    registry.RegisterAliases(m_rt_Position, {
-        "$user$position",
-        "s_position"
-    });
-
-    registry.RegisterRT("rt_Normal", m_rt_Normal);
-    registry.RegisterAliases(m_rt_Normal, {
-        "s_normal",
-        "s_nmap"
-    });
-
-    registry.RegisterRT("rt_Albedo", m_rt_Albedo);
-    registry.RegisterRT("rt_Color", m_rt_Albedo);
-    registry.RegisterAliases(m_rt_Albedo, {
-        "$user$albedo",
-        "s_albedo",
-        "s_diffuse",
-        "s_image",
-        "s_base"
-    });
-
-    registry.RegisterRT("rt_Depth", m_rt_Depth);
-    registry.RegisterAliases(m_rt_Depth, {
-        "$user$base_depth",
-        "s_depth"
-    });
-
-    registry.RegisterRT("rt_Accumulator", m_rt_Accumulator);
-    registry.RegisterAliases(m_rt_Accumulator, {
-        "s_accumulator",
-        "s_acc"
-    });
-
-    registry.RegisterRT("rt_Generic_0", m_rt_Generic_0);
-    registry.RegisterAliases(m_rt_Generic_0, {
-        "$user$generic0",
-        "s_generic0"
-    });
-
-    registry.RegisterRT("rt_Generic_1", m_rt_Generic_1);
-    registry.RegisterAliases(m_rt_Generic_1, {
-        "$user$generic1",
-        "s_generic1"
-    });
-
-    registry.RegisterRT("rt_Generic_2", m_rt_Generic_2);
-    registry.RegisterAliases(m_rt_Generic_2, {
-        "s_generic2"
-    });
-
-    registry.RegisterRT("rt_MenuMain", m_rt_MenuMain);
-    registry.RegisterAliases(m_rt_MenuMain, {
-        "$user$menu_main",
-        "s_menu_main"
-    });
-
-    registry.RegisterRT("rt_MenuDistort", m_rt_MenuDistort);
-    registry.RegisterAliases(m_rt_MenuDistort, {
-        "$user$menu_distort",
-        "s_menu_distort"
-    });
-
-    registry.RegisterRT("rt_Backbuffer", m_backbuffer);
-    registry.RegisterAliases(m_backbuffer, {
-        "s_backbuffer",
-        "s_screen"
-    });
-
-    registry.RegisterRT("GBuffer.Albedo", gbufferOutputs.albedo);
-    registry.RegisterRT("GBuffer.Normal", gbufferOutputs.normal);
-    registry.RegisterRT("GBuffer.Material", gbufferOutputs.material);
-    registry.RegisterRT("GBuffer.Depth", gbufferOutputs.depth);
-
-    registry.PrintRegistry();
-
-    m_finalOutput = m_rt_FinalComposite;
-}
-
 void FrameGraphRenderer::SetupFrameGraphPasses() {
 
-    CreateAllRequiredPasses();
+    const u32 width = Device.dwWidth;
+    const u32 height = Device.dwHeight;
 
-    RouteBatchesToPasses();
+    framegraph::VirtualResourceHandle depthBuffer;
+    auto gbufferOutputs = passes::setupGBufferPass(
+        *m_framegraph,
+        m_device,
+        depthBuffer,
+        m_geometryCollector.get(),
+        m_materialCache.get(),
+        width,
+        height
+    );
 
-    m_hudPass->SetHUDBatches(&m_hudBatches);
+    auto uiTarget = passes::setupUIPass(
+        *m_framegraph,
+        width,
+        height
+    );
 
-    m_particlePass->SetWorldParticleBatches(&m_worldParticleBatches);
-    m_particlePass->SetHUDParticleBatches(&m_hudParticleBatches);
+    uiTarget = passes::setupTextPass(
+        *m_framegraph,
+        uiTarget,
+        width,
+        height
+    );
+
+    uiTarget = passes::setupCursorPass(
+        *m_framegraph,
+        uiTarget,
+        width,
+        height
+    );
+
+    auto compositeOutput = passes::setupCompositePass(
+        *m_framegraph,
+        gbufferOutputs.albedo,
+        uiTarget,
+        width,
+        height
+    );
+
+    ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
+    auto finalOutput = passes::setupImGuiPass(
+        *m_framegraph,
+        compositeOutput,
+        imguiRenderer,
+        width,
+        height
+    );
+
+    m_finalOutput = finalOutput;
 
 }
 
@@ -1187,7 +1008,6 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
 
         switch (phase) {
             case framegraph::RenderPhase::Geometry:
-                m_gbufferPass->SetBatches(phaseBatches);
                 break;
 
             case framegraph::RenderPhase::Lighting:

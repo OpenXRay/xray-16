@@ -24,7 +24,7 @@ struct CursorPassConfig {
 
 class CursorPass : public framegraph::IPass {
 public:
-    CursorPass(ng::RenderDevice* device, const CursorPassConfig& config = CursorPassConfig());
+    CursorPass(const CursorPassConfig& config = CursorPassConfig());
     ~CursorPass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -45,7 +45,7 @@ public:
 
 private:
 
-    ng::RenderDevice* m_device;
+    
     CursorPassConfig m_config;
     CursorStats m_cursorStats;
 

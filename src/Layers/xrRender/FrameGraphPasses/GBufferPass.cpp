@@ -17,12 +17,9 @@ namespace xray::render::passes {
 
 using namespace framegraph;
 
-GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& config)
-    : m_device(device)
-    , m_config(config)
+GBufferPass::GBufferPass(const GBufferPassConfig& config)
+    : m_config(config)
 {
-    VERIFY(m_device != nullptr);
-
     if (config.width == 0 || config.height == 0) {
         Msg("! [GBufferPass] ERROR: Invalid resolution %ux%u! Must set config.width/height to Device.dwWidth/dwHeight!",
             config.width, config.height);
@@ -31,11 +28,10 @@ GBufferPass::GBufferPass(ng::RenderDevice* device, const GBufferPassConfig& conf
 
     Msg("* [GBufferPass] Created (%ux%u)", config.width, config.height);
 
-    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
+    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
 
     m_materialCache = xr_make_unique<MaterialCache>(
-        device,
-        device->GetFGResourceManager(),
+        GEnv.FrameGraphRenderer->GetRenderDevice()->GetFGResourceManager(),
         m_vcbPool.get()
     );
 
@@ -51,7 +47,7 @@ GBufferPass::~GBufferPass() {
 
 bool GBufferPass::LoadShaders()
 {
-    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
+    ShaderLoader loader(GEnv.FrameGraphRenderer->GetRenderDevice()->GetSlangCompiler());
 
     m_vertexShader = loader.LoadVertexShaderWithReflection("gbuffer", "main");
     if (!m_vertexShader.handle)
@@ -151,7 +147,7 @@ bool GBufferPass::CreatePipeline(const framegraph::DefaultOutputLayout& outputs,
 
     psoDesc.debugName = "GBufferPass";
 
-    m_pipeline = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
+    m_pipeline = GEnv.FrameGraphRenderer->GetRenderDevice()->GetPipelineCache()->GetOrCreate(psoDesc);
 
     if (!m_pipeline)
     {
@@ -274,7 +270,7 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
         dynamicTransformsCB.m_W[2], dynamicTransformsCB.m_W[3]);
 
     ID3D11Device* d3dDevice = static_cast<ID3D11Device*>(
-        m_device->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
+        GEnv.FrameGraphRenderer->GetRenderDevice()->GetNativeDevice()->getNativeObject(nvrhi::ObjectTypes::D3D11_Device).pointer);
     VERIFY(d3dDevice);
 
     xr_set<ID3D11Buffer*> updatedBuffers;
@@ -498,7 +494,7 @@ void GBufferPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                     constsPtr[3] = 0.0f;
                 }
 
-                nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+                nvrhi::IBuffer* vcbBuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNativeBuffer(vcbHandle);
 
                 ctx.WriteBuffer(vcbBuffer, cbData, vcbSize);
 

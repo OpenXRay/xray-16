@@ -564,7 +564,7 @@ void CRender::create()
                     Msg("* FrameGraphRenderer enabled (ps_r4_use_framegraph=1)");
 
                     m_shaderLoader = xr_new<framegraph::ShaderLoader>(
-                        m_renderDevice, m_renderDevice->GetSlangCompiler());
+                        m_renderDevice->GetSlangCompiler());
                     Msg("* ShaderLoader initialized (Slang compiler active)");
                 }
             }

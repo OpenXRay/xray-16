@@ -15,7 +15,7 @@ namespace xray::render::framegraph {
 
 class ShaderLoader {
 public:
-    ShaderLoader(ng::RenderDevice* device, xray::render::SlangCompiler* slangCompiler);
+    ShaderLoader(xray::render::SlangCompiler* slangCompiler);
     ~ShaderLoader();
 
     struct ShaderResult {
@@ -92,7 +92,6 @@ private:
     IReader* OpenShaderFile(const char* name, const char* extension);
 
 private:
-    ng::RenderDevice* m_device;
     xray::render::SlangCompiler* m_slangCompiler;
     ShaderCache m_cache;
 };

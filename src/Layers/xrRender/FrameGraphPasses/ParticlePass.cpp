@@ -56,12 +56,10 @@ Fmatrix ParticlePass::ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
     return result;
 }
 
-ParticlePass::ParticlePass(ng::RenderDevice* device, MaterialCache* materialCache, const ParticlePassConfig& config)
-    : m_device(device)
-    , m_materialCache(materialCache)
+ParticlePass::ParticlePass(MaterialCache* materialCache, const ParticlePassConfig& config)
+    : m_materialCache(materialCache)
     , m_config(config)
 {
-    VERIFY(m_device != nullptr);
     VERIFY(m_materialCache != nullptr);
 
     if (config.width == 0 || config.height == 0) {
@@ -113,17 +111,17 @@ void ParticlePass::EnsureQuadIndexBuffer(u32 maxQuads) {
     ibDesc.debugName = "ParticleQuadIB";
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
-    m_quadIB = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
+    m_quadIB = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBuffer(ibDesc);
     if (!m_quadIB) {
         Msg("! [ParticlePass] ERROR: Failed to create quad index buffer");
         return;
     }
 
-    nvrhi::CommandListHandle cmdList = m_device->GetNVRHIDevice()->createCommandList();
+    nvrhi::CommandListHandle cmdList = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createCommandList();
     cmdList->open();
     cmdList->writeBuffer(m_quadIB, indices.data(), indices.size() * sizeof(u16));
     cmdList->close();
-    m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+    GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->executeCommandList(cmdList);
 
     m_maxQuads = maxQuads;
 }
@@ -142,7 +140,7 @@ void ParticlePass::EnsureParticleVertexBuffer(u32 sizeBytes) {
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
     vbDesc.keepInitialState = false;
 
-    m_particleVB = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
+    m_particleVB = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBuffer(vbDesc);
     if (!m_particleVB) {
         Msg("! [ParticlePass] ERROR: Failed to create particle vertex buffer");
         return;
@@ -394,7 +392,7 @@ ng::PipelineState* ParticlePass::GetOrCreateParticlePSO(
 
     psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
 
-    ng::PipelineState* pso = m_device->GetPipelineCache()->GetOrCreate(psoDesc);
+    ng::PipelineState* pso = GEnv.FrameGraphRenderer->GetRenderDevice()->GetPipelineCache()->GetOrCreate(psoDesc);
     if (!pso) {
         Msg("! [ParticlePass] ERROR: Failed to create PSO for '%s'", vs->cName.c_str());
         return nullptr;
@@ -456,7 +454,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         bufDesc.keepInitialState = false;
         bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
-        nvrhi::BufferHandle buffer = m_device->GetNVRHIDevice()->createBuffer(bufDesc);
+        nvrhi::BufferHandle buffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBuffer(bufDesc);
         if (buffer) {
             ParticlePass::ParticleBindingCache::CBInfo info;
             info.slot = cbInfo.slot;
@@ -484,7 +482,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         bufDesc.keepInitialState = false;
         bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
-        nvrhi::BufferHandle buffer = m_device->GetNVRHIDevice()->createBuffer(bufDesc);
+        nvrhi::BufferHandle buffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBuffer(bufDesc);
         if (buffer) {
             ParticlePass::ParticleBindingCache::CBInfo info;
             info.slot = cbInfo.slot;
@@ -517,7 +515,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         }
     }
 
-    cacheEntry.vsBindingLayout = m_device->GetNVRHIDevice()->createBindingLayout(vsLayoutDesc);
+    cacheEntry.vsBindingLayout = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBindingLayout(vsLayoutDesc);
     if (!cacheEntry.vsBindingLayout) {
         Msg("! [ParticlePass] ERROR: Failed to create VS binding layout");
         return nullptr;
@@ -553,7 +551,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
             nvrhi::BindingLayoutItem::Sampler(i));
     }
 
-    cacheEntry.psBindingLayout = m_device->GetNVRHIDevice()->createBindingLayout(psLayoutDesc);
+    cacheEntry.psBindingLayout = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBindingLayout(psLayoutDesc);
     if (!cacheEntry.psBindingLayout) {
         Msg("! [ParticlePass] ERROR: Failed to create PS binding layout");
         return nullptr;
@@ -568,7 +566,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         }
     }
 
-    cacheEntry.vsBindingSet = m_device->GetNVRHIDevice()->createBindingSet(
+    cacheEntry.vsBindingSet = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBindingSet(
         vsBindingDesc, cacheEntry.vsBindingLayout);
     if (!cacheEntry.vsBindingSet) {
         Msg("! [ParticlePass] ERROR: Failed to create VS binding set");
@@ -635,13 +633,13 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
                             }
                         }
 
-                        ng::TextureHandle nvrhiTex = m_device->CreateTextureFromD3D11(resource, texDesc);
+                        ng::TextureHandle nvrhiTex = GEnv.FrameGraphRenderer->GetRenderDevice()->CreateTextureFromD3D11(resource, texDesc);
                         resource->Release();
 
                         if (nvrhiTex.IsValid()) {
                             cacheEntry.textures.push_back(nvrhiTex);
 
-                            nvrhi::ITexture* nativeTex = m_device->GetNativeTexture(nvrhiTex);
+                            nvrhi::ITexture* nativeTex = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNativeTexture(nvrhiTex);
                             if (nativeTex) {
                                 nvrhi::TextureDimension nvrhiDim = nvrhi::TextureDimension::Texture2D;
                                 if (texDesc.dimension == ng::RenderDevice::TextureDesc::TextureCube) {
@@ -670,7 +668,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
         samplerDesc.setMaxAnisotropy(8.0f);
 
-        nvrhi::SamplerHandle sampler = m_device->GetNVRHIDevice()->createSampler(samplerDesc);
+        nvrhi::SamplerHandle sampler = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createSampler(samplerDesc);
         if (sampler) {
             cacheEntry.samplers.push_back(sampler);
             psBindingDesc.bindings.push_back(
@@ -678,7 +676,7 @@ ParticlePass::ParticleBindingCache* ParticlePass::CreateParticleBindingSet(
         }
     }
 
-    cacheEntry.psBindingSet = m_device->GetNVRHIDevice()->createBindingSet(
+    cacheEntry.psBindingSet = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createBindingSet(
         psBindingDesc, cacheEntry.psBindingLayout);
     if (!cacheEntry.psBindingSet) {
         Msg("! [ParticlePass] ERROR: Failed to create PS binding set");

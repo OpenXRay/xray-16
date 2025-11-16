@@ -248,14 +248,32 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::calcCombinedPath(
     xr_string combined;
     if (fromPath && fromPath[0])
     {
-        xr_string fromDir = fromPath;
-        size_t lastSlash = fromDir.find_last_of("/\\");
-        if (lastSlash != xr_string::npos)
-            fromDir = fromDir.substr(0, lastSlash + 1);
+        xr_string fromPathStr = fromPath;
+        size_t r5Pos = fromPathStr.find("r5");
+        if (r5Pos != xr_string::npos)
+        {
+            size_t slashAfterR5 = fromPathStr.find_first_of("/\\", r5Pos);
+            if (slashAfterR5 != xr_string::npos)
+            {
+                xr_string shaderRoot = fromPathStr.substr(0, slashAfterR5 + 1);
+                combined = shaderRoot + path;
+            }
+            else
+            {
+                combined = path;
+            }
+        }
         else
-            fromDir = "";
+        {
+            xr_string fromDir = fromPath;
+            size_t lastSlash = fromDir.find_last_of("/\\");
+            if (lastSlash != xr_string::npos)
+                fromDir = fromDir.substr(0, lastSlash + 1);
+            else
+                fromDir = "";
 
-        combined = fromDir + path;
+            combined = fromDir + path;
+        }
     }
     else
     {

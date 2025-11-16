@@ -2,6 +2,7 @@
 #include "TextureStreaming.h"
 #include "DDSLoader.h"
 #include "../RenderContext/RenderDevice.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::resources {
 
@@ -10,7 +11,6 @@ StreamingManager::StreamingManager(xray::render::ng::RenderDevice* device, Textu
     , m_texManager(texManager)
     , m_asyncIO(nullptr)
 {
-    VERIFY(m_device);
     VERIFY(m_texManager);
 
     m_asyncIO = xr_new<AsyncIOManager>();

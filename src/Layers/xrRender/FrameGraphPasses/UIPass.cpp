@@ -9,20 +9,17 @@
 
 namespace xray::render::passes {
 
-UIPass::UIPass(ng::RenderDevice* device, const UIPassConfig& config)
-    : m_device(device)
-    , m_config(config)
+UIPass::UIPass(const UIPassConfig& config)
+    : m_config(config)
     , m_uiStats{}
     , m_outputRT{}
     , m_depthStencil{}
 {
-    VERIFY(m_device != nullptr);
 
-    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
+    m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
 
     m_materialCache = xr_make_unique<MaterialCache>(
-        device,
-        device->GetFGResourceManager(),
+        GEnv.FrameGraphRenderer->GetRenderDevice()->GetFGResourceManager(),
         m_vcbPool.get()
     );
 
@@ -65,7 +62,7 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     fbDesc.addColorAttachment(outputTexture);
     fbDesc.setDepthAttachment(depthTexture);
 
-    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    nvrhi::FramebufferHandle framebuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
         Msg("! [UIPass::Execute] Failed to create framebuffer");
         cmdList->endMarker();
@@ -81,11 +78,11 @@ void UIPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg) {
     cmdList->clearDepthStencilTexture(depthTexture, nvrhi::AllSubresources, true, m_config.clearDepth, true, m_config.clearStencil);
 
     cmdList->close();
-    m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+    GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->executeCommandList(cmdList);
 
     if (g_pGamePersistent) {
         if (!m_nvrhiUIInitialized) {
-            m_uiRenderer->Initialize(m_device, m_materialCache.get());
+            m_uiRenderer->Initialize(m_materialCache.get());
             m_nvrhiUIInitialized = true;
         }
 

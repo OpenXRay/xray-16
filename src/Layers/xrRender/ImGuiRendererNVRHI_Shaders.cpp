@@ -7,7 +7,7 @@ namespace xray::render::ng {
 
 bool ImGuiRendererNVRHI::CreateShaders()
 {
-    framegraph::ShaderLoader shaderLoader(m_renderDevice, m_renderDevice->GetSlangCompiler());
+    framegraph::ShaderLoader shaderLoader(m_renderDevice->GetSlangCompiler());
 
     m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main", nullptr);
 

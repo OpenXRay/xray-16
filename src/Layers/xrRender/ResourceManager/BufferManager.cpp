@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "BufferManager.h"
 #include "../RenderContext/RenderDevice.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::resources {
 
@@ -12,7 +13,6 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
     , m_cpuAddress(nullptr)
 {
     VERIFY(m_device);
-
     nvrhi::BufferDesc desc;
     desc.byteSize = size;
     desc.structStride = 0;

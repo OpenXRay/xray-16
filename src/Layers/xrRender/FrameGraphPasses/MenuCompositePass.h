@@ -13,7 +13,7 @@ struct MenuCompositePassConfig {
 
 class MenuCompositePass : public framegraph::IPass {
 public:
-    MenuCompositePass(ng::RenderDevice* device, const MenuCompositePassConfig& config = MenuCompositePassConfig());
+    MenuCompositePass(const MenuCompositePassConfig& config = MenuCompositePassConfig());
     ~MenuCompositePass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -33,7 +33,7 @@ public:
     const MenuCompositeStats& GetMenuCompositeStats() const { return m_menuCompositeStats; }
 
 private:
-    ng::RenderDevice* m_device;
+    
     MenuCompositePassConfig m_config;
     MenuCompositeStats m_menuCompositeStats;
 

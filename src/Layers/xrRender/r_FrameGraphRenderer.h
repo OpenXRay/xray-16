@@ -31,6 +31,18 @@ namespace xray::render::ng {
 namespace xray::render {
 using RENDER_NAMESPACE::dxRender_Visual;
 
+class GeometryCollector;
+class MaterialCache;
+
+namespace ui {
+    class UIRenderCollector;
+    class NVRHIUIRenderer;
+}
+
+namespace framegraph {
+    class VolatileConstantBufferPool;
+}
+
 class FrameGraphRenderer: public IFrameGraphRender{
 public:
     FrameGraphRenderer();
@@ -59,6 +71,14 @@ public:
 
     const Stats& GetStats() const { return m_stats; }
     void PrintStats() const;
+
+    ng::RenderDevice* GetRenderDevice() const override { return m_device; }
+    MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
+    MaterialCache* GetUIMaterialCache() const override { return m_uiMaterialCache.get(); }
+    ui::UIRenderCollector* GetUICollector() const override { return m_uiCollector.get(); }
+    ui::NVRHIUIRenderer* GetUIRenderer() const override { return m_uiRenderer.get(); }
+    MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
+    framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
 
 private:
     bool m_enabled = false;
@@ -97,19 +117,18 @@ private:
     framegraph::VirtualResourceHandle m_rt_MenuDistort;
     framegraph::VirtualResourceHandle m_rt_FinalComposite;
 
-    xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
-    xr_unique_ptr<passes::HUDPass> m_hudPass;
-    xr_unique_ptr<passes::ParticlePass> m_particlePass;
-    xr_unique_ptr<passes::LightingPass> m_lightingPass;
-    xr_unique_ptr<passes::TonemapPass> m_tonemapPass;
-
-    xr_unique_ptr<passes::UIPass> m_uiPass;
-    xr_unique_ptr<passes::TextPass> m_textPass;
-    xr_unique_ptr<passes::CursorPass> m_cursorPass;
-    xr_unique_ptr<passes::MenuDistortPass> m_menuDistortPass;
-    xr_unique_ptr<passes::MenuCompositePass> m_menuCompositePass;
-
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
+
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
+    xr_unique_ptr<MaterialCache> m_materialCache;
+
+    xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
+    xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_uiVCBPool;
+    xr_unique_ptr<MaterialCache> m_uiMaterialCache;
+
+    xr_unique_ptr<MaterialCache> m_textMaterialCache;
+    xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_textVCBPool;
 
     xr_vector<GeometryBatch> m_hudBatches;
 
@@ -125,8 +144,6 @@ private:
     xr_vector<ISpatial*> m_lstRenderables;
 
     void SetupFrame();
-
-    void BuildFrameGraphStructure();
 
     void SetupFrameGraphPasses();
 

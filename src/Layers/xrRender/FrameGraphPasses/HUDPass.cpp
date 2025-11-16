@@ -45,12 +45,9 @@ static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
     return result;
 }
 
-HUDPass::HUDPass(ng::RenderDevice* device, const HUDPassConfig& config)
-    : m_device(device)
-    , m_config(config)
+HUDPass::HUDPass(const HUDPassConfig& config)
+    : m_config(config)
 {
-    VERIFY(m_device != nullptr);
-
     if (config.width == 0 || config.height == 0) {
         Msg("! [HUDPass] ERROR: Invalid resolution %ux%u", config.width, config.height);
     }
@@ -248,7 +245,7 @@ void HUDPass::Execute(ng::RenderContext& ctx, const FrameGraph& fg) {
                 CopyBoneMatrix(cbData, identity);
             }
 
-            nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(vcbHandle);
+            nvrhi::IBuffer* vcbBuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNativeBuffer(vcbHandle);
             ctx.WriteBuffer(vcbBuffer, cbData, vcbSize);
 
             m_materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);

@@ -38,7 +38,7 @@ struct ParticlePassConfig {
 
 class ParticlePass : public framegraph::IPass {
 public:
-    ParticlePass(ng::RenderDevice* device, MaterialCache* materialCache, const ParticlePassConfig& config);
+    ParticlePass(MaterialCache* materialCache, const ParticlePassConfig& config);
     ~ParticlePass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -58,7 +58,6 @@ public:
     }
 
 private:
-    ng::RenderDevice* m_device = nullptr;
     MaterialCache* m_materialCache = nullptr;
     ParticlePassConfig m_config;
 

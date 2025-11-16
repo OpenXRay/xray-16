@@ -287,6 +287,8 @@ private:
 
     static u64 ComputeStateHash(SPass* pass);
 
+    bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
+
     void SetupVertexAttributes(dxRender_Visual* visual, MaterialPSO* matPSO, ng::PipelineStateDesc& psoDesc);
     void SetupRenderTargets(
         MaterialPSO* matPSO,

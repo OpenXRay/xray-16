@@ -9,14 +9,14 @@
 
 namespace xray::render::passes {
 
-CursorPass::CursorPass(ng::RenderDevice* device, const CursorPassConfig& config)
+CursorPass::CursorPass(const CursorPassConfig& config)
     : m_device(device)
     , m_config(config)
     , m_cursorStats{}
     , m_outputRT{}
     , m_depthStencil{}
 {
-    VERIFY(m_device != nullptr);
+    
 
     m_vcbPool = xr_make_unique<framegraph::VolatileConstantBufferPool>(device);
 
@@ -65,7 +65,7 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
     fbDesc.addColorAttachment(outputTexture);
     fbDesc.setDepthAttachment(depthTexture);
 
-    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    nvrhi::FramebufferHandle framebuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
         Msg("! [CursorPass::Execute] Failed to create framebuffer");
         cmdList->endMarker();
@@ -74,7 +74,7 @@ void CursorPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& f
 
     if (g_pGamePersistent) {
         if (!m_nvrhiUIInitialized) {
-            m_uiRenderer->Initialize(m_device, m_materialCache.get());
+            m_uiRenderer->Initialize(m_materialCache.get());
             m_nvrhiUIInitialized = true;
         }
 

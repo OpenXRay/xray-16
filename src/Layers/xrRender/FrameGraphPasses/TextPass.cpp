@@ -19,14 +19,14 @@ namespace xray::render::passes {
 
 using namespace xray::render::RENDER_NAMESPACE;
 
-TextPass::TextPass(ng::RenderDevice* device, const TextPassConfig& config)
+TextPass::TextPass(const TextPassConfig& config)
     : m_device(device)
     , m_config(config)
     , m_textStats{}
     , m_outputRT{}
     , m_depthStencil{}
 {
-    VERIFY(m_device != nullptr);
+    
 
     Msg("* [TextPass] Created (resolution: %ux%u)", config.width, config.height);
 
@@ -73,7 +73,7 @@ void TextPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGraph& fg)
     if (!m_initialized) {
         Msg("  [TextPass] Initializing NVRHI resources...");
 
-        nvrhi::IDevice* nvrhiDevice = m_device->GetNVRHIDevice();
+        nvrhi::IDevice* nvrhiDevice = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice();
         VERIFY(nvrhiDevice != nullptr);
 
         constexpr u32 MAX_TEXT_VERTICES = 16384;
@@ -243,7 +243,7 @@ void TextPass::CollectTextGeometry() {
         if (!(font->uFlags & CGameFont::fsValid)) {
             auto* fontRender = static_cast<render_r4::dxFontRender*>(font->pFontRender);
             if (fontRender && fontRender->strTextureName.size() > 0) {
-                resources::FGResourceManager* resMgr = m_device->GetFGResourceManager();
+                resources::FGResourceManager* resMgr = GEnv.FrameGraphRenderer->GetRenderDevice()->GetFGResourceManager();
                 resources::TextureManager* texMgr = resMgr->GetTextureManager();
                 ng::TextureHandle texHandle = texMgr->LoadTexture(fontRender->strTextureName.c_str());
 
@@ -403,7 +403,7 @@ void TextPass::RenderText(ng::RenderContext& ctx, nvrhi::ITexture* outputTexture
     fbDesc.addColorAttachment(outputTexture);
     fbDesc.setDepthAttachment(depthTexture);
 
-    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    nvrhi::FramebufferHandle framebuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
         Msg("! [TextPass::RenderText] Failed to create framebuffer");
         return;

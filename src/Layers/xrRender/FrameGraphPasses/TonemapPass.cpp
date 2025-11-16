@@ -7,7 +7,7 @@ namespace xray::render::passes {
 
 using namespace framegraph;
 
-TonemapPass::TonemapPass(ng::RenderDevice* device, const TonemapPassConfig& config)
+TonemapPass::TonemapPass(const TonemapPassConfig& config)
     : m_device(device)
     , m_config(config)
 {
@@ -28,7 +28,7 @@ TonemapPass::~TonemapPass() {
 
 bool TonemapPass::LoadShaders()
 {
-    ShaderLoader loader(m_device, m_device->GetSlangCompiler());
+    ShaderLoader loader(m_device, GEnv.FrameGraphRenderer->GetRenderDevice()->GetSlangCompiler());
 
     m_vertexShader = loader.LoadVertexShader("fullscreen");
     if (!m_vertexShader)
@@ -78,7 +78,7 @@ bool TonemapPass::CreatePipeline(nvrhi::ITexture* backbufferTexture)
 
     psoDesc.debugName = "TonemapPass";
 
-    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    ng::PipelineStateCache* psoCache = GEnv.FrameGraphRenderer->GetRenderDevice()->GetPipelineCache();
     if (!psoCache) {
         Msg("! [TonemapPass] Pipeline cache is null!");
         return false;

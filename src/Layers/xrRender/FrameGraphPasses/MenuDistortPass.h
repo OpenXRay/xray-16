@@ -15,7 +15,7 @@ struct MenuDistortPassConfig {
 
 class MenuDistortPass : public framegraph::IPass {
 public:
-    MenuDistortPass(ng::RenderDevice* device, const MenuDistortPassConfig& config = MenuDistortPassConfig());
+    MenuDistortPass(const MenuDistortPassConfig& config = MenuDistortPassConfig());
     ~MenuDistortPass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -35,7 +35,7 @@ public:
     const MenuDistortStats& GetMenuDistortStats() const { return m_menuDistortStats; }
 
 private:
-    ng::RenderDevice* m_device;
+    
     MenuDistortPassConfig m_config;
     MenuDistortStats m_menuDistortStats;
 

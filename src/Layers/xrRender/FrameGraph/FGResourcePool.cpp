@@ -23,8 +23,10 @@ resources::TextureHandle FGResourcePool::AllocateTexture(const resources::Textur
         if (pooled.IsValid()) {
             m_stats.texturesAliased++;
             m_stats.memorySaved += desc.CalculateMemorySize();
-
+            Msg("~ [FGResourcePool] AllocateTexture: REUSED from pool (%ux%u)", desc.width, desc.height);
             return pooled;
+        } else {
+            Msg("~ [FGResourcePool] AllocateTexture: No compatible texture in pool (size=%u) for %ux%u", (u32)m_texturePool.size(), desc.width, desc.height);
         }
     }
 
@@ -34,7 +36,7 @@ resources::TextureHandle FGResourcePool::AllocateTexture(const resources::Textur
     m_stats.texturesActive++;
     m_stats.memoryAllocated += desc.CalculateMemorySize();
 
-
+    Msg("~ [FGResourcePool] AllocateTexture: Created NEW texture (%ux%u)", desc.width, desc.height);
     return handle;
 }
 
@@ -51,25 +53,46 @@ resources::TextureHandle FGResourcePool::AllocatePersistentTexture(const resourc
 }
 
 void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
-    if (!handle.IsValid()) return;
+    if (!handle.IsValid()) {
+        Msg("! [FGResourcePool] FreeTexture called with invalid handle");
+        return;
+    }
 
     const resources::TextureMetadata* meta =
         m_resourceManager->GetTextureManager()->GetMetadata(handle);
 
-    if (!meta) return;
+    if (!meta) {
+        Msg("! [FGResourcePool] FreeTexture: No metadata for handle");
+        return;
+    }
 
     if (m_aliasingEnabled) {
-        PooledTexture pooled;
-        pooled.handle = handle;
-        pooled.desc = meta->desc;
-        pooled.inUse = false;
-        pooled.lastUsedFrame = m_currentFrame;
+        bool foundInPool = false;
+        for (auto& pooled : m_texturePool) {
+            if (pooled.handle.index == handle.index && pooled.handle.generation == handle.generation) {
+                pooled.inUse = false;
+                pooled.lastUsedFrame = m_currentFrame;
+                foundInPool = true;
+                Msg("~ [FGResourcePool] FreeTexture: Marked as available in pool");
+                break;
+            }
+        }
 
-        m_texturePool.push_back(pooled);
+        if (!foundInPool) {
+            PooledTexture pooled;
+            pooled.handle = handle;
+            pooled.desc = meta->desc;
+            pooled.inUse = false;
+            pooled.lastUsedFrame = m_currentFrame;
+
+            m_texturePool.push_back(pooled);
+            Msg("~ [FGResourcePool] FreeTexture: Added NEW to pool (pool size=%u)", (u32)m_texturePool.size());
+        }
 
     } else {
         m_resourceManager->GetTextureManager()->Release(handle);
         m_stats.texturesActive--;
+        Msg("~ [FGResourcePool] FreeTexture: Released (aliasing disabled)");
     }
 }
 
@@ -118,7 +141,12 @@ void FGResourcePool::Reset() {
     }
 
     m_texturePool.clear();
+
+    m_stats.texturesAllocated = 0;
+    m_stats.texturesAliased = 0;
     m_stats.texturesActive = 0;
+    m_stats.memoryAllocated = 0;
+    m_stats.memorySaved = 0;
 
     m_currentFrame++;
 

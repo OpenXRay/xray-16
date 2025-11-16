@@ -4,7 +4,7 @@
 
 namespace xray::render::passes {
 
-MenuDistortPass::MenuDistortPass(ng::RenderDevice* device, const MenuDistortPassConfig& config)
+MenuDistortPass::MenuDistortPass(const MenuDistortPassConfig& config)
     : m_device(device)
     , m_config(config)
     , m_menuDistortStats{}
@@ -48,7 +48,7 @@ void MenuDistortPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGra
     fbDesc.addColorAttachment(outputTexture);
     fbDesc.setDepthAttachment(depthTexture);
 
-    nvrhi::FramebufferHandle framebuffer = m_device->GetNVRHIDevice()->createFramebuffer(fbDesc);
+    nvrhi::FramebufferHandle framebuffer = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createFramebuffer(fbDesc);
     if (!framebuffer) {
         Msg("! [MenuDistortPass::Execute] Failed to create framebuffer");
         cmdList->endMarker();
@@ -62,7 +62,7 @@ void MenuDistortPass::Execute(ng::RenderContext& ctx, const framegraph::FrameGra
                      m_config.clearColor[2], m_config.clearColor[3]));
 
     cmdList->close();
-    m_device->GetNVRHIDevice()->executeCommandList(cmdList);
+    GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->executeCommandList(cmdList);
 
     Msg("  [MenuDistortPass::Execute] Cleared rt_MenuDistort to neutral (no legacy distortion yet)");
 

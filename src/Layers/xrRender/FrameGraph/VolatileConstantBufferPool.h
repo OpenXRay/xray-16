@@ -8,7 +8,7 @@ namespace xray::render::framegraph {
 
 class VolatileConstantBufferPool {
 public:
-    VolatileConstantBufferPool(ng::RenderDevice* device);
+    VolatileConstantBufferPool();
     ~VolatileConstantBufferPool();
 
     struct CBLayout {
@@ -48,8 +48,6 @@ public:
     void LogStats() const;
 
 private:
-    ng::RenderDevice* m_device;
-
     xr_map<CBLayout, ng::BufferHandle> m_vcbs;
 
     mutable Stats m_stats;

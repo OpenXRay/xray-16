@@ -30,7 +30,7 @@ struct UIPassConfig {
 
 class UIPass : public framegraph::IPass {
 public:
-    UIPass(ng::RenderDevice* device, const UIPassConfig& config = UIPassConfig());
+    UIPass(const UIPassConfig& config = UIPassConfig());
     ~UIPass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -50,7 +50,6 @@ public:
     const UIStats& GetUIStats() const { return m_uiStats; }
 
 private:
-    ng::RenderDevice* m_device;
     UIPassConfig m_config;
     UIStats m_uiStats;
 

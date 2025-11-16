@@ -17,7 +17,7 @@ struct HUDPassConfig {
 
 class HUDPass : public framegraph::IPass {
 public:
-    HUDPass(ng::RenderDevice* device, const HUDPassConfig& config);
+    HUDPass(const HUDPassConfig& config);
     ~HUDPass() override;
 
     void Setup(framegraph::FrameGraph& fg) override;
@@ -31,7 +31,6 @@ public:
     void SetOutputs(const framegraph::DefaultOutputLayout& outputs) { m_outputs = outputs; }
 
 private:
-    ng::RenderDevice* m_device = nullptr;
     HUDPassConfig m_config;
 
     const xr_vector<GeometryBatch>* m_hudBatches = nullptr;

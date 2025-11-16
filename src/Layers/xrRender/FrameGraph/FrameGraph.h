@@ -45,6 +45,28 @@ public:
 
     void SetPassCallback(PassHandle pass, PassExecuteCallback callback);
 
+    template<typename PassData>
+    PassData& addCallbackPass(
+        const char* name,
+        std::function<void(FrameGraph&, PassHandle, PassData&)> setupFunc,
+        std::function<void(const PassData&, const FrameGraph&, ng::RenderContext*)> executeFunc)
+    {
+        PassHandle passHandle = AddPass(name);
+
+        PassData* passData = new PassData();
+
+        setupFunc(*this, passHandle, *passData);
+
+        PassExecuteCallback callback = [passData, executeFunc](ng::RenderContext& ctx, const FrameGraph& fg) {
+            executeFunc(*passData, fg, &ctx);
+            delete passData;
+        };
+
+        SetPassCallback(passHandle, callback);
+
+        return *passData;
+    }
+
     void SetRenderContext(ng::RenderContext* context) { m_context = context; }
 
     void Compile();
