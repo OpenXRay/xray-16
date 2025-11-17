@@ -55,8 +55,12 @@ float4 	u_position	(float4 v)	{ return float4(v.xyz, 1.f);	}	// -12..+12
 //uniform float4 	sbones_array	[256-22] : register(vs,c22);
 //tbuffer	SkeletonBones
 //{
-	float4 	sbones_array	[256-22];
+	// float4 	sbones_array	[256-22];
 //}
+
+cbuffer SkeletonBones : register(b7) {
+	float4 sbones_array[256-22];
+};
 
 float3 	skinning_dir 	(float3 dir, float3 m0, float3 m1, float3 m2)
 {

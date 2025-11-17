@@ -498,58 +498,6 @@ MaterialPSO* MaterialCache::CreatePSO(
     }
 
     // ═══════════════════════════════════════════════════════
-    //  ANALYZE CONSTANT BUFFERS & REGISTER WITH VCB POOL
-    // ═══════════════════════════════════════════════════════
-
-    if (m_vcbPool) {
-        // Get vertex shader CBs from extracted reflection
-        const auto& vsCBs = framegraph::ShaderReflector::GetConstantBuffers(
-            pso->vertexShader->reflection);
-        for (const auto& cbInfo : vsCBs.buffers) {
-            // Create CB layout and register with pool
-            framegraph::VolatileConstantBufferPool::CBLayout layout(
-                cbInfo.name.c_str(),
-                cbInfo.slot,
-                cbInfo.size
-            );
-
-            // Get or create VCB from pool
-            ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
-
-            // Store requirement in MaterialPSO
-            MaterialPSO::VCBRequirement req;
-            req.slot = cbInfo.slot;
-            req.size = cbInfo.size;
-            req.name = cbInfo.name;
-            req.vcbHandle = vcbHandle;
-            pso->vcbRequirements.push_back(req);
-        }
-
-        // Get pixel shader CBs from extracted reflection
-        const auto& psCBs = framegraph::ShaderReflector::GetConstantBuffers(
-            pso->pixelShader->reflection);
-        for (const auto& cbInfo : psCBs.buffers) {
-            // Create CB layout and register with pool
-            framegraph::VolatileConstantBufferPool::CBLayout layout(
-                cbInfo.name.c_str(),
-                cbInfo.slot,
-                cbInfo.size
-            );
-
-            // Get or create VCB from pool
-            ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
-
-            // Store requirement in MaterialPSO
-            MaterialPSO::VCBRequirement req;
-            req.slot = cbInfo.slot;
-            req.size = cbInfo.size;
-            req.name = cbInfo.name;
-            req.vcbHandle = vcbHandle;
-            pso->vcbRequirements.push_back(req);
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
     //  EXTRACT CONSTANT LAYOUT (CB + PER-CONSTANT METADATA)
     // ═══════════════════════════════════════════════════════
 
@@ -823,7 +771,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     // ═══════════════════════════════════════════════════════
 
     if (vs && vs->reflection) {
-        const auto& vsCBs = vs->reflection->constantBuffers.buffers;
+        const auto& vsCBs = vs->reflection->constantLayout.constantBuffers.buffers;
         for (const auto& cb : vsCBs) {
             auto& unique = uniqueCBs[cb.name];
             unique.name = cb.name;
@@ -841,7 +789,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     // ═══════════════════════════════════════════════════════
 
     if (ps && ps->reflection) {
-        const auto& psCBs = ps->reflection->constantBuffers.buffers;
+        const auto& psCBs = ps->reflection->constantLayout.constantBuffers.buffers;
         for (const auto& cb : psCBs) {
             auto& unique = uniqueCBs[cb.name];
             unique.name = cb.name;
@@ -855,17 +803,48 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
     }
 
     // ═══════════════════════════════════════════════════════
-    // STEP 3: Create ONE Shared Buffer Per Unique CB
+    // STEP 3: Create Shared Buffers (ONLY for Global CBs)
     // ═══════════════════════════════════════════════════════
+    // Per-object CBs ($Globals, globalParams_0, etc.) are handled by VCB pool!
 
     for (const auto& [cbName, cbReq] : uniqueCBs) {
-        bool isPerObjectCB = (cbReq.name == "$Globals");
+        bool isPerObjectCB = (cbReq.name == "$Globals" ||
+                              cbReq.name == "globalParams_0" ||
+                              cbReq.name == "SkeletonBones");
 
-        // Create single shared buffer (used by both VS and PS)
+        if (isPerObjectCB) {
+            // Skip per-object CBs - they're managed by VCB pool
+            Msg("  [MaterialCache] Skipping per-object CB '%s' (handled by VCB pool)",
+                cbReq.name.c_str());
+
+            // Create VCB requirement for this CB
+            if (cbReq.usedInVS) {
+                framegraph::VolatileConstantBufferPool::CBLayout layout(
+                    cbReq.name.c_str(),
+                    cbReq.vsSlot,
+                    cbReq.size
+                );
+
+                ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(layout);
+
+                MaterialPSO::VCBRequirement req;
+                req.slot = cbReq.vsSlot;
+                req.size = cbReq.size;
+                req.name = cbReq.name;
+                req.vcbHandle = vcbHandle;
+                matPSO->vcbRequirements.push_back(req);
+
+                Msg("    [MaterialCache] Created VCB requirement: %s at b%u (size=%u) for %s",
+                    cbReq.name.c_str(), cbReq.vsSlot, cbReq.size, matPSO->debugName.c_str());
+            }
+            continue;  // Don't create shared buffer for per-object CBs
+        }
+
+        // Create single shared buffer for global CBs (used by both VS and PS)
         nvrhi::BufferDesc bufferDesc;
         bufferDesc.byteSize = cbReq.size;
         bufferDesc.isConstantBuffer = true;
-        bufferDesc.debugName = isPerObjectCB ? "XRay_PerObject_CB" : make_string("CB_%s", cbReq.name.c_str()).c_str();
+        bufferDesc.debugName = make_string("CB_%s", cbReq.name.c_str()).c_str();
         bufferDesc.keepInitialState = false;
         bufferDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
@@ -876,30 +855,39 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        // Store in MaterialPSO (one entry per unique CB, regardless of stages)
-        MaterialPSO::ConstantBufferInfo cbInfo;
-        cbInfo.name = cbReq.name;
-        cbInfo.size = cbReq.size;
-        cbInfo.nvrhiBuffer = sharedBuffer;
-        cbInfo.stage = MaterialPSO::ShaderStage::Vertex;  // Stage doesn't matter - it's shared!
-        cbInfo.slot = cbReq.usedInVS ? cbReq.vsSlot : cbReq.psSlot;  // Use VS slot if available
-        cbInfo.isPerObject = isPerObjectCB;
+        // CRITICAL FIX: Create TWO entries (VS and PS) both pointing to same buffer
+        // This ensures binding set creation finds the buffer for both stages
 
-        matPSO->constantBuffers.push_back(cbInfo);
+        if (cbReq.usedInVS) {
+            MaterialPSO::ConstantBufferInfo vsInfo;
+            vsInfo.name = cbReq.name;
+            vsInfo.size = cbReq.size;
+            vsInfo.nvrhiBuffer = sharedBuffer;
+            vsInfo.stage = MaterialPSO::ShaderStage::Vertex;
+            vsInfo.slot = cbReq.vsSlot;
+            matPSO->constantBuffers.push_back(vsInfo);
 
-        Msg("  [MaterialCache] ✓ Shared CB: %s (size=%u, vsSlot=%s, psSlot=%s, buffer=0x%p)",
-            cbReq.name.c_str(), cbReq.size,
-            cbReq.usedInVS ? make_string("b%u", cbReq.vsSlot).c_str() : "none",
-            cbReq.usedInPS ? make_string("b%u", cbReq.psSlot).c_str() : "none",
-            sharedBuffer.Get());
+            Msg("  [MaterialCache] ✓ Shared CB (VS): %s at b%u (size=%u, buffer=0x%p)",
+                cbReq.name.c_str(), cbReq.vsSlot, cbReq.size, sharedBuffer.Get());
+        }
+
+        if (cbReq.usedInPS) {
+            MaterialPSO::ConstantBufferInfo psInfo;
+            psInfo.name = cbReq.name;
+            psInfo.size = cbReq.size;
+            psInfo.nvrhiBuffer = sharedBuffer;  // ← SAME BUFFER as VS!
+            psInfo.stage = MaterialPSO::ShaderStage::Pixel;
+            psInfo.slot = cbReq.psSlot;
+            matPSO->constantBuffers.push_back(psInfo);
+
+            Msg("  [MaterialCache] ✓ Shared CB (PS): %s at b%u (size=%u, buffer=0x%p)",
+                cbReq.name.c_str(), cbReq.psSlot, cbReq.size, sharedBuffer.Get());
+        }
     }
 
-    // Store per-object CB size for convenience
-    for (const auto& cbInfo : matPSO->constantBuffers) {
-        if (cbInfo.isPerObject) {
-            matPSO->perObjectCBSize = cbInfo.size;
-            break;
-        }
+    // Store per-object CB size for convenience (from VCB requirements)
+    if (!matPSO->vcbRequirements.empty()) {
+        matPSO->perObjectCBSize = matPSO->vcbRequirements[0].size;
     }
 
     // Fallback if no slot 0 CB found
@@ -978,19 +966,22 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
 
     const char* stageName = (stage == MaterialPSO::ShaderStage::Vertex) ? "VS" : "PS";
 
-    // Add ONLY resources for THIS stage
+    // Add VCBs from vcbRequirements (per-draw volatile constant buffers)
     u32 cbCount = 0;
+    if (stage == MaterialPSO::ShaderStage::Vertex && !matPSO->vcbRequirements.empty()) {
+        // VCBs are typically only in VS
+        for (const auto& vcbReq : matPSO->vcbRequirements) {
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(vcbReq.slot));
+            cbCount++;
+        }
+    }
+
+    // Add global CBs from constantBuffers
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == stage) {
-            if (cbInfo.isPerObject) {
-                // Slot 0: Per-object VOLATILE constant buffer (updated per-draw)
-                layoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
-            } else {
-                // Other slots: Regular constant buffers (global state, updated per-frame)
-                layoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
-            }
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
             cbCount++;
         }
     }
@@ -1056,25 +1047,26 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
     nvrhi::BindingSetDesc vsBindingDesc;
 
-    // Add ONLY VS constant buffers
+    // Add VCB from vcbRequirements (per-draw data)
+    if (!matPSO->vcbRequirements.empty()) {
+        const auto& vcbReq = matPSO->vcbRequirements[0];
+        vsBindingDesc.bindings.push_back(
+            nvrhi::BindingSetItem::ConstantBuffer(vcbReq.slot, perObjectVCB));
+        Msg("  [GetOrCreateBindingSet] VS: Added VCB '%s' at slot b%u (buffer=%p, size=%u) for %s",
+            vcbReq.name.c_str(), vcbReq.slot, perObjectVCB, vcbReq.size, matPSO->debugName.c_str());
+    }
+
+    // Add global CBs from constantBuffers
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == MaterialPSO::ShaderStage::Vertex) {
-            if (cbInfo.isPerObject) {
-                // Slot 0: Use the per-object VCB passed in (updated per-draw via WriteBuffer)
+            if (cbInfo.nvrhiBuffer) {
                 vsBindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
-                Msg("  [GetOrCreateBindingSet] VS: Added per-object CB at slot %d", cbInfo.slot);
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                Msg("  [GetOrCreateBindingSet] VS: Added global CB '%s' at slot b%u (size=%u) for %s",
+                    cbInfo.name.c_str(), cbInfo.slot, cbInfo.size, matPSO->debugName.c_str());
             } else {
-                // Slots 1+: Add global CBs
-                if (cbInfo.nvrhiBuffer) {
-                    vsBindingDesc.bindings.push_back(
-                        nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
-                    Msg("  [GetOrCreateBindingSet] VS: Added global CB '%s' at slot %d (size=%d)",
-                        cbInfo.name.empty() ? "EMPTY" : cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
-                } else {
-                    Msg("! [GetOrCreateBindingSet] VS: CB '%s' at slot %d has NULL buffer!",
-                        cbInfo.name.empty() ? "EMPTY" : cbInfo.name.c_str(), cbInfo.slot);
-                }
+                Msg("! [GetOrCreateBindingSet] VS: CB '%s' at slot b%u has NULL buffer! for %s",
+                    cbInfo.name.c_str(), cbInfo.slot, matPSO->debugName.c_str());
             }
         }
     }
@@ -1085,19 +1077,14 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
 
     nvrhi::BindingSetDesc psBindingDesc;
 
-    // Add ONLY PS constant buffers
+    // Add global CBs from constantBuffers (PS typically doesn't have VCBs)
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == MaterialPSO::ShaderStage::Pixel) {
-            if (cbInfo.isPerObject) {
-                // Slot 0: Use the per-object VCB passed in (shouldn't happen for PS, but handle it)
+            if (cbInfo.nvrhiBuffer) {
                 psBindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, perObjectVCB));
-            } else {
-                // Slots 0+: Add global CBs (PS doesn't have per-object CB)
-                if (cbInfo.nvrhiBuffer) {
-                    psBindingDesc.bindings.push_back(
-                        nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
-                }
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
+                Msg("  [GetOrCreateBindingSet] PS: Added global CB '%s' at slot b%u for %s",
+                    cbInfo.name.c_str(), cbInfo.slot, matPSO->debugName.c_str());
             }
         }
     }

@@ -153,9 +153,9 @@ struct MaterialPSO {
         ShaderStage stage;           // Which shader stage (VS/PS/etc)
         nvrhi::BufferHandle nvrhiBuffer;  // NVRHI wrapped buffer
         u32 size;                    // Size in bytes
-        bool isPerObject;            // True if $Globals CB
         shared_str name;             // CB name from reflection
-        // NOTE: initialData removed - causes memory corruption
+        // NOTE: Only contains GLOBAL CBs (shared across draws)
+        // Per-draw CBs are in vcbRequirements and managed by VCB pool
     };
     xr_vector<ConstantBufferInfo> constantBuffers;
     u32 perObjectCBSize = 0;  // Size of $Globals CB (for convenience)

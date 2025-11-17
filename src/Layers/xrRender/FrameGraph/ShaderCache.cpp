@@ -195,10 +195,10 @@ void ShaderCache::SerializeReflection(IWriter* writer, const ExtractedReflection
     }
 
     // ═══════════════════════════════════════════════════
-    //  SERIALIZE CONSTANT BUFFERS
+    //  SERIALIZE CONSTANT BUFFERS (from constantLayout)
     // ═══════════════════════════════════════════════════
-    writer->w_u32(static_cast<u32>(reflection.constantBuffers.buffers.size()));
-    for (const auto& cb : reflection.constantBuffers.buffers)
+    writer->w_u32(static_cast<u32>(reflection.constantLayout.constantBuffers.buffers.size()));
+    for (const auto& cb : reflection.constantLayout.constantBuffers.buffers)
     {
         // Write buffer name
         u32 nameLen = cb.name.size();
@@ -317,13 +317,13 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
         }
 
         // ═══════════════════════════════════════════════════
-        //  DESERIALIZE CONSTANT BUFFERS
+        //  DESERIALIZE CONSTANT BUFFERS (directly into constantLayout)
         // ═══════════════════════════════════════════════════
         u32 cbCount = reader->r_u32();
-        outReflection.constantBuffers.buffers.resize(cbCount);
+        outReflection.constantLayout.constantBuffers.buffers.resize(cbCount);
         for (u32 i = 0; i < cbCount; ++i)
         {
-            auto& cb = outReflection.constantBuffers.buffers[i];
+            auto& cb = outReflection.constantLayout.constantBuffers.buffers[i];
 
             // Read buffer name
             u32 nameLen = reader->r_u32();
@@ -371,9 +371,6 @@ bool ShaderCache::DeserializeReflection(IReader* reader, ExtractedReflection& ou
             constant.elementSize = reader->r_u16();
             constant.matrixStride = reader->r_u16();
         }
-
-        // Also populate constantLayout.constantBuffers from reflection.constantBuffers
-        outReflection.constantLayout.constantBuffers = outReflection.constantBuffers;
 
         // ═══════════════════════════════════════════════════
         //  DESERIALIZE RT BINDINGS

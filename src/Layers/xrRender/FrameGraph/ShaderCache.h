@@ -13,16 +13,15 @@ namespace xray::render::framegraph {
 struct ExtractedReflection
 {
     VertexInputSignature vertexInputSignature;
-    ShaderConstantBuffers constantBuffers;
     ShaderRTBindings rtBindings;
-    ShaderConstantLayout constantLayout;  // NEW: Full layout with per-constant data
+    ShaderConstantLayout constantLayout;  // Full layout: CB metadata + per-constant data
 
     ExtractedReflection() = default;
 
     /// Check if this reflection has any data
     bool IsEmpty() const {
         return vertexInputSignature.elements.empty() &&
-               constantBuffers.buffers.empty() &&
+               constantLayout.constantBuffers.buffers.empty() &&
                rtBindings.inputTextures.empty() &&
                rtBindings.samplers.empty() &&
                rtBindings.outputRTs.empty();
@@ -123,7 +122,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 3;  // Bumped for per-constant metadata (constantLayout.constants)
+    static constexpr u32 CACHE_VERSION = 4;  // Removed redundant constantBuffers field - unified into constantLayout
     Stats m_stats;
 };
 

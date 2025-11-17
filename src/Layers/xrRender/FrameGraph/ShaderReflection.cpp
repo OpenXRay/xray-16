@@ -518,86 +518,243 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
     // STEP 2: Extract Implicit $Globals (Loose Constants) ⚠️ CRITICAL FIX
     // ═══════════════════════════════════════════════════
 
+    Msg("  [AnalyzeConstantLayout] === STEP 2: Checking for loose constants ($Globals) ===");
+
     auto* globalParamsLayout = reflection->getGlobalParamsTypeLayout();
 
-    if (globalParamsLayout) {
-        auto* globalParamsType = globalParamsLayout->getType();
-        if (globalParamsType) {
-            u32 fieldCount = globalParamsType->getFieldCount();
+    if (!globalParamsLayout) {
+        Msg("  [AnalyzeConstantLayout] No globalParamsLayout (no loose constants in shader)");
+    } else {
+        Msg("  [AnalyzeConstantLayout] globalParamsLayout exists, checking fields...");
 
-            if (fieldCount > 0) {
-                Msg("  [AnalyzeConstantLayout] Found %u loose constants -> implicit $Globals CB", fieldCount);
+        // Query binding slot from Slang BEFORE branching (both paths need this!)
+        auto* globalParamsVar = reflection->getGlobalParamsVarLayout();
+        u32 globalsBindingSlot = 0;
 
-                // Create implicit $Globals constant buffer entry
-                ConstantBufferInfo implicitCB;
-                implicitCB.name = "$Globals";
+        if (globalParamsVar) {
+            globalsBindingSlot = static_cast<u32>(globalParamsVar->getOffset(slang::ParameterCategory::ConstantBuffer));
+            Msg("  [AnalyzeConstantLayout] $Globals binding: b%u (from reflection)", globalsBindingSlot);
+        } else {
+            // Fallback: $Globals typically at b0 (per-object constants)
+            globalsBindingSlot = 0;
+            Msg("  [AnalyzeConstantLayout] $Globals binding: b0 (fallback - Slang didn't provide slot)");
+        }
 
-                // Query binding slot from Slang
-                // Try to get the global params variable layout to find the binding
-                auto* globalParamsVar = reflection->getGlobalParamsVarLayout();
+        // CRITICAL FIX: Slang sometimes wraps loose uniforms into a struct, sometimes doesn't
+        // Try getFieldCount() first (wrapped case), fallback to parameter iteration (unwrapped case)
+        u32 fieldCount = static_cast<u32>(globalParamsLayout->getFieldCount());
+        Msg("  [AnalyzeConstantLayout] globalParamsLayout has %u fields", fieldCount);
 
-                if (globalParamsVar) {
-                    implicitCB.slot = static_cast<u32>(globalParamsVar->getOffset(slang::ParameterCategory::ConstantBuffer));
-                    Msg("    [AnalyzeConstantLayout] $Globals binding: b%u (from reflection)", implicitCB.slot);
-                } else {
-                    // Fallback: $Globals typically at b0 (per-object constants)
-                    implicitCB.slot = 0;
-                    Msg("    [AnalyzeConstantLayout] $Globals binding: b0 (fallback - Slang didn't provide slot)");
+        if (fieldCount > 0) {
+            Msg("  [AnalyzeConstantLayout] globalParamsLayout has %u fields, checking if valid loose constants", fieldCount);
+
+            // Create implicit $Globals constant buffer entry (but don't add it yet)
+            ConstantBufferInfo implicitCB;
+            implicitCB.name = "$Globals";
+            implicitCB.slot = globalsBindingSlot;  // Use pre-queried binding
+            implicitCB.size = static_cast<u32>(globalParamsLayout->getSize());
+
+            u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
+            u32 extractedConstantCount = 0;
+
+            // Extract individual loose constants using field API
+            for (u32 i = 0; i < fieldCount; ++i) {
+                auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
+                if (!fieldLayout) {
+                    Msg("    [AnalyzeConstantLayout] Field[%u]: NULL layout", i);
+                    continue;
                 }
 
-                implicitCB.size = static_cast<u32>(globalParamsLayout->getSize());
+                // CRITICAL: Skip non-uniform resources (textures, samplers, CB references)
+                // Only process actual uniform constants (category=8)
+                auto* fieldTypeLayout = fieldLayout->getTypeLayout();
+                if (fieldTypeLayout) {
+                    auto category = fieldTypeLayout->getParameterCategory();
+                    if (category != slang::ParameterCategory::Uniform) {
+                        // Skip this field - it's a texture, sampler, or CB reference, not a loose constant
+                        continue;
+                    }
+                }
 
-                u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
-                layout.constantBuffers.buffers.push_back(implicitCB);
+                // Get field name from variable reflection
+                auto* fieldVar = fieldLayout->getVariable();
+                if (!fieldVar) {
+                    Msg("    [AnalyzeConstantLayout] Field[%u]: No variable", i);
+                    continue;
+                }
 
-                // Extract individual loose constants
-                for (u32 i = 0; i < fieldCount; ++i) {
-                    auto* field = globalParamsType->getFieldByIndex(i);
-                    auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
+                const char* fieldName = fieldVar->getName();
+                if (!fieldName) {
+                    Msg("    [AnalyzeConstantLayout] Field[%u]: NULL name", i);
+                    continue;
+                }
 
-                    if (!field || !fieldLayout) continue;
+                ShaderConstant constant;
+                constant.name = fieldName;
+                constant.offset = static_cast<u32>(fieldLayout->getOffset(slang::ParameterCategory::Uniform));
+                constant.cbIndex = cbIndex;
 
-                    const char* fieldName = field->getName();
-                    if (!fieldName) continue;
+                // Detect type (scalar/vector/matrix/array) using the helper
+                // (fieldTypeLayout already obtained above for category check)
+                constant.type = DetectConstantType(
+                    fieldTypeLayout,
+                    constant.elementSize,
+                    constant.matrixStride,
+                    constant.arrayCount
+                );
 
-                    ShaderConstant constant;
-                    constant.name = fieldName;
-                    constant.offset = static_cast<u32>(fieldLayout->getOffset(slang::ParameterCategory::Uniform));
-                    constant.cbIndex = cbIndex;
+                constant.size = (constant.arrayCount > 1)
+                    ? (constant.elementSize * constant.arrayCount)
+                    : static_cast<u32>(fieldTypeLayout ? fieldTypeLayout->getSize() : 0);
 
-                    // Detect type (scalar/vector/matrix/array) using the helper
-                    auto* fieldTypeLayout = fieldLayout->getTypeLayout();
-                    constant.type = DetectConstantType(
-                        fieldTypeLayout,
-                        constant.elementSize,
-                        constant.matrixStride,
-                        constant.arrayCount
-                    );
+                // Infer frequency and persistence
+                constant.frequency = InferConstantFrequency(fieldName, "$Globals");
+                constant.persistence = ConstantPersistence::Volatile;  // Loose constants are volatile
 
-                    constant.size = (constant.arrayCount > 1)
-                        ? (constant.elementSize * constant.arrayCount)
-                        : static_cast<u32>(fieldTypeLayout ? fieldTypeLayout->getSize() : 0);
+                layout.constants.push_back(constant);
+                extractedConstantCount++;
 
-                    // Infer frequency and persistence
-                    constant.frequency = InferConstantFrequency(fieldName, "$Globals");
-                    constant.persistence = ConstantPersistence::Volatile;  // Loose constants are volatile
+                // Detailed logging for debugging
+                const char* typeStr = "unknown";
+                switch (constant.type) {
+                case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
+                case ShaderConstant::Type::Vector: typeStr = "vector"; break;
+                case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
+                case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
+                case ShaderConstant::Type::Array: typeStr = "array"; break;
+                case ShaderConstant::Type::Struct: typeStr = "struct"; break;
+                }
 
-                    layout.constants.push_back(constant);
+                Msg("    [AnalyzeConstantLayout] Loose constant: %s (type=%s, offset=%u, size=%u, freq=%d)",
+                    fieldName, typeStr, constant.offset, constant.size,
+                    static_cast<int>(constant.frequency));
+            }
 
-                    // Detailed logging for debugging
-                    const char* typeStr = "unknown";
-                    switch (constant.type) {
-                        case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
-                        case ShaderConstant::Type::Vector: typeStr = "vector"; break;
-                        case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
-                        case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
-                        case ShaderConstant::Type::Array: typeStr = "array"; break;
-                        case ShaderConstant::Type::Struct: typeStr = "struct"; break;
+            // Only add the $Globals CB if we extracted valid constants
+            if (extractedConstantCount > 0) {
+                // Sanity check: if we have constants, size should be > 0
+                if (implicitCB.size == 0) {
+                    // Slang reflection bug: calculate size from extracted constants
+                    u32 calculatedSize = 0;
+                    for (const auto& constant : layout.constants) {
+                        if (constant.cbIndex == cbIndex) {
+                            u32 constantEnd = constant.offset + constant.size;
+                            calculatedSize = std::max(calculatedSize, constantEnd);
+                        }
                     }
 
-                    Msg("    [AnalyzeConstantLayout] Loose constant: %s (type=%s, offset=%u, size=%u, freq=%d)",
-                        fieldName, typeStr, constant.offset, constant.size,
-                        static_cast<int>(constant.frequency));
+                    Msg("! [AnalyzeConstantLayout] WARNING: $Globals size=0 from Slang, calculated %u bytes from %u constants",
+                        calculatedSize, extractedConstantCount);
+                    implicitCB.size = calculatedSize;
+                }
+
+                if (implicitCB.size > 0) {
+                    layout.constantBuffers.buffers.push_back(implicitCB);
+                    Msg("  [AnalyzeConstantLayout] ✓ Added implicit $Globals CB (%u constants, %u bytes)",
+                        extractedConstantCount, implicitCB.size);
+                } else {
+                    Msg("! [AnalyzeConstantLayout] ERROR: Cannot add $Globals CB - size is 0 even after calculation");
+                }
+            } else {
+                Msg("  [AnalyzeConstantLayout] Skipping $Globals CB (no valid constants extracted)");
+            }
+        } else {
+            // FALLBACK: fieldCount == 0 means Slang didn't wrap loose uniforms into a struct
+            // Iterate program parameters directly and extract category=Uniform (8)
+            Msg("  [AnalyzeConstantLayout] fieldCount=0, falling back to parameter iteration");
+
+            // Create implicit $Globals CB anyway
+            ConstantBufferInfo implicitCB;
+            implicitCB.name = "$Globals";
+            implicitCB.slot = globalsBindingSlot;  // Use pre-queried binding (same as wrapped path!)
+            implicitCB.size = static_cast<u32>(globalParamsLayout->getSize());
+
+            u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
+
+            // Iterate all program parameters to find loose uniforms (category=8)
+            SlangInt paramCount = reflection->getParameterCount();
+            Msg("  [AnalyzeConstantLayout] Scanning %d program parameters for loose uniforms", (int)paramCount);
+
+            u32 looseConstantCount = 0;
+            for (SlangInt i = 0; i < paramCount; ++i) {
+                auto* param = reflection->getParameterByIndex(i);
+                if (!param) continue;
+
+                auto* typeLayout = param->getTypeLayout();
+                if (!typeLayout) continue;
+
+                // Check if this is a loose uniform (category=8)
+                auto category = typeLayout->getParameterCategory();
+                if (category != slang::ParameterCategory::Uniform) {
+                    continue;  // Not a loose uniform
+                }
+
+                const char* paramName = param->getName();
+                if (!paramName) continue;
+
+                Msg("    [AnalyzeConstantLayout] Found loose uniform: %s", paramName);
+
+                ShaderConstant constant;
+                constant.name = paramName;
+                constant.offset = static_cast<u32>(param->getOffset(slang::ParameterCategory::Uniform));
+                constant.cbIndex = cbIndex;
+
+                // Detect type
+                constant.type = DetectConstantType(
+                    typeLayout,
+                    constant.elementSize,
+                    constant.matrixStride,
+                    constant.arrayCount
+                );
+
+                constant.size = (constant.arrayCount > 1)
+                    ? (constant.elementSize * constant.arrayCount)
+                    : static_cast<u32>(typeLayout->getSize());
+
+                constant.frequency = InferConstantFrequency(paramName, "$Globals");
+                constant.persistence = ConstantPersistence::Volatile;
+
+                layout.constants.push_back(constant);
+                looseConstantCount++;
+
+                // Detailed logging
+                const char* typeStr = "unknown";
+                switch (constant.type) {
+                    case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
+                    case ShaderConstant::Type::Vector: typeStr = "vector"; break;
+                    case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
+                    case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
+                    case ShaderConstant::Type::Array: typeStr = "array"; break;
+                    case ShaderConstant::Type::Struct: typeStr = "struct"; break;
+                }
+
+                Msg("    [AnalyzeConstantLayout] Loose constant: %s (type=%s, offset=%u, size=%u, count=%u, freq=%d)",
+                    paramName, typeStr, constant.offset, constant.size, constant.arrayCount,
+                    static_cast<int>(constant.frequency));
+            }
+
+            if (looseConstantCount > 0) {
+                // Sanity check: calculate size from constants if Slang returned 0
+                if (implicitCB.size == 0) {
+                    u32 calculatedSize = 0;
+                    for (const auto& constant : layout.constants) {
+                        if (constant.cbIndex == cbIndex) {
+                            u32 constantEnd = constant.offset + constant.size;
+                            calculatedSize = std::max(calculatedSize, constantEnd);
+                        }
+                    }
+
+                    Msg("! [AnalyzeConstantLayout] WARNING: $Globals size=0 from Slang (unwrapped), calculated %u bytes from %u constants",
+                        calculatedSize, looseConstantCount);
+                    implicitCB.size = calculatedSize;
+                }
+
+                if (implicitCB.size > 0) {
+                    layout.constantBuffers.buffers.push_back(implicitCB);
+                    Msg("  [AnalyzeConstantLayout] ✓ Extracted %u loose uniforms via parameter iteration (%u bytes)",
+                        looseConstantCount, implicitCB.size);
+                } else {
+                    Msg("! [AnalyzeConstantLayout] ERROR: Cannot add $Globals CB - size is 0 even after calculation (unwrapped path)");
                 }
             } else {
                 Msg("  [AnalyzeConstantLayout] No loose constants found (shader uses explicit cbuffers)");
@@ -987,13 +1144,11 @@ ExtractedReflection ShaderReflector::ExtractReflection(
             result.rtBindings.outputRTs.size());
     }
 
-    result.constantBuffers = AnalyzeConstantBuffers(slangReflection);
-    Msg("  [ShaderReflector::ExtractReflection] Extracted %u constant buffers",
-        result.constantBuffers.buffers.size());
-
     // Extract full constant layout (CB + per-constant metadata)
+    // This includes implicit $Globals CB for loose uniforms
     result.constantLayout = AnalyzeConstantLayout(slangReflection);
-    Msg("  [ShaderReflector::ExtractReflection] Extracted %u individual constants",
+    Msg("  [ShaderReflector::ExtractReflection] Extracted %u constant buffers, %u individual constants",
+        result.constantLayout.constantBuffers.buffers.size(),
         result.constantLayout.constants.size());
 
     return result;
@@ -1021,7 +1176,7 @@ const ShaderConstantBuffers& ShaderReflector::GetConstantBuffers(
     const ExtractedReflection* reflection)
 {
     static ShaderConstantBuffers empty;
-    return reflection ? reflection->constantBuffers : empty;
+    return reflection ? reflection->constantLayout.constantBuffers : empty;
 }
 
 } // namespace xray::render::framegraph

@@ -60,7 +60,7 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
         Msg("  [create_shader] Stored reflection for %s: vsInputs=%u, constantBuffers=%u, rtBindings=%u",
             file_name,
             result->reflection->vertexInputSignature.elements.size(),
-            result->reflection->constantBuffers.buffers.size(),
+            result->reflection->constantLayout.constantBuffers.buffers.size(),
             result->reflection->rtBindings.outputRTs.size());
 #endif
 

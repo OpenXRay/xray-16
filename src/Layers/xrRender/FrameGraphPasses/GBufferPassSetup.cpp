@@ -201,8 +201,9 @@ void renderGBufferGeometry(
         if (batch.visual && materialCache) {
             MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
             if (matPSO) {
+                // Update all global CBs (constantBuffers only contains global CBs, VCBs are in vcbRequirements)
                 for (const auto& cbInfo : matPSO->constantBuffers) {
-                    if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
+                    if (cbInfo.nvrhiBuffer) {
                         if (updatedGlobalBuffers.find(cbInfo.nvrhiBuffer.Get()) == updatedGlobalBuffers.end()) {
                             // Fill buffer based on CB name
                             if (cbInfo.name == "static_globals") {
@@ -328,17 +329,39 @@ void renderGBufferGeometry(
         // ═══════════════════════════════════════════════════════
 
         if (matPSO) {
-            // Get VCB size from material requirements
+            // Get VCB based on visual type
             ng::BufferHandle vcbHandle;
             u32 vcbSize = 0;
-            if (!matPSO->vcbRequirements.empty()) {
-                vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                vcbSize = matPSO->vcbRequirements[0].size;
+
+            // Determine if this is a skeleton mesh
+            bool isSkeleton = false;
+            u32 visualType = 0;
+            if (batch.visual && batch.renderable) {
+                visualType = batch.visual->getType();
+                isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+            }
+
+            // For skeletons, we need the SkeletonBones VCB that contains sbones_array
+            // For other meshes, use the first VCB (legacy behavior)
+            if (isSkeleton) {
+                for (const auto& vcbReq : matPSO->vcbRequirements) {
+                    if (vcbReq.name == "SkeletonBones") {
+                        vcbHandle = vcbReq.vcbHandle;
+                        vcbSize = vcbReq.size;
+                        break;
+                    }
+                }
+            } else {
+                // Non-skeleton: use first VCB (terrain, trees, etc.)
+                if (!matPSO->vcbRequirements.empty()) {
+                    vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                    vcbSize = matPSO->vcbRequirements[0].size;
+                }
             }
 
             if (!vcbHandle.IsValid()) {
-                Msg("! [GBufferPass] Material '%s' has no valid VCB (vcbRequirements.size=%u)",
-                    matPSO->debugName.c_str(), matPSO->vcbRequirements.size());
+                Msg("! [GBufferPass] Material '%s' has no valid VCB (vcbRequirements.size=%u, isSkeleton=%d)",
+                    matPSO->debugName.c_str(), matPSO->vcbRequirements.size(), isSkeleton);
                 continue;  // Skip if no VCB
             }
 
@@ -369,14 +392,7 @@ void renderGBufferGeometry(
                 destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
             };
 
-            // Determine visual type
-            bool isSkeleton = false;
-            u32 visualType = 0;
-            if (batch.visual && batch.renderable) {
-                visualType = batch.visual->getType();
-                isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
-            }
-
+            // isSkeleton and visualType already determined above (lines 336-342)
             if (isSkeleton) {
                 // ─────────────────────────────────────────────────
                 //  SKELETON VCB: sbones_array
@@ -465,12 +481,15 @@ void renderGBufferGeometry(
 
             if (vcbBuffer) {
                 // Write VCB within render pass
+                Msg("Write to VCB for %s", matPSO->debugName.c_str());
                 ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
 
                 // Get or create cached binding sets
                 materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
                 // Bind BOTH per-stage binding sets
+                Msg("  [GBufferPass] Binding VS set=%p, PS set=%p for %s",
+                    matPSO->vsBindingSet.Get(), matPSO->psBindingSet.Get(), matPSO->debugName.c_str());
                 ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
                 ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
             }
@@ -492,6 +511,8 @@ void renderGBufferGeometry(
 
         // Draw
         ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+
+        Msg("Successful draw for %s", matPSO->debugName.c_str());
 
         numDraws++;
         numTriangles += batch.indexCount / 3;
