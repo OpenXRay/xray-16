@@ -126,7 +126,6 @@ struct MaterialPSO {
         ShaderStage stage;
         nvrhi::BufferHandle nvrhiBuffer;
         u32 size;
-        bool isPerObject;
         shared_str name;
     };
     xr_vector<ConstantBufferInfo> constantBuffers;

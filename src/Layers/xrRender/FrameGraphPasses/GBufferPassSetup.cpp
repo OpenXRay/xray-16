@@ -175,7 +175,7 @@ void renderGBufferGeometry(
             MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
             if (matPSO) {
                 for (const auto& cbInfo : matPSO->constantBuffers) {
-                    if (!cbInfo.isPerObject && cbInfo.nvrhiBuffer) {
+                    if (cbInfo.nvrhiBuffer) {
                         if (updatedGlobalBuffers.find(cbInfo.nvrhiBuffer.Get()) == updatedGlobalBuffers.end()) {
                             if (cbInfo.name == "static_globals") {
                                 u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
@@ -273,14 +273,32 @@ void renderGBufferGeometry(
         if (matPSO) {
             ng::BufferHandle vcbHandle;
             u32 vcbSize = 0;
-            if (!matPSO->vcbRequirements.empty()) {
-                vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                vcbSize = matPSO->vcbRequirements[0].size;
+
+            bool isSkeleton = false;
+            u32 visualType = 0;
+            if (batch.visual && batch.renderable) {
+                visualType = batch.visual->getType();
+                isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+            }
+
+            if (isSkeleton) {
+                for (const auto& vcbReq : matPSO->vcbRequirements) {
+                    if (vcbReq.name == "SkeletonBones") {
+                        vcbHandle = vcbReq.vcbHandle;
+                        vcbSize = vcbReq.size;
+                        break;
+                    }
+                }
+            } else {
+                if (!matPSO->vcbRequirements.empty()) {
+                    vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                    vcbSize = matPSO->vcbRequirements[0].size;
+                }
             }
 
             if (!vcbHandle.IsValid()) {
-                Msg("! [GBufferPass] Material '%s' has no valid VCB (vcbRequirements.size=%u)",
-                    matPSO->debugName.c_str(), matPSO->vcbRequirements.size());
+                Msg("! [GBufferPass] Material '%s' has no valid VCB (vcbRequirements.size=%u, isSkeleton=%d)",
+                    matPSO->debugName.c_str(), matPSO->vcbRequirements.size(), isSkeleton);
                 continue;
             }
 
@@ -307,13 +325,6 @@ void renderGBufferGeometry(
                 destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
                 destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
             };
-
-            bool isSkeleton = false;
-            u32 visualType = 0;
-            if (batch.visual && batch.renderable) {
-                visualType = batch.visual->getType();
-                isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
-            }
 
             if (isSkeleton) {
 
@@ -385,10 +396,13 @@ void renderGBufferGeometry(
             nvrhi::IBuffer* vcbBuffer = device->GetNativeBuffer(vcbHandle);
 
             if (vcbBuffer) {
+                Msg("Write to VCB for %s", matPSO->debugName.c_str());
                 ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
 
                 materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
 
+                Msg("  [GBufferPass] Binding VS set=%p, PS set=%p for %s",
+                    matPSO->vsBindingSet.Get(), matPSO->psBindingSet.Get(), matPSO->debugName.c_str());
                 ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
                 ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
             }
@@ -405,6 +419,8 @@ void renderGBufferGeometry(
         ctx->SetIndexBuffer(ib, nvrhi::Format::R16_UINT, 0);
 
         ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+
+        Msg("Successful draw for %s", matPSO->debugName.c_str());
 
         numDraws++;
         numTriangles += batch.indexCount / 3;

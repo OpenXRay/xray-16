@@ -8,7 +8,6 @@ namespace xray::render::framegraph {
 struct ExtractedReflection
 {
     VertexInputSignature vertexInputSignature;
-    ShaderConstantBuffers constantBuffers;
     ShaderRTBindings rtBindings;
     ShaderConstantLayout constantLayout;
 
@@ -16,7 +15,7 @@ struct ExtractedReflection
 
     bool IsEmpty() const {
         return vertexInputSignature.elements.empty() &&
-               constantBuffers.buffers.empty() &&
+               constantLayout.constantBuffers.buffers.empty() &&
                rtBindings.inputTextures.empty() &&
                rtBindings.samplers.empty() &&
                rtBindings.outputRTs.empty();
@@ -75,7 +74,7 @@ private:
         ExtractedReflection& outReflection
     );
 
-    static constexpr u32 CACHE_VERSION = 3;
+    static constexpr u32 CACHE_VERSION = 4;
     Stats m_stats;
 };
 
