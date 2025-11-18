@@ -202,7 +202,7 @@ public:
     CEventNotifierCallback::CID m_script_reset_event_cid;
 
 private:
-    DECLARE_SCRIPT_REGISTER_FUNCTION(CDialogHolder);
+    DECLARE_SCRIPT_REGISTER_FUNCTION(CDialogHolder, CUIDialogWnd, CUIWindow);
 };
 
 extern CMainMenu* MainMenu();
