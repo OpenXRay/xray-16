@@ -32,67 +32,83 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     using namespace detail_manager;
 
+    if (uniformBufferObject.id == GL_NONE)
+        RCache.uniformBufferObjectGenerate(uniformBufferObject);
+
     // Render-prepare
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
     float fDelta = Device.fTimeGlobal - m_global_time_old;
     if (fDelta < 0 || fDelta > 1)
+    {
         fDelta = 0.03f;
+    }
     m_global_time_old = Device.fTimeGlobal;
 
     m_time_rot_1 += PI_MUL_2 * fDelta / swing_current.rot1;
     m_time_rot_2 += PI_MUL_2 * fDelta / swing_current.rot2;
     m_time_pos += fDelta * swing_current.speed;
 
-    //float		tm_rot1		= (PI_MUL_2*Device.fTimeGlobal/swing_current.rot1);
-    //float		tm_rot2		= (PI_MUL_2*Device.fTimeGlobal/swing_current.rot2);
-    float tm_rot1 = m_time_rot_1;
-    float tm_rot2 = m_time_rot_2;
-
-    Fvector4 dir1, dir2;
-    dir1.set(_sin(tm_rot1), 0, _cos(tm_rot1), 0).normalize().mul(swing_current.amp1);
-    dir2.set(_sin(tm_rot2), 0, _cos(tm_rot2), 0).normalize().mul(swing_current.amp2);
+    glm::vec4 wind1 = normalize(glm::vec4(_sin(m_time_rot_1), 0, _cos(m_time_rot_1), 0)) * swing_current.amp1;
+    glm::vec4 wind2 = normalize(glm::vec4(_sin(m_time_rot_2), 0, _cos(m_time_rot_2), 0)) * swing_current.amp2;
 
     // Setup geometry and DMA
     cmd_list.set_Geometry(hw_Geom);
 
+    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
+
     // Wave0
     float scale = 1.f / float(quant);
-    Fvector4 wave;
-    Fvector4 consts;
-    consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
-    //wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
-    wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
-    //RCache.set_c			(&*hwc_consts,	scale,		scale,		ps_r__Detail_l_aniso,	ps_r__Detail_l_ambient);				// consts
-    //RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
-    //RCache.set_c			(&*hwc_wind,	dir1);																					// wind-dir
-    //hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir1, 1, 0);
 
-    // Wave1
-    //wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
-    wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
-    //RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
-    //RCache.set_c			(&*hwc_wind,	dir2);																					// wind-dir
-    //hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 2, 0);
+    //environmentDetailUbo[0].xform = Device.mFullTransform;
+    memcpy(&environmentDetailData[0].xform, &Device.mFullTransform, sizeof(glm::mat4));
+    //environmentDetailUbo[0].xformView;
+    environmentDetailData[0].consts = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    environmentDetailData[0].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    //environmentDetailUbo[0].bias;
+    environmentDetailData[0].wind = wind1;
+    environmentDetailData[0].wave = glm::vec4(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos) / PI_MUL_2;
+    environmentDetailData[0].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
 
-    // Still
-    consts.set(scale, scale, scale, 1.f);
-    //RCache.set_c			(&*hwc_s_consts,scale,		scale,		scale,				1.f);
-    //RCache.set_c			(&*hwc_s_xform,	Device.mFullTransform);
-    //hw_Render_dump			(&*hwc_s_array,	0, 1, c_hdr );
-    hw_Render_dump(cmd_list, consts, wave.div(PI_MUL_2), dir2, 0, 1);
+    //
+
+    //environmentDetailUbo[1].xform = Device.mFullTransform;
+    memcpy(&environmentDetailData[1].xform, &Device.mFullTransform, sizeof(glm::mat4));
+    //environmentDetailUbo[1].xformView;
+    environmentDetailData[1].consts = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    environmentDetailData[1].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    //environmentDetailUbo[1].bias;
+    environmentDetailData[1].wind = wind2;
+    environmentDetailData[1].wave = glm::vec4(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos) / PI_MUL_2;
+    environmentDetailData[1].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
+
+    //
+
+    //environmentDetailUbo[2].xform = Device.mFullTransform;
+    memcpy(&environmentDetailData[2].xform, &Device.mFullTransform, sizeof(glm::mat4));
+    //environmentDetailUbo[2].xformView;
+    environmentDetailData[2].consts = glm::vec4(scale, scale, scale, 1.f);
+    environmentDetailData[2].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    //environmentDetailUbo[2].bias;
+    environmentDetailData[2].wind = wind2;
+    environmentDetailData[2].wave = glm::vec4(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos) / PI_MUL_2;
+    environmentDetailData[2].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
+
+    RCache.uniformBufferObjectPushToDevice(uniformBufferObject, uniformBufferObject.size, &environmentDetailData);
+
+    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, 3, uniformBufferObject.id, 0, sizeof(EnvironmentDetailData)));
+    hw_Render_dump(cmd_list, 1, 0);
+
+    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, 3, uniformBufferObject.id, sizeof(EnvironmentDetailData), sizeof(EnvironmentDetailData)));
+    hw_Render_dump(cmd_list, 2, 0);
+
+    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, 3, uniformBufferObject.id, sizeof(EnvironmentDetailData)*2, sizeof(EnvironmentDetailData)));
+    hw_Render_dump(cmd_list, 0, 1);
 }
 
-void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id,
-                                    u32 lod_id)
+void CDetailManager::hw_Render_dump(CBackend& cmd_list, u32 var_id, u32 lod_id)
 {
-    static shared_str strConsts("consts");
-    static shared_str strWave("wave");
-    static shared_str strDir2D("dir2D");
     static shared_str strArray("array");
-    static shared_str strXForm("xform");
 
     RImplementation.BasicStats.DetailCount = 0;
 
@@ -118,34 +134,14 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
         {
             for (u32 iPass = 0; iPass < Object.shader->E[lod_id]->passes.size(); ++iPass)
             {
-                // Setup matrices + colors (and flush it as necessary)
-                //RCache.set_Element				(Object.shader->E[lod_id]);
+                // TODO register only once
+                RCache.uniformBufferObjectRegisterWithProgram(Object.shader->E[lod_id]->passes[iPass]->vs, "EnvironmentDetailUBO", 3, uniformBufferObject);
+
                 cmd_list.set_Element(Object.shader->E[lod_id], iPass);
                 cmd_list.apply_lmaterial();
 
-                //	This could be cached in the corresponding consatant buffer
-                //	as it is done for DX9
-                cmd_list.set_c(strConsts, consts);
-                cmd_list.set_c(strWave, wave);
-                cmd_list.set_c(strDir2D, wind);
-                cmd_list.set_c(strXForm, Device.mFullTransform);
-
                 ref_constant constArray = cmd_list.get_c(strArray);
                 VERIFY(constArray);
-
-                //u32			c_base				= x_array->vs.index;
-                //Fvector4*	c_storage			= RCache.get_ConstantCache_Vertex().get_array_f().access(c_base);
-                // TODO: OGL: Implement a constants buffer.
-                /*Fvector4*	c_storage=0;
-                //	Map constants to memory directly
-                {
-                    void*	pVData;
-                    RCache.get_ConstantDirect( strArray,
-                        hw_BatchSize*sizeof(Fvector4)*4,
-                        &pVData, 0, 0);
-                    c_storage = (Fvector4*) pVData;
-                }
-                VERIFY(c_storage);*/
 
                 u32 dwBatch = 0;
                 xr_vector<glm::vec4> uniformBuffer;
@@ -167,10 +163,8 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
 
                         // Build color
                         // R2 only needs hemisphere
-                        float h = instance->c_hemi;
-                        float s = instance->c_sun;
+                        uniformBuffer.emplace_back(instance->c_sun, instance->c_sun, instance->c_sun, instance->c_hemi);
 
-                        uniformBuffer.emplace_back(s, s, s, h);
                         dwBatch ++;
                         if (dwBatch == hw_BatchSize)
                         {
@@ -178,11 +172,10 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                             RImplementation.BasicStats.DetailCount += dwBatch;
                             u32 dwCNT_verts = dwBatch * Object.number_vertices;
                             u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
-                            //RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
-                            //RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
 
                             cmd_list.set_uniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
-                            cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                            glDrawElementsInstancedBaseVertex(GL_TRIANGLES, Object.number_indices, GL_UNSIGNED_SHORT, (void*)(iOffset * sizeof(GLushort)), dwBatch, vOffset);
+
                             cmd_list.stat.r.s_details.add(dwCNT_verts);
                             uniformBuffer.clear();
 
@@ -197,16 +190,15 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, 
                     RImplementation.BasicStats.DetailCount += dwBatch;
                     u32 dwCNT_verts = dwBatch * Object.number_vertices;
                     u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
-                    //RCache.get_ConstantCache_Vertex().b_dirty				=	TRUE;
-                    //RCache.get_ConstantCache_Vertex().get_array_f().dirty	(c_base,c_base+dwBatch*4);
+
                     cmd_list.set_uniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
-                    cmd_list.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
+                    glDrawElementsInstancedBaseVertex(GL_TRIANGLES, Object.number_indices, GL_UNSIGNED_SHORT, (void*)(iOffset * sizeof(GLushort)), dwBatch, vOffset);
                     cmd_list.stat.r.s_details.add(dwCNT_verts);
                 }
             }
         }
-        vOffset += hw_BatchSize * Object.number_vertices;
-        iOffset += hw_BatchSize * Object.number_indices;
+        vOffset += Object.number_vertices;
+        iOffset += Object.number_indices;
     }
 }
 } // namespace xray::render::RENDER_NAMESPACE

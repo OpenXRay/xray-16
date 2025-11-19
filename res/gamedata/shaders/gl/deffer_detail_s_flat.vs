@@ -1,18 +1,24 @@
 #include "common.h"
 #include "iostructs\v_detail.h"
 
-uniform float4 		consts; // {1/quant,1/quant,diffusescale,ambient}
-//uniform float4 		array	[200] : register(c12);
-//tbuffer DetailsData
-//{
-	uniform float4 		array[61*4];
-//}
+layout(std140) uniform EnvironmentDetailUBO {
+    mat4 xform;
+    mat4 formView;
+    vec4 consts;
+    vec4 scale;
+    vec4 bias;
+    vec4 wind;
+    vec4 wave;
+    vec3 sun;
+};
+
+uniform float4 		array[61*4];
 
 v2p_flat 	_main (v_detail v)
 {
 	v2p_flat 		O;
 	// index
-	int 	i 	= int(v.misc.w);
+	int 	i 	= gl_InstanceID*4;
 	float4  m0 	= array[i+0];
 	float4  m1 	= array[i+1];
 	float4  m2 	= array[i+2];

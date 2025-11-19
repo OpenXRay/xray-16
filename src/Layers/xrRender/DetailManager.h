@@ -50,9 +50,38 @@ extern float dm_current_fade;// = float(2*dm_current_size)-.5f;
 extern float ps_current_detail_density;
 extern float ps_current_detail_height;
 
+#ifdef USE_OGL
+#pragma pack(push, 1)
+struct EnvironmentDetailData
+{
+    glm::mat4x4	xform;
+    glm::mat4x4	xformView;
+    glm::vec4 consts;
+    glm::vec4 scale;
+    glm::vec4 bias;
+    glm::vec4 wind;
+    glm::vec4 wave;
+    glm::vec3 sun;
+
+private:
+    [[maybe_unused]]
+    glm::vec1 _glsl_140_padding {};
+    // 224 bytes
+};
+#pragma pack(pop)
+#endif
+
 class ECORE_API CDetailManager
 {
 public:
+#ifdef USE_OGL
+    EnvironmentDetailData environmentDetailData[3];
+
+    UniformBufferObject uniformBufferObject = {
+        GL_NONE, GL_DYNAMIC_DRAW, sizeof(EnvironmentDetailData)*3
+    };
+#endif
+
     struct SlotItem
     { // один кустик
         float scale;
@@ -70,9 +99,9 @@ public:
 
     struct SlotPart
     { //
-        u32 id; // ID модельки
-        SlotItemVec items; // список кустиков
-        SlotItemVec r_items[3]; // список кустиков for render
+        u32 id; // ID models
+        SlotItemVec items; // list of bushes
+        SlotItemVec r_items[3]; // list of bushes for render
     };
 
     enum SlotType : u32
@@ -197,7 +226,11 @@ public:
     void hw_Load_Shaders();
     void hw_Unload();
     void hw_Render(CBackend& cmd_list);
+#ifdef USE_OGL
+    void hw_Render_dump(CBackend& cmd_list, u32 var_id, u32 lod_id);
+#else
     void hw_Render_dump(CBackend& cmd_list, const Fvector4& consts, const Fvector4& wave, const Fvector4& wind, u32 var_id, u32 lod_id);
+#endif
 
     // get unpacked slot
     DetailSlot& QueryDB(int sx, int sz);

@@ -38,6 +38,28 @@ void CBackendUniforms::uniformBufferObjectRegisterWithProgram(Program& program, 
     CHK_GL(glBindBuffer(GL_UNIFORM_BUFFER, ubo.id));
 }
 
+void CBackendUniforms::uniformBufferObjectRegisterWithProgram(ref_vs& program, const std::string_view location, const uint32_t blockBinding, const UniformBufferObject& ubo)
+{
+    // Only single bit is 1
+    //VERIFY(blockBinding == 0 || (blockBinding & (blockBinding - 1)) == 0);
+    //VERIFY(program.bindingSlots & 1 << blockBinding == 0);
+
+    if (program->bindingSlots & 1 << blockBinding)
+    {
+        // UBO already registered with this program
+        return;
+    }
+
+    const GLuint blockIndex = glGetUniformBlockIndex(program->sh, location.data());
+    VERIFY(blockIndex != GL_INVALID_INDEX);
+    CHK_GL(glUniformBlockBinding(program->sh, blockIndex, blockBinding));
+    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, blockBinding, ubo.id, 0,ubo.size));
+
+    program->bindingSlots |= 1 << blockBinding;
+
+    CHK_GL(glBindBuffer(GL_UNIFORM_BUFFER, ubo.id));
+}
+
 void CBackendUniforms::uniformBufferObjectPushToDevice(const UniformBufferObject& ubo, GLsizeiptr size, void* data)
 {
     CHK_GL(glBindBuffer(GL_UNIFORM_BUFFER, ubo.id));

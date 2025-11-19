@@ -30,6 +30,7 @@ public:
 
     static void uniformBufferObjectGenerate(UniformBufferObject& ubo);
     static void uniformBufferObjectRegisterWithProgram(Program& program, std::string_view location, uint32_t blockBinding, const UniformBufferObject& ubo);
+    static void uniformBufferObjectRegisterWithProgram(ref_vs& program, std::string_view location, uint32_t blockBinding, const UniformBufferObject& ubo);
 
     static void uniformBufferObjectPushToDevice(const UniformBufferObject& ubo)
     {

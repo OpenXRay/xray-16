@@ -1,0 +1,121 @@
+#include "stdafx.h"
+#pragma hdrstop
+#include "DetailManager.h"
+#include <glm/glm.hpp>
+
+namespace xray::render::RENDER_NAMESPACE
+{
+namespace detail_manager
+{
+extern const int quant = 16384;
+extern const int c_hdr = 10;
+const int c_size = 4;
+
+static VertexElement dwDecl[] =
+{
+    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
+    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
+    D3DDECL_END()
+};
+
+#pragma pack(push, 1)
+// TODO glm, remove mid param
+struct vertHW
+{
+    float x, y, z;
+    short u, v, t, _pad;
+};
+#pragma pack(pop)
+
+short QC(float v)
+{
+    int t = iFloor(v * float(quant));
+    clamp(t, -32768, 32767);
+    return short(t & 0xffff);
+}
+} // namespace detail_manager
+
+void CDetailManager::hw_Load()
+{
+    hw_Load_Geom();
+    hw_Load_Shaders();
+}
+
+void CDetailManager::hw_Load_Geom()
+{
+    using namespace detail_manager;
+
+    // TODO it can be dynamic based on GPU, as of now its static 61 (16kb) (limited in shader)
+    hw_BatchSize = 61;//(u32(HW.Caps.geometry.dwRegisters) - c_hdr) / c_size;
+
+    Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", u32(HW.Caps.geometry.dwRegisters), hw_BatchSize);
+
+    // Pre-process objects
+    u32 vertexCount = 0;
+    u32 indexCount = 0;
+    for (u32 o = 0; o < objects.size(); o++)
+    {
+        const CDetail& D = *objects[o];
+        vertexCount += D.number_vertices;
+        indexCount += D.number_indices;
+    }
+    u32 vertHWSize = sizeof(vertHW);
+    Msg("* [DETAILS] %d v(%d), %d p", vertexCount, vertHWSize, indexCount / 3);
+    Msg("* [DETAILS] Batch(%d), VB(%dK), IB(%dK)", hw_BatchSize, (vertexCount * vertHWSize) / 1024, (indexCount * 2) / 1024);
+
+    // Fill VB
+    hw_VB.Create(vertexCount * vertHWSize);
+    {
+        vertHW* pV = static_cast<vertHW*>(hw_VB.Map());
+        for (u32 objectIndex = 0; objectIndex < objects.size(); objectIndex++)
+        {
+            const CDetail& D = *objects[objectIndex];
+            for (u32 v = 0; v < D.number_vertices; v++)
+            {
+                const Fvector& vP = D.vertices[v].P;
+                pV->x = vP.x;
+                pV->y = vP.y;
+                pV->z = vP.z;
+                pV->u = QC(D.vertices[v].u);
+                pV->v = QC(D.vertices[v].v);
+                pV->t = QC(vP.y / (D.bv_bb.vMax.y - D.bv_bb.vMin.y));
+                pV++;
+            }
+        }
+        hw_VB.Unmap(true); // upload vertex data
+    }
+
+    // Fill IB
+    hw_IB.Create(indexCount * sizeof(u16));
+    {
+        u16* pI = static_cast<u16*>(hw_IB.Map());
+        for (u32 o = 0; o < objects.size(); o++)
+        {
+            const CDetail& D = *objects[o];
+            u16 offset = 0;
+
+            for (u32 i = 0; i < u32(D.number_indices); i++)
+            {
+                *pI++ = u16(u16(D.indices[i]) + u16(offset));
+            }
+            offset = u16(offset + u16(D.number_vertices));
+
+        }
+        hw_IB.Unmap(true); // upload index data
+    }
+
+    // Declare geometry
+    hw_Geom.create(dwDecl, hw_VB, hw_IB);
+}
+
+void CDetailManager::hw_Unload()
+{
+    // Destroy VS/VB/IB
+    if (hw_Geom)
+        hw_Geom.destroy();
+    if (hw_IB)
+        hw_IB.Release();
+    if (hw_VB)
+        hw_VB.Release();
+}
+} // namespace xray::render::RENDER_NAMESPACE

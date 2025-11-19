@@ -9,6 +9,8 @@ target_sources(xrRender_GL PRIVATE
     gl_rendertarget_u_set_rt.cpp
     gl_backend_uniforms.h
     gl_backend_uniforms.cpp
+    gl_program.h
+    ../xrRenderGL/glDetailManager_loadGeometry.cpp
     r2_R_sun.cpp
     r2_test_hw.cpp
     rgl_shaders.cpp
@@ -38,7 +40,6 @@ target_sources(xrRender_GL PRIVATE
     ../xrRender/DetailManager_Decompress.cpp
     ../xrRender/DetailManager_soft.cpp
     ../xrRender/DetailManager.h
-    ../xrRender/DetailManager_VS.cpp
     ../xrRender/DetailModel.cpp
     ../xrRender/DetailModel.h
     ../xrRender/du_box.cpp

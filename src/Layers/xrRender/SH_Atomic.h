@@ -31,6 +31,7 @@ struct ECORE_API SVS : public xr_resource_named
     ID3DVertexShader* sh;
 #elif defined(USE_OGL)
     GLuint sh;
+    uint32_t bindingSlots = 0;
 #else
 #   error No graphics API selected or enabled!
 #endif
