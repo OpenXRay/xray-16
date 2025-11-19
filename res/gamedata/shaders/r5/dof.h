@@ -27,8 +27,8 @@ float DOFFactor( float depth)
 }
 
 
-#define MAXCOF		7.h
-#define EPSDEPTH	0.0001h
+#define MAXCOF		7.f
+#define EPSDEPTH	0.0001f
 float3	dof(float2 center)
 {
 #ifndef USE_MSAA
@@ -39,7 +39,7 @@ float3	dof(float2 center)
 	if (depth <= EPSDEPTH)	depth = dof_params.w;
 	float	blur 		= DOFFactor(depth);
 
-	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * (dof_kernel.z * blur);
+	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * (dof_kernel.z * blur);
 
 	float2 	o  [12];
 		o[0]	= float2(-0.326212f , -0.405810f)*scale;
@@ -55,8 +55,8 @@ float3	dof(float2 center)
 		o[10] 	= float2(-0.321940f , -0.932615f)*scale;
 		o[11] 	= float2(-0.791559f , -0.597710f)*scale;
 
-	float3	sum 	= s_image.Sample( smp_nofilter, center);
-	float 	contrib	= 1.h;
+	float3	sum 	= s_image.Sample( smp_nofilter, center).xyz;
+	float 	contrib	= 1.f;
 
    	[unroll] for (int i=0; i<12; i++)
 	{
@@ -69,7 +69,7 @@ float3	dof(float2 center)
 #endif
 		[flatten] if (tap_depth <= EPSDEPTH)	tap_depth = dof_params.w;
 		float 	tap_contrib	= DOFFactor(tap_depth);
-		sum 		+= tap_color	* tap_contrib;
+		sum 		+= tap_color.xyz	* tap_contrib;
 		contrib		+= tap_contrib;
 	}
 

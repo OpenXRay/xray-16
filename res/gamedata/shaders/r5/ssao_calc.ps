@@ -25,10 +25,10 @@ float4 main ( _input I
 #endif
 ) : SV_Target0
 {
-	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
-	gbuffer_data gbd1 = gbuffer_load_data( GLD_P(I.tc0.xy - 0.5f * pos_decompression_params2.zw, I.pos2d * 2, ISAMPLE) );
-	gbuffer_data gbd2 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(+pos_decompression_params2.z, -pos_decompression_params2.w), I.pos2d * 2, ISAMPLE) );
-	gbuffer_data gbd3 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(-pos_decompression_params2.z, +pos_decompression_params2.w), I.pos2d * 2, ISAMPLE) );
+	gbuffer_data gbd0 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * pos_decompression_params2.zw, I.pos2d.xy * 2, ISAMPLE) );
+	gbuffer_data gbd1 = gbuffer_load_data( GLD_P(I.tc0.xy - 0.5f * pos_decompression_params2.zw, I.pos2d.xy * 2, ISAMPLE) );
+	gbuffer_data gbd2 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(+pos_decompression_params2.z, -pos_decompression_params2.w), I.pos2d.xy * 2, ISAMPLE) );
+	gbuffer_data gbd3 = gbuffer_load_data( GLD_P(I.tc0.xy + 0.5f * float2(-pos_decompression_params2.z, +pos_decompression_params2.w), I.pos2d.xy * 2, ISAMPLE) );
 
 	gbuffer_data gbd = gbd0;
 	if (gbd1.P.z < gbd.P.z) gbd = gbd1;	
@@ -39,7 +39,7 @@ float4 main ( _input I
 	float4	N = float4( gbd0.N, gbd0.hemi );
 
 #ifndef USE_HBAO
-	float occ = calc_ssao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE) );
+	float occ = calc_ssao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d.xy, ISAMPLE) );
 #else
 	float occ = 1.0f;
 #endif

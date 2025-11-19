@@ -66,7 +66,7 @@ float4 main( vf I ) : SV_Target
 
 #ifdef	NEED_SOFT_WATER
 
-	float	alpha	= 0.75h+0.25h*power;
+	float	alpha	= 0.75f+0.25f*power;
 
 #ifdef	USE_SOFT_WATER
 	float2 PosTc = I.tctexgen.xy/I.tctexgen.z;
@@ -78,9 +78,9 @@ float4 main( vf I ) : SV_Target
 	float4 _P = 	float4( gbd.P, gbd.mtl );
 	float waterDepth = _P.z-I.tctexgen.z;
 
-	float  fog_exp_intens = -4.0h;
+	float  fog_exp_intens = -4.0f;
 	float fog	= 1-exp(fog_exp_intens*waterDepth);
-	float3 Fc  	= float3( 0.1h, 0.1h, 0.1h) * water_intensity.r;
+	float3 Fc  	= float3( 0.1f, 0.1f, 0.1f) * water_intensity.r;
 	final 		= lerp (Fc, final, alpha);
 
 	alpha 		= min(alpha, saturate(waterDepth));

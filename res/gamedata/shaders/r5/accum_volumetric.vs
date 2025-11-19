@@ -28,7 +28,7 @@ v2p main ( float3 P : POSITION )
 	o.lightToPos = vPos.xyz - Ldynamic_pos.xyz;
 	o.vPos = vPos.xyz;
 
-	o.fDensity = 1.0h/40.0h;
+	o.fDensity = 1.0f/40.0f;
 
 	for (int i=0; i<3; ++i)
 	{

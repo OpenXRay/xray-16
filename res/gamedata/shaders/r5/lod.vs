@@ -21,7 +21,7 @@ struct vf
 	float4 	hpos: SV_Position;
 };
 
-#define L_SCALE (2.0h*1.55h)
+#define L_SCALE (2.0f*1.55f)
 vf 	main	( vv I )
 {
 	vf 		o;

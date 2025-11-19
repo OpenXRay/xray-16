@@ -5,7 +5,7 @@ uniform float4	MiddleGray;
 float sample( float2 tc )
 {
 	float4	data = s_image.Sample( smp_rtlinear, tc );
-	return 	dot( data, 1.h/4.h );
+	return 	dot( data, 1.f/4.f );
 }
 
 float4 main ( p_filter I ) : SV_Target
@@ -32,11 +32,11 @@ float4 main ( p_filter I ) : SV_Target
 		accum3.w =	sample(I.Tex7.wz);
 
 	float4	final;
-		final.x	= dot(accum0,1/4.h);
-		final.y	= dot(accum1,1/4.h);
-		final.z	= dot(accum2,1/4.h);
-		final.w	= dot(accum3,1/4.h);
-	float 	result	= dot(final, 1/4.h);
+		final.x	= dot(accum0,1/4.f);
+		final.y	= dot(accum1,1/4.f);
+		final.z	= dot(accum2,1/4.f);
+		final.w	= dot(accum3,1/4.f);
+	float 	result	= dot(final, 1/4.f);
 
 	float	scale 		= MiddleGray.x / (result*MiddleGray.y + MiddleGray.z);
 	float  	scale_prev	= s_tonemap.Sample( smp_nofilter, I.Tex0.xy ).x;

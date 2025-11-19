@@ -1,7 +1,5 @@
 #include "common_iostructs.h"
 
-float4		screen_res;
-
 v2p_filter main ( v_filter I )
 {
 	v2p_filter O;

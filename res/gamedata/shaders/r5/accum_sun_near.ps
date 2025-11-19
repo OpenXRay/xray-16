@@ -45,7 +45,7 @@ float4 main ( v2p_volume I ) : SV_Target
 #endif
 {
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos.xy, ISAMPLE) );
 
 #ifdef	GBUFFER_OPTIMIZATION
 	gbd.P += gbd.N*0.015f;
@@ -58,7 +58,7 @@ float4 main ( v2p_volume I ) : SV_Target
 # ifndef USE_R2_STATIC_SUN
 			m 	= _P.w;
 # endif
-	float4	light	= plight_infinity ( m, _P, _N, Ldynamic_dir );
+	float4	light	= plight_infinity ( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
 
   	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.f);
 	float4 	PS	= mul( m_shadow, P4 );
@@ -77,6 +77,6 @@ float4 main ( v2p_volume I ) : SV_Target
 #endif
 	#endif
 
-	return 		blend( Ldynamic_color * light * s , I.tc );
+	return 		blend( Ldynamic_color * light * s , I.tc.xy );
 }
 #endif

@@ -32,7 +32,7 @@ f_deffer 	main	( p_bumped I )
 #endif
 #ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
 	float alpha = (S.base.w-def_aref*0.5f)/(1-def_aref*0.5f);
-	uint mask = alpha_to_coverage ( alpha, pos2d );
+	uint mask = alpha_to_coverage ( alpha, pos2d.xy );
 #endif
 
 #else

@@ -95,7 +95,7 @@ float ssao_noise_tile_factor;
 float ssao_kernel_size;
 
 Texture2D	jitter0;
-sampler		smp_jitter;
+SamplerState smp_jitter;
 Texture2D	jitterMipped;
 
 
@@ -124,16 +124,16 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 #endif
 
 	float point_depth = P.z;
-	if (point_depth<0.01) point_depth = 100000.0h;
-	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h)*ssao_kernel_size/max(point_depth,1.3);
+	if (point_depth<0.01) point_depth = 100000.0f;
+	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f)*ssao_kernel_size/max(point_depth,1.3);
 
-	float 	occ	= 0.0h;	
-	float num_dir	= 0.0h;
+	float 	occ	= 0.0f;	
+	float num_dir	= 0.0f;
 
 	float3 tc1	= mul( m_v2w, float4(P,1) );
 	tc1 *= ssao_noise_tile_factor;
 	tc1.xz += tc1.y;
-	float2	SmallTap = jitter0.Sample( smp_jitter, tc1.xz );
+	float2	SmallTap = jitter0.Sample( smp_jitter, tc1.xz ).xy;
 
 [unroll] for (int rad=0; rad < RINGS; rad++)
 {
@@ -152,13 +152,13 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 #ifndef SSAO_OPT_DATA
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d, iSample );
+		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d.xy, iSample );
 #else
 		gbuffer_data gbd = gbuffer_load_data( tap, iSample );
 #endif
 #else
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d );
+		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d.xy );
 #else
 		gbuffer_data gbd = gbuffer_load_data( tap );
 #endif

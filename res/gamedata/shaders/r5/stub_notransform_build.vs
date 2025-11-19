@@ -1,7 +1,5 @@
 #include "common_iostructs.h"
 
-float4		screen_res;
-
 v2p_build main ( v_build I )
 {
 	v2p_build O;

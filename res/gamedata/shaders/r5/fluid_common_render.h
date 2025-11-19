@@ -156,8 +156,8 @@ float4 Raycast( PS_INPUT_RAYCAST input )
     float rayLength = rayData.w;
 
     float fSamples = ( rayLength / gridScaleFactor * maxGridDim ) * 2.0;
-    int nSamples = floor(fSamples);
-    float3 stepVec = normalize( (rayOrigin - eyeOnGrid) * gridDim ) * recGridDim * 0.5;
+    int nSamples = int(floor(fSamples));
+    float3 stepVec = normalize( (rayOrigin - eyeOnGrid.xyz) * gridDim.xyz ) * recGridDim.xyz * 0.5;
    
     float3 O = rayOrigin + stepVec*Offset;
     
@@ -166,7 +166,8 @@ float4 Raycast( PS_INPUT_RAYCAST input )
     stepVec = -stepVec;
 #endif
 
-    for( int i=0; i<nSamples ; i++ )
+    int i;
+    for( i=0; i<nSamples ; i++ )
     {
         DoSample(1, O, color);
         O += stepVec;

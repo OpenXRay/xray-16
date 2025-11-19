@@ -65,13 +65,13 @@ float3 fetch_eye_pos(float2 uv)
 #ifndef SSAO_OPT_DATA
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d, iSample );
+		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d.xy, iSample );
 #else
 		gbuffer_data gbd = gbuffer_load_data( tap, iSample );
 #endif
 #else
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d );
+		gbuffer_data gbd = gbuffer_load_data_offset( tc, tap, pos2d.xy );
 #else
 		gbuffer_data gbd = gbuffer_load_data( tap );
 #endif

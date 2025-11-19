@@ -50,7 +50,7 @@ float4 main( v2p I ) : SV_Target
 	faded	= faded*POWER - .5*POWER + 0.5        ;
 
 #ifdef	NEED_SOFT_WATER
-	return  float4( faded, 0.0h, alpha );
+	return  float4( faded, 0.0f, alpha );
 #else
 	return  float4( faded, .08h, alpha );
 #endif

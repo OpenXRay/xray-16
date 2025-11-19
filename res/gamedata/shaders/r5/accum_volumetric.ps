@@ -27,12 +27,12 @@ float4 main ( v2p I, uint iSample : SV_SAMPLEINDEX ) : SV_Target
 {
 	float4	P4	= float4(I.vPos, 1);
         float4	PS	= mul( m_shadow, P4);
-        float	s	= 1.h;
+        float	s	= 1.f;
         #ifdef	USE_SHADOW
                   	s	= shadow(PS);
         #endif
 
-        float4	lightmap = 1.h;
+        float4	lightmap = 1.f;
         #ifdef	USE_LMAP
                 #ifdef	USE_LMAPXFORM
 					PS.x	= dot( P4, m_lmap[0]);
