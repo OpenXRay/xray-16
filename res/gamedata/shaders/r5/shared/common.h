@@ -16,12 +16,12 @@ cbuffer	dynamic_transforms : register(b0)
 	float4		L_material;	// 0,0,0,mid
 	float4          hemi_cube_pos_faces;
 	float4          hemi_cube_neg_faces;
-	float4 		dt_params;	//	Detail params
 };
 
 cbuffer	shader_params : register(b1)
 {
 	float	m_AlphaRef;
+	float4 		dt_params;	//	Detail params (moved from dynamic_transforms - material frequency)
 };
 
 cbuffer	static_globals : register(b2)

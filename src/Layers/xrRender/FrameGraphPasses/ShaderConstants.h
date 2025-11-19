@@ -51,7 +51,15 @@ struct alignas(16) DynamicTransforms {
     Fvector4 L_material;       // 160-176: Material params (0,0,0,mid)
     Fvector4 hemi_cube_pos_faces;  // 176-192: Hemisphere cube pos faces
     Fvector4 hemi_cube_neg_faces;  // 192-208: Hemisphere cube neg faces
-    Fvector4 dt_params;        // 208-224: Detail texture params
+    // dt_params MOVED to ShaderParams (b1) - it's material-frequency, not instance-frequency
+};
+
+// Shader Params (Material-frequency constants, register b1)
+// UPDATED PER-MATERIAL! Contains alpha ref and detail texture params.
+struct alignas(16) ShaderParams {
+    float m_AlphaRef;          // 0-4:    Alpha reference value for alpha testing
+    float padding[3];          // 4-16:   Padding to align dt_params
+    Fvector4 dt_params;        // 16-32:  Detail texture params (xy=scale, w=1/range)
 };
 
 // Slot 2: Static Globals (368 bytes minimum, often 512 bytes allocated)
@@ -217,7 +225,7 @@ static class cl_pos_decompress_params2 : public R_constant_setup
     cb.padding3 = 0.0f;
 }
 
-inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity, float dtParamScale = 1.f) {
+inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {
     Fmatrix wv, wvp;
     wv.mul_43(Device.mView, m_W);           // WV = View * World
     wvp.mul(Device.mProject, wv);        // WVP = Projection *
@@ -251,8 +259,7 @@ inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
 
-    cb.dt_params.set(dtParamScale, dtParamScale, dtParamScale,
-                     1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
+    // dt_params moved to ShaderParams (b1) - material-frequency, not instance-frequency
 }
 
 } // namespace xray::render::passes

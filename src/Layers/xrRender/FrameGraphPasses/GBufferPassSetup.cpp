@@ -321,8 +321,8 @@ void renderGBufferGeometry(
             //  MATERIAL-FREQUENCY CONSTANTS (once per material)
             // ─────────────────────────────────────────────────
 
-            // Set material-specific detail scale
-            // dt_params.xy = detail_scale, dt_params.w = 1.0 / dtex_range
+            // Set material-specific detail scale (now in shader_params b1, not dynamic_transforms b0)
+            // dt_params.xyz = detail_scale, dt_params.w = 1.0 / dtex_range
             Fvector4 dt_params(
                 matPSO->detail_scale,
                 matPSO->detail_scale,
@@ -349,7 +349,7 @@ void renderGBufferGeometry(
             if (isSkeleton) {
                 // Update global dynamic_transforms CB with skeleton's world matrix
                 DynamicTransforms dynamicCB = {};
-                FillDynamicTransforms(dynamicCB, batch.worldMatrix, 1.0f);
+                FillDynamicTransforms(dynamicCB, batch.worldMatrix);
                 for (const auto& cbInfo : matPSO->constantBuffers) {
                     if (cbInfo.name == "dynamic_transforms") {
                         u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
