@@ -75,7 +75,7 @@ float3   p_hemi( float2 tc )
 {
 //	float3	t_lmh = tex2D (s_hemi, tc);
 //	float3	t_lmh = s_hemi.Sample( smp_rtlinear, tc);
-//	return	dot(t_lmh,1.h/4.h);
+//	return	dot(t_lmh,1.f/4.f);
 	float4	t_lmh = s_hemi.Sample( smp_rtlinear, tc);
 	return	t_lmh.a;
 }

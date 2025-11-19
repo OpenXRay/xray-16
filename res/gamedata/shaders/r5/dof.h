@@ -31,9 +31,9 @@ float DOFFactor( float depth)
 }
 
 
-//#define MAXCOF		5.h
-#define MAXCOF		7.h
-#define EPSDEPTH	0.0001h
+//#define MAXCOF		5.f
+#define MAXCOF		7.f
+#define EPSDEPTH	0.0001f
 float3	dof(float2 center)
 {
 	// Scale tap offsets based on render target size
@@ -48,9 +48,9 @@ float3	dof(float2 center)
 
 	//float blur = 1;
 	//	const amount of blur: define controlled
-	//float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * MAXCOF * blur;
+	//float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * MAXCOF * blur;
 	//	const amount of blur: engine controlled
-	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * (dof_kernel.z * blur);
+	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * (dof_kernel.z * blur);
 	//	amount of blur varies according to resolution
 	//	but kernel size in pixels is fixed.
 	//	float2 	scale 	= dof_kernel.xy * blur;
@@ -72,8 +72,8 @@ float3	dof(float2 center)
 
 	// sample
 //	float3	sum 	= tex2D(s_image,center);
-	float3	sum 	= s_image.Sample( smp_nofilter, center);
-	float 	contrib	= 1.h;
+	float3	sum 	= s_image.Sample( smp_nofilter, center).xyz;
+	float 	contrib	= 1.f;
 
    	[unroll] for (int i=0; i<12; i++)
 	{
@@ -90,7 +90,7 @@ float3	dof(float2 center)
 #endif
 		[flatten] if (tap_depth <= EPSDEPTH)	tap_depth = dof_params.w;
 		float 	tap_contrib	= DOFFactor(tap_depth);
-		sum 		+= tap_color	* tap_contrib;
+		sum 		+= tap_color.xyz	* tap_contrib;
 		contrib		+= tap_contrib;
 	}
 
@@ -115,9 +115,9 @@ float3	dof(float2 center)
 
 	//float blur = 1;
 	//	const amount of blur: define controlled
-	//float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * MAXCOF * blur;
+	//float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * MAXCOF * blur;
 	//	const amount of blur: engine controlled
-	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * (dof_kernel.z * blur);
+	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * (dof_kernel.z * blur);
 	//	amount of blur varies according to resolution
 	//	but kernel size in pixels is fixed.
 	//	float2 	scale 	= dof_kernel.xy * blur;
@@ -139,7 +139,7 @@ float3	dof(float2 center)
 
 	// sample 
 	float3	sum 	= tex2D(s_image,center);
-	float 	contrib	= 1.h;
+	float 	contrib	= 1.f;
 	for (int i=0; i<12; i++)
 	{
 		float2 	tap 		= center + o[i];
@@ -147,7 +147,7 @@ float3	dof(float2 center)
 		float 	tap_depth 	= tex2D	(s_position,tap).z;
 //		if (tap_depth <= EPSDEPTH)	tap_depth = dof_params.w;
 		if (tap_depth <= EPSDEPTH)	tap_depth = (dof_params.z-dof_params.y)*0.3;
-//		float 	tap_contrib	= 1.h;	//(tap_depth>depth)?1.h:0.h;
+//		float 	tap_contrib	= 1.f;	//(tap_depth>depth)?1.f:0.f;
 		float 	tap_contrib	= 1-saturate(abs(tap_depth-depth)/dist_to_focus);
 			sum 		+= tap_color	* tap_contrib;
 			contrib		+= tap_contrib;
@@ -157,15 +157,15 @@ float3	dof(float2 center)
 */
 
 /*
-#define NEAR 		0.2h
-//#define MINDIST 	0.4h
-#define MINDIST 	1.4h
-//#define MAXDIST 	100.h
-//#define MAXDIST 	300.h
-#define MAXDIST 	2.0h
-#define MAXCOF		5.h
-#define MAXCOF_NEAR	100.h
-#define EPSDEPTH	0.0001h
+#define NEAR 		0.2f
+//#define MINDIST 	0.4f
+#define MINDIST 	1.4f
+//#define MAXDIST 	100.f
+//#define MAXDIST 	300.f
+#define MAXDIST 	2.0f
+#define MAXCOF		5.f
+#define MAXCOF_NEAR	100.f
+#define EPSDEPTH	0.0001f
 float3	dof(float2 center)
 {
 	// Scale tap offsets based on render target size
@@ -177,7 +177,7 @@ float3	dof(float2 center)
 	//float 	blur 		= (blur_near+blur_far);	
 
 	//float blur = 1;
-	float2 	scale 	= float2	(.5f / 1024.h, .5f / 768.h) * MAXCOF * blur;
+	float2 	scale 	= float2	(.5f / 1024.f, .5f / 768.f) * MAXCOF * blur;
 
 	// poisson
 	float2 	o  [12];
@@ -196,13 +196,13 @@ float3	dof(float2 center)
 
 	// sample 
 	float3	sum 	= tex2D(s_image,center);
-	float 	contrib	= 1.h;
+	float 	contrib	= 1.f;
 	for (int i=0; i<12; i++)
 	{
 		float2 	tap 		= center + o[i];
 		float4	tap_color	= tex2D	(s_image,tap);
 		float 	tap_depth 	= tex2D	(s_position,tap).z;
-		float 	tap_contrib	= 1.h;	//(tap_depth>depth)?1.h:0.h;
+		float 	tap_contrib	= 1.f;	//(tap_depth>depth)?1.f:0.f;
 			sum 		+= tap_color	* tap_contrib;
 			contrib		+= tap_contrib;
 	}

@@ -35,7 +35,7 @@ f_deffer 	main	( p_flat I )
 #endif	//	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1_ATOC) )
 #ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
 	float alpha = (D.w-def_aref*0.5f)/(1-def_aref*0.5f);
-	uint mask = alpha_to_coverage ( alpha, pos2d );
+	uint mask = alpha_to_coverage ( alpha, pos2d.xy );
 #endif	//	MSAA_ALPHATEST_DX10_1_ATOC
 
 #else
@@ -73,7 +73,7 @@ f_deffer 	main	( p_flat I )
 #ifdef USE_LM_HEMI
 //	float4	lm 	= tex2D			(s_hemi, I.lmh);
 	float4	lm 	= s_hemi.Sample( smp_rtlinear, I.lmh);
-//	float 	h  	= dot			(lm.rgb,1.h/3.h);
+//	float 	h  	= dot			(lm.rgb,1.f/3.f);
 	float 	h  	= get_hemi(lm);
 # ifdef USE_R2_STATIC_SUN
 //		 	ms 	= lm.w			;
@@ -91,12 +91,12 @@ f_deffer 	main	( p_flat I )
 #if !( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1) )
   O				= pack_gbuffer(
   								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.h	, 	ms			),
+								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f	, 	ms			),
 								float4	(D.rgb,											def_gloss	) );
 #else
   O				= pack_gbuffer(
   								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.h	, 	ms			),
+								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f	, 	ms			),
 								float4	(D.rgb,											def_gloss	),
 								mask );
 #endif

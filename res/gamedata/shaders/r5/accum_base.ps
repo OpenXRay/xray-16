@@ -32,7 +32,7 @@ float4 main( p_volume I ) : SV_Target
 
 	float2	tcProj			= I.tc.xy / I.tc.w;
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tcProj, pos2d.xy, ISAMPLE) );
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
@@ -48,12 +48,12 @@ float4 main( p_volume I ) : SV_Target
 # endif
         // ----- light-model
       	float        		rsqr;
-        float4        		light   = plight_local( m, _P, _N, Ldynamic_pos, Ldynamic_pos.w, rsqr );
+        float4        		light   = plight_local( m, _P.xyz, _N.xyz, Ldynamic_pos.xyz, Ldynamic_pos.w, rsqr );
 
         // ----- shadow
 		float4          		P4      = float4( _P.x, _P.y, _P.z, 1);
         float4         		PS      = mul( m_shadow, P4 );
-        float         		s		= 1.h;
+        float         		s		= 1.f;
         #ifdef  USE_SHADOW
                 #ifdef         USE_SJITTER
 							s		= shadowtest( PS, I.tcJ );
@@ -63,7 +63,7 @@ float4 main( p_volume I ) : SV_Target
         #endif
 
         // ----- lightmap
-        float4         lightmap= 1.h;
+        float4         lightmap= 1.f;
         #ifdef        USE_LMAP
                 #ifdef         USE_LMAPXFORM
 							PS.x	= dot( P4, m_lmap[0] );

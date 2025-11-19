@@ -78,14 +78,14 @@ _out main ( _input I )
 _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 #endif
 {
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc0, I.pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc0.xy, I.pos2d.xy, ISAMPLE) );
 	
 	// Sample the buffers:
 	float4	P = float4( gbd.P, gbd.mtl );	// position.(mtl or sun)
 	float4	N = float4( gbd.N, gbd.hemi );		// normal.hemi
 	float4	D = float4( gbd.C, gbd.gloss );		// rgb.gloss
 #ifndef USE_MSAA
-	float4	L = s_accumulator.Sample( smp_nofilter, I.tc0);	// diffuse.specular
+	float4	L = s_accumulator.Sample( smp_nofilter, I.tc0.xy);	// diffuse.specular
 #else
 #	ifdef GBUFFER_OPTIMIZATION
 	float4	L = s_accumulator.Load( int3( I.pos2d.xy, 0 ), ISAMPLE);	// diffuse.specular
@@ -96,8 +96,8 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 
 #ifdef USE_SUPER_SPECULAR
 	{
-		float ds = dot( D.rgb, 1.h/3.h );
-		D.w = max( D.w, ds*ds/8.h );
+		float ds = dot( D.rgb, 1.f/3.f );
+		D.w = max( D.w, ds*ds/8.f );
 	}
 #endif
 
@@ -126,7 +126,7 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 
 #ifdef USE_MSAA
 #	ifdef GBUFFER_OPTIMIZATION
-	int2	texCoord = I.pos2d;
+	int2	texCoord = I.pos2d.xy;
 #	else
 	int2	texCoord = int2( I.tc0 * pos_decompression_params2.xy );
 #	endif
@@ -144,27 +144,27 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
 #if SSAO_QUALITY > 3
     float occ = s_occ.Sample( smp_nofilter, I.tc0);	
 #else // SSAO_QUALITY > 3
-	float occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	float occ = calc_hdao( CS_P(P.xyz, N.xyz, I.tc0.xy, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif // SSAO_QUALITY > 3
 #else // SM_5
 #if SSAO_QUALITY > 3
-	float occ = calc_new_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	float occ = calc_new_hdao( CS_P(P.xyz, N.xyz, I.tc0.xy, I.tcJ, I.pos2d.xy, ISAMPLE ) );
 #else // SSAO_QUALITY > 3
-	float occ = calc_hdao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	float occ = calc_hdao( CS_P(P.xyz, N.xyz, I.tc0.xy, I.tcJ, I.pos2d, ISAMPLE ) );
 #endif // SSAO_QUALITY > 3
 #endif // SM_5
 #else // USE_HDAO
 #ifdef USE_HBAO
-	float occ = calc_hbao( P.z, N, I.tc0, I.pos2d );
+	float occ = calc_hbao( P.z, N, I.tc0, I.pos2d.xy );
 #else // USE_HBAO
-	float occ = calc_ssao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d, ISAMPLE ) );
+	float occ = calc_ssao( CS_P(P, N, I.tc0, I.tcJ, I.pos2d.xy, ISAMPLE ) );
 #endif
 #endif // USE_HDAO
 	
 	hmodel	(hdiffuse, hspecular, mtl, N.w, D.w, P.xyz, N.xyz);
 //      hmodel		(hdiffuse, hspecular, mtl, 1, D.w, P.xyz, N.xyz);
 //	hdiffuse*=hdiffuse;			//. high contrast hemi
-//	hdiffuse*=(D.rgb*0.8 + 0.2h);	// rise texture contrast for diffuse lighting
+//	hdiffuse*=(D.rgb*0.8 + 0.2f);	// rise texture contrast for diffuse lighting
 //	hdiffuse = 0.8;
 //	hdiffuse *= (occ*(D.rgb + .1h));
 	hdiffuse *= occ;
@@ -179,7 +179,7 @@ _out main ( _input I, uint iSample : SV_SAMPLEINDEX )
                       spec      = (C.rgb*.5h + .5h)*C.w + hspecular        ;
 #endif
 //		float3       color     = C.rgb + D.rgb*spec     ;
-//		float3       color     = C.rgb + (D.rgb*spec+spec)/0.5h;
+//		float3       color     = C.rgb + (D.rgb*spec+spec)/0.5f;
 		float3       color     = C.rgb + spec     ;
 //		float3       color     = C.rgb + D.rgb*spec+hspecular+hspecular     ;	//	More realistic and contrast specular - Ugrumiy edition
 

@@ -15,7 +15,7 @@ float4 main( v2p I ) : SV_Target
 	float4	t_base 	= s_base.Sample( smp_base, I.tc0 );
 
 	float3	light	= I.c0;
-	float3	final 	= light*t_base*2;
+	float3	final 	= light*t_base.rgb*2;
 
 	// out
 	return  float4	(final.r,final.g,final.b,t_base.a);

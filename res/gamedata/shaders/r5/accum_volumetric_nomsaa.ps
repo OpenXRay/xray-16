@@ -1,2 +1,6 @@
+// Ensure MSAA_OPTIMIZATION is undefined (define it first to avoid Slang warning)
+#ifndef MSAA_OPTIMIZATION
+#define MSAA_OPTIMIZATION 0
+#endif
 #undef MSAA_OPTIMIZATION
 #include "accum_volumetric.ps"

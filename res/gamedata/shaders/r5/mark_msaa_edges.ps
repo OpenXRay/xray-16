@@ -9,7 +9,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4 col: COLOR )
 #if MSAA_SAMPLES
 
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbd0 = gbuffer_load_data( tc, pos2d, 0 );
+	gbuffer_data gbd0 = gbuffer_load_data( tc, pos2d.xy, 0 );
 #else
 	gbuffer_data gbd0 = gbuffer_load_data( tc, 0 );
 #endif
@@ -22,7 +22,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4 col: COLOR )
 	[unroll] for( int i = 1; i < MSAA_SAMPLES; i++ )
 	{
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd = gbuffer_load_data( tc, pos2d, i );
+		gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, i );
 #else
 		gbuffer_data gbd = gbuffer_load_data( tc, i );
 #endif

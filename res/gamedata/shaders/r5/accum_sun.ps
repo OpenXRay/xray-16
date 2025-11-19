@@ -28,7 +28,7 @@ float4 	main	( p_aa_AA_sun I ) : SV_Target
 #endif
 #endif
 {
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc, pos2d.xy, ISAMPLE) );
 
 //  float4 _P		= tex2D 	(s_position, 	I.tc); 
 //  float4  _N		= tex2D 	(s_normal,   	I.tc); 
@@ -40,7 +40,7 @@ float4 	main	( p_aa_AA_sun I ) : SV_Target
 # ifndef USE_R2_STATIC_SUN
 			m 	= _P.w		;
 # endif
-	float4	light	= plight_infinity( m, _P, _N, Ldynamic_dir );
+	float4	light	= plight_infinity( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
 
 	// ----- shadow
 	float4 	s_sum;
@@ -52,8 +52,8 @@ float4 	main	( p_aa_AA_sun I ) : SV_Target
 		s_sum.y = s_smap.Sample( smp_nofilter, I.RT).y;
 		s_sum.z	= s_smap.Sample( smp_nofilter, I.LB).z;
 		s_sum.w = s_smap.Sample( smp_nofilter, I.RB).w;
-//	float 	s 	= dot	( s_sum, 1.h/4.h);
-	float 	s 	= ((s_sum.x+s_sum.y)+(s_sum.z+s_sum.w))*(1.h/4.h);
+//	float 	s 	= dot	( s_sum, 1.f/4.f);
+	float 	s 	= ((s_sum.x+s_sum.y)+(s_sum.z+s_sum.w))*(1.f/4.f);
 
 	return 		Ldynamic_color * light * s;
 }

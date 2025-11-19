@@ -18,12 +18,12 @@ float4 main( p_fluidsim input ) : SV_Target
     float4 velocity;
     float3 obstV = float3(0,0,0);
     float3 vMask = float3(1,1,1);
-    float3 vLeft = GetObstVelocity(LEFTCELL);
-    float3 vRight = GetObstVelocity(RIGHTCELL);
-    float3 vBottom = GetObstVelocity(BOTTOMCELL);
-    float3 vTop = GetObstVelocity(TOPCELL);
-    float3 vDown = GetObstVelocity(DOWNCELL);
-    float3 vUp = GetObstVelocity(UPCELL);
+    float3 vLeft = GetObstVelocity(LEFTCELL).xyz;
+    float3 vRight = GetObstVelocity(RIGHTCELL).xyz;
+    float3 vBottom = GetObstVelocity(BOTTOMCELL).xyz;
+    float3 vTop = GetObstVelocity(TOPCELL).xyz;
+    float3 vDown = GetObstVelocity(DOWNCELL).xyz;
+    float3 vUp = GetObstVelocity(UPCELL).xyz;
     float3 v;
 
     if( IsBoundaryCell(LEFTCELL) )  { pL = pCenter; obstV.x = vLeft.x; vMask.x = 0; }

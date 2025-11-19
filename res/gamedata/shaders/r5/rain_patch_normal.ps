@@ -70,9 +70,9 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 {
 #ifdef GBUFFER_OPTIMIZATION
 #ifdef MSAA_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, iSample );
 #else
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, ISAMPLE );
 #endif
 #else
 #ifdef MSAA_OPTIMIZATION
@@ -90,7 +90,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 	float4 PS = mul( m_shadow,  _P );
 
 	float3 WorldP	= mul( m_sunmask, _P );
-	float3 WorldN	= mul( m_sunmask, _N.xyz );
+	float3 WorldN	= mul( m_sunmask, float4(_N.xyz, 0) );
 
 	// Read rain projection with some jetter. Also adding pixel normal 
 	// factor to jitter to make rain strips more realistic.
@@ -148,7 +148,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 	water += waterFallZ.zxy*(abs(fIsZ)*ApplyNormalCoeff);
 
 	//	Translate NM to view space
-	water.xyz = mul( m_V, water.xyz );
+	water.xyz = mul( m_V, float4(water.xyz, 0) );
 	
 	//return float4(water.xyz,1); // holger
 

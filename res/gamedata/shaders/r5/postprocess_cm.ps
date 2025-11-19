@@ -29,23 +29,23 @@ float4 main( p_postpr I ) : SV_Target
 	float3	t_1 	= s_base1.Sample( smp_rtlinear, I.Tex1).rgb;	
 	float3 	image_o	= (t_0+t_1)*.5;					// add_d2
 
-	float	grad_i 	= dot		(image_o,(0.3333h).xxx);
+	float	grad_i 	= dot		(image_o,(0.3333f).xxx);
 
-	float3 	image0 	= s_grad0.Sample( smp_rtlinear, float2(grad_i,0.5));
-	float3 	image1 	= s_grad1.Sample( smp_rtlinear, float2(grad_i,0.5));
+	float3 	image0 	= s_grad0.Sample( smp_rtlinear, float2(grad_i,0.5)).xyz;
+	float3 	image1 	= s_grad1.Sample( smp_rtlinear, float2(grad_i,0.5)).xyz;
 	float3	image	= lerp		(image0, image1, c_colormap.y);
 			image	= lerp		(image_o, image, c_colormap.x);
 
-	float	gray 	= dot		(image,I.Gray);			// dp3
+	float	gray 	= dot		(image,I.Gray.xyz);			// dp3
 			image 	= lerp 		(gray,image,I.Gray.w);		// mul/mad
 
-//	float4	t_noise	= tex2D		(s_noise,I.tc2);	
-	float4	t_noise	= s_noise.Sample( smp_linear, I.Tex2);	
-	float3 	noised 	= image*t_noise*2;                     		// mul_2x
+//	float4	t_noise	= tex2D		(s_noise,I.tc2);
+	float4	t_noise	= s_noise.Sample( smp_linear, I.Tex2);
+	float3 	noised 	= image*t_noise.xyz*2;                     		// mul_2x
 			image	= lerp( noised, image, I.Color.w); 	// lrp ?
-			image	= (image * I.Color + c_brightness)*2;		// mad
+			image	= (image * I.Color.xyz + c_brightness.xyz)*2;		// mad
 //		image	= (image + c_brightness) * I.Color;		// mad ?
 
 	// out
-	return  float4( image, 1.0h);					// +mov
+	return  float4( image, 1.0f);					// +mov
 }

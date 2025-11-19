@@ -60,7 +60,7 @@ float4 main( v2p I ) : SV_Target
         // out
 	//	Igor: need for alpha water
 #ifdef	NEED_SOFT_WATER
-	return  float4( faded, 0.0h, alpha );
+	return  float4( faded, 0.0f, alpha );
 #else	//	NEED_SOFT_WATER
 	return  float4( faded, .08h, alpha );
 #endif	//	NEED_SOFT_WATER

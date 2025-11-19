@@ -51,7 +51,7 @@ float4 main ( v2p_volume I ) : SV_Target
 	//float4 	_P	= tex2D( s_position, tc );
 	//float4	_N	= tex2D( s_normal, tc );
 
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(I.tc.xy/I.tc.w, I.hpos.xy, ISAMPLE) );
 
 #ifdef	GBUFFER_OPTIMIZATION
 	//	Emulate virtual offset
@@ -66,7 +66,7 @@ float4 main ( v2p_volume I ) : SV_Target
 # ifndef USE_R2_STATIC_SUN
 			m 	= _P.w;
 # endif
-	float4	light	= plight_infinity ( m, _P, _N, Ldynamic_dir );
+	float4	light	= plight_infinity ( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
 
 	// ----- shadow
   	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.f);
@@ -98,6 +98,6 @@ float4 main ( v2p_volume I ) : SV_Target
 	s += ((1-s)*(1-fac_x*fac_y));
 	//\ Far edge fading code
 
-	return 		blend( Ldynamic_color * light * s/*float4( 1.f, 0.2f, 0.2f, 1.f)*/, I.tc );
+	return 		blend( Ldynamic_color * light * s/*float4( 1.f, 0.2f, 0.2f, 1.f)*/, I.tc.xy );
 }
 #endif

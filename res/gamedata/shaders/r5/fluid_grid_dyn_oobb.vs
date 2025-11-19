@@ -29,7 +29,7 @@ v2g_fluidsim_dyn_aabb main( v_fluidsim input)
 
 		output.velocity += AngularVel;
 
-		output.velocity = mul( WorldToLocal, output.velocity );
+		output.velocity = mul( WorldToLocal, float4(output.velocity, 0) );
 	}
 	
 	for (int i=0; i<3; ++i)

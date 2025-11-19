@@ -19,7 +19,7 @@ uniform float2 	m_blur;		// scale_x / 12, scale_y / 12
 
 float3 	mblur	(float2 UV, float3 pos, float3 c_original)	
 {
-	float4 	pos4		= float4	(pos,1.h);
+	float4 	pos4		= float4	(pos,1.f);
 
 	float4 	p_current	= mul	(m_current,	pos4);
 	float4 	p_previous 	= mul	(m_previous,	pos4);
@@ -29,17 +29,17 @@ float3 	mblur	(float2 UV, float3 pos, float3 c_original)
 	// For each sample, sum up each sample's color in "Blurred" and then divide
 	// to average the color after all the samples are added.
 	float3 	blurred 	= 	c_original	;
-        	blurred 	+= 	tex2D(s_image, p_velocity * 1.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 2.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 3.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 4.h  + UV).rgb;
-        	blurred 	+= 	tex2D(s_image, p_velocity * 5.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 6.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 7.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 8.h  + UV).rgb;
-        	blurred 	+= 	tex2D(s_image, p_velocity * 9.h  + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 10.h + UV).rgb;
-		blurred		+= 	tex2D(s_image, p_velocity * 11.h + UV).rgb;
+        	blurred 	+= 	tex2D(s_image, p_velocity * 1.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 2.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 3.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 4.f  + UV).rgb;
+        	blurred 	+= 	tex2D(s_image, p_velocity * 5.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 6.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 7.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 8.f  + UV).rgb;
+        	blurred 	+= 	tex2D(s_image, p_velocity * 9.f  + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 10.f + UV).rgb;
+		blurred		+= 	tex2D(s_image, p_velocity * 11.f + UV).rgb;
 	return 	blurred/MBLUR_SAMPLES;
 }
 */

@@ -15,7 +15,7 @@ struct v2p
 
 
 //	Must be less than view near
-#define	DEPTH_EPSILON	0.1h
+#define	DEPTH_EPSILON	0.1f
 //////////////////////////////////////////////////////////////////////////////////////////
 // Pixel
 float4 main( v2p I ) : SV_Target
@@ -35,10 +35,10 @@ float4 main( v2p I ) : SV_Target
 	float4 _P		= float4( gbd.P, gbd.mtl );
 	float spaceDepth = _P.z-I.tctexgen.z-DEPTH_EPSILON;
 	if (spaceDepth < -2*DEPTH_EPSILON ) spaceDepth = 100000.0f; //  Skybox doesn't draw into position buffer
-	//result.a *= saturate(spaceDepth*0.3h);
-	result.a *= Contrast( saturate(spaceDepth*1.3h), 2);
-	result.rgb *= Contrast( saturate(spaceDepth*1.3h), 2);
-//	result = Contrast( saturate(spaceDepth*1.3h), 2);
+	//result.a *= saturate(spaceDepth*0.3f);
+	result.a *= Contrast( saturate(spaceDepth*1.3f), 2);
+	result.rgb *= Contrast( saturate(spaceDepth*1.3f), 2);
+//	result = Contrast( saturate(spaceDepth*1.3f), 2);
 //	result = saturate (spaceDepth*5.0);
 //	result.rgb = float3(1,0,0);
 //	result.a = 1;

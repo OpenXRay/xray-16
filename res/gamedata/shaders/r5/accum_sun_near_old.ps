@@ -24,9 +24,9 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4	Color	: COLO
 	//float4 _P = tex2D( s_position, tc );
 #ifdef GBUFFER_OPTIMIZATION
 #ifdef MSAA_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, iSample );
 #else
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, ISAMPLE );
 #endif
 #else
 #ifdef MSAA_OPTIMIZATION
@@ -63,9 +63,9 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 
 #ifdef GBUFFER_OPTIMIZATION
 #ifdef MSAA_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, iSample );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, iSample );
 #else
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d, ISAMPLE );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy, ISAMPLE );
 #endif
 #else
 #ifdef MSAA_OPTIMIZATION
@@ -82,7 +82,7 @@ float4 main ( float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 # ifndef USE_R2_STATIC_SUN
 			m 	= _P.w;
 # endif
-	float4	light	= plight_infinity ( m, _P, _N, Ldynamic_dir );
+	float4	light	= plight_infinity ( m, _P.xyz, _N.xyz, Ldynamic_dir.xyz );
 
 	// ----- shadow
   	float4 	P4 	= float4( _P.x, _P.y, _P.z, 1.f);

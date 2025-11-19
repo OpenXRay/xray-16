@@ -14,7 +14,7 @@
 
 
 #ifdef        USE_R2_STATIC_SUN
-#  define xmaterial float(1.0h/4.h)
+#  define xmaterial float(1.0f/4.f)
 #else
 #  define xmaterial float(L_material.w)
 #endif

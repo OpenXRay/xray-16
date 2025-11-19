@@ -17,10 +17,14 @@ struct 	v2p
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifndef USE_MSAA
 Texture2D 			s_distort;
+#ifndef EPSDEPTH
 #define	EPSDEPTH	0.001
+#endif
 #else
 Texture2DMS<float4, MSAA_SAMPLES> s_distort;
+#ifndef EPSDEPTH
 #define	EPSDEPTH	0.001
+#endif
 #endif
 uniform float4 		e_barrier;	// x=norm(.8f), y=depth(.1f), z=clr
 uniform float4 		e_weights;	// x=norm, y=depth, z=clr
@@ -52,7 +56,7 @@ c2_out main( v2p_aa_AA I )
 	int iSample = 0;
 
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, I.HPos, iSample );
+	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, I.HPos.xy, iSample );
 #else
 	gbuffer_data gbd	= gbuffer_load_data(I.Tex0, iSample );
 #endif
@@ -66,11 +70,11 @@ c2_out main( v2p_aa_AA I )
 #else // USE_MSAA
 	float4 	distort	= s_distort.Load( int3( I.Tex0 * pos_decompression_params2.xy, 0 ), iSample );
 #endif // USE_MSAA
-	float2	offset	= (distort.xy-(127.0h/255.0h))*def_distort;  // fix newtral offset
+	float2	offset	= (distort.xy-(127.0f/255.0f))*def_distort;  // fix newtral offset
 	float2	center	= I.Tex0 + offset;
 
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbdx	= gbuffer_load_data_offset(I.Tex0, center, I.HPos, iSample );
+	gbuffer_data gbdx	= gbuffer_load_data_offset(I.Tex0, center, I.HPos.xy, iSample );
 #else
 	gbuffer_data gbdx	= gbuffer_load_data_offset(I.Tex0, center, iSample);
 #endif
@@ -92,7 +96,7 @@ c2_out main( v2p_aa_AA I )
 			img 	= mblur( center, ( gbd ).P, img.rgb);
 
 #ifdef 	USE_DISTORT
- 	float3	blurred	= bloom*def_hdr	;
+ 	float3	blurred	= (bloom*def_hdr).xyz	;
 			img		= lerp	(img,blurred,distort.z);
 #endif
 

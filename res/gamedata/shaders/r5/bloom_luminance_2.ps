@@ -19,7 +19,7 @@ float	sample	(float2	tc)
 {
 //	float4	data = tex2D(s_image,tc);
 	float4	data = s_image.Sample( smp_rtlinear, tc );
-	return 	dot( data, 1.h/4.h );	// sum components
+	return 	dot( data, 1.f/4.f );	// sum components
 }
 
 float4 main( p_filter I ) : SV_Target
@@ -48,10 +48,10 @@ float4 main( p_filter I ) : SV_Target
 
 	// perform accumulation
 	float4	final;
-		final.x	= dot(accum0,1.h/4.h);
-		final.y	= dot(accum1,1.h/4.h);
-		final.z	= dot(accum2,1.h/4.h);
-		final.w	= dot(accum3,1.h/4.h);
+		final.x	= dot(accum0,1.f/4.f);
+		final.y	= dot(accum1,1.f/4.f);
+		final.z	= dot(accum2,1.f/4.f);
+		final.w	= dot(accum3,1.f/4.f);
 
 	// OK
 	return 	final;

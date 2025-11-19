@@ -77,7 +77,7 @@ float4 main( vf I ) : SV_Target
 
 #ifdef	NEED_SOFT_WATER
 
-	float	alpha	= 0.75h+0.25h*power;                        // 1=full env, 0=no env
+	float	alpha	= 0.75f+0.25f*power;                        // 1=full env, 0=no env
 
 #ifdef	USE_SOFT_WATER
 	//	Igor: additional depth test
@@ -92,9 +92,9 @@ float4 main( vf I ) : SV_Target
 	float waterDepth = _P.z-I.tctexgen.z;
 
 	//	water fog
-	float  fog_exp_intens = -4.0h;
+	float  fog_exp_intens = -4.0f;
 	float fog	= 1-exp(fog_exp_intens*waterDepth);
-	float3 Fc  	= float3( 0.1h, 0.1h, 0.1h) * water_intensity.r;
+	float3 Fc  	= float3( 0.1f, 0.1f, 0.1f) * water_intensity.r;
 	final 		= lerp (Fc, final, alpha);
 
 	alpha 		= min(alpha, saturate(waterDepth));

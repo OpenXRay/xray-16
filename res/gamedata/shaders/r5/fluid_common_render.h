@@ -189,8 +189,8 @@ float4 Raycast( PS_INPUT_RAYCAST input )
 
     // Sample twice per voxel
     float fSamples = ( rayLength / gridScaleFactor * maxGridDim ) * 2.0;
-    int nSamples = floor(fSamples);
-    float3 stepVec = normalize( (rayOrigin - eyeOnGrid) * gridDim ) * recGridDim * 0.5;
+    int nSamples = int(floor(fSamples));
+    float3 stepVec = normalize( (rayOrigin - eyeOnGrid.xyz) * gridDim.xyz ) * recGridDim.xyz * 0.5;
    
     float3 O = rayOrigin + stepVec*Offset;
     
@@ -200,7 +200,8 @@ float4 Raycast( PS_INPUT_RAYCAST input )
     stepVec = -stepVec;
 #endif
 
-    for( int i=0; i<nSamples ; i++ )
+    int i;
+    for( i=0; i<nSamples ; i++ )
     {
         DoSample(1, O, color);
         O += stepVec;
@@ -212,7 +213,7 @@ float4 Raycast( PS_INPUT_RAYCAST input )
 #endif
     }
 
-    // The last sample is weighted by the fractional part of the ray length in voxel 
+    // The last sample is weighted by the fractional part of the ray length in voxel
     //  space (fSamples), thus avoiding banding artifacts when the smoke is blended against the scene
     if( i == nSamples )
     {
@@ -303,8 +304,8 @@ float4 Raycast( PS_INPUT_RAYCAST input )
 
     // Sample twice per voxel
     float fSamples = ( rayLength / gridScaleFactor * maxGridDim ) * 2.0;
-    int nSamples = floor(fSamples);
-    float3 stepVec = normalize( (rayOrigin - eyeOnGrid) * gridDim ) * recGridDim * 0.5;
+    int nSamples = int(floor(fSamples));
+    float3 stepVec = normalize( (rayOrigin - eyeOnGrid.xyz) * gridDim.xyz ) * recGridDim.xyz * 0.5;
    
     float3 O = rayOrigin + stepVec*Offset;
     
@@ -314,7 +315,8 @@ float4 Raycast( PS_INPUT_RAYCAST input )
     stepVec = -stepVec;
 #endif	//	RENDER_FIRE
 
-    for( int i=0; i<nSamples ; i++ )
+    int i;
+    for( i=0; i<nSamples ; i++ )
     {
         DoSample(1, O, color);
         O += stepVec;
@@ -326,7 +328,7 @@ float4 Raycast( PS_INPUT_RAYCAST input )
 #endif	//	RENDER_FIRE
     }
 
-    // The last sample is weighted by the fractional part of the ray length in voxel 
+    // The last sample is weighted by the fractional part of the ray length in voxel
     //  space (fSamples), thus avoiding banding artifacts when the smoke is blended against the scene
     if( i == nSamples )
     {

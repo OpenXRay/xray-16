@@ -62,10 +62,10 @@ float4 main ( v_aa_AA I ) : SV_Target
   float4 tc6r 		=  I.Tex6.wzyx;
   
 #ifdef GBUFFER_OPTIMIZATION
-  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5, pos2d.xy);
-  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6, pos2d.xy);
-  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r, pos2d.xy);
-  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r, pos2d.xy); 
+  gbuffer_data gbd5 = gbuffer_load_data_offset(I.Tex0,I.Tex5.xy, pos2d.xy);
+  gbuffer_data gbd6 = gbuffer_load_data_offset(I.Tex0,I.Tex6.xy, pos2d.xy);
+  gbuffer_data gbd5r = gbuffer_load_data_offset(I.Tex0,tc5r.xy, pos2d.xy);
+  gbuffer_data gbd6r = gbuffer_load_data_offset(I.Tex0,tc6r.xy, pos2d.xy); 
 #else
   gbuffer_data gbd5 = gbuffer_load_data(I.Tex5); 
   gbuffer_data gbd6 = gbuffer_load_data(I.Tex6); 
@@ -118,7 +118,7 @@ float4 main ( v_aa_AA I ) : SV_Target
 	float4	s2 	=  s_image.Sample( smp_rtlinear, offset + I.Tex3*w);
 	float4	s3 	=  s_image.Sample( smp_rtlinear, offset + I.Tex4*w);
 
-	float3 	final	=  mblur( center, dc, (s0+s1+s2+s3)/4.h );
+	float3 	final	=  mblur( center, dc.xyz, ((s0+s1+s2+s3)/4.f).xyz );
 
 //	return combine_bloom(final,tex2D	(s_bloom, I.tc0));
 	return combine_bloom( final, s_bloom.Sample( smp_rtlinear, I.Tex0.xy));

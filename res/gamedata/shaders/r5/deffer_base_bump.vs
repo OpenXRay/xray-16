@@ -1,7 +1,7 @@
 #include	"common.h"
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
-#define	v_in	v_static_color	
+#define	v_in	v_static_color
 #else
 #define	v_in	v_static
 #endif

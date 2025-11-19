@@ -1,9 +1,16 @@
 #include "common.h"
 
+// Define macros before undefining to avoid Slang warnings
+#ifndef ULTRA_SHADOWS_ON
+#define ULTRA_SHADOWS_ON 0
+#endif
+#ifndef USE_ULTRA_SHADOWS
+#define USE_ULTRA_SHADOWS 0
+#endif
 #undef ULTRA_SHADOWS_ON
 #undef USE_ULTRA_SHADOWS
 
-#define RAY_PATH	2.0h
+#define RAY_PATH	2.0f
 #define JITTER_TEXTURE_SIZE	64.0f
 
 #define	JITTER_SUN_SHAFTS
@@ -49,7 +56,7 @@ float4 	main (v2p_volume  I) : SV_Target
 	float2	tc  = I.tc.xy/I.tc.w;
 	float4	pos2d = I.hpos;
 	
-	gbuffer_data gbd = gbuffer_load_data( GLD_P(tc, pos2d, ISAMPLE) );
+	gbuffer_data gbd = gbuffer_load_data( GLD_P(tc, pos2d.xy, ISAMPLE) );
 
 #ifndef	SUN_SHAFTS_QUALITY
 	return float4(0,0,0,0);
@@ -80,7 +87,7 @@ float4 	main (v2p_volume  I) : SV_Target
 	float4	delta 	= mul (m_shadow, float4(direction,0));
 
 	float	res = 0;
-	float	max_density = sun_shafts_intensity;
+	float	max_density = sun_shafts_intensity.x;
 	float	density = max_density/RAY_SAMPLES;
 
 	if (depth<0.0001)
@@ -128,7 +135,7 @@ float4 	main (float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 #endif
 {
 #ifdef GBUFFER_OPTIMIZATION
-	gbuffer_data gbd = gbuffer_load_data( tc, pos2d  );
+	gbuffer_data gbd = gbuffer_load_data( tc, pos2d.xy  );
 #else
 	gbuffer_data gbd = gbuffer_load_data( tc );
 #endif
@@ -160,7 +167,7 @@ float4 	main (float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1 ) : SV_Target
 	float4	delta 	= mul (m_shadow, float4(direction,0));
 
 	float	res = 0;
-	float	max_density = sun_shafts_intensity;
+	float	max_density = sun_shafts_intensity.x;
 	float	density = max_density/RAY_SAMPLES;
 
 	if (depth<0.0001)

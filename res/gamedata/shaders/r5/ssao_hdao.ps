@@ -19,6 +19,11 @@ static float g_fSSAOAcceptAngle       = 0.98f;	// Used by the ValleyAngle functi
 #define NUM_RING_1_GATHERS	(6)
 #define NUM_RING_2_GATHERS	(12)
 
+// Define MSAA_SAMPLES if not already defined (to avoid Slang warnings)
+#ifndef MSAA_SAMPLES
+#define MSAA_SAMPLES 0
+#endif
+
 #if ( MSAA_SAMPLES == 2 )
 
     #define MSAA_SAMPLE_INDEX ( 0 )
@@ -202,10 +207,9 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		i2MirrorOffsetScreenCoord = u2ScreenCoord + i2MirrorPattern;
 		
 		// Clamp our test to screen coordinates
-		i2OffsetScreenCoord = ( i2OffsetScreenCoord > ( g_f2RTSize - float2( 1.0f, 1.0f ) ) ) ? ( g_f2RTSize - float2( 1.0f, 1.0f ) ) : ( i2OffsetScreenCoord );
-		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord > ( g_f2RTSize - float2( 1.0f, 1.0f ) ) ) ? ( g_f2RTSize - float2( 1.0f, 1.0f ) ) : ( i2MirrorOffsetScreenCoord );
-		i2OffsetScreenCoord = ( i2OffsetScreenCoord < 0 ) ? ( 0 ) : ( i2OffsetScreenCoord );
-		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord < 0 ) ? ( 0 ) : ( i2MirrorOffsetScreenCoord );
+		int2 maxCoord = int2( g_f2RTSize - float2( 1.0f, 1.0f ) );
+		i2OffsetScreenCoord = clamp( i2OffsetScreenCoord, int2(0, 0), maxCoord );
+		i2MirrorOffsetScreenCoord = clamp( i2MirrorOffsetScreenCoord, int2(0, 0), maxCoord );
 						
 #ifdef GBUFFER_OPTIMIZATION
 		f3N1.xy  = g_txNormal.Load( int3( i2OffsetScreenCoord, 0), MSAA_SAMPLE_INDEX ).xy;
@@ -304,13 +308,13 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 		
 		f4PosZ		  = GatherZSamples( f2TexCoord );
 		f4Diff		  = ZDisp.xxxx - f4PosZ;
-		f4Compare[0]  = ( f4Diff < g_fSSAORejectRadius.xxxx ) ? ( 1.0f ) : ( 0.0f );
-		f4Compare[0] *= ( f4Diff > g_fSSAOAcceptRadius.xxxx ) ? ( 1.0f ) : ( 0.0f );
-		
+		f4Compare[0]  = select( f4Diff < g_fSSAORejectRadius.xxxx, 1.0f, 0.0f );
+		f4Compare[0] *= select( f4Diff > g_fSSAOAcceptRadius.xxxx, 1.0f, 0.0f );
+
 		f4PosZ		  = GatherZSamples( f2MirrorTexCoord );
 		f4Diff		  = ZDisp.xxxx - f4PosZ;
-		f4Compare[1]  = ( f4Diff < g_fSSAORejectRadius.xxxx ) ? ( 1.0f ) : ( 0.0f );
-		f4Compare[1] *= ( f4Diff > g_fSSAOAcceptRadius.xxxx ) ? ( 1.0f ) : ( 0.0f );
+		f4Compare[1]  = select( f4Diff < g_fSSAORejectRadius.xxxx, 1.0f, 0.0f );
+		f4Compare[1] *= select( f4Diff > g_fSSAOAcceptRadius.xxxx, 1.0f, 0.0f );
 
 		f4Occlusion.xyzw += g_f4SSAORingWeight[iGather].xyzw * ( f4Compare[0].xyzw * f4Compare[1].zwxy );
 	}
@@ -319,7 +323,7 @@ float	calc_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	fOcclusion *= fDot;
 	fOcclusion *= P.z < 0.5f ? 0.0f : lerp( 0.0f, 1.0f, saturate( P.z - 0.5f ) );
 	fOcclusion  = 1.0f - saturate( fOcclusion );
-	return fOcclusion.xxxx;
+	return fOcclusion;
 }
 #endif
 #endif

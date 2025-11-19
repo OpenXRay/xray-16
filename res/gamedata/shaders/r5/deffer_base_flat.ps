@@ -18,7 +18,7 @@ f_deffer main( p_flat I )
 #ifdef USE_LM_HEMI
 //	float4	lm 	= tex2D( s_hemi, I.lmh );
 	float4	lm 	= s_hemi.Sample( smp_rtlinear, I.lmh );
-//	float 	h  	= dot( lm.rgb, 1.h/3.h );
+//	float 	h  	= dot( lm.rgb, 1.f/3.f );
 	float 	h  	= get_hemi(lm);
 # ifdef USE_R2_STATIC_SUN
 //		 	ms 	= lm.w			;

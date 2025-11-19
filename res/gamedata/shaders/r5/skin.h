@@ -55,12 +55,8 @@ float4 	u_position	(float4 v)	{ return float4(v.xyz, 1.f);	}	// -12..+12
 //uniform float4 	sbones_array	[256-22] : register(vs,c22);
 //tbuffer	SkeletonBones
 //{
-	// float4 	sbones_array	[256-22];
+	float4 	sbones_array	[256-22];
 //}
-
-cbuffer SkeletonBones : register(b7) {
-	float4 sbones_array[256-22];
-};
 
 float3 	skinning_dir 	(float3 dir, float3 m0, float3 m1, float3 m2)
 {
@@ -236,11 +232,11 @@ v_model skinning_4 	(v_model_skinned_4	v)
 	float4  m2 	= m[0][2]*w[0];
 
 	[unroll]
-	for (int i=1; i<4; ++i)
+	for (int j=1; j<4; ++j)
 	{
-		m0 	+= m[i][0]*w[i];
-		m1 	+= m[i][1]*w[i];
-		m2 	+= m[i][2]*w[i];
+		m0 	+= m[j][0]*w[j];
+		m1 	+= m[j][1]*w[j];
+		m2 	+= m[j][2]*w[j];
 	}
 
 	// skinning
