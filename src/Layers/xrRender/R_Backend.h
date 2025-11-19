@@ -23,6 +23,7 @@
 #endif
 #ifdef USE_OGL
 #include <glm/glm.hpp>
+#include "gl_backend_uniforms.h"
 #endif
 
 #include "FVF.h"
@@ -63,6 +64,9 @@ struct R_statistics
 #pragma warning(push)
 #pragma warning(disable:4324)
 class ECORE_API CBackend
+#ifdef USE_OGL
+    : public CBackendUniforms
+#endif
 {
 public:
     enum
@@ -103,13 +107,6 @@ private:
     GLuint pFB;
     GLuint pRT[4];
     GLuint pZB;
-
-    template<typename TYPE>
-    void _set_uniforms(GLuint program, GLint location, xr_vector<TYPE>& uniforms);
-
-public:
-    void set_uniforms(GLuint program, GLint location, xr_vector<glm::vec4>& uniforms);
-private:
 #else
 #   error No graphics API selected or enabled!
 #endif

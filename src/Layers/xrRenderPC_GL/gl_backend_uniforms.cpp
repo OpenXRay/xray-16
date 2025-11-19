@@ -3,7 +3,6 @@
 
 #include <glm/glm.hpp>
 
-
 namespace xray::render::RENDER_NAMESPACE
 {
 void CBackendUniforms::uniformBufferObjectGenerate(UniformBufferObject& info)
@@ -21,9 +20,9 @@ void CBackendUniforms::uniformBufferObjectRegisterWithProgram(Program& program, 
 {
     // Only single bit is 1
     VERIFY(blockBinding != 0 && (blockBinding & (blockBinding - 1)) == 0);
-    //VERIFY(program.blockBindingSlots & 1 << blockBinding == 0);
+    //VERIFY(program.bindingSlots & 1 << blockBinding == 0);
 
-    if (program.blockBindingSlots & 1 << blockBinding)
+    if (program.bindingSlots & 1 << blockBinding)
     {
         // UBO already registered with this program
         return;
@@ -34,15 +33,15 @@ void CBackendUniforms::uniformBufferObjectRegisterWithProgram(Program& program, 
     CHK_GL(glUniformBlockBinding(program.id, blockIndex, blockBinding));
     CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, blockBinding, ubo.id, 0,ubo.size));
 
-    program.blockBindingSlots |= 1 << blockBinding;
+    program.bindingSlots |= 1 << blockBinding;
 
     CHK_GL(glBindBuffer(GL_UNIFORM_BUFFER, ubo.id));
 }
 
-void CBackendUniforms::uniformBufferObjectPushToDevice(const UniformBufferObject& ubo)
+void CBackendUniforms::uniformBufferObjectPushToDevice(const UniformBufferObject& ubo, GLsizeiptr size, void* data)
 {
     CHK_GL(glBindBuffer(GL_UNIFORM_BUFFER, ubo.id));
-    CHK_GL(glBufferSubData(GL_UNIFORM_BUFFER, 0, ubo.size, ubo.data));
+    CHK_GL(glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data));
     //CHK_GL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
 }
 
@@ -58,5 +57,11 @@ void CBackendUniforms::_set_uniforms(GLuint program, GLint location, xr_vector<T
     {
         CHK_GL(glProgramUniform4fv(program, location, uniforms.size(), reinterpret_cast<GLfloat*>(uniforms.data())));
     }
+}
+
+void CBackendUniforms::initializeUniforms()
+{
+    CHK_GL(glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &maxUniformVertexSize));
+    CHK_GL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize));
 }
 }

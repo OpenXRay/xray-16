@@ -470,6 +470,10 @@ void CBackend::OnDeviceCreate()
 
     // invalidate caching
     Invalidate();
+
+#ifdef USE_OGL
+    initializeUniforms();
+#endif
 }
 
 void CBackend::OnDeviceDestroy()
