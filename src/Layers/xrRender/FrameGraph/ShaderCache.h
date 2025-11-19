@@ -66,6 +66,13 @@ public:
     );
 
     /// <summary>
+    /// Enable/disable shader caching (useful for development)
+    /// When disabled, TryLoad always returns false (cache miss)
+    /// </summary>
+    void SetCacheEnabled(bool enabled) { m_cacheEnabled = enabled; }
+    bool IsCacheEnabled() const { return m_cacheEnabled; }
+
+    /// <summary>
     /// Save compiled shader bytecode to cache
     /// </summary>
     /// <param name="reflection">Optional: Reflection data to cache (nullptr = bytecode only)</param>
@@ -124,6 +131,7 @@ private:
 
     static constexpr u32 CACHE_VERSION = 4;  // Removed redundant constantBuffers field - unified into constantLayout
     Stats m_stats;
+    bool m_cacheEnabled;  // If false, TryLoad always returns false (dev mode)
 };
 
 } // namespace xray::render::framegraph

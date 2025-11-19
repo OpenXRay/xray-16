@@ -158,21 +158,14 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     // Create shaders
     SPS* ps = RImplementation.Resources->_CreatePS(_ps);
     u32 flags = 0;
-    //if (ps->constants.dx9compatibility)
-        //flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
     SVS* vs = RImplementation.Resources->_CreateVS(_vs, flags);
     SGS* gs = RImplementation.Resources->_CreateGS(_gs);
     dest.ps = ps;
     dest.vs = vs;
     dest.gs = gs;
-#ifdef USE_DX11
     dest.hs = RImplementation.Resources->_CreateHS("null");
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
-#endif
-    //ctable.merge(&ps->constants);
-    //ctable.merge(&vs->constants);
-    //ctable.merge(&gs->constants);
 
     // Last Stage - disable
     if (0 == xr_stricmp(_ps, "null"))
@@ -182,7 +175,6 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     }
 }
 
-#ifdef USE_DX11
 void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest,
     BOOL bZwrite, BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
@@ -190,18 +182,10 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
 
     dest.hs = RImplementation.Resources->_CreateHS(hs);
     dest.ds = RImplementation.Resources->_CreateDS(ds);
-
-    // NOTE: Disabled old constant table merge - now using FGConstantSystem
-    //ctable.merge(&dest.hs->constants);
-    //ctable.merge(&dest.ds->constants);
 }
 
 void CBlender_Compile::r_ComputePass(LPCSTR cs)
 {
     dest.cs = RImplementation.Resources->_CreateCS(cs);
-
-    // NOTE: Disabled old constant table merge - now using FGConstantSystem
-    //ctable.merge(&dest.cs->constants);
 }
-#endif
 } // namespace xray::render::RENDER_NAMESPACE

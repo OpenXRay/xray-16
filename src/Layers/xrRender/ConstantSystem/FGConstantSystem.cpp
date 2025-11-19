@@ -87,22 +87,16 @@ void FGConstantSystem::Set(const char* name, const Fvector4& value) {
 void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::Set] Matrix constant '%s' not found in shader '%s'", name, m_pso->debugName.c_str());
         return;
     }
 
     if (!constant->IsMatrix()) {
-        Msg("! [FGConstantSystem] Constant '%s' is not a matrix (type=%d)",
-            name, (int)constant->type);
         return;
     }
 
     // REFLECTION-DRIVEN ROUTING
     u16 cbIndex = constant->cbIndex;
     const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
-    Msg("~ [FGConstantSystem::Set] Setting matrix '%s' (cb=%s[%u], offset=%u, type=%s)",
-        name, cbInfo.name.c_str(), cbIndex, constant->offset,
-        constant->IsMatrix3x4() ? "float3x4" : "float4x4");
 
     u8* stagingBuffer = GetStagingBuffer(constant->frequency, cbIndex);
 
@@ -603,16 +597,19 @@ void FGConstantSystem::WriteMatrix3x4(u8* dest, const Fmatrix& src) {
     // Since Slang shader uses row_major qualifier, we write in row-major order
     //
 
+    Fmatrix transposed;
+    transposed.transpose(src);
+
     float* out = (float*)dest;
 
     // Row 0: [_11, _12, _13, _14]
-    out[0]  = src._11;  out[1]  = src._12;  out[2]  = src._13;  out[3]  = src._14;
+    out[0]  = transposed._11;  out[1]  = transposed._12;  out[2]  = transposed._13;  out[3]  = transposed._14;
 
     // Row 1: [_21, _22, _23, _24]
-    out[4]  = src._21;  out[5]  = src._22;  out[6]  = src._23;  out[7]  = src._24;
+    out[4]  = transposed._21;  out[5]  = transposed._22;  out[6]  = transposed._23;  out[7]  = transposed._24;
 
     // Row 2: [_31, _32, _33, _34]
-    out[8]  = src._31;  out[9]  = src._32;  out[10] = src._33;  out[11] = src._34;
+    out[8]  = transposed._31;  out[9]  = transposed._32;  out[10] = transposed._33;  out[11] = transposed._34;
 
     // Note: Row 3 (_41, _42, _43, _44) is discarded (float3x4 has no 4th row)
 }

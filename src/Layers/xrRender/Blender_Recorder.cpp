@@ -223,34 +223,15 @@ void CBlender_Compile::PassEnd()
 
 void CBlender_Compile::PassSET_Shaders(pcstr _vs, pcstr _ps, pcstr _gs /*= nullptr*/, pcstr _hs /*= nullptr*/, pcstr _ds /*= nullptr*/)
 {
-#if defined(USE_OGL)
-    dest.pp = RImplementation.Resources->_CreatePP(_vs, _ps, _gs, _hs, _ds);
-    if (GLAD_GL_ARB_separate_shader_objects || !dest.pp->pp)
-#endif
-    {
-        dest.ps = RImplementation.Resources->_CreatePS(_ps);
-        ctable.merge(&dest.ps->constants);
-        u32 flags = 0;
-#if defined(USE_DX11)
-        if (dest.ps->constants.dx9compatibility)
-            flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-#endif
-        dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
-        ctable.merge(&dest.vs->constants);
-        dest.gs = RImplementation.Resources->_CreateGS(_gs);
-        ctable.merge(&dest.gs->constants);
-#ifdef USE_DX11
-        dest.hs = RImplementation.Resources->_CreateHS(_hs);
-        dest.ds = RImplementation.Resources->_CreateDS(_ds);
-        ctable.merge(&dest.hs->constants);
-        ctable.merge(&dest.ds->constants);
-        dest.cs = RImplementation.Resources->_CreateCS("null");
-#endif
-    }
-#if defined(USE_OGL)
-    RImplementation.Resources->_LinkPP(dest);
-    ctable.merge(&dest.pp->constants);
-#endif
+    dest.ps = RImplementation.Resources->_CreatePS(_ps);
+    u32 flags = 0;
+    if (dest.ps->constants.dx9compatibility)
+        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+    dest.vs = RImplementation.Resources->_CreateVS(_vs, flags);
+    dest.gs = RImplementation.Resources->_CreateGS(_gs);
+    dest.hs = RImplementation.Resources->_CreateHS(_hs);
+    dest.ds = RImplementation.Resources->_CreateDS(_ds);
+    dest.cs = RImplementation.Resources->_CreateCS("null");
 }
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)

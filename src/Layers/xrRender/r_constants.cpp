@@ -70,6 +70,8 @@ ref_constant R_constant_table::get(const shared_str& S, u16 type /*= u16(-1)*/) 
 /// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
 {
+    return;
+
     if (nullptr == T)
         return;
 

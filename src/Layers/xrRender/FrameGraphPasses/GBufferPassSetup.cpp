@@ -309,38 +309,34 @@ void renderGBufferGeometry(
         }
 
         // ═══════════════════════════════════════════════════════
-        //  UPDATE PER-MATERIAL DYNAMIC CONSTANTS
-        // ═══════════════════════════════════════════════════════
-        // TEMPORARY: Still using legacy CB name check for dynamic_transforms
-        // Will migrate to FGConstantSystem.CommitMaterial() in Phase 7
-
-        if (matPSO) {
-            DynamicTransforms dynamicCB = {};
-            FillDynamicTransforms(dynamicCB);
-
-            // Override dt_params with per-material detail scale
-
-            dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
-                                   1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
-
-            // TEMPORARY: Update DynamicTransforms CB (will use FGConstantSystem.Set("dt_params") later)
-            for (const auto& cbInfo : matPSO->constantBuffers) {
-                if (cbInfo.name == "dynamic_transforms") {
-                    u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
-                    ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
-                    break;
-                }
-            }
-        }
-
-        // ═══════════════════════════════════════════════════════
-        //  UPDATE PER-INSTANCE CONSTANTS (REFLECTION-DRIVEN)
+        //  UPDATE MATERIAL AND INSTANCE CONSTANTS (USING FGCONSTANTSYSTEM)
         // ═══════════════════════════════════════════════════════
 
         if (matPSO) {
-            // Get VCB based on visual type
-            ng::BufferHandle vcbHandle;
-            u32 vcbSize = 0;
+            // Initialize FGConstantSystem for reflection-driven constant binding
+            // Single instance handles both material and instance-level constants
+            fgconstants::FGConstantSystem constants(matPSO, materialCache->GetVCBPool());
+
+            // ─────────────────────────────────────────────────
+            //  MATERIAL-FREQUENCY CONSTANTS (once per material)
+            // ─────────────────────────────────────────────────
+
+            // Set material-specific detail scale
+            // dt_params.xy = detail_scale, dt_params.w = 1.0 / dtex_range
+            Fvector4 dt_params(
+                matPSO->detail_scale,
+                matPSO->detail_scale,
+                matPSO->detail_scale,
+                1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range
+            );
+            constants.Set("dt_params", dt_params);
+
+            // Commit material-frequency constants to GPU
+            constants.CommitMaterial(ctx);
+
+            // ─────────────────────────────────────────────────
+            //  INSTANCE-FREQUENCY CONSTANTS (per draw call)
+            // ─────────────────────────────────────────────────
 
             // Determine if this is a skeleton mesh
             bool isSkeleton = false;
@@ -350,57 +346,7 @@ void renderGBufferGeometry(
                 isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
             }
 
-            for (const auto& vcbReq : matPSO->vcbRequirements) {
-                if (vcbReq.name == "$Globals") { // yohji TODO: turn vcbReq into map for o(1) lookup
-                    vcbHandle = vcbReq.vcbHandle;
-                    vcbSize = vcbReq.size;
-                    break;
-                }
-            }
-
-            // If no $Globals found, use first VCB as fallback
-            if ((!vcbHandle.IsValid() || !vcbSize) && !matPSO->vcbRequirements.empty()) {
-                vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                vcbSize = matPSO->vcbRequirements[0].size;
-            }
-
-            if (!vcbHandle.IsValid()) {
-                continue;  // Skip if no VCB
-            }
-
-            // Allocate buffer for CB data (max 4096 bytes for skeleton)
-            constexpr u32 MAX_CB_SIZE = 4096;
-            if (vcbSize > MAX_CB_SIZE) {
-                continue;
-            }
-
-            u8 cbData[MAX_CB_SIZE];
-            ZeroMemory(cbData, vcbSize);
-
-            // Helper to copy bone matrix (3 float4s, column-major)
-            auto CopyBoneMatrix = [](u8* dest, const Fmatrix& M) {
-                float* destF = reinterpret_cast<float*>(dest);
-                destF[0] = M._11; destF[1] = M._21; destF[2] = M._31; destF[3] = M._41;
-                destF[4] = M._12; destF[5] = M._22; destF[6] = M._32; destF[7] = M._42;
-                destF[8] = M._13; destF[9] = M._23; destF[10] = M._33; destF[11] = M._43;
-                };
-
-            // Helper for tree/regular meshes (transposed 3x4)
-            auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
-                Fmatrix transposed;
-                transposed.transpose(src);
-                float* destF = reinterpret_cast<float*>(dest);
-                destF[0] = transposed._11; destF[1] = transposed._12; destF[2] = transposed._13; destF[3] = transposed._14;
-                destF[4] = transposed._21; destF[5] = transposed._22; destF[6] = transposed._23; destF[7] = transposed._24;
-                destF[8] = transposed._31; destF[9] = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
-                };
-
-            // isSkeleton and visualType already determined above (lines 336-342)
             if (isSkeleton) {
-                // ─────────────────────────────────────────────────
-                //  SKELETON VCB: sbones_array
-                // ─────────────────────────────────────────────────
-
                 // Update global dynamic_transforms CB with skeleton's world matrix
                 DynamicTransforms dynamicCB = {};
                 FillDynamicTransforms(dynamicCB, batch.worldMatrix, 1.0f);
@@ -412,7 +358,7 @@ void renderGBufferGeometry(
                     }
                 }
 
-                // Get Parent from skinned mesh visual itself
+                // Get Parent skeleton from skinned mesh visual
                 RENDER_NAMESPACE::CKinematics* Parent = nullptr;
 
                 if (visualType == MT_SKELETON_GEOMDEF_ST) {
@@ -428,73 +374,51 @@ void renderGBufferGeometry(
                     // Calculate bones BEFORE accessing transforms
                     Parent->CalculateBones(TRUE);
 
-                    // Fill sbones_array - EXACT copy of vanilla code
+                    // Get bone count
                     u32 count = Parent->LL_BoneCount();
-                    u32 maxBones = vcbSize / 48;
-                    count = std::min(count, maxBones);
 
-                    float* array = reinterpret_cast<float*>(cbData);
-                    for (u32 mid = 0; mid < count; mid++)
-                    {
-                        Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
-                        u32 id = mid * 3;
-                        // array[id + 0] = float4(M._11, M._21, M._31, M._41)
-                        array[(id + 0) * 4 + 0] = M._11;
-                        array[(id + 0) * 4 + 1] = M._21;
-                        array[(id + 0) * 4 + 2] = M._31;
-                        array[(id + 0) * 4 + 3] = M._41;
-                        // array[id + 1] = float4(M._12, M._22, M._32, M._42)
-                        array[(id + 1) * 4 + 0] = M._12;
-                        array[(id + 1) * 4 + 1] = M._22;
-                        array[(id + 1) * 4 + 2] = M._32;
-                        array[(id + 1) * 4 + 3] = M._42;
-                        // array[id + 2] = float4(M._13, M._23, M._33, M._43)
-                        array[(id + 2) * 4 + 0] = M._13;
-                        array[(id + 2) * 4 + 1] = M._23;
-                        array[(id + 2) * 4 + 2] = M._33;
-                        array[(id + 2) * 4 + 3] = M._43;
+                    // Build bone matrix array (FGConstantSystem will handle 3x4 conversion)
+                    constexpr u32 MAX_BONES = 78;  // From vanilla (3744 bytes / 48 bytes per bone)
+                    Fmatrix boneMatrices[MAX_BONES];
+                    u32 bonesToUpload = std::min(count, MAX_BONES);
+
+                    for (u32 i = 0; i < bonesToUpload; i++) {
+                        boneMatrices[i] = Parent->LL_GetTransform_R(u16(i));
                     }
+
+                    // Use FGConstantSystem matrix array API
+                    // NOTE: Shader constant is named "sbones_array", not "m_xform"
+                    // SetArray() automatically detects float3x4 format and converts properly
+                    constants.SetArray("sbones_array", boneMatrices, bonesToUpload);
                 }
             }
             else {
-                // ─────────────────────────────────────────────────
-                //  TREE/REGULAR VCB: m_xform, m_xform_v, consts
-                // ─────────────────────────────────────────────────
-
                 // Compute matrices
                 Fmatrix xform = batch.worldMatrix;
                 Fmatrix xform_v;
                 xform_v.mul(batch.worldMatrix, Device.mView);
 
-                // Write transforms
-                CopyMatrix3x4(cbData + 0, xform);     // m_xform at offset 0
-                CopyMatrix3x4(cbData + 48, xform_v);  // m_xform_v at offset 48
+                // Use FGConstantSystem matrix APIs
+                // Set() automatically detects float3x4 vs float4x4 and converts properly
+                constants.Set("m_xform", xform);
+                constants.Set("m_xform_v", xform_v);
 
-                // Write consts at offset 96
+                // Write tree scale constant
                 using namespace xray::render::RENDER_NAMESPACE;
                 float tree_scale = 1.0f / float(FTreeVisual_quant);
-
-                float* constsPtr = reinterpret_cast<float*>(cbData + 96);
-                constsPtr[0] = tree_scale;
-                constsPtr[1] = tree_scale;
-                constsPtr[2] = 0.0f;
-                constsPtr[3] = 0.0f;
+                Fvector4 consts(tree_scale, tree_scale, 0.0f, 0.0f);
+                constants.Set("consts", consts);
             }
 
-            // Get NVRHI buffer from BufferHandle using RenderDevice
-            nvrhi::IBuffer* vcbBuffer = device->GetNativeBuffer(vcbHandle);
+            // Commit per-instance constants to GPU (uploads dirty VCBs)
+            constants.CommitInstance(ctx);
 
-            if (vcbBuffer) {
-                // Write VCB within render pass
-                ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
+            // Get or create cached binding sets (unchanged)
+            materialCache->GetOrCreateBindingSet(matPSO);
 
-                // Get or create cached binding sets
-                materialCache->GetOrCreateBindingSet(matPSO);
-
-                // Bind BOTH per-stage binding sets
-                ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
-                ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
-            }
+            // Bind BOTH per-stage binding sets
+            ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
+            ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
         }
 
         // ═══════════════════════════════════════════════════════
