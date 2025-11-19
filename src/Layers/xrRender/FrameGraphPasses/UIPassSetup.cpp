@@ -518,7 +518,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 UploadStaticGlobals(constants, staticGlobalsCB);
                 constants.CommitStatic(ctx);  // Upload to static persistent CBs
 
-                textMatCache->GetOrCreateBindingSet(pso, s_constantBuffer, pso->pass);
+                textMatCache->GetOrCreateBindingSet(pso);
 
                 if (!pso->vsBindingSet || !pso->psBindingSet) continue;
 
@@ -770,8 +770,8 @@ framegraph::VirtualResourceHandle setupCompositePass(
 
                 // Load shaders (ui_composite.vs/ps)
                 framegraph::ShaderLoader shaderLoader(device->GetSlangCompiler());
-                s_vertexShader = shaderLoader.LoadVertexShader("ui_composite");
-                s_pixelShader = shaderLoader.LoadPixelShader("ui_composite");
+                s_vertexShader = shaderLoader.LoadVertexShader("ui_composite").handle;
+                s_pixelShader = shaderLoader.LoadPixelShader("ui_composite").handle;
 
                 if (!s_vertexShader || !s_pixelShader) {
                     Msg("! [CompositePass] Failed to load shaders");

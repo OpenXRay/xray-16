@@ -99,16 +99,7 @@ bool ShaderCache::TryLoad(
                 m_stats.misses++;
                 return false;
             }
-            Msg("  ✓ [ShaderCache] Cache HIT (with reflection): %s%s (%u bytes)", shaderName, extension, bytecodeSize);
         }
-        else
-        {
-            Msg("  ✓ [ShaderCache] Cache HIT (no reflection): %s%s (%u bytes)", shaderName, extension, bytecodeSize);
-        }
-    }
-    else
-    {
-        Msg("  ✓ [ShaderCache] Cache HIT: %s%s (%u bytes)", shaderName, extension, bytecodeSize);
     }
 
     FS.r_close(reader);

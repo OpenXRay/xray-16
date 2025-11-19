@@ -311,6 +311,7 @@ UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const 
     // ═══════════════════════════════════════════════════
     //  FREQUENCY CLASSIFICATION RULES
     // ═══════════════════════════════════════════════════
+    // IMPORTANT: Check constant names BEFORE CB names to allow per-constant overrides!
 
     // Engine-frequency (samplers, global state)
     if (strstr(cbName, "static_globals") != nullptr) {
@@ -326,21 +327,22 @@ UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const 
         return UpdateFrequency::Pass;
     }
 
+    // Instance-frequency (world matrix, bones) - CHECK BEFORE CB NAME!
+    // This allows m_W/m_WV/m_WVP to be Instance even if in dynamic_transforms CB
+    if (strstr(name, "m_World") != nullptr ||
+        strstr(name, "m_W") != nullptr ||  // Matches m_W, m_WV, m_WVP
+        strstr(name, "m_xform") != nullptr ||
+        strstr(name, "bones") != nullptr ||
+        strstr(cbName, "$Globals") != nullptr ||
+        strstr(cbName, "SkeletonBones") != nullptr) {
+        return UpdateFrequency::Instance;
+    }
+
     // Material-frequency (textures, detail scale, material params)
     if (strstr(name, "dt_params") != nullptr ||
         strstr(name, "material") != nullptr ||
         strstr(cbName, "dynamic_transforms") != nullptr) {
         return UpdateFrequency::Material;
-    }
-
-    // Instance-frequency (world matrix, bones)
-    if (strstr(name, "m_World") != nullptr ||
-        strstr(name, "m_WV") != nullptr ||
-        strstr(name, "m_WVP") != nullptr ||
-        strstr(name, "m_xform") != nullptr ||
-        strstr(name, "bones") != nullptr ||
-        strstr(cbName, "$Globals") != nullptr) {
-        return UpdateFrequency::Instance;
     }
 
     // Default to Instance if unclear
@@ -356,28 +358,34 @@ UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const 
 // it's a static CB that exists persistently rather than volatile per-frame.
 //
 ConstantPersistence ShaderReflector::InferConstantPersistence(const char* cbName, UpdateFrequency frequency) {
-    // Heuristic: UI shaders typically use static constant buffers
-    // These CBs are in MaterialPSO->constantBuffers (not vcbRequirements)
+    // Determines whether a CB should be:
+    // - Static: Persistent shared buffer (created once, updated as needed, shared across draws)
+    // - Volatile: VCB ring-buffered (new instance per draw from pool)
 
-    // VCB-based constants (volatile) - these use the ring buffer system
-    if (strstr(cbName, "dynamic_transforms") != nullptr ||
-        strstr(cbName, "$Globals") != nullptr) {
-        return ConstantPersistence::Volatile;  // Uses VCB system
+    // Static CBs (persistent shared buffers)
+    if (strstr(cbName, "static_globals") != nullptr ||
+        strstr(cbName, "dynamic_transforms") != nullptr) {
+        return ConstantPersistence::Static;  // Shared global buffer
     }
 
-    // Static constants - persistent GPU buffers created once
-    if (strstr(cbName, "static_globals") != nullptr) {
-        return ConstantPersistence::Static;  // UI/persistent data
+    // Volatile CBs (VCB ring-buffered - per-draw instances)
+    if (strstr(cbName, "$Globals") != nullptr ||
+        strstr(cbName, "SkeletonBones") != nullptr ||
+        strstr(cbName, "GlobalParams") != nullptr ||  // Slang-generated CB containing sbones_array
+        strstr(cbName, "PerInstanceTransforms") != nullptr ||
+        strstr(cbName, "TreeData") != nullptr ||
+        strstr(cbName, "GrassWind") != nullptr) {
+        return ConstantPersistence::Volatile;  // VCB pool
     }
 
     // Default behavior based on frequency:
-    // - Engine frequency with no VCB name = likely static (UI projection, etc.)
-    // - Instance/Material = likely volatile (per-draw data)
+    // - Engine/Pass frequency = static (shared across draws)
+    // - Instance/Material = volatile (per-draw data)
     if (frequency == UpdateFrequency::Engine || frequency == UpdateFrequency::Pass) {
-        return ConstantPersistence::Static;   // Engine/Pass constants are typically static
+        return ConstantPersistence::Static;
     }
 
-    return ConstantPersistence::Volatile;  // Material/Instance are typically volatile
+    return ConstantPersistence::Volatile;
 }
 
 // ═══════════════════════════════════════════════════

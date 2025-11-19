@@ -34,19 +34,9 @@ namespace xray::render::RENDER_NAMESPACE
 
 ///////////////////////////////////////////////////////////////////////
 //  SVS
-SVS::SVS() : sh(0)
-#if defined(USE_DX11)
-//  ,signature(0)
-#endif
-{}
-
 SVS::~SVS()
 {
-    RImplementation.Resources->_DeleteVS(this);
-
-#if defined(USE_DX11)
-    // Release shader bytecode
-    _RELEASE(bytecode);
+    // nvrhiShader is automatically cleaned up by NVRHI refcounting
 
     // Release extracted reflection data
     if (reflection)
@@ -54,28 +44,15 @@ SVS::~SVS()
         xr_delete(reflection);
         reflection = nullptr;
     }
-#endif
 
-#if defined(USE_DX11)
-    _RELEASE(sh);
-#elif defined(USE_OGL)
-    if (GLAD_GL_ARB_separate_shader_objects)
-        CHK_GL(glDeleteProgram(sh));
-    else
-        CHK_GL(glDeleteShader(sh));
-#else
-#   error No graphics API selected or enabled!
-#endif
+    RImplementation.Resources->_DeleteVS(this);
 }
 
 ///////////////////////////////////////////////////////////////////////
 // SPS
 SPS::~SPS()
 {
-#if defined(USE_DX11)
-    _RELEASE(sh);
-    // Release shader bytecode
-    _RELEASE(bytecode);
+    // nvrhiShader is automatically cleaned up by NVRHI refcounting
 
     // Release extracted reflection data
     if (reflection)
@@ -83,14 +60,6 @@ SPS::~SPS()
         xr_delete(reflection);
         reflection = nullptr;
     }
-#elif defined(USE_OGL)
-    if (GLAD_GL_ARB_separate_shader_objects)
-        CHK_GL(glDeleteProgram(sh));
-    else
-        CHK_GL(glDeleteShader(sh));
-#else
-#   error No graphics API selected or enabled!
-#endif
 
     RImplementation.Resources->_DeletePS(this);
 }
@@ -99,10 +68,7 @@ SPS::~SPS()
 // SGS
 SGS::~SGS()
 {
-#   if defined(USE_DX11)
-    _RELEASE(sh);
-    // Release shader bytecode
-    _RELEASE(bytecode);
+    // nvrhiShader is automatically cleaned up by NVRHI refcounting
 
     // Release extracted reflection data
     if (reflection)
@@ -110,24 +76,13 @@ SGS::~SGS()
         xr_delete(reflection);
         reflection = nullptr;
     }
-#   elif defined(USE_OGL)
-    if (GLAD_GL_ARB_separate_shader_objects)
-        CHK_GL(glDeleteProgram(sh));
-    else
-        CHK_GL(glDeleteShader(sh));
-#   else
-#       error No graphics API selected or enabled!
-#   endif
 
     RImplementation.Resources->_DeleteGS(this);
 }
 
 SHS::~SHS()
 {
-#   if defined(USE_DX11)
-    _RELEASE(sh);
-    // Release shader bytecode
-    _RELEASE(bytecode);
+    // nvrhiShader is automatically cleaned up by NVRHI refcounting
 
     // Release extracted reflection data
     if (reflection)
@@ -135,24 +90,13 @@ SHS::~SHS()
         xr_delete(reflection);
         reflection = nullptr;
     }
-#   elif defined(USE_OGL)
-    if (GLAD_GL_ARB_separate_shader_objects)
-        CHK_GL(glDeleteProgram(sh));
-    else
-        CHK_GL(glDeleteShader(sh));
-#   else
-#       error No graphics API selected or enabled!
-#   endif
 
     RImplementation.Resources->_DeleteHS(this);
 }
 
 SDS::~SDS()
 {
-#   if defined(USE_DX11)
-    _RELEASE(sh);
-    // Release shader bytecode
-    _RELEASE(bytecode);
+    // nvrhiShader is automatically cleaned up by NVRHI refcounting
 
     // Release extracted reflection data
     if (reflection)
@@ -160,22 +104,13 @@ SDS::~SDS()
         xr_delete(reflection);
         reflection = nullptr;
     }
-#   elif defined(USE_OGL)
-    if (GLAD_GL_ARB_separate_shader_objects)
-        CHK_GL(glDeleteProgram(sh));
-    else
-        CHK_GL(glDeleteShader(sh));
-#   endif
 
     RImplementation.Resources->_DeleteDS(this);
 }
 
 SCS::~SCS()
 {
-#    if defined(USE_DX11)
-    _RELEASE(sh);
-    // Release shader bytecode
-    _RELEASE(bytecode);
+    // nvrhiShader is automatically cleaned up by NVRHI refcounting
 
     // Release extracted reflection data
     if (reflection)
@@ -183,14 +118,6 @@ SCS::~SCS()
         xr_delete(reflection);
         reflection = nullptr;
     }
-#    elif defined(USE_OGL)
-    if (GLAD_GL_ARB_separate_shader_objects)
-        CHK_GL(glDeleteProgram(sh));
-    else
-        CHK_GL(glDeleteShader(sh));
-#   else
-#       error No graphics API selected or enabled!
-#   endif
 
     RImplementation.Resources->_DeleteCS(this);
 }

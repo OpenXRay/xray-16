@@ -49,33 +49,21 @@ CTexture* dxUIShader::GetBaseTexture() const
     const SPass& pass = *hShader->E[0]->passes[0];
     if (!pass.T)
     {
-        Msg("! [GetBaseTexture] pass.T is NULL");
         return nullptr;
     }
 
     const STextureList& textures = *pass.T;
     if (textures.empty())
     {
-        Msg("! [GetBaseTexture] pass.T is empty");
         return nullptr;
-    }
-
-    Msg("  [GetBaseTexture] pass.T has %zu textures", textures.size());
-    for (size_t i = 0; i < textures.size(); i++)
-    {
-        const auto& [slot, textureName] = textures[i];
-        Msg("    Texture[%zu]: slot=%u, name='%s'", i, slot,
-            textureName.c_str() ? textureName.c_str() : "NULL");
     }
 
     const char* baseTextureName = nullptr;
 
-#ifdef USE_DX11
     // Find s_base texture by querying pixel shader reflection
     SPS* ps = pass.ps._get();
     if (ps && ps->reflection)
     {
-        Msg("  [GetBaseTexture] Searching for '%s' in reflection", baseTexture.c_str());
         const auto& inputTextures = ps->reflection->rtBindings.inputTextures;
         for (const auto& tex : inputTextures)
         {
@@ -83,29 +71,20 @@ CTexture* dxUIShader::GetBaseTexture() const
             {
                 // Found s_base, now find the texture with matching slot in pass.T
                 u32 expectedSlot = tex.slot + CTexture::rstPixel;
-                Msg("  [GetBaseTexture] Found '%s' in reflection at slot %u, expectedSlot (with offset) = %u",
-                    baseTexture.c_str(), tex.slot, expectedSlot);
 
                 for (const auto& [slot, textureName] : textures)
                 {
                     if (slot == expectedSlot)
                     {
-                        Msg("  [GetBaseTexture] ✓ MATCH found at expectedSlot %u", expectedSlot);
                         baseTextureName = textureName.c_str();
                         break;
                     }
                 }
-                if (!baseTextureName)
-                    Msg("! [GetBaseTexture] No texture found at expectedSlot %u", expectedSlot);
+
                 break;
             }
         }
     }
-    else
-    {
-        Msg("! [GetBaseTexture] No pixel shader reflection available");
-    }
-#endif
 
     // Fallback: use first texture if s_base not found
     if (!baseTextureName || !baseTextureName[0])

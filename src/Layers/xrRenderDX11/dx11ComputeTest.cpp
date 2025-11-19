@@ -261,7 +261,8 @@ bool ComputeTest::RunComputeShader(u32 iteration_count)
     context->End(s_timestamp_start);
 
     // Bind resources
-    context->CSSetShader(s_compute_shader->sh, nullptr, 0);
+    // TODO: Port to NVRHI compute dispatch
+    // context->CSSetShader(s_compute_shader->sh, nullptr, 0);
     context->CSSetConstantBuffers(0, 1, &s_params_cb);
     context->CSSetShaderResources(0, 1, &s_input_srv);
 

@@ -16,6 +16,16 @@ ShaderLoader::ShaderLoader(xray::render::SlangCompiler* slangCompiler)
 
 ShaderLoader::~ShaderLoader()
 {
+    // Clean up reflection cache
+    for (auto& [key, reflection] : m_reflectionCache)
+    {
+        if (reflection)
+        {
+            xr_delete(reflection);
+        }
+    }
+    m_reflectionCache.clear();
+
     const auto& stats = m_cache.GetStats();
     Msg("* [ShaderLoader] Destroyed (Cache - Hits: %u, Misses: %u, Saves: %u)",
         stats.hits, stats.misses, stats.saves);
@@ -23,8 +33,43 @@ ShaderLoader::~ShaderLoader()
 
 IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
 {
+    // Remove ( and everything after it (shader variant params)
+    // e.g., "deffer_model_bump(TESS_PN,)" -> "deffer_model_bump"
+    string_path shName;
+    {
+        pcstr pchr = strchr(name, '(');
+        ptrdiff_t size = pchr ? pchr - name : xr_strlen(name);
+        strncpy(shName, name, size);
+        shName[size] = 0;
+    }
+
+    // Only remove skinning suffix (_0, _1, _2, _3, _4) for vertex shaders
+    // Skinning only affects vertex processing, not pixel shaders
+    // This avoids incorrectly stripping suffixes from shaders like "bloom_luminance_1"
+    bool isVertexShader = (xr_strcmp(extension, ".vs") == 0);
+    if (isVertexShader)
+    {
+        size_t len = xr_strlen(shName);
+        if (len > 2 && shName[len-2] == '_' && shName[len-1] >= '0' && shName[len-1] <= '4')
+        {
+            // Check if this looks like a skinning suffix by checking if the base name exists
+            string_path testName;
+            xr_strcpy(testName, shName);
+            testName[len-2] = 0;  // Remove the "_X" suffix
+
+            string_path testFilename;
+            strconcat(sizeof(testFilename), testFilename, "r5" DELIMITER, testName, extension);
+
+            // Only strip if the base file exists
+            if (FS.exist("$game_shaders$", testFilename))
+            {
+                xr_strcpy(shName, testName);  // Use the base name
+            }
+        }
+    }
+
     string_path filename;
-    strconcat(sizeof(filename), filename, "r5" DELIMITER, name, extension);
+    strconcat(sizeof(filename), filename, "r5" DELIMITER, shName, extension);
 
     IReader* R = FS.r_open("$game_shaders$", filename);
     if (!R)
@@ -93,81 +138,11 @@ bool ShaderLoader::CompileShader(
     return true;
 }
 
-nvrhi::ShaderHandle ShaderLoader::LoadVertexShader(
-    const char* name,
-    const char* entryPoint,
-    xr_vector<u8>* outBytecode)
-{
-    xr_vector<u8> bytecode;
-    if (!CompileShader(name, ".vs", entryPoint, xray::render::SlangCompiler::Stage::Vertex, bytecode))
-        return nullptr;
-
-    // Create NVRHI shader descriptor
-    nvrhi::ShaderDesc desc;
-    desc.shaderType = nvrhi::ShaderType::Vertex;
-    desc.debugName = name;
-
-    // Create NVRHI shader from bytecode
-    nvrhi::ShaderHandle shader = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
-        desc,
-        bytecode.data(),
-        bytecode.size()
-    );
-
-    if (!shader)
-    {
-        Msg("! [ShaderLoader] Failed to create NVRHI vertex shader: %s", name);
-        return nullptr;
-    }
-
-    // Store bytecode if caller requested it (for reflection)
-    if (outBytecode)
-        *outBytecode = std::move(bytecode);
-
-    Msg("  ✓ Loaded vertex shader: %s (%zu bytes)", name, bytecode.size());
-    return shader;
-}
-
-nvrhi::ShaderHandle ShaderLoader::LoadPixelShader(
-    const char* name,
-    const char* entryPoint,
-    xr_vector<u8>* outBytecode)
-{
-    xr_vector<u8> bytecode;
-    if (!CompileShader(name, ".ps", entryPoint, xray::render::SlangCompiler::Stage::Pixel, bytecode))
-        return nullptr;
-
-    // Create NVRHI shader descriptor
-    nvrhi::ShaderDesc desc;
-    desc.shaderType = nvrhi::ShaderType::Pixel;
-    desc.debugName = name;
-
-    // Create NVRHI shader from bytecode
-    nvrhi::ShaderHandle shader = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
-        desc,
-        bytecode.data(),
-        bytecode.size()
-    );
-
-    if (!shader)
-    {
-        Msg("! [ShaderLoader] Failed to create NVRHI pixel shader: %s", name);
-        return nullptr;
-    }
-
-    // Store bytecode if caller requested it (for reflection)
-    if (outBytecode)
-        *outBytecode = std::move(bytecode);
-
-    Msg("  ✓ Loaded pixel shader: %s (%zu bytes)", name, bytecode.size());
-    return shader;
-}
-
 // ═══════════════════════════════════════════════════
-//  NEW: SHADER LOADING WITH SLANG REFLECTION
+//  CONSOLIDATED SHADER LOADING WITH REFLECTION
 // ═══════════════════════════════════════════════════
 
-ShaderLoader::ShaderResult ShaderLoader::LoadVertexShaderWithReflection(
+ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     const char* name,
     const char* entryPoint)
 {
@@ -278,7 +253,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShaderWithReflection(
     return result;
 }
 
-ShaderLoader::ShaderResult ShaderLoader::LoadPixelShaderWithReflection(
+ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     const char* name,
     const char* entryPoint)
 {
@@ -387,6 +362,157 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShaderWithReflection(
 
     Msg("  ✓ Loaded pixel shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
     return result;
+}
+
+// ══════════════════════════════════════════════════════════
+//  COMPILE SHADER WITH DEFINES (FOR MATERIAL SHADERS)
+// ══════════════════════════════════════════════════════════
+
+bool ShaderLoader::CompileShaderWithDefines(
+    const char* shaderName,
+    const char* extension,
+    const char* entryPoint,
+    xray::render::SlangCompiler::Stage stage,
+    const xr_vector<xray::render::SlangCompiler::Define>& defines,
+    xr_vector<u8>& outBytecode)
+{
+    VERIFY(shaderName);
+    VERIFY(extension);
+    VERIFY(entryPoint);
+
+    // Read shader source
+    IReader* shaderFile = OpenShaderFile(shaderName, extension);
+    if (!shaderFile)
+    {
+        Msg("! [ShaderLoader] Failed to open shader file: %s%s", shaderName, extension);
+        return false;
+    }
+
+    // Extract source code
+    xr_string sourceCode;
+    sourceCode.assign((const char*)shaderFile->pointer(), shaderFile->length());
+    shaderFile->close();
+
+    xr_string definesStr;
+    for (const auto& define : defines)
+    {
+        definesStr.append(define.name);
+        definesStr.append("=");
+        if (define.value)
+            definesStr.append(define.value);
+        definesStr.append(";");
+    }
+
+    u32 cacheKey = ShaderCache::ComputeHash(
+        sourceCode.c_str(),
+        sourceCode.length(),
+        definesStr.c_str()
+    );
+
+    // Try to load from cache
+    ExtractedReflection cachedReflection;
+    bool cacheHit = m_cache.TryLoad(
+        shaderName,
+        extension,
+        cacheKey,
+        outBytecode,
+        &cachedReflection
+    );
+
+    if (cacheHit && !cachedReflection.IsEmpty())
+    {
+        // Cache hit! Store reflection and return
+        xr_string cacheKeyStr = xr_string(shaderName) + extension;
+
+        // Clean up old reflection if exists
+        auto it = m_reflectionCache.find(cacheKeyStr);
+        if (it != m_reflectionCache.end())
+        {
+            xr_delete(it->second);
+        }
+
+        // Store new reflection (transfer ownership to cache)
+        auto* reflection = xr_new<ExtractedReflection>();
+        *reflection = std::move(cachedReflection);
+        m_reflectionCache[cacheKeyStr] = reflection;
+
+        Msg("  [ShaderLoader] Cache HIT: %s%s (with defines)", shaderName, extension);
+        return true;
+    }
+
+    // Cache miss - compile with Slang
+    Msg("  [ShaderLoader] Cache MISS: %s%s - compiling with Slang...", shaderName, extension);
+
+    // Build full shader path for include resolution
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath,
+        GEnv.Render->getShaderPath(),
+        shaderName,
+        extension);
+
+    // Compile with Slang (with defines!)
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(),
+        entryPoint,
+        stage,
+        xray::render::SlangCompiler::Target::DXBC,
+        fullPath,
+        defines.data(),
+        defines.size()
+    );
+
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Slang compilation failed: %s%s", shaderName, extension);
+        if (!compileResult.errorMessage.empty())
+        {
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        }
+        return false;
+    }
+
+    // Extract reflection
+    bool isVertexShader = (strcmp(extension, ".vs") == 0);
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection,
+        isVertexShader
+    );
+
+    // Cache reflection for later retrieval
+    xr_string cacheKeyStr = xr_string(shaderName) + extension;
+    auto* reflection = xr_new<ExtractedReflection>();
+    *reflection = std::move(extractedReflection);
+    m_reflectionCache[cacheKeyStr] = reflection;
+
+    // Save to disk cache
+    m_cache.Save(shaderName, extension, cacheKey, compileResult.bytecode, reflection);
+
+    // Return bytecode
+    outBytecode = std::move(compileResult.bytecode);
+
+    Msg("  [ShaderLoader] Compilation SUCCESS: %s%s (%zu bytes)",
+        shaderName, extension, outBytecode.size());
+
+    return true;
+}
+
+// ══════════════════════════════════════════════════════════
+//  GET CACHED REFLECTION DATA
+// ══════════════════════════════════════════════════════════
+
+ExtractedReflection* ShaderLoader::GetCachedReflection(
+    const char* shaderName,
+    const char* extension)
+{
+    xr_string key = xr_string(shaderName) + extension;
+    auto it = m_reflectionCache.find(key);
+
+    if (it != m_reflectionCache.end())
+    {
+        return it->second;
+    }
+
+    return nullptr;
 }
 
 } // namespace xray::render::framegraph

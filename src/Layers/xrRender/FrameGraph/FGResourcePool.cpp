@@ -31,10 +31,7 @@ resources::TextureHandle FGResourcePool::AllocateTexture(const resources::Textur
         if (pooled.IsValid()) {
             m_stats.texturesAliased++;
             m_stats.memorySaved += desc.CalculateMemorySize();
-            Msg("~ [FGResourcePool] AllocateTexture: REUSED from pool (%ux%u)", desc.width, desc.height);
             return pooled;
-        } else {
-            Msg("~ [FGResourcePool] AllocateTexture: No compatible texture in pool (size=%u) for %ux%u", (u32)m_texturePool.size(), desc.width, desc.height);
         }
     }
 
@@ -45,7 +42,6 @@ resources::TextureHandle FGResourcePool::AllocateTexture(const resources::Textur
     m_stats.texturesActive++;
     m_stats.memoryAllocated += desc.CalculateMemorySize();
 
-    Msg("~ [FGResourcePool] AllocateTexture: Created NEW texture (%ux%u)", desc.width, desc.height);
     return handle;
 }
 

@@ -38,145 +38,81 @@ typedef resptr_core<SInputSignature, resptr_base<SInputSignature>> ref_input_sig
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SVS : public xr_resource_named
 {
-#if defined(USE_DX11)
-    ID3DVertexShader* sh;
-    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
-    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+    nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
+    framegraph::ExtractedReflection* reflection = nullptr;  // Shader reflection metadata
+    R_constant_table constants;  // Legacy X-Ray constant table (to be removed in future)
 
-    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
-    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
-#elif defined(USE_OGL)
-    GLuint sh;
-#else
-#   error No graphics API selected or enabled!
-#endif
-    R_constant_table constants;
-#if defined(USE_DX11)
-    ref_input_sign signature;
-#endif
-    SVS();
+    SVS() = default;
     ~SVS();
 
-#if defined(USE_DX11)
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Vertex; }
-#endif
 };
 typedef resptr_core<SVS, resptr_base<SVS>> ref_vs;
 
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPS : public xr_resource_named
 {
-#if defined(USE_DX11)
-    ID3DPixelShader* sh;
-    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
-    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+    nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
+    framegraph::ExtractedReflection* reflection = nullptr;  // Shader reflection metadata
+    R_constant_table constants;  // Legacy X-Ray constant table (to be removed in future)
 
-    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
-    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
-#elif defined(USE_OGL)
-    GLuint sh;
-#else
-#   error No graphics API selected or enabled!
-#endif
-    R_constant_table constants;
+    SPS() = default;
     ~SPS();
 
-#if defined(USE_DX11)
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Pixel; }
-#endif
 };
 typedef resptr_core<SPS, resptr_base<SPS>> ref_ps;
 
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SGS : public xr_resource_named
 {
-#if defined(USE_DX11)
-    ID3DGeometryShader* sh;
-    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
-    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+    nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
+    framegraph::ExtractedReflection* reflection = nullptr;  // Shader reflection metadata
+    R_constant_table constants;  // Legacy X-Ray constant table (to be removed in future)
 
-    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
-    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
-#elif defined(USE_OGL)
-    GLuint sh;
-#else
-#   error No graphics API selected or enabled!
-#endif
-    R_constant_table constants;
+    SGS() = default;
     ~SGS();
 
-#if defined(USE_DX11)
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Geometry; }
-#endif
 };
 typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
 
 struct ECORE_API SHS : public xr_resource_named
 {
-#if defined(USE_DX11)
-	ID3D11HullShader* sh;
-    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
-    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+    nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
+    framegraph::ExtractedReflection* reflection = nullptr;  // Shader reflection metadata
+    R_constant_table constants;  // Legacy X-Ray constant table (to be removed in future)
 
-    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
-    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
-#elif defined(USE_OGL)
-    GLuint sh;
-#else
-#   error No graphics API selected or enabled!
-#endif
-    R_constant_table constants;
+    SHS() = default;
     ~SHS();
 
-#if defined(USE_DX11)
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Hull; }
-#endif
 };
 typedef resptr_core<SHS, resptr_base<SHS>> ref_hs;
 
 struct ECORE_API SDS : public xr_resource_named
 {
-#if defined(USE_DX11)
-    ID3D11DomainShader* sh;
-    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
-    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+    nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
+    framegraph::ExtractedReflection* reflection = nullptr;  // Shader reflection metadata
+    R_constant_table constants;  // Legacy X-Ray constant table (to be removed in future)
 
-    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
-    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
-#elif defined(USE_OGL)
-    GLuint sh;
-#else
-#   error No graphics API selected or enabled!
-#endif
-    R_constant_table constants;
+    SDS() = default;
     ~SDS();
 
-#if defined(USE_DX11)
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Domain; }
-#endif
 };
 typedef resptr_core<SDS, resptr_base<SDS>> ref_ds;
 
 struct ECORE_API SCS : public xr_resource_named
 {
-#if defined(USE_DX11)
-    ID3D11ComputeShader* sh;
-    ID3DBlob* bytecode = nullptr;  // Compiled shader bytecode for NVRHI/FrameGraph
-    nvrhi::ShaderHandle nvrhiShader;  // Native NVRHI shader (Phase A: dual storage)
+    nvrhi::ShaderHandle nvrhiShader;  // NVRHI shader handle
+    framegraph::ExtractedReflection* reflection = nullptr;  // Shader reflection metadata
+    R_constant_table constants;  // Legacy X-Ray constant table (to be removed in future)
 
-    // Reflection data (extracted from Slang during compilation OR deserialized from cache)
-    framegraph::ExtractedReflection* reflection = nullptr;  // Owned by this shader
-#elif defined(USE_OGL)
-    GLuint sh;
-#else
-#   error No graphics API selected or enabled!
-#endif
-    R_constant_table constants;
+    SCS() = default;
     ~SCS();
 
-#if defined(USE_DX11)
     static nvrhi::ShaderType GetShaderType() { return nvrhi::ShaderType::Compute; }
-#endif
 };
 
 struct ECORE_API resptrcode_cs : public resptr_base<SCS>

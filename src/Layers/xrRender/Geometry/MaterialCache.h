@@ -297,6 +297,9 @@ public:
     const Stats& GetStats() const { return m_stats; }
     void ResetStats() { m_stats.numCacheHits = 0; m_stats.numCacheMisses = 0; }
 
+    // Get VCB pool (for FGConstantSystem)
+    framegraph::VolatileConstantBufferPool* GetVCBPool() const { return m_vcbPool; }
+
 private:
     ng::RenderDevice* m_device;
     resources::FGResourceManager* m_resourceManager;  // NEW: Direct access to resource management
@@ -348,12 +351,10 @@ public:
         MaterialPSO::ShaderStage stage,
         nvrhi::ShaderType nvrhiStage);
 
-    // Get or create cached binding set for material (with per-object VCB)
+    // Get or create cached binding set for material
     // Cached per MaterialPSO for reuse across draws - only creates once!
-    nvrhi::BindingSetHandle GetOrCreateBindingSet(
-        MaterialPSO* matPSO,  // Non-const to allow caching
-        nvrhi::IBuffer* perObjectVCB,
-        SPass* pass);  // For extracting X-Ray's SRVs
+    // VCBs are queried directly from the pool
+    nvrhi::BindingSetHandle GetOrCreateBindingSet(MaterialPSO* matPSO);
 
     // Shader handle cache (shared across all materials to avoid recreating identical shaders)
     // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages

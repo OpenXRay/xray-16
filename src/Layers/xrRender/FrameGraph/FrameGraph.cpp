@@ -1043,20 +1043,7 @@ void FrameGraph::AllocateResources() {
                     resource.nvrhiTexture = texManager->GetNVRHITexture(rmHandle);
                     resource.isAllocated = (resource.nvrhiTexture != nullptr);
                     totalMemoryAllocated += resource.memorySize;
-
-                    Msg("~ [FrameGraph] Allocated texture '%s' via ResourceManager%s: %ux%ux%u, %.2f MB",
-                        resource.desc.debugName.c_str(),
-                        !skipAliasing ? " (transient)" : "",
-                        resource.desc.width,
-                        resource.desc.height,
-                        resource.desc.depth,
-                        resource.memorySize / (1024.0f * 1024.0f));
-
-                    // Early continue - we're done
                     continue;
-                } else {
-                    Msg("! [FrameGraph] Failed to allocate texture '%s' via ResourceManager, falling back to NVRHI",
-                        resource.desc.debugName.c_str());
                 }
             }
 
@@ -1110,18 +1097,6 @@ void FrameGraph::AllocateResources() {
             if (resource.nvrhiTexture) {
                 resource.isAllocated = true;
                 totalMemoryAllocated += resource.memorySize;
-
-                Msg("~ [FrameGraph] Allocated texture '%s'%s%s: %ux%ux%u, %.2f MB",
-                    resource.desc.debugName.c_str(),
-                    m_resourcePool ? " via pool" : "",
-                    (m_resourcePool && !skipAliasing) ? " (transient)" : "",
-                    resource.desc.width,
-                    resource.desc.height,
-                    resource.desc.depth,
-                    resource.memorySize / (1024.0f * 1024.0f));
-            } else {
-                Msg("! [FrameGraph] Failed to create NVRHI texture '%s'",
-                    resource.desc.debugName.c_str());
             }
         }
     }

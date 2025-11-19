@@ -242,6 +242,16 @@ public:
     {
         return LL_GetBoneInstance(bone_id).mRenderTransform;
     } // rendering only
+
+    // Get all bone render transforms as contiguous array (for FGConstantSystem.SetArray)
+    // Returns pointer to first bone's mRenderTransform, caller can iterate: transforms[i]
+    ICF const Fmatrix* LL_GetBoneTransforms() const
+    {
+        VERIFY(bone_instances);
+        VERIFY(LL_BoneCount() > 0);
+        return &bone_instances[0].mRenderTransform;
+    }
+
     Fobb& LL_GetBox(u16 bone_id) override
     {
         VERIFY(bone_id < LL_BoneCount());

@@ -77,37 +77,22 @@ public:
 
     /// <summary>
     /// Load and compile vertex shader from res/gamedata/shaders/r5/
+    /// Always returns shader with reflection data
     /// </summary>
     /// <param name="name">Shader name without extension (e.g., "gbuffer")</param>
     /// <param name="entryPoint">Entry point function name (default: "main")</param>
-    /// <param name="outBytecode">Optional: output bytecode for reflection (DEPRECATED - use ShaderResult)</param>
-    nvrhi::ShaderHandle LoadVertexShader(
-        const char* name,
-        const char* entryPoint = "main",
-        xr_vector<u8>* outBytecode = nullptr
-    );
-
-    /// <summary>
-    /// Load and compile vertex shader with Slang reflection
-    /// </summary>
-    ShaderResult LoadVertexShaderWithReflection(
+    ShaderResult LoadVertexShader(
         const char* name,
         const char* entryPoint = "main"
     );
 
     /// <summary>
     /// Load and compile pixel shader from res/gamedata/shaders/r5/
+    /// Always returns shader with reflection data
     /// </summary>
-    nvrhi::ShaderHandle LoadPixelShader(
-        const char* name,
-        const char* entryPoint = "main",
-        xr_vector<u8>* outBytecode = nullptr
-    );
-
-    /// <summary>
-    /// Load and compile pixel shader with Slang reflection
-    /// </summary>
-    ShaderResult LoadPixelShaderWithReflection(
+    /// <param name="name">Shader name without extension (e.g., "gbuffer")</param>
+    /// <param name="entryPoint">Entry point function name (default: "main")</param>
+    ShaderResult LoadPixelShader(
         const char* name,
         const char* entryPoint = "main"
     );
@@ -121,6 +106,26 @@ public:
     /// Get the underlying SlangCompiler (for direct access)
     /// </summary>
     xray::render::SlangCompiler* GetSlangCompiler() const { return m_slangCompiler; }
+
+    /// <summary>
+    /// Compile shader with preprocessor defines (for material shaders)
+    /// </summary>
+    bool CompileShaderWithDefines(
+        const char* shaderName,
+        const char* extension,
+        const char* entryPoint,
+        xray::render::SlangCompiler::Stage stage,
+        const xr_vector<xray::render::SlangCompiler::Define>& defines,
+        xr_vector<u8>& outBytecode
+    );
+
+    /// <summary>
+    /// Get cached reflection data for a shader
+    /// </summary>
+    ExtractedReflection* GetCachedReflection(
+        const char* shaderName,
+        const char* extension
+    );
 
 private:
     /// <summary>
@@ -143,6 +148,9 @@ private:
 private:
     xray::render::SlangCompiler* m_slangCompiler;
     ShaderCache m_cache;
+
+    // Cache for extracted reflection data (keyed by shader name + extension)
+    xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
 };
 
 } // namespace xray::render::framegraph

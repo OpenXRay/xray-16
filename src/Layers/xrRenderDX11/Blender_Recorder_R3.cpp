@@ -38,7 +38,6 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
     VERIFY(ResourceName);
     if (!texture || !texture[0])
     {
-        Msg("~ [r_dx11Texture] Skipping empty texture for resource '%s'", ResourceName);
         return;
     }
 
@@ -65,11 +64,9 @@ void CBlender_Compile::r_dx11Texture(LPCSTR ResourceName, LPCSTR texture, bool r
 
     if (stage == u32(-1))
     {
-        Msg("! [r_dx11Texture] Texture resource '%s' not found in pixel shader reflection", ResourceName);
         return;
     }
 
-    Msg("  [r_dx11Texture] Binding texture '%s' at resource '%s' (slot=%u)", TexName, ResourceName, stage);
     passTextures.emplace_back(stage, shared_str(TexName));
 }
 
@@ -161,8 +158,8 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     // Create shaders
     SPS* ps = RImplementation.Resources->_CreatePS(_ps);
     u32 flags = 0;
-    if (ps->constants.dx9compatibility)
-        flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+    //if (ps->constants.dx9compatibility)
+        //flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
     SVS* vs = RImplementation.Resources->_CreateVS(_vs, flags);
     SGS* gs = RImplementation.Resources->_CreateGS(_gs);
     dest.ps = ps;
@@ -173,9 +170,9 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
 #endif
-    ctable.merge(&ps->constants);
-    ctable.merge(&vs->constants);
-    ctable.merge(&gs->constants);
+    //ctable.merge(&ps->constants);
+    //ctable.merge(&vs->constants);
+    //ctable.merge(&gs->constants);
 
     // Last Stage - disable
     if (0 == xr_stricmp(_ps, "null"))
@@ -194,15 +191,17 @@ void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LP
     dest.hs = RImplementation.Resources->_CreateHS(hs);
     dest.ds = RImplementation.Resources->_CreateDS(ds);
 
-    ctable.merge(&dest.hs->constants);
-    ctable.merge(&dest.ds->constants);
+    // NOTE: Disabled old constant table merge - now using FGConstantSystem
+    //ctable.merge(&dest.hs->constants);
+    //ctable.merge(&dest.ds->constants);
 }
 
 void CBlender_Compile::r_ComputePass(LPCSTR cs)
 {
     dest.cs = RImplementation.Resources->_CreateCS(cs);
 
-    ctable.merge(&dest.cs->constants);
+    // NOTE: Disabled old constant table merge - now using FGConstantSystem
+    //ctable.merge(&dest.cs->constants);
 }
 #endif
 } // namespace xray::render::RENDER_NAMESPACE

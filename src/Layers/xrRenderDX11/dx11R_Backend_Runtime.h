@@ -600,14 +600,12 @@ IC void CBackend::ApplyVertexLayout()
 
 ICF void CBackend::set_VS(ref_vs& _vs)
 {
-    m_pInputSignature = _vs->signature->signature;
-    set_VS(_vs->sh, _vs->cName.c_str());
+    // No-op in FrameGraph mode - vertex shaders are set via NVRHI pipeline
 }
 
 ICF void CBackend::set_VS(SVS* _vs)
 {
-    m_pInputSignature = _vs->signature->signature;
-    set_VS(_vs->sh, _vs->cName.c_str());
+    // No-op in FrameGraph mode - vertex shaders are set via NVRHI pipeline
 }
 
 IC bool CBackend::CBuffersNeedUpdate(

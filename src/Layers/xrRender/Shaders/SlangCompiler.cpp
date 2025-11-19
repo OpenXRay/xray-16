@@ -110,7 +110,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     }
 
     // Configure compiler options to preserve bindings and prevent reordering
-    slang::CompilerOptionEntry compilerOptions[2];
+    slang::CompilerOptionEntry compilerOptions[3];
 
     // Disable name mangling to preserve original resource names
     compilerOptions[0].name = slang::CompilerOptionName::NoMangle;
@@ -122,8 +122,16 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
     compilerOptions[1].value.kind = slang::CompilerOptionValueKind::Int;
     compilerOptions[1].value.intValue0 = 1;
 
+    compilerOptions[2].name = slang::CompilerOptionName::DebugInformation;
+    compilerOptions[2].value.kind = slang::CompilerOptionValueKind::Int;
+#ifdef DEBUG
+    compilerOptions[2].value.intValue0 = SLANG_DEBUG_INFO_LEVEL_MAXIMAL;
+#else
+    compilerOptions[2].value.intValue0 = SLANG_DEBUG_INFO_LEVEL_NONE;
+#endif
+
     sessionDesc.compilerOptionEntries = compilerOptions;
-    sessionDesc.compilerOptionEntryCount = 2;
+    sessionDesc.compilerOptionEntryCount = 3;
 
     // Use VFS adapter for file system operations (includes from VFS)
     sessionDesc.fileSystem = m_vfsAdapter.get();

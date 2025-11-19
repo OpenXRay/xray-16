@@ -105,12 +105,12 @@ void CDetailManager::hw_Load_Shaders()
     interaction_compute_shader.create("detail_interaction");
     wind_compute_shader.create("detail_wind_fbm");
 
-    if (interaction_compute_shader && interaction_compute_shader->sh)
+    if (interaction_compute_shader && interaction_compute_shader->nvrhiShader)
         Msg("* [DetailManager] Loaded interaction compute shader: OK");
     else
         Msg("! [DetailManager] Failed to load interaction compute shader!");
 
-    if (wind_compute_shader && wind_compute_shader->sh)
+    if (wind_compute_shader && wind_compute_shader->nvrhiShader)
         Msg("* [DetailManager] Loaded wind compute shader: OK");
     else
         Msg("! [DetailManager] Failed to load wind compute shader!");
@@ -118,7 +118,7 @@ void CDetailManager::hw_Load_Shaders()
     // Phase 3: Load interaction update shader (for deferred A-Life updates)
     interaction_update_cs.create("detail_interaction_apply");
 
-    if (interaction_update_cs && interaction_update_cs->sh)
+    if (interaction_update_cs && interaction_update_cs->nvrhiShader)
         Msg("* [DetailManager] Loaded interaction update shader: OK");
     else
         Msg("! [DetailManager] Failed to load interaction update shader!");
@@ -564,7 +564,8 @@ void CDetailManager::DispatchGPUCulling(CBackend& cmd_list)
 
     context->CSSetUnorderedAccessViews(0, 35, uavs, nullptr);
 
-    context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
+    // TODO: Port to NVRHI compute dispatch
+    // context->CSSetShader(cull_compute_shader->sh, nullptr, 0);
 
     u32 num_groups = (slot_count + 255) / 256;
     context->Dispatch(num_groups, 1, 1);
@@ -1508,8 +1509,8 @@ void CDetailManager::RenderInteractions(CBackend& cmd_list)
 
     auto context = HW.get_context(cmd_list.context_id);
 
-    // Set compute shader
-    context->CSSetShader(interaction_compute_shader->sh, nullptr, 0);
+    // TODO: Port to NVRHI compute dispatch
+    // context->CSSetShader(interaction_compute_shader->sh, nullptr, 0);
 
     // Update constant buffer
     struct InteractionParams
@@ -1586,8 +1587,8 @@ void CDetailManager::UpdateWind(CBackend& cmd_list)
 
     auto context = HW.get_context(cmd_list.context_id);
 
-    // Set compute shader
-    context->CSSetShader(wind_compute_shader->sh, nullptr, 0);
+    // TODO: Port to NVRHI compute dispatch
+    // context->CSSetShader(wind_compute_shader->sh, nullptr, 0);
 
     // Update constant buffer
     WindParams params;
@@ -2556,7 +2557,7 @@ void CDetailManager::ApplyInteractionUpdateGPU(
     float radius,
     float strength)
 {
-    if (!interaction_update_cs || !interaction_update_cs->sh) {
+    if (!interaction_update_cs || !interaction_update_cs->nvrhiShader) {
         return;  // Shader not loaded
     }
 
@@ -2588,8 +2589,9 @@ void CDetailManager::ApplyInteractionUpdateGPU(
     context->Unmap(interaction_update_cb, 0);
 
     // 3. Bind resources
-    ID3D11ComputeShader* cs = interaction_update_cs->sh;
-    context->CSSetShader(cs, nullptr, 0);
+    // TODO: Port to NVRHI compute dispatch
+    // ID3D11ComputeShader* cs = interaction_update_cs->sh;
+    // context->CSSetShader(cs, nullptr, 0);
     context->CSSetConstantBuffers(0, 1, &interaction_update_cb);
     context->CSSetUnorderedAccessViews(0, 1, &interaction_uav, nullptr);
 

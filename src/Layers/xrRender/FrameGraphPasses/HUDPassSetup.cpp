@@ -266,8 +266,8 @@ framegraph::DefaultOutputLayout setupHUDPass(
                         if (vcbBuffer) {
                             ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
 
-                            // Get or create binding sets
-                            data.materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
+                            // Get or create binding sets (queries VCB pool directly)
+                            data.materialCache->GetOrCreateBindingSet(matPSO);
 
                             // Bind both VS and PS binding sets
                             ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());

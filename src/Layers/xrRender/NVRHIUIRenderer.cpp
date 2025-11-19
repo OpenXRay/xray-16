@@ -156,9 +156,8 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
     //   - VS: Constant buffers for vertex shader
     //   - PS: Constant buffers + Textures + Samplers for pixel shader
 
-    // Use m_constantBuffer as the per-object CB for UI rendering
-    // (UI shaders may not need per-object CB, but we pass it anyway for consistency)
-    m_matCache->GetOrCreateBindingSet(pso, m_constantBuffer, pso->pass);
+    // GetOrCreateBindingSet queries VCB pool directly (no parameters needed)
+    m_matCache->GetOrCreateBindingSet(pso);
 
     // Verify binding sets were created
     if (!pso->vsBindingSet || !pso->psBindingSet) {

@@ -29,8 +29,11 @@ using namespace framegraph;
 //
 class FGConstantSystem {
 public:
-    // Initialize with material PSO (contains ShaderConstantLayout)
-    explicit FGConstantSystem(const MaterialPSO* pso);
+    // Initialize with material PSO and VCB pool for per-instance CB management
+    explicit FGConstantSystem(
+        const MaterialPSO* pso,
+        framegraph::VolatileConstantBufferPool* vcbPool = nullptr
+    );
 
     // ═══════════════════════════════════════════════════
     //  TYPE-SAFE CONSTANT SETTERS
@@ -98,22 +101,28 @@ public:
 
 private:
     const MaterialPSO* m_pso;
+    framegraph::VolatileConstantBufferPool* m_vcbPool;
 
     // ═══════════════════════════════════════════════════
-    //  VOLATILE CONSTANT STATE (VCB-BASED)
+    //  VOLATILE CONSTANT STATE (VCB-BASED - PER-CB STAGING)
     // ═══════════════════════════════════════════════════
 
-    // Dirty tracking for volatile constants (bitfield - max 64 per tier)
-    u64 m_dirtyEngine;
-    u64 m_dirtyPass;
-    u64 m_dirtyMaterial;
-    u64 m_dirtyInstance;
+    // Per-CB staging buffers (one staging buffer per CB at each frequency)
+    // This enables:
+    // - Uploading only dirty CBs (not entire frequency tier)
+    // - Different sizes per CB (SkeletonBones: 3072 bytes vs PerInstanceTransforms: 160 bytes)
+    // - Reflection-driven routing (no hardcoded CB names)
+    struct StagingBuffer {
+        alignas(16) u8 data[4096];  // Max CB size (covers SkeletonBones: 3072 bytes)
+        bool dirty = false;
+        u32 size = 0;                // Actual CB size from reflection
+    };
 
-    // Staging buffers for volatile constants (stack-allocated, aligned for GPU)
-    alignas(16) u8 m_engineConstants[512];   // Engine-frequency volatile
-    alignas(16) u8 m_passConstants[512];     // Pass-frequency volatile
-    alignas(16) u8 m_materialConstants[256]; // Material-frequency volatile
-    alignas(16) u8 m_instanceConstants[256]; // Instance-frequency volatile
+    // Per-frequency, per-CB staging buffers (cbIndex → staging)
+    xr_map<u16, StagingBuffer> m_engineStaging;
+    xr_map<u16, StagingBuffer> m_passStaging;
+    xr_map<u16, StagingBuffer> m_materialStaging;
+    xr_map<u16, StagingBuffer> m_instanceStaging;
 
     // ═══════════════════════════════════════════════════
     //  STATIC CONSTANT STATE (PERSISTENT CB-BASED)
@@ -129,13 +138,18 @@ private:
     bool m_staticInitialized;
 
     // ═══════════════════════════════════════════════════
-    //  HELPER METHODS
+    //  HELPER METHODS (REFLECTION-DRIVEN ROUTING)
     // ═══════════════════════════════════════════════════
 
-    // Volatile constant helpers
+    // Volatile constant helpers (per-CB staging)
     void WriteConstant(const ShaderConstant* constant, const void* data, u32 size);
-    u8* GetStagingBuffer(UpdateFrequency freq);
-    void SetDirtyBit(UpdateFrequency freq, u32 constantIndex);
+
+    // Get staging buffer for specific CB at given frequency
+    // Returns pointer to staging data for writing constants
+    u8* GetStagingBuffer(UpdateFrequency freq, u16 cbIndex);
+
+    // Mark CB as dirty (needs upload on next commit)
+    void SetDirtyBit(UpdateFrequency freq, u16 cbIndex);
 
     // Static constant helpers
     void WriteStaticConstant(const ShaderConstant* constant, const void* data, u32 size);

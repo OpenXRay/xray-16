@@ -361,18 +361,26 @@ private:
 #   error No graphics API selected or enabled!
 #endif
 
-    ICF void set_PS(ref_ps& _ps) { set_PS(_ps->sh, _ps->cName.c_str()); }
+    ICF void set_PS(ref_ps& _ps) {
+        // No-op in FrameGraph mode - shaders are set via NVRHI pipeline
+    }
 
-    ICF void set_GS(ref_gs& _gs) { set_GS(_gs->sh, _gs->cName.c_str()); }
+    ICF void set_GS(ref_gs& _gs) {
+        // No-op in FrameGraph mode - shaders are set via NVRHI pipeline
+    }
 
 #   if defined(USE_DX11)
     ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = nullptr);
 
     ICF void set_HS(ID3D11HullShader* _hs, LPCSTR _n = nullptr);
-    ICF void set_HS(ref_hs& _hs) { set_HS(_hs->sh, _hs->cName.c_str()); }
+    ICF void set_HS(ref_hs& _hs) {
+        // No-op in FrameGraph mode - shaders are set via NVRHI pipeline
+    }
 
     ICF void set_DS(ID3D11DomainShader* _ds, LPCSTR _n = nullptr);
-    ICF void set_DS(ref_ds& _ds) { set_DS(_ds->sh, _ds->cName.c_str()); }
+    ICF void set_DS(ref_ds& _ds) {
+        // No-op in FrameGraph mode - shaders are set via NVRHI pipeline
+    }
 #   elif defined(USE_OGL)
     ICF void set_GS(GLuint _gs, LPCSTR _n = 0);
 
@@ -397,7 +405,9 @@ private:
 public:
 #if defined(USE_DX11)
     ICF void set_CS(ID3D11ComputeShader* _cs, LPCSTR _n = nullptr);
-    ICF void set_CS(ref_cs& _cs) { set_CS(_cs->sh, _cs->cName.c_str()); }
+    ICF void set_CS(ref_cs& _cs) {
+        // No-op in FrameGraph mode - shaders are set via NVRHI pipeline
+    }
     ICF void Compute(u32 ThreadGroupCountX, u32 ThreadGroupCountY, u32 ThreadGroupCountZ);
 #endif
 

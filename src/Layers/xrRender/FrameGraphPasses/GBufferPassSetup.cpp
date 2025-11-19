@@ -14,6 +14,12 @@
 #include "Layers/xrRender/FSkinned.h"  // For CSkeletonX (skinned mesh parent pointer)
 #include "Layers/xrRender/FTreeVisual.h"  // For FTreeVisual_quant constant
 #include "Layers/xrRender/SkeletonX.h"  // For CSkeletonX_ST, CSkeletonX_PM
+#include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"  // NEW: Reflection-driven constant binding
+
+namespace xray::render::RENDER_NAMESPACE
+{
+    extern float r__dtex_range;
+}
 
 namespace xray::render::passes {
 
@@ -118,7 +124,6 @@ framegraph::DefaultOutputLayout setupGBufferPass(
             auto* positionRT = fg.GetPhysicalTexture(data.position);
 
             if (!depthRT || !albedoRT || !normalRT || !positionRT) {
-                Msg("! [GBufferPass] Failed to get physical textures");
                 return;
             }
 
@@ -194,6 +199,11 @@ void renderGBufferGeometry(
     // ═══════════════════════════════════════════════════════
     // Global CBs must be updated OUTSIDE render passes!
     // Pre-scan batches to find unique CB buffers and update them.
+    //
+    // NOTE: We still use legacy CB name checks here because:
+    // 1. Global CBs (static_globals, dynamic_transforms) are PERSISTENT (not VCBs)
+    // 2. FGConstantSystem handles VCBs only (per-instance data)
+    // 3. These global CBs will be migrated to FGConstantSystem.SetStatic() in Phase 7
 
     xr_set<nvrhi::IBuffer*> updatedGlobalBuffers;
 
@@ -205,7 +215,7 @@ void renderGBufferGeometry(
                 for (const auto& cbInfo : matPSO->constantBuffers) {
                     if (cbInfo.nvrhiBuffer) {
                         if (updatedGlobalBuffers.find(cbInfo.nvrhiBuffer.Get()) == updatedGlobalBuffers.end()) {
-                            // Fill buffer based on CB name
+                            // TEMPORARY: Fill buffer based on CB name (will migrate to FGConstantSystem.SetStatic() later)
                             if (cbInfo.name == "static_globals") {
                                 u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
                                 ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
@@ -274,7 +284,6 @@ void renderGBufferGeometry(
     u32 numTriangles = 0;
 
     ng::PipelineState* currentPipeline = nullptr;
-    float lastDetailScale = -1.0f;  // Track to avoid redundant CB updates
 
     for (const auto& batch : batches) {
         // Get per-material PSO from MaterialCache
@@ -302,17 +311,19 @@ void renderGBufferGeometry(
         // ═══════════════════════════════════════════════════════
         //  UPDATE PER-MATERIAL DYNAMIC CONSTANTS
         // ═══════════════════════════════════════════════════════
+        // TEMPORARY: Still using legacy CB name check for dynamic_transforms
+        // Will migrate to FGConstantSystem.CommitMaterial() in Phase 7
 
-        if (matPSO && matPSO->detail_scale != lastDetailScale) {
+        if (matPSO) {
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB);
 
             // Override dt_params with per-material detail scale
-            extern float r__dtex_range;
+
             dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
                                    1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
 
-            // Update DynamicTransforms CB
+            // TEMPORARY: Update DynamicTransforms CB (will use FGConstantSystem.Set("dt_params") later)
             for (const auto& cbInfo : matPSO->constantBuffers) {
                 if (cbInfo.name == "dynamic_transforms") {
                     u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
@@ -320,12 +331,10 @@ void renderGBufferGeometry(
                     break;
                 }
             }
-
-            lastDetailScale = matPSO->detail_scale;
         }
 
         // ═══════════════════════════════════════════════════════
-        //  UPDATE PER-OBJECT CONSTANTS (VCB)
+        //  UPDATE PER-INSTANCE CONSTANTS (REFLECTION-DRIVEN)
         // ═══════════════════════════════════════════════════════
 
         if (matPSO) {
@@ -341,27 +350,21 @@ void renderGBufferGeometry(
                 isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
             }
 
-            // For skeletons, we need the SkeletonBones VCB that contains sbones_array
-            // For other meshes, use the first VCB (legacy behavior)
-            if (isSkeleton) {
-                for (const auto& vcbReq : matPSO->vcbRequirements) {
-                    if (vcbReq.name == "SkeletonBones") {
-                        vcbHandle = vcbReq.vcbHandle;
-                        vcbSize = vcbReq.size;
-                        break;
-                    }
-                }
-            } else {
-                // Non-skeleton: use first VCB (terrain, trees, etc.)
-                if (!matPSO->vcbRequirements.empty()) {
-                    vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                    vcbSize = matPSO->vcbRequirements[0].size;
+            for (const auto& vcbReq : matPSO->vcbRequirements) {
+                if (vcbReq.name == "$Globals") { // yohji TODO: turn vcbReq into map for o(1) lookup
+                    vcbHandle = vcbReq.vcbHandle;
+                    vcbSize = vcbReq.size;
+                    break;
                 }
             }
 
+            // If no $Globals found, use first VCB as fallback
+            if ((!vcbHandle.IsValid() || !vcbSize) && !matPSO->vcbRequirements.empty()) {
+                vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                vcbSize = matPSO->vcbRequirements[0].size;
+            }
+
             if (!vcbHandle.IsValid()) {
-                Msg("! [GBufferPass] Material '%s' has no valid VCB (vcbRequirements.size=%u, isSkeleton=%d)",
-                    matPSO->debugName.c_str(), matPSO->vcbRequirements.size(), isSkeleton);
                 continue;  // Skip if no VCB
             }
 
@@ -377,20 +380,20 @@ void renderGBufferGeometry(
             // Helper to copy bone matrix (3 float4s, column-major)
             auto CopyBoneMatrix = [](u8* dest, const Fmatrix& M) {
                 float* destF = reinterpret_cast<float*>(dest);
-                destF[0]  = M._11; destF[1]  = M._21; destF[2]  = M._31; destF[3]  = M._41;
-                destF[4]  = M._12; destF[5]  = M._22; destF[6]  = M._32; destF[7]  = M._42;
-                destF[8]  = M._13; destF[9]  = M._23; destF[10] = M._33; destF[11] = M._43;
-            };
+                destF[0] = M._11; destF[1] = M._21; destF[2] = M._31; destF[3] = M._41;
+                destF[4] = M._12; destF[5] = M._22; destF[6] = M._32; destF[7] = M._42;
+                destF[8] = M._13; destF[9] = M._23; destF[10] = M._33; destF[11] = M._43;
+                };
 
             // Helper for tree/regular meshes (transposed 3x4)
             auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
                 Fmatrix transposed;
                 transposed.transpose(src);
                 float* destF = reinterpret_cast<float*>(dest);
-                destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
-                destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
-                destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
-            };
+                destF[0] = transposed._11; destF[1] = transposed._12; destF[2] = transposed._13; destF[3] = transposed._14;
+                destF[4] = transposed._21; destF[5] = transposed._22; destF[6] = transposed._23; destF[7] = transposed._24;
+                destF[8] = transposed._31; destF[9] = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
+                };
 
             // isSkeleton and visualType already determined above (lines 336-342)
             if (isSkeleton) {
@@ -415,7 +418,8 @@ void renderGBufferGeometry(
                 if (visualType == MT_SKELETON_GEOMDEF_ST) {
                     auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_ST*>(batch.visual);
                     Parent = skeletonMesh->GetParent();
-                } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+                }
+                else if (visualType == MT_SKELETON_GEOMDEF_PM) {
                     auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_PM*>(batch.visual);
                     Parent = skeletonMesh->GetParent();
                 }
@@ -451,7 +455,8 @@ void renderGBufferGeometry(
                         array[(id + 2) * 4 + 3] = M._43;
                     }
                 }
-            } else {
+            }
+            else {
                 // ─────────────────────────────────────────────────
                 //  TREE/REGULAR VCB: m_xform, m_xform_v, consts
                 // ─────────────────────────────────────────────────
@@ -481,15 +486,12 @@ void renderGBufferGeometry(
 
             if (vcbBuffer) {
                 // Write VCB within render pass
-                Msg("Write to VCB for %s", matPSO->debugName.c_str());
                 ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
 
                 // Get or create cached binding sets
-                materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
+                materialCache->GetOrCreateBindingSet(matPSO);
 
                 // Bind BOTH per-stage binding sets
-                Msg("  [GBufferPass] Binding VS set=%p, PS set=%p for %s",
-                    matPSO->vsBindingSet.Get(), matPSO->psBindingSet.Get(), matPSO->debugName.c_str());
                 ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
                 ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
             }
@@ -512,16 +514,12 @@ void renderGBufferGeometry(
         // Draw
         ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
 
-        Msg("Successful draw for %s", matPSO->debugName.c_str());
-
         numDraws++;
         numTriangles += batch.indexCount / 3;
     }
 
     // End render pass
     ctx->EndRenderPass();
-
-    Msg("* [GBufferPass] Rendered %u draws, %u triangles", numDraws, numTriangles);
 }
 
 } // namespace xray::render::passes
