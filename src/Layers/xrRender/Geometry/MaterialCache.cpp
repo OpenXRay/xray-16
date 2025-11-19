@@ -1079,13 +1079,11 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         );
 
         if (!latestHandle.IsValid()) {
-            Msg("! [GetOrCreateBindingSet] VS: VCB '%s' has invalid handle!", vcbReq.name.c_str());
             continue;
         }
 
         nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(latestHandle);
         if (!vcbBuffer) {
-            Msg("! [GetOrCreateBindingSet] VS: VCB '%s' failed to get native buffer!", vcbReq.name.c_str());
             continue;
         }
 
@@ -1097,9 +1095,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         if (cbInfo.stage == MaterialPSO::ShaderStage::Vertex) {
             if (cbInfo.nvrhiBuffer) {
                 vsBindings.push_back({cbInfo.slot, cbInfo.nvrhiBuffer.Get(), cbInfo.name, false});
-            } else {
-                Msg("! [GetOrCreateBindingSet] VS: CB '%s' at slot b%u has NULL buffer! for %s",
-                    cbInfo.name.c_str(), cbInfo.slot, matPSO->debugName.c_str());
             }
         }
     }
@@ -1114,10 +1109,6 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     for (const auto& binding : vsBindings) {
         vsBindingDesc.bindings.push_back(
             nvrhi::BindingSetItem::ConstantBuffer(binding.slot, binding.buffer));
-
-        const char* type = binding.isVCB ? "VCB" : "global CB";
-        Msg("  [GetOrCreateBindingSet] VS: Added %s '%s' at slot b%u (buffer=%p) for %s",
-            type, binding.name.c_str(), binding.slot, binding.buffer, matPSO->debugName.c_str());
     }
 
     // ═══════════════════════════════════════════════════════
@@ -1184,21 +1175,11 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     nvrhi::BindingSetDesc psBindingDesc;
     for (const auto& binding : psBindings) {
         psBindingDesc.bindings.push_back(binding.item);
-
-        const char* typeStr = (binding.type == PSBinding::CB) ? "CB" :
-                             (binding.type == PSBinding::Texture) ? "texture" : "sampler";
-        Msg("  [GetOrCreateBindingSet] PS: Added %s '%s' at slot %c%u for %s",
-            typeStr, binding.name.c_str(),
-            (binding.type == PSBinding::CB) ? 'b' : (binding.type == PSBinding::Texture) ? 't' : 's',
-            binding.slot, matPSO->debugName.c_str());
     }
 
     // ═══════════════════════════════════════════════════════
     //  CREATE VS BINDING SET
     // ═══════════════════════════════════════════════════════
-
-    Msg("  [GetOrCreateBindingSet] Creating VS binding set with %u bindings for '%s'",
-        vsBindingDesc.bindings.size(), matPSO->debugName.c_str());
 
     matPSO->vsBindingSet = m_device->CreateBindingSet(
         vsBindingDesc,
@@ -1212,20 +1193,13 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     //  CREATE PS BINDING SET
     // ═══════════════════════════════════════════════════════
 
-    Msg("  [GetOrCreateBindingSet] Creating PS binding set with %u bindings for '%s'",
-        psBindingDesc.bindings.size(), matPSO->debugName.c_str());
-
     matPSO->psBindingSet = m_device->CreateBindingSet(
         psBindingDesc,
         matPSO->psBindingLayout);
 
     if (!matPSO->psBindingSet) {
-        Msg("! [GetOrCreateBindingSet] FAILED to create PS binding set for '%s'", matPSO->debugName.c_str());
         return nullptr;
     }
-
-    Msg("  [GetOrCreateBindingSet] ✓ Successfully created VS (%p) and PS (%p) binding sets for '%s'",
-        matPSO->vsBindingSet.Get(), matPSO->psBindingSet.Get(), matPSO->debugName.c_str());
 
     // ═══════════════════════════════════════════════════════
     //  DONE - Binding sets cached in MaterialPSO

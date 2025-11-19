@@ -27,8 +27,6 @@ ng::BufferHandle VolatileConstantBufferPool::GetOrCreateVCB(const CBLayout& layo
     if (it != m_vcbs.end())
     {
         // Layout already exists - return existing VCB
-        Msg("  [VCBPool] Reusing existing VCB for '%s' (slot b%u, %u bytes)",
-            layout.name.c_str(), layout.slot, layout.size);
         return it->second;
     }
 
