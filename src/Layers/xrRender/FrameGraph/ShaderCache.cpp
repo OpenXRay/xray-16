@@ -5,8 +5,17 @@
 namespace xray::render::framegraph {
 
 ShaderCache::ShaderCache()
+#ifdef DEBUG
+    : m_cacheEnabled(false)
+#else
+    : m_cacheEnabled(true)
+#endif
 {
-    Msg("* [ShaderCache] Initialized (cache dir: shaders_cache_fg/)");
+#ifdef DEBUG
+    Msg("* [ShaderCache] Initialized (cache dir: shaders_cache_fg/) - CACHING DISABLED (DEBUG MODE)");
+#else
+    Msg("* [ShaderCache] Initialized (cache dir: shaders_cache_fg/) - CACHING ENABLED");
+#endif
 }
 
 ShaderCache::~ShaderCache()
@@ -36,6 +45,12 @@ bool ShaderCache::TryLoad(
     xr_vector<u8>& outBytecode,
     ExtractedReflection* outReflection)
 {
+    if (!m_cacheEnabled)
+    {
+        m_stats.misses++;
+        return false;
+    }
+
     string_path cachePath;
     GetCachePath(shaderName, extension, sourceHash, cachePath);
 

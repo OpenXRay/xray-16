@@ -36,6 +36,9 @@ public:
         ExtractedReflection* outReflection = nullptr
     );
 
+    void SetCacheEnabled(bool enabled) { m_cacheEnabled = enabled; }
+    bool IsCacheEnabled() const { return m_cacheEnabled; }
+
     void Save(
         const char* shaderName,
         const char* extension,
@@ -76,6 +79,7 @@ private:
 
     static constexpr u32 CACHE_VERSION = 4;
     Stats m_stats;
+    bool m_cacheEnabled;
 };
 
 }
