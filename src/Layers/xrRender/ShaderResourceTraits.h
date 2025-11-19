@@ -661,7 +661,6 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
         sh_map.emplace(sh->set_name(name), sh);
         if (0 == xr_stricmp(name, "null"))
         {
-            sh->sh = 0;
             return sh;
         }
 

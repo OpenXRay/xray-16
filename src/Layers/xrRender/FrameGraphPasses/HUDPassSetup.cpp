@@ -240,7 +240,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
                         if (vcbBuffer) {
                             ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
 
-                            data.materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
+                            data.materialCache->GetOrCreateBindingSet(matPSO);
 
                             ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
                             ctx->SetBindingSet(1, matPSO->psBindingSet.Get());

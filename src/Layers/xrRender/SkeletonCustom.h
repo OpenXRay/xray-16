@@ -237,6 +237,14 @@ public:
     {
         return LL_GetBoneInstance(bone_id).mRenderTransform;
     } // rendering only
+
+    ICF const Fmatrix* LL_GetBoneTransforms() const
+    {
+        VERIFY(bone_instances);
+        VERIFY(LL_BoneCount() > 0);
+        return &bone_instances[0].mRenderTransform;
+    }
+
     Fobb& LL_GetBox(u16 bone_id) override
     {
         VERIFY(bone_id < LL_BoneCount());

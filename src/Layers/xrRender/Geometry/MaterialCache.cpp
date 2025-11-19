@@ -52,6 +52,7 @@ nvrhi::Format ConvertDxgiFormatToNvrhi(DXGI_FORMAT dxgiFormat) {
 #ifdef DEBUG
 static void LogConstantLayout(const framegraph::ShaderConstantLayout& layout, const char* shaderName) {
     using namespace framegraph;
+    return;
 
     Msg("═══════════════════════════════════════════════════");
     Msg("Shader Constant Layout: %s", shaderName);
@@ -146,12 +147,6 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         mergedCB.slot = (cbInfo.vsSlot != UINT32_MAX) ? cbInfo.vsSlot : cbInfo.psSlot;
 
         merged.constantBuffers.buffers.push_back(mergedCB);
-
-        Msg("  [MergeConstantLayouts] Merged CB: %s (vsSlot=%s, psSlot=%s, size=%u, mergedIdx=%u)",
-            cbInfo.name.c_str(),
-            (cbInfo.vsSlot != UINT32_MAX) ? make_string("b%u", cbInfo.vsSlot).c_str() : "none",
-            (cbInfo.psSlot != UINT32_MAX) ? make_string("b%u", cbInfo.psSlot).c_str() : "none",
-            cbInfo.size, cbInfo.mergedIndex);
     }
 
     xr_map<u16, u16> vsIndexToMerged;
@@ -227,9 +222,6 @@ framegraph::ShaderConstantLayout MergeConstantLayouts(
         merged.constants.push_back(mergedConstant);
     }
 
-    Msg("  [MergeConstantLayouts] Result: %u unique CBs, %u total constants",
-        merged.constantBuffers.buffers.size(), merged.constants.size());
-
     return merged;
 }
 
@@ -267,36 +259,27 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
              visual->textureName.c_str() && visual->textureName.size() > 0) {
 
-        Msg("* [MaterialCache::GetOrCreatePSO] Compiling shader on-demand: '%s' with texture '%s'",
-            visual->shaderName.c_str(), visual->textureName.c_str());
-
         visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
         shader = visual->shader._get();
 
         if (!shader) {
-            Msg("! [MaterialCache::GetOrCreatePSO] Failed to compile shader '%s' for visual type %u",
-                visual->shaderName.c_str(), visual->getType());
             return nullptr;
         }
     } else {
-        Msg("! [MaterialCache::GetOrCreatePSO] Visual has no shader or shader name (type %u)", visual->getType());
         return nullptr;
     }
 
     ShaderElement* elem = shader->E[0]._get();
     if (!elem) {
-        Msg("! [MaterialCache::GetOrCreatePSO] Shader has no element E[0] (visual type %u)", visual->getType());
         return nullptr;
     }
 
     if (elem->passes.empty()) {
-        Msg("! [MaterialCache::GetOrCreatePSO] Shader element E[0] has no passes (visual type %u)", visual->getType());
         return nullptr;
     }
 
     SPass* pass = elem->passes[0]._get();
     if (!pass) {
-        Msg("! [MaterialCache::GetOrCreatePSO] Shader element E[0] pass[0] is NULL (visual type %u)", visual->getType());
         return nullptr;
     }
 
@@ -318,7 +301,6 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 
     m_stats.numCacheMisses++;
 
-    Msg("* [MaterialCache::GetOrCreatePSO] Creating PSO for shader '%s' (cache miss)", shaderName);
 
     MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
     if (!pso) {
@@ -378,21 +360,13 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     if (pso->vertexShader && pso->vertexShader->reflection) {
         vsLayout = pso->vertexShader->reflection->constantLayout;
-        Msg("  [MaterialCache] VS constantLayout has %u CBs, %u constants",
-            vsLayout.constantBuffers.buffers.size(), vsLayout.constants.size());
     }
 
     if (pso->pixelShader && pso->pixelShader->reflection) {
         psLayout = pso->pixelShader->reflection->constantLayout;
-        Msg("  [MaterialCache] PS constantLayout has %u CBs, %u constants",
-            psLayout.constantBuffers.buffers.size(), psLayout.constants.size());
     }
 
     pso->constantLayout = MergeConstantLayouts(vsLayout, psLayout);
-
-    Msg("  [MaterialCache] Final PSO constantLayout: %u unique CBs, %u total constants",
-        pso->constantLayout.constantBuffers.buffers.size(),
-        pso->constantLayout.constants.size());
 
 #ifdef DEBUG
     const char* shaderName = pso->vertexShader ? pso->vertexShader->cName.c_str() : "Unknown";
@@ -537,9 +511,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
 
     matPSO->debugName = vs->cName;
 
-    Msg("  [MaterialCache] VS '%s' reflection pointer: %p", vs->cName.c_str(), vs->reflection);
     if (vs->reflection) {
-        Msg("  [MaterialCache] VS reflection has %u input elements", vs->reflection->vertexInputSignature.elements.size());
         matPSO->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(
             vs->reflection
         );
@@ -576,9 +548,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
             unique.vsSlot = cb.slot;
             unique.size = std::max(unique.size, cb.size);
             unique.usedInVS = true;
-
-            Msg("  [MaterialCache] VS CB: %s (slot=b%u, size=%u)",
-                cb.name.c_str(), cb.slot, cb.size);
         }
     }
 
@@ -590,21 +559,44 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
             unique.psSlot = cb.slot;
             unique.size = std::max(unique.size, cb.size);
             unique.usedInPS = true;
-
-            Msg("  [MaterialCache] PS CB: %s (slot=b%u, size=%u)",
-                cb.name.c_str(), cb.slot, cb.size);
         }
     }
 
     for (const auto& [cbName, cbReq] : uniqueCBs) {
-        bool isPerObjectCB = (cbReq.name == "$Globals" ||
-                              cbReq.name == "globalParams_0" ||
-                              cbReq.name == "SkeletonBones");
 
-        if (isPerObjectCB) {
-            Msg("  [MaterialCache] Skipping per-object CB '%s' (handled by VCB pool)",
-                cbReq.name.c_str());
+        bool isVolatileCB = false;
 
+        if (vs && vs->reflection) {
+            const auto& constantLayout = vs->reflection->constantLayout;
+            for (const auto& constant : constantLayout.constants) {
+                if (constant.cbIndex < constantLayout.constantBuffers.buffers.size()) {
+                    const auto& cbInfo = constantLayout.constantBuffers.buffers[constant.cbIndex];
+                    if (cbInfo.name == cbReq.name) {
+                        if (constant.persistence == framegraph::ConstantPersistence::Volatile) {
+                            isVolatileCB = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!isVolatileCB && ps && ps->reflection) {
+            const auto& constantLayout = ps->reflection->constantLayout;
+            for (const auto& constant : constantLayout.constants) {
+                if (constant.cbIndex < constantLayout.constantBuffers.buffers.size()) {
+                    const auto& cbInfo = constantLayout.constantBuffers.buffers[constant.cbIndex];
+                    if (cbInfo.name == cbReq.name) {
+                        if (constant.persistence == framegraph::ConstantPersistence::Volatile) {
+                            isVolatileCB = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isVolatileCB) {
             if (cbReq.usedInVS) {
                 framegraph::VolatileConstantBufferPool::CBLayout layout(
                     cbReq.name.c_str(),
@@ -649,9 +641,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
             vsInfo.stage = MaterialPSO::ShaderStage::Vertex;
             vsInfo.slot = cbReq.vsSlot;
             matPSO->constantBuffers.push_back(vsInfo);
-
-            Msg("  [MaterialCache] ✓ Shared CB (VS): %s at b%u (size=%u, buffer=0x%p)",
-                cbReq.name.c_str(), cbReq.vsSlot, cbReq.size, sharedBuffer.Get());
         }
 
         if (cbReq.usedInPS) {
@@ -662,9 +651,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
             psInfo.stage = MaterialPSO::ShaderStage::Pixel;
             psInfo.slot = cbReq.psSlot;
             matPSO->constantBuffers.push_back(psInfo);
-
-            Msg("  [MaterialCache] ✓ Shared CB (PS): %s at b%u (size=%u, buffer=0x%p)",
-                cbReq.name.c_str(), cbReq.psSlot, cbReq.size, sharedBuffer.Get());
         }
     }
 
@@ -695,7 +681,6 @@ void MaterialCache::ExtractSamplers(SPass* pass, MaterialPSO* matPSO)
 
         if (samplerInfo.nvrhiSampler) {
             matPSO->samplers.push_back(samplerInfo);
-            Msg("  [ExtractSamplers] Created '%s' at slot %u", samplerInfo.name.c_str(), samplerDecl.slot);
         } else {
             Msg("! [ExtractSamplers] Failed to create sampler '%s'", samplerInfo.name.c_str());
         }
@@ -730,21 +715,47 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
 
     const char* stageName = (stage == MaterialPSO::ShaderStage::Vertex) ? "VS" : "PS";
 
-    u32 cbCount = 0;
-    if (stage == MaterialPSO::ShaderStage::Vertex && !matPSO->vcbRequirements.empty()) {
+    struct CBBinding {
+        u32 slot;
+        bool isVCB;
+        shared_str name;
+        u32 size;
+    };
+    xr_vector<CBBinding> allCBs;
+
+    if (stage == MaterialPSO::ShaderStage::Vertex) {
         for (const auto& vcbReq : matPSO->vcbRequirements) {
-            layoutDesc.bindings.push_back(
-                nvrhi::BindingLayoutItem::VolatileConstantBuffer(vcbReq.slot));
-            cbCount++;
+            allCBs.push_back({vcbReq.slot, true, vcbReq.name, vcbReq.size});
         }
     }
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == stage) {
-            layoutDesc.bindings.push_back(
-                nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
-            cbCount++;
+            allCBs.push_back({cbInfo.slot, false, cbInfo.name, cbInfo.size});
         }
+    }
+
+    std::sort(allCBs.begin(), allCBs.end(), [](const CBBinding& a, const CBBinding& b) {
+        return a.slot < b.slot;
+    });
+
+    u32 cbCount = 0;
+    if (stage == MaterialPSO::ShaderStage::Vertex && !allCBs.empty()) {
+        Msg("  [CreateStageBindingLayout] Creating VS LAYOUT for '%s' with %u CBs (SORTED by slot):",
+            matPSO->debugName.c_str(), allCBs.size());
+    }
+    for (const auto& cb : allCBs) {
+        const char* cbType = cb.isVCB ? "VCB" : "Global CB";
+        if (stage == MaterialPSO::ShaderStage::Vertex)
+            Msg("    [Layout] Index %u: %s '%s' at slot b%u (size=%u)",
+                cbCount, cbType, cb.name.c_str(), cb.slot, cb.size);
+
+        if (cb.isVCB) {
+            layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::VolatileConstantBuffer(cb.slot));
+        } else {
+            layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::ConstantBuffer(cb.slot));
+        }
+        cbCount++;
     }
 
     u32 texCount = 0;
@@ -776,13 +787,9 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     return layout;
 }
 
-nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
-    MaterialPSO* matPSO,
-    nvrhi::IBuffer* perObjectVCB,
-    SPass* pass)
+nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO)
 {
     VERIFY(matPSO);
-    VERIFY(perObjectVCB);
     VERIFY(matPSO->vsBindingLayout);
     VERIFY(matPSO->psBindingLayout);
 
@@ -790,23 +797,39 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
         return matPSO->vsBindingSet;
     }
 
-    nvrhi::BindingSetDesc vsBindingDesc;
+    struct TempBinding {
+        u32 slot;
+        nvrhi::IBuffer* buffer;
+        shared_str name;
+        bool isVCB;
+    };
+    xr_vector<TempBinding> vsBindings;
 
-    if (!matPSO->vcbRequirements.empty()) {
-        const auto& vcbReq = matPSO->vcbRequirements[0];
-        vsBindingDesc.bindings.push_back(
-            nvrhi::BindingSetItem::ConstantBuffer(vcbReq.slot, perObjectVCB));
-        Msg("  [GetOrCreateBindingSet] VS: Added VCB '%s' at slot b%u (buffer=%p, size=%u) for %s",
-            vcbReq.name.c_str(), vcbReq.slot, perObjectVCB, vcbReq.size, matPSO->debugName.c_str());
+    for (const auto& vcbReq : matPSO->vcbRequirements) {
+        ng::BufferHandle latestHandle = m_vcbPool->GetOrCreateVCB(
+            framegraph::VolatileConstantBufferPool::CBLayout(
+                vcbReq.name.c_str(), vcbReq.slot, vcbReq.size
+            )
+        );
+
+        if (!latestHandle.IsValid()) {
+            Msg("! [GetOrCreateBindingSet] VS: VCB '%s' has invalid handle!", vcbReq.name.c_str());
+            continue;
+        }
+
+        nvrhi::IBuffer* vcbBuffer = m_device->GetNativeBuffer(latestHandle);
+        if (!vcbBuffer) {
+            Msg("! [GetOrCreateBindingSet] VS: VCB '%s' failed to get native buffer!", vcbReq.name.c_str());
+            continue;
+        }
+
+        vsBindings.push_back({vcbReq.slot, vcbBuffer, vcbReq.name, true});
     }
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == MaterialPSO::ShaderStage::Vertex) {
             if (cbInfo.nvrhiBuffer) {
-                vsBindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
-                Msg("  [GetOrCreateBindingSet] VS: Added global CB '%s' at slot b%u (size=%u) for %s",
-                    cbInfo.name.c_str(), cbInfo.slot, cbInfo.size, matPSO->debugName.c_str());
+                vsBindings.push_back({cbInfo.slot, cbInfo.nvrhiBuffer.Get(), cbInfo.name, false});
             } else {
                 Msg("! [GetOrCreateBindingSet] VS: CB '%s' at slot b%u has NULL buffer! for %s",
                     cbInfo.name.c_str(), cbInfo.slot, matPSO->debugName.c_str());
@@ -814,49 +837,83 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
         }
     }
 
-    nvrhi::BindingSetDesc psBindingDesc;
+    std::sort(vsBindings.begin(), vsBindings.end(), [](const TempBinding& a, const TempBinding& b) {
+        return a.slot < b.slot;
+    });
+
+    nvrhi::BindingSetDesc vsBindingDesc;
+    for (const auto& binding : vsBindings) {
+        vsBindingDesc.bindings.push_back(
+            nvrhi::BindingSetItem::ConstantBuffer(binding.slot, binding.buffer));
+
+        const char* type = binding.isVCB ? "VCB" : "global CB";
+        Msg("  [GetOrCreateBindingSet] VS: Added %s '%s' at slot b%u (buffer=%p) for %s",
+            type, binding.name.c_str(), binding.slot, binding.buffer, matPSO->debugName.c_str());
+    }
+
+    struct PSBinding {
+        u32 slot;
+        nvrhi::BindingSetItem item;
+        shared_str name;
+        enum Type { CB, Texture, Sampler } type;
+    };
+    xr_vector<PSBinding> psBindings;
 
     for (const auto& cbInfo : matPSO->constantBuffers) {
         if (cbInfo.stage == MaterialPSO::ShaderStage::Pixel) {
             if (cbInfo.nvrhiBuffer) {
-                psBindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()));
-                Msg("  [GetOrCreateBindingSet] PS: Added global CB '%s' at slot b%u for %s",
-                    cbInfo.name.c_str(), cbInfo.slot, matPSO->debugName.c_str());
+                psBindings.push_back({cbInfo.slot,
+                    nvrhi::BindingSetItem::ConstantBuffer(cbInfo.slot, cbInfo.nvrhiBuffer.Get()),
+                    cbInfo.name, PSBinding::CB});
             }
         }
     }
 
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
-    Msg("  [GetOrCreateBindingSet] Adding %u textures to PS binding set", matPSO->textures.size());
     for (const auto& texSlot : matPSO->textures) {
         nvrhi::ITexture* nativeTex = texManager->GetNVRHITexture(texSlot.handle);
 
         if (nativeTex) {
             const nvrhi::TextureDesc& texDesc = nativeTex->getDesc();
-            Msg("    [GetOrCreateBindingSet] Adding texture to slot t%u (valid texture, %ux%u)",
-                texSlot.slot, texDesc.width, texDesc.height);
-            psBindingDesc.bindings.push_back(
+            psBindings.push_back({texSlot.slot,
                 nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nativeTex,
-                    nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension));
+                    nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension),
+                "texture", PSBinding::Texture});
         } else {
-            Msg("!   [GetOrCreateBindingSet] Texture at slot t%u is NULL!", texSlot.slot);
-            psBindingDesc.bindings.push_back(
-                nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nullptr));
+            psBindings.push_back({texSlot.slot,
+                nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nullptr),
+                "texture_null", PSBinding::Texture});
         }
     }
 
     for (const auto& samplerInfo : matPSO->samplers) {
         if (samplerInfo.stage == MaterialPSO::ShaderStage::Pixel) {
             if (samplerInfo.nvrhiSampler) {
-                psBindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::Sampler(samplerInfo.slot, samplerInfo.nvrhiSampler));
+                psBindings.push_back({samplerInfo.slot,
+                    nvrhi::BindingSetItem::Sampler(samplerInfo.slot, samplerInfo.nvrhiSampler),
+                    samplerInfo.name, PSBinding::Sampler});
             } else {
-                psBindingDesc.bindings.push_back(
-                    nvrhi::BindingSetItem::Sampler(samplerInfo.slot, nullptr));
+                psBindings.push_back({samplerInfo.slot,
+                    nvrhi::BindingSetItem::Sampler(samplerInfo.slot, nullptr),
+                    "sampler_null", PSBinding::Sampler});
             }
         }
     }
+
+    nvrhi::BindingSetDesc psBindingDesc;
+    for (const auto& binding : psBindings) {
+        psBindingDesc.bindings.push_back(binding.item);
+
+        const char* typeStr = (binding.type == PSBinding::CB) ? "CB" :
+                             (binding.type == PSBinding::Texture) ? "texture" : "sampler";
+        Msg("  [GetOrCreateBindingSet] PS: Added %s '%s' at slot %c%u for %s",
+            typeStr, binding.name.c_str(),
+            (binding.type == PSBinding::CB) ? 'b' : (binding.type == PSBinding::Texture) ? 't' : 's',
+            binding.slot, matPSO->debugName.c_str());
+    }
+
+    Msg("  [GetOrCreateBindingSet] Creating VS binding set with %u bindings for '%s'",
+        vsBindingDesc.bindings.size(), matPSO->debugName.c_str());
 
     matPSO->vsBindingSet = m_device->CreateBindingSet(
         vsBindingDesc,
@@ -866,13 +923,20 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(
         return nullptr;
     }
 
+    Msg("  [GetOrCreateBindingSet] Creating PS binding set with %u bindings for '%s'",
+        psBindingDesc.bindings.size(), matPSO->debugName.c_str());
+
     matPSO->psBindingSet = m_device->CreateBindingSet(
         psBindingDesc,
         matPSO->psBindingLayout);
 
     if (!matPSO->psBindingSet) {
+        Msg("! [GetOrCreateBindingSet] FAILED to create PS binding set for '%s'", matPSO->debugName.c_str());
         return nullptr;
     }
+
+    Msg("  [GetOrCreateBindingSet] ✓ Successfully created VS (%p) and PS (%p) binding sets for '%s'",
+        matPSO->vsBindingSet.Get(), matPSO->psBindingSet.Get(), matPSO->debugName.c_str());
 
 
     return matPSO->vsBindingSet;
@@ -986,21 +1050,6 @@ bool MaterialCache::ValidateVertexLayoutCompatibility(dxRender_Visual* visual, M
     SDeclaration* decl = geom->dcl._get();
 
     if (!matPSO->vsInputSignature.elements.empty()) {
-        Msg("  [MaterialCache::Validate] Geometry provides %u vertex attributes:", decl->dx11_dcl_code.size());
-        for (size_t i = 0; i < decl->dx11_dcl_code.size(); ++i) {
-            const auto& d3dElem = decl->dx11_dcl_code[i];
-            if (d3dElem.SemanticName) {
-                Msg("    [%u] %s%d", i, d3dElem.SemanticName, d3dElem.SemanticIndex);
-            } else {
-                Msg("    [%u] (null semantic)", i);
-            }
-        }
-
-        Msg("  [MaterialCache::Validate] Shader expects %u vertex attributes:", matPSO->vsInputSignature.elements.size());
-        for (const auto& elem : matPSO->vsInputSignature.elements) {
-            Msg("    - %s%d (format %d)", elem.semanticName.c_str(), elem.semanticIndex, (int)elem.format);
-        }
-
         for (const auto& shaderElem : matPSO->vsInputSignature.elements) {
             bool found = false;
             for (const auto& d3dElem : decl->dx11_dcl_code) {
@@ -1358,21 +1407,13 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     if (pso->vertexShader && pso->vertexShader->reflection) {
         vsLayout = pso->vertexShader->reflection->constantLayout;
-        Msg("  [MaterialCache] VS constantLayout has %u CBs, %u constants",
-            vsLayout.constantBuffers.buffers.size(), vsLayout.constants.size());
     }
 
     if (pso->pixelShader && pso->pixelShader->reflection) {
         psLayout = pso->pixelShader->reflection->constantLayout;
-        Msg("  [MaterialCache] PS constantLayout has %u CBs, %u constants",
-            psLayout.constantBuffers.buffers.size(), psLayout.constants.size());
     }
 
     pso->constantLayout = MergeConstantLayouts(vsLayout, psLayout);
-
-    Msg("  [MaterialCache] Final PSO constantLayout: %u unique CBs, %u total constants",
-        pso->constantLayout.constantBuffers.buffers.size(),
-        pso->constantLayout.constants.size());
 
 #ifdef DEBUG
     const char* shaderName = pso->vertexShader ? pso->vertexShader->cName.c_str() : "Unknown";
@@ -1518,31 +1559,17 @@ nvrhi::ShaderHandle MaterialCache::GetOrCreateShaderVS(SVS* vs)
         return it->second;
     }
 
-    nvrhi::ShaderHandle vsHandle;
-
-    if (vs->nvrhiShader)
+    if (!vs->nvrhiShader)
     {
-        vsHandle = vs->nvrhiShader;
-    }
-    else if (vs->bytecode)
-    {
-        nvrhi::ShaderDesc desc(nvrhi::ShaderType::Vertex);
-        desc.debugName = vs->cName.c_str();
-        desc.entryName = "main";
-
-        vsHandle = m_device->GetNVRHIDevice()->createShader(
-            desc,
-            vs->bytecode->GetBufferPointer(),
-            vs->bytecode->GetBufferSize());
-    }
-    else
-    {
-        Msg("! [MaterialCache] ERROR: VS '%s' has no nvrhiShader and no bytecode", vs->cName.c_str());
+        Msg("! [MaterialCache] ERROR: VS '%s' has no nvrhiShader - shader not compiled upfront!", vs->cName.c_str());
+        R_ASSERT2(false, "All shaders must be compiled during material loading");
         return nullptr;
     }
 
+    nvrhi::ShaderHandle vsHandle = vs->nvrhiShader;
+
     if (!vsHandle) {
-        Msg("! [MaterialCache] ERROR: Failed to get/create VS '%s'", vs->cName.c_str());
+        Msg("! [MaterialCache] ERROR: Invalid nvrhiShader for VS '%s'", vs->cName.c_str());
         return nullptr;
     }
 
@@ -1564,31 +1591,17 @@ nvrhi::ShaderHandle MaterialCache::GetOrCreateShaderPS(SPS* ps)
         return it->second;
     }
 
-    nvrhi::ShaderHandle psHandle;
-
-    if (ps->nvrhiShader)
+    if (!ps->nvrhiShader)
     {
-        psHandle = ps->nvrhiShader;
-    }
-    else if (ps->bytecode)
-    {
-        nvrhi::ShaderDesc desc(nvrhi::ShaderType::Pixel);
-        desc.debugName = ps->cName.c_str();
-        desc.entryName = "main";
-
-        psHandle = m_device->GetNVRHIDevice()->createShader(
-            desc,
-            ps->bytecode->GetBufferPointer(),
-            ps->bytecode->GetBufferSize());
-    }
-    else
-    {
-        Msg("! [MaterialCache] ERROR: PS '%s' has no nvrhiShader and no bytecode", ps->cName.c_str());
+        Msg("! [MaterialCache] ERROR: PS '%s' has no nvrhiShader - shader not compiled upfront!", ps->cName.c_str());
+        R_ASSERT2(false, "All shaders must be compiled during material loading");
         return nullptr;
     }
 
+    nvrhi::ShaderHandle psHandle = ps->nvrhiShader;
+
     if (!psHandle) {
-        Msg("! [MaterialCache] ERROR: Failed to get/create PS '%s'", ps->cName.c_str());
+        Msg("! [MaterialCache] ERROR: Invalid nvrhiShader for PS '%s'", ps->cName.c_str());
         return nullptr;
     }
 

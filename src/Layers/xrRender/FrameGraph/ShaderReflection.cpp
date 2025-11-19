@@ -273,19 +273,19 @@ UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const 
         return UpdateFrequency::Pass;
     }
 
+    if (strstr(name, "m_World") != nullptr ||
+        strstr(name, "m_W") != nullptr ||
+        strstr(name, "m_xform") != nullptr ||
+        strstr(name, "bones") != nullptr ||
+        strstr(cbName, "$Globals") != nullptr ||
+        strstr(cbName, "SkeletonBones") != nullptr) {
+        return UpdateFrequency::Instance;
+    }
+
     if (strstr(name, "dt_params") != nullptr ||
         strstr(name, "material") != nullptr ||
         strstr(cbName, "dynamic_transforms") != nullptr) {
         return UpdateFrequency::Material;
-    }
-
-    if (strstr(name, "m_World") != nullptr ||
-        strstr(name, "m_WV") != nullptr ||
-        strstr(name, "m_WVP") != nullptr ||
-        strstr(name, "m_xform") != nullptr ||
-        strstr(name, "bones") != nullptr ||
-        strstr(cbName, "$Globals") != nullptr) {
-        return UpdateFrequency::Instance;
     }
 
     return UpdateFrequency::Instance;
@@ -293,13 +293,18 @@ UpdateFrequency ShaderReflector::InferConstantFrequency(const char* name, const 
 
 ConstantPersistence ShaderReflector::InferConstantPersistence(const char* cbName, UpdateFrequency frequency) {
 
-    if (strstr(cbName, "dynamic_transforms") != nullptr ||
-        strstr(cbName, "$Globals") != nullptr) {
-        return ConstantPersistence::Volatile;
+    if (strstr(cbName, "static_globals") != nullptr ||
+        strstr(cbName, "dynamic_transforms") != nullptr) {
+        return ConstantPersistence::Static;
     }
 
-    if (strstr(cbName, "static_globals") != nullptr) {
-        return ConstantPersistence::Static;
+    if (strstr(cbName, "$Globals") != nullptr ||
+        strstr(cbName, "SkeletonBones") != nullptr ||
+        strstr(cbName, "GlobalParams") != nullptr ||
+        strstr(cbName, "PerInstanceTransforms") != nullptr ||
+        strstr(cbName, "TreeData") != nullptr ||
+        strstr(cbName, "GrassWind") != nullptr) {
+        return ConstantPersistence::Volatile;
     }
 
     if (frequency == UpdateFrequency::Engine || frequency == UpdateFrequency::Pass) {

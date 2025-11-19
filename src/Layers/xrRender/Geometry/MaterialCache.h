@@ -236,6 +236,8 @@ public:
     const Stats& GetStats() const { return m_stats; }
     void ResetStats() { m_stats.numCacheHits = 0; m_stats.numCacheMisses = 0; }
 
+    framegraph::VolatileConstantBufferPool* GetVCBPool() const { return m_vcbPool; }
+
 private:
     ng::RenderDevice* m_device;
     resources::FGResourceManager* m_resourceManager;
@@ -275,10 +277,7 @@ public:
         MaterialPSO::ShaderStage stage,
         nvrhi::ShaderType nvrhiStage);
 
-    nvrhi::BindingSetHandle GetOrCreateBindingSet(
-        MaterialPSO* matPSO,
-        nvrhi::IBuffer* perObjectVCB,
-        SPass* pass);
+    nvrhi::BindingSetHandle GetOrCreateBindingSet(MaterialPSO* matPSO);
 
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 

@@ -260,7 +260,6 @@ bool ComputeTest_SIMD::RunComputeShader(u32 iteration_count)
     context->Begin(s_timestamp_disjoint);
     context->End(s_timestamp_start);
 
-    context->CSSetShader(s_compute_shader->sh, nullptr, 0);
     context->CSSetConstantBuffers(0, 1, &s_params_cb);
     context->CSSetShaderResources(0, 1, &s_input_srv);
 

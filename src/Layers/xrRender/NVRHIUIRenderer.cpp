@@ -132,7 +132,7 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
     if (!nativePipeline)
         return;
 
-    m_matCache->GetOrCreateBindingSet(pso, m_constantBuffer, pso->pass);
+    m_matCache->GetOrCreateBindingSet(pso);
 
     if (!pso->vsBindingSet || !pso->psBindingSet) {
         Msg("! [NVRHIUIRenderer] Failed to create binding sets for shader");

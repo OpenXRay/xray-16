@@ -10,7 +10,10 @@ using namespace framegraph;
 
 class FGConstantSystem {
 public:
-    explicit FGConstantSystem(const MaterialPSO* pso);
+    explicit FGConstantSystem(
+        const MaterialPSO* pso,
+        framegraph::VolatileConstantBufferPool* vcbPool = nullptr
+    );
 
     void Set(const char* name, float value);
     void Set(const char* name, const Fvector2& value);
@@ -47,16 +50,18 @@ public:
 
 private:
     const MaterialPSO* m_pso;
+    framegraph::VolatileConstantBufferPool* m_vcbPool;
 
-    u64 m_dirtyEngine;
-    u64 m_dirtyPass;
-    u64 m_dirtyMaterial;
-    u64 m_dirtyInstance;
+    struct StagingBuffer {
+        alignas(16) u8 data[4096];
+        bool dirty = false;
+        u32 size = 0;
+    };
 
-    alignas(16) u8 m_engineConstants[512];
-    alignas(16) u8 m_passConstants[512];
-    alignas(16) u8 m_materialConstants[256];
-    alignas(16) u8 m_instanceConstants[256];
+    xr_map<u16, StagingBuffer> m_engineStaging;
+    xr_map<u16, StagingBuffer> m_passStaging;
+    xr_map<u16, StagingBuffer> m_materialStaging;
+    xr_map<u16, StagingBuffer> m_instanceStaging;
 
     u64 m_dirtyStatic;
 
@@ -65,8 +70,10 @@ private:
     bool m_staticInitialized;
 
     void WriteConstant(const ShaderConstant* constant, const void* data, u32 size);
-    u8* GetStagingBuffer(UpdateFrequency freq);
-    void SetDirtyBit(UpdateFrequency freq, u32 constantIndex);
+
+    u8* GetStagingBuffer(UpdateFrequency freq, u16 cbIndex);
+
+    void SetDirtyBit(UpdateFrequency freq, u16 cbIndex);
 
     void WriteStaticConstant(const ShaderConstant* constant, const void* data, u32 size);
 

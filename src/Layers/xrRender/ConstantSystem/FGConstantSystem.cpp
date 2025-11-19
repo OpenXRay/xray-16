@@ -1,24 +1,19 @@
 #include "stdafx.h"
 #include "FGConstantSystem.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
+#include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 
 namespace xray::render::fgconstants {
 
-FGConstantSystem::FGConstantSystem(const MaterialPSO* pso)
+FGConstantSystem::FGConstantSystem(
+    const MaterialPSO* pso,
+    framegraph::VolatileConstantBufferPool* vcbPool)
     : m_pso(pso)
-    , m_dirtyEngine(0)
-    , m_dirtyPass(0)
-    , m_dirtyMaterial(0)
-    , m_dirtyInstance(0)
+    , m_vcbPool(vcbPool)
     , m_dirtyStatic(0)
     , m_staticInitialized(false)
 {
     VERIFY(pso != nullptr);
-
-    ZeroMemory(m_engineConstants, sizeof(m_engineConstants));
-    ZeroMemory(m_passConstants, sizeof(m_passConstants));
-    ZeroMemory(m_materialConstants, sizeof(m_materialConstants));
-    ZeroMemory(m_instanceConstants, sizeof(m_instanceConstants));
 
     ZeroMemory(m_staticConstants, sizeof(m_staticConstants));
 }
@@ -26,7 +21,7 @@ FGConstantSystem::FGConstantSystem(const MaterialPSO* pso)
 void FGConstantSystem::Set(const char* name, float value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem] Constant '%s' not found in shader", name);
+        Msg("! [FGConstantSystem::Set] Constant '%s' not found in shader '%s'", name, m_pso->debugName.c_str());
         return;
     }
 
@@ -36,6 +31,8 @@ void FGConstantSystem::Set(const char* name, float value) {
         return;
     }
 
+    Msg("~ [FGConstantSystem::Set] Setting '%s' (cb=%s, offset=%u)", name,
+        m_pso->constantLayout.constantBuffers.buffers[constant->cbIndex].name.c_str(), constant->offset);
     WriteConstant(constant, &value, sizeof(float));
 }
 
@@ -80,7 +77,7 @@ void FGConstantSystem::Set(const char* name, const Fvector4& value) {
 void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem] Constant '%s' not found in shader", name);
+        Msg("! [FGConstantSystem::Set] Matrix constant '%s' not found in shader '%s'", name, m_pso->debugName.c_str());
         return;
     }
 
@@ -90,7 +87,13 @@ void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
         return;
     }
 
-    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+    u16 cbIndex = constant->cbIndex;
+    const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
+    Msg("~ [FGConstantSystem::Set] Setting matrix '%s' (cb=%s[%u], offset=%u, type=%s)",
+        name, cbInfo.name.c_str(), cbIndex, constant->offset,
+        constant->IsMatrix3x4() ? "float3x4" : "float4x4");
+
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency, cbIndex);
 
     if (constant->IsMatrix3x4()) {
         WriteMatrix3x4(stagingBuffer + constant->offset, value);
@@ -101,12 +104,7 @@ void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
         return;
     }
 
-    switch (constant->frequency) {
-        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
-        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
-        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
-        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
-    }
+    SetDirtyBit(constant->frequency, cbIndex);
 }
 
 void FGConstantSystem::SetStatic(const char* name, float value) {
@@ -202,7 +200,8 @@ void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 cou
         count = constant->arrayCount;
     }
 
-    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+    u16 cbIndex = constant->cbIndex;
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency, cbIndex);
     u8* dest = stagingBuffer + constant->offset;
 
     if (constant->elementSize == 48) {
@@ -221,12 +220,7 @@ void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 cou
         return;
     }
 
-    switch (constant->frequency) {
-        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
-        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
-        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
-        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
-    }
+    SetDirtyBit(constant->frequency, cbIndex);
 }
 
 void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u32 count) {
@@ -269,89 +263,120 @@ void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u
 }
 
 void FGConstantSystem::CommitEngine(ng::RenderContext* ctx) {
-    const auto* engineCB = m_pso->constantLayout.constantBuffers.GetByName("static_globals");
-    if (!engineCB) {
-        return;
-    }
+    if (!m_vcbPool) return;
 
-    if (m_dirtyEngine == 0) {
-        return;
-    }
+    for (auto& [cbIndex, staging] : m_engineStaging) {
+        if (!staging.dirty) continue;
 
-    nvrhi::IBuffer* engineBuffer = nullptr;
-    for (const auto& vcbReq : m_pso->vcbRequirements) {
-        if (vcbReq.name == "static_globals") {
-            engineBuffer = ctx->GetDevice()->GetNativeBuffer(vcbReq.vcbHandle);
-            break;
+        const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
+        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+            framegraph::VolatileConstantBufferPool::CBLayout(
+                cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
+            )
+        );
+
+        if (!vcbHandle.IsValid()) continue;
+
+        nvrhi::IBuffer* nvrhiBuffer = ctx->GetDevice()->GetNativeBuffer(vcbHandle);
+        if (nvrhiBuffer) {
+            ctx->WriteBuffer(nvrhiBuffer, staging.data, staging.size);
+            staging.dirty = false;
         }
     }
-
-    if (!engineBuffer) {
-        Msg("! [FGConstantSystem] No VCB found for static_globals");
-        return;
-    }
-
-    ctx->WriteBuffer(engineBuffer, m_engineConstants, engineCB->size);
-
-    m_dirtyEngine = 0;
 }
 
 void FGConstantSystem::CommitPass(ng::RenderContext* ctx) {
-    m_dirtyPass = 0;
+    if (!m_vcbPool) return;
+
+    for (auto& [cbIndex, staging] : m_passStaging) {
+        if (!staging.dirty) continue;
+
+        const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
+        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+            framegraph::VolatileConstantBufferPool::CBLayout(
+                cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
+            )
+        );
+
+        if (!vcbHandle.IsValid()) continue;
+
+        nvrhi::IBuffer* nvrhiBuffer = ctx->GetDevice()->GetNativeBuffer(vcbHandle);
+        if (nvrhiBuffer) {
+            ctx->WriteBuffer(nvrhiBuffer, staging.data, staging.size);
+            staging.dirty = false;
+        }
+    }
 }
 
 void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
-    const auto* materialCB = m_pso->constantLayout.constantBuffers.GetByName("dynamic_transforms");
-    if (!materialCB) {
-        return;
-    }
+    if (!m_vcbPool) return;
 
-    if (m_dirtyMaterial == 0) {
-        return;
-    }
+    for (auto& [cbIndex, staging] : m_materialStaging) {
+        if (!staging.dirty) continue;
 
-    nvrhi::IBuffer* materialBuffer = nullptr;
-    for (const auto& vcbReq : m_pso->vcbRequirements) {
-        if (vcbReq.name == "dynamic_transforms") {
-            materialBuffer = ctx->GetDevice()->GetNativeBuffer(vcbReq.vcbHandle);
-            break;
+        const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
+        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+            framegraph::VolatileConstantBufferPool::CBLayout(
+                cbInfo.name.c_str(), cbInfo.slot, cbInfo.size
+            )
+        );
+
+        if (!vcbHandle.IsValid()) continue;
+
+        nvrhi::IBuffer* nvrhiBuffer = ctx->GetDevice()->GetNativeBuffer(vcbHandle);
+        if (nvrhiBuffer) {
+            ctx->WriteBuffer(nvrhiBuffer, staging.data, staging.size);
+            staging.dirty = false;
         }
     }
-
-    if (!materialBuffer) {
-        Msg("! [FGConstantSystem] No VCB found for dynamic_transforms");
-        return;
-    }
-
-    ctx->WriteBuffer(materialBuffer, m_materialConstants, materialCB->size);
-    m_dirtyMaterial = 0;
 }
 
 void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
-    const auto* instanceCB = m_pso->constantLayout.constantBuffers.GetByName("$Globals");
-    if (!instanceCB) {
+
+    if (!m_vcbPool) {
+        Msg("! [FGConstantSystem] No VCB pool provided - cannot commit instance constants");
         return;
     }
 
-    if (m_dirtyInstance == 0) {
-        return;
-    }
-
-    nvrhi::IBuffer* instanceBuffer = nullptr;
-    for (const auto& vcbReq : m_pso->vcbRequirements) {
-        if (vcbReq.name == "$Globals") {
-            instanceBuffer = ctx->GetDevice()->GetNativeBuffer(vcbReq.vcbHandle);
-            break;
+    for (auto& [cbIndex, staging] : m_instanceStaging) {
+        if (!staging.dirty) {
+            continue;
         }
-    }
 
-    if (!instanceBuffer) {
-        Msg("! [FGConstantSystem] No VCB found for $Globals");
-        return;
-    }
+        if (cbIndex >= m_pso->constantLayout.constantBuffers.buffers.size()) {
+            Msg("! [FGConstantSystem] Invalid cbIndex %u in instance staging", cbIndex);
+            continue;
+        }
 
-    ctx->WriteBuffer(instanceBuffer, m_instanceConstants, instanceCB->size);
-    m_dirtyInstance = 0;
+        const auto& cbInfo = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
+
+        ng::BufferHandle vcbHandle = m_vcbPool->GetOrCreateVCB(
+            framegraph::VolatileConstantBufferPool::CBLayout(
+                cbInfo.name.c_str(),
+                cbInfo.slot,
+                cbInfo.size
+            )
+        );
+
+        if (!vcbHandle.IsValid()) {
+            Msg("! [FGConstantSystem] Failed to get VCB for CB '%s' (slot=b%u, size=%u)",
+                cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
+            continue;
+        }
+
+        nvrhi::IBuffer* nvrhiBuffer = ctx->GetDevice()->GetNativeBuffer(vcbHandle);
+        if (!nvrhiBuffer) {
+            Msg("! [FGConstantSystem] Failed to get NVRHI buffer for CB '%s'", cbInfo.name.c_str());
+            continue;
+        }
+
+        ctx->WriteBuffer(nvrhiBuffer, staging.data, staging.size);
+
+        staging.dirty = false;
+
+        Msg("~ [FGConstantSystem] Uploaded Instance CB '%s' (slot=b%u, size=%u)",
+            cbInfo.name.c_str(), cbInfo.slot, staging.size);
+    }
 }
 
 void FGConstantSystem::CommitAll(ng::RenderContext* ctx) {
@@ -415,25 +440,50 @@ bool FGConstantSystem::HasStaticConstants() const {
 void FGConstantSystem::WriteConstant(const ShaderConstant* constant, const void* data, u32 size) {
     VERIFY(constant != nullptr);
 
-    u8* stagingBuffer = GetStagingBuffer(constant->frequency);
+    u16 cbIndex = constant->cbIndex;
+
+    u8* stagingBuffer = GetStagingBuffer(constant->frequency, cbIndex);
+
     memcpy(stagingBuffer + constant->offset, data, size);
 
-    switch (constant->frequency) {
-        case UpdateFrequency::Engine:   m_dirtyEngine = ~0ull; break;
-        case UpdateFrequency::Pass:     m_dirtyPass = ~0ull; break;
-        case UpdateFrequency::Material: m_dirtyMaterial = ~0ull; break;
-        case UpdateFrequency::Instance: m_dirtyInstance = ~0ull; break;
-    }
+    SetDirtyBit(constant->frequency, cbIndex);
 }
 
-u8* FGConstantSystem::GetStagingBuffer(UpdateFrequency freq) {
+u8* FGConstantSystem::GetStagingBuffer(UpdateFrequency freq, u16 cbIndex) {
+    xr_map<u16, StagingBuffer>* stagingMap = nullptr;
+
     switch (freq) {
-        case UpdateFrequency::Engine:   return m_engineConstants;
-        case UpdateFrequency::Pass:     return m_passConstants;
-        case UpdateFrequency::Material: return m_materialConstants;
-        case UpdateFrequency::Instance: return m_instanceConstants;
-        default:                        return m_instanceConstants;
+        case UpdateFrequency::Engine:   stagingMap = &m_engineStaging; break;
+        case UpdateFrequency::Pass:     stagingMap = &m_passStaging; break;
+        case UpdateFrequency::Material: stagingMap = &m_materialStaging; break;
+        case UpdateFrequency::Instance: stagingMap = &m_instanceStaging; break;
+        default:                        stagingMap = &m_instanceStaging; break;
     }
+
+    auto& staging = (*stagingMap)[cbIndex];
+
+    if (staging.size == 0) {
+        const auto& cb = m_pso->constantLayout.constantBuffers.buffers[cbIndex];
+        staging.size = cb.size;
+        ZeroMemory(staging.data, sizeof(staging.data));
+    }
+
+    return staging.data;
+}
+
+void FGConstantSystem::SetDirtyBit(UpdateFrequency freq, u16 cbIndex) {
+    xr_map<u16, StagingBuffer>* stagingMap = nullptr;
+
+    switch (freq) {
+        case UpdateFrequency::Engine:   stagingMap = &m_engineStaging; break;
+        case UpdateFrequency::Pass:     stagingMap = &m_passStaging; break;
+        case UpdateFrequency::Material: stagingMap = &m_materialStaging; break;
+        case UpdateFrequency::Instance: stagingMap = &m_instanceStaging; break;
+        default:                        return;
+    }
+
+    auto& staging = (*stagingMap)[cbIndex];
+    staging.dirty = true;
 }
 
 void FGConstantSystem::WriteStaticConstant(const ShaderConstant* constant, const void* data, u32 size) {

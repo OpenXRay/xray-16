@@ -54,62 +54,12 @@ static HRESULT create_shader(DWORD const* buffer, size_t const buffer_size, LPCS
             result->reflection->rtBindings.outputRTs.size());
 #endif
 
-#if defined(USE_DX11)
-        _hr = D3DCreateBlob(buffer_size, &result->bytecode);
-        if (SUCCEEDED(_hr) && result->bytecode)
-        {
-            CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
-        }
-        else
-        {
-            Msg("! Failed to create bytecode blob for %s", file_name);
-        }
-#endif
     }
     else
     {
-        _hr = ShaderTypeTraits<T>::CreateHWShader(buffer, buffer_size, result->sh);
-        if (!SUCCEEDED(_hr))
-        {
-            Log("! Shader: ", file_name);
-            Msg("! CreateHWShader hr == 0x%08x", _hr);
-            return E_FAIL;
-        }
-
-#ifdef DEBUG
-        if (result->sh)
-        {
-            result->sh->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(file_name), file_name);
-        }
-#endif
-
-#if defined(USE_DX11)
-        _hr = D3DCreateBlob(buffer_size, &result->bytecode);
-        if (SUCCEEDED(_hr) && result->bytecode)
-        {
-            CopyMemory(result->bytecode->GetBufferPointer(), buffer, buffer_size);
-        }
-        else
-        {
-            Msg("! Failed to create bytecode blob for %s", file_name);
-        }
-#endif
-
-        ID3DShaderReflection* pReflection = 0;
-        _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-
-        if (SUCCEEDED(_hr) && pReflection)
-        {
-            result->constants.dx9compatibility = false;
-            // Parse constant table data
-            result->constants.parse(pReflection, ShaderTypeTraits<T>::GetShaderDest());
-
-            _RELEASE(pReflection);
-        }
-        else
-        {
-            Msg("! D3DReflectShader %s hr == 0x%08x", file_name, _hr);
-        }
+        Msg("! ERROR: Shader %s created without reflection data", file_name);
+        R_ASSERT2(false, "All shaders must have reflection data in FrameGraph mode");
+        return E_FAIL;
     }
 
     return _hr;
@@ -130,17 +80,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, size_t c
         extension = ".vs";
         SVS* svs_result = (SVS*)result;
         _result = create_shader(buffer, buffer_size, file_name, svs_result, extractedReflection);
-        if (SUCCEEDED(_result))
-        {
-            //	Store input signature (need only for VS)
-            ID3DBlob* pSignatureBlob;
-            CHK_DX(D3DGetInputSignatureBlob(buffer, buffer_size, &pSignatureBlob));
-            VERIFY(pSignatureBlob);
-
-            svs_result->signature = RImplementation.Resources->_CreateInputSignature(pSignatureBlob);
-
-            _RELEASE(pSignatureBlob);
-        }
     }
     else if (pTarget[0] == 'g')
     {
@@ -562,31 +501,15 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
         if (!m_shaderLoader)
         {
             Msg("! [shader_compile] FrameGraph enabled but ShaderLoader not initialized!");
-            Msg("! Shader: %s (target: %s)", name, pTarget);
-            R_ASSERT2(false, "ShaderLoader must be initialized before compiling shaders with FrameGraph");
+            R_ASSERT2(false, "ShaderLoader must be initialized");
             return E_FAIL;
         }
-        xray::render::SlangCompiler::Stage stage;
+
         char extension[3];
         strncpy_s(extension, pTarget, 2);
 
-        if (strcmp(extension, "vs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Vertex;
-        else if (strcmp(extension, "ps") == 0)
-            stage = xray::render::SlangCompiler::Stage::Pixel;
-        else if (strcmp(extension, "gs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Geometry;
-        else if (strcmp(extension, "hs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Hull;
-        else if (strcmp(extension, "ds") == 0)
-            stage = xray::render::SlangCompiler::Stage::Domain;
-        else if (strcmp(extension, "cs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Compute;
-        else
-        {
-            Msg("! Unknown shader stage: %s", extension);
-            return E_FAIL;
-        }
+        bool isVertexShader = (strcmp(extension, "vs") == 0);
+        bool isPixelShader = (strcmp(extension, "ps") == 0);
 
         xr_string definesStr;
         for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
@@ -598,62 +521,29 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             definesStr.append(";");
         }
 
-        u32 sourceHash = xray::render::framegraph::ShaderCache::ComputeHash(
-            (const char*)fs->pointer(),
-            fs->length(),
-            definesStr.c_str()
-        );
+        Msg("~ [shader_compile] Compiling '%s' (target:%s, defines:%s)",
+            name, pTarget, definesStr.c_str());
 
-        xr_vector<u8> cachedBytecode;
-        static xray::render::framegraph::ShaderCache s_cache;
+        xr_vector<u8> bytecode;
+        xray::render::SlangCompiler::Stage stage;
 
-        xray::render::framegraph::ExtractedReflection deserializedReflection;
-        bool cacheHit = s_cache.TryLoad(name, extension, sourceHash, cachedBytecode, &deserializedReflection);
-
-        if (cacheHit && !deserializedReflection.IsEmpty())
-        {
-            _result = create_shader(
-                pTarget,
-                (DWORD*)cachedBytecode.data(),
-                cachedBytecode.size(),
-                name,
-                result,
-                o.disasm,
-                &deserializedReflection
-            );
-
-            if (SUCCEEDED(_result))
-            {
-                Msg("  ✓ [shader_compile] Cache HIT (with reflection): %s (%zu bytes)", name, cachedBytecode.size());
-            }
-
-            return _result;
-        }
-        else if (cacheHit)
-        {
-            Msg("! [shader_compile] Cache hit but no reflection for %s - recompiling to extract reflection", name);
-        }
-
-        Msg("~ [shader_compile] Compiling with Slang: %s (target: %s)", name, pTarget);
-
-        xr_string sourceCode;
-        sourceCode.assign((const char*)fs->pointer(), fs->length());
-
-        string_path fullShaderPath;
-        strconcat(sizeof(fullShaderPath), fullShaderPath, RImplementation.getShaderPath(), name);
-
-        if (strcmp(extension, "vs") == 0)
-            xr_strcat(fullShaderPath, ".vs");
-        else if (strcmp(extension, "ps") == 0)
-            xr_strcat(fullShaderPath, ".ps");
+        if (isVertexShader)
+            stage = xray::render::SlangCompiler::Stage::Vertex;
+        else if (isPixelShader)
+            stage = xray::render::SlangCompiler::Stage::Pixel;
         else if (strcmp(extension, "gs") == 0)
-            xr_strcat(fullShaderPath, ".gs");
+            stage = xray::render::SlangCompiler::Stage::Geometry;
         else if (strcmp(extension, "hs") == 0)
-            xr_strcat(fullShaderPath, ".hs");
+            stage = xray::render::SlangCompiler::Stage::Hull;
         else if (strcmp(extension, "ds") == 0)
-            xr_strcat(fullShaderPath, ".ds");
+            stage = xray::render::SlangCompiler::Stage::Domain;
         else if (strcmp(extension, "cs") == 0)
-            xr_strcat(fullShaderPath, ".cs");
+            stage = xray::render::SlangCompiler::Stage::Compute;
+        else
+        {
+            Msg("! [shader_compile] Unknown stage: %s", extension);
+            return E_FAIL;
+        }
 
         size_t defineCount = 0;
         for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
@@ -669,63 +559,64 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             slangDefines.push_back(define);
         }
 
-        xray::render::SlangCompiler::CompileResult compileResult =
-            m_shaderLoader->GetSlangCompiler()->CompileFromSource(
-                sourceCode.c_str(),
-                pFunctionName,
-                stage,
-                xray::render::SlangCompiler::Target::DXBC,
-                fullShaderPath,
-                slangDefines.data(),
-                slangDefines.size()
-            );
+        char extWithDot[4] = ".";
+        xr_strcat(extWithDot, extension);
 
-        if (!compileResult.IsValid())
+        Msg("═══════════════════════════════════════════════════");
+        Msg("[shader_compile] About to call CompileShaderWithDefines:");
+        Msg("  Shader: %s%s", name, extWithDot);
+        Msg("  Entry: %s", pFunctionName);
+        Msg("  Defines: %zu", slangDefines.size());
+        Msg("  Skinning = %i", m_skinning);
+        for (size_t i = 0; i < std::min<size_t>(15, slangDefines.size()); ++i)
         {
+            Msg("    [%zu] %s = %s", i, slangDefines[i].name,
+                slangDefines[i].value ? slangDefines[i].value : "(null)");
+        }
+        if (slangDefines.size() > 15)
+            Msg("    ... and %zu more", slangDefines.size() - 15);
+        Msg("═══════════════════════════════════════════════════");
+
+        bool success = m_shaderLoader->CompileShaderWithDefines(
+            name,
+            extWithDot,
+            pFunctionName,
+            stage,
+            slangDefines,
+            bytecode
+        );
+
+        if (!success)
+        {
+            Msg("! [shader_compile] ShaderLoader failed to compile '%s'", name);
+
             xr_string failedInfo;
             failedInfo.append("║   - ");
             failedInfo.append(name);
             failedInfo.append(" (");
             failedInfo.append(pTarget);
             failedInfo.append(")");
-            if (!compileResult.errorMessage.empty())
-            {
-                failedInfo.append("\n║     Error: ");
-                const char* newline = strchr(compileResult.errorMessage.c_str(), '\n');
-                if (newline)
-                    failedInfo.append(compileResult.errorMessage.c_str(), newline - compileResult.errorMessage.c_str());
-                else
-                    failedInfo.append(compileResult.errorMessage.c_str());
-            }
             g_failedShaders.push_back(failedInfo);
-
-            Msg("! [shader_compile] Failed: %s (target: %s) - continuing...", name, pTarget);
 
             return E_FAIL;
         }
 
-        bool isVertexShader = (strcmp(extension, "vs") == 0);
-        auto extractedReflection = xray::render::framegraph::ShaderReflector::ExtractReflection(
-            compileResult.reflection,
-            isVertexShader
-        );
+        auto* reflection = m_shaderLoader->GetCachedReflection(name, extWithDot);
 
         _result = create_shader(
             pTarget,
-            (DWORD*)compileResult.bytecode.data(),
-            compileResult.bytecode.size(),
+            (DWORD*)bytecode.data(),
+            bytecode.size(),
             name,
             result,
             o.disasm,
-            &extractedReflection
+            reflection
         );
 
         if (SUCCEEDED(_result))
         {
-            Msg("* [shader_compile] Successfully compiled with Slang: %s (%zu bytes)",
-                name, compileResult.bytecode.size());
-
-            s_cache.Save(name, extension, sourceHash, compileResult.bytecode, &extractedReflection);
+            Msg("* [shader_compile] SUCCESS via ShaderLoader: '%s' (%zu bytes)",
+                name, bytecode.size());
         }
 
         return _result;

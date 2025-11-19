@@ -77,9 +77,8 @@ RenderPhase ShaderPhaseCache::ExtractPhase(dxRender_Visual* visual) {
         return RenderPhase::Geometry;
     }
 
-    ID3D11PixelShader* d3dPS = ps->sh;
-    if (!d3dPS) {
-        Msg("! [ShaderPhaseCache] Failed to get D3D11 pixel shader for shader '%s'",
+    if (!ps->nvrhiShader) {
+        Msg("! [ShaderPhaseCache] Failed to get NVRHI shader handle for shader '%s'",
             shaderName.c_str());
         return RenderPhase::Geometry;
     }

@@ -70,16 +70,6 @@ void CResourceManager::_DeleteVS(const SVS* vs)
 {
     if (DestroyShader(vs))
     {
-        for (const auto& iDecl : v_declarations)
-        {
-            const auto iLayout = iDecl->vs_to_layout.find(vs->signature->signature);
-            if (iLayout != iDecl->vs_to_layout.end())
-            {
-                //	Release vertex layout
-                _RELEASE(iLayout->second);
-                iDecl->vs_to_layout.erase(iLayout);
-            }
-        }
     }
 }
 

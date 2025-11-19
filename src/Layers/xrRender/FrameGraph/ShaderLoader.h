@@ -54,24 +54,12 @@ public:
         }
     };
 
-    nvrhi::ShaderHandle LoadVertexShader(
-        const char* name,
-        const char* entryPoint = "main",
-        xr_vector<u8>* outBytecode = nullptr
-    );
-
-    ShaderResult LoadVertexShaderWithReflection(
+    ShaderResult LoadVertexShader(
         const char* name,
         const char* entryPoint = "main"
     );
 
-    nvrhi::ShaderHandle LoadPixelShader(
-        const char* name,
-        const char* entryPoint = "main",
-        xr_vector<u8>* outBytecode = nullptr
-    );
-
-    ShaderResult LoadPixelShaderWithReflection(
+    ShaderResult LoadPixelShader(
         const char* name,
         const char* entryPoint = "main"
     );
@@ -79,6 +67,20 @@ public:
     const ShaderCache::Stats& GetCacheStats() const { return m_cache.GetStats(); }
 
     xray::render::SlangCompiler* GetSlangCompiler() const { return m_slangCompiler; }
+
+    bool CompileShaderWithDefines(
+        const char* shaderName,
+        const char* extension,
+        const char* entryPoint,
+        xray::render::SlangCompiler::Stage stage,
+        const xr_vector<xray::render::SlangCompiler::Define>& defines,
+        xr_vector<u8>& outBytecode
+    );
+
+    ExtractedReflection* GetCachedReflection(
+        const char* shaderName,
+        const char* extension
+    );
 
 private:
     bool CompileShader(
@@ -94,6 +96,8 @@ private:
 private:
     xray::render::SlangCompiler* m_slangCompiler;
     ShaderCache m_cache;
+
+    xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
 };
 
 }

@@ -9,7 +9,7 @@ bool ImGuiRendererNVRHI::CreateShaders()
 {
     framegraph::ShaderLoader shaderLoader(m_renderDevice->GetSlangCompiler());
 
-    m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main", nullptr);
+    m_vertexShader = shaderLoader.LoadVertexShader("imgui", "main").handle;
 
     if (!m_vertexShader)
     {
@@ -17,7 +17,7 @@ bool ImGuiRendererNVRHI::CreateShaders()
         return false;
     }
 
-    m_pixelShader = shaderLoader.LoadPixelShader("imgui", "main", nullptr);
+    m_pixelShader = shaderLoader.LoadPixelShader("imgui", "main").handle;
 
     if (!m_pixelShader)
     {

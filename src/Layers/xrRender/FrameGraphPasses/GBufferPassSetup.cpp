@@ -13,6 +13,12 @@
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/SkeletonX.h"
+#include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
+
+namespace xray::render::RENDER_NAMESPACE
+{
+    extern float r__dtex_range;
+}
 
 namespace xray::render::passes {
 
@@ -107,7 +113,6 @@ framegraph::DefaultOutputLayout setupGBufferPass(
             auto* positionRT = fg.GetPhysicalTexture(data.position);
 
             if (!depthRT || !albedoRT || !normalRT || !positionRT) {
-                Msg("! [GBufferPass] Failed to get physical textures");
                 return;
             }
 
@@ -228,7 +233,6 @@ void renderGBufferGeometry(
     u32 numTriangles = 0;
 
     ng::PipelineState* currentPipeline = nullptr;
-    float lastDetailScale = -1.0f;
 
     for (const auto& batch : batches) {
         ng::PipelineState* pipelineToUse = nullptr;
@@ -251,11 +255,10 @@ void renderGBufferGeometry(
             currentPipeline = pipelineToUse;
         }
 
-        if (matPSO && matPSO->detail_scale != lastDetailScale) {
+        if (matPSO) {
             DynamicTransforms dynamicCB = {};
             FillDynamicTransforms(dynamicCB);
 
-            extern float r__dtex_range;
             dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
                                    1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
 
@@ -266,8 +269,6 @@ void renderGBufferGeometry(
                     break;
                 }
             }
-
-            lastDetailScale = matPSO->detail_scale;
         }
 
         if (matPSO) {
@@ -281,24 +282,20 @@ void renderGBufferGeometry(
                 isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
             }
 
-            if (isSkeleton) {
-                for (const auto& vcbReq : matPSO->vcbRequirements) {
-                    if (vcbReq.name == "SkeletonBones") {
-                        vcbHandle = vcbReq.vcbHandle;
-                        vcbSize = vcbReq.size;
-                        break;
-                    }
-                }
-            } else {
-                if (!matPSO->vcbRequirements.empty()) {
-                    vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                    vcbSize = matPSO->vcbRequirements[0].size;
+            for (const auto& vcbReq : matPSO->vcbRequirements) {
+                if (vcbReq.name == "$Globals") {
+                    vcbHandle = vcbReq.vcbHandle;
+                    vcbSize = vcbReq.size;
+                    break;
                 }
             }
 
+            if ((!vcbHandle.IsValid() || !vcbSize) && !matPSO->vcbRequirements.empty()) {
+                vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
+                vcbSize = matPSO->vcbRequirements[0].size;
+            }
+
             if (!vcbHandle.IsValid()) {
-                Msg("! [GBufferPass] Material '%s' has no valid VCB (vcbRequirements.size=%u, isSkeleton=%d)",
-                    matPSO->debugName.c_str(), matPSO->vcbRequirements.size(), isSkeleton);
                 continue;
             }
 
@@ -312,19 +309,19 @@ void renderGBufferGeometry(
 
             auto CopyBoneMatrix = [](u8* dest, const Fmatrix& M) {
                 float* destF = reinterpret_cast<float*>(dest);
-                destF[0]  = M._11; destF[1]  = M._21; destF[2]  = M._31; destF[3]  = M._41;
-                destF[4]  = M._12; destF[5]  = M._22; destF[6]  = M._32; destF[7]  = M._42;
-                destF[8]  = M._13; destF[9]  = M._23; destF[10] = M._33; destF[11] = M._43;
-            };
+                destF[0] = M._11; destF[1] = M._21; destF[2] = M._31; destF[3] = M._41;
+                destF[4] = M._12; destF[5] = M._22; destF[6] = M._32; destF[7] = M._42;
+                destF[8] = M._13; destF[9] = M._23; destF[10] = M._33; destF[11] = M._43;
+                };
 
             auto CopyMatrix3x4 = [](u8* dest, const Fmatrix& src) {
                 Fmatrix transposed;
                 transposed.transpose(src);
                 float* destF = reinterpret_cast<float*>(dest);
-                destF[0]  = transposed._11; destF[1]  = transposed._12; destF[2]  = transposed._13; destF[3]  = transposed._14;
-                destF[4]  = transposed._21; destF[5]  = transposed._22; destF[6]  = transposed._23; destF[7]  = transposed._24;
-                destF[8]  = transposed._31; destF[9]  = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
-            };
+                destF[0] = transposed._11; destF[1] = transposed._12; destF[2] = transposed._13; destF[3] = transposed._14;
+                destF[4] = transposed._21; destF[5] = transposed._22; destF[6] = transposed._23; destF[7] = transposed._24;
+                destF[8] = transposed._31; destF[9] = transposed._32; destF[10] = transposed._33; destF[11] = transposed._34;
+                };
 
             if (isSkeleton) {
 
@@ -343,7 +340,8 @@ void renderGBufferGeometry(
                 if (visualType == MT_SKELETON_GEOMDEF_ST) {
                     auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_ST*>(batch.visual);
                     Parent = skeletonMesh->GetParent();
-                } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+                }
+                else if (visualType == MT_SKELETON_GEOMDEF_PM) {
                     auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_PM*>(batch.visual);
                     Parent = skeletonMesh->GetParent();
                 }
@@ -374,7 +372,8 @@ void renderGBufferGeometry(
                         array[(id + 2) * 4 + 3] = M._43;
                     }
                 }
-            } else {
+            }
+            else {
 
                 Fmatrix xform = batch.worldMatrix;
                 Fmatrix xform_v;
@@ -396,13 +395,10 @@ void renderGBufferGeometry(
             nvrhi::IBuffer* vcbBuffer = device->GetNativeBuffer(vcbHandle);
 
             if (vcbBuffer) {
-                Msg("Write to VCB for %s", matPSO->debugName.c_str());
                 ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
 
-                materialCache->GetOrCreateBindingSet(matPSO, vcbBuffer, matPSO->pass);
+                materialCache->GetOrCreateBindingSet(matPSO);
 
-                Msg("  [GBufferPass] Binding VS set=%p, PS set=%p for %s",
-                    matPSO->vsBindingSet.Get(), matPSO->psBindingSet.Get(), matPSO->debugName.c_str());
                 ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
                 ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
             }
@@ -420,15 +416,11 @@ void renderGBufferGeometry(
 
         ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
 
-        Msg("Successful draw for %s", matPSO->debugName.c_str());
-
         numDraws++;
         numTriangles += batch.indexCount / 3;
     }
 
     ctx->EndRenderPass();
-
-    Msg("* [GBufferPass] Rendered %u draws, %u triangles", numDraws, numTriangles);
 }
 
 }
