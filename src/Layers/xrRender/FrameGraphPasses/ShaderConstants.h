@@ -34,6 +34,11 @@ struct alignas(16) DynamicTransforms {
     Fvector4 L_material;
     Fvector4 hemi_cube_pos_faces;
     Fvector4 hemi_cube_neg_faces;
+};
+
+struct alignas(16) ShaderParams {
+    float m_AlphaRef;
+    float padding[3];
     Fvector4 dt_params;
 };
 
@@ -139,7 +144,7 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.padding3 = 0.0f;
 }
 
-inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity, float dtParamScale = 1.f) {
+inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {
     Fmatrix wv, wvp;
     wv.mul_43(Device.mView, m_W);
     wvp.mul(Device.mProject, wv);
@@ -168,8 +173,6 @@ inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity
     cb.hemi_cube_pos_faces.set(0.08034f, 0.42066f, 0.13277f, 0.0f);
     cb.hemi_cube_neg_faces.set(0.19919f, 0.00392f, 0.09922f, 0.0f);
 
-    cb.dt_params.set(dtParamScale, dtParamScale, dtParamScale,
-                     1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
 }
 
 }

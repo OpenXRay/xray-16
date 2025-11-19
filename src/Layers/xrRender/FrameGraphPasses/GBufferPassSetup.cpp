@@ -277,7 +277,7 @@ void renderGBufferGeometry(
 
             if (isSkeleton) {
                 DynamicTransforms dynamicCB = {};
-                FillDynamicTransforms(dynamicCB, batch.worldMatrix, 1.0f);
+                FillDynamicTransforms(dynamicCB, batch.worldMatrix);
                 for (const auto& cbInfo : matPSO->constantBuffers) {
                     if (cbInfo.name == "dynamic_transforms") {
                         u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);

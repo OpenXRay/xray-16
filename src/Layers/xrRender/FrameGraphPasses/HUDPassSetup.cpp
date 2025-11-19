@@ -167,11 +167,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
                 if (matPSO->detail_scale != lastDetailScale) {
                     DynamicTransforms dynamicCB = {};
-                    FillDynamicTransforms(dynamicCB, adjustedWorldMatrix, 1.0f);
-
-                    extern float r__dtex_range;
-                    dynamicCB.dt_params.set(matPSO->detail_scale, matPSO->detail_scale, matPSO->detail_scale,
-                                           1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range);
+                    FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
 
                     for (const auto& cbInfo : matPSO->constantBuffers) {
                         if (cbInfo.name == "dynamic_transforms") {
@@ -199,7 +195,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
                         if (isSkeleton) {
                             DynamicTransforms dynamicCB = {};
-                            FillDynamicTransforms(dynamicCB, adjustedWorldMatrix, 1.0f);
+                            FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
                             for (const auto& cbInfo : matPSO->constantBuffers) {
                                 if (cbInfo.name == "dynamic_transforms") {
                                     u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
