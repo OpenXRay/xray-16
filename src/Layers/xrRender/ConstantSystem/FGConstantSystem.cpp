@@ -21,25 +21,19 @@ FGConstantSystem::FGConstantSystem(
 void FGConstantSystem::Set(const char* name, float value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::Set] Constant '%s' not found in shader '%s'", name, m_pso->debugName.c_str());
         return;
     }
 
     if (constant->size != sizeof(float)) {
-        Msg("! [FGConstantSystem] Size mismatch for '%s': expected %u, got %u",
-            name, constant->size, sizeof(float));
         return;
     }
 
-    Msg("~ [FGConstantSystem::Set] Setting '%s' (cb=%s, offset=%u)", name,
-        m_pso->constantLayout.constantBuffers.buffers[constant->cbIndex].name.c_str(), constant->offset);
     WriteConstant(constant, &value, sizeof(float));
 }
 
 void FGConstantSystem::Set(const char* name, const Fvector2& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem] Constant '%s' not found in shader", name);
         return;
     }
 
@@ -50,7 +44,6 @@ void FGConstantSystem::Set(const char* name, const Fvector2& value) {
 void FGConstantSystem::Set(const char* name, const Fvector& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem] Constant '%s' not found in shader", name);
         return;
     }
 
@@ -61,13 +54,10 @@ void FGConstantSystem::Set(const char* name, const Fvector& value) {
 void FGConstantSystem::Set(const char* name, const Fvector4& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem] Constant '%s' not found in shader", name);
         return;
     }
 
     if (constant->size != 16) {
-        Msg("! [FGConstantSystem] Size mismatch for '%s': expected %u, got 16",
-            name, constant->size);
         return;
     }
 
@@ -94,7 +84,6 @@ void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
     } else if (constant->IsMatrix4x4()) {
         WriteMatrix4x4(stagingBuffer + constant->offset, value);
     } else {
-        Msg("! [FGConstantSystem] Unknown matrix type for '%s'", name);
         return;
     }
 
@@ -104,13 +93,10 @@ void FGConstantSystem::Set(const char* name, const Fmatrix& value) {
 void FGConstantSystem::SetStatic(const char* name, float value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::SetStatic] Constant '%s' not found in shader", name);
         return;
     }
 
     if (constant->size != sizeof(float)) {
-        Msg("! [FGConstantSystem::SetStatic] Size mismatch for '%s': expected %u, got %u",
-            name, constant->size, sizeof(float));
         return;
     }
 
@@ -120,7 +106,6 @@ void FGConstantSystem::SetStatic(const char* name, float value) {
 void FGConstantSystem::SetStatic(const char* name, const Fvector2& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::SetStatic] Constant '%s' not found in shader", name);
         return;
     }
 
@@ -131,7 +116,6 @@ void FGConstantSystem::SetStatic(const char* name, const Fvector2& value) {
 void FGConstantSystem::SetStatic(const char* name, const Fvector& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::SetStatic] Constant '%s' not found in shader", name);
         return;
     }
 
@@ -142,13 +126,10 @@ void FGConstantSystem::SetStatic(const char* name, const Fvector& value) {
 void FGConstantSystem::SetStatic(const char* name, const Fvector4& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::SetStatic] Constant '%s' not found in shader", name);
         return;
     }
 
     if (constant->size != 16) {
-        Msg("! [FGConstantSystem::SetStatic] Size mismatch for '%s': expected %u, got 16",
-            name, constant->size);
         return;
     }
 
@@ -158,12 +139,10 @@ void FGConstantSystem::SetStatic(const char* name, const Fvector4& value) {
 void FGConstantSystem::SetStatic(const char* name, const Fmatrix& value) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::SetStatic] Constant '%s' not found in shader", name);
         return;
     }
 
     if (!constant->IsMatrix()) {
-        Msg("! [FGConstantSystem::SetStatic] Constant '%s' is not a matrix", name);
         return;
     }
 
@@ -179,18 +158,14 @@ void FGConstantSystem::SetStatic(const char* name, const Fmatrix& value) {
 void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 count) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem] Array constant '%s' not found", name);
         return;
     }
 
     if (!constant->IsArray()) {
-        Msg("! [FGConstantSystem] Constant '%s' is not an array", name);
         return;
     }
 
     if (count > constant->arrayCount) {
-        Msg("! [FGConstantSystem] Array size mismatch for '%s': writing %u, shader expects %u",
-            name, count, constant->arrayCount);
         count = constant->arrayCount;
     }
 
@@ -209,8 +184,6 @@ void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 cou
             dest += 64;
         }
     } else {
-        Msg("! [FGConstantSystem] Unknown matrix element size %u for array '%s'",
-            constant->elementSize, name);
         return;
     }
 
@@ -220,18 +193,14 @@ void FGConstantSystem::SetArray(const char* name, const Fmatrix* values, u32 cou
 void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u32 count) {
     const ShaderConstant* constant = m_pso->FindConstant(name);
     if (!constant) {
-        Msg("! [FGConstantSystem::SetStaticArray] Array constant '%s' not found", name);
         return;
     }
 
     if (!constant->IsArray()) {
-        Msg("! [FGConstantSystem::SetStaticArray] Constant '%s' is not an array", name);
         return;
     }
 
     if (count > constant->arrayCount) {
-        Msg("! [FGConstantSystem::SetStaticArray] Array size mismatch for '%s': writing %u, shader expects %u",
-            name, count, constant->arrayCount);
         count = constant->arrayCount;
     }
 
@@ -248,8 +217,6 @@ void FGConstantSystem::SetStaticArray(const char* name, const Fmatrix* values, u
             dest += 64;
         }
     } else {
-        Msg("! [FGConstantSystem::SetStaticArray] Unknown matrix element size %u for array '%s'",
-            constant->elementSize, name);
         return;
     }
 
@@ -328,7 +295,6 @@ void FGConstantSystem::CommitMaterial(ng::RenderContext* ctx) {
 void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
 
     if (!m_vcbPool) {
-        Msg("! [FGConstantSystem] No VCB pool provided - cannot commit instance constants");
         return;
     }
 
@@ -338,7 +304,6 @@ void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
         }
 
         if (cbIndex >= m_pso->constantLayout.constantBuffers.buffers.size()) {
-            Msg("! [FGConstantSystem] Invalid cbIndex %u in instance staging", cbIndex);
             continue;
         }
 
@@ -353,23 +318,17 @@ void FGConstantSystem::CommitInstance(ng::RenderContext* ctx) {
         );
 
         if (!vcbHandle.IsValid()) {
-            Msg("! [FGConstantSystem] Failed to get VCB for CB '%s' (slot=b%u, size=%u)",
-                cbInfo.name.c_str(), cbInfo.slot, cbInfo.size);
             continue;
         }
 
         nvrhi::IBuffer* nvrhiBuffer = ctx->GetDevice()->GetNativeBuffer(vcbHandle);
         if (!nvrhiBuffer) {
-            Msg("! [FGConstantSystem] Failed to get NVRHI buffer for CB '%s'", cbInfo.name.c_str());
             continue;
         }
 
         ctx->WriteBuffer(nvrhiBuffer, staging.data, staging.size);
 
         staging.dirty = false;
-
-        Msg("~ [FGConstantSystem] Uploaded Instance CB '%s' (slot=b%u, size=%u)",
-            cbInfo.name.c_str(), cbInfo.slot, staging.size);
     }
 }
 
