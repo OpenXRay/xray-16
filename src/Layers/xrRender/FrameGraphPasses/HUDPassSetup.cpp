@@ -12,6 +12,8 @@
 #include "Layers/xrRender/SkeletonCustom.h"  // For CKinematics
 #include "Layers/xrRender/FSkinned.h"  // For CSkeletonX
 #include "Layers/xrRender/SkeletonX.h"  // For CSkeletonX_ST, CSkeletonX_PM
+#include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"  // For reflection-driven constants
+#include "Layers/xrRender/FTreeVisual.h"  // For FTreeVisual_quant constant
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -166,7 +168,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
             // Render HUD batches
             ng::PipelineState* currentPipeline = nullptr;
-            float lastDetailScale = -1.0f;
+            MaterialPSO* lastMatPSO = nullptr;
             u32 numDraws = 0;
 
             for (const auto& batch : *data.hudBatches) {
@@ -182,14 +184,54 @@ framegraph::DefaultOutputLayout setupHUDPass(
                     currentPipeline = matPSO->pso;
                 }
 
-                // Apply HUD FOV adjustment
+                // Apply HUD FOV adjustment to world matrix
                 Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
 
-                // Update DynamicTransforms CB
-                if (matPSO->detail_scale != lastDetailScale) {
+                // ═══════════════════════════════════════════════════════
+                //  UPDATE MATERIAL AND INSTANCE CONSTANTS (USING FGCONSTANTSYSTEM)
+                // ═══════════════════════════════════════════════════════
+
+                // Initialize FGConstantSystem for this batch
+                fgconstants::FGConstantSystem constants(matPSO, data.materialCache->GetVCBPool());
+
+                // ─────────────────────────────────────────────────
+                //  MATERIAL-FREQUENCY CONSTANTS (once per material)
+                // ─────────────────────────────────────────────────
+
+                // Only update material constants if material changed
+                if (matPSO != lastMatPSO) {
+                    // Set material-specific detail scale (now in shader_params b1)
+                    Fvector4 dt_params(
+                        matPSO->detail_scale,
+                        matPSO->detail_scale,
+                        matPSO->detail_scale,
+                        1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range
+                    );
+                    constants.Set("dt_params", dt_params);
+
+                    // Commit material-frequency constants to GPU
+                    constants.CommitMaterial(ctx);
+
+                    lastMatPSO = matPSO;
+                }
+
+                // ─────────────────────────────────────────────────
+                //  INSTANCE-FREQUENCY CONSTANTS (per draw call)
+                // ─────────────────────────────────────────────────
+
+                // Determine if this is a skeleton mesh
+                bool isSkeleton = false;
+                u32 visualType = 0;
+                if (batch.visual && batch.renderable) {
+                    visualType = batch.visual->getType();
+                    isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+                }
+
+                if (isSkeleton) {
+                    // Skeleton meshes: Upload dynamic_transforms manually (includes dt_params from material)
+                    // FIXME: This is a temporary solution until we migrate dynamic_transforms to FGConstantSystem
                     DynamicTransforms dynamicCB = {};
                     FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
-
                     for (const auto& cbInfo : matPSO->constantBuffers) {
                         if (cbInfo.name == "dynamic_transforms") {
                             u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
@@ -197,80 +239,60 @@ framegraph::DefaultOutputLayout setupHUDPass(
                             break;
                         }
                     }
-                    lastDetailScale = matPSO->detail_scale;
-                }
 
-                // Handle VCB for skeletons
-                if (!matPSO->vcbRequirements.empty()) {
-                    ng::BufferHandle vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                    u32 vcbSize = matPSO->vcbRequirements[0].size;
-
-                    if (vcbHandle.IsValid() && vcbSize <= 4096) {
-                        u8 cbData[4096];
-                        ZeroMemory(cbData, vcbSize);
-
-                        // Check if skeleton
-                        bool isSkeleton = false;
-                        if (batch.visual && batch.renderable) {
-                            auto visualType = batch.visual->getType();
-                            isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
-                        }
-
-                        if (isSkeleton) {
-                            // Update DynamicTransforms with FOV-adjusted matrix
-                            DynamicTransforms dynamicCB = {};
-                            FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
-                            for (const auto& cbInfo : matPSO->constantBuffers) {
-                                if (cbInfo.name == "dynamic_transforms") {
-                                    u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
-                                    ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
-                                    break;
-                                }
-                            }
-
-                            // Get Parent skeleton
-                            RENDER_NAMESPACE::CKinematics* Parent = nullptr;
-                            auto visualType = batch.visual->getType();
-                            if (visualType == MT_SKELETON_GEOMDEF_ST) {
-                                auto* skeletonMesh = static_cast<CSkeletonX_ST*>(batch.visual);
-                                Parent = skeletonMesh->GetParent();
-                            } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
-                                auto* skeletonMesh = static_cast<CSkeletonX_PM*>(batch.visual);
-                                Parent = skeletonMesh->GetParent();
-                            }
-
-                            if (Parent) {
-                                Parent->CalculateBones(TRUE);
-
-                                u32 count = Parent->LL_BoneCount();
-                                u32 maxBones = vcbSize / 48;
-                                count = std::min(count, maxBones);
-
-                                float* array = reinterpret_cast<float*>(cbData);
-                                for (u32 mid = 0; mid < count; mid++) {
-                                    Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
-                                    u32 id = mid * 3;
-                                    array[(id + 0) * 4 + 0] = M._11; array[(id + 0) * 4 + 1] = M._21; array[(id + 0) * 4 + 2] = M._31; array[(id + 0) * 4 + 3] = M._41;
-                                    array[(id + 1) * 4 + 0] = M._12; array[(id + 1) * 4 + 1] = M._22; array[(id + 1) * 4 + 2] = M._32; array[(id + 1) * 4 + 3] = M._42;
-                                    array[(id + 2) * 4 + 0] = M._13; array[(id + 2) * 4 + 1] = M._23; array[(id + 2) * 4 + 2] = M._33; array[(id + 2) * 4 + 3] = M._43;
-                                }
-                            }
-                        }
-
-                        // Write VCB
-                        nvrhi::IBuffer* vcbBuffer = data.device->GetNativeBuffer(vcbHandle);
-                        if (vcbBuffer) {
-                            ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
-
-                            // Get or create binding sets (queries VCB pool directly)
-                            data.materialCache->GetOrCreateBindingSet(matPSO);
-
-                            // Bind both VS and PS binding sets
-                            ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
-                            ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
-                        }
+                    // Get Parent skeleton
+                    RENDER_NAMESPACE::CKinematics* Parent = nullptr;
+                    if (visualType == MT_SKELETON_GEOMDEF_ST) {
+                        auto* skeletonMesh = static_cast<CSkeletonX_ST*>(batch.visual);
+                        Parent = skeletonMesh->GetParent();
+                    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+                        auto* skeletonMesh = static_cast<CSkeletonX_PM*>(batch.visual);
+                        Parent = skeletonMesh->GetParent();
                     }
+
+                    if (Parent) {
+                        // Calculate bones BEFORE accessing transforms
+                        Parent->CalculateBones(TRUE);
+
+                        // Get bone count
+                        u32 count = Parent->LL_BoneCount();
+
+                        // Build bone matrix array
+                        constexpr u32 MAX_BONES = 78;
+                        Fmatrix boneMatrices[MAX_BONES];
+                        u32 bonesToUpload = std::min(count, MAX_BONES);
+
+                        for (u32 i = 0; i < bonesToUpload; i++) {
+                            boneMatrices[i] = Parent->LL_GetTransform_R(u16(i));
+                        }
+
+                        // Use FGConstantSystem for bone array upload
+                        constants.SetArray("sbones_array", boneMatrices, bonesToUpload);
+                    }
+                } else {
+                    // Non-skeleton meshes (trees, weapons): Use FGConstantSystem
+                    Fmatrix xform_v;
+                    xform_v.mul(adjustedWorldMatrix, Device.mView);
+
+                    constants.Set("m_xform", adjustedWorldMatrix);
+                    constants.Set("m_xform_v", xform_v);
+
+                    // Tree scale constant (for tree meshes)
+                    using namespace xray::render::RENDER_NAMESPACE;
+                    float tree_scale = 1.0f / float(FTreeVisual_quant);
+                    Fvector4 consts_vec(tree_scale, tree_scale, 0.0f, 0.0f);
+                    constants.Set("consts", consts_vec);
                 }
+
+                // Commit per-instance constants to GPU
+                constants.CommitInstance(ctx);
+
+                // Get or create cached binding sets
+                data.materialCache->GetOrCreateBindingSet(matPSO);
+
+                // Bind BOTH per-stage binding sets
+                ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
+                ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
 
                 // Bind vertex/index buffers
                 nvrhi::IBuffer* vb = batch.vertexBuffer.Get();

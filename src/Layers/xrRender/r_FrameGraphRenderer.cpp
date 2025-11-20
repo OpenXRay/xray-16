@@ -497,9 +497,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    // 2. HUD Pass - TEMPORARILY DISABLED (vertex layout issues to fix)
-    // auto hudOutputs = passes::setupHUDPass(...);
-    // For now, skip HUD and use GBuffer output directly
+    // 2. HUD Pass - Renders HUD items on top of world geometry
+    auto hudOutputs = passes::setupHUDPass(
+        *m_framegraph,
+        m_device,
+        gbufferOutputs,
+        &m_hudBatches,
+        m_materialCache.get(),
+        width,
+        height
+    );
 
     // Skip lighting/postprocess for now (not implemented)
     // 3. Would be: Lighting Pass
@@ -528,11 +535,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    // 8. Composite Pass - Combines scene (GBuffer only, no HUD yet) with UI layer
+    // 8. Composite Pass - Combines scene (GBuffer + HUD) with UI layer
     auto compositeOutput = passes::setupCompositePass(
         *m_framegraph,
-        gbufferOutputs.albedo,  // Scene input (GBuffer only for now)
-        uiTarget,               // UI layer
+        hudOutputs.albedo,  // Scene input (GBuffer + HUD)
+        uiTarget,          // UI layer
         width,
         height
     );
