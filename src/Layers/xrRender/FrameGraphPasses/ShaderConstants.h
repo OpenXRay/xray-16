@@ -70,8 +70,18 @@ struct alignas(16) StaticGlobals {
 
     Fvector4 parallax;
     Fvector4 screen_res;
+
+    float m_InvVP[16];
+
+    float shadow_matrices[4][16];
+    Fvector4 cascade_splits;
+
+    Fvector4 cluster_params;
+    Fvector4 cluster_scales;
+
+    Fvector4 camera_direction;
 };
-static_assert(sizeof(StaticGlobals) == 384, "StaticGlobals must be 384 bytes");
+static_assert(sizeof(StaticGlobals) == 768, "StaticGlobals must be 768 bytes");
 
 using GlobalConstants = StaticGlobals;
 
@@ -142,6 +152,38 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.padding1 = 0.0f;
     cb.padding2 = 0.0f;
     cb.padding3 = 0.0f;
+
+    Fmatrix invVP;
+    invVP.invert(tempVP);
+    Fmatrix invVPT;
+    invVPT.transpose(invVP);
+    cb.m_InvVP[0]  = invVPT._11; cb.m_InvVP[1]  = invVPT._12; cb.m_InvVP[2]  = invVPT._13; cb.m_InvVP[3]  = invVPT._14;
+    cb.m_InvVP[4]  = invVPT._21; cb.m_InvVP[5]  = invVPT._22; cb.m_InvVP[6]  = invVPT._23; cb.m_InvVP[7]  = invVPT._24;
+    cb.m_InvVP[8]  = invVPT._31; cb.m_InvVP[9]  = invVPT._32; cb.m_InvVP[10] = invVPT._33; cb.m_InvVP[11] = invVPT._34;
+    cb.m_InvVP[12] = invVPT._41; cb.m_InvVP[13] = invVPT._42; cb.m_InvVP[14] = invVPT._43; cb.m_InvVP[15] = invVPT._44;
+
+    for (int i = 0; i < 4; i++) {
+        Fmatrix identity;
+        identity.identity();
+        Fmatrix identityT;
+        identityT.transpose(identity);
+
+        cb.shadow_matrices[i][0]  = identityT._11; cb.shadow_matrices[i][1]  = identityT._12;
+        cb.shadow_matrices[i][2]  = identityT._13; cb.shadow_matrices[i][3]  = identityT._14;
+        cb.shadow_matrices[i][4]  = identityT._21; cb.shadow_matrices[i][5]  = identityT._22;
+        cb.shadow_matrices[i][6]  = identityT._23; cb.shadow_matrices[i][7]  = identityT._24;
+        cb.shadow_matrices[i][8]  = identityT._31; cb.shadow_matrices[i][9]  = identityT._32;
+        cb.shadow_matrices[i][10] = identityT._33; cb.shadow_matrices[i][11] = identityT._34;
+        cb.shadow_matrices[i][12] = identityT._41; cb.shadow_matrices[i][13] = identityT._42;
+        cb.shadow_matrices[i][14] = identityT._43; cb.shadow_matrices[i][15] = identityT._44;
+    }
+    cb.cascade_splits.set(10.0f, 50.0f, 150.0f, 500.0f);
+
+    cb.cluster_params.set(16.0f, 16.0f, 24.0f, 0.0f);
+    cb.cluster_scales.set(0.1f, 500.0f, 1.0f, 1.0f);
+
+    cb.camera_direction.set(Device.vCameraDirection.x, Device.vCameraDirection.y,
+                            Device.vCameraDirection.z, 0.0f);
 }
 
 inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity) {

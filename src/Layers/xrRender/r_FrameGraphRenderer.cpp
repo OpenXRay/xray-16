@@ -22,7 +22,8 @@
 #include "xrEngine/device.h"
 #include <imgui.h>
 
-#include "FrameGraphPasses/GBufferPassSetup.h"
+#include "FrameGraphPasses/DepthPrepassSetup.h"
+#include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
@@ -296,8 +297,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
 
-    framegraph::VirtualResourceHandle depthBuffer;
-    auto gbufferOutputs = passes::setupGBufferPass(
+    framegraph::VirtualResourceHandle depthBuffer = passes::setupDepthPrepass(
+        *m_framegraph,
+        m_device,
+        m_geometryCollector.get(),
+        m_materialCache.get(),
+        width,
+        height
+    );
+
+    auto forwardOutputs = passes::setupForwardColorPass(
         *m_framegraph,
         m_device,
         depthBuffer,
@@ -310,7 +319,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto hudOutputs = passes::setupHUDPass(
         *m_framegraph,
         m_device,
-        gbufferOutputs,
+        forwardOutputs,
         &m_hudBatches,
         m_materialCache.get(),
         width,

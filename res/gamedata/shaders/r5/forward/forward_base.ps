@@ -1,0 +1,52 @@
+#include "../shared/common.h"
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float3 worldPos : TEXCOORD0;
+    float3 worldNormal : TEXCOORD1;
+    float2 texcoord : TEXCOORD2;
+    float3 worldTangent : TEXCOORD3;
+    float3 worldBinormal : TEXCOORD4;
+};
+
+struct PS_OUTPUT {
+    float4 color : SV_TARGET0;
+};
+
+Texture2D t_albedo : register(t0);
+Texture2D t_normal : register(t1);
+Texture2D t_material : register(t2);
+
+SamplerState s_linear : register(s0);
+
+cbuffer Material : register(b1) {
+    float4 g_BaseColor;
+    float g_Metallic;
+    float g_Roughness;
+    float g_MaterialID;
+    float _padding;
+};
+
+PS_OUTPUT main(PS_INPUT input) {
+    PS_OUTPUT output;
+
+    float4 albedoSample = t_albedo.Sample(s_linear, input.texcoord);
+    float3 normalSample = t_normal.Sample(s_linear, input.texcoord).xyz;
+    float2 materialSample = t_material.Sample(s_linear, input.texcoord).rg;
+
+    float3 albedo = albedoSample.rgb * g_BaseColor.rgb;
+
+    float3 tangentNormal = normalSample * 2.0 - 1.0;
+
+    float3x3 TBN = float3x3(
+        normalize(input.worldTangent),
+        normalize(input.worldBinormal),
+        normalize(input.worldNormal)
+    );
+
+    float3 worldNormal = normalize(mul(tangentNormal, TBN));
+
+    output.color = float4(albedo, 1.0);
+
+    return output;
+}
