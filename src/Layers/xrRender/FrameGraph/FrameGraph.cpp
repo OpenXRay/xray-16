@@ -20,9 +20,6 @@ FrameGraph::FrameGraph(ng::RenderDevice* renderDevice)
     // Create resource pool for aliasing (if ResourceManager available)
     if (m_resourceManager) {
         m_resourcePool = xr_make_unique<FGResourcePool>(m_resourceManager);
-        Msg("* [FrameGraph] Initialized with ResourceManager");
-    } else {
-        Msg("* [FrameGraph] Initialized without ResourceManager (direct NVRHI mode)");
     }
 
     // Reserve space to avoid reallocations
@@ -53,12 +50,6 @@ VirtualResourceHandle FrameGraph::CreateTexture(const char* name, const Resource
     // Add to registry
     m_resources.push_back(node);
 
-    Msg("~ [FrameGraph] Created texture '%s' (%ux%u, %.2f MB)",
-        name,
-        desc.width,
-        desc.height,
-        desc.ComputeMemorySize() / (1024.0f * 1024.0f));
-
     return node.handle;
 }
 
@@ -72,10 +63,6 @@ VirtualResourceHandle FrameGraph::CreateBuffer(const char* name, const ResourceD
 
     // Add to registry
     m_resources.push_back(node);
-
-    Msg("~ [FrameGraph] Created buffer '%s' (%.2f MB)",
-        name,
-        desc.bufferSize / (1024.0f * 1024.0f));
 
     return node.handle;
 }
@@ -100,8 +87,6 @@ VirtualResourceHandle FrameGraph::ImportTexture(
     // Add to registry
     m_resources.push_back(node);
 
-    Msg("~ [FrameGraph] Imported texture '%s'", name);
-
     return node.handle;
 }
 
@@ -125,8 +110,6 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
     // Add to registry
     m_resources.push_back(node);
 
-    Msg("~ [FrameGraph] Imported buffer '%s'", name);
-
     return node.handle;
 }
 
@@ -143,8 +126,6 @@ PassHandle FrameGraph::AddPass(const char* name) {
 
     // Add to registry
     m_passes.push_back(pass);
-
-    Msg("~ [FrameGraph] Added pass '%s'", name);
 
     return pass.handle;
 }
@@ -210,9 +191,6 @@ void FrameGraph::Compile() {
     m_compiled = true;
     m_stats.numPasses = static_cast<u32>(m_passes.size());
     m_stats.numResources = static_cast<u32>(m_resources.size());
-
-    Msg("~ [FrameGraph] Compilation complete (%u passes, %u resources)",
-        m_stats.numPasses, m_stats.numResources);
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -242,8 +220,6 @@ void FrameGraph::Execute() {
 
         // Skip passes without callbacks
         if (!pass->executeCallback) {
-            Msg("! [FrameGraph] Pass '%s' has no execute callback - skipping",
-                pass->name.c_str());
             continue;
         }
 
@@ -348,12 +324,6 @@ void FrameGraph::ResetForNextFrame() {
 
     // Reset per-frame statistics
     m_stats = Statistics();
-
-    // IMPORTANT: Keep m_resourcePool intact!
-    // The pool persists across frames and reuses GPU memory
-    // This is how Frostbite avoids allocating new textures every frame
-
-    Msg("~ [FrameGraph] Reset complete");
 }
 
 // ════════════════════════════════════════════════════════════
@@ -428,8 +398,6 @@ void FrameGraph::Reset() {
     m_stats.executeTimeMs = 0.0f;
     m_stats.totalGPUTimeMs = 0.0f;
     m_stats.passTimings.clear();  // Properly clear the map
-
-    Msg("~ [FrameGraph] Reset complete");
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -552,7 +520,6 @@ bool FrameGraph::ValidateGraph() const {
         if (pass.culled) continue;
 
         if (!pass.executeCallback) {
-            Msg("! [FrameGraph] ERROR: Pass '%s' has no execute callback", pass.name.c_str());
             valid = false;
         }
     }
@@ -564,15 +531,11 @@ bool FrameGraph::ValidateGraph() const {
         for (const auto& access : pass.resourceAccesses) {
             const ResourceNode* resource = GetResourceNode(access.resource);
             if (!resource) {
-                Msg("! [FrameGraph] ERROR: Pass '%s' uses invalid resource handle %u",
-                    pass.name.c_str(), access.resource.index);
                 valid = false;
                 continue;
             }
 
             if (!resource->isAllocated && !resource->desc.isImported) {
-                Msg("! [FrameGraph] ERROR: Pass '%s' uses unallocated resource '%s'",
-                    pass.name.c_str(), resource->desc.debugName.c_str());
                 valid = false;
             }
         }
@@ -586,14 +549,10 @@ bool FrameGraph::ValidateGraph() const {
         if (resource.desc.isImported) {
             if (resource.desc.type == ResourceDesc::Type::Buffer) {
                 if (!resource.nvrhiBuffer) {
-                    Msg("! [FrameGraph] ERROR: Imported buffer '%s' has null handle",
-                        resource.desc.debugName.c_str());
                     valid = false;
                 }
             } else {
                 if (!resource.nvrhiTexture) {
-                    Msg("! [FrameGraph] ERROR: Imported texture '%s' has null handle",
-                        resource.desc.debugName.c_str());
                     valid = false;
                 }
             }

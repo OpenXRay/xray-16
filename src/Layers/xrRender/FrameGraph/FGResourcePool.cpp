@@ -60,7 +60,6 @@ resources::TextureHandle FGResourcePool::AllocatePersistentTexture(const resourc
 
 void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
     if (!handle.IsValid()) {
-        Msg("! [FGResourcePool] FreeTexture called with invalid handle");
         return;
     }
 
@@ -68,7 +67,6 @@ void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
         m_resourceManager->GetTextureManager()->GetMetadata(handle);
 
     if (!meta) {
-        Msg("! [FGResourcePool] FreeTexture: No metadata for handle");
         return;
     }
 
@@ -82,7 +80,6 @@ void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
                 pooled.inUse = false;
                 pooled.lastUsedFrame = m_currentFrame;
                 foundInPool = true;
-                Msg("~ [FGResourcePool] FreeTexture: Marked as available in pool");
                 break;
             }
         }
@@ -96,14 +93,12 @@ void FGResourcePool::FreeTexture(resources::TextureHandle handle) {
             pooled.lastUsedFrame = m_currentFrame;
 
             m_texturePool.push_back(pooled);
-            Msg("~ [FGResourcePool] FreeTexture: Added NEW to pool (pool size=%u)", (u32)m_texturePool.size());
         }
 
     } else {
         // Aliasing disabled - actually destroy
         m_resourceManager->GetTextureManager()->Release(handle);
         m_stats.texturesActive--;
-        Msg("~ [FGResourcePool] FreeTexture: Released (aliasing disabled)");
     }
 }
 

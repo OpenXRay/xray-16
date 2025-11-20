@@ -199,21 +199,7 @@ void CBlender_Compile::PassEnd()
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
 
-    Msg("  [r_End] Creating texture list from %zu passTextures entries", passTextures.size());
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
-    if (dest.T && dest.T->size() > 0)
-    {
-        Msg("  [r_End] Created texture list with %zu textures", dest.T->size());
-    }
-    else if (dest.T)
-    {
-        Msg("! [r_End] Created texture list but it's EMPTY (passTextures had %zu)", passTextures.size());
-    }
-    else
-    {
-        Msg("! [r_End] dest.T is NULL!");
-    }
-
     dest.M = RImplementation.Resources->_CreateMatrixList(passMatrices);
     dest.C = RImplementation.Resources->_CreateConstantList(passConstants);
 
@@ -473,14 +459,12 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
         // Skip if texture name is empty after copying
         if (!name[0])
         {
-            Msg("~ [SampledImage] Skipping empty texture for image '%s'", image);
             return samplerStage;
         }
 
         fix_texture_name(name);
 
         passTextures.emplace_back(textureStage, shared_str(name));
-        Msg("  [SampledImage] Binding texture '%s' at image '%s' (slot=%u)", name, image, textureStage);
     }
     else if (textureStage == InvalidStage)
     {

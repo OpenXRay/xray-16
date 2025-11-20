@@ -1,8 +1,5 @@
 #include "stdafx.h"
 #include "dxUIShader.h"
-
-// FrameGraph includes - only available in R4 renderer
-#if defined(USE_DX11)
 #include "xrRender_console.h"
 #include "RenderContext/RenderDevice.h"
 #include "ResourceManager/FGResourceManager.h"
@@ -10,7 +7,8 @@
 #include "FrameGraph/ShaderCache.h"
 
 extern ENGINE_API int ps_r4_use_framegraph;
-#endif
+
+using namespace xray::render::resources;
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -18,20 +16,12 @@ void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
 
 void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 {
-    Msg("  [dxUIShader::create] Creating UI shader: sh='%s', tex='%s'", sh, tex);
     hShader.create(sh, tex);
 
-    // CRITICAL: Force UI textures to load immediately to avoid lazy loading during rendering
-    // This ensures dimensions are available when UI calculates UVs
     CTexture* baseTexture = GetBaseTexture();
-    if (baseTexture)
+    if (baseTexture && baseTexture->get_Width() == 0)
     {
-        Msg("  [dxUIShader::create] Got base texture: '%s' (width=%u)",
-            baseTexture->cName.c_str(), baseTexture->get_Width());
-        if (baseTexture->get_Width() == 0)
-        {
-            baseTexture->Load();
-        }
+        baseTexture->Load();
     }
     else
     {
@@ -60,7 +50,6 @@ CTexture* dxUIShader::GetBaseTexture() const
 
     const char* baseTextureName = nullptr;
 
-    // Find s_base texture by querying pixel shader reflection
     SPS* ps = pass.ps._get();
     if (ps && ps->reflection)
     {
@@ -86,20 +75,6 @@ CTexture* dxUIShader::GetBaseTexture() const
         }
     }
 
-    // Fallback: use first texture if s_base not found
-    if (!baseTextureName || !baseTextureName[0])
-    {
-        Msg("  [GetBaseTexture] Falling back to first texture");
-        baseTextureName = textures[0].second.c_str();
-    }
-
-    if (!baseTextureName || !baseTextureName[0])
-    {
-        Msg("! [GetBaseTexture] No valid texture name found");
-        return nullptr;
-    }
-
-    // Load the actual CTexture from the texture name
     return RImplementation.Resources->_CreateTexture(baseTextureName);
 }
 
@@ -128,58 +103,21 @@ bool dxUIShader::GetBaseTextureResolution(Fvector2& res)
         return false;
     }
 
-#if defined(USE_DX11)
-    // ═══════════════════════════════════════════════════
-    //  FRAMEGRAPH MODE: Read dimensions from TextureManager
-    // ═══════════════════════════════════════════════════
-    // When using FrameGraph, textures are loaded through TextureManager and
-    // CTexture::get_Width() may return 0. We need to read from NVRHI instead.
-
-    using namespace xray::render::ng;
-    using namespace xray::render::resources;
-
-    if (ps_r4_use_framegraph && RImplementation.m_renderDevice)
-    {
-        FGResourceManager* resourceMgr = RImplementation.m_renderDevice->GetFGResourceManager();
-        if (resourceMgr)
-        {
-            TextureManager* texManager = resourceMgr->GetTextureManager();
-
-            // Load texture to ensure it exists (deduplicates automatically if already loaded)
-            TextureHandle handle = texManager->LoadTexture(texture->cName.c_str());
-            if (handle.IsValid())
-            {
-                // Get NVRHI texture and query its dimensions
-                nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
-                if (nvrhiTexture)
-                {
-                    nvrhi::TextureDesc desc = nvrhiTexture->getDesc();
-                    res = { float(desc.width), float(desc.height) };
-                    return true;
-                }
-            }
-            else
-            {
-                Msg("! [dxUIShader] FindTexture failed for: '%s'", texture->cName.c_str());
-            }
-        }
-    }
-#endif
-
-    // ═══════════════════════════════════════════════════
-    //  LEGACY MODE: Read from CTexture
-    // ═══════════════════════════════════════════════════
-
-    u32 w = texture->get_Width();
-    u32 h = texture->get_Height();
-
-    if (w == 0 || h == 0)
-    {
-        res = { 1.0f, 1.0f };  // Safety fallback to avoid division by zero
+    FGResourceManager* resourceMgr = RImplementation.m_renderDevice->GetFGResourceManager();
+    if (!resourceMgr)
         return false;
-    }
 
-    res = { float(w), float(h) };
+    TextureManager* texManager = resourceMgr->GetTextureManager();
+    TextureHandle handle = texManager->LoadTexture(texture->cName.c_str());
+    if (!handle.IsValid())
+        return false;
+
+    nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
+    if (!nvrhiTexture)
+        return false;
+
+    nvrhi::TextureDesc desc = nvrhiTexture->getDesc();
+    res = { float(desc.width), float(desc.height) };
     return true;
 }
 } // namespace xray::render::RENDER_NAMESPACE

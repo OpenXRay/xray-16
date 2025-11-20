@@ -11,7 +11,6 @@ ShaderLoader::ShaderLoader(xray::render::SlangCompiler* slangCompiler)
 {
     VERIFY(m_slangCompiler != nullptr);
     VERIFY(m_slangCompiler->IsInitialized());
-    Msg("* [ShaderLoader] Created (using Slang compiler)");
 }
 
 ShaderLoader::~ShaderLoader()
@@ -27,8 +26,6 @@ ShaderLoader::~ShaderLoader()
     m_reflectionCache.clear();
 
     const auto& stats = m_cache.GetStats();
-    Msg("* [ShaderLoader] Destroyed (Cache - Hits: %u, Misses: %u, Saves: %u)",
-        stats.hits, stats.misses, stats.saves);
 }
 
 IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
@@ -72,10 +69,6 @@ IReader* ShaderLoader::OpenShaderFile(const char* name, const char* extension)
     strconcat(sizeof(filename), filename, "r5" DELIMITER, shName, extension);
 
     IReader* R = FS.r_open("$game_shaders$", filename);
-    if (!R)
-    {
-        Msg("! [ShaderLoader] Failed to open shader: %s", filename);
-    }
     return R;
 }
 
@@ -103,11 +96,6 @@ bool ShaderLoader::CompileShader(
         fs->close();
         return true;  // Cache hit!
     }
-
-    // Cache miss - compile with Slang
-    Msg("~ [ShaderLoader] Compiling %s%s (entry: %s, stage: %s)",
-        shaderName, extension, entryPoint,
-        xray::render::SlangCompiler::GetStageName(stage));
 
     // Copy source to null-terminated string (Slang expects C-string)
     xr_string sourceCode;
@@ -187,12 +175,9 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         // Store deserialized reflection
         result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
 
-        Msg("  ✓ Loaded vertex shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        Msg("  Loaded vertex shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
         return result;
     }
-
-    // Cache miss - compile with Slang (gets reflection!)
-    Msg("~ [ShaderLoader] Compiling %s.vs (entry: %s)", name, entryPoint);
 
     xr_string sourceCode;
     sourceCode.assign((const char*)fs->pointer(), fs->length());
@@ -249,7 +234,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     // Save bytecode + reflection to cache
     m_cache.Save(name, ".vs", sourceHash, result.bytecode, &extractedReflection);
 
-    Msg("  ✓ Loaded vertex shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    Msg("  Loaded vertex shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
     return result;
 }
 
@@ -301,9 +286,6 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         Msg("  ✓ Loaded pixel shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
         return result;
     }
-
-    // Cache miss - compile with Slang (gets reflection!)
-    Msg("~ [ShaderLoader] Compiling %s.ps (entry: %s)", name, entryPoint);
 
     xr_string sourceCode;
     sourceCode.assign((const char*)fs->pointer(), fs->length());
@@ -360,7 +342,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     // Save bytecode + reflection to cache
     m_cache.Save(name, ".ps", sourceHash, result.bytecode, &extractedReflection);
 
-    Msg("  ✓ Loaded pixel shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    Msg("  Loaded pixel shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
     return result;
 }
 
@@ -440,9 +422,6 @@ bool ShaderLoader::CompileShaderWithDefines(
         return true;
     }
 
-    // Cache miss - compile with Slang
-    Msg("  [ShaderLoader] Cache MISS: %s%s - compiling with Slang...", shaderName, extension);
-
     // Build full shader path for include resolution
     string_path fullPath;
     strconcat(sizeof(fullPath), fullPath,
@@ -490,7 +469,7 @@ bool ShaderLoader::CompileShaderWithDefines(
     // Return bytecode
     outBytecode = std::move(compileResult.bytecode);
 
-    Msg("  [ShaderLoader] Compilation SUCCESS: %s%s (%zu bytes)",
+    Msg("[ShaderLoader] Compilation SUCCESS: %s%s (%zu bytes)",
         shaderName, extension, outBytecode.size());
 
     return true;
