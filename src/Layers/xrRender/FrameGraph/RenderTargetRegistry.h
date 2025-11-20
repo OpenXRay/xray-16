@@ -17,12 +17,10 @@ public:
         #ifdef DEBUG
         auto it = m_registry.find(key);
         if (it != m_registry.end()) {
-            Msg("! [RTRegistry] Warning: Overwriting RT '%s'", name);
         }
         #endif
 
         m_registry[key] = handle;
-        Msg("! [RTRegistry] Registered: %s (handle index: %u)", name, handle.index);
     }
 
     void RegisterAliases(VirtualResourceHandle handle, const std::initializer_list<const char*>& names) {
@@ -36,7 +34,6 @@ public:
         auto it = m_registry.find(key);
 
         if (it == m_registry.end()) {
-            Msg("! [RTRegistry] ERROR: RT not found: %s", name);
             R_ASSERT2(false, make_string("RT not found: %s", name));
         }
 
@@ -80,7 +77,6 @@ public:
 
     void Clear() {
         m_registry.clear();
-        Msg("! [RTRegistry] Cleared");
     }
 
 private:
