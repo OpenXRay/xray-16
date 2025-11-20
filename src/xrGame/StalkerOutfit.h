@@ -17,5 +17,5 @@ public:
     virtual ~CStalkerOutfit(void);
 
 private:
-    DECLARE_SCRIPT_REGISTER_FUNCTION();
+    DECLARE_SCRIPT_REGISTER_FUNCTION(CGameObject);
 };
