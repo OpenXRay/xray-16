@@ -11,6 +11,8 @@
 #include "Layers/xrRender/SkeletonCustom.h"
 #include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/SkeletonX.h"
+#include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
+#include "Layers/xrRender/FTreeVisual.h"
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -149,7 +151,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
             ctx->SetScissor(scissor);
 
             ng::PipelineState* currentPipeline = nullptr;
-            float lastDetailScale = -1.0f;
+            MaterialPSO* lastMatPSO = nullptr;
             u32 numDraws = 0;
 
             for (const auto& batch : *data.hudBatches) {
@@ -165,10 +167,32 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
                 Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
 
-                if (matPSO->detail_scale != lastDetailScale) {
+                fgconstants::FGConstantSystem constants(matPSO, data.materialCache->GetVCBPool());
+
+                if (matPSO != lastMatPSO) {
+                    Fvector4 dt_params(
+                        matPSO->detail_scale,
+                        matPSO->detail_scale,
+                        matPSO->detail_scale,
+                        1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range
+                    );
+                    constants.Set("dt_params", dt_params);
+
+                    constants.CommitMaterial(ctx);
+
+                    lastMatPSO = matPSO;
+                }
+
+                bool isSkeleton = false;
+                u32 visualType = 0;
+                if (batch.visual && batch.renderable) {
+                    visualType = batch.visual->getType();
+                    isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+                }
+
+                if (isSkeleton) {
                     DynamicTransforms dynamicCB = {};
                     FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
-
                     for (const auto& cbInfo : matPSO->constantBuffers) {
                         if (cbInfo.name == "dynamic_transforms") {
                             u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
@@ -176,73 +200,50 @@ framegraph::DefaultOutputLayout setupHUDPass(
                             break;
                         }
                     }
-                    lastDetailScale = matPSO->detail_scale;
-                }
 
-                if (!matPSO->vcbRequirements.empty()) {
-                    ng::BufferHandle vcbHandle = matPSO->vcbRequirements[0].vcbHandle;
-                    u32 vcbSize = matPSO->vcbRequirements[0].size;
-
-                    if (vcbHandle.IsValid() && vcbSize <= 4096) {
-                        u8 cbData[4096];
-                        ZeroMemory(cbData, vcbSize);
-
-                        bool isSkeleton = false;
-                        if (batch.visual && batch.renderable) {
-                            auto visualType = batch.visual->getType();
-                            isSkeleton = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
-                        }
-
-                        if (isSkeleton) {
-                            DynamicTransforms dynamicCB = {};
-                            FillDynamicTransforms(dynamicCB, adjustedWorldMatrix);
-                            for (const auto& cbInfo : matPSO->constantBuffers) {
-                                if (cbInfo.name == "dynamic_transforms") {
-                                    u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
-                                    ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicCB, sizeToWrite);
-                                    break;
-                                }
-                            }
-
-                            RENDER_NAMESPACE::CKinematics* Parent = nullptr;
-                            auto visualType = batch.visual->getType();
-                            if (visualType == MT_SKELETON_GEOMDEF_ST) {
-                                auto* skeletonMesh = static_cast<CSkeletonX_ST*>(batch.visual);
-                                Parent = skeletonMesh->GetParent();
-                            } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
-                                auto* skeletonMesh = static_cast<CSkeletonX_PM*>(batch.visual);
-                                Parent = skeletonMesh->GetParent();
-                            }
-
-                            if (Parent) {
-                                Parent->CalculateBones(TRUE);
-
-                                u32 count = Parent->LL_BoneCount();
-                                u32 maxBones = vcbSize / 48;
-                                count = std::min(count, maxBones);
-
-                                float* array = reinterpret_cast<float*>(cbData);
-                                for (u32 mid = 0; mid < count; mid++) {
-                                    Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
-                                    u32 id = mid * 3;
-                                    array[(id + 0) * 4 + 0] = M._11; array[(id + 0) * 4 + 1] = M._21; array[(id + 0) * 4 + 2] = M._31; array[(id + 0) * 4 + 3] = M._41;
-                                    array[(id + 1) * 4 + 0] = M._12; array[(id + 1) * 4 + 1] = M._22; array[(id + 1) * 4 + 2] = M._32; array[(id + 1) * 4 + 3] = M._42;
-                                    array[(id + 2) * 4 + 0] = M._13; array[(id + 2) * 4 + 1] = M._23; array[(id + 2) * 4 + 2] = M._33; array[(id + 2) * 4 + 3] = M._43;
-                                }
-                            }
-                        }
-
-                        nvrhi::IBuffer* vcbBuffer = data.device->GetNativeBuffer(vcbHandle);
-                        if (vcbBuffer) {
-                            ctx->WriteBuffer(vcbBuffer, cbData, vcbSize);
-
-                            data.materialCache->GetOrCreateBindingSet(matPSO);
-
-                            ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
-                            ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
-                        }
+                    RENDER_NAMESPACE::CKinematics* Parent = nullptr;
+                    if (visualType == MT_SKELETON_GEOMDEF_ST) {
+                        auto* skeletonMesh = static_cast<CSkeletonX_ST*>(batch.visual);
+                        Parent = skeletonMesh->GetParent();
+                    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+                        auto* skeletonMesh = static_cast<CSkeletonX_PM*>(batch.visual);
+                        Parent = skeletonMesh->GetParent();
                     }
+
+                    if (Parent) {
+                        Parent->CalculateBones(TRUE);
+
+                        u32 count = Parent->LL_BoneCount();
+
+                        constexpr u32 MAX_BONES = 78;
+                        Fmatrix boneMatrices[MAX_BONES];
+                        u32 bonesToUpload = std::min(count, MAX_BONES);
+
+                        for (u32 i = 0; i < bonesToUpload; i++) {
+                            boneMatrices[i] = Parent->LL_GetTransform_R(u16(i));
+                        }
+
+                        constants.SetArray("sbones_array", boneMatrices, bonesToUpload);
+                    }
+                } else {
+                    Fmatrix xform_v;
+                    xform_v.mul(adjustedWorldMatrix, Device.mView);
+
+                    constants.Set("m_xform", adjustedWorldMatrix);
+                    constants.Set("m_xform_v", xform_v);
+
+                    using namespace xray::render::RENDER_NAMESPACE;
+                    float tree_scale = 1.0f / float(FTreeVisual_quant);
+                    Fvector4 consts_vec(tree_scale, tree_scale, 0.0f, 0.0f);
+                    constants.Set("consts", consts_vec);
                 }
+
+                constants.CommitInstance(ctx);
+
+                data.materialCache->GetOrCreateBindingSet(matPSO);
+
+                ctx->SetBindingSet(0, matPSO->vsBindingSet.Get());
+                ctx->SetBindingSet(1, matPSO->psBindingSet.Get());
 
                 nvrhi::IBuffer* vb = batch.vertexBuffer.Get();
                 nvrhi::IBuffer* ib = batch.indexBuffer.Get();

@@ -307,6 +307,16 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
+    auto hudOutputs = passes::setupHUDPass(
+        *m_framegraph,
+        m_device,
+        gbufferOutputs,
+        &m_hudBatches,
+        m_materialCache.get(),
+        width,
+        height
+    );
+
     auto uiTarget = passes::setupUIPass(
         *m_framegraph,
         width,
@@ -329,7 +339,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto compositeOutput = passes::setupCompositePass(
         *m_framegraph,
-        gbufferOutputs.albedo,
+        hudOutputs.albedo,
         uiTarget,
         width,
         height
