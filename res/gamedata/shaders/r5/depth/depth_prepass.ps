@@ -1,0 +1,37 @@
+// xrRender/Shaders/depth/depth_prepass.ps.hlsl
+// Phase 2.2: Depth Prepass Pixel Shader (stub for Phase 2)
+//
+// Optional pixel shader for alpha-tested geometry in depth prepass
+// Most geometry won't need this (pure Z-only rendering in vertex shader)
+
+// ══════════════════════════════════════════════════════════
+//  INPUT
+// ══════════════════════════════════════════════════════════
+
+struct PS_INPUT {
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+};
+
+// ══════════════════════════════════════════════════════════
+//  TEXTURES (for alpha testing)
+// ══════════════════════════════════════════════════════════
+
+Texture2D t_albedo : register(t0);
+SamplerState s_linear : register(s0);
+
+// ══════════════════════════════════════════════════════════
+//  PIXEL SHADER (Alpha test only, no color output)
+// ══════════════════════════════════════════════════════════
+
+void main(PS_INPUT input) {
+    // Sample alpha channel
+    float alpha = t_albedo.Sample(s_linear, input.texcoord).a;
+
+    // Discard if alpha fails threshold (alpha testing)
+    if (alpha < 0.5) {
+        discard;
+    }
+
+    // No color output needed - depth is written automatically
+}

@@ -889,6 +889,12 @@
     <ClInclude Include="..\xrRender\ConstantSystem\FGConstantSystem.h">
       <Filter>Framegraph\ConstantSystem</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1629,6 +1635,12 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\ConstantSystem\FGConstantSystem.cpp">
       <Filter>Framegraph\ConstantSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
