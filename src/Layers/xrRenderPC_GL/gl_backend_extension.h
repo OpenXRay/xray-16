@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glad/gl.h>
 #include <string_view>
+#include <shader_data.h>
 
 namespace xray::render::RENDER_NAMESPACE
 {
