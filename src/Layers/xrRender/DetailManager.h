@@ -50,38 +50,9 @@ extern float dm_current_fade;// = float(2*dm_current_size)-.5f;
 extern float ps_current_detail_density;
 extern float ps_current_detail_height;
 
-#ifdef USE_OGL
-#pragma pack(push, 1)
-struct EnvironmentDetailData
-{
-    glm::mat4x4	xform;
-    glm::mat4x4	xformView;
-    glm::vec4 consts;
-    glm::vec4 scale;
-    glm::vec4 bias;
-    glm::vec4 wind;
-    glm::vec4 wave;
-    glm::vec3 sun;
-
-private:
-    [[maybe_unused]]
-    glm::vec1 _glsl_140_padding {};
-    // 224 bytes
-};
-#pragma pack(pop)
-#endif
-
 class ECORE_API CDetailManager
 {
 public:
-#ifdef USE_OGL
-    EnvironmentDetailData environmentDetailData[3];
-
-    UniformBufferObject uniformBufferObject = {
-        GL_NONE, GL_DYNAMIC_DRAW, sizeof(EnvironmentDetailData)*3
-    };
-#endif
-
     struct SlotItem
     { // один кустик
         float scale;
@@ -214,12 +185,14 @@ public:
     VertexStagingBuffer hw_VB;
     IndexStagingBuffer hw_IB;
 
+#ifndef USE_OGL
     ref_constant hwc_consts;
     ref_constant hwc_wave;
     ref_constant hwc_wind;
-    ref_constant hwc_array;
     ref_constant hwc_s_consts;
     ref_constant hwc_s_xform;
+#endif
+    ref_constant hwc_array;
     ref_constant hwc_s_array;
     void hw_Load();
     void hw_Load_Geom();
@@ -258,5 +231,16 @@ public:
 
     CDetailManager();
     virtual ~CDetailManager();
+
+#ifdef USE_OGL
+private:
+    // TODO move to global registry ?
+    GLuint renderDumpBlockBinding = 3;
+    ShaderInstanceData renderDumpData[3];
+
+    UniformBufferObject renderDumpUBO = {
+        BUFFER_DEBUG_NAME("DetailManagerUBO") GL_NONE, GL_DYNAMIC_DRAW, sizeof(ShaderInstanceData)*3
+    };
+#endif
 };
 } // namespace xray::render::RENDER_NAMESPACE

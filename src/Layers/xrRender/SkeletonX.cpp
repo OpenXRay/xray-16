@@ -95,7 +95,7 @@ void CSkeletonX::_Render(CBackend& cmd_list, ref_geom& hGeom, u32 vCount, u32 iO
 
         // render
 #ifdef USE_OGL
-        cmd_list.set_uniforms(array->vs.program, array->vs.location, uniformBuffer);
+        cmd_list.setUniforms(array->vs.program, array->vs.location, uniformBuffer);
 #endif
         cmd_list.set_Geometry(hGeom);
         cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, vCount, iOffset, pCount);

@@ -1,16 +1,7 @@
 #include "common.h"
 #include "iostructs\v_detail.h"
 
-layout(std140) uniform EnvironmentDetailUBO {
-    mat4 xform;
-    mat4 formView;
-    vec4 consts;
-    vec4 scale;
-    vec4 bias;
-    vec4 wind;
-    vec4 wave;
-    vec3 sun;
-};
+#include "shared\ubo_render_dump.h"
 
 uniform float4 		array[61*4];
 

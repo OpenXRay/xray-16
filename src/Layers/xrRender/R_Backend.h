@@ -23,7 +23,7 @@
 #endif
 #ifdef USE_OGL
 #include <glm/glm.hpp>
-#include "gl_backend_uniforms.h"
+#include "gl_backend_extension.h"
 #endif
 
 #include "FVF.h"
@@ -65,7 +65,7 @@ struct R_statistics
 #pragma warning(disable:4324)
 class ECORE_API CBackend
 #ifdef USE_OGL
-    : public CBackendUniforms
+    : public CBackendExtension
 #endif
 {
 public:
@@ -410,6 +410,7 @@ public:
 public:
 #if defined(USE_OGL)
     ICF bool is_TessEnabled() { return false; }
+    void RenderInstanced(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC, GLsizei instanceCount);
 #elif defined(USE_DX11)
     ICF bool is_TessEnabled();
 #else

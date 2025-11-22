@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "DetailManager.h"
-#include <glm/glm.hpp>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -19,7 +18,6 @@ static VertexElement dwDecl[] =
 };
 
 #pragma pack(push, 1)
-// TODO glm, remove mid param
 struct vertHW
 {
     float x, y, z;
@@ -37,6 +35,8 @@ short QC(float v)
 
 void CDetailManager::hw_Load()
 {
+    RCache.uboGenerate(renderDumpUBO);
+
     hw_Load_Geom();
     hw_Load_Shaders();
 }
@@ -92,14 +92,11 @@ void CDetailManager::hw_Load_Geom()
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
-            u16 offset = 0;
 
             for (u32 i = 0; i < u32(D.number_indices); i++)
             {
-                *pI++ = u16(u16(D.indices[i]) + u16(offset));
+                *pI++ = u16(D.indices[i]);
             }
-            offset = u16(offset + u16(D.number_vertices));
-
         }
         hw_IB.Unmap(true); // upload index data
     }
@@ -110,6 +107,9 @@ void CDetailManager::hw_Load_Geom()
 
 void CDetailManager::hw_Unload()
 {
+    if (renderDumpUBO.valid())
+        RCache.uboDispose(renderDumpUBO);
+
     // Destroy VS/VB/IB
     if (hw_Geom)
         hw_Geom.destroy();

@@ -19,21 +19,28 @@ void CDetailManager::hw_Load_Shaders()
     S.create("details" DELIMITER "set");
     R_constant_table& T0 = *S->E[0]->passes[0]->constants;
     R_constant_table& T1 = *S->E[1]->passes[0]->constants;
-    hwc_consts = T0.get("consts");
-    hwc_wave = T0.get("wave");
-    hwc_wind = T0.get("dir2D");
     hwc_array = T0.get("array");
-    hwc_s_consts = T1.get("consts");
-    hwc_s_xform = T1.get("xform");
     hwc_s_array = T1.get("array");
+
+    // TODO: There has to be a better way to do this
+    for (auto shader_element : S->E)
+    {
+        if (shader_element == nullptr)
+            continue;
+
+        for (auto pass : shader_element->passes)
+        {
+            if (pass->vs && pass->vs->sh)
+            {
+                RCache.uboRegisterWithProgram(pass->vs, "RenderDumpUBO", renderDumpBlockBinding, renderDumpUBO);
+            }
+        }
+    }
 }
 
 void CDetailManager::hw_Render(CBackend& cmd_list)
 {
     using namespace detail_manager;
-
-    if (uniformBufferObject.id == GL_NONE)
-        RCache.uniformBufferObjectGenerate(uniformBufferObject);
 
     // Render-prepare
     //	Update timer
@@ -58,51 +65,47 @@ void CDetailManager::hw_Render(CBackend& cmd_list)
     const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
 
     // Wave0
-    float scale = 1.f / float(quant);
+    float scale = 1.f / static_cast<float>(quant);
 
     //environmentDetailUbo[0].xform = Device.mFullTransform;
-    memcpy(&environmentDetailData[0].xform, &Device.mFullTransform, sizeof(glm::mat4));
+    memcpy(&renderDumpData[0].xform, &Device.mFullTransform, sizeof(glm::mat4));
     //environmentDetailUbo[0].xformView;
-    environmentDetailData[0].consts = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
-    environmentDetailData[0].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    renderDumpData[0].consts = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    renderDumpData[0].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
     //environmentDetailUbo[0].bias;
-    environmentDetailData[0].wind = wind1;
-    environmentDetailData[0].wave = glm::vec4(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos) / PI_MUL_2;
-    environmentDetailData[0].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
-
-    //
+    renderDumpData[0].wind = wind1;
+    renderDumpData[0].wave = glm::vec4(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos) / PI_MUL_2;
+    renderDumpData[0].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
 
     //environmentDetailUbo[1].xform = Device.mFullTransform;
-    memcpy(&environmentDetailData[1].xform, &Device.mFullTransform, sizeof(glm::mat4));
+    memcpy(&renderDumpData[1].xform, &Device.mFullTransform, sizeof(glm::mat4));
     //environmentDetailUbo[1].xformView;
-    environmentDetailData[1].consts = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
-    environmentDetailData[1].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    renderDumpData[1].consts = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    renderDumpData[1].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
     //environmentDetailUbo[1].bias;
-    environmentDetailData[1].wind = wind2;
-    environmentDetailData[1].wave = glm::vec4(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos) / PI_MUL_2;
-    environmentDetailData[1].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
-
-    //
+    renderDumpData[1].wind = wind2;
+    renderDumpData[1].wave = glm::vec4(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos) / PI_MUL_2;
+    renderDumpData[1].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
 
     //environmentDetailUbo[2].xform = Device.mFullTransform;
-    memcpy(&environmentDetailData[2].xform, &Device.mFullTransform, sizeof(glm::mat4));
+    memcpy(&renderDumpData[2].xform, &Device.mFullTransform, sizeof(glm::mat4));
     //environmentDetailUbo[2].xformView;
-    environmentDetailData[2].consts = glm::vec4(scale, scale, scale, 1.f);
-    environmentDetailData[2].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
+    renderDumpData[2].consts = glm::vec4(scale, scale, scale, 1.f);
+    renderDumpData[2].scale = glm::vec4(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
     //environmentDetailUbo[2].bias;
-    environmentDetailData[2].wind = wind2;
-    environmentDetailData[2].wave = glm::vec4(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos) / PI_MUL_2;
-    environmentDetailData[2].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
+    renderDumpData[2].wind = wind2;
+    renderDumpData[2].wave = glm::vec4(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos) / PI_MUL_2;
+    renderDumpData[2].sun = glm::vec3(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z) * 0.5f;
 
-    RCache.uniformBufferObjectPushToDevice(uniformBufferObject, uniformBufferObject.size, &environmentDetailData);
+    cmd_list.uboPushToDevice(renderDumpUBO, renderDumpUBO.size, &renderDumpData);
 
-    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, 3, uniformBufferObject.id, 0, sizeof(EnvironmentDetailData)));
+    cmd_list.uboBindRange(renderDumpUBO, renderDumpBlockBinding, 0, sizeof(ShaderInstanceData));
     hw_Render_dump(cmd_list, 1, 0);
 
-    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, 3, uniformBufferObject.id, sizeof(EnvironmentDetailData), sizeof(EnvironmentDetailData)));
+    cmd_list.uboBindRange(renderDumpUBO, renderDumpBlockBinding, sizeof(ShaderInstanceData), sizeof(ShaderInstanceData));
     hw_Render_dump(cmd_list, 2, 0);
 
-    CHK_GL(glBindBufferRange(GL_UNIFORM_BUFFER, 3, uniformBufferObject.id, sizeof(EnvironmentDetailData)*2, sizeof(EnvironmentDetailData)));
+    cmd_list.uboBindRange(renderDumpUBO, renderDumpBlockBinding, sizeof(ShaderInstanceData)*2, sizeof(ShaderInstanceData));
     hw_Render_dump(cmd_list, 0, 1);
 }
 
@@ -118,32 +121,23 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, u32 var_id, u32 lod_id)
 
     vis_list& list = m_visibles [var_id];
 
-    const auto& desc = g_pGamePersistent->Environment().CurrentEnv;
-    Fvector c_sun, c_ambient, c_hemi;
-    c_sun.set(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z);
-    c_sun.mul(.5f);
-    c_ambient.set(desc.ambient.x, desc.ambient.y, desc.ambient.z);
-    c_hemi.set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z);
-
     // Iterate
     for (u32 O = 0; O < objects.size(); O++)
     {
         CDetail& Object = *objects [O];
         xr_vector<SlotItemVec*>& vis = list [O];
+
         if (!vis.empty())
         {
             for (u32 iPass = 0; iPass < Object.shader->E[lod_id]->passes.size(); ++iPass)
             {
-                // TODO register only once
-                RCache.uniformBufferObjectRegisterWithProgram(Object.shader->E[lod_id]->passes[iPass]->vs, "EnvironmentDetailUBO", 3, uniformBufferObject);
-
                 cmd_list.set_Element(Object.shader->E[lod_id], iPass);
                 cmd_list.apply_lmaterial();
 
                 ref_constant constArray = cmd_list.get_c(strArray);
                 VERIFY(constArray);
 
-                u32 dwBatch = 0;
+                u32 instanceCount = 0;
                 xr_vector<glm::vec4> uniformBuffer;
                 uniformBuffer.reserve(hw_BatchSize*4);
 
@@ -151,8 +145,6 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, u32 var_id, u32 lod_id)
                 {
                     for (auto& instance : *items)
                     {
-                        u32 base = dwBatch * 4;
-
                         // Build matrix ( 3x4 matrix, last row - color )
                         float scale = instance->scale_calculated;
                         Fmatrix& M = instance->mRotY;
@@ -165,35 +157,28 @@ void CDetailManager::hw_Render_dump(CBackend& cmd_list, u32 var_id, u32 lod_id)
                         // R2 only needs hemisphere
                         uniformBuffer.emplace_back(instance->c_sun, instance->c_sun, instance->c_sun, instance->c_hemi);
 
-                        dwBatch ++;
-                        if (dwBatch == hw_BatchSize)
+                        instanceCount++;
+                        // flush when buffer full
+                        if (instanceCount == hw_BatchSize) // flush
                         {
-                            // flush
-                            RImplementation.BasicStats.DetailCount += dwBatch;
-                            u32 dwCNT_verts = dwBatch * Object.number_vertices;
-                            u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
+                            RImplementation.BasicStats.DetailCount += instanceCount;
 
-                            cmd_list.set_uniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
-                            glDrawElementsInstancedBaseVertex(GL_TRIANGLES, Object.number_indices, GL_UNSIGNED_SHORT, (void*)(iOffset * sizeof(GLushort)), dwBatch, vOffset);
-
-                            cmd_list.stat.r.s_details.add(dwCNT_verts);
-                            uniformBuffer.clear();
+                            cmd_list.setUniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
+                            cmd_list.RenderInstanced(D3DPT_TRIANGLELIST, vOffset, 0, Object.number_vertices, iOffset, Object.number_indices / 3, instanceCount);
 
                             // restart
-                            dwBatch = 0;
+                            instanceCount = 0;
+                            uniformBuffer.clear();
                         }
                     }
                 }
-                // flush if nessecary
-                if (dwBatch)
+                // flush if necessary
+                if (instanceCount)
                 {
-                    RImplementation.BasicStats.DetailCount += dwBatch;
-                    u32 dwCNT_verts = dwBatch * Object.number_vertices;
-                    u32 dwCNT_prims = dwBatch * Object.number_indices / 3;
+                    RImplementation.BasicStats.DetailCount += instanceCount;
 
-                    cmd_list.set_uniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
-                    glDrawElementsInstancedBaseVertex(GL_TRIANGLES, Object.number_indices, GL_UNSIGNED_SHORT, (void*)(iOffset * sizeof(GLushort)), dwBatch, vOffset);
-                    cmd_list.stat.r.s_details.add(dwCNT_verts);
+                    cmd_list.setUniforms(constArray->vs.program, constArray->vs.location, uniformBuffer);
+                    cmd_list.RenderInstanced(D3DPT_TRIANGLELIST, vOffset, 0, Object.number_vertices, iOffset, Object.number_indices / 3, instanceCount);
                 }
             }
         }
