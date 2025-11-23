@@ -890,14 +890,8 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     // ═══════════════════════════════════════════════════════
     //  STEP 4: Re-normalize dirty albedo to DEFAULT for SegFormer
     // ═══════════════════════════════════════════════════════
-    // Dirty albedo is in raw logits, need to convert to [0,1] first, then normalize
-    // Apply sigmoid to convert logits to probabilities
-    for (u32 i = 0; i < dirty_albedo.data.size(); ++i) {
-        float val = dirty_albedo.data[i];
-        dirty_albedo.data[i] = 1.0f / (1.0f + std::exp(-val));  // sigmoid
-    }
 
-    // Now normalize with DEFAULT stats for SegFormer
+    // Normalize with DEFAULT stats for SegFormer
     PreprocessingUtils::NormalizeImageNetDefault(dirty_albedo);
 
     // ═══════════════════════════════════════════════════════
