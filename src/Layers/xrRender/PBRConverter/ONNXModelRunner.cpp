@@ -359,7 +359,26 @@ xr_vector<Tensor> ONNXModelRunner::Run(
     }
 }
 
-void PreprocessingUtils::NormalizeImageNet(Tensor& tensor) {
+void PreprocessingUtils::NormalizeImageNetStandard(Tensor& tensor) {
+    constexpr float MEAN[] = {0.5f, 0.5f, 0.5f};
+    constexpr float STD[] = {0.5f, 0.5f, 0.5f};
+
+    const u32 H = tensor.height();
+    const u32 W = tensor.width();
+
+    const u32 channels_to_normalize = std::min(tensor.channels(), 3u);
+
+    for (u32 c = 0; c < channels_to_normalize; ++c) {
+        for (u32 h = 0; h < H; ++h) {
+            for (u32 w = 0; w < W; ++w) {
+                const u32 idx = c * H * W + h * W + w;
+                tensor.data[idx] = (tensor.data[idx] - MEAN[c]) / STD[c];
+            }
+        }
+    }
+}
+
+void PreprocessingUtils::NormalizeImageNetDefault(Tensor& tensor) {
     constexpr float MEAN[] = {0.485f, 0.456f, 0.406f};
     constexpr float STD[] = {0.229f, 0.224f, 0.225f};
 
@@ -376,6 +395,10 @@ void PreprocessingUtils::NormalizeImageNet(Tensor& tensor) {
             }
         }
     }
+}
+
+void PreprocessingUtils::NormalizeImageNet(Tensor& tensor) {
+    NormalizeImageNetDefault(tensor);
 }
 
 Tensor PreprocessingUtils::ComputeMeanCurvature(const Tensor& normal_map) {
@@ -637,9 +660,10 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
         return false;
     }
 
-    string_path seg_path, albedo_path, parallax_path, ao_path, metallic_path, roughness_path;
+    string_path seg_path, albedo_path, albedo_uncond_path, parallax_path, ao_path, metallic_path, roughness_path;
     FS.update_path(seg_path, "$game_data$", (config.model_dir + "\\segformer.onnx").c_str());
     FS.update_path(albedo_path, "$game_data$", (config.model_dir + "\\unet_albedo.onnx").c_str());
+    FS.update_path(albedo_uncond_path, "$game_data$", (config.model_dir + "\\unet_albedo_uncond.onnx").c_str());
     FS.update_path(parallax_path, "$game_data$", (config.model_dir + "\\unet_parallax.onnx").c_str());
     FS.update_path(ao_path, "$game_data$", (config.model_dir + "\\unet_ao.onnx").c_str());
     FS.update_path(metallic_path, "$game_data$", (config.model_dir + "\\unet_metallic.onnx").c_str());
@@ -648,6 +672,7 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     bool all_exist = true;
     all_exist &= FS.exist(seg_path, FSType::External);
     all_exist &= FS.exist(albedo_path, FSType::External);
+    all_exist &= FS.exist(albedo_uncond_path, FSType::External);
     all_exist &= FS.exist(parallax_path, FSType::External);
     all_exist &= FS.exist(ao_path, FSType::External);
     all_exist &= FS.exist(metallic_path, FSType::External);
@@ -660,6 +685,7 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
 
     segformer_path_ = seg_path;
     unet_albedo_path_ = albedo_path;
+    unet_albedo_uncond_path_ = albedo_uncond_path;
     unet_parallax_path_ = parallax_path;
     unet_ao_path_ = ao_path;
     unet_metallic_path_ = metallic_path;
@@ -682,33 +708,82 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     const u32 W = diffuse.width();
 
     if (config_.verbose) {
-        Msg("[PBRPipeline] Stage1: Processing %ux%u texture", W, H);
+        Msg("[PBRPipeline] Stage1: Processing %ux%u texture (Two-Pass Albedo)", W, H);
     }
 
-    Tensor diffuse_norm = Tensor::Create(1, 3, H, W);
-    Tensor normal_norm = Tensor::Create(1, 3, H, W);
+    Tensor diffuse_std = Tensor::Create(1, 3, H, W);
+    Tensor normal_std = Tensor::Create(1, 3, H, W);
 
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            diffuse_norm.data[c * H * W + i] = diffuse.data[c * H * W + i];
-            normal_norm.data[c * H * W + i] = normal.data[c * H * W + i];
+            diffuse_std.data[c * H * W + i] = diffuse.data[c * H * W + i];
+            normal_std.data[c * H * W + i] = normal.data[c * H * W + i];
         }
     }
 
-    PreprocessingUtils::NormalizeImageNet(diffuse_norm);
-    PreprocessingUtils::NormalizeImageNet(normal_norm);
+    PreprocessingUtils::NormalizeImageNetStandard(diffuse_std);
+    PreprocessingUtils::NormalizeImageNetStandard(normal_std);
 
-    Tensor input_6ch = Tensor::Create(1, 6, H, W);
+    Tensor input_6ch_std = Tensor::Create(1, 6, H, W);
 
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_6ch.data[c * H * W + i] = diffuse_norm.data[c * H * W + i];
+            input_6ch_std.data[c * H * W + i] = diffuse_std.data[c * H * W + i];
         }
     }
 
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_6ch.data[(c + 3) * H * W + i] = normal_norm.data[c * H * W + i];
+            input_6ch_std.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
+        }
+    }
+
+    Tensor dirty_albedo;
+    {
+        ONNXModelRunner unet_albedo_uncond;
+        if (!unet_albedo_uncond.LoadModel(unet_albedo_uncond_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
+            Msg("! [PBRPipeline] Stage1: Failed to load UNet Albedo Uncond");
+            return result;
+        }
+
+        xr_vector<Tensor> uncond_inputs = { input_6ch_std };
+        xr_vector<const char*> uncond_input_names = { "image" };
+        xr_vector<const char*> uncond_output_names = { "albedo" };
+
+        xr_vector<Tensor> uncond_outputs = unet_albedo_uncond.Run(uncond_inputs, uncond_input_names, uncond_output_names);
+
+        if (uncond_outputs.empty()) {
+            Msg("! [PBRPipeline] Stage1: UNet Albedo Uncond failed");
+            return result;
+        }
+
+        dirty_albedo = std::move(uncond_outputs[0]);
+    }
+
+    if (config_.verbose) {
+        Msg("[PBRPipeline] First pass (uncond): Dirty albedo [%u,%u,%u,%u]",
+            dirty_albedo.batch(), dirty_albedo.channels(),
+            dirty_albedo.height(), dirty_albedo.width());
+    }
+
+    for (u32 i = 0; i < dirty_albedo.data.size(); ++i) {
+        float val = dirty_albedo.data[i];
+        dirty_albedo.data[i] = 1.0f / (1.0f + std::exp(-val));
+    }
+
+    PreprocessingUtils::NormalizeImageNetDefault(dirty_albedo);
+
+    Tensor segformer_input_6ch = Tensor::Create(1, 6, H, W);
+
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            segformer_input_6ch.data[c * H * W + i] = dirty_albedo.data[c * H * W + i];
+        }
+    }
+
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            segformer_input_6ch.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
         }
     }
 
@@ -720,7 +795,7 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
             return result;
         }
 
-        xr_vector<Tensor> seg_inputs = { input_6ch };
+        xr_vector<Tensor> seg_inputs = { segformer_input_6ch };
         xr_vector<const char*> seg_input_names = { "input" };
         xr_vector<const char*> seg_output_names = { "logits", "features" };
 
@@ -751,7 +826,7 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
             return result;
         }
 
-        xr_vector<Tensor> albedo_inputs = { input_6ch, result.seg_features };
+        xr_vector<Tensor> albedo_inputs = { input_6ch_std, result.seg_features };
         xr_vector<const char*> albedo_input_names = { "image", "seg_features" };
         xr_vector<const char*> albedo_output_names = { "albedo" };
 
@@ -766,7 +841,7 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     result.albedo = std::move(albedo_outputs[0]);
 
     if (config_.verbose) {
-        Msg("[PBRPipeline] UNet Albedo output: [%u,%u,%u,%u]",
+        Msg("[PBRPipeline] Second pass (cond): Final albedo [%u,%u,%u,%u]",
             result.albedo.batch(), result.albedo.channels(),
             result.albedo.height(), result.albedo.width());
     }
@@ -790,22 +865,26 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
         Msg("[PBRPipeline] Stage2: Processing %ux%u texture", W, H);
     }
 
-    Tensor albedo_norm = Tensor::Create(1, 3, H, W);
-    Tensor normal_norm = Tensor::Create(1, 3, H, W);
+    Tensor albedo_std = Tensor::Create(1, 3, H, W);
+    Tensor albedo_default = Tensor::Create(1, 3, H, W);
+    Tensor normal_std = Tensor::Create(1, 3, H, W);
 
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            albedo_norm.data[c * H * W + i] = albedo.data[c * H * W + i];
-            normal_norm.data[c * H * W + i] = normal.data[c * H * W + i];
+            albedo_std.data[c * H * W + i] = albedo.data[c * H * W + i];
+            albedo_default.data[c * H * W + i] = albedo.data[c * H * W + i];
+            normal_std.data[c * H * W + i] = normal.data[c * H * W + i];
         }
     }
 
-    PreprocessingUtils::NormalizeImageNet(albedo_norm);
-    PreprocessingUtils::NormalizeImageNet(normal_norm);
+    PreprocessingUtils::NormalizeImageNetStandard(albedo_std);
+    PreprocessingUtils::NormalizeImageNetDefault(albedo_default);
 
-    Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_norm);
+    PreprocessingUtils::NormalizeImageNetStandard(normal_std);
 
-    Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_norm);
+    Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_std);
+
+    Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_std);
 
     constexpr u32 NUM_CLASSES = 6;
     Tensor material_mask = PreprocessingUtils::LogitsToMask(material_logits, NUM_CLASSES);
@@ -838,7 +917,7 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     Tensor input_5ch = Tensor::Create(1, 5, H, W);
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_5ch.data[c * H * W + i] = normal_norm.data[c * H * W + i];
+            input_5ch.data[c * H * W + i] = normal_std.data[c * H * W + i];
         }
     }
     for (u32 i = 0; i < H * W; ++i) {
@@ -859,20 +938,20 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     Msg("~ [PBRPipeline] Input ranges: albedo [%.4f, %.4f], normal [%.4f, %.4f]",
         albedo_min, albedo_max, normal_min, normal_max);
 
-    Msg("~ [PBRPipeline] Creating 12ch input from: albedo_norm [%u,%u,%u,%u], normal_norm [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
-        albedo_norm.batch(), albedo_norm.channels(), albedo_norm.height(), albedo_norm.width(),
-        normal_norm.batch(), normal_norm.channels(), normal_norm.height(), normal_norm.width(),
+    Msg("~ [PBRPipeline] Creating 12ch input from: albedo_default [%u,%u,%u,%u], normal_std [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
+        albedo_default.batch(), albedo_default.channels(), albedo_default.height(), albedo_default.width(),
+        normal_std.batch(), normal_std.channels(), normal_std.height(), normal_std.width(),
         material_mask.batch(), material_mask.channels(), material_mask.height(), material_mask.width());
 
     Tensor input_12ch = Tensor::Create(1, 12, H, W);
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[c * H * W + i] = albedo_norm.data[c * H * W + i];
+            input_12ch.data[c * H * W + i] = albedo_default.data[c * H * W + i];
         }
     }
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[(c + 3) * H * W + i] = normal_norm.data[c * H * W + i];
+            input_12ch.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
         }
     }
     for (u32 c = 0; c < NUM_CLASSES; ++c) {
@@ -997,11 +1076,17 @@ PBRPipelineOutputs PBRPipeline::Process(const u8* diffuse, const u8* normal, u32
 
     const u32 H = diffuse_rgba.height();
     const u32 W = diffuse_rgba.width();
+
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
             diffuse_tensor.data[c * H * W + i] = diffuse_rgba.data[c * H * W + i];
-            normal_tensor.data[c * H * W + i] = normal_rgba.data[c * H * W + i];
         }
+    }
+
+    for (u32 i = 0; i < H * W; ++i) {
+        normal_tensor.data[0 * H * W + i] = normal_rgba.data[3 * H * W + i];
+        normal_tensor.data[1 * H * W + i] = normal_rgba.data[2 * H * W + i];
+        normal_tensor.data[2 * H * W + i] = normal_rgba.data[1 * H * W + i];
     }
 
     auto stage1 = RunStage1(diffuse_tensor, normal_tensor);
@@ -1029,6 +1114,7 @@ bool AreAIModelsAvailable(const char* model_dir) {
     const char* required_models[] = {
         "segformer.onnx",
         "unet_albedo.onnx",
+        "unet_albedo_uncond.onnx",
         "unet_parallax.onnx",
         "unet_ao.onnx",
         "unet_metallic.onnx",

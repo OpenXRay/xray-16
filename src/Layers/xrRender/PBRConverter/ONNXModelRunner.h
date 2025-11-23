@@ -84,6 +84,10 @@ private:
 
 class PreprocessingUtils {
 public:
+    static void NormalizeImageNetStandard(Tensor& tensor);
+
+    static void NormalizeImageNetDefault(Tensor& tensor);
+
     static void NormalizeImageNet(Tensor& tensor);
 
     static Tensor ComputeMeanCurvature(const Tensor& normal_map);
@@ -131,6 +135,7 @@ private:
 
     xr_string segformer_path_;
     xr_string unet_albedo_path_;
+    xr_string unet_albedo_uncond_path_;
     xr_string unet_parallax_path_;
     xr_string unet_ao_path_;
     xr_string unet_metallic_path_;
