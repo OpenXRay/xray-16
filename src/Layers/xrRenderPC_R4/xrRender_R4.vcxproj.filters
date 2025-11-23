@@ -199,6 +199,9 @@
     <Filter Include="Framegraph\ConstantSystem">
       <UniqueIdentifier>{7e4fa8a3-2a14-47bb-8d56-b7230ea2ba89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PBRConverter">
+      <UniqueIdentifier>{878d07e8-9481-4b4f-9c22-84db67a73811}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -894,6 +897,9 @@
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h">
       <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\PBRConverter\PBRTextureConverter.h">
+      <Filter>PBRConverter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1641,6 +1647,9 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\PBRConverter\PBRTextureConverter.cpp">
+      <Filter>PBRConverter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

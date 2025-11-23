@@ -30,6 +30,7 @@
 
 extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
 extern ENGINE_API int ps_r4_use_framegraph;
+extern ENGINE_API int ps_r4_use_pbr;
 
 class ENGINE_API IConsole_Command
 {

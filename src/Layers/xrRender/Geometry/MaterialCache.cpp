@@ -314,6 +314,67 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     return pso;
 }
 
+MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
+    dxRender_Visual* visual,
+    const framegraph::FrameGraph& fg)
+{
+    if (!visual) {
+        Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
+        return nullptr;
+    }
+
+    Shader* shader = nullptr;
+
+    if (visual->shader && visual->shader._get()) {
+        shader = visual->shader._get();
+    }
+    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
+             visual->textureName.c_str() && visual->textureName.size() > 0) {
+        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
+        shader = visual->shader._get();
+
+        if (!shader) {
+            return nullptr;
+        }
+    } else {
+        return nullptr;
+    }
+
+    ShaderElement* elem = shader->E[0]._get();
+    if (!elem || elem->passes.empty()) {
+        return nullptr;
+    }
+
+    SPass* pass = elem->passes[0]._get();
+    if (!pass) {
+        return nullptr;
+    }
+
+    u64 textureHash = ComputeTextureHash(pass);
+    MaterialKey key(shader, textureHash, 0, PSOType::Depth);
+
+    auto it = m_cache.find(key);
+    if (it != m_cache.end()) {
+        m_stats.numCacheHits++;
+        return it->second.get();
+    }
+
+    m_stats.numCacheMisses++;
+
+    MaterialPSO* pso = CreateDepthPSO(visual, elem, pass, fg);
+    if (!pso) {
+        const char* shaderName = (pass->vs._get() && pass->vs._get()->cName.c_str())
+            ? pass->vs._get()->cName.c_str() : "unknown";
+        Msg("! [MaterialCache::GetOrCreateDepthPSO] CreateDepthPSO failed for shader '%s'", shaderName);
+        return nullptr;
+    }
+
+    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
+    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
+
+    return pso;
+}
+
 MaterialPSO* MaterialCache::CreatePSO(
     dxRender_Visual* visual,
     ShaderElement* elem,
@@ -1331,7 +1392,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
         return nullptr;
 
     MaterialKey key;
-    key.isUIPSO = true;
+    key.psoType = PSOType::UI;
     key.shader = shader;
     key.element = elementIndex;
     key.framebuffer = framebuffer;
@@ -1353,6 +1414,77 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
 
     return pso;
+}
+
+MaterialPSO* MaterialCache::CreateDepthPSO(
+    dxRender_Visual* visual,
+    ShaderElement* elem,
+    SPass* pass,
+    const framegraph::FrameGraph& fg)
+{
+    auto pso = xr_make_unique<MaterialPSO>();
+    pso->pass = pass;
+
+    ExtractTextures(pass, pso.get());
+
+    if (!ExtractShaders(pass, pso.get())) {
+        return nullptr;
+    }
+
+    ExtractSamplers(pass, pso.get());
+
+    if (pass && pass->T && !pass->T->empty()) {
+        const shared_str& baseTexName = (*pass->T)[0].second;
+        if (baseTexName.c_str() && baseTexName[0]) {
+            pso->detail_scale = GetDetailScale(baseTexName);
+        }
+    }
+
+    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
+    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
+
+    if (!nvrhiVS || !nvrhiPS) {
+        return nullptr;
+    }
+
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = nvrhiVS.Get();
+    psoDesc.pixelShader = nvrhiPS.Get();
+
+    if (!ValidateVertexLayoutCompatibility(visual, pso.get())) {
+        return nullptr;
+    }
+    SetupVertexAttributes(visual, pso.get(), psoDesc);
+
+    psoDesc.renderTargetCount = 0;
+
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthWriteEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    SetupRenderStates(pass, psoDesc);
+
+    psoDesc.blendState.renderTargets[0].writeMask = static_cast<ng::ColorWriteMask>(0);
+
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache::CreateDepthPSO] PSO creation failed");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    CreateBindingLayouts(pso.get());
+
+    pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
+
+    return pso.release();
 }
 
 MaterialPSO* MaterialCache::CreateUIPSO(

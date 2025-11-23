@@ -32,6 +32,7 @@
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/Shaders/SlangCompilerTest.h"
+#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 #ifdef DEBUG
 #include "Layers/xrRender/ResourceManager/TestTextureManager.h"
 #endif
@@ -1508,6 +1509,7 @@ void xrRender_initconsole()
     CMD1(CCC_FrameGraphTestTwoPass, "r4_framegraph_test2");
     CMD1(CCC_FrameGraphTestAliasing, "r4_framegraph_test_aliasing");
     CMD4(CCC_Integer, "r4_use_framegraph", &ps_r4_use_framegraph, 0, 1);
+    CMD4(CCC_Integer, "r4_use_pbr", &ps_r4_use_pbr, 0, 1);
 
 #ifdef DEBUG
     using namespace xray::render::resources::test;

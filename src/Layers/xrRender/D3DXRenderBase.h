@@ -62,6 +62,8 @@ public:
 
     xrImTextureData GetImGuiTextureId(pcstr texture_name) override;
 
+    void ConvertLegacyAssetsToPBR() override;
+
     RenderContext GetCurrentContext() const override { return IRender::PrimaryContext; }
     void MakeContextCurrent(RenderContext /*context*/) override {}
 

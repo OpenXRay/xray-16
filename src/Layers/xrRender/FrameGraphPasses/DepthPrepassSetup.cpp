@@ -126,9 +126,7 @@ void renderDepthOnlyGeometry(
 
     for (const auto& batch : batches) {
         if (batch.visual && materialCache) {
-
-            framegraph::DefaultOutputLayout tempOutputs;
-            MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, tempOutputs, fg);
+            MaterialPSO* matPSO = materialCache->GetOrCreateDepthPSO(batch.visual, fg);
 
             if (matPSO) {
                 for (const auto& cbInfo : matPSO->constantBuffers) {
@@ -180,8 +178,7 @@ void renderDepthOnlyGeometry(
         MaterialPSO* matPSO = nullptr;
 
         if (batch.visual && materialCache) {
-            framegraph::DefaultOutputLayout tempOutputs;
-            matPSO = materialCache->GetOrCreatePSO(batch.visual, tempOutputs, fg);
+            matPSO = materialCache->GetOrCreateDepthPSO(batch.visual, fg);
 
             if (matPSO && matPSO->pso) {
                 pipelineToUse = matPSO->pso;

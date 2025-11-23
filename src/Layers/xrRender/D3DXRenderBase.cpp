@@ -6,9 +6,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-#if defined(USE_DX11) && RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
-#endif
+#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"
 
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #   ifndef MASTER_GOLD
@@ -19,6 +18,8 @@
 #ifdef USE_RENDERDOC
 #include <renderdoc/renderdoc_app.h>
 #endif
+
+extern ENGINE_API int ps_r4_use_pbr;
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -476,4 +477,52 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     }
     BasicStats.FrameStart();
 }
+
+using namespace xray::render::pbr;
+void D3DXRenderBase::ConvertLegacyAssetsToPBR()
+{
+    if (ps_r4_use_pbr == 0)
+        return;
+
+    Msg("~ [PBR] PBR rendering enabled, checking texture conversion...");
+
+    TextureScanConfig scanConfig;
+    scanConfig.texture_roots = {"$game_textures$"};
+    scanConfig.recursive = true;
+    scanConfig.include_levels = true;
+
+    TextureInventory inventory = BuildTextureInventory(scanConfig);
+    Msg("~ [PBR] Found %d legacy texture sets", static_cast<int>(inventory.assets.size()));
+
+    PBRConversionParams params;
+    params.generate_mipmaps = true;
+    params.default_metallic = 0.0f;
+    params.default_roughness = 0.5f;
+    params.default_ao = 1.0f;
+
+    bool needsConversion = !VerifyPBROutputs(inventory, params);
+
+    if (needsConversion)
+    {
+        Msg("~ [PBR] Starting texture conversion (outputs missing)...");
+
+        PBRConversionStats stats;
+        bool success = ConvertTexturesToPBR(inventory, params, stats, nullptr);
+
+        if (success)
+        {
+            Msg("~ [PBR] Conversion complete: %d converted, %d skipped, %d failed",
+                stats.textures_converted, stats.textures_skipped, stats.textures_failed);
+        }
+        else
+        {
+            Msg("! [PBR] Conversion failed!");
+        }
+    }
+    else
+    {
+        Msg("~ [PBR] Textures already converted, skipping conversion.");
+    }
+}
+
 } // namespace xray::render::RENDER_NAMESPACE
