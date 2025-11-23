@@ -400,6 +400,85 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
 }
 
 // ══════════════════════════════════════════════════════════
+//  GET OR CREATE DEPTH PSO (Phase 2.4)
+// ══════════════════════════════════════════════════════════
+
+MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
+    dxRender_Visual* visual,
+    const framegraph::FrameGraph& fg)
+{
+    if (!visual) {
+        Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
+        return nullptr;
+    }
+
+    // Get or compile shader
+    Shader* shader = nullptr;
+
+    if (visual->shader && visual->shader._get()) {
+        shader = visual->shader._get();
+    }
+    else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
+             visual->textureName.c_str() && visual->textureName.size() > 0) {
+        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
+        shader = visual->shader._get();
+
+        if (!shader) {
+            return nullptr;
+        }
+    } else {
+        return nullptr;
+    }
+
+    // Extract shader element
+    ShaderElement* elem = shader->E[0]._get();
+    if (!elem || elem->passes.empty()) {
+        return nullptr;
+    }
+
+    SPass* pass = elem->passes[0]._get();
+    if (!pass) {
+        return nullptr;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  COMPUTE DEPTH PSO KEY
+    // ═══════════════════════════════════════════════════════
+    // Depth PSOs are keyed by shader + texture hash only
+    // (state hash doesn't matter as we override render state)
+
+    u64 textureHash = ComputeTextureHash(pass);
+    MaterialKey key(shader, textureHash, 0, PSOType::Depth);
+
+    // Check cache
+    auto it = m_cache.find(key);
+    if (it != m_cache.end()) {
+        m_stats.numCacheHits++;
+        return it->second.get();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CACHE MISS - CREATE DEPTH PSO
+    // ═══════════════════════════════════════════════════════
+
+    m_stats.numCacheMisses++;
+
+    MaterialPSO* pso = CreateDepthPSO(visual, elem, pass, fg);
+    if (!pso) {
+        const char* shaderName = (pass->vs._get() && pass->vs._get()->cName.c_str())
+            ? pass->vs._get()->cName.c_str() : "unknown";
+        Msg("! [MaterialCache::GetOrCreateDepthPSO] CreateDepthPSO failed for shader '%s'", shaderName);
+        return nullptr;
+    }
+
+    // Store in cache
+    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
+    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
+
+    return pso;
+}
+
+// ══════════════════════════════════════════════════════════
 //  CREATE PSO
 // ══════════════════════════════════════════════════════════
 
@@ -1739,7 +1818,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
 
     // Create cache key (shader + element + framebuffer)
     MaterialKey key;
-    key.isUIPSO = true;
+    key.psoType = PSOType::UI;
     key.shader = shader;
     key.element = elementIndex;
     key.framebuffer = framebuffer;
@@ -1763,6 +1842,118 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
 
     return pso;
+}
+
+// ══════════════════════════════════════════════════════════
+//  CREATE DEPTH PSO (Phase 2.4)
+// ══════════════════════════════════════════════════════════
+// Creates optimized depth-only PSO with:
+// - No color writes (color mask = 0)
+// - Depth write enabled
+// - Minimal pixel shader (alpha test only for vegetation)
+// - Same vertex processing as material PSO
+
+MaterialPSO* MaterialCache::CreateDepthPSO(
+    dxRender_Visual* visual,
+    ShaderElement* elem,
+    SPass* pass,
+    const framegraph::FrameGraph& fg)
+{
+    auto pso = xr_make_unique<MaterialPSO>();
+    pso->pass = pass;
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT TEXTURES (needed for alpha testing)
+    // ═══════════════════════════════════════════════════════
+    ExtractTextures(pass, pso.get());
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT SHADERS
+    // ═══════════════════════════════════════════════════════
+    if (!ExtractShaders(pass, pso.get())) {
+        return nullptr;
+    }
+
+    ExtractSamplers(pass, pso.get());
+
+    // ═══════════════════════════════════════════════════════
+    //  EXTRACT DETAIL SCALE (before PSO creation)
+    // ═══════════════════════════════════════════════════════
+    if (pass && pass->T && !pass->T->empty()) {
+        // Get base texture name (usually slot 0)
+        const shared_str& baseTexName = (*pass->T)[0].second;
+        if (baseTexName.c_str() && baseTexName[0]) {
+            pso->detail_scale = GetDetailScale(baseTexName);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  BUILD DEPTH-ONLY PSO DESCRIPTOR
+    // ═══════════════════════════════════════════════════════
+
+    // Get native NVRHI shaders directly
+    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
+    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
+
+    if (!nvrhiVS || !nvrhiPS) {
+        return nullptr;
+    }
+
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = nvrhiVS.Get();  // Direct NVRHI shader pointer
+    psoDesc.pixelShader = nvrhiPS.Get();   // Keep PS for alpha testing
+
+    // Vertex layout (same as material PSO)
+    if (!ValidateVertexLayoutCompatibility(visual, pso.get())) {
+        return nullptr;
+    }
+    SetupVertexAttributes(visual, pso.get(), psoDesc);
+
+    // ═══════════════════════════════════════════════════════
+    //  DEPTH-ONLY RENDER STATE
+    // ═══════════════════════════════════════════════════════
+    // Override render state for depth-only rendering
+
+    // NO COLOR OUTPUTS (this is the key optimization!)
+    psoDesc.renderTargetCount = 0;
+
+    // Depth state: Enable depth write and test
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthWriteEnable = true;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;  // Standard depth test
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    // Rasterizer state: Use material's cull mode
+    SetupRenderStates(pass, psoDesc);  // Extract cull mode from pass
+
+    // Override color write mask to NONE (belt-and-suspenders with renderTargetCount=0)
+    psoDesc.blendState.renderTargets[0].writeMask = static_cast<ng::ColorWriteMask>(0);  // No color writes!
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE PIPELINE STATE VIA CACHE
+    // ═══════════════════════════════════════════════════════
+
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache::CreateDepthPSO] PSO creation failed");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    // ═══════════════════════════════════════════════════════
+    //  CREATE BINDING LAYOUTS
+    // ═══════════════════════════════════════════════════════
+    CreateBindingLayouts(pso.get());
+
+    pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
+
+    return pso.release();
 }
 
 MaterialPSO* MaterialCache::CreateUIPSO(

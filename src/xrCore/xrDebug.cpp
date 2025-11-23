@@ -289,7 +289,7 @@ AssertionResult xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, cons
             // we must hide the window
             if (windowHandler && !DebuggerIsPresent())
                 windowHandler->OnFatalError();
-            DEBUG_BREAK;
+                DEBUG_BREAK;
         } // switch (result)
     }
 

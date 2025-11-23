@@ -345,6 +345,9 @@ public:
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, pcstr name = nullptr) = 0;
     virtual void SetPostProcessParams(const SPPInfo& ppi) = 0;
 
+    // Phase 2.5.3: PBR texture conversion
+    virtual void ConvertLegacyAssetsToPBR() = 0;
+
     // Constructor/destructor
     virtual ~IRender() {}
 

@@ -6,9 +6,8 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-#if defined(USE_DX11) && RENDER == R_R4
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
-#endif
+#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #   ifndef MASTER_GOLD
@@ -19,6 +18,8 @@
 #ifdef USE_RENDERDOC
 #include <renderdoc/renderdoc_app.h>
 #endif
+
+extern ENGINE_API int ps_r4_use_pbr;
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -481,4 +482,56 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     }
     BasicStats.FrameStart();
 }
+
+// Phase 2.5.3: PBR texture conversion
+using namespace xray::render::pbr;
+void D3DXRenderBase::ConvertLegacyAssetsToPBR()
+{
+    if (ps_r4_use_pbr == 0)
+        return; // PBR disabled
+
+    Msg("~ [PBR] PBR rendering enabled, checking texture conversion...");
+
+    // Configure texture scanning
+    TextureScanConfig scanConfig;
+    scanConfig.texture_roots = {"$game_textures$"};
+    scanConfig.recursive = true;
+    scanConfig.include_levels = true;
+
+    // Build texture inventory
+    TextureInventory inventory = BuildTextureInventory(scanConfig);
+    Msg("~ [PBR] Found %d legacy texture sets", static_cast<int>(inventory.assets.size()));
+
+    // Check if conversion is needed (missing output files)
+    PBRConversionParams params;
+    params.generate_mipmaps = true;
+    params.default_metallic = 0.0f;  // Non-metallic by default
+    params.default_roughness = 0.5f; // Mid-range roughness by default
+    params.default_ao = 1.0f;        // No occlusion by default
+
+    bool needsConversion = !VerifyPBROutputs(inventory, params);
+
+    if (needsConversion)
+    {
+        Msg("~ [PBR] Starting texture conversion (outputs missing)...");
+
+        PBRConversionStats stats;
+        bool success = ConvertTexturesToPBR(inventory, params, stats, nullptr);
+
+        if (success)
+        {
+            Msg("~ [PBR] Conversion complete: %d converted, %d skipped, %d failed",
+                stats.textures_converted, stats.textures_skipped, stats.textures_failed);
+        }
+        else
+        {
+            Msg("! [PBR] Conversion failed!");
+        }
+    }
+    else
+    {
+        Msg("~ [PBR] Textures already converted, skipping conversion.");
+    }
+}
+
 } // namespace xray::render::RENDER_NAMESPACE

@@ -164,13 +164,8 @@ void renderDepthOnlyGeometry(
 
     for (const auto& batch : batches) {
         if (batch.visual && materialCache) {
-            // TODO Phase 2.4: Get depth-only PSO from MaterialCache
-            // For now, use regular PSO (will be optimized later)
-            // MaterialPSO* depthPSO = materialCache->GetOrCreateDepthPSO(batch.visual, fg);
-
-            // Temporarily use regular PSO - Phase 2.4 will add depth-specific PSOs
-            framegraph::DefaultOutputLayout tempOutputs;  // Empty for now
-            MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, tempOutputs, fg);
+            // Phase 2.4: Use optimized depth-only PSO
+            MaterialPSO* matPSO = materialCache->GetOrCreateDepthPSO(batch.visual, fg);
 
             if (matPSO) {
                 // Update all global CBs
@@ -238,10 +233,8 @@ void renderDepthOnlyGeometry(
         MaterialPSO* matPSO = nullptr;
 
         if (batch.visual && materialCache) {
-            // TODO Phase 2.4: Use depth-only PSO
-            // For now, use regular PSO (suboptimal but functional)
-            framegraph::DefaultOutputLayout tempOutputs;
-            matPSO = materialCache->GetOrCreatePSO(batch.visual, tempOutputs, fg);
+            // Phase 2.4: Use optimized depth-only PSO
+            matPSO = materialCache->GetOrCreateDepthPSO(batch.visual, fg);
 
             if (matPSO && matPSO->pso) {
                 pipelineToUse = matPSO->pso;

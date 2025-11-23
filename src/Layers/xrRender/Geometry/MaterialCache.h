@@ -50,58 +50,77 @@ using RENDER_NAMESPACE::SVS;
 using RENDER_NAMESPACE::SPS;
 
 // ══════════════════════════════════════════════════════════
+//  PSO TYPE ENUM (Phase 2.4)
+// ══════════════════════════════════════════════════════════
+
+enum class PSOType : u8 {
+    Material = 0,   // Regular material rendering (forward/deferred)
+    Depth = 1,      // Depth-only prepass (Phase 2.4)
+    UI = 2,         // UI rendering (HUD, menus)
+    Shadow = 3,     // Shadow map rendering (Phase 4)
+    PostProcess = 4 // Post-processing effects
+};
+
+// ══════════════════════════════════════════════════════════
 //  MATERIAL KEY (FOR PSO CACHE LOOKUP)
 // ══════════════════════════════════════════════════════════
 
 struct MaterialKey {
+    PSOType psoType;             // PSO type (material/depth/UI/shadow/postprocess)
     Shader* shader;              // Pointer to shader object
     u64 textureHash;             // Hash of texture combination
     u64 stateHash;               // Hash of render state
 
-    // For UI PSOs (simpler - no texture/state hash needed)
-    u32 element;                 // Shader element index (0 for UI)
+    // For specialized PSOs (UI, depth-only, etc.)
+    u32 element;                 // Shader element index
     nvrhi::IFramebuffer* framebuffer;  // Framebuffer (needed for PSO creation)
-    bool isUIPSO;                // Flag to distinguish UI PSOs
 
     MaterialKey()
-        : shader(nullptr)
+        : psoType(PSOType::Material)
+        , shader(nullptr)
         , textureHash(0)
         , stateHash(0)
         , element(0)
         , framebuffer(nullptr)
-        , isUIPSO(false)
     {
     }
 
-    MaterialKey(Shader* s, u64 texHash, u64 stHash)
-        : shader(s)
+    MaterialKey(Shader* s, u64 texHash, u64 stHash, PSOType type = PSOType::Material)
+        : psoType(type)
+        , shader(s)
         , textureHash(texHash)
         , stateHash(stHash)
         , element(0)
         , framebuffer(nullptr)
-        , isUIPSO(false)
     {
     }
 
     bool operator<(const MaterialKey& other) const {
-        if (isUIPSO != other.isUIPSO) return isUIPSO < other.isUIPSO;
+        // Sort by PSO type first
+        if (psoType != other.psoType) return psoType < other.psoType;
         if (shader != other.shader) return shader < other.shader;
-        if (isUIPSO) {
-            // UI PSO comparison
+
+        // Specialized PSO comparison (UI/depth use element + framebuffer)
+        if (psoType == PSOType::UI || psoType == PSOType::Depth) {
             if (element != other.element) return element < other.element;
             return framebuffer < other.framebuffer;
         }
-        // Regular material PSO comparison
+
+        // Regular material PSO comparison (uses texture/state hashes)
         if (textureHash != other.textureHash) return textureHash < other.textureHash;
         return stateHash < other.stateHash;
     }
 
     bool operator==(const MaterialKey& other) const {
-        if (isUIPSO != other.isUIPSO) return false;
+        if (psoType != other.psoType) return false;
         if (shader != other.shader) return false;
-        if (isUIPSO) {
+
+        // Specialized PSO comparison
+        if (psoType == PSOType::UI || psoType == PSOType::Depth) {
             return element == other.element && framebuffer == other.framebuffer;
         }
+
+        // Regular material PSO comparison
         return textureHash == other.textureHash &&
                stateHash == other.stateHash;
     }
@@ -276,6 +295,12 @@ public:
         const framegraph::DefaultOutputLayout& outputs,
         const framegraph::FrameGraph& fg);
 
+    // Get or create depth-only PSO for depth prepass (Phase 2.4)
+    // Optimized PSO with no color writes, minimal pixel shader
+    MaterialPSO* GetOrCreateDepthPSO(
+        dxRender_Visual* visual,
+        const framegraph::FrameGraph& fg);
+
     // Get or create PSO for UI rendering (simplified - no visual required)
     // Uses fixed UI vertex layout (position, color, texcoord)
     MaterialPSO* GetOrCreateUIPSO(
@@ -325,6 +350,13 @@ private:
         ShaderElement* elem,
         SPass* pass,
         const framegraph::DefaultOutputLayout& outputs,
+        const framegraph::FrameGraph& fg);
+
+    // Create depth-only PSO (Phase 2.4)
+    MaterialPSO* CreateDepthPSO(
+        dxRender_Visual* visual,
+        ShaderElement* elem,
+        SPass* pass,
         const framegraph::FrameGraph& fg);
 
     // Create UI PSO (no visual, fixed vertex layout)

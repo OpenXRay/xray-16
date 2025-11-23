@@ -32,6 +32,7 @@
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/Shaders/SlangCompilerTest.h"
+#include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 #ifdef DEBUG
 #include "Layers/xrRender/ResourceManager/TestTextureManager.h"
 #endif
@@ -1555,6 +1556,8 @@ void xrRender_initconsole()
     CMD1(CCC_FrameGraphTestAliasing, "r4_framegraph_test_aliasing");
     // FrameGraph renderer toggle (Phase 3)
     CMD4(CCC_Integer, "r4_use_framegraph", &ps_r4_use_framegraph, 0, 1);
+    // PBR rendering toggle (Phase 2.5)
+    CMD4(CCC_Integer, "r4_use_pbr", &ps_r4_use_pbr, 0, 1);
 
 #ifdef DEBUG
     // TextureManager unit tests (Week 1 Day 2)
