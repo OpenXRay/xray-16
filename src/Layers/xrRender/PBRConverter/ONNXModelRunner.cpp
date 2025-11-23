@@ -766,11 +766,6 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
             dirty_albedo.height(), dirty_albedo.width());
     }
 
-    for (u32 i = 0; i < dirty_albedo.data.size(); ++i) {
-        float val = dirty_albedo.data[i];
-        dirty_albedo.data[i] = 1.0f / (1.0f + std::exp(-val));
-    }
-
     PreprocessingUtils::NormalizeImageNetDefault(dirty_albedo);
 
     Tensor segformer_input_6ch = Tensor::Create(1, 6, H, W);
