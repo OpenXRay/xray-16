@@ -415,16 +415,17 @@ xr_vector<Tensor> ONNXModelRunner::Run(
 //  PREPROCESSING UTILITIES
 // ══════════════════════════════════════════════════════════
 
-void PreprocessingUtils::NormalizeImageNet(Tensor& tensor) {
-    // ImageNet normalization constants (only for RGB channels)
-    constexpr float MEAN[] = {0.485f, 0.456f, 0.406f};
-    constexpr float STD[] = {0.229f, 0.224f, 0.225f};
+// ImageNet STANDARD normalization (for UNets)
+// mean = [0.5, 0.5, 0.5], std = [0.5, 0.5, 0.5]
+// Used by: UNetAlbedo, UNetSingleChannel models
+void PreprocessingUtils::NormalizeImageNetStandard(Tensor& tensor) {
+    constexpr float MEAN[] = {0.5f, 0.5f, 0.5f};
+    constexpr float STD[] = {0.5f, 0.5f, 0.5f};
 
     const u32 H = tensor.height();
     const u32 W = tensor.width();
 
     // Only normalize first 3 channels (RGB)
-    // If tensor has more channels (e.g., 6-channel diffuse+normal), leave them untouched
     const u32 channels_to_normalize = std::min(tensor.channels(), 3u);
 
     for (u32 c = 0; c < channels_to_normalize; ++c) {
@@ -435,6 +436,34 @@ void PreprocessingUtils::NormalizeImageNet(Tensor& tensor) {
             }
         }
     }
+}
+
+// ImageNet DEFAULT normalization (for SegFormer)
+// mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]
+// Used by: SegFormer model (requires standard ImageNet stats)
+void PreprocessingUtils::NormalizeImageNetDefault(Tensor& tensor) {
+    constexpr float MEAN[] = {0.485f, 0.456f, 0.406f};
+    constexpr float STD[] = {0.229f, 0.224f, 0.225f};
+
+    const u32 H = tensor.height();
+    const u32 W = tensor.width();
+
+    // Only normalize first 3 channels (RGB)
+    const u32 channels_to_normalize = std::min(tensor.channels(), 3u);
+
+    for (u32 c = 0; c < channels_to_normalize; ++c) {
+        for (u32 h = 0; h < H; ++h) {
+            for (u32 w = 0; w < W; ++w) {
+                const u32 idx = c * H * W + h * W + w;
+                tensor.data[idx] = (tensor.data[idx] - MEAN[c]) / STD[c];
+            }
+        }
+    }
+}
+
+// Legacy function - defaults to DEFAULT normalization for backwards compatibility
+void PreprocessingUtils::NormalizeImageNet(Tensor& tensor) {
+    NormalizeImageNetDefault(tensor);
 }
 
 Tensor PreprocessingUtils::ComputeMeanCurvature(const Tensor& normal_map) {
@@ -734,9 +763,10 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     }
 
     // Build model paths using VFS and validate they exist
-    string_path seg_path, albedo_path, parallax_path, ao_path, metallic_path, roughness_path;
+    string_path seg_path, albedo_path, albedo_uncond_path, parallax_path, ao_path, metallic_path, roughness_path;
     FS.update_path(seg_path, "$game_data$", (config.model_dir + "\\segformer.onnx").c_str());
     FS.update_path(albedo_path, "$game_data$", (config.model_dir + "\\unet_albedo.onnx").c_str());
+    FS.update_path(albedo_uncond_path, "$game_data$", (config.model_dir + "\\unet_albedo_uncond.onnx").c_str());
     FS.update_path(parallax_path, "$game_data$", (config.model_dir + "\\unet_parallax.onnx").c_str());
     FS.update_path(ao_path, "$game_data$", (config.model_dir + "\\unet_ao.onnx").c_str());
     FS.update_path(metallic_path, "$game_data$", (config.model_dir + "\\unet_metallic.onnx").c_str());
@@ -746,6 +776,7 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     bool all_exist = true;
     all_exist &= FS.exist(seg_path, FSType::External);
     all_exist &= FS.exist(albedo_path, FSType::External);
+    all_exist &= FS.exist(albedo_uncond_path, FSType::External);
     all_exist &= FS.exist(parallax_path, FSType::External);
     all_exist &= FS.exist(ao_path, FSType::External);
     all_exist &= FS.exist(metallic_path, FSType::External);
@@ -759,6 +790,7 @@ bool PBRPipeline::Initialize(const PBRPipelineConfig& config) {
     // Store paths for on-demand loading (saves VRAM - only load when needed)
     segformer_path_ = seg_path;
     unet_albedo_path_ = albedo_path;
+    unet_albedo_uncond_path_ = albedo_uncond_path;
     unet_parallax_path_ = parallax_path;
     unet_ao_path_ = ao_path;
     unet_metallic_path_ = metallic_path;
@@ -782,50 +814,113 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     const u32 W = diffuse.width();
 
     if (config_.verbose) {
-        Msg("[PBRPipeline] Stage1: Processing %ux%u texture", W, H);
+        Msg("[PBRPipeline] Stage1: Processing %ux%u texture (Two-Pass Albedo)", W, H);
     }
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 1: Normalize diffuse and normal separately
+    //  STEP 1: Normalize diffuse and normal with STANDARD normalization
     // ═══════════════════════════════════════════════════════
-    // CRITICAL: Must normalize BEFORE concatenating to match Python preprocessing!
-    // Python does: normalize(diffuse), normalize(normal), then concat
-    Tensor diffuse_norm = Tensor::Create(1, 3, H, W);
-    Tensor normal_norm = Tensor::Create(1, 3, H, W);
+    // CRITICAL: UNets expect STANDARD normalization (0.5, 0.5, 0.5)
+    // SegFormer expects DEFAULT normalization (0.485, 0.456, 0.406)
+    Tensor diffuse_std = Tensor::Create(1, 3, H, W);
+    Tensor normal_std = Tensor::Create(1, 3, H, W);
 
     // Copy diffuse and normal (to avoid modifying originals)
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            diffuse_norm.data[c * H * W + i] = diffuse.data[c * H * W + i];
-            normal_norm.data[c * H * W + i] = normal.data[c * H * W + i];
+            diffuse_std.data[c * H * W + i] = diffuse.data[c * H * W + i];
+            normal_std.data[c * H * W + i] = normal.data[c * H * W + i];
         }
     }
 
-    // Normalize each separately with ImageNet stats
-    PreprocessingUtils::NormalizeImageNet(diffuse_norm);
-    PreprocessingUtils::NormalizeImageNet(normal_norm);
+    // Normalize with STANDARD stats for UNets
+    PreprocessingUtils::NormalizeImageNetStandard(diffuse_std);
+    PreprocessingUtils::NormalizeImageNetStandard(normal_std);
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 2: Concatenate normalized tensors → 6ch input
+    //  STEP 2: Concatenate STANDARD-normalized tensors → 6ch input for UNets
     // ═══════════════════════════════════════════════════════
-    Tensor input_6ch = Tensor::Create(1, 6, H, W);
+    Tensor input_6ch_std = Tensor::Create(1, 6, H, W);
 
     // Copy normalized diffuse → channels 0-2
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_6ch.data[c * H * W + i] = diffuse_norm.data[c * H * W + i];
+            input_6ch_std.data[c * H * W + i] = diffuse_std.data[c * H * W + i];
         }
     }
 
     // Copy normalized normal → channels 3-5
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_6ch.data[(c + 3) * H * W + i] = normal_norm.data[c * H * W + i];
+            input_6ch_std.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
         }
     }
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 3: Run SegFormer → logits + features (load on-demand)
+    //  STEP 3: FIRST PASS - Run UNet Albedo UNCOND (no features) → "dirty" albedo
+    // ═══════════════════════════════════════════════════════
+    Tensor dirty_albedo;
+    {
+        ONNXModelRunner unet_albedo_uncond;
+        if (!unet_albedo_uncond.LoadModel(unet_albedo_uncond_path_.c_str(), config_.use_gpu, trt_cache_path_.c_str())) {
+            Msg("! [PBRPipeline] Stage1: Failed to load UNet Albedo Uncond");
+            return result;
+        }
+
+        xr_vector<Tensor> uncond_inputs = { input_6ch_std };
+        xr_vector<const char*> uncond_input_names = { "image" };
+        xr_vector<const char*> uncond_output_names = { "albedo" };
+
+        xr_vector<Tensor> uncond_outputs = unet_albedo_uncond.Run(uncond_inputs, uncond_input_names, uncond_output_names);
+
+        if (uncond_outputs.empty()) {
+            Msg("! [PBRPipeline] Stage1: UNet Albedo Uncond failed");
+            return result;
+        }
+
+        dirty_albedo = std::move(uncond_outputs[0]);
+    } // UNet Albedo Uncond unloaded here
+
+    if (config_.verbose) {
+        Msg("[PBRPipeline] First pass (uncond): Dirty albedo [%u,%u,%u,%u]",
+            dirty_albedo.batch(), dirty_albedo.channels(),
+            dirty_albedo.height(), dirty_albedo.width());
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  STEP 4: Re-normalize dirty albedo to DEFAULT for SegFormer
+    // ═══════════════════════════════════════════════════════
+    // Dirty albedo is in raw logits, need to convert to [0,1] first, then normalize
+    // Apply sigmoid to convert logits to probabilities
+    for (u32 i = 0; i < dirty_albedo.data.size(); ++i) {
+        float val = dirty_albedo.data[i];
+        dirty_albedo.data[i] = 1.0f / (1.0f + std::exp(-val));  // sigmoid
+    }
+
+    // Now normalize with DEFAULT stats for SegFormer
+    PreprocessingUtils::NormalizeImageNetDefault(dirty_albedo);
+
+    // ═══════════════════════════════════════════════════════
+    //  STEP 5: Create 6ch input for SegFormer (DEFAULT-normalized albedo + STANDARD-normalized normal)
+    // ═══════════════════════════════════════════════════════
+    Tensor segformer_input_6ch = Tensor::Create(1, 6, H, W);
+
+    // Copy DEFAULT-normalized dirty albedo → channels 0-2
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            segformer_input_6ch.data[c * H * W + i] = dirty_albedo.data[c * H * W + i];
+        }
+    }
+
+    // Copy STANDARD-normalized normal → channels 3-5
+    for (u32 c = 0; c < 3; ++c) {
+        for (u32 i = 0; i < H * W; ++i) {
+            segformer_input_6ch.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  STEP 6: Run SegFormer → logits + features (load on-demand)
     // ═══════════════════════════════════════════════════════
     xr_vector<Tensor> seg_outputs;
     {
@@ -835,7 +930,7 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
             return result;
         }
 
-        xr_vector<Tensor> seg_inputs = { input_6ch };
+        xr_vector<Tensor> seg_inputs = { segformer_input_6ch };
         xr_vector<const char*> seg_input_names = { "input" };
         xr_vector<const char*> seg_output_names = { "logits", "features" };
 
@@ -859,7 +954,7 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     }
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 4: Run UNet Albedo with features → albedo (load on-demand)
+    //  STEP 7: SECOND PASS - Run UNet Albedo with features → final albedo (load on-demand)
     // ═══════════════════════════════════════════════════════
     xr_vector<Tensor> albedo_outputs;
     {
@@ -869,7 +964,8 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
             return result;
         }
 
-        xr_vector<Tensor> albedo_inputs = { input_6ch, result.seg_features };
+        // Use original STANDARD-normalized 6ch input + seg_features
+        xr_vector<Tensor> albedo_inputs = { input_6ch_std, result.seg_features };
         xr_vector<const char*> albedo_input_names = { "image", "seg_features" };
         xr_vector<const char*> albedo_output_names = { "albedo" };
 
@@ -884,7 +980,7 @@ PBRPipeline::Stage1Outputs PBRPipeline::RunStage1(const Tensor& diffuse, const T
     result.albedo = std::move(albedo_outputs[0]);
 
     if (config_.verbose) {
-        Msg("[PBRPipeline] UNet Albedo output: [%u,%u,%u,%u]",
+        Msg("[PBRPipeline] Second pass (cond): Final albedo [%u,%u,%u,%u]",
             result.albedo.batch(), result.albedo.channels(),
             result.albedo.height(), result.albedo.width());
     }
@@ -909,35 +1005,42 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     }
 
     // ═══════════════════════════════════════════════════════
-    //  STEP 1: Normalize albedo and normal
+    //  STEP 1: Dual normalization (STANDARD + DEFAULT)
     // ═══════════════════════════════════════════════════════
-    // CRITICAL: Must normalize inputs to match Python preprocessing!
-    // Python normalizes both albedo and normal before using in Stage2
+    // CRITICAL: Python creates TWO albedo copies with different normalizations!
+    // - albedo_std (STANDARD 0.5): for UNets (not used in 5ch, but kept for consistency)
+    // - albedo_default (DEFAULT 0.485): for 12ch input (metallic/roughness)
+    // - normal_std (STANDARD 0.5): for all inputs
 
-    Tensor albedo_norm = Tensor::Create(1, 3, H, W);
-    Tensor normal_norm = Tensor::Create(1, 3, H, W);
+    Tensor albedo_std = Tensor::Create(1, 3, H, W);
+    Tensor albedo_default = Tensor::Create(1, 3, H, W);
+    Tensor normal_std = Tensor::Create(1, 3, H, W);
 
-    // Copy albedo and normal
+    // Copy albedo (twice) and normal
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            albedo_norm.data[c * H * W + i] = albedo.data[c * H * W + i];
-            normal_norm.data[c * H * W + i] = normal.data[c * H * W + i];
+            albedo_std.data[c * H * W + i] = albedo.data[c * H * W + i];
+            albedo_default.data[c * H * W + i] = albedo.data[c * H * W + i];
+            normal_std.data[c * H * W + i] = normal.data[c * H * W + i];
         }
     }
 
-    // Normalize with ImageNet stats
-    PreprocessingUtils::NormalizeImageNet(albedo_norm);
-    PreprocessingUtils::NormalizeImageNet(normal_norm);
+    // Normalize albedo with BOTH stats
+    PreprocessingUtils::NormalizeImageNetStandard(albedo_std);
+    PreprocessingUtils::NormalizeImageNetDefault(albedo_default);
+
+    // Normalize normal with STANDARD stats
+    PreprocessingUtils::NormalizeImageNetStandard(normal_std);
 
     // ═══════════════════════════════════════════════════════
     //  STEP 2: Compute preprocessing from NORMALIZED normal
     // ═══════════════════════════════════════════════════════
 
-    // Compute mean curvature from NORMALIZED normal map
-    Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_norm);
+    // Compute mean curvature from STANDARD-normalized normal map
+    Tensor curvature = PreprocessingUtils::ComputeMeanCurvature(normal_std);
 
-    // Compute Poisson coarse height from NORMALIZED normal map
-    Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_norm);
+    // Compute Poisson coarse height from STANDARD-normalized normal map
+    Tensor poisson = PreprocessingUtils::ComputePoissonCoarse(normal_std);
 
     // Convert material logits to one-hot mask (6 classes)
     constexpr u32 NUM_CLASSES = 6;  // fabric, ground, leather, metal, stone, wood
@@ -975,11 +1078,11 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     //  STEP 3: Prepare inputs for 4 UNets
     // ═══════════════════════════════════════════════════════
 
-    // Input for Parallax/AO: 5 channels (RGB NORMALIZED normal + curvature + poisson)
+    // Input for Parallax/AO: 5 channels (RGB STANDARD-normalized normal + curvature + poisson)
     Tensor input_5ch = Tensor::Create(1, 5, H, W);
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_5ch.data[c * H * W + i] = normal_norm.data[c * H * W + i];
+            input_5ch.data[c * H * W + i] = normal_std.data[c * H * W + i];
         }
     }
     for (u32 i = 0; i < H * W; ++i) {
@@ -1001,23 +1104,24 @@ PBRPipeline::Stage2Outputs PBRPipeline::RunStage2(
     Msg("~ [PBRPipeline] Input ranges: albedo [%.4f, %.4f], normal [%.4f, %.4f]",
         albedo_min, albedo_max, normal_min, normal_max);
 
-    // Input for Metallic/Roughness: 12 channels (RGB NORMALIZED albedo + RGB NORMALIZED normal + 6-class mask)
-    Msg("~ [PBRPipeline] Creating 12ch input from: albedo_norm [%u,%u,%u,%u], normal_norm [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
-        albedo_norm.batch(), albedo_norm.channels(), albedo_norm.height(), albedo_norm.width(),
-        normal_norm.batch(), normal_norm.channels(), normal_norm.height(), normal_norm.width(),
+    // Input for Metallic/Roughness: 12 channels (DEFAULT albedo + STANDARD normal + 6-class mask)
+    // CRITICAL: Python uses DEFAULT-normalized albedo here, not STANDARD!
+    Msg("~ [PBRPipeline] Creating 12ch input from: albedo_default [%u,%u,%u,%u], normal_std [%u,%u,%u,%u], mask [%u,%u,%u,%u]",
+        albedo_default.batch(), albedo_default.channels(), albedo_default.height(), albedo_default.width(),
+        normal_std.batch(), normal_std.channels(), normal_std.height(), normal_std.width(),
         material_mask.batch(), material_mask.channels(), material_mask.height(), material_mask.width());
 
     Tensor input_12ch = Tensor::Create(1, 12, H, W);
-    // Copy NORMALIZED albedo (3ch)
+    // Copy DEFAULT-normalized albedo (3ch) - matches Python's albedo_segformer
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[c * H * W + i] = albedo_norm.data[c * H * W + i];
+            input_12ch.data[c * H * W + i] = albedo_default.data[c * H * W + i];
         }
     }
-    // Copy NORMALIZED normal (3ch)
+    // Copy STANDARD-normalized normal (3ch)
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
-            input_12ch.data[(c + 3) * H * W + i] = normal_norm.data[c * H * W + i];
+            input_12ch.data[(c + 3) * H * W + i] = normal_std.data[c * H * W + i];
         }
     }
     // Copy material mask (6ch)
@@ -1152,17 +1256,27 @@ PBRPipelineOutputs PBRPipeline::Process(const u8* diffuse, const u8* normal, u32
     Tensor diffuse_rgba = Tensor::FromImageData(diffuse, width, height, 4);
     Tensor normal_rgba = Tensor::FromImageData(normal, width, height, 4);
 
-    // Extract RGB channels (discard alpha)
+    // Extract RGB channels
     Tensor diffuse_tensor = Tensor::Create(1, 3, diffuse_rgba.height(), diffuse_rgba.width());
     Tensor normal_tensor = Tensor::Create(1, 3, normal_rgba.height(), normal_rgba.width());
 
     const u32 H = diffuse_rgba.height();
     const u32 W = diffuse_rgba.width();
+
+    // Extract diffuse RGB (discard alpha - gloss channel)
     for (u32 c = 0; c < 3; ++c) {
         for (u32 i = 0; i < H * W; ++i) {
             diffuse_tensor.data[c * H * W + i] = diffuse_rgba.data[c * H * W + i];
-            normal_tensor.data[c * H * W + i] = normal_rgba.data[c * H * W + i];
         }
+    }
+
+    // Swizzle X-Ray normal format to AI model format
+    // X-Ray format (RGBA): R=gloss, G=normalZ, B=normalY, A=normalX
+    // AI expects (RGB):    R=normalX, G=normalY, B=normalZ
+    for (u32 i = 0; i < H * W; ++i) {
+        normal_tensor.data[0 * H * W + i] = normal_rgba.data[3 * H * W + i];  // R ← A (normal X)
+        normal_tensor.data[1 * H * W + i] = normal_rgba.data[2 * H * W + i];  // G ← B (normal Y)
+        normal_tensor.data[2 * H * W + i] = normal_rgba.data[1 * H * W + i];  // B ← G (normal Z)
     }
 
     // Stage 1: Albedo + Material Classification
@@ -1198,6 +1312,7 @@ bool AreAIModelsAvailable(const char* model_dir) {
     const char* required_models[] = {
         "segformer.onnx",
         "unet_albedo.onnx",
+        "unet_albedo_uncond.onnx",
         "unet_parallax.onnx",
         "unet_ao.onnx",
         "unet_metallic.onnx",

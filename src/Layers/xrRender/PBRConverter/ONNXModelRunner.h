@@ -140,8 +140,17 @@ private:
 
 class PreprocessingUtils {
 public:
-    // ImageNet normalization (required for SegFormer)
+    // ImageNet STANDARD normalization (for UNets)
+    // mean = [0.5, 0.5, 0.5], std = [0.5, 0.5, 0.5]
+    // Used by: UNetAlbedo, UNetSingleChannel models
+    static void NormalizeImageNetStandard(Tensor& tensor);
+
+    // ImageNet DEFAULT normalization (for SegFormer)
     // mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225]
+    // Used by: SegFormer model (requires standard ImageNet stats)
+    static void NormalizeImageNetDefault(Tensor& tensor);
+
+    // Legacy ImageNet normalization (defaults to DEFAULT for backwards compatibility)
     static void NormalizeImageNet(Tensor& tensor);
 
     // Compute mean curvature map from normal map (3-channel → 1-channel)
@@ -216,6 +225,7 @@ private:
     // Model paths (models loaded on-demand to save VRAM)
     xr_string segformer_path_;
     xr_string unet_albedo_path_;
+    xr_string unet_albedo_uncond_path_;  // Unconditional albedo model (first pass)
     xr_string unet_parallax_path_;
     xr_string unet_ao_path_;
     xr_string unet_metallic_path_;
