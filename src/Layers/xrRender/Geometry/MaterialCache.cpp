@@ -1278,14 +1278,9 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     // ═══════════════════════════════════════════════════════
     //  CHECK CACHE - Return existing binding sets if already created
     // ═══════════════════════════════════════════════════════
-    // IMPORTANT: If the material has VCBs (per-draw constant buffers like bones/transforms),
-    // we MUST recreate binding sets every time because VCB buffers can change between draws.
-    // Only cache binding sets for materials that ONLY use global CBs.
-
-    bool hasVCBs = !matPSO->vcbRequirements.empty();
-
-    if (!hasVCBs && matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
-        // No VCBs and already cached with valid textures - safe to reuse!
+    // With proper NVRHI VCB support (isVolatile=true, maxVersions set),
+    // binding sets can be cached even with VCBs - NVRHI handles versioning.
+    if (matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
         return matPSO->vsBindingSet;
     }
 
@@ -1344,6 +1339,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
 
     nvrhi::BindingSetDesc vsBindingDesc;
     for (const auto& binding : vsBindings) {
+        // ConstantBuffer() auto-detects volatile buffers (checks buffer->getDesc().isVolatile)
         vsBindingDesc.bindings.push_back(
             nvrhi::BindingSetItem::ConstantBuffer(binding.slot, binding.buffer));
     }
@@ -1445,9 +1441,9 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     // ═══════════════════════════════════════════════════════
     //  STORE BINDING SETS
     // ═══════════════════════════════════════════════════════
-    // Cache binding sets for reuse, with caveats:
-    // - If VCBs are present, we'll recreate every draw anyway (see cache check above)
-    // - If textures weren't valid, mark for rebuild next frame
+    // Cache binding sets for reuse. VCBs use NVRHI's internal versioning
+    // (isVolatile=true, maxVersions set) so caching is safe.
+    // Only rebuild if textures weren't valid.
 
     matPSO->vsBindingSet = vsBindingSet;
     matPSO->psBindingSet = psBindingSet;

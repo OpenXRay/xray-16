@@ -124,6 +124,46 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 return;
             }
 
+            // ═══════════════════════════════════════════════════════
+            //  PREPARE GLOBAL CB DATA
+            // ═══════════════════════════════════════════════════════
+
+            StaticGlobals staticGlobalsCB = {};
+            FillGlobalConstants(staticGlobalsCB);
+
+            DynamicTransforms dynamicTransformsCB = {};
+            FillDynamicTransforms(dynamicTransformsCB);
+
+            // ═══════════════════════════════════════════════════════
+            //  UPDATE GLOBAL CBS BEFORE RENDER PASS
+            // ═══════════════════════════════════════════════════════
+
+            xr_set<nvrhi::IBuffer*> updatedGlobalBuffers;
+
+            for (const auto& batch : *data.hudBatches) {
+                if (batch.visual && data.materialCache) {
+                    MaterialPSO* matPSO = data.materialCache->GetOrCreatePSO(batch.visual, data.outputs, fg, RenderPassType::HUD);
+                    if (matPSO) {
+                        for (const auto& cbInfo : matPSO->constantBuffers) {
+                            if (cbInfo.nvrhiBuffer) {
+                                if (updatedGlobalBuffers.find(cbInfo.nvrhiBuffer.Get()) == updatedGlobalBuffers.end()) {
+                                    if (cbInfo.name == "static_globals") {
+                                        u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
+                                        ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
+                                        updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
+                                    }
+                                    else if (cbInfo.name == "dynamic_transforms") {
+                                        u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
+                                        ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicTransformsCB, sizeToWrite);
+                                        updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Setup render pass (no clear - HUD renders on top of world)
             ng::RenderPassDesc passDesc;
             passDesc.passName = "HUD Pass";
@@ -261,8 +301,12 @@ framegraph::DefaultOutputLayout setupHUDPass(
                     Fmatrix xform_v;
                     xform_v.mul(adjustedWorldMatrix, Device.mView);
 
+                    Fmatrix invW;
+                    invW.invert(adjustedWorldMatrix);
+
                     constants.Set("m_xform", adjustedWorldMatrix);
                     constants.Set("m_xform_v", xform_v);
+                    constants.Set("m_invW", invW);
 
                     // Tree scale constant (for tree meshes)
                     using namespace xray::render::RENDER_NAMESPACE;

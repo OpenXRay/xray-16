@@ -163,6 +163,7 @@ public:
 
         // Update frequency hint
         bool isVolatile = false;  // Updated every frame
+        u32 maxVersions = 0;      // For volatile buffers: NVRHI version count
 
         shared_str debugName;
     };

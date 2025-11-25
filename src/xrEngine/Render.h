@@ -290,7 +290,6 @@ public:
 
     virtual xrImTextureData GetImGuiTextureId(pcstr texture_name) = 0;
 
-    // Forward declare ShaderLoader (can't include framegraph headers here)
     virtual xray::render::framegraph::ShaderLoader* GetShaderLoader() const = 0;
 
     // Main
