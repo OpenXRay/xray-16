@@ -161,8 +161,8 @@ framegraph::DefaultOutputLayout setupHUDPass(
             for (const auto& batch : *data.hudBatches) {
                 if (!batch.visual) continue;
 
-                // Get per-material PSO
-                MaterialPSO* matPSO = data.materialCache->GetOrCreatePSO(batch.visual, data.outputs, fg);
+                // Get per-material PSO (HUD pass type for correct depth state)
+                MaterialPSO* matPSO = data.materialCache->GetOrCreatePSO(batch.visual, data.outputs, fg, RenderPassType::HUD);
                 if (!matPSO || !matPSO->pso) continue;
 
                 // Bind pipeline

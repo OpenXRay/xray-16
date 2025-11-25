@@ -23,108 +23,6 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-// Forward declaration of depth rendering function
-void renderDepthOnlyGeometry(
-    ng::RenderContext* ctx,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    nvrhi::ITexture* depthRT,
-    MaterialCache* materialCache,
-    const framegraph::FrameGraph& fg);
-
-framegraph::VirtualResourceHandle setupDepthPrepass(
-    framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    MaterialCache* materialCache,
-    u32 width,
-    u32 height)
-{
-    using namespace framegraph;
-
-    // PassData structure to hold data between setup and execute
-    struct DepthPrepassData {
-        VirtualResourceHandle depth;
-        ng::RenderDevice* device;
-        const GeometryCollector* geometry;
-        MaterialCache* materialCache;
-        u32 width;
-        u32 height;
-    };
-
-    auto& passData = fg.addCallbackPass<DepthPrepassData>(
-        "Depth Prepass (Early-Z)",
-
-        // ═══════════════════════════════════════════════════════
-        //  SETUP LAMBDA (Declares resource usage)
-        // ═══════════════════════════════════════════════════════
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
-            // Store pass configuration
-            data.width = width;
-            data.height = height;
-            data.device = device;
-            data.geometry = geometry;
-            data.materialCache = materialCache;
-
-            // Declare resource usage
-            RenderPassBuilder passBuilder(builder, passHandle);
-
-            // ═══════════════════════════════════════════════════════
-            //  DEPTH BUFFER CREATION (Phase 2.1)
-            // ═══════════════════════════════════════════════════════
-            // Create depth buffer that will be reused in forward pass
-            // Early-Z optimization: depth written here, tested in forward pass
-            // Format: D24S8 or D32F (GPU-dependent, NVRHI abstracts this)
-
-            data.depth = passBuilder.createDepthBuffer(
-                "rt_DepthPrepass",
-                width,
-                height
-            );
-        },
-
-        // ═══════════════════════════════════════════════════════
-        //  EXECUTE LAMBDA (Renders depth-only geometry)
-        // ═══════════════════════════════════════════════════════
-        [](const DepthPrepassData& data,
-           const FrameGraph& fg,
-           ng::RenderContext* ctx) {
-
-            // Get physical depth buffer from virtual handle
-            auto* depthRT = fg.GetPhysicalTexture(data.depth);
-
-            if (!depthRT) {
-                return;
-            }
-
-            // Check if we have geometry to render
-            if (!data.geometry || data.geometry->GetBatches().empty()) {
-                // No geometry - just clear depth and exit
-                // TODO: Add depth clear command if needed
-                return;
-            }
-
-            // Render geometry depth-only (no color output)
-            renderDepthOnlyGeometry(
-                ctx,
-                data.device,
-                data.geometry,
-                depthRT,
-                data.materialCache,
-                fg
-            );
-        }
-    );
-
-    // Return the depth buffer handle for reuse in forward pass
-    return passData.depth;
-}
-
-// ═══════════════════════════════════════════════════════
-//  DEPTH-ONLY RENDERING IMPLEMENTATION
-// ═══════════════════════════════════════════════════════
-// Simplified version of forward rendering - only writes depth, no color
-
 void renderDepthOnlyGeometry(
     ng::RenderContext* ctx,
     ng::RenderDevice* device,
@@ -176,7 +74,8 @@ void renderDepthOnlyGeometry(
                                 u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
                                 ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
                                 updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
-                            } else if (cbInfo.name == "dynamic_transforms") {
+                            }
+                            else if (cbInfo.name == "dynamic_transforms") {
                                 u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
                                 ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicTransformsCB, sizeToWrite);
                                 updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
@@ -381,6 +280,94 @@ void renderDepthOnlyGeometry(
 
     // End render pass
     ctx->EndRenderPass();
+}
+
+framegraph::VirtualResourceHandle setupDepthPrepass(
+    framegraph::FrameGraph& fg,
+    ng::RenderDevice* device,
+    const GeometryCollector* geometry,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height)
+{
+    using namespace framegraph;
+
+    // PassData structure to hold data between setup and execute
+    struct DepthPrepassData {
+        VirtualResourceHandle depth;
+        ng::RenderDevice* device;
+        const GeometryCollector* geometry;
+        MaterialCache* materialCache;
+        u32 width;
+        u32 height;
+    };
+
+    auto& passData = fg.addCallbackPass<DepthPrepassData>(
+        "Depth Prepass (Early-Z)",
+
+        // ═══════════════════════════════════════════════════════
+        //  SETUP LAMBDA (Declares resource usage)
+        // ═══════════════════════════════════════════════════════
+        [&, width, height](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
+            // Store pass configuration
+            data.width = width;
+            data.height = height;
+            data.device = device;
+            data.geometry = geometry;
+            data.materialCache = materialCache;
+
+            // Declare resource usage
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            // ═══════════════════════════════════════════════════════
+            //  DEPTH BUFFER CREATION (Phase 2.1)
+            // ═══════════════════════════════════════════════════════
+            // Create depth buffer that will be reused in forward pass
+            // Early-Z optimization: depth written here, tested in forward pass
+            // Format: D24S8 or D32F (GPU-dependent, NVRHI abstracts this)
+
+            data.depth = passBuilder.createDepthBuffer(
+                "rt_DepthPrepass",
+                width,
+                height
+            );
+        },
+
+        // ═══════════════════════════════════════════════════════
+        //  EXECUTE LAMBDA (Renders depth-only geometry)
+        // ═══════════════════════════════════════════════════════
+        [](const DepthPrepassData& data,
+           const FrameGraph& fg,
+           ng::RenderContext* ctx) {
+
+            // Get physical depth buffer from virtual handle
+            auto* depthRT = fg.GetPhysicalTexture(data.depth);
+
+            if (!depthRT) {
+                return;
+            }
+
+            // Check if we have geometry to render
+            if (!data.geometry || data.geometry->GetBatches().empty()) {
+                // No geometry - just clear depth and exit
+                // TODO: Add depth clear command if needed
+                return;
+            }
+
+            // Render geometry depth-only (no color output)
+            renderDepthOnlyGeometry(
+                ctx,
+                data.device,
+                data.geometry,
+                depthRT,
+                data.materialCache,
+                fg
+            );
+        }
+    );
+
+    // Return the depth buffer handle for reuse in forward pass
+    return passData.depth;
 }
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

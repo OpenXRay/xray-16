@@ -49,6 +49,15 @@ using RENDER_NAMESPACE::dxRender_Visual;
 using RENDER_NAMESPACE::SVS;
 using RENDER_NAMESPACE::SPS;
 
+// Pass types for different depth state requirements
+enum class RenderPassType : u8 {
+    DepthPrepass,      // depthFunc=Less, depthWrite=true
+    ForwardColor,      // depthFunc=Equal, depthWrite=false (early-Z optimization)
+    HUD,               // depthFunc=LessEqual, depthWrite=true (renders in front)
+    UI,                // depthFunc disabled
+    Default            // Use material's original depth state
+};
+
 // ══════════════════════════════════════════════════════════
 //  PSO TYPE ENUM (Phase 2.4)
 // ══════════════════════════════════════════════════════════
@@ -142,6 +151,7 @@ struct MaterialPSO {
     nvrhi::BindingLayoutHandle psBindingLayout;   // Pixel shader resources
     nvrhi::BindingSetHandle vsBindingSet;         // Cached VS binding set
     nvrhi::BindingSetHandle psBindingSet;         // Cached PS binding set
+    bool needsBindingSetRebuild = false;          // True if textures weren't ready when binding set was created
 
     // Extracted data for quick access
     struct TextureSlot {
@@ -293,7 +303,8 @@ public:
     MaterialPSO* GetOrCreatePSO(
         dxRender_Visual* visual,
         const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg);
+        const framegraph::FrameGraph& fg,
+        RenderPassType passType = RenderPassType::ForwardColor);
 
     // Get or create depth-only PSO for depth prepass (Phase 2.4)
     // Optimized PSO with no color writes, minimal pixel shader
@@ -341,6 +352,16 @@ private:
     // Cached to avoid repeated queries and avoid casting R_constant_setup*
     xr_map<xr_string, float> m_detailScaleCache;
 
+    // Default PBR textures (1x1 solid color textures for fallback)
+    // Used when no PBR texture is specified in .thm metadata
+    resources::TextureHandle m_defaultMetallic;   // Black (0) = dielectric
+    resources::TextureHandle m_defaultRoughness;  // White (1) = fully rough
+    resources::TextureHandle m_defaultAO;         // White (1) = no occlusion
+    resources::TextureHandle m_defaultParallax;   // Gray (0.5) = neutral height
+
+    // Create default PBR textures
+    void CreateDefaultPBRTextures();
+
     // Helper: Get detail scale for texture (queries TextureDescrManager and caches result)
     float GetDetailScale(const shared_str& textureName);
 
@@ -350,7 +371,8 @@ private:
         ShaderElement* elem,
         SPass* pass,
         const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg);
+        const framegraph::FrameGraph& fg,
+        RenderPassType passType);
 
     // Create depth-only PSO (Phase 2.4)
     MaterialPSO* CreateDepthPSO(

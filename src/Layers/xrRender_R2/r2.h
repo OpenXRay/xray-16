@@ -575,7 +575,6 @@ public:
     xray::render::ng::ImGuiRendererNVRHI* m_imguiRendererNVRHI{ nullptr };
     xray::render::ng::ImGuiRendererNVRHI* GetImGuiRendererNVRHI() const { return m_imguiRendererNVRHI; }
 
-    // Shader Loader (for loading HLSL shaders)
     framegraph::ShaderLoader* GetShaderLoader() const { return m_shaderLoader; }
 
     // Test resources for triangle

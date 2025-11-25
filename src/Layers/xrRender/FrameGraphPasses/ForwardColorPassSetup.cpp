@@ -200,7 +200,7 @@ void renderForwardGeometry(
 
     for (const auto& batch : batches) {
         if (batch.visual && materialCache) {
-            MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
+            MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg, RenderPassType::ForwardColor);
             if (matPSO) {
                 // Update all global CBs (constantBuffers only contains global CBs, VCBs are in vcbRequirements)
                 for (const auto& cbInfo : matPSO->constantBuffers) {
@@ -278,7 +278,7 @@ void renderForwardGeometry(
         MaterialPSO* matPSO = nullptr;
 
         if (batch.visual && materialCache) {
-            matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
+            matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg, RenderPassType::ForwardColor);
 
             if (matPSO && matPSO->pso) {
                 pipelineToUse = matPSO->pso;

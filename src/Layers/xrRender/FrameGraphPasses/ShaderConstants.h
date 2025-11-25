@@ -15,6 +15,22 @@ namespace xray::render {
 namespace xray::render::RENDER_NAMESPACE::passes {
 
 // ══════════════════════════════════════════════════════════
+//  PBR TEXTURE SLOT ASSIGNMENTS (Forward+ Rendering)
+// ══════════════════════════════════════════════════════════
+// These slots are reserved for PBR textures in Forward+ rendering.
+// Must match shader expectations in res/gamedata/shaders/r5/forward/
+
+constexpr u32 TEX_SLOT_DIFFUSE   = 0;  // Base color / diffuse (legacy)
+constexpr u32 TEX_SLOT_BUMP      = 1;  // Normal map (bump)
+constexpr u32 TEX_SLOT_BUMP_X    = 2;  // Normal map secondary channel
+constexpr u32 TEX_SLOT_DETAIL    = 3;  // Detail texture
+
+constexpr u32 TEX_SLOT_METALLIC  = 4;  // PBR: Metallic map
+constexpr u32 TEX_SLOT_ROUGHNESS = 5;  // PBR: Roughness map
+constexpr u32 TEX_SLOT_AO        = 6;  // PBR: Ambient occlusion
+constexpr u32 TEX_SLOT_PARALLAX  = 7;  // PBR: Parallax/height map
+
+// ══════════════════════════════════════════════════════════
 //  SHADER CONSTANT BUFFER LAYOUTS
 // ══════════════════════════════════════════════════════════
 // These structs match the HLSL constant buffer layouts from X-Ray shaders.

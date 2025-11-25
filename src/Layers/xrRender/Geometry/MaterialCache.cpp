@@ -22,6 +22,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"  // For FrameGraph definition
 #include "Layers/xrRender/FrameGraph/IPass.h"  // For DefaultOutputLayout
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"  // For PBR texture slot constants
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -288,6 +289,63 @@ MaterialCache::MaterialCache(
     VERIFY(m_device);
     VERIFY(m_resourceManager);
     // VCB pool is optional - can be null for legacy code
+
+    // Create default PBR textures for materials without explicit PBR maps
+    CreateDefaultPBRTextures();
+}
+
+void MaterialCache::CreateDefaultPBRTextures()
+{
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+    if (!texManager) {
+        Msg("! [MaterialCache] TextureManager not available - skipping default PBR textures");
+        return;
+    }
+
+    // Create 1x1 default textures with appropriate values:
+    // - Metallic: 0 (black) = non-metallic/dielectric
+    // - Roughness: 1 (white) = fully rough (safer default)
+    // - AO: 1 (white) = no occlusion
+
+    resources::TextureDesc desc;
+    desc.type = resources::TextureDesc::Texture2D;
+    desc.width = 1;
+    desc.height = 1;
+    desc.mipLevels = 1;
+    desc.format = nvrhi::Format::R8_UNORM;  // Single channel for PBR maps
+
+    // Metallic: black (0)
+    desc.debugName = "$default_metallic";
+    u8 blackPixel = 0;
+    m_defaultMetallic = texManager->CreateTexture(desc, &blackPixel);
+    if (m_defaultMetallic.IsValid()) {
+        m_textureHandleCache["$default_metallic"] = m_defaultMetallic;
+    }
+
+    // Roughness: white (255 = 1.0)
+    desc.debugName = "$default_roughness";
+    u8 whitePixel = 255;
+    m_defaultRoughness = texManager->CreateTexture(desc, &whitePixel);
+    if (m_defaultRoughness.IsValid()) {
+        m_textureHandleCache["$default_roughness"] = m_defaultRoughness;
+    }
+
+    // AO: white (255 = 1.0)
+    desc.debugName = "$default_ao";
+    m_defaultAO = texManager->CreateTexture(desc, &whitePixel);
+    if (m_defaultAO.IsValid()) {
+        m_textureHandleCache["$default_ao"] = m_defaultAO;
+    }
+
+    // Parallax: gray (128 = 0.5 = neutral height, no displacement)
+    desc.debugName = "$default_parallax";
+    u8 grayPixel = 128;
+    m_defaultParallax = texManager->CreateTexture(desc, &grayPixel);
+    if (m_defaultParallax.IsValid()) {
+        m_textureHandleCache["$default_parallax"] = m_defaultParallax;
+    }
+
+    Msg("* [MaterialCache] Created default PBR textures");
 }
 
 MaterialCache::~MaterialCache() {
@@ -301,7 +359,8 @@ MaterialCache::~MaterialCache() {
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
     const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    RenderPassType passType)
 {
     if (!visual) {
         Msg("! [MaterialCache::GetOrCreatePSO] Visual is NULL");
@@ -355,12 +414,15 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     }
 
     // ═══════════════════════════════════════════════════════
-    //  COMPUTE MATERIAL KEY
+    //  COMPUTE MATERIAL KEY (includes pass type for different depth states)
     // ═══════════════════════════════════════════════════════
 
     // Compute hash based on X-Ray texture pointers (stable across frames)
     u64 textureHash = ComputeTextureHash(pass);
     u64 stateHash = ComputeStateHash(pass);
+
+    // Include pass type in state hash so different passes get different PSOs
+    stateHash ^= (static_cast<u64>(passType) << 56);
 
     MaterialKey key(shader, textureHash, stateHash);
 
@@ -387,7 +449,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     m_stats.numCacheMisses++;
 
 
-    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
+    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg, passType);
     if (!pso) {
         Msg("! [MaterialCache::GetOrCreatePSO] CreatePSO failed for shader '%s'", shaderName);
         return nullptr;
@@ -488,7 +550,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     ShaderElement* elem,
     SPass* pass,
     const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    RenderPassType passType)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -611,22 +674,44 @@ MaterialPSO* MaterialCache::CreatePSO(
     // Set up render states from X-Ray pass
     SetupRenderStates(pass, psoDesc);
 
-    // ═══════════════════════════════════════════════════════
-    //  OVERRIDE DEPTH STATE FOR EARLY-Z OPTIMIZATION
-    // ═══════════════════════════════════════════════════════
-    // Forward+ materials render AFTER depth prepass, so:
-    // - Depth was already written in prepass
-    // - Forward+ only needs to TEST depth, not WRITE it
-    // - Use Equal comparison to reject fragments behind prepass depth
-    //
-    // This enables early-Z rejection:
-    // - GPU tests fragment depth BEFORE running pixel shader
-    // - Fragments behind prepass depth are culled (30-50% savings on overdraw)
-    // - Fragments at exact depth run pixel shader for color/lighting
-    psoDesc.depthStencilState.depthTestEnable = true;
-    psoDesc.depthStencilState.depthWriteEnable = false;  // Don't re-write (saves bandwidth)
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;  // Only exact matches
-    psoDesc.depthStencilState.stencilEnable = false;  // CRITICAL: No stencil ops (enables early-Z)
+    // Override depth state based on pass type
+    switch (passType) {
+    case RenderPassType::ForwardColor:
+        // Early-Z optimization: depth already written by prepass
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = false;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::HUD:
+        // HUD renders in front using viewport depth compression [0.0, 0.1]
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::DepthPrepass:
+        // Depth prepass: write depth, normal Less test
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::UI:
+        // UI: no depth testing
+        psoDesc.depthStencilState.depthTestEnable = false;
+        psoDesc.depthStencilState.depthWriteEnable = false;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::Default:
+    default:
+        // Use material's original depth state (already set by SetupRenderStates)
+        break;
+    }
 
     // Set up render target formats from DefaultOutputLayout (using shader reflection)
     SetupRenderTargets(pso.get(), outputs, fg, psoDesc);
@@ -694,11 +779,8 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
     STextureList* texList = pass->T._get();
 
     if (!texList || texList->empty()) {
-        Msg("  [ExtractTextures] No textures bound for this shader");
         return;
     }
-
-    Msg("  [ExtractTextures] Loading %u textures from pass", texList->size());
 
     // STextureList is now a vector of (stage, shared_str) pairs - directly stores texture names!
     for (size_t i = 0; i < texList->size(); i++) {
@@ -711,12 +793,9 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             continue;
         }
 
-        // TODO: Handle $user$ render target textures via RenderTargetRegistry
-        // For now, skip them to avoid disk loading errors
+        // Skip $user$ render target textures (handled separately)
         if (xr_strlen(textureName.c_str()) > 6 && 0 == strncmp(textureName.c_str(), "$user$", 6))
         {
-            Msg("~ [ExtractTextures] Skipping render target texture: %s (slot=%u) - RT resolution not yet implemented",
-                textureName.c_str(), stage);
             continue;
         }
 
@@ -750,11 +829,64 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         texSlot.slot = stage;
         texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
-
-        Msg("  [ExtractTextures] Loaded texture '%s' at slot=%u", textureName, stage);
     }
 
-    Msg("  [ExtractTextures] Total textures loaded: %u", matPSO->textures.size());
+    // ═══════════════════════════════════════════════════════
+    //  LOAD PBR TEXTURES FROM BASE TEXTURE METADATA
+    // ═══════════════════════════════════════════════════════
+    // PBR textures are associated with the base diffuse texture (slot 0)
+    // Load them into reserved slots for Forward+ PBR rendering
+
+    if (!texList->empty()) {
+        const shared_str& baseTexName = (*texList)[0].second;
+
+        if (!baseTexName.empty()) {
+            auto& texDescMgr = RImplementation.Resources->m_textures_description;
+
+            // PBR texture slot assignments (from ShaderConstants.h)
+            using namespace passes;
+
+            // Helper lambda to load PBR texture with fallback to default
+            auto loadPBRTexture = [&](const shared_str& pbrTexName, u32 slot, const char* type, resources::TextureHandle defaultTex) {
+                resources::TextureHandle handle;
+
+                if (!pbrTexName.empty()) {
+                    // Check cache
+                    auto cacheIt = m_textureHandleCache.find(pbrTexName.c_str());
+                    if (cacheIt != m_textureHandleCache.end()) {
+                        handle = cacheIt->second;
+                    } else {
+                        // Load texture
+                        handle = texManager->LoadTexture(
+                            pbrTexName.c_str(),
+                            resources::TexturePriority::High
+                        );
+                        if (handle.IsValid()) {
+                            m_textureHandleCache[pbrTexName.c_str()] = handle;
+                        }
+                    }
+                }
+
+                // Use default texture if no explicit texture available
+                if (!handle.IsValid()) {
+                    handle = defaultTex;
+                }
+
+                if (handle.IsValid()) {
+                    MaterialPSO::TextureSlot texSlot;
+                    texSlot.slot = slot;
+                    texSlot.handle = handle;
+                    matPSO->textures.push_back(texSlot);
+                }
+            };
+
+            // Load PBR textures from metadata (with fallback to defaults)
+            loadPBRTexture(texDescMgr.GetMetallicName(baseTexName),  TEX_SLOT_METALLIC,  "metallic",  m_defaultMetallic);
+            loadPBRTexture(texDescMgr.GetRoughnessName(baseTexName), TEX_SLOT_ROUGHNESS, "roughness", m_defaultRoughness);
+            loadPBRTexture(texDescMgr.GetAOName(baseTexName),        TEX_SLOT_AO,        "ao",        m_defaultAO);
+            loadPBRTexture(texDescMgr.GetParallaxName(baseTexName),  TEX_SLOT_PARALLAX,  "parallax",  m_defaultParallax);
+        }
+    }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1146,11 +1278,19 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     // ═══════════════════════════════════════════════════════
     //  CHECK CACHE - Return existing binding sets if already created
     // ═══════════════════════════════════════════════════════
+    // IMPORTANT: If the material has VCBs (per-draw constant buffers like bones/transforms),
+    // we MUST recreate binding sets every time because VCB buffers can change between draws.
+    // Only cache binding sets for materials that ONLY use global CBs.
 
-    if (matPSO->vsBindingSet && matPSO->psBindingSet) {
-        // Already cached - reuse them!
+    bool hasVCBs = !matPSO->vcbRequirements.empty();
+
+    if (!hasVCBs && matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
+        // No VCBs and already cached with valid textures - safe to reuse!
         return matPSO->vsBindingSet;
     }
+
+    // Clear the rebuild flag - we're rebuilding now
+    matPSO->needsBindingSetRebuild = false;
 
     // ═══════════════════════════════════════════════════════
     //  BUILD VS BINDING SET DESCRIPTOR
@@ -1234,6 +1374,8 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     }
 
     // Collect textures
+    // Track if all textures are valid - if not, we won't cache the binding set
+    bool allTexturesValid = true;
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     for (const auto& texSlot : matPSO->textures) {
         nvrhi::ITexture* nativeTex = texManager->GetNVRHITexture(texSlot.handle);
@@ -1245,6 +1387,8 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
                     nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension),
                 "texture", PSBinding::Texture});
         } else {
+            // Texture not ready - mark as invalid so we don't cache this binding set
+            allTexturesValid = false;
             psBindings.push_back({texSlot.slot,
                 nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nullptr),
                 "texture_null", PSBinding::Texture});
@@ -1278,11 +1422,11 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     //  CREATE VS BINDING SET
     // ═══════════════════════════════════════════════════════
 
-    matPSO->vsBindingSet = m_device->CreateBindingSet(
+    nvrhi::BindingSetHandle vsBindingSet = m_device->CreateBindingSet(
         vsBindingDesc,
         matPSO->vsBindingLayout);
 
-    if (!matPSO->vsBindingSet) {
+    if (!vsBindingSet) {
         return nullptr;
     }
 
@@ -1290,18 +1434,28 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     //  CREATE PS BINDING SET
     // ═══════════════════════════════════════════════════════
 
-    matPSO->psBindingSet = m_device->CreateBindingSet(
+    nvrhi::BindingSetHandle psBindingSet = m_device->CreateBindingSet(
         psBindingDesc,
         matPSO->psBindingLayout);
 
-    if (!matPSO->psBindingSet) {
+    if (!psBindingSet) {
         return nullptr;
     }
 
     // ═══════════════════════════════════════════════════════
-    //  DONE - Binding sets cached in MaterialPSO
+    //  STORE BINDING SETS
     // ═══════════════════════════════════════════════════════
+    // Cache binding sets for reuse, with caveats:
+    // - If VCBs are present, we'll recreate every draw anyway (see cache check above)
+    // - If textures weren't valid, mark for rebuild next frame
 
+    matPSO->vsBindingSet = vsBindingSet;
+    matPSO->psBindingSet = psBindingSet;
+
+    if (!allTexturesValid) {
+        // Textures not ready - mark for recreation next frame
+        matPSO->needsBindingSetRebuild = true;
+    }
 
     return matPSO->vsBindingSet;
 }
@@ -1835,58 +1989,23 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     auto pso = xr_make_unique<MaterialPSO>();
     pso->pass = pass;
 
-    // ═══════════════════════════════════════════════════════
-    //  REUSE MATERIAL VS + MINIMAL DEPTH PS
-    // ═══════════════════════════════════════════════════════
-    // Strategy: Reuse the material's vertex shader (has correct constant layout)
-    // and pair it with minimal depth_prepass.ps (just alpha test, no color output)
-    //
-    // This ensures:
-    // - Vertex shader matches material's constant requirements (dynamic_transforms, sbones_array, etc.)
-    // - Pixel shader is minimal (no expensive PBR/lighting calculations)
-    // - No need to maintain multiple depth shader variants
-    //
-    // Yes, we run the full VS twice (depth + forward), but:
-    // - VS is cheap compared to PS (1-2ms vs 5-10ms)
-    // - Early-Z saves 30-50% of PS invocations in forward pass
-    // - Net gain: 15-25% faster on overdraw-heavy scenes
-
-    // ═══════════════════════════════════════════════════════
-    //  EXTRACT SHADERS FROM MATERIAL (REUSE VS, NULL PS)
-    // ═══════════════════════════════════════════════════════
-
-    // Reuse material's vertex shader (has correct constant layout)
+    // Reuse material's vertex shader + NULL pixel shader for depth-only rendering
     if (!ExtractShaders(pass, pso.get())) {
-        Msg("! [CreateDepthPSO] Failed to extract material vertex shader");
         return nullptr;
     }
 
-    // Store the material's VS (for reflection data and constant layout)
     nvrhi::ShaderHandle materialVS = GetOrCreateShaderVS(pso->vertexShader);
     if (!materialVS) {
-        Msg("! [CreateDepthPSO] Failed to get material vertex shader handle");
         return nullptr;
     }
 
-    // Use NULL pixel shader for depth-only rendering
-    // D3D11 explicitly supports NULL PS for depth-only passes
-    // This is more efficient than a minimal PS and actually works with renderTargetCount=0
-    pso->pixelShader = nullptr;
+    pso->pixelShader = nullptr;  // NULL PS for depth-only
 
-    // ═══════════════════════════════════════════════════════
-    //  EXTRACT CONSTANT LAYOUT FROM VS REFLECTION
-    // ═══════════════════════════════════════════════════════
-    // CRITICAL: FGConstantSystem needs constantLayout to map constant names to buffer offsets
-    // Without this, Set("m_xform") won't know where to write data!
+    // Extract constant layout from VS (needed for FGConstantSystem)
     if (pso->vertexShader && pso->vertexShader->reflection) {
         pso->constantLayout = pso->vertexShader->reflection->constantLayout;
-        Msg("  [CreateDepthPSO] Extracted constant layout: %zu constants from VS",
-            pso->constantLayout.constants.size());
-    } else {
-        Msg("! [CreateDepthPSO] WARNING: VS has no reflection data!");
     }
 
-    // Extract textures (needed for alpha testing in depth_prepass.ps)
     ExtractTextures(pass, pso.get());
     ExtractSamplers(pass, pso.get());
 
@@ -1915,33 +2034,16 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     }
     SetupVertexAttributes(visual, pso.get(), psoDesc);
 
-    // ═══════════════════════════════════════════════════════
-    //  DEPTH-ONLY RENDER STATE
-    // ═══════════════════════════════════════════════════════
-    // Override render state for depth-only rendering
-
-    // NO COLOR OUTPUTS (this is the key optimization!)
+    // Depth-only render state
     psoDesc.renderTargetCount = 0;
-
-    // DEPTH FORMAT (CRITICAL: PSO needs to know the depth buffer format!)
-    // Match the format used by createDepthBuffer in DepthPrepassSetup (D32)
     psoDesc.depthStencilFormat = nvrhi::Format::D32;
-
-    // Extract rasterizer/blend state from material (this also sets depth state from legacy)
     SetupRenderStates(pass, psoDesc);
 
-    // OVERRIDE depth state for depth-only rendering (MUST be after SetupRenderStates!)
-    // SetupRenderStates extracts legacy state which might have depth write disabled
+    // Override depth state (must be after SetupRenderStates)
     psoDesc.depthStencilState.depthTestEnable = true;
-    psoDesc.depthStencilState.depthWriteEnable = true;  // CRITICAL: Force depth write ON
+    psoDesc.depthStencilState.depthWriteEnable = true;
     psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
     psoDesc.depthStencilState.stencilEnable = false;
-
-    // Debug: Verify depth write is actually enabled
-    Msg("* [CreateDepthPSO] Setting depth state: test=%d write=%d func=%d",
-        psoDesc.depthStencilState.depthTestEnable,
-        psoDesc.depthStencilState.depthWriteEnable,
-        (int)psoDesc.depthStencilState.depthFunc);
 
     // ═══════════════════════════════════════════════════════
     //  CREATE PIPELINE STATE VIA CACHE
@@ -1960,15 +2062,8 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 
     pso->pso = nvrhiPSO;
 
-    // ═══════════════════════════════════════════════════════
-    //  CREATE BINDING LAYOUTS
-    // ═══════════════════════════════════════════════════════
     CreateBindingLayouts(pso.get());
-
     pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
-
-    // Debug: Log successful depth PSO creation
-    Msg("* [MaterialCache::CreateDepthPSO] Created depth PSO for shader '%s'", pso->debugName.c_str());
 
     return pso.release();
 }

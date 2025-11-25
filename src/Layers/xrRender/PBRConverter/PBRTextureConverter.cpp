@@ -7,9 +7,11 @@
 #include "xrCore/FS.h"
 #include "xrCore/Threading/ParallelFor.hpp"
 #include "Layers/xrRender/ResourceManager/DDSLoader.h"
+#include "Layers/xrRender/ETextureParams.h"  // For .thm file support
 #include <atomic>
 #include <algorithm>
 
+using namespace xray::render::RENDER_NAMESPACE;
 namespace xray::render::pbr {
 
 // Runtime PBR flag
@@ -392,6 +394,53 @@ xr_string ComputeTextureInventoryDigest(const TextureInventory& inventory) {
 }
 
 // ══════════════════════════════════════════════════════════
+//  HELPER: Check if .thm needs PBR update
+// ══════════════════════════════════════════════════════════
+// Returns true if .thm doesn't exist or lacks PBR texture references
+
+static bool THMNeedsPBRUpdate(
+    const char* root_alias,
+    const xr_string& base_name,
+    const xr_string& metallic_name,
+    const xr_string& roughness_name,
+    const xr_string& ao_name,
+    const xr_string& parallax_name)
+{
+    xr_string thm_path = base_name + ".thm";
+
+    string_path full_path;
+    FS.update_path(full_path, root_alias, thm_path.c_str());
+
+    if (!FS.exist(full_path)) {
+        Msg("* [PBRTextureConverter] THMNeedsPBRUpdate: %s doesn't exist, needs creation", full_path);
+        return true;  // .thm doesn't exist
+    }
+
+    // Load existing .thm and check PBR fields
+    IReader* reader = FS.r_open(root_alias, thm_path.c_str());
+    if (!reader) {
+        Msg("* [PBRTextureConverter] THMNeedsPBRUpdate: Can't read %s", full_path);
+        return true;  // Can't read, needs update
+    }
+
+    STextureParams params;
+    params.Clear();
+    params.Load(*reader);
+    FS.r_close(reader);
+
+    // Check if PBR names match expected values
+    if (params.metallic_name != metallic_name.c_str() ||
+        params.roughness_name != roughness_name.c_str() ||
+        params.ao_name != ao_name.c_str() ||
+        params.parallax_name != parallax_name.c_str()) {
+        Msg("* [PBRTextureConverter] THMNeedsPBRUpdate: %s has outdated PBR fields", full_path);
+        return true;  // PBR fields don't match
+    }
+
+    return false;  // .thm is up to date
+}
+
+// ══════════════════════════════════════════════════════════
 //  VERIFY PBR OUTPUTS (Check if conversion needed)
 // ══════════════════════════════════════════════════════════
 
@@ -399,7 +448,8 @@ bool VerifyPBROutputs(
     const TextureInventory& inventory,
     const PBRConversionParams& params)
 {
-    u32 missing_outputs = 0;
+    u32 missing_textures = 0;
+    u32 missing_thm = 0;
 
     for (const auto& asset : inventory.assets) {
         // Check if metallic/roughness outputs exist
@@ -408,18 +458,34 @@ bool VerifyPBROutputs(
 
         if (!FileExists(params.output_root.c_str(), metallic_path.c_str()) ||
             !FileExists(params.output_root.c_str(), roughness_path.c_str())) {
-            missing_outputs++;
+            missing_textures++;
+        } else {
+            // Textures exist - check if .thm exists with PBR fields
+            xr_string metallic_name = asset.base_name + "_metallic";
+            xr_string roughness_name = asset.base_name + "_roughness";
+            xr_string ao_name = asset.base_name + "_ao";
+            xr_string parallax_name = asset.base_name + "_parallax";
+
+            if (THMNeedsPBRUpdate(params.output_root.c_str(), asset.base_name,
+                                  metallic_name, roughness_name, ao_name, parallax_name)) {
+                missing_thm++;
+            }
         }
     }
 
-    if (missing_outputs > 0) {
+    if (missing_textures > 0) {
         Msg("[PBRTextureConverter] %u/%u textures need conversion",
-            missing_outputs, inventory.total_textures);
-        return true;
-        //return false;
+            missing_textures, inventory.total_textures);
+        return false;  // Need full conversion
     }
 
-    return true;
+    if (missing_thm > 0) {
+        Msg("[PBRTextureConverter] %u/%u .thm files need PBR fields updated",
+            missing_thm, inventory.total_textures);
+        return false;  // Need .thm update pass
+    }
+
+    return true;  // All outputs verified
 }
 
 // ══════════════════════════════════════════════════════════
@@ -933,6 +999,85 @@ static void SanityTestDecompressor(const LegacyTextureAsset& asset)
 }
 
 // ══════════════════════════════════════════════════════════
+//  HELPER: Write/Update .thm file with PBR texture references
+// ══════════════════════════════════════════════════════════
+// Creates or updates a .thm file to include PBR texture names
+// This allows TextureDescrManager to find PBR textures via normal lookup
+
+static bool WriteTHMFile(
+    const char* root_alias,
+    const xr_string& base_name,
+    const xr_string& metallic_name,
+    const xr_string& roughness_name,
+    const xr_string& ao_name,
+    const xr_string& parallax_name)
+{
+    xr_string thm_path = base_name + ".thm";
+
+    // Try to load existing .thm file
+    STextureParams params;
+    params.Clear();
+
+    string_path full_path;
+    FS.update_path(full_path, root_alias, thm_path.c_str());
+
+    Msg("* [PBRTextureConverter] WriteTHMFile: Writing to %s (resolved: %s)", thm_path.c_str(), full_path);
+
+    if (FS.exist(full_path)) {
+        // Load existing .thm to preserve other settings
+        IReader* reader = FS.r_open(root_alias, thm_path.c_str());
+        if (reader) {
+            // Skip THM_CHUNK_VERSION and THM_CHUNK_DATA (thumbnail)
+            if (reader->find_chunk(THM_CHUNK_VERSION)) {
+                // Version chunk exists, skip it
+            }
+            if (reader->find_chunk(THM_CHUNK_DATA)) {
+                // Thumbnail data exists, skip it
+            }
+            // Load texture params
+            params.Load(*reader);
+            FS.r_close(reader);
+            Msg("* [PBRTextureConverter] Loaded existing .thm, updating PBR fields");
+        }
+    } else {
+        Msg("* [PBRTextureConverter] Creating new .thm file");
+        // Set default type for new .thm files
+        params.type = STextureParams::ttImage;
+    }
+
+    // Update PBR texture names
+    params.metallic_name = metallic_name.c_str();
+    params.roughness_name = roughness_name.c_str();
+    params.ao_name = ao_name.c_str();
+    params.parallax_name = parallax_name.c_str();
+
+    // Write updated .thm file
+    IWriter* writer = FS.w_open(root_alias, thm_path.c_str());
+    if (!writer) {
+        Msg("! [PBRTextureConverter] Failed to open .thm for writing: %s/%s (full: %s)",
+            root_alias, thm_path.c_str(), full_path);
+        return false;
+    }
+
+    // Write version chunk
+    writer->open_chunk(THM_CHUNK_VERSION);
+    writer->w_u16(1);  // Version 1
+    writer->close_chunk();
+
+    // Write THM_CHUNK_TYPE - required by LoadTHM before params.Load()
+    writer->open_chunk(THM_CHUNK_TYPE);
+    writer->w_u32(0);  // THM type (0 = texture)
+    writer->close_chunk();
+
+    // Write texture params (includes PBR names)
+    params.Save(*writer);
+
+    FS.w_close(writer);
+    Msg("* [PBRTextureConverter] Successfully wrote .thm: %s", full_path);
+    return true;
+}
+
+// ══════════════════════════════════════════════════════════
 //  CONVERT TEXTURES TO PBR (Phase 2.5.2-2.5.3: Implementation)
 // ══════════════════════════════════════════════════════════
 // Main conversion loop using xr_parallel_for
@@ -998,15 +1143,41 @@ bool ConvertTexturesToPBR(
             xr_string ao_path = asset.base_name + "_ao.dds";
             xr_string parallax_path = asset.base_name + "_parallax.dds";  // Height map
 
-            if (FileExists(params.output_root.c_str(), albedo_path.c_str()) &&
+            // PBR texture names (without .dds extension, for .thm reference)
+            xr_string metallic_name = asset.base_name + "_metallic";
+            xr_string roughness_name = asset.base_name + "_roughness";
+            xr_string ao_name = asset.base_name + "_ao";
+            xr_string parallax_name = asset.base_name + "_parallax";
+
+            // Check if all PBR textures exist AND .thm is up to date
+            bool texturesExist =
                 FileExists(params.output_root.c_str(), metallic_path.c_str()) &&
                 FileExists(params.output_root.c_str(), roughness_path.c_str()) &&
                 FileExists(params.output_root.c_str(), ao_path.c_str()) &&
-                FileExists(params.output_root.c_str(), parallax_path.c_str())) {
-                // Already converted
+                FileExists(params.output_root.c_str(), parallax_path.c_str());
+
+            bool thmUpToDate = !THMNeedsPBRUpdate(
+                params.output_root.c_str(),
+                asset.base_name,
+                metallic_name, roughness_name, ao_name, parallax_name);
+
+            if (texturesExist && thmUpToDate) {
+                // Already converted and .thm is up to date
                 skipped_count++;
                 continue;
             }
+
+            // If textures exist but .thm needs update, just update .thm
+            if (texturesExist && !thmUpToDate) {
+                Msg("* [PBRTextureConverter] PBR textures exist but .thm needs update: %s", asset.base_name.c_str());
+                WriteTHMFile(params.output_root.c_str(), asset.base_name,
+                            metallic_name, roughness_name, ao_name, parallax_name);
+                skipped_count++;  // Count as skipped (no texture conversion needed)
+                continue;
+            }
+
+            // PBR textures don't exist - will run full conversion
+            Msg("* [PBRTextureConverter] PBR textures missing, running conversion: %s", asset.base_name.c_str());
 
             // ═══════════════════════════════════════════════════════
             //  SKIP IF NO NORMAL MAP (AI requires normal)
@@ -1160,6 +1331,12 @@ bool ConvertTexturesToPBR(
                     continue;
                 }
             }
+
+            // ═══════════════════════════════════════════════════════
+            //  WRITE .THM FILE WITH PBR TEXTURE REFERENCES
+            // ═══════════════════════════════════════════════════════
+            WriteTHMFile(params.output_root.c_str(), asset.base_name,
+                        metallic_name, roughness_name, ao_name, parallax_name);
 
             // Success!
             converted_count++;
