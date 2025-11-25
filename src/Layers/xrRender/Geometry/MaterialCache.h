@@ -43,6 +43,14 @@ using RENDER_NAMESPACE::dxRender_Visual;
 using RENDER_NAMESPACE::SVS;
 using RENDER_NAMESPACE::SPS;
 
+enum class RenderPassType : u8 {
+    DepthPrepass,
+    ForwardColor,
+    HUD,
+    UI,
+    Default
+};
+
 enum class PSOType : u8 {
     Material = 0,
     Depth = 1,
@@ -113,6 +121,7 @@ struct MaterialPSO {
     nvrhi::BindingLayoutHandle psBindingLayout;
     nvrhi::BindingSetHandle vsBindingSet;
     nvrhi::BindingSetHandle psBindingSet;
+    bool needsBindingSetRebuild = false;
 
     struct TextureSlot {
         u32 slot;
@@ -229,7 +238,8 @@ public:
     MaterialPSO* GetOrCreatePSO(
         dxRender_Visual* visual,
         const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg);
+        const framegraph::FrameGraph& fg,
+        RenderPassType passType = RenderPassType::ForwardColor);
 
     MaterialPSO* GetOrCreateDepthPSO(
         dxRender_Visual* visual,
@@ -265,6 +275,13 @@ private:
 
     xr_map<xr_string, float> m_detailScaleCache;
 
+    resources::TextureHandle m_defaultMetallic;
+    resources::TextureHandle m_defaultRoughness;
+    resources::TextureHandle m_defaultAO;
+    resources::TextureHandle m_defaultParallax;
+
+    void CreateDefaultPBRTextures();
+
     float GetDetailScale(const shared_str& textureName);
 
     MaterialPSO* CreatePSO(
@@ -272,7 +289,8 @@ private:
         ShaderElement* elem,
         SPass* pass,
         const framegraph::DefaultOutputLayout& outputs,
-        const framegraph::FrameGraph& fg);
+        const framegraph::FrameGraph& fg,
+        RenderPassType passType);
 
     MaterialPSO* CreateDepthPSO(
         dxRender_Visual* visual,

@@ -28,80 +28,6 @@ void renderDepthOnlyGeometry(
     const GeometryCollector* geometry,
     nvrhi::ITexture* depthRT,
     MaterialCache* materialCache,
-    const framegraph::FrameGraph& fg);
-
-framegraph::VirtualResourceHandle setupDepthPrepass(
-    framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    MaterialCache* materialCache,
-    u32 width,
-    u32 height)
-{
-    using namespace framegraph;
-
-    struct DepthPrepassData {
-        VirtualResourceHandle depth;
-        ng::RenderDevice* device;
-        const GeometryCollector* geometry;
-        MaterialCache* materialCache;
-        u32 width;
-        u32 height;
-    };
-
-    auto& passData = fg.addCallbackPass<DepthPrepassData>(
-        "Depth Prepass (Early-Z)",
-
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
-            data.width = width;
-            data.height = height;
-            data.device = device;
-            data.geometry = geometry;
-            data.materialCache = materialCache;
-
-            RenderPassBuilder passBuilder(builder, passHandle);
-
-            data.depth = passBuilder.createDepthBuffer(
-                "rt_DepthPrepass",
-                width,
-                height
-            );
-        },
-
-        [](const DepthPrepassData& data,
-           const FrameGraph& fg,
-           ng::RenderContext* ctx) {
-
-            auto* depthRT = fg.GetPhysicalTexture(data.depth);
-
-            if (!depthRT) {
-                return;
-            }
-
-            if (!data.geometry || data.geometry->GetBatches().empty()) {
-                return;
-            }
-
-            renderDepthOnlyGeometry(
-                ctx,
-                data.device,
-                data.geometry,
-                depthRT,
-                data.materialCache,
-                fg
-            );
-        }
-    );
-
-    return passData.depth;
-}
-
-void renderDepthOnlyGeometry(
-    ng::RenderContext* ctx,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    nvrhi::ITexture* depthRT,
-    MaterialCache* materialCache,
     const framegraph::FrameGraph& fg)
 {
     using RENDER_NAMESPACE::CSkeletonX_ST;
@@ -136,7 +62,8 @@ void renderDepthOnlyGeometry(
                                 u32 sizeToWrite = std::min<u32>(sizeof(StaticGlobals), cbInfo.size);
                                 ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &staticGlobalsCB, sizeToWrite);
                                 updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
-                            } else if (cbInfo.name == "dynamic_transforms") {
+                            }
+                            else if (cbInfo.name == "dynamic_transforms") {
                                 u32 sizeToWrite = std::min<u32>(sizeof(DynamicTransforms), cbInfo.size);
                                 ctx->WriteBuffer(cbInfo.nvrhiBuffer.Get(), &dynamicTransformsCB, sizeToWrite);
                                 updatedGlobalBuffers.insert(cbInfo.nvrhiBuffer.Get());
@@ -289,6 +216,72 @@ void renderDepthOnlyGeometry(
     }
 
     ctx->EndRenderPass();
+}
+
+framegraph::VirtualResourceHandle setupDepthPrepass(
+    framegraph::FrameGraph& fg,
+    ng::RenderDevice* device,
+    const GeometryCollector* geometry,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height)
+{
+    using namespace framegraph;
+
+    struct DepthPrepassData {
+        VirtualResourceHandle depth;
+        ng::RenderDevice* device;
+        const GeometryCollector* geometry;
+        MaterialCache* materialCache;
+        u32 width;
+        u32 height;
+    };
+
+    auto& passData = fg.addCallbackPass<DepthPrepassData>(
+        "Depth Prepass (Early-Z)",
+
+        [&, width, height](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
+            data.width = width;
+            data.height = height;
+            data.device = device;
+            data.geometry = geometry;
+            data.materialCache = materialCache;
+
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.depth = passBuilder.createDepthBuffer(
+                "rt_DepthPrepass",
+                width,
+                height
+            );
+        },
+
+        [](const DepthPrepassData& data,
+           const FrameGraph& fg,
+           ng::RenderContext* ctx) {
+
+            auto* depthRT = fg.GetPhysicalTexture(data.depth);
+
+            if (!depthRT) {
+                return;
+            }
+
+            if (!data.geometry || data.geometry->GetBatches().empty()) {
+                return;
+            }
+
+            renderDepthOnlyGeometry(
+                ctx,
+                data.device,
+                data.geometry,
+                depthRT,
+                data.materialCache,
+                fg
+            );
+        }
+    );
+
+    return passData.depth;
 }
 
 }

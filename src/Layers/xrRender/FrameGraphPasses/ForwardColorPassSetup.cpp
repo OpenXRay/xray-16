@@ -151,7 +151,7 @@ void renderForwardGeometry(
 
     for (const auto& batch : batches) {
         if (batch.visual && materialCache) {
-            MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
+            MaterialPSO* matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg, RenderPassType::ForwardColor);
             if (matPSO) {
                 for (const auto& cbInfo : matPSO->constantBuffers) {
                     if (cbInfo.nvrhiBuffer) {
@@ -211,7 +211,7 @@ void renderForwardGeometry(
         MaterialPSO* matPSO = nullptr;
 
         if (batch.visual && materialCache) {
-            matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg);
+            matPSO = materialCache->GetOrCreatePSO(batch.visual, outputs, fg, RenderPassType::ForwardColor);
 
             if (matPSO && matPSO->pso) {
                 pipelineToUse = matPSO->pso;

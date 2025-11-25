@@ -281,6 +281,14 @@ shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
     return "";
 }
 
+static bool TextureFileExists(const char* tex_name)
+{
+    string_path fn;
+    FS.update_path(fn, "$game_textures$", tex_name);
+    xr_strcat(fn, ".dds");
+    return FS.exist(fn).Exists;
+}
+
 shared_str CTextureDescrMngr::GetMetallicName(const shared_str& tex_name) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
@@ -293,7 +301,9 @@ shared_str CTextureDescrMngr::GetMetallicName(const shared_str& tex_name) const
     }
     string256 nm;
     strconcat(sizeof(nm), nm, tex_name.c_str(), "_metallic");
-    return nm;
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
 }
 
 shared_str CTextureDescrMngr::GetRoughnessName(const shared_str& tex_name) const
@@ -308,7 +318,9 @@ shared_str CTextureDescrMngr::GetRoughnessName(const shared_str& tex_name) const
     }
     string256 nm;
     strconcat(sizeof(nm), nm, tex_name.c_str(), "_roughness");
-    return nm;
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
 }
 
 shared_str CTextureDescrMngr::GetAOName(const shared_str& tex_name) const
@@ -323,7 +335,9 @@ shared_str CTextureDescrMngr::GetAOName(const shared_str& tex_name) const
     }
     string256 nm;
     strconcat(sizeof(nm), nm, tex_name.c_str(), "_ao");
-    return nm;
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
 }
 
 shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
@@ -338,7 +352,9 @@ shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
     }
     string256 nm;
     strconcat(sizeof(nm), nm, tex_name.c_str(), "_parallax");
-    return nm;
+    if (TextureFileExists(nm))
+        return nm;
+    return "";
 }
 
 BOOL CTextureDescrMngr::UseSteepParallax(const shared_str& tex_name) const

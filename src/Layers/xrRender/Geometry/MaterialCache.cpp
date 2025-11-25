@@ -21,6 +21,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -236,6 +237,53 @@ MaterialCache::MaterialCache(
 {
     VERIFY(m_device);
     VERIFY(m_resourceManager);
+
+    CreateDefaultPBRTextures();
+}
+
+void MaterialCache::CreateDefaultPBRTextures()
+{
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+    if (!texManager) {
+        Msg("! [MaterialCache] TextureManager not available - skipping default PBR textures");
+        return;
+    }
+
+    resources::TextureDesc desc;
+    desc.type = resources::TextureDesc::Texture2D;
+    desc.width = 1;
+    desc.height = 1;
+    desc.mipLevels = 1;
+    desc.format = nvrhi::Format::R8_UNORM;
+
+    desc.debugName = "$default_metallic";
+    u8 blackPixel = 0;
+    m_defaultMetallic = texManager->CreateTexture(desc, &blackPixel);
+    if (m_defaultMetallic.IsValid()) {
+        m_textureHandleCache["$default_metallic"] = m_defaultMetallic;
+    }
+
+    desc.debugName = "$default_roughness";
+    u8 whitePixel = 255;
+    m_defaultRoughness = texManager->CreateTexture(desc, &whitePixel);
+    if (m_defaultRoughness.IsValid()) {
+        m_textureHandleCache["$default_roughness"] = m_defaultRoughness;
+    }
+
+    desc.debugName = "$default_ao";
+    m_defaultAO = texManager->CreateTexture(desc, &whitePixel);
+    if (m_defaultAO.IsValid()) {
+        m_textureHandleCache["$default_ao"] = m_defaultAO;
+    }
+
+    desc.debugName = "$default_parallax";
+    u8 grayPixel = 128;
+    m_defaultParallax = texManager->CreateTexture(desc, &grayPixel);
+    if (m_defaultParallax.IsValid()) {
+        m_textureHandleCache["$default_parallax"] = m_defaultParallax;
+    }
+
+    Msg("* [MaterialCache] Created default PBR textures");
 }
 
 MaterialCache::~MaterialCache() {
@@ -245,7 +293,8 @@ MaterialCache::~MaterialCache() {
 MaterialPSO* MaterialCache::GetOrCreatePSO(
     dxRender_Visual* visual,
     const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    RenderPassType passType)
 {
     if (!visual) {
         Msg("! [MaterialCache::GetOrCreatePSO] Visual is NULL");
@@ -287,6 +336,8 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     u64 textureHash = ComputeTextureHash(pass);
     u64 stateHash = ComputeStateHash(pass);
 
+    stateHash ^= (static_cast<u64>(passType) << 56);
+
     MaterialKey key(shader, textureHash, stateHash);
 
     const char* shaderName = "unknown";
@@ -303,7 +354,7 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
     m_stats.numCacheMisses++;
 
 
-    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg);
+    MaterialPSO* pso = CreatePSO(visual, elem, pass, outputs, fg, passType);
     if (!pso) {
         Msg("! [MaterialCache::GetOrCreatePSO] CreatePSO failed for shader '%s'", shaderName);
         return nullptr;
@@ -381,7 +432,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     ShaderElement* elem,
     SPass* pass,
     const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    RenderPassType passType)
 {
     auto pso = xr_make_unique<MaterialPSO>();
 
@@ -449,10 +501,38 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     SetupRenderStates(pass, psoDesc);
 
-    psoDesc.depthStencilState.depthTestEnable = true;
-    psoDesc.depthStencilState.depthWriteEnable = false;
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;
-    psoDesc.depthStencilState.stencilEnable = false;
+    switch (passType) {
+    case RenderPassType::ForwardColor:
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = false;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::HUD:
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::DepthPrepass:
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::UI:
+        psoDesc.depthStencilState.depthTestEnable = false;
+        psoDesc.depthStencilState.depthWriteEnable = false;
+        psoDesc.depthStencilState.stencilEnable = false;
+        break;
+
+    case RenderPassType::Default:
+    default:
+        break;
+    }
 
     SetupRenderTargets(pso.get(), outputs, fg, psoDesc);
 
@@ -505,11 +585,8 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
     STextureList* texList = pass->T._get();
 
     if (!texList || texList->empty()) {
-        Msg("  [ExtractTextures] No textures bound for this shader");
         return;
     }
-
-    Msg("  [ExtractTextures] Loading %u textures from pass", texList->size());
 
     for (size_t i = 0; i < texList->size(); i++) {
         const auto& texPair = (*texList)[i];
@@ -522,8 +599,6 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
         if (xr_strlen(textureName.c_str()) > 6 && 0 == strncmp(textureName.c_str(), "$user$", 6))
         {
-            Msg("~ [ExtractTextures] Skipping render target texture: %s (slot=%u) - RT resolution not yet implemented",
-                textureName.c_str(), stage);
             continue;
         }
 
@@ -552,11 +627,52 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         texSlot.slot = stage;
         texSlot.handle = resourceHandle;
         matPSO->textures.push_back(texSlot);
-
-        Msg("  [ExtractTextures] Loaded texture '%s' at slot=%u", textureName, stage);
     }
 
-    Msg("  [ExtractTextures] Total textures loaded: %u", matPSO->textures.size());
+    if (!texList->empty()) {
+        const shared_str& baseTexName = (*texList)[0].second;
+
+        if (!baseTexName.empty()) {
+            auto& texDescMgr = RImplementation.Resources->m_textures_description;
+
+            using namespace passes;
+
+            auto loadPBRTexture = [&](const shared_str& pbrTexName, u32 slot, const char* type, resources::TextureHandle defaultTex) {
+                resources::TextureHandle handle;
+
+                if (!pbrTexName.empty()) {
+                    auto cacheIt = m_textureHandleCache.find(pbrTexName.c_str());
+                    if (cacheIt != m_textureHandleCache.end()) {
+                        handle = cacheIt->second;
+                    } else {
+                        handle = texManager->LoadTexture(
+                            pbrTexName.c_str(),
+                            resources::TexturePriority::High
+                        );
+                        if (handle.IsValid()) {
+                            m_textureHandleCache[pbrTexName.c_str()] = handle;
+                        }
+                    }
+                }
+
+                if (!handle.IsValid()) {
+                    handle = defaultTex;
+                }
+
+                if (handle.IsValid()) {
+                    MaterialPSO::TextureSlot texSlot;
+                    texSlot.slot = slot;
+                    texSlot.handle = handle;
+                    matPSO->textures.push_back(texSlot);
+                }
+            };
+
+            loadPBRTexture(texDescMgr.GetMetallicName(baseTexName),  TEX_SLOT_METALLIC,  "metallic",  m_defaultMetallic);
+            loadPBRTexture(texDescMgr.GetRoughnessName(baseTexName), TEX_SLOT_ROUGHNESS, "roughness", m_defaultRoughness);
+            loadPBRTexture(texDescMgr.GetAOName(baseTexName),        TEX_SLOT_AO,        "ao",        m_defaultAO);
+            loadPBRTexture(texDescMgr.GetParallaxName(baseTexName),  TEX_SLOT_PARALLAX,  "parallax",  m_defaultParallax);
+        }
+    }
 }
 
 bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
@@ -860,9 +976,13 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     VERIFY(matPSO->vsBindingLayout);
     VERIFY(matPSO->psBindingLayout);
 
-    if (matPSO->vsBindingSet && matPSO->psBindingSet) {
+    bool hasVCBs = !matPSO->vcbRequirements.empty();
+
+    if (!hasVCBs && matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
         return matPSO->vsBindingSet;
     }
+
+    matPSO->needsBindingSetRebuild = false;
 
     struct TempBinding {
         u32 slot;
@@ -927,6 +1047,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         }
     }
 
+    bool allTexturesValid = true;
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
     for (const auto& texSlot : matPSO->textures) {
         nvrhi::ITexture* nativeTex = texManager->GetNVRHITexture(texSlot.handle);
@@ -938,6 +1059,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
                     nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension),
                 "texture", PSBinding::Texture});
         } else {
+            allTexturesValid = false;
             psBindings.push_back({texSlot.slot,
                 nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nullptr),
                 "texture_null", PSBinding::Texture});
@@ -963,22 +1085,28 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         psBindingDesc.bindings.push_back(binding.item);
     }
 
-    matPSO->vsBindingSet = m_device->CreateBindingSet(
+    nvrhi::BindingSetHandle vsBindingSet = m_device->CreateBindingSet(
         vsBindingDesc,
         matPSO->vsBindingLayout);
 
-    if (!matPSO->vsBindingSet) {
+    if (!vsBindingSet) {
         return nullptr;
     }
 
-    matPSO->psBindingSet = m_device->CreateBindingSet(
+    nvrhi::BindingSetHandle psBindingSet = m_device->CreateBindingSet(
         psBindingDesc,
         matPSO->psBindingLayout);
 
-    if (!matPSO->psBindingSet) {
+    if (!psBindingSet) {
         return nullptr;
     }
 
+    matPSO->vsBindingSet = vsBindingSet;
+    matPSO->psBindingSet = psBindingSet;
+
+    if (!allTexturesValid) {
+        matPSO->needsBindingSetRebuild = true;
+    }
 
     return matPSO->vsBindingSet;
 }
@@ -1389,13 +1517,11 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     pso->pass = pass;
 
     if (!ExtractShaders(pass, pso.get())) {
-        Msg("! [CreateDepthPSO] Failed to extract material vertex shader");
         return nullptr;
     }
 
     nvrhi::ShaderHandle materialVS = GetOrCreateShaderVS(pso->vertexShader);
     if (!materialVS) {
-        Msg("! [CreateDepthPSO] Failed to get material vertex shader handle");
         return nullptr;
     }
 
@@ -1403,10 +1529,6 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 
     if (pso->vertexShader && pso->vertexShader->reflection) {
         pso->constantLayout = pso->vertexShader->reflection->constantLayout;
-        Msg("  [CreateDepthPSO] Extracted constant layout: %zu constants from VS",
-            pso->constantLayout.constants.size());
-    } else {
-        Msg("! [CreateDepthPSO] WARNING: VS has no reflection data!");
     }
 
     ExtractTextures(pass, pso.get());
@@ -1429,20 +1551,13 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     SetupVertexAttributes(visual, pso.get(), psoDesc);
 
     psoDesc.renderTargetCount = 0;
-
     psoDesc.depthStencilFormat = nvrhi::Format::D32;
-
     SetupRenderStates(pass, psoDesc);
 
     psoDesc.depthStencilState.depthTestEnable = true;
     psoDesc.depthStencilState.depthWriteEnable = true;
     psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
     psoDesc.depthStencilState.stencilEnable = false;
-
-    Msg("* [CreateDepthPSO] Setting depth state: test=%d write=%d func=%d",
-        psoDesc.depthStencilState.depthTestEnable,
-        psoDesc.depthStencilState.depthWriteEnable,
-        (int)psoDesc.depthStencilState.depthFunc);
 
     ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
@@ -1458,10 +1573,7 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     pso->pso = nvrhiPSO;
 
     CreateBindingLayouts(pso.get());
-
     pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
-
-    Msg("* [MaterialCache::CreateDepthPSO] Created depth PSO for shader '%s'", pso->debugName.c_str());
 
     return pso.release();
 }
