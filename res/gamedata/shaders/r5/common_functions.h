@@ -7,9 +7,28 @@ float Contrast(float Input, float ContrastPower)
      //piecewise contrast function
      bool IsAboveHalf = Input > 0.5 ;
      float ToRaise = saturate(2*(IsAboveHalf ? 1-Input : Input));
-     float Output = 0.5*pow(ToRaise, ContrastPower); 
+     float Output = 0.5*pow(ToRaise, ContrastPower);
      Output = IsAboveHalf ? 1-Output : Output;
      return Output;
+}
+
+// Transform direction from view space to world space
+// m_V is 3x4 view matrix (world to view), inverse rotation is transpose of 3x3 part
+float3 viewDirToWorld(float3 viewDir)
+{
+    // m_V rows contain world-space basis vectors in view space
+    // Transpose to get view-space basis vectors in world space
+    return float3(
+        dot(viewDir, float3(m_V[0].x, m_V[1].x, m_V[2].x)),
+        dot(viewDir, float3(m_V[0].y, m_V[1].y, m_V[2].y)),
+        dot(viewDir, float3(m_V[0].z, m_V[1].z, m_V[2].z))
+    );
+}
+
+// Transform position from view space to world space
+float3 viewPosToWorld(float3 viewPos)
+{
+    return viewDirToWorld(viewPos) + eye_position;
 }
 
 void tonemap( out float4 low, out float4 high, float3 rgb, float scale)
@@ -199,21 +218,66 @@ float gbuf_unpack_mtl( float mtl_hemi )
 }
 
 // ══════════════════════════════════════════════════════════
-//  FORWARD+ COLOR OUTPUT (Phase 3.0: Unlit Albedo)
+//  FORWARD+ PBR LIGHTING (Phase 3.1: Sun + Ambient)
 // ══════════════════════════════════════════════════════════
-// Replaced legacy pack_gbuffer() with simple forward color output
-// Phase 3.1+ will add PBR lighting (Cook-Torrance BRDF)
+#include "shared/pbr_brdf.h"
 
 f_forward output_forward_color(float3 albedo, float3 normal, float metallic, float roughness)
 {
+	// Legacy overload - assumes world position unavailable, no lighting
+	f_forward res;
+	res.color = float4(albedo, 1.0);
+	return res;
+}
+
+f_forward output_forward_pbr(
+	float3 albedo,
+	float3 worldNormal,
+	float3 worldPos,
+	float metallic,
+	float roughness,
+	float ao,
+	float hemi)
+{
 	f_forward res;
 
-	// Phase 3.0: Output unlit albedo only
-	// TODO Phase 3.1: Add PBR lighting calculation here
-	// float3 lit_color = compute_pbr_lighting(albedo, normal, metallic, roughness);
+	// Normalize inputs
+	float3 N = normalize(worldNormal);
 
-	res.color = float4(albedo, 1.0);
+	// Calculate view direction (surface to eye)
+	float3 V = normalize(eye_position - worldPos);
 
+	// Sun light direction (already pointing toward light in engine)
+	float3 L = normalize(-L_sun_dir_w);
+
+	// PBR sun lighting
+	float3 sunLight = PBRDirectLighting(
+		albedo,
+		N,
+		V,
+		L,
+		L_sun_color,
+		metallic,
+		roughness,
+		ao
+	);
+
+	// Ambient lighting (hemisphere + environment)
+	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * hemi;
+	float3 ambient = PBRAmbient(
+		albedo,
+		N,
+		V,
+		metallic,
+		roughness,
+		ao,
+		ambientColor
+	);
+
+	// Combine lighting
+	float3 finalColor = sunLight + ambient;
+
+	res.color = float4(finalColor, 1.0);
 	return res;
 }
 

@@ -1,29 +1,38 @@
 #include "common.h"
 #include "sload.h"
 
-struct 	p_particle
+struct p_particle
 {
-	float4 	color	: COLOR0;
-	p_flat	base;
+	float4 color : COLOR0;
+	p_flat base;
 };
 
-f_forward 	main	( p_particle II )
+f_forward main( p_particle II )
 {
-  p_flat	I;	I=II.base;
+	p_flat I;
+	I = II.base;
 
-  // Base texture with vertex color modulation + alpha test
-  float4 	D 	= 	s_base.Sample( smp_base, I.tcdh);
-		D	*=	II.color;
-	clip	(D.w-def_aref);
+	// Base texture with vertex color modulation + alpha test
+	float4 D = s_base.Sample(smp_base, I.tcdh);
+	D *= II.color;
+	clip(D.w - def_aref);
 
-  // Normalized vertex normal
-  float3 Ne = normalize((float3)I.N.xyz);
+	// Normalized vertex normal (view space)
+	float3 Nv = normalize((float3)I.N.xyz);
 
-  // Extract material properties
-  float3 albedo = D.rgb;
-  float roughness = 1.0 - def_gloss;  // Convert gloss to roughness
-  float metallic = 0.0;  // TODO: Sample from PBR material texture in Phase 3.1
+	// Transform to world space for PBR lighting
+	float3 Nw = viewDirToWorld(Nv);
 
-  // Forward+ output (Phase 3.0: unlit albedo)
-  return output_forward_color(albedo, Ne, metallic, roughness);
+	// Get world position from view position
+	float3 worldPos = viewPosToWorld(I.position.xyz);
+
+	// Particles use simple ambient lighting (no specular)
+	float3 albedo = D.rgb;
+	float hemi = I.position.w;
+	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * hemi;
+	float3 finalColor = albedo * ambientColor;
+
+	f_forward res;
+	res.color = float4(finalColor, D.w);
+	return res;
 }

@@ -60,14 +60,28 @@ f_forward 	main	( p_flat I 		)
 	float3	N 	= I.N.xyz	;
 # endif
 
-  // Normalize normal
-  float3 Ne = normalize(N);
+	// Normalize normal (view space)
+	float3 Nv = normalize(N);
 
-  // Extract material properties
-  float3 albedo = D.rgb;
-  float roughness = 1.0 - G;  // Convert gloss to roughness
-  float metallic = 0.0;  // TODO: Sample from PBR material texture in Phase 3.1
+	// Transform to world space for PBR lighting
+	float3 Nw = viewDirToWorld(Nv);
 
-  // Forward+ output (Phase 3.0: unlit albedo)
-  return output_forward_color(albedo, Ne, metallic, roughness);
+	// Get world position from view position
+	float3 worldPos = viewPosToWorld(I.position.xyz);
+
+	// Extract material properties from PBR textures
+	float3 albedo = D.rgb;
+	float roughness = s_roughness.Sample(smp_base, I.tcdh).r;
+	float metallic = s_metallic.Sample(smp_base, I.tcdh).r;
+	float ao = s_ao.Sample(smp_base, I.tcdh).r;
+
+	// Get hemisphere occlusion
+#ifdef USE_LM_HEMI
+	float hemi = s_hemi.Sample(smp_rtlinear, I.lmh).a;
+#else
+	float hemi = I.position.w;
+#endif
+
+	// PBR Forward+ lighting
+	return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }

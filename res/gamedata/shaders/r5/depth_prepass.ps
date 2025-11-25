@@ -1,0 +1,10 @@
+// depth_prepass.ps - Minimal pixel shader for depth prepass
+// Uses early depth write hint to force depth output
+
+[earlydepthstencil]
+void main()
+{
+    // Early depth write - depth is written BEFORE pixel shader execution
+    // This works even with no color output (renderTargetCount=0)
+    // The [earlydepthstencil] attribute tells the driver to write depth early
+}

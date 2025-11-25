@@ -70,12 +70,20 @@ f_forward main(p_flat I)
         grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
     }
 
+    // Transform normal to world space for PBR lighting
+    float3 Nw = viewDirToWorld(N);
+
+    // Get world position from view position
+    float3 worldPos = viewPosToWorld(I.position.xyz);
+
+    // Get hemisphere occlusion
+    float hemi = I.position.w;
+
     // Extract material properties
     float3 albedo = grassAlbedo;
-    float roughness = 1.0 - gloss;  // Convert gloss to roughness
-    float metallic = 0.0;  // Grass is not metallic
+    float roughness = 1.0 - gloss;
+    float metallic = 0.0;
 
-    // Forward+ output (Phase 3.0: unlit albedo)
-    // TODO Phase 3.1: Use ao in lighting calculation
-    return output_forward_color(albedo, N, metallic, roughness);
+    // PBR Forward+ lighting with grass AO
+    return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }

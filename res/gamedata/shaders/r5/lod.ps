@@ -41,26 +41,34 @@ float4 	main	( vf I ) : SV_Target
 	return D.w;
 }
 
-#else	//	ATOC
+#else // ATOC
 
-f_forward 	main	( vf I )
+f_forward main( vf I )
 {
-  // Sample LOD textures with alpha test
-  float4 D;
-  float4 H;
+	// Sample LOD textures with alpha test
+	float4 D;
+	float4 H;
 
-  sample_Textures(D, H, I.tc1, I.tc0, I.af, float2(0,0));
-  clip(D.w - (96.f/255.f));
+	sample_Textures(D, H, I.tc1, I.tc0, I.af, float2(0, 0));
+	clip(D.w - (96.f / 255.f));
 
-  float3 N 	= normalize	(H.xyz);
+	// LOD normal is world-space from hemi texture
+	float3 Nw = normalize(H.xyz);
 
-  // Extract material properties
-  float3 albedo = D.rgb;
-  float roughness = 1.0 - def_gloss;  // Convert gloss to roughness
-  float metallic = 0.0;  // TODO: Sample from PBR material texture in Phase 3.1
+	// LOD position is world-space from vertex shader
+	float3 worldPos = I.position;
 
-  // Forward+ output (Phase 3.0: unlit albedo)
-  return output_forward_color(albedo, N, metallic, roughness);
+	// Extract material properties from PBR textures
+	// LOD objects: sample PBR textures using lerped texture coordinates
+	float2 pbr_tc = lerp(I.tc0, I.tc1, I.af.w);
+	float3 albedo = D.rgb;
+	float roughness = s_roughness.Sample(smp_base, pbr_tc).r;
+	float metallic = s_metallic.Sample(smp_base, pbr_tc).r;
+	float ao = s_ao.Sample(smp_base, pbr_tc).r;
+	float hemi = H.w;
+
+	// PBR Forward+ lighting
+	return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }
 
-#endif	//	ATOC
+#endif // ATOC

@@ -26,6 +26,11 @@ struct	surface_bumped
 	float	gloss;
 	float	height;
 
+	// PBR material properties (Forward+ pipeline)
+	float	metallic;
+	float	roughness;
+	float	ao;
+	float	parallax_height;  // PBR parallax/height map
 };
 
 float4 tbase( float2 tc )
@@ -146,6 +151,16 @@ surface_bumped sload_i( p_bumped I)
 	S.height	= NuE.z;
 	//S.height	= 0;
 
+	// Sample PBR textures (with fallback defaults when not bound)
+	// Metallic: default 0.0 (dielectric), sample from red channel
+	S.metallic  = s_metallic.Sample(smp_base, I.tcdh).r;
+	// Roughness: default from inverse gloss, sample from red channel
+	S.roughness = s_roughness.Sample(smp_base, I.tcdh).r;
+	// AO: default 1.0 (no occlusion), sample from red channel
+	S.ao        = s_ao.Sample(smp_base, I.tcdh).r;
+	// Parallax: default 0.5 (neutral height), sample from red channel
+	S.parallax_height = s_parallax.Sample(smp_base, I.tcdh).r;
+
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP
 	float4 NDetail		= s_detailBump.Sample( smp_base, I.tcdbump);
@@ -187,6 +202,12 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	S.gloss		= Nu.x*Nu.x;					//	S.gloss = Nu.x*Nu.x;
 	S.height	= NuE.z;
 	//S.height	= 0;
+
+	// Sample PBR textures (with fallback defaults when not bound)
+	S.metallic  = s_metallic.Sample(smp_base, I.tcdh).r;
+	S.roughness = s_roughness.Sample(smp_base, I.tcdh).r;
+	S.ao        = s_ao.Sample(smp_base, I.tcdh).r;
+	S.parallax_height = s_parallax.Sample(smp_base, I.tcdh).r;
 
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP

@@ -1,35 +1,49 @@
 #include "common.h"
 #include "sload.h"
 
-#ifdef	ATOC
+#ifdef ATOC
 
-float4 	main	( p_bumped I ) : SV_Target
+float4 main( p_bumped I ) : SV_Target
 {
-	surface_bumped 	S 		= sload 	(I);
-	S.base.w = (S.base.w-def_aref*0.5f)/(1-def_aref*0.5f);
+	surface_bumped S = sload(I);
+	S.base.w = (S.base.w - def_aref * 0.5f) / (1 - def_aref * 0.5f);
 	return S.base;
 }
 
-#else	//	ATOC
+#else // ATOC
 
-f_forward 	main	( p_bumped I )
+f_forward main( p_bumped I )
 {
-	surface_bumped 	S 		= sload 	(I);
+	surface_bumped S = sload(I);
 
 	// Alpha test
 	clip(S.base.w - def_aref);
 
-	// Sample normal, rotate it by matrix
-  	float3	Ne  = mul		(float3x3(I.M1, I.M2, I.M3), S.normal);
-			Ne	= normalize	(Ne);
+	// Sample normal in tangent space, transform to view space via TBN
+	float3 Nv = mul(float3x3(I.M1, I.M2, I.M3), S.normal);
+	Nv = normalize(Nv);
 
-	// Extract material properties
+	// Transform to world space for PBR lighting
+	float3 Nw = viewDirToWorld(Nv);
+
+	// Get world position from view position
+	float3 worldPos = viewPosToWorld(I.position.xyz);
+
+	// Extract material properties from PBR textures
 	float3 albedo = S.base.xyz;
-	float roughness = 1.0 - S.gloss;  // Convert gloss to roughness
-	float metallic = 0.0;  // TODO: Sample from PBR material texture in Phase 3.1
+	float roughness = S.roughness;
+	float metallic = S.metallic;
+	float ao = S.ao;
 
-	// Forward+ output (Phase 3.0: unlit albedo)
-	return output_forward_color(albedo, Ne, metallic, roughness);
+	// Get hemisphere occlusion
+#ifdef USE_LM_HEMI
+	float hemi = s_hemi.Sample(smp_rtlinear, I.lmh).a;
+#else
+	float hemi = I.position.w;
+#endif
+
+	// PBR Forward+ lighting
+	return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }
 
-#endif //	ATOC
+#endif // ATOC
