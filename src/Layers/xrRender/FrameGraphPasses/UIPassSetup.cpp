@@ -21,7 +21,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 using RENDER_NAMESPACE::dxFontRender;
 using namespace xray::render::fgconstants;
@@ -75,14 +75,15 @@ static void UploadStaticGlobals(FGConstantSystem& constants, const StaticGlobals
 
 framegraph::VirtualResourceHandle setupUIPass(
     framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle sceneTarget,
     u32 width,
     u32 height)
 {
     using namespace framegraph;
 
     struct UIPassData {
-        VirtualResourceHandle uiTarget;
-        VirtualResourceHandle uiDepth;
+        VirtualResourceHandle sceneInput;
+        VirtualResourceHandle sceneOutput;
         u32 width;
         u32 height;
     };
@@ -90,25 +91,14 @@ framegraph::VirtualResourceHandle setupUIPass(
     auto& passData = fg.addCallbackPass<UIPassData>(
         "UI",
 
-        [width, height](FrameGraph& builder, PassHandle passHandle, UIPassData& data) {
+        [sceneTarget, width, height](FrameGraph& builder, PassHandle passHandle, UIPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
 
-            data.uiTarget = passBuilder.createTexture2D(
-                "rt_UI",
-                width,
-                height,
-                nvrhi::Format::RGBA8_UNORM
-            );
-
-            data.uiDepth = passBuilder.createDepthBuffer(
-                "rt_UIDepth",
-                width,
-                height,
-                nvrhi::Format::D32
-            );
+            data.sceneInput = passBuilder.read(sceneTarget);
+            data.sceneOutput = passBuilder.write(sceneTarget, ResourceState::RenderTarget);
         },
 
         [](const UIPassData& data,
@@ -118,21 +108,16 @@ framegraph::VirtualResourceHandle setupUIPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             cmdList->beginMarker("UI Pass");
 
-            auto* uiRT = fg.GetPhysicalTexture(data.uiTarget);
-            auto* depthRT = fg.GetPhysicalTexture(data.uiDepth);
+            auto* sceneRT = fg.GetPhysicalTexture(data.sceneOutput);
 
-            if (!uiRT || !depthRT) {
-                Msg("! [UIPass] Failed to get physical textures");
+            if (!sceneRT) {
+                Msg("! [UIPass] Failed to get scene texture");
                 cmdList->endMarker();
                 return;
             }
 
-            cmdList->clearTextureFloat(uiRT, nvrhi::AllSubresources, nvrhi::Color(0.0f, 0.0f, 0.0f, 0.0f));
-            cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
-
             nvrhi::FramebufferDesc fbDesc;
-            fbDesc.addColorAttachment(uiRT);
-            fbDesc.setDepthAttachment(depthRT);
+            fbDesc.addColorAttachment(sceneRT);
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
 
             if (!g_pGamePersistent) {
@@ -193,7 +178,7 @@ framegraph::VirtualResourceHandle setupUIPass(
         }
     );
 
-    return passData.uiTarget;
+    return passData.sceneOutput;
 }
 
 framegraph::VirtualResourceHandle setupTextPass(
@@ -430,6 +415,7 @@ framegraph::VirtualResourceHandle setupTextPass(
             auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
 
             ng::RenderPassDesc passDesc;
+            passDesc.passName = "UI Pass";
             passDesc.renderTargets[0] = uiRT;
             passDesc.numRenderTargets = 1;
             passDesc.clearColor = false;
@@ -611,180 +597,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
     );
 
     return passData.uiTarget;
-}
-
-framegraph::VirtualResourceHandle setupCompositePass(
-    framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle sceneInput,
-    framegraph::VirtualResourceHandle uiInput,
-    u32 width,
-    u32 height)
-{
-    using namespace framegraph;
-
-    struct CompositePassData {
-        VirtualResourceHandle sceneInput;
-        VirtualResourceHandle uiInput;
-        VirtualResourceHandle output;
-        u32 width;
-        u32 height;
-    };
-
-    auto& passData = fg.addCallbackPass<CompositePassData>(
-        "Composite",
-
-        [sceneInput, uiInput, width, height](FrameGraph& builder, PassHandle passHandle, CompositePassData& data) {
-            RenderPassBuilder passBuilder(builder, passHandle);
-
-            data.width = width;
-            data.height = height;
-
-            data.sceneInput = passBuilder.read(sceneInput, ResourceState::ShaderResource);
-            data.uiInput = passBuilder.read(uiInput, ResourceState::ShaderResource);
-
-            data.output = passBuilder.createTexture2D(
-                "rt_Final",
-                width,
-                height,
-                nvrhi::Format::RGBA8_UNORM
-            );
-        },
-
-        [](const CompositePassData& data,
-           const FrameGraph& fg,
-           ng::RenderContext* ctx) {
-
-            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Composite Pass");
-
-            auto* sceneTex = fg.GetPhysicalTexture(data.sceneInput);
-            auto* uiTex = fg.GetPhysicalTexture(data.uiInput);
-            auto* outputRT = fg.GetPhysicalTexture(data.output);
-
-            if (!uiTex || !outputRT) {
-                Msg("! [CompositePass] Failed to get textures");
-                cmdList->endMarker();
-                return;
-            }
-
-            bool hasScene = sceneTex != nullptr;
-
-            if (!hasScene) {
-                Msg("* [CompositePass] No scene - copying UI directly (main menu mode)");
-                cmdList->copyTexture(outputRT, nvrhi::TextureSlice(), uiTex, nvrhi::TextureSlice());
-                cmdList->endMarker();
-                return;
-            }
-
-            auto* fgRenderer = static_cast<FrameGraphRenderer*>(GEnv.FrameGraphRenderer);
-            auto* device = fgRenderer->GetRenderDevice();
-
-            if (!device) {
-                Msg("! [CompositePass] Device not available");
-                cmdList->endMarker();
-                return;
-            }
-
-            static nvrhi::ShaderHandle s_vertexShader;
-            static nvrhi::ShaderHandle s_pixelShader;
-            static nvrhi::SamplerHandle s_linearSampler;
-            static nvrhi::BindingLayoutHandle s_bindingLayout;
-            static nvrhi::GraphicsPipelineHandle s_pipeline;
-            static bool s_initialized = false;
-
-            if (!s_initialized) {
-                nvrhi::IDevice* nvrhiDevice = device->GetNVRHIDevice();
-
-                framegraph::ShaderLoader shaderLoader(device->GetSlangCompiler());
-                s_vertexShader = shaderLoader.LoadVertexShader("ui_composite").handle;
-                s_pixelShader = shaderLoader.LoadPixelShader("ui_composite").handle;
-
-                if (!s_vertexShader || !s_pixelShader) {
-                    Msg("! [CompositePass] Failed to load shaders");
-                    cmdList->endMarker();
-                    return;
-                }
-
-                nvrhi::SamplerDesc samplerDesc;
-                samplerDesc.setAllFilters(true);
-                samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-                s_linearSampler = nvrhiDevice->createSampler(samplerDesc);
-
-                nvrhi::BindingLayoutDesc layoutDesc;
-                layoutDesc.visibility = nvrhi::ShaderType::Pixel;
-                layoutDesc.bindings = {
-                    nvrhi::BindingLayoutItem::Texture_SRV(0),
-                    nvrhi::BindingLayoutItem::Texture_SRV(1),
-                    nvrhi::BindingLayoutItem::Sampler(0)
-                };
-                s_bindingLayout = nvrhiDevice->createBindingLayout(layoutDesc);
-
-                nvrhi::GraphicsPipelineDesc psoDesc;
-                psoDesc.VS = s_vertexShader;
-                psoDesc.PS = s_pixelShader;
-                psoDesc.primType = nvrhi::PrimitiveType::TriangleList;
-                psoDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-                psoDesc.renderState.blendState.targets[0].blendEnable = false;
-                psoDesc.renderState.depthStencilState.depthTestEnable = false;
-                psoDesc.renderState.depthStencilState.depthWriteEnable = false;
-                psoDesc.bindingLayouts = { s_bindingLayout };
-
-                nvrhi::FramebufferInfoEx framebufferInfo;
-                framebufferInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
-                s_pipeline = nvrhiDevice->createGraphicsPipeline(psoDesc, framebufferInfo);
-
-                if (!s_pipeline) {
-                    Msg("! [CompositePass] Failed to create pipeline");
-                    cmdList->endMarker();
-                    return;
-                }
-
-                s_initialized = true;
-                Msg("* [CompositePass] Initialized composite resources");
-            }
-
-            nvrhi::BindingSetDesc bindingSetDesc;
-            bindingSetDesc.bindings = {
-                nvrhi::BindingSetItem::Texture_SRV(0, sceneTex),
-                nvrhi::BindingSetItem::Texture_SRV(1, uiTex),
-                nvrhi::BindingSetItem::Sampler(0, s_linearSampler)
-            };
-            nvrhi::BindingSetHandle bindingSet = device->GetNVRHIDevice()->createBindingSet(bindingSetDesc, s_bindingLayout);
-
-            if (!bindingSet) {
-                Msg("! [CompositePass] Failed to create binding set");
-                cmdList->endMarker();
-                return;
-            }
-
-            ng::RenderPassDesc passDesc;
-            passDesc.renderTargets[0] = outputRT;
-            passDesc.numRenderTargets = 1;
-            passDesc.clearColor = false;
-            ctx->BeginRenderPass(passDesc);
-
-            ctx->SetViewport(0, 0, (float)data.width, (float)data.height);
-            ng::Rect scissor;
-            scissor.x = 0;
-            scissor.y = 0;
-            scissor.width = data.width;
-            scissor.height = data.height;
-            ctx->SetScissor(scissor);
-
-            ctx->SetPipeline(s_pipeline);
-            ctx->SetBindingSet(0, bindingSet.Get());
-
-            ctx->Draw(3, 0);
-
-            ctx->EndRenderPass();
-
-            Msg("* [CompositePass] Composited scene + UI");
-
-            cmdList->endMarker();
-        }
-    );
-
-    return passData.output;
 }
 
 }

@@ -10,7 +10,7 @@ namespace xray::render {
     }
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 struct alignas(16) PerObjectConstants {
     Fmatrix m_xform;

@@ -20,7 +20,7 @@ namespace xray::render::RENDER_NAMESPACE
     extern float r__dtex_range;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 void renderForwardGeometry(
     ng::RenderContext* ctx,
@@ -55,7 +55,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     };
 
     auto& passData = fg.addCallbackPass<ForwardColorPassData>(
-        "ForwardColor",
+        "Forward+ Color Pass",
 
         [&, width, height](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
@@ -67,7 +67,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             RenderPassBuilder passBuilder(builder, passHandle);
 
             if (depthInput.is_valid()) {
-                data.depth = passBuilder.write(depthInput, ResourceState::DepthStencilWrite);
+                data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
             } else {
                 data.depth = passBuilder.createDepthBuffer("rt_Depth", width, height);
             }
@@ -80,8 +80,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             );
 
             data.outputs.albedo = data.color;
-            data.outputs.normal = data.color;
-            data.outputs.material = data.color;
             data.outputs.depth = data.depth;
         },
 
@@ -175,21 +173,19 @@ void renderForwardGeometry(
     }
 
     ng::RenderPassDesc passDesc;
+    passDesc.passName = "Forward+ Color Pass";
     passDesc.renderTargets[0] = colorRT;
-    passDesc.renderTargets[1] = colorRT;
-    passDesc.renderTargets[2] = colorRT;
-    passDesc.numRenderTargets = 3;
+    passDesc.numRenderTargets = 1;
     passDesc.depthStencil = depthRT;
 
     passDesc.clearValue.color[0] = 0.0f;
     passDesc.clearValue.color[1] = 0.0f;
     passDesc.clearValue.color[2] = 0.0f;
     passDesc.clearValue.color[3] = 1.0f;
-    passDesc.clearValue.depth = 1.0f;
-    passDesc.clearValue.stencil = 0;
     passDesc.clearColor = true;
-    passDesc.clearDepth = true;
-    passDesc.clearStencil = true;
+
+    passDesc.clearDepth = false;
+    passDesc.clearStencil = false;
 
     ctx->BeginRenderPass(passDesc);
 

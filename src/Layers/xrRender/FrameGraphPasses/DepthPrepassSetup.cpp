@@ -20,7 +20,7 @@ namespace xray::render::RENDER_NAMESPACE
     extern float r__dtex_range;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 void renderDepthOnlyGeometry(
     ng::RenderContext* ctx,
@@ -50,7 +50,7 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
     };
 
     auto& passData = fg.addCallbackPass<DepthPrepassData>(
-        "DepthPrepass",
+        "Depth Prepass (Early-Z)",
 
         [&, width, height](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
             data.width = width;
@@ -149,13 +149,14 @@ void renderDepthOnlyGeometry(
     }
 
     ng::RenderPassDesc passDesc;
+    passDesc.passName = "Depth Prepass (Early-Z)";
     passDesc.numRenderTargets = 0;
     passDesc.depthStencil = depthRT;
 
     passDesc.clearValue.depth = 1.0f;
-    passDesc.clearValue.stencil = 0;
     passDesc.clearDepth = true;
-    passDesc.clearStencil = true;
+
+    passDesc.clearStencil = false;
 
     ctx->BeginRenderPass(passDesc);
 

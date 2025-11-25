@@ -26,6 +26,7 @@
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
+#include "FrameGraphPasses/TonemapPassSetup.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 
 namespace xray::render {
@@ -202,16 +203,15 @@ void FrameGraphRenderer::RenderMenu() {
         }
     );
 
-    auto uiTarget = passes::setupUIPass(*m_framegraph, width, height);
+    auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
 
-    uiTarget = passes::setupTextPass(*m_framegraph, uiTarget, width, height);
+    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height);
 
-    uiTarget = passes::setupCursorPass(*m_framegraph, uiTarget, width, height);
+    sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
 
-    auto compositeOutput = passes::setupCompositePass(
+    auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
-        backgroundTarget,
-        uiTarget,
+        sceneWithUI,
         width,
         height
     );
@@ -219,7 +219,7 @@ void FrameGraphRenderer::RenderMenu() {
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        compositeOutput,
+        ldrOutput,
         imguiRenderer,
         width,
         height
@@ -326,30 +326,30 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    auto uiTarget = passes::setupUIPass(
-        *m_framegraph,
-        width,
-        height
-    );
-
-    uiTarget = passes::setupTextPass(
-        *m_framegraph,
-        uiTarget,
-        width,
-        height
-    );
-
-    uiTarget = passes::setupCursorPass(
-        *m_framegraph,
-        uiTarget,
-        width,
-        height
-    );
-
-    auto compositeOutput = passes::setupCompositePass(
+    auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
         hudOutputs.albedo,
-        uiTarget,
+        width,
+        height
+    );
+
+    sceneWithUI = passes::setupTextPass(
+        *m_framegraph,
+        sceneWithUI,
+        width,
+        height
+    );
+
+    sceneWithUI = passes::setupCursorPass(
+        *m_framegraph,
+        sceneWithUI,
+        width,
+        height
+    );
+
+    auto ldrOutput = passes::setupTonemapPass(
+        *m_framegraph,
+        sceneWithUI,
         width,
         height
     );
@@ -357,7 +357,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        compositeOutput,
+        ldrOutput,
         imguiRenderer,
         width,
         height

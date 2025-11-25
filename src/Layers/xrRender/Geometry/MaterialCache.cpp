@@ -20,6 +20,7 @@
 #include "Layers/xrRender/FrameGraph/VolatileConstantBufferPool.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -447,6 +448,11 @@ MaterialPSO* MaterialCache::CreatePSO(
     SetupVertexAttributes(visual, pso.get(), psoDesc);
 
     SetupRenderStates(pass, psoDesc);
+
+    psoDesc.depthStencilState.depthTestEnable = true;
+    psoDesc.depthStencilState.depthWriteEnable = false;
+    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;
+    psoDesc.depthStencilState.stencilEnable = false;
 
     SetupRenderTargets(pso.get(), outputs, fg, psoDesc);
 
@@ -1314,65 +1320,22 @@ void MaterialCache::SetupRenderTargets(
     ng::PipelineStateDesc& psoDesc)
 {
     nvrhi::ITexture* albedoTex = fg.GetPhysicalTexture(outputs.albedo);
-    nvrhi::ITexture* normalTex = fg.GetPhysicalTexture(outputs.normal);
-    nvrhi::ITexture* materialTex = fg.GetPhysicalTexture(outputs.material);
     nvrhi::ITexture* depthTex = fg.GetPhysicalTexture(outputs.depth);
 
-    if (!albedoTex || !normalTex || !materialTex || !depthTex) {
-        psoDesc.renderTargetCount = 3;
-        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA8_SNORM;
-        psoDesc.renderTargetFormats[1] = nvrhi::Format::RGBA8_UNORM;
-        psoDesc.renderTargetFormats[2] = nvrhi::Format::R16_UINT;
-        psoDesc.depthStencilFormat = nvrhi::Format::D24S8;
+    if (!albedoTex || !depthTex) {
+        psoDesc.renderTargetCount = 1;
+        psoDesc.renderTargetFormats[0] = nvrhi::Format::RGBA16_FLOAT;
+        psoDesc.depthStencilFormat = nvrhi::Format::D32;
         return;
     }
 
-    psoDesc.renderTargetCount = static_cast<u32>(matPSO->rtBindings.outputRTs.size());
+    psoDesc.renderTargetCount = 1;
+    psoDesc.renderTargetFormats[0] = albedoTex->getDesc().format;
+    psoDesc.depthStencilFormat = depthTex->getDesc().format;
 
-    for (u32 i = 0; i < 8; i++) {
+    for (u32 i = 1; i < 8; i++) {
         psoDesc.renderTargetFormats[i] = nvrhi::Format::UNKNOWN;
     }
-
-    using RTSemantic = framegraph::ShaderRTBindings::RTSemantic;
-
-    for (const auto& outputRT : matPSO->rtBindings.outputRTs) {
-        u32 slot = outputRT.slot;
-        nvrhi::Format format = nvrhi::Format::UNKNOWN;
-        const char* rtName = "Unknown";
-
-        switch (outputRT.semantic) {
-            case RTSemantic::Normal:
-                format = normalTex->getDesc().format;
-                rtName = "Normal";
-                break;
-
-            case RTSemantic::Albedo:
-                format = albedoTex->getDesc().format;
-                rtName = "Albedo";
-                break;
-
-            case RTSemantic::Material:
-                format = materialTex->getDesc().format;
-                rtName = "Material";
-                break;
-
-            case RTSemantic::Position:
-                continue;
-
-            case RTSemantic::Emissive:
-                continue;
-
-            case RTSemantic::Accumulator:
-                continue;
-
-            default:
-                continue;
-        }
-
-        psoDesc.renderTargetFormats[slot] = format;
-    }
-
-    psoDesc.depthStencilFormat = depthTex->getDesc().format;
 }
 
 MaterialPSO* MaterialCache::GetOrCreateUIPSO(
@@ -1425,12 +1388,28 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     auto pso = xr_make_unique<MaterialPSO>();
     pso->pass = pass;
 
-    ExtractTextures(pass, pso.get());
-
     if (!ExtractShaders(pass, pso.get())) {
+        Msg("! [CreateDepthPSO] Failed to extract material vertex shader");
         return nullptr;
     }
 
+    nvrhi::ShaderHandle materialVS = GetOrCreateShaderVS(pso->vertexShader);
+    if (!materialVS) {
+        Msg("! [CreateDepthPSO] Failed to get material vertex shader handle");
+        return nullptr;
+    }
+
+    pso->pixelShader = nullptr;
+
+    if (pso->vertexShader && pso->vertexShader->reflection) {
+        pso->constantLayout = pso->vertexShader->reflection->constantLayout;
+        Msg("  [CreateDepthPSO] Extracted constant layout: %zu constants from VS",
+            pso->constantLayout.constants.size());
+    } else {
+        Msg("! [CreateDepthPSO] WARNING: VS has no reflection data!");
+    }
+
+    ExtractTextures(pass, pso.get());
     ExtractSamplers(pass, pso.get());
 
     if (pass && pass->T && !pass->T->empty()) {
@@ -1440,16 +1419,9 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
         }
     }
 
-    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
-    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
-
-    if (!nvrhiVS || !nvrhiPS) {
-        return nullptr;
-    }
-
     ng::PipelineStateDesc psoDesc;
-    psoDesc.vertexShader = nvrhiVS.Get();
-    psoDesc.pixelShader = nvrhiPS.Get();
+    psoDesc.vertexShader = materialVS.Get();
+    psoDesc.pixelShader = nullptr;
 
     if (!ValidateVertexLayoutCompatibility(visual, pso.get())) {
         return nullptr;
@@ -1458,14 +1430,19 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 
     psoDesc.renderTargetCount = 0;
 
+    psoDesc.depthStencilFormat = nvrhi::Format::D32;
+
+    SetupRenderStates(pass, psoDesc);
+
     psoDesc.depthStencilState.depthTestEnable = true;
     psoDesc.depthStencilState.depthWriteEnable = true;
     psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Less;
     psoDesc.depthStencilState.stencilEnable = false;
 
-    SetupRenderStates(pass, psoDesc);
-
-    psoDesc.blendState.renderTargets[0].writeMask = static_cast<ng::ColorWriteMask>(0);
+    Msg("* [CreateDepthPSO] Setting depth state: test=%d write=%d func=%d",
+        psoDesc.depthStencilState.depthTestEnable,
+        psoDesc.depthStencilState.depthWriteEnable,
+        (int)psoDesc.depthStencilState.depthFunc);
 
     ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
@@ -1483,6 +1460,8 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
     CreateBindingLayouts(pso.get());
 
     pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
+
+    Msg("* [MaterialCache::CreateDepthPSO] Created depth PSO for shader '%s'", pso->debugName.c_str());
 
     return pso.release();
 }

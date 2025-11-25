@@ -16,7 +16,7 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 {
@@ -51,14 +51,10 @@ framegraph::DefaultOutputLayout setupHUDPass(
     using namespace framegraph;
 
     struct HUDPassData {
-        VirtualResourceHandle inputAlbedo;
-        VirtualResourceHandle inputNormal;
-        VirtualResourceHandle inputMaterial;
+        VirtualResourceHandle inputColor;
         VirtualResourceHandle depth;
 
-        VirtualResourceHandle outputAlbedo;
-        VirtualResourceHandle outputNormal;
-        VirtualResourceHandle outputMaterial;
+        VirtualResourceHandle outputColor;
 
         ng::RenderDevice* device;
         const xr_vector<GeometryBatch>* hudBatches;
@@ -80,19 +76,13 @@ framegraph::DefaultOutputLayout setupHUDPass(
             data.hudBatches = hudBatches;
             data.materialCache = materialCache;
 
-            data.inputAlbedo = passBuilder.read(gbufferInputs.albedo);
-            data.inputNormal = passBuilder.read(gbufferInputs.normal);
-            data.inputMaterial = passBuilder.read(gbufferInputs.material);
+            data.inputColor = passBuilder.read(gbufferInputs.albedo);
 
-            data.outputAlbedo = passBuilder.write(gbufferInputs.albedo, ResourceState::RenderTarget);
-            data.outputNormal = passBuilder.write(gbufferInputs.normal, ResourceState::RenderTarget);
-            data.outputMaterial = passBuilder.write(gbufferInputs.material, ResourceState::RenderTarget);
+            data.outputColor = passBuilder.write(gbufferInputs.albedo, ResourceState::RenderTarget);
 
             data.depth = passBuilder.readWrite(gbufferInputs.depth, ResourceState::DepthStencilWrite);
 
-            data.outputs.albedo = data.outputAlbedo;
-            data.outputs.normal = data.outputNormal;
-            data.outputs.material = data.outputMaterial;
+            data.outputs.albedo = data.outputColor;
             data.outputs.depth = data.depth;
         },
 
@@ -111,22 +101,19 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 return;
             }
 
-            auto* albedoRT = fg.GetPhysicalTexture(data.outputAlbedo);
-            auto* normalRT = fg.GetPhysicalTexture(data.outputNormal);
-            auto* materialRT = fg.GetPhysicalTexture(data.outputMaterial);
+            auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
 
-            if (!albedoRT || !normalRT || !materialRT || !depthRT) {
+            if (!colorRT || !depthRT) {
                 Msg("! [HUDPass] Failed to get physical textures");
                 cmdList->endMarker();
                 return;
             }
 
             ng::RenderPassDesc passDesc;
-            passDesc.renderTargets[0] = normalRT;
-            passDesc.renderTargets[1] = albedoRT;
-            passDesc.renderTargets[2] = materialRT;
-            passDesc.numRenderTargets = 3;
+            passDesc.passName = "HUD Pass";
+            passDesc.renderTargets[0] = colorRT;
+            passDesc.numRenderTargets = 1;
             passDesc.depthStencil = depthRT;
             passDesc.clearColor = false;
             passDesc.clearDepth = false;
@@ -174,7 +161,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
                         matPSO->detail_scale,
                         matPSO->detail_scale,
                         matPSO->detail_scale,
-                        1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range
+                        1.0f / r__dtex_range
                     );
                     constants.Set("dt_params", dt_params);
 
@@ -265,9 +252,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
     );
 
     DefaultOutputLayout outputs;
-    outputs.albedo = passData.outputAlbedo;
-    outputs.normal = passData.outputNormal;
-    outputs.material = passData.outputMaterial;
+    outputs.albedo = passData.outputColor;
     outputs.depth = passData.depth;
     return outputs;
 }

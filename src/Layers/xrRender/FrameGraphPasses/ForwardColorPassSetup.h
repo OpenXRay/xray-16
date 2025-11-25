@@ -16,7 +16,7 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,

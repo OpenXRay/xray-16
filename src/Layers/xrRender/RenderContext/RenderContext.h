@@ -83,6 +83,7 @@ struct BindingSetDesc {
 };
 
 struct RenderPassDesc {
+    const char* passName = "RenderPass";
     nvrhi::TextureHandle renderTargets[8] = {};
     u32 numRenderTargets = 0;
     nvrhi::TextureHandle depthStencil = nullptr;

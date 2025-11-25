@@ -20,7 +20,7 @@ namespace xray::render::RENDER_NAMESPACE
     extern float r__dtex_range;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 void renderGBufferGeometry(
     ng::RenderContext* ctx,
@@ -199,6 +199,7 @@ void renderGBufferGeometry(
     }
 
     ng::RenderPassDesc passDesc;
+    passDesc.passName = "GBuffer Pass (Legacy - Unused)";
     passDesc.renderTargets[0] = normalRT;
     passDesc.renderTargets[1] = albedoRT;
     passDesc.renderTargets[2] = positionRT;

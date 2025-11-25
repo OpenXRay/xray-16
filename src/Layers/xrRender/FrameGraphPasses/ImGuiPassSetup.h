@@ -11,7 +11,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 framegraph::VirtualResourceHandle setupImGuiPass(
     framegraph::FrameGraph& fg,

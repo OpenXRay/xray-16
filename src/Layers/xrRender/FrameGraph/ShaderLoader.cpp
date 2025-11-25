@@ -159,12 +159,18 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     xr_string sourceCode;
     sourceCode.assign((const char*)fs->pointer(), fs->length());
 
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath,
+        GEnv.Render->getShaderPath(),
+        name,
+        ".vs");
+
     auto compileResult = m_slangCompiler->CompileFromSource(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Vertex,
         xray::render::SlangCompiler::Target::DXBC,
-        name
+        fullPath
     );
 
     fs->close();
@@ -255,12 +261,18 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     xr_string sourceCode;
     sourceCode.assign((const char*)fs->pointer(), fs->length());
 
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath,
+        GEnv.Render->getShaderPath(),
+        name,
+        ".ps");
+
     auto compileResult = m_slangCompiler->CompileFromSource(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Pixel,
         xray::render::SlangCompiler::Target::DXBC,
-        name
+        fullPath
     );
 
     fs->close();

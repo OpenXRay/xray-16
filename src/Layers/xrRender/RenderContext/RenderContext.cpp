@@ -56,7 +56,7 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
         return;
     }
 
-    m_commandList->beginMarker("RenderPass");
+    m_commandList->beginMarker(desc.passName);
 
     m_currentState = nvrhi::GraphicsState();
     m_currentState.framebuffer = m_currentFramebuffer;

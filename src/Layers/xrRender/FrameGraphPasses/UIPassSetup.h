@@ -7,10 +7,11 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 framegraph::VirtualResourceHandle setupUIPass(
     framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle sceneTarget,
     u32 width,
     u32 height
 );
@@ -25,14 +26,6 @@ framegraph::VirtualResourceHandle setupTextPass(
 framegraph::VirtualResourceHandle setupCursorPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle uiTarget,
-    u32 width,
-    u32 height
-);
-
-framegraph::VirtualResourceHandle setupCompositePass(
-    framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle sceneInput,
-    framegraph::VirtualResourceHandle uiInput,
     u32 width,
     u32 height
 );

@@ -209,6 +209,11 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
                 desc.m_spec->m_bump_name = tp.bump_name;
                 desc.m_spec->m_use_steep_parallax = true;
             }
+
+            desc.m_spec->m_metallic_name = tp.metallic_name;
+            desc.m_spec->m_roughness_name = tp.roughness_name;
+            desc.m_spec->m_ao_name = tp.ao_name;
+            desc.m_spec->m_parallax_name = tp.parallax_name;
         }
     };
     if (!listTHM)
@@ -274,6 +279,66 @@ shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
         }
     }
     return "";
+}
+
+shared_str CTextureDescrMngr::GetMetallicName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_metallic_name.size())
+        {
+            return I->second.m_spec->m_metallic_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_metallic");
+    return nm;
+}
+
+shared_str CTextureDescrMngr::GetRoughnessName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_roughness_name.size())
+        {
+            return I->second.m_spec->m_roughness_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_roughness");
+    return nm;
+}
+
+shared_str CTextureDescrMngr::GetAOName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_ao_name.size())
+        {
+            return I->second.m_spec->m_ao_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_ao");
+    return nm;
+}
+
+shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_parallax_name.size())
+        {
+            return I->second.m_spec->m_parallax_name;
+        }
+    }
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_parallax");
+    return nm;
 }
 
 BOOL CTextureDescrMngr::UseSteepParallax(const shared_str& tex_name) const
