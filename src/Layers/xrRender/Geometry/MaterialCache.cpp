@@ -976,9 +976,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
     VERIFY(matPSO->vsBindingLayout);
     VERIFY(matPSO->psBindingLayout);
 
-    bool hasVCBs = !matPSO->vcbRequirements.empty();
-
-    if (!hasVCBs && matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
+    if (matPSO->vsBindingSet && matPSO->psBindingSet && !matPSO->needsBindingSetRebuild) {
         return matPSO->vsBindingSet;
     }
 

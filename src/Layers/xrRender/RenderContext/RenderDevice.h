@@ -130,6 +130,7 @@ public:
         bool cpuWrite = false;
 
         bool isVolatile = false;
+        u32 maxVersions = 0;
 
         shared_str debugName;
     };

@@ -837,6 +837,9 @@ nvrhi::BufferDesc RenderDevice::ConvertBufferDesc(const BufferDesc& desc) {
 
     nvrhiDesc.canHaveRawViews = desc.cpuRead || desc.cpuWrite;
     nvrhiDesc.isVolatile = desc.isVolatile;
+    if (desc.isVolatile && desc.maxVersions > 0) {
+        nvrhiDesc.maxVersions = desc.maxVersions;
+    }
 
     return nvrhiDesc;
 }
