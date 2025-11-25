@@ -43,67 +43,21 @@ float4 	main	( vf I ) : SV_Target
 
 #else
 
-#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-f_deffer 	main	( vf I, float4 pos2d : SV_Position )
-#else
-f_deffer 	main	( vf I )
-#endif
+f_forward 	main	( vf I )
 {
-  f_deffer	O;
-
   float4 D;
   float4 H;
-  
-#if !defined(MSAA_ALPHATEST_DX10_1)
+
   sample_Textures(D, H, I.tc1, I.tc0, I.af, float2(0,0));
+  clip(D.w - (96.f/255.f));
 
-#if	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_0_ATOC) )
-	clip		(D.w-(96.f/255.f))  ;
-#endif
-#ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
-	float alpha = (D.w-(96.f/255.f)*0.5)/(1-(96.f/255.f)*0.5);
-	uint mask = alpha_to_coverage ( alpha, pos2d.xy );
-#endif
-
-#else
-  uint mask = 0x0;
-  
-  float2 pixeloffset = MSAAOffsets[0]*(1.0/16.0);
-  
-  sample_Textures(D, H, I.tc1, I.tc0, I.af, pixeloffset );
-
-  if( D.w-(96.f/255.f) >= 0 ) mask |= 0x1;
-  
-  [unroll] for( int i = 1; i < MSAA_SAMPLES; ++i )
-  {
-	float4 DI;
-	float4 HI;
-	pixeloffset = MSAAOffsets[i]*(1.0/16.0);
-	sample_Textures(DI, HI, I.tc1, I.tc0, I.af, pixeloffset );
-	if( DI.w-(96.f/255.f) >= 0 ) mask |= ( uint(0x1) << i );
-  }
-	
-  if( mask == 0x0 )
-	discard;
-      	
-#endif
-  
   float3 N 	= normalize	(H.xyz);
 
-#ifndef EXTEND_F_DEFFER
-  O				= pack_gbuffer(
-								float4	(N					, H.w		),
-								float4 	(I.position + N*def_virtualh/2.f	, 0		),
-								float4	(D.x,	D.y,	D.z			, def_gloss	) );
-#else
-  O				= pack_gbuffer(
-								float4	(N					, H.w		),
-								float4 	(I.position + N*def_virtualh/2.f	, 0		),
-								float4	(D.x,	D.y,	D.z			, def_gloss	),
-								mask );
-#endif
+  float3 albedo = D.rgb;
+  float roughness = 1.0 - def_gloss;
+  float metallic = 0.0;
 
-  return O;
+  return output_forward_color(albedo, N, metallic, roughness);
 }
 
 #endif

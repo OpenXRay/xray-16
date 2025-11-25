@@ -6,12 +6,6 @@ struct PS_INPUT {
     float2 texcoord : TEXCOORD0;
 };
 
-cbuffer TonemapParams : register(b0) {
-    float g_Exposure;
-    float g_Gamma;
-    float2 _padding;
-};
-
 float3 ACESFilm(float3 x) {
     float a = 2.51;
     float b = 0.03;
@@ -24,11 +18,10 @@ float3 ACESFilm(float3 x) {
 float4 main(PS_INPUT input) : SV_TARGET {
     float3 hdr = t_hdr.Sample(s_linear, input.texcoord).rgb;
 
-    hdr *= g_Exposure;
+    const float exposure = 1.0;
+    hdr *= exposure;
 
     float3 ldr = ACESFilm(hdr);
-
-    ldr = pow(ldr, 1.0 / g_Gamma);
 
     return float4(ldr, 1.0);
 }

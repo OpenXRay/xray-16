@@ -15,9 +15,8 @@ float SampleGrassInteraction(float2 atlas_uv)
     return interaction.r;
 }
 
-f_deffer main(p_flat I)
+f_forward main(p_flat I)
 {
-    f_deffer O;
 
     float widthPercent = I.tcdh.x;
 
@@ -40,14 +39,6 @@ f_deffer main(p_flat I)
 
     grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, vein_detail.a * 0.15);
 
-    float hemi = I.position.w;
-
-#if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
-    float sun = I.tcdh.w;
-#else
-    float sun = 0.5;
-#endif
-
     float gloss = 0.2;
 
     if (dm_debug_trails > 0)
@@ -56,11 +47,9 @@ f_deffer main(p_flat I)
         grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
     }
 
-    float4 Ne = float4(N, hemi * ao);
-    float4 position = float4(I.position.xyz, sun);
-    float4 albedo = float4(grassAlbedo, gloss);
+    float3 albedo = grassAlbedo;
+    float roughness = 1.0 - gloss;
+    float metallic = 0.0;
 
-    O = pack_gbuffer(Ne, position, albedo);
-
-    return O;
+    return output_forward_color(albedo, N, metallic, roughness);
 }

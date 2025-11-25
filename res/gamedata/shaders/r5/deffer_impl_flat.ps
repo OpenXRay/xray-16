@@ -8,13 +8,11 @@
 #endif
 
 #ifdef USE_4_BUMP
-f_deffer 	main	( p_bumped I 	)
+f_forward 	main	( p_bumped I 	)
 #else
-f_deffer 	main	( p_flat I 		)
+f_forward 	main	( p_flat I 		)
 #endif
 {
-	f_deffer	O;
-
 	float4 D		= tbase		(I.tcdh);
 	float4 L 	= s_lmap.Sample( smp_base, I.tcdh);
 
@@ -34,12 +32,11 @@ f_deffer 	main	( p_flat I 		)
 		D.rgb	= 2*D.rgb*dt	 ;
 
   # ifdef USE_4_BUMP
-
  	 float4	n_Rt = s_dn_r.Sample ( smp_linear, I.tcdbump).wzyx;
 	 float4	n_Gt = s_dn_g.Sample ( smp_linear, I.tcdbump).wzyx;
 	 float4	n_Bt = s_dn_b.Sample ( smp_linear, I.tcdbump).wzyx;
 	 float4	n_At = s_dn_a.Sample ( smp_linear, I.tcdbump).wzyx;
-	 
+
  	 float3	n_R = (n_Rt.xyz-0.5)*mask.r; float g_R=n_Rt.w*mask.r;
 	 float3	n_G = (n_Gt.xyz-0.5)*mask.g; float g_G=n_Gt.w*mask.g;
 	 float3	n_B = (n_Bt.xyz-0.5)*mask.b; float g_B=n_Bt.w*mask.b;
@@ -61,16 +58,11 @@ f_deffer 	main	( p_flat I 		)
 	float3	N 	= I.N.xyz	;
 # endif
 
-	float 	ms	= xmaterial	;
-# ifdef USE_R2_STATIC_SUN
-		 	ms 	= L.w		;
-# endif
+  float3 Ne = normalize(N);
 
-  float4     Ne = float4	(normalize(N), 									D.w			);
-  O				= pack_gbuffer( 
-								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f, 	ms			),
-								float4	(D.x,	D.y,	D.z,						G			) );
+  float3 albedo = D.rgb;
+  float roughness = 1.0 - G;
+  float metallic = 0.0;
 
-  return O;
+  return output_forward_color(albedo, Ne, metallic, roughness);
 }

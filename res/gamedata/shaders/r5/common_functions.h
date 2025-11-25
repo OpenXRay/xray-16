@@ -158,26 +158,11 @@ float gbuf_unpack_mtl( float mtl_hemi )
    return float( packed_hemi ) * (1.0/31.0) * 1.333333333;
 }
 
-#ifndef EXTEND_F_DEFFER
-f_deffer pack_gbuffer( float4 norm, float4 pos, float4 col )
-#else
-f_deffer pack_gbuffer( float4 norm, float4 pos, float4 col, uint imask )
-#endif
+f_forward output_forward_color(float3 albedo, float3 normal, float metallic, float roughness)
 {
-	f_deffer res;
+	f_forward res;
 
-#ifndef GBUFFER_OPTIMIZATION
-	res.position	= pos;
-	res.Ne			= norm;
-	res.C			   = col;
-#else
-	res.position	= float4( gbuf_pack_normal( norm.xyz ), pos.z, gbuf_pack_hemi_mtl( norm.w, pos.w ) );
-	res.C			   = col;
-#endif
-
-#ifdef EXTEND_F_DEFFER
-   res.mask = imask;
-#endif
+	res.color = float4(albedo, 1.0);
 
 	return res;
 }

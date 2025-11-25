@@ -262,26 +262,10 @@ struct	v_static_color
     float4	P : POSITION;
 };
 
-#ifndef GBUFFER_OPTIMIZATION
-struct                  f_deffer
+struct f_forward
 {
-    float4	position : SV_Target0;
-    float4	Ne : SV_Target1;
-    float4	C : SV_Target2;
-#ifdef EXTEND_F_DEFFER
-    uint     mask : SV_COVERAGE;
-#endif
+    float4	color : SV_Target0;
 };
-#else
-struct                  f_deffer
-{
-    float4	position : SV_Target0;
-    float4	C : SV_Target1;
-#ifdef EXTEND_F_DEFFER
-    uint     mask : SV_COVERAGE;
-#endif
-};
-#endif
 
 struct					gbuffer_data
 {
