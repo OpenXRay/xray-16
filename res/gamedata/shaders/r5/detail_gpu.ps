@@ -47,9 +47,15 @@ f_forward main(p_flat I)
         grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
     }
 
+    float3 Nw = viewDirToWorld(N);
+
+    float3 worldPos = viewPosToWorld(I.position.xyz);
+
+    float hemi = I.position.w;
+
     float3 albedo = grassAlbedo;
     float roughness = 1.0 - gloss;
     float metallic = 0.0;
 
-    return output_forward_color(albedo, N, metallic, roughness);
+    return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }

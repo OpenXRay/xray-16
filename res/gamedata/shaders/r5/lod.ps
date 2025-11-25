@@ -43,21 +43,26 @@ float4 	main	( vf I ) : SV_Target
 
 #else
 
-f_forward 	main	( vf I )
+f_forward main( vf I )
 {
-  float4 D;
-  float4 H;
+	float4 D;
+	float4 H;
 
-  sample_Textures(D, H, I.tc1, I.tc0, I.af, float2(0,0));
-  clip(D.w - (96.f/255.f));
+	sample_Textures(D, H, I.tc1, I.tc0, I.af, float2(0, 0));
+	clip(D.w - (96.f / 255.f));
 
-  float3 N 	= normalize	(H.xyz);
+	float3 Nw = normalize(H.xyz);
 
-  float3 albedo = D.rgb;
-  float roughness = 1.0 - def_gloss;
-  float metallic = 0.0;
+	float3 worldPos = I.position;
 
-  return output_forward_color(albedo, N, metallic, roughness);
+	float2 pbr_tc = lerp(I.tc0, I.tc1, I.af.w);
+	float3 albedo = D.rgb;
+	float roughness = s_roughness.Sample(smp_base, pbr_tc).r;
+	float metallic = s_metallic.Sample(smp_base, pbr_tc).r;
+	float ao = s_ao.Sample(smp_base, pbr_tc).r;
+	float hemi = H.w;
+
+	return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }
 
 #endif

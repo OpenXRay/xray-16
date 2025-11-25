@@ -18,10 +18,15 @@ Texture2D   s_generic;
 Texture2D 	s_bump;             	//
 Texture2D 	s_bumpX;                //
 Texture2D 	s_detail;               //
-Texture2D 	s_detailBump;           //	
+Texture2D 	s_detailBump;           //
 Texture2D 	s_detailBumpX;          //	Error for bump detail
 //Texture2D 	s_bumpD;                //
 Texture2D 	s_hemi;             	//
+
+Texture2D 	s_metallic  : register(t4);
+Texture2D 	s_roughness : register(t5);
+Texture2D 	s_ao        : register(t6);
+Texture2D 	s_parallax  : register(t7);
 
 Texture2D 	s_mask;             	//
 

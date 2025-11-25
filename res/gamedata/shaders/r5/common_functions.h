@@ -5,9 +5,23 @@ float Contrast(float Input, float ContrastPower)
 {
      bool IsAboveHalf = Input > 0.5 ;
      float ToRaise = saturate(2*(IsAboveHalf ? 1-Input : Input));
-     float Output = 0.5*pow(ToRaise, ContrastPower); 
+     float Output = 0.5*pow(ToRaise, ContrastPower);
      Output = IsAboveHalf ? 1-Output : Output;
      return Output;
+}
+
+float3 viewDirToWorld(float3 viewDir)
+{
+    return float3(
+        dot(viewDir, float3(m_V[0].x, m_V[1].x, m_V[2].x)),
+        dot(viewDir, float3(m_V[0].y, m_V[1].y, m_V[2].y)),
+        dot(viewDir, float3(m_V[0].z, m_V[1].z, m_V[2].z))
+    );
+}
+
+float3 viewPosToWorld(float3 viewPos)
+{
+    return viewDirToWorld(viewPos) + eye_position;
 }
 
 void tonemap( out float4 low, out float4 high, float3 rgb, float scale)
@@ -158,12 +172,57 @@ float gbuf_unpack_mtl( float mtl_hemi )
    return float( packed_hemi ) * (1.0/31.0) * 1.333333333;
 }
 
+#include "shared/pbr_brdf.h"
+
 f_forward output_forward_color(float3 albedo, float3 normal, float metallic, float roughness)
 {
 	f_forward res;
-
 	res.color = float4(albedo, 1.0);
+	return res;
+}
 
+f_forward output_forward_pbr(
+	float3 albedo,
+	float3 worldNormal,
+	float3 worldPos,
+	float metallic,
+	float roughness,
+	float ao,
+	float hemi)
+{
+	f_forward res;
+
+	float3 N = normalize(worldNormal);
+
+	float3 V = normalize(eye_position - worldPos);
+
+	float3 L = normalize(-L_sun_dir_w);
+
+	float3 sunLight = PBRDirectLighting(
+		albedo,
+		N,
+		V,
+		L,
+		L_sun_color,
+		metallic,
+		roughness,
+		ao
+	);
+
+	float3 ambientColor = L_ambient.rgb + L_hemi_color.rgb * hemi;
+	float3 ambient = PBRAmbient(
+		albedo,
+		N,
+		V,
+		metallic,
+		roughness,
+		ao,
+		ambientColor
+	);
+
+	float3 finalColor = sunLight + ambient;
+
+	res.color = float4(finalColor, 1.0);
 	return res;
 }
 

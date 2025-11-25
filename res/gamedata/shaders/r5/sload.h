@@ -23,6 +23,10 @@ struct	surface_bumped
 	float	gloss;
 	float	height;
 
+	float	metallic;
+	float	roughness;
+	float	ao;
+	float	parallax_height;
 };
 
 float4 tbase( float2 tc )
@@ -126,6 +130,11 @@ surface_bumped sload_i( p_bumped I)
 	S.gloss		= Nu.x*Nu.x;
 	S.height	= NuE.z;
 
+	S.metallic  = s_metallic.Sample(smp_base, I.tcdh).r;
+	S.roughness = s_roughness.Sample(smp_base, I.tcdh).r;
+	S.ao        = s_ao.Sample(smp_base, I.tcdh).r;
+	S.parallax_height = s_parallax.Sample(smp_base, I.tcdh).r;
+
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP
 	float4 NDetail		= s_detailBump.Sample( smp_base, I.tcdbump);
@@ -163,6 +172,11 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	S.normal	= Nu.wzyx.xyz + (NuE.xyz - 1.0f);
 	S.gloss		= Nu.x*Nu.x;
 	S.height	= NuE.z;
+
+	S.metallic  = s_metallic.Sample(smp_base, I.tcdh).r;
+	S.roughness = s_roughness.Sample(smp_base, I.tcdh).r;
+	S.ao        = s_ao.Sample(smp_base, I.tcdh).r;
+	S.parallax_height = s_parallax.Sample(smp_base, I.tcdh).r;
 
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP
