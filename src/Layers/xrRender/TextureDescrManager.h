@@ -27,6 +27,12 @@ class CTextureDescrMngr
         shared_str m_bump_name;
         float m_material;
         bool m_use_steep_parallax;
+
+        // PBR texture names (AI-generated or artist-authored)
+        shared_str m_metallic_name;
+        shared_str m_roughness_name;
+        shared_str m_ao_name;
+        shared_str m_parallax_name;
     };
     struct texture_desc
     {
@@ -58,5 +64,11 @@ public:
 
     // Get detail scale for a texture (returns 1.0 if no detail texture)
     float GetDetailScale(const shared_str& tex_name) const;
+
+    // Get PBR texture names (AI-generated or artist-authored)
+    shared_str GetMetallicName(const shared_str& tex_name) const;
+    shared_str GetRoughnessName(const shared_str& tex_name) const;
+    shared_str GetAOName(const shared_str& tex_name) const;
+    shared_str GetParallaxName(const shared_str& tex_name) const;
 };
 } // namespace xray::render::RENDER_NAMESPACE

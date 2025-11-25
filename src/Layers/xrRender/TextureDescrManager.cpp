@@ -209,6 +209,12 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
                 desc.m_spec->m_bump_name = tp.bump_name;
                 desc.m_spec->m_use_steep_parallax = true;
             }
+
+            // Load PBR texture names from .thm file
+            desc.m_spec->m_metallic_name = tp.metallic_name;
+            desc.m_spec->m_roughness_name = tp.roughness_name;
+            desc.m_spec->m_ao_name = tp.ao_name;
+            desc.m_spec->m_parallax_name = tp.parallax_name;
         }
     };
     if (!listTHM)
@@ -274,6 +280,71 @@ shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
         }
     }
     return "";
+}
+
+shared_str CTextureDescrMngr::GetMetallicName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_metallic_name.size())
+        {
+            return I->second.m_spec->m_metallic_name;
+        }
+    }
+    // Fallback: Use naming convention (texturename_metallic)
+    // This matches what PBRTextureConverter generates
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_metallic");
+    return nm;
+}
+
+shared_str CTextureDescrMngr::GetRoughnessName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_roughness_name.size())
+        {
+            return I->second.m_spec->m_roughness_name;
+        }
+    }
+    // Fallback: Use naming convention (texturename_roughness)
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_roughness");
+    return nm;
+}
+
+shared_str CTextureDescrMngr::GetAOName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_ao_name.size())
+        {
+            return I->second.m_spec->m_ao_name;
+        }
+    }
+    // Fallback: Use naming convention (texturename_ao)
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_ao");
+    return nm;
+}
+
+shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_parallax_name.size())
+        {
+            return I->second.m_spec->m_parallax_name;
+        }
+    }
+    // Fallback: Use naming convention (texturename_parallax)
+    string256 nm;
+    strconcat(sizeof(nm), nm, tex_name.c_str(), "_parallax");
+    return nm;
 }
 
 BOOL CTextureDescrMngr::UseSteepParallax(const shared_str& tex_name) const

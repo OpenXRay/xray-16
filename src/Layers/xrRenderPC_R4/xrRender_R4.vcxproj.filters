@@ -811,6 +811,9 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraph\FGPass.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1568,6 +1571,9 @@
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp">

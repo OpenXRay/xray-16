@@ -28,6 +28,7 @@
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
+#include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/ImGuiPassSetup.h"
 
 namespace xray::render {
@@ -346,29 +347,28 @@ void FrameGraphRenderer::RenderMenu() {
         }
     );
 
-    // 2. UI Pass - Renders menu UI
-    auto uiTarget = passes::setupUIPass(*m_framegraph, width, height);
+    // 2. UI Pass - Renders menu UI directly to background with alpha blending
+    auto sceneWithUI = passes::setupUIPass(*m_framegraph, backgroundTarget, width, height);
 
     // 3. Text Pass - Renders menu text
-    uiTarget = passes::setupTextPass(*m_framegraph, uiTarget, width, height);
+    sceneWithUI = passes::setupTextPass(*m_framegraph, sceneWithUI, width, height);
 
     // 4. Cursor Pass - Renders cursor
-    uiTarget = passes::setupCursorPass(*m_framegraph, uiTarget, width, height);
+    sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
 
-    // 5. Composite Pass - Combines background with UI
-    auto compositeOutput = passes::setupCompositePass(
+    // 5. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
+    auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
-        backgroundTarget,  // Black background
-        uiTarget,          // UI layer
+        sceneWithUI,  // HDR input (RGBA16_FLOAT)
         width,
         height
     );
 
-    // 6. ImGui Pass - Debug overlay
+    // 6. ImGui Pass - Debug overlay on LDR output
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        compositeOutput,
+        ldrOutput,  // LDR input (RGBA8_UNORM)
         imguiRenderer,
         width,
         height
@@ -537,43 +537,43 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // 3. Would be: Lighting Pass
     // 4. Would be: Tonemap Pass
 
-    // 5. UI Pass - Renders 2D UI to separate target
-    auto uiTarget = passes::setupUIPass(
+    // 3. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
+    auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
+        hudOutputs.albedo,  // Scene + HUD (HDR)
         width,
         height
     );
 
-    // 6. Text Pass - Renders text on top of UI
-    uiTarget = passes::setupTextPass(
+    // 4. Text Pass - Renders text on top of UI
+    sceneWithUI = passes::setupTextPass(
         *m_framegraph,
-        uiTarget,
+        sceneWithUI,
         width,
         height
     );
 
-    // 7. Cursor Pass - Renders cursor on top of UI+Text
-    uiTarget = passes::setupCursorPass(
+    // 5. Cursor Pass - Renders cursor on top of UI+Text
+    sceneWithUI = passes::setupCursorPass(
         *m_framegraph,
-        uiTarget,
+        sceneWithUI,
         width,
         height
     );
 
-    // 8. Composite Pass - Combines scene (GBuffer + HUD) with UI layer
-    auto compositeOutput = passes::setupCompositePass(
+    // 6. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
+    auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
-        hudOutputs.albedo,  // Scene input (GBuffer + HUD)
-        uiTarget,          // UI layer
+        sceneWithUI,  // HDR input (RGBA16_FLOAT)
         width,
         height
     );
 
-    // 9. ImGui Pass - Renders debug UI on top of everything
+    // 7. ImGui Pass - Renders debug UI on top of LDR output
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        compositeOutput,
+        ldrOutput,  // LDR input (RGBA8_UNORM)
         imguiRenderer,
         width,
         height

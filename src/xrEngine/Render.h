@@ -25,6 +25,8 @@ struct Fcolor;
 class IReader;
 class CMemoryWriter;
 
+namespace xray::render::framegraph { class ShaderLoader; }
+
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;
 #else
@@ -287,6 +289,9 @@ public:
     virtual IRenderVisual* getVisual(int id) = 0;
 
     virtual xrImTextureData GetImGuiTextureId(pcstr texture_name) = 0;
+
+    // Forward declare ShaderLoader (can't include framegraph headers here)
+    virtual xray::render::framegraph::ShaderLoader* GetShaderLoader() const = 0;
 
     // Main
     virtual void add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fmatrix& m) = 0; // add visual leaf (no culling performed at all)

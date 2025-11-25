@@ -87,6 +87,7 @@ struct BindingSetDesc {
 
 // Render pass description
 struct RenderPassDesc {
+    const char* passName = "RenderPass";  // Debug name for RenderDoc markers
     nvrhi::TextureHandle renderTargets[8] = {};
     u32 numRenderTargets = 0;
     nvrhi::TextureHandle depthStencil = nullptr;

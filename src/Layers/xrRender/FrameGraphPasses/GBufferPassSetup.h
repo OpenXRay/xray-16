@@ -18,7 +18,7 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Lambda-based GBufferPass setup function (Frostbite pattern)
 // This replaces the class-based GBufferPass with a free function

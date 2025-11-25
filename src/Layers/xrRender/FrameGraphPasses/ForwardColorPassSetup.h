@@ -18,7 +18,7 @@ namespace xray::render::framegraph {
     struct DefaultOutputLayout;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // ═══════════════════════════════════════════════════════
 //  FORWARD COLOR PASS (Phase 1: Single-RT Forward Rendering)

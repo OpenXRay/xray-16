@@ -86,6 +86,19 @@ void STextureParams::Load(IReader& F)
 
     if (F.find_chunk(THM_CHUNK_FADE_DELAY))
         fade_delay = F.r_u8();
+
+    // PBR texture chunks (optional - may not exist in legacy .thm files)
+    if (F.find_chunk(THM_CHUNK_PBR_METALLIC))
+        F.r_stringZ(metallic_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_ROUGHNESS))
+        F.r_stringZ(roughness_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_AO))
+        F.r_stringZ(ao_name);
+
+    if (F.find_chunk(THM_CHUNK_PBR_PARALLAX))
+        F.r_stringZ(parallax_name);
 }
 
 void STextureParams::Save(IWriter& F)
@@ -127,6 +140,23 @@ void STextureParams::Save(IWriter& F)
 
     F.open_chunk(THM_CHUNK_FADE_DELAY);
     F.w_u8(fade_delay);
+    F.close_chunk();
+
+    // PBR texture chunks
+    F.open_chunk(THM_CHUNK_PBR_METALLIC);
+    F.w_stringZ(metallic_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_ROUGHNESS);
+    F.w_stringZ(roughness_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_AO);
+    F.w_stringZ(ao_name);
+    F.close_chunk();
+
+    F.open_chunk(THM_CHUNK_PBR_PARALLAX);
+    F.w_stringZ(parallax_name);
     F.close_chunk();
 }
 

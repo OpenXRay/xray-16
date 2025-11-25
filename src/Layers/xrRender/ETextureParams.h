@@ -116,6 +116,12 @@ struct ECORE_API STextureParams
     shared_str bump_name;
     shared_str ext_normal_map_name;
 
+    // PBR textures (AI-generated or artist-authored)
+    shared_str metallic_name;
+    shared_str roughness_name;
+    shared_str ao_name;
+    shared_str parallax_name;
+
     STextureParams() { Clear(); }
     void destroy_shared_str(shared_str& object) { object.~shared_str(); }
     void construct_shared_str(shared_str& object) { ::new (&object) shared_str(); }
@@ -125,12 +131,20 @@ struct ECORE_API STextureParams
         destroy_shared_str(detail_name);
         destroy_shared_str(bump_name);
         destroy_shared_str(ext_normal_map_name);
+        destroy_shared_str(metallic_name);
+        destroy_shared_str(roughness_name);
+        destroy_shared_str(ao_name);
+        destroy_shared_str(parallax_name);
 
         ZeroMemory(this, sizeof(STextureParams));
 
         construct_shared_str(detail_name);
         construct_shared_str(bump_name);
         construct_shared_str(ext_normal_map_name);
+        construct_shared_str(metallic_name);
+        construct_shared_str(roughness_name);
+        construct_shared_str(ao_name);
+        construct_shared_str(parallax_name);
 
         flags.set(flGenerateMipMaps | flDitherColor, TRUE);
         mip_filter = kMIPFilterBox;
@@ -190,6 +204,11 @@ extern const xr_token ttype_token[];
 #define THM_CHUNK_BUMP 0x0817
 #define THM_CHUNK_EXT_NORMALMAP 0x0818
 #define THM_CHUNK_FADE_DELAY 0x0819
+// PBR texture chunks (AI-generated or artist-authored)
+#define THM_CHUNK_PBR_METALLIC 0x081A
+#define THM_CHUNK_PBR_ROUGHNESS 0x081B
+#define THM_CHUNK_PBR_AO 0x081C
+#define THM_CHUNK_PBR_PARALLAX 0x081D
 //----------------------------------------------------
 #define THUMB_WIDTH 128
 #define THUMB_HEIGHT 128

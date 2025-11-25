@@ -167,6 +167,12 @@ public: //	Public class members (must be encapsulated further)
     float m_material;
     shared_str m_bumpmap;
 
+    // PBR texture names (AI-generated or artist-authored)
+    shared_str m_metallic;
+    shared_str m_roughness;
+    shared_str m_ao;
+    shared_str m_parallax;
+
     union
     {
         u32 m_play_time; // sync theora time
@@ -217,6 +223,19 @@ struct resptrcode_texture : public resptr_base<CTexture>
     void destroy() { _set(nullptr); }
     shared_str bump_get() { return _get()->m_bumpmap; }
     bool bump_exist() { return 0 != bump_get().size(); }
+
+    // PBR texture accessors
+    shared_str metallic_get() { return _get()->m_metallic; }
+    bool metallic_exist() { return 0 != metallic_get().size(); }
+
+    shared_str roughness_get() { return _get()->m_roughness; }
+    bool roughness_exist() { return 0 != roughness_get().size(); }
+
+    shared_str ao_get() { return _get()->m_ao; }
+    bool ao_exist() { return 0 != ao_get().size(); }
+
+    shared_str parallax_get() { return _get()->m_parallax; }
+    bool parallax_exist() { return 0 != parallax_get().size(); }
 };
 
 typedef resptr_core<CTexture, resptrcode_texture> ref_texture;

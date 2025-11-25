@@ -17,7 +17,7 @@
 
 extern ENGINE_API float psHUD_FOV;
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Apply HUD FOV adjustment to world matrix
 static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
@@ -53,16 +53,12 @@ framegraph::DefaultOutputLayout setupHUDPass(
     using namespace framegraph;
 
     struct HUDPassData {
-        // Input from GBuffer
-        VirtualResourceHandle inputAlbedo;
-        VirtualResourceHandle inputNormal;
-        VirtualResourceHandle inputMaterial;
+        // Input from Forward+ color pass
+        VirtualResourceHandle inputColor;
         VirtualResourceHandle depth;  // Read-write depth
 
         // Output (same as input, HUD renders on top)
-        VirtualResourceHandle outputAlbedo;
-        VirtualResourceHandle outputNormal;
-        VirtualResourceHandle outputMaterial;
+        VirtualResourceHandle outputColor;
 
         // HUD geometry
         ng::RenderDevice* device;
@@ -87,23 +83,17 @@ framegraph::DefaultOutputLayout setupHUDPass(
             data.hudBatches = hudBatches;
             data.materialCache = materialCache;
 
-            // Read GBuffer inputs
-            data.inputAlbedo = passBuilder.read(gbufferInputs.albedo);
-            data.inputNormal = passBuilder.read(gbufferInputs.normal);
-            data.inputMaterial = passBuilder.read(gbufferInputs.material);
+            // Read Forward+ color input
+            data.inputColor = passBuilder.read(gbufferInputs.albedo);
 
-            // Write to the same targets (HUD renders on top)
-            data.outputAlbedo = passBuilder.write(gbufferInputs.albedo, ResourceState::RenderTarget);
-            data.outputNormal = passBuilder.write(gbufferInputs.normal, ResourceState::RenderTarget);
-            data.outputMaterial = passBuilder.write(gbufferInputs.material, ResourceState::RenderTarget);
+            // Write to the same target (HUD renders on top)
+            data.outputColor = passBuilder.write(gbufferInputs.albedo, ResourceState::RenderTarget);
 
             // Read-write depth (for depth testing)
             data.depth = passBuilder.readWrite(gbufferInputs.depth, ResourceState::DepthStencilWrite);
 
-            // Store outputs for MaterialCache
-            data.outputs.albedo = data.outputAlbedo;
-            data.outputs.normal = data.outputNormal;
-            data.outputs.material = data.outputMaterial;
+            // Store outputs for MaterialCache (Forward+ single-RT)
+            data.outputs.albedo = data.outputColor;
             data.outputs.depth = data.depth;
         },
 
@@ -124,13 +114,11 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 return;
             }
 
-            // Get physical resources
-            auto* albedoRT = fg.GetPhysicalTexture(data.outputAlbedo);
-            auto* normalRT = fg.GetPhysicalTexture(data.outputNormal);
-            auto* materialRT = fg.GetPhysicalTexture(data.outputMaterial);
+            // Get physical resources (Forward+ single-RT)
+            auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
 
-            if (!albedoRT || !normalRT || !materialRT || !depthRT) {
+            if (!colorRT || !depthRT) {
                 Msg("! [HUDPass] Failed to get physical textures");
                 cmdList->endMarker();
                 return;
@@ -138,10 +126,9 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
             // Setup render pass (no clear - HUD renders on top of world)
             ng::RenderPassDesc passDesc;
-            passDesc.renderTargets[0] = normalRT;
-            passDesc.renderTargets[1] = albedoRT;
-            passDesc.renderTargets[2] = materialRT;
-            passDesc.numRenderTargets = 3;
+            passDesc.passName = "HUD Pass";
+            passDesc.renderTargets[0] = colorRT;
+            passDesc.numRenderTargets = 1;
             passDesc.depthStencil = depthRT;
             passDesc.clearColor = false;
             passDesc.clearDepth = false;
@@ -205,7 +192,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
                         matPSO->detail_scale,
                         matPSO->detail_scale,
                         matPSO->detail_scale,
-                        1.0f / xray::render::RENDER_NAMESPACE::r__dtex_range
+                        1.0f / r__dtex_range
                     );
                     constants.Set("dt_params", dt_params);
 
@@ -315,13 +302,11 @@ framegraph::DefaultOutputLayout setupHUDPass(
         }
     );
 
-    // Return the modified outputs (same as GBuffer but with HUD rendered on top)
+    // Return the modified outputs (Forward+ single-RT with HUD rendered on top)
     DefaultOutputLayout outputs;
-    outputs.albedo = passData.outputAlbedo;
-    outputs.normal = passData.outputNormal;
-    outputs.material = passData.outputMaterial;
+    outputs.albedo = passData.outputColor;
     outputs.depth = passData.depth;
     return outputs;
 }
 
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

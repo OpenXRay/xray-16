@@ -8,12 +8,13 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Lambda-based UI pass setup
-// Renders UI sprites/widgets to separate render target
+// Renders UI sprites/widgets directly to scene HDR target with alpha blending
 framegraph::VirtualResourceHandle setupUIPass(
     framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle sceneTarget,
     u32 width,
     u32 height
 );
@@ -34,13 +35,4 @@ framegraph::VirtualResourceHandle setupCursorPass(
     u32 height
 );
 
-// Composite pass - combines scene and UI layers
-framegraph::VirtualResourceHandle setupCompositePass(
-    framegraph::FrameGraph& fg,
-    framegraph::VirtualResourceHandle sceneInput,
-    framegraph::VirtualResourceHandle uiInput,
-    u32 width,
-    u32 height
-);
-
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

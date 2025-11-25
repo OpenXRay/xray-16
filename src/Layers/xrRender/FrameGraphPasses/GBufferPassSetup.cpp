@@ -21,7 +21,7 @@ namespace xray::render::RENDER_NAMESPACE
     extern float r__dtex_range;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Forward declaration of the rendering function
 void renderGBufferGeometry(
@@ -242,6 +242,7 @@ void renderGBufferGeometry(
     // - Slot 2 → Material (RTSemantic::Material)
 
     ng::RenderPassDesc passDesc;
+    passDesc.passName = "GBuffer Pass (Legacy - Unused)";
     passDesc.renderTargets[0] = normalRT;    // SV_Target0
     passDesc.renderTargets[1] = albedoRT;    // SV_Target1
     passDesc.renderTargets[2] = positionRT;  // SV_Target2 (using position as material)
@@ -446,4 +447,4 @@ void renderGBufferGeometry(
     ctx->EndRenderPass();
 }
 
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

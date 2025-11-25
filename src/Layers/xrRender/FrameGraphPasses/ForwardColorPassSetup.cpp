@@ -21,7 +21,7 @@ namespace xray::render::RENDER_NAMESPACE
     extern float r__dtex_range;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Forward declaration of the rendering function
 void renderForwardGeometry(
@@ -58,7 +58,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     };
 
     auto& passData = fg.addCallbackPass<ForwardColorPassData>(
-        "ForwardColor",
+        "Forward+ Color Pass",
 
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
@@ -76,7 +76,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             // If depth buffer provided, use it; otherwise create new
             if (depthInput.is_valid()) {
-                data.depth = passBuilder.write(depthInput, ResourceState::DepthStencilWrite);
+                // READ-WRITE for early-Z: read depth from prepass, write new fragments
+                data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
             } else {
                 data.depth = passBuilder.createDepthBuffer("rt_Depth", width, height);
             }
@@ -101,12 +102,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             );
 
             // Store outputs in PassData for MaterialCache
-            // NOTE: For compatibility with shaders that may output multiple RTs,
-            // we point all outputs to the same color buffer
-            // This allows legacy shaders to work while we transition to forward+
-            data.outputs.albedo = data.color;    // Primary output
-            data.outputs.normal = data.color;    // Point to same buffer (legacy compatibility)
-            data.outputs.material = data.color;  // Point to same buffer (legacy compatibility)
+            // Forward+ uses single RT output (all shaders converted to f_forward)
+            data.outputs.albedo = data.color;    // Single HDR color output
             data.outputs.depth = data.depth;
         },
 
@@ -227,18 +224,15 @@ void renderForwardGeometry(
     }
 
     // ═══════════════════════════════════════════════════════
-    //  SETUP RENDER PASS (Bind same RT to all 3 slots)
+    //  SETUP RENDER PASS (Single RT for Forward+)
     // ═══════════════════════════════════════════════════════
-    // IMPORTANT: Legacy shaders still output to 3 targets (normal, albedo, material)
-    // We bind the SAME color buffer to all 3 slots for compatibility
-    // This allows shaders to write to any target without errors
-    // Later (Phase 1.2) we'll convert shaders to single-output forward shaders
+    // Forward+ uses a single HDR color buffer
+    // Shaders must output to SV_Target0 only
 
     ng::RenderPassDesc passDesc;
-    passDesc.renderTargets[0] = colorRT;     // SV_Target0 - Normal (legacy)
-    passDesc.renderTargets[1] = colorRT;     // SV_Target1 - Albedo (legacy)
-    passDesc.renderTargets[2] = colorRT;     // SV_Target2 - Material (legacy)
-    passDesc.numRenderTargets = 3;           // Keep 3 for legacy shader compatibility
+    passDesc.passName = "Forward+ Color Pass";
+    passDesc.renderTargets[0] = colorRT;     // SV_Target0 - Color output
+    passDesc.numRenderTargets = 1;           // Single RT for Forward+
     passDesc.depthStencil = depthRT;
 
     // Clear values
@@ -246,11 +240,11 @@ void renderForwardGeometry(
     passDesc.clearValue.color[1] = 0.0f;
     passDesc.clearValue.color[2] = 0.0f;
     passDesc.clearValue.color[3] = 1.0f;
-    passDesc.clearValue.depth = 1.0f;
-    passDesc.clearValue.stencil = 0;
     passDesc.clearColor = true;
-    passDesc.clearDepth = true;
-    passDesc.clearStencil = true;
+
+    // DON'T clear depth - we're reusing it from depth prepass for early-Z!
+    passDesc.clearDepth = false;
+    passDesc.clearStencil = false;
 
     // Begin render pass
     ctx->BeginRenderPass(passDesc);
@@ -437,4 +431,4 @@ void renderForwardGeometry(
     // Msg("ForwardColor: %u draws, %u triangles", numDraws, numTriangles);
 }
 
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

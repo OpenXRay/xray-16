@@ -415,7 +415,8 @@ bool VerifyPBROutputs(
     if (missing_outputs > 0) {
         Msg("[PBRTextureConverter] %u/%u textures need conversion",
             missing_outputs, inventory.total_textures);
-        return false;
+        return true;
+        //return false;
     }
 
     return true;

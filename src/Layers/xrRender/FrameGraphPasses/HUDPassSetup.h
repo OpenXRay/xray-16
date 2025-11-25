@@ -17,7 +17,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Lambda-based HUD pass setup
 // Renders HUD geometry (weapons, world-space UI) on top of GBuffer

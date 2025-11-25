@@ -4,10 +4,6 @@
 
 #include "xrEngine/GameFont.h"
 
-namespace xray::render::passes {
-    class TextPass;  // Forward declaration
-}
-
 namespace xray::render::RENDER_NAMESPACE
 {
 class dxFontRender : public IFontRender

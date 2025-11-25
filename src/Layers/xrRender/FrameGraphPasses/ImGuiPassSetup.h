@@ -12,7 +12,7 @@ namespace xray::render::framegraph {
     class FrameGraph;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Lambda-based ImGui pass setup
 // Renders ImGui interface on top of final output

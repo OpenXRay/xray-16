@@ -156,6 +156,12 @@ void CTexture::Preload()
 {
     m_bumpmap = RImplementation.Resources->m_textures_description.GetBumpName(cName);
     m_material = RImplementation.Resources->m_textures_description.GetMaterial(cName);
+
+    // Load PBR texture names
+    m_metallic = RImplementation.Resources->m_textures_description.GetMetallicName(cName);
+    m_roughness = RImplementation.Resources->m_textures_description.GetRoughnessName(cName);
+    m_ao = RImplementation.Resources->m_textures_description.GetAOName(cName);
+    m_parallax = RImplementation.Resources->m_textures_description.GetParallaxName(cName);
 }
 
 void CTexture::Load()

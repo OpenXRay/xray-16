@@ -21,7 +21,7 @@ namespace xray::render::RENDER_NAMESPACE
     extern float r__dtex_range;
 }
 
-namespace xray::render::passes {
+namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Forward declaration of depth rendering function
 void renderDepthOnlyGeometry(
@@ -53,7 +53,7 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
     };
 
     auto& passData = fg.addCallbackPass<DepthPrepassData>(
-        "DepthPrepass",
+        "Depth Prepass (Early-Z)",
 
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
@@ -195,14 +195,16 @@ void renderDepthOnlyGeometry(
     // This is the key optimization: minimal pixel shader work
 
     ng::RenderPassDesc passDesc;
+    passDesc.passName = "Depth Prepass (Early-Z)";
     passDesc.numRenderTargets = 0;           // NO color output!
     passDesc.depthStencil = depthRT;
 
     // Clear depth to far plane (1.0)
     passDesc.clearValue.depth = 1.0f;
-    passDesc.clearValue.stencil = 0;
     passDesc.clearDepth = true;
-    passDesc.clearStencil = true;
+
+    // D32 format has NO stencil channel - don't try to clear it!
+    passDesc.clearStencil = false;
 
     // Begin render pass
     ctx->BeginRenderPass(passDesc);
@@ -381,4 +383,4 @@ void renderDepthOnlyGeometry(
     ctx->EndRenderPass();
 }
 
-} // namespace xray::render::passes
+} // namespace xray::render::RENDER_NAMESPACE::passes

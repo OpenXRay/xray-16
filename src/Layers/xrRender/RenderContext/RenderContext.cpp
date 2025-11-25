@@ -65,8 +65,8 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
         return;
     }
 
-    // Begin render pass in command list
-    m_commandList->beginMarker("RenderPass");  // Debug marker
+    // Begin debug marker with pass-specific name
+    m_commandList->beginMarker(desc.passName);
 
     // Initialize current graphics state with framebuffer
     m_currentState = nvrhi::GraphicsState();
@@ -108,7 +108,8 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
 void RenderContext::EndRenderPass() {
     VERIFY2(m_inRenderPass, "Not in render pass!");
 
-    m_commandList->endMarker();  // End debug marker
+    // End debug marker
+    m_commandList->endMarker();
 
     // Clear temporary binding sets (release references)
     m_tempBindingSets.clear();

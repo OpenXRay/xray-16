@@ -182,12 +182,19 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     xr_string sourceCode;
     sourceCode.assign((const char*)fs->pointer(), fs->length());
 
+    // Build full shader path for include resolution (like CompileShaderWithDefines does)
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath,
+        GEnv.Render->getShaderPath(),  // "shaders/r5/"
+        name,
+        ".vs");
+
     auto compileResult = m_slangCompiler->CompileFromSource(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Vertex,
         xray::render::SlangCompiler::Target::DXBC,
-        name
+        fullPath  // Full path allows VFS to resolve relative includes
     );
 
     fs->close();
@@ -290,12 +297,19 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     xr_string sourceCode;
     sourceCode.assign((const char*)fs->pointer(), fs->length());
 
+    // Build full shader path for include resolution (like CompileShaderWithDefines does)
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath,
+        GEnv.Render->getShaderPath(),  // "shaders/r5/"
+        name,
+        ".ps");
+
     auto compileResult = m_slangCompiler->CompileFromSource(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Pixel,
         xray::render::SlangCompiler::Target::DXBC,
-        name
+        fullPath  // Full path allows VFS to resolve relative includes
     );
 
     fs->close();
