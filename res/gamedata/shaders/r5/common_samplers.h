@@ -41,6 +41,27 @@ Texture2D 	s_dn_g;                	//
 Texture2D 	s_dn_b;                	//
 Texture2D 	s_dn_a;                	//
 
+// Terrain PBR textures (per detail layer)
+Texture2D 	s_parallax_r;
+Texture2D 	s_parallax_g;
+Texture2D 	s_parallax_b;
+Texture2D 	s_parallax_a;
+
+Texture2D 	s_metallic_r;
+Texture2D 	s_metallic_g;
+Texture2D 	s_metallic_b;
+Texture2D 	s_metallic_a;
+
+Texture2D 	s_roughness_r;
+Texture2D 	s_roughness_g;
+Texture2D 	s_roughness_b;
+Texture2D 	s_roughness_a;
+
+Texture2D 	s_ao_r;
+Texture2D 	s_ao_g;
+Texture2D 	s_ao_b;
+Texture2D 	s_ao_a;
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // Lighting/shadowing phase                     //
 

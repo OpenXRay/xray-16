@@ -49,6 +49,25 @@ f_forward 	main	( p_flat I 		)
 	 float3	N		= 	mul     	(float3x3(I.M1, I.M2, I.M3), mix.xyz);
 
 	 	 	G 		= 	g_R+g_G+g_B+g_A;
+
+	 // Sample terrain PBR textures and blend by mask
+	 float metal_R = s_metallic_r.Sample(smp_base, I.tcdbump).r * mask.r;
+	 float metal_G = s_metallic_g.Sample(smp_base, I.tcdbump).r * mask.g;
+	 float metal_B = s_metallic_b.Sample(smp_base, I.tcdbump).r * mask.b;
+	 float metal_A = s_metallic_a.Sample(smp_base, I.tcdbump).r * mask.a;
+	 float terrain_metallic = metal_R + metal_G + metal_B + metal_A;
+
+	 float rough_R = s_roughness_r.Sample(smp_base, I.tcdbump).r * mask.r;
+	 float rough_G = s_roughness_g.Sample(smp_base, I.tcdbump).r * mask.g;
+	 float rough_B = s_roughness_b.Sample(smp_base, I.tcdbump).r * mask.b;
+	 float rough_A = s_roughness_a.Sample(smp_base, I.tcdbump).r * mask.a;
+	 float terrain_roughness = rough_R + rough_G + rough_B + rough_A;
+
+	 float ao_R = s_ao_r.Sample(smp_base, I.tcdbump).r * mask.r;
+	 float ao_G = s_ao_g.Sample(smp_base, I.tcdbump).r * mask.g;
+	 float ao_B = s_ao_b.Sample(smp_base, I.tcdbump).r * mask.b;
+	 float ao_A = s_ao_a.Sample(smp_base, I.tcdbump).r * mask.a;
+	 float terrain_ao = ao_R + ao_G + ao_B + ao_A;
   # else
 	float3	N 	= I.N.xyz	;
   # endif
@@ -71,9 +90,16 @@ f_forward 	main	( p_flat I 		)
 
 	// Extract material properties from PBR textures
 	float3 albedo = D.rgb;
+#ifdef USE_4_BUMP
+	// Use blended terrain PBR values
+	float roughness = terrain_roughness;
+	float metallic = terrain_metallic;
+	float ao = terrain_ao;
+#else
 	float roughness = s_roughness.Sample(smp_base, I.tcdh).r;
 	float metallic = s_metallic.Sample(smp_base, I.tcdh).r;
 	float ao = s_ao.Sample(smp_base, I.tcdh).r;
+#endif
 
 	// Get hemisphere occlusion
 #ifdef USE_LM_HEMI
