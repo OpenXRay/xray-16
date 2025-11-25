@@ -1,7 +1,3 @@
-#if ( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1) ) 
-#define EXTEND_F_DEFFER
-#endif
-
 #include "common.h"
 #include "sload.h"
 
@@ -16,91 +12,26 @@ float4 	main	( p_flat I ) : SV_Target
 
 #else	//	ATOC
 
-#ifdef	MSAA_ALPHATEST_DX10_1_ATOC
-f_deffer 	main	( p_flat I, float4 pos2d : SV_Position )
-#else	//	MSAA_ALPHATEST_DX10_1_ATOC
-f_deffer 	main	( p_flat I )
-#endif	//	MSAA_ALPHATEST_DX10_1_ATOC
+f_forward 	main	( p_flat I )
 {
-  f_deffer	O;
-
-  // 1. Base texture + kill pixels with low alpha
-  
-#if !defined(MSAA_ALPHATEST_DX10_1)
-
+  // Base texture + alpha test
   float4 D 	= tbase	 	(I.tcdh);
-
-#if	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_0_ATOC) )
-	clip					(D.w-def_aref);
-#endif	//	!( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1_ATOC) )
-#ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
-	float alpha = (D.w-def_aref*0.5f)/(1-def_aref*0.5f);
-	uint mask = alpha_to_coverage ( alpha, pos2d.xy );
-#endif	//	MSAA_ALPHATEST_DX10_1_ATOC
-
-#else
-  uint mask = 0x0;
-  float2 ddx_base = ddx( I.tcdh );
-  float2 ddy_base = ddy( I.tcdh );
-
-  float2 pixeloffset = MSAAOffsets[0]*(1.0/16.0);
-  
-  float2 texeloffset =  pixeloffset.x * ddx_base + pixeloffset.y * ddy_base;
-      	
-  float4 D 	= tbase(I.tcdh+texeloffset);
-	
-  if( D.w-def_aref >= 0 ) mask |= 0x1;
-	
-  [unroll] for( int i = 1; i < MSAA_SAMPLES; ++i )
-  {
-	pixeloffset = MSAAOffsets[i]*(1.0/16.0);
-	texeloffset =  pixeloffset.x * ddx_base + pixeloffset.y * ddy_base;
-	float4 DI 	= tbase(I.tcdh+texeloffset);
-	if( DI.w-def_aref >= 0 ) mask |= ( uint(0x1) << i );
-  }
-	
-  if( mask == 0x0 )
-	discard;
-#endif
+  clip(D.w - def_aref);
 
 #ifdef	USE_TDETAIL
-//	D.rgb	= 2*D.rgb*tex2D	(s_detail, I.tcdbump).rgb;
 	D.rgb	= 2*D.rgb * s_detail.Sample( smp_base, I.tcdbump ).rgb;
 #endif
 
-	// hemi,sun,material
-	float 	ms	= xmaterial		;
-#ifdef USE_LM_HEMI
-//	float4	lm 	= tex2D			(s_hemi, I.lmh);
-	float4	lm 	= s_hemi.Sample( smp_rtlinear, I.lmh);
-//	float 	h  	= dot			(lm.rgb,1.f/3.f);
-	float 	h  	= get_hemi(lm);
-# ifdef USE_R2_STATIC_SUN
-//		 	ms 	= lm.w			;
-			ms 	= get_sun(lm);
-# endif
-#else
-	float 	h	= I.position.w	;
-# ifdef USE_R2_STATIC_SUN
-		 	ms	= I.tcdh.w		;
-# endif
-#endif
+  // Normalized vertex normal
+  float3 Ne = normalize((float3)I.N.xyz);
 
-  // 2. Standart output
-  float4 Ne     = float4	(normalize((float3)I.N.xyz), 					h			);
-#if !( defined(MSAA_ALPHATEST_DX10_1_ATOC) || defined(MSAA_ALPHATEST_DX10_1) )
-  O				= pack_gbuffer(
-  								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f	, 	ms			),
-								float4	(D.rgb,											def_gloss	) );
-#else
-  O				= pack_gbuffer(
-  								Ne,
-								float4 	(I.position.xyz + Ne.xyz*def_virtualh/2.f	, 	ms			),
-								float4	(D.rgb,											def_gloss	),
-								mask );
-#endif
-  return O;
+  // Extract material properties
+  float3 albedo = D.rgb;
+  float roughness = 1.0 - def_gloss;  // Convert gloss to roughness
+  float metallic = 0.0;  // TODO: Sample from PBR material texture in Phase 3.1
+
+  // Forward+ output (Phase 3.0: unlit albedo)
+  return output_forward_color(albedo, Ne, metallic, roughness);
 }
 
 #endif	//	ATOC

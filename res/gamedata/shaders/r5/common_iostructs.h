@@ -300,27 +300,11 @@ struct	v_static_color
 };
 
 ////////////////////////////////////////////////////////////////
-//	defer
-#ifndef GBUFFER_OPTIMIZATION
-struct                  f_deffer
+//	Forward+ output (single RT)
+struct f_forward
 {
-    float4	position : SV_Target0;        // px,py,pz, m-id
-    float4	Ne : SV_Target1;        // nx,ny,nz, hemi
-    float4	C : SV_Target2;        // r, g, b,  gloss
-#ifdef EXTEND_F_DEFFER
-    uint     mask : SV_COVERAGE;
-#endif
+    float4	color : SV_Target0;        // Final HDR color output (RGBA16_FLOAT)
 };
-#else
-struct                  f_deffer
-{
-    float4	position : SV_Target0;        // xy=encoded normal, z = pz, w = encoded(m-id,hemi)
-    float4	C : SV_Target1;        // r, g, b,  gloss
-#ifdef EXTEND_F_DEFFER
-    uint     mask : SV_COVERAGE;
-#endif
-};
-#endif
 
 struct					gbuffer_data
 {
