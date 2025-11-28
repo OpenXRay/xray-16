@@ -802,9 +802,6 @@
     <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPassSetup.h">
-      <Filter>Framegraph\Passes</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1563,9 +1560,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp">
       <Filter>Framegraph</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPassSetup.cpp">
-      <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>

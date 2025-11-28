@@ -138,7 +138,6 @@
     <ClInclude Include="..\xrRender\dxImGuiRender.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h" />
-    <ClInclude Include="..\xrRender\FrameGraphPasses\GBufferPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.h" />
@@ -360,7 +359,6 @@
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp" />
-    <ClCompile Include="..\xrRender\FrameGraphPasses\GBufferPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp" />
