@@ -248,6 +248,44 @@ static FileLocation MakeFileLocation(
 // Scans filesystem for diffuse textures (_d.dds) and finds
 // matching specular/gloss/normal textures
 
+// ══════════════════════════════════════════════════════════
+//  FOLDER BLACKLIST - Skip folders with special texture semantics
+// ══════════════════════════════════════════════════════════
+// These folders contain textures where RGBA channels have special meanings
+// (e.g., terrain masks use RGBA for 4-layer blending) and should NOT be
+// processed by the PBR converter which may corrupt alpha channels.
+
+static const char* const FOLDER_BLACKLIST[] = {
+    "terrain",      // Terrain masks use RGBA for 4-layer detail blending
+    "levels",       // Level-specific textures (lightmaps, terrain, etc.)
+    "lmap",         // Lightmaps
+    "detail",       // Detail textures (terrain detail layers)
+    "sky",          // Sky textures
+    "water",        // Water textures (special effects)
+    "wm",           // World model textures (may have special formats)
+    "ui",           // UI textures
+    "hud",          // HUD textures
+    "grad"
+};
+
+static bool IsInBlacklistedFolder(const xr_string& path) {
+    for (const char* folder : FOLDER_BLACKLIST) {
+        // Check if path starts with "folder\" or "folder/"
+        xr_string prefix1 = xr_string(folder) + "\\";
+        xr_string prefix2 = xr_string(folder) + "/";
+        if (path.find(prefix1) == 0 || path.find(prefix2) == 0) {
+            return true;
+        }
+        // Also check if folder appears anywhere in path (subfolder)
+        xr_string infix1 = xr_string("\\") + folder + "\\";
+        xr_string infix2 = xr_string("/") + folder + "/";
+        if (path.find(infix1) != xr_string::npos || path.find(infix2) != xr_string::npos) {
+            return true;
+        }
+    }
+    return false;
+}
+
 TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
     TextureInventory inventory;
 
@@ -271,6 +309,11 @@ TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
             // Skip special shader test textures (start with $)
             if (!file_name.empty() && file_name[0] == '$') {
                 continue;  // Skip shader test textures like $alphadxt1, $shadertest, etc.
+            }
+
+            // Skip blacklisted folders (terrain, levels, etc.)
+            if (IsInBlacklistedFolder(file_name)) {
+                continue;  // Skip textures in folders with special RGBA semantics
             }
 
             // Skip files that are clearly NOT base textures
@@ -497,7 +540,7 @@ bool VerifyPBROutputs(
 // - Fallbacks: metallic=0.0 (non-metallic), roughness=0.5 (mid-range)
 
 struct ConvertedPBRTextures {
-    xr_vector<u8> albedoData;     // RGB (3 channels)
+    xr_vector<u8> albedoData;     // RGBA (4 channels) - preserves original alpha!
     xr_vector<u8> metallicData;   // Single-channel (R8)
     xr_vector<u8> roughnessData;  // Single-channel (R8)
     xr_vector<u8> aoData;         // Single-channel (R8)
@@ -680,11 +723,31 @@ static ConvertedPBRTextures ConvertWithAI(
     // Matching Python processing:
     // - Albedo: NO sigmoid (model has built-in nn.Sigmoid())
     // - All others: YES sigmoid (raw logits from model)
-    result.albedoData = outputs.albedo.ToImageData(false);      // RGB basecolor (NO sigmoid)
+    xr_vector<u8> aiAlbedoRGB = outputs.albedo.ToImageData(false);  // RGB basecolor (NO sigmoid)
     result.metallicData = outputs.metallic.ToImageData(true);   // R8 (sigmoid)
     result.roughnessData = outputs.roughness.ToImageData(true); // R8 (sigmoid)
     result.aoData = outputs.ao.ToImageData(true);               // R8 (sigmoid)
     result.parallaxData = outputs.parallax.ToImageData(true);   // R8 height map (sigmoid)
+
+    // ═══════════════════════════════════════════════════════
+    //  PRESERVE ORIGINAL ALPHA CHANNEL
+    // ═══════════════════════════════════════════════════════
+    // Combine AI-generated RGB albedo with original diffuse alpha.
+    // This is critical for textures where alpha has special meaning:
+    // - Terrain masks: RGBA channels control 4-layer blending
+    // - Transparent textures: alpha controls opacity
+    // - Specular in alpha: some workflows store spec/gloss in alpha
+    const u32 pixelCount = result.width * result.height;
+    result.albedoData.resize(pixelCount * 4);  // RGBA
+
+    for (u32 i = 0; i < pixelCount; ++i) {
+        // RGB from AI model
+        result.albedoData[i * 4 + 0] = aiAlbedoRGB[i * 3 + 0];  // R
+        result.albedoData[i * 4 + 1] = aiAlbedoRGB[i * 3 + 1];  // G
+        result.albedoData[i * 4 + 2] = aiAlbedoRGB[i * 3 + 2];  // B
+        // Alpha from ORIGINAL diffuse texture (diffuseRGB is actually RGBA from DecompressDDS)
+        result.albedoData[i * 4 + 3] = diffuseRGB[i * 4 + 3];   // A - preserved!
+    }
 
     result.success = true;
     return result;
@@ -725,10 +788,10 @@ static xr_vector<u8> GenerateMipLevel(const u8* srcData, u32 srcWidth, u32 srcHe
     return dstData;
 }
 
-static bool WriteRGBDDS(
+static bool WriteRGBADDS(
     const char* root_alias,
     const xr_string& relative_path,
-    const u8* rgbData,
+    const u8* rgbaData,
     u32 width,
     u32 height,
     bool generateMipmaps)
@@ -784,22 +847,13 @@ static bool WriteRGBDDS(
     writer->w(&magic, sizeof(magic));
     writer->w(&header, sizeof(header));
 
-    // Convert RGB → RGBA (match header bit masks)
+    // Write mip 0 - data is already RGBA with preserved alpha!
     const u32 pixelCount = width * height;
-    xr_vector<u8> rgbaData(pixelCount * 4);
-    for (u32 i = 0; i < pixelCount; ++i) {
-        rgbaData[i * 4 + 0] = rgbData[i * 3 + 0];  // R
-        rgbaData[i * 4 + 1] = rgbData[i * 3 + 1];  // G
-        rgbaData[i * 4 + 2] = rgbData[i * 3 + 2];  // B
-        rgbaData[i * 4 + 3] = 255;                 // A
-    }
-
-    // Write mip 0
-    writer->w(rgbaData.data(), pixelCount * 4);
+    writer->w(rgbaData, pixelCount * 4);
 
     // Generate and write mipmaps
     if (generateMipmaps) {
-        xr_vector<u8> currentMip = rgbaData;
+        xr_vector<u8> currentMip(rgbaData, rgbaData + pixelCount * 4);
         u32 mipWidth = width;
         u32 mipHeight = height;
 
@@ -1276,11 +1330,11 @@ bool ConvertTexturesToPBR(
             //  WRITE OUTPUT TEXTURES
             // ═══════════════════════════════════════════════════════
 
-            // Write albedo (RGB basecolor) - replaces original diffuse
+            // Write albedo (RGBA - RGB from AI, Alpha preserved from original!)
             if (!converted.albedoData.empty()) {
-                if (!WriteRGBDDS(params.output_root.c_str(), albedo_path,
-                                 converted.albedoData.data(),
-                                 converted.width, converted.height, params.generate_mipmaps)) {
+                if (!WriteRGBADDS(params.output_root.c_str(), albedo_path,
+                                  converted.albedoData.data(),
+                                  converted.width, converted.height, params.generate_mipmaps)) {
                     Msg("! [PBRTextureConverter] Failed to write albedo: %s/%s",
                         params.output_root.c_str(), albedo_path.c_str());
                     failed_count++;
