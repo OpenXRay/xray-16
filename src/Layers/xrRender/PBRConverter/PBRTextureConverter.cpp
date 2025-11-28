@@ -195,6 +195,35 @@ static FileLocation MakeFileLocation(
     return loc;
 }
 
+static const char* const FOLDER_BLACKLIST[] = {
+    "terrain",
+    "levels",
+    "lmap",
+    "detail",
+    "sky",
+    "water",
+    "wm",
+    "ui",
+    "hud",
+    "grad"
+};
+
+static bool IsInBlacklistedFolder(const xr_string& path) {
+    for (const char* folder : FOLDER_BLACKLIST) {
+        xr_string prefix1 = xr_string(folder) + "\\";
+        xr_string prefix2 = xr_string(folder) + "/";
+        if (path.find(prefix1) == 0 || path.find(prefix2) == 0) {
+            return true;
+        }
+        xr_string infix1 = xr_string("\\") + folder + "\\";
+        xr_string infix2 = xr_string("/") + folder + "/";
+        if (path.find(infix1) != xr_string::npos || path.find(infix2) != xr_string::npos) {
+            return true;
+        }
+    }
+    return false;
+}
+
 TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
     TextureInventory inventory;
 
@@ -210,6 +239,10 @@ TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
             const xr_string file_name = file.name.c_str();
 
             if (!file_name.empty() && file_name[0] == '$') {
+                continue;
+            }
+
+            if (IsInBlacklistedFolder(file_name)) {
                 continue;
             }
 
@@ -539,11 +572,21 @@ static ConvertedPBRTextures ConvertWithAI(
         return result;
     }
 
-    result.albedoData = outputs.albedo.ToImageData(false);
+    xr_vector<u8> aiAlbedoRGB = outputs.albedo.ToImageData(false);
     result.metallicData = outputs.metallic.ToImageData(true);
     result.roughnessData = outputs.roughness.ToImageData(true);
     result.aoData = outputs.ao.ToImageData(true);
     result.parallaxData = outputs.parallax.ToImageData(true);
+
+    const u32 pixelCount = result.width * result.height;
+    result.albedoData.resize(pixelCount * 4);
+
+    for (u32 i = 0; i < pixelCount; ++i) {
+        result.albedoData[i * 4 + 0] = aiAlbedoRGB[i * 3 + 0];
+        result.albedoData[i * 4 + 1] = aiAlbedoRGB[i * 3 + 1];
+        result.albedoData[i * 4 + 2] = aiAlbedoRGB[i * 3 + 2];
+        result.albedoData[i * 4 + 3] = diffuseRGB[i * 4 + 3];
+    }
 
     result.success = true;
     return result;
@@ -577,10 +620,10 @@ static xr_vector<u8> GenerateMipLevel(const u8* srcData, u32 srcWidth, u32 srcHe
     return dstData;
 }
 
-static bool WriteRGBDDS(
+static bool WriteRGBADDS(
     const char* root_alias,
     const xr_string& relative_path,
-    const u8* rgbData,
+    const u8* rgbaData,
     u32 width,
     u32 height,
     bool generateMipmaps)
@@ -633,18 +676,10 @@ static bool WriteRGBDDS(
     writer->w(&header, sizeof(header));
 
     const u32 pixelCount = width * height;
-    xr_vector<u8> rgbaData(pixelCount * 4);
-    for (u32 i = 0; i < pixelCount; ++i) {
-        rgbaData[i * 4 + 0] = rgbData[i * 3 + 0];
-        rgbaData[i * 4 + 1] = rgbData[i * 3 + 1];
-        rgbaData[i * 4 + 2] = rgbData[i * 3 + 2];
-        rgbaData[i * 4 + 3] = 255;
-    }
-
-    writer->w(rgbaData.data(), pixelCount * 4);
+    writer->w(rgbaData, pixelCount * 4);
 
     if (generateMipmaps) {
-        xr_vector<u8> currentMip = rgbaData;
+        xr_vector<u8> currentMip(rgbaData, rgbaData + pixelCount * 4);
         u32 mipWidth = width;
         u32 mipHeight = height;
 
@@ -1042,9 +1077,9 @@ bool ConvertTexturesToPBR(
             }
 
             if (!converted.albedoData.empty()) {
-                if (!WriteRGBDDS(params.output_root.c_str(), albedo_path,
-                                 converted.albedoData.data(),
-                                 converted.width, converted.height, params.generate_mipmaps)) {
+                if (!WriteRGBADDS(params.output_root.c_str(), albedo_path,
+                                  converted.albedoData.data(),
+                                  converted.width, converted.height, params.generate_mipmaps)) {
                     Msg("! [PBRTextureConverter] Failed to write albedo: %s/%s",
                         params.output_root.c_str(), albedo_path.c_str());
                     failed_count++;
