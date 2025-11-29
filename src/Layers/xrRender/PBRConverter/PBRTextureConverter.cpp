@@ -205,7 +205,9 @@ static const char* const FOLDER_BLACKLIST[] = {
     "wm",
     "ui",
     "hud",
-    "grad"
+    "grad",
+    "pfx",
+    "glow"
 };
 
 static bool IsInBlacklistedFolder(const xr_string& path) {

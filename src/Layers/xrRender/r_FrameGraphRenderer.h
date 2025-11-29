@@ -14,6 +14,10 @@ namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
 }
 
+namespace xray::render::RENDER_NAMESPACE::passes {
+    struct ParticleBatch;
+}
+
 namespace xray::render::ng {
     class ImGuiRendererNVRHI;
 }
@@ -121,6 +125,9 @@ private:
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_textVCBPool;
 
     xr_vector<GeometryBatch> m_hudBatches;
+
+    xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_worldParticleBatches;
+    xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_hudParticleBatches;
 
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 

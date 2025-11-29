@@ -25,6 +25,7 @@
 #include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/HUDPassSetup.h"
+#include "FrameGraphPasses/ParticlePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
@@ -265,6 +266,9 @@ void FrameGraphRenderer::SetupFrame() {
 
     m_hudBatches.clear();
 
+    m_worldParticleBatches.clear();
+    m_hudParticleBatches.clear();
+
     if (levelLoaded)
         CollectVisibleGeometry();
 
@@ -326,9 +330,20 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
+    auto particleOutputs = passes::setupParticlePass(
+        *m_framegraph,
+        m_device,
+        hudOutputs,
+        &m_worldParticleBatches,
+        &m_hudParticleBatches,
+        m_materialCache.get(),
+        width,
+        height
+    );
+
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        hudOutputs.albedo,
+        particleOutputs.albedo,
         width,
         height
     );
@@ -717,6 +732,18 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
         RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
             static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
         isHUDParticle = pEffect->GetHudMode();
+    }
+
+    passes::ParticleBatch batch;
+    batch.visual = visual;
+    batch.worldMatrix = worldTransform;
+    batch.renderable = renderable;
+    batch.isHUDMode = isHUDParticle;
+
+    if (isHUDParticle) {
+        m_hudParticleBatches.push_back(batch);
+    } else {
+        m_worldParticleBatches.push_back(batch);
     }
 
     return true;
