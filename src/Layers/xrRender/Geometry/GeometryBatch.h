@@ -3,6 +3,8 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For RenderPhase
+#include "Layers/xrRender/Shader.h"  // For ShaderElement flags
+#include "Layers/xrRender/FBasicVisual.h"  // For dxRender_Visual
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;  // Forward declaration
@@ -60,12 +62,46 @@ struct GeometryBatch {
     dxRender_Visual* visual = nullptr;
     IRenderable* renderable = nullptr; // For skinned meshes
 
-    // Visibility/culling (for front-to-back sorting)
+    // Visibility/culling
     bool isVisible = true;
-    float distanceToCamera = 0.0f;
+
+    // SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
+    // SSA = R / distSQ where R = bounding sphere radius, distSQ = distance squared to camera
+    // Larger SSA = closer/bigger = should render first (front-to-back for opaque)
+    float ssa = 0.0f;
 
     // Debug
     shared_str debugName;
+
+    // ═══════════════════════════════════════════════════
+    //  SHADER FLAG HELPERS
+    // ═══════════════════════════════════════════════════
+    // Uses ShaderElement::Sflags set during blender compilation:
+    //   - bAlphaTest: Alpha-tested (uses clip/discard in shader)
+    //   - bStrictB2F: Requires back-to-front sorting (transparent)
+
+    // Check if batch is alpha-tested (bAlphaTest flag set by blender)
+    bool IsAlphaTested() const {
+        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
+        if (elem) {
+            return elem->flags.bAlphaTest != 0;
+        }
+        return false;
+    }
+
+    // Check if batch requires back-to-front sorting (transparent/alpha-blended)
+    bool IsStrictB2F() const {
+        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
+        if (elem) {
+            return elem->flags.bStrictB2F != 0;
+        }
+        return false;
+    }
+
+    // Check if batch is opaque (no alpha-test and no strict B2F)
+    bool IsOpaque() const {
+        return !IsAlphaTested() && !IsStrictB2F();
+    }
 };
 
 // ══════════════════════════════════════════════════════════

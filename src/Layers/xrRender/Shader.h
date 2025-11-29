@@ -124,6 +124,7 @@ struct ECORE_API ShaderElement : public xr_resource_flagged
         u32 bEmissive : 1;
         u32 bDistort : 1;
         u32 bWmark : 1;
+        u32 bAlphaTest : 1;  // Set by blender when alpha testing is enabled (for depth prepass filtering)
     };
 
     Sflags flags;

@@ -51,6 +51,34 @@ public:
     BOOL equal(SimulatorStates& S);
     void clear();
     void record(ID3DState*& state);
+
+    // Query render state value (returns false if not found)
+    bool get_RS(u32 rsType, u32& outValue) const
+    {
+        for (const auto& S : States)
+        {
+            if (S.type == 0 && S.v1 == rsType)
+            {
+                outValue = S.v2;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check if alpha testing is enabled
+    bool IsAlphaTestEnabled() const
+    {
+        u32 val = 0;
+        return get_RS(D3DRS_ALPHATESTENABLE, val) && val != 0;
+    }
+
+    // Check if alpha blending is enabled (non-opaque)
+    bool IsAlphaBlendEnabled() const
+    {
+        u32 val = 0;
+        return get_RS(D3DRS_ALPHABLENDENABLE, val) && val != 0;
+    }
 #if defined(USE_DX11)
     void UpdateState(dx11State& state) const;
     void UpdateDesc(D3D_RASTERIZER_DESC& desc) const;

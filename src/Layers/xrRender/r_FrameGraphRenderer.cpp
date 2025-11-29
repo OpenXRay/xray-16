@@ -838,6 +838,14 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Store renderable (for skeletons - provides bone data)
     batch.renderable = renderable;
 
+    // Calculate SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
+    // SSA = R / distSQ - larger SSA = closer/bigger = render first (front-to-back)
+    Fvector worldCenter;
+    worldTransform.transform_tiny(worldCenter, visual->vis.sphere.P);
+    float distSQ = Device.vCameraPosition.distance_to_sqr(worldCenter) + EPS;
+    float R = visual->vis.sphere.R;
+    batch.ssa = R / distSQ;
+
     // PSO and binding set will be created by MaterialCache in GBufferPass
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;

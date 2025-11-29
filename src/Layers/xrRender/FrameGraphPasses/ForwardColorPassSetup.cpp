@@ -23,6 +23,9 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+// Render phase enum for marker tracking
+enum class RenderPhase { None, Opaque, AlphaTested, Transparent };
+
 // Forward declaration of the rendering function
 void renderForwardGeometry(
     ng::RenderContext* ctx,
@@ -264,15 +267,26 @@ void renderForwardGeometry(
     ctx->SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  RENDER GEOMETRY BATCHES
+    //  RENDER GEOMETRY BATCHES (Pre-sorted by GeometryCollector)
     // ═══════════════════════════════════════════════════════
+    // Batches are sorted using vanilla's SSA (Screen Space Area) logic:
+    //   SSA = R / distSQ (larger = closer/bigger = more visually important)
+    //
+    // Sort order (matches vanilla r__dsgraph):
+    //   1. Priority 0 (Opaque) - SSA descending (front-to-back for early-Z)
+    //   2. Priority 1 (Alpha-tested) - SSA descending (front-to-back)
+    //   3. bStrictB2F (Transparent) - SSA ascending (back-to-front for blending)
+    //
+    // This ensures opaque geometry fills the depth buffer FIRST,
+    // then alpha-tested geometry renders with correct backgrounds.
 
     u32 numDraws = 0;
     u32 numTriangles = 0;
 
     ng::PipelineState* currentPipeline = nullptr;
 
-    for (const auto& batch : batches) {
+    // Helper lambda to render a single batch (returns true if rendered, false if skipped)
+    auto renderBatch = [&](const GeometryBatch& batch) -> bool {
         // Get per-material PSO from MaterialCache
         ng::PipelineState* pipelineToUse = nullptr;
         MaterialPSO* matPSO = nullptr;
@@ -286,7 +300,7 @@ void renderForwardGeometry(
         }
 
         if (!pipelineToUse) {
-            continue;  // Skip batches without valid PSO
+            return false;  // Skip batches without valid PSO
         }
 
         // Bind pipeline if changed
@@ -411,7 +425,7 @@ void renderForwardGeometry(
         nvrhi::IBuffer* ib = batch.indexBuffer.Get();
 
         if (!vb || !ib) {
-            continue;  // Skip batches with null buffers
+            return false;  // Skip batches with null buffers
         }
 
         ctx->SetVertexBuffer(0, vb, 0);
@@ -422,6 +436,66 @@ void renderForwardGeometry(
 
         numDraws++;
         numTriangles += batch.indexCount / 3;
+        return true;
+    };
+
+    // ═══════════════════════════════════════════════════════
+    //  RENDER ALL BATCHES WITH PHASE MARKERS
+    // ═══════════════════════════════════════════════════════
+    // GeometryCollector::Sort() ensures proper render order:
+    //   1. Priority 0 (opaque) - SSA descending (front-to-back)
+    //   2. Priority 1 (alpha-tested) - SSA descending (front-to-back)
+    //   3. bStrictB2F (transparent) - SSA ascending (back-to-front)
+    //
+    // We track phase transitions to insert debug markers for RenderDoc.
+
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    RenderPhase currentPhase = RenderPhase::None;
+
+    for (const auto& batch : batches) {
+        // Determine batch's render phase based on shader flags:
+        // - iPriority == 0: Opaque (default)
+        // - iPriority == 1: Alpha-tested (set by blender_deffer_aref.cpp)
+        // - bStrictB2F: Transparent (back-to-front sorting required)
+        RenderPhase batchPhase;
+        if (batch.IsStrictB2F()) {
+            batchPhase = RenderPhase::Transparent;
+        } else if (batch.IsAlphaTested()) {
+            batchPhase = RenderPhase::AlphaTested;
+        } else {
+            batchPhase = RenderPhase::Opaque;
+        }
+
+        // Insert markers on phase transition
+        if (batchPhase != currentPhase) {
+            // End previous marker (if any)
+            if (currentPhase != RenderPhase::None) {
+                cmdList->endMarker();
+            }
+
+            // Begin new phase marker
+            switch (batchPhase) {
+                case RenderPhase::Opaque:
+                    cmdList->beginMarker("Forward Opaque (Priority 0)");
+                    break;
+                case RenderPhase::AlphaTested:
+                    cmdList->beginMarker("Forward Alpha-Tested (Priority 1)");
+                    break;
+                case RenderPhase::Transparent:
+                    cmdList->beginMarker("Forward Transparent (bStrictB2F)");
+                    break;
+                default:
+                    break;
+            }
+            currentPhase = batchPhase;
+        }
+
+        renderBatch(batch);
+    }
+
+    // End final marker
+    if (currentPhase != RenderPhase::None) {
+        cmdList->endMarker();
     }
 
     // End render pass

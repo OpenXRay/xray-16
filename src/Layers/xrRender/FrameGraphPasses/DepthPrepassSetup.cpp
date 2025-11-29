@@ -123,12 +123,22 @@ void renderDepthOnlyGeometry(
     ctx->SetScissor(scissor);
 
     // ═══════════════════════════════════════════════════════
-    //  RENDER GEOMETRY BATCHES (Depth-only)
+    //  RENDER GEOMETRY BATCHES (Depth-only, OPAQUE ONLY)
     // ═══════════════════════════════════════════════════════
+    // Depth prepass only renders opaque geometry (iPriority == 0):
+    //   - Skip alpha-tested (iPriority == 1) - they use clip() which creates holes
+    //   - Skip transparent (bStrictB2F) - they don't write depth
+    //
+    // Alpha-tested geometry will write depth during the color pass.
 
     ng::PipelineState* currentPipeline = nullptr;
 
     for (const auto& batch : batches) {
+        // Skip non-opaque geometry (alpha-tested and transparent)
+        if (!batch.IsOpaque()) {
+            continue;
+        }
+
         // Get per-material PSO from MaterialCache
         ng::PipelineState* pipelineToUse = nullptr;
         MaterialPSO* matPSO = nullptr;

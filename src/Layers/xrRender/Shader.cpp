@@ -86,11 +86,12 @@ bool SPass::equal(const SPass& other) const
 //
 ShaderElement::ShaderElement()
 {
-    flags.iPriority = 1;
+    flags.iPriority = 0;
     flags.bStrictB2F = FALSE;
     flags.bEmissive = FALSE;
     flags.bDistort = FALSE;
     flags.bWmark = FALSE;
+    flags.bAlphaTest = FALSE;
 }
 
 BOOL ShaderElement::equal(ShaderElement& S)
@@ -104,6 +105,8 @@ BOOL ShaderElement::equal(ShaderElement& S)
     if (flags.bWmark != S.flags.bWmark)
         return FALSE;
     if (flags.bDistort != S.flags.bDistort)
+        return FALSE;
+    if (flags.bAlphaTest != S.flags.bAlphaTest)
         return FALSE;
     if (passes.size() != S.passes.size())
         return FALSE;

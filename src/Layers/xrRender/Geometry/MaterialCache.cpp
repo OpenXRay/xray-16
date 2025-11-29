@@ -677,10 +677,14 @@ MaterialPSO* MaterialCache::CreatePSO(
     // Override depth state based on pass type
     switch (passType) {
     case RenderPassType::ForwardColor:
-        // Early-Z optimization: depth already written by prepass
+        // Forward pass with depth prepass optimization:
+        // - Use LessEqual (not Equal) so alpha-tested geometry can pass
+        // - Enable depth write so alpha-tested geometry can write depth for clip() holes
+        // - Opaque geometry benefits from early-Z since prepass filled depth buffer
+        // - Alpha-tested geometry wasn't in prepass, needs LessEqual to render
         psoDesc.depthStencilState.depthTestEnable = true;
-        psoDesc.depthStencilState.depthWriteEnable = false;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 
