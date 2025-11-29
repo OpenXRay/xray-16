@@ -265,7 +265,9 @@ static const char* const FOLDER_BLACKLIST[] = {
     "wm",           // World model textures (may have special formats)
     "ui",           // UI textures
     "hud",          // HUD textures
-    "grad"
+    "grad",
+    "pfx",
+    "glow"
 };
 
 static bool IsInBlacklistedFolder(const xr_string& path) {

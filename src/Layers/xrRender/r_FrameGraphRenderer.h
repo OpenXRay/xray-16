@@ -16,6 +16,10 @@ namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
 }
 
+namespace xray::render::RENDER_NAMESPACE::passes {
+    struct ParticleBatch;
+}
+
 namespace xray::render::ng {
     class ImGuiRendererNVRHI;
 }
@@ -167,8 +171,8 @@ private:
     xr_vector<GeometryBatch> m_hudBatches;
 
     // Particle systems (collected during same spatial query as geometry)
-    //xr_vector<passes::ParticleBatch> m_worldParticleBatches;  // World-space particles
-    //xr_vector<passes::ParticleBatch> m_hudParticleBatches;    // HUD particles (need FOV adjustment)
+    xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_worldParticleBatches;  // World-space particles
+    xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_hudParticleBatches;    // HUD particles (need FOV adjustment)
 
     // RenderContext for execution
     xr_unique_ptr<ng::RenderContext> m_renderContext;

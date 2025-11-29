@@ -27,6 +27,7 @@
 #include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/HUDPassSetup.h"
+#include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/ImGuiPassSetup.h"
@@ -436,9 +437,9 @@ void FrameGraphRenderer::SetupFrame() {
     // Clear HUD batches from previous frame
     m_hudBatches.clear();
 
-    // Clear particle batches from previous frame - yohji TODO: Re-enable when particles are supported
-    //m_worldParticleBatches.clear();
-    //m_hudParticleBatches.clear();
+    // Clear particle batches from previous frame
+    m_worldParticleBatches.clear();
+    m_hudParticleBatches.clear();
 
     // Collect visible geometry (CPU culling for now, GPU later)
     if (levelLoaded)
@@ -533,14 +534,26 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    // Skip lighting/postprocess for now (not implemented)
-    // 3. Would be: Lighting Pass
-    // 4. Would be: Tonemap Pass
+    // 3. Particle Pass - Renders particle effects on top of world + HUD
+    auto particleOutputs = passes::setupParticlePass(
+        *m_framegraph,
+        m_device,
+        hudOutputs,
+        &m_worldParticleBatches,
+        &m_hudParticleBatches,
+        m_materialCache.get(),
+        width,
+        height
+    );
 
-    // 3. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
+    // Skip lighting/postprocess for now (not implemented)
+    // 4. Would be: Lighting Pass
+    // 5. Would be: Tonemap Pass
+
+    // 4. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        hudOutputs.albedo,  // Scene + HUD (HDR)
+        particleOutputs.albedo,  // Scene + HUD + Particles (HDR)
         width,
         height
     );
@@ -1038,19 +1051,19 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
         isHUDParticle = pEffect->GetHudMode();
     }
 
-    //// Create particle batch - yohji TODO: Re-enable when particles are supported
-    //passes::ParticleBatch batch;
-    //batch.visual = visual;
-    //batch.worldMatrix = worldTransform;
-    //batch.renderable = renderable;
-    //batch.isHUDMode = isHUDParticle;
+    // Create particle batch
+    passes::ParticleBatch batch;
+    batch.visual = visual;
+    batch.worldMatrix = worldTransform;
+    batch.renderable = renderable;
+    batch.isHUDMode = isHUDParticle;
 
-    //// Add to appropriate list (world or HUD)
-    //if (isHUDParticle) {
-    //    m_hudParticleBatches.push_back(batch);
-    //} else {
-    //    m_worldParticleBatches.push_back(batch);
-    //}
+    // Add to appropriate list (world or HUD)
+    if (isHUDParticle) {
+        m_hudParticleBatches.push_back(batch);
+    } else {
+        m_worldParticleBatches.push_back(batch);
+    }
 
     return true;
 }
