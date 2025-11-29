@@ -42,9 +42,24 @@ void GeometryCollector::Sort() {
 
     std::sort(m_batches.begin(), m_batches.end(),
         [](const GeometryBatch& a, const GeometryBatch& b) {
-            u64 keyA = ComputeSortKey(a);
-            u64 keyB = ComputeSortKey(b);
-            return keyA < keyB;
+            bool aB2F = a.IsStrictB2F();
+            bool bB2F = b.IsStrictB2F();
+            bool aAref = a.IsAlphaTested();
+            bool bAref = b.IsAlphaTested();
+
+            if (aB2F != bB2F) {
+                return !aB2F;
+            }
+
+            if (aB2F && bB2F) {
+                return a.ssa < b.ssa;
+            }
+
+            if (aAref != bAref) {
+                return !aAref;
+            }
+
+            return a.ssa > b.ssa;
         });
 }
 

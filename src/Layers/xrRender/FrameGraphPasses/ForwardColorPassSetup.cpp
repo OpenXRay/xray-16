@@ -22,6 +22,8 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+enum class RenderPhase { None, Opaque, AlphaTested, Transparent };
+
 void renderForwardGeometry(
     ng::RenderContext* ctx,
     ng::RenderDevice* device,
@@ -206,7 +208,7 @@ void renderForwardGeometry(
 
     ng::PipelineState* currentPipeline = nullptr;
 
-    for (const auto& batch : batches) {
+    auto renderBatch = [&](const GeometryBatch& batch) -> bool {
         ng::PipelineState* pipelineToUse = nullptr;
         MaterialPSO* matPSO = nullptr;
 
@@ -219,7 +221,7 @@ void renderForwardGeometry(
         }
 
         if (!pipelineToUse) {
-            continue;
+            return false;
         }
 
         if (pipelineToUse != currentPipeline) {
@@ -311,7 +313,7 @@ void renderForwardGeometry(
         nvrhi::IBuffer* ib = batch.indexBuffer.Get();
 
         if (!vb || !ib) {
-            continue;
+            return false;
         }
 
         ctx->SetVertexBuffer(0, vb, 0);
@@ -321,6 +323,48 @@ void renderForwardGeometry(
 
         numDraws++;
         numTriangles += batch.indexCount / 3;
+        return true;
+    };
+
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    RenderPhase currentPhase = RenderPhase::None;
+
+    for (const auto& batch : batches) {
+        RenderPhase batchPhase;
+        if (batch.IsStrictB2F()) {
+            batchPhase = RenderPhase::Transparent;
+        } else if (batch.IsAlphaTested()) {
+            batchPhase = RenderPhase::AlphaTested;
+        } else {
+            batchPhase = RenderPhase::Opaque;
+        }
+
+        if (batchPhase != currentPhase) {
+            if (currentPhase != RenderPhase::None) {
+                cmdList->endMarker();
+            }
+
+            switch (batchPhase) {
+                case RenderPhase::Opaque:
+                    cmdList->beginMarker("Forward Opaque (Priority 0)");
+                    break;
+                case RenderPhase::AlphaTested:
+                    cmdList->beginMarker("Forward Alpha-Tested (Priority 1)");
+                    break;
+                case RenderPhase::Transparent:
+                    cmdList->beginMarker("Forward Transparent (bStrictB2F)");
+                    break;
+                default:
+                    break;
+            }
+            currentPhase = batchPhase;
+        }
+
+        renderBatch(batch);
+    }
+
+    if (currentPhase != RenderPhase::None) {
+        cmdList->endMarker();
     }
 
     ctx->EndRenderPass();

@@ -56,6 +56,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     if (_aref)
     {
         xr_strcat(ps, "_aref");
+        C.SH->flags.bAlphaTest = TRUE;
     }
 
     if (!bump)

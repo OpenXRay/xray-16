@@ -102,6 +102,10 @@ void renderDepthOnlyGeometry(
     ng::PipelineState* currentPipeline = nullptr;
 
     for (const auto& batch : batches) {
+        if (!batch.IsOpaque()) {
+            continue;
+        }
+
         ng::PipelineState* pipelineToUse = nullptr;
         MaterialPSO* matPSO = nullptr;
 

@@ -2,6 +2,8 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
+#include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/FBasicVisual.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
@@ -40,9 +42,30 @@ struct GeometryBatch {
     IRenderable* renderable = nullptr;
 
     bool isVisible = true;
-    float distanceToCamera = 0.0f;
+
+    float ssa = 0.0f;
 
     shared_str debugName;
+
+    bool IsAlphaTested() const {
+        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
+        if (elem) {
+            return elem->flags.bAlphaTest != 0;
+        }
+        return false;
+    }
+
+    bool IsStrictB2F() const {
+        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
+        if (elem) {
+            return elem->flags.bStrictB2F != 0;
+        }
+        return false;
+    }
+
+    bool IsOpaque() const {
+        return !IsAlphaTested() && !IsStrictB2F();
+    }
 };
 
 class GeometryCollector {

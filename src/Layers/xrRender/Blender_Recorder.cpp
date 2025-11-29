@@ -253,7 +253,10 @@ void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
     clamp(aRef, 0u, 255u);
     RS.SetRS(D3DRS_ALPHATESTENABLE, BC(bATest));
     if (bATest)
+    {
         RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
+        SH->flags.bAlphaTest = TRUE;
+    }
 }
 
 void CBlender_Compile::PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL bATest, u32 aRef)

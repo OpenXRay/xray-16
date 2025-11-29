@@ -121,6 +121,7 @@ struct ECORE_API ShaderElement : public xr_resource_flagged
         u32 bEmissive : 1;
         u32 bDistort : 1;
         u32 bWmark : 1;
+        u32 bAlphaTest : 1;
     };
 
     Sflags flags;

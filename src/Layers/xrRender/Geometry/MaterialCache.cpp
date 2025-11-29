@@ -504,8 +504,8 @@ MaterialPSO* MaterialCache::CreatePSO(
     switch (passType) {
     case RenderPassType::ForwardColor:
         psoDesc.depthStencilState.depthTestEnable = true;
-        psoDesc.depthStencilState.depthWriteEnable = false;
-        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Equal;
+        psoDesc.depthStencilState.depthWriteEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::LessEqual;
         psoDesc.depthStencilState.stencilEnable = false;
         break;
 

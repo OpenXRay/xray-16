@@ -559,6 +559,12 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     batch.renderable = renderable;
 
+    Fvector worldCenter;
+    worldTransform.transform_tiny(worldCenter, visual->vis.sphere.P);
+    float distSQ = Device.vCameraPosition.distance_to_sqr(worldCenter) + EPS;
+    float R = visual->vis.sphere.R;
+    batch.ssa = R / distSQ;
+
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
