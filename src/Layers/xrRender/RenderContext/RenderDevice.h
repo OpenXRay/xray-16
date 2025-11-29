@@ -202,6 +202,12 @@ public:
 
     nvrhi::FramebufferHandle CreateFramebuffer(const nvrhi::FramebufferDesc& desc);
 
+    nvrhi::ComputePipelineHandle CreateComputePipeline(
+        nvrhi::IShader* computeShader,
+        nvrhi::IBindingLayout* bindingLayout);
+
+    nvrhi::ComputePipelineHandle CreateComputePipeline(const nvrhi::ComputePipelineDesc& desc);
+
     ShaderHandle CreateShader(
         ShaderStage stage,
         const void* bytecode,

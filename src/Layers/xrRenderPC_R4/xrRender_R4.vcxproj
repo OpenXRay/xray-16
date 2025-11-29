@@ -141,6 +141,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\UIPassSetup.h" />
     <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\TonemapPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\UIPassSetup.cpp" />
     <ClCompile Include="..\xrRender\ImGuiRendererNVRHI.cpp" />

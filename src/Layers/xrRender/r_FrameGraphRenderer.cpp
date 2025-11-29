@@ -26,6 +26,7 @@
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"
+#include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
@@ -340,6 +341,19 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         width,
         height
     );
+
+    passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
+    auto exposureOutput = passes::setupExposurePass(
+        *m_framegraph,
+        m_device,
+        particleOutputs.albedo,
+        exposureConfig,
+        Device.fTimeDelta,
+        width,
+        height
+    );
+
+    m_exposureTexture = exposureOutput.exposureTexture;
 
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,

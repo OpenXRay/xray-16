@@ -169,6 +169,14 @@ public:
                              u32 startIndex = 0, int baseVertex = 0,
                              u32 startInstance = 0);
 
+    void SetComputePipeline(nvrhi::IComputePipeline* pipeline);
+
+    void SetComputeBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet);
+
+    void Dispatch(u32 groupsX, u32 groupsY = 1, u32 groupsZ = 1);
+
+    void ClearBufferUint(nvrhi::IBuffer* buffer, u32 value);
+
     void ClearRenderTarget(nvrhi::ITexture* rt, const float color[4]);
     void ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stencil);
 
@@ -179,6 +187,9 @@ public:
         u32 numDrawIndexedCalls = 0;
         u32 numDrawInstancedCalls = 0;
         u32 numDrawIndexedInstancedCalls = 0;
+
+        u32 numDispatchCalls = 0;
+        u32 numComputePipelineChanges = 0;
 
         u32 numPipelineChanges = 0;
         u32 numViewportChanges = 0;
@@ -198,6 +209,8 @@ public:
             numDrawIndexedCalls = 0;
             numDrawInstancedCalls = 0;
             numDrawIndexedInstancedCalls = 0;
+            numDispatchCalls = 0;
+            numComputePipelineChanges = 0;
             numPipelineChanges = 0;
             numViewportChanges = 0;
             numScissorChanges = 0;
@@ -229,6 +242,8 @@ private:
     RenderPassDesc m_currentRenderPass;
     nvrhi::FramebufferHandle m_currentFramebuffer;
     nvrhi::GraphicsState m_currentState;
+
+    nvrhi::ComputeState m_currentComputeState;
 
     xr_vector<nvrhi::BindingSetHandle> m_tempBindingSets;
 

@@ -111,6 +111,8 @@ private:
     framegraph::VirtualResourceHandle m_rt_MenuDistort;
     framegraph::VirtualResourceHandle m_rt_FinalComposite;
 
+    framegraph::VirtualResourceHandle m_exposureTexture;
+
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
