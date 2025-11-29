@@ -608,6 +608,64 @@ void RenderContext::ClearDepthStencil(nvrhi::ITexture* ds, float depth, u8 stenc
 }
 
 // ═══════════════════════════════════════════════════════
+//  COMPUTE SHADER DISPATCH
+// ═══════════════════════════════════════════════════════
+
+void RenderContext::SetComputePipeline(nvrhi::IComputePipeline* pipeline) {
+    VERIFY2(!m_inRenderPass, "Cannot use compute in render pass!");
+    VERIFY(pipeline != nullptr);
+
+    // Check cache - skip if already set
+    if (m_currentComputeState.pipeline == pipeline) {
+        return;
+    }
+
+    m_currentComputeState.pipeline = pipeline;
+    m_stats.numComputePipelineChanges++;
+}
+
+void RenderContext::SetComputeBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet) {
+    VERIFY2(!m_inRenderPass, "Cannot use compute in render pass!");
+    VERIFY(bindingSet != nullptr);
+    VERIFY2(slot < 6, "NVRHI supports up to 6 binding set slots (0-5)");
+
+    // Resize bindings vector if needed and initialize with nullptr
+    while (m_currentComputeState.bindings.size() <= slot) {
+        m_currentComputeState.bindings.push_back(nullptr);
+    }
+
+    m_currentComputeState.bindings[slot] = bindingSet;
+}
+
+void RenderContext::Dispatch(u32 groupsX, u32 groupsY, u32 groupsZ) {
+    VERIFY2(!m_inRenderPass, "Cannot dispatch compute in render pass!");
+    VERIFY(m_currentComputeState.pipeline != nullptr);
+
+    // Apply compute state and dispatch
+    m_commandList->setComputeState(m_currentComputeState);
+    m_commandList->dispatch(groupsX, groupsY, groupsZ);
+
+    m_stats.numDispatchCalls++;
+}
+
+void RenderContext::ClearBufferUint(nvrhi::IBuffer* buffer, u32 value) {
+    VERIFY(buffer != nullptr);
+    VERIFY2(!m_inRenderPass, "Cannot clear buffer in render pass!");
+
+    // NVRHI doesn't have a direct ClearUnorderedAccessViewUint equivalent
+    // We need to use writeBuffer or fall back to DX11 direct call
+    // For now, write zeros manually if value is 0 (common case for histograms)
+    if (value == 0) {
+        const auto& desc = buffer->getDesc();
+        xr_vector<u32> zeros(desc.byteSize / sizeof(u32), 0);
+        m_commandList->writeBuffer(buffer, zeros.data(), desc.byteSize, 0);
+    } else {
+        // For non-zero values, need platform-specific code
+        Msg("! [RenderContext::ClearBufferUint] Non-zero clear not yet implemented");
+    }
+}
+
+// ═══════════════════════════════════════════════════════
 //  TEXTURE OPERATIONS
 // ═══════════════════════════════════════════════════════
 

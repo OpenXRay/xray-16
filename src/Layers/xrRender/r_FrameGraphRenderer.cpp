@@ -28,6 +28,7 @@
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
+#include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/ImGuiPassSetup.h"
@@ -546,9 +547,27 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    // Skip lighting/postprocess for now (not implemented)
-    // 4. Would be: Lighting Pass
-    // 5. Would be: Tonemap Pass
+    // ═══════════════════════════════════════════════════════
+    //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
+    // ═══════════════════════════════════════════════════════
+    // Computes scene exposure using histogram-based analysis.
+    // Outputs 1×1 R32_FLOAT texture for sky and tonemap passes.
+    // Uses temporal adaptation for smooth transitions.
+
+    passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
+    auto exposureOutput = passes::setupExposurePass(
+        *m_framegraph,
+        m_device,
+        particleOutputs.albedo,  // HDR scene color for histogram
+        exposureConfig,
+        Device.fTimeDelta,       // Frame delta for temporal adaptation
+        width,
+        height
+    );
+
+    // Store exposure texture for future sky pass integration
+    // (Sky pass will read exposure via s_tonemap.Load(int3(0,0,0)).x)
+    m_exposureTexture = exposureOutput.exposureTexture;
 
     // 4. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
     auto sceneWithUI = passes::setupUIPass(

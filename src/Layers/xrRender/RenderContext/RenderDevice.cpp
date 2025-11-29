@@ -612,6 +612,33 @@ nvrhi::FramebufferHandle RenderDevice::CreateFramebuffer(const nvrhi::Framebuffe
     return GetNativeDevice()->createFramebuffer(desc);
 }
 
+// ═══════════════════════════════════════════════════
+//  COMPUTE PIPELINE CREATION
+// ═══════════════════════════════════════════════════
+
+nvrhi::ComputePipelineHandle RenderDevice::CreateComputePipeline(
+    nvrhi::IShader* computeShader,
+    nvrhi::IBindingLayout* bindingLayout)
+{
+    VERIFY(m_initialized);
+    VERIFY(computeShader != nullptr);
+
+    nvrhi::ComputePipelineDesc desc;
+    desc.CS = computeShader;
+    if (bindingLayout) {
+        desc.bindingLayouts.push_back(bindingLayout);
+    }
+
+    return GetNativeDevice()->createComputePipeline(desc);
+}
+
+nvrhi::ComputePipelineHandle RenderDevice::CreateComputePipeline(const nvrhi::ComputePipelineDesc& desc) {
+    VERIFY(m_initialized);
+    VERIFY(desc.CS != nullptr);
+
+    return GetNativeDevice()->createComputePipeline(desc);
+}
+
 nvrhi::ISampler* RenderDevice::GetNativeSampler(SamplerHandle handle) {
     if (!ValidateSamplerHandle(handle))
         return nullptr;

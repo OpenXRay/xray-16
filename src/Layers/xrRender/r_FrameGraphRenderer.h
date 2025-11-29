@@ -136,6 +136,9 @@ private:
     framegraph::VirtualResourceHandle m_rt_MenuDistort;   // Distortion mask
     framegraph::VirtualResourceHandle m_rt_FinalComposite; // Final composited output (scene + UI)
 
+    // Exposure texture (1x1 R32_FLOAT) for sky and tonemap passes
+    framegraph::VirtualResourceHandle m_exposureTexture;
+
     // Passes
     //xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     //xr_unique_ptr<passes::HUDPass> m_hudPass;

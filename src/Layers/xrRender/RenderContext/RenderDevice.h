@@ -251,6 +251,18 @@ public:
     nvrhi::FramebufferHandle CreateFramebuffer(const nvrhi::FramebufferDesc& desc);
 
     // ═══════════════════════════════════════════════════
+    //  COMPUTE PIPELINE CREATION
+    // ═══════════════════════════════════════════════════
+
+    // Create compute pipeline from shader and binding layout
+    nvrhi::ComputePipelineHandle CreateComputePipeline(
+        nvrhi::IShader* computeShader,
+        nvrhi::IBindingLayout* bindingLayout);
+
+    // Create compute pipeline from descriptor
+    nvrhi::ComputePipelineHandle CreateComputePipeline(const nvrhi::ComputePipelineDesc& desc);
+
+    // ═══════════════════════════════════════════════════
     //  SHADER CREATION
     // ═══════════════════════════════════════════════════
 

@@ -223,6 +223,22 @@ public:
                              u32 startInstance = 0);
 
     // ═══════════════════════════════════════════════════════
+    //  COMPUTE SHADER DISPATCH
+    // ═══════════════════════════════════════════════════════
+
+    // Set compute pipeline (must be done before Dispatch)
+    void SetComputePipeline(nvrhi::IComputePipeline* pipeline);
+
+    // Set compute binding set (SRVs, UAVs, samplers, constant buffers)
+    void SetComputeBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet);
+
+    // Dispatch compute shader
+    void Dispatch(u32 groupsX, u32 groupsY = 1, u32 groupsZ = 1);
+
+    // Clear UAV buffer (useful for histograms)
+    void ClearBufferUint(nvrhi::IBuffer* buffer, u32 value);
+
+    // ═══════════════════════════════════════════════════════
     //  CLEAR OPERATIONS
     // ═══════════════════════════════════════════════════════
 
@@ -247,6 +263,10 @@ public:
         u32 numDrawInstancedCalls = 0;
         u32 numDrawIndexedInstancedCalls = 0;
 
+        // Compute dispatch counts
+        u32 numDispatchCalls = 0;
+        u32 numComputePipelineChanges = 0;
+
         // State change counts (redundancy tracking)
         u32 numPipelineChanges = 0;
         u32 numViewportChanges = 0;
@@ -267,6 +287,8 @@ public:
             numDrawIndexedCalls = 0;
             numDrawInstancedCalls = 0;
             numDrawIndexedInstancedCalls = 0;
+            numDispatchCalls = 0;
+            numComputePipelineChanges = 0;
             numPipelineChanges = 0;
             numViewportChanges = 0;
             numScissorChanges = 0;
@@ -307,6 +329,9 @@ private:
     RenderPassDesc m_currentRenderPass;
     nvrhi::FramebufferHandle m_currentFramebuffer;
     nvrhi::GraphicsState m_currentState;  // Track current graphics state
+
+    // Compute state tracking
+    nvrhi::ComputeState m_currentComputeState;  // Track current compute state
 
     // Keep binding sets alive (reference counted by NVRHI)
     // These are temporary binding sets created by SetConstantBuffer, etc.
