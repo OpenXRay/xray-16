@@ -47,6 +47,7 @@ namespace xray::render::framegraph {
         DepthStencilRead,    // Depth/stencil read-only
         ShaderResource,      // Texture/buffer SRV
         UnorderedAccess,     // UAV
+        IndirectArgument,    // Indirect draw arguments (buffer only)
         CopySource,          // Copy source
         CopyDest,            // Copy destination
         Present,             // Presentable
@@ -62,6 +63,7 @@ namespace xray::render::framegraph {
         case ResourceState::DepthStencilRead: return "DepthStencilRead";
         case ResourceState::ShaderResource: return "ShaderResource";
         case ResourceState::UnorderedAccess: return "UnorderedAccess";
+        case ResourceState::IndirectArgument: return "IndirectArgument";
         case ResourceState::CopySource: return "CopySource";
         case ResourceState::CopyDest: return "CopyDest";
         case ResourceState::Present: return "Present";

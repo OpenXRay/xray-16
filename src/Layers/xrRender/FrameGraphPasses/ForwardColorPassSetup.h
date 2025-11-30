@@ -30,6 +30,12 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // - Simpler, cleaner architecture
 // - Foundation for Forward+ lighting (Phase 3+)
 //
+// GPU CULLING INTEGRATION (Phase 3.5):
+// - When drawArgsBuffer is valid, uses DrawIndexedIndirect for GPU-driven rendering
+// - Draw args buffer is passed through FrameGraph for proper dependency tracking
+// - This ensures correct state transition (UAV -> IndirectArgument)
+// - Falls back to standard DrawIndexed if drawArgsBuffer is invalid
+//
 // Lambda-based ForwardColorPass setup function (Frostbite pattern)
 // Replaces the wasteful 3-RT G-buffer with single color output
 // NOTE: Does NOT clear color buffer - sky pass renders background first
@@ -41,7 +47,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     const GeometryCollector* geometry,             // Geometry batches to render
     MaterialCache* materialCache,                  // Material cache for shaders
     u32 width,                                     // Render target width
-    u32 height                                     // Render target height
+    u32 height,                                    // Render target height
+    framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle()  // GPU culling draw args (optional)
 );
 
 } // namespace xray::render::passes

@@ -222,6 +222,10 @@ public:
                              u32 startIndex = 0, int baseVertex = 0,
                              u32 startInstance = 0);
 
+    // GPU-driven indirect draw (args read from GPU buffer)
+    // Buffer contains DrawIndexedIndirectArguments (indexCount, instanceCount, startIndex, baseVertex, startInstance)
+    void DrawIndexedIndirect(nvrhi::IBuffer* argsBuffer, u32 argsOffset = 0);
+
     // ═══════════════════════════════════════════════════════
     //  COMPUTE SHADER DISPATCH
     // ═══════════════════════════════════════════════════════
@@ -262,6 +266,7 @@ public:
         u32 numDrawIndexedCalls = 0;
         u32 numDrawInstancedCalls = 0;
         u32 numDrawIndexedInstancedCalls = 0;
+        u32 numDrawIndexedIndirectCalls = 0;
 
         // Compute dispatch counts
         u32 numDispatchCalls = 0;
@@ -287,6 +292,7 @@ public:
             numDrawIndexedCalls = 0;
             numDrawInstancedCalls = 0;
             numDrawIndexedInstancedCalls = 0;
+            numDrawIndexedIndirectCalls = 0;
             numDispatchCalls = 0;
             numComputePipelineChanges = 0;
             numPipelineChanges = 0;

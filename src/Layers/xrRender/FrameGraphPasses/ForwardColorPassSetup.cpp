@@ -15,6 +15,7 @@
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
+#include "Layers/xrRender/GPUCullingManager.h"  // For IndirectDrawArgs struct
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -25,118 +26,6 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 
 // Render phase enum for marker tracking
 enum class RenderPhase { None, Opaque, AlphaTested, Transparent };
-
-// Forward declaration of the rendering function
-void renderForwardGeometry(
-    ng::RenderContext* ctx,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    nvrhi::ITexture* colorRT,
-    nvrhi::ITexture* depthRT,
-    MaterialCache* materialCache,
-    const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg);
-
-framegraph::DefaultOutputLayout setupForwardColorPass(
-    framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
-    framegraph::VirtualResourceHandle depthInput,
-    framegraph::VirtualResourceHandle colorInput,
-    const GeometryCollector* geometry,
-    MaterialCache* materialCache,
-    u32 width,
-    u32 height)
-{
-    using namespace framegraph;
-
-    // PassData structure to hold data between setup and execute
-    struct ForwardColorPassData {
-        VirtualResourceHandle depth;
-        VirtualResourceHandle color;              // Single HDR color buffer (RGBA16_FLOAT)
-        ng::RenderDevice* device;
-        const GeometryCollector* geometry;
-        MaterialCache* materialCache;
-        DefaultOutputLayout outputs;
-        u32 width;
-        u32 height;
-    };
-
-    auto& passData = fg.addCallbackPass<ForwardColorPassData>(
-        "Forward+ Color Pass",
-
-        // ═══════════════════════════════════════════════════════
-        //  SETUP LAMBDA (Declares resource usage)
-        // ═══════════════════════════════════════════════════════
-        [&, width, height, colorInput](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
-            // Store pass configuration
-            data.width = width;
-            data.height = height;
-            data.device = device;
-            data.geometry = geometry;
-            data.materialCache = materialCache;
-
-            // Declare resource usage
-            RenderPassBuilder passBuilder(builder, passHandle);
-
-            // Depth buffer from prepass (READ-WRITE for early-Z)
-            data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
-
-            // Color buffer from sky pass (READ-WRITE to preserve sky background)
-            // CRITICAL: Using readWrite() creates a dependency on SkyPass!
-            // This ensures sky renders first (as background), then forward geometry on top.
-            data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
-
-            // Store outputs in PassData for MaterialCache
-            // Forward+ uses single RT output (all shaders converted to f_forward)
-            data.outputs.albedo = data.color;    // Single HDR color output
-            data.outputs.depth = data.depth;
-        },
-
-        // ═══════════════════════════════════════════════════════
-        //  EXECUTE LAMBDA (Renders geometry)
-        // ═══════════════════════════════════════════════════════
-        [](const ForwardColorPassData& data,
-           const FrameGraph& fg,
-           ng::RenderContext* ctx) {
-
-            // Get physical resources from virtual handles
-            auto* depthRT = fg.GetPhysicalTexture(data.depth);
-            auto* colorRT = fg.GetPhysicalTexture(data.color);
-
-            if (!depthRT || !colorRT) {
-                return;
-            }
-
-            // Check if we have geometry to render
-            if (!data.geometry || data.geometry->GetBatches().empty()) {
-                // No geometry - clear RTs and exit
-                // TODO: Add clear commands if needed
-                return;
-            }
-
-            // Render geometry using forward rendering
-            renderForwardGeometry(
-                ctx,
-                data.device,
-                data.geometry,
-                colorRT,
-                depthRT,
-                data.materialCache,
-                data.outputs,
-                fg
-            );
-        }
-    );
-
-    // Return the forward color outputs
-    // All outputs point to the same color buffer for legacy shader compatibility
-    DefaultOutputLayout outputs;
-    outputs.albedo = passData.color;      // Primary color output
-    outputs.normal = passData.color;      // Same buffer (legacy compatibility)
-    outputs.material = passData.color;    // Same buffer (legacy compatibility)
-    outputs.depth = passData.depth;
-    return outputs;
-}
 
 // ═══════════════════════════════════════════════════════
 //  FORWARD RENDERING IMPLEMENTATION
@@ -151,7 +40,8 @@ void renderForwardGeometry(
     nvrhi::ITexture* depthRT,
     MaterialCache* materialCache,
     const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    nvrhi::IBuffer* drawArgsBuffer)
 {
     using RENDER_NAMESPACE::CSkeletonX_ST;
     using RENDER_NAMESPACE::CSkeletonX_PM;
@@ -164,6 +54,9 @@ void renderForwardGeometry(
     if (batches.empty()) {
         return;
     }
+
+    // Check if GPU culling is available (draw args buffer passed through framegraph)
+    const bool useIndirectDraw = (drawArgsBuffer != nullptr);
 
     // ═══════════════════════════════════════════════════════
     //  FILL CONSTANT BUFFERS FROM DEVICE STATE
@@ -270,11 +163,15 @@ void renderForwardGeometry(
 
     u32 numDraws = 0;
     u32 numTriangles = 0;
+    u32 numCulled = 0;
 
     ng::PipelineState* currentPipeline = nullptr;
 
+    // drawArgsBuffer is already passed in from framegraph (proper state transition guaranteed)
+
     // Helper lambda to render a single batch (returns true if rendered, false if skipped)
-    auto renderBatch = [&](const GeometryBatch& batch) -> bool {
+    // batchIndex is used for indirect draw offset
+    auto renderBatch = [&](const GeometryBatch& batch, u32 batchIndex) -> bool {
         // Get per-material PSO from MaterialCache
         ng::PipelineState* pipelineToUse = nullptr;
         MaterialPSO* matPSO = nullptr;
@@ -420,8 +317,17 @@ void renderForwardGeometry(
         ctx->SetVertexBuffer(0, vb, 0);
         ctx->SetIndexBuffer(ib, nvrhi::Format::R16_UINT, 0);  // X-Ray uses 16-bit indices
 
-        // Draw
-        ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+        // Draw - use indirect draw if GPU culling is available
+        if (useIndirectDraw && drawArgsBuffer) {
+            // DrawIndexedIndirect reads args from GPU buffer
+            // Each IndirectDrawArgs is 20 bytes (5 u32s)
+            // instanceCount will be 0 (culled) or 1 (visible) as set by culling shader
+            u32 argsOffset = batchIndex * sizeof(IndirectDrawArgs);
+            ctx->DrawIndexedIndirect(drawArgsBuffer, argsOffset);
+        } else {
+            // Standard draw
+            ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+        }
 
         numDraws++;
         numTriangles += batch.indexCount / 3;
@@ -441,7 +347,9 @@ void renderForwardGeometry(
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     RenderPhase currentPhase = RenderPhase::None;
 
-    for (const auto& batch : batches) {
+    for (u32 batchIndex = 0; batchIndex < batches.size(); batchIndex++) {
+        const auto& batch = batches[batchIndex];
+
         // Determine batch's render phase based on shader flags:
         // - iPriority == 0: Opaque (default)
         // - iPriority == 1: Alpha-tested (set by blender_deffer_aref.cpp)
@@ -479,7 +387,7 @@ void renderForwardGeometry(
             currentPhase = batchPhase;
         }
 
-        renderBatch(batch);
+        renderBatch(batch, batchIndex);
     }
 
     // End final marker
@@ -494,4 +402,122 @@ void renderForwardGeometry(
     // Msg("ForwardColor: %u draws, %u triangles", numDraws, numTriangles);
 }
 
+framegraph::DefaultOutputLayout setupForwardColorPass(
+    framegraph::FrameGraph& fg,
+    ng::RenderDevice* device,
+    framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle colorInput,
+    const GeometryCollector* geometry,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height,
+    framegraph::VirtualResourceHandle drawArgsInput)
+{
+    using namespace framegraph;
+
+    // PassData structure to hold data between setup and execute
+    struct ForwardColorPassData {
+        VirtualResourceHandle depth;
+        VirtualResourceHandle color;              // Single HDR color buffer (RGBA16_FLOAT)
+        VirtualResourceHandle drawArgsBuffer;     // GPU culling draw args (optional)
+        ng::RenderDevice* device;
+        const GeometryCollector* geometry;
+        MaterialCache* materialCache;
+        DefaultOutputLayout outputs;
+        u32 width;
+        u32 height;
+    };
+
+    auto& passData = fg.addCallbackPass<ForwardColorPassData>(
+        "Forward+ Color Pass",
+
+        // ═══════════════════════════════════════════════════════
+        //  SETUP LAMBDA (Declares resource usage)
+        // ═══════════════════════════════════════════════════════
+        [&, width, height, colorInput, drawArgsInput](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+            // Store pass configuration
+            data.width = width;
+            data.height = height;
+            data.device = device;
+            data.geometry = geometry;
+            data.materialCache = materialCache;
+
+            // Declare resource usage
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            // Depth buffer from prepass (READ-WRITE for early-Z)
+            data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
+
+            // Color buffer from sky pass (READ-WRITE to preserve sky background)
+            // CRITICAL: Using readWrite() creates a dependency on SkyPass!
+            // This ensures sky renders first (as background), then forward geometry on top.
+            data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
+
+            // Draw args buffer from GPU culling (READ for indirect draw)
+            // CRITICAL: This creates proper dependency on GPU culling pass!
+            // Without this, culling and forward passes can race, causing "exploding geometry"
+            if (drawArgsInput.is_valid()) {
+                data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
+            }
+
+            // Store outputs in PassData for MaterialCache
+            // Forward+ uses single RT output (all shaders converted to f_forward)
+            data.outputs.albedo = data.color;    // Single HDR color output
+            data.outputs.depth = data.depth;
+        },
+
+        // ═══════════════════════════════════════════════════════
+        //  EXECUTE LAMBDA (Renders geometry)
+        // ═══════════════════════════════════════════════════════
+        [](const ForwardColorPassData& data,
+            const FrameGraph& fg,
+            ng::RenderContext* ctx) {
+
+                // Get physical resources from virtual handles
+                auto* depthRT = fg.GetPhysicalTexture(data.depth);
+                auto* colorRT = fg.GetPhysicalTexture(data.color);
+
+                if (!depthRT || !colorRT) {
+                    return;
+                }
+
+                // Check if we have geometry to render
+                if (!data.geometry || data.geometry->GetBatches().empty()) {
+                    // No geometry - clear RTs and exit
+                    // TODO: Add clear commands if needed
+                    return;
+                }
+
+                // Get draw args buffer through framegraph (proper dependency tracking)
+                // This ensures state transition UAV -> IndirectArgument happened
+                nvrhi::IBuffer* drawArgsBuffer = nullptr;
+                if (data.drawArgsBuffer.is_valid()) {
+                    drawArgsBuffer = fg.GetPhysicalBuffer(data.drawArgsBuffer);
+                }
+
+                // Render geometry using forward rendering
+                // If drawArgsBuffer is provided, uses DrawIndexedIndirect for GPU-driven rendering
+                renderForwardGeometry(
+                    ctx,
+                    data.device,
+                    data.geometry,
+                    colorRT,
+                    depthRT,
+                    data.materialCache,
+                    data.outputs,
+                    fg,
+                    drawArgsBuffer
+                );
+        }
+    );
+
+    // Return the forward color outputs
+    // All outputs point to the same color buffer for legacy shader compatibility
+    DefaultOutputLayout outputs;
+    outputs.albedo = passData.color;      // Primary color output
+    outputs.normal = passData.color;      // Same buffer (legacy compatibility)
+    outputs.material = passData.color;    // Same buffer (legacy compatibility)
+    outputs.depth = passData.depth;
+    return outputs;
+}
 } // namespace xray::render::RENDER_NAMESPACE::passes

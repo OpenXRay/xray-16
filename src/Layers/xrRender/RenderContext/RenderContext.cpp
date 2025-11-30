@@ -586,6 +586,27 @@ void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
     m_commandList->drawIndexed(args);
 }
 
+void RenderContext::DrawIndexedIndirect(nvrhi::IBuffer* argsBuffer, u32 argsOffset) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(argsBuffer != nullptr);
+
+    // Track draw call
+    m_stats.numDrawIndexedIndirectCalls++;
+
+    // Set indirect params buffer on state
+    m_currentState.indirectParams = argsBuffer;
+
+    // Apply all batched state changes before draw
+    m_commandList->setGraphicsState(m_currentState);
+
+    // Execute indirect draw - GPU reads args from buffer at offset
+    // drawCount=1 because we're drawing one batch per call
+    m_commandList->drawIndexedIndirect(argsOffset, 1);
+
+    // Clear indirect params after use
+    m_currentState.indirectParams = nullptr;
+}
+
 // ═══════════════════════════════════════════════════════
 //  CLEAR OPERATIONS
 // ═══════════════════════════════════════════════════════

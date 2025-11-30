@@ -55,12 +55,17 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             }
 
             // Create LDR output (RGBA8_UNORM for standard displays)
-            data.ldrOutput = passBuilder.createTexture2D(
-                "rt_Final",
-                width,
-                height,
-                nvrhi::Format::RGBA8_UNORM
-            );
+            // NOTE: Must be non-transient (persistent) to be a terminal pass and keep render chain alive
+            framegraph::ResourceDesc ldrDesc;
+            ldrDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            ldrDesc.width = width;
+            ldrDesc.height = height;
+            ldrDesc.format = nvrhi::Format::RGBA8_UNORM;
+            ldrDesc.isRenderTarget = true;
+            ldrDesc.isTransient = false;  // CRITICAL: Makes this a terminal pass
+            ldrDesc.debugName = "rt_Final";
+
+            data.ldrOutput = passBuilder.createTexture("rt_Final", ldrDesc);
         },
 
         // Execute lambda

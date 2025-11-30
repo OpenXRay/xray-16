@@ -838,6 +838,9 @@
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\GPUCullingManager.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h">
       <Filter>Slang</Filter>
     </ClInclude>
@@ -902,6 +905,9 @@
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\PBRConverter\PBRTextureConverter.h">
@@ -1603,6 +1609,9 @@
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp">
       <Filter>Framegraph</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\GPUCullingManager.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp">
       <Filter>Slang</Filter>
     </ClCompile>
@@ -1658,6 +1667,9 @@
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\PBRConverter\PBRTextureConverter.cpp">

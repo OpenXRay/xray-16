@@ -31,6 +31,10 @@ using RENDER_NAMESPACE::dxRender_Visual;
 class GeometryCollector;
 class MaterialCache;
 
+namespace RENDER_NAMESPACE {
+    class GPUCullingManager;
+}
+
 namespace ui {
     class UIRenderCollector;
     class NVRHIUIRenderer;
@@ -139,6 +143,10 @@ private:
     // Exposure texture (1x1 R32_FLOAT) for sky and tonemap passes
     framegraph::VirtualResourceHandle m_exposureTexture;
 
+    // Hi-Z pyramid (R32_FLOAT with mip chain) for GPU occlusion culling
+    // Generated from depth prepass, used by GPU culling and froxel volumetrics
+    framegraph::VirtualResourceHandle m_hizPyramid;
+
     // Passes
     //xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
     //xr_unique_ptr<passes::HUDPass> m_hudPass;
@@ -159,6 +167,9 @@ private:
     // Material cache (for shader/PSO management)
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
     xr_unique_ptr<MaterialCache> m_materialCache;
+
+    // GPU Culling Manager (Phase 3.5: Hi-Z occlusion culling)
+    xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)
     xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;

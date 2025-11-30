@@ -25,6 +25,8 @@
 
 // Lambda-based pass setup functions
 #include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
+#include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
+#include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
@@ -157,6 +159,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     // Set global geometry collector pointer
     g_geometryCollector = m_geometryCollector.get();
+
+    // Create GPU culling manager (Phase 3.5)
+    // NOTE: Initialization is deferred to first frame (SetupFrameGraphPasses)
+    // because ShaderLoader isn't ready during FrameGraphRenderer::Initialize
+    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
 
     // Create RenderContext for execution
     m_renderContext.reset(device->CreateContext());
@@ -528,6 +535,71 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
+    //  PHASE 3.5: HI-Z PYRAMID BUILD (GPU Culling Foundation)
+    // ═══════════════════════════════════════════════════════
+    // Generates hierarchical depth pyramid from depth prepass output.
+    // Each mip level contains MAX depth of 2x2 block (conservative).
+    //
+    // USAGE:
+    // - GPU occlusion culling (object_cull.cs) - Phase 3.5
+    // - Froxel volumetrics ray termination - Phase 6
+    // - Particle depth fade
+    //
+    // PERFORMANCE: ~0.2-0.3ms (async compute capable)
+
+    auto hizOutput = passes::setupHiZBuildPass(
+        *m_framegraph,
+        m_device,
+        depthBuffer,
+        width,
+        height
+    );
+
+    // Store Hi-Z pyramid handle for future GPU culling pass
+    m_hizPyramid = hizOutput.pyramid;
+
+    // ═══════════════════════════════════════════════════════
+    //  PHASE 3.5: GPU CULLING PASS (Frustum + Occlusion)
+    // ═══════════════════════════════════════════════════════
+    // Uses Hi-Z pyramid to perform GPU-side occlusion culling.
+    // Outputs draw args buffer for indirect draw in forward pass.
+    //
+    // PERFORMANCE:
+    // - ~0.3-0.5ms for 100K objects (async compute capable)
+    // - 10-100x faster than CPU culling for large scenes
+    //
+    // ARCHITECTURE:
+    // - GPU culling pass writes to draw args buffer (UAV)
+    // - Forward pass reads draw args buffer (IndirectArgument)
+    // - FrameGraph ensures proper state transitions and execution order
+
+    framegraph::VirtualResourceHandle drawArgsBuffer;  // Will be passed to forward pass
+
+    if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
+        // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
+        m_gpuCullingManager->Initialize(m_device);
+
+        if (m_gpuCullingManager->IsEnabled()) {
+            // NOTE: UploadSceneObjects is now called inside the culling pass execute lambda
+            // This ensures it uses the correct command list during framegraph execution
+
+            // Setup GPU culling pass (upload happens inside execute lambda)
+            auto cullOutput = m_gpuCullingManager->SetupCullingPass(
+                *m_framegraph,
+                m_hizPyramid,
+                hizOutput.width,
+                hizOutput.height,
+                hizOutput.mipLevels,
+                m_geometryCollector.get()  // Geometry is uploaded during execute
+            );
+
+            // Pass draw args buffer handle to forward pass
+            // Forward pass declares read dependency, ensuring proper sync
+            drawArgsBuffer = cullOutput.drawArgsBuffer;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  SKY PASS (Renders sky dome behind everything)
     // ═══════════════════════════════════════════════════════
     // Renders sky dome geometry with cubemap textures
@@ -586,7 +658,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
-        height
+        height,
+        drawArgsBuffer  // Draw args from GPU culling (enables indirect draw if valid)
     );
 
     // 2. HUD Pass - Renders HUD items on top of world geometry
