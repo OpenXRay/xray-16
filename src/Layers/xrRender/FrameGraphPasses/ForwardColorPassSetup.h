@@ -26,7 +26,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
-    u32 height
+    u32 height,
+    framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle()
 );
 
 }

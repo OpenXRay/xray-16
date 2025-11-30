@@ -14,6 +14,7 @@
 #include "Layers/xrRender/FTreeVisual.h"
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -32,96 +33,8 @@ void renderForwardGeometry(
     nvrhi::ITexture* depthRT,
     MaterialCache* materialCache,
     const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg);
-
-framegraph::DefaultOutputLayout setupForwardColorPass(
-    framegraph::FrameGraph& fg,
-    ng::RenderDevice* device,
-    framegraph::VirtualResourceHandle depthInput,
-    framegraph::VirtualResourceHandle colorInput,
-    const GeometryCollector* geometry,
-    MaterialCache* materialCache,
-    u32 width,
-    u32 height)
-{
-    using namespace framegraph;
-
-    struct ForwardColorPassData {
-        VirtualResourceHandle depth;
-        VirtualResourceHandle color;
-        ng::RenderDevice* device;
-        const GeometryCollector* geometry;
-        MaterialCache* materialCache;
-        DefaultOutputLayout outputs;
-        u32 width;
-        u32 height;
-    };
-
-    auto& passData = fg.addCallbackPass<ForwardColorPassData>(
-        "Forward+ Color Pass",
-
-        [&, width, height, colorInput](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
-            data.width = width;
-            data.height = height;
-            data.device = device;
-            data.geometry = geometry;
-            data.materialCache = materialCache;
-
-            RenderPassBuilder passBuilder(builder, passHandle);
-
-            data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
-
-            data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
-
-            data.outputs.albedo = data.color;
-            data.outputs.depth = data.depth;
-        },
-
-        [](const ForwardColorPassData& data,
-           const FrameGraph& fg,
-           ng::RenderContext* ctx) {
-
-            auto* depthRT = fg.GetPhysicalTexture(data.depth);
-            auto* colorRT = fg.GetPhysicalTexture(data.color);
-
-            if (!depthRT || !colorRT) {
-                return;
-            }
-
-            if (!data.geometry || data.geometry->GetBatches().empty()) {
-                return;
-            }
-
-            renderForwardGeometry(
-                ctx,
-                data.device,
-                data.geometry,
-                colorRT,
-                depthRT,
-                data.materialCache,
-                data.outputs,
-                fg
-            );
-        }
-    );
-
-    DefaultOutputLayout outputs;
-    outputs.albedo = passData.color;
-    outputs.normal = passData.color;
-    outputs.material = passData.color;
-    outputs.depth = passData.depth;
-    return outputs;
-}
-
-void renderForwardGeometry(
-    ng::RenderContext* ctx,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    nvrhi::ITexture* colorRT,
-    nvrhi::ITexture* depthRT,
-    MaterialCache* materialCache,
-    const framegraph::DefaultOutputLayout& outputs,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    nvrhi::IBuffer* drawArgsBuffer)
 {
     using RENDER_NAMESPACE::CSkeletonX_ST;
     using RENDER_NAMESPACE::CSkeletonX_PM;
@@ -134,6 +47,8 @@ void renderForwardGeometry(
     if (batches.empty()) {
         return;
     }
+
+    const bool useIndirectDraw = (drawArgsBuffer != nullptr);
 
     StaticGlobals staticGlobalsCB = {};
     FillGlobalConstants(staticGlobalsCB);
@@ -197,10 +112,11 @@ void renderForwardGeometry(
 
     u32 numDraws = 0;
     u32 numTriangles = 0;
+    u32 numCulled = 0;
 
     ng::PipelineState* currentPipeline = nullptr;
 
-    auto renderBatch = [&](const GeometryBatch& batch) -> bool {
+    auto renderBatch = [&](const GeometryBatch& batch, u32 batchIndex) -> bool {
         ng::PipelineState* pipelineToUse = nullptr;
         MaterialPSO* matPSO = nullptr;
 
@@ -311,7 +227,12 @@ void renderForwardGeometry(
         ctx->SetVertexBuffer(0, vb, 0);
         ctx->SetIndexBuffer(ib, nvrhi::Format::R16_UINT, 0);
 
-        ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+        if (useIndirectDraw && drawArgsBuffer) {
+            u32 argsOffset = batchIndex * sizeof(IndirectDrawArgs);
+            ctx->DrawIndexedIndirect(drawArgsBuffer, argsOffset);
+        } else {
+            ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
+        }
 
         numDraws++;
         numTriangles += batch.indexCount / 3;
@@ -321,7 +242,9 @@ void renderForwardGeometry(
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     RenderPhase currentPhase = RenderPhase::None;
 
-    for (const auto& batch : batches) {
+    for (u32 batchIndex = 0; batchIndex < batches.size(); batchIndex++) {
+        const auto& batch = batches[batchIndex];
+
         RenderPhase batchPhase;
         if (batch.IsStrictB2F()) {
             batchPhase = RenderPhase::Transparent;
@@ -352,7 +275,7 @@ void renderForwardGeometry(
             currentPhase = batchPhase;
         }
 
-        renderBatch(batch);
+        renderBatch(batch, batchIndex);
     }
 
     if (currentPhase != RenderPhase::None) {
@@ -363,4 +286,94 @@ void renderForwardGeometry(
 
 }
 
+framegraph::DefaultOutputLayout setupForwardColorPass(
+    framegraph::FrameGraph& fg,
+    ng::RenderDevice* device,
+    framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle colorInput,
+    const GeometryCollector* geometry,
+    MaterialCache* materialCache,
+    u32 width,
+    u32 height,
+    framegraph::VirtualResourceHandle drawArgsInput)
+{
+    using namespace framegraph;
+
+    struct ForwardColorPassData {
+        VirtualResourceHandle depth;
+        VirtualResourceHandle color;
+        VirtualResourceHandle drawArgsBuffer;
+        ng::RenderDevice* device;
+        const GeometryCollector* geometry;
+        MaterialCache* materialCache;
+        DefaultOutputLayout outputs;
+        u32 width;
+        u32 height;
+    };
+
+    auto& passData = fg.addCallbackPass<ForwardColorPassData>(
+        "Forward+ Color Pass",
+
+        [&, width, height, colorInput, drawArgsInput](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+            data.width = width;
+            data.height = height;
+            data.device = device;
+            data.geometry = geometry;
+            data.materialCache = materialCache;
+
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
+
+            data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
+
+            if (drawArgsInput.is_valid()) {
+                data.drawArgsBuffer = passBuilder.read(drawArgsInput, ResourceState::IndirectArgument);
+            }
+
+            data.outputs.albedo = data.color;
+            data.outputs.depth = data.depth;
+        },
+
+        [](const ForwardColorPassData& data,
+            const FrameGraph& fg,
+            ng::RenderContext* ctx) {
+
+                auto* depthRT = fg.GetPhysicalTexture(data.depth);
+                auto* colorRT = fg.GetPhysicalTexture(data.color);
+
+                if (!depthRT || !colorRT) {
+                    return;
+                }
+
+                if (!data.geometry || data.geometry->GetBatches().empty()) {
+                    return;
+                }
+
+                nvrhi::IBuffer* drawArgsBuffer = nullptr;
+                if (data.drawArgsBuffer.is_valid()) {
+                    drawArgsBuffer = fg.GetPhysicalBuffer(data.drawArgsBuffer);
+                }
+
+                renderForwardGeometry(
+                    ctx,
+                    data.device,
+                    data.geometry,
+                    colorRT,
+                    depthRT,
+                    data.materialCache,
+                    data.outputs,
+                    fg,
+                    drawArgsBuffer
+                );
+        }
+    );
+
+    DefaultOutputLayout outputs;
+    outputs.albedo = passData.color;
+    outputs.normal = passData.color;
+    outputs.material = passData.color;
+    outputs.depth = passData.depth;
+    return outputs;
+}
 }

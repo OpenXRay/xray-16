@@ -469,6 +469,21 @@ void RenderContext::DrawIndexedInstanced(u32 indexCount, u32 instanceCount,
     m_commandList->drawIndexed(args);
 }
 
+void RenderContext::DrawIndexedIndirect(nvrhi::IBuffer* argsBuffer, u32 argsOffset) {
+    VERIFY2(m_inRenderPass, "Must be in render pass!");
+    VERIFY(argsBuffer != nullptr);
+
+    m_stats.numDrawIndexedIndirectCalls++;
+
+    m_currentState.indirectParams = argsBuffer;
+
+    m_commandList->setGraphicsState(m_currentState);
+
+    m_commandList->drawIndexedIndirect(argsOffset, 1);
+
+    m_currentState.indirectParams = nullptr;
+}
+
 void RenderContext::ClearRenderTarget(nvrhi::ITexture* rt, const float color[4]) {
     VERIFY(rt != nullptr);
 

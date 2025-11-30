@@ -23,6 +23,8 @@
 #include <imgui.h>
 
 #include "FrameGraphPasses/DepthPrepassSetup.h"
+#include "FrameGraphPasses/HiZBuildPassSetup.h"
+#include "GPUCullingManager.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
@@ -96,6 +98,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 
     g_geometryCollector = m_geometryCollector.get();
+
+    m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
 
     m_renderContext.reset(device->CreateContext());
     if (!m_renderContext)
@@ -320,6 +324,36 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
+    auto hizOutput = passes::setupHiZBuildPass(
+        *m_framegraph,
+        m_device,
+        depthBuffer,
+        width,
+        height
+    );
+
+    m_hizPyramid = hizOutput.pyramid;
+
+    framegraph::VirtualResourceHandle drawArgsBuffer;
+
+    if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
+        m_gpuCullingManager->Initialize(m_device);
+
+        if (m_gpuCullingManager->IsEnabled()) {
+
+            auto cullOutput = m_gpuCullingManager->SetupCullingPass(
+                *m_framegraph,
+                m_hizPyramid,
+                hizOutput.width,
+                hizOutput.height,
+                hizOutput.mipLevels,
+                m_geometryCollector.get()
+            );
+
+            drawArgsBuffer = cullOutput.drawArgsBuffer;
+        }
+    }
+
     framegraph::ResourceDesc colorDesc;
     colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     colorDesc.width = width;
@@ -357,7 +391,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
-        height
+        height,
+        drawArgsBuffer
     );
 
     auto hudOutputs = passes::setupHUDPass(

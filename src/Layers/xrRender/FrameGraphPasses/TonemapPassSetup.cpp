@@ -49,12 +49,16 @@ framegraph::VirtualResourceHandle setupTonemapPass(
                 data.exposureInput = passBuilder.read(exposureTexture, ResourceState::ShaderResource);
             }
 
-            data.ldrOutput = passBuilder.createTexture2D(
-                "rt_Final",
-                width,
-                height,
-                nvrhi::Format::RGBA8_UNORM
-            );
+            framegraph::ResourceDesc ldrDesc;
+            ldrDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+            ldrDesc.width = width;
+            ldrDesc.height = height;
+            ldrDesc.format = nvrhi::Format::RGBA8_UNORM;
+            ldrDesc.isRenderTarget = true;
+            ldrDesc.isTransient = false;
+            ldrDesc.debugName = "rt_Final";
+
+            data.ldrOutput = passBuilder.createTexture("rt_Final", ldrDesc);
         },
 
         [](const TonemapPassData& data,

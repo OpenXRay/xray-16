@@ -65,6 +65,7 @@ VirtualResourceHandle FrameGraph::ImportTexture(
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
+    node.desc.isImported = true;
 
     m_resources.push_back(node);
 
@@ -85,6 +86,7 @@ VirtualResourceHandle FrameGraph::ImportBuffer(
     node.isAllocated = true;
     node.canAlias = false;
     node.isPersistent = true;
+    node.desc.isImported = true;
 
     m_resources.push_back(node);
 
@@ -197,7 +199,13 @@ void FrameGraph::Execute() {
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
     const ResourceNode* node = GetResourceNode(handle);
     VERIFY(node != nullptr);
-    VERIFY(node->isAllocated && "Resource not allocated - call Compile first");
+    if (!node->isAllocated) {
+        Msg("! [FrameGraph] GetPhysicalTexture FAILED for resource index %u, name='%s'",
+            handle.index, node->desc.debugName.c_str());
+        Msg("!   firstUsedPass=%u, lastUsedPass=%u, refCount=%u",
+            node->firstUsedPass, node->lastUsedPass, node->refCount);
+        VERIFY2(false, "Resource not allocated - call Compile first");
+    }
     return node->nvrhiTexture;
 }
 
@@ -443,9 +451,7 @@ bool FrameGraph::ValidateGraph() const {
         }
     }
 
-    if (valid) {
-        Msg("~ [FrameGraph] Validation passed");
-    } else {
+    if (!valid) {
         Msg("! [FrameGraph] Validation FAILED");
     }
 
@@ -635,8 +641,10 @@ void FrameGraph::ComputeResourceLifetimes() {
         resource.refCount = 0;
     }
 
+    u32 nonCulledPasses = 0;
     for (const PassNode* pass : m_sortedPasses) {
         if (pass->culled) continue;
+        nonCulledPasses++;
 
         u32 passIndex = pass->executionOrder;
 
@@ -944,6 +952,8 @@ nvrhi::ResourceStates FrameGraph::ConvertToNVRHIState(ResourceState state) {
             return nvrhi::ResourceStates::ShaderResource;
         case ResourceState::UnorderedAccess:
             return nvrhi::ResourceStates::UnorderedAccess;
+        case ResourceState::IndirectArgument:
+            return nvrhi::ResourceStates::IndirectArgument;
         case ResourceState::CopySource:
             return nvrhi::ResourceStates::CopySource;
         case ResourceState::CopyDest:

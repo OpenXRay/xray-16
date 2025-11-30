@@ -28,6 +28,10 @@ using RENDER_NAMESPACE::dxRender_Visual;
 class GeometryCollector;
 class MaterialCache;
 
+namespace RENDER_NAMESPACE {
+    class GPUCullingManager;
+}
+
 namespace ui {
     class UIRenderCollector;
     class NVRHIUIRenderer;
@@ -113,10 +117,14 @@ private:
 
     framegraph::VirtualResourceHandle m_exposureTexture;
 
+    framegraph::VirtualResourceHandle m_hizPyramid;
+
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
     xr_unique_ptr<MaterialCache> m_materialCache;
+
+    xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
 
     xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
     xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;

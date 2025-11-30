@@ -138,6 +138,7 @@
     <ClInclude Include="..\xrRender\dxImGuiRender.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h" />
@@ -290,6 +291,7 @@
     <ClInclude Include="..\xrRender\Shaders\SlangCompiler.h" />
     <ClInclude Include="..\xrRender\Shaders\SlangCompilerTest.h" />
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h" />
+    <ClInclude Include="..\xrRender\GPUCullingManager.h" />
     <ClInclude Include="..\xrRender\r_FrameGraphRenderer.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -364,6 +366,7 @@
     <ClCompile Include="..\xrRender\dxImGuiRender.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\DepthPrepassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ForwardColorPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\HiZBuildPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp" />
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp" />
@@ -547,6 +550,7 @@
     <ClCompile Include="..\xrRender\Shaders\SlangCompiler.cpp" />
     <ClCompile Include="..\xrRender\Shaders\SlangCompilerTest.cpp" />
     <ClCompile Include="..\xrRender\Geometry\GeometryBatch.cpp" />
+    <ClCompile Include="..\xrRender\GPUCullingManager.cpp" />
     <ClCompile Include="..\xrRender\r_FrameGraphRenderer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

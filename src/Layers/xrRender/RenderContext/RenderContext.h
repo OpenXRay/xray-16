@@ -169,6 +169,8 @@ public:
                              u32 startIndex = 0, int baseVertex = 0,
                              u32 startInstance = 0);
 
+    void DrawIndexedIndirect(nvrhi::IBuffer* argsBuffer, u32 argsOffset = 0);
+
     void SetComputePipeline(nvrhi::IComputePipeline* pipeline);
 
     void SetComputeBindingSet(u32 slot, nvrhi::IBindingSet* bindingSet);
@@ -187,6 +189,7 @@ public:
         u32 numDrawIndexedCalls = 0;
         u32 numDrawInstancedCalls = 0;
         u32 numDrawIndexedInstancedCalls = 0;
+        u32 numDrawIndexedIndirectCalls = 0;
 
         u32 numDispatchCalls = 0;
         u32 numComputePipelineChanges = 0;
@@ -209,6 +212,7 @@ public:
             numDrawIndexedCalls = 0;
             numDrawInstancedCalls = 0;
             numDrawIndexedInstancedCalls = 0;
+            numDrawIndexedIndirectCalls = 0;
             numDispatchCalls = 0;
             numComputePipelineChanges = 0;
             numPipelineChanges = 0;
