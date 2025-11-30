@@ -24,12 +24,17 @@
 
 #include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
+#include "FrameGraphPasses/SkyPassSetup.h"
+#include "FrameGraphPasses/SunPassSetup.h"
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"
 #include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"
 #include "FrameGraphPasses/ImGuiPassSetup.h"
+
+#include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Persistent.h"
 
 namespace xray::render {
 
@@ -99,6 +104,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
         return false;
     }
 
+    passes::InitializeSkyGeometry(device);
+
     Msg("* [FrameGraphRenderer] initialized");
 
     return true;
@@ -126,6 +133,8 @@ void FrameGraphRenderer::Shutdown() {
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
+    passes::ShutdownSkyGeometry();
+
     m_device = nullptr;
 }
 
@@ -135,6 +144,8 @@ void FrameGraphRenderer::Render() {
     VERIFY(m_framegraph != nullptr);
 
     auto frameStart = std::chrono::high_resolution_clock::now();
+
+    RImplementation.Lights.Update();
 
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
@@ -171,8 +182,6 @@ void FrameGraphRenderer::RenderMenu() {
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
-
-    Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
@@ -214,6 +223,7 @@ void FrameGraphRenderer::RenderMenu() {
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         sceneWithUI,
+        framegraph::VirtualResourceHandle(),
         width,
         height
     );
@@ -235,7 +245,6 @@ void FrameGraphRenderer::RenderMenu() {
 
     PresentToBackbuffer();
 
-    Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
 }
 
 void FrameGraphRenderer::SetupFrame() {
@@ -311,10 +320,40 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
+    framegraph::ResourceDesc colorDesc;
+    colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    colorDesc.width = width;
+    colorDesc.height = height;
+    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    colorDesc.isRenderTarget = true;
+    colorDesc.debugName = "rt_SceneColor";
+
+    auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
+
+    auto skyOutput = passes::setupSkyPass(
+        *m_framegraph,
+        m_device,
+        skyColorHandle,
+        depthBuffer,
+        g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
+        width,
+        height
+    );
+
+    auto sunOutput = passes::setupSunPass(
+        *m_framegraph,
+        m_device,
+        skyOutput,
+        g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
+        width,
+        height
+    );
+
     auto forwardOutputs = passes::setupForwardColorPass(
         *m_framegraph,
         m_device,
         depthBuffer,
+        sunOutput,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
@@ -379,6 +418,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         sceneWithUI,
+        exposureOutput.exposureTexture,
         width,
         height
     );
@@ -473,8 +513,6 @@ void FrameGraphRenderer::PresentToBackbuffer() {
         finalTexture
     );
 
-    Msg("  [FrameGraphRenderer] Presented final output to game backbuffer (%ux%u)",
-        d3dDesc.Width, d3dDesc.Height);
 }
 
 void FrameGraphRenderer::RenderHUD() {
@@ -983,7 +1021,6 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
     xr_set<framegraph::RenderPhase> phases;
 
     auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
-    Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
 
     xr_map<framegraph::RenderPhase, u32> phaseCount;
 
@@ -1030,23 +1067,10 @@ void FrameGraphRenderer::CreateAllRequiredPasses() {
         CreatePhasePass(phase);
     }
 
-    Msg("! [FrameGraphRenderer] Created %u passes", m_activePasses.size());
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
     auto& batches = m_geometryCollector->GetBatchesMutable();
-
-    u32 nullVBCount = 0, nullIBCount = 0;
-    for (const auto& batch : batches) {
-        if (!batch.vertexBuffer) nullVBCount++;
-        if (!batch.indexBuffer) nullIBCount++;
-    }
-    if (nullVBCount > 0 || nullIBCount > 0) {
-        Msg("! [RouteBatches] BEFORE ROUTING: %u batches with null VB, %u with null IB (total %u)",
-            nullVBCount, nullIBCount, batches.size());
-    } else {
-        Msg("  [RouteBatches] All %u batches have valid buffers before routing", batches.size());
-    }
 
     xr_map<framegraph::RenderPhase, xr_vector<GeometryBatch*>> batchesByPhase;
 

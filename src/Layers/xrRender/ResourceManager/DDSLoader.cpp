@@ -65,14 +65,28 @@ DDSData& DDSData::operator=(DDSData&& other) noexcept {
 
 bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
 
+    string_path basePath;
+    xr_strcpy(basePath, filePath);
+    if (char* dot = strrchr(basePath, '.')) {
+        if (_stricmp(dot, ".tga") == 0 ||
+            _stricmp(dot, ".dds") == 0 ||
+            _stricmp(dot, ".bmp") == 0 ||
+            _stricmp(dot, ".png") == 0 ||
+            _stricmp(dot, ".seq") == 0 ||
+            _stricmp(dot, ".ogm") == 0 ||
+            _stricmp(dot, ".avi") == 0) {
+            *dot = '\0';
+        }
+    }
+
     string_path resolvedPath;
     IReader* reader = nullptr;
 
     auto TryFindFile = [&](const char* ext) -> bool {
-        if (FS.exist(resolvedPath, "$game_textures$", filePath, ext)) {
+        if (FS.exist(resolvedPath, "$game_textures$", basePath, ext)) {
             return true;
         }
-        if (FS.exist(resolvedPath, "$level$", filePath, ext)) {
+        if (FS.exist(resolvedPath, "$level$", basePath, ext)) {
             return true;
         }
         return false;
@@ -90,21 +104,19 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
 
     }
     else if (TryFindFile(".seq")) {
-        Msg("* [DDSLoader] Detected sequence texture: %s.seq", filePath);
         return LoadSequenceTexture(resolvedPath, outData);
     }
     else if (TryFindFile(".ogm")) {
-        Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
         return LoadVideoTexture(resolvedPath, outData);
     }
     else if (TryFindFile(".avi")) {
-        Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", filePath);
+        Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", basePath);
         outData.isValid = false;
         outData.errorMessage = "AVI video textures not yet implemented";
         return false;
     }
     else {
-        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .seq, .ogm, .avi in $game_textures$ and $level$)", filePath);
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .seq, .ogm, .avi in $game_textures$ and $level$)", basePath);
         outData.isValid = false;
         outData.errorMessage = "Texture file not found";
         return false;
@@ -184,17 +196,11 @@ bool DDSLoader::LoadFromMemory(
         desc.mipLevels = 1;
     }
 
-    Msg("~ [DDSLoader] Header: %ux%u, %u mips, arraySize=%u, depth=%u",
-        desc.width, desc.height, desc.mipLevels, desc.arraySize, desc.depth);
-
     if (header.ddspf.dwFlags & DDPF_FOURCC) {
         if (header.ddspf.dwFourCC == FOURCC_DX10) {
             desc.format = GetFormatFromDXGI(headerDX10.dxgiFormat);
-            Msg("~ [DDSLoader] Format: DX10 DXGI=%u → NVRHI=%d", (u32)headerDX10.dxgiFormat, (int)desc.format);
         } else {
             desc.format = GetFormatFromFourCC(header.ddspf.dwFourCC);
-            Msg("~ [DDSLoader] Format: FourCC=0x%08X (%.4s) → NVRHI=%d",
-                header.ddspf.dwFourCC, (const char*)&header.ddspf.dwFourCC, (int)desc.format);
         }
     } else {
         u32 bpp = header.ddspf.dwRGBBitCount;
@@ -247,9 +253,6 @@ bool DDSLoader::LoadFromMemory(
             Msg("! [DDSLoader] Unknown uncompressed format: flags=0x%X, bpp=%u", flags, bpp);
             desc.format = nvrhi::Format::UNKNOWN;
         }
-
-        Msg("~ [DDSLoader] Format: Uncompressed (flags=0x%X, bpp=%u) → NVRHI=%d",
-            flags, bpp, (int)desc.format);
     }
 
     if (debugName) {
@@ -270,11 +273,6 @@ bool DDSLoader::LoadFromMemory(
 
     outData.isValid = true;
     outData.errorMessage = "";
-
-    Msg("* [DDSLoader] Loaded: %s (%ux%u, %u mips, format=%d, %llu bytes)",
-        debugName ? debugName : "unknown",
-        desc.width, desc.height, desc.mipLevels,
-        (int)desc.format, outData.totalDataSize);
 
     return true;
 }
@@ -537,24 +535,11 @@ bool DDSLoader::ParseMipLevels(
 
                 mip.rowPitch = blockWidth * formatInfo.bytesPerBlock;
                 mip.slicePitch = mip.rowPitch * blockHeight;
-
-                if (mipLevel == 0 && arraySlice == 0) {
-                    Msg("* [DDSLoader] Block-compressed: %ux%u → %ux%u blocks, blockSize=%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
-                        mipWidth, mipHeight, blockWidth, blockHeight,
-                        formatInfo.blockSize, formatInfo.bytesPerBlock,
-                        mip.rowPitch, mip.slicePitch);
-                }
             } else {
                 u32 naturalRowPitch = mipWidth * formatInfo.bytesPerBlock;
 
                 mip.rowPitch = naturalRowPitch;
                 mip.slicePitch = mip.rowPitch * mipHeight;
-
-                if (mipLevel == 0 && arraySlice == 0) {
-                    Msg("* [DDSLoader] Uncompressed: %ux%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
-                        mipWidth, mipHeight, formatInfo.bytesPerBlock,
-                        mip.rowPitch, mip.slicePitch);
-                }
             }
 
             outMipLevels.push_back(mip);
@@ -635,9 +620,21 @@ bool DDSLoader::LoadMipRange(
     TextureDesc& desc = outData.desc;
     desc.width = header.dwWidth;
     desc.height = header.dwHeight;
-    desc.depth = (header.dwCaps2 & DDSCAPS2_VOLUME) ? header.dwDepth : 1;
     desc.mipLevels = (header.dwFlags & DDSD_MIPMAPCOUNT) ? header.dwMipMapCount : 1;
-    desc.arraySize = (header.dwCaps2 & DDSCAPS2_CUBEMAP) ? 6 : 1;
+
+    if (header.dwCaps2 & DDSCAPS2_CUBEMAP) {
+        desc.type = TextureDesc::TextureCube;
+        desc.arraySize = 6;
+        desc.depth = 1;
+    } else if (header.dwCaps2 & DDSCAPS2_VOLUME) {
+        desc.type = TextureDesc::Texture3D;
+        desc.arraySize = 1;
+        desc.depth = header.dwDepth > 0 ? header.dwDepth : 1;
+    } else {
+        desc.type = TextureDesc::Texture2D;
+        desc.arraySize = 1;
+        desc.depth = 1;
+    }
 
     if (header.ddspf.dwFlags & DDPF_FOURCC) {
         desc.format = GetFormatFromFourCC(header.ddspf.dwFourCC);
@@ -722,14 +719,10 @@ bool DDSLoader::LoadMipRange(
     outData.filePath = filePath;
     outData.isValid = true;
 
-    Msg("* [DDSLoader] LoadMipRange: %s (mips %u→%u, %llu KB)",
-        filePath, startMip, startMip + mipCount, totalSize / 1024);
-
     return true;
 }
 
 bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
-    Msg("* [DDSLoader] Loading video texture: %s", filePath);
 
     CTheoraSurface* theoraSurface = xr_new<CTheoraSurface>();
 
@@ -745,9 +738,6 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
     u32 videoHeight = theoraSurface->Height(true);
     u32 texWidth = theoraSurface->Width(false);
     u32 texHeight = theoraSurface->Height(false);
-
-    Msg("* [DDSLoader] Video dimensions: %ux%u (texture: %ux%u)",
-        videoWidth, videoHeight, texWidth, texHeight);
 
     outData.type = DDSData::TextureType::Video;
     outData.videoState = xr_new<DDSData::VideoState>();
@@ -788,8 +778,6 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
 
     theoraSurface->Play(shouldLoop, Device.dwTimeContinual);
 
-    Msg("* [DDSLoader] Decoding initial video frame...");
-
     bool firstFrameDecoded = theoraSurface->Update(Device.dwTimeContinual);
     if (!firstFrameDecoded) {
         Sleep(16);
@@ -804,8 +792,6 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
             pos
         );
 
-        Msg("* [DDSLoader] First frame decoded successfully (pos=%d, expected=%u)",
-            pos, videoHeight * texWidth);
     } else {
         Msg("! [DDSLoader] WARNING: Failed to decode initial frame for: %s", filePath);
         for (u32& pixel : outData.videoState->frameBuffer) {
@@ -818,15 +804,10 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
     outData.isValid = true;
     outData.filePath = filePath;
 
-    Msg("* [DDSLoader] Video texture loaded: %s (%ux%u, loop=%s, initialFrame=%s)",
-        filePath, videoWidth, videoHeight, shouldLoop ? "yes" : "no",
-        firstFrameDecoded ? "OK" : "FAIL");
-
     return true;
 }
 
 bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
-    Msg("* [DDSLoader] Loading sequence texture: %s", filePath);
 
     IReader* reader = FS.r_open(filePath);
     if (!reader) {
@@ -882,9 +863,6 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
         return false;
     }
 
-    Msg("* [DDSLoader] Sequence FPS=%u, cycled=%s, frames=%u",
-        fps, cycled ? "yes" : "no", (u32)frameTextureNames.size());
-
     outData.type = DDSData::TextureType::Sequence;
     outData.sequenceState = xr_new<DDSData::SequenceState>();
     outData.sequenceState->fps = fps;
@@ -897,9 +875,6 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
 
     for (u32 i = 0; i < frameTextureNames.size(); i++) {
         const char* frameName = frameTextureNames[i].c_str();
-
-        Msg("* [DDSLoader]   Loading frame %u/%u: %s",
-            i + 1, (u32)frameTextureNames.size(), frameName);
 
         DDSData frameData;
         if (!LoadFromFile(frameName, frameData)) {
@@ -941,10 +916,6 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
             outData.sequenceState->frameData.back().data = outData.sequenceState->framePixels.back().data();
         }
     }
-
-    Msg("* [DDSLoader] Pre-loaded %u frames (%ux%u, format=%d)",
-        (u32)outData.sequenceState->frameData.size(),
-        expectedWidth, expectedHeight, (int)expectedFormat);
 
     outData.sequenceState->frameWidth = expectedWidth;
     outData.sequenceState->frameHeight = expectedHeight;
@@ -992,13 +963,6 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
 
     outData.isValid = true;
     outData.filePath = filePath;
-
-    Msg("* [DDSLoader] Sequence texture loaded: %s (%ux%u, %u frames, %u fps, cycled=%s)",
-        filePath, expectedWidth, expectedHeight,
-        (u32)outData.sequenceState->frameData.size(), fps, cycled ? "yes" : "no");
-
-    Msg("* [DDSLoader] Sequence texture size: %ux%u from first frame",
-        outData.desc.width, outData.desc.height);
 
     return true;
 }

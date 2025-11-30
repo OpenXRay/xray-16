@@ -187,7 +187,7 @@ void renderDepthOnlyGeometry(
             else {
                 Fmatrix xform = batch.worldMatrix;
                 Fmatrix xform_v;
-                xform_v.mul(batch.worldMatrix, Device.mView);
+                xform_v.mul_43(Device.mView, batch.worldMatrix);
 
                 constants.Set("m_xform", xform);
                 constants.Set("m_xform_v", xform_v);
@@ -270,7 +270,7 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
                 return;
             }
 
-            if (!data.geometry || data.geometry->GetBatches().empty()) {
+            if (!data.geometry) {
                 return;
             }
 

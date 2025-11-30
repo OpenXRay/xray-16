@@ -35,7 +35,6 @@ bool SlangCompiler::Initialize()
         return false;
     }
 
-    Msg("* [SlangCompiler] Initialized successfully (VFS integration active)");
     return true;
 }
 
@@ -196,15 +195,8 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         result.slangProgram = program;
 
         auto* programLayout = program->getLayout();
-        if (programLayout)
-        {
-            Msg("  [SlangCompiler] ProgramLayout has %u entry points", programLayout->getEntryPointCount());
-        }
         result.reflection = programLayout;
     }
-
-    Msg("* [SlangCompiler] Successfully compiled %s (entry: %s, stage: %s, target: %s) -> %zu bytes",
-        sourcePath, entryPoint, GetStageName(stage), GetTargetName(target), bytecodeSize);
 
     if (!result.warningMessage.empty())
     {

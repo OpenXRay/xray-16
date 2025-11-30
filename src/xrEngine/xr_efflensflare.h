@@ -144,4 +144,13 @@ public:
     auto& GetDescriptors() { return m_Palette; }
 
     void save(bool soc_style) const;
+
+    [[nodiscard]]
+    CLensFlareDescriptor* GetCurrent() const { return m_Current; }
+
+    [[nodiscard]]
+    bool ShouldRender() const { return bRender; }
+
+    [[nodiscard]]
+    float GetStateBlend() const { return m_StateBlend; }
 };

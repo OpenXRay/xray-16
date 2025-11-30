@@ -49,4 +49,6 @@ ExposureOutput setupExposurePass(
 
 ExposureConfig GetDefaultExposureConfig();
 
+nvrhi::ITexture* GetExposureTexture();
+
 }

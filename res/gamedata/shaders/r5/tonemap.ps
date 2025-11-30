@@ -1,4 +1,5 @@
 Texture2D t_hdr : register(t0);
+Texture2D<float> t_exposure : register(t1);
 SamplerState s_linear : register(s0);
 
 struct PS_INPUT {
@@ -6,23 +7,8 @@ struct PS_INPUT {
     float2 texcoord : TEXCOORD0;
 };
 
-float3 ACESFilm(float3 x) {
-    float a = 2.51;
-    float b = 0.03;
-    float c = 2.43;
-    float d = 0.59;
-    float e = 0.14;
-    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
-}
-
 float4 main(PS_INPUT input) : SV_TARGET {
-    float3 hdr = t_hdr.Sample(s_linear, input.texcoord).rgb;
+    float4 color = t_hdr.Sample(s_linear, input.texcoord);
 
-    const float exposure = 1.0;
-    hdr *= exposure;
-
-    float3 ldr = ACESFilm(hdr);
-
-    return float4(ldr, 1.0);
+    return color;
 }
-

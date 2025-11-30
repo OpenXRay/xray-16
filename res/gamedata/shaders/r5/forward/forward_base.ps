@@ -27,6 +27,36 @@ cbuffer Material : register(b1) {
     float _padding;
 };
 
+static const float PI = 3.14159265359;
+
+float DistributionGGX(float NdotH, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH2 = NdotH * NdotH;
+
+    float denom = NdotH2 * (a2 - 1.0) + 1.0;
+    denom = PI * denom * denom;
+
+    return a2 / max(denom, 0.0001);
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float r = roughness + 1.0;
+    float k = (r * r) / 8.0;
+
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+float GeometrySmith(float NdotV, float NdotL, float roughness) {
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    return ggx1 * ggx2;
+}
+
+float3 FresnelSchlick(float cosTheta, float3 F0) {
+    return F0 + (1.0 - F0) * pow(saturate(1.0 - cosTheta), 5.0);
+}
+
 PS_OUTPUT main(PS_INPUT input) {
     PS_OUTPUT output;
 
@@ -46,7 +76,46 @@ PS_OUTPUT main(PS_INPUT input) {
 
     float3 worldNormal = normalize(mul(tangentNormal, TBN));
 
-    output.color = float4(albedo, 1.0);
+    float metallic = materialSample.r * g_Metallic;
+    float roughness = max(materialSample.g * g_Roughness, 0.04);
+
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+
+    float3 N = worldNormal;
+    float3 V = normalize(eye_position - input.worldPos);
+    float3 L = normalize(-L_sun_dir_w);
+    float3 H = normalize(V + L);
+
+    float NdotV = max(dot(N, V), 0.001);
+    float NdotL = max(dot(N, L), 0.0);
+    float NdotH = max(dot(N, H), 0.0);
+    float HdotV = max(dot(H, V), 0.0);
+
+    float D = DistributionGGX(NdotH, roughness);
+    float G = GeometrySmith(NdotV, NdotL, roughness);
+    float3 F = FresnelSchlick(HdotV, F0);
+
+    float3 numerator = D * G * F;
+    float denominator = 4.0 * NdotV * NdotL + 0.0001;
+    float3 specular = numerator / denominator;
+
+    float3 kS = F;
+    float3 kD = (1.0 - kS) * (1.0 - metallic);
+
+    float3 diffuse = kD * albedo / PI;
+
+    float3 sunContrib = (diffuse + specular) * L_sun_color * NdotL;
+
+    float hemisphereBlend = N.y * 0.5 + 0.5;
+    float3 ambientColor = lerp(L_ambient.rgb * 0.5, L_hemi_color.rgb, hemisphereBlend);
+
+    float3 ambientDiffuse = (1.0 - metallic) * albedo * ambientColor;
+    float3 ambientSpecular = metallic * F0 * ambientColor * 0.5;
+    float3 ambient = ambientDiffuse + ambientSpecular;
+
+    float3 finalColor = sunContrib + ambient;
+
+    output.color = float4(finalColor, 1.0);
 
     return output;
 }

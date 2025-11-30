@@ -12,7 +12,6 @@ RenderContext::RenderContext(RenderDevice* device,
     VERIFY(m_device != nullptr);
     VERIFY(m_commandList != nullptr);
 
-    Msg("~ [RenderContext] Created");
 }
 
 RenderContext::~RenderContext() {
@@ -21,15 +20,6 @@ RenderContext::~RenderContext() {
         EndRenderPass();
     }
 
-    Msg("~ [RenderContext] Stats: %d draws, %d pipeline changes, %d redundant calls avoided",
-        m_stats.numDrawCalls + m_stats.numDrawIndexedCalls +
-        m_stats.numDrawInstancedCalls + m_stats.numDrawIndexedInstancedCalls,
-        m_stats.numPipelineChanges,
-        m_stats.numRedundantPipeline + m_stats.numRedundantViewport +
-        m_stats.numRedundantVertexBuffer + m_stats.numRedundantIndexBuffer +
-        m_stats.numRedundantBindingSet);
-
-    Msg("~ [RenderContext] Destroyed");
 }
 
 void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
@@ -321,7 +311,6 @@ nvrhi::BindingLayoutHandle RenderContext::CreateBindingLayout(const BindingLayou
         return nullptr;
     }
 
-    Msg("~ [RenderContext] Created binding layout with %d bindings", desc.numItems);
     return layout;
 }
 
@@ -384,7 +373,6 @@ nvrhi::BindingSetHandle RenderContext::CreateBindingSet(const BindingSetDesc& de
         return nullptr;
     }
 
-    Msg("~ [RenderContext] Created binding set with %d resources", desc.numItems);
     return bindingSet;
 }
 

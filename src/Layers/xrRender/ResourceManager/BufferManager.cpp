@@ -30,8 +30,6 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
 
     m_cpuAddress = m_device->GetNativeDevice()->mapBuffer(m_buffer, nvrhi::CpuAccessMode::Write);
 
-    Msg("! [RingBuffer] Created: %s (%llu MB)",
-        debugName, size / (1024 * 1024));
 }
 
 RingBuffer::~RingBuffer() {
@@ -44,8 +42,6 @@ RingBuffer::Allocation RingBuffer::Allocate(u64 size, u32 alignment) {
     u64 alignedHead = (m_head + alignment - 1) & ~(u64)(alignment - 1);
 
     if (alignedHead + size > m_size) {
-        Msg("! [RingBuffer] ⚠️ Wrapping around (head=%llu, size=%llu)",
-            m_head, m_size);
 
         alignedHead = 0;
         m_head = 0;
@@ -92,7 +88,6 @@ BufferManager::BufferManager(xray::render::ng::RenderDevice* device)
         "IndexBufferRing"
     );
 
-    Msg("! [BufferManager] Created");
 }
 
 BufferManager::~BufferManager() {
@@ -157,7 +152,7 @@ BufferHandle BufferManager::CreateBuffer(
     meta.nvrhiBuffer = m_device->GetNativeDevice()->createBuffer(nvrhiDesc);
 
     if (!meta.nvrhiBuffer) {
-        Msg("! [BufferManager] ❌ Failed to create buffer: %s",
+        Msg("! [BufferManager] Failed to create buffer: %s",
             desc.debugName.c_str());
         FreeHandle(handle);
         return BufferHandle();
@@ -171,9 +166,6 @@ BufferHandle BufferManager::CreateBuffer(
         m_device->GetNativeDevice()->executeCommandList(cmd);
         cmd->Release();
     }
-
-    Msg("! [BufferManager] Created buffer: %s (%llu KB)",
-        desc.debugName.c_str(), desc.size / 1024);
 
     m_stats.buffersTotal++;
     m_stats.buffersStatic++;
@@ -233,9 +225,6 @@ void BufferManager::DestroyBuffer(BufferHandle handle) {
     if (!ValidateHandle(handle)) return;
 
     BufferMetadata& meta = m_buffers[handle.index];
-
-    Msg("! [BufferManager] Destroying buffer: %s",
-        meta.desc.debugName.c_str());
 
     meta.nvrhiBuffer = nullptr;
 

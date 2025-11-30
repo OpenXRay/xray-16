@@ -113,6 +113,10 @@ framegraph::DefaultOutputLayout setupHUDPass(
             StaticGlobals staticGlobalsCB = {};
             FillGlobalConstants(staticGlobalsCB);
 
+            SunLightData sunData;
+            GetSunLightData(sunData, 2.0f);
+            FillSunConstants(staticGlobalsCB, sunData);
+
             DynamicTransforms dynamicTransformsCB = {};
             FillDynamicTransforms(dynamicTransformsCB);
 
@@ -246,7 +250,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
                     }
                 } else {
                     Fmatrix xform_v;
-                    xform_v.mul(adjustedWorldMatrix, Device.mView);
+                    xform_v.mul_43(Device.mView, adjustedWorldMatrix);
 
                     Fmatrix invW;
                     invW.invert(adjustedWorldMatrix);
@@ -280,8 +284,6 @@ framegraph::DefaultOutputLayout setupHUDPass(
             }
 
             ctx->EndRenderPass();
-
-            Msg("* [HUDPass] Rendered %u draws", numDraws);
 
             cmdList->endMarker();
         }

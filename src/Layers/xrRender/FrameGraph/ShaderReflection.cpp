@@ -166,7 +166,6 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     }
 
     u32 paramCount = entryPoint->getParameterCount();
-    Msg("  [ShaderReflector] Entry point has %u parameters", paramCount);
 
     slang::VariableLayoutReflection* inputParam = nullptr;
     for (u32 i = 0; i < paramCount; i++) {
@@ -178,7 +177,6 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
 
         if (typeLayout->getParameterCategory() == slang::ParameterCategory::VaryingInput) {
             inputParam = param;
-            Msg("  [ShaderReflector] Found input parameter at index %u: '%s'", i, param->getName());
             break;
         }
     }
@@ -196,7 +194,6 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
     }
 
     u32 fieldCount = inputType->getFieldCount();
-    Msg("  [ShaderReflector] Input struct has %u fields", fieldCount);
 
     for (u32 i = 0; i < fieldCount; i++) {
         auto* field = inputType->getFieldByIndex(i);
@@ -208,8 +205,6 @@ VertexInputSignature ShaderReflector::AnalyzeVertexShader(
         const char* fieldName = field->getName() ? field->getName() : "<unknown>";
 
         const char* semanticName = fieldLayout->getSemanticName();
-        Msg("  [ShaderReflector] Field[%u]: name='%s', semantic='%s'",
-            i, fieldName, semanticName ? semanticName : "<none>");
 
         if (!semanticName || semanticName[0] == '\0') {
             Msg("! [ShaderReflector] Skipping field[%u] '%s' - no semantic name", i, fieldName);
@@ -324,74 +319,59 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
     layout.constantBuffers = AnalyzeConstantBuffers(reflection);
 
-    Msg("  [AnalyzeConstantLayout] Found %u constant buffers", layout.constantBuffers.buffers.size());
-
     SlangReflectionWrapper wrapper(reflection);
     auto constantBuffers = wrapper.GetConstantBuffers();
 
     for (u32 cbIdx = 0; cbIdx < constantBuffers.size(); ++cbIdx) {
         const auto& cbInfo = constantBuffers[cbIdx];
 
-        Msg("  [AnalyzeConstantLayout] Processing CB[%u]: '%s' (size=%u)", cbIdx, cbInfo.name, cbInfo.size);
-
         u32 paramCount = reflection->getParameterCount();
-        Msg("  [AnalyzeConstantLayout]   Shader has %u parameters total", paramCount);
 
         bool foundMatchingParam = false;
         for (u32 paramIdx = 0; paramIdx < paramCount; ++paramIdx) {
             auto* param = reflection->getParameterByIndex(paramIdx);
             if (!param) {
-                Msg("  [AnalyzeConstantLayout]   Param[%u]: NULL", paramIdx);
                 continue;
             }
 
             const char* paramName = param->getName();
-            Msg("  [AnalyzeConstantLayout]   Param[%u]: '%s'", paramIdx, paramName ? paramName : "NULL");
 
             auto* typeLayout = param->getTypeLayout();
             if (!typeLayout) {
-                Msg("  [AnalyzeConstantLayout]     No typeLayout");
                 continue;
             }
 
             auto paramCategory = typeLayout->getParameterCategory();
             if (paramCategory != slang::ParameterCategory::ConstantBuffer) {
-                Msg("  [AnalyzeConstantLayout]     Not a CB (category=%d)", (int)paramCategory);
                 continue;
             }
 
-            Msg("  [AnalyzeConstantLayout]     IS a constant buffer parameter");
-
             if (!paramName || xr_strcmp(paramName, cbInfo.name) != 0) {
-                Msg("  [AnalyzeConstantLayout]     Name mismatch: '%s' != '%s'", paramName ? paramName : "NULL", cbInfo.name);
                 continue;
             }
 
             foundMatchingParam = true;
-            Msg("  [AnalyzeConstantLayout]     MATCHED! Extracting fields...");
 
             auto* elementTypeLayout = typeLayout->getElementTypeLayout();
             if (!elementTypeLayout) {
-                Msg("  [AnalyzeConstantLayout]     ERROR: No elementTypeLayout (CB wrapper is empty?)");
+                Msg("! [AnalyzeConstantLayout] ERROR: No elementTypeLayout (CB wrapper is empty?)");
                 continue;
             }
 
             auto* cbType = elementTypeLayout->getType();
             if (!cbType) {
-                Msg("  [AnalyzeConstantLayout]     ERROR: No cbType from element");
+                Msg("! [AnalyzeConstantLayout] ERROR: No cbType from element");
                 continue;
             }
 
             auto typeKind = cbType->getKind();
-            Msg("  [AnalyzeConstantLayout]     Unwrapped cbType kind: %d (Struct=%d)", (int)typeKind, (int)slang::TypeReflection::Kind::Struct);
 
             if (typeKind != slang::TypeReflection::Kind::Struct) {
-                Msg("  [AnalyzeConstantLayout]     ERROR: Not a struct type after unwrapping");
+                Msg("! [AnalyzeConstantLayout] ERROR: Not a struct type after unwrapping");
                 continue;
             }
 
             u32 fieldCount = cbType->getFieldCount();
-            Msg("  [AnalyzeConstantLayout]     Found %u fields in CB struct", fieldCount);
 
             for (u32 i = 0; i < fieldCount; ++i) {
                 auto* field = cbType->getFieldByIndex(i);
@@ -432,32 +412,22 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
         }
     }
 
-    Msg("  [AnalyzeConstantLayout] === STEP 2: Checking for loose constants ($Globals) ===");
-
     auto* globalParamsLayout = reflection->getGlobalParamsTypeLayout();
 
     if (!globalParamsLayout) {
-        Msg("  [AnalyzeConstantLayout] No globalParamsLayout (no loose constants in shader)");
     } else {
-        Msg("  [AnalyzeConstantLayout] globalParamsLayout exists, checking fields...");
-
         auto* globalParamsVar = reflection->getGlobalParamsVarLayout();
         u32 globalsBindingSlot = 0;
 
         if (globalParamsVar) {
             globalsBindingSlot = static_cast<u32>(globalParamsVar->getOffset(slang::ParameterCategory::ConstantBuffer));
-            Msg("  [AnalyzeConstantLayout] $Globals binding: b%u (from reflection)", globalsBindingSlot);
         } else {
             globalsBindingSlot = 0;
-            Msg("  [AnalyzeConstantLayout] $Globals binding: b0 (fallback - Slang didn't provide slot)");
         }
 
         u32 fieldCount = static_cast<u32>(globalParamsLayout->getFieldCount());
-        Msg("  [AnalyzeConstantLayout] globalParamsLayout has %u fields", fieldCount);
 
         if (fieldCount > 0) {
-            Msg("  [AnalyzeConstantLayout] globalParamsLayout has %u fields, checking if valid loose constants", fieldCount);
-
             ConstantBufferInfo implicitCB;
             implicitCB.name = "$Globals";
             implicitCB.slot = globalsBindingSlot;
@@ -469,7 +439,6 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
             for (u32 i = 0; i < fieldCount; ++i) {
                 auto* fieldLayout = globalParamsLayout->getFieldByIndex(i);
                 if (!fieldLayout) {
-                    Msg("    [AnalyzeConstantLayout] Field[%u]: NULL layout", i);
                     continue;
                 }
 
@@ -483,13 +452,11 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
                 auto* fieldVar = fieldLayout->getVariable();
                 if (!fieldVar) {
-                    Msg("    [AnalyzeConstantLayout] Field[%u]: No variable", i);
                     continue;
                 }
 
                 const char* fieldName = fieldVar->getName();
                 if (!fieldName) {
-                    Msg("    [AnalyzeConstantLayout] Field[%u]: NULL name", i);
                     continue;
                 }
 
@@ -514,20 +481,6 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
                 layout.constants.push_back(constant);
                 extractedConstantCount++;
-
-                const char* typeStr = "unknown";
-                switch (constant.type) {
-                case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
-                case ShaderConstant::Type::Vector: typeStr = "vector"; break;
-                case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
-                case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
-                case ShaderConstant::Type::Array: typeStr = "array"; break;
-                case ShaderConstant::Type::Struct: typeStr = "struct"; break;
-                }
-
-                Msg("    [AnalyzeConstantLayout] Loose constant: %s (type=%s, offset=%u, size=%u, freq=%d)",
-                    fieldName, typeStr, constant.offset, constant.size,
-                    static_cast<int>(constant.frequency));
             }
 
             if (extractedConstantCount > 0) {
@@ -547,16 +500,11 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
                 if (implicitCB.size > 0) {
                     layout.constantBuffers.buffers.push_back(implicitCB);
-                    Msg("  [AnalyzeConstantLayout] ✓ Added implicit $Globals CB (%u constants, %u bytes)",
-                        extractedConstantCount, implicitCB.size);
                 } else {
                     Msg("! [AnalyzeConstantLayout] ERROR: Cannot add $Globals CB - size is 0 even after calculation");
                 }
-            } else {
-                Msg("  [AnalyzeConstantLayout] Skipping $Globals CB (no valid constants extracted)");
             }
         } else {
-            Msg("  [AnalyzeConstantLayout] fieldCount=0, falling back to parameter iteration");
 
             ConstantBufferInfo implicitCB;
             implicitCB.name = "$Globals";
@@ -566,7 +514,6 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
             u16 cbIndex = static_cast<u16>(layout.constantBuffers.buffers.size());
 
             SlangInt paramCount = reflection->getParameterCount();
-            Msg("  [AnalyzeConstantLayout] Scanning %d program parameters for loose uniforms", (int)paramCount);
 
             u32 looseConstantCount = 0;
             for (SlangInt i = 0; i < paramCount; ++i) {
@@ -583,8 +530,6 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
                 const char* paramName = param->getName();
                 if (!paramName) continue;
-
-                Msg("    [AnalyzeConstantLayout] Found loose uniform: %s", paramName);
 
                 ShaderConstant constant;
                 constant.name = paramName;
@@ -607,20 +552,6 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
                 layout.constants.push_back(constant);
                 looseConstantCount++;
-
-                const char* typeStr = "unknown";
-                switch (constant.type) {
-                    case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
-                    case ShaderConstant::Type::Vector: typeStr = "vector"; break;
-                    case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
-                    case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
-                    case ShaderConstant::Type::Array: typeStr = "array"; break;
-                    case ShaderConstant::Type::Struct: typeStr = "struct"; break;
-                }
-
-                Msg("    [AnalyzeConstantLayout] Loose constant: %s (type=%s, offset=%u, size=%u, count=%u, freq=%d)",
-                    paramName, typeStr, constant.offset, constant.size, constant.arrayCount,
-                    static_cast<int>(constant.frequency));
             }
 
             if (looseConstantCount > 0) {
@@ -640,18 +571,12 @@ ShaderConstantLayout ShaderReflector::AnalyzeConstantLayout(slang::ShaderReflect
 
                 if (implicitCB.size > 0) {
                     layout.constantBuffers.buffers.push_back(implicitCB);
-                    Msg("  [AnalyzeConstantLayout] ✓ Extracted %u loose uniforms via parameter iteration (%u bytes)",
-                        looseConstantCount, implicitCB.size);
                 } else {
                     Msg("! [AnalyzeConstantLayout] ERROR: Cannot add $Globals CB - size is 0 even after calculation (unwrapped path)");
                 }
-            } else {
-                Msg("  [AnalyzeConstantLayout] No loose constants found (shader uses explicit cbuffers)");
             }
         }
     }
-
-    Msg("  [AnalyzeConstantLayout] Extracted %u total constants", layout.constants.size());
 
     return layout;
 }
@@ -705,7 +630,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
             if (type && type->getKind() == slang::TypeReflection::Kind::Struct)
             {
                 u32 fieldCount = type->getFieldCount();
-                Msg("  [AnalyzePixelShader] Return struct has %u fields", fieldCount);
 
                 for (u32 i = 0; i < fieldCount; i++)
                 {
@@ -722,9 +646,6 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
                     const char* semantic = fieldLayout->getSemanticName();
                     u32 semanticIndex = fieldLayout->getSemanticIndex();
 
-                    Msg("  [AnalyzePixelShader] Field[%u]: name='%s', semantic='%s', index=%u",
-                        i, fieldName ? fieldName : "null", semantic ? semantic : "null", semanticIndex);
-
                     if (semantic)
                     {
                         if (xr_strcmp(semantic, "SV_Target") == 0)
@@ -732,12 +653,10 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
                             ShaderRTBindings::OutputRT output;
                             output.slot = semanticIndex;
                             bindings.outputRTs.push_back(output);
-                            Msg("  [AnalyzePixelShader] Added RT output at slot %u", semanticIndex);
                         }
                         else if (xr_strcmp(semantic, "SV_Depth") == 0)
                         {
                             bindings.hasDepthOutput = true;
-                            Msg("  [AnalyzePixelShader] Found depth output");
                         }
                     }
                 }
@@ -747,15 +666,11 @@ ShaderRTBindings ShaderReflector::AnalyzePixelShader(
                 const char* semantic = resultVarLayout->getSemanticName();
                 u32 semanticIndex = resultVarLayout->getSemanticIndex();
 
-                Msg("  [AnalyzePixelShader] Simple return type: semantic='%s', index=%u",
-                    semantic ? semantic : "null", semanticIndex);
-
                 if (semantic && xr_strcmp(semantic, "SV_Target") == 0)
                 {
                     ShaderRTBindings::OutputRT output;
                     output.slot = semanticIndex;
                     bindings.outputRTs.push_back(output);
-                    Msg("  [AnalyzePixelShader] Added RT output at slot %u", semanticIndex);
                 }
             }
         }
@@ -920,27 +835,16 @@ ExtractedReflection ShaderReflector::ExtractReflection(
         return result;
     }
 
-    Msg("  [ShaderReflector::ExtractReflection] Extracting %s shader reflection (entryPoints=%u)",
-        isVertexShader ? "vertex" : "pixel",
-        slangReflection->getEntryPointCount());
-
     if (isVertexShader)
     {
         result.vertexInputSignature = AnalyzeVertexShader(slangReflection);
-        Msg("  [ShaderReflector::ExtractReflection] Extracted %u vertex inputs",
-            result.vertexInputSignature.elements.size());
     }
     else
     {
         result.rtBindings = AnalyzePixelShader(slangReflection);
-        Msg("  [ShaderReflector::ExtractReflection] Extracted %u RT outputs",
-            result.rtBindings.outputRTs.size());
     }
 
     result.constantLayout = AnalyzeConstantLayout(slangReflection);
-    Msg("  [ShaderReflector::ExtractReflection] Extracted %u constant buffers, %u individual constants",
-        result.constantLayout.constantBuffers.buffers.size(),
-        result.constantLayout.constants.size());
 
     return result;
 }

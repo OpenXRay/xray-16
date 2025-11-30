@@ -196,18 +196,15 @@ static FileLocation MakeFileLocation(
 }
 
 static const char* const FOLDER_BLACKLIST[] = {
-    "terrain",
-    "levels",
-    "lmap",
-    "detail",
-    "sky",
-    "water",
-    "wm",
-    "ui",
-    "hud",
-    "grad",
-    "pfx",
+    "editor",
+    "fx",
     "glow"
+    "grad",
+    "internal",
+    "lights",
+    "pfx",
+    "sky",
+    "ui",
 };
 
 static bool IsInBlacklistedFolder(const xr_string& path) {

@@ -121,12 +121,9 @@ TextureManager::TextureManager(RenderDevice* device)
 
     m_streamingManager = xr_make_unique<StreamingManager>(device, this);
 
-    Msg("! [TextureManager] Created with budget: %llu MB",
-        m_memoryBudget / (1024 * 1024));
 }
 
 TextureManager::~TextureManager() {
-    Msg("! [TextureManager] Destroying...");
 
     u32 leakCount = 0;
     for (const auto& tex : m_textures) {
@@ -215,9 +212,6 @@ TextureHandle TextureManager::LoadTexture(
 
     m_pathToHandle[pathStr] = handle;
 
-    Msg("! [TextureManager] Registered texture: %s (handle=%u.%u)",
-        path, handle.index, handle.generation);
-
     m_stats.texturesTotal++;
 
     LoadTextureSync(handle);
@@ -292,10 +286,6 @@ TextureHandle TextureManager::CreateTexture(
         m_stats.texturesResident++;
         m_stats.totalMemoryUsed += meta.memoryUsed;
 
-        Msg("~ [TextureManager] Created runtime texture '%s': %ux%ux%u, %.2f MB",
-            desc.debugName.c_str(),
-            desc.width, desc.height, desc.depth,
-            meta.memoryUsed / (1024.0f * 1024.0f));
     } else {
         Msg("! [TextureManager] Failed to create NVRHI texture '%s'", desc.debugName.c_str());
     }
@@ -341,8 +331,6 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
     meta.accessCount++;
 
     if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
-        Msg("! [TextureManager] ⚠️ Accessing evicted texture: %s - reloading...",
-            meta.filePath.c_str());
         LoadTextureSync(handle);
     }
 
@@ -371,8 +359,6 @@ bool TextureManager::IsResident(TextureHandle handle) const {
 
 void TextureManager::SetMemoryBudget(u64 bytes) {
     m_memoryBudget = bytes;
-    Msg("! [TextureManager] Memory budget set to: %llu MB",
-        m_memoryBudget / (1024 * 1024));
 }
 
 void TextureManager::RequestMips(TextureHandle handle, u32 mipCount) {
@@ -434,7 +420,6 @@ void TextureManager::Evict(TextureHandle handle) {
     TextureMetadata& meta = m_textures[handle.index];
 
     if (meta.state == TextureState::Resident) {
-        Msg("! [TextureManager] Evicting: %s", meta.filePath.c_str());
         EvictTextureInternal(handle);
     }
 }
@@ -449,9 +434,6 @@ bool TextureManager::EnforceMemoryBudget(u64 requiredBytes) {
     }
 
     u64 bytesNeeded = (m_memoryUsed + requiredBytes) - m_memoryBudget;
-
-    Msg("! [TextureManager] Over budget! Need to free %llu MB",
-        bytesNeeded / (1024 * 1024));
 
     return EvictTextures(bytesNeeded);
 }
@@ -497,8 +479,6 @@ bool TextureManager::EvictTextures(u64 bytesNeeded) {
 
     std::sort(candidates.begin(), candidates.end());
 
-    Msg("! [TextureManager] Found %u eviction candidates", candidates.size());
-
     for (const auto& candidate : candidates) {
         if (bytesFreed >= bytesNeeded) {
             break;
@@ -506,19 +486,10 @@ bool TextureManager::EvictTextures(u64 bytesNeeded) {
 
         const TextureMetadata* meta = GetMetadata(candidate.handle);
 
-        Msg("!   Evicting: %s (score=%.2f, %llu KB)",
-            meta->filePath.c_str(),
-            candidate.score,
-            candidate.memoryUsed / 1024);
-
         EvictTextureInternal(candidate.handle);
 
         bytesFreed += candidate.memoryUsed;
     }
-
-    Msg("! [TextureManager] Freed %llu MB (needed %llu MB)",
-        bytesFreed / (1024 * 1024),
-        bytesNeeded / (1024 * 1024));
 
     return bytesFreed >= bytesNeeded;
 }
@@ -542,7 +513,6 @@ void TextureManager::EvictTextureInternal(TextureHandle handle) {
     m_memoryUsed -= meta.memoryUsed;
     meta.memoryUsed = 0;
 
-    Msg("! [TextureManager] Evicted: %s", meta.filePath.c_str());
 }
 
 void TextureManager::Update(float deltaTime) {
@@ -586,15 +556,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
     bool isVideoTexture = (ddsData.type == DDSData::TextureType::Video);
     bool isSequenceTexture = (ddsData.type == DDSData::TextureType::Sequence);
-
-    if (isVideoTexture) {
-        Msg("* [TextureManager] Video texture detected: %s", meta.filePath.c_str());
-    }
-    if (isSequenceTexture) {
-        Msg("* [TextureManager] Sequence texture detected: %s (%u frames)",
-            meta.filePath.c_str(),
-            (u32)ddsData.sequenceState->frameData.size());
-    }
 
     u64 requiredMemory = ddsData.totalDataSize;
 
@@ -666,7 +627,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         meta.videoTextureData = xr_make_unique<DDSData>();
         *meta.videoTextureData = std::move(ddsData);
 
-        Msg("* [TextureManager] Video texture state stored for: %s", meta.filePath.c_str());
     }
 
     if (isSequenceTexture) {
@@ -676,7 +636,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         meta.sequenceTextureData->sequenceState->currentFrame = 0;
         meta.sequenceTextureData->sequenceState->elapsedTime = 0.0f;
 
-        Msg("* [TextureManager] Sequence texture state stored for: %s", meta.filePath.c_str());
     }
 
     meta.state = TextureState::Resident;
@@ -686,10 +645,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
     meta.memoryUsed = ddsData.totalDataSize;
 
     m_memoryUsed += meta.memoryUsed;
-
-    Msg("* [TextureManager] Loaded texture: %s (%u mips, %llu bytes, total memory: %llu / %llu, video=%s)",
-        meta.filePath.c_str(), meta.residentMips, meta.memoryUsed,
-        m_memoryUsed, m_memoryBudget, isVideoTexture ? "yes" : "no");
 }
 
 void TextureManager::LoadTextureAsync(TextureHandle handle) {
@@ -783,8 +738,6 @@ TextureHandle TextureManager::LoadTextureThreadSafe(
         m_pathToHandle[pathStr] = handle;
     }
 
-    Msg("! [TextureManager] LoadTextureThreadSafe: %s", path);
-
     LoadTextureSync(handle);
 
     return handle;
@@ -870,16 +823,8 @@ void TextureManager::UpdateVideoTextures() {
 
         videoState->needsUpdate = false;
 
-        if (s_frameCount % 60 == 0) {
-            Msg("* [TextureManager] Updated video texture: %s (%ux%u)",
-                meta.filePath.c_str(), texWidth, texHeight);
-        }
     }
 
-    if (s_frameCount % 120 == 0 && videoTextureCount > 0) {
-        Msg("* [TextureManager] UpdateVideoTextures: %d video textures, %d updated this frame",
-            videoTextureCount, updatedCount);
-    }
 }
 
 void TextureManager::UpdateSequenceTextures(float deltaTime) {

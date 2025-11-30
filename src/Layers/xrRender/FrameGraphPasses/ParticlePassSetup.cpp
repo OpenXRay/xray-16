@@ -208,8 +208,6 @@ static ng::PipelineState* GetOrCreateParticlePSO(
     if (!vs || !ps)
         return nullptr;
 
-    Msg("* [ParticlePass] Creating PSO for VS='%s' PS='%s'", vs->cName.c_str(), ps->cName.c_str());
-
     nvrhi::ShaderHandle vsHandle = materialCache->GetOrCreateShaderVS(vs);
     if (!vsHandle) {
         Msg("! [ParticlePass] ERROR: Failed to get VS '%s'", vs->cName.c_str());
@@ -309,11 +307,6 @@ static ParticleBindingCache* CreateParticleBindingSet(
     if (!vs || !ps)
         return nullptr;
 
-    Msg("  Shader reflection: VS=%p PS=%p", vs->reflection, ps->reflection);
-    if (!vs->reflection || !ps->reflection) {
-        Msg("  WARNING: Missing shader reflection!");
-    }
-
     xr_string cacheKeyStr;
     cacheKeyStr.append(vs->cName.c_str());
     cacheKeyStr.append("|");
@@ -321,31 +314,24 @@ static ParticleBindingCache* CreateParticleBindingSet(
 
     RENDER_NAMESPACE::STextureList* texList = pass->T._get();
 
-    Msg("* [ParticlePass] CreateBindingSet for VS='%s' PS='%s'", vs->cName.c_str(), ps->cName.c_str());
     if (texList && !texList->empty()) {
-        Msg("  Texture list has %zu entries:", texList->size());
         for (size_t i = 0; i < texList->size(); i++) {
             const auto& texPair = (*texList)[i];
             const shared_str& textureName = texPair.second;
-            Msg("    [%u] slot=%u name='%s'", (u32)i, texPair.first, textureName.c_str() ? textureName.c_str() : "(null)");
             if (textureName.c_str() && textureName[0]) {
                 cacheKeyStr.append("|");
                 cacheKeyStr.append(textureName.c_str());
             }
         }
-    } else {
-        Msg("  WARNING: Texture list is EMPTY or NULL!");
     }
 
     shared_str cacheKey = cacheKeyStr.c_str();
 
     auto it = s_bindingCache.find(cacheKey);
     if (it != s_bindingCache.end()) {
-        Msg("  [CACHE HIT] Returning cached binding set");
         return &it->second;
     }
 
-    Msg("  [CACHE MISS] Creating new binding set...");
     ParticleBindingCache cacheEntry;
 
     const auto& vsCBs = ShaderReflector::GetConstantBuffers(vs->reflection);
@@ -438,6 +424,7 @@ static ParticleBindingCache* CreateParticleBindingSet(
 
     psLayoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Texture_SRV(0));
     psLayoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Sampler(0));
+    psLayoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::Sampler(3));
 
     cacheEntry.psBindingLayout = device->GetNVRHIDevice()->createBindingLayout(psLayoutDesc);
     if (!cacheEntry.psBindingLayout) {
@@ -469,7 +456,6 @@ static ParticleBindingCache* CreateParticleBindingSet(
         }
     }
 
-    Msg("  Binding particle texture...");
     if (texList && !texList->empty()) {
         for (size_t i = 0; i < texList->size(); i++) {
             const auto& texPair = (*texList)[i];
@@ -478,7 +464,6 @@ static ParticleBindingCache* CreateParticleBindingSet(
             if (slot != 0) continue;
 
             const shared_str& textureName = texPair.second;
-            Msg("    Binding s_base texture: '%s'", textureName.c_str() ? textureName.c_str() : "(null)");
 
             RENDER_NAMESPACE::CTexture* xrayTex = (textureName.c_str() && textureName[0])
                 ? RENDER_NAMESPACE::RImplementation.Resources->_CreateTexture(textureName.c_str())
@@ -527,38 +512,38 @@ static ParticleBindingCache* CreateParticleBindingSet(
                             if (nativeTex) {
                                 psBindingDesc.bindings.push_back(
                                     nvrhi::BindingSetItem::Texture_SRV(0, nativeTex));
-                                Msg("      SUCCESS: Bound texture to slot 0");
-                            } else {
-                                Msg("      ERROR: GetNativeTexture returned null!");
                             }
-                        } else {
-                            Msg("      ERROR: CreateTextureFromD3D11 failed!");
                         }
-                    } else {
-                        Msg("      ERROR: Failed to get ID3D11Resource!");
                     }
-                } else {
-                    Msg("      ERROR: surface_get() returned null!");
                 }
-            } else {
-                Msg("      ERROR: _CreateTexture returned null!");
             }
             break;
         }
-    } else {
-        Msg("  WARNING: No textures to bind!");
     }
 
-    nvrhi::SamplerDesc samplerDesc;
-    samplerDesc.setAllFilters(true);
-    samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
-    samplerDesc.setMaxAnisotropy(8.0f);
+    {
+        nvrhi::SamplerDesc nofilterDesc;
+        nofilterDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
+        nofilterDesc.setAllFilters(false);
 
-    nvrhi::SamplerHandle sampler = device->GetNVRHIDevice()->createSampler(samplerDesc);
-    if (sampler) {
-        cacheEntry.samplers.push_back(sampler);
-        psBindingDesc.bindings.push_back(nvrhi::BindingSetItem::Sampler(0, sampler));
-        Msg("      SUCCESS: Created sampler at slot 0");
+        nvrhi::SamplerHandle smpNofilter = device->GetNVRHIDevice()->createSampler(nofilterDesc);
+        if (smpNofilter) {
+            cacheEntry.samplers.push_back(smpNofilter);
+            psBindingDesc.bindings.push_back(nvrhi::BindingSetItem::Sampler(0, smpNofilter));
+        }
+    }
+
+    {
+        nvrhi::SamplerDesc baseDesc;
+        baseDesc.setAllFilters(true);
+        baseDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        baseDesc.setMaxAnisotropy(8.0f);
+
+        nvrhi::SamplerHandle smpBase = device->GetNVRHIDevice()->createSampler(baseDesc);
+        if (smpBase) {
+            cacheEntry.samplers.push_back(smpBase);
+            psBindingDesc.bindings.push_back(nvrhi::BindingSetItem::Sampler(3, smpBase));
+        }
     }
 
     cacheEntry.psBindingSet = device->GetNVRHIDevice()->createBindingSet(
@@ -585,13 +570,8 @@ static bool RenderParticleEffect(
 
     auto* pDef = pEffect->GetDefinition();
     if (!pDef || !pDef->m_Flags.is(CPEDef::dfSprite)) {
-        Msg("* [ParticlePass] Skipping non-sprite particle effect");
         return false;
     }
-
-    Msg("* [ParticlePass] Rendering particle effect: shader='%s' texture='%s'",
-        pDef->m_ShaderName.c_str() ? pDef->m_ShaderName.c_str() : "(null)",
-        pDef->m_TextureName.c_str() ? pDef->m_TextureName.c_str() : "(null)");
 
     PAPI::Particle* particles = nullptr;
     u32 particleCount = 0;
@@ -676,6 +656,10 @@ static bool RenderParticleEffect(
 
     StaticGlobals staticGlobalsCB = {};
     FillGlobalConstants(staticGlobalsCB);
+
+    SunLightData sunData;
+    GetSunLightData(sunData, 2.0f);
+    FillSunConstants(staticGlobalsCB, sunData);
 
     DynamicTransforms dynamicTransformsCB = {};
     FillDynamicTransforms(dynamicTransformsCB);
@@ -773,8 +757,6 @@ DefaultOutputLayout setupParticlePass(
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 
-            Msg("* [ParticlePass] Execute: %u world batches, %u HUD batches", totalWorld, totalHUD);
-
             if (totalWorld == 0 && totalHUD == 0) {
                 cmdList->endMarker();
                 return;
@@ -845,10 +827,6 @@ DefaultOutputLayout setupParticlePass(
             }
 
             ctx->EndRenderPass();
-
-            if (numDraws > 0) {
-                Msg("* [ParticlePass] Rendered %u particle effects", numDraws);
-            }
 
             cmdList->endMarker();
         }

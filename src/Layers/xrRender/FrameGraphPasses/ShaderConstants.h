@@ -227,4 +227,26 @@ inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity
 
 }
 
+struct SunLightData {
+    Fvector color;
+    Fvector direction;
+    float intensity;
+};
+
+inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
+    cb.L_sun_color.set(
+        sun.color.x * sun.intensity,
+        sun.color.y * sun.intensity,
+        sun.color.z * sun.intensity
+    );
+
+    cb.L_sun_dir_w.set(
+        sun.direction.x,
+        sun.direction.y,
+        sun.direction.z
+    );
+}
+
+void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
+
 }

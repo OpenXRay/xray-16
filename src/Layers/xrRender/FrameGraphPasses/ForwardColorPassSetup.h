@@ -22,6 +22,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle colorInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,

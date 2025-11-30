@@ -38,6 +38,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle colorInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
@@ -59,7 +60,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     auto& passData = fg.addCallbackPass<ForwardColorPassData>(
         "Forward+ Color Pass",
 
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
@@ -68,18 +69,9 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             RenderPassBuilder passBuilder(builder, passHandle);
 
-            if (depthInput.is_valid()) {
-                data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
-            } else {
-                data.depth = passBuilder.createDepthBuffer("rt_Depth", width, height);
-            }
+            data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
 
-            data.color = passBuilder.createTexture2D(
-                "rt_SceneColor",
-                width,
-                height,
-                nvrhi::Format::RGBA16_FLOAT
-            );
+            data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
 
             data.outputs.albedo = data.color;
             data.outputs.depth = data.depth;
@@ -146,6 +138,10 @@ void renderForwardGeometry(
     StaticGlobals staticGlobalsCB = {};
     FillGlobalConstants(staticGlobalsCB);
 
+    SunLightData sunData;
+    GetSunLightData(sunData, 2.0f);
+    FillSunConstants(staticGlobalsCB, sunData);
+
     DynamicTransforms dynamicTransformsCB = {};
     FillDynamicTransforms(dynamicTransformsCB);
 
@@ -180,11 +176,7 @@ void renderForwardGeometry(
     passDesc.numRenderTargets = 1;
     passDesc.depthStencil = depthRT;
 
-    passDesc.clearValue.color[0] = 0.0f;
-    passDesc.clearValue.color[1] = 0.0f;
-    passDesc.clearValue.color[2] = 0.0f;
-    passDesc.clearValue.color[3] = 1.0f;
-    passDesc.clearColor = true;
+    passDesc.clearColor = false;
 
     passDesc.clearDepth = false;
     passDesc.clearStencil = false;
@@ -290,7 +282,7 @@ void renderForwardGeometry(
             else {
                 Fmatrix xform = batch.worldMatrix;
                 Fmatrix xform_v;
-                xform_v.mul(batch.worldMatrix, Device.mView);
+                xform_v.mul_43(Device.mView, batch.worldMatrix);
 
                 constants.Set("m_xform", xform);
                 constants.Set("m_xform_v", xform_v);

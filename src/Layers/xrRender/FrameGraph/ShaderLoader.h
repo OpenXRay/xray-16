@@ -98,6 +98,8 @@ private:
     ShaderCache m_cache;
 
     xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
+
+    xr_map<xr_string, nvrhi::ShaderHandle> m_handleCache;
 };
 
 }

@@ -53,6 +53,11 @@ ExposureConfig GetDefaultExposureConfig()
     return config;
 }
 
+nvrhi::ITexture* GetExposureTexture()
+{
+    return s_exposure_texture.Get();
+}
+
 struct HistogramCB {
     float minLogLum;
     float logLumRange;
@@ -360,7 +365,10 @@ ExposureOutput setupExposurePass(
                     }
                 } else {
                     float exposure = ComputeFallbackExposure(data.config, data.deltaTime);
-                    cmdList->writeTexture(s_exposure_texture, 0, 0, &exposure, sizeof(float));
+
+                    if (s_exposure_texture) {
+                        cmdList->writeTexture(s_exposure_texture, 0, 0, &exposure, sizeof(float));
+                    }
                 }
             } else {
                 float exposure = ComputeFallbackExposure(data.config, data.deltaTime);

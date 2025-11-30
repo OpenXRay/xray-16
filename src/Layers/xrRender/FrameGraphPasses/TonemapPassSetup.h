@@ -12,6 +12,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle hdrInput,
+    framegraph::VirtualResourceHandle exposureTexture,
     u32 width,
     u32 height
 );

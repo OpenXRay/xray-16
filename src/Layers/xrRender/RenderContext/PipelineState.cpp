@@ -218,10 +218,6 @@ PipelineState* PipelineStateCache::GetOrCreate(
             m_cache[hash] = xr_unique_ptr<PipelineState>(pso);
             m_stats.psoCount++;
             m_stats.cacheMisses++;
-
-            Msg("! [PipelineStateCache] Created PSO: %s (hash: 0x%llx)",
-                desc.debugName.c_str(), hash);
-
             return pso;
         }
 
@@ -347,12 +343,6 @@ PipelineState* PipelineStateCache::CreatePipelineState(
         fbInfo.colorFormats.push_back(desc.renderTargetFormats[i]);
     }
     fbInfo.depthFormat = desc.depthStencilFormat;
-
-    Msg("  [PipelineStateCache] Creating PSO: %s", desc.debugName.c_str());
-    Msg("    - VS: %s", nvrhiDesc.VS ? "valid" : "NULL");
-    Msg("    - PS: %s", nvrhiDesc.PS ? "valid" : "NULL");
-    Msg("    - Primitive type: %d", (int)nvrhiDesc.primType);
-    Msg("    - RT count: %d", fbInfo.colorFormats.size());
 
     if (!nvrhiDesc.VS) {
         Msg("! [PipelineStateCache] Cannot create pipeline without vertex shader!");

@@ -64,7 +64,7 @@ struct GeometryBatch {
     }
 
     bool IsOpaque() const {
-        return !IsAlphaTested() && !IsStrictB2F();
+        return !IsAlphaTested();
     }
 };
 

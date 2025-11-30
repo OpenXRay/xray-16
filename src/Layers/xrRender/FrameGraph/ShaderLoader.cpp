@@ -118,6 +118,17 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
 {
     ShaderResult result;
 
+    xr_string cacheKey = xr_string(name) + ".vs";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
+
     IReader* fs = OpenShaderFile(name, ".vs");
     if (!fs)
         return result;
@@ -152,7 +163,9 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
 
         result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
 
-        Msg("  Loaded vertex shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+
         return result;
     }
 
@@ -210,7 +223,9 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
 
     m_cache.Save(name, ".vs", sourceHash, result.bytecode, &extractedReflection);
 
-    Msg("  Loaded vertex shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
     return result;
 }
 
@@ -219,6 +234,17 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     const char* entryPoint)
 {
     ShaderResult result;
+
+    xr_string cacheKey = xr_string(name) + ".ps";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
 
     IReader* fs = OpenShaderFile(name, ".ps");
     if (!fs)
@@ -254,7 +280,9 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
 
         result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
 
-        Msg("  ✓ Loaded pixel shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+
         return result;
     }
 
@@ -312,7 +340,9 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
 
     m_cache.Save(name, ".ps", sourceHash, result.bytecode, &extractedReflection);
 
-    Msg("  Loaded pixel shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
     return result;
 }
 

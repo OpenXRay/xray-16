@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TonemapPassSetup.h"
+#include "ExposurePassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -15,6 +16,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle hdrInput,
+    framegraph::VirtualResourceHandle exposureTexture,
     u32 width,
     u32 height)
 {
@@ -22,21 +24,30 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
     struct TonemapPassData {
         VirtualResourceHandle hdrInput;
+        VirtualResourceHandle exposureInput;
         VirtualResourceHandle ldrOutput;
+        bool hasExposure;
         u32 width;
         u32 height;
     };
 
+    bool hasExposure = exposureTexture.is_valid();
+
     auto& passData = fg.addCallbackPass<TonemapPassData>(
         "Tonemap",
 
-        [hdrInput, width, height](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
+        [hdrInput, exposureTexture, hasExposure, width, height](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
             data.height = height;
+            data.hasExposure = hasExposure;
 
             data.hdrInput = passBuilder.read(hdrInput, ResourceState::ShaderResource);
+
+            if (hasExposure) {
+                data.exposureInput = passBuilder.read(exposureTexture, ResourceState::ShaderResource);
+            }
 
             data.ldrOutput = passBuilder.createTexture2D(
                 "rt_Final",
@@ -55,6 +66,8 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             auto* hdrTexture = fg.GetPhysicalTexture(data.hdrInput);
             auto* ldrTexture = fg.GetPhysicalTexture(data.ldrOutput);
+
+            auto* exposureTexture = data.hasExposure ? passes::GetExposureTexture() : nullptr;
 
             if (!hdrTexture || !ldrTexture) {
                 Msg("! [TonemapPass] Failed to get textures");
@@ -81,6 +94,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             bindingLayoutDesc.visibility = nvrhi::ShaderType::Pixel;
             bindingLayoutDesc.bindings = {
                 nvrhi::BindingLayoutItem::Texture_SRV(0),
+                nvrhi::BindingLayoutItem::Texture_SRV(1),
                 nvrhi::BindingLayoutItem::Sampler(0)
             };
 
@@ -127,9 +141,36 @@ framegraph::VirtualResourceHandle setupTonemapPass(
                 return;
             }
 
+            nvrhi::ITexture* exposureToUse = exposureTexture;
+            nvrhi::TextureHandle fallbackExposure;
+
+            if (!exposureToUse) {
+                nvrhi::TextureDesc texDesc;
+                texDesc.debugName = "FallbackExposure";
+                texDesc.width = 1;
+                texDesc.height = 1;
+                texDesc.format = nvrhi::Format::R32_FLOAT;
+                texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+                texDesc.keepInitialState = true;
+
+                fallbackExposure = cmdList->getDevice()->createTexture(texDesc);
+                if (fallbackExposure) {
+                    float defaultExposure = 1.0f;
+                    cmdList->writeTexture(fallbackExposure, 0, 0, &defaultExposure, sizeof(float));
+                    exposureToUse = fallbackExposure.Get();
+                }
+            }
+
+            if (!exposureToUse) {
+                Msg("! [TonemapPass] Failed to create fallback exposure texture");
+                cmdList->endMarker();
+                return;
+            }
+
             nvrhi::BindingSetDesc bindingSetDesc;
             bindingSetDesc.bindings = {
                 nvrhi::BindingSetItem::Texture_SRV(0, hdrTexture),
+                nvrhi::BindingSetItem::Texture_SRV(1, exposureToUse),
                 nvrhi::BindingSetItem::Sampler(0, sampler)
             };
 
@@ -154,7 +195,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             viewport.maxZ = 1.0f;
 
             cmdList->open();
-            cmdList->clearTextureFloat(ldrTexture, nvrhi::AllSubresources, nvrhi::Color(0.0f));
 
             nvrhi::GraphicsState state;
             state.pipeline = pipeline;
@@ -170,7 +210,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             cmdList->close();
 
-            Msg("* [TonemapPass] Tonemap applied (HDR→LDR)");
             cmdList->endMarker();
         }
     );
