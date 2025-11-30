@@ -256,18 +256,15 @@ static FileLocation MakeFileLocation(
 // processed by the PBR converter which may corrupt alpha channels.
 
 static const char* const FOLDER_BLACKLIST[] = {
-    "terrain",      // Terrain masks use RGBA for 4-layer detail blending
-    "levels",       // Level-specific textures (lightmaps, terrain, etc.)
-    "lmap",         // Lightmaps
-    "detail",       // Detail textures (terrain detail layers)
-    "sky",          // Sky textures
-    "water",        // Water textures (special effects)
-    "wm",           // World model textures (may have special formats)
-    "ui",           // UI textures
-    "hud",          // HUD textures
-    "grad",
-    "pfx",
+    "editor",
+    "fx",
     "glow"
+    "grad",
+    "internal",
+    "lights",
+    "pfx",
+    "sky",          // Sky textures
+    "ui",           // UI textures
 };
 
 static bool IsInBlacklistedFolder(const xr_string& path) {

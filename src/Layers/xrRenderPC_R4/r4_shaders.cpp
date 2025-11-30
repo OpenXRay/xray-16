@@ -581,27 +581,8 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
             slangDefines.push_back(define);
         }
 
-        // Build extension string with dot prefix (.vs, .ps, etc.)
         char extWithDot[4] = ".";
         xr_strcat(extWithDot, extension);
-
-        // CRITICAL DEBUG: Log what we're passing
-        Msg("═══════════════════════════════════════════════════");
-        Msg("[shader_compile] About to call CompileShaderWithDefines:");
-        Msg("  Shader: %s%s", name, extWithDot);
-        Msg("  Entry: %s", pFunctionName);
-        Msg("  Defines: %zu", slangDefines.size());
-        Msg("  Skinning = %i", m_skinning);
-        for (size_t i = 0; i < std::min<size_t>(15, slangDefines.size()); ++i)
-        {
-            Msg("    [%zu] %s = %s", i, slangDefines[i].name,
-                slangDefines[i].value ? slangDefines[i].value : "(null)");
-        }
-        if (slangDefines.size() > 15)
-            Msg("    ... and %zu more", slangDefines.size() - 15);
-        Msg("═══════════════════════════════════════════════════");
-
-        // Compile via ShaderLoader (which uses its own cache!)
         bool success = m_shaderLoader->CompileShaderWithDefines(
             name,           // Shader name
             extWithDot,     // Extension (.vs, .ps, etc.)

@@ -26,12 +26,17 @@
 // Lambda-based pass setup functions
 #include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
+#include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
+#include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
 #include "FrameGraphPasses/HUDPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
 #include "FrameGraphPasses/TonemapPassSetup.h"       // Tonemap pass: HDR→LDR conversion
 #include "FrameGraphPasses/ImGuiPassSetup.h"
+
+#include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Persistent.h"
 
 namespace xray::render {
 
@@ -170,6 +175,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // BuildFrameGraphStructure();  // REMOVED - Using transient resources
     // m_framegraph->Compile();     // REMOVED - Compile per-frame now
 
+    // ═══════════════════════════════════════════════════════
+    //  INITIALIZE SKY GEOMETRY
+    // ═══════════════════════════════════════════════════════
+    passes::InitializeSkyGeometry(device);
+
     Msg("* [FrameGraphRenderer] initialized");
 
     return true;
@@ -200,6 +210,9 @@ void FrameGraphRenderer::Shutdown() {
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
+    // Cleanup sky geometry
+    passes::ShutdownSkyGeometry();
+
     m_device = nullptr;
 }
 
@@ -209,6 +222,12 @@ void FrameGraphRenderer::Render() {
     VERIFY(m_framegraph != nullptr);
 
     auto frameStart = std::chrono::high_resolution_clock::now();
+
+    // ═══════════════════════════════════════════════════════
+    //  UPDATE LIGHTS (Sun direction, color from environment)
+    // ═══════════════════════════════════════════════════════
+    // Must be called before rendering to update sun from environment system
+    RImplementation.Lights.Update();
 
     // ═══════════════════════════════════════════════════════
     //  UPDATE RESOURCE MANAGER (Video textures, streaming)
@@ -302,7 +321,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     VERIFY(m_framegraph != nullptr);
 
-    Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
+    // Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 
     // ═══════════════════════════════════════════════════════
     //  UPDATE RESOURCE MANAGER (Video textures, streaming)
@@ -359,9 +378,11 @@ void FrameGraphRenderer::RenderMenu() {
     sceneWithUI = passes::setupCursorPass(*m_framegraph, sceneWithUI, width, height);
 
     // 5. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
+    // Note: No exposure pass for menu rendering, pass invalid handle for fixed exposure
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         sceneWithUI,  // HDR input (RGBA16_FLOAT)
+        framegraph::VirtualResourceHandle(),  // No exposure for menu
         width,
         height
     );
@@ -395,7 +416,7 @@ void FrameGraphRenderer::RenderMenu() {
     // NOTE: We call Reset() at the start of each frame (line 285)
     // No need to reset here at the end
 
-    Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
+    // Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
 }
 
 void FrameGraphRenderer::SetupFrame() {
@@ -507,17 +528,61 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
+    //  SKY PASS (Renders sky dome behind everything)
+    // ═══════════════════════════════════════════════════════
+    // Renders sky dome geometry with cubemap textures
+    // Creates the HDR color RT and fills it with sky
+    // Must render BEFORE forward geometry (sky = background)
+
+    // Create HDR color buffer for sky (will be reused by forward pass)
+    framegraph::ResourceDesc colorDesc;
+    colorDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    colorDesc.width = width;
+    colorDesc.height = height;
+    colorDesc.format = nvrhi::Format::RGBA16_FLOAT;
+    colorDesc.isRenderTarget = true;
+    colorDesc.debugName = "rt_SceneColor";
+
+    auto skyColorHandle = m_framegraph->CreateTexture("rt_SceneColor", colorDesc);
+
+    auto skyOutput = passes::setupSkyPass(
+        *m_framegraph,
+        m_device,
+        skyColorHandle,
+        depthBuffer,
+        g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
+        width,
+        height
+    );
+
+    // ═══════════════════════════════════════════════════════
+    //  SUN PASS (Sun disc with additive blending)
+    // ═══════════════════════════════════════════════════════
+    // Renders sun disc as camera-facing billboard
+    // Uses additive blending on top of sky
+
+    auto sunOutput = passes::setupSunPass(
+        *m_framegraph,
+        m_device,
+        skyOutput,  // Color buffer from sky pass
+        g_pGamePersistent ? &g_pGamePersistent->Environment() : nullptr,
+        width,
+        height
+    );
+
+    // ═══════════════════════════════════════════════════════
     //  PHASE 1: FORWARD COLOR PASS (Single-RT, Reuses Depth)
     // ═══════════════════════════════════════════════════════
     // Simplified from wasteful 3-RT G-buffer to single HDR color output
     // BANDWIDTH SAVINGS: 60% reduction (3 RTs → 1 RT)
     // EARLY-Z OPTIMIZATION: Reuses depth from prepass (20-30% faster)
-    // Next phases will add: PBR lighting, shadows, clustered lights
+    // Reuses sky color RT (no clear - sky is background)
 
     auto forwardOutputs = passes::setupForwardColorPass(
         *m_framegraph,
         m_device,
         depthBuffer,  // Reuse depth from prepass for early-Z
+        sunOutput,    // Color buffer from sun pass (has sky + sun)
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
@@ -594,9 +659,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // 6. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
+    // Now uses exposure from ExposurePass for auto-exposure
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         sceneWithUI,  // HDR input (RGBA16_FLOAT)
+        exposureOutput.exposureTexture,  // Auto-exposure from histogram
         width,
         height
     );
@@ -703,8 +770,8 @@ void FrameGraphRenderer::PresentToBackbuffer() {
         finalTexture            // src
     );
 
-    Msg("  [FrameGraphRenderer] Presented final output to game backbuffer (%ux%u)",
-        d3dDesc.Width, d3dDesc.Height);
+    // Msg("  [FrameGraphRenderer] Presented final output to game backbuffer (%ux%u)",
+    //     d3dDesc.Width, d3dDesc.Height);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1406,7 +1473,7 @@ xr_set<framegraph::RenderPhase> FrameGraphRenderer::ScanRequiredPhases() const {
 
     // Get batches and populate phase info
     auto& batches = const_cast<GeometryCollector*>(m_geometryCollector.get())->GetBatchesMutable();
-    Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
+    // Msg("! [FrameGraphRenderer] Scanning %u batches for required phases...", batches.size());
 
     // ═══════════════════════════════════════════════════════
     //  TRUE PHASE DETECTION (Week 16 - with ShaderPhaseCache)
@@ -1478,7 +1545,7 @@ void FrameGraphRenderer::CreateAllRequiredPasses() {
         CreatePhasePass(phase);
     }
 
-    Msg("! [FrameGraphRenderer] Created %u passes", m_activePasses.size());
+    // Msg("! [FrameGraphRenderer] Created %u passes", m_activePasses.size());
 }
 
 void FrameGraphRenderer::RouteBatchesToPasses() {
@@ -1486,17 +1553,17 @@ void FrameGraphRenderer::RouteBatchesToPasses() {
     auto& batches = m_geometryCollector->GetBatchesMutable();
 
     // DEBUG: Check if batches have valid buffers before routing
-    u32 nullVBCount = 0, nullIBCount = 0;
-    for (const auto& batch : batches) {
-        if (!batch.vertexBuffer) nullVBCount++;
-        if (!batch.indexBuffer) nullIBCount++;
-    }
-    if (nullVBCount > 0 || nullIBCount > 0) {
-        Msg("! [RouteBatches] BEFORE ROUTING: %u batches with null VB, %u with null IB (total %u)",
-            nullVBCount, nullIBCount, batches.size());
-    } else {
-        Msg("  [RouteBatches] All %u batches have valid buffers before routing", batches.size());
-    }
+    // u32 nullVBCount = 0, nullIBCount = 0;
+    // for (const auto& batch : batches) {
+    //     if (!batch.vertexBuffer) nullVBCount++;
+    //     if (!batch.indexBuffer) nullIBCount++;
+    // }
+    // if (nullVBCount > 0 || nullIBCount > 0) {
+    //     Msg("! [RouteBatches] BEFORE ROUTING: %u batches with null VB, %u with null IB (total %u)",
+    //         nullVBCount, nullIBCount, batches.size());
+    // } else {
+    //     Msg("  [RouteBatches] All %u batches have valid buffers before routing", batches.size());
+    // }
 
     // ═══════════════════════════════════════════════════════
     //  TRUE PHASE-BASED ROUTING (Week 16)

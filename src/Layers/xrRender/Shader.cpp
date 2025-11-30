@@ -86,7 +86,7 @@ bool SPass::equal(const SPass& other) const
 //
 ShaderElement::ShaderElement()
 {
-    flags.iPriority = 0;
+    flags.iPriority = 1;
     flags.bStrictB2F = FALSE;
     flags.bEmissive = FALSE;
     flags.bDistort = FALSE;

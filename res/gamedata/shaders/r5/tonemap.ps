@@ -1,7 +1,18 @@
 // xrRender/Shaders/tonemap.ps.hlsl
-// ACES Filmic tonemap with gamma correction
+// Tonemap pass - currently passthrough until HDR lighting is implemented
+//
+// When HDR is ready, this will apply:
+// - Auto-exposure from ExposurePass
+// - ACES filmic tonemapping
+// - Gamma correction (if needed)
+//
+// Inputs:
+//   t0: Scene color (RGBA16_FLOAT or RGBA8_UNORM)
+//   t1: Exposure texture (1x1 R32_FLOAT from ExposurePass) - unused for now
+//   s0: Linear sampler
 
 Texture2D t_hdr : register(t0);
+Texture2D<float> t_exposure : register(t1);  // Reserved for future HDR
 SamplerState s_linear : register(s0);
 
 struct PS_INPUT {
@@ -9,32 +20,26 @@ struct PS_INPUT {
     float2 texcoord : TEXCOORD0;
 };
 
-// ACES Filmic tonemap (Narkowicz 2015)
-float3 ACESFilm(float3 x) {
-    float a = 2.51;
-    float b = 0.03;
-    float c = 2.43;
-    float d = 0.59;
-    float e = 0.14;
-    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
-}
+// ACES Filmic tonemap (Narkowicz 2015) - for future HDR use
+// float3 ACESFilm(float3 x) {
+//     float a = 2.51;
+//     float b = 0.03;
+//     float c = 2.43;
+//     float d = 0.59;
+//     float e = 0.14;
+//     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+// }
 
 float4 main(PS_INPUT input) : SV_TARGET {
-    // Sample HDR color
-    float3 hdr = t_hdr.Sample(s_linear, input.texcoord).rgb;
+    float4 color = t_hdr.Sample(s_linear, input.texcoord);
 
-    // Apply fixed exposure (can be made configurable later via console vars)
-    const float exposure = 1.0;
-    hdr *= exposure;
+    // Apply exposure uniformly to entire scene
+    // float exposure = t_exposure.Load(int3(0, 0, 0));
+    // exposure = clamp(exposure, 0.1, 16.0);
+    // color.rgb *= exposure;
 
-    // Tonemap (HDR -> LDR)
-    float3 ldr = ACESFilm(hdr);
+    // TODO: Enable ACES tonemapping when HDR lighting is fully implemented
+    // color.rgb = ACESFilm(color.rgb);
 
-    // Gamma correction - try without it first since backbuffer might handle it
-    // If still too bright/dark, uncomment and adjust gamma value (2.2 = standard, higher = darker)
-    // const float gamma = 2.2;
-    // ldr = pow(ldr, 1.0 / gamma);
-
-    return float4(ldr, 1.0);
+    return color;
 }
-

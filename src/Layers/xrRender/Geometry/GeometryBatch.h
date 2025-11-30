@@ -100,7 +100,7 @@ struct GeometryBatch {
 
     // Check if batch is opaque (no alpha-test and no strict B2F)
     bool IsOpaque() const {
-        return !IsAlphaTested() && !IsStrictB2F();
+        return !IsAlphaTested();
     }
 };
 

@@ -192,11 +192,11 @@ inline void FillGlobalConstants(GlobalConstants& cb) {
     cb.fog_params.set(0.0f, 1000.0f, 0.001f, 0.0f);  // near, far, density
     cb.fog_color.set(0.5f, 0.5f, 0.6f, 1.0f);  // Grayish-blue fog
 
-    // Lighting (TODO: Hook into X-Ray's light manager)
-    cb.L_ambient.set(0.2f, 0.2f, 0.2f, 1.0f);  // Ambient
-    cb.L_sun_color.set(1.0f, 0.95f, 0.9f);     // Warm sunlight
-    cb.L_sun_dir_w.set(0.577f, -0.577f, 0.577f);  // Diagonal down
-    cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, 1.0f);  // Sky color
+    // Lighting - defaults, will be overridden by FillSunConstants if sun is available
+    cb.L_ambient.set(0.2f, 0.2f, 0.2f, 1.0f);  // Ambient (placeholder)
+    cb.L_sun_color.set(1.0f, 0.95f, 0.9f);     // Warm sunlight (placeholder)
+    cb.L_sun_dir_w.set(0.577f, -0.577f, 0.577f);  // Diagonal down (placeholder)
+    cb.L_hemi_color.set(0.3f, 0.4f, 0.5f, 1.0f);  // Sky color (placeholder)
 
     // Camera position
     cb.eye_position = Device.vCameraPosition;
@@ -337,5 +337,44 @@ inline void FillDynamicTransforms(DynamicTransforms& cb, Fmatrix m_W = Fidentity
 
     // dt_params moved to ShaderParams (b1) - material-frequency, not instance-frequency
 }
+
+// ══════════════════════════════════════════════════════════
+//  SUN CONSTANTS (HDR Lighting)
+// ══════════════════════════════════════════════════════════
+// Separate struct for sun data to be filled from RImplementation.Lights.sun
+
+struct SunLightData {
+    Fvector color;      // Sun color (RGB)
+    Fvector direction;  // Sun direction (world space, pointing toward light)
+    float intensity;    // HDR intensity multiplier (1.0 = SDR, 2.0+ = HDR)
+};
+
+// Fill sun constants in StaticGlobals from sun light data
+// Call this AFTER FillGlobalConstants to override placeholder values
+inline void FillSunConstants(StaticGlobals& cb, const SunLightData& sun) {
+    // Apply HDR intensity multiplier to sun color
+    // For true HDR, sun should be MUCH brighter than 1.0
+    // Real sun illuminance: ~100,000 lux
+    // Typical indoor: ~300-500 lux
+    // For now, use a moderate multiplier to get values > 1.0
+    cb.L_sun_color.set(
+        sun.color.x * sun.intensity,
+        sun.color.y * sun.intensity,
+        sun.color.z * sun.intensity
+    );
+
+    // Sun direction (world space)
+    // Vanilla passes sun_dir directly - it's the direction light travels (from sun toward scene)
+    // Shaders handle the negation internally for N.L calculations
+    cb.L_sun_dir_w.set(
+        sun.direction.x,
+        sun.direction.y,
+        sun.direction.z
+    );
+}
+
+// Helper to extract sun data from an IRender_Light (call from pass setup)
+// Declaration only - implementation in ShaderConstants.cpp
+void GetSunLightData(SunLightData& outSun, float hdrIntensity = 2.0f);
 
 } // namespace xray::render::passes

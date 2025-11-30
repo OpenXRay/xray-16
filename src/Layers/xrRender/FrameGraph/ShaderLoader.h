@@ -151,6 +151,10 @@ private:
 
     // Cache for extracted reflection data (keyed by shader name + extension)
     xr_map<xr_string, ExtractedReflection*> m_reflectionCache;
+
+    // In-memory cache for compiled shader handles (keyed by shader name + extension)
+    // Prevents re-creating NVRHI handles every frame when passes call LoadVertexShader/LoadPixelShader
+    xr_map<xr_string, nvrhi::ShaderHandle> m_handleCache;
 };
 
 } // namespace xray::render::framegraph

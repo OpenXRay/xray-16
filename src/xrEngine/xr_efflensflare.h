@@ -137,4 +137,13 @@ public:
 
     [[nodiscard]]
     auto& GetDescriptors() { return m_Palette; }
+
+    [[nodiscard]]
+    CLensFlareDescriptor* GetCurrent() const { return m_Current; }
+
+    [[nodiscard]]
+    bool ShouldRender() const { return bRender; }
+
+    [[nodiscard]]
+    float GetStateBlend() const { return m_StateBlend; }
 };

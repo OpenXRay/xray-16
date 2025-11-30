@@ -41,6 +41,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
     framegraph::VirtualResourceHandle depthInput,
+    framegraph::VirtualResourceHandle colorInput,
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
@@ -66,7 +67,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA (Declares resource usage)
         // ═══════════════════════════════════════════════════════
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
+        [&, width, height, colorInput](FrameGraph& builder, PassHandle passHandle, ForwardColorPassData& data) {
             // Store pass configuration
             data.width = width;
             data.height = height;
@@ -77,32 +78,13 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             // Declare resource usage
             RenderPassBuilder passBuilder(builder, passHandle);
 
-            // If depth buffer provided, use it; otherwise create new
-            if (depthInput.is_valid()) {
-                // READ-WRITE for early-Z: read depth from prepass, write new fragments
-                data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
-            } else {
-                data.depth = passBuilder.createDepthBuffer("rt_Depth", width, height);
-            }
+            // Depth buffer from prepass (READ-WRITE for early-Z)
+            data.depth = passBuilder.readWrite(depthInput, ResourceState::DepthStencilWrite);
 
-            // ═══════════════════════════════════════════════════════
-            //  SINGLE HDR COLOR BUFFER (Phase 1 Simplification)
-            // ═══════════════════════════════════════════════════════
-            // BEFORE: 3 RTs (albedo RGBA8 + normal RGBA16F + position RGBA32F)
-            //         = 8 + 8 + 16 = 32 bytes/pixel = 256 bits/pixel
-            //
-            // AFTER:  1 RT (color RGBA16_FLOAT)
-            //         = 8 bytes/pixel = 64 bits/pixel
-            //
-            // BANDWIDTH SAVINGS: 60% reduction (32 → 8 bytes/pixel)
-            // PERFORMANCE GAIN:  ~0.5-1.0ms on typical scenes
-
-            data.color = passBuilder.createTexture2D(
-                "rt_SceneColor",
-                width,
-                height,
-                nvrhi::Format::RGBA16_FLOAT  // HDR color (for future lighting)
-            );
+            // Color buffer from sky pass (READ-WRITE to preserve sky background)
+            // CRITICAL: Using readWrite() creates a dependency on SkyPass!
+            // This ensures sky renders first (as background), then forward geometry on top.
+            data.color = passBuilder.readWrite(colorInput, ResourceState::RenderTarget);
 
             // Store outputs in PassData for MaterialCache
             // Forward+ uses single RT output (all shaders converted to f_forward)
@@ -190,6 +172,16 @@ void renderForwardGeometry(
     StaticGlobals staticGlobalsCB = {};
     FillGlobalConstants(staticGlobalsCB);
 
+    // ═══════════════════════════════════════════════════════
+    //  HDR SUN LIGHTING (from RImplementation.Lights.sun)
+    // ═══════════════════════════════════════════════════════
+    // Get actual sun data from the game's lighting system
+    // HDR intensity 2.0 = sun is 2x brighter than 1.0 (basic HDR)
+    // For true HDR, this should be much higher (10-100+)
+    SunLightData sunData;
+    GetSunLightData(sunData, 2.0f);  // HDR multiplier
+    FillSunConstants(staticGlobalsCB, sunData);
+
     DynamicTransforms dynamicTransformsCB = {};
     FillDynamicTransforms(dynamicTransformsCB);
 
@@ -238,12 +230,8 @@ void renderForwardGeometry(
     passDesc.numRenderTargets = 1;           // Single RT for Forward+
     passDesc.depthStencil = depthRT;
 
-    // Clear values
-    passDesc.clearValue.color[0] = 0.0f;
-    passDesc.clearValue.color[1] = 0.0f;
-    passDesc.clearValue.color[2] = 0.0f;
-    passDesc.clearValue.color[3] = 1.0f;
-    passDesc.clearColor = true;
+    // DON'T clear color - sky pass already rendered background
+    passDesc.clearColor = false;
 
     // DON'T clear depth - we're reusing it from depth prepass for early-Z!
     passDesc.clearDepth = false;
@@ -393,7 +381,8 @@ void renderForwardGeometry(
                 // Compute matrices
                 Fmatrix xform = batch.worldMatrix;
                 Fmatrix xform_v;
-                xform_v.mul(batch.worldMatrix, Device.mView);
+                // mul_43(A,B) = B then A, so View*World = World then View (object->world->view)
+                xform_v.mul_43(Device.mView, batch.worldMatrix);
 
                 // Use FGConstantSystem matrix APIs
                 constants.Set("m_xform", xform);

@@ -73,53 +73,12 @@ static void LogConstantLayout(const framegraph::ShaderConstantLayout& layout, co
     using namespace framegraph;
     return;
 
-    Msg("═══════════════════════════════════════════════════");
-    Msg("Shader Constant Layout: %s", shaderName);
-    Msg("═══════════════════════════════════════════════════");
-
-    for (const auto& cb : layout.constantBuffers.buffers) {
-        Msg("  CB: %s (slot=b%u, size=%u bytes)",
-            cb.name.c_str(), cb.slot, cb.size);
-    }
-
-    Msg("---------------------------------------------------");
-
     for (const auto& constant : layout.constants) {
         if (constant.cbIndex >= layout.constantBuffers.buffers.size()) {
             Msg("    - %s: ERROR - invalid cbIndex %u", constant.name.c_str(), constant.cbIndex);
             continue;
         }
-
-        const auto& cb = layout.constantBuffers.buffers[constant.cbIndex];
-
-        const char* typeStr = "unknown";
-        switch (constant.type) {
-            case ShaderConstant::Type::Scalar: typeStr = "scalar"; break;
-            case ShaderConstant::Type::Vector: typeStr = "vector"; break;
-            case ShaderConstant::Type::Matrix3x4: typeStr = "float3x4"; break;
-            case ShaderConstant::Type::Matrix4x4: typeStr = "float4x4"; break;
-            case ShaderConstant::Type::Array: typeStr = "array"; break;
-            case ShaderConstant::Type::Struct: typeStr = "struct"; break;
-        }
-
-        if (constant.IsArray()) {
-            Msg("    - %s[%u]: cb=%s, type=%s, offset=%u, elemSize=%u, totalSize=%u, freq=%d",
-                constant.name.c_str(), constant.arrayCount, cb.name.c_str(),
-                typeStr, constant.offset, constant.elementSize, constant.size,
-                static_cast<int>(constant.frequency));
-        } else if (constant.IsMatrix()) {
-            Msg("    - %s: cb=%s, type=%s, offset=%u, size=%u, stride=%u, freq=%d",
-                constant.name.c_str(), cb.name.c_str(), typeStr,
-                constant.offset, constant.size, constant.matrixStride,
-                static_cast<int>(constant.frequency));
-        } else {
-            Msg("    - %s: cb=%s, type=%s, offset=%u, size=%u, freq=%d",
-                constant.name.c_str(), cb.name.c_str(), typeStr,
-                constant.offset, constant.size, static_cast<int>(constant.frequency));
-        }
     }
-
-    Msg("═══════════════════════════════════════════════════");
 }
 #endif
 
@@ -1063,9 +1022,6 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
                 req.name = cbReq.name;
                 req.vcbHandle = vcbHandle;
                 matPSO->vcbRequirements.push_back(req);
-
-                Msg("    [MaterialCache] Created VCB requirement: %s at b%u (size=%u) for %s",
-                    cbReq.name.c_str(), cbReq.vsSlot, cbReq.size, matPSO->debugName.c_str());
             }
             continue;  // Don't create shared buffer for volatile CBs
         }
@@ -1220,16 +1176,7 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
 
     // Add to layout in SORTED order
     u32 cbCount = 0;
-    if (stage == MaterialPSO::ShaderStage::Vertex && !allCBs.empty()) {
-        Msg("  [CreateStageBindingLayout] Creating VS LAYOUT for '%s' with %u CBs (SORTED by slot):",
-            matPSO->debugName.c_str(), allCBs.size());
-    }
     for (const auto& cb : allCBs) {
-        const char* cbType = cb.isVCB ? "VCB" : "Global CB";
-        if (stage == MaterialPSO::ShaderStage::Vertex)
-            Msg("    [Layout] Index %u: %s '%s' at slot b%u (size=%u)",
-                cbCount, cbType, cb.name.c_str(), cb.slot, cb.size);
-
         if (cb.isVCB) {
             layoutDesc.bindings.push_back(nvrhi::BindingLayoutItem::VolatileConstantBuffer(cb.slot));
         } else {
@@ -2089,9 +2036,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     // ExtractSamplers MUST come after ExtractShaders (relies on rtBindings.samplers)
     ExtractSamplers(pass, pso.get());
 
-    Msg("  [MaterialCache::CreateUIPSO] Extracted %zu textures, %zu samplers",
-        pso->textures.size(), pso->samplers.size());
-
     // ═══════════════════════════════════════════════════════
     //  EXTRACT CONSTANT LAYOUT (CB + PER-CONSTANT METADATA)
     // ═══════════════════════════════════════════════════════
@@ -2199,14 +2143,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     pso->vertexStride = calculatedStride;
-    Msg("  [MaterialCache::CreateUIPSO] Calculated vertex stride: %u bytes", pso->vertexStride);
-
-    // Log final attributes with stride
-    for (size_t i = 0; i < psoDesc.vertexAttributes.size(); ++i) {
-        const auto& attr = psoDesc.vertexAttributes[i];
-        Msg("  [MaterialCache::CreateUIPSO] Vertex attribute[%zu]: %s%d -> format=%d, offset=%u, stride=%u",
-            i, attr.semanticName, attr.semanticIndex, (int)attr.format, attr.offset, attr.elementStride);
-    }
 
     // UI render state - matches vanilla X-Ray:
     // Depth: enabled, always pass, no write (for stencil support)

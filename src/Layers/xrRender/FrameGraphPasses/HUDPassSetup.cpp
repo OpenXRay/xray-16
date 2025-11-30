@@ -131,6 +131,11 @@ framegraph::DefaultOutputLayout setupHUDPass(
             StaticGlobals staticGlobalsCB = {};
             FillGlobalConstants(staticGlobalsCB);
 
+            // Get actual sun data from RImplementation.Lights.sun
+            SunLightData sunData;
+            GetSunLightData(sunData, 2.0f);  // HDR multiplier
+            FillSunConstants(staticGlobalsCB, sunData);
+
             DynamicTransforms dynamicTransformsCB = {};
             FillDynamicTransforms(dynamicTransformsCB);
 
@@ -299,7 +304,8 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 } else {
                     // Non-skeleton meshes (trees, weapons): Use FGConstantSystem
                     Fmatrix xform_v;
-                    xform_v.mul(adjustedWorldMatrix, Device.mView);
+                    // mul_43(A,B) = B then A, so View*World = World then View (object->world->view)
+                    xform_v.mul_43(Device.mView, adjustedWorldMatrix);
 
                     Fmatrix invW;
                     invW.invert(adjustedWorldMatrix);
@@ -339,8 +345,6 @@ framegraph::DefaultOutputLayout setupHUDPass(
             }
 
             ctx->EndRenderPass();
-
-            Msg("* [HUDPass] Rendered %u draws", numDraws);
 
             cmdList->endMarker();
         }

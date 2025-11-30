@@ -85,4 +85,8 @@ ExposureOutput setupExposurePass(
 // Get default exposure config (Earth-like, game-friendly)
 ExposureConfig GetDefaultExposureConfig();
 
+// Get the physical NVRHI exposure texture directly (for tonemap pass)
+// This bypasses the framegraph virtual resource system to avoid state transition issues
+nvrhi::ITexture* GetExposureTexture();
+
 } // namespace xray::render::RENDER_NAMESPACE::passes

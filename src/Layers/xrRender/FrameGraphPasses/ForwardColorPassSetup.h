@@ -32,10 +32,12 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 //
 // Lambda-based ForwardColorPass setup function (Frostbite pattern)
 // Replaces the wasteful 3-RT G-buffer with single color output
+// NOTE: Does NOT clear color buffer - sky pass renders background first
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,                      // Render device for buffer access
-    framegraph::VirtualResourceHandle depthInput,  // Optional existing depth buffer
+    framegraph::VirtualResourceHandle depthInput,  // Existing depth buffer from prepass
+    framegraph::VirtualResourceHandle colorInput,  // Color buffer from sky pass
     const GeometryCollector* geometry,             // Geometry batches to render
     MaterialCache* materialCache,                  // Material cache for shaders
     u32 width,                                     // Render target width

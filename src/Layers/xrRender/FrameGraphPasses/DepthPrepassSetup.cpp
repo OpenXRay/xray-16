@@ -246,7 +246,8 @@ void renderDepthOnlyGeometry(
                 // Compute matrices
                 Fmatrix xform = batch.worldMatrix;
                 Fmatrix xform_v;
-                xform_v.mul(batch.worldMatrix, Device.mView);
+                // mul_43(A,B) = B then A, so View*World = World then View (object->world->view)
+                xform_v.mul_43(Device.mView, batch.worldMatrix);
 
                 // Use FGConstantSystem matrix APIs
                 constants.Set("m_xform", xform);
@@ -358,9 +359,7 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
             }
 
             // Check if we have geometry to render
-            if (!data.geometry || data.geometry->GetBatches().empty()) {
-                // No geometry - just clear depth and exit
-                // TODO: Add depth clear command if needed
+            if (!data.geometry) {
                 return;
             }
 

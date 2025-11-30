@@ -47,8 +47,6 @@ void NVRHIUIRenderer::RenderBatches(
     u32 screenWidth,
     u32 screenHeight)
 {
-    Msg("  [NVRHIUIRenderer::RenderBatches] Called with %zu batches", batches.size());
-
     if (!m_initialized)
     {
         Msg("! [NVRHIUIRenderer] Not initialized!");
@@ -57,7 +55,6 @@ void NVRHIUIRenderer::RenderBatches(
 
     if (batches.empty())
     {
-        Msg("  [NVRHIUIRenderer] No batches to render");
         return;
     }
 
@@ -69,8 +66,6 @@ void NVRHIUIRenderer::RenderBatches(
         totalVertices += batch.vertices.size();
         totalIndices += batch.indices.size();
     }
-
-    Msg("  [NVRHIUIRenderer] Total geometry: %zu vertices, %zu indices", totalVertices, totalIndices);
 
     // Ensure buffers are large enough
     EnsureBufferCapacity(totalVertices, totalIndices);

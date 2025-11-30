@@ -184,14 +184,7 @@ void FGResourcePool::Reset() {
 // ═══════════════════════════════════════════════════
 
 void FGResourcePool::PrintStatistics() const {
-    Msg("! [FGResourcePool] Statistics:");
-    Msg("!   Allocated: %u, Aliased: %u, Active: %u",
-        m_stats.texturesAllocated,
-        m_stats.texturesAliased,
-        m_stats.texturesActive);
-    Msg("!   Memory: %llu MB allocated, %llu MB saved via aliasing",
-        m_stats.memoryAllocated / (1024 * 1024),
-        m_stats.memorySaved / (1024 * 1024));
+    // Statistics are available via GetStatistics() if needed
 }
 
 } // namespace xray::render::framegraph

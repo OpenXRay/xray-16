@@ -68,75 +68,25 @@ private:
 SlangVFSAdapter::SlangVFSAdapter()
     : m_refCount(1)
 {
-    Msg("* [SlangVFSAdapter] Created (VFS-aware file system for Slang)");
-
     // Force VFS to scan shader directories to populate the file index
-    Msg("~ [SlangVFSAdapter] Scanning VFS for shader files...");
     xr_vector<char*>* folder = FS.file_list_open("$game_shaders$", "", FS_ListFiles);
     if (folder)
     {
-        Msg("~ [SlangVFSAdapter] VFS scan found %u files, resolving paths...", folder->size());
-
-        // Show first 20 files and look for common_*.h files
-        Msg("~ [SlangVFSAdapter] Sample of files found:");
-        u32 commonFileCount = 0;
+        // Resolve paths through VFS
         for (u32 it = 0; it < folder->size(); it++)
         {
             const char* filename = (*folder)[it];
-
-            // Log first 20 files
-            if (it < 20)
-                Msg("  [%u] %s", it, filename);
-
-            // Count common_*.h files
-            if (strstr(filename, "common_") && strstr(filename, ".h"))
-            {
-                commonFileCount++;
-                Msg("  [FOUND common_*.h] %s", filename);
-            }
-
-            // Resolve path through VFS
             string_path fn;
             xr_strcpy(fn, filename);
             FS.update_path(fn, "$game_shaders$", fn);
         }
-
-        Msg("~ [SlangVFSAdapter] VFS scan complete: %u files resolved, %u common_*.h files found",
-            folder->size(), commonFileCount);
         FS.file_list_close(folder);
-    }
-    else
-    {
-        Msg("! [SlangVFSAdapter] VFS scan failed - file_list_open returned NULL");
-    }
-
-    // Test VFS access for common missing files (try both slashes!)
-    const char* testFiles[] = {
-        "r5/common_policies.h",
-        "r5\\common_policies.h",   // Try backslash
-        "r5/common_samplers.h",
-        "r5\\common_samplers.h"    // Try backslash
-    };
-
-    Msg("~ [SlangVFSAdapter] Testing VFS access...");
-    for (const char* testFile : testFiles)
-    {
-        IReader* r = FS.r_open("$game_shaders$", testFile);
-        if (r)
-        {
-            Msg("  [OK] VFS can open: %s (%u bytes)", testFile, r->length());
-            FS.r_close(r);
-        }
-        else
-        {
-            Msg("  [FAIL] VFS cannot open: %s", testFile);
-        }
     }
 }
 
 SlangVFSAdapter::~SlangVFSAdapter()
 {
-    Msg("* [SlangVFSAdapter] Destroyed");
+    // Cleanup handled by reference counting
 }
 
 // ═════════════════════════════════════════════════════
@@ -204,8 +154,6 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::loadFile(
             c = '\\';
     }
 
-    Msg("~ [SlangVFSAdapter] Loading file from VFS: %s", vfsPath.c_str());
-
     // Try to open from VFS (searches loose files + archives)
     IReader* reader = FS.r_open("$game_shaders$", vfsPath.c_str());
     if (!reader)
@@ -216,13 +164,11 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::loadFile(
         if (lastSlash != xr_string::npos)
         {
             xr_string fileNameOnly = vfsPath.substr(lastSlash + 1);
-            Msg("~ [SlangVFSAdapter] Trying fallback path: %s", fileNameOnly.c_str());
             reader = FS.r_open("$game_shaders$", fileNameOnly.c_str());
         }
 
         if (!reader)
         {
-            Msg("! [SlangVFSAdapter] File not found in VFS: %s", vfsPath.c_str());
             return SLANG_E_NOT_FOUND;
         }
     }
@@ -237,11 +183,7 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::loadFile(
     // Close reader
     FS.r_close(reader);
 
-    if (SLANG_SUCCEEDED(result))
-    {
-        Msg("* [SlangVFSAdapter] Loaded %zu bytes from VFS: %s", fileSize, vfsPath.c_str());
-    }
-    else
+    if (!SLANG_SUCCEEDED(result))
     {
         Msg("! [SlangVFSAdapter] Failed to create blob for: %s", vfsPath.c_str());
     }
@@ -275,14 +217,10 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::calcCombinedPath(
     if (!path || !pathOut)
         return SLANG_E_INVALID_ARG;
 
-    Msg("~ [SlangVFSAdapter::calcCombinedPath] fromPath='%s', path='%s'",
-        fromPath ? fromPath : "(null)", path);
-
     // If path is absolute, just return it
     if (path[0] == '/' || path[0] == '\\' || (path[1] == ':'))
     {
         xr_string normalized = NormalizePath(path);
-        Msg("~ [SlangVFSAdapter::calcCombinedPath] Absolute path -> '%s'", normalized.c_str());
         return CreateBlob(normalized.c_str(), normalized.length() + 1, pathOut);
     }
 
@@ -329,7 +267,6 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::calcCombinedPath(
     }
 
     xr_string normalized = NormalizePath(combined.c_str());
-    Msg("~ [SlangVFSAdapter::calcCombinedPath] Combined -> '%s'", normalized.c_str());
     return CreateBlob(normalized.c_str(), normalized.length() + 1, pathOut);
 }
 
@@ -348,47 +285,27 @@ SLANG_NO_THROW SlangResult SLANG_MCALL SlangVFSAdapter::getPathType(
             c = '\\';
     }
 
-    Msg("~ [SlangVFSAdapter::getPathType] Checking '%s'", vfsPath.c_str());
-
     IReader* reader = FS.r_open("$game_shaders$", vfsPath.c_str());
     if (!reader)
     {
-        Msg("  [FAIL] VFS.r_open('%s') returned NULL, trying fallback...", vfsPath.c_str());
-
         // Fallback: Try without directory prefix (matches vanilla behavior)
         size_t lastSlash = vfsPath.find_last_of("/\\");
         if (lastSlash != xr_string::npos)
         {
             xr_string fileNameOnly = vfsPath.substr(lastSlash + 1);
-            Msg("  [FALLBACK] Trying: '%s'", fileNameOnly.c_str());
             reader = FS.r_open("$game_shaders$", fileNameOnly.c_str());
-
-            if (reader)
-                Msg("  [SUCCESS] Fallback found file!");
-            else
-                Msg("  [FAIL] Fallback also returned NULL");
         }
-        else
-        {
-            Msg("  [NO FALLBACK] No directory separator found in path");
-        }
-    }
-    else
-    {
-        Msg("  [OK] VFS.r_open('%s') succeeded", vfsPath.c_str());
     }
 
     if (reader)
     {
         FS.r_close(reader);
         *pathTypeOut = SLANG_PATH_TYPE_FILE;
-        Msg("~ [SlangVFSAdapter::getPathType] '%s' -> EXISTS", vfsPath.c_str());
         return SLANG_OK;
     }
 
     // VFS doesn't support directory queries easily
     *pathTypeOut = SLANG_PATH_TYPE_FILE;
-    Msg("! [SlangVFSAdapter::getPathType] '%s' -> NOT FOUND", vfsPath.c_str());
     return SLANG_E_NOT_FOUND;
 }
 

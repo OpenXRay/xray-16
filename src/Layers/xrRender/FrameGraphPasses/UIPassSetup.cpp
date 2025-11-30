@@ -195,9 +195,6 @@ framegraph::VirtualResourceHandle setupUIPass(
                 }
 
                 uiRenderer->RenderBatches(cmdList, uiCollector->GetBatches(), framebuffer, data.width, data.height);
-                Msg("* [UIPass] Rendered %u batches", (u32)uiCollector->GetBatches().size());
-            } else {
-                Msg("* [UIPass] No UI batches");
             }
 
             cmdList->endMarker();
@@ -445,7 +442,6 @@ framegraph::VirtualResourceHandle setupTextPass(
             }
 
             if (fontBatches.empty()) {
-                Msg("* [TextPass] No text to render");
                 return;
             }
 
@@ -534,8 +530,6 @@ framegraph::VirtualResourceHandle setupTextPass(
                     }
                 }
             }
-
-            Msg("* [TextPass] Rendered %u font batches", (u32)fontBatches.size());
 
             cmdList->endMarker();
         }
@@ -647,9 +641,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
                 }
 
                 uiRenderer->RenderBatches(cmdList, uiCollector->GetBatches(), framebuffer, data.width, data.height);
-                Msg("* [CursorPass] Rendered %u batches", (u32)uiCollector->GetBatches().size());
-            } else {
-                Msg("* [CursorPass] No cursor batches");
             }
 
             cmdList->endMarker();

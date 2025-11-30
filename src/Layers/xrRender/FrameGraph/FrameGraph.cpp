@@ -165,8 +165,6 @@ void FrameGraph::SetPassCallback(PassHandle pass, PassExecuteCallback callback) 
 void FrameGraph::Compile() {
     VERIFY(!m_compiled && "Already compiled");
 
-    Msg("~ [FrameGraph] Compiling graph...");
-
     // Phase 1: Build dependency graph from resource accesses
     BuildDependencyGraph();
 
@@ -653,15 +651,6 @@ void FrameGraph::BuildDependencyGraph() {
         }
     }
 
-    Msg("~ [FrameGraph] Built dependency graph: %u passes, %u edges",
-        m_passes.size(),
-        [this]() {
-            u32 edgeCount = 0;
-            for (const auto& pass : m_passes) {
-                edgeCount += static_cast<u32>(pass.dependsOn.size());
-            }
-            return edgeCount;
-        }());
 }
 
 void FrameGraph::TopologicalSort() {
@@ -721,8 +710,6 @@ void FrameGraph::TopologicalSort() {
         VERIFY2(false, "FrameGraph has cyclic dependencies");
     }
 
-    Msg("~ [FrameGraph] Topological sort complete: %u passes ordered",
-        m_sortedPasses.size());
 }
 
 void FrameGraph::CullUnusedPasses() {
@@ -752,7 +739,6 @@ void FrameGraph::CullUnusedPasses() {
 
     // If no terminal passes found, keep all passes (conservative)
     if (terminalPasses.empty()) {
-        Msg("~ [FrameGraph] No terminal passes found - keeping all passes");
         for (auto& pass : m_passes) {
             pass.culled = false;
         }
@@ -785,7 +771,6 @@ void FrameGraph::CullUnusedPasses() {
     for (const auto& pass : m_passes) {
         if (pass.culled) {
             culledCount++;
-            Msg("~ [FrameGraph] Culling unused pass: %s", pass.name.c_str());
         }
     }
 
@@ -795,9 +780,6 @@ void FrameGraph::CullUnusedPasses() {
     m_sortedPasses.erase(it, m_sortedPasses.end());
 
     m_stats.numCulledPasses = culledCount;
-
-    Msg("~ [FrameGraph] Pass culling complete: %u/%u passes culled",
-        culledCount, m_passes.size());
 }
 
 void FrameGraph::ComputeResourceLifetimes() {
@@ -835,40 +817,19 @@ void FrameGraph::ComputeResourceLifetimes() {
         }
     }
 
-    // Log resource lifetimes
+    // Count unused resources
     u32 unusedCount = 0;
     for (const auto& resource : m_resources) {
         if (resource.firstUsedPass == INVALID_INDEX) {
             unusedCount++;
-            if (resource.desc.debugName.size() > 0) {
-                Msg("~ [FrameGraph] Unused resource: %s", resource.desc.debugName.c_str());
-            }
-        } else {
-            u32 lifetime = resource.GetLifetimeSpan();
-            const char* name = (resource.desc.debugName.size() > 0) ? resource.desc.debugName.c_str() : "<unnamed>";
-            Msg("~ [FrameGraph] Resource '%s': passes [%u-%u], lifetime=%u, refs=%u",
-                name,
-                resource.firstUsedPass,
-                resource.lastUsedPass,
-                lifetime,
-                resource.refCount);
         }
     }
 
     m_stats.numCulledResources = unusedCount;
-
-    Msg("~ [FrameGraph] Resource lifetime computation complete: %u/%u resources unused",
-        unusedCount, m_resources.size());
 }
 
 void FrameGraph::AllocateResources() {
     u64 totalMemoryAllocated = 0;
-
-    if (m_resourcePool) {
-        Msg("~ [FrameGraph] Allocating resources via FGResourcePool...");
-    } else {
-        Msg("~ [FrameGraph] Allocating resources directly via NVRHI...");
-    }
 
     for (auto& resource : m_resources) {
         // Skip unused resources
@@ -914,10 +875,6 @@ void FrameGraph::AllocateResources() {
                     resource.isAllocated = (resource.nvrhiBuffer != nullptr);
                     totalMemoryAllocated += resource.memorySize;
 
-                    Msg("~ [FrameGraph] Allocated buffer '%s' via ResourceManager: %.2f MB",
-                        resource.desc.debugName.c_str(),
-                        resource.memorySize / (1024.0f * 1024.0f));
-
                     // Early continue - we're done
                     continue;
                 } else {
@@ -940,10 +897,6 @@ void FrameGraph::AllocateResources() {
             if (resource.nvrhiBuffer) {
                 resource.isAllocated = true;
                 totalMemoryAllocated += resource.memorySize;
-
-                Msg("~ [FrameGraph] Allocated buffer '%s' directly: %.2f MB",
-                    resource.desc.debugName.c_str(),
-                    resource.memorySize / (1024.0f * 1024.0f));
             } else {
                 Msg("! [FrameGraph] Failed to create NVRHI buffer '%s'",
                     resource.desc.debugName.c_str());
@@ -1061,14 +1014,6 @@ void FrameGraph::AllocateResources() {
     }
 
     m_stats.totalMemoryAllocated = totalMemoryAllocated;
-
-    Msg("~ [FrameGraph] Resource allocation complete: %.2f MB total",
-        totalMemoryAllocated / (1024.0f * 1024.0f));
-
-    // Print resource pool statistics
-    if (m_resourcePool) {
-        m_resourcePool->PrintStatistics();
-    }
 }
 
 void FrameGraph::InsertResourceBarriers() {
@@ -1106,12 +1051,6 @@ void FrameGraph::InsertResourceBarriers() {
                     ResourceBarrier(access.resource, currentState, requiredState)
                 );
                 totalBarriers++;
-
-                Msg("~ [FrameGraph] Pass '%s': Barrier %s -> %s for resource '%s'",
-                    pass->name.c_str(),
-                    ResourceStateToString(currentState),
-                    ResourceStateToString(requiredState),
-                    resource->desc.debugName.c_str());
             }
 
             // Update current state after this access
@@ -1122,9 +1061,6 @@ void FrameGraph::InsertResourceBarriers() {
             }
         }
     }
-
-    Msg("~ [FrameGraph] Resource barrier insertion complete: %u barriers inserted",
-        totalBarriers);
 }
 
 void FrameGraph::OptimizeMemoryAliasing() {
@@ -1137,7 +1073,6 @@ void FrameGraph::OptimizeMemoryAliasing() {
     }
 
     if (transientResources.empty()) {
-        Msg("~ [FrameGraph] No transient resources to alias");
         return;
     }
 
@@ -1189,12 +1124,6 @@ void FrameGraph::OptimizeMemoryAliasing() {
                     current->aliasedWith = candidate->handle.index;
                     aliasedCount++;
                     memoryReduced += current->memorySize;
-
-                    Msg("~ [FrameGraph] Aliased '%s' with '%s' (saved %.2f MB)",
-                        current->desc.debugName.c_str(),
-                        candidate->desc.debugName.c_str(),
-                        current->memorySize / (1024.0f * 1024.0f));
-
                     break;
                 }
             }
@@ -1204,13 +1133,6 @@ void FrameGraph::OptimizeMemoryAliasing() {
     m_stats.numAliasedResources = aliasedCount;
     m_stats.memoryReduced = memoryReduced;
     m_stats.peakMemoryUsage = m_stats.totalMemoryAllocated - memoryReduced;
-
-    Msg("~ [FrameGraph] Memory aliasing complete: %u resources aliased, %.2f MB saved",
-        aliasedCount,
-        memoryReduced / (1024.0f * 1024.0f));
-    Msg("~ [FrameGraph] Peak memory usage: %.2f MB (reduced from %.2f MB)",
-        m_stats.peakMemoryUsage / (1024.0f * 1024.0f),
-        m_stats.totalMemoryAllocated / (1024.0f * 1024.0f));
 }
 
 // ══════════════════════════════════════════════════════════

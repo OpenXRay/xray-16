@@ -1,0 +1,37 @@
+// xrRender/Shaders/forward/sky_forward.ps
+// Sky dome pixel shader for Forward+ rendering
+//
+// Samples two cubemap textures and blends between them
+// Outputs HDR color to single render target
+
+#include "shared/common.h"
+
+struct PS_INPUT {
+    float4 hpos     : SV_POSITION;
+    float4 color    : COLOR0;      // RGB = sky color tint, A = blend factor
+    float3 tc0      : TEXCOORD0;   // Cubemap UV for sky0
+    float3 tc1      : TEXCOORD1;   // Cubemap UV for sky1
+};
+
+// Sky cubemap textures
+TextureCube s_sky0 : register(t0);
+TextureCube s_sky1 : register(t1);
+
+// Sampler
+SamplerState smp_rtlinear : register(s0);
+
+float4 main(PS_INPUT I) : SV_TARGET {
+    // Sample both sky cubemaps
+    float3 sky0 = s_sky0.Sample(smp_rtlinear, I.tc0).rgb;
+    float3 sky1 = s_sky1.Sample(smp_rtlinear, I.tc1).rgb;
+
+    // Blend between sky states (alpha = blend weight from environment)
+    float blendFactor = I.color.a;
+    float3 sky = lerp(sky0, sky1, blendFactor);
+
+    // Apply sky color tint from environment
+    // sky *= I.color.rgb;
+
+    // Output HDR sky color (exposure applied uniformly in tonemap pass)
+    return float4(sky, 1.0f);
+}

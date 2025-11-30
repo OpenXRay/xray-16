@@ -339,12 +339,6 @@ void RenderDevice::UploadTextureData(
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
 
-        // Debug log first slice
-        if (i == 0) {
-            Msg("* [RenderDevice] Uploading texture slice: arraySlice=%u, mip=%u, dataSize=%llu, rowPitch=%u, slicePitch=%u, data=%p",
-                slice.arraySlice, slice.mipLevel, slice.dataSize, slice.rowPitch, slice.slicePitch, slice.data);
-        }
-
         // Use pitch values calculated by DDSLoader (no duplicate calculation here)
         // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
         m_uploadCommandList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,

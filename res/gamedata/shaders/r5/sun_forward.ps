@@ -1,0 +1,29 @@
+// sun_forward.ps
+// Sun billboard pixel shader for Forward+ rendering
+//
+// Samples sun texture and applies vertex color tint.
+// Sun texture typically has falloff baked in.
+
+#include "shared/common.h"
+
+// Sun texture (gradient or sun image with baked falloff)
+Texture2D s_sun : register(t0);
+SamplerState smp_linear : register(s0);
+
+struct PS_INPUT {
+    float4 hpos     : SV_POSITION;
+    float4 color    : COLOR0;
+    float2 tc       : TEXCOORD0;
+};
+
+float4 main(PS_INPUT I) : SV_Target {
+    // Sample sun texture (usually has falloff baked in)
+    float4 sunTex = s_sun.Sample(smp_linear, I.tc);
+
+    // Apply vertex color tint (HDR sun color)
+    float4 color;
+    color.rgb = sunTex.rgb * I.color.rgb;
+    color.a = sunTex.a * I.color.a;
+
+    return color;
+}

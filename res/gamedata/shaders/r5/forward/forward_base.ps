@@ -34,8 +34,10 @@ Texture2D t_material : register(t2);  // R: metallic, G: roughness
 SamplerState s_linear : register(s0);
 
 // ══════════════════════════════════════════════════════════
-//  CONSTANTS
+//  CONSTANTS (from common.h static_globals b2)
 // ══════════════════════════════════════════════════════════
+// Sun lighting data is in static_globals (register b2)
+// L_sun_color, L_sun_dir_w, L_ambient, eye_position are available
 
 cbuffer Material : register(b1) {
     float4 g_BaseColor;
@@ -44,6 +46,44 @@ cbuffer Material : register(b1) {
     float g_MaterialID;
     float _padding;
 };
+
+// ══════════════════════════════════════════════════════════
+//  PBR FUNCTIONS (Cook-Torrance BRDF)
+// ══════════════════════════════════════════════════════════
+
+static const float PI = 3.14159265359;
+
+// GGX/Trowbridge-Reitz Normal Distribution Function
+float DistributionGGX(float NdotH, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH2 = NdotH * NdotH;
+
+    float denom = NdotH2 * (a2 - 1.0) + 1.0;
+    denom = PI * denom * denom;
+
+    return a2 / max(denom, 0.0001);
+}
+
+// Schlick-GGX Geometry Function (single direction)
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float r = roughness + 1.0;
+    float k = (r * r) / 8.0;  // Direct lighting
+
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+// Smith's Geometry Function (both directions)
+float GeometrySmith(float NdotV, float NdotL, float roughness) {
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    return ggx1 * ggx2;
+}
+
+// Fresnel-Schlick approximation
+float3 FresnelSchlick(float cosTheta, float3 F0) {
+    return F0 + (1.0 - F0) * pow(saturate(1.0 - cosTheta), 5.0);
+}
 
 // ══════════════════════════════════════════════════════════
 //  PIXEL SHADER
@@ -82,16 +122,78 @@ PS_OUTPUT main(PS_INPUT input) {
     float3 worldNormal = normalize(mul(tangentNormal, TBN));
 
     // ═══════════════════════════════════════════════════════
-    //  LIGHTING (Phase 1: UNLIT - just output albedo)
+    //  PBR MATERIAL PROPERTIES
     // ═══════════════════════════════════════════════════════
-    // Phase 3 will add:
-    // - Sun light (directional with CSM shadows)
-    // - Clustered point/spot lights
-    // - PBR BRDF (Cook-Torrance)
 
-    // TEMPORARY: No lighting - just albedo
-    // This matches the migration plan Phase 1 goal
-    output.color = float4(albedo, 1.0);
+    // Get material properties from texture (R: metallic, G: roughness)
+    float metallic = materialSample.r * g_Metallic;
+    float roughness = max(materialSample.g * g_Roughness, 0.04);  // Clamp to avoid division issues
+
+    // Calculate F0 (surface reflectance at normal incidence)
+    // Dielectric: 0.04, Metal: albedo color
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+
+    // ═══════════════════════════════════════════════════════
+    //  HDR SUN LIGHTING (Cook-Torrance PBR)
+    // ═══════════════════════════════════════════════════════
+    // L_sun_color contains HDR values (can be > 1.0)
+    // L_sun_dir_w is direction light travels (from sun toward scene)
+    // Negate to get direction toward sun for N.L calculation
+
+    float3 N = worldNormal;
+    float3 V = normalize(eye_position - input.worldPos);
+    float3 L = normalize(-L_sun_dir_w);
+    float3 H = normalize(V + L);
+
+    // Dot products (clamped to avoid negative values)
+    float NdotV = max(dot(N, V), 0.001);
+    float NdotL = max(dot(N, L), 0.0);
+    float NdotH = max(dot(N, H), 0.0);
+    float HdotV = max(dot(H, V), 0.0);
+
+    // Cook-Torrance BRDF components
+    float D = DistributionGGX(NdotH, roughness);
+    float G = GeometrySmith(NdotV, NdotL, roughness);
+    float3 F = FresnelSchlick(HdotV, F0);
+
+    // Specular BRDF (Cook-Torrance)
+    float3 numerator = D * G * F;
+    float denominator = 4.0 * NdotV * NdotL + 0.0001;
+    float3 specular = numerator / denominator;
+
+    // Diffuse BRDF (Lambertian, energy-conserving)
+    // kS = Fresnel = energy ratio that gets reflected
+    // kD = 1 - kS = energy ratio that gets refracted (diffuse)
+    float3 kS = F;
+    float3 kD = (1.0 - kS) * (1.0 - metallic);  // Metals have no diffuse
+
+    float3 diffuse = kD * albedo / PI;
+
+    // Sun contribution (HDR - can exceed 1.0!)
+    float3 sunContrib = (diffuse + specular) * L_sun_color * NdotL;
+
+    // ═══════════════════════════════════════════════════════
+    //  AMBIENT LIGHTING (Hemisphere approximation)
+    // ═══════════════════════════════════════════════════════
+    // TODO: Replace with IBL (Image-Based Lighting) for proper PBR
+    // For now, use simple hemisphere blend
+
+    float hemisphereBlend = N.y * 0.5 + 0.5;  // [-1,1] -> [0,1]
+    float3 ambientColor = lerp(L_ambient.rgb * 0.5, L_hemi_color.rgb, hemisphereBlend);
+
+    // Apply ambient with simple Fresnel for metals
+    float3 ambientDiffuse = (1.0 - metallic) * albedo * ambientColor;
+    float3 ambientSpecular = metallic * F0 * ambientColor * 0.5;  // Rough approx for metals
+    float3 ambient = ambientDiffuse + ambientSpecular;
+
+    // ═══════════════════════════════════════════════════════
+    //  FINAL HDR OUTPUT
+    // ═══════════════════════════════════════════════════════
+
+    float3 finalColor = sunContrib + ambient;
+
+    // Output HDR color (tonemapping happens in tonemap pass)
+    output.color = float4(finalColor, 1.0);
 
     return output;
 }

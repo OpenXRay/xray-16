@@ -96,6 +96,26 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     // We search in multiple VFS directories:
     // 1. $game_textures$ (general textures)
     // 2. $level$ (level-specific textures like build_details)
+    //
+    // NOTE: Config files often reference textures with .tga extension
+    // (e.g., "fx\fx_sun.tga") but actual files are stored as .dds.
+    // We strip any existing extension before searching.
+
+    // Strip existing extension if present (e.g., "fx\fx_sun.tga" -> "fx\fx_sun")
+    string_path basePath;
+    xr_strcpy(basePath, filePath);
+    if (char* dot = strrchr(basePath, '.')) {
+        // Only strip if the extension looks like a texture extension
+        if (_stricmp(dot, ".tga") == 0 ||
+            _stricmp(dot, ".dds") == 0 ||
+            _stricmp(dot, ".bmp") == 0 ||
+            _stricmp(dot, ".png") == 0 ||
+            _stricmp(dot, ".seq") == 0 ||
+            _stricmp(dot, ".ogm") == 0 ||
+            _stricmp(dot, ".avi") == 0) {
+            *dot = '\0';  // Terminate string at the dot
+        }
+    }
 
     string_path resolvedPath;
     IReader* reader = nullptr;
@@ -103,11 +123,11 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     // Helper lambda to try finding file in VFS directories
     auto TryFindFile = [&](const char* ext) -> bool {
         // Try $game_textures$ first (most common)
-        if (FS.exist(resolvedPath, "$game_textures$", filePath, ext)) {
+        if (FS.exist(resolvedPath, "$game_textures$", basePath, ext)) {
             return true;
         }
         // Try $level$ (level-specific textures)
-        if (FS.exist(resolvedPath, "$level$", filePath, ext)) {
+        if (FS.exist(resolvedPath, "$level$", basePath, ext)) {
             return true;
         }
         return false;
@@ -128,24 +148,24 @@ bool DDSLoader::LoadFromFile(const char* filePath, DDSData& outData) {
     }
     // Try SEQ (Animated sequence)
     else if (TryFindFile(".seq")) {
-        Msg("* [DDSLoader] Detected sequence texture: %s.seq", filePath);
+        // Msg("* [DDSLoader] Detected sequence texture: %s.seq", basePath);
         return LoadSequenceTexture(resolvedPath, outData);
     }
     // Try OGM (Theora video)
     else if (TryFindFile(".ogm")) {
-        Msg("* [DDSLoader] Detected video texture: %s.ogm", filePath);
+        // Msg("* [DDSLoader] Detected video texture: %s.ogm", basePath);
         return LoadVideoTexture(resolvedPath, outData);
     }
     // Try AVI (future)
     else if (TryFindFile(".avi")) {
-        Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", filePath);
+        Msg("! [DDSLoader] AVI video textures not yet supported: %s.avi", basePath);
         outData.isValid = false;
         outData.errorMessage = "AVI video textures not yet implemented";
         return false;
     }
     // Not found
     else {
-        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .seq, .ogm, .avi in $game_textures$ and $level$)", filePath);
+        Msg("! [DDSLoader] Texture not found: %s (tried .dds, .seq, .ogm, .avi in $game_textures$ and $level$)", basePath);
         outData.isValid = false;
         outData.errorMessage = "Texture file not found";
         return false;
@@ -241,20 +261,14 @@ bool DDSLoader::LoadFromMemory(
         desc.mipLevels = 1;
     }
 
-    Msg("~ [DDSLoader] Header: %ux%u, %u mips, arraySize=%u, depth=%u",
-        desc.width, desc.height, desc.mipLevels, desc.arraySize, desc.depth);
-
     // Format conversion
     if (header.ddspf.dwFlags & DDPF_FOURCC) {
         if (header.ddspf.dwFourCC == FOURCC_DX10) {
             // Use DX10 header for format
             desc.format = GetFormatFromDXGI(headerDX10.dxgiFormat);
-            Msg("~ [DDSLoader] Format: DX10 DXGI=%u → NVRHI=%d", (u32)headerDX10.dxgiFormat, (int)desc.format);
         } else {
             // Use FourCC for format
             desc.format = GetFormatFromFourCC(header.ddspf.dwFourCC);
-            Msg("~ [DDSLoader] Format: FourCC=0x%08X (%.4s) → NVRHI=%d",
-                header.ddspf.dwFourCC, (const char*)&header.ddspf.dwFourCC, (int)desc.format);
         }
     } else {
         // Uncompressed format - detect from bit count and flags
@@ -314,9 +328,6 @@ bool DDSLoader::LoadFromMemory(
             Msg("! [DDSLoader] Unknown uncompressed format: flags=0x%X, bpp=%u", flags, bpp);
             desc.format = nvrhi::Format::UNKNOWN;
         }
-
-        Msg("~ [DDSLoader] Format: Uncompressed (flags=0x%X, bpp=%u) → NVRHI=%d",
-            flags, bpp, (int)desc.format);
     }
 
     // Debug name
@@ -341,11 +352,6 @@ bool DDSLoader::LoadFromMemory(
     // Success
     outData.isValid = true;
     outData.errorMessage = "";
-
-    Msg("* [DDSLoader] Loaded: %s (%ux%u, %u mips, format=%d, %llu bytes)",
-        debugName ? debugName : "unknown",
-        desc.width, desc.height, desc.mipLevels,
-        (int)desc.format, outData.totalDataSize);
 
     return true;
 }
@@ -637,14 +643,6 @@ bool DDSLoader::ParseMipLevels(
 
                 mip.rowPitch = blockWidth * formatInfo.bytesPerBlock;
                 mip.slicePitch = mip.rowPitch * blockHeight;
-
-                // Debug log for first mip only
-                if (mipLevel == 0 && arraySlice == 0) {
-                    Msg("* [DDSLoader] Block-compressed: %ux%u → %ux%u blocks, blockSize=%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
-                        mipWidth, mipHeight, blockWidth, blockHeight,
-                        formatInfo.blockSize, formatInfo.bytesPerBlock,
-                        mip.rowPitch, mip.slicePitch);
-                }
             } else {
                 // Uncompressed formats
                 // CRITICAL: D3D11 requires rowPitch to be aligned to D3D11_TEXTURE_DATA_PITCH_ALIGNMENT (256 bytes for most hardware)
@@ -655,13 +653,6 @@ bool DDSLoader::ParseMipLevels(
                 // The driver will handle alignment internally
                 mip.rowPitch = naturalRowPitch;
                 mip.slicePitch = mip.rowPitch * mipHeight;
-
-                // Debug log for first mip only
-                if (mipLevel == 0 && arraySlice == 0) {
-                    Msg("* [DDSLoader] Uncompressed: %ux%u, bytesPerBlock=%u, rowPitch=%u, slicePitch=%u",
-                        mipWidth, mipHeight, formatInfo.bytesPerBlock,
-                        mip.rowPitch, mip.slicePitch);
-                }
             }
 
             // NOTE: For 3D textures, slicePitch is the stride between consecutive 2D slices,
@@ -760,9 +751,22 @@ bool DDSLoader::LoadMipRange(
     TextureDesc& desc = outData.desc;
     desc.width = header.dwWidth;
     desc.height = header.dwHeight;
-    desc.depth = (header.dwCaps2 & DDSCAPS2_VOLUME) ? header.dwDepth : 1;
     desc.mipLevels = (header.dwFlags & DDSD_MIPMAPCOUNT) ? header.dwMipMapCount : 1;
-    desc.arraySize = (header.dwCaps2 & DDSCAPS2_CUBEMAP) ? 6 : 1;
+
+    // Determine texture type from DDS caps
+    if (header.dwCaps2 & DDSCAPS2_CUBEMAP) {
+        desc.type = TextureDesc::TextureCube;
+        desc.arraySize = 6;
+        desc.depth = 1;
+    } else if (header.dwCaps2 & DDSCAPS2_VOLUME) {
+        desc.type = TextureDesc::Texture3D;
+        desc.arraySize = 1;
+        desc.depth = header.dwDepth > 0 ? header.dwDepth : 1;
+    } else {
+        desc.type = TextureDesc::Texture2D;
+        desc.arraySize = 1;
+        desc.depth = 1;
+    }
 
     // Determine format
     if (header.ddspf.dwFlags & DDPF_FOURCC) {
@@ -870,8 +874,8 @@ bool DDSLoader::LoadMipRange(
     outData.filePath = filePath;
     outData.isValid = true;
 
-    Msg("* [DDSLoader] LoadMipRange: %s (mips %u→%u, %llu KB)",
-        filePath, startMip, startMip + mipCount, totalSize / 1024);
+    // Msg("* [DDSLoader] LoadMipRange: %s (mips %u→%u, %llu KB)",
+    //     filePath, startMip, startMip + mipCount, totalSize / 1024);
 
     return true;
 }
@@ -881,7 +885,7 @@ bool DDSLoader::LoadMipRange(
 // ═══════════════════════════════════════════════════
 
 bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
-    Msg("* [DDSLoader] Loading video texture: %s", filePath);
+    // Msg("* [DDSLoader] Loading video texture: %s", filePath);
 
     // ═══════════════════════════════════════════════════
     //  STEP 1: LOAD THEORA STREAM AND GET METADATA
@@ -903,8 +907,8 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
     u32 texWidth = theoraSurface->Width(false);    // Pow2 texture width
     u32 texHeight = theoraSurface->Height(false);  // Pow2 texture height
 
-    Msg("* [DDSLoader] Video dimensions: %ux%u (texture: %ux%u)",
-        videoWidth, videoHeight, texWidth, texHeight);
+    // Msg("* [DDSLoader] Video dimensions: %ux%u (texture: %ux%u)",
+    //     videoWidth, videoHeight, texWidth, texHeight);
 
     // ═══════════════════════════════════════════════════
     //  STEP 2: CREATE VIDEO STATE
@@ -971,7 +975,7 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
     // CRITICAL: We must decode the first frame BEFORE creating the GPU texture
     // Otherwise the texture will be created with uninitialized/black data!
 
-    Msg("* [DDSLoader] Decoding initial video frame...");
+    // Msg("* [DDSLoader] Decoding initial video frame...");
 
     // Update to get first frame
     bool firstFrameDecoded = theoraSurface->Update(Device.dwTimeContinual);
@@ -990,8 +994,8 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
             pos
         );
 
-        Msg("* [DDSLoader] First frame decoded successfully (pos=%d, expected=%u)",
-            pos, videoHeight * texWidth);
+        // Msg("* [DDSLoader] First frame decoded successfully (pos=%d, expected=%u)",
+        //     pos, videoHeight * texWidth);
     } else {
         Msg("! [DDSLoader] WARNING: Failed to decode initial frame for: %s", filePath);
         // Fill with a visible color for debugging (magenta)
@@ -1010,9 +1014,9 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
     outData.isValid = true;
     outData.filePath = filePath;
 
-    Msg("* [DDSLoader] Video texture loaded: %s (%ux%u, loop=%s, initialFrame=%s)",
-        filePath, videoWidth, videoHeight, shouldLoop ? "yes" : "no",
-        firstFrameDecoded ? "OK" : "FAIL");
+    // Msg("* [DDSLoader] Video texture loaded: %s (%ux%u, loop=%s, initialFrame=%s)",
+    //     filePath, videoWidth, videoHeight, shouldLoop ? "yes" : "no",
+    //     firstFrameDecoded ? "OK" : "FAIL");
 
     return true;
 }
@@ -1022,7 +1026,7 @@ bool DDSLoader::LoadVideoTexture(const char* filePath, DDSData& outData) {
 // ═══════════════════════════════════════════════════
 
 bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
-    Msg("* [DDSLoader] Loading sequence texture: %s", filePath);
+    // Msg("* [DDSLoader] Loading sequence texture: %s", filePath);
 
     // ═══════════════════════════════════════════════════
     //  STEP 1: PARSE .SEQ FILE
@@ -1088,8 +1092,8 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
         return false;
     }
 
-    Msg("* [DDSLoader] Sequence FPS=%u, cycled=%s, frames=%u",
-        fps, cycled ? "yes" : "no", (u32)frameTextureNames.size());
+    // Msg("* [DDSLoader] Sequence FPS=%u, cycled=%s, frames=%u",
+    //     fps, cycled ? "yes" : "no", (u32)frameTextureNames.size());
 
     // ═══════════════════════════════════════════════════
     //  STEP 2: PRE-LOAD ALL FRAME TEXTURES
@@ -1108,8 +1112,8 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
     for (u32 i = 0; i < frameTextureNames.size(); i++) {
         const char* frameName = frameTextureNames[i].c_str();
 
-        Msg("* [DDSLoader]   Loading frame %u/%u: %s",
-            i + 1, (u32)frameTextureNames.size(), frameName);
+        // Msg("* [DDSLoader]   Loading frame %u/%u: %s",
+        //     i + 1, (u32)frameTextureNames.size(), frameName);
 
         // Load frame DDS
         DDSData frameData;
@@ -1158,9 +1162,9 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
         }
     }
 
-    Msg("* [DDSLoader] Pre-loaded %u frames (%ux%u, format=%d)",
-        (u32)outData.sequenceState->frameData.size(),
-        expectedWidth, expectedHeight, (int)expectedFormat);
+    // Msg("* [DDSLoader] Pre-loaded %u frames (%ux%u, format=%d)",
+    //     (u32)outData.sequenceState->frameData.size(),
+    //     expectedWidth, expectedHeight, (int)expectedFormat);
 
     // ═══════════════════════════════════════════════════
     //  STEP 3: CREATE SEQUENCE STATE (LIKE VIDEO STATE)
@@ -1233,12 +1237,12 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
     outData.isValid = true;
     outData.filePath = filePath;
 
-    Msg("* [DDSLoader] Sequence texture loaded: %s (%ux%u, %u frames, %u fps, cycled=%s)",
-        filePath, expectedWidth, expectedHeight,
-        (u32)outData.sequenceState->frameData.size(), fps, cycled ? "yes" : "no");
+    // Msg("* [DDSLoader] Sequence texture loaded: %s (%ux%u, %u frames, %u fps, cycled=%s)",
+    //     filePath, expectedWidth, expectedHeight,
+    //     (u32)outData.sequenceState->frameData.size(), fps, cycled ? "yes" : "no");
 
-    Msg("* [DDSLoader] Sequence texture size: %ux%u from first frame",
-        outData.desc.width, outData.desc.height);
+    // Msg("* [DDSLoader] Sequence texture size: %ux%u from first frame",
+    //     outData.desc.width, outData.desc.height);
 
     return true;
 }

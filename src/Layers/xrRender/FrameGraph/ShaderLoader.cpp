@@ -136,6 +136,21 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
 {
     ShaderResult result;
 
+    // ═══════════════════════════════════════════════════
+    //  CHECK IN-MEMORY HANDLE CACHE FIRST (fastest path)
+    // ═══════════════════════════════════════════════════
+    xr_string cacheKey = xr_string(name) + ".vs";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        // Return cached handle + reflection
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
+
     // Open shader source file
     IReader* fs = OpenShaderFile(name, ".vs");
     if (!fs)
@@ -147,13 +162,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         fs->length()
     );
 
-    // Try to load bytecode + reflection from cache
+    // Try to load bytecode + reflection from disk cache
     ExtractedReflection deserializedReflection;
     bool cacheHit = m_cache.TryLoad(name, ".vs", sourceHash, result.bytecode, &deserializedReflection);
 
     if (cacheHit)
     {
-        // Cache hit - create shader from cached bytecode + deserialized reflection
+        // Disk cache hit - create shader from cached bytecode + deserialized reflection
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Vertex;
         desc.debugName = name;
@@ -175,7 +190,10 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         // Store deserialized reflection
         result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
 
-        Msg("  Loaded vertex shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        // Cache handle and reflection for future calls
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+
         return result;
     }
 
@@ -238,10 +256,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
     // Store extracted reflection in result
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
-    // Save bytecode + reflection to cache
+    // Save bytecode + reflection to disk cache
     m_cache.Save(name, ".vs", sourceHash, result.bytecode, &extractedReflection);
 
-    Msg("  Loaded vertex shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    // Cache handle and reflection for future calls
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
     return result;
 }
 
@@ -250,6 +271,21 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     const char* entryPoint)
 {
     ShaderResult result;
+
+    // ═══════════════════════════════════════════════════
+    //  CHECK IN-MEMORY HANDLE CACHE FIRST (fastest path)
+    // ═══════════════════════════════════════════════════
+    xr_string cacheKey = xr_string(name) + ".ps";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        // Return cached handle + reflection
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
 
     // Open shader source file
     IReader* fs = OpenShaderFile(name, ".ps");
@@ -268,7 +304,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
 
     if (cacheHit)
     {
-        // Cache hit - create shader from cached bytecode + deserialized reflection
+        // Disk cache hit - create shader from cached bytecode + deserialized reflection
         nvrhi::ShaderDesc desc;
         desc.shaderType = nvrhi::ShaderType::Pixel;
         desc.debugName = name;
@@ -290,7 +326,10 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         // Store deserialized reflection
         result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
 
-        Msg("  ✓ Loaded pixel shader from cache (with reflection): %s (%zu bytes)", name, result.bytecode.size());
+        // Cache handle and reflection for future calls
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+
         return result;
     }
 
@@ -353,10 +392,13 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
     // Store extracted reflection in result
     result.reflection = xr_new<ExtractedReflection>(extractedReflection);
 
-    // Save bytecode + reflection to cache
+    // Save bytecode + reflection to disk cache
     m_cache.Save(name, ".ps", sourceHash, result.bytecode, &extractedReflection);
 
-    Msg("  Loaded pixel shader with reflection: %s (%zu bytes)", name, result.bytecode.size());
+    // Cache handle and reflection for future calls
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
     return result;
 }
 

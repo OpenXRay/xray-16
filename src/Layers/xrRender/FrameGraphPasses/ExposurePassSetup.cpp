@@ -66,6 +66,12 @@ ExposureConfig GetDefaultExposureConfig()
     return config;
 }
 
+// Get the physical exposure texture directly
+nvrhi::ITexture* GetExposureTexture()
+{
+    return s_exposure_texture.Get();
+}
+
 // ═══════════════════════════════════════════════════════
 //  CONSTANT BUFFER STRUCTURES (must match HLSL)
 // ═══════════════════════════════════════════════════════
@@ -433,7 +439,11 @@ ExposureOutput setupExposurePass(
                 } else {
                     // Scene texture not available - use fallback
                     float exposure = ComputeFallbackExposure(data.config, data.deltaTime);
-                    cmdList->writeTexture(s_exposure_texture, 0, 0, &exposure, sizeof(float));
+
+                    // Write to static exposure texture (used directly by tonemap pass)
+                    if (s_exposure_texture) {
+                        cmdList->writeTexture(s_exposure_texture, 0, 0, &exposure, sizeof(float));
+                    }
                 }
             } else {
                 // ─────────────────────────────────────────────────────
@@ -441,7 +451,7 @@ ExposureOutput setupExposurePass(
                 // ─────────────────────────────────────────────────────
                 float exposure = ComputeFallbackExposure(data.config, data.deltaTime);
 
-                // Write fallback exposure value to texture
+                // Write to static exposure texture (used directly by tonemap pass)
                 if (s_exposure_texture) {
                     cmdList->writeTexture(s_exposure_texture, 0, 0, &exposure, sizeof(float));
                 }

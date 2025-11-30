@@ -6,17 +6,9 @@
 namespace xray::render::framegraph {
 
 ShaderCache::ShaderCache()
-#ifdef DEBUG
-    : m_cacheEnabled(false)  // DEBUG: Disable cache for rapid shader iteration
-#else
-    : m_cacheEnabled(true)   // RELEASE: Enable cache for performance
-#endif
+    : m_cacheEnabled(true)   // Always enable cache (even in DEBUG) for performance
 {
-#ifdef DEBUG
-    Msg("* [ShaderCache] Initialized (cache dir: shaders_cache_fg/) - CACHING DISABLED (DEBUG MODE)");
-#else
     Msg("* [ShaderCache] Initialized (cache dir: shaders_cache_fg/) - CACHING ENABLED");
-#endif
 }
 
 ShaderCache::~ShaderCache()
@@ -154,12 +146,12 @@ void ShaderCache::Save(
     {
         writer->w_u8(1);  // Has reflection flag
         SerializeReflection(writer, *reflection);
-        Msg("  ✓ [ShaderCache] Saved (with reflection): %s%s (%u bytes)", shaderName, extension, (u32)bytecode.size());
+        Msg("[ShaderCache] Saved (with reflection): %s%s (%u bytes)", shaderName, extension, (u32)bytecode.size());
     }
     else
     {
         writer->w_u8(0);  // No reflection flag
-        Msg("  ✓ [ShaderCache] Saved: %s%s (%u bytes)", shaderName, extension, (u32)bytecode.size());
+        Msg("[ShaderCache] Saved: %s%s (%u bytes)", shaderName, extension, (u32)bytecode.size());
     }
 
     FS.w_close(writer);
