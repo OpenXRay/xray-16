@@ -31,6 +31,9 @@ struct GeometryBatch {
 
     Fmatrix worldMatrix;
 
+    Fvector worldBoundsCenter;
+    float worldBoundsRadius = 0.0f;
+
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;
 

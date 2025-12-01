@@ -661,11 +661,17 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     batch.renderable = renderable;
 
-    Fvector worldCenter;
-    worldTransform.transform_tiny(worldCenter, visual->vis.sphere.P);
-    float distSQ = Device.vCameraPosition.distance_to_sqr(worldCenter) + EPS;
-    float R = visual->vis.sphere.R;
-    batch.ssa = R / distSQ;
+    u32 visualType = visual->getType();
+    if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
+        batch.worldBoundsCenter = visual->vis.sphere.P;
+        batch.worldBoundsRadius = visual->vis.sphere.R;
+    } else {
+        worldTransform.transform_tiny(batch.worldBoundsCenter, visual->vis.sphere.P);
+        batch.worldBoundsRadius = visual->vis.sphere.R;
+    }
+
+    float distSQ = Device.vCameraPosition.distance_to_sqr(batch.worldBoundsCenter) + EPS;
+    batch.ssa = batch.worldBoundsRadius / distSQ;
 
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;

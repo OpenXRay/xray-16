@@ -57,7 +57,7 @@ bool DistanceTest(float3 position, float radius)
 bool FrustumTestSphere(float3 center, float radius)
 {
 
-    for (uint i = 0; i < 6; i++)
+    for (uint i = 0; i < 5; i++)
     {
         float dist = dot(g_FrustumPlanes[i].xyz, center) + g_FrustumPlanes[i].w;
 
@@ -70,9 +70,8 @@ bool FrustumTestSphere(float3 center, float radius)
 
 bool OcclusionTestSphere(float3 center, float radius)
 {
-    return true;
 
-    float4 clipPos = mul(g_ViewProj, float4(center, 1.0));
+    float4 clipPos = mul(m_V, float4(center, 1.0));
 
     if (clipPos.w <= 0.0)
         return true;
@@ -95,14 +94,14 @@ bool OcclusionTestSphere(float3 center, float radius)
     float3 viewDir = normalize(center - g_CameraPos);
     float3 frontPoint = center - viewDir * radius;
 
-    float4 frontClip = mul(g_ViewProj, float4(frontPoint, 1.0));
+    float4 frontClip = mul(m_V, float4(frontPoint, 1.0));
     float objectDepth = frontClip.z / frontClip.w;
 
     objectDepth = saturate(objectDepth);
 
-    float depthBias = 0.001;
+    float depthBias = 0.0001;
 
-    return objectDepth <= (hiZDepth + depthBias);
+    return objectDepth >= (hiZDepth - depthBias);
 }
 
 [numthreads(64, 1, 1)]
@@ -115,7 +114,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     GPUObjectData obj = g_Objects[objectIdx];
 
-    #if 0
     if (!DistanceTest(obj.position, obj.radius))
         return;
 
@@ -124,7 +122,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     if (!OcclusionTestSphere(obj.position, obj.radius))
         return;
-    #endif
 
     uint visibleIdx;
     g_VisibleCount.InterlockedAdd(0, 1, visibleIdx);

@@ -249,20 +249,8 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
         GPUObjectData obj;
 
-        obj.position = batch.worldMatrix.c;
-        obj.radius = 2.0f;
-
-        if (batch.visual) {
-            vis_data& vis = batch.visual->getVisData();
-
-            batch.worldMatrix.transform_tiny(obj.position, vis.sphere.P);
-
-            float scaleX = batch.worldMatrix.i.magnitude();
-            float scaleY = batch.worldMatrix.j.magnitude();
-            float scaleZ = batch.worldMatrix.k.magnitude();
-            float maxScale = std::max({scaleX, scaleY, scaleZ});
-            obj.radius = vis.sphere.R;
-        }
+        obj.position = batch.worldBoundsCenter;
+        obj.radius = batch.worldBoundsRadius;
 
         obj.batchIndex = i;
 
