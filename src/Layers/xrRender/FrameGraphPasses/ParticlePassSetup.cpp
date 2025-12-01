@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ParticlePassSetup.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -564,7 +565,9 @@ static bool RenderParticleEffect(
     const ParticleBatch& batch,
     bool applyFOV,
     const DefaultOutputLayout& outputs,
-    const FrameGraph& fg)
+    const FrameGraph& fg,
+    nvrhi::IBuffer* drawArgsBuffer,
+    u32 batchIndex)
 {
     CParticleEffect* pEffect = static_cast<CParticleEffect*>(batch.visual);
 
@@ -694,8 +697,15 @@ static bool RenderParticleEffect(
     ctx->SetVertexBuffer(0, s_particleVB.Get(), 0);
     ctx->SetIndexBuffer(s_quadIB.Get(), nvrhi::Format::R16_UINT, 0);
 
-    u32 indexCount = particleCount * 6;
-    ctx->DrawIndexed(indexCount, 0, 0);
+    if (drawArgsBuffer) {
+        u32 actualIndexCount = particleCount * 6;
+        u32 argsOffset = batchIndex * sizeof(IndirectDrawArgs);
+        ctx->GetCommandList()->writeBuffer(drawArgsBuffer, &actualIndexCount, sizeof(u32), argsOffset);
+        ctx->DrawIndexedIndirect(drawArgsBuffer, argsOffset);
+    } else {
+        u32 indexCount = particleCount * 6;
+        ctx->DrawIndexed(indexCount, 0, 0);
+    }
 
     return true;
 }
@@ -708,7 +718,8 @@ DefaultOutputLayout setupParticlePass(
     const xr_vector<ParticleBatch>* hudParticleBatches,
     MaterialCache* materialCache,
     u32 width,
-    u32 height)
+    u32 height,
+    nvrhi::IBuffer* particleDrawArgsBuffer)
 {
     struct ParticlePassData {
         VirtualResourceHandle inputColor;
@@ -718,6 +729,7 @@ DefaultOutputLayout setupParticlePass(
         ng::RenderDevice* device;
         const xr_vector<ParticleBatch>* worldParticleBatches;
         const xr_vector<ParticleBatch>* hudParticleBatches;
+        nvrhi::IBuffer* drawArgsBuffer;
         MaterialCache* materialCache;
         DefaultOutputLayout outputs;
         u32 width;
@@ -727,7 +739,7 @@ DefaultOutputLayout setupParticlePass(
     auto& passData = fg.addCallbackPass<ParticlePassData>(
         "Particles",
 
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
+        [&, width, height, particleDrawArgsBuffer](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -735,6 +747,7 @@ DefaultOutputLayout setupParticlePass(
             data.device = device;
             data.worldParticleBatches = worldParticleBatches;
             data.hudParticleBatches = hudParticleBatches;
+            data.drawArgsBuffer = particleDrawArgsBuffer;
             data.materialCache = materialCache;
 
             data.inputColor = passBuilder.read(forwardInputs.albedo);
@@ -802,10 +815,12 @@ DefaultOutputLayout setupParticlePass(
 
             if (data.worldParticleBatches && !data.worldParticleBatches->empty()) {
                 cmdList->beginMarker("World Particles");
-                for (const auto& batch : *data.worldParticleBatches) {
+                for (u32 i = 0; i < data.worldParticleBatches->size(); i++) {
+                    const auto& batch = (*data.worldParticleBatches)[i];
                     if (batch.visual && batch.visual->getType() == MT_PARTICLE_EFFECT) {
                         if (RenderParticleEffect(ctx, data.device, data.materialCache,
-                                                 batch, false, data.outputs, fg)) {
+                                                 batch, false, data.outputs, fg,
+                                                 data.drawArgsBuffer, i)) {
                             numDraws++;
                         }
                     }
@@ -818,7 +833,8 @@ DefaultOutputLayout setupParticlePass(
                 for (const auto& batch : *data.hudParticleBatches) {
                     if (batch.visual && batch.visual->getType() == MT_PARTICLE_EFFECT) {
                         if (RenderParticleEffect(ctx, data.device, data.materialCache,
-                                                 batch, true, data.outputs, fg)) {
+                                                 batch, true, data.outputs, fg,
+                                                 nullptr, 0)) {
                             numDraws++;
                         }
                     }

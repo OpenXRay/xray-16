@@ -62,17 +62,17 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 
     output.uv = cornerOffset;
 
-    if (debugData.cullState == CULL_STATE_VISIBLE)
+    if (debugData.cullState == CULL_STATE_CULLED_OCCLUSION)
     {
-        output.alpha = 0.0;
+        output.alpha = g_WireframeAlpha;
     }
-    else if (debugData.cullState >= CULL_STATE_CULLED_DISTANCE)
+    else if (debugData.cullState == CULL_STATE_PARTICLE_CULLED)
     {
         output.alpha = g_WireframeAlpha;
     }
     else
     {
-        output.alpha = g_WireframeAlpha * 0.5;
+        output.alpha = 0.0;
     }
 
     return output;

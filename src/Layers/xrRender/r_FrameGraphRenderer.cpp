@@ -37,6 +37,7 @@
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrParticles/psystem.h"
 
 namespace xray::render {
 
@@ -352,6 +353,17 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
             drawArgsBuffer = cullOutput.drawArgsBuffer;
         }
+
+        if (m_gpuCullingManager->IsParticleCullingEnabled() && !m_worldParticleBatches.empty()) {
+            m_gpuCullingManager->SetupParticleCullingPass(
+                *m_framegraph,
+                m_hizPyramid,
+                hizOutput.width,
+                hizOutput.height,
+                hizOutput.mipLevels,
+                &m_worldParticleBatches
+            );
+        }
     }
 
     framegraph::ResourceDesc colorDesc;
@@ -403,7 +415,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             depthBuffer,
             hizOutput.width,
             hizOutput.height,
-            hizOutput.mipLevels
+            hizOutput.mipLevels,
+            &m_worldParticleBatches
         );
     }
 
@@ -417,6 +430,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
+    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr;
+    if (m_gpuCullingManager && m_gpuCullingManager->IsParticleCullingEnabled()) {
+        particleDrawArgsBuffer = m_gpuCullingManager->GetParticleDrawArgsBuffer();
+    }
+
     auto particleOutputs = passes::setupParticlePass(
         *m_framegraph,
         m_device,
@@ -425,7 +443,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_hudParticleBatches,
         m_materialCache.get(),
         width,
-        height
+        height,
+        particleDrawArgsBuffer
     );
 
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
@@ -833,17 +852,26 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
         return false;
 
     bool isHUDParticle = isHUD;
+    u32 particleCount = 0;
+
     if (vType == MT_PARTICLE_EFFECT) {
         RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
             static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
         isHUDParticle = pEffect->GetHudMode();
+
+        PAPI::Particle* particles = nullptr;
+        PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
     }
+
+    if (particleCount == 0)
+        return false;
 
     passes::ParticleBatch batch;
     batch.visual = visual;
     batch.worldMatrix = worldTransform;
     batch.renderable = renderable;
     batch.isHUDMode = isHUDParticle;
+    batch.particleCount = particleCount;
 
     if (isHUDParticle) {
         m_hudParticleBatches.push_back(batch);

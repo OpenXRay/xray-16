@@ -34,6 +34,8 @@ struct ParticleBatch {
     Fmatrix worldMatrix;
     IRenderable* renderable = nullptr;
     bool isHUDMode = false;
+    u32 particleCount = 0;
+    u32 vertexOffset = 0;
 };
 
 struct ParticleVertex {
@@ -50,7 +52,8 @@ framegraph::DefaultOutputLayout setupParticlePass(
     const xr_vector<ParticleBatch>* hudParticleBatches,
     MaterialCache* materialCache,
     u32 width,
-    u32 height
+    u32 height,
+    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr
 );
 
 }
