@@ -11,6 +11,7 @@
 //
 #define SM_5_0
 #include "common.h"
+#include "cull_utils.h"
 
 // ═══════════════════════════════════════════════════════
 //  DATA STRUCTURES
@@ -77,131 +78,95 @@ RWByteAddressBuffer g_VisibleCount : register(u1);
 RWByteAddressBuffer g_DrawArgs : register(u2);
 
 // ═══════════════════════════════════════════════════════
-//  DISTANCE CULLING
-// ═══════════════════════════════════════════════════════
-
-bool DistanceTest(float3 position, float radius)
-{
-    // Calculate squared distance to object center
-    float3 delta = position - g_CameraPos;
-    float distSq = dot(delta, delta);
-
-    // Account for object radius (closest point could be closer)
-    float effectiveDistSq = distSq - (radius * radius);
-    effectiveDistSq = max(0.0, effectiveDistSq);
-
-    // Test against max distance (g_MaxDistance is already squared)
-    return effectiveDistSq <= g_MaxDistance;
-}
-
-// ═══════════════════════════════════════════════════════
-//  FRUSTUM CULLING
-// ═══════════════════════════════════════════════════════
-
-bool FrustumTestSphere(float3 center, float radius)
-{
-    // Test sphere against 5 frustum planes (skip near plane at index 5)
-    // Matches X-Ray's CFrustum convention (see Frustum.cpp and detail_cull.cs)
-    //
-    // X-Ray plane format: dot(n, P) + d
-    // - Positive = OUTSIDE frustum (to be culled)
-    // - Negative/Zero = INSIDE frustum (visible)
-    //
-    // Sphere is completely outside if dist > radius for ANY plane
-    // Skip near plane to avoid culling objects that intersect it
-
-    for (uint i = 0; i < 5; i++)
-    {
-        // Signed distance from sphere center to plane
-        float dist = dot(g_FrustumPlanes[i].xyz, center) + g_FrustumPlanes[i].w;
-
-        // If sphere is completely outside this plane, cull it
-        if (dist > radius)
-            return false;
-    }
-
-    // Sphere is inside or intersecting all planes = potentially visible
-    return true;
-}
-
-// ═══════════════════════════════════════════════════════
-//  HI-Z OCCLUSION CULLING
+//  HI-Z OCCLUSION CULLING (4-tap)
 // ═══════════════════════════════════════════════════════
 
 bool OcclusionTestSphere(float3 center, float radius)
 {
     // ─────────────────────────────────────────────────────
-    //  PROJECT SPHERE TO SCREEN SPACE
+    //  1. PROJECT SPHERE CENTER TO CLIP SPACE
     // ─────────────────────────────────────────────────────
+    float4 clipPos = mul(g_ViewProj, float4(center, 1.0));
 
-    // Transform center to clip space
-    // X-Ray uses row-major matrices with row vectors (v * M)
-    float4 clipPos = mul(m_V, float4(center, 1.0));
-
-    // Behind camera check (w <= 0 means behind or at camera plane)
-    if (clipPos.w <= 0.0)
-        return true;  // Behind camera - conservatively visible
+    // Safety: behind camera check
+    if (clipPos.w <= 0.001)
+        return true;  // Conservatively visible
 
     // Perspective divide -> NDC
     float3 ndc = clipPos.xyz / clipPos.w;
 
-    // Check if center is outside NDC bounds [-1, 1]
-    // If outside, conservatively mark as visible (partial visibility)
-    if (any(abs(ndc.xy) > 1.0 + radius / clipPos.w))
-        return true;
+    // ─────────────────────────────────────────────────────
+    //  2. CALCULATE SCREEN-SPACE BOUNDING BOX
+    // ─────────────────────────────────────────────────────
+    // Approximate screen-space size of the sphere
+    // g_ViewProj[0][0] and g_ViewProj[1][1] are projection scale factors
+    float projScale = max(abs(g_ViewProj[0][0]), abs(g_ViewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
 
+    // Calculate bounding box in NDC
+    float2 minNDC = ndc.xy - ndcSize;
+    float2 maxNDC = ndc.xy + ndcSize;
+
+    // Early exit if completely outside screen
+    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
+        return false;  // Definitely not visible
+
+    // ─────────────────────────────────────────────────────
+    //  3. CONVERT TO UV AND SELECT MIP
+    // ─────────────────────────────────────────────────────
     // Convert NDC to UV space [0, 1]
-    float2 uv = ndc.xy * 0.5 + 0.5;
-    uv.y = 1.0 - uv.y;  // Flip Y (NDC Y+ is up, UV Y+ is down)
+    float2 minUV = minNDC * 0.5 + 0.5;
+    float2 maxUV = maxNDC * 0.5 + 0.5;
 
-    // ─────────────────────────────────────────────────────
-    //  CALCULATE SCREEN-SPACE RADIUS FOR MIP SELECTION
-    // ─────────────────────────────────────────────────────
+    // Flip Y (NDC Y+ is up, UV Y+ is down)
+    minUV.y = 1.0 - minUV.y;
+    maxUV.y = 1.0 - maxUV.y;
 
-    // Approximate screen-space radius in pixels
-    // This is used to select the appropriate Hi-Z mip level
-    float screenRadius = (radius / clipPos.w) * float(g_HiZWidth) * 0.5;
+    // Re-sort after Y flip (minUV.y is now larger)
+    float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV)); // xy=min, zw=max
 
-    // Select mip level based on object's screen coverage
-    // Larger objects need coarser mip (more conservative)
-    // log2(diameter) gives us a reasonable mip level
-    float mipLevel = log2(max(1.0, screenRadius * 2.0));
+    // Calculate box size in pixels
+    float boxWidth = (boxUV.z - boxUV.x) * float(g_HiZWidth);
+    float boxHeight = (boxUV.w - boxUV.y) * float(g_HiZHeight);
+
+    // Select mip where box is roughly 2x2 pixels (4 taps cover it)
+    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
     mipLevel = clamp(mipLevel, 0.0, float(g_HiZMipLevels - 1));
 
     // ─────────────────────────────────────────────────────
-    //  SAMPLE HI-Z AND TEST DEPTH
+    //  4. SAMPLE HI-Z AT 4 CORNERS
     // ─────────────────────────────────────────────────────
+    float d1 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.x, boxUV.y), mipLevel); // Min corner
+    float d2 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.z, boxUV.y), mipLevel); // X-max
+    float d3 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.x, boxUV.w), mipLevel); // Y-max
+    float d4 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.z, boxUV.w), mipLevel); // Max corner
 
-    // Sample Hi-Z pyramid at calculated mip level
-    float hiZDepth = g_HiZPyramid.SampleLevel(g_PointSampler, uv, mipLevel);
+    // MAX = farthest depth in region (for standard Z: 0=near, 1=far)
+    float hiZDepth = max(max(d1, d2), max(d3, d4));
 
-    // Calculate object's closest depth (front of bounding sphere)
-    // We need to test if the closest point of the sphere is occluded
-    //
-    // Conservative approach: offset center toward camera by radius
+    // ─────────────────────────────────────────────────────
+    //  5. CALCULATE OBJECT'S FRONT DEPTH
+    // ─────────────────────────────────────────────────────
     float3 viewDir = normalize(center - g_CameraPos);
     float3 frontPoint = center - viewDir * radius;
 
-    float4 frontClip = mul(m_V, float4(frontPoint, 1.0));
-    float objectDepth = frontClip.z / frontClip.w;
+    float4 frontClip = mul(g_ViewProj, float4(frontPoint, 1.0));
 
-    // Clamp to valid depth range
-    objectDepth = saturate(objectDepth);
+    // If front point is behind camera, object straddles near plane - visible
+    if (frontClip.w <= 0.001)
+        return true;
+
+    float objectDepth = saturate(frontClip.z / frontClip.w);
 
     // ─────────────────────────────────────────────────────
-    //  DEPTH COMPARISON
+    //  6. DEPTH COMPARISON
     // ─────────────────────────────────────────────────────
-    //
-    // For standard Z-buffer (0=near, 1=far):
-    // - Hi-Z contains MAX depth of region = farthest surface
-    // - Object is OCCLUDED if objectDepth > hiZDepth (behind EVERYTHING in region)
-    // - Object is VISIBLE if objectDepth <= hiZDepth (might be in front of something)
-    // - This is CONSERVATIVE: never incorrectly cull visible objects
-    //
-    // Add small bias to avoid z-fighting and floating point precision issues
+    // Standard Z (0=near, 1=far):
+    // - hiZDepth = MAX (farthest surface in region)
+    // - VISIBLE if objectDepth <= hiZDepth (closer than farthest)
+    // - OCCLUDED if objectDepth > hiZDepth (behind everything)
     float depthBias = 0.0001;
-
-    return objectDepth >= (hiZDepth - depthBias);
+    return objectDepth <= (hiZDepth + depthBias);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -225,11 +190,11 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // ─────────────────────────────────────────────────────
 
     // 1. Distance culling (cheapest - just a dot product)
-    if (!DistanceTest(obj.position, obj.radius))
+    if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
         return;
 
-    // 2. Frustum culling (cheap - 6 plane tests)
-    if (!FrustumTestSphere(obj.position, obj.radius))
+    // 2. Frustum culling (cheap - 5 plane tests, skip near)
+    if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
         return;
 
     // 3. Hi-Z occlusion culling (expensive - texture sample + math)

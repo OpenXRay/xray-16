@@ -3,6 +3,7 @@
 //
 #define SM_5_0
 #include "common.h"
+#include "cull_utils.h"
 
 struct InstanceData
 {
@@ -63,24 +64,6 @@ RWByteAddressBuffer g_visible_slot_counter : register(u34);  // Atomic counter (
 RWByteAddressBuffer g_indirect_args_unified : register(u2);
 
 
-bool AABBDistanceTest(float3 aabb_min, float3 aabb_max, float3 camera_pos, float max_dist_sqr)
-{
-    float3 closest = clamp(camera_pos, aabb_min, aabb_max);
-    float dist_sqr = dot(closest - camera_pos, closest - camera_pos);
-    return dist_sqr < max_dist_sqr;
-}
-
-bool SphereFrustumTest(float3 center, float radius, float4 planes[6])
-{
-    for (uint i = 0; i < 5; ++i)
-    {
-        float dist = dot(planes[i].xyz, center) + planes[i].w;
-        if (dist > radius)
-            return false;
-    }
-    return true;
-}
-
 // UNIFIED: Single buffer append (replaces 16-way branch)
 void AppendInstance(InstanceData inst)
 {
@@ -127,7 +110,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
             return;
     }
 
-    if (!AABBDistanceTest(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
+    if (!DistanceTestAABB(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
         return;
 
     // Phase 6B: Record that this slot is visible (for page table system)
@@ -146,7 +129,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
         float bounds_radius = inst.scale * 0.75f;
 
-        if (!SphereFrustumTest(inst.pos, bounds_radius, g_frustum_planes))
+        if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
             continue;
 
         float3 delta = inst.pos - g_camera_pos;

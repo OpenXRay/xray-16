@@ -1,0 +1,62 @@
+// cull_debug.ps - Debug visualization pixel shader
+// Renders bounding spheres as wireframe circles
+//
+#define SM_5_0
+#include "common.h"
+#include "cull_debug.h"
+
+// ═══════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 color    : COLOR0;
+    float2 uv       : TEXCOORD0;     // [-1, 1] range from billboard quad
+    float  alpha    : TEXCOORD1;
+    uint   cullState: TEXCOORD2;
+};
+
+// ═══════════════════════════════════════════════════════
+//  OUTPUT
+// ═══════════════════════════════════════════════════════
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+};
+
+// ═══════════════════════════════════════════════════════
+//  MAIN
+// ═══════════════════════════════════════════════════════
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    // Distance from center of billboard
+    float dist = length(input.uv);
+
+    // Discard pixels outside circle
+    if (dist > 1.0)
+        discard;
+
+    // Simple ring: draw only pixels near the edge (0.85 to 1.0)
+    float ringInner = 0.85;
+    float ringOuter = 1.0;
+
+    // Discard pixels inside the ring (creates hollow circle)
+    if (dist < ringInner)
+        discard;
+
+    // Smooth edges for antialiasing
+    float ddist = fwidth(dist);
+    float finalAlpha = smoothstep(ringInner - ddist, ringInner + ddist, dist)
+                     * smoothstep(ringOuter + ddist, ringOuter - ddist, dist);
+
+    // Apply color with alpha
+    output.color = float4(input.color, finalAlpha * input.alpha);
+
+    return output;
+}

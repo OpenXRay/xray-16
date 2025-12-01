@@ -662,6 +662,28 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         drawArgsBuffer  // Draw args from GPU culling (enables indirect draw if valid)
     );
 
+    // ═══════════════════════════════════════════════════════
+    //  GPU CULLING DEBUG VISUALIZATION (Optional overlay)
+    // ═══════════════════════════════════════════════════════
+    // Renders colored bounding spheres showing culling state:
+    // - Green: Visible (passed all tests)
+    // - Blue: Occluder (close to camera)
+    // - Red: Culled (distance/frustum)
+    // - Yellow: Culled by Hi-Z occlusion
+    // Enable with: r4_debug_gpu_culling 1
+
+    if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
+        m_gpuCullingManager->SetupDebugVisualizationPass(
+            *m_framegraph,
+            m_hizPyramid,
+            forwardOutputs.albedo,  // Color target to overlay on
+            depthBuffer,            // Depth for depth testing
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels
+        );
+    }
+
     // 2. HUD Pass - Renders HUD items on top of world geometry
     auto hudOutputs = passes::setupHUDPass(
         *m_framegraph,

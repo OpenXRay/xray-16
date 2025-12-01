@@ -6,6 +6,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -37,10 +38,38 @@ struct CullParamsCB {
 };
 
 // ═══════════════════════════════════════════════════════
+//  DEBUG CONSTANT BUFFER (must match HLSL)
+// ═══════════════════════════════════════════════════════
+
+struct CullDebugParamsCB {
+    Fmatrix viewProj;           // View-projection matrix
+    Fvector cameraPos;          // Camera world position
+    float maxDistanceSq;        // Maximum render distance (squared)
+    Fvector4 frustumPlanes[6];  // View frustum planes
+    u32 objectCount;            // Total objects to test
+    u32 hizWidth;               // Hi-Z pyramid width
+    u32 hizHeight;              // Hi-Z pyramid height
+    u32 hizMipLevels;           // Hi-Z mip levels
+    float occluderThreshold;    // Distance for "occluder" classification
+    Fvector padding;            // Pad to 16-byte alignment
+};
+
+struct CullDebugVSParamsCB {
+    Fmatrix view;               // View matrix (for billboard orientation)
+    Fmatrix viewProj;           // View-projection matrix
+    u32 objectCount;            // Number of objects
+    float wireframeAlpha;       // Wireframe transparency
+    float padding[2];
+};
+
+// ═══════════════════════════════════════════════════════
 //  STATIC STATE
 // ═══════════════════════════════════════════════════════
 
 static ref_cs s_object_cull_cs;
+static ref_cs s_object_cull_debug_cs;
+static ref_vs s_cull_debug_vs;
+static ref_ps s_cull_debug_ps;
 
 // ═══════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -90,6 +119,7 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
 
     CreateBuffers(device);
     CreateComputePipeline(device);
+    CreateDebugResources(device);
 
     m_initialized = true;
     Msg("* [GPUCulling] Initialized (max objects: %d)", m_maxObjects);
@@ -256,6 +286,7 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
 
 void GPUCullingManager::Shutdown()
 {
+    // Main culling resources
     m_objectBuffer = nullptr;
     m_visibleIndexBuffer = nullptr;
     m_visibleCountBuffer = nullptr;
@@ -263,6 +294,16 @@ void GPUCullingManager::Shutdown()
     m_cullPipeline = nullptr;
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
+
+    // Debug resources
+    m_debugBuffer = nullptr;
+    m_debugComputeParamsCB = nullptr;
+    m_debugGraphicsParamsCB = nullptr;
+    m_debugComputePipeline = nullptr;
+    m_debugComputeLayout = nullptr;
+    m_debugGraphicsPipeline = nullptr;
+    m_debugGraphicsLayout = nullptr;
+    m_debugInputLayout = nullptr;
 
     m_initialized = false;
     m_computeEnabled = false;
@@ -345,68 +386,21 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 //  FRUSTUM PLANE EXTRACTION
 // ═══════════════════════════════════════════════════════
 
-void GPUCullingManager::ExtractFrustumPlanes(const Fmatrix& M, Fvector4* outPlanes)
+void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
 {
-    // Extract frustum planes from view-projection matrix
-    // EXACTLY matches X-Ray's CFrustum::CreateFromMatrix (src/xrCDB/Frustum.cpp)
-    //
-    // X-Ray convention: planes have normals pointing INWARD (toward frustum interior)
-    // - classify(P) > 0 means OUTSIDE (to be culled)
-    // - classify(P) <= 0 means INSIDE (visible)
-    //
-    // Fmatrix layout:
-    //   _11 _12 _13 _14  <- row 0 (i vector + tx)
-    //   _21 _22 _23 _24  <- row 1 (j vector + ty)
-    //   _31 _32 _33 _34  <- row 2 (k vector + tz)
-    //   _41 _42 _43 _44  <- row 3 (c translation + tw)
+    // Use CFrustum::CreateFromMatrix - EXACTLY matches detail_cull.cs setup
+    // Extract LRTB + FAR planes (5 planes), skip NEAR to avoid culling close objects
+    CFrustum frustum;
+    frustum.CreateFromMatrix(M, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    // Left plane (matches X-Ray Frustum.cpp line 476-480)
-    outPlanes[0].x = -(M._14 + M._11);
-    outPlanes[0].y = -(M._24 + M._21);
-    outPlanes[0].z = -(M._34 + M._31);
-    outPlanes[0].w = -(M._44 + M._41);
-
-    // Right plane (matches X-Ray Frustum.cpp line 486-490)
-    outPlanes[1].x = -(M._14 - M._11);
-    outPlanes[1].y = -(M._24 - M._21);
-    outPlanes[1].z = -(M._34 - M._31);
-    outPlanes[1].w = -(M._44 - M._41);
-
-    // Top plane (matches X-Ray Frustum.cpp line 496-500)
-    outPlanes[2].x = -(M._14 - M._12);
-    outPlanes[2].y = -(M._24 - M._22);
-    outPlanes[2].z = -(M._34 - M._32);
-    outPlanes[2].w = -(M._44 - M._42);
-
-    // Bottom plane (matches X-Ray Frustum.cpp line 506-510)
-    outPlanes[3].x = -(M._14 + M._12);
-    outPlanes[3].y = -(M._24 + M._22);
-    outPlanes[3].z = -(M._34 + M._32);
-    outPlanes[3].w = -(M._44 + M._42);
-
-    // Far plane (matches X-Ray Frustum.cpp line 516-520)
-    outPlanes[4].x = -(M._14 - M._13);
-    outPlanes[4].y = -(M._24 - M._23);
-    outPlanes[4].z = -(M._34 - M._33);
-    outPlanes[4].w = -(M._44 - M._43);
-
-    // Near plane (matches X-Ray Frustum.cpp line 526-529)
-    outPlanes[5].x = -(M._14 + M._13);
-    outPlanes[5].y = -(M._24 + M._23);
-    outPlanes[5].z = -(M._34 + M._33);
-    outPlanes[5].w = -(M._44 + M._43);
-
-    // Normalize planes (required for correct distance calculations with sphere radius)
-    for (int i = 0; i < 6; i++) {
-        float len = sqrt(outPlanes[i].x * outPlanes[i].x +
-                        outPlanes[i].y * outPlanes[i].y +
-                        outPlanes[i].z * outPlanes[i].z);
-        if (len > 0.0001f) {
-            outPlanes[i].x /= len;
-            outPlanes[i].y /= len;
-            outPlanes[i].z /= len;
-            outPlanes[i].w /= len;
-        }
+    for (u32 i = 0; i < frustum.p_count && i < 6; i++)
+    {
+        outPlanes[i].set(
+            frustum.planes[i].n.x,
+            frustum.planes[i].n.y,
+            frustum.planes[i].n.z,
+            frustum.planes[i].d
+        );
     }
 }
 
@@ -525,7 +519,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
             // Fill constant buffer
             CullParamsCB cb;
-            cb.viewProj = Device.mFullTransform;
+            // Must transpose matrices - Fmatrix storage is transposed relative to HLSL row-major
+            cb.viewProj.transpose(Device.mFullTransform);
             cb.cameraPos = Device.vCameraPosition;
             cb.maxDistanceSq = 500.0f * 500.0f;  // 500m max distance
             cb.objectCount = data.objectCount;
@@ -577,6 +572,374 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     output.visibleCount = VirtualResourceHandle();
     output.drawArgsBuffer = passData.drawArgsBuffer;
     return output;
+}
+
+// ═══════════════════════════════════════════════════════
+//  DEBUG VISUALIZATION
+// ═══════════════════════════════════════════════════════
+
+bool GPUCullingManager::IsDebugEnabled() const
+{
+    return ps_r4_debug_gpu_culling != 0 && m_computeEnabled && m_debugComputePipeline && m_debugGraphicsPipeline;
+}
+
+void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
+{
+    if (!m_computeEnabled)
+        return;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+
+    // Load debug shaders
+    s_object_cull_debug_cs.create("object_cull_debug");
+    s_cull_debug_vs = RImplementation.Resources->_CreateVS("cull_debug");
+    s_cull_debug_ps = RImplementation.Resources->_CreatePS("cull_debug");
+
+    if (!s_object_cull_debug_cs || !s_object_cull_debug_cs->nvrhiShader) {
+        Msg("! [GPUCulling] object_cull_debug.cs not found - debug visualization disabled");
+        return;
+    }
+    if (!s_cull_debug_vs || !s_cull_debug_vs->nvrhiShader) {
+        Msg("! [GPUCulling] cull_debug.vs not found - debug visualization disabled");
+        return;
+    }
+    if (!s_cull_debug_ps || !s_cull_debug_ps->nvrhiShader) {
+        Msg("! [GPUCulling] cull_debug.ps not found - debug visualization disabled");
+        return;
+    }
+
+    // ─────────────────────────────────────────────────────
+    //  DEBUG BUFFER (CullDebugData for all objects)
+    // ─────────────────────────────────────────────────────
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_DebugData";
+        desc.byteSize = m_maxObjects * sizeof(CullDebugData);
+        desc.structStride = sizeof(CullDebugData);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;  // Will transition between UAV and SRV
+
+        m_debugBuffer = nvDevice->createBuffer(desc);
+        if (!m_debugBuffer) {
+            Msg("! [GPUCulling] Failed to create debug buffer");
+            return;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────
+    //  DEBUG CONSTANT BUFFERS (separate for compute and graphics)
+    // ─────────────────────────────────────────────────────
+    {
+        // Compute shader constant buffer
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_DebugComputeParams";
+        desc.byteSize = sizeof(CullDebugParamsCB);
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+
+        m_debugComputeParamsCB = nvDevice->createBuffer(desc);
+        if (!m_debugComputeParamsCB) {
+            Msg("! [GPUCulling] Failed to create debug compute constant buffer");
+            return;
+        }
+    }
+    {
+        // Graphics shader constant buffer
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_DebugGraphicsParams";
+        desc.byteSize = sizeof(CullDebugVSParamsCB);
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+
+        m_debugGraphicsParamsCB = nvDevice->createBuffer(desc);
+        if (!m_debugGraphicsParamsCB) {
+            Msg("! [GPUCulling] Failed to create debug graphics constant buffer");
+            return;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────
+    //  DEBUG COMPUTE PIPELINE (object_cull_debug.cs)
+    // ─────────────────────────────────────────────────────
+    {
+        // Binding layout for debug compute
+        // b5: CullDebugParams
+        // t0: g_Objects (structured buffer SRV)
+        // t1: g_HiZPyramid (texture SRV)
+        // s0: g_PointSampler
+        // u0: g_DebugOutput (structured buffer UAV)
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::Texture_SRV(1),
+            nvrhi::BindingLayoutItem::Sampler(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0)
+        };
+
+        m_debugComputeLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (!m_debugComputeLayout) {
+            Msg("! [GPUCulling] Failed to create debug compute binding layout");
+            return;
+        }
+
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = s_object_cull_debug_cs->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_debugComputeLayout };
+
+        m_debugComputePipeline = nvDevice->createComputePipeline(pipeDesc);
+        if (!m_debugComputePipeline) {
+            Msg("! [GPUCulling] Failed to create debug compute pipeline");
+            return;
+        }
+    }
+
+    // ─────────────────────────────────────────────────────
+    //  DEBUG GRAPHICS PIPELINE (cull_debug.vs + cull_debug.ps)
+    // ─────────────────────────────────────────────────────
+    {
+        // Binding layout for debug graphics
+        // b5: CullDebugVSParams (constant buffer)
+        // t0: g_DebugData (structured buffer SRV)
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Vertex | nvrhi::ShaderType::Pixel;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0)
+        };
+
+        m_debugGraphicsLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (!m_debugGraphicsLayout) {
+            Msg("! [GPUCulling] Failed to create debug graphics binding layout");
+            return;
+        }
+
+        // No input layout needed - VS generates vertices from SV_VertexID/SV_InstanceID
+        nvrhi::GraphicsPipelineDesc pipeDesc;
+        pipeDesc.VS = s_cull_debug_vs->nvrhiShader;
+        pipeDesc.PS = s_cull_debug_ps->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_debugGraphicsLayout };
+        pipeDesc.primType = nvrhi::PrimitiveType::TriangleStrip;
+        pipeDesc.inputLayout = nullptr;  // No vertex input - generated in shader
+
+        // Render state: alpha blending, no depth write, depth test enabled
+        pipeDesc.renderState.blendState.targets[0].setBlendEnable(true);
+        pipeDesc.renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+        pipeDesc.renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
+        pipeDesc.renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
+        pipeDesc.renderState.blendState.targets[0].setSrcBlendAlpha(nvrhi::BlendFactor::One);
+        pipeDesc.renderState.blendState.targets[0].setDestBlendAlpha(nvrhi::BlendFactor::Zero);
+        pipeDesc.renderState.blendState.targets[0].setBlendOpAlpha(nvrhi::BlendOp::Add);
+
+        pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);  // Always render on top
+        pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);  // Don't write depth
+
+        pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);  // No culling for billboards
+
+        // Must provide framebuffer info for pipeline creation
+        nvrhi::FramebufferInfoEx framebufferInfo;
+        framebufferInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);  // HDR color target
+        framebufferInfo.setDepthFormat(nvrhi::Format::D32);           // Depth buffer
+
+        m_debugGraphicsPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebufferInfo);
+        if (!m_debugGraphicsPipeline) {
+            Msg("! [GPUCulling] Failed to create debug graphics pipeline");
+            return;
+        }
+    }
+
+    Msg("* [GPUCulling] Debug visualization resources created");
+}
+
+void GPUCullingManager::SetupDebugVisualizationPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle hizPyramid,
+    framegraph::VirtualResourceHandle colorTarget,
+    framegraph::VirtualResourceHandle depthTarget,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels)
+{
+    using namespace framegraph;
+
+    if (!IsDebugEnabled() || m_objectCount == 0)
+        return;
+
+    struct DebugPassData {
+        VirtualResourceHandle hizPyramid;
+        VirtualResourceHandle colorTarget;
+        VirtualResourceHandle depthTarget;
+
+        GPUCullingManager* manager;
+        u32 objectCount;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    fg.addCallbackPass<DebugPassData>(
+        "GPU Culling Debug",
+
+        // Setup lambda
+        [&, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.manager = this;
+            data.objectCount = m_objectCount;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
+
+            // Read Hi-Z pyramid for occlusion testing
+            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
+
+            // Read/write color target (overlay)
+            data.colorTarget = passBuilder.write(colorTarget, ResourceState::RenderTarget);
+
+            // Read depth for depth testing
+            data.depthTarget = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
+        },
+
+        // Execute lambda
+        [](const DebugPassData& data,
+           const FrameGraph& fg,
+           ng::RenderContext* ctx) {
+
+            GPUCullingManager* mgr = data.manager;
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
+
+            cmdList->beginMarker("GPU Culling Debug");
+
+            // Get physical resources
+            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
+            nvrhi::ITexture* colorTexture = fg.GetPhysicalTexture(data.colorTarget);
+            nvrhi::ITexture* depthTexture = fg.GetPhysicalTexture(data.depthTarget);
+
+            if (!hizTexture || !colorTexture || !depthTexture) {
+                Msg("! [GPUCulling] Debug pass missing textures");
+                cmdList->endMarker();
+                return;
+            }
+
+            // ─────────────────────────────────────────────────────
+            //  PHASE 1: Debug Compute - Test all objects
+            // ─────────────────────────────────────────────────────
+            {
+                cmdList->beginMarker("Debug Compute");
+
+                // Fill debug compute constant buffer
+                // NOTE: Must transpose matrices - Fmatrix storage is transposed relative to HLSL row-major
+                CullDebugParamsCB cb;
+                cb.viewProj.transpose(Device.mFullTransform);
+                cb.cameraPos = Device.vCameraPosition;
+                cb.maxDistanceSq = 500.0f * 500.0f;
+                cb.objectCount = data.objectCount;
+                cb.hizWidth = data.hizWidth;
+                cb.hizHeight = data.hizHeight;
+                cb.hizMipLevels = data.hizMipLevels;
+                cb.occluderThreshold = 50.0f;  // Objects within 50m are "occluders"
+
+                mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+
+                cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
+
+                // Create binding set for debug compute
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_objectBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_debugBuffer)
+                };
+
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
+
+                // Dispatch debug compute
+                nvrhi::ComputeState state;
+                state.pipeline = mgr->m_debugComputePipeline;
+                state.bindings = { bindingSet };
+                cmdList->setComputeState(state);
+
+                u32 groupCount = (data.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                cmdList->dispatch(groupCount, 1, 1);
+
+                cmdList->endMarker();
+            }
+
+            // Barrier: debug buffer UAV -> SRV
+            cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::ShaderResource);
+
+            // ─────────────────────────────────────────────────────
+            //  PHASE 2: Debug Render - Draw colored spheres
+            // ─────────────────────────────────────────────────────
+            {
+                cmdList->beginMarker("Debug Render");
+
+                // Fill VS constant buffer
+                // NOTE: Must transpose matrices - Fmatrix storage is transposed relative to HLSL row-major
+                CullDebugVSParamsCB vsCB;
+                vsCB.view.transpose(Device.mView);
+                vsCB.viewProj.transpose(Device.mFullTransform);
+                vsCB.objectCount = data.objectCount;
+                vsCB.wireframeAlpha = 0.7f;
+
+                cmdList->writeBuffer(mgr->m_debugGraphicsParamsCB, &vsCB, sizeof(vsCB));
+
+                // Create binding set for debug graphics
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugGraphicsParamsCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_debugBuffer)
+                };
+
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugGraphicsLayout);
+
+                // Create framebuffer
+                nvrhi::FramebufferDesc fbDesc;
+                fbDesc.addColorAttachment(colorTexture);
+                fbDesc.setDepthAttachment(depthTexture);
+                nvrhi::FramebufferHandle framebuffer = nvDevice->createFramebuffer(fbDesc);
+
+                // Set graphics state
+                nvrhi::GraphicsState gfxState;
+                gfxState.pipeline = mgr->m_debugGraphicsPipeline;
+                gfxState.bindings = { bindingSet };
+                gfxState.framebuffer = framebuffer;
+
+                nvrhi::Viewport viewport;
+                viewport.minX = 0;
+                viewport.minY = 0;
+                viewport.maxX = static_cast<float>(colorTexture->getDesc().width);
+                viewport.maxY = static_cast<float>(colorTexture->getDesc().height);
+                viewport.minZ = 0.0f;
+                viewport.maxZ = 1.0f;
+                gfxState.viewport.addViewportAndScissorRect(viewport);
+
+                cmdList->setGraphicsState(gfxState);
+
+                // Draw: 4 vertices per quad (triangle strip), 1 instance per object
+                nvrhi::DrawArguments drawArgs;
+                drawArgs.vertexCount = 4;
+                drawArgs.instanceCount = data.objectCount;
+                drawArgs.startVertexLocation = 0;
+                drawArgs.startInstanceLocation = 0;
+                cmdList->draw(drawArgs);
+
+                cmdList->endMarker();
+            }
+
+            // Barrier: debug buffer SRV -> UAV (for next frame)
+            cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+            cmdList->endMarker();
+        }
+    );
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

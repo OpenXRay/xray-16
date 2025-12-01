@@ -41,6 +41,29 @@ enum GPUObjectFlags : u32 {
 };
 
 // ═══════════════════════════════════════════════════════
+//  DEBUG VISUALIZATION DATA (matches HLSL CullDebugData struct)
+// ═══════════════════════════════════════════════════════
+
+// Culling result states
+enum CullState : u32 {
+    CULL_STATE_VISIBLE           = 0,  // Passed all tests - GREEN
+    CULL_STATE_OCCLUDER          = 1,  // Visible and close (writing Hi-Z) - BLUE
+    CULL_STATE_CULLED_DISTANCE   = 2,  // Failed distance test - RED (dark)
+    CULL_STATE_CULLED_FRUSTUM    = 3,  // Failed frustum test - RED (medium)
+    CULL_STATE_CULLED_OCCLUSION  = 4,  // Failed Hi-Z occlusion test - YELLOW
+};
+
+struct CullDebugData {
+    Fvector position;       // World-space sphere center (12 bytes)
+    float radius;           // Sphere radius (4 bytes)
+    u32 cullState;          // One of CullState values (4 bytes)
+    float objectDepth;      // Normalized depth (4 bytes)
+    float hiZDepth;         // Hi-Z depth sampled (4 bytes)
+    u32 objectIndex;        // Original object index (4 bytes)
+};
+static_assert(sizeof(CullDebugData) == 32, "CullDebugData must be 32 bytes for GPU alignment");
+
+// ═══════════════════════════════════════════════════════
 //  INDIRECT DRAW ARGUMENTS (matches D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS)
 // ═══════════════════════════════════════════════════════
 
@@ -114,12 +137,33 @@ public:
     // Check if culling is enabled and ready
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
 
+    // ───────────────────────────────────────────────────────
+    //  DEBUG VISUALIZATION
+    // ───────────────────────────────────────────────────────
+
+    // Setup debug visualization pass (renders colored bounding spheres)
+    // Call AFTER main rendering, renders as overlay
+    // Only executes if r_debug_gpu_culling is enabled
+    void SetupDebugVisualizationPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        framegraph::VirtualResourceHandle colorTarget,
+        framegraph::VirtualResourceHandle depthTarget,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels
+    );
+
+    // Check if debug visualization is enabled
+    bool IsDebugEnabled() const;
+
 private:
     void CreateBuffers(ng::RenderDevice* device);
     void CreateComputePipeline(ng::RenderDevice* device);
+    void CreateDebugResources(ng::RenderDevice* device);
 
     // Extract frustum planes from view-projection matrix
-    void ExtractFrustumPlanes(const Fmatrix& viewProj, Fvector4* outPlanes);
+    void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
     // NVRHI resources
     nvrhi::BufferHandle m_objectBuffer;         // All objects (GPU read)
@@ -134,6 +178,22 @@ private:
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
     nvrhi::SamplerHandle m_pointSampler;
+
+    // ───────────────────────────────────────────────────────
+    //  DEBUG VISUALIZATION RESOURCES
+    // ───────────────────────────────────────────────────────
+    nvrhi::BufferHandle m_debugBuffer;                // CullDebugData for all objects
+    nvrhi::BufferHandle m_debugComputeParamsCB;       // Constant buffer for compute shader
+    nvrhi::BufferHandle m_debugGraphicsParamsCB;      // Constant buffer for graphics shaders
+
+    // Debug compute pipeline (object_cull_debug.cs)
+    nvrhi::ComputePipelineHandle m_debugComputePipeline;
+    nvrhi::BindingLayoutHandle m_debugComputeLayout;
+
+    // Debug graphics pipeline (cull_debug.vs + cull_debug.ps)
+    nvrhi::GraphicsPipelineHandle m_debugGraphicsPipeline;
+    nvrhi::BindingLayoutHandle m_debugGraphicsLayout;
+    nvrhi::InputLayoutHandle m_debugInputLayout;
 
     // State
     ng::RenderDevice* m_device = nullptr;
