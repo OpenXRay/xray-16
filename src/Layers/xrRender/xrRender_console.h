@@ -161,6 +161,8 @@ extern ECORE_API float ps_r3_dyn_wet_surf_near; // 10.0f
 extern ECORE_API float ps_r3_dyn_wet_surf_far; // 30.0f
 extern ECORE_API int ps_r3_dyn_wet_surf_sm_res; // 256
 
+extern ECORE_API int ps_r4_debug_gpu_culling;
+
 enum
 {
     R2FLAG_SUN = (1 << 0),

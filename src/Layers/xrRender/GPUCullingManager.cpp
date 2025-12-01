@@ -5,6 +5,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/xrRender_console.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -27,7 +28,31 @@ struct CullParamsCB {
     u32 hizMipLevels;
 };
 
+struct CullDebugParamsCB {
+    Fmatrix viewProj;
+    Fvector cameraPos;
+    float maxDistanceSq;
+    Fvector4 frustumPlanes[6];
+    u32 objectCount;
+    u32 hizWidth;
+    u32 hizHeight;
+    u32 hizMipLevels;
+    float occluderThreshold;
+    Fvector padding;
+};
+
+struct CullDebugVSParamsCB {
+    Fmatrix view;
+    Fmatrix viewProj;
+    u32 objectCount;
+    float wireframeAlpha;
+    float padding[2];
+};
+
 static ref_cs s_object_cull_cs;
+static ref_cs s_object_cull_debug_cs;
+static ref_vs s_cull_debug_vs;
+static ref_ps s_cull_debug_ps;
 
 GPUCullingManager::GPUCullingManager()
     : m_objectCount(0)
@@ -68,6 +93,7 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
 
     CreateBuffers(device);
     CreateComputePipeline(device);
+    CreateDebugResources(device);
 
     m_initialized = true;
     Msg("* [GPUCulling] Initialized (max objects: %d)", m_maxObjects);
@@ -223,6 +249,15 @@ void GPUCullingManager::Shutdown()
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
 
+    m_debugBuffer = nullptr;
+    m_debugComputeParamsCB = nullptr;
+    m_debugGraphicsParamsCB = nullptr;
+    m_debugComputePipeline = nullptr;
+    m_debugComputeLayout = nullptr;
+    m_debugGraphicsPipeline = nullptr;
+    m_debugGraphicsLayout = nullptr;
+    m_debugInputLayout = nullptr;
+
     m_initialized = false;
     m_computeEnabled = false;
     m_objectCount = 0;
@@ -282,49 +317,19 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     cmdList->writeBuffer(m_drawArgsBuffer, m_drawArgsData.data(), m_objectCount * sizeof(IndirectDrawArgs));
 }
 
-void GPUCullingManager::ExtractFrustumPlanes(const Fmatrix& M, Fvector4* outPlanes)
+void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
 {
+    CFrustum frustum;
+    frustum.CreateFromMatrix(M, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
-    outPlanes[0].x = -(M._14 + M._11);
-    outPlanes[0].y = -(M._24 + M._21);
-    outPlanes[0].z = -(M._34 + M._31);
-    outPlanes[0].w = -(M._44 + M._41);
-
-    outPlanes[1].x = -(M._14 - M._11);
-    outPlanes[1].y = -(M._24 - M._21);
-    outPlanes[1].z = -(M._34 - M._31);
-    outPlanes[1].w = -(M._44 - M._41);
-
-    outPlanes[2].x = -(M._14 - M._12);
-    outPlanes[2].y = -(M._24 - M._22);
-    outPlanes[2].z = -(M._34 - M._32);
-    outPlanes[2].w = -(M._44 - M._42);
-
-    outPlanes[3].x = -(M._14 + M._12);
-    outPlanes[3].y = -(M._24 + M._22);
-    outPlanes[3].z = -(M._34 + M._32);
-    outPlanes[3].w = -(M._44 + M._42);
-
-    outPlanes[4].x = -(M._14 - M._13);
-    outPlanes[4].y = -(M._24 - M._23);
-    outPlanes[4].z = -(M._34 - M._33);
-    outPlanes[4].w = -(M._44 - M._43);
-
-    outPlanes[5].x = -(M._14 + M._13);
-    outPlanes[5].y = -(M._24 + M._23);
-    outPlanes[5].z = -(M._34 + M._33);
-    outPlanes[5].w = -(M._44 + M._43);
-
-    for (int i = 0; i < 6; i++) {
-        float len = sqrt(outPlanes[i].x * outPlanes[i].x +
-                        outPlanes[i].y * outPlanes[i].y +
-                        outPlanes[i].z * outPlanes[i].z);
-        if (len > 0.0001f) {
-            outPlanes[i].x /= len;
-            outPlanes[i].y /= len;
-            outPlanes[i].z /= len;
-            outPlanes[i].w /= len;
-        }
+    for (u32 i = 0; i < frustum.p_count && i < 6; i++)
+    {
+        outPlanes[i].set(
+            frustum.planes[i].n.x,
+            frustum.planes[i].n.y,
+            frustum.planes[i].n.z,
+            frustum.planes[i].d
+        );
     }
 }
 
@@ -424,7 +429,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             cmdList->writeBuffer(mgr->m_visibleCountBuffer, &zero, sizeof(u32));
 
             CullParamsCB cb;
-            cb.viewProj = Device.mFullTransform;
+            cb.viewProj.transpose(Device.mFullTransform);
             cb.cameraPos = Device.vCameraPosition;
             cb.maxDistanceSq = 500.0f * 500.0f;
             cb.objectCount = data.objectCount;
@@ -470,6 +475,319 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     output.visibleCount = VirtualResourceHandle();
     output.drawArgsBuffer = passData.drawArgsBuffer;
     return output;
+}
+
+bool GPUCullingManager::IsDebugEnabled() const
+{
+    return ps_r4_debug_gpu_culling != 0 && m_computeEnabled && m_debugComputePipeline && m_debugGraphicsPipeline;
+}
+
+void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
+{
+    if (!m_computeEnabled)
+        return;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+
+    s_object_cull_debug_cs.create("object_cull_debug");
+    s_cull_debug_vs = RImplementation.Resources->_CreateVS("cull_debug");
+    s_cull_debug_ps = RImplementation.Resources->_CreatePS("cull_debug");
+
+    if (!s_object_cull_debug_cs || !s_object_cull_debug_cs->nvrhiShader) {
+        Msg("! [GPUCulling] object_cull_debug.cs not found - debug visualization disabled");
+        return;
+    }
+    if (!s_cull_debug_vs || !s_cull_debug_vs->nvrhiShader) {
+        Msg("! [GPUCulling] cull_debug.vs not found - debug visualization disabled");
+        return;
+    }
+    if (!s_cull_debug_ps || !s_cull_debug_ps->nvrhiShader) {
+        Msg("! [GPUCulling] cull_debug.ps not found - debug visualization disabled");
+        return;
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_DebugData";
+        desc.byteSize = m_maxObjects * sizeof(CullDebugData);
+        desc.structStride = sizeof(CullDebugData);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;
+
+        m_debugBuffer = nvDevice->createBuffer(desc);
+        if (!m_debugBuffer) {
+            Msg("! [GPUCulling] Failed to create debug buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_DebugComputeParams";
+        desc.byteSize = sizeof(CullDebugParamsCB);
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+
+        m_debugComputeParamsCB = nvDevice->createBuffer(desc);
+        if (!m_debugComputeParamsCB) {
+            Msg("! [GPUCulling] Failed to create debug compute constant buffer");
+            return;
+        }
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_DebugGraphicsParams";
+        desc.byteSize = sizeof(CullDebugVSParamsCB);
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+
+        m_debugGraphicsParamsCB = nvDevice->createBuffer(desc);
+        if (!m_debugGraphicsParamsCB) {
+            Msg("! [GPUCulling] Failed to create debug graphics constant buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::Texture_SRV(1),
+            nvrhi::BindingLayoutItem::Sampler(0),
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0)
+        };
+
+        m_debugComputeLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (!m_debugComputeLayout) {
+            Msg("! [GPUCulling] Failed to create debug compute binding layout");
+            return;
+        }
+
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = s_object_cull_debug_cs->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_debugComputeLayout };
+
+        m_debugComputePipeline = nvDevice->createComputePipeline(pipeDesc);
+        if (!m_debugComputePipeline) {
+            Msg("! [GPUCulling] Failed to create debug compute pipeline");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Vertex | nvrhi::ShaderType::Pixel;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0)
+        };
+
+        m_debugGraphicsLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (!m_debugGraphicsLayout) {
+            Msg("! [GPUCulling] Failed to create debug graphics binding layout");
+            return;
+        }
+
+        nvrhi::GraphicsPipelineDesc pipeDesc;
+        pipeDesc.VS = s_cull_debug_vs->nvrhiShader;
+        pipeDesc.PS = s_cull_debug_ps->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_debugGraphicsLayout };
+        pipeDesc.primType = nvrhi::PrimitiveType::TriangleStrip;
+        pipeDesc.inputLayout = nullptr;
+
+        pipeDesc.renderState.blendState.targets[0].setBlendEnable(true);
+        pipeDesc.renderState.blendState.targets[0].setSrcBlend(nvrhi::BlendFactor::SrcAlpha);
+        pipeDesc.renderState.blendState.targets[0].setDestBlend(nvrhi::BlendFactor::InvSrcAlpha);
+        pipeDesc.renderState.blendState.targets[0].setBlendOp(nvrhi::BlendOp::Add);
+        pipeDesc.renderState.blendState.targets[0].setSrcBlendAlpha(nvrhi::BlendFactor::One);
+        pipeDesc.renderState.blendState.targets[0].setDestBlendAlpha(nvrhi::BlendFactor::Zero);
+        pipeDesc.renderState.blendState.targets[0].setBlendOpAlpha(nvrhi::BlendOp::Add);
+
+        pipeDesc.renderState.depthStencilState.setDepthTestEnable(false);
+        pipeDesc.renderState.depthStencilState.setDepthWriteEnable(false);
+
+        pipeDesc.renderState.rasterState.setCullMode(nvrhi::RasterCullMode::None);
+
+        nvrhi::FramebufferInfoEx framebufferInfo;
+        framebufferInfo.addColorFormat(nvrhi::Format::RGBA16_FLOAT);
+        framebufferInfo.setDepthFormat(nvrhi::Format::D32);
+
+        m_debugGraphicsPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebufferInfo);
+        if (!m_debugGraphicsPipeline) {
+            Msg("! [GPUCulling] Failed to create debug graphics pipeline");
+            return;
+        }
+    }
+
+    Msg("* [GPUCulling] Debug visualization resources created");
+}
+
+void GPUCullingManager::SetupDebugVisualizationPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle hizPyramid,
+    framegraph::VirtualResourceHandle colorTarget,
+    framegraph::VirtualResourceHandle depthTarget,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels)
+{
+    using namespace framegraph;
+
+    if (!IsDebugEnabled() || m_objectCount == 0)
+        return;
+
+    struct DebugPassData {
+        VirtualResourceHandle hizPyramid;
+        VirtualResourceHandle colorTarget;
+        VirtualResourceHandle depthTarget;
+
+        GPUCullingManager* manager;
+        u32 objectCount;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    fg.addCallbackPass<DebugPassData>(
+        "GPU Culling Debug",
+
+        [&, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.manager = this;
+            data.objectCount = m_objectCount;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
+
+            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
+
+            data.colorTarget = passBuilder.write(colorTarget, ResourceState::RenderTarget);
+
+            data.depthTarget = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
+        },
+
+        [](const DebugPassData& data,
+           const FrameGraph& fg,
+           ng::RenderContext* ctx) {
+
+            GPUCullingManager* mgr = data.manager;
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
+
+            cmdList->beginMarker("GPU Culling Debug");
+
+            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
+            nvrhi::ITexture* colorTexture = fg.GetPhysicalTexture(data.colorTarget);
+            nvrhi::ITexture* depthTexture = fg.GetPhysicalTexture(data.depthTarget);
+
+            if (!hizTexture || !colorTexture || !depthTexture) {
+                Msg("! [GPUCulling] Debug pass missing textures");
+                cmdList->endMarker();
+                return;
+            }
+
+            {
+                cmdList->beginMarker("Debug Compute");
+
+                CullDebugParamsCB cb;
+                cb.viewProj.transpose(Device.mFullTransform);
+                cb.cameraPos = Device.vCameraPosition;
+                cb.maxDistanceSq = 500.0f * 500.0f;
+                cb.objectCount = data.objectCount;
+                cb.hizWidth = data.hizWidth;
+                cb.hizHeight = data.hizHeight;
+                cb.hizMipLevels = data.hizMipLevels;
+                cb.occluderThreshold = 50.0f;
+
+                mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+
+                cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
+
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_objectBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_debugBuffer)
+                };
+
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
+
+                nvrhi::ComputeState state;
+                state.pipeline = mgr->m_debugComputePipeline;
+                state.bindings = { bindingSet };
+                cmdList->setComputeState(state);
+
+                u32 groupCount = (data.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                cmdList->dispatch(groupCount, 1, 1);
+
+                cmdList->endMarker();
+            }
+
+            cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::ShaderResource);
+
+            {
+                cmdList->beginMarker("Debug Render");
+
+                CullDebugVSParamsCB vsCB;
+                vsCB.view.transpose(Device.mView);
+                vsCB.viewProj.transpose(Device.mFullTransform);
+                vsCB.objectCount = data.objectCount;
+                vsCB.wireframeAlpha = 0.7f;
+
+                cmdList->writeBuffer(mgr->m_debugGraphicsParamsCB, &vsCB, sizeof(vsCB));
+
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugGraphicsParamsCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_debugBuffer)
+                };
+
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugGraphicsLayout);
+
+                nvrhi::FramebufferDesc fbDesc;
+                fbDesc.addColorAttachment(colorTexture);
+                fbDesc.setDepthAttachment(depthTexture);
+                nvrhi::FramebufferHandle framebuffer = nvDevice->createFramebuffer(fbDesc);
+
+                nvrhi::GraphicsState gfxState;
+                gfxState.pipeline = mgr->m_debugGraphicsPipeline;
+                gfxState.bindings = { bindingSet };
+                gfxState.framebuffer = framebuffer;
+
+                nvrhi::Viewport viewport;
+                viewport.minX = 0;
+                viewport.minY = 0;
+                viewport.maxX = static_cast<float>(colorTexture->getDesc().width);
+                viewport.maxY = static_cast<float>(colorTexture->getDesc().height);
+                viewport.minZ = 0.0f;
+                viewport.maxZ = 1.0f;
+                gfxState.viewport.addViewportAndScissorRect(viewport);
+
+                cmdList->setGraphicsState(gfxState);
+
+                nvrhi::DrawArguments drawArgs;
+                drawArgs.vertexCount = 4;
+                drawArgs.instanceCount = data.objectCount;
+                drawArgs.startVertexLocation = 0;
+                drawArgs.startInstanceLocation = 0;
+                cmdList->draw(drawArgs);
+
+                cmdList->endMarker();
+            }
+
+            cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+            cmdList->endMarker();
+        }
+    );
 }
 
 }

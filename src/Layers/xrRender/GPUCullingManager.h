@@ -33,6 +33,24 @@ enum GPUObjectFlags : u32 {
     GPU_OBJECT_TRANSPARENT = 0x4,
 };
 
+enum CullState : u32 {
+    CULL_STATE_VISIBLE           = 0,
+    CULL_STATE_OCCLUDER          = 1,
+    CULL_STATE_CULLED_DISTANCE   = 2,
+    CULL_STATE_CULLED_FRUSTUM    = 3,
+    CULL_STATE_CULLED_OCCLUSION  = 4,
+};
+
+struct CullDebugData {
+    Fvector position;
+    float radius;
+    u32 cullState;
+    float objectDepth;
+    float hiZDepth;
+    u32 objectIndex;
+};
+static_assert(sizeof(CullDebugData) == 32, "CullDebugData must be 32 bytes for GPU alignment");
+
 struct IndirectDrawArgs {
     u32 indexCountPerInstance;
     u32 instanceCount;
@@ -73,11 +91,24 @@ public:
 
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
 
+    void SetupDebugVisualizationPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        framegraph::VirtualResourceHandle colorTarget,
+        framegraph::VirtualResourceHandle depthTarget,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels
+    );
+
+    bool IsDebugEnabled() const;
+
 private:
     void CreateBuffers(ng::RenderDevice* device);
     void CreateComputePipeline(ng::RenderDevice* device);
+    void CreateDebugResources(ng::RenderDevice* device);
 
-    void ExtractFrustumPlanes(const Fmatrix& viewProj, Fvector4* outPlanes);
+    void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
     nvrhi::BufferHandle m_objectBuffer;
     nvrhi::BufferHandle m_visibleIndexBuffer;
@@ -90,6 +121,17 @@ private:
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
     nvrhi::SamplerHandle m_pointSampler;
+
+    nvrhi::BufferHandle m_debugBuffer;
+    nvrhi::BufferHandle m_debugComputeParamsCB;
+    nvrhi::BufferHandle m_debugGraphicsParamsCB;
+
+    nvrhi::ComputePipelineHandle m_debugComputePipeline;
+    nvrhi::BindingLayoutHandle m_debugComputeLayout;
+
+    nvrhi::GraphicsPipelineHandle m_debugGraphicsPipeline;
+    nvrhi::BindingLayoutHandle m_debugGraphicsLayout;
+    nvrhi::InputLayoutHandle m_debugInputLayout;
 
     ng::RenderDevice* m_device = nullptr;
     u32 m_objectCount = 0;

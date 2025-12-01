@@ -395,6 +395,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         drawArgsBuffer
     );
 
+    if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
+        m_gpuCullingManager->SetupDebugVisualizationPass(
+            *m_framegraph,
+            m_hizPyramid,
+            forwardOutputs.albedo,
+            depthBuffer,
+            hizOutput.width,
+            hizOutput.height,
+            hizOutput.mipLevels
+        );
+    }
+
     auto hudOutputs = passes::setupHUDPass(
         *m_framegraph,
         m_device,
