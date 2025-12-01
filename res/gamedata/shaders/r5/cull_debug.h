@@ -6,18 +6,21 @@
 #define CULL_DEBUG_H
 
 // Culling result states (written by debug compute shader, read by debug VS/PS)
-#define CULL_STATE_VISIBLE           0  // Passed all tests - GREEN
-#define CULL_STATE_OCCLUDER          1  // Visible and close (writing Hi-Z) - BLUE
-#define CULL_STATE_CULLED_DISTANCE   2  // Failed distance test - RED (dark)
-#define CULL_STATE_CULLED_FRUSTUM    3  // Failed frustum test - RED (medium)
-#define CULL_STATE_CULLED_OCCLUSION  4  // Failed Hi-Z occlusion test - YELLOW
+#define CULL_STATE_VISIBLE           0
+#define CULL_STATE_OCCLUDER          1
+#define CULL_STATE_CULLED_DISTANCE   2
+#define CULL_STATE_CULLED_FRUSTUM    3
+#define CULL_STATE_CULLED_OCCLUSION  4
+#define CULL_STATE_PARTICLE_VISIBLE  5
+#define CULL_STATE_PARTICLE_CULLED   6
 
-// Debug colors (linear RGB)
-static const float3 DEBUG_COLOR_VISIBLE         = float3(0.0, 1.0, 0.0);   // Green
-static const float3 DEBUG_COLOR_OCCLUDER        = float3(0.0, 0.5, 1.0);   // Blue
-static const float3 DEBUG_COLOR_CULLED_DISTANCE = float3(0.5, 0.0, 0.0);   // Dark red
-static const float3 DEBUG_COLOR_CULLED_FRUSTUM  = float3(1.0, 0.0, 0.0);   // Bright red
-static const float3 DEBUG_COLOR_CULLED_OCCLUSION= float3(1.0, 1.0, 0.0);   // Yellow
+static const float3 DEBUG_COLOR_VISIBLE         = float3(0.0, 1.0, 0.0);
+static const float3 DEBUG_COLOR_OCCLUDER        = float3(0.0, 0.5, 1.0);
+static const float3 DEBUG_COLOR_CULLED_DISTANCE = float3(0.5, 0.0, 0.0);
+static const float3 DEBUG_COLOR_CULLED_FRUSTUM  = float3(1.0, 0.0, 0.0);
+static const float3 DEBUG_COLOR_CULLED_OCCLUSION= float3(1.0, 1.0, 0.0);
+static const float3 DEBUG_COLOR_PARTICLE_VISIBLE= float3(0.0, 1.0, 1.0);
+static const float3 DEBUG_COLOR_PARTICLE_CULLED = float3(1.0, 0.0, 1.0);
 
 // Per-object debug data (output from compute shader)
 struct CullDebugData
@@ -40,7 +43,9 @@ float3 GetCullDebugColor(uint cullState)
         case CULL_STATE_CULLED_DISTANCE:   return DEBUG_COLOR_CULLED_DISTANCE;
         case CULL_STATE_CULLED_FRUSTUM:    return DEBUG_COLOR_CULLED_FRUSTUM;
         case CULL_STATE_CULLED_OCCLUSION:  return DEBUG_COLOR_CULLED_OCCLUSION;
-        default:                           return float3(1.0, 0.0, 1.0); // Magenta = error
+        case CULL_STATE_PARTICLE_VISIBLE:  return DEBUG_COLOR_PARTICLE_VISIBLE;
+        case CULL_STATE_PARTICLE_CULLED:   return DEBUG_COLOR_PARTICLE_CULLED;
+        default:                           return float3(1.0, 1.0, 1.0);
     }
 }
 

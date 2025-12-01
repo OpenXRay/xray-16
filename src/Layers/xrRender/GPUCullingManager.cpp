@@ -7,6 +7,8 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/xrRender_console.h"
+#include "Layers/xrRender/FrameGraphPasses/ParticlePassSetup.h"
+#include "Layers/xrRender/FBasicVisual.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -42,16 +44,17 @@ struct CullParamsCB {
 // ═══════════════════════════════════════════════════════
 
 struct CullDebugParamsCB {
-    Fmatrix viewProj;           // View-projection matrix
-    Fvector cameraPos;          // Camera world position
-    float maxDistanceSq;        // Maximum render distance (squared)
-    Fvector4 frustumPlanes[6];  // View frustum planes
-    u32 objectCount;            // Total objects to test
-    u32 hizWidth;               // Hi-Z pyramid width
-    u32 hizHeight;              // Hi-Z pyramid height
-    u32 hizMipLevels;           // Hi-Z mip levels
-    float occluderThreshold;    // Distance for "occluder" classification
-    Fvector padding;            // Pad to 16-byte alignment
+    Fmatrix viewProj;
+    Fvector cameraPos;
+    float maxDistanceSq;
+    Fvector4 frustumPlanes[6];
+    u32 objectCount;
+    u32 hizWidth;
+    u32 hizHeight;
+    u32 hizMipLevels;
+    float occluderThreshold;
+    u32 debugOffset;
+    float padding[2];
 };
 
 struct CullDebugVSParamsCB {
@@ -70,18 +73,26 @@ static ref_cs s_object_cull_cs;
 static ref_cs s_object_cull_debug_cs;
 static ref_vs s_cull_debug_vs;
 static ref_ps s_cull_debug_ps;
+static ref_cs s_particle_cull_cs;
+static ref_cs s_particle_cull_debug_cs;
 
 // ═══════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
 // ═══════════════════════════════════════════════════════
+
+constexpr u32 MAX_CULLING_PARTICLES = 16384;
 
 GPUCullingManager::GPUCullingManager()
     : m_objectCount(0)
     , m_maxObjects(MAX_CULLING_OBJECTS)
     , m_initialized(false)
     , m_computeEnabled(false)
+    , m_particleCount(0)
+    , m_maxParticles(MAX_CULLING_PARTICLES)
+    , m_particleCullEnabled(false)
 {
     m_objectData.reserve(MAX_CULLING_OBJECTS);
+    m_particleData.reserve(MAX_CULLING_PARTICLES);
 }
 
 GPUCullingManager::~GPUCullingManager()
@@ -120,9 +131,10 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
     CreateBuffers(device);
     CreateComputePipeline(device);
     CreateDebugResources(device);
+    CreateParticleResources(device);
 
     m_initialized = true;
-    Msg("* [GPUCulling] Initialized (max objects: %d)", m_maxObjects);
+    Msg("* [GPUCulling] Initialized (max objects: %d, max particles: %d)", m_maxObjects, m_maxParticles);
 }
 
 void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
@@ -286,7 +298,6 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
 
 void GPUCullingManager::Shutdown()
 {
-    // Main culling resources
     m_objectBuffer = nullptr;
     m_visibleIndexBuffer = nullptr;
     m_visibleCountBuffer = nullptr;
@@ -295,19 +306,28 @@ void GPUCullingManager::Shutdown()
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
 
-    // Debug resources
     m_debugBuffer = nullptr;
     m_debugComputeParamsCB = nullptr;
     m_debugGraphicsParamsCB = nullptr;
     m_debugComputePipeline = nullptr;
+    m_particleDebugComputePipeline = nullptr;
     m_debugComputeLayout = nullptr;
     m_debugGraphicsPipeline = nullptr;
     m_debugGraphicsLayout = nullptr;
     m_debugInputLayout = nullptr;
 
+    m_particleBuffer = nullptr;
+    m_particleDrawArgsBuffer = nullptr;
+    m_particleVisibleCountBuffer = nullptr;
+    m_particleCullParamsCB = nullptr;
+    m_particleCullPipeline = nullptr;
+    m_particleCullLayout = nullptr;
+
     m_initialized = false;
     m_computeEnabled = false;
+    m_particleCullEnabled = false;
     m_objectCount = 0;
+    m_particleCount = 0;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -522,7 +542,9 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             // Must transpose matrices - Fmatrix storage is transposed relative to HLSL row-major
             cb.viewProj.transpose(Device.mFullTransform);
             cb.cameraPos = Device.vCameraPosition;
-            cb.maxDistanceSq = 500.0f * 500.0f;  // 500m max distance
+            // Use environment far plane for culling distance
+            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
+            cb.maxDistanceSq = farPlane * farPlane;
             cb.objectCount = data.objectCount;
             cb.hizWidth = data.hizWidth;
             cb.hizHeight = data.hizHeight;
@@ -590,8 +612,8 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    // Load debug shaders
     s_object_cull_debug_cs.create("object_cull_debug");
+    s_particle_cull_debug_cs.create("particle_cull_debug");
     s_cull_debug_vs = RImplementation.Resources->_CreateVS("cull_debug");
     s_cull_debug_ps = RImplementation.Resources->_CreatePS("cull_debug");
 
@@ -607,18 +629,18 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
         Msg("! [GPUCulling] cull_debug.ps not found - debug visualization disabled");
         return;
     }
+    if (!s_particle_cull_debug_cs || !s_particle_cull_debug_cs->nvrhiShader) {
+        Msg("* [GPUCulling] particle_cull_debug.cs not found - particle debug disabled");
+    }
 
-    // ─────────────────────────────────────────────────────
-    //  DEBUG BUFFER (CullDebugData for all objects)
-    // ─────────────────────────────────────────────────────
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_DebugData";
-        desc.byteSize = m_maxObjects * sizeof(CullDebugData);
+        desc.byteSize = (m_maxObjects + m_maxParticles) * sizeof(CullDebugData);
         desc.structStride = sizeof(CullDebugData);
         desc.canHaveUAVs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;  // Will transition between UAV and SRV
+        desc.keepInitialState = false;
 
         m_debugBuffer = nvDevice->createBuffer(desc);
         if (!m_debugBuffer) {
@@ -696,6 +718,13 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
             Msg("! [GPUCulling] Failed to create debug compute pipeline");
             return;
         }
+
+        if (s_particle_cull_debug_cs && s_particle_cull_debug_cs->nvrhiShader) {
+            nvrhi::ComputePipelineDesc particlePipeDesc;
+            particlePipeDesc.CS = s_particle_cull_debug_cs->nvrhiShader;
+            particlePipeDesc.bindingLayouts = { m_debugComputeLayout };
+            m_particleDebugComputePipeline = nvDevice->createComputePipeline(particlePipeDesc);
+        }
     }
 
     // ─────────────────────────────────────────────────────
@@ -762,11 +791,14 @@ void GPUCullingManager::SetupDebugVisualizationPass(
     framegraph::VirtualResourceHandle depthTarget,
     u32 hizWidth,
     u32 hizHeight,
-    u32 hizMipLevels)
+    u32 hizMipLevels,
+    const xr_vector<passes::ParticleBatch>* particleBatches)
 {
     using namespace framegraph;
 
-    if (!IsDebugEnabled() || m_objectCount == 0)
+    u32 particleCount = particleBatches ? std::min(static_cast<u32>(particleBatches->size()), m_maxParticles) : 0;
+
+    if (!IsDebugEnabled() || (m_objectCount == 0 && particleCount == 0))
         return;
 
     struct DebugPassData {
@@ -775,7 +807,9 @@ void GPUCullingManager::SetupDebugVisualizationPass(
         VirtualResourceHandle depthTarget;
 
         GPUCullingManager* manager;
+        const xr_vector<passes::ParticleBatch>* particleBatches;
         u32 objectCount;
+        u32 particleCount;
         u32 hizWidth;
         u32 hizHeight;
         u32 hizMipLevels;
@@ -784,23 +818,19 @@ void GPUCullingManager::SetupDebugVisualizationPass(
     fg.addCallbackPass<DebugPassData>(
         "GPU Culling Debug",
 
-        // Setup lambda
-        [&, hizWidth, hizHeight, hizMipLevels](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
+        [&, hizWidth, hizHeight, hizMipLevels, particleCount, particleBatches](FrameGraph& builder, PassHandle passHandle, DebugPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.manager = this;
+            data.particleBatches = particleBatches;
             data.objectCount = m_objectCount;
+            data.particleCount = particleCount;
             data.hizWidth = hizWidth;
             data.hizHeight = hizHeight;
             data.hizMipLevels = hizMipLevels;
 
-            // Read Hi-Z pyramid for occlusion testing
             data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
-
-            // Read/write color target (overlay)
             data.colorTarget = passBuilder.write(colorTarget, ResourceState::RenderTarget);
-
-            // Read depth for depth testing
             data.depthTarget = passBuilder.read(depthTarget, ResourceState::DepthStencilRead);
         },
 
@@ -826,29 +856,25 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 return;
             }
 
-            // ─────────────────────────────────────────────────────
-            //  PHASE 1: Debug Compute - Test all objects
-            // ─────────────────────────────────────────────────────
-            {
-                cmdList->beginMarker("Debug Compute");
+            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
 
-                // Fill debug compute constant buffer
-                // NOTE: Must transpose matrices - Fmatrix storage is transposed relative to HLSL row-major
+            if (data.objectCount > 0) {
+                cmdList->beginMarker("Object Debug Compute");
+
                 CullDebugParamsCB cb;
                 cb.viewProj.transpose(Device.mFullTransform);
                 cb.cameraPos = Device.vCameraPosition;
-                cb.maxDistanceSq = 500.0f * 500.0f;
+                cb.maxDistanceSq = farPlane * farPlane;
                 cb.objectCount = data.objectCount;
                 cb.hizWidth = data.hizWidth;
                 cb.hizHeight = data.hizHeight;
                 cb.hizMipLevels = data.hizMipLevels;
-                cb.occluderThreshold = 50.0f;  // Objects within 50m are "occluders"
+                cb.occluderThreshold = 50.0f;
+                cb.debugOffset = 0;
 
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
-
                 cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
 
-                // Create binding set for debug compute
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
@@ -860,7 +886,6 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
 
-                // Dispatch debug compute
                 nvrhi::ComputeState state;
                 state.pipeline = mgr->m_debugComputePipeline;
                 state.bindings = { bindingSet };
@@ -872,26 +897,81 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 cmdList->endMarker();
             }
 
-            // Barrier: debug buffer UAV -> SRV
+            if (data.particleCount > 0 && data.particleBatches && mgr->m_particleDebugComputePipeline) {
+                cmdList->beginMarker("Particle Debug Compute");
+
+                mgr->m_particleData.clear();
+                mgr->m_particleData.reserve(data.particleCount);
+
+                for (u32 i = 0; i < data.particleCount; i++) {
+                    const auto& batch = (*data.particleBatches)[i];
+                    if (!batch.visual) continue;
+
+                    GPUParticleData particle;
+                    particle.position = batch.visual->vis.sphere.P;
+                    particle.radius = batch.visual->vis.sphere.R;
+                    particle.batchIndex = i;
+                    particle.flags = 0;
+                    particle.pad0 = 0.0f;
+                    particle.pad1 = 0.0f;
+                    mgr->m_particleData.push_back(particle);
+                }
+
+                if (!mgr->m_particleData.empty()) {
+                    cmdList->writeBuffer(mgr->m_particleBuffer, mgr->m_particleData.data(),
+                                         mgr->m_particleData.size() * sizeof(GPUParticleData));
+
+                    CullDebugParamsCB cb;
+                    cb.viewProj.transpose(Device.mFullTransform);
+                    cb.cameraPos = Device.vCameraPosition;
+                    cb.maxDistanceSq = farPlane * farPlane;
+                    cb.objectCount = static_cast<u32>(mgr->m_particleData.size());
+                    cb.hizWidth = data.hizWidth;
+                    cb.hizHeight = data.hizHeight;
+                    cb.hizMipLevels = data.hizMipLevels;
+                    cb.occluderThreshold = 50.0f;
+                    cb.debugOffset = data.objectCount;
+
+                    mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+                    cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
+
+                    nvrhi::BindingSetDesc bindDesc;
+                    bindDesc.bindings = {
+                        nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
+                        nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_particleBuffer),
+                        nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                        nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_debugBuffer)
+                    };
+
+                    nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
+
+                    nvrhi::ComputeState state;
+                    state.pipeline = mgr->m_particleDebugComputePipeline;
+                    state.bindings = { bindingSet };
+                    cmdList->setComputeState(state);
+
+                    u32 groupCount = (static_cast<u32>(mgr->m_particleData.size()) + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                    cmdList->dispatch(groupCount, 1, 1);
+                }
+
+                cmdList->endMarker();
+            }
+
             cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::ShaderResource);
 
-            // ─────────────────────────────────────────────────────
-            //  PHASE 2: Debug Render - Draw colored spheres
-            // ─────────────────────────────────────────────────────
-            {
+            u32 totalDebugCount = data.objectCount + data.particleCount;
+            if (totalDebugCount > 0) {
                 cmdList->beginMarker("Debug Render");
 
-                // Fill VS constant buffer
-                // NOTE: Must transpose matrices - Fmatrix storage is transposed relative to HLSL row-major
                 CullDebugVSParamsCB vsCB;
                 vsCB.view.transpose(Device.mView);
                 vsCB.viewProj.transpose(Device.mFullTransform);
-                vsCB.objectCount = data.objectCount;
+                vsCB.objectCount = totalDebugCount;
                 vsCB.wireframeAlpha = 0.7f;
 
                 cmdList->writeBuffer(mgr->m_debugGraphicsParamsCB, &vsCB, sizeof(vsCB));
 
-                // Create binding set for debug graphics
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugGraphicsParamsCB),
@@ -900,13 +980,11 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugGraphicsLayout);
 
-                // Create framebuffer
                 nvrhi::FramebufferDesc fbDesc;
                 fbDesc.addColorAttachment(colorTexture);
                 fbDesc.setDepthAttachment(depthTexture);
                 nvrhi::FramebufferHandle framebuffer = nvDevice->createFramebuffer(fbDesc);
 
-                // Set graphics state
                 nvrhi::GraphicsState gfxState;
                 gfxState.pipeline = mgr->m_debugGraphicsPipeline;
                 gfxState.bindings = { bindingSet };
@@ -923,10 +1001,9 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 cmdList->setGraphicsState(gfxState);
 
-                // Draw: 4 vertices per quad (triangle strip), 1 instance per object
                 nvrhi::DrawArguments drawArgs;
                 drawArgs.vertexCount = 4;
-                drawArgs.instanceCount = data.objectCount;
+                drawArgs.instanceCount = totalDebugCount;
                 drawArgs.startVertexLocation = 0;
                 drawArgs.startInstanceLocation = 0;
                 cmdList->draw(drawArgs);
@@ -934,12 +1011,304 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 cmdList->endMarker();
             }
 
-            // Barrier: debug buffer SRV -> UAV (for next frame)
             cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
             cmdList->endMarker();
         }
     );
+}
+
+void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
+{
+    if (!m_computeEnabled)
+        return;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+
+    s_particle_cull_cs.create("particle_cull");
+    if (!s_particle_cull_cs || !s_particle_cull_cs->nvrhiShader) {
+        Msg("! [GPUCulling] particle_cull.cs not found - particle culling disabled");
+        return;
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_Particles";
+        desc.byteSize = m_maxParticles * sizeof(GPUParticleData);
+        desc.structStride = sizeof(GPUParticleData);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        m_particleBuffer = nvDevice->createBuffer(desc);
+        if (!m_particleBuffer) {
+            Msg("! [GPUCulling] Failed to create particle buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_ParticleDrawArgs";
+        desc.byteSize = m_maxParticles * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;
+
+        m_particleDrawArgsBuffer = nvDevice->createBuffer(desc);
+        if (!m_particleDrawArgsBuffer) {
+            Msg("! [GPUCulling] Failed to create particle draw args buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_ParticleVisibleCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_particleVisibleCountBuffer = nvDevice->createBuffer(desc);
+        if (!m_particleVisibleCountBuffer) {
+            Msg("! [GPUCulling] Failed to create particle visible count buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_ParticleParams";
+        desc.byteSize = sizeof(CullParamsCB);
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+
+        m_particleCullParamsCB = nvDevice->createBuffer(desc);
+        if (!m_particleCullParamsCB) {
+            Msg("! [GPUCulling] Failed to create particle constant buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::Texture_SRV(1),
+            nvrhi::BindingLayoutItem::Sampler(0),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(1)
+        };
+
+        m_particleCullLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (!m_particleCullLayout) {
+            Msg("! [GPUCulling] Failed to create particle binding layout");
+            return;
+        }
+    }
+
+    {
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = s_particle_cull_cs->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_particleCullLayout };
+
+        m_particleCullPipeline = nvDevice->createComputePipeline(pipeDesc);
+        if (!m_particleCullPipeline) {
+            Msg("! [GPUCulling] Failed to create particle compute pipeline");
+            return;
+        }
+    }
+
+    m_particleCullEnabled = true;
+    Msg("* [GPUCulling] Particle culling resources created");
+}
+
+void GPUCullingManager::UploadParticleBatches(ng::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches)
+{
+    if (!m_particleCullEnabled || !batches)
+        return;
+
+    m_particleCount = std::min(static_cast<u32>(batches->size()), m_maxParticles);
+
+    if (m_particleCount == 0)
+        return;
+
+    m_particleData.clear();
+    m_particleData.reserve(m_particleCount);
+    m_particleDrawArgsData.clear();
+    m_particleDrawArgsData.reserve(m_particleCount);
+
+    for (u32 i = 0; i < m_particleCount; i++) {
+        const auto& batch = (*batches)[i];
+
+        if (!batch.visual)
+            continue;
+
+        GPUParticleData particle;
+        particle.position = batch.visual->vis.sphere.P;
+        particle.radius = batch.visual->vis.sphere.R;
+        particle.batchIndex = i;
+        particle.flags = 0;
+        particle.pad0 = 0.0f;
+        particle.pad1 = 0.0f;
+
+        m_particleData.push_back(particle);
+
+        IndirectDrawArgs args;
+        args.indexCountPerInstance = batch.particleCount * 6;
+        args.instanceCount = 0;
+        args.startIndexLocation = 0;
+        args.baseVertexLocation = 0;
+        args.startInstanceLocation = 0;
+
+        m_particleDrawArgsData.push_back(args);
+    }
+
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    cmdList->writeBuffer(m_particleBuffer, m_particleData.data(), m_particleCount * sizeof(GPUParticleData));
+    cmdList->writeBuffer(m_particleDrawArgsBuffer, m_particleDrawArgsData.data(), m_particleCount * sizeof(IndirectDrawArgs));
+}
+
+GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle hizPyramid,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels,
+    const xr_vector<passes::ParticleBatch>* batches)
+{
+    using namespace framegraph;
+
+    GPUParticleCullOutput output;
+    output.maxParticles = m_maxParticles;
+
+    if (!m_particleCullEnabled) {
+        output.drawArgsBuffer = VirtualResourceHandle();
+        return output;
+    }
+
+    m_particleCount = batches ? std::min(static_cast<u32>(batches->size()), m_maxParticles) : 0;
+
+    if (m_particleCount == 0) {
+        output.drawArgsBuffer = VirtualResourceHandle();
+        return output;
+    }
+
+    struct ParticleCullPassData {
+        VirtualResourceHandle hizPyramid;
+        VirtualResourceHandle drawArgsBuffer;
+
+        GPUCullingManager* manager;
+        const xr_vector<passes::ParticleBatch>* batches;
+        u32 particleCount;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    ResourceDesc drawArgsDesc;
+    drawArgsDesc.type = ResourceDesc::Type::Buffer;
+    drawArgsDesc.debugName = "GPUCull_ParticleDrawArgs";
+    drawArgsDesc.bufferSize = m_maxParticles * sizeof(IndirectDrawArgs);
+    drawArgsDesc.structStride = sizeof(IndirectDrawArgs);
+    drawArgsDesc.isUAV = true;
+    drawArgsDesc.isTransient = false;
+
+    VirtualResourceHandle drawArgsHandle = fg.ImportBuffer("gpu_cull_particle_drawargs", m_particleDrawArgsBuffer, drawArgsDesc);
+
+    auto& passData = fg.addCallbackPass<ParticleCullPassData>(
+        "GPU Particle Culling",
+
+        [&, hizWidth, hizHeight, hizMipLevels, drawArgsHandle, batches](FrameGraph& builder, PassHandle passHandle, ParticleCullPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.manager = this;
+            data.batches = batches;
+            data.particleCount = m_particleCount;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
+
+            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
+            data.drawArgsBuffer = passBuilder.write(drawArgsHandle, ResourceState::UnorderedAccess);
+        },
+
+        [](const ParticleCullPassData& data,
+           const FrameGraph& fg,
+           ng::RenderContext* ctx) {
+
+            GPUCullingManager* mgr = data.manager;
+            if (!mgr->m_particleCullEnabled || data.particleCount == 0)
+                return;
+
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            cmdList->beginMarker("GPU Particle Culling");
+
+            nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
+
+            mgr->UploadParticleBatches(ctx, data.batches);
+
+            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
+            if (!hizTexture) {
+                Msg("! [GPUCulling] Hi-Z texture not available for particle culling");
+                cmdList->endMarker();
+                return;
+            }
+
+            u32 zero = 0;
+            cmdList->writeBuffer(mgr->m_particleVisibleCountBuffer, &zero, sizeof(u32));
+
+            CullParamsCB cb;
+            cb.viewProj.transpose(Device.mFullTransform);
+            cb.cameraPos = Device.vCameraPosition;
+            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
+            cb.maxDistanceSq = farPlane * farPlane;
+            cb.objectCount = data.particleCount;
+            cb.hizWidth = data.hizWidth;
+            cb.hizHeight = data.hizHeight;
+            cb.hizMipLevels = data.hizMipLevels;
+
+            mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+
+            cmdList->writeBuffer(mgr->m_particleCullParamsCB, &cb, sizeof(cb));
+
+            nvrhi::BindingSetDesc bindDesc;
+            bindDesc.bindings = {
+                nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_particleCullParamsCB),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_particleBuffer),
+                nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_particleVisibleCountBuffer),
+                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_particleDrawArgsBuffer)
+            };
+
+            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_particleCullLayout);
+            if (!bindingSet) {
+                Msg("! [GPUCulling] Failed to create particle binding set");
+                cmdList->endMarker();
+                return;
+            }
+
+            nvrhi::ComputeState state;
+            state.pipeline = mgr->m_particleCullPipeline;
+            state.bindings = { bindingSet };
+            cmdList->setComputeState(state);
+
+            u32 groupCount = (data.particleCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+            cmdList->dispatch(groupCount, 1, 1);
+
+            cmdList->endMarker();
+        }
+    );
+
+    output.drawArgsBuffer = passData.drawArgsBuffer;
+    return output;
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

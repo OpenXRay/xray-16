@@ -36,10 +36,12 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // Represents a single particle system to render
 // Particles are dynamic billboards/sprites, not static geometry
 struct ParticleBatch {
-    RENDER_NAMESPACE::dxRender_Visual* visual = nullptr;  // CParticleEffect or CParticleGroup
-    Fmatrix worldMatrix;                                  // Transform (usually identity for world, camera-relative for HUD)
-    IRenderable* renderable = nullptr;                    // Owner object
-    bool isHUDMode = false;                               // True if HUD particle (needs FOV adjustment)
+    RENDER_NAMESPACE::dxRender_Visual* visual = nullptr;
+    Fmatrix worldMatrix;
+    IRenderable* renderable = nullptr;
+    bool isHUDMode = false;
+    u32 particleCount = 0;
+    u32 vertexOffset = 0;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -68,7 +70,8 @@ framegraph::DefaultOutputLayout setupParticlePass(
     const xr_vector<ParticleBatch>* hudParticleBatches,
     MaterialCache* materialCache,
     u32 width,
-    u32 height
+    u32 height,
+    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

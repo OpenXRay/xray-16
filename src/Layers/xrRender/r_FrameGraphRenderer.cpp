@@ -39,6 +39,7 @@
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrParticles/psystem.h"
 
 namespace xray::render {
 
@@ -593,9 +594,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 m_geometryCollector.get()  // Geometry is uploaded during execute
             );
 
-            // Pass draw args buffer handle to forward pass
-            // Forward pass declares read dependency, ensuring proper sync
             drawArgsBuffer = cullOutput.drawArgsBuffer;
+        }
+
+        if (m_gpuCullingManager->IsParticleCullingEnabled() && !m_worldParticleBatches.empty()) {
+            m_gpuCullingManager->SetupParticleCullingPass(
+                *m_framegraph,
+                m_hizPyramid,
+                hizOutput.width,
+                hizOutput.height,
+                hizOutput.mipLevels,
+                &m_worldParticleBatches
+            );
         }
     }
 
@@ -676,11 +686,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_gpuCullingManager->SetupDebugVisualizationPass(
             *m_framegraph,
             m_hizPyramid,
-            forwardOutputs.albedo,  // Color target to overlay on
-            depthBuffer,            // Depth for depth testing
+            forwardOutputs.albedo,
+            depthBuffer,
             hizOutput.width,
             hizOutput.height,
-            hizOutput.mipLevels
+            hizOutput.mipLevels,
+            &m_worldParticleBatches
         );
     }
 
@@ -695,7 +706,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    // 3. Particle Pass - Renders particle effects on top of world + HUD
+    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr;
+    if (m_gpuCullingManager && m_gpuCullingManager->IsParticleCullingEnabled()) {
+        particleDrawArgsBuffer = m_gpuCullingManager->GetParticleDrawArgsBuffer();
+    }
+
     auto particleOutputs = passes::setupParticlePass(
         *m_framegraph,
         m_device,
@@ -704,7 +719,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_hudParticleBatches,
         m_materialCache.get(),
         width,
-        height
+        height,
+        particleDrawArgsBuffer
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1237,23 +1253,28 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     if (vType != MT_PARTICLE_EFFECT && vType != MT_PARTICLE_GROUP)
         return false;
 
-    // Check if this particle has HUD mode flag set (for CParticleEffect)
     bool isHUDParticle = isHUD;
+    u32 particleCount = 0;
+
     if (vType == MT_PARTICLE_EFFECT) {
         RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
             static_cast<RENDER_NAMESPACE::PS::CParticleEffect*>(visual);
-        // Override with actual HUD mode from particle
         isHUDParticle = pEffect->GetHudMode();
+
+        PAPI::Particle* particles = nullptr;
+        PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
     }
 
-    // Create particle batch
+    if (particleCount == 0)
+        return false;
+
     passes::ParticleBatch batch;
     batch.visual = visual;
     batch.worldMatrix = worldTransform;
     batch.renderable = renderable;
     batch.isHUDMode = isHUDParticle;
+    batch.particleCount = particleCount;
 
-    // Add to appropriate list (world or HUD)
     if (isHUDParticle) {
         m_hudParticleBatches.push_back(batch);
     } else {

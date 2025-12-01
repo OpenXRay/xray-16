@@ -92,19 +92,17 @@ VS_OUTPUT main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
     // UV for circle rendering ([-1, 1] range)
     output.uv = cornerOffset;
 
-    // Alpha based on cull state
-    // Hide visible objects (green) - only show culled objects
-    if (debugData.cullState == CULL_STATE_VISIBLE)
+    if (debugData.cullState == CULL_STATE_CULLED_OCCLUSION)
     {
-        output.alpha = 0.0; // Hide visible objects
+        output.alpha = g_WireframeAlpha;
     }
-    else if (debugData.cullState >= CULL_STATE_CULLED_DISTANCE)
+    else if (debugData.cullState == CULL_STATE_PARTICLE_CULLED)
     {
-        output.alpha = g_WireframeAlpha; // Culled = full visibility
+        output.alpha = g_WireframeAlpha;
     }
     else
     {
-        output.alpha = g_WireframeAlpha * 0.5; // Occluders = semi-transparent
+        output.alpha = 0.0;
     }
 
     return output;
