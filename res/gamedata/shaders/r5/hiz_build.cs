@@ -59,13 +59,10 @@ void main(uint3 dispatch_id : SV_DispatchThreadID)
     //  CONSERVATIVE DEPTH SELECTION
     // ─────────────────────────────────────────────────────
     // For standard Z-buffer (0=near, 1=far):
-    //   - Take MAX depth (farthest point)
-    //   - This is CONSERVATIVE: an object at this depth or closer might be visible
-    //   - Avoids false occlusion (never incorrectly cull visible objects)
-    //
-    // For reversed Z-buffer (1=near, 0=far):
-    //   - Would take MIN depth instead
-    //   - X-Ray uses standard Z, so we use MAX
+    //   - Take MAX depth (farthest surface in region)
+    //   - Object is OCCLUDED if objectDepth > maxDepth (behind EVERYTHING in region)
+    //   - Object is VISIBLE if objectDepth <= maxDepth (might be in front of something)
+    //   - This is CONSERVATIVE: never incorrectly cull visible objects
     //
     float max_depth = max(max(d0, d1), max(d2, d3));
 

@@ -41,6 +41,14 @@ struct GeometryBatch {
     // Transform
     Fmatrix worldMatrix;
 
+    // Pre-computed world-space bounding sphere for GPU culling
+    // Computed at batch creation time to handle different visual types:
+    // - Static geometry: sphere already in world space (identity transform)
+    // - Trees: sphere already in world space (level compiler pre-transforms)
+    // - Dynamic objects: sphere transformed by worldMatrix
+    Fvector worldBoundsCenter;
+    float worldBoundsRadius = 0.0f;
+
     // Shader
     nvrhi::IGraphicsPipeline* pipeline = nullptr;
     nvrhi::IBindingSet* bindingSet = nullptr;

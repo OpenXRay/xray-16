@@ -1001,7 +1001,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
 
-    // Set world matrix
+    // Set world matrix (used for shader constants)
     batch.worldMatrix = worldTransform;
 
     // Store visual for material system
@@ -1010,13 +1010,27 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Store renderable (for skeletons - provides bone data)
     batch.renderable = renderable;
 
+    // Compute world-space bounding sphere for GPU culling
+    // Different visual types have different sphere conventions:
+    // - Static geometry: sphere already in world space, worldTransform = identity
+    // - Trees: sphere already in world space (level compiler pre-transforms), but worldTransform != identity
+    // - Dynamic objects: sphere in local space, needs worldTransform applied
+    u32 visualType = visual->getType();
+    if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
+        // Trees: sphere is ALREADY in world space (pre-transformed by level compiler)
+        // Do NOT apply worldTransform to sphere (it's only for shader constants)
+        batch.worldBoundsCenter = visual->vis.sphere.P;
+        batch.worldBoundsRadius = visual->vis.sphere.R;
+    } else {
+        // Static/dynamic geometry: transform sphere by worldMatrix
+        worldTransform.transform_tiny(batch.worldBoundsCenter, visual->vis.sphere.P);
+        batch.worldBoundsRadius = visual->vis.sphere.R;
+    }
+
     // Calculate SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
     // SSA = R / distSQ - larger SSA = closer/bigger = render first (front-to-back)
-    Fvector worldCenter;
-    worldTransform.transform_tiny(worldCenter, visual->vis.sphere.P);
-    float distSQ = Device.vCameraPosition.distance_to_sqr(worldCenter) + EPS;
-    float R = visual->vis.sphere.R;
-    batch.ssa = R / distSQ;
+    float distSQ = Device.vCameraPosition.distance_to_sqr(batch.worldBoundsCenter) + EPS;
+    batch.ssa = batch.worldBoundsRadius / distSQ;
 
     // PSO and binding set will be created by MaterialCache in GBufferPass
     batch.pipeline = nullptr;

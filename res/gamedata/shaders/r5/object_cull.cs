@@ -100,12 +100,17 @@ bool DistanceTest(float3 position, float radius)
 
 bool FrustumTestSphere(float3 center, float radius)
 {
-    // Test sphere against all 6 frustum planes
-    // Plane equation: dot(normal, point) + d = 0
-    // Positive = outside, Negative = inside
-    // Sphere outside if distance > radius for ANY plane
+    // Test sphere against 5 frustum planes (skip near plane at index 5)
+    // Matches X-Ray's CFrustum convention (see Frustum.cpp and detail_cull.cs)
+    //
+    // X-Ray plane format: dot(n, P) + d
+    // - Positive = OUTSIDE frustum (to be culled)
+    // - Negative/Zero = INSIDE frustum (visible)
+    //
+    // Sphere is completely outside if dist > radius for ANY plane
+    // Skip near plane to avoid culling objects that intersect it
 
-    for (uint i = 0; i < 6; i++)
+    for (uint i = 0; i < 5; i++)
     {
         // Signed distance from sphere center to plane
         float dist = dot(g_FrustumPlanes[i].xyz, center) + g_FrustumPlanes[i].w;
@@ -125,16 +130,13 @@ bool FrustumTestSphere(float3 center, float radius)
 
 bool OcclusionTestSphere(float3 center, float radius)
 {
-    // DEBUG: Disable Hi-Z occlusion test - always return visible
-    // Remove this line once culling is debugged
-    return true;
-
     // ─────────────────────────────────────────────────────
     //  PROJECT SPHERE TO SCREEN SPACE
     // ─────────────────────────────────────────────────────
 
     // Transform center to clip space
-    float4 clipPos = mul(g_ViewProj, float4(center, 1.0));
+    // X-Ray uses row-major matrices with row vectors (v * M)
+    float4 clipPos = mul(m_V, float4(center, 1.0));
 
     // Behind camera check (w <= 0 means behind or at camera plane)
     if (clipPos.w <= 0.0)
@@ -180,7 +182,7 @@ bool OcclusionTestSphere(float3 center, float radius)
     float3 viewDir = normalize(center - g_CameraPos);
     float3 frontPoint = center - viewDir * radius;
 
-    float4 frontClip = mul(g_ViewProj, float4(frontPoint, 1.0));
+    float4 frontClip = mul(m_V, float4(frontPoint, 1.0));
     float objectDepth = frontClip.z / frontClip.w;
 
     // Clamp to valid depth range
@@ -191,14 +193,15 @@ bool OcclusionTestSphere(float3 center, float radius)
     // ─────────────────────────────────────────────────────
     //
     // For standard Z-buffer (0=near, 1=far):
-    // - Object is visible if its depth <= Hi-Z depth
     // - Hi-Z contains MAX depth of region = farthest surface
-    // - If object is closer than farthest surface, it might be visible
+    // - Object is OCCLUDED if objectDepth > hiZDepth (behind EVERYTHING in region)
+    // - Object is VISIBLE if objectDepth <= hiZDepth (might be in front of something)
+    // - This is CONSERVATIVE: never incorrectly cull visible objects
     //
     // Add small bias to avoid z-fighting and floating point precision issues
-    float depthBias = 0.001;
+    float depthBias = 0.0001;
 
-    return objectDepth <= (hiZDepth + depthBias);
+    return objectDepth >= (hiZDepth - depthBias);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -221,10 +224,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
     //  CULLING TESTS (ordered by cost: cheapest first)
     // ─────────────────────────────────────────────────────
 
-    // DEBUG: Disable ALL culling to test if indirect draw works
-    // If geometry still doesn't render, the problem is in the draw args buffer
-    // or the indirect draw call itself
-    #if 0
     // 1. Distance culling (cheapest - just a dot product)
     if (!DistanceTest(obj.position, obj.radius))
         return;
@@ -238,7 +237,6 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // but will never mark visible objects as occluded
     if (!OcclusionTestSphere(obj.position, obj.radius))
         return;
-    #endif
 
     // ─────────────────────────────────────────────────────
     //  OBJECT IS VISIBLE - Add to output

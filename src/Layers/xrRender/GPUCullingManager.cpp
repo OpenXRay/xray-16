@@ -298,26 +298,13 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         // ─────────────────────────────────────────────────────
         GPUObjectData obj;
 
-        // Use batch's bounding sphere if available, otherwise compute from world matrix
-        obj.position = batch.worldMatrix.c;  // Translation component (fallback)
-        obj.radius = 2.0f;  // Default radius
-
-        if (batch.visual) {
-            // Get bounding sphere from visual (in LOCAL/object space)
-            vis_data& vis = batch.visual->getVisData();
-
-            // Transform local-space sphere center to world space
-            // Using transform_tiny for point transformation (includes translation)
-            batch.worldMatrix.transform_tiny(obj.position, vis.sphere.P);
-
-            // Scale radius by the maximum scale factor of the world matrix
-            // This handles non-uniform scaling conservatively
-            float scaleX = batch.worldMatrix.i.magnitude();
-            float scaleY = batch.worldMatrix.j.magnitude();
-            float scaleZ = batch.worldMatrix.k.magnitude();
-            float maxScale = std::max({scaleX, scaleY, scaleZ});
-            obj.radius = vis.sphere.R;
-        }
+        // Use pre-computed world-space bounding sphere from batch
+        // This handles different visual types correctly:
+        // - Static geometry: identity transform applied (no-op)
+        // - Trees: no transform applied (sphere already world-space)
+        // - Dynamic objects: worldMatrix transform applied
+        obj.position = batch.worldBoundsCenter;
+        obj.radius = batch.worldBoundsRadius;
 
         obj.batchIndex = i;
 
