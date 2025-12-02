@@ -104,6 +104,7 @@ static xr_vector<u8> DecompressDDS(const resources::DDSData& ddsData, u32& outWi
     bool isDXT1 = (static_cast<int>(ddsData.desc.format) == 56);
     bool isDXT5 = (static_cast<int>(ddsData.desc.format) == 60);
     bool isRGBA8 = (static_cast<int>(ddsData.desc.format) == 19);
+    bool isR8 = (static_cast<int>(ddsData.desc.format) == 3);
 
     if (isRGBA8) {
         if (mip0.data && mip0.size >= pixelCount * 4) {
@@ -112,8 +113,21 @@ static xr_vector<u8> DecompressDDS(const resources::DDSData& ddsData, u32& outWi
         return result;
     }
 
+    if (isR8) {
+        if (mip0.data && mip0.size >= pixelCount) {
+            for (u32 i = 0; i < pixelCount; ++i) {
+                u8 r = mip0.data[i];
+                result[i * 4 + 0] = r;
+                result[i * 4 + 1] = r;
+                result[i * 4 + 2] = r;
+                result[i * 4 + 3] = 255;
+            }
+        }
+        return result;
+    }
+
     if (!isDXT1 && !isDXT5) {
-        Msg("! [PBRTextureConverter] Unsupported format: %d (only DXT1/DXT5/RGBA8 supported)", static_cast<int>(ddsData.desc.format));
+        Msg("! [PBRTextureConverter] Unsupported format: %d (only DXT1/DXT5/RGBA8/R8 supported)", static_cast<int>(ddsData.desc.format));
         return result;
     }
 
@@ -315,13 +329,17 @@ static FileLocation MakeFileLocation(
 static const char* const FOLDER_BLACKLIST[] = {
     "editor",
     "fx",
-    "glow"
+    "glow",
     "grad",
     "internal",
     "lights",
     "pfx",
     "sky",
     "ui",
+    "intro",
+    "terrain",
+    "water",
+    "wm",
 };
 
 static bool IsInBlacklistedFolder(const xr_string& path) {
@@ -369,6 +387,7 @@ TextureInventory BuildTextureInventory(const TextureScanConfig& config) {
                 file_name.find("_roughness") != xr_string::npos ||
                 file_name.find("_ao") != xr_string::npos ||
                 file_name.find("_parallax") != xr_string::npos ||
+                file_name.find("_pbr") != xr_string::npos ||
                 file_name.find("_s.dds") != xr_string::npos ||
                 file_name.find("_g.dds") != xr_string::npos) {
                 continue;
@@ -453,13 +472,12 @@ xr_string ComputeTextureInventoryDigest(const TextureInventory& inventory) {
     return xr_string(hex_buffer);
 }
 
+static bool WriteTHMFileConsolidated(const char* root_alias, const xr_string& base_name, const xr_string& pbr_name);
+
 static bool THMNeedsPBRUpdate(
     const char* root_alias,
     const xr_string& base_name,
-    const xr_string& metallic_name,
-    const xr_string& roughness_name,
-    const xr_string& ao_name,
-    const xr_string& parallax_name)
+    const xr_string& pbr_name)
 {
     xr_string thm_path = base_name + ".thm";
 
@@ -467,13 +485,11 @@ static bool THMNeedsPBRUpdate(
     FS.update_path(full_path, root_alias, thm_path.c_str());
 
     if (!FS.exist(full_path)) {
-        Msg("* [PBRTextureConverter] THMNeedsPBRUpdate: %s doesn't exist, needs creation", full_path);
         return true;
     }
 
     IReader* reader = FS.r_open(root_alias, thm_path.c_str());
     if (!reader) {
-        Msg("* [PBRTextureConverter] THMNeedsPBRUpdate: Can't read %s", full_path);
         return true;
     }
 
@@ -482,11 +498,7 @@ static bool THMNeedsPBRUpdate(
     params.Load(*reader);
     FS.r_close(reader);
 
-    if (params.metallic_name != metallic_name.c_str() ||
-        params.roughness_name != roughness_name.c_str() ||
-        params.ao_name != ao_name.c_str() ||
-        params.parallax_name != parallax_name.c_str()) {
-        Msg("* [PBRTextureConverter] THMNeedsPBRUpdate: %s has outdated PBR fields", full_path);
+    if (params.pbr_name != pbr_name.c_str()) {
         return true;
     }
 
@@ -501,22 +513,15 @@ bool VerifyPBROutputs(
     u32 missing_thm = 0;
 
     for (const auto& asset : inventory.assets) {
-        xr_string metallic_path = asset.base_name + "_metallic.dds";
-        xr_string roughness_path = asset.base_name + "_roughness.dds";
+        xr_string pbr_path = asset.base_name + "_pbr.dds";
+        xr_string pbr_name = asset.base_name + "_pbr";
 
-        if (!FileExists(params.output_root.c_str(), metallic_path.c_str()) ||
-            !FileExists(params.output_root.c_str(), roughness_path.c_str())) {
-            missing_textures++;
-        } else {
-            xr_string metallic_name = asset.base_name + "_metallic";
-            xr_string roughness_name = asset.base_name + "_roughness";
-            xr_string ao_name = asset.base_name + "_ao";
-            xr_string parallax_name = asset.base_name + "_parallax";
-
-            if (THMNeedsPBRUpdate(params.output_root.c_str(), asset.base_name,
-                                  metallic_name, roughness_name, ao_name, parallax_name)) {
+        if (FileExists(params.output_root.c_str(), pbr_path.c_str())) {
+            if (THMNeedsPBRUpdate(params.output_root.c_str(), asset.base_name, pbr_name)) {
                 missing_thm++;
             }
+        } else {
+            missing_textures++;
         }
     }
 
@@ -645,6 +650,49 @@ static ConvertedPBRTextures ConvertWithAI(
 
     Msg("~ [PBRTextureConverter] Decompressed dimensions: diffuse %ux%u, normal %ux%u",
         diffuseWidth, diffuseHeight, normalWidth, normalHeight);
+
+    constexpr u32 MIN_AI_TEXTURE_SIZE = 32;
+    if (diffuseWidth < MIN_AI_TEXTURE_SIZE || diffuseHeight < MIN_AI_TEXTURE_SIZE) {
+        u32 newWidth = std::max(diffuseWidth, MIN_AI_TEXTURE_SIZE);
+        u32 newHeight = std::max(diffuseHeight, MIN_AI_TEXTURE_SIZE);
+        Msg("~ [PBRTextureConverter] Upscaling small texture %ux%u → %ux%u for AI processing",
+            diffuseWidth, diffuseHeight, newWidth, newHeight);
+
+        xr_vector<u8> upscaledDiffuse(newWidth * newHeight * 4);
+        for (u32 y = 0; y < newHeight; ++y) {
+            for (u32 x = 0; x < newWidth; ++x) {
+                u32 srcX = x * diffuseWidth / newWidth;
+                u32 srcY = y * diffuseHeight / newHeight;
+                u32 srcIdx = (srcY * diffuseWidth + srcX) * 4;
+                u32 dstIdx = (y * newWidth + x) * 4;
+                upscaledDiffuse[dstIdx + 0] = diffuseRGB[srcIdx + 0];
+                upscaledDiffuse[dstIdx + 1] = diffuseRGB[srcIdx + 1];
+                upscaledDiffuse[dstIdx + 2] = diffuseRGB[srcIdx + 2];
+                upscaledDiffuse[dstIdx + 3] = diffuseRGB[srcIdx + 3];
+            }
+        }
+        diffuseRGB = std::move(upscaledDiffuse);
+
+        xr_vector<u8> upscaledNormal(newWidth * newHeight * 4);
+        for (u32 y = 0; y < newHeight; ++y) {
+            for (u32 x = 0; x < newWidth; ++x) {
+                u32 srcX = x * normalWidth / newWidth;
+                u32 srcY = y * normalHeight / newHeight;
+                u32 srcIdx = (srcY * normalWidth + srcX) * 4;
+                u32 dstIdx = (y * newWidth + x) * 4;
+                upscaledNormal[dstIdx + 0] = normalRGB[srcIdx + 0];
+                upscaledNormal[dstIdx + 1] = normalRGB[srcIdx + 1];
+                upscaledNormal[dstIdx + 2] = normalRGB[srcIdx + 2];
+                upscaledNormal[dstIdx + 3] = normalRGB[srcIdx + 3];
+            }
+        }
+        normalRGB = std::move(upscaledNormal);
+
+        diffuseWidth = newWidth;
+        diffuseHeight = newHeight;
+        normalWidth = newWidth;
+        normalHeight = newHeight;
+    }
 
     result.width = diffuseWidth;
     result.height = diffuseHeight;
@@ -810,6 +858,30 @@ static bool WriteRGBADDS(
 
     FS.w_close(writer);
     return true;
+}
+
+static bool WritePackedPBRDDS(
+    const char* root_alias,
+    const xr_string& relative_path,
+    const u8* metallicData,
+    const u8* roughnessData,
+    const u8* aoData,
+    const u8* parallaxData,
+    u32 width,
+    u32 height,
+    bool generateMipmaps)
+{
+    const u32 pixelCount = width * height;
+    xr_vector<u8> packedData(pixelCount * 4);
+
+    for (u32 i = 0; i < pixelCount; ++i) {
+        packedData[i * 4 + 0] = metallicData ? metallicData[i] : 0;
+        packedData[i * 4 + 1] = roughnessData ? roughnessData[i] : 128;
+        packedData[i * 4 + 2] = aoData ? aoData[i] : 255;
+        packedData[i * 4 + 3] = parallaxData ? parallaxData[i] : 128;
+    }
+
+    return WriteRGBADDS(root_alias, relative_path, packedData.data(), width, height, generateMipmaps);
 }
 
 static bool WriteSingleChannelDDS(
@@ -1081,6 +1153,23 @@ bool ConvertTexturesToPBR(
                     asset.base_name.c_str());
             }
 
+            xr_string pbr_path = asset.base_name + "_pbr.dds";
+            xr_string pbr_name = asset.base_name + "_pbr";
+
+            bool pbrExists = FileExists(params.output_root.c_str(), pbr_path.c_str());
+            bool thmUpToDate = !THMNeedsPBRUpdate(params.output_root.c_str(), asset.base_name, pbr_name);
+
+            if (pbrExists && thmUpToDate) {
+                skipped_count++;
+                continue;
+            }
+
+            if (pbrExists && !thmUpToDate) {
+                WriteTHMFileConsolidated(params.output_root.c_str(), asset.base_name, pbr_name);
+                skipped_count++;
+                continue;
+            }
+
             xr_string albedo_path = asset.base_name + ".dds";
             xr_string metallic_path = asset.base_name + "_metallic.dds";
             xr_string roughness_path = asset.base_name + "_roughness.dds";
@@ -1091,30 +1180,6 @@ bool ConvertTexturesToPBR(
             xr_string roughness_name = asset.base_name + "_roughness";
             xr_string ao_name = asset.base_name + "_ao";
             xr_string parallax_name = asset.base_name + "_parallax";
-
-            bool texturesExist =
-                FileExists(params.output_root.c_str(), metallic_path.c_str()) &&
-                FileExists(params.output_root.c_str(), roughness_path.c_str()) &&
-                FileExists(params.output_root.c_str(), ao_path.c_str()) &&
-                FileExists(params.output_root.c_str(), parallax_path.c_str());
-
-            bool thmUpToDate = !THMNeedsPBRUpdate(
-                params.output_root.c_str(),
-                asset.base_name,
-                metallic_name, roughness_name, ao_name, parallax_name);
-
-            if (texturesExist && thmUpToDate) {
-                skipped_count++;
-                continue;
-            }
-
-            if (texturesExist && !thmUpToDate) {
-                Msg("* [PBRTextureConverter] PBR textures exist but .thm needs update: %s", asset.base_name.c_str());
-                WriteTHMFile(params.output_root.c_str(), asset.base_name,
-                            metallic_name, roughness_name, ao_name, parallax_name);
-                skipped_count++;
-                continue;
-            }
 
             Msg("* [PBRTextureConverter] PBR textures missing, running conversion: %s", asset.base_name.c_str());
 
@@ -1305,6 +1370,202 @@ bool ConvertTexturesToPBR(
         out_stats.textures_failed,
         out_stats.conversion_time_seconds);
 #endif
+
+    return out_stats.textures_failed == 0;
+}
+
+static xr_vector<u8> LoadSingleChannelDDS(const char* root_alias, const xr_string& path, u32& outWidth, u32& outHeight)
+{
+    xr_vector<u8> result;
+    outWidth = outHeight = 0;
+
+    xr_string vfs_path = path;
+    if (vfs_path.size() >= 4 && vfs_path.substr(vfs_path.size() - 4) == ".dds") {
+        vfs_path = vfs_path.substr(0, vfs_path.size() - 4);
+    }
+
+    resources::DDSData ddsData;
+    if (!resources::DDSLoader::LoadFromFile(vfs_path.c_str(), ddsData)) {
+        return result;
+    }
+
+    xr_vector<u8> rgba = DecompressDDS(ddsData, outWidth, outHeight);
+    if (rgba.empty()) {
+        return result;
+    }
+
+    const u32 pixelCount = outWidth * outHeight;
+    result.resize(pixelCount);
+
+    if (rgba.size() == pixelCount) {
+        result = std::move(rgba);
+    } else if (rgba.size() == pixelCount * 4) {
+        for (u32 i = 0; i < pixelCount; ++i) {
+            result[i] = rgba[i * 4];
+        }
+    }
+
+    return result;
+}
+
+static bool WriteTHMFileConsolidated(
+    const char* root_alias,
+    const xr_string& base_name,
+    const xr_string& pbr_name)
+{
+    xr_string thm_path = base_name + ".thm";
+
+    STextureParams params;
+    params.Clear();
+
+    string_path full_path;
+    FS.update_path(full_path, root_alias, thm_path.c_str());
+
+    if (FS.exist(full_path)) {
+        IReader* reader = FS.r_open(root_alias, thm_path.c_str());
+        if (reader) {
+            if (reader->find_chunk(THM_CHUNK_VERSION)) {}
+            if (reader->find_chunk(THM_CHUNK_DATA)) {}
+            params.Load(*reader);
+            FS.r_close(reader);
+        }
+    } else {
+        params.type = STextureParams::ttImage;
+    }
+
+    params.metallic_name = "";
+    params.roughness_name = "";
+    params.ao_name = "";
+    params.parallax_name = "";
+    params.pbr_name = pbr_name.c_str();
+
+    IWriter* writer = FS.w_open(root_alias, thm_path.c_str());
+    if (!writer) {
+        return false;
+    }
+
+    writer->open_chunk(THM_CHUNK_VERSION);
+    writer->w_u16(1);
+    writer->close_chunk();
+
+    writer->open_chunk(THM_CHUNK_TYPE);
+    writer->w_u32(0);
+    writer->close_chunk();
+
+    params.Save(*writer);
+    FS.w_close(writer);
+
+    return true;
+}
+
+static bool DeleteFile(const char* root_alias, const xr_string& path)
+{
+    string_path full_path;
+    FS.update_path(full_path, root_alias, path.c_str());
+
+    if (!FS.exist(full_path)) {
+        return true;
+    }
+
+    return (std::remove(full_path) == 0);
+}
+
+bool ConsolidatePBRTextures(
+    const xr_string& root_alias,
+    ConsolidationStats& out_stats,
+    ProgressCallback progress_callback)
+{
+    Msg("[PBRTextureConverter] Starting PBR texture consolidation...");
+
+    FS_FileSet metallic_files;
+    FS.file_list(metallic_files, root_alias.c_str(), FS_ListFiles, "*_metallic.dds");
+
+    out_stats.textures_found = static_cast<u32>(metallic_files.size());
+    Msg("[PBRTextureConverter] Found %u texture sets to consolidate", out_stats.textures_found);
+
+    if (metallic_files.empty()) {
+        return true;
+    }
+
+    u32 processed = 0;
+    for (const auto& file : metallic_files) {
+        xr_string metallic_path = file.name.c_str();
+        xr_string base_name = metallic_path.substr(0, metallic_path.size() - 13);
+
+        xr_string roughness_path = base_name + "_roughness.dds";
+        xr_string ao_path = base_name + "_ao.dds";
+        xr_string parallax_path = base_name + "_parallax.dds";
+        xr_string pbr_path = base_name + "_pbr.dds";
+
+        string_path pbr_full_path;
+        FS.update_path(pbr_full_path, root_alias.c_str(), pbr_path.c_str());
+        if (FS.exist(pbr_full_path)) {
+            processed++;
+            continue;
+        }
+
+        u32 width = 0, height = 0;
+        u32 tempW, tempH;
+
+        xr_vector<u8> metallicData = LoadSingleChannelDDS(root_alias.c_str(), metallic_path, width, height);
+        if (metallicData.empty()) {
+            Msg("! [PBRTextureConverter] Failed to load metallic: %s", metallic_path.c_str());
+            out_stats.textures_failed++;
+            continue;
+        }
+
+        xr_vector<u8> roughnessData = LoadSingleChannelDDS(root_alias.c_str(), roughness_path, tempW, tempH);
+        if (roughnessData.empty() || tempW != width || tempH != height) {
+            Msg("! [PBRTextureConverter] Failed to load roughness or size mismatch: %s", roughness_path.c_str());
+            out_stats.textures_failed++;
+            continue;
+        }
+
+        xr_vector<u8> aoData = LoadSingleChannelDDS(root_alias.c_str(), ao_path, tempW, tempH);
+        if (aoData.empty() || tempW != width || tempH != height) {
+            Msg("! [PBRTextureConverter] Failed to load AO or size mismatch: %s", ao_path.c_str());
+            out_stats.textures_failed++;
+            continue;
+        }
+
+        xr_vector<u8> parallaxData = LoadSingleChannelDDS(root_alias.c_str(), parallax_path, tempW, tempH);
+        if (!parallaxData.empty() && (tempW != width || tempH != height)) {
+            parallaxData.clear();
+        }
+
+        if (!WritePackedPBRDDS(root_alias.c_str(), pbr_path,
+                               metallicData.data(),
+                               roughnessData.data(),
+                               aoData.data(),
+                               parallaxData.empty() ? nullptr : parallaxData.data(),
+                               width, height, true)) {
+            Msg("! [PBRTextureConverter] Failed to write packed PBR: %s", pbr_path.c_str());
+            out_stats.textures_failed++;
+            continue;
+        }
+
+        Msg("* [PBRTextureConverter] Consolidated: %s (%ux%u)", pbr_path.c_str(), width, height);
+
+        xr_string pbr_name = base_name + "_pbr";
+        WriteTHMFileConsolidated(root_alias.c_str(), base_name, pbr_name);
+
+        if (DeleteFile(root_alias.c_str(), metallic_path)) out_stats.files_deleted++;
+        if (DeleteFile(root_alias.c_str(), roughness_path)) out_stats.files_deleted++;
+        if (DeleteFile(root_alias.c_str(), ao_path)) out_stats.files_deleted++;
+        if (!parallaxData.empty() && DeleteFile(root_alias.c_str(), parallax_path)) out_stats.files_deleted++;
+
+        out_stats.textures_consolidated++;
+        processed++;
+
+        if (progress_callback) {
+            float progress = static_cast<float>(processed) / static_cast<float>(out_stats.textures_found);
+            xr_string status = "Consolidating " + base_name + "...";
+            progress_callback(progress, status.c_str());
+        }
+    }
+
+    Msg("[PBRTextureConverter] Consolidation complete: %u consolidated, %u failed, %u files deleted",
+        out_stats.textures_consolidated, out_stats.textures_failed, out_stats.files_deleted);
 
     return out_stats.textures_failed == 0;
 }

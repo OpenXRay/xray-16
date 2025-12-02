@@ -100,6 +100,19 @@ bool ConvertTexturesToPBR(
     ProgressCallback progress_callback = nullptr
 );
 
+struct ConsolidationStats {
+    u32 textures_found = 0;
+    u32 textures_consolidated = 0;
+    u32 textures_failed = 0;
+    u32 files_deleted = 0;
+};
+
+bool ConsolidatePBRTextures(
+    const xr_string& root_alias,
+    ConsolidationStats& out_stats,
+    ProgressCallback progress_callback = nullptr
+);
+
 inline TextureInventory BuildDefaultTextureInventory() {
     TextureScanConfig config;
     config.texture_roots = { "$game_textures$" };
