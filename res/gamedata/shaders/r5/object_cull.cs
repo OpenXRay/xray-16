@@ -107,16 +107,18 @@ bool OcclusionTestSphere(float3 center, float radius)
     float2 minNDC = ndc.xy - ndcSize;
     float2 maxNDC = ndc.xy + ndcSize;
 
-    // Early exit if completely outside screen
+    // CONSERVATIVE: If screen-space box is completely outside after passing frustum test,
+    // mark as visible anyway - precision differences between world-space frustum and
+    // screen-space projection can cause edge cases. Let the rasterizer handle it.
     if (any(minNDC > 1.0) || any(maxNDC < -1.0))
-        return false;  // Definitely not visible
+        return true;  // Conservatively visible
 
     // ─────────────────────────────────────────────────────
     //  3. CONVERT TO UV AND SELECT MIP
     // ─────────────────────────────────────────────────────
-    // Convert NDC to UV space [0, 1]
-    float2 minUV = minNDC * 0.5 + 0.5;
-    float2 maxUV = maxNDC * 0.5 + 0.5;
+    // Convert NDC to UV space [0, 1] and clamp to valid range
+    float2 minUV = saturate(minNDC * 0.5 + 0.5);
+    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
 
     // Flip Y (NDC Y+ is up, UV Y+ is down)
     minUV.y = 1.0 - minUV.y;

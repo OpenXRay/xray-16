@@ -112,23 +112,22 @@ u32 TextureAtlas::GetTextureSlice(const shared_str& textureName) const
 
 void TextureAtlas::EnsureCapacity(u32 requiredSlices)
 {
-    if (m_arrayCapacity >= requiredSlices)
+    // Already have the array - no resize needed (we allocate full capacity upfront)
+    if (m_array)
         return;
 
-    // Grow by 2x, minimum 64, max MAX_TEXTURES_PER_ATLAS
-    u32 newCapacity = std::max(64u, m_arrayCapacity * 2);
-    while (newCapacity < requiredSlices)
-        newCapacity *= 2;
-    newCapacity = std::min(newCapacity, MAX_TEXTURES_PER_ATLAS);
+    // Allocate reasonable capacity upfront to avoid resize issues
+    // 512 slices × 1024×1024 × 4 bytes = 2 GB per atlas (reasonable for most levels)
+    // If a level needs more, we'll log a warning when hitting capacity
+    constexpr u32 INITIAL_CAPACITY = 512;
 
-    // Create new array
     nvrhi::TextureDesc desc;
     desc.width = ATLAS_TEXTURE_SIZE;
     desc.height = ATLAS_TEXTURE_SIZE;
-    desc.arraySize = newCapacity;
+    desc.arraySize = INITIAL_CAPACITY;
     desc.dimension = nvrhi::TextureDimension::Texture2DArray;
     desc.format = nvrhi::Format::RGBA8_UNORM;
-    desc.mipLevels = 1;  // TODO: Support mipmaps
+    desc.mipLevels = 1;
     desc.sampleCount = 1;
     desc.isShaderResource = true;
     desc.initialState = nvrhi::ResourceStates::ShaderResource;
@@ -139,21 +138,18 @@ void TextureAtlas::EnsureCapacity(u32 requiredSlices)
     desc.debugName = debugName;
 
     nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
-    nvrhi::TextureHandle newArray = nvDevice->createTexture(desc);
+    m_array = nvDevice->createTexture(desc);
 
-    if (!newArray) {
+    if (!m_array) {
         Msg("! [BindlessAtlas] Failed to create %s Texture2DArray (%ux%u x %u slices)",
-            GetAtlasTypeName(m_type), ATLAS_TEXTURE_SIZE, ATLAS_TEXTURE_SIZE, newCapacity);
+            GetAtlasTypeName(m_type), ATLAS_TEXTURE_SIZE, ATLAS_TEXTURE_SIZE, INITIAL_CAPACITY);
         return;
     }
 
-    // TODO: Copy existing slices when growing
-
-    m_array = newArray;
-    m_arrayCapacity = newCapacity;
+    m_arrayCapacity = INITIAL_CAPACITY;
 
     Msg("* [BindlessAtlas] Created %s array: %ux%u x %u slices (RGBA8)",
-        GetAtlasTypeName(m_type), ATLAS_TEXTURE_SIZE, ATLAS_TEXTURE_SIZE, newCapacity);
+        GetAtlasTypeName(m_type), ATLAS_TEXTURE_SIZE, ATLAS_TEXTURE_SIZE, INITIAL_CAPACITY);
 }
 
 bool TextureAtlas::CopyTextureToSlice(
@@ -176,12 +172,14 @@ bool TextureAtlas::CopyTextureToSlice(
         srcDesc.format != nvrhi::Format::BGRA8_UNORM &&
         srcDesc.format != nvrhi::Format::SBGRA8_UNORM)
     {
-        // For now, skip compressed textures
-        // We need a decompression pass to convert BC1/BC3/BC5 to RGBA8
-        static bool s_warnedFormat = false;
-        if (!s_warnedFormat) {
-            s_warnedFormat = true;
-            Msg("! [BindlessAtlas] Format conversion not yet implemented - skipping compressed textures");
+        // Track how many textures we're skipping due to format
+        static u32 s_skippedCount = 0;
+        s_skippedCount++;
+
+        // Log first few and periodically after
+        if (s_skippedCount <= 5 || (s_skippedCount % 100 == 0)) {
+            Msg("! [BindlessAtlas] Skipping compressed texture (format %d) - total skipped: %u",
+                static_cast<int>(srcDesc.format), s_skippedCount);
         }
         return false;
     }

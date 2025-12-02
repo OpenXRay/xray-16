@@ -49,8 +49,15 @@ struct BindlessForwardConfig {
     // Material IDs parallel to compact draw args
     nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
 
-    // Number of visible objects from previous frame (for multi-draw count)
-    u32 previousFrameVisibleCount = 0;
+    // Compact batch indices (maps draw index → original batch index)
+    nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
+
+    // Instance data buffer (GPUInstanceData: world matrix + materialID per batch)
+    nvrhi::IBuffer* instanceBuffer = nullptr;
+
+    // Total number of objects uploaded to GPU (max possible draws)
+    // We draw all slots; culled batches have instanceCount=0 (no-op)
+    u32 totalObjectCount = 0;
 
     // Enable bindless rendering mode
     bool enabled = false;
@@ -66,7 +73,12 @@ struct BindlessForwardConfig {
     bool megaBuffersReady = false;
 
     bool IsValid() const {
-        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && previousFrameVisibleCount > 0;
+        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && totalObjectCount > 0;
+    }
+
+    // Check if GPU-driven culled rendering is available
+    bool UseGPUCulling() const {
+        return IsValid() && compactBatchIndicesBuffer && instanceBuffer;
     }
 
     bool UseMegaBuffers() const {

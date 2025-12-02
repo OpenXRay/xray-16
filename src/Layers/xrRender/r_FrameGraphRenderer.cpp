@@ -280,15 +280,6 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
-    //  READBACK GPU CULLING VISIBLE COUNT (for next frame)
-    // ═══════════════════════════════════════════════════════
-    // After GPU culling executes, read back the visible count for use in
-    // next frame's bindless rendering (previousFrameVisibleCount)
-    if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled()) {
-        m_gpuCullingManager->ReadbackVisibleCount(m_renderContext.get());
-    }
-
-    // ═══════════════════════════════════════════════════════
     //  RT VISUALIZATION: View what GBufferPass is rendering
     // ═══════════════════════════════════════════════════════
     // For now, m_finalOutput is pointing to gbufferOutputs.albedo (prototype RT)
@@ -691,7 +682,9 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.enabled = true;  // TODO: Add console var to toggle bindless mode
         bindlessConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetCompactDrawArgsBuffer();
         bindlessConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetCompactMaterialIDBuffer();
-        bindlessConfig.previousFrameVisibleCount = m_gpuCullingManager->GetPreviousFrameVisibleCount();
+        bindlessConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetCompactBatchIndicesBuffer();
+        bindlessConfig.instanceBuffer = m_gpuCullingManager->GetInstanceBuffer();
+        bindlessConfig.totalObjectCount = m_gpuCullingManager->GetObjectCount();
 
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
@@ -701,18 +694,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
             bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
             bindlessConfig.megaBuffersReady = true;
-        }
-
-        // Debug: Log bindless config state periodically
-        static u32 s_debugCounter = 0;
-        if (++s_debugCounter % 300 == 1) {
-            Msg("* [Bindless] Config: enabled=%d, drawArgs=%p, matIDs=%p, prevCount=%u, IsValid=%d, megaReady=%d",
-                bindlessConfig.enabled,
-                bindlessConfig.compactDrawArgsBuffer,
-                bindlessConfig.compactMaterialIDBuffer,
-                bindlessConfig.previousFrameVisibleCount,
-                bindlessConfig.IsValid(),
-                bindlessConfig.megaBuffersReady);
         }
     }
 

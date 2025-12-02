@@ -25,6 +25,7 @@
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"  // For PBR texture slot constants
 #include "Layers/xrRender/Bindless/TextureAtlas.h"            // Bindless texture atlases
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"          // Bindless material buffer
+#include "Layers/xrRender/r_constants.h"                      // For R_constant_setup
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -2525,33 +2526,48 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             }
         }
 
-        // Get normal map (slot 1 if exists)
-        for (size_t i = 0; i < texList->size(); i++) {
-            if ((*texList)[i].first == 1) {  // Normal map slot
-                const shared_str& normalName = (*texList)[i].second;
-                if (normalName.c_str() && normalName[0]) {
-                    resources::TextureHandle handle = texManager->LoadTexture(normalName.c_str());
-                    if (handle.IsValid()) {
-                        nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
-                        if (nvrhiTex) {
-                            TextureRegisterResult result = atlasManager.Normal().RegisterTexture(ctx, normalName, nvrhiTex);
-                            if (result.IsValid()) {
-                                matData.normalSlice = result.sliceRef.packed;
-                                matData.flags |= MAT_FLAG_HAS_NORMAL;
-                                updated = true;
-                            }
+        // Get normal/bump map from texture description (proper X-Ray way)
+        auto& texDescMgr = RImplementation.Resources->m_textures_description;
+        shared_str bumpName = texDescMgr.GetBumpName(diffuseName);
+        if (bumpName.size() && bumpName[0]) {
+            resources::TextureHandle handle = texManager->LoadTexture(bumpName.c_str());
+            if (handle.IsValid()) {
+                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                if (nvrhiTex) {
+                    TextureRegisterResult result = atlasManager.Normal().RegisterTexture(ctx, bumpName, nvrhiTex);
+                    if (result.IsValid()) {
+                        matData.normalSlice = result.sliceRef.packed;
+                        matData.flags |= MAT_FLAG_HAS_NORMAL;
+                        updated = true;
+                    }
+                }
+            }
+        }
+
+        // Get detail texture from texture description
+        LPCSTR detailTexName = nullptr;
+        R_constant_setup* detailCS = nullptr;
+        if (texDescMgr.GetDetailTexture(diffuseName, detailTexName, detailCS)) {
+            if (detailTexName && detailTexName[0]) {
+                resources::TextureHandle handle = texManager->LoadTexture(detailTexName);
+                if (handle.IsValid()) {
+                    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                    if (nvrhiTex) {
+                        TextureRegisterResult result = atlasManager.Detail().RegisterTexture(ctx, detailTexName, nvrhiTex);
+                        if (result.IsValid()) {
+                            matData.detailSlice = result.sliceRef.packed;
+                            matData.detailScale = texDescMgr.GetDetailScale(diffuseName);
+                            matData.flags |= MAT_FLAG_HAS_DETAIL;
+                            updated = true;
                         }
                     }
                 }
-                break;
             }
         }
 
         // Get PBR texture from texture description metadata
         // Prefer consolidated _pbr texture, fallback to legacy _metallic
         if (diffuseName.c_str() && diffuseName[0]) {
-            auto& texDescMgr = RImplementation.Resources->m_textures_description;
-
             // Helper to register PBR texture to atlas
             auto registerPBRTexture = [&](const shared_str& pbrTexName) -> TextureRegisterResult {
                 if (pbrTexName.empty())
@@ -2591,7 +2607,14 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
     // Upload updated materials to GPU
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
+
+        // Log atlas population statistics
         Msg("* [MaterialCache] Finalized %u pending materials", processedCount);
+        Msg("* [MaterialCache] Atlas usage: Diffuse=%u, Normal=%u, Detail=%u, PBR=%u",
+            atlasManager.Diffuse().GetTextureCount(),
+            atlasManager.Normal().GetTextureCount(),
+            atlasManager.Detail().GetTextureCount(),
+            atlasManager.PBR().GetTextureCount());
     }
 }
 

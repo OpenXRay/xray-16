@@ -499,11 +499,6 @@ void renderDepthOnlyGeometry(
 
                 bindlessDraws++;
             }
-
-            static u32 s_logCounter = 0;
-            if (++s_logCounter % 300 == 0) {
-                Msg("* [BindlessDepth] Rendered %u bindless draws in depth prepass", bindlessDraws);
-            }
         }
     }
 

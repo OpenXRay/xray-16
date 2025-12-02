@@ -483,7 +483,7 @@ void renderBindlessForward(
         layoutDesc.bindings = {
             nvrhi::BindingLayoutItem::ConstantBuffer(2),  // static_globals (b2) - engine matrices
             nvrhi::BindingLayoutItem::ConstantBuffer(4),  // LightingConstants (b4)
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),  // PerDrawConstants (b5) - world matrix + materialID
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),  // PerDrawConstants (b5) - drawIndex (GPU-driven) or world+materialID (legacy)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),   // g_Materials
             nvrhi::BindingLayoutItem::Sampler(0),
             // 4 texture atlas arrays (simplified from 72)
@@ -491,6 +491,10 @@ void renderBindlessForward(
             nvrhi::BindingLayoutItem::Texture_SRV(11),    // g_NormalAtlas
             nvrhi::BindingLayoutItem::Texture_SRV(12),    // g_DetailAtlas
             nvrhi::BindingLayoutItem::Texture_SRV(13),    // g_PBRAtlas
+            // GPU-driven rendering buffers (for culled rendering)
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),  // g_InstanceData (world matrices)
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),  // g_CompactBatchIndices
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),  // g_CompactMaterialIDs
         };
         s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
 
@@ -640,13 +644,12 @@ void renderBindlessForward(
 
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
-    // Per-draw constants struct - 80 bytes (float4x4 + uint + padding)
+    // Per-draw constants struct - 16 bytes (just draw index)
     struct PerDrawConstants {
-        Fmatrix world;
-        u32 materialID;   // Direct material ID - no indirection through g_DrawMaterialIDs
-        float padding[3];
+        u32 drawIndex;        // Draw index into compact buffers
+        u32 padding[3];
     };
-    static_assert(sizeof(PerDrawConstants) == 80, "PerDrawConstants must be 80 bytes");
+    static_assert(sizeof(PerDrawConstants) == 16, "PerDrawConstants must be 16 bytes");
 
     cbDesc.byteSize = sizeof(PerDrawConstants);  // Must match exactly!
     auto perDrawCB = nvDevice->createBuffer(cbDesc);
@@ -678,7 +681,7 @@ void renderBindlessForward(
     bindDesc.bindings = {
         nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),  // b2 - engine matrices (m_VP, etc.)
         nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),       // b4 - our lighting constants
-        nvrhi::BindingSetItem::ConstantBuffer(5, perDrawCB),        // b5 - per-draw world matrix + materialID
+        nvrhi::BindingSetItem::ConstantBuffer(5, perDrawCB),        // b5 - per-draw constants
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
         // 4 texture atlas arrays
@@ -686,6 +689,10 @@ void renderBindlessForward(
         nvrhi::BindingSetItem::Texture_SRV(11, getAtlasOrPlaceholder(AtlasType::Normal)),
         nvrhi::BindingSetItem::Texture_SRV(12, getAtlasOrPlaceholder(AtlasType::Detail)),
         nvrhi::BindingSetItem::Texture_SRV(13, getAtlasOrPlaceholder(AtlasType::PBR)),
+        // GPU-driven rendering buffers (may be null if not using GPU culling)
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.instanceBuffer),           // g_InstanceData
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.compactBatchIndicesBuffer), // g_CompactBatchIndices
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.compactMaterialIDBuffer),  // g_CompactMaterialIDs
     };
 
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
@@ -699,117 +706,65 @@ void renderBindlessForward(
     // ═══════════════════════════════════════════════════════
     cmdList->beginMarker("Bindless Forward");
 
-    const auto& batches = geometry->GetBatches();
-    // Don't limit draw count by GPU culling results - we're using direct draw, not indirect
-    // GPU culling's previousFrameVisibleCount is for indirect draw path only
-    u32 drawCount = static_cast<u32>(batches.size());
-
     // Set viewport
     const auto& rtDesc = colorRT->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
 
-    // Check if mega-buffers are available for GPU-driven rendering
-    const bool useMegaBuffers = config.UseMegaBuffers();
+    // Track stats
+    static u32 s_gpuDrivenDraws = 0;
 
-    // Track mega-buffer vs legacy draw counts
-    static u32 s_megaBufferDraws = 0;
-    static u32 s_legacyDraws = 0;
-    static u32 s_skippedNoMaterial = 0;
-    static u32 s_skippedNoAlloc = 0;
-    static u32 s_visTypeCounts[16] = {0};  // Track visual types being rendered
+    // ═══════════════════════════════════════════════════════
+    //  GPU-DRIVEN CULLED RENDERING
+    // ═══════════════════════════════════════════════════════
+    // Only visible batches are drawn using indirect draw commands
+    // Draw args come from GPU culling's compact buffer
+    if (!config.UseGPUCulling() || !config.UseMegaBuffers()) {
+        // GPU culling not available - skip bindless forward
+        // (regular deferred path will handle rendering)
+        cmdList->endMarker();
+        return;
+    }
 
-    for (u32 i = 0; i < drawCount; i++) {
-        const auto& batch = batches[i];
+    cmdList->beginMarker("GPU-Driven Culled");
 
-        // Skip batches with invalid material ID
-        if (batch.bindlessMaterialID == UINT32_MAX) {
-            s_skippedNoMaterial++;
-            continue;
-        }
+    // Draw ALL object slots - culled batches have instanceCount=0 (GPU skips them)
+    // This avoids needing CPU readback of visible count from previous frame
+    const u32 visibleCount = config.totalObjectCount;
 
-        // Track visual type
-        if (batch.visual && batch.visual->Type < 16) {
-            s_visTypeCounts[batch.visual->Type]++;
-        }
+    // sizeof(IndirectDrawArgs) = 20 bytes per draw
+    constexpr u32 INDIRECT_ARGS_SIZE = 20;
 
-        // No visual type filtering - rely on megaBufferAlloc.valid instead
-        // If geometry was successfully converted during level load, it has a valid allocation
-        // Unsupported formats (skeleton animations, particles) won't have valid allocations
+    // Set up base graphics state with indirect params buffer
+    nvrhi::GraphicsState state;
+    state.pipeline = s_bindlessPipeline;
+    state.framebuffer = framebuffer;
+    state.bindings = { bindingSet };
+    state.vertexBuffers = { {config.megaVertexBuffer, 0, 0} };
+    state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+    state.indirectParams = config.compactDrawArgsBuffer;  // Indirect args buffer
+    state.viewport.addViewport(viewport);
+    state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-        // Determine which buffers to use
-        nvrhi::IBuffer* vb = nullptr;
-        nvrhi::IBuffer* ib = nullptr;
-        nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
-        u32 startIndex = batch.startIndex;
-        s32 baseVertex = batch.baseVertex;
-
-        if (useMegaBuffers && batch.megaBufferAlloc.valid) {
-            // GPU-driven path: use unified mega-buffers
-            vb = config.megaVertexBuffer;
-            ib = config.megaIndexBuffer;
-            indexFormat = nvrhi::Format::R32_UINT;  // Mega-buffer uses 32-bit indices
-            startIndex = batch.megaBufferAlloc.indexOffset;
-            baseVertex = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
-            s_megaBufferDraws++;
-        } else {
-            // Legacy path: use per-batch D3D11 buffers
-            if (!batch.vertexBuffer || !batch.indexBuffer) {
-                s_skippedNoAlloc++;
-                continue;
-            }
-            vb = batch.vertexBuffer.Get();
-            ib = batch.indexBuffer.Get();
-            s_legacyDraws++;
-        }
-
-        // Update per-draw constants (PerDrawConstants struct defined above)
-        // CRITICAL: HLSL expects row-major matrices, X-Ray uses column-major
-        // Must transpose to match FillGlobalConstants convention for m_VP
-        PerDrawConstants perDrawData;
-        perDrawData.world.transpose(batch.worldMatrix);
-        perDrawData.materialID = batch.bindlessMaterialID;  // Direct material ID lookup
-        perDrawData.padding[0] = perDrawData.padding[1] = perDrawData.padding[2] = 0.0f;
+    // Draw each visible batch using indirect draw args
+    for (u32 i = 0; i < visibleCount; i++) {
+        // Update per-draw constants with draw index (shader looks up instance data)
+        struct DrawIndexConstant {
+            u32 drawIndex;
+            u32 padding[3];
+        } perDrawData;
+        perDrawData.drawIndex = i;
+        perDrawData.padding[0] = perDrawData.padding[1] = perDrawData.padding[2] = 0;
         cmdList->writeBuffer(perDrawCB, &perDrawData, sizeof(perDrawData));
-
-        // Set graphics state
-        nvrhi::GraphicsState state;
-        state.pipeline = s_bindlessPipeline;
-        state.framebuffer = framebuffer;
-        state.bindings = { bindingSet };
-        state.vertexBuffers = { {vb, 0, 0} };
-        state.indexBuffer = { ib, indexFormat, 0 };
-        state.viewport.addViewport(viewport);
-        state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
         cmdList->setGraphicsState(state);
 
-        // Draw using computed parameters
-        nvrhi::DrawArguments drawArgs;
-        drawArgs.vertexCount = batch.indexCount;          // Index count for indexed draw
-        drawArgs.startIndexLocation = startIndex;         // Start offset in index buffer
-        drawArgs.startVertexLocation = baseVertex;        // Base vertex offset in vertex buffer
-        drawArgs.instanceCount = 1;
-        drawArgs.startInstanceLocation = 0;
-        cmdList->drawIndexed(drawArgs);
+        // Draw using indirect args from compact buffer at offset
+        cmdList->drawIndexedIndirect(i * INDIRECT_ARGS_SIZE, 1);
     }
 
-    cmdList->endMarker();
-
-    // Only log occasionally to avoid spam
-    static u32 s_logCounter = 0;
-    if (++s_logCounter % 300 == 0) {
-        Msg("* [BindlessForward] Rendered %u draws (mega: %u, legacy: %u, skipped: noMat=%u noAlloc=%u)",
-            drawCount, s_megaBufferDraws, s_legacyDraws, s_skippedNoMaterial, s_skippedNoAlloc);
-        // MT enum: 0=NORMAL, 1=HIERRARHY, 2=PROGRESSIVE, 3=SKEL_ANIM, 4=SKEL_PM, 5=SKEL_ST, 6=LOD, 7=TREE_ST, 8=PARTICLE, 9=PARTICLE_GRP, 10=SKEL_RIGID, 11=TREE_PM
-        Msg("  VisTypes: NORMAL=%u, HIERRARHY=%u, PROGRESSIVE=%u, TREE_ST=%u, TREE_PM=%u, LOD=%u",
-            s_visTypeCounts[0], s_visTypeCounts[1], s_visTypeCounts[2],
-            s_visTypeCounts[7], s_visTypeCounts[11], s_visTypeCounts[6]);
-        s_megaBufferDraws = 0;
-        s_legacyDraws = 0;
-        s_skippedNoMaterial = 0;
-        s_skippedNoAlloc = 0;
-        std::memset(s_visTypeCounts, 0, sizeof(s_visTypeCounts));
-    }
+    s_gpuDrivenDraws += visibleCount;
+    cmdList->endMarker();  // GPU-Driven Culled
+    cmdList->endMarker();  // Bindless Forward
 }
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
