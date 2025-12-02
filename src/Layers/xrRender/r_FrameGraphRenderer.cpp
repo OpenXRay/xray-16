@@ -25,6 +25,8 @@
 #include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "GPUCullingManager.h"
+#include "Bindless/TextureAtlas.h"
+#include "Bindless/MaterialBuffer.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
@@ -167,6 +169,10 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Compile();
 
     m_framegraph->Execute();
+
+    if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled()) {
+        m_gpuCullingManager->ReadbackVisibleCount(m_renderContext.get());
+    }
 
     PresentToBackbuffer();
 
@@ -316,13 +322,21 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
 
+    passes::BindlessDepthConfig bindlessDepthConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
+        bindlessDepthConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
+        bindlessDepthConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
+        bindlessDepthConfig.megaBuffersReady = true;
+    }
+
     framegraph::VirtualResourceHandle depthBuffer = passes::setupDepthPrepass(
         *m_framegraph,
         m_device,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
-        height
+        height,
+        bindlessDepthConfig
     );
 
     auto hizOutput = passes::setupHiZBuildPass(
@@ -339,6 +353,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->Initialize(m_device);
+
+        bindless::TextureAtlasManager::Instance().Initialize(m_device);
+        bindless::MaterialBuffer::Instance().Initialize(m_device);
+        bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
 
         if (m_gpuCullingManager->IsEnabled()) {
 
@@ -395,6 +413,31 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
+    passes::BindlessForwardConfig bindlessConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetCompactDrawArgsBuffer()) {
+        bindlessConfig.enabled = true;
+        bindlessConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetCompactDrawArgsBuffer();
+        bindlessConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetCompactMaterialIDBuffer();
+        bindlessConfig.previousFrameVisibleCount = m_gpuCullingManager->GetPreviousFrameVisibleCount();
+
+        if (m_gpuCullingManager->AreMegaBuffersReady()) {
+            bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
+            bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
+            bindlessConfig.megaBuffersReady = true;
+        }
+
+        static u32 s_debugCounter = 0;
+        if (++s_debugCounter % 300 == 1) {
+            Msg("* [Bindless] Config: enabled=%d, drawArgs=%p, matIDs=%p, prevCount=%u, IsValid=%d, megaReady=%d",
+                bindlessConfig.enabled,
+                bindlessConfig.compactDrawArgsBuffer,
+                bindlessConfig.compactMaterialIDBuffer,
+                bindlessConfig.previousFrameVisibleCount,
+                bindlessConfig.IsValid(),
+                bindlessConfig.megaBuffersReady);
+        }
+    }
+
     auto forwardOutputs = passes::setupForwardColorPass(
         *m_framegraph,
         m_device,
@@ -404,7 +447,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache.get(),
         width,
         height,
-        drawArgsBuffer
+        drawArgsBuffer,
+        bindlessConfig
     );
 
     if (m_gpuCullingManager && m_gpuCullingManager->IsDebugEnabled() && hizOutput.pyramid.is_valid()) {
@@ -722,6 +766,27 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         return false;
     }
 
+    if (m_materialCache) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+    }
+
+    if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
+        batch.megaBufferAlloc = m_gpuCullingManager->GetMeshAllocation(
+            meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
+            meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+            meshVisual->useAlternativeGeom
+        );
+
+        static int s_allocDebug = 0;
+        if (s_allocDebug < 10 && !batch.megaBufferAlloc.valid) {
+            Msg("! [MegaBuffer] Invalid alloc: vbPool=%u, vBase=%u, vCount=%u, ibPool=%u, iBase=%u, iCount=%u, alt=%d",
+                meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
+                meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+                meshVisual->useAlternativeGeom ? 1 : 0);
+            s_allocDebug++;
+        }
+    }
+
     m_geometryCollector->Submit(batch);
     return true;
 }
@@ -986,7 +1051,25 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     u32 culledStatic = 0;
 
-    for (dxRender_Visual* visual : staticVisuals) {
+    xr_set<dxRender_Visual*> uniqueVisuals;
+    u32 duplicateCount = 0;
+    for (dxRender_Visual* v : staticVisuals) {
+        if (uniqueVisuals.count(v)) {
+            duplicateCount++;
+        } else {
+            uniqueVisuals.insert(v);
+        }
+    }
+    if (duplicateCount > 0) {
+        static bool s_loggedDuplicates = false;
+        if (!s_loggedDuplicates) {
+            Msg("! [CollectVisibleGeometry] Found %u duplicate visuals in staticVisuals (total: %zu, unique: %zu)",
+                duplicateCount, staticVisuals.size(), uniqueVisuals.size());
+            s_loggedDuplicates = true;
+        }
+    }
+
+    for (dxRender_Visual* visual : uniqueVisuals) {
         if (!frustum.testSphere_dirty(visual->vis.sphere.P, visual->vis.sphere.R)) {
             culledStatic++;
             continue;

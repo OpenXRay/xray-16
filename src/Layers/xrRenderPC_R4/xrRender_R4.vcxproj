@@ -87,6 +87,11 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h" />
+    <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
+    <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
+    <ClInclude Include="..\xrRender\Bindless\TextureAtlas.h" />
+    <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
+    <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h" />
     <ClInclude Include="..\xrRender\blenders\dx11RainBlender.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ConstantBuffer.h" />
@@ -309,6 +314,9 @@
     <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\TextureAtlas.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_detail_still_deferred.cpp" />
@@ -618,7 +626,6 @@
     <PropertyGroup>
       <ONNXRuntimeDir>$(xrExternals)onnxruntime</ONNXRuntimeDir>
       <ONNXRuntimeBuildDir>$(ONNXRuntimeDir)\vs_build</ONNXRuntimeBuildDir>
-
       <!-- CUDA/cuDNN/TensorRT paths: Use environment variables if set, otherwise use detected defaults -->
       <!-- Users can override by setting: CUDA_HOME, CUDNN_HOME, TENSORRT_HOME environment variables -->
       <CudaHome Condition="'$(CUDA_HOME)'!=''">$(CUDA_HOME)</CudaHome>
@@ -627,7 +634,6 @@
       <CudnnHome Condition="'$(CUDNN_HOME)'==''">C:\Program Files\NVIDIA GPU Computing Toolkit\CUDNN\v9.16.0.29</CudnnHome>
       <TensorRTHome Condition="'$(TENSORRT_HOME)'!=''">$(TENSORRT_HOME)</TensorRTHome>
       <TensorRTHome Condition="'$(TENSORRT_HOME)'==''">C:\Program Files\NVIDIA GPU Computing Toolkit\TensorRT-10.14.1.48</TensorRTHome>
-
       <ONNXCMakeOptions>-DONNX_USE_MSVC_STATIC_RUNTIME=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF -Donnxruntime_BUILD_SHARED_LIB=ON -Donnxruntime_BUILD_UNIT_TESTS=OFF -Donnxruntime_USE_DML=OFF -Donnxruntime_USE_CUDA=ON -Donnxruntime_USE_TENSORRT=ON -Donnxruntime_CUDA_HOME="$(CudaHome)" -Donnxruntime_CUDNN_HOME="$(CudnnHome)" -Donnxruntime_TENSORRT_HOME="$(TensorRTHome)" "-DCMAKE_CXX_FLAGS=/MD /MP" "-DCMAKE_CXX_FLAGS_RELEASE=/MD /O2 /Ob2 /DNDEBUG" "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=/MD /Zi /O2 /Ob1 /DNDEBUG"</ONNXCMakeOptions>
       <!-- Map OpenXRay configurations to ONNX Runtime build configs -->
       <ONNXConfig Condition="'$(Configuration)'=='Debug'">RelWithDebInfo</ONNXConfig>
@@ -655,7 +661,6 @@
     <Copy SourceFiles="$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll')" />
     <Warning Text="[ONNX Runtime] WARNING: onnxruntime_providers_cuda.dll not found - CUDA support will not be available!" Condition="!Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')" />
     <Warning Text="[ONNX Runtime] WARNING: onnxruntime_providers_tensorrt.dll not found - TensorRT support will not be available!" Condition="!Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_tensorrt.dll')" />
-
     <!-- Copy CUDA/cuDNN/TensorRT runtime dependencies if CUDA provider was built -->
     <!-- This ensures the engine works without requiring users to modify PATH -->
     <ItemGroup Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')">
@@ -679,14 +684,14 @@
       <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_dispatch_10.dll" />
       <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_vc_plugin_10.dll" />
       <!-- Also include the builder resource DLLs for your GPU architecture -->
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_sm86_10.dll" />  <!-- RTX 3080 is SM86 -->
-      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_ptx_10.dll" />    <!-- PTX for JIT compilation -->
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_sm86_10.dll" />
+      <!-- RTX 3080 is SM86 -->
+      <TensorRTDlls Include="$(TensorRTHome)\bin\nvinfer_builder_resource_ptx_10.dll" />
+      <!-- PTX for JIT compilation -->
     </ItemGroup>
-
     <Copy SourceFiles="@(CudaRuntimeDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')" />
     <Copy SourceFiles="@(CudnnDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')" />
     <Copy SourceFiles="@(TensorRTDlls)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('%(Identity)')" />
-
     <Message Text="[ONNX Runtime] Copied CUDA/cuDNN/TensorRT runtime DLLs for zero-config GPU acceleration" Importance="high" Condition="Exists('$(ONNXRuntimeBuildDir)\$(ONNXConfig)\onnxruntime_providers_cuda.dll')" />
   </Target>
   <Target Name="ConfigureAndBuildNVRHI" BeforeTargets="PrepareForBuild">

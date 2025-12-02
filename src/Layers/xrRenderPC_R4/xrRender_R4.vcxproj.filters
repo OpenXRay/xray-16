@@ -913,6 +913,15 @@
     <ClInclude Include="..\xrRender\PBRConverter\PBRTextureConverter.h">
       <Filter>PBRConverter</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ShaderConstants.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\SkyPassSetup.h" />
+    <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
+    <ClInclude Include="..\xrRender\PBRConverter\ONNXModelRunner.h" />
+    <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
+    <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
+    <ClInclude Include="..\xrRender\Bindless\TextureAtlas.h" />
+    <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
+    <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1675,6 +1684,13 @@
     <ClCompile Include="..\xrRender\PBRConverter\PBRTextureConverter.cpp">
       <Filter>PBRConverter</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ShaderConstants.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\SkyPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
+    <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\TextureAtlas.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -220,6 +220,8 @@ struct MaterialPSO {
 
     shared_str debugName;
 
+    u32 bindlessMaterialID = UINT32_MAX;
+
     ~MaterialPSO() {
     }
 };
@@ -275,6 +277,14 @@ private:
 
     xr_map<xr_string, float> m_detailScaleCache;
 
+    xr_unordered_map<dxRender_Visual*, u32> m_visualToMaterialID;
+
+    struct PendingMaterial {
+        u32 materialID;
+        dxRender_Visual* visual;
+    };
+    xr_vector<PendingMaterial> m_pendingMaterials;
+
     resources::TextureHandle m_defaultMetallic;
     resources::TextureHandle m_defaultRoughness;
     resources::TextureHandle m_defaultAO;
@@ -318,6 +328,12 @@ public:
         nvrhi::ShaderType nvrhiStage);
 
     nvrhi::BindingSetHandle GetOrCreateBindingSet(MaterialPSO* matPSO);
+
+    u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
+
+    u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
+
+    void FinalizePendingMaterials(ng::RenderContext* ctx);
 
     xr_map<shared_str, nvrhi::ShaderHandle> m_shaderHandles;
 

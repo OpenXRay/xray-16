@@ -78,6 +78,8 @@ public:
     MaterialCache* GetTextMaterialCache() const override { return m_textMaterialCache.get(); }
     framegraph::VolatileConstantBufferPool* GetTextVCBPool() const { return m_textVCBPool.get(); }
 
+    RENDER_NAMESPACE::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
+
 private:
     bool m_enabled = false;
     ng::RenderDevice* m_device = nullptr;

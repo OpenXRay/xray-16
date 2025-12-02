@@ -2,6 +2,7 @@
 
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include <nvrhi/nvrhi.h>
 
 namespace xray::render {
     class GeometryCollector;
@@ -18,6 +19,28 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+struct BindlessForwardConfig {
+    nvrhi::IBuffer* compactDrawArgsBuffer = nullptr;
+
+    nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
+
+    u32 previousFrameVisibleCount = 0;
+
+    bool enabled = false;
+
+    nvrhi::IBuffer* megaVertexBuffer = nullptr;
+    nvrhi::IBuffer* megaIndexBuffer = nullptr;
+    bool megaBuffersReady = false;
+
+    bool IsValid() const {
+        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && previousFrameVisibleCount > 0;
+    }
+
+    bool UseMegaBuffers() const {
+        return megaBuffersReady && megaVertexBuffer && megaIndexBuffer;
+    }
+};
+
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
@@ -27,7 +50,8 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle()
+    framegraph::VirtualResourceHandle drawArgsBuffer = framegraph::VirtualResourceHandle(),
+    const BindlessForwardConfig& bindlessConfig = BindlessForwardConfig()
 );
 
 }

@@ -31,6 +31,10 @@ struct IRender_Mesh
     u32 iCount;
     u32 dwPrimitives;
 
+    u32 vbPoolID{UINT32_MAX};
+    u32 ibPoolID{UINT32_MAX};
+    bool useAlternativeGeom{false};
+
     IRender_Mesh()
     {
         p_rm_Vertices   = nullptr;
@@ -41,6 +45,9 @@ struct IRender_Mesh
         iCount          = 0;
         dwPrimitives    = 0;
         rm_geom         = nullptr;
+        vbPoolID        = UINT32_MAX;
+        ibPoolID        = UINT32_MAX;
+        useAlternativeGeom = false;
     }
     virtual ~IRender_Mesh();
 

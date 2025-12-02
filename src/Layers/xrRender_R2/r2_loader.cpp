@@ -12,6 +12,9 @@
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
 
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRender::level_Load(IReader* fs)
@@ -56,6 +59,14 @@ void CRender::level_Load(IReader* fs)
 
     if (!GEnv.isDedicatedServer)
     {
+        GPUCullingManager* gpuCulling = nullptr;
+        if (m_framegraphRenderer) {
+            gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+            if (gpuCulling) {
+                gpuCulling->BeginLevelLoad(2000000, 6000000);
+            }
+        }
+
         // VB,IB,SWI
         g_pGamePersistent->LoadTitle("st_loading_geometry");
         {
@@ -79,6 +90,10 @@ void CRender::level_Load(IReader* fs)
         chunk = fs->open_chunk(fsL_VISUALS);
         LoadVisuals(chunk);
         chunk->close();
+
+        if (gpuCulling) {
+            gpuCulling->EndLevelLoad();
+        }
 
         // Details
         g_pGamePersistent->LoadTitle("st_loading_details");
@@ -201,6 +216,12 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     R_ASSERT2(base_fs, "Could not load geometry. File not found.");
     Resources->Evict();
+
+    GPUCullingManager* gpuCulling = nullptr;
+    if (m_framegraphRenderer) {
+        gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+    }
+
     // Vertex buffers
     {
         ZoneScopedN("Load VBs");
@@ -240,6 +261,11 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             vbuffers[i].Create(vCount * vSize);
             u8* pData = static_cast<u8*>(vbuffers[i].Map());
             fs->r(pData, vCount * vSize);
+
+            if (gpuCulling) {
+                gpuCulling->RegisterVBPool(pData, vCount, vSize, dcl, alternative);
+            }
+
             vbuffers[i].Unmap(true); // upload vertex data
 
             //			fs->advance			(vCount*vSize);
@@ -268,6 +294,11 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             ibuffers[i].Create(iCount * 2);
             u8* pData = static_cast<u8*>(ibuffers[i].Map());
             fs->r(pData, iCount * 2);
+
+            if (gpuCulling) {
+                gpuCulling->RegisterIBPool(reinterpret_cast<const u16*>(pData), iCount, alternative);
+            }
+
             ibuffers[i].Unmap(true); // upload index data
 
             //			fs().advance		(iCount*2);

@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -22,13 +23,29 @@ namespace xray::render::RENDER_NAMESPACE
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+struct BindlessDepthPerDrawConstants {
+    Fmatrix world;
+    u32 materialID;
+    float padding[3];
+};
+static_assert(sizeof(BindlessDepthPerDrawConstants) == 80, "BindlessDepthPerDrawConstants must be 80 bytes");
+
+static nvrhi::ShaderHandle s_bindlessDepthVS;
+static nvrhi::InputLayoutHandle s_bindlessDepthInputLayout;
+static nvrhi::GraphicsPipelineHandle s_bindlessDepthPipeline;
+static nvrhi::BindingLayoutHandle s_bindlessDepthBindingLayout;
+static nvrhi::BufferHandle s_bindlessDepthStaticGlobalsCB;
+static nvrhi::BufferHandle s_bindlessDepthPerDrawCB;
+static bool s_bindlessDepthInitialized = false;
+
 void renderDepthOnlyGeometry(
     ng::RenderContext* ctx,
     ng::RenderDevice* device,
     const GeometryCollector* geometry,
     nvrhi::ITexture* depthRT,
     MaterialCache* materialCache,
-    const framegraph::FrameGraph& fg)
+    const framegraph::FrameGraph& fg,
+    const BindlessDepthConfig& bindlessConfig = {})
 {
     using RENDER_NAMESPACE::CSkeletonX_ST;
     using RENDER_NAMESPACE::CSkeletonX_PM;
@@ -103,6 +120,10 @@ void renderDepthOnlyGeometry(
 
     for (const auto& batch : batches) {
         if (!batch.IsOpaque()) {
+            continue;
+        }
+
+        if (batch.megaBufferAlloc.valid) {
             continue;
         }
 
@@ -219,6 +240,174 @@ void renderDepthOnlyGeometry(
         ctx->DrawIndexed(batch.indexCount, batch.startIndex, batch.baseVertex);
     }
 
+    if (bindlessConfig.UseMegaBuffers()) {
+        nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+        nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+
+        if (!s_bindlessDepthInitialized) {
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            if (!shaderLoader) {
+                Msg("! [BindlessDepth] ShaderLoader not available");
+            }
+            else {
+                auto vsResult = shaderLoader->LoadVertexShader("bindless_depth", "main");
+                if (!vsResult.handle) {
+                    Msg("! [BindlessDepth] Failed to load bindless_depth.vs");
+                }
+                else {
+                    s_bindlessDepthVS = vsResult.handle;
+
+                    constexpr u32 vertexStride = 48;
+                    nvrhi::VertexAttributeDesc vertexAttribs[] = {
+                        nvrhi::VertexAttributeDesc()
+                            .setName("POSITION")
+                            .setFormat(nvrhi::Format::RGB32_FLOAT)
+                            .setOffset(0)
+                            .setElementStride(vertexStride),
+                        nvrhi::VertexAttributeDesc()
+                            .setName("NORMAL")
+                            .setFormat(nvrhi::Format::BGRA8_UNORM)
+                            .setOffset(12)
+                            .setElementStride(vertexStride),
+                        nvrhi::VertexAttributeDesc()
+                            .setName("TANGENT")
+                            .setFormat(nvrhi::Format::BGRA8_UNORM)
+                            .setOffset(16)
+                            .setElementStride(vertexStride),
+                        nvrhi::VertexAttributeDesc()
+                            .setName("BINORMAL")
+                            .setFormat(nvrhi::Format::BGRA8_UNORM)
+                            .setOffset(20)
+                            .setElementStride(vertexStride),
+                        nvrhi::VertexAttributeDesc()
+                            .setName("TEXCOORD")
+                            .setFormat(nvrhi::Format::RG32_FLOAT)
+                            .setArraySize(2)
+                            .setOffset(24)
+                            .setElementStride(vertexStride),
+                        nvrhi::VertexAttributeDesc()
+                            .setName("COLOR")
+                            .setFormat(nvrhi::Format::BGRA8_UNORM)
+                            .setOffset(40)
+                            .setElementStride(vertexStride),
+                    };
+                    s_bindlessDepthInputLayout = nvDevice->createInputLayout(
+                        vertexAttribs, std::size(vertexAttribs), s_bindlessDepthVS);
+
+                    nvrhi::BindingLayoutDesc bindLayoutDesc;
+                    bindLayoutDesc.visibility = nvrhi::ShaderType::Vertex;
+                    bindLayoutDesc.bindings = {
+                        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+                        nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+                    };
+                    s_bindlessDepthBindingLayout = nvDevice->createBindingLayout(bindLayoutDesc);
+
+                    nvrhi::BufferDesc globalsCBDesc;
+                    globalsCBDesc.debugName = "BindlessDepthStaticGlobalsCB";
+                    globalsCBDesc.byteSize = sizeof(StaticGlobals);
+                    globalsCBDesc.isConstantBuffer = true;
+                    globalsCBDesc.isVolatile = true;
+                    globalsCBDesc.maxVersions = 16;
+                    s_bindlessDepthStaticGlobalsCB = nvDevice->createBuffer(globalsCBDesc);
+
+                    nvrhi::BufferDesc cbDesc;
+                    cbDesc.debugName = "BindlessDepthPerDrawCB";
+                    cbDesc.byteSize = sizeof(BindlessDepthPerDrawConstants);
+                    cbDesc.isConstantBuffer = true;
+                    cbDesc.isVolatile = true;
+                    cbDesc.maxVersions = 256;
+                    s_bindlessDepthPerDrawCB = nvDevice->createBuffer(cbDesc);
+
+                    nvrhi::GraphicsPipelineDesc pipeDesc;
+                    pipeDesc.VS = s_bindlessDepthVS;
+                    pipeDesc.PS = nullptr;
+                    pipeDesc.inputLayout = s_bindlessDepthInputLayout;
+                    pipeDesc.bindingLayouts = { s_bindlessDepthBindingLayout };
+                    pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+                    pipeDesc.renderState.depthStencilState.depthTestEnable = true;
+                    pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+                    pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::Less;
+                    pipeDesc.renderState.rasterState.frontCounterClockwise = false;
+                    pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+
+                    nvrhi::FramebufferDesc fbDesc;
+                    fbDesc.setDepthAttachment(depthRT);
+
+                    nvrhi::FramebufferHandle fb = nvDevice->createFramebuffer(fbDesc);
+                    s_bindlessDepthPipeline = nvDevice->createGraphicsPipeline(pipeDesc, fb);
+
+                    if (s_bindlessDepthPipeline) {
+                        Msg("* [BindlessDepth] Pipeline created successfully");
+                        s_bindlessDepthInitialized = true;
+                    } else {
+                        Msg("! [BindlessDepth] Failed to create pipeline");
+                    }
+                }
+            }
+        }
+
+        if (s_bindlessDepthInitialized && s_bindlessDepthPipeline) {
+            nvrhi::FramebufferDesc fbDesc;
+            fbDesc.setDepthAttachment(depthRT);
+            nvrhi::FramebufferHandle framebuffer = nvDevice->createFramebuffer(fbDesc);
+
+            const auto& depthDesc = depthRT->getDesc();
+            nvrhi::Viewport viewport(0.0f, static_cast<float>(depthDesc.width),
+                                     0.0f, static_cast<float>(depthDesc.height), 0.0f, 1.0f);
+
+            StaticGlobals staticGlobals = {};
+            FillGlobalConstants(staticGlobals);
+            cmdList->writeBuffer(s_bindlessDepthStaticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
+
+            u32 bindlessDraws = 0;
+
+            for (const auto& batch : batches) {
+                if (!batch.IsOpaque() || !batch.megaBufferAlloc.valid) {
+                    continue;
+                }
+
+                BindlessDepthPerDrawConstants perDrawData;
+                perDrawData.world.transpose(batch.worldMatrix);
+                perDrawData.materialID = batch.bindlessMaterialID;
+                perDrawData.padding[0] = perDrawData.padding[1] = perDrawData.padding[2] = 0.0f;
+                cmdList->writeBuffer(s_bindlessDepthPerDrawCB, &perDrawData, sizeof(perDrawData));
+
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(2, s_bindlessDepthStaticGlobalsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(5, s_bindlessDepthPerDrawCB),
+                };
+                auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessDepthBindingLayout);
+
+                nvrhi::GraphicsState state;
+                state.pipeline = s_bindlessDepthPipeline;
+                state.framebuffer = framebuffer;
+                state.bindings = { bindingSet };
+                state.vertexBuffers = { {bindlessConfig.megaVertexBuffer, 0, 0} };
+                state.indexBuffer = { bindlessConfig.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+                state.viewport.addViewport(viewport);
+                state.viewport.addScissorRect(nvrhi::Rect(depthDesc.width, depthDesc.height));
+
+                cmdList->setGraphicsState(state);
+
+                nvrhi::DrawArguments drawArgs;
+                drawArgs.vertexCount = batch.indexCount;
+                drawArgs.startIndexLocation = batch.megaBufferAlloc.indexOffset;
+                drawArgs.startVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
+                drawArgs.instanceCount = 1;
+                drawArgs.startInstanceLocation = 0;
+                cmdList->drawIndexed(drawArgs);
+
+                bindlessDraws++;
+            }
+
+            static u32 s_logCounter = 0;
+            if (++s_logCounter % 300 == 0) {
+                Msg("* [BindlessDepth] Rendered %u bindless draws in depth prepass", bindlessDraws);
+            }
+        }
+    }
+
     ctx->EndRenderPass();
 }
 
@@ -228,7 +417,8 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
     const GeometryCollector* geometry,
     MaterialCache* materialCache,
     u32 width,
-    u32 height)
+    u32 height,
+    const BindlessDepthConfig& bindlessConfig)
 {
     using namespace framegraph;
 
@@ -239,17 +429,19 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
         MaterialCache* materialCache;
         u32 width;
         u32 height;
+        BindlessDepthConfig bindlessConfig;
     };
 
     auto& passData = fg.addCallbackPass<DepthPrepassData>(
         "Depth Prepass (Early-Z)",
 
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
+        [&, width, height, bindlessConfig](FrameGraph& builder, PassHandle passHandle, DepthPrepassData& data) {
             data.width = width;
             data.height = height;
             data.device = device;
             data.geometry = geometry;
             data.materialCache = materialCache;
+            data.bindlessConfig = bindlessConfig;
 
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -280,7 +472,8 @@ framegraph::VirtualResourceHandle setupDepthPrepass(
                 data.geometry,
                 depthRT,
                 data.materialCache,
-                fg
+                fg,
+                data.bindlessConfig
             );
         }
     );

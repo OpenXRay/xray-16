@@ -4,6 +4,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
@@ -24,6 +25,7 @@ struct GeometryBatch {
     s32 baseVertex = 0;
 
     u32 materialID = 0;
+    u32 bindlessMaterialID = UINT32_MAX;
 
     ng::TextureHandle albedoTexture;
     ng::TextureHandle normalTexture;
@@ -49,6 +51,8 @@ struct GeometryBatch {
     float ssa = 0.0f;
 
     shared_str debugName;
+
+    RENDER_NAMESPACE::MeshAllocation megaBufferAlloc;
 
     bool IsAlphaTested() const {
         RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
