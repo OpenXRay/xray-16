@@ -24,7 +24,11 @@ struct BindlessForwardConfig {
 
     nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
 
-    u32 previousFrameVisibleCount = 0;
+    nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
+
+    nvrhi::IBuffer* instanceBuffer = nullptr;
+
+    u32 totalObjectCount = 0;
 
     bool enabled = false;
 
@@ -33,7 +37,11 @@ struct BindlessForwardConfig {
     bool megaBuffersReady = false;
 
     bool IsValid() const {
-        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && previousFrameVisibleCount > 0;
+        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && totalObjectCount > 0;
+    }
+
+    bool UseGPUCulling() const {
+        return IsValid() && compactBatchIndicesBuffer && instanceBuffer;
     }
 
     bool UseMegaBuffers() const {

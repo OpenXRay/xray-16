@@ -359,6 +359,9 @@ void renderBindlessForward(
             nvrhi::BindingLayoutItem::Texture_SRV(11),
             nvrhi::BindingLayoutItem::Texture_SRV(12),
             nvrhi::BindingLayoutItem::Texture_SRV(13),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
         };
         s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
 
@@ -483,11 +486,10 @@ void renderBindlessForward(
     cmdList->writeBuffer(lightingCB, &lightingData, sizeof(lightingData));
 
     struct PerDrawConstants {
-        Fmatrix world;
-        u32 materialID;
-        float padding[3];
+        u32 drawIndex;
+        u32 padding[3];
     };
-    static_assert(sizeof(PerDrawConstants) == 80, "PerDrawConstants must be 80 bytes");
+    static_assert(sizeof(PerDrawConstants) == 16, "PerDrawConstants must be 16 bytes");
 
     cbDesc.byteSize = sizeof(PerDrawConstants);
     auto perDrawCB = nvDevice->createBuffer(cbDesc);
@@ -517,6 +519,9 @@ void renderBindlessForward(
         nvrhi::BindingSetItem::Texture_SRV(11, getAtlasOrPlaceholder(AtlasType::Normal)),
         nvrhi::BindingSetItem::Texture_SRV(12, getAtlasOrPlaceholder(AtlasType::Detail)),
         nvrhi::BindingSetItem::Texture_SRV(13, getAtlasOrPlaceholder(AtlasType::PBR)),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.instanceBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.compactBatchIndicesBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.compactMaterialIDBuffer),
     };
 
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
@@ -527,96 +532,49 @@ void renderBindlessForward(
 
     cmdList->beginMarker("Bindless Forward");
 
-    const auto& batches = geometry->GetBatches();
-    u32 drawCount = static_cast<u32>(batches.size());
-
     const auto& rtDesc = colorRT->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
 
-    const bool useMegaBuffers = config.UseMegaBuffers();
+    static u32 s_gpuDrivenDraws = 0;
 
-    static u32 s_megaBufferDraws = 0;
-    static u32 s_legacyDraws = 0;
-    static u32 s_skippedNoMaterial = 0;
-    static u32 s_skippedNoAlloc = 0;
-    static u32 s_visTypeCounts[16] = {0};
+    if (!config.UseGPUCulling() || !config.UseMegaBuffers()) {
+        cmdList->endMarker();
+        return;
+    }
 
-    for (u32 i = 0; i < drawCount; i++) {
-        const auto& batch = batches[i];
+    cmdList->beginMarker("GPU-Driven Culled");
 
-        if (batch.bindlessMaterialID == UINT32_MAX) {
-            s_skippedNoMaterial++;
-            continue;
-        }
+    const u32 visibleCount = config.totalObjectCount;
 
-        if (batch.visual && batch.visual->Type < 16) {
-            s_visTypeCounts[batch.visual->Type]++;
-        }
+    constexpr u32 INDIRECT_ARGS_SIZE = 20;
 
-        nvrhi::IBuffer* vb = nullptr;
-        nvrhi::IBuffer* ib = nullptr;
-        nvrhi::Format indexFormat = nvrhi::Format::R16_UINT;
-        u32 startIndex = batch.startIndex;
-        s32 baseVertex = batch.baseVertex;
+    nvrhi::GraphicsState state;
+    state.pipeline = s_bindlessPipeline;
+    state.framebuffer = framebuffer;
+    state.bindings = { bindingSet };
+    state.vertexBuffers = { {config.megaVertexBuffer, 0, 0} };
+    state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+    state.indirectParams = config.compactDrawArgsBuffer;
+    state.viewport.addViewport(viewport);
+    state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-        if (useMegaBuffers && batch.megaBufferAlloc.valid) {
-            vb = config.megaVertexBuffer;
-            ib = config.megaIndexBuffer;
-            indexFormat = nvrhi::Format::R32_UINT;
-            startIndex = batch.megaBufferAlloc.indexOffset;
-            baseVertex = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
-            s_megaBufferDraws++;
-        } else {
-            if (!batch.vertexBuffer || !batch.indexBuffer) {
-                s_skippedNoAlloc++;
-                continue;
-            }
-            vb = batch.vertexBuffer.Get();
-            ib = batch.indexBuffer.Get();
-            s_legacyDraws++;
-        }
-
-        PerDrawConstants perDrawData;
-        perDrawData.world.transpose(batch.worldMatrix);
-        perDrawData.materialID = batch.bindlessMaterialID;
-        perDrawData.padding[0] = perDrawData.padding[1] = perDrawData.padding[2] = 0.0f;
+    for (u32 i = 0; i < visibleCount; i++) {
+        struct DrawIndexConstant {
+            u32 drawIndex;
+            u32 padding[3];
+        } perDrawData;
+        perDrawData.drawIndex = i;
+        perDrawData.padding[0] = perDrawData.padding[1] = perDrawData.padding[2] = 0;
         cmdList->writeBuffer(perDrawCB, &perDrawData, sizeof(perDrawData));
-
-        nvrhi::GraphicsState state;
-        state.pipeline = s_bindlessPipeline;
-        state.framebuffer = framebuffer;
-        state.bindings = { bindingSet };
-        state.vertexBuffers = { {vb, 0, 0} };
-        state.indexBuffer = { ib, indexFormat, 0 };
-        state.viewport.addViewport(viewport);
-        state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
         cmdList->setGraphicsState(state);
 
-        nvrhi::DrawArguments drawArgs;
-        drawArgs.vertexCount = batch.indexCount;
-        drawArgs.startIndexLocation = startIndex;
-        drawArgs.startVertexLocation = baseVertex;
-        drawArgs.instanceCount = 1;
-        drawArgs.startInstanceLocation = 0;
-        cmdList->drawIndexed(drawArgs);
+        cmdList->drawIndexedIndirect(i * INDIRECT_ARGS_SIZE, 1);
     }
 
+    s_gpuDrivenDraws += visibleCount;
     cmdList->endMarker();
-
-    static u32 s_logCounter = 0;
-    if (++s_logCounter % 300 == 0) {
-        Msg("* [BindlessForward] Rendered %u draws (mega: %u, legacy: %u, skipped: noMat=%u noAlloc=%u)",
-            drawCount, s_megaBufferDraws, s_legacyDraws, s_skippedNoMaterial, s_skippedNoAlloc);
-        Msg("  VisTypes: NORMAL=%u, HIERRARHY=%u, PROGRESSIVE=%u, TREE_ST=%u, TREE_PM=%u, LOD=%u",
-            s_visTypeCounts[0], s_visTypeCounts[1], s_visTypeCounts[2],
-            s_visTypeCounts[7], s_visTypeCounts[11], s_visTypeCounts[6]);
-        s_megaBufferDraws = 0;
-        s_legacyDraws = 0;
-        s_skippedNoMaterial = 0;
-        s_skippedNoAlloc = 0;
-        std::memset(s_visTypeCounts, 0, sizeof(s_visTypeCounts));
-    }
+    cmdList->endMarker();
 }
 
 framegraph::DefaultOutputLayout setupForwardColorPass(

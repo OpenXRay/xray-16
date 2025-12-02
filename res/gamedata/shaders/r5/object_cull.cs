@@ -60,10 +60,10 @@ bool OcclusionTestSphere(float3 center, float radius)
     float2 maxNDC = ndc.xy + ndcSize;
 
     if (any(minNDC > 1.0) || any(maxNDC < -1.0))
-        return false;
+        return true;
 
-    float2 minUV = minNDC * 0.5 + 0.5;
-    float2 maxUV = maxNDC * 0.5 + 0.5;
+    float2 minUV = saturate(minNDC * 0.5 + 0.5);
+    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
 
     minUV.y = 1.0 - minUV.y;
     maxUV.y = 1.0 - maxUV.y;

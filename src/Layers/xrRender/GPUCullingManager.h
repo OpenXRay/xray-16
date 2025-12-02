@@ -101,7 +101,6 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle compactDrawArgs;
     framegraph::VirtualResourceHandle compactBatchIndices;
     u32 maxObjects;
-    u32 previousFrameVisibleCount;
 };
 
 struct GPUParticleCullOutput {
@@ -185,11 +184,9 @@ public:
     bool IsParticleCullingEnabled() const { return m_initialized && m_particleCullEnabled; }
     nvrhi::IBuffer* GetParticleDrawArgsBuffer() const { return m_particleDrawArgsBuffer.Get(); }
 
-    u32 GetPreviousFrameVisibleCount() const { return m_previousFrameVisibleCount; }
     nvrhi::IBuffer* GetCompactDrawArgsBuffer() const { return m_compactDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetCompactBatchIndicesBuffer() const { return m_compactBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetCompactMaterialIDBuffer() const { return m_compactMaterialIDBuffer.Get(); }
-    void ReadbackVisibleCount(ng::RenderContext* ctx);
 
 private:
     void CreateBuffers(ng::RenderDevice* device);
@@ -218,13 +215,11 @@ private:
     nvrhi::BufferHandle m_compactDrawArgsBuffer;
     nvrhi::BufferHandle m_compactBatchIndicesBuffer;
     nvrhi::BufferHandle m_compactCountBuffer;
-    nvrhi::BufferHandle m_compactCountReadbackBuffer;
     nvrhi::BufferHandle m_compactParamsCB;
 
     nvrhi::BufferHandle m_materialIDBuffer;
     nvrhi::BufferHandle m_compactMaterialIDBuffer;
 
-    u32 m_previousFrameVisibleCount = 0;
     bool m_compactEnabled = false;
 
     nvrhi::BufferHandle m_debugBuffer;

@@ -170,10 +170,6 @@ void FrameGraphRenderer::Render() {
 
     m_framegraph->Execute();
 
-    if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled()) {
-        m_gpuCullingManager->ReadbackVisibleCount(m_renderContext.get());
-    }
-
     PresentToBackbuffer();
 
     auto frameEnd = std::chrono::high_resolution_clock::now();
@@ -418,23 +414,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.enabled = true;
         bindlessConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetCompactDrawArgsBuffer();
         bindlessConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetCompactMaterialIDBuffer();
-        bindlessConfig.previousFrameVisibleCount = m_gpuCullingManager->GetPreviousFrameVisibleCount();
+        bindlessConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetCompactBatchIndicesBuffer();
+        bindlessConfig.instanceBuffer = m_gpuCullingManager->GetInstanceBuffer();
+        bindlessConfig.totalObjectCount = m_gpuCullingManager->GetObjectCount();
 
         if (m_gpuCullingManager->AreMegaBuffersReady()) {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
             bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
             bindlessConfig.megaBuffersReady = true;
-        }
-
-        static u32 s_debugCounter = 0;
-        if (++s_debugCounter % 300 == 1) {
-            Msg("* [Bindless] Config: enabled=%d, drawArgs=%p, matIDs=%p, prevCount=%u, IsValid=%d, megaReady=%d",
-                bindlessConfig.enabled,
-                bindlessConfig.compactDrawArgsBuffer,
-                bindlessConfig.compactMaterialIDBuffer,
-                bindlessConfig.previousFrameVisibleCount,
-                bindlessConfig.IsValid(),
-                bindlessConfig.megaBuffersReady);
         }
     }
 

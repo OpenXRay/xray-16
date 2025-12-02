@@ -26,10 +26,21 @@ struct VS_OUTPUT
 
 cbuffer PerDrawConstants : register(b5)
 {
-    float4x4 g_World;
-    uint g_MaterialID;
-    float3 g_Padding;
+    uint g_DrawIndex;
+    uint3 g_Padding;
 };
+
+struct InstanceData
+{
+    float4x4 world;
+    uint materialID;
+    uint flags;
+    float pad0, pad1;
+};
+
+StructuredBuffer<InstanceData> g_InstanceData : register(t14);
+StructuredBuffer<uint> g_CompactBatchIndices : register(t15);
+StructuredBuffer<uint> g_CompactMaterialIDs : register(t16);
 
 float3 UnpackNormal(float4 packed)
 {
@@ -40,22 +51,27 @@ VS_OUTPUT main(VS_INPUT input, uint instanceID : SV_InstanceID)
 {
     VS_OUTPUT output;
 
+    uint batchIndex = g_CompactBatchIndices[g_DrawIndex];
+    InstanceData instanceData = g_InstanceData[batchIndex];
+    float4x4 worldMatrix = instanceData.world;
+    uint materialID = g_CompactMaterialIDs[g_DrawIndex];
+
     float3 normalUnpacked = UnpackNormal(input.normal);
     float3 tangentUnpacked = UnpackNormal(input.tangent);
     float3 binormalUnpacked = UnpackNormal(input.binormal);
 
-    float4 worldPos = mul(g_World, float4(input.position.xyz, 1.0));
+    float4 worldPos = mul(worldMatrix, float4(input.position.xyz, 1.0));
     output.worldPos = worldPos.xyz;
     output.position = mul(m_VP, worldPos);
 
-    float3x3 worldMatrix3x3 = (float3x3)g_World;
+    float3x3 worldMatrix3x3 = (float3x3)worldMatrix;
     output.normal = normalize(mul(worldMatrix3x3, normalUnpacked));
     output.tangent = normalize(mul(worldMatrix3x3, tangentUnpacked));
     output.bitangent = normalize(mul(worldMatrix3x3, binormalUnpacked));
 
     output.texcoord = input.texcoord;
 
-    output.materialID = g_MaterialID;
+    output.materialID = materialID;
 
     return output;
 }

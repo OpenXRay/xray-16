@@ -350,21 +350,6 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_CompactCountReadback";
-        desc.byteSize = sizeof(u32);
-        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
-        desc.initialState = nvrhi::ResourceStates::CopyDest;
-        desc.keepInitialState = true;
-
-        m_compactCountReadbackBuffer = nvDevice->createBuffer(desc);
-        if (!m_compactCountReadbackBuffer) {
-            Msg("! [GPUCulling] Failed to create compact count readback buffer");
-            return;
-        }
-    }
-
-    {
-        nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_CompactParams";
         desc.byteSize = 16;
         desc.isConstantBuffer = true;
@@ -414,30 +399,6 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     Msg("* [GPUCulling] Compaction resources created");
 }
 
-void GPUCullingManager::ReadbackVisibleCount(ng::RenderContext* ctx)
-{
-    if (!m_compactEnabled || !m_compactCountReadbackBuffer) {
-        static bool s_loggedOnce = false;
-        if (!s_loggedOnce) {
-            Msg("* [GPUCulling] ReadbackVisibleCount skipped: compactEnabled=%d, buffer=%p",
-                m_compactEnabled, m_compactCountReadbackBuffer.Get());
-            s_loggedOnce = true;
-        }
-        return;
-    }
-
-    void* mappedData = m_device->GetNVRHIDevice()->mapBuffer(m_compactCountReadbackBuffer, nvrhi::CpuAccessMode::Read);
-    if (mappedData) {
-        u32 newCount = *static_cast<u32*>(mappedData);
-        m_device->GetNVRHIDevice()->unmapBuffer(m_compactCountReadbackBuffer);
-
-        if (m_previousFrameVisibleCount == 0 && newCount > 0) {
-            Msg("* [GPUCulling] First visible count readback: %u objects", newCount);
-        }
-        m_previousFrameVisibleCount = newCount;
-    }
-}
-
 void GPUCullingManager::Shutdown()
 {
     m_objectBuffer = nullptr;
@@ -451,7 +412,6 @@ void GPUCullingManager::Shutdown()
     m_compactDrawArgsBuffer = nullptr;
     m_compactBatchIndicesBuffer = nullptr;
     m_compactCountBuffer = nullptr;
-    m_compactCountReadbackBuffer = nullptr;
     m_compactParamsCB = nullptr;
     m_compactPipeline = nullptr;
     m_compactLayout = nullptr;
@@ -492,7 +452,6 @@ void GPUCullingManager::Shutdown()
     m_computeEnabled = false;
     m_compactEnabled = false;
     m_particleCullEnabled = false;
-    m_previousFrameVisibleCount = 0;
     m_objectCount = 0;
     m_particleCount = 0;
 }
@@ -541,8 +500,13 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         IndirectDrawArgs args;
         args.indexCountPerInstance = batch.indexCount;
         args.instanceCount = 0;
-        args.startIndexLocation = batch.startIndex;
-        args.baseVertexLocation = batch.baseVertex;
+        if (batch.megaBufferAlloc.valid) {
+            args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
+            args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
+        } else {
+            args.startIndexLocation = batch.startIndex;
+            args.baseVertexLocation = batch.baseVertex;
+        }
         args.startInstanceLocation = 0;
 
         m_drawArgsData.push_back(args);
@@ -582,6 +546,8 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     if (m_compactEnabled && m_materialIDBuffer) {
         cmdList->writeBuffer(m_materialIDBuffer, m_materialIDData.data(), m_objectCount * sizeof(u32));
     }
+
+    UploadInstanceData(ctx, geometry);
 }
 
 void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
@@ -773,10 +739,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setComputeState(compactState);
                     cmdList->dispatch(groupCount, 1, 1);
 
-                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::CopySource);
-                    cmdList->copyBuffer(mgr->m_compactCountReadbackBuffer, 0, mgr->m_compactCountBuffer, 0, sizeof(u32));
-                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
                     cmdList->setBufferState(mgr->m_compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
 
@@ -809,11 +771,9 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
         output.compactDrawArgs = fg.ImportBuffer("gpu_cull_compact_drawargs", m_compactDrawArgsBuffer, compactArgsDesc);
         output.compactBatchIndices = fg.ImportBuffer("gpu_cull_compact_batchindices", m_compactBatchIndicesBuffer, compactIndicesDesc);
-        output.previousFrameVisibleCount = m_previousFrameVisibleCount;
     } else {
         output.compactDrawArgs = VirtualResourceHandle();
         output.compactBatchIndices = VirtualResourceHandle();
-        output.previousFrameVisibleCount = 0;
     }
 
     return output;
