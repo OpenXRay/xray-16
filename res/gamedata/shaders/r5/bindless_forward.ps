@@ -111,7 +111,8 @@ PS_OUTPUT main(PS_INPUT input)
     float3 N = normalize(input.normal);
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        float3 normalSample = SampleNormal(mat.normalSlice, input.texcoord);
+        // Use same UV scale as diffuse (normal maps match diffuse size)
+        float3 normalSample = SampleNormalScaled(mat.normalSlice, input.texcoord, uvScale);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
@@ -124,7 +125,8 @@ PS_OUTPUT main(PS_INPUT input)
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
         float2 detailUV = input.texcoord * mat.detailScale;
-        float4 detailSample = SampleDetail(mat.detailSlice, detailUV);
+        // Detail textures also need UV scaling for atlas placement
+        float4 detailSample = SampleDetailScaled(mat.detailSlice, detailUV, uvScale);
         // Blend detail (multiply-2x style)
         albedo = albedo * (detailSample.rgb * 2.0);
     }
@@ -136,7 +138,8 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        float3 pbrSample = SamplePBR(mat.pbrSlice, input.texcoord);
+        // Use same UV scale as diffuse (PBR textures match diffuse size)
+        float3 pbrSample = SamplePBRScaled(mat.pbrSlice, input.texcoord, uvScale);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;

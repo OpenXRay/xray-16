@@ -369,12 +369,10 @@ private:
     };
     xr_vector<PendingMaterial> m_pendingMaterials;
 
-    // Default PBR textures (1x1 solid color textures for fallback)
+    // Default PBR texture (1x1 RGBA8 packed texture for fallback)
     // Used when no PBR texture is specified in .thm metadata
-    resources::TextureHandle m_defaultMetallic;   // Black (0) = dielectric
-    resources::TextureHandle m_defaultRoughness;  // White (1) = fully rough
-    resources::TextureHandle m_defaultAO;         // White (1) = no occlusion
-    resources::TextureHandle m_defaultParallax;   // Gray (0.5) = neutral height
+    // Format: R=metallic(0), G=roughness(255), B=ao(255), A=parallax(128)
+    resources::TextureHandle m_defaultPBR;
 
     // Create default PBR textures
     void CreateDefaultPBRTextures();

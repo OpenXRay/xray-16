@@ -58,13 +58,14 @@ f_forward main( vf I )
 	// LOD position is world-space from vertex shader
 	float3 worldPos = I.position;
 
-	// Extract material properties from PBR textures
+	// Extract material properties from consolidated PBR texture (R=M, G=R, B=AO, A=Parallax)
 	// LOD objects: sample PBR textures using lerped texture coordinates
 	float2 pbr_tc = lerp(I.tc0, I.tc1, I.af.w);
 	float3 albedo = D.rgb;
-	float roughness = s_roughness.Sample(smp_base, pbr_tc).r;
-	float metallic = s_metallic.Sample(smp_base, pbr_tc).r;
-	float ao = s_ao.Sample(smp_base, pbr_tc).r;
+	float4 pbr = s_pbr.Sample(smp_base, pbr_tc);
+	float metallic  = pbr.r;
+	float roughness = pbr.g;
+	float ao        = pbr.b;
 	float hemi = H.w;
 
 	// PBR Forward+ lighting

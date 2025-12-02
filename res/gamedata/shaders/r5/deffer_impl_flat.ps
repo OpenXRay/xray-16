@@ -50,24 +50,16 @@ f_forward 	main	( p_flat I 		)
 
 	 	 	G 		= 	g_R+g_G+g_B+g_A;
 
-	 // Sample terrain PBR textures and blend by mask
-	 float metal_R = s_metallic_r.Sample(smp_base, I.tcdbump).r * mask.r;
-	 float metal_G = s_metallic_g.Sample(smp_base, I.tcdbump).r * mask.g;
-	 float metal_B = s_metallic_b.Sample(smp_base, I.tcdbump).r * mask.b;
-	 float metal_A = s_metallic_a.Sample(smp_base, I.tcdbump).r * mask.a;
-	 float terrain_metallic = metal_R + metal_G + metal_B + metal_A;
+	 // Sample terrain PBR textures (consolidated: R=metallic, G=roughness, B=ao, A=parallax)
+	 float4 pbr_R = s_pbr_r.Sample(smp_base, I.tcdbump);
+	 float4 pbr_G = s_pbr_g.Sample(smp_base, I.tcdbump);
+	 float4 pbr_B = s_pbr_b.Sample(smp_base, I.tcdbump);
+	 float4 pbr_A = s_pbr_a.Sample(smp_base, I.tcdbump);
 
-	 float rough_R = s_roughness_r.Sample(smp_base, I.tcdbump).r * mask.r;
-	 float rough_G = s_roughness_g.Sample(smp_base, I.tcdbump).r * mask.g;
-	 float rough_B = s_roughness_b.Sample(smp_base, I.tcdbump).r * mask.b;
-	 float rough_A = s_roughness_a.Sample(smp_base, I.tcdbump).r * mask.a;
-	 float terrain_roughness = rough_R + rough_G + rough_B + rough_A;
-
-	 float ao_R = s_ao_r.Sample(smp_base, I.tcdbump).r * mask.r;
-	 float ao_G = s_ao_g.Sample(smp_base, I.tcdbump).r * mask.g;
-	 float ao_B = s_ao_b.Sample(smp_base, I.tcdbump).r * mask.b;
-	 float ao_A = s_ao_a.Sample(smp_base, I.tcdbump).r * mask.a;
-	 float terrain_ao = ao_R + ao_G + ao_B + ao_A;
+	 // Blend PBR properties by mask
+	 float terrain_metallic  = pbr_R.r * mask.r + pbr_G.r * mask.g + pbr_B.r * mask.b + pbr_A.r * mask.a;
+	 float terrain_roughness = pbr_R.g * mask.r + pbr_G.g * mask.g + pbr_B.g * mask.b + pbr_A.g * mask.a;
+	 float terrain_ao        = pbr_R.b * mask.r + pbr_G.b * mask.g + pbr_B.b * mask.b + pbr_A.b * mask.a;
   # else
 	float3	N 	= I.N.xyz	;
   # endif
@@ -96,9 +88,11 @@ f_forward 	main	( p_flat I 		)
 	float metallic = terrain_metallic;
 	float ao = terrain_ao;
 #else
-	float roughness = s_roughness.Sample(smp_base, I.tcdh).r;
-	float metallic = s_metallic.Sample(smp_base, I.tcdh).r;
-	float ao = s_ao.Sample(smp_base, I.tcdh).r;
+	// Sample consolidated PBR texture (R=M, G=R, B=AO, A=Parallax)
+	float4 pbr = s_pbr.Sample(smp_base, I.tcdh);
+	float metallic  = pbr.r;
+	float roughness = pbr.g;
+	float ao        = pbr.b;
 #endif
 
 	// Get hemisphere occlusion

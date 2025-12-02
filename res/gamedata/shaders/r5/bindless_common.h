@@ -88,11 +88,12 @@ float4 SampleDiffuseScaled(uint packedSlice, float2 uv, float2 uvScale)
 
     uint slice = GetSliceIndex(packedSlice);
 
-    // Wrap UV to [0,1] then scale for textures smaller than atlas
-    float2 wrappedUV = frac(uv);
-    float2 scaledUV = wrappedUV * uvScale;
+    // uvScale is a DIVISOR (e.g., 0.0625 for 64x64 texture in 1024 atlas)
+    // frac(uv) wraps to [0,1], then * uvScale maps to texture region
+    // Texture is tiled in atlas, so filtering at edges samples valid data
+    float2 atlasUV = frac(uv) * uvScale;
 
-    return g_DiffuseAtlas.Sample(g_LinearSampler, float3(scaledUV, slice));
+    return g_DiffuseAtlas.Sample(g_LinearSampler, float3(atlasUV, slice));
 }
 
 float4 SampleDiffuse(uint packedSlice, float2 uv)
@@ -100,13 +101,17 @@ float4 SampleDiffuse(uint packedSlice, float2 uv)
     return SampleDiffuseScaled(packedSlice, uv, float2(1.0, 1.0));
 }
 
-float3 SampleNormal(uint packedSlice, float2 uv)
+float3 SampleNormalScaled(uint packedSlice, float2 uv, float2 uvScale)
 {
     if (packedSlice == INVALID_SLICE)
         return float3(0.5, 0.5, 1.0); // Flat normal
 
     uint slice = GetSliceIndex(packedSlice);
-    float4 sample = g_NormalAtlas.Sample(g_LinearSampler, float3(uv, slice));
+
+    // uvScale is a DIVISOR - texture is tiled in atlas for seamless filtering
+    float2 atlasUV = frac(uv) * uvScale;
+
+    float4 sample = g_NormalAtlas.Sample(g_LinearSampler, float3(atlasUV, slice));
 
     // Decode normal (RG -> XYZ, reconstruct Z)
     float3 normal;
@@ -115,25 +120,48 @@ float3 SampleNormal(uint packedSlice, float2 uv)
     return normal;
 }
 
-float4 SampleDetail(uint packedSlice, float2 uv)
+float3 SampleNormal(uint packedSlice, float2 uv)
+{
+    return SampleNormalScaled(packedSlice, uv, float2(1.0, 1.0));
+}
+
+float4 SampleDetailScaled(uint packedSlice, float2 uv, float2 uvScale)
 {
     if (packedSlice == INVALID_SLICE)
         return float4(0.5, 0.5, 0.5, 0.5); // Neutral detail
 
     uint slice = GetSliceIndex(packedSlice);
-    return g_DetailAtlas.Sample(g_LinearSampler, float3(uv, slice));
+
+    // uvScale is a DIVISOR - texture is tiled in atlas for seamless filtering
+    float2 atlasUV = frac(uv) * uvScale;
+
+    return g_DetailAtlas.Sample(g_LinearSampler, float3(atlasUV, slice));
 }
 
-float3 SamplePBR(uint packedSlice, float2 uv)
+float4 SampleDetail(uint packedSlice, float2 uv)
+{
+    return SampleDetailScaled(packedSlice, uv, float2(1.0, 1.0));
+}
+
+float3 SamplePBRScaled(uint packedSlice, float2 uv, float2 uvScale)
 {
     if (packedSlice == INVALID_SLICE)
         return float3(0.0, 0.5, 1.0); // Default: non-metallic, medium rough, full AO
 
     uint slice = GetSliceIndex(packedSlice);
-    float4 sample = g_PBRAtlas.Sample(g_LinearSampler, float3(uv, slice));
+
+    // uvScale is a DIVISOR - texture is tiled in atlas for seamless filtering
+    float2 atlasUV = frac(uv) * uvScale;
+
+    float4 sample = g_PBRAtlas.Sample(g_LinearSampler, float3(atlasUV, slice));
 
     // R = metallic, G = roughness, B = AO
     return sample.rgb;
+}
+
+float3 SamplePBR(uint packedSlice, float2 uv)
+{
+    return SamplePBRScaled(packedSlice, uv, float2(1.0, 1.0));
 }
 
 #endif // BINDLESS_COMMON_H

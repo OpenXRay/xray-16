@@ -23,11 +23,9 @@ Texture2D 	s_detailBumpX;          //	Error for bump detail
 //Texture2D 	s_bumpD;                //
 Texture2D 	s_hemi;             	//
 
-// PBR Material Textures (Forward+ Pipeline)
-Texture2D 	s_metallic  : register(t4);   // Metallic map
-Texture2D 	s_roughness : register(t5);   // Roughness map
-Texture2D 	s_ao        : register(t6);   // Ambient Occlusion map
-Texture2D 	s_parallax  : register(t7);   // Parallax/height map
+// PBR Material Texture (Forward+ Pipeline)
+// Consolidated packed format: R=metallic, G=roughness, B=ao, A=parallax
+Texture2D 	s_pbr : register(t4);   // Packed PBR texture (M/R/AO/Parallax)
 
 Texture2D 	s_mask;             	//
 
@@ -42,25 +40,11 @@ Texture2D 	s_dn_b;                	//
 Texture2D 	s_dn_a;                	//
 
 // Terrain PBR textures (per detail layer)
-Texture2D 	s_parallax_r;
-Texture2D 	s_parallax_g;
-Texture2D 	s_parallax_b;
-Texture2D 	s_parallax_a;
-
-Texture2D 	s_metallic_r;
-Texture2D 	s_metallic_g;
-Texture2D 	s_metallic_b;
-Texture2D 	s_metallic_a;
-
-Texture2D 	s_roughness_r;
-Texture2D 	s_roughness_g;
-Texture2D 	s_roughness_b;
-Texture2D 	s_roughness_a;
-
-Texture2D 	s_ao_r;
-Texture2D 	s_ao_g;
-Texture2D 	s_ao_b;
-Texture2D 	s_ao_a;
+// Consolidated packed format: R=metallic, G=roughness, B=ao, A=parallax
+Texture2D 	s_pbr_r;
+Texture2D 	s_pbr_g;
+Texture2D 	s_pbr_b;
+Texture2D 	s_pbr_a;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Lighting/shadowing phase                     //

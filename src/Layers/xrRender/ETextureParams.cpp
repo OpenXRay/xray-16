@@ -99,6 +99,10 @@ void STextureParams::Load(IReader& F)
 
     if (F.find_chunk(THM_CHUNK_PBR_PARALLAX))
         F.r_stringZ(parallax_name);
+
+    // Consolidated packed PBR texture (preferred over separate textures)
+    if (F.find_chunk(THM_CHUNK_PBR_PACKED))
+        F.r_stringZ(pbr_name);
 }
 
 void STextureParams::Save(IWriter& F)
@@ -157,6 +161,11 @@ void STextureParams::Save(IWriter& F)
 
     F.open_chunk(THM_CHUNK_PBR_PARALLAX);
     F.w_stringZ(parallax_name);
+    F.close_chunk();
+
+    // Consolidated packed PBR texture
+    F.open_chunk(THM_CHUNK_PBR_PACKED);
+    F.w_stringZ(pbr_name);
     F.close_chunk();
 }
 

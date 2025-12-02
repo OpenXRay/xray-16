@@ -117,10 +117,13 @@ struct ECORE_API STextureParams
     shared_str ext_normal_map_name;
 
     // PBR textures (AI-generated or artist-authored)
+    // Legacy separate texture references (deprecated):
     shared_str metallic_name;
     shared_str roughness_name;
     shared_str ao_name;
     shared_str parallax_name;
+    // Consolidated packed PBR texture (R=metallic, G=roughness, B=ao, A=parallax):
+    shared_str pbr_name;
 
     STextureParams() { Clear(); }
     void destroy_shared_str(shared_str& object) { object.~shared_str(); }
@@ -135,6 +138,7 @@ struct ECORE_API STextureParams
         destroy_shared_str(roughness_name);
         destroy_shared_str(ao_name);
         destroy_shared_str(parallax_name);
+        destroy_shared_str(pbr_name);
 
         ZeroMemory(this, sizeof(STextureParams));
 
@@ -145,6 +149,7 @@ struct ECORE_API STextureParams
         construct_shared_str(roughness_name);
         construct_shared_str(ao_name);
         construct_shared_str(parallax_name);
+        construct_shared_str(pbr_name);
 
         flags.set(flGenerateMipMaps | flDitherColor, TRUE);
         mip_filter = kMIPFilterBox;
@@ -205,10 +210,11 @@ extern const xr_token ttype_token[];
 #define THM_CHUNK_EXT_NORMALMAP 0x0818
 #define THM_CHUNK_FADE_DELAY 0x0819
 // PBR texture chunks (AI-generated or artist-authored)
-#define THM_CHUNK_PBR_METALLIC 0x081A
-#define THM_CHUNK_PBR_ROUGHNESS 0x081B
-#define THM_CHUNK_PBR_AO 0x081C
-#define THM_CHUNK_PBR_PARALLAX 0x081D
+#define THM_CHUNK_PBR_METALLIC 0x081A   // Deprecated - use THM_CHUNK_PBR_PACKED
+#define THM_CHUNK_PBR_ROUGHNESS 0x081B  // Deprecated - use THM_CHUNK_PBR_PACKED
+#define THM_CHUNK_PBR_AO 0x081C         // Deprecated - use THM_CHUNK_PBR_PACKED
+#define THM_CHUNK_PBR_PARALLAX 0x081D   // Deprecated - use THM_CHUNK_PBR_PACKED
+#define THM_CHUNK_PBR_PACKED 0x081E     // Consolidated _pbr texture (R=M, G=R, B=AO, A=Parallax)
 //----------------------------------------------------
 #define THUMB_WIDTH 128
 #define THUMB_HEIGHT 128

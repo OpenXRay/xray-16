@@ -29,10 +29,13 @@ class CTextureDescrMngr
         bool m_use_steep_parallax;
 
         // PBR texture names (AI-generated or artist-authored)
+        // Legacy separate textures (deprecated):
         shared_str m_metallic_name;
         shared_str m_roughness_name;
         shared_str m_ao_name;
         shared_str m_parallax_name;
+        // Consolidated packed PBR texture (R=M, G=R, B=AO, A=Parallax):
+        shared_str m_pbr_name;
     };
     struct texture_desc
     {
@@ -66,9 +69,12 @@ public:
     float GetDetailScale(const shared_str& tex_name) const;
 
     // Get PBR texture names (AI-generated or artist-authored)
+    // Legacy separate texture getters (deprecated - prefer GetPBRName):
     shared_str GetMetallicName(const shared_str& tex_name) const;
     shared_str GetRoughnessName(const shared_str& tex_name) const;
     shared_str GetAOName(const shared_str& tex_name) const;
     shared_str GetParallaxName(const shared_str& tex_name) const;
+    // Consolidated packed PBR texture (R=metallic, G=roughness, B=ao, A=parallax):
+    shared_str GetPBRName(const shared_str& tex_name) const;
 };
 } // namespace xray::render::RENDER_NAMESPACE

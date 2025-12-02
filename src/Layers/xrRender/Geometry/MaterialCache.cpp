@@ -263,50 +263,28 @@ void MaterialCache::CreateDefaultPBRTextures()
         return;
     }
 
-    // Create 1x1 default textures with appropriate values:
-    // - Metallic: 0 (black) = non-metallic/dielectric
-    // - Roughness: 1 (white) = fully rough (safer default)
-    // - AO: 1 (white) = no occlusion
+    // Create 1x1 RGBA8 default PBR texture with appropriate values:
+    // R = Metallic:  0   (dielectric)
+    // G = Roughness: 255 (fully rough, safer default)
+    // B = AO:        255 (no occlusion)
+    // A = Parallax:  128 (neutral height, no displacement)
 
     resources::TextureDesc desc;
     desc.type = resources::TextureDesc::Texture2D;
     desc.width = 1;
     desc.height = 1;
     desc.mipLevels = 1;
-    desc.format = nvrhi::Format::R8_UNORM;  // Single channel for PBR maps
+    desc.format = nvrhi::Format::RGBA8_UNORM;  // Packed PBR format
+    desc.debugName = "$default_pbr";
 
-    // Metallic: black (0)
-    desc.debugName = "$default_metallic";
-    u8 blackPixel = 0;
-    m_defaultMetallic = texManager->CreateTexture(desc, &blackPixel);
-    if (m_defaultMetallic.IsValid()) {
-        m_textureHandleCache["$default_metallic"] = m_defaultMetallic;
+    // RGBA8 pixel: R=0 (metallic), G=255 (rough), B=255 (ao), A=128 (parallax)
+    u8 pbrPixel[4] = { 0, 255, 255, 128 };
+    m_defaultPBR = texManager->CreateTexture(desc, pbrPixel);
+    if (m_defaultPBR.IsValid()) {
+        m_textureHandleCache["$default_pbr"] = m_defaultPBR;
     }
 
-    // Roughness: white (255 = 1.0)
-    desc.debugName = "$default_roughness";
-    u8 whitePixel = 255;
-    m_defaultRoughness = texManager->CreateTexture(desc, &whitePixel);
-    if (m_defaultRoughness.IsValid()) {
-        m_textureHandleCache["$default_roughness"] = m_defaultRoughness;
-    }
-
-    // AO: white (255 = 1.0)
-    desc.debugName = "$default_ao";
-    m_defaultAO = texManager->CreateTexture(desc, &whitePixel);
-    if (m_defaultAO.IsValid()) {
-        m_textureHandleCache["$default_ao"] = m_defaultAO;
-    }
-
-    // Parallax: gray (128 = 0.5 = neutral height, no displacement)
-    desc.debugName = "$default_parallax";
-    u8 grayPixel = 128;
-    m_defaultParallax = texManager->CreateTexture(desc, &grayPixel);
-    if (m_defaultParallax.IsValid()) {
-        m_textureHandleCache["$default_parallax"] = m_defaultParallax;
-    }
-
-    Msg("* [MaterialCache] Created default PBR textures");
+    Msg("* [MaterialCache] Created default PBR texture");
 }
 
 MaterialCache::~MaterialCache() {
@@ -815,45 +793,38 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
             // PBR texture slot assignments (from ShaderConstants.h)
             using namespace passes;
 
-            // Helper lambda to load PBR texture with fallback to default
-            auto loadPBRTexture = [&](const shared_str& pbrTexName, u32 slot, const char* type, resources::TextureHandle defaultTex) {
-                resources::TextureHandle handle;
+            // Load consolidated PBR texture (R=metallic, G=roughness, B=ao, A=parallax)
+            resources::TextureHandle pbrHandle;
+            shared_str pbrTexName = texDescMgr.GetPBRName(baseTexName);
 
-                if (!pbrTexName.empty()) {
-                    // Check cache
-                    auto cacheIt = m_textureHandleCache.find(pbrTexName.c_str());
-                    if (cacheIt != m_textureHandleCache.end()) {
-                        handle = cacheIt->second;
-                    } else {
-                        // Load texture
-                        handle = texManager->LoadTexture(
-                            pbrTexName.c_str(),
-                            resources::TexturePriority::High
-                        );
-                        if (handle.IsValid()) {
-                            m_textureHandleCache[pbrTexName.c_str()] = handle;
-                        }
+            if (!pbrTexName.empty()) {
+                // Check cache
+                auto cacheIt = m_textureHandleCache.find(pbrTexName.c_str());
+                if (cacheIt != m_textureHandleCache.end()) {
+                    pbrHandle = cacheIt->second;
+                } else {
+                    // Load texture
+                    pbrHandle = texManager->LoadTexture(
+                        pbrTexName.c_str(),
+                        resources::TexturePriority::High
+                    );
+                    if (pbrHandle.IsValid()) {
+                        m_textureHandleCache[pbrTexName.c_str()] = pbrHandle;
                     }
                 }
+            }
 
-                // Use default texture if no explicit texture available
-                if (!handle.IsValid()) {
-                    handle = defaultTex;
-                }
+            // Use default PBR texture if no explicit texture available
+            if (!pbrHandle.IsValid()) {
+                pbrHandle = m_defaultPBR;
+            }
 
-                if (handle.IsValid()) {
-                    MaterialPSO::TextureSlot texSlot;
-                    texSlot.slot = slot;
-                    texSlot.handle = handle;
-                    matPSO->textures.push_back(texSlot);
-                }
-            };
-
-            // Load PBR textures from metadata (with fallback to defaults)
-            loadPBRTexture(texDescMgr.GetMetallicName(baseTexName),  TEX_SLOT_METALLIC,  "metallic",  m_defaultMetallic);
-            loadPBRTexture(texDescMgr.GetRoughnessName(baseTexName), TEX_SLOT_ROUGHNESS, "roughness", m_defaultRoughness);
-            loadPBRTexture(texDescMgr.GetAOName(baseTexName),        TEX_SLOT_AO,        "ao",        m_defaultAO);
-            loadPBRTexture(texDescMgr.GetParallaxName(baseTexName),  TEX_SLOT_PARALLAX,  "parallax",  m_defaultParallax);
+            if (pbrHandle.IsValid()) {
+                MaterialPSO::TextureSlot texSlot;
+                texSlot.slot = TEX_SLOT_PBR;
+                texSlot.handle = pbrHandle;
+                matPSO->textures.push_back(texSlot);
+            }
         }
     }
 }
@@ -2576,8 +2547,8 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             }
         }
 
-        // Get PBR textures from texture description metadata
-        // PBR textures are associated with the base diffuse texture
+        // Get PBR texture from texture description metadata
+        // Prefer consolidated _pbr texture, fallback to legacy _metallic
         if (diffuseName.c_str() && diffuseName[0]) {
             auto& texDescMgr = RImplementation.Resources->m_textures_description;
 
@@ -2597,17 +2568,14 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                 return atlasManager.PBR().RegisterTexture(ctx, pbrTexName, nvrhiTex);
             };
 
-            // Try to register metallic texture (primary PBR texture)
-            shared_str metallicName = texDescMgr.GetMetallicName(diffuseName);
-            TextureRegisterResult metallicResult = registerPBRTexture(metallicName);
-            if (metallicResult.IsValid()) {
-                matData.pbrSlice = metallicResult.sliceRef.packed;
+            // Try consolidated _pbr texture first (R=metallic, G=roughness, B=ao, A=parallax)
+            shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
+            TextureRegisterResult pbrResult = registerPBRTexture(pbrName);
+            if (pbrResult.IsValid()) {
+                matData.pbrSlice = pbrResult.sliceRef.packed;
                 matData.flags |= MAT_FLAG_HAS_PBR;
                 updated = true;
             }
-
-            // TODO: Register roughness, AO, parallax to separate atlas slots when needed
-            // For now, metallic is the primary PBR texture indicator
         }
 
         // Update material buffer if any textures were registered

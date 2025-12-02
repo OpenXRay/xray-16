@@ -227,26 +227,11 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx11Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_dx11Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
 
-        // PBR terrain textures
-        C.r_dx11Texture("s_parallax_r", strconcat(sizeof(mask), mask, oR_Name, "_parallax"));
-        C.r_dx11Texture("s_parallax_g", strconcat(sizeof(mask), mask, oG_Name, "_parallax"));
-        C.r_dx11Texture("s_parallax_b", strconcat(sizeof(mask), mask, oB_Name, "_parallax"));
-        C.r_dx11Texture("s_parallax_a", strconcat(sizeof(mask), mask, oA_Name, "_parallax"));
-
-        C.r_dx11Texture("s_metallic_r", strconcat(sizeof(mask), mask, oR_Name, "_metallic"));
-        C.r_dx11Texture("s_metallic_g", strconcat(sizeof(mask), mask, oG_Name, "_metallic"));
-        C.r_dx11Texture("s_metallic_b", strconcat(sizeof(mask), mask, oB_Name, "_metallic"));
-        C.r_dx11Texture("s_metallic_a", strconcat(sizeof(mask), mask, oA_Name, "_metallic"));
-
-        C.r_dx11Texture("s_roughness_r", strconcat(sizeof(mask), mask, oR_Name, "_roughness"));
-        C.r_dx11Texture("s_roughness_g", strconcat(sizeof(mask), mask, oG_Name, "_roughness"));
-        C.r_dx11Texture("s_roughness_b", strconcat(sizeof(mask), mask, oB_Name, "_roughness"));
-        C.r_dx11Texture("s_roughness_a", strconcat(sizeof(mask), mask, oA_Name, "_roughness"));
-
-        C.r_dx11Texture("s_ao_r", strconcat(sizeof(mask), mask, oR_Name, "_ao"));
-        C.r_dx11Texture("s_ao_g", strconcat(sizeof(mask), mask, oG_Name, "_ao"));
-        C.r_dx11Texture("s_ao_b", strconcat(sizeof(mask), mask, oB_Name, "_ao"));
-        C.r_dx11Texture("s_ao_a", strconcat(sizeof(mask), mask, oA_Name, "_ao"));
+        // PBR terrain textures (consolidated: R=metallic, G=roughness, B=ao, A=parallax)
+        C.r_dx11Texture("s_pbr_r", strconcat(sizeof(mask), mask, oR_Name, "_pbr"));
+        C.r_dx11Texture("s_pbr_g", strconcat(sizeof(mask), mask, oG_Name, "_pbr"));
+        C.r_dx11Texture("s_pbr_b", strconcat(sizeof(mask), mask, oB_Name, "_pbr"));
+        C.r_dx11Texture("s_pbr_a", strconcat(sizeof(mask), mask, oA_Name, "_pbr"));
 
         if (C.bUseSteepParallax)
         {

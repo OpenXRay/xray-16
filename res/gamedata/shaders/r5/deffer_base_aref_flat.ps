@@ -31,11 +31,12 @@ f_forward main( p_flat I )
 	// Get world position from view position
 	float3 worldPos = viewPosToWorld(I.position.xyz);
 
-	// Extract material properties from PBR textures
+	// Extract material properties from consolidated PBR texture (R=M, G=R, B=AO, A=Parallax)
 	float3 albedo = D.rgb;
-	float roughness = s_roughness.Sample(smp_base, I.tcdh).r;
-	float metallic = s_metallic.Sample(smp_base, I.tcdh).r;
-	float ao = s_ao.Sample(smp_base, I.tcdh).r;
+	float4 pbr = s_pbr.Sample(smp_base, I.tcdh);
+	float metallic  = pbr.r;
+	float roughness = pbr.g;
+	float ao        = pbr.b;
 
 	// Get hemisphere occlusion
 #ifdef USE_LM_HEMI

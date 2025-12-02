@@ -25,10 +25,7 @@ constexpr u32 TEX_SLOT_BUMP      = 1;  // Normal map (bump)
 constexpr u32 TEX_SLOT_BUMP_X    = 2;  // Normal map secondary channel
 constexpr u32 TEX_SLOT_DETAIL    = 3;  // Detail texture
 
-constexpr u32 TEX_SLOT_METALLIC  = 4;  // PBR: Metallic map
-constexpr u32 TEX_SLOT_ROUGHNESS = 5;  // PBR: Roughness map
-constexpr u32 TEX_SLOT_AO        = 6;  // PBR: Ambient occlusion
-constexpr u32 TEX_SLOT_PARALLAX  = 7;  // PBR: Parallax/height map
+constexpr u32 TEX_SLOT_PBR       = 4;  // PBR: Packed texture (R=metallic, G=roughness, B=ao, A=parallax)
 
 // ══════════════════════════════════════════════════════════
 //  SHADER CONSTANT BUFFER LAYOUTS
