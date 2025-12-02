@@ -173,6 +173,27 @@ bool ConvertTexturesToPBR(
 );
 
 // ══════════════════════════════════════════════════════════
+//  PBR TEXTURE CONSOLIDATION
+// ══════════════════════════════════════════════════════════
+// Packs existing separate PBR textures (_metallic, _roughness, _ao, _parallax)
+// into a single _pbr.dds texture (R=M, G=R, B=AO, A=Parallax)
+
+struct ConsolidationStats {
+    u32 textures_found = 0;
+    u32 textures_consolidated = 0;
+    u32 textures_failed = 0;
+    u32 files_deleted = 0;
+};
+
+// Consolidate existing separate PBR textures into packed _pbr.dds
+// Also updates .thm files and deletes old separate files
+bool ConsolidatePBRTextures(
+    const xr_string& root_alias,
+    ConsolidationStats& out_stats,
+    ProgressCallback progress_callback = nullptr
+);
+
+// ══════════════════════════════════════════════════════════
 //  HELPER: Build default inventory (common case)
 // ══════════════════════════════════════════════════════════
 
