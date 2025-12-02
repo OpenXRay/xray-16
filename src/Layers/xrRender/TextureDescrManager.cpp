@@ -214,6 +214,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial, bool listTHM)
             desc.m_spec->m_roughness_name = tp.roughness_name;
             desc.m_spec->m_ao_name = tp.ao_name;
             desc.m_spec->m_parallax_name = tp.parallax_name;
+            desc.m_spec->m_pbr_name = tp.pbr_name;
         }
     };
     if (!listTHM)
@@ -354,6 +355,29 @@ shared_str CTextureDescrMngr::GetParallaxName(const shared_str& tex_name) const
     strconcat(sizeof(nm), nm, tex_name.c_str(), "_parallax");
     if (TextureFileExists(nm))
         return nm;
+    return "";
+}
+
+shared_str CTextureDescrMngr::GetPBRName(const shared_str& tex_name) const
+{
+    map_TD::const_iterator I = m_texture_details.find(tex_name);
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec && I->second.m_spec->m_pbr_name.size())
+        {
+            return I->second.m_spec->m_pbr_name;
+        }
+    }
+
+    xr_string base = tex_name.c_str();
+    if (base.size() > 2 && base.substr(base.size() - 2) == "_d")
+        base = base.substr(0, base.size() - 2);
+
+    string256 nm;
+    strconcat(sizeof(nm), nm, base.c_str(), "_pbr");
+    if (TextureFileExists(nm))
+        return nm;
+
     return "";
 }
 

@@ -17,10 +17,7 @@ constexpr u32 TEX_SLOT_BUMP      = 1;
 constexpr u32 TEX_SLOT_BUMP_X    = 2;
 constexpr u32 TEX_SLOT_DETAIL    = 3;
 
-constexpr u32 TEX_SLOT_METALLIC  = 4;
-constexpr u32 TEX_SLOT_ROUGHNESS = 5;
-constexpr u32 TEX_SLOT_AO        = 6;
-constexpr u32 TEX_SLOT_PARALLAX  = 7;
+constexpr u32 TEX_SLOT_PBR       = 4;
 
 struct alignas(16) PerObjectConstants {
     Fmatrix m_xform;

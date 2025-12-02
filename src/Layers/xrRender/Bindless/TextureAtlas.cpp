@@ -87,10 +87,6 @@ TextureRegisterResult TextureAtlas::RegisterTexture(
     if (s_logCount[typeIdx] < 3) {
         s_logCount[typeIdx]++;
         const auto& desc = sourceTexture->getDesc();
-        Msg("* [BindlessAtlas] %s[%u] = '%s' (%ux%u -> %ux%u, uvScale=%.2f,%.2f)",
-            GetAtlasTypeName(m_type), sliceIndex, textureName.c_str(),
-            desc.width, desc.height, ATLAS_TEXTURE_SIZE, ATLAS_TEXTURE_SIZE,
-            uvScaleU, uvScaleV);
     }
 
     return result;
@@ -156,9 +152,6 @@ bool TextureAtlas::CopyTextureToSlice(
 
     const auto& srcDesc = sourceTexture->getDesc();
 
-    outUVScaleU = static_cast<float>(srcDesc.width) / static_cast<float>(ATLAS_TEXTURE_SIZE);
-    outUVScaleV = static_cast<float>(srcDesc.height) / static_cast<float>(ATLAS_TEXTURE_SIZE);
-
     if (srcDesc.format != nvrhi::Format::RGBA8_UNORM &&
         srcDesc.format != nvrhi::Format::SRGBA8_UNORM &&
         srcDesc.format != nvrhi::Format::BGRA8_UNORM &&
@@ -180,6 +173,12 @@ bool TextureAtlas::CopyTextureToSlice(
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
+    u32 tilesX = ATLAS_TEXTURE_SIZE / srcDesc.width;
+    u32 tilesY = ATLAS_TEXTURE_SIZE / srcDesc.height;
+
+    outUVScaleU = static_cast<float>(srcDesc.width) / static_cast<float>(ATLAS_TEXTURE_SIZE);
+    outUVScaleV = static_cast<float>(srcDesc.height) / static_cast<float>(ATLAS_TEXTURE_SIZE);
+
     nvrhi::TextureSlice srcSlice;
     srcSlice.mipLevel = 0;
     srcSlice.arraySlice = 0;
@@ -190,17 +189,21 @@ bool TextureAtlas::CopyTextureToSlice(
     srcSlice.height = srcDesc.height;
     srcSlice.depth = 1;
 
-    nvrhi::TextureSlice dstSlice;
-    dstSlice.mipLevel = 0;
-    dstSlice.arraySlice = sliceIndex;
-    dstSlice.x = 0;
-    dstSlice.y = 0;
-    dstSlice.z = 0;
-    dstSlice.width = srcDesc.width;
-    dstSlice.height = srcDesc.height;
-    dstSlice.depth = 1;
+    for (u32 ty = 0; ty < tilesY; ty++) {
+        for (u32 tx = 0; tx < tilesX; tx++) {
+            nvrhi::TextureSlice dstSlice;
+            dstSlice.mipLevel = 0;
+            dstSlice.arraySlice = sliceIndex;
+            dstSlice.x = tx * srcDesc.width;
+            dstSlice.y = ty * srcDesc.height;
+            dstSlice.z = 0;
+            dstSlice.width = srcDesc.width;
+            dstSlice.height = srcDesc.height;
+            dstSlice.depth = 1;
 
-    cmdList->copyTexture(m_array, dstSlice, sourceTexture, srcSlice);
+            cmdList->copyTexture(m_array, dstSlice, sourceTexture, srcSlice);
+        }
+    }
 
     return true;
 }

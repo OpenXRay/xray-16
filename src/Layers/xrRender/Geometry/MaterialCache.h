@@ -285,10 +285,7 @@ private:
     };
     xr_vector<PendingMaterial> m_pendingMaterials;
 
-    resources::TextureHandle m_defaultMetallic;
-    resources::TextureHandle m_defaultRoughness;
-    resources::TextureHandle m_defaultAO;
-    resources::TextureHandle m_defaultParallax;
+    resources::TextureHandle m_defaultPBR;
 
     void CreateDefaultPBRTextures();
 

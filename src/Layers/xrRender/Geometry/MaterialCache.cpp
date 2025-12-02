@@ -215,36 +215,16 @@ void MaterialCache::CreateDefaultPBRTextures()
     desc.width = 1;
     desc.height = 1;
     desc.mipLevels = 1;
-    desc.format = nvrhi::Format::R8_UNORM;
+    desc.format = nvrhi::Format::RGBA8_UNORM;
+    desc.debugName = "$default_pbr";
 
-    desc.debugName = "$default_metallic";
-    u8 blackPixel = 0;
-    m_defaultMetallic = texManager->CreateTexture(desc, &blackPixel);
-    if (m_defaultMetallic.IsValid()) {
-        m_textureHandleCache["$default_metallic"] = m_defaultMetallic;
+    u8 pbrPixel[4] = { 0, 255, 255, 128 };
+    m_defaultPBR = texManager->CreateTexture(desc, pbrPixel);
+    if (m_defaultPBR.IsValid()) {
+        m_textureHandleCache["$default_pbr"] = m_defaultPBR;
     }
 
-    desc.debugName = "$default_roughness";
-    u8 whitePixel = 255;
-    m_defaultRoughness = texManager->CreateTexture(desc, &whitePixel);
-    if (m_defaultRoughness.IsValid()) {
-        m_textureHandleCache["$default_roughness"] = m_defaultRoughness;
-    }
-
-    desc.debugName = "$default_ao";
-    m_defaultAO = texManager->CreateTexture(desc, &whitePixel);
-    if (m_defaultAO.IsValid()) {
-        m_textureHandleCache["$default_ao"] = m_defaultAO;
-    }
-
-    desc.debugName = "$default_parallax";
-    u8 grayPixel = 128;
-    m_defaultParallax = texManager->CreateTexture(desc, &grayPixel);
-    if (m_defaultParallax.IsValid()) {
-        m_textureHandleCache["$default_parallax"] = m_defaultParallax;
-    }
-
-    Msg("* [MaterialCache] Created default PBR textures");
+    Msg("* [MaterialCache] Created default PBR texture");
 }
 
 MaterialCache::~MaterialCache() {
@@ -600,40 +580,34 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
             using namespace passes;
 
-            auto loadPBRTexture = [&](const shared_str& pbrTexName, u32 slot, const char* type, resources::TextureHandle defaultTex) {
-                resources::TextureHandle handle;
+            resources::TextureHandle pbrHandle;
+            shared_str pbrTexName = texDescMgr.GetPBRName(baseTexName);
 
-                if (!pbrTexName.empty()) {
-                    auto cacheIt = m_textureHandleCache.find(pbrTexName.c_str());
-                    if (cacheIt != m_textureHandleCache.end()) {
-                        handle = cacheIt->second;
-                    } else {
-                        handle = texManager->LoadTexture(
-                            pbrTexName.c_str(),
-                            resources::TexturePriority::High
-                        );
-                        if (handle.IsValid()) {
-                            m_textureHandleCache[pbrTexName.c_str()] = handle;
-                        }
+            if (!pbrTexName.empty()) {
+                auto cacheIt = m_textureHandleCache.find(pbrTexName.c_str());
+                if (cacheIt != m_textureHandleCache.end()) {
+                    pbrHandle = cacheIt->second;
+                } else {
+                    pbrHandle = texManager->LoadTexture(
+                        pbrTexName.c_str(),
+                        resources::TexturePriority::High
+                    );
+                    if (pbrHandle.IsValid()) {
+                        m_textureHandleCache[pbrTexName.c_str()] = pbrHandle;
                     }
                 }
+            }
 
-                if (!handle.IsValid()) {
-                    handle = defaultTex;
-                }
+            if (!pbrHandle.IsValid()) {
+                pbrHandle = m_defaultPBR;
+            }
 
-                if (handle.IsValid()) {
-                    MaterialPSO::TextureSlot texSlot;
-                    texSlot.slot = slot;
-                    texSlot.handle = handle;
-                    matPSO->textures.push_back(texSlot);
-                }
-            };
-
-            loadPBRTexture(texDescMgr.GetMetallicName(baseTexName),  TEX_SLOT_METALLIC,  "metallic",  m_defaultMetallic);
-            loadPBRTexture(texDescMgr.GetRoughnessName(baseTexName), TEX_SLOT_ROUGHNESS, "roughness", m_defaultRoughness);
-            loadPBRTexture(texDescMgr.GetAOName(baseTexName),        TEX_SLOT_AO,        "ao",        m_defaultAO);
-            loadPBRTexture(texDescMgr.GetParallaxName(baseTexName),  TEX_SLOT_PARALLAX,  "parallax",  m_defaultParallax);
+            if (pbrHandle.IsValid()) {
+                MaterialPSO::TextureSlot texSlot;
+                texSlot.slot = TEX_SLOT_PBR;
+                texSlot.handle = pbrHandle;
+                matPSO->textures.push_back(texSlot);
+            }
         }
     }
 }
@@ -1991,14 +1965,13 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                 return atlasManager.PBR().RegisterTexture(ctx, pbrTexName, nvrhiTex);
             };
 
-            shared_str metallicName = texDescMgr.GetMetallicName(diffuseName);
-            TextureRegisterResult metallicResult = registerPBRTexture(metallicName);
-            if (metallicResult.IsValid()) {
-                matData.pbrSlice = metallicResult.sliceRef.packed;
+            shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
+            TextureRegisterResult pbrResult = registerPBRTexture(pbrName);
+            if (pbrResult.IsValid()) {
+                matData.pbrSlice = pbrResult.sliceRef.packed;
                 matData.flags |= MAT_FLAG_HAS_PBR;
                 updated = true;
             }
-
         }
 
         if (updated) {

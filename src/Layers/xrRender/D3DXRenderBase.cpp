@@ -523,6 +523,25 @@ void D3DXRenderBase::ConvertLegacyAssetsToPBR()
     {
         Msg("~ [PBR] Textures already converted, skipping conversion.");
     }
+
+    Msg("~ [PBR] Checking for PBR texture consolidation...");
+    ConsolidationStats consolidationStats;
+    if (ConsolidatePBRTextures("$game_textures$", consolidationStats, nullptr))
+    {
+        if (consolidationStats.textures_consolidated > 0)
+        {
+            Msg("~ [PBR] Consolidation complete: %d packed, %d files deleted",
+                consolidationStats.textures_consolidated, consolidationStats.files_deleted);
+        }
+        else
+        {
+            Msg("~ [PBR] No textures needed consolidation.");
+        }
+    }
+    else
+    {
+        Msg("! [PBR] Consolidation had failures: %d failed", consolidationStats.textures_failed);
+    }
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

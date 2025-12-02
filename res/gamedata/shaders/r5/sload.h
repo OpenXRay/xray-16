@@ -130,10 +130,11 @@ surface_bumped sload_i( p_bumped I)
 	S.gloss		= Nu.x*Nu.x;
 	S.height	= NuE.z;
 
-	S.metallic  = s_metallic.Sample(smp_base, I.tcdh).r;
-	S.roughness = s_roughness.Sample(smp_base, I.tcdh).r;
-	S.ao        = s_ao.Sample(smp_base, I.tcdh).r;
-	S.parallax_height = s_parallax.Sample(smp_base, I.tcdh).r;
+	float4 pbr = s_pbr.Sample(smp_base, I.tcdh);
+	S.metallic       = pbr.r;
+	S.roughness      = pbr.g;
+	S.ao             = pbr.b;
+	S.parallax_height = pbr.a;
 
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP
@@ -173,10 +174,11 @@ surface_bumped sload_i( p_bumped I, float2 pixeloffset )
 	S.gloss		= Nu.x*Nu.x;
 	S.height	= NuE.z;
 
-	S.metallic  = s_metallic.Sample(smp_base, I.tcdh).r;
-	S.roughness = s_roughness.Sample(smp_base, I.tcdh).r;
-	S.ao        = s_ao.Sample(smp_base, I.tcdh).r;
-	S.parallax_height = s_parallax.Sample(smp_base, I.tcdh).r;
+	float4 pbr = s_pbr.Sample(smp_base, I.tcdh);
+	S.metallic       = pbr.r;
+	S.roughness      = pbr.g;
+	S.ao             = pbr.b;
+	S.parallax_height = pbr.a;
 
 #ifdef        USE_TDETAIL
 #ifdef        USE_TDETAIL_BUMP

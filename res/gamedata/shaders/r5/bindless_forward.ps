@@ -74,7 +74,7 @@ PS_OUTPUT main(PS_INPUT input)
     float3 N = normalize(input.normal);
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        float3 normalSample = SampleNormal(mat.normalSlice, input.texcoord);
+        float3 normalSample = SampleNormalScaled(mat.normalSlice, input.texcoord, uvScale);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
@@ -86,7 +86,7 @@ PS_OUTPUT main(PS_INPUT input)
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
         float2 detailUV = input.texcoord * mat.detailScale;
-        float4 detailSample = SampleDetail(mat.detailSlice, detailUV);
+        float4 detailSample = SampleDetailScaled(mat.detailSlice, detailUV, uvScale);
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
@@ -96,7 +96,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        float3 pbrSample = SamplePBR(mat.pbrSlice, input.texcoord);
+        float3 pbrSample = SamplePBRScaled(mat.pbrSlice, input.texcoord, uvScale);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;

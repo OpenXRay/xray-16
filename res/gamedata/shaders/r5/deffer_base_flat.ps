@@ -16,9 +16,10 @@ f_forward main( p_flat I )
 	float3 worldPos = viewPosToWorld(I.position.xyz);
 
 	float3 albedo = D.rgb;
-	float roughness = s_roughness.Sample(smp_base, I.tcdh).r;
-	float metallic = s_metallic.Sample(smp_base, I.tcdh).r;
-	float ao = s_ao.Sample(smp_base, I.tcdh).r;
+	float4 pbr = s_pbr.Sample(smp_base, I.tcdh);
+	float metallic  = pbr.r;
+	float roughness = pbr.g;
+	float ao        = pbr.b;
 
 #ifdef USE_LM_HEMI
 	float hemi = s_hemi.Sample(smp_rtlinear, I.lmh).a;

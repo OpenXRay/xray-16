@@ -32,6 +32,7 @@ class CTextureDescrMngr
         shared_str m_roughness_name;
         shared_str m_ao_name;
         shared_str m_parallax_name;
+        shared_str m_pbr_name;
     };
     struct texture_desc
     {
@@ -67,5 +68,6 @@ public:
     shared_str GetRoughnessName(const shared_str& tex_name) const;
     shared_str GetAOName(const shared_str& tex_name) const;
     shared_str GetParallaxName(const shared_str& tex_name) const;
+    shared_str GetPBRName(const shared_str& tex_name) const;
 };
 } // namespace xray::render::RENDER_NAMESPACE
