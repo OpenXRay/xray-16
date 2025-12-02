@@ -10,6 +10,7 @@
 #include "Layers/xrRender/ETextureParams.h"  // For .thm file support
 #include <atomic>
 #include <algorithm>
+#include <DirectXTex.h>  // For normal map generation from diffuse
 
 using namespace xray::render::RENDER_NAMESPACE;
 namespace xray::render::pbr {
@@ -127,9 +128,18 @@ static xr_vector<u8> DecompressDDS(const resources::DDSData& ddsData, u32& outWi
     // Check format (cast enum to int for comparison)
     bool isDXT1 = (static_cast<int>(ddsData.desc.format) == 56);  // BC1/DXT1
     bool isDXT5 = (static_cast<int>(ddsData.desc.format) == 60);  // BC3/DXT5
+    bool isRGBA8 = (static_cast<int>(ddsData.desc.format) == 19); // R8G8B8A8_UNORM
+
+    // Handle uncompressed RGBA8 (e.g., generated bumpmaps)
+    if (isRGBA8) {
+        if (mip0.data && mip0.size >= pixelCount * 4) {
+            std::memcpy(result.data(), mip0.data, pixelCount * 4);
+        }
+        return result;
+    }
 
     if (!isDXT1 && !isDXT5) {
-        Msg("! [PBRTextureConverter] Unsupported format: %d (only DXT1/DXT5 supported)", static_cast<int>(ddsData.desc.format));
+        Msg("! [PBRTextureConverter] Unsupported format: %d (only DXT1/DXT5/RGBA8 supported)", static_cast<int>(ddsData.desc.format));
         return result;
     }
 
@@ -174,6 +184,130 @@ static xr_vector<u8> DecompressDDS(const resources::DDSData& ddsData, u32& outWi
     }
 
     return result;
+}
+
+// ══════════════════════════════════════════════════════════
+//  HELPER: Generate Normal Map from Diffuse using DirectXTex
+// ══════════════════════════════════════════════════════════
+// Uses luminance-based Sobel filter to create height-derived normal map
+// amplitude controls bump strength (higher = more pronounced bumps)
+
+static bool GenerateNormalMapFromDiffuse(
+    const xr_vector<u8>& diffuseRGBA,
+    u32 width, u32 height,
+    xr_vector<u8>& outNormalRGBA,
+    float amplitude = 12.0f)
+{
+    if (diffuseRGBA.empty() || width == 0 || height == 0) {
+        return false;
+    }
+
+    // Create DirectXTex image from diffuse data
+    DirectX::Image srcImage = {};
+    srcImage.width = width;
+    srcImage.height = height;
+    srcImage.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srcImage.rowPitch = width * 4;
+    srcImage.slicePitch = width * height * 4;
+    srcImage.pixels = const_cast<u8*>(diffuseRGBA.data());
+
+    // Compute normal map using luminance channel as height
+    DirectX::ScratchImage normalMap;
+    HRESULT hr = DirectX::ComputeNormalMap(
+        srcImage,
+        DirectX::CNMAP_CHANNEL_LUMINANCE,  // Use luminance as height source
+        amplitude,                          // Bump strength
+        DXGI_FORMAT_R8G8B8A8_UNORM,
+        normalMap
+    );
+
+    if (FAILED(hr)) {
+        Msg("! [PBRTextureConverter] DirectXTex ComputeNormalMap failed: 0x%08X", hr);
+        return false;
+    }
+
+    // Copy result to output vector
+    const DirectX::Image* result = normalMap.GetImage(0, 0, 0);
+    if (!result || !result->pixels) {
+        return false;
+    }
+
+    // Swizzle from DirectXTex format to X-Ray bump format
+    // DirectXTex output: R=X, G=Y, B=Z, A=1 (standard tangent-space normal)
+    // X-Ray bump format: R=Gloss, G=Z, B=Y, A=X
+    const u32 pixelCount = width * height;
+    outNormalRGBA.resize(pixelCount * 4);
+    const u8* src = result->pixels;
+
+    // Debug: log first pixel values from DirectXTex
+    if (pixelCount > 0) {
+        Msg("* [PBRTextureConverter] DirectXTex normal[0]: R=%u G=%u B=%u A=%u",
+            src[0], src[1], src[2], src[3]);
+    }
+
+    for (u32 i = 0; i < pixelCount; ++i) {
+        u8 x = src[i * 4 + 0];  // Normal X from DirectXTex
+        u8 y = src[i * 4 + 1];  // Normal Y from DirectXTex
+        u8 z = src[i * 4 + 2];  // Normal Z from DirectXTex
+
+        outNormalRGBA[i * 4 + 0] = 128;  // R = Gloss (default 0.5)
+        outNormalRGBA[i * 4 + 1] = z;    // G = Normal Z
+        outNormalRGBA[i * 4 + 2] = y;    // B = Normal Y
+        outNormalRGBA[i * 4 + 3] = x;    // A = Normal X
+    }
+
+    // Debug: log first pixel values after swizzle
+    if (pixelCount > 0) {
+        Msg("* [PBRTextureConverter] X-Ray bump[0]: R=%u G=%u B=%u A=%u (Gloss,Z,Y,X)",
+            outNormalRGBA[0], outNormalRGBA[1], outNormalRGBA[2], outNormalRGBA[3]);
+    }
+
+    return true;
+}
+
+// Helper to write generated normal map as DDS (RGBA8 uncompressed for simplicity)
+static bool WriteNormalMapDDS(
+    const char* root_alias,
+    const xr_string& relative_path,
+    const xr_vector<u8>& normalRGBA,
+    u32 width, u32 height)
+{
+    using namespace resources;
+
+    DDS_HEADER header = {};
+    header.dwSize = 124;
+    header.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_PITCH | DDSD_MIPMAPCOUNT;
+    header.dwWidth = width;
+    header.dwHeight = height;
+    header.dwPitchOrLinearSize = width * 4;
+    header.dwDepth = 0;
+    header.dwMipMapCount = 1;
+
+    // RGBA8 pixel format
+    header.ddspf.dwSize = 32;
+    header.ddspf.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+    header.ddspf.dwRGBBitCount = 32;
+    header.ddspf.dwRBitMask = 0x000000FF;  // R in byte 0
+    header.ddspf.dwGBitMask = 0x0000FF00;  // G in byte 1
+    header.ddspf.dwBBitMask = 0x00FF0000;  // B in byte 2
+    header.ddspf.dwABitMask = 0xFF000000;  // A in byte 3
+
+    header.dwCaps = DDSCAPS_TEXTURE;
+
+    IWriter* writer = FS.w_open(root_alias, relative_path.c_str());
+    if (!writer) {
+        Msg("! [PBRTextureConverter] Failed to open file for writing: %s/%s", root_alias, relative_path.c_str());
+        return false;
+    }
+
+    const u32 magic = DDS_MAGIC;
+    writer->w(&magic, sizeof(magic));
+    writer->w(&header, sizeof(header));
+    writer->w(normalRGBA.data(), normalRGBA.size());
+
+    FS.w_close(writer);
+    Msg("* [PBRTextureConverter] Generated normal map: %s/%s (%ux%u)", root_alias, relative_path.c_str(), width, height);
+    return true;
 }
 
 #ifdef USE_AI_PBR
@@ -1177,7 +1311,8 @@ bool ConvertTexturesToPBR(
     // Process textures sequentially to avoid running out of memory
     // AI models use significant VRAM/RAM, parallel processing causes OOM
     for (size_t idx = 0; idx < inventory.assets.size(); ++idx) {
-            const auto& asset = inventory.assets[idx];
+            // Copy to mutable variable - we may generate missing normal maps
+            LegacyTextureAsset asset = inventory.assets[idx];
 
             // Show progress every 10 textures or at start
             if (idx % 10 == 0 || idx == 0) {
@@ -1233,17 +1368,6 @@ bool ConvertTexturesToPBR(
             Msg("* [PBRTextureConverter] PBR textures missing, running conversion: %s", asset.base_name.c_str());
 
             // ═══════════════════════════════════════════════════════
-            //  SKIP IF NO NORMAL MAP (AI requires normal)
-            // ═══════════════════════════════════════════════════════
-#ifdef USE_AI_PBR
-            if (!asset.has_normal) {
-                Msg("~ [PBRTextureConverter] Skipping %s (AI requires normal map)", asset.base_name.c_str());
-                skipped_count++;
-                continue;
-            }
-#endif
-
-            // ═══════════════════════════════════════════════════════
             //  LOAD SOURCE TEXTURES
             // ═══════════════════════════════════════════════════════
             resources::DDSData diffuseData;
@@ -1268,6 +1392,45 @@ bool ConvertTexturesToPBR(
                 failed_count++;
                 continue;
             }
+
+            // ═══════════════════════════════════════════════════════
+            //  GENERATE NORMAL MAP IF MISSING (DirectXTex)
+            // ═══════════════════════════════════════════════════════
+            xr_vector<u8> generatedNormalRGBA;
+
+            if (!asset.has_normal) {
+                Msg("~ [PBRTextureConverter] No normal map for %s, generating from diffuse...", asset.base_name.c_str());
+
+                // Decompress diffuse to RGBA for normal map generation
+                u32 diffuseWidth, diffuseHeight;
+                xr_vector<u8> diffuseRGBA = DecompressDDS(diffuseData, diffuseWidth, diffuseHeight);
+
+                if (!diffuseRGBA.empty()) {
+                    // Generate normal map using DirectXTex
+                    if (GenerateNormalMapFromDiffuse(diffuseRGBA, diffuseWidth, diffuseHeight, generatedNormalRGBA, 4.0f)) {
+                        // Save generated normal map to disk
+                        xr_string bump_path = asset.base_name + "_bump.dds";
+                        if (WriteNormalMapDDS(params.output_root.c_str(), bump_path, generatedNormalRGBA, diffuseWidth, diffuseHeight)) {
+                            // Update asset to indicate normal map now exists
+                            asset.has_normal = true;
+                            asset.normal.root_alias = params.output_root;
+                            asset.normal.relative_path = bump_path;
+                            Msg("* [PBRTextureConverter] Generated normal map saved: %s", bump_path.c_str());
+                        }
+                    } else {
+                        Msg("! [PBRTextureConverter] Failed to generate normal map for %s", asset.base_name.c_str());
+                    }
+                }
+            }
+
+#ifdef USE_AI_PBR
+            // If still no normal map after generation attempt, skip AI conversion
+            if (!asset.has_normal) {
+                Msg("~ [PBRTextureConverter] Skipping %s (no normal map available)", asset.base_name.c_str());
+                skipped_count++;
+                continue;
+            }
+#endif
 
             // Load specular (optional)
             const resources::DDSData* specularPtr = nullptr;
@@ -1295,7 +1458,7 @@ bool ConvertTexturesToPBR(
 #ifdef USE_AI_PBR
             // Try AI conversion if available AND we have normal map
             if (g_ai_available && asset.has_normal) {
-                // Load normal map
+                // Load normal map (either existing or freshly generated)
                 resources::DDSData normalData;
                 xr_string normal_vfs_path = StripDDSExtension(asset.normal.relative_path);
 
