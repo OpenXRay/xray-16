@@ -12,6 +12,10 @@
 #include "Layers/xrRenderDX11/3DFluid/dx113DFluidVolume.h"
 #endif
 
+// Mega-buffer system integration
+#include "Layers/xrRender/r_FrameGraphRenderer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRender::level_Load(IReader* fs)
@@ -56,6 +60,18 @@ void CRender::level_Load(IReader* fs)
 
     if (!GEnv.isDedicatedServer)
     {
+        // ═══════════════════════════════════════════════════════
+        //  MEGA-BUFFER SYSTEM: Begin level load
+        // ═══════════════════════════════════════════════════════
+        GPUCullingManager* gpuCulling = nullptr;
+        if (m_framegraphRenderer) {
+            gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+            if (gpuCulling) {
+                // Estimate geometry size (will be refined during LoadBuffers)
+                gpuCulling->BeginLevelLoad(2000000, 6000000);
+            }
+        }
+
         // VB,IB,SWI
         g_pGamePersistent->LoadTitle("st_loading_geometry");
         {
@@ -79,6 +95,13 @@ void CRender::level_Load(IReader* fs)
         chunk = fs->open_chunk(fsL_VISUALS);
         LoadVisuals(chunk);
         chunk->close();
+
+        // ═══════════════════════════════════════════════════════
+        //  MEGA-BUFFER SYSTEM: End level load
+        // ═══════════════════════════════════════════════════════
+        if (gpuCulling) {
+            gpuCulling->EndLevelLoad();
+        }
 
         // Details
         g_pGamePersistent->LoadTitle("st_loading_details");
@@ -203,6 +226,13 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
 
     R_ASSERT2(base_fs, "Could not load geometry. File not found.");
     Resources->Evict();
+
+    // Get GPUCullingManager for mega-buffer registration
+    GPUCullingManager* gpuCulling = nullptr;
+    if (m_framegraphRenderer) {
+        gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
+    }
+
     // Vertex buffers
     {
         ZoneScopedN("Load VBs");
@@ -242,6 +272,14 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             vbuffers[i].Create(vCount * vSize);
             u8* pData = static_cast<u8*>(vbuffers[i].Map());
             fs->r(pData, vCount * vSize);
+
+            // ═══════════════════════════════════════════════════════
+            //  MEGA-BUFFER: Register VB pool before upload
+            // ═══════════════════════════════════════════════════════
+            if (gpuCulling) {
+                gpuCulling->RegisterVBPool(pData, vCount, vSize, dcl, alternative);
+            }
+
             vbuffers[i].Unmap(true); // upload vertex data
 
             //			fs->advance			(vCount*vSize);
@@ -270,6 +308,14 @@ void CRender::LoadBuffers(CStreamReader* base_fs, bool alternative)
             ibuffers[i].Create(iCount * 2);
             u8* pData = static_cast<u8*>(ibuffers[i].Map());
             fs->r(pData, iCount * 2);
+
+            // ═══════════════════════════════════════════════════════
+            //  MEGA-BUFFER: Register IB pool before upload
+            // ═══════════════════════════════════════════════════════
+            if (gpuCulling) {
+                gpuCulling->RegisterIBPool(reinterpret_cast<const u16*>(pData), iCount, alternative);
+            }
+
             ibuffers[i].Unmap(true); // upload index data
 
             //			fs().advance		(iCount*2);

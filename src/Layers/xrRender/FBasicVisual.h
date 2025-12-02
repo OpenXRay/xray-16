@@ -31,6 +31,12 @@ struct IRender_Mesh
     u32 iCount;
     u32 dwPrimitives;
 
+    // GPU-driven rendering: VB/IB pool IDs for mega-buffer lookup
+    // Set during level load, used by ProcessVisualGeometry to compute mega-buffer offsets
+    u32 vbPoolID{UINT32_MAX};   // Index into GPUCullingManager::m_vbPools
+    u32 ibPoolID{UINT32_MAX};   // Index into GPUCullingManager::m_ibPools
+    bool useAlternativeGeom{false};  // True if using fast/alternative geometry
+
     IRender_Mesh()
     {
         p_rm_Vertices   = nullptr;
@@ -41,6 +47,9 @@ struct IRender_Mesh
         iCount          = 0;
         dwPrimitives    = 0;
         rm_geom         = nullptr;
+        vbPoolID        = UINT32_MAX;
+        ibPoolID        = UINT32_MAX;
+        useAlternativeGeom = false;
     }
     virtual ~IRender_Mesh();
 

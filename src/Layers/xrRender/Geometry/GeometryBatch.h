@@ -5,6 +5,7 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For RenderPhase
 #include "Layers/xrRender/Shader.h"  // For ShaderElement flags
 #include "Layers/xrRender/FBasicVisual.h"  // For dxRender_Visual
+#include "Layers/xrRender/GPUCullingManager.h"  // For MeshAllocation
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;  // Forward declaration
@@ -30,8 +31,9 @@ struct GeometryBatch {
     u32 startIndex = 0;
     s32 baseVertex = 0;
 
-    // Material
-    u32 materialID = 0;
+    // Material IDs
+    u32 materialID = 0;              // Legacy material ID (for sorting)
+    u32 bindlessMaterialID = UINT32_MAX;  // Index into g_Materials for GPU-driven rendering
 
     // Textures
     ng::TextureHandle albedoTexture;
@@ -80,6 +82,13 @@ struct GeometryBatch {
 
     // Debug
     shared_str debugName;
+
+    // ═══════════════════════════════════════════════════
+    //  GPU-DRIVEN RENDERING: Mega-buffer allocation
+    // ═══════════════════════════════════════════════════
+    // Contains offsets into the unified mega vertex/index buffers
+    // Set during ProcessVisualGeometry using pool IDs from mesh
+    RENDER_NAMESPACE::MeshAllocation megaBufferAlloc;
 
     // ═══════════════════════════════════════════════════
     //  SHADER FLAG HELPERS

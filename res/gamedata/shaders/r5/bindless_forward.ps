@@ -1,0 +1,158 @@
+// bindless_forward.ps
+// Bindless forward pixel shader
+// All materials use this single shader - textures fetched via material buffer
+
+#define SM_5_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+};
+
+// Lighting constants (b4 to avoid conflict with common.h's b0-b2)
+cbuffer LightingConstants : register(b4)
+{
+    float4 g_SunDirection;
+    float4 g_SunColor;
+    float4 g_AmbientColor;
+    float4 g_CameraPosition;
+    float4 g_FogParams;      // x = start, y = end, z = density
+    float4 g_FogColor;
+};
+
+// Simple PBR-ish lighting
+float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
+{
+    float3 L = -g_SunDirection.xyz;
+    float3 H = normalize(V + L);
+
+    float NdotL = saturate(dot(N, L));
+    float NdotH = saturate(dot(N, H));
+    float NdotV = saturate(dot(N, V));
+
+    // Diffuse
+    float3 diffuse = albedo * (1.0 - metallic);
+
+    // Specular (simplified GGX)
+    float alpha = roughness * roughness;
+    float alpha2 = alpha * alpha;
+    float denom = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
+    float D = alpha2 / (3.14159 * denom * denom);
+
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+    float3 F = F0 + (1.0 - F0) * pow(1.0 - saturate(dot(H, V)), 5.0);
+
+    float3 specular = D * F * 0.25;
+
+    // Combine
+    float3 directLight = (diffuse + specular) * g_SunColor.rgb * NdotL;
+    float3 ambient = albedo * g_AmbientColor.rgb * ao;
+
+    return directLight + ambient;
+}
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    // DEBUG: Visualize UVs as color to find where black areas are in UV space
+    // Uncomment ONE of these to debug:
+
+    // Option 1: Show UV coordinates as RG color (frac to see tiling)
+    //output.color = float4(frac(input.texcoord.x), frac(input.texcoord.y), 0, 1);
+    //return output;
+
+    // Option 2: Show material ID as grayscale
+    //output.color = float4(input.materialID / 255.0, input.materialID / 255.0, input.materialID / 255.0, 1);
+    //return output;
+
+    // Get material data directly using material ID (no indirection through g_DrawMaterialIDs)
+    MaterialData mat = g_Materials[input.materialID];
+
+    // DEBUG: Show atlas index and slice as color
+    //uint atlasIdx = mat.diffuseSlice >> 24;
+    //uint sliceIdx = mat.diffuseSlice & 0x00FFFFFF;
+    //output.color = float4(atlasIdx / 72.0, (sliceIdx % 256) / 255.0, sliceIdx / 1000.0, 1);
+    //return output;
+
+    // Sample textures from atlases using UV scale for non-square textures
+    float2 uvScale = float2(mat.diffuseUVScaleU, mat.diffuseUVScaleV);
+    float4 diffuseSample = SampleDiffuseScaled(mat.diffuseSlice, input.texcoord, uvScale);
+
+    // DEBUG: Highlight black samples in CYAN to see where texture returns black
+    //float luminance = dot(diffuseSample.rgb, float3(0.299, 0.587, 0.114));
+    //if (luminance < 0.05) {
+    //    output.color = float4(0, 1, 1, 1); // CYAN = texture returned black
+    //    return output;
+    //}
+
+    // Alpha test
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        clip(diffuseSample.a - mat.alphaRef);
+    }
+
+    float3 albedo = diffuseSample.rgb;
+
+    // Normal mapping
+    float3 N = normalize(input.normal);
+    if (mat.flags & MAT_FLAG_HAS_NORMAL)
+    {
+        float3 normalSample = SampleNormal(mat.normalSlice, input.texcoord);
+        float3x3 TBN = float3x3(
+            normalize(input.tangent),
+            normalize(input.bitangent),
+            N
+        );
+        N = normalize(mul(normalSample, TBN));
+    }
+
+    // Detail texture
+    if (mat.flags & MAT_FLAG_HAS_DETAIL)
+    {
+        float2 detailUV = input.texcoord * mat.detailScale;
+        float4 detailSample = SampleDetail(mat.detailSlice, detailUV);
+        // Blend detail (multiply-2x style)
+        albedo = albedo * (detailSample.rgb * 2.0);
+    }
+
+    // PBR properties
+    float metallic = 0.0;
+    float roughness = 0.5;
+    float ao = 1.0;
+
+    if (mat.flags & MAT_FLAG_HAS_PBR)
+    {
+        float3 pbrSample = SamplePBR(mat.pbrSlice, input.texcoord);
+        metallic = pbrSample.r;
+        roughness = pbrSample.g;
+        ao = pbrSample.b;
+    }
+
+    // View direction
+    float3 V = normalize(g_CameraPosition.xyz - input.worldPos);
+
+    // Calculate lighting
+    float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
+
+    // Fog
+    float fogDist = length(input.worldPos - g_CameraPosition.xyz);
+    float fogFactor = saturate((g_FogParams.y - fogDist) / (g_FogParams.y - g_FogParams.x));
+    finalColor = lerp(g_FogColor.rgb, finalColor, fogFactor);
+
+    output.color = float4(finalColor, diffuseSample.a);
+    return output;
+}

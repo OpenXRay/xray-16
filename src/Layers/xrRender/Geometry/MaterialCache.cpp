@@ -23,6 +23,8 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"  // For DefaultOutputLayout
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"  // For PBR texture slot constants
+#include "Layers/xrRender/Bindless/TextureAtlas.h"            // Bindless texture atlases
+#include "Layers/xrRender/Bindless/MaterialBuffer.h"          // Bindless material buffer
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -716,6 +718,10 @@ MaterialPSO* MaterialCache::CreatePSO(
     }
 
     pso->pso = nvrhiPSO;
+
+    // Register with bindless system for GPU-driven rendering
+    // This assigns a material ID that will be used during geometry upload
+    RegisterBindlessMaterial(pso.get());
 
     m_stats.totalPSOCreations++;
 
@@ -2306,6 +2312,319 @@ float MaterialCache::GetDetailScale(const shared_str& textureName)
     m_detailScaleCache[textureName.c_str()] = scale;
 
     return scale;
+}
+
+// ══════════════════════════════════════════════════════════
+//  REGISTER MATERIAL WITH BINDLESS SYSTEM
+// ══════════════════════════════════════════════════════════
+
+u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (!matPSO)
+        return UINT32_MAX;
+
+    // Already registered?
+    if (matPSO->bindlessMaterialID != UINT32_MAX)
+        return matPSO->bindlessMaterialID;
+
+    // Check if bindless system is initialized
+    auto& atlasManager = TextureAtlasManager::Instance();
+    auto& materialBuffer = MaterialBuffer::Instance();
+
+    if (!atlasManager.IsInitialized() || !materialBuffer.IsInitialized())
+        return UINT32_MAX;
+
+    // Get texture manager for NVRHI texture access
+    resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+    if (!texManager)
+        return UINT32_MAX;
+
+    // Build MaterialData from PSO textures
+    MaterialData matData = {};
+    matData.diffuseSlice = 0xFFFFFFFF;  // Invalid by default
+    matData.normalSlice = 0xFFFFFFFF;
+    matData.detailSlice = 0xFFFFFFFF;
+    matData.pbrSlice = 0xFFFFFFFF;
+    matData.detailScale = matPSO->detail_scale;
+    matData.alphaRef = 0.5f;  // Default alpha ref
+    matData.flags = 0;
+    matData.diffuseUVScaleU = 1.0f;  // Default: texture fills bucket
+    matData.diffuseUVScaleV = 1.0f;
+
+    // Extract material properties from shader/pass
+    if (matPSO->pass) {
+        // Check texture list for material flags
+        RENDER_NAMESPACE::STextureList* texList = matPSO->pass->T._get();
+        if (texList && !texList->empty()) {
+            // Has diffuse texture
+            matData.flags |= 0;  // Will be updated below
+
+            // Check for normal map (usually slot 1 or named with _bump)
+            for (size_t i = 0; i < texList->size(); i++) {
+                const auto& texPair = (*texList)[i];
+                if (texPair.first == 1) {  // Normal map slot
+                    matData.flags |= MAT_FLAG_HAS_NORMAL;
+                }
+            }
+        }
+    }
+
+    // Note: Actual texture registration to atlases happens lazily during rendering
+    // when RenderContext is available. For now, we just set up the material flags
+    // and register with the buffer. The diffuseSlice etc. will be updated later.
+
+    // Register with material buffer
+    u32 materialID = materialBuffer.RegisterMaterial(matData);
+    matPSO->bindlessMaterialID = materialID;
+
+    return materialID;
+}
+
+// ══════════════════════════════════════════════════════════
+//  PRE-REGISTER BINDLESS MATERIAL BY VISUAL
+// ══════════════════════════════════════════════════════════
+// Called during geometry collection (before PSO exists)
+// Creates bindless material entry based on visual's shader/textures
+// Returns material ID for batch.bindlessMaterialID
+
+u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (!visual)
+        return UINT32_MAX;
+
+    // Check cache first
+    auto it = m_visualToMaterialID.find(visual);
+    if (it != m_visualToMaterialID.end())
+        return it->second;
+
+    // Check if bindless system is initialized
+    auto& materialBuffer = MaterialBuffer::Instance();
+    if (!materialBuffer.IsInitialized())
+        return UINT32_MAX;
+
+    // Get or compile shader
+    RENDER_NAMESPACE::Shader* shader = nullptr;
+    if (visual->shader && visual->shader._get()) {
+        shader = visual->shader._get();
+    } else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
+               visual->textureName.c_str() && visual->textureName.size() > 0) {
+        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
+        shader = visual->shader._get();
+    }
+
+    if (!shader)
+        return UINT32_MAX;
+
+    // Get first element and pass for texture info
+    RENDER_NAMESPACE::ShaderElement* elem = shader->E[0]._get();
+    if (!elem || elem->passes.empty())
+        return UINT32_MAX;
+
+    RENDER_NAMESPACE::SPass* pass = elem->passes[0]._get();
+    if (!pass)
+        return UINT32_MAX;
+
+    // Build MaterialData
+    MaterialData matData = {};
+    matData.diffuseSlice = 0xFFFFFFFF;
+    matData.normalSlice = 0xFFFFFFFF;
+    matData.detailSlice = 0xFFFFFFFF;
+    matData.pbrSlice = 0xFFFFFFFF;
+    matData.detailScale = 1.0f;
+    matData.alphaRef = 0.5f;
+    matData.flags = 0;
+    matData.diffuseUVScaleU = 1.0f;  // Default until texture is registered
+    matData.diffuseUVScaleV = 1.0f;
+
+    // Extract detail scale from base texture
+    RENDER_NAMESPACE::STextureList* texList = pass->T._get();
+    if (texList && !texList->empty()) {
+        const shared_str& baseTexName = (*texList)[0].second;
+        if (baseTexName.c_str() && baseTexName[0]) {
+            matData.detailScale = GetDetailScale(baseTexName);
+        }
+
+        // Check for normal map
+        for (size_t i = 0; i < texList->size(); i++) {
+            if ((*texList)[i].first == 1) {  // Normal map slot
+                matData.flags |= MAT_FLAG_HAS_NORMAL;
+            }
+        }
+    }
+
+    // Check alpha test from shader element
+    if (elem->flags.bAlphaTest) {
+        matData.flags |= MAT_FLAG_ALPHA_TEST;
+    }
+
+    // Register with material buffer
+    u32 materialID = materialBuffer.RegisterMaterial(matData);
+
+    // Cache for future lookups
+    m_visualToMaterialID[visual] = materialID;
+
+    // Add to pending list for atlas population
+    // This will be finalized when RenderContext is available
+    PendingMaterial pending;
+    pending.materialID = materialID;
+    pending.visual = visual;
+    m_pendingMaterials.push_back(pending);
+
+    return materialID;
+}
+
+// ══════════════════════════════════════════════════════════
+//  FINALIZE PENDING MATERIALS (Populate Texture Atlases)
+// ══════════════════════════════════════════════════════════
+// Called once per frame when RenderContext is available
+// Populates atlas textures for materials registered this frame
+
+void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (m_pendingMaterials.empty())
+        return;
+
+    auto& atlasManager = TextureAtlasManager::Instance();
+    auto& materialBuffer = MaterialBuffer::Instance();
+
+    if (!atlasManager.IsInitialized() || !materialBuffer.IsInitialized())
+        return;
+
+    resources::TextureManager* texManager = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
+    if (!texManager)
+        return;
+
+    u32 processedCount = 0;
+
+    for (const auto& pending : m_pendingMaterials) {
+        dxRender_Visual* visual = pending.visual;
+        u32 materialID = pending.materialID;
+
+        if (!visual || materialID == UINT32_MAX)
+            continue;
+
+        // Get material data to update
+        const MaterialData* existingMat = materialBuffer.GetMaterial(materialID);
+        if (!existingMat)
+            continue;
+
+        MaterialData matData = *existingMat;
+        bool updated = false;
+
+        // Get shader pass for texture names
+        RENDER_NAMESPACE::Shader* shader = visual->shader._get();
+        if (!shader)
+            continue;
+
+        RENDER_NAMESPACE::ShaderElement* elem = shader->E[0]._get();
+        if (!elem || elem->passes.empty())
+            continue;
+
+        RENDER_NAMESPACE::SPass* pass = elem->passes[0]._get();
+        if (!pass)
+            continue;
+
+        RENDER_NAMESPACE::STextureList* texList = pass->T._get();
+        if (!texList || texList->empty())
+            continue;
+
+        // Get diffuse texture (slot 0)
+        const shared_str& diffuseName = (*texList)[0].second;
+        if (diffuseName.c_str() && diffuseName[0]) {
+            // Load texture through modern resource manager
+            resources::TextureHandle handle = texManager->LoadTexture(diffuseName.c_str());
+            if (handle.IsValid()) {
+                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                if (nvrhiTex) {
+                    // RegisterTexture returns slice ref + UV scale for textures smaller than atlas
+                    TextureRegisterResult result = atlasManager.Diffuse().RegisterTexture(ctx, diffuseName, nvrhiTex);
+                    if (result.IsValid()) {
+                        matData.diffuseSlice = result.sliceRef.packed;
+                        matData.diffuseUVScaleU = result.uvScaleU;
+                        matData.diffuseUVScaleV = result.uvScaleV;
+                        updated = true;
+                    }
+                }
+            }
+        }
+
+        // Get normal map (slot 1 if exists)
+        for (size_t i = 0; i < texList->size(); i++) {
+            if ((*texList)[i].first == 1) {  // Normal map slot
+                const shared_str& normalName = (*texList)[i].second;
+                if (normalName.c_str() && normalName[0]) {
+                    resources::TextureHandle handle = texManager->LoadTexture(normalName.c_str());
+                    if (handle.IsValid()) {
+                        nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                        if (nvrhiTex) {
+                            TextureRegisterResult result = atlasManager.Normal().RegisterTexture(ctx, normalName, nvrhiTex);
+                            if (result.IsValid()) {
+                                matData.normalSlice = result.sliceRef.packed;
+                                matData.flags |= MAT_FLAG_HAS_NORMAL;
+                                updated = true;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        // Get PBR textures from texture description metadata
+        // PBR textures are associated with the base diffuse texture
+        if (diffuseName.c_str() && diffuseName[0]) {
+            auto& texDescMgr = RImplementation.Resources->m_textures_description;
+
+            // Helper to register PBR texture to atlas
+            auto registerPBRTexture = [&](const shared_str& pbrTexName) -> TextureRegisterResult {
+                if (pbrTexName.empty())
+                    return TextureRegisterResult();
+
+                resources::TextureHandle handle = texManager->LoadTexture(pbrTexName.c_str());
+                if (!handle.IsValid())
+                    return TextureRegisterResult();
+
+                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                if (!nvrhiTex)
+                    return TextureRegisterResult();
+
+                return atlasManager.PBR().RegisterTexture(ctx, pbrTexName, nvrhiTex);
+            };
+
+            // Try to register metallic texture (primary PBR texture)
+            shared_str metallicName = texDescMgr.GetMetallicName(diffuseName);
+            TextureRegisterResult metallicResult = registerPBRTexture(metallicName);
+            if (metallicResult.IsValid()) {
+                matData.pbrSlice = metallicResult.sliceRef.packed;
+                matData.flags |= MAT_FLAG_HAS_PBR;
+                updated = true;
+            }
+
+            // TODO: Register roughness, AO, parallax to separate atlas slots when needed
+            // For now, metallic is the primary PBR texture indicator
+        }
+
+        // Update material buffer if any textures were registered
+        if (updated) {
+            materialBuffer.UpdateMaterial(materialID, matData);
+            processedCount++;
+        }
+    }
+
+    // Clear pending list
+    m_pendingMaterials.clear();
+
+    // Upload updated materials to GPU
+    if (processedCount > 0) {
+        materialBuffer.Upload(ctx);
+        Msg("* [MaterialCache] Finalized %u pending materials", processedCount);
+    }
 }
 
 } // namespace xray::render

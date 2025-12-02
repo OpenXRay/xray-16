@@ -1,0 +1,89 @@
+// bindless_forward.vs
+// Bindless forward vertex shader
+//
+// SUPPORTS TWO VERTEX FORMATS:
+// 1. Legacy X-Ray compressed format (32 bytes) - current rendering path
+// 2. UnifiedVertex format (48 bytes) - GPU-driven mega-buffer path
+//
+// For now, we use the UnifiedVertex format which has pre-unpacked UVs.
+// When rendering from legacy D3D11 buffers, the input layout handles conversion.
+
+#define SM_5_0
+#include "common.h"
+#include "bindless_common.h"
+
+// UnifiedVertex format (48 bytes):
+//   Position:  float3    at offset  0 (12 bytes)
+//   Normal:    D3DCOLOR  at offset 12 (4 bytes) - packed [-1,1] -> [0,1], A=hemi
+//   Tangent:   D3DCOLOR  at offset 16 (4 bytes) - packed
+//   Binormal:  D3DCOLOR  at offset 20 (4 bytes) - packed
+//   TexCoord0: float2    at offset 24 (8 bytes) - pre-unpacked base UV
+//   TexCoord1: float2    at offset 32 (8 bytes) - lightmap UV
+//   Color:     D3DCOLOR  at offset 40 (4 bytes) - vertex color
+//   Flags:     uint      at offset 44 (4 bytes) - reserved
+struct VS_INPUT
+{
+    float4 position  : POSITION;     // float3 position
+    float4 normal    : NORMAL;       // D3DCOLOR: packed normal + hemi (BGRA8_UNORM)
+    float4 tangent   : TANGENT;      // D3DCOLOR: packed tangent
+    float4 binormal  : BINORMAL;     // D3DCOLOR: packed binormal
+    float2 texcoord  : TEXCOORD0;    // float2: pre-unpacked base UV
+    float2 texcoord1 : TEXCOORD1;    // float2: lightmap UV
+    float4 color     : COLOR0;       // D3DCOLOR: vertex color (BGRA8_UNORM)
+};
+
+struct VS_OUTPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal   : TEXCOORD2;
+    float3 tangent  : TEXCOORD3;
+    float3 bitangent: TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+};
+
+// Per-draw constants (b5 to avoid conflict with common.h's b0-b2)
+cbuffer PerDrawConstants : register(b5)
+{
+    float4x4 g_World;
+    uint g_MaterialID;  // Direct material ID into g_Materials buffer
+    float3 g_Padding;
+};
+
+// Unpack D3DCOLOR normal from [0,1] to [-1,1]
+float3 UnpackNormal(float4 packed)
+{
+    // D3DCOLOR stores in BGRA order, but BGRA8_UNORM reads as RGBA
+    // So .rgb gives us the normal components
+    return packed.rgb * 2.0 - 1.0;
+}
+
+VS_OUTPUT main(VS_INPUT input, uint instanceID : SV_InstanceID)
+{
+    VS_OUTPUT output;
+
+    // Unpack compressed normal/tangent/binormal
+    float3 normalUnpacked = UnpackNormal(input.normal);
+    float3 tangentUnpacked = UnpackNormal(input.tangent);
+    float3 binormalUnpacked = UnpackNormal(input.binormal);
+
+    // Transform position
+    float4 worldPos = mul(g_World, float4(input.position.xyz, 1.0));
+    output.worldPos = worldPos.xyz;
+    output.position = mul(m_VP, worldPos);
+
+    // Transform normal/tangent to world space
+    float3x3 worldMatrix3x3 = (float3x3)g_World;
+    output.normal = normalize(mul(worldMatrix3x3, normalUnpacked));
+    output.tangent = normalize(mul(worldMatrix3x3, tangentUnpacked));
+    output.bitangent = normalize(mul(worldMatrix3x3, binormalUnpacked));
+
+    // UVs are pre-unpacked in UnifiedVertex format - pass through directly
+    output.texcoord = input.texcoord;
+
+    // Pass material ID directly to pixel shader (no indirection needed)
+    output.materialID = g_MaterialID;
+
+    return output;
+}

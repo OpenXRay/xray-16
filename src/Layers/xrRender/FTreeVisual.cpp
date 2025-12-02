@@ -31,25 +31,32 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
     R_ASSERT(data->find_chunk(OGF_GCONTAINER));
     {
         // verts
-        u32 ID = data->r_u32();
+        u32 vbID = data->r_u32();
         vBase = data->r_u32();
         vCount = data->r_u32();
-        vFormat = RImplementation.getVB_Format(ID);
+        vFormat = RImplementation.getVB_Format(vbID);
 
         VERIFY(nullptr == p_rm_Vertices);
-        p_rm_Vertices = RImplementation.getVB(ID);
+        p_rm_Vertices = RImplementation.getVB(vbID);
         p_rm_Vertices->AddRef();
+
+        // GPU-driven: Store VB pool ID for mega-buffer lookup
+        vbPoolID = vbID;
 
         // indices
         dwPrimitives = 0;
-        ID = data->r_u32();
+        u32 ibID = data->r_u32();
         iBase = data->r_u32();
         iCount = data->r_u32();
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ID);
+        p_rm_Indices = RImplementation.getIB(ibID);
         p_rm_Indices->AddRef();
+
+        // GPU-driven: Store IB pool ID for mega-buffer lookup
+        ibPoolID = ibID;
+        useAlternativeGeom = false;
     }
 
     // load tree-def

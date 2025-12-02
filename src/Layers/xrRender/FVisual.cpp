@@ -42,15 +42,22 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         vFormat = RImplementation.getVB_Format(ID);
         loaded_v = true;
 
+        // GPU-driven: Store VB pool ID for mega-buffer lookup
+        vbPoolID = ID;
+
         // indices
-        ID = data->r_u32();
+        u32 ibID = data->r_u32();
         iBase = data->r_u32();
         iCount = data->r_u32();
         dwPrimitives = iCount / 3;
 
         VERIFY(nullptr == p_rm_Indices);
-        p_rm_Indices = RImplementation.getIB(ID);
+        p_rm_Indices = RImplementation.getIB(ibID);
         p_rm_Indices->AddRef();
+
+        // GPU-driven: Store IB pool ID for mega-buffer lookup
+        ibPoolID = ibID;
+        useAlternativeGeom = false;
 #endif
         // check for fast-vertices
 #if RENDER == R_R1
@@ -67,25 +74,32 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
             // verts
             VertexElement* fmt = nullptr;
-            ID = def().r_u32();
+            u32 fastVbID = def().r_u32();
             m_fast->vBase = def().r_u32();
             m_fast->vCount = def().r_u32();
 
             VERIFY(nullptr == m_fast->p_rm_Vertices);
-            m_fast->p_rm_Vertices = RImplementation.getVB(ID, true);
+            m_fast->p_rm_Vertices = RImplementation.getVB(fastVbID, true);
             m_fast->p_rm_Vertices->AddRef();
 
-            fmt = RImplementation.getVB_Format(ID, true);
+            fmt = RImplementation.getVB_Format(fastVbID, true);
+
+            // GPU-driven: Store VB pool ID for mega-buffer lookup (alternative geometry)
+            m_fast->vbPoolID = fastVbID;
 
             // indices
-            ID = def().r_u32();
+            u32 fastIbID = def().r_u32();
             m_fast->iBase = def().r_u32();
             m_fast->iCount = def().r_u32();
             m_fast->dwPrimitives = m_fast->iCount / 3;
 
             VERIFY(nullptr == m_fast->p_rm_Indices);
-            m_fast->p_rm_Indices = RImplementation.getIB(ID, true);
+            m_fast->p_rm_Indices = RImplementation.getIB(fastIbID, true);
             m_fast->p_rm_Indices->AddRef();
+
+            // GPU-driven: Store IB pool ID for mega-buffer lookup (alternative geometry)
+            m_fast->ibPoolID = fastIbID;
+            m_fast->useAlternativeGeom = true;
 
             // geom
             m_fast->rm_geom.create(fmt, *m_fast->p_rm_Vertices, *m_fast->p_rm_Indices);
@@ -209,6 +223,11 @@ void Fvisual::Copy(dxRender_Visual* pSrc)
     PCOPY(iBase);
     PCOPY(iCount);
     PCOPY(dwPrimitives);
+
+    // GPU-driven: Copy pool IDs for mega-buffer lookup
+    PCOPY(vbPoolID);
+    PCOPY(ibPoolID);
+    PCOPY(useAlternativeGeom);
 
     PCOPY(m_fast);
 }

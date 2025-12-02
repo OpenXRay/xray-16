@@ -4,6 +4,7 @@
 #include "xrCore/xrCore.h"
 #include "Layers/xrRender/FrameGraph/FGTypes.h"
 #include "Layers/xrRender/FrameGraph/FGResource.h"
+#include "Layers/xrRender/Bindless/UnifiedVertex.h"
 
 namespace xray::render::RENDER_NAMESPACE::passes {
     struct ParticleBatch;
@@ -91,6 +92,32 @@ struct IndirectDrawArgs {
 static_assert(sizeof(IndirectDrawArgs) == 20, "IndirectDrawArgs must be 20 bytes");
 
 // ═══════════════════════════════════════════════════════
+//  MESH ALLOCATION (for mega-buffer system)
+// ═══════════════════════════════════════════════════════
+
+struct MeshAllocation {
+    u32 vertexOffset;   // Offset in mega-VB (in vertices)
+    u32 indexOffset;    // Offset in mega-IB (in indices)
+    u32 vertexCount;
+    u32 indexCount;
+    bool valid;
+
+    MeshAllocation() : vertexOffset(0), indexOffset(0), vertexCount(0), indexCount(0), valid(false) {}
+};
+
+// ═══════════════════════════════════════════════════════
+//  INSTANCE DATA (matches HLSL InstanceData struct)
+// ═══════════════════════════════════════════════════════
+
+struct GPUInstanceData {
+    Fmatrix world;          // World transform (64 bytes)
+    u32 materialID;         // Bindless material ID
+    u32 flags;              // Instance flags
+    float pad0, pad1;       // Padding to 80 bytes
+};
+static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
+
+// ═══════════════════════════════════════════════════════
 //  GPU CULLING OUTPUT
 // ═══════════════════════════════════════════════════════
 
@@ -98,7 +125,10 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
     framegraph::VirtualResourceHandle visibleCount;
     framegraph::VirtualResourceHandle drawArgsBuffer;
+    framegraph::VirtualResourceHandle compactDrawArgs;
+    framegraph::VirtualResourceHandle compactBatchIndices;
     u32 maxObjects;
+    u32 previousFrameVisibleCount;
 };
 
 struct GPUParticleCullOutput {
@@ -157,6 +187,46 @@ public:
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
 
     // ───────────────────────────────────────────────────────
+    //  MEGA-BUFFER SYSTEM (GPU-Driven Rendering)
+    // ───────────────────────────────────────────────────────
+    // Unified vertex/index buffers for all geometry
+    // Enables true MultiDrawIndirect with single VB/IB binding
+
+    // Begin level load - prepare to receive mesh data
+    // estimatedVertices/Indices help pre-allocate, but will grow if needed
+    void BeginLevelLoad(u32 estimatedVertices = 1000000, u32 estimatedIndices = 3000000);
+
+    // Register a mesh's geometry into mega-buffers
+    // Converts from X-Ray format to UnifiedVertex and stores in mega-buffer
+    // Returns allocation info with offsets for draw args
+    MeshAllocation RegisterMesh(
+        const void* vertices,
+        u32 vertexCount,
+        u32 vertexStride,
+        bindless::SourceVertexFormat format,
+        const u16* indices,
+        u32 indexCount
+    );
+
+    // End level load - upload all data to GPU
+    void EndLevelLoad();
+
+    // Check if mega-buffers are ready for rendering
+    bool AreMegaBuffersReady() const { return m_megaBuffersReady; }
+
+    // Get mega-buffers for rendering
+    nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
+    nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
+    nvrhi::IBuffer* GetInstanceBuffer() const { return m_instanceBuffer.Get(); }
+
+    // Upload instance data (transforms) for current frame
+    void UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry);
+
+    // Get mega-buffer stats
+    u32 GetTotalVertexCount() const { return m_totalVertexCount; }
+    u32 GetTotalIndexCount() const { return m_totalIndexCount; }
+
+    // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION
     // ───────────────────────────────────────────────────────
 
@@ -191,11 +261,19 @@ public:
     bool IsParticleCullingEnabled() const { return m_initialized && m_particleCullEnabled; }
     nvrhi::IBuffer* GetParticleDrawArgsBuffer() const { return m_particleDrawArgsBuffer.Get(); }
 
+    u32 GetPreviousFrameVisibleCount() const { return m_previousFrameVisibleCount; }
+    nvrhi::IBuffer* GetCompactDrawArgsBuffer() const { return m_compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetCompactBatchIndicesBuffer() const { return m_compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetCompactMaterialIDBuffer() const { return m_compactMaterialIDBuffer.Get(); }
+    void ReadbackVisibleCount(ng::RenderContext* ctx);
+
 private:
     void CreateBuffers(ng::RenderDevice* device);
     void CreateComputePipeline(ng::RenderDevice* device);
+    void CreateCompactionResources(ng::RenderDevice* device);
     void CreateDebugResources(ng::RenderDevice* device);
     void CreateParticleResources(ng::RenderDevice* device);
+    void CreateMegaBuffers();  // Called by EndLevelLoad
 
     // Extract frustum planes from view-projection matrix
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
@@ -208,11 +286,26 @@ private:
     nvrhi::BufferHandle m_cullParamsCB;         // Constant buffer
 
     // Compute pipelines
-    nvrhi::ComputePipelineHandle m_cullPipeline;      // Main culling pass
-    nvrhi::ComputePipelineHandle m_clearArgsPipeline; // Clear draw args pass
+    nvrhi::ComputePipelineHandle m_cullPipeline;
+    nvrhi::ComputePipelineHandle m_clearArgsPipeline;
+    nvrhi::ComputePipelineHandle m_compactPipeline;
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
+    nvrhi::BindingLayoutHandle m_compactLayout;
     nvrhi::SamplerHandle m_pointSampler;
+
+    nvrhi::BufferHandle m_compactDrawArgsBuffer;
+    nvrhi::BufferHandle m_compactBatchIndicesBuffer;
+    nvrhi::BufferHandle m_compactCountBuffer;
+    nvrhi::BufferHandle m_compactCountReadbackBuffer;
+    nvrhi::BufferHandle m_compactParamsCB;
+
+    // Material ID buffers for bindless rendering
+    nvrhi::BufferHandle m_materialIDBuffer;          // Material ID per batch (input)
+    nvrhi::BufferHandle m_compactMaterialIDBuffer;   // Material ID per visible batch (output)
+
+    u32 m_previousFrameVisibleCount = 0;
+    bool m_compactEnabled = false;
 
     // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES
@@ -251,10 +344,89 @@ private:
     // CPU-side object data (for upload)
     xr_vector<GPUObjectData> m_objectData;
     xr_vector<IndirectDrawArgs> m_drawArgsData;  // Draw arguments (geometry info)
+    xr_vector<u32> m_materialIDData;             // Material IDs per batch (for bindless)
+
+    // ───────────────────────────────────────────────────────
+    //  MEGA-BUFFER SYSTEM
+    // ───────────────────────────────────────────────────────
+    nvrhi::BufferHandle m_megaVertexBuffer;     // Unified vertex buffer (UnifiedVertex format)
+    nvrhi::BufferHandle m_megaIndexBuffer;      // Unified index buffer (32-bit indices)
+    nvrhi::BufferHandle m_instanceBuffer;       // Per-instance transforms + material IDs
+
+    // CPU-side staging data (during level load)
+    xr_vector<bindless::UnifiedVertex> m_megaVertices;
+    xr_vector<u32> m_megaIndices;
+    xr_vector<GPUInstanceData> m_instanceData;
+
+    // Tracking
+    u32 m_totalVertexCount = 0;
+    u32 m_totalIndexCount = 0;
+    u32 m_maxMegaVertices = 0;
+    u32 m_maxMegaIndices = 0;
+    bool m_megaBuffersReady = false;
+    bool m_levelLoadInProgress = false;
+
+    // ───────────────────────────────────────────────────────
+    //  VB POOL REGISTRATION (for level geometry)
+    // ───────────────────────────────────────────────────────
+    // During LoadBuffers(), we register entire VB pools
+    // Each pool's vertices are converted and stored in mega-buffer
+    // Meshes later lookup their allocation by (vbID, vBase)
+
+    struct VBPoolInfo {
+        u32 megaBufferVertexOffset;  // Start offset in mega-VB
+        u32 vertexCount;              // Total vertices in pool
+        bindless::SourceVertexFormat format;
+    };
+
+    struct IBPoolInfo {
+        u32 megaBufferIndexOffset;   // Start offset in mega-IB
+        u32 indexCount;               // Total indices in pool
+    };
+
+    xr_vector<VBPoolInfo> m_vbPools;       // VB ID -> pool info
+    xr_vector<IBPoolInfo> m_ibPools;       // IB ID -> pool info
+    xr_vector<VBPoolInfo> m_vbPoolsAlt;    // Alternative (fast) geometry
+    xr_vector<IBPoolInfo> m_ibPoolsAlt;
 
 public:
     // Get draw args buffer for forward pass (indirect draw)
     nvrhi::IBuffer* GetDrawArgsBuffer() const { return m_drawArgsBuffer.Get(); }
+
+    // ───────────────────────────────────────────────────────
+    //  VB POOL REGISTRATION API
+    // ───────────────────────────────────────────────────────
+
+    // Register a vertex buffer pool during level load (called from LoadBuffers)
+    // Returns pool index for later mesh allocation lookup
+    u32 RegisterVBPool(
+        const void* vertices,
+        u32 vertexCount,
+        u32 vertexStride,
+        const D3DVERTEXELEMENT9* decl,
+        bool alternative = false
+    );
+
+    // Register an index buffer pool during level load
+    u32 RegisterIBPool(
+        const u16* indices,
+        u32 indexCount,
+        bool alternative = false
+    );
+
+    // Get mesh allocation from VB/IB pool + offsets
+    // Called from FVisual::Load() to get mega-buffer offsets
+    MeshAllocation GetMeshAllocation(
+        u32 vbID, u32 vBase, u32 vCount,
+        u32 ibID, u32 iBase, u32 iCount,
+        bool alternative = false
+    ) const;
+
+    // Detect vertex format from vertex declaration
+    static bindless::SourceVertexFormat DetectFormatFromDecl(
+        const D3DVERTEXELEMENT9* decl,
+        u32 stride
+    );
 };
 
 } // namespace xray::render::RENDER_NAMESPACE

@@ -279,6 +279,11 @@ struct MaterialPSO {
     // Debug name
     shared_str debugName;
 
+    // ─── Bindless Material ID ───
+    // Index into g_Materials buffer for GPU-driven rendering
+    // UINT32_MAX = not registered with bindless system
+    u32 bindlessMaterialID = UINT32_MAX;
+
     ~MaterialPSO() {
         // pso is managed by RenderDevice, don't delete
     }
@@ -352,6 +357,18 @@ private:
     // Cached to avoid repeated queries and avoid casting R_constant_setup*
     xr_map<xr_string, float> m_detailScaleCache;
 
+    // Bindless material ID cache: Maps visual pointer -> material ID
+    // Used for pre-registration during geometry collection
+    xr_unordered_map<dxRender_Visual*, u32> m_visualToMaterialID;
+
+    // Pending materials that need texture population
+    // Stores (materialID, visual) pairs for deferred atlas registration
+    struct PendingMaterial {
+        u32 materialID;
+        dxRender_Visual* visual;
+    };
+    xr_vector<PendingMaterial> m_pendingMaterials;
+
     // Default PBR textures (1x1 solid color textures for fallback)
     // Used when no PBR texture is specified in .thm metadata
     resources::TextureHandle m_defaultMetallic;   // Black (0) = dielectric
@@ -409,6 +426,21 @@ public:
     // Cached per MaterialPSO for reuse across draws - only creates once!
     // VCBs are queried directly from the pool
     nvrhi::BindingSetHandle GetOrCreateBindingSet(MaterialPSO* matPSO);
+
+    // Register material with bindless system
+    // Populates texture atlases and creates material buffer entry
+    // Returns material ID (stored in matPSO->bindlessMaterialID)
+    u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
+
+    // Pre-register bindless material by visual (for geometry collection)
+    // Creates material entry before PSO exists, returns material ID
+    // Used to populate batch.bindlessMaterialID before GPU culling upload
+    u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
+
+    // Finalize pending materials (populate texture atlases)
+    // Call once per frame when RenderContext is available
+    // This populates atlas textures for any materials registered this frame
+    void FinalizePendingMaterials(ng::RenderContext* ctx);
 
     // Shader handle cache (shared across all materials to avoid recreating identical shaders)
     // Key format: "VS_<shadername>" or "PS_<shadername>" to distinguish stages

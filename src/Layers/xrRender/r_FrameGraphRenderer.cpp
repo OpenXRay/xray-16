@@ -27,6 +27,8 @@
 #include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
+#include "Bindless/TextureAtlas.h"                   // Bindless texture atlases
+#include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
@@ -278,6 +280,15 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Execute();
 
     // ═══════════════════════════════════════════════════════
+    //  READBACK GPU CULLING VISIBLE COUNT (for next frame)
+    // ═══════════════════════════════════════════════════════
+    // After GPU culling executes, read back the visible count for use in
+    // next frame's bindless rendering (previousFrameVisibleCount)
+    if (m_gpuCullingManager && m_gpuCullingManager->IsEnabled()) {
+        m_gpuCullingManager->ReadbackVisibleCount(m_renderContext.get());
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  RT VISUALIZATION: View what GBufferPass is rendering
     // ═══════════════════════════════════════════════════════
     // For now, m_finalOutput is pointing to gbufferOutputs.albedo (prototype RT)
@@ -526,13 +537,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // - Forward pass savings: ~3.0-4.0ms (early-Z rejects occluded fragments)
     // - Net gain: ~1.0-2.0ms
 
+    // Create bindless depth config from GPU culling manager
+    passes::BindlessDepthConfig bindlessDepthConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
+        bindlessDepthConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
+        bindlessDepthConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
+        bindlessDepthConfig.megaBuffersReady = true;
+    }
+
     framegraph::VirtualResourceHandle depthBuffer = passes::setupDepthPrepass(
         *m_framegraph,
         m_device,
         m_geometryCollector.get(),
         m_materialCache.get(),
         width,
-        height
+        height,
+        bindlessDepthConfig
     );
 
     // ═══════════════════════════════════════════════════════
@@ -579,6 +599,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
         // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
         m_gpuCullingManager->Initialize(m_device);
+
+        // Initialize bindless rendering system (texture atlases + material buffer)
+        bindless::TextureAtlasManager::Instance().Initialize(m_device);
+        bindless::MaterialBuffer::Instance().Initialize(m_device);
+        bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
 
         if (m_gpuCullingManager->IsEnabled()) {
             // NOTE: UploadSceneObjects is now called inside the culling pass execute lambda
@@ -660,6 +685,37 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // EARLY-Z OPTIMIZATION: Reuses depth from prepass (20-30% faster)
     // Reuses sky color RT (no clear - sky is background)
 
+    // Configure bindless rendering if GPU culling manager has compaction data
+    passes::BindlessForwardConfig bindlessConfig;
+    if (m_gpuCullingManager && m_gpuCullingManager->GetCompactDrawArgsBuffer()) {
+        bindlessConfig.enabled = true;  // TODO: Add console var to toggle bindless mode
+        bindlessConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetCompactDrawArgsBuffer();
+        bindlessConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetCompactMaterialIDBuffer();
+        bindlessConfig.previousFrameVisibleCount = m_gpuCullingManager->GetPreviousFrameVisibleCount();
+
+        // ═══════════════════════════════════════════════════════
+        //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
+        // ═══════════════════════════════════════════════════════
+        // If mega-buffers are ready, provide them for unified VB/IB rendering
+        if (m_gpuCullingManager->AreMegaBuffersReady()) {
+            bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
+            bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
+            bindlessConfig.megaBuffersReady = true;
+        }
+
+        // Debug: Log bindless config state periodically
+        static u32 s_debugCounter = 0;
+        if (++s_debugCounter % 300 == 1) {
+            Msg("* [Bindless] Config: enabled=%d, drawArgs=%p, matIDs=%p, prevCount=%u, IsValid=%d, megaReady=%d",
+                bindlessConfig.enabled,
+                bindlessConfig.compactDrawArgsBuffer,
+                bindlessConfig.compactMaterialIDBuffer,
+                bindlessConfig.previousFrameVisibleCount,
+                bindlessConfig.IsValid(),
+                bindlessConfig.megaBuffersReady);
+        }
+    }
+
     auto forwardOutputs = passes::setupForwardColorPass(
         *m_framegraph,
         m_device,
@@ -669,7 +725,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache.get(),
         width,
         height,
-        drawArgsBuffer  // Draw args from GPU culling (enables indirect draw if valid)
+        drawArgsBuffer,  // Draw args from GPU culling (enables indirect draw if valid)
+        bindlessConfig   // Bindless rendering configuration
     );
 
     // ═══════════════════════════════════════════════════════
@@ -1092,6 +1149,34 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         return false;
     }
 
+    // Pre-register bindless material for GPU-driven rendering
+    // This assigns material ID before GPU culling uploads the batch
+    if (m_materialCache) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  GPU-DRIVEN: Compute mega-buffer allocation
+    // ═══════════════════════════════════════════════════════
+    // Use mesh's pool IDs to get offsets into unified mega-buffers
+    if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
+        batch.megaBufferAlloc = m_gpuCullingManager->GetMeshAllocation(
+            meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
+            meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+            meshVisual->useAlternativeGeom
+        );
+
+        // Debug: Log allocation details for first few batches
+        static int s_allocDebug = 0;
+        if (s_allocDebug < 10 && !batch.megaBufferAlloc.valid) {
+            Msg("! [MegaBuffer] Invalid alloc: vbPool=%u, vBase=%u, vCount=%u, ibPool=%u, iBase=%u, iCount=%u, alt=%d",
+                meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
+                meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+                meshVisual->useAlternativeGeom ? 1 : 0);
+            s_allocDebug++;
+        }
+    }
+
     // Submit to collector
     m_geometryCollector->Submit(batch);
     return true;
@@ -1429,7 +1514,26 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
 
     u32 culledStatic = 0;
 
-    for (dxRender_Visual* visual : staticVisuals) {
+    // Detect and remove duplicate visuals to prevent Z-fighting
+    xr_set<dxRender_Visual*> uniqueVisuals;
+    u32 duplicateCount = 0;
+    for (dxRender_Visual* v : staticVisuals) {
+        if (uniqueVisuals.count(v)) {
+            duplicateCount++;
+        } else {
+            uniqueVisuals.insert(v);
+        }
+    }
+    if (duplicateCount > 0) {
+        static bool s_loggedDuplicates = false;
+        if (!s_loggedDuplicates) {
+            Msg("! [CollectVisibleGeometry] Found %u duplicate visuals in staticVisuals (total: %zu, unique: %zu)",
+                duplicateCount, staticVisuals.size(), uniqueVisuals.size());
+            s_loggedDuplicates = true;
+        }
+    }
+
+    for (dxRender_Visual* visual : uniqueVisuals) {
         // ═══════════════════════════════════════════════════════
         //  FRUSTUM CULLING FOR STATIC GEOMETRY
         // ═══════════════════════════════════════════════════════

@@ -9,6 +9,7 @@
 #include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/FrameGraphPasses/ParticlePassSetup.h"
 #include "Layers/xrRender/FBasicVisual.h"
+#include "Layers/xrRender/Bindless/VertexConverter.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -75,6 +76,7 @@ static ref_vs s_cull_debug_vs;
 static ref_ps s_cull_debug_ps;
 static ref_cs s_particle_cull_cs;
 static ref_cs s_particle_cull_debug_cs;
+static ref_cs s_batch_compact_cs;
 
 // ═══════════════════════════════════════════════════════
 //  CONSTRUCTOR / DESTRUCTOR
@@ -130,11 +132,13 @@ void GPUCullingManager::Initialize(ng::RenderDevice* device)
 
     CreateBuffers(device);
     CreateComputePipeline(device);
+    CreateCompactionResources(device);
     CreateDebugResources(device);
     CreateParticleResources(device);
 
     m_initialized = true;
-    Msg("* [GPUCulling] Initialized (max objects: %d, max particles: %d)", m_maxObjects, m_maxParticles);
+    Msg("* [GPUCulling] Initialized (max objects: %d, max particles: %d, compact: %s)",
+        m_maxObjects, m_maxParticles, m_compactEnabled ? "yes" : "no");
 }
 
 void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
@@ -296,6 +300,201 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
     Msg("* [GPUCulling] Compute pipeline created successfully");
 }
 
+void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
+{
+    if (!m_computeEnabled)
+        return;
+
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+
+    s_batch_compact_cs.create("batch_compact");
+    if (!s_batch_compact_cs || !s_batch_compact_cs->nvrhiShader) {
+        Msg("! [GPUCulling] batch_compact.cs not found - compaction disabled");
+        return;
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_CompactDrawArgs";
+        desc.byteSize = m_maxObjects * sizeof(IndirectDrawArgs);
+        // No structStride - raw buffer for D3D11 indirect args compatibility
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;  // RWByteAddressBuffer access
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;
+
+        m_compactDrawArgsBuffer = nvDevice->createBuffer(desc);
+        if (!m_compactDrawArgsBuffer) {
+            Msg("! [GPUCulling] Failed to create compact draw args buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_CompactBatchIndices";
+        desc.byteSize = m_maxObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;
+
+        m_compactBatchIndicesBuffer = nvDevice->createBuffer(desc);
+        if (!m_compactBatchIndicesBuffer) {
+            Msg("! [GPUCulling] Failed to create compact batch indices buffer");
+            return;
+        }
+    }
+
+    // Material ID buffers for bindless rendering
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_MaterialIDs";
+        desc.byteSize = m_maxObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        m_materialIDBuffer = nvDevice->createBuffer(desc);
+        if (!m_materialIDBuffer) {
+            Msg("! [GPUCulling] Failed to create material ID buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_CompactMaterialIDs";
+        desc.byteSize = m_maxObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = false;
+
+        m_compactMaterialIDBuffer = nvDevice->createBuffer(desc);
+        if (!m_compactMaterialIDBuffer) {
+            Msg("! [GPUCulling] Failed to create compact material ID buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_CompactCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_compactCountBuffer = nvDevice->createBuffer(desc);
+        if (!m_compactCountBuffer) {
+            Msg("! [GPUCulling] Failed to create compact count buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_CompactCountReadback";
+        desc.byteSize = sizeof(u32);
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+
+        m_compactCountReadbackBuffer = nvDevice->createBuffer(desc);
+        if (!m_compactCountReadbackBuffer) {
+            Msg("! [GPUCulling] Failed to create compact count readback buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_CompactParams";
+        desc.byteSize = 16;
+        desc.isConstantBuffer = true;
+        desc.isVolatile = true;
+        desc.maxVersions = 16;
+
+        m_compactParamsCB = nvDevice->createBuffer(desc);
+        if (!m_compactParamsCB) {
+            Msg("! [GPUCulling] Failed to create compact params CB");
+            return;
+        }
+    }
+
+    {
+        // Binding layout for batch_compact.cs:
+        // b5: CompactParams (constant buffer)
+        // t0: g_InputDrawArgs (ByteAddressBuffer - raw buffer SRV)
+        // t1: g_InputMaterialIDs (StructuredBuffer<uint> - SRV)
+        // u0: g_OutputDrawArgs (RWByteAddressBuffer - raw buffer UAV)
+        // u1: g_VisibleBatchIndices (RWStructuredBuffer<uint>)
+        // u2: g_VisibleCount (RWByteAddressBuffer)
+        // u3: g_OutputMaterialIDs (RWStructuredBuffer<uint>)
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::RawBuffer_SRV(0),          // Input draw args
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),   // Input material IDs
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(0),          // Output draw args
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),   // Batch indices
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(2),          // Visible count
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3)    // Output material IDs
+        };
+
+        m_compactLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (!m_compactLayout) {
+            Msg("! [GPUCulling] Failed to create compact binding layout");
+            return;
+        }
+    }
+
+    {
+        nvrhi::ComputePipelineDesc pipeDesc;
+        pipeDesc.CS = s_batch_compact_cs->nvrhiShader;
+        pipeDesc.bindingLayouts = { m_compactLayout };
+
+        m_compactPipeline = nvDevice->createComputePipeline(pipeDesc);
+        if (!m_compactPipeline) {
+            Msg("! [GPUCulling] Failed to create compact pipeline");
+            return;
+        }
+    }
+
+    m_compactEnabled = true;
+    Msg("* [GPUCulling] Compaction resources created");
+}
+
+void GPUCullingManager::ReadbackVisibleCount(ng::RenderContext* ctx)
+{
+    if (!m_compactEnabled || !m_compactCountReadbackBuffer) {
+        // Debug: Log why readback is skipped
+        static bool s_loggedOnce = false;
+        if (!s_loggedOnce) {
+            Msg("* [GPUCulling] ReadbackVisibleCount skipped: compactEnabled=%d, buffer=%p",
+                m_compactEnabled, m_compactCountReadbackBuffer.Get());
+            s_loggedOnce = true;
+        }
+        return;
+    }
+
+    void* mappedData = m_device->GetNVRHIDevice()->mapBuffer(m_compactCountReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    if (mappedData) {
+        u32 newCount = *static_cast<u32*>(mappedData);
+        m_device->GetNVRHIDevice()->unmapBuffer(m_compactCountReadbackBuffer);
+
+        // Debug: Log significant changes in visible count
+        if (m_previousFrameVisibleCount == 0 && newCount > 0) {
+            Msg("* [GPUCulling] First visible count readback: %u objects", newCount);
+        }
+        m_previousFrameVisibleCount = newCount;
+    }
+}
+
 void GPUCullingManager::Shutdown()
 {
     m_objectBuffer = nullptr;
@@ -305,6 +504,16 @@ void GPUCullingManager::Shutdown()
     m_cullPipeline = nullptr;
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
+
+    m_compactDrawArgsBuffer = nullptr;
+    m_compactBatchIndicesBuffer = nullptr;
+    m_compactCountBuffer = nullptr;
+    m_compactCountReadbackBuffer = nullptr;
+    m_compactParamsCB = nullptr;
+    m_compactPipeline = nullptr;
+    m_compactLayout = nullptr;
+    m_materialIDBuffer = nullptr;
+    m_compactMaterialIDBuffer = nullptr;
 
     m_debugBuffer = nullptr;
     m_debugComputeParamsCB = nullptr;
@@ -323,9 +532,25 @@ void GPUCullingManager::Shutdown()
     m_particleCullPipeline = nullptr;
     m_particleCullLayout = nullptr;
 
+    // Mega-buffer resources
+    m_megaVertexBuffer = nullptr;
+    m_megaIndexBuffer = nullptr;
+    m_instanceBuffer = nullptr;
+    m_megaVertices.clear();
+    m_megaIndices.clear();
+    m_instanceData.clear();
+    m_totalVertexCount = 0;
+    m_totalIndexCount = 0;
+    m_maxMegaVertices = 0;
+    m_maxMegaIndices = 0;
+    m_megaBuffersReady = false;
+    m_levelLoadInProgress = false;
+
     m_initialized = false;
     m_computeEnabled = false;
+    m_compactEnabled = false;
     m_particleCullEnabled = false;
+    m_previousFrameVisibleCount = 0;
     m_objectCount = 0;
     m_particleCount = 0;
 }
@@ -345,11 +570,13 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     if (m_objectCount == 0)
         return;
 
-    // Build object data and draw args arrays
+    // Build object data, draw args, and material ID arrays
     m_objectData.clear();
     m_objectData.reserve(m_objectCount);
     m_drawArgsData.clear();
     m_drawArgsData.reserve(m_objectCount);
+    m_materialIDData.clear();
+    m_materialIDData.reserve(m_objectCount);
 
     for (u32 i = 0; i < m_objectCount; i++) {
         const auto& batch = batches[i];
@@ -394,12 +621,52 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         args.startInstanceLocation = 0;
 
         m_drawArgsData.push_back(args);
+
+        // ─────────────────────────────────────────────────────
+        //  MATERIAL ID (for bindless rendering)
+        // ─────────────────────────────────────────────────────
+        m_materialIDData.push_back(batch.bindlessMaterialID);
     }
 
     // Upload to GPU
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+
+    // ─────────────────────────────────────────────────────
+    //  MEGA-BUFFER UPLOAD (one-time, for GPU-driven rendering)
+    // ─────────────────────────────────────────────────────
+    // Upload mega vertex/index data on first frame after level load
+    static bool s_megaDataUploaded = false;
+    if (!s_megaDataUploaded && m_megaBuffersReady &&
+        !m_megaVertices.empty() && !m_megaIndices.empty() &&
+        m_megaVertexBuffer && m_megaIndexBuffer) {
+
+        cmdList->writeBuffer(m_megaVertexBuffer,
+            m_megaVertices.data(),
+            m_megaVertices.size() * sizeof(bindless::UnifiedVertex));
+
+        cmdList->writeBuffer(m_megaIndexBuffer,
+            m_megaIndices.data(),
+            m_megaIndices.size() * sizeof(u32));
+
+        s_megaDataUploaded = true;
+
+        Msg("* [GPUCulling] Mega-buffer data uploaded: %zu vertices, %zu indices",
+            m_megaVertices.size(), m_megaIndices.size());
+
+        // Free CPU memory after upload
+        m_megaVertices.clear();
+        m_megaVertices.shrink_to_fit();
+        m_megaIndices.clear();
+        m_megaIndices.shrink_to_fit();
+    }
+
     cmdList->writeBuffer(m_objectBuffer, m_objectData.data(), m_objectCount * sizeof(GPUObjectData));
     cmdList->writeBuffer(m_drawArgsBuffer, m_drawArgsData.data(), m_objectCount * sizeof(IndirectDrawArgs));
+
+    // Upload material IDs if compaction is enabled
+    if (m_compactEnabled && m_materialIDBuffer) {
+        cmdList->writeBuffer(m_materialIDBuffer, m_materialIDData.data(), m_objectCount * sizeof(u32));
+    }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -573,7 +840,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 return;
             }
 
-            // Set compute state and dispatch
+            // Set compute state and dispatch culling
             nvrhi::ComputeState state;
             state.pipeline = mgr->m_cullPipeline;
             state.bindings = { bindingSet };
@@ -582,9 +849,65 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             u32 groupCount = (data.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
             cmdList->dispatch(groupCount, 1, 1);
 
-            // NOTE: State transition to IndirectArgument is handled by FrameGraph
-            // Forward pass declares read(drawArgsBuffer, IndirectArgument) dependency
-            // which ensures proper barrier insertion between passes
+            // ─────────────────────────────────────────────────────
+            //  BATCH COMPACTION PASS
+            // ─────────────────────────────────────────────────────
+            // Compacts visible batches into contiguous list for efficient multi-draw
+            if (mgr->m_compactEnabled) {
+                cmdList->beginMarker("Batch Compaction");
+
+                // Barrier: Draw args UAV -> SRV for compaction reading
+                cmdList->setBufferState(mgr->m_drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+
+                // Clear compact count to 0
+                u32 zeroCount = 0;
+                cmdList->writeBuffer(mgr->m_compactCountBuffer, &zeroCount, sizeof(u32));
+
+                // Clear compact draw args buffer (for safety when previousFrameVisibleCount > actual visible)
+                // This ensures any unwritten slots have instanceCount=0 (no-op draws)
+                cmdList->clearBufferUInt(mgr->m_compactDrawArgsBuffer, 0);
+
+                // Update compact params
+                struct CompactParamsCB {
+                    u32 batchCount;
+                    u32 padding[3];
+                };
+                CompactParamsCB compactCB;
+                compactCB.batchCount = data.objectCount;
+                compactCB.padding[0] = compactCB.padding[1] = compactCB.padding[2] = 0;
+                cmdList->writeBuffer(mgr->m_compactParamsCB, &compactCB, sizeof(compactCB));
+
+                // Create binding set for compaction
+                nvrhi::BindingSetDesc compactBindDesc;
+                compactBindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
+                    nvrhi::BindingSetItem::RawBuffer_SRV(0, mgr->m_drawArgsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(1, mgr->m_materialIDBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_compactDrawArgsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(1, mgr->m_compactBatchIndicesBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_compactCountBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(3, mgr->m_compactMaterialIDBuffer)
+                };
+
+                nvrhi::BindingSetHandle compactBindingSet = nvDevice->createBindingSet(compactBindDesc, mgr->m_compactLayout);
+                if (compactBindingSet) {
+                    nvrhi::ComputeState compactState;
+                    compactState.pipeline = mgr->m_compactPipeline;
+                    compactState.bindings = { compactBindingSet };
+                    cmdList->setComputeState(compactState);
+                    cmdList->dispatch(groupCount, 1, 1);
+
+                    // Copy compact count to readback buffer for next frame
+                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::CopySource);
+                    cmdList->copyBuffer(mgr->m_compactCountReadbackBuffer, 0, mgr->m_compactCountBuffer, 0, sizeof(u32));
+                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+                    // Transition compact draw args to IndirectArgument for rendering
+                    cmdList->setBufferState(mgr->m_compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                }
+
+                cmdList->endMarker();
+            }
 
             cmdList->endMarker();
         }
@@ -593,6 +916,34 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     output.visibleIndices = VirtualResourceHandle();  // Not using framegraph for these
     output.visibleCount = VirtualResourceHandle();
     output.drawArgsBuffer = passData.drawArgsBuffer;
+
+    // Set compact output handles if compaction is enabled
+    if (m_compactEnabled) {
+        // Import compact buffers into framegraph
+        ResourceDesc compactArgsDesc;
+        compactArgsDesc.type = ResourceDesc::Type::Buffer;
+        compactArgsDesc.debugName = "GPUCull_CompactDrawArgs";
+        compactArgsDesc.bufferSize = m_maxObjects * sizeof(IndirectDrawArgs);
+        compactArgsDesc.isUAV = true;
+        compactArgsDesc.isTransient = false;
+
+        ResourceDesc compactIndicesDesc;
+        compactIndicesDesc.type = ResourceDesc::Type::Buffer;
+        compactIndicesDesc.debugName = "GPUCull_CompactBatchIndices";
+        compactIndicesDesc.bufferSize = m_maxObjects * sizeof(u32);
+        compactIndicesDesc.structStride = sizeof(u32);
+        compactIndicesDesc.isUAV = true;
+        compactIndicesDesc.isTransient = false;
+
+        output.compactDrawArgs = fg.ImportBuffer("gpu_cull_compact_drawargs", m_compactDrawArgsBuffer, compactArgsDesc);
+        output.compactBatchIndices = fg.ImportBuffer("gpu_cull_compact_batchindices", m_compactBatchIndicesBuffer, compactIndicesDesc);
+        output.previousFrameVisibleCount = m_previousFrameVisibleCount;
+    } else {
+        output.compactDrawArgs = VirtualResourceHandle();
+        output.compactBatchIndices = VirtualResourceHandle();
+        output.previousFrameVisibleCount = 0;
+    }
+
     return output;
 }
 
@@ -1309,6 +1660,480 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
     output.drawArgsBuffer = passData.drawArgsBuffer;
     return output;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MEGA-BUFFER SYSTEM IMPLEMENTATION
+// ═══════════════════════════════════════════════════════
+
+void GPUCullingManager::BeginLevelLoad(u32 estimatedVertices, u32 estimatedIndices)
+{
+    if (m_levelLoadInProgress) {
+        Msg("! [GPUCulling] BeginLevelLoad called while already in progress");
+        return;
+    }
+
+    m_levelLoadInProgress = true;
+    m_megaBuffersReady = false;
+
+    // Clear and pre-allocate mega-buffers
+    m_megaVertices.clear();
+    m_megaVertices.reserve(estimatedVertices);
+    m_megaIndices.clear();
+    m_megaIndices.reserve(estimatedIndices);
+
+    // Clear VB/IB pool tracking
+    m_vbPools.clear();
+    m_ibPools.clear();
+    m_vbPoolsAlt.clear();
+    m_ibPoolsAlt.clear();
+
+    m_totalVertexCount = 0;
+    m_totalIndexCount = 0;
+
+    Msg("* [GPUCulling] BeginLevelLoad - estimated %u vertices, %u indices", estimatedVertices, estimatedIndices);
+}
+
+MeshAllocation GPUCullingManager::RegisterMesh(
+    const void* vertices,
+    u32 vertexCount,
+    u32 vertexStride,
+    bindless::SourceVertexFormat format,
+    const u16* indices,
+    u32 indexCount)
+{
+    MeshAllocation alloc;
+
+    if (!m_levelLoadInProgress) {
+        Msg("! [GPUCulling] RegisterMesh called outside of level load");
+        return alloc;
+    }
+
+    if (!vertices || vertexCount == 0 || !indices || indexCount == 0) {
+        return alloc;
+    }
+
+    if (format == bindless::SourceVertexFormat::Unknown) {
+        Msg("! [GPUCulling] RegisterMesh: Unknown vertex format (stride=%u)", vertexStride);
+        return alloc;
+    }
+
+    // Record offsets before adding
+    alloc.vertexOffset = m_totalVertexCount;
+    alloc.indexOffset = m_totalIndexCount;
+    alloc.vertexCount = vertexCount;
+    alloc.indexCount = indexCount;
+
+    // Convert vertices to unified format
+    u32 prevSize = static_cast<u32>(m_megaVertices.size());
+    m_megaVertices.resize(prevSize + vertexCount);
+
+    u32 converted = bindless::VertexConverter::ConvertVertices(
+        vertices, vertexStride, vertexCount, format,
+        &m_megaVertices[prevSize]
+    );
+
+    if (converted != vertexCount) {
+        Msg("! [GPUCulling] RegisterMesh: Vertex conversion failed (got %u, expected %u)", converted, vertexCount);
+        m_megaVertices.resize(prevSize);  // Rollback
+        return alloc;
+    }
+
+    // Copy indices, converting from 16-bit to 32-bit and adjusting for vertex offset
+    u32 prevIndexSize = static_cast<u32>(m_megaIndices.size());
+    m_megaIndices.resize(prevIndexSize + indexCount);
+
+    for (u32 i = 0; i < indexCount; i++) {
+        // Note: We store raw indices without adding vertexOffset here
+        // The offset will be handled via baseVertexLocation in draw args
+        m_megaIndices[prevIndexSize + i] = static_cast<u32>(indices[i]);
+    }
+
+    m_totalVertexCount += vertexCount;
+    m_totalIndexCount += indexCount;
+    alloc.valid = true;
+
+    return alloc;
+}
+
+void GPUCullingManager::CreateMegaBuffers()
+{
+    if (!m_device) {
+        Msg("! [GPUCulling] CreateMegaBuffers: No device");
+        return;
+    }
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+    // Create vertex buffer
+    // NOTE: Vertex buffers cannot use structStride (structured buffer) - D3D11 restriction
+    if (m_totalVertexCount > 0) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "MegaVertexBuffer";
+        desc.byteSize = m_totalVertexCount * sizeof(bindless::UnifiedVertex);
+        desc.isVertexBuffer = true;  // Required for D3D11 vertex buffer binding
+        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+        desc.keepInitialState = true;
+
+        m_megaVertexBuffer = nvDevice->createBuffer(desc);
+        if (!m_megaVertexBuffer) {
+            Msg("! [GPUCulling] Failed to create mega vertex buffer (%u vertices, %zu bytes)",
+                m_totalVertexCount, desc.byteSize);
+            return;
+        }
+
+        m_maxMegaVertices = m_totalVertexCount;
+    }
+
+    // Create index buffer (32-bit indices)
+    if (m_totalIndexCount > 0) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "MegaIndexBuffer";
+        desc.byteSize = m_totalIndexCount * sizeof(u32);
+        desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+        desc.keepInitialState = true;
+        desc.isIndexBuffer = true;
+
+        m_megaIndexBuffer = nvDevice->createBuffer(desc);
+        if (!m_megaIndexBuffer) {
+            Msg("! [GPUCulling] Failed to create mega index buffer (%u indices, %zu bytes)",
+                m_totalIndexCount, desc.byteSize);
+            return;
+        }
+
+        m_maxMegaIndices = m_totalIndexCount;
+    }
+
+    // Create instance buffer (sized for max objects)
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "InstanceBuffer";
+        desc.byteSize = m_maxObjects * sizeof(GPUInstanceData);
+        desc.structStride = sizeof(GPUInstanceData);
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        m_instanceBuffer = nvDevice->createBuffer(desc);
+        if (!m_instanceBuffer) {
+            Msg("! [GPUCulling] Failed to create instance buffer");
+            return;
+        }
+    }
+
+    Msg("* [GPUCulling] Mega-buffers created: VB=%u verts (%.1f MB), IB=%u indices (%.1f MB)",
+        m_totalVertexCount,
+        (m_totalVertexCount * sizeof(bindless::UnifiedVertex)) / (1024.0f * 1024.0f),
+        m_totalIndexCount,
+        (m_totalIndexCount * sizeof(u32)) / (1024.0f * 1024.0f));
+}
+
+void GPUCullingManager::EndLevelLoad()
+{
+    if (!m_levelLoadInProgress) {
+        Msg("! [GPUCulling] EndLevelLoad called without BeginLevelLoad");
+        return;
+    }
+
+    Msg("* [GPUCulling] EndLevelLoad - collected %u vertices, %u indices",
+        m_totalVertexCount, m_totalIndexCount);
+
+    // Create GPU buffers
+    CreateMegaBuffers();
+
+    if (!m_megaVertexBuffer || !m_megaIndexBuffer) {
+        Msg("! [GPUCulling] EndLevelLoad: Failed to create mega-buffers");
+        m_levelLoadInProgress = false;
+        return;
+    }
+
+    // Upload data to GPU (need a context - will be done on first frame)
+    // Mark as ready - upload will happen in UploadSceneObjects on first frame
+    m_megaBuffersReady = true;
+    m_levelLoadInProgress = false;
+
+    Msg("* [GPUCulling] Mega-buffers ready for GPU upload");
+}
+
+void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry)
+{
+    // NOTE: Mega-buffer upload is now handled in UploadSceneObjects()
+    // This function is reserved for future per-frame instance data (transforms for instancing)
+    if (!m_instanceBuffer || !geometry)
+        return;
+
+    const auto& batches = geometry->GetBatches();
+    u32 instanceCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
+
+    if (instanceCount == 0)
+        return;
+
+    m_instanceData.clear();
+    m_instanceData.reserve(instanceCount);
+
+    for (u32 i = 0; i < instanceCount; i++) {
+        const auto& batch = batches[i];
+
+        GPUInstanceData inst;
+        // Transpose for HLSL row-major convention
+        inst.world.transpose(batch.worldMatrix);
+        inst.materialID = batch.bindlessMaterialID;
+        inst.flags = 0;
+        if (batch.IsOpaque()) inst.flags |= GPU_OBJECT_OPAQUE;
+        if (batch.IsAlphaTested()) inst.flags |= GPU_OBJECT_ALPHA_TEST;
+        if (batch.IsStrictB2F()) inst.flags |= GPU_OBJECT_TRANSPARENT;
+        inst.pad0 = 0.0f;
+        inst.pad1 = 0.0f;
+
+        m_instanceData.push_back(inst);
+    }
+
+    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+    cmdList->writeBuffer(m_instanceBuffer, m_instanceData.data(), instanceCount * sizeof(GPUInstanceData));
+}
+
+// ═══════════════════════════════════════════════════════
+//  VB/IB POOL REGISTRATION (for level geometry)
+// ═══════════════════════════════════════════════════════
+
+bindless::SourceVertexFormat GPUCullingManager::DetectFormatFromDecl(
+    const D3DVERTEXELEMENT9* decl,
+    u32 stride)
+{
+    if (!decl)
+        return bindless::SourceVertexFormat::Unknown;
+
+    // Analyze declaration to determine format
+    // Key differentiators:
+    // - r1_decl_lmap: TEXCOORD 0 (SHORT2) + TEXCOORD 1 (SHORT2) for lightmap
+    // - r1_decl_vert: COLOR + TEXCOORD 0 (SHORT2), no lightmap
+    // - mu_model_decl: TEXCOORD 0 (SHORT4), no COLOR
+    // - x_decl_vert: position only (12 bytes)
+
+    bool hasColor = false;
+    bool hasTexCoord1 = false;
+    bool hasShort4TexCoord = false;
+    bool hasFloat2TexCoord = false;
+    u32 texcoord0Type = 0;
+
+    for (int i = 0; decl[i].Stream != 0xFF; i++) {
+        const D3DVERTEXELEMENT9& elem = decl[i];
+
+        if (elem.Usage == D3DDECLUSAGE_COLOR && elem.UsageIndex == 0) {
+            hasColor = true;
+        }
+        else if (elem.Usage == D3DDECLUSAGE_TEXCOORD) {
+            if (elem.UsageIndex == 0) {
+                texcoord0Type = elem.Type;
+                if (elem.Type == D3DDECLTYPE_SHORT4) hasShort4TexCoord = true;
+                if (elem.Type == D3DDECLTYPE_FLOAT2) hasFloat2TexCoord = true;
+            }
+            else if (elem.UsageIndex == 1) {
+                hasTexCoord1 = true;
+            }
+        }
+    }
+
+    // Match against known formats
+    if (stride == 12) {
+        return bindless::SourceVertexFormat::X_Vert;
+    }
+    else if (stride == 28) {
+        // Unpacked formats
+        if (hasColor) return bindless::SourceVertexFormat::R1_Vert_Unpacked;
+        return bindless::SourceVertexFormat::MU_Model_Unpacked;
+    }
+    else if (stride == 32) {
+        if (hasFloat2TexCoord && hasTexCoord1) {
+            return bindless::SourceVertexFormat::R1_Lmap_Unpacked;
+        }
+        if (hasTexCoord1) {
+            return bindless::SourceVertexFormat::R1_Lmap;  // Lightmapped
+        }
+        if (hasColor) {
+            return bindless::SourceVertexFormat::R1_Vert;  // Vertex-lit
+        }
+        if (hasShort4TexCoord) {
+            return bindless::SourceVertexFormat::MU_Model;  // Trees/models
+        }
+        // Default to R1_Lmap for 32-byte without clear indicators
+        return bindless::SourceVertexFormat::R1_Lmap;
+    }
+
+    Msg("! [GPUCulling] Unknown vertex format: stride=%u, hasColor=%d, hasTexCoord1=%d, hasShort4=%d",
+        stride, hasColor, hasTexCoord1, hasShort4TexCoord);
+    return bindless::SourceVertexFormat::Unknown;
+}
+
+u32 GPUCullingManager::RegisterVBPool(
+    const void* vertices,
+    u32 vertexCount,
+    u32 vertexStride,
+    const D3DVERTEXELEMENT9* decl,
+    bool alternative)
+{
+    if (!m_levelLoadInProgress) {
+        Msg("! [GPUCulling] RegisterVBPool called outside of level load");
+        return UINT32_MAX;
+    }
+
+    if (!vertices || vertexCount == 0) {
+        Msg("! [GPUCulling] RegisterVBPool: Invalid parameters");
+        return UINT32_MAX;
+    }
+
+    // Detect vertex format from declaration
+    bindless::SourceVertexFormat format = DetectFormatFromDecl(decl, vertexStride);
+    if (format == bindless::SourceVertexFormat::Unknown) {
+        // Still register a placeholder pool to keep indices in sync
+        // (FVisual stores the raw VB ID, so pool[i] must correspond to VB[i])
+        Msg("! [GPUCulling] RegisterVBPool: Unknown vertex format (stride=%u) - registering placeholder", vertexStride);
+
+        VBPoolInfo placeholder;
+        placeholder.megaBufferVertexOffset = 0;
+        placeholder.vertexCount = 0;  // Empty placeholder
+        placeholder.format = bindless::SourceVertexFormat::Unknown;
+
+        xr_vector<VBPoolInfo>& pools = alternative ? m_vbPoolsAlt : m_vbPools;
+        u32 poolID = static_cast<u32>(pools.size());
+        pools.push_back(placeholder);
+
+        return poolID;  // Return valid index but pool has 0 vertices
+    }
+
+    // Create pool info
+    VBPoolInfo poolInfo;
+    poolInfo.megaBufferVertexOffset = m_totalVertexCount;
+    poolInfo.vertexCount = vertexCount;
+    poolInfo.format = format;
+
+    // Convert vertices to unified format and add to mega-buffer
+    u32 prevSize = static_cast<u32>(m_megaVertices.size());
+    m_megaVertices.resize(prevSize + vertexCount);
+
+    u32 converted = bindless::VertexConverter::ConvertVertices(
+        vertices, vertexStride, vertexCount, format,
+        &m_megaVertices[prevSize]
+    );
+
+    if (converted != vertexCount) {
+        Msg("! [GPUCulling] RegisterVBPool: Vertex conversion failed (got %u, expected %u)", converted, vertexCount);
+        m_megaVertices.resize(prevSize);  // Rollback
+        return UINT32_MAX;
+    }
+
+    m_totalVertexCount += vertexCount;
+
+    // Store pool info
+    xr_vector<VBPoolInfo>& pools = alternative ? m_vbPoolsAlt : m_vbPools;
+    u32 poolID = static_cast<u32>(pools.size());
+    pools.push_back(poolInfo);
+
+    Msg("* [GPUCulling] RegisterVBPool[%u]: %u verts (format=%d, offset=%u)%s",
+        poolID, vertexCount, static_cast<int>(format), poolInfo.megaBufferVertexOffset,
+        alternative ? " [ALT]" : "");
+
+    return poolID;
+}
+
+u32 GPUCullingManager::RegisterIBPool(
+    const u16* indices,
+    u32 indexCount,
+    bool alternative)
+{
+    if (!m_levelLoadInProgress) {
+        Msg("! [GPUCulling] RegisterIBPool called outside of level load");
+        return UINT32_MAX;
+    }
+
+    if (!indices || indexCount == 0) {
+        // Register placeholder to keep indices in sync
+        Msg("! [GPUCulling] RegisterIBPool: Invalid parameters - registering placeholder");
+
+        IBPoolInfo placeholder;
+        placeholder.megaBufferIndexOffset = 0;
+        placeholder.indexCount = 0;
+
+        xr_vector<IBPoolInfo>& pools = alternative ? m_ibPoolsAlt : m_ibPools;
+        u32 poolID = static_cast<u32>(pools.size());
+        pools.push_back(placeholder);
+
+        return poolID;
+    }
+
+    // Create pool info
+    IBPoolInfo poolInfo;
+    poolInfo.megaBufferIndexOffset = m_totalIndexCount;
+    poolInfo.indexCount = indexCount;
+
+    // Convert from 16-bit to 32-bit indices
+    u32 prevSize = static_cast<u32>(m_megaIndices.size());
+    m_megaIndices.resize(prevSize + indexCount);
+
+    for (u32 i = 0; i < indexCount; i++) {
+        m_megaIndices[prevSize + i] = static_cast<u32>(indices[i]);
+    }
+
+    m_totalIndexCount += indexCount;
+
+    // Store pool info
+    xr_vector<IBPoolInfo>& pools = alternative ? m_ibPoolsAlt : m_ibPools;
+    u32 poolID = static_cast<u32>(pools.size());
+    pools.push_back(poolInfo);
+
+    Msg("* [GPUCulling] RegisterIBPool[%u]: %u indices (offset=%u)%s",
+        poolID, indexCount, poolInfo.megaBufferIndexOffset,
+        alternative ? " [ALT]" : "");
+
+    return poolID;
+}
+
+MeshAllocation GPUCullingManager::GetMeshAllocation(
+    u32 vbID, u32 vBase, u32 vCount,
+    u32 ibID, u32 iBase, u32 iCount,
+    bool alternative) const
+{
+    MeshAllocation alloc;
+
+    const xr_vector<VBPoolInfo>& vbPools = alternative ? m_vbPoolsAlt : m_vbPools;
+    const xr_vector<IBPoolInfo>& ibPools = alternative ? m_ibPoolsAlt : m_ibPools;
+
+    if (vbID >= vbPools.size() || ibID >= ibPools.size()) {
+        // Pool not registered - mesh not in mega-buffer
+        return alloc;
+    }
+
+    const VBPoolInfo& vbPool = vbPools[vbID];
+    const IBPoolInfo& ibPool = ibPools[ibID];
+
+    // Check for placeholder pools (unknown format or invalid data)
+    if (vbPool.vertexCount == 0 || ibPool.indexCount == 0) {
+        // Placeholder pool - mesh uses unsupported vertex format
+        return alloc;
+    }
+
+    // Validate bounds
+    if (vBase + vCount > vbPool.vertexCount) {
+        Msg("! [GPUCulling] GetMeshAllocation: VB bounds exceeded (vBase=%u, vCount=%u, poolCount=%u)",
+            vBase, vCount, vbPool.vertexCount);
+        return alloc;
+    }
+    if (iBase + iCount > ibPool.indexCount) {
+        Msg("! [GPUCulling] GetMeshAllocation: IB bounds exceeded (iBase=%u, iCount=%u, poolCount=%u)",
+            iBase, iCount, ibPool.indexCount);
+        return alloc;
+    }
+
+    // Calculate mega-buffer offsets
+    // vBase/iBase are the mesh's starting offsets within its VB/IB pool
+    // Indices in X-Ray are relative to the start of the IB pool, and reference
+    // vertices relative to vBase=0 of the VB pool
+    alloc.vertexOffset = vbPool.megaBufferVertexOffset + vBase;
+    alloc.indexOffset = ibPool.megaBufferIndexOffset + iBase;
+    alloc.vertexCount = vCount;
+    alloc.indexCount = iCount;
+    alloc.valid = true;
+
+    return alloc;
 }
 
 } // namespace xray::render::RENDER_NAMESPACE
