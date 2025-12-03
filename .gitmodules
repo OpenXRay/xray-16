@@ -34,3 +34,6 @@
 [submodule "Externals/slang"]
 	path = Externals/slang
 	url = https://github.com/shader-slang/slang.git
+[submodule "Externals/DirectX-Headers"]
+	path = Externals/DirectX-Headers
+	url = https://github.com/microsoft/DirectX-Headers.git

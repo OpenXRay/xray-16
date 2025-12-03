@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RenderDevice.h"
 #include "RenderContext.h"
-#include "../NVRHI/NVRHIDevice.h"
+#include "../Backend/D3D11Backend.h"
 #include "../ResourceManager/FGResourceManager.h"
 #include "../Shaders/SlangCompiler.h"
 
@@ -21,11 +21,11 @@ RenderDevice::~RenderDevice() {
 }
 
 nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
-    return m_nvrhiDevice ? m_nvrhiDevice->GetDevice() : nullptr;
+    return m_backend ? m_backend->GetDevice() : nullptr;
 }
 
 nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
-    return m_nvrhiDevice ? m_nvrhiDevice->GetCommandList() : nullptr;
+    return m_backend ? m_backend->GetImmediateCommandList() : nullptr;
 }
 
 xray::render::SlangCompiler* RenderDevice::GetSlangCompiler() const {
@@ -40,12 +40,22 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     VERIFY(device);
     VERIFY(context);
 
-    // Create NVRHI device wrapper
-    m_nvrhiDevice = xr_make_unique<nvrhi_wrapper::NVRHIDevice>();
-    if (!m_nvrhiDevice->Initialize(device, context)) {
-        Msg("! [RenderDevice] Failed to initialize NVRHI device");
+    // Create D3D11 backend wrapper
+    // Note: Construct directly as IRenderBackend to avoid unique_ptr deleters mismatch
+    xr_unique_ptr<IRenderBackend> backend(xr_new<D3D11Backend>());
+
+    BackendInitParams params;
+    params.existingD3D11Device = device;
+    params.existingD3D11Context = context;
+    params.enableValidation = false; // Managed by legacy CHW for now
+
+    if (!backend->Initialize(params)) {
+        Msg("! [RenderDevice] Failed to initialize D3D11 backend");
         return false;
     }
+
+    m_backend = std::move(backend);
+    Msg("* [RenderDevice] Backend initialized: %s", GetGraphicsAPIName(m_backend->GetAPI()));
 
     // Create pipeline state cache
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
@@ -119,8 +129,11 @@ void RenderDevice::Shutdown() {
     m_samplers.clear();
     m_shaders.clear();
 
-    // Shutdown NVRHI
-    m_nvrhiDevice = nullptr;
+    // Shutdown Backend
+    if (m_backend) {
+        m_backend->Shutdown();
+        m_backend = nullptr;
+    }
 
     m_initialized = false;
 }
@@ -458,11 +471,11 @@ BufferHandle RenderDevice::CreateBuffer(
 
     // Upload initial data if provided
     if (initialData) {
-        nvrhi::ICommandList* cmdList = m_nvrhiDevice->GetCommandList();
+        nvrhi::ICommandList* cmdList = m_backend->GetImmediateCommandList();
         cmdList->open();
         cmdList->writeBuffer(nvrhiBuffer, initialData, desc.byteSize);
         cmdList->close();
-        m_nvrhiDevice->ExecuteCommandList(cmdList);
+        m_backend->ExecuteCommandList(cmdList);
     }
 
     // Allocate handle
@@ -514,11 +527,11 @@ void RenderDevice::UpdateBuffer(
     BufferInfo& info = m_buffers[handle.index];
     VERIFY(offset + size <= info.desc.byteSize);
 
-    nvrhi::ICommandList* cmdList = m_nvrhiDevice->GetCommandList();
+    nvrhi::ICommandList* cmdList = m_backend->GetImmediateCommandList();
     cmdList->open();
     cmdList->writeBuffer(info.nvrhiHandle, data, size, offset);
     cmdList->close();
-    m_nvrhiDevice->ExecuteCommandList(cmdList);
+    m_backend->ExecuteCommandList(cmdList);
 }
 
 nvrhi::IBuffer* RenderDevice::GetNativeBuffer(BufferHandle handle) {
@@ -748,7 +761,7 @@ void RenderDevice::DestroyContext(RenderContext* context) {
 
 void RenderDevice::ExecuteContext(RenderContext* context) {
     VERIFY(context);
-    m_nvrhiDevice->ExecuteCommandList(context->GetCommandList());
+    m_backend->ExecuteCommandList(context->GetCommandList());
 }
 
 // ═══════════════════════════════════════════════════
@@ -756,8 +769,8 @@ void RenderDevice::ExecuteContext(RenderContext* context) {
 // ═══════════════════════════════════════════════════
 
 nvrhi::IDevice* RenderDevice::GetNativeDevice() const {
-    VERIFY(m_nvrhiDevice);
-    return m_nvrhiDevice->GetDevice();
+    VERIFY(m_backend);
+    return m_backend->GetDevice();
 }
 
 // ═══════════════════════════════════════════════════

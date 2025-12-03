@@ -2313,17 +2313,20 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     if (!texManager)
         return UINT32_MAX;
 
-    // Build MaterialData from PSO textures
+    // Build MaterialData from PSO textures (grid-packing: 2× u32 per texture)
     MaterialData matData = {};
-    matData.diffuseSlice = 0xFFFFFFFF;  // Invalid by default
-    matData.normalSlice = 0xFFFFFFFF;
-    matData.detailSlice = 0xFFFFFFFF;
-    matData.pbrSlice = 0xFFFFFFFF;
+    // Invalid allocations have pageIndex = 0xFFFF (set by default constructor)
+    matData.diffuseAtlasLow = 0xFFFF;   // Invalid page
+    matData.diffuseAtlasHigh = 0;
+    matData.normalAtlasLow = 0xFFFF;
+    matData.normalAtlasHigh = 0;
+    matData.detailAtlasLow = 0xFFFF;
+    matData.detailAtlasHigh = 0;
+    matData.pbrAtlasLow = 0xFFFF;
+    matData.pbrAtlasHigh = 0;
     matData.detailScale = matPSO->detail_scale;
     matData.alphaRef = 0.5f;  // Default alpha ref
     matData.flags = 0;
-    matData.diffuseUVScaleU = 1.0f;  // Default: texture fills bucket
-    matData.diffuseUVScaleV = 1.0f;
 
     // Extract material properties from shader/pass
     if (matPSO->pass) {
@@ -2345,7 +2348,7 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
 
     // Note: Actual texture registration to atlases happens lazily during rendering
     // when RenderContext is available. For now, we just set up the material flags
-    // and register with the buffer. The diffuseSlice etc. will be updated later.
+    // and register with the buffer. The atlas allocations will be updated later.
 
     // Register with material buffer
     u32 materialID = materialBuffer.RegisterMaterial(matData);
@@ -2400,17 +2403,20 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     if (!pass)
         return UINT32_MAX;
 
-    // Build MaterialData
+    // Build MaterialData (grid-packing: 2× u32 per texture)
     MaterialData matData = {};
-    matData.diffuseSlice = 0xFFFFFFFF;
-    matData.normalSlice = 0xFFFFFFFF;
-    matData.detailSlice = 0xFFFFFFFF;
-    matData.pbrSlice = 0xFFFFFFFF;
+    matData.diffuseAtlasLow = 0xFFFF;   // Invalid page
+    matData.diffuseAtlasHigh = 0;
+    matData.normalAtlasLow = 0xFFFF;
+    matData.normalAtlasHigh = 0;
+    matData.detailAtlasLow = 0xFFFF;
+    matData.detailAtlasHigh = 0;
+    matData.pbrAtlasLow = 0xFFFF;
+    matData.pbrAtlasHigh = 0;
     matData.detailScale = 1.0f;
     matData.alphaRef = 0.5f;
     matData.flags = 0;
-    matData.diffuseUVScaleU = 1.0f;  // Default until texture is registered
-    matData.diffuseUVScaleV = 1.0f;
+    matData.padding1 = 0.0f;
 
     // Extract detail scale from base texture
     RENDER_NAMESPACE::STextureList* texList = pass->T._get();
@@ -2514,12 +2520,10 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
-                    // RegisterTexture returns slice ref + UV scale for textures smaller than atlas
+                    // RegisterTexture returns allocation with page/cell info
                     TextureRegisterResult result = atlasManager.Diffuse().RegisterTexture(ctx, diffuseName, nvrhiTex);
                     if (result.IsValid()) {
-                        matData.diffuseSlice = result.sliceRef.packed;
-                        matData.diffuseUVScaleU = result.uvScaleU;
-                        matData.diffuseUVScaleV = result.uvScaleV;
+                        SetDiffuseAllocation(matData, result.allocation);
                         updated = true;
                     }
                 }
@@ -2536,7 +2540,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                 if (nvrhiTex) {
                     TextureRegisterResult result = atlasManager.Normal().RegisterTexture(ctx, bumpName, nvrhiTex);
                     if (result.IsValid()) {
-                        matData.normalSlice = result.sliceRef.packed;
+                        SetNormalAllocation(matData, result.allocation);
                         matData.flags |= MAT_FLAG_HAS_NORMAL;
                         updated = true;
                     }
@@ -2555,7 +2559,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                     if (nvrhiTex) {
                         TextureRegisterResult result = atlasManager.Detail().RegisterTexture(ctx, detailTexName, nvrhiTex);
                         if (result.IsValid()) {
-                            matData.detailSlice = result.sliceRef.packed;
+                            SetDetailAllocation(matData, result.allocation);
                             matData.detailScale = texDescMgr.GetDetailScale(diffuseName);
                             matData.flags |= MAT_FLAG_HAS_DETAIL;
                             updated = true;
@@ -2588,7 +2592,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
             TextureRegisterResult pbrResult = registerPBRTexture(pbrName);
             if (pbrResult.IsValid()) {
-                matData.pbrSlice = pbrResult.sliceRef.packed;
+                SetPBRAllocation(matData, pbrResult.allocation);
                 matData.flags |= MAT_FLAG_HAS_PBR;
                 updated = true;
             }
@@ -2608,13 +2612,9 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
 
-        // Log atlas population statistics
+        // Log atlas population and memory statistics
         Msg("* [MaterialCache] Finalized %u pending materials", processedCount);
-        Msg("* [MaterialCache] Atlas usage: Diffuse=%u, Normal=%u, Detail=%u, PBR=%u",
-            atlasManager.Diffuse().GetTextureCount(),
-            atlasManager.Normal().GetTextureCount(),
-            atlasManager.Detail().GetTextureCount(),
-            atlasManager.PBR().GetTextureCount());
+        atlasManager.LogMemoryUsage();
     }
 }
 

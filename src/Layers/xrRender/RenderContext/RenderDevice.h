@@ -2,6 +2,7 @@
 
 #include "ResourceHandle.h"
 #include "PipelineState.h"
+#include "../Backend/RenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
 // Forward declarations
@@ -17,7 +18,6 @@ namespace xray::render::ng {
 
 // Forward declarations
 class RenderContext;
-namespace nvrhi_wrapper = xray::render::RENDER_NAMESPACE::nvrhi_wrapper;
 
 // ═══════════════════════════════════════════════════
 //  RENDER DEVICE (Resource Factory + Manager)
@@ -39,6 +39,9 @@ public:
 
     // Get the underlying NVRHI device
     nvrhi::IDevice* GetNVRHIDevice() const;
+
+    // Get the render backend (new abstraction)
+    IRenderBackend* GetBackend() const { return m_backend.get(); }
 
     // Get the immediate command list for direct rendering (e.g., ImGui)
     nvrhi::ICommandList* GetImmediateCommandList() const;
@@ -332,8 +335,8 @@ public:
     void ResetStatistics();
 
 private:
-    // NVRHI device wrapper
-    xr_unique_ptr<nvrhi_wrapper::NVRHIDevice> m_nvrhiDevice;
+    // Render backend (D3D11/D3D12 wrapper)
+    xr_unique_ptr<IRenderBackend> m_backend;
 
     // Pipeline state cache
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;

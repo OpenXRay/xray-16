@@ -1,5 +1,5 @@
 // bindless_forward.ps
-// Bindless forward pixel shader
+// Bindless forward pixel shader with grid-packing atlas support
 // All materials use this single shader - textures fetched via material buffer
 
 #define SM_5_0
@@ -82,15 +82,15 @@ PS_OUTPUT main(PS_INPUT input)
     // Get material data directly using material ID (no indirection through g_DrawMaterialIDs)
     MaterialData mat = g_Materials[input.materialID];
 
-    // DEBUG: Show atlas index and slice as color
-    //uint atlasIdx = mat.diffuseSlice >> 24;
-    //uint sliceIdx = mat.diffuseSlice & 0x00FFFFFF;
-    //output.color = float4(atlasIdx / 72.0, (sliceIdx % 256) / 255.0, sliceIdx / 1000.0, 1);
+    // DEBUG: Show page index and cell info as color
+    //uint pageIdx = mat.diffuseAtlasLow & 0xFFFF;
+    //uint cellX = (mat.diffuseAtlasLow >> 16) & 0xFFFF;
+    //uint cellY = mat.diffuseAtlasHigh & 0xFFFF;
+    //output.color = float4(pageIdx / 4.0, cellX / 32.0, cellY / 32.0, 1);
     //return output;
 
-    // Sample textures from atlases using UV scale for non-square textures
-    float2 uvScale = float2(mat.diffuseUVScaleU, mat.diffuseUVScaleV);
-    float4 diffuseSample = SampleDiffuseScaled(mat.diffuseSlice, input.texcoord, uvScale);
+    // Sample textures from grid-packed atlases
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
 
     // DEBUG: Highlight black samples in CYAN to see where texture returns black
     //float luminance = dot(diffuseSample.rgb, float3(0.299, 0.587, 0.114));
@@ -111,8 +111,7 @@ PS_OUTPUT main(PS_INPUT input)
     float3 N = normalize(input.normal);
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        // Use same UV scale as diffuse (normal maps match diffuse size)
-        float3 normalSample = SampleNormalScaled(mat.normalSlice, input.texcoord, uvScale);
+        float3 normalSample = SampleNormal(mat, input.texcoord);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
@@ -124,9 +123,8 @@ PS_OUTPUT main(PS_INPUT input)
     // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        float2 detailUV = input.texcoord * mat.detailScale;
-        // Detail textures also need UV scaling for atlas placement
-        float4 detailSample = SampleDetailScaled(mat.detailSlice, detailUV, uvScale);
+        // Detail sampling uses scaled UV for tiling effect
+        float4 detailSample = SampleDetail(mat, input.texcoord, mat.detailScale);
         // Blend detail (multiply-2x style)
         albedo = albedo * (detailSample.rgb * 2.0);
     }
@@ -138,8 +136,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        // Use same UV scale as diffuse (PBR textures match diffuse size)
-        float3 pbrSample = SamplePBRScaled(mat.pbrSlice, input.texcoord, uvScale);
+        float3 pbrSample = SamplePBR(mat, input.texcoord);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;

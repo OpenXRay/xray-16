@@ -1,5 +1,6 @@
 // xrRender/Bindless/TextureAtlas.h
-// Simplified texture atlas - one Texture2DArray per type, all same size/format
+// 2D Grid-Packing Texture Atlas
+// Uses 4096×4096 pages with 128px cell-based allocation for variable-size textures
 #pragma once
 
 #include "BindlessTypes.h"
@@ -17,21 +18,19 @@ namespace xray::render::RENDER_NAMESPACE::bindless {
 // ═══════════════════════════════════════════════════════
 //  TEXTURE REGISTRATION RESULT
 // ═══════════════════════════════════════════════════════
-// Returns slice reference plus UV scale for smaller textures
 
 struct TextureRegisterResult {
-    TextureSliceRef sliceRef;
-    float uvScaleU = 1.0f;
-    float uvScaleV = 1.0f;
+    AtlasAllocation allocation;
 
-    bool IsValid() const { return sliceRef.IsValid(); }
+    bool IsValid() const { return allocation.IsValid(); }
 };
 
 // ═══════════════════════════════════════════════════════
-//  TEXTURE ATLAS
+//  GRID-PACKING TEXTURE ATLAS
 // ═══════════════════════════════════════════════════════
-// Single Texture2DArray with all textures resized to ATLAS_TEXTURE_SIZE
-// Format: RGBA8_UNORM for all textures
+// Each atlas is a Texture2DArray where each slice is a 4096×4096 page.
+// Textures are packed into pages using a 128px cell grid (32×32 cells per page).
+// Supports textures from 64×64 to 2048×2048 (or even 4096×4096).
 
 class TextureAtlas {
 public:
@@ -41,60 +40,70 @@ public:
     void Initialize(ng::RenderDevice* device);
     void Shutdown();
 
-    // Register a texture - resizes to ATLAS_TEXTURE_SIZE, converts to RGBA8
-    // Returns slice reference and UV scale for textures smaller than atlas size
+    // Register a texture - allocates cells in a page and copies texture data
+    // Returns allocation with page index and UV rect info
     TextureRegisterResult RegisterTexture(
         ng::RenderContext* ctx,
         const shared_str& textureName,
         nvrhi::ITexture* sourceTexture
     );
 
-    // Get slice index for already-registered texture (returns UINT32_MAX if not found)
-    u32 GetTextureSlice(const shared_str& textureName) const;
+    // Get allocation for already-registered texture (returns invalid if not found)
+    AtlasAllocation GetTextureAllocation(const shared_str& textureName) const;
 
     // Accessors
     AtlasType GetType() const { return m_type; }
     nvrhi::ITexture* GetArray() const { return m_array.Get(); }
-    u32 GetTextureCount() const { return m_currentSlice; }
+    u32 GetTextureCount() const { return static_cast<u32>(m_textureMap.size()); }
+    u32 GetPageCount() const { return static_cast<u32>(m_pages.size()); }
     bool IsInitialized() const { return m_initialized; }
+
+    // Memory stats
+    u64 GetAllocatedMemoryBytes() const;
+    u64 GetUsedCellCount() const;
+    float GetUtilization() const;
 
 private:
     AtlasType m_type;
     ng::RenderDevice* m_device = nullptr;
     bool m_initialized = false;
 
-    // Single texture array for this type
+    // Texture2DArray - each slice is a 4096×4096 page
     nvrhi::TextureHandle m_array;
-    u32 m_currentSlice = 0;
     u32 m_arrayCapacity = 0;
 
-    // Cached texture info (slice + UV scale)
-    struct CachedTextureInfo {
-        u32 sliceIndex;
-        float uvScaleU;
-        float uvScaleV;
-    };
+    // Page occupancy tracking
+    xr_vector<AtlasPage> m_pages;
 
-    // Name -> texture info lookup
-    xr_unordered_map<shared_str, CachedTextureInfo> m_textureMap;
+    // Name -> allocation lookup
+    xr_unordered_map<shared_str, AtlasAllocation> m_textureMap;
 
-    // Create/resize the texture array
-    void EnsureCapacity(u32 requiredSlices);
+    // Try to allocate in an existing page
+    // Returns page index, or UINT32_MAX if no space found
+    u32 TryAllocateInPage(u32 pageIndex, u32 cellsWide, u32 cellsTall, u32& outCellX, u32& outCellY);
 
-    // Copy and resize texture to atlas slice
-    bool CopyTextureToSlice(
+    // Add a new page to the atlas
+    bool AddPage();
+
+    // Ensure array has capacity for required pages
+    void EnsurePageCapacity(u32 requiredPages);
+
+    // Copy texture to a specific region in a page
+    bool CopyTextureToRegion(
         ng::RenderContext* ctx,
         nvrhi::ITexture* sourceTexture,
-        u32 sliceIndex,
-        float& outUVScaleU,
-        float& outUVScaleV
+        u32 pageIndex,
+        u32 pixelX,
+        u32 pixelY
     );
+
+    // Bottom-left first-fit allocation
+    AtlasAllocation Allocate(u32 textureWidth, u32 textureHeight);
 };
 
 // ═══════════════════════════════════════════════════════
 //  TEXTURE ATLAS MANAGER
 // ═══════════════════════════════════════════════════════
-// Manages all 4 atlas types
 
 class TextureAtlasManager {
 public:
@@ -114,6 +123,9 @@ public:
     TextureAtlas& PBR() { return GetAtlas(AtlasType::PBR); }
 
     bool IsInitialized() const { return m_initialized; }
+
+    // Log memory usage for all atlases
+    void LogMemoryUsage() const;
 
 private:
     TextureAtlasManager();

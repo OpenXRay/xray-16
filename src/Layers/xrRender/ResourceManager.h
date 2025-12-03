@@ -98,11 +98,8 @@ public:
     CScriptEngine ScriptEngine;
     Lock ScriptEngineLock;
 
-private:
     void LS_Load();
     void LS_Unload();
-
-public:
     // Miscelaneous
     void _ParseList(sh_list& dest, LPCSTR names);
     IBlender* _GetBlender(LPCSTR Name);
