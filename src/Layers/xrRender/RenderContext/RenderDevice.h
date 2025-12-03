@@ -2,6 +2,7 @@
 
 #include "ResourceHandle.h"
 #include "PipelineState.h"
+#include "../Backend/RenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
 namespace xray::render::resources {
@@ -15,7 +16,6 @@ namespace xray::render {
 namespace xray::render::ng {
 
 class RenderContext;
-namespace nvrhi_wrapper = xray::render::RENDER_NAMESPACE::nvrhi_wrapper;
 
 class RenderDevice {
 public:
@@ -28,6 +28,8 @@ public:
     bool IsInitialized() const { return m_initialized; }
 
     nvrhi::IDevice* GetNVRHIDevice() const;
+
+    IRenderBackend* GetBackend() const { return m_backend.get(); }
 
     nvrhi::ICommandList* GetImmediateCommandList() const;
 
@@ -250,7 +252,7 @@ public:
     void ResetStatistics();
 
 private:
-    xr_unique_ptr<nvrhi_wrapper::NVRHIDevice> m_nvrhiDevice;
+    xr_unique_ptr<IRenderBackend> m_backend;
 
     xr_unique_ptr<PipelineStateCache> m_pipelineCache;
 

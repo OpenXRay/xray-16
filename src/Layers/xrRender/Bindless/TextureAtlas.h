@@ -13,11 +13,9 @@ namespace xray::render {
 namespace xray::render::RENDER_NAMESPACE::bindless {
 
 struct TextureRegisterResult {
-    TextureSliceRef sliceRef;
-    float uvScaleU = 1.0f;
-    float uvScaleV = 1.0f;
+    AtlasAllocation allocation;
 
-    bool IsValid() const { return sliceRef.IsValid(); }
+    bool IsValid() const { return allocation.IsValid(); }
 };
 
 class TextureAtlas {
@@ -34,12 +32,17 @@ public:
         nvrhi::ITexture* sourceTexture
     );
 
-    u32 GetTextureSlice(const shared_str& textureName) const;
+    AtlasAllocation GetTextureAllocation(const shared_str& textureName) const;
 
     AtlasType GetType() const { return m_type; }
     nvrhi::ITexture* GetArray() const { return m_array.Get(); }
-    u32 GetTextureCount() const { return m_currentSlice; }
+    u32 GetTextureCount() const { return static_cast<u32>(m_textureMap.size()); }
+    u32 GetPageCount() const { return static_cast<u32>(m_pages.size()); }
     bool IsInitialized() const { return m_initialized; }
+
+    u64 GetAllocatedMemoryBytes() const;
+    u64 GetUsedCellCount() const;
+    float GetUtilization() const;
 
 private:
     AtlasType m_type;
@@ -47,26 +50,27 @@ private:
     bool m_initialized = false;
 
     nvrhi::TextureHandle m_array;
-    u32 m_currentSlice = 0;
     u32 m_arrayCapacity = 0;
 
-    struct CachedTextureInfo {
-        u32 sliceIndex;
-        float uvScaleU;
-        float uvScaleV;
-    };
+    xr_vector<AtlasPage> m_pages;
 
-    xr_unordered_map<shared_str, CachedTextureInfo> m_textureMap;
+    xr_unordered_map<shared_str, AtlasAllocation> m_textureMap;
 
-    void EnsureCapacity(u32 requiredSlices);
+    u32 TryAllocateInPage(u32 pageIndex, u32 cellsWide, u32 cellsTall, u32& outCellX, u32& outCellY);
 
-    bool CopyTextureToSlice(
+    bool AddPage();
+
+    void EnsurePageCapacity(u32 requiredPages);
+
+    bool CopyTextureToRegion(
         ng::RenderContext* ctx,
         nvrhi::ITexture* sourceTexture,
-        u32 sliceIndex,
-        float& outUVScaleU,
-        float& outUVScaleV
+        u32 pageIndex,
+        u32 pixelX,
+        u32 pixelY
     );
+
+    AtlasAllocation Allocate(u32 textureWidth, u32 textureHeight);
 };
 
 class TextureAtlasManager {
@@ -85,6 +89,8 @@ public:
     TextureAtlas& PBR() { return GetAtlas(AtlasType::PBR); }
 
     bool IsInitialized() const { return m_initialized; }
+
+    void LogMemoryUsage() const;
 
 private:
     TextureAtlasManager();

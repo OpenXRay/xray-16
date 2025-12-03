@@ -1755,15 +1755,17 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
         return UINT32_MAX;
 
     MaterialData matData = {};
-    matData.diffuseSlice = 0xFFFFFFFF;
-    matData.normalSlice = 0xFFFFFFFF;
-    matData.detailSlice = 0xFFFFFFFF;
-    matData.pbrSlice = 0xFFFFFFFF;
+    matData.diffuseAtlasLow = 0xFFFF;
+    matData.diffuseAtlasHigh = 0;
+    matData.normalAtlasLow = 0xFFFF;
+    matData.normalAtlasHigh = 0;
+    matData.detailAtlasLow = 0xFFFF;
+    matData.detailAtlasHigh = 0;
+    matData.pbrAtlasLow = 0xFFFF;
+    matData.pbrAtlasHigh = 0;
     matData.detailScale = matPSO->detail_scale;
     matData.alphaRef = 0.5f;
     matData.flags = 0;
-    matData.diffuseUVScaleU = 1.0f;
-    matData.diffuseUVScaleV = 1.0f;
 
     if (matPSO->pass) {
         RENDER_NAMESPACE::STextureList* texList = matPSO->pass->T._get();
@@ -1821,15 +1823,18 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         return UINT32_MAX;
 
     MaterialData matData = {};
-    matData.diffuseSlice = 0xFFFFFFFF;
-    matData.normalSlice = 0xFFFFFFFF;
-    matData.detailSlice = 0xFFFFFFFF;
-    matData.pbrSlice = 0xFFFFFFFF;
+    matData.diffuseAtlasLow = 0xFFFF;
+    matData.diffuseAtlasHigh = 0;
+    matData.normalAtlasLow = 0xFFFF;
+    matData.normalAtlasHigh = 0;
+    matData.detailAtlasLow = 0xFFFF;
+    matData.detailAtlasHigh = 0;
+    matData.pbrAtlasLow = 0xFFFF;
+    matData.pbrAtlasHigh = 0;
     matData.detailScale = 1.0f;
     matData.alphaRef = 0.5f;
     matData.flags = 0;
-    matData.diffuseUVScaleU = 1.0f;
-    matData.diffuseUVScaleV = 1.0f;
+    matData.padding1 = 0.0f;
 
     RENDER_NAMESPACE::STextureList* texList = pass->T._get();
     if (texList && !texList->empty()) {
@@ -1918,9 +1923,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                 if (nvrhiTex) {
                     TextureRegisterResult result = atlasManager.Diffuse().RegisterTexture(ctx, diffuseName, nvrhiTex);
                     if (result.IsValid()) {
-                        matData.diffuseSlice = result.sliceRef.packed;
-                        matData.diffuseUVScaleU = result.uvScaleU;
-                        matData.diffuseUVScaleV = result.uvScaleV;
+                        SetDiffuseAllocation(matData, result.allocation);
                         updated = true;
                     }
                 }
@@ -1936,7 +1939,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                 if (nvrhiTex) {
                     TextureRegisterResult result = atlasManager.Normal().RegisterTexture(ctx, bumpName, nvrhiTex);
                     if (result.IsValid()) {
-                        matData.normalSlice = result.sliceRef.packed;
+                        SetNormalAllocation(matData, result.allocation);
                         matData.flags |= MAT_FLAG_HAS_NORMAL;
                         updated = true;
                     }
@@ -1954,7 +1957,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                     if (nvrhiTex) {
                         TextureRegisterResult result = atlasManager.Detail().RegisterTexture(ctx, detailTexName, nvrhiTex);
                         if (result.IsValid()) {
-                            matData.detailSlice = result.sliceRef.packed;
+                            SetDetailAllocation(matData, result.allocation);
                             matData.detailScale = texDescMgr.GetDetailScale(diffuseName);
                             matData.flags |= MAT_FLAG_HAS_DETAIL;
                             updated = true;
@@ -1983,7 +1986,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
             TextureRegisterResult pbrResult = registerPBRTexture(pbrName);
             if (pbrResult.IsValid()) {
-                matData.pbrSlice = pbrResult.sliceRef.packed;
+                SetPBRAllocation(matData, pbrResult.allocation);
                 matData.flags |= MAT_FLAG_HAS_PBR;
                 updated = true;
             }
@@ -2001,11 +2004,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         materialBuffer.Upload(ctx);
 
         Msg("* [MaterialCache] Finalized %u pending materials", processedCount);
-        Msg("* [MaterialCache] Atlas usage: Diffuse=%u, Normal=%u, Detail=%u, PBR=%u",
-            atlasManager.Diffuse().GetTextureCount(),
-            atlasManager.Normal().GetTextureCount(),
-            atlasManager.Detail().GetTextureCount(),
-            atlasManager.PBR().GetTextureCount());
+        atlasManager.LogMemoryUsage();
     }
 }
 

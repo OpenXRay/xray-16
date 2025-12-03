@@ -10,6 +10,8 @@
 #include <nvrhi/nvrhi.h>
 
 extern ENGINE_API int ps_r4_use_framegraph;
+using namespace xray::render::ng;
+using namespace xray::render::resources;
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -107,168 +109,55 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
     ret_msize = 0;
     R_ASSERT1_CURE(fRName && fRName[0], { return nullptr; });
 
-    if (ps_r4_use_framegraph && m_renderDevice && m_renderDevice->GetFGResourceManager())
+    if (!m_renderDevice || !m_renderDevice->GetFGResourceManager())
+        return nullptr;
+
+
+    string_path fname;
+    xr_strcpy(fname, fRName);
+    fix_texture_name(fname);
+
+    string_path vfsPath;
+    xr_sprintf(vfsPath, "$game_textures$\\%s", fname);
+
+    Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
+
+    FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
+    TextureManager* texManager = resourceMgr->GetTextureManager();
+
+    TextureHandle handle = texManager->LoadTexture(fRName, TexturePriority::High);
+    if (!handle.IsValid())
     {
-        using namespace xray::render::ng;
-        using namespace xray::render::resources;
-
-        string_path fname;
-        xr_strcpy(fname, fRName);
-        fix_texture_name(fname);
-
-        string_path vfsPath;
-        xr_sprintf(vfsPath, "$game_textures$\\%s", fname);
-
-        Msg("* [FrameGraph] Loading texture through TextureManager: %s", fname);
-
-        FGResourceManager* resourceMgr = m_renderDevice->GetFGResourceManager();
-        TextureManager* texManager = resourceMgr->GetTextureManager();
-
-        TextureHandle handle = texManager->LoadTexture(fRName, TexturePriority::High);
-        if (!handle.IsValid())
-        {
-            Msg("! [FrameGraph] Failed to load texture through TextureManager: %s", fname);
-            goto _LEGACY_PATH;
-        }
-
-        nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
-        if (!nvrhiTexture)
-        {
-            Msg("! [FrameGraph] Failed to get NVRHI texture: %s", fname);
-            goto _LEGACY_PATH;
-        }
-
-        ID3D11Texture2D* d3d11Texture = static_cast<ID3D11Texture2D*>(
-            nvrhiTexture->getNativeObject(nvrhi::ObjectTypes::D3D11_Resource).pointer
-        );
-
-        if (!d3d11Texture)
-        {
-            Msg("! [FrameGraph] Failed to get D3D11 texture from NVRHI: %s", fname);
-            goto _LEGACY_PATH;
-        }
-
-        const TextureMetadata* meta = texManager->GetMetadata(handle);
-        if (meta)
-        {
-            ret_msize = (u32)meta->memoryUsed;
-        }
-
-        Msg("* [FrameGraph] Successfully loaded texture: %s (NVRHI-owned)", fname);
-
-        d3d11Texture->AddRef();
-
-        return d3d11Texture;
+        Msg("! [FrameGraph] Failed to load texture through TextureManager: %s", fname);
+        return nullptr;
     }
 
-_LEGACY_PATH:
-
-    ID3DBaseTexture* pTexture2D{};
-    string_path fn;
+    nvrhi::ITexture* nvrhiTexture = texManager->GetNVRHITexture(handle);
+    if (!nvrhiTexture)
     {
-        // make file name
-        string_path fname;
-        xr_strcpy(fname, fRName);
-        fix_texture_name(fname);
-
-        // Call to FS.exist WRITES to fn !
-
-        if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))
-        {
-            Msg("! Fallback to default bump map: %s", fname);
-            if (strstr(fname, "_bump#"))
-                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), return nullptr);
-            else
-                R_ASSERT1_CURE(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump", ".dds"), return nullptr);
-        }
-        else
-        {
-            bool exist = false;
-
-            for (cpcstr folder : { "$level$", "$game_saves$", "$game_textures$" })
-            {
-                exist = FS.exist(fn, folder, fname, ".dds");
-                if (exist)
-                    break;
-            }
-
-            if (!exist)
-            {
-                Msg("! Can't find texture '%s'", fname);
-                if (!FS.exist(fn, "$game_textures$", "ed\\ed_not_existing_texture", ".dds"))
-                    return nullptr;
-            }
-        }
+        Msg("! [FrameGraph] Failed to get NVRHI texture: %s", fname);
+        return nullptr;
     }
 
-    // Load and get header
-    IReader* S = FS.r_open(fn);
-    R_ASSERT3_CURE(S, "Can't open texture", fn, { return nullptr; });
+    ID3D11Texture2D* d3d11Texture = static_cast<ID3D11Texture2D*>(
+        nvrhiTexture->getNativeObject(nvrhi::ObjectTypes::D3D11_Resource).pointer
+    );
 
-    size_t img_size = S->length();
-#ifdef DEBUG
-    Msg("* Loaded: %s[%zu]", fn, img_size);
-#endif // DEBUG
-
-    DirectX::DDS_FLAGS dds_flags{ DirectX::DDS_FLAGS_PERMISSIVE };
-
-    for (int i = 1; i <= 3; ++i) // 3 attempts
+    if (!d3d11Texture)
     {
-        DirectX::TexMetadata IMG;
-        DirectX::ScratchImage texture;
-        auto hresult = LoadFromDDSMemory(static_cast<u8*>(S->pointer()), img_size, dds_flags, &IMG, texture);
-
-        R_ASSERT3_CURE(SUCCEEDED(hresult), "Failed to load texture from memory", fn,
-        {
-            FS.r_close(S);
-            return nullptr;
-        });
-
-        // Check for LMAP and compress if needed
-        xr_strlwr(fn);
-
-        const int img_loaded_lod = get_texture_load_lod(fn);
-
-        size_t mip_lod = 0;
-        if (img_loaded_lod && !IMG.IsCubemap())
-        {
-            const auto old_mipmap_cnt = IMG.mipLevels;
-            Reduce(IMG.width, IMG.height, IMG.mipLevels, img_loaded_lod);
-            mip_lod = old_mipmap_cnt - IMG.mipLevels;
-        }
-
-        // DirectX requires compressed texture size to be
-        // a multiple of 4. Make sure to meet this requirement.
-        if (DirectX::IsCompressed(IMG.format))
-        {
-            IMG.width = (IMG.width + 3u) & ~0x3u;
-            IMG.height = (IMG.height + 3u) & ~0x3u;
-        }
-
-        hresult = CreateTextureEx(HW.pDevice, texture.GetImages() + mip_lod, texture.GetImageCount(), IMG,
-            D3D_USAGE_IMMUTABLE, D3D_BIND_SHADER_RESOURCE, 0, IMG.miscFlags, DirectX::CREATETEX_DEFAULT,
-            &pTexture2D);
-
-        if (SUCCEEDED(hresult))
-        {
-            // OK
-            ret_msize = calc_texture_size(img_loaded_lod, IMG.mipLevels, img_size);
-            break;
-        }
-
-        if (i == 1)
-            dds_flags |= DirectX::DDS_FLAGS::DDS_FLAGS_NO_16BPP; // System isn't WDDM 1.2 compliant
-        else if (i == 2)
-            dds_flags |= DirectX::DDS_FLAGS::DDS_FLAGS_FORCE_RGB; // Not even WDDM 1.1 compliant
-        else if (i == 3)
-            Msg("! Could not load texture [%s] after %d attempts", fn, i);
-        else
-        {
-            NODEFAULT;
-        }
+        return nullptr;
     }
 
-    FS.r_close(S);
-    return pTexture2D;
+    const TextureMetadata* meta = texManager->GetMetadata(handle);
+    if (meta)
+    {
+        ret_msize = (u32)meta->memoryUsed;
+    }
+
+    Msg("* [FrameGraph] Successfully loaded texture: %s (NVRHI-owned)", fname);
+
+    d3d11Texture->AddRef();
+
+    return d3d11Texture;
 }
 } // namespace xray::render::RENDER_NAMESPACE

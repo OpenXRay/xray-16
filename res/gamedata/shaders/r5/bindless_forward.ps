@@ -61,8 +61,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     MaterialData mat = g_Materials[input.materialID];
 
-    float2 uvScale = float2(mat.diffuseUVScaleU, mat.diffuseUVScaleV);
-    float4 diffuseSample = SampleDiffuseScaled(mat.diffuseSlice, input.texcoord, uvScale);
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
 
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
     {
@@ -74,7 +73,7 @@ PS_OUTPUT main(PS_INPUT input)
     float3 N = normalize(input.normal);
     if (mat.flags & MAT_FLAG_HAS_NORMAL)
     {
-        float3 normalSample = SampleNormalScaled(mat.normalSlice, input.texcoord, uvScale);
+        float3 normalSample = SampleNormal(mat, input.texcoord);
         float3x3 TBN = float3x3(
             normalize(input.tangent),
             normalize(input.bitangent),
@@ -85,8 +84,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        float2 detailUV = input.texcoord * mat.detailScale;
-        float4 detailSample = SampleDetailScaled(mat.detailSlice, detailUV, uvScale);
+        float4 detailSample = SampleDetail(mat, input.texcoord, mat.detailScale);
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
@@ -96,7 +94,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_PBR)
     {
-        float3 pbrSample = SamplePBRScaled(mat.pbrSlice, input.texcoord, uvScale);
+        float3 pbrSample = SamplePBR(mat, input.texcoord);
         metallic = pbrSample.r;
         roughness = pbrSample.g;
         ao = pbrSample.b;

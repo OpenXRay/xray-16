@@ -922,6 +922,9 @@
     <ClInclude Include="..\xrRender\Bindless\TextureAtlas.h" />
     <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
+    <ClInclude Include="..\xrRender\Backend\D3D11Backend.h" />
+    <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
+    <ClInclude Include="..\xrRender\Backend\RenderBackend.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1691,6 +1694,9 @@
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\TextureAtlas.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
+    <ClCompile Include="..\xrRender\Backend\D3D11Backend.cpp" />
+    <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
+    <ClCompile Include="..\xrRender\Backend\RenderBackend.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

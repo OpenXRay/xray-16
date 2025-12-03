@@ -1,12 +1,18 @@
 #pragma once
 
 #include "xrCore/xrCore.h"
+#include <bitset>
 
 namespace xray::render::RENDER_NAMESPACE::bindless {
 
-constexpr u32 ATLAS_TEXTURE_SIZE = 1024;
+constexpr u32 ATLAS_PAGE_SIZE = 4096;
 
-constexpr u32 MAX_TEXTURES_PER_ATLAS = 2048;
+constexpr u32 ATLAS_CELL_SIZE = 128;
+
+constexpr u32 ATLAS_GRID_SIZE = ATLAS_PAGE_SIZE / ATLAS_CELL_SIZE;
+constexpr u32 ATLAS_CELLS_PER_PAGE = ATLAS_GRID_SIZE * ATLAS_GRID_SIZE;
+
+constexpr u32 MAX_PAGES_PER_ATLAS = 64;
 
 constexpr u32 MAX_MATERIALS = 16384;
 
@@ -25,6 +31,130 @@ inline const char* GetAtlasTypeName(AtlasType type) {
     return names[static_cast<u8>(type)];
 }
 
+struct AtlasAllocation {
+    u16 pageIndex;
+    u16 cellX;
+    u16 cellY;
+    u8  cellsWide;
+    u8  cellsTall;
+
+    AtlasAllocation() : pageIndex(0xFFFF), cellX(0), cellY(0), cellsWide(0), cellsTall(0) {}
+
+    AtlasAllocation(u16 page, u16 x, u16 y, u8 w, u8 h)
+        : pageIndex(page), cellX(x), cellY(y), cellsWide(w), cellsTall(h) {}
+
+    bool IsValid() const { return pageIndex != 0xFFFF && cellsWide > 0 && cellsTall > 0; }
+
+    u32 GetPackedLow() const {
+        return static_cast<u32>(pageIndex) | (static_cast<u32>(cellX) << 16);
+    }
+
+    u32 GetPackedHigh() const {
+        return static_cast<u32>(cellY) |
+               (static_cast<u32>(cellsWide) << 16) |
+               (static_cast<u32>(cellsTall) << 24);
+    }
+
+    static AtlasAllocation Unpack(u32 low, u32 high) {
+        AtlasAllocation alloc;
+        alloc.pageIndex = static_cast<u16>(low & 0xFFFF);
+        alloc.cellX = static_cast<u16>((low >> 16) & 0xFFFF);
+        alloc.cellY = static_cast<u16>(high & 0xFFFF);
+        alloc.cellsWide = static_cast<u8>((high >> 16) & 0xFF);
+        alloc.cellsTall = static_cast<u8>((high >> 24) & 0xFF);
+        return alloc;
+    }
+
+    u32 GetPixelX() const { return cellX * ATLAS_CELL_SIZE; }
+    u32 GetPixelY() const { return cellY * ATLAS_CELL_SIZE; }
+    u32 GetPixelWidth() const { return cellsWide * ATLAS_CELL_SIZE; }
+    u32 GetPixelHeight() const { return cellsTall * ATLAS_CELL_SIZE; }
+};
+static_assert(sizeof(AtlasAllocation) == 8, "AtlasAllocation must be 8 bytes");
+
+struct AtlasPage {
+    std::bitset<ATLAS_CELLS_PER_PAGE> occupied;
+    u32 freeCount = ATLAS_CELLS_PER_PAGE;
+
+    AtlasPage() = default;
+
+    bool CanPlace(u32 x, u32 y, u32 w, u32 h) const {
+        if (x + w > ATLAS_GRID_SIZE || y + h > ATLAS_GRID_SIZE)
+            return false;
+
+        for (u32 cy = y; cy < y + h; ++cy) {
+            for (u32 cx = x; cx < x + w; ++cx) {
+                if (occupied[cy * ATLAS_GRID_SIZE + cx])
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    void MarkOccupied(u32 x, u32 y, u32 w, u32 h) {
+        for (u32 cy = y; cy < y + h; ++cy) {
+            for (u32 cx = x; cx < x + w; ++cx) {
+                u32 idx = cy * ATLAS_GRID_SIZE + cx;
+                if (!occupied[idx]) {
+                    occupied[idx] = true;
+                    --freeCount;
+                }
+            }
+        }
+    }
+
+    bool HasSpace(u32 cellsNeeded) const {
+        return freeCount >= cellsNeeded;
+    }
+};
+
+struct alignas(16) MaterialData {
+    u32 diffuseAtlasLow;
+    u32 diffuseAtlasHigh;
+    u32 normalAtlasLow;
+    u32 normalAtlasHigh;
+
+    u32 detailAtlasLow;
+    u32 detailAtlasHigh;
+    u32 pbrAtlasLow;
+    u32 pbrAtlasHigh;
+
+    float detailScale;
+    float alphaRef;
+    u32 flags;
+    float padding1;
+};
+static_assert(sizeof(MaterialData) == 48, "MaterialData must be 48 bytes for GPU alignment");
+
+inline void SetDiffuseAllocation(MaterialData& mat, const AtlasAllocation& alloc) {
+    mat.diffuseAtlasLow = alloc.GetPackedLow();
+    mat.diffuseAtlasHigh = alloc.GetPackedHigh();
+}
+
+inline void SetNormalAllocation(MaterialData& mat, const AtlasAllocation& alloc) {
+    mat.normalAtlasLow = alloc.GetPackedLow();
+    mat.normalAtlasHigh = alloc.GetPackedHigh();
+}
+
+inline void SetDetailAllocation(MaterialData& mat, const AtlasAllocation& alloc) {
+    mat.detailAtlasLow = alloc.GetPackedLow();
+    mat.detailAtlasHigh = alloc.GetPackedHigh();
+}
+
+inline void SetPBRAllocation(MaterialData& mat, const AtlasAllocation& alloc) {
+    mat.pbrAtlasLow = alloc.GetPackedLow();
+    mat.pbrAtlasHigh = alloc.GetPackedHigh();
+}
+
+enum MaterialFlags : u32 {
+    MAT_FLAG_ALPHA_TEST    = (1 << 0),
+    MAT_FLAG_TWO_SIDED     = (1 << 1),
+    MAT_FLAG_EMISSIVE      = (1 << 2),
+    MAT_FLAG_HAS_DETAIL    = (1 << 3),
+    MAT_FLAG_HAS_NORMAL    = (1 << 4),
+    MAT_FLAG_HAS_PBR       = (1 << 5),
+};
+
 struct TextureSliceRef {
     u32 packed = 0xFFFFFFFF;
 
@@ -35,36 +165,8 @@ struct TextureSliceRef {
     }
 
     bool IsValid() const { return packed != 0xFFFFFFFF; }
-
     AtlasType GetType() const { return static_cast<AtlasType>(packed >> 24); }
     u32 GetSliceIndex() const { return packed & 0x00FFFFFF; }
-};
-
-struct alignas(16) MaterialData {
-    u32 diffuseSlice;
-    u32 normalSlice;
-    u32 detailSlice;
-    u32 pbrSlice;
-
-    float detailScale;
-    float alphaRef;
-    u32 flags;
-    float padding1;
-
-    float diffuseUVScaleU;
-    float diffuseUVScaleV;
-    float padding2;
-    float padding3;
-};
-static_assert(sizeof(MaterialData) == 48, "MaterialData must be 48 bytes for GPU alignment");
-
-enum MaterialFlags : u32 {
-    MAT_FLAG_ALPHA_TEST    = (1 << 0),
-    MAT_FLAG_TWO_SIDED     = (1 << 1),
-    MAT_FLAG_EMISSIVE      = (1 << 2),
-    MAT_FLAG_HAS_DETAIL    = (1 << 3),
-    MAT_FLAG_HAS_NORMAL    = (1 << 4),
-    MAT_FLAG_HAS_PBR       = (1 << 5),
 };
 
 }

@@ -47,6 +47,5 @@ void CRenderDevice::Create()
     GEnv.Render->OnDeviceCreate(fname);
     m_imgui_render = GEnv.RenderFactory->CreateImGuiRender();
     m_imgui_render->OnDeviceCreate(GetImGuiContext());
-    Statistic->OnDeviceCreate();
     dwFrame = 0;
 }
