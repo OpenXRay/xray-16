@@ -84,7 +84,7 @@ void dxDebugRender::NextSceneMode()
 {
     // XXX: Fix overdraw on DX10+, OpenGL
 #ifdef USE_DX9
-    HW.Caps.SceneMode = (HW.Caps.SceneMode + 1) % 3;
+    GEnv.Backend->GetMutableCapabilities().SceneMode = (GEnv.Backend->GetCapabilities().SceneMode + 1) % 3;
 #endif
 }
 

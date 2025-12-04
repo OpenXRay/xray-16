@@ -221,7 +221,7 @@ struct ShaderTypeTraits<SVS>
 
     static inline const char* GetCompilationTarget()
     {
-        return HW.Caps.geometry_profile;
+        return GEnv.Backend->GetCapabilities().geometry_profile;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -292,7 +292,7 @@ struct ShaderTypeTraits<SPS>
 
     static inline const char* GetCompilationTarget()
     {
-        return HW.Caps.raster_profile;
+        return GEnv.Backend->GetCapabilities().raster_profile;
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* data)
@@ -731,22 +731,11 @@ T* CResourceManager::CreateShader(cpcstr name, pcstr filename /*= nullptr*/, u32
 
         FS.r_close(file);
 
-        extern ENGINE_API int ps_r4_use_framegraph;
         if (FAILED(_hr))
         {
-            if (ps_r4_use_framegraph)
-            {
-                if (fallback)
-                    goto fallback;
-                return nullptr;
-            }
-            else
-            {
-                VERIFY(SUCCEEDED(_hr));
-                if (fallback)
-                    goto fallback;
-                CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
-            }
+            if (fallback)
+                goto fallback;
+            return nullptr;
         }
 
         return sh;

@@ -87,9 +87,8 @@
     <ClInclude Include="..\xrRenderDX11\3DFluid\dx113DFluidVolume.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_Matrices.h" />
     <ClInclude Include="..\xrRenderDX11\dx11ComputeTest_SIMD.h" />
-    <ClInclude Include="..\xrRender\Backend\D3D11Backend.h" />
+    <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
-    <ClInclude Include="..\xrRender\Backend\RenderBackend.h" />
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\TextureAtlas.h" />
@@ -317,9 +316,8 @@
     <ClCompile Include="..\xrRenderDX11\dx11ComputeTest_SIMD.cpp" />
     <ClCompile Include="..\xrRenderDX11\dx11r_screenshot.cpp" />
     <ClCompile Include="..\xrRenderDX11\StateManager\dx11StateCache.cpp" />
-    <ClCompile Include="..\xrRender\Backend\D3D11Backend.cpp" />
+    <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
-    <ClCompile Include="..\xrRender\Backend\RenderBackend.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\TextureAtlas.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />

@@ -8,8 +8,6 @@
 #include "Layers/xrRender/xrRender_console.h"
 #endif
 
-extern ENGINE_API int ps_r4_use_framegraph;
-
 namespace xray::render::RENDER_NAMESPACE
 {
 float g_fSCREEN;
@@ -75,17 +73,7 @@ void CRender::Calculate()
     ZoneScopedN("r2_calculate");
 
 #if defined(USE_DX11) && RENDER == R_R4
-    if (m_nvrhiTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
-    {
-        return;
-    }
-
-    if (m_renderContextTestMode && m_nvrhiDevice && m_nvrhiDevice->IsInitialized())
-    {
-        return;
-    }
-
-    if (ps_r4_use_framegraph && m_framegraphRenderer)
+    if (m_framegraphRenderer)
     {
         return;
     }

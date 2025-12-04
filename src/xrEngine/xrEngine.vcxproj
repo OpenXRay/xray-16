@@ -72,6 +72,7 @@
     <ClInclude Include="IPhysicsGeometry.h" />
     <ClInclude Include="IPhysicsShell.h" />
     <ClInclude Include="IRenderable.h" />
+    <ClInclude Include="IRenderBackend.h" />
     <ClInclude Include="ISheduled.h" />
     <ClInclude Include="LightAnimLibrary.h" />
     <ClInclude Include="line_edit_control.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="IGame_Persistent.cpp" />
     <ClCompile Include="IInputReceiver.cpp" />
     <ClCompile Include="IRenderable.cpp" />
+    <ClCompile Include="IRenderBackend.cpp" />
     <ClCompile Include="ISheduled.cpp" />
     <ClCompile Include="key_binding_registrator_script.cpp" />
     <ClCompile Include="LightAnimLibrary.cpp" />

@@ -10,6 +10,8 @@
 
 #include "xrScriptEngine/script_engine.hpp"
 
+#include <nvrhi/nvrhi.h>
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class dx11ConstantBuffer;

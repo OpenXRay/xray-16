@@ -254,7 +254,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
 #if defined(USE_DX11)
     RCache.set_Textures(reinterpret_cast<STextureList*>(&sky_r_textures));
 #elif defined(USE_OGL)
-    if (HW.Caps.geometry.bVTF)
+    if (GEnv.Backend->GetCapabilities().geometry.bVTF)
         RCache.set_Textures(reinterpret_cast<STextureList*>(&sky_r_textures));
 #else
 #   error No graphics API selected or enabled!

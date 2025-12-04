@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RenderBackend.h"
-#include <nvrhi/d3d12.h>
+#include "xrEngine/IRenderBackend.h"
+#include <nvrhi/nvrhi.h>
 
 struct ID3D12Device;
 struct ID3D12CommandQueue;
@@ -9,28 +9,31 @@ struct ID3D12Fence;
 struct IDXGISwapChain3;
 struct IDXGIFactory4;
 struct IDXGIAdapter1;
+struct SDL_Window;
 
-namespace xray::render::ng {
-
-class ECORE_API D3D12Backend : public IRenderBackend {
+class D3D12Backend : public IRenderBackend {
 public:
     D3D12Backend();
     ~D3D12Backend() override;
 
-    bool Initialize(const BackendInitParams& params) override;
-    void Shutdown() override;
+    bool Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation = false);
+    void Shutdown();
+
+    API GetAPI() const override { return API::D3D12; }
+    pcstr GetAPIName() const override { return "D3D12"; }
+
     bool IsInitialized() const override { return m_initialized; }
+    void WaitForIdle() override;
 
-    GraphicsAPI GetAPI() const override { return GraphicsAPI::D3D12; }
-    const BackendCapabilities& GetCapabilities() const override { return m_capabilities; }
+    nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
+    nvrhi::ICommandList* GetCommandList() const override { return m_commandList.Get(); }
 
-    nvrhi::IDevice* GetDevice() const override { return m_device.Get(); }
-    nvrhi::ICommandList* GetImmediateCommandList() const override { return m_commandList.Get(); }
+    nvrhi::ICommandList* CreateCommandList() override;
 
-    nvrhi::CommandListHandle CreateCommandList(
-        nvrhi::CommandListParameters params = nvrhi::CommandListParameters()) override;
+    void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
+    void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
-    nvrhi::ITexture* GetCurrentBackBuffer() override;
+    nvrhi::ITexture* GetBackBuffer() override;
     u32 GetCurrentBackBufferIndex() const override { return m_currentBackBufferIndex; }
     u32 GetBackBufferCount() const override { return BACK_BUFFER_COUNT; }
     std::pair<u32, u32> GetBackBufferSize() const override { return {m_backBufferWidth, m_backBufferHeight}; }
@@ -39,37 +42,38 @@ public:
 
     void BeginFrame() override;
     void EndFrame() override;
-    void WaitForIdle() override;
 
-    void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
-    void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
+    const Capabilities& GetCapabilities() const override { return m_capabilities; }
+    Capabilities& GetMutableCapabilities() override { return m_capabilities; }
+    void UpdateCapabilities() override {}
 
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override;
     void UnregisterBindlessTexture(u32 index) override;
     nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_bindlessLayout.Get(); }
     nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_bindlessDescriptorTable.Get(); }
 
-    void BeginEvent(const char* name) override;
-    void EndEvent() override;
-    void SetMarker(const char* name) override;
+    void BeginDebugEvent(pcstr name) override;
+    void EndDebugEvent() override;
+    void SetMarker(pcstr name) override;
 
     ID3D12Device* GetD3D12Device() const { return m_d3d12Device; }
-    ID3D12CommandQueue* GetCommandQueue() const { return m_commandQueue; }
+    ID3D12CommandQueue* GetD3D12CommandQueue() const { return m_commandQueue; }
     IDXGISwapChain3* GetSwapChain() const { return m_swapChain; }
 
 private:
     static constexpr u32 BACK_BUFFER_COUNT = 2;
     static constexpr u32 MAX_BINDLESS_TEXTURES = 65536;
 
-    bool CreateDevice(const BackendInitParams& params);
-    bool CreateSwapChain(const BackendInitParams& params);
+    bool CreateDXGIFactory(bool enableValidation);
+    bool SelectAdapter();
+    bool CreateDevice();
     bool CreateCommandQueue();
+    bool CreateSwapChain(HWND hwnd, u32 width, u32 height);
     bool CreateFence();
     void CreateBackBufferTextures();
     void CreateBindlessResources();
     void QueryCapabilities();
     void WaitForFence(u64 fenceValue);
-    void MoveToNextFrame();
 
     IDXGIFactory4* m_dxgiFactory = nullptr;
     IDXGIAdapter1* m_adapter = nullptr;
@@ -82,7 +86,7 @@ private:
     u64 m_fenceValues[BACK_BUFFER_COUNT] = {};
     u64 m_currentFenceValue = 0;
 
-    nvrhi::DeviceHandle m_device;
+    nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::CommandListHandle m_commandList;
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
@@ -92,10 +96,8 @@ private:
     u32 m_nextBindlessIndex = 0;
 
     bool m_initialized = false;
-    BackendCapabilities m_capabilities;
+    Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;
     u32 m_currentBackBufferIndex = 0;
 };
-
-}

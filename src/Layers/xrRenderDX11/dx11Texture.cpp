@@ -3,13 +3,11 @@
 
 #include <DirectXTex.h>
 
-#include "Layers/xrRender/xrRender_console.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include <nvrhi/nvrhi.h>
 
-extern ENGINE_API int ps_r4_use_framegraph;
 using namespace xray::render::ng;
 using namespace xray::render::resources;
 

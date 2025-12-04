@@ -158,12 +158,6 @@ void CHUDManager::RenderUI()
         HitMarker.Render();
         if (pUIGame)
             pUIGame->Render();
-
-        extern ENGINE_API int ps_r4_use_framegraph;
-        if (!ps_r4_use_framegraph)
-        {
-            UI().RenderFont();
-        }
     }
 
     m_pHUDTarget->Render();

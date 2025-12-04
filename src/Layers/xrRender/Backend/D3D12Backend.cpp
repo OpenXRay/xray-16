@@ -3,13 +3,12 @@
 
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <nvrhi/d3d12.h>
 #include <SDL.h>
 #include <SDL_syswm.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
-
-namespace xray::render::ng {
 
 D3D12Backend::D3D12Backend() = default;
 
@@ -17,15 +16,38 @@ D3D12Backend::~D3D12Backend() {
     Shutdown();
 }
 
-bool D3D12Backend::Initialize(const BackendInitParams& params) {
+bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation) {
     if (m_initialized) {
         Msg("! [D3D12Backend] Already initialized");
         return false;
     }
 
+    if (!window) {
+        Msg("! [D3D12Backend] No window provided");
+        return false;
+    }
+
     Msg("* [D3D12Backend] Initializing...");
 
-    if (!CreateDevice(params)) {
+    SDL_SysWMinfo wmInfo;
+    SDL_VERSION(&wmInfo.version);
+    if (!SDL_GetWindowWMInfo(window, &wmInfo)) {
+        Msg("! [D3D12Backend] Failed to get window info: %s", SDL_GetError());
+        return false;
+    }
+    HWND hwnd = wmInfo.info.win.window;
+
+    if (!CreateDXGIFactory(enableValidation)) {
+        Shutdown();
+        return false;
+    }
+
+    if (!SelectAdapter()) {
+        Shutdown();
+        return false;
+    }
+
+    if (!CreateDevice()) {
         Shutdown();
         return false;
     }
@@ -40,7 +62,7 @@ bool D3D12Backend::Initialize(const BackendInitParams& params) {
         return false;
     }
 
-    if (!CreateSwapChain(params)) {
+    if (!CreateSwapChain(hwnd, width, height)) {
         Shutdown();
         return false;
     }
@@ -51,8 +73,8 @@ bool D3D12Backend::Initialize(const BackendInitParams& params) {
     deviceDesc.errorCB = nullptr;
     deviceDesc.enableHeapDirectlyIndexed = true;
 
-    m_device = nvrhi::d3d12::createDevice(deviceDesc);
-    if (!m_device) {
+    m_nvrhiDevice = nvrhi::d3d12::createDevice(deviceDesc);
+    if (!m_nvrhiDevice) {
         Msg("! [D3D12Backend] Failed to create NVRHI device");
         Shutdown();
         return false;
@@ -60,7 +82,7 @@ bool D3D12Backend::Initialize(const BackendInitParams& params) {
 
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false;
-    m_commandList = m_device->createCommandList(cmdParams);
+    m_commandList = m_nvrhiDevice->createCommandList(cmdParams);
 
     if (!m_commandList) {
         Msg("! [D3D12Backend] Failed to create command list");
@@ -76,13 +98,13 @@ bool D3D12Backend::Initialize(const BackendInitParams& params) {
 
     m_initialized = true;
     Msg("* [D3D12Backend] Initialized successfully");
-    Msg("*   Bindless textures: Yes (max %u)", m_capabilities.maxBindlessTextures);
+    Msg("*   Bindless textures: Yes (max %u)", m_capabilities.maxBindlessResources);
 
     return true;
 }
 
 void D3D12Backend::Shutdown() {
-    if (!m_initialized && !m_device)
+    if (!m_initialized && !m_nvrhiDevice)
         return;
 
     Msg("* [D3D12Backend] Shutting down...");
@@ -94,7 +116,7 @@ void D3D12Backend::Shutdown() {
     for (auto& bb : m_backBuffers)
         bb = nullptr;
     m_commandList = nullptr;
-    m_device = nullptr;
+    m_nvrhiDevice = nullptr;
 
     if (m_fenceEvent) {
         CloseHandle(m_fenceEvent);
@@ -129,9 +151,9 @@ void D3D12Backend::Shutdown() {
     Msg("* [D3D12Backend] Shutdown complete");
 }
 
-bool D3D12Backend::CreateDevice(const BackendInitParams& params) {
+bool D3D12Backend::CreateDXGIFactory(bool enableValidation) {
     UINT dxgiFlags = 0;
-    if (params.enableValidation) {
+    if (enableValidation) {
         dxgiFlags |= DXGI_CREATE_FACTORY_DEBUG;
 
         ID3D12Debug* debugController = nullptr;
@@ -147,7 +169,10 @@ bool D3D12Backend::CreateDevice(const BackendInitParams& params) {
         Msg("! [D3D12Backend] Failed to create DXGI factory");
         return false;
     }
+    return true;
+}
 
+bool D3D12Backend::SelectAdapter() {
     IDXGIAdapter1* adapter = nullptr;
     for (UINT i = 0; m_dxgiFactory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i) {
         DXGI_ADAPTER_DESC1 desc;
@@ -158,20 +183,27 @@ bool D3D12Backend::CreateDevice(const BackendInitParams& params) {
             continue;
         }
 
-        hr = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_d3d12Device));
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), nullptr))) {
             m_adapter = adapter;
             Msg("* [D3D12Backend] Using adapter: %S", desc.Description);
-            break;
+
+            m_capabilities.id_vendor = desc.VendorId;
+            m_capabilities.id_device = desc.DeviceId;
+            return true;
         }
         adapter->Release();
     }
 
-    if (!m_d3d12Device) {
-        Msg("! [D3D12Backend] No D3D12-capable adapter found");
+    Msg("! [D3D12Backend] No D3D12-capable adapter found");
+    return false;
+}
+
+bool D3D12Backend::CreateDevice() {
+    HRESULT hr = D3D12CreateDevice(m_adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&m_d3d12Device));
+    if (FAILED(hr)) {
+        Msg("! [D3D12Backend] Failed to create D3D12 device");
         return false;
     }
-
     return true;
 }
 
@@ -207,23 +239,10 @@ bool D3D12Backend::CreateFence() {
     return true;
 }
 
-bool D3D12Backend::CreateSwapChain(const BackendInitParams& params) {
-    if (!params.window) {
-        Msg("! [D3D12Backend] No window provided for swap chain");
-        return false;
-    }
-
-    SDL_SysWMinfo wmInfo;
-    SDL_VERSION(&wmInfo.version);
-    if (!SDL_GetWindowWMInfo(params.window, &wmInfo)) {
-        Msg("! [D3D12Backend] Failed to get window info");
-        return false;
-    }
-    HWND hwnd = wmInfo.info.win.window;
-
+bool D3D12Backend::CreateSwapChain(HWND hwnd, u32 width, u32 height) {
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-    swapChainDesc.Width = params.backBufferWidth;
-    swapChainDesc.Height = params.backBufferHeight;
+    swapChainDesc.Width = width;
+    swapChainDesc.Height = height;
     swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.SampleDesc.Count = 1;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -253,8 +272,8 @@ bool D3D12Backend::CreateSwapChain(const BackendInitParams& params) {
         return false;
     }
 
-    m_backBufferWidth = params.backBufferWidth;
-    m_backBufferHeight = params.backBufferHeight;
+    m_backBufferWidth = width;
+    m_backBufferHeight = height;
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 
     return true;
@@ -274,7 +293,7 @@ void D3D12Backend::CreateBackBufferTextures() {
         desc.isRenderTarget = true;
         desc.debugName = "BackBuffer";
 
-        m_backBuffers[i] = m_device->createHandleForNativeTexture(
+        m_backBuffers[i] = m_nvrhiDevice->createHandleForNativeTexture(
             nvrhi::ObjectTypes::D3D12_Resource,
             nvrhi::Object(backBuffer),
             desc
@@ -291,13 +310,13 @@ void D3D12Backend::CreateBindlessResources() {
     bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
     bindlessDesc.registerSpaces.push_back(nvrhi::BindingLayoutItem::Texture_SRV(0));
 
-    m_bindlessLayout = m_device->createBindlessLayout(bindlessDesc);
+    m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
     if (!m_bindlessLayout) {
         Msg("! [D3D12Backend] Failed to create bindless layout");
         return;
     }
 
-    m_bindlessDescriptorTable = m_device->createDescriptorTable(m_bindlessLayout);
+    m_bindlessDescriptorTable = m_nvrhiDevice->createDescriptorTable(m_bindlessLayout);
     if (!m_bindlessDescriptorTable) {
         Msg("! [D3D12Backend] Failed to create bindless descriptor table");
         return;
@@ -308,9 +327,8 @@ void D3D12Backend::CreateBindlessResources() {
 
 void D3D12Backend::QueryCapabilities() {
     m_capabilities.bindlessTextures = true;
-    m_capabilities.bindlessSamplers = true;
-    m_capabilities.maxBindlessTextures = MAX_BINDLESS_TEXTURES;
-    m_capabilities.maxBindlessSamplers = 2048;
+    m_capabilities.maxBindlessResources = MAX_BINDLESS_TEXTURES;
+    m_capabilities.shaderModel = 60;
 
     D3D12_FEATURE_DATA_D3D12_OPTIONS7 options7 = {};
     if (SUCCEEDED(m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS7, &options7, sizeof(options7)))) {
@@ -326,6 +344,31 @@ void D3D12Backend::QueryCapabilities() {
     if (SUCCEEDED(m_d3d12Device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS6, &options6, sizeof(options6)))) {
         m_capabilities.variableRateShading = (options6.VariableShadingRateTier != D3D12_VARIABLE_SHADING_RATE_TIER_NOT_SUPPORTED);
     }
+
+    m_capabilities.geometry.dwRegisters = 256;
+    m_capabilities.geometry.dwInstructions = 65535;
+    m_capabilities.geometry.dwClipPlanes = 6;
+    m_capabilities.geometry.dwVertexCache = 24;
+    m_capabilities.geometry.bVTF = true;
+
+    m_capabilities.raster.dwRegisters = 256;
+    m_capabilities.raster.dwInstructions = 65535;
+    m_capabilities.raster.dwStages = 16;
+    m_capabilities.raster.dwMRT_count = 8;
+    m_capabilities.raster.b_MRT_mixdepth = true;
+
+    m_capabilities.raster_major = 6;
+    m_capabilities.raster_minor = 0;
+    m_capabilities.raster_profile = "ps_6_0";
+    m_capabilities.geometry_major = 6;
+    m_capabilities.geometry_minor = 0;
+    m_capabilities.geometry_profile = "vs_6_0";
+    m_capabilities.iGPUNum = 1;
+
+    m_capabilities.hasStencil = true;
+    m_capabilities.hasScissor = true;
+    m_capabilities.hasFixedPipeline = false;
+    m_capabilities.useCombinedSamplers = true;
 }
 
 u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
@@ -347,7 +390,7 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
     nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
     item.slot = index;
 
-    if (!m_device->writeDescriptorTable(m_bindlessDescriptorTable, item)) {
+    if (!m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, item)) {
         m_freeBindlessIndices.push_back(index);
         return UINT32_MAX;
     }
@@ -361,7 +404,7 @@ void D3D12Backend::UnregisterBindlessTexture(u32 index) {
     }
 }
 
-nvrhi::ITexture* D3D12Backend::GetCurrentBackBuffer() {
+nvrhi::ITexture* D3D12Backend::GetBackBuffer() {
     return m_backBuffers[m_currentBackBufferIndex].Get();
 }
 
@@ -407,7 +450,7 @@ void D3D12Backend::BeginFrame() {
 
 void D3D12Backend::EndFrame() {
     m_commandList->close();
-    m_device->executeCommandList(m_commandList);
+    m_nvrhiDevice->executeCommandList(m_commandList);
 
     m_fenceValues[m_currentBackBufferIndex] = m_currentFenceValue;
     m_commandQueue->Signal(m_fence, m_currentFenceValue);
@@ -430,39 +473,31 @@ void D3D12Backend::WaitForIdle() {
 }
 
 void D3D12Backend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
-    if (m_device && commandList) {
-        m_device->executeCommandList(commandList);
+    if (m_nvrhiDevice && commandList) {
+        m_nvrhiDevice->executeCommandList(commandList);
     }
 }
 
 void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) {
-    if (!m_device)
+    if (!m_nvrhiDevice)
         return;
 
     for (u32 i = 0; i < count; ++i) {
         if (commandLists[i]) {
-            m_device->executeCommandList(commandLists[i]);
+            m_nvrhiDevice->executeCommandList(commandLists[i]);
         }
     }
 }
 
-nvrhi::CommandListHandle D3D12Backend::CreateCommandList(nvrhi::CommandListParameters params) {
-    if (!m_device)
-        return nullptr;
-
-    params.enableImmediateExecution = false;
-    return m_device->createCommandList(params);
+nvrhi::ICommandList* D3D12Backend::CreateCommandList() {
+    return nullptr;
 }
 
-void D3D12Backend::BeginEvent(const char* name) {
-    if (m_commandList) {
-    }
+void D3D12Backend::BeginDebugEvent(pcstr name) {
 }
 
-void D3D12Backend::EndEvent() {
+void D3D12Backend::EndDebugEvent() {
 }
 
-void D3D12Backend::SetMarker(const char* name) {
-}
-
+void D3D12Backend::SetMarker(pcstr name) {
 }
