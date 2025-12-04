@@ -272,9 +272,11 @@ struct D3D_VIEWPORT : D3D11_VIEWPORT
     {}
 };
 
-using VertexBufferHandle    = ID3D11Buffer*;
-using IndexBufferHandle     = ID3D11Buffer*;
-using ConstantBufferHandle  = ID3D11Buffer*;
+// Buffer handles - use NVRHI for D3D12
+#include <nvrhi/nvrhi.h>
+using VertexBufferHandle    = nvrhi::BufferHandle;
+using IndexBufferHandle     = nvrhi::BufferHandle;
+using ConstantBufferHandle  = nvrhi::BufferHandle;
 using HostBufferHandle      = void*;
 
 using VertexElement         = D3DVERTEXELEMENT9;

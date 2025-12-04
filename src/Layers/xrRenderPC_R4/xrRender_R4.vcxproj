@@ -291,6 +291,7 @@
     <ClInclude Include="..\xrRender\FrameGraph\FGResourcePool.h" />
     <ClInclude Include="..\xrRender\FrameGraph\FGPass.h" />
     <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\PassResourceCache.h" />
     <ClInclude Include="..\xrRender\FrameGraph\FGTest.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderLoader.h" />
     <ClInclude Include="..\xrRender\FrameGraph\ShaderCache.h" />
@@ -554,6 +555,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\FGResourcePool.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGPass.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderReflection.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\FGTest.cpp" />
     <ClCompile Include="..\xrRender\FrameGraph\ShaderLoader.cpp" />

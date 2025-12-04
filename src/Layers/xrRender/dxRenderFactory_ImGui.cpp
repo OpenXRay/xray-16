@@ -2,6 +2,7 @@
 #include "dxRenderFactory.h"
 #include "dxImGuiRender.h"
 #include "ImGuiRendererNVRHI.h"
+#include "RenderContext/RenderDevice.h"
 
 // Forward declarations for integration
 namespace xray::render {
@@ -22,8 +23,17 @@ IImGuiRender* dxRenderFactory::CreateImGuiRender()
         return existingRenderer;
     }
 
-    // Fallback to legacy DX11 implementation
-    Msg("* ImGui: Creating legacy DX11 renderer");
+    // Create NVRHI-based ImGui renderer for D3D12
+    // Get RenderDevice from the renderer
+    auto& render = RImplementation;
+    if (render.m_renderDevice)
+    {
+        Msg("* ImGui: Creating NVRHI renderer");
+        return xr_new<xray::render::ng::ImGuiRendererNVRHI>(render.m_renderDevice);
+    }
+
+    // Fallback to legacy DX11 implementation (should not happen with D3D12)
+    Msg("! ImGui: No RenderDevice available, falling back to legacy DX11 renderer");
     return xr_new<dxImGuiRender>();
 }
 

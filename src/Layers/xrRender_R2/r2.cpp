@@ -542,14 +542,14 @@ void CRender::create()
     Resources->RegisterConstantSetup("triLOD", &binder_LOD);
 #endif
 
-#if defined(USE_DX11) && RENDER == R_R4
-    // Initialize RenderDevice with HW's D3D11 device and context BEFORE creating render targets
+#if RENDER == R_R4
+    // Initialize RenderDevice from the backend (D3D12 or D3D11)
     // This ensures ShaderLoader is available for shader compilation during Target creation
-    if (HW.pDevice)
+    if (GEnv.Backend && GEnv.Backend->IsInitialized())
     {
         m_renderDevice = xr_new<xray::render::ng::RenderDevice>();
 
-        if (m_renderDevice->InitializeD3D11(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
+        if (m_renderDevice->InitializeFromBackend(GEnv.Backend))
         {
             Msg("* RenderDevice initialized successfully");
 
@@ -599,9 +599,17 @@ void CRender::create()
 
     //	TODO: OGL: Implement FluidManager.
 #if defined(USE_DX11)
-    FluidManager.Initialize(70, 70, 70);
-    //	FluidManager.Initialize( 100, 100, 100 );
-    FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
+    // FluidManager uses D3D11 geometry shaders - skip for D3D12/FrameGraph
+    if (!GEnv.Backend || GEnv.Backend->GetAPI() != IRenderBackend::API::D3D12)
+    {
+        FluidManager.Initialize(70, 70, 70);
+        //	FluidManager.Initialize( 100, 100, 100 );
+        FluidManager.SetScreenSize(Device.dwWidth, Device.dwHeight);
+    }
+    else
+    {
+        Msg("* [FluidManager] Disabled for D3D12 - uses legacy geometry shaders");
+    }
 #endif
 
     // Print summary of any failed shader compilations
@@ -611,7 +619,11 @@ void CRender::create()
 void CRender::destroy()
 {
 #if defined(USE_DX11)
-    FluidManager.Destroy();
+    // FluidManager only initialized for D3D11, not D3D12
+    if (!GEnv.Backend || GEnv.Backend->GetAPI() != IRenderBackend::API::D3D12)
+    {
+        FluidManager.Destroy();
+    }
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4

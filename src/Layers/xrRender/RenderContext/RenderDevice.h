@@ -34,6 +34,7 @@ public:
     // ═══════════════════════════════════════════════════
 
     bool InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* context);
+    bool InitializeFromBackend(IRenderBackend* backend);  // For D3D12
     void Shutdown();
 
     bool IsInitialized() const { return m_initialized; }

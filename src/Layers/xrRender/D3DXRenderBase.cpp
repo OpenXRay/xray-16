@@ -6,8 +6,7 @@
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
 
-#include "Layers/xrRender/NVRHI/NVRHIDevice.h"
-#include "Layers/xrRender/Backend/D3D11BackendWrapper.h"
+#include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
@@ -81,34 +80,35 @@ void D3DXRenderBase::OnDeviceDestroy(bool bKeepTextures)
 
 void D3DXRenderBase::Destroy()
 {
-#if defined(USE_DX11) && RENDER == R_R4
-    // Cleanup NVRHI before destroying D3D11 device
-    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    if (render.m_nvrhiDevice)
-    {
-        render.m_nvrhiDevice->Shutdown();
-        xr_delete(render.m_nvrhiDevice);
-        render.m_nvrhiDevice = nullptr;
-    }
-#endif
-
     xr_delete(Resources);
-    HW.DestroyDevice();
+
+    // Shutdown the graphics backend
+    if (GEnv.Backend)
+    {
+        GEnv.Backend->Shutdown();
+        auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
+        xr_delete(render.m_backend);
+        GEnv.Backend = nullptr;
+    }
 }
 
 void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2)
 {
     ZoneScoped;
-#if defined(DEBUG) && defined(USE_DX11)
-    _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
-#endif // DEBUG
 
     reset_begin();
     Memory.mem_compact();
 
-    HW.Reset();
+    // Resize the swap chain via backend
+    if (GEnv.Backend)
+    {
+        // Get new window size
+        int w, h;
+        SDL_GetWindowSize(hWnd, &w, &h);
+        GEnv.Backend->ResizeSwapChain(static_cast<u32>(w), static_cast<u32>(h));
+        std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
+    }
 
-    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
 
@@ -120,15 +120,13 @@ void D3DXRenderBase::Reset(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float&
 #ifndef MASTER_GOLD
     Resources->Dump(true);
 #endif
-
-#if defined(DEBUG) && defined(USE_DX11)
-    _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
-#endif
 }
 
 void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 {
-    HW.SetPrimaryAttributes(windowFlags);
+    // D3D12 doesn't require special window flags beyond what SDL provides
+    // Just ensure we have a proper window for HWND extraction
+    windowFlags |= SDL_WINDOW_SHOWN;
 }
 
 void D3DXRenderBase::SetupStates()
@@ -171,11 +169,16 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     create();
     if (!GEnv.isDedicatedServer)
     {
-        m_WireShader.create("editor" DELIMITER "wire");
-        m_SelectionShader.create("editor" DELIMITER "selection");
-        m_PortalFadeShader.create("portal");
-        m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);
-        DUImpl.OnDeviceCreate();
+        // For D3D12/FrameGraph: Skip legacy shader creation - FrameGraph has its own rendering
+        const bool useFrameGraph = GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12;
+        if (!useFrameGraph)
+        {
+            m_WireShader.create("editor" DELIMITER "wire");
+            m_SelectionShader.create("editor" DELIMITER "selection");
+            m_PortalFadeShader.create("portal");
+            m_PortalFadeGeom.create(FVF::F_L, RImplementation.Vertex.Buffer(), 0);
+            DUImpl.OnDeviceCreate();  // Creates fonts/debug utils via legacy blenders
+        }
         UIRenderImpl.CreateUIGeom();
     }
 }
@@ -184,7 +187,7 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
 {
     ZoneScoped;
 
-#if defined(USE_RENDERDOC) && defined(USE_DX11)
+#ifdef USE_RENDERDOC
     if (!g_renderdoc_api)
     {
         HMODULE hModule = GetModuleHandleA("renderdoc.dll");
@@ -223,44 +226,35 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     }
 #endif
 
-    HW.CreateDevice(hWnd);
+    // Get initial window size
+    int w, h;
+    SDL_GetWindowSize(hWnd, &w, &h);
+    dwWidth = static_cast<u32>(w);
+    dwHeight = static_cast<u32>(h);
 
-#if defined(USE_DX11) && RENDER == R_R4
-    // Initialize NVRHI wrapper after D3D11 device creation
+    // Initialize D3D12 backend
     auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    render.m_nvrhiDevice = xr_new<xray::render::RENDER_NAMESPACE::nvrhi_wrapper::NVRHIDevice>();
 
-    const bool nvrhiSuccess = render.m_nvrhiDevice->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID));
+    const bool enableValidation = !!strstr(Core.Params, "-d3ddebug");
+    auto* dx12Backend = xr_new<D3D12Backend>();
 
-    if (!nvrhiSuccess)
+    if (dx12Backend->Initialize(hWnd, dwWidth, dwHeight, enableValidation))
     {
-        Msg("! [CRender] NVRHI initialization failed - modern rendering path disabled");
-        xr_delete(render.m_nvrhiDevice);
-        render.m_nvrhiDevice = nullptr;
+        render.m_backend = dx12Backend;
+        GEnv.Backend = dx12Backend;
+        Msg("* [CRender] D3D12 backend initialized successfully");
+        Msg("*   Bindless textures: %s (max %u)",
+            dx12Backend->GetCapabilities().bindlessTextures ? "Yes" : "No",
+            dx12Backend->GetCapabilities().maxBindlessResources);
     }
     else
     {
-        Msg("~ [CRender] NVRHI initialized - modern rendering path available");
+        Msg("! [CRender] D3D12 backend initialization failed");
+        xr_delete(dx12Backend);
+        FATAL("D3D12 initialization failed - no fallback available");
     }
 
-    // Initialize Backend wrapper and set GEnv.Backend (required before SetupStates)
-    if (!render.m_backend)
-    {
-        auto* backendWrapper = xr_new<D3D11BackendWrapper>();
-        if (backendWrapper->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
-        {
-            render.m_backend = backendWrapper;
-            GEnv.Backend = render.m_backend;
-        }
-        else
-        {
-            Msg("! [CRender] Backend wrapper initialization failed");
-            xr_delete(backendWrapper);
-        }
-    }
-#endif
-
-    std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
+    std::tie(dwWidth, dwHeight) = GEnv.Backend->GetBackBufferSize();
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
@@ -305,7 +299,7 @@ void D3DXRenderBase::ResourcesDumpMemoryUsage()
 }
 DeviceState D3DXRenderBase::GetDeviceState()
 {
-    return HW.GetDeviceState();
+    return GEnv.Backend ? GEnv.Backend->GetDeviceState() : DeviceState::Lost;
 }
 
 bool D3DXRenderBase::GetForceGPU_REF()
@@ -318,16 +312,9 @@ u32 D3DXRenderBase::GetCacheStatPolys()
 }
 void D3DXRenderBase::Begin()
 {
-#if defined(USE_DX11) && RENDER == R_R4
-    // Skip Begin() if NVRHI test mode is active
-    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    if (render.m_nvrhiTestMode && render.m_nvrhiDevice && render.m_nvrhiDevice->IsInitialized())
-    {
-        return;
-    }
-#endif
+    // Begin frame on backend
+    GEnv.Backend->BeginFrame();
 
-    HW.BeginScene();
 #if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
@@ -357,19 +344,10 @@ void D3DXRenderBase::Clear()
 
 void D3DXRenderBase::End()
 {
-#if defined(USE_DX11) && RENDER == R_R4
-    // Skip normal End() cleanup if NVRHI test mode is active
-    // (TestNVRHI_Render already called Present)
-    auto& render = static_cast<xray::render::RENDER_NAMESPACE::CRender&>(*this);
-    if (render.m_nvrhiTestMode || render.m_renderContextTestMode)
-    {
-        return; // Skip normal cleanup and present
-    }
-#endif
-
     if (GEnv.Backend->GetCapabilities().SceneMode)
         overdrawEnd();
- #if RENDER == R_R4
+
+#if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
         contexts_pool[id].cmd_list.OnFrameEnd();
@@ -381,8 +359,9 @@ void D3DXRenderBase::End()
     // we're done with rendering
     cleanup_contexts();
 
-    HW.EndScene();
-    HW.Present();
+    // End frame and present via backend
+    GEnv.Backend->EndFrame();
+    GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
 }
 
 void D3DXRenderBase::ResourcesDestroyNecessaryTextures()

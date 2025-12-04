@@ -3,6 +3,7 @@
 #include "SunPassSetup.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -26,6 +27,42 @@ struct SunVertex {
     float u, v;
 };
 #pragma pack(pop)
+
+// Static placeholder texture (1x1 white)
+static nvrhi::TextureHandle s_sunPlaceholderTexture;
+static bool s_sunPassInitialized = false;
+
+void InitializeSunPass(ng::RenderDevice* device) {
+    if (s_sunPassInitialized || !device) return;
+
+    auto* nvrhiDevice = device->GetNVRHIDevice();
+    if (!nvrhiDevice) return;
+
+    // Create 1x1 white placeholder texture
+    nvrhi::TextureDesc texDesc;
+    texDesc.width = 1;
+    texDesc.height = 1;
+    texDesc.format = nvrhi::Format::RGBA8_UNORM;
+    texDesc.debugName = "SunTexturePlaceholder";
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;  // OK - static texture persists
+    s_sunPlaceholderTexture = nvrhiDevice->createTexture(texDesc);
+
+    // Initialize with white
+    nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
+    cmdList->open();
+    u32 white = 0xFFFFFFFF;
+    cmdList->writeTexture(s_sunPlaceholderTexture, 0, 0, &white, sizeof(white));
+    cmdList->close();
+    nvrhiDevice->executeCommandList(cmdList);
+
+    s_sunPassInitialized = true;
+}
+
+void ShutdownSunPass() {
+    s_sunPlaceholderTexture = nullptr;
+    s_sunPassInitialized = false;
+}
 
 framegraph::VirtualResourceHandle setupSunPass(
     framegraph::FrameGraph& fg,
@@ -187,6 +224,8 @@ framegraph::VirtualResourceHandle setupSunPass(
             vbDesc.byteSize = sizeof(vertices);
             vbDesc.debugName = "SunVertexBuffer";
             vbDesc.isVertexBuffer = true;
+            vbDesc.isVolatile = true;
+            vbDesc.maxVersions = 16;
             vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
             auto vb = cmdList->getDevice()->createBuffer(vbDesc);
             cmdList->writeBuffer(vb, vertices, sizeof(vertices));
@@ -197,6 +236,8 @@ framegraph::VirtualResourceHandle setupSunPass(
             ibDesc.byteSize = sizeof(indices);
             ibDesc.debugName = "SunIndexBuffer";
             ibDesc.isIndexBuffer = true;
+            ibDesc.isVolatile = true;
+            ibDesc.maxVersions = 16;
             ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
             auto ib = cmdList->getDevice()->createBuffer(ibDesc);
             cmdList->writeBuffer(ib, indices, sizeof(indices));
@@ -221,8 +262,11 @@ framegraph::VirtualResourceHandle setupSunPass(
             }
 
             // ═══════════════════════════════════════════════════════
-            //  CREATE PIPELINE
+            //  CREATE PIPELINE (cached)
             // ═══════════════════════════════════════════════════════
+
+            auto& cache = framegraph::GetPassResourceCache();
+            nvrhi::IDevice* device = cmdList->getDevice();
 
             // Input layout
             nvrhi::VertexAttributeDesc vertexAttribs[] = {
@@ -243,8 +287,8 @@ framegraph::VirtualResourceHandle setupSunPass(
                     .setElementStride(sizeof(SunVertex)),
             };
 
-            auto inputLayout = cmdList->getDevice()->createInputLayout(
-                vertexAttribs, std::size(vertexAttribs), vsResult.handle);
+            auto inputLayout = cache.GetOrCreateInputLayout(
+                "SunPass", vertexAttribs, std::size(vertexAttribs), vsResult.handle, device);
 
             // Binding layout
             nvrhi::BindingLayoutDesc bindingLayoutDesc;
@@ -254,7 +298,7 @@ framegraph::VirtualResourceHandle setupSunPass(
                 nvrhi::BindingLayoutItem::Texture_SRV(0),     // sun texture
                 nvrhi::BindingLayoutItem::Sampler(0)          // sampler
             };
-            auto bindingLayout = cmdList->getDevice()->createBindingLayout(bindingLayoutDesc);
+            auto bindingLayout = cache.GetOrCreateBindingLayout("SunPass", bindingLayoutDesc, device);
 
             // Render state: additive blending, no depth write
             nvrhi::RenderState renderState;
@@ -275,7 +319,7 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = cache.GetOrCreateFramebuffer("SunPass", fbDesc, device);
 
             nvrhi::FramebufferInfoEx fbInfo = framebuffer->getFramebufferInfo();
 
@@ -287,7 +331,7 @@ framegraph::VirtualResourceHandle setupSunPass(
             pipelineDesc.renderState = renderState;
             pipelineDesc.primType = nvrhi::PrimitiveType::TriangleList;
 
-            auto pipeline = cmdList->getDevice()->createGraphicsPipeline(pipelineDesc, fbInfo);
+            auto pipeline = cache.GetOrCreatePipeline("SunPass", pipelineDesc, fbInfo, device);
 
             if (!pipeline) {
                 Msg("! [SunPass] Failed to create pipeline");
@@ -307,6 +351,8 @@ framegraph::VirtualResourceHandle setupSunPass(
             cbDesc.byteSize = sizeof(DynamicTransforms);
             cbDesc.isConstantBuffer = true;
             cbDesc.debugName = "SunDynamicTransforms";
+            cbDesc.isVolatile = true;  // Per-frame data, no state tracking needed
+            cbDesc.maxVersions = 16;
             auto dynamicCBBuffer = cmdList->getDevice()->createBuffer(cbDesc);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
@@ -329,27 +375,16 @@ framegraph::VirtualResourceHandle setupSunPass(
                 }
             }
 
-            // Fallback to white placeholder if texture not available
-            nvrhi::TextureHandle placeholderTex;
+            // Fallback to static placeholder if texture not available
             if (!sunTex) {
-                nvrhi::TextureDesc texDesc;
-                texDesc.width = 1;
-                texDesc.height = 1;
-                texDesc.format = nvrhi::Format::RGBA8_UNORM;
-                texDesc.debugName = "SunTexturePlaceholder";
-                texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-                texDesc.keepInitialState = true;
-                placeholderTex = cmdList->getDevice()->createTexture(texDesc);
-                u32 white = 0xFFFFFFFF;
-                cmdList->writeTexture(placeholderTex, 0, 0, &white, sizeof(white));
-                sunTex = placeholderTex.Get();
+                sunTex = s_sunPlaceholderTexture.Get();
             }
 
-            // Create sampler
+            // Create sampler (cached)
             nvrhi::SamplerDesc samplerDesc;
             samplerDesc.setAllFilters(true);
             samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cmdList->getDevice()->createSampler(samplerDesc);
+            auto sampler = cache.GetOrCreateSampler("SunPass", samplerDesc, device);
 
             // Create binding set
             nvrhi::BindingSetDesc bindingSetDesc;

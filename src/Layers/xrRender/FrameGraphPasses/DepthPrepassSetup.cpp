@@ -4,6 +4,7 @@
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
@@ -339,6 +340,8 @@ void renderDepthOnlyGeometry(
                 else {
                     s_bindlessDepthVS = vsResult.handle;
 
+                    auto& cache = framegraph::GetPassResourceCache();
+
                     // Create input layout for UnifiedVertex (48 bytes) - matches forward pass
                     constexpr u32 vertexStride = 48;
                     nvrhi::VertexAttributeDesc vertexAttribs[] = {
@@ -374,8 +377,8 @@ void renderDepthOnlyGeometry(
                             .setOffset(40)
                             .setElementStride(vertexStride),
                     };
-                    s_bindlessDepthInputLayout = nvDevice->createInputLayout(
-                        vertexAttribs, std::size(vertexAttribs), s_bindlessDepthVS);
+                    s_bindlessDepthInputLayout = cache.GetOrCreateInputLayout(
+                        "BindlessDepthPass", vertexAttribs, std::size(vertexAttribs), s_bindlessDepthVS, nvDevice);
 
                     // Create binding layout - needs static globals (m_VP) and per-draw CB (g_World)
                     // common.h defines m_VP in static_globals at register(b2), NOT b0!
@@ -385,7 +388,7 @@ void renderDepthOnlyGeometry(
                         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (m_VP at b2)
                         nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // PerDrawConstants (g_World)
                     };
-                    s_bindlessDepthBindingLayout = nvDevice->createBindingLayout(bindLayoutDesc);
+                    s_bindlessDepthBindingLayout = cache.GetOrCreateBindingLayout("BindlessDepthPass", bindLayoutDesc, nvDevice);
 
                     // Create static globals CB for m_VP (matches common.h layout at b2)
                     // Must be full StaticGlobals size (768 bytes) to match shader expectations
@@ -395,6 +398,8 @@ void renderDepthOnlyGeometry(
                     globalsCBDesc.isConstantBuffer = true;
                     globalsCBDesc.isVolatile = true;
                     globalsCBDesc.maxVersions = 16;
+                    globalsCBDesc.keepInitialState = true;
+                    globalsCBDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
                     s_bindlessDepthStaticGlobalsCB = nvDevice->createBuffer(globalsCBDesc);
 
                     // Create per-draw constant buffer - size MUST match struct exactly
@@ -404,9 +409,11 @@ void renderDepthOnlyGeometry(
                     cbDesc.isConstantBuffer = true;
                     cbDesc.isVolatile = true;
                     cbDesc.maxVersions = 256;
+                    cbDesc.keepInitialState = true;
+                    cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
                     s_bindlessDepthPerDrawCB = nvDevice->createBuffer(cbDesc);
 
-                    // Create depth-only pipeline
+                    // Create depth-only pipeline (cached)
                     nvrhi::GraphicsPipelineDesc pipeDesc;
                     pipeDesc.VS = s_bindlessDepthVS;
                     pipeDesc.PS = nullptr;  // No pixel shader - depth only
@@ -419,12 +426,13 @@ void renderDepthOnlyGeometry(
                     pipeDesc.renderState.rasterState.frontCounterClockwise = false;
                     pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
 
-                    // Create framebuffer desc for pipeline creation
+                    // Create framebuffer desc for pipeline creation (cached)
                     nvrhi::FramebufferDesc fbDesc;
                     fbDesc.setDepthAttachment(depthRT);
 
-                    nvrhi::FramebufferHandle fb = nvDevice->createFramebuffer(fbDesc);
-                    s_bindlessDepthPipeline = nvDevice->createGraphicsPipeline(pipeDesc, fb);
+                    nvrhi::FramebufferHandle fb = cache.GetOrCreateFramebuffer("BindlessDepthPass", fbDesc, nvDevice);
+                    nvrhi::FramebufferInfoEx fbInfo = fb->getFramebufferInfo();
+                    s_bindlessDepthPipeline = cache.GetOrCreatePipeline("BindlessDepthPass", pipeDesc, fbInfo, nvDevice);
 
                     if (s_bindlessDepthPipeline) {
                         Msg("* [BindlessDepth] Pipeline created successfully");
@@ -438,10 +446,12 @@ void renderDepthOnlyGeometry(
 
         // Render bindless geometry
         if (s_bindlessDepthInitialized && s_bindlessDepthPipeline) {
-            // Create framebuffer for this render
+            auto& cache = framegraph::GetPassResourceCache();
+
+            // Create framebuffer for this render (cached)
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.setDepthAttachment(depthRT);
-            nvrhi::FramebufferHandle framebuffer = nvDevice->createFramebuffer(fbDesc);
+            nvrhi::FramebufferHandle framebuffer = cache.GetOrCreateFramebuffer("BindlessDepthPass_Render", fbDesc, nvDevice);
 
             // Set viewport
             const auto& depthDesc = depthRT->getDesc();

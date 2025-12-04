@@ -3,6 +3,7 @@
 #include "TonemapPassSetup.h"
 #include "ExposurePassSetup.h"  // For GetExposureTexture()
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
@@ -14,10 +15,45 @@ namespace xray::render::RENDER_NAMESPACE {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
+// Static fallback exposure texture (1x1, value = 1.0)
+static nvrhi::TextureHandle s_fallbackExposureTexture;
+static bool s_tonemapPassInitialized = false;
+
+void InitializeTonemapPass(nvrhi::IDevice* device) {
+    if (s_tonemapPassInitialized || !device) return;
+
+    // Create 1x1 R32_FLOAT texture with default exposure = 1.0
+    nvrhi::TextureDesc texDesc;
+    texDesc.debugName = "FallbackExposure";
+    texDesc.width = 1;
+    texDesc.height = 1;
+    texDesc.format = nvrhi::Format::R32_FLOAT;
+    texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    texDesc.keepInitialState = true;  // OK - static texture persists
+
+    s_fallbackExposureTexture = device->createTexture(texDesc);
+
+    // Initialize with default exposure = 1.0
+    nvrhi::CommandListHandle cmdList = device->createCommandList();
+    cmdList->open();
+    float defaultExposure = 1.0f;
+    cmdList->writeTexture(s_fallbackExposureTexture, 0, 0, &defaultExposure, sizeof(float));
+    cmdList->close();
+    device->executeCommandList(cmdList);
+
+    s_tonemapPassInitialized = true;
+}
+
+void ShutdownTonemapPass() {
+    s_fallbackExposureTexture = nullptr;
+    s_tonemapPassInitialized = false;
+}
+
 framegraph::VirtualResourceHandle setupTonemapPass(
     framegraph::FrameGraph& fg,
     framegraph::VirtualResourceHandle hdrInput,
     framegraph::VirtualResourceHandle exposureTexture,
+    framegraph::VirtualResourceHandle outputTarget,
     u32 width,
     u32 height)
 {
@@ -34,12 +70,13 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
     // Check if exposure texture is valid
     bool hasExposure = exposureTexture.is_valid();
+    bool hasOutputTarget = outputTarget.is_valid();
 
     auto& passData = fg.addCallbackPass<TonemapPassData>(
         "Tonemap",
 
         // Setup lambda
-        [hdrInput, exposureTexture, hasExposure, width, height](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
+        [hdrInput, exposureTexture, outputTarget, hasExposure, hasOutputTarget, width, height](FrameGraph& builder, PassHandle passHandle, TonemapPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -54,18 +91,24 @@ framegraph::VirtualResourceHandle setupTonemapPass(
                 data.exposureInput = passBuilder.read(exposureTexture, ResourceState::ShaderResource);
             }
 
-            // Create LDR output (RGBA8_UNORM for standard displays)
-            // NOTE: Must be non-transient (persistent) to be a terminal pass and keep render chain alive
-            framegraph::ResourceDesc ldrDesc;
-            ldrDesc.type = framegraph::ResourceDesc::Type::Texture2D;
-            ldrDesc.width = width;
-            ldrDesc.height = height;
-            ldrDesc.format = nvrhi::Format::RGBA8_UNORM;
-            ldrDesc.isRenderTarget = true;
-            ldrDesc.isTransient = false;  // CRITICAL: Makes this a terminal pass
-            ldrDesc.debugName = "rt_Final";
+            // Use provided output target (backbuffer) or create internal rt_Final
+            if (hasOutputTarget) {
+                // Write directly to imported backbuffer (Frostbite pattern)
+                data.ldrOutput = passBuilder.write(outputTarget, ResourceState::RenderTarget);
+            } else {
+                // Create LDR output (RGBA8_UNORM for standard displays)
+                // NOTE: Must be non-transient (persistent) to be a terminal pass and keep render chain alive
+                framegraph::ResourceDesc ldrDesc;
+                ldrDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+                ldrDesc.width = width;
+                ldrDesc.height = height;
+                ldrDesc.format = nvrhi::Format::RGBA8_UNORM;
+                ldrDesc.isRenderTarget = true;
+                ldrDesc.isTransient = false;  // CRITICAL: Makes this a terminal pass
+                ldrDesc.debugName = "rt_Final";
 
-            data.ldrOutput = passBuilder.createTexture("rt_Final", ldrDesc);
+                data.ldrOutput = passBuilder.createTexture("rt_Final", ldrDesc);
+            }
         },
 
         // Execute lambda
@@ -108,8 +151,11 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             }
 
             // ═══════════════════════════════════════════════════
-            //  CREATE PIPELINE STATE
+            //  CREATE PIPELINE STATE (cached)
             // ═══════════════════════════════════════════════════
+
+            auto& cache = framegraph::GetPassResourceCache();
+            nvrhi::IDevice* device = cmdList->getDevice();
 
             // Create binding layout
             // t0: HDR texture, t1: Exposure texture (1x1), s0: Linear sampler
@@ -121,7 +167,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
                 nvrhi::BindingLayoutItem::Sampler(0)       // s0: Linear sampler
             };
 
-            auto bindingLayout = cmdList->getDevice()->createBindingLayout(bindingLayoutDesc);
+            auto bindingLayout = cache.GetOrCreateBindingLayout("TonemapPass", bindingLayoutDesc, device);
 
             if (!bindingLayout) {
                 Msg("! [TonemapPass] Failed to create binding layout");
@@ -148,7 +194,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             nvrhi::FramebufferInfoEx framebufferInfo;
             framebufferInfo.addColorFormat(nvrhi::Format::RGBA8_UNORM);
 
-            auto pipeline = cmdList->getDevice()->createGraphicsPipeline(pipelineDesc, framebufferInfo);
+            auto pipeline = cache.GetOrCreatePipeline("TonemapPass", pipelineDesc, framebufferInfo, device);
 
             if (!pipeline) {
                 Msg("! [TonemapPass] Failed to create pipeline");
@@ -157,12 +203,12 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             }
 
             // ═══════════════════════════════════════════════════
-            //  CREATE SAMPLER
+            //  CREATE SAMPLER (cached)
             // ═══════════════════════════════════════════════════
             nvrhi::SamplerDesc samplerDesc;
             samplerDesc.setAllFilters(true);  // Linear filtering
             samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cmdList->getDevice()->createSampler(samplerDesc);
+            auto sampler = cache.GetOrCreateSampler("TonemapPass", samplerDesc, device);
 
             if (!sampler) {
                 Msg("! [TonemapPass] Failed to create sampler");
@@ -171,31 +217,15 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             }
 
             // ═══════════════════════════════════════════════════
-            //  CREATE FALLBACK EXPOSURE TEXTURE (if not provided)
+            //  GET EXPOSURE TEXTURE (use static fallback if not provided)
             // ═══════════════════════════════════════════════════
             nvrhi::ITexture* exposureToUse = exposureTexture;
-            nvrhi::TextureHandle fallbackExposure;
-
             if (!exposureToUse) {
-                // Create a 1x1 texture with default exposure = 1.0
-                nvrhi::TextureDesc texDesc;
-                texDesc.debugName = "FallbackExposure";
-                texDesc.width = 1;
-                texDesc.height = 1;
-                texDesc.format = nvrhi::Format::R32_FLOAT;
-                texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-                texDesc.keepInitialState = true;
-
-                fallbackExposure = cmdList->getDevice()->createTexture(texDesc);
-                if (fallbackExposure) {
-                    float defaultExposure = 1.0f;
-                    cmdList->writeTexture(fallbackExposure, 0, 0, &defaultExposure, sizeof(float));
-                    exposureToUse = fallbackExposure.Get();
-                }
+                exposureToUse = s_fallbackExposureTexture.Get();
             }
 
             if (!exposureToUse) {
-                Msg("! [TonemapPass] Failed to create fallback exposure texture");
+                Msg("! [TonemapPass] No exposure texture available (static fallback not initialized)");
                 cmdList->endMarker();
                 return;
             }
@@ -222,10 +252,10 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             //  RENDER FULLSCREEN TRIANGLE
             // ═══════════════════════════════════════════════════
 
-            // Create framebuffer
+            // Create framebuffer (cached)
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(ldrTexture);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = cache.GetOrCreateFramebuffer("TonemapPass", fbDesc, device);
 
             // Setup viewport
             nvrhi::Viewport viewport;
@@ -236,8 +266,7 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             viewport.minZ = 0.0f;
             viewport.maxZ = 1.0f;
 
-            // Begin render pass (no clear needed - fullscreen triangle covers everything)
-            cmdList->open();
+            // Note: Command list is already open from FrameGraph::Execute()
 
             nvrhi::GraphicsState state;
             state.pipeline = pipeline;
@@ -252,9 +281,8 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             drawArgs.vertexCount = 3;
             cmdList->draw(drawArgs);
 
-            cmdList->close();
-
-            cmdList->endMarker();
+            // Note: Command list is closed by FrameGraph::Execute()
+            // cmdList->endMarker();  // Disabled - NVRHI D3D12 doesn't implement debug markers
         }
     );
 

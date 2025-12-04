@@ -13,7 +13,8 @@ public:
     ~dx11ConstantBuffer();
 
     bool Similar(dx11ConstantBuffer& _in);
-    ID3DBuffer* GetBuffer() { return m_pBuffer; }
+    nvrhi::IBuffer* GetBuffer() { return m_pBuffer.Get(); }
+    ConstantBufferHandle GetBufferHandle() { return m_pBuffer; }
     void* GetBufferData() { return m_pBufferData; }
     u32 GetBufferSize() const { return m_uiBufferSize; }
     const char* GetBufferName() const { return m_strBufferName.c_str(); }
@@ -78,7 +79,7 @@ private:
     xr_vector<D3D_SHADER_TYPE_DESC> m_MembersList;
     xr_vector<shared_str> m_MembersNames;
 
-    ID3DBuffer* m_pBuffer;
+    ConstantBufferHandle m_pBuffer;  // NVRHI constant buffer
     u32 m_uiBufferSize; //	Cache buffer size for debug validation
     void* m_pBufferData;
     bool m_bChanged;

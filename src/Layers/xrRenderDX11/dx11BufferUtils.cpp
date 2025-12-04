@@ -1,7 +1,9 @@
+// dx11BufferUtils.cpp - NVRHI-based buffer utilities for D3D12
 #include "stdafx.h"
 #include "Layers/xrRender/BufferUtils.h"
 
 #include <FlexibleVertexFormat.h>
+#include <nvrhi/nvrhi.h>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -20,48 +22,91 @@ u32 GetDeclLength(const VertexElement* decl)
     return static_cast<u32>(::FVF::GetDeclLength(decl));
 }
 
-static HRESULT CreateBuffer(ID3DBuffer** ppBuffer, const void* pData, u32 dataSize,
-    bool bDynamic, D3D_BIND_FLAG bufferType)
+// NVRHI-based buffer creation
+static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void* pData, u32 dataSize,
+    bool bDynamic, bool isVertexBuffer, bool isIndexBuffer, bool isConstantBuffer)
 {
-    D3D_BUFFER_DESC desc;
-    desc.ByteWidth      = dataSize;
-    desc.Usage          = bDynamic ? D3D_USAGE_DYNAMIC : D3D_USAGE_DEFAULT;
-    desc.BindFlags      = bufferType;
-    desc.CPUAccessFlags = bDynamic ? D3D_CPU_ACCESS_WRITE : 0;
-    desc.MiscFlags      = 0;
+    nvrhi::BufferDesc desc;
+    desc.byteSize = dataSize;
+    desc.debugName = isVertexBuffer ? "VertexBuffer" : (isIndexBuffer ? "IndexBuffer" : "ConstantBuffer");
 
-    D3D_SUBRESOURCE_DATA subData;
-    subData.pSysMem = pData;
+    if (isVertexBuffer)
+        desc.isVertexBuffer = true;
+    if (isIndexBuffer)
+        desc.isIndexBuffer = true;
+    if (isConstantBuffer)
+        desc.isConstantBuffer = true;
 
-    HRESULT res = HW.pDevice->CreateBuffer(
-        &desc,
-        pData ? &subData : nullptr,
-        ppBuffer);
+    if (bDynamic)
+    {
+        desc.cpuAccess = nvrhi::CpuAccessMode::Write;
+    }
 
-    return res;
+    // Tell NVRHI to track state from creation - required for D3D12
+    desc.keepInitialState = true;
+    if (isVertexBuffer)
+        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    else if (isIndexBuffer)
+        desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    else if (isConstantBuffer)
+        desc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+    else
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+    nvrhi::BufferHandle buffer = device->createBuffer(desc);
+
+    if (buffer && pData)
+    {
+        // Upload initial data using a dedicated command list
+        // (The per-frame command list may not be ready during initialization)
+        nvrhi::CommandListParameters cmdParams;
+        cmdParams.enableImmediateExecution = false;  // D3D12 uses deferred execution
+        nvrhi::CommandListHandle uploadCmdList = device->createCommandList(cmdParams);
+        if (uploadCmdList)
+        {
+            uploadCmdList->open();
+            uploadCmdList->writeBuffer(buffer, pData, dataSize);
+            uploadCmdList->close();
+            device->executeCommandList(uploadCmdList);
+            // Note: No need to wait - NVRHI handles synchronization
+        }
+    }
+
+    return buffer;
 }
 
-static inline HRESULT CreateVertexBuffer(VertexBufferHandle* ppBuffer, const void* pData, u32 dataSize, bool bDynamic)
+static VertexBufferHandle CreateVertexBuffer(const void* pData, u32 dataSize, bool bDynamic)
 {
-    return CreateBuffer(ppBuffer, pData, dataSize, bDynamic, D3D_BIND_VERTEX_BUFFER);
+    nvrhi::IDevice* device = GEnv.Backend->GetDevice();
+    if (!device)
+        return nullptr;
+
+    return CreateNvrhiBuffer(device, pData, dataSize, bDynamic, true, false, false);
 }
 
-static inline HRESULT CreateIndexBuffer(IndexBufferHandle* ppBuffer, const void* pData, u32 dataSize, bool bDynamic)
+static IndexBufferHandle CreateIndexBuffer(const void* pData, u32 dataSize, bool bDynamic)
 {
-    return CreateBuffer(ppBuffer, pData, dataSize, bDynamic, D3D_BIND_INDEX_BUFFER);
+    nvrhi::IDevice* device = GEnv.Backend->GetDevice();
+    if (!device)
+        return nullptr;
+
+    return CreateNvrhiBuffer(device, pData, dataSize, bDynamic, false, true, false);
 }
 
-static inline HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 dataSize)
+static ConstantBufferHandle CreateConstantBufferInternal(u32 dataSize)
 {
-    return CreateBuffer(ppBuffer, nullptr, dataSize, true, D3D_BIND_CONSTANT_BUFFER);
+    nvrhi::IDevice* device = GEnv.Backend->GetDevice();
+    if (!device)
+        return nullptr;
+
+    return CreateNvrhiBuffer(device, nullptr, dataSize, true, false, false, true);
 }
 
 namespace BufferUtils
 {
-// TODO: replace by streaming buffer instance in `dx11ConstantBuffer`
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize)
+ConstantBufferHandle CreateConstantBuffer(u32 DataSize)
 {
-    return RENDER_NAMESPACE::CreateConstantBuffer(ppBuffer, DataSize);
+    return RENDER_NAMESPACE::CreateConstantBufferInternal(DataSize);
 }
 };
 
@@ -74,23 +119,13 @@ struct VertexFormatPairs
 VertexFormatPairs VertexFormatList[] = {{D3DDECLTYPE_FLOAT1, DXGI_FORMAT_R32_FLOAT},
     {D3DDECLTYPE_FLOAT2, DXGI_FORMAT_R32G32_FLOAT}, {D3DDECLTYPE_FLOAT3, DXGI_FORMAT_R32G32B32_FLOAT},
     {D3DDECLTYPE_FLOAT4, DXGI_FORMAT_R32G32B32A32_FLOAT},
-    {D3DDECLTYPE_D3DCOLOR,
-        DXGI_FORMAT_R8G8B8A8_UNORM}, // Warning. Explicit RGB component swizzling is nesessary	//	Not available
-    {D3DDECLTYPE_UBYTE4, DXGI_FORMAT_R8G8B8A8_UINT}, // Note: Shader gets UINT values, but if Direct3D 9 style integral
-    // floats are needed (0.0f, 1.0f... 255.f), UINT can just be converted
-    // to float32 in shader.
-    {D3DDECLTYPE_SHORT2,
-        DXGI_FORMAT_R16G16_SINT}, // Note: Shader gets SINT values, but if Direct3D 9 style integral floats
-    // are needed, SINT can just be converted to float32 in shader.
-    {D3DDECLTYPE_SHORT4,
-        DXGI_FORMAT_R16G16B16A16_SINT}, // Note: Shader gets SINT values, but if Direct3D 9 style integral
-    // floats are needed, SINT can just be converted to float32 in
-    // shader.
+    {D3DDECLTYPE_D3DCOLOR, DXGI_FORMAT_R8G8B8A8_UNORM},
+    {D3DDECLTYPE_UBYTE4, DXGI_FORMAT_R8G8B8A8_UINT},
+    {D3DDECLTYPE_SHORT2, DXGI_FORMAT_R16G16_SINT},
+    {D3DDECLTYPE_SHORT4, DXGI_FORMAT_R16G16B16A16_SINT},
     {D3DDECLTYPE_UBYTE4N, DXGI_FORMAT_R8G8B8A8_UNORM},
     {D3DDECLTYPE_SHORT2N, DXGI_FORMAT_R16G16_SNORM}, {D3DDECLTYPE_SHORT4N, DXGI_FORMAT_R16G16B16A16_SNORM},
     {D3DDECLTYPE_USHORT2N, DXGI_FORMAT_R16G16_UNORM}, {D3DDECLTYPE_USHORT4N, DXGI_FORMAT_R16G16B16A16_UNORM},
-    // D3DDECLTYPE_UDEC3 Not available
-    // D3DDECLTYPE_DEC3N Not available
     {D3DDECLTYPE_FLOAT16_2, DXGI_FORMAT_R16G16_FLOAT}, {D3DDECLTYPE_FLOAT16_4, DXGI_FORMAT_R16G16B16A16_FLOAT}};
 
 DXGI_FORMAT ConvertVertexFormat(D3DDECLTYPE dx9FMT)
@@ -113,20 +148,16 @@ struct VertexSemanticPairs
 };
 
 VertexSemanticPairs VertexSemanticList[] = {
-    {D3DDECLUSAGE_POSITION, "POSITION"}, //	0
-    {D3DDECLUSAGE_BLENDWEIGHT, "BLENDWEIGHT"}, // 1
-    {D3DDECLUSAGE_BLENDINDICES, "BLENDINDICES"}, // 2
-    {D3DDECLUSAGE_NORMAL, "NORMAL"}, // 3
-    {D3DDECLUSAGE_PSIZE, "PSIZE"}, // 4
-    {D3DDECLUSAGE_TEXCOORD, "TEXCOORD"}, // 5
-    {D3DDECLUSAGE_TANGENT, "TANGENT"}, // 6
-    {D3DDECLUSAGE_BINORMAL, "BINORMAL"}, // 7
-    // D3DDECLUSAGE_TESSFACTOR,    // 8
-    {D3DDECLUSAGE_POSITIONT, "POSITIONT"}, // 9
-    {D3DDECLUSAGE_COLOR, "COLOR"}, // 10
-    // D3DDECLUSAGE_FOG,           // 11
-    // D3DDECLUSAGE_DEPTH,         // 12
-    // D3DDECLUSAGE_SAMPLE,        // 13
+    {D3DDECLUSAGE_POSITION, "POSITION"},
+    {D3DDECLUSAGE_BLENDWEIGHT, "BLENDWEIGHT"},
+    {D3DDECLUSAGE_BLENDINDICES, "BLENDINDICES"},
+    {D3DDECLUSAGE_NORMAL, "NORMAL"},
+    {D3DDECLUSAGE_PSIZE, "PSIZE"},
+    {D3DDECLUSAGE_TEXCOORD, "TEXCOORD"},
+    {D3DDECLUSAGE_TANGENT, "TANGENT"},
+    {D3DDECLUSAGE_BINORMAL, "BINORMAL"},
+    {D3DDECLUSAGE_POSITIONT, "POSITIONT"},
+    {D3DDECLUSAGE_COLOR, "COLOR"},
 };
 
 LPCSTR ConvertSemantic(D3DDECLUSAGE Semantic)
@@ -166,6 +197,8 @@ void ConvertVertexDeclaration(const xr_vector<D3DVERTEXELEMENT9>& declIn, xr_vec
 }
 
 //-----------------------------------------------------------------------------
+// VertexStagingBuffer - uses host memory + NVRHI buffer upload
+//-----------------------------------------------------------------------------
 VertexStagingBuffer::~VertexStagingBuffer()
 {
     Destroy();
@@ -182,13 +215,10 @@ void VertexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/)
 
 bool VertexStagingBuffer::IsValid() const
 {
-    return !!m_DeviceBuffer;
+    return m_DeviceBuffer != nullptr;
 }
 
-void* VertexStagingBuffer::Map(
-    size_t offset /*= 0*/,
-    size_t size /*= 0*/,
-    bool read /*= false*/)
+void* VertexStagingBuffer::Map(size_t offset /*= 0*/, size_t size /*= 0*/, bool read /*= false*/)
 {
     VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
@@ -200,22 +230,21 @@ void* VertexStagingBuffer::Map(
 void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
 {
     if (!doFlush)
-    {
-        /* Do nothing*/
         return;
-    }
 
     VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
-    // Upload data to device
-    R_CHK(CreateVertexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false));
-    VERIFY(m_DeviceBuffer);
-    HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
+    // Upload data to device using NVRHI
+    m_DeviceBuffer = CreateVertexBuffer(m_HostBuffer, m_Size, false);
+    if (!m_DeviceBuffer)
+    {
+        VERIFY(!"Failed to create vertex buffer");
+        return;
+    }
 
     if (!m_AllowReadBack)
     {
-        // Cache buffer isn't required anymore. Free host memory
         DiscardHostBuffer();
     }
 }
@@ -229,9 +258,7 @@ void VertexStagingBuffer::Destroy()
 {
     DiscardHostBuffer();
     m_Size = 0;
-
-    HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
-    _RELEASE(m_DeviceBuffer);
+    m_DeviceBuffer = nullptr;  // NVRHI handles release via RefCountPtr
 }
 
 void VertexStagingBuffer::DiscardHostBuffer()
@@ -249,14 +276,13 @@ size_t VertexStagingBuffer::GetVideoMemoryUsage() const
 {
     if (m_DeviceBuffer)
     {
-        D3D_BUFFER_DESC desc;
-        m_DeviceBuffer->GetDesc(&desc);
-        return desc.ByteWidth;
+        return m_DeviceBuffer->getDesc().byteSize;
     }
-
     return 0;
 }
 
+//-----------------------------------------------------------------------------
+// IndexStagingBuffer - uses host memory + NVRHI buffer upload
 //-----------------------------------------------------------------------------
 IndexStagingBuffer::~IndexStagingBuffer()
 {
@@ -274,13 +300,10 @@ void IndexStagingBuffer::Create(size_t size, bool allowReadBack /*= false*/, boo
 
 bool IndexStagingBuffer::IsValid() const
 {
-    return !!m_DeviceBuffer;
+    return m_DeviceBuffer != nullptr;
 }
 
-void* IndexStagingBuffer::Map(
-    size_t offset /*= 0*/,
-    size_t size /*= 0*/,
-    bool read /*= false*/)
+void* IndexStagingBuffer::Map(size_t offset /*= 0*/, size_t size /*= 0*/, bool read /*= false*/)
 {
     VERIFY2(m_HostBuffer, "Buffer wasn't created or already discarded");
     VERIFY2(!read || m_AllowReadBack, "Can't read from write only buffer");
@@ -292,22 +315,21 @@ void* IndexStagingBuffer::Map(
 void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
 {
     if (!doFlush)
-    {
-        /* Do nothing*/
         return;
-    }
 
     VERIFY2(!m_DeviceBuffer, "Attempting to upload buffer twice");
     VERIFY(m_HostBuffer && m_Size);
 
-    // Upload data to device
-    R_CHK(CreateIndexBuffer(&m_DeviceBuffer, m_HostBuffer, m_Size, false));
-    VERIFY(m_DeviceBuffer);
-    HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
+    // Upload data to device using NVRHI
+    m_DeviceBuffer = CreateIndexBuffer(m_HostBuffer, m_Size, false);
+    if (!m_DeviceBuffer)
+    {
+        VERIFY(!"Failed to create index buffer");
+        return;
+    }
 
     if (!m_AllowReadBack)
     {
-        // Cache buffer isn't required anymore. Free host memory
         DiscardHostBuffer();
     }
 }
@@ -321,9 +343,7 @@ void IndexStagingBuffer::Destroy()
 {
     DiscardHostBuffer();
     m_Size = 0;
-
-    HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
-    _RELEASE(m_DeviceBuffer);
+    m_DeviceBuffer = nullptr;  // NVRHI handles release via RefCountPtr
 }
 
 void IndexStagingBuffer::DiscardHostBuffer()
@@ -341,14 +361,13 @@ size_t IndexStagingBuffer::GetVideoMemoryUsage() const
 {
     if (m_DeviceBuffer)
     {
-        D3D_BUFFER_DESC desc;
-        m_DeviceBuffer->GetDesc(&desc);
-        return desc.ByteWidth;
+        return m_DeviceBuffer->getDesc().byteSize;
     }
-
     return 0;
 }
 
+//-----------------------------------------------------------------------------
+// VertexStreamBuffer - dynamic vertex buffer with NVRHI
 //-----------------------------------------------------------------------------
 VertexStreamBuffer::~VertexStreamBuffer()
 {
@@ -357,47 +376,69 @@ VertexStreamBuffer::~VertexStreamBuffer()
 
 void VertexStreamBuffer::Create(size_t size)
 {
-    R_CHK(CreateVertexBuffer(&m_DeviceBuffer, nullptr, size, true));
-    VERIFY(m_DeviceBuffer);
+    m_DeviceBuffer = CreateVertexBuffer(nullptr, size, true);
+    if (!m_DeviceBuffer)
+    {
+        VERIFY(!"Failed to create vertex stream buffer");
+        return;
+    }
     AddRef();
-    HW.stats_manager.increment_stats_vb(m_DeviceBuffer);
 }
 
 void VertexStreamBuffer::Destroy()
 {
-    if (m_DeviceBuffer == nullptr)
+    m_DeviceBuffer = nullptr;  // NVRHI handles release via RefCountPtr
+}
+
+void* VertexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
+{
+    // For NVRHI, we use a staging approach - allocate temp memory
+    // and use writeBuffer on unmap. This is a simplified implementation.
+    // A proper implementation would use a ring buffer or upload heap.
+
+    if (!m_DeviceBuffer)
+        return nullptr;
+
+    // For dynamic buffers in NVRHI/D3D12, we need to use a different approach
+    // since Map/Unmap is not directly supported like D3D11
+    // We'll use a host-side buffer and write on unmap
+
+    // Store the mapping info for later
+    m_MappedOffset = offset;
+    m_MappedSize = size;
+    m_MappedFlush = flush;
+
+    // Allocate temp buffer if needed
+    if (!m_MappedData)
+    {
+        size_t bufSize = m_DeviceBuffer->getDesc().byteSize;
+        m_MappedData = xr_alloc<u8>(bufSize);
+    }
+
+    return static_cast<u8*>(m_MappedData) + offset;
+}
+
+void VertexStreamBuffer::Unmap()
+{
+    if (!m_DeviceBuffer || !m_MappedData)
         return;
 
-    HW.stats_manager.decrement_stats_vb(m_DeviceBuffer);
-    _RELEASE(m_DeviceBuffer);
-}
-
-void* VertexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= false*/) // TODO: this should be moved into backend
-{
-    VERIFY(m_DeviceBuffer);
-
-    const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
-
-    D3D11_MAPPED_SUBRESOURCE MappedSubRes;
-    HW.get_context(CHW::IMM_CTX_ID)->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes); // TODO: proper context id + check for flush & imm
-
-    u8* pData = static_cast<u8*>(MappedSubRes.pData);
-    pData += offset;
-
-    return static_cast<void*>(pData);
-}
-
-void VertexStreamBuffer::Unmap() // TODO: this should be moved into backend
-{
-    VERIFY(m_DeviceBuffer);
-    HW.get_context(CHW::IMM_CTX_ID)->Unmap(m_DeviceBuffer, 0); // TODO: proper context id
+    // Write the data to the GPU buffer
+    nvrhi::ICommandList* cmdList = GEnv.Backend->GetCommandList();
+    if (cmdList)
+    {
+        size_t bufSize = m_DeviceBuffer->getDesc().byteSize;
+        cmdList->writeBuffer(m_DeviceBuffer, m_MappedData, bufSize);
+    }
 }
 
 bool VertexStreamBuffer::IsValid() const
 {
-    return !!m_DeviceBuffer;
+    return m_DeviceBuffer != nullptr;
 }
 
+//-----------------------------------------------------------------------------
+// IndexStreamBuffer - dynamic index buffer with NVRHI
 //-----------------------------------------------------------------------------
 IndexStreamBuffer::~IndexStreamBuffer()
 {
@@ -406,44 +447,54 @@ IndexStreamBuffer::~IndexStreamBuffer()
 
 void IndexStreamBuffer::Create(size_t size)
 {
-    R_CHK(CreateIndexBuffer(&m_DeviceBuffer, nullptr, size, true));
-    VERIFY(m_DeviceBuffer);
+    m_DeviceBuffer = CreateIndexBuffer(nullptr, size, true);
+    if (!m_DeviceBuffer)
+    {
+        VERIFY(!"Failed to create index stream buffer");
+        return;
+    }
     AddRef();
-    HW.stats_manager.increment_stats_ib(m_DeviceBuffer);
 }
 
 void IndexStreamBuffer::Destroy()
 {
-    if (m_DeviceBuffer == nullptr)
-        return;
-
-    HW.stats_manager.decrement_stats_ib(m_DeviceBuffer);
-    _RELEASE(m_DeviceBuffer);
+    m_DeviceBuffer = nullptr;  // NVRHI handles release via RefCountPtr
 }
 
-void* IndexStreamBuffer::Map(size_t offset, size_t /*size*/, bool flush /*= false*/)
+void* IndexStreamBuffer::Map(size_t offset, size_t size, bool flush /*= false*/)
 {
-    VERIFY(m_DeviceBuffer);
+    if (!m_DeviceBuffer)
+        return nullptr;
 
-    const auto flag = flush ? D3D_MAP_WRITE_DISCARD : D3D_MAP_WRITE_NO_OVERWRITE;
+    m_MappedOffset = offset;
+    m_MappedSize = size;
+    m_MappedFlush = flush;
 
-    D3D11_MAPPED_SUBRESOURCE MappedSubRes;
-    HW.get_context(CHW::IMM_CTX_ID)->Map(m_DeviceBuffer, 0, flag, 0, &MappedSubRes); // TODO: see above comms for vertex
+    if (!m_MappedData)
+    {
+        size_t bufSize = m_DeviceBuffer->getDesc().byteSize;
+        m_MappedData = xr_alloc<u8>(bufSize);
+    }
 
-    u8* pData = static_cast<u8*>(MappedSubRes.pData);
-    pData += offset;
-
-    return static_cast<void*>(pData);
+    return static_cast<u8*>(m_MappedData) + offset;
 }
 
 void IndexStreamBuffer::Unmap()
 {
-    VERIFY(m_DeviceBuffer);
-    HW.get_context(CHW::IMM_CTX_ID)->Unmap(m_DeviceBuffer, 0); // TODO: see above comms for vertex
+    if (!m_DeviceBuffer || !m_MappedData)
+        return;
+
+    nvrhi::ICommandList* cmdList = GEnv.Backend->GetCommandList();
+    if (cmdList)
+    {
+        size_t bufSize = m_DeviceBuffer->getDesc().byteSize;
+        cmdList->writeBuffer(m_DeviceBuffer, m_MappedData, bufSize);
+    }
 }
 
 bool IndexStreamBuffer::IsValid() const
 {
-    return !!m_DeviceBuffer;
+    return m_DeviceBuffer != nullptr;
 }
+
 } // namespace xray::render::RENDER_NAMESPACE

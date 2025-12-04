@@ -316,6 +316,16 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 {
     if (!GEnv.isDedicatedServer)
     {
+        // For D3D12/FrameGraph: Skip legacy shader creation entirely
+        // FrameGraph manages its own shaders/pipelines via NVRHI
+        // Any code that crashes on null here needs to be updated to use FrameGraph
+        if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+        {
+            // Log what's trying to create legacy shaders so we know what needs updating
+            Msg("! [D3D12] Skipping legacy shader creation: %s", s_shader);
+            return nullptr;
+        }
+
 #if defined(USE_DX9)
         const bool useCppBlender = RImplementation.o.ffp && _GetBlender(s_shader);
         if (!useCppBlender && _lua_HasShader(s_shader))

@@ -186,9 +186,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // m_framegraph->Compile();     // REMOVED - Compile per-frame now
 
     // ═══════════════════════════════════════════════════════
-    //  INITIALIZE SKY GEOMETRY
+    //  INITIALIZE PASS RESOURCES
     // ═══════════════════════════════════════════════════════
     passes::InitializeSkyGeometry(device);
+    passes::InitializeSunPass(device);
+    passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
     Msg("* [FrameGraphRenderer] initialized");
 
@@ -220,8 +222,10 @@ void FrameGraphRenderer::Shutdown() {
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
-    // Cleanup sky geometry
+    // Cleanup pass resources
     passes::ShutdownSkyGeometry();
+    passes::ShutdownSunPass();
+    passes::ShutdownTonemapPass();
 
     m_device = nullptr;
 }
@@ -354,6 +358,26 @@ void FrameGraphRenderer::RenderMenu() {
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
 
+    // ═══════════════════════════════════════════════════════
+    //  IMPORT BACKBUFFER (Frostbite Pattern)
+    // ═══════════════════════════════════════════════════════
+    nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
+    framegraph::VirtualResourceHandle backbufferHandle;
+
+    if (backbufferTexture) {
+        framegraph::ResourceDesc backbufferDesc;
+        backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        backbufferDesc.width = width;
+        backbufferDesc.height = height;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.isImported = true;
+        backbufferDesc.isTransient = false;
+        backbufferDesc.debugName = "Backbuffer";
+
+        backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+    }
+
     // 1. Create black background target
     framegraph::ResourceDesc bgDesc;
     bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
@@ -389,10 +413,12 @@ void FrameGraphRenderer::RenderMenu() {
 
     // 5. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
     // Note: No exposure pass for menu rendering, pass invalid handle for fixed exposure
+    // Renders directly to backbuffer (Frostbite pattern)
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         sceneWithUI,  // HDR input (RGBA16_FLOAT)
         framegraph::VirtualResourceHandle(),  // No exposure for menu
+        backbufferHandle,  // Output directly to imported backbuffer
         width,
         height
     );
@@ -518,6 +544,30 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
+
+    // ═══════════════════════════════════════════════════════
+    //  IMPORT BACKBUFFER (Frostbite Pattern)
+    // ═══════════════════════════════════════════════════════
+    // Import swapchain backbuffer as external resource.
+    // Final pass (TonemapPass/ImGuiPass) renders directly to it.
+    // This eliminates the need for a separate copy-to-backbuffer pass.
+
+    nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
+    framegraph::VirtualResourceHandle backbufferHandle;
+
+    if (backbufferTexture) {
+        framegraph::ResourceDesc backbufferDesc;
+        backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        backbufferDesc.width = width;
+        backbufferDesc.height = height;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;  // Swapchain format
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.isImported = true;
+        backbufferDesc.isTransient = false;  // External resource - don't manage lifetime
+        backbufferDesc.debugName = "Backbuffer";
+
+        backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+    }
 
     // ═══════════════════════════════════════════════════════
     //  PHASE 2: DEPTH PREPASS (Early-Z Optimization)
@@ -809,25 +859,27 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     // 6. Tonemap Pass - Convert HDR to LDR using ACES filmic tonemap
     // Now uses exposure from ExposurePass for auto-exposure
+    // Renders directly to backbuffer if available (Frostbite pattern)
     auto ldrOutput = passes::setupTonemapPass(
         *m_framegraph,
         sceneWithUI,  // HDR input (RGBA16_FLOAT)
         exposureOutput.exposureTexture,  // Auto-exposure from histogram
+        backbufferHandle,  // Output directly to imported backbuffer
         width,
         height
     );
 
-    // 7. ImGui Pass - Renders debug UI on top of LDR output
+    // 7. ImGui Pass - Renders debug UI on top of LDR output (backbuffer)
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
-        ldrOutput,  // LDR input (RGBA8_UNORM)
+        ldrOutput,  // LDR input (backbuffer if available, else rt_Final)
         imguiRenderer,
         width,
         height
     );
 
-    // Store final output for presentation
+    // Store final output for presentation (now points to backbuffer)
     m_finalOutput = finalOutput;
 
     // OLD SYSTEM - DISABLED
@@ -852,28 +904,19 @@ void FrameGraphRenderer::PrintStats() const {
 }
 
 void FrameGraphRenderer::PresentToBackbuffer() {
-    VERIFY(m_device != nullptr);
-    VERIFY(m_framegraph != nullptr);
-
-    // Get the physical texture from FrameGraph
-    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-    if (!finalTexture) {
-        Msg("! [FrameGraphRenderer] Failed to get final output texture for present");
-        return;
-    }
-
-    // Get backbuffer directly from NVRHI backend
-    nvrhi::ITexture* backbuffer = GEnv.Backend->GetBackBuffer();
-    if (!backbuffer) {
-        Msg("! [FrameGraphRenderer] Failed to get backbuffer from backend");
-        return;
-    }
-
-    // Copy final output to backbuffer using NVRHI command list
-    ng::RenderContext* ctx = m_renderContext.get();
-    VERIFY(ctx != nullptr);
-
-    ctx->CopyTexture(backbuffer, finalTexture);
+    // ═══════════════════════════════════════════════════════
+    //  FROSTBITE PATTERN: No copy needed!
+    // ═══════════════════════════════════════════════════════
+    // The final pass (TonemapPass + ImGuiPass) now renders directly
+    // to the imported backbuffer. No separate copy operation required.
+    //
+    // The swapchain Present() is called by the engine after this
+    // in CRenderDevice::End() which calls Backend->Present().
+    //
+    // This function is kept as a stub for:
+    // - Potential debug overlays
+    // - Future HDR output path handling
+    // - Resolution scaling blit (if backbuffer size != render size)
 }
 
 // ═══════════════════════════════════════════════════════
@@ -952,69 +995,15 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         return false;
 
     // ═══════════════════════════════════════════════════════
-    //  WRAP D3D11 BUFFERS AS NVRHI HANDLES
+    //  GET NVRHI BUFFER HANDLES
     // ═══════════════════════════════════════════════════════
 
-    // Wrap buffers with caching - geom->vb and geom->ib are SHARED buffers used by many meshes!
-    // Check cache first to avoid creating duplicate NVRHI handles
-    ID3D11Buffer* d3dVB = geom->vb;
-    ID3D11Buffer* d3dIB = geom->ib;
+    // geom->vb and geom->ib are already nvrhi::BufferHandle (created via NVRHI)
+    nvrhi::BufferHandle nvrhiVB = geom->vb;
+    nvrhi::BufferHandle nvrhiIB = geom->ib;
 
-    //Msg("! [ProcessVisualGeometry] Visual '%s': D3D VB=%p, IB=%p, vBase=%d, iBase=%d, vCount=%d, iCount=%d",
-    //    visual->dbg_name.c_str(), d3dVB, d3dIB,
-    //    meshVisual->vBase, meshVisual->iBase, meshVisual->vCount, meshVisual->iCount);
-
-    // Get or create vertex buffer handle
-    nvrhi::BufferHandle nvrhiVB;
-    auto vbIt = m_bufferHandleCache.find(d3dVB);
-    if (vbIt != m_bufferHandleCache.end()) {
-        nvrhiVB = vbIt->second;
-    } else {
-        // First time seeing this buffer - wrap it
-        D3D11_BUFFER_DESC d3dVBDesc;
-        d3dVB->GetDesc(&d3dVBDesc);
-
-        nvrhi::BufferDesc vbDesc;
-        vbDesc.debugName = "Shared_VB";
-        vbDesc.byteSize = d3dVBDesc.ByteWidth;
-        vbDesc.isVertexBuffer = true;
-        vbDesc.keepInitialState = true;
-        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-
-        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
-
-        if (!nvrhiVB)
-            return false;
-
-        m_bufferHandleCache[d3dVB] = nvrhiVB;
-    }
-
-    // Get or create index buffer handle
-    nvrhi::BufferHandle nvrhiIB;
-    auto ibIt = m_bufferHandleCache.find(d3dIB);
-    if (ibIt != m_bufferHandleCache.end()) {
-        nvrhiIB = ibIt->second;
-    } else {
-        // First time seeing this buffer - wrap it
-        D3D11_BUFFER_DESC d3dIBDesc;
-        d3dIB->GetDesc(&d3dIBDesc);
-
-        nvrhi::BufferDesc ibDesc;
-        ibDesc.debugName = "Shared_IB";
-        ibDesc.byteSize = d3dIBDesc.ByteWidth;
-        ibDesc.isIndexBuffer = true;
-        ibDesc.keepInitialState = true;
-        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-
-        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
-
-        if (!nvrhiIB)
-            return false;
-
-        m_bufferHandleCache[d3dIB] = nvrhiIB;
-    }
+    if (!nvrhiVB || !nvrhiIB)
+        return false;
 
     // ═══════════════════════════════════════════════════════
     //  CREATE GEOMETRY BATCH
@@ -1078,8 +1067,8 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     // DEBUG: Verify buffers are valid before submit
     if (!nvrhiVB || !nvrhiIB) {
-        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p, D3DVB=%p, D3DIB=%p",
-            nvrhiVB.Get(), nvrhiIB.Get(), d3dVB, d3dIB);
+        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p",
+            nvrhiVB.Get(), nvrhiIB.Get());
         return false;
     }
 
@@ -1166,59 +1155,12 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     if (!geom->vb || !geom->ib)
         return false;
 
-    // Wrap D3D11 buffers (same caching logic as world geometry)
-    ID3D11Buffer* d3dVB = geom->vb;
-    ID3D11Buffer* d3dIB = geom->ib;
+    // geom->vb and geom->ib are already nvrhi::BufferHandle (created via NVRHI)
+    nvrhi::BufferHandle nvrhiVB = geom->vb;
+    nvrhi::BufferHandle nvrhiIB = geom->ib;
 
-    // Get or create vertex buffer handle
-    nvrhi::BufferHandle nvrhiVB;
-    auto vbIt = m_bufferHandleCache.find(d3dVB);
-    if (vbIt != m_bufferHandleCache.end()) {
-        nvrhiVB = vbIt->second;
-    } else {
-        D3D11_BUFFER_DESC d3dVBDesc;
-        d3dVB->GetDesc(&d3dVBDesc);
-
-        nvrhi::BufferDesc vbDesc;
-        vbDesc.debugName = "HUD_VB";
-        vbDesc.byteSize = d3dVBDesc.ByteWidth;
-        vbDesc.isVertexBuffer = true;
-        vbDesc.keepInitialState = true;
-        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-
-        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
-
-        if (!nvrhiVB)
-            return false;
-
-        m_bufferHandleCache[d3dVB] = nvrhiVB;
-    }
-
-    // Get or create index buffer handle
-    nvrhi::BufferHandle nvrhiIB;
-    auto ibIt = m_bufferHandleCache.find(d3dIB);
-    if (ibIt != m_bufferHandleCache.end()) {
-        nvrhiIB = ibIt->second;
-    } else {
-        D3D11_BUFFER_DESC d3dIBDesc;
-        d3dIB->GetDesc(&d3dIBDesc);
-
-        nvrhi::BufferDesc ibDesc;
-        ibDesc.debugName = "HUD_IB";
-        ibDesc.byteSize = d3dIBDesc.ByteWidth;
-        ibDesc.isIndexBuffer = true;
-        ibDesc.keepInitialState = true;
-        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-
-        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
-
-        if (!nvrhiIB)
-            return false;
-
-        m_bufferHandleCache[d3dIB] = nvrhiIB;
-    }
+    if (!nvrhiVB || !nvrhiIB)
+        return false;
 
     // Create HUD batch
     GeometryBatch batch;

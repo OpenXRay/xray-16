@@ -287,7 +287,7 @@ TextureHandle TextureManager::CreateTexture(
     nvrhiDesc.format = desc.format;
     nvrhiDesc.debugName = desc.debugName.c_str();
     nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
-    nvrhiDesc.keepInitialState = false;
+    nvrhiDesc.keepInitialState = true;  // D3D12 requires state tracking
 
     // Set dimension
     switch (desc.type) {

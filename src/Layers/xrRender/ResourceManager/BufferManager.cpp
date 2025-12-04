@@ -20,14 +20,17 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
     , m_cpuAddress(nullptr)
 {
     VERIFY(m_device);
-    // Create buffer
+    // Create upload buffer for D3D12 - NOT volatile, just CPU-writable
+    // This allows persistent mapping which is needed for ring buffer pattern
     nvrhi::BufferDesc desc;
     desc.byteSize = size;
     desc.structStride = 0;
     desc.debugName = debugName;
-    desc.isConstantBuffer = true;
-    desc.isVolatile = true;  // Hint for driver
+    desc.isConstantBuffer = false;  // Generic upload buffer
     desc.cpuAccess = nvrhi::CpuAccessMode::Write;
+    desc.isVolatile = false;  // Allows persistent mapping
+    desc.keepInitialState = true;
+    desc.initialState = nvrhi::ResourceStates::CopySource;  // Upload heap state
 
     m_buffer = m_device->GetNativeDevice()->createBuffer(desc);
 
@@ -36,8 +39,14 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
         return;
     }
 
-    // Persistent map
+    // Persistent map - this works for non-volatile upload buffers in D3D12
     m_cpuAddress = m_device->GetNativeDevice()->mapBuffer(m_buffer, nvrhi::CpuAccessMode::Write);
+
+    if (!m_cpuAddress) {
+        Msg("! [RingBuffer] ❌ Failed to map buffer: %s", debugName);
+        m_buffer = nullptr;
+        return;
+    }
 
     // Msg("! [RingBuffer] Created: %s (%llu MB)",
     //     debugName, size / (1024 * 1024));

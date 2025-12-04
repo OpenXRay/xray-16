@@ -41,4 +41,10 @@ framegraph::VirtualResourceHandle setupSunPass(
     u32 height
 );
 
+// Initialize sun pass resources (call once at startup)
+void InitializeSunPass(ng::RenderDevice* device);
+
+// Shutdown sun pass resources
+void ShutdownSunPass();
+
 } // namespace xray::render::RENDER_NAMESPACE::passes

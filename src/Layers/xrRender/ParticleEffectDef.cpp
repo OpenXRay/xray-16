@@ -46,10 +46,15 @@ CPEDef::~CPEDef()
 }
 void CPEDef::CreateShader()
 {
+    // NOTE: For FrameGraph rendering, particle shaders are created by ParticlePassSetup
+    // The legacy shader creation path uses the blender system which requires D3D11
+    // Skip legacy shader creation - FrameGraph handles particle rendering directly
+#if 0  // Disabled for D3D12/FrameGraph - legacy blender system not available
     if (m_ShaderName.c_str() && m_TextureName.c_str())
     {
         m_CachedShader.create(m_ShaderName.c_str(), m_TextureName.c_str());
     }
+#endif
 }
 void CPEDef::DestroyShader() { m_CachedShader.destroy(); }
 void CPEDef::SetName(LPCSTR name) { m_Name = name; }

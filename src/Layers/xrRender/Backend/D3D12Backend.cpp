@@ -13,6 +13,35 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
+// ═══════════════════════════════════════════════════════
+//  NVRHI MESSAGE CALLBACK
+// ═══════════════════════════════════════════════════════
+// Captures NVRHI errors/warnings and logs them via engine's Msg system
+
+class NVRHIMessageCallback : public nvrhi::IMessageCallback {
+public:
+    void message(nvrhi::MessageSeverity severity, const char* messageText) override {
+        switch (severity) {
+        case nvrhi::MessageSeverity::Info:
+            Msg("* [NVRHI] %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Warning:
+            Msg("! [NVRHI] WARNING: %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Error:
+            Msg("! [NVRHI] ERROR: %s", messageText);
+            break;
+        case nvrhi::MessageSeverity::Fatal:
+            Msg("! [NVRHI] FATAL: %s", messageText);
+            R_ASSERT2(false, messageText);  // Trigger debugger break
+            break;
+        }
+    }
+};
+
+// Static instance (must outlive the NVRHI device)
+static NVRHIMessageCallback s_nvrhiMessageCallback;
+
 D3D12Backend::D3D12Backend() = default;
 
 D3D12Backend::~D3D12Backend() {
@@ -61,11 +90,6 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         return false;
     }
 
-    if (!CreateFence()) {
-        Shutdown();
-        return false;
-    }
-
     if (!CreateSwapChain(hwnd, width, height)) {
         Shutdown();
         return false;
@@ -75,8 +99,8 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
     nvrhi::d3d12::DeviceDesc deviceDesc;
     deviceDesc.pDevice = m_d3d12Device;
     deviceDesc.pGraphicsCommandQueue = m_commandQueue;
-    deviceDesc.errorCB = nullptr;
-    deviceDesc.enableHeapDirectlyIndexed = true;  // Enable bindless
+    deviceDesc.errorCB = &s_nvrhiMessageCallback;  // Error/warning logging
+    deviceDesc.enableHeapDirectlyIndexed = true;   // Enable bindless
 
     m_nvrhiDevice = nvrhi::d3d12::createDevice(deviceDesc);
     if (!m_nvrhiDevice) {
@@ -129,14 +153,6 @@ void D3D12Backend::Shutdown() {
     m_nvrhiDevice = nullptr;
 
     // Release D3D12 resources
-    if (m_fenceEvent) {
-        CloseHandle(m_fenceEvent);
-        m_fenceEvent = nullptr;
-    }
-    if (m_fence) {
-        m_fence->Release();
-        m_fence = nullptr;
-    }
     if (m_swapChain) {
         m_swapChain->Release();
         m_swapChain = nullptr;
@@ -237,23 +253,6 @@ bool D3D12Backend::CreateCommandQueue() {
     return true;
 }
 
-bool D3D12Backend::CreateFence() {
-    HRESULT hr = m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
-    if (FAILED(hr)) {
-        Msg("! [D3D12Backend] Failed to create fence");
-        return false;
-    }
-
-    m_fenceEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    if (!m_fenceEvent) {
-        Msg("! [D3D12Backend] Failed to create fence event");
-        return false;
-    }
-
-    m_currentFenceValue = 1;
-    return true;
-}
-
 bool D3D12Backend::CreateSwapChain(HWND hwnd, u32 width, u32 height) {
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
     swapChainDesc.Width = width;
@@ -307,6 +306,8 @@ void D3D12Backend::CreateBackBufferTextures() {
         desc.format = nvrhi::Format::RGBA8_UNORM;
         desc.isRenderTarget = true;
         desc.debugName = "BackBuffer";
+        desc.keepInitialState = true;
+        desc.initialState = nvrhi::ResourceStates::Present;  // Swapchain starts in Present state
 
         m_backBuffers[i] = m_nvrhiDevice->createHandleForNativeTexture(
             nvrhi::ObjectTypes::D3D12_Resource,
@@ -470,36 +471,27 @@ void D3D12Backend::ResizeSwapChain(u32 width, u32 height) {
 void D3D12Backend::BeginFrame() {
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-    // Wait for previous frame on this buffer to complete
-    WaitForFence(m_fenceValues[m_currentBackBufferIndex]);
+    // Run garbage collection to release completed command list resources
+    // This frees binding sets, buffers, and other resources from finished frames
+    // NVRHI tracks its own fences internally via executeCommandList()
+    m_nvrhiDevice->runGarbageCollection();
 
     m_commandList->open();
 }
 
 void D3D12Backend::EndFrame() {
     m_commandList->close();
+
+    // NVRHI handles fence signaling internally
     m_nvrhiDevice->executeCommandList(m_commandList);
-
-    // Signal fence
-    m_fenceValues[m_currentBackBufferIndex] = m_currentFenceValue;
-    m_commandQueue->Signal(m_fence, m_currentFenceValue);
-    m_currentFenceValue++;
-}
-
-void D3D12Backend::WaitForFence(u64 fenceValue) {
-    if (m_fence->GetCompletedValue() < fenceValue) {
-        m_fence->SetEventOnCompletion(fenceValue, m_fenceEvent);
-        WaitForSingleObject(m_fenceEvent, INFINITE);
-    }
 }
 
 void D3D12Backend::WaitForIdle() {
-    // Signal and wait for all frames
-    u64 waitValue = m_currentFenceValue;
-    m_commandQueue->Signal(m_fence, waitValue);
-    m_currentFenceValue++;
+    // Use NVRHI's built-in wait which handles its internal fences
+    m_nvrhiDevice->waitForIdle();
 
-    WaitForFence(waitValue);
+    // Also run garbage collection to release any pending resources
+    m_nvrhiDevice->runGarbageCollection();
 }
 
 void D3D12Backend::ExecuteCommandList(nvrhi::ICommandList* commandList) {
@@ -536,4 +528,18 @@ void D3D12Backend::EndDebugEvent() {
 
 void D3D12Backend::SetMarker(pcstr name) {
     // PIX marker for D3D12
+}
+
+DeviceState D3D12Backend::GetDeviceState() const {
+    if (!m_initialized || !m_d3d12Device)
+        return DeviceState::Lost;
+
+    // Check for device removal
+    HRESULT hr = m_d3d12Device->GetDeviceRemovedReason();
+    if (FAILED(hr)) {
+        Msg("! [D3D12Backend] Device removed: 0x%08X", hr);
+        return DeviceState::Lost;
+    }
+
+    return DeviceState::Normal;
 }

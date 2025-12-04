@@ -202,24 +202,28 @@ void FrameGraph::Execute() {
     VERIFY(m_context != nullptr && "RenderContext required for execution");
     VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
 
-    // ═══════════════════════════════════════════════════════
-    //  OPEN COMMAND LIST (CRITICAL: Required by NVRHI)
-    // ═══════════════════════════════════════════════════════
+    // Get command list from context (which now uses the backend's command list)
+    // The backend opens the command list in BeginFrame() and closes/executes it in EndFrame()
+    // We just record commands to it here.
     nvrhi::ICommandList* cmdList = m_context->GetCommandList();
     VERIFY(cmdList != nullptr);
-    cmdList->open();
 
     u32 passesExecuted = 0;
+    u32 passesCulled = 0;
+    u32 passesNoCallback = 0;
 
     // Execute passes in sorted order
     for (PassNode* pass : m_sortedPasses) {
         // Skip culled passes
         if (pass->culled) {
+            passesCulled++;
             continue;
         }
 
         // Skip passes without callbacks
         if (!pass->executeCallback) {
+            Msg("! [FrameGraph::Execute] Pass '%s' has no callback!", pass->name.c_str());
+            passesNoCallback++;
             continue;
         }
 
@@ -248,10 +252,27 @@ void FrameGraph::Execute() {
     }
 
     // ═══════════════════════════════════════════════════════
-    //  CLOSE AND EXECUTE COMMAND LIST (CRITICAL: Submit to GPU)
+    //  TRANSITION IMPORTED BACKBUFFER TO PRESENT STATE
     // ═══════════════════════════════════════════════════════
-    cmdList->close();
-    m_renderDevice->ExecuteContext(m_context);
+    // D3D12 requires backbuffer to be in Present state before Present() is called.
+    // Find imported resources and transition them to Present state.
+    for (auto& resource : m_resources) {
+        if (resource.desc.isImported && resource.nvrhiTexture) {
+            // Imported render target (backbuffer) - transition to Present
+            if (resource.desc.isRenderTarget) {
+                cmdList->setTextureState(
+                    resource.nvrhiTexture.Get(),
+                    nvrhi::AllSubresources,
+                    nvrhi::ResourceStates::Present
+                );
+            }
+        }
+    }
+    // Commit all pending barriers
+    cmdList->commitBarriers();
+
+    // NOTE: We do NOT close or execute the command list here.
+    // The backend handles that in EndFrame() after all rendering is complete.
 }
 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -259,16 +280,43 @@ void FrameGraph::Execute() {
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
+    // Debug: Log every call to track the crash
+    Msg("* [FrameGraph] GetPhysicalTexture called: index=%u, is_valid=%d, m_resources.size=%zu",
+        handle.index, handle.is_valid(), m_resources.size());
+    FlushLog();  // Force flush to see logs before crash
+
     const ResourceNode* node = GetResourceNode(handle);
-    VERIFY(node != nullptr);
+    if (!node) {
+        Msg("! [FrameGraph] GetPhysicalTexture: GetResourceNode returned null for index %u", handle.index);
+        Msg("!   m_resources.size()=%zu, handle.is_valid()=%d", m_resources.size(), handle.is_valid());
+        FlushLog();
+        return nullptr;
+    }
+
+    Msg("* [FrameGraph] GetPhysicalTexture: node found, name='%s', isAllocated=%d",
+        node->desc.debugName.c_str(), node->isAllocated);
+    FlushLog();
+
     if (!node->isAllocated) {
         Msg("! [FrameGraph] GetPhysicalTexture FAILED for resource index %u, name='%s'",
             handle.index, node->desc.debugName.c_str());
-        Msg("!   firstUsedPass=%u, lastUsedPass=%u, refCount=%u",
-            node->firstUsedPass, node->lastUsedPass, node->refCount);
-        VERIFY2(false, "Resource not allocated - call Compile first");
+        Msg("!   firstUsedPass=%u, lastUsedPass=%u, refCount=%u, isAllocated=%d",
+            node->firstUsedPass, node->lastUsedPass, node->refCount, node->isAllocated);
+        Msg("!   nvrhiTexture=%p", node->nvrhiTexture.Get());
+        FlushLog();
+        return nullptr;
     }
-    return node->nvrhiTexture;
+    nvrhi::ITexture* tex = node->nvrhiTexture.Get();
+    Msg("* [FrameGraph] GetPhysicalTexture: nvrhiTexture ptr=%p for '%s'", tex, node->desc.debugName.c_str());
+    FlushLog();
+
+    if (!tex) {
+        Msg("! [FrameGraph] GetPhysicalTexture: nvrhiTexture is null for index %u, name='%s'",
+            handle.index, node->desc.debugName.c_str());
+        FlushLog();
+        return nullptr;
+    }
+    return tex;
 }
 
 nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) const {
@@ -897,7 +945,7 @@ void FrameGraph::AllocateResources() {
             nvrhiDesc.structStride = resource.desc.structStride;
             nvrhiDesc.debugName = resource.desc.debugName.c_str();
             nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
-            nvrhiDesc.keepInitialState = false;
+            nvrhiDesc.keepInitialState = true;  // D3D12 requires state tracking
             nvrhiDesc.canHaveUAVs = resource.desc.allowUAV;
 
             resource.nvrhiBuffer = m_device->createBuffer(nvrhiDesc);
@@ -978,7 +1026,7 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.format = resource.desc.format;
                 nvrhiDesc.debugName = resource.desc.debugName.c_str();
                 nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
-                nvrhiDesc.keepInitialState = false;
+                nvrhiDesc.keepInitialState = true;  // D3D12 requires state tracking
 
                 // Set texture dimension
                 switch (resource.desc.type) {

@@ -85,6 +85,70 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     return true;
 }
 
+bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
+    VERIFY(backend);
+    VERIFY(backend->IsInitialized());
+
+    // Use existing backend (don't take ownership - it's managed by renderer)
+    // Create a wrapper that doesn't own the backend
+    class BackendRef : public IRenderBackend {
+    public:
+        IRenderBackend* m_ref;
+        BackendRef(IRenderBackend* ref) : m_ref(ref) {}
+        API GetAPI() const override { return m_ref->GetAPI(); }
+        pcstr GetAPIName() const override { return m_ref->GetAPIName(); }
+        bool IsInitialized() const override { return m_ref->IsInitialized(); }
+        void Shutdown() override {} // Don't shutdown the referenced backend
+        void WaitForIdle() override { m_ref->WaitForIdle(); }
+        DeviceState GetDeviceState() const override { return m_ref->GetDeviceState(); }
+        nvrhi::IDevice* GetDevice() const override { return m_ref->GetDevice(); }
+        nvrhi::ICommandList* GetCommandList() const override { return m_ref->GetCommandList(); }
+        nvrhi::ITexture* GetBackBuffer() override { return m_ref->GetBackBuffer(); }
+        void Present(bool vsync) override { m_ref->Present(vsync); }
+        std::pair<u32, u32> GetBackBufferSize() const override { return m_ref->GetBackBufferSize(); }
+        void BeginFrame() override { m_ref->BeginFrame(); }
+        void EndFrame() override { m_ref->EndFrame(); }
+        const Capabilities& GetCapabilities() const override { return m_ref->GetCapabilities(); }
+        Capabilities& GetMutableCapabilities() override { return m_ref->GetMutableCapabilities(); }
+    };
+
+    m_backend.reset(xr_new<BackendRef>(backend));
+    Msg("* [RenderDevice] Backend initialized: %s (from existing backend)", backend->GetAPIName());
+
+    // Create pipeline state cache
+    m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
+
+    // Create Slang compiler
+    m_slangCompiler = xr_make_unique<xray::render::SlangCompiler>();
+    if (!m_slangCompiler->Initialize()) {
+        Msg("! [RenderDevice] Failed to initialize Slang compiler");
+        return false;
+    }
+    Msg("* [RenderDevice] Slang compiler initialized");
+
+    // Create modern resource manager
+    m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
+    Msg("* [RenderDevice] FGResourceManager initialized");
+
+    // Create persistent upload command list
+    m_uploadCommandList = GetNativeDevice()->createCommandList();
+    if (!m_uploadCommandList) {
+        Msg("! [RenderDevice] Failed to create upload command list");
+        return false;
+    }
+    Msg("* [RenderDevice] Created persistent upload command list");
+
+    // Reserve initial capacity
+    m_textures.reserve(256);
+    m_buffers.reserve(512);
+    m_samplers.reserve(64);
+    m_shaders.reserve(128);
+
+    m_initialized = true;
+
+    return true;
+}
+
 void RenderDevice::Shutdown() {
     if (!m_initialized) return;
 
@@ -730,14 +794,20 @@ bool RenderDevice::IsShaderValid(ShaderHandle handle) const {
 RenderContext* RenderDevice::CreateContext() {
     VERIFY(m_initialized);
 
-    nvrhi::CommandListHandle cmdList = GetNativeDevice()->createCommandList();
+    // Use the backend's command list - this is the one that gets opened in BeginFrame
+    // and closed/executed in EndFrame. This ensures all rendering goes to the same
+    // command list that actually gets submitted to the GPU.
+    nvrhi::ICommandList* cmdList = m_backend->GetCommandList();
     if (!cmdList) {
-        Msg("! [RenderDevice] Failed to create command list");
+        Msg("! [RenderDevice] Backend command list is NULL");
         return nullptr;
     }
 
+    // Wrap in CommandListHandle for RenderContext (adds ref count)
+    nvrhi::CommandListHandle cmdListHandle = cmdList;
+
     // Pass 'this' RenderDevice so RenderContext can resolve BufferHandles and other handles
-    RenderContext* context = xr_new<RenderContext>(this, cmdList);
+    RenderContext* context = xr_new<RenderContext>(this, cmdListHandle);
     m_stats.contextsAlive++;
 
     return context;

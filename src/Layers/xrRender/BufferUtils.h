@@ -27,7 +27,8 @@ void SetGLVertexPointer(SDeclaration* decl);
 
 namespace BufferUtils
 {
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize);
+// Create a constant buffer - returns null handle on failure
+ConstantBufferHandle CreateConstantBuffer(u32 DataSize);
 };
 
 /**
@@ -86,6 +87,9 @@ public:
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
 
+    // Conversion to bool for validity checks
+    operator bool() const { return IsValid(); }
+
     size_t GetSystemMemoryUsage() const;
     size_t GetVideoMemoryUsage() const;
 
@@ -138,6 +142,9 @@ public:
     {
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
+
+    // Conversion to bool for validity checks
+    operator bool() const { return IsValid(); }
 
     size_t GetSystemMemoryUsage() const;
     size_t GetVideoMemoryUsage() const;
@@ -199,6 +206,12 @@ private:
 
     VertexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
+
+    // For NVRHI mapping (D3D12 doesn't support D3D11-style Map/Unmap)
+    void* m_MappedData{};
+    size_t m_MappedOffset{};
+    size_t m_MappedSize{};
+    bool m_MappedFlush{};
 };
 
 class IndexStreamBuffer
@@ -238,5 +251,11 @@ private:
 
     IndexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
+
+    // For NVRHI mapping (D3D12 doesn't support D3D11-style Map/Unmap)
+    void* m_MappedData{};
+    size_t m_MappedOffset{};
+    size_t m_MappedSize{};
+    bool m_MappedFlush{};
 };
 } // namespace xray::render::RENDER_NAMESPACE

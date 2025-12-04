@@ -2,6 +2,14 @@
 
 #include "xrEngine/Engine.h"
 
+// Device state enum - shared between IRenderBackend and IRender
+enum class DeviceState
+{
+    Normal = 0,
+    Lost,
+    NeedReset
+};
+
 // Forward declarations - avoid exposing NVRHI to engine code
 namespace nvrhi {
     class IDevice;
@@ -41,7 +49,9 @@ public:
 
     // ═══════ Lifecycle ═══════
     virtual bool IsInitialized() const = 0;
+    virtual void Shutdown() = 0;
     virtual void WaitForIdle() = 0;
+    virtual DeviceState GetDeviceState() const { return DeviceState::Normal; }
 
     // ═══════ NVRHI Access ═══════
     // All modern rendering goes through NVRHI

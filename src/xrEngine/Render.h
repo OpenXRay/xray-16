@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrEngine/Engine.h"
+#include "xrEngine/IRenderBackend.h"  // For DeviceState
 #include "xrCDB/Frustum.h"
 #include "xrCDB/ISpatial.h"
 #include "vis_common.h"
@@ -123,12 +124,7 @@ struct xrImTextureData
     Fvector2 size{};
 };
 
-enum class DeviceState
-{
-    Normal = 0,
-    Lost,
-    NeedReset
-};
+// DeviceState is now defined in IRenderBackend.h
 
 class ENGINE_API IRender
 {

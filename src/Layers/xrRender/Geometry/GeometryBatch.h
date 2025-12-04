@@ -99,6 +99,8 @@ struct GeometryBatch {
 
     // Check if batch is alpha-tested (bAlphaTest flag set by blender)
     bool IsAlphaTested() const {
+        if (!visual || !visual->shader)
+            return false;  // D3D12/FrameGraph: no legacy shader
         RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
         if (elem) {
             return elem->flags.bAlphaTest != 0;
@@ -108,6 +110,8 @@ struct GeometryBatch {
 
     // Check if batch requires back-to-front sorting (transparent/alpha-blended)
     bool IsStrictB2F() const {
+        if (!visual || !visual->shader)
+            return false;  // D3D12/FrameGraph: no legacy shader
         RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
         if (elem) {
             return elem->flags.bStrictB2F != 0;

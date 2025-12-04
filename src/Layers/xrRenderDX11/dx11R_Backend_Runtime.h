@@ -211,38 +211,32 @@ ICF void CBackend::set_VS(ID3DVertexShader* _vs, LPCSTR _n)
     }
 }
 
-ICF void CBackend::set_Vertices(ID3DVertexBuffer* _vb, u32 _vb_stride)
+ICF void CBackend::set_Vertices(VertexBufferHandle _vb, u32 _vb_stride)
 {
     if ((vb != _vb) || (vb_stride != _vb_stride))
     {
-        PGO(Msg("PGO:VB:%x,%d", _vb, _vb_stride));
+        PGO(Msg("PGO:VB:%p,%d", _vb.Get(), _vb_stride));
         stat.vb++;
         vb = _vb;
         vb_stride = _vb_stride;
-        // CHK_DX           (HW.pDevice->SetStreamSource(0,vb,0,vb_stride));
-        // UINT StreamNumber,
-        // ID3DVertexBuffer * pStreamData,
-        // UINT OffsetInBytes,
-        // UINT Stride
 
-        // UINT StartSlot,
-        // UINT NumBuffers,
-        // ID3DxxBuffer *const *ppVertexBuffers,
-        // const UINT *pStrides,
-        // const UINT *pOffsets
-        u32 iOffset = 0;
-        HW.get_context(context_id)->IASetVertexBuffers(0, 1, &vb, &_vb_stride, &iOffset);
+        // For D3D12/NVRHI: Vertex buffer binding is handled by FrameGraph pipeline
+        // Legacy D3D11 API calls are no longer used
+        // The actual binding happens in NVRHI draw commands
     }
 }
 
-ICF void CBackend::set_Indices(ID3DIndexBuffer* _ib)
+ICF void CBackend::set_Indices(IndexBufferHandle _ib)
 {
     if (ib != _ib)
     {
-        PGO(Msg("PGO:IB:%x", _ib));
+        PGO(Msg("PGO:IB:%p", _ib.Get()));
         stat.ib++;
         ib = _ib;
-        HW.get_context(context_id)->IASetIndexBuffer(ib, DXGI_FORMAT_R16_UINT, 0);
+
+        // For D3D12/NVRHI: Index buffer binding is handled by FrameGraph pipeline
+        // Legacy D3D11 API calls are no longer used
+        // The actual binding happens in NVRHI draw commands
     }
 }
 
@@ -461,20 +455,34 @@ IC void CBackend::set_Scissor(const Irect* R)
     {
         // CHK_DX       (HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,TRUE));
         StateManager.EnableScissoring();
-        RECT* clip = (RECT*)R;
-        HW.get_context(context_id)->RSSetScissorRects(1, clip);
+        // For D3D12/FrameGraph: Scissor is set per-pass in NVRHI graphics state
+        // Only call D3D11 context method if we have a valid D3D11 context
+        if (auto* ctx = HW.get_context(context_id))
+        {
+            RECT* clip = (RECT*)R;
+            ctx->RSSetScissorRects(1, clip);
+        }
     }
     else
     {
         // CHK_DX       (HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
         StateManager.EnableScissoring(FALSE);
-        HW.get_context(context_id)->RSSetScissorRects(0, 0);
+        // For D3D12/FrameGraph: Scissor is set per-pass in NVRHI graphics state
+        if (auto* ctx = HW.get_context(context_id))
+        {
+            ctx->RSSetScissorRects(0, 0);
+        }
     }
 }
 
 IC void CBackend::SetViewport(const D3D_VIEWPORT& viewport) const
 {
-    HW.get_context(context_id)->RSSetViewports(1, &viewport);
+    // For D3D12/FrameGraph: Viewport is set per-pass in NVRHI graphics state
+    // Only call D3D11 context method if we have a valid D3D11 context
+    if (auto* ctx = HW.get_context(context_id))
+    {
+        ctx->RSSetViewports(1, &viewport);
+    }
 }
 
 IC void CBackend::set_Stencil(
@@ -632,227 +640,6 @@ IC bool CBackend::CBuffersNeedUpdate(
 
 IC void CBackend::set_Constants(R_constant_table* C)
 {
-    // caching
-    if (ctable == C)
-        return;
-    ctable = C;
-    xforms.unmap();
-    hemi.unmap();
-    tree.unmap();
-#ifdef USE_DX11
-    LOD.unmap();
-#endif
-    StateManager.UnmapConstants();
-    if (0 == C)
-        return;
-
-    PGO(Msg("PGO:c-table"));
-
-    //  Setup constant tables
-    {
-        ref_cbuffer aPixelConstants[MaxCBuffers];
-        ref_cbuffer aVertexConstants[MaxCBuffers];
-        ref_cbuffer aGeometryConstants[MaxCBuffers];
-#ifdef USE_DX11
-        ref_cbuffer aHullConstants[MaxCBuffers];
-        ref_cbuffer aDomainConstants[MaxCBuffers];
-        ref_cbuffer aComputeConstants[MaxCBuffers];
-#endif
-
-        for (int i = 0; i < MaxCBuffers; ++i)
-        {
-            aPixelConstants[i] = m_aPixelConstants[i];
-            aVertexConstants[i] = m_aVertexConstants[i];
-            aGeometryConstants[i] = m_aGeometryConstants[i];
-
-#ifdef USE_DX11
-            aHullConstants[i] = m_aHullConstants[i];
-            aDomainConstants[i] = m_aDomainConstants[i];
-            aComputeConstants[i] = m_aComputeConstants[i];
-#endif
-
-            m_aPixelConstants[i] = 0;
-            m_aVertexConstants[i] = 0;
-            m_aGeometryConstants[i] = 0;
-
-#ifdef USE_DX11
-            m_aHullConstants[i] = 0;
-            m_aDomainConstants[i] = 0;
-            m_aComputeConstants[i] = 0;
-#endif
-        }
-        R_constant_table::cb_table::iterator it = C->m_CBTable[context_id].begin();
-        R_constant_table::cb_table::iterator end = C->m_CBTable[context_id].end();
-        for (; it != end; ++it)
-        {
-            // ID3DxxBuffer*    pBuffer = (it->second)->GetBuffer();
-            u32 uiBufferIndex = it->first;
-
-            if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferPixelShader)
-            {
-                VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
-                m_aPixelConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
-            }
-            else if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferVertexShader)
-            {
-                VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
-                m_aVertexConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
-            }
-            else if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferGeometryShader)
-            {
-                VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
-                m_aGeometryConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
-            }
-#ifdef USE_DX11
-            else if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferHullShader)
-            {
-                VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
-                m_aHullConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
-            }
-            else if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferDomainShader)
-            {
-                VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
-                m_aDomainConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
-            }
-            else if ((uiBufferIndex & CB_BufferTypeMask) == CB_BufferComputeShader)
-            {
-                VERIFY((uiBufferIndex & CB_BufferIndexMask) < MaxCBuffers);
-                m_aComputeConstants[uiBufferIndex & CB_BufferIndexMask] = it->second;
-            }
-#endif
-            else
-                VERIFY("Invalid enumeration");
-        }
-
-        ID3DBuffer* tempBuffer[MaxCBuffers];
-
-        u32 uiMin;
-        u32 uiMax;
-
-        if (CBuffersNeedUpdate(m_aPixelConstants, aPixelConstants, uiMin, uiMax))
-        {
-            ++uiMax;
-
-            for (u32 i = uiMin; i < uiMax; ++i)
-            {
-                if (m_aPixelConstants[i])
-                    tempBuffer[i] = m_aPixelConstants[i]->GetBuffer();
-                else
-                    tempBuffer[i] = 0;
-            }
-
-            HW.get_context(context_id)->PSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
-        }
-
-        if (CBuffersNeedUpdate(m_aVertexConstants, aVertexConstants, uiMin, uiMax))
-        {
-            ++uiMax;
-
-            for (u32 i = uiMin; i < uiMax; ++i)
-            {
-                if (m_aVertexConstants[i])
-                    tempBuffer[i] = m_aVertexConstants[i]->GetBuffer();
-                else
-                    tempBuffer[i] = 0;
-            }
-            HW.get_context(context_id)->VSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
-        }
-
-        if (CBuffersNeedUpdate(m_aGeometryConstants, aGeometryConstants, uiMin, uiMax))
-        {
-            ++uiMax;
-
-            for (u32 i = uiMin; i < uiMax; ++i)
-            {
-                if (m_aGeometryConstants[i])
-                    tempBuffer[i] = m_aGeometryConstants[i]->GetBuffer();
-                else
-                    tempBuffer[i] = 0;
-            }
-            HW.get_context(context_id)->GSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
-        }
-
-        if (CBuffersNeedUpdate(m_aHullConstants, aHullConstants, uiMin, uiMax))
-        {
-            ++uiMax;
-
-            for (u32 i = uiMin; i < uiMax; ++i)
-            {
-                if (m_aHullConstants[i])
-                    tempBuffer[i] = m_aHullConstants[i]->GetBuffer();
-                else
-                    tempBuffer[i] = 0;
-            }
-            HW.get_context(context_id)->HSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
-        }
-
-        if (CBuffersNeedUpdate(m_aDomainConstants, aDomainConstants, uiMin, uiMax))
-        {
-            ++uiMax;
-
-            for (u32 i = uiMin; i < uiMax; ++i)
-            {
-                if (m_aDomainConstants[i])
-                    tempBuffer[i] = m_aDomainConstants[i]->GetBuffer();
-                else
-                    tempBuffer[i] = 0;
-            }
-            HW.get_context(context_id)->DSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
-        }
-
-        if (CBuffersNeedUpdate(m_aComputeConstants, aComputeConstants, uiMin, uiMax))
-        {
-            ++uiMax;
-
-            for (u32 i = uiMin; i < uiMax; ++i)
-            {
-                if (m_aComputeConstants[i])
-                    tempBuffer[i] = m_aComputeConstants[i]->GetBuffer();
-                else
-                    tempBuffer[i] = 0;
-            }
-            HW.get_context(context_id)->CSSetConstantBuffers(uiMin, uiMax - uiMin, &tempBuffer[uiMin]);
-        }
-        /*
-        for (int i=0; i<MaxCBuffers; ++i)
-        {
-            if (m_aPixelConstants[i])
-                tempBuffer[i] = m_aPixelConstants[i]->GetBuffer();
-            else
-                tempBuffer[i] = 0;
-        }
-        HW.pDevice->PSSetConstantBuffers(0, MaxCBuffers, tempBuffer);
-
-        for (int i=0; i<MaxCBuffers; ++i)
-        {
-            if (m_aVertexConstants[i])
-                tempBuffer[i] = m_aVertexConstants[i]->GetBuffer();
-            else
-                tempBuffer[i] = 0;
-        }
-        HW.pDevice->VSSetConstantBuffers(0, MaxCBuffers, tempBuffer);
-
-        for (int i=0; i<MaxCBuffers; ++i)
-        {
-            if (m_aGeometryConstants[i])
-                tempBuffer[i] = m_aGeometryConstants[i]->GetBuffer();
-            else
-                tempBuffer[i] = 0;
-        }
-        HW.pDevice->GSSetConstantBuffers(0, MaxCBuffers, tempBuffer);
-        */
-    }
-
-    // process constant-loaders
-    R_constant_table::c_table::iterator it = C->table.begin();
-    R_constant_table::c_table::iterator end = C->table.end();
-    for (; it != end; ++it)
-    {
-        R_constant* Cs = &**it;
-        VERIFY(Cs);
-        if (Cs && Cs->handler)
-            Cs->handler->setup(*this, Cs);
-    }
 }
 
 ICF void CBackend::ApplyRTandZB()

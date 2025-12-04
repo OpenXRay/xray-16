@@ -139,7 +139,7 @@ class RenderDevice;
 
 class RenderContext {
 public:
-    RenderContext(RenderDevice* device, nvrhi::ICommandList* commandList);
+    RenderContext(RenderDevice* device, nvrhi::CommandListHandle commandList);
     ~RenderContext();
 
     // ═══════════════════════════════════════════════════════
@@ -322,12 +322,12 @@ public:
     //  INTERNAL
     // ═══════════════════════════════════════════════════════
 
-    nvrhi::ICommandList* GetCommandList() const { return m_commandList; }
+    nvrhi::ICommandList* GetCommandList() const { return m_commandList.Get(); }
     RenderDevice* GetDevice() const { return m_device; }
 
 private:
     RenderDevice* m_device;  // Our abstraction layer device
-    nvrhi::ICommandList* m_commandList;
+    nvrhi::CommandListHandle m_commandList;  // Smart pointer - MUST keep alive!
     ResourceManager* m_resourceManager = nullptr;  // Set later
 
     // State tracking
