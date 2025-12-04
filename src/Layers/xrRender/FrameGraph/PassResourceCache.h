@@ -1,0 +1,98 @@
+#pragma once
+
+#include <nvrhi/nvrhi.h>
+#include "Common/Common.hpp"
+
+namespace xray::render::framegraph {
+
+class PassResourceCache {
+public:
+    static PassResourceCache& Instance();
+
+    nvrhi::SamplerHandle GetOrCreateSampler(
+        const char* passName,
+        const nvrhi::SamplerDesc& desc,
+        nvrhi::IDevice* device);
+
+    nvrhi::BindingLayoutHandle GetOrCreateBindingLayout(
+        const char* passName,
+        const nvrhi::BindingLayoutDesc& desc,
+        nvrhi::IDevice* device);
+
+    nvrhi::GraphicsPipelineHandle GetOrCreatePipeline(
+        const char* passName,
+        const nvrhi::GraphicsPipelineDesc& desc,
+        const nvrhi::FramebufferInfo& fbInfo,
+        nvrhi::IDevice* device);
+
+    nvrhi::ComputePipelineHandle GetOrCreateComputePipeline(
+        const char* passName,
+        const nvrhi::ComputePipelineDesc& desc,
+        nvrhi::IDevice* device);
+
+    nvrhi::FramebufferHandle GetOrCreateFramebuffer(
+        const char* passName,
+        const nvrhi::FramebufferDesc& desc,
+        nvrhi::IDevice* device);
+
+    nvrhi::InputLayoutHandle GetOrCreateInputLayout(
+        const char* passName,
+        const nvrhi::VertexAttributeDesc* attrs,
+        u32 attrCount,
+        nvrhi::IShader* vertexShader,
+        nvrhi::IDevice* device);
+
+    nvrhi::BufferHandle GetOrCreateStaticBuffer(
+        const char* passName,
+        const char* bufferName,
+        const nvrhi::BufferDesc& desc,
+        nvrhi::IDevice* device);
+
+    bool HasStaticBuffer(const char* passName, const char* bufferName) const;
+
+    void Clear();
+
+    struct Stats {
+        u32 samplerHits = 0;
+        u32 samplerMisses = 0;
+        u32 layoutHits = 0;
+        u32 layoutMisses = 0;
+        u32 pipelineHits = 0;
+        u32 pipelineMisses = 0;
+        u32 computePipelineHits = 0;
+        u32 computePipelineMisses = 0;
+        u32 framebufferHits = 0;
+        u32 framebufferMisses = 0;
+        u32 inputLayoutHits = 0;
+        u32 inputLayoutMisses = 0;
+        u32 bufferHits = 0;
+        u32 bufferMisses = 0;
+    };
+    const Stats& GetStats() const { return m_stats; }
+    void ResetStats();
+
+private:
+    PassResourceCache() = default;
+    ~PassResourceCache() = default;
+
+    PassResourceCache(const PassResourceCache&) = delete;
+    PassResourceCache& operator=(const PassResourceCache&) = delete;
+
+    xr_map<u64, nvrhi::SamplerHandle> m_samplers;
+    xr_map<u64, nvrhi::BindingLayoutHandle> m_bindingLayouts;
+    xr_map<u64, nvrhi::GraphicsPipelineHandle> m_graphicsPipelines;
+    xr_map<u64, nvrhi::ComputePipelineHandle> m_computePipelines;
+    xr_map<u64, nvrhi::FramebufferHandle> m_framebuffers;
+    xr_map<u64, nvrhi::InputLayoutHandle> m_inputLayouts;
+    xr_map<u64, nvrhi::BufferHandle> m_staticBuffers;
+
+    Stats m_stats;
+
+    static u64 HashString(const char* str);
+    static u64 HashCombine(u64 a, u64 b);
+    static u64 HashPointer(const void* ptr);
+};
+
+PassResourceCache& GetPassResourceCache();
+
+}

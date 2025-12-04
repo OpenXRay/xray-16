@@ -105,6 +105,7 @@ static void EnsureQuadIndexBuffer(ng::RenderDevice* device, u32 maxQuads) {
     ibDesc.byteSize = numIndices * sizeof(u16);
     ibDesc.isIndexBuffer = true;
     ibDesc.debugName = "ParticleQuadIB";
+    ibDesc.keepInitialState = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
     s_quadIB = device->GetNVRHIDevice()->createBuffer(ibDesc);
@@ -134,7 +135,7 @@ static void EnsureParticleVertexBuffer(ng::RenderDevice* device, u32 sizeBytes) 
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "ParticleDynamicVB";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = false;
+    vbDesc.keepInitialState = true;
 
     s_particleVB = device->GetNVRHIDevice()->createBuffer(vbDesc);
     if (!s_particleVB) {
@@ -343,7 +344,7 @@ static ParticleBindingCache* CreateParticleBindingSet(
         bufDesc.byteSize = cbInfo.size;
         bufDesc.isConstantBuffer = true;
         bufDesc.debugName = cbInfo.name.c_str();
-        bufDesc.keepInitialState = false;
+        bufDesc.keepInitialState = true;
         bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         nvrhi::BufferHandle buffer = device->GetNVRHIDevice()->createBuffer(bufDesc);
@@ -368,7 +369,7 @@ static ParticleBindingCache* CreateParticleBindingSet(
         bufDesc.byteSize = cbInfo.size;
         bufDesc.isConstantBuffer = true;
         bufDesc.debugName = cbInfo.name.c_str();
-        bufDesc.keepInitialState = false;
+        bufDesc.keepInitialState = true;
         bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         nvrhi::BufferHandle buffer = device->GetNVRHIDevice()->createBuffer(bufDesc);

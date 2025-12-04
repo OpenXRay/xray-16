@@ -2,6 +2,7 @@
 #include "HiZBuildPassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -74,7 +75,11 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         cbDesc.isConstantBuffer = true;
         cbDesc.isVolatile = true;
         cbDesc.maxVersions = 16;
+        cbDesc.keepInitialState = true;
+        cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
         s_hiz_cb = nvDevice->createBuffer(cbDesc);
+
+        auto& cache = framegraph::GetPassResourceCache();
 
         nvrhi::SamplerDesc samplerDesc;
         samplerDesc.minFilter = false;
@@ -83,7 +88,7 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
         samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
         samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
-        s_point_sampler = nvDevice->createSampler(samplerDesc);
+        s_point_sampler = cache.GetOrCreateSampler("HiZBuildPass", samplerDesc, nvDevice);
 
         if (s_compute_enabled) {
             nvrhi::BindingLayoutDesc layoutDesc;
@@ -94,13 +99,13 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
                 nvrhi::BindingLayoutItem::Texture_UAV(0),
                 nvrhi::BindingLayoutItem::Sampler(0)
             };
-            s_hiz_layout = nvDevice->createBindingLayout(layoutDesc);
+            s_hiz_layout = cache.GetOrCreateBindingLayout("HiZBuildPass", layoutDesc, nvDevice);
 
             if (s_hiz_layout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
                 pipeDesc.CS = s_hiz_build_cs->nvrhiShader;
                 pipeDesc.bindingLayouts = { s_hiz_layout };
-                s_hiz_pipeline = nvDevice->createComputePipeline(pipeDesc);
+                s_hiz_pipeline = cache.GetOrCreateComputePipeline("HiZBuildPass", pipeDesc, nvDevice);
 
                 if (s_hiz_pipeline) {
                     Msg("* [HiZBuild] Compute pipeline created successfully");

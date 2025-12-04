@@ -123,7 +123,7 @@ class RenderDevice;
 
 class RenderContext {
 public:
-    RenderContext(RenderDevice* device, nvrhi::ICommandList* commandList);
+    RenderContext(RenderDevice* device, nvrhi::CommandListHandle commandList);
     ~RenderContext();
 
     void BeginRenderPass(const RenderPassDesc& desc);
@@ -234,12 +234,12 @@ public:
 
     bool IsInRenderPass() const { return m_inRenderPass; }
 
-    nvrhi::ICommandList* GetCommandList() const { return m_commandList; }
+    nvrhi::ICommandList* GetCommandList() const { return m_commandList.Get(); }
     RenderDevice* GetDevice() const { return m_device; }
 
 private:
     RenderDevice* m_device;
-    nvrhi::ICommandList* m_commandList;
+    nvrhi::CommandListHandle m_commandList;
     ResourceManager* m_resourceManager = nullptr;
 
     bool m_inRenderPass = false;

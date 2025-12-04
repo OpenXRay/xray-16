@@ -46,10 +46,12 @@ CPEDef::~CPEDef()
 }
 void CPEDef::CreateShader()
 {
+#if 0
     if (m_ShaderName.c_str() && m_TextureName.c_str())
     {
         m_CachedShader.create(m_ShaderName.c_str(), m_TextureName.c_str());
     }
+#endif
 }
 void CPEDef::DestroyShader() { m_CachedShader.destroy(); }
 void CPEDef::SetName(LPCSTR name) { m_Name = name; }

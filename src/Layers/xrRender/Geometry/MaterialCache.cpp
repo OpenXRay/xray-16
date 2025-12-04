@@ -741,7 +741,7 @@ bool MaterialCache::ExtractShaders(SPass* pass, MaterialPSO* matPSO)
         bufferDesc.byteSize = cbReq.size;
         bufferDesc.isConstantBuffer = true;
         bufferDesc.debugName = make_string("CB_%s", cbReq.name.c_str()).c_str();
-        bufferDesc.keepInitialState = false;
+        bufferDesc.keepInitialState = true;
         bufferDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         nvrhi::BufferHandle sharedBuffer = m_device->GetNativeDevice()->createBuffer(bufferDesc);

@@ -161,16 +161,20 @@ void FrameGraph::Execute() {
 
     nvrhi::ICommandList* cmdList = m_context->GetCommandList();
     VERIFY(cmdList != nullptr);
-    cmdList->open();
 
     u32 passesExecuted = 0;
+    u32 passesCulled = 0;
+    u32 passesNoCallback = 0;
 
     for (PassNode* pass : m_sortedPasses) {
         if (pass->culled) {
+            passesCulled++;
             continue;
         }
 
         if (!pass->executeCallback) {
+            Msg("! [FrameGraph::Execute] Pass '%s' has no callback!", pass->name.c_str());
+            passesNoCallback++;
             continue;
         }
 
@@ -192,21 +196,58 @@ void FrameGraph::Execute() {
         passesExecuted++;
     }
 
-    cmdList->close();
-    m_renderDevice->ExecuteContext(m_context);
+    for (auto& resource : m_resources) {
+        if (resource.desc.isImported && resource.nvrhiTexture) {
+            if (resource.desc.isRenderTarget) {
+                cmdList->setTextureState(
+                    resource.nvrhiTexture.Get(),
+                    nvrhi::AllSubresources,
+                    nvrhi::ResourceStates::Present
+                );
+            }
+        }
+    }
+    cmdList->commitBarriers();
+
 }
 
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
+    Msg("* [FrameGraph] GetPhysicalTexture called: index=%u, is_valid=%d, m_resources.size=%zu",
+        handle.index, handle.is_valid(), m_resources.size());
+    FlushLog();
+
     const ResourceNode* node = GetResourceNode(handle);
-    VERIFY(node != nullptr);
+    if (!node) {
+        Msg("! [FrameGraph] GetPhysicalTexture: GetResourceNode returned null for index %u", handle.index);
+        Msg("!   m_resources.size()=%zu, handle.is_valid()=%d", m_resources.size(), handle.is_valid());
+        FlushLog();
+        return nullptr;
+    }
+
+    Msg("* [FrameGraph] GetPhysicalTexture: node found, name='%s', isAllocated=%d",
+        node->desc.debugName.c_str(), node->isAllocated);
+    FlushLog();
+
     if (!node->isAllocated) {
         Msg("! [FrameGraph] GetPhysicalTexture FAILED for resource index %u, name='%s'",
             handle.index, node->desc.debugName.c_str());
-        Msg("!   firstUsedPass=%u, lastUsedPass=%u, refCount=%u",
-            node->firstUsedPass, node->lastUsedPass, node->refCount);
-        VERIFY2(false, "Resource not allocated - call Compile first");
+        Msg("!   firstUsedPass=%u, lastUsedPass=%u, refCount=%u, isAllocated=%d",
+            node->firstUsedPass, node->lastUsedPass, node->refCount, node->isAllocated);
+        Msg("!   nvrhiTexture=%p", node->nvrhiTexture.Get());
+        FlushLog();
+        return nullptr;
     }
-    return node->nvrhiTexture;
+    nvrhi::ITexture* tex = node->nvrhiTexture.Get();
+    Msg("* [FrameGraph] GetPhysicalTexture: nvrhiTexture ptr=%p for '%s'", tex, node->desc.debugName.c_str());
+    FlushLog();
+
+    if (!tex) {
+        Msg("! [FrameGraph] GetPhysicalTexture: nvrhiTexture is null for index %u, name='%s'",
+            handle.index, node->desc.debugName.c_str());
+        FlushLog();
+        return nullptr;
+    }
+    return tex;
 }
 
 nvrhi::IBuffer* FrameGraph::GetPhysicalBuffer(VirtualResourceHandle handle) const {
@@ -722,7 +763,7 @@ void FrameGraph::AllocateResources() {
             nvrhiDesc.structStride = resource.desc.structStride;
             nvrhiDesc.debugName = resource.desc.debugName.c_str();
             nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
-            nvrhiDesc.keepInitialState = false;
+            nvrhiDesc.keepInitialState = true;
             nvrhiDesc.canHaveUAVs = resource.desc.allowUAV;
 
             resource.nvrhiBuffer = m_device->createBuffer(nvrhiDesc);
@@ -795,7 +836,7 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.format = resource.desc.format;
                 nvrhiDesc.debugName = resource.desc.debugName.c_str();
                 nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
-                nvrhiDesc.keepInitialState = false;
+                nvrhiDesc.keepInitialState = true;
 
                 switch (resource.desc.type) {
                     case ResourceDesc::Type::Texture2D:

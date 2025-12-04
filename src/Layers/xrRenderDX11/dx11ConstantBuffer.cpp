@@ -14,7 +14,7 @@ dx11ConstantBuffer::~dx11ConstantBuffer()
     }
 
     //	Flush();
-    _RELEASE(m_pBuffer);
+    m_pBuffer = nullptr;
     xr_free(m_pBufferData);
 }
 
@@ -60,17 +60,11 @@ dx11ConstantBuffer::dx11ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
         }
     }
 
-    R_CHK(BufferUtils::CreateConstantBuffer(&m_pBuffer, Desc.Size));
+    m_pBuffer = BufferUtils::CreateConstantBuffer(Desc.Size);
     VERIFY(m_pBuffer);
     m_pBufferData = xr_malloc(Desc.Size);
     VERIFY(m_pBufferData);
 
-#ifdef DEBUG
-    if (m_pBuffer)
-    {
-        m_pBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(Desc.Name), Desc.Name);
-    }
-#endif
 }
 
 dx11ConstantBuffer::dx11ConstantBuffer(const char* name, u32 size) : m_bChanged(true)
@@ -86,17 +80,11 @@ dx11ConstantBuffer::dx11ConstantBuffer(const char* name, u32 size) : m_bChanged(
     m_MembersNames.clear();
     m_uiMembersCRC = 0;
 
-    R_CHK(BufferUtils::CreateConstantBuffer(&m_pBuffer, size));
+    m_pBuffer = BufferUtils::CreateConstantBuffer(size);
     VERIFY(m_pBuffer);
     m_pBufferData = xr_malloc(size);
     VERIFY(m_pBufferData);
 
-#ifdef DEBUG
-    if (m_pBuffer)
-    {
-        m_pBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, xr_strlen(name), name);
-    }
-#endif
 }
 
 bool dx11ConstantBuffer::Similar(dx11ConstantBuffer& _in)
@@ -132,22 +120,15 @@ void dx11ConstantBuffer::Flush(u32 context_id)
 {
     if (m_bChanged)
     {
-        void* pData;
-#ifdef USE_DX11
-        D3D11_MAPPED_SUBRESOURCE pSubRes;
-        CHK_DX(HW.get_context(context_id)->Map(m_pBuffer, 0, D3D_MAP_WRITE_DISCARD, 0, &pSubRes));
-        pData = pSubRes.pData;
-#else
-        CHK_DX(m_pBuffer->Map(D3D_MAP_WRITE_DISCARD, 0, &pData));
-#endif
-        VERIFY(pData);
+        VERIFY(m_pBuffer);
         VERIFY(m_pBufferData);
-        CopyMemory(pData, m_pBufferData, m_uiBufferSize);
-#ifdef USE_DX11
-        HW.get_context(context_id)->Unmap(m_pBuffer, 0);
-#else
-        m_pBuffer->Unmap();
-#endif
+
+        nvrhi::ICommandList* cmdList = GEnv.Backend->GetCommandList();
+        if (cmdList)
+        {
+            cmdList->writeBuffer(m_pBuffer, m_pBufferData, m_uiBufferSize);
+        }
+
         m_bChanged = false;
     }
 }

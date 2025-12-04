@@ -2,6 +2,13 @@
 
 #include "xrEngine/Engine.h"
 
+enum class DeviceState
+{
+    Normal = 0,
+    Lost,
+    NeedReset
+};
+
 namespace nvrhi {
     class IDevice;
     class ITexture;
@@ -30,7 +37,9 @@ public:
     virtual pcstr GetAPIName() const = 0;
 
     virtual bool IsInitialized() const = 0;
+    virtual void Shutdown() = 0;
     virtual void WaitForIdle() = 0;
+    virtual DeviceState GetDeviceState() const { return DeviceState::Normal; }
 
     virtual nvrhi::IDevice* GetDevice() const = 0;
     virtual nvrhi::ICommandList* GetCommandList() const = 0;

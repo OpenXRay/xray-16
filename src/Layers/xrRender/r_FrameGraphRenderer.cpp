@@ -112,6 +112,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     }
 
     passes::InitializeSkyGeometry(device);
+    passes::InitializeSunPass(device);
+    passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
     Msg("* [FrameGraphRenderer] initialized");
 
@@ -141,6 +143,8 @@ void FrameGraphRenderer::Shutdown() {
     m_framegraph = nullptr;
 
     passes::ShutdownSkyGeometry();
+    passes::ShutdownSunPass();
+    passes::ShutdownTonemapPass();
 
     m_device = nullptr;
 }
@@ -199,6 +203,23 @@ void FrameGraphRenderer::RenderMenu() {
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
 
+    nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
+    framegraph::VirtualResourceHandle backbufferHandle;
+
+    if (backbufferTexture) {
+        framegraph::ResourceDesc backbufferDesc;
+        backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        backbufferDesc.width = width;
+        backbufferDesc.height = height;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.isImported = true;
+        backbufferDesc.isTransient = false;
+        backbufferDesc.debugName = "Backbuffer";
+
+        backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+    }
+
     framegraph::ResourceDesc bgDesc;
     bgDesc.type = framegraph::ResourceDesc::Type::Texture2D;
     bgDesc.width = width;
@@ -231,6 +252,7 @@ void FrameGraphRenderer::RenderMenu() {
         *m_framegraph,
         sceneWithUI,
         framegraph::VirtualResourceHandle(),
+        backbufferHandle,
         width,
         height
     );
@@ -317,6 +339,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     const u32 width = Device.dwWidth;
     const u32 height = Device.dwHeight;
+
+    nvrhi::ITexture* backbufferTexture = GEnv.Backend->GetBackBuffer();
+    framegraph::VirtualResourceHandle backbufferHandle;
+
+    if (backbufferTexture) {
+        framegraph::ResourceDesc backbufferDesc;
+        backbufferDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        backbufferDesc.width = width;
+        backbufferDesc.height = height;
+        backbufferDesc.format = nvrhi::Format::RGBA8_UNORM;
+        backbufferDesc.isRenderTarget = true;
+        backbufferDesc.isImported = true;
+        backbufferDesc.isTransient = false;
+        backbufferDesc.debugName = "Backbuffer";
+
+        backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
+    }
 
     passes::BindlessDepthConfig bindlessDepthConfig;
     if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
@@ -516,6 +555,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         *m_framegraph,
         sceneWithUI,
         exposureOutput.exposureTexture,
+        backbufferHandle,
         width,
         height
     );
@@ -549,25 +589,6 @@ void FrameGraphRenderer::PrintStats() const {
 }
 
 void FrameGraphRenderer::PresentToBackbuffer() {
-    VERIFY(m_device != nullptr);
-    VERIFY(m_framegraph != nullptr);
-
-    nvrhi::ITexture* finalTexture = m_framegraph->GetPhysicalTexture(m_finalOutput);
-    if (!finalTexture) {
-        Msg("! [FrameGraphRenderer] Failed to get final output texture for present");
-        return;
-    }
-
-    nvrhi::ITexture* backbuffer = GEnv.Backend->GetBackBuffer();
-    if (!backbuffer) {
-        Msg("! [FrameGraphRenderer] Failed to get backbuffer from backend");
-        return;
-    }
-
-    ng::RenderContext* ctx = m_renderContext.get();
-    VERIFY(ctx != nullptr);
-
-    ctx->CopyTexture(backbuffer, finalTexture);
 }
 
 void FrameGraphRenderer::RenderHUD() {
@@ -615,56 +636,11 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     if (!geom->vb || !geom->ib)
         return false;
 
-    ID3D11Buffer* d3dVB = geom->vb;
-    ID3D11Buffer* d3dIB = geom->ib;
+    nvrhi::BufferHandle nvrhiVB = geom->vb;
+    nvrhi::BufferHandle nvrhiIB = geom->ib;
 
-    nvrhi::BufferHandle nvrhiVB;
-    auto vbIt = m_bufferHandleCache.find(d3dVB);
-    if (vbIt != m_bufferHandleCache.end()) {
-        nvrhiVB = vbIt->second;
-    } else {
-        D3D11_BUFFER_DESC d3dVBDesc;
-        d3dVB->GetDesc(&d3dVBDesc);
-
-        nvrhi::BufferDesc vbDesc;
-        vbDesc.debugName = "Shared_VB";
-        vbDesc.byteSize = d3dVBDesc.ByteWidth;
-        vbDesc.isVertexBuffer = true;
-        vbDesc.keepInitialState = true;
-        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-
-        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
-
-        if (!nvrhiVB)
-            return false;
-
-        m_bufferHandleCache[d3dVB] = nvrhiVB;
-    }
-
-    nvrhi::BufferHandle nvrhiIB;
-    auto ibIt = m_bufferHandleCache.find(d3dIB);
-    if (ibIt != m_bufferHandleCache.end()) {
-        nvrhiIB = ibIt->second;
-    } else {
-        D3D11_BUFFER_DESC d3dIBDesc;
-        d3dIB->GetDesc(&d3dIBDesc);
-
-        nvrhi::BufferDesc ibDesc;
-        ibDesc.debugName = "Shared_IB";
-        ibDesc.byteSize = d3dIBDesc.ByteWidth;
-        ibDesc.isIndexBuffer = true;
-        ibDesc.keepInitialState = true;
-        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-
-        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
-
-        if (!nvrhiIB)
-            return false;
-
-        m_bufferHandleCache[d3dIB] = nvrhiIB;
-    }
+    if (!nvrhiVB || !nvrhiIB)
+        return false;
 
     GeometryBatch batch;
 
@@ -706,8 +682,8 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     }
 
     if (!nvrhiVB || !nvrhiIB) {
-        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p, D3DVB=%p, D3DIB=%p",
-            nvrhiVB.Get(), nvrhiIB.Get(), d3dVB, d3dIB);
+        Msg("! [ProcessVisualGeometry] ERROR: Created batch with null buffers! VB=%p, IB=%p",
+            nvrhiVB.Get(), nvrhiIB.Get());
         return false;
     }
 
@@ -772,56 +748,11 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     if (!geom->vb || !geom->ib)
         return false;
 
-    ID3D11Buffer* d3dVB = geom->vb;
-    ID3D11Buffer* d3dIB = geom->ib;
+    nvrhi::BufferHandle nvrhiVB = geom->vb;
+    nvrhi::BufferHandle nvrhiIB = geom->ib;
 
-    nvrhi::BufferHandle nvrhiVB;
-    auto vbIt = m_bufferHandleCache.find(d3dVB);
-    if (vbIt != m_bufferHandleCache.end()) {
-        nvrhiVB = vbIt->second;
-    } else {
-        D3D11_BUFFER_DESC d3dVBDesc;
-        d3dVB->GetDesc(&d3dVBDesc);
-
-        nvrhi::BufferDesc vbDesc;
-        vbDesc.debugName = "HUD_VB";
-        vbDesc.byteSize = d3dVBDesc.ByteWidth;
-        vbDesc.isVertexBuffer = true;
-        vbDesc.keepInitialState = true;
-        vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-
-        nvrhiVB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dVB), vbDesc);
-
-        if (!nvrhiVB)
-            return false;
-
-        m_bufferHandleCache[d3dVB] = nvrhiVB;
-    }
-
-    nvrhi::BufferHandle nvrhiIB;
-    auto ibIt = m_bufferHandleCache.find(d3dIB);
-    if (ibIt != m_bufferHandleCache.end()) {
-        nvrhiIB = ibIt->second;
-    } else {
-        D3D11_BUFFER_DESC d3dIBDesc;
-        d3dIB->GetDesc(&d3dIBDesc);
-
-        nvrhi::BufferDesc ibDesc;
-        ibDesc.debugName = "HUD_IB";
-        ibDesc.byteSize = d3dIBDesc.ByteWidth;
-        ibDesc.isIndexBuffer = true;
-        ibDesc.keepInitialState = true;
-        ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-
-        nvrhiIB = m_device->GetNVRHIDevice()->createHandleForNativeBuffer(
-            nvrhi::ObjectTypes::D3D11_Buffer, nvrhi::Object(d3dIB), ibDesc);
-
-        if (!nvrhiIB)
-            return false;
-
-        m_bufferHandleCache[d3dIB] = nvrhiIB;
-    }
+    if (!nvrhiVB || !nvrhiIB)
+        return false;
 
     GeometryBatch batch;
     batch.vertexBuffer = nvrhiVB;

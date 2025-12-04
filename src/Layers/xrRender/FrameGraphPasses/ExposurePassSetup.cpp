@@ -2,6 +2,7 @@
 #include "ExposurePassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
@@ -131,6 +132,8 @@ static void InitializeExposureResources(ng::RenderDevice* device)
         cbDesc.isConstantBuffer = true;
         cbDesc.isVolatile = true;
         cbDesc.maxVersions = 16;
+        cbDesc.keepInitialState = true;
+        cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         s_histogram_cb = nvDevice->createBuffer(cbDesc);
     }
@@ -142,6 +145,8 @@ static void InitializeExposureResources(ng::RenderDevice* device)
         cbDesc.isConstantBuffer = true;
         cbDesc.isVolatile = true;
         cbDesc.maxVersions = 16;
+        cbDesc.keepInitialState = true;
+        cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         s_adapt_cb = nvDevice->createBuffer(cbDesc);
     }
@@ -162,6 +167,8 @@ static void InitializeExposureResources(ng::RenderDevice* device)
     }
 
     if (s_compute_enabled) {
+        auto& cache = framegraph::GetPassResourceCache();
+
         {
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Compute;
@@ -170,13 +177,13 @@ static void InitializeExposureResources(ng::RenderDevice* device)
                 nvrhi::BindingLayoutItem::Texture_SRV(0),
                 nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0)
             };
-            s_histogram_layout = nvDevice->createBindingLayout(layoutDesc);
+            s_histogram_layout = cache.GetOrCreateBindingLayout("ExposurePass_Histogram", layoutDesc, nvDevice);
 
             if (s_histogram_layout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
                 pipeDesc.CS = s_histogram_cs->nvrhiShader;
                 pipeDesc.bindingLayouts = { s_histogram_layout };
-                s_histogram_pipeline = nvDevice->createComputePipeline(pipeDesc);
+                s_histogram_pipeline = cache.GetOrCreateComputePipeline("ExposurePass_Histogram", pipeDesc, nvDevice);
             }
         }
 
@@ -188,13 +195,13 @@ static void InitializeExposureResources(ng::RenderDevice* device)
                 nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
                 nvrhi::BindingLayoutItem::Texture_UAV(0)
             };
-            s_adapt_layout = nvDevice->createBindingLayout(layoutDesc);
+            s_adapt_layout = cache.GetOrCreateBindingLayout("ExposurePass_Adapt", layoutDesc, nvDevice);
 
             if (s_adapt_layout) {
                 nvrhi::ComputePipelineDesc pipeDesc;
                 pipeDesc.CS = s_adapt_cs->nvrhiShader;
                 pipeDesc.bindingLayouts = { s_adapt_layout };
-                s_adapt_pipeline = nvDevice->createComputePipeline(pipeDesc);
+                s_adapt_pipeline = cache.GetOrCreateComputePipeline("ExposurePass_Adapt", pipeDesc, nvDevice);
             }
         }
 

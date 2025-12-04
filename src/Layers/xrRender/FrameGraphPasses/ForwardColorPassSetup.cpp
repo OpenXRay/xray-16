@@ -310,6 +310,9 @@ void renderBindlessForward(
 {
     using namespace RENDER_NAMESPACE::bindless;
 
+    Msg("* [BindlessForward] Enter - config.valid=%d, geometry=%p, batchCount=%zu",
+        config.IsValid(), geometry, geometry ? geometry->GetBatches().size() : 0);
+
     if (!config.IsValid() || !geometry || geometry->GetBatches().empty())
         return;
 
@@ -322,6 +325,14 @@ void renderBindlessForward(
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+
+    auto nativeD3D12 = cmdList->getNativeObject(nvrhi::ObjectTypes::D3D12_GraphicsCommandList);
+    Msg("* [BindlessForward] NVRHI cmdList=%p, D3D12 cmdList=%p", cmdList, nativeD3D12.pointer);
+
+    if (!cmdList) {
+        Msg("! [BindlessForward] Command list is NULL!");
+        return;
+    }
 
     if (!s_bindlessInitialized) {
         auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -537,7 +548,11 @@ void renderBindlessForward(
 
     static u32 s_gpuDrivenDraws = 0;
 
+    Msg("* [BindlessForward] GPU culling check: UseGPUCulling=%d, UseMegaBuffers=%d",
+        config.UseGPUCulling(), config.UseMegaBuffers());
+
     if (!config.UseGPUCulling() || !config.UseMegaBuffers()) {
+        Msg("! [BindlessForward] Skipping - GPU culling or mega buffers not ready");
         cmdList->endMarker();
         return;
     }
@@ -545,6 +560,30 @@ void renderBindlessForward(
     cmdList->beginMarker("GPU-Driven Culled");
 
     const u32 visibleCount = config.totalObjectCount;
+    Msg("* [BindlessForward] Drawing %u objects via indirect draw", visibleCount);
+
+    Msg("* [BindlessForward] State validation:");
+    Msg("*   pipeline=%p, framebuffer=%p, bindingSet=%p",
+        s_bindlessPipeline, framebuffer, bindingSet);
+    Msg("*   megaVB=%p, megaIB=%p, compactDrawArgs=%p",
+        config.megaVertexBuffer, config.megaIndexBuffer, config.compactDrawArgsBuffer);
+    Msg("*   perDrawCB=%p, staticGlobalsCB=%p", perDrawCB.Get(), staticGlobalsCB.Get());
+
+    if (!s_bindlessPipeline) {
+        Msg("! [BindlessForward] Pipeline is NULL - cannot draw!");
+        cmdList->endMarker();
+        return;
+    }
+    if (!framebuffer) {
+        Msg("! [BindlessForward] Framebuffer is NULL - cannot draw!");
+        cmdList->endMarker();
+        return;
+    }
+    if (!bindingSet) {
+        Msg("! [BindlessForward] BindingSet is NULL - cannot draw!");
+        cmdList->endMarker();
+        return;
+    }
 
     constexpr u32 INDIRECT_ARGS_SIZE = 20;
 
@@ -557,6 +596,25 @@ void renderBindlessForward(
     state.indirectParams = config.compactDrawArgsBuffer;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+
+    Msg("* [BindlessForward] Entering draw loop for %u objects...", visibleCount);
+
+    {
+        struct DrawIndexConstant {
+            u32 drawIndex;
+            u32 padding[3];
+        } testDrawData = {0, {0,0,0}};
+        cmdList->writeBuffer(perDrawCB, &testDrawData, sizeof(testDrawData));
+        cmdList->setGraphicsState(state);
+
+        nvrhi::DrawArguments testArgs;
+        testArgs.vertexCount = 3;
+        testArgs.instanceCount = 1;
+        testArgs.startVertexLocation = 0;
+        testArgs.startInstanceLocation = 0;
+        cmdList->draw(testArgs);
+        Msg("* [BindlessForward] TEST: Issued simple draw(3 vertices)");
+    }
 
     for (u32 i = 0; i < visibleCount; i++) {
         struct DrawIndexConstant {
@@ -573,6 +631,7 @@ void renderBindlessForward(
     }
 
     s_gpuDrivenDraws += visibleCount;
+    Msg("* [BindlessForward] Draw loop complete - %u indirect draws issued", visibleCount);
     cmdList->endMarker();
     cmdList->endMarker();
 }
@@ -633,14 +692,26 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             const FrameGraph& fg,
             ng::RenderContext* ctx) {
 
+                Msg("* [ForwardColorPass] Execute started");
+
                 auto* depthRT = fg.GetPhysicalTexture(data.depth);
                 auto* colorRT = fg.GetPhysicalTexture(data.color);
 
                 if (!depthRT || !colorRT) {
+                    Msg("! [ForwardColorPass] Missing RT: depth=%p, color=%p", depthRT, colorRT);
                     return;
                 }
 
-                if (!data.geometry || data.geometry->GetBatches().empty()) {
+                if (!data.geometry) {
+                    Msg("! [ForwardColorPass] No geometry collector");
+                    return;
+                }
+
+                const auto& batches = data.geometry->GetBatches();
+                Msg("* [ForwardColorPass] Batch count: %zu", batches.size());
+
+                if (batches.empty()) {
+                    Msg("! [ForwardColorPass] No batches to render");
                     return;
                 }
 
@@ -650,6 +721,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 }
 
                 if (data.bindlessConfig.IsValid()) {
+                    Msg("* [ForwardColorPass] Using BINDLESS path (totalObjects=%u)", data.bindlessConfig.totalObjectCount);
                     renderBindlessForward(
                         ctx,
                         data.device,
@@ -662,6 +734,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                     return;
                 }
 
+                Msg("* [ForwardColorPass] Using STANDARD path");
                 renderForwardGeometry(
                     ctx,
                     data.device,

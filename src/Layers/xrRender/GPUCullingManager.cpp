@@ -174,7 +174,7 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         m_drawArgsBuffer = nvDevice->createBuffer(desc);
         if (!m_drawArgsBuffer) {
@@ -276,7 +276,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         m_compactDrawArgsBuffer = nvDevice->createBuffer(desc);
         if (!m_compactDrawArgsBuffer) {
@@ -292,7 +292,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.structStride = sizeof(u32);
         desc.canHaveUAVs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         m_compactBatchIndicesBuffer = nvDevice->createBuffer(desc);
         if (!m_compactBatchIndicesBuffer) {
@@ -323,7 +323,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         desc.structStride = sizeof(u32);
         desc.canHaveUAVs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         m_compactMaterialIDBuffer = nvDevice->createBuffer(desc);
         if (!m_compactMaterialIDBuffer) {
@@ -819,7 +819,7 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
         desc.structStride = sizeof(CullDebugData);
         desc.canHaveUAVs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         m_debugBuffer = nvDevice->createBuffer(desc);
         if (!m_debugBuffer) {
@@ -1208,7 +1208,7 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
         desc.canHaveRawViews = true;
         desc.isDrawIndirectArgs = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
+        desc.keepInitialState = true;
 
         m_particleDrawArgsBuffer = nvDevice->createBuffer(desc);
         if (!m_particleDrawArgsBuffer) {

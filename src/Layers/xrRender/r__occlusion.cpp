@@ -9,6 +9,14 @@ R_occlusion::~R_occlusion(void) { occq_destroy(); }
 void R_occlusion::occq_create(u32 limit)
 {
     ZoneScoped;
+
+    if (GEnv.Backend && GEnv.Backend->IsInitialized())
+    {
+        enabled = false;
+        Msg("* [R_occlusion] Disabled - using GPU culling instead");
+        return;
+    }
+
     enabled = strstr(Core.Params, "-no_occq") ? false : true;
     pool.reserve(limit);
     used.reserve(limit);

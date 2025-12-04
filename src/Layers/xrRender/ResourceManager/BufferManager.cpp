@@ -17,9 +17,11 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
     desc.byteSize = size;
     desc.structStride = 0;
     desc.debugName = debugName;
-    desc.isConstantBuffer = true;
-    desc.isVolatile = true;
+    desc.isConstantBuffer = false;
     desc.cpuAccess = nvrhi::CpuAccessMode::Write;
+    desc.isVolatile = false;
+    desc.keepInitialState = true;
+    desc.initialState = nvrhi::ResourceStates::CopySource;
 
     m_buffer = m_device->GetNativeDevice()->createBuffer(desc);
 
@@ -29,6 +31,12 @@ RingBuffer::RingBuffer(xray::render::ng::RenderDevice* device, u64 size, const c
     }
 
     m_cpuAddress = m_device->GetNativeDevice()->mapBuffer(m_buffer, nvrhi::CpuAccessMode::Write);
+
+    if (!m_cpuAddress) {
+        Msg("! [RingBuffer] ❌ Failed to map buffer: %s", debugName);
+        m_buffer = nullptr;
+        return;
+    }
 
 }
 

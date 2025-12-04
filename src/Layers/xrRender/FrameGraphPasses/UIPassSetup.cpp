@@ -246,6 +246,8 @@ framegraph::VirtualResourceHandle setupTextPass(
                 vbDesc.debugName = "TextPass Vertex Buffer";
                 vbDesc.isVertexBuffer = true;
                 vbDesc.isVolatile = true;
+                vbDesc.keepInitialState = true;
+                vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
                 s_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
                 xr_vector<u16> quadIndices;
@@ -264,6 +266,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ibDesc.byteSize = MAX_TEXT_INDICES * sizeof(u16);
                 ibDesc.debugName = "TextPass Index Buffer";
                 ibDesc.isIndexBuffer = true;
+                ibDesc.keepInitialState = true;
                 ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
                 s_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
                 cmdList->writeBuffer(s_indexBuffer, quadIndices.data(), quadIndices.size() * sizeof(u16));
@@ -273,6 +276,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 cbDesc.isConstantBuffer = true;
                 cbDesc.debugName = "TextPass screen_res CB";
                 cbDesc.isVolatile = true;
+                cbDesc.keepInitialState = true;
                 cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
                 s_constantBuffer = nvrhiDevice->createBuffer(cbDesc);
 

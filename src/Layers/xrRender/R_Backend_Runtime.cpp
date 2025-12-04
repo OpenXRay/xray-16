@@ -14,9 +14,6 @@ void CBackend::OnFrameEnd()
 {
     if (!GEnv.isDedicatedServer)
     {
-#if defined(USE_DX11)
-        HW.get_context(CHW::IMM_CTX_ID)->ClearState();
-#endif
         Invalidate();
     }
 }
@@ -49,8 +46,8 @@ void CBackend::Invalidate()
 #endif
 
     decl = nullptr;
-    vb = 0;
-    ib = 0;
+    vb = nullptr;
+    ib = nullptr;
     vb_stride = 0;
 
     state = nullptr;
@@ -495,12 +492,7 @@ void CBackend::OnDeviceCreate()
 {
     ZoneScoped;
 
-#if defined(USE_DX11)
-    HW.get_context(context_id)->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&pAnnotation));
-#endif
-
     // Debug Draw
-    InitializeDebugDraw();
 
     // invalidate caching
     Invalidate();

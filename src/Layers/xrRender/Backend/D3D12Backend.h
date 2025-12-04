@@ -5,7 +5,6 @@
 
 struct ID3D12Device;
 struct ID3D12CommandQueue;
-struct ID3D12Fence;
 struct IDXGISwapChain3;
 struct IDXGIFactory4;
 struct IDXGIAdapter1;
@@ -17,13 +16,14 @@ public:
     ~D3D12Backend() override;
 
     bool Initialize(SDL_Window* window, u32 width, u32 height, bool enableValidation = false);
-    void Shutdown();
+    void Shutdown() override;
 
     API GetAPI() const override { return API::D3D12; }
     pcstr GetAPIName() const override { return "D3D12"; }
 
     bool IsInitialized() const override { return m_initialized; }
     void WaitForIdle() override;
+    DeviceState GetDeviceState() const override;
 
     nvrhi::IDevice* GetDevice() const override { return m_nvrhiDevice.Get(); }
     nvrhi::ICommandList* GetCommandList() const override { return m_commandList.Get(); }
@@ -69,11 +69,9 @@ private:
     bool CreateDevice();
     bool CreateCommandQueue();
     bool CreateSwapChain(HWND hwnd, u32 width, u32 height);
-    bool CreateFence();
     void CreateBackBufferTextures();
     void CreateBindlessResources();
     void QueryCapabilities();
-    void WaitForFence(u64 fenceValue);
 
     IDXGIFactory4* m_dxgiFactory = nullptr;
     IDXGIAdapter1* m_adapter = nullptr;
@@ -81,10 +79,6 @@ private:
 
     ID3D12Device* m_d3d12Device = nullptr;
     ID3D12CommandQueue* m_commandQueue = nullptr;
-    ID3D12Fence* m_fence = nullptr;
-    void* m_fenceEvent = nullptr;
-    u64 m_fenceValues[BACK_BUFFER_COUNT] = {};
-    u64 m_currentFenceValue = 0;
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::CommandListHandle m_commandList;

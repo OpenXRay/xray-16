@@ -55,6 +55,8 @@ struct GeometryBatch {
     RENDER_NAMESPACE::MeshAllocation megaBufferAlloc;
 
     bool IsAlphaTested() const {
+        if (!visual || !visual->shader)
+            return false;
         RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
         if (elem) {
             return elem->flags.bAlphaTest != 0;
@@ -63,6 +65,8 @@ struct GeometryBatch {
     }
 
     bool IsStrictB2F() const {
+        if (!visual || !visual->shader)
+            return false;
         RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
         if (elem) {
             return elem->flags.bStrictB2F != 0;

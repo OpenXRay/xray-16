@@ -5,12 +5,12 @@
 namespace xray::render::ng {
 
 RenderContext::RenderContext(RenderDevice* device,
-                             nvrhi::ICommandList* commandList)
+                             nvrhi::CommandListHandle commandList)
     : m_device(device)
     , m_commandList(commandList)
 {
     VERIFY(m_device != nullptr);
-    VERIFY(m_commandList != nullptr);
+    VERIFY(m_commandList);
 
 }
 

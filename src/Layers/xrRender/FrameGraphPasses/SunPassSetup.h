@@ -26,4 +26,8 @@ framegraph::VirtualResourceHandle setupSunPass(
     u32 height
 );
 
+void InitializeSunPass(ng::RenderDevice* device);
+
+void ShutdownSunPass();
+
 }

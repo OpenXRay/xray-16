@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrEngine/Engine.h"
+#include "xrEngine/IRenderBackend.h"
 #include "xrCDB/Frustum.h"
 #include "xrCDB/ISpatial.h"
 #include "vis_common.h"
@@ -121,13 +122,6 @@ struct xrImTextureData
 {
     ImTextureID texture{};
     Fvector2 size{};
-};
-
-enum class DeviceState
-{
-    Normal = 0,
-    Lost,
-    NeedReset
 };
 
 class ENGINE_API IRender

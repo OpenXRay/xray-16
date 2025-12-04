@@ -3,6 +3,7 @@
 #include "ShaderConstants.h"
 #include "ExposurePassSetup.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
+#include "Layers/xrRender/FrameGraph/PassResourceCache.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -67,6 +68,7 @@ struct SkyVertex {
 
 static nvrhi::BufferHandle s_skyVertexBuffer;
 static nvrhi::BufferHandle s_skyIndexBuffer;
+static nvrhi::TextureHandle s_placeholderCubemap;
 static bool s_skyGeometryInitialized = false;
 
 void InitializeSkyGeometry(ng::RenderDevice* device) {
@@ -93,9 +95,26 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
 
     s_skyIndexBuffer = nvrhiDevice->createBuffer(ibDesc);
 
+    nvrhi::TextureDesc placeholderDesc;
+    placeholderDesc.width = 1;
+    placeholderDesc.height = 1;
+    placeholderDesc.format = nvrhi::Format::RGBA8_UNORM;
+    placeholderDesc.dimension = nvrhi::TextureDimension::TextureCube;
+    placeholderDesc.arraySize = 6;
+    placeholderDesc.debugName = "PlaceholderSkyCubemap";
+    placeholderDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+    placeholderDesc.keepInitialState = true;
+    s_placeholderCubemap = nvrhiDevice->createTexture(placeholderDesc);
+
     nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
     cmdList->open();
     cmdList->writeBuffer(s_skyIndexBuffer, hbox_faces, sizeof(hbox_faces));
+
+    u32 skyBlue = 0xFF8080FF;
+    for (u32 face = 0; face < 6; face++) {
+        cmdList->writeTexture(s_placeholderCubemap, face, 0, &skyBlue, sizeof(skyBlue));
+    }
+
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 
@@ -106,6 +125,7 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
 void ShutdownSkyGeometry() {
     s_skyVertexBuffer = nullptr;
     s_skyIndexBuffer = nullptr;
+    s_placeholderCubemap = nullptr;
     s_skyGeometryInitialized = false;
 }
 
@@ -211,6 +231,9 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 }
             }
 
+            auto& cache = framegraph::GetPassResourceCache();
+            nvrhi::IDevice* device = cmdList->getDevice();
+
             nvrhi::BindingLayoutDesc bindingLayoutDesc;
             bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
             bindingLayoutDesc.bindings = {
@@ -221,7 +244,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 nvrhi::BindingLayoutItem::Sampler(0)
             };
 
-            auto bindingLayout = cmdList->getDevice()->createBindingLayout(bindingLayoutDesc);
+            auto bindingLayout = cache.GetOrCreateBindingLayout("SkyPass", bindingLayoutDesc, device);
 
             nvrhi::RenderState renderState;
             renderState.blendState.targets[0].setBlendEnable(false);
@@ -248,7 +271,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
                     .setElementStride(sizeof(SkyVertex)),
             };
 
-            auto inputLayout = cmdList->getDevice()->createInputLayout(vertexAttribs, 3, vsResult.handle);
+            auto inputLayout = cache.GetOrCreateInputLayout("SkyPass", vertexAttribs, 3, vsResult.handle, device);
 
             nvrhi::GraphicsPipelineDesc pipelineDesc;
             pipelineDesc.setVertexShader(vsResult.handle);
@@ -261,7 +284,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
             nvrhi::FramebufferInfoEx fbInfo;
             fbInfo.addColorFormat(colorRT->getDesc().format);
 
-            auto pipeline = cmdList->getDevice()->createGraphicsPipeline(pipelineDesc, fbInfo);
+            auto pipeline = cache.GetOrCreatePipeline("SkyPass", pipelineDesc, fbInfo, device);
 
             if (!pipeline) {
                 Msg("! [SkyPass] Failed to create pipeline");
@@ -276,6 +299,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
             cbDesc.byteSize = sizeof(DynamicTransforms);
             cbDesc.isConstantBuffer = true;
             cbDesc.debugName = "SkyDynamicTransforms";
+            cbDesc.isVolatile = true;
+            cbDesc.maxVersions = 16;
             auto dynamicCBBuffer = cmdList->getDevice()->createBuffer(cbDesc);
             cmdList->writeBuffer(dynamicCBBuffer, &dynamicCB, sizeof(dynamicCB));
 
@@ -311,32 +336,13 @@ framegraph::VirtualResourceHandle setupSkyPass(
                 }
             }
 
-            nvrhi::TextureHandle placeholderTex;
-            if (!sky0Tex || !sky1Tex) {
-                nvrhi::TextureDesc placeholderDesc;
-                placeholderDesc.width = 1;
-                placeholderDesc.height = 1;
-                placeholderDesc.format = nvrhi::Format::RGBA8_UNORM;
-                placeholderDesc.dimension = nvrhi::TextureDimension::TextureCube;
-                placeholderDesc.arraySize = 6;
-                placeholderDesc.debugName = "PlaceholderSkyCubemap";
-                placeholderDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-                placeholderDesc.keepInitialState = true;
-
-                placeholderTex = cmdList->getDevice()->createTexture(placeholderDesc);
-                u32 skyBlue = 0xFF8080FF;
-                for (u32 face = 0; face < 6; face++) {
-                    cmdList->writeTexture(placeholderTex, face, 0, &skyBlue, sizeof(skyBlue));
-                }
-
-                if (!sky0Tex) sky0Tex = placeholderTex.Get();
-                if (!sky1Tex) sky1Tex = placeholderTex.Get();
-            }
+            if (!sky0Tex) sky0Tex = s_placeholderCubemap.Get();
+            if (!sky1Tex) sky1Tex = s_placeholderCubemap.Get();
 
             nvrhi::SamplerDesc samplerDesc;
             samplerDesc.setAllFilters(true);
             samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
-            auto sampler = cmdList->getDevice()->createSampler(samplerDesc);
+            auto sampler = cache.GetOrCreateSampler("SkyPass", samplerDesc, device);
 
             nvrhi::BindingSetDesc bindingSetDesc;
             bindingSetDesc.bindings = {
@@ -353,7 +359,7 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             nvrhi::FramebufferDesc fbDesc;
             fbDesc.addColorAttachment(colorRT);
-            auto framebuffer = cmdList->getDevice()->createFramebuffer(fbDesc);
+            auto framebuffer = cache.GetOrCreateFramebuffer("SkyPass", fbDesc, device);
 
             nvrhi::Viewport viewport;
             viewport.minX = 0;

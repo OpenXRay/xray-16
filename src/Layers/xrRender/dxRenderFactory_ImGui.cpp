@@ -2,6 +2,7 @@
 #include "dxRenderFactory.h"
 #include "dxImGuiRender.h"
 #include "ImGuiRendererNVRHI.h"
+#include "RenderContext/RenderDevice.h"
 
 namespace xray::render {
     IImGuiRender* GetImGuiRenderer();
@@ -19,7 +20,14 @@ IImGuiRender* dxRenderFactory::CreateImGuiRender()
         return existingRenderer;
     }
 
-    Msg("* ImGui: Creating legacy DX11 renderer");
+    auto& render = RImplementation;
+    if (render.m_renderDevice)
+    {
+        Msg("* ImGui: Creating NVRHI renderer");
+        return xr_new<xray::render::ng::ImGuiRendererNVRHI>(render.m_renderDevice);
+    }
+
+    Msg("! ImGui: No RenderDevice available, falling back to legacy DX11 renderer");
     return xr_new<dxImGuiRender>();
 }
 

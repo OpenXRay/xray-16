@@ -241,7 +241,7 @@ TextureHandle TextureManager::CreateTexture(
     nvrhiDesc.format = desc.format;
     nvrhiDesc.debugName = desc.debugName.c_str();
     nvrhiDesc.initialState = nvrhi::ResourceStates::Common;
-    nvrhiDesc.keepInitialState = false;
+    nvrhiDesc.keepInitialState = true;
 
     switch (desc.type) {
         case TextureDesc::Texture1D:

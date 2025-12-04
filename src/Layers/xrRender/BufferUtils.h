@@ -22,18 +22,12 @@ void ConvertVertexDeclaration(const VertexElement* dxdecl, SDeclaration* decl);
 void ConvertVertexDeclaration(const xr_vector<VertexElement>& declIn, xr_vector<InputElementDesc>& declOut);
 
 #ifdef USE_OGL
-void SetGLVertexPointer(SDeclaration* decl, u32 baseOffset = 0);
-#   ifdef XR_PLATFORM_WEB
-GLuint GetVertexArray(SDeclaration* decl, u32 baseVertex);
-bool IsStreamVertexBuffer(GLuint buffer);
-void ForgetVertexArrays(GLuint buffer);
-void ForgetVertexArrays(const SDeclaration* decl);
-#   endif
+void SetGLVertexPointer(SDeclaration* decl);
 #endif
 
 namespace BufferUtils
 {
-HRESULT CreateConstantBuffer(ConstantBufferHandle* ppBuffer, u32 DataSize);
+ConstantBufferHandle CreateConstantBuffer(u32 DataSize);
 };
 
 /**
@@ -92,6 +86,8 @@ public:
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
 
+    operator bool() const { return IsValid(); }
+
     size_t GetSystemMemoryUsage() const;
     size_t GetVideoMemoryUsage() const;
 
@@ -145,6 +141,8 @@ public:
         return other.m_DeviceBuffer == m_DeviceBuffer;
     }
 
+    operator bool() const { return IsValid(); }
+
     size_t GetSystemMemoryUsage() const;
     size_t GetVideoMemoryUsage() const;
 
@@ -177,9 +175,6 @@ public:
 
     void* Map(size_t offset, size_t size, bool flush = false);
     void Unmap();
-#ifdef XR_PLATFORM_WEB
-    void Unmap(size_t writtenSize);
-#endif
     bool IsValid() const;
 
     void AddRef()
@@ -208,11 +203,11 @@ private:
 
     VertexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
-#ifdef XR_PLATFORM_WEB
-    xr_vector<u8> m_HostBuffer;
+
+    void* m_MappedData{};
     size_t m_MappedOffset{};
     size_t m_MappedSize{};
-#endif
+    bool m_MappedFlush{};
 };
 
 class IndexStreamBuffer
@@ -224,9 +219,6 @@ public:
 
     void* Map(size_t offset, size_t size, bool flush = false);
     void Unmap();
-#ifdef XR_PLATFORM_WEB
-    void Unmap(size_t writtenSize);
-#endif
     bool IsValid() const;
 
     void AddRef()
@@ -255,10 +247,10 @@ private:
 
     IndexBufferHandle m_DeviceBuffer{};
     u32 m_RefCounter{};
-#ifdef XR_PLATFORM_WEB
-    xr_vector<u8> m_HostBuffer;
+
+    void* m_MappedData{};
     size_t m_MappedOffset{};
     size_t m_MappedSize{};
-#endif
+    bool m_MappedFlush{};
 };
 } // namespace xray::render::RENDER_NAMESPACE
