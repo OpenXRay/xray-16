@@ -2,10 +2,11 @@
 
 #include "ResourceHandle.h"
 #include "PipelineState.h"
-#include "../Backend/RenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
 // Forward declarations
+class IRenderBackend;
+
 namespace xray::render::resources {
     class FGResourceManager;
 }

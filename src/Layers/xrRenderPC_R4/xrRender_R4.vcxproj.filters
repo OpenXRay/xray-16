@@ -759,7 +759,6 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\utils\xrLC_Light\R_light.h" />
     <ClInclude Include="..\xrRender\ResourceManager\DDSLoader.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
@@ -925,6 +924,8 @@
     <ClInclude Include="..\xrRender\Backend\D3D11Backend.h" />
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
     <ClInclude Include="..\xrRender\Backend\RenderBackend.h" />
+    <ClInclude Include="..\utils\xrLC_Light\R_light.h" />
+    <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1697,6 +1698,7 @@
     <ClCompile Include="..\xrRender\Backend\D3D11Backend.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
     <ClCompile Include="..\xrRender\Backend\RenderBackend.cpp" />
+    <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

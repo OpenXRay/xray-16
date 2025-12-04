@@ -17,9 +17,7 @@ void CResourceManager::reset_begin()
     for (SState* sstate : v_states)
         _RELEASE(sstate->state);
 
-    // destroy RTs
-    for (auto& rt_pair : m_rtargets)
-        rt_pair.second->reset_begin();
+    // destroy RTs - stubbed, FrameGraph handles render targets
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
     //  DX10 cut        rtc_it->second->reset_begin();
 
@@ -31,7 +29,6 @@ void CResourceManager::reset_begin()
     RImplementation.Vertex.reset_begin();
 }
 
-bool cmp_rt(const CRT* A, const CRT* B) { return A->_order < B->_order; }
 //  DX10 cut bool   cmp_rtc (const CRTC* A,const CRTC* B)   { return A->_order < B->_order; }
 
 void CResourceManager::reset_end()
@@ -65,27 +62,7 @@ void CResourceManager::reset_end()
         }
     }
 
-    // create RTs in the same order as them was first created
-    {
-        // RT
-        const size_t buffer_size = m_rtargets.size() * sizeof(CRT*);
-        buffer_vector<CRT*> sorted_rts(xr_alloca(buffer_size), m_rtargets.size());
-        for (auto& rt_pair : m_rtargets)
-            sorted_rts.push_back(rt_pair.second);
-
-        std::sort(sorted_rts.begin(), sorted_rts.end(), cmp_rt);
-
-        for (CRT* rt : sorted_rts)
-            rt->reset_end();
-    }
-    {
-        // RTc
-    //DX10 cut		const size_t buffer_size = m_rtargets_c.size() * sizeof(CRTC*);
-    //DX10 cut		buffer_vector<CRTC*> sorted_rtcs(xr_alloca(buffer_size), m_rtargets_c.size());
-    //DX10 cut		for (map_RTCIt rt_it=m_rtargets_c.begin(); rt_it!=m_rtargets_c.end(); rt_it++)	sorted_rtcs.push_back(rt_it->second);
-    //DX10 cut		std::sort(sorted_rtcs.begin(),sorted_rtcs.end(),cmp_rtc);
-    //DX10 cut		for (u32 _it=0; _it<sorted_rtcs.size(); _it++)	sorted_rtcs[_it]->reset_end	();
-    }
+    // create RTs - stubbed, FrameGraph handles render targets
 
     // create state-blocks
     for (SState* sstate : v_states)

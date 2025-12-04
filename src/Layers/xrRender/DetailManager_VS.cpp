@@ -115,9 +115,10 @@ void CDetailManager::hw_Load_Geom()
     using namespace detail_manager;
 
     // Analyze batch-size
-    hw_BatchSize = (u32(HW.Caps.geometry.dwRegisters) - c_hdr) / c_size;
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    hw_BatchSize = (caps.geometry.dwRegisters - c_hdr) / c_size;
     clamp<size_t>(hw_BatchSize, 0, 64);
-    Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", u32(HW.Caps.geometry.dwRegisters), hw_BatchSize);
+    Msg("* [DETAILS] VertexConsts(%u), Batch(%zu)", caps.geometry.dwRegisters, hw_BatchSize);
 
     // Pre-process objects
     u32 dwVerts = 0;

@@ -125,10 +125,10 @@ void R_constants::flush_cache()
             u32		count		= F.r_hi()-F.r_lo();
             if (count)			{
 #ifdef DEBUG
-                if (F.r_hi() > HW.Caps.geometry.dwRegisters)
+                if (F.r_hi() > GEnv.Backend->GetCapabilities().geometry.dwRegisters)
                 {
                     xrDebug::Fatal(DEBUG_INFO,"Internal error setting VS-constants: overflow\nregs[%d],hi[%d]",
-                        HW.Caps.geometry.dwRegisters,F.r_hi()
+                        GEnv.Backend->GetCapabilities().geometry.dwRegisters,F.r_hi()
                         );
                 }
                 PGO		(Msg("PGO:V_CONST:%d",count));

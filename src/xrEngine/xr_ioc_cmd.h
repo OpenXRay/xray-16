@@ -29,7 +29,6 @@
 #include "xrCore/xr_token.h"
 
 extern ENGINE_API bool renderer_allow_override; // allows to change renderer setting
-extern ENGINE_API int ps_r4_use_framegraph;
 extern ENGINE_API int ps_r4_use_pbr;  // Phase 2.5: Enable PBR texture conversion and rendering
 
 class ENGINE_API IConsole_Command

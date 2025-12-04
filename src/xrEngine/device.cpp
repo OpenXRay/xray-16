@@ -33,8 +33,6 @@ ref_light precache_light = 0;
 
 using namespace xray;
 
-extern ENGINE_API int ps_r4_use_framegraph;
-
 bool CRenderDevice::RenderBegin()
 {
     if (GEnv.isDedicatedServer)
@@ -239,26 +237,9 @@ void CRenderDevice::DoRender()
     renderTotalReal.Begin();
     if (b_is_Active && RenderBegin())
     {
-        if (ps_r4_use_framegraph)
-        {
-            GEnv.FrameGraphRenderer->Render();
-        }
-        else
-        {
-            ZoneScopedN("Render process");
-            seqRender.Process(); // all rendering is done here
-        }
+        GEnv.FrameGraphRenderer->Render();
 
         CalcFrameStats();
-        //Statistic->Show();
-
-        // ImGui rendering is handled inline by FrameGraphRenderer when enabled
-        // Only render here for legacy path
-        if (!ps_r4_use_framegraph)
-        {
-            ImGui::Render();
-            m_imgui_render->Render(ImGui::GetDrawData());
-        }
 
         UpdateViewports();
 

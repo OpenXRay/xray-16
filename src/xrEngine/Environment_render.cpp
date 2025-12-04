@@ -16,34 +16,16 @@
 //-----------------------------------------------------------------------------
 // Environment render
 //-----------------------------------------------------------------------------
+// FrameGraph handles sky/clouds rendering directly
 
 void CEnvironment::RenderSky()
 {
-#ifndef _EDITOR
-    if (0 == g_pGameLevel)
-        return;
-#endif
-
-    // Skip vanilla environment renderer when FrameGraph is active
-    extern ENGINE_API int ps_r4_use_framegraph;
-    if (!ps_r4_use_framegraph)
-        m_pRender->RenderSky(*this);
+    // FrameGraph handles sky rendering
 }
 
 void CEnvironment::RenderClouds()
 {
-#ifndef _EDITOR
-    if (0 == g_pGameLevel)
-        return;
-#endif
-    // draw clouds
-    if (fis_zero(CurrentEnv.clouds_color.w, EPS_L))
-        return;
-
-    // Skip vanilla environment renderer when FrameGraph is active
-    extern ENGINE_API int ps_r4_use_framegraph;
-    if (!ps_r4_use_framegraph)
-        m_pRender->RenderClouds(*this);
+    // FrameGraph handles clouds rendering
 }
 
 void CEnvironment::RenderFlares()
@@ -69,11 +51,6 @@ void CEnvironment::RenderLast()
 
 void CEnvironment::OnDeviceCreate()
 {
-    // Skip vanilla environment renderer when FrameGraph is active
-    extern ENGINE_API int ps_r4_use_framegraph;
-    if (!ps_r4_use_framegraph)
-        m_pRender->OnDeviceCreate();
-
     // weathers
     for (auto& cycle : WeatherCycles)
     {
@@ -94,11 +71,6 @@ void CEnvironment::OnDeviceCreate()
 
 void CEnvironment::OnDeviceDestroy()
 {
-    // Skip vanilla environment renderer when FrameGraph is active
-    extern ENGINE_API int ps_r4_use_framegraph;
-    if (!ps_r4_use_framegraph)
-        m_pRender->OnDeviceDestroy();
-
     // weathers
     for (auto& cycle : WeatherCycles)
     {

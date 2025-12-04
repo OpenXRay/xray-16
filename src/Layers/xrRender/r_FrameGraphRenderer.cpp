@@ -862,50 +862,10 @@ void FrameGraphRenderer::PresentToBackbuffer() {
         return;
     }
 
-    // Get game backbuffer from RenderTarget system
-    ID3D11RenderTargetView* backbufferRTV = RImplementation.Target->get_base_rt();
-    if (!backbufferRTV) {
-        Msg("! [FrameGraphRenderer] Failed to get game backbuffer RTV");
-        return;
-    }
-
-    // Extract D3D11 texture from RTV
-    ID3D11Resource* d3dBackbufferResource = nullptr;
-    backbufferRTV->GetResource(&d3dBackbufferResource);
-    if (!d3dBackbufferResource) {
-        Msg("! [FrameGraphRenderer] Failed to get backbuffer resource");
-        return;
-    }
-
-    ID3D11Texture2D* d3dBackbufferTex = nullptr;
-    HRESULT hr = d3dBackbufferResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&d3dBackbufferTex);
-    d3dBackbufferResource->Release();
-
-    if (FAILED(hr) || !d3dBackbufferTex) {
-        Msg("! [FrameGraphRenderer] Backbuffer is not a 2D texture");
-        return;
-    }
-
-    // Wrap D3D11 texture as NVRHI texture
-    nvrhi::TextureDesc backbufferDesc;
-    D3D11_TEXTURE2D_DESC d3dDesc;
-    d3dBackbufferTex->GetDesc(&d3dDesc);
-
-    backbufferDesc.width = d3dDesc.Width;
-    backbufferDesc.height = d3dDesc.Height;
-    backbufferDesc.format = nvrhi::Format::RGBA8_UNORM; // Assume RGBA8 for backbuffer
-    backbufferDesc.isRenderTarget = true;
-    backbufferDesc.debugName = "GameBackbuffer";
-
-    nvrhi::TextureHandle backbufferHandle = m_device->GetNativeDevice()->createHandleForNativeTexture(
-        nvrhi::ObjectTypes::D3D11_Resource,
-        nvrhi::Object(d3dBackbufferTex),
-        backbufferDesc
-    );
-    d3dBackbufferTex->Release();
-
-    if (!backbufferHandle) {
-        Msg("! [FrameGraphRenderer] Failed to wrap backbuffer as NVRHI texture");
+    // Get backbuffer directly from NVRHI backend
+    nvrhi::ITexture* backbuffer = GEnv.Backend->GetBackBuffer();
+    if (!backbuffer) {
+        Msg("! [FrameGraphRenderer] Failed to get backbuffer from backend");
         return;
     }
 
@@ -913,14 +873,7 @@ void FrameGraphRenderer::PresentToBackbuffer() {
     ng::RenderContext* ctx = m_renderContext.get();
     VERIFY(ctx != nullptr);
 
-    // Copy texture (full mip 0 to mip 0)
-    ctx->CopyTexture(
-        backbufferHandle.Get(),  // dest
-        finalTexture            // src
-    );
-
-    // Msg("  [FrameGraphRenderer] Presented final output to game backbuffer (%ux%u)",
-    //     d3dDesc.Width, d3dDesc.Height);
+    ctx->CopyTexture(backbuffer, finalTexture);
 }
 
 // ═══════════════════════════════════════════════════════

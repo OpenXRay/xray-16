@@ -7,6 +7,7 @@
 #include "xrEngine/PerformanceAlert.hpp"
 
 #include "Layers/xrRender/NVRHI/NVRHIDevice.h"
+#include "Layers/xrRender/Backend/D3D11BackendWrapper.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
 
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
@@ -132,7 +133,7 @@ void D3DXRenderBase::ObtainRequiredWindowFlags(u32& windowFlags)
 
 void D3DXRenderBase::SetupStates()
 {
-    HW.Caps.Update();
+    GEnv.Backend->UpdateCapabilities();
 #if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
@@ -241,6 +242,22 @@ void D3DXRenderBase::Create(SDL_Window* hWnd, u32& dwWidth, u32& dwHeight, float
     {
         Msg("~ [CRender] NVRHI initialized - modern rendering path available");
     }
+
+    // Initialize Backend wrapper and set GEnv.Backend (required before SetupStates)
+    if (!render.m_backend)
+    {
+        auto* backendWrapper = xr_new<D3D11BackendWrapper>();
+        if (backendWrapper->Initialize(HW.pDevice, HW.get_context(CHW::IMM_CTX_ID)))
+        {
+            render.m_backend = backendWrapper;
+            GEnv.Backend = render.m_backend;
+        }
+        else
+        {
+            Msg("! [CRender] Backend wrapper initialization failed");
+            xr_delete(backendWrapper);
+        }
+    }
 #endif
 
     std::tie(dwWidth, dwHeight) = HW.GetSurfaceSize();
@@ -293,7 +310,7 @@ DeviceState D3DXRenderBase::GetDeviceState()
 
 bool D3DXRenderBase::GetForceGPU_REF()
 {
-    return HW.Caps.bForceGPU_REF;
+    return GEnv.Backend->GetCapabilities().bForceGPU_REF;
 }
 u32 D3DXRenderBase::GetCacheStatPolys()
 {
@@ -325,7 +342,7 @@ void D3DXRenderBase::Begin()
 #endif
     Vertex.Flush();
     Index.Flush();
-    if (HW.Caps.SceneMode)
+    if (GEnv.Backend->GetCapabilities().SceneMode)
         overdrawBegin();
 }
 
@@ -350,7 +367,7 @@ void D3DXRenderBase::End()
     }
 #endif
 
-    if (HW.Caps.SceneMode)
+    if (GEnv.Backend->GetCapabilities().SceneMode)
         overdrawEnd();
  #if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
@@ -393,7 +410,8 @@ void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 
 bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 {
-    u32 v_dev = CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor);
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
     u32 v_need = CAP_VERSION(2, 0);
     return v_dev >= v_need;
 }

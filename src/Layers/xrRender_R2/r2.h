@@ -20,6 +20,7 @@
 #include "Layers/xrRender/r_sun_cascades.h"
 
 #include "xrEngine/IRenderable.h"
+#include "xrEngine/IRenderBackend.h"
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
@@ -564,6 +565,9 @@ public:
     bool m_renderContextTestMode{ false };
     xray::render::ng::RenderContext* m_renderContext{ nullptr };
     xray::render::ng::RenderDevice* m_renderDevice{ nullptr };
+
+    // Modern render backend (replaces HW) - exposed via GEnv.Backend
+    IRenderBackend* m_backend{ nullptr };
 
     // FrameGraph Renderer (Phase 3)
     xray::render::FrameGraphRenderer* m_framegraphRenderer{ nullptr };

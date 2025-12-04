@@ -143,7 +143,7 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
     case SE_R1_NORMAL_HQ:
     case SE_R1_NORMAL_LQ:
     {
-        switch (HW.Caps.raster.dwStages)
+        switch (GEnv.Backend->GetCapabilities().raster.dwStages)
         {
         case 2: // Geforce1/2/MX
             if (bConstant)
@@ -158,7 +158,7 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
             else
                 compile_3(C);
             break;
-        } // switch (HW.Caps.raster.dwStages)
+        } // switch (caps.raster.dwStages)
         break;
     }
     case SE_R1_LMODELS:

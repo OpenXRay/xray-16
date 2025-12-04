@@ -3,14 +3,12 @@
 
 #include <DirectXTex.h>
 
-// Week 6: FrameGraph texture loading integration
-#include "Layers/xrRender/xrRender_console.h"                    // ps_r4_use_framegraph
+// FrameGraph texture loading integration
 #include "Layers/xrRender/RenderContext/RenderDevice.h"          // RenderDevice
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"   // FGResourceManager (renamed from ModernResourceManager)
 #include "Layers/xrRender/ResourceManager/TextureManager.h"      // TextureManager
 #include <nvrhi/nvrhi.h>                                         // getNativeObject
 
-extern ENGINE_API int ps_r4_use_framegraph;
 using namespace xray::render::ng;
 using namespace xray::render::resources;
 

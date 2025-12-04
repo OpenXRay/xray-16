@@ -20,6 +20,7 @@
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/Backend/D3D11BackendWrapper.h"
 
 // Forward declaration for ImGui initialization
 namespace xray::render {
@@ -27,7 +28,6 @@ namespace xray::render {
 }
 #endif
 
-extern ENGINE_API int ps_r4_use_framegraph;
 namespace xray::render::RENDER_NAMESPACE
 {
 CRender RImplementation;
@@ -240,8 +240,9 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
-    o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    o.mrt = (caps.raster.dwMRT_count >= 3);
+    o.mrtmixdepth = (caps.raster.b_MRT_mixdepth);
 
     // Check for NULL render target support
     o.nullrt = false;
@@ -260,7 +261,7 @@ void CRender::create()
         //.		??? if (date < 22-march-07)
         if (0)
         {
-            u32 device_id = HW.Caps.id_device;
+            u32 device_id = caps.id_device;
             bool disable_nullrt = false;
             switch (device_id)
             {
@@ -317,7 +318,7 @@ void CRender::create()
     {
 #if defined(USE_DX11)
         //	For ATI it's much faster on DX11 to use D32F format
-        if (HW.Caps.id_vendor == 0x1002)
+        if (caps.id_vendor == 0x1002)
             o.HW_smap_FORMAT = D3DFMT_D32F_LOCKABLE;
         else
 #endif
@@ -340,7 +341,7 @@ void CRender::create()
         o.fp16_blend = FALSE;
     }
 
-    VERIFY2(o.mrt && (HW.Caps.raster.dwInstructions >= 256), "Hardware doesn't meet minimum feature-level");
+    VERIFY2(o.mrt && (caps.raster.dwInstructions >= 256), "Hardware doesn't meet minimum feature-level");
     if (o.mrtmixdepth)
         o.albedo_wo = FALSE;
     else if (o.fp16_blend)
@@ -429,7 +430,7 @@ void CRender::create()
 #endif
 
     //	TODO: fix hbao shader to allow to perform per-subsample effect!
-    if (o.ssao_hbao && HW.Caps.id_vendor == 0x1002)
+    if (o.ssao_hbao && caps.id_vendor == 0x1002)
         o.hbao_vectorized = true;
     else
         o.hbao_vectorized = false;
@@ -506,7 +507,7 @@ void CRender::create()
         o.minmax_sm = MMSM_OFF;
 
         //	AMD device
-        if (HW.Caps.id_vendor == 0x1002)
+        if (caps.id_vendor == 0x1002)
         {
             if (ps_r_sun_quality >= 3)
                 o.minmax_sm = MMSM_AUTO;
@@ -519,7 +520,7 @@ void CRender::create()
         }
 
         //	NVidia boards
-        if (HW.Caps.id_vendor == 0x10DE)
+        if (caps.id_vendor == 0x10DE)
         {
             if (ps_r_sun_shafts >= 2)
             {
@@ -565,17 +566,13 @@ void CRender::create()
                 // Expose through GEnv for global access
                 GEnv.FrameGraphRenderer = m_framegraphRenderer;
 
-                // Enable it if ps_r4_use_framegraph is set
-                if (ps_r4_use_framegraph)
-                {
-                    m_framegraphRenderer->SetEnabled(true);
-                    Msg("* FrameGraphRenderer enabled (ps_r4_use_framegraph=1)");
+                m_framegraphRenderer->SetEnabled(true);
+                Msg("* FrameGraphRenderer enabled");
 
-                    // Initialize ShaderLoader for Slang compilation
-                    m_shaderLoader = xr_new<framegraph::ShaderLoader>(
-                        m_renderDevice->GetSlangCompiler());
-                    Msg("* ShaderLoader initialized (Slang compiler active)");
-                }
+                // Initialize ShaderLoader for Slang compilation
+                m_shaderLoader = xr_new<framegraph::ShaderLoader>(
+                    m_renderDevice->GetSlangCompiler());
+                Msg("* ShaderLoader initialized (Slang compiler active)");
             }
             else
             {
@@ -608,11 +605,7 @@ void CRender::create()
 #endif
 
     // Print summary of any failed shader compilations
-    extern ENGINE_API int ps_r4_use_framegraph;
-    if (ps_r4_use_framegraph)
-    {
-        PrintFailedShadersSummary();
-    }
+    PrintFailedShadersSummary();
 }
 
 void CRender::destroy()
@@ -643,6 +636,14 @@ void CRender::destroy()
         m_renderDevice->Shutdown();
         xr_delete(m_renderDevice);
         Msg("* RenderDevice destroyed");
+    }
+
+    // Cleanup Backend
+    if (m_backend)
+    {
+        GEnv.Backend = nullptr;
+        xr_delete(m_backend);
+        Msg("* Backend destroyed");
     }
 #endif
 
@@ -893,18 +894,12 @@ void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fm
     // - Dynamic objects with sub-objects
     // ═══════════════════════════════════════════════════════
 
-    extern ENGINE_API int ps_r4_use_framegraph;
-
-    if (ps_r4_use_framegraph && m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
+    if (m_framegraphRenderer && m_framegraphRenderer->IsEnabled())
     {
         m_framegraphRenderer->add_Visual(root, V, m);
         return;
     }
 #endif
-
-    // Legacy path: use dsgraph
-    auto& dsgraph = get_context(context_id);
-    dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
 }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {

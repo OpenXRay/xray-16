@@ -387,6 +387,9 @@
     <ClInclude Include="IFrameGraphRender.h">
       <Filter>Interfaces\Render</Filter>
     </ClInclude>
+    <ClInclude Include="IRenderBackend.h">
+      <Filter>Interfaces\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -627,6 +630,9 @@
       <Filter>Render\Details</Filter>
     </ClCompile>
     <ClCompile Include="IFrameGraphRender.cpp">
+      <Filter>Interfaces\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="IRenderBackend.cpp">
       <Filter>Interfaces\Render</Filter>
     </ClCompile>
   </ItemGroup>

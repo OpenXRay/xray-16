@@ -550,7 +550,7 @@ void CDetailManager::UpdateVisibleM()
 
 bool CDetailManager::UseVS() const
 {
-    return HW.Caps.geometry_major >= 1 && !RImplementation.o.ffp;
+    return GEnv.Backend->GetCapabilities().geometry_major >= 1 && !RImplementation.o.ffp;
 }
 
 void CDetailManager::Render(CBackend& cmd_list)

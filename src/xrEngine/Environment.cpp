@@ -34,8 +34,6 @@
 ENGINE_API float psVisDistance = 1.f;
 static const float MAX_NOISE_FREQ = 0.03f;
 
-extern ENGINE_API int ps_r4_use_framegraph;
-
 //#define WEATHER_LOGGING
 
 // real WEATHER->WFX transition time
@@ -401,14 +399,7 @@ void CEnvironment::lerp()
     // final lerp
     const float current_weight = TimeWeight(fGameTime, Current[0]->exec_time, Current[1]->exec_time);
     CurrentEnv.lerp(*this, *Current[0], *Current[1], current_weight, EM, mpower);
-
-    // Skip legacy environment renderer updates when using FrameGraph
-    // FrameGraph will handle sky/environment rendering in Week 15+
-    if (ps_r4_use_framegraph) {
-        return;
-    }
-
-    m_pRender->lerp(CurrentEnv, &*Current[0]->m_pDescriptor, &*Current[1]->m_pDescriptor);
+    // FrameGraph handles sky/environment rendering
 }
 
 void CEnvironment::OnFrame()

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RenderDevice.h"
 #include "RenderContext.h"
-#include "../Backend/D3D11Backend.h"
+#include "../Backend/D3D11BackendWrapper.h"
 #include "../ResourceManager/FGResourceManager.h"
 #include "../Shaders/SlangCompiler.h"
 
@@ -25,7 +25,7 @@ nvrhi::IDevice* RenderDevice::GetNVRHIDevice() const {
 }
 
 nvrhi::ICommandList* RenderDevice::GetImmediateCommandList() const {
-    return m_backend ? m_backend->GetImmediateCommandList() : nullptr;
+    return m_backend ? m_backend->GetCommandList() : nullptr;
 }
 
 xray::render::SlangCompiler* RenderDevice::GetSlangCompiler() const {
@@ -41,21 +41,15 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     VERIFY(context);
 
     // Create D3D11 backend wrapper
-    // Note: Construct directly as IRenderBackend to avoid unique_ptr deleters mismatch
-    xr_unique_ptr<IRenderBackend> backend(xr_new<D3D11Backend>());
-
-    BackendInitParams params;
-    params.existingD3D11Device = device;
-    params.existingD3D11Context = context;
-    params.enableValidation = false; // Managed by legacy CHW for now
-
-    if (!backend->Initialize(params)) {
+    auto* backendWrapper = xr_new<D3D11BackendWrapper>();
+    if (!backendWrapper->Initialize(device, context)) {
         Msg("! [RenderDevice] Failed to initialize D3D11 backend");
+        xr_delete(backendWrapper);
         return false;
     }
 
-    m_backend = std::move(backend);
-    Msg("* [RenderDevice] Backend initialized: %s", GetGraphicsAPIName(m_backend->GetAPI()));
+    m_backend.reset(backendWrapper);
+    Msg("* [RenderDevice] Backend initialized: %s", m_backend->GetAPIName());
 
     // Create pipeline state cache
     m_pipelineCache = xr_make_unique<PipelineStateCache>(this);
@@ -129,11 +123,8 @@ void RenderDevice::Shutdown() {
     m_samplers.clear();
     m_shaders.clear();
 
-    // Shutdown Backend
-    if (m_backend) {
-        m_backend->Shutdown();
-        m_backend = nullptr;
-    }
+    // Release Backend
+    m_backend = nullptr;
 
     m_initialized = false;
 }
@@ -471,7 +462,7 @@ BufferHandle RenderDevice::CreateBuffer(
 
     // Upload initial data if provided
     if (initialData) {
-        nvrhi::ICommandList* cmdList = m_backend->GetImmediateCommandList();
+        nvrhi::ICommandList* cmdList = m_backend->GetCommandList();
         cmdList->open();
         cmdList->writeBuffer(nvrhiBuffer, initialData, desc.byteSize);
         cmdList->close();
@@ -527,7 +518,7 @@ void RenderDevice::UpdateBuffer(
     BufferInfo& info = m_buffers[handle.index];
     VERIFY(offset + size <= info.desc.byteSize);
 
-    nvrhi::ICommandList* cmdList = m_backend->GetImmediateCommandList();
+    nvrhi::ICommandList* cmdList = m_backend->GetCommandList();
     cmdList->open();
     cmdList->writeBuffer(info.nvrhiHandle, data, size, offset);
     cmdList->close();

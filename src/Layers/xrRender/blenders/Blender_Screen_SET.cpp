@@ -213,7 +213,7 @@ void CBlender_Screen_SET::Compile(CBlender_Compile& C)
 
     C.PassBegin();
     {
-        if (HW.Caps.hasFixedPipeline)
+        if (GEnv.Backend->GetCapabilities().hasFixedPipeline)
         {
             CompileFixed(C);
         }

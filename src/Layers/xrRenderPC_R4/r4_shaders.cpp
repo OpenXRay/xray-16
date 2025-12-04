@@ -285,10 +285,11 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     appendShaderOption(o.sjitter, "USE_SJITTER", "1");
 
     // Branching
-    appendShaderOption(HW.Caps.raster_major >= 3, "USE_BRANCHING", "1");
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    appendShaderOption(caps.raster_major >= 3, "USE_BRANCHING", "1");
 
     // Vertex texture fetch
-    appendShaderOption(HW.Caps.geometry.bVTF, "USE_VTF", "1");
+    appendShaderOption(caps.geometry.bVTF, "USE_VTF", "1");
 
     // Tshadows
     appendShaderOption(o.Tshadows, "USE_TSHADOWS", "1");
@@ -506,236 +507,116 @@ HRESULT CRender::shader_compile(pcstr name, IReader* fs, pcstr pFunctionName,
     options.finish();
     sh_name.finish();
 
-    HRESULT _result = E_FAIL;
-
-    // Route through ShaderLoader if FrameGraph is active
-    extern ENGINE_API int ps_r4_use_framegraph;
-    if (ps_r4_use_framegraph)
+    if (!m_shaderLoader)
     {
-        if (!m_shaderLoader)
-        {
-            Msg("! [shader_compile] FrameGraph enabled but ShaderLoader not initialized!");
-            R_ASSERT2(false, "ShaderLoader must be initialized");
-            return E_FAIL;
-        }
-
-        // Determine shader stage from target
-        char extension[3];
-        strncpy_s(extension, pTarget, 2);
-
-        bool isVertexShader = (strcmp(extension, "vs") == 0);
-        bool isPixelShader = (strcmp(extension, "ps") == 0);
-
-        // ═══════════════════════════════════════════════════════
-        // DELEGATE TO SHADERLOADER - Single compilation path!
-        // ═══════════════════════════════════════════════════════
-
-        // Build defines string for logging
-        xr_string definesStr;
-        for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
-        {
-            definesStr.append(macro->Name);
-            definesStr.append("=");
-            if (macro->Definition)
-                definesStr.append(macro->Definition);
-            definesStr.append(";");
-        }
-
-        Msg("~ [shader_compile] Compiling '%s' (target:%s, defines:%s)",
-            name, pTarget, definesStr.c_str());
-
-        // Use ShaderLoader's CompileShaderWithDefines (which handles caching internally!)
-        xr_vector<u8> bytecode;
-        xray::render::SlangCompiler::Stage stage;
-
-        if (isVertexShader)
-            stage = xray::render::SlangCompiler::Stage::Vertex;
-        else if (isPixelShader)
-            stage = xray::render::SlangCompiler::Stage::Pixel;
-        else if (strcmp(extension, "gs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Geometry;
-        else if (strcmp(extension, "hs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Hull;
-        else if (strcmp(extension, "ds") == 0)
-            stage = xray::render::SlangCompiler::Stage::Domain;
-        else if (strcmp(extension, "cs") == 0)
-            stage = xray::render::SlangCompiler::Stage::Compute;
-        else
-        {
-            Msg("! [shader_compile] Unknown stage: %s", extension);
-            return E_FAIL;
-        }
-
-        // Convert D3D_SHADER_MACRO to SlangCompiler::Define
-        size_t defineCount = 0;
-        for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
-            defineCount++;
-
-        xr_vector<xray::render::SlangCompiler::Define> slangDefines;
-        slangDefines.reserve(defineCount);
-        for (size_t i = 0; i < defineCount; ++i)
-        {
-            xray::render::SlangCompiler::Define define;
-            define.name = options.data()[i].Name;
-            define.value = options.data()[i].Definition;
-            slangDefines.push_back(define);
-        }
-
-        char extWithDot[4] = ".";
-        xr_strcat(extWithDot, extension);
-        bool success = m_shaderLoader->CompileShaderWithDefines(
-            name,           // Shader name
-            extWithDot,     // Extension (.vs, .ps, etc.)
-            pFunctionName,  // Entry point
-            stage,          // Shader stage
-            slangDefines,   // Preprocessor defines
-            bytecode        // Output bytecode
-        );
-
-        if (!success)
-        {
-            Msg("! [shader_compile] ShaderLoader failed to compile '%s'", name);
-
-            // Store failed shader info for batch reporting
-            xr_string failedInfo;
-            failedInfo.append("║   - ");
-            failedInfo.append(name);
-            failedInfo.append(" (");
-            failedInfo.append(pTarget);
-            failedInfo.append(")");
-            g_failedShaders.push_back(failedInfo);
-
-            return E_FAIL;
-        }
-
-        // Get reflection data from ShaderLoader's cache
-        auto* reflection = m_shaderLoader->GetCachedReflection(name, extWithDot);
-
-        // Create the hardware shader object
-        _result = create_shader(
-            pTarget,                          // Shader target
-            (DWORD*)bytecode.data(),         // Bytecode
-            bytecode.size(),                  // Size
-            name,                             // Name
-            result,                           // Output shader object
-            o.disasm,                         // Disassembly flag
-            reflection                        // Reflection data
-        );
-
-        if (SUCCEEDED(_result))
-        {
-            Msg("* [shader_compile] SUCCESS via ShaderLoader: '%s' (%zu bytes)",
-                name, bytecode.size());
-        }
-
-        return _result;
+        Msg("! [shader_compile] ShaderLoader not initialized!");
+        R_ASSERT2(false, "ShaderLoader must be initialized");
+        return E_FAIL;
     }
 
+    // Determine shader stage from target
     char extension[3];
     strncpy_s(extension, pTarget, 2);
 
-    pcstr renderer;
-    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0)
-        renderer = "r4" DELIMITER;
-    else if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-        renderer = "r3" DELIMITER;
+    bool isVertexShader = (strcmp(extension, "vs") == 0);
+    bool isPixelShader = (strcmp(extension, "ps") == 0);
+
+    // Build defines string for logging
+    xr_string definesStr;
+    for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
+    {
+        definesStr.append(macro->Name);
+        definesStr.append("=");
+        if (macro->Definition)
+            definesStr.append(macro->Definition);
+        definesStr.append(";");
+    }
+
+    Msg("~ [shader_compile] Compiling '%s' (target:%s, defines:%s)",
+        name, pTarget, definesStr.c_str());
+
+    // Use ShaderLoader's CompileShaderWithDefines (which handles caching internally!)
+    xr_vector<u8> bytecode;
+    xray::render::SlangCompiler::Stage stage;
+
+    if (isVertexShader)
+        stage = xray::render::SlangCompiler::Stage::Vertex;
+    else if (isPixelShader)
+        stage = xray::render::SlangCompiler::Stage::Pixel;
+    else if (strcmp(extension, "gs") == 0)
+        stage = xray::render::SlangCompiler::Stage::Geometry;
+    else if (strcmp(extension, "hs") == 0)
+        stage = xray::render::SlangCompiler::Stage::Hull;
+    else if (strcmp(extension, "ds") == 0)
+        stage = xray::render::SlangCompiler::Stage::Domain;
+    else if (strcmp(extension, "cs") == 0)
+        stage = xray::render::SlangCompiler::Stage::Compute;
     else
     {
-        renderer = "r4_level9" DELIMITER;
-        R_ASSERT(!"Feature levels lower than 10.0 are unsupported");
+        Msg("! [shader_compile] Unknown stage: %s", extension);
+        return E_FAIL;
     }
 
-    string_path filename;
-    strconcat(sizeof(filename), filename, renderer, name, ".", extension);
+    // Convert D3D_SHADER_MACRO to SlangCompiler::Define
+    size_t defineCount = 0;
+    for (const D3D_SHADER_MACRO* macro = options.data(); macro->Name != nullptr; ++macro)
+        defineCount++;
 
-    string_path file_name;
+    xr_vector<xray::render::SlangCompiler::Define> slangDefines;
+    slangDefines.reserve(defineCount);
+    for (size_t i = 0; i < defineCount; ++i)
     {
-        string_path file;
-        strconcat(sizeof(file), file, "shaders_cache_oxr" DELIMITER, filename, DELIMITER, sh_name.c_str());
-        strconcat(sizeof(filename), filename, filename, DELIMITER, sh_name.c_str());
-        FS.update_path(file_name, "$app_data_root$", file);
+        xray::render::SlangCompiler::Define define;
+        define.name = options.data()[i].Name;
+        define.value = options.data()[i].Definition;
+        slangDefines.push_back(define);
     }
 
-    string_path shadersFolder;
-    FS.update_path(shadersFolder, "$game_shaders$", RImplementation.getShaderPath());
+    char extWithDot[4] = ".";
+    xr_strcat(extWithDot, extension);
+    bool success = m_shaderLoader->CompileShaderWithDefines(
+        name,           // Shader name
+        extWithDot,     // Extension (.vs, .ps, etc.)
+        pFunctionName,  // Entry point
+        stage,          // Shader stage
+        slangDefines,   // Preprocessor defines
+        bytecode        // Output bytecode
+    );
 
-    u32 fileCrc = 0;
-    getFileCrc32(fs, shadersFolder, fileCrc);
-    fs->seek(0);
-
-    if (FS.exist(file_name))
+    if (!success)
     {
-        IReader* file = FS.r_open(file_name);
-        if (file->length() > 4)
-        {
-            const bool dx9compatibility = file->r_u32();
+        Msg("! [shader_compile] ShaderLoader failed to compile '%s'", name);
 
-            u32 savedFileCrc = file->r_u32();
-            if (savedFileCrc == fileCrc)
-            {
-                u32 savedBytecodeCrc = file->r_u32();
-                u32 bytecodeCrc = crc32(file->pointer(), file->elapsed());
-                if (bytecodeCrc == savedBytecodeCrc)
-                {
-#ifdef DEBUG
-                    Log("* Loading shader:", file_name);
-#endif
-                    _result =
-                        create_shader(pTarget, (DWORD*)file->pointer(), file->elapsed(),
-                            filename, result, o.disasm, nullptr);
-                }
-            }
-        }
-        file->close();
+        // Store failed shader info for batch reporting
+        xr_string failedInfo;
+        failedInfo.append("║   - ");
+        failedInfo.append(name);
+        failedInfo.append(" (");
+        failedInfo.append(pTarget);
+        failedInfo.append(")");
+        g_failedShaders.push_back(failedInfo);
+
+        return E_FAIL;
     }
 
-    if (FAILED(_result))
+    // Get reflection data from ShaderLoader's cache
+    auto* reflection = m_shaderLoader->GetCachedReflection(name, extWithDot);
+
+    // Create the hardware shader object
+    HRESULT _result = create_shader(
+        pTarget,                          // Shader target
+        (DWORD*)bytecode.data(),         // Bytecode
+        bytecode.size(),                  // Size
+        name,                             // Name
+        result,                           // Output shader object
+        o.disasm,                         // Disassembly flag
+        reflection                        // Reflection data
+    );
+
+    if (SUCCEEDED(_result))
     {
-        includer Includer;
-        LPD3DBLOB pShaderBuf = NULL;
-        LPD3DBLOB pErrorBuf = NULL;
-        _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
-            &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
-
-        if (FAILED(_result) && pErrorBuf)
-        {
-            cpcstr str = static_cast<cpcstr>(pErrorBuf->GetBufferPointer());
-            if (strstr(str, "error X3523")) // is there a better way?
-            {
-                pErrorBuf = nullptr;
-                Flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-                _result = HW.D3DCompile(fs->pointer(), fs->length(), "", options.data(),
-                    &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
-            }
-        }
-
-        if (SUCCEEDED(_result))
-        {
-            const bool dx9compatibility = Flags & D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-            IWriter* file = FS.w_open(file_name);
-
-            file->w_u32(dx9compatibility);
-            file->w_u32(fileCrc);
-
-            u32 bytecodeCrc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
-            file->w_u32(bytecodeCrc); // Do not write anything below this line, take a look at reading (crc32)
-
-            file->w(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
-            FS.w_close(file);
-#ifdef DEBUG
-            Log("- Compile shader:", file_name);
-#endif
-            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
-                filename, result, o.disasm, nullptr);
-        }
-        else
-        {
-            Log("! ", file_name);
-            if (pErrorBuf)
-                Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
-            else
-                Msg("Can't compile shader hr=0x%08x", _result);
-        }
+        Msg("* [shader_compile] SUCCESS via ShaderLoader: '%s' (%zu bytes)",
+            name, bytecode.size());
     }
 
     return _result;

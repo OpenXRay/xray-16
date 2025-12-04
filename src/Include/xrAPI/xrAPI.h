@@ -13,6 +13,7 @@
 class IRender;
 class IRenderFactory;
 class IDebugRender;
+class IRenderBackend;
 class CDUInterface;
 struct xr_token;
 class IUIRender;
@@ -28,6 +29,7 @@ class XRAPI_API EngineGlobalEnvironment
 {
 public:
     IRender* Render;
+    IRenderBackend* Backend;  // Modern backend (D3D12/Vulkan) - replaces HW
     IDebugRender* DRender;
     CDUInterface* DU;
     IUIRender* UIRender;

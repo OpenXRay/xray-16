@@ -446,7 +446,8 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
     };
 
     /* Setup sampler */
-    auto samplerName = HW.Caps.useCombinedSamplers ? image : sampler;
+    bool useCombinedSamplers = GEnv.Backend->GetCapabilities().useCombinedSamplers;
+    auto samplerName = useCombinedSamplers ? image : sampler;
     const u32 samplerStage = findSamplerResource(samplerName);
     if (samplerStage != InvalidStage)
     {
@@ -454,7 +455,7 @@ u32 CBlender_Compile::SampledImage(pcstr sampler, pcstr image, shared_str textur
     }
 
     /* Setup assigned texture */
-    const u32 textureStage = HW.Caps.useCombinedSamplers ? samplerStage : findTextureSlot(image);
+    const u32 textureStage = useCombinedSamplers ? samplerStage : findTextureSlot(image);
     if (textureStage != InvalidStage && texture.size() != 0)
     {
         string256 name;

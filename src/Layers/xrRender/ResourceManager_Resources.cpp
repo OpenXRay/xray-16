@@ -98,38 +98,15 @@ void CResourceManager::_DeleteConstantTable(const R_constant_table* C)
     Msg("! ERROR: Failed to find compiled constant-table");
 }
 
-CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 sampleCount /* = 1 */, u32 slices_num /*=1*/, Flags32 flags /*= {}*/)
+// Legacy RT functions - stubbed out, FrameGraph handles all render targets
+CRT* CResourceManager::_CreateRT(LPCSTR, u32, u32, D3DFORMAT, u32, u32, Flags32)
 {
-    R_ASSERT(Name && Name[0] && w && h);
-
-    // ***** first pass - search already created RT
-    pstr N = pstr(Name);
-    map_RT::iterator I = m_rtargets.find(N);
-    if (I != m_rtargets.end())
-        return I->second;
-    else
-    {
-        CRT* RT = xr_new<CRT>();
-        RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_rtargets.emplace(RT->set_name(Name), RT);
-        if (Device.b_is_Ready)
-            RT->create(Name, w, h, f, sampleCount, slices_num, flags);
-        return RT;
-    }
+    return nullptr;
 }
 
-void CResourceManager::_DeleteRT(const CRT* RT)
+void CResourceManager::_DeleteRT(const CRT*)
 {
-    if (0 == (RT->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return;
-    pstr N = pstr(RT->cName.c_str());
-    map_RT::iterator I = m_rtargets.find(N);
-    if (I != m_rtargets.end())
-    {
-        m_rtargets.erase(I);
-        return;
-    }
-    Msg("! ERROR: Failed to find render-target '%s'", RT->cName.c_str());
+    // Stubbed - FrameGraph handles render targets
 }
 
 //	DX10 cut

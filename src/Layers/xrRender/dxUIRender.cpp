@@ -156,7 +156,8 @@ void dxUIRender::SetScissor(Irect* rect)
 LPCSTR dxUIRender::UpdateShaderName(LPCSTR tex_name, LPCSTR sh_name)
 {
     string_path buff;
-    u32 v_dev = CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor);
+    const auto& caps = GEnv.Backend->GetCapabilities();
+    u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
     u32 v_need = CAP_VERSION(2, 0);
     // strstr(Core.Params,"-ps_movie") &&
     if ((v_dev >= v_need) && FS.exist(buff, "$game_textures$", tex_name, ".ogm"))

@@ -6,8 +6,6 @@
 #include "ResourceManager/TextureManager.h"
 #include "FrameGraph/ShaderCache.h"
 
-extern ENGINE_API int ps_r4_use_framegraph;
-
 using namespace xray::render::resources;
 
 namespace xray::render::RENDER_NAMESPACE

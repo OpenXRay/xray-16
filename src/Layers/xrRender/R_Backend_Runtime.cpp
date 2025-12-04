@@ -29,15 +29,7 @@ void CBackend::OnFrameBegin()
 
 #ifndef USE_DX9
         Invalidate();
-        // DX9 sets base rt and base zb by default
-#ifndef USE_OGL
-        // XXX: Getting broken HUD hands for OpenGL after calling rmNormal()
-        RImplementation.rmNormal(*this);
-#else
-        set_FB(HW.pFB);
-#endif
-        set_RT(RImplementation.Target->get_base_rt());
-        set_ZB(RImplementation.Target->get_base_zb());
+        // FrameGraph handles render target setup
 #endif
 
         ZeroMemory(&stat, sizeof(stat));
@@ -154,7 +146,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
 #ifndef DEDICATED_SREVER
 void CBackend::set_ClipPlanes(u32 _enable, Fmatrix* _xform /*=NULL */, u32 fmask /* =0xff */)
 {
-    if (0 == HW.Caps.geometry.dwClipPlanes)
+    if (0 == GEnv.Backend->GetCapabilities().geometry.dwClipPlanes)
         return;
     if (!_enable)
     {

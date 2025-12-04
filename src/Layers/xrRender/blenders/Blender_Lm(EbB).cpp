@@ -67,7 +67,7 @@ void CBlender_LmEbB::CompileFFP(CBlender_Compile& C) const
         case SE_R1_NORMAL_HQ:
         case SE_R1_NORMAL_LQ:
         {
-            switch (HW.Caps.raster.dwStages)
+            switch (GEnv.Backend->GetCapabilities().raster.dwStages)
             {
             case 2: // Geforce1/2/MX
                 compile_2(C);
@@ -76,7 +76,7 @@ void CBlender_LmEbB::CompileFFP(CBlender_Compile& C) const
             default:
                 compile_3(C);
                 break;
-            } // switch (HW.Caps.raster.dwStages)
+            } // switch (caps.raster.dwStages)
             break;
         }
         case SE_R1_LMODELS:
