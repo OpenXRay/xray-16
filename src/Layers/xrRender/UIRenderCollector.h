@@ -40,7 +40,7 @@ public:
 
 private:
     // Current rendering state
-    ref_shader m_currentShader;
+    IUIShader* m_currentUIShader{nullptr};  // Backend-agnostic: Current UI shader
     int m_currentAlphaRef{0};
     bool m_hasScissor{false};
     Irect m_scissorRect;

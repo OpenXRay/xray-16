@@ -17,7 +17,13 @@ public:
 
 private:
     // Visualization	(rain)
+    // Legacy D3D11
     ref_shader SH_Rain;
+
+    // DX12: NVRHI shader handles
+    nvrhi::ShaderHandle SH_Rain_VS;
+    nvrhi::ShaderHandle SH_Rain_PS;
+
     ref_geom hGeom_Rain;
 
     // Visualization	(drops)

@@ -15,7 +15,7 @@ dxWallMarkArray::~dxWallMarkArray()
 void dxWallMarkArray::AppendMark(LPCSTR s_textures)
 {
     ref_shader s;
-    s.create("effects" DELIMITER "wallmark", s_textures);
+    s.create("effects" DELIMITER "wallmark", s_textures);  // Now uses NVRHI for DX12
     m_CollideMarks.push_back(s);
 }
 

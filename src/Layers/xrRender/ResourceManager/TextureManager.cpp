@@ -812,7 +812,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
 
         // Initialize animation state
         meta.sequenceTextureData->sequenceState->currentFrame = 0;
-        meta.sequenceTextureData->sequenceState->elapsedTime = 0.0f;
 
         // Msg("* [TextureManager] Sequence texture state stored for: %s", meta.filePath.c_str());
     }
@@ -1052,7 +1051,10 @@ void TextureManager::UpdateVideoTextures() {
 
 void TextureManager::UpdateSequenceTextures(float deltaTime) {
     // Animate .seq texture sequences (cursor, animated UI elements, etc.)
-    // Follows the same pattern as UpdateVideoTextures (OGM-style)
+    // Uses absolute time like OGM videos, so it works in paused menus
+
+    // Get absolute time (milliseconds since engine start, unaffected by pause)
+    u32 currentTime = Device.dwTimeContinual;
 
     for (auto& meta : m_textures) {
         if (!meta.isAlive || !meta.sequenceTextureData) {
@@ -1064,12 +1066,19 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
             continue;
         }
 
-        // Update animation timer
-        seqState->elapsedTime += deltaTime * 1000.0f;  // Convert to milliseconds
+        // Initialize lastUpdateTime on first update
+        if (seqState->lastUpdateTime == 0) {
+            seqState->lastUpdateTime = currentTime;
+            continue;
+        }
+
+        // Calculate elapsed time since last update
+        u32 elapsedMs = currentTime - seqState->lastUpdateTime;
 
         // Check if we should advance frame
-        if (seqState->elapsedTime >= seqState->msPerFrame) {
-            seqState->elapsedTime -= seqState->msPerFrame;
+        if (elapsedMs >= seqState->msPerFrame) {
+            // Update last update time
+            seqState->lastUpdateTime = currentTime;
 
             // Advance frame
             u32 nextFrame = seqState->currentFrame + 1;

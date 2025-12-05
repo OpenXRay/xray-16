@@ -14,7 +14,14 @@ public:
 
     // private:
 public:
+    // Legacy D3D11
     ref_shader hShader;
+
+    // DX12/FrameGraph: Store shader/texture names and NVRHI handles
+    shared_str m_shaderName;
+    shared_str m_textureName;
+    nvrhi::ShaderHandle m_vsHandle;
+    nvrhi::ShaderHandle m_psHandle;
 };
 
 class dxLensFlareRender : public ILensFlareRender

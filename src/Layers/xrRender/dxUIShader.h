@@ -6,6 +6,10 @@ namespace xray::render::ui {
     class UIRenderCollector;  // Forward declaration
 }
 
+namespace xray::render::framegraph {
+    struct ExtractedReflection;  // Forward declaration
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class dxUIShader : public IUIShader
@@ -19,15 +23,29 @@ class dxUIShader : public IUIShader
 public:
     virtual void Copy(IUIShader& _in);
     virtual void create(LPCSTR sh, LPCSTR tex = nullptr);
-    virtual bool inited() { return hShader; }
+    virtual bool inited()
+    {
+        // DX12: Check if NVRHI shaders are loaded
+        if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+            return m_vsHandle && m_psHandle;
+        return hShader;
+    }
     virtual void destroy();
 
     CTexture* GetBaseTexture() const;
     bool GetBaseTextureResolution(Fvector2& res) override;
     xrImTextureData GetImGuiTextureId() override;
 
-private:
+    // Legacy D3D11
     ref_shader hShader;
+
+    // DX12: NVRHI shader handles + reflection
+    nvrhi::ShaderHandle m_vsHandle;
+    nvrhi::ShaderHandle m_psHandle;
+    framegraph::ExtractedReflection* m_vsReflection = nullptr;  // Owned by dxUIShader
+    framegraph::ExtractedReflection* m_psReflection = nullptr;  // Owned by dxUIShader
+    CTexture* m_baseTexture = nullptr;  // DX12: Cached base texture pointer
+
     shared_str baseTexture{ "s_base" };
 };
 } // namespace xray::render::RENDER_NAMESPACE

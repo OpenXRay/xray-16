@@ -5,6 +5,7 @@
 #include "Layers/xrRender/ResourceManager/TextureManager.h"
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
+#include "Layers/xrRender/dxUIShader.h"  // For dxUIShader NVRHI handles
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FProgressive.h"
@@ -310,11 +311,37 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
         return nullptr;
     }
 
-    // D3D12/FrameGraph mode: Return null - uses bindless rendering path instead
-    // The calling pass should fall back to bindless pipeline (s_bindless_pipeline)
+    // ═══════════════════════════════════════════════════
+    //  D3D12: FAST PATH - Precompiled PSO Lookup
+    // ═══════════════════════════════════════════════════
     if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
-        // In D3D12 mode, we don't create per-material PSOs
-        // Instead, we use a unified bindless pipeline with material data in buffers
+        // Check if this is level geometry with precompiled PSOs
+        u32 shaderID = visual->shader_id;
+        if (shaderID != UINT32_MAX) {
+            auto* compiled = RImplementation.getCompiledShader(shaderID);
+            if (compiled) {
+                // Extract vertex format from visual
+                u32 vertexFormatID = GetVertexFormatID(visual);
+
+                // Compute cache key
+                u64 cacheKey = RImplementation.ComputePSOCacheKey(vertexFormatID, passType);
+
+                // Look up precompiled PSO
+                auto it = compiled->precompiledPSOs.psoCache.find(cacheKey);
+                if (it != compiled->precompiledPSOs.psoCache.end() && it->second) {
+                    // ✅ CACHE HIT! Return precompiled PSO
+                    m_stats.numCacheHits++;
+                    return it->second;
+                }
+
+                // Cache miss - PSO not precompiled for this format combination
+                m_stats.numCacheMisses++;
+                Msg("! [MaterialCache] PSO cache miss for shader %u (format %u, pass %u)",
+                    shaderID, vertexFormatID, (u32)passType);
+            }
+        }
+
+        // Fallback: use bindless pipeline (dynamic objects, or cache miss)
         return nullptr;
     }
 
@@ -1330,11 +1357,9 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
                     nvrhi::Format::UNKNOWN, nvrhi::AllSubresources, texDesc.dimension),
                 "texture", PSBinding::Texture});
         } else {
-            // Texture not ready - mark as invalid so we don't cache this binding set
-            allTexturesValid = false;
-            psBindings.push_back({texSlot.slot,
-                nvrhi::BindingSetItem::Texture_SRV(texSlot.slot, nullptr),
-                "texture_null", PSBinding::Texture});
+            // Texture not ready - binding set creation will fail, so return early
+            Msg("! [MaterialCache::GetOrCreateBindingSet] Texture not loaded yet (slot t%u), cannot create binding set", texSlot.slot);
+            return nullptr;
         }
     }
 
@@ -1446,6 +1471,19 @@ u64 MaterialCache::ComputeStateHash(SPass* pass)
     u32 hash = crc32(&statePtr, sizeof(statePtr), 0);
 
     return static_cast<u64>(hash);
+}
+
+// D3D12: Extract vertex format ID from visual's geometry
+u32 MaterialCache::GetVertexFormatID(dxRender_Visual* visual)
+{
+    if (!visual)
+        return 0;
+
+    // For level geometry, the VB index is stored in the visual
+    // The vertex format ID corresponds to the nDC/xDC index
+    // For now, return 0 (most common format) - will be refined when we add proper VB tracking
+    // TODO: Extract actual VB declaration ID from visual's geometry
+    return 0;  // Default to first format
 }
 
 // Helper: Get size in bytes of a DXGI format
@@ -1870,26 +1908,43 @@ void MaterialCache::SetupRenderTargets(
 // ══════════════════════════════════════════════════════════
 
 MaterialPSO* MaterialCache::GetOrCreateUIPSO(
-    Shader* shader,
+    IUIShader* uiShader,
     u32 elementIndex,
     nvrhi::IFramebuffer* framebuffer)
 {
-    if (!shader || !framebuffer)
+    if (!uiShader || !framebuffer)
         return nullptr;
 
-    // Extract shader element and pass
-    ShaderElement* elem = shader->E[elementIndex]._get();
-    if (!elem || elem->passes.empty())
+    // Cast to dxUIShader to access NVRHI handles
+    dxUIShader* dxShader = static_cast<dxUIShader*>(uiShader);
+    if (!dxShader)
         return nullptr;
 
-    SPass* pass = elem->passes[0]._get();
-    if (!pass)
-        return nullptr;
+    // Create cache key using VS/PS handle pointers + texture name
+    // ShaderLoader caches shaders internally, so same shader bytecode = same handle pointer
+    // Example: All UI elements using "hud\default" share the same VS/PS handles
+    // Only the texture differs, so we hash: (VS ptr, PS ptr, texture name)
 
-    // Create cache key (shader + element + framebuffer)
+    u64 shaderHash = 0;
+    if (dxShader->m_vsHandle && dxShader->m_psHandle) {
+        // Combine VS pointer + PS pointer into hash
+        shaderHash = reinterpret_cast<uintptr_t>(dxShader->m_vsHandle.Get()) ^
+                     (reinterpret_cast<uintptr_t>(dxShader->m_psHandle.Get()) << 1);
+    }
+
+    // Hash texture name (what actually differs between UI shader instances)
+    u64 textureHash = 0;
+    if (dxShader->m_baseTexture && dxShader->m_baseTexture->cName.size() > 0) {
+        textureHash = std::hash<xr_string>{}(xr_string(dxShader->m_baseTexture->cName.c_str()));
+    }
+
+    // Combine shader hash + texture hash
+    u64 combinedHash = shaderHash ^ (textureHash << 2);
+
     MaterialKey key;
     key.psoType = PSOType::UI;
-    key.shader = shader;
+    key.shader = nullptr;  // Not used for UI
+    key.textureHash = combinedHash;  // VS/PS handles + texture name
     key.element = elementIndex;
     key.framebuffer = framebuffer;
 
@@ -1903,8 +1958,7 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     // Create new UI PSO
     m_stats.numCacheMisses++;
     m_stats.totalPSOCreations++;
-
-    MaterialPSO* pso = CreateUIPSO(shader, elem, pass, framebuffer);
+    MaterialPSO* pso = CreateUIPSO(uiShader, nullptr, nullptr, framebuffer);
     if (!pso)
         return nullptr;
 
@@ -2012,59 +2066,177 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 }
 
 MaterialPSO* MaterialCache::CreateUIPSO(
-    Shader* shader,
+    IUIShader* uiShader,
     ShaderElement* elem,
     SPass* pass,
     nvrhi::IFramebuffer* framebuffer)
 {
     auto pso = xr_make_unique<MaterialPSO>();
-    pso->pass = pass;
+    // Note: pso->pass is nullptr for DX12 (no legacy shader system)
 
-    // Extract textures and samplers
-    ExtractTextures(pass, pso.get());
-
-    // Extract shaders (THIS MUST COME FIRST - populates rtBindings!)
-    if (!ExtractShaders(pass, pso.get())) {
-        Msg("! [MaterialCache::CreateUIPSO] Failed to extract shaders");
+    // Cast to dxUIShader to access NVRHI handles
+    dxUIShader* dxShader = static_cast<dxUIShader*>(uiShader);
+    if (!dxShader) {
+        Msg("! [MaterialCache::CreateUIPSO] Invalid uiShader pointer");
         return nullptr;
     }
 
-    // ExtractSamplers MUST come after ExtractShaders (relies on rtBindings.samplers)
-    ExtractSamplers(pass, pso.get());
+    Msg("* [MaterialCache::CreateUIPSO] dxShader=%p, checking handles...", dxShader);
 
-    // ═══════════════════════════════════════════════════════
-    //  EXTRACT CONSTANT LAYOUT (CB + PER-CONSTANT METADATA)
-    // ═══════════════════════════════════════════════════════
+    // Get NVRHI shader handles directly from dxUIShader (compiled in dxUIShader::create)
+    nvrhi::ShaderHandle nvrhiVS = dxShader->m_vsHandle;
+    nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
 
-    framegraph::ShaderConstantLayout vsLayout;
-    framegraph::ShaderConstantLayout psLayout;
-
-    // Extract VS constant layout
-    if (pso->vertexShader && pso->vertexShader->reflection) {
-        vsLayout = pso->vertexShader->reflection->constantLayout;
-    }
-
-    // Extract PS constant layout
-    if (pso->pixelShader && pso->pixelShader->reflection) {
-        psLayout = pso->pixelShader->reflection->constantLayout;
-    }
-
-    // ✅ CRITICAL FIX: Merge layouts with proper CB deduplication
-    pso->constantLayout = MergeConstantLayouts(vsLayout, psLayout);
-
-#ifdef DEBUG
-    // Log detailed constant layout for debugging
-    const char* shaderName = pso->vertexShader ? pso->vertexShader->cName.c_str() : "Unknown";
-    LogConstantLayout(pso->constantLayout, shaderName);
-#endif
-
-    // Get native NVRHI shaders directly
-    nvrhi::ShaderHandle nvrhiVS = GetOrCreateShaderVS(pso->vertexShader);
-    nvrhi::ShaderHandle nvrhiPS = GetOrCreateShaderPS(pso->pixelShader);
+    Msg("* [MaterialCache::CreateUIPSO] Read handles: nvrhiVS=%p nvrhiPS=%p", nvrhiVS.Get(), nvrhiPS.Get());
 
     if (!nvrhiVS || !nvrhiPS) {
-        Msg("! [MaterialCache::CreateUIPSO] Failed to get shader handles");
+        Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in dxUIShader (VS=%p PS=%p)",
+            nvrhiVS.Get(), nvrhiPS.Get());
         return nullptr;
+    }
+
+    // Extract reflection from dxUIShader
+    if (dxShader->m_vsReflection) {
+        pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(dxShader->m_vsReflection);
+        pso->constantLayout = dxShader->m_vsReflection->constantLayout;
+
+        // Extract VS constant buffers from constantLayout
+        for (const auto& cb : dxShader->m_vsReflection->constantLayout.constantBuffers.buffers) {
+            MaterialPSO::ConstantBufferInfo cbInfo;
+            cbInfo.name = cb.name.c_str();
+            cbInfo.slot = cb.slot;
+            cbInfo.size = cb.size;
+            cbInfo.stage = MaterialPSO::ShaderStage::Vertex;
+            pso->constantBuffers.push_back(cbInfo);
+        }
+    }
+    else {
+        Msg("! [MaterialCache::CreateUIPSO] No VS reflection data available");
+    }
+
+    // Extract PS reflection
+    if (dxShader->m_psReflection) {
+        // Extract PS constant buffers from constantLayout
+        for (const auto& cb : dxShader->m_psReflection->constantLayout.constantBuffers.buffers) {
+            MaterialPSO::ConstantBufferInfo cbInfo;
+            cbInfo.name = cb.name.c_str();
+            cbInfo.slot = cb.slot;
+            cbInfo.size = cb.size;
+            cbInfo.stage = MaterialPSO::ShaderStage::Pixel;
+            pso->constantBuffers.push_back(cbInfo);
+        }
+
+        // Extract PS textures from rtBindings and load them
+        for (const auto& tex : dxShader->m_psReflection->rtBindings.inputTextures) {
+            // Load texture from UI shader
+            // For UI shaders, s_base is the main texture (from the shader's "tex" parameter)
+            if (xr_strcmp(tex.name.c_str(), "s_base") != 0)
+                break;
+
+            CTexture* baseTexture = dxShader->GetBaseTexture();
+            if (baseTexture) {
+                Msg("* [MaterialCache::CreateUIPSO] Loading UI texture: %s (slot t%u)", baseTexture->cName.c_str(), tex.slot);
+
+                // Get NVRHI texture handle from texture manager (it will load the texture if needed)
+                resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+                resources::TextureHandle texHandle = texManager->LoadTexture(baseTexture->cName.c_str());
+
+                if (!texHandle.IsValid()) {
+                    Msg("! [MaterialCache::CreateUIPSO] Failed to load texture: %s", baseTexture->cName.c_str());
+                } else {
+                    Msg("* [MaterialCache::CreateUIPSO] Successfully loaded texture: %s", baseTexture->cName.c_str());
+
+                    // Only add to textures list if we successfully loaded it
+                    MaterialPSO::TextureSlot texSlot;
+                    texSlot.slot = tex.slot;
+                    texSlot.handle = texHandle;
+                    pso->textures.push_back(texSlot);
+                }
+            }
+        }
+
+        // Extract PS samplers from rtBindings and create NVRHI sampler objects
+        for (const auto& samp : dxShader->m_psReflection->rtBindings.samplers) {
+            MaterialPSO::SamplerInfo sampInfo;
+            sampInfo.name = samp.name.c_str();
+            sampInfo.slot = samp.slot;
+            sampInfo.stage = MaterialPSO::ShaderStage::Pixel;
+
+            // Create NVRHI sampler based on X-Ray sampler naming convention
+            // smp_base -> anisotropic filter, wrap
+            // smp_rtlinear -> linear filter, clamp
+            // smp_nofilter -> point filter, clamp
+            nvrhi::SamplerDesc samplerDesc;
+            if (strstr(samp.name.c_str(), "smp_base")) {
+                samplerDesc.minFilter = true;
+                samplerDesc.magFilter = true;
+                samplerDesc.mipFilter = true;
+                samplerDesc.maxAnisotropy = 16;
+                samplerDesc.addressU = nvrhi::SamplerAddressMode::Wrap;
+                samplerDesc.addressV = nvrhi::SamplerAddressMode::Wrap;
+                samplerDesc.addressW = nvrhi::SamplerAddressMode::Wrap;
+            } else if (strstr(samp.name.c_str(), "smp_linear") || strstr(samp.name.c_str(), "smp_rtlinear")) {
+                samplerDesc.minFilter = true;
+                samplerDesc.magFilter = true;
+                samplerDesc.mipFilter = true;
+                samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
+                samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
+                samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
+            } else if (strstr(samp.name.c_str(), "smp_nofilter")) {
+                samplerDesc.minFilter = false;
+                samplerDesc.magFilter = false;
+                samplerDesc.mipFilter = false;
+                samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
+                samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
+                samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
+            } else {
+                // Default: linear filter, wrap
+                samplerDesc.minFilter = true;
+                samplerDesc.magFilter = true;
+                samplerDesc.mipFilter = true;
+                samplerDesc.addressU = nvrhi::SamplerAddressMode::Wrap;
+                samplerDesc.addressV = nvrhi::SamplerAddressMode::Wrap;
+                samplerDesc.addressW = nvrhi::SamplerAddressMode::Wrap;
+            }
+
+            sampInfo.nvrhiSampler = m_device->GetNVRHIDevice()->createSampler(samplerDesc);
+            if (!sampInfo.nvrhiSampler) {
+                Msg("! [MaterialCache::CreateUIPSO] Failed to create sampler: %s", samp.name.c_str());
+            }
+
+            pso->samplers.push_back(sampInfo);
+        }
+    }
+
+    // Create NVRHI buffers for all constant buffers
+    // Group constant buffers by name to create shared buffers for VS+PS
+    xr_map<shared_str, nvrhi::BufferHandle> createdBuffers;
+
+    for (auto& cbInfo : pso->constantBuffers) {
+        // Check if we already created a buffer for this CB name
+        auto it = createdBuffers.find(cbInfo.name);
+        if (it != createdBuffers.end()) {
+            // Reuse existing buffer
+            cbInfo.nvrhiBuffer = it->second;
+            continue;
+        }
+
+        // Create new buffer
+        nvrhi::BufferDesc bufferDesc;
+        bufferDesc.byteSize = cbInfo.size;
+        bufferDesc.isConstantBuffer = true;
+        bufferDesc.debugName = make_string("UI_CB_%s", cbInfo.name.c_str()).c_str();
+        bufferDesc.keepInitialState = true;
+        bufferDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+        nvrhi::BufferHandle buffer = m_device->GetNVRHIDevice()->createBuffer(bufferDesc);
+        if (!buffer) {
+            Msg("! [MaterialCache::CreateUIPSO] Failed to create constant buffer: %s", cbInfo.name.c_str());
+            continue;
+        }
+
+        cbInfo.nvrhiBuffer = buffer;
+        createdBuffers[cbInfo.name] = buffer;
     }
 
     // Create binding layouts
@@ -2096,11 +2268,15 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     };
 
     std::map<std::string, VertexElement> uiVertexLayout;
-    uiVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};   // float4 at offset 0 (16 bytes) - vanilla uses RGBA32!
-    uiVertexLayout["COLOR"]      = {nvrhi::Format::RGBA8_UNORM, 16};  // u32 at offset 16 (4 bytes)
-    uiVertexLayout["TEXCOORD"]   = {nvrhi::Format::RG32_FLOAT, 20};   // float2 at offset 20 (8 bytes)
+    uiVertexLayout["POSITION"]  = {nvrhi::Format::RGBA32_FLOAT, 0};   // float4 at offset 0 (16 bytes)
+    uiVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};   // Alias for POSITION
+    uiVertexLayout["COLOR"]     = {nvrhi::Format::RGBA8_UNORM, 16};   // u32 at offset 16 (4 bytes)
+    uiVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};    // float2 at offset 20 (8 bytes)
 
     // Build attributes in shader-expected order (WITHOUT stride first)
+    Msg("* [MaterialCache::CreateUIPSO] Building vertex layout from %u shader inputs:",
+        pso->vsInputSignature.elements.size());
+
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
 
@@ -2117,6 +2293,9 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         attr.offset = it->second.offset;
         attr.bufferIndex = 0;
         attr.elementStride = 0;  // Will be set below after calculating stride
+
+        Msg("  - %s%d: format=%d, offset=%u", attr.semanticName, attr.semanticIndex,
+            (int)attr.format, attr.offset);
 
         psoDesc.vertexAttributes.push_back(attr);
     }
@@ -2139,39 +2318,70 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     pso->vertexStride = calculatedStride;
+    Msg("* [MaterialCache::CreateUIPSO] Calculated vertex stride: %u bytes", calculatedStride);
 
-    // UI render state - matches vanilla X-Ray:
-    // Depth: enabled, always pass, no write (for stencil support)
-    // Stencil: enabled (used by some UI shaders)
-    // Blend: standard alpha blending for both color and alpha channels
-    psoDesc.depthStencilState.depthTestEnable = true;
-    psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Always;  // Always pass depth test
-    psoDesc.depthStencilState.depthWriteEnable = false;  // Don't write depth
-    psoDesc.depthStencilState.stencilEnable = true;      // Enable stencil for UI effects
-
-    // Standard premultiplied alpha blending (matches vanilla)
-    psoDesc.blendState.renderTargets[0].blendEnable = true;
-    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
-    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
-    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;  // FIXED: was One, should be SrcAlpha!
-    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
-
-    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
-    psoDesc.rasterizerState.frontCounterClockwise = false;
-    psoDesc.rasterizerState.scissorEnable = true;  // Enable scissor for UI clipping (maps, scrollviews, etc.)
-
-    // Set render target formats from framebuffer
+    // Set render target formats from framebuffer FIRST
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
+    psoDesc.renderTargetCount = static_cast<u32>(fbDesc.colorAttachments.size());
     for (u32 i = 0; i < fbDesc.colorAttachments.size() && i < 8; ++i) {
         if (fbDesc.colorAttachments[i].texture) {
             psoDesc.renderTargetFormats[i] = fbDesc.colorAttachments[i].texture->getDesc().format;
         }
     }
-    if (fbDesc.depthAttachment.texture) {
+
+    // UI render state:
+    // Depth/Stencil: Only enable if framebuffer has depth
+    // Blend: standard alpha blending
+    bool hasDepth = (fbDesc.depthAttachment.texture != nullptr);
+    if (hasDepth) {
         psoDesc.depthStencilFormat = fbDesc.depthAttachment.texture->getDesc().format;
+        psoDesc.depthStencilState.depthTestEnable = true;
+        psoDesc.depthStencilState.depthFunc = ng::ComparisonFunc::Always;  // Always pass
+        psoDesc.depthStencilState.depthWriteEnable = false;  // Don't write depth
+        psoDesc.depthStencilState.stencilEnable = true;      // Enable stencil for UI effects
+    } else {
+        psoDesc.depthStencilState.depthTestEnable = false;
+        psoDesc.depthStencilState.depthWriteEnable = false;
+        psoDesc.depthStencilState.stencilEnable = false;
+    }
+
+    // Standard premultiplied alpha blending (matches vanilla)
+    psoDesc.blendState.renderTargets[0].blendEnable = true;
+    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.scissorEnable = true;  // Enable scissor for UI clipping
+
+    // Set primitive topology (UI uses triangle lists) - already defaults to TriangleList but being explicit
+    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
+
+    // Use binding layouts created by CreateBindingLayouts() from shader reflection
+    // These layouts were built from the shader's actual resource declarations
+    if (pso->vsBindingLayout) {
+        psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);
+    }
+    if (pso->psBindingLayout) {
+        psoDesc.bindingLayouts.push_back(pso->psBindingLayout);
+    }
+
+    if (psoDesc.bindingLayouts.empty()) {
+        Msg("! [MaterialCache::CreateUIPSO] No binding layouts created from shader reflection!");
+        return nullptr;
     }
 
     psoDesc.debugName = "UI_PSO";
+
+    // Log PSO descriptor before creation
+    Msg("* [MaterialCache::CreateUIPSO] Creating PSO:");
+    Msg("  - VS: %p, PS: %p", psoDesc.vertexShader, psoDesc.pixelShader);
+    Msg("  - Vertex attributes: %u, stride: %u", psoDesc.vertexAttributes.size(), calculatedStride);
+    Msg("  - RT count: %u, RT format: %d, depth format: %d",
+        psoDesc.renderTargetCount, (int)psoDesc.renderTargetFormats[0], (int)psoDesc.depthStencilFormat);
+    Msg("  - Depth enabled: %d, has depth attachment: %d", psoDesc.depthStencilState.depthTestEnable, hasDepth);
 
     // Create pipeline state via cache
     ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();

@@ -1,8 +1,8 @@
 // bindless_depth.vs
-// Depth-only vertex shader for bindless geometry
+// SM6 Depth-only vertex shader for bindless geometry
 // MUST produce identical SV_Position as bindless_forward.vs for Z consistency
 
-#define SM_5_0
+#define SM_6_0
 #include "common.h"
 
 // UnifiedVertex format (48 bytes) - same as bindless_forward.vs

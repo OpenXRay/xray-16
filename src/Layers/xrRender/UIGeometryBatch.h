@@ -54,7 +54,7 @@ public:
     UIPrimitiveType primitiveType{UIPrimitiveType::TriList};
 
     // Rendering state
-    ref_shader shader;          // Shader for this batch
+    IUIShader* uiShader{nullptr};  // Backend-agnostic: Pointer to shader (dxUIShader has NVRHI handles)
     u32 shaderElement{0};       // Shader element index (always 0 for UI = SE_R2_NORMAL_HQ)
     int alphaRef{0};            // Alpha reference value
     bool hasScissor{false};     // Whether scissor rect is active
@@ -66,7 +66,7 @@ public:
     {
         vertices.clear();
         indices.clear();
-        shader = nullptr;
+        uiShader = nullptr;
         alphaRef = 0;
         hasScissor = false;
         cullMode = 0;
@@ -143,10 +143,10 @@ public:
     }
 
     // Check if this batch can be merged with given state
-    bool CanMergeWith(ref_shader otherShader, int otherAlphaRef, bool otherScissor,
+    bool CanMergeWith(IUIShader* otherShader, int otherAlphaRef, bool otherScissor,
                       const Irect* otherScissorRect, int otherCullMode) const
     {
-        if (shader != otherShader)
+        if (uiShader != otherShader)
             return false;
         if (alphaRef != otherAlphaRef)
             return false;

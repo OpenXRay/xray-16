@@ -24,6 +24,10 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
+// D3D12: Need full MaterialSystem definition for MaterialInfo
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+
 namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
 {
 class NVRHIDevice;
@@ -39,11 +43,18 @@ class ImGuiRendererNVRHI;
 namespace xray::render
 {
 class FrameGraphRenderer;
+struct MaterialPSO;
+}
+
+namespace xray::render::ng
+{
+class PipelineState;
 }
 
 namespace xray::render::framegraph
 {
 class ShaderLoader;
+struct ExtractedReflection;
 }
 
 namespace xray::render::RENDER_NAMESPACE
@@ -331,15 +342,44 @@ public:
 
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
-    xr_vector<ref_shader> Shaders;
 
-    // D3D12: Store shader/texture name strings for level geometry
-    // (shader_id indexes into these - used when OGF_TEXTURE chunk is missing)
-    struct ShaderNameEntry {
+    // ═══════════════════════════════════════════════════
+    //  D3D12: CompiledLevelShader (replaces ref_shader + ShaderNameEntry)
+    // ═══════════════════════════════════════════════════
+    struct CompiledLevelShader {
+        // Metadata
         shared_str shaderName;
         shared_str textureName;
+
+        // NVRHI shader handles (replaces ref_shader)
+        nvrhi::ShaderHandle vsHandle;
+        nvrhi::ShaderHandle psHandle;
+
+        // Reflection data (needed for PSO creation)
+        xr_unique_ptr<framegraph::ExtractedReflection> vsReflection;
+        xr_unique_ptr<framegraph::ExtractedReflection> psReflection;
+
+        // Material info (alpha test, transparency, etc.)
+        MaterialSystem::MaterialInfo materialInfo;
+
+        // Precompiled PSOs (indexed by vertex format + pass type)
+        struct PrecompiledPSOs {
+            struct PSOVariant {
+                u32 vertexFormatID;
+                RenderPassType passType;
+                ng::PipelineState* pso;
+                MaterialPSO* materialPSO;
+            };
+
+            xr_vector<PSOVariant> variants;
+            xr_map<u64, MaterialPSO*> psoCache;  // hash(vertexFormatID, passType) → MaterialPSO*
+        };
+
+        PrecompiledPSOs precompiledPSOs;
     };
-    xr_vector<ShaderNameEntry> ShaderNames;
+
+    xr_vector<CompiledLevelShader> CompiledLevelShaders;  // D3D12: Replaces legacy Shaders + ShaderNames
+
     typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
@@ -379,7 +419,22 @@ private:
     void Load3DFluid();
 #endif
 
+    // D3D12: Shader compilation and PSO precompilation (private helpers)
+    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
+    void PrecompileLevelPSOs();
+    bool IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection);
+    bool MatchesSemanticName(const VertexElement& elem, const xr_string& semanticName);
+    bool IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat);
+    u32 GetVertexStride(u32 vertexFormatID);
+    bool CreatePrecompiledPSO(u32 shaderID, u32 vertexFormatID, RenderPassType passType,
+                               nvrhi::Format colorFormat, nvrhi::Format depthFormat, MaterialCache* materialCache);
+    void SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
+    void SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
+
 public:
+    // D3D12: Public PSO cache key computation (used by MaterialCache)
+    u64 ComputePSOCacheKey(u32 vertexFormatID, RenderPassType passType);
+
     void render_forward();
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
@@ -465,8 +520,15 @@ public:
 
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    // D3D12/NVRHI: New shader access (replaces getShader/getShaderNames)
+    CompiledLevelShader* getCompiledShader(int id);
+    bool getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS);
+
+    // Legacy D3D11: Old shader access
     ref_shader getShader(int id);
     bool getShaderNames(int id, shared_str& outShaderName, shared_str& outTextureName);
+
     IRenderVisual* getVisual(int id) override;
 
     // Main

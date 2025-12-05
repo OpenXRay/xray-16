@@ -16,6 +16,10 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 
+// D3D12: Shader compilation
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRender::level_Load(IReader* fs)
@@ -30,44 +34,9 @@ void CRender::level_Load(IReader* fs)
     Resources->DeferredLoad(TRUE);
     IReader* chunk;
 
-    // Shaders
-    g_pGamePersistent->LoadTitle("st_loading_shaders");
-    {
-        ZoneScopedN("Load shaders");
-        chunk = fs->open_chunk(fsL_SHADERS);
-        R_ASSERT2(chunk, "Level doesn't builded correctly.");
-        u32 count = chunk->r_u32();
-        Shaders.resize(count);
-        ShaderNames.resize(count);  // D3D12: Store shader/texture names for level geometry
-        for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
-        {
-            string512 n_sh, n_tlist;
-            LPCSTR n = LPCSTR(chunk->pointer());
-            chunk->skip_stringZ();
-            if (0 == n[0])
-                continue;
-            xr_strcpy(n_sh, n);
-            pstr delim = strchr(n_sh, '/');
-            *delim = 0;
-            xr_strcpy(n_tlist, delim + 1);
-            Shaders[i] = Resources->Create(n_sh, n_tlist);
-
-            // D3D12: Store shader/texture names for MaterialSystem lookup
-            // n_tlist may contain comma-separated texture names; first one is diffuse
-            string256 firstTexture;
-            xr_strcpy(firstTexture, n_tlist);
-            if (pstr comma = strchr(firstTexture, ','))
-                *comma = 0;  // Truncate at first comma
-            ShaderNames[i].shaderName = n_sh;
-            ShaderNames[i].textureName = firstTexture;
-        }
-        chunk->close();
-    }
-
-    // Components
-    Wallmarks = xr_new<CWallmarksEngine>();
-    Details = xr_new<CDetailManager>();
-
+    // ═══════════════════════════════════════════════════
+    // CRITICAL: Load vertex formats BEFORE shaders (needed for PSO precompilation)
+    // ═══════════════════════════════════════════════════
     if (!GEnv.isDedicatedServer)
     {
         // ═══════════════════════════════════════════════════════
@@ -82,7 +51,7 @@ void CRender::level_Load(IReader* fs)
             }
         }
 
-        // VB,IB,SWI
+        // VB,IB,SWI - MOVED UP! Must load vertex formats before compiling shaders
         g_pGamePersistent->LoadTitle("st_loading_geometry");
         {
             CStreamReader* geom = FS.rs_open("$level$", "level.geom");
@@ -99,7 +68,56 @@ void CRender::level_Load(IReader* fs)
             FS.r_close(geom);
             m_fast_geom_loaded = true;
         }
+    }
 
+    // Shaders - NOW LOADS AFTER VERTEX FORMATS
+    g_pGamePersistent->LoadTitle("st_loading_shaders");
+    {
+        ZoneScopedN("Load shaders");
+        chunk = fs->open_chunk(fsL_SHADERS);
+        R_ASSERT2(chunk, "Level doesn't builded correctly.");
+        u32 count = chunk->r_u32();
+        CompiledLevelShaders.resize(count);  // D3D12: Compiled NVRHI shaders
+        for (u32 i = 0; i < count; i++)
+        {
+            string512 n_sh, n_tlist;
+            LPCSTR n = LPCSTR(chunk->pointer());
+            chunk->skip_stringZ();
+            if (0 == n[0])
+                continue;
+            xr_strcpy(n_sh, n);
+            pstr delim = strchr(n_sh, '/');
+            *delim = 0;
+            xr_strcpy(n_tlist, delim + 1);
+
+            // Extract first texture name
+            string256 firstTexture;
+            xr_strcpy(firstTexture, n_tlist);
+            if (pstr comma = strchr(firstTexture, ','))
+                *comma = 0;  // Truncate at first comma
+
+            // D3D12: Compile NVRHI shaders directly (NO legacy ref_shader!)
+            if (m_framegraphRenderer) {
+                CompileLevelShader(i, n_sh, firstTexture);
+            }
+        }
+        chunk->close();
+    }
+
+    // ═══════════════════════════════════════════════════
+    // D3D12: PSO PRECOMPILATION (eliminates runtime hitches!)
+    // ═══════════════════════════════════════════════════
+    if (m_framegraphRenderer && !GEnv.isDedicatedServer) {
+        g_pGamePersistent->LoadTitle("st_precompiling_pso");
+        PrecompileLevelPSOs();
+    }
+
+    // Components
+    Wallmarks = xr_new<CWallmarksEngine>();
+    Details = xr_new<CDetailManager>();
+
+    if (!GEnv.isDedicatedServer)
+    {
         // Visuals
         g_pGamePersistent->LoadTitle("st_loading_spatial_db");
         chunk = fs->open_chunk(fsL_VISUALS);
@@ -109,6 +127,7 @@ void CRender::level_Load(IReader* fs)
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER SYSTEM: End level load
         // ═══════════════════════════════════════════════════════
+        auto* gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
         }
@@ -140,6 +159,149 @@ void CRender::level_Load(IReader* fs)
 
     // signal loaded
     b_loaded = TRUE;
+}
+
+// ═══════════════════════════════════════════════════
+//  D3D12: Compile shaders using NVRHI ShaderLoader
+// ═══════════════════════════════════════════════════
+void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName)
+{
+    ZoneScopedN("Compile Level Shader");
+
+    auto& compiled = CompiledLevelShaders[shaderID];
+    compiled.shaderName = shaderName;
+    compiled.textureName = textureName;
+
+    // Use the CRender's ShaderLoader instance
+    if (!m_shaderLoader) {
+        Msg("! [ERROR] ShaderLoader not available for shader: %s", shaderName);
+        return;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  COMPILE VERTEX SHADER
+    // ═══════════════════════════════════════════════════
+    auto vsResult = m_shaderLoader->LoadVertexShader(shaderName, "main");
+
+    if (vsResult.handle) {
+        compiled.vsHandle = vsResult.handle;
+        // Move ownership of reflection data
+        compiled.vsReflection.reset(vsResult.reflection);
+        vsResult.reflection = nullptr;  // Prevent double deletion
+    } else {
+        Msg("! [ERROR] Failed to compile VS for shader: %s", shaderName);
+        return;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  COMPILE PIXEL SHADER
+    // ═══════════════════════════════════════════════════
+    auto psResult = m_shaderLoader->LoadPixelShader(shaderName, "main");
+
+    if (psResult.handle) {
+        compiled.psHandle = psResult.handle;
+        // Move ownership of reflection data
+        compiled.psReflection.reset(psResult.reflection);
+        psResult.reflection = nullptr;  // Prevent double deletion
+    } else {
+        Msg("! [ERROR] Failed to compile PS for shader: %s", shaderName);
+        return;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  GET MATERIAL INFO (from MaterialSystem)
+    // ═══════════════════════════════════════════════════
+    compiled.materialInfo = MaterialSystem::Instance().GetMaterialInfo(shaderName);
+
+    Msg("* Compiled shader %u: %s (VS=%p, PS=%p, alphaTest=%d, transparent=%d)",
+        shaderID, shaderName,
+        compiled.vsHandle.Get(),
+        compiled.psHandle.Get(),
+        compiled.materialInfo.alphaTest,
+        compiled.materialInfo.transparent);
+}
+
+// ═══════════════════════════════════════════════════
+//  D3D12: Precompile PSOs for all level shaders
+// ═══════════════════════════════════════════════════
+void CRender::PrecompileLevelPSOs()
+{
+    ZoneScopedN("Precompile Level PSOs");
+
+    auto* materialCache = m_framegraphRenderer->GetMaterialCache();
+    if (!materialCache) {
+        Msg("! [ERROR] MaterialCache not available - skipping PSO precompilation");
+        return;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  HARDCODE FRAMEBUFFER FORMATS (matches ForwardColorPassSetup)
+    // ═══════════════════════════════════════════════════
+    nvrhi::Format colorFormat = nvrhi::Format::RGBA16_FLOAT;  // HDR
+    nvrhi::Format depthFormat = nvrhi::Format::D32;
+
+    u32 totalPSOs = 0;
+
+    for (u32 shaderID = 0; shaderID < CompiledLevelShaders.size(); ++shaderID) {
+        auto& compiled = CompiledLevelShaders[shaderID];
+
+        if (!compiled.vsHandle || !compiled.psHandle)
+            continue;  // Skip failed compilations
+
+        // Update progress
+        float progress = float(shaderID) / float(CompiledLevelShaders.size());
+        g_pGamePersistent->LoadTitle("st_precompiling_pso", progress);
+
+        // ═══════════════════════════════════════════════════
+        //  FIND COMPATIBLE VERTEX FORMATS
+        // ═══════════════════════════════════════════════════
+        xr_vector<u32> compatibleFormats;
+        for (u32 dcl_id = 0; dcl_id < nDC.size(); ++dcl_id) {
+            if (IsVertexFormatCompatible(nDC[dcl_id], compiled.vsReflection.get())) {
+                compatibleFormats.push_back(dcl_id);
+            }
+        }
+
+        if (compatibleFormats.empty()) {
+            Msg("! Shader %u (%s) has no compatible vertex formats!",
+                shaderID, compiled.shaderName.c_str());
+            continue;
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  PRECOMPILE PSOs FOR EACH FORMAT + PASS TYPE
+        // ═══════════════════════════════════════════════════
+        for (u32 dcl_id : compatibleFormats) {
+            // 1. Forward Color PSO (always needed)
+            if (CreatePrecompiledPSO(
+                shaderID,
+                dcl_id,
+                RenderPassType::ForwardColor,
+                colorFormat,
+                depthFormat,
+                materialCache
+            )) {
+                totalPSOs++;
+            }
+
+            // 2. Depth Prepass PSO (for opaque + alpha-tested)
+            if (!compiled.materialInfo.transparent) {
+                if (CreatePrecompiledPSO(
+                    shaderID,
+                    dcl_id,
+                    RenderPassType::DepthPrepass,
+                    nvrhi::Format::UNKNOWN,  // No color output
+                    depthFormat,
+                    materialCache
+                )) {
+                    totalPSOs++;
+                }
+            }
+        }
+    }
+
+    Msg("* Precompiled %u PSOs for %u shaders across %u vertex formats",
+        totalPSOs, CompiledLevelShaders.size(), nDC.size());
 }
 
 void CRender::level_Unload()
@@ -218,8 +380,7 @@ void CRender::level_Unload()
     xr_delete(Wallmarks);
 
     //*** Shaders
-    Shaders.clear();
-    ShaderNames.clear();  // D3D12: Clear shader name cache
+    CompiledLevelShaders.clear();  // D3D12: Clear compiled NVRHI shaders
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

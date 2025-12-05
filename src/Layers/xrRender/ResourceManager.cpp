@@ -321,12 +321,11 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 {
     if (!GEnv.isDedicatedServer)
     {
-        // For D3D12/FrameGraph: Skip legacy shader creation entirely
-        // FrameGraph manages its own shaders/pipelines via NVRHI
-        // Any code that crashes on null here needs to be updated to use FrameGraph
+        // D3D12: Skip legacy shader creation - use NVRHI ShaderLoader instead
+        // Individual systems (UI, lensflares, etc.) handle DX12 path in their create() methods
         if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
         {
-            return nullptr;
+            return nullptr;  // No legacy shader object for DX12
         }
 
 #if defined(USE_DX9)

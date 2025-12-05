@@ -207,7 +207,7 @@ void CUIStaticItem::Render(float angle)
 
 void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)
 {
-    hShader->create(sh, tex);
+    hShader->create(sh, tex);  // Now uses NVRHI for DX12 via dxUIShader::create()
     uFlags.set(flValidSize, FALSE);
     uFlags.set(flValidTextureRect, FALSE);
 }

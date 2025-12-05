@@ -194,6 +194,9 @@ struct PipelineStateDesc {
     // ─── Vertex Input ───
     xr_vector<VertexAttribute> vertexAttributes;
 
+    // ─── Binding Layouts (Root Signature) ───
+    xr_vector<nvrhi::BindingLayoutHandle> bindingLayouts;
+
     // ─── Fixed Function State ───
     RasterizerState rasterizerState;
     BlendState blendState;

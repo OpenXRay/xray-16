@@ -380,6 +380,13 @@ PipelineState* PipelineStateCache::CreatePipelineState(
     // ─── Primitive Topology ───
     nvrhiDesc.primType = ConvertPrimitiveTopology(desc.primitiveTopology);
 
+    // ─── Binding Layouts (Root Signature) ───
+    if (!desc.bindingLayouts.empty()) {
+        for (const auto& layout : desc.bindingLayouts) {
+            nvrhiDesc.bindingLayouts.push_back(layout);
+        }
+    }
+
     // ─── Create framebuffer info (needed for PSO creation) ───
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.width = 1920;   // Dummy values (not used for PSO validation)

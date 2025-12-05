@@ -389,6 +389,12 @@ void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 
 bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 {
+    // DX12/FrameGraph: GPU-side YUV→RGB conversion not yet implemented
+    // Force CPU-side conversion until we implement YUV shader support
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+        return false;
+
+    // D3D11: Use hardware capabilities check
     const auto& caps = GEnv.Backend->GetCapabilities();
     u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
     u32 v_need = CAP_VERSION(2, 0);

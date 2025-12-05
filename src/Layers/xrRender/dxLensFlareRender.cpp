@@ -2,6 +2,7 @@
 #include "dxLensFlareRender.h"
 #include "xrEngine/xr_efflensflare.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "FrameGraph/ShaderLoader.h"
 #define MAX_Flares 24
 
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv.far_plane
@@ -11,11 +12,55 @@ namespace xray::render::RENDER_NAMESPACE
 void dxFlareRender::Copy(IFlareRender& _in) { *this = *(dxFlareRender*)&_in; }
 void dxFlareRender::CreateShader(LPCSTR sh_name, LPCSTR tex_name)
 {
+    // DX12/FrameGraph: Compile shaders using NVRHI ShaderLoader
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    {
+        if (tex_name && tex_name[0])
+        {
+            m_shaderName = sh_name;
+            m_textureName = tex_name;
+
+            // Get ShaderLoader from renderer
+            auto* shaderLoader = RImplementation.GetShaderLoader();
+            if (shaderLoader)
+            {
+                // Compile vertex and pixel shaders
+                auto vsResult = shaderLoader->LoadVertexShader(sh_name, "main");
+                auto psResult = shaderLoader->LoadPixelShader(sh_name, "main");
+
+                if (vsResult.handle && psResult.handle)
+                {
+                    m_vsHandle = vsResult.handle;
+                    m_psHandle = psResult.handle;
+                    Msg("* [dxFlareRender] Compiled flare shader: %s (tex: %s)", sh_name, tex_name);
+                }
+                else
+                {
+                    Msg("! [dxFlareRender] Failed to compile flare shader: %s", sh_name);
+                }
+            }
+        }
+        return;
+    }
+
+    // Legacy D3D11 path
     if (tex_name && tex_name[0])
         hShader.create(sh_name, tex_name);
 }
 
-void dxFlareRender::DestroyShader() { hShader.destroy(); }
+void dxFlareRender::DestroyShader()
+{
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    {
+        m_vsHandle = nullptr;
+        m_psHandle = nullptr;
+        m_shaderName = nullptr;
+        m_textureName = nullptr;
+        return;
+    }
+
+    hShader.destroy();
+}
 void dxLensFlareRender::Copy(ILensFlareRender& _in) { *this = *(dxLensFlareRender*)&_in; }
 void dxLensFlareRender::Render(CLensFlare& owner, BOOL bSun, BOOL bFlares, BOOL bGradient)
 {

@@ -42,10 +42,17 @@ private:
     RuntimeTextureList sky_r_textures;
     RuntimeTextureList clouds_r_textures;
 
+    // Legacy D3D11
     ref_shader sh_2sky;
-    ref_geom sh_2geom;
-
     ref_shader clouds_sh;
+
+    // DX12: NVRHI shader handles
+    nvrhi::ShaderHandle sh_2sky_VS;
+    nvrhi::ShaderHandle sh_2sky_PS;
+    nvrhi::ShaderHandle clouds_sh_VS;
+    nvrhi::ShaderHandle clouds_sh_PS;
+
+    ref_geom sh_2geom;
     ref_geom clouds_geom;
 
     u32 tsky0_tstage{};

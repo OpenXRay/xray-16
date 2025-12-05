@@ -107,30 +107,47 @@ struct MaterialKey {
     bool operator<(const MaterialKey& other) const {
         // Sort by PSO type first
         if (psoType != other.psoType) return psoType < other.psoType;
-        if (shader != other.shader) return shader < other.shader;
 
-        // Specialized PSO comparison (UI/depth use element + framebuffer)
-        if (psoType == PSOType::UI || psoType == PSOType::Depth) {
+        // UI PSOs: Use textureHash (shader+texture combined) + element
+        // NOTE: Don't include framebuffer for UI - it's recreated every frame but format is always the same
+        if (psoType == PSOType::UI) {
+            if (textureHash != other.textureHash) return textureHash < other.textureHash;
+            return element < other.element;
+        }
+
+        // Depth PSOs: Use shader pointer + element + framebuffer
+        if (psoType == PSOType::Depth) {
+            if (shader != other.shader) return shader < other.shader;
             if (element != other.element) return element < other.element;
             return framebuffer < other.framebuffer;
         }
 
-        // Regular material PSO comparison (uses texture/state hashes)
+        // Regular material PSOs: Use shader pointer + texture/state hashes
+        if (shader != other.shader) return shader < other.shader;
         if (textureHash != other.textureHash) return textureHash < other.textureHash;
         return stateHash < other.stateHash;
     }
 
     bool operator==(const MaterialKey& other) const {
         if (psoType != other.psoType) return false;
-        if (shader != other.shader) return false;
 
-        // Specialized PSO comparison
-        if (psoType == PSOType::UI || psoType == PSOType::Depth) {
-            return element == other.element && framebuffer == other.framebuffer;
+        // UI PSOs: Compare textureHash (shader+texture combined) + element
+        // NOTE: Don't include framebuffer for UI - it's recreated every frame but format is always the same
+        if (psoType == PSOType::UI) {
+            return textureHash == other.textureHash &&
+                   element == other.element;
         }
 
-        // Regular material PSO comparison
-        return textureHash == other.textureHash &&
+        // Depth PSOs: Compare shader pointer + element + framebuffer
+        if (psoType == PSOType::Depth) {
+            return shader == other.shader &&
+                   element == other.element &&
+                   framebuffer == other.framebuffer;
+        }
+
+        // Regular material PSOs: Compare shader pointer + texture/state hashes
+        return shader == other.shader &&
+               textureHash == other.textureHash &&
                stateHash == other.stateHash;
     }
 };
@@ -319,8 +336,9 @@ public:
 
     // Get or create PSO for UI rendering (simplified - no visual required)
     // Uses fixed UI vertex layout (position, color, texcoord)
+    // Takes IUIShader* (backend-agnostic) instead of Shader*
     MaterialPSO* GetOrCreateUIPSO(
-        Shader* shader,
+        IUIShader* uiShader,
         u32 elementIndex,
         nvrhi::IFramebuffer* framebuffer);
 
@@ -397,8 +415,9 @@ private:
         const framegraph::FrameGraph& fg);
 
     // Create UI PSO (no visual, fixed vertex layout)
+    // Takes IUIShader* to access NVRHI handles directly
     MaterialPSO* CreateUIPSO(
-        Shader* shader,
+        IUIShader* uiShader,
         ShaderElement* elem,
         SPass* pass,
         nvrhi::IFramebuffer* framebuffer);
@@ -457,6 +476,9 @@ private:
 
     // Compute state hash
     static u64 ComputeStateHash(SPass* pass);
+
+    // D3D12: Extract vertex format ID from visual's geometry
+    static u32 GetVertexFormatID(dxRender_Visual* visual);
 
     // Setup PSO descriptor helpers
     // Validate that geometry provides all vertex attributes the shader expects

@@ -6,7 +6,7 @@
 // Mip 0: Reads from full-res depth buffer
 // Mip N: Reads from mip N-1 of Hi-Z pyramid
 //
-#define SM_5_0
+#define SM_6_0
 #include "common.h"
 
 // ═══════════════════════════════════════════════════════

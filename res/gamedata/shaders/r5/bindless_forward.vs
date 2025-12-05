@@ -1,5 +1,5 @@
 // bindless_forward.vs
-// Bindless forward vertex shader
+// SM6 Bindless forward vertex shader
 //
 // SUPPORTS TWO VERTEX FORMATS:
 // 1. Legacy X-Ray compressed format (32 bytes) - current rendering path
@@ -8,7 +8,7 @@
 // For now, we use the UnifiedVertex format which has pre-unpacked UVs.
 // When rendering from legacy D3D11 buffers, the input layout handles conversion.
 
-#define SM_5_0
+#define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
 

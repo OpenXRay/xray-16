@@ -97,28 +97,24 @@ void NVRHIUIRenderer::RenderBatches(
     // the submission order (cursor needs to render LAST, not first!).
     // Now we render in exact submission order, changing PSO as needed.
 
-    Shader* lastShader = nullptr;
+    IUIShader* lastUIShader = nullptr;
     MaterialPSO* currentPSO = nullptr;
 
     for (const auto& batch : batches)
     {
-        if (batch.IsEmpty() || !batch.shader)
-            continue;
-
-        Shader* shader = batch.shader._get();
-        if (!shader)
+        if (batch.IsEmpty() || !batch.uiShader)
             continue;
 
         // Only change PSO when shader changes
-        if (shader != lastShader)
+        if (batch.uiShader != lastUIShader)
         {
-            currentPSO = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
+            currentPSO = m_matCache->GetOrCreateUIPSO(batch.uiShader, 0, framebuffer);
             if (!currentPSO)
             {
                 Msg("! [NVRHIUIRenderer] Failed to get PSO, skipping batch");
                 continue;
             }
-            lastShader = shader;
+            lastUIShader = batch.uiShader;
         }
 
         // Render this single batch

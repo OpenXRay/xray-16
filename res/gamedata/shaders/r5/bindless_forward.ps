@@ -1,8 +1,10 @@
 // bindless_forward.ps
-// Bindless forward pixel shader with grid-packing atlas support
-// All materials use this single shader - textures fetched via material buffer
+// SM6 Bindless forward pixel shader
+// Uses ResourceDescriptorHeap[NonUniformResourceIndex(index)] for texture access
+// MaterialData contains descriptor heap indices (diffuseIndex, normalIndex, etc.)
+// Uses static_globals (b2) for lighting - same values as legacy renderer
 
-#define SM_5_0
+#define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
 
@@ -22,21 +24,16 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
 };
 
-// Lighting constants (b4 to avoid conflict with common.h's b0-b2)
-cbuffer LightingConstants : register(b4)
-{
-    float4 g_SunDirection;
-    float4 g_SunColor;
-    float4 g_AmbientColor;
-    float4 g_CameraPosition;
-    float4 g_FogParams;      // x = start, y = end, z = density
-    float4 g_FogColor;
-};
+// Lighting uses static_globals from common.h (b2):
+// - L_sun_color, L_sun_dir_w (sun)
+// - L_ambient (ambient)
+// - eye_position (camera)
+// - fog_params, fog_color (fog)
 
 // Simple PBR-ish lighting
 float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
 {
-    float3 L = -g_SunDirection.xyz;
+    float3 L = -L_sun_dir_w;
     float3 H = normalize(V + L);
 
     float NdotL = saturate(dot(N, L));
@@ -58,8 +55,8 @@ float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, floa
     float3 specular = D * F * 0.25;
 
     // Combine
-    float3 directLight = (diffuse + specular) * g_SunColor.rgb * NdotL;
-    float3 ambient = albedo * g_AmbientColor.rgb * ao;
+    float3 directLight = (diffuse + specular) * L_sun_color * NdotL;
+    float3 ambient = albedo * L_ambient.rgb * ao;
 
     return directLight + ambient;
 }
@@ -79,17 +76,11 @@ PS_OUTPUT main(PS_INPUT input)
     //output.color = float4(input.materialID / 255.0, input.materialID / 255.0, input.materialID / 255.0, 1);
     //return output;
 
-    // Get material data directly using material ID (no indirection through g_DrawMaterialIDs)
+    // Get material data directly using material ID
     MaterialData mat = g_Materials[input.materialID];
 
-    // DEBUG: Show page index and cell info as color
-    //uint pageIdx = mat.diffuseAtlasLow & 0xFFFF;
-    //uint cellX = (mat.diffuseAtlasLow >> 16) & 0xFFFF;
-    //uint cellY = mat.diffuseAtlasHigh & 0xFFFF;
-    //output.color = float4(pageIdx / 4.0, cellX / 32.0, cellY / 32.0, 1);
-    //return output;
 
-    // Sample textures from grid-packed atlases
+    // Sample textures using SM6 bindless (ResourceDescriptorHeap)
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
 
     // DEBUG: Highlight black samples in CYAN to see where texture returns black
@@ -123,8 +114,8 @@ PS_OUTPUT main(PS_INPUT input)
     // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        // Detail sampling uses scaled UV for tiling effect
-        float4 detailSample = SampleDetail(mat, input.texcoord, mat.detailScale);
+        // Detail sampling (uses mat.detailScale internally)
+        float4 detailSample = SampleDetail(mat, input.texcoord);
         // Blend detail (multiply-2x style)
         albedo = albedo * (detailSample.rgb * 2.0);
     }
@@ -142,16 +133,17 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    // View direction
-    float3 V = normalize(g_CameraPosition.xyz - input.worldPos);
+    // View direction (eye_position from static_globals)
+    float3 V = normalize(eye_position - input.worldPos);
 
     // Calculate lighting
     float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
 
-    // Fog
-    float fogDist = length(input.worldPos - g_CameraPosition.xyz);
-    float fogFactor = saturate((g_FogParams.y - fogDist) / (g_FogParams.y - g_FogParams.x));
-    finalColor = lerp(g_FogColor.rgb, finalColor, fogFactor);
+    // Fog (fog_params/fog_color from static_globals)
+    // fog_params: x=near (unused here), y=far, z=density (unused here)
+    float fogDist = length(input.worldPos - eye_position);
+    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
+    finalColor = lerp(fog_color.rgb, finalColor, fogFactor);
 
     output.color = float4(finalColor, diffuseSample.a);
     return output;

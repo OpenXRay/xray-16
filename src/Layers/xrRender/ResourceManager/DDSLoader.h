@@ -205,7 +205,7 @@ struct DDSData {
         bool cycled = false;                  // Ping-pong animation (forward then reverse)
         bool needsUpdate = false;             // Frame has changed, need writeTexture
         u32 currentFrame = 0;                 // Current frame index
-        float elapsedTime = 0.0f;             // Elapsed time since last frame change (ms)
+        u32 lastUpdateTime = 0;               // Absolute time of last frame change (ms)
     };
 
     SequenceState* sequenceState = nullptr;  // Only allocated for sequence textures

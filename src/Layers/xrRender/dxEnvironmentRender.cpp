@@ -7,6 +7,7 @@
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/xr_efflensflare.h"
+#include "FrameGraph/ShaderLoader.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -343,46 +344,82 @@ void dxEnvironmentRender::OnDeviceCreate()
     if (GEnv.isDedicatedServer)
         return;
 
-    if (RImplementation.o.ffp)
+    // DX12: Compile shaders using NVRHI
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
     {
-        // XXX: We need better blender with multitexturing
-        // to properly blend two textures.
-        // Currently, it just suddenly changes.
-        sh_2sky.create("sky\\skydome", "skybox_2t");
+        auto* shaderLoader = RImplementation.GetShaderLoader();
+        if (shaderLoader)
+        {
+            // Sky shader
+            auto sky_vs = shaderLoader->LoadVertexShader("sky2", "main");
+            auto sky_ps = shaderLoader->LoadPixelShader("sky2", "main");
+            if (sky_vs.handle && sky_ps.handle)
+            {
+                sh_2sky_VS = sky_vs.handle;
+                sh_2sky_PS = sky_ps.handle;
+                Msg("* [dxEnvironmentRender] Compiled sky shader");
+            }
+
+            // Clouds shader
+            auto clouds_vs = shaderLoader->LoadVertexShader("clouds", "main");
+            auto clouds_ps = shaderLoader->LoadPixelShader("clouds", "main");
+            if (clouds_vs.handle && clouds_ps.handle)
+            {
+                clouds_sh_VS = clouds_vs.handle;
+                clouds_sh_PS = clouds_ps.handle;
+                Msg("* [dxEnvironmentRender] Compiled clouds shader");
+            }
+        }
     }
     else
     {
-        CBlender_skybox b_skybox;
-        sh_2sky.create(&b_skybox, "skybox_2t");
+        // Legacy D3D11
+        if (RImplementation.o.ffp)
+        {
+            // XXX: We need better blender with multitexturing
+            // to properly blend two textures.
+            // Currently, it just suddenly changes.
+            sh_2sky.create("sky\\skydome", "skybox_2t");
+        }
+        else
+        {
+            CBlender_skybox b_skybox;
+            sh_2sky.create(&b_skybox, "skybox_2t");
+        }
+        clouds_sh.create("clouds", "null");
     }
+
     sh_2geom.create(v_skybox_fvf, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
-    clouds_sh.create("clouds", "null");
     clouds_geom.create(v_clouds_fvf, RImplementation.Vertex.Buffer(), RImplementation.Index.Buffer());
 
-    const auto& sky2_constants = sh_2sky->E[0]->passes[0]->constants;
-    const auto& clouds_constants = clouds_sh->E[0]->passes[0]->constants;
-
-    // Just let texture stages be 0 if constants are missing
-    if (sky2_constants)
+    // DX12: Skip legacy constant setup (not used in framegraph)
+    if (GEnv.Backend && GEnv.Backend->GetAPI() != IRenderBackend::API::D3D12)
     {
-        if (const auto C = sky2_constants->get(c_ssky0)._get())
-            tsky0_tstage = C->samp.index;
+        const auto& sky2_constants = sh_2sky->E[0]->passes[0]->constants;
+        const auto& clouds_constants = clouds_sh->E[0]->passes[0]->constants;
 
-        if (const auto C = sky2_constants->get(c_ssky1)._get())
-            tsky1_tstage = C->samp.index;
-    }
-    if (clouds_constants)
-    {
-        if (const auto C = clouds_constants->get(c_sclouds0)._get())
-            tclouds0_tstage = C->samp.index;
+        // Just let texture stages be 0 if constants are missing
+        if (sky2_constants)
+        {
+            if (const auto C = sky2_constants->get(c_ssky0)._get())
+                tsky0_tstage = C->samp.index;
 
-        if (const auto C = clouds_constants->get(c_sclouds1)._get())
-            tclouds1_tstage = C->samp.index;
-    }
+            if (const auto C = sky2_constants->get(c_ssky1)._get())
+                tsky1_tstage = C->samp.index;
+        }
+        if (clouds_constants)
+        {
+            if (const auto C = clouds_constants->get(c_sclouds0)._get())
+                tclouds0_tstage = C->samp.index;
 
-    const bool r2 = RImplementation.GenerationIsR2OrHigher();
-    tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
-    tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
+            if (const auto C = clouds_constants->get(c_sclouds1)._get())
+                tclouds1_tstage = C->samp.index;
+        }
+
+        const bool r2 = RImplementation.GenerationIsR2OrHigher();
+        tonemap_tstage_2sky = sh_2sky->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
+        tonemap_tstage_clouds = clouds_sh->E[0]->passes[0]->T->find_texture_stage(r2_RT_luminance_cur, r2);
+    }  // End DX12 skip block
 }
 
 void dxEnvironmentRender::OnDeviceDestroy()

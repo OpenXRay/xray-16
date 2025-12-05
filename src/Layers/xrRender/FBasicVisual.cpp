@@ -67,13 +67,13 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     }
     else if (hdr.shader_id)
     {
-        // Level geometry uses shader_id to reference pre-loaded shader names
-        // Get texture/shader names from the level's shader string table
-        shared_str shName, texName;
-        if (RImplementation.getShaderNames(hdr.shader_id, shName, texName))
+        // Level geometry uses shader_id to reference precompiled NVRHI shaders
+        auto* compiled = RImplementation.getCompiledShader(hdr.shader_id);
+        if (compiled)
         {
-            shaderName = shName;
-            textureName = texName;
+            shaderName = compiled->shaderName;
+            textureName = compiled->textureName;
+            // NVRHI shader handles are in compiled->vsHandle, compiled->psHandle
         }
     }
 
