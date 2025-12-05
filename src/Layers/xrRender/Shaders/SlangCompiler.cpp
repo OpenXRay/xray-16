@@ -86,7 +86,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         profile = "sm_5_0"; // Shader Model 5.0 for DX11
         break;
     case Target::DXIL:
-        profile = "sm_6_0"; // Shader Model 6.0 for DX12
+        profile = "sm_6_6"; // Shader Model 6.6 for DX12 (ResourceDescriptorHeap bindless)
         break;
     case Target::SPIRV:
         profile = "sm_5_0"; // Use SM 5.0 equivalent for Vulkan

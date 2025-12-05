@@ -139,19 +139,15 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     // Setup render state
     SetupRenderState(drawData, cmdList);
 
-    // Set graphics pipeline state
+    // Set up base graphics state (viewport and scissor set per-draw)
     nvrhi::GraphicsState graphicsState;
     graphicsState.pipeline = m_pipeline;
     graphicsState.framebuffer = m_currentFramebuffer;  // Use the framebuffer passed to Render()
-    graphicsState.viewport.addViewport(m_viewport);    // Set viewport calculated in SetupRenderState()
     graphicsState.bindings = { m_resourceBindings };
     graphicsState.vertexBuffers = {
         { m_vertexBuffer, 0, 0 }
     };
     graphicsState.indexBuffer = { m_indexBuffer, nvrhi::Format::R16_UINT, 0 };
-
-    // Apply complete graphics state
-    cmdList->setGraphicsState(graphicsState);
 
     // Render command lists
     int globalVtxOffset = 0;
@@ -202,9 +198,6 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
                     scissor.maxX = (int)clipRect.z;
                     scissor.maxY = (int)clipRect.w;
 
-                    // Set scissor rect in graphics state
-                    graphicsState.viewport.addScissorRect(scissor);
-
                     // Bind texture if changed
                     ImTextureID texId = pcmd->GetTexID();
                     if (texId != lastTextureId)
@@ -216,7 +209,12 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
                         graphicsState.bindings = { m_resourceBindings };
                     }
 
-                    // Update graphics state (with scissor and possibly new bindings)
+                    // Create fresh viewport state for this draw (don't accumulate)
+                    graphicsState.viewport = nvrhi::ViewportState();
+                    graphicsState.viewport.addViewport(m_viewport);
+                    graphicsState.viewport.addScissorRect(scissor);
+
+                    // Apply graphics state
                     cmdList->setGraphicsState(graphicsState);
 
                     // Draw

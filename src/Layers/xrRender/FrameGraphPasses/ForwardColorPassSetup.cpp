@@ -17,7 +17,7 @@
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 #include "Layers/xrRender/GPUCullingManager.h"  // For IndirectDrawArgs struct
-#include "Layers/xrRender/Bindless/TextureAtlas.h"
+#include "Layers/xrRender/Backend/D3D12Backend.h"  // For SM6 bindless descriptor heap
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "xrCore/FMesh.hpp"  // For MT_NORMAL, MT_TREE, etc.
 
@@ -367,36 +367,7 @@ void renderForwardGeometry(
             batchPhase = RenderPhase::Opaque;
         }
 
-        // Insert markers on phase transition
-        if (batchPhase != currentPhase) {
-            // End previous marker (if any)
-            if (currentPhase != RenderPhase::None) {
-                cmdList->endMarker();
-            }
-
-            // Begin new phase marker
-            switch (batchPhase) {
-                case RenderPhase::Opaque:
-                    cmdList->beginMarker("Forward Opaque (Priority 0)");
-                    break;
-                case RenderPhase::AlphaTested:
-                    cmdList->beginMarker("Forward Alpha-Tested (Priority 1)");
-                    break;
-                case RenderPhase::Transparent:
-                    cmdList->beginMarker("Forward Transparent (bStrictB2F)");
-                    break;
-                default:
-                    break;
-            }
-            currentPhase = batchPhase;
-        }
-
         renderBatch(batch, batchIndex);
-    }
-
-    // End final marker
-    if (currentPhase != RenderPhase::None) {
-        cmdList->endMarker();
     }
 
     // End render pass
@@ -413,13 +384,13 @@ void renderForwardGeometry(
 // This is the high-performance GPU-driven rendering path
 
 // Static resources for bindless rendering (initialized once)
+// SM6 bindless: Textures accessed via ResourceDescriptorHeap[index]
 static nvrhi::GraphicsPipelineHandle s_bindlessPipeline;
 static nvrhi::BindingLayoutHandle s_bindlessLayout;
 static nvrhi::InputLayoutHandle s_bindlessInputLayout;
 static nvrhi::SamplerHandle s_linearSampler;
 static nvrhi::ShaderHandle s_bindlessVS;
 static nvrhi::ShaderHandle s_bindlessPS;
-static nvrhi::TextureHandle s_placeholderTexture;
 static bool s_bindlessInitialized = false;
 
 void renderBindlessForward(
@@ -433,13 +404,10 @@ void renderBindlessForward(
 {
     using namespace RENDER_NAMESPACE::bindless;
 
-    Msg("* [BindlessForward] Enter - config.valid=%d, geometry=%p, batchCount=%zu",
-        config.IsValid(), geometry, geometry ? geometry->GetBatches().size() : 0);
-
     if (!config.IsValid() || !geometry || geometry->GetBatches().empty())
         return;
 
-    // Finalize any pending materials (populate texture atlases)
+    // Finalize any pending materials (register textures to bindless descriptor heap)
     if (materialCache) {
         materialCache->FinalizePendingMaterials(ctx);
     }
@@ -450,15 +418,8 @@ void renderBindlessForward(
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-
-    // DEBUG: Log both NVRHI and native D3D12 command list pointers
-    auto nativeD3D12 = cmdList->getNativeObject(nvrhi::ObjectTypes::D3D12_GraphicsCommandList);
-    Msg("* [BindlessForward] NVRHI cmdList=%p, D3D12 cmdList=%p", cmdList, nativeD3D12.pointer);
-
-    if (!cmdList) {
-        Msg("! [BindlessForward] Command list is NULL!");
+    if (!cmdList)
         return;
-    }
 
     // ═══════════════════════════════════════════════════════
     //  LAZY INITIALIZATION OF BINDLESS RESOURCES
@@ -466,18 +427,14 @@ void renderBindlessForward(
     if (!s_bindlessInitialized) {
         // Load shaders using ShaderLoader
         auto* shaderLoader = GEnv.Render->GetShaderLoader();
-        if (!shaderLoader) {
-            Msg("! [BindlessForward] ShaderLoader not available");
+        if (!shaderLoader)
             return;
-        }
 
         auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
         auto psResult = shaderLoader->LoadPixelShader("bindless_forward", "main");
 
-        if (!vsResult.handle || !psResult.handle) {
-            Msg("! [BindlessForward] Failed to load bindless shaders");
+        if (!vsResult.handle || !psResult.handle)
             return;
-        }
 
         s_bindlessVS = vsResult.handle;
         s_bindlessPS = psResult.handle;
@@ -490,23 +447,21 @@ void renderBindlessForward(
         s_linearSampler = nvDevice->createSampler(samplerDesc);
 
         // Create binding layout
+        // SM6 Bindless: Textures accessed via ResourceDescriptorHeap[index]
+        // No explicit texture bindings needed - just materials buffer with indices
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::All;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(2),  // static_globals (b2) - engine matrices
-            nvrhi::BindingLayoutItem::ConstantBuffer(4),  // LightingConstants (b4)
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),  // PerDrawConstants (b5) - drawIndex (GPU-driven) or world+materialID (legacy)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),   // g_Materials
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2) - engine matrices - volatile
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // LightingConstants (b4) - volatile
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // PerDrawConstants (b5) - volatile
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (contains descriptor indices)
             nvrhi::BindingLayoutItem::Sampler(0),
-            // 4 texture atlas arrays (simplified from 72)
-            nvrhi::BindingLayoutItem::Texture_SRV(10),    // g_DiffuseAtlas
-            nvrhi::BindingLayoutItem::Texture_SRV(11),    // g_NormalAtlas
-            nvrhi::BindingLayoutItem::Texture_SRV(12),    // g_DetailAtlas
-            nvrhi::BindingLayoutItem::Texture_SRV(13),    // g_PBRAtlas
+            // SM6 bindless: No texture arrays - textures accessed via ResourceDescriptorHeap[NonUniformResourceIndex(index)]
             // GPU-driven rendering buffers (for culled rendering)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),  // g_InstanceData (world matrices)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),  // g_CompactBatchIndices
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),  // g_CompactMaterialIDs
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),   // g_InstanceData (world matrices)
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),   // g_CompactBatchIndices
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),   // g_CompactMaterialIDs
         };
         s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
 
@@ -563,25 +518,26 @@ void renderBindlessForward(
         };
         s_bindlessInputLayout = nvDevice->createInputLayout(vertexAttribs, 6, s_bindlessVS);
 
-        // Create placeholder texture for empty atlas slots
-        nvrhi::TextureDesc texDesc;
-        texDesc.width = 1;
-        texDesc.height = 1;
-        texDesc.arraySize = 1;
-        texDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
-        texDesc.format = nvrhi::Format::RGBA8_UNORM;
-        texDesc.isShaderResource = true;
-        texDesc.debugName = "BindlessPlaceholder";
-        texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-        texDesc.keepInitialState = true;
-        s_placeholderTexture = nvDevice->createTexture(texDesc);
+        // SM6 bindless: No placeholder texture needed
+        // Missing textures handled by INVALID_TEXTURE_INDEX check in shader
 
         // Create graphics pipeline
+        // SM6.6 bindless requires both our regular layout AND the D3D12 backend's bindless layout
         nvrhi::GraphicsPipelineDesc pipeDesc;
         pipeDesc.VS = s_bindlessVS;
         pipeDesc.PS = s_bindlessPS;
         pipeDesc.inputLayout = s_bindlessInputLayout;
-        pipeDesc.bindingLayouts = { s_bindlessLayout };
+
+        // Get bindless layout from D3D12 backend for ResourceDescriptorHeap access
+        auto* backend = device->GetBackend();
+        nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+
+        if (bindlessLayout) {
+            pipeDesc.bindingLayouts = { s_bindlessLayout, bindlessLayout };
+        } else {
+            pipeDesc.bindingLayouts = { s_bindlessLayout };
+        }
+
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
         // Depth prepass now renders bindless geometry with bindless_depth.vs
         // which uses IDENTICAL vertex transformation as bindless_forward.vs
@@ -598,13 +554,10 @@ void renderBindlessForward(
         auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
         s_bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        if (!s_bindlessPipeline) {
-            Msg("! [BindlessForward] Failed to create bindless pipeline");
+        if (!s_bindlessPipeline)
             return;
-        }
 
         s_bindlessInitialized = true;
-        Msg("* [BindlessForward] Bindless rendering initialized");
     }
 
     // ═══════════════════════════════════════════════════════
@@ -667,7 +620,7 @@ void renderBindlessForward(
     auto perDrawCB = nvDevice->createBuffer(cbDesc);
 
     // ═══════════════════════════════════════════════════════
-    //  CREATE STATIC_GLOBALS BUFFER (engine matrices)
+    //  CREATE STATIC_GLOBALS BUFFER (engine matrices + lighting)
     // ═══════════════════════════════════════════════════════
     cbDesc.byteSize = sizeof(StaticGlobals);  // 768 bytes
     auto staticGlobalsCB = nvDevice->createBuffer(cbDesc);
@@ -675,32 +628,28 @@ void renderBindlessForward(
     // Fill static globals with view/projection matrices
     StaticGlobals staticGlobals;
     FillGlobalConstants(staticGlobals);
+
+    // CRITICAL: Fill sun lighting data! Shader reads L_sun_color/L_sun_dir_w from static_globals
+    SunLightData sunData;
+    GetSunLightData(sunData, 2.0f);  // HDR multiplier
+    FillSunConstants(staticGlobals, sunData);
+
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
     // ═══════════════════════════════════════════════════════
-    //  CREATE BINDING SET WITH ATLASES (Simplified - 4 arrays)
+    //  CREATE BINDING SET (SM6 Bindless - No texture arrays)
     // ═══════════════════════════════════════════════════════
-    // Just 4 texture arrays: Diffuse (t10), Normal (t11), Detail (t12), PBR (t13)
-    auto& atlasManager = TextureAtlasManager::Instance();
-
-    // Helper to get atlas array or placeholder for empty atlases
-    auto getAtlasOrPlaceholder = [&](AtlasType type) -> nvrhi::ITexture* {
-        auto* atlas = atlasManager.GetAtlas(type).GetArray();
-        return atlas ? atlas : s_placeholderTexture.Get();
-    };
+    // SM6 bindless uses ResourceDescriptorHeap[index] for texture access
+    // MaterialData contains descriptor indices (diffuseIndex, normalIndex, etc.)
 
     nvrhi::BindingSetDesc bindDesc;
     bindDesc.bindings = {
         nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),  // b2 - engine matrices (m_VP, etc.)
         nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),       // b4 - our lighting constants
         nvrhi::BindingSetItem::ConstantBuffer(5, perDrawCB),        // b5 - per-draw constants
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // g_Materials (has descriptor indices)
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-        // 4 texture atlas arrays
-        nvrhi::BindingSetItem::Texture_SRV(10, getAtlasOrPlaceholder(AtlasType::Diffuse)),
-        nvrhi::BindingSetItem::Texture_SRV(11, getAtlasOrPlaceholder(AtlasType::Normal)),
-        nvrhi::BindingSetItem::Texture_SRV(12, getAtlasOrPlaceholder(AtlasType::Detail)),
-        nvrhi::BindingSetItem::Texture_SRV(13, getAtlasOrPlaceholder(AtlasType::PBR)),
+        // SM6 bindless: No texture arrays - textures accessed via ResourceDescriptorHeap
         // GPU-driven rendering buffers (may be null if not using GPU culling)
         nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.instanceBuffer),           // g_InstanceData
         nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.compactBatchIndicesBuffer), // g_CompactBatchIndices
@@ -708,16 +657,12 @@ void renderBindlessForward(
     };
 
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
-    if (!bindingSet) {
-        Msg("! [BindlessForward] Failed to create binding set");
+    if (!bindingSet)
         return;
-    }
 
     // ═══════════════════════════════════════════════════════
     //  RENDER VISIBLE BATCHES
     // ═══════════════════════════════════════════════════════
-    cmdList->beginMarker("Bindless Forward");
-
     // Set viewport
     const auto& rtDesc = colorRT->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
@@ -730,45 +675,18 @@ void renderBindlessForward(
     // ═══════════════════════════════════════════════════════
     // Only visible batches are drawn using indirect draw commands
     // Draw args come from GPU culling's compact buffer
-    Msg("* [BindlessForward] GPU culling check: UseGPUCulling=%d, UseMegaBuffers=%d",
-        config.UseGPUCulling(), config.UseMegaBuffers());
-
     if (!config.UseGPUCulling() || !config.UseMegaBuffers()) {
         // GPU culling not available - skip bindless forward
         // (regular deferred path will handle rendering)
-        Msg("! [BindlessForward] Skipping - GPU culling or mega buffers not ready");
-        cmdList->endMarker();
         return;
     }
-
-    cmdList->beginMarker("GPU-Driven Culled");
 
     // Draw ALL object slots - culled batches have instanceCount=0 (GPU skips them)
     // This avoids needing CPU readback of visible count from previous frame
     const u32 visibleCount = config.totalObjectCount;
-    Msg("* [BindlessForward] Drawing %u objects via indirect draw", visibleCount);
 
     // Validate all required resources before draw loop
-    Msg("* [BindlessForward] State validation:");
-    Msg("*   pipeline=%p, framebuffer=%p, bindingSet=%p",
-        s_bindlessPipeline, framebuffer, bindingSet);
-    Msg("*   megaVB=%p, megaIB=%p, compactDrawArgs=%p",
-        config.megaVertexBuffer, config.megaIndexBuffer, config.compactDrawArgsBuffer);
-    Msg("*   perDrawCB=%p, staticGlobalsCB=%p", perDrawCB.Get(), staticGlobalsCB.Get());
-
-    if (!s_bindlessPipeline) {
-        Msg("! [BindlessForward] Pipeline is NULL - cannot draw!");
-        cmdList->endMarker();
-        return;
-    }
-    if (!framebuffer) {
-        Msg("! [BindlessForward] Framebuffer is NULL - cannot draw!");
-        cmdList->endMarker();
-        return;
-    }
-    if (!bindingSet) {
-        Msg("! [BindlessForward] BindingSet is NULL - cannot draw!");
-        cmdList->endMarker();
+    if (!s_bindlessPipeline || !framebuffer || !bindingSet) {
         return;
     }
 
@@ -780,32 +698,22 @@ void renderBindlessForward(
     state.pipeline = s_bindlessPipeline;
     state.framebuffer = framebuffer;
     state.bindings = { bindingSet };
+
+    // SM6.6 bindless: Add the descriptor table from D3D12 backend
+    // IDescriptorTable derives from IBindingSet, so we add it to bindings
+    auto* backend = device->GetBackend();
+    if (backend) {
+        auto* bindlessTable = backend->GetBindlessDescriptorTable();
+        if (bindlessTable) {
+            state.addBindingSet(bindlessTable);
+        }
+    }
+
     state.vertexBuffers = { {config.megaVertexBuffer, 0, 0} };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
     state.indirectParams = config.compactDrawArgsBuffer;  // Indirect args buffer
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-
-    Msg("* [BindlessForward] Entering draw loop for %u objects...", visibleCount);
-
-    // TEST: Try a simple direct draw first to verify command recording works
-    {
-        struct DrawIndexConstant {
-            u32 drawIndex;
-            u32 padding[3];
-        } testDrawData = {0, {0,0,0}};
-        cmdList->writeBuffer(perDrawCB, &testDrawData, sizeof(testDrawData));
-        cmdList->setGraphicsState(state);
-
-        // Simple test draw - 3 vertices, no indexing issues
-        nvrhi::DrawArguments testArgs;
-        testArgs.vertexCount = 3;
-        testArgs.instanceCount = 1;
-        testArgs.startVertexLocation = 0;
-        testArgs.startInstanceLocation = 0;
-        cmdList->draw(testArgs);
-        Msg("* [BindlessForward] TEST: Issued simple draw(3 vertices)");
-    }
 
     // Draw each visible batch using indirect draw args
     for (u32 i = 0; i < visibleCount; i++) {
@@ -825,9 +733,6 @@ void renderBindlessForward(
     }
 
     s_gpuDrivenDraws += visibleCount;
-    Msg("* [BindlessForward] Draw loop complete - %u indirect draws issued", visibleCount);
-    cmdList->endMarker();  // GPU-Driven Culled
-    cmdList->endMarker();  // Bindless Forward
 }
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
@@ -904,29 +809,27 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             const FrameGraph& fg,
             ng::RenderContext* ctx) {
 
-                Msg("* [ForwardColorPass] Execute started");
-
                 // Get physical resources from virtual handles
                 auto* depthRT = fg.GetPhysicalTexture(data.depth);
                 auto* colorRT = fg.GetPhysicalTexture(data.color);
 
-                if (!depthRT || !colorRT) {
-                    Msg("! [ForwardColorPass] Missing RT: depth=%p, color=%p", depthRT, colorRT);
+                if (!depthRT || !colorRT)
                     return;
-                }
 
                 // Check if we have geometry to render
-                if (!data.geometry) {
-                    Msg("! [ForwardColorPass] No geometry collector");
+                if (!data.geometry)
                     return;
-                }
 
                 const auto& batches = data.geometry->GetBatches();
-                Msg("* [ForwardColorPass] Batch count: %zu", batches.size());
-
-                if (batches.empty()) {
-                    Msg("! [ForwardColorPass] No batches to render");
+                if (batches.empty())
                     return;
+
+                // Throttled logging (once per second)
+                static u32 s_lastLogTime = 0;
+                u32 currentTime = Device.dwTimeGlobal;
+                if (currentTime - s_lastLogTime >= 1000) {
+                    Msg("* [ForwardColorPass] Batch count: %zu", batches.size());
+                    s_lastLogTime = currentTime;
                 }
 
                 // Get draw args buffer through framegraph (proper dependency tracking)
@@ -941,35 +844,14 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 // ═══════════════════════════════════════════════════════
                 // When bindless is enabled and valid, use GPU-driven rendering
                 // with all materials accessed via material buffer
-                if (data.bindlessConfig.IsValid()) {
-                    Msg("* [ForwardColorPass] Using BINDLESS path (totalObjects=%u)", data.bindlessConfig.totalObjectCount);
-                    renderBindlessForward(
-                        ctx,
-                        data.device,
-                        data.geometry,
-                        colorRT,
-                        depthRT,
-                        data.bindlessConfig,
-                        data.materialCache
-                    );
-                    return;
-                }
-
-                // ═══════════════════════════════════════════════════════
-                //  STANDARD RENDERING PATH (PER-MATERIAL PSO)
-                // ═══════════════════════════════════════════════════════
-                // Traditional per-material rendering with individual PSOs
-                Msg("* [ForwardColorPass] Using STANDARD path");
-                renderForwardGeometry(
+                renderBindlessForward(
                     ctx,
                     data.device,
                     data.geometry,
                     colorRT,
                     depthRT,
-                    data.materialCache,
-                    data.outputs,
-                    fg,
-                    drawArgsBuffer
+                    data.bindlessConfig,
+                    data.materialCache
                 );
         }
     );

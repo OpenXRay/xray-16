@@ -3,9 +3,10 @@
 
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"  // For RenderPhase
-#include "Layers/xrRender/Shader.h"  // For ShaderElement flags
+#include "Layers/xrRender/Shader.h"  // For ShaderElement flags (legacy)
 #include "Layers/xrRender/FBasicVisual.h"  // For dxRender_Visual
 #include "Layers/xrRender/GPUCullingManager.h"  // For MeshAllocation
+#include "Layers/xrRender/Materials/MaterialSystem.h"  // For D3D12 material info
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;  // Forward declaration
@@ -93,35 +94,31 @@ struct GeometryBatch {
     // ═══════════════════════════════════════════════════
     //  SHADER FLAG HELPERS
     // ═══════════════════════════════════════════════════
-    // Uses ShaderElement::Sflags set during blender compilation:
-    //   - bAlphaTest: Alpha-tested (uses clip/discard in shader)
-    //   - bStrictB2F: Requires back-to-front sorting (transparent)
+    // Uses MaterialSystem for material flags
 
-    // Check if batch is alpha-tested (bAlphaTest flag set by blender)
+    // Check if batch is alpha-tested (uses clip/discard in shader)
     bool IsAlphaTested() const {
-        if (!visual || !visual->shader)
-            return false;  // D3D12/FrameGraph: no legacy shader
-        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
-        if (elem) {
-            return elem->flags.bAlphaTest != 0;
-        }
-        return false;
+        if (!visual || !visual->shaderName.size())
+            return false;
+
+        return MaterialSystem::Instance()
+            .GetMaterialInfo(visual->shaderName.c_str())
+            .alphaTest;
     }
 
     // Check if batch requires back-to-front sorting (transparent/alpha-blended)
     bool IsStrictB2F() const {
-        if (!visual || !visual->shader)
-            return false;  // D3D12/FrameGraph: no legacy shader
-        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
-        if (elem) {
-            return elem->flags.bStrictB2F != 0;
-        }
-        return false;
+        if (!visual || !visual->shaderName.size())
+            return false;
+
+        return MaterialSystem::Instance()
+            .GetMaterialInfo(visual->shaderName.c_str())
+            .transparent;
     }
 
     // Check if batch is opaque (no alpha-test and no strict B2F)
     bool IsOpaque() const {
-        return !IsAlphaTested();
+        return !IsAlphaTested() && !IsStrictB2F();
     }
 };
 

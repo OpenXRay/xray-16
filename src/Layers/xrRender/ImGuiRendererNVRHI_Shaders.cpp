@@ -97,8 +97,8 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
     nvrhi::BindingLayoutDesc bindingLayoutDesc;
     bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
     bindingLayoutDesc.bindings = {
-        // Constant buffer for projection matrix
-        nvrhi::BindingLayoutItem::ConstantBuffer(0),
+        // Constant buffer for projection matrix (volatile - updated every frame)
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
         // Texture
         nvrhi::BindingLayoutItem::Texture_SRV(0),
         // Sampler

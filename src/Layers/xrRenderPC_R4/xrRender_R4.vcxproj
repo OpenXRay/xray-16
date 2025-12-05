@@ -91,7 +91,6 @@
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
-    <ClInclude Include="..\xrRender\Bindless\TextureAtlas.h" />
     <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
     <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h" />
@@ -182,6 +181,7 @@
     <ClInclude Include="..\xrRender\FVF.h" />
     <ClInclude Include="..\xrRender\FVisual.h" />
     <ClInclude Include="..\xrRender\Geometry\MaterialCache.h" />
+    <ClInclude Include="..\xrRender\Materials\MaterialSystem.h" />
     <ClInclude Include="..\xrRender\HOM.h" />
     <ClInclude Include="..\xrRender\HWCaps.h" />
     <ClInclude Include="..\xrRender\IRenderDetailModel.h" />
@@ -320,7 +320,6 @@
     <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
-    <ClCompile Include="..\xrRender\Bindless\TextureAtlas.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp" />
@@ -417,6 +416,7 @@
     <ClCompile Include="..\xrRender\FTreeVisual.cpp" />
     <ClCompile Include="..\xrRender\FVisual.cpp" />
     <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp" />
+    <ClCompile Include="..\xrRender\Materials\MaterialSystem.cpp" />
     <ClCompile Include="..\xrRender\HOM.cpp" />
     <ClCompile Include="..\xrRender\light.cpp" />
     <ClCompile Include="..\xrRender\LightTrack.cpp" />

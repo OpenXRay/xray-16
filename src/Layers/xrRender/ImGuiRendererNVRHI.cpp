@@ -75,8 +75,6 @@ void ImGuiRendererNVRHI::Render(ImDrawData* data, nvrhi::IFramebuffer* framebuff
         return;
     }
 
-    cmdList->beginMarker("ImGui");
-
     // Store framebuffer so RenderDrawData can use it in graphics state
     m_currentFramebuffer = framebuffer;
 
@@ -84,8 +82,6 @@ void ImGuiRendererNVRHI::Render(ImDrawData* data, nvrhi::IFramebuffer* framebuff
     RenderDrawData(data, cmdList);
 
     m_currentFramebuffer = nullptr;
-
-    cmdList->endMarker();
 }
 
 void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)
@@ -217,13 +213,18 @@ void ImGuiRendererNVRHI::DestroyDeviceObjects()
 
 bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
 {
-    // Create dynamic vertex buffer
+    // Create vertex buffer
+    // NOTE: Using non-volatile buffers for vertex/index data.
+    // Volatile buffers in NVRHI D3D12 have issues with IA binding -
+    // they use a ring buffer that may not have valid GPU addresses for IA.
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = vtxSize * sizeof(ImDrawVert);
-    // Don't set structStride for vertex buffers - it makes D3D11 think we want a structured buffer
     vbDesc.isVertexBuffer = true;
-    vbDesc.isVolatile = true; // Dynamic buffer, updated every frame
+    vbDesc.isVolatile = false;
+    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;  // Allow CPU writes for dynamic updates
     vbDesc.debugName = "ImGui Vertex Buffer";
+    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    vbDesc.keepInitialState = true;
 
     m_vertexBuffer = m_device->createBuffer(vbDesc);
     if (!m_vertexBuffer)
@@ -231,12 +232,15 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
 
     m_vertexBufferSize = vtxSize;
 
-    // Create dynamic index buffer
+    // Create index buffer
     nvrhi::BufferDesc ibDesc;
     ibDesc.byteSize = idxSize * sizeof(ImDrawIdx);
     ibDesc.isIndexBuffer = true;
-    ibDesc.isVolatile = true; // Dynamic buffer, updated every frame
+    ibDesc.isVolatile = false;
+    ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;  // Allow CPU writes for dynamic updates
     ibDesc.debugName = "ImGui Index Buffer";
+    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
 
     m_indexBuffer = m_device->createBuffer(ibDesc);
     if (!m_indexBuffer)
@@ -294,6 +298,10 @@ void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
 
                 texDesc.setFormat(nvrhiFormat);
                 texDesc.setDebugName("ImGui Texture");
+
+                // D3D12 requires explicit state tracking for textures
+                texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+                texDesc.keepInitialState = true;
 
                 nvrhi::TextureHandle texture = m_device->createTexture(texDesc);
                 if (texture)

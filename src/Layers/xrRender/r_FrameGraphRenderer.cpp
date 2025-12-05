@@ -27,7 +27,7 @@
 #include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
-#include "Bindless/TextureAtlas.h"                   // Bindless texture atlases
+// SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
@@ -641,8 +641,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
         m_gpuCullingManager->Initialize(m_device);
 
-        // Initialize bindless rendering system (texture atlases + material buffer)
-        bindless::TextureAtlasManager::Instance().Initialize(m_device);
+        // Initialize bindless rendering system (material buffer only - textures use D3D12 descriptor heap)
+        // SM6 bindless: Textures registered via D3D12Backend::RegisterBindlessTexture() during material creation
         bindless::MaterialBuffer::Instance().Initialize(m_device);
         bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
 

@@ -66,9 +66,6 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
         return;
     }
 
-    // Begin debug marker with pass-specific name
-    m_commandList->beginMarker(desc.passName);
-
     // Initialize current graphics state with framebuffer
     m_currentState = nvrhi::GraphicsState();
     m_currentState.framebuffer = m_currentFramebuffer;
@@ -108,9 +105,6 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
 
 void RenderContext::EndRenderPass() {
     VERIFY2(m_inRenderPass, "Not in render pass!");
-
-    // End debug marker
-    m_commandList->endMarker();
 
     // Clear temporary binding sets (release references)
     m_tempBindingSets.clear();
@@ -300,12 +294,21 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
     VERIFY(buffer != nullptr);
     VERIFY(m_commandList != nullptr);
 
+    // Check if buffer is volatile to use correct layout type
+    bool isVolatile = buffer->getDesc().isVolatile;
+
     // Step 1: Create binding layout (describes what we're binding)
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::ConstantBuffer(slot)
-    };
+    if (isVolatile) {
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(slot)
+        };
+    } else {
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(slot)
+        };
+    }
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {

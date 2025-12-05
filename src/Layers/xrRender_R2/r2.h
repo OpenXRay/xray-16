@@ -332,6 +332,14 @@ public:
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
     xr_vector<ref_shader> Shaders;
+
+    // D3D12: Store shader/texture name strings for level geometry
+    // (shader_id indexes into these - used when OGF_TEXTURE chunk is missing)
+    struct ShaderNameEntry {
+        shared_str shaderName;
+        shared_str textureName;
+    };
+    xr_vector<ShaderNameEntry> ShaderNames;
     typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
@@ -458,6 +466,7 @@ public:
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
     ref_shader getShader(int id);
+    bool getShaderNames(int id, shared_str& outShaderName, shared_str& outTextureName);
     IRenderVisual* getVisual(int id) override;
 
     // Main

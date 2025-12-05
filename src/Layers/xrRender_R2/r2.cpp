@@ -21,6 +21,7 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Backend/D3D11BackendWrapper.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
 
 // Forward declaration for ImGui initialization
 namespace xray::render {
@@ -573,6 +574,12 @@ void CRender::create()
                 m_shaderLoader = xr_new<framegraph::ShaderLoader>(
                     m_renderDevice->GetSlangCompiler());
                 Msg("* ShaderLoader initialized (Slang compiler active)");
+
+                // Initialize MaterialSystem for D3D12 material handling
+                xray::render::MaterialSystem::Instance().Initialize(
+                    m_renderDevice->GetFGResourceManager(),
+                    m_shaderLoader);
+                Msg("* MaterialSystem initialized");
             }
             else
             {
@@ -627,6 +634,10 @@ void CRender::destroy()
 #endif
 
 #if defined(USE_DX11) && RENDER == R_R4
+    // Shutdown MaterialSystem before ShaderLoader (depends on it)
+    xray::render::MaterialSystem::Instance().Shutdown();
+    Msg("* MaterialSystem shutdown");
+
     // Cleanup ShaderLoader
     if (m_shaderLoader)
     {
@@ -838,6 +849,14 @@ ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
     return Shaders[id];
+}
+bool CRender::getShaderNames(int id, shared_str& outShaderName, shared_str& outTextureName)
+{
+    if (id < 0 || id >= int(ShaderNames.size()))
+        return false;
+    outShaderName = ShaderNames[id].shaderName;
+    outTextureName = ShaderNames[id].textureName;
+    return outTextureName.size() > 0;
 }
 IRenderVisual* CRender::getVisual(int id)
 {

@@ -117,7 +117,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Tonemap Pass");
 
             // Get physical resources
             auto* hdrTexture = fg.GetPhysicalTexture(data.hdrInput);
@@ -128,7 +127,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!hdrTexture || !ldrTexture) {
                 Msg("! [TonemapPass] Failed to get textures");
-                cmdList->endMarker();
                 return;
             }
 
@@ -137,7 +135,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             // ═══════════════════════════════════════════════════
             if (!RImplementation.m_shaderLoader) {
                 Msg("! [TonemapPass] ShaderLoader not initialized");
-                cmdList->endMarker();
                 return;
             }
 
@@ -146,7 +143,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!vsResult.handle || !psResult.handle) {
                 Msg("! [TonemapPass] Failed to load shaders");
-                cmdList->endMarker();
                 return;
             }
 
@@ -171,7 +167,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!bindingLayout) {
                 Msg("! [TonemapPass] Failed to create binding layout");
-                cmdList->endMarker();
                 return;
             }
 
@@ -198,7 +193,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!pipeline) {
                 Msg("! [TonemapPass] Failed to create pipeline");
-                cmdList->endMarker();
                 return;
             }
 
@@ -212,7 +206,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!sampler) {
                 Msg("! [TonemapPass] Failed to create sampler");
-                cmdList->endMarker();
                 return;
             }
 
@@ -226,7 +219,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!exposureToUse) {
                 Msg("! [TonemapPass] No exposure texture available (static fallback not initialized)");
-                cmdList->endMarker();
                 return;
             }
 
@@ -244,7 +236,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
 
             if (!bindingSet) {
                 Msg("! [TonemapPass] Failed to create binding set");
-                cmdList->endMarker();
                 return;
             }
 
@@ -280,9 +271,6 @@ framegraph::VirtualResourceHandle setupTonemapPass(
             nvrhi::DrawArguments drawArgs;
             drawArgs.vertexCount = 3;
             cmdList->draw(drawArgs);
-
-            // Note: Command list is closed by FrameGraph::Execute()
-            // cmdList->endMarker();  // Disabled - NVRHI D3D12 doesn't implement debug markers
         }
     );
 

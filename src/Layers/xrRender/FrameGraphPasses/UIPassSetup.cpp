@@ -125,14 +125,11 @@ framegraph::VirtualResourceHandle setupUIPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("UI Pass");
 
             // Get physical scene target
             auto* sceneRT = fg.GetPhysicalTexture(data.sceneOutput);
 
             if (!sceneRT) {
-                Msg("! [UIPass] Failed to get scene texture");
-                cmdList->endMarker();
                 return;
             }
 
@@ -196,8 +193,6 @@ framegraph::VirtualResourceHandle setupUIPass(
 
                 uiRenderer->RenderBatches(cmdList, uiCollector->GetBatches(), framebuffer, data.width, data.height);
             }
-
-            cmdList->endMarker();
         }
     );
 
@@ -239,14 +234,12 @@ framegraph::VirtualResourceHandle setupTextPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Text Pass");
 
             // Get physical resource
             auto* uiRT = fg.GetPhysicalTexture(data.uiTarget);
 
             if (!uiRT) {
                 Msg("! [TextPass] Failed to get UI texture");
-                cmdList->endMarker();
                 return;
             }
 
@@ -257,7 +250,6 @@ framegraph::VirtualResourceHandle setupTextPass(
 
             if (!device || !textMatCache) {
                 Msg("! [TextPass] Text infrastructure not initialized");
-                cmdList->endMarker();
                 return;
             }
             extern ENGINE_API Fvector2 g_current_font_scale;
@@ -534,8 +526,6 @@ framegraph::VirtualResourceHandle setupTextPass(
                     }
                 }
             }
-
-            cmdList->endMarker();
         }
     );
 
@@ -577,14 +567,12 @@ framegraph::VirtualResourceHandle setupCursorPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Cursor Pass");
 
             // Get physical resource
             auto* uiRT = fg.GetPhysicalTexture(data.uiTarget);
 
             if (!uiRT) {
                 Msg("! [CursorPass] Failed to get UI texture");
-                cmdList->endMarker();
                 return;
             }
 
@@ -607,7 +595,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
 
             if (!uiCollector || !uiRenderer || !uiMatCache) {
                 Msg("! [CursorPass] UI infrastructure not initialized");
-                cmdList->endMarker();
                 return;
             }
 
@@ -646,8 +633,6 @@ framegraph::VirtualResourceHandle setupCursorPass(
 
                 uiRenderer->RenderBatches(cmdList, uiCollector->GetBatches(), framebuffer, data.width, data.height);
             }
-
-            cmdList->endMarker();
         }
     );
 

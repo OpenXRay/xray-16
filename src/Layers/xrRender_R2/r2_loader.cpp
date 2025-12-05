@@ -38,6 +38,7 @@ void CRender::level_Load(IReader* fs)
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
         Shaders.resize(count);
+        ShaderNames.resize(count);  // D3D12: Store shader/texture names for level geometry
         for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
         {
             string512 n_sh, n_tlist;
@@ -50,6 +51,15 @@ void CRender::level_Load(IReader* fs)
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
             Shaders[i] = Resources->Create(n_sh, n_tlist);
+
+            // D3D12: Store shader/texture names for MaterialSystem lookup
+            // n_tlist may contain comma-separated texture names; first one is diffuse
+            string256 firstTexture;
+            xr_strcpy(firstTexture, n_tlist);
+            if (pstr comma = strchr(firstTexture, ','))
+                *comma = 0;  // Truncate at first comma
+            ShaderNames[i].shaderName = n_sh;
+            ShaderNames[i].textureName = firstTexture;
         }
         chunk->close();
     }
@@ -209,6 +219,7 @@ void CRender::level_Unload()
 
     //*** Shaders
     Shaders.clear();
+    ShaderNames.clear();  // D3D12: Clear shader name cache
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

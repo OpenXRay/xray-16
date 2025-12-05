@@ -361,8 +361,8 @@ private:
     // Used for pre-registration during geometry collection
     xr_unordered_map<dxRender_Visual*, u32> m_visualToMaterialID;
 
-    // Pending materials that need texture population
-    // Stores (materialID, visual) pairs for deferred atlas registration
+    // Pending materials that need texture registration
+    // Stores (materialID, visual) pairs for deferred bindless descriptor registration
     struct PendingMaterial {
         u32 materialID;
         dxRender_Visual* visual;
@@ -426,7 +426,7 @@ public:
     nvrhi::BindingSetHandle GetOrCreateBindingSet(MaterialPSO* matPSO);
 
     // Register material with bindless system
-    // Populates texture atlases and creates material buffer entry
+    // Registers textures to D3D12 descriptor heap and creates material buffer entry
     // Returns material ID (stored in matPSO->bindlessMaterialID)
     u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
 
@@ -435,9 +435,9 @@ public:
     // Used to populate batch.bindlessMaterialID before GPU culling upload
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
 
-    // Finalize pending materials (populate texture atlases)
+    // Finalize pending materials (register textures to bindless descriptor heap)
     // Call once per frame when RenderContext is available
-    // This populates atlas textures for any materials registered this frame
+    // This registers textures to D3D12 descriptor heap for any materials registered this frame
     void FinalizePendingMaterials(ng::RenderContext* ctx);
 
     // Shader handle cache (shared across all materials to avoid recreating identical shaders)

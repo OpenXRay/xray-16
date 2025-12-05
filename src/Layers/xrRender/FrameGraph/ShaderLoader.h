@@ -21,7 +21,8 @@ namespace xray::render::framegraph {
 // ══════════════════════════════════════════════════════════
 //
 //  Modern shader loading system using Slang compiler with disk caching
-//  - Compiles HLSL to DXBC (DX11) using Slang
+//  - Compiles HLSL to DXIL (DX12 SM6) using Slang
+//  - Supports SM6 bindless via ResourceDescriptorHeap
 //  - Caches compiled bytecode to shaders_cache_fg/
 //  - No D3DCompile dependency
 //  - Ready for multi-API (SPIRV for Vulkan in future)

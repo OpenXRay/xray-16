@@ -266,7 +266,7 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
             nvrhi::BindingLayoutItem::Texture_SRV(1),
             nvrhi::BindingLayoutItem::Sampler(0),
@@ -422,7 +422,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
             nvrhi::BindingLayoutItem::RawBuffer_SRV(0),          // Input draw args
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),   // Input material IDs
             nvrhi::BindingLayoutItem::RawBuffer_UAV(0),          // Output draw args
@@ -750,7 +750,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("GPU Culling");
 
             nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
 
@@ -764,7 +763,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
             if (!hizTexture) {
                 Msg("! [GPUCulling] Hi-Z texture not available");
-                cmdList->endMarker();
                 return;
             }
 
@@ -804,7 +802,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
             if (!bindingSet) {
                 Msg("! [GPUCulling] Failed to create binding set");
-                cmdList->endMarker();
                 return;
             }
 
@@ -822,8 +819,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             // ─────────────────────────────────────────────────────
             // Compacts visible batches into contiguous list for efficient multi-draw
             if (mgr->m_compactEnabled) {
-                cmdList->beginMarker("Batch Compaction");
-
                 // Barrier: Draw args UAV -> SRV for compaction reading
                 cmdList->setBufferState(mgr->m_drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
 
@@ -868,11 +863,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     // Transition compact draw args to IndirectArgument for rendering
                     cmdList->setBufferState(mgr->m_compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
-
-                cmdList->endMarker();
             }
-
-            cmdList->endMarker();
         }
     );
 
@@ -1008,7 +999,7 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
             nvrhi::BindingLayoutItem::Texture_SRV(1),
             nvrhi::BindingLayoutItem::Sampler(0),
@@ -1049,7 +1040,7 @@ void GPUCullingManager::CreateDebugResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Vertex | nvrhi::ShaderType::Pixel;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0)
         };
 
@@ -1155,8 +1146,6 @@ void GPUCullingManager::SetupDebugVisualizationPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
 
-            cmdList->beginMarker("GPU Culling Debug");
-
             // Get physical resources
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
             nvrhi::ITexture* colorTexture = fg.GetPhysicalTexture(data.colorTarget);
@@ -1164,15 +1153,12 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
             if (!hizTexture || !colorTexture || !depthTexture) {
                 Msg("! [GPUCulling] Debug pass missing textures");
-                cmdList->endMarker();
                 return;
             }
 
             float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
 
             if (data.objectCount > 0) {
-                cmdList->beginMarker("Object Debug Compute");
-
                 CullDebugParamsCB cb;
                 cb.viewProj.transpose(Device.mFullTransform);
                 cb.cameraPos = Device.vCameraPosition;
@@ -1205,13 +1191,9 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
                 u32 groupCount = (data.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
                 cmdList->dispatch(groupCount, 1, 1);
-
-                cmdList->endMarker();
             }
 
             if (data.particleCount > 0 && data.particleBatches && mgr->m_particleDebugComputePipeline) {
-                cmdList->beginMarker("Particle Debug Compute");
-
                 mgr->m_particleData.clear();
                 mgr->m_particleData.reserve(data.particleCount);
 
@@ -1266,16 +1248,12 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                     u32 groupCount = (static_cast<u32>(mgr->m_particleData.size()) + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
                     cmdList->dispatch(groupCount, 1, 1);
                 }
-
-                cmdList->endMarker();
             }
 
             cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::ShaderResource);
 
             u32 totalDebugCount = data.objectCount + data.particleCount;
             if (totalDebugCount > 0) {
-                cmdList->beginMarker("Debug Render");
-
                 CullDebugVSParamsCB vsCB;
                 vsCB.view.transpose(Device.mView);
                 vsCB.viewProj.transpose(Device.mFullTransform);
@@ -1319,13 +1297,9 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 drawArgs.startVertexLocation = 0;
                 drawArgs.startInstanceLocation = 0;
                 cmdList->draw(drawArgs);
-
-                cmdList->endMarker();
             }
 
             cmdList->setBufferState(mgr->m_debugBuffer, nvrhi::ResourceStates::UnorderedAccess);
-
-            cmdList->endMarker();
         }
     );
 }
@@ -1410,7 +1384,7 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::Compute;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // volatile CB
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
             nvrhi::BindingLayoutItem::Texture_SRV(1),
             nvrhi::BindingLayoutItem::Sampler(0),
@@ -1560,8 +1534,6 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
                 return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("GPU Particle Culling");
-
             nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
 
             mgr->UploadParticleBatches(ctx, data.batches);
@@ -1569,7 +1541,6 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
             nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
             if (!hizTexture) {
                 Msg("! [GPUCulling] Hi-Z texture not available for particle culling");
-                cmdList->endMarker();
                 return;
             }
 
@@ -1603,7 +1574,6 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
             nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_particleCullLayout);
             if (!bindingSet) {
                 Msg("! [GPUCulling] Failed to create particle binding set");
-                cmdList->endMarker();
                 return;
             }
 
@@ -1614,8 +1584,6 @@ GPUParticleCullOutput GPUCullingManager::SetupParticleCullingPass(
 
             u32 groupCount = (data.particleCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
             cmdList->dispatch(groupCount, 1, 1);
-
-            cmdList->endMarker();
         }
     );
 

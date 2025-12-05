@@ -105,7 +105,7 @@ bool ShaderLoader::CompileShader(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXBC,  // DX11 target
+        xray::render::SlangCompiler::Target::DXIL,  // DX12 target (SM6 bindless)
         shaderName
     );
 
@@ -211,7 +211,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Vertex,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
         fullPath  // Full path allows VFS to resolve relative includes
     );
 
@@ -347,7 +347,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Pixel,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
         fullPath  // Full path allows VFS to resolve relative includes
     );
 
@@ -490,7 +490,7 @@ bool ShaderLoader::CompileShaderWithDefines(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
         fullPath,
         defines.data(),
         defines.size()

@@ -94,7 +94,13 @@ void CDetail::Load(IReader* S)
     string256 fnT, fnS;
     S->r_stringZ(fnS, sizeof(fnS));
     S->r_stringZ(fnT, sizeof(fnT));
-    shader.create(fnS, fnT);
+
+    // Store names for MaterialSystem lookup
+    shaderName = fnS;
+    textureName = fnT;
+
+    Msg("* [MaterialCache] Assign names: visual=%p tex='%s' shader='%s'",
+        this, textureName.c_str(), shaderName.c_str());
 
     // Params
     m_Flags.assign(S->r_u32());

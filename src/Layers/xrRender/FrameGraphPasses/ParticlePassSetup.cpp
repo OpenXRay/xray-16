@@ -374,7 +374,9 @@ static ParticleBindingCache* CreateParticleBindingSet(
         bufDesc.byteSize = cbInfo.size;
         bufDesc.isConstantBuffer = true;
         bufDesc.debugName = cbInfo.name.c_str();
-        bufDesc.keepInitialState = true;  // D3D12 requires state tracking
+        bufDesc.isVolatile = true;  // All CBs are volatile - written per frame
+        bufDesc.maxVersions = 16;
+        bufDesc.keepInitialState = true;
         bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         nvrhi::BufferHandle buffer = device->GetNVRHIDevice()->createBuffer(bufDesc);
@@ -400,7 +402,9 @@ static ParticleBindingCache* CreateParticleBindingSet(
         bufDesc.byteSize = cbInfo.size;
         bufDesc.isConstantBuffer = true;
         bufDesc.debugName = cbInfo.name.c_str();
-        bufDesc.keepInitialState = true;  // D3D12 requires state tracking
+        bufDesc.isVolatile = true;  // All CBs are volatile - written per frame
+        bufDesc.maxVersions = 16;
+        bufDesc.keepInitialState = true;
         bufDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
 
         nvrhi::BufferHandle buffer = device->GetNVRHIDevice()->createBuffer(bufDesc);
@@ -424,13 +428,9 @@ static ParticleBindingCache* CreateParticleBindingSet(
 
     for (const auto& cbInfo : cacheEntry.cbInfos) {
         if (cbInfo.isVertexShader) {
-            if (cbInfo.isPerObject) {
-                vsLayoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
-            } else {
-                vsLayoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
-            }
+            // All CBs are volatile - written per frame
+            vsLayoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
         }
     }
 
@@ -447,13 +447,9 @@ static ParticleBindingCache* CreateParticleBindingSet(
 
     for (const auto& cbInfo : cacheEntry.cbInfos) {
         if (!cbInfo.isVertexShader) {
-            if (cbInfo.isPerObject) {
-                psLayoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
-            } else {
-                psLayoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::ConstantBuffer(cbInfo.slot));
-            }
+            // All CBs are volatile - written per frame
+            psLayoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(cbInfo.slot));
         }
     }
 
@@ -831,13 +827,11 @@ DefaultOutputLayout setupParticlePass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Particle Pass");
 
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 
             if (totalWorld == 0 && totalHUD == 0) {
-                cmdList->endMarker();
                 return;
             }
 
@@ -846,7 +840,6 @@ DefaultOutputLayout setupParticlePass(
 
             if (!colorRT || !depthRT) {
                 Msg("! [ParticlePass] Failed to get physical textures");
-                cmdList->endMarker();
                 return;
             }
 
@@ -881,7 +874,6 @@ DefaultOutputLayout setupParticlePass(
             u32 numDraws = 0;
 
             if (data.worldParticleBatches && !data.worldParticleBatches->empty()) {
-                cmdList->beginMarker("World Particles");
                 for (u32 i = 0; i < data.worldParticleBatches->size(); i++) {
                     const auto& batch = (*data.worldParticleBatches)[i];
                     if (batch.visual && batch.visual->getType() == MT_PARTICLE_EFFECT) {
@@ -892,11 +884,9 @@ DefaultOutputLayout setupParticlePass(
                         }
                     }
                 }
-                cmdList->endMarker();
             }
 
             if (data.hudParticleBatches && !data.hudParticleBatches->empty()) {
-                cmdList->beginMarker("HUD Particles");
                 for (const auto& batch : *data.hudParticleBatches) {
                     if (batch.visual && batch.visual->getType() == MT_PARTICLE_EFFECT) {
                         if (RenderParticleEffect(ctx, data.device, data.materialCache,
@@ -906,12 +896,9 @@ DefaultOutputLayout setupParticlePass(
                         }
                     }
                 }
-                cmdList->endMarker();
             }
 
             ctx->EndRenderPass();
-
-            cmdList->endMarker();
         }
     );
 

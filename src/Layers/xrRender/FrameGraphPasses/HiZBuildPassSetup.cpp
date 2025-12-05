@@ -101,6 +101,12 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
         s_hiz_cb = nvDevice->createBuffer(cbDesc);
 
+        if (s_hiz_cb) {
+            Msg("* [HiZBuild] Constant buffer created: %p, size=%d", s_hiz_cb.Get(), sizeof(HiZCB));
+        } else {
+            Msg("! [HiZBuild] Failed to create constant buffer!");
+        }
+
         // Create point sampler (cached)
         auto& cache = framegraph::GetPassResourceCache();
 
@@ -117,11 +123,13 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         if (s_compute_enabled) {
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Compute;
+            // NOTE: Order must match binding set push order (SRV, UAV, CB, Sampler)
+            // Use VolatileConstantBuffer since the buffer is created with isVolatile=true
             layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::ConstantBuffer(5),       // b5: HiZParams
-                nvrhi::BindingLayoutItem::Texture_SRV(0),          // t0: g_input_depth
-                nvrhi::BindingLayoutItem::Texture_UAV(0),          // u0: g_output_hiz
-                nvrhi::BindingLayoutItem::Sampler(0)               // s0: g_point_sampler
+                nvrhi::BindingLayoutItem::Texture_SRV(0),              // t0: g_input_depth
+                nvrhi::BindingLayoutItem::Texture_UAV(0),              // u0: g_output_hiz
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),   // b5: HiZParams (volatile)
+                nvrhi::BindingLayoutItem::Sampler(0)                   // s0: g_point_sampler
             };
             s_hiz_layout = cache.GetOrCreateBindingLayout("HiZBuildPass", layoutDesc, nvDevice);
 
@@ -239,7 +247,6 @@ HiZPyramidOutput setupHiZBuildPass(
             }
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Hi-Z Build");
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
 
@@ -250,13 +257,11 @@ HiZPyramidOutput setupHiZBuildPass(
 
             if (!depthTexture) {
                 Msg("! [HiZBuild] Depth texture not available");
-                cmdList->endMarker();
                 return;
             }
 
             if (!hizTexture) {
                 Msg("! [HiZBuild] Hi-Z pyramid texture not available");
-                cmdList->endMarker();
                 return;
             }
 
@@ -275,6 +280,12 @@ HiZPyramidOutput setupHiZBuildPass(
             //
             // For mip 0, we read from full-res depth and downsample 2x2 → 1
             // For mip N (N>0), we read from Hi-Z mip N-1 and downsample 2x2 → 1
+
+            // Verify constant buffer is valid before dispatch loop
+            if (!s_hiz_cb) {
+                Msg("! [HiZBuild] Constant buffer is NULL at execute time!");
+                return;
+            }
 
             for (u32 mip = 0; mip < data.mipLevels; mip++) {
                 // Output dimensions for this mip level
@@ -349,20 +360,17 @@ HiZPyramidOutput setupHiZBuildPass(
                 u32 groupsY = (outHeight + 7) / 8;
                 cmdList->dispatch(groupsX, groupsY, 1);
 
-                // CRITICAL: Insert UAV barrier to ensure writes complete before next read
-                // Without this, reading mip N-1 while mip N is being written can fail
-                nvrhi::utils::TextureUavBarrier(cmdList, hizTexture);
-
-                // Transition output mip to ShaderResource for next iteration's read
-                cmdList->setTextureState(hizTexture, outputSubres,
-                    nvrhi::ResourceStates::ShaderResource);
+                // Insert UAV barrier to ensure writes complete before next mip reads this one
+                // This is sufficient - no need to also transition state since we use UAV barrier
+                if (mip < data.mipLevels - 1) {
+                    // Only need barrier if there's another mip that will read from this one
+                    nvrhi::utils::TextureUavBarrier(cmdList, hizTexture);
+                }
             }
 
-            // Final state: make Hi-Z readable as shader resource
+            // Final state: transition entire pyramid to ShaderResource for culling pass
             cmdList->setTextureState(hizTexture, nvrhi::AllSubresources,
                 nvrhi::ResourceStates::ShaderResource);
-
-            cmdList->endMarker();
         }
     );
 

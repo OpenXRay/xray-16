@@ -106,25 +106,43 @@ framegraph::VirtualResourceHandle setupSunPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Sun Pass");
+
+            // Debug: Log that we're entering sun pass execute
+            static bool s_logOnce = true;
+            if (s_logOnce) {
+                Msg("* [SunPass] Execute lambda called");
+                s_logOnce = false;
+            }
 
             // Get lens flare system
-            CLensFlare* lensFlare = data.environment->eff_LensFlare;
+            CLensFlare* lensFlare = data.environment ? data.environment->eff_LensFlare : nullptr;
             if (!lensFlare) {
-                cmdList->endMarker();
+                static bool s_noLensFlare = true;
+                if (s_noLensFlare) {
+                    Msg("! [SunPass] No lens flare system (environment=%p)", data.environment);
+                    s_noLensFlare = false;
+                }
                 return;
             }
 
             // Get current lens flare descriptor (updated by OnFrame)
             CLensFlareDescriptor* flareDesc = lensFlare->GetCurrent();
             if (!flareDesc) {
-                cmdList->endMarker();
+                static bool s_noFlareDesc = true;
+                if (s_noFlareDesc) {
+                    Msg("! [SunPass] No flare descriptor");
+                    s_noFlareDesc = false;
+                }
                 return;
             }
 
             // Check if sun source should be rendered
             if (!flareDesc->m_Flags.is(CLensFlareDescriptor::flSource)) {
-                cmdList->endMarker();
+                static bool s_noSource = true;
+                if (s_noSource) {
+                    Msg("! [SunPass] flSource flag not set");
+                    s_noSource = false;
+                }
                 return;
             }
 
@@ -140,8 +158,14 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             // Sun behind camera?
             if (fDot <= 0.01f) {
-                cmdList->endMarker();
+                // Don't log this - it's normal when looking away from sun
                 return;
+            }
+
+            static bool s_sunRendering = true;
+            if (s_sunRendering) {
+                Msg("* [SunPass] Rendering sun (fDot=%.3f)", fDot);
+                s_sunRendering = false;
             }
 
             // Calculate sun position on far plane
@@ -220,13 +244,15 @@ framegraph::VirtualResourceHandle setupSunPass(
             vertices[3].v = 1.0f;
 
             // Create vertex buffer
+            // NOTE: Non-volatile buffer - volatile buffers have IA binding issues in D3D12
             nvrhi::BufferDesc vbDesc;
             vbDesc.byteSize = sizeof(vertices);
             vbDesc.debugName = "SunVertexBuffer";
             vbDesc.isVertexBuffer = true;
-            vbDesc.isVolatile = true;
-            vbDesc.maxVersions = 16;
+            vbDesc.isVolatile = false;
+            vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
             vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+            vbDesc.keepInitialState = true;
             auto vb = cmdList->getDevice()->createBuffer(vbDesc);
             cmdList->writeBuffer(vb, vertices, sizeof(vertices));
 
@@ -236,9 +262,10 @@ framegraph::VirtualResourceHandle setupSunPass(
             ibDesc.byteSize = sizeof(indices);
             ibDesc.debugName = "SunIndexBuffer";
             ibDesc.isIndexBuffer = true;
-            ibDesc.isVolatile = true;
-            ibDesc.maxVersions = 16;
+            ibDesc.isVolatile = false;
+            ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
             ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            ibDesc.keepInitialState = true;
             auto ib = cmdList->getDevice()->createBuffer(ibDesc);
             cmdList->writeBuffer(ib, indices, sizeof(indices));
 
@@ -248,7 +275,6 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             if (!RImplementation.m_shaderLoader) {
                 Msg("! [SunPass] ShaderLoader not initialized");
-                cmdList->endMarker();
                 return;
             }
 
@@ -257,7 +283,6 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             if (!vsResult.handle || !psResult.handle) {
                 Msg("! [SunPass] Failed to load sun shaders");
-                cmdList->endMarker();
                 return;
             }
 
@@ -294,9 +319,9 @@ framegraph::VirtualResourceHandle setupSunPass(
             nvrhi::BindingLayoutDesc bindingLayoutDesc;
             bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
             bindingLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::ConstantBuffer(0),  // dynamic_transforms
-                nvrhi::BindingLayoutItem::Texture_SRV(0),     // sun texture
-                nvrhi::BindingLayoutItem::Sampler(0)          // sampler
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms - volatile
+                nvrhi::BindingLayoutItem::Texture_SRV(0),             // sun texture
+                nvrhi::BindingLayoutItem::Sampler(0)                  // sampler
             };
             auto bindingLayout = cache.GetOrCreateBindingLayout("SunPass", bindingLayoutDesc, device);
 
@@ -313,7 +338,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             // Get color RT
             nvrhi::ITexture* colorRT = fg.GetPhysicalTexture(data.colorOutput);
             if (!colorRT) {
-                cmdList->endMarker();
                 return;
             }
 
@@ -335,7 +359,6 @@ framegraph::VirtualResourceHandle setupSunPass(
 
             if (!pipeline) {
                 Msg("! [SunPass] Failed to create pipeline");
-                cmdList->endMarker();
                 return;
             }
 
@@ -413,8 +436,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             nvrhi::DrawArguments args;
             args.vertexCount = 6;
             cmdList->drawIndexed(args);
-
-            cmdList->endMarker();
         }
     );
 

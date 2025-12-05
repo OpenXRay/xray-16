@@ -50,10 +50,8 @@ framegraph::VirtualResourceHandle setupImGuiPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("ImGui Pass");
 
             if (!data.renderer) {
-                cmdList->endMarker();
                 return;  // No ImGui renderer available
             }
 
@@ -62,7 +60,6 @@ framegraph::VirtualResourceHandle setupImGuiPass(
             ImDrawData* drawData = ImGui::GetDrawData();
 
             if (!drawData || drawData->TotalVtxCount == 0) {
-                cmdList->endMarker();
                 return;  // Nothing to render
             }
 
@@ -71,7 +68,6 @@ framegraph::VirtualResourceHandle setupImGuiPass(
 
             if (!outputRT) {
                 Msg("! [ImGuiPass] Failed to get output texture");
-                cmdList->endMarker();
                 return;
             }
 
@@ -83,10 +79,6 @@ framegraph::VirtualResourceHandle setupImGuiPass(
 
             // Render ImGui using the explicit framebuffer/cmdList method
             data.renderer->Render(drawData, framebuffer, cmdList);
-
-            Msg("* [ImGuiPass] ImGui rendered (%d vertices)", drawData->TotalVtxCount);
-
-            cmdList->endMarker();
         }
     );
 
