@@ -91,22 +91,24 @@ framegraph::DefaultOutputLayout setupHUDPass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("HUD Pass");
 
             using RENDER_NAMESPACE::CSkeletonX_ST;
             using RENDER_NAMESPACE::CSkeletonX_PM;
 
             if (!data.hudBatches || data.hudBatches->empty() || !data.materialCache || !data.device) {
-                cmdList->endMarker();
+                Msg("* [HUDPass] No batches (batches=%p, empty=%d, matCache=%p, device=%p)",
+                    data.hudBatches, data.hudBatches ? data.hudBatches->empty() : -1,
+                    data.materialCache, data.device);
                 return;
             }
+
+            Msg("* [HUDPass] Processing %u batches", data.hudBatches->size());
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
 
             if (!colorRT || !depthRT) {
                 Msg("! [HUDPass] Failed to get physical textures");
-                cmdList->endMarker();
                 return;
             }
 
@@ -178,10 +180,16 @@ framegraph::DefaultOutputLayout setupHUDPass(
             u32 numDraws = 0;
 
             for (const auto& batch : *data.hudBatches) {
-                if (!batch.visual) continue;
+                if (!batch.visual) {
+                    Msg("! [HUDPass] Batch has no visual");
+                    continue;
+                }
 
                 MaterialPSO* matPSO = data.materialCache->GetOrCreatePSO(batch.visual, data.outputs, fg, RenderPassType::HUD);
-                if (!matPSO || !matPSO->pso) continue;
+                if (!matPSO || !matPSO->pso) {
+                    Msg("! [HUDPass] Failed to get PSO (matPSO=%p, pso=%p)", matPSO, matPSO ? matPSO->pso : nullptr);
+                    continue;
+                }
 
                 if (matPSO->pso != currentPipeline) {
                     ctx->SetPipeline(matPSO->pso->GetNativePipeline());
@@ -274,7 +282,10 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
                 nvrhi::IBuffer* vb = batch.vertexBuffer.Get();
                 nvrhi::IBuffer* ib = batch.indexBuffer.Get();
-                if (!vb || !ib) continue;
+                if (!vb || !ib) {
+                    Msg("! [HUDPass] Missing buffers (vb=%p, ib=%p)", vb, ib);
+                    continue;
+                }
 
                 ctx->SetVertexBuffer(0, vb, 0);
                 ctx->SetIndexBuffer(ib, nvrhi::Format::R16_UINT, 0);
@@ -283,9 +294,8 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 numDraws++;
             }
 
+            Msg("* [HUDPass] Issued %u draw calls", numDraws);
             ctx->EndRenderPass();
-
-            cmdList->endMarker();
         }
     );
 

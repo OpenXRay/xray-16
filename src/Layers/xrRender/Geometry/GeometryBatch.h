@@ -5,6 +5,7 @@
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/GPUCullingManager.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
 
 namespace xray::render::RENDER_NAMESPACE {
     class dxRender_Visual;
@@ -55,27 +56,25 @@ struct GeometryBatch {
     RENDER_NAMESPACE::MeshAllocation megaBufferAlloc;
 
     bool IsAlphaTested() const {
-        if (!visual || !visual->shader)
+        if (!visual || !visual->shaderName.size())
             return false;
-        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
-        if (elem) {
-            return elem->flags.bAlphaTest != 0;
-        }
-        return false;
+
+        return MaterialSystem::Instance()
+            .GetMaterialInfo(visual->shaderName.c_str())
+            .alphaTest;
     }
 
     bool IsStrictB2F() const {
-        if (!visual || !visual->shader)
+        if (!visual || !visual->shaderName.size())
             return false;
-        RENDER_NAMESPACE::ShaderElement* elem = visual->shader->E[0]._get();
-        if (elem) {
-            return elem->flags.bStrictB2F != 0;
-        }
-        return false;
+
+        return MaterialSystem::Instance()
+            .GetMaterialInfo(visual->shaderName.c_str())
+            .transparent;
     }
 
     bool IsOpaque() const {
-        return !IsAlphaTested();
+        return !IsAlphaTested() && !IsStrictB2F();
     }
 };
 

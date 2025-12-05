@@ -59,15 +59,11 @@ void ImGuiRendererNVRHI::Render(ImDrawData* data, nvrhi::IFramebuffer* framebuff
         return;
     }
 
-    cmdList->beginMarker("ImGui");
-
     m_currentFramebuffer = framebuffer;
 
     RenderDrawData(data, cmdList);
 
     m_currentFramebuffer = nullptr;
-
-    cmdList->endMarker();
 }
 
 void ImGuiRendererNVRHI::OnDeviceCreate(ImGuiContext* context)
@@ -178,8 +174,11 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = vtxSize * sizeof(ImDrawVert);
     vbDesc.isVertexBuffer = true;
-    vbDesc.isVolatile = true;
+    vbDesc.isVolatile = false;
+    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
     vbDesc.debugName = "ImGui Vertex Buffer";
+    vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+    vbDesc.keepInitialState = true;
 
     m_vertexBuffer = m_device->createBuffer(vbDesc);
     if (!m_vertexBuffer)
@@ -190,8 +189,11 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     nvrhi::BufferDesc ibDesc;
     ibDesc.byteSize = idxSize * sizeof(ImDrawIdx);
     ibDesc.isIndexBuffer = true;
-    ibDesc.isVolatile = true;
+    ibDesc.isVolatile = false;
+    ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
     ibDesc.debugName = "ImGui Index Buffer";
+    ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
 
     m_indexBuffer = m_device->createBuffer(ibDesc);
     if (!m_indexBuffer)
@@ -242,6 +244,9 @@ void ImGuiRendererNVRHI::ProcessTextureRequests(ImDrawData* drawData)
 
                 texDesc.setFormat(nvrhiFormat);
                 texDesc.setDebugName("ImGui Texture");
+
+                texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+                texDesc.keepInitialState = true;
 
                 nvrhi::TextureHandle texture = m_device->createTexture(texDesc);
                 if (texture)

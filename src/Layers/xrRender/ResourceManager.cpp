@@ -309,6 +309,11 @@ Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures
     if (GEnv.isDedicatedServer)
         return nullptr;
 
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    {
+        return nullptr;
+    }
+
     return _cpp_Create(B, s_shader, s_textures, s_constants, s_matrices);
 }
 
@@ -318,7 +323,6 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
     {
         if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
         {
-            Msg("! [D3D12] Skipping legacy shader creation: %s", s_shader);
             return nullptr;
         }
 

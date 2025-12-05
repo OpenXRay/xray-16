@@ -7,6 +7,7 @@
 
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
+#include "xrEngine/xr_object.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -45,8 +46,6 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     {
         R_ASSERT2(hdr.format_version == xrOGF_FormatVersion, "Invalid visual version");
         Type = hdr.type;
-        if (hdr.shader_id)
-            shader = RImplementation.getShader(hdr.shader_id);
         vis.box.set(hdr.bb.min, hdr.bb.max);
         vis.sphere.set(hdr.bs.c, hdr.bs.r);
     }
@@ -55,7 +54,6 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
         FATAL("Invalid visual");
     }
 
-    // Shader
     if (data->find_chunk(OGF_TEXTURE))
     {
         string256 fnT, fnS;
@@ -64,7 +62,15 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
 
         shaderName = fnS;
         textureName = fnT;
-        shader.create(fnS, fnT);
+    }
+    else if (hdr.shader_id)
+    {
+        shared_str shName, texName;
+        if (RImplementation.getShaderNames(hdr.shader_id, shName, texName))
+        {
+            shaderName = shName;
+            textureName = texName;
+        }
     }
 
 // desc
@@ -82,6 +88,12 @@ void dxRender_Visual::Copy(dxRender_Visual* pFrom)
     PCOPY(shaderName);
     PCOPY(textureName);
     PCOPY(vis);
+
+    static u32 copyCount = 0;
+    if (++copyCount <= 5) {
+        Msg("* [Visual::Copy] from=%p to=%p tex='%s' shader='%s'",
+            pFrom, this, pFrom->textureName.c_str(), pFrom->shaderName.c_str());
+    }
 #ifdef _EDITOR
     PCOPY(desc);
 #endif

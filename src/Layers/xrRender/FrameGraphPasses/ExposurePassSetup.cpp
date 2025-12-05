@@ -173,7 +173,7 @@ static void InitializeExposureResources(ng::RenderDevice* device)
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Compute;
             layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::ConstantBuffer(5),
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
                 nvrhi::BindingLayoutItem::Texture_SRV(0),
                 nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0)
             };
@@ -191,7 +191,7 @@ static void InitializeExposureResources(ng::RenderDevice* device)
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Compute;
             layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::ConstantBuffer(5),
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
                 nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
                 nvrhi::BindingLayoutItem::Texture_UAV(0)
             };
@@ -302,7 +302,6 @@ ExposureOutput setupExposurePass(
            ng::RenderContext* ctx) {
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Exposure Pass");
 
             if (s_compute_enabled && s_histogram_pipeline && s_adapt_pipeline) {
                 nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
@@ -384,8 +383,6 @@ ExposureOutput setupExposurePass(
                     cmdList->writeTexture(s_exposure_texture, 0, 0, &exposure, sizeof(float));
                 }
             }
-
-            cmdList->endMarker();
         }
     );
 

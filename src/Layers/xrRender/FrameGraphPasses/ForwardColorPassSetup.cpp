@@ -16,7 +16,7 @@
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 #include "Layers/xrRender/GPUCullingManager.h"
-#include "Layers/xrRender/Bindless/TextureAtlas.h"
+#include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "xrCore/FMesh.hpp"
 
@@ -258,32 +258,7 @@ void renderForwardGeometry(
             batchPhase = RenderPhase::Opaque;
         }
 
-        if (batchPhase != currentPhase) {
-            if (currentPhase != RenderPhase::None) {
-                cmdList->endMarker();
-            }
-
-            switch (batchPhase) {
-                case RenderPhase::Opaque:
-                    cmdList->beginMarker("Forward Opaque (Priority 0)");
-                    break;
-                case RenderPhase::AlphaTested:
-                    cmdList->beginMarker("Forward Alpha-Tested (Priority 1)");
-                    break;
-                case RenderPhase::Transparent:
-                    cmdList->beginMarker("Forward Transparent (bStrictB2F)");
-                    break;
-                default:
-                    break;
-            }
-            currentPhase = batchPhase;
-        }
-
         renderBatch(batch, batchIndex);
-    }
-
-    if (currentPhase != RenderPhase::None) {
-        cmdList->endMarker();
     }
 
     ctx->EndRenderPass();
@@ -296,7 +271,6 @@ static nvrhi::InputLayoutHandle s_bindlessInputLayout;
 static nvrhi::SamplerHandle s_linearSampler;
 static nvrhi::ShaderHandle s_bindlessVS;
 static nvrhi::ShaderHandle s_bindlessPS;
-static nvrhi::TextureHandle s_placeholderTexture;
 static bool s_bindlessInitialized = false;
 
 void renderBindlessForward(
@@ -310,9 +284,6 @@ void renderBindlessForward(
 {
     using namespace RENDER_NAMESPACE::bindless;
 
-    Msg("* [BindlessForward] Enter - config.valid=%d, geometry=%p, batchCount=%zu",
-        config.IsValid(), geometry, geometry ? geometry->GetBatches().size() : 0);
-
     if (!config.IsValid() || !geometry || geometry->GetBatches().empty())
         return;
 
@@ -325,29 +296,19 @@ void renderBindlessForward(
 
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-
-    auto nativeD3D12 = cmdList->getNativeObject(nvrhi::ObjectTypes::D3D12_GraphicsCommandList);
-    Msg("* [BindlessForward] NVRHI cmdList=%p, D3D12 cmdList=%p", cmdList, nativeD3D12.pointer);
-
-    if (!cmdList) {
-        Msg("! [BindlessForward] Command list is NULL!");
+    if (!cmdList)
         return;
-    }
 
     if (!s_bindlessInitialized) {
         auto* shaderLoader = GEnv.Render->GetShaderLoader();
-        if (!shaderLoader) {
-            Msg("! [BindlessForward] ShaderLoader not available");
+        if (!shaderLoader)
             return;
-        }
 
         auto vsResult = shaderLoader->LoadVertexShader("bindless_forward", "main");
         auto psResult = shaderLoader->LoadPixelShader("bindless_forward", "main");
 
-        if (!vsResult.handle || !psResult.handle) {
-            Msg("! [BindlessForward] Failed to load bindless shaders");
+        if (!vsResult.handle || !psResult.handle)
             return;
-        }
 
         s_bindlessVS = vsResult.handle;
         s_bindlessPS = psResult.handle;
@@ -361,15 +322,11 @@ void renderBindlessForward(
         nvrhi::BindingLayoutDesc layoutDesc;
         layoutDesc.visibility = nvrhi::ShaderType::All;
         layoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::ConstantBuffer(2),
-            nvrhi::BindingLayoutItem::ConstantBuffer(4),
-            nvrhi::BindingLayoutItem::ConstantBuffer(5),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
             nvrhi::BindingLayoutItem::Sampler(0),
-            nvrhi::BindingLayoutItem::Texture_SRV(10),
-            nvrhi::BindingLayoutItem::Texture_SRV(11),
-            nvrhi::BindingLayoutItem::Texture_SRV(12),
-            nvrhi::BindingLayoutItem::Texture_SRV(13),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
@@ -418,23 +375,20 @@ void renderBindlessForward(
         };
         s_bindlessInputLayout = nvDevice->createInputLayout(vertexAttribs, 6, s_bindlessVS);
 
-        nvrhi::TextureDesc texDesc;
-        texDesc.width = 1;
-        texDesc.height = 1;
-        texDesc.arraySize = 1;
-        texDesc.dimension = nvrhi::TextureDimension::Texture2DArray;
-        texDesc.format = nvrhi::Format::RGBA8_UNORM;
-        texDesc.isShaderResource = true;
-        texDesc.debugName = "BindlessPlaceholder";
-        texDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-        texDesc.keepInitialState = true;
-        s_placeholderTexture = nvDevice->createTexture(texDesc);
-
         nvrhi::GraphicsPipelineDesc pipeDesc;
         pipeDesc.VS = s_bindlessVS;
         pipeDesc.PS = s_bindlessPS;
         pipeDesc.inputLayout = s_bindlessInputLayout;
-        pipeDesc.bindingLayouts = { s_bindlessLayout };
+
+        auto* backend = device->GetBackend();
+        nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
+
+        if (bindlessLayout) {
+            pipeDesc.bindingLayouts = { s_bindlessLayout, bindlessLayout };
+        } else {
+            pipeDesc.bindingLayouts = { s_bindlessLayout };
+        }
+
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
         pipeDesc.renderState.depthStencilState.depthTestEnable = true;
         pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
@@ -448,13 +402,10 @@ void renderBindlessForward(
         auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
         s_bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        if (!s_bindlessPipeline) {
-            Msg("! [BindlessForward] Failed to create bindless pipeline");
+        if (!s_bindlessPipeline)
             return;
-        }
 
         s_bindlessInitialized = true;
-        Msg("* [BindlessForward] Bindless rendering initialized");
     }
 
     nvrhi::FramebufferDesc fbDesc;
@@ -510,14 +461,12 @@ void renderBindlessForward(
 
     StaticGlobals staticGlobals;
     FillGlobalConstants(staticGlobals);
+
+    SunLightData sunData;
+    GetSunLightData(sunData, 2.0f);
+    FillSunConstants(staticGlobals, sunData);
+
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
-
-    auto& atlasManager = TextureAtlasManager::Instance();
-
-    auto getAtlasOrPlaceholder = [&](AtlasType type) -> nvrhi::ITexture* {
-        auto* atlas = atlasManager.GetAtlas(type).GetArray();
-        return atlas ? atlas : s_placeholderTexture.Get();
-    };
 
     nvrhi::BindingSetDesc bindDesc;
     bindDesc.bindings = {
@@ -526,62 +475,27 @@ void renderBindlessForward(
         nvrhi::BindingSetItem::ConstantBuffer(5, perDrawCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-        nvrhi::BindingSetItem::Texture_SRV(10, getAtlasOrPlaceholder(AtlasType::Diffuse)),
-        nvrhi::BindingSetItem::Texture_SRV(11, getAtlasOrPlaceholder(AtlasType::Normal)),
-        nvrhi::BindingSetItem::Texture_SRV(12, getAtlasOrPlaceholder(AtlasType::Detail)),
-        nvrhi::BindingSetItem::Texture_SRV(13, getAtlasOrPlaceholder(AtlasType::PBR)),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.instanceBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.compactBatchIndicesBuffer),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.compactMaterialIDBuffer),
     };
 
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
-    if (!bindingSet) {
-        Msg("! [BindlessForward] Failed to create binding set");
+    if (!bindingSet)
         return;
-    }
-
-    cmdList->beginMarker("Bindless Forward");
 
     const auto& rtDesc = colorRT->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
 
     static u32 s_gpuDrivenDraws = 0;
 
-    Msg("* [BindlessForward] GPU culling check: UseGPUCulling=%d, UseMegaBuffers=%d",
-        config.UseGPUCulling(), config.UseMegaBuffers());
-
     if (!config.UseGPUCulling() || !config.UseMegaBuffers()) {
-        Msg("! [BindlessForward] Skipping - GPU culling or mega buffers not ready");
-        cmdList->endMarker();
         return;
     }
-
-    cmdList->beginMarker("GPU-Driven Culled");
 
     const u32 visibleCount = config.totalObjectCount;
-    Msg("* [BindlessForward] Drawing %u objects via indirect draw", visibleCount);
 
-    Msg("* [BindlessForward] State validation:");
-    Msg("*   pipeline=%p, framebuffer=%p, bindingSet=%p",
-        s_bindlessPipeline, framebuffer, bindingSet);
-    Msg("*   megaVB=%p, megaIB=%p, compactDrawArgs=%p",
-        config.megaVertexBuffer, config.megaIndexBuffer, config.compactDrawArgsBuffer);
-    Msg("*   perDrawCB=%p, staticGlobalsCB=%p", perDrawCB.Get(), staticGlobalsCB.Get());
-
-    if (!s_bindlessPipeline) {
-        Msg("! [BindlessForward] Pipeline is NULL - cannot draw!");
-        cmdList->endMarker();
-        return;
-    }
-    if (!framebuffer) {
-        Msg("! [BindlessForward] Framebuffer is NULL - cannot draw!");
-        cmdList->endMarker();
-        return;
-    }
-    if (!bindingSet) {
-        Msg("! [BindlessForward] BindingSet is NULL - cannot draw!");
-        cmdList->endMarker();
+    if (!s_bindlessPipeline || !framebuffer || !bindingSet) {
         return;
     }
 
@@ -591,30 +505,20 @@ void renderBindlessForward(
     state.pipeline = s_bindlessPipeline;
     state.framebuffer = framebuffer;
     state.bindings = { bindingSet };
+
+    auto* backend = device->GetBackend();
+    if (backend) {
+        auto* bindlessTable = backend->GetBindlessDescriptorTable();
+        if (bindlessTable) {
+            state.addBindingSet(bindlessTable);
+        }
+    }
+
     state.vertexBuffers = { {config.megaVertexBuffer, 0, 0} };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
     state.indirectParams = config.compactDrawArgsBuffer;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-
-    Msg("* [BindlessForward] Entering draw loop for %u objects...", visibleCount);
-
-    {
-        struct DrawIndexConstant {
-            u32 drawIndex;
-            u32 padding[3];
-        } testDrawData = {0, {0,0,0}};
-        cmdList->writeBuffer(perDrawCB, &testDrawData, sizeof(testDrawData));
-        cmdList->setGraphicsState(state);
-
-        nvrhi::DrawArguments testArgs;
-        testArgs.vertexCount = 3;
-        testArgs.instanceCount = 1;
-        testArgs.startVertexLocation = 0;
-        testArgs.startInstanceLocation = 0;
-        cmdList->draw(testArgs);
-        Msg("* [BindlessForward] TEST: Issued simple draw(3 vertices)");
-    }
 
     for (u32 i = 0; i < visibleCount; i++) {
         struct DrawIndexConstant {
@@ -631,9 +535,6 @@ void renderBindlessForward(
     }
 
     s_gpuDrivenDraws += visibleCount;
-    Msg("* [BindlessForward] Draw loop complete - %u indirect draws issued", visibleCount);
-    cmdList->endMarker();
-    cmdList->endMarker();
 }
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
@@ -692,27 +593,24 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             const FrameGraph& fg,
             ng::RenderContext* ctx) {
 
-                Msg("* [ForwardColorPass] Execute started");
-
                 auto* depthRT = fg.GetPhysicalTexture(data.depth);
                 auto* colorRT = fg.GetPhysicalTexture(data.color);
 
-                if (!depthRT || !colorRT) {
-                    Msg("! [ForwardColorPass] Missing RT: depth=%p, color=%p", depthRT, colorRT);
+                if (!depthRT || !colorRT)
                     return;
-                }
 
-                if (!data.geometry) {
-                    Msg("! [ForwardColorPass] No geometry collector");
+                if (!data.geometry)
                     return;
-                }
 
                 const auto& batches = data.geometry->GetBatches();
-                Msg("* [ForwardColorPass] Batch count: %zu", batches.size());
-
-                if (batches.empty()) {
-                    Msg("! [ForwardColorPass] No batches to render");
+                if (batches.empty())
                     return;
+
+                static u32 s_lastLogTime = 0;
+                u32 currentTime = Device.dwTimeGlobal;
+                if (currentTime - s_lastLogTime >= 1000) {
+                    Msg("* [ForwardColorPass] Batch count: %zu", batches.size());
+                    s_lastLogTime = currentTime;
                 }
 
                 nvrhi::IBuffer* drawArgsBuffer = nullptr;
@@ -720,31 +618,14 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                     drawArgsBuffer = fg.GetPhysicalBuffer(data.drawArgsBuffer);
                 }
 
-                if (data.bindlessConfig.IsValid()) {
-                    Msg("* [ForwardColorPass] Using BINDLESS path (totalObjects=%u)", data.bindlessConfig.totalObjectCount);
-                    renderBindlessForward(
-                        ctx,
-                        data.device,
-                        data.geometry,
-                        colorRT,
-                        depthRT,
-                        data.bindlessConfig,
-                        data.materialCache
-                    );
-                    return;
-                }
-
-                Msg("* [ForwardColorPass] Using STANDARD path");
-                renderForwardGeometry(
+                renderBindlessForward(
                     ctx,
                     data.device,
                     data.geometry,
                     colorRT,
                     depthRT,
-                    data.materialCache,
-                    data.outputs,
-                    fg,
-                    drawArgsBuffer
+                    data.bindlessConfig,
+                    data.materialCache
                 );
         }
     );

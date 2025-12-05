@@ -92,7 +92,7 @@ bool ShaderLoader::CompileShader(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,
         shaderName
     );
 
@@ -182,7 +182,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadVertexShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Vertex,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,
         fullPath
     );
 
@@ -299,7 +299,7 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
         sourceCode.c_str(),
         entryPoint,
         xray::render::SlangCompiler::Stage::Pixel,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,
         fullPath
     );
 
@@ -422,7 +422,7 @@ bool ShaderLoader::CompileShaderWithDefines(
         sourceCode.c_str(),
         entryPoint,
         stage,
-        xray::render::SlangCompiler::Target::DXBC,
+        xray::render::SlangCompiler::Target::DXIL,
         fullPath,
         defines.data(),
         defines.size()

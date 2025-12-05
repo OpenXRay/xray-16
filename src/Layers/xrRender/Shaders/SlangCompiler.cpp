@@ -80,7 +80,7 @@ SlangCompiler::CompileResult SlangCompiler::CompileFromSource(
         profile = "sm_5_0";
         break;
     case Target::DXIL:
-        profile = "sm_6_0";
+        profile = "sm_6_6";
         break;
     case Target::SPIRV:
         profile = "sm_5_0";

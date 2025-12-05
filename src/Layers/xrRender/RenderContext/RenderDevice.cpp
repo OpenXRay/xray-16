@@ -94,6 +94,10 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
         void EndFrame() override { m_ref->EndFrame(); }
         const Capabilities& GetCapabilities() const override { return m_ref->GetCapabilities(); }
         Capabilities& GetMutableCapabilities() override { return m_ref->GetMutableCapabilities(); }
+        u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override { return m_ref->RegisterBindlessTexture(texture); }
+        void UnregisterBindlessTexture(u32 index) override { m_ref->UnregisterBindlessTexture(index); }
+        nvrhi::IBindingLayout* GetBindlessLayout() const override { return m_ref->GetBindlessLayout(); }
+        nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const override { return m_ref->GetBindlessDescriptorTable(); }
     };
 
     m_backend.reset(xr_new<BackendRef>(backend));

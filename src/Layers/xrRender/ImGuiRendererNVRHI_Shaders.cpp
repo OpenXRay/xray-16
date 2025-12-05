@@ -83,7 +83,7 @@ bool ImGuiRendererNVRHI::CreatePipelineState()
     nvrhi::BindingLayoutDesc bindingLayoutDesc;
     bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
     bindingLayoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::ConstantBuffer(0),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
         nvrhi::BindingLayoutItem::Texture_SRV(0),
         nvrhi::BindingLayoutItem::Sampler(0)
     };

@@ -46,8 +46,6 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
         return;
     }
 
-    m_commandList->beginMarker(desc.passName);
-
     m_currentState = nvrhi::GraphicsState();
     m_currentState.framebuffer = m_currentFramebuffer;
 
@@ -85,8 +83,6 @@ void RenderContext::BeginRenderPass(const RenderPassDesc& desc) {
 
 void RenderContext::EndRenderPass() {
     VERIFY2(m_inRenderPass, "Not in render pass!");
-
-    m_commandList->endMarker();
 
     m_tempBindingSets.clear();
 
@@ -235,11 +231,19 @@ void RenderContext::SetConstantBuffer(u32 slot, nvrhi::IBuffer* buffer) {
     VERIFY(buffer != nullptr);
     VERIFY(m_commandList != nullptr);
 
+    bool isVolatile = buffer->getDesc().isVolatile;
+
     nvrhi::BindingLayoutDesc layoutDesc;
     layoutDesc.visibility = nvrhi::ShaderType::All;
-    layoutDesc.bindings = {
-        nvrhi::BindingLayoutItem::ConstantBuffer(slot)
-    };
+    if (isVolatile) {
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(slot)
+        };
+    } else {
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::ConstantBuffer(slot)
+        };
+    }
 
     nvrhi::BindingLayoutHandle layout = m_device->CreateBindingLayout(layoutDesc);
     if (!layout) {

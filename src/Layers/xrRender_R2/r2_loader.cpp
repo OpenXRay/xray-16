@@ -37,6 +37,7 @@ void CRender::level_Load(IReader* fs)
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
         Shaders.resize(count);
+        ShaderNames.resize(count);
         for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
         {
             string512 n_sh, n_tlist;
@@ -49,6 +50,13 @@ void CRender::level_Load(IReader* fs)
             *delim = 0;
             xr_strcpy(n_tlist, delim + 1);
             Shaders[i] = Resources->Create(n_sh, n_tlist);
+
+            string256 firstTexture;
+            xr_strcpy(firstTexture, n_tlist);
+            if (pstr comma = strchr(firstTexture, ','))
+                *comma = 0;
+            ShaderNames[i].shaderName = n_sh;
+            ShaderNames[i].textureName = firstTexture;
         }
         chunk->close();
     }
@@ -199,6 +207,7 @@ void CRender::level_Unload()
 
     //*** Shaders
     Shaders.clear();
+    ShaderNames.clear();
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

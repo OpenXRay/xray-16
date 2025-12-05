@@ -176,14 +176,12 @@ framegraph::VirtualResourceHandle setupSkyPass(
             }
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Sky Pass");
 
             auto* colorRT = fg.GetPhysicalTexture(data.colorOutput);
             auto* depthRT = fg.GetPhysicalTexture(data.depthOutput);
 
             if (!colorRT || !depthRT) {
                 Msg("! [SkyPass] Failed to get render targets");
-                cmdList->endMarker();
                 return;
             }
 
@@ -212,7 +210,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             if (!RImplementation.m_shaderLoader) {
                 Msg("! [SkyPass] ShaderLoader not initialized");
-                cmdList->endMarker();
                 return;
             }
 
@@ -226,7 +223,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
                 if (!vsResult.handle || !psResult.handle) {
                     Msg("! [SkyPass] Failed to load sky shaders");
-                    cmdList->endMarker();
                     return;
                 }
             }
@@ -237,8 +233,8 @@ framegraph::VirtualResourceHandle setupSkyPass(
             nvrhi::BindingLayoutDesc bindingLayoutDesc;
             bindingLayoutDesc.visibility = nvrhi::ShaderType::All;
             bindingLayoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::ConstantBuffer(0),
-                nvrhi::BindingLayoutItem::ConstantBuffer(2),
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
                 nvrhi::BindingLayoutItem::Texture_SRV(0),
                 nvrhi::BindingLayoutItem::Texture_SRV(1),
                 nvrhi::BindingLayoutItem::Sampler(0)
@@ -288,7 +284,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             if (!pipeline) {
                 Msg("! [SkyPass] Failed to create pipeline");
-                cmdList->endMarker();
                 return;
             }
 
@@ -386,8 +381,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
             drawArgs.startVertexLocation = 0;
 
             cmdList->drawIndexed(nvrhi::DrawArguments{60, 1, 0, 0, 0});
-
-            cmdList->endMarker();
         }
     );
 

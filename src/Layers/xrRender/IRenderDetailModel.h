@@ -29,6 +29,8 @@ public:
     float m_fMaxScale;
 
     ref_shader shader;
+    shared_str shaderName;
+    shared_str textureName;
     fvfVertexIn* vertices;
     u32 number_vertices;
     u16* indices;

@@ -828,6 +828,9 @@
     <ClInclude Include="..\xrRender\Geometry\MaterialCache.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\Materials\MaterialSystem.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\Geometry\GeometryBatch.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
@@ -918,7 +921,6 @@
     <ClInclude Include="..\xrRender\PBRConverter\ONNXModelRunner.h" />
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
-    <ClInclude Include="..\xrRender\Bindless\TextureAtlas.h" />
     <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
     <ClInclude Include="..\xrRender\Backend\D3D11Backend.h" />
@@ -1616,6 +1618,9 @@
     <ClCompile Include="..\xrRender\Geometry\MaterialCache.cpp">
       <Filter>Framegraph</Filter>
     </ClCompile>
+    <ClCompile Include="..\xrRender\Materials\MaterialSystem.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
     <ClCompile Include="..\xrRender\ResourceManager\NativeRTFactory.cpp">
       <Filter>Framegraph</Filter>
     </ClCompile>
@@ -1693,7 +1698,6 @@
     <ClCompile Include="..\xrRender\FrameGraphPasses\SunPassSetup.cpp" />
     <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
-    <ClCompile Include="..\xrRender\Bindless\TextureAtlas.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D11Backend.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />

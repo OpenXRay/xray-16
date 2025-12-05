@@ -22,9 +22,11 @@
 #include "Layers/xrRender/FrameGraph/IPass.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
-#include "Layers/xrRender/Bindless/TextureAtlas.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "xrEngine/IRenderBackend.h"
 #include "Layers/xrRender/r_constants.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "xrEngine/xr_object.h"
 
 #if defined(USE_DX11)
 #include "Layers/xrRenderDX11/StateManager/dx11State.h"
@@ -243,6 +245,10 @@ MaterialPSO* MaterialCache::GetOrCreatePSO(
         return nullptr;
     }
 
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
+        return nullptr;
+    }
+
     Shader* shader = nullptr;
 
     if (visual->shader && visual->shader._get()) {
@@ -314,6 +320,10 @@ MaterialPSO* MaterialCache::GetOrCreateDepthPSO(
 {
     if (!visual) {
         Msg("! [MaterialCache::GetOrCreateDepthPSO] Visual is NULL");
+        return nullptr;
+    }
+
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12) {
         return nullptr;
     }
 
@@ -1653,6 +1663,8 @@ void MaterialCache::Clear()
     m_textureHandleCache.clear();
     m_detailScaleCache.clear();
     m_shaderHandles.clear();
+    m_visualToMaterialID.clear();
+    m_pendingMaterials.clear();
     m_stats = Stats{};
 }
 
@@ -1744,10 +1756,8 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     if (matPSO->bindlessMaterialID != UINT32_MAX)
         return matPSO->bindlessMaterialID;
 
-    auto& atlasManager = TextureAtlasManager::Instance();
     auto& materialBuffer = MaterialBuffer::Instance();
-
-    if (!atlasManager.IsInitialized() || !materialBuffer.IsInitialized())
+    if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
 
     resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
@@ -1755,23 +1765,18 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
         return UINT32_MAX;
 
     MaterialData matData = {};
-    matData.diffuseAtlasLow = 0xFFFF;
-    matData.diffuseAtlasHigh = 0;
-    matData.normalAtlasLow = 0xFFFF;
-    matData.normalAtlasHigh = 0;
-    matData.detailAtlasLow = 0xFFFF;
-    matData.detailAtlasHigh = 0;
-    matData.pbrAtlasLow = 0xFFFF;
-    matData.pbrAtlasHigh = 0;
+    matData.diffuseIndex = INVALID_TEXTURE_INDEX;
+    matData.normalIndex = INVALID_TEXTURE_INDEX;
+    matData.detailIndex = INVALID_TEXTURE_INDEX;
+    matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = matPSO->detail_scale;
     matData.alphaRef = 0.5f;
     matData.flags = 0;
+    matData.padding = 0.0f;
 
     if (matPSO->pass) {
         RENDER_NAMESPACE::STextureList* texList = matPSO->pass->T._get();
         if (texList && !texList->empty()) {
-            matData.flags |= 0;
-
             for (size_t i = 0; i < texList->size(); i++) {
                 const auto& texPair = (*texList)[i];
                 if (texPair.first == 1) {
@@ -1802,56 +1807,26 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     if (!materialBuffer.IsInitialized())
         return UINT32_MAX;
 
-    RENDER_NAMESPACE::Shader* shader = nullptr;
-    if (visual->shader && visual->shader._get()) {
-        shader = visual->shader._get();
-    } else if (visual->shaderName.c_str() && visual->shaderName.size() > 0 &&
-               visual->textureName.c_str() && visual->textureName.size() > 0) {
-        visual->shader.create(visual->shaderName.c_str(), visual->textureName.c_str());
-        shader = visual->shader._get();
-    }
-
-    if (!shader)
-        return UINT32_MAX;
-
-    RENDER_NAMESPACE::ShaderElement* elem = shader->E[0]._get();
-    if (!elem || elem->passes.empty())
-        return UINT32_MAX;
-
-    RENDER_NAMESPACE::SPass* pass = elem->passes[0]._get();
-    if (!pass)
-        return UINT32_MAX;
-
     MaterialData matData = {};
-    matData.diffuseAtlasLow = 0xFFFF;
-    matData.diffuseAtlasHigh = 0;
-    matData.normalAtlasLow = 0xFFFF;
-    matData.normalAtlasHigh = 0;
-    matData.detailAtlasLow = 0xFFFF;
-    matData.detailAtlasHigh = 0;
-    matData.pbrAtlasLow = 0xFFFF;
-    matData.pbrAtlasHigh = 0;
+    matData.diffuseIndex = INVALID_TEXTURE_INDEX;
+    matData.normalIndex = INVALID_TEXTURE_INDEX;
+    matData.detailIndex = INVALID_TEXTURE_INDEX;
+    matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
     matData.alphaRef = 0.5f;
     matData.flags = 0;
-    matData.padding1 = 0.0f;
+    matData.padding = 0.0f;
 
-    RENDER_NAMESPACE::STextureList* texList = pass->T._get();
-    if (texList && !texList->empty()) {
-        const shared_str& baseTexName = (*texList)[0].second;
-        if (baseTexName.c_str() && baseTexName[0]) {
-            matData.detailScale = GetDetailScale(baseTexName);
-        }
-
-        for (size_t i = 0; i < texList->size(); i++) {
-            if ((*texList)[i].first == 1) {
-                matData.flags |= MAT_FLAG_HAS_NORMAL;
-            }
-        }
+    if (visual->textureName.size() > 0) {
+        matData.detailScale = GetDetailScale(visual->textureName);
     }
 
-    if (elem->flags.bAlphaTest) {
-        matData.flags |= MAT_FLAG_ALPHA_TEST;
+    if (visual->shaderName.size() > 0) {
+        const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str());
+        if (matInfo.alphaTest) {
+            matData.flags |= MAT_FLAG_ALPHA_TEST;
+        }
+        matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
 
     u32 materialID = materialBuffer.RegisterMaterial(matData);
@@ -1863,6 +1838,13 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     pending.visual = visual;
     m_pendingMaterials.push_back(pending);
 
+    static u32 logCount = 0;
+    if (++logCount <= 10) {
+        Msg("* [MaterialCache] PreRegister: matID=%u visual=%p type=%u tex='%s' shader='%s' pending=%u",
+            materialID, visual, visual->getType(), visual->textureName.c_str(), visual->shaderName.c_str(),
+            static_cast<u32>(m_pendingMaterials.size()));
+    }
+
     return materialID;
 }
 
@@ -1870,18 +1852,31 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
 {
     using namespace RENDER_NAMESPACE::bindless;
 
-    if (m_pendingMaterials.empty())
+    if (m_pendingMaterials.empty()) {
+        static u32 emptyCount = 0;
+        if (++emptyCount <= 3) {
+            Msg("* [MaterialCache] FinalizePending: empty (cached=%u)",
+                static_cast<u32>(m_visualToMaterialID.size()));
+        }
         return;
+    }
 
-    auto& atlasManager = TextureAtlasManager::Instance();
+    Msg("* [MaterialCache] FinalizePending: processing %u materials",
+        static_cast<u32>(m_pendingMaterials.size()));
+
     auto& materialBuffer = MaterialBuffer::Instance();
-
-    if (!atlasManager.IsInitialized() || !materialBuffer.IsInitialized())
+    if (!materialBuffer.IsInitialized())
         return;
 
     resources::TextureManager* texManager = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
     if (!texManager)
         return;
+
+    IRenderBackend* backend = GEnv.Backend;
+    if (!backend) {
+        Msg("! [MaterialCache] Backend not available - cannot register bindless textures");
+        return;
+    }
 
     u32 processedCount = 0;
 
@@ -1899,31 +1894,19 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         MaterialData matData = *existingMat;
         bool updated = false;
 
-        RENDER_NAMESPACE::Shader* shader = visual->shader._get();
-        if (!shader)
+        shared_str diffuseName = visual->textureName;
+
+        if (!diffuseName.size() || !diffuseName[0])
             continue;
 
-        RENDER_NAMESPACE::ShaderElement* elem = shader->E[0]._get();
-        if (!elem || elem->passes.empty())
-            continue;
-
-        RENDER_NAMESPACE::SPass* pass = elem->passes[0]._get();
-        if (!pass)
-            continue;
-
-        RENDER_NAMESPACE::STextureList* texList = pass->T._get();
-        if (!texList || texList->empty())
-            continue;
-
-        const shared_str& diffuseName = (*texList)[0].second;
-        if (diffuseName.c_str() && diffuseName[0]) {
+        {
             resources::TextureHandle handle = texManager->LoadTexture(diffuseName.c_str());
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
-                    TextureRegisterResult result = atlasManager.Diffuse().RegisterTexture(ctx, diffuseName, nvrhiTex);
-                    if (result.IsValid()) {
-                        SetDiffuseAllocation(matData, result.allocation);
+                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                    if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                        matData.diffuseIndex = descriptorIndex;
                         updated = true;
                     }
                 }
@@ -1937,9 +1920,9 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
             if (handle.IsValid()) {
                 nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                 if (nvrhiTex) {
-                    TextureRegisterResult result = atlasManager.Normal().RegisterTexture(ctx, bumpName, nvrhiTex);
-                    if (result.IsValid()) {
-                        SetNormalAllocation(matData, result.allocation);
+                    u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                    if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                        matData.normalIndex = descriptorIndex;
                         matData.flags |= MAT_FLAG_HAS_NORMAL;
                         updated = true;
                     }
@@ -1955,9 +1938,9 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
                 if (handle.IsValid()) {
                     nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
                     if (nvrhiTex) {
-                        TextureRegisterResult result = atlasManager.Detail().RegisterTexture(ctx, detailTexName, nvrhiTex);
-                        if (result.IsValid()) {
-                            SetDetailAllocation(matData, result.allocation);
+                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                        if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                            matData.detailIndex = descriptorIndex;
                             matData.detailScale = texDescMgr.GetDetailScale(diffuseName);
                             matData.flags |= MAT_FLAG_HAS_DETAIL;
                             updated = true;
@@ -1968,27 +1951,20 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         }
 
         if (diffuseName.c_str() && diffuseName[0]) {
-            auto registerPBRTexture = [&](const shared_str& pbrTexName) -> TextureRegisterResult {
-                if (pbrTexName.empty())
-                    return TextureRegisterResult();
-
-                resources::TextureHandle handle = texManager->LoadTexture(pbrTexName.c_str());
-                if (!handle.IsValid())
-                    return TextureRegisterResult();
-
-                nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
-                if (!nvrhiTex)
-                    return TextureRegisterResult();
-
-                return atlasManager.PBR().RegisterTexture(ctx, pbrTexName, nvrhiTex);
-            };
-
             shared_str pbrName = texDescMgr.GetPBRName(diffuseName);
-            TextureRegisterResult pbrResult = registerPBRTexture(pbrName);
-            if (pbrResult.IsValid()) {
-                SetPBRAllocation(matData, pbrResult.allocation);
-                matData.flags |= MAT_FLAG_HAS_PBR;
-                updated = true;
+            if (!pbrName.empty()) {
+                resources::TextureHandle handle = texManager->LoadTexture(pbrName.c_str());
+                if (handle.IsValid()) {
+                    nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+                    if (nvrhiTex) {
+                        u32 descriptorIndex = backend->RegisterBindlessTexture(nvrhiTex);
+                        if (descriptorIndex != INVALID_TEXTURE_INDEX) {
+                            matData.pbrIndex = descriptorIndex;
+                            matData.flags |= MAT_FLAG_HAS_PBR;
+                            updated = true;
+                        }
+                    }
+                }
             }
         }
 
@@ -2002,9 +1978,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
 
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
-
-        Msg("* [MaterialCache] Finalized %u pending materials", processedCount);
-        atlasManager.LogMemoryUsage();
+        Msg("* [MaterialCache] Finalized %u pending materials with SM6 bindless textures", processedCount);
     }
 }
 

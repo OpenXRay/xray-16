@@ -79,6 +79,12 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
         cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
         s_hiz_cb = nvDevice->createBuffer(cbDesc);
 
+        if (s_hiz_cb) {
+            Msg("* [HiZBuild] Constant buffer created: %p, size=%d", s_hiz_cb.Get(), sizeof(HiZCB));
+        } else {
+            Msg("! [HiZBuild] Failed to create constant buffer!");
+        }
+
         auto& cache = framegraph::GetPassResourceCache();
 
         nvrhi::SamplerDesc samplerDesc;
@@ -94,9 +100,9 @@ static void InitializeHiZResources(ng::RenderDevice* device, u32 width, u32 heig
             nvrhi::BindingLayoutDesc layoutDesc;
             layoutDesc.visibility = nvrhi::ShaderType::Compute;
             layoutDesc.bindings = {
-                nvrhi::BindingLayoutItem::ConstantBuffer(5),
                 nvrhi::BindingLayoutItem::Texture_SRV(0),
                 nvrhi::BindingLayoutItem::Texture_UAV(0),
+                nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
                 nvrhi::BindingLayoutItem::Sampler(0)
             };
             s_hiz_layout = cache.GetOrCreateBindingLayout("HiZBuildPass", layoutDesc, nvDevice);
@@ -199,7 +205,6 @@ HiZPyramidOutput setupHiZBuildPass(
             }
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-            cmdList->beginMarker("Hi-Z Build");
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
 
@@ -208,13 +213,16 @@ HiZPyramidOutput setupHiZBuildPass(
 
             if (!depthTexture) {
                 Msg("! [HiZBuild] Depth texture not available");
-                cmdList->endMarker();
                 return;
             }
 
             if (!hizTexture) {
                 Msg("! [HiZBuild] Hi-Z pyramid texture not available");
-                cmdList->endMarker();
+                return;
+            }
+
+            if (!s_hiz_cb) {
+                Msg("! [HiZBuild] Constant buffer is NULL at execute time!");
                 return;
             }
 
@@ -278,16 +286,13 @@ HiZPyramidOutput setupHiZBuildPass(
                 u32 groupsY = (outHeight + 7) / 8;
                 cmdList->dispatch(groupsX, groupsY, 1);
 
-                nvrhi::utils::TextureUavBarrier(cmdList, hizTexture);
-
-                cmdList->setTextureState(hizTexture, outputSubres,
-                    nvrhi::ResourceStates::ShaderResource);
+                if (mip < data.mipLevels - 1) {
+                    nvrhi::utils::TextureUavBarrier(cmdList, hizTexture);
+                }
             }
 
             cmdList->setTextureState(hizTexture, nvrhi::AllSubresources,
                 nvrhi::ResourceStates::ShaderResource);
-
-            cmdList->endMarker();
         }
     );
 

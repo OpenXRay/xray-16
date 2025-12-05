@@ -25,7 +25,6 @@
 #include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "GPUCullingManager.h"
-#include "Bindless/TextureAtlas.h"
 #include "Bindless/MaterialBuffer.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
@@ -389,7 +388,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->Initialize(m_device);
 
-        bindless::TextureAtlasManager::Instance().Initialize(m_device);
         bindless::MaterialBuffer::Instance().Initialize(m_device);
         bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
 

@@ -114,14 +114,11 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
     nvrhi::GraphicsState graphicsState;
     graphicsState.pipeline = m_pipeline;
     graphicsState.framebuffer = m_currentFramebuffer;
-    graphicsState.viewport.addViewport(m_viewport);
     graphicsState.bindings = { m_resourceBindings };
     graphicsState.vertexBuffers = {
         { m_vertexBuffer, 0, 0 }
     };
     graphicsState.indexBuffer = { m_indexBuffer, nvrhi::Format::R16_UINT, 0 };
-
-    cmdList->setGraphicsState(graphicsState);
 
     int globalVtxOffset = 0;
     int globalIdxOffset = 0;
@@ -167,8 +164,6 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
                     scissor.maxX = (int)clipRect.z;
                     scissor.maxY = (int)clipRect.w;
 
-                    graphicsState.viewport.addScissorRect(scissor);
-
                     ImTextureID texId = pcmd->GetTexID();
                     if (texId != lastTextureId)
                     {
@@ -177,6 +172,10 @@ void ImGuiRendererNVRHI::RenderDrawData(ImDrawData* drawData, nvrhi::ICommandLis
 
                         graphicsState.bindings = { m_resourceBindings };
                     }
+
+                    graphicsState.viewport = nvrhi::ViewportState();
+                    graphicsState.viewport.addViewport(m_viewport);
+                    graphicsState.viewport.addScissorRect(scissor);
 
                     cmdList->setGraphicsState(graphicsState);
 

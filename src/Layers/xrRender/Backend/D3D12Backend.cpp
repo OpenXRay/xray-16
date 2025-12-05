@@ -299,25 +299,36 @@ void D3D12Backend::CreateBackBufferTextures() {
 }
 
 void D3D12Backend::CreateBindlessResources() {
+    Msg("* [D3D12Backend] Creating bindless resources...");
+
     nvrhi::BindlessLayoutDesc bindlessDesc;
-    bindlessDesc.visibility = nvrhi::ShaderType::Pixel | nvrhi::ShaderType::Compute;
+    bindlessDesc.visibility = nvrhi::ShaderType::Pixel | nvrhi::ShaderType::Compute | nvrhi::ShaderType::Vertex;
     bindlessDesc.firstSlot = 0;
     bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
-    bindlessDesc.registerSpaces.push_back(nvrhi::BindingLayoutItem::Texture_SRV(0));
+    bindlessDesc.layoutType = nvrhi::BindlessLayoutDesc::LayoutType::MutableSrvUavCbv;
+
+    Msg("* [D3D12Backend] Bindless layout desc: visibility=0x%x, maxCapacity=%u, layoutType=MutableSrvUavCbv",
+        static_cast<u32>(bindlessDesc.visibility), bindlessDesc.maxCapacity);
 
     m_bindlessLayout = m_nvrhiDevice->createBindlessLayout(bindlessDesc);
     if (!m_bindlessLayout) {
-        Msg("! [D3D12Backend] Failed to create bindless layout");
+        Msg("! [D3D12Backend] Failed to create bindless layout - createBindlessLayout returned null");
+        Msg("! [D3D12Backend] This may indicate SM6.6/ResourceBindingTier3 is not supported");
         return;
     }
+    Msg("* [D3D12Backend] Bindless layout created: %p", m_bindlessLayout.Get());
 
     m_bindlessDescriptorTable = m_nvrhiDevice->createDescriptorTable(m_bindlessLayout);
     if (!m_bindlessDescriptorTable) {
         Msg("! [D3D12Backend] Failed to create bindless descriptor table");
         return;
     }
+    Msg("* [D3D12Backend] Bindless descriptor table created: %p", m_bindlessDescriptorTable.Get());
 
-    Msg("* [D3D12Backend] Bindless resources created (max %u textures)", MAX_BINDLESS_TEXTURES);
+    m_nvrhiDevice->resizeDescriptorTable(m_bindlessDescriptorTable, MAX_BINDLESS_TEXTURES, false);
+    Msg("* [D3D12Backend] Bindless descriptor table resized to %u entries", MAX_BINDLESS_TEXTURES);
+
+    Msg("* [D3D12Backend] Bindless resources created successfully (max %u textures)", MAX_BINDLESS_TEXTURES);
 }
 
 void D3D12Backend::QueryCapabilities() {
@@ -370,32 +381,39 @@ u32 D3D12Backend::RegisterBindlessTexture(nvrhi::ITexture* texture) {
     if (!m_bindlessDescriptorTable || !texture)
         return UINT32_MAX;
 
-    u32 index;
+    u32 slot;
     if (!m_freeBindlessIndices.empty()) {
-        index = m_freeBindlessIndices.back();
+        slot = m_freeBindlessIndices.back();
         m_freeBindlessIndices.pop_back();
     } else {
         if (m_nextBindlessIndex >= MAX_BINDLESS_TEXTURES) {
             Msg("! [D3D12Backend] Bindless texture limit reached");
             return UINT32_MAX;
         }
-        index = m_nextBindlessIndex++;
+        slot = m_nextBindlessIndex++;
     }
 
     nvrhi::BindingSetItem item = nvrhi::BindingSetItem::Texture_SRV(0, texture);
-    item.slot = index;
+    item.slot = slot;
 
     if (!m_nvrhiDevice->writeDescriptorTable(m_bindlessDescriptorTable, item)) {
-        m_freeBindlessIndices.push_back(index);
+        m_freeBindlessIndices.push_back(slot);
         return UINT32_MAX;
     }
 
-    return index;
+    u32 heapOffset = m_bindlessDescriptorTable->getFirstDescriptorIndexInHeap();
+    return heapOffset + slot;
 }
 
-void D3D12Backend::UnregisterBindlessTexture(u32 index) {
-    if (index < MAX_BINDLESS_TEXTURES) {
-        m_freeBindlessIndices.push_back(index);
+void D3D12Backend::UnregisterBindlessTexture(u32 absoluteIndex) {
+    u32 heapOffset = m_bindlessDescriptorTable ?
+        m_bindlessDescriptorTable->getFirstDescriptorIndexInHeap() : 0;
+
+    if (absoluteIndex >= heapOffset) {
+        u32 slot = absoluteIndex - heapOffset;
+        if (slot < MAX_BINDLESS_TEXTURES) {
+            m_freeBindlessIndices.push_back(slot);
+        }
     }
 }
 

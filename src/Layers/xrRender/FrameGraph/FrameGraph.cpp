@@ -191,7 +191,9 @@ void FrameGraph::Execute() {
             }
         }
 
+        cmdList->beginMarker(pass->name.c_str());
         pass->executeCallback(*m_context, *this);
+        cmdList->endMarker();
 
         passesExecuted++;
     }
@@ -212,41 +214,17 @@ void FrameGraph::Execute() {
 }
 
 nvrhi::ITexture* FrameGraph::GetPhysicalTexture(VirtualResourceHandle handle) const {
-    Msg("* [FrameGraph] GetPhysicalTexture called: index=%u, is_valid=%d, m_resources.size=%zu",
-        handle.index, handle.is_valid(), m_resources.size());
-    FlushLog();
-
     const ResourceNode* node = GetResourceNode(handle);
-    if (!node) {
-        Msg("! [FrameGraph] GetPhysicalTexture: GetResourceNode returned null for index %u", handle.index);
-        Msg("!   m_resources.size()=%zu, handle.is_valid()=%d", m_resources.size(), handle.is_valid());
-        FlushLog();
+    if (!node || !node->isAllocated) {
         return nullptr;
     }
 
-    Msg("* [FrameGraph] GetPhysicalTexture: node found, name='%s', isAllocated=%d",
-        node->desc.debugName.c_str(), node->isAllocated);
-    FlushLog();
-
-    if (!node->isAllocated) {
-        Msg("! [FrameGraph] GetPhysicalTexture FAILED for resource index %u, name='%s'",
-            handle.index, node->desc.debugName.c_str());
-        Msg("!   firstUsedPass=%u, lastUsedPass=%u, refCount=%u, isAllocated=%d",
-            node->firstUsedPass, node->lastUsedPass, node->refCount, node->isAllocated);
-        Msg("!   nvrhiTexture=%p", node->nvrhiTexture.Get());
-        FlushLog();
-        return nullptr;
-    }
     nvrhi::ITexture* tex = node->nvrhiTexture.Get();
-    Msg("* [FrameGraph] GetPhysicalTexture: nvrhiTexture ptr=%p for '%s'", tex, node->desc.debugName.c_str());
-    FlushLog();
 
     if (!tex) {
-        Msg("! [FrameGraph] GetPhysicalTexture: nvrhiTexture is null for index %u, name='%s'",
-            handle.index, node->desc.debugName.c_str());
-        FlushLog();
         return nullptr;
     }
+
     return tex;
 }
 
