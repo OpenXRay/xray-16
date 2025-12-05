@@ -15,6 +15,9 @@
 #include "Layers/xrRender/r_FrameGraphRenderer.h"
 #include "Layers/xrRender/GPUCullingManager.h"
 
+#include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CRender::level_Load(IReader* fs)
@@ -29,42 +32,6 @@ void CRender::level_Load(IReader* fs)
     Resources->DeferredLoad(TRUE);
     IReader* chunk;
 
-    // Shaders
-    g_pGamePersistent->LoadTitle("st_loading_shaders");
-    {
-        ZoneScopedN("Load shaders");
-        chunk = fs->open_chunk(fsL_SHADERS);
-        R_ASSERT2(chunk, "Level doesn't builded correctly.");
-        u32 count = chunk->r_u32();
-        Shaders.resize(count);
-        ShaderNames.resize(count);
-        for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
-        {
-            string512 n_sh, n_tlist;
-            LPCSTR n = LPCSTR(chunk->pointer());
-            chunk->skip_stringZ();
-            if (0 == n[0])
-                continue;
-            xr_strcpy(n_sh, n);
-            pstr delim = strchr(n_sh, '/');
-            *delim = 0;
-            xr_strcpy(n_tlist, delim + 1);
-            Shaders[i] = Resources->Create(n_sh, n_tlist);
-
-            string256 firstTexture;
-            xr_strcpy(firstTexture, n_tlist);
-            if (pstr comma = strchr(firstTexture, ','))
-                *comma = 0;
-            ShaderNames[i].shaderName = n_sh;
-            ShaderNames[i].textureName = firstTexture;
-        }
-        chunk->close();
-    }
-
-    // Components
-    Wallmarks = xr_new<CWallmarksEngine>();
-    Details = xr_new<CDetailManager>();
-
     if (!GEnv.isDedicatedServer)
     {
         GPUCullingManager* gpuCulling = nullptr;
@@ -75,7 +42,6 @@ void CRender::level_Load(IReader* fs)
             }
         }
 
-        // VB,IB,SWI
         g_pGamePersistent->LoadTitle("st_loading_geometry");
         {
             CStreamReader* geom = FS.rs_open("$level$", "level.geom");
@@ -92,13 +58,57 @@ void CRender::level_Load(IReader* fs)
             FS.r_close(geom);
             m_fast_geom_loaded = true;
         }
+    }
 
+    g_pGamePersistent->LoadTitle("st_loading_shaders");
+    {
+        ZoneScopedN("Load shaders");
+        chunk = fs->open_chunk(fsL_SHADERS);
+        R_ASSERT2(chunk, "Level doesn't builded correctly.");
+        u32 count = chunk->r_u32();
+        CompiledLevelShaders.resize(count);
+        for (u32 i = 0; i < count; i++)
+        {
+            string512 n_sh, n_tlist;
+            LPCSTR n = LPCSTR(chunk->pointer());
+            chunk->skip_stringZ();
+            if (0 == n[0])
+                continue;
+            xr_strcpy(n_sh, n);
+            pstr delim = strchr(n_sh, '/');
+            *delim = 0;
+            xr_strcpy(n_tlist, delim + 1);
+
+            string256 firstTexture;
+            xr_strcpy(firstTexture, n_tlist);
+            if (pstr comma = strchr(firstTexture, ','))
+                *comma = 0;
+
+            if (m_framegraphRenderer) {
+                CompileLevelShader(i, n_sh, firstTexture);
+            }
+        }
+        chunk->close();
+    }
+
+    if (m_framegraphRenderer && !GEnv.isDedicatedServer) {
+        g_pGamePersistent->LoadTitle("st_precompiling_pso");
+        PrecompileLevelPSOs();
+    }
+
+    // Components
+    Wallmarks = xr_new<CWallmarksEngine>();
+    Details = xr_new<CDetailManager>();
+
+    if (!GEnv.isDedicatedServer)
+    {
         // Visuals
         g_pGamePersistent->LoadTitle("st_loading_spatial_db");
         chunk = fs->open_chunk(fsL_VISUALS);
         LoadVisuals(chunk);
         chunk->close();
 
+        auto* gpuCulling = m_framegraphRenderer->GetGPUCullingManager();
         if (gpuCulling) {
             gpuCulling->EndLevelLoad();
         }
@@ -128,6 +138,119 @@ void CRender::level_Load(IReader* fs)
 
     // signal loaded
     b_loaded = TRUE;
+}
+
+void CRender::CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName)
+{
+    ZoneScopedN("Compile Level Shader");
+
+    auto& compiled = CompiledLevelShaders[shaderID];
+    compiled.shaderName = shaderName;
+    compiled.textureName = textureName;
+
+    if (!m_shaderLoader) {
+        Msg("! [ERROR] ShaderLoader not available for shader: %s", shaderName);
+        return;
+    }
+
+    auto vsResult = m_shaderLoader->LoadVertexShader(shaderName, "main");
+
+    if (vsResult.handle) {
+        compiled.vsHandle = vsResult.handle;
+        compiled.vsReflection.reset(vsResult.reflection);
+        vsResult.reflection = nullptr;
+    } else {
+        Msg("! [ERROR] Failed to compile VS for shader: %s", shaderName);
+        return;
+    }
+
+    auto psResult = m_shaderLoader->LoadPixelShader(shaderName, "main");
+
+    if (psResult.handle) {
+        compiled.psHandle = psResult.handle;
+        compiled.psReflection.reset(psResult.reflection);
+        psResult.reflection = nullptr;
+    } else {
+        Msg("! [ERROR] Failed to compile PS for shader: %s", shaderName);
+        return;
+    }
+
+    compiled.materialInfo = MaterialSystem::Instance().GetMaterialInfo(shaderName);
+
+    Msg("* Compiled shader %u: %s (VS=%p, PS=%p, alphaTest=%d, transparent=%d)",
+        shaderID, shaderName,
+        compiled.vsHandle.Get(),
+        compiled.psHandle.Get(),
+        compiled.materialInfo.alphaTest,
+        compiled.materialInfo.transparent);
+}
+
+void CRender::PrecompileLevelPSOs()
+{
+    ZoneScopedN("Precompile Level PSOs");
+
+    auto* materialCache = m_framegraphRenderer->GetMaterialCache();
+    if (!materialCache) {
+        Msg("! [ERROR] MaterialCache not available - skipping PSO precompilation");
+        return;
+    }
+
+    nvrhi::Format colorFormat = nvrhi::Format::RGBA16_FLOAT;
+    nvrhi::Format depthFormat = nvrhi::Format::D32;
+
+    u32 totalPSOs = 0;
+
+    for (u32 shaderID = 0; shaderID < CompiledLevelShaders.size(); ++shaderID) {
+        auto& compiled = CompiledLevelShaders[shaderID];
+
+        if (!compiled.vsHandle || !compiled.psHandle)
+            continue;
+
+        float progress = float(shaderID) / float(CompiledLevelShaders.size());
+        g_pGamePersistent->LoadTitle("st_precompiling_pso", progress);
+
+        xr_vector<u32> compatibleFormats;
+        for (u32 dcl_id = 0; dcl_id < nDC.size(); ++dcl_id) {
+            if (IsVertexFormatCompatible(nDC[dcl_id], compiled.vsReflection.get())) {
+                compatibleFormats.push_back(dcl_id);
+            }
+        }
+
+        if (compatibleFormats.empty()) {
+            Msg("! Shader %u (%s) has no compatible vertex formats!",
+                shaderID, compiled.shaderName.c_str());
+            continue;
+        }
+
+        for (u32 dcl_id : compatibleFormats) {
+            if (CreatePrecompiledPSO(
+                shaderID,
+                dcl_id,
+                RenderPassType::ForwardColor,
+                colorFormat,
+                depthFormat,
+                materialCache
+            )) {
+                totalPSOs++;
+            }
+
+            if (!compiled.materialInfo.transparent) {
+                if (CreatePrecompiledPSO(
+                    shaderID,
+                    dcl_id,
+                    RenderPassType::DepthPrepass,
+                    nvrhi::Format::UNKNOWN,
+                    depthFormat,
+                    materialCache
+                )) {
+                    totalPSOs++;
+                }
+            }
+        }
+    }
+
+    Msg("* Precompiled %u PSOs for %u shaders across %u vertex formats",
+        totalPSOs, CompiledLevelShaders.size(), nDC.size());
 }
 
 void CRender::level_Unload()
@@ -206,8 +329,7 @@ void CRender::level_Unload()
     xr_delete(Wallmarks);
 
     //*** Shaders
-    Shaders.clear();
-    ShaderNames.clear();
+    CompiledLevelShaders.clear();
     b_loaded = FALSE;
     if (ps_r__clear_models_on_unload)
     {

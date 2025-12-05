@@ -21,6 +21,9 @@ void dxUIRender::DestroyUIGeom()
 
 void dxUIRender::SetShader(IUIShader& shader)
 {
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+        return;
+
     dxUIShader* pShader = (dxUIShader*)&shader;
     VERIFY(&pShader);
     VERIFY(pShader->hShader);

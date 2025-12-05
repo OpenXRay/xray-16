@@ -20,10 +20,7 @@ void UIRenderCollector::DestroyUIGeom()
 
 void UIRenderCollector::SetShader(IUIShader& shader)
 {
-    dxUIShader* pShader = static_cast<dxUIShader*>(&shader);
-    VERIFY(pShader);
-    VERIFY(pShader->hShader);
-    m_currentShader = pShader->hShader;
+    m_currentUIShader = &shader;
 }
 
 void UIRenderCollector::SetAlphaRef(int aref)
@@ -116,7 +113,6 @@ void UIRenderCollector::Clear()
     m_currentVertices.clear();
     m_primitiveType = ptNone;
     m_pointType = pttNone;
-    m_currentShader = nullptr;
     m_currentAlphaRef = 0;
     m_hasScissor = false;
     m_cullMode = 0;
@@ -146,7 +142,7 @@ UIGeometryBatch* UIRenderCollector::GetOrCreateBatch()
     if (!m_batches.empty())
     {
         UIGeometryBatch& lastBatch = m_batches.back();
-        if (lastBatch.CanMergeWith(m_currentShader, m_currentAlphaRef, m_hasScissor,
+        if (lastBatch.CanMergeWith(m_currentUIShader, m_currentAlphaRef, m_hasScissor,
                                    m_hasScissor ? &m_scissorRect : nullptr, m_cullMode))
         {
             return &lastBatch;
@@ -156,7 +152,7 @@ UIGeometryBatch* UIRenderCollector::GetOrCreateBatch()
     m_batches.emplace_back();
     UIGeometryBatch& newBatch = m_batches.back();
 
-    newBatch.shader = m_currentShader;
+    newBatch.uiShader = m_currentUIShader;
     newBatch.alphaRef = m_currentAlphaRef;
     newBatch.hasScissor = m_hasScissor;
     if (m_hasScissor)

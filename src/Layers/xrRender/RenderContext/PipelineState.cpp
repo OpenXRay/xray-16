@@ -333,6 +333,12 @@ PipelineState* PipelineStateCache::CreatePipelineState(
 
     nvrhiDesc.primType = ConvertPrimitiveTopology(desc.primitiveTopology);
 
+    if (!desc.bindingLayouts.empty()) {
+        for (const auto& layout : desc.bindingLayouts) {
+            nvrhiDesc.bindingLayouts.push_back(layout);
+        }
+    }
+
     nvrhi::FramebufferInfoEx fbInfo;
     fbInfo.width = 1920;
     fbInfo.height = 1080;

@@ -65,11 +65,11 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     }
     else if (hdr.shader_id)
     {
-        shared_str shName, texName;
-        if (RImplementation.getShaderNames(hdr.shader_id, shName, texName))
+        auto* compiled = RImplementation.getCompiledShader(hdr.shader_id);
+        if (compiled)
         {
-            shaderName = shName;
-            textureName = texName;
+            shaderName = compiled->shaderName;
+            textureName = compiled->textureName;
         }
     }
 

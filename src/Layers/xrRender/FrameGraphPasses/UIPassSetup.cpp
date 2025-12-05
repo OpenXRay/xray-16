@@ -132,10 +132,6 @@ framegraph::VirtualResourceHandle setupUIPass(
                 return;
             }
 
-            IUIRender* oldRenderer = GEnv.UIRender;
-            uiCollector->Clear();
-            GEnv.UIRender = uiCollector;
-
             g_pGamePersistent->OnRenderPPUI_main();
             g_pGamePersistent->OnRenderInGameUI();
             if (g_pGamePersistent->IsLoadingScreenShown()) {
@@ -143,16 +139,14 @@ framegraph::VirtualResourceHandle setupUIPass(
             }
             g_pGamePersistent->OnRenderSequencers();
 
-            GEnv.UIRender = oldRenderer;
-
             if (!uiCollector->GetBatches().empty()) {
                 StaticGlobals staticGlobalsCB = {};
                 FillGlobalConstants(staticGlobalsCB);
 
                 for (const auto& batch : uiCollector->GetBatches()) {
-                    if (batch.shader && uiMatCache) {
+                    if (batch.uiShader && uiMatCache) {
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
-                            batch.shader._get(),
+                            batch.uiShader,
                             batch.shaderElement,
                             framebuffer
                         );
@@ -237,7 +231,8 @@ framegraph::VirtualResourceHandle setupTextPass(
                 vbDesc.byteSize = MAX_TEXT_VERTICES * 24;
                 vbDesc.debugName = "TextPass Vertex Buffer";
                 vbDesc.isVertexBuffer = true;
-                vbDesc.isVolatile = true;
+                vbDesc.isVolatile = false;
+                vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
                 vbDesc.keepInitialState = true;
                 vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
                 s_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
@@ -258,6 +253,8 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ibDesc.byteSize = MAX_TEXT_INDICES * sizeof(u16);
                 ibDesc.debugName = "TextPass Index Buffer";
                 ibDesc.isIndexBuffer = true;
+                ibDesc.isVolatile = false;
+                ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
                 ibDesc.keepInitialState = true;
                 ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
                 s_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
@@ -435,37 +432,6 @@ framegraph::VirtualResourceHandle setupTextPass(
             StaticGlobals staticGlobalsCB = {};
             FillGlobalConstants(staticGlobalsCB);
 
-            for (const auto& batch : fontBatches) {
-                auto* fontRender = static_cast<dxFontRender*>(batch.font->pFontRender);
-                if (!fontRender || !fontRender->pShader) continue;
-
-                Shader* shader = fontRender->pShader._get();
-                if (!shader || !shader->E[0]) continue;
-
-                MaterialPSO* pso = textMatCache->GetOrCreateUIPSO(shader, 0, framebuffer);
-                if (!pso) continue;
-
-                FGConstantSystem constants(pso);
-                UploadStaticGlobals(constants, staticGlobalsCB);
-                constants.CommitStatic(ctx);
-
-                textMatCache->GetOrCreateBindingSet(pso);
-
-                if (!pso->vsBindingSet || !pso->psBindingSet) continue;
-
-                cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), batch.vertices.size() * sizeof(TextVertex));
-
-                ctx->SetPipeline(pso->pso->GetNativePipeline());
-                ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);
-                ctx->SetIndexBuffer(s_indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
-                ctx->SetBindingSet(0, pso->vsBindingSet.Get());
-                ctx->SetBindingSet(1, pso->psBindingSet.Get());
-
-                const u32 numQuads = static_cast<u32>(batch.vertices.size() / 4);
-                const u32 numIndices = numQuads * 6;
-                ctx->DrawIndexed(numIndices, 0, 0);
-            }
-
             ctx->EndRenderPass();
 
             if (!GEnv.isDedicatedServer && GEnv.UI) {
@@ -556,9 +522,9 @@ framegraph::VirtualResourceHandle setupCursorPass(
                 FillGlobalConstants(staticGlobalsCB);
 
                 for (const auto& batch : uiCollector->GetBatches()) {
-                    if (batch.shader && uiMatCache) {
+                    if (batch.uiShader && uiMatCache) {
                         MaterialPSO* matPSO = uiMatCache->GetOrCreateUIPSO(
-                            batch.shader._get(),
+                            batch.uiShader,
                             batch.shaderElement,
                             framebuffer
                         );

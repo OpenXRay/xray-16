@@ -15,6 +15,11 @@ public:
     // private:
 public:
     ref_shader hShader;
+
+    shared_str m_shaderName;
+    shared_str m_textureName;
+    nvrhi::ShaderHandle m_vsHandle;
+    nvrhi::ShaderHandle m_psHandle;
 };
 
 class dxLensFlareRender : public ILensFlareRender

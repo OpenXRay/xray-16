@@ -34,7 +34,7 @@ public:
     void Clear();
 
 private:
-    ref_shader m_currentShader;
+    IUIShader* m_currentUIShader{nullptr};
     int m_currentAlphaRef{0};
     bool m_hasScissor{false};
     Irect m_scissorRect;

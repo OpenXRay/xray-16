@@ -634,7 +634,6 @@ void TextureManager::LoadTextureSync(TextureHandle handle) {
         *meta.sequenceTextureData = std::move(ddsData);
 
         meta.sequenceTextureData->sequenceState->currentFrame = 0;
-        meta.sequenceTextureData->sequenceState->elapsedTime = 0.0f;
 
     }
 
@@ -829,6 +828,8 @@ void TextureManager::UpdateVideoTextures() {
 
 void TextureManager::UpdateSequenceTextures(float deltaTime) {
 
+    u32 currentTime = Device.dwTimeContinual;
+
     for (auto& meta : m_textures) {
         if (!meta.isAlive || !meta.sequenceTextureData) {
             continue;
@@ -839,10 +840,15 @@ void TextureManager::UpdateSequenceTextures(float deltaTime) {
             continue;
         }
 
-        seqState->elapsedTime += deltaTime * 1000.0f;
+        if (seqState->lastUpdateTime == 0) {
+            seqState->lastUpdateTime = currentTime;
+            continue;
+        }
 
-        if (seqState->elapsedTime >= seqState->msPerFrame) {
-            seqState->elapsedTime -= seqState->msPerFrame;
+        u32 elapsedMs = currentTime - seqState->lastUpdateTime;
+
+        if (elapsedMs >= seqState->msPerFrame) {
+            seqState->lastUpdateTime = currentTime;
 
             u32 nextFrame = seqState->currentFrame + 1;
 

@@ -1,4 +1,4 @@
-#define SM_5_0
+#define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
 
@@ -18,19 +18,9 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
 };
 
-cbuffer LightingConstants : register(b4)
-{
-    float4 g_SunDirection;
-    float4 g_SunColor;
-    float4 g_AmbientColor;
-    float4 g_CameraPosition;
-    float4 g_FogParams;
-    float4 g_FogColor;
-};
-
 float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
 {
-    float3 L = -g_SunDirection.xyz;
+    float3 L = -L_sun_dir_w;
     float3 H = normalize(V + L);
 
     float NdotL = saturate(dot(N, L));
@@ -49,8 +39,8 @@ float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, floa
 
     float3 specular = D * F * 0.25;
 
-    float3 directLight = (diffuse + specular) * g_SunColor.rgb * NdotL;
-    float3 ambient = albedo * g_AmbientColor.rgb * ao;
+    float3 directLight = (diffuse + specular) * L_sun_color * NdotL;
+    float3 ambient = albedo * L_ambient.rgb * ao;
 
     return directLight + ambient;
 }
@@ -60,6 +50,7 @@ PS_OUTPUT main(PS_INPUT input)
     PS_OUTPUT output;
 
     MaterialData mat = g_Materials[input.materialID];
+
 
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
 
@@ -84,7 +75,7 @@ PS_OUTPUT main(PS_INPUT input)
 
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        float4 detailSample = SampleDetail(mat, input.texcoord, mat.detailScale);
+        float4 detailSample = SampleDetail(mat, input.texcoord);
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
@@ -100,13 +91,13 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    float3 V = normalize(g_CameraPosition.xyz - input.worldPos);
+    float3 V = normalize(eye_position - input.worldPos);
 
     float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
 
-    float fogDist = length(input.worldPos - g_CameraPosition.xyz);
-    float fogFactor = saturate((g_FogParams.y - fogDist) / (g_FogParams.y - g_FogParams.x));
-    finalColor = lerp(g_FogColor.rgb, finalColor, fogFactor);
+    float fogDist = length(input.worldPos - eye_position);
+    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
+    finalColor = lerp(fog_color.rgb, finalColor, fogFactor);
 
     output.color = float4(finalColor, diffuseSample.a);
     return output;

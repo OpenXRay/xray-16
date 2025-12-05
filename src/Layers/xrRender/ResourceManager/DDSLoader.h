@@ -170,7 +170,7 @@ struct DDSData {
         bool cycled = false;
         bool needsUpdate = false;
         u32 currentFrame = 0;
-        float elapsedTime = 0.0f;
+        u32 lastUpdateTime = 0;
     };
 
     SequenceState* sequenceState = nullptr;

@@ -90,26 +90,39 @@ struct MaterialKey {
 
     bool operator<(const MaterialKey& other) const {
         if (psoType != other.psoType) return psoType < other.psoType;
-        if (shader != other.shader) return shader < other.shader;
 
-        if (psoType == PSOType::UI || psoType == PSOType::Depth) {
+        if (psoType == PSOType::UI) {
+            if (textureHash != other.textureHash) return textureHash < other.textureHash;
+            return element < other.element;
+        }
+
+        if (psoType == PSOType::Depth) {
+            if (shader != other.shader) return shader < other.shader;
             if (element != other.element) return element < other.element;
             return framebuffer < other.framebuffer;
         }
 
+        if (shader != other.shader) return shader < other.shader;
         if (textureHash != other.textureHash) return textureHash < other.textureHash;
         return stateHash < other.stateHash;
     }
 
     bool operator==(const MaterialKey& other) const {
         if (psoType != other.psoType) return false;
-        if (shader != other.shader) return false;
 
-        if (psoType == PSOType::UI || psoType == PSOType::Depth) {
-            return element == other.element && framebuffer == other.framebuffer;
+        if (psoType == PSOType::UI) {
+            return textureHash == other.textureHash &&
+                   element == other.element;
         }
 
-        return textureHash == other.textureHash &&
+        if (psoType == PSOType::Depth) {
+            return shader == other.shader &&
+                   element == other.element &&
+                   framebuffer == other.framebuffer;
+        }
+
+        return shader == other.shader &&
+               textureHash == other.textureHash &&
                stateHash == other.stateHash;
     }
 };
@@ -248,7 +261,7 @@ public:
         const framegraph::FrameGraph& fg);
 
     MaterialPSO* GetOrCreateUIPSO(
-        Shader* shader,
+        IUIShader* uiShader,
         u32 elementIndex,
         nvrhi::IFramebuffer* framebuffer);
 
@@ -306,7 +319,7 @@ private:
         const framegraph::FrameGraph& fg);
 
     MaterialPSO* CreateUIPSO(
-        Shader* shader,
+        IUIShader* uiShader,
         ShaderElement* elem,
         SPass* pass,
         nvrhi::IFramebuffer* framebuffer);
@@ -343,6 +356,8 @@ private:
     static u64 ComputeTextureHash(SPass* pass);
 
     static u64 ComputeStateHash(SPass* pass);
+
+    static u32 GetVertexFormatID(dxRender_Visual* visual);
 
     bool ValidateVertexLayoutCompatibility(dxRender_Visual* visual, MaterialPSO* matPSO);
 

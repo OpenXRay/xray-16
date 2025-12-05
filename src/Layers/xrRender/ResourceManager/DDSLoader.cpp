@@ -57,6 +57,11 @@ DDSData& DDSData::operator=(DDSData&& other) noexcept {
         videoState = other.videoState;
         sequenceState = other.sequenceState;
 
+        if (sequenceState) {
+            Msg("* [DDSData move assignment] Transferred sequenceState: fps=%u, msPerFrame=%u, frames=%u",
+                sequenceState->fps, sequenceState->msPerFrame, (u32)sequenceState->frameData.size());
+        }
+
         other.videoState = nullptr;
         other.sequenceState = nullptr;
     }
@@ -868,6 +873,9 @@ bool DDSLoader::LoadSequenceTexture(const char* filePath, DDSData& outData) {
     outData.sequenceState->fps = fps;
     outData.sequenceState->msPerFrame = 1000 / fps;
     outData.sequenceState->cycled = cycled;
+
+    Msg("* [DDSLoader::LoadSequenceTexture] Initialized: fps=%u, msPerFrame=%u, cycled=%s, file=%s",
+        fps, outData.sequenceState->msPerFrame, cycled ? "yes" : "no", filePath);
 
     u32 expectedWidth = 0;
     u32 expectedHeight = 0;

@@ -5,6 +5,7 @@
 #include "ResourceManager/FGResourceManager.h"
 #include "ResourceManager/TextureManager.h"
 #include "FrameGraph/ShaderCache.h"
+#include "FrameGraph/ShaderLoader.h"
 
 using namespace xray::render::resources;
 
@@ -14,6 +15,57 @@ void dxUIShader::Copy(IUIShader& _in) { *this = *((dxUIShader*)&_in); }
 
 void dxUIShader::create(LPCSTR sh, LPCSTR tex)
 {
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    {
+        auto* shaderLoader = RImplementation.GetShaderLoader();
+        if (!shaderLoader)
+        {
+            Msg("! [dxUIShader] ShaderLoader is NULL for shader: %s", sh);
+            return;
+        }
+
+        if (tex) {
+            bool prevDeferredLoad = RImplementation.Resources->bDeferredLoad;
+            RImplementation.Resources->bDeferredLoad = true;
+
+            m_baseTexture = RImplementation.Resources->_CreateTexture(tex);
+
+            RImplementation.Resources->bDeferredLoad = prevDeferredLoad;
+        }
+
+        auto vsResult = shaderLoader->LoadVertexShader(sh, "main");
+        auto psResult = shaderLoader->LoadPixelShader(sh, "main");
+
+        if (!vsResult.handle || !psResult.handle)
+        {
+            Msg("* [dxUIShader] Shader '%s' not found, falling back to stub_notransform_t", sh);
+            vsResult = shaderLoader->LoadVertexShader("stub_notransform_t", "main");
+            psResult = shaderLoader->LoadPixelShader("stub_default", "main");
+        }
+
+        if (vsResult.handle && psResult.handle)
+        {
+            m_vsHandle = vsResult.handle;
+            m_psHandle = psResult.handle;
+
+            m_vsReflection = vsResult.reflection;
+            m_psReflection = psResult.reflection;
+            vsResult.reflection = nullptr;
+            psResult.reflection = nullptr;
+
+            Msg("* [dxUIShader] Compiled UI shader: %s (tex: %s)", sh, tex ? tex : "none");
+        }
+        else
+        {
+            Msg("! [dxUIShader] Failed to compile UI shader: %s (VS=%s, PS=%s)",
+                sh,
+                vsResult.handle ? "OK" : "FAILED",
+                psResult.handle ? "OK" : "FAILED");
+        }
+
+        return;
+    }
+
     hShader.create(sh, tex);
 
     CTexture* baseTexture = GetBaseTexture();
@@ -27,7 +79,27 @@ void dxUIShader::create(LPCSTR sh, LPCSTR tex)
     }
 }
 
-void dxUIShader::destroy() { hShader.destroy(); }
+void dxUIShader::destroy()
+{
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    {
+        m_vsHandle = nullptr;
+        m_psHandle = nullptr;
+        m_baseTexture = nullptr;
+
+        if (m_vsReflection) {
+            xr_delete(m_vsReflection);
+            m_vsReflection = nullptr;
+        }
+        if (m_psReflection) {
+            xr_delete(m_psReflection);
+            m_psReflection = nullptr;
+        }
+        return;
+    }
+
+    hShader.destroy();
+}
 
 bool dxUIShader::operator==(const IUIShader& other) const
 {
@@ -36,6 +108,11 @@ bool dxUIShader::operator==(const IUIShader& other) const
 
 CTexture* dxUIShader::GetBaseTexture() const
 {
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+    {
+        return m_baseTexture;
+    }
+
     if (!hShader)
         return nullptr;
 

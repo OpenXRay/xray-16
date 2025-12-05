@@ -18,6 +18,10 @@ public:
 private:
     // Visualization	(rain)
     ref_shader SH_Rain;
+
+    nvrhi::ShaderHandle SH_Rain_VS;
+    nvrhi::ShaderHandle SH_Rain_PS;
+
     ref_geom hGeom_Rain;
 
     // Visualization	(drops)

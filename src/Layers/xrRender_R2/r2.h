@@ -24,6 +24,9 @@
 #include "xrCore/Threading/TaskManager.hpp"
 #include "xrCore/FMesh.hpp"
 
+#include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/Geometry/MaterialCache.h"
+
 namespace xray::render::RENDER_NAMESPACE::nvrhi_wrapper
 {
 class NVRHIDevice;
@@ -39,11 +42,18 @@ class ImGuiRendererNVRHI;
 namespace xray::render
 {
 class FrameGraphRenderer;
+struct MaterialPSO;
+}
+
+namespace xray::render::ng
+{
+class PipelineState;
 }
 
 namespace xray::render::framegraph
 {
 class ShaderLoader;
+struct ExtractedReflection;
 }
 
 namespace xray::render::RENDER_NAMESPACE
@@ -331,13 +341,36 @@ public:
 
     // Global vertex-buffer container
     xr_vector<FSlideWindowItem> SWIs;
-    xr_vector<ref_shader> Shaders;
 
-    struct ShaderNameEntry {
+    struct CompiledLevelShader {
         shared_str shaderName;
         shared_str textureName;
+
+        nvrhi::ShaderHandle vsHandle;
+        nvrhi::ShaderHandle psHandle;
+
+        xr_unique_ptr<framegraph::ExtractedReflection> vsReflection;
+        xr_unique_ptr<framegraph::ExtractedReflection> psReflection;
+
+        MaterialSystem::MaterialInfo materialInfo;
+
+        struct PrecompiledPSOs {
+            struct PSOVariant {
+                u32 vertexFormatID;
+                RenderPassType passType;
+                ng::PipelineState* pso;
+                MaterialPSO* materialPSO;
+            };
+
+            xr_vector<PSOVariant> variants;
+            xr_map<u64, MaterialPSO*> psoCache;
+        };
+
+        PrecompiledPSOs precompiledPSOs;
     };
-    xr_vector<ShaderNameEntry> ShaderNames;
+
+    xr_vector<CompiledLevelShader> CompiledLevelShaders;
+
     typedef svector<VertexElement, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
     xr_vector<VertexStagingBuffer> nVB, xVB;
@@ -377,7 +410,20 @@ private:
     void Load3DFluid();
 #endif
 
+    void CompileLevelShader(u32 shaderID, const char* shaderName, const char* textureName);
+    void PrecompileLevelPSOs();
+    bool IsVertexFormatCompatible(const VertexDeclarator& decl, const framegraph::ExtractedReflection* vsReflection);
+    bool MatchesSemanticName(const VertexElement& elem, const xr_string& semanticName);
+    bool IsFormatCompatible(u8 d3dFormat, nvrhi::Format nvrhiFormat);
+    u32 GetVertexStride(u32 vertexFormatID);
+    bool CreatePrecompiledPSO(u32 shaderID, u32 vertexFormatID, RenderPassType passType,
+                               nvrhi::Format colorFormat, nvrhi::Format depthFormat, MaterialCache* materialCache);
+    void SetupDepthState(RenderPassType passType, const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
+    void SetupBlendState(const MaterialSystem::MaterialInfo& materialInfo, nvrhi::GraphicsPipelineDesc& psoDesc);
+
 public:
+    u64 ComputePSOCacheKey(u32 vertexFormatID, RenderPassType passType);
+
     void render_forward();
     void render_indirect(light* L) const;
     void render_lights(light_Package& LP);
@@ -463,8 +509,13 @@ public:
 
     // Information
     void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
+    CompiledLevelShader* getCompiledShader(int id);
+    bool getShaderHandles(int id, nvrhi::ShaderHandle& outVS, nvrhi::ShaderHandle& outPS);
+
     ref_shader getShader(int id);
     bool getShaderNames(int id, shared_str& outShaderName, shared_str& outTextureName);
+
     IRenderVisual* getVisual(int id) override;
 
     // Main

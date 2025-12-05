@@ -84,27 +84,23 @@ void NVRHIUIRenderer::RenderBatches(
 
     commandList->writeBuffer(m_constantBuffer, cbData, 256);
 
-    Shader* lastShader = nullptr;
+    IUIShader* lastUIShader = nullptr;
     MaterialPSO* currentPSO = nullptr;
 
     for (const auto& batch : batches)
     {
-        if (batch.IsEmpty() || !batch.shader)
+        if (batch.IsEmpty() || !batch.uiShader)
             continue;
 
-        Shader* shader = batch.shader._get();
-        if (!shader)
-            continue;
-
-        if (shader != lastShader)
+        if (batch.uiShader != lastUIShader)
         {
-            currentPSO = m_matCache->GetOrCreateUIPSO(shader, 0, framebuffer);
+            currentPSO = m_matCache->GetOrCreateUIPSO(batch.uiShader, 0, framebuffer);
             if (!currentPSO)
             {
                 Msg("! [NVRHIUIRenderer] Failed to get PSO, skipping batch");
                 continue;
             }
-            lastShader = shader;
+            lastUIShader = batch.uiShader;
         }
 
         xr_vector<const UIGeometryBatch*> singleBatch = { &batch };

@@ -44,7 +44,7 @@ public:
     xr_vector<u16> indices;
     UIPrimitiveType primitiveType{UIPrimitiveType::TriList};
 
-    ref_shader shader;
+    IUIShader* uiShader{nullptr};
     u32 shaderElement{0};
     int alphaRef{0};
     bool hasScissor{false};
@@ -56,7 +56,7 @@ public:
     {
         vertices.clear();
         indices.clear();
-        shader = nullptr;
+        uiShader = nullptr;
         alphaRef = 0;
         hasScissor = false;
         cullMode = 0;
@@ -125,10 +125,10 @@ public:
         }
     }
 
-    bool CanMergeWith(ref_shader otherShader, int otherAlphaRef, bool otherScissor,
+    bool CanMergeWith(IUIShader* otherShader, int otherAlphaRef, bool otherScissor,
                       const Irect* otherScissorRect, int otherCullMode) const
     {
-        if (shader != otherShader)
+        if (uiShader != otherShader)
             return false;
         if (alphaRef != otherAlphaRef)
             return false;

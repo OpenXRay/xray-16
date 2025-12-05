@@ -379,6 +379,9 @@ void D3DXRenderBase::SetCacheXform(Fmatrix& mView, Fmatrix& mProject)
 
 bool D3DXRenderBase::HWSupportsShaderYUV2RGB()
 {
+    if (GEnv.Backend && GEnv.Backend->GetAPI() == IRenderBackend::API::D3D12)
+        return false;
+
     const auto& caps = GEnv.Backend->GetCapabilities();
     u32 v_dev = CAP_VERSION(caps.raster_major, caps.raster_minor);
     u32 v_need = CAP_VERSION(2, 0);

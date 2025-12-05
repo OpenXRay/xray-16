@@ -18,7 +18,6 @@ dxFontRender::~dxFontRender()
 
 void dxFontRender::Initialize(cpcstr cShader, cpcstr cTexture)
 {
-    pShader.create(cShader, cTexture);
     pGeom.create(FVF::F_TL, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
     strTextureName = cTexture;
 }

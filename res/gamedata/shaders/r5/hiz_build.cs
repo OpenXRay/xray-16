@@ -1,4 +1,4 @@
-#define SM_5_0
+#define SM_6_0
 #include "common.h"
 
 cbuffer HiZParams : register(b5)

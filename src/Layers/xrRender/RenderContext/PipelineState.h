@@ -165,6 +165,8 @@ struct PipelineStateDesc {
 
     xr_vector<VertexAttribute> vertexAttributes;
 
+    xr_vector<nvrhi::BindingLayoutHandle> bindingLayouts;
+
     RasterizerState rasterizerState;
     BlendState blendState;
     DepthStencilState depthStencilState;
