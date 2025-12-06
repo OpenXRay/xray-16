@@ -400,7 +400,6 @@ void IGame_Persistent::Prefetch()
     GEnv.Render->models_Prefetch();
 
     Log("Loading textures...");
-    GEnv.Render->ResourcesDeferredUpload();
 
     const auto memoryAfter = Memory.mem_usage() - memoryBefore;
 

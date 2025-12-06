@@ -217,7 +217,6 @@ bool CLevel::net_start_client5()
         {
             g_pGamePersistent->LoadTitle("st_loading_textures");
             GEnv.Render->DeferredLoad(FALSE);
-            GEnv.Render->ResourcesDeferredUpload();
             LL_CheckTextures();
         }
         sended_request_connection_data = FALSE;

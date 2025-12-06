@@ -4,6 +4,10 @@
 
 #include "xrEngine/GameFont.h"
 
+namespace xray::render::framegraph {
+    struct ExtractedReflection;
+}
+
 namespace xray::render::RENDER_NAMESPACE
 {
 class dxFontRender : public IFontRender
@@ -20,6 +24,14 @@ public:
 
     ref_shader pShader;
     ref_geom pGeom;
-    shared_str strTextureName;
+
+    nvrhi::ShaderHandle m_vsHandle;
+    nvrhi::ShaderHandle m_psHandle;
+    framegraph::ExtractedReflection* m_vsReflection = nullptr;
+    framegraph::ExtractedReflection* m_psReflection = nullptr;
+
+    shared_str m_shaderName;
+    shared_str m_textureName;
+    CTexture* m_baseTexture = nullptr;
 };
 } // namespace xray::render::RENDER_NAMESPACE

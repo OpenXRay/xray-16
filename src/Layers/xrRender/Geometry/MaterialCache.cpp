@@ -5,6 +5,7 @@
 #include "Layers/xrRender/SH_Texture.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/dxUIShader.h"
+#include "Layers/xrRender/dxFontRender.h"
 #include "Layers/xrRender/FVisual.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/FProgressive.h"
@@ -610,8 +611,6 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
         if (!baseTexName.empty()) {
             auto& texDescMgr = RImplementation.Resources->m_textures_description;
 
-            using namespace passes;
-
             resources::TextureHandle pbrHandle;
             shared_str pbrTexName = texDescMgr.GetPBRName(baseTexName);
 
@@ -636,7 +635,7 @@ void MaterialCache::ExtractTextures(SPass* pass, MaterialPSO* matPSO)
 
             if (pbrHandle.IsValid()) {
                 MaterialPSO::TextureSlot texSlot;
-                texSlot.slot = TEX_SLOT_PBR;
+                texSlot.slot = RENDER_NAMESPACE::passes::TEX_SLOT_PBR;
                 texSlot.handle = pbrHandle;
                 matPSO->textures.push_back(texSlot);
             }
@@ -1477,6 +1476,51 @@ MaterialPSO* MaterialCache::GetOrCreateUIPSO(
     return pso;
 }
 
+MaterialPSO* MaterialCache::GetOrCreateFontPSO(
+    dxFontRender* fontRender,
+    nvrhi::IFramebuffer* framebuffer)
+{
+    if (!fontRender || !framebuffer)
+        return nullptr;
+
+    u64 shaderHash = 0;
+    if (fontRender->m_vsHandle && fontRender->m_psHandle) {
+        shaderHash = reinterpret_cast<uintptr_t>(fontRender->m_vsHandle.Get()) ^
+                     (reinterpret_cast<uintptr_t>(fontRender->m_psHandle.Get()) << 1);
+    }
+
+    u64 textureHash = 0;
+    if (fontRender->m_baseTexture && fontRender->m_baseTexture->cName.size() > 0) {
+        textureHash = std::hash<xr_string>{}(xr_string(fontRender->m_baseTexture->cName.c_str()));
+    }
+
+    u64 combinedHash = shaderHash ^ (textureHash << 2);
+
+    MaterialKey key;
+    key.psoType = PSOType::UI;
+    key.shader = nullptr;
+    key.textureHash = combinedHash;
+    key.element = 0;
+    key.framebuffer = framebuffer;
+
+    auto it = m_cache.find(key);
+    if (it != m_cache.end()) {
+        m_stats.numCacheHits++;
+        return it->second.get();
+    }
+
+    m_stats.numCacheMisses++;
+    m_stats.totalPSOCreations++;
+    MaterialPSO* pso = CreateFontPSO(fontRender, framebuffer);
+    if (!pso)
+        return nullptr;
+
+    m_cache[key] = xr_unique_ptr<MaterialPSO>(pso);
+    m_stats.numCachedPSOs = static_cast<u32>(m_cache.size());
+
+    return pso;
+}
+
 MaterialPSO* MaterialCache::CreateDepthPSO(
     dxRender_Visual* visual,
     ShaderElement* elem,
@@ -1827,6 +1871,219 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
     if (!nvrhiPSO) {
         Msg("! [MaterialCache::CreateUIPSO] Failed to create pipeline state");
+        return nullptr;
+    }
+
+    pso->pso = nvrhiPSO;
+
+    return pso.release();
+}
+
+MaterialPSO* MaterialCache::CreateFontPSO(
+    dxFontRender* fontRender,
+    nvrhi::IFramebuffer* framebuffer)
+{
+
+    auto pso = xr_make_unique<MaterialPSO>();
+
+    if (!fontRender) {
+        Msg("! [MaterialCache::CreateFontPSO] Invalid fontRender pointer");
+        return nullptr;
+    }
+
+    nvrhi::ShaderHandle nvrhiVS = fontRender->m_vsHandle;
+    nvrhi::ShaderHandle nvrhiPS = fontRender->m_psHandle;
+
+    if (!nvrhiVS || !nvrhiPS) {
+        Msg("! [MaterialCache::CreateFontPSO] Missing NVRHI shader handles in dxFontRender (VS=%p PS=%p)",
+            nvrhiVS.Get(), nvrhiPS.Get());
+        return nullptr;
+    }
+
+    if (fontRender->m_vsReflection) {
+        pso->vsInputSignature = framegraph::ShaderReflector::GetVertexInputSignature(fontRender->m_vsReflection);
+        pso->constantLayout = fontRender->m_vsReflection->constantLayout;
+
+        for (const auto& cb : fontRender->m_vsReflection->constantLayout.constantBuffers.buffers) {
+            MaterialPSO::ConstantBufferInfo cbInfo;
+            cbInfo.name = cb.name.c_str();
+            cbInfo.slot = cb.slot;
+            cbInfo.size = cb.size;
+            cbInfo.stage = MaterialPSO::ShaderStage::Vertex;
+            pso->constantBuffers.push_back(cbInfo);
+        }
+    }
+
+    if (fontRender->m_psReflection) {
+        for (const auto& cb : fontRender->m_psReflection->constantLayout.constantBuffers.buffers) {
+            MaterialPSO::ConstantBufferInfo cbInfo;
+            cbInfo.name = cb.name.c_str();
+            cbInfo.slot = cb.slot;
+            cbInfo.size = cb.size;
+            cbInfo.stage = MaterialPSO::ShaderStage::Pixel;
+            pso->constantBuffers.push_back(cbInfo);
+        }
+
+        for (const auto& tex : fontRender->m_psReflection->rtBindings.inputTextures) {
+            if (xr_strcmp(tex.name.c_str(), "s_base") != 0)
+                continue;
+
+            CTexture* baseTexture = fontRender->m_baseTexture;
+            if (baseTexture) {
+                resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
+                resources::TextureHandle texHandle = texManager->LoadTexture(baseTexture->cName.c_str());
+
+                if (texHandle.IsValid()) {
+                    MaterialPSO::TextureSlot texSlot;
+                    texSlot.slot = tex.slot;
+                    texSlot.handle = texHandle;
+                    pso->textures.push_back(texSlot);
+                }
+            }
+        }
+
+        for (const auto& samp : fontRender->m_psReflection->rtBindings.samplers) {
+            MaterialPSO::SamplerInfo sampInfo;
+            sampInfo.name = samp.name.c_str();
+            sampInfo.slot = samp.slot;
+            sampInfo.stage = MaterialPSO::ShaderStage::Pixel;
+
+            nvrhi::SamplerDesc samplerDesc;
+            samplerDesc.minFilter = true;
+            samplerDesc.magFilter = true;
+            samplerDesc.mipFilter = true;
+            samplerDesc.addressU = nvrhi::SamplerAddressMode::Wrap;
+            samplerDesc.addressV = nvrhi::SamplerAddressMode::Wrap;
+            samplerDesc.addressW = nvrhi::SamplerAddressMode::Wrap;
+
+            sampInfo.nvrhiSampler = m_device->GetNVRHIDevice()->createSampler(samplerDesc);
+            pso->samplers.push_back(sampInfo);
+        }
+    }
+
+    xr_map<shared_str, nvrhi::BufferHandle> createdBuffers;
+
+    for (auto& cbInfo : pso->constantBuffers) {
+        auto it = createdBuffers.find(cbInfo.name);
+        if (it != createdBuffers.end()) {
+            cbInfo.nvrhiBuffer = it->second;
+            continue;
+        }
+
+        nvrhi::BufferDesc cbDesc;
+        cbDesc.byteSize = cbInfo.size;
+        cbDesc.isConstantBuffer = true;
+        cbDesc.debugName = cbInfo.name.c_str();
+        cbDesc.isVolatile = false;
+        cbDesc.keepInitialState = true;
+        cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
+
+        cbInfo.nvrhiBuffer = m_device->GetNVRHIDevice()->createBuffer(cbDesc);
+        createdBuffers[cbInfo.name] = cbInfo.nvrhiBuffer;
+    }
+
+    CreateBindingLayouts(pso.get());
+
+    ng::PipelineStateDesc psoDesc;
+    psoDesc.vertexShader = nvrhiVS.Get();
+    psoDesc.pixelShader = nvrhiPS.Get();
+
+    struct VertexElement {
+        nvrhi::Format format;
+        u32 offset;
+    };
+
+    std::map<std::string, VertexElement> fontVertexLayout;
+    fontVertexLayout["POSITION"]  = {nvrhi::Format::RGBA32_FLOAT, 0};
+    fontVertexLayout["POSITIONT"] = {nvrhi::Format::RGBA32_FLOAT, 0};
+    fontVertexLayout["COLOR"]     = {nvrhi::Format::RGBA8_UNORM, 16};
+    fontVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};
+
+    for (const auto& shaderElem : pso->vsInputSignature.elements) {
+        std::string semantic = shaderElem.semanticName.c_str();
+
+        auto it = fontVertexLayout.find(semantic);
+        if (it == fontVertexLayout.end()) {
+            Msg("! [MaterialCache::CreateFontPSO] Unknown font vertex semantic: %s", semantic.c_str());
+            continue;
+        }
+
+        ng::VertexAttribute attr;
+        attr.semanticName = shaderElem.semanticName.c_str();
+        attr.semanticIndex = shaderElem.semanticIndex;
+        attr.format = it->second.format;
+        attr.offset = it->second.offset;
+        attr.bufferIndex = 0;
+        attr.elementStride = 0;
+
+        psoDesc.vertexAttributes.push_back(attr);
+    }
+
+    u32 calculatedStride = 0;
+    for (const auto& attr : psoDesc.vertexAttributes) {
+        if (attr.bufferIndex == 0) {
+            const nvrhi::FormatInfo& formatInfo = nvrhi::getFormatInfo(attr.format);
+            u32 formatSize = formatInfo.bytesPerBlock;
+            u32 endOffset = attr.offset + formatSize;
+            calculatedStride = std::max(calculatedStride, endOffset);
+        }
+    }
+
+    for (auto& attr : psoDesc.vertexAttributes) {
+        attr.elementStride = calculatedStride;
+    }
+
+    pso->vertexStride = calculatedStride;
+
+    const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
+    psoDesc.renderTargetCount = static_cast<u32>(fbDesc.colorAttachments.size());
+    for (u32 i = 0; i < fbDesc.colorAttachments.size() && i < 8; ++i) {
+        if (fbDesc.colorAttachments[i].texture) {
+            psoDesc.renderTargetFormats[i] = fbDesc.colorAttachments[i].texture->getDesc().format;
+        }
+    }
+
+    psoDesc.depthStencilState.depthTestEnable = false;
+    psoDesc.depthStencilState.depthWriteEnable = false;
+    psoDesc.depthStencilState.stencilEnable = false;
+
+    psoDesc.blendState.alphaToCoverageEnable = false;
+    psoDesc.blendState.renderTargets[0].blendEnable = true;
+    psoDesc.blendState.renderTargets[0].srcBlend = ng::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlend = ng::BlendFactor::InvSrcAlpha;
+    psoDesc.blendState.renderTargets[0].blendOp = ng::BlendOp::Add;
+    psoDesc.blendState.renderTargets[0].srcBlendAlpha = ng::BlendFactor::SrcAlpha;
+    psoDesc.blendState.renderTargets[0].dstBlendAlpha = ng::BlendFactor::InvSrcAlpha;
+
+    psoDesc.rasterizerState.cullMode = ng::CullMode::None;
+    psoDesc.rasterizerState.frontCounterClockwise = false;
+    psoDesc.rasterizerState.scissorEnable = true;
+
+    psoDesc.primitiveTopology = ng::PrimitiveTopology::TriangleList;
+
+    if (pso->vsBindingLayout) {
+        psoDesc.bindingLayouts.push_back(pso->vsBindingLayout);
+    }
+    if (pso->psBindingLayout) {
+        psoDesc.bindingLayouts.push_back(pso->psBindingLayout);
+    }
+
+    if (psoDesc.bindingLayouts.empty()) {
+        Msg("! [MaterialCache::CreateFontPSO] No binding layouts created!");
+        return nullptr;
+    }
+
+    psoDesc.debugName = "Font_PSO";
+
+    ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
+    if (!psoCache) {
+        Msg("! [MaterialCache::CreateFontPSO] No PSO cache");
+        return nullptr;
+    }
+
+    ng::PipelineState* nvrhiPSO = psoCache->GetOrCreate(psoDesc);
+    if (!nvrhiPSO) {
+        Msg("! [MaterialCache::CreateFontPSO] Failed to create pipeline state");
         return nullptr;
     }
 
