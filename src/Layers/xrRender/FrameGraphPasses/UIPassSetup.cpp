@@ -336,10 +336,10 @@ framegraph::VirtualResourceHandle setupTextPass(
                         // Validate font texture size
                         if (!(font->uFlags & CGameFont::fsValid)) {
                             auto* fontRender = static_cast<dxFontRender*>(font->pFontRender);
-                            if (fontRender && fontRender->strTextureName.size() > 0) {
+                            if (fontRender && fontRender->m_textureName.size() > 0) {
                                 auto* resMgr = device->GetFGResourceManager();
                                 auto* texMgr = resMgr->GetTextureManager();
-                                ng::TextureHandle texHandle = texMgr->LoadTexture(fontRender->strTextureName.c_str());
+                                ng::TextureHandle texHandle = texMgr->LoadTexture(fontRender->m_textureName.c_str());
                                 if (texHandle.IsValid()) {
                                     nvrhi::ITexture* nvrhiTex = texMgr->GetNVRHITexture(texHandle);
                                     if (nvrhiTex) {
@@ -476,39 +476,50 @@ framegraph::VirtualResourceHandle setupTextPass(
             StaticGlobals staticGlobalsCB = {};
             FillGlobalConstants(staticGlobalsCB);
 
-//            for (const auto& batch : fontBatches) {
-//                auto* fontRender = static_cast<dxFontRender*>(batch.font->pFontRender);
-//                if (!fontRender || !fontRender->pShader) continue;
-//
-//                Shader* shader = fontRender->pShader._get();
-//                if (!shader || !shader->E[0]) continue;
-//
-//                MaterialPSO* pso = textMatCache->GetOrCreateUIPSO(shader, 0, framebuffer);
-//                if (!pso) continue;
-//
-//                // Use FGConstantSystem with STATIC constant API
-//                // Text shaders use static CBs (MaterialPSO->constantBuffers), not VCBs
-//                FGConstantSystem constants(pso);
-//                UploadStaticGlobals(constants, staticGlobalsCB);
-//                constants.CommitStatic(ctx);  // Upload to static persistent CBs
-//
-//                textMatCache->GetOrCreateBindingSet(pso);
-//
-//                if (!pso->vsBindingSet || !pso->psBindingSet) continue;
-//
-//                // Upload vertices
-//                cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), batch.vertices.size() * sizeof(TextVertex));
-//
-//                ctx->SetPipeline(pso->pso->GetNativePipeline());
-//                ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);
-//                ctx->SetIndexBuffer(s_indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
-//                ctx->SetBindingSet(0, pso->vsBindingSet.Get());
-//                ctx->SetBindingSet(1, pso->psBindingSet.Get());
-//
-//                const u32 numQuads = static_cast<u32>(batch.vertices.size() / 4);
-//                const u32 numIndices = numQuads * 6;
-//                ctx->DrawIndexed(numIndices, 0, 0);
-//            }
+            for (const auto& batch : fontBatches) {
+                auto* fontRender = static_cast<dxFontRender*>(batch.font->pFontRender);
+                if (!fontRender) continue;
+
+                // DX12: Use NVRHI shader handles from dxFontRender
+                if (!fontRender->m_vsHandle || !fontRender->m_psHandle) {
+                    Msg("! [TextPass] Font shader not loaded for font");
+                    continue;
+                }
+
+                // Get or create PSO for this font
+                MaterialPSO* pso = textMatCache->GetOrCreateFontPSO(fontRender, framebuffer);
+                if (!pso) {
+                    Msg("! [TextPass] Failed to create PSO for font");
+                    continue;
+                }
+
+                // Use FGConstantSystem with STATIC constant API
+                // Text shaders use static CBs (MaterialPSO->constantBuffers), not VCBs
+                FGConstantSystem constants(pso);
+                UploadStaticGlobals(constants, staticGlobalsCB);
+                constants.CommitStatic(ctx);  // Upload to static persistent CBs
+
+                // Create or get binding sets (this binds textures + constant buffers)
+                textMatCache->GetOrCreateBindingSet(pso);
+
+                if (!pso->vsBindingSet || !pso->psBindingSet) {
+                    Msg("! [TextPass] Binding sets not created");
+                    continue;
+                }
+
+                // Upload vertices
+                cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), batch.vertices.size() * sizeof(TextVertex));
+
+                ctx->SetPipeline(pso->pso->GetNativePipeline());
+                ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);
+                ctx->SetIndexBuffer(s_indexBuffer.Get(), nvrhi::Format::R16_UINT, 0);
+                ctx->SetBindingSet(0, pso->vsBindingSet.Get());
+                ctx->SetBindingSet(1, pso->psBindingSet.Get());
+
+                const u32 numQuads = static_cast<u32>(batch.vertices.size() / 4);
+                const u32 numIndices = numQuads * 6;
+                ctx->DrawIndexed(numIndices, 0, 0);
+            }
 
             ctx->EndRenderPass();
 

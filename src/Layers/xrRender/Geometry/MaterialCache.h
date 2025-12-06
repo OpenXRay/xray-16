@@ -16,6 +16,7 @@ namespace xray::render::RENDER_NAMESPACE {
     struct SVS;
     struct SPS;
     class CTexture;  // Legacy - will be replaced by FGResourceManager
+    class dxFontRender;  // Font rendering system
 }
 
 // Forward declare FGResourceManager
@@ -48,6 +49,7 @@ using RENDER_NAMESPACE::SPass;
 using RENDER_NAMESPACE::dxRender_Visual;
 using RENDER_NAMESPACE::SVS;
 using RENDER_NAMESPACE::SPS;
+using RENDER_NAMESPACE::dxFontRender;
 
 // Pass types for different depth state requirements
 enum class RenderPassType : u8 {
@@ -422,6 +424,11 @@ private:
         SPass* pass,
         nvrhi::IFramebuffer* framebuffer);
 
+    // Create Font PSO (similar to UI PSO but uses dxFontRender)
+    MaterialPSO* CreateFontPSO(
+        dxFontRender* fontRender,
+        nvrhi::IFramebuffer* framebuffer);
+
     // Extract textures from SPass
     void ExtractTextures(SPass* pass, MaterialPSO* matPSO);
 
@@ -468,6 +475,10 @@ public:
     nvrhi::ShaderHandle GetOrCreateShaderVS(SVS* vs);
     nvrhi::ShaderHandle GetOrCreateShaderPS(SPS* ps);
     void SetupRenderStates(SPass* pass, ng::PipelineStateDesc& psoDesc);
+
+    MaterialPSO* GetOrCreateFontPSO(
+        dxFontRender* fontRender,
+        nvrhi::IFramebuffer* framebuffer);
 
 private:
 
