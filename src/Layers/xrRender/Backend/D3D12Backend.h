@@ -33,6 +33,8 @@ public:
     void ExecuteCommandList(nvrhi::ICommandList* commandList) override;
     void ExecuteCommandLists(nvrhi::ICommandList* const* commandLists, u32 count) override;
 
+    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
+
     nvrhi::ITexture* GetBackBuffer() override;
     u32 GetCurrentBackBufferIndex() const override { return m_currentBackBufferIndex; }
     u32 GetBackBufferCount() const override { return BACK_BUFFER_COUNT; }
@@ -82,6 +84,7 @@ private:
 
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::CommandListHandle m_commandList;
+    nvrhi::CommandListHandle m_uploadCommandList;
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
     nvrhi::BindingLayoutHandle m_bindlessLayout;

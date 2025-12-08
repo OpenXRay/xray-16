@@ -462,27 +462,30 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         return;
 
     const auto& batches = geometry->GetBatches();
-    m_objectCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
+    u32 totalBatches = static_cast<u32>(batches.size());
 
-    if (m_objectCount == 0)
+    if (totalBatches == 0)
         return;
 
     m_objectData.clear();
-    m_objectData.reserve(m_objectCount);
+    m_objectData.reserve(totalBatches);
     m_drawArgsData.clear();
-    m_drawArgsData.reserve(m_objectCount);
+    m_drawArgsData.reserve(totalBatches);
     m_materialIDData.clear();
-    m_materialIDData.reserve(m_objectCount);
+    m_materialIDData.reserve(totalBatches);
 
-    for (u32 i = 0; i < m_objectCount; i++) {
+    for (u32 i = 0; i < totalBatches; i++) {
         const auto& batch = batches[i];
+
+        if (batch.isSkinned)
+            continue;
 
         GPUObjectData obj;
 
         obj.position = batch.worldBoundsCenter;
         obj.radius = batch.worldBoundsRadius;
 
-        obj.batchIndex = i;
+        obj.batchIndex = static_cast<u32>(m_objectData.size());
 
         obj.flags = 0;
         if (batch.IsOpaque())
@@ -513,6 +516,11 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
         m_materialIDData.push_back(batch.bindlessMaterialID);
     }
+
+    m_objectCount = std::min(static_cast<u32>(m_objectData.size()), m_maxObjects);
+
+    if (m_objectCount == 0)
+        return;
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
@@ -1613,16 +1621,19 @@ void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const Geometr
         return;
 
     const auto& batches = geometry->GetBatches();
-    u32 instanceCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
+    u32 batchCount = static_cast<u32>(batches.size());
 
-    if (instanceCount == 0)
+    if (batchCount == 0)
         return;
 
     m_instanceData.clear();
-    m_instanceData.reserve(instanceCount);
+    m_instanceData.reserve(batchCount);
 
-    for (u32 i = 0; i < instanceCount; i++) {
+    for (u32 i = 0; i < batchCount; i++) {
         const auto& batch = batches[i];
+
+        if (batch.isSkinned)
+            continue;
 
         GPUInstanceData inst;
         inst.world.transpose(batch.worldMatrix);
@@ -1636,6 +1647,10 @@ void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const Geometr
 
         m_instanceData.push_back(inst);
     }
+
+    u32 instanceCount = std::min(static_cast<u32>(m_instanceData.size()), m_maxObjects);
+    if (instanceCount == 0)
+        return;
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     cmdList->writeBuffer(m_instanceBuffer, m_instanceData.data(), instanceCount * sizeof(GPUInstanceData));

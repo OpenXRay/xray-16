@@ -23,7 +23,7 @@ float VertexConverter::UnpackLmapUV(s16 value)
 
 float VertexConverter::UnpackMuModelUV(s16 value)
 {
-    return static_cast<float>(value) * (32.0f / 32768.0f);
+    return static_cast<float>(value) * (16.0f / 32768.0f);
 }
 
 Fvector3 VertexConverter::UnpackNormal(u32 packed)

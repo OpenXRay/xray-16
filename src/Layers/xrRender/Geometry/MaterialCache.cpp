@@ -2258,8 +2258,15 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
 
     if (visual->shaderName.size() > 0) {
         const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str());
+
+        Msg("* [MaterialCache] '%s': alphaTest=%d, alphaRef=%d, transparent=%d",
+            visual->shaderName.c_str(), matInfo.alphaTest, matInfo.alphaRef, matInfo.transparent);
+
         if (matInfo.alphaTest) {
             matData.flags |= MAT_FLAG_ALPHA_TEST;
+            matData.alphaRef = matInfo.alphaRef / 255.0f;
+            Msg("* [MaterialCache] -> SET MAT_FLAG_ALPHA_TEST, alphaRef=%.3f (%d/255)",
+                matData.alphaRef, matInfo.alphaRef);
         }
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }

@@ -50,8 +50,9 @@ float3 SampleNormal(MaterialData mat, float2 uv)
     float4 sample = tex.Sample(g_LinearSampler, uv);
 
     float3 normal;
-    normal.xy = sample.xy * 2.0 - 1.0;
-    normal.z = sqrt(saturate(1.0 - dot(normal.xy, normal.xy)));
+    normal.x = sample.a * 2.0 - 1.0;
+    normal.y = sample.b * 2.0 - 1.0;
+    normal.z = sample.g * 2.0 - 1.0;
     return normal;
 }
 

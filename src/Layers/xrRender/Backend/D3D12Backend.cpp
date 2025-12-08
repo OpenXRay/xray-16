@@ -108,6 +108,13 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         return false;
     }
 
+    m_uploadCommandList = m_nvrhiDevice->createCommandList(cmdParams);
+    if (!m_uploadCommandList) {
+        Msg("! [D3D12Backend] Failed to create upload command list");
+        Shutdown();
+        return false;
+    }
+
     QueryCapabilities();
 
     CreateBackBufferTextures();
@@ -133,6 +140,7 @@ void D3D12Backend::Shutdown() {
     m_bindlessLayout = nullptr;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
+    m_uploadCommandList = nullptr;
     m_commandList = nullptr;
     m_nvrhiDevice = nullptr;
 
@@ -488,6 +496,19 @@ void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
             m_nvrhiDevice->executeCommandList(commandLists[i]);
         }
     }
+}
+
+void D3D12Backend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
+    if (!m_uploadCommandList || !buffer || !data || size == 0)
+        return;
+
+    m_uploadCommandList->open();
+    m_uploadCommandList->writeBuffer(buffer, data, size);
+    m_uploadCommandList->close();
+
+    m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+
+    m_nvrhiDevice->waitForIdle();
 }
 
 nvrhi::ICommandList* D3D12Backend::CreateCommandList() {

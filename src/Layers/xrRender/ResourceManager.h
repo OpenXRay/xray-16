@@ -108,6 +108,13 @@ public:
     IBlender* _FindBlender(LPCSTR Name);
     void _GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps);
     void _DumpMemoryUsage();
+
+    struct BlenderProperties {
+        bool alphaTest = false;
+        u32 alphaRef = 0;
+        bool alphaBlend = false;
+    };
+    bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);
 
     map_Blender& _GetBlenders() { return m_blenders; }

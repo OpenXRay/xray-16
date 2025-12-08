@@ -100,6 +100,14 @@ void D3D11BackendWrapper::WaitForIdle()
     }
 }
 
+void D3D11BackendWrapper::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size)
+{
+    if (m_commandList && buffer && data && size > 0)
+    {
+        m_commandList->writeBuffer(buffer, data, size);
+    }
+}
+
 nvrhi::ITexture* D3D11BackendWrapper::GetBackBuffer()
 {
     if (!m_backBuffer && HW.m_pSwapChain)

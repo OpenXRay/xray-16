@@ -21,6 +21,7 @@ public:
     struct MaterialInfo
     {
         bool alphaTest = false;
+        u32 alphaRef = 0;
         bool transparent = false;
         u8 priority = 1;
 
@@ -61,7 +62,7 @@ public:
     {
         u32 materialsCached = 0;
         u32 textureSetsCached = 0;
-        u32 materialsFromFiles = 0;
+        u32 materialsFromBlender = 0;
         u32 materialsFromReflection = 0;
         u32 materialsFromDefaults = 0;
     };
@@ -75,7 +76,6 @@ private:
 
     friend MaterialSystem& GetMaterialSystemInstance();
 
-    MaterialInfo LoadFromMetadataFile(const char* shaderName);
     MaterialInfo InferFromShaderReflection(const char* shaderName);
     MaterialInfo GetDefaultMaterialInfo() const;
 
@@ -83,8 +83,6 @@ private:
     xr_string GetNormalPath(const char* textureName) const;
     xr_string GetPBRPath(const char* textureName) const;
     xr_string GetDetailPath(const char* textureName) const;
-
-    bool ParseMaterialFile(const char* path, MaterialInfo& outInfo);
 
     xr_map<shared_str, MaterialInfo> m_materialCache;
     xr_map<shared_str, TextureSet> m_textureCache;

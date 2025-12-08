@@ -24,9 +24,9 @@
 
 #include "FrameGraphPasses/DepthPrepassSetup.h"
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
+#include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
 #include "Bindless/MaterialBuffer.h"
-#include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
 #include "FrameGraphPasses/HUDPassSetup.h"
@@ -152,6 +152,12 @@ void FrameGraphRenderer::Render() {
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
+
+    static bool s_pipelinesInitialized = false;
+    if (!s_pipelinesInitialized && m_device) {
+        passes::InitializeForwardPipelines(m_device);
+        s_pipelinesInitialized = true;
+    }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
 
@@ -640,6 +646,23 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     if (!nvrhiVB || !nvrhiIB)
         return false;
 
+    u32 visualType = visual->getType();
+    if (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM) {
+        u16 renderMode = 0;
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            renderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            renderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+        Msg("* [Skeleton] VB=%p IB=%p vStride=%u vBase=%d vCount=%d iBase=%d iCount=%d type=%s RenderMode=%u",
+            nvrhiVB.Get(), nvrhiIB.Get(),
+            meshVisual->vStride,
+            meshVisual->vBase, meshVisual->vCount,
+            meshVisual->iBase, meshVisual->iCount,
+            visualType == MT_SKELETON_GEOMDEF_ST ? "ST" : "PM",
+            renderMode);
+    }
+
     GeometryBatch batch;
 
     batch.vertexBuffer = nvrhiVB;
@@ -648,6 +671,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.indexCount = meshVisual->iCount;
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
+    batch.vertexStride = meshVisual->vStride;
 
     batch.worldMatrix = worldTransform;
 
@@ -655,7 +679,10 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     batch.renderable = renderable;
 
-    u32 visualType = visual->getType();
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    if (batch.isSkinned)
+        Msg("Maked batch as skinned %s", batch.visual->dbg_name.c_str());
+
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
         batch.worldBoundsCenter = visual->vis.sphere.P;
         batch.worldBoundsRadius = visual->vis.sphere.R;
@@ -758,6 +785,7 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.indexCount = meshVisual->iCount;
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
+    batch.vertexStride = meshVisual->vStride;
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
     batch.renderable = renderable;

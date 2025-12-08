@@ -24,6 +24,7 @@ struct GeometryBatch {
     u32 indexCount = 0;
     u32 startIndex = 0;
     s32 baseVertex = 0;
+    u32 vertexStride = 0;
 
     u32 materialID = 0;
     u32 bindlessMaterialID = UINT32_MAX;
@@ -48,6 +49,8 @@ struct GeometryBatch {
     IRenderable* renderable = nullptr;
 
     bool isVisible = true;
+
+    bool isSkinned = false;
 
     float ssa = 0.0f;
 

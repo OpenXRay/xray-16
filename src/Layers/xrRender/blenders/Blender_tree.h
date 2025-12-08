@@ -4,6 +4,7 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class CBlender_Tree : public IBlender
 {
+public:
     xrP_BOOL oBlend;
     xrP_BOOL oNotAnTree;
 

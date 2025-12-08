@@ -12,6 +12,11 @@
 #include "Blender.h"
 #include "Blender_Recorder.h"
 
+#include "Blender_CLSID.h"
+#include "blenders/blender_deffer_aref.h"
+#include "blenders/Blender_Vertex_aref.h"
+#include "blenders/Blender_tree.h"
+
 namespace xray::render::RENDER_NAMESPACE
 {
 //	Already defined in Texture.cpp
@@ -57,6 +62,42 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
         return nullptr;
     else
         return I->second;
+}
+
+bool CResourceManager::GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps)
+{
+    IBlender* B = _FindBlender(blenderName);
+    if (!B)
+    {
+        Msg("! [GetBlenderProperties] Blender '%s' not found", blenderName);
+        return false;
+    }
+
+    const CLASS_ID cls = B->getDescription().CLS;
+
+    if (cls == B_DEFAULT_AREF || cls == B_VERT_AREF)
+    {
+        auto* aref = static_cast<CBlender_deffer_aref*>(B);
+        outProps.alphaTest = (aref->oAREF.value > 0);
+        outProps.alphaRef = aref->oAREF.value;
+        outProps.alphaBlend = aref->oBlend.value;
+        Msg("* [GetBlenderProperties] '%s' (AREF): alphaTest=%d, alphaRef=%d, alphaBlend=%d",
+            blenderName, outProps.alphaTest, outProps.alphaRef, outProps.alphaBlend);
+        return true;
+    }
+    else if (cls == B_TREE)
+    {
+        auto* tree = static_cast<CBlender_Tree*>(B);
+        outProps.alphaBlend = false;
+        outProps.alphaTest = tree->oBlend.value;
+        outProps.alphaRef = tree->oBlend.value ? 33 : 0;
+        Msg("* [GetBlenderProperties] '%s' (TREE): oBlend=%d -> alphaTest=%d, alphaRef=%d, alphaBlend=false",
+            blenderName, tree->oBlend.value, outProps.alphaTest, outProps.alphaRef);
+        return true;
+    }
+
+    Msg("* [GetBlenderProperties] '%s' (CLS=%llu): unknown blender type", blenderName, cls);
+    return false;
 }
 
 void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)

@@ -107,6 +107,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     GPUObjectData obj = g_Objects[objectIdx];
 
+    if (obj.flags & 0x4)
+        return;
+
     if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
         return;
 

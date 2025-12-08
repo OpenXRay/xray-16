@@ -11,6 +11,7 @@ struct VS_INPUT
     float2 texcoord  : TEXCOORD0;
     float2 texcoord1 : TEXCOORD1;
     float4 color     : COLOR0;
+    uint drawIndex   : DRAWINDEX;
 };
 
 struct VS_OUTPUT
@@ -22,12 +23,6 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;
-};
-
-cbuffer PerDrawConstants : register(b5)
-{
-    uint g_DrawIndex;
-    uint3 g_Padding;
 };
 
 struct InstanceData
@@ -47,14 +42,16 @@ float3 UnpackNormal(float4 packed)
     return packed.rgb * 2.0 - 1.0;
 }
 
-VS_OUTPUT main(VS_INPUT input, uint instanceID : SV_InstanceID)
+VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    uint batchIndex = g_CompactBatchIndices[g_DrawIndex];
+    uint drawID = input.drawIndex;
+
+    uint batchIndex = g_CompactBatchIndices[drawID];
     InstanceData instanceData = g_InstanceData[batchIndex];
     float4x4 worldMatrix = instanceData.world;
-    uint materialID = g_CompactMaterialIDs[g_DrawIndex];
+    uint materialID = g_CompactMaterialIDs[drawID];
 
     float3 normalUnpacked = UnpackNormal(input.normal);
     float3 tangentUnpacked = UnpackNormal(input.tangent);

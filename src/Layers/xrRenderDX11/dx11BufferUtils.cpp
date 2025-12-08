@@ -3,6 +3,7 @@
 
 #include <FlexibleVertexFormat.h>
 #include <nvrhi/nvrhi.h>
+#include "xrEngine/IRenderBackend.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -51,18 +52,25 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
         desc.initialState = nvrhi::ResourceStates::Common;
 
     nvrhi::BufferHandle buffer = device->createBuffer(desc);
-
-    if (buffer && pData)
+    if (!buffer)
     {
-        nvrhi::CommandListParameters cmdParams;
-        cmdParams.enableImmediateExecution = false;
-        nvrhi::CommandListHandle uploadCmdList = device->createCommandList(cmdParams);
-        if (uploadCmdList)
+        if (GEnv.Backend && GEnv.Backend->GetDeviceState() == DeviceState::Lost)
         {
-            uploadCmdList->open();
-            uploadCmdList->writeBuffer(buffer, pData, dataSize);
-            uploadCmdList->close();
-            device->executeCommandList(uploadCmdList);
+            Msg("! [NVRHI] ERROR: Device Removed!");
+        }
+        Msg("! [NVRHI] Failed to create %s (size=%u bytes)", desc.debugName, dataSize);
+        return nullptr;
+    }
+
+    if (pData)
+    {
+        if (GEnv.Backend)
+        {
+            GEnv.Backend->UploadBufferData(buffer, pData, dataSize);
+        }
+        else
+        {
+            Msg("! [NVRHI] ERROR: Backend not available for buffer upload");
         }
     }
 

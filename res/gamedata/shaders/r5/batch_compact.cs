@@ -40,7 +40,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
         g_OutputDrawArgs.Store(outOffset + 4, instanceCount);
         g_OutputDrawArgs.Store(outOffset + 8, startIndex);
         g_OutputDrawArgs.Store(outOffset + 12, asuint(baseVertex));
-        g_OutputDrawArgs.Store(outOffset + 16, startInstance);
+        g_OutputDrawArgs.Store(outOffset + 16, outputIdx);
 
         g_VisibleBatchIndices[outputIdx] = batchIdx;
         g_OutputMaterialIDs[outputIdx] = g_InputMaterialIDs[batchIdx];

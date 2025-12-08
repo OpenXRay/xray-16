@@ -1,0 +1,113 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+};
+
+cbuffer SkinnedMaterialCB : register(b4)
+{
+    uint g_SkinnedMaterialID;
+    uint g_SkinnedPad0;
+    uint g_SkinnedPad1;
+    uint g_SkinnedPad2;
+};
+
+float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
+{
+    float3 L = -L_sun_dir_w;
+    float3 H = normalize(V + L);
+
+    float NdotL = saturate(dot(N, L));
+    float NdotH = saturate(dot(N, H));
+    float NdotV = saturate(dot(N, V));
+
+    float3 diffuse = albedo * (1.0 - metallic);
+
+    float alpha = roughness * roughness;
+    float alpha2 = alpha * alpha;
+    float denom = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
+    float D = alpha2 / (3.14159 * denom * denom);
+
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+    float3 F = F0 + (1.0 - F0) * pow(1.0 - saturate(dot(H, V)), 5.0);
+
+    float3 specular = D * F * 0.25;
+
+    float3 directLight = (diffuse + specular) * L_sun_color * NdotL;
+    float3 ambient = albedo * L_ambient.rgb * ao;
+
+    return directLight + ambient;
+}
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    uint materialID = g_SkinnedMaterialID;
+
+    MaterialData mat = g_Materials[materialID];
+
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+
+    if (mat.flags & MAT_FLAG_ALPHA_TEST)
+    {
+        clip(diffuseSample.a - mat.alphaRef);
+    }
+
+    float3 albedo = diffuseSample.rgb;
+
+    float3 N = normalize(input.normal);
+    if (mat.flags & MAT_FLAG_HAS_NORMAL)
+    {
+        float3 normalSample = SampleNormal(mat, input.texcoord);
+        float3x3 TBN = float3x3(
+            normalize(input.tangent),
+            normalize(input.bitangent),
+            N
+        );
+        N = normalize(mul(normalSample, TBN));
+    }
+
+    if (mat.flags & MAT_FLAG_HAS_DETAIL)
+    {
+        float4 detailSample = SampleDetail(mat, input.texcoord);
+        albedo = albedo * (detailSample.rgb * 2.0);
+    }
+
+    float metallic = 0.0;
+    float roughness = 0.5;
+    float ao = 1.0;
+
+    if (mat.flags & MAT_FLAG_HAS_PBR)
+    {
+        float3 pbrSample = SamplePBR(mat, input.texcoord);
+        metallic = pbrSample.r;
+        roughness = pbrSample.g;
+        ao = pbrSample.b;
+    }
+
+    float3 V = normalize(eye_position - input.worldPos);
+
+    float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
+
+    float fogDist = length(input.worldPos - eye_position);
+    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
+    finalColor = lerp(fog_color.rgb, finalColor, fogFactor);
+
+    output.color = float4(finalColor, diffuseSample.a);
+    return output;
+}

@@ -49,6 +49,10 @@ struct BindlessForwardConfig {
     }
 };
 
+void InitializeForwardPipelines(ng::RenderDevice* device);
+
+void ShutdownForwardPipelines();
+
 framegraph::DefaultOutputLayout setupForwardColorPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,

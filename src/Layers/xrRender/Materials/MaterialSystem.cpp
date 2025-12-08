@@ -2,6 +2,7 @@
 #include "MaterialSystem.h"
 #include "Layers/xrRender/ResourceManager/FGResourceManager.h"
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
+#include "Layers/xrRender/ResourceManager.h"
 
 using namespace xray::render::resources;
 using namespace xray::render::framegraph;
@@ -67,123 +68,51 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
     if (it != m_materialCache.end())
         return it->second;
 
-    MaterialInfo info = LoadFromMetadataFile(shaderName);
+    MaterialInfo info = GetDefaultMaterialInfo();
 
-    if (!info.alphaTest && !info.transparent && info.priority == 1)
+    if (RENDER_NAMESPACE::RImplementation.Resources)
     {
-        MaterialInfo reflectionInfo = InferFromShaderReflection(shaderName);
-        if (reflectionInfo.alphaTest || reflectionInfo.transparent)
+        RENDER_NAMESPACE::CResourceManager::BlenderProperties blenderProps;
+        if (RENDER_NAMESPACE::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
         {
-            info = reflectionInfo;
+            info.alphaTest = blenderProps.alphaTest;
+            info.alphaRef = blenderProps.alphaRef;
+            info.transparent = blenderProps.alphaBlend;
+            m_stats.materialsFromBlender++;
+
+            Msg("* [MaterialSystem] '%s': from blender -> alphaTest=%d, alphaRef=%d, transparent=%d",
+                shaderName, info.alphaTest, info.alphaRef, info.transparent);
+
+            m_materialCache[key] = info;
+            return m_materialCache[key];
         }
     }
+
+    info = InferFromShaderReflection(shaderName);
+    Msg("* [MaterialSystem] '%s': from reflection -> alphaTest=%d, alphaRef=%d, transparent=%d",
+        shaderName, info.alphaTest, info.alphaRef, info.transparent);
 
     m_materialCache[key] = info;
     return m_materialCache[key];
-}
-
-MaterialSystem::MaterialInfo MaterialSystem::LoadFromMetadataFile(const char* shaderName)
-{
-    MaterialInfo info = GetDefaultMaterialInfo();
-
-    string_path materialPath;
-    xr_sprintf(materialPath, "materials\\%s.material", shaderName);
-
-    string_path fullPath;
-    if (!FS.exist(fullPath, "$game_data$", materialPath))
-    {
-        m_stats.materialsFromDefaults++;
-        return info;
-    }
-
-    if (ParseMaterialFile(fullPath, info))
-    {
-        m_stats.materialsFromFiles++;
-    }
-    else
-    {
-        m_stats.materialsFromDefaults++;
-    }
-
-    return info;
-}
-
-bool MaterialSystem::ParseMaterialFile(const char* path, MaterialInfo& outInfo)
-{
-    IReader* reader = FS.r_open(path);
-    if (!reader)
-        return false;
-
-    string256 line;
-    while (!reader->eof())
-    {
-        reader->r_string(line, sizeof(line));
-
-        if (line[0] == '\0' || line[0] == '#' || line[0] == ';')
-            continue;
-
-        if (line[0] == '[')
-            continue;
-
-        char* eq = strchr(line, '=');
-        if (!eq)
-            continue;
-
-        *eq = '\0';
-        const char* key = line;
-        const char* value = eq + 1;
-
-        while (*key == ' ' || *key == '\t') key++;
-        while (*value == ' ' || *value == '\t') value++;
-
-        if (xr_strcmp(key, "alpha_test") == 0)
-        {
-            outInfo.alphaTest = (xr_strcmp(value, "true") == 0 || xr_strcmp(value, "1") == 0);
-        }
-        else if (xr_strcmp(key, "transparent") == 0)
-        {
-            outInfo.transparent = (xr_strcmp(value, "true") == 0 || xr_strcmp(value, "1") == 0);
-        }
-        else if (xr_strcmp(key, "priority") == 0)
-        {
-            outInfo.priority = static_cast<u8>(atoi(value));
-        }
-        else if (xr_strcmp(key, "metallic") == 0)
-        {
-            outInfo.metallic = static_cast<float>(atof(value));
-        }
-        else if (xr_strcmp(key, "roughness") == 0)
-        {
-            outInfo.roughness = static_cast<float>(atof(value));
-        }
-        else if (xr_strcmp(key, "ao_scale") == 0)
-        {
-            outInfo.aoScale = static_cast<float>(atof(value));
-        }
-        else if (xr_strcmp(key, "use_parallax") == 0)
-        {
-            outInfo.useParallax = (xr_strcmp(value, "true") == 0 || xr_strcmp(value, "1") == 0);
-        }
-        else if (xr_strcmp(key, "use_detail") == 0)
-        {
-            outInfo.useDetail = (xr_strcmp(value, "true") == 0 || xr_strcmp(value, "1") == 0);
-        }
-    }
-
-    FS.r_close(reader);
-    return true;
 }
 
 MaterialSystem::MaterialInfo MaterialSystem::InferFromShaderReflection(const char* shaderName)
 {
     MaterialInfo info = GetDefaultMaterialInfo();
 
-    if (!m_shaderLoader)
+    if (!m_shaderLoader) {
+        Msg("! [MaterialSystem] InferFromShaderReflection: m_shaderLoader is NULL!");
         return info;
+    }
 
     auto psResult = m_shaderLoader->LoadPixelShader(shaderName);
+
+    Msg("* [MaterialSystem] InferFromShaderReflection '%s': psResult.reflection=%p",
+        shaderName, psResult.reflection);
+
     if (psResult.reflection)
     {
+        Msg("* [MaterialSystem] InferFromShaderReflection '%s': HAS reflection, checking patterns...", shaderName);
 
         const char* alphaPatterns[] = {
             "_alpha", "_aref", "_atest", "flora", "tree", "grass", "leaves"
@@ -224,6 +153,7 @@ MaterialSystem::MaterialInfo MaterialSystem::GetDefaultMaterialInfo() const
 {
     return MaterialInfo{
         false,
+        0,
         false,
         1,
         0.0f,
