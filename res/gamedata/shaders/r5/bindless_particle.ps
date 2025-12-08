@@ -1,0 +1,37 @@
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 hpos     : SV_Position;
+    float2 texcoord : TEXCOORD0;
+    float4 color    : TEXCOORD1;
+    float3 worldPos : TEXCOORD2;
+    nointerpolation uint materialID : TEXCOORD3;
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+};
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    MaterialData mat = g_Materials[input.materialID];
+
+    float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
+
+    float4 result = diffuseSample * input.color;
+
+    clip(result.a - (0.01 / 255.0));
+
+    float fogDist = length(input.worldPos - eye_position);
+    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
+    result.rgb = lerp(fog_color.rgb, result.rgb, fogFactor);
+
+    output.color = result;
+    return output;
+}

@@ -7,6 +7,7 @@
 namespace xray::render {
     struct GeometryBatch;
     class MaterialCache;
+    class GeometryCollector;
     namespace ng {
         class RenderDevice;
     }
@@ -18,10 +19,15 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-framegraph::DefaultOutputLayout setupHUDPass(
+void InitializeSkinningPipelines(ng::RenderDevice* device);
+
+void ShutdownSkinningPipelines();
+
+framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
-    const framegraph::DefaultOutputLayout& gbufferInputs,
+    const framegraph::DefaultOutputLayout& inputs,
+    const GeometryCollector* geometry,
     const xr_vector<GeometryBatch>* hudBatches,
     MaterialCache* materialCache,
     u32 width,

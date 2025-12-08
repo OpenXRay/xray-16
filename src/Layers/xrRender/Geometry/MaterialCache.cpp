@@ -2290,6 +2290,47 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     return materialID;
 }
 
+u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (!textureName.size() || !textureName[0])
+        return UINT32_MAX;
+
+    auto it = m_particleTextureToMaterialID.find(textureName);
+    if (it != m_particleTextureToMaterialID.end())
+        return it->second;
+
+    auto& materialBuffer = MaterialBuffer::Instance();
+    if (!materialBuffer.IsInitialized())
+        return UINT32_MAX;
+
+    MaterialData matData = {};
+    matData.diffuseIndex = INVALID_TEXTURE_INDEX;
+    matData.normalIndex = INVALID_TEXTURE_INDEX;
+    matData.detailIndex = INVALID_TEXTURE_INDEX;
+    matData.pbrIndex = INVALID_TEXTURE_INDEX;
+    matData.detailScale = 1.0f;
+    matData.alphaRef = 0.01f / 255.0f;
+    matData.flags = 0;
+    matData.padding = 0.0f;
+
+    u32 materialID = materialBuffer.RegisterMaterial(matData);
+
+    m_particleTextureToMaterialID[textureName] = materialID;
+
+    PendingMaterial pending;
+    pending.materialID = materialID;
+    pending.visual = nullptr;
+    pending.textureName = textureName;
+    m_pendingMaterials.push_back(pending);
+
+    Msg("* [MaterialCache] PreRegisterParticle: matID=%u tex='%s' pending=%u",
+        materialID, textureName.c_str(), static_cast<u32>(m_pendingMaterials.size()));
+
+    return materialID;
+}
+
 void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
 {
     using namespace RENDER_NAMESPACE::bindless;
@@ -2326,7 +2367,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         dxRender_Visual* visual = pending.visual;
         u32 materialID = pending.materialID;
 
-        if (!visual || materialID == UINT32_MAX)
+        if (materialID == UINT32_MAX)
             continue;
 
         const MaterialData* existingMat = materialBuffer.GetMaterial(materialID);
@@ -2336,7 +2377,12 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         MaterialData matData = *existingMat;
         bool updated = false;
 
-        shared_str diffuseName = visual->textureName;
+        shared_str diffuseName;
+        if (visual) {
+            diffuseName = visual->textureName;
+        } else if (pending.textureName.size()) {
+            diffuseName = pending.textureName;
+        }
 
         if (!diffuseName.size() || !diffuseName[0])
             continue;

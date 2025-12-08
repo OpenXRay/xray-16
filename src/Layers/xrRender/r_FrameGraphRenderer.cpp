@@ -10,6 +10,7 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
+#include "ParticleEffectDef.h"
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -29,7 +30,7 @@
 #include "Bindless/MaterialBuffer.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
-#include "FrameGraphPasses/HUDPassSetup.h"
+#include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"
 #include "FrameGraphPasses/ExposurePassSetup.h"
 #include "FrameGraphPasses/UIPassSetup.h"
@@ -156,6 +157,8 @@ void FrameGraphRenderer::Render() {
     static bool s_pipelinesInitialized = false;
     if (!s_pipelinesInitialized && m_device) {
         passes::InitializeForwardPipelines(m_device);
+        passes::InitializeSkinningPipelines(m_device);
+        passes::InitializeParticlePipelines(m_device);
         s_pipelinesInitialized = true;
     }
 
@@ -494,10 +497,11 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    auto hudOutputs = passes::setupHUDPass(
+    auto hudOutputs = passes::setupSkinningPass(
         *m_framegraph,
         m_device,
         forwardOutputs,
+        m_geometryCollector.get(),
         &m_hudBatches,
         m_materialCache.get(),
         width,
@@ -808,6 +812,13 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
+    u32 visualType = visual->getType();
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+
+    if (m_materialCache) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+    }
+
     RENDER_NAMESPACE::ShaderKey shaderKey;
     if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
         static thread_local std::string s_hudDebugNameBuffer;
@@ -836,6 +847,7 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
 
     bool isHUDParticle = isHUD;
     u32 particleCount = 0;
+    shared_str textureName;
 
     if (vType == MT_PARTICLE_EFFECT) {
         RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
@@ -844,6 +856,11 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
 
         PAPI::Particle* particles = nullptr;
         PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
+
+        auto* pDef = pEffect->GetDefinition();
+        if (pDef) {
+            textureName = pDef->m_TextureName;
+        }
     }
 
     if (particleCount == 0)
@@ -855,6 +872,10 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     batch.renderable = renderable;
     batch.isHUDMode = isHUDParticle;
     batch.particleCount = particleCount;
+
+    if (m_materialCache && textureName.size()) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterParticleMaterial(textureName);
+    }
 
     if (isHUDParticle) {
         m_hudParticleBatches.push_back(batch);

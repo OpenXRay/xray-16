@@ -36,6 +36,7 @@ struct ParticleBatch {
     bool isHUDMode = false;
     u32 particleCount = 0;
     u32 vertexOffset = 0;
+    u32 bindlessMaterialID = 0;
 };
 
 struct ParticleVertex {
@@ -43,6 +44,10 @@ struct ParticleVertex {
     u32 color;
     Fvector2 t;
 };
+
+void InitializeParticlePipelines(ng::RenderDevice* device);
+
+void ShutdownParticlePipelines();
 
 framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::FrameGraph& fg,

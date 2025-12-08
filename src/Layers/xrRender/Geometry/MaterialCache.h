@@ -297,8 +297,11 @@ private:
     struct PendingMaterial {
         u32 materialID;
         dxRender_Visual* visual;
+        shared_str textureName;
     };
     xr_vector<PendingMaterial> m_pendingMaterials;
+
+    xr_map<shared_str, u32> m_particleTextureToMaterialID;
 
     resources::TextureHandle m_defaultPBR;
 
@@ -348,6 +351,8 @@ public:
     u32 RegisterBindlessMaterial(MaterialPSO* matPSO);
 
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
+
+    u32 PreRegisterParticleMaterial(const shared_str& textureName);
 
     void FinalizePendingMaterials(ng::RenderContext* ctx);
 
