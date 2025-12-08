@@ -67,6 +67,8 @@ public:
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
 
+    const FSlideWindowItem* GetSWI() const { return pSWI; }
+
 private:
     FTreeVisual_PM(const FTreeVisual_PM& other);
     void operator=(const FTreeVisual_PM& other);

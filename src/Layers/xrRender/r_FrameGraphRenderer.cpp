@@ -668,17 +668,20 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
 
+    const FSlideWindowItem* pSWI = nullptr;
+
     if (visualType == MT_SKELETON_GEOMDEF_PM) {
-        auto* pmVisual = static_cast<CSkeletonX_PM*>(visual);
-        const FSlideWindowItem& swi = pmVisual->GetSWI();
-        if (swi.sw && swi.count > 0) {
-            const FSlideWindow& sw = swi.sw[0];
-            batch.indexCount = sw.num_tris * 3;
-            batch.startIndex = meshVisual->iBase + sw.offset;
-        } else {
-            batch.indexCount = meshVisual->iCount;
-            batch.startIndex = meshVisual->iBase;
-        }
+        pSWI = &static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+    } else if (visualType == MT_PROGRESSIVE) {
+        pSWI = &static_cast<FProgressive*>(visual)->GetSWI();
+    } else if (visualType == MT_TREE_PM) {
+        pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
+    }
+
+    if (pSWI && pSWI->sw && pSWI->count > 0) {
+        const FSlideWindow& sw = pSWI->sw[0];
+        batch.indexCount = sw.num_tris * 3;
+        batch.startIndex = meshVisual->iBase + sw.offset;
     } else {
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
