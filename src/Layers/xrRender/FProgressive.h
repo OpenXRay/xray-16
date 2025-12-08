@@ -25,6 +25,9 @@ public:
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
 
+    // Accessor for slide window data (used by framegraph renderer for LOD selection)
+    const FSlideWindowItem& GetSWI() const { return nSWI; }
+
 private:
     FProgressive(const FProgressive& other);
     void operator=(const FProgressive& other);

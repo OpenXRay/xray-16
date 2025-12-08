@@ -34,22 +34,17 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-// Bone matrices - uploaded per skeleton instance
+// Bone matrices - uploaded per skeleton instance as StructuredBuffer
 // Using float3x4 format (3 rows of float4) - matches legacy sbones_array
 // 78 bones * float3x4 (48 bytes each) = 3744 bytes
-// NOTE: b0=dynamic_transforms, b1=shader_params, b2=static_globals (from common.h)
-//       So we use b3 for bones
-cbuffer BonesCB : register(b3)
-{
-    float3x4 sbones_array[78];
-};
+StructuredBuffer<float3x4> g_BoneMatrices : register(t3);
 
 // Get bone matrix from index
 // Legacy X-Ray multiplies bone index by 3 (for 3 rows per matrix)
 // The index stored in vertex is already pre-multiplied by 3
 float3x4 get_bone(int legacy_index)
 {
-    return sbones_array[legacy_index / 3];
+    return g_BoneMatrices[legacy_index / 3];
 }
 
 // Unpack D3DCOLOR normal from [0,1] to [-1,1]
@@ -85,7 +80,7 @@ float4 unpack_skinned_position(float4 v)
 }
 
 // DEBUG: Set to 1 to skip bone skinning and just render base mesh
-#define DEBUG_SKIP_SKINNING 1
+#define DEBUG_SKIP_SKINNING 0
 
 VS_OUTPUT main(VS_INPUT input)
 {

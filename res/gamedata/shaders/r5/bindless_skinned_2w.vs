@@ -13,20 +13,17 @@
 #include "common.h"
 #include "bindless_common.h"
 
-cbuffer BonesCB : register(b3)
-{
-    float3x4 sbones_array[78];
-}
+// Bone matrices as StructuredBuffer (t3 SRV)
+StructuredBuffer<float3x4> g_BoneMatrices : register(t3);
 
 float3x4 get_bone(int legacy_index)
 {
-    return sbones_array[legacy_index / 3];
+    return g_BoneMatrices[legacy_index / 3];
 }
 
 float3 unpack_d3dcolor_normal(float3 packed)
 {
-    float3 swizzled = packed.zyx;  // BGRA -> RGB order
-    return swizzled * 2.0 - 1.0;   // [0,1] -> [-1,1]
+    return packed * 2.0 - 1.0;   // [0,1] -> [-1,1]
 }
 
 float4 skinning_pos(float4 pos, float3x4 bone)
@@ -60,13 +57,12 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-#define DEBUG_SKIP_SKINNING 1
+#define DEBUG_SKIP_SKINNING 0
 
 VS_OUTPUT main(VS_INPUT_2W v)
 {
     VS_OUTPUT o;
 
-    // Swizzle D3DCOLOR (BGRA -> RGB)
     float3 N = unpack_d3dcolor_normal(v.N.xyz);
     float3 T = unpack_d3dcolor_normal(v.T.xyz);
     float3 B = unpack_d3dcolor_normal(v.B.xyz);

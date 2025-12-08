@@ -1044,8 +1044,27 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
 
-    batch.indexCount = meshVisual->iCount;
-    batch.startIndex = meshVisual->iBase;
+    // For progressive meshes, use LOD data instead of static iCount
+    // CSkeletonX_PM inherits from FProgressive which has SWI (slide window item)
+    if (visualType == MT_SKELETON_GEOMDEF_PM) {
+        auto* pmVisual = static_cast<CSkeletonX_PM*>(visual);
+        // Use LOD = 1.0 (maximum detail) -> lod_id = 0 (first entry has most verts/tris)
+        // Formula: lod_id = floor((1 - LOD) * (count - 1) + 0.5)
+        // For LOD=1.0: lod_id = floor(0 * (count-1) + 0.5) = 0
+        const FSlideWindowItem& swi = pmVisual->GetSWI();
+        if (swi.sw && swi.count > 0) {
+            const FSlideWindow& sw = swi.sw[0];  // LOD 0 = max detail
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;
+        } else {
+            // Fallback to static counts if SWI not available
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+    } else {
+        batch.indexCount = meshVisual->iCount;
+        batch.startIndex = meshVisual->iBase;
+    }
     batch.baseVertex = meshVisual->vBase;
     batch.vertexStride = meshVisual->vStride;
 

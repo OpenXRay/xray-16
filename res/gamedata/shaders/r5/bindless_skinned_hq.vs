@@ -15,25 +15,21 @@
 #include "common.h"
 #include "bindless_common.h"
 
-// Bone matrices - uploaded per skeleton instance
+// Bone matrices - uploaded per skeleton instance as StructuredBuffer
 // Using float3x4 format (3 rows of float4) - matches legacy sbones_array
-cbuffer BonesCB : register(b3)
-{
-    float3x4 sbones_array[78];
-}
+StructuredBuffer<float3x4> g_BoneMatrices : register(t3);
 
 // Get bone matrix from legacy index (pre-multiplied by 3)
 float3x4 get_bone(int legacy_index)
 {
-    return sbones_array[legacy_index / 3];
+    return g_BoneMatrices[legacy_index / 3];
 }
 
 // Unpack D3DCOLOR normal: BGRA8_UNORM -> float4, needs swizzle and remap to [-1,1]
 // D3DCOLOR stores as BGRA, but HLSL reads as RGBA, so .xyz = .zyx
 float3 unpack_d3dcolor_normal(float3 packed)
 {
-    float3 swizzled = packed.zyx;  // BGRA -> RGB order
-    return swizzled * 2.0 - 1.0;   // [0,1] -> [-1,1]
+    return packed * 2.0 - 1.0;   // [0,1] -> [-1,1]
 }
 
 // Transform position by bone matrix
@@ -80,13 +76,12 @@ struct VS_OUTPUT
 };
 
 // DEBUG: Set to 1 to skip bone skinning and just render base mesh
-#define DEBUG_SKIP_SKINNING 1
+#define DEBUG_SKIP_SKINNING 0
 
 VS_OUTPUT main(VS_INPUT_1W v)
 {
     VS_OUTPUT o;
 
-    // Unpack normals (D3DCOLOR BGRA -> swizzle to RGB -> remap to [-1,1])
     float3 N = unpack_d3dcolor_normal(v.N.xyz);
     float3 T = unpack_d3dcolor_normal(v.T.xyz);
     float3 B = unpack_d3dcolor_normal(v.B.xyz);
