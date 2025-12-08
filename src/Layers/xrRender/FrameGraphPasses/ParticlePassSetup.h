@@ -42,6 +42,7 @@ struct ParticleBatch {
     bool isHUDMode = false;
     u32 particleCount = 0;
     u32 vertexOffset = 0;
+    u32 bindlessMaterialID = 0;  // Bindless material ID for texture lookup
 };
 
 // ═══════════════════════════════════════════════════════
@@ -56,11 +57,20 @@ struct ParticleVertex {
 };
 
 // ═══════════════════════════════════════════════════════
+//  PARTICLE PIPELINE MANAGEMENT
+// ═══════════════════════════════════════════════════════
+// Initialize particle pipelines (call once at startup)
+void InitializeParticlePipelines(ng::RenderDevice* device);
+
+// Shutdown particle pipelines (call at cleanup)
+void ShutdownParticlePipelines();
+
+// ═══════════════════════════════════════════════════════
 //  PARTICLE PASS SETUP
 // ═══════════════════════════════════════════════════════
 // Lambda-based particle pass setup
 // Renders particle systems (effects and groups) as dynamic billboards/sprites
-// Renders AFTER forward color and HUD passes (particles on top of world+HUD)
+// Renders AFTER forward color and skinning passes (particles on top of world+HUD)
 // Supports both world and HUD particles with proper FOV handling
 framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::FrameGraph& fg,

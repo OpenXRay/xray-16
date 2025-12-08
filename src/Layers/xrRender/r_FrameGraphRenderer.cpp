@@ -11,6 +11,7 @@
 #include "FTreeVisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
+#include "ParticleEffectDef.h"
 #include "Shader.h"
 #include "r__dsgraph_structure.h"
 #include "Layers/xrRender/Geometry/MaterialCache.h"
@@ -32,7 +33,7 @@
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
-#include "FrameGraphPasses/HUDPassSetup.h"
+#include "FrameGraphPasses/SkinningPassSetup.h"
 #include "FrameGraphPasses/ParticlePassSetup.h"      // Particle rendering (billboards/sprites)
 #include "FrameGraphPasses/ExposurePassSetup.h"      // Auto-exposure from histogram
 #include "FrameGraphPasses/UIPassSetup.h"
@@ -73,56 +74,6 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     // Create shader phase cache (Week 16 - for precompilation phase detection)
     m_shaderPhaseCache = xr_make_unique<framegraph::ShaderPhaseCache>();
-
-    // OLD PASS SYSTEM - DISABLED
-    // All passes now created dynamically with lambda pattern
-    // No need for upfront pass object creation
-
-    /* DISABLED - Using lambda passes instead
-    passes::GBufferPassConfig gbufferConfig;
-    gbufferConfig.width = Device.dwWidth;
-    gbufferConfig.height = Device.dwHeight;
-    m_gbufferPass = xr_make_unique<passes::GBufferPass>(gbufferConfig);
-
-    passes::HUDPassConfig hudConfig;
-    hudConfig.width = Device.dwWidth;
-    hudConfig.height = Device.dwHeight;
-    m_hudPass = xr_make_unique<passes::HUDPass>(hudConfig);
-
-    passes::ParticlePassConfig particleConfig;
-    particleConfig.width = Device.dwWidth;
-    particleConfig.height = Device.dwHeight;
-    m_particlePass = xr_make_unique<passes::ParticlePass>(m_gbufferPass->GetMaterialCache(), particleConfig);
-
-    // Disabled - using lambda-based passes now
-    // m_lightingPass = xr_make_unique<passes::LightingPass>();
-    // m_tonemapPass = xr_make_unique<passes::TonemapPass>();
-
-    passes::UIPassConfig uiConfig;
-    uiConfig.width = Device.dwWidth;
-    uiConfig.height = Device.dwHeight;
-    m_uiPass = xr_make_unique<passes::UIPass>(uiConfig);
-
-    passes::TextPassConfig textConfig;
-    textConfig.width = Device.dwWidth;
-    textConfig.height = Device.dwHeight;
-    m_textPass = xr_make_unique<passes::TextPass>(textConfig);
-
-    passes::CursorPassConfig cursorConfig;
-    cursorConfig.width = Device.dwWidth;
-    cursorConfig.height = Device.dwHeight;
-    m_cursorPass = xr_make_unique<passes::CursorPass>(device, cursorConfig);
-
-    passes::MenuDistortPassConfig menuDistortConfig;
-    menuDistortConfig.width = Device.dwWidth;
-    menuDistortConfig.height = Device.dwHeight;
-    m_menuDistortPass = xr_make_unique<passes::MenuDistortPass>(device, menuDistortConfig);
-
-    passes::MenuCompositePassConfig menuCompositeConfig;
-    menuCompositeConfig.width = Device.dwWidth;
-    menuCompositeConfig.height = Device.dwHeight;
-    m_menuCompositePass = xr_make_unique<passes::MenuCompositePass>(device, menuCompositeConfig);
-    */
 
     // Create VCB pool for geometry rendering
     m_geometryVCBPool = xr_make_unique<framegraph::VolatileConstantBufferPool>();
@@ -242,6 +193,8 @@ void FrameGraphRenderer::Render() {
     static bool s_pipelinesInitialized = false;
     if (!s_pipelinesInitialized && m_device) {
         passes::InitializeForwardPipelines(m_device);
+        passes::InitializeSkinningPipelines(m_device);
+        passes::InitializeParticlePipelines(m_device);
         s_pipelinesInitialized = true;
     }
 
@@ -793,12 +746,15 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
-    // 2. HUD Pass - Renders HUD items on top of world geometry
-    auto hudOutputs = passes::setupHUDPass(
+    // 2. Skinning Pass - Renders all skinned meshes (world + HUD)
+    // World skinned: NPCs, monsters with normal depth [0.0, 1.0]
+    // HUD skinned: First-person weapons/hands with depth [0.0, 0.1]
+    auto hudOutputs = passes::setupSkinningPass(
         *m_framegraph,
         m_device,
         forwardOutputs,
-        &m_hudBatches,
+        m_geometryCollector.get(),  // World skinned batches from GeometryCollector
+        &m_hudBatches,              // HUD skinned batches
         m_materialCache.get(),
         width,
         height
@@ -941,7 +897,7 @@ void FrameGraphRenderer::PresentToBackbuffer() {
 // Original engine: hud_transform_helper + mapHUD/mapHUDSorted/mapHUDEmissive
 
 void FrameGraphRenderer::RenderHUD() {
-    // HUD rendering is now handled by HUDPass in the FrameGraph pipeline
+    // HUD rendering is now handled by SkinningPass in the FrameGraph pipeline
     // This function is kept as a stub for future HUD-specific post-processing
     // (e.g., HUD-only effects, UI overlays, etc.)
 }
@@ -1237,6 +1193,15 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.pipeline = nullptr;
     batch.bindingSet = nullptr;
 
+    // Mark skinned meshes (HUD weapons/hands are typically skinned)
+    u32 visualType = visual->getType();
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+
+    // Pre-register bindless material for HUD rendering
+    if (m_materialCache) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+    }
+
     // Extract shader key for debug name
     RENDER_NAMESPACE::ShaderKey shaderKey;
     if (RENDER_NAMESPACE::ExtractShaderKey(visual, shaderKey)) {
@@ -1278,6 +1243,7 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
 
     bool isHUDParticle = isHUD;
     u32 particleCount = 0;
+    shared_str textureName;
 
     if (vType == MT_PARTICLE_EFFECT) {
         RENDER_NAMESPACE::PS::CParticleEffect* pEffect =
@@ -1286,6 +1252,12 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
 
         PAPI::Particle* particles = nullptr;
         PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
+
+        // Get texture name from particle definition for bindless material
+        auto* pDef = pEffect->GetDefinition();
+        if (pDef) {
+            textureName = pDef->m_TextureName;
+        }
     }
 
     if (particleCount == 0)
@@ -1297,6 +1269,11 @@ bool FrameGraphRenderer::ProcessParticleGeometry(
     batch.renderable = renderable;
     batch.isHUDMode = isHUDParticle;
     batch.particleCount = particleCount;
+
+    // Register bindless material for particle texture
+    if (m_materialCache && textureName.size()) {
+        batch.bindlessMaterialID = m_materialCache->PreRegisterParticleMaterial(textureName);
+    }
 
     if (isHUDParticle) {
         m_hudParticleBatches.push_back(batch);

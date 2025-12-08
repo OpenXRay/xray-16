@@ -56,26 +56,30 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/Shaders/SlangVFSAdapter.cpp
 
     # FrameGraph Passes (Phase 3) - Renderer agnostic
-    ../xrRender/FrameGraphPasses/GBufferPass.h
-    ../xrRender/FrameGraphPasses/GBufferPass.cpp
-    ../xrRender/FrameGraphPasses/HUDPass.h
-    ../xrRender/FrameGraphPasses/HUDPass.cpp
-    ../xrRender/FrameGraphPasses/ParticlePass.h
-    ../xrRender/FrameGraphPasses/ParticlePass.cpp
-    ../xrRender/FrameGraphPasses/LightingPass.h
-    ../xrRender/FrameGraphPasses/LightingPass.cpp
-    ../xrRender/FrameGraphPasses/TonemapPass.h
-    ../xrRender/FrameGraphPasses/TonemapPass.cpp
-    ../xrRender/FrameGraphPasses/UIPass.h
-    ../xrRender/FrameGraphPasses/UIPass.cpp
-    ../xrRender/FrameGraphPasses/TextPass.h
-    ../xrRender/FrameGraphPasses/TextPass.cpp
-    ../xrRender/FrameGraphPasses/CursorPass.h
-    ../xrRender/FrameGraphPasses/CursorPass.cpp
-    ../xrRender/FrameGraphPasses/MenuDistortPass.h
-    ../xrRender/FrameGraphPasses/MenuDistortPass.cpp
-    ../xrRender/FrameGraphPasses/MenuCompositePass.h
-    ../xrRender/FrameGraphPasses/MenuCompositePass.cpp
+    ../xrRender/FrameGraphPasses/ShaderConstants.h
+    ../xrRender/FrameGraphPasses/ShaderConstants.cpp
+    ../xrRender/FrameGraphPasses/DepthPrepassSetup.h
+    ../xrRender/FrameGraphPasses/DepthPrepassSetup.cpp
+    ../xrRender/FrameGraphPasses/ForwardColorPassSetup.h
+    ../xrRender/FrameGraphPasses/ForwardColorPassSetup.cpp
+    ../xrRender/FrameGraphPasses/HiZBuildPassSetup.h
+    ../xrRender/FrameGraphPasses/HiZBuildPassSetup.cpp
+    ../xrRender/FrameGraphPasses/SkinningPassSetup.h
+    ../xrRender/FrameGraphPasses/SkinningPassSetup.cpp
+    ../xrRender/FrameGraphPasses/ImGuiPassSetup.h
+    ../xrRender/FrameGraphPasses/ImGuiPassSetup.cpp
+    ../xrRender/FrameGraphPasses/ParticlePassSetup.h
+    ../xrRender/FrameGraphPasses/ParticlePassSetup.cpp
+    ../xrRender/FrameGraphPasses/ExposurePassSetup.h
+    ../xrRender/FrameGraphPasses/ExposurePassSetup.cpp
+    ../xrRender/FrameGraphPasses/TonemapPassSetup.h
+    ../xrRender/FrameGraphPasses/TonemapPassSetup.cpp
+    ../xrRender/FrameGraphPasses/UIPassSetup.h
+    ../xrRender/FrameGraphPasses/UIPassSetup.cpp
+    ../xrRender/FrameGraphPasses/SkyPassSetup.h
+    ../xrRender/FrameGraphPasses/SkyPassSetup.cpp
+    ../xrRender/FrameGraphPasses/SunPassSetup.h
+    ../xrRender/FrameGraphPasses/SunPassSetup.cpp
 
     # Geometry System (Phase 3) - Renderer agnostic
     ../xrRender/Geometry/GeometryBatch.h

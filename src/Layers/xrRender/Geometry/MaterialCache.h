@@ -386,8 +386,12 @@ private:
     struct PendingMaterial {
         u32 materialID;
         dxRender_Visual* visual;
+        shared_str textureName;  // For particles (visual is null)
     };
     xr_vector<PendingMaterial> m_pendingMaterials;
+
+    // Cache for particle materials (texture name -> material ID)
+    xr_map<shared_str, u32> m_particleTextureToMaterialID;
 
     // Default PBR texture (1x1 RGBA8 packed texture for fallback)
     // Used when no PBR texture is specified in .thm metadata
@@ -460,6 +464,10 @@ public:
     // Creates material entry before PSO exists, returns material ID
     // Used to populate batch.bindlessMaterialID before GPU culling upload
     u32 PreRegisterBindlessMaterial(dxRender_Visual* visual);
+
+    // Pre-register bindless material for particle effects (texture name from CPEDef)
+    // Returns material ID for particle batch
+    u32 PreRegisterParticleMaterial(const shared_str& textureName);
 
     // Finalize pending materials (register textures to bindless descriptor heap)
     // Call once per frame when RenderContext is available

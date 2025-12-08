@@ -11,10 +11,7 @@
 #include "Layers/xrRender/RenderContext/RenderContext.h"
 #include "Layers/xrRender/RenderContext/PipelineState.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
-#include "Layers/xrRender/SkeletonCustom.h"
-#include "Layers/xrRender/FSkinned.h"
 #include "Layers/xrRender/FTreeVisual.h"
-#include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/ConstantSystem/FGConstantSystem.h"
 #include "Layers/xrRender/GPUCullingManager.h"  // For IndirectDrawArgs struct
 #include "Layers/xrRender/Backend/D3D12Backend.h"  // For SM6 bindless descriptor heap
@@ -48,44 +45,10 @@ static nvrhi::ShaderHandle s_bindlessPS;
 static nvrhi::BufferHandle s_drawIndexBuffer;  // Per-instance buffer with [0,1,2,3,...]
 static bool s_bindlessInitialized = false;
 
-// ═══════════════════════════════════════════════════════
-//  SKINNED MESH PIPELINE (Per-draw bone matrices)
-// ═══════════════════════════════════════════════════════
-// Separate pipeline for skeleton meshes with different vertex format
-// Non-HQ: 24 bytes (SHORT4 position, SHORT2 UV)
-static nvrhi::GraphicsPipelineHandle s_skinnedPipeline;
-static nvrhi::BindingLayoutHandle s_skinnedLayout;
-static nvrhi::InputLayoutHandle s_skinnedInputLayout;
-static nvrhi::ShaderHandle s_skinnedVS;
-static nvrhi::ShaderHandle s_skinnedPS;
-static bool s_skinnedInitialized = false;
-
-// HQ Skinned 1W: 36 bytes (FLOAT4 position, FLOAT2 UV, bone index in normal.w)
-// Covers 1W_HQ (36 bytes) - RenderMode 2 (RM_SINGLE_HQ) and 4 (RM_SKINNING_1B_HQ)
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ1WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ1WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ1WVS;
-static bool s_skinnedHQ1WInitialized = false;
-
-// HQ Skinned 4W: 40 bytes (FLOAT4 position, FLOAT2 UV, BLENDINDICES)
-// Covers 4W_HQ (40 bytes) - RenderMode 10 (RM_SKINNING_4B_HQ)
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ4WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ4WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ4WVS;
-static bool s_skinnedHQ4WInitialized = false;
-
-// HQ Skinned 2W/3W: 44 bytes (FLOAT4 position, FLOAT4 UV+indices)
-// Covers 2W_HQ and 3W_HQ (44 bytes) - RenderModes 6, 8
-static nvrhi::GraphicsPipelineHandle s_skinnedHQ2WPipeline;
-static nvrhi::InputLayoutHandle s_skinnedHQ2WInputLayout;
-static nvrhi::ShaderHandle s_skinnedHQ2WVS;
-static bool s_skinnedHQ2WInitialized = false;
-
 // ═══════════════════════════════════════════════════════════════════════════
 //  FORWARD DECLARATIONS
 // ═══════════════════════════════════════════════════════════════════════════
 static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
-static void InitializeSkinnedPipelines(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  EAGER PIPELINE INITIALIZATION
@@ -135,16 +98,15 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
         return;
     }
 
-    // Initialize all pipelines
+    // Initialize bindless pipeline (skinned pipelines moved to SkinningPassSetup)
     InitializeBindlessPipeline(device, dummyFramebuffer);
-    InitializeSkinnedPipelines(device, dummyFramebuffer);
 
     Msg("* [ForwardPass] Pipeline initialization complete");
 }
 
 void ShutdownForwardPipelines()
 {
-    // Release all pipeline resources
+    // Release bindless pipeline resources (skinned pipelines moved to SkinningPassSetup)
     s_bindlessPipeline = nullptr;
     s_bindlessLayout = nullptr;
     s_bindlessInputLayout = nullptr;
@@ -153,28 +115,6 @@ void ShutdownForwardPipelines()
     s_bindlessPS = nullptr;
     s_drawIndexBuffer = nullptr;
     s_bindlessInitialized = false;
-
-    s_skinnedPipeline = nullptr;
-    s_skinnedLayout = nullptr;
-    s_skinnedInputLayout = nullptr;
-    s_skinnedVS = nullptr;
-    s_skinnedPS = nullptr;
-    s_skinnedInitialized = false;
-
-    s_skinnedHQ1WPipeline = nullptr;
-    s_skinnedHQ1WInputLayout = nullptr;
-    s_skinnedHQ1WVS = nullptr;
-    s_skinnedHQ1WInitialized = false;
-
-    s_skinnedHQ4WPipeline = nullptr;
-    s_skinnedHQ4WInputLayout = nullptr;
-    s_skinnedHQ4WVS = nullptr;
-    s_skinnedHQ4WInitialized = false;
-
-    s_skinnedHQ2WPipeline = nullptr;
-    s_skinnedHQ2WInputLayout = nullptr;
-    s_skinnedHQ2WVS = nullptr;
-    s_skinnedHQ2WInitialized = false;
 
     Msg("* [ForwardPass] Pipeline resources released");
 }
@@ -337,235 +277,6 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
     s_bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  SKINNED PIPELINE INITIALIZATION
-// ═══════════════════════════════════════════════════════════════════════════
-static void InitializeSkinnedPipelines(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer)
-{
-    if (s_skinnedInitialized && s_skinnedHQ1WInitialized && s_skinnedHQ4WInitialized && s_skinnedHQ2WInitialized)
-        return;
-
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
-    if (!nvDevice)
-        return;
-
-    auto* shaderLoader = GEnv.Render->GetShaderLoader();
-    if (!shaderLoader)
-        return;
-
-    auto* backend = device->GetBackend();
-    nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
-
-    // Create shared skinned binding layout and pixel shader (if not already created)
-    if (!s_skinnedLayout) {
-        Msg("* [SkinnedPipeline] Creating binding layout...");
-        nvrhi::BindingLayoutDesc skinnedLayoutDesc;
-        skinnedLayoutDesc.visibility = nvrhi::ShaderType::All;
-        skinnedLayoutDesc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms (b0)
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),    // g_BoneMatrices (t3)
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // SkinnedMaterialCB (b4)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials
-            nvrhi::BindingLayoutItem::Sampler(0),
-        };
-        s_skinnedLayout = nvDevice->createBindingLayout(skinnedLayoutDesc);
-        Msg("* [SkinnedPipeline] Binding layout: %s", s_skinnedLayout ? "OK" : "FAILED");
-    }
-
-    if (!s_skinnedPS) {
-        auto skinnedPsResult = shaderLoader->LoadPixelShader("bindless_skinned", "main");
-        if (skinnedPsResult.handle) {
-            s_skinnedPS = skinnedPsResult.handle;
-        } else {
-            Msg("! [SkinnedPipeline] Failed to load pixel shader");
-            return;
-        }
-    }
-
-    // Create sampler if not exists
-    if (!s_linearSampler) {
-        nvrhi::SamplerDesc samplerDesc;
-        samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
-        samplerDesc.setAllFilters(true);
-        samplerDesc.setMaxAnisotropy(16.0f);
-        s_linearSampler = nvDevice->createSampler(samplerDesc);
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  SKINNED NON-HQ PIPELINE (24-byte format)
-    // ═══════════════════════════════════════════════════════
-    if (!s_skinnedInitialized) {
-        auto skinnedVsResult = shaderLoader->LoadVertexShader("bindless_skinned", "main");
-        if (skinnedVsResult.handle) {
-            s_skinnedVS = skinnedVsResult.handle;
-
-            constexpr u32 stride = 24;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA16_SNORM).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(8).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(12).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG16_SNORM).setOffset(20).setElementStride(stride),
-            };
-            s_skinnedInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedVS);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedInputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            Msg("* [SkinnedPipeline] About to call createGraphicsPipeline (24-byte)...");
-            s_skinnedPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinnedPipeline] Result: %s", s_skinnedPipeline ? "OK" : "FAILED");
-        }
-        s_skinnedInitialized = true;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  SKINNED HQ 1W PIPELINE (36-byte format)
-    // ═══════════════════════════════════════════════════════
-    if (!s_skinnedHQ1WInitialized) {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_hq", "main");
-        if (vsResult.handle) {
-            s_skinnedHQ1WVS = vsResult.handle;
-
-            constexpr u32 stride = 36;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
-            };
-            s_skinnedHQ1WInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedHQ1WVS);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ1WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ1WInputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            Msg("* [SkinnedHQ1W] About to call createGraphicsPipeline (36-byte)...");
-            s_skinnedHQ1WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinnedHQ1W] Result: %s", s_skinnedHQ1WPipeline ? "OK" : "FAILED");
-        }
-        s_skinnedHQ1WInitialized = true;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  SKINNED HQ 4W PIPELINE (40-byte format)
-    // ═══════════════════════════════════════════════════════
-    if (!s_skinnedHQ4WInitialized) {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_4w", "main");
-        if (vsResult.handle) {
-            s_skinnedHQ4WVS = vsResult.handle;
-
-            constexpr u32 stride = 40;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RG32_FLOAT).setOffset(28).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BLENDINDICES").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(36).setElementStride(stride),
-            };
-            s_skinnedHQ4WInputLayout = nvDevice->createInputLayout(attribs, 6, s_skinnedHQ4WVS);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ4WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ4WInputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            Msg("* [SkinnedHQ4W] About to call createGraphicsPipeline (40-byte)...");
-            s_skinnedHQ4WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinnedHQ4W] Result: %s", s_skinnedHQ4WPipeline ? "OK" : "FAILED");
-        }
-        s_skinnedHQ4WInitialized = true;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    //  SKINNED HQ 2W/3W PIPELINE (44-byte format)
-    // ═══════════════════════════════════════════════════════
-    if (!s_skinnedHQ2WInitialized) {
-        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_2w", "main");
-        if (vsResult.handle) {
-            s_skinnedHQ2WVS = vsResult.handle;
-
-            constexpr u32 stride = 44;
-            nvrhi::VertexAttributeDesc attribs[] = {
-                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
-                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
-            };
-            s_skinnedHQ2WInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedHQ2WVS);
-
-            nvrhi::GraphicsPipelineDesc pipeDesc;
-            pipeDesc.VS = s_skinnedHQ2WVS;
-            pipeDesc.PS = s_skinnedPS;
-            pipeDesc.inputLayout = s_skinnedHQ2WInputLayout;
-            if (bindlessLayout) {
-                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
-            } else {
-                pipeDesc.bindingLayouts = { s_skinnedLayout };
-            }
-            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
-            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
-            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
-            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
-
-            Msg("* [SkinnedHQ2W] About to call createGraphicsPipeline (44-byte)...");
-            s_skinnedHQ2WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-            Msg("* [SkinnedHQ2W] Result: %s", s_skinnedHQ2WPipeline ? "OK" : "FAILED");
-        }
-        s_skinnedHQ2WInitialized = true;
-    }
-
-    Msg("* [SkinnedPipeline] All pipelines initialized");
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  SKINNED MESH RENDERING (Separate Pass)
-// ═══════════════════════════════════════════════════════════════════════════
-// Renders skeleton meshes with per-draw bone matrices.
-// Separated from bindless forward pass for easier debugging in RenderDoc.
 
 void renderBindlessForward(
     ng::RenderContext* ctx,
@@ -946,287 +657,7 @@ void renderBindlessForward(
 
     s_gpuDrivenDraws += visibleCount;
 
-    // Skinned meshes are rendered in a separate pass (renderBindlessSkinned)
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  SKINNED MESH RENDERING PASS
-// ═══════════════════════════════════════════════════════════════════════════
-void renderBindlessSkinned(
-    ng::RenderContext* ctx,
-    ng::RenderDevice* device,
-    const GeometryCollector* geometry,
-    nvrhi::ITexture* colorRT,
-    nvrhi::ITexture* depthRT,
-    const BindlessForwardConfig& config)
-{
-    using namespace RENDER_NAMESPACE::bindless;
-
-    if (!geometry || geometry->GetBatches().empty())
-        return;
-
-    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
-    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-    if (!cmdList || !nvDevice)
-        return;
-
-    // ═══════════════════════════════════════════════════════
-    //  SETUP FRAMEBUFFER AND RENDER STATE
-    // ═══════════════════════════════════════════════════════
-    nvrhi::FramebufferDesc fbDesc;
-    fbDesc.addColorAttachment(colorRT);
-    fbDesc.setDepthAttachment(depthRT);
-    auto framebuffer = nvDevice->createFramebuffer(fbDesc);
-    if (!framebuffer)
-        return;
-
-    // Set viewport
-    const auto& rtDesc = colorRT->getDesc();
-    nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
-
-    // Get material buffer reference
-    auto& matBuffer = MaterialBuffer::Instance();
-
-    // Create static_globals buffer for skinned rendering
-    nvrhi::BufferDesc staticGlobalsCbDesc;
-    staticGlobalsCbDesc.byteSize = sizeof(StaticGlobals);
-    staticGlobalsCbDesc.isConstantBuffer = true;
-    staticGlobalsCbDesc.isVolatile = true;
-    staticGlobalsCbDesc.maxVersions = 16;
-    auto staticGlobalsCB = nvDevice->createBuffer(staticGlobalsCbDesc);
-
-    // Fill static globals
-    StaticGlobals staticGlobals;
-    FillGlobalConstants(staticGlobals);
-    SunLightData sunData;
-    GetSunLightData(sunData, 2.0f);
-    FillSunConstants(staticGlobals, sunData);
-    cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
-
-    // Get D3D12 backend for bindless descriptor table
-    auto* backend = device->GetBackend();
-
-    const auto& batches = geometry->GetBatches();
-
-    // Count skinned batches
-    u32 skinnedCount = 0;
-    for (const auto& batch : batches) {
-        if (batch.isSkinned)
-            skinnedCount++;
-    }
-
-    if (skinnedCount == 0)
-        return;
-
-    // Check if skinned pipelines are initialized
-    if (!s_skinnedPipeline && !s_skinnedHQ1WPipeline && !s_skinnedHQ4WPipeline && !s_skinnedHQ2WPipeline)
-        return;
-
-    // Create dynamic_transforms buffer (b0) - contains m_W, m_VP for skeleton
-    nvrhi::BufferDesc dynTransCbDesc;
-    dynTransCbDesc.byteSize = sizeof(DynamicTransforms);  // ~224 bytes
-    dynTransCbDesc.isConstantBuffer = true;
-    dynTransCbDesc.isVolatile = true;
-    dynTransCbDesc.maxVersions = 128;  // Many skeleton draws per frame
-    auto dynTransformsCB = nvDevice->createBuffer(dynTransCbDesc);
-
-    // Create bone matrix structured buffer (t3 SRV) - 78 bones * float3x4 = 3744 bytes
-    constexpr u32 MAX_BONES = 78;
-    constexpr u32 BONE_STRIDE = sizeof(float) * 12;  // float3x4 per bone (48 bytes)
-
-    nvrhi::BufferDesc boneSbDesc;
-    boneSbDesc.byteSize = MAX_BONES * BONE_STRIDE;
-    boneSbDesc.structStride = BONE_STRIDE;  // StructuredBuffer stride
-    boneSbDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-    boneSbDesc.keepInitialState = true;
-    boneSbDesc.debugName = "BoneMatrices_SB";
-    auto bonesSB = nvDevice->createBuffer(boneSbDesc);
-
-    if (!bonesSB) {
-        Msg("! [SkinnedRender] Failed to create bones structured buffer");
-        return;
-    }
-
-    // Create material ID constant buffer (b4) - 16 bytes for alignment
-    nvrhi::BufferDesc matIdCbDesc;
-    matIdCbDesc.byteSize = 16;  // uint materialID + 3 padding
-    matIdCbDesc.isConstantBuffer = true;
-    matIdCbDesc.isVolatile = true;
-    matIdCbDesc.maxVersions = 128;
-    auto matIdCB = nvDevice->createBuffer(matIdCbDesc);
-
-    // Bone matrices as float3x4 (3 rows of float4)
-    // Declare struct outside loop for reuse
-    struct Float3x4 {
-        float m[3][4];
-    };
-
-    // Pre-allocate full bone array (78 bones) - initialized to identity
-    xr_vector<Float3x4> boneData(MAX_BONES);
-    for (u32 i = 0; i < MAX_BONES; i++) {
-        // Identity matrix
-        boneData[i].m[0][0] = 1.0f; boneData[i].m[0][1] = 0.0f; boneData[i].m[0][2] = 0.0f; boneData[i].m[0][3] = 0.0f;
-        boneData[i].m[1][0] = 0.0f; boneData[i].m[1][1] = 1.0f; boneData[i].m[1][2] = 0.0f; boneData[i].m[1][3] = 0.0f;
-        boneData[i].m[2][0] = 0.0f; boneData[i].m[2][1] = 0.0f; boneData[i].m[2][2] = 1.0f; boneData[i].m[2][3] = 0.0f;
-    }
-
-    // Add bindless descriptor table for ResourceDescriptorHeap access
-    nvrhi::IDescriptorTable* bindlessTable = nullptr;
-    if (backend) {
-        bindlessTable = backend->GetBindlessDescriptorTable();
-    }
-
-    // Render each skinned batch with its own bone matrices
-    for (const auto& batch : batches) {
-        if (!batch.isSkinned)
-            continue;
-
-        if (!batch.vertexBuffer || !batch.indexBuffer)
-            continue;
-
-        // Select appropriate pipeline based on vertex stride
-        // - stride 24: non-HQ (SHORT4 position, SHORT2 UV)
-        // - stride 36: 1W_HQ (FLOAT4 position, bone index in normal.w)
-        // - stride 40: 4W_HQ (FLOAT4 position, BLENDINDICES)
-        // - stride 44: 2W_HQ (FLOAT4 position, FLOAT4 TEXCOORD with bone indices)
-        nvrhi::IGraphicsPipeline* selectedPipeline = nullptr;
-        const char* pipelineName = "unknown";
-
-        if (batch.vertexStride == 36) {
-            selectedPipeline = s_skinnedHQ1WPipeline.Get();
-            pipelineName = "HQ1W (36-byte)";
-        } else if (batch.vertexStride == 40) {
-            selectedPipeline = s_skinnedHQ4WPipeline.Get();
-            pipelineName = "HQ4W (40-byte)";
-        } else if (batch.vertexStride == 44) {
-            selectedPipeline = s_skinnedHQ2WPipeline.Get();
-            pipelineName = "HQ2W (44-byte)";
-        } else if (batch.vertexStride == 24) {
-            selectedPipeline = s_skinnedPipeline.Get();
-            pipelineName = "non-HQ (24-byte)";
-        } else if (batch.vertexStride >= 36) {
-            selectedPipeline = s_skinnedHQ1WPipeline.Get();
-            pipelineName = "HQ1W (fallback)";
-        } else {
-            selectedPipeline = s_skinnedPipeline.Get();
-            pipelineName = "non-HQ (fallback)";
-        }
-
-        if (!selectedPipeline) {
-            static bool s_pipelineWarningLogged = false;
-            if (!s_pipelineWarningLogged) {
-                Msg("! [SkinnedRender] No pipeline available for stride %u", batch.vertexStride);
-                s_pipelineWarningLogged = true;
-            }
-            continue;
-        }
-
-        // Log pipeline selection (once per stride)
-        static u32 s_lastLoggedStride = 0;
-        if (batch.vertexStride != s_lastLoggedStride) {
-            Msg("* [SkinnedRender] Using %s pipeline for stride %u, VB=%p IB=%p",
-                pipelineName, batch.vertexStride,
-                batch.vertexBuffer.Get(), batch.indexBuffer.Get());
-            s_lastLoggedStride = batch.vertexStride;
-        }
-
-        // Set up graphics state for this batch
-        nvrhi::GraphicsState skinnedState;
-        skinnedState.pipeline = selectedPipeline;
-        skinnedState.framebuffer = framebuffer;
-        skinnedState.viewport.addViewport(viewport);
-        skinnedState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-
-        // Get parent skeleton for bone data
-        RENDER_NAMESPACE::CKinematics* Parent = nullptr;
-        u32 visualType = batch.visual ? batch.visual->getType() : 0;
-
-        if (visualType == MT_SKELETON_GEOMDEF_ST) {
-            auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_ST*>(batch.visual);
-            Parent = skeletonMesh->GetParent();
-        } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
-            auto* skeletonMesh = static_cast<RENDER_NAMESPACE::CSkeletonX_PM*>(batch.visual);
-            Parent = skeletonMesh->GetParent();
-        }
-
-        if (!Parent)
-            continue;
-
-        // Calculate bones
-        Parent->CalculateBones(TRUE);
-
-        // Prepare dynamic_transforms (b0) with skeleton's world matrix
-        DynamicTransforms dynTransData = {};
-        FillDynamicTransforms(dynTransData, batch.worldMatrix);
-
-        // Build bone matrix array (float3x4 format for shader)
-        u32 boneCount = Parent->LL_BoneCount();
-        u32 bonesToFill = std::min(boneCount, MAX_BONES);
-
-        // Debug: Log bone count once
-        static bool s_loggedBoneCount = false;
-        if (!s_loggedBoneCount) {
-            Msg("* [SkinnedRender] Skeleton has %u bones, filling %u into buffer of %u",
-                boneCount, bonesToFill, MAX_BONES);
-            s_loggedBoneCount = true;
-        }
-
-        // Fill bone data into pre-allocated array
-        for (u32 i = 0; i < bonesToFill; i++) {
-            const Fmatrix& bone = Parent->LL_GetTransform_R(u16(i));
-            // Convert Fmatrix (column-major) to float3x4 row-major for shader
-            boneData[i].m[0][0] = bone._11; boneData[i].m[0][1] = bone._21; boneData[i].m[0][2] = bone._31; boneData[i].m[0][3] = bone._41;
-            boneData[i].m[1][0] = bone._12; boneData[i].m[1][1] = bone._22; boneData[i].m[1][2] = bone._32; boneData[i].m[1][3] = bone._42;
-            boneData[i].m[2][0] = bone._13; boneData[i].m[2][1] = bone._23; boneData[i].m[2][2] = bone._33; boneData[i].m[2][3] = bone._43;
-        }
-
-        // Upload dynamic_transforms (b0) with skeleton's world matrix
-        cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
-
-        // Upload ALL bone matrices (t3 structured buffer)
-        cmdList->writeBuffer(bonesSB, boneData.data(), MAX_BONES * sizeof(Float3x4));
-
-        // Upload material ID (b4)
-        struct SkinnedMaterialCB {
-            u32 materialID;
-            u32 pad0, pad1, pad2;
-        } matIdData;
-        matIdData.materialID = batch.bindlessMaterialID;
-        matIdData.pad0 = matIdData.pad1 = matIdData.pad2 = 0;
-        cmdList->writeBuffer(matIdCB, &matIdData, sizeof(matIdData));
-
-        // Create binding set AFTER writing buffer data
-        nvrhi::BindingSetDesc skinnedBindDesc;
-        skinnedBindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
-            nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(3, bonesSB),  // t3 bone matrices
-            nvrhi::BindingSetItem::ConstantBuffer(4, matIdCB),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-            nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-        };
-        auto skinnedBindingSet = nvDevice->createBindingSet(skinnedBindDesc, s_skinnedLayout);
-
-        // Set up bindings for this draw
-        skinnedState.bindings = { skinnedBindingSet };
-        if (bindlessTable) {
-            skinnedState.addBindingSet(bindlessTable);
-        }
-
-        // Set vertex/index buffers for this skeleton mesh
-        skinnedState.vertexBuffers = { {batch.vertexBuffer, 0, 0} };
-        skinnedState.indexBuffer = { batch.indexBuffer, nvrhi::Format::R16_UINT, 0 };
-
-        cmdList->setGraphicsState(skinnedState);
-
-        // Draw
-        cmdList->drawIndexed(
-            nvrhi::DrawArguments()
-                .setVertexCount(batch.indexCount)
-                .setStartIndexLocation(batch.startIndex)
-                .setStartVertexLocation(batch.baseVertex)
-        );
-    }
+    // Skinned meshes are rendered in the SkinningPass (see SkinningPassSetup.cpp)
 }
 
 framegraph::DefaultOutputLayout setupForwardColorPass(
@@ -1325,6 +756,7 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
             //  BINDLESS RENDERING PATH (GPU-DRIVEN MULTI-DRAW)
             // ═══════════════════════════════════════════════════════
             // Render static geometry with GPU-driven multi-draw
+            // NOTE: Skinned meshes are rendered in SkinningPass (see SkinningPassSetup.cpp)
             renderBindlessForward(
                 ctx,
                 data.device,
@@ -1333,19 +765,6 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
                 depthRT,
                 data.bindlessConfig,
                 data.materialCache
-            );
-
-            // ═══════════════════════════════════════════════════════
-            //  SKINNED MESH RENDERING (Per-draw bone matrices)
-            // ═══════════════════════════════════════════════════════
-            // Render skeleton meshes separately with bone matrices
-            renderBindlessSkinned(
-                ctx,
-                data.device,
-                data.geometry,
-                colorRT,
-                depthRT,
-                data.bindlessConfig
             );
         }
     );

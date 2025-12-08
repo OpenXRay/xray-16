@@ -801,7 +801,7 @@
     <ClInclude Include="..\xrRender\FrameGraph\FrameGraph.h">
       <Filter>Framegraph</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\FrameGraphPasses\HUDPassSetup.h">
+    <ClInclude Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.h">
@@ -1588,7 +1588,7 @@
     <ClCompile Include="..\xrRender\FrameGraph\FrameGraph.cpp">
       <Filter>Framegraph</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\FrameGraphPasses\HUDPassSetup.cpp">
+    <ClCompile Include="..\xrRender\FrameGraphPasses\SkinningPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ImGuiPassSetup.cpp">

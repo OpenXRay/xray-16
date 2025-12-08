@@ -2957,6 +2957,55 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     return materialID;
 }
 
+// Pre-register bindless material for particle effects
+// Particles have their texture name in CPEDef, not in visual
+u32 MaterialCache::PreRegisterParticleMaterial(const shared_str& textureName)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (!textureName.size() || !textureName[0])
+        return UINT32_MAX;
+
+    // Check cache first
+    auto it = m_particleTextureToMaterialID.find(textureName);
+    if (it != m_particleTextureToMaterialID.end())
+        return it->second;
+
+    // Check if bindless system is initialized
+    auto& materialBuffer = MaterialBuffer::Instance();
+    if (!materialBuffer.IsInitialized())
+        return UINT32_MAX;
+
+    // Build MaterialData for particle (just needs diffuse texture)
+    MaterialData matData = {};
+    matData.diffuseIndex = INVALID_TEXTURE_INDEX;
+    matData.normalIndex = INVALID_TEXTURE_INDEX;
+    matData.detailIndex = INVALID_TEXTURE_INDEX;
+    matData.pbrIndex = INVALID_TEXTURE_INDEX;
+    matData.detailScale = 1.0f;
+    matData.alphaRef = 0.01f / 255.0f;  // Minimal alpha test for particles
+    matData.flags = 0;  // No alpha test, no normal map for particles
+    matData.padding = 0.0f;
+
+    // Register with material buffer
+    u32 materialID = materialBuffer.RegisterMaterial(matData);
+
+    // Cache for future lookups
+    m_particleTextureToMaterialID[textureName] = materialID;
+
+    // Add to pending list for descriptor registration
+    PendingMaterial pending;
+    pending.materialID = materialID;
+    pending.visual = nullptr;  // No visual for particles
+    pending.textureName = textureName;  // Store texture name directly
+    m_pendingMaterials.push_back(pending);
+
+    Msg("* [MaterialCache] PreRegisterParticle: matID=%u tex='%s' pending=%u",
+        materialID, textureName.c_str(), static_cast<u32>(m_pendingMaterials.size()));
+
+    return materialID;
+}
+
 // ══════════════════════════════════════════════════════════
 //  FINALIZE PENDING MATERIALS (Register Textures to Bindless Descriptor Heap)
 // ══════════════════════════════════════════════════════════
@@ -3001,7 +3050,7 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         dxRender_Visual* visual = pending.visual;
         u32 materialID = pending.materialID;
 
-        if (!visual || materialID == UINT32_MAX)
+        if (materialID == UINT32_MAX)
             continue;
 
         // Get material data to update
@@ -3012,8 +3061,14 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
         MaterialData matData = *existingMat;
         bool updated = false;
 
-        // Get diffuse texture name from visual
-        shared_str diffuseName = visual->textureName;
+        // Get diffuse texture name from visual or pending (particle case)
+        shared_str diffuseName;
+        if (visual) {
+            diffuseName = visual->textureName;
+        } else if (pending.textureName.size()) {
+            // Particle material - texture name stored directly
+            diffuseName = pending.textureName;
+        }
 
         // Skip if no diffuse texture name
         if (!diffuseName.size() || !diffuseName[0])
