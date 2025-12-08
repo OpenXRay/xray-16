@@ -25,6 +25,8 @@ public:
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
 
+    const FSlideWindowItem& GetSWI() const { return nSWI; }
+
 private:
     FProgressive(const FProgressive& other);
     void operator=(const FProgressive& other);

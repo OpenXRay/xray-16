@@ -2,20 +2,16 @@
 #include "common.h"
 #include "bindless_common.h"
 
-cbuffer BonesCB : register(b3)
-{
-    float3x4 sbones_array[78];
-}
+StructuredBuffer<float3x4> g_BoneMatrices : register(t3);
 
 float3x4 get_bone(int legacy_index)
 {
-    return sbones_array[legacy_index / 3];
+    return g_BoneMatrices[legacy_index / 3];
 }
 
 float3 unpack_d3dcolor_normal(float3 packed)
 {
-    float3 swizzled = packed.zyx;
-    return swizzled * 2.0 - 1.0;
+    return packed * 2.0 - 1.0;
 }
 
 float4 skinning_pos(float4 pos, float3x4 bone)
@@ -50,20 +46,16 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-#define DEBUG_SKIP_SKINNING 1
+#define DEBUG_SKIP_SKINNING 0
 
 VS_OUTPUT main(VS_INPUT_4W v)
 {
     VS_OUTPUT o;
 
-    float3 N_raw = v.N.zyx;
-    float3 T_raw = v.T.zyx;
-    float3 B_raw = v.B.zyx;
-    float4 ind   = v.ind.zyxw;
-
-    float3 N = N_raw * 2.0 - 1.0;
-    float3 T = T_raw * 2.0 - 1.0;
-    float3 B = B_raw * 2.0 - 1.0;
+    float3 N = v.N.xyz * 2.0 - 1.0;
+    float3 T = v.T.xyz * 2.0 - 1.0;
+    float3 B = v.B.xyz * 2.0 - 1.0;
+    float4 ind = v.ind;
 
 #if DEBUG_SKIP_SKINNING
     float4 skinnedPos = float4(v.P.xyz, 1.0);

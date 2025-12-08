@@ -22,14 +22,11 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-cbuffer BonesCB : register(b3)
-{
-    float3x4 sbones_array[78];
-};
+StructuredBuffer<float3x4> g_BoneMatrices : register(t3);
 
 float3x4 get_bone(int legacy_index)
 {
-    return sbones_array[legacy_index / 3];
+    return g_BoneMatrices[legacy_index / 3];
 }
 
 float3 unpack_skinned_normal(float3 packed)
@@ -52,7 +49,7 @@ float4 unpack_skinned_position(float4 v)
     return float4(v.xyz * 12.0, 1.0);
 }
 
-#define DEBUG_SKIP_SKINNING 1
+#define DEBUG_SKIP_SKINNING 0
 
 VS_OUTPUT main(VS_INPUT input)
 {
