@@ -67,6 +67,9 @@ public:
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
 
+    // Accessor for slide window data (used by framegraph renderer for LOD selection)
+    const FSlideWindowItem* GetSWI() const { return pSWI; }
+
 private:
     FTreeVisual_PM(const FTreeVisual_PM& other);
     void operator=(const FTreeVisual_PM& other);
