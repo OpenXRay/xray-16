@@ -109,13 +109,22 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
         return false;
     }
 
-    // Create command list
+    // Create per-frame command list (for rendering)
     nvrhi::CommandListParameters cmdParams;
     cmdParams.enableImmediateExecution = false; // D3D12 uses deferred execution
     m_commandList = m_nvrhiDevice->createCommandList(cmdParams);
 
     if (!m_commandList) {
         Msg("! [D3D12Backend] Failed to create command list");
+        Shutdown();
+        return false;
+    }
+
+    // Create dedicated upload command list (reusable for buffer uploads)
+    // This prevents creating a new command list for every buffer, which exhausts D3D12 resources
+    m_uploadCommandList = m_nvrhiDevice->createCommandList(cmdParams);
+    if (!m_uploadCommandList) {
+        Msg("! [D3D12Backend] Failed to create upload command list");
         Shutdown();
         return false;
     }
@@ -149,6 +158,7 @@ void D3D12Backend::Shutdown() {
     m_bindlessLayout = nullptr;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
+    m_uploadCommandList = nullptr;
     m_commandList = nullptr;
     m_nvrhiDevice = nullptr;
 
@@ -534,6 +544,26 @@ void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
             m_nvrhiDevice->executeCommandList(commandLists[i]);
         }
     }
+}
+
+void D3D12Backend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
+    if (!m_uploadCommandList || !buffer || !data || size == 0)
+        return;
+
+    // Reuse dedicated upload command list (avoids creating new list every time)
+    // NVRHI should handle synchronization internally via its fence tracking
+    m_uploadCommandList->open();
+    m_uploadCommandList->writeBuffer(buffer, data, size);
+    m_uploadCommandList->close();
+
+    // Execute upload command list
+    m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+
+    // IMPORTANT: Force synchronization after each upload to prevent race conditions
+    // Without this, sequential uploads may corrupt each other's data because the
+    // upload heap memory can be reused before the GPU copy completes.
+    // TODO: Optimize later with fence-based tracking instead of full stall
+    m_nvrhiDevice->waitForIdle();
 }
 
 nvrhi::ICommandList* D3D12Backend::CreateCommandList() {

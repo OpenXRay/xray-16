@@ -31,6 +31,7 @@ struct GeometryBatch {
     u32 indexCount = 0;
     u32 startIndex = 0;
     s32 baseVertex = 0;
+    u32 vertexStride = 0;  // Vertex stride for skinned meshes (24=1W, 28=2W/3W/4W)
 
     // Material IDs
     u32 materialID = 0;              // Legacy material ID (for sorting)
@@ -75,6 +76,10 @@ struct GeometryBatch {
 
     // Visibility/culling
     bool isVisible = true;
+
+    // Skinned mesh flag - determines which pipeline to use
+    // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
+    bool isSkinned = false;
 
     // SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
     // SSA = R / distSQ where R = bounding sphere radius, distSQ = distance squared to camera

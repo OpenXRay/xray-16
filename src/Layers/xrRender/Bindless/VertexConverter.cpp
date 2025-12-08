@@ -32,8 +32,10 @@ float VertexConverter::UnpackLmapUV(s16 value)
 
 float VertexConverter::UnpackMuModelUV(s16 value)
 {
-    // mu_model UV: value * (32/32768)
-    return static_cast<float>(value) * (32.0f / 32768.0f);
+    // mu_model UV: value * (1/quant) where quant = 32768/16 = 2048
+    // Legacy shader: tc = I.tc * consts.xy, where consts.x = 1.0/FTreeVisual_quant = 1.0/2048
+    // So: UV = value * (1.0 / 2048.0) = value * (16.0 / 32768.0)
+    return static_cast<float>(value) * (16.0f / 32768.0f);
 }
 
 Fvector3 VertexConverter::UnpackNormal(u32 packed)

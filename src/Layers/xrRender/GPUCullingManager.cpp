@@ -522,21 +522,27 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         return;
 
     const auto& batches = geometry->GetBatches();
-    m_objectCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
+    u32 totalBatches = static_cast<u32>(batches.size());
 
-    if (m_objectCount == 0)
+    if (totalBatches == 0)
         return;
 
     // Build object data, draw args, and material ID arrays
+    // NOTE: Skip skinned batches - they use separate per-draw rendering with bone matrices
     m_objectData.clear();
-    m_objectData.reserve(m_objectCount);
+    m_objectData.reserve(totalBatches);
     m_drawArgsData.clear();
-    m_drawArgsData.reserve(m_objectCount);
+    m_drawArgsData.reserve(totalBatches);
     m_materialIDData.clear();
-    m_materialIDData.reserve(m_objectCount);
+    m_materialIDData.reserve(totalBatches);
 
-    for (u32 i = 0; i < m_objectCount; i++) {
+    for (u32 i = 0; i < totalBatches; i++) {
         const auto& batch = batches[i];
+
+        // Skip skinned batches - they use a separate per-draw rendering path
+        // with bone matrices and cannot use the GPU-driven multi-draw system
+        if (batch.isSkinned)
+            continue;
 
         // ─────────────────────────────────────────────────────
         //  BUILD OBJECT DATA (for culling)
@@ -551,7 +557,8 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         obj.position = batch.worldBoundsCenter;
         obj.radius = batch.worldBoundsRadius;
 
-        obj.batchIndex = i;
+        // Use GPU-local index (position in filtered array) for instance data lookup
+        obj.batchIndex = static_cast<u32>(m_objectData.size());
 
         // Set flags based on batch properties
         obj.flags = 0;
@@ -592,6 +599,12 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         // ─────────────────────────────────────────────────────
         m_materialIDData.push_back(batch.bindlessMaterialID);
     }
+
+    // Set object count based on how many non-skinned batches we added
+    m_objectCount = std::min(static_cast<u32>(m_objectData.size()), m_maxObjects);
+
+    if (m_objectCount == 0)
+        return;
 
     // Upload to GPU
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -1791,16 +1804,21 @@ void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const Geometr
         return;
 
     const auto& batches = geometry->GetBatches();
-    u32 instanceCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
+    u32 batchCount = static_cast<u32>(batches.size());
 
-    if (instanceCount == 0)
+    if (batchCount == 0)
         return;
 
     m_instanceData.clear();
-    m_instanceData.reserve(instanceCount);
+    m_instanceData.reserve(batchCount);
 
-    for (u32 i = 0; i < instanceCount; i++) {
+    for (u32 i = 0; i < batchCount; i++) {
         const auto& batch = batches[i];
+
+        // Skip skinned batches - they use a separate per-draw rendering path
+        // with bone matrices and cannot use the GPU-driven multi-draw system
+        if (batch.isSkinned)
+            continue;
 
         GPUInstanceData inst;
         // Transpose for HLSL row-major convention
@@ -1815,6 +1833,10 @@ void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const Geometr
 
         m_instanceData.push_back(inst);
     }
+
+    u32 instanceCount = std::min(static_cast<u32>(m_instanceData.size()), m_maxObjects);
+    if (instanceCount == 0)
+        return;
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
     cmdList->writeBuffer(m_instanceBuffer, m_instanceData.data(), instanceCount * sizeof(GPUInstanceData));

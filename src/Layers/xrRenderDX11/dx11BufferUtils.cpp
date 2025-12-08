@@ -4,6 +4,7 @@
 
 #include <FlexibleVertexFormat.h>
 #include <nvrhi/nvrhi.h>
+#include "xrEngine/IRenderBackend.h"  // For DeviceState enum
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -54,21 +55,29 @@ static nvrhi::BufferHandle CreateNvrhiBuffer(nvrhi::IDevice* device, const void*
         desc.initialState = nvrhi::ResourceStates::Common;
 
     nvrhi::BufferHandle buffer = device->createBuffer(desc);
-
-    if (buffer && pData)
+    if (!buffer)
     {
-        // Upload initial data using a dedicated command list
-        // (The per-frame command list may not be ready during initialization)
-        nvrhi::CommandListParameters cmdParams;
-        cmdParams.enableImmediateExecution = false;  // D3D12 uses deferred execution
-        nvrhi::CommandListHandle uploadCmdList = device->createCommandList(cmdParams);
-        if (uploadCmdList)
+        // Check if device was removed
+        if (GEnv.Backend && GEnv.Backend->GetDeviceState() == DeviceState::Lost)
         {
-            uploadCmdList->open();
-            uploadCmdList->writeBuffer(buffer, pData, dataSize);
-            uploadCmdList->close();
-            device->executeCommandList(uploadCmdList);
-            // Note: No need to wait - NVRHI handles synchronization
+            Msg("! [NVRHI] ERROR: Device Removed!");
+        }
+        Msg("! [NVRHI] Failed to create %s (size=%u bytes)", desc.debugName, dataSize);
+        return nullptr;
+    }
+
+    if (pData)
+    {
+        // Use backend's dedicated upload command list (reusable, prevents resource exhaustion)
+        // Previously we created a new command list for EVERY buffer, which exhausted D3D12's
+        // command allocator pool during model loading and caused DEVICE_REMOVED errors
+        if (GEnv.Backend)
+        {
+            GEnv.Backend->UploadBufferData(buffer, pData, dataSize);
+        }
+        else
+        {
+            Msg("! [NVRHI] ERROR: Backend not available for buffer upload");
         }
     }
 

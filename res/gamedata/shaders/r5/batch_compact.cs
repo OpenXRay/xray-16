@@ -56,7 +56,9 @@ void main(uint3 dtID : SV_DispatchThreadID)
         g_OutputDrawArgs.Store(outOffset + 4, instanceCount);
         g_OutputDrawArgs.Store(outOffset + 8, startIndex);
         g_OutputDrawArgs.Store(outOffset + 12, asuint(baseVertex));
-        g_OutputDrawArgs.Store(outOffset + 16, startInstance);
+        // CRITICAL: Set startInstanceLocation to outputIdx for multi-draw
+        // With instanceCount=1, SV_InstanceID in VS will equal outputIdx (draw index)
+        g_OutputDrawArgs.Store(outOffset + 16, outputIdx);
 
         // Copy batch index and material ID for bindless rendering
         g_VisibleBatchIndices[outputIdx] = batchIdx;

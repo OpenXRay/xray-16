@@ -126,6 +126,7 @@ void load_hw(Fvisual& V, const TSrc* src)
     V.p_rm_Vertices->Create(V.vCount * V.vStride, true); // VB may be read by wallmarks code
 
     TDst* dst = static_cast<TDst*>(V.p_rm_Vertices->Map());
+    TDst* dstStart = dst;  // Save for debug
 
     // XXX: install some Ultra HD models pack and test the parallel code
     // For the original game models parallel code is always slower...
@@ -159,8 +160,124 @@ void load_hw(Fvisual& V, const TSrc* src)
             src++;
         }
     }
+
+    // DEBUG: Verify converted vertex data for all HQ float formats
+    if constexpr (std::is_same_v<TDst, vertHW_1W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_1W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ1W vertex data check (stride=%u, count=%u, sizeof=%zu):",
+                V.vStride, V.vCount, sizeof(vertHW_1W<float>));
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bone=%u",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3], verts[i].get_bone());
+            }
+            // Raw hex dump of first 2 vertices (72 bytes)
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row*36+b) < V.vCount*V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row*36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+    if constexpr (std::is_same_v<TDst, vertHW_2W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_2W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ2W vertex data check (stride=%u, count=%u):", V.vStride, V.vCount);
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bones=(%u,%u) w=%f",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3],
+                    verts[i].get_bone(0), verts[i].get_bone(1), verts[i].get_weight());
+            }
+            // Raw hex dump of first 2 vertices (72 bytes)
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row * 36 + b) < V.vCount * V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row * 36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+    if constexpr (std::is_same_v<TDst, vertHW_3W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_3W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ3W vertex data check (stride=%u, count=%u):", V.vStride, V.vCount);
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bones=(%u,%u,%u)",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3],
+                    verts[i].get_bone(0), verts[i].get_bone(1), verts[i].get_bone(2));
+            }// Raw hex dump of first 2 vertices (72 bytes)
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row * 36 + b) < V.vCount * V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row * 36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+    if constexpr (std::is_same_v<TDst, vertHW_4W<float>>) {
+        static bool s_debugLogged = false;
+        if (!s_debugLogged && V.vCount >= 5) {
+            s_debugLogged = true;
+            const vertHW_4W<float>* verts = dstStart;
+            Msg("* [SkinnedLoad] HQ4W vertex data check (stride=%u, count=%u):", V.vStride, V.vCount);
+            for (u32 i = 0; i < 5; i++) {
+                Msg("  Vtx %u: pos=(%f, %f, %f, %f) bones=(%u,%u,%u,%u)",
+                    i, verts[i].Position[0], verts[i].Position[1],
+                    verts[i].Position[2], verts[i].Position[3],
+                    verts[i].get_bone(0), verts[i].get_bone(1),
+                    verts[i].get_bone(2), verts[i].get_bone(3));
+            }
+            // Raw hex dump of first 2 vertices (72 bytes)
+            const u8* raw = reinterpret_cast<const u8*>(dstStart);
+            Msg("* [SkinnedLoad] RAW HEX dump (first 72 bytes = 2 vertices):");
+            for (u32 row = 0; row < 2; row++) {
+                char hex[256];
+                int pos = 0;
+                pos += snprintf(hex + pos, sizeof(hex) - pos, "  Vtx%u: ", row);
+                for (u32 b = 0; b < 36 && (row * 36 + b) < V.vCount * V.vStride; b++) {
+                    pos += snprintf(hex + pos, sizeof(hex) - pos, "%02X ", raw[row * 36 + b]);
+                }
+                Msg("%s", hex);
+            }
+        }
+    }
+
     V.p_rm_Vertices->Unmap(true); // upload vertex data
     V.rm_geom.create(get_decl<TDst>(), *V.p_rm_Vertices, *V.p_rm_Indices);
+
+    // DEBUG: Log buffer pointer after upload
+    static int s_uploadLogCount = 0;
+    if (s_uploadLogCount < 5) {
+        nvrhi::IBuffer* vbPtr = V.p_rm_Vertices->GetBufferHandle().Get();
+        Msg("* [SkinnedUpload] VB=%p stride=%u count=%u size=%u",
+            vbPtr, V.vStride, V.vCount, V.vStride * V.vCount);
+        s_uploadLogCount++;
+    }
 }
 
 void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)

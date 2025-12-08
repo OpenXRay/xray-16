@@ -2905,7 +2905,7 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     matData.detailIndex = INVALID_TEXTURE_INDEX;
     matData.pbrIndex = INVALID_TEXTURE_INDEX;
     matData.detailScale = 1.0f;
-    matData.alphaRef = 0.5f;
+    matData.alphaRef = 0.5f;  // Default, will be overwritten if blender data available
     matData.flags = 0;
     matData.padding = 0.0f;
 
@@ -2914,11 +2914,19 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
         matData.detailScale = GetDetailScale(visual->textureName);
     }
 
-    // Get material flags from MaterialSystem
+    // Get material flags from MaterialSystem (queries blender properties)
     if (visual->shaderName.size() > 0) {
         const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str());
+
+        Msg("* [MaterialCache] '%s': alphaTest=%d, alphaRef=%d, transparent=%d",
+            visual->shaderName.c_str(), matInfo.alphaTest, matInfo.alphaRef, matInfo.transparent);
+
         if (matInfo.alphaTest) {
             matData.flags |= MAT_FLAG_ALPHA_TEST;
+            // Use actual alphaRef from blender, normalized to 0.0-1.0
+            matData.alphaRef = matInfo.alphaRef / 255.0f;
+            Msg("* [MaterialCache] -> SET MAT_FLAG_ALPHA_TEST, alphaRef=%.3f (%d/255)",
+                matData.alphaRef, matInfo.alphaRef);
         }
         // Note: Normal map detection would need texture probing or metadata
         // For now, assume materials have normals (common case)

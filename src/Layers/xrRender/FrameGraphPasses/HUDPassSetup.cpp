@@ -109,13 +109,13 @@ framegraph::DefaultOutputLayout setupHUDPass(
 
             // Skip if no HUD batches
             if (!data.hudBatches || data.hudBatches->empty() || !data.materialCache || !data.device) {
-                Msg("* [HUDPass] No batches (batches=%p, empty=%d, matCache=%p, device=%p)",
-                    data.hudBatches, data.hudBatches ? data.hudBatches->empty() : -1,
-                    data.materialCache, data.device);
+                //Msg("* [HUDPass] No batches (batches=%p, empty=%d, matCache=%p, device=%p)",
+                //    data.hudBatches, data.hudBatches ? data.hudBatches->empty() : -1,
+                //    data.materialCache, data.device);
                 return;
             }
 
-            Msg("* [HUDPass] Processing %u batches", data.hudBatches->size());
+            // Processing HUD batches (logging disabled to reduce spam)
 
             // Get physical resources (Forward+ single-RT)
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
@@ -214,7 +214,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 // Get per-material PSO (HUD pass type for correct depth state)
                 MaterialPSO* matPSO = data.materialCache->GetOrCreatePSO(batch.visual, data.outputs, fg, RenderPassType::HUD);
                 if (!matPSO || !matPSO->pso) {
-                    Msg("! [HUDPass] Failed to get PSO (matPSO=%p, pso=%p)", matPSO, matPSO ? matPSO->pso : nullptr);
+                    // Failed to get PSO (logging disabled to reduce spam)
                     continue;
                 }
 
@@ -355,7 +355,7 @@ framegraph::DefaultOutputLayout setupHUDPass(
                 numDraws++;
             }
 
-            Msg("* [HUDPass] Issued %u draw calls", numDraws);
+            // HUD pass complete (logging disabled to reduce spam)
             ctx->EndRenderPass();
         }
     );

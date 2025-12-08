@@ -86,6 +86,16 @@ struct BindlessForwardConfig {
     }
 };
 
+// ═══════════════════════════════════════════════════════
+//  PIPELINE INITIALIZATION (Called once at device creation)
+// ═══════════════════════════════════════════════════════
+// Eagerly initializes all forward pass pipelines to avoid frame hitches
+// on first render. Call from D3D12Backend::OnDeviceCreate() or equivalent.
+void InitializeForwardPipelines(ng::RenderDevice* device);
+
+// Clean up forward pass resources (call on device destroy)
+void ShutdownForwardPipelines();
+
 // Lambda-based ForwardColorPass setup function (Frostbite pattern)
 // Replaces the wasteful 3-RT G-buffer with single color output
 // NOTE: Does NOT clear color buffer - sky pass renders background first

@@ -35,6 +35,7 @@ public:
     {
         // Rendering flags
         bool alphaTest = false;      // Uses clip()/discard - needs alpha test in depth prepass
+        u32 alphaRef = 0;            // Alpha reference threshold (0-255), normalized to 0.0-1.0 for GPU
         bool transparent = false;    // Requires back-to-front sorting (bStrictB2F)
         u8 priority = 1;             // Render priority (0-3) for batching
 
@@ -105,7 +106,7 @@ public:
     {
         u32 materialsCached = 0;
         u32 textureSetsCached = 0;
-        u32 materialsFromFiles = 0;
+        u32 materialsFromBlender = 0;
         u32 materialsFromReflection = 0;
         u32 materialsFromDefaults = 0;
     };
@@ -121,7 +122,6 @@ private:
     friend MaterialSystem& GetMaterialSystemInstance();
 
     // Material info loading
-    MaterialInfo LoadFromMetadataFile(const char* shaderName);
     MaterialInfo InferFromShaderReflection(const char* shaderName);
     MaterialInfo GetDefaultMaterialInfo() const;
 
@@ -130,9 +130,6 @@ private:
     xr_string GetNormalPath(const char* textureName) const;
     xr_string GetPBRPath(const char* textureName) const;
     xr_string GetDetailPath(const char* textureName) const;
-
-    // Parse .material file
-    bool ParseMaterialFile(const char* path, MaterialInfo& outInfo);
 
     // Caches (thread-safe reads after init)
     xr_map<shared_str, MaterialInfo> m_materialCache;

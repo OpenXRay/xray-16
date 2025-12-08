@@ -21,6 +21,7 @@ class CSkeletonX
 {
 public:
     CKinematics* GetParent() { return Parent; }
+    u16 RenderMode;
 protected:
     enum
     {
@@ -48,7 +49,6 @@ protected:
     ref_smem<vertBoned4W> Vertices4W; // shared
     ref_smem<u16> BonesUsed; // actual bones which have influence on vertices
 
-    u16 RenderMode;
     u16 ChildIDX;
 
     // render-mode specifics

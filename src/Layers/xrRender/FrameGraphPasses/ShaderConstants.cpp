@@ -28,17 +28,13 @@ void GetSunLightData(SunLightData& outSun, float hdrIntensity) {
 
         // HDR intensity multiplier
         outSun.intensity = 1.f;
-
-        Msg("* [Sun] color=(%.3f, %.3f, %.3f), dir=(%.3f, %.3f, %.3f)",
-            sun->color.r, sun->color.g, sun->color.b,
-            sun->direction.x, sun->direction.y, sun->direction.z);
     } else {
         // Fallback if no sun available
         outSun.color.set(1.0f, 0.95f, 0.9f);  // Warm white
         outSun.direction.set(0.577f, -0.577f, 0.577f);  // Diagonal down
         outSun.intensity = hdrIntensity;
 
-        Msg("! [Sun] Not available, using fallback");
+        //Msg("! [Sun] Not available, using fallback");
     }
 }
 

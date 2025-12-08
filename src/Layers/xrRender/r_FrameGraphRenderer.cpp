@@ -26,10 +26,10 @@
 // Lambda-based pass setup functions
 #include "FrameGraphPasses/DepthPrepassSetup.h"      // Phase 2: Depth prepass for early-Z
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
+#include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
-#include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
 #include "FrameGraphPasses/HUDPassSetup.h"
@@ -234,6 +234,16 @@ void FrameGraphRenderer::Render() {
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
+
+    // ═══════════════════════════════════════════════════════
+    //  EAGER PIPELINE INITIALIZATION (First frame only)
+    // ═══════════════════════════════════════════════════════
+    // Initialize forward pass pipelines on first render when ShaderLoader is ready
+    static bool s_pipelinesInitialized = false;
+    if (!s_pipelinesInitialized && m_device) {
+        passes::InitializeForwardPipelines(m_device);
+        s_pipelinesInitialized = true;
+    }
 
     auto frameStart = std::chrono::high_resolution_clock::now();
 
@@ -1005,6 +1015,25 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     if (!nvrhiVB || !nvrhiIB)
         return false;
 
+    // Diagnostic logging for skeleton meshes - investigating "wrong mesh" issue
+    u32 visualType = visual->getType();
+    if (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM) {
+        // Get RenderMode from skeleton
+        u16 renderMode = 0;
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            renderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            renderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+        Msg("* [Skeleton] VB=%p IB=%p vStride=%u vBase=%d vCount=%d iBase=%d iCount=%d type=%s RenderMode=%u",
+            nvrhiVB.Get(), nvrhiIB.Get(),
+            meshVisual->vStride,
+            meshVisual->vBase, meshVisual->vCount,
+            meshVisual->iBase, meshVisual->iCount,
+            visualType == MT_SKELETON_GEOMDEF_ST ? "ST" : "PM",
+            renderMode);
+    }
+
     // ═══════════════════════════════════════════════════════
     //  CREATE GEOMETRY BATCH
     // ═══════════════════════════════════════════════════════
@@ -1018,6 +1047,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.indexCount = meshVisual->iCount;
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
+    batch.vertexStride = meshVisual->vStride;
 
     // Set world matrix (used for shader constants)
     batch.worldMatrix = worldTransform;
@@ -1028,12 +1058,18 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Store renderable (for skeletons - provides bone data)
     batch.renderable = renderable;
 
+    // Mark skinned meshes for separate rendering pipeline
+    // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
+    batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    if (batch.isSkinned)
+        Msg("Maked batch as skinned %s", batch.visual->dbg_name.c_str());
+
     // Compute world-space bounding sphere for GPU culling
     // Different visual types have different sphere conventions:
     // - Static geometry: sphere already in world space, worldTransform = identity
     // - Trees: sphere already in world space (level compiler pre-transforms), but worldTransform != identity
     // - Dynamic objects: sphere in local space, needs worldTransform applied
-    u32 visualType = visual->getType();
+    // Note: visualType already computed above for skeleton logging
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
         // Trees: sphere is ALREADY in world space (pre-transformed by level compiler)
         // Do NOT apply worldTransform to sphere (it's only for shader constants)
@@ -1169,6 +1205,7 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     batch.indexCount = meshVisual->iCount;
     batch.startIndex = meshVisual->iBase;
     batch.baseVertex = meshVisual->vBase;
+    batch.vertexStride = meshVisual->vStride;
     batch.worldMatrix = worldTransform;
     batch.visual = visual;
     batch.renderable = renderable;

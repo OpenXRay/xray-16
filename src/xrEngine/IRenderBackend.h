@@ -14,6 +14,7 @@ enum class DeviceState
 namespace nvrhi {
     class IDevice;
     class ITexture;
+    class IBuffer;
     class ICommandList;
     class IBindingLayout;
     class IDescriptorTable;
@@ -140,6 +141,11 @@ public:
     virtual void UnregisterBindlessTexture(u32 index) {}
     virtual nvrhi::IBindingLayout* GetBindlessLayout() const { return nullptr; }
     virtual nvrhi::IDescriptorTable* GetBindlessDescriptorTable() const { return nullptr; }
+
+    // ═══════ Buffer Upload (for resource creation) ═══════
+    // Uploads data to GPU buffer using a dedicated upload command list
+    // This avoids creating a new command list for every buffer upload
+    virtual void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {}
 
     // ═══════ Debug ═══════
     virtual void BeginDebugEvent(pcstr name) {}

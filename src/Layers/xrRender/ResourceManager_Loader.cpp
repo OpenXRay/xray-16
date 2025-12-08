@@ -3,6 +3,7 @@
 
 #include "ResourceManager.h"
 #include "Blender.h"
+#include "Blender_CLSID.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {

@@ -30,6 +30,7 @@ struct VS_INPUT
     float2 texcoord  : TEXCOORD0;    // float2: pre-unpacked base UV
     float2 texcoord1 : TEXCOORD1;    // float2: lightmap UV
     float4 color     : COLOR0;       // D3DCOLOR: vertex color (BGRA8_UNORM)
+    uint drawIndex   : DRAWINDEX;    // Per-instance draw index from StartInstanceLocation
 };
 
 struct VS_OUTPUT
@@ -41,13 +42,6 @@ struct VS_OUTPUT
     float3 tangent  : TEXCOORD3;
     float3 bitangent: TEXCOORD4;
     nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
-};
-
-// Per-draw constants (b5 to avoid conflict with common.h's b0-b2)
-cbuffer PerDrawConstants : register(b5)
-{
-    uint g_DrawIndex;      // Draw index into compact buffers
-    uint3 g_Padding;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -74,15 +68,19 @@ float3 UnpackNormal(float4 packed)
     return packed.rgb * 2.0 - 1.0;
 }
 
-VS_OUTPUT main(VS_INPUT input, uint instanceID : SV_InstanceID)
+VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    // GPU-driven: look up instance data from buffers using draw index
-    uint batchIndex = g_CompactBatchIndices[g_DrawIndex];
+    // GPU-driven multi-draw: Draw index comes from per-instance DRAWINDEX attribute
+    // The compaction shader sets StartInstanceLocation in indirect args (0,1,2,3...)
+    // D3D12 uses StartInstanceLocation to offset into the per-instance draw index buffer
+    uint drawID = input.drawIndex;
+
+    uint batchIndex = g_CompactBatchIndices[drawID];
     InstanceData instanceData = g_InstanceData[batchIndex];
     float4x4 worldMatrix = instanceData.world;
-    uint materialID = g_CompactMaterialIDs[g_DrawIndex];
+    uint materialID = g_CompactMaterialIDs[drawID];
 
     // Unpack compressed normal/tangent/binormal
     float3 normalUnpacked = UnpackNormal(input.normal);

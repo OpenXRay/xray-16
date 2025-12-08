@@ -57,6 +57,9 @@ public:
     u32 RegisterBindlessTexture(nvrhi::ITexture* texture) override { return UINT32_MAX; }
     void UnregisterBindlessTexture(u32 index) override {}
 
+    // Buffer upload (D3D11 doesn't need special handling but we implement for consistency)
+    void UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) override;
+
     void BeginDebugEvent(pcstr name) override;
     void EndDebugEvent() override;
 

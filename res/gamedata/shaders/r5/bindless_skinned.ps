@@ -1,8 +1,7 @@
-// bindless_forward.ps
-// SM6 Bindless forward pixel shader
+// bindless_skinned.ps
+// SM6 Bindless forward pixel shader for SKINNED meshes
+// Uses per-draw constant for material ID (not GPU-driven)
 // Uses ResourceDescriptorHeap[NonUniformResourceIndex(index)] for texture access
-// MaterialData contains descriptor heap indices (diffuseIndex, normalIndex, etc.)
-// Uses static_globals (b2) for lighting - same values as legacy renderer
 
 #define SM_6_0
 #include "common.h"
@@ -16,7 +15,7 @@ struct PS_INPUT
     float3 normal : TEXCOORD2;
     float3 tangent : TEXCOORD3;
     float3 bitangent : TEXCOORD4;
-    nointerpolation uint materialID : TEXCOORD5;  // Direct material ID (no indirection)
+    nointerpolation uint materialID : TEXCOORD5;
 };
 
 struct PS_OUTPUT
@@ -24,13 +23,17 @@ struct PS_OUTPUT
     float4 color : SV_Target0;
 };
 
-// Lighting uses static_globals from common.h (b2):
-// - L_sun_color, L_sun_dir_w (sun)
-// - L_ambient (ambient)
-// - eye_position (camera)
-// - fog_params, fog_color (fog)
+// Per-draw material ID (set via constant buffer for skinned meshes)
+// This is uploaded by FGConstantSystem for each skeleton draw
+cbuffer SkinnedMaterialCB : register(b4)
+{
+    uint g_SkinnedMaterialID;
+    uint g_SkinnedPad0;
+    uint g_SkinnedPad1;
+    uint g_SkinnedPad2;
+};
 
-// Simple PBR-ish lighting
+// Simple PBR-ish lighting (same as bindless_forward.ps)
 float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
 {
     float3 L = -L_sun_dir_w;
@@ -65,30 +68,15 @@ PS_OUTPUT main(PS_INPUT input)
 {
     PS_OUTPUT output;
 
-    // DEBUG: Visualize UVs as color to find where black areas are in UV space
-    // Uncomment ONE of these to debug:
+    // Use per-draw material ID from constant buffer
+    // (vertex shader outputs 0, we override with CB value)
+    uint materialID = g_SkinnedMaterialID;
 
-    // Option 1: Show UV coordinates as RG color (frac to see tiling)
-    //output.color = float4(frac(input.texcoord.x), frac(input.texcoord.y), 0, 1);
-    //return output;
+    // Get material data
+    MaterialData mat = g_Materials[materialID];
 
-    // Option 2: Show material ID as grayscale
-    //output.color = float4(input.materialID / 255.0, input.materialID / 255.0, input.materialID / 255.0, 1);
-    //return output;
-
-    // Get material data directly using material ID
-    MaterialData mat = g_Materials[input.materialID];
-
-
-    // Sample textures using SM6 bindless (ResourceDescriptorHeap)
+    // Sample diffuse texture
     float4 diffuseSample = SampleDiffuse(mat, input.texcoord);
-
-    // DEBUG: Visualize material ID (drawIndex) - use brighter colors
-    //float r = (input.materialID % 7) / 6.0;
-    //float g = (input.materialID % 5) / 4.0 + 0.3;
-    //float b = (input.materialID % 3) / 2.0 + 0.5;
-    //output.color = float4(r, g, b, 1);
-    //return output;
 
     // Alpha test
     if (mat.flags & MAT_FLAG_ALPHA_TEST)
@@ -114,9 +102,7 @@ PS_OUTPUT main(PS_INPUT input)
     // Detail texture
     if (mat.flags & MAT_FLAG_HAS_DETAIL)
     {
-        // Detail sampling (uses mat.detailScale internally)
         float4 detailSample = SampleDetail(mat, input.texcoord);
-        // Blend detail (multiply-2x style)
         albedo = albedo * (detailSample.rgb * 2.0);
     }
 
@@ -133,14 +119,13 @@ PS_OUTPUT main(PS_INPUT input)
         ao = pbrSample.b;
     }
 
-    // View direction (eye_position from static_globals)
+    // View direction
     float3 V = normalize(eye_position - input.worldPos);
 
     // Calculate lighting
     float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
 
-    // Fog (fog_params/fog_color from static_globals)
-    // fog_params: x=near (unused here), y=far, z=density (unused here)
+    // Fog
     float fogDist = length(input.worldPos - eye_position);
     float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
     finalColor = lerp(fog_color.rgb, finalColor, fogFactor);

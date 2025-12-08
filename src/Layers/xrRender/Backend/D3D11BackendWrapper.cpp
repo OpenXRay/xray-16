@@ -110,6 +110,16 @@ void D3D11BackendWrapper::WaitForIdle()
     }
 }
 
+void D3D11BackendWrapper::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size)
+{
+    // D3D11 doesn't need special handling - NVRHI handles immediate uploads via UpdateSubresource
+    // This stub is here for API consistency with D3D12Backend
+    if (m_commandList && buffer && data && size > 0)
+    {
+        m_commandList->writeBuffer(buffer, data, size);
+    }
+}
+
 nvrhi::ITexture* D3D11BackendWrapper::GetBackBuffer()
 {
     // Get back buffer from CHW's swap chain

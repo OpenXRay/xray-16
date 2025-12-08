@@ -188,6 +188,17 @@ void main(uint3 dtID : SV_DispatchThreadID)
     GPUObjectData obj = g_Objects[objectIdx];
 
     // ─────────────────────────────────────────────────────
+    //  SKIP TRANSPARENT GEOMETRY (requires separate pass with blending)
+    // ─────────────────────────────────────────────────────
+    // Transparent objects need:
+    // 1. Back-to-front sorting
+    // 2. Alpha blending (not available in single-PSO multi-draw)
+    // 3. Depth write disabled
+    // For now, let the legacy renderer handle them
+    if (obj.flags & 0x4)  // GPU_OBJECT_TRANSPARENT = 0x4
+        return;
+
+    // ─────────────────────────────────────────────────────
     //  CULLING TESTS (ordered by cost: cheapest first)
     // ─────────────────────────────────────────────────────
 
