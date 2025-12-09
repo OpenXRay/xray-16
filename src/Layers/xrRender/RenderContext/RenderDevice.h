@@ -262,8 +262,6 @@ private:
 
     xr_unique_ptr<xray::render::SlangCompiler> m_slangCompiler;
 
-    nvrhi::CommandListHandle m_uploadCommandList;
-
     std::mutex m_uploadMutex;
 
     bool m_initialized = false;

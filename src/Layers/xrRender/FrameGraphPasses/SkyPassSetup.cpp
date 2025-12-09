@@ -106,15 +106,16 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     placeholderDesc.keepInitialState = true;
     s_placeholderCubemap = nvrhiDevice->createTexture(placeholderDesc);
 
+    if (GEnv.Backend) {
+        GEnv.Backend->UploadBufferData(s_skyIndexBuffer, hbox_faces, sizeof(hbox_faces));
+    }
+
     nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
     cmdList->open();
-    cmdList->writeBuffer(s_skyIndexBuffer, hbox_faces, sizeof(hbox_faces));
-
     u32 skyBlue = 0xFF8080FF;
     for (u32 face = 0; face < 6; face++) {
         cmdList->writeTexture(s_placeholderCubemap, face, 0, &skyBlue, sizeof(skyBlue));
     }
-
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 

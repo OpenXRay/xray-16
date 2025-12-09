@@ -93,11 +93,9 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
         return;
     }
 
-    nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
-    cmdList->open();
-    cmdList->writeBuffer(s_quadIB, indices.data(), indices.size() * sizeof(u16));
-    cmdList->close();
-    nvDevice->executeCommandList(cmdList);
+    if (GEnv.Backend) {
+        GEnv.Backend->UploadBufferData(s_quadIB, indices.data(), indices.size() * sizeof(u16));
+    }
 
     s_maxQuads = maxQuads;
 }

@@ -59,6 +59,7 @@ public:
 
     virtual void BeginFrame() = 0;
     virtual void EndFrame() = 0;
+    virtual bool IsInFrame() const { return false; }
 
     struct Capabilities {
         bool bindlessTextures = false;

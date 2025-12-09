@@ -1255,10 +1255,6 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
     }
 
     imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
-
-    cmdList->close();
-    m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-    cmdList->open();
 }
 
 }

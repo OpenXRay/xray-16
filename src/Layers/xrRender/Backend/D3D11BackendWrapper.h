@@ -33,6 +33,7 @@ public:
 
     void BeginFrame() override;
     void EndFrame() override;
+    bool IsInFrame() const override { return m_inFrame; }
 
     const Capabilities& GetCapabilities() const override { return m_capabilities; }
     Capabilities& GetMutableCapabilities() override { return m_capabilities; }
@@ -60,6 +61,7 @@ private:
     nvrhi::TextureHandle m_backBuffer;
 
     bool m_initialized = false;
+    bool m_inFrame = false;
     Capabilities m_capabilities;
 
     struct ID3DUserDefinedAnnotation* m_annotation = nullptr;

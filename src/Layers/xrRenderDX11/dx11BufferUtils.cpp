@@ -321,7 +321,6 @@ void IndexStagingBuffer::Unmap(bool doFlush /*= false*/)
     m_DeviceBuffer = CreateIndexBuffer(m_HostBuffer, m_Size, false);
     if (!m_DeviceBuffer)
     {
-        VERIFY(!"Failed to create index buffer");
         return;
     }
 

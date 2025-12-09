@@ -140,8 +140,8 @@ void D3D12Backend::Shutdown() {
     m_bindlessLayout = nullptr;
     for (auto& bb : m_backBuffers)
         bb = nullptr;
-    m_uploadCommandList = nullptr;
     m_commandList = nullptr;
+    m_uploadCommandList = nullptr;
     m_nvrhiDevice = nullptr;
 
     if (m_swapChain) {
@@ -467,9 +467,11 @@ void D3D12Backend::BeginFrame() {
     m_nvrhiDevice->runGarbageCollection();
 
     m_commandList->open();
+    m_inFrame = true;
 }
 
 void D3D12Backend::EndFrame() {
+    m_inFrame = false;
     m_commandList->close();
 
     m_nvrhiDevice->executeCommandList(m_commandList);
@@ -499,16 +501,17 @@ void D3D12Backend::ExecuteCommandLists(nvrhi::ICommandList* const* commandLists,
 }
 
 void D3D12Backend::UploadBufferData(nvrhi::IBuffer* buffer, const void* data, size_t size) {
-    if (!m_uploadCommandList || !buffer || !data || size == 0)
+    if (!buffer || !data || size == 0)
         return;
 
-    m_uploadCommandList->open();
-    m_uploadCommandList->writeBuffer(buffer, data, size);
-    m_uploadCommandList->close();
-
-    m_nvrhiDevice->executeCommandList(m_uploadCommandList);
-
-    m_nvrhiDevice->waitForIdle();
+    if (m_inFrame) {
+        m_commandList->writeBuffer(buffer, data, size);
+    } else {
+        m_uploadCommandList->open();
+        m_uploadCommandList->writeBuffer(buffer, data, size);
+        m_uploadCommandList->close();
+        m_nvrhiDevice->executeCommandList(m_uploadCommandList);
+    }
 }
 
 nvrhi::ICommandList* D3D12Backend::CreateCommandList() {

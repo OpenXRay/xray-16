@@ -166,13 +166,8 @@ BufferHandle BufferManager::CreateBuffer(
         return BufferHandle();
     }
 
-    if (initialData) {
-        nvrhi::ICommandList* cmd = m_device->GetNativeDevice()->createCommandList();
-        cmd->open();
-        cmd->writeBuffer(meta.nvrhiBuffer, initialData, desc.size);
-        cmd->close();
-        m_device->GetNativeDevice()->executeCommandList(cmd);
-        cmd->Release();
+    if (initialData && GEnv.Backend) {
+        GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, initialData, desc.size);
     }
 
     m_stats.buffersTotal++;
@@ -192,12 +187,19 @@ void BufferManager::UpdateBuffer(
 
     BufferMetadata& meta = m_buffers[handle.index];
 
-    nvrhi::ICommandList* cmd = m_device->GetNativeDevice()->createCommandList();
-    cmd->open();
-    cmd->writeBuffer(meta.nvrhiBuffer, data, size, offset);
-    cmd->close();
-    m_device->GetNativeDevice()->executeCommandList(cmd);
-    cmd->Release();
+    if (GEnv.Backend) {
+        if (GEnv.Backend->IsInFrame()) {
+            GEnv.Backend->GetCommandList()->writeBuffer(meta.nvrhiBuffer, data, size, offset);
+        } else {
+            if (offset == 0) {
+                GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, data, size);
+            } else {
+                nvrhi::ICommandList* cmdList = GEnv.Backend->GetCommandList();
+                Msg("! [BufferManager] WARNING: Offset update outside frame - using immediate upload");
+                GEnv.Backend->UploadBufferData(meta.nvrhiBuffer, data, size);
+            }
+        }
+    }
 
     meta.lastAccessTime = 0.0f;
 }
