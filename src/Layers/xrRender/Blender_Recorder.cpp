@@ -255,8 +255,6 @@ void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
     if (bATest)
     {
         RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
-        // Set explicit flag for depth prepass filtering (DX11 doesn't use D3DRS_ALPHATESTENABLE)
-        SH->flags.bAlphaTest = TRUE;
     }
 }
 

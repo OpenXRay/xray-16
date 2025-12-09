@@ -416,7 +416,6 @@ static const char* const FOLDER_BLACKLIST[] = {
     "ui",           // UI textures
     "intro",
     "terrain",
-    "water",
     "wm",
 };
 

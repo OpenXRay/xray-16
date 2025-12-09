@@ -56,8 +56,6 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
     if (_aref)
     {
         xr_strcat(ps, "_aref");
-        // Set explicit flag for depth prepass filtering
-        C.SH->flags.bAlphaTest = TRUE;
     }
 
     if (!bump)

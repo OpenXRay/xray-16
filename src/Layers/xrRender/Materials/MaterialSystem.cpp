@@ -61,7 +61,7 @@ void MaterialSystem::Shutdown()
     Msg("* [MaterialSystem] Shutdown");
 }
 
-const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* shaderName)
+const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* shaderName, const char* textureName)
 {
     if (!shaderName || !shaderName[0])
         return m_defaultMaterialInfo;
@@ -75,94 +75,26 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
     MaterialInfo info = GetDefaultMaterialInfo();
 
     // Try blender lookup first (most accurate - actual values from shaders.xr)
-    if (RENDER_NAMESPACE::RImplementation.Resources)
+    RENDER_NAMESPACE::CResourceManager::BlenderProperties blenderProps;
+    if (RENDER_NAMESPACE::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
     {
-        RENDER_NAMESPACE::CResourceManager::BlenderProperties blenderProps;
-        if (RENDER_NAMESPACE::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
-        {
-            info.alphaTest = blenderProps.alphaTest;
-            info.alphaRef = blenderProps.alphaRef;
-            info.transparent = blenderProps.alphaBlend;
-            m_stats.materialsFromBlender++;
+        info.alphaTest = blenderProps.alphaTest || blenderProps.alphaBlend;
+        info.alphaRef = blenderProps.alphaBlend ? 127 : blenderProps.alphaRef;
+        info.transparent = false;
+        m_stats.materialsFromBlender++;
 
-            Msg("* [MaterialSystem] '%s': from blender -> alphaTest=%d, alphaRef=%d, transparent=%d",
-                shaderName, info.alphaTest, info.alphaRef, info.transparent);
+        if (blenderProps.alphaBlend)
+            Msg("* [MaterialSystem] '%s - %s': from blender -> alphaTest=%d, alphaRef=%d, alphaBlend=%d",
+            shaderName, textureName, info.alphaTest, info.alphaRef, blenderProps.alphaBlend);
 
-            // Cache and return
-            m_materialCache[key] = info;
-            return m_materialCache[key];
-        }
+        // Cache and return
+        m_materialCache[key] = info;
+        return m_materialCache[key];
     }
-
-    // Fall back to pattern matching on shader name
-    info = InferFromShaderReflection(shaderName);
-    Msg("* [MaterialSystem] '%s': from reflection -> alphaTest=%d, alphaRef=%d, transparent=%d",
-        shaderName, info.alphaTest, info.alphaRef, info.transparent);
 
     // Cache and return
     m_materialCache[key] = info;
     return m_materialCache[key];
-}
-
-MaterialSystem::MaterialInfo MaterialSystem::InferFromShaderReflection(const char* shaderName)
-{
-    MaterialInfo info = GetDefaultMaterialInfo();
-
-    if (!m_shaderLoader) {
-        Msg("! [MaterialSystem] InferFromShaderReflection: m_shaderLoader is NULL!");
-        return info;
-    }
-
-    // Try to load the pixel shader and check reflection for discard usage
-    // ShaderLoader caches results, so this is efficient
-    auto psResult = m_shaderLoader->LoadPixelShader(shaderName);
-
-    Msg("* [MaterialSystem] InferFromShaderReflection '%s': psResult.reflection=%p",
-        shaderName, psResult.reflection);
-
-    if (psResult.reflection)
-    {
-        Msg("* [MaterialSystem] InferFromShaderReflection '%s': HAS reflection, checking patterns...", shaderName);
-        // Check if shader uses discard/clip
-        // This would be detected during Slang compilation
-        // For now, we check the shader name for common patterns as a fallback
-        // TODO: Add proper usesDiscard flag to ExtractedReflection
-
-        // Common alpha-test shader name patterns
-        const char* alphaPatterns[] = {
-            "_alpha", "_aref", "_atest", "flora", "tree", "grass", "leaves"
-        };
-
-        xr_string lowerName = shaderName;
-        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
-
-        for (const char* pattern : alphaPatterns)
-        {
-            if (lowerName.find(pattern) != xr_string::npos)
-            {
-                info.alphaTest = true;
-                m_stats.materialsFromReflection++;
-                return info;
-            }
-        }
-
-        // Common transparent shader patterns
-        const char* transparentPatterns[] = {
-            "glass", "water", "particle", "distort", "blend"
-        };
-
-        for (const char* pattern : transparentPatterns)
-        {
-            if (lowerName.find(pattern) != xr_string::npos)
-            {
-                info.transparent = true;
-                m_stats.materialsFromReflection++;
-                return info;
-            }
-        }
-    }
-
-    return info;
 }
 
 MaterialSystem::MaterialInfo MaterialSystem::GetDefaultMaterialInfo() const

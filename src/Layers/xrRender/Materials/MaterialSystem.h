@@ -74,7 +74,7 @@ public:
      * Checks in order: .material file, shader reflection, defaults
      * Results are cached after first lookup
      */
-    const MaterialInfo& GetMaterialInfo(const char* shaderName);
+    const MaterialInfo& GetMaterialInfo(const char* shaderName, const char* textureName = "");
 
     /**
      * Preload textures for a texture name during level load
@@ -120,9 +120,6 @@ private:
 
     // Allow static instance creation
     friend MaterialSystem& GetMaterialSystemInstance();
-
-    // Material info loading
-    MaterialInfo InferFromShaderReflection(const char* shaderName);
     MaterialInfo GetDefaultMaterialInfo() const;
 
     // Texture path resolution (handles PBR conventions)

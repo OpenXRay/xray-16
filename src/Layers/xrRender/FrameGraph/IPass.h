@@ -21,10 +21,11 @@ namespace xray::render::framegraph {
 // Future: Add LightingOutputLayout, PostProcessOutputLayout, etc.
 
 struct DefaultOutputLayout {
-    VirtualResourceHandle albedo;    // RT0: Albedo.rgb + Metallic.a
-    VirtualResourceHandle normal;    // RT1: Normal.xyz + Roughness.a
-    VirtualResourceHandle material;  // RT2: Material ID
-    VirtualResourceHandle depth;     // Depth/Stencil
+    VirtualResourceHandle albedo;      // RT0: Albedo.rgb + Metallic.a
+    VirtualResourceHandle normal;      // RT1: Normal.xyz + Roughness.a
+    VirtualResourceHandle material;    // RT2: Material ID
+    VirtualResourceHandle depth;       // Depth/Stencil
+    VirtualResourceHandle distortion;  // Distortion buffer (RG = UV offset, A = intensity)
 };
 
 // ═══════════════════════════════════════════════════

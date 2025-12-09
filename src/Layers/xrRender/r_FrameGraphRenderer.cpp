@@ -981,13 +981,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         } else {
             renderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
         }
-        Msg("* [Skeleton] VB=%p IB=%p vStride=%u vBase=%d vCount=%d iBase=%d iCount=%d type=%s RenderMode=%u",
-            nvrhiVB.Get(), nvrhiIB.Get(),
-            meshVisual->vStride,
-            meshVisual->vBase, meshVisual->vCount,
-            meshVisual->iBase, meshVisual->iCount,
-            visualType == MT_SKELETON_GEOMDEF_ST ? "ST" : "PM",
-            renderMode);
     }
 
     // ═══════════════════════════════════════════════════════
@@ -1042,8 +1035,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Mark skinned meshes for separate rendering pipeline
     // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
-    if (batch.isSkinned)
-        Msg("Maked batch as skinned %s", batch.visual->dbg_name.c_str());
 
     // Compute world-space bounding sphere for GPU culling
     // Different visual types have different sphere conventions:
