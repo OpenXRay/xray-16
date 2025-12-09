@@ -338,7 +338,6 @@ static const char* const FOLDER_BLACKLIST[] = {
     "ui",
     "intro",
     "terrain",
-    "water",
     "wm",
 };
 

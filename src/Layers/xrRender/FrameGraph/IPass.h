@@ -18,6 +18,7 @@ struct DefaultOutputLayout {
     VirtualResourceHandle normal;
     VirtualResourceHandle material;
     VirtualResourceHandle depth;
+    VirtualResourceHandle distortion;
 };
 
 class IPass {

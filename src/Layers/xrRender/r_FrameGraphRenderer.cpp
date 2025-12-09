@@ -658,13 +658,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         } else {
             renderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
         }
-        Msg("* [Skeleton] VB=%p IB=%p vStride=%u vBase=%d vCount=%d iBase=%d iCount=%d type=%s RenderMode=%u",
-            nvrhiVB.Get(), nvrhiIB.Get(),
-            meshVisual->vStride,
-            meshVisual->vBase, meshVisual->vCount,
-            meshVisual->iBase, meshVisual->iCount,
-            visualType == MT_SKELETON_GEOMDEF_ST ? "ST" : "PM",
-            renderMode);
     }
 
     GeometryBatch batch;
@@ -700,8 +693,6 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.renderable = renderable;
 
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
-    if (batch.isSkinned)
-        Msg("Maked batch as skinned %s", batch.visual->dbg_name.c_str());
 
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
         batch.worldBoundsCenter = visual->vis.sphere.P;

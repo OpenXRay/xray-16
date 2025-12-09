@@ -255,7 +255,6 @@ void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
     if (bATest)
     {
         RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
-        SH->flags.bAlphaTest = TRUE;
     }
 }
 

@@ -2257,16 +2257,10 @@ u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)
     }
 
     if (visual->shaderName.size() > 0) {
-        const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str());
-
-        Msg("* [MaterialCache] '%s': alphaTest=%d, alphaRef=%d, transparent=%d",
-            visual->shaderName.c_str(), matInfo.alphaTest, matInfo.alphaRef, matInfo.transparent);
-
+        const auto& matInfo = MaterialSystem::Instance().GetMaterialInfo(visual->shaderName.c_str(), visual->textureName.c_str());
         if (matInfo.alphaTest) {
             matData.flags |= MAT_FLAG_ALPHA_TEST;
             matData.alphaRef = matInfo.alphaRef / 255.0f;
-            Msg("* [MaterialCache] -> SET MAT_FLAG_ALPHA_TEST, alphaRef=%.3f (%d/255)",
-                matData.alphaRef, matInfo.alphaRef);
         }
         matData.flags |= MAT_FLAG_HAS_NORMAL;
     }
@@ -2336,16 +2330,8 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
     using namespace RENDER_NAMESPACE::bindless;
 
     if (m_pendingMaterials.empty()) {
-        static u32 emptyCount = 0;
-        if (++emptyCount <= 3) {
-            Msg("* [MaterialCache] FinalizePending: empty (cached=%u)",
-                static_cast<u32>(m_visualToMaterialID.size()));
-        }
         return;
     }
-
-    Msg("* [MaterialCache] FinalizePending: processing %u materials",
-        static_cast<u32>(m_pendingMaterials.size()));
 
     auto& materialBuffer = MaterialBuffer::Instance();
     if (!materialBuffer.IsInitialized())
@@ -2466,7 +2452,6 @@ void MaterialCache::FinalizePendingMaterials(ng::RenderContext* ctx)
 
     if (processedCount > 0) {
         materialBuffer.Upload(ctx);
-        Msg("* [MaterialCache] Finalized %u pending materials with SM6 bindless textures", processedCount);
     }
 }
 

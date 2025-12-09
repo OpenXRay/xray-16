@@ -48,7 +48,7 @@ public:
     void Initialize(resources::FGResourceManager* fgResourceManager, framegraph::ShaderLoader* shaderLoader);
     void Shutdown();
 
-    const MaterialInfo& GetMaterialInfo(const char* shaderName);
+    const MaterialInfo& GetMaterialInfo(const char* shaderName, const char* textureName = "");
 
     void PreloadMaterialTextures(const char* textureName);
 
@@ -75,8 +75,6 @@ private:
     MaterialSystem& operator=(const MaterialSystem&) = delete;
 
     friend MaterialSystem& GetMaterialSystemInstance();
-
-    MaterialInfo InferFromShaderReflection(const char* shaderName);
     MaterialInfo GetDefaultMaterialInfo() const;
 
     xr_string GetAlbedoPath(const char* textureName) const;
