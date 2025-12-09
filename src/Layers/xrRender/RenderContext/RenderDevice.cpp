@@ -8,6 +8,57 @@
 namespace xray::render::ng {
 
 // ═══════════════════════════════════════════════════
+//  UPLOAD HELPER - Batched or Immediate execution
+// ═══════════════════════════════════════════════════
+// When in-frame: uses main command list (batched, executed at EndFrame)
+// Outside frame: creates temp command list (immediate execution)
+
+// Persistent upload command list for out-of-frame texture uploads
+// Prevents exhausting D3D12's command allocator pool during level loading
+static nvrhi::CommandListHandle s_textureUploadCmdList;
+static std::mutex s_textureUploadMutex;
+
+class ScopedUpload {
+public:
+    ScopedUpload(IRenderBackend* backend, nvrhi::IDevice* device)
+        : m_backend(backend), m_device(device), m_ownsCommandList(false)
+    {
+        if (backend && backend->IsInFrame()) {
+            // Use main command list - already open
+            m_cmdList = backend->GetCommandList();
+            m_ownsCommandList = false;
+        } else {
+            // Use persistent upload command list (lazy init)
+            m_lock = std::unique_lock<std::mutex>(s_textureUploadMutex);
+            if (!s_textureUploadCmdList) {
+                s_textureUploadCmdList = device->createCommandList();
+            }
+            s_textureUploadCmdList->open();
+            m_cmdList = s_textureUploadCmdList.Get();
+            m_ownsCommandList = true;
+        }
+    }
+
+    ~ScopedUpload() {
+        if (m_ownsCommandList && s_textureUploadCmdList) {
+            s_textureUploadCmdList->close();
+            m_device->executeCommandList(s_textureUploadCmdList);
+            // Lock released when m_lock destructor runs
+        }
+    }
+
+    nvrhi::ICommandList* Get() const { return m_cmdList; }
+    operator nvrhi::ICommandList*() const { return m_cmdList; }
+
+private:
+    IRenderBackend* m_backend;
+    nvrhi::IDevice* m_device;
+    nvrhi::ICommandList* m_cmdList = nullptr;
+    std::unique_lock<std::mutex> m_lock;
+    bool m_ownsCommandList;
+};
+
+// ═══════════════════════════════════════════════════
 //  CONSTRUCTION / DESTRUCTION
 // ═══════════════════════════════════════════════════
 
@@ -65,14 +116,6 @@ bool RenderDevice::InitializeD3D11(ID3D11Device* device, ID3D11DeviceContext* co
     // Create modern resource manager (Week 2-3)
     m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
     Msg("* [RenderDevice] FGResourceManager initialized");
-
-    // Create persistent upload command list (reused for texture/buffer uploads)
-    m_uploadCommandList = GetNativeDevice()->createCommandList();
-    if (!m_uploadCommandList) {
-        Msg("! [RenderDevice] Failed to create upload command list");
-        return false;
-    }
-    Msg("* [RenderDevice] Created persistent upload command list");
 
     // Reserve initial capacity
     m_textures.reserve(256);
@@ -135,14 +178,6 @@ bool RenderDevice::InitializeFromBackend(IRenderBackend* backend) {
     m_modernResourceManager = xr_make_unique<xray::render::resources::FGResourceManager>(this);
     Msg("* [RenderDevice] FGResourceManager initialized");
 
-    // Create persistent upload command list
-    m_uploadCommandList = GetNativeDevice()->createCommandList();
-    if (!m_uploadCommandList) {
-        Msg("! [RenderDevice] Failed to create upload command list");
-        return false;
-    }
-    Msg("* [RenderDevice] Created persistent upload command list");
-
     // Reserve initial capacity
     m_textures.reserve(256);
     m_buffers.reserve(512);
@@ -178,10 +213,6 @@ void RenderDevice::Shutdown() {
     if (m_stats.shadersAlive > 0) {
         Msg("! [RenderDevice] WARNING: %u shaders leaked", m_stats.shadersAlive);
     }
-
-    // Release upload command list
-    m_uploadCommandList = nullptr;
-    Msg("* [RenderDevice] Released upload command list");
 
     // Shutdown modern resource manager
     m_modernResourceManager = nullptr;
@@ -225,12 +256,8 @@ TextureHandle RenderDevice::CreateTexture(
         size_t rowPitch = nvrhiDesc.width * formatInfo.bytesPerBlock;
         size_t depthPitch = rowPitch * nvrhiDesc.height;
 
-        // CRITICAL: Must use upload command list, not the immediate command list!
-        m_uploadCommandList->open();
-        // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
-        m_uploadCommandList->writeTexture(nvrhiTexture, 0, 0, initialData, rowPitch, depthPitch);
-        m_uploadCommandList->close();
-        GetNativeDevice()->executeCommandList(m_uploadCommandList);
+        ScopedUpload upload(m_backend.get(), GetNativeDevice());
+        upload.Get()->writeTexture(nvrhiTexture, 0, 0, initialData, rowPitch, depthPitch);
     }
 
     // Allocate handle
@@ -400,28 +427,17 @@ void RenderDevice::UploadTextureData(
         return;
     }
 
-    // Use persistent upload command list (reused, not recreated)
-    VERIFY(m_uploadCommandList && "Upload command list not initialized");
-
     // Lock for thread safety - textures are loaded in parallel
     std::lock_guard<std::mutex> lock(m_uploadMutex);
 
-    m_uploadCommandList->open();
+    ScopedUpload upload(m_backend.get(), GetNativeDevice());
 
     // Upload all slices
     for (u32 i = 0; i < sliceCount; ++i) {
         const TextureSliceData& slice = slices[i];
-
-        // Use pitch values calculated by DDSLoader (no duplicate calculation here)
-        // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
-        m_uploadCommandList->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
+        upload.Get()->writeTexture(nvrhiTexture, slice.arraySlice, slice.mipLevel,
                              slice.data, slice.rowPitch, slice.slicePitch);
     }
-
-    // Execute immediately
-    m_uploadCommandList->close();
-    GetNativeDevice()->executeCommandList(m_uploadCommandList);
-    // Note: Command list is reused, not released - it's persistent!
 }
 
 void RenderDevice::UploadTextureDataToNVRHI(
@@ -435,12 +451,9 @@ void RenderDevice::UploadTextureDataToNVRHI(
     VERIFY(texture != nullptr);
     VERIFY(data != nullptr);
     VERIFY(dataSize > 0);
-    VERIFY(m_uploadCommandList && "Upload command list not initialized");
 
     // Lock for thread safety - textures are loaded in parallel
     std::lock_guard<std::mutex> lock(m_uploadMutex);
-
-    m_uploadCommandList->open();
 
     // Get texture desc to calculate row pitch
     const auto& desc = texture->getDesc();
@@ -461,18 +474,10 @@ void RenderDevice::UploadTextureDataToNVRHI(
             break;
     }
 
-    // Write texture data
-    // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
     size_t depthPitch = rowPitch * desc.height;  // For 2D textures
-    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, depthPitch);
 
-    // Execute immediately and wait for completion
-    m_uploadCommandList->close();
-    GetNVRHIDevice()->executeCommandList(m_uploadCommandList);
-
-    // Wait for upload to complete to avoid D3D11 state corruption
-    // (NVRHI command execution can unbind shaders/state)
-    GetNVRHIDevice()->waitForIdle();
+    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, depthPitch);
 }
 
 void RenderDevice::UploadTextureDataToNVRHI(
@@ -488,24 +493,12 @@ void RenderDevice::UploadTextureDataToNVRHI(
     VERIFY(texture != nullptr);
     VERIFY(data != nullptr);
     VERIFY(dataSize > 0);
-    VERIFY(m_uploadCommandList && "Upload command list not initialized");
 
     // Lock for thread safety - textures are loaded in parallel
     std::lock_guard<std::mutex> lock(m_uploadMutex);
 
-    m_uploadCommandList->open();
-
-    // Write texture data with explicit pitch values (for compressed textures)
-    // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
-    m_uploadCommandList->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, slicePitch);
-
-    // Execute immediately and wait for completion
-    m_uploadCommandList->close();
-    GetNVRHIDevice()->executeCommandList(m_uploadCommandList);
-
-    // Wait for upload to complete to avoid D3D11 state corruption
-    // (NVRHI command execution can unbind shaders/state)
-    GetNVRHIDevice()->waitForIdle();
+    ScopedUpload upload(m_backend.get(), GetNativeDevice());
+    upload.Get()->writeTexture(texture, arraySlice, mipLevel, data, rowPitch, slicePitch);
 }
 
 // ═══════════════════════════════════════════════════

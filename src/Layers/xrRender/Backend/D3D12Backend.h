@@ -50,6 +50,7 @@ public:
 
     void BeginFrame() override;
     void EndFrame() override;
+    bool IsInFrame() const override { return m_inFrame; }
 
     const Capabilities& GetCapabilities() const override { return m_capabilities; }
     Capabilities& GetMutableCapabilities() override { return m_capabilities; }
@@ -96,7 +97,7 @@ private:
     // NVRHI wrapper
     nvrhi::DeviceHandle m_nvrhiDevice;
     nvrhi::CommandListHandle m_commandList;  // Per-frame command list for rendering
-    nvrhi::CommandListHandle m_uploadCommandList;  // Dedicated for buffer uploads (reusable)
+    nvrhi::CommandListHandle m_uploadCommandList;  // Persistent upload command list (out-of-frame)
     nvrhi::TextureHandle m_backBuffers[BACK_BUFFER_COUNT];
 
     // Bindless resources
@@ -107,6 +108,7 @@ private:
 
     // State
     bool m_initialized = false;
+    bool m_inFrame = false;  // True between BeginFrame/EndFrame
     Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;

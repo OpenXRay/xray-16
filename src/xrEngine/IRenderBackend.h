@@ -78,6 +78,7 @@ public:
     // ═══════ Frame Sync ═══════
     virtual void BeginFrame() = 0;
     virtual void EndFrame() = 0;
+    virtual bool IsInFrame() const { return false; }  // True between BeginFrame/EndFrame
 
     // ═══════ Capabilities ═══════
     struct Capabilities {

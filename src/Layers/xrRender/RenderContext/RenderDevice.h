@@ -349,10 +349,6 @@ private:
     // Slang shader compiler
     xr_unique_ptr<xray::render::SlangCompiler> m_slangCompiler;
 
-    // Persistent command list for upload operations (texture/buffer uploads)
-    // Created once during Init(), reused for all uploads, released in destructor
-    nvrhi::CommandListHandle m_uploadCommandList;
-
     // Thread safety for upload operations (textures loaded in parallel)
     std::mutex m_uploadMutex;
 

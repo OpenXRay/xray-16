@@ -119,17 +119,18 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     placeholderDesc.keepInitialState = true;  // OK - static texture persists
     s_placeholderCubemap = nvrhiDevice->createTexture(placeholderDesc);
 
-    // Upload index data and placeholder cubemap
+    // Upload index data via backend
+    if (GEnv.Backend) {
+        GEnv.Backend->UploadBufferData(s_skyIndexBuffer, hbox_faces, sizeof(hbox_faces));
+    }
+
+    // Initialize placeholder cubemap faces with light blue (one-time init, immediate)
     nvrhi::CommandListHandle cmdList = nvrhiDevice->createCommandList();
     cmdList->open();
-    cmdList->writeBuffer(s_skyIndexBuffer, hbox_faces, sizeof(hbox_faces));
-
-    // Initialize placeholder cubemap faces with light blue
     u32 skyBlue = 0xFF8080FF;  // ABGR (light blue)
     for (u32 face = 0; face < 6; face++) {
         cmdList->writeTexture(s_placeholderCubemap, face, 0, &skyBlue, sizeof(skyBlue));
     }
-
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
 

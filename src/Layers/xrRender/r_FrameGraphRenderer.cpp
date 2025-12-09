@@ -1830,21 +1830,16 @@ void FrameGraphRenderer::RenderImGui(ImDrawData* drawData, ng::ImGuiRendererNVRH
         return;
     }
 
-    // Get immediate command list
+    // Get main command list (already open from BeginFrame, will execute at EndFrame)
     nvrhi::ICommandList* cmdList = m_device->GetImmediateCommandList();
     if (!cmdList) {
         Msg("! [FrameGraphRenderer] No command list available for ImGui");
         return;
     }
 
-    // Render ImGui onto final output (pass raw pointer from handle)
+    // Render ImGui onto final output
+    // Commands are batched into main cmdlist, executed at EndFrame
     imguiRenderer->Render(drawData, framebuffer.Get(), cmdList);
-
-    // CRITICAL: Close and execute the immediate command list to ensure ImGui draws before present
-    // Without this, ImGui commands are queued but not submitted to GPU
-    cmdList->close();
-    m_device->GetNVRHIDevice()->executeCommandList(cmdList);
-    cmdList->open(); // Reopen for subsequent operations
 }
 
 } // namespace xray::render

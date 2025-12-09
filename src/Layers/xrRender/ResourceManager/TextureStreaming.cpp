@@ -10,6 +10,10 @@
 
 namespace xray::render::resources {
 
+// Persistent upload command list for streaming (prevents exhausting D3D12 allocator pool)
+static nvrhi::CommandListHandle s_streamingCmdList;
+static std::mutex s_streamingCmdListMutex;
+
 StreamingManager::StreamingManager(xray::render::ng::RenderDevice* device, TextureManager* texManager)
     : m_device(device)
     , m_texManager(texManager)
@@ -295,26 +299,39 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
         return false;
     }
 
-    // Upload directly via NVRHI
-    nvrhi::ICommandList* cmdList = m_device->GetNativeDevice()->createCommandList();
-    cmdList->open();
-
+    // Upload texture mips
     u32 startMip = request.currentMips;
     u32 endMip = request.targetMips;
+
+    // Use backend command list if in-frame, otherwise use persistent streaming cmdlist
+    nvrhi::ICommandList* cmdList = nullptr;
+    std::unique_lock<std::mutex> streamingLock;
+    bool needsExecute = false;
+
+    if (GEnv.Backend && GEnv.Backend->IsInFrame()) {
+        cmdList = GEnv.Backend->GetCommandList();
+    } else {
+        // Use persistent streaming command list (prevents exhausting D3D12 allocator pool)
+        streamingLock = std::unique_lock<std::mutex>(s_streamingCmdListMutex);
+        if (!s_streamingCmdList) {
+            s_streamingCmdList = m_device->GetNativeDevice()->createCommandList();
+        }
+        s_streamingCmdList->open();
+        cmdList = s_streamingCmdList.Get();
+        needsExecute = true;
+    }
 
     for (u32 mip = startMip; mip < endMip; mip++) {
         if (mip >= ddsData.mipLevels.size()) break;
 
         const DDSMipLevel& mipData = ddsData.mipLevels[mip];
-
-        // Use pitch values calculated by DDSLoader (DRY principle)
-        // writeTexture signature: (texture, arraySlice, mipLevel, data, rowPitch, depthPitch)
         cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch, mipData.slicePitch);
     }
 
-    cmdList->close();
-    m_device->GetNativeDevice()->executeCommandList(cmdList);
-    cmdList->Release();  // CRITICAL: Release to avoid massive leak during streaming!
+    if (needsExecute) {
+        s_streamingCmdList->close();
+        m_device->GetNativeDevice()->executeCommandList(s_streamingCmdList);
+    }
 
     // Update metadata
     meta->residentMips = request.targetMips;
