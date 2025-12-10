@@ -669,25 +669,51 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
 
-    const FSlideWindowItem* pSWI = nullptr;
+    bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
 
-    if (visualType == MT_SKELETON_GEOMDEF_PM) {
-        pSWI = &static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+    if (isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_PM) {
+            const FSlideWindowItem& swi = static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+            if (swi.sw && swi.count > 0) {
+                const FSlideWindow& sw = swi.sw[0];
+                batch.indexCount = sw.num_tris * 3;
+                batch.startIndex = sw.offset;
+            } else {
+                batch.indexCount = meshVisual->iCount;
+                batch.startIndex = 0;
+            }
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = 0;
+        }
+        batch.baseVertex = 0;
     } else if (visualType == MT_PROGRESSIVE) {
-        pSWI = &static_cast<FProgressive*>(visual)->GetSWI();
+        const FSlideWindowItem& swi = static_cast<FProgressive*>(visual)->GetSWI();
+        if (swi.sw && swi.count > 0) {
+            const FSlideWindow& sw = swi.sw[0];
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+        batch.baseVertex = meshVisual->vBase;
     } else if (visualType == MT_TREE_PM) {
-        pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
-    }
-
-    if (pSWI && pSWI->sw && pSWI->count > 0) {
-        const FSlideWindow& sw = pSWI->sw[0];
-        batch.indexCount = sw.num_tris * 3;
-        batch.startIndex = meshVisual->iBase + sw.offset;
+        const FSlideWindowItem* pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
+        if (pSWI && pSWI->sw && pSWI->count > 0) {
+            const FSlideWindow& sw = pSWI->sw[0];
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+        batch.baseVertex = meshVisual->vBase;
     } else {
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
+        batch.baseVertex = meshVisual->vBase;
     }
-    batch.baseVertex = meshVisual->vBase;
     batch.vertexStride = meshVisual->vStride;
 
     batch.worldMatrix = worldTransform;
@@ -733,16 +759,16 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
 
     if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
         batch.megaBufferAlloc = m_gpuCullingManager->GetMeshAllocation(
-            meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
-            meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+            meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
+            meshVisual->ibPoolID, batch.startIndex, batch.indexCount,
             meshVisual->useAlternativeGeom
         );
 
         static int s_allocDebug = 0;
         if (s_allocDebug < 10 && !batch.megaBufferAlloc.valid) {
             Msg("! [MegaBuffer] Invalid alloc: vbPool=%u, vBase=%u, vCount=%u, ibPool=%u, iBase=%u, iCount=%u, alt=%d",
-                meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
-                meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+                meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
+                meshVisual->ibPoolID, batch.startIndex, batch.indexCount,
                 meshVisual->useAlternativeGeom ? 1 : 0);
             s_allocDebug++;
         }
