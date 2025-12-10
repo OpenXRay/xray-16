@@ -636,26 +636,16 @@ void renderBindlessForward(
         {s_drawIndexBuffer, 1, 0}           // Slot 1: Per-instance draw indices (stride 4)
     };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-    state.indirectParams = config.compactDrawArgsBuffer;  // Indirect args buffer
+    state.indirectParams = config.compactDrawArgsBuffer;
+    state.indirectCountBuffer = config.compactCountBuffer;
+    state.indirectCountOffset = 0;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-    // ═══════════════════════════════════════════════════════
-    //  SINGLE MULTI-DRAW INDIRECT CALL (GPU-DRIVEN)
-    // ═══════════════════════════════════════════════════════
-    // This is the ENTIRE POINT of GPU-driven rendering:
-    // - ONE pipeline bind
-    // - ONE vertex/index buffer bind
-    // - ONE multi-draw call for ALL objects
-    // Shader uses SV_DrawID to index into g_CompactBatchIndices/g_CompactMaterialIDs
-
     cmdList->setGraphicsState(state);
+    cmdList->drawIndexedIndirectCount(0, config.totalObjectCount);
 
-    // Single multi-draw indirect: Draw ALL visible objects in one API call
-    // D3D12 ExecuteIndirect reads visibleCount draw args from compactDrawArgsBuffer
-    cmdList->drawIndexedIndirect(0, visibleCount);
-
-    s_gpuDrivenDraws += visibleCount;
+    s_gpuDrivenDraws += config.totalObjectCount;
 
     // Skinned meshes are rendered in the SkinningPass (see SkinningPassSetup.cpp)
 }

@@ -248,7 +248,6 @@ void VertexStagingBuffer::Unmap(bool doFlush /*= false*/)
     m_DeviceBuffer = CreateVertexBuffer(m_HostBuffer, m_Size, false);
     if (!m_DeviceBuffer)
     {
-        VERIFY(!"Failed to create vertex buffer");
         return;
     }
 

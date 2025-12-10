@@ -218,6 +218,10 @@ public:
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
     nvrhi::IBuffer* GetInstanceBuffer() const { return m_instanceBuffer.Get(); }
 
+    // Get compact count buffer (contains actual visible draw count from GPU culling)
+    nvrhi::IBuffer* GetCompactCountBuffer() const { return m_compactCountBuffer.Get(); }
+    bool IsCompactionEnabled() const { return m_compactEnabled; }
+
     // Upload instance data (transforms) for current frame
     void UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry);
 

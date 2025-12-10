@@ -55,8 +55,12 @@ struct BindlessForwardConfig {
     // Instance data buffer (GPUInstanceData: world matrix + materialID per batch)
     nvrhi::IBuffer* instanceBuffer = nullptr;
 
+    // Compact count buffer (contains actual visible draw count from GPU culling)
+    // Enables true GPU-driven rendering: GPU determines how many draws to execute
+    nvrhi::IBuffer* compactCountBuffer = nullptr;
+
     // Total number of objects uploaded to GPU (max possible draws)
-    // We draw all slots; culled batches have instanceCount=0 (no-op)
+    // Used as maxDrawCount safety limit for ExecuteIndirect with count buffer
     u32 totalObjectCount = 0;
 
     // Enable bindless rendering mode

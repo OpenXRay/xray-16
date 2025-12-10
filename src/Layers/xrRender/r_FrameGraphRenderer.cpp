@@ -699,6 +699,12 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.instanceBuffer = m_gpuCullingManager->GetInstanceBuffer();
         bindlessConfig.totalObjectCount = m_gpuCullingManager->GetObjectCount();
 
+        // GPU-driven draw count: Use count buffer if compaction is enabled
+        // This enables true GPU-driven rendering where GPU determines how many draws to execute
+        if (m_gpuCullingManager->IsCompactionEnabled()) {
+            bindlessConfig.compactCountBuffer = m_gpuCullingManager->GetCompactCountBuffer();
+        }
+
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
         // ═══════════════════════════════════════════════════════
