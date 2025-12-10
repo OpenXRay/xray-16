@@ -4,6 +4,7 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class CBlender_Vertex_aref : public IBlender
 {
+public:
     xrP_Integer oAREF;
     xrP_BOOL oBlend;
 

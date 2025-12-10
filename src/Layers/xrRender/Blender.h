@@ -57,6 +57,11 @@ public:
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
     virtual BOOL canUseSteepParallax() { return FALSE; }
+
+    // Alpha properties for bindless material system
+    virtual int getAREF() { return 0; }
+    virtual bool getBlend() { return false; }
+
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
