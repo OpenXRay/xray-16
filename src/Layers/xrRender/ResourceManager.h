@@ -109,10 +109,18 @@ public:
     void _GetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps);
     void _DumpMemoryUsage();
 
+    enum class BlendMode : u8 {
+        Opaque,
+        AlphaTest,
+        AlphaBlend,
+        Additive,
+        Multiply,
+        Multiply2X,
+    };
     struct BlenderProperties {
-        bool alphaTest = false;
+        BlendMode blendMode = BlendMode::Opaque;
         u32 alphaRef = 0;
-        bool alphaBlend = false;
+        bool writesDepth = true;
     };
     bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);

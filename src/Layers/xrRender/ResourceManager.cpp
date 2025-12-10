@@ -71,109 +71,106 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
         return I->second;
 }
 
+static CResourceManager::BlendMode TokenToBlendMode(u32 tokenID)
+{
+    using BlendMode = CResourceManager::BlendMode;
+    switch (tokenID)
+    {
+    case 0: return BlendMode::Opaque;
+    case 1: return BlendMode::AlphaBlend;
+    case 2: return BlendMode::Additive;
+    case 3: return BlendMode::Multiply;
+    case 4: return BlendMode::Multiply2X;
+    case 5: return BlendMode::Additive;
+    default: return BlendMode::AlphaBlend;
+    }
+}
+
 bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties& outProps)
 {
     IBlender* B = _FindBlender(shaderName);
     if (!B)
-    {
-        Msg("[GetBlenderProperties] Blender '%s' not found.", shaderName);
         return false;
-    }
 
     const CLASS_ID cls = B->getDescription().CLS;
     outProps = {};
 
-    if (cls == B_DEFAULT_AREF)
+    if (cls == B_DEFAULT_AREF || cls == B_VERT_AREF)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_DEFAULT_AREF", shaderName, cls);
-        auto* b = static_cast<CBlender_deffer_aref*>(B);
-        outProps.alphaTest = (b->oAREF.value > 0);
+        auto* b = (cls == B_DEFAULT_AREF)
+            ? static_cast<CBlender_deffer_aref*>(B)
+            : reinterpret_cast<CBlender_deffer_aref*>(static_cast<CBlender_Vertex_aref*>(B));
         outProps.alphaRef = b->oAREF.value;
-        outProps.alphaBlend = b->oBlend.value;
-        return true;
-    }
-    if (cls == B_VERT_AREF)
-    {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_VERT_AREF", shaderName, cls);
-
-        auto* b = static_cast<CBlender_Vertex_aref*>(B);
-        outProps.alphaTest = (b->oAREF.value > 0);
-        outProps.alphaRef = b->oAREF.value;
-        outProps.alphaBlend = b->oBlend.value;
+        if (b->oBlend.value)
+            outProps.blendMode = BlendMode::AlphaBlend;
+        else if (b->oAREF.value > 0)
+            outProps.blendMode = BlendMode::AlphaTest;
+        else
+            outProps.blendMode = BlendMode::Opaque;
+        outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
         return true;
     }
     if (cls == B_TREE)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_TREE", shaderName, cls);
-
         auto* b = static_cast<CBlender_Tree*>(B);
-        outProps.alphaTest = b->oBlend.value;
+        outProps.blendMode = b->oBlend.value ? BlendMode::AlphaTest : BlendMode::Opaque;
         outProps.alphaRef = b->oBlend.value ? 200 : 0;
-        outProps.alphaBlend = false;
+        outProps.writesDepth = true;
         return true;
     }
     if (cls == B_DETAIL)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_DETAIL", shaderName, cls);
-
         auto* b = static_cast<CBlender_Detail_Still*>(B);
-        outProps.alphaTest = true;
+        outProps.blendMode = b->oBlend.value ? BlendMode::AlphaBlend : BlendMode::AlphaTest;
         outProps.alphaRef = 200;
-        outProps.alphaBlend = b->oBlend.value;
+        outProps.writesDepth = !b->oBlend.value;
         return true;
     }
     if (cls == B_MODEL)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_MODEL", shaderName, cls);
-
         auto* b = static_cast<CBlender_Model*>(B);
-        outProps.alphaTest = (b->oAREF.value > 0);
         outProps.alphaRef = b->oAREF.value;
-        outProps.alphaBlend = b->oBlend.value;
+        if (b->oBlend.value)
+            outProps.blendMode = BlendMode::AlphaBlend;
+        else if (b->oAREF.value > 0)
+            outProps.blendMode = BlendMode::AlphaTest;
+        else
+            outProps.blendMode = BlendMode::Opaque;
+        outProps.writesDepth = (outProps.blendMode != BlendMode::AlphaBlend);
         return true;
     }
     if (cls == B_MODEL_EbB)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_MODEL_EbB", shaderName, cls);
-
         auto* b = static_cast<CBlender_Model_EbB*>(B);
-        outProps.alphaBlend = b->oBlend.value;
-        outProps.alphaTest = false;
-        outProps.alphaRef = 0;
+        outProps.blendMode = b->oBlend.value ? BlendMode::AlphaBlend : BlendMode::Opaque;
+        outProps.writesDepth = !b->oBlend.value;
         return true;
     }
     if (cls == B_SCREEN_SET)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_SCREEN_SET", shaderName, cls);
-
         auto* b = static_cast<CBlender_Screen_SET*>(B);
-        outProps.alphaBlend = (b->oBlend.IDselected >= 1);
-        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.blendMode = TokenToBlendMode(b->oBlend.IDselected);
         outProps.alphaRef = b->oAREF.value;
+        outProps.writesDepth = (outProps.blendMode == BlendMode::Opaque);
         return true;
     }
     if (cls == B_PARTICLE)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_PARTICLE", shaderName, cls);
-
         auto* b = static_cast<CBlender_Particle*>(B);
-        outProps.alphaBlend = (b->oBlend.IDselected >= 1);
-        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.blendMode = TokenToBlendMode(b->oBlend.IDselected);
         outProps.alphaRef = b->oAREF.value;
+        outProps.writesDepth = false;
         return true;
     }
     if (cls == B_DEFAULT || cls == B_VERT || cls == B_LmBmmD || cls == B_LaEmB || cls == B_LmEbB ||
         cls == B_B || cls == B_BmmD || cls == B_SCREEN_GRAY || cls == B_LIGHT || cls == B_BLUR ||
         cls == B_SHADOW_TEX || cls == B_SHADOW_WORLD || cls == B_EDITOR_WIRE || cls == B_EDITOR_SEL)
     {
-        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> DEFAULT_OPAQUE", shaderName, cls);
-        outProps.alphaBlend = false;
-        outProps.alphaTest = false;
-        outProps.alphaRef = 0;
+        outProps.blendMode = BlendMode::Opaque;
+        outProps.writesDepth = true;
         return true;
     }
 
-    Msg("[GetBlenderProperties] Blender '%s' not mapped.", shaderName);
     return false;
 }
 
