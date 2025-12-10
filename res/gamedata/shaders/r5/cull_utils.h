@@ -52,4 +52,64 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
     return dist_sq < max_dist_sq;
 }
 
+bool HiZTestSphere(
+    float3 center,
+    float radius,
+    float3 cameraPos,
+    float4x4 viewProj,
+    Texture2D<float> hiZPyramid,
+    SamplerState pointSampler,
+    uint hiZWidth,
+    uint hiZHeight,
+    uint hiZMipLevels)
+{
+    float4 clipPos = mul(viewProj, float4(center, 1.0));
+
+    if (clipPos.w <= 0.001)
+        return true;
+
+    float3 ndc = clipPos.xyz / clipPos.w;
+
+    float projScale = max(abs(viewProj[0][0]), abs(viewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
+
+    float2 minNDC = ndc.xy - ndcSize;
+    float2 maxNDC = ndc.xy + ndcSize;
+
+    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
+        return true;
+
+    float2 minUV = saturate(minNDC * 0.5 + 0.5);
+    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
+
+    minUV.y = 1.0 - minUV.y;
+    maxUV.y = 1.0 - maxUV.y;
+
+    float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV));
+
+    float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
+    float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
+
+    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
+    mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
+
+    float d1 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.y), mipLevel);
+    float d2 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.y), mipLevel);
+    float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
+    float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
+
+    float hiZDepth = max(max(d1, d2), max(d3, d4));
+
+    float3 viewDir = normalize(center - cameraPos);
+    float3 frontPoint = center - viewDir * radius;
+    float4 frontClip = mul(viewProj, float4(frontPoint, 1.0));
+
+    if (frontClip.w <= 0.001)
+        return true;
+
+    float frontDepth = frontClip.z / frontClip.w;
+
+    return frontDepth <= hiZDepth;
+}
+
 #endif

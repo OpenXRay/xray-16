@@ -43,7 +43,19 @@ struct ParticleVertex {
     Fvector p;
     u32 color;
     Fvector2 t;
+    u32 materialID;
 };
+
+struct GPUParticleData {
+    Fvector position;
+    float rotation;
+    Fvector2 size;
+    u32 color;
+    u32 materialID;
+    Fvector2 uvMin;
+    Fvector2 uvMax;
+};
+static_assert(sizeof(GPUParticleData) == 48, "GPUParticleData must be 48 bytes");
 
 void InitializeParticlePipelines(ng::RenderDevice* device);
 
@@ -58,7 +70,10 @@ framegraph::DefaultOutputLayout setupParticlePass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr
+    framegraph::VirtualResourceHandle hiZPyramid = {},
+    u32 hiZWidth = 0,
+    u32 hiZHeight = 0,
+    u32 hiZMipLevels = 0
 );
 
 }

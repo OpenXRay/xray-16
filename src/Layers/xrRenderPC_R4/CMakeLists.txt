@@ -70,6 +70,8 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/ImGuiPassSetup.cpp
     ../xrRender/FrameGraphPasses/ParticlePassSetup.h
     ../xrRender/FrameGraphPasses/ParticlePassSetup.cpp
+    ../xrRender/FrameGraphPasses/ParticleGPUCullingManager.h
+    ../xrRender/FrameGraphPasses/ParticleGPUCullingManager.cpp
     ../xrRender/FrameGraphPasses/ExposurePassSetup.h
     ../xrRender/FrameGraphPasses/ExposurePassSetup.cpp
     ../xrRender/FrameGraphPasses/TonemapPassSetup.h
