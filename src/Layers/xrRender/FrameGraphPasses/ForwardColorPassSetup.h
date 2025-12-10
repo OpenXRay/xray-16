@@ -28,6 +28,8 @@ struct BindlessForwardConfig {
 
     nvrhi::IBuffer* instanceBuffer = nullptr;
 
+    nvrhi::IBuffer* compactCountBuffer = nullptr;
+
     u32 totalObjectCount = 0;
 
     bool enabled = false;

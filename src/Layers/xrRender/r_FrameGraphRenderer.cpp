@@ -464,6 +464,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         bindlessConfig.instanceBuffer = m_gpuCullingManager->GetInstanceBuffer();
         bindlessConfig.totalObjectCount = m_gpuCullingManager->GetObjectCount();
 
+        if (m_gpuCullingManager->IsCompactionEnabled()) {
+            bindlessConfig.compactCountBuffer = m_gpuCullingManager->GetCompactCountBuffer();
+        }
+
         if (m_gpuCullingManager->AreMegaBuffersReady()) {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
             bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();

@@ -151,6 +151,9 @@ public:
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
     nvrhi::IBuffer* GetInstanceBuffer() const { return m_instanceBuffer.Get(); }
 
+    nvrhi::IBuffer* GetCompactCountBuffer() const { return m_compactCountBuffer.Get(); }
+    bool IsCompactionEnabled() const { return m_compactEnabled; }
+
     void UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry);
 
     u32 GetTotalVertexCount() const { return m_totalVertexCount; }

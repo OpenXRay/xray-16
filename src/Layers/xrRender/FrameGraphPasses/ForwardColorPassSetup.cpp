@@ -520,14 +520,15 @@ void renderBindlessForward(
     };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
     state.indirectParams = config.compactDrawArgsBuffer;
+    state.indirectCountBuffer = config.compactCountBuffer;
+    state.indirectCountOffset = 0;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
     cmdList->setGraphicsState(state);
+    cmdList->drawIndexedIndirectCount(0, config.totalObjectCount);
 
-    cmdList->drawIndexedIndirect(0, visibleCount);
-
-    s_gpuDrivenDraws += visibleCount;
+    s_gpuDrivenDraws += config.totalObjectCount;
 
 }
 
