@@ -766,11 +766,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         height
     );
 
-    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr;
-    if (m_gpuCullingManager && m_gpuCullingManager->IsParticleCullingEnabled()) {
-        particleDrawArgsBuffer = m_gpuCullingManager->GetParticleDrawArgsBuffer();
-    }
-
     auto particleOutputs = passes::setupParticlePass(
         *m_framegraph,
         m_device,
@@ -780,7 +775,10 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         m_materialCache.get(),
         width,
         height,
-        particleDrawArgsBuffer
+        hizOutput.pyramid,       // Hi-Z pyramid for GPU particle culling
+        hizOutput.width,
+        hizOutput.height,
+        hizOutput.mipLevels
     );
 
     // ═══════════════════════════════════════════════════════

@@ -1,110 +1,75 @@
-#define SM_5_0
-#include "common.h"
+// particle_cull.cs
+// GPU particle culling: frustum + Hi-Z occlusion
+// Outputs visible particle indices and count
+
+#define THREAD_GROUP_SIZE 64
+
 #include "cull_utils.h"
 
-struct GPUParticleData
-{
-    float3 position;
-    float radius;
-    uint batchIndex;
-    uint flags;
-    float2 padding;
+// Must match GPUParticleData in ParticlePassSetup.h (48 bytes)
+struct ParticleData {
+    float3 position;    // 12 bytes
+    float rotation;     //  4 bytes
+    float2 size;        //  8 bytes
+    uint color;         //  4 bytes
+    uint materialID;    //  4 bytes
+    float2 uvMin;       //  8 bytes
+    float2 uvMax;       //  8 bytes
 };
 
-cbuffer CullParams : register(b5)
-{
-    float4x4 g_ViewProj;
-    float3 g_CameraPos;
-    float g_MaxDistance;
-    float4 g_FrustumPlanes[6];
-    uint g_ParticleCount;
-    uint g_HiZWidth;
-    uint g_HiZHeight;
-    uint g_HiZMipLevels;
+cbuffer ParticleCullParams : register(b0) {
+    float4x4 g_ViewProj;        // 64 bytes
+    float4 g_FrustumPlanes[6];  // 96 bytes
+    float4 g_CameraPos;         // 16 bytes
+    float4 g_CameraTop;         // 16 bytes
+    float4 g_CameraRight;       // 16 bytes
+    uint g_ParticleCount;       //  4 bytes
+    uint g_HiZWidth;            //  4 bytes
+    uint g_HiZHeight;           //  4 bytes
+    uint g_HiZMipLevels;        //  4 bytes
 };
 
-StructuredBuffer<GPUParticleData> g_Particles : register(t0);
+StructuredBuffer<ParticleData> g_ParticleData : register(t0);
 Texture2D<float> g_HiZPyramid : register(t1);
-SamplerState g_PointSampler : register(s0);
+SamplerState g_PointClampSampler : register(s0);
 
-RWByteAddressBuffer g_VisibleCount : register(u0);
-RWByteAddressBuffer g_DrawArgs : register(u1);
+RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
+RWByteAddressBuffer g_VisibleCount : register(u1);
 
-bool OcclusionTestSphere(float3 center, float radius)
+[numthreads(THREAD_GROUP_SIZE, 1, 1)]
+void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 {
-    float4 clipPos = mul(g_ViewProj, float4(center, 1.0));
-
-    if (clipPos.w <= 0.001)
-        return true;
-
-    float3 ndc = clipPos.xyz / clipPos.w;
-
-    float projScale = max(abs(g_ViewProj[0][0]), abs(g_ViewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
-
-    float2 minNDC = ndc.xy - ndcSize;
-    float2 maxNDC = ndc.xy + ndcSize;
-
-    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
-        return false;
-
-    float2 minUV = minNDC * 0.5 + 0.5;
-    float2 maxUV = maxNDC * 0.5 + 0.5;
-
-    minUV.y = 1.0 - minUV.y;
-    maxUV.y = 1.0 - maxUV.y;
-
-    float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV));
-
-    float boxWidth = (boxUV.z - boxUV.x) * float(g_HiZWidth);
-    float boxHeight = (boxUV.w - boxUV.y) * float(g_HiZHeight);
-
-    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
-    mipLevel = clamp(mipLevel, 0.0, float(g_HiZMipLevels - 1));
-
-    float d1 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.x, boxUV.y), mipLevel);
-    float d2 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.z, boxUV.y), mipLevel);
-    float d3 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.x, boxUV.w), mipLevel);
-    float d4 = g_HiZPyramid.SampleLevel(g_PointSampler, float2(boxUV.z, boxUV.w), mipLevel);
-
-    float hiZDepth = max(max(d1, d2), max(d3, d4));
-
-    float3 viewDir = normalize(center - g_CameraPos);
-    float3 frontPoint = center - viewDir * radius;
-
-    float4 frontClip = mul(g_ViewProj, float4(frontPoint, 1.0));
-
-    if (frontClip.w <= 0.001)
-        return true;
-
-    float objectDepth = saturate(frontClip.z / frontClip.w);
-
-    float depthBias = 0.0001;
-    return objectDepth <= (hiZDepth + depthBias);
-}
-
-[numthreads(64, 1, 1)]
-void main(uint3 dtID : SV_DispatchThreadID)
-{
-    uint particleIdx = dtID.x;
+    uint particleIdx = dispatchThreadID.x;
 
     if (particleIdx >= g_ParticleCount)
         return;
 
-    GPUParticleData particle = g_Particles[particleIdx];
+    ParticleData p = g_ParticleData[particleIdx];
 
-    if (!DistanceTestSphere(particle.position, particle.radius, g_CameraPos, g_MaxDistance))
+    // Bounding sphere radius (diagonal of billboard)
+    float radius = length(p.size);
+
+    // Frustum culling (returns true = visible)
+    if (!FrustumTestSphere(p.position, radius, g_FrustumPlanes))
         return;
 
-    if (!FrustumTestSphere(particle.position, particle.radius, g_FrustumPlanes))
-        return;
+    // Hi-Z occlusion culling (returns true = visible)
+    if (g_HiZMipLevels > 0) {
+        if (!HiZTestSphere(
+                p.position,
+                radius,
+                g_CameraPos.xyz,
+                g_ViewProj,
+                g_HiZPyramid,
+                g_PointClampSampler,
+                g_HiZWidth,
+                g_HiZHeight,
+                g_HiZMipLevels))
+            return;
+    }
 
-    if (!OcclusionTestSphere(particle.position, particle.radius))
-        return;
-
+    // Particle is visible - append to output
     uint visibleIdx;
     g_VisibleCount.InterlockedAdd(0, 1, visibleIdx);
-
-    uint argsBaseOffset = particle.batchIndex * 20;
-    g_DrawArgs.Store(argsBaseOffset + 4, 1);
+    g_VisibleIndices[visibleIdx] = particleIdx;
 }

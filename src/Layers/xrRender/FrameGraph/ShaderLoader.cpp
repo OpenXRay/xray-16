@@ -403,6 +403,148 @@ ShaderLoader::ShaderResult ShaderLoader::LoadPixelShader(
 }
 
 // ══════════════════════════════════════════════════════════
+//  LOAD COMPUTE SHADER
+// ══════════════════════════════════════════════════════════
+
+ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
+    const char* name,
+    const char* entryPoint)
+{
+    ShaderResult result;
+
+    // ═══════════════════════════════════════════════════
+    //  CHECK IN-MEMORY HANDLE CACHE FIRST (fastest path)
+    // ═══════════════════════════════════════════════════
+    xr_string cacheKey = xr_string(name) + ".cs";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        // Return cached handle + reflection
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
+
+    // Open shader source file
+    IReader* fs = OpenShaderFile(name, ".cs");
+    if (!fs)
+        return result;  // Empty result
+
+    // Compute hash of shader source
+    u32 sourceHash = ShaderCache::ComputeHash(
+        (const char*)fs->pointer(),
+        fs->length()
+    );
+
+    // Try to load bytecode + reflection from cache
+    ExtractedReflection deserializedReflection;
+    bool cacheHit = m_cache.TryLoad(name, ".cs", sourceHash, result.bytecode, &deserializedReflection);
+
+    if (cacheHit)
+    {
+        // Disk cache hit - create shader from cached bytecode + deserialized reflection
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Compute;
+        desc.debugName = name;
+
+        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+            desc,
+            result.bytecode.data(),
+            result.bytecode.size()
+        );
+
+        fs->close();
+
+        if (!result.handle)
+        {
+            Msg("! [ShaderLoader] Failed to create NVRHI compute shader from cache: %s", name);
+            return result;
+        }
+
+        // Store deserialized reflection
+        result.reflection = xr_new<ExtractedReflection>(deserializedReflection);
+
+        // Cache handle and reflection for future calls
+        m_handleCache[cacheKey] = result.handle;
+        m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(deserializedReflection);
+
+        return result;
+    }
+
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+
+    // Build full shader path for include resolution
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath,
+        GEnv.Render->getShaderPath(),  // "shaders/r5/"
+        name,
+        ".cs");
+
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(),
+        entryPoint,
+        xray::render::SlangCompiler::Stage::Compute,
+        xray::render::SlangCompiler::Target::DXIL,  // DX12 SM6
+        fullPath  // Full path allows VFS to resolve relative includes
+    );
+
+    fs->close();
+
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.cs", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;  // Empty result
+    }
+
+    // Create NVRHI shader
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Compute;
+    desc.debugName = name;
+
+    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        desc,
+        compileResult.bytecode.data(),
+        compileResult.bytecode.size()
+    );
+
+    if (!result.handle)
+    {
+        Msg("! [ShaderLoader] Failed to create NVRHI compute shader: %s", name);
+        return result;
+    }
+
+    // ═══════════════════════════════════════════════════
+    //  EXTRACT AND STORE REFLECTION
+    // ═══════════════════════════════════════════════════
+    result.bytecode = std::move(compileResult.bytecode);
+
+    // Extract reflection from Slang for storage and caching
+    auto extractedReflection = ShaderReflector::ExtractReflection(
+        compileResult.reflection,
+        false  // isVertexShader (this is compute shader)
+    );
+
+    // Store extracted reflection in result
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+
+    // Save bytecode + reflection to disk cache
+    m_cache.Save(name, ".cs", sourceHash, result.bytecode, &extractedReflection);
+
+    // Cache handle and reflection for future calls
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
+    Msg("* [ShaderLoader] Compiled compute shader: %s.cs", name);
+
+    return result;
+}
+
+// ══════════════════════════════════════════════════════════
 //  COMPILE SHADER WITH DEFINES (FOR MATERIAL SHADERS)
 // ══════════════════════════════════════════════════════════
 

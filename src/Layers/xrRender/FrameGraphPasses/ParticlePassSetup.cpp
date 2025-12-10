@@ -1,7 +1,8 @@
 // xrRender/FrameGraphPasses/ParticlePassSetup.cpp
-// Modernized particle rendering with bindless material system
+// Batched particle rendering with GPU culling
 #include "stdafx.h"
 #include "ParticlePassSetup.h"
+#include "ParticleGPUCullingManager.h"
 #include "ShaderConstants.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/IPass.h"
@@ -17,6 +18,7 @@
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
 #include "xrParticles/psystem.h"
+#include "xrCDB/Frustum.h"  // For CFrustum (frustum plane extraction)
 
 extern ENGINE_API float psHUD_FOV;
 
@@ -28,54 +30,26 @@ using RENDER_NAMESPACE::PS::CParticleEffect;
 using RENDER_NAMESPACE::PS::CParticleGroup;
 using RENDER_NAMESPACE::PS::CPEDef;
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  PARTICLE PIPELINE INFRASTRUCTURE
-// ═══════════════════════════════════════════════════════════════════════════
-
-// Static pipeline state (created once, used for all particles)
-static nvrhi::GraphicsPipelineHandle s_particlePipelineBlend;     // Alpha blend
-static nvrhi::GraphicsPipelineHandle s_particlePipelineAdd;       // Additive
+// Static pipeline state
+static nvrhi::GraphicsPipelineHandle s_particlePipelineBlend;
+static nvrhi::GraphicsPipelineHandle s_particlePipelineAdd;
 static nvrhi::BindingLayoutHandle s_particleLayout;
 static nvrhi::InputLayoutHandle s_particleInputLayout;
 static nvrhi::ShaderHandle s_particleVS;
 static nvrhi::ShaderHandle s_particlePS;
 static nvrhi::SamplerHandle s_particleSampler;
+static nvrhi::BindingSetHandle s_particleBindingSet;
 static bool s_particleInitialized = false;
 
-// Dynamic buffers (grow as needed)
+// Dynamic buffers (CPU fallback path)
 static nvrhi::BufferHandle s_particleVB;
 static u32 s_particleVBSize = 0;
 static nvrhi::BufferHandle s_quadIB;
 static u32 s_maxQuads = 0;
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  HUD FOV ADJUSTMENT
-// ═══════════════════════════════════════════════════════════════════════════
-
-static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
-{
-    float fovScale = 1.0f / psHUD_FOV;
-    Fmatrix viewMatrix = Device.mView;
-    Fmatrix invView;
-    invView.invert(viewMatrix);
-
-    Fmatrix fovScaleMatrix;
-    fovScaleMatrix.identity();
-    fovScaleMatrix._11 = fovScale;
-    fovScaleMatrix._22 = fovScale;
-    fovScaleMatrix._33 = 1.0f;
-
-    Fmatrix temp1, temp2, result;
-    temp1.mul(viewMatrix, worldMatrix);
-    temp2.mul(fovScaleMatrix, temp1);
-    result.mul(invView, temp2);
-
-    return result;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  BUFFER MANAGEMENT
-// ═══════════════════════════════════════════════════════════════════════════
+// GPU culling manager
+static std::unique_ptr<ParticleGPUCullingManager> s_gpuCullingManager;
+static constexpr u32 MAX_GPU_PARTICLES = 65536;
 
 static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
 {
@@ -87,13 +61,13 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
     indices.reserve(numIndices);
 
     for (u32 i = 0; i < maxQuads; i++) {
-        u16 baseVertex = (u16)(i * 4);
-        indices.push_back(baseVertex + 0);
-        indices.push_back(baseVertex + 1);
-        indices.push_back(baseVertex + 2);
-        indices.push_back(baseVertex + 2);
-        indices.push_back(baseVertex + 1);
-        indices.push_back(baseVertex + 3);
+        u16 base = (u16)(i * 4);
+        indices.push_back(base + 0);
+        indices.push_back(base + 1);
+        indices.push_back(base + 2);
+        indices.push_back(base + 2);
+        indices.push_back(base + 1);
+        indices.push_back(base + 3);
     }
 
     nvrhi::BufferDesc ibDesc;
@@ -104,15 +78,14 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
     s_quadIB = nvDevice->createBuffer(ibDesc);
-    if (!s_quadIB) {
-        Msg("! [ParticlePass] ERROR: Failed to create quad index buffer");
+    if (!s_quadIB)
         return;
-    }
 
-    // Upload via backend (handles in-frame batching or immediate execution)
-    if (GEnv.Backend) {
-        GEnv.Backend->UploadBufferData(s_quadIB, indices.data(), indices.size() * sizeof(u16));
-    }
+    nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
+    cmdList->open();
+    cmdList->writeBuffer(s_quadIB, indices.data(), indices.size() * sizeof(u16));
+    cmdList->close();
+    nvDevice->executeCommandList(cmdList);
 
     s_maxQuads = maxQuads;
 }
@@ -132,17 +105,8 @@ static void EnsureParticleVertexBuffer(nvrhi::IDevice* nvDevice, u32 sizeBytes)
     vbDesc.keepInitialState = true;
 
     s_particleVB = nvDevice->createBuffer(vbDesc);
-    if (!s_particleVB) {
-        Msg("! [ParticlePass] ERROR: Failed to create particle vertex buffer");
-        return;
-    }
-
-    s_particleVBSize = allocSize;
+    s_particleVBSize = s_particleVB ? allocSize : 0;
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  BILLBOARD GENERATION
-// ═══════════════════════════════════════════════════════════════════════════
 
 static void FillSprite(
     ParticleVertex*& pv,
@@ -150,15 +114,13 @@ static void FillSprite(
     const Fvector& pos,
     const Fvector2& lt, const Fvector2& rb,
     float r1, float r2,
-    u32 clr,
+    u32 clr, u32 matID,
     float sina, float cosa)
 {
     Fvector Vr, Vt;
-
     Vr.x = T.x * r1 * sina + R.x * r1 * cosa;
     Vr.y = T.y * r1 * sina + R.y * r1 * cosa;
     Vr.z = T.z * r1 * sina + R.z * r1 * cosa;
-
     Vt.x = T.x * r2 * cosa - R.x * r2 * sina;
     Vt.y = T.y * r2 * cosa - R.y * r2 * sina;
     Vt.z = T.z * r2 * cosa - R.z * r2 * sina;
@@ -172,27 +134,152 @@ static void FillSprite(
     pv->p.set(d.x + pos.x, d.y + pos.y, d.z + pos.z);
     pv->color = clr;
     pv->t.set(lt.x, rb.y);
+    pv->materialID = matID;
     pv++;
 
     pv->p.set(a.x + pos.x, a.y + pos.y, a.z + pos.z);
     pv->color = clr;
     pv->t.set(lt.x, lt.y);
+    pv->materialID = matID;
     pv++;
 
     pv->p.set(c.x + pos.x, c.y + pos.y, c.z + pos.z);
     pv->color = clr;
     pv->t.set(rb.x, rb.y);
+    pv->materialID = matID;
     pv++;
 
     pv->p.set(b.x + pos.x, b.y + pos.y, b.z + pos.z);
     pv->color = clr;
     pv->t.set(rb.x, lt.y);
+    pv->materialID = matID;
     pv++;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-//  PIPELINE INITIALIZATION
-// ═══════════════════════════════════════════════════════════════════════════
+// Returns total particle count generated, fills vertices
+static u32 GenerateParticleVertices(
+    const xr_vector<ParticleBatch>& batches,
+    xr_vector<ParticleVertex>& vertices)
+{
+    u32 totalParticles = 0;
+
+    for (const auto& batch : batches) {
+        if (!batch.visual || batch.visual->getType() != MT_PARTICLE_EFFECT)
+            continue;
+
+        CParticleEffect* pEffect = static_cast<CParticleEffect*>(batch.visual);
+        auto* pDef = pEffect->GetDefinition();
+        if (!pDef || !pDef->m_Flags.is(CPEDef::dfSprite))
+            continue;
+
+        PAPI::Particle* particles = nullptr;
+        u32 particleCount = 0;
+        PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
+
+        if (particleCount == 0 || !particles)
+            continue;
+
+        u32 baseVertex = (u32)vertices.size();
+        vertices.resize(baseVertex + particleCount * 4);
+        ParticleVertex* pv = &vertices[baseVertex];
+
+        float sina = 0.0f, cosa = 0.0f;
+        float angle = float(0xFFFFFFFF);
+
+        for (u32 i = 0; i < particleCount; i++) {
+            auto& m = particles[i];
+
+            if (angle != m.rot.x) {
+                angle = m.rot.x;
+                sina = _sin(angle);
+                cosa = _cos(angle);
+            }
+
+            Fvector2 lt, rb;
+            lt.set(0.f, 0.f);
+            rb.set(1.f, 1.f);
+
+            if (pDef->m_Flags.is(CPEDef::dfFramed))
+                pDef->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), lt, rb);
+
+            float r_x = m.size.x * 0.5f;
+            float r_y = m.size.y * 0.5f;
+
+            if (pDef->m_Flags.is(CPEDef::dfVelocityScale)) {
+                float speed = m.vel.magnitude();
+                r_x += speed * pDef->m_VelocityScale.x;
+                r_y += speed * pDef->m_VelocityScale.y;
+            }
+
+            FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb,
+                       r_x, r_y, m.color, batch.bindlessMaterialID, sina, cosa);
+        }
+
+        totalParticles += particleCount;
+    }
+
+    return totalParticles;
+}
+
+// Collect GPUParticleData for GPU culling path
+static u32 CollectGPUParticleData(
+    const xr_vector<ParticleBatch>& batches,
+    xr_vector<GPUParticleData>& gpuParticles)
+{
+    u32 totalParticles = 0;
+
+    for (const auto& batch : batches) {
+        if (!batch.visual || batch.visual->getType() != MT_PARTICLE_EFFECT)
+            continue;
+
+        CParticleEffect* pEffect = static_cast<CParticleEffect*>(batch.visual);
+        auto* pDef = pEffect->GetDefinition();
+        if (!pDef || !pDef->m_Flags.is(CPEDef::dfSprite))
+            continue;
+
+        PAPI::Particle* particles = nullptr;
+        u32 particleCount = 0;
+        PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
+
+        if (particleCount == 0 || !particles)
+            continue;
+
+        u32 baseIdx = (u32)gpuParticles.size();
+        gpuParticles.resize(baseIdx + particleCount);
+
+        for (u32 i = 0; i < particleCount; i++) {
+            auto& m = particles[i];
+            auto& gp = gpuParticles[baseIdx + i];
+
+            gp.position = m.pos;
+            gp.rotation = m.rot.x;
+
+            float r_x = m.size.x * 0.5f;
+            float r_y = m.size.y * 0.5f;
+
+            if (pDef->m_Flags.is(CPEDef::dfVelocityScale)) {
+                float speed = m.vel.magnitude();
+                r_x += speed * pDef->m_VelocityScale.x;
+                r_y += speed * pDef->m_VelocityScale.y;
+            }
+
+            gp.size.set(r_x, r_y);
+            gp.color = m.color;
+            gp.materialID = batch.bindlessMaterialID;
+
+            if (pDef->m_Flags.is(CPEDef::dfFramed)) {
+                pDef->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), gp.uvMin, gp.uvMax);
+            } else {
+                gp.uvMin.set(0.f, 0.f);
+                gp.uvMax.set(1.f, 1.f);
+            }
+        }
+
+        totalParticles += particleCount;
+    }
+
+    return totalParticles;
+}
 
 void InitializeParticlePipelines(ng::RenderDevice* device)
 {
@@ -205,7 +292,7 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
 
     Msg("* [ParticlePass] Initializing particle pipelines...");
 
-    // Create dummy framebuffer for pipeline creation
+    // Dummy framebuffer for pipeline creation
     nvrhi::TextureDesc colorDesc;
     colorDesc.width = 64;
     colorDesc.height = 64;
@@ -230,11 +317,8 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
     fbDesc.addColorAttachment(dummyColorRT);
     fbDesc.setDepthAttachment(dummyDepthRT);
     auto framebuffer = nvDevice->createFramebuffer(fbDesc);
-
-    if (!framebuffer) {
-        Msg("! [ParticlePass] Failed to create dummy framebuffer");
+    if (!framebuffer)
         return;
-    }
 
     auto* shaderLoader = GEnv.Render->GetShaderLoader();
     if (!shaderLoader)
@@ -243,85 +327,79 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
     auto* backend = device->GetBackend();
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
-    // Create binding layout (matches bindless pattern)
-    nvrhi::BindingLayoutDesc particleLayoutDesc;
-    particleLayoutDesc.visibility = nvrhi::ShaderType::All;
-    particleLayoutDesc.bindings = {
+    // Binding layout - no per-material CB needed anymore
+    nvrhi::BindingLayoutDesc layoutDesc;
+    layoutDesc.visibility = nvrhi::ShaderType::All;
+    layoutDesc.bindings = {
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms (b0)
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // ParticleMaterialCB (b4)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (t8)
         nvrhi::BindingLayoutItem::Sampler(0),                 // g_LinearSampler (s0)
     };
-    s_particleLayout = nvDevice->createBindingLayout(particleLayoutDesc);
+    s_particleLayout = nvDevice->createBindingLayout(layoutDesc);
 
     // Load shaders
     auto vsResult = shaderLoader->LoadVertexShader("bindless_particle", "main");
-    if (!vsResult.handle) {
-        Msg("! [ParticlePass] Failed to load vertex shader");
+    if (!vsResult.handle)
         return;
-    }
     s_particleVS = vsResult.handle;
 
     auto psResult = shaderLoader->LoadPixelShader("bindless_particle", "main");
-    if (!psResult.handle) {
-        Msg("! [ParticlePass] Failed to load pixel shader");
+    if (!psResult.handle)
         return;
-    }
     s_particlePS = psResult.handle;
 
-    // Create sampler
+    // Sampler
     nvrhi::SamplerDesc samplerDesc;
     samplerDesc.setAllAddressModes(nvrhi::SamplerAddressMode::Repeat);
     samplerDesc.setAllFilters(true);
     samplerDesc.setMaxAnisotropy(8.0f);
     s_particleSampler = nvDevice->createSampler(samplerDesc);
 
-    // Create input layout (ParticleVertex: 24 bytes)
-    constexpr u32 stride = sizeof(ParticleVertex);  // 24 bytes
+    // Input layout (28 bytes per vertex now)
+    constexpr u32 stride = sizeof(ParticleVertex);
     nvrhi::VertexAttributeDesc attribs[] = {
         nvrhi::VertexAttributeDesc()
             .setName("POSITION")
             .setFormat(nvrhi::Format::RGB32_FLOAT)
+            .setBufferIndex(0)
             .setOffset(0)
             .setElementStride(stride),
         nvrhi::VertexAttributeDesc()
             .setName("COLOR")
             .setFormat(nvrhi::Format::BGRA8_UNORM)
+            .setBufferIndex(0)
             .setOffset(12)
             .setElementStride(stride),
         nvrhi::VertexAttributeDesc()
             .setName("TEXCOORD")
             .setFormat(nvrhi::Format::RG32_FLOAT)
+            .setBufferIndex(0)
             .setOffset(16)
             .setElementStride(stride),
+        nvrhi::VertexAttributeDesc()
+            .setName("MATERIALID")
+            .setFormat(nvrhi::Format::R32_UINT)
+            .setBufferIndex(0)
+            .setOffset(24)
+            .setElementStride(stride),
     };
-    s_particleInputLayout = nvDevice->createInputLayout(attribs, 3, s_particleVS);
+    s_particleInputLayout = nvDevice->createInputLayout(attribs, 4, s_particleVS);
 
-    // ─────────────────────────────────────────────────────
-    //  ALPHA BLEND PIPELINE
-    // ─────────────────────────────────────────────────────
+    // Alpha blend pipeline
     {
         nvrhi::GraphicsPipelineDesc pipeDesc;
         pipeDesc.VS = s_particleVS;
         pipeDesc.PS = s_particlePS;
         pipeDesc.inputLayout = s_particleInputLayout;
-        if (bindlessLayout) {
-            pipeDesc.bindingLayouts = { s_particleLayout, bindlessLayout };
-        } else {
-            pipeDesc.bindingLayouts = { s_particleLayout };
-        }
+        pipeDesc.bindingLayouts.push_back(s_particleLayout);
+        if (bindlessLayout)
+            pipeDesc.bindingLayouts.push_back(bindlessLayout);
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-        // Depth: test enabled, write disabled (particles don't write depth)
         pipeDesc.renderState.depthStencilState.depthTestEnable = true;
         pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
         pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-
-        // Culling: none (billboards face camera)
         pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-
-        // Blending: alpha blend (src*srcAlpha + dst*invSrcAlpha)
         pipeDesc.renderState.blendState.targets[0].enableBlend();
         pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
         pipeDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::InvSrcAlpha;
@@ -332,30 +410,20 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
         Msg("* [ParticlePass] Alpha blend pipeline: %s", s_particlePipelineBlend ? "OK" : "FAILED");
     }
 
-    // ─────────────────────────────────────────────────────
-    //  ADDITIVE BLEND PIPELINE
-    // ─────────────────────────────────────────────────────
+    // Additive blend pipeline
     {
         nvrhi::GraphicsPipelineDesc pipeDesc;
         pipeDesc.VS = s_particleVS;
         pipeDesc.PS = s_particlePS;
         pipeDesc.inputLayout = s_particleInputLayout;
-        if (bindlessLayout) {
-            pipeDesc.bindingLayouts = { s_particleLayout, bindlessLayout };
-        } else {
-            pipeDesc.bindingLayouts = { s_particleLayout };
-        }
+        pipeDesc.bindingLayouts.push_back(s_particleLayout);
+        if (bindlessLayout)
+            pipeDesc.bindingLayouts.push_back(bindlessLayout);
         pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
-
-        // Depth: test enabled, write disabled
         pipeDesc.renderState.depthStencilState.depthTestEnable = true;
         pipeDesc.renderState.depthStencilState.depthWriteEnable = false;
         pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
-
-        // Culling: none
         pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::None;
-
-        // Blending: additive (src + dst)
         pipeDesc.renderState.blendState.targets[0].enableBlend();
         pipeDesc.renderState.blendState.targets[0].srcBlend = nvrhi::BlendFactor::SrcAlpha;
         pipeDesc.renderState.blendState.targets[0].destBlend = nvrhi::BlendFactor::One;
@@ -368,10 +436,21 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
 
     s_particleInitialized = true;
     Msg("* [ParticlePass] Pipeline initialization complete");
+
+    // Initialize GPU culling manager
+    s_gpuCullingManager = std::make_unique<ParticleGPUCullingManager>();
+    if (!s_gpuCullingManager->Initialize(device, MAX_GPU_PARTICLES)) {
+        Msg("! [ParticlePass] GPU culling initialization failed, using CPU fallback");
+        s_gpuCullingManager.reset();
+    }
 }
 
 void ShutdownParticlePipelines()
 {
+    if (s_gpuCullingManager) {
+        s_gpuCullingManager->Shutdown();
+        s_gpuCullingManager.reset();
+    }
     s_particlePipelineBlend = nullptr;
     s_particlePipelineAdd = nullptr;
     s_particleLayout = nullptr;
@@ -379,157 +458,13 @@ void ShutdownParticlePipelines()
     s_particleVS = nullptr;
     s_particlePS = nullptr;
     s_particleSampler = nullptr;
+    s_particleBindingSet = nullptr;
     s_particleVB = nullptr;
     s_quadIB = nullptr;
     s_particleVBSize = 0;
     s_maxQuads = 0;
     s_particleInitialized = false;
-
-    Msg("* [ParticlePass] Pipeline resources released");
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  RENDER PARTICLE EFFECT
-// ═══════════════════════════════════════════════════════════════════════════
-
-static bool RenderParticleEffect(
-    nvrhi::ICommandList* cmdList,
-    nvrhi::IDevice* nvDevice,
-    nvrhi::IFramebuffer* framebuffer,
-    nvrhi::IBuffer* dynTransformsCB,
-    nvrhi::IBuffer* staticGlobalsCB,
-    nvrhi::IBuffer* matIdCB,
-    nvrhi::IDescriptorTable* bindlessTable,
-    const nvrhi::Viewport& viewport,
-    const nvrhi::Rect& scissor,
-    const ParticleBatch& batch,
-    bool isAdditive)
-{
-    CParticleEffect* pEffect = static_cast<CParticleEffect*>(batch.visual);
-    if (!pEffect)
-        return false;
-
-    auto* pDef = pEffect->GetDefinition();
-    if (!pDef || !pDef->m_Flags.is(CPEDef::dfSprite))
-        return false;
-
-    PAPI::Particle* particles = nullptr;
-    u32 particleCount = 0;
-    PAPI::ParticleManager()->GetParticles(pEffect->GetHandleEffect(), particles, particleCount);
-
-    if (particleCount == 0 || !particles)
-        return false;
-
-    // Ensure buffers
-    u32 requiredVBSize = particleCount * 4 * sizeof(ParticleVertex);
-    EnsureParticleVertexBuffer(nvDevice, requiredVBSize);
-    EnsureQuadIndexBuffer(nvDevice, particleCount);
-
-    if (!s_particleVB || !s_quadIB)
-        return false;
-
-    // Generate billboard geometry
-    xr_vector<ParticleVertex> vertices;
-    vertices.resize(particleCount * 4);
-    ParticleVertex* pv = vertices.data();
-
-    float sina = 0.0f, cosa = 0.0f;
-    float angle = float(0xFFFFFFFF);
-
-    for (u32 i = 0; i < particleCount; i++) {
-        auto& m = particles[i];
-
-        if (angle != m.rot.x) {
-            angle = m.rot.x;
-            sina = _sin(angle);
-            cosa = _cos(angle);
-        }
-
-        Fvector2 lt, rb;
-        lt.set(0.f, 0.f);
-        rb.set(1.f, 1.f);
-
-        if (pDef->m_Flags.is(CPEDef::dfFramed)) {
-            pDef->m_Frame.CalculateTC(iFloor(float(m.frame) / 255.f), lt, rb);
-        }
-
-        float r_x = m.size.x * 0.5f;
-        float r_y = m.size.y * 0.5f;
-
-        if (pDef->m_Flags.is(CPEDef::dfVelocityScale)) {
-            float speed = m.vel.magnitude();
-            r_x += speed * pDef->m_VelocityScale.x;
-            r_y += speed * pDef->m_VelocityScale.y;
-        }
-
-        FillSprite(pv, Device.vCameraTop, Device.vCameraRight, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
-    }
-
-    // Upload vertex data
-    cmdList->writeBuffer(s_particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
-
-    // Select pipeline based on blend mode
-    nvrhi::IGraphicsPipeline* pipeline = isAdditive ? s_particlePipelineAdd.Get() : s_particlePipelineBlend.Get();
-    if (!pipeline)
-        return false;
-
-    // Upload dynamic transforms (identity for particles - positions are world space)
-    DynamicTransforms dynTransData = {};
-    FillDynamicTransforms(dynTransData);
-    cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
-
-    // Upload material ID
-    struct ParticleMaterialCB {
-        u32 materialID;
-        u32 textureIndex;
-        u32 pad0, pad1;
-    } matIdData;
-    matIdData.materialID = batch.bindlessMaterialID;
-    matIdData.textureIndex = 0;  // Not used - using MaterialData lookup
-    matIdData.pad0 = matIdData.pad1 = 0;
-    cmdList->writeBuffer(matIdCB, &matIdData, sizeof(matIdData));
-
-    // Create binding set
-    auto& matBuffer = MaterialBuffer::Instance();
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
-        nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-        nvrhi::BindingSetItem::ConstantBuffer(4, matIdCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-        nvrhi::BindingSetItem::Sampler(0, s_particleSampler),
-    };
-    auto bindingSet = nvDevice->createBindingSet(bindDesc, s_particleLayout);
-
-    // Set up graphics state
-    nvrhi::GraphicsState state;
-    state.pipeline = pipeline;
-    state.framebuffer = framebuffer;
-    state.bindings = { bindingSet };
-    if (bindlessTable) {
-        state.addBindingSet(bindlessTable);
-    }
-    state.vertexBuffers = { {s_particleVB, 0, 0} };
-    state.indexBuffer = { s_quadIB, nvrhi::Format::R16_UINT, 0 };
-    state.viewport.addViewport(viewport);
-    state.viewport.addScissorRect(scissor);
-
-    cmdList->setGraphicsState(state);
-
-    // Draw
-    cmdList->drawIndexed(
-        nvrhi::DrawArguments()
-            .setVertexCount(particleCount * 6)
-            .setStartIndexLocation(0)
-            .setStartVertexLocation(0)
-    );
-
-    return true;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-//  SETUP PARTICLE PASS
-// ═══════════════════════════════════════════════════════════════════════════
 
 DefaultOutputLayout setupParticlePass(
     FrameGraph& fg,
@@ -540,13 +475,16 @@ DefaultOutputLayout setupParticlePass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    nvrhi::IBuffer* particleDrawArgsBuffer)
+    VirtualResourceHandle hiZPyramid,
+    u32 hiZWidth,
+    u32 hiZHeight,
+    u32 hiZMipLevels)
 {
     struct ParticlePassData {
         VirtualResourceHandle inputColor;
         VirtualResourceHandle depth;
         VirtualResourceHandle outputColor;
-
+        VirtualResourceHandle hiZPyramid;
         ng::RenderDevice* device;
         const xr_vector<ParticleBatch>* worldParticleBatches;
         const xr_vector<ParticleBatch>* hudParticleBatches;
@@ -554,15 +492,14 @@ DefaultOutputLayout setupParticlePass(
         DefaultOutputLayout outputs;
         u32 width;
         u32 height;
+        u32 hiZWidth;
+        u32 hiZHeight;
+        u32 hiZMipLevels;
     };
 
     auto& passData = fg.addCallbackPass<ParticlePassData>(
         "Particles",
-
-        // ═══════════════════════════════════════════════════════
-        //  SETUP LAMBDA
-        // ═══════════════════════════════════════════════════════
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels](FrameGraph& builder, PassHandle passHandle, ParticlePassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -571,46 +508,44 @@ DefaultOutputLayout setupParticlePass(
             data.worldParticleBatches = worldParticleBatches;
             data.hudParticleBatches = hudParticleBatches;
             data.materialCache = materialCache;
+            data.hiZPyramid = hiZPyramid;
+            data.hiZWidth = hiZWidth;
+            data.hiZHeight = hiZHeight;
+            data.hiZMipLevels = hiZMipLevels;
 
-            // Read color input (from Forward+/Skinning)
+            // Add Hi-Z as read dependency if valid
+            if (hiZPyramid.is_valid())
+                passBuilder.read(hiZPyramid);
+
             data.inputColor = passBuilder.read(forwardInputs.albedo);
-
-            // Write to same target (particles render on top)
             data.outputColor = passBuilder.write(forwardInputs.albedo, ResourceState::RenderTarget);
-
-            // Read-write depth (for depth testing)
             data.depth = passBuilder.readWrite(forwardInputs.depth, ResourceState::DepthStencilWrite);
 
             data.outputs.albedo = data.outputColor;
             data.outputs.depth = data.depth;
         },
-
-        // ═══════════════════════════════════════════════════════
-        //  EXECUTE LAMBDA
-        // ═══════════════════════════════════════════════════════
         [](const ParticlePassData& data, const FrameGraph& fg, ng::RenderContext* ctx) {
-
             u32 totalWorld = data.worldParticleBatches ? (u32)data.worldParticleBatches->size() : 0;
             u32 totalHUD = data.hudParticleBatches ? (u32)data.hudParticleBatches->size() : 0;
 
-            if (totalWorld == 0 && totalHUD == 0)
-                return;
-
-            if (!s_particleInitialized)
+            if ((totalWorld == 0 && totalHUD == 0) || !s_particleInitialized)
                 return;
 
             auto* colorRT = fg.GetPhysicalTexture(data.outputColor);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
-
-            if (!colorRT || !depthRT) {
-                Msg("! [ParticlePass] Failed to get physical textures");
+            if (!colorRT || !depthRT)
                 return;
-            }
 
             nvrhi::IDevice* nvDevice = data.device->GetNVRHIDevice();
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
             if (!nvDevice || !cmdList)
                 return;
+
+            // Finalize materials
+            if (data.materialCache)
+                data.materialCache->FinalizePendingMaterials(ctx);
+            auto& matBuffer = MaterialBuffer::Instance();
+            matBuffer.Upload(ctx);
 
             // Create framebuffer
             nvrhi::FramebufferDesc fbDesc;
@@ -623,21 +558,21 @@ DefaultOutputLayout setupParticlePass(
             const auto& rtDesc = colorRT->getDesc();
 
             // Create constant buffers
-            nvrhi::BufferDesc dynTransCbDesc;
-            dynTransCbDesc.byteSize = sizeof(DynamicTransforms);
-            dynTransCbDesc.isConstantBuffer = true;
-            dynTransCbDesc.isVolatile = true;
-            dynTransCbDesc.maxVersions = 128;
-            auto dynTransformsCB = nvDevice->createBuffer(dynTransCbDesc);
+            nvrhi::BufferDesc cbDesc;
+            cbDesc.byteSize = sizeof(DynamicTransforms);
+            cbDesc.isConstantBuffer = true;
+            cbDesc.isVolatile = true;
+            cbDesc.maxVersions = 16;
+            auto dynTransformsCB = nvDevice->createBuffer(cbDesc);
 
-            nvrhi::BufferDesc staticGlobalsCbDesc;
-            staticGlobalsCbDesc.byteSize = sizeof(StaticGlobals);
-            staticGlobalsCbDesc.isConstantBuffer = true;
-            staticGlobalsCbDesc.isVolatile = true;
-            staticGlobalsCbDesc.maxVersions = 16;
-            auto staticGlobalsCB = nvDevice->createBuffer(staticGlobalsCbDesc);
+            cbDesc.byteSize = sizeof(StaticGlobals);
+            auto staticGlobalsCB = nvDevice->createBuffer(cbDesc);
 
-            // Fill static globals
+            // Fill constants
+            DynamicTransforms dynTrans = {};
+            FillDynamicTransforms(dynTrans);
+            cmdList->writeBuffer(dynTransformsCB, &dynTrans, sizeof(dynTrans));
+
             StaticGlobals staticGlobals;
             FillGlobalConstants(staticGlobals);
             SunLightData sunData;
@@ -645,81 +580,168 @@ DefaultOutputLayout setupParticlePass(
             FillSunConstants(staticGlobals, sunData);
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            // Create material ID buffer
-            nvrhi::BufferDesc matIdCbDesc;
-            matIdCbDesc.byteSize = 16;
-            matIdCbDesc.isConstantBuffer = true;
-            matIdCbDesc.isVolatile = true;
-            matIdCbDesc.maxVersions = 128;
-            auto matIdCB = nvDevice->createBuffer(matIdCbDesc);
+            // Create binding set (shared for all particles)
+            nvrhi::BindingSetDesc bindDesc;
+            bindDesc.bindings = {
+                nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
+                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+                nvrhi::BindingSetItem::Sampler(0, s_particleSampler),
+            };
+            auto bindingSet = nvDevice->createBindingSet(bindDesc, s_particleLayout);
 
-            // Finalize any pending materials
-            if (data.materialCache) {
-                data.materialCache->FinalizePendingMaterials(ctx);
-            }
-
-            // Upload material buffer
-            auto& matBuffer = MaterialBuffer::Instance();
-            matBuffer.Upload(ctx);
-
-            // Get bindless descriptor table
             auto* backend = data.device->GetBackend();
             nvrhi::IDescriptorTable* bindlessTable = backend ? backend->GetBindlessDescriptorTable() : nullptr;
 
-            // Scissor rect (same for all particles)
             nvrhi::Rect scissor(rtDesc.width, rtDesc.height);
 
-            // ═══════════════════════════════════════════════════════
-            //  PHASE 1: WORLD PARTICLES (depth [0.0, 1.0])
-            // ═══════════════════════════════════════════════════════
+            // Get Hi-Z texture for GPU culling
+            nvrhi::ITexture* hiZTexture = data.hiZPyramid.is_valid() ? fg.GetPhysicalTexture(data.hiZPyramid) : nullptr;
+
+            // Check if GPU culling is available
+            // TODO: Re-enable once GPU particle culling is debugged
+            bool useGPUCulling = s_gpuCullingManager && s_gpuCullingManager->IsReady() && hiZTexture;
+
+            // Extract frustum planes at execute time (from current view matrix)
+            Fvector4 frustumPlanes[6] = {};
+            if (useGPUCulling) {
+                CFrustum frustum;
+                frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+                for (u32 i = 0; i < frustum.p_count && i < 6; i++) {
+                    frustumPlanes[i].set(
+                        frustum.planes[i].n.x,
+                        frustum.planes[i].n.y,
+                        frustum.planes[i].n.z,
+                        frustum.planes[i].d
+                    );
+                }
+            }
+
+            // GPU culling path
+            auto renderParticlesGPU = [&](const xr_vector<ParticleBatch>& batches, float depthMin, float depthMax) {
+                xr_vector<GPUParticleData> gpuParticles;
+                u32 totalParticles = CollectGPUParticleData(batches, gpuParticles);
+
+                if (totalParticles == 0)
+                    return;
+
+                // Clamp to max particles
+                if (totalParticles > s_gpuCullingManager->GetMaxParticles()) {
+                    gpuParticles.resize(s_gpuCullingManager->GetMaxParticles());
+                    totalParticles = s_gpuCullingManager->GetMaxParticles();
+                }
+
+                // Upload particle data
+                s_gpuCullingManager->UploadParticleData(cmdList, gpuParticles);
+
+                // Clear visible count
+                s_gpuCullingManager->ClearVisibleCount(cmdList);
+
+                // Dispatch culling
+                s_gpuCullingManager->DispatchCulling(
+                    cmdList,
+                    hiZTexture,
+                    Device.mFullTransform,
+                    frustumPlanes,
+                    Device.vCameraPosition,
+                    Device.vCameraTop,
+                    Device.vCameraRight,
+                    totalParticles,
+                    data.hiZWidth, data.hiZHeight, data.hiZMipLevels
+                );
+
+                // Dispatch billboard generation
+                s_gpuCullingManager->DispatchBillboardGeneration(
+                    cmdList,
+                    Device.vCameraTop,
+                    Device.vCameraRight,
+                    totalParticles
+                );
+
+                // Ensure index buffer
+                EnsureQuadIndexBuffer(nvDevice, totalParticles);
+                if (!s_quadIB)
+                    return;
+
+                // Setup graphics state
+                nvrhi::Viewport viewport(
+                    0.0f, static_cast<float>(rtDesc.width),
+                    0.0f, static_cast<float>(rtDesc.height),
+                    depthMin, depthMax
+                );
+
+                nvrhi::GraphicsState state;
+                state.pipeline = s_particlePipelineBlend;
+                state.framebuffer = framebuffer;
+                state.bindings = { bindingSet };
+                if (bindlessTable)
+                    state.addBindingSet(bindlessTable);
+                state.vertexBuffers = { {s_gpuCullingManager->GetVertexBuffer(), 0, 0} };
+                state.indexBuffer = { s_quadIB, nvrhi::Format::R16_UINT, 0 };
+                state.indirectParams = s_gpuCullingManager->GetDrawArgsBuffer();
+                state.viewport.addViewport(viewport);
+                state.viewport.addScissorRect(scissor);
+
+                cmdList->setGraphicsState(state);
+
+                // Indirect draw
+                cmdList->drawIndexedIndirect(0, 1);
+            };
+
+            // CPU fallback path
+            auto renderParticlesCPU = [&](const xr_vector<ParticleBatch>& batches, float depthMin, float depthMax) {
+                xr_vector<ParticleVertex> vertices;
+                u32 totalParticles = GenerateParticleVertices(batches, vertices);
+
+                if (totalParticles == 0)
+                    return;
+
+                EnsureParticleVertexBuffer(nvDevice, (u32)(vertices.size() * sizeof(ParticleVertex)));
+                EnsureQuadIndexBuffer(nvDevice, totalParticles);
+
+                if (!s_particleVB || !s_quadIB)
+                    return;
+
+                cmdList->writeBuffer(s_particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
+
+                nvrhi::Viewport viewport(
+                    0.0f, static_cast<float>(rtDesc.width),
+                    0.0f, static_cast<float>(rtDesc.height),
+                    depthMin, depthMax
+                );
+
+                nvrhi::GraphicsState state;
+                state.pipeline = s_particlePipelineBlend;
+                state.framebuffer = framebuffer;
+                state.bindings = { bindingSet };
+                if (bindlessTable)
+                    state.addBindingSet(bindlessTable);
+                state.vertexBuffers = { {s_particleVB, 0, 0} };
+                state.indexBuffer = { s_quadIB, nvrhi::Format::R16_UINT, 0 };
+                state.viewport.addViewport(viewport);
+                state.viewport.addScissorRect(scissor);
+
+                cmdList->setGraphicsState(state);
+
+                cmdList->drawIndexed(
+                    nvrhi::DrawArguments()
+                        .setVertexCount(totalParticles * 6)
+                        .setStartIndexLocation(0)
+                        .setStartVertexLocation(0)
+                );
+            };
+
+            // Render world particles (depth 0.0 - 1.0)
             if (totalWorld > 0) {
-                nvrhi::Viewport worldViewport(
-                    0.0f, static_cast<float>(rtDesc.width),
-                    0.0f, static_cast<float>(rtDesc.height),
-                    0.0f, 1.0f
-                );
-
-                for (const auto& batch : *data.worldParticleBatches) {
-                    if (batch.visual && batch.visual->getType() == MT_PARTICLE_EFFECT) {
-                        // Determine if additive based on particle definition
-                        bool isAdditive = false;
-                        auto* pEffect = static_cast<CParticleEffect*>(batch.visual);
-                        auto* pDef = pEffect->GetDefinition();
-                        // Could check pDef for blend mode flags if needed
-
-                        RenderParticleEffect(
-                            cmdList, nvDevice, framebuffer,
-                            dynTransformsCB, staticGlobalsCB, matIdCB,
-                            bindlessTable, worldViewport, scissor,
-                            batch, isAdditive
-                        );
-                    }
-                }
+                if (useGPUCulling)
+                    renderParticlesGPU(*data.worldParticleBatches, 0.0f, 1.0f);
+                else
+                    renderParticlesCPU(*data.worldParticleBatches, 0.0f, 1.0f);
             }
 
-            // ═══════════════════════════════════════════════════════
-            //  PHASE 2: HUD PARTICLES (depth [0.0, 0.1])
-            // ═══════════════════════════════════════════════════════
-            if (totalHUD > 0) {
-                nvrhi::Viewport hudViewport(
-                    0.0f, static_cast<float>(rtDesc.width),
-                    0.0f, static_cast<float>(rtDesc.height),
-                    0.0f, 0.1f
-                );
-
-                for (const auto& batch : *data.hudParticleBatches) {
-                    if (batch.visual && batch.visual->getType() == MT_PARTICLE_EFFECT) {
-                        bool isAdditive = false;
-
-                        RenderParticleEffect(
-                            cmdList, nvDevice, framebuffer,
-                            dynTransformsCB, staticGlobalsCB, matIdCB,
-                            bindlessTable, hudViewport, scissor,
-                            batch, isAdditive
-                        );
-                    }
-                }
-            }
+            // Render HUD particles (depth 0.0 - 0.1) - always use CPU path (no culling needed for HUD)
+            if (totalHUD > 0)
+                renderParticlesCPU(*data.hudParticleBatches, 0.0f, 0.1f);
         }
     );
 

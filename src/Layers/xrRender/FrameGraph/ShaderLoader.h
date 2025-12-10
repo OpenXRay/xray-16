@@ -99,6 +99,17 @@ public:
     );
 
     /// <summary>
+    /// Load and compile compute shader from res/gamedata/shaders/r5/
+    /// Always returns shader with reflection data
+    /// </summary>
+    /// <param name="name">Shader name without extension (e.g., "object_cull")</param>
+    /// <param name="entryPoint">Entry point function name (default: "main")</param>
+    ShaderResult LoadComputeShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
+    /// <summary>
     /// Get cache statistics
     /// </summary>
     const ShaderCache::Stats& GetCacheStats() const { return m_cache.GetStats(); }

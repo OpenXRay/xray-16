@@ -86,4 +86,88 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
     return dist_sq < max_dist_sq;
 }
 
+// ═══════════════════════════════════════════════════════
+//  HI-Z OCCLUSION CULLING
+// ═══════════════════════════════════════════════════════
+// Requires caller to define:
+//   Texture2D<float> g_HiZPyramid : register(t1);
+//   SamplerState g_PointSampler : register(s0);  (or g_PointClampSampler)
+
+// Hi-Z occlusion test for sphere (4-tap conservative)
+// Returns: true = visible, false = occluded (cull)
+bool HiZTestSphere(
+    float3 center,
+    float radius,
+    float3 cameraPos,
+    float4x4 viewProj,
+    Texture2D<float> hiZPyramid,
+    SamplerState pointSampler,
+    uint hiZWidth,
+    uint hiZHeight,
+    uint hiZMipLevels)
+{
+    // Project sphere center to clip space
+    float4 clipPos = mul(viewProj, float4(center, 1.0));
+
+    // Behind camera - conservatively visible
+    if (clipPos.w <= 0.001)
+        return true;
+
+    // Perspective divide -> NDC
+    float3 ndc = clipPos.xyz / clipPos.w;
+
+    // Calculate screen-space bounding box
+    float projScale = max(abs(viewProj[0][0]), abs(viewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
+
+    float2 minNDC = ndc.xy - ndcSize;
+    float2 maxNDC = ndc.xy + ndcSize;
+
+    // Conservatively visible if off-screen (frustum should handle)
+    if (any(minNDC > 1.0) || any(maxNDC < -1.0))
+        return true;
+
+    // Convert NDC to UV space [0, 1]
+    float2 minUV = saturate(minNDC * 0.5 + 0.5);
+    float2 maxUV = saturate(maxNDC * 0.5 + 0.5);
+
+    // Flip Y (NDC Y+ is up, UV Y+ is down)
+    minUV.y = 1.0 - minUV.y;
+    maxUV.y = 1.0 - maxUV.y;
+
+    // Re-sort after Y flip
+    float4 boxUV = float4(min(minUV, maxUV), max(minUV, maxUV));
+
+    // Calculate box size in pixels
+    float boxWidth = (boxUV.z - boxUV.x) * float(hiZWidth);
+    float boxHeight = (boxUV.w - boxUV.y) * float(hiZHeight);
+
+    // Select mip where box is roughly 2x2 pixels
+    float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
+    mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
+
+    // Sample Hi-Z at 4 corners
+    float d1 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.y), mipLevel);
+    float d2 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.y), mipLevel);
+    float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
+    float d4 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.w), mipLevel);
+
+    // MAX = farthest depth in region (0=near, 1=far)
+    float hiZDepth = max(max(d1, d2), max(d3, d4));
+
+    // Calculate front depth of sphere
+    float3 viewDir = normalize(center - cameraPos);
+    float3 frontPoint = center - viewDir * radius;
+    float4 frontClip = mul(viewProj, float4(frontPoint, 1.0));
+
+    // Front point behind camera - straddles near plane, visible
+    if (frontClip.w <= 0.001)
+        return true;
+
+    float frontDepth = frontClip.z / frontClip.w;
+
+    // Visible if front of sphere is in front of Hi-Z depth
+    return frontDepth <= hiZDepth;
+}
+
 #endif // CULL_UTILS_H

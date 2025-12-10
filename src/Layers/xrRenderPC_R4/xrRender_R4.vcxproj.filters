@@ -810,6 +810,9 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.h">
       <Filter>Framegraph\Passes</Filter>
     </ClInclude>
@@ -1595,6 +1598,9 @@
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ParticlePassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\ParticleGPUCullingManager.cpp">
       <Filter>Framegraph\Passes</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\ExposurePassSetup.cpp">

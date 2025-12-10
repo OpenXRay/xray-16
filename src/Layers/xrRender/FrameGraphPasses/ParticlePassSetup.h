@@ -48,13 +48,30 @@ struct ParticleBatch {
 // ═══════════════════════════════════════════════════════
 //  PARTICLE VERTEX FORMAT
 // ═══════════════════════════════════════════════════════
-// Matches FVF::LIT format used by vanilla particle rendering
+// Extended format with material ID for batched rendering
 struct ParticleVertex {
     Fvector p;       // Position (12 bytes)
     u32 color;       // RGBA color (4 bytes)
     Fvector2 t;      // Texcoord (8 bytes)
-    // Total: 24 bytes per vertex
+    u32 materialID;  // Bindless material ID (4 bytes)
+    // Total: 28 bytes per vertex
 };
+
+// ═══════════════════════════════════════════════════════
+//  GPU PARTICLE DATA (for GPU culling)
+// ═══════════════════════════════════════════════════════
+// Compact particle data uploaded to GPU for culling + billboard generation
+struct GPUParticleData {
+    Fvector position;   // 12 bytes - World position (billboard center)
+    float rotation;     //  4 bytes - Rotation angle (radians)
+    Fvector2 size;      //  8 bytes - Billboard half-extents
+    u32 color;          //  4 bytes - BGRA8 packed color
+    u32 materialID;     //  4 bytes - Bindless material index
+    Fvector2 uvMin;     //  8 bytes - UV top-left
+    Fvector2 uvMax;     //  8 bytes - UV bottom-right
+    // Total: 48 bytes per particle
+};
+static_assert(sizeof(GPUParticleData) == 48, "GPUParticleData must be 48 bytes");
 
 // ═══════════════════════════════════════════════════════
 //  PARTICLE PIPELINE MANAGEMENT
@@ -68,10 +85,11 @@ void ShutdownParticlePipelines();
 // ═══════════════════════════════════════════════════════
 //  PARTICLE PASS SETUP
 // ═══════════════════════════════════════════════════════
-// Lambda-based particle pass setup
+// Lambda-based particle pass setup with GPU culling support
 // Renders particle systems (effects and groups) as dynamic billboards/sprites
 // Renders AFTER forward color and skinning passes (particles on top of world+HUD)
 // Supports both world and HUD particles with proper FOV handling
+// When hiZPyramid is valid, uses GPU frustum + occlusion culling
 framegraph::DefaultOutputLayout setupParticlePass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
@@ -81,7 +99,10 @@ framegraph::DefaultOutputLayout setupParticlePass(
     MaterialCache* materialCache,
     u32 width,
     u32 height,
-    nvrhi::IBuffer* particleDrawArgsBuffer = nullptr
+    framegraph::VirtualResourceHandle hiZPyramid = {},  // Hi-Z pyramid for GPU culling
+    u32 hiZWidth = 0,
+    u32 hiZHeight = 0,
+    u32 hiZMipLevels = 0
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes
