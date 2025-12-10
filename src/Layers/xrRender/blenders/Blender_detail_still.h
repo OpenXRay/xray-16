@@ -4,6 +4,7 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class CBlender_Detail_Still : public IBlender
 {
+public:
     xrP_BOOL oBlend;
 
 private:

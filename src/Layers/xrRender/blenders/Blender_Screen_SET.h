@@ -4,6 +4,7 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class CBlender_Screen_SET : public IBlender
 {
+public:
     xrP_TOKEN oBlend;
     xrP_Integer oAREF;
     xrP_BOOL oZTest;

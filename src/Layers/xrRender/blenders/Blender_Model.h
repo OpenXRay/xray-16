@@ -4,6 +4,7 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class CBlender_Model : public IBlender
 {
+public:
     xrP_TOKEN oTessellation;
     xrP_Integer oAREF;
     xrP_BOOL oBlend;

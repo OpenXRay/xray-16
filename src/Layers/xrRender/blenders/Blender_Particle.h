@@ -4,11 +4,10 @@ namespace xray::render::RENDER_NAMESPACE
 {
 class CBlender_Particle : public IBlender
 {
+public:
     xrP_TOKEN oBlend;
     xrP_Integer oAREF;
     xrP_BOOL oClamp;
-
-public:
     CBlender_Particle();
     ~CBlender_Particle() override = default;
 

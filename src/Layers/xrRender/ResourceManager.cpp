@@ -14,8 +14,15 @@
 
 #include "Blender_CLSID.h"
 #include "blenders/blender_deffer_aref.h"
+#include "blenders/blender_deffer_model.h"
 #include "blenders/Blender_Vertex_aref.h"
+#include "blenders/Blender_default_aref.h"
 #include "blenders/Blender_tree.h"
+#include "blenders/Blender_detail_still.h"
+#include "blenders/Blender_Model.h"
+#include "blenders/Blender_Model_EbB.h"
+#include "blenders/Blender_Screen_SET.h"
+#include "blenders/Blender_Particle.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -64,39 +71,109 @@ IBlender* CResourceManager::_FindBlender(LPCSTR Name)
         return I->second;
 }
 
-bool CResourceManager::GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps)
+bool CResourceManager::GetBlenderProperties(LPCSTR shaderName, BlenderProperties& outProps)
 {
-    IBlender* B = _FindBlender(blenderName);
+    IBlender* B = _FindBlender(shaderName);
     if (!B)
     {
-        Msg("! [GetBlenderProperties] Blender '%s' not found", blenderName);
+        Msg("[GetBlenderProperties] Blender '%s' not found.", shaderName);
         return false;
     }
 
     const CLASS_ID cls = B->getDescription().CLS;
+    outProps = {};
 
-    if (cls == B_DEFAULT_AREF || cls == B_VERT_AREF)
+    if (cls == B_DEFAULT_AREF)
     {
-        auto* aref = static_cast<CBlender_deffer_aref*>(B);
-        outProps.alphaTest = (aref->oAREF.value > 0);
-        outProps.alphaRef = aref->oAREF.value;
-        outProps.alphaBlend = aref->oBlend.value;
-        Msg("* [GetBlenderProperties] '%s' (AREF): alphaTest=%d, alphaRef=%d, alphaBlend=%d",
-            blenderName, outProps.alphaTest, outProps.alphaRef, outProps.alphaBlend);
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_DEFAULT_AREF", shaderName, cls);
+        auto* b = static_cast<CBlender_deffer_aref*>(B);
+        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.alphaRef = b->oAREF.value;
+        outProps.alphaBlend = b->oBlend.value;
         return true;
     }
-    else if (cls == B_TREE)
+    if (cls == B_VERT_AREF)
     {
-        auto* tree = static_cast<CBlender_Tree*>(B);
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_VERT_AREF", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Vertex_aref*>(B);
+        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.alphaRef = b->oAREF.value;
+        outProps.alphaBlend = b->oBlend.value;
+        return true;
+    }
+    if (cls == B_TREE)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_TREE", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Tree*>(B);
+        outProps.alphaTest = b->oBlend.value;
+        outProps.alphaRef = b->oBlend.value ? 200 : 0;
         outProps.alphaBlend = false;
-        outProps.alphaTest = tree->oBlend.value;
-        outProps.alphaRef = tree->oBlend.value ? 33 : 0;
-        Msg("* [GetBlenderProperties] '%s' (TREE): oBlend=%d -> alphaTest=%d, alphaRef=%d, alphaBlend=false",
-            blenderName, tree->oBlend.value, outProps.alphaTest, outProps.alphaRef);
+        return true;
+    }
+    if (cls == B_DETAIL)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_DETAIL", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Detail_Still*>(B);
+        outProps.alphaTest = true;
+        outProps.alphaRef = 200;
+        outProps.alphaBlend = b->oBlend.value;
+        return true;
+    }
+    if (cls == B_MODEL)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_MODEL", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Model*>(B);
+        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.alphaRef = b->oAREF.value;
+        outProps.alphaBlend = b->oBlend.value;
+        return true;
+    }
+    if (cls == B_MODEL_EbB)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_MODEL_EbB", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Model_EbB*>(B);
+        outProps.alphaBlend = b->oBlend.value;
+        outProps.alphaTest = false;
+        outProps.alphaRef = 0;
+        return true;
+    }
+    if (cls == B_SCREEN_SET)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_SCREEN_SET", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Screen_SET*>(B);
+        outProps.alphaBlend = (b->oBlend.IDselected >= 1);
+        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.alphaRef = b->oAREF.value;
+        return true;
+    }
+    if (cls == B_PARTICLE)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> B_PARTICLE", shaderName, cls);
+
+        auto* b = static_cast<CBlender_Particle*>(B);
+        outProps.alphaBlend = (b->oBlend.IDselected >= 1);
+        outProps.alphaTest = (b->oAREF.value > 0);
+        outProps.alphaRef = b->oAREF.value;
+        return true;
+    }
+    if (cls == B_DEFAULT || cls == B_VERT || cls == B_LmBmmD || cls == B_LaEmB || cls == B_LmEbB ||
+        cls == B_B || cls == B_BmmD || cls == B_SCREEN_GRAY || cls == B_LIGHT || cls == B_BLUR ||
+        cls == B_SHADOW_TEX || cls == B_SHADOW_WORLD || cls == B_EDITOR_WIRE || cls == B_EDITOR_SEL)
+    {
+        Msg("* [GetBlenderProperties] map '%s' (CLS=%llu) -> DEFAULT_OPAQUE", shaderName, cls);
+        outProps.alphaBlend = false;
+        outProps.alphaTest = false;
+        outProps.alphaRef = 0;
         return true;
     }
 
-    Msg("* [GetBlenderProperties] '%s' (CLS=%llu): unknown blender type", blenderName, cls);
+    Msg("[GetBlenderProperties] Blender '%s' not mapped.", shaderName);
     return false;
 }
 
