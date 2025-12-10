@@ -999,34 +999,76 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.vertexBuffer = nvrhiVB;
     batch.indexBuffer = nvrhiIB;
 
-    // For progressive meshes, use LOD data instead of static iCount
-    // Progressive meshes store SWI (slide window item) with per-LOD index counts
-    // Use LOD = 1.0 (maximum detail) -> lod_id = 0 (first entry has most verts/tris)
-    // Formula: lod_id = floor((1 - LOD) * (count - 1) + 0.5)
-    // For LOD=1.0: lod_id = floor(0 * (count-1) + 0.5) = 0
-    const FSlideWindowItem* pSWI = nullptr;
+    // ═══════════════════════════════════════════════════════
+    //  INDEX/VERTEX OFFSET HANDLING
+    // ═══════════════════════════════════════════════════════
+    // Different mesh types have different buffer layouts:
+    //
+    // SKINNED MESHES (CSkeletonX_ST, CSkeletonX_PM):
+    //   - Have dedicated VB/IB (not shared pools)
+    //   - vBase = 0, startIndex = 0 (ST) or SW.offset (PM)
+    //   - Vanilla: _Render(rm_geom, vCount, 0, dwPrimitives) for ST
+    //   - Vanilla: _Render(rm_geom, SW.num_verts, SW.offset, SW.num_tris) for PM
+    //
+    // STATIC/PROGRESSIVE MESHES (Fvisual, FProgressive, FTreeVisual):
+    //   - Use shared VB/IB pools from level geometry
+    //   - For now, always use iBase/iCount (max detail, no LOD)
+    //   - TODO: Implement proper LOD selection for progressive meshes
+    //
+    bool isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
 
-    if (visualType == MT_SKELETON_GEOMDEF_PM) {
-        // Skinned progressive mesh - SWI from FProgressive base
-        pSWI = &static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+    if (isSkinned) {
+        // Skinned meshes: indices are mesh-relative, ignore iBase
+        if (visualType == MT_SKELETON_GEOMDEF_PM) {
+            // Progressive skinned: use SWI for proper index range
+            const FSlideWindowItem& swi = static_cast<CSkeletonX_PM*>(visual)->GetSWI();
+            if (swi.sw && swi.count > 0) {
+                const FSlideWindow& sw = swi.sw[0];  // LOD 0 = max detail
+                batch.indexCount = sw.num_tris * 3;
+                batch.startIndex = sw.offset;  // NOT iBase + offset (skinned meshes have dedicated IB)
+            } else {
+                batch.indexCount = meshVisual->iCount;
+                batch.startIndex = 0;
+            }
+        } else {
+            // Static skinned: startIndex = 0
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = 0;
+        }
+        batch.baseVertex = 0;  // Skinned meshes always have vBase = 0
     } else if (visualType == MT_PROGRESSIVE) {
-        // Regular progressive mesh
-        pSWI = &static_cast<FProgressive*>(visual)->GetSWI();
+        // Progressive meshes (terrain, water, etc.): use SWI for LOD 0 (max detail)
+        // Vanilla: Render(vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris)
+        const FSlideWindowItem& swi = static_cast<FProgressive*>(visual)->GetSWI();
+        if (swi.sw && swi.count > 0) {
+            const FSlideWindow& sw = swi.sw[0];  // LOD 0 = max detail
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;  // iBase + SW.offset
+        } else {
+            // Fallback if SWI not available
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+        batch.baseVertex = meshVisual->vBase;
     } else if (visualType == MT_TREE_PM) {
-        // Progressive tree mesh - SWI is a pointer (loaded from global SWIs)
-        pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
-    }
-
-    if (pSWI && pSWI->sw && pSWI->count > 0) {
-        const FSlideWindow& sw = pSWI->sw[0];  // LOD 0 = max detail
-        batch.indexCount = sw.num_tris * 3;
-        batch.startIndex = meshVisual->iBase + sw.offset;
+        // Progressive tree mesh: SWI is a pointer (loaded from global SWIs)
+        // Vanilla: Render(vBase, 0, SW.num_verts, iBase + SW.offset, SW.num_tris)
+        const FSlideWindowItem* pSWI = static_cast<FTreeVisual_PM*>(visual)->GetSWI();
+        if (pSWI && pSWI->sw && pSWI->count > 0) {
+            const FSlideWindow& sw = pSWI->sw[0];  // LOD 0 = max detail
+            batch.indexCount = sw.num_tris * 3;
+            batch.startIndex = meshVisual->iBase + sw.offset;
+        } else {
+            batch.indexCount = meshVisual->iCount;
+            batch.startIndex = meshVisual->iBase;
+        }
+        batch.baseVertex = meshVisual->vBase;
     } else {
-        // Non-progressive mesh or fallback if SWI not available
+        // Non-progressive meshes (MT_NORMAL, MT_TREE_ST): use iBase/iCount directly
         batch.indexCount = meshVisual->iCount;
         batch.startIndex = meshVisual->iBase;
+        batch.baseVertex = meshVisual->vBase;
     }
-    batch.baseVertex = meshVisual->vBase;
     batch.vertexStride = meshVisual->vStride;
 
     // Set world matrix (used for shader constants)
@@ -1096,10 +1138,12 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     //  GPU-DRIVEN: Compute mega-buffer allocation
     // ═══════════════════════════════════════════════════════
     // Use mesh's pool IDs to get offsets into unified mega-buffers
+    // CRITICAL: Use batch.startIndex/indexCount (adjusted for SWI) not meshVisual->iBase/iCount
+    // For progressive meshes, batch.startIndex = iBase + sw.offset, batch.indexCount = sw.num_tris * 3
     if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
         batch.megaBufferAlloc = m_gpuCullingManager->GetMeshAllocation(
-            meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
-            meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+            meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
+            meshVisual->ibPoolID, batch.startIndex, batch.indexCount,
             meshVisual->useAlternativeGeom
         );
 
@@ -1107,8 +1151,8 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
         static int s_allocDebug = 0;
         if (s_allocDebug < 10 && !batch.megaBufferAlloc.valid) {
             Msg("! [MegaBuffer] Invalid alloc: vbPool=%u, vBase=%u, vCount=%u, ibPool=%u, iBase=%u, iCount=%u, alt=%d",
-                meshVisual->vbPoolID, meshVisual->vBase, meshVisual->vCount,
-                meshVisual->ibPoolID, meshVisual->iBase, meshVisual->iCount,
+                meshVisual->vbPoolID, batch.baseVertex, meshVisual->vCount,
+                meshVisual->ibPoolID, batch.startIndex, batch.indexCount,
                 meshVisual->useAlternativeGeom ? 1 : 0);
             s_allocDebug++;
         }
