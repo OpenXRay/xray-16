@@ -75,17 +75,33 @@ const MaterialSystem::MaterialInfo& MaterialSystem::GetMaterialInfo(const char* 
     MaterialInfo info = GetDefaultMaterialInfo();
 
     // Try blender lookup first (most accurate - actual values from shaders.xr)
+    using BlendMode = RENDER_NAMESPACE::CResourceManager::BlendMode;
     RENDER_NAMESPACE::CResourceManager::BlenderProperties blenderProps;
     if (RENDER_NAMESPACE::RImplementation.Resources->GetBlenderProperties(shaderName, blenderProps))
     {
-        info.alphaTest = blenderProps.alphaTest || blenderProps.alphaBlend;
-        info.alphaRef = blenderProps.alphaBlend ? 127 : blenderProps.alphaRef;
-        info.transparent = false;
+        // Convert BlendMode to material properties
+        switch (blenderProps.blendMode)
+        {
+        case BlendMode::Opaque:
+            info.alphaTest = false;
+            info.alphaRef = 0;
+            info.transparent = false;
+            break;
+        case BlendMode::AlphaTest:
+            info.alphaTest = true;
+            info.alphaRef = blenderProps.alphaRef;
+            info.transparent = false;
+            break;
+        case BlendMode::AlphaBlend:
+        case BlendMode::Additive:
+        case BlendMode::Multiply:
+        case BlendMode::Multiply2X:
+            info.alphaTest = true;  // Use alpha test for clip
+            info.alphaRef = blenderProps.alphaRef > 0 ? blenderProps.alphaRef : 1;
+            info.transparent = true;
+            break;
+        }
         m_stats.materialsFromBlender++;
-
-        if (blenderProps.alphaBlend)
-            Msg("* [MaterialSystem] '%s - %s': from blender -> alphaTest=%d, alphaRef=%d, alphaBlend=%d",
-            shaderName, textureName, info.alphaTest, info.alphaRef, blenderProps.alphaBlend);
 
         // Cache and return
         m_materialCache[key] = info;

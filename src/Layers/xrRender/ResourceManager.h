@@ -110,10 +110,18 @@ public:
     void _DumpMemoryUsage();
 
     // Blender property extraction for D3D12/Framegraph renderer
+    enum class BlendMode : u8 {
+        Opaque,         // No blending, full depth write
+        AlphaTest,      // Alpha test only, full depth write
+        AlphaBlend,     // Standard alpha blend (srcAlpha, invSrcAlpha)
+        Additive,       // Additive blend (one, one) or (srcAlpha, one)
+        Multiply,       // Multiply blend (destColor, zero)
+        Multiply2X,     // Double multiply (destColor, srcColor)
+    };
     struct BlenderProperties {
-        bool alphaTest = false;
-        u32 alphaRef = 0;           // 0-255 alpha threshold
-        bool alphaBlend = false;
+        BlendMode blendMode = BlendMode::Opaque;
+        u32 alphaRef = 0;           // 0-255 alpha threshold (for AlphaTest)
+        bool writesDepth = true;    // Whether this shader writes to depth buffer
     };
     bool GetBlenderProperties(LPCSTR blenderName, BlenderProperties& outProps);
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);
