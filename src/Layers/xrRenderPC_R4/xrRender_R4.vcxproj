@@ -25,29 +25,35 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)onnxruntime\include\onnxruntime\core\session;$(xrExternals)DirectX-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;USE_AI_PBR;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
       <AdditionalOptions Condition="'$(EnableUnitySupport)'=='true'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;slang.lib;onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;slang.lib;onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3dcompiler.lib;d3d12.lib;nvapi$(PlatformArchitecture).lib;nvrhi.lib;nvrhi_d3d11.lib;nvrhi_d3d12.lib;slang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'!='Release Master Gold'">onnxruntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'!='Debug'">amd_ags_$(PlatformShortName)_2019_MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">amd_ags_$(PlatformShortName)_2019_MDd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)AGS_SDK\ags_lib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Mixed'">$(xrExternals)nvrhi\vs_build\RelWithDebInfo;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\RelWithDebInfo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;$(xrExternals)onnxruntime\vs_build\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release Master Gold'">$(xrExternals)nvrhi\vs_build\Release;$(xrExternals)slang\vs_build\slang-2025.22-windows-x86_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='Win32'">$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalLibraryDirectories Condition="'$(Platform)'=='x64'">$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -199,7 +205,7 @@
     <ClInclude Include="..\xrRender\ParticleEffect.h" />
     <ClInclude Include="..\xrRender\ParticleEffectDef.h" />
     <ClInclude Include="..\xrRender\ParticleGroup.h" />
-    <ClInclude Include="..\xrRender\PBRConverter\ONNXModelRunner.h" />
+    <ClInclude Include="..\xrRender\PBRConverter\ONNXModelRunner.h" Condition="'$(Configuration)'!='Release Master Gold'" />
     <ClInclude Include="..\xrRender\PBRConverter\PBRTextureConverter.h" />
     <ClInclude Include="..\xrRender\PSLibrary.h" />
     <ClInclude Include="..\xrRender\QueryHelper.h" />
@@ -433,7 +439,7 @@
     <ClCompile Include="..\xrRender\ParticleEffect.cpp" />
     <ClCompile Include="..\xrRender\ParticleEffectDef.cpp" />
     <ClCompile Include="..\xrRender\ParticleGroup.cpp" />
-    <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" />
+    <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" Condition="'$(Configuration)'!='Release Master Gold'" />
     <ClCompile Include="..\xrRender\PBRConverter\PBRTextureConverter.cpp" />
     <ClCompile Include="..\xrRender\PSLibrary.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager.cpp" />
@@ -633,7 +639,7 @@
     <Import Project="..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets" Condition="Exists('..\..\packages\sdl2.nuget.redist.2.32.4\build\native\sdl2.nuget.redist.targets')" />
     <Import Project="..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets" Condition="Exists('..\..\packages\sdl2.nuget.2.32.4\build\native\sdl2.nuget.targets')" />
   </ImportGroup>
-  <Target Name="ConfigureAndBuildONNXRuntime" BeforeTargets="PrepareForBuild">
+  <Target Name="ConfigureAndBuildONNXRuntime" BeforeTargets="PrepareForBuild" Condition="'$(Configuration)'!='Release Master Gold'">
     <PropertyGroup>
       <ONNXRuntimeDir>$(xrExternals)onnxruntime</ONNXRuntimeDir>
       <ONNXRuntimeBuildDir>$(ONNXRuntimeDir)\vs_build</ONNXRuntimeBuildDir>
