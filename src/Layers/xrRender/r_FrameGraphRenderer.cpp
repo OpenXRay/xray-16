@@ -29,6 +29,8 @@
 #include "FrameGraphPasses/HiZBuildPassSetup.h"      // Phase 3.5: Hi-Z pyramid for GPU culling
 #include "FrameGraphPasses/ForwardColorPassSetup.h"  // Phase 1: Single-RT forward rendering + pipeline init
 #include "GPUCullingManager.h"                       // Phase 3.5: GPU frustum/occlusion culling
+#include "FGDetailManager.h"                         // Detail system (grass/vegetation)
+#include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
@@ -119,6 +121,10 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     // because ShaderLoader isn't ready during FrameGraphRenderer::Initialize
     m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
 
+    // Create detail manager (Framegraph)
+    // Note: Will be loaded during level loading (see r2_loader.cpp), not here
+    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
+
     // Create RenderContext for execution
     m_renderContext.reset(device->CreateContext());
     if (!m_renderContext)
@@ -195,6 +201,7 @@ void FrameGraphRenderer::Render() {
         passes::InitializeForwardPipelines(m_device);
         passes::InitializeSkinningPipelines(m_device);
         passes::InitializeParticlePipelines(m_device);
+        // Note: Detail pipelines initialized later (after shader loading, see line ~622)
         s_pipelinesInitialized = true;
     }
 
@@ -604,6 +611,34 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         // Lazy initialization - ShaderLoader isn't ready during FrameGraphRenderer::Initialize
         m_gpuCullingManager->Initialize(m_device);
 
+        // Initialize detail manager shaders (lazy - needs ShaderLoader)
+        if (m_detailManager && m_detailManager->total_instance_count > 0) {
+            static bool detailShadersLoaded = false;
+            if (!detailShadersLoaded) {
+                auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                m_detailManager->LoadCullComputeShader(shaderLoader);
+                m_detailManager->LoadGraphicsShaders(shaderLoader);
+
+                // Create compute pipeline now that shaders are loaded
+                if (!m_detailManager->computePipeline) {
+                    m_detailManager->CreateComputePipeline(m_device);
+                }
+
+                // Initialize wind system (FBM wind texture + compute shader)
+                if (!m_detailManager->windTexture) {
+                    m_detailManager->CreateWindTexture(m_device->GetNVRHIDevice());
+                }
+                if (!m_detailManager->windComputeShader) {
+                    m_detailManager->LoadWindComputeShader(shaderLoader);
+                }
+                if (!m_detailManager->windPipeline && m_detailManager->windComputeShader) {
+                    m_detailManager->CreateWindPipeline(m_device->GetNVRHIDevice());
+                }
+
+                detailShadersLoaded = true;
+            }
+        }
+
         // Initialize bindless rendering system (material buffer only - textures use D3D12 descriptor heap)
         // SM6 bindless: Textures registered via D3D12Backend::RegisterBindlessTexture() during material creation
         bindless::MaterialBuffer::Instance().Initialize(m_device);
@@ -782,6 +817,27 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     // ═══════════════════════════════════════════════════════
+    //  DETAIL PASS (Grass/Vegetation)
+    // ═══════════════════════════════════════════════════════
+    // Renders detail objects (grass, small vegetation) using:
+    // - GPU compute culling (frustum + Hi-Z occlusion)
+    // - Single unified draw call via DrawIndexedIndirect
+    // Renders after particles but before post-processing.
+
+    auto detailOutputs = passes::setupDetailPass(
+        *m_framegraph,
+        m_device,
+        m_detailManager.get(),
+        particleOutputs,          // Render on top of particles
+        width,
+        height,
+        hizOutput.pyramid,        // Hi-Z pyramid for GPU culling
+        hizOutput.width,
+        hizOutput.height,
+        hizOutput.mipLevels
+    );
+
+    // ═══════════════════════════════════════════════════════
     //  EXPOSURE PASS (Auto-Exposure / Eye Adaptation)
     // ═══════════════════════════════════════════════════════
     // Computes scene exposure using histogram-based analysis.
@@ -792,7 +848,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        particleOutputs.albedo,  // HDR scene color for histogram
+        detailOutputs.albedo,     // HDR scene color for histogram (after detail pass)
         exposureConfig,
         Device.fTimeDelta,       // Frame delta for temporal adaptation
         width,
@@ -806,7 +862,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     // 4. UI Pass - Renders 2D UI directly to scene HDR target with alpha blending
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        particleOutputs.albedo,  // Scene + HUD + Particles (HDR)
+        detailOutputs.albedo,  // Scene + HUD + Particles + Details (HDR)
         width,
         height
     );

@@ -19,6 +19,7 @@
 // D3D12: Shader compilation
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/FGDetailManager.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -134,8 +135,19 @@ void CRender::level_Load(IReader* fs)
 
         // Details
         g_pGamePersistent->LoadTitle("st_loading_details");
-        // yohji TODO: port dx11 dependent logic to use nvrhi abstractions
-        //Details->Load();
+
+        // FGDetailManager: Load details for framegraph renderer
+        if (m_framegraphRenderer) {
+            auto* detailMgr = m_framegraphRenderer->GetDetailManager();
+            if (detailMgr && detailMgr->Load()) {
+                detailMgr->DecompressAllSlots();
+                detailMgr->ComputeSlotAABBs();
+                detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+            }
+        }
+
+        // Legacy CDetailManager (TODO: remove once FGDetailManager is fully working)
+        // Details->Load();
     }
 
     // Sectors

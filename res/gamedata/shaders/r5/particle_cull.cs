@@ -17,7 +17,8 @@ struct ParticleData {
     float2 uvMax;       //  8 bytes
 };
 
-cbuffer ParticleCullParams : register(b0) {
+// Use b5 to avoid collision with common.h buffers (b0, b1, b2, b3, b4)
+cbuffer ParticleCullParams : register(b5) {
     float4x4 g_ViewProj;        // 64 bytes
     float4 g_FrustumPlanes[6];  // 96 bytes
     float4 g_CameraPos;         // 16 bytes

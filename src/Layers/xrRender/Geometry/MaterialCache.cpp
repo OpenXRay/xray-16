@@ -744,6 +744,19 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     pso->pso = nvrhiPSO;
 
+    // CRITICAL FIX: NVRHI creates NEW layout objects internally when creating a pipeline.
+    // We must use the layouts FROM the pipeline, not the ones we created!
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 1) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            if (actualDesc.bindingLayouts.size() >= 2) {
+                pso->psBindingLayout = actualDesc.bindingLayouts[1];
+            }
+        }
+    }
+
     // Register with bindless system for GPU-driven rendering
     // This assigns a material ID that will be used during geometry upload
     RegisterBindlessMaterial(pso.get());
@@ -1207,9 +1220,17 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     }
 
     // Textures (t0, t1, t2, ...) - currently only in PS
+    // CRITICAL: Must sort by slot to match binding set order in GetOrCreateBindingSet
     u32 texCount = 0;
     if (stage == MaterialPSO::ShaderStage::Pixel) {
-        for (const auto& texSlot : matPSO->textures) {
+        // Sort textures by slot before adding to layout
+        xr_vector<MaterialPSO::TextureSlot> sortedTextures(matPSO->textures);
+        std::sort(sortedTextures.begin(), sortedTextures.end(),
+            [](const MaterialPSO::TextureSlot& a, const MaterialPSO::TextureSlot& b) {
+                return a.slot < b.slot;
+            });
+
+        for (const auto& texSlot : sortedTextures) {
             layoutDesc.bindings.push_back(
                 nvrhi::BindingLayoutItem::Texture_SRV(texSlot.slot));
             texCount++;
@@ -1217,14 +1238,27 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
     }
 
     // Samplers (s0, s1, s2, ...) - currently only in PS
+    // CRITICAL: Must sort by slot to match binding set order in GetOrCreateBindingSet
     u32 samplerCount = 0;
     if (stage == MaterialPSO::ShaderStage::Pixel) {
+        // Collect samplers for this stage
+        xr_vector<MaterialPSO::SamplerInfo> stageSamplers;
         for (const auto& samplerInfo : matPSO->samplers) {
             if (samplerInfo.stage == stage) {
-                layoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
-                samplerCount++;
+                stageSamplers.push_back(samplerInfo);
             }
+        }
+
+        // Sort samplers by slot before adding to layout
+        std::sort(stageSamplers.begin(), stageSamplers.end(),
+            [](const MaterialPSO::SamplerInfo& a, const MaterialPSO::SamplerInfo& b) {
+                return a.slot < b.slot;
+            });
+
+        for (const auto& samplerInfo : stageSamplers) {
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
+            samplerCount++;
         }
     }
 
@@ -1376,8 +1410,15 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         }
     }
 
-    // NOTE: Do NOT sort! NVRHI matches bindings by INDEX, not slot number.
-    // The binding set order MUST match the layout order.
+    // CRITICAL: SORT by slot number AND type to match layout order!
+    // CreateStageBindingLayout sorts ALL CBs by slot, then adds textures, then samplers.
+    // NVRHI matches bindings by INDEX, so binding set order MUST match layout order (b0, b1, ..., t0, t1, ..., s0, s1, ...)
+    std::sort(psBindings.begin(), psBindings.end(), [](const PSBinding& a, const PSBinding& b) {
+        // First sort by type (CB < Texture < Sampler) to match CreateStageBindingLayout order
+        if (a.type != b.type) return a.type < b.type;
+        // Then sort by slot within each type
+        return a.slot < b.slot;
+    });
 
     nvrhi::BindingSetDesc psBindingDesc;
     for (const auto& binding : psBindings) {
@@ -1393,6 +1434,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         matPSO->vsBindingLayout);
 
     if (!vsBindingSet) {
+        Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create VS binding set");
         return nullptr;
     }
 
@@ -1405,6 +1447,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         matPSO->psBindingLayout);
 
     if (!psBindingSet) {
+        Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create PS binding set");
         return nullptr;
     }
 
@@ -2114,7 +2157,18 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 
     pso->pso = nvrhiPSO;
 
-    CreateBindingLayouts(pso.get());
+    // CRITICAL FIX: Get layouts FROM the pipeline, not by creating new ones
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 1) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            if (actualDesc.bindingLayouts.size() >= 2) {
+                pso->psBindingLayout = actualDesc.bindingLayouts[1];
+            }
+        }
+    }
+
     pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
 
     return pso.release();
@@ -2136,13 +2190,9 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         return nullptr;
     }
 
-    Msg("* [MaterialCache::CreateUIPSO] dxShader=%p, checking handles...", dxShader);
-
     // Get NVRHI shader handles directly from dxUIShader (compiled in dxUIShader::create)
     nvrhi::ShaderHandle nvrhiVS = dxShader->m_vsHandle;
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
-
-    Msg("* [MaterialCache::CreateUIPSO] Read handles: nvrhiVS=%p nvrhiPS=%p", nvrhiVS.Get(), nvrhiPS.Get());
 
     if (!nvrhiVS || !nvrhiPS) {
         Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in dxUIShader (VS=%p PS=%p)",
@@ -2190,8 +2240,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
             CTexture* baseTexture = dxShader->GetBaseTexture();
             if (baseTexture) {
-                Msg("* [MaterialCache::CreateUIPSO] Loading UI texture: %s (slot t%u)", baseTexture->cName.c_str(), tex.slot);
-
                 // Get NVRHI texture handle from texture manager (it will load the texture if needed)
                 resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
                 resources::TextureHandle texHandle = texManager->LoadTexture(baseTexture->cName.c_str());
@@ -2199,8 +2247,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
                 if (!texHandle.IsValid()) {
                     Msg("! [MaterialCache::CreateUIPSO] Failed to load texture: %s", baseTexture->cName.c_str());
                 } else {
-                    Msg("* [MaterialCache::CreateUIPSO] Successfully loaded texture: %s", baseTexture->cName.c_str());
-
                     // Only add to textures list if we successfully loaded it
                     MaterialPSO::TextureSlot texSlot;
                     texSlot.slot = tex.slot;
@@ -2329,9 +2375,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     uiVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};    // float2 at offset 20 (8 bytes)
 
     // Build attributes in shader-expected order (WITHOUT stride first)
-    Msg("* [MaterialCache::CreateUIPSO] Building vertex layout from %u shader inputs:",
-        pso->vsInputSignature.elements.size());
-
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
 
@@ -2348,9 +2391,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         attr.offset = it->second.offset;
         attr.bufferIndex = 0;
         attr.elementStride = 0;  // Will be set below after calculating stride
-
-        Msg("  - %s%d: format=%d, offset=%u", attr.semanticName, attr.semanticIndex,
-            (int)attr.format, attr.offset);
 
         psoDesc.vertexAttributes.push_back(attr);
     }
@@ -2373,7 +2413,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     pso->vertexStride = calculatedStride;
-    Msg("* [MaterialCache::CreateUIPSO] Calculated vertex stride: %u bytes", calculatedStride);
 
     // Set render target formats from framebuffer FIRST
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
@@ -2430,14 +2469,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.debugName = "UI_PSO";
 
-    // Log PSO descriptor before creation
-    Msg("* [MaterialCache::CreateUIPSO] Creating PSO:");
-    Msg("  - VS: %p, PS: %p", psoDesc.vertexShader, psoDesc.pixelShader);
-    Msg("  - Vertex attributes: %u, stride: %u", psoDesc.vertexAttributes.size(), calculatedStride);
-    Msg("  - RT count: %u, RT format: %d, depth format: %d",
-        psoDesc.renderTargetCount, (int)psoDesc.renderTargetFormats[0], (int)psoDesc.depthStencilFormat);
-    Msg("  - Depth enabled: %d, has depth attachment: %d", psoDesc.depthStencilState.depthTestEnable, hasDepth);
-
     // Create pipeline state via cache
     ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
@@ -2452,6 +2483,17 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     pso->pso = nvrhiPSO;
+
+    // CRITICAL FIX: NVRHI creates NEW layout objects internally when creating a pipeline.
+    // We must use the layouts FROM the pipeline, not the ones we created!
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 2) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            pso->psBindingLayout = actualDesc.bindingLayouts[1];
+        }
+    }
 
     return pso.release();
 }
@@ -2692,6 +2734,17 @@ MaterialPSO* MaterialCache::CreateFontPSO(
     }
 
     pso->pso = nvrhiPSO;
+
+    // CRITICAL FIX: NVRHI creates NEW layout objects internally when creating a pipeline.
+    // We must use the layouts FROM the pipeline, not the ones we created!
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 2) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            pso->psBindingLayout = actualDesc.bindingLayouts[1];
+        }
+    }
 
     return pso.release();
 }

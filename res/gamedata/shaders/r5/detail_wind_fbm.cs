@@ -1,8 +1,7 @@
 // detail_wind_fbm.cs - Fractal Brownian Motion wind generation for interactive grass
 // Phase 5, Milestone 5.4: Generate natural wind using procedural noise
 //
-#define SM_5_0
-#include "common.h"
+// NOTE: Don't include common.h - it's for graphics shaders, not compute shaders
 
 // Constant buffer for wind parameters
 cbuffer WindParams : register(b0)

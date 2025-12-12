@@ -1,4 +1,6 @@
+#define SM_6_0
 #include "common.h"
+#include "bindless_common.h"
 
 // ========================================
 // GHOST OF TSUSHIMA-INSPIRED GRASS RENDERING
@@ -20,45 +22,53 @@
 // - Same visual result, optimized for X-Ray engine's deferred pipeline
 // ========================================
 
-uniform float4 consts; // {1/quant,1/quant,diffusescale,ambient}
-uniform float4 wave;   // cx,cy,cz,tm - for wave1
-uniform float4 dir2D;  // dir1 - for wave1 (vis_id=1)
-uniform float4 dir2D_2; // dir2 - for wave2 (vis_id=2)
-uniform float4 detail_params; // Phase 5: x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
-uniform float grass_wind_displacement; // Phase 5: Wind displacement strength (tunable via ImGui)
-uniform float grass_interaction_displacement; // Phase 5: Interaction displacement strength (tunable via ImGui)
-uniform float4 g_wind_direction; // Phase 6: Wind angle in degrees (X component only) WindParams
+// Detail-specific constant buffer (must match C++ DetailFrameConstants)
+cbuffer DetailGlobals : register(b3)
+{
+    float4 consts;                  // {1/quant,1/quant,diffusescale,ambient}
+    float4 wave;                    // cx,cy,cz,tm - for wave animation
+    float4 dir2D;                   // Wind direction 1 (XY = direction, normalized)
+    float4 dir2D_2;                 // Wind direction 2 (perpendicular)
+    float4x4 m_VP;                  // View-projection matrix
+    float4 detail_params;           // x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
+    float4 g_wind_direction;        // x=wind angle degrees, y=wind speed, z/w=unused
+    float grass_wind_displacement;  // Wind displacement strength
+    float grass_interaction_displacement;  // Interaction displacement strength
+    uint interaction_atlas_index;   // Bindless index for interaction atlas
+    uint wind_texture_index;        // Bindless index for wind texture
+};
+
 static const float M_PI = 3.1415926;
 
-// Phase 5: Interactive grass textures
-// Note: Slot t0 = instance buffer, so we use t1, t2, t3 (engine limit is 4 VS texture slots)
-Texture2D interaction_atlas : register(t1);  // RG=displacement XZ, B=bend, A=age
-Texture2D wind_texture : register(t2);       // RGB=wind vector, A=strength
-// Phase 6: Virtual texturing indirection table (NEW)
-Buffer<uint> slot_indirection : register(t3);  // Packed: physical_page (16) | mip (8) | flags (8)
+// Phase 6: Virtual texturing indirection table
+// NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
+Buffer<uint> slot_indirection : register(t32);  // Packed: physical_page (16) | mip (8) | flags (8)
 
 // Phase 6: New vertex structure for SDF blade geometry
+// NOTE: Semantic names must match C++ VertexAttributeDesc in FGDetailManager.cpp
+// NVRHI requires different semantic names for different formats
 struct v_blade_sdf
 {
 	float3 pos : POSITION;           // Local blade position (Y-up)
-	float2 tc : TEXCOORD0;           // Texture coordinates
-	float t : TEXCOORD1;             // Height parameter (0-1) for AO
-	float width_scale : TEXCOORD2;   // Width at this vertex
+	float2 tc : TEXCOORD;            // Texture coordinates
+	float t : COLOR0;                // Height parameter (0-1) for AO
+	float width_scale : COLOR1;      // Width at this vertex
 };
 
-// Instance data structure (must match C++ InstanceData)
+// Instance data structure (must match C++ FGDetailManager::InstanceData exactly!)
 struct InstanceData
 {
-	float3 pos;      // Position (12 bytes)
+	float3 pos;      // World position (12 bytes)
 	float scale;     // Scale factor (4 bytes)
+	float rotation;  // Y-axis rotation in radians (4 bytes)
 	float hemi;      // Hemisphere lighting (4 bytes)
 	uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2) (4 bytes)
 	uint object_id;  // Which grass object type (0-63) (4 bytes)
-	float padding;   // Padding to align to 16 bytes (4 bytes) = 32 bytes total
-};
+};  // Total: 32 bytes
 
-// Structured buffer bound to slot 0
-StructuredBuffer<InstanceData> detail_buffer : register(t0);
+// Instance buffer
+// NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
+StructuredBuffer<InstanceData> detail_buffer : register(t33);
 
 v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 {
@@ -76,9 +86,8 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	float3 base_world_pos = P0;
 
 	// ===== CALCULATE FACING DIRECTION (EARLY) =====
-	// Each blade gets a unique random rotation based on its position
-	// This must be calculated early since we need it for wind influence calculation
-	float blade_rotation = frac(P0.x * 12.9898 + P0.z * 78.233) * 2.0 * M_PI;  // Random 0-2π
+	// Use instance rotation from CPU decompression (matches original game's deterministic placement)
+	float blade_rotation = det.rotation;
 	float3 facing = normalize(float3(sin(blade_rotation), 0.0, cos(blade_rotation)));
 
 	// ===== BEZIER CURVE EVALUATION HELPER =====
@@ -148,17 +157,19 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 		// Final atlas UV
 		atlas_uv = page_base_uv + slot_local * page_size_uv;
 
-		// Sample interaction atlas
-		interaction = interaction_atlas.SampleLevel(smp_linear, atlas_uv, 0);
+		// Sample interaction atlas using bindless
+		Texture2D interaction_tex = GetBindlessTexture(interaction_atlas_index);
+		interaction = interaction_tex.SampleLevel(g_LinearSampler, atlas_uv, 0);
 	}
 
 	// ===== MODIFY BEZIER CONTROL POINTS FOR WIND/INTERACTION =====
 	// GoT doc (lines 391-405): "Wind animation integration"
 	// Instead of directly offsetting vertices, we modify P1 and P2
 
-	// Sample wind texture at blade base for strength/turbulence variation
+	// Sample wind texture at blade base for strength/turbulence variation using bindless
 	float2 wind_uv = P0.xz * 0.001;  // Use base position for sampling
-	float4 wind = wind_texture.SampleLevel(smp_linear, wind_uv, 0);
+	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
+	float4 wind = wind_tex.SampleLevel(g_LinearSampler, wind_uv, 0);
 
 	// Extract wind strength and turbulence from texture
 	// wind.a = base wind strength (0-1)
@@ -311,53 +322,39 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// TANGENT = Bezier curve derivative at parameter t
 	// B'(t) = 3(1-t)²(P₁-P₀) + 6(1-t)t(P₂-P₁) + 3t²(P₃-P₂)
 	// GoT doc (lines 72-76): "The first derivative (tangent vector)"
-	float3 tangent = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
-	tangent = normalize(tangent);
+	float3 tangent_raw = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
+	float tangent_len = length(tangent_raw);
+	float3 tangent = (tangent_len > 0.001) ? (tangent_raw / tangent_len) : float3(0, 1, 0);
 
-	// ===== GHOST OF TSUSHIMA: GLANCING ANGLE ADJUSTMENT =====
-	// GoT doc (lines 185-186): "vertices rotate slightly about the tangent to maintain visibility"
-	// When blade is perpendicular to camera, rotate it to face the camera
+	// ===== WIDTH OFFSET USING ROTATION MATRIX (like original X-Ray shader) =====
+	// Original X-Ray detail shader transforms vertices using a per-instance matrix.
+	// We replicate this by building a Y-axis rotation matrix from det.rotation.
+	// The vertex's local X position (I.pos.x) represents blade width offset.
 
-	// Calculate view direction
-	float3 view_dir = normalize(bezier_pos - eye_position);
+	// Build rotation matrix for Y-axis rotation (blade_rotation is in radians)
+	float cos_rot = cos(blade_rotation);
+	float sin_rot = sin(blade_rotation);
 
-	// Calculate right vector for blade width
-	// Normally this would be perpendicular to tangent and facing
-	float3 right = normalize(cross(tangent, facing));
+	// The "right" vector is simply the rotated X-axis
+	// For Y-axis rotation: right = (cos, 0, -sin)
+	float3 right = float3(cos_rot, 0.0, -sin_rot);
 
-	// Calculate how edge-on the blade is to the camera
-	// dot(view_dir, right) = 0 when camera is perpendicular to blade face
-	// dot(view_dir, right) = ±1 when camera is aligned with blade face
-	float edge_on_factor = abs(dot(view_dir, right));
-
-	// When edge_on_factor is close to 1 (edge-on), rotate blade to face camera
-	// Blend the right vector toward camera-facing direction
-	if (edge_on_factor > 0.8)  // Only adjust at steep angles
-	{
-		// Camera-facing right vector (perpendicular to tangent and view)
-		float3 camera_right = normalize(cross(tangent, view_dir));
-
-		// Blend between natural right and camera-facing right
-		// More edge-on = more camera-facing
-		float blend = (edge_on_factor - 0.8) / 0.2;  // 0.8-1.0 -> 0-1
-		right = normalize(lerp(right, camera_right, blend * 0.5));  // Max 50% blend
-	}
-
-	// Apply width offset using adjusted right vector
+	// Apply width offset using rotation-based right vector
 	float3 width_offset = right * (I.pos.x * det.scale);
 
 	// Final position
 	float4 pos = float4(bezier_pos + width_offset, 1.0);
 
-	// ===== GHOST OF TSUSHIMA: Calculate blade normal =====
+	// ===== Calculate blade normal =====
 	float hemi = abs(det.hemi);
 	float sun = sign(det.hemi) * 0.25f + 0.25f;
 
-	// NORMAL = perpendicular to blade surface
-	// Ghost of Tsushima: normal = cross(tangent, right)
-	// Note: We use the adjusted 'right' vector from glancing angle adjustment
-	// This ensures normals match the adjusted blade geometry
-	float3 blade_normal = normalize(cross(tangent, right));
+	// NORMAL = perpendicular to blade surface = cross(tangent, right)
+	// Since right is derived from rotation matrix, this is stable
+	float3 normal_raw = cross(tangent, right);
+	float normal_len = length(normal_raw);
+	// Fallback to facing direction if cross product is degenerate
+	float3 blade_normal = (normal_len > 0.001) ? (normal_raw / normal_len) : facing;
 
 	// ===== GHOST OF TSUSHIMA: ROUNDED BLADE NORMALS =====
 	float rotationAngle = 3.14159 * 0.3;  // ±30 degrees (PI * 0.3)
@@ -403,4 +400,3 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	O.hpos = mul(m_WVP, pos);
 	return O;
 }
-FXVS;

@@ -303,6 +303,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 cbDesc.isConstantBuffer = true;
                 cbDesc.debugName = "TextPass screen_res CB";
                 cbDesc.isVolatile = true;
+                cbDesc.maxVersions = 16;  // Support multiple frames in flight
                 cbDesc.keepInitialState = true;
                 cbDesc.initialState = nvrhi::ResourceStates::ConstantBuffer;
                 s_constantBuffer = nvrhiDevice->createBuffer(cbDesc);

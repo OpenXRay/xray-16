@@ -67,7 +67,8 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
     Msg("* [ForwardPass] Initializing forward pipelines...");
 
     // Create dummy framebuffer with expected formats for pipeline creation
-    // Forward pass uses: RGBA16_FLOAT color, D24S8 depth
+    // Forward pass uses: RGBA16_FLOAT color, D32_FLOAT depth
+    // IMPORTANT: Must match framegraph's actual depth format (53 = D32_FLOAT, not D24S8)
     nvrhi::TextureDesc colorDesc;
     colorDesc.width = 64;
     colorDesc.height = 64;
@@ -81,7 +82,7 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D24S8;
+    depthDesc.format = nvrhi::Format::D32;  // Changed from D24S8 to match framegraph
     depthDesc.isRenderTarget = true;
     depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
     depthDesc.keepInitialState = true;
@@ -274,6 +275,12 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
         return;
     }
 
+    // CRITICAL FIX: Query binding layout from pipeline
+    const nvrhi::GraphicsPipelineDesc& actualDesc = s_bindlessPipeline->getDesc();
+    if (!actualDesc.bindingLayouts.empty()) {
+        s_bindlessLayout = actualDesc.bindingLayouts[0];
+    }
+
     s_bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
 }
@@ -349,6 +356,9 @@ void renderBindlessForward(
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),   // g_CompactMaterialIDs
         };
         s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
+
+        if (!s_bindlessLayout)
+            return;
 
         // Create input layout matching UnifiedVertex format for GPU-driven rendering
         // UnifiedVertex has pre-unpacked UVs and vertex color:
@@ -477,9 +487,26 @@ void renderBindlessForward(
         fbDesc.setDepthAttachment(depthRT);
         auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
+        Msg("* [FGDetailManager] Creating bindless forward graphics pipeline...");
+        Msg("  - VS handle: %p", s_bindlessVS.Get());
+        Msg("  - PS handle: %p", s_bindlessPS.Get());
+        Msg("  - Binding layout: %p", s_bindlessLayout.Get());
+        Msg("* [FGDetailManager] Calling device->createGraphicsPipeline...");
+
         s_bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        if (!s_bindlessPipeline)
+        if (!s_bindlessPipeline) {
+            Msg("! [FGDetailManager] Failed to create bindless forward graphics pipeline");
             return;
+        }
+
+        Msg("* [FGDetailManager] Bindless forward graphics pipeline created successfully");
+
+        // CRITICAL FIX: Query binding layout from pipeline
+        const nvrhi::GraphicsPipelineDesc& actualDesc = s_bindlessPipeline->getDesc();
+        if (!actualDesc.bindingLayouts.empty()) {
+            s_bindlessLayout = actualDesc.bindingLayouts[0];
+            Msg("* [FGDetailManager] Updated bindless forward bindingLayout from pipeline (pointer: %p)", s_bindlessLayout.Get());
+        }
 
         s_bindlessInitialized = true;
     }

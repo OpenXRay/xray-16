@@ -237,7 +237,7 @@ bool ParticleGPUCullingManager::CreateBindingLayouts()
         nvrhi::BindingLayoutDesc desc;
         desc.visibility = nvrhi::ShaderType::Compute;
         desc.bindings = {
-            nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),       // ParticleCullParams (b0)
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),       // ParticleCullParams (b5 - avoid common.h collision)
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),         // g_ParticleData (t0)
             nvrhi::BindingLayoutItem::Texture_SRV(1),                  // g_HiZPyramid (t1)
             nvrhi::BindingLayoutItem::Sampler(0),                      // g_PointClampSampler (s0)
@@ -283,6 +283,15 @@ bool ParticleGPUCullingManager::CreatePipelines()
         m_cullPipeline = nvDevice->createComputePipeline(desc);
         if (!m_cullPipeline)
             return false;
+
+        // CRITICAL FIX: Query binding layout from pipeline
+        nvrhi::IComputePipeline* nativePipeline = m_cullPipeline;
+        if (nativePipeline) {
+            const nvrhi::ComputePipelineDesc& actualDesc = nativePipeline->getDesc();
+            if (!actualDesc.bindingLayouts.empty()) {
+                m_cullLayout = actualDesc.bindingLayouts[0];
+            }
+        }
     }
 
     // Billboard pipeline
@@ -293,6 +302,15 @@ bool ParticleGPUCullingManager::CreatePipelines()
         m_billboardPipeline = nvDevice->createComputePipeline(desc);
         if (!m_billboardPipeline)
             return false;
+
+        // CRITICAL FIX: Query binding layout from pipeline
+        nvrhi::IComputePipeline* nativePipeline = m_billboardPipeline;
+        if (nativePipeline) {
+            const nvrhi::ComputePipelineDesc& actualDesc = nativePipeline->getDesc();
+            if (!actualDesc.bindingLayouts.empty()) {
+                m_billboardLayout = actualDesc.bindingLayouts[0];
+            }
+        }
     }
 
     Msg("* [ParticleGPUCulling] Pipelines created");
@@ -360,7 +378,7 @@ void ParticleGPUCullingManager::DispatchCulling(
     // Create binding set
     nvrhi::BindingSetDesc bindDesc;
     bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, m_cullParamsCB),
+        nvrhi::BindingSetItem::ConstantBuffer(5, m_cullParamsCB),  // b5 to match layout (avoid common.h collision)
         nvrhi::BindingSetItem::StructuredBuffer_SRV(0, m_particleDataBuffer),
         nvrhi::BindingSetItem::Texture_SRV(1, hiZPyramid),
         nvrhi::BindingSetItem::Sampler(0, m_pointClampSampler),

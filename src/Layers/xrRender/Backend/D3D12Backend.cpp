@@ -4,8 +4,10 @@
 #include "D3D12Backend.h"
 
 #include <d3d12.h>
+#include <d3d12sdklayers.h>  // For ID3D12Debug1
 #include <dxgi1_4.h>
 #include <nvrhi/d3d12.h>
+#include <nvrhi/validation.h>
 #include <SDL.h>
 #include <SDL_syswm.h>
 
@@ -102,12 +104,22 @@ bool D3D12Backend::Initialize(SDL_Window* window, u32 width, u32 height, bool en
     deviceDesc.errorCB = &s_nvrhiMessageCallback;  // Error/warning logging
     deviceDesc.enableHeapDirectlyIndexed = true;   // Enable bindless
 
-    m_nvrhiDevice = nvrhi::d3d12::createDevice(deviceDesc);
-    if (!m_nvrhiDevice) {
-        Msg("! [D3D12Backend] Failed to create NVRHI device");
+    nvrhi::DeviceHandle baseDevice = nvrhi::d3d12::createDevice(deviceDesc);
+    if (!baseDevice) {
+        Msg("! [D3D12Backend] Failed to create NVRHI base device");
         Shutdown();
         return false;
     }
+
+    // Wrap with validation layer for detailed error messages
+    m_nvrhiDevice = nvrhi::validation::createValidationLayer(baseDevice);
+    if (!m_nvrhiDevice) {
+        Msg("! [D3D12Backend] Failed to create NVRHI validation layer");
+        Shutdown();
+        return false;
+    }
+
+    Msg("* [D3D12Backend] NVRHI validation layer enabled");
 
     // Create per-frame command list (for rendering)
     nvrhi::CommandListParameters cmdParams;
@@ -197,6 +209,16 @@ bool D3D12Backend::CreateDXGIFactory(bool enableValidation) {
         ID3D12Debug* debugController = nullptr;
         if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
             debugController->EnableDebugLayer();
+
+            // Enable GPU-based validation for more detailed errors
+            ID3D12Debug1* debugController1 = nullptr;
+            if (SUCCEEDED(debugController->QueryInterface(IID_PPV_ARGS(&debugController1)))) {
+                debugController1->SetEnableGPUBasedValidation(TRUE);
+                debugController1->SetEnableSynchronizedCommandQueueValidation(TRUE);
+                debugController1->Release();
+                Msg("* [D3D12Backend] GPU-based validation enabled");
+            }
+
             debugController->Release();
             Msg("* [D3D12Backend] Debug layer enabled");
         }

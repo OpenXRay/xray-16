@@ -926,11 +926,16 @@
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
-    <ClInclude Include="..\xrRender\Backend\D3D11Backend.h" />
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
-    <ClInclude Include="..\xrRender\Backend\RenderBackend.h" />
     <ClInclude Include="..\utils\xrLC_Light\R_light.h" />
     <ClInclude Include="..\xrRender\Backend\D3D11BackendWrapper.h" />
+    <ClInclude Include="..\xrRender\FrameGraph\PassResourceCache.h" />
+    <ClInclude Include="..\xrRender\FGDetailManager.h">
+      <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h">
+      <Filter>Framegraph\Passes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1705,10 +1710,15 @@
     <ClCompile Include="..\xrRender\PBRConverter\ONNXModelRunner.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
-    <ClCompile Include="..\xrRender\Backend\D3D11Backend.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
-    <ClCompile Include="..\xrRender\Backend\RenderBackend.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
+    <ClCompile Include="..\xrRender\FrameGraph\PassResourceCache.cpp" />
+    <ClCompile Include="..\xrRender\FGDetailManager.cpp">
+      <Filter>Framegraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp">
+      <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,0 +1,66 @@
+// DetailPassSetup.h - Framegraph pass for detail objects (grass, etc.)
+#pragma once
+
+#include "Layers/xrRender/FrameGraph/FGTypes.h"
+#include "Layers/xrRender/FrameGraph/FGResource.h"
+#include <nvrhi/nvrhi.h>
+
+namespace xray::render::RENDER_NAMESPACE {
+    class FGDetailManager;
+}
+
+namespace xray::render {
+    namespace ng {
+        class RenderDevice;
+        class RenderContext;
+    }
+}
+
+namespace xray::render::framegraph {
+    class FrameGraph;
+    class ShaderLoader;
+    struct DefaultOutputLayout;
+}
+
+namespace xray::render::RENDER_NAMESPACE::passes {
+
+// ═══════════════════════════════════════════════════════
+//  DETAIL PASS DATA
+// ═══════════════════════════════════════════════════════
+// Pass data for detail rendering (grass, small vegetation)
+struct DetailPassData
+{
+    framegraph::VirtualResourceHandle depthBuffer;
+    framegraph::VirtualResourceHandle colorTarget;
+    framegraph::VirtualResourceHandle hiZPyramid;  // Hi-Z for GPU culling
+    u32 width;
+    u32 height;
+    u32 hiZWidth;
+    u32 hiZHeight;
+    u32 hiZMipLevels;
+};
+
+// ═══════════════════════════════════════════════════════
+//  DETAIL PASS SETUP
+// ═══════════════════════════════════════════════════════
+// Lambda-based detail pass setup with GPU culling support
+// Renders detail objects (grass, vegetation) using:
+// - GPU compute culling (frustum + Hi-Z occlusion)
+// - Single unified draw call via DrawIndexedInstancedIndirect
+// - Interactive grass system (wind + entity interactions)
+// - Virtual texturing for interaction atlas
+// Renders AFTER forward color pass (details on top of world geometry)
+framegraph::DefaultOutputLayout setupDetailPass(
+    framegraph::FrameGraph& fg,
+    ng::RenderDevice* device,
+    RENDER_NAMESPACE::FGDetailManager* detailManager,
+    const framegraph::DefaultOutputLayout& forwardInputs,
+    u32 width,
+    u32 height,
+    framegraph::VirtualResourceHandle hiZPyramid = {},
+    u32 hiZWidth = 0,
+    u32 hiZHeight = 0,
+    u32 hiZMipLevels = 0
+);
+
+} // namespace xray::render::RENDER_NAMESPACE::passes

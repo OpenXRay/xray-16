@@ -537,15 +537,17 @@ struct ShaderTypeTraits<SCS>
             return "cs_4_1";
         case D3D_FEATURE_LEVEL_11_0:
         case D3D_FEATURE_LEVEL_11_1:
+            return "cs_5_0";
 #       ifdef HAS_DX11_3
         case D3D_FEATURE_LEVEL_12_0:
         case D3D_FEATURE_LEVEL_12_1:
+        case D3D_FEATURE_LEVEL_12_2:
+            return "cs_6_0";  // DX12 requires Shader Model 6.0+
 #       endif
-            return "cs_5_0";
         }
 #   endif // USE_DX11
 
-        return "cs_5_0";
+        return "cs_6_0";
     }
 
     static void GetCompilationTarget(const char*& target, const char*& entry, const char* /*data*/)

@@ -163,6 +163,7 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     cbDesc.byteSize = sizeof(ImGuiConstants);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true; // We update it every frame
+    cbDesc.maxVersions = 16;  // Support multiple frames in flight
     cbDesc.debugName = "ImGui Constants";
     m_constantBuffer = m_device->createBuffer(cbDesc);
 

@@ -33,6 +33,7 @@ class MaterialCache;
 
 namespace RENDER_NAMESPACE {
     class GPUCullingManager;
+    class FGDetailManager;
 }
 
 namespace ui {
@@ -93,6 +94,9 @@ public:
 
     // GPU Culling Manager accessor (for level loading integration)
     RENDER_NAMESPACE::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
+
+    // Detail Manager accessor (for level loading integration)
+    RENDER_NAMESPACE::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
 
 private:
     bool m_enabled = false;
@@ -173,6 +177,9 @@ private:
 
     // GPU Culling Manager (Phase 3.5: Hi-Z occlusion culling)
     xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
+
+    // Detail Manager (Framegraph: grass/vegetation rendering)
+    xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
 
     // UI rendering infrastructure (shared by UI/Text/Cursor passes)
     xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;

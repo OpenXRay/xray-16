@@ -1,5 +1,6 @@
+#define SM_6_0
 #include "common.h"
-#include "sload.h"
+#include "bindless_common.h"
 
 // Ghost of Tsushima approach: Minimal pixel shader
 // "The G-buffer pixel shader keeps operations minimal"
@@ -9,16 +10,17 @@
 static const float3 youngGrassCol = float3(0.35, 0.45, 0.18);  // Brighter, more vibrant
 static const float3 oldGrassCol = float3(0.28, 0.38, 0.15);    // Slightly duller brown-green
 
-// Phase 6: Grass vein detail texture
-Texture2D s_grass_vein;
+// Bindless texture indices for detail rendering
+uniform uint grass_vein_index;         // Bindless index for grass vein texture
+uniform uint interaction_atlas_index;  // Bindless index for interaction atlas
 
 // Phase 5: Grass interaction debug visualization
-Texture2D s_interaction_atlas;
 uniform int dm_debug_trails;
 
 float SampleGrassInteraction(float2 atlas_uv)
 {
-    float4 interaction = s_interaction_atlas.Sample(smp_base, atlas_uv);
+    Texture2D interaction_tex = GetBindlessTexture(interaction_atlas_index);
+    float4 interaction = interaction_tex.Sample(g_LinearSampler, atlas_uv);
     return interaction.r;
 }
 
@@ -54,8 +56,9 @@ f_forward main(p_flat I)
     float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
     grassAlbedo *= lerp(0.85, 1.15, hash);  // ±15% color variation per blade
 
-    // ===== VEIN DETAIL TEXTURE =====
-    float4 vein_detail = s_grass_vein.Sample(smp_base, I.tcdh.xy);
+    // ===== VEIN DETAIL TEXTURE (BINDLESS) =====
+    Texture2D vein_tex = GetBindlessTexture(grass_vein_index);
+    float4 vein_detail = vein_tex.Sample(g_LinearSampler, I.tcdh.xy);
 
     // Overlay vein detail on base color
     grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, vein_detail.a * 0.15);

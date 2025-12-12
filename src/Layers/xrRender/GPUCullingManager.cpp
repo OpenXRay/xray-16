@@ -1417,9 +1417,15 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
         pipeDesc.CS = s_particle_cull_cs->nvrhiShader;
         pipeDesc.bindingLayouts = { m_particleCullLayout };
 
+        Msg("* [GPUCulling] Creating particle compute pipeline:");
+        Msg("    CS shader: %p", pipeDesc.CS.Get());
+        Msg("    Binding layouts: %u", pipeDesc.bindingLayouts.size());
+        Msg("    Layout[0]: %p", pipeDesc.bindingLayouts[0].Get());
+
         m_particleCullPipeline = nvDevice->createComputePipeline(pipeDesc);
         if (!m_particleCullPipeline) {
             Msg("! [GPUCulling] Failed to create particle compute pipeline");
+            Msg("! [GPUCulling]   Check NVRHI validation layer output above for details");
             return;
         }
     }
