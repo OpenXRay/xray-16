@@ -94,7 +94,7 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D24S8;
+    depthDesc.format = nvrhi::Format::D32;
     depthDesc.isRenderTarget = true;
     depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
     depthDesc.keepInitialState = true;
@@ -176,6 +176,13 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
 
             s_skinnedPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
             Msg("* [SkinningPass] Non-HQ pipeline (24-byte): %s", s_skinnedPipeline ? "OK" : "FAILED");
+
+            if (s_skinnedPipeline) {
+                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedPipeline->getDesc();
+                if (!actualDesc.bindingLayouts.empty()) {
+                    s_skinnedLayout = actualDesc.bindingLayouts[0];
+                }
+            }
         }
     }
 
@@ -212,6 +219,13 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
 
             s_skinnedHQ1WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
             Msg("* [SkinningPass] HQ 1W pipeline (36-byte): %s", s_skinnedHQ1WPipeline ? "OK" : "FAILED");
+
+            if (s_skinnedHQ1WPipeline) {
+                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ1WPipeline->getDesc();
+                if (!actualDesc.bindingLayouts.empty()) {
+                    s_skinnedLayout = actualDesc.bindingLayouts[0];
+                }
+            }
         }
     }
 
@@ -249,6 +263,13 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
 
             s_skinnedHQ4WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
             Msg("* [SkinningPass] HQ 4W pipeline (40-byte): %s", s_skinnedHQ4WPipeline ? "OK" : "FAILED");
+
+            if (s_skinnedHQ4WPipeline) {
+                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ4WPipeline->getDesc();
+                if (!actualDesc.bindingLayouts.empty()) {
+                    s_skinnedLayout = actualDesc.bindingLayouts[0];
+                }
+            }
         }
     }
 
@@ -285,6 +306,13 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
 
             s_skinnedHQ2WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
             Msg("* [SkinningPass] HQ 2W pipeline (44-byte): %s", s_skinnedHQ2WPipeline ? "OK" : "FAILED");
+
+            if (s_skinnedHQ2WPipeline) {
+                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ2WPipeline->getDesc();
+                if (!actualDesc.bindingLayouts.empty()) {
+                    s_skinnedLayout = actualDesc.bindingLayouts[0];
+                }
+            }
         }
     }
 

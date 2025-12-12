@@ -541,6 +541,17 @@ MaterialPSO* MaterialCache::CreatePSO(
 
     pso->pso = nvrhiPSO;
 
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 1) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            if (actualDesc.bindingLayouts.size() >= 2) {
+                pso->psBindingLayout = actualDesc.bindingLayouts[1];
+            }
+        }
+    }
+
     RegisterBindlessMaterial(pso.get());
 
     m_stats.totalPSOCreations++;
@@ -899,7 +910,13 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
 
     u32 texCount = 0;
     if (stage == MaterialPSO::ShaderStage::Pixel) {
-        for (const auto& texSlot : matPSO->textures) {
+        xr_vector<MaterialPSO::TextureSlot> sortedTextures(matPSO->textures);
+        std::sort(sortedTextures.begin(), sortedTextures.end(),
+            [](const MaterialPSO::TextureSlot& a, const MaterialPSO::TextureSlot& b) {
+                return a.slot < b.slot;
+            });
+
+        for (const auto& texSlot : sortedTextures) {
             layoutDesc.bindings.push_back(
                 nvrhi::BindingLayoutItem::Texture_SRV(texSlot.slot));
             texCount++;
@@ -908,12 +925,22 @@ nvrhi::BindingLayoutHandle MaterialCache::CreateStageBindingLayout(
 
     u32 samplerCount = 0;
     if (stage == MaterialPSO::ShaderStage::Pixel) {
+        xr_vector<MaterialPSO::SamplerInfo> stageSamplers;
         for (const auto& samplerInfo : matPSO->samplers) {
             if (samplerInfo.stage == stage) {
-                layoutDesc.bindings.push_back(
-                    nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
-                samplerCount++;
+                stageSamplers.push_back(samplerInfo);
             }
+        }
+
+        std::sort(stageSamplers.begin(), stageSamplers.end(),
+            [](const MaterialPSO::SamplerInfo& a, const MaterialPSO::SamplerInfo& b) {
+                return a.slot < b.slot;
+            });
+
+        for (const auto& samplerInfo : stageSamplers) {
+            layoutDesc.bindings.push_back(
+                nvrhi::BindingLayoutItem::Sampler(samplerInfo.slot));
+            samplerCount++;
         }
     }
 
@@ -1032,6 +1059,11 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         }
     }
 
+    std::sort(psBindings.begin(), psBindings.end(), [](const PSBinding& a, const PSBinding& b) {
+        if (a.type != b.type) return a.type < b.type;
+        return a.slot < b.slot;
+    });
+
     nvrhi::BindingSetDesc psBindingDesc;
     for (const auto& binding : psBindings) {
         psBindingDesc.bindings.push_back(binding.item);
@@ -1042,6 +1074,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         matPSO->vsBindingLayout);
 
     if (!vsBindingSet) {
+        Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create VS binding set");
         return nullptr;
     }
 
@@ -1050,6 +1083,7 @@ nvrhi::BindingSetHandle MaterialCache::GetOrCreateBindingSet(MaterialPSO* matPSO
         matPSO->psBindingLayout);
 
     if (!psBindingSet) {
+        Msg("! [MaterialCache::GetOrCreateBindingSet] Failed to create PS binding set");
         return nullptr;
     }
 
@@ -1586,7 +1620,17 @@ MaterialPSO* MaterialCache::CreateDepthPSO(
 
     pso->pso = nvrhiPSO;
 
-    CreateBindingLayouts(pso.get());
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 1) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            if (actualDesc.bindingLayouts.size() >= 2) {
+                pso->psBindingLayout = actualDesc.bindingLayouts[1];
+            }
+        }
+    }
+
     pso->debugName = shared_str(pass->vs._get() ? pass->vs._get()->cName.c_str() : "depth_pso");
 
     return pso.release();
@@ -1606,12 +1650,8 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         return nullptr;
     }
 
-    Msg("* [MaterialCache::CreateUIPSO] dxShader=%p, checking handles...", dxShader);
-
     nvrhi::ShaderHandle nvrhiVS = dxShader->m_vsHandle;
     nvrhi::ShaderHandle nvrhiPS = dxShader->m_psHandle;
-
-    Msg("* [MaterialCache::CreateUIPSO] Read handles: nvrhiVS=%p nvrhiPS=%p", nvrhiVS.Get(), nvrhiPS.Get());
 
     if (!nvrhiVS || !nvrhiPS) {
         Msg("! [MaterialCache::CreateUIPSO] Missing NVRHI shader handles in dxUIShader (VS=%p PS=%p)",
@@ -1652,16 +1692,12 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
             CTexture* baseTexture = dxShader->GetBaseTexture();
             if (baseTexture) {
-                Msg("* [MaterialCache::CreateUIPSO] Loading UI texture: %s (slot t%u)", baseTexture->cName.c_str(), tex.slot);
-
                 resources::TextureManager* texManager = m_resourceManager->GetTextureManager();
                 resources::TextureHandle texHandle = texManager->LoadTexture(baseTexture->cName.c_str());
 
                 if (!texHandle.IsValid()) {
                     Msg("! [MaterialCache::CreateUIPSO] Failed to load texture: %s", baseTexture->cName.c_str());
                 } else {
-                    Msg("* [MaterialCache::CreateUIPSO] Successfully loaded texture: %s", baseTexture->cName.c_str());
-
                     MaterialPSO::TextureSlot texSlot;
                     texSlot.slot = tex.slot;
                     texSlot.handle = texHandle;
@@ -1765,9 +1801,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     uiVertexLayout["COLOR"]     = {nvrhi::Format::RGBA8_UNORM, 16};
     uiVertexLayout["TEXCOORD"]  = {nvrhi::Format::RG32_FLOAT, 20};
 
-    Msg("* [MaterialCache::CreateUIPSO] Building vertex layout from %u shader inputs:",
-        pso->vsInputSignature.elements.size());
-
     for (const auto& shaderElem : pso->vsInputSignature.elements) {
         std::string semantic = shaderElem.semanticName.c_str();
 
@@ -1784,9 +1817,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
         attr.offset = it->second.offset;
         attr.bufferIndex = 0;
         attr.elementStride = 0;
-
-        Msg("  - %s%d: format=%d, offset=%u", attr.semanticName, attr.semanticIndex,
-            (int)attr.format, attr.offset);
 
         psoDesc.vertexAttributes.push_back(attr);
     }
@@ -1806,7 +1836,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     pso->vertexStride = calculatedStride;
-    Msg("* [MaterialCache::CreateUIPSO] Calculated vertex stride: %u bytes", calculatedStride);
 
     const nvrhi::FramebufferDesc& fbDesc = framebuffer->getDesc();
     psoDesc.renderTargetCount = static_cast<u32>(fbDesc.colorAttachments.size());
@@ -1855,13 +1884,6 @@ MaterialPSO* MaterialCache::CreateUIPSO(
 
     psoDesc.debugName = "UI_PSO";
 
-    Msg("* [MaterialCache::CreateUIPSO] Creating PSO:");
-    Msg("  - VS: %p, PS: %p", psoDesc.vertexShader, psoDesc.pixelShader);
-    Msg("  - Vertex attributes: %u, stride: %u", psoDesc.vertexAttributes.size(), calculatedStride);
-    Msg("  - RT count: %u, RT format: %d, depth format: %d",
-        psoDesc.renderTargetCount, (int)psoDesc.renderTargetFormats[0], (int)psoDesc.depthStencilFormat);
-    Msg("  - Depth enabled: %d, has depth attachment: %d", psoDesc.depthStencilState.depthTestEnable, hasDepth);
-
     ng::PipelineStateCache* psoCache = m_device->GetPipelineCache();
     if (!psoCache) {
         Msg("! [MaterialCache::CreateUIPSO] No PSO cache");
@@ -1875,6 +1897,15 @@ MaterialPSO* MaterialCache::CreateUIPSO(
     }
 
     pso->pso = nvrhiPSO;
+
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 2) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            pso->psBindingLayout = actualDesc.bindingLayouts[1];
+        }
+    }
 
     return pso.release();
 }
@@ -2088,6 +2119,15 @@ MaterialPSO* MaterialCache::CreateFontPSO(
     }
 
     pso->pso = nvrhiPSO;
+
+    nvrhi::IGraphicsPipeline* nativePipeline = nvrhiPSO->GetNativePipeline();
+    if (nativePipeline) {
+        const nvrhi::GraphicsPipelineDesc& actualDesc = nativePipeline->getDesc();
+        if (actualDesc.bindingLayouts.size() >= 2) {
+            pso->vsBindingLayout = actualDesc.bindingLayouts[0];
+            pso->psBindingLayout = actualDesc.bindingLayouts[1];
+        }
+    }
 
     return pso.release();
 }

@@ -298,7 +298,7 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D24S8;
+    depthDesc.format = nvrhi::Format::D32;
     depthDesc.isRenderTarget = true;
     depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
     depthDesc.keepInitialState = true;
@@ -395,6 +395,13 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
 
         s_particlePipelineBlend = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
         Msg("* [ParticlePass] Alpha blend pipeline: %s", s_particlePipelineBlend ? "OK" : "FAILED");
+
+        if (s_particlePipelineBlend) {
+            const nvrhi::GraphicsPipelineDesc& actualDesc = s_particlePipelineBlend->getDesc();
+            if (!actualDesc.bindingLayouts.empty()) {
+                s_particleLayout = actualDesc.bindingLayouts[0];
+            }
+        }
     }
 
     {
@@ -418,6 +425,13 @@ void InitializeParticlePipelines(ng::RenderDevice* device)
 
         s_particlePipelineAdd = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
         Msg("* [ParticlePass] Additive blend pipeline: %s", s_particlePipelineAdd ? "OK" : "FAILED");
+
+        if (s_particlePipelineAdd) {
+            const nvrhi::GraphicsPipelineDesc& actualDesc = s_particlePipelineAdd->getDesc();
+            if (!actualDesc.bindingLayouts.empty()) {
+                s_particleLayout = actualDesc.bindingLayouts[0];
+            }
+        }
     }
 
     s_particleInitialized = true;

@@ -17,6 +17,7 @@
 
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
+#include "Layers/xrRender/FGDetailManager.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -115,6 +116,16 @@ void CRender::level_Load(IReader* fs)
 
         // Details
         g_pGamePersistent->LoadTitle("st_loading_details");
+
+        if (m_framegraphRenderer) {
+            auto* detailMgr = m_framegraphRenderer->GetDetailManager();
+            if (detailMgr && detailMgr->Load()) {
+                detailMgr->DecompressAllSlots();
+                detailMgr->ComputeSlotAABBs();
+                detailMgr->CreateGPUBuffers(m_framegraphRenderer->GetRenderDevice()->GetNVRHIDevice());
+            }
+        }
+
     }
 
     // Sectors

@@ -30,6 +30,7 @@ class MaterialCache;
 
 namespace RENDER_NAMESPACE {
     class GPUCullingManager;
+    class FGDetailManager;
 }
 
 namespace ui {
@@ -80,6 +81,8 @@ public:
 
     RENDER_NAMESPACE::GPUCullingManager* GetGPUCullingManager() const { return m_gpuCullingManager.get(); }
 
+    RENDER_NAMESPACE::FGDetailManager* GetDetailManager() const { return m_detailManager.get(); }
+
 private:
     bool m_enabled = false;
     ng::RenderDevice* m_device = nullptr;
@@ -127,6 +130,8 @@ private:
     xr_unique_ptr<MaterialCache> m_materialCache;
 
     xr_unique_ptr<RENDER_NAMESPACE::GPUCullingManager> m_gpuCullingManager;
+
+    xr_unique_ptr<RENDER_NAMESPACE::FGDetailManager> m_detailManager;
 
     xr_unique_ptr<ui::UIRenderCollector> m_uiCollector;
     xr_unique_ptr<ui::NVRHIUIRenderer> m_uiRenderer;

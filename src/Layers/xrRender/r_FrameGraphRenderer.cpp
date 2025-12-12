@@ -27,6 +27,8 @@
 #include "FrameGraphPasses/HiZBuildPassSetup.h"
 #include "FrameGraphPasses/ForwardColorPassSetup.h"
 #include "GPUCullingManager.h"
+#include "FGDetailManager.h"
+#include "FrameGraphPasses/DetailPassSetup.h"
 #include "Bindless/MaterialBuffer.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
@@ -103,6 +105,8 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     g_geometryCollector = m_geometryCollector.get();
 
     m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
+
+    m_detailManager = xr_make_unique<RENDER_NAMESPACE::FGDetailManager>();
 
     m_renderContext.reset(device->CreateContext());
     if (!m_renderContext)
@@ -397,6 +401,31 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     if (m_gpuCullingManager && hizOutput.pyramid.is_valid()) {
         m_gpuCullingManager->Initialize(m_device);
 
+        if (m_detailManager && m_detailManager->total_instance_count > 0) {
+            static bool detailShadersLoaded = false;
+            if (!detailShadersLoaded) {
+                auto* shaderLoader = GEnv.Render->GetShaderLoader();
+                m_detailManager->LoadCullComputeShader(shaderLoader);
+                m_detailManager->LoadGraphicsShaders(shaderLoader);
+
+                if (!m_detailManager->computePipeline) {
+                    m_detailManager->CreateComputePipeline(m_device);
+                }
+
+                if (!m_detailManager->windTexture) {
+                    m_detailManager->CreateWindTexture(m_device->GetNVRHIDevice());
+                }
+                if (!m_detailManager->windComputeShader) {
+                    m_detailManager->LoadWindComputeShader(shaderLoader);
+                }
+                if (!m_detailManager->windPipeline && m_detailManager->windComputeShader) {
+                    m_detailManager->CreateWindPipeline(m_device->GetNVRHIDevice());
+                }
+
+                detailShadersLoaded = true;
+            }
+        }
+
         bindless::MaterialBuffer::Instance().Initialize(m_device);
         bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
 
@@ -527,11 +556,24 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.mipLevels
     );
 
+    auto detailOutputs = passes::setupDetailPass(
+        *m_framegraph,
+        m_device,
+        m_detailManager.get(),
+        particleOutputs,
+        width,
+        height,
+        hizOutput.pyramid,
+        hizOutput.width,
+        hizOutput.height,
+        hizOutput.mipLevels
+    );
+
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
     auto exposureOutput = passes::setupExposurePass(
         *m_framegraph,
         m_device,
-        particleOutputs.albedo,
+        detailOutputs.albedo,
         exposureConfig,
         Device.fTimeDelta,
         width,
@@ -542,7 +584,7 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     auto sceneWithUI = passes::setupUIPass(
         *m_framegraph,
-        particleOutputs.albedo,
+        detailOutputs.albedo,
         width,
         height
     );

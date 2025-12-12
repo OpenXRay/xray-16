@@ -82,6 +82,12 @@ target_sources(xrRenderPC_R4 PRIVATE
     ../xrRender/FrameGraphPasses/SkyPassSetup.cpp
     ../xrRender/FrameGraphPasses/SunPassSetup.h
     ../xrRender/FrameGraphPasses/SunPassSetup.cpp
+    ../xrRender/FrameGraphPasses/DetailPassSetup.h
+    ../xrRender/FrameGraphPasses/DetailPassSetup.cpp
+
+    # Detail System (Framegraph) - Renderer agnostic
+    ../xrRender/FGDetailManager.h
+    ../xrRender/FGDetailManager.cpp
 
     # Geometry System (Phase 3) - Renderer agnostic
     ../xrRender/Geometry/GeometryBatch.h

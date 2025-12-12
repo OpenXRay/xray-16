@@ -131,6 +131,7 @@ bool ImGuiRendererNVRHI::CreateDeviceObjects()
     cbDesc.byteSize = sizeof(ImGuiConstants);
     cbDesc.isConstantBuffer = true;
     cbDesc.isVolatile = true;
+    cbDesc.maxVersions = 16;
     cbDesc.debugName = "ImGui Constants";
     m_constantBuffer = m_device->createBuffer(cbDesc);
 

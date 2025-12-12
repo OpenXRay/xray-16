@@ -61,7 +61,7 @@ void InitializeForwardPipelines(ng::RenderDevice* device)
     nvrhi::TextureDesc depthDesc;
     depthDesc.width = 64;
     depthDesc.height = 64;
-    depthDesc.format = nvrhi::Format::D24S8;
+    depthDesc.format = nvrhi::Format::D32;
     depthDesc.isRenderTarget = true;
     depthDesc.initialState = nvrhi::ResourceStates::DepthWrite;
     depthDesc.keepInitialState = true;
@@ -242,6 +242,11 @@ static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebu
         return;
     }
 
+    const nvrhi::GraphicsPipelineDesc& actualDesc = s_bindlessPipeline->getDesc();
+    if (!actualDesc.bindingLayouts.empty()) {
+        s_bindlessLayout = actualDesc.bindingLayouts[0];
+    }
+
     s_bindlessInitialized = true;
     Msg("* [BindlessForward] Pipeline initialized");
 }
@@ -304,6 +309,9 @@ void renderBindlessForward(
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
         };
         s_bindlessLayout = nvDevice->createBindingLayout(layoutDesc);
+
+        if (!s_bindlessLayout)
+            return;
 
         constexpr u32 vertexStride = 48;
         nvrhi::VertexAttributeDesc vertexAttribs[] = {
@@ -406,9 +414,25 @@ void renderBindlessForward(
         fbDesc.setDepthAttachment(depthRT);
         auto framebuffer = nvDevice->createFramebuffer(fbDesc);
 
+        Msg("* [FGDetailManager] Creating bindless forward graphics pipeline...");
+        Msg("  - VS handle: %p", s_bindlessVS.Get());
+        Msg("  - PS handle: %p", s_bindlessPS.Get());
+        Msg("  - Binding layout: %p", s_bindlessLayout.Get());
+        Msg("* [FGDetailManager] Calling device->createGraphicsPipeline...");
+
         s_bindlessPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
-        if (!s_bindlessPipeline)
+        if (!s_bindlessPipeline) {
+            Msg("! [FGDetailManager] Failed to create bindless forward graphics pipeline");
             return;
+        }
+
+        Msg("* [FGDetailManager] Bindless forward graphics pipeline created successfully");
+
+        const nvrhi::GraphicsPipelineDesc& actualDesc = s_bindlessPipeline->getDesc();
+        if (!actualDesc.bindingLayouts.empty()) {
+            s_bindlessLayout = actualDesc.bindingLayouts[0];
+            Msg("* [FGDetailManager] Updated bindless forward bindingLayout from pipeline (pointer: %p)", s_bindlessLayout.Get());
+        }
 
         s_bindlessInitialized = true;
     }

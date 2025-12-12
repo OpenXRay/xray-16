@@ -1,38 +1,45 @@
+#define SM_6_0
 #include "common.h"
+#include "bindless_common.h"
 
-uniform float4 consts;
-uniform float4 wave;
-uniform float4 dir2D;
-uniform float4 dir2D_2;
-uniform float4 detail_params;
-uniform float grass_wind_displacement;
-uniform float grass_interaction_displacement;
-uniform float4 g_wind_direction;
+cbuffer DetailGlobals : register(b3)
+{
+    float4 consts;
+    float4 wave;
+    float4 dir2D;
+    float4 dir2D_2;
+    float4x4 m_VP;
+    float4 detail_params;
+    float4 g_wind_direction;
+    float grass_wind_displacement;
+    float grass_interaction_displacement;
+    uint interaction_atlas_index;
+    uint wind_texture_index;
+};
+
 static const float M_PI = 3.1415926;
 
-Texture2D interaction_atlas : register(t1);
-Texture2D wind_texture : register(t2);
-Buffer<uint> slot_indirection : register(t3);
+Buffer<uint> slot_indirection : register(t32);
 
 struct v_blade_sdf
 {
 	float3 pos : POSITION;
-	float2 tc : TEXCOORD0;
-	float t : TEXCOORD1;
-	float width_scale : TEXCOORD2;
+	float2 tc : TEXCOORD;
+	float t : COLOR0;
+	float width_scale : COLOR1;
 };
 
 struct InstanceData
 {
 	float3 pos;
 	float scale;
+	float rotation;
 	float hemi;
 	uint vis_id;
 	uint object_id;
-	float padding;
 };
 
-StructuredBuffer<InstanceData> detail_buffer : register(t0);
+StructuredBuffer<InstanceData> detail_buffer : register(t33);
 
 v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 {
@@ -47,7 +54,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	float3 base_world_pos = P0;
 
-	float blade_rotation = frac(P0.x * 12.9898 + P0.z * 78.233) * 2.0 * M_PI;
+	float blade_rotation = det.rotation;
 	float3 facing = normalize(float3(sin(blade_rotation), 0.0, cos(blade_rotation)));
 
 	float vertex_height_factor = I.t;
@@ -92,11 +99,13 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 		atlas_uv = page_base_uv + slot_local * page_size_uv;
 
-		interaction = interaction_atlas.SampleLevel(smp_linear, atlas_uv, 0);
+		Texture2D interaction_tex = GetBindlessTexture(interaction_atlas_index);
+		interaction = interaction_tex.SampleLevel(g_LinearSampler, atlas_uv, 0);
 	}
 
 	float2 wind_uv = P0.xz * 0.001;
-	float4 wind = wind_texture.SampleLevel(smp_linear, wind_uv, 0);
+	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
+	float4 wind = wind_tex.SampleLevel(g_LinearSampler, wind_uv, 0);
 
 	float fbm_wind_strength = wind.a;
 	float fbm_turbulence = (wind.r * 2.0 - 1.0) * 0.3;
@@ -203,22 +212,14 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	float3 bezier_pos = mt3 * P0 + 3.0 * mt2 * t * P1 + 3.0 * mt * t2 * P2 + t3 * P3;
 
-	float3 tangent = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
-	tangent = normalize(tangent);
+	float3 tangent_raw = 3.0 * mt2 * (P1 - P0) + 6.0 * mt * t * (P2 - P1) + 3.0 * t2 * (P3 - P2);
+	float tangent_len = length(tangent_raw);
+	float3 tangent = (tangent_len > 0.001) ? (tangent_raw / tangent_len) : float3(0, 1, 0);
 
-	float3 view_dir = normalize(bezier_pos - eye_position);
+	float cos_rot = cos(blade_rotation);
+	float sin_rot = sin(blade_rotation);
 
-	float3 right = normalize(cross(tangent, facing));
-
-	float edge_on_factor = abs(dot(view_dir, right));
-
-	if (edge_on_factor > 0.8)
-	{
-		float3 camera_right = normalize(cross(tangent, view_dir));
-
-		float blend = (edge_on_factor - 0.8) / 0.2;
-		right = normalize(lerp(right, camera_right, blend * 0.5));
-	}
+	float3 right = float3(cos_rot, 0.0, -sin_rot);
 
 	float3 width_offset = right * (I.pos.x * det.scale);
 
@@ -227,7 +228,9 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	float hemi = abs(det.hemi);
 	float sun = sign(det.hemi) * 0.25f + 0.25f;
 
-	float3 blade_normal = normalize(cross(tangent, right));
+	float3 normal_raw = cross(tangent, right);
+	float normal_len = length(normal_raw);
+	float3 blade_normal = (normal_len > 0.001) ? (normal_raw / normal_len) : facing;
 
 	float rotationAngle = 3.14159 * 0.3;
 	float cosTheta = cos(rotationAngle);
@@ -263,4 +266,3 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	O.hpos = mul(m_WVP, pos);
 	return O;
 }
-FXVS;

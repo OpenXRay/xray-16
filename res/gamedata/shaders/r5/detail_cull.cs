@@ -1,15 +1,13 @@
-#define SM_5_0
-#include "common.h"
 #include "cull_utils.h"
 
 struct InstanceData
 {
     float3 pos;
     float scale;
+    float rotation;
     float hemi;
     uint vis_id;
     uint object_id;
-    float padding;
 };
 
 struct SlotAABB
@@ -25,7 +23,7 @@ struct SlotAABB
     float4 padding2;
 };
 
-cbuffer DetailCullParams : register(b1)
+cbuffer DetailCullParams : register(b5)
 {
     float4x4 g_view_proj;
     float3 g_camera_pos;
@@ -33,12 +31,17 @@ cbuffer DetailCullParams : register(b1)
     float4 g_frustum_planes[6];
     uint g_total_instance_count;
     uint g_total_slot_count;
-    uint g_object_count;
-    uint g_pad0;
+    uint g_hiz_width;
+    uint g_hiz_height;
+    uint g_hiz_mip_levels;
+    uint3 g_pad;
 };
 
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
 StructuredBuffer<InstanceData> g_all_instances : register(t1);
+
+Texture2D<float> g_hiz_pyramid : register(t2);
+SamplerState g_point_sampler : register(s0);
 
 RWStructuredBuffer<InstanceData> g_visible_unified : register(u0);
 
@@ -74,47 +77,32 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
     if (slot.instance_count == 0)
         return;
 
-    for (uint i = 0; i < 5; ++i)
-    {
-        float3 plane_normal = g_frustum_planes[i].xyz;
-        float plane_dist = g_frustum_planes[i].w;
-
-        float3 negative_vertex = float3(
-            plane_normal.x < 0.0 ? slot.aabb_max.x : slot.aabb_min.x,
-            plane_normal.y < 0.0 ? slot.aabb_max.y : slot.aabb_min.y,
-            plane_normal.z < 0.0 ? slot.aabb_max.z : slot.aabb_min.z
-        );
-
-        float dist = dot(plane_normal, negative_vertex) + plane_dist;
-
-        if (dist > 2.0)
-            return;
-    }
-
     if (!DistanceTestAABB(slot.aabb_min, slot.aabb_max, g_camera_pos, g_fade_distance_sqr))
+        return;
+
+    if (!FrustumTestAABB(slot.aabb_min, slot.aabb_max, g_frustum_planes))
         return;
 
     uint insert_index = 0;
     g_visible_slot_counter.InterlockedAdd(0, 1, insert_index);
-
     if (insert_index < 8192)
-    {
         g_visible_slot_ids[insert_index] = slot_idx;
-    }
 
     for (uint i = 0; i < slot.instance_count; i++)
     {
         uint inst_idx = slot.instance_base + i;
         InstanceData inst = g_all_instances[inst_idx];
 
-        float bounds_radius = inst.scale * 0.75f;
+        float bounds_radius = inst.scale * 0.5;
+
+        if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
+            continue;
 
         if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
             continue;
 
-        float3 delta = inst.pos - g_camera_pos;
-        float dist_sqr = dot(delta, delta);
-        if (dist_sqr > g_fade_distance_sqr)
+        if (!HiZTestSphere(inst.pos, bounds_radius, g_camera_pos, g_view_proj,
+                            g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
         AppendInstance(inst);

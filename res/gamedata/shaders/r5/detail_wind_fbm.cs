@@ -1,6 +1,3 @@
-#define SM_5_0
-#include "common.h"
-
 cbuffer WindParams : register(b0)
 {
     float g_time;
