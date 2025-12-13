@@ -232,8 +232,6 @@ framegraph::VirtualResourceHandle setupTextPass(
                 vbDesc.debugName = "TextPass Vertex Buffer";
                 vbDesc.isVertexBuffer = true;
                 vbDesc.isVolatile = false;
-                vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-                vbDesc.keepInitialState = true;
                 vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
                 s_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
@@ -254,10 +252,12 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ibDesc.debugName = "TextPass Index Buffer";
                 ibDesc.isIndexBuffer = true;
                 ibDesc.isVolatile = false;
-                ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-                ibDesc.keepInitialState = true;
                 ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
                 s_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
+
+                cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+                cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
+
                 cmdList->writeBuffer(s_indexBuffer, quadIndices.data(), quadIndices.size() * sizeof(u16));
 
                 nvrhi::BufferDesc cbDesc;
@@ -273,6 +273,9 @@ framegraph::VirtualResourceHandle setupTextPass(
                 s_initialized = true;
                 Msg("* [TextPass] Initialized buffers");
             }
+
+            cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+            cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
             struct TextVertex {
                 float x, y, z, w;
@@ -460,6 +463,8 @@ framegraph::VirtualResourceHandle setupTextPass(
                 }
 
                 cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), batch.vertices.size() * sizeof(TextVertex));
+
+                cmdList->setBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
 
                 ctx->SetPipeline(pso->pso->GetNativePipeline());
                 ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);

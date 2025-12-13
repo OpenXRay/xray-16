@@ -838,6 +838,11 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
                 nvrhiDesc.isShaderResource = true;
 
+                if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
+                    nvrhiDesc.useClearValue = true;
+                    nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
+                }
+
                 if (resource.desc.isDepthStencil) {
                     nvrhiDesc.isRenderTarget = true;
                     nvrhiDesc.isTypeless = true;

@@ -247,12 +247,16 @@ bool StreamingManager::UploadMipsToGPU(StreamingRequest& request) {
         needsExecute = true;
     }
 
+    cmdList->beginMarker("Texture Streaming Upload");
+
     for (u32 mip = startMip; mip < endMip; mip++) {
         if (mip >= ddsData.mipLevels.size()) break;
 
         const DDSMipLevel& mipData = ddsData.mipLevels[mip];
         cmdList->writeTexture(meta->nvrhiTexture, 0, mip, mipData.data, mipData.rowPitch, mipData.slicePitch);
     }
+
+    cmdList->endMarker();
 
     if (needsExecute) {
         s_streamingCmdList->close();

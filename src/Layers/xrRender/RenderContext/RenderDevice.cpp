@@ -27,9 +27,11 @@ public:
             m_cmdList = s_textureUploadCmdList.Get();
             m_ownsCommandList = true;
         }
+        m_cmdList->beginMarker("Texture Upload");
     }
 
     ~ScopedUpload() {
+        m_cmdList->endMarker();
         if (m_ownsCommandList && s_textureUploadCmdList) {
             s_textureUploadCmdList->close();
             m_device->executeCommandList(s_textureUploadCmdList);

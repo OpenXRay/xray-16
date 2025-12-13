@@ -130,26 +130,8 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         return;
     }
 
-    nvrhi::GraphicsState state;
-    state.pipeline = nativePipeline;
-    state.framebuffer = framebuffer;
-    state.viewport = nvrhi::ViewportState()
-        .addViewportAndScissorRect(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)));
-
-    state.addBindingSet(pso->vsBindingSet);
-    state.addBindingSet(pso->psBindingSet);
-
-    nvrhi::VertexBufferBinding vbBinding;
-    vbBinding.buffer = m_vertexBuffer;
-    vbBinding.slot = 0;
-    vbBinding.offset = 0;
-    state.addVertexBuffer(vbBinding);
-
-    state.indexBuffer.buffer = m_indexBuffer;
-    state.indexBuffer.format = nvrhi::Format::R16_UINT;
-    state.indexBuffer.offset = 0;
-
-    commandList->setGraphicsState(state);
+    commandList->beginTrackingBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+    commandList->beginTrackingBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
     u32 vertexOffset = 0;
     u32 indexOffset = 0;
@@ -158,6 +140,30 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
     {
         if (batch->IsEmpty())
             continue;
+
+        u32 batchVertexOffset = vertexOffset;
+        u32 batchIndexOffset = indexOffset;
+        UploadBatchGeometry(commandList, *batch, vertexOffset, indexOffset);
+
+        commandList->setBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+        commandList->setBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
+
+        nvrhi::GraphicsState state;
+        state.pipeline = nativePipeline;
+        state.framebuffer = framebuffer;
+
+        state.addBindingSet(pso->vsBindingSet);
+        state.addBindingSet(pso->psBindingSet);
+
+        nvrhi::VertexBufferBinding vbBinding;
+        vbBinding.buffer = m_vertexBuffer;
+        vbBinding.slot = 0;
+        vbBinding.offset = 0;
+        state.addVertexBuffer(vbBinding);
+
+        state.indexBuffer.buffer = m_indexBuffer;
+        state.indexBuffer.format = nvrhi::Format::R16_UINT;
+        state.indexBuffer.offset = 0;
 
         if (batch->hasScissor) {
             nvrhi::Rect scissor;
@@ -175,10 +181,6 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         }
 
         commandList->setGraphicsState(state);
-
-        u32 batchVertexOffset = vertexOffset;
-        u32 batchIndexOffset = indexOffset;
-        UploadBatchGeometry(commandList, *batch, vertexOffset, indexOffset);
 
         nvrhi::DrawArguments drawArgs;
         drawArgs.vertexCount = static_cast<u32>(batch->indices.size());
@@ -214,7 +216,6 @@ bool NVRHIUIRenderer::CreateBuffers()
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "UI_VertexBuffer";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = true;
 
     m_vertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
     if (!m_vertexBuffer)
@@ -229,7 +230,6 @@ bool NVRHIUIRenderer::CreateBuffers()
     ibDesc.isIndexBuffer = true;
     ibDesc.debugName = "UI_IndexBuffer";
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-    ibDesc.keepInitialState = true;
 
     m_indexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
     if (!m_indexBuffer)
@@ -253,7 +253,6 @@ void NVRHIUIRenderer::EnsureBufferCapacity(size_t vertexCount, size_t indexCount
         vbDesc.isVertexBuffer = true;
         vbDesc.debugName = "UI_VertexBuffer";
         vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-        vbDesc.keepInitialState = true;
 
         m_vertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
         m_vertexBufferSize = newSize;
@@ -270,7 +269,6 @@ void NVRHIUIRenderer::EnsureBufferCapacity(size_t vertexCount, size_t indexCount
         ibDesc.isIndexBuffer = true;
         ibDesc.debugName = "UI_IndexBuffer";
         ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-        ibDesc.keepInitialState = true;
 
         m_indexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
         m_indexBufferSize = newSize;

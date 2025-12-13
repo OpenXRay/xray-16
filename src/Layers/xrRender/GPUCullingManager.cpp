@@ -743,6 +743,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->dispatch(groupCount, 1, 1);
 
                     cmdList->setBufferState(mgr->m_compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
             }
         }

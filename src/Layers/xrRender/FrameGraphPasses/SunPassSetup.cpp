@@ -224,7 +224,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             vbDesc.isVolatile = false;
             vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
             vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-            vbDesc.keepInitialState = true;
             auto vb = cmdList->getDevice()->createBuffer(vbDesc);
             cmdList->writeBuffer(vb, vertices, sizeof(vertices));
 
@@ -236,7 +235,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             ibDesc.isVolatile = false;
             ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
             ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-            ibDesc.keepInitialState = true;
             auto ib = cmdList->getDevice()->createBuffer(ibDesc);
             cmdList->writeBuffer(ib, indices, sizeof(indices));
 

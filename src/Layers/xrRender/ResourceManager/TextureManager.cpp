@@ -268,6 +268,11 @@ TextureHandle TextureManager::CreateTexture(
     nvrhiDesc.isUAV = desc.isUAV;
     nvrhiDesc.isShaderResource = true;
 
+    if (desc.isRenderTarget && !desc.isDepthStencil) {
+        nvrhiDesc.useClearValue = true;
+        nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);
+    }
+
     if (desc.isDepthStencil) {
         nvrhiDesc.isRenderTarget = true;
         nvrhiDesc.isTypeless = true;

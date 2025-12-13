@@ -69,7 +69,6 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
     ibDesc.byteSize = numIndices * sizeof(u16);
     ibDesc.isIndexBuffer = true;
     ibDesc.debugName = "ParticleQuadIB";
-    ibDesc.keepInitialState = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
 
     s_quadIB = nvDevice->createBuffer(ibDesc);
@@ -78,6 +77,7 @@ static void EnsureQuadIndexBuffer(nvrhi::IDevice* nvDevice, u32 maxQuads)
 
     nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
     cmdList->open();
+    cmdList->beginTrackingBufferState(s_quadIB, nvrhi::ResourceStates::IndexBuffer);
     cmdList->writeBuffer(s_quadIB, indices.data(), indices.size() * sizeof(u16));
     cmdList->close();
     nvDevice->executeCommandList(cmdList);
@@ -97,7 +97,6 @@ static void EnsureParticleVertexBuffer(nvrhi::IDevice* nvDevice, u32 sizeBytes)
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "ParticleDynamicVB";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = true;
 
     s_particleVB = nvDevice->createBuffer(vbDesc);
     s_particleVBSize = s_particleVB ? allocSize : 0;
@@ -645,6 +644,8 @@ DefaultOutputLayout setupParticlePass(
                 if (!s_quadIB)
                     return;
 
+                cmdList->beginTrackingBufferState(s_quadIB, nvrhi::ResourceStates::IndexBuffer);
+
                 nvrhi::Viewport viewport(
                     0.0f, static_cast<float>(rtDesc.width),
                     0.0f, static_cast<float>(rtDesc.height),
@@ -680,6 +681,9 @@ DefaultOutputLayout setupParticlePass(
 
                 if (!s_particleVB || !s_quadIB)
                     return;
+
+                cmdList->beginTrackingBufferState(s_particleVB, nvrhi::ResourceStates::VertexBuffer);
+                cmdList->beginTrackingBufferState(s_quadIB, nvrhi::ResourceStates::IndexBuffer);
 
                 cmdList->writeBuffer(s_particleVB, vertices.data(), vertices.size() * sizeof(ParticleVertex));
 
