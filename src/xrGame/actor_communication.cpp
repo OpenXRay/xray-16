@@ -114,13 +114,15 @@ void CActor::AddGameTask(const CInfoPortion* info_portion) const
 
 void CActor::AddGameNews(GAME_NEWS_DATA&& news_data)
 {
+    // Assign timestamp before passing the news to UI
+    news_data.receive_time = Level().GetGameTime();
+
     if (CurrentGameUI())
     {
         CurrentGameUI()->UIMainIngameWnd->ReceiveNews(&news_data);
     }
 
     GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
-    news_data.receive_time = Level().GetGameTime();
     news_vector.emplace_back(std::move(news_data));
 }
 
