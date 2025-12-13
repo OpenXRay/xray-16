@@ -150,7 +150,6 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
 void CUITalkDialogWnd::Show()
 {
     InventoryUtilities::SendInfoToActor("ui_talk_show");
-    InventoryUtilities::SendInfoToLuaScripts("ui_talk_show");
     inherited::Show(true);
     inherited::Enable(true);
 
@@ -164,7 +163,6 @@ void CUITalkDialogWnd::Hide()
     if (UI().Focus().GetLocker() == UIQuestionsList)
         UI().Focus().Unlock();
     InventoryUtilities::SendInfoToActor("ui_talk_hide");
-    InventoryUtilities::SendInfoToLuaScripts("ui_talk_hide");
     inherited::Show(false);
     inherited::Enable(false);
     g_btnHint->Discard();
