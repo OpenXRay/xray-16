@@ -157,36 +157,15 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
     }
 
     // ═══════════════════════════════════════════════════════
-    //  SET GRAPHICS STATE
-    // ═══════════════════════════════════════════════════════
-
-    nvrhi::GraphicsState state;
-    state.pipeline = nativePipeline;
-    state.framebuffer = framebuffer;
-    state.viewport = nvrhi::ViewportState()
-        .addViewportAndScissorRect(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)));
-
-    // Bind both per-stage binding sets:
-    // Slot 0: VS binding set (VS constant buffers)
-    // Slot 1: PS binding set (PS constant buffers + textures + samplers)
-    state.addBindingSet(pso->vsBindingSet);
-    state.addBindingSet(pso->psBindingSet);
-
-    nvrhi::VertexBufferBinding vbBinding;
-    vbBinding.buffer = m_vertexBuffer;
-    vbBinding.slot = 0;
-    vbBinding.offset = 0;
-    state.addVertexBuffer(vbBinding);
-
-    state.indexBuffer.buffer = m_indexBuffer;
-    state.indexBuffer.format = nvrhi::Format::R16_UINT;
-    state.indexBuffer.offset = 0;
-
-    commandList->setGraphicsState(state);
-
-    // ═══════════════════════════════════════════════════════
     //  UPLOAD AND DRAW BATCHES
     // ═══════════════════════════════════════════════════════
+    // NVRHI pattern: writeBuffer -> setGraphicsState -> draw
+    // writeBuffer transitions buffers to COPY_DEST, then setGraphicsState
+    // sees this and inserts barriers to transition to VertexBuffer/IndexBuffer
+
+    // Initialize buffer state tracking for this command list
+    commandList->beginTrackingBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+    commandList->beginTrackingBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
     u32 vertexOffset = 0;
     u32 indexOffset = 0;
@@ -196,9 +175,40 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
         if (batch->IsEmpty())
             continue;
 
-        // Update scissor rect for each batch
+        // Upload geometry FIRST (writeBuffer transitions to COPY_DEST)
+        u32 batchVertexOffset = vertexOffset;
+        u32 batchIndexOffset = indexOffset;
+        UploadBatchGeometry(commandList, *batch, vertexOffset, indexOffset);
+
+        // Manually transition buffers for drawing - required because NVRHI's
+        // setGraphicsState optimizes away redundant buffer bindings, but we need
+        // fresh barriers after each writeBuffer call
+        commandList->setBufferState(m_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+        commandList->setBufferState(m_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
+
+        // Build graphics state AFTER writeBuffer
+        nvrhi::GraphicsState state;
+        state.pipeline = nativePipeline;
+        state.framebuffer = framebuffer;
+
+        // Bind both per-stage binding sets:
+        // Slot 0: VS binding set (VS constant buffers)
+        // Slot 1: PS binding set (PS constant buffers + textures + samplers)
+        state.addBindingSet(pso->vsBindingSet);
+        state.addBindingSet(pso->psBindingSet);
+
+        nvrhi::VertexBufferBinding vbBinding;
+        vbBinding.buffer = m_vertexBuffer;
+        vbBinding.slot = 0;
+        vbBinding.offset = 0;
+        state.addVertexBuffer(vbBinding);
+
+        state.indexBuffer.buffer = m_indexBuffer;
+        state.indexBuffer.format = nvrhi::Format::R16_UINT;
+        state.indexBuffer.offset = 0;
+
+        // Set scissor rect for this batch
         if (batch->hasScissor) {
-            // Apply custom scissor rect (for maps, scrollviews, etc.)
             nvrhi::Rect scissor;
             scissor.minX = batch->scissorRect.x1;
             scissor.minY = batch->scissorRect.y1;
@@ -209,17 +219,12 @@ void NVRHIUIRenderer::RenderBatchesWithShader(
                 .addViewport(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)))
                 .addScissorRect(scissor);
         } else {
-            // Reset to full-screen scissor rect
             state.viewport = nvrhi::ViewportState()
                 .addViewportAndScissorRect(nvrhi::Viewport(static_cast<float>(screenWidth), static_cast<float>(screenHeight)));
         }
 
-        commandList->setGraphicsState(state);  // Apply scissor state for this batch
-
-        // Upload geometry
-        u32 batchVertexOffset = vertexOffset;
-        u32 batchIndexOffset = indexOffset;
-        UploadBatchGeometry(commandList, *batch, vertexOffset, indexOffset);
+        // setGraphicsState AFTER writeBuffer - NVRHI will insert barriers
+        commandList->setGraphicsState(state);
 
         // Draw
         nvrhi::DrawArguments drawArgs;
@@ -259,7 +264,6 @@ bool NVRHIUIRenderer::CreateBuffers()
     vbDesc.isVertexBuffer = true;
     vbDesc.debugName = "UI_VertexBuffer";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = true;
 
     m_vertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
     if (!m_vertexBuffer)
@@ -275,7 +279,6 @@ bool NVRHIUIRenderer::CreateBuffers()
     ibDesc.isIndexBuffer = true;
     ibDesc.debugName = "UI_IndexBuffer";
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-    ibDesc.keepInitialState = true;
 
     m_indexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
     if (!m_indexBuffer)
@@ -300,7 +303,6 @@ void NVRHIUIRenderer::EnsureBufferCapacity(size_t vertexCount, size_t indexCount
         vbDesc.isVertexBuffer = true;
         vbDesc.debugName = "UI_VertexBuffer";
         vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-        vbDesc.keepInitialState = true;
 
         m_vertexBuffer = m_device->GetNVRHIDevice()->createBuffer(vbDesc);
         m_vertexBufferSize = newSize;
@@ -318,7 +320,6 @@ void NVRHIUIRenderer::EnsureBufferCapacity(size_t vertexCount, size_t indexCount
         ibDesc.isIndexBuffer = true;
         ibDesc.debugName = "UI_IndexBuffer";
         ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-        ibDesc.keepInitialState = true;
 
         m_indexBuffer = m_device->GetNVRHIDevice()->createBuffer(ibDesc);
         m_indexBufferSize = newSize;

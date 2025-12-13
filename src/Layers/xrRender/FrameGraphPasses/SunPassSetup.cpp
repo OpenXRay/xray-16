@@ -244,7 +244,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             vertices[3].v = 1.0f;
 
             // Create vertex buffer
-            // NOTE: Non-volatile buffer - volatile buffers have IA binding issues in D3D12
             nvrhi::BufferDesc vbDesc;
             vbDesc.byteSize = sizeof(vertices);
             vbDesc.debugName = "SunVertexBuffer";
@@ -252,7 +251,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             vbDesc.isVolatile = false;
             vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
             vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-            vbDesc.keepInitialState = true;
             auto vb = cmdList->getDevice()->createBuffer(vbDesc);
             cmdList->writeBuffer(vb, vertices, sizeof(vertices));
 
@@ -265,7 +263,6 @@ framegraph::VirtualResourceHandle setupSunPass(
             ibDesc.isVolatile = false;
             ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
             ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-            ibDesc.keepInitialState = true;
             auto ib = cmdList->getDevice()->createBuffer(ibDesc);
             cmdList->writeBuffer(ib, indices, sizeof(indices));
 

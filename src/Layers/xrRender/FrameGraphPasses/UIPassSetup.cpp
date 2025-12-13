@@ -261,15 +261,12 @@ framegraph::VirtualResourceHandle setupTextPass(
 
                 nvrhi::IDevice* nvrhiDevice = device->GetNVRHIDevice();
 
-                // Create vertex buffer
-                // NOTE: Non-volatile buffer - volatile buffers have IA binding issues in D3D12
+                // Create vertex buffer (no cpuAccess - allows proper state transitions)
                 nvrhi::BufferDesc vbDesc;
                 vbDesc.byteSize = MAX_TEXT_VERTICES * 24; // sizeof(TextVertex) = 24
                 vbDesc.debugName = "TextPass Vertex Buffer";
                 vbDesc.isVertexBuffer = true;
                 vbDesc.isVolatile = false;
-                vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-                vbDesc.keepInitialState = true;
                 vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
                 s_vertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
@@ -291,10 +288,13 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ibDesc.debugName = "TextPass Index Buffer";
                 ibDesc.isIndexBuffer = true;
                 ibDesc.isVolatile = false;
-                ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-                ibDesc.keepInitialState = true;
                 ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
                 s_indexBuffer = nvrhiDevice->createBuffer(ibDesc);
+
+                // Initialize buffer state tracking before first use
+                cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+                cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
+
                 cmdList->writeBuffer(s_indexBuffer, quadIndices.data(), quadIndices.size() * sizeof(u16));
 
                 // Create constant buffer
@@ -311,6 +311,9 @@ framegraph::VirtualResourceHandle setupTextPass(
                 s_initialized = true;
                 Msg("* [TextPass] Initialized buffers");
             }
+
+            cmdList->beginTrackingBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
+            cmdList->beginTrackingBufferState(s_indexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
             // Collect text geometry from fonts
             struct TextVertex {
@@ -510,6 +513,9 @@ framegraph::VirtualResourceHandle setupTextPass(
 
                 // Upload vertices
                 cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), batch.vertices.size() * sizeof(TextVertex));
+
+                // Manually transition buffer for drawing - NVRHI optimizes away redundant bindings
+                cmdList->setBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
 
                 ctx->SetPipeline(pso->pso->GetNativePipeline());
                 ctx->SetVertexBuffer(0, s_vertexBuffer.Get(), 0);

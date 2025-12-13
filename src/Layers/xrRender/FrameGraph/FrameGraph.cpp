@@ -1029,6 +1029,12 @@ void FrameGraph::AllocateResources() {
                 nvrhiDesc.isUAV = resource.desc.isUAV || resource.desc.allowUAV;
                 nvrhiDesc.isShaderResource = true;  // Always allow SRV
 
+                // Set optimized clear value for render targets (D3D12 performance optimization)
+                if (resource.desc.isRenderTarget && !resource.desc.isDepthStencil) {
+                    nvrhiDesc.useClearValue = true;
+                    nvrhiDesc.clearValue = nvrhi::Color(0.0f, 0.0f, 0.0f, 1.0f);  // Default RT clear: black
+                }
+
                 // Depth/stencil handling
                 if (resource.desc.isDepthStencil) {
                     nvrhiDesc.isRenderTarget = true;  // NVRHI uses this flag + format to set BIND_DEPTH_STENCIL

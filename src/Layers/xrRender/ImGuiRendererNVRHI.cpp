@@ -217,15 +217,13 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     // Create vertex buffer
     // NOTE: Using non-volatile buffers for vertex/index data.
     // Volatile buffers in NVRHI D3D12 have issues with IA binding -
-    // they use a ring buffer that may not have valid GPU addresses for IA.
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = vtxSize * sizeof(ImDrawVert);
     vbDesc.isVertexBuffer = true;
     vbDesc.isVolatile = false;
-    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;  // Allow CPU writes for dynamic updates
+    vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
     vbDesc.debugName = "ImGui Vertex Buffer";
     vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
-    vbDesc.keepInitialState = true;
 
     m_vertexBuffer = m_device->createBuffer(vbDesc);
     if (!m_vertexBuffer)
@@ -238,10 +236,9 @@ bool ImGuiRendererNVRHI::CreateBuffers(size_t vtxSize, size_t idxSize)
     ibDesc.byteSize = idxSize * sizeof(ImDrawIdx);
     ibDesc.isIndexBuffer = true;
     ibDesc.isVolatile = false;
-    ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;  // Allow CPU writes for dynamic updates
+    ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
     ibDesc.debugName = "ImGui Index Buffer";
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
-    ibDesc.keepInitialState = true;
 
     m_indexBuffer = m_device->createBuffer(ibDesc);
     if (!m_indexBuffer)

@@ -873,8 +873,9 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setComputeState(compactState);
                     cmdList->dispatch(groupCount, 1, 1);
 
-                    // Transition compact draw args to IndirectArgument for rendering
+                    // Transition compact buffers to IndirectArgument for ExecuteIndirect with count
                     cmdList->setBufferState(mgr->m_compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
             }
         }
