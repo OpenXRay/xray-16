@@ -235,11 +235,13 @@ void CUITalkWnd::Show(bool status)
     if (status)
     {
         InitTalkDialog();
+        InventoryUtilities::SendInfoToLuaScripts("ui_talk_show");
     }
     else
     {
         StopSnd();
         UITalkDialogWnd->Hide();
+        InventoryUtilities::SendInfoToLuaScripts("ui_talk_hide");
 
         if (m_pActor)
         {
