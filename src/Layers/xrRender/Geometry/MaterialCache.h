@@ -393,6 +393,24 @@ private:
     // Cache for particle materials (texture name -> material ID)
     xr_map<shared_str, u32> m_particleTextureToMaterialID;
 
+    // ═══════════════════════════════════════════════════════
+    //  TERRAIN MATERIAL TRACKING
+    // ═══════════════════════════════════════════════════════
+    // Terrain uses separate TerrainMaterialBuffer (register t9)
+    // with 4-layer detail blending via RGBA mask
+
+    // Cache: shader name -> terrain material ID
+    // Terrain materials are determined by shader (e.g., "levels\zaton_earth_2")
+    // which defines the detail textures. Multiple visuals with same shader share one material.
+    xr_unordered_map<shared_str, u32> m_shaderToTerrainMaterialID;
+
+    // Pending terrain materials needing texture registration
+    struct PendingTerrainMaterial {
+        u32 terrainMaterialID;
+        dxRender_Visual* visual;
+    };
+    xr_vector<PendingTerrainMaterial> m_pendingTerrainMaterials;
+
     // Default PBR texture (1x1 RGBA8 packed texture for fallback)
     // Used when no PBR texture is specified in .thm metadata
     // Format: R=metallic(0), G=roughness(255), B=ao(255), A=parallax(128)
@@ -468,6 +486,22 @@ public:
     // Pre-register bindless material for particle effects (texture name from CPEDef)
     // Returns material ID for particle batch
     u32 PreRegisterParticleMaterial(const shared_str& textureName);
+
+    // ═══════════════════════════════════════════════════════
+    //  TERRAIN MATERIAL REGISTRATION (4-layer detail blending)
+    // ═══════════════════════════════════════════════════════
+
+    // Check if visual uses terrain blender (B_BmmD or B_LmBmmD)
+    // Uses Blender CLASS_ID detection for reliability
+    bool IsTerrainMaterial(dxRender_Visual* visual);
+
+    // Pre-register terrain material - creates TerrainMaterialData entry
+    // Returns terrain material ID for batch.terrainMaterialID
+    u32 PreRegisterTerrainMaterial(dxRender_Visual* visual);
+
+    // Finalize pending terrain materials (register textures to descriptor heap)
+    // Call once per frame when RenderContext is available
+    void FinalizePendingTerrainMaterials(ng::RenderContext* ctx);
 
     // Finalize pending materials (register textures to bindless descriptor heap)
     // Call once per frame when RenderContext is available

@@ -243,18 +243,20 @@ framegraph::VirtualResourceHandle setupSunPass(
             vertices[3].u = 1.0f;
             vertices[3].v = 1.0f;
 
-            // Create vertex buffer
+            // Create vertex buffer (dynamic - updated each frame)
             nvrhi::BufferDesc vbDesc;
             vbDesc.byteSize = sizeof(vertices);
             vbDesc.debugName = "SunVertexBuffer";
             vbDesc.isVertexBuffer = true;
             vbDesc.isVolatile = false;
             vbDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-            vbDesc.initialState = nvrhi::ResourceStates::VertexBuffer;
+            vbDesc.initialState = nvrhi::ResourceStates::CopyDest;  // Start in CopyDest for writeBuffer
             auto vb = cmdList->getDevice()->createBuffer(vbDesc);
+            cmdList->beginTrackingBufferState(vb, nvrhi::ResourceStates::CopyDest);
             cmdList->writeBuffer(vb, vertices, sizeof(vertices));
+            cmdList->setBufferState(vb, nvrhi::ResourceStates::VertexBuffer);
 
-            // Index buffer for two triangles
+            // Index buffer for two triangles (static - same indices every frame)
             u16 indices[] = { 0, 1, 2, 2, 1, 3 };
             nvrhi::BufferDesc ibDesc;
             ibDesc.byteSize = sizeof(indices);
@@ -262,9 +264,11 @@ framegraph::VirtualResourceHandle setupSunPass(
             ibDesc.isIndexBuffer = true;
             ibDesc.isVolatile = false;
             ibDesc.cpuAccess = nvrhi::CpuAccessMode::Write;
-            ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            ibDesc.initialState = nvrhi::ResourceStates::CopyDest;  // Start in CopyDest for writeBuffer
             auto ib = cmdList->getDevice()->createBuffer(ibDesc);
+            cmdList->beginTrackingBufferState(ib, nvrhi::ResourceStates::CopyDest);
             cmdList->writeBuffer(ib, indices, sizeof(indices));
+            cmdList->setBufferState(ib, nvrhi::ResourceStates::IndexBuffer);
 
             // ═══════════════════════════════════════════════════════
             //  LOAD SUN SHADER

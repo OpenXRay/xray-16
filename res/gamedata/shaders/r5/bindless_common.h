@@ -52,12 +52,49 @@ struct MaterialData
 #define MAT_FLAG_HAS_DETAIL    (1 << 3)
 #define MAT_FLAG_HAS_NORMAL    (1 << 4)
 #define MAT_FLAG_HAS_PBR       (1 << 5)
+#define MAT_FLAG_TERRAIN       (1 << 6)
+#define MAT_FLAG_HAS_PBR_LAYER (1 << 7)
+
+// ═══════════════════════════════════════════════════════
+//  TERRAIN MATERIAL DATA (matches C++ TerrainMaterialData)
+// ═══════════════════════════════════════════════════════
+// 64 bytes - 4-layer detail blending with RGBA mask
+
+struct TerrainMaterialData
+{
+    // Base textures
+    uint baseAlbedoIndex;   // Level terrain base texture
+    uint blendMaskIndex;    // RGBA blend mask
+
+    // Detail color textures (4 layers)
+    uint detailR_Index;     // Detail for mask.r channel
+    uint detailG_Index;     // Detail for mask.g channel
+    uint detailB_Index;     // Detail for mask.b channel
+    uint detailA_Index;     // Detail for mask.a channel
+
+    // Detail normal textures (4 layers)
+    uint normalR_Index;     // Normal for mask.r channel
+    uint normalG_Index;     // Normal for mask.g channel
+    uint normalB_Index;     // Normal for mask.b channel
+    uint normalA_Index;     // Normal for mask.a channel
+
+    // Detail PBR textures (4 layers, optional)
+    uint pbrR_Index;        // PBR for mask.r channel
+    uint pbrG_Index;        // PBR for mask.g channel
+    uint pbrB_Index;        // PBR for mask.b channel
+    uint pbrA_Index;        // PBR for mask.a channel
+
+    // Properties
+    float detailScale;      // Uniform scale for all 4 detail layers
+    uint flags;             // MAT_FLAG_TERRAIN, MAT_FLAG_HAS_PBR_LAYER
+};
 
 // ═══════════════════════════════════════════════════════
 //  BINDLESS BUFFERS
 // ═══════════════════════════════════════════════════════
 
 StructuredBuffer<MaterialData> g_Materials : register(t8);
+StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
 
 // ═══════════════════════════════════════════════════════
 //  SAMPLER STATE

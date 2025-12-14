@@ -35,12 +35,12 @@ void MaterialBuffer::Initialize(ng::RenderDevice* device)
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
     // Create GPU buffer for materials
+    // NOTE: Do NOT use keepInitialState - buffer needs state transitions for writeBuffer!
     nvrhi::BufferDesc desc;
     desc.debugName = "Bindless_MaterialBuffer";
     desc.byteSize = MAX_MATERIALS * sizeof(MaterialData);
     desc.structStride = sizeof(MaterialData);
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
+    desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
 
     m_buffer = nvDevice->createBuffer(desc);
     if (!m_buffer) {
@@ -101,24 +101,32 @@ const MaterialData* MaterialBuffer::GetMaterial(u32 materialID) const
 
 void MaterialBuffer::Upload(ng::RenderContext* ctx)
 {
-    if (!m_initialized || !m_buffer || m_materialCount == 0)
+    if (!m_initialized || !m_buffer)
         return;
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-    if (m_fullUploadNeeded) {
-        // Upload all materials
+    if (m_fullUploadNeeded && m_materialCount > 0) {
+        // Upload all materials with explicit state tracking
+        cmdList->beginTrackingBufferState(m_buffer, nvrhi::ResourceStates::CopyDest);
         cmdList->writeBuffer(m_buffer, m_materials.data(), m_materialCount * sizeof(MaterialData));
+        cmdList->setBufferState(m_buffer, nvrhi::ResourceStates::ShaderResource);
         m_fullUploadNeeded = false;
         m_dirtyRangeStart = UINT32_MAX;
         m_dirtyRangeEnd = 0;
     } else if (m_dirtyRangeEnd > m_dirtyRangeStart) {
-        // Partial update
+        // Partial update - also needs state tracking
+        cmdList->beginTrackingBufferState(m_buffer, nvrhi::ResourceStates::CopyDest);
         u32 offset = m_dirtyRangeStart * sizeof(MaterialData);
         u32 size = (m_dirtyRangeEnd - m_dirtyRangeStart) * sizeof(MaterialData);
         cmdList->writeBuffer(m_buffer, &m_materials[m_dirtyRangeStart], size, offset);
+        cmdList->setBufferState(m_buffer, nvrhi::ResourceStates::ShaderResource);
         m_dirtyRangeStart = UINT32_MAX;
         m_dirtyRangeEnd = 0;
+    } else {
+        // No upload needed, but still need to track state for NVRHI
+        // The buffer should be in ShaderResource state from previous upload
+        cmdList->beginTrackingBufferState(m_buffer, nvrhi::ResourceStates::ShaderResource);
     }
 }
 
@@ -151,12 +159,12 @@ void DrawMaterialIDBuffer::Initialize(ng::RenderDevice* device, u32 maxDraws)
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
     // Create GPU buffer for draw material IDs
+    // NOTE: Do NOT use keepInitialState - buffer needs state transitions for writeBuffer!
     nvrhi::BufferDesc desc;
     desc.debugName = "Bindless_DrawMaterialIDs";
     desc.byteSize = maxDraws * sizeof(u32);
     desc.structStride = sizeof(u32);
-    desc.initialState = nvrhi::ResourceStates::ShaderResource;
-    desc.keepInitialState = true;
+    desc.initialState = nvrhi::ResourceStates::Common;  // Will be transitioned as needed
 
     m_buffer = nvDevice->createBuffer(desc);
     if (!m_buffer) {
@@ -186,12 +194,21 @@ void DrawMaterialIDBuffer::SetMaterialID(u32 drawIndex, u32 materialID)
 
 void DrawMaterialIDBuffer::Upload(ng::RenderContext* ctx, u32 drawCount)
 {
-    if (!m_initialized || !m_buffer || drawCount == 0)
+    if (!m_initialized || !m_buffer)
         return;
 
-    drawCount = std::min(drawCount, m_maxDraws);
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-    cmdList->writeBuffer(m_buffer, m_materialIDs.data(), drawCount * sizeof(u32));
+
+    if (drawCount > 0) {
+        drawCount = std::min(drawCount, m_maxDraws);
+        // Use explicit state tracking for proper buffer transitions
+        cmdList->beginTrackingBufferState(m_buffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_buffer, m_materialIDs.data(), drawCount * sizeof(u32));
+        cmdList->setBufferState(m_buffer, nvrhi::ResourceStates::ShaderResource);
+    } else {
+        // No upload needed, but still need to track state for NVRHI
+        cmdList->beginTrackingBufferState(m_buffer, nvrhi::ResourceStates::ShaderResource);
+    }
 }
 
 } // namespace xray::render::RENDER_NAMESPACE::bindless

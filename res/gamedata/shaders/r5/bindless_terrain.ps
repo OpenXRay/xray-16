@@ -1,0 +1,212 @@
+// bindless_terrain.ps
+// SM6 Bindless terrain pixel shader with 4-layer detail blending
+// Uses RGBA mask for terrain detail texture blending
+// TerrainMaterialData contains 14 texture descriptor indices
+
+#define SM_6_0
+#include "common.h"
+#include "bindless_common.h"
+
+struct PS_INPUT
+{
+    float4 position : SV_Position;
+    float3 worldPos : TEXCOORD0;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : TEXCOORD2;
+    float3 tangent : TEXCOORD3;
+    float3 bitangent : TEXCOORD4;
+    nointerpolation uint materialID : TEXCOORD5;  // Index into g_TerrainMaterials
+};
+
+struct PS_OUTPUT
+{
+    float4 color : SV_Target0;
+};
+
+// ═══════════════════════════════════════════════════════
+//  TERRAIN TEXTURE SAMPLING
+// ═══════════════════════════════════════════════════════
+
+// Sample terrain texture with fallback for invalid index
+float4 SampleTerrainTexture(uint index, float2 uv)
+{
+    if (index == INVALID_TEXTURE_INDEX)
+        return float4(0.5, 0.5, 0.5, 1.0);  // Neutral gray fallback
+
+    Texture2D tex = GetBindlessTexture(index);
+    return tex.Sample(g_LinearSampler, uv);
+}
+
+// Sample terrain normal map with X-Ray format conversion
+float3 SampleTerrainNormal(uint index, float2 uv)
+{
+    if (index == INVALID_TEXTURE_INDEX)
+        return float3(0.0, 0.0, 1.0);  // Flat normal
+
+    Texture2D tex = GetBindlessTexture(index);
+    float4 sample = tex.Sample(g_LinearSampler, uv);
+
+    // X-Ray normal map format: R=gloss, G=Z, B=Y, A=X
+    float3 normal;
+    normal.x = sample.a * 2.0 - 1.0;
+    normal.y = sample.b * 2.0 - 1.0;
+    normal.z = sample.g * 2.0 - 1.0;
+    return normalize(normal);
+}
+
+// Simple PBR-ish lighting (same as bindless_forward.ps)
+float3 CalculateLighting(float3 albedo, float3 N, float3 V, float metallic, float roughness, float ao)
+{
+    float3 L = -L_sun_dir_w;
+    float3 H = normalize(V + L);
+
+    float NdotL = saturate(dot(N, L));
+    float NdotH = saturate(dot(N, H));
+    float NdotV = saturate(dot(N, V));
+
+    // Diffuse
+    float3 diffuse = albedo * (1.0 - metallic);
+
+    // Specular (simplified GGX)
+    float alpha = roughness * roughness;
+    float alpha2 = alpha * alpha;
+    float denom = NdotH * NdotH * (alpha2 - 1.0) + 1.0;
+    float D = alpha2 / (3.14159 * denom * denom);
+
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedo, metallic);
+    float3 F = F0 + (1.0 - F0) * pow(1.0 - saturate(dot(H, V)), 5.0);
+
+    float3 specular = D * F * 0.25;
+
+    // Combine
+    float3 directLight = (diffuse + specular) * L_sun_color * NdotL;
+    float3 ambient = albedo * L_ambient.rgb * ao;
+
+    return directLight + ambient;
+}
+
+PS_OUTPUT main(PS_INPUT input)
+{
+    PS_OUTPUT output;
+
+    // Get terrain material data
+    TerrainMaterialData mat = g_TerrainMaterials[input.materialID];
+
+    // Base UV (low-frequency for base texture and mask)
+    float2 baseUV = input.texcoord;
+
+    // Detail UV (high-frequency for detail textures)
+    float2 detailUV = input.texcoord * mat.detailScale;
+
+    // ═══════════════════════════════════════════════════════
+    //  SAMPLE BASE TEXTURE AND MASK
+    // ═══════════════════════════════════════════════════════
+
+    // Sample base albedo (low-frequency terrain color)
+    float4 baseSample = SampleTerrainTexture(mat.baseAlbedoIndex, baseUV);
+
+    // Sample and normalize blend mask (RGBA = 4 detail layers)
+    float4 mask = SampleTerrainTexture(mat.blendMaskIndex, baseUV);
+    float maskSum = dot(mask, float4(1, 1, 1, 1));
+    if (maskSum > 0.001)
+        mask = mask / maskSum;  // Normalize so weights sum to 1
+    else
+        mask = float4(0.25, 0.25, 0.25, 0.25);  // Fallback: equal blend
+
+    // ═══════════════════════════════════════════════════════
+    //  4-LAYER DETAIL BLENDING (COLOR)
+    // ═══════════════════════════════════════════════════════
+
+    // Sample 4 detail color textures
+    float3 detailR = SampleTerrainTexture(mat.detailR_Index, detailUV).rgb;
+    float3 detailG = SampleTerrainTexture(mat.detailG_Index, detailUV).rgb;
+    float3 detailB = SampleTerrainTexture(mat.detailB_Index, detailUV).rgb;
+    float3 detailA = SampleTerrainTexture(mat.detailA_Index, detailUV).rgb;
+
+    // Blend detail colors by mask weights
+    float3 blendedDetail =
+        detailR * mask.r +
+        detailG * mask.g +
+        detailB * mask.b +
+        detailA * mask.a;
+
+    // Apply detail using multiply-2x blending (matches X-Ray vanilla)
+    float3 albedo = baseSample.rgb * blendedDetail * 2.0;
+
+    // ═══════════════════════════════════════════════════════
+    //  4-LAYER DETAIL BLENDING (NORMALS)
+    // ═══════════════════════════════════════════════════════
+
+    float3 N = normalize(input.normal);
+
+    // Sample 4 detail normal maps
+    float3 normalR = SampleTerrainNormal(mat.normalR_Index, detailUV);
+    float3 normalG = SampleTerrainNormal(mat.normalG_Index, detailUV);
+    float3 normalB = SampleTerrainNormal(mat.normalB_Index, detailUV);
+    float3 normalA = SampleTerrainNormal(mat.normalA_Index, detailUV);
+
+    // Blend detail normals by mask weights
+    float3 blendedNormal =
+        normalR * mask.r +
+        normalG * mask.g +
+        normalB * mask.b +
+        normalA * mask.a;
+    blendedNormal = normalize(blendedNormal);
+
+    // Transform from tangent space to world space
+    float3x3 TBN = float3x3(
+        normalize(input.tangent),
+        normalize(input.bitangent),
+        N
+    );
+    N = normalize(mul(blendedNormal, TBN));
+
+    // ═══════════════════════════════════════════════════════
+    //  4-LAYER DETAIL BLENDING (PBR) - Optional
+    // ═══════════════════════════════════════════════════════
+
+    float metallic = 0.0;
+    float roughness = 0.5;
+    float ao = 1.0;
+
+    if (mat.flags & MAT_FLAG_HAS_PBR_LAYER)
+    {
+        // Sample 4 detail PBR textures (R=metallic, G=roughness, B=AO)
+        float3 pbrR = SampleTerrainTexture(mat.pbrR_Index, detailUV).rgb;
+        float3 pbrG = SampleTerrainTexture(mat.pbrG_Index, detailUV).rgb;
+        float3 pbrB = SampleTerrainTexture(mat.pbrB_Index, detailUV).rgb;
+        float3 pbrA = SampleTerrainTexture(mat.pbrA_Index, detailUV).rgb;
+
+        // Blend PBR properties by mask weights
+        float3 blendedPBR =
+            pbrR * mask.r +
+            pbrG * mask.g +
+            pbrB * mask.b +
+            pbrA * mask.a;
+
+        metallic = blendedPBR.r;
+        roughness = blendedPBR.g;
+        ao = blendedPBR.b;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  LIGHTING
+    // ═══════════════════════════════════════════════════════
+
+    // View direction
+    float3 V = normalize(eye_position - input.worldPos);
+
+    // Calculate lighting
+    float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
+
+    // ═══════════════════════════════════════════════════════
+    //  FOG
+    // ═══════════════════════════════════════════════════════
+
+    float fogDist = length(input.worldPos - eye_position);
+    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
+    finalColor = lerp(fog_color.rgb, finalColor, fogFactor);
+
+    output.color = float4(finalColor, 1.0);  // Terrain is always opaque
+    return output;
+}

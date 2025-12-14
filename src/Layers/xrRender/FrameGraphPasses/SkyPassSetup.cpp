@@ -88,6 +88,7 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
 
     // Create vertex buffer (12 vertices, using every other from hbox_verts)
     // The vanilla code uses 12 vertices for the sky box
+    // NOTE: Vertex buffer is updated every frame, so we use state tracking (not keepInitialState)
     nvrhi::BufferDesc vbDesc;
     vbDesc.byteSize = 12 * sizeof(SkyVertex);
     vbDesc.debugName = "SkyVertexBuffer";
@@ -96,11 +97,13 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     s_skyVertexBuffer = nvrhiDevice->createBuffer(vbDesc);
 
     // Create index buffer (20 triangles = 60 indices)
+    // NOTE: Index buffer is uploaded once and never modified, so keepInitialState is safe
     nvrhi::BufferDesc ibDesc;
     ibDesc.byteSize = 20 * 3 * sizeof(u16);
     ibDesc.debugName = "SkyIndexBuffer";
     ibDesc.isIndexBuffer = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;  // Static data - uploaded once, never modified
     s_skyIndexBuffer = nvrhiDevice->createBuffer(ibDesc);
     
     // Create placeholder cubemap (1x1 per face, light blue)
@@ -128,9 +131,9 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
         cmdList->writeTexture(s_placeholderCubemap, face, 0, &skyBlue, sizeof(skyBlue));
     }
 
-    // Initialize buffer state tracking for this command list
+    // Initialize buffer state tracking for vertex buffer (updated every frame)
+    // Note: Index buffer uses keepInitialState=true so no tracking needed
     cmdList->beginTrackingBufferState(s_skyVertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-    cmdList->beginTrackingBufferState(s_skyIndexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
@@ -200,9 +203,9 @@ framegraph::VirtualResourceHandle setupSkyPass(
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
-            // Initialize buffer state tracking for this command list
+            // Initialize buffer state tracking for vertex buffer (updated every frame)
+            // Note: Index buffer uses keepInitialState=true so no tracking needed
             cmdList->beginTrackingBufferState(s_skyVertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-            cmdList->beginTrackingBufferState(s_skyIndexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
             auto* colorRT = fg.GetPhysicalTexture(data.colorOutput);
             auto* depthRT = fg.GetPhysicalTexture(data.depthOutput);

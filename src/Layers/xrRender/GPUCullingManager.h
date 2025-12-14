@@ -128,6 +128,12 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle compactDrawArgs;
     framegraph::VirtualResourceHandle compactBatchIndices;
     u32 maxObjects;
+
+    // Terrain-specific outputs (separate draw call)
+    framegraph::VirtualResourceHandle terrainDrawArgsBuffer;
+    framegraph::VirtualResourceHandle terrainCompactDrawArgs;
+    framegraph::VirtualResourceHandle terrainCompactBatchIndices;
+    u32 terrainObjectCount;
 };
 
 struct GPUParticleCullOutput {
@@ -268,6 +274,18 @@ public:
     nvrhi::IBuffer* GetCompactBatchIndicesBuffer() const { return m_compactBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetCompactMaterialIDBuffer() const { return m_compactMaterialIDBuffer.Get(); }
 
+    // ───────────────────────────────────────────────────────
+    //  TERRAIN-SPECIFIC BUFFERS
+    // ───────────────────────────────────────────────────────
+    u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
+    nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainBatchIndicesBuffer() const { return m_terrainBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactDrawArgsBuffer() const { return m_terrainCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactBatchIndicesBuffer() const { return m_terrainCompactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
+
 private:
     void CreateBuffers(ng::RenderDevice* device);
     void CreateComputePipeline(ng::RenderDevice* device);
@@ -307,6 +325,22 @@ private:
     bool m_compactEnabled = false;
 
     // ───────────────────────────────────────────────────────
+    //  TERRAIN-SPECIFIC BUFFERS
+    // ───────────────────────────────────────────────────────
+    // Terrain uses separate TerrainMaterialBuffer (t9) with 4-layer detail blending
+    // Rendered in separate draw call after regular geometry
+    nvrhi::BufferHandle m_terrainObjectBuffer;           // Terrain objects (GPU read)
+    nvrhi::BufferHandle m_terrainDrawArgsBuffer;         // Terrain indirect draw args
+    nvrhi::BufferHandle m_terrainVisibleIndexBuffer;     // Terrain visible indices
+    nvrhi::BufferHandle m_terrainVisibleCountBuffer;     // Terrain atomic counter
+    nvrhi::BufferHandle m_terrainInstanceBuffer;         // Terrain world transforms (like m_instanceBuffer)
+    nvrhi::BufferHandle m_terrainBatchIndicesBuffer;     // Identity mapping (0,1,2,3...) for direct indexing
+    nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;  // Terrain compacted draw args
+    nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
+    nvrhi::BufferHandle m_terrainCompactCountBuffer;
+    nvrhi::BufferHandle m_terrainMaterialIDBuffer;       // Terrain material IDs (for bindless)
+
+    // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES
     // ───────────────────────────────────────────────────────
     nvrhi::BufferHandle m_debugBuffer;                // CullDebugData for all objects
@@ -344,6 +378,14 @@ private:
     xr_vector<GPUObjectData> m_objectData;
     xr_vector<IndirectDrawArgs> m_drawArgsData;  // Draw arguments (geometry info)
     xr_vector<u32> m_materialIDData;             // Material IDs per batch (for bindless)
+
+    // Terrain-specific CPU data (separate from regular geometry)
+    u32 m_terrainObjectCount = 0;
+    u32 m_maxTerrainObjects = 0;
+    xr_vector<GPUObjectData> m_terrainObjectData;
+    xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
+    xr_vector<u32> m_terrainMaterialIDData;      // Terrain material IDs (index into TerrainMaterialBuffer)
+    xr_vector<GPUInstanceData> m_terrainInstanceData;  // Terrain world transforms
 
     // ───────────────────────────────────────────────────────
     //  MEGA-BUFFER SYSTEM

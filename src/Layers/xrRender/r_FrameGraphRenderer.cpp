@@ -33,6 +33,7 @@
 #include "FrameGraphPasses/DetailPassSetup.h"        // Detail rendering pass
 // SM6 bindless: Textures registered directly with D3D12Backend via RegisterBindlessTexture()
 #include "Bindless/MaterialBuffer.h"                 // Bindless material buffer
+#include "Bindless/TerrainMaterialBuffer.h"          // Terrain material buffer
 #include "FrameGraphPasses/SkyPassSetup.h"           // Sky dome rendering
 #include "FrameGraphPasses/SunPassSetup.h"           // Sun disc rendering
 #include "FrameGraphPasses/SkinningPassSetup.h"
@@ -115,6 +116,18 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
 
     // Set global geometry collector pointer
     g_geometryCollector = m_geometryCollector.get();
+
+    // ═══════════════════════════════════════════════════════
+    //  INITIALIZE BINDLESS BUFFERS (EARLY - before level load!)
+    // ═══════════════════════════════════════════════════════
+    // CRITICAL: Must initialize BEFORE level geometry is loaded!
+    // Level load calls ProcessVisualGeometry -> PreRegisterTerrainMaterial
+    // which needs TerrainMaterialBuffer to be initialized, otherwise
+    // terrain batches get UINT32_MAX material IDs and render black.
+    bindless::MaterialBuffer::Instance().Initialize(m_device);
+    bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
+    bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
+    Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
     // Create GPU culling manager (Phase 3.5)
     // NOTE: Initialization is deferred to first frame (SetupFrameGraphPasses)
@@ -220,6 +233,10 @@ void FrameGraphRenderer::Render() {
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
     }
+
+    // NOTE: Bindless buffers are initialized in FrameGraphRenderer::Initialize()
+    // (before level load) so terrain materials get valid IDs during geometry processing.
+    // The Initialize() calls are idempotent so this is just a safety fallback.
 
     // ═══════════════════════════════════════════════════════
     //  SETUP FRAME (PER-FRAME: Collect geometry)
@@ -639,10 +656,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             }
         }
 
-        // Initialize bindless rendering system (material buffer only - textures use D3D12 descriptor heap)
-        // SM6 bindless: Textures registered via D3D12Backend::RegisterBindlessTexture() during material creation
-        bindless::MaterialBuffer::Instance().Initialize(m_device);
-        bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);  // Max 64K draws
+        // NOTE: Bindless buffers initialized earlier in RenderFrame() before SetupFrame()
+        // This ensures materials are ready when CollectVisibleGeometry() calls PreRegisterBindlessMaterial
 
         if (m_gpuCullingManager->IsEnabled()) {
             // NOTE: UploadSceneObjects is now called inside the culling pass execute lambda
@@ -748,6 +763,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
             bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
             bindlessConfig.megaBuffersReady = true;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        //  TERRAIN CONFIGURATION (4-layer detail blending)
+        // ═══════════════════════════════════════════════════════
+        // Terrain uses separate TerrainMaterialBuffer and terrain shader
+        if (m_gpuCullingManager->GetTerrainObjectCount() > 0) {
+            bindlessConfig.terrainDrawArgsBuffer = m_gpuCullingManager->GetTerrainDrawArgsBuffer();
+            bindlessConfig.terrainMaterialIDBuffer = m_gpuCullingManager->GetTerrainMaterialIDBuffer();
+            bindlessConfig.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            bindlessConfig.terrainBatchIndicesBuffer = m_gpuCullingManager->GetTerrainBatchIndicesBuffer();
+            bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
     }
 
@@ -1185,7 +1212,13 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Pre-register bindless material for GPU-driven rendering
     // This assigns material ID before GPU culling uploads the batch
     if (m_materialCache) {
-        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+        // Check if this is terrain (uses B_BmmD blender with 4-layer detail blending)
+        if (m_materialCache->IsTerrainMaterial(visual)) {
+            batch.isTerrain = true;
+            batch.terrainMaterialID = m_materialCache->PreRegisterTerrainMaterial(visual);
+        } else {
+            batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+        }
     }
 
     // ═══════════════════════════════════════════════════════

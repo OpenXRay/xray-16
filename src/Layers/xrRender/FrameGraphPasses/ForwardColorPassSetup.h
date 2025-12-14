@@ -76,6 +76,18 @@ struct BindlessForwardConfig {
     nvrhi::IBuffer* megaIndexBuffer = nullptr;    // 32-bit indices
     bool megaBuffersReady = false;
 
+    // ═══════════════════════════════════════════════════════
+    //  TERRAIN RENDERING (4-layer detail blending)
+    // ═══════════════════════════════════════════════════════
+    // Terrain uses separate TerrainMaterialBuffer (register t9)
+    // Rendered after regular geometry with terrain shader
+
+    nvrhi::IBuffer* terrainDrawArgsBuffer = nullptr;     // Terrain indirect draw args
+    nvrhi::IBuffer* terrainMaterialIDBuffer = nullptr;   // Terrain material IDs (TerrainMaterialBuffer)
+    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;     // Terrain world transforms
+    nvrhi::IBuffer* terrainBatchIndicesBuffer = nullptr; // Identity mapping (0,1,2,3...) for direct indexing
+    u32 terrainObjectCount = 0;                          // Number of terrain objects
+
     bool IsValid() const {
         return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && totalObjectCount > 0;
     }
@@ -87,6 +99,11 @@ struct BindlessForwardConfig {
 
     bool UseMegaBuffers() const {
         return megaBuffersReady && megaVertexBuffer && megaIndexBuffer;
+    }
+
+    // Check if terrain rendering is available
+    bool HasTerrain() const {
+        return terrainDrawArgsBuffer && terrainObjectCount > 0;
     }
 };
 

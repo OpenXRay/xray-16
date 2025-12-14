@@ -511,8 +511,17 @@ framegraph::VirtualResourceHandle setupTextPass(
                     continue;
                 }
 
-                // Upload vertices
-                cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), batch.vertices.size() * sizeof(TextVertex));
+                // Upload vertices (clamp to buffer capacity)
+                constexpr u32 MAX_TEXT_VERTICES = 16384;
+                const u32 vertexCount = std::min(static_cast<u32>(batch.vertices.size()), MAX_TEXT_VERTICES);
+                if (vertexCount < batch.vertices.size()) {
+                    static bool s_warnOnce = false;
+                    if (!s_warnOnce) {
+                        Msg("! [TextPass] Vertex count %zu exceeds buffer capacity %u, truncating", batch.vertices.size(), MAX_TEXT_VERTICES);
+                        s_warnOnce = true;
+                    }
+                }
+                cmdList->writeBuffer(s_vertexBuffer, batch.vertices.data(), vertexCount * sizeof(TextVertex));
 
                 // Manually transition buffer for drawing - NVRHI optimizes away redundant bindings
                 cmdList->setBufferState(s_vertexBuffer, nvrhi::ResourceStates::VertexBuffer);
@@ -523,7 +532,7 @@ framegraph::VirtualResourceHandle setupTextPass(
                 ctx->SetBindingSet(0, pso->vsBindingSet.Get());
                 ctx->SetBindingSet(1, pso->psBindingSet.Get());
 
-                const u32 numQuads = static_cast<u32>(batch.vertices.size() / 4);
+                const u32 numQuads = vertexCount / 4;
                 const u32 numIndices = numQuads * 6;
                 ctx->DrawIndexed(numIndices, 0, 0);
             }

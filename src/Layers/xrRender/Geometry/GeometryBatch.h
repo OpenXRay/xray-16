@@ -81,6 +81,11 @@ struct GeometryBatch {
     // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
     bool isSkinned = false;
 
+    // Terrain flag - determines which pipeline to use
+    // Terrain uses bindless_terrain.ps with 4-layer detail blending
+    bool isTerrain = false;
+    u32 terrainMaterialID = UINT32_MAX;  // Index into g_TerrainMaterials for terrain rendering
+
     // SSA (Screen Space Area) for sorting - matches vanilla CalcSSA()
     // SSA = R / distSQ where R = bounding sphere radius, distSQ = distance squared to camera
     // Larger SSA = closer/bigger = should render first (front-to-back for opaque)

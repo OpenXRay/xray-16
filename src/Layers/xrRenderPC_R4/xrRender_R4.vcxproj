@@ -97,6 +97,7 @@
     <ClInclude Include="..\xrRender\Backend\D3D12Backend.h" />
     <ClInclude Include="..\xrRender\Bindless\BindlessTypes.h" />
     <ClInclude Include="..\xrRender\Bindless\MaterialBuffer.h" />
+    <ClInclude Include="..\xrRender\Bindless\TerrainMaterialBuffer.h" />
     <ClInclude Include="..\xrRender\Bindless\UnifiedVertex.h" />
     <ClInclude Include="..\xrRender\Bindless\VertexConverter.h" />
     <ClInclude Include="..\xrRender\blenders\Blender_Detail_GPU.h" />
@@ -329,6 +330,7 @@
     <ClCompile Include="..\xrRender\Backend\D3D11BackendWrapper.cpp" />
     <ClCompile Include="..\xrRender\Backend\D3D12Backend.cpp" />
     <ClCompile Include="..\xrRender\Bindless\MaterialBuffer.cpp" />
+    <ClCompile Include="..\xrRender\Bindless\TerrainMaterialBuffer.cpp" />
     <ClCompile Include="..\xrRender\Bindless\VertexConverter.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_BmmD_deferred.cpp" />
     <ClCompile Include="..\xrRender\blenders\Blender_Detail_GPU.cpp" />
