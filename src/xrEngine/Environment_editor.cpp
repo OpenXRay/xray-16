@@ -16,6 +16,35 @@ ENGINE_API float ps_r3_grass_wind_displacement = 2.0f;   // Vertex displacement 
 ENGINE_API float ps_r3_grass_interaction_displacement = 0.5f;  // Interaction displacement strength
 ENGINE_API u32 ps_r3_grass_wind_octaves = 5;             // FBM octave count
 
+// Grass color parameters (per object ID support)
+ENGINE_API Fvector3 ps_r3_grass_color_tip = {0.35f, 0.45f, 0.18f};    // Blade tip color (vibrant green)
+ENGINE_API Fvector3 ps_r3_grass_color_base = {0.28f, 0.38f, 0.15f};   // Blade base color (duller brown-green)
+ENGINE_API float ps_r3_grass_color_variation = 0.15f;                  // Per-blade color variation (±%)
+ENGINE_API Fvector3 ps_r3_grass_sss_color = {0.5f, 0.7f, 0.3f};       // Subsurface scattering tint
+ENGINE_API float ps_r3_grass_sss_intensity = 0.25f;                    // SSS strength
+
+// Per-object-ID color tints (64 grass types max)
+// Default all to white (1,1,1) = no tint
+ENGINE_API Fvector3 ps_r3_grass_object_tints[64] = {
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f},
+};
+ENGINE_API int ps_r3_grass_selected_object = 0;  // Currently selected object ID for editing
+
 namespace
 {
 bool window_weather_cycle = false;
@@ -549,6 +578,58 @@ void CEnvironment::on_tool_frame()
             if (ImGui::SliderInt("FBM quality (octaves)", &octaves, 1, 8))
                 ps_r3_grass_wind_octaves = (u32)octaves;
             ItemHelp("Number of noise octaves for wind generation (higher = more detail, slower)");
+        }
+
+        // Grass Color controls
+        if (ImGui::CollapsingHeader("Grass Color", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            extern Fvector3 ps_r3_grass_color_tip;
+            extern Fvector3 ps_r3_grass_color_base;
+            extern float ps_r3_grass_color_variation;
+            extern Fvector3 ps_r3_grass_sss_color;
+            extern float ps_r3_grass_sss_intensity;
+            extern Fvector3 ps_r3_grass_object_tints[64];
+            extern int ps_r3_grass_selected_object;
+
+            ImGui::SeparatorText("Blade Colors");
+
+            ImGui::ColorEdit3("Tip color", reinterpret_cast<float*>(&ps_r3_grass_color_tip));
+            ItemHelp("Color at blade tips - typically brighter, more vibrant");
+
+            ImGui::ColorEdit3("Base color", reinterpret_cast<float*>(&ps_r3_grass_color_base));
+            ItemHelp("Color at blade base - typically darker, more muted");
+
+            ImGui::DragFloat("Color variation", &ps_r3_grass_color_variation, 0.01f, 0.0f, 0.5f);
+            ItemHelp("Per-blade random color variation (0 = uniform, 0.15 = +/-15%)");
+
+            ImGui::SeparatorText("Subsurface Scattering");
+
+            ImGui::ColorEdit3("SSS color", reinterpret_cast<float*>(&ps_r3_grass_sss_color));
+            ItemHelp("Color of light transmitted through grass blades (backlit effect)");
+
+            ImGui::DragFloat("SSS intensity", &ps_r3_grass_sss_intensity, 0.01f, 0.0f, 1.0f);
+            ItemHelp("Strength of subsurface scattering effect");
+
+            ImGui::SeparatorText("Per-Object Tint");
+
+            ImGui::SliderInt("Object ID", &ps_r3_grass_selected_object, 0, 63);
+            ItemHelp("Select which grass object type (0-63) to edit");
+
+            string128 tintLabel;
+            xr_sprintf(tintLabel, "Tint (Object %d)", ps_r3_grass_selected_object);
+            ImGui::ColorEdit3(tintLabel, reinterpret_cast<float*>(&ps_r3_grass_object_tints[ps_r3_grass_selected_object]));
+            ItemHelp("Color multiplier for this grass type (white = no change)");
+
+            if (ImGui::Button("Reset to white"))
+            {
+                ps_r3_grass_object_tints[ps_r3_grass_selected_object] = {1.0f, 1.0f, 1.0f};
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Reset all tints"))
+            {
+                for (int i = 0; i < 64; i++)
+                    ps_r3_grass_object_tints[i] = {1.0f, 1.0f, 1.0f};
+            }
         }
 
     }

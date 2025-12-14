@@ -18,6 +18,14 @@ extern ENGINE_API float ps_r__Detail_l_ambient;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
 
+// Grass color parameters (defined in xrEngine)
+extern ENGINE_API Fvector3 ps_r3_grass_color_tip;
+extern ENGINE_API Fvector3 ps_r3_grass_color_base;
+extern ENGINE_API float ps_r3_grass_color_variation;
+extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
+extern ENGINE_API float ps_r3_grass_sss_intensity;
+extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
+
 namespace xray::render::RENDER_NAMESPACE::passes
 {
 
@@ -210,7 +218,7 @@ DefaultOutputLayout setupDetailPass(
             FillSunConstants(staticGlobals, sunData);
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            // b3: DetailGlobals (must match HLSL cbuffer - 176 bytes)
+            // b3: DetailGlobals (must match HLSL cbuffer)
             struct DetailFrameConstants
             {
                 Fvector4 consts;                  // scale, scale, aniso, ambient
@@ -224,6 +232,12 @@ DefaultOutputLayout setupDetailPass(
                 float grass_interaction_displacement;  // Interaction strength
                 u32 interaction_atlas_index;      // Bindless index for interaction atlas
                 u32 wind_texture_index;           // Bindless index for wind texture
+                // Grass color parameters
+                Fvector4 grass_color_tip;         // RGB + padding (blade tip color)
+                Fvector4 grass_color_base;        // RGB + padding (blade base color)
+                Fvector4 grass_sss_color;         // RGB + intensity (subsurface scattering)
+                float grass_color_variation;      // Per-blade color variation amount
+                float pad0, pad1, pad2;           // Padding to 16-byte alignment
             };
 
             // Get wind parameters
@@ -245,6 +259,12 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
             frameConstants.interaction_atlas_index = 0;  // TODO: Add interaction atlas
             frameConstants.wind_texture_index = data.detailManager->windTextureBindlessIndex;
+            // Grass color parameters
+            frameConstants.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
+            frameConstants.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
+            frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
+            frameConstants.grass_color_variation = ps_r3_grass_color_variation;
+            frameConstants.pad0 = frameConstants.pad1 = frameConstants.pad2 = 0.0f;
 
             cbDesc.byteSize = sizeof(DetailFrameConstants);
             cbDesc.debugName = "DetailGlobals";
@@ -285,6 +305,29 @@ DefaultOutputLayout setupDetailPass(
             dummyBufDesc.keepInitialState = true;
             nvrhi::BufferHandle dummySlotIndirection = data.device->GetNVRHIDevice()->createBuffer(dummyBufDesc);
 
+            // Create per-object grass tint buffer (64 colors, each float4 = 16 bytes)
+            struct GrassObjectTint { float r, g, b, pad; };
+            nvrhi::BufferDesc tintBufDesc;
+            tintBufDesc.byteSize = sizeof(GrassObjectTint) * 64;
+            tintBufDesc.structStride = sizeof(GrassObjectTint);
+            tintBufDesc.canHaveRawViews = false;
+            tintBufDesc.isVertexBuffer = false;
+            tintBufDesc.debugName = "GrassObjectTints";
+            tintBufDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            tintBufDesc.keepInitialState = true;
+            nvrhi::BufferHandle grassTintsBuffer = data.device->GetNVRHIDevice()->createBuffer(tintBufDesc);
+
+            // Fill tints from global array
+            GrassObjectTint tintData[64];
+            for (int i = 0; i < 64; i++)
+            {
+                tintData[i].r = ps_r3_grass_object_tints[i].x;
+                tintData[i].g = ps_r3_grass_object_tints[i].y;
+                tintData[i].b = ps_r3_grass_object_tints[i].z;
+                tintData[i].pad = 1.0f;
+            }
+            cmdList->writeBuffer(grassTintsBuffer, tintData, sizeof(tintData));
+
             // Create samplers (match common_samplers.h declarations)
             // s0: g_LinearSampler (from bindless_common.h)
             nvrhi::SamplerDesc s0Desc;
@@ -323,10 +366,10 @@ DefaultOutputLayout setupDetailPass(
             s5Desc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
             nvrhi::SamplerHandle s5_material = data.device->GetNVRHIDevice()->createSampler(s5Desc);
 
-            // Create binding set (BINDLESS: b0-b4, t8, t32-t33, s0-s5)
+            // Create binding set (BINDLESS: b0-b4, t8, t32-t34, s0-s5)
             // NOTE: t8 required by bindless_common.h (g_Materials)
             // NOTE: s0-s5 required by common_samplers.h (even if unused)
-            // NOTE: t32-t33 avoid common_samplers.h conflict (t0-t31)
+            // NOTE: t32-t34 avoid common_samplers.h conflict (t0-t31)
             nvrhi::BindingSetDesc bindDesc;
             bindDesc.bindings = {
                 nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),                                 // b0: dynamic_transforms
@@ -337,6 +380,7 @@ DefaultOutputLayout setupDetailPass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dummyMaterials),                           // t8: g_Materials (from bindless_common.h)
                 nvrhi::BindingSetItem::TypedBuffer_SRV(32, dummySlotIndirection),                         // t32: slot_indirection (dummy for now)
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(33, data.detailManager->visibleIndicesBuffer), // t33: detail_buffer (visible instances)
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(34, grassTintsBuffer),                        // t34: grass_object_tints (per-object colors)
                 nvrhi::BindingSetItem::Sampler(0, s0_LinearSampler),                                       // s0: g_LinearSampler
                 nvrhi::BindingSetItem::Sampler(1, s1_nofilter),                                            // s1: smp_nofilter
                 nvrhi::BindingSetItem::Sampler(2, s2_rtlinear),                                            // s2: smp_rtlinear

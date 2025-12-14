@@ -404,7 +404,7 @@ void FGDetailManager::DecompressAllSlots()
                     instance.vis_id = vis_id;
                     instance.object_id = object_id;
 
-                    if (instance.object_id <= 7) // ONLY GRASS (id 8-16 used for leaves and ground/water details?)
+                    if (instance.object_id <= 6) // ONLY GRASS (id 7-16 used for leaves and ground/water details?)
                         all_instances.push_back(instance);
                 }
             }
@@ -1055,11 +1055,12 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // b0: dynamic_transforms
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),  // b1: shader_params
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // b2: static_globals
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),  // b3: $Globals (detail params)
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(3),  // b3: $Globals (detail params + grass colors)
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // b4: dynamic_light
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // t8: g_Materials
         nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),        // t32: slot_indirection (dummy)
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),   // t33: visible instances
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),   // t34: grass_object_tints (per-object colors)
         nvrhi::BindingLayoutItem::Sampler(0),                 // s0: g_LinearSampler
         nvrhi::BindingLayoutItem::Sampler(1),                 // s1: smp_nofilter
         nvrhi::BindingLayoutItem::Sampler(2),                 // s2: smp_rtlinear

@@ -6,13 +6,54 @@
 // "The G-buffer pixel shader keeps operations minimal"
 // All lighting is handled by the deferred lighting system
 
-// Procedural grass color parameters
-static const float3 youngGrassCol = float3(0.35, 0.45, 0.18);  // Brighter, more vibrant
-static const float3 oldGrassCol = float3(0.28, 0.38, 0.15);    // Slightly duller brown-green
+// ══════════════════════════════════════════════════════════
+//  DETAIL GLOBALS CONSTANT BUFFER (must match vertex shader and C++)
+// ══════════════════════════════════════════════════════════
+
+cbuffer DetailGlobals : register(b3)
+{
+    float4 consts;                  // {1/quant,1/quant,diffusescale,ambient}
+    float4 wave;                    // cx,cy,cz,tm - for wave animation
+    float4 dir2D;                   // Wind direction 1 (XY = direction, normalized)
+    float4 dir2D_2;                 // Wind direction 2 (perpendicular)
+    float4x4 m_VP;                  // View-projection matrix
+    float4 detail_params;           // x=slot_x_size, y=slot_z_size, z=slot_x_offs, w=slot_z_offs
+    float4 g_wind_direction;        // x=wind angle degrees, y=wind speed, z/w=unused
+    float grass_wind_displacement;  // Wind displacement strength
+    float grass_interaction_displacement;  // Interaction displacement strength
+    uint interaction_atlas_index;   // Bindless index for interaction atlas
+    uint wind_texture_index;        // Bindless index for wind texture
+    // Grass color parameters
+    float4 grass_color_tip;         // RGB + padding (blade tip color)
+    float4 grass_color_base;        // RGB + padding (blade base color)
+    float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
+    float grass_color_variation;    // Per-blade color variation amount
+    float _pad0, _pad1, _pad2;      // Padding to 16-byte alignment
+};
+
+// Per-object tint buffer (64 grass types)
+struct GrassObjectTint
+{
+    float r, g, b, pad;
+};
+StructuredBuffer<GrassObjectTint> grass_object_tints : register(t34);
+
+// ══════════════════════════════════════════════════════════
+//  PROCEDURAL GRASS PBR MATERIAL PARAMETERS
+// ══════════════════════════════════════════════════════════
+
+// PBR Material properties for grass
+static const float GRASS_ROUGHNESS_BASE = 0.85;   // Base of blade is rough/matte
+static const float GRASS_ROUGHNESS_TIP = 0.55;    // Tips have waxy coating, slightly shinier
+static const float GRASS_METALLIC = 0.0;          // Organic material, never metallic
+
+// AO parameters
+static const float GRASS_AO_BASE = 0.35;          // Dark occlusion at blade base
+static const float GRASS_AO_TIP = 1.0;            // Full exposure at tip
+static const float GRASS_AO_POWER = 0.6;          // Curve falloff (lower = darker longer)
 
 // Bindless texture indices for detail rendering
 uniform uint grass_vein_index;         // Bindless index for grass vein texture
-uniform uint interaction_atlas_index;  // Bindless index for interaction atlas
 
 // Phase 5: Grass interaction debug visualization
 uniform int dm_debug_trails;
@@ -22,6 +63,52 @@ float SampleGrassInteraction(float2 atlas_uv)
     Texture2D interaction_tex = GetBindlessTexture(interaction_atlas_index);
     float4 interaction = interaction_tex.Sample(g_LinearSampler, atlas_uv);
     return interaction.r;
+}
+
+// ══════════════════════════════════════════════════════════
+//  GRASS PBR MATERIAL COMPUTATION
+// ══════════════════════════════════════════════════════════
+
+// Compute height-based roughness (tips shinier due to waxy cuticle)
+float ComputeGrassRoughness(float heightParam, float veinDetail)
+{
+    // Base roughness varies with height
+    float baseRoughness = lerp(GRASS_ROUGHNESS_BASE, GRASS_ROUGHNESS_TIP, heightParam);
+
+    // Vein detail adds micro-roughness variation
+    float microRoughness = veinDetail * 0.1;
+
+    return saturate(baseRoughness + microRoughness);
+}
+
+// Compute ambient occlusion from height and blade geometry
+float ComputeGrassAO(float heightParam, float veinDetail, float widthPercent)
+{
+    // Primary AO: height-based (base is occluded, tip is exposed)
+    float heightAO = lerp(GRASS_AO_BASE, GRASS_AO_TIP, pow(saturate(heightParam), GRASS_AO_POWER));
+
+    // Secondary AO: edges of blade get slightly more light than center
+    // (cylindrical blade shape catches light at edges)
+    float edgeFactor = abs(widthPercent - 0.5) * 2.0;  // 0 at center, 1 at edges
+    float edgeAO = lerp(0.95, 1.0, edgeFactor);
+
+    // Micro-AO from vein texture (veins are slightly recessed)
+    float microAO = lerp(0.9, 1.0, veinDetail);
+
+    return heightAO * edgeAO * microAO;
+}
+
+// Simple subsurface scattering approximation for grass
+float3 ComputeGrassSSS(float3 worldNormal, float3 lightDir, float heightParam)
+{
+    // SSS is stronger at thin blade tips and when backlit
+    float backlit = saturate(dot(worldNormal, lightDir) * 0.5 + 0.5);
+    float thinness = heightParam;  // Tips are thinner
+
+    // Use SSS color and intensity from constant buffer
+    float sssIntensity = grass_sss_color.w;
+    float sssAmount = backlit * thinness * sssIntensity;
+    return grass_sss_color.rgb * sssAmount;
 }
 
 f_forward main(p_flat I)
@@ -39,32 +126,40 @@ f_forward main(p_flat I)
     float3 N = lerp(I.rotatedNormal1, I.rotatedNormal2, widthPercent);
     N = normalize(N);
 
-    // Height parameter for AO calculation (0=base is darker, 1=tip is brighter)
+    // Height parameter (0=base, 1=tip)
     float t = I.heightParam;
-
-    // Simple height-based AO curve
-    float ao_base = 0.5;   // Base darkness at blade bottom
-    float ao_range = 0.5;  // Range to full brightness at tip
-    float ao = ao_base + ao_range * pow(saturate(t), 0.5);  // Smooth curve
-
-    // Procedural grass albedo color
-    // Mix young/old grass based on height (tips are greener, base is browner)
-    float color_blend = smoothstep(0.2, 0.8, t);
-    float3 grassAlbedo = lerp(oldGrassCol, youngGrassCol, color_blend);
-
-    // Per-blade variation using world position hash
-    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
-    grassAlbedo *= lerp(0.85, 1.15, hash);  // ±15% color variation per blade
 
     // ===== VEIN DETAIL TEXTURE (BINDLESS) =====
     Texture2D vein_tex = GetBindlessTexture(grass_vein_index);
     float4 vein_detail = vein_tex.Sample(g_LinearSampler, I.tcdh.xy);
+    float veinValue = vein_detail.a;  // Use alpha for detail intensity
+
+    // ===== PROCEDURAL GRASS ALBEDO =====
+    // Get colors from constant buffer
+    float3 tipColor = grass_color_tip.rgb;
+    float3 baseColor = grass_color_base.rgb;
+
+    // Blend from base to tip based on height
+    float color_blend = smoothstep(0.2, 0.8, t);
+    float3 grassAlbedo = lerp(baseColor, tipColor, color_blend);
+
+    // Per-blade variation using world position hash
+    float hash = frac(sin(dot(I.position.xz, float2(12.9898, 78.233))) * 43758.5453);
+    float variationAmount = grass_color_variation;  // From constant buffer (e.g., 0.15 = ±15%)
+    grassAlbedo *= lerp(1.0 - variationAmount, 1.0 + variationAmount, hash);
+
+    // Apply per-object tint (from structured buffer)
+    GrassObjectTint objectTint = grass_object_tints[I.objectId];
+    float3 tintColor = float3(objectTint.r, objectTint.g, objectTint.b);
+    grassAlbedo *= tintColor;
 
     // Overlay vein detail on base color
-    grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, vein_detail.a * 0.15);
+    grassAlbedo = lerp(grassAlbedo, grassAlbedo * vein_detail.rgb, veinValue * 0.15);
 
-    // Grass has low gloss (slightly matte surface)
-    float gloss = 0.2;  // Low specular response
+    // ===== PBR MATERIAL PROPERTIES =====
+    float roughness = ComputeGrassRoughness(t, veinValue);
+    float metallic = GRASS_METALLIC;  // Always 0 for organic grass
+    float ao = ComputeGrassAO(t, veinValue, widthPercent);
 
     // Phase 5: Debug visualization overlay
     if (dm_debug_trails > 0)
@@ -73,20 +168,16 @@ f_forward main(p_flat I)
         grassAlbedo = lerp(grassAlbedo, float3(1.0, 0.0, 0.0), interaction_strength * 0.7);
     }
 
-    // Transform normal to world space for PBR lighting
+    // ===== WORLD SPACE TRANSFORMS =====
     float3 Nw = viewDirToWorld(N);
-
-    // Get world position from view position
     float3 worldPos = viewPosToWorld(I.position.xyz);
-
-    // Get hemisphere occlusion
     float hemi = I.position.w;
 
-    // Extract material properties
-    float3 albedo = grassAlbedo;
-    float roughness = 1.0 - gloss;
-    float metallic = 0.0;
+    // ===== SUBSURFACE SCATTERING APPROXIMATION =====
+    // Add SSS contribution to albedo (approximate translucency)
+    float3 sss = ComputeGrassSSS(Nw, -L_sun_dir_w, t);
+    float3 finalAlbedo = grassAlbedo + sss * L_sun_color;
 
-    // PBR Forward+ lighting with grass AO
-    return output_forward_pbr(albedo, Nw, worldPos, metallic, roughness, ao, hemi);
+    // PBR Forward+ lighting with computed grass material properties
+    return output_forward_pbr(finalAlbedo, Nw, worldPos, metallic, roughness, ao, hemi);
 }

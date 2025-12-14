@@ -36,9 +36,20 @@ cbuffer DetailGlobals : register(b3)
     float grass_interaction_displacement;  // Interaction displacement strength
     uint interaction_atlas_index;   // Bindless index for interaction atlas
     uint wind_texture_index;        // Bindless index for wind texture
+    // Grass color parameters (must match pixel shader)
+    float4 grass_color_tip;         // RGB + padding (blade tip color)
+    float4 grass_color_base;        // RGB + padding (blade base color)
+    float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
+    float grass_color_variation;    // Per-blade color variation amount
+    float _pad0, _pad1, _pad2;      // Padding to 16-byte alignment
 };
 
 static const float M_PI = 3.1415926;
+
+// Height variation parameters (using FBM noise for natural look)
+static const float HEIGHT_VARIATION_MIN = 0.7;   // Minimum height multiplier (70%)
+static const float HEIGHT_VARIATION_MAX = 1.15;  // Maximum height multiplier (115%)
+static const float HEIGHT_NOISE_SCALE = 0.05;    // World-space frequency of height variation
 
 // Phase 6: Virtual texturing indirection table
 // NOTE: common_samplers.h uses t0-t31, so we use t32+ to avoid conflicts
@@ -77,10 +88,21 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Read instance data from structured buffer
 	InstanceData det = detail_buffer[instance_id];
 
+	// ===== HEIGHT VARIATION USING FBM NOISE =====
+	// Sample wind texture at different scale/offset for height variation
+	// This gives natural-looking height randomization that tiles seamlessly
+	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);  // Offset to decorrelate from wind
+	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);
+	float height_noise = height_noise_tex.SampleLevel(g_LinearSampler, height_uv, 0).r;  // Use R channel (turbulence)
+
+	// Map noise to height multiplier range
+	float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
+	float blade_height = det.scale * height_multiplier;
+
 	float3 P0 = det.pos;
-	float3 P1 = det.pos + float3(0, det.scale * 0.33, 0);
-	float3 P2 = det.pos + float3(0, det.scale * 0.67, 0);
-	float3 P3 = det.pos + float3(0, det.scale, 0);
+	float3 P1 = det.pos + float3(0, blade_height * 0.33, 0);
+	float3 P2 = det.pos + float3(0, blade_height * 0.67, 0);
+	float3 P3 = det.pos + float3(0, blade_height, 0);
 
 	// Save base position before any modifications for normal calculations
 	float3 base_world_pos = P0;
@@ -267,31 +289,31 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	}
 
 	// Calculate bend angle
-	float max_bend_displacement = det.scale * 0.8;
+	float max_bend_displacement = blade_height * 0.8;
 	float bend_ratio = saturate(total_bend_strength / max_bend_displacement);
 	float bend_angle = bend_ratio * 1.2;  // Max ~70 degrees
 
 	if (total_bend_strength > 0.001)
 	{
 		// P3 (tip): Position it at the end of the arc
-		float tip_horizontal = det.scale * sin(bend_angle);
-		float tip_vertical_drop = det.scale * (1.0 - cos(bend_angle));
+		float tip_horizontal = blade_height * sin(bend_angle);
+		float tip_vertical_drop = blade_height * (1.0 - cos(bend_angle));
 
 		P3 += bend_dir * tip_horizontal;
 		P3.y -= tip_vertical_drop;
 
 		// P1 (lower control point): 1/3 along arc
 		float p1_angle = bend_angle * 0.33;
-		float p1_horizontal = det.scale * 0.33 * sin(p1_angle);
-		float p1_drop = det.scale * 0.33 * (1.0 - cos(p1_angle));
+		float p1_horizontal = blade_height * 0.33 * sin(p1_angle);
+		float p1_drop = blade_height * 0.33 * (1.0 - cos(p1_angle));
 
 		P1 += bend_dir * p1_horizontal;
 		P1.y -= p1_drop;
 
 		// P2 (upper control point): 2/3 along arc
 		float p2_angle = bend_angle * 0.67;
-		float p2_horizontal = det.scale * 0.67 * sin(p2_angle);
-		float p2_drop = det.scale * 0.67 * (1.0 - cos(p2_angle));
+		float p2_horizontal = blade_height * 0.67 * sin(p2_angle);
+		float p2_drop = blade_height * 0.67 * (1.0 - cos(p2_angle));
 
 		P2 += bend_dir * p2_horizontal;
 		P2.y -= p2_drop;
@@ -340,6 +362,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	float3 right = float3(cos_rot, 0.0, -sin_rot);
 
 	// Apply width offset using rotation-based right vector
+	// Note: Use original det.scale for width (not blade_height) so taller blades appear thinner/wispier
 	float3 width_offset = right * (I.pos.x * det.scale);
 
 	// Final position
@@ -396,6 +419,9 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	// Phase 5: Pass atlas UV for grass interaction debug visualization
 	O.interaction_uv = atlas_uv;  // Pass the correct atlas UV computed with indirection table
+
+	// Pass object ID for per-type coloring (nointerpolation - flat shading)
+	O.objectId = det.object_id;
 
 	O.hpos = mul(m_WVP, pos);
 	return O;
