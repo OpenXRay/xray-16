@@ -15,9 +15,18 @@ cbuffer DetailGlobals : register(b3)
     float grass_interaction_displacement;
     uint interaction_atlas_index;
     uint wind_texture_index;
+    float4 grass_color_tip;
+    float4 grass_color_base;
+    float4 grass_sss_color;
+    float grass_color_variation;
+    float _pad0, _pad1, _pad2;
 };
 
 static const float M_PI = 3.1415926;
+
+static const float HEIGHT_VARIATION_MIN = 0.7;
+static const float HEIGHT_VARIATION_MAX = 1.15;
+static const float HEIGHT_NOISE_SCALE = 0.05;
 
 Buffer<uint> slot_indirection : register(t32);
 
@@ -47,10 +56,17 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	InstanceData det = detail_buffer[instance_id];
 
+	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);
+	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);
+	float height_noise = height_noise_tex.SampleLevel(g_LinearSampler, height_uv, 0).r;
+
+	float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
+	float blade_height = det.scale * height_multiplier;
+
 	float3 P0 = det.pos;
-	float3 P1 = det.pos + float3(0, det.scale * 0.33, 0);
-	float3 P2 = det.pos + float3(0, det.scale * 0.67, 0);
-	float3 P3 = det.pos + float3(0, det.scale, 0);
+	float3 P1 = det.pos + float3(0, blade_height * 0.33, 0);
+	float3 P2 = det.pos + float3(0, blade_height * 0.67, 0);
+	float3 P3 = det.pos + float3(0, blade_height, 0);
 
 	float3 base_world_pos = P0;
 
@@ -168,28 +184,28 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 		bend_dir = normalize(total_bend_force);
 	}
 
-	float max_bend_displacement = det.scale * 0.8;
+	float max_bend_displacement = blade_height * 0.8;
 	float bend_ratio = saturate(total_bend_strength / max_bend_displacement);
 	float bend_angle = bend_ratio * 1.2;
 
 	if (total_bend_strength > 0.001)
 	{
-		float tip_horizontal = det.scale * sin(bend_angle);
-		float tip_vertical_drop = det.scale * (1.0 - cos(bend_angle));
+		float tip_horizontal = blade_height * sin(bend_angle);
+		float tip_vertical_drop = blade_height * (1.0 - cos(bend_angle));
 
 		P3 += bend_dir * tip_horizontal;
 		P3.y -= tip_vertical_drop;
 
 		float p1_angle = bend_angle * 0.33;
-		float p1_horizontal = det.scale * 0.33 * sin(p1_angle);
-		float p1_drop = det.scale * 0.33 * (1.0 - cos(p1_angle));
+		float p1_horizontal = blade_height * 0.33 * sin(p1_angle);
+		float p1_drop = blade_height * 0.33 * (1.0 - cos(p1_angle));
 
 		P1 += bend_dir * p1_horizontal;
 		P1.y -= p1_drop;
 
 		float p2_angle = bend_angle * 0.67;
-		float p2_horizontal = det.scale * 0.67 * sin(p2_angle);
-		float p2_drop = det.scale * 0.67 * (1.0 - cos(p2_angle));
+		float p2_horizontal = blade_height * 0.67 * sin(p2_angle);
+		float p2_drop = blade_height * 0.67 * (1.0 - cos(p2_angle));
 
 		P2 += bend_dir * p2_horizontal;
 		P2.y -= p2_drop;
@@ -262,6 +278,8 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	O.rotatedNormal2 = view_rotatedNormal2;
 
 	O.interaction_uv = atlas_uv;
+
+	O.objectId = det.object_id;
 
 	O.hpos = mul(m_WVP, pos);
 	return O;

@@ -362,7 +362,7 @@ void FGDetailManager::DecompressAllSlots()
                     instance.vis_id = vis_id;
                     instance.object_id = object_id;
 
-                    if (instance.object_id <= 7)
+                    if (instance.object_id <= 6)
                         all_instances.push_back(instance);
                 }
             }
@@ -978,6 +978,7 @@ bool FGDetailManager::CreateGraphicsPipeline(ng::RenderDevice* renderDevice, nvr
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
         nvrhi::BindingLayoutItem::TypedBuffer_SRV(32),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(33),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(34),
         nvrhi::BindingLayoutItem::Sampler(0),
         nvrhi::BindingLayoutItem::Sampler(1),
         nvrhi::BindingLayoutItem::Sampler(2),

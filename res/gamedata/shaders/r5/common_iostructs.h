@@ -334,6 +334,7 @@ struct	v2p_flat
     float2	interaction_uv : TEXCOORD6;
     float3	rotatedNormal1 : TEXCOORD7;
     float3	rotatedNormal2 : TEXCOORD8;
+    nointerpolation uint objectId : TEXCOORD9;
     float4	hpos : SV_Position;
 };
 
@@ -356,6 +357,7 @@ struct	p_flat
     float2	interaction_uv : TEXCOORD6;
     float3	rotatedNormal1 : TEXCOORD7;
     float3	rotatedNormal2 : TEXCOORD8;
+    nointerpolation uint objectId : TEXCOORD9;
 };
 
 struct	v_shadow_direct_aref

@@ -15,6 +15,13 @@ extern ENGINE_API float ps_r__Detail_l_ambient;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
 
+extern ENGINE_API Fvector3 ps_r3_grass_color_tip;
+extern ENGINE_API Fvector3 ps_r3_grass_color_base;
+extern ENGINE_API float ps_r3_grass_color_variation;
+extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
+extern ENGINE_API float ps_r3_grass_sss_intensity;
+extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
+
 namespace xray::render::RENDER_NAMESPACE::passes
 {
 
@@ -198,6 +205,11 @@ DefaultOutputLayout setupDetailPass(
                 float grass_interaction_displacement;
                 u32 interaction_atlas_index;
                 u32 wind_texture_index;
+                Fvector4 grass_color_tip;
+                Fvector4 grass_color_base;
+                Fvector4 grass_sss_color;
+                float grass_color_variation;
+                float pad0, pad1, pad2;
             };
 
             float windAngleDeg = 0.0f;
@@ -218,6 +230,11 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_interaction_displacement = ps_r3_grass_interaction_displacement;
             frameConstants.interaction_atlas_index = 0;
             frameConstants.wind_texture_index = data.detailManager->windTextureBindlessIndex;
+            frameConstants.grass_color_tip.set(ps_r3_grass_color_tip.x, ps_r3_grass_color_tip.y, ps_r3_grass_color_tip.z, 0.0f);
+            frameConstants.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
+            frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
+            frameConstants.grass_color_variation = ps_r3_grass_color_variation;
+            frameConstants.pad0 = frameConstants.pad1 = frameConstants.pad2 = 0.0f;
 
             cbDesc.byteSize = sizeof(DetailFrameConstants);
             cbDesc.debugName = "DetailGlobals";
@@ -251,6 +268,27 @@ DefaultOutputLayout setupDetailPass(
             dummyBufDesc.initialState = nvrhi::ResourceStates::ShaderResource;
             dummyBufDesc.keepInitialState = true;
             nvrhi::BufferHandle dummySlotIndirection = data.device->GetNVRHIDevice()->createBuffer(dummyBufDesc);
+
+            struct GrassObjectTint { float r, g, b, pad; };
+            nvrhi::BufferDesc tintBufDesc;
+            tintBufDesc.byteSize = sizeof(GrassObjectTint) * 64;
+            tintBufDesc.structStride = sizeof(GrassObjectTint);
+            tintBufDesc.canHaveRawViews = false;
+            tintBufDesc.isVertexBuffer = false;
+            tintBufDesc.debugName = "GrassObjectTints";
+            tintBufDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            tintBufDesc.keepInitialState = true;
+            nvrhi::BufferHandle grassTintsBuffer = data.device->GetNVRHIDevice()->createBuffer(tintBufDesc);
+
+            GrassObjectTint tintData[64];
+            for (int i = 0; i < 64; i++)
+            {
+                tintData[i].r = ps_r3_grass_object_tints[i].x;
+                tintData[i].g = ps_r3_grass_object_tints[i].y;
+                tintData[i].b = ps_r3_grass_object_tints[i].z;
+                tintData[i].pad = 1.0f;
+            }
+            cmdList->writeBuffer(grassTintsBuffer, tintData, sizeof(tintData));
 
             nvrhi::SamplerDesc s0Desc;
             s0Desc.setAllFilters(true);
@@ -293,6 +331,7 @@ DefaultOutputLayout setupDetailPass(
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dummyMaterials),
                 nvrhi::BindingSetItem::TypedBuffer_SRV(32, dummySlotIndirection),
                 nvrhi::BindingSetItem::StructuredBuffer_SRV(33, data.detailManager->visibleIndicesBuffer),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(34, grassTintsBuffer),
                 nvrhi::BindingSetItem::Sampler(0, s0_LinearSampler),
                 nvrhi::BindingSetItem::Sampler(1, s1_nofilter),
                 nvrhi::BindingSetItem::Sampler(2, s2_rtlinear),
