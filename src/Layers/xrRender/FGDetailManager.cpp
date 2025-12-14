@@ -404,7 +404,8 @@ void FGDetailManager::DecompressAllSlots()
                     instance.vis_id = vis_id;
                     instance.object_id = object_id;
 
-                    all_instances.push_back(instance);
+                    if (instance.object_id <= 7) // ONLY GRASS (id 8-16 used for leaves and ground/water details?)
+                        all_instances.push_back(instance);
                 }
             }
 
