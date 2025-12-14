@@ -27,8 +27,35 @@ struct MaterialData
 #define MAT_FLAG_HAS_DETAIL    (1 << 3)
 #define MAT_FLAG_HAS_NORMAL    (1 << 4)
 #define MAT_FLAG_HAS_PBR       (1 << 5)
+#define MAT_FLAG_TERRAIN       (1 << 6)
+#define MAT_FLAG_HAS_PBR_LAYER (1 << 7)
+
+struct TerrainMaterialData
+{
+    uint baseAlbedoIndex;
+    uint blendMaskIndex;
+
+    uint detailR_Index;
+    uint detailG_Index;
+    uint detailB_Index;
+    uint detailA_Index;
+
+    uint normalR_Index;
+    uint normalG_Index;
+    uint normalB_Index;
+    uint normalA_Index;
+
+    uint pbrR_Index;
+    uint pbrG_Index;
+    uint pbrB_Index;
+    uint pbrA_Index;
+
+    float detailScale;
+    uint flags;
+};
 
 StructuredBuffer<MaterialData> g_Materials : register(t8);
+StructuredBuffer<TerrainMaterialData> g_TerrainMaterials : register(t9);
 
 SamplerState g_LinearSampler : register(s0);
 

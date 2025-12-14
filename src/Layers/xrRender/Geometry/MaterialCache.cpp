@@ -25,7 +25,10 @@
 #include "Layers/xrRender/FrameGraph/ShaderLoader.h"
 #include "Layers/xrRender/FrameGraphPasses/ShaderConstants.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "xrEngine/IRenderBackend.h"
+#include "Layers/xrRender/Blender_CLSID.h"
+#include "Layers/xrRender/blenders/Blender_BmmD.h"
 #include "Layers/xrRender/r_constants.h"
 #include "Layers/xrRender/Materials/MaterialSystem.h"
 #include "xrEngine/xr_object.h"
@@ -2265,6 +2268,297 @@ u32 MaterialCache::RegisterBindlessMaterial(MaterialPSO* matPSO)
     matPSO->bindlessMaterialID = materialID;
 
     return materialID;
+}
+
+bool MaterialCache::IsTerrainMaterial(dxRender_Visual* visual)
+{
+    if (!visual || !visual->shaderName.size())
+        return false;
+
+    IBlender* blender = RImplementation.Resources->_FindBlender(visual->shaderName.c_str());
+    if (!blender)
+        return false;
+
+    CLASS_ID cls = blender->getDescription().CLS;
+    return (cls == B_BmmD || cls == B_LmBmmD);
+}
+
+u32 MaterialCache::PreRegisterTerrainMaterial(dxRender_Visual* visual)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (!visual)
+        return UINT32_MAX;
+
+    shared_str shaderName = visual->shaderName;
+
+    auto it = m_shaderToTerrainMaterialID.find(shaderName);
+    if (it != m_shaderToTerrainMaterialID.end())
+        return it->second;
+
+    auto& terrainBuffer = TerrainMaterialBuffer::Instance();
+    if (!terrainBuffer.IsInitialized()) {
+        static bool s_warnOnce = false;
+        if (!s_warnOnce) {
+            Msg("! [MaterialCache] TerrainMaterialBuffer not initialized - terrain will render BLACK!");
+            Msg("!   This usually means level loaded before FrameGraphRenderer::Initialize()");
+            s_warnOnce = true;
+        }
+        return UINT32_MAX;
+    }
+
+    TerrainMaterialData matData = {};
+
+    matData.baseAlbedoIndex = INVALID_TEXTURE_INDEX;
+    matData.blendMaskIndex = INVALID_TEXTURE_INDEX;
+    matData.detailR_Index = INVALID_TEXTURE_INDEX;
+    matData.detailG_Index = INVALID_TEXTURE_INDEX;
+    matData.detailB_Index = INVALID_TEXTURE_INDEX;
+    matData.detailA_Index = INVALID_TEXTURE_INDEX;
+    matData.normalR_Index = INVALID_TEXTURE_INDEX;
+    matData.normalG_Index = INVALID_TEXTURE_INDEX;
+    matData.normalB_Index = INVALID_TEXTURE_INDEX;
+    matData.normalA_Index = INVALID_TEXTURE_INDEX;
+    matData.pbrR_Index = INVALID_TEXTURE_INDEX;
+    matData.pbrG_Index = INVALID_TEXTURE_INDEX;
+    matData.pbrB_Index = INVALID_TEXTURE_INDEX;
+    matData.pbrA_Index = INVALID_TEXTURE_INDEX;
+
+    matData.flags = MAT_FLAG_TERRAIN;
+
+    if (visual->textureName.size() > 0) {
+        matData.detailScale = GetDetailScale(visual->textureName);
+    } else {
+        matData.detailScale = 4.0f;
+    }
+
+    u32 terrainMaterialID = terrainBuffer.RegisterMaterial(matData);
+
+    m_shaderToTerrainMaterialID[shaderName] = terrainMaterialID;
+
+    PendingTerrainMaterial pending;
+    pending.terrainMaterialID = terrainMaterialID;
+    pending.visual = visual;
+    m_pendingTerrainMaterials.push_back(pending);
+
+    static u32 logCount = 0;
+    if (++logCount <= 5) {
+        Msg("* [MaterialCache] PreRegisterTerrain: matID=%u visual=%p tex='%s' shader='%s'",
+            terrainMaterialID, visual, visual->textureName.c_str(), visual->shaderName.c_str());
+    }
+
+    return terrainMaterialID;
+}
+
+void MaterialCache::FinalizePendingTerrainMaterials(ng::RenderContext* ctx)
+{
+    using namespace RENDER_NAMESPACE::bindless;
+
+    if (m_pendingTerrainMaterials.empty())
+        return;
+
+    auto& terrainBuffer = TerrainMaterialBuffer::Instance();
+    if (!terrainBuffer.IsInitialized())
+        return;
+
+    resources::TextureManager* texManager = m_resourceManager ? m_resourceManager->GetTextureManager() : nullptr;
+    if (!texManager)
+        return;
+
+    IRenderBackend* backend = GEnv.Backend;
+    if (!backend)
+        return;
+
+    u32 processedCount = 0;
+
+    for (const auto& pending : m_pendingTerrainMaterials) {
+        dxRender_Visual* visual = pending.visual;
+        u32 terrainMaterialID = pending.terrainMaterialID;
+
+        if (!visual || terrainMaterialID == UINT32_MAX)
+            continue;
+
+        const TerrainMaterialData* existingMat = terrainBuffer.GetMaterial(terrainMaterialID);
+        if (!existingMat)
+            continue;
+
+        TerrainMaterialData matData = *existingMat;
+        bool updated = false;
+        xr_vector<xr_string> missingTextures;
+
+        IBlender* blender = RImplementation.Resources->_FindBlender(visual->shaderName.c_str());
+        CBlender_BmmD* terrainBlender = nullptr;
+        if (blender) {
+            CLASS_ID cls = blender->getDescription().CLS;
+            if (cls == B_BmmD || cls == B_LmBmmD) {
+                terrainBlender = static_cast<CBlender_BmmD*>(blender);
+            }
+        }
+
+        auto RegisterTexture = [&](const char* texName, const char* slotName) -> u32 {
+            if (!texName || !texName[0]) {
+                missingTextures.push_back(xr_string(slotName) + ": (empty name)");
+                return INVALID_TEXTURE_INDEX;
+            }
+
+            resources::TextureHandle handle = texManager->LoadTexture(texName);
+            if (!handle.IsValid()) {
+                missingTextures.push_back(xr_string(slotName) + ": " + texName + " (load failed)");
+                return INVALID_TEXTURE_INDEX;
+            }
+
+            nvrhi::ITexture* nvrhiTex = texManager->GetNVRHITexture(handle);
+            if (!nvrhiTex) {
+                missingTextures.push_back(xr_string(slotName) + ": " + texName + " (no NVRHI tex)");
+                return INVALID_TEXTURE_INDEX;
+            }
+
+            u32 idx = backend->RegisterBindlessTexture(nvrhiTex);
+            if (idx == INVALID_TEXTURE_INDEX) {
+                missingTextures.push_back(xr_string(slotName) + ": " + texName + " (register failed)");
+            }
+            return idx;
+        };
+
+        if (visual->textureName.size()) {
+            u32 idx = RegisterTexture(visual->textureName.c_str(), "base");
+            if (idx != INVALID_TEXTURE_INDEX) {
+                matData.baseAlbedoIndex = idx;
+                updated = true;
+            }
+        }
+
+        if (visual->textureName.size()) {
+            xr_string maskName(visual->textureName.c_str());
+            maskName += "_mask";
+            u32 idx = RegisterTexture(maskName.c_str(), "mask");
+            if (idx != INVALID_TEXTURE_INDEX) {
+                matData.blendMaskIndex = idx;
+                updated = true;
+            }
+        }
+
+        const char* detailR = terrainBlender ? terrainBlender->GetDetailR() : nullptr;
+        const char* detailG = terrainBlender ? terrainBlender->GetDetailG() : nullptr;
+        const char* detailB = terrainBlender ? terrainBlender->GetDetailB() : nullptr;
+        const char* detailA = terrainBlender ? terrainBlender->GetDetailA() : nullptr;
+
+        {
+            u32 idx = RegisterTexture(detailR, "detailR");
+            if (idx != INVALID_TEXTURE_INDEX) { matData.detailR_Index = idx; updated = true; }
+        }
+        {
+            u32 idx = RegisterTexture(detailG, "detailG");
+            if (idx != INVALID_TEXTURE_INDEX) { matData.detailG_Index = idx; updated = true; }
+        }
+        {
+            u32 idx = RegisterTexture(detailB, "detailB");
+            if (idx != INVALID_TEXTURE_INDEX) { matData.detailB_Index = idx; updated = true; }
+        }
+        {
+            u32 idx = RegisterTexture(detailA, "detailA");
+            if (idx != INVALID_TEXTURE_INDEX) { matData.detailA_Index = idx; updated = true; }
+        }
+
+        auto& texDescMgr = RImplementation.Resources->m_textures_description;
+        if (detailR && detailR[0]) {
+            shared_str bumpR = texDescMgr.GetBumpName(detailR);
+            if (bumpR.size()) {
+                u32 idx = RegisterTexture(bumpR.c_str(), "normalR");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.normalR_Index = idx; updated = true; }
+            }
+        }
+        if (detailG && detailG[0]) {
+            shared_str bumpG = texDescMgr.GetBumpName(detailG);
+            if (bumpG.size()) {
+                u32 idx = RegisterTexture(bumpG.c_str(), "normalG");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.normalG_Index = idx; updated = true; }
+            }
+        }
+        if (detailB && detailB[0]) {
+            shared_str bumpB = texDescMgr.GetBumpName(detailB);
+            if (bumpB.size()) {
+                u32 idx = RegisterTexture(bumpB.c_str(), "normalB");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.normalB_Index = idx; updated = true; }
+            }
+        }
+        if (detailA && detailA[0]) {
+            shared_str bumpA = texDescMgr.GetBumpName(detailA);
+            if (bumpA.size()) {
+                u32 idx = RegisterTexture(bumpA.c_str(), "normalA");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.normalA_Index = idx; updated = true; }
+            }
+        }
+
+        if (detailR && detailR[0]) {
+            shared_str pbrR = texDescMgr.GetPBRName(detailR);
+            if (pbrR.size()) {
+                u32 idx = RegisterTexture(pbrR.c_str(), "pbrR");
+                if (idx != INVALID_TEXTURE_INDEX) {
+                    matData.pbrR_Index = idx;
+                    matData.flags |= MAT_FLAG_HAS_PBR_LAYER;
+                    updated = true;
+                }
+            }
+        }
+        if (detailG && detailG[0]) {
+            shared_str pbrG = texDescMgr.GetPBRName(detailG);
+            if (pbrG.size()) {
+                u32 idx = RegisterTexture(pbrG.c_str(), "pbrG");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.pbrG_Index = idx; updated = true; }
+            }
+        }
+        if (detailB && detailB[0]) {
+            shared_str pbrB = texDescMgr.GetPBRName(detailB);
+            if (pbrB.size()) {
+                u32 idx = RegisterTexture(pbrB.c_str(), "pbrB");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.pbrB_Index = idx; updated = true; }
+            }
+        }
+        if (detailA && detailA[0]) {
+            shared_str pbrA = texDescMgr.GetPBRName(detailA);
+            if (pbrA.size()) {
+                u32 idx = RegisterTexture(pbrA.c_str(), "pbrA");
+                if (idx != INVALID_TEXTURE_INDEX) { matData.pbrA_Index = idx; updated = true; }
+            }
+        }
+
+        if (updated) {
+            terrainBuffer.UpdateMaterial(terrainMaterialID, matData);
+            processedCount++;
+
+            static u32 s_debugLogCount = 0;
+            bool hasZeroIndex = (matData.baseAlbedoIndex == 0 || matData.blendMaskIndex == 0 ||
+                                 matData.detailR_Index == 0 || matData.detailG_Index == 0 ||
+                                 matData.normalR_Index == 0 || matData.pbrR_Index == 0);
+            Msg("* [TerrainMat] id=%u base=%u mask=%u dR=%u dG=%u dB=%u dA=%u nR=%u nG=%u pR=%u%s",
+                terrainMaterialID, matData.baseAlbedoIndex, matData.blendMaskIndex,
+                matData.detailR_Index, matData.detailG_Index, matData.detailB_Index, matData.detailA_Index,
+                matData.normalR_Index, matData.normalG_Index, matData.pbrR_Index,
+                hasZeroIndex ? " [IDX 0!]" : "");
+            s_debugLogCount++;
+        }
+
+        if (!missingTextures.empty()) {
+            Msg("! [TerrainMaterial] matID=%u shader='%s' tex='%s' - missing %zu textures:",
+                terrainMaterialID, visual->shaderName.c_str(), visual->textureName.c_str(),
+                missingTextures.size());
+            for (const auto& missing : missingTextures) {
+                Msg("!   - %s", missing.c_str());
+            }
+        }
+    }
+
+    m_pendingTerrainMaterials.clear();
+
+    static u32 s_finalizeCallCount = 0;
+    s_finalizeCallCount++;
+
+    if (processedCount > 0) {
+        terrainBuffer.Upload(ctx);
+        Msg("* [MaterialCache] Finalized %u terrain materials (call #%u, total registered: %u)",
+            processedCount, s_finalizeCallCount, terrainBuffer.GetMaterialCount());
+    }
 }
 
 u32 MaterialCache::PreRegisterBindlessMaterial(dxRender_Visual* visual)

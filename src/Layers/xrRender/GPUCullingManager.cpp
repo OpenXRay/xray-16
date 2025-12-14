@@ -209,6 +209,89 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
 
         m_pointSampler = nvDevice->createSampler(desc);
     }
+
+    m_maxTerrainObjects = 4096;
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainObjects";
+        desc.byteSize = m_maxTerrainObjects * sizeof(GPUObjectData);
+        desc.structStride = sizeof(GPUObjectData);
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_terrainObjectBuffer = nvDevice->createBuffer(desc);
+        if (!m_terrainObjectBuffer) {
+            Msg("! [GPUCulling] Failed to create terrain object buffer");
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainVisibleIndices";
+        desc.byteSize = m_maxTerrainObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainVisibleIndexBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainVisibleCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainVisibleCountBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainDrawArgs";
+        desc.byteSize = m_maxTerrainObjects * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_terrainDrawArgsBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainMaterialIDs";
+        desc.byteSize = m_maxTerrainObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_terrainMaterialIDBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainInstanceData";
+        desc.byteSize = m_maxTerrainObjects * sizeof(GPUInstanceData);
+        desc.structStride = sizeof(GPUInstanceData);
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_terrainInstanceBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainBatchIndices";
+        desc.byteSize = m_maxTerrainObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_terrainBatchIndicesBuffer = nvDevice->createBuffer(desc);
+    }
+
+    Msg("* [GPUCulling] Terrain buffers created (max: %u objects)", m_maxTerrainObjects);
 }
 
 void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
@@ -448,6 +531,22 @@ void GPUCullingManager::Shutdown()
     m_megaBuffersReady = false;
     m_levelLoadInProgress = false;
 
+    m_terrainObjectBuffer = nullptr;
+    m_terrainDrawArgsBuffer = nullptr;
+    m_terrainVisibleIndexBuffer = nullptr;
+    m_terrainVisibleCountBuffer = nullptr;
+    m_terrainInstanceBuffer = nullptr;
+    m_terrainBatchIndicesBuffer = nullptr;
+    m_terrainMaterialIDBuffer = nullptr;
+    m_terrainCompactDrawArgsBuffer = nullptr;
+    m_terrainCompactBatchIndicesBuffer = nullptr;
+    m_terrainCompactCountBuffer = nullptr;
+    m_terrainObjectData.clear();
+    m_terrainDrawArgsData.clear();
+    m_terrainMaterialIDData.clear();
+    m_terrainInstanceData.clear();
+    m_terrainObjectCount = 0;
+
     m_initialized = false;
     m_computeEnabled = false;
     m_compactEnabled = false;
@@ -474,11 +573,55 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     m_materialIDData.clear();
     m_materialIDData.reserve(totalBatches);
 
+    m_terrainObjectData.clear();
+    m_terrainObjectData.reserve(totalBatches / 4);
+    m_terrainDrawArgsData.clear();
+    m_terrainDrawArgsData.reserve(totalBatches / 4);
+    m_terrainMaterialIDData.clear();
+    m_terrainMaterialIDData.reserve(totalBatches / 4);
+    m_terrainInstanceData.clear();
+    m_terrainInstanceData.reserve(totalBatches / 4);
+
     for (u32 i = 0; i < totalBatches; i++) {
         const auto& batch = batches[i];
 
         if (batch.isSkinned)
             continue;
+
+        if (batch.isTerrain) {
+            GPUObjectData obj;
+            obj.position = batch.worldBoundsCenter;
+            obj.radius = batch.worldBoundsRadius;
+            obj.batchIndex = static_cast<u32>(m_terrainObjectData.size());
+            obj.flags = GPU_OBJECT_OPAQUE;
+            obj.pad0 = 0.0f;
+            obj.pad1 = 0.0f;
+            m_terrainObjectData.push_back(obj);
+
+            IndirectDrawArgs args;
+            args.indexCountPerInstance = batch.indexCount;
+            args.instanceCount = 0;
+            if (batch.megaBufferAlloc.valid) {
+                args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
+                args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
+            } else {
+                args.startIndexLocation = batch.startIndex;
+                args.baseVertexLocation = batch.baseVertex;
+            }
+            args.startInstanceLocation = static_cast<u32>(m_terrainDrawArgsData.size());
+            m_terrainDrawArgsData.push_back(args);
+
+            m_terrainMaterialIDData.push_back(batch.terrainMaterialID);
+
+            GPUInstanceData inst;
+            inst.world.transpose(batch.worldMatrix);
+            inst.materialID = batch.terrainMaterialID;
+            inst.flags = GPU_OBJECT_OPAQUE;
+            inst.pad0 = 0.0f;
+            inst.pad1 = 0.0f;
+            m_terrainInstanceData.push_back(inst);
+            continue;
+        }
 
         GPUObjectData obj;
 
@@ -553,6 +696,73 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
 
     if (m_compactEnabled && m_materialIDBuffer) {
         cmdList->writeBuffer(m_materialIDBuffer, m_materialIDData.data(), m_objectCount * sizeof(u32));
+    }
+
+    m_terrainObjectCount = std::min(static_cast<u32>(m_terrainObjectData.size()), m_maxTerrainObjects);
+
+    if (m_terrainObjectCount > 0 && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
+        cmdList->beginTrackingBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_terrainObjectBuffer,
+            m_terrainObjectData.data(),
+            m_terrainObjectCount * sizeof(GPUObjectData));
+        cmdList->setBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::ShaderResource);
+
+        cmdList->beginTrackingBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::CopyDest);
+        cmdList->writeBuffer(m_terrainDrawArgsBuffer,
+            m_terrainDrawArgsData.data(),
+            m_terrainObjectCount * sizeof(IndirectDrawArgs));
+        cmdList->setBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+
+        if (m_terrainMaterialIDBuffer) {
+            cmdList->beginTrackingBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::CopyDest);
+            cmdList->writeBuffer(m_terrainMaterialIDBuffer,
+                m_terrainMaterialIDData.data(),
+                m_terrainObjectCount * sizeof(u32));
+            cmdList->setBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+
+            static bool s_materialIDLogged = false;
+            if (!s_materialIDLogged) {
+                u32 invalidCount = 0;
+                u32 maxID = 0;
+                for (u32 i = 0; i < m_terrainObjectCount && i < m_terrainMaterialIDData.size(); i++) {
+                    if (m_terrainMaterialIDData[i] == UINT32_MAX)
+                        invalidCount++;
+                    else if (m_terrainMaterialIDData[i] > maxID)
+                        maxID = m_terrainMaterialIDData[i];
+                }
+                Msg("* [GPUCulling] Terrain material IDs: count=%u, maxID=%u, invalid=%u",
+                    m_terrainObjectCount, maxID, invalidCount);
+                if (invalidCount > 0) {
+                    Msg("! [GPUCulling] WARNING: %u terrain batches have invalid material IDs!", invalidCount);
+                }
+                s_materialIDLogged = true;
+            }
+        }
+
+        if (m_terrainInstanceBuffer && !m_terrainInstanceData.empty()) {
+            cmdList->beginTrackingBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::CopyDest);
+            cmdList->writeBuffer(m_terrainInstanceBuffer,
+                m_terrainInstanceData.data(),
+                m_terrainObjectCount * sizeof(GPUInstanceData));
+            cmdList->setBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+        }
+
+        if (m_terrainBatchIndicesBuffer) {
+            xr_vector<u32> identityIndices(m_terrainObjectCount);
+            for (u32 i = 0; i < m_terrainObjectCount; i++)
+                identityIndices[i] = i;
+            cmdList->beginTrackingBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::CopyDest);
+            cmdList->writeBuffer(m_terrainBatchIndicesBuffer,
+                identityIndices.data(),
+                m_terrainObjectCount * sizeof(u32));
+            cmdList->setBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+        }
+
+        static bool s_terrainLogged = false;
+        if (!s_terrainLogged && m_terrainObjectCount > 0) {
+            Msg("* [GPUCulling] Terrain batches: %u objects uploaded", m_terrainObjectCount);
+            s_terrainLogged = true;
+        }
     }
 
     UploadInstanceData(ctx, geometry);
@@ -746,6 +956,47 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
             }
+
+            if (mgr->m_terrainObjectCount > 0 && mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer) {
+                u32 zeroTerrain = 0;
+                cmdList->writeBuffer(mgr->m_terrainVisibleCountBuffer, &zeroTerrain, sizeof(u32));
+
+                CullParamsCB terrainCB;
+                terrainCB.viewProj.transpose(Device.mFullTransform);
+                terrainCB.cameraPos = Device.vCameraPosition;
+                float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
+                terrainCB.maxDistanceSq = farPlane * farPlane;
+                terrainCB.objectCount = mgr->m_terrainObjectCount;
+                terrainCB.hizWidth = data.hizWidth;
+                terrainCB.hizHeight = data.hizHeight;
+                terrainCB.hizMipLevels = data.hizMipLevels;
+                mgr->ExtractFrustumPlanes(Device.mFullTransform, terrainCB.frustumPlanes);
+                cmdList->writeBuffer(mgr->m_cullParamsCB, &terrainCB, sizeof(terrainCB));
+
+                nvrhi::BindingSetDesc terrainBindDesc;
+                terrainBindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainObjectBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_terrainVisibleIndexBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_terrainVisibleCountBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_terrainDrawArgsBuffer)
+                };
+
+                nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, mgr->m_cullLayout);
+                if (terrainBindingSet) {
+                    nvrhi::ComputeState terrainState;
+                    terrainState.pipeline = mgr->m_cullPipeline;
+                    terrainState.bindings = { terrainBindingSet };
+                    cmdList->setComputeState(terrainState);
+
+                    u32 terrainGroupCount = (mgr->m_terrainObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                    cmdList->dispatch(terrainGroupCount, 1, 1);
+
+                    cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                }
+            }
         }
     );
 
@@ -774,6 +1025,26 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     } else {
         output.compactDrawArgs = VirtualResourceHandle();
         output.compactBatchIndices = VirtualResourceHandle();
+    }
+
+    output.terrainObjectCount = m_terrainObjectCount;
+
+    if (m_terrainObjectCount > 0 && m_terrainDrawArgsBuffer) {
+        ResourceDesc terrainArgsDesc;
+        terrainArgsDesc.type = ResourceDesc::Type::Buffer;
+        terrainArgsDesc.debugName = "GPUCull_TerrainDrawArgs";
+        terrainArgsDesc.bufferSize = m_maxTerrainObjects * sizeof(IndirectDrawArgs);
+        terrainArgsDesc.isUAV = true;
+        terrainArgsDesc.isTransient = false;
+
+        output.terrainDrawArgsBuffer = fg.ImportBuffer("gpu_cull_terrain_drawargs", m_terrainDrawArgsBuffer, terrainArgsDesc);
+
+        output.terrainCompactDrawArgs = VirtualResourceHandle();
+        output.terrainCompactBatchIndices = VirtualResourceHandle();
+    } else {
+        output.terrainDrawArgsBuffer = VirtualResourceHandle();
+        output.terrainCompactDrawArgs = VirtualResourceHandle();
+        output.terrainCompactBatchIndices = VirtualResourceHandle();
     }
 
     return output;
@@ -1640,6 +1911,9 @@ void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const Geometr
         const auto& batch = batches[i];
 
         if (batch.isSkinned)
+            continue;
+
+        if (batch.isTerrain)
             continue;
 
         GPUInstanceData inst;

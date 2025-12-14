@@ -25,6 +25,11 @@ public:
 
     void Compile(CBlender_Compile& C) override;
 
+    const char* GetDetailR() const { return oR_Name; }
+    const char* GetDetailG() const { return oG_Name; }
+    const char* GetDetailB() const { return oB_Name; }
+    const char* GetDetailA() const { return oA_Name; }
+
     CBlender_BmmD();
     ~CBlender_BmmD() override = default;
 };

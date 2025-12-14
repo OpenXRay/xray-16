@@ -38,6 +38,12 @@ struct BindlessForwardConfig {
     nvrhi::IBuffer* megaIndexBuffer = nullptr;
     bool megaBuffersReady = false;
 
+    nvrhi::IBuffer* terrainDrawArgsBuffer = nullptr;
+    nvrhi::IBuffer* terrainMaterialIDBuffer = nullptr;
+    nvrhi::IBuffer* terrainInstanceBuffer = nullptr;
+    nvrhi::IBuffer* terrainBatchIndicesBuffer = nullptr;
+    u32 terrainObjectCount = 0;
+
     bool IsValid() const {
         return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && totalObjectCount > 0;
     }
@@ -48,6 +54,10 @@ struct BindlessForwardConfig {
 
     bool UseMegaBuffers() const {
         return megaBuffersReady && megaVertexBuffer && megaIndexBuffer;
+    }
+
+    bool HasTerrain() const {
+        return terrainDrawArgsBuffer && terrainObjectCount > 0;
     }
 };
 

@@ -101,6 +101,11 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle compactDrawArgs;
     framegraph::VirtualResourceHandle compactBatchIndices;
     u32 maxObjects;
+
+    framegraph::VirtualResourceHandle terrainDrawArgsBuffer;
+    framegraph::VirtualResourceHandle terrainCompactDrawArgs;
+    framegraph::VirtualResourceHandle terrainCompactBatchIndices;
+    u32 terrainObjectCount;
 };
 
 struct GPUParticleCullOutput {
@@ -191,6 +196,15 @@ public:
     nvrhi::IBuffer* GetCompactBatchIndicesBuffer() const { return m_compactBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetCompactMaterialIDBuffer() const { return m_compactMaterialIDBuffer.Get(); }
 
+    u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
+    nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainBatchIndicesBuffer() const { return m_terrainBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactDrawArgsBuffer() const { return m_terrainCompactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactBatchIndicesBuffer() const { return m_terrainCompactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
+
 private:
     void CreateBuffers(ng::RenderDevice* device);
     void CreateComputePipeline(ng::RenderDevice* device);
@@ -225,6 +239,17 @@ private:
 
     bool m_compactEnabled = false;
 
+    nvrhi::BufferHandle m_terrainObjectBuffer;
+    nvrhi::BufferHandle m_terrainDrawArgsBuffer;
+    nvrhi::BufferHandle m_terrainVisibleIndexBuffer;
+    nvrhi::BufferHandle m_terrainVisibleCountBuffer;
+    nvrhi::BufferHandle m_terrainInstanceBuffer;
+    nvrhi::BufferHandle m_terrainBatchIndicesBuffer;
+    nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;
+    nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
+    nvrhi::BufferHandle m_terrainCompactCountBuffer;
+    nvrhi::BufferHandle m_terrainMaterialIDBuffer;
+
     nvrhi::BufferHandle m_debugBuffer;
     nvrhi::BufferHandle m_debugComputeParamsCB;
     nvrhi::BufferHandle m_debugGraphicsParamsCB;
@@ -258,6 +283,13 @@ private:
     xr_vector<GPUObjectData> m_objectData;
     xr_vector<IndirectDrawArgs> m_drawArgsData;
     xr_vector<u32> m_materialIDData;
+
+    u32 m_terrainObjectCount = 0;
+    u32 m_maxTerrainObjects = 0;
+    xr_vector<GPUObjectData> m_terrainObjectData;
+    xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
+    xr_vector<u32> m_terrainMaterialIDData;
+    xr_vector<GPUInstanceData> m_terrainInstanceData;
 
     nvrhi::BufferHandle m_megaVertexBuffer;
     nvrhi::BufferHandle m_megaIndexBuffer;

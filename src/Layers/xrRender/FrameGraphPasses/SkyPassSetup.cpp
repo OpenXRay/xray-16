@@ -89,6 +89,7 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     ibDesc.debugName = "SkyIndexBuffer";
     ibDesc.isIndexBuffer = true;
     ibDesc.initialState = nvrhi::ResourceStates::IndexBuffer;
+    ibDesc.keepInitialState = true;
     s_skyIndexBuffer = nvrhiDevice->createBuffer(ibDesc);
     
     nvrhi::TextureDesc placeholderDesc;
@@ -114,7 +115,6 @@ void InitializeSkyGeometry(ng::RenderDevice* device) {
     }
 
     cmdList->beginTrackingBufferState(s_skyVertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-    cmdList->beginTrackingBufferState(s_skyIndexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
     cmdList->close();
     nvrhiDevice->executeCommandList(cmdList);
@@ -179,7 +179,6 @@ framegraph::VirtualResourceHandle setupSkyPass(
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
             cmdList->beginTrackingBufferState(s_skyVertexBuffer, nvrhi::ResourceStates::VertexBuffer);
-            cmdList->beginTrackingBufferState(s_skyIndexBuffer, nvrhi::ResourceStates::IndexBuffer);
 
             auto* colorRT = fg.GetPhysicalTexture(data.colorOutput);
             auto* depthRT = fg.GetPhysicalTexture(data.depthOutput);

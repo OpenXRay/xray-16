@@ -30,6 +30,7 @@
 #include "FGDetailManager.h"
 #include "FrameGraphPasses/DetailPassSetup.h"
 #include "Bindless/MaterialBuffer.h"
+#include "Bindless/TerrainMaterialBuffer.h"
 #include "FrameGraphPasses/SkyPassSetup.h"
 #include "FrameGraphPasses/SunPassSetup.h"
 #include "FrameGraphPasses/SkinningPassSetup.h"
@@ -103,6 +104,11 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     m_geometryCollector = xr_make_unique<GeometryCollector>();
 
     g_geometryCollector = m_geometryCollector.get();
+
+    bindless::MaterialBuffer::Instance().Initialize(m_device);
+    bindless::TerrainMaterialBuffer::Instance().Initialize(m_device);
+    bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
+    Msg("* [FrameGraphRenderer] Bindless material buffers initialized (early)");
 
     m_gpuCullingManager = xr_make_unique<RENDER_NAMESPACE::GPUCullingManager>();
 
@@ -426,9 +432,6 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             }
         }
 
-        bindless::MaterialBuffer::Instance().Initialize(m_device);
-        bindless::DrawMaterialIDBuffer::Instance().Initialize(m_device, 65536);
-
         if (m_gpuCullingManager->IsEnabled()) {
 
             auto cullOutput = m_gpuCullingManager->SetupCullingPass(
@@ -501,6 +504,14 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
             bindlessConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
             bindlessConfig.megaBuffersReady = true;
+        }
+
+        if (m_gpuCullingManager->GetTerrainObjectCount() > 0) {
+            bindlessConfig.terrainDrawArgsBuffer = m_gpuCullingManager->GetTerrainDrawArgsBuffer();
+            bindlessConfig.terrainMaterialIDBuffer = m_gpuCullingManager->GetTerrainMaterialIDBuffer();
+            bindlessConfig.terrainInstanceBuffer = m_gpuCullingManager->GetTerrainInstanceBuffer();
+            bindlessConfig.terrainBatchIndicesBuffer = m_gpuCullingManager->GetTerrainBatchIndicesBuffer();
+            bindlessConfig.terrainObjectCount = m_gpuCullingManager->GetTerrainObjectCount();
         }
     }
 
@@ -794,7 +805,12 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     }
 
     if (m_materialCache) {
-        batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+        if (m_materialCache->IsTerrainMaterial(visual)) {
+            batch.isTerrain = true;
+            batch.terrainMaterialID = m_materialCache->PreRegisterTerrainMaterial(visual);
+        } else {
+            batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
+        }
     }
 
     if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {

@@ -52,6 +52,9 @@ struct GeometryBatch {
 
     bool isSkinned = false;
 
+    bool isTerrain = false;
+    u32 terrainMaterialID = UINT32_MAX;
+
     float ssa = 0.0f;
 
     shared_str debugName;

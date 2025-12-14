@@ -15,6 +15,7 @@
 #include "Layers/xrRender/GPUCullingManager.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
 #include "xrCore/FMesh.hpp"
 
 namespace xray::render::RENDER_NAMESPACE
@@ -34,6 +35,11 @@ static nvrhi::ShaderHandle s_bindlessVS;
 static nvrhi::ShaderHandle s_bindlessPS;
 static nvrhi::BufferHandle s_drawIndexBuffer;
 static bool s_bindlessInitialized = false;
+
+static nvrhi::GraphicsPipelineHandle s_terrainPipeline;
+static nvrhi::BindingLayoutHandle s_terrainLayout;
+static nvrhi::ShaderHandle s_terrainPS;
+static bool s_terrainInitialized = false;
 
 static void InitializeBindlessPipeline(ng::RenderDevice* device, nvrhi::IFramebuffer* framebuffer);
 
@@ -267,6 +273,7 @@ void renderBindlessForward(
 
     if (materialCache) {
         materialCache->FinalizePendingMaterials(ctx);
+        materialCache->FinalizePendingTerrainMaterials(ctx);
     }
 
     auto& matBuffer = MaterialBuffer::Instance();
@@ -553,6 +560,145 @@ void renderBindlessForward(
     cmdList->drawIndexedIndirectCount(0, config.totalObjectCount);
 
     s_gpuDrivenDraws += config.totalObjectCount;
+
+    if (config.HasTerrain() && config.UseMegaBuffers()) {
+        if (!s_terrainInitialized) {
+            auto* shaderLoader = GEnv.Render->GetShaderLoader();
+            if (shaderLoader) {
+                auto terrainPsResult = shaderLoader->LoadPixelShader("bindless_terrain", "main");
+                if (terrainPsResult.handle) {
+                    s_terrainPS = terrainPsResult.handle;
+
+                    nvrhi::BindingLayoutDesc terrainLayoutDesc;
+                    terrainLayoutDesc.visibility = nvrhi::ShaderType::All;
+                    terrainLayoutDesc.bindings = {
+                        nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
+                        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
+                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
+                        nvrhi::BindingLayoutItem::Sampler(0),
+                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(14),
+                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(15),
+                        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(16),
+                    };
+                    s_terrainLayout = nvDevice->createBindingLayout(terrainLayoutDesc);
+
+                    if (s_terrainLayout && s_bindlessVS) {
+                        nvrhi::GraphicsPipelineDesc terrainPipeDesc;
+                        terrainPipeDesc.VS = s_bindlessVS;
+                        terrainPipeDesc.PS = s_terrainPS;
+                        terrainPipeDesc.inputLayout = s_bindlessInputLayout;
+
+                        auto* backendDevice = device->GetBackend();
+                        nvrhi::IBindingLayout* bindlessLayout = backendDevice ? backendDevice->GetBindlessLayout() : nullptr;
+                        if (bindlessLayout) {
+                            terrainPipeDesc.bindingLayouts = { s_terrainLayout, bindlessLayout };
+                            Msg("* [TerrainForward] Pipeline created WITH bindless layout");
+                        } else {
+                            terrainPipeDesc.bindingLayouts = { s_terrainLayout };
+                            Msg("! [TerrainForward] Pipeline created WITHOUT bindless layout - textures will be black!");
+                        }
+
+                        terrainPipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+                        terrainPipeDesc.renderState.depthStencilState.depthTestEnable = true;
+                        terrainPipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+                        terrainPipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+                        terrainPipeDesc.renderState.rasterState.frontCounterClockwise = false;
+                        terrainPipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+
+                        s_terrainPipeline = nvDevice->createGraphicsPipeline(terrainPipeDesc, framebuffer);
+                        if (s_terrainPipeline) {
+                            s_terrainInitialized = true;
+                            Msg("* [BindlessForward] Terrain pipeline initialized");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (s_terrainInitialized && s_terrainPipeline) {
+            auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
+            terrainMatBuffer.Upload(ctx);
+
+            if (!terrainMatBuffer.GetBuffer() || !config.terrainInstanceBuffer ||
+                !config.terrainBatchIndicesBuffer || !config.terrainMaterialIDBuffer ||
+                !config.terrainDrawArgsBuffer) {
+                static bool s_terrainWarnOnce = false;
+                if (!s_terrainWarnOnce) {
+                    Msg("! [BindlessForward] Terrain buffers not ready: matBuf=%p, inst=%p, batchIdx=%p, matID=%p, drawArgs=%p",
+                        terrainMatBuffer.GetBuffer(), config.terrainInstanceBuffer,
+                        config.terrainBatchIndicesBuffer, config.terrainMaterialIDBuffer,
+                        config.terrainDrawArgsBuffer);
+                    s_terrainWarnOnce = true;
+                }
+            } else {
+                nvrhi::BindingSetDesc terrainBindDesc;
+                terrainBindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMatBuffer.GetBuffer()),
+                    nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.terrainInstanceBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.terrainBatchIndicesBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.terrainMaterialIDBuffer),
+                };
+
+                auto terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, s_terrainLayout);
+                if (terrainBindingSet) {
+                    nvrhi::GraphicsState terrainState;
+                    terrainState.pipeline = s_terrainPipeline;
+                    terrainState.framebuffer = framebuffer;
+                    terrainState.bindings = { terrainBindingSet };
+
+                    if (backend) {
+                        auto* bindlessTable = backend->GetBindlessDescriptorTable();
+                        if (bindlessTable) {
+                            terrainState.addBindingSet(bindlessTable);
+                        } else {
+                            static bool s_warnOnce = false;
+                            if (!s_warnOnce) {
+                                Msg("! [TerrainForward] GetBindlessDescriptorTable() returned null!");
+                                s_warnOnce = true;
+                            }
+                        }
+                    } else {
+                        static bool s_warnOnce = false;
+                        if (!s_warnOnce) {
+                            Msg("! [TerrainForward] backend is null - bindless textures won't work!");
+                            s_warnOnce = true;
+                        }
+                    }
+
+                    terrainState.vertexBuffers = {
+                        {config.megaVertexBuffer, 0, 0},
+                        {s_drawIndexBuffer, 1, 0}
+                    };
+                    terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+                    terrainState.indirectParams = config.terrainDrawArgsBuffer;
+                    terrainState.viewport.addViewport(viewport);
+                    terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+
+                    cmdList->setGraphicsState(terrainState);
+
+                    static bool s_terrainDrawLogged = false;
+                    if (!s_terrainDrawLogged) {
+                        Msg("* [TerrainDraw] Drawing %u terrain batches, megaVB=%p, megaIB=%p, drawArgs=%p, matIDs=%p, inst=%p, batchIdx=%p",
+                            config.terrainObjectCount, config.megaVertexBuffer, config.megaIndexBuffer,
+                            config.terrainDrawArgsBuffer, config.terrainMaterialIDBuffer,
+                            config.terrainInstanceBuffer, config.terrainBatchIndicesBuffer);
+                        s_terrainDrawLogged = true;
+                    }
+
+                    for (u32 i = 0; i < config.terrainObjectCount; i++) {
+                        cmdList->drawIndexedIndirect(i * sizeof(IndirectDrawArgs));
+                    }
+
+                    s_gpuDrivenDraws += config.terrainObjectCount;
+                }
+            }
+        }
+    }
 
 }
 
