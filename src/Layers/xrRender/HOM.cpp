@@ -365,6 +365,8 @@ BOOL CHOM::visible(vis_data& vis) const
         return TRUE; // not at this time :)
     if (!bEnabled)
         return TRUE; // return - everything visible
+    if (!vis.box.is_valid() || !_valid(vis.box))
+        return TRUE; // invalid box
 
     ScopeStatTimer scopeStats(stats.Total, stats.TotalTimerLock);
 
