@@ -67,18 +67,21 @@ public:
 
     DetailHeader dtH;
 
+    static constexpr u32 LOD_COUNT = 3;
+    static constexpr u32 LOD_SEGMENTS[LOD_COUNT] = {9, 4, 2};
+
     nvrhi::BufferHandle instanceBuffer;
 
-    nvrhi::BufferHandle bladeVertexBuffer;
-    nvrhi::BufferHandle bladeIndexBuffer;
-    u32 bladeVertexCount = 0;
-    u32 bladeIndexCount = 0;
-    xr_vector<BladeVertex> bladeVertices;
-    xr_vector<u16> bladeIndices;
+    nvrhi::BufferHandle bladeVertexBuffer[LOD_COUNT];
+    nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
+    u32 bladeVertexCount[LOD_COUNT] = {0, 0, 0};
+    u32 bladeIndexCount[LOD_COUNT] = {0, 0, 0};
+    xr_vector<BladeVertex> bladeVertices[LOD_COUNT];
+    xr_vector<u16> bladeIndices[LOD_COUNT];
 
-    nvrhi::BufferHandle visibleIndicesBuffer;
-    nvrhi::BufferHandle visibleCountBuffer;
-    nvrhi::BufferHandle drawArgsBuffer;
+    nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];
+    nvrhi::BufferHandle visibleCountBuffer[LOD_COUNT];
+    nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];
     nvrhi::BufferHandle slotAABBBuffer;
 
     nvrhi::BufferHandle visibleSlotIDsBuffer;
@@ -150,6 +153,8 @@ public:
     void DispatchWindCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time);
 
     void GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 8);
+
+    void RegenerateBladeGeometry(nvrhi::ICommandList* cmdList);
 
     void ComputeSlotAABBs();
 

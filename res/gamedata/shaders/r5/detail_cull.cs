@@ -34,7 +34,9 @@ cbuffer DetailCullParams : register(b5)
     uint g_hiz_width;
     uint g_hiz_height;
     uint g_hiz_mip_levels;
-    uint3 g_pad;
+    float g_lod_distance_close_sqr;
+    float g_lod_distance_mid_sqr;
+    uint g_pad;
 };
 
 StructuredBuffer<SlotAABB> g_slot_aabbs : register(t0);
@@ -43,25 +45,46 @@ StructuredBuffer<InstanceData> g_all_instances : register(t1);
 Texture2D<float> g_hiz_pyramid : register(t2);
 SamplerState g_point_sampler : register(s0);
 
-RWStructuredBuffer<InstanceData> g_visible_unified : register(u0);
+RWStructuredBuffer<InstanceData> g_visible_lod0 : register(u0);
+RWByteAddressBuffer g_visible_count_lod0 : register(u1);
+RWByteAddressBuffer g_indirect_args_lod0 : register(u2);
 
-RWByteAddressBuffer g_visible_count : register(u1);
+RWStructuredBuffer<InstanceData> g_visible_lod1 : register(u3);
+RWByteAddressBuffer g_visible_count_lod1 : register(u4);
+RWByteAddressBuffer g_indirect_args_lod1 : register(u5);
+
+RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u6);
+RWByteAddressBuffer g_visible_count_lod2 : register(u7);
+RWByteAddressBuffer g_indirect_args_lod2 : register(u8);
 
 RWStructuredBuffer<uint> g_visible_slot_ids : register(u33);
 RWByteAddressBuffer g_visible_slot_counter : register(u34);
 
-RWByteAddressBuffer g_indirect_args_unified : register(u2);
 
-
-void AppendInstance(InstanceData inst)
+void AppendInstanceLOD(InstanceData inst)
 {
-    uint output_idx = 0;
-    g_visible_count.InterlockedAdd(0, 1, output_idx);
+    float3 to_camera = inst.pos - g_camera_pos;
+    float dist_sqr = dot(to_camera, to_camera);
 
-    g_visible_unified[output_idx] = inst;
-
-    uint dummy;
-    g_indirect_args_unified.InterlockedAdd(4, 1, dummy);
+    uint idx;
+    if (dist_sqr < g_lod_distance_close_sqr)
+    {
+        g_visible_count_lod0.InterlockedAdd(0, 1, idx);
+        g_visible_lod0[idx] = inst;
+        g_indirect_args_lod0.InterlockedAdd(4, 1, idx);
+    }
+    else if (dist_sqr < g_lod_distance_mid_sqr)
+    {
+        g_visible_count_lod1.InterlockedAdd(0, 1, idx);
+        g_visible_lod1[idx] = inst;
+        g_indirect_args_lod1.InterlockedAdd(4, 1, idx);
+    }
+    else
+    {
+        g_visible_count_lod2.InterlockedAdd(0, 1, idx);
+        g_visible_lod2[idx] = inst;
+        g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
+    }
 }
 
 [numthreads(256, 1, 1)]
@@ -105,6 +128,6 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
-        AppendInstance(inst);
+        AppendInstanceLOD(inst);
     }
 }

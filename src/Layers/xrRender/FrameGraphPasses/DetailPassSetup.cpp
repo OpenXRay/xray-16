@@ -22,6 +22,9 @@ extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
 extern ENGINE_API float ps_r3_grass_sss_intensity;
 extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
 
+extern ENGINE_API float ps_r3_grass_blade_width;
+extern ENGINE_API float ps_r3_grass_blade_height;
+
 namespace xray::render::RENDER_NAMESPACE::passes
 {
 
@@ -107,6 +110,13 @@ DefaultOutputLayout setupDetailPass(
             {
                 data.detailManager->UploadBufferData(cmdList);
                 s_detailDataUploaded = true;
+            }
+
+            static float s_lastBladeWidth = ps_r3_grass_blade_width;
+            if (s_lastBladeWidth != ps_r3_grass_blade_width)
+            {
+                data.detailManager->RegenerateBladeGeometry(cmdList);
+                s_lastBladeWidth = ps_r3_grass_blade_width;
             }
 
             data.detailManager->DispatchWindCompute(cmdList, data.device->GetNVRHIDevice(), Device.fTimeGlobal);
@@ -209,7 +219,8 @@ DefaultOutputLayout setupDetailPass(
                 Fvector4 grass_color_base;
                 Fvector4 grass_sss_color;
                 float grass_color_variation;
-                float pad0, pad1, pad2;
+                float grass_blade_height;
+                float pad0, pad1;
             };
 
             float windAngleDeg = 0.0f;
@@ -234,7 +245,8 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
             frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
             frameConstants.grass_color_variation = ps_r3_grass_color_variation;
-            frameConstants.pad0 = frameConstants.pad1 = frameConstants.pad2 = 0.0f;
+            frameConstants.grass_blade_height = ps_r3_grass_blade_height;
+            frameConstants.pad0 = frameConstants.pad1 = 0.0f;
 
             cbDesc.byteSize = sizeof(DetailFrameConstants);
             cbDesc.debugName = "DetailGlobals";
@@ -321,48 +333,53 @@ DefaultOutputLayout setupDetailPass(
             s5Desc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
             nvrhi::SamplerHandle s5_material = data.device->GetNVRHIDevice()->createSampler(s5Desc);
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(3, detailGlobalsCB),
-                nvrhi::BindingSetItem::ConstantBuffer(4, dynLightCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dummyMaterials),
-                nvrhi::BindingSetItem::TypedBuffer_SRV(32, dummySlotIndirection),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(33, data.detailManager->visibleIndicesBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(34, grassTintsBuffer),
-                nvrhi::BindingSetItem::Sampler(0, s0_LinearSampler),
-                nvrhi::BindingSetItem::Sampler(1, s1_nofilter),
-                nvrhi::BindingSetItem::Sampler(2, s2_rtlinear),
-                nvrhi::BindingSetItem::Sampler(3, s3_linear),
-                nvrhi::BindingSetItem::Sampler(4, s4_base),
-                nvrhi::BindingSetItem::Sampler(5, s5_material),
-            };
-
-            nvrhi::BindingSetHandle bindingSet = data.device->GetNVRHIDevice()->createBindingSet(bindDesc, data.detailManager->graphicsBindingLayout);
-
-            nvrhi::GraphicsState state;
-            state.framebuffer = framebuffer;
-            state.viewport.addViewportAndScissorRect(nvrhi::Viewport((float)data.width, (float)data.height));
-            state.pipeline = data.detailManager->graphicsPipeline;
-            state.bindings = { bindingSet };
-
+            nvrhi::IBindingSet* bindlessTable = nullptr;
             auto* backend = data.device->GetBackend();
             if (backend) {
-                auto* bindlessTable = backend->GetBindlessDescriptorTable();
+                bindlessTable = backend->GetBindlessDescriptorTable();
+            }
+
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+            {
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(3, detailGlobalsCB),
+                    nvrhi::BindingSetItem::ConstantBuffer(4, dynLightCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dummyMaterials),
+                    nvrhi::BindingSetItem::TypedBuffer_SRV(32, dummySlotIndirection),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, data.detailManager->visibleInstancesBuffer[lod]),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(34, grassTintsBuffer),
+                    nvrhi::BindingSetItem::Sampler(0, s0_LinearSampler),
+                    nvrhi::BindingSetItem::Sampler(1, s1_nofilter),
+                    nvrhi::BindingSetItem::Sampler(2, s2_rtlinear),
+                    nvrhi::BindingSetItem::Sampler(3, s3_linear),
+                    nvrhi::BindingSetItem::Sampler(4, s4_base),
+                    nvrhi::BindingSetItem::Sampler(5, s5_material),
+                };
+
+                nvrhi::BindingSetHandle bindingSet = data.device->GetNVRHIDevice()->createBindingSet(bindDesc, data.detailManager->graphicsBindingLayout);
+
+                nvrhi::GraphicsState state;
+                state.framebuffer = framebuffer;
+                state.viewport.addViewportAndScissorRect(nvrhi::Viewport((float)data.width, (float)data.height));
+                state.pipeline = data.detailManager->graphicsPipeline;
+                state.bindings = { bindingSet };
+
                 if (bindlessTable) {
                     state.addBindingSet(bindlessTable);
                 }
+
+                state.indexBuffer = { data.detailManager->bladeIndexBuffer[lod], nvrhi::Format::R16_UINT, 0 };
+                state.vertexBuffers = {{ data.detailManager->bladeVertexBuffer[lod], 0, 0 }};
+
+                state.indirectParams = data.detailManager->drawArgsBuffer[lod];
+
+                cmdList->setGraphicsState(state);
+                cmdList->drawIndexedIndirect(0);
             }
-
-            state.indexBuffer = { data.detailManager->bladeIndexBuffer, nvrhi::Format::R16_UINT, 0 };
-            state.vertexBuffers = {{ data.detailManager->bladeVertexBuffer, 0, 0 }};
-
-            state.indirectParams = data.detailManager->drawArgsBuffer;
-
-            cmdList->setGraphicsState(state);
-            cmdList->drawIndexedIndirect(0);
         }
     );
 

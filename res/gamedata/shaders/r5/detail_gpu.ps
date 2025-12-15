@@ -19,7 +19,9 @@ cbuffer DetailGlobals : register(b3)
     float4 grass_color_base;
     float4 grass_sss_color;
     float grass_color_variation;
-    float _pad0, _pad1, _pad2;
+    uint current_lod_level;
+    uint debug_lod_colors;
+    float _pad0, _pad1;
 };
 
 struct GrassObjectTint

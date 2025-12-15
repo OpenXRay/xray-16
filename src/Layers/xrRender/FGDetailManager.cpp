@@ -14,6 +14,12 @@ extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
 extern ENGINE_API u32 ps_r3_grass_wind_octaves;
 
+extern ENGINE_API float ps_r3_grass_lod_close;
+extern ENGINE_API float ps_r3_grass_lod_mid;
+
+extern ENGINE_API float ps_r3_grass_blade_width;
+extern ENGINE_API float ps_r3_grass_blade_height;
+
 namespace xray::render::RENDER_NAMESPACE
 {
 
@@ -434,72 +440,75 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = visibleBufferCapacity * sizeof(InstanceData);
-        desc.structStride = sizeof(InstanceData);
-        desc.debugName = "DetailVisibleInstances";
-        desc.canHaveUAVs = true;
-        desc.canHaveTypedViews = false;
-        desc.isVertexBuffer = false;
-        desc.isIndexBuffer = false;
-        desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
-        desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
-
-        visibleIndicesBuffer = device->createBuffer(desc);
-        if (!visibleIndicesBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create visible instances buffer");
-            return false;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = visibleBufferCapacity * sizeof(InstanceData);
+            desc.structStride = sizeof(InstanceData);
+            desc.debugName = ("DetailVisibleLOD" + std::to_string(lod)).c_str();
+            desc.canHaveUAVs = true;
+            desc.canHaveTypedViews = false;
+            desc.isVertexBuffer = false;
+            desc.isIndexBuffer = false;
+            desc.isConstantBuffer = false;
+            desc.isDrawIndirectArgs = false;
+            desc.canHaveRawViews = false;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = false;
+
+            visibleInstancesBuffer[lod] = device->createBuffer(desc);
+            if (!visibleInstancesBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create visible instances buffer LOD%u", lod);
+                return false;
+            }
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32);
-        desc.structStride = 0;
-        desc.debugName = "DetailVisibleCount";
-        desc.canHaveUAVs = true;
-        desc.canHaveTypedViews = false;
-        desc.isVertexBuffer = false;
-        desc.isIndexBuffer = false;
-        desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
-        desc.canHaveRawViews = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
-
-        visibleCountBuffer = device->createBuffer(desc);
-        if (!visibleCountBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create visible count buffer");
-            return false;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = sizeof(u32);
+            desc.structStride = 0;
+            desc.debugName = ("DetailVisibleCountLOD" + std::to_string(lod)).c_str();
+            desc.canHaveUAVs = true;
+            desc.canHaveTypedViews = false;
+            desc.isVertexBuffer = false;
+            desc.isIndexBuffer = false;
+            desc.isConstantBuffer = false;
+            desc.isDrawIndirectArgs = false;
+            desc.canHaveRawViews = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = false;
+
+            visibleCountBuffer[lod] = device->createBuffer(desc);
+            if (!visibleCountBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create visible count buffer LOD%u", lod);
+                return false;
+            }
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = 5 * sizeof(u32);
-        desc.structStride = 0;
-        desc.debugName = "DetailDrawArgs";
-        desc.canHaveUAVs = true;
-        desc.canHaveTypedViews = false;
-        desc.isVertexBuffer = false;
-        desc.isIndexBuffer = false;
-        desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = true;
-        desc.canHaveRawViews = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = false;
-
-        drawArgsBuffer = device->createBuffer(desc);
-        if (!drawArgsBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create draw args buffer");
-            return false;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = 5 * sizeof(u32);
+            desc.structStride = 0;
+            desc.debugName = ("DetailDrawArgsLOD" + std::to_string(lod)).c_str();
+            desc.canHaveUAVs = true;
+            desc.canHaveTypedViews = false;
+            desc.isVertexBuffer = false;
+            desc.isIndexBuffer = false;
+            desc.isConstantBuffer = false;
+            desc.isDrawIndirectArgs = true;
+            desc.canHaveRawViews = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = false;
+
+            drawArgsBuffer[lod] = device->createBuffer(desc);
+            if (!drawArgsBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create draw args buffer LOD%u", lod);
+                return false;
+            }
         }
     }
 
@@ -572,56 +581,59 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    xr_vector<BladeVertex> bladeVertices;
-    xr_vector<u16> bladeIndices;
-    GenerateBladeGeometry(bladeVertices, bladeIndices, 8);
-
-    bladeVertexCount = bladeVertices.size();
-    bladeIndexCount = bladeIndices.size();
-
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = bladeVertices.size() * sizeof(BladeVertex);
-        desc.structStride = 0;
-        desc.debugName = "DetailBladeVB";
-        desc.canHaveUAVs = false;
-        desc.canHaveTypedViews = false;
-        desc.isVertexBuffer = true;
-        desc.isIndexBuffer = false;
-        desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
-        desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::VertexBuffer;
-        desc.keepInitialState = true;
+        GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
+        bladeVertexCount[lod] = static_cast<u32>(bladeVertices[lod].size());
+        bladeIndexCount[lod] = static_cast<u32>(bladeIndices[lod].size());
 
-        bladeVertexBuffer = device->createBuffer(desc);
-        if (!bladeVertexBuffer)
+        Msg("* [FGDetailManager] LOD%u: %u segments, %u vertices, %u indices",
+            lod, LOD_SEGMENTS[lod], bladeVertexCount[lod], bladeIndexCount[lod]);
+
         {
-            Msg("! [FGDetailManager] Failed to create blade vertex buffer");
-            return false;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = bladeVertices[lod].size() * sizeof(BladeVertex);
+            desc.structStride = 0;
+            desc.debugName = ("DetailBladeVB_LOD" + std::to_string(lod)).c_str();
+            desc.canHaveUAVs = false;
+            desc.canHaveTypedViews = false;
+            desc.isVertexBuffer = true;
+            desc.isIndexBuffer = false;
+            desc.isConstantBuffer = false;
+            desc.isDrawIndirectArgs = false;
+            desc.canHaveRawViews = false;
+            desc.initialState = nvrhi::ResourceStates::VertexBuffer;
+            desc.keepInitialState = true;
+
+            bladeVertexBuffer[lod] = device->createBuffer(desc);
+            if (!bladeVertexBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create blade vertex buffer LOD%u", lod);
+                return false;
+            }
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.byteSize = bladeIndices.size() * sizeof(u16);
-        desc.structStride = 0;
-        desc.debugName = "DetailBladeIB";
-        desc.canHaveUAVs = false;
-        desc.canHaveTypedViews = false;
-        desc.isVertexBuffer = false;
-        desc.isIndexBuffer = true;
-        desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
-        desc.canHaveRawViews = false;
-        desc.initialState = nvrhi::ResourceStates::IndexBuffer;
-        desc.keepInitialState = true;
-
-        bladeIndexBuffer = device->createBuffer(desc);
-        if (!bladeIndexBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create blade index buffer");
-            return false;
+            nvrhi::BufferDesc desc;
+            desc.byteSize = bladeIndices[lod].size() * sizeof(u16);
+            desc.structStride = 0;
+            desc.debugName = ("DetailBladeIB_LOD" + std::to_string(lod)).c_str();
+            desc.canHaveUAVs = false;
+            desc.canHaveTypedViews = false;
+            desc.isVertexBuffer = false;
+            desc.isIndexBuffer = true;
+            desc.isConstantBuffer = false;
+            desc.isDrawIndirectArgs = false;
+            desc.canHaveRawViews = false;
+            desc.initialState = nvrhi::ResourceStates::IndexBuffer;
+            desc.keepInitialState = true;
+
+            bladeIndexBuffer[lod] = device->createBuffer(desc);
+            if (!bladeIndexBuffer[lod])
+            {
+                Msg("! [FGDetailManager] Failed to create blade index buffer LOD%u", lod);
+                return false;
+            }
         }
     }
 
@@ -633,14 +645,19 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 void FGDetailManager::DestroyGPUBuffers()
 {
     instanceBuffer = nullptr;
-    visibleIndicesBuffer = nullptr;
-    visibleCountBuffer = nullptr;
-    drawArgsBuffer = nullptr;
+
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        visibleInstancesBuffer[lod] = nullptr;
+        visibleCountBuffer[lod] = nullptr;
+        drawArgsBuffer[lod] = nullptr;
+        bladeVertexBuffer[lod] = nullptr;
+        bladeIndexBuffer[lod] = nullptr;
+    }
+
     slotAABBBuffer = nullptr;
     visibleSlotIDsBuffer = nullptr;
     visibleSlotCounterBuffer = nullptr;
-    bladeVertexBuffer = nullptr;
-    bladeIndexBuffer = nullptr;
     computePipeline = nullptr;
     graphicsPipeline = nullptr;
     computeBindingLayout = nullptr;
@@ -811,15 +828,16 @@ void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr
     vertices.clear();
     indices.clear();
 
-    float width_base = 0.05f;
-    float width_tip = 0.01f;
-    float height = 1.0f;
+    float width_base = ps_r3_grass_blade_width;
+    float height = ps_r3_grass_blade_height;
 
-    for (int i = 0; i <= segments; i++)
+    for (int i = 0; i < segments; i++)
     {
         float t = float(i) / float(segments);
         float y = t * height;
-        float width = width_base + (width_tip - width_base) * t;
+
+        float taper = 1.0f - powf(t, 0.7f);
+        float width = width_base * taper;
 
         BladeVertex v_left;
         v_left.pos.set(-width * 0.5f, y, 0.0f);
@@ -836,7 +854,18 @@ void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr
         vertices.push_back(v_right);
     }
 
-    for (int i = 0; i < segments; i++)
+    {
+        BladeVertex v_tip;
+        v_tip.pos.set(0.0f, height, 0.0f);
+        v_tip.uv.set(0.5f, 0.0f);
+        v_tip.t = 1.0f;
+        v_tip.width_scale = 0.0f;
+        vertices.push_back(v_tip);
+    }
+
+    u16 tipIndex = static_cast<u16>(segments * 2);
+
+    for (int i = 0; i < segments - 1; i++)
     {
         u16 base = i * 2;
         indices.push_back(base);
@@ -845,6 +874,32 @@ void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr
         indices.push_back(base + 1);
         indices.push_back(base + 2);
         indices.push_back(base + 3);
+    }
+
+    {
+        u16 base = (segments - 1) * 2;
+        indices.push_back(base);
+        indices.push_back(tipIndex);
+        indices.push_back(base + 1);
+    }
+}
+
+void FGDetailManager::RegenerateBladeGeometry(nvrhi::ICommandList* cmdList)
+{
+    if (!cmdList)
+        return;
+
+    Msg("* [FGDetailManager] Regenerating blade geometry (width=%.3f, height=%.2f)",
+        ps_r3_grass_blade_width, ps_r3_grass_blade_height);
+
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        GenerateBladeGeometry(bladeVertices[lod], bladeIndices[lod], LOD_SEGMENTS[lod]);
+        bladeVertexCount[lod] = static_cast<u32>(bladeVertices[lod].size());
+        bladeIndexCount[lod] = static_cast<u32>(bladeIndices[lod].size());
+
+        cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
+        cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
     }
 }
 
@@ -903,11 +958,11 @@ void FGDetailManager::UploadBufferData(nvrhi::ICommandList* cmdList)
 
     cmdList->writeBuffer(instanceBuffer, all_instances.data(), all_instances.size() * sizeof(InstanceData));
 
-    xr_vector<BladeVertex> bladeVertices;
-    xr_vector<u16> bladeIndices;
-    GenerateBladeGeometry(bladeVertices, bladeIndices, 8);
-    cmdList->writeBuffer(bladeVertexBuffer, bladeVertices.data(), bladeVertices.size() * sizeof(BladeVertex));
-    cmdList->writeBuffer(bladeIndexBuffer, bladeIndices.data(), bladeIndices.size() * sizeof(u16));
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        cmdList->writeBuffer(bladeVertexBuffer[lod], bladeVertices[lod].data(), bladeVertices[lod].size() * sizeof(BladeVertex));
+        cmdList->writeBuffer(bladeIndexBuffer[lod], bladeIndices[lod].data(), bladeIndices[lod].size() * sizeof(u16));
+    }
 
     cmdList->writeBuffer(slotAABBBuffer, slot_aabbs.data(), slot_aabbs.size() * sizeof(SlotAABB));
 }
@@ -933,6 +988,12 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
         nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
         nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
         nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(3),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(4),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(5),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(7),
+        nvrhi::BindingLayoutItem::RawBuffer_UAV(8),
         nvrhi::BindingLayoutItem::StructuredBuffer_UAV(33),
         nvrhi::BindingLayoutItem::RawBuffer_UAV(34),
     };
@@ -1080,7 +1141,9 @@ void FGDetailManager::DispatchCulling(
         u32 hizWidth;
         u32 hizHeight;
         u32 hizMipLevels;
-        u32 pad[3];
+        float lodDistanceCloseSqr;
+        float lodDistanceMidSqr;
+        u32 pad;
     };
 
     DetailCullParams params;
@@ -1101,7 +1164,9 @@ void FGDetailManager::DispatchCulling(
     params.hizWidth = hiZWidth;
     params.hizHeight = hiZHeight;
     params.hizMipLevels = hiZMipLevels;
-    params.pad[0] = params.pad[1] = params.pad[2] = 0;
+    params.lodDistanceCloseSqr = ps_r3_grass_lod_close * ps_r3_grass_lod_close;
+    params.lodDistanceMidSqr = ps_r3_grass_lod_mid * ps_r3_grass_lod_mid;
+    params.pad = 0;
 
     nvrhi::BufferDesc cbDesc;
     cbDesc.byteSize = sizeof(DetailCullParams);
@@ -1113,21 +1178,27 @@ void FGDetailManager::DispatchCulling(
     nvrhi::BufferHandle cullParamsCB = device->createBuffer(cbDesc);
     cmdList->writeBuffer(cullParamsCB, &params, sizeof(params));
 
-    cmdList->beginTrackingBufferState(visibleIndicesBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(visibleCountBuffer, nvrhi::ResourceStates::UnorderedAccess);
-    cmdList->beginTrackingBufferState(drawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        cmdList->beginTrackingBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->beginTrackingBufferState(visibleCountBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
+        cmdList->beginTrackingBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::UnorderedAccess);
+    }
     cmdList->beginTrackingBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
     u32 zero = 0;
-    cmdList->clearBufferUInt(visibleCountBuffer, zero);
     cmdList->clearBufferUInt(visibleSlotCounterBuffer, zero);
 
     struct IndirectDrawArgs { u32 indexCount, instanceCount, startIndex; s32 baseVertex; u32 startInstance; };
-    IndirectDrawArgs args = { bladeIndexCount, 0, 0, 0, 0 };
-    cmdList->writeBuffer(drawArgsBuffer, &args, sizeof(args));
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        cmdList->clearBufferUInt(visibleCountBuffer[lod], zero);
+        IndirectDrawArgs args = { bladeIndexCount[lod], 0, 0, 0, 0 };
+        cmdList->writeBuffer(drawArgsBuffer[lod], &args, sizeof(args));
+    }
 
     if (!computePipeline)
         return;
@@ -1148,9 +1219,15 @@ void FGDetailManager::DispatchCulling(
         nvrhi::BindingSetItem::StructuredBuffer_SRV(1, instanceBuffer),
         nvrhi::BindingSetItem::Texture_SRV(2, hiZPyramid),
         nvrhi::BindingSetItem::Sampler(0, pointSampler),
-        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleIndicesBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer),
-        nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
+        nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer[0]),
+        nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer[0]),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, visibleInstancesBuffer[1]),
+        nvrhi::BindingSetItem::RawBuffer_UAV(4, visibleCountBuffer[1]),
+        nvrhi::BindingSetItem::RawBuffer_UAV(5, drawArgsBuffer[1]),
+        nvrhi::BindingSetItem::StructuredBuffer_UAV(6, visibleInstancesBuffer[2]),
+        nvrhi::BindingSetItem::RawBuffer_UAV(7, visibleCountBuffer[2]),
+        nvrhi::BindingSetItem::RawBuffer_UAV(8, drawArgsBuffer[2]),
         nvrhi::BindingSetItem::StructuredBuffer_UAV(33, visibleSlotIDsBuffer),
         nvrhi::BindingSetItem::RawBuffer_UAV(34, visibleSlotCounterBuffer),
     };
@@ -1166,8 +1243,11 @@ void FGDetailManager::DispatchCulling(
     u32 numGroups = (slot_count + threadGroupSize - 1) / threadGroupSize;
     cmdList->dispatch(numGroups, 1, 1);
 
-    cmdList->setBufferState(visibleIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-    cmdList->setBufferState(drawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
+        cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
+    }
 }
 
 }
