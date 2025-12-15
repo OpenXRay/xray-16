@@ -7,7 +7,6 @@
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
 
-struct Fmatrix;
 struct ImDrawData;
 
 namespace xray::render::RENDER_NAMESPACE {
@@ -124,6 +123,14 @@ private:
 
     framegraph::VirtualResourceHandle m_hizPyramid;
 
+    nvrhi::TextureHandle m_prevFrameDepth;
+    framegraph::VirtualResourceHandle m_currentDepthHandle;
+    Fmatrix m_prevViewProj;
+    Fvector m_prevCameraPos;
+    bool m_hasPrevFrameData = false;
+    u32 m_prevFrameWidth = 0;
+    u32 m_prevFrameHeight = 0;
+
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 
     xr_unique_ptr<framegraph::VolatileConstantBufferPool> m_geometryVCBPool;
@@ -145,6 +152,9 @@ private:
 
     xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_worldParticleBatches;
     xr_vector<RENDER_NAMESPACE::passes::ParticleBatch> m_hudParticleBatches;
+
+    xr_vector<GeometryBatch> m_cachedStaticBatches;
+    bool m_staticBatchesCached = false;
 
     xr_unique_ptr<ng::RenderContext> m_renderContext;
 

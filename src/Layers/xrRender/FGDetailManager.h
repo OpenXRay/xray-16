@@ -137,6 +137,7 @@ public:
         nvrhi::IDevice* device,
         nvrhi::ITexture* hiZPyramid,
         const Fmatrix& viewProj,
+        const Fmatrix& prevViewProj,
         const Fvector4* frustumPlanes,
         u32 frustumPlaneCount,
         const Fvector& cameraPos,

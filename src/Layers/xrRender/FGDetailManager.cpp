@@ -1119,6 +1119,7 @@ void FGDetailManager::DispatchCulling(
     nvrhi::IDevice* device,
     nvrhi::ITexture* hiZPyramid,
     const Fmatrix& viewProj,
+    const Fmatrix& prevViewProj,
     const Fvector4* frustumPlanes,
     u32 frustumPlaneCount,
     const Fvector& cameraPos,
@@ -1133,6 +1134,7 @@ void FGDetailManager::DispatchCulling(
     struct DetailCullParams
     {
         Fmatrix viewProj;
+        Fmatrix prevViewProj;
         Fvector3 cameraPos;
         float fadeDistanceSqr;
         Fvector4 frustumPlanes[6];
@@ -1148,6 +1150,7 @@ void FGDetailManager::DispatchCulling(
 
     DetailCullParams params;
     params.viewProj.transpose(viewProj);
+    params.prevViewProj.transpose(prevViewProj);
     params.cameraPos = cameraPos;
     params.fadeDistanceSqr = fadeDistance * fadeDistance;
 

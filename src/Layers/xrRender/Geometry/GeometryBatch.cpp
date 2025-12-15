@@ -21,13 +21,7 @@ void GeometryCollector::BeginFrame() {
 }
 
 void GeometryCollector::EndFrame() {
-    Sort();
-
     m_stats.numBatches = static_cast<u32>(m_batches.size());
-
-    for (const auto& batch : m_batches) {
-        m_stats.numTriangles += batch.indexCount / 3;
-    }
 }
 
 void GeometryCollector::Submit(const GeometryBatch& batch) {

@@ -52,29 +52,30 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
     return dist_sq < max_dist_sq;
 }
 
-bool HiZTestSphere(
+bool HiZTestSphereTemporal(
     float3 center,
     float radius,
     float3 cameraPos,
-    float4x4 viewProj,
+    float4x4 currentViewProj,
+    float4x4 prevViewProj,
     Texture2D<float> hiZPyramid,
     SamplerState pointSampler,
     uint hiZWidth,
     uint hiZHeight,
     uint hiZMipLevels)
 {
-    float4 clipPos = mul(viewProj, float4(center, 1.0));
+    float4 prevClipPos = mul(prevViewProj, float4(center, 1.0));
 
-    if (clipPos.w <= 0.001)
+    if (prevClipPos.w <= 0.001)
         return true;
 
-    float3 ndc = clipPos.xyz / clipPos.w;
+    float3 prevNdc = prevClipPos.xyz / prevClipPos.w;
 
-    float projScale = max(abs(viewProj[0][0]), abs(viewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
+    float projScale = max(abs(prevViewProj[0][0]), abs(prevViewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / prevClipPos.w;
 
-    float2 minNDC = ndc.xy - ndcSize;
-    float2 maxNDC = ndc.xy + ndcSize;
+    float2 minNDC = prevNdc.xy - ndcSize;
+    float2 maxNDC = prevNdc.xy + ndcSize;
 
     if (any(minNDC > 1.0) || any(maxNDC < -1.0))
         return true;
@@ -102,7 +103,7 @@ bool HiZTestSphere(
 
     float3 viewDir = normalize(center - cameraPos);
     float3 frontPoint = center - viewDir * radius;
-    float4 frontClip = mul(viewProj, float4(frontPoint, 1.0));
+    float4 frontClip = mul(prevViewProj, float4(frontPoint, 1.0));
 
     if (frontClip.w <= 0.001)
         return true;
@@ -110,6 +111,21 @@ bool HiZTestSphere(
     float frontDepth = frontClip.z / frontClip.w;
 
     return frontDepth <= hiZDepth;
+}
+
+bool HiZTestSphere(
+    float3 center,
+    float radius,
+    float3 cameraPos,
+    float4x4 viewProj,
+    Texture2D<float> hiZPyramid,
+    SamplerState pointSampler,
+    uint hiZWidth,
+    uint hiZHeight,
+    uint hiZMipLevels)
+{
+    return HiZTestSphereTemporal(center, radius, cameraPos, viewProj, viewProj,
+                                  hiZPyramid, pointSampler, hiZWidth, hiZHeight, hiZMipLevels);
 }
 
 #endif

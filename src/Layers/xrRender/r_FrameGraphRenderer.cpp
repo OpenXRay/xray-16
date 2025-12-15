@@ -149,6 +149,9 @@ void FrameGraphRenderer::Shutdown() {
     m_textMaterialCache = nullptr;
     m_textVCBPool = nullptr;
 
+    m_cachedStaticBatches.clear();
+    m_staticBatchesCached = false;
+
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
 
@@ -375,30 +378,49 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         backbufferHandle = m_framegraph->ImportTexture("Backbuffer", backbufferTexture, backbufferDesc);
     }
 
-    passes::BindlessDepthConfig bindlessDepthConfig;
-    if (m_gpuCullingManager && m_gpuCullingManager->AreMegaBuffersReady()) {
-        bindlessDepthConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
-        bindlessDepthConfig.megaIndexBuffer = m_gpuCullingManager->GetMegaIndexBuffer();
-        bindlessDepthConfig.megaBuffersReady = true;
+    framegraph::ResourceDesc depthDesc;
+    depthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+    depthDesc.debugName = "rt_Depth";
+    depthDesc.width = width;
+    depthDesc.height = height;
+    depthDesc.format = nvrhi::Format::D32;
+    depthDesc.isDepthStencil = true;
+    depthDesc.isTransient = true;
+
+    framegraph::VirtualResourceHandle depthBuffer = m_framegraph->CreateTexture("rt_Depth", depthDesc);
+
+    m_currentDepthHandle = depthBuffer;
+
+    passes::HiZPyramidOutput hizOutput;
+    hizOutput.pyramid = framegraph::VirtualResourceHandle();
+    hizOutput.mipLevels = 0;
+    hizOutput.width = width / 2;
+    hizOutput.height = height / 2;
+
+    bool hasPrevDepth = m_hasPrevFrameData && m_prevFrameDepth &&
+                        m_prevFrameWidth == width && m_prevFrameHeight == height;
+
+    if (hasPrevDepth) {
+        framegraph::ResourceDesc prevDepthDesc;
+        prevDepthDesc.type = framegraph::ResourceDesc::Type::Texture2D;
+        prevDepthDesc.debugName = "rt_PrevDepth";
+        prevDepthDesc.width = width;
+        prevDepthDesc.height = height;
+        prevDepthDesc.format = nvrhi::Format::D32;
+        prevDepthDesc.isDepthStencil = true;
+        prevDepthDesc.isImported = true;
+        prevDepthDesc.isTransient = false;
+
+        auto prevDepthHandle = m_framegraph->ImportTexture("rt_PrevDepth", m_prevFrameDepth, prevDepthDesc);
+
+        hizOutput = passes::setupHiZBuildPass(
+            *m_framegraph,
+            m_device,
+            prevDepthHandle,
+            width,
+            height
+        );
     }
-
-    framegraph::VirtualResourceHandle depthBuffer = passes::setupDepthPrepass(
-        *m_framegraph,
-        m_device,
-        m_geometryCollector.get(),
-        m_materialCache.get(),
-        width,
-        height,
-        bindlessDepthConfig
-    );
-
-    auto hizOutput = passes::setupHiZBuildPass(
-        *m_framegraph,
-        m_device,
-        depthBuffer,
-        width,
-        height
-    );
 
     m_hizPyramid = hizOutput.pyramid;
 
@@ -440,7 +462,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 hizOutput.width,
                 hizOutput.height,
                 hizOutput.mipLevels,
-                m_geometryCollector.get()
+                m_geometryCollector.get(),
+                m_prevViewProj
             );
 
             drawArgsBuffer = cullOutput.drawArgsBuffer;
@@ -577,7 +600,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.pyramid,
         hizOutput.width,
         hizOutput.height,
-        hizOutput.mipLevels
+        hizOutput.mipLevels,
+        m_hasPrevFrameData ? &m_prevViewProj : nullptr
     );
 
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();
@@ -652,6 +676,65 @@ void FrameGraphRenderer::PrintStats() const {
 }
 
 void FrameGraphRenderer::PresentToBackbuffer() {
+
+    if (!m_device || !m_currentDepthHandle.is_valid())
+        return;
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    if (!nvDevice)
+        return;
+
+    nvrhi::ITexture* currentDepth = m_framegraph->GetPhysicalTexture(m_currentDepthHandle);
+    if (!currentDepth)
+        return;
+
+    const nvrhi::TextureDesc& depthDesc = currentDepth->getDesc();
+    u32 width = depthDesc.width;
+    u32 height = depthDesc.height;
+
+    if (!m_prevFrameDepth || m_prevFrameWidth != width || m_prevFrameHeight != height) {
+        nvrhi::TextureDesc prevDepthDesc;
+        prevDepthDesc.width = width;
+        prevDepthDesc.height = height;
+        prevDepthDesc.format = nvrhi::Format::D32;
+        prevDepthDesc.isRenderTarget = false;
+        prevDepthDesc.isShaderResource = true;
+        prevDepthDesc.debugName = "PrevFrameDepth";
+        prevDepthDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+        prevDepthDesc.keepInitialState = true;
+
+        m_prevFrameDepth = nvDevice->createTexture(prevDepthDesc);
+        m_prevFrameWidth = width;
+        m_prevFrameHeight = height;
+
+        if (m_prevFrameDepth) {
+            Msg("* [TemporalHiZ] Created persistent depth buffer: %dx%d", width, height);
+        }
+    }
+
+    if (!m_prevFrameDepth)
+        return;
+
+    nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
+    cmdList->open();
+
+    cmdList->beginTrackingTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+
+    cmdList->setTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+    cmdList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+    cmdList->commitBarriers();
+
+    cmdList->copyTexture(m_prevFrameDepth, nvrhi::TextureSlice(), currentDepth, nvrhi::TextureSlice());
+
+    cmdList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    cmdList->commitBarriers();
+
+    cmdList->close();
+    nvDevice->executeCommandList(cmdList);
+
+    m_hasPrevFrameData = true;
+    m_prevViewProj = Device.mFullTransform;
+    m_prevCameraPos = Device.vCameraPosition;
 }
 
 void FrameGraphRenderer::RenderHUD() {
@@ -1031,108 +1114,58 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
     if (!g_pGamePersistent)
         return;
 
-    CFrustum frustum;
-    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-
-    xr_vector<dxRender_Visual*> staticVisuals;
-
     auto& dsgraph = RImplementation.get_imm_context();
-
-    if (!dsgraph.Sectors.empty()) {
-        Fvector camPos = Device.vCameraPosition;
-        auto sectorID = dsgraph.detect_sector(camPos);
-
-        if (sectorID != IRender_Sector::INVALID_SECTOR_ID) {
-            dsgraph.PortalTraverser.traverse(
-                dsgraph.Sectors[sectorID],
-                frustum,
-                camPos,
-                Device.mFullTransform,
-                CPortalTraverser::VQ_SSA
-            );
-
-            for (CSector* sector : dsgraph.PortalTraverser.r_sectors) {
-                if (sector && sector->root()) {
-                    ExtractStaticLeafVisuals(sector->root(), staticVisuals);
-                }
-            }
-
-        }
-    }
-
     u32 submittedStatic = 0;
-    u32 notFvisual_static = 0;
-    u32 noGeometry_static = 0;
-    u32 noBuffers_static = 0;
 
-    u32 culledStatic = 0;
+    if (!m_staticBatchesCached && !dsgraph.Sectors.empty()) {
+        Msg("* [GeomCache] Building static geometry cache from %zu sectors...", dsgraph.Sectors.size());
 
-    xr_set<dxRender_Visual*> uniqueVisuals;
-    u32 duplicateCount = 0;
-    for (dxRender_Visual* v : staticVisuals) {
-        if (uniqueVisuals.count(v)) {
-            duplicateCount++;
-        } else {
+        xr_vector<dxRender_Visual*> staticVisuals;
+        xr_set<dxRender_Visual*> uniqueVisuals;
+
+        for (CSector* sector : dsgraph.Sectors) {
+            if (sector && sector->root()) {
+                ExtractStaticLeafVisuals(sector->root(), staticVisuals);
+            }
+        }
+
+        for (dxRender_Visual* v : staticVisuals) {
             uniqueVisuals.insert(v);
         }
-    }
-    if (duplicateCount > 0) {
-        static bool s_loggedDuplicates = false;
-        if (!s_loggedDuplicates) {
-            Msg("! [CollectVisibleGeometry] Found %u duplicate visuals in staticVisuals (total: %zu, unique: %zu)",
-                duplicateCount, staticVisuals.size(), uniqueVisuals.size());
-            s_loggedDuplicates = true;
-        }
-    }
 
-    for (dxRender_Visual* visual : uniqueVisuals) {
-        if (!frustum.testSphere_dirty(visual->vis.sphere.P, visual->vis.sphere.R)) {
-            culledStatic++;
-            continue;
-        }
+        u32 batchCountBefore = static_cast<u32>(m_geometryCollector->GetBatches().size());
 
-        Fmatrix xform = Fidentity;
+        for (dxRender_Visual* visual : uniqueVisuals) {
+            Fmatrix xform = Fidentity;
 
-        switch (visual->getType())
-        {
-            case MT_TREE_ST:
-            case MT_TREE_PM:
-            {
-                FTreeVisual* treeVisual = static_cast<FTreeVisual*>(visual);
-                xform = treeVisual->xform;
-                break;
-            }
-            case MT_NORMAL:
-            case MT_PROGRESSIVE:
-            case MT_SKELETON_GEOMDEF_ST:
-            case MT_SKELETON_GEOMDEF_PM:
-            default:
-                xform = Fidentity;
-                break;
-        }
-
-        if (ProcessVisualGeometry(visual, xform)) {
-            submittedStatic++;
-        } else {
-            IRender_Mesh* meshVisual = nullptr;
             switch (visual->getType()) {
-                case MT_NORMAL:
-                    meshVisual = static_cast<Fvisual*>(visual);
-                    break;
                 case MT_TREE_ST:
-                case MT_TREE_PM:
-                    meshVisual = static_cast<FTreeVisual*>(visual);
+                case MT_TREE_PM: {
+                    FTreeVisual* treeVisual = static_cast<FTreeVisual*>(visual);
+                    xform = treeVisual->xform;
                     break;
+                }
                 default:
-                    notFvisual_static++;
-                    continue;
+                    xform = Fidentity;
+                    break;
             }
 
-            if (!meshVisual || !meshVisual->rm_geom || !meshVisual->rm_geom._get()) {
-                noGeometry_static++;
-            } else if (!meshVisual->rm_geom._get()->vb || !meshVisual->rm_geom._get()->ib) {
-                noBuffers_static++;
+            if (ProcessVisualGeometry(visual, xform)) {
+                submittedStatic++;
             }
+        }
+
+        const auto& allBatches = m_geometryCollector->GetBatches();
+        m_cachedStaticBatches.assign(allBatches.begin() + batchCountBefore, allBatches.end());
+        m_staticBatchesCached = true;
+
+        Msg("* [GeomCache] Cached %zu static batches from %zu unique visuals (total sectors: %zu)",
+            m_cachedStaticBatches.size(), uniqueVisuals.size(), dsgraph.Sectors.size());
+    }
+    else if (m_staticBatchesCached) {
+        for (const auto& batch : m_cachedStaticBatches) {
+            m_geometryCollector->Submit(batch);
+            submittedStatic++;
         }
     }
 

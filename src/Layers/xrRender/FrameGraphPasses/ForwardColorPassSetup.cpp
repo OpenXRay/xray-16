@@ -632,6 +632,11 @@ void renderBindlessForward(
                     s_terrainWarnOnce = true;
                 }
             } else {
+                cmdList->beginTrackingBufferState(config.terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(config.terrainBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(config.terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(config.terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+
                 nvrhi::BindingSetDesc terrainBindDesc;
                 terrainBindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
@@ -690,9 +695,7 @@ void renderBindlessForward(
                         s_terrainDrawLogged = true;
                     }
 
-                    for (u32 i = 0; i < config.terrainObjectCount; i++) {
-                        cmdList->drawIndexedIndirect(i * sizeof(IndirectDrawArgs));
-                    }
+                    cmdList->drawIndexedIndirect(0, config.terrainObjectCount);
 
                     s_gpuDrivenDraws += config.terrainObjectCount;
                 }
@@ -763,6 +766,11 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             if (!depthRT || !colorRT)
                 return;
+
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (cmdList) {
+                cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+            }
 
             if (!data.geometry)
                 return;

@@ -23,6 +23,7 @@ struct IndirectDrawArgs
 cbuffer CullParams : register(b5)
 {
     float4x4 g_ViewProj;
+    float4x4 g_PrevViewProj;
     float3 g_CameraPos;
     float g_MaxDistance;
     float4 g_FrustumPlanes[6];
@@ -42,7 +43,7 @@ RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
 
 RWByteAddressBuffer g_VisibleCount : register(u1);
 
-RWByteAddressBuffer g_DrawArgs : register(u2);
+RWStructuredBuffer<uint> g_Visibility : register(u2);
 
 [numthreads(64, 1, 1)]
 void main(uint3 dtID : SV_DispatchThreadID)
@@ -63,7 +64,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
         return;
 
-    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_ViewProj,
+    if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
                        g_HiZPyramid, g_PointSampler, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 
@@ -72,6 +73,5 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     g_VisibleIndices[visibleIdx] = obj.batchIndex;
 
-    uint argsBaseOffset = obj.batchIndex * 20;
-    g_DrawArgs.Store(argsBaseOffset + 4, 1);
+    g_Visibility[obj.batchIndex] = 1;
 }

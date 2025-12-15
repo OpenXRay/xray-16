@@ -22,6 +22,7 @@ constexpr u32 CULL_THREAD_GROUP_SIZE = 64;
 
 struct CullParamsCB {
     Fmatrix viewProj;
+    Fmatrix prevViewProj;
     Fvector cameraPos;
     float maxDistanceSq;
     Fvector4 frustumPlanes[6];
@@ -60,6 +61,7 @@ static ref_ps s_cull_debug_ps;
 static ref_cs s_particle_cull_cs;
 static ref_cs s_particle_cull_debug_cs;
 static ref_cs s_batch_compact_cs;
+static ref_cs s_terrain_apply_visibility_cs;
 
 constexpr u32 MAX_CULLING_PARTICLES = 16384;
 
@@ -185,6 +187,22 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
 
     {
         nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_Visibility";
+        desc.byteSize = m_maxObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_visibilityBuffer = nvDevice->createBuffer(desc);
+        if (!m_visibilityBuffer) {
+            Msg("! [GPUCulling] Failed to create visibility buffer");
+            m_computeEnabled = false;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_Params";
         desc.byteSize = sizeof(CullParamsCB);
         desc.isConstantBuffer = true;
@@ -251,6 +269,18 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
 
     {
         nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainVisibility";
+        desc.byteSize = m_maxTerrainObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainVisibilityBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_TerrainDrawArgs";
         desc.byteSize = m_maxTerrainObjects * sizeof(IndirectDrawArgs);
         desc.canHaveUAVs = true;
@@ -311,7 +341,7 @@ void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
             nvrhi::BindingLayoutItem::Sampler(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(1),
-            nvrhi::BindingLayoutItem::RawBuffer_UAV(2)
+            nvrhi::BindingLayoutItem::StructuredBuffer_UAV(2)
         };
 
         m_cullLayout = nvDevice->createBindingLayout(layoutDesc);
@@ -453,6 +483,7 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
             nvrhi::BindingLayoutItem::RawBuffer_SRV(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(0),
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(1),
             nvrhi::BindingLayoutItem::RawBuffer_UAV(2),
@@ -480,6 +511,31 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
     m_compactEnabled = true;
     Msg("* [GPUCulling] Compaction resources created");
+
+    s_terrain_apply_visibility_cs.create("terrain_apply_visibility");
+    if (s_terrain_apply_visibility_cs && s_terrain_apply_visibility_cs->nvrhiShader) {
+        nvrhi::BindingLayoutDesc layoutDesc;
+        layoutDesc.visibility = nvrhi::ShaderType::Compute;
+        layoutDesc.bindings = {
+            nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),
+            nvrhi::BindingLayoutItem::RawBuffer_UAV(0)
+        };
+
+        m_terrainApplyVisibilityLayout = nvDevice->createBindingLayout(layoutDesc);
+        if (m_terrainApplyVisibilityLayout) {
+            nvrhi::ComputePipelineDesc pipeDesc;
+            pipeDesc.CS = s_terrain_apply_visibility_cs->nvrhiShader;
+            pipeDesc.bindingLayouts = { m_terrainApplyVisibilityLayout };
+
+            m_terrainApplyVisibilityPipeline = nvDevice->createComputePipeline(pipeDesc);
+            if (m_terrainApplyVisibilityPipeline) {
+                Msg("* [GPUCulling] Terrain apply visibility pipeline created");
+            }
+        }
+    } else {
+        Msg("! [GPUCulling] terrain_apply_visibility.cs not found");
+    }
 }
 
 void GPUCullingManager::Shutdown()
@@ -535,17 +591,24 @@ void GPUCullingManager::Shutdown()
     m_terrainDrawArgsBuffer = nullptr;
     m_terrainVisibleIndexBuffer = nullptr;
     m_terrainVisibleCountBuffer = nullptr;
+    m_terrainVisibilityBuffer = nullptr;
     m_terrainInstanceBuffer = nullptr;
     m_terrainBatchIndicesBuffer = nullptr;
     m_terrainMaterialIDBuffer = nullptr;
     m_terrainCompactDrawArgsBuffer = nullptr;
     m_terrainCompactBatchIndicesBuffer = nullptr;
     m_terrainCompactCountBuffer = nullptr;
+    m_terrainApplyVisibilityPipeline = nullptr;
+    m_terrainApplyVisibilityLayout = nullptr;
     m_terrainObjectData.clear();
     m_terrainDrawArgsData.clear();
     m_terrainMaterialIDData.clear();
     m_terrainInstanceData.clear();
     m_terrainObjectCount = 0;
+
+    m_visibilityBuffer = nullptr;
+    m_staticDrawArgsUploaded = false;
+    m_staticTerrainDrawArgsUploaded = false;
 
     m_initialized = false;
     m_computeEnabled = false;
@@ -692,10 +755,19 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     }
 
     cmdList->writeBuffer(m_objectBuffer, m_objectData.data(), m_objectCount * sizeof(GPUObjectData));
-    cmdList->writeBuffer(m_drawArgsBuffer, m_drawArgsData.data(), m_objectCount * sizeof(IndirectDrawArgs));
 
-    if (m_compactEnabled && m_materialIDBuffer) {
-        cmdList->writeBuffer(m_materialIDBuffer, m_materialIDData.data(), m_objectCount * sizeof(u32));
+    if (!m_staticDrawArgsUploaded && m_drawArgsBuffer) {
+        for (auto& args : m_drawArgsData) {
+            args.instanceCount = 1;
+        }
+        cmdList->writeBuffer(m_drawArgsBuffer, m_drawArgsData.data(), m_objectCount * sizeof(IndirectDrawArgs));
+
+        if (m_compactEnabled && m_materialIDBuffer) {
+            cmdList->writeBuffer(m_materialIDBuffer, m_materialIDData.data(), m_objectCount * sizeof(u32));
+        }
+
+        m_staticDrawArgsUploaded = true;
+        Msg("* [GPUCulling] Static draw args uploaded: %u objects (visibility buffer mode)", m_objectCount);
     }
 
     m_terrainObjectCount = std::min(static_cast<u32>(m_terrainObjectData.size()), m_maxTerrainObjects);
@@ -707,21 +779,24 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
             m_terrainObjectCount * sizeof(GPUObjectData));
         cmdList->setBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::ShaderResource);
 
-        cmdList->beginTrackingBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::CopyDest);
-        cmdList->writeBuffer(m_terrainDrawArgsBuffer,
-            m_terrainDrawArgsData.data(),
-            m_terrainObjectCount * sizeof(IndirectDrawArgs));
-        cmdList->setBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+        if (!m_staticTerrainDrawArgsUploaded) {
+            for (auto& args : m_terrainDrawArgsData) {
+                args.instanceCount = 1;
+            }
 
-        if (m_terrainMaterialIDBuffer) {
-            cmdList->beginTrackingBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::CopyDest);
-            cmdList->writeBuffer(m_terrainMaterialIDBuffer,
-                m_terrainMaterialIDData.data(),
-                m_terrainObjectCount * sizeof(u32));
-            cmdList->setBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->beginTrackingBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::CopyDest);
+            cmdList->writeBuffer(m_terrainDrawArgsBuffer,
+                m_terrainDrawArgsData.data(),
+                m_terrainObjectCount * sizeof(IndirectDrawArgs));
+            cmdList->setBufferState(m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
 
-            static bool s_materialIDLogged = false;
-            if (!s_materialIDLogged) {
+            if (m_terrainMaterialIDBuffer) {
+                cmdList->beginTrackingBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::CopyDest);
+                cmdList->writeBuffer(m_terrainMaterialIDBuffer,
+                    m_terrainMaterialIDData.data(),
+                    m_terrainObjectCount * sizeof(u32));
+                cmdList->setBufferState(m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+
                 u32 invalidCount = 0;
                 u32 maxID = 0;
                 for (u32 i = 0; i < m_terrainObjectCount && i < m_terrainMaterialIDData.size(); i++) {
@@ -732,36 +807,29 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
                 }
                 Msg("* [GPUCulling] Terrain material IDs: count=%u, maxID=%u, invalid=%u",
                     m_terrainObjectCount, maxID, invalidCount);
-                if (invalidCount > 0) {
-                    Msg("! [GPUCulling] WARNING: %u terrain batches have invalid material IDs!", invalidCount);
-                }
-                s_materialIDLogged = true;
             }
-        }
 
-        if (m_terrainInstanceBuffer && !m_terrainInstanceData.empty()) {
-            cmdList->beginTrackingBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::CopyDest);
-            cmdList->writeBuffer(m_terrainInstanceBuffer,
-                m_terrainInstanceData.data(),
-                m_terrainObjectCount * sizeof(GPUInstanceData));
-            cmdList->setBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
-        }
+            if (m_terrainInstanceBuffer && !m_terrainInstanceData.empty()) {
+                cmdList->beginTrackingBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::CopyDest);
+                cmdList->writeBuffer(m_terrainInstanceBuffer,
+                    m_terrainInstanceData.data(),
+                    m_terrainObjectCount * sizeof(GPUInstanceData));
+                cmdList->setBufferState(m_terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+            }
 
-        if (m_terrainBatchIndicesBuffer) {
-            xr_vector<u32> identityIndices(m_terrainObjectCount);
-            for (u32 i = 0; i < m_terrainObjectCount; i++)
-                identityIndices[i] = i;
-            cmdList->beginTrackingBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::CopyDest);
-            cmdList->writeBuffer(m_terrainBatchIndicesBuffer,
-                identityIndices.data(),
-                m_terrainObjectCount * sizeof(u32));
-            cmdList->setBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-        }
+            if (m_terrainBatchIndicesBuffer) {
+                xr_vector<u32> identityIndices(m_terrainObjectCount);
+                for (u32 i = 0; i < m_terrainObjectCount; i++)
+                    identityIndices[i] = i;
+                cmdList->beginTrackingBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::CopyDest);
+                cmdList->writeBuffer(m_terrainBatchIndicesBuffer,
+                    identityIndices.data(),
+                    m_terrainObjectCount * sizeof(u32));
+                cmdList->setBufferState(m_terrainBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+            }
 
-        static bool s_terrainLogged = false;
-        if (!s_terrainLogged && m_terrainObjectCount > 0) {
-            Msg("* [GPUCulling] Terrain batches: %u objects uploaded", m_terrainObjectCount);
-            s_terrainLogged = true;
+            m_staticTerrainDrawArgsUploaded = true;
+            Msg("* [GPUCulling] Static terrain draw args uploaded: %u objects (visibility buffer mode)", m_terrainObjectCount);
         }
     }
 
@@ -790,7 +858,8 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     u32 hizWidth,
     u32 hizHeight,
     u32 hizMipLevels,
-    const GeometryCollector* geometry)
+    const GeometryCollector* geometry,
+    const Fmatrix& prevViewProj)
 {
     using namespace framegraph;
 
@@ -820,6 +889,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
+        Fmatrix prevViewProj;
         u32 objectCount;
         u32 hizWidth;
         u32 hizHeight;
@@ -839,11 +909,12 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     auto& passData = fg.addCallbackPass<GPUCullPassData>(
         "GPU Culling",
 
-        [&, hizWidth, hizHeight, hizMipLevels, drawArgsHandle, geometry](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
+        [&, hizWidth, hizHeight, hizMipLevels, drawArgsHandle, geometry, prevViewProj](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.manager = this;
             data.geometry = geometry;
+            data.prevViewProj = prevViewProj;
             data.objectCount = m_objectCount;
             data.hizWidth = hizWidth;
             data.hizHeight = hizHeight;
@@ -877,8 +948,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             u32 zero = 0;
             cmdList->writeBuffer(mgr->m_visibleCountBuffer, &zero, sizeof(u32));
 
+            cmdList->clearBufferUInt(mgr->m_visibilityBuffer, 0);
+
             CullParamsCB cb;
             cb.viewProj.transpose(Device.mFullTransform);
+            cb.prevViewProj.transpose(data.prevViewProj);
             cb.cameraPos = Device.vCameraPosition;
             float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
             cb.maxDistanceSq = farPlane * farPlane;
@@ -899,7 +973,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
                 nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_visibleIndexBuffer),
                 nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_visibleCountBuffer),
-                nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_drawArgsBuffer)
+                nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_visibilityBuffer)
             };
 
             nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
@@ -938,6 +1012,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
                     nvrhi::BindingSetItem::RawBuffer_SRV(0, mgr->m_drawArgsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_SRV(1, mgr->m_materialIDBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(2, mgr->m_visibilityBuffer),
                     nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_compactDrawArgsBuffer),
                     nvrhi::BindingSetItem::StructuredBuffer_UAV(1, mgr->m_compactBatchIndicesBuffer),
                     nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_compactCountBuffer),
@@ -960,9 +1035,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             if (mgr->m_terrainObjectCount > 0 && mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer) {
                 u32 zeroTerrain = 0;
                 cmdList->writeBuffer(mgr->m_terrainVisibleCountBuffer, &zeroTerrain, sizeof(u32));
+                cmdList->clearBufferUInt(mgr->m_terrainVisibilityBuffer, 0);
 
                 CullParamsCB terrainCB;
                 terrainCB.viewProj.transpose(Device.mFullTransform);
+                terrainCB.prevViewProj.transpose(data.prevViewProj);
                 terrainCB.cameraPos = Device.vCameraPosition;
                 float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
                 terrainCB.maxDistanceSq = farPlane * farPlane;
@@ -981,7 +1058,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                     nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
                     nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_terrainVisibleIndexBuffer),
                     nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_terrainVisibleCountBuffer),
-                    nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_terrainDrawArgsBuffer)
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_terrainVisibilityBuffer)
                 };
 
                 nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, mgr->m_cullLayout);
@@ -993,6 +1070,36 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
                     u32 terrainGroupCount = (mgr->m_terrainObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
                     cmdList->dispatch(terrainGroupCount, 1, 1);
+
+                    if (mgr->m_terrainApplyVisibilityPipeline) {
+                        cmdList->beginTrackingBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                        cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+
+                        struct ApplyVisibilityParams {
+                            u32 objectCount;
+                            u32 padding[3];
+                        };
+                        ApplyVisibilityParams applyParams;
+                        applyParams.objectCount = mgr->m_terrainObjectCount;
+                        applyParams.padding[0] = applyParams.padding[1] = applyParams.padding[2] = 0;
+                        cmdList->writeBuffer(mgr->m_compactParamsCB, &applyParams, sizeof(applyParams));
+
+                        nvrhi::BindingSetDesc applyBindDesc;
+                        applyBindDesc.bindings = {
+                            nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
+                            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainVisibilityBuffer),
+                            nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_terrainDrawArgsBuffer)
+                        };
+
+                        nvrhi::BindingSetHandle applyBindingSet = nvDevice->createBindingSet(applyBindDesc, mgr->m_terrainApplyVisibilityLayout);
+                        if (applyBindingSet) {
+                            nvrhi::ComputeState applyState;
+                            applyState.pipeline = mgr->m_terrainApplyVisibilityPipeline;
+                            applyState.bindings = { applyBindingSet };
+                            cmdList->setComputeState(applyState);
+                            cmdList->dispatch(terrainGroupCount, 1, 1);
+                        }
+                    }
 
                     cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }

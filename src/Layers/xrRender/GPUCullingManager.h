@@ -130,7 +130,8 @@ public:
         u32 hizWidth,
         u32 hizHeight,
         u32 hizMipLevels,
-        const GeometryCollector* geometry
+        const GeometryCollector* geometry,
+        const Fmatrix& prevViewProj
     );
 
     u32 GetObjectCount() const { return m_objectCount; }
@@ -237,18 +238,26 @@ private:
     nvrhi::BufferHandle m_materialIDBuffer;
     nvrhi::BufferHandle m_compactMaterialIDBuffer;
 
+    nvrhi::BufferHandle m_visibilityBuffer;
+    bool m_staticDrawArgsUploaded = false;
+    bool m_staticTerrainDrawArgsUploaded = false;
+
     bool m_compactEnabled = false;
 
     nvrhi::BufferHandle m_terrainObjectBuffer;
     nvrhi::BufferHandle m_terrainDrawArgsBuffer;
     nvrhi::BufferHandle m_terrainVisibleIndexBuffer;
     nvrhi::BufferHandle m_terrainVisibleCountBuffer;
+    nvrhi::BufferHandle m_terrainVisibilityBuffer;
     nvrhi::BufferHandle m_terrainInstanceBuffer;
     nvrhi::BufferHandle m_terrainBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;
     nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactCountBuffer;
     nvrhi::BufferHandle m_terrainMaterialIDBuffer;
+
+    nvrhi::ComputePipelineHandle m_terrainApplyVisibilityPipeline;
+    nvrhi::BindingLayoutHandle m_terrainApplyVisibilityLayout;
 
     nvrhi::BufferHandle m_debugBuffer;
     nvrhi::BufferHandle m_debugComputeParamsCB;

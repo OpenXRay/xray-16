@@ -26,6 +26,7 @@ struct SlotAABB
 cbuffer DetailCullParams : register(b5)
 {
     float4x4 g_view_proj;
+    float4x4 g_prev_view_proj;
     float3 g_camera_pos;
     float g_fade_distance_sqr;
     float4 g_frustum_planes[6];
@@ -124,7 +125,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
         if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
             continue;
 
-        if (!HiZTestSphere(inst.pos, bounds_radius, g_camera_pos, g_view_proj,
+        if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 

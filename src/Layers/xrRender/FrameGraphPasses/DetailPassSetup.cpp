@@ -40,7 +40,8 @@ DefaultOutputLayout setupDetailPass(
     VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,
     u32 hiZHeight,
-    u32 hiZMipLevels
+    u32 hiZMipLevels,
+    const Fmatrix* prevViewProj
 )
 {
     struct DetailPassData {
@@ -56,11 +57,21 @@ DefaultOutputLayout setupDetailPass(
         u32 hiZWidth;
         u32 hiZHeight;
         u32 hiZMipLevels;
+        Fmatrix prevViewProj;
+        bool hasPrevViewProj;
     };
+
+    Fmatrix capturedPrevViewProj;
+    bool hasPrevViewProj = (prevViewProj != nullptr);
+    if (hasPrevViewProj) {
+        capturedPrevViewProj = *prevViewProj;
+    } else {
+        capturedPrevViewProj.identity();
+    }
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "Details",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels](
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -71,6 +82,8 @@ DefaultOutputLayout setupDetailPass(
             data.hiZWidth = hiZWidth;
             data.hiZHeight = hiZHeight;
             data.hiZMipLevels = hiZMipLevels;
+            data.prevViewProj = capturedPrevViewProj;
+            data.hasPrevViewProj = hasPrevViewProj;
 
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
 
@@ -138,11 +151,15 @@ DefaultOutputLayout setupDetailPass(
             nvrhi::ITexture* hiZTexture = fg.GetPhysicalTexture(data.hiZPyramid);
 
             const float fadeDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane;
+
+            Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
+
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
                 hiZTexture,
                 Device.mFullTransform,
+                effectivePrevViewProj,
                 extractedPlanes,
                 frustum.p_count,
                 Device.vCameraPosition,
