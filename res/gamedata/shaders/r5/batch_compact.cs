@@ -1,6 +1,6 @@
 // batch_compact.cs
 // Compacts visible batches into a contiguous list for multi-draw indirect
-// Input: Draw args with instanceCount set by culling (0 = culled, 1 = visible)
+// Input: Static draw args (uploaded once) + visibility buffer (from cull pass)
 // Output: Only visible batches in compact array + their original indices + material IDs
 #define SM_5_0
 #include "common.h"
@@ -11,10 +11,11 @@ cbuffer CompactParams : register(b5)
     uint3 g_Padding;
 };
 
-// Input draw args is a raw buffer (for D3D11 DrawIndexedIndirect compatibility)
+// Input draw args is a raw buffer (STATIC - uploaded once at level load)
 // Each IndirectDrawArgs is 20 bytes (5 x uint)
 ByteAddressBuffer g_InputDrawArgs : register(t0);
 StructuredBuffer<uint> g_InputMaterialIDs : register(t1);  // Material ID per batch
+StructuredBuffer<uint> g_Visibility : register(t2);        // Visibility from cull pass (0=culled, 1=visible)
 
 RWByteAddressBuffer g_OutputDrawArgs : register(u0);       // Raw buffer for indirect args
 RWStructuredBuffer<uint> g_VisibleBatchIndices : register(u1);
@@ -36,17 +37,19 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (batchIdx >= g_BatchCount)
         return;
 
-    // Read draw args from raw buffer (20 bytes per entry)
-    uint byteOffset = batchIdx * 20;
-    uint indexCount = g_InputDrawArgs.Load(byteOffset);
-    uint instanceCount = g_InputDrawArgs.Load(byteOffset + 4);
-    uint startIndex = g_InputDrawArgs.Load(byteOffset + 8);
-    int baseVertex = asint(g_InputDrawArgs.Load(byteOffset + 12));
-    uint startInstance = g_InputDrawArgs.Load(byteOffset + 16);
+    // Check visibility buffer (written by cull pass, cleared per-frame)
+    uint visible = g_Visibility[batchIdx];
 
-    // Only compact visible batches (instanceCount > 0)
-    if (instanceCount > 0)
+    // Only compact visible batches
+    if (visible > 0)
     {
+        // Read static draw args from raw buffer (20 bytes per entry)
+        uint byteOffset = batchIdx * 20;
+        uint indexCount = g_InputDrawArgs.Load(byteOffset);
+        uint instanceCount = g_InputDrawArgs.Load(byteOffset + 4);
+        uint startIndex = g_InputDrawArgs.Load(byteOffset + 8);
+        int baseVertex = asint(g_InputDrawArgs.Load(byteOffset + 12));
+
         uint outputIdx;
         g_VisibleCount.InterlockedAdd(0, 1, outputIdx);
 

@@ -95,35 +95,41 @@ bool DistanceTestAABB(float3 aabb_min, float3 aabb_max, float3 camera_pos, float
 
 // Hi-Z occlusion test for sphere (4-tap conservative)
 // Returns: true = visible, false = occluded (cull)
-bool HiZTestSphere(
+//
+// TEMPORAL HI-Z: When using previous frame's depth for Hi-Z:
+// - Use prevViewProj for Hi-Z UV calculation (matches depth buffer camera)
+// - Use currentViewProj for depth comparison (current camera position)
+// - This handles camera movement without false culling
+bool HiZTestSphereTemporal(
     float3 center,
     float radius,
     float3 cameraPos,
-    float4x4 viewProj,
+    float4x4 currentViewProj,  // Current frame - for frustum/depth compare
+    float4x4 prevViewProj,     // Previous frame - for Hi-Z UV lookup
     Texture2D<float> hiZPyramid,
     SamplerState pointSampler,
     uint hiZWidth,
     uint hiZHeight,
     uint hiZMipLevels)
 {
-    // Project sphere center to clip space
-    float4 clipPos = mul(viewProj, float4(center, 1.0));
+    // Project sphere center to PREVIOUS frame's clip space (matches Hi-Z data)
+    float4 prevClipPos = mul(prevViewProj, float4(center, 1.0));
 
-    // Behind camera - conservatively visible
-    if (clipPos.w <= 0.001)
+    // Behind previous camera - conservatively visible
+    if (prevClipPos.w <= 0.001)
         return true;
 
-    // Perspective divide -> NDC
-    float3 ndc = clipPos.xyz / clipPos.w;
+    // Perspective divide -> NDC (previous frame)
+    float3 prevNdc = prevClipPos.xyz / prevClipPos.w;
 
-    // Calculate screen-space bounding box
-    float projScale = max(abs(viewProj[0][0]), abs(viewProj[1][1]));
-    float2 ndcSize = float2(radius, radius) * projScale / clipPos.w;
+    // Calculate screen-space bounding box (in previous frame's space)
+    float projScale = max(abs(prevViewProj[0][0]), abs(prevViewProj[1][1]));
+    float2 ndcSize = float2(radius, radius) * projScale / prevClipPos.w;
 
-    float2 minNDC = ndc.xy - ndcSize;
-    float2 maxNDC = ndc.xy + ndcSize;
+    float2 minNDC = prevNdc.xy - ndcSize;
+    float2 maxNDC = prevNdc.xy + ndcSize;
 
-    // Conservatively visible if off-screen (frustum should handle)
+    // Conservatively visible if off-screen in previous frame
     if (any(minNDC > 1.0) || any(maxNDC < -1.0))
         return true;
 
@@ -146,7 +152,7 @@ bool HiZTestSphere(
     float mipLevel = floor(log2(max(1.0, max(boxWidth, boxHeight) * 0.5)));
     mipLevel = clamp(mipLevel, 0.0, float(hiZMipLevels - 1));
 
-    // Sample Hi-Z at 4 corners
+    // Sample Hi-Z at 4 corners (previous frame's depth)
     float d1 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.y), mipLevel);
     float d2 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.z, boxUV.y), mipLevel);
     float d3 = hiZPyramid.SampleLevel(pointSampler, float2(boxUV.x, boxUV.w), mipLevel);
@@ -155,12 +161,13 @@ bool HiZTestSphere(
     // MAX = farthest depth in region (0=near, 1=far)
     float hiZDepth = max(max(d1, d2), max(d3, d4));
 
-    // Calculate front depth of sphere
+    // Calculate front depth of sphere in PREVIOUS frame's space
+    // (must match the Hi-Z data we're comparing against)
     float3 viewDir = normalize(center - cameraPos);
     float3 frontPoint = center - viewDir * radius;
-    float4 frontClip = mul(viewProj, float4(frontPoint, 1.0));
+    float4 frontClip = mul(prevViewProj, float4(frontPoint, 1.0));
 
-    // Front point behind camera - straddles near plane, visible
+    // Front point behind previous camera - straddles near plane, visible
     if (frontClip.w <= 0.001)
         return true;
 
@@ -168,6 +175,23 @@ bool HiZTestSphere(
 
     // Visible if front of sphere is in front of Hi-Z depth
     return frontDepth <= hiZDepth;
+}
+
+// Legacy single-viewProj version (for non-temporal Hi-Z)
+bool HiZTestSphere(
+    float3 center,
+    float radius,
+    float3 cameraPos,
+    float4x4 viewProj,
+    Texture2D<float> hiZPyramid,
+    SamplerState pointSampler,
+    uint hiZWidth,
+    uint hiZHeight,
+    uint hiZMipLevels)
+{
+    // Use same viewProj for both sampling and depth comparison
+    return HiZTestSphereTemporal(center, radius, cameraPos, viewProj, viewProj,
+                                  hiZPyramid, pointSampler, hiZWidth, hiZHeight, hiZMipLevels);
 }
 
 #endif // CULL_UTILS_H

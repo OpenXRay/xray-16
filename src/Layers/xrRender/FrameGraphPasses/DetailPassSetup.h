@@ -5,6 +5,8 @@
 #include "Layers/xrRender/FrameGraph/FGResource.h"
 #include <nvrhi/nvrhi.h>
 
+struct Fmatrix;
+
 namespace xray::render::RENDER_NAMESPACE {
     class FGDetailManager;
 }
@@ -60,7 +62,8 @@ framegraph::DefaultOutputLayout setupDetailPass(
     framegraph::VirtualResourceHandle hiZPyramid = {},
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
-    u32 hiZMipLevels = 0
+    u32 hiZMipLevels = 0,
+    const Fmatrix* prevViewProj = nullptr  // Previous frame's viewProj for temporal Hi-Z
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

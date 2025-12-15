@@ -199,6 +199,7 @@ public:
         nvrhi::IDevice* device,
         nvrhi::ITexture* hiZPyramid,
         const Fmatrix& viewProj,
+        const Fmatrix& prevViewProj,  // Previous frame's viewProj for temporal Hi-Z
         const Fvector4* frustumPlanes,
         u32 frustumPlaneCount,
         const Fvector& cameraPos,

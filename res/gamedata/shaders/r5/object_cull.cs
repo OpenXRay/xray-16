@@ -43,7 +43,8 @@ struct IndirectDrawArgs
 
 cbuffer CullParams : register(b5)  // b5 to avoid conflicts with common.h
 {
-    float4x4 g_ViewProj;           // View-projection matrix
+    float4x4 g_ViewProj;           // Current frame view-projection (for frustum culling)
+    float4x4 g_PrevViewProj;       // Previous frame view-projection (for Hi-Z sampling)
     float3 g_CameraPos;            // Camera world position
     float g_MaxDistance;           // Maximum render distance (squared)
     float4 g_FrustumPlanes[6];     // View frustum planes (world space)
@@ -72,10 +73,10 @@ RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
 // Output: Atomic counter for visible object count
 RWByteAddressBuffer g_VisibleCount : register(u1);
 
-// Output: Indirect draw arguments (one per batch)
-// Using RWByteAddressBuffer because D3D11 doesn't allow structured buffers with indirect args
-// Each element is DrawIndexedIndirectArguments (20 bytes = 5 uints)
-RWByteAddressBuffer g_DrawArgs : register(u2);
+// Output: Visibility buffer (1 uint per object: 0=culled, 1=visible)
+// Compaction shader reads this + static draw args to create compact buffer
+// Avoids CPU re-uploading draw args every frame
+RWStructuredBuffer<uint> g_Visibility : register(u2);
 
 // ═══════════════════════════════════════════════════════
 //  MAIN COMPUTE SHADER
@@ -119,7 +120,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // 3. Hi-Z occlusion culling (expensive - texture sample + math)
     // Note: This test is conservative - may mark occluded objects as visible
     // but will never mark visible objects as occluded
-    if (!HiZTestSphere(obj.position, obj.radius, g_CameraPos, g_ViewProj,
+    // TEMPORAL HI-Z: Use prevViewProj for Hi-Z lookup since pyramid was built from previous frame's depth
+    if (!HiZTestSphereTemporal(obj.position, obj.radius, g_CameraPos, g_ViewProj, g_PrevViewProj,
                        g_HiZPyramid, g_PointSampler, g_HiZWidth, g_HiZHeight, g_HiZMipLevels))
         return;
 
@@ -134,13 +136,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // Store batch index (for debug/readback)
     g_VisibleIndices[visibleIdx] = obj.batchIndex;
 
-    // Enable indirect draw for this batch by setting instanceCount = 1
-    // DrawIndexedIndirectArguments layout (20 bytes):
-    //   offset 0:  indexCountPerInstance (uint)
-    //   offset 4:  instanceCount (uint) <- we write this
-    //   offset 8:  startIndexLocation (uint)
-    //   offset 12: baseVertexLocation (int)
-    //   offset 16: startInstanceLocation (uint)
-    uint argsBaseOffset = obj.batchIndex * 20;  // 20 bytes per DrawArgs
-    g_DrawArgs.Store(argsBaseOffset + 4, 1);    // instanceCount = 1
+    // Mark this object as visible in the visibility buffer
+    // Compaction shader will read this + static draw args to create compact buffer
+    // This avoids CPU re-uploading draw args every frame!
+    g_Visibility[obj.batchIndex] = 1;
 }

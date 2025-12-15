@@ -19,7 +19,8 @@ struct ParticleData {
 
 // Use b5 to avoid collision with common.h buffers (b0, b1, b2, b3, b4)
 cbuffer ParticleCullParams : register(b5) {
-    float4x4 g_ViewProj;        // 64 bytes
+    float4x4 g_ViewProj;        // Current frame (for frustum culling) - 64 bytes
+    float4x4 g_PrevViewProj;    // Previous frame (for Hi-Z sampling) - 64 bytes
     float4 g_FrustumPlanes[6];  // 96 bytes
     float4 g_CameraPos;         // 16 bytes
     float4 g_CameraTop;         // 16 bytes

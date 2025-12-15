@@ -1231,6 +1231,7 @@ void FGDetailManager::DispatchCulling(
     nvrhi::IDevice* device,
     nvrhi::ITexture* hiZPyramid,
     const Fmatrix& viewProj,
+    const Fmatrix& prevViewProj,
     const Fvector4* frustumPlanes,
     u32 frustumPlaneCount,
     const Fvector& cameraPos,
@@ -1245,7 +1246,8 @@ void FGDetailManager::DispatchCulling(
     // Create and fill constant buffer (must match HLSL DetailCullParams)
     struct DetailCullParams
     {
-        Fmatrix viewProj;
+        Fmatrix viewProj;        // Current frame (for frustum culling)
+        Fmatrix prevViewProj;    // Previous frame (for temporal Hi-Z sampling)
         Fvector3 cameraPos;
         float fadeDistanceSqr;
         Fvector4 frustumPlanes[6];
@@ -1261,6 +1263,7 @@ void FGDetailManager::DispatchCulling(
 
     DetailCullParams params;
     params.viewProj.transpose(viewProj);
+    params.prevViewProj.transpose(prevViewProj);  // Previous frame's viewProj for temporal Hi-Z
     params.cameraPos = cameraPos;
     params.fadeDistanceSqr = fadeDistance * fadeDistance;
 

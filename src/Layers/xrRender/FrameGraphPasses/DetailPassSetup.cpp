@@ -45,7 +45,8 @@ DefaultOutputLayout setupDetailPass(
     VirtualResourceHandle hiZPyramid,
     u32 hiZWidth,
     u32 hiZHeight,
-    u32 hiZMipLevels
+    u32 hiZMipLevels,
+    const Fmatrix* prevViewProj
 )
 {
     struct DetailPassData {
@@ -61,11 +62,22 @@ DefaultOutputLayout setupDetailPass(
         u32 hiZWidth;
         u32 hiZHeight;
         u32 hiZMipLevels;
+        Fmatrix prevViewProj;    // Previous frame's viewProj for temporal Hi-Z
+        bool hasPrevViewProj;    // True if prevViewProj is valid
     };
+
+    // Capture prevViewProj by value (it's a pointer, we need to copy the data)
+    Fmatrix capturedPrevViewProj;
+    bool hasPrevViewProj = (prevViewProj != nullptr);
+    if (hasPrevViewProj) {
+        capturedPrevViewProj = *prevViewProj;
+    } else {
+        capturedPrevViewProj.identity();  // Fallback to identity if no previous data
+    }
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "Details",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels](
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -76,6 +88,8 @@ DefaultOutputLayout setupDetailPass(
             data.hiZWidth = hiZWidth;
             data.hiZHeight = hiZHeight;
             data.hiZMipLevels = hiZMipLevels;
+            data.prevViewProj = capturedPrevViewProj;
+            data.hasPrevViewProj = hasPrevViewProj;
 
             // Add Hi-Z as read dependency
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
@@ -158,11 +172,16 @@ DefaultOutputLayout setupDetailPass(
 
             // Dispatch GPU culling
             const float fadeDistance = g_pGamePersistent->Environment().CurrentEnv.far_plane;
+
+            // Use previous frame's viewProj for temporal Hi-Z, or current if not available
+            Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
+
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
                 hiZTexture,
                 Device.mFullTransform,
+                effectivePrevViewProj,  // Previous frame's viewProj for temporal Hi-Z
                 extractedPlanes,
                 frustum.p_count,
                 Device.vCameraPosition,

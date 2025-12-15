@@ -764,6 +764,12 @@ void renderBindlessForward(
                     s_terrainWarnOnce = true;
                 }
             } else {
+                // Begin tracking terrain buffer states for this command list
+                cmdList->beginTrackingBufferState(config.terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(config.terrainBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(config.terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(config.terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+
                 // Create terrain binding set (includes TerrainMaterialBuffer at t9)
                 // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
                 nvrhi::BindingSetDesc terrainBindDesc;
@@ -827,10 +833,10 @@ void renderBindlessForward(
                         s_terrainDrawLogged = true;
                     }
 
-                    // Draw terrain batches
-                    for (u32 i = 0; i < config.terrainObjectCount; i++) {
-                        cmdList->drawIndexedIndirect(i * sizeof(IndirectDrawArgs));
-                    }
+                    // Draw terrain batches with single MDI call
+                    // GPU culling sets instanceCount=0 for invisible batches, so we draw all
+                    // This is ONE ExecuteIndirect call instead of N separate API calls
+                    cmdList->drawIndexedIndirect(0, config.terrainObjectCount);
 
                     s_gpuDrivenDraws += config.terrainObjectCount;
                 }
@@ -921,6 +927,12 @@ framegraph::DefaultOutputLayout setupForwardColorPass(
 
             if (!depthRT || !colorRT)
                 return;
+
+            // Clear depth buffer (temporal Hi-Z: no depth prepass, so clear here)
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            if (cmdList) {
+                cmdList->clearDepthStencilTexture(depthRT, nvrhi::AllSubresources, true, 1.0f, false, 0);
+            }
 
             // Check if we have geometry to render
             if (!data.geometry)

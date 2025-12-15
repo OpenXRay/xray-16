@@ -182,7 +182,8 @@ public:
         u32 hizWidth,
         u32 hizHeight,
         u32 hizMipLevels,
-        const GeometryCollector* geometry
+        const GeometryCollector* geometry,
+        const Fmatrix& prevViewProj  // Previous frame's viewProj for temporal Hi-Z
     );
 
     // Get number of objects uploaded this frame
@@ -322,6 +323,12 @@ private:
     nvrhi::BufferHandle m_materialIDBuffer;          // Material ID per batch (input)
     nvrhi::BufferHandle m_compactMaterialIDBuffer;   // Material ID per visible batch (output)
 
+    // Visibility buffer (GPU-written per frame, avoids re-uploading draw args)
+    // 1 uint per object: 0 = culled, 1 = visible
+    nvrhi::BufferHandle m_visibilityBuffer;
+    bool m_staticDrawArgsUploaded = false;         // True after first upload (regular geometry)
+    bool m_staticTerrainDrawArgsUploaded = false;  // True after first upload (terrain)
+
     bool m_compactEnabled = false;
 
     // ───────────────────────────────────────────────────────
@@ -333,12 +340,17 @@ private:
     nvrhi::BufferHandle m_terrainDrawArgsBuffer;         // Terrain indirect draw args
     nvrhi::BufferHandle m_terrainVisibleIndexBuffer;     // Terrain visible indices
     nvrhi::BufferHandle m_terrainVisibleCountBuffer;     // Terrain atomic counter
+    nvrhi::BufferHandle m_terrainVisibilityBuffer;       // Terrain visibility (1 uint per object, like regular geometry)
     nvrhi::BufferHandle m_terrainInstanceBuffer;         // Terrain world transforms (like m_instanceBuffer)
     nvrhi::BufferHandle m_terrainBatchIndicesBuffer;     // Identity mapping (0,1,2,3...) for direct indexing
     nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;  // Terrain compacted draw args
     nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactCountBuffer;
     nvrhi::BufferHandle m_terrainMaterialIDBuffer;       // Terrain material IDs (for bindless)
+
+    // Terrain visibility apply pass (copies visibility → instanceCount in draw args)
+    nvrhi::ComputePipelineHandle m_terrainApplyVisibilityPipeline;
+    nvrhi::BindingLayoutHandle m_terrainApplyVisibilityLayout;
 
     // ───────────────────────────────────────────────────────
     //  DEBUG VISUALIZATION RESOURCES

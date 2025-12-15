@@ -1,0 +1,39 @@
+// terrain_apply_visibility.cs
+// Copies visibility buffer → instanceCount in terrain draw args
+// This allows terrain to use the same visibility buffer pattern as regular geometry
+// without needing full compaction
+#define SM_5_0
+#include "common.h"
+
+cbuffer ApplyVisibilityParams : register(b5)
+{
+    uint g_ObjectCount;
+    uint3 g_Padding;
+};
+
+// Input: Visibility buffer from cull pass (1 = visible, 0 = culled)
+StructuredBuffer<uint> g_Visibility : register(t0);
+
+// Output: Draw args buffer (we write instanceCount field)
+// Layout: 20 bytes per entry, instanceCount at offset 4
+RWByteAddressBuffer g_DrawArgs : register(u0);
+
+[numthreads(64, 1, 1)]
+void main(uint3 dtID : SV_DispatchThreadID)
+{
+    uint idx = dtID.x;
+    if (idx >= g_ObjectCount)
+        return;
+
+    // Read visibility (1 = visible, 0 = culled)
+    uint visible = g_Visibility[idx];
+
+    // Write to instanceCount field of draw args
+    // DrawIndexedIndirectArguments layout (20 bytes):
+    //   offset 0:  indexCountPerInstance
+    //   offset 4:  instanceCount <- we write here
+    //   offset 8:  startIndexLocation
+    //   offset 12: baseVertexLocation
+    //   offset 16: startInstanceLocation
+    g_DrawArgs.Store(idx * 20 + 4, visible);
+}

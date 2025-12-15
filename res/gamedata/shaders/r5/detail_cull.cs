@@ -32,7 +32,8 @@ struct SlotAABB
 // Use b5 to avoid collision with common.h buffers (b0, b1, b2, b3, b4)
 cbuffer DetailCullParams : register(b5)
 {
-    float4x4 g_view_proj;
+    float4x4 g_view_proj;          // Current frame view-projection (for frustum culling)
+    float4x4 g_prev_view_proj;     // Previous frame view-projection (for temporal Hi-Z sampling)
     float3 g_camera_pos;
     float g_fade_distance_sqr;
     float4 g_frustum_planes[6];
@@ -160,7 +161,8 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
             continue;
 
         // 3. Hi-Z occlusion culling (expensive but effective)
-        if (!HiZTestSphere(inst.pos, bounds_radius, g_camera_pos, g_view_proj,
+        // TEMPORAL HI-Z: Use prev_view_proj for Hi-Z lookup since pyramid was built from previous frame's depth
+        if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
