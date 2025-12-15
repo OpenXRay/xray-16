@@ -28,7 +28,9 @@ cbuffer DetailGlobals : register(b3)
     float4 grass_color_base;        // RGB + padding (blade base color)
     float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
     float grass_color_variation;    // Per-blade color variation amount
-    float _pad0, _pad1, _pad2;      // Padding to 16-byte alignment
+    uint current_lod_level;         // 0=close, 1=mid, 2=far (set per draw call)
+    uint debug_lod_colors;          // 1=show LOD debug colors, 0=normal rendering
+    float _pad0, _pad1;             // Padding to 16-byte alignment
 };
 
 // Per-object tint buffer (64 grass types)

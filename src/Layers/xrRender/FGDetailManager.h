@@ -98,22 +98,26 @@ public:
     //  GPU RESOURCES (NVRHI)
     // ═══════════════════════════════════════════════════════
 
+    // LOD system constants
+    static constexpr u32 LOD_COUNT = 3;
+    static constexpr u32 LOD_SEGMENTS[LOD_COUNT] = {9, 4, 2};  // Close, mid, far
+
     // Instance data buffer (all level instances)
     nvrhi::BufferHandle instanceBuffer;
 
-    // Blade geometry (procedural grass mesh)
-    nvrhi::BufferHandle bladeVertexBuffer;
-    nvrhi::BufferHandle bladeIndexBuffer;
-    u32 bladeVertexCount = 0;
-    u32 bladeIndexCount = 0;
-    xr_vector<BladeVertex> bladeVertices;  // Cached for upload
-    xr_vector<u16> bladeIndices;           // Cached for upload
+    // Blade geometry per LOD (procedural grass mesh)
+    nvrhi::BufferHandle bladeVertexBuffer[LOD_COUNT];
+    nvrhi::BufferHandle bladeIndexBuffer[LOD_COUNT];
+    u32 bladeVertexCount[LOD_COUNT] = {0, 0, 0};
+    u32 bladeIndexCount[LOD_COUNT] = {0, 0, 0};
+    xr_vector<BladeVertex> bladeVertices[LOD_COUNT];  // Cached for upload
+    xr_vector<u16> bladeIndices[LOD_COUNT];           // Cached for upload
 
-    // GPU culling buffers
-    nvrhi::BufferHandle visibleIndicesBuffer;   // Output: visible instance indices
-    nvrhi::BufferHandle visibleCountBuffer;     // Output: atomic counter
-    nvrhi::BufferHandle drawArgsBuffer;         // Output: indirect draw args
-    nvrhi::BufferHandle slotAABBBuffer;         // Input: slot bounding boxes
+    // GPU culling buffers (per-LOD)
+    nvrhi::BufferHandle visibleInstancesBuffer[LOD_COUNT];  // Output: visible instances per LOD
+    nvrhi::BufferHandle visibleCountBuffer[LOD_COUNT];      // Output: atomic counter per LOD
+    nvrhi::BufferHandle drawArgsBuffer[LOD_COUNT];          // Output: indirect draw args per LOD
+    nvrhi::BufferHandle slotAABBBuffer;                     // Input: slot bounding boxes (shared)
 
     // Phase 6B: Visible slot tracking (for page table system)
     nvrhi::BufferHandle visibleSlotIDsBuffer;   // u33: visible slot IDs
@@ -214,6 +218,9 @@ public:
 
     // Generate procedural blade geometry
     void GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments = 8);
+
+    // Regenerate blade geometry and upload to GPU (for runtime parameter changes)
+    void RegenerateBladeGeometry(nvrhi::ICommandList* cmdList);
 
     // Compute slot AABBs from instances
     void ComputeSlotAABBs();

@@ -1,5 +1,6 @@
 // detail_cull.cs - GPU-driven frustum + Hi-Z occlusion culling for detail objects
 // Hierarchical culling: test slot AABBs first, then instances within visible slots
+// LOD classification: instances sorted into 3 LOD buckets by distance
 //
 // NOTE: Don't include common.h - it's for graphics shaders, not compute shaders
 #include "cull_utils.h"
@@ -40,7 +41,9 @@ cbuffer DetailCullParams : register(b5)
     uint g_hiz_width;
     uint g_hiz_height;
     uint g_hiz_mip_levels;
-    uint3 g_pad;
+    float g_lod_distance_close_sqr;  // LOD0 -> LOD1 threshold (squared)
+    float g_lod_distance_mid_sqr;    // LOD1 -> LOD2 threshold (squared)
+    uint g_pad;
 };
 
 // Input buffers
@@ -52,40 +55,57 @@ Texture2D<float> g_hiz_pyramid : register(t2);
 SamplerState g_point_sampler : register(s0);
 
 // ===========================
-// Output Buffers (UNIFIED - Single draw call optimization)
+// Output Buffers (Per-LOD)
 // ===========================
 
-// UNIFIED: All grass types use same shader/geometry, so merge into one buffer
-RWStructuredBuffer<InstanceData> g_visible_unified : register(u0);
+// LOD0 (close - highest detail)
+RWStructuredBuffer<InstanceData> g_visible_lod0 : register(u0);
+RWByteAddressBuffer g_visible_count_lod0 : register(u1);
+RWByteAddressBuffer g_indirect_args_lod0 : register(u2);
 
-// Single atomic counter for all visible instances
-RWByteAddressBuffer g_visible_count : register(u1);
+// LOD1 (mid - medium detail)
+RWStructuredBuffer<InstanceData> g_visible_lod1 : register(u3);
+RWByteAddressBuffer g_visible_count_lod1 : register(u4);
+RWByteAddressBuffer g_indirect_args_lod1 : register(u5);
 
-// Phase 6B: Output buffer for visible slot IDs (for page table system)
-RWStructuredBuffer<uint> g_visible_slot_ids : register(u33);  // Append visible slots here
-RWByteAddressBuffer g_visible_slot_counter : register(u34);  // Atomic counter (ByteAddressBuffer for InterlockedAdd)
+// LOD2 (far - low detail)
+RWStructuredBuffer<InstanceData> g_visible_lod2 : register(u6);
+RWByteAddressBuffer g_visible_count_lod2 : register(u7);
+RWByteAddressBuffer g_indirect_args_lod2 : register(u8);
 
-// Phase 2.2.1: UNIFIED indirect draw args buffer
-// D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS:
-// struct { u32 IndexCount; u32 InstanceCount; u32 StartIndex; s32 BaseVertex; u32 StartInstance; }
-// We only write to InstanceCount field (offset 4 bytes)
-RWByteAddressBuffer g_indirect_args_unified : register(u2);
+// Visible slot tracking (for page table system)
+RWStructuredBuffer<uint> g_visible_slot_ids : register(u33);
+RWByteAddressBuffer g_visible_slot_counter : register(u34);
 
 
-// UNIFIED: Single buffer append (replaces 16-way branch)
-void AppendInstance(InstanceData inst)
+// Append instance to appropriate LOD buffer based on distance
+void AppendInstanceLOD(InstanceData inst)
 {
-    // Atomically allocate slot in unified buffer
-    uint output_idx = 0;
-    g_visible_count.InterlockedAdd(0, 1, output_idx);
+    float3 to_camera = inst.pos - g_camera_pos;
+    float dist_sqr = dot(to_camera, to_camera);
 
-    // Write instance to unified buffer
-    // object_id is already stored in inst, so shader can handle variation if needed
-    g_visible_unified[output_idx] = inst;
-
-    // Update indirect draw args (InstanceCount at offset 4)
-    uint dummy;
-    g_indirect_args_unified.InterlockedAdd(4, 1, dummy);
+    uint idx;
+    if (dist_sqr < g_lod_distance_close_sqr)
+    {
+        // LOD0 - close range, highest detail
+        g_visible_count_lod0.InterlockedAdd(0, 1, idx);
+        g_visible_lod0[idx] = inst;
+        g_indirect_args_lod0.InterlockedAdd(4, 1, idx);  // InstanceCount at offset 4
+    }
+    else if (dist_sqr < g_lod_distance_mid_sqr)
+    {
+        // LOD1 - mid range, medium detail
+        g_visible_count_lod1.InterlockedAdd(0, 1, idx);
+        g_visible_lod1[idx] = inst;
+        g_indirect_args_lod1.InterlockedAdd(4, 1, idx);
+    }
+    else
+    {
+        // LOD2 - far range, low detail
+        g_visible_count_lod2.InterlockedAdd(0, 1, idx);
+        g_visible_lod2[idx] = inst;
+        g_indirect_args_lod2.InterlockedAdd(4, 1, idx);
+    }
 }
 
 [numthreads(256, 1, 1)]
@@ -144,7 +164,7 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
                             g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
             continue;
 
-        // Instance passed all culling tests - append to visible buffer
-        AppendInstance(inst);
+        // Instance passed all culling tests - append to appropriate LOD buffer
+        AppendInstanceLOD(inst);
     }
 }

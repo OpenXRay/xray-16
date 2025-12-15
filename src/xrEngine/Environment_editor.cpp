@@ -45,6 +45,14 @@ ENGINE_API Fvector3 ps_r3_grass_object_tints[64] = {
 };
 ENGINE_API int ps_r3_grass_selected_object = 0;  // Currently selected object ID for editing
 
+// Grass LOD distance thresholds
+ENGINE_API float ps_r3_grass_lod_close = 15.0f;  // LOD0 -> LOD1 threshold (meters)
+ENGINE_API float ps_r3_grass_lod_mid = 40.0f;    // LOD1 -> LOD2 threshold (meters)
+
+// Grass blade geometry parameters
+ENGINE_API float ps_r3_grass_blade_width = 0.05f;   // Base width in meters (5cm default)
+ENGINE_API float ps_r3_grass_blade_height = 1.0f;   // Height multiplier (1.0 default)
+
 namespace
 {
 bool window_weather_cycle = false;
@@ -546,16 +554,9 @@ void CEnvironment::on_tool_frame()
             } // if (ImGui::BeginTable("Environment lerp", 3, flags))
         } // if (ImGui::CollapsingHeader("Live edit", ImGuiTreeNodeFlags_DefaultOpen))
 
-        // Phase 5: Grass wind controls
+        // Grass wind controls
         if (ImGui::CollapsingHeader("Grass Wind", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            // Access DetailManager wind parameters (extern or via RenderFactory)
-            // For now, we'll add hooks that DetailManager can use
-            extern float ps_r3_grass_wind_multiplier;
-            extern float ps_r3_grass_wind_min;
-            extern float ps_r3_grass_wind_lerp_rate;
-            extern float ps_r3_grass_wind_displacement;
-            extern u32 ps_r3_grass_wind_octaves;
             float windDirection = CurrentEnv.wind_direction;
 
             ImGui::DragFloat("Wind strength multiplier", &ps_r3_grass_wind_multiplier, 0.01f, 0.0f, 5.0f);
@@ -583,14 +584,6 @@ void CEnvironment::on_tool_frame()
         // Grass Color controls
         if (ImGui::CollapsingHeader("Grass Color", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            extern Fvector3 ps_r3_grass_color_tip;
-            extern Fvector3 ps_r3_grass_color_base;
-            extern float ps_r3_grass_color_variation;
-            extern Fvector3 ps_r3_grass_sss_color;
-            extern float ps_r3_grass_sss_intensity;
-            extern Fvector3 ps_r3_grass_object_tints[64];
-            extern int ps_r3_grass_selected_object;
-
             ImGui::SeparatorText("Blade Colors");
 
             ImGui::ColorEdit3("Tip color", reinterpret_cast<float*>(&ps_r3_grass_color_tip));
@@ -630,6 +623,34 @@ void CEnvironment::on_tool_frame()
                 for (int i = 0; i < 64; i++)
                     ps_r3_grass_object_tints[i] = {1.0f, 1.0f, 1.0f};
             }
+        }
+
+        // Grass LOD controls
+        if (ImGui::CollapsingHeader("Grass LOD", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::DragFloat("Close LOD distance", &ps_r3_grass_lod_close, 0.5f, 5.0f, 50.0f);
+            ItemHelp("Distance (meters) at which grass switches from 9-segment (high) to 4-segment (medium) detail");
+
+            ImGui::DragFloat("Mid LOD distance", &ps_r3_grass_lod_mid, 1.0f, 20.0f, 100.0f);
+            ItemHelp("Distance (meters) at which grass switches from 4-segment (medium) to 2-segment (low) detail");
+
+            // Ensure close < mid
+            if (ps_r3_grass_lod_close >= ps_r3_grass_lod_mid)
+                ps_r3_grass_lod_close = ps_r3_grass_lod_mid - 1.0f;
+
+            ImGui::Text("LOD0 (9 segments): 0 - %.0fm", ps_r3_grass_lod_close);
+            ImGui::Text("LOD1 (4 segments): %.0fm - %.0fm", ps_r3_grass_lod_close, ps_r3_grass_lod_mid);
+            ImGui::Text("LOD2 (2 segments): %.0fm+", ps_r3_grass_lod_mid);
+        }
+
+        // Grass Geometry controls
+        if (ImGui::CollapsingHeader("Grass Geometry", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::DragFloat("Blade height", &ps_r3_grass_blade_height, 0.05f, 0.2f, 3.0f, "%.2f");
+            ItemHelp("Height multiplier for grass blades (default 1.0)");
+
+            ImGui::DragFloat("Blade width (m)", &ps_r3_grass_blade_width, 0.005f, 0.01f, 0.2f, "%.3f");
+            ItemHelp("Base width of grass blades in meters (default 0.05 = 5cm)");
         }
 
     }

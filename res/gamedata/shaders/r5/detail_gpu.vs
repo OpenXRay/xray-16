@@ -41,7 +41,8 @@ cbuffer DetailGlobals : register(b3)
     float4 grass_color_base;        // RGB + padding (blade base color)
     float4 grass_sss_color;         // RGB + intensity (subsurface scattering)
     float grass_color_variation;    // Per-blade color variation amount
-    float _pad0, _pad1, _pad2;      // Padding to 16-byte alignment
+    float grass_blade_height;       // Blade height multiplier (default 1.0)
+    float _pad0, _pad1;             // Padding to 16-byte alignment
 };
 
 static const float M_PI = 3.1415926;
@@ -97,7 +98,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	// Map noise to height multiplier range
 	float height_multiplier = lerp(HEIGHT_VARIATION_MIN, HEIGHT_VARIATION_MAX, height_noise);
-	float blade_height = det.scale * height_multiplier;
+	float blade_height = det.scale * height_multiplier * grass_blade_height;
 
 	float3 P0 = det.pos;
 	float3 P1 = det.pos + float3(0, blade_height * 0.33, 0);

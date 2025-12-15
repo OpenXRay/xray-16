@@ -26,6 +26,10 @@ extern ENGINE_API Fvector3 ps_r3_grass_sss_color;
 extern ENGINE_API float ps_r3_grass_sss_intensity;
 extern ENGINE_API Fvector3 ps_r3_grass_object_tints[64];
 
+// Grass blade geometry parameters (defined in xrEngine)
+extern ENGINE_API float ps_r3_grass_blade_width;
+extern ENGINE_API float ps_r3_grass_blade_height;
+
 namespace xray::render::RENDER_NAMESPACE::passes
 {
 
@@ -117,6 +121,14 @@ DefaultOutputLayout setupDetailPass(
             {
                 data.detailManager->UploadBufferData(cmdList);
                 s_detailDataUploaded = true;
+            }
+
+            // === AUTO-REGENERATE GEOMETRY WHEN WIDTH CHANGES ===
+            static float s_lastBladeWidth = ps_r3_grass_blade_width;
+            if (s_lastBladeWidth != ps_r3_grass_blade_width)
+            {
+                data.detailManager->RegenerateBladeGeometry(cmdList);
+                s_lastBladeWidth = ps_r3_grass_blade_width;
             }
 
             // === WIND COMPUTE PASS ===
@@ -237,7 +249,8 @@ DefaultOutputLayout setupDetailPass(
                 Fvector4 grass_color_base;        // RGB + padding (blade base color)
                 Fvector4 grass_sss_color;         // RGB + intensity (subsurface scattering)
                 float grass_color_variation;      // Per-blade color variation amount
-                float pad0, pad1, pad2;           // Padding to 16-byte alignment
+                float grass_blade_height;         // Blade height multiplier
+                float pad0, pad1;                 // Padding to 16-byte alignment
             };
 
             // Get wind parameters
@@ -264,7 +277,8 @@ DefaultOutputLayout setupDetailPass(
             frameConstants.grass_color_base.set(ps_r3_grass_color_base.x, ps_r3_grass_color_base.y, ps_r3_grass_color_base.z, 0.0f);
             frameConstants.grass_sss_color.set(ps_r3_grass_sss_color.x, ps_r3_grass_sss_color.y, ps_r3_grass_sss_color.z, ps_r3_grass_sss_intensity);
             frameConstants.grass_color_variation = ps_r3_grass_color_variation;
-            frameConstants.pad0 = frameConstants.pad1 = frameConstants.pad2 = 0.0f;
+            frameConstants.grass_blade_height = ps_r3_grass_blade_height;
+            frameConstants.pad0 = frameConstants.pad1 = 0.0f;
 
             cbDesc.byteSize = sizeof(DetailFrameConstants);
             cbDesc.debugName = "DetailGlobals";
@@ -366,58 +380,64 @@ DefaultOutputLayout setupDetailPass(
             s5Desc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
             nvrhi::SamplerHandle s5_material = data.device->GetNVRHIDevice()->createSampler(s5Desc);
 
-            // Create binding set (BINDLESS: b0-b4, t8, t32-t34, s0-s5)
-            // NOTE: t8 required by bindless_common.h (g_Materials)
-            // NOTE: s0-s5 required by common_samplers.h (even if unused)
-            // NOTE: t32-t34 avoid common_samplers.h conflict (t0-t31)
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),                                 // b0: dynamic_transforms
-                nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),                                  // b1: shader_params
-                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),                                 // b2: static_globals
-                nvrhi::BindingSetItem::ConstantBuffer(3, detailGlobalsCB),                                 // b3: $Globals (with texture indices)
-                nvrhi::BindingSetItem::ConstantBuffer(4, dynLightCB),                                      // b4: dynamic_light
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dummyMaterials),                           // t8: g_Materials (from bindless_common.h)
-                nvrhi::BindingSetItem::TypedBuffer_SRV(32, dummySlotIndirection),                         // t32: slot_indirection (dummy for now)
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(33, data.detailManager->visibleIndicesBuffer), // t33: detail_buffer (visible instances)
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(34, grassTintsBuffer),                        // t34: grass_object_tints (per-object colors)
-                nvrhi::BindingSetItem::Sampler(0, s0_LinearSampler),                                       // s0: g_LinearSampler
-                nvrhi::BindingSetItem::Sampler(1, s1_nofilter),                                            // s1: smp_nofilter
-                nvrhi::BindingSetItem::Sampler(2, s2_rtlinear),                                            // s2: smp_rtlinear
-                nvrhi::BindingSetItem::Sampler(3, s3_linear),                                              // s3: smp_linear
-                nvrhi::BindingSetItem::Sampler(4, s4_base),                                                // s4: smp_base
-                nvrhi::BindingSetItem::Sampler(5, s5_material),                                            // s5: smp_material
-            };
-
-            nvrhi::BindingSetHandle bindingSet = data.device->GetNVRHIDevice()->createBindingSet(bindDesc, data.detailManager->graphicsBindingLayout);
-
-            // Setup graphics state
-            nvrhi::GraphicsState state;
-            state.framebuffer = framebuffer;
-            state.viewport.addViewportAndScissorRect(nvrhi::Viewport((float)data.width, (float)data.height));
-            state.pipeline = data.detailManager->graphicsPipeline;
-            state.bindings = { bindingSet };
-
-            // SM6.6 bindless: Add the descriptor table from D3D12 backend
-            // IDescriptorTable derives from IBindingSet, so we add it to bindings
+            // SM6.6 bindless: Get the descriptor table from D3D12 backend
+            nvrhi::IBindingSet* bindlessTable = nullptr;
             auto* backend = data.device->GetBackend();
             if (backend) {
-                auto* bindlessTable = backend->GetBindlessDescriptorTable();
+                bindlessTable = backend->GetBindlessDescriptorTable();
+            }
+
+            // Draw all 3 LOD levels
+            for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
+            {
+                // Create binding set per LOD (t33 is different for each LOD)
+                // NOTE: t8 required by bindless_common.h (g_Materials)
+                // NOTE: s0-s5 required by common_samplers.h (even if unused)
+                // NOTE: t32-t34 avoid common_samplers.h conflict (t0-t31)
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),                                      // b0: dynamic_transforms
+                    nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),                                       // b1: shader_params
+                    nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),                                      // b2: static_globals
+                    nvrhi::BindingSetItem::ConstantBuffer(3, detailGlobalsCB),                                      // b3: $Globals (with texture indices)
+                    nvrhi::BindingSetItem::ConstantBuffer(4, dynLightCB),                                           // b4: dynamic_light
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, dummyMaterials),                                 // t8: g_Materials (from bindless_common.h)
+                    nvrhi::BindingSetItem::TypedBuffer_SRV(32, dummySlotIndirection),                               // t32: slot_indirection (dummy for now)
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(33, data.detailManager->visibleInstancesBuffer[lod]), // t33: detail_buffer (visible instances for this LOD)
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(34, grassTintsBuffer),                              // t34: grass_object_tints (per-object colors)
+                    nvrhi::BindingSetItem::Sampler(0, s0_LinearSampler),                                            // s0: g_LinearSampler
+                    nvrhi::BindingSetItem::Sampler(1, s1_nofilter),                                                 // s1: smp_nofilter
+                    nvrhi::BindingSetItem::Sampler(2, s2_rtlinear),                                                 // s2: smp_rtlinear
+                    nvrhi::BindingSetItem::Sampler(3, s3_linear),                                                   // s3: smp_linear
+                    nvrhi::BindingSetItem::Sampler(4, s4_base),                                                     // s4: smp_base
+                    nvrhi::BindingSetItem::Sampler(5, s5_material),                                                 // s5: smp_material
+                };
+
+                nvrhi::BindingSetHandle bindingSet = data.device->GetNVRHIDevice()->createBindingSet(bindDesc, data.detailManager->graphicsBindingLayout);
+
+                // Setup graphics state
+                nvrhi::GraphicsState state;
+                state.framebuffer = framebuffer;
+                state.viewport.addViewportAndScissorRect(nvrhi::Viewport((float)data.width, (float)data.height));
+                state.pipeline = data.detailManager->graphicsPipeline;
+                state.bindings = { bindingSet };
+
+                // Add bindless descriptor table if available
                 if (bindlessTable) {
                     state.addBindingSet(bindlessTable);
                 }
+
+                // Set up vertex/index buffers for this LOD's geometry
+                state.indexBuffer = { data.detailManager->bladeIndexBuffer[lod], nvrhi::Format::R16_UINT, 0 };
+                state.vertexBuffers = {{ data.detailManager->bladeVertexBuffer[lod], 0, 0 }};
+
+                // Set up indirect draw args buffer for this LOD
+                state.indirectParams = data.detailManager->drawArgsBuffer[lod];
+
+                // Draw indexed indirect
+                cmdList->setGraphicsState(state);
+                cmdList->drawIndexedIndirect(0);  // Offset 0 in draw args buffer
             }
-
-            // Set up vertex/index buffers (blade geometry)
-            state.indexBuffer = { data.detailManager->bladeIndexBuffer, nvrhi::Format::R16_UINT, 0 };
-            state.vertexBuffers = {{ data.detailManager->bladeVertexBuffer, 0, 0 }};
-
-            // Set up indirect draw args buffer
-            state.indirectParams = data.detailManager->drawArgsBuffer;
-
-            // Draw indexed indirect
-            cmdList->setGraphicsState(state);
-            cmdList->drawIndexedIndirect(0);  // Offset 0 in draw args buffer
         }
     );
 
