@@ -103,14 +103,13 @@ Thank you for your support!
 * [GSC Game World](https://gsc-game.com/) – for creating S.T.A.L.K.E.R. and supporting the community.
 * Loxotron – for making the engine sources available.
 * [All the OpenXRay contributors](https://github.com/OpenXRay/xray-16/graphs/contributors) – for making the project what it is:
-  * The first OpenXRay team (2014-2017) – for being at the origins of the project:
+  * The OpenXRay team:
     * [nitrocaster](https://github.com/nitrocaster) – original project founder.
     * [Kaffeine](https://github.com/Kaffeine) – initial work on the Linux port, refactoring, polishing.
     * [CrossVR](https://github.com/CrossVR) (Armada651) – creation of the OpenGL renderer, work on the build system, other project maintenance work.
     * [andrew-boyarshin](https://github.com/andrew-boyarshin) – work on the build system.
     * [CasualDev242](https://github.com/CasualDev242) (Swartz27) – work on renderer features.
     * [awdavies](https://github.com/awdavies) – project maintenance work.
-  * The second OpenXRay team (2017-now) – for continuing work on the project:
     * [Xottab_DUTY](https://github.com/Xottab-DUTY) – current project leader.
     * [intorr](https://github.com/intorr) – work on the project quality, memory leaks, refactoring and optimizations.
     * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
