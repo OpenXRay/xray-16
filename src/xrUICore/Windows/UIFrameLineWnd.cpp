@@ -28,9 +28,9 @@ bool CUIFrameLineWnd::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= 
 {
     string256 buf;
 
-    const bool back_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_back"), shader, m_shader, m_tex_rect[flBack]);
-    const bool b_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_b"), shader, m_shader, m_tex_rect[flFirst]);
-    const bool e_exist = CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_e"), shader, m_shader, m_tex_rect[flSecond]);
+    const bool back_exist = CUITextureMaster::InitTexture(strconcat(buf, texture, "_back"), shader, m_shader[flBack], m_tex_rect[flBack]);
+    const bool b_exist = CUITextureMaster::InitTexture(strconcat(buf, texture, "_b"), shader, m_shader[flFirst], m_tex_rect[flFirst]);
+    const bool e_exist = CUITextureMaster::InitTexture(strconcat(buf, texture, "_e"), shader, m_shader[flSecond], m_tex_rect[flSecond]);
 
     bool failed = false;
 
@@ -119,27 +119,34 @@ ICF void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 c
 
 void CUIFrameLineWnd::DrawElements() const
 {
-    GEnv.UIRender->SetShader(*m_shader);
-
-    Fvector2 ts{};
-    m_shader->GetBaseTextureResolution(ts);
-
     Frect rect;
     GetAbsoluteRect(rect);
     UI().ClientToScreenScaled(rect.lt);
     UI().ClientToScreenScaled(rect.rb);
 
+    float first_len  = bHorizontal ? m_tex_rect[flFirst].width()  : m_tex_rect[flFirst].height();
+    float second_len = bHorizontal ? m_tex_rect[flSecond].width() : m_tex_rect[flSecond].height();
+    float back_len   = bHorizontal ? m_tex_rect[flBack].width()   : m_tex_rect[flBack].height();
+
+    if (bHorizontal)
+    {
+        first_len = UI().ClientToScreenScaledX(first_len);
+        back_len = UI().ClientToScreenScaledX(back_len);
+        second_len = UI().ClientToScreenScaledX(second_len) * UI().get_current_kx();
+    }
+    else
+    {
+        first_len = UI().ClientToScreenScaledY(first_len);
+        back_len = UI().ClientToScreenScaledY(back_len);
+        second_len = UI().ClientToScreenScaledY(second_len);
+    }
+
     u32 total_tiles{};
     u32 back_tiles{};
     float back_remainder{};
 
-    const float line_len   = bHorizontal ? rect.width() : rect.height();
-
-    const float first_len  = bHorizontal ? m_tex_rect[flFirst].width()  : m_tex_rect[flFirst].height();
-    const float second_len = bHorizontal ? m_tex_rect[flSecond].width() : m_tex_rect[flSecond].height();
-    const float back_len   = bHorizontal ? m_tex_rect[flBack].width()   : m_tex_rect[flBack].height();
-
-    const float back_available_len = line_len - first_len - second_len;
+    const float total_line_len = bHorizontal ? rect.width() : rect.height();
+    const float back_available_len = total_line_len - first_len - second_len;
 
     if (back_available_len > 0.0f && back_len > 0.0f)
     {
@@ -156,13 +163,9 @@ void CUIFrameLineWnd::DrawElements() const
             rect.y2 -= back_len;
     }
 
-    total_tiles += 2; // first & second
-
-    GEnv.UIRender->StartPrimitive(6 * total_tiles, IUIRender::ptTriList, UI().m_currentPointType);
-
     float cursor{};
 
-    const auto draw_tile = [&](const float length, const Frect tex_rect)
+    const auto draw_tile = [&](const float length, const Frect tex_rect, const RectSegment segment)
     {
         Fvector2 lt, rb;
         if (bHorizontal)
@@ -175,21 +178,27 @@ void CUIFrameLineWnd::DrawElements() const
             lt = { rect.lt.x, rect.lt.y + cursor };
             rb = { rect.rb.x, lt.y      + length };
         }
+        cursor += length;
+
+        Fvector2 ts{};
+        m_shader[segment]->GetBaseTextureResolution(ts);
+        GEnv.UIRender->SetShader(*m_shader[segment]);
 
         draw_rect(lt, rb, tex_rect.lt, tex_rect.rb, m_texture_color, ts);
-        cursor += length;
     };
 
     // first
-    draw_tile(first_len, m_tex_rect[flFirst]);
+    GEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
+    draw_tile(first_len, m_tex_rect[flFirst], flFirst);
+    GEnv.UIRender->FlushPrimitive();
 
     // back
+    GEnv.UIRender->StartPrimitive(6 * total_tiles, IUIRender::ptTriList, UI().m_currentPointType);
     for (u32 i = 0; i < back_tiles; ++i)
     {
-        draw_tile(back_len, m_tex_rect[flBack]);
+        draw_tile(back_len, m_tex_rect[flBack], flBack);
     }
 
-    // back remainder
     if (back_remainder > 0.0f)
     {
         Frect remainder_tc = m_tex_rect[flBack];
@@ -198,12 +207,13 @@ void CUIFrameLineWnd::DrawElements() const
         else
             remainder_tc.rb.y = remainder_tc.lt.y + remainder_tc.height() * back_remainder;
 
-        draw_tile(back_len * back_remainder, remainder_tc);
+        draw_tile(back_len * back_remainder, remainder_tc, flBack);
     }
+    GEnv.UIRender->FlushPrimitive();
 
     // second
-    draw_tile(second_len, m_tex_rect[flSecond]);
-
+    GEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
+    draw_tile(second_len, m_tex_rect[flSecond], flSecond);
     GEnv.UIRender->FlushPrimitive();
 }
 
@@ -227,11 +237,12 @@ void CUIFrameLineWnd::FillDebugInfo()
 
     xray::imgui::ColorEdit4("Texture color", m_texture_color);
 
-    Fvector2 ts{};
-    m_shader->GetBaseTextureResolution(ts);
-
-    const auto showRectAdjust = [ts](pcstr label, Frect& tex_rect)
+    const auto showRectAdjust = [&](pcstr label, RectSegment segment)
     {
+        Fvector2 ts{};
+        m_shader[segment]->GetBaseTextureResolution(ts);
+
+        Frect& tex_rect = m_tex_rect[segment];
         Frect rect =
         {
             .lt = tex_rect.lt,
@@ -248,8 +259,8 @@ void CUIFrameLineWnd::FillDebugInfo()
         }
     };
 
-    showRectAdjust("Texture rect: first", m_tex_rect[flFirst]);
-    showRectAdjust("Texture rect: middle", m_tex_rect[flBack]);
-    showRectAdjust("Texture rect: second", m_tex_rect[flSecond]);
+    showRectAdjust("Texture rect: first", flFirst);
+    showRectAdjust("Texture rect: middle", flBack);
+    showRectAdjust("Texture rect: second", flSecond);
 #endif
 }

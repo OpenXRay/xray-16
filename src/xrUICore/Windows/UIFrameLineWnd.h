@@ -50,7 +50,11 @@ public:
     bool GetStretchTexture() override { return false; }
 
     void SetTextureVisible(bool value) { m_bTextureVisible = value; }
-    void SetShader(const ui_shader& sh) { m_shader = sh; }
+    void SetShader(const ui_shader& sh)
+    {
+        for (auto& shader : m_shader)
+            shader = sh;
+    }
 
     bool IsHorizontal() const { return bHorizontal; }
     void SetHorizontal(bool horiz) { bHorizontal = horiz; }
@@ -66,8 +70,8 @@ protected:
     bool m_bTextureVisible{ false };
     bool bHorizontal{ true };
 
-    Frect m_tex_rect[flMax];
-    ui_shader m_shader;
+    Frect m_tex_rect[flMax]{};
+    ui_shader m_shader[flMax]{};
 
 private:
     DECLARE_SCRIPT_REGISTER_FUNCTION(CUIWindow);
