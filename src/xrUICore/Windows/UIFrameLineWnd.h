@@ -60,12 +60,11 @@ public:
     void FillDebugInfo() override;
 
 protected:
-    bool inc_pos(Frect& rect, int counter, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
-    void DrawElements();
+    void DrawElements() const;
 
-    u32 m_texture_color;
-    bool m_bTextureVisible;
-    bool bHorizontal;
+    u32 m_texture_color{ color_argb(255, 255, 255, 255) };
+    bool m_bTextureVisible{ false };
+    bool bHorizontal{ true };
 
     Frect m_tex_rect[flMax];
     ui_shader m_shader;
