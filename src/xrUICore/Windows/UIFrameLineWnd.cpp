@@ -3,11 +3,7 @@
 #include "XML/UITextureMaster.h"
 #include "xrEngine/editor_helper.h"
 
-CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name)
-    : CUIWindow(window_name), m_bTextureVisible(false), bHorizontal(true)
-{
-    m_texture_color = color_argb(255, 255, 255, 255);
-}
+CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name) : CUIWindow(window_name) {}
 
 bool CUIFrameLineWnd::InitFrameLineWnd(pcstr base_name, Fvector2 pos, Fvector2 size, bool horizontal, bool fatal /*= true*/)
 {
@@ -99,9 +95,9 @@ void CUIFrameLineWnd::Draw()
     inherited::Draw();
 }
 
-static Fvector2 pt_offset = {-0.5f, -0.5f};
+constexpr Fvector2 pt_offset = { -0.5f, -0.5f };
 
-void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts)
+ICF void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts)
 {
     UI().AlignPixel(LTp.x);
     UI().AlignPixel(LTp.y);
@@ -121,7 +117,7 @@ void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, 
     GEnv.UIRender->PushPoint(RBp.x, RBp.y, 0, clr, RBt.x, RBt.y);
 }
 
-void CUIFrameLineWnd::DrawElements()
+void CUIFrameLineWnd::DrawElements() const
 {
     GEnv.UIRender->SetShader(*m_shader);
 
@@ -133,41 +129,81 @@ void CUIFrameLineWnd::DrawElements()
     UI().ClientToScreenScaled(rect.lt);
     UI().ClientToScreenScaled(rect.rb);
 
-    float back_len = 0.0f;
-    u32 prim_count = 6 * 2; // first&second
-    if (bHorizontal)
+    u32 total_tiles{};
+    u32 back_tiles{};
+    float back_remainder{};
+
+    const float line_len   = bHorizontal ? rect.width() : rect.height();
+
+    const float first_len  = bHorizontal ? m_tex_rect[flFirst].width()  : m_tex_rect[flFirst].height();
+    const float second_len = bHorizontal ? m_tex_rect[flSecond].width() : m_tex_rect[flSecond].height();
+    const float back_len   = bHorizontal ? m_tex_rect[flBack].width()   : m_tex_rect[flBack].height();
+
+    const float back_available_len = line_len - first_len - second_len;
+
+    if (back_available_len > 0.0f && back_len > 0.0f)
     {
-        back_len = rect.width() - m_tex_rect[flFirst].width() - m_tex_rect[flSecond].width();
-        if (back_len < 0.0f)
+        const float back_tiles_full = back_available_len / back_len;
+        total_tiles   += iCeil(back_tiles_full);
+        back_tiles     = iFloor(back_tiles_full);
+        back_remainder = back_tiles_full - float(back_tiles);
+    }
+    else if (back_available_len < 0.0f)
+    {
+        if (bHorizontal)
             rect.x2 -= back_len;
-
-        if (back_len > 0.0f)
-            prim_count += 6 * iCeil(back_len / m_tex_rect[flBack].width());
-    }
-    else
-    {
-        back_len = rect.height() - m_tex_rect[flFirst].height() - m_tex_rect[flSecond].height();
-        if (back_len < 0)
+        else
             rect.y2 -= back_len;
-
-        if (back_len > 0.0f)
-            prim_count += 6 * iCeil(back_len / m_tex_rect[flBack].height());
     }
 
-    GEnv.UIRender->StartPrimitive(prim_count, IUIRender::ptTriList, UI().m_currentPointType);
+    total_tiles += 2; // first & second
 
-    for (int i = 0; i < flMax; ++i)
+    GEnv.UIRender->StartPrimitive(6 * total_tiles, IUIRender::ptTriList, UI().m_currentPointType);
+
+    float cursor{};
+
+    const auto draw_tile = [&](const float length, const Frect tex_rect)
     {
-        Fvector2 LTt, RBt;
-        Fvector2 LTp, RBp;
-        int counter = 0;
-
-        while (inc_pos(rect, counter, i, LTp, RBp, LTt, RBt))
+        Fvector2 lt, rb;
+        if (bHorizontal)
         {
-            draw_rect(LTp, RBp, LTt, RBt, m_texture_color, ts);
-            ++counter;
-        };
+            lt = { rect.lt.x + cursor, rect.lt.y };
+            rb = { lt.x      + length, rect.rb.y };
+        }
+        else
+        {
+            lt = { rect.lt.x, rect.lt.y + cursor };
+            rb = { rect.rb.x, lt.y      + length };
+        }
+
+        draw_rect(lt, rb, tex_rect.lt, tex_rect.rb, m_texture_color, ts);
+        cursor += length;
+    };
+
+    // first
+    draw_tile(first_len, m_tex_rect[flFirst]);
+
+    // back
+    for (u32 i = 0; i < back_tiles; ++i)
+    {
+        draw_tile(back_len, m_tex_rect[flBack]);
     }
+
+    // back remainder
+    if (back_remainder > 0.0f)
+    {
+        Frect remainder_tc = m_tex_rect[flBack];
+        if (bHorizontal)
+            remainder_tc.rb.x = remainder_tc.lt.x + remainder_tc.width() * back_remainder;
+        else
+            remainder_tc.rb.y = remainder_tc.lt.y + remainder_tc.height() * back_remainder;
+
+        draw_tile(back_len * back_remainder, remainder_tc);
+    }
+
+    // second
+    draw_tile(second_len, m_tex_rect[flSecond]);
+
     GEnv.UIRender->FlushPrimitive();
 }
 
@@ -184,91 +220,36 @@ void CUIFrameLineWnd::FillDebugInfo()
     if (!ImGui::CollapsingHeader(CUIFrameLineWnd::GetDebugType()))
         return;
 
-    ImGui::Checkbox("Texture visible", &m_bTextureVisible);
+    ImGui::Checkbox("Enable texture", &m_bTextureVisible);
 
     ImGui::SameLine();
     ImGui::Checkbox("Horizontal", &bHorizontal);
 
     xray::imgui::ColorEdit4("Texture color", m_texture_color);
 
-    ImGui::DragFloat4("Texture rect: back", reinterpret_cast<float*>(&m_tex_rect[flBack]));
-    ImGui::DragFloat4("Texture rect: first", reinterpret_cast<float*>(&m_tex_rect[flFirst]));
-    ImGui::DragFloat4("Texture rect: second", reinterpret_cast<float*>(&m_tex_rect[flSecond]));
+    Fvector2 ts{};
+    m_shader->GetBaseTextureResolution(ts);
+
+    const auto showRectAdjust = [ts](pcstr label, Frect& tex_rect)
+    {
+        Frect rect =
+        {
+            .lt = tex_rect.lt,
+            .rb = { tex_rect.width(), tex_rect.height() }
+        };
+        if (ImGui::DragFloat4(label, reinterpret_cast<float*>(&rect), 1.0f, 0.0f, std::max(ts.x, ts.y)))
+        {
+            tex_rect.lt = rect.lt;
+            tex_rect.rb = rect.lt.add(rect.rb);
+            clamp(tex_rect.lt.x, 0.0f, ts.x);
+            clamp(tex_rect.lt.y, 0.0f, ts.y);
+            clamp(tex_rect.rb.x, 0.0f, ts.x);
+            clamp(tex_rect.rb.y, 0.0f, ts.y);
+        }
+    };
+
+    showRectAdjust("Texture rect: first", m_tex_rect[flFirst]);
+    showRectAdjust("Texture rect: middle", m_tex_rect[flBack]);
+    showRectAdjust("Texture rect: second", m_tex_rect[flSecond]);
 #endif
-}
-
-bool CUIFrameLineWnd::inc_pos(
-    Frect& rect, int counter, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt)
-{
-    if (i == flFirst || i == flSecond)
-    {
-        if (counter != 0)
-            return false;
-
-        LTt = m_tex_rect[i].lt;
-        RBt = m_tex_rect[i].rb;
-
-        LTp = rect.lt;
-
-        RBp = rect.lt;
-        RBp.x += m_tex_rect[i].width();
-        RBp.y += m_tex_rect[i].height();
-    }
-    else // i==flBack
-    {
-        if ((bHorizontal && rect.lt.x + m_tex_rect[flSecond].width() + EPS_L >= rect.rb.x) ||
-            (!bHorizontal && rect.lt.y + m_tex_rect[flSecond].height() + EPS_L >= rect.rb.y))
-            return false;
-
-        LTt = m_tex_rect[i].lt;
-        LTp = rect.lt;
-
-        bool b_draw_reminder = (bHorizontal) ?
-            (rect.lt.x + m_tex_rect[flBack].width() > rect.rb.x - m_tex_rect[flSecond].width()) :
-            (rect.lt.y + m_tex_rect[flBack].height() > rect.rb.y - m_tex_rect[flSecond].height());
-        if (b_draw_reminder)
-        { // draw reminder
-            float rem_len = (bHorizontal) ? rect.rb.x - m_tex_rect[flSecond].width() - rect.lt.x :
-                                            rect.rb.y - m_tex_rect[flSecond].height() - rect.lt.y;
-
-            if (bHorizontal)
-            {
-                RBt.y = m_tex_rect[i].rb.y;
-                RBt.x = m_tex_rect[i].lt.x + rem_len;
-
-                RBp = rect.lt;
-                RBp.x += rem_len;
-                RBp.y += m_tex_rect[i].height();
-            }
-            else
-            {
-                RBt.y = m_tex_rect[i].lt.y + rem_len;
-                RBt.x = m_tex_rect[i].rb.x;
-
-                RBp = rect.lt;
-                RBp.x += m_tex_rect[i].width();
-                RBp.y += rem_len;
-            }
-        }
-        else
-        { // draw full element
-            RBt = m_tex_rect[i].rb;
-
-            RBp = rect.lt;
-            RBp.x += m_tex_rect[i].width();
-            RBp.y += m_tex_rect[i].height();
-        }
-    }
-
-    // stretch always
-    if (bHorizontal)
-        RBp.y = rect.rb.y;
-    else
-        RBp.x = rect.rb.x;
-
-    if (bHorizontal)
-        rect.lt.x = RBp.x;
-    else
-        rect.lt.y = RBp.y;
-    return true;
 }
