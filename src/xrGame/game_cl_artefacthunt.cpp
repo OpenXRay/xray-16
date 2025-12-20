@@ -11,7 +11,6 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "ui/UIMessageBoxEx.h"
 #include "xrUICore/Static/UIStatic.h"
 #include "xrEngine/xr_level_controller.h"
@@ -58,7 +57,6 @@ void game_cl_ArtefactHunt::Init()
 {
     //	pInventoryMenu	= new CUIInventoryWnd();
     //	pPdaMenu = new CUIPdaWnd();
-    //	pMapDesc = new CUIMapDesc();
 
     LoadTeamData(::detail::mp::ahunt::TEAM1_MENU);
     LoadTeamData(::detail::mp::ahunt::TEAM2_MENU);

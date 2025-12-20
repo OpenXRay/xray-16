@@ -1,42 +1,90 @@
 #include "StdAfx.h"
+
 #include "UIServerInfo.h"
-#include "xrUICore/Static/UIStatic.h"
+
+#include "xrUICore/Buttons/UI3tButton.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "xrUICore/ScrollView/UIScrollView.h"
-#include "UIXmlInit.h"
-#include "xrUICore/Buttons/UI3tButton.h"
-#include "UIGameCustom.h"
-#include "Level.h"
+#include "xrUICore/Static/UIStatic.h"
+
 #include "game_cl_mp.h"
+#include "Level.h"
+#include "UIGameCustom.h"
 #include "UIHelper.h"
+#include "UIMapInfo.h"
+#include "UIXmlInit.h"
 
 #include "xrCore/Media/Image.hpp"
 
 CUIServerInfo::CUIServerInfo() : CUIDialogWnd(CUIServerInfo::GetDebugType())
 {
     CUIXml xml_doc;
-    xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "server_info.xml");
+    if (xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "server_info.xml", false))
+    {
+        CUIXmlInit::InitWindow(xml_doc, "server_info", 0, this);
+        xml_doc.SetLocalRoot(xml_doc.NavigateToNode("server_info", 0));
+    }
+    else
+    {
+        xml_doc.ClearInternal();
+        xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "map_desc.xml");
 
-    CUIXmlInit::InitWindow(xml_doc, "server_info", 0, this);
+        CUIXmlInit::InitWindow(xml_doc, "map_desc", 0, this);
+        xml_doc.SetLocalRoot(xml_doc.NavigateToNode("map_desc", 0));
+    }
 
-    std::ignore = UIHelper::CreateStatic(xml_doc, "server_info:background", 0, this);
-    std::ignore = UIHelper::CreateStatic(xml_doc, "server_info:caption", 0, this);
-    m_image     = UIHelper::CreateStatic(xml_doc, "server_info:image", this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "background", 0, this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "caption", 0, this);
 
-    const auto text_desc = UIHelper::CreateScrollView(xml_doc, "server_info:text_desc", this);
+    m_image = UIHelper::CreateStatic(xml_doc, "image", this);
+    {
+        xr_string map_name = "intro\\intro_map_pic_";
 
-    m_text_body = UIHelper::CreateStatic(xml_doc, "server_info:text_body", nullptr);
-    m_text_body->SetTextComplexMode(true);
-    m_text_body->SetWidth(text_desc->GetDesiredChildWidth());
-    text_desc->AddWindow(m_text_body, true);
+        map_name += Level().name().c_str();
+        xr_string full_name = map_name + ".dds";
 
-    Frect orig_rect = m_image->GetTextureRect();
-    m_image->InitTexture("ui" DELIMITER "ui_noise");
-    m_image->SetTextureRect(orig_rect);
-    m_image->SetStretchTexture(true);
+        Frect orig_rect = m_image->GetTextureRect();
+        if (FS.exist("$game_textures$", full_name.c_str()))
+            m_image->InitTexture(map_name.c_str());
+        else
+            m_image->InitTexture("ui\\ui_noise");
+        m_image->SetTextureRect(orig_rect);
+        m_image->SetStretchTexture(true);
+    }
 
-    const auto btn_next      = UIHelper::Create3tButton(xml_doc, "server_info:btn_next", this);
-    const auto btn_spectator = UIHelper::Create3tButton(xml_doc, "server_info:btn_spectator", this);
+    const auto text_desc = UIHelper::CreateScrollView(xml_doc, "text_desc", this);
+
+    m_text_body = UIHelper::CreateStatic(xml_doc, "text_body", nullptr, false);
+    if (m_text_body)
+    {
+        m_text_body->SetTextComplexMode(true);
+        m_text_body->SetWidth(text_desc->GetDesiredChildWidth());
+        text_desc->AddWindow(m_text_body, true);
+    }
+    else
+    {
+        auto map_info = xr_new<CUIMapInfo>();
+        map_info->SetAutoDelete(true);
+        AttachChild(map_info);
+
+        CUIXmlInit::InitWindow(xml_doc, "map_info", 0, map_info);
+        map_info->InitMapInfo(map_info->GetWndPos(), map_info->GetWndSize());
+        map_info->InitMap(Level().name().c_str(), nullptr);
+
+        pcstr description = map_info->GetLargeDesc();
+        if (description && description[0])
+        {
+            ADD_TEXT_TO_VIEW2(map_info->GetLargeDesc(), text_desc);
+            m_has_info = true;
+        }
+    }
+
+    std::ignore = UIHelper::CreateStatic(xml_doc, "image_frames_1", this, false);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "image_frames_2", this, false);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "image_frames_3", this, false);
+
+    const auto btn_next      = UIHelper::Create3tButton(xml_doc, "btn_next", this);
+    const auto btn_spectator = UIHelper::Create3tButton(xml_doc, "btn_spectator", this);
 
     Register(btn_next);
     Register(btn_spectator);
@@ -65,13 +113,16 @@ void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
     // XXX: real convert jpg to dds
     tmp_writer->w((void*)data_ptr, data_size); // sorry :(
     FS.w_close(tmp_writer);
-    m_dds_file_created = true;
     m_image->InitTexture(tmp_logo_file_name);
     FS.file_delete("$game_saves$", tmp_logo_file_name);
+    m_has_info = true;
 }
 
 void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
 {
+    if (!m_text_body)
+        return;
+
     string4096 tmp_string;
     u32 new_size = data_size;
     if (new_size > (sizeof(tmp_string) - 1))
@@ -93,6 +144,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
 
     m_text_body->SetText(tmp_string); // will create shared_str
     m_text_body->AdjustHeightToText();
+    m_has_info = true;
 }
 
 void CUIServerInfo::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)

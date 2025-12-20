@@ -9,7 +9,6 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "ui/UIMessageBoxEx.h"
 #include "ui/UIVote.h"
 #include "GamePersistent.h"

@@ -17,7 +17,7 @@ public:
     void SetServerRules(u8 const* data_ptr, u32 data_size);
 
     [[nodiscard]]
-    bool HasInfo() const { return m_dds_file_created; }
+    bool HasInfo() const { return m_has_info; }
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = nullptr);
     bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
@@ -30,7 +30,7 @@ private:
 
     static char const* tmp_logo_file_name;
 
-    bool m_dds_file_created{};
+    bool m_has_info{};
     CUIStatic* m_text_body{};
     CUIStatic* m_image{};
 }; // class CUIServerInfo
