@@ -12,46 +12,46 @@ bool CUIFrameLineWnd::InitTexture(pcstr texture, bool fatal /*= true*/)
 
 bool CUIFrameLineWnd::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*/)
 {
-    string256 buf;
+    m_bTextureVisible = false;
 
-    const bool back_exist = CUITextureMaster::InitTexture(strconcat(buf, texture, "_back"), shader, m_shader[flBack], m_tex_rect[flBack]);
-    const bool b_exist = CUITextureMaster::InitTexture(strconcat(buf, texture, "_b"), shader, m_shader[flFirst], m_tex_rect[flFirst]);
-    const bool e_exist = CUITextureMaster::InitTexture(strconcat(buf, texture, "_e"), shader, m_shader[flSecond], m_tex_rect[flSecond]);
+    string_path first, second, back;
+    strconcat(back, texture, "_back");
+    strconcat(first, texture, "_b");
+    strconcat(second, texture, "_e");
 
-    bool failed = false;
+    const bool back_exist = CUITextureMaster::InitTexture(back, shader, m_shader[flBack], m_tex_rect[flBack]);
+    const bool b_exist = CUITextureMaster::InitTexture(first, shader, m_shader[flFirst], m_tex_rect[flFirst]);
+    const bool e_exist = CUITextureMaster::InitTexture(second, shader, m_shader[flSecond], m_tex_rect[flSecond]);
 
-    if (fatal)
+    if (back_exist && b_exist && e_exist)
     {
-        R_ASSERT2(back_exist, texture);
-        R_ASSERT2(b_exist, texture);
-        R_ASSERT2(e_exist, texture);
-    }
-    /*else*/ // Always set failed flag to be able to play in debug
-    {
-        failed |= !back_exist;
-        failed |= !b_exist;
-        failed |= !e_exist;
-    }
+        m_bTextureVisible = true;
 
 #ifndef MASTER_GOLD
-    if (bHorizontal)
-    {
-        if (b_exist && e_exist && !fsimilar(m_tex_rect[flFirst].height(), m_tex_rect[flSecond].height()))
-            Msg("~ Textures %s_b and %s_e are not similar by height", texture, texture);
-        if (b_exist && back_exist && !fsimilar(m_tex_rect[flFirst].height(), m_tex_rect[flBack].height()))
-            Msg("~ Textures %s_b and %s_back are not similar by height", texture, texture);
-    }
-    else
-    {
-        if (b_exist && e_exist && !fsimilar(m_tex_rect[flFirst].width(), m_tex_rect[flSecond].width()))
-            Msg("~ Textures %s_b and %s_e are not similar by width", texture, texture);
-        if (b_exist && back_exist && !fsimilar(m_tex_rect[flFirst].width(), m_tex_rect[flBack].width()))
-            Msg("~ Textures %s_b and %s_back are not similar by width", texture, texture);
-    }
+        if (bHorizontal)
+        {
+            if (b_exist && e_exist && !fsimilar(m_tex_rect[flFirst].height(), m_tex_rect[flSecond].height()))
+                Msg("~ Textures %s_b and %s_e are not similar by height", texture, texture);
+            if (b_exist && back_exist && !fsimilar(m_tex_rect[flFirst].height(), m_tex_rect[flBack].height()))
+                Msg("~ Textures %s_b and %s_back are not similar by height", texture, texture);
+        }
+        else
+        {
+            if (b_exist && e_exist && !fsimilar(m_tex_rect[flFirst].width(), m_tex_rect[flSecond].width()))
+                Msg("~ Textures %s_b and %s_e are not similar by width", texture, texture);
+            if (b_exist && back_exist && !fsimilar(m_tex_rect[flFirst].width(), m_tex_rect[flBack].width()))
+                Msg("~ Textures %s_b and %s_back are not similar by width", texture, texture);
+        }
 #endif
+    }
+    else if (fatal)
+    {
+        R_ASSERT3(back_exist, "Texture needed for CUIFrameLineWnd is missing", back);
+        R_ASSERT3(b_exist, "Texture needed for CUIFrameLineWnd is missing", first);
+        R_ASSERT3(e_exist, "Texture needed for CUIFrameLineWnd is missing", second);
+    }
 
-    m_bTextureVisible = !failed;
-    return !failed;
+    return m_bTextureVisible;
 }
 
 void CUIFrameLineWnd::Draw()
@@ -134,6 +134,9 @@ void CUIFrameLineWnd::DrawElements() const
 
     const auto draw_tile = [&](const float length, const Frect tex_rect, const RectSegment segment)
     {
+        if (fis_zero(length))
+            return;
+
         Fvector2 lt, rb;
         if (bHorizontal)
         {
