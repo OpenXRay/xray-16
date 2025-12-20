@@ -8,84 +8,42 @@
 #include "UIGameCustom.h"
 #include "Level.h"
 #include "game_cl_mp.h"
+#include "UIHelper.h"
 
 #include "xrCore/Media/Image.hpp"
 
-CUIServerInfo::CUIServerInfo()
-    : CUIDialogWnd(CUIServerInfo::GetDebugType())
-{
-    m_dds_file_created = false;
-
-    m_background = xr_new<CUIStatic>("Background");
-    AttachChild(m_background);
-    m_background->SetAutoDelete(true);
-
-    m_caption = xr_new<CUIStatic>("Caption");
-    AttachChild(m_caption);
-    m_caption->SetAutoDelete(true);
-
-    m_image = xr_new<CUIStatic>("Image");
-    AttachChild(m_image);
-    m_image->SetAutoDelete(true);
-
-    m_text_desc = xr_new<CUIScrollView>();
-    AttachChild(m_text_desc);
-    m_text_desc->SetAutoDelete(true);
-
-    m_text_body = xr_new<CUIStatic>("Text body");
-    // m_text_desc->AttachChild		(m_text_body);
-    // m_text_body->SetAutoDelete		(true);
-
-    m_btn_spectator = xr_new<CUI3tButton>();
-    AttachChild(m_btn_spectator);
-    m_btn_spectator->SetAutoDelete(true);
-
-    m_btn_next = xr_new<CUI3tButton>();
-    AttachChild(m_btn_next);
-    m_btn_next->SetAutoDelete(true);
-
-    Init();
-}
-
-CUIServerInfo::~CUIServerInfo() {}
-void CUIServerInfo::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
-void CUIServerInfo::Init()
+CUIServerInfo::CUIServerInfo() : CUIDialogWnd(CUIServerInfo::GetDebugType())
 {
     CUIXml xml_doc;
     xml_doc.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "server_info.xml");
 
     CUIXmlInit::InitWindow(xml_doc, "server_info", 0, this);
-    CUIXmlInit::InitStatic(xml_doc, "server_info:caption", 0, m_caption);
-    CUIXmlInit::InitStatic(xml_doc, "server_info:background", 0, m_background);
-    CUIXmlInit::InitScrollView(xml_doc, "server_info:text_desc", 0, m_text_desc);
-    CUIXmlInit::InitStatic(xml_doc, "server_info:image", 0, m_image);
 
-    CUIXmlInit::InitStatic(xml_doc, "server_info:text_body", 0, m_text_body);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "server_info:background", 0, this);
+    std::ignore = UIHelper::CreateStatic(xml_doc, "server_info:caption", 0, this);
+    m_image     = UIHelper::CreateStatic(xml_doc, "server_info:image", this);
+
+    const auto text_desc = UIHelper::CreateScrollView(xml_doc, "server_info:text_desc", this);
+
+    m_text_body = UIHelper::CreateStatic(xml_doc, "server_info:text_body", nullptr);
     m_text_body->SetTextComplexMode(true);
-    m_text_body->SetWidth(m_text_desc->GetDesiredChildWidth());
-    m_text_desc->AddWindow(m_text_body, true);
+    m_text_body->SetWidth(text_desc->GetDesiredChildWidth());
+    text_desc->AddWindow(m_text_body, true);
 
     Frect orig_rect = m_image->GetTextureRect();
     m_image->InitTexture("ui" DELIMITER "ui_noise");
     m_image->SetTextureRect(orig_rect);
     m_image->SetStretchTexture(true);
 
-    CUIXmlInit::Init3tButton(xml_doc, "server_info:btn_next", 0, m_btn_next);
-    CUIXmlInit::Init3tButton(xml_doc, "server_info:btn_spectator", 0, m_btn_spectator);
+    const auto btn_next      = UIHelper::Create3tButton(xml_doc, "server_info:btn_next", this);
+    const auto btn_spectator = UIHelper::Create3tButton(xml_doc, "server_info:btn_spectator", this);
 
-    InitCallbacks();
-}
+    Register(btn_next);
+    Register(btn_spectator);
 
-void CUIServerInfo::InitCallbacks()
-{
-    Register(m_btn_next);
-    Register(m_btn_spectator);
-
-    AddCallback(m_btn_next, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIServerInfo::OnNextBtnClick));
-    AddCallback(
-        m_btn_spectator, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIServerInfo::OnSpectatorBtnClick));
-    // AddCallback	(this,				WINDOW_KEY_PRESSED,	CUIWndCallback::void_function(this,
-    // &CUIServerInfo::OnNextBtnClick));
+    AddCallback(btn_next, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIServerInfo::OnNextBtnClick));
+    AddCallback(btn_spectator, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIServerInfo::OnSpectatorBtnClick));
+    // AddCallback(this, WINDOW_KEY_PRESSED, CUIWndCallback::void_function(this, &CUIServerInfo::OnNextBtnClick));
 }
 
 char const* CUIServerInfo::tmp_logo_file_name = "tmp_sv_logo.dds";
@@ -135,6 +93,11 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
 
     m_text_body->SetText(tmp_string); // will create shared_str
     m_text_body->AdjustHeightToText();
+}
+
+void CUIServerInfo::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
+{
+    CUIWndCallback::OnEvent(pWnd, msg, pData);
 }
 
 void CUIServerInfo::OnSpectatorBtnClick(CUIWindow* w, void* d)
