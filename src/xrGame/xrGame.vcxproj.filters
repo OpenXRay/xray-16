@@ -1996,12 +1996,6 @@
     <Filter Include="UI\Multiplayer\team_skin_info">
       <UniqueIdentifier>{fabc6e12-dda3-49a7-94b8-98f7b0cff48b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Multiplayer\team_skin_info\MapDesc">
-      <UniqueIdentifier>{3854fc6e-819a-453b-9195-71ebeeb12599}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI\Multiplayer\team_skin_info\MapDesc\MapInfo">
-      <UniqueIdentifier>{bfa2904a-5c5d-498d-be7d-e3238731f03c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI\Multiplayer\team_skin_info\Spawn">
       <UniqueIdentifier>{775f1493-564c-49e5-b7b9-d6de5e670b05}</UniqueIdentifier>
     </Filter>
@@ -2010,6 +2004,9 @@
     </Filter>
     <Filter Include="UI\Multiplayer\team_skin_info\ServerInfo">
       <UniqueIdentifier>{5b96c35c-b5b3-409b-987d-161d10d9ad2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Multiplayer\team_skin_info\ServerInfo\MapInfo">
+      <UniqueIdentifier>{bfa2904a-5c5d-498d-be7d-e3238731f03c}</UniqueIdentifier>
     </Filter>
     <Filter Include="UI\Multiplayer\Voting">
       <UniqueIdentifier>{e2241740-7d81-4634-a522-bd9ff597994f}</UniqueIdentifier>
@@ -5967,11 +5964,8 @@
     <ClInclude Include="ui\UITabButtonMP.h">
       <Filter>UI\Multiplayer\BuyWeaponWnd\TAB</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIMapDesc.h">
-      <Filter>UI\Multiplayer\team_skin_info\MapDesc</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIMapInfo.h">
-      <Filter>UI\Multiplayer\team_skin_info\MapDesc\MapInfo</Filter>
+      <Filter>UI\Multiplayer\team_skin_info\ServerInfo\MapInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UISpawnWnd.h">
       <Filter>UI\Multiplayer\team_skin_info\Spawn</Filter>
@@ -9175,14 +9169,11 @@
     <ClCompile Include="ui\UITabButtonMP.cpp">
       <Filter>UI\Multiplayer\BuyWeaponWnd\TAB</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIMapDesc.cpp">
-      <Filter>UI\Multiplayer\team_skin_info\MapDesc</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIMapInfo.cpp">
-      <Filter>UI\Multiplayer\team_skin_info\MapDesc\MapInfo</Filter>
+      <Filter>UI\Multiplayer\team_skin_info\ServerInfo\MapInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIMapInfo_script.cpp">
-      <Filter>UI\Multiplayer\team_skin_info\MapDesc\MapInfo</Filter>
+      <Filter>UI\Multiplayer\team_skin_info\ServerInfo\MapInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UISpawnWnd.cpp">
       <Filter>UI\Multiplayer\team_skin_info\Spawn</Filter>

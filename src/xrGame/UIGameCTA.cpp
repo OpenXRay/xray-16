@@ -24,7 +24,6 @@
 #include "ui/UISkinSelector.h"
 //.#include "ui/UIInventoryWnd.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "ui/UISpawnWnd.h"
 #include "ui/UIBuyWndBase.h"
 #include "ui/UIMpTradeWnd.h"
@@ -154,16 +153,6 @@ void CUIGameCTA::SetClGame(game_cl_GameState* g)
     inherited::SetClGame(g);
     m_game = smart_cast<game_cl_CaptureTheArtefact*>(g);
     VERIFY(m_game);
-
-    /*if (m_pMapDesc)
-    {
-        if (m_pMapDesc->IsShown())
-        {
-            m_pMapDesc->HideDialog();
-        }
-        delete_data(m_pMapDesc);
-    }
-    m_pMapDesc = new CUIMapDesc();*/
 
     if (m_pBuySpawnMsgBox)
     {

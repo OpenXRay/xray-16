@@ -10,7 +10,6 @@
 #include "ui/UIMainIngameWnd.h"
 #include "ui/UISkinSelector.h"
 #include "ui/UIPdaWnd.h"
-#include "ui/UIMapDesc.h"
 #include "game_base_menu_events.h"
 #include "ui/TeamInfo.h"
 #include "clsid_game.h"
@@ -58,7 +57,6 @@ void game_cl_TeamDeathmatch::Init()
 {
     //	pInventoryMenu	= new CUIInventoryWnd();
     //	pPdaMenu = new CUIPdaWnd();
-    //	pMapDesc = new CUIMapDesc();
     //-----------------------------------------------------------
     LoadTeamData(GetTeamMenu(1));
     LoadTeamData(GetTeamMenu(2));

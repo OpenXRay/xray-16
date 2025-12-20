@@ -1292,7 +1292,6 @@
     <ClInclude Include="ui\UILogsWnd.h" />
     <ClInclude Include="ui\UIMainIngameWnd.h" />
     <ClInclude Include="ui\UIMap.h" />
-    <ClInclude Include="ui\UIMapDesc.h" />
     <ClInclude Include="ui\UIMapFilters.h" />
     <ClInclude Include="ui\UIMapInfo.h" />
     <ClInclude Include="ui\UIMapLegend.h" />
@@ -3158,7 +3157,6 @@
     <ClCompile Include="ui\UILogsWnd.cpp" />
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
     <ClCompile Include="ui\UIMap.cpp" />
-    <ClCompile Include="ui\UIMapDesc.cpp" />
     <ClCompile Include="ui\UIMapFilters.cpp" />
     <ClCompile Include="ui\UIMapInfo.cpp" />
     <ClCompile Include="ui\UIMapInfo_script.cpp">
