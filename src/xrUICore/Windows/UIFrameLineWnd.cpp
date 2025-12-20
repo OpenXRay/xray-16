@@ -5,23 +5,9 @@
 
 CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name) : CUIWindow(window_name) {}
 
-bool CUIFrameLineWnd::InitFrameLineWnd(pcstr base_name, Fvector2 pos, Fvector2 size, bool horizontal, bool fatal /*= true*/)
-{
-    InitFrameLineWnd(pos, size, horizontal);
-    return InitTexture(base_name, fatal);
-}
-
-void CUIFrameLineWnd::InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal)
-{
-    inherited::SetWndPos(pos);
-    inherited::SetWndSize(size);
-
-    bHorizontal = horizontal;
-}
-
 bool CUIFrameLineWnd::InitTexture(pcstr texture, bool fatal /*= true*/)
 {
-    return InitTextureEx(texture, "hud" DELIMITER "default", fatal);
+    return InitTextureEx(texture, "hud\\default", fatal);
 }
 
 bool CUIFrameLineWnd::InitTextureEx(pcstr texture, pcstr shader, bool fatal /*= true*/)

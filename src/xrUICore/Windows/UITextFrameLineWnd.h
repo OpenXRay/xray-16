@@ -10,21 +10,8 @@ class XRUICORE_API CUITextFrameLineWnd final : public CUIWindow
 public:
     CUITextFrameLineWnd();
 
-    void Init(pcstr baseTexture, Fvector2 pos, Fvector2 size, bool horizontal = true);
-    void InitTexture(pcstr texture, bool horizontal = true);
-
-    virtual void SetOrientation(bool horizontal)
-    {
-        m_frameline.SetHorizontal(horizontal);
-    }
-
-    void SetColor(u32 cl)
-    {
-        m_frameline.SetTextureColor(cl);
-    }
-
     // Also we can display textual caption on the frame
-    CUIStatic* GetTitleStatic() { return &m_title; };
+    CUIStatic* GetTitleStatic() { return &m_title; }
     void SetText(pcstr text) { m_title.SetText(text); }
 
     pcstr GetDebugType() override { return "CUITextFrameLineWnd"; }
@@ -32,7 +19,6 @@ public:
 protected:
     friend class CUIXmlInitBase;
 
-    bool bHorizontal;
     CUIFrameLineWnd m_frameline;
     CUIStatic m_title;
 };

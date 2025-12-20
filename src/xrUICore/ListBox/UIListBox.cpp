@@ -50,7 +50,7 @@ CUIListBoxItem* CUIListBox::AddTextItem(LPCSTR text)
 CUIListBoxItem* CUIListBox::AddItem()
 {
     CUIListBoxItem* item = xr_new<CUIListBoxItem>(m_def_item_height);
-    item->InitFrameLineWnd(Fvector2().set(0, 0), Fvector2().set(GetDesiredChildWidth() - 5, m_def_item_height));
+    item->SetWndSize({ GetDesiredChildWidth() - 5, m_def_item_height });
     item->GetTextItem()->SetWidth(GetDesiredChildWidth());
     item->SetWidth(GetDesiredChildWidth());
 
@@ -68,7 +68,7 @@ CUIListBoxItem* CUIListBox::AddItem()
 
 void CUIListBox::AddExistingItem(CUIListBoxItem* item)
 {
-    item->InitFrameLineWnd(Fvector2().set(0, 0), Fvector2().set(GetDesiredChildWidth() - 5, m_def_item_height));
+    item->SetWndSize({ GetDesiredChildWidth() - 5, m_def_item_height });
     item->SetWidth(GetDesiredChildWidth());
 
     if (m_selection_texture.size())

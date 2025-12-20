@@ -16,8 +16,6 @@ public:
 
     CUIFrameLineWnd(pcstr window_name);
 
-    bool InitFrameLineWnd(pcstr base_name, Fvector2 pos, Fvector2 size, bool horizontal = true, bool fatal = true);
-    void InitFrameLineWnd(Fvector2 pos, Fvector2 size, bool horizontal = true);
     bool InitTexture(pcstr texture, bool fatal = true) override;
     bool InitTextureEx(pcstr texture, pcstr shader = "hud" DELIMITER "default", bool fatal = true) override;
 
@@ -33,14 +31,12 @@ public:
 
     void SetTextureRect(const Frect& r) override
     {
-        VERIFY2(false, "This overload is not supposed to be called!!!");
-        m_tex_rect[flBack] = r;
+        // we don't mess with it
     }
 
     const Frect& GetTextureRect() const override
     {
-        VERIFY2(false, "This overload is not supposed to be called!!!");
-        return m_tex_rect[flBack];
+        return m_tex_rect[flFirst];
     }
 
     void SetTextureColor(u32 cl) override { m_texture_color = cl; }
