@@ -170,8 +170,18 @@ void CUIDebugger::on_tool_frame()
             }
             ImGui::TableNextColumn();
             if (m_state.selected)
-                m_state.selected->FillDebugInfo();
+            {
+                const bool debug = xrDebug::DebuggerIsPresent();
+                if (ImGui::Button("Debug break at element"))
+                {
+                    if (debug)
+                        DEBUG_BREAK;
+                }
+                if (!debug)
+                    ImGui::SetItemTooltip("No debugger attached to the process");
 
+                m_state.selected->FillDebugInfo();
+            }
             ImGui::EndTable();
         }
     }
