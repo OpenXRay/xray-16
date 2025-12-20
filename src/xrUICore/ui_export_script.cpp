@@ -391,9 +391,10 @@ void CUIFrameLineWnd::script_register(lua_State* luaState)
             .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
             .def("Init", +[](CUIFrameLineWnd* self, cpcstr texture, float x, float y, float width, float height, bool horizontal)
             {
-                const Fvector2 pos { x, y };
-                const Fvector2 size { width, height };
-                self->InitFrameLineWnd(texture, pos, size, horizontal);
+                self->SetWndPos({ x, y });
+                self->SetWndSize({ width, height });
+                self->SetHorizontal(horizontal);
+                self->InitTexture(texture);
             }),
 
         class_<CUIFrameLineWndScript, CUIFrameLineWnd>("CUIFrameLineWnd")

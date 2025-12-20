@@ -137,7 +137,9 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
         else
             SetWidth(tempBackground->GetWidth());
 
-        m_FrameBackground->InitFrameLineWnd(GetWndPos(), GetWndSize(), m_bIsHorizontal);
+        m_FrameBackground->SetWndPos(GetWndPos());
+        m_FrameBackground->SetWndSize(GetWndSize());
+        m_FrameBackground->SetHorizontal(m_bIsHorizontal);
 
         m_FrameBackground->SetShader(tempBackground->GetShader());
         m_FrameBackground->SetTextureRect(tempBackground->GetTextureRect(), CUIFrameLineWnd::flBack);
@@ -148,7 +150,9 @@ bool CUIScrollBar::InitScrollBar(Fvector2 pos, float length, bool bIsHorizontal,
 
     if (tempScroll && tempScroll->IsShown())
     {
-        m_ScrollBox->InitFrameLineWnd(tempScroll->GetWndPos(), GetWndSize(), m_bIsHorizontal);
+        m_ScrollBox->SetWndPos(tempScroll->GetWndPos());
+        m_ScrollBox->SetWndSize(GetWndSize());
+        m_ScrollBox->SetHorizontal(m_bIsHorizontal);
 
         m_ScrollBox->SetShader(tempScroll->GetShader());
         m_ScrollBox->SetTextureRect(tempScroll->GetTextureRect(), CUIFrameLineWnd::flBack);

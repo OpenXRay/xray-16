@@ -784,32 +784,18 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, pcstr path, int index, CUIFr
         return false;
     }
 
+    const bool vertical = !!xml_doc.ReadAttribInt(path, index, "vertical");
+    pWnd->SetHorizontal(!vertical);
+
+    bool result = InitWindow(xml_doc, path, index, pWnd, fatal);
+    result &= InitTexture(xml_doc, path, index, pWnd, fatal);
+
+    // Reapply stretch (previously applied in InitTexture) as a special case
     const int stretch_default = ClearSkyMode || ShadowOfChernobylMode ? 0 : 1;
     const int stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch", stretch_default);
     pWnd->SetStretchTexture(stretch_flag);
 
-    Fvector2 pos, size;
-    pos.x = xml_doc.ReadAttribFlt(path, index, "x");
-    pos.y = xml_doc.ReadAttribFlt(path, index, "y");
-
-    InitAlignment(xml_doc, path, index, pos.x, pos.y, pWnd);
-
-    size.x = xml_doc.ReadAttribFlt(path, index, "width");
-    size.y = xml_doc.ReadAttribFlt(path, index, "height");
-    const bool vertical = !!xml_doc.ReadAttribInt(path, index, "vertical");
-
-    string256 buf;
-    strconcat(buf, path, ":texture");
-    const shared_str base_name = xml_doc.Read(buf, index, nullptr);
-
-    VERIFY(base_name);
-
-    const u32 color = GetColor(xml_doc, buf, index, 0xff);
-    pWnd->SetTextureColor(color);
-
-    InitWindow(xml_doc, path, index, pWnd);
-
-    return pWnd->InitFrameLineWnd(base_name.c_str(), pos, size, !vertical, fatal);
+    return result;
 }
 
 bool CUIXmlInitBase::InitTextFrameLine(CUIXml& xml_doc, pcstr path, int index, CUITextFrameLineWnd* pWnd, bool fatal /*= true*/)
@@ -931,7 +917,7 @@ bool CUIXmlInitBase::InitTexture(const CUIXml& xml_doc, pcstr path, int index, I
     const u32 color = GetColor(xml_doc, buf, index, 0xff);
     pWnd->SetTextureColor(color);
 
-    if (rect.width() != 0 && rect.height() != 0)
+    if (!fis_zero(rect.width()) && !fis_zero(rect.height()))
         pWnd->SetTextureRect(rect);
 
     return result;
