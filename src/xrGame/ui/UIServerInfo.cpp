@@ -44,7 +44,11 @@ CUIServerInfo::CUIServerInfo() : CUIDialogWnd(CUIServerInfo::GetDebugType())
         xr_string full_name = map_name + ".dds";
 
         Frect orig_rect = m_image->GetTextureRect();
-        if (FS.exist("$game_textures$", full_name.c_str()))
+        if (pGameIni->section_exist(Level().name()) && pGameIni->line_exist(Level().name(), "texture"))
+        {
+            m_image->InitTexture(pGameIni->r_string(Level().name(), "texture"));
+        }
+        else if (FS.exist("$game_textures$", full_name.c_str()))
             m_image->InitTexture(map_name.c_str());
         else
             m_image->InitTexture("ui\\ui_noise");
