@@ -45,10 +45,9 @@ protected:
 
     void InitSkins();
     void UpdateSkins();
-    CUIStatic* m_pCaption;
-    CUIStatic* m_pBackground;
-    CUIStatic* m_pFrames;
-#define p_image_count 6
+
+    static constexpr size_t p_image_count = 6;
+
     CUIStatix* m_pImage[p_image_count];
     //	CUI3tButton*	m_pButtons[2];
     //	CUIAnimatedStatic* m_pAnims[2];
