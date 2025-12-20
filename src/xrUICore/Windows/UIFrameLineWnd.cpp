@@ -199,13 +199,22 @@ void CUIFrameLineWnd::DrawElements() const
         draw_rect(lt, rb, tex_rect.lt, tex_rect.rb, m_texture_color, ts);
     };
 
+    bool one_shader = false;
+    if (m_shader[flFirst] == m_shader[flBack] && m_shader[flBack] == m_shader[flSecond])
+        one_shader = true;
+
     // first
-    GEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
+    const auto first_tiles = one_shader ? total_tiles + 2 : 1;
+    GEnv.UIRender->StartPrimitive(6 * first_tiles, IUIRender::ptTriList, UI().m_currentPointType);
     draw_tile(first_len, m_tex_rect[flFirst], flFirst);
-    GEnv.UIRender->FlushPrimitive();
+
+    if (!one_shader)
+    {
+        GEnv.UIRender->FlushPrimitive();
+        GEnv.UIRender->StartPrimitive(6 * total_tiles, IUIRender::ptTriList, UI().m_currentPointType);
+    }
 
     // back
-    GEnv.UIRender->StartPrimitive(6 * total_tiles, IUIRender::ptTriList, UI().m_currentPointType);
     for (u32 i = 0; i < back_tiles; ++i)
     {
         draw_tile(back_len, m_tex_rect[flBack], flBack);
@@ -221,10 +230,14 @@ void CUIFrameLineWnd::DrawElements() const
 
         draw_tile(back_len * back_remainder, remainder_tc, flBack);
     }
-    GEnv.UIRender->FlushPrimitive();
+
+    if (!one_shader)
+    {
+        GEnv.UIRender->FlushPrimitive();
+        GEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
+    }
 
     // second
-    GEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
     draw_tile(second_len, m_tex_rect[flSecond], flSecond);
     GEnv.UIRender->FlushPrimitive();
 }
