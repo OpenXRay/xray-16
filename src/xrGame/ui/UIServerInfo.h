@@ -12,33 +12,27 @@ class CUIServerInfo final : public CUIDialogWnd, public CUIWndCallback
 {
 public:
     CUIServerInfo();
-    virtual ~CUIServerInfo();
-    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
-    void Init();
-    void SetServerLogo(u8 const* data_ptr, u32 const data_size);
-    void SetServerRules(u8 const* data_ptr, u32 const data_size);
-    bool HasInfo() { return m_dds_file_created; };
-    virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
+    void SetServerLogo(u8 const* data_ptr, u32 data_size);
+    void SetServerRules(u8 const* data_ptr, u32 data_size);
+
+    [[nodiscard]]
+    bool HasInfo() const { return m_dds_file_created; }
+
+    virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = nullptr);
+    bool OnKeyboardAction(int dik, EUIMessages keyboard_action) override;
 
     pcstr GetDebugType() override { return "CUIServerInfo"; }
 
 private:
-    void InitCallbacks();
-
     void OnSpectatorBtnClick(CUIWindow* w, void* d);
     void OnNextBtnClick(CUIWindow* w, void* d);
 
     static char const* tmp_logo_file_name;
 
-    bool m_dds_file_created;
-    CUIStatic* m_caption;
-    CUIStatic* m_background;
-    CUIScrollView* m_text_desc;
-    CUIStatic* m_text_body;
-    CUIStatic* m_image;
-    CUI3tButton* m_btn_spectator;
-    CUI3tButton* m_btn_next;
+    bool m_dds_file_created{};
+    CUIStatic* m_text_body{};
+    CUIStatic* m_image{};
 }; // class CUIServerInfo
 
 #endif //#ifndef UISERVER_INFO_INCLUDED
