@@ -648,8 +648,6 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
     //-----------------------------------------------
 
     //-----------------------------------------------
-    // if (m_game_ui->m_pInventoryMenu && m_game_ui->m_pInventoryMenu->IsShown() && !CanCallInventoryMenu())
-    //	StartStopMenu(m_game_ui->m_pInventoryMenu,true);
     if (m_game_ui && m_game_ui->GetActorMenu().IsShown() && !CanCallInventoryMenu())
     {
         m_game_ui->HideActorMenu();
@@ -658,10 +656,6 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
     //-----------------------------------------
 
     u32 cur_game_state = Phase();
-    // if(m_game_ui->m_pMapDesc && m_game_ui->m_pMapDesc->IsShown() && cur_game_state!=GAME_PHASE_INPROGRESS)
-    //{
-    //	m_game_ui->m_pMapDesc->HideDialog();
-    //}
 
     if (pCurSkinMenu && pCurSkinMenu->IsShown() && cur_game_state != GAME_PHASE_INPROGRESS)
     {
@@ -1133,9 +1127,6 @@ void game_cl_Deathmatch::OnGameMenuRespond_ChangeSkin(NET_Packet& P)
 
     if (pCurSkinMenu && pCurSkinMenu->IsShown())
         pCurSkinMenu->HideDialog();
-
-    // if (m_game_ui->m_pMapDesc && m_game_ui->m_pMapDesc->IsShown())
-    //	m_game_ui->m_pMapDesc->HideDialog();
 
     SetCurrentSkinMenu();
     if (pCurSkinMenu)
