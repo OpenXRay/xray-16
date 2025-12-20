@@ -170,13 +170,25 @@ void CUIFrameLineWnd::DrawElements() const
         Fvector2 lt, rb;
         if (bHorizontal)
         {
+            float height;
+            if (m_bStretchTexture && rect.height() > 0.0f)
+                height = rect.rb.y;
+            else
+                height = rect.lt.y + UI().ClientToScreenScaledY(tex_rect.height());
+
             lt = { rect.lt.x + cursor, rect.lt.y };
-            rb = { lt.x      + length, rect.rb.y };
+            rb = { lt.x      + length, height    };
         }
         else
         {
+            float width;
+            if (m_bStretchTexture && rect.width() > 0.0f)
+                width = rect.rb.x;
+            else
+                width = rect.lt.x + UI().ClientToScreenScaledX(tex_rect.width());
+
             lt = { rect.lt.x, rect.lt.y + cursor };
-            rb = { rect.rb.x, lt.y      + length };
+            rb = { width,     lt.y      + length };
         }
         cursor += length;
 
@@ -231,6 +243,9 @@ void CUIFrameLineWnd::FillDebugInfo()
         return;
 
     ImGui::Checkbox("Enable texture", &m_bTextureVisible);
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Stretch texture", &m_bStretchTexture);
 
     ImGui::SameLine();
     ImGui::Checkbox("Horizontal", &bHorizontal);
