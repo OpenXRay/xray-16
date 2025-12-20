@@ -46,8 +46,8 @@ public:
     void SetTextureColor(u32 cl) override { m_texture_color = cl; }
     u32 GetTextureColor() const override { return m_texture_color; }
 
-    void SetStretchTexture(bool /*stretch*/) override {}
-    bool GetStretchTexture() override { return false; }
+    void SetStretchTexture(bool stretch) override { m_bStretchTexture = stretch;}
+    bool GetStretchTexture() override { return m_bStretchTexture; }
 
     void SetTextureVisible(bool value) { m_bTextureVisible = value; }
     void SetShader(const ui_shader& sh)
@@ -68,6 +68,7 @@ protected:
 
     u32 m_texture_color{ color_argb(255, 255, 255, 255) };
     bool m_bTextureVisible{ false };
+    bool m_bStretchTexture{ true };
     bool bHorizontal{ true };
 
     Frect m_tex_rect[flMax]{};

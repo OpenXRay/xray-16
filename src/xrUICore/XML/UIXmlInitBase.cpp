@@ -784,12 +784,9 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, pcstr path, int index, CUIFr
         return false;
     }
 
-    string256 buf;
-
-    if (xml_doc.ReadAttribInt(path, index, "stretch"))
-    {
-        //.	pWnd->SetStretchTexture( stretch_flag );
-    }
+    const int stretch_default = ClearSkyMode || ShadowOfChernobylMode ? 0 : 1;
+    const int stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch", stretch_default);
+    pWnd->SetStretchTexture(stretch_flag);
 
     Fvector2 pos, size;
     pos.x = xml_doc.ReadAttribFlt(path, index, "x");
@@ -801,6 +798,7 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, pcstr path, int index, CUIFr
     size.y = xml_doc.ReadAttribFlt(path, index, "height");
     const bool vertical = !!xml_doc.ReadAttribInt(path, index, "vertical");
 
+    string256 buf;
     strconcat(buf, path, ":texture");
     const shared_str base_name = xml_doc.Read(buf, index, nullptr);
 
