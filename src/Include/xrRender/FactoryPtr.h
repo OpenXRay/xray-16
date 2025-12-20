@@ -71,6 +71,12 @@ public:
     [[nodiscard]]
     bool operator!() const { return m_pObject == nullptr; }
 
+    [[nodiscard]]
+    bool operator==(const FactoryPtr& other) const
+    {
+        return *m_pObject == *other.m_pObject;
+    }
+
 private:
     void CreateObject();
     void DestroyObject();
