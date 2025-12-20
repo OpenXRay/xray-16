@@ -6,9 +6,6 @@
 
 #include "UIDialogWnd.h"
 
-const u32 SKIN_TEX_HEIGHT = 232;
-const u32 SKIN_TEX_WIDTH = 111;
-
 class CUIStatic;
 class CUIStatix;
 class CUI3tButton;
@@ -46,11 +43,9 @@ protected:
     void InitSkins();
     void UpdateSkins();
 
-    static constexpr size_t p_image_count = 6;
-
-    CUIStatix* m_pImage[p_image_count];
-    //	CUI3tButton*	m_pButtons[2];
-    //	CUIAnimatedStatic* m_pAnims[2];
+    xr_vector<CUIStatix*> m_pImage;
+    CUI3tButton* m_pButtons[2];
+    CUIAnimatedStatic* m_pAnims[2];
     CUI3tButton* m_pBtnAutoSelect;
     CUI3tButton* m_pBtnSpectator;
     CUI3tButton* m_pBtnBack;
