@@ -22,7 +22,6 @@
 #include "WeaponKnife.h"
 
 #include "ui/UISkinSelector.h"
-//.#include "ui/UIInventoryWnd.h"
 #include "ui/UIPdaWnd.h"
 #include "ui/UISpawnWnd.h"
 #include "ui/UIBuyWndBase.h"
