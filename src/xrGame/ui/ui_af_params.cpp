@@ -76,13 +76,13 @@ bool CUIArtefactParams::InitFromXml(CUIXml& xml)
     m_disp_condition = CreateItem(xml, "condition", "ui_inv_af_condition");
     //-Alundaio
 
-    for (auto [id, section, caption, magnitude, sign_inverse, unit] : af_immunity)
-    {
-        m_immunity_item[id] = CreateItem(xml, section, magnitude, sign_inverse, unit, caption);
-    }
     for (auto [id, section, caption, magnitude, sign_inverse, unit] : af_restore)
     {
         m_restore_item[id] = CreateItem(xml, section, magnitude, sign_inverse, unit, caption);
+    }
+    for (auto [id, section, caption, magnitude, sign_inverse, unit] : af_immunity)
+    {
+        m_immunity_item[id] = CreateItem(xml, section, magnitude, sign_inverse, unit, caption);
     }
     m_additional_weight = CreateItem(xml, "additional_weight", "ui_inv_weight", "ui_inv_outfit_additional_weight");
 
@@ -164,6 +164,19 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         setValue(m_disp_condition, pInvItem.GetCondition());
     //-Alundaio
 
+    for (auto [id, restore_section, restore_caption, magnitude, sign_inverse, unit] : af_restore)
+    {
+        if (!m_restore_item[id])
+            continue;
+
+        float val = pSettings->r_float(af_section, restore_section);
+        if (fis_zero(val))
+            continue;
+
+        val *= pInvItem.GetCondition();
+        setValue(m_restore_item[id], val);
+    }
+
     for (auto [id, immunity_section, immunity_caption, magnitude, sign_inverse, unit] : af_immunity)
     {
         if (!m_immunity_item[id])
@@ -188,19 +201,6 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
             val *= pInvItem.GetCondition();
             setValue(m_additional_weight, val);
         }
-    }
-
-    for (auto [id, restore_section, restore_caption, magnitude, sign_inverse, unit] : af_restore)
-    {
-        if (!m_restore_item[id])
-            continue;
-
-        float val = pSettings->r_float(af_section, restore_section);
-        if (fis_zero(val))
-            continue;
-
-        val *= pInvItem.GetCondition();
-        setValue(m_restore_item[id], val);
     }
 
     SetHeight(h);
