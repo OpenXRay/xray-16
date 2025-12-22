@@ -7,6 +7,7 @@
 #include "UIDragDropReferenceList.h"
 #include "UIActorStateInfo.h"
 #include "UIItemInfo.h"
+#include "UIOutfitInfo.h"
 #include "UITradeBar.h"
 #include "UIWeightBar.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
@@ -321,9 +322,10 @@ void CUIActorMenu::InitializeInventoryMode(CUIXml& uiXml)
     CUIFrameWindow* personalWnd = UIHelper::CreateFrameWindow(uiXml, "character_frame_window", m_pInventoryWnd);
     UIHelper::CreateStatic(uiXml, "static_personal", personalWnd);
 
-    CUIItemInfo* outfitInfo = xr_new<CUIItemInfo>();
-    outfitInfo->SetAutoDelete(true);
-    m_pInventoryWnd->AttachChild(outfitInfo);
+    m_OutfitInfo = xr_new<CUIOutfitInfo>();
+    m_OutfitInfo->SetAutoDelete(true);
+    m_pInventoryWnd->AttachChild(m_OutfitInfo);
+    m_OutfitInfo->InitFromXml(uiXml);
 
     std::tuple<eActorMenuListType, cpcstr, CUIWindow*, bool> inventory_lists[] =
     {

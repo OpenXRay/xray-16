@@ -299,11 +299,15 @@ float CScriptGameObject::GetCurrentOutfitProtection(int hit_type)
         return (0);
     }
     CGameObject* current_equipment = inventoryOwner->GetOutfit();
-    CCustomOutfit* o = smart_cast<CCustomOutfit*>(current_equipment);
+    const CCustomOutfit* o = smart_cast<CCustomOutfit*>(current_equipment);
     if (!o)
         return 0.0f;
 
-    return o->GetDefHitTypeProtection(ALife::EHitType(hit_type));
+    const float protection = o->GetDefHitTypeProtection(ALife::EHitType(hit_type));
+
+    if (o->GetHitFracType() == SBoneProtections::HitFraction)
+        return 1.0f - protection; // SOC
+    return protection;
 }
 
 CScriptGameObject* CScriptGameObject::GetFood() const

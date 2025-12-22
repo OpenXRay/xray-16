@@ -23,6 +23,8 @@ public:
     [[nodiscard]] float GetDefHitTypeProtection(ALife::EHitType hit_type) const;
     [[nodiscard]] float GetBoneArmor(s16 element) const;
 
+    [[nodiscard]] auto  GetHitFracType() const { return m_boneProtection.m_hitFracType; }
+
     //коэффициент на который домножается потеря силы
     //если на персонаже надет костюм
     [[nodiscard]] float GetPowerLoss() const;

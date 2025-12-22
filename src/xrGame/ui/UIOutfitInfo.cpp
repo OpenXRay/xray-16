@@ -24,10 +24,9 @@ constexpr std::tuple<ALife::EHitType, cpcstr, cpcstr> immunity_names[] =
     { ALife::eHitTypeFireWound,    "fire_wound_immunity",    "ui_inv_outfit_fire_wound_protection" },
 };
 
-CUIOutfitImmunity::CUIOutfitImmunity()
-    : CUIWindow("CUIOutfitImmunity"), m_name("Name"), m_value("Value")
+CUIOutfitImmunity::CUIOutfitImmunity(pcstr immunity_name)
+    : CUIStatic(immunity_name), m_value("static_value")
 {
-    AttachChild(&m_name);
     AttachChild(&m_progress);
     AttachChild(&m_value);
     m_magnitude = 1.0f;
@@ -35,145 +34,220 @@ CUIOutfitImmunity::CUIOutfitImmunity()
 
 bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immunity, pcstr immunity_text)
 {
-    CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
+    float default_magnitude = 1.0f;
 
     string256 buf;
-
-    strconcat(sizeof(buf), buf, base_str, ":", immunity);
-    if (!CUIXmlInit::InitWindow(xml_doc, buf, 0, this, false))
+    strconcat(buf, base_str, ":", immunity);
+    if (!CUIXmlInit::InitStatic(xml_doc, buf, 0, this, false))
         return false;
 
-    CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_name);
-    m_name.TextItemControl()->SetTextST(immunity_text);
+    SetTextST(immunity_text);
 
-    strconcat(sizeof(buf), buf, base_str, ":", immunity, ":progress_immunity");
-    m_progress.InitFromXml(xml_doc, buf);
+    strconcat(buf, base_str, ":", immunity, ":progress_immunity");
+    if (xml_doc.NavigateToNode(buf, 0))
+    {
+        m_progress.InitFromXml(xml_doc, buf);
+        m_progress.Show(true);
+    }
+    else
+    {
+        m_progress.Show(false);
+    }
 
-    strconcat(sizeof(buf), buf, base_str, ":", immunity, ":static_value");
+    strconcat(buf, base_str, ":", immunity, ":static_value");
     if (xml_doc.NavigateToNode(buf, 0) && !CallOfPripyatMode)
     {
         CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_value);
         m_value.Show(true);
+    }
+    else if (!m_progress.IsShown()) // SOC
+    {
+        strconcat(buf, base_str, ":", immunity);
+        CUIXmlInit::InitText(xml_doc, buf, 0, m_value.TextItemControl());
+
+        const auto font = GetFont();
+        float text_len  = font->SizeOf_(GetText());
+        float space_len = font->SizeOf_(" ");
+        UI().ClientToScreenScaledWidth(text_len);
+        UI().ClientToScreenScaledWidth(space_len);
+
+        auto rect = GetWndRect();
+        rect.x1 += TextItemControl()->m_TextOffset.x + text_len + space_len;
+        m_value.SetWndRect(rect);
+
+        m_value.Show(true);
+        default_magnitude = 100.0f;
     }
     else
     {
         m_value.Show(false);
     }
 
-    m_magnitude = xml_doc.ReadAttribFlt(buf, 0, "magnitude", 1.0f);
+    m_magnitude = xml_doc.ReadAttribFlt(buf, 0, "magnitude", default_magnitude);
     return true;
 }
 
 void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 {
+    string128 buf;
+
     cur *= m_magnitude;
     comp *= m_magnitude;
-    m_progress.SetTwoPos(cur, comp);
-    string32 buf;
-    //	xr_sprintf( buf, sizeof(buf), "%d %%", (int)cur );
-    xr_sprintf(buf, sizeof(buf), "%.0f", cur);
+
+    if (m_progress.IsShown())
+    {
+        m_progress.SetTwoPos(cur, comp);
+        xr_sprintf(buf, "%.0f", cur);
+    }
+    else // SOC
+    {
+        xr_sprintf(buf, "%s %+3.0f%%", cur > 0.0f ? "%c[green]" : "%c[red]", cur);
+    }
+
     m_value.SetText(buf);
 }
 
 // ===========================================================================================
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
-    const LPCSTR base_str = "outfit_info";
+    constexpr pcstr base_str = "outfit_info";
 
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
     string128 buf;
 
-    strconcat(sizeof(buf), buf, base_str, ":caption");
-    m_caption = UIHelper::CreateStatic(xml_doc, buf, this, false);
+    strconcat(buf, base_str, ":caption");
+    const auto caption = UIHelper::CreateStatic(xml_doc, buf, this, false);
 
-    strconcat(sizeof(buf), buf, base_str, ":", "prop_line");
-    m_Prop_line = UIHelper::CreateStatic(xml_doc, buf, this, false);
+    strconcat(buf, base_str, ":prop_line");
+    const auto prop_line = UIHelper::CreateStatic(xml_doc, buf, this, false);
 
-    Fvector2 pos{};
-
-    if (m_Prop_line)
-        pos.set(0.0f, m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y);
-    else if (m_caption)
-        pos.set(0.0f, m_caption->GetWndSize().y);
+    if (prop_line)
+        m_start_pos = { 0.0f, prop_line->GetWndPos().y + prop_line->GetWndSize().y };
+    else if (caption)
+        m_start_pos = { 0.0f, caption->GetWndSize().y };
+    else // SOC
+    {
+        strconcat(buf, base_str, ":scroll_view");
+        if (const auto node = xml_doc.NavigateToNode(buf))
+        {
+            const auto x = xml_doc.ReadAttribFlt(node, "x", 0.0f);
+            const auto y = xml_doc.ReadAttribFlt(node, "y", 0.0f);
+            m_start_pos = { x, y };
+        }
+    }
 
     for (const auto [hit_type, immunity, immunity_text] : immunity_names)
     {
-        auto item = xr_new<CUIOutfitImmunity>();
-        if (!item->InitFromXml(xml_doc, base_str, immunity, immunity_text))
+        auto item = xr_new<CUIOutfitImmunity>(immunity);
+
+        strconcat(buf, "static_", immunity); // SOC
+        if (item->InitFromXml(xml_doc, base_str, immunity, immunity_text) ||
+            item->InitFromXml(xml_doc, base_str, buf, immunity_text))
         {
-            xr_delete(item);
+            item->SetAutoDelete(true);
+            AttachChild(item);
+            m_items[hit_type] = item;
             continue;
         }
-        item->SetAutoDelete(true);
-        AttachChild(item);
-        item->SetWndPos(pos);
-        pos.y += item->GetWndSize().y;
-        m_items[hit_type] = item;
+        xr_delete(item);
     }
 
+    AdjustElements();
+}
+
+void CUIOutfitInfo::AdjustElements()
+{
+    auto pos = m_start_pos;
+
+    for (const auto [hit_type, _, __] : immunity_names)
+    {
+        auto item = m_items[hit_type];
+        if (!item || !item->IsShown())
+            continue;
+        item->SetWndPos(pos);
+        pos.y += item->GetWndSize().y;
+    }
     pos.x = GetWndSize().x;
     SetWndSize(pos);
 }
 
-void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit)
+void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit /*= nullptr*/, bool hide_if_zero_immunity /*= false*/)
 {
     const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor || !cur_outfit)
     {
+        if (hide_if_zero_immunity)
+        {
+            for (auto& [hit_type, item] : m_items)
+            {
+                if (item)
+                    item->Show(false);
+            }
+        }
         return;
     }
+
+    const bool is_cs_cop = cur_outfit->GetHitFracType() != SBoneProtections::HitFraction;
 
     for (auto& [hit_type, item] : m_items)
     {
         if (!item)
             continue;
 
-        if (hit_type == ALife::eHitTypeFireWound)
+        if (hit_type == ALife::eHitTypeFireWound && is_cs_cop)
             continue;
 
-        const float max_power = actor->conditions().GetZoneMaxPower(hit_type);
+        float cur  = cur_outfit->GetDefHitTypeProtection(hit_type);
+        float slot = slot_outfit ? slot_outfit->GetDefHitTypeProtection(hit_type) : cur;
 
-        float cur = cur_outfit->GetDefHitTypeProtection(hit_type);
-        cur /= max_power; // = 0..1
-        float slot = cur;
-
-        if (slot_outfit)
+        if (is_cs_cop)
         {
-            slot = slot_outfit->GetDefHitTypeProtection(hit_type);
+            const float max_power = actor->conditions().GetZoneMaxPower(hit_type);
+            cur /= max_power;  // = 0..1
             slot /= max_power; //  = 0..1
         }
-        item->SetProgressValue(cur, slot);
+        else // SOC
+        {
+            cur  = 1.0f - cur;
+            slot = 1.0f - slot;
+        }
+
+        const bool hide = hide_if_zero_immunity && fis_zero(cur) && fis_zero(slot);
+        item->Show(!hide);
+
+        if (!hide)
+            item->SetProgressValue(cur, slot);
     }
 
-    if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound])
+    if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound];
+        fireWoundItem && is_cs_cop)
     {
         IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
         VERIFY(ikv);
         u16 spine_bone = ikv->LL_BoneID("bip01_spine");
 
         float cur = cur_outfit->GetBoneArmor(spine_bone) * cur_outfit->GetCondition();
-        // if(!cur_outfit->bIsHelmetAvaliable)
-        //{
-        //	spine_bone = ikv->LL_BoneID("bip01_head");
-        //	cur += cur_outfit->GetBoneArmor(spine_bone);
-        //}
+
         float slot = cur;
         if (slot_outfit)
         {
             spine_bone = ikv->LL_BoneID("bip01_spine");
             slot = slot_outfit->GetBoneArmor(spine_bone) * slot_outfit->GetCondition();
-            // if(!slot_outfit->bIsHelmetAvaliable)
-            //{
-            //	spine_bone = ikv->LL_BoneID("bip01_head");
-            //	slot += slot_outfit->GetBoneArmor(spine_bone);
-            //}
+
         }
         const float max_power = actor->conditions().GetMaxFireWoundProtection();
         cur /= max_power;
         slot /= max_power;
-        fireWoundItem->SetProgressValue(cur, slot);
+
+        const bool hide = hide_if_zero_immunity && fis_zero(cur) && fis_zero(slot);
+        fireWoundItem->Show(!hide);
+
+        if (!hide)
+            fireWoundItem->SetProgressValue(cur, slot);
     }
+
+    AdjustElements();
 }
 
 void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)

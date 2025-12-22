@@ -63,6 +63,8 @@ void CCustomOutfit::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeTelepatic] = pSettings->r_float(section, "telepatic_protection");
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
+    // fire_wound_protection isn't used in hit calculations code, bone protections are used instead.
+    // This is used as a virtual value in the UI, and possibly in Lua scripts (which can do some real calculations).
     m_HitTypeProtection[ALife::eHitTypeFireWound] = pSettings->read_if_exists<float>(section, "fire_wound_protection", 0.0f);
     m_HitTypeProtection[ALife::eHitTypePhysicStrike] = pSettings->read_if_exists<float>(
         section, "physic_strike_protection", m_HitTypeProtection[ALife::eHitTypeStrike]);
@@ -221,7 +223,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     {
         if (hit_type == ALife::eHitTypeFireWound)
         {
-            const float BoneArmor = m_boneProtection.getBoneArmor(element) * GetCondition();
+            const float BoneArmor = GetBoneArmor(element) * GetCondition();
 
             if (ap > EPS && ap > BoneArmor)
             {
@@ -271,7 +273,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     {
         if (hit_type == ALife::eHitTypeFireWound)
         {
-            const float BoneArmor = m_boneProtection.getBoneArmor(element) * GetCondition() * (1 - ap);
+            const float BoneArmor = GetBoneArmor(element) * GetCondition() * (1 - ap);
             NewHitPower -= BoneArmor;
             if (NewHitPower < hit_power * m_boneProtection.m_fHitFrac)
                 NewHitPower = hit_power * m_boneProtection.m_fHitFrac;
