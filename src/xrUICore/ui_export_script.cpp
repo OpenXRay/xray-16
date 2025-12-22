@@ -209,32 +209,53 @@ void CUIWindow::script_register(lua_State* luaState)
 
             .def("Init", +[](CUIWindow* self, float x, float y, float width, float height)
             {
-                const Frect rect { x, y, width, height };
+                self->SetWndRect({ x, y, width, height });
+            })
+            .def("Init", +[](CUIWindow* self, Frect rect)
+            {
                 self->SetWndRect(rect);
             })
-            .def("Init", (void (CUIWindow::*)(Frect))& CUIWindow::SetWndRect_script)
 
-            .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
+            // Rect
+            .def("GetWndRect", +[](CUIWindow* self) -> Frect
+            {
+                return self->GetWndRect();
+            })
+            .def("SetWndRect", +[](CUIWindow* self, Frect rect)
+            {
+                self->SetWndRect(rect);
+            })
             .def("SetWndRect", +[](CUIWindow* self, float x, float y, float width, float height)
             {
-                const Frect rect { x, y, width, height };
-                self->SetWndRect(rect);
+                self->SetWndRect({ x, y, width, height });
             })
 
-            .def("SetWndSize", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndSize_script)
-
-            .def("GetWndPos", +[](CUIWindow* w) -> Fvector2 { return w->GetWndPos(); })
-            .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
-
+            // Position
+            .def("GetWndPos", +[](CUIWindow* self) -> Fvector2
+            {
+                return self->GetWndPos();
+            })
+            .def("SetWndPos", +[](CUIWindow* self, Fvector2 pos)
+            {
+                 self->SetWndPos(pos);
+            })
             .def("SetWndPos", +[](CUIWindow* self, float x, float y)
             {
-                const Fvector2 pos { x, y };
-                self->SetWndPos(pos);
+                self->SetWndPos({ x, y });
+            })
+
+            // Size
+            .def("GetWndSize", +[](CUIWindow* self) -> Fvector2
+            {
+                return self->GetWndSize();
+            })
+            .def("SetWndSize", +[](CUIWindow* self, Fvector2 size)
+            {
+                self->SetWndSize(size);
             })
             .def("SetWndSize", +[](CUIWindow* self, float width, float height)
             {
-                const Fvector2 size { width, height };
-                self->SetWndSize(size);
+                self->SetWndSize({ width, height });
             })
 
             .def("GetWidth", &CUIWindow::GetWidth)
