@@ -354,6 +354,10 @@ void CUIFrameWindow::script_register(lua_State* luaState)
             .def("SetWidth", &CUIFrameWindow::SetWidth)
             .def("SetHeight", &CUIFrameWindow::SetHeight)
             .def("SetColor", &CUIFrameWindow::SetTextureColor)
+            .def("GetTitleStatic", +[](CUIFrameWindow* self) -> CUIStatic*
+            {
+                return self->GetTitleText(true);
+            })
             .def("Init", +[](CUIFrameWindow* self, pcstr texture, float x, float y, float width, float height)
             {
                 self->SetWndRect({ x, y, width, height });
@@ -389,6 +393,10 @@ void CUIFrameLineWnd::script_register(lua_State* luaState)
             .def("SetWidth", &CUIFrameLineWnd::SetWidth)
             .def("SetHeight", &CUIFrameLineWnd::SetHeight)
             .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
+            .def("GetTitleStatic", +[](CUIFrameWindow* self) -> CUIStatic*
+            {
+                return self->GetTitleText(true);
+            })
             .def("Init", +[](CUIFrameLineWnd* self, cpcstr texture, float x, float y, float width, float height, bool horizontal)
             {
                 self->SetWndPos({ x, y });
