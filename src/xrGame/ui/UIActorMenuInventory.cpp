@@ -11,6 +11,7 @@
 #include "UIDragDropReferenceList.h"
 #include "UICellCustomItems.h"
 #include "UIItemInfo.h"
+#include "UIOutfitInfo.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/PropertiesBox/UIPropertiesBox.h"
 #include "xrUICore/ListBox/UIListBoxItem.h"
@@ -1545,6 +1546,11 @@ void CUIActorMenu::UpdateOutfit()
             m_pLists[eInventoryHelmetList]->SetCellsCapacity({ 0, 0 });
         else
             m_pLists[eInventoryHelmetList]->SetCellsCapacity(m_pLists[eInventoryHelmetList]->MaxCellsCapacity());
+    }
+
+    if (m_OutfitInfo)
+    {
+        m_OutfitInfo->UpdateInfo(outfit, nullptr, true);
     }
 
     if (ShadowOfChernobylMode)
