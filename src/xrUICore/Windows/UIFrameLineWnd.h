@@ -1,5 +1,8 @@
 #pragma once
+
 #include "UIWindow.h"
+
+class CUIStatic;
 
 class XRUICORE_API CUIFrameLineWnd : public CUIWindow, public ITextureOwner
 {
@@ -55,6 +58,8 @@ public:
     bool IsHorizontal() const { return bHorizontal; }
     void SetHorizontal(bool horiz) { bHorizontal = horiz; }
 
+    CUIStatic* GetTitleText(bool create_on_demand = false);
+
     pcstr GetDebugType() override { return "CUIFrameLineWnd"; }
     bool FillDebugTree(const CUIDebugState& debugState) override;
     void FillDebugInfo() override;
@@ -69,6 +74,8 @@ protected:
 
     Frect m_tex_rect[flMax]{};
     ui_shader m_shader[flMax]{};
+
+    CUIStatic* m_title_text{};
 
 private:
     DECLARE_SCRIPT_REGISTER_FUNCTION(CUIWindow);

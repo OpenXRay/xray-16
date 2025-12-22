@@ -94,6 +94,12 @@ bool CUIXmlInitBase::InitFrameWindow(CUIXml& xml_doc, pcstr path, int index, CUI
     bool result = InitWindow(xml_doc, path, index, pWnd, fatal);
     result &= InitTexture(xml_doc, path, index, pWnd, fatal);
 
+    // Initialize window title (Shadow of Chernobyl)
+    string256 buf;
+    strconcat(buf, path, ":title");
+    if (xml_doc.NavigateToNode(buf, index))
+        InitStatic(xml_doc, buf, index, pWnd->GetTitleText(true), false);
+
     return result;
 }
 
@@ -794,6 +800,12 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, pcstr path, int index, CUIFr
     const int stretch_default = ClearSkyMode || ShadowOfChernobylMode ? 0 : 1;
     const int stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch", stretch_default);
     pWnd->SetStretchTexture(stretch_flag);
+
+    // Initialize window title (Shadow of Chernobyl)
+    string256 buf;
+    strconcat(buf, path, ":title");
+    if (xml_doc.NavigateToNode(buf, index))
+        InitStatic(xml_doc, buf, index, pWnd->GetTitleText(true), false);
 
     return result;
 }

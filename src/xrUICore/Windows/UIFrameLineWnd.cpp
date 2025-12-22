@@ -1,6 +1,10 @@
 #include "pch.hpp"
+
 #include "UIFrameLineWnd.h"
+
+#include "Static/UIStatic.h"
 #include "XML/UITextureMaster.h"
+
 #include "xrEngine/editor_helper.h"
 
 CUIFrameLineWnd::CUIFrameLineWnd(pcstr window_name) : CUIWindow(window_name) {}
@@ -210,6 +214,17 @@ void CUIFrameLineWnd::DrawElements() const
     // second
     draw_tile(second_len, m_tex_rect[flSecond], flSecond);
     GEnv.UIRender->FlushPrimitive();
+}
+
+CUIStatic* CUIFrameLineWnd::GetTitleText(bool create_on_demand /*= false*/)
+{
+    if (create_on_demand && !m_title_text)
+    {
+        m_title_text = xr_new<CUIStatic>("title");
+        m_title_text->SetAutoDelete(true);
+        AttachChild(m_title_text);
+    }
+    return m_title_text;
 }
 
 bool CUIFrameLineWnd::FillDebugTree(const CUIDebugState& debugState)
