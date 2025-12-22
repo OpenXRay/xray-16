@@ -393,6 +393,7 @@ void CUIFrameLineWnd::script_register(lua_State* luaState)
             .def("SetWidth", &CUIFrameLineWnd::SetWidth)
             .def("SetHeight", &CUIFrameLineWnd::SetHeight)
             .def("SetColor", &CUIFrameLineWnd::SetTextureColor)
+            .def("SetOrientation", &CUIFrameLineWnd::SetHorizontal)
             .def("GetTitleStatic", +[](CUIFrameWindow* self) -> CUIStatic*
             {
                 return self->GetTitleText(true);
