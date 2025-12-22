@@ -2,7 +2,7 @@
 
 #include "inventory_item_object.h"
 
-struct SBoneProtections;
+#include "BoneProtections.h"
 
 class CCustomOutfit : public CInventoryItemObject
 {
@@ -10,7 +10,6 @@ class CCustomOutfit : public CInventoryItemObject
 
 public:
     CCustomOutfit();
-    virtual ~CCustomOutfit();
 
     virtual void Load(LPCSTR section);
 
@@ -39,7 +38,7 @@ protected:
 
     shared_str m_ActorVisual;
     shared_str m_full_icon_name;
-    SBoneProtections* m_boneProtection;
+    SBoneProtections m_boneProtection;
 
 protected:
     u32 m_ef_equipment_type;

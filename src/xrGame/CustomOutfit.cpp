@@ -19,11 +19,8 @@ CCustomOutfit::CCustomOutfit()
     m_HitTypeProtection.resize(ALife::eHitTypeMax);
     for (int i = 0; i < static_cast<int>(ALife::eHitTypeMax); i++)
         m_HitTypeProtection[i] = 1.0f;
-
-    m_boneProtection = xr_new<SBoneProtections>();
 }
 
-CCustomOutfit::~CCustomOutfit() { xr_delete(m_boneProtection); }
 bool CCustomOutfit::net_Spawn(CSE_Abstract* DC)
 {
     if (IsGameTypeSingle())
@@ -73,16 +70,16 @@ void CCustomOutfit::Load(LPCSTR section)
 
     if (pSettings->line_exist(section, "hit_fraction_actor"))
     {
-        m_boneProtection->m_fHitFrac = pSettings->r_float(section, "hit_fraction_actor");
+        m_boneProtection.m_fHitFrac = pSettings->r_float(section, "hit_fraction_actor");
 
         // Since hit_fraction_actor exists both in CS and COP, but fire_wound_protection was removed in COP,
         // We can use this hacky solution to determine which damage formula to use.
         // It not robust for mods, because they can have fire_wound_protection in configs, despite that
         // original COP engine doesn't read it.
         if (pSettings->line_exist(section, "fire_wound_protection"))
-            m_boneProtection->m_hitFracType = SBoneProtections::HitFractionActorCS;
+            m_boneProtection.m_hitFracType = SBoneProtections::HitFractionActorCS;
         else
-            m_boneProtection->m_hitFracType = SBoneProtections::HitFractionActorCOP;
+            m_boneProtection.m_hitFracType = SBoneProtections::HitFractionActorCOP;
     }
 
     if (pSettings->line_exist(section, "nightvision_sect"))
@@ -126,7 +123,7 @@ void CCustomOutfit::ReloadBonesProtection()
         parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
-        m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
+        m_boneProtection.reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
 }
 
 void CCustomOutfit::Hit(float hit_power, ALife::EHitType hit_type)
@@ -139,7 +136,7 @@ float CCustomOutfit::GetDefHitTypeProtection(ALife::EHitType hit_type) const
 {
     const float base = m_HitTypeProtection[hit_type] * GetCondition();
 
-    if (m_boneProtection->m_hitFracType == SBoneProtections::HitFraction)
+    if (m_boneProtection.m_hitFracType == SBoneProtections::HitFraction)
         return 1.0f - base; // SOC
 
     return base; // CS/COP
@@ -148,9 +145,9 @@ float CCustomOutfit::GetDefHitTypeProtection(ALife::EHitType hit_type) const
 float CCustomOutfit::GetHitTypeProtection(ALife::EHitType hit_type, s16 element) const
 {
     const float base = m_HitTypeProtection[hit_type] * GetCondition();
-    const float bone = m_boneProtection->getBoneProtection(element);
+    const float bone = m_boneProtection.getBoneProtection(element);
 
-    if (m_boneProtection->m_hitFracType == SBoneProtections::HitFraction)
+    if (m_boneProtection.m_hitFracType == SBoneProtections::HitFraction)
         return 1.0f - base * bone; // SOC
 
     return base * bone; // CS/COP
@@ -158,14 +155,14 @@ float CCustomOutfit::GetHitTypeProtection(ALife::EHitType hit_type, s16 element)
 
 float CCustomOutfit::GetBoneArmor(s16 element) const
 {
-    return m_boneProtection->getBoneArmor(element);
+    return m_boneProtection.getBoneArmor(element);
 }
 
 float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type)
 {
     float NewHitPower = hit_power;
 
-    switch (m_boneProtection->m_hitFracType)
+    switch (m_boneProtection.m_hitFracType)
     {
     default:
     case SBoneProtections::HitFractionActorCOP:
@@ -183,11 +180,11 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
                 if (!IsGameTypeSingle())
                 {
                     float hit_fraction = (ap - BoneArmor) / ap;
-                    if (hit_fraction < m_boneProtection->m_fHitFrac)
-                        hit_fraction = m_boneProtection->m_fHitFrac;
+                    if (hit_fraction < m_boneProtection.m_fHitFrac)
+                        hit_fraction = m_boneProtection.m_fHitFrac;
 
                     NewHitPower *= hit_fraction;
-                    NewHitPower *= m_boneProtection->getBoneProtection(element);
+                    NewHitPower *= m_boneProtection.getBoneProtection(element);
                 }
 
                 VERIFY(NewHitPower >= 0.0f);
@@ -195,7 +192,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
             else
             {
                 //пуля НЕ пробила бронь
-                NewHitPower *= m_boneProtection->m_fHitFrac;
+                NewHitPower *= m_boneProtection.m_fHitFrac;
                 add_wound = false; 	//раны нет
             }
         }
@@ -224,7 +221,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     {
         if (hit_type == ALife::eHitTypeFireWound)
         {
-            const float BoneArmor = m_boneProtection->getBoneArmor(element) * GetCondition();
+            const float BoneArmor = m_boneProtection.getBoneArmor(element) * GetCondition();
 
             if (ap > EPS && ap > BoneArmor)
             {
@@ -232,12 +229,12 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
                 const float d_ap = ap - BoneArmor;
                 NewHitPower *= (d_ap / ap);
 
-                if (NewHitPower < m_boneProtection->m_fHitFrac)
-                    NewHitPower = m_boneProtection->m_fHitFrac;
+                if (NewHitPower < m_boneProtection.m_fHitFrac)
+                    NewHitPower = m_boneProtection.m_fHitFrac;
 
                 if (!IsGameTypeSingle())
                 {
-                    NewHitPower *= m_boneProtection->getBoneProtection(element);
+                    NewHitPower *= m_boneProtection.getBoneProtection(element);
                 }
 
                 if (NewHitPower < 0.0f)
@@ -246,7 +243,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
             else
             {
                 //пуля НЕ пробила бронь
-                NewHitPower *= m_boneProtection->m_fHitFrac;
+                NewHitPower *= m_boneProtection.m_fHitFrac;
                 add_wound = false; //раны нет
             }
         }
@@ -274,10 +271,10 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     {
         if (hit_type == ALife::eHitTypeFireWound)
         {
-            const float BoneArmor = m_boneProtection->getBoneArmor(element) * GetCondition() * (1 - ap);
+            const float BoneArmor = m_boneProtection.getBoneArmor(element) * GetCondition() * (1 - ap);
             NewHitPower -= BoneArmor;
-            if (NewHitPower < hit_power * m_boneProtection->m_fHitFrac)
-                NewHitPower = hit_power * m_boneProtection->m_fHitFrac;
+            if (NewHitPower < hit_power * m_boneProtection.m_fHitFrac)
+                NewHitPower = hit_power * m_boneProtection.m_fHitFrac;
         }
         else
         {
@@ -288,12 +285,12 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
         Hit(hit_power, hit_type);
         break;
     }
-    } // switch (m_boneProtection->m_hitFracType)
+    } // switch (m_boneProtection.m_hitFracType)
 
     return NewHitPower;
 }
 
-bool CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
+bool CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection.getBonePassBullet(s16(boneID)); }
 #include "Torch.h"
 void CCustomOutfit::OnMoveToSlot(const SInvItemPlace& prev)
 {
@@ -392,7 +389,7 @@ float CCustomOutfit::GetPowerLoss() const
     // Hit fraction and power loss are unrelated,
     // but it's the only way we can distinguish between SOC/CS and COP.
     // Sorry.
-    if (m_boneProtection->m_hitFracType != SBoneProtections::HitFractionActorCOP)
+    if (m_boneProtection.m_hitFracType != SBoneProtections::HitFractionActorCOP)
     {
         if (m_fPowerLoss < 1 && GetCondition() <= 0)
         {
@@ -445,10 +442,10 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
         AddBonesProtection(str);
     result |= result2;
 
-    if (m_boneProtection->m_hitFracType == SBoneProtections::HitFractionActorCS ||
-        m_boneProtection->m_hitFracType == SBoneProtections::HitFractionActorCOP)
+    if (m_boneProtection.m_hitFracType == SBoneProtections::HitFractionActorCS ||
+        m_boneProtection.m_hitFracType == SBoneProtections::HitFractionActorCOP)
     {
-        result |= process_if_exists(section, "hit_fraction_actor", &CInifile::r_float, m_boneProtection->m_fHitFrac, test);
+        result |= process_if_exists(section, "hit_fraction_actor", &CInifile::r_float, m_boneProtection.m_fHitFrac, test);
     }
 
     result |= process_if_exists(section, "additional_inventory_weight", &CInifile::r_float, m_additional_weight, test);
@@ -477,5 +474,5 @@ void CCustomOutfit::AddBonesProtection(LPCSTR bones_section)
         parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
-        m_boneProtection->add(bones_section, smart_cast<IKinematics*>(parent->Visual()));
+        m_boneProtection.add(bones_section, smart_cast<IKinematics*>(parent->Visual()));
 }
