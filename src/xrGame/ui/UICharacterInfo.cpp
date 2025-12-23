@@ -46,11 +46,7 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
     m_original_color = m_icons[eIcon] ? m_icons[eIcon]->GetTextureColor() : color_xrgb(255, 255, 255);
 
-    m_deadbody_color = color_argb(160, 160, 160, 160);
-    if (xml_doc->NavigateToNode("icon:deadbody", 0))
-    {
-        m_deadbody_color = CUIXmlInit::GetColor(*xml_doc, "icon:deadbody", 0, m_deadbody_color);
-    }
+    m_deadbody_color = CUIXmlInit::GetColor(*xml_doc, "icon:deadbody", 0, color_argb(160, 160, 160, 160));
 
     Init_IconInfoItem(*xml_doc, "icon_over", eIconOver);
 
