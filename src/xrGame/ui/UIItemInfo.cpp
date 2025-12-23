@@ -186,8 +186,10 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     }
     if (UIWeight)
     {
-        LPCSTR kg_str = StringTable().translate("st_kg").c_str();
         float weight = pInvItem->Weight();
+
+        shared_str kg_str = "kg";
+        StringTable().translate("st_kg", kg_str);
 
         if (!weight)
         {
@@ -203,7 +205,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
             }
         }
 
-        xr_sprintf(str, "%3.2f %s", weight, kg_str);
+        xr_sprintf(str, "%3.2f %s", weight, kg_str.c_str());
         UIWeight->SetText(str);
 
         pos.x = UIWeight->GetWndPos().x;
