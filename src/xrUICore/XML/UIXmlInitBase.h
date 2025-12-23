@@ -67,7 +67,9 @@ public:
     static bool InitComboBox(CUIXml& xml_doc, pcstr path, int index, CUIComboBox* pWnd);
     static bool InitTrackBar(CUIXml& xml_doc, pcstr path, int index, CUITrackBar* pWnd, bool fatal = true);
     static Frect GetFRect(const CUIXml& xml_doc, pcstr path, int index);
+
     static u32 GetColor(const CUIXml& xml_doc, pcstr path, int index, u32 def_clr);
+    static bool GetColor(pcstr color_name, u32& color);
 
     static bool InitAlignment(const CUIXml& xml_doc, const char* path, int index, float& x, float& y, CUIWindow* pWnd);
 
