@@ -223,28 +223,28 @@ bool CUIXmlInitBase::InitCheck(CUIXml& xml_doc, pcstr path, int index, CUICheckB
     strconcat(buf, path, ":text_color:e");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Enabled);
     }
 
     strconcat(buf, path, ":text_color:d");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Disabled);
     }
 
     strconcat(buf, path, ":text_color:t");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Touched);
     }
 
     strconcat(buf, path, ":text_color:h");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Highlighted);
     }
 
@@ -266,13 +266,13 @@ bool CUIXmlInitBase::InitSpin(CUIXml& xml_doc, pcstr path, int index, CUICustomS
     strconcat(foo, path, ":text_color:e");
     if (xml_doc.NavigateToNode(foo, index))
     {
-        color = GetColor(xml_doc, foo, index, 0x00);
+        color = GetColor(xml_doc, foo, index, color_rgba(0, 0, 0, 255));
         pWnd->SetTextColor(color);
     }
     strconcat(foo, path, ":text_color:d");
     if (xml_doc.NavigateToNode(foo, index))
     {
-        color = GetColor(xml_doc, foo, index, 0x00);
+        color = GetColor(xml_doc, foo, index, color_rgba(0, 0, 0, 255));
         pWnd->SetTextColorD(color);
     }
 
@@ -354,28 +354,28 @@ bool CUIXmlInitBase::Init3tButton(CUIXml& xml_doc, pcstr path, int index, CUI3tB
     strconcat(buf, path, ":text_color:e");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Enabled);
     }
 
     strconcat(buf, path, ":text_color:d");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Disabled);
     }
 
     strconcat(buf, path, ":text_color:t");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Touched);
     }
 
     strconcat(buf, path, ":text_color:h");
     if (xml_doc.NavigateToNode(buf, index))
     {
-        color = GetColor(xml_doc, buf, index, 0x00);
+        color = GetColor(xml_doc, buf, index, color_rgba(0, 0, 0, 255));
         pWnd->SetStateTextColor(color, S_Highlighted);
     }
 
@@ -521,17 +521,17 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, pcstr path, int index, CUI
     {
         pWnd->m_bUseColor = true;
 
-        pWnd->m_minColor = GetColor(xml_doc, buf, index, 0xff);
+        pWnd->m_minColor = GetColor(xml_doc, buf, index, 0xFFFFFFFF);
 
         strconcat(buf, path, ":middle_color");
         if (xml_doc.NavigateToNode(buf, 0))
         {
-            pWnd->m_middleColor = GetColor(xml_doc, buf, index, 0xff);
+            pWnd->m_middleColor = GetColor(xml_doc, buf, index, 0xFFFFFFFF);
             pWnd->m_bUseMiddleColor = true;
         }
 
         strconcat(buf, path, ":max_color");
-        pWnd->m_maxColor = GetColor(xml_doc, buf, index, 0xff);
+        pWnd->m_maxColor = GetColor(xml_doc, buf, index, 0xFFFFFFFF);
     }
 
     return true;
@@ -670,7 +670,7 @@ void CUIXmlInitBase::InitAutoFrameLineGroup(CUIXml& xml_doc, pcstr path, int ind
 
 bool CUIXmlInitBase::InitFont(const CUIXml& xml_doc, pcstr path, int index, u32& color, CGameFont*& pFnt)
 {
-    color = GetColor(xml_doc, path, index, 0xff);
+    color = GetColor(xml_doc, path, index, 0xFFFFFFFF);
 
     cpcstr font_name = xml_doc.ReadAttrib(path, index, "font", nullptr);
     if (!font_name)
@@ -830,7 +830,7 @@ bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, pcstr path, int index, CUIC
     strconcat(foo, path, ":text_color:e");
     if (xml_doc.NavigateToNode(foo, index))
     {
-        const u32 color = GetColor(xml_doc, foo, index, 0x00);
+        const u32 color = GetColor(xml_doc, foo, index, color_rgba(0, 0, 0, 255));
         pWnd->TextItemControl()->SetTextColor(color);
     }
 
@@ -926,7 +926,7 @@ bool CUIXmlInitBase::InitTexture(const CUIXml& xml_doc, pcstr path, int index, I
     const bool stretch_flag = xml_doc.ReadAttribInt(path, index, "stretch") ? true : false;
     pWnd->SetStretchTexture(stretch_flag);
 
-    const u32 color = GetColor(xml_doc, buf, index, 0xff);
+    const u32 color = GetColor(xml_doc, buf, index, 0xFFFFFFFF);
     pWnd->SetTextureColor(color);
 
     if (!fis_zero(rect.width()) && !fis_zero(rect.height()))
@@ -1325,14 +1325,14 @@ bool CUIXmlInitBase::InitComboBox(CUIXml& xml_doc, pcstr path, int index, CUICom
     strconcat(_path, path, ":text_color:e");
     if (xml_doc.NavigateToNode(_path, index))
     {
-        color = GetColor(xml_doc, _path, index, 0x00);
+        color = GetColor(xml_doc, _path, index, color_rgba(0, 0, 0, 255));
         pWnd->SetTextColor(color);
     }
 
     strconcat(_path, path, ":text_color:d");
     if (xml_doc.NavigateToNode(_path, index))
     {
-        color = GetColor(xml_doc, _path, index, 0x00);
+        color = GetColor(xml_doc, _path, index, color_rgba(0, 0, 0, 255));
         pWnd->SetTextColorD(color);
     }
 
@@ -1347,14 +1347,11 @@ u32 CUIXmlInitBase::GetColor(const CUIXml& xml_doc, pcstr path, int index, u32 d
         VERIFY(GetColorDefs()->find(clr_def) != GetColorDefs()->end());
         return (*m_pColorDefs)[clr_def];
     }
-    else
-    {
-        const int r = xml_doc.ReadAttribInt(path, index, "r", def_clr);
-        const int g = xml_doc.ReadAttribInt(path, index, "g", def_clr);
-        const int b = xml_doc.ReadAttribInt(path, index, "b", def_clr);
-        const int a = xml_doc.ReadAttribInt(path, index, "a", 0xff);
-        return color_argb(a, r, g, b);
-    }
+    const int r = xml_doc.ReadAttribInt(path, index, "r", color_get_R(def_clr));
+    const int g = xml_doc.ReadAttribInt(path, index, "g", color_get_G(def_clr));
+    const int b = xml_doc.ReadAttribInt(path, index, "b", color_get_B(def_clr));
+    const int a = xml_doc.ReadAttribInt(path, index, "a", color_get_A(def_clr));
+    return color_argb(a, r, g, b);
 }
 
 bool CUIXmlInitBase::GetColor(pcstr color_name, u32& color)
