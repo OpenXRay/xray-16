@@ -1,5 +1,7 @@
 #pragma once
+
 #include "xrUICore/Windows/UIWindow.h"
+
 #include "xrServerEntities/alife_space.h"
 
 class CInventoryItem;
@@ -10,23 +12,17 @@ class UIArtefactParamItem;
 class CUIArtefactParams final : public CUIWindow
 {
 public:
-    CUIArtefactParams() : CUIWindow("Artefact Params") {}
+    CUIArtefactParams();
     ~CUIArtefactParams() override;
+
     bool InitFromXml(CUIXml& xml);
-    bool Check(const shared_str& af_section);
+    bool Check(const shared_str& af_section) const;
     void SetInfo(const CInventoryItem& pInvItem);
+
     pcstr GetDebugType() override { return "CUIArtefactParams"; }
 
 protected:
-    UIArtefactParamItem* CreateItem(CUIXml& uiXml, pcstr section,
-        const shared_str& translationId, const shared_str& translationId2 = nullptr);
-
-    UIArtefactParamItem* CreateItem(CUIXml& uiXml, pcstr section,
-        float magnitude, bool isSignInverse, const shared_str& unit,
-        const shared_str& translationId, const shared_str& translationId2 = nullptr);
-
-protected:
-    UIArtefactParamItem* m_disp_condition; //Alundaio: Show AF Condition
+    UIArtefactParamItem* m_disp_condition{}; //Alundaio: Show AF Condition
     UIArtefactParamItem* m_immunity_item[9]{};
     UIArtefactParamItem* m_restore_item[ALife::eRestoreTypeMax]{};
     UIArtefactParamItem* m_additional_weight{};
@@ -40,33 +36,24 @@ protected:
 class UIArtefactParamItem final : public CUIStatic
 {
 public:
-    UIArtefactParamItem();
+    UIArtefactParamItem(pcstr param_name);
 
-    enum class InitResult
-    {
-        Failed,
-        Normal,
-        Plain
-    };
+    bool Init(CUIXml& xml, pcstr section, pcstr caption,
+        u32 positive_color, u32 negative_color,
+        float magnitude = 1.0f, bool is_sign_inverse = false, pcstr unit = "");
 
-    InitResult Init(CUIXml& xml, pcstr section);
-
-    void SetDefaultValuesPlain(float magnitude, bool isSignInverse, const shared_str& unit);
-    void SetCaption(LPCSTR name);
     void SetValue(float value);
 
     pcstr GetDebugType() override { return "UIArtefactParamItem"; }
 
-protected:
-    InitResult InitPlain(CUIXml& xml, pcstr section);
-
 private:
+    CUIStatic m_value{ "value" };
     CUIStatic* m_caption{};
-    CUIStatic* m_value{};
-    float m_magnitude;
-    bool m_sign_inverse;
+    float m_magnitude{ 1.0f };
+    bool m_sign_inverse{ false };
     shared_str m_unit_str;
     shared_str m_texture_minus;
     shared_str m_texture_plus;
-
+    u32 m_positive_color;
+    u32 m_negative_color;
 }; // class UIArtefactParamItem
