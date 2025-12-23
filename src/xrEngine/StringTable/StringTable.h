@@ -29,9 +29,17 @@ public:
     void Init();
     static void Destroy();
 
+    [[nodiscard]]
     STRING_VALUE translate(const STRING_ID& str_id) const;
+
+    [[nodiscard]]
+    STRING_VALUE translate(const STRING_ID& str_id, const STRING_ID& str_id2) const; // returns str_id if no translation found
+
     bool translate(const STRING_ID& str_id, STRING_VALUE& out) const;
-    pcstr translate(const STRING_ID& str_id, pcstr default_value) const;
+
+    [[nodiscard]]
+    bool has_translation(const STRING_ID& str_id) const;
+
     void rescan();
 
     void ReloadLanguage();

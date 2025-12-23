@@ -1009,7 +1009,7 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
         {
             if (!pHelmet)
             {
-                const bool has_translation = StringTable().translate("st_unequip", nullptr);
+                const bool has_translation = StringTable().has_translation("st_unequip");
                 if (m_currMenuMode == mmDeadBodySearch || !has_translation)
                     m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
                 else
