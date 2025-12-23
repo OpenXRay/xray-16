@@ -41,7 +41,7 @@ void CZoneEffector::Activate()
     m_pp_effector->SetType(EEffectorPPType(u32(u64(this) & u32(-1))));
     m_pp_effector->SetCyclic(true);
     m_pp_effector->SetFactorFunc(GET_KOEFF_FUNC(this, &CZoneEffector::GetFactor));
-    m_pp_effector->Load(*m_pp_fname);
+    m_pp_effector->Load(m_pp_fname.c_str());
     m_pActor->Cameras().AddPPEffector(m_pp_effector);
 }
 

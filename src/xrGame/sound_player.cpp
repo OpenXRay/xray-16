@@ -239,12 +239,12 @@ CSoundPlayer::CSoundCollection::CSoundCollection(const CSoundCollectionParams& p
 {
     seed(u32(CPU::QPC() & 0xffffffff));
     m_sounds.clear();
-    for (int j = 0, N = _GetItemCount(*params.m_sound_prefix); j < N; ++j)
+    for (int j = 0, N = _GetItemCount(params.m_sound_prefix.c_str()); j < N; ++j)
     {
         string_path fn, s, temp;
         pstr S = (pstr)&s;
-        _GetItem(*params.m_sound_prefix, j, temp);
-        strconcat(sizeof(s), S, *params.m_sound_player_prefix, temp);
+        _GetItem(params.m_sound_prefix.c_str(), j, temp);
+        strconcat(sizeof(s), S, params.m_sound_player_prefix.c_str(), temp);
         if (FS.exist(fn, "$game_sounds$", S, ".ogg"))
         {
             ref_sound* temp = add(params.m_type, S);

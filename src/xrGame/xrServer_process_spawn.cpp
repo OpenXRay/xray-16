@@ -32,7 +32,7 @@ CSE_Abstract* xrServer::Process_spawn(
             !E->m_gameType.MatchType((u16)game->Type()) || !E->match_configuration() || !game->OnPreCreate(E))
         {
 #ifndef MASTER_GOLD
-            Msg("- SERVER: Entity [%s] incompatible with current game type.", *E->s_name);
+            Msg("- SERVER: Entity [%s] incompatible with current game type.", E->s_name.c_str());
 #endif // #ifndef MASTER_GOLD
             F_entity_Destroy(E);
             return NULL;
@@ -76,7 +76,7 @@ CSE_Abstract* xrServer::Process_spawn(
     if (E->RespawnTime && (0xffff == E->ID_Phantom))
     {
         // Create phantom
-        CSE_Abstract* Phantom = entity_Create(*E->s_name);
+        CSE_Abstract* Phantom = entity_Create(E->s_name.c_str());
         R_ASSERT(Phantom);
         Phantom->Spawn_Read(P);
         Phantom->ID = PerformIDgen(0xffff);

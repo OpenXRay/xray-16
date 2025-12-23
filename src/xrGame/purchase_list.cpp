@@ -62,7 +62,7 @@ void CPurchaseList::process(
             continue;
 
         ++j;
-        Level().spawn_item(*name, position, level_vertex_id, id, false);
+        Level().spawn_item(name.c_str(), position, level_vertex_id, id, false);
     }
 
     VERIFY3(m_deficits.find(name) == m_deficits.end(), "Duplicate section in the purchase list", name.c_str());

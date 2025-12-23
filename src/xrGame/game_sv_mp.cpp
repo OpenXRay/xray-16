@@ -1346,7 +1346,7 @@ void game_sv_mp::SetPlayersDefItems(game_PlayerState* ps)
                 continue;
             shared_str WeaponName = m_strWeaponsData->GetItemName((*pItemID) & 0x00FF);
             //			strconcat(ItemStr, "def_item_repl_", pWpnS->WeaponName.c_str());
-            strconcat(sizeof(ItemStr), ItemStr, "def_item_repl_", *WeaponName);
+            strconcat(sizeof(ItemStr), ItemStr, "def_item_repl_", WeaponName.c_str());
             if (!pSettings->line_exist(RankStr, ItemStr))
                 continue;
 
@@ -1369,7 +1369,7 @@ void game_sv_mp::SetPlayersDefItems(game_PlayerState* ps)
             continue;
 
         shared_str WeaponName = m_strWeaponsData->GetItemName((*pItemID) & 0x00FF);
-        if (!xr_strcmp(*WeaponName, "mp_wpn_knife"))
+        if (!xr_strcmp(WeaponName.c_str(), "mp_wpn_knife"))
             continue;
         u16 AmmoID = u16(-1);
         if (pSettings->line_exist(WeaponName, "ammo_class"))
@@ -1773,14 +1773,14 @@ void game_sv_mp::ReadOptions(shared_str& options)
     inherited::ReadOptions(options);
 
     u8 SpectatorModes = SpectatorModes_Pack();
-    SpectatorModes = u8(get_option_i(*options, "spectrmds", s32(SpectatorModes)) & 0x00ff);
+    SpectatorModes = u8(get_option_i(options.c_str(), "spectrmds", s32(SpectatorModes)) & 0x00ff);
     SpectatorModes_UnPack(SpectatorModes);
 
-    g_sv_dwMaxClientPing = get_option_i(*options, "maxping", g_sv_dwMaxClientPing);
+    g_sv_dwMaxClientPing = get_option_i(options.c_str(), "maxping", g_sv_dwMaxClientPing);
 
     string64 StartTime, TimeFactor;
-    xr_strcpy(StartTime, get_option_s(*options, "estime", "9:00"));
-    xr_strcpy(TimeFactor, get_option_s(*options, "etimef", "1"));
+    xr_strcpy(StartTime, get_option_s(options.c_str(), "estime", "9:00"));
+    xr_strcpy(TimeFactor, get_option_s(options.c_str(), "etimef", "1"));
 
     u32 hours = 0, mins = 0;
     sscanf(StartTime, "%d:%d", &hours, &mins);

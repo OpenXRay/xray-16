@@ -139,8 +139,8 @@ public:
         return *this;
     }
     // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use
-    [[nodiscard]]
-    pcstr operator*() const { return p_ ? p_->value : nullptr; }
+    //[[nodiscard]]
+    //pcstr operator*() const { return p_ ? p_->value : nullptr; }
 
     [[nodiscard]]
     bool operator!() const { return p_ == nullptr; }
@@ -258,3 +258,4 @@ IC void xr_strlwr(shared_str& src)
 }
 
 #pragma pack(pop)
+////

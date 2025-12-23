@@ -219,7 +219,7 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
         xr_sprintf(buff, "%d.", _cntr);
         itm->m_text0->SetText(buff);
 
-        itm->m_text1->SetTextST(*CStringTable().translate((*it).key));
+        itm->m_text1->SetTextST(CStringTable().translate((*it).key).c_str());
         itm->m_text1->AdjustHeightToText();
 
         if (0 == (*it).str_value.size())
@@ -268,7 +268,7 @@ void CUIActorInfoWnd::FillReputationDetails(CUIXml* xml, LPCSTR path)
         CUIActorStaticticDetail* itm = xr_new<CUIActorStaticticDetail>();
         itm->Init(xml, path, 0);
         comm.set(xml->Read(_list_node, "r", i, "unknown_community"));
-        itm->m_text1->SetTextST(*(comm.id()));
+        itm->m_text1->SetTextST(comm.id().c_str());
 
         CHARACTER_GOODWILL gw = RELATION_REGISTRY().GetCommunityGoodwill(comm.index(), Actor()->ID());
         gw += CHARACTER_COMMUNITY::relation(Actor()->Community(), comm.index());

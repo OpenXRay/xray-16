@@ -19,7 +19,7 @@ game_sv_Single::~game_sv_Single() { delete_data(m_alife_simulator); }
 void game_sv_Single::Create(shared_str& options)
 {
     inherited::Create(options);
-    if (strstr(*options, "/alife"))
+    if (strstr(options.c_str(), "/alife"))
         m_alife_simulator = xr_new<CALifeSimulator>(&server(), &options);
     switch_Phase(GAME_PHASE_INPROGRESS);
 }
@@ -243,7 +243,7 @@ bool game_sv_Single::load_game(NET_Packet& net_packet, ClientID sender)
         return (inherited::load_game(net_packet, sender));
     shared_str game_name;
     net_packet.r_stringZ(game_name);
-    return (alife().load_game(*game_name, true));
+    return (alife().load_game(game_name.c_str(), true));
 }
 
 void game_sv_Single::reload_game(NET_Packet& net_packet, ClientID sender) {}
