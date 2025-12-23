@@ -1356,3 +1356,13 @@ u32 CUIXmlInitBase::GetColor(const CUIXml& xml_doc, pcstr path, int index, u32 d
         return color_argb(a, r, g, b);
     }
 }
+
+bool CUIXmlInitBase::GetColor(pcstr color_name, u32& color)
+{
+    const auto it = GetColorDefs()->find(color_name);
+    if (it == GetColorDefs()->end())
+        return false;
+
+    color = it->second;
+    return true;
+}
