@@ -92,12 +92,23 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
     UICost = UIHelper::CreateStatic(uiXml, "static_cost", this, false);
     UITradeTip = UIHelper::CreateStatic(uiXml, "static_no_trade", this, false);
 
-    if (uiXml.NavigateToNode("descr_list", 0))
+    const bool descr_list         = !!uiXml.NavigateToNode("descr_list", 0);
+    const bool condition_progress = !!uiXml.NavigateToNode("condition_progress", 0);
+
+    if (descr_list || condition_progress)
     {
         UIConditionWnd = xr_new<CUIConditionParams>();
         if (!UIConditionWnd->InitFromXml(uiXml))
             xr_delete(UIConditionWnd);
+        else if (condition_progress) // SOC
+        {
+            UIConditionWnd->SetWndRect(GetWndRect()); // don't like but meh
+            AttachChild(UIConditionWnd);
+        }
+    }
 
+    if (descr_list)
+    {
         UIWpnParams = xr_new<CUIWpnParams>();
         if (!UIWpnParams->InitFromXml(uiXml))
             xr_delete(UIWpnParams);
@@ -175,13 +186,15 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     if (!m_pInvItem)
         return;
 
-    Fvector2 pos;
-    pos.set(0.0f, 0.0f);
+    const bool soc_style = IsChild(UIConditionWnd);
+
+    Fvector2 pos{};
     string256 str;
     if (UIName)
     {
         UIName->SetText(pInvItem->NameItem());
-        UIName->AdjustHeightToText();
+        if (!soc_style)
+            UIName->AdjustHeightToText();
         pos.y = UIName->GetWndPos().y + UIName->GetHeight() + 4.0f;
     }
     if (UIWeight)
@@ -191,7 +204,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         shared_str kg_str = "kg";
         StringTable().translate("st_kg", kg_str);
 
-        if (!weight)
+        if (!fis_zero(weight))
         {
             if (/*CWeaponAmmo* ammo =*/ smart_cast<CWeaponAmmo*>(pInvItem))
             {
@@ -216,9 +229,15 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     }
     if (UICost && IsGameTypeSingle())
     {
-        if (item_price != u32(-1))
+        if (soc_style && item_price == u32(-1))
+            item_price = pInvItem->Cost();
+
+        if (item_price == u32(-1))
+            UICost->Show(false);
+        else
         {
-            xr_sprintf(str, "%d %s", item_price, StringTable().GetCurrency().c_str()); // will be owerwritten in multiplayer
+            xr_sprintf(str, "%d %s", item_price, StringTable().GetCurrency().c_str());
+            // will be overwritten in multiplayer
             UICost->SetText(str);
             pos.x = UICost->GetWndPos().x;
             if (m_complex_desc)
@@ -227,17 +246,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
             }
             UICost->Show(true);
         }
-        else
-            UICost->Show(false);
     }
-
-    //	CActor* actor = smart_cast<CActor*>( Level().CurrentViewEntity() );
-    //	if ( g_pGameLevel && Level().game && actor )
-    //	{
-    //		game_cl_Deathmatch* gs_mp = smart_cast<game_cl_Deathmatch*>( Game() );
-    //		IBuyWnd* buy_menu = gs_mp->pCurBuyMenu->GetItemPrice();
-    //		GetItemPrice();
-    //	}
     if (UITradeTip && IsGameTypeSingle())
     {
         pos.y = UITradeTip->GetWndPos().y;
@@ -252,11 +261,11 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         {
             UITradeTip->SetText(StringTable().translate(trade_tip).c_str());
             UITradeTip->AdjustHeightToText();
-            UITradeTip->SetWndPos(pos);
+            if (!soc_style || m_complex_desc)
+                UITradeTip->SetWndPos(pos);
             UITradeTip->Show(true);
         }
     }
-
     if (UIDesc)
     {
         pos = UIDesc->GetWndPos();
@@ -266,19 +275,22 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         if (UITradeTip && trade_tip != NULL)
             pos.y = UITradeTip->GetWndPos().y + UITradeTip->GetHeight() + 4.0f;
 
-        UIDesc->SetWndPos(pos);
+        if (!soc_style || m_complex_desc)
+            UIDesc->SetWndPos(pos);
         UIDesc->Clear();
         VERIFY(0 == UIDesc->GetSize());
+
+        CUIStatic* descr{};
         if (m_desc_info.bShowDescrText)
         {
-            auto* pItem = xr_new<CUIStatic>("Description");
-            pItem->SetTextColor(m_desc_info.uDescClr);
-            pItem->SetFont(m_desc_info.pDescFont);
-            pItem->SetWidth(UIDesc->GetDesiredChildWidth());
-            pItem->SetTextComplexMode(true);
-            pItem->SetText(pInvItem->ItemDescription().c_str());
-            pItem->AdjustHeightToText();
-            UIDesc->AddWindow(pItem, true);
+            descr = xr_new<CUIStatic>("Description");
+            descr->SetTextColor(m_desc_info.uDescClr);
+            descr->SetFont(m_desc_info.pDescFont);
+            descr->SetWidth(UIDesc->GetDesiredChildWidth());
+            descr->SetTextComplexMode(true);
+            descr->SetText(pInvItem->ItemDescription().c_str());
+            descr->AdjustHeightToText();
+            UIDesc->AddWindow(descr, !soc_style);
         }
         TryAddConditionInfo(*pInvItem, pCompareItem);
         TryAddWpnInfo(*pInvItem, pCompareItem);
@@ -286,6 +298,12 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         TryAddOutfitInfo(*pInvItem, pCompareItem);
         TryAddUpgradeInfo(*pInvItem);
         TryAddBoosterInfo(*pInvItem);
+
+        if (descr && soc_style)
+        {
+            UIDesc->RemoveWindow(descr);
+            UIDesc->AddWindow(descr, true);
+        }
 
         if (m_b_FitToHeight)
         {
@@ -316,11 +334,17 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         UIItemImage->GetUIStaticItem().SetTextureRect(texture_rect);
         UIItemImage->TextureOn();
         UIItemImage->SetStretchTexture(true);
-        Fvector2 v_r = {item_grid_rect.x2 * INV_GRID_WIDTH2, item_grid_rect.y2 * INV_GRID_HEIGHT2};
 
+        Fvector2 v_r =
+        {
+            item_grid_rect.x2 * (soc_style ? INV_GRID_WIDTH : INV_GRID_WIDTH2),
+            item_grid_rect.y2 * (soc_style ? INV_GRID_HEIGHT : INV_GRID_HEIGHT2)
+        };
         v_r.x *= UI().get_current_kx();
 
         UIItemImage->GetUIStaticItem().SetSize(v_r);
+        if (soc_style)
+            v_r.min(UIItemImageSize);
         UIItemImage->SetWidth(v_r.x);
         UIItemImage->SetHeight(v_r.y);
     }
@@ -336,7 +360,8 @@ void CUIItemInfo::TryAddConditionInfo(CInventoryItem& pInvItem, CInventoryItem* 
     if (weapon || outfit)
     {
         UIConditionWnd->SetInfo(pCompareItem, pInvItem);
-        UIDesc->AddWindow(UIConditionWnd, false);
+        if (!IsChild(UIConditionWnd))
+            UIDesc->AddWindow(UIConditionWnd, false);
     }
 }
 
