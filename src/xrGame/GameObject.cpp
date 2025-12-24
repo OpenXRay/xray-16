@@ -119,15 +119,15 @@ void CGameObject::cNameSect_set(shared_str N) { NameSection = N; }
 void CGameObject::cNameVisual_set(shared_str N)
 {
     // check if equal
-    if (*N && *NameVisual)
+    if (N.c_str() && NameVisual.c_str())
         if (N == NameVisual)
             return;
     // replace model
-    if (*N && N[0])
+    if (N.c_str() && N[0])
     {
         IRenderVisual* old_v = renderable.visual;
         NameVisual = N;
-        renderable.visual = GEnv.Render->model_Create(*N);
+        renderable.visual = GEnv.Render->model_Create(N.c_str());
         IKinematics* old_k = old_v ? old_v->dcast_PKinematics() : NULL;
         IKinematics* new_k = renderable.visual->dcast_PKinematics();
         /*
@@ -484,7 +484,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     {
 #pragma warning(push)
 #pragma warning(disable : 4238)
-        IReader reader((void*)(*(O->m_ini_string)), O->m_ini_string.size());
+        IReader reader((void*)((O->m_ini_string).c_str()), O->m_ini_string.size());
         m_ini_file = xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
     }
@@ -517,9 +517,9 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
             spatial.type = (spatial.type | STYPE_VISIBLEFORAI) ^ STYPE_VISIBLEFORAI;
     }
 
-    reload(*cNameSect());
+    reload(cNameSect().c_str());
     if (!GEnv.isDedicatedServer)
-        scriptBinder.reload(*cNameSect());
+        scriptBinder.reload(cNameSect().c_str());
 
     reinit();
     if (!GEnv.isDedicatedServer)
@@ -1201,7 +1201,7 @@ void CGameObject::shedule_Update(u32 dt)
 
 bool CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
 //игровое имя объекта
-LPCSTR CGameObject::Name() const { return (*cName()); }
+LPCSTR CGameObject::Name() const { return (cName().c_str()); }
 u32 CGameObject::ef_creature_type() const
 {
     string16 temp;
@@ -1522,7 +1522,7 @@ bool CGameObject::use(IGameObject* obj)
     return true;
 }
 
-LPCSTR CGameObject::tip_text() { return *m_sTipText; }
+LPCSTR CGameObject::tip_text() { return m_sTipText.c_str(); }
 void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
 void CGameObject::set_tip_text_default() { m_sTipText = nullptr; }
 bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }

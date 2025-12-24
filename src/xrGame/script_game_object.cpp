@@ -214,7 +214,7 @@ LPCSTR CScriptGameObject::WhoHitName()
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(&object());
     if (entity_alive)
         return entity_alive->conditions().GetWhoHitLastTime() ?
-            (*entity_alive->conditions().GetWhoHitLastTime()->cName()) :
+            (entity_alive->conditions().GetWhoHitLastTime()->cName().c_str()) :
             NULL;
     else
     {
@@ -229,7 +229,7 @@ LPCSTR CScriptGameObject::WhoHitSectionName()
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(&object());
     if (entity_alive)
         return entity_alive->conditions().GetWhoHitLastTime() ?
-            (*entity_alive->conditions().GetWhoHitLastTime()->cNameSect()) :
+            (entity_alive->conditions().GetWhoHitLastTime()->cNameSect().c_str()) :
             NULL;
     else
     {

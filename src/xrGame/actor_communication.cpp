@@ -61,8 +61,8 @@ void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
         article_vector.emplace_back(*it, Level().GetGameTime(), article.data()->articleType);
         LPCSTR g, n;
         int _atype = article.data()->articleType;
-        g = *(article.data()->group);
-        n = *(article.data()->name);
+        g = (article.data()->group).c_str();
+        n = (article.data()->name).c_str();
         callback(GameObject::eArticleInfo)(lua_game_object(), g, n, _atype);
 
         /* XXX: Shadow of Chernobyl encyclopedia, return this code
@@ -144,7 +144,7 @@ bool CActor::OnReceiveInfo(shared_str info_id) const
     AddEncyclopediaArticle(&info_portion);
     AddGameTask(&info_portion);
 
-    callback(GameObject::eInventoryInfo)(lua_game_object(), *info_id);
+    callback(GameObject::eInventoryInfo)(lua_game_object(), info_id.c_str());
 
     if (!CurrentGameUI())
         return false;

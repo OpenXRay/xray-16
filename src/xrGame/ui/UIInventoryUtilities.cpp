@@ -334,20 +334,20 @@ LPCSTR InventoryUtilities::GetTimePeriodAsString(pstr _buff, u32 buff_sz, ALife:
     u8 yrdiff = ((year2 - year1) * 12);
 
     if (month1 != month2 || yrdiff > 0)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", month2 + (yrdiff - month1), *CStringTable().translate("ui_st_months"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", month2 + (yrdiff - month1), CStringTable().translate("ui_st_months").c_str());
 
     if (!cnt && day1 != day2)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", day2 - day1, *StringTable().translate("ui_st_days"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", day2 - day1, StringTable().translate("ui_st_days").c_str());
 
     if (!cnt && hours1 != hours2)
         cnt =
-            xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", hours2 - hours1, *StringTable().translate("ui_st_hours"));
+            xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", hours2 - hours1, StringTable().translate("ui_st_hours").c_str());
 
     if (!cnt && mins1 != mins2)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", mins2 - mins1, *StringTable().translate("ui_st_mins"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", mins2 - mins1, StringTable().translate("ui_st_mins").c_str());
 
     if (!cnt && secs1 != secs2)
-        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", secs2 - secs1, *StringTable().translate("ui_st_secs"));
+        cnt = xr_sprintf(_buff + cnt, buff_sz - cnt, "%d %s", secs2 - secs1, StringTable().translate("ui_st_secs").c_str());
 
     return _buff;
 }

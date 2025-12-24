@@ -49,7 +49,7 @@ void SLocationKey::load(IReader& stream)
     stream.r_stringZ(spot_type);
     stream.r_u8();
 
-    location = xr_new<CMapLocation>(*spot_type, object_id);
+    location = xr_new<CMapLocation>(spot_type.c_str(), object_id);
 
     location->load(stream);
 }
