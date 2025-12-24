@@ -45,8 +45,8 @@ void CUIColorAnimatorWrapper::SetColorAnimation(const shared_str& animationName)
 {
     if (animationName.size() != 0)
     {
-        colorAnimation = LALib.FindItem(*animationName);
-        R_ASSERT2(colorAnimation, *animationName);
+        colorAnimation = LALib.FindItem(animationName.c_str());
+        R_ASSERT2(colorAnimation, animationName.c_str());
     }
     else
     {
