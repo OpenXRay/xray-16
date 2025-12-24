@@ -406,7 +406,7 @@ bool IPureClient::Connect(pcstr options)
             net_csEnumeration->Enter();
             // real connect
             for (u32 I = 0; I < net_Hosts.size(); I++)
-                Msg("* HOST #%d: %s\n", I + 1, *net_Hosts[I].dpSessionName);
+                Msg("* HOST #%d: %s\n", I + 1, net_Hosts[I].dpSessionName.c_str());
 
             if (res != S_OK)
                 return false;
