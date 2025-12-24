@@ -36,7 +36,7 @@ LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
 xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionData& game_descr)
 {
 #ifdef DEBUG
-    Msg("* sv_Connect: %s", *session_name);
+    Msg("* sv_Connect: %s", session_name.c_str());
 #endif
 
     // Parse options and create game

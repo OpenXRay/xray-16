@@ -1270,7 +1270,7 @@ void CActor::make_Interpolation()
             if (!pSyncObj)
                 return;
             pSyncObj->set_State(PredictedState); //, PredictedState.enabled);
-            VERIFY2(_valid(renderable.xform), *cName());
+            VERIFY2(_valid(renderable.xform), cName().c_str());
         }
         else
         {
@@ -1282,7 +1282,7 @@ void CActor::make_Interpolation()
             Fvector NewPos;
             NewPos.lerp(IStart.Pos, IEnd.Pos, factor);
 
-            VERIFY2(_valid(renderable.xform), *cName());
+            VERIFY2(_valid(renderable.xform), cName().c_str());
 
             //			r_model_yaw		= angle_lerp	(IStart.o_model,IEnd.o_model,		factor);
             unaffected_r_torso.yaw = angle_lerp(IStart.o_torso.yaw, IEnd.o_torso.yaw, factor);
@@ -1916,8 +1916,8 @@ void CActor::OnCriticalHitHealthLoss()
 
 #ifdef DEBUG
     IGameObject* pLastHitter = Level().Objects.net_Find(m_iLastHitterID);
-    Msg("%s killed by hit from %s %s", *cName(), (pLastHitter ? *(pLastHitter->cName()) : ""),
-        ((pLastHittingWeapon && pLastHittingWeapon != pLastHitter) ? *(pLastHittingWeapon->cName()) : ""));
+    Msg("%s killed by hit from %s %s", cName().c_str(), (pLastHitter ? pLastHitter->cName().c_str() : ""),
+        ((pLastHittingWeapon && pLastHittingWeapon != pLastHitter) ? pLastHittingWeapon->cName().c_str() : ""));
 #endif
     //-------------------------------------------------------------------
     if (m_iLastHitterID != u16(-1))
@@ -2023,7 +2023,7 @@ void CActor::OnCriticalWoundHealthLoss()
     if (GameID() == eGameIDSingle || !OnServer())
         return;
 #ifdef DEBUG
-    Msg("--- %s is bleed out", *cName());
+    Msg("--- %s is bleed out", cName().c_str());
 #endif // #ifdef DEBUG
     //-------------------------------
     NET_Packet P;

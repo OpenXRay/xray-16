@@ -272,7 +272,7 @@ void CScriptEntity::ProcessScripts()
 #ifdef DEBUG
         if (empty_queue)
             GEnv.ScriptEngine->script_log(
-                LuaMessageType::Info, "Object %s has an empty script queue!", *object().cName());
+                LuaMessageType::Info, "Object %s has an empty script queue!", object().cName().c_str());
 #endif
         return;
     }
@@ -513,7 +513,7 @@ bool CScriptEntity::bfAssignMovement(CScriptEntityAction* tpEntityAction)
             string256 S;
             xr_sprintf(S,
                 "Cannot find corresponding level vertex for the specified position [%f][%f][%f] for monster %s",
-                VPUSH(l_tMovementAction.m_tDestinationPosition), *m_monster->cName());
+                VPUSH(l_tMovementAction.m_tDestinationPosition), m_monster->cName().c_str());
             THROW2(ai().level_graph().valid_vertex_id(vertex_id), S);
         }
 #endif
@@ -568,7 +568,7 @@ LPCSTR CScriptEntity::GetPatrolPathName()
     if (!GetScriptControl())
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
-            "Object %s is not under script control while you are trying to get patrol path name!", *m_object->cName());
+            "Object %s is not under script control while you are trying to get patrol path name!", m_object->cName().c_str());
         return "";
     }
 #endif

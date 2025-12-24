@@ -223,7 +223,7 @@ void CSpaceRestriction::initialize()
         if (!m_out_space_restriction->object().correct())
         {
             Msg("~ BAD out restrictions combination :");
-            Msg("~ %s", *m_out_space_restriction->name());
+            Msg("~ %s", m_out_space_restriction->name().c_str());
         }
     }
 #endif

@@ -818,7 +818,7 @@ void CAI_Stalker::UpdateCL()
 {
     START_PROFILE("stalker")
     START_PROFILE("stalker/client_update")
-    VERIFY2(PPhysicsShell() || getEnabled(), *cName());
+    VERIFY2(PPhysicsShell() || getEnabled(), cName().c_str());
 
     if (g_Alive())
     {
@@ -907,7 +907,7 @@ void CAI_Stalker::shedule_Update(u32 DT)
 {
     START_PROFILE("stalker")
     START_PROFILE("stalker/schedule_update")
-    VERIFY2(getEnabled() || PPhysicsShell(), *cName());
+    VERIFY2(getEnabled() || PPhysicsShell(), cName().c_str());
 
     if (!CObjectHandler::planner().initialized())
     {

@@ -700,8 +700,8 @@ void CWeaponMagazined::switch2_Fire()
 
 #ifdef DEBUG
     if (ii != io->inventory().ActiveItem())
-        Msg("! not an active item, item %s, owner %s, active item %s", *cName(), *H_Parent()->cName(),
-            io->inventory().ActiveItem() ? *io->inventory().ActiveItem()->object().cName() : "no_active_item");
+        Msg("! not an active item, item %s, owner %s, active item %s", cName().c_str(), H_Parent()->cName().c_str(),
+            io->inventory().ActiveItem() ? io->inventory().ActiveItem()->object().cName().c_str() : "no_active_item");
 
     if (!(io && (ii == io->inventory().ActiveItem())))
     {

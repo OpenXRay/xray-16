@@ -222,10 +222,10 @@ void stalker_movement_manager_smart_cover::reach_enter_location(u32 const& time_
 
         VERIFY(ai().level_graph().inside(level_vertex_id, position));
 
-        VERIFY2(restrictions().accessible(level_vertex_id) || show_restrictions(&restrictions()), *object().cName());
+        VERIFY2(restrictions().accessible(level_vertex_id) || show_restrictions(&restrictions()), object().cName().c_str());
         CMovementManager::set_level_dest_vertex(level_vertex_id);
 
-        VERIFY2(restrictions().accessible(position) || show_restrictions(&restrictions()), *object().cName());
+        VERIFY2(restrictions().accessible(position) || show_restrictions(&restrictions()), object().cName().c_str());
         m_current.desired_position(&position);
     }
     else

@@ -208,8 +208,8 @@ void draw_restrictions(const shared_str& restrictions, LPCSTR start_indent, LPCS
 {
     DBG_OutText("%s%s%s", start_indent, indent, header);
     string256 temp;
-    for (u32 i = 0, n = _GetItemCount(*restrictions); i < n; ++i)
-        DBG_OutText("%s%s%s%s", start_indent, indent, indent, _GetItem(*restrictions, i, temp));
+    for (u32 i = 0, n = _GetItemCount(restrictions.c_str()); i < n; ++i)
+        DBG_OutText("%s%s%s%s", start_indent, indent, indent, _GetItem(restrictions.c_str(), i, temp));
 }
 
 LPCSTR movement_type(const MonsterSpace::EMovementType& movement_type)
@@ -267,8 +267,8 @@ void CAI_Stalker::debug_text()
     DBG_TextOutSet(0, up_indent);
     // memory
     DBG_OutText("memory");
-    DBG_OutText("%sname          : %s", indent, *cName());
-    DBG_OutText("%ssection       : %s", indent, *cNameSect());
+    DBG_OutText("%sname          : %s", indent, cName().c_str());
+    DBG_OutText("%ssection       : %s", indent, cNameSect().c_str());
     DBG_OutText("%sid            : %d", indent, ID());
     DBG_OutText("%shealth        : %f", indent, conditions().health());
     DBG_OutText("%swounded       : %c", indent, wounded() ? '+' : '-');
@@ -304,7 +304,7 @@ void CAI_Stalker::debug_text()
             DBG_OutText("%s%s%stype", indent, indent, indent);
             DBG_OutText("%s%s%spower     : %f", indent, indent, indent, memory().sound().sound()->m_power);
             DBG_OutText("%s%s%sobject    : %s", indent, indent, indent,
-                memory().sound().sound()->m_object ? *memory().sound().sound()->m_object->cName() : "unknown");
+                memory().sound().sound()->m_object ? memory().sound().sound()->m_object->cName().c_str() : "unknown");
             if (g_Alive() && memory().sound().sound()->m_object)
                 DBG_OutText("%s%s%svisible   : %s", indent, indent, indent,
                     memory().visual().visible_now(memory().sound().sound()->m_object) ? "+" : "-");
@@ -316,14 +316,14 @@ void CAI_Stalker::debug_text()
         ALife::_OBJECT_ID object_id = memory().hit().last_hit_object_id();
         DBG_OutText("%s%slast hit object id   : %d", indent, indent, object_id);
         IGameObject* object = (object_id == ALife::_OBJECT_ID(-1)) ? 0 : Level().Objects.net_Find(object_id);
-        DBG_OutText("%s%slast hit object name : %s", indent, indent, object ? *object->cName() : "");
+        DBG_OutText("%s%slast hit object name : %s", indent, indent, object ? object->cName().c_str() : "");
 #ifdef USE_SELECTED_HIT
         if (memory().hit().hit())
         {
             DBG_OutText("%s%sselected", indent, indent);
             DBG_OutText("%s%s%spower     : %f", indent, indent, indent, memory().hit().hit()->m_amount);
             DBG_OutText("%s%s%sobject    : %s", indent, indent, indent,
-                memory().hit().hit()->m_object ? *memory().hit().hit()->m_object->cName() : "unknown");
+                memory().hit().hit()->m_object ? memory().hit().hit()->m_object->cName().c_str() : "unknown");
             if (g_Alive() && memory().hit().hit()->m_object)
                 DBG_OutText("%s%s%svisible   : %s", indent, indent, indent,
                     memory().visual().visible_now(memory().hit().hit()->m_object) ? "+" : "-");
@@ -348,7 +348,7 @@ void CAI_Stalker::debug_text()
         CEnemyManager::OBJECTS::const_iterator I = memory().enemy().objects().begin();
         CEnemyManager::OBJECTS::const_iterator E = memory().enemy().objects().end();
         for (; I != E; ++I)
-            DBG_OutText("%s%s%s%s : %s", indent, indent, indent, *(*I)->cName(),
+            DBG_OutText("%s%s%s%s : %s", indent, indent, indent, (*I)->cName().c_str(),
                 memory().visual().visible_now(*I) ? "visible" : "invisible");
     }
 
@@ -372,7 +372,7 @@ void CAI_Stalker::debug_text()
             DBG_OutText("%s%s%svisible   : %s %f", indent, indent, indent,
                 memory().visual().visible_now(memory().enemy().selected()) ? "+" : "-", fuzzy);
         }
-        DBG_OutText("%s%s%sobject    : %s", indent, indent, indent, *memory().enemy().selected()->cName());
+        DBG_OutText("%s%s%sobject    : %s", indent, indent, indent, memory().enemy().selected()->cName().c_str());
         if (g_Alive())
         {
             float interval = (1.f - panic_threshold()) * .25f, left = -1.f, right = -1.f;
@@ -432,7 +432,7 @@ void CAI_Stalker::debug_text()
         DBG_OutText("%s%s%stime      : %.3f (%.3f)", indent, indent, indent,
             float(memory().danger().selected()->time()) / 1000.f,
             float(Device.dwTimeGlobal - memory().danger().selected()->time()) / 1000.f);
-        DBG_OutText("%s%s%sinitiator : %s", indent, indent, indent, *memory().danger().selected()->object()->cName());
+        DBG_OutText("%s%s%sinitiator : %s", indent, indent, indent, memory().danger().selected()->object()->cName().c_str());
         if (g_Alive() && memory().danger().selected()->object())
             DBG_OutText("%s%s%svisible   : %s", indent, indent, indent,
                 memory().visual().visible_now(memory().danger().selected()->object()) ? "+" : "-");
@@ -441,7 +441,7 @@ void CAI_Stalker::debug_text()
             !!memory().danger().selected()->dependent_object()->cName())
         {
             DBG_OutText("%s%s%sdependent : %s", indent, indent, indent,
-                *memory().danger().selected()->dependent_object()->cName());
+                memory().danger().selected()->dependent_object()->cName().c_str());
             if (g_Alive())
                 DBG_OutText("%s%s%svisible   : %s", indent, indent, indent,
                     memory().visual().visible_now(
@@ -483,12 +483,12 @@ void CAI_Stalker::debug_text()
 
             if (agent_manager().member().member(this).member_death_reaction().m_processing)
                 DBG_OutText("%react on death : %s", indent,
-                    *agent_manager().member().member(this).member_death_reaction().m_member->cName());
+                    agent_manager().member().member(this).member_death_reaction().m_member->cName().c_str());
 
             if (agent_manager().member().member(this).grenade_reaction().m_processing)
                 DBG_OutText("%react on grenade : %s", indent,
                     agent_manager().member().member(this).grenade_reaction().m_game_object ?
-                        *agent_manager().member().member(this).grenade_reaction().m_game_object->cName() :
+                        agent_manager().member().member(this).grenade_reaction().m_game_object->cName().c_str() :
                         "unknown");
         }
     }
@@ -498,18 +498,18 @@ void CAI_Stalker::debug_text()
     DBG_OutText("%sobjects", indent);
     DBG_OutText("%s%sobjects             : %d", indent, indent, inventory().m_all.size());
     DBG_OutText("%s%sactive item         : %s", indent, indent,
-        inventory().ActiveItem() ? *inventory().ActiveItem()->object().cName() : "");
-    DBG_OutText("%s%sbest weapon         : %s", indent, indent, best_weapon() ? *best_weapon()->object().cName() : "");
+        inventory().ActiveItem() ? inventory().ActiveItem()->object().cName().c_str() : "");
+    DBG_OutText("%s%sbest weapon         : %s", indent, indent, best_weapon() ? best_weapon()->object().cName().c_str() : "");
     DBG_OutText(
-        "%s%sitem to kill        : %s", indent, indent, item_to_kill() ? *m_best_item_to_kill->object().cName() : "");
+        "%s%sitem to kill        : %s", indent, indent, item_to_kill() ? m_best_item_to_kill->object().cName().c_str() : "");
     DBG_OutText("%s%sitem can kill       : %s", indent, indent, item_can_kill() ? "+" : "-");
     DBG_OutText("%s%smemory item to kill : %s", indent, indent,
-        remember_item_to_kill() ? *m_best_found_item_to_kill->object().cName() : "");
+        remember_item_to_kill() ? m_best_found_item_to_kill->object().cName().c_str() : "");
     DBG_OutText(
-        "%s%smemory ammo         : %s", indent, indent, remember_ammo() ? *m_best_found_ammo->object().cName() : "");
+        "%s%smemory ammo         : %s", indent, indent, remember_ammo() ? m_best_found_ammo->object().cName().c_str() : "");
     DBG_OutText("%s%sinfinite ammo       : %s", indent, indent, m_infinite_ammo ? "+" : "-");
     DBG_OutText(
-        "%s%sitem to spawn       : %s", indent, indent, item_to_spawn().size() ? *item_to_spawn() : "no item to spawn");
+        "%s%sitem to spawn       : %s", indent, indent, item_to_spawn().size() ? item_to_spawn().c_str() : "no item to spawn");
     DBG_OutText("%s%sammo in box to spawn: %d", indent, indent, item_to_spawn().size() ? ammo_in_box_to_spawn() : 0);
 
     CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(inventory().ActiveItem());
@@ -525,7 +525,7 @@ void CAI_Stalker::debug_text()
     {
         DBG_OutText("%s%sactive item", indent, indent);
         DBG_OutText("%s%s%sobject         : %s", indent, indent, indent,
-            inventory().ActiveItem() ? *inventory().ActiveItem()->object().cName() : "");
+            inventory().ActiveItem() ? inventory().ActiveItem()->object().cName().c_str() : "");
         CWeapon* weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
         if (weapon)
         {
@@ -654,7 +654,7 @@ void CAI_Stalker::debug_text()
     if (movement().path_type() == MovementManager::ePathTypePatrolPath)
     {
         DBG_OutText("%s%spatrol", indent, indent);
-        DBG_OutText("%s%s%spath          : %s", indent, indent, indent, *movement().patrol().path_name());
+        DBG_OutText("%s%s%spath          : %s", indent, indent, indent, movement().patrol().path_name().c_str());
         DBG_OutText("%s%s%scompleted     : %s", indent, indent, indent, movement().patrol().completed() ? "+" : "-");
         DBG_OutText("%s%s%scurrent point : %d", indent, indent, indent, movement().patrol().get_current_point_index());
         if (movement().patrol().get_path() &&
@@ -924,7 +924,7 @@ void CAI_Stalker::debug_text()
     }
     case SightManager::eSightTypeObject:
     {
-        DBG_OutText("%s%sobject          : %s", indent, indent, *sight().current_action().object().cName());
+        DBG_OutText("%s%sobject          : %s", indent, indent, sight().current_action().object().cName().c_str());
         DBG_OutText(
             "%s%sposition        : [%f][%f][%f]", indent, indent, VPUSH(sight().current_action().object().Position()));
         break;
@@ -939,7 +939,7 @@ void CAI_Stalker::debug_text()
     }
     case SightManager::eSightTypeFireObject:
     {
-        DBG_OutText("%s%sobject          : %s", indent, indent, *sight().current_action().object().cName());
+        DBG_OutText("%s%sobject          : %s", indent, indent, sight().current_action().object().cName().c_str());
         DBG_OutText(
             "%s%sposition        : [%f][%f][%f]", indent, indent, VPUSH(sight().current_action().object().Position()));
         DBG_OutText("%s%svisible point   : %s", indent, indent, false ? "-" : "+");

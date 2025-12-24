@@ -46,7 +46,7 @@ void CStalkerSoundDataVisitor::visit(CStalkerSoundData* data)
     if (!object().g_Alive())
         return;
 #ifdef DEBUG
-    Msg("%s : Adding fiction hit by sound info from stalker %s", *object().cName(), *data->object().cName());
+    Msg("%s : Adding fiction hit by sound info from stalker %s", object().cName().c_str(), data->object().cName().c_str());
 #endif //#ifdef DEBUG
     object().memory().make_object_visible_somewhen(data->object().memory().enemy().selected());
 

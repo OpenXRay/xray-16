@@ -293,7 +293,7 @@ void CMapManager::Dump()
     auto it_e = Locations().end();
     for (; it != it_e; ++it)
     {
-        Msg("spot_type=[%s] object_id=[%d]", *((*it).spot_type), (*it).object_id);
+        Msg("spot_type=[%s] object_id=[%d]", (*it).spot_type.c_str(), (*it).object_id);
         (*it).location->Dump();
     }
 

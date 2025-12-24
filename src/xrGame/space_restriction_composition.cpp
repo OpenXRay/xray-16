@@ -190,7 +190,7 @@ Fsphere CSpaceRestrictionComposition::sphere() const
 #ifdef DEBUG
 void CSpaceRestrictionComposition::check_restrictor_type()
 {
-    if (_GetItemCount(*m_space_restrictors) == 1)
+    if (_GetItemCount(m_space_restrictors.c_str()) == 1)
         return;
 
     if (!ai().get_alife())
@@ -201,7 +201,7 @@ void CSpaceRestrictionComposition::check_restrictor_type()
         return;
 
     CSpaceRestrictor* restrictor = smart_cast<CSpaceRestrictor*>(object);
-    VERIFY3(restrictor, "you are trying to use object as a restrictor", *m_space_restrictors);
+    VERIFY3(restrictor, "you are trying to use object as a restrictor", m_space_restrictors.c_str());
     VERIFY2(restrictor->restrictor_type() == RestrictionSpace::eRestrictorTypeNone,
         "you are trying to restrict yourself with restrictor with type eRestrictorTypeNone");
     VERIFY2(restrictor->restrictor_type() != RestrictionSpace::eRestrictorTypeNone,

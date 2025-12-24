@@ -169,7 +169,7 @@ void CSoundPlayer::play(
     {
 #ifdef DEBUG
         Msg("- There are no sounds in sound collection \"%s\" with internal type %d (sound_script = %d)",
-            *sound.m_sound_prefix, internal_type, StalkerSpace::eStalkerSoundScript);
+            sound.m_sound_prefix.c_str(), internal_type, StalkerSpace::eStalkerSoundScript);
 #endif
         return;
     }
@@ -265,7 +265,7 @@ CSoundPlayer::CSoundCollection::CSoundCollection(const CSoundCollectionParams& p
     }
 #ifdef DEBUG
     if (m_sounds.empty())
-        Msg("- There are no sounds with prefix %s", *params.m_sound_prefix);
+        Msg("- There are no sounds with prefix %s", params.m_sound_prefix.c_str());
 #endif
 }
 
