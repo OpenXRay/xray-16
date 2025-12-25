@@ -44,7 +44,8 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     m_uiXml = xr_new<CUIXml>();
     m_uiXml->Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, TALK_XML);
 
-    CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this, false);
+    if (!CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this, false))
+        SetWndRect({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 
     UIStaticTop = UIHelper::CreateStatic(*m_uiXml, "top_background", this, false);
     UIStaticBottom = UIHelper::CreateStatic(*m_uiXml, "bottom_background", this, false);
