@@ -409,8 +409,68 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
     }
     TryHidePropertiesBox();
 
-    if (GetModeSpecificItemInfo())
-        GetModeSpecificItemInfo()->InitItem(itm);
+    if (auto* info = GetModeSpecificItemInfo())
+    {
+        u32 item_price = u32(-1);
+        PIItem compare_item = nullptr;
+        pcstr trade_tip = nullptr;
+        if (PIItem current_item = itm ? (PIItem)itm->m_pData : nullptr)
+        {
+            if (GetMenuMode() != mmTrade)
+                item_price = current_item->Cost();
+            else
+            {
+                u16 compare_slot = current_item->BaseSlot();
+                if (compare_slot != NO_ACTIVE_SLOT)
+                {
+                    compare_item = m_pActorInvOwner->inventory().ItemFromSlot(compare_slot);
+                }
+
+                CInventoryOwner* item_owner = smart_cast<CInventoryOwner*>(current_item->m_pInventory->GetOwner());
+
+                if (item_owner && item_owner == m_pActorInvOwner)
+                    item_price = m_partner_trade->GetItemPrice(current_item, true);
+                else
+                    item_price = m_partner_trade->GetItemPrice(current_item, false);
+
+                // if(item_price>500)
+                //	item_price = iFloor(item_price/10+0.5f)*10;
+
+                CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(current_item);
+                if (ammo)
+                {
+                    for (u32 j = 0; j < itm->ChildsCount(); ++j)
+                    {
+                        u32 tmp_price = 0;
+                        PIItem jitem = (PIItem)itm->Child(j)->m_pData;
+                        CInventoryOwner* ammo_owner = smart_cast<CInventoryOwner*>(jitem->m_pInventory->GetOwner());
+                        if (ammo_owner && ammo_owner == m_pActorInvOwner)
+                            tmp_price = m_partner_trade->GetItemPrice(jitem, true);
+                        else
+                            tmp_price = m_partner_trade->GetItemPrice(jitem, false);
+
+                        // if(tmp_price>500)
+                        //	tmp_price = iFloor(tmp_price/10+0.5f)*10;
+
+                        item_price += tmp_price;
+                    }
+                }
+                if (!current_item->CanTrade() || (!m_pPartnerInvOwner->trade_parameters().enabled(
+                    CTradeParameters::action_buy(0), current_item->object().cNameSect()) &&
+                    item_owner && item_owner == m_pActorInvOwner))
+                {
+                    item_price = u32(-1);
+                    trade_tip = "st_no_trade_tip_1";
+                }
+                else if (current_item->GetCondition() < m_pPartnerInvOwner->trade_parameters().buy_item_condition_factor)
+                {
+                    item_price = u32(-1);
+                    trade_tip = "st_no_trade_tip_2";
+                }
+            }
+        }
+        info->InitItem(itm, compare_item, item_price, trade_tip);
+    }
 
     if (m_currMenuMode == mmUpgrade)
     {

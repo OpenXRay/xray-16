@@ -1280,6 +1280,8 @@ bool CInventory::CanTakeItem(CInventoryItem* inventory_item) const
 
 u32 CInventory::BeltWidth() const
 {
+    if (ShadowOfChernobylMode)
+        return m_iMaxBelt;
     CActor* pActor = smart_cast<CActor*>(m_pOwner);
     if (pActor)
     {

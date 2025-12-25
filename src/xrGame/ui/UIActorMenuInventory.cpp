@@ -424,7 +424,12 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyB
 
     CUIDragDropListEx* curr_list = pBagList;
 
-    TIItemContainer ruck_list = m_pActorInvOwner->inventory().m_ruck;
+    TIItemContainer ruck_list;
+    if (onlyBagList)
+        m_pActorInvOwner->inventory().AddAvailableItems(ruck_list, true);
+    else
+        ruck_list = m_pActorInvOwner->inventory().m_ruck;
+
     std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
 
     for (PIItem item : ruck_list)
