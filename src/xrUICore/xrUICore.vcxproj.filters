@@ -235,9 +235,6 @@
     <ClCompile Include="ListWnd\UIListItem.cpp">
       <Filter>ListWnd</Filter>
     </ClCompile>
-    <ClCompile Include="Windows\UITextFrameLineWnd.cpp">
-      <Filter>Windows</Filter>
-    </ClCompile>
     <ClCompile Include="ui_styles.cpp" />
     <ClCompile Include="ui_debug.cpp" />
     <ClCompile Include="ui_focus.cpp" />
@@ -412,9 +409,6 @@
     </ClInclude>
     <ClInclude Include="ListWnd\UIListWnd_inline.h">
       <Filter>ListWnd</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\UITextFrameLineWnd.h">
-      <Filter>Windows</Filter>
     </ClInclude>
     <ClInclude Include="ui_styles.h" />
     <ClInclude Include="ui_debug.h" />
