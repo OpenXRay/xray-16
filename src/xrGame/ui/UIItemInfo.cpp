@@ -229,9 +229,6 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
     }
     if (UICost && IsGameTypeSingle())
     {
-        if (soc_style && item_price == u32(-1))
-            item_price = pInvItem->Cost();
-
         if (item_price == u32(-1))
             UICost->Show(false);
         else

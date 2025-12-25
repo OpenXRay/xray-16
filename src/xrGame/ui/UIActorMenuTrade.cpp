@@ -49,7 +49,8 @@ void CUIActorMenu::InitTradeMode()
     VERIFY(m_pPartnerInvOwner);
     m_pPartnerInvOwner->StartTrading();
 
-    InitInventoryContents(m_pLists[eTradeActorBagList]);
+    InitInventoryContents(m_pLists[eTradeActorBagList],
+        m_pLists[eSearchLootActorBagList] != m_pLists[eInventoryBagList]);
     InitPartnerInventoryContents();
 
     m_actor_trade = m_pActorInvOwner->GetTrade();
