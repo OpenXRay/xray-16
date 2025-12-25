@@ -87,7 +87,7 @@ bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immun
     return true;
 }
 
-void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
+void CUIOutfitImmunity::SetProgressValue(float cur, float comp, float add /*= 0.0f*/)
 {
     string128 buf;
 
@@ -96,12 +96,19 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 
     if (m_progress.IsShown())
     {
+        if (fsimilar(cur, comp) && !fis_zero(add))
+            comp = add;
         m_progress.SetTwoPos(cur, comp);
-        xr_sprintf(buf, "%.0f", cur);
+
+        const auto sz = xr_sprintf(buf, "%.0f", cur);
+        if (!fis_zero(add))
+            xr_sprintf(buf + sz, sizeof(buf) - sz, "+ %.0f%", add * m_magnitude);
     }
     else // SOC
     {
-        xr_sprintf(buf, "%s %+3.0f%%", cur > 0.0f ? "%c[green]" : "%c[red]", cur);
+        const auto sz = xr_sprintf(buf, "%s %+3.0f%%", cur > 0.0f ? "%c[green]" : "%c[red]", cur);
+        if (!fis_zero(add))
+            xr_sprintf(buf + sz, sizeof(buf) - sz, "%s %+3.0f%%", add > 0.0f ? "%c[green]" : "%c[red]", add * m_magnitude);
     }
 
     m_value.SetText(buf);
@@ -172,7 +179,8 @@ void CUIOutfitInfo::AdjustElements()
     SetWndSize(pos);
 }
 
-void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit /*= nullptr*/, bool hide_if_zero_immunity /*= false*/)
+void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit /*= nullptr*/,
+    bool add_artefact_info /*= false*/, bool hide_if_zero_immunity /*= false*/)
 {
     const CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor || !cur_outfit)
@@ -200,6 +208,7 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
 
         float cur  = cur_outfit->GetDefHitTypeProtection(hit_type);
         float slot = slot_outfit ? slot_outfit->GetDefHitTypeProtection(hit_type) : cur;
+        float add  = add_artefact_info ? actor->GetProtection_ArtefactsOnBelt(hit_type) : 0.0f;
 
         if (is_cs_cop)
         {
@@ -207,17 +216,12 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
             cur /= max_power;  // = 0..1
             slot /= max_power; //  = 0..1
         }
-        else // SOC
-        {
-            cur  = 1.0f - cur;
-            slot = 1.0f - slot;
-        }
 
         const bool hide = hide_if_zero_immunity && fis_zero(cur) && fis_zero(slot);
         item->Show(!hide);
 
         if (!hide)
-            item->SetProgressValue(cur, slot);
+            item->SetProgressValue(cur, slot, add);
     }
 
     if (const auto& fireWoundItem = m_items[ALife::eHitTypeFireWound];

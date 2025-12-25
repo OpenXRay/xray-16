@@ -303,11 +303,7 @@ float CScriptGameObject::GetCurrentOutfitProtection(int hit_type)
     if (!o)
         return 0.0f;
 
-    const float protection = o->GetDefHitTypeProtection(ALife::EHitType(hit_type));
-
-    if (o->GetHitFracType() == SBoneProtections::HitFraction)
-        return 1.0f - protection; // SOC
-    return protection;
+    return o->GetDefHitTypeProtection(ALife::EHitType(hit_type));
 }
 
 CScriptGameObject* CScriptGameObject::GetFood() const

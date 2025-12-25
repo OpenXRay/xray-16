@@ -136,23 +136,14 @@ void CCustomOutfit::Hit(float hit_power, ALife::EHitType hit_type)
 
 float CCustomOutfit::GetDefHitTypeProtection(ALife::EHitType hit_type) const
 {
-    const float base = m_HitTypeProtection[hit_type] * GetCondition();
-
-    if (m_boneProtection.m_hitFracType == SBoneProtections::HitFraction)
-        return 1.0f - base; // SOC
-
-    return base; // CS/COP
+    return m_HitTypeProtection[hit_type] * GetCondition();
 }
 
 float CCustomOutfit::GetHitTypeProtection(ALife::EHitType hit_type, s16 element) const
 {
     const float base = m_HitTypeProtection[hit_type] * GetCondition();
     const float bone = m_boneProtection.getBoneProtection(element);
-
-    if (m_boneProtection.m_hitFracType == SBoneProtections::HitFraction)
-        return 1.0f - base * bone; // SOC
-
-    return base * bone; // CS/COP
+    return base * bone;
 }
 
 float CCustomOutfit::GetBoneArmor(s16 element) const
@@ -280,7 +271,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
         }
         else
         {
-            NewHitPower *= GetHitTypeProtection(hit_type, element);
+            NewHitPower -= GetHitTypeProtection(hit_type, element);
         }
 
         //увеличить изношенность костюма
@@ -425,6 +416,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
     result |= process_if_exists(
         section, "physic_strike_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypePhysicStrike], test);
+
     LPCSTR str{};
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)

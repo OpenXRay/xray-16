@@ -1555,7 +1555,7 @@ void CUIActorMenu::UpdateOutfit()
 
     if (m_OutfitInfo)
     {
-        m_OutfitInfo->UpdateInfo(outfit, nullptr, true);
+        m_OutfitInfo->UpdateInfo(outfit, nullptr, true, true);
     }
 
     if (ShadowOfChernobylMode)
