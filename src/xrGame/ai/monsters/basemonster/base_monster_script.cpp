@@ -498,7 +498,7 @@ void CBaseMonster::ProcessScripts()
     {
         DBG().object_info(this, this).remove_item(u32(0));
         DBG().object_info(this, this).remove_item(u32(1));
-        DBG().object_info(this, this).add_item(*cName(), color_xrgb(255, 0, 0), 0);
+        DBG().object_info(this, this).add_item(cName().c_str(), color_xrgb(255, 0, 0), 0);
         DBG().object_info(this, this).add_item("Under script", color_xrgb(255, 0, 0), 1);
     }
     else

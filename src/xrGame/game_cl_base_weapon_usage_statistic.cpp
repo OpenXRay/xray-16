@@ -449,8 +449,8 @@ void WeaponUsageStatistic::RemoveBullet(ABULLETS_it& Bullet_it)
     if (!Bullet_it->Removed || Bullet_it->HitRefCount != Bullet_it->HitResponds)
         return;
     //-------------------------------------------------------------
-    auto PlayerIt = FindPlayer(*(Bullet_it->FirerName));
-    auto WeaponIt = PlayerIt->FindPlayersWeapon(*(Bullet_it->WeaponName));
+    auto PlayerIt = FindPlayer(Bullet_it->FirerName.c_str());
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(Bullet_it->WeaponName.c_str());
     HITS_VEC_it HitIt;
     if (WeaponIt->FindHit(Bullet_it->Bullet.m_dwID, HitIt))
     {
@@ -504,10 +504,10 @@ void WeaponUsageStatistic::OnBullet_Fire(SBullet* pBullet, const CCartridge& car
     if (!pActor)
         return;
     //-----------------------------------------------------------------------------------
-    auto PlayerIt = FindPlayer(*object_parent->cName());
+    auto PlayerIt = FindPlayer(object_parent->cName().c_str());
     pBullet->m_dwID = PlayerIt->m_dwTotalShots++;
     PlayerIt->m_dwTotalShots_d++;
-    auto WeaponIt = PlayerIt->FindPlayersWeapon(*object_weapon->cNameSect());
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(object_weapon->cNameSect().c_str());
     WeaponIt->m_dwRoundsFired = (++WeaponIt->m_dwBulletsFired) / cartridge.param_s.buckShot;
     WeaponIt->m_dwBulletsFired_d++;
     //-----------------------------------------------------------------------------------
@@ -526,8 +526,8 @@ void WeaponUsageStatistic::OnBullet_Hit(SBullet* pBullet, u16 TargetID, s16 elem
     if (!FindBullet(pBullet->m_dwID, BulletIt))
         return;
     //-----------------------------------------------------
-    auto PlayerIt = FindPlayer(*(BulletIt->FirerName));
-    auto WeaponIt = PlayerIt->FindPlayersWeapon(*(BulletIt->WeaponName));
+    auto PlayerIt = FindPlayer(BulletIt->FirerName.c_str());
+    auto WeaponIt = PlayerIt->FindPlayersWeapon(BulletIt->WeaponName.c_str());
     if (!BulletIt->HitRefCount++)
     {
         WeaponIt->m_dwHitsScored++;
@@ -717,8 +717,8 @@ void WeaponUsageStatistic::On_Check_Respond(NET_Packet* P)
         BulletIt->HitResponds++;
 
         //---------------------------------------------------------------
-        auto PlayerIt = FindPlayer(*(BulletIt->FirerName));
-        auto WeaponIt = PlayerIt->FindPlayersWeapon(*(BulletIt->WeaponName));
+        auto PlayerIt = FindPlayer(BulletIt->FirerName.c_str());
+        auto WeaponIt = PlayerIt->FindPlayersWeapon(BulletIt->WeaponName.c_str());
         (*WeaponIt).m_dwKillsScored++;
         (*WeaponIt).m_dwKillsScored_d++;
 
@@ -998,7 +998,7 @@ void WeaponUsageStatistic::OnUpdateRespond(NET_Packet* P, shared_str const& send
 
     shared_str PName;
     P->r_stringZ(PName);
-    Player_Statistic& PS = *(FindPlayer(*PName));
+    Player_Statistic& PS = *(FindPlayer(PName.c_str()));
     PS.PDigest = sender_digest;
     PS.PID = sender_pid;
     Msg("--- CL: On Update Respond from [%s]", PName.c_str());

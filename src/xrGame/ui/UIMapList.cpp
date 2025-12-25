@@ -287,7 +287,7 @@ void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
 void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
 {
     R_ASSERT2(m_pWeatherSelector, "m_pWeatherSelector == NULL");
-    m_pWeatherSelector->AddItem_(*WeatherType, 0)->SetTAG(_id);
+    m_pWeatherSelector->AddItem_(WeatherType.c_str(), 0)->SetTAG(_id);
 
     m_mapWeather.resize(m_mapWeather.size() + 1);
     m_mapWeather.back().weather_name = WeatherType;

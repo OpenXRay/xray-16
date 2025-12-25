@@ -390,7 +390,7 @@ void CLevel::MakeReconnect()
         char const* client_options = nullptr;
         if (m_caServerOptions.c_str())
         {
-            server_options = xr_strdup(*m_caServerOptions);
+            server_options = xr_strdup(m_caServerOptions.c_str());
         }
         else
         {
@@ -398,7 +398,7 @@ void CLevel::MakeReconnect()
         }
         if (m_caClientOptions.c_str())
         {
-            client_options = xr_strdup(*m_caClientOptions);
+            client_options = xr_strdup(m_caClientOptions.c_str());
         }
         else
         {

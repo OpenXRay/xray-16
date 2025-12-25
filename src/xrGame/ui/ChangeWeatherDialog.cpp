@@ -112,7 +112,7 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
 void ChangeWeatherDialog::OnButtonClick(int i)
 {
     string1024 command;
-    xr_sprintf(command, "cl_votestart changeweather %s %s", *weathers[i].Name, *weathers[i].Time);
+    xr_sprintf(command, "cl_votestart changeweather %s %s", weathers[i].Name.c_str(), weathers[i].Time.c_str());
     Console->Execute(command);
     HideDialog();
 }

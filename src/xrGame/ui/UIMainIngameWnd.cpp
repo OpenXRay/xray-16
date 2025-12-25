@@ -181,14 +181,14 @@ void CUIMainIngameWnd::Init()
     {
         // Читаем данные порогов для каждого индикатора
         shared_str cfgRecord =
-            pSettings->r_string("main_ingame_indicators_thresholds", *warningStrings[static_cast<int>(j) - 1]);
-        u32 count = _GetItemCount(*cfgRecord);
+            pSettings->r_string("main_ingame_indicators_thresholds", warningStrings[static_cast<int>(j) - 1].c_str());
+        u32 count = _GetItemCount(cfgRecord.c_str());
 
         char singleThreshold[8];
         float f = 0;
         for (u32 k = 0; k < count; ++k)
         {
-            _GetItem(*cfgRecord, k, singleThreshold);
+            _GetItem(cfgRecord.c_str(), k, singleThreshold);
             sscanf(singleThreshold, "%f", &f);
 
             m_Thresholds[j].push_back(f);

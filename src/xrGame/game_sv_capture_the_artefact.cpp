@@ -1279,7 +1279,7 @@ void game_sv_CaptureTheArtefact::SpawnWeaponsForActor(CSE_Abstract* pE, game_Pla
     {
         u16 ItemID = ps->pItemList.front();
         SpawnWeapon4Actor(
-            pA->ID, *m_strWeaponsData->GetItemName(ItemID & 0x00FF), u8((ItemID & 0xFF00) >> 0x08), ps->pItemList);
+            pA->ID, m_strWeaponsData->GetItemName(ItemID & 0x00FF).c_str(), u8((ItemID & 0xFF00) >> 0x08), ps->pItemList);
         // Game().m_WeaponUsageStatistic->OnWeaponBought(ps, *m_strWeaponsData->GetItemName(ItemID& 0x00FF));
         R_ASSERT(ps->pItemList.size());
         ps->pItemList.erase(ps->pItemList.begin());
@@ -2453,37 +2453,37 @@ void game_sv_CaptureTheArtefact::ReadOptions(shared_str& options)
     inherited::ReadOptions(options);
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    g_sv_dm_bAnomaliesEnabled = (get_option_i(*options, "ans", (isAnomaliesEnabled() ? 1 : 0)) != 0);
-    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
-    g_sv_dm_bPDAHunt = (get_option_i(*options, "pdahunt", (isPDAHuntEnabled() ? 1 : 0)) != 0);
-    g_sv_dm_bDamageBlockIndicators = (get_option_i(*options, "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
-    g_sv_dm_dwWarmUp_MaxTime = get_option_i(*options, "warmup", g_sv_dm_dwWarmUp_MaxTime);
+    g_sv_dm_bAnomaliesEnabled = (get_option_i(options.c_str(), "ans", (isAnomaliesEnabled() ? 1 : 0)) != 0);
+    g_sv_dm_dwAnomalySetLengthTime = get_option_i(options.c_str(), "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
+    g_sv_dm_bPDAHunt = (get_option_i(options.c_str(), "pdahunt", (isPDAHuntEnabled() ? 1 : 0)) != 0);
+    g_sv_dm_bDamageBlockIndicators = (get_option_i(options.c_str(), "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
+    g_sv_dm_dwWarmUp_MaxTime = get_option_i(options.c_str(), "warmup", g_sv_dm_dwWarmUp_MaxTime);
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     //-------------------------------------------------------------------------
-    g_sv_tdm_bAutoTeamBalance = get_option_i(*options, "abalance", (g_sv_tdm_bAutoTeamBalance ? 1 : 0)) != 0;
-    g_sv_tdm_bAutoTeamSwap = get_option_i(*options, "aswap", (g_sv_tdm_bAutoTeamSwap ? 1 : 0)) != 0;
-    g_sv_tdm_bFriendlyIndicators = get_option_i(*options, "fi", (g_sv_tdm_bFriendlyIndicators ? 1 : 0)) != 0;
-    g_sv_tdm_bFriendlyNames = get_option_i(*options, "fn", (g_sv_tdm_bFriendlyNames ? 1 : 0)) != 0;
+    g_sv_tdm_bAutoTeamBalance = get_option_i(options.c_str(), "abalance", (g_sv_tdm_bAutoTeamBalance ? 1 : 0)) != 0;
+    g_sv_tdm_bAutoTeamSwap = get_option_i(options.c_str(), "aswap", (g_sv_tdm_bAutoTeamSwap ? 1 : 0)) != 0;
+    g_sv_tdm_bFriendlyIndicators = get_option_i(options.c_str(), "fi", (g_sv_tdm_bFriendlyIndicators ? 1 : 0)) != 0;
+    g_sv_tdm_bFriendlyNames = get_option_i(options.c_str(), "fn", (g_sv_tdm_bFriendlyNames ? 1 : 0)) != 0;
 
-    float fFF = get_option_f(*options, "ffire", g_sv_tdm_fFriendlyFireModifier);
+    float fFF = get_option_f(options.c_str(), "ffire", g_sv_tdm_fFriendlyFireModifier);
     g_sv_tdm_fFriendlyFireModifier = fFF;
     //-------------------------------------------------------------------------
-    g_sv_ah_dwArtefactsNum = get_option_i(*options, "anum", g_sv_ah_dwArtefactsNum);
+    g_sv_ah_dwArtefactsNum = get_option_i(options.c_str(), "anum", g_sv_ah_dwArtefactsNum);
     //----------------------------------------------------------------------------
-    g_sv_ah_iReinforcementTime = get_option_i(*options, "reinf", g_sv_ah_iReinforcementTime);
+    g_sv_ah_iReinforcementTime = get_option_i(options.c_str(), "reinf", g_sv_ah_iReinforcementTime);
     if (g_sv_ah_iReinforcementTime <= 0)
         g_sv_ah_iReinforcementTime = 1;
     //----------------------------------------------------------------------------
-    g_sv_cta_dwInvincibleTime = get_option_i(*options, "dmgblock", g_sv_cta_dwInvincibleTime); // in (sec)
-    g_sv_cta_artefactReturningTime = get_option_i(*options, "artrettime", g_sv_cta_artefactReturningTime); // in (sec)
-    g_sv_cta_activatedArtefactRet = get_option_i(*options, "actret", g_sv_cta_activatedArtefactRet); // in (sec)
+    g_sv_cta_dwInvincibleTime = get_option_i(options.c_str(), "dmgblock", g_sv_cta_dwInvincibleTime); // in (sec)
+    g_sv_cta_artefactReturningTime = get_option_i(options.c_str(), "artrettime", g_sv_cta_artefactReturningTime); // in (sec)
+    g_sv_cta_activatedArtefactRet = get_option_i(options.c_str(), "actret", g_sv_cta_activatedArtefactRet); // in (sec)
 
     m_bSpectatorMode = false;
-    if (!GEnv.isDedicatedServer && (get_option_i(*options, "spectr", -1) != -1))
+    if (!GEnv.isDedicatedServer && (get_option_i(options.c_str(), "spectr", -1) != -1))
     {
         m_bSpectatorMode = true;
-        m_dwSM_SwitchDelta = get_option_i(*options, "spectr", 0) * 1000;
+        m_dwSM_SwitchDelta = get_option_i(options.c_str(), "spectr", 0) * 1000;
         if (m_dwSM_SwitchDelta < 1000)
             m_dwSM_SwitchDelta = 1000;
     };

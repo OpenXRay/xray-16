@@ -176,7 +176,7 @@ void CGameTaskManager::SetTaskState(const TASK_ID& id, ETaskState state, TASK_OB
     CGameTask* t = HasGameTask(id, objectiveSpecified);
     if (NULL == t)
     {
-        Msg("! actor does not has task [%s]%s", *id, objectiveSpecified ? "" : " or it is completed");
+        Msg("! actor does not has task [%s]%s", id.c_str(), objectiveSpecified ? "" : " or it is completed");
         return;
     }
     SetTaskState(t, state, objective_id);

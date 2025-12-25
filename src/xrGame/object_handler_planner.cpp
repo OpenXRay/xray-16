@@ -70,7 +70,7 @@ void CObjectHandlerPlanner::set_goal(MonsterSpace::EObjectAction object_action, 
     if (m_use_log)
     {
         Msg("%6d : Active item %s", Device.dwTimeGlobal, object().inventory().ActiveItem() ?
-                *object().inventory().ActiveItem()->object().cName() :
+                object().inventory().ActiveItem()->object().cName().c_str() :
                 "no active items");
         Msg("%6d : Goal %s", Device.dwTimeGlobal, property2string(condition_id));
     }
@@ -121,7 +121,7 @@ LPCSTR CObjectHandlerPlanner::action2string(const _action_id_type& id)
     pstr S = m_temp_string;
     if (action_object_id(id) != 0xffff)
         if (Level().Objects.net_Find(action_object_id(id)))
-            xr_strcpy(m_temp_string, *Level().Objects.net_Find(action_object_id(id))->cName());
+            xr_strcpy(m_temp_string, Level().Objects.net_Find(action_object_id(id))->cName().c_str());
         else
             xr_strcpy(m_temp_string, "no_items");
     else
@@ -313,7 +313,7 @@ LPCSTR CObjectHandlerPlanner::property2string(const _condition_type& id)
 {
     if (action_object_id(id) != 0xffff)
         if (Level().Objects.net_Find(action_object_id(id)))
-            xr_strcpy(m_temp_string, *Level().Objects.net_Find(action_object_id(id))->cName());
+            xr_strcpy(m_temp_string, Level().Objects.net_Find(action_object_id(id))->cName().c_str());
         else
             xr_strcpy(m_temp_string, "no_items");
     else

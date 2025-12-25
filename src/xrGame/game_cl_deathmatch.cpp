@@ -516,11 +516,11 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 ConvertTime2String(&S, TimeRemains);
                 string1024 tmpStr = "";
                 if (TimeRemains > 10000)
-                    strconcat(sizeof(tmpStr), tmpStr, *st.translate("mp_time2start"), " ", S);
+                    strconcat(sizeof(tmpStr), tmpStr, st.translate("mp_time2start").c_str(), " ", S);
                 else
                 {
                     if (TimeRemains < 1000)
-                        strconcat(sizeof(tmpStr), tmpStr, *st.translate("mp_go"), "");
+                        strconcat(sizeof(tmpStr), tmpStr, st.translate("mp_go").c_str(), "");
                     else
                     {
                         static u32 dwLastTimeRemains = 10;
@@ -532,7 +532,7 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                         }
                         dwLastTimeRemains = dwCurTimeRemains;
                         xr_itoa(dwCurTimeRemains, S, 10);
-                        strconcat(sizeof(tmpStr), tmpStr, *st.translate("mp_ready"), "...", S);
+                        strconcat(sizeof(tmpStr), tmpStr, st.translate("mp_ready").c_str(), "...", S);
                     }
                 };
 
@@ -596,7 +596,7 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 string64 S;
                 ConvertTime2String(&S, Rest);
                 string128 FullS;
-                xr_sprintf(FullS, "%s : %s", *st.translate("mp_time2respawn"), S);
+                xr_sprintf(FullS, "%s : %s", st.translate("mp_time2respawn").c_str(), S);
 
                 m_game_ui->SetForceRespawnTimeCaption(FullS);
             };
@@ -812,15 +812,15 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
 
         if (!xr_strcmp(CmdName, "restart"))
         {
-            xr_sprintf(NewCmd, "%s", *st.translate("mp_restart"));
+            xr_sprintf(NewCmd, "%s", st.translate("mp_restart").c_str());
         }
         else if (!xr_strcmp(CmdName, "restart_fast"))
         {
-            xr_sprintf(NewCmd, "%s", *st.translate("mp_restart_fast"));
+            xr_sprintf(NewCmd, "%s", st.translate("mp_restart_fast").c_str());
         }
         else if (!xr_strcmp(CmdName, "kick"))
         {
-            xr_sprintf(NewCmd, "%s %s", *st.translate("mp_kick"), CmdParams[0]);
+            xr_sprintf(NewCmd, "%s %s", st.translate("mp_kick").c_str(), CmdParams[0]);
             for (size_t i = 1; i < MAX_VOTE_PARAMS; i++)
             {
                 if (xr_strlen(CmdParams[i]))
@@ -832,7 +832,7 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
         }
         else if (!xr_strcmp(CmdName, "ban"))
         {
-            xr_sprintf(NewCmd, "%s %s", *st.translate("mp_ban"), CmdParams[0]);
+            xr_sprintf(NewCmd, "%s %s", st.translate("mp_ban").c_str(), CmdParams[0]);
             for (size_t i = 1; i < MAX_VOTE_PARAMS; i++)
             {
                 if (xr_strlen(CmdParams[i]))
@@ -844,15 +844,15 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
         }
         else if (!xr_strcmp(CmdName, "changemap"))
         {
-            xr_sprintf(NewCmd, "%s %s", *st.translate("mp_change_map"), *st.translate(CmdParams[0]));
+            xr_sprintf(NewCmd, "%s %s", st.translate("mp_change_map").c_str(), st.translate(CmdParams[0]).c_str());
         }
         else if (!xr_strcmp(CmdName, "changeweather"))
         {
-            xr_sprintf(NewCmd, "%s %s", *st.translate("mp_change_weather"), *st.translate(CmdParams[0]));
+            xr_sprintf(NewCmd, "%s %s", st.translate("mp_change_weather").c_str(), st.translate(CmdParams[0]).c_str());
         }
 
         string1024 VoteStr;
-        xr_sprintf(VoteStr, *st.translate("mp_voting_started"), NewCmd, Player);
+        xr_sprintf(VoteStr, st.translate("mp_voting_started").c_str(), NewCmd, Player);
 
         m_game_ui->SetVoteMessage(VoteStr);
         m_game_ui->SetVoteTimeResultMsg("");

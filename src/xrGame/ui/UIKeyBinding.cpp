@@ -80,7 +80,7 @@ void CUIKeyBinding::FillUpList(CUIXml& xml_doc_ui, LPCSTR path_ui)
             shared_str exe = xml_doc.ReadAttrib("command", j, "exe");
 
 #ifdef DEBUG
-            if (kNOTBINDED == ActionNameToId(*exe))
+            if (kNOTBINDED == ActionNameToId(exe.c_str()))
             {
                 Msg("action [%s] not exist. update data", exe.c_str());
                 continue;
@@ -187,7 +187,7 @@ bool CUIKeyBinding::IsActionExist(LPCSTR action, CUIXml& xml_doc)
         {
             // first field of list item
             shared_str command_id = xml_doc.ReadAttrib("command", j, "exe");
-            if (0 == xr_strcmp(action, *command_id))
+            if (0 == xr_strcmp(action, command_id.c_str()))
             {
                 ret = true;
                 break;

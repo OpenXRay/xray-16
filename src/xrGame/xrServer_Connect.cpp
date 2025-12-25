@@ -36,16 +36,16 @@ LPCSTR xrServer::get_map_download_url(LPCSTR level_name, LPCSTR level_version)
 xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionData& game_descr)
 {
 #ifdef DEBUG
-    Msg("* sv_Connect: %s", *session_name);
+    Msg("* sv_Connect: %s", session_name.c_str());
 #endif
 
     // Parse options and create game
-    if (0 == strchr(*session_name, '/'))
+    if (0 == strchr(session_name.c_str(), '/'))
         return ErrConnect;
 
     string1024 options;
     R_ASSERT2(xr_strlen(session_name) <= sizeof(options), "session_name too BIIIGGG!!!");
-    xr_strcpy(options, strchr(*session_name, '/') + 1);
+    xr_strcpy(options, strchr(session_name.c_str(), '/') + 1);
 
     // Parse game type
     string1024 type;
@@ -83,7 +83,7 @@ xrServer::EConnect xrServer::Connect(shared_str& session_name, GameDescriptionDa
 
     game->Create(session_name);
 
-    return IPureServer::Connect(*session_name, game_descr);
+    return IPureServer::Connect(session_name.c_str(), game_descr);
 }
 
 IClient* xrServer::new_client(SClientConnectData* cl_data)

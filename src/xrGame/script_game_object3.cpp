@@ -351,7 +351,7 @@ LPCSTR CScriptGameObject::GetPatrolPathName()
             return (script_monster->GetPatrolPathName());
     }
     else
-        return (*stalker->movement().patrol().path_name());
+        return (stalker->movement().patrol().path_name().c_str());
 }
 
 void CScriptGameObject::add_animation(LPCSTR animation, bool hand_usage, bool use_movement_controller)
@@ -572,7 +572,7 @@ void CScriptGameObject::set_desired_position(const Fvector* desired_position)
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
     {
-        THROW2(desired_position || stalker->movement().restrictions().accessible(*desired_position), *stalker->cName());
+        THROW2(desired_position || stalker->movement().restrictions().accessible(*desired_position), stalker->cName().c_str());
         stalker->movement().set_desired_position(desired_position);
     }
 }
@@ -1239,7 +1239,7 @@ LPCSTR CScriptGameObject::sound_prefix() const
         return (0);
     }
 
-    return (*custom_monster->sound().sound_prefix());
+    return (custom_monster->sound().sound_prefix().c_str());
 }
 
 void CScriptGameObject::sound_prefix(LPCSTR sound_prefix)
