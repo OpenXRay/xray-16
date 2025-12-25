@@ -23,7 +23,7 @@ public:
 
 protected:
     UIArtefactParamItem* m_disp_condition{}; //Alundaio: Show AF Condition
-    UIArtefactParamItem* m_immunity_item[9]{};
+    UIArtefactParamItem* m_immunity_item[ALife::eHitTypeMax - 3]{};
     UIArtefactParamItem* m_restore_item[ALife::eRestoreTypeMax]{};
     UIArtefactParamItem* m_additional_weight{};
 

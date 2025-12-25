@@ -15,7 +15,7 @@ public:
     CUIOutfitImmunity(pcstr immunity_name);
 
     bool InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immunity, pcstr immunity_text);
-    void SetProgressValue(float cur, float comp);
+    void SetProgressValue(float cur, float comp, float add = 0.0f);
 
     pcstr GetDebugType() override { return "CUIOutfitImmunity"; }
 
@@ -33,7 +33,8 @@ public:
     CUIOutfitInfo() : CUIWindow("CUIOutfitInfo") {}
 
     void InitFromXml(CUIXml& xml_doc);
-    void UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit = nullptr, bool hide_if_zero_immunity = false);
+    void UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit = nullptr,
+        bool add_artefact_info = false, bool hide_if_zero_immunity = false);
     void UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet = nullptr);
 
     void AdjustElements();

@@ -1939,10 +1939,10 @@ float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
     return hit_power;
 }
 
-float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type)
+float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type) const
 {
     float sum = 0.0f;
-    for (auto& it : inventory().m_belt)
+    for (const auto& it : inventory().m_belt)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)

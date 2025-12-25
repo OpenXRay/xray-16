@@ -26,18 +26,18 @@ CUIArtefactParams::~CUIArtefactParams()
     xr_delete(m_Prop_line);
 }
 
-constexpr std::tuple<u32, cpcstr, cpcstr, float, bool, cpcstr> af_immunity[] =
+constexpr std::tuple<ALife::EHitType, cpcstr, cpcstr, float, bool, cpcstr> af_immunity[] =
 {
-    //{ ALife::infl_,      "section",                "caption",                                magnitude, sign_inverse, "unit" }
-    { ALife::infl_rad,     "radiation_immunity",     "ui_inv_outfit_radiation_protection",     100.0f,    false,        "%" },
-    { ALife::infl_fire,    "burn_immunity",          "ui_inv_outfit_burn_protection",          100.0f,    false,        "%" },
-    { ALife::infl_acid,    "chemical_burn_immunity", "ui_inv_outfit_chemical_burn_protection", 100.0f,    false,        "%" },
-    { ALife::infl_psi,     "telepatic_immunity",     "ui_inv_outfit_telepatic_protection",     100.0f,    false,        "%" },
-    { ALife::infl_electra, "shock_immunity",         "ui_inv_outfit_shock_protection",         100.0f,    false,        "%" },
-    { 5,                   "strike_immunity",        "ui_inv_outfit_strike_protection",        100.0f,    false,        "%" },
-    { 6,                   "wound_immunity",         "ui_inv_outfit_wound_protection",         100.0f,    false,        "%" },
-    { 7,                   "explosion_immunity",     "ui_inv_outfit_explosion_protection",     100.0f,    false,        "%" },
-    { 8,                   "fire_wound_immunity",    "ui_inv_outfit_fire_wound_protection",    100.0f,    false,        "%" },
+    //{ ALife::EHitType,           "section",                "caption",                                magnitude, sign_inverse, "unit" }
+    { ALife::eHitTypeRadiation,    "radiation_immunity",     "ui_inv_outfit_radiation_protection",     100.0f,    false,        "%" },
+    { ALife::eHitTypeBurn,         "burn_immunity",          "ui_inv_outfit_burn_protection",          100.0f,    false,        "%" },
+    { ALife::eHitTypeChemicalBurn, "chemical_burn_immunity", "ui_inv_outfit_chemical_burn_protection", 100.0f,    false,        "%" },
+    { ALife::eHitTypeTelepatic,    "telepatic_immunity",     "ui_inv_outfit_telepatic_protection",     100.0f,    false,        "%" },
+    { ALife::eHitTypeShock,        "shock_immunity",         "ui_inv_outfit_shock_protection",         100.0f,    false,        "%" },
+    { ALife::eHitTypeStrike,       "strike_immunity",        "ui_inv_outfit_strike_protection",        100.0f,    false,        "%" },
+    { ALife::eHitTypeWound,        "wound_immunity",         "ui_inv_outfit_wound_protection",         100.0f,    false,        "%" },
+    { ALife::eHitTypeExplosion,    "explosion_immunity",     "ui_inv_outfit_explosion_protection",     100.0f,    false,        "%" },
+    { ALife::eHitTypeFireWound,    "fire_wound_immunity",    "ui_inv_outfit_fire_wound_protection",    100.0f,    false,        "%" },
 };
 
 constexpr std::tuple<ALife::EConditionRestoreType, cpcstr, cpcstr, cpcstr, float, bool, cpcstr> af_restore[] =
@@ -126,6 +126,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
     const auto& af_section = pInvItem.object().cNameSect().c_str();
     const auto& actor_sect = actor->cNameSect().c_str();
     const auto& condition_sect = pSettings->read_if_exists<pcstr>(actor_sect, "condition_sect", actor_sect);
+    const auto& hit_absorbation_sect = pSettings->r_string(af_section, "hit_absorbation_sect");
 
     float h = 0.0f;
     if (m_Prop_line)
@@ -168,29 +169,24 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         setValue(m_restore_item[id], val);
     }
 
+    CHitImmunity immunities;
+    immunities.LoadImmunities(hit_absorbation_sect, pSettings);
+
     for (auto [id, immunity_section, immunity_caption, magnitude, sign_inverse, unit] : af_immunity)
     {
         if (!m_immunity_item[id])
             continue;
 
-        shared_str const& hit_absorbation_sect = pSettings->r_string(af_section, "hit_absorbation_sect");
-        float val = pSettings->r_float(hit_absorbation_sect, immunity_section);
+        float val = immunities.GetHitImmunity(id);
+        if (fis_zero(val))
+            continue;
 
+        val *= pInvItem.GetCondition();
         if (is_cs_cop)
         {
-            if (fis_zero(val))
-                continue;
-            const float max_val = actor->conditions().GetZoneMaxPower(static_cast<ALife::EInfluenceType>(id));
-            val = val * pInvItem.GetCondition() / max_val;
+            const float max_val = actor->conditions().GetZoneMaxPower(id);
+            val /= max_val;
         }
-        else // SOC
-        {
-            if (fsimilar(val, 1.0f))
-                continue;
-            val = 1.0f - val * pInvItem.GetCondition();
-
-        }
-
         setValue(m_immunity_item[id], val);
     }
 
