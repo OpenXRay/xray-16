@@ -142,12 +142,17 @@ CUIProgressShape* UIHelper::CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUI
 
 CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
 {
+    return CreateFrameLine(xml, ui_path, 0, parent, critical);
+}
+
+CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical)
+{
     // If it's not critical element, then don't crash if it doesn't exist
-    if (!critical && !xml.NavigateToNode(ui_path, 0))
+    if (!critical && !xml.NavigateToNode(ui_path, index))
         return nullptr;
 
     auto ui = xr_new<CUIFrameLineWnd>(ui_path);
-    if (!CUIXmlInit::InitFrameLine(xml, ui_path, 0, ui, critical) && !critical)
+    if (!CUIXmlInit::InitFrameLine(xml, ui_path, index, ui, critical) && !critical)
     {
         xr_delete(ui);
     }

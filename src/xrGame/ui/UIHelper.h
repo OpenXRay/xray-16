@@ -36,6 +36,7 @@ public:
     static CUIProgressBar* CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIProgressShape* CreateProgressShape(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIFrameLineWnd* CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
+    static CUIFrameLineWnd* CreateFrameLine(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
     static CUIFrameWindow* CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, int index, CUIWindow* parent, bool critical = true);
