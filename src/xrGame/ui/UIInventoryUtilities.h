@@ -64,13 +64,12 @@ enum EDatePrecision
     edpDateToYear
 };
 
-const shared_str GetGameDateAsString(EDatePrecision datePrec, char dateSeparator = ',');
-const shared_str GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator = ':');
-const shared_str GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator = ',');
-const shared_str GetTimeAsString(
-    ALife::_TIME_ID time, ETimePrecision timePrec, char timeSeparator = ':', bool full_mode = true);
-const shared_str GetTimeAndDateAsString(ALife::_TIME_ID time);
-const shared_str Get_GameTimeAndDate_AsString();
+shared_str GetGameDateAsString(EDatePrecision datePrec, char dateSeparator = ',');
+shared_str GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator = ':', bool full_mode = true);
+shared_str GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator = ',');
+shared_str GetTimeAsString(ALife::_TIME_ID time, ETimePrecision timePrec, char timeSeparator = ':', bool full_mode = true);
+shared_str GetTimeAndDateAsString(ALife::_TIME_ID time);
+shared_str Get_GameTimeAndDate_AsString();
 
 LPCSTR GetTimePeriodAsString(pstr _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to);
 // Отобразить вес, который несет (*pInvOwner)

@@ -215,19 +215,19 @@ const ui_shader& InventoryUtilities::GetWeaponUpgradeIconsShader()
 
 //////////////////////////////////////////////////////////////////////////
 
-const shared_str InventoryUtilities::GetGameDateAsString(EDatePrecision datePrec, char dateSeparator)
+shared_str InventoryUtilities::GetGameDateAsString(EDatePrecision datePrec, char dateSeparator)
 {
     return GetDateAsString(Level().GetGameTime(), datePrec, dateSeparator);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-const shared_str InventoryUtilities::GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator)
+shared_str InventoryUtilities::GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator, bool full_mode)
 {
-    return GetTimeAsString(Level().GetGameTime(), timePrec, timeSeparator);
+    return GetTimeAsString(Level().GetGameTime(), timePrec, timeSeparator, full_mode);
 }
 
-const shared_str InventoryUtilities::GetTimeAndDateAsString(ALife::_TIME_ID time)
+shared_str InventoryUtilities::GetTimeAndDateAsString(ALife::_TIME_ID time)
 {
     string256 buf;
     LPCSTR time_str = GetTimeAsString(time, etpTimeToMinutes).c_str();
@@ -236,14 +236,14 @@ const shared_str InventoryUtilities::GetTimeAndDateAsString(ALife::_TIME_ID time
     return buf;
 }
 
-const shared_str InventoryUtilities::Get_GameTimeAndDate_AsString()
+shared_str InventoryUtilities::Get_GameTimeAndDate_AsString()
 {
     return GetTimeAndDateAsString(Level().GetGameTime());
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-const shared_str InventoryUtilities::GetTimeAsString(
+shared_str InventoryUtilities::GetTimeAsString(
     ALife::_TIME_ID time, ETimePrecision timePrec, char timeSeparator, bool full_mode)
 {
     string32 bufTime;
@@ -296,7 +296,7 @@ const shared_str InventoryUtilities::GetTimeAsString(
     return bufTime;
 }
 
-const shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID date, EDatePrecision datePrec, char dateSeparator)
+shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator)
 {
     string64 bufDate;
 
@@ -304,7 +304,7 @@ const shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID date, EDate
 
     u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
 
-    split_time(date, year, month, day, hours, mins, secs, milisecs);
+    split_time(time, year, month, day, hours, mins, secs, milisecs);
     VERIFY(1 <= month && month <= 12);
     LPCSTR month_str = StringTable().translate(st_months[month - 1]).c_str();
 
