@@ -215,9 +215,9 @@ const ui_shader& InventoryUtilities::GetWeaponUpgradeIconsShader()
 
 //////////////////////////////////////////////////////////////////////////
 
-shared_str InventoryUtilities::GetGameDateAsString(EDatePrecision datePrec, char dateSeparator)
+shared_str InventoryUtilities::GetGameDateAsString(EDatePrecision datePrec, char dateSeparator, bool numericMonth)
 {
-    return GetDateAsString(Level().GetGameTime(), datePrec, dateSeparator);
+    return GetDateAsString(Level().GetGameTime(), datePrec, dateSeparator, numericMonth);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -296,7 +296,7 @@ shared_str InventoryUtilities::GetTimeAsString(
     return bufTime;
 }
 
-shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator)
+shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator, bool numericMonth)
 {
     string64 bufDate;
 
@@ -311,9 +311,26 @@ shared_str InventoryUtilities::GetDateAsString(ALife::_TIME_ID time, EDatePrecis
     // Date
     switch (datePrec)
     {
-    case edpDateToYear: xr_sprintf(bufDate, "%04i", year); break;
-    case edpDateToMonth: xr_sprintf(bufDate, "%s%c% 04i", month_str, dateSeparator, year); break;
-    case edpDateToDay: xr_sprintf(bufDate, "%s %d%c %04i", month_str, day, dateSeparator, year); break;
+    case edpDateToYear:
+        xr_sprintf(bufDate, "%04i", year);
+        break;
+    case edpDateToMonth:
+        if (numericMonth)
+        {
+            xr_sprintf(bufDate, "%02i%c%04i", month, dateSeparator, year);
+            break;
+        }
+        xr_sprintf(bufDate, "%s%c% 04i", month_str, dateSeparator, year);
+        break;
+    case edpDateToDay:
+        if (numericMonth)
+        {
+            xr_sprintf(bufDate, "%02i%c%02i%c%04i", day, dateSeparator, month, dateSeparator, year);
+            break;
+        }
+        xr_sprintf(bufDate, "%s %d%c %04i", month_str, day, dateSeparator, year);
+        break;
+
     default: R_ASSERT(!"Unknown type of date precision");
     }
 

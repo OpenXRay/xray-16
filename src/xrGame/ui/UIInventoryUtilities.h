@@ -64,9 +64,9 @@ enum EDatePrecision
     edpDateToYear
 };
 
-shared_str GetGameDateAsString(EDatePrecision datePrec, char dateSeparator = ',');
+shared_str GetGameDateAsString(EDatePrecision datePrec, char dateSeparator = ',', bool numericMonth = false);
 shared_str GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator = ':', bool full_mode = true);
-shared_str GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator = ',');
+shared_str GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator = ',', bool numericMonth = false);
 shared_str GetTimeAsString(ALife::_TIME_ID time, ETimePrecision timePrec, char timeSeparator = ':', bool full_mode = true);
 shared_str GetTimeAndDateAsString(ALife::_TIME_ID time);
 shared_str Get_GameTimeAndDate_AsString();
