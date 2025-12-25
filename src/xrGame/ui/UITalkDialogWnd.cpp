@@ -21,8 +21,6 @@ CUITalkDialogWnd::CUITalkDialogWnd()
       m_pParent(nullptr),
       mechanic_mode(false),
       m_ClickedQuestionID(""),
-      UIDialogFrameTop(nullptr),
-      UIDialogFrameBottom(nullptr),
       m_btn_pos(),
       UIToExitButton(nullptr),
       UIOurIcon(nullptr),
@@ -47,8 +45,8 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
     if (!CUIXmlInit::InitWindow(*m_uiXml, "main", 0, this, false))
         SetWndRect({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 
-    UIStaticTop = UIHelper::CreateStatic(*m_uiXml, "top_background", this, false);
-    UIStaticBottom = UIHelper::CreateStatic(*m_uiXml, "bottom_background", this, false);
+    std::ignore = UIHelper::CreateStatic(*m_uiXml, "top_background", this, false);
+    std::ignore = UIHelper::CreateStatic(*m_uiXml, "bottom_background", this, false);
 
     pcstr ourTag = "right_character_icon";
     pcstr othersTag = "left_character_icon";
@@ -71,43 +69,26 @@ void CUITalkDialogWnd::InitTalkDialogWnd()
             TALK_CHARACTER_XML, TRADE_CHARACTER_XML);
     }
 
-    CUIWindow* answersParent = this;
-    CUIWindow* questionsParent = this;
-
-    // Our phrases frame
+    // CS/COP order:
+    // 1. Our phrases frame
+    // 2. Main dialog frame
     UIDialogFrameBottom = UIHelper::CreateStatic(*m_uiXml, "frame_bottom", this, false);
-    if (UIDialogFrameBottom)
-        questionsParent = UIDialogFrameBottom;
-    else
-    {
-        if (m_uiXml->NavigateToNode("frame_line_window", 1))
-        {
-            // XXX: Don't replace this with UI helper, until it's missing needed functionality to select the index
-            UIOurPhrasesFrame = xr_new<CUIFrameLineWnd>("Our phrases frame");
-            UIOurPhrasesFrame->SetAutoDelete(true);
-            AttachChild(UIOurPhrasesFrame);
-            CUIXmlInitBase::InitFrameLine(*m_uiXml, "frame_line_window", 1, UIOurPhrasesFrame); // index for field is 1 (one) !!!
-            questionsParent = UIOurPhrasesFrame;
-        }
-    }
-
-    // Main dialog frame
     UIDialogFrameTop = UIHelper::CreateStatic(*m_uiXml, "frame_top", this, false);
-    if (UIDialogFrameTop)
-        answersParent = UIDialogFrameTop;
-    else
-    {
-        UIDialogFrame = UIHelper::CreateFrameLine(*m_uiXml, "frame_line_window", this, false);
-        if (UIDialogFrame)
-            answersParent = UIDialogFrame;
-    }
+
+    // SOC order:
+    // 1. Main dialog frame
+    // 2. Our phrases frame
+    if (!UIDialogFrameTop)
+        UIDialogFrameTop = UIHelper::CreateFrameLine(*m_uiXml, "frame_line_window", 0, this, false);
+    if (!UIDialogFrameBottom)
+        UIDialogFrameBottom = UIHelper::CreateFrameLine(*m_uiXml, "frame_line_window", 1, this, false);
 
     // Answers
-    UIAnswersList = UIHelper::CreateScrollView(*m_uiXml, "answers_list", answersParent);
+    UIAnswersList = UIHelper::CreateScrollView(*m_uiXml, "answers_list", UIDialogFrameTop ? UIDialogFrameTop : this);
     UIAnswersList->SetWindowName("---UIAnswersList");
 
     // Questions
-    UIQuestionsList = UIHelper::CreateScrollView(*m_uiXml, "questions_list", questionsParent);
+    UIQuestionsList = UIHelper::CreateScrollView(*m_uiXml, "questions_list", UIDialogFrameBottom ? UIDialogFrameBottom : this);
     UIQuestionsList->SetWindowName("---UIQuestionsList");
 
     //кнопка перехода в режим торговли
@@ -204,6 +185,25 @@ void CUITalkDialogWnd::ClearAll()
 }
 
 void CUITalkDialogWnd::ClearQuestions() { UIQuestionsList->Clear(); }
+
+void CUITalkDialogWnd::SetOurName(pcstr name)
+{
+    const auto frameline = smart_cast<CUIFrameLineWnd*>(UIDialogFrameBottom);
+    if (!frameline)
+        return;
+    if (const auto title = frameline->GetTitleText())
+        title->SetText(name);
+}
+
+void CUITalkDialogWnd::SetOthersName(pcstr name)
+{
+    const auto frameline = smart_cast<CUIFrameLineWnd*>(UIDialogFrameTop);
+    if (!frameline)
+        return;
+    if (const auto title = frameline->GetTitleText())
+        title->SetText(name);
+}
+
 void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_finalizer)
 {
     CUIQuestionItem* itm = xr_new<CUIQuestionItem>(m_uiXml, "question_item");
@@ -301,8 +301,6 @@ void CUITalkDialogWnd::SetOsoznanieMode(bool b)
 
     if (UIDialogFrameTop)
         UIDialogFrameTop->Show(!b);
-    else if (UIDialogFrame)
-        UIDialogFrame->Show(!b);
 
     UIToTradeButton.Show(!b);
     if (mechanic_mode)

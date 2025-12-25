@@ -38,14 +38,8 @@ public:
     shared_str m_ClickedQuestionID;
 
     // Dialog interface elements
-    CUIStatic* UIStaticTop;
-    CUIStatic* UIStaticBottom;
-
-    CUIFrameLineWnd* UIDialogFrame;
-    CUIFrameLineWnd* UIOurPhrasesFrame;
-
-    CUIStatic* UIDialogFrameTop;
-    CUIStatic* UIDialogFrameBottom;
+    CUIWindow* UIDialogFrameTop{};
+    CUIWindow* UIDialogFrameBottom{};
 
     Fvector2 m_btn_pos[3];
     CUI3tButton UIToTradeButton;
@@ -64,6 +58,8 @@ public:
     void ClearAll();
     void ClearQuestions();
 
+    void SetOurName(pcstr name);
+    void SetOthersName(pcstr name);
     void SetOsoznanieMode(bool b);
     void SetTradeMode();
     void UpdateButtonsLayout(bool b_disable_break, bool trade_enabled);
