@@ -34,7 +34,7 @@ CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 
 void CUITalkWnd::InitTalkWnd()
 {
-    inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+    inherited::SetWndRect({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 
     UITalkDialogWnd = xr_new<CUITalkDialogWnd>();
     UITalkDialogWnd->SetAutoDelete(true);
@@ -59,8 +59,10 @@ void CUITalkWnd::InitTalkDialog()
     UITalkDialogWnd->UICharacterInfoLeft.InitCharacter(m_pOurInvOwner->object_id());
     UITalkDialogWnd->UICharacterInfoRight.InitCharacter(m_pOthersInvOwner->object_id());
 
-    //.	UITalkDialogWnd->UIDialogFrame.UITitleText.SetText		(m_pOthersInvOwner->Name());
-    //.	UITalkDialogWnd->UIOurPhrasesFrame.UITitleText.SetText	(m_pOurInvOwner->Name());
+    if (const auto title = UITalkDialogWnd->UIDialogFrame->GetTitleText())
+        title->SetText(m_pOthersInvOwner->Name());
+    if (const auto title = UITalkDialogWnd->UIOurPhrasesFrame->GetTitleText())
+        title->SetText(m_pOurInvOwner->Name());
 
     //очистить лог сообщений
     UITalkDialogWnd->ClearAll();

@@ -42,7 +42,11 @@ void CUICharacterInfo::InitCharacterInfo(Fvector2 pos, Fvector2 size, CUIXml* xm
 
     Init_IconInfoItem(*xml_doc, "icon", eIcon);
     if (!m_icons[eIcon])
-        Init_IconInfoItem(*xml_doc, "icon_static", eIcon);
+    {
+        Init_IconInfoItem(*xml_doc, "icon_static", eIcon); // SOC
+        if (m_icons[eIcon])
+            m_icons[eIcon]->SetStretchTexture(true);
+    }
 
     m_original_color = m_icons[eIcon] ? m_icons[eIcon]->GetTextureColor() : color_xrgb(255, 255, 255);
 
