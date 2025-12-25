@@ -60,7 +60,7 @@ bool CSpaceRestrictionComposition::inside(const Fsphere& sphere)
 
 void CSpaceRestrictionComposition::initialize()
 {
-    u32 n = _GetItemCount(*m_space_restrictors);
+    u32 n = _GetItemCount(m_space_restrictors.c_str());
     VERIFY(n);
     if (n == 1)
     {
@@ -74,14 +74,14 @@ void CSpaceRestrictionComposition::initialize()
     string256 element;
 
     for (u32 i = 0; i < n; ++i)
-        if (!m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors, i, element))->initialized())
+        if (!m_space_restriction_holder->restriction(_GetItem(m_space_restrictors.c_str(), i, element))->initialized())
             return;
 
     Fsphere* spheres = (Fsphere*)xr_alloca(n * sizeof(Fsphere));
     for (u32 i = 0; i < n; ++i)
     {
         SpaceRestrictionHolder::CBaseRestrictionPtr restriction =
-            m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors, i, element));
+            m_space_restriction_holder->restriction(_GetItem(m_space_restrictors.c_str(), i, element));
 
         merge(restriction);
 
@@ -190,7 +190,7 @@ Fsphere CSpaceRestrictionComposition::sphere() const
 #ifdef DEBUG
 void CSpaceRestrictionComposition::check_restrictor_type()
 {
-    if (_GetItemCount(*m_space_restrictors) == 1)
+    if (_GetItemCount(m_space_restrictors.c_str()) == 1)
         return;
 
     if (!ai().get_alife())
@@ -201,7 +201,7 @@ void CSpaceRestrictionComposition::check_restrictor_type()
         return;
 
     CSpaceRestrictor* restrictor = smart_cast<CSpaceRestrictor*>(object);
-    VERIFY3(restrictor, "you are trying to use object as a restrictor", *m_space_restrictors);
+    VERIFY3(restrictor, "you are trying to use object as a restrictor", m_space_restrictors.c_str());
     VERIFY2(restrictor->restrictor_type() == RestrictionSpace::eRestrictorTypeNone,
         "you are trying to restrict yourself with restrictor with type eRestrictorTypeNone");
     VERIFY2(restrictor->restrictor_type() != RestrictionSpace::eRestrictorTypeNone,

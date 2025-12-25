@@ -63,7 +63,7 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
     if (res != ErrNoError)
         return res;
 
-    if (0 == *(game->get_option_s(*session_name, "hname", NULL)))
+    if (0 == *(game->get_option_s(session_name.c_str(), "hname", NULL)))
     {
 #ifdef XR_PLATFORM_WINDOWS // XXX: add Linux implementation
         string1024 CompName;
@@ -73,20 +73,20 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
 #endif
     }
     else
-        HostName = game->get_option_s(*session_name, "hname", NULL);
+        HostName = game->get_option_s(session_name.c_str(), "hname", NULL);
 
-    if (0 != *(game->get_option_s(*session_name, "psw", NULL)))
-        Password._set(game->get_option_s(*session_name, "psw", NULL));
+    if (0 != *(game->get_option_s(session_name.c_str(), "psw", NULL)))
+        Password._set(game->get_option_s(session_name.c_str(), "psw", NULL));
 
     string4096 tMapName = "";
-    const char* SName = *session_name;
-    strncpy_s(tMapName, *session_name, strchr(SName, '/') - SName);
+    const char* SName = session_name.c_str();
+    strncpy_s(tMapName, session_name.c_str(), strchr(SName, '/') - SName);
     MapName = tMapName; // = (session_name);
 
-    m_iReportToMasterServer = game->get_option_i(*session_name, "public", 0);
-    m_iMaxPlayers = game->get_option_i(*session_name, "maxplayers", 32);
+    m_iReportToMasterServer = game->get_option_i(session_name.c_str(), "public", 0);
+    m_iMaxPlayers = game->get_option_i(session_name.c_str(), "maxplayers", 32);
     //	m_bCheckCDKey = game->get_option_i		(*session_name,"cdkey",0) != 0;
-    m_bCheckCDKey = game->get_option_i(*session_name, "public", 0) != 0;
+    m_bCheckCDKey = game->get_option_i(session_name.c_str(), "public", 0) != 0;
     //--------------------------------------------//
     if (game->Type() != eGameIDSingle)
     {
@@ -95,11 +95,11 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
         shared_str result_string;
         if (!GSA.CheckAvailableServices(result_string))
         {
-            Msg(*result_string);
+            Msg(session_name.c_str());
         };
 
         //------ Init of QR2 SDK -------------
-        iGameSpyBasePort = game->get_option_i(*session_name, "portgs", -1);
+        iGameSpyBasePort = game->get_option_i(session_name.c_str(), "portgs", -1);
         QR2_Init(iGameSpyBasePort);
 
 //------ Init of CDKey SDK -----------

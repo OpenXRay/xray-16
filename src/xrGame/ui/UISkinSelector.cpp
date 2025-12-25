@@ -29,8 +29,8 @@ CUISkinSelectorWnd::~CUISkinSelectorWnd()
 
 void CUISkinSelectorWnd::InitSkins()
 {
-    R_ASSERT2(pSettings->section_exist(m_strSection), *m_strSection);
-    R_ASSERT2(pSettings->line_exist(m_strSection, "skins"), *m_strSection);
+    R_ASSERT2(pSettings->section_exist(m_strSection), m_strSection.c_str());
+    R_ASSERT2(pSettings->line_exist(m_strSection, "skins"), m_strSection.c_str());
 
     LPCSTR lst = pSettings->r_string(m_strSection, "skins");
     string256 singleItem;

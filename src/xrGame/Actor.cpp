@@ -416,10 +416,10 @@ void CActor::Load(LPCSTR section)
             }
         }
 
-        sndDie[0].create(strconcat(buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        sndDie[1].create(strconcat(buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        sndDie[2].create(strconcat(buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        sndDie[3].create(strconcat(buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[0].create(strconcat(buf, cName().c_str(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[1].create(strconcat(buf, cName().c_str(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[2].create(strconcat(buf, cName().c_str(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
+        sndDie[3].create(strconcat(buf, cName().c_str(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
 
         m_HeavyBreathSnd.create(
             pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
@@ -2064,7 +2064,7 @@ void CActor::OnDifficultyChanged()
     conditions().LoadImmunities(tmp, pSettings);
     // hit probability
     strconcat(sizeof(tmp), tmp, "hit_probability_", diff_name);
-    m_hit_probability = pSettings->r_float(*cNameSect(), tmp);
+    m_hit_probability = pSettings->r_float(cNameSect().c_str(), tmp);
     // two hits death parameters
     strconcat(sizeof(tmp), tmp, "actor_thd_", diff_name);
     conditions().LoadTwoHitsDeathParams(tmp);

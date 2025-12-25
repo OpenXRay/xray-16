@@ -54,7 +54,7 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
 
 #ifdef DEBUG
     if (psAI_Flags.test(aiInfoPortion))
-        Msg("[%s] Received Info [%s]", Name(), *info_id);
+        Msg("[%s] Received Info [%s]", Name(), info_id.c_str());
 #endif
 
     //Запустить скриптовый callback

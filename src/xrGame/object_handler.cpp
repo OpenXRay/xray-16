@@ -42,9 +42,9 @@ void CObjectHandler::reinit(CAI_Stalker* object)
     m_hammer_is_clutched = false;
     planner().setup(object);
     IKinematics* kinematics = smart_cast<IKinematics*>(planner().m_object->Visual());
-    m_r_hand = kinematics->LL_BoneID(pSettings->r_string(*planner().m_object->cNameSect(), "weapon_bone0"));
-    m_l_finger1 = kinematics->LL_BoneID(pSettings->r_string(*planner().m_object->cNameSect(), "weapon_bone1"));
-    m_r_finger2 = kinematics->LL_BoneID(pSettings->r_string(*planner().m_object->cNameSect(), "weapon_bone2"));
+    m_r_hand = kinematics->LL_BoneID(pSettings->r_string(planner().m_object->cNameSect().c_str(), "weapon_bone0"));
+    m_l_finger1 = kinematics->LL_BoneID(pSettings->r_string(planner().m_object->cNameSect().c_str(), "weapon_bone1"));
+    m_r_finger2 = kinematics->LL_BoneID(pSettings->r_string(planner().m_object->cNameSect().c_str(), "weapon_bone2"));
     m_strap_object_id = ALife::_OBJECT_ID(-1);
     m_strap_bone0 = -1;
     m_strap_bone1 = -1;
@@ -103,7 +103,7 @@ void CObjectHandler::OnItemDrop(CInventoryItem* inventory_item, bool just_before
         CWeaponAmmo* weapon_ammo = smart_cast<CWeaponAmmo*>(inventory_item);
         if (weapon_ammo)
         {
-            Level().spawn_item(*weapon_ammo->cNameSect(), planner().object().Position(),
+            Level().spawn_item(weapon_ammo->cNameSect().c_str(), planner().object().Position(),
                 planner().object().ai_location().level_vertex_id(), planner().object().ID());
             m_item_to_spawn = weapon_ammo->cNameSect();
             m_ammo_in_box_to_spawn = weapon_ammo->m_boxSize;
@@ -159,7 +159,7 @@ void CObjectHandler::weapon_bones(int& b0, int& b1, int& b2) const
         return;
     }
 
-    THROW3(weapon->can_be_strapped(), "Cannot strap weapon", *weapon->cName());
+    THROW3(weapon->can_be_strapped(), "Cannot strap weapon", weapon->cName().c_str());
 
     if (weapon->ID() != m_strap_object_id)
     {
@@ -196,7 +196,7 @@ void CObjectHandler::actualize_strap_mode(CWeapon* weapon) const
         return;
     }
 
-    THROW3(weapon->can_be_strapped(), "Cannot strap weapon", *weapon->cName());
+    THROW3(weapon->can_be_strapped(), "Cannot strap weapon", weapon->cName().c_str());
     //	Msg							( "[%6d][%s] actualizing: weapon_strapped = true", Device.dwTimeGlobal,
     // planner().object().cName().c_str() );
     weapon->strapped_mode(true);

@@ -299,7 +299,7 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
         }
         else
         {
-            xr_sprintf(Text, "%s%s", Color_Main, *st.translate("mp_you_captured_artefact"));
+            xr_sprintf(Text, "%s%s", Color_Main, st.translate("mp_you_captured_artefact").c_str());
 
             PlayCapturedTheArtefact(ps);
 

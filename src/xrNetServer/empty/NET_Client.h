@@ -105,7 +105,7 @@ public:
     {
         return m_game_description;
     }
-    pcstr net_SessionName() { return *net_Hosts.front().dpSessionName; }
+    pcstr net_SessionName() { return net_Hosts.front().dpSessionName.c_str(); }
     // receive
     void StartProcessQueue()
     {
