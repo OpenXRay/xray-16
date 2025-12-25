@@ -1,7 +1,6 @@
 #include "pch.hpp"
 #include "UIXmlInitBase.h"
 #include "Windows/UIFrameWindow.h"
-#include "Windows/UITextFrameLineWnd.h"
 #include "Buttons/UICheckButton.h"
 #include "SpinBox/UICustomSpin.h"
 #include "Buttons/UIRadioButton.h"
@@ -808,15 +807,6 @@ bool CUIXmlInitBase::InitFrameLine(CUIXml& xml_doc, pcstr path, int index, CUIFr
         InitStatic(xml_doc, buf, index, pWnd->GetTitleText(true), false);
 
     return result;
-}
-
-bool CUIXmlInitBase::InitTextFrameLine(CUIXml& xml_doc, pcstr path, int index, CUITextFrameLineWnd* pWnd, bool fatal /*= true*/)
-{
-    string256 buf;
-    strconcat(buf, path, ":title");
-    InitStatic(xml_doc, buf, index, &pWnd->m_title, false);
-
-    return InitFrameLine(xml_doc, path, index, &pWnd->m_frameline, fatal);
 }
 
 bool CUIXmlInitBase::InitCustomEdit(CUIXml& xml_doc, pcstr path, int index, CUICustomEdit* pWnd, bool fatal /*= true*/)

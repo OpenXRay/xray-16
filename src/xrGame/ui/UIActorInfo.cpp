@@ -2,7 +2,7 @@
 #include "UIActorInfo.h"
 #include "UIXmlInit.h"
 
-#include "xrUICore/Windows/UITextFrameLineWnd.h"
+#include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/Static/UIAnimatedStatic.h"
 
 #include "Actor.h"
@@ -34,9 +34,9 @@ bool CUIActorInfoWnd::Init()
     CUIXmlInit::InitFrameWindow(uiXml, "chicon_frame_window", 0, UICharIconFrame);
     AttachChild(UICharIconFrame);
 
-    UICharIconHeader = xr_new<CUITextFrameLineWnd>();
+    UICharIconHeader = xr_new<CUIFrameLineWnd>("Character icon header");
     UICharIconHeader->SetAutoDelete(true);
-    CUIXmlInit::InitTextFrameLine(uiXml, "chicon_frame_line", 0, UICharIconHeader);
+    CUIXmlInit::InitFrameLine(uiXml, "chicon_frame_line", 0, UICharIconHeader);
     UICharIconFrame->AttachChild(UICharIconHeader);
 
     UIAnimatedIcon = xr_new<CUIAnimatedStatic>();
@@ -49,9 +49,9 @@ bool CUIActorInfoWnd::Init()
     CUIXmlInit::InitFrameWindow(uiXml, "info_frame_window", 0, UIInfoFrame);
     AttachChild(UIInfoFrame);
 
-    UIInfoHeader = xr_new<CUITextFrameLineWnd>();
+    UIInfoHeader = xr_new<CUIFrameLineWnd>("Info header");
     UIInfoHeader->SetAutoDelete(true);
-    CUIXmlInit::InitTextFrameLine(uiXml, "info_frame_line", 0, UIInfoHeader);
+    CUIXmlInit::InitFrameLine(uiXml, "info_frame_line", 0, UIInfoHeader);
     UIInfoFrame->AttachChild(UIInfoHeader);
 
     UIDetailList = xr_new<CUIScrollView>();
@@ -87,7 +87,8 @@ void CUIActorInfoWnd::Show(bool status)
     if (!status) return;
 
     UICharacterInfo->InitCharacter(Actor()->ID());
-    UICharIconHeader->SetText(Actor()->Name());
+    if (UICharIconHeader->GetTitleText())
+        UICharIconHeader->GetTitleText()->SetText(Actor()->Name());
     FillPointsInfo();
 }
 
@@ -197,13 +198,15 @@ void CUIActorInfoWnd::FillPointsDetail(const shared_str& id)
 
     if (id == "reputation") //reputation
     {
-        UIInfoHeader->GetTitleStatic()->SetTextST("st_detail_list_for_community_relations");
+        if (UICharIconHeader->GetTitleText())
+            UICharIconHeader->GetTitleText()->SetTextST("st_detail_list_for_community_relations");
         FillReputationDetails(&uiXml, path);
         return;
     }
     string256 str;
     xr_sprintf(str, "st_detail_list_for_%s", id.c_str());
-    UIInfoHeader->GetTitleStatic()->SetTextST(str);
+    if (UICharIconHeader->GetTitleText())
+        UICharIconHeader->GetTitleText()->SetTextST(str);
 
     SStatSectionData& section = Actor()->StatisticMgr().GetSection(id);
     vStatDetailData::const_iterator it = section.data.begin();
