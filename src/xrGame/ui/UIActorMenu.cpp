@@ -416,16 +416,16 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
         pcstr trade_tip = nullptr;
         if (PIItem current_item = itm ? (PIItem)itm->m_pData : nullptr)
         {
+            u16 compare_slot = current_item->BaseSlot();
+            if (compare_slot != NO_ACTIVE_SLOT)
+            {
+                compare_item = m_pActorInvOwner->inventory().ItemFromSlot(compare_slot);
+            }
+
             if (GetMenuMode() != mmTrade)
                 item_price = current_item->Cost();
             else
             {
-                u16 compare_slot = current_item->BaseSlot();
-                if (compare_slot != NO_ACTIVE_SLOT)
-                {
-                    compare_item = m_pActorInvOwner->inventory().ItemFromSlot(compare_slot);
-                }
-
                 CInventoryOwner* item_owner = smart_cast<CInventoryOwner*>(current_item->m_pInventory->GetOwner());
 
                 if (item_owner && item_owner == m_pActorInvOwner)
