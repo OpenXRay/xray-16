@@ -149,7 +149,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
         setValue(m_disp_condition, pInvItem.GetCondition());
     //-Alundaio
 
-    const bool is_cs_cop = GMLib.GetLibraryVersion() > GAMEMTL_VERSION_SOC;
+    const bool is_soc = GMLib.GetLibraryVersion() <= GAMEMTL_VERSION_SOC;
 
     for (auto [id, restore_section, actor_condition, restore_caption, magnitude, sign_inverse, unit] : af_restore)
     {
@@ -161,7 +161,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
             continue;
 
         val = val * pInvItem.GetCondition();
-        if (!is_cs_cop)
+        if (is_soc)
         {
             const float max_val = pSettings->r_float(condition_sect, actor_condition);
             val /= max_val;
@@ -170,7 +170,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
     }
 
     CHitImmunity immunities;
-    immunities.LoadImmunities(hit_absorbation_sect, pSettings);
+    immunities.LoadImmunities(hit_absorbation_sect, pSettings, is_soc);
 
     for (auto [id, immunity_section, immunity_caption, magnitude, sign_inverse, unit] : af_immunity)
     {
@@ -182,7 +182,7 @@ void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
             continue;
 
         val *= pInvItem.GetCondition();
-        if (is_cs_cop)
+        if (!is_soc)
         {
             const float max_val = actor->conditions().GetZoneMaxPower(id);
             val /= max_val;
