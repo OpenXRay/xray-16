@@ -8,7 +8,6 @@ CUIDoubleProgressBar::CUIDoubleProgressBar() : CUIWindow("CUIDoubleProgressBar")
     AttachChild(&m_progress_two);
 }
 
-CUIDoubleProgressBar::~CUIDoubleProgressBar() {}
 void CUIDoubleProgressBar::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 {
     CUIXmlInitBase::InitProgressBar(xml_doc, path, 0, &m_progress_one);
@@ -47,4 +46,22 @@ void CUIDoubleProgressBar::SetTwoPos(float cur_value, float compare_value)
         m_progress_one.SetProgressPos(cur_value);
         m_progress_two.SetProgressPos(cur_value);
     }
+}
+
+void CUIDoubleProgressBar::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+
+    if (!ImGui::CollapsingHeader(CUIDoubleProgressBar::GetDebugType()))
+        return;
+
+    Fcolor color = m_less_color;
+    if (ImGui::ColorEdit4("Less color", reinterpret_cast<float*>(&color)))
+        m_less_color = color.get();
+
+    color = m_more_color;
+    if (ImGui::ColorEdit4("More color", reinterpret_cast<float*>(&color)))
+        m_less_color = color.get();
+#endif
 }

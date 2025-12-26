@@ -510,7 +510,7 @@ bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, pcstr path, int index, CUI
     if (xml_doc.NavigateToNode(buf, index))
     {
         InitStatic(xml_doc, buf, index, &pWnd->m_UIBackgroundItem);
-        pWnd->m_bBackgroundPresent = true;
+        pWnd->ShowBackground(true);
         pWnd->m_UIBackgroundItem.SetWndSize(pWnd->GetWndSize());
     }
 
