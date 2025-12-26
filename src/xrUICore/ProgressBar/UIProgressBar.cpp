@@ -4,22 +4,10 @@
 CUIProgressBar::CUIProgressBar()
     : CUIWindow("CUIProgressBar"), m_UIProgressItem("Progress"), m_UIBackgroundItem("Background")
 {
-    m_MinPos = 1.0f;
-    m_MaxPos = 1.0f + EPS;
-
     Enable(false);
-
-    m_bBackgroundPresent = false;
-    m_bUseColor = false;
-    m_bUseMiddleColor = false;
-    m_bUseGradient = true;
 
     AttachChild(&m_UIBackgroundItem);
     AttachChild(&m_UIProgressItem);
-    m_ProgressPos.x = 0.0f;
-    m_ProgressPos.y = 0.0f;
-    m_inertion = 0.0f;
-    m_orient_mode = om_horz;
 }
 
 void CUIProgressBar::InitProgressBar(Fvector2 pos, Fvector2 size, EOrientMode mode)
@@ -110,7 +98,7 @@ void CUIProgressBar::Draw()
     Frect rect;
     GetAbsoluteRect(rect);
 
-    if (m_bBackgroundPresent)
+    if (IsShownBackground())
     {
         UI().PushScissor(rect);
         m_UIBackgroundItem.Draw();
@@ -149,4 +137,75 @@ void CUIProgressBar::Draw()
         m_UIProgressItem.Draw();
         UI().PopScissor();
     }
+}
+
+void CUIProgressBar::FillDebugInfo()
+{
+#ifndef MASTER_GOLD
+    CUIWindow::FillDebugInfo();
+
+    if (!ImGui::CollapsingHeader(CUIProgressBar::GetDebugType()))
+        return;
+
+    ImGui::DragFloat2("Position (current vs destination)", reinterpret_cast<float*>(&m_ProgressPos));
+    ImGui::DragFloat("Current length", &m_CurrentLength);
+
+    bool update{};
+    update |= ImGui::DragFloat("Min position", &m_MinPos);
+    update |= ImGui::DragFloat("Max position", &m_MaxPos);
+    update |= ImGui::DragFloat("Inertion", &m_inertion);
+    ImGui::Separator();
+
+    constexpr pcstr styles[om_count] =
+    {
+        "Horizontal (left to right)",
+        "Vertical (bottom to top)",
+        "Horizontal (right to left)",
+        "Vertical (top to bottom)",
+        "Horizontal (from center to sides)",
+        "Vertical (from center to sides)",
+    };
+    int mode = m_orient_mode;
+    if (ImGui::SliderInt("Mode", &mode, 0, om_count - 1, styles[m_orient_mode]))
+    {
+        m_orient_mode = (EOrientMode)mode;
+        update |= true;
+    }
+
+    update |= ImGui::Button("Update");
+
+    bool v = IsShownBackground();
+    if (ImGui::Checkbox("Background", &v))
+        ShowBackground(v);
+
+    v = m_bUseColor;
+    if (ImGui::Checkbox("Color", &v))
+    {
+        m_bUseColor = v;
+        update |= true;
+    }
+
+    v = m_bUseMiddleColor;
+    if (ImGui::Checkbox("Middle color", &v))
+    {
+        m_bUseMiddleColor = v;
+        update |= true;
+    }
+
+    v = m_bUseGradient;
+    if (ImGui::Checkbox("Gradient", &v))
+    {
+        m_bUseGradient = v;
+        update |= true;
+    }
+
+    ImGui::Separator();
+
+    update |= ImGui::ColorEdit4("Min color", reinterpret_cast<float*>(&m_minColor));
+    update |= ImGui::ColorEdit4("Middle color", reinterpret_cast<float*>(&m_middleColor));
+    update |= ImGui::ColorEdit4("Max color", reinterpret_cast<float*>(&m_maxColor));
+
+    if (update)
+        UpdateProgressBar();
+#endif
 }
