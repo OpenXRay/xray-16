@@ -9,7 +9,7 @@ CHitImmunity::CHitImmunity()
 {
     m_HitImmunityKoefs.resize(ALife::eHitTypeMax);
     for (u32 i = 0; i < ALife::eHitTypeMax; i++)
-        m_HitImmunityKoefs[i] = 0.0f;
+        m_HitImmunityKoefs[i] = 1.0f;
 }
 
 constexpr std::tuple<ALife::EHitType, cpcstr, bool> hit_immunities[] =
@@ -28,12 +28,9 @@ constexpr std::tuple<ALife::EHitType, cpcstr, bool> hit_immunities[] =
     { ALife::eHitTypePhysicStrike, "physic_strike_wound_immunity", true  },
 };
 
-void CHitImmunity::LoadImmunities(const char* imm_sect, const CInifile* ini)
+void CHitImmunity::LoadImmunities(const char* imm_sect, const CInifile* ini, bool invert /*= false*/)
 {
     R_ASSERT2(ini->section_exist(imm_sect), imm_sect);
-
-    // SOC vs CS/COP are inverted, convert to CS/COP format.
-    const bool is_soc = GMLib.GetLibraryVersion() <= GAMEMTL_VERSION_SOC;
 
     for (const auto& [hit_type, immunity_name, optional] : hit_immunities)
     {
@@ -41,27 +38,23 @@ void CHitImmunity::LoadImmunities(const char* imm_sect, const CInifile* ini)
             continue;
 
         float immunity = ini->r_float(imm_sect, immunity_name);
-        if (is_soc)
+        if (invert)
             immunity = 1.0f - immunity;
 
         m_HitImmunityKoefs[hit_type] = immunity;
     }
 }
 
-void CHitImmunity::AddImmunities(const char* imm_sect, const CInifile* ini)
+void CHitImmunity::AddImmunities(const char* imm_sect, const CInifile* ini, bool invert /*= false*/)
 {
     R_ASSERT2(ini->section_exist(imm_sect), imm_sect);
-
-    // Consistency is the key.
-    // We want this to have SOC format in SOC, the same as LoadImmunities does.
-    const bool is_soc = GMLib.GetLibraryVersion() <= GAMEMTL_VERSION_SOC;
 
     for (const auto& [hit_type, immunity_name, _] : hit_immunities)
     {
         if (!ini->line_exist(imm_sect, immunity_name))
             continue;
         float immunity = ini->r_float(imm_sect, immunity_name);
-        if (is_soc)
+        if (invert)
             immunity = 1.0f - immunity;
         m_HitImmunityKoefs[hit_type] += immunity;
     }
