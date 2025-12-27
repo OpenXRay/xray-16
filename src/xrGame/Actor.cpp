@@ -1500,7 +1500,7 @@ void CActor::shedule_Update(u32 DT)
                 }
                 else if (m_pVehicleWeLookingAt)
                 {
-                    m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction != nullptr ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
+                    m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
                 }
                 else if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
                     m_pObjectWeLookingAt->cast_inventory_item()->CanTake())

@@ -141,7 +141,8 @@ public:
 
     [[nodiscard]]
     bool operator!() const { return p_ == nullptr; }
-
+    [[nodiscard]]
+    explicit operator bool() const { return p_ != nullptr; }
     [[nodiscard]]
     char operator[](size_t id) { return p_->value[id]; }
     [[nodiscard]]
@@ -200,6 +201,12 @@ struct std::hash<shared_str>
         return std::hash<pcstr>{}(str_val ? str_val->value : nullptr);
     }
 };
+
+bool operator==(const shared_str&, std::nullptr_t) = delete;
+bool operator!=(const shared_str&, std::nullptr_t) = delete;
+
+bool operator==(std::nullptr_t, const shared_str&) = delete;
+bool operator!=(std::nullptr_t, const shared_str&) = delete;
 
 // res_ptr == res_ptr
 // res_ptr != res_ptr
