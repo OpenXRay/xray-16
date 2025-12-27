@@ -68,7 +68,7 @@ void CUIFrameLineWnd::Draw()
 
 constexpr Fvector2 pt_offset = { -0.5f, -0.5f };
 
-ICF void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts)
+void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts)
 {
     UI().AlignPixel(LTp.x);
     UI().AlignPixel(LTp.y);
