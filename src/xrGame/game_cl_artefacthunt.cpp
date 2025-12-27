@@ -443,11 +443,10 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
                 else
                     dTime = iCeil(float(dReinforcementTime - CurTime) / 1000);
 
-                string128 _buff;
-                m_game_ui->m_pReinforcementInidcator->SetText(xr_itoa(dTime, _buff, 10));
+                m_game_ui->SetReinforcementTimes(dTime, iReinforcementTime);
             }
             else
-                m_game_ui->m_pReinforcementInidcator->SetText("0");
+                m_game_ui->SetReinforcementTimes(0, 1);
 
             s16 lt = local_player->team;
             if (lt >= 0)
