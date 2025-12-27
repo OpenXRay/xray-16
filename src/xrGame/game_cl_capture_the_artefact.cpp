@@ -168,7 +168,7 @@ void game_cl_CaptureTheArtefact::shedule_Update(u32 dt)
             }
             if (InWarmUp())
             {
-                m_game_ui->SetReinforcementTimes(0, 0);
+                m_game_ui->SetReinforcementTimes(0, 1);
             }
             else
             {

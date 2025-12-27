@@ -63,7 +63,7 @@ void CUIGameCTA::Init(int stage)
         CUIXml uiXml;
         uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, CTA_GAME_WND_XML);
 
-        CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
+        CUIXmlInit::InitWindow(uiXml, "global", 0, Window, false);
 
         m_pMoneyIndicator = xr_new<CUIMoneyIndicator>();
         m_pMoneyIndicator->SetAutoDelete(true);
@@ -73,9 +73,11 @@ void CUIGameCTA::Init(int stage)
         m_pRankIndicator->SetAutoDelete(true);
         m_pRankIndicator->InitFromXml(uiXml);
 
-        m_pReinforcementInidcator = xr_new<CUIStatic>("Reinforcement indicator");
+        m_pReinforcementInidcator = UIHelper::CreateProgressShape(uiXml, "reinforcement", nullptr, false);
+        if (!m_pReinforcementInidcator)
+            m_pReinforcementInidcator = UIHelper::CreateStatic(uiXml, "reinforcement", nullptr);
+
         m_pReinforcementInidcator->SetAutoDelete(true);
-        CUIXmlInit::InitStatic(uiXml, "reinforcement", 0, m_pReinforcementInidcator);
 
         m_team1_icon = xr_new<CUIStatic>("Team 1 icon");
         m_team2_icon = xr_new<CUIStatic>("Team 2 icon");
@@ -626,8 +628,13 @@ s8 CUIGameCTA::GetSelectedSkinIndex()
 
 void CUIGameCTA::SetReinforcementTimes(u32 curTime, u32 maxTime)
 {
-    string128 _buff;
-    m_pReinforcementInidcator->SetText(xr_itoa(curTime / 1000, _buff, 10));
+    if (auto shape = smart_cast<CUIProgressShape*>(m_pReinforcementInidcator))
+        shape->SetPos(curTime / 1000, maxTime / 1000);
+    else
+    {
+        string128 _buff;
+        m_pReinforcementInidcator->SetText(xr_itoa(curTime / 1000, _buff, 10));
+    }
 }
 
 void CUIGameCTA::DisplayMoneyChange(LPCSTR deltaMoney) { m_pMoneyIndicator->SetMoneyChange(deltaMoney); }

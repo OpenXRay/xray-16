@@ -18,8 +18,9 @@ private:
     game_cl_ArtefactHunt* m_game;
     typedef CUIGameTDM inherited;
 
-public:
     CUIStatic* m_pReinforcementInidcator;
+
+public:
     CUIMessageBoxEx* m_pBuySpawnMsgBox;
 
 public:
@@ -30,6 +31,8 @@ public:
     virtual void Init(int stage);
     virtual void UnLoad();
     void SetBuyMsgCaption(LPCSTR str);
+
+    void SetReinforcementTimes(int curTime, int maxTime);
 
 protected:
     CUIStatic* m_buy_msg_caption;

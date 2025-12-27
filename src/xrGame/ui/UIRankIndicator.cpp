@@ -12,9 +12,10 @@ CUIRankIndicator::~CUIRankIndicator()
         xr_delete(m_ranks[i]);
 }
 
-void CUIRankIndicator::InitFromXml(CUIXml& xml_doc)
+bool CUIRankIndicator::InitFromXml(CUIXml& xml_doc)
 {
-    CUIXmlInit::InitWindow(xml_doc, "rank_wnd", 0, this);
+    if (!CUIXmlInit::InitWindow(xml_doc, "rank_wnd", 0, this, false))
+        return false;
     string256 str;
     for (u8 i = 0; i < max_rank; ++i)
     {
@@ -27,6 +28,7 @@ void CUIRankIndicator::InitFromXml(CUIXml& xml_doc)
     back->SetAutoDelete(true);
     CUIXmlInit::InitStatic(xml_doc, "rank_wnd:background", 0, back);
     AttachChild(back);
+    return true;
 }
 
 void CUIRankIndicator::SetRank(u8 team, u8 rank)

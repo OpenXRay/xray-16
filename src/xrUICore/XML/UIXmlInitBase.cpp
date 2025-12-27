@@ -564,6 +564,9 @@ bool CUIXmlInitBase::InitProgressShape(CUIXml& xml_doc, pcstr path, int index, C
         InitStatic(xml_doc, _path, index, pWnd->m_pTexture);
     }
 
+    if (!pWnd->m_pTexture && !pWnd->GetShader()->inited())
+        return false; // Can't work without a texture
+
     pWnd->m_sectorCount = xml_doc.ReadAttribInt(path, index, "sector_count", 8);
     pWnd->m_bClockwise = xml_doc.ReadAttribInt(path, index, "clockwise") ? true : false;
 
