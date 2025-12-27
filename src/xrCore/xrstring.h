@@ -201,6 +201,12 @@ struct std::hash<shared_str>
     }
 };
 
+bool operator==(const shared_str&, std::nullptr_t) = delete;
+bool operator!=(const shared_str&, std::nullptr_t) = delete;
+
+bool operator==(std::nullptr_t, const shared_str&) = delete;
+bool operator!=(std::nullptr_t, const shared_str&) = delete;
+
 // res_ptr == res_ptr
 // res_ptr != res_ptr
 // const res_ptr == ptr
