@@ -141,7 +141,8 @@ public:
 
     [[nodiscard]]
     bool operator!() const { return p_ == nullptr; }
-
+    [[nodiscard]]
+    explicit operator bool() const { return p_ != nullptr; }
     [[nodiscard]]
     char operator[](size_t id) { return p_->value[id]; }
     [[nodiscard]]
