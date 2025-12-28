@@ -1084,7 +1084,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             }
             else
             {
-                xr_sprintf(m_pVoteCommand, "%s %s", votecommands[i].command, CommandParams);
+                xr_sprintf(m_pVoteCommand, "%s %s", votecommands[i].command, CommandParams); // backward compatibility
             }
             xr_strcpy(resVoteCommand, VoteCommand);
         }
