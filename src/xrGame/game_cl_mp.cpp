@@ -1244,8 +1244,7 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
         }
         case SKT_KIR:
         {
-            BName.printf("%d_kill_in_row", BonusKills);
-
+            xr_sprintf(BName, "%d_kill_in_row", BonusKills);
             xr_sprintf(MoneyStr, sizeof(MoneyStr), "%d", BonusKills);
             BMS.m_killer.m_name = MoneyStr;
             BMS.m_killer.m_color = 0xffff0000;

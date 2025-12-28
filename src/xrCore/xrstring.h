@@ -177,7 +177,7 @@ public:
     [[nodiscard]]
     bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
 
-    shared_str& __cdecl printf(const char* format, ...)
+    /*shared_str& __cdecl printf(const char* format, ...)
     {
         string4096 buf;
         va_list p;
@@ -188,9 +188,22 @@ public:
         if (vs_sz)
             _set(buf);
         return (shared_str&)*this;
-    }
+    }*/
 };
 
+    
+IC int __cdecl xr_sprintf(shared_str& destination, pcstr format_string, ...)
+{
+    string4096 buf;
+    va_list p;
+    va_start(p, format_string);
+    int vs_sz = vsnprintf(buf, sizeof(buf) - 1, format_string, p);
+    buf[sizeof(buf) - 1] = 0;
+    va_end(p);
+    if (vs_sz >= 0)
+        destination = buf;
+    return vs_sz;
+}
 
 template<>
 struct std::hash<shared_str>
