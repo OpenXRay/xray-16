@@ -256,11 +256,10 @@ void CUIFrameLineWnd::FillDebugInfo()
         m_shader[segment]->GetBaseTextureResolution(ts);
 
         Frect& tex_rect = m_tex_rect[segment];
-        Frect rect =
-        {
-            .lt = tex_rect.lt,
-            .rb = { tex_rect.width(), tex_rect.height() }
-        };
+        Frect rect;
+        rect.lt = tex_rect.lt;
+        rect.rb = { tex_rect.width(), tex_rect.height() };
+
         if (ImGui::DragFloat4(label, reinterpret_cast<float*>(&rect), 1.0f, 0.0f, std::max(ts.x, ts.y)))
         {
             tex_rect.lt = rect.lt;
