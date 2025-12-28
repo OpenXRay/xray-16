@@ -289,6 +289,14 @@ void CScriptXmlInit::script_register(lua_State* luaState)
             .def("InitLabel", &CScriptXmlInit::InitStatic)
             .def("InitAnimStatic", &CScriptXmlInit::InitAnimStatic)
             .def("InitSleepStatic", &CScriptXmlInit::InitSleepStatic)
+            .def("InitButton", +[](CScriptXmlInit* self, pcstr path, CUIWindow* parent)
+            {
+                CUIButton* pWnd = xr_new<CUIButton>();
+                CUIXmlInit::InitButton(self->m_xml, path, 0, pWnd);
+                pWnd->SetAutoDelete(true);
+                _attach_child(pWnd, parent);
+                return pWnd;
+            })
             .def("Init3tButton", &CScriptXmlInit::Init3tButton)
             .def("InitCheck", &CScriptXmlInit::InitCheck)
             .def("InitSpinNum", &CScriptXmlInit::InitSpinNum)
@@ -307,6 +315,10 @@ void CScriptXmlInit::script_register(lua_State* luaState)
             .def("InitScrollView", &CScriptXmlInit::InitScrollView)
             .def("InitList", &CScriptXmlInit::InitListWnd)
             .def("InitListBox", &CScriptXmlInit::InitListBox)
+            .def("InitAutoStaticGroup", +[](CScriptXmlInit* self, pcstr path, CUIWindow* pWnd)
+            {
+                CUIXmlInit::InitAutoStaticGroup(self->m_xml, path, 0, pWnd);
+            })
             .def("InitProgressBar", &CScriptXmlInit::InitProgressBar)
     ];
 }

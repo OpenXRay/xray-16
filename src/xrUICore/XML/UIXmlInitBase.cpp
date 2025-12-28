@@ -431,6 +431,51 @@ bool CUIXmlInitBase::InitSound(const CUIXml& xml_doc, pcstr path, int index, CUI
     return true;
 }
 
+bool CUIXmlInitBase::InitButton(CUIXml& xml_doc, pcstr path, int index, CUIButton* pWnd)
+{
+    R_ASSERT4(xml_doc.NavigateToNode(path, index), "XML node not found", path, xml_doc.m_xml_file_name);
+
+    InitStatic(xml_doc, path, index, pWnd);
+
+    const auto checkAccelerator = [&](pcstr attrName, size_t accelIdx)
+    {
+        if (cpcstr accel = xml_doc.ReadAttrib(path, index, attrName, nullptr))
+        {
+            const int acc = KeynameToDik(accel, true);
+            if (acc != SDL_SCANCODE_UNKNOWN)
+                pWnd->SetAccelerator(acc, true, accelIdx);
+            else
+            {
+                const auto action = ActionNameToId(accel, true);
+                if (action != kNOTBINDED)
+                    pWnd->SetAccelerator(static_cast<int>(action), false, accelIdx);
+                else
+                {
+                    Msg("~ [%s] has wrong '%s' attribute value[%s] for button[%s] with index[%d] - can't find such button or action",
+                        xml_doc.m_xml_file_name, attrName, accel, path, index);
+                }
+            }
+        }
+    };
+
+    checkAccelerator("accel", 0);
+    checkAccelerator("accel_ext", 1);
+
+    if (cpcstr text_hint = xml_doc.ReadAttrib(path, index, "hint", nullptr))
+        pWnd->m_hint_text = StringTable().translate(text_hint);
+
+    //float shadowOffsetX = xml_doc.ReadAttribFlt(path, index, "shadow_offset_x", 0);
+    //float shadowOffsetY = xml_doc.ReadAttribFlt(path, index, "shadow_offset_y", 0);
+
+    //float pushOffsetX = xml_doc.ReadAttribFlt(path, index, "push_off_x", 2);
+    //float pushOffsetY = xml_doc.ReadAttribFlt(path, index, "push_off_y", 3);
+
+    //pWnd->SetShadowOffset({ shadowOffsetX, shadowOffsetY });
+    //pWnd->SetPushOffset({ pushOffsetX, pushOffsetY });
+
+    return true;
+}
+
 bool CUIXmlInitBase::InitProgressBar(CUIXml& xml_doc, pcstr path, int index, CUIProgressBar* pWnd, bool fatal /*= true*/)
 {
     const bool nodeExist = xml_doc.NavigateToNode(path, index);

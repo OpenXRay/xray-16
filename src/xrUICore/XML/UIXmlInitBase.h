@@ -47,6 +47,7 @@ public:
     static bool InitCheck(CUIXml& xml_doc, pcstr path, int index, CUICheckButton* pWnd, bool fatal = true);
     static bool InitSpin(CUIXml& xml_doc, pcstr path, int index, CUICustomSpin* pWnd, bool fatal = true);
     static bool InitText(CUIXml& xml_doc, pcstr path, int index, CUILines* pLines);
+    static bool InitButton(CUIXml& xml_doc, LPCSTR path, int index, CUIButton* pWnd);
     static bool Init3tButton(CUIXml& xml_doc, pcstr path, int index, CUI3tButton* pWnd, bool fatal = true);
     static bool InitProgressBar(CUIXml& xml_doc, pcstr path, int index, CUIProgressBar* pWnd, bool fatal = true);
     static bool InitProgressShape(CUIXml& xml_doc, pcstr path, int index, CUIProgressShape* pWnd, bool fatal = true);
