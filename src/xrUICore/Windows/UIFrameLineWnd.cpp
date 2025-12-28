@@ -68,7 +68,7 @@ void CUIFrameLineWnd::Draw()
 
 constexpr Fvector2 pt_offset = { -0.5f, -0.5f };
 
-ICF void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts)
+void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts)
 {
     UI().AlignPixel(LTp.x);
     UI().AlignPixel(LTp.y);
@@ -256,11 +256,10 @@ void CUIFrameLineWnd::FillDebugInfo()
         m_shader[segment]->GetBaseTextureResolution(ts);
 
         Frect& tex_rect = m_tex_rect[segment];
-        Frect rect =
-        {
-            .lt = tex_rect.lt,
-            .rb = { tex_rect.width(), tex_rect.height() }
-        };
+        Frect rect;
+        rect.lt = tex_rect.lt;
+        rect.rb = { tex_rect.width(), tex_rect.height() };
+
         if (ImGui::DragFloat4(label, reinterpret_cast<float*>(&rect), 1.0f, 0.0f, std::max(ts.x, ts.y)))
         {
             tex_rect.lt = rect.lt;

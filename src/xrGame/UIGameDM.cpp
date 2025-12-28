@@ -69,7 +69,7 @@ void CUIGameDM::Init(int stage)
         m_pTeamPanels->Init(TEAM_PANELS_DM_XML_NAME, "team_panels_wnd");
         CUIXml uiXml;
         uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, "ui_game_dm.xml");
-        CUIXmlInit::InitWindow(uiXml, "global", 0, Window);
+        CUIXmlInit::InitWindow(uiXml, "global", 0, Window, false);
         m_pMoneyIndicator->InitFromXML(uiXml);
         m_pRankIndicator->InitFromXml(uiXml);
         CUIXmlInit::InitStatic(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
