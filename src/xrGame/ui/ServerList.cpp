@@ -868,8 +868,8 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     m_itemInfo.info.address = address.c_str();
     m_itemInfo.info.map = pServerInfo->m_SessionName;
     m_itemInfo.info.game = GameTypeToStringEx(pServerInfo->m_GameType, true);
-    m_itemInfo.info.players.printf("%d/%d", pServerInfo->m_ServerNumPlayers, pServerInfo->m_ServerMaxPlayers);
-    m_itemInfo.info.ping.printf("%d", pServerInfo->m_Ping);
+    xr_sprintf(m_itemInfo.info.players, "%d/%d", pServerInfo->m_ServerNumPlayers, pServerInfo->m_ServerMaxPlayers);
+    xr_sprintf(m_itemInfo.info.ping, "%d", pServerInfo->m_Ping);
     m_itemInfo.info.version = pServerInfo->m_ServerVersion;
     m_itemInfo.info.icons.pass = pServerInfo->m_bPassword;
     m_itemInfo.info.icons.dedicated = pServerInfo->m_bDedicated;

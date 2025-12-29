@@ -259,7 +259,7 @@ void CUIPdaWnd::Update()
         if (m_clock->GetParent() != this) // SOC
         {
             const auto date = GetGameDateAsString(InventoryUtilities::edpDateToDay, '/', true);
-            time.printf("%s %s", time.c_str(), date.c_str());
+            xr_sprintf(time, "%s %s", time.c_str(), date.c_str());
         }
         m_clock->SetText(time.c_str());
     }
