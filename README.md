@@ -110,7 +110,7 @@ Thank you for your support!
     * [andrew-boyarshin](https://github.com/andrew-boyarshin) – work on the build system.
     * [CasualDev242](https://github.com/CasualDev242) (Swartz27) – work on renderer features.
     * [awdavies](https://github.com/awdavies) – project maintenance work.
-    * [Xottab_DUTY](https://github.com/Xottab-DUTY) – current project leader.
+    * [Xottab_DUTY](https://github.com/Xottab-DUTY) – current project leader, gathering a new team, creation of the community (GitHub, Discord, VK), defining project guiding principles and goals, working on many areas of tasks (core, renderering, AI, gameplay, UI), SOC/CS/COC support.
     * [intorr](https://github.com/intorr) – work on the project quality, memory leaks, refactoring and optimizations.
     * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
     * [q4a](https://github.com/q4a) – main part of the work on Linux port.
@@ -174,7 +174,8 @@ Thank you for your support!
     * Valevicor, Nac, Midiy, Vadim Balashov, Jacob Arms,
     * CatWMuttonChops, Reed777, Interpreter_, nexusasx10, [Egor Olefirenko](https://github.com/olefirenque),
     * Igor Zharenko, SLF, Dmitriy Terletskiy, Alex Brodskiy, Neizvestniy Chelovek,
-    * LinuxNerd, [tyabus](https://github.com/tyabus), [Sevenfortyseven](https://github.com/Sevenfortyseven), 777yur0k, ItzVladik
+    * LinuxNerd, [tyabus](https://github.com/tyabus), [Sevenfortyseven](https://github.com/Sevenfortyseven), 777yur0k, ItzVladik,
+    * @psistore, @forealdo25, Tech Racoon
 * Particular projects and their contributors:
   * [Oxygen](https://github.com/xrOxygen) – for being our friends and giving tips and help with new features, optimizations, bug fixes, etc.
   * [Shoker Weapon Mod](https://github.com/ShokerStlk/xray-16-SWM) – for first introducing 3D (PiP) scopes and implementing new features to overall improve the weaponry of the game.
