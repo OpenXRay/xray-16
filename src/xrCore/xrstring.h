@@ -185,7 +185,7 @@ inline int __cdecl xr_sprintf(shared_str& destination, pcstr format_string, ...)
     va_start(args, format_string);
     const int vs_sz = vsnprintf(buf, sizeof(buf) - 1, format_string, args);
     buf[sizeof(buf) - 1] = 0;
-    va_end(p);
+    va_end(args);
     if (vs_sz >= 0)
         destination = buf;
     return vs_sz;
