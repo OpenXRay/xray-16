@@ -25,11 +25,6 @@ struct XRCORE_API str_value_cmp
     IC bool operator()(const str_value* A, const str_value* B) const { return A->dwCRC < B->dwCRC; };
 };
 
-struct XRCORE_API str_hash_function
-{
-    IC u32 operator()(str_value const* const value) const { return value->dwCRC; };
-};
-
 #pragma warning(pop)
 
 struct str_container_impl;
@@ -196,8 +191,7 @@ struct std::hash<shared_str>
 {
     [[nodiscard]] size_t operator()(const shared_str& str) const noexcept
     {
-        const auto str_val = str._get();
-        return std::hash<pcstr>{}(str_val ? str_val->value : nullptr);
+        return str ? str._get()->dwCRC : std::hash<pcstr>{}(nullptr);
     }
 };
 
