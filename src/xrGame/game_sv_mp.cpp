@@ -1055,7 +1055,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             string256 WeatherTime = "", WeatherName = "";
             sscanf(CommandParams, "%255s %255s", WeatherName, WeatherTime);
 
-            m_pVoteCommand.printf("%s %s", votecommands[i].command, WeatherTime);
+            xr_sprintf(m_pVoteCommand, "%s %s", votecommands[i].command, WeatherTime);
             xr_sprintf(resVoteCommand, "%s %s", votecommands[i].name, WeatherName);
         }
         else if (!xr_stricmp(votecommands[i].name, "changemap"))
@@ -1080,11 +1080,11 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             IClient* tmp_client = m_server->FindClient(tmp_predicate);
             if (tmp_client)
             {
-                m_pVoteCommand.printf("sv_kick_id %u", tmp_client->ID.value());
+                xr_sprintf(m_pVoteCommand, "sv_kick_id %u", tmp_client->ID.value());
             }
             else
             {
-                m_pVoteCommand.printf("%s %s", votecommands[i].command, CommandParams); // backward compatibility
+                xr_sprintf(m_pVoteCommand, "%s %s", votecommands[i].command, CommandParams); // backward compatibility
             }
             xr_strcpy(resVoteCommand, VoteCommand);
         }
@@ -1098,7 +1098,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             IClient* tmp_client = m_server->FindClient(tmp_predicate);
             if (tmp_client)
             {
-                m_pVoteCommand.printf("sv_banplayer %u %d", tmp_client->ID.value(), ban_time);
+                xr_sprintf(m_pVoteCommand, "sv_banplayer %u %d", tmp_client->ID.value(), ban_time);
             }
             else
             {
@@ -1112,13 +1112,13 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
         }
         else
         {
-            m_pVoteCommand.printf("%s %s", votecommands[i].command, CommandParams);
+            xr_sprintf(m_pVoteCommand, "%s %s", votecommands[i].command, CommandParams);
             xr_strcpy(resVoteCommand, VoteCommand);
         }
     }
     else
     {
-        m_pVoteCommand.printf("%s", VoteCommand + 1);
+        xr_sprintf(m_pVoteCommand, "%s", VoteCommand + 1);
     };
 
     struct vote_status_setter
