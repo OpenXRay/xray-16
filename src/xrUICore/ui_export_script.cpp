@@ -273,6 +273,15 @@ void CUIWindow::script_register(lua_State* luaState)
             .def("SetFont", &CUIWindow::SetFont)
             .def("GetFont", &CUIWindow::GetFont)
 
+            .def("GetMouseX", +[](CUIWindow* self) // X-Ray Extensions
+            {
+                return self->cursor_pos.x;
+            })
+            .def("GetMouseY", +[](CUIWindow* self) // X-Ray Extensions
+            {
+                return self->cursor_pos.y;
+            })
+
             .def("WindowName", +[](CUIWindow* self) -> pcstr { return self->WindowName().c_str(); })
             .def("SetWindowName", &CUIWindow::SetWindowName),
 

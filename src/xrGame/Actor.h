@@ -414,6 +414,15 @@ public:
     bool AnyMove() { return (mstate_real & mcAnyMove) != 0; };
     bool is_jump();
     u32 MovingState() const { return mstate_real; }
+
+    [[nodiscard]]
+    u32 GetBodyState() const { return mstate_real; }
+    void SetBodyState(const u32 state) { mstate_real = state; }
+
+    [[nodiscard]]
+    u32 GetWishfulBodyState() const { return mstate_wishful; }
+    void SetWishfulBodyState(const u32 state) { mstate_wishful = state; }
+
 protected:
     u32 mstate_wishful;
     u32 mstate_old;
@@ -785,26 +794,6 @@ private:
     bool m_disabled_hitmarks;
     bool m_inventory_disabled;
     // static CPhysicsShell		*actor_camera_shell;
-
-    IC u32 get_state() const
-    {
-        return this->mstate_real;
-    }
-
-    IC void set_state(u32 state)
-    {
-        mstate_real = state;
-    }
-
-    IC u32 get_state_wishful() const
-    {
-        return this->mstate_wishful;
-    }
-
-    IC void set_state_wishful(u32 state)
-    {
-        mstate_wishful = state;
-    }
 
 private:
     DECLARE_SCRIPT_REGISTER_FUNCTION(CGameObject);
