@@ -280,21 +280,23 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         m_pActiveDialog->Show(false);
     }
 
-    const std::tuple<shared_str, CUIWindow*> availableWindowsList[] =
+    const std::tuple<shared_str, pcstr, CUIWindow*> availableWindowsList[] =
     {
-        { "eptMap",         pUIMapWnd },
-        { "eptTasks",       pUITaskWnd },
-        { "eptFractionWar", pUIFactionWarWnd },
-        { "eptStatistics",  pUIActorInfo },
-        { "eptRanking",     pUIRankingWnd },
-        { "eptLogs",        pUILogsWnd },
+        { "eptMap",         nullptr, pUIMapWnd },
+        { "eptTasks",       nullptr, pUITaskWnd },
+        { "eptFractionWar", nullptr, pUIFactionWarWnd },
+        { "eptStatistics",  "ui_pda_actor_info", pUIActorInfo },
+        { "eptRanking",     nullptr, pUIRankingWnd },
+        { "eptLogs",        nullptr, pUILogsWnd },
     };
 
-    for (const auto& [id, wnd] : availableWindowsList)
+    pcstr soc_infoportion{};
+    for (const auto& [id, info, wnd] : availableWindowsList)
     {
         if (section == id && wnd)
         {
             m_pActiveDialog = wnd;
+            soc_infoportion = info;
             break;
         }
     }
@@ -309,13 +311,12 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         }
     }
 
-    if (m_pActiveDialog == pUIActorInfo && pUIActorInfo)
-    {
-        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
-    }
-
     if (m_pActiveDialog)
     {
+        InventoryUtilities::SendInfoToActor(section.c_str()); // X-Ray extensions
+        if (soc_infoportion)
+            InventoryUtilities::SendInfoToActor(soc_infoportion); // SOC
+
         if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
             UIMainPdaFrame->AttachChild(m_pActiveDialog);
         UIMainPdaFrame->SetKeyboardCapture(m_pActiveDialog, true);
