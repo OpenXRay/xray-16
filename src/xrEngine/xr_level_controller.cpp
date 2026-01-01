@@ -666,6 +666,9 @@ game_action* ActionNameToPtr(pcstr name, [[maybe_unused]] bool silent /*= false*
 
 bool IsBinded(EGameActions action_id, int dik, EKeyContext context /*= EKeyContext::Undefined*/)
 {
+    if (action_id >= kNOTBINDED)
+        return false;
+
     key_binding* binding = &g_key_bindings[action_id];
     for (u8 i = 0; i < bindtypes_count; ++i)
     {
@@ -678,6 +681,9 @@ bool IsBinded(EGameActions action_id, int dik, EKeyContext context /*= EKeyConte
 
 int GetActionDik(EGameActions action_id, int idx)
 {
+    if (action_id >= kNOTBINDED)
+        return SDL_SCANCODE_UNKNOWN;
+
     key_binding* binding = &g_key_bindings[action_id];
 
     if (idx == -1)
