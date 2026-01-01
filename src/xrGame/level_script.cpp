@@ -37,6 +37,8 @@
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "HUDManager.h"
 #include "raypick.h"
+#include "ui/UIMainIngameWnd.h"
+#include "UIZoneMap.h"
 #include "xrCDB/xr_collide_defs.h"
 #include "xrNetServer/NET_Messages.h"
 
@@ -730,11 +732,45 @@ void CLevel::script_register(lua_State* luaState)
 
     module(luaState, "level")
     [
+        // X-Ray Extensions:
+        def("get_target_obj", &g_get_target_obj),
+        def("get_target_dist", &g_get_target_dist),
+        def("get_target_element", &g_get_target_element), // Can get bone cursor is targeting
+        def("get_actor_body_state", +[]() -> u32
+        {
+            if (!g_actor)
+                return 0;
+            return g_actor->GetBodyState();
+        }),
+        def("get_actor_body_state_wishful", +[]() -> u32
+        {
+            if (!g_actor)
+                return 0;
+            return g_actor->GetWishfulBodyState();
+        }),
+        def("get_fov", +[]
+        {
+            return g_fov;
+        }),
+        def("set_fov", +[](float fov)
+        {
+            g_fov = fov;
+        }),
+        def("show_minimap", +[]
+        {
+            CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(true);
+        }),
+        def("hide_minimap", +[]
+        {
+            CurrentGameUI()->UIMainIngameWnd->ShowZoneMap(false);
+        }),
+        def("minimap_shown", +[]
+        {
+            return CurrentGameUI()->UIMainIngameWnd->IsZoneMapShown();
+        }),
+
         //Alundaio: Extend level namespace exports
         def("send", &g_send) , //allow the ability to send netpacket to level
-        def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
-        def("get_target_dist", &g_get_target_dist),
-        def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),

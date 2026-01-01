@@ -15,6 +15,8 @@ void key_binding_registrator::script_register(lua_State* luaState)
     [
         def("dik_to_bind", +[](int dik) -> int { return GetBindedAction(dik); }),
         def("dik_to_bind", +[](int dik, int ctx) -> int { return GetBindedAction(dik, (EKeyContext)ctx); }),
+        def("bind_to_dik", +[](int action) { return GetActionDik((EGameActions)action);}),
+        def("bind_to_dik", +[](int action, int idx) { return GetActionDik((EGameActions)action, idx);}),
 
         class_<EnumGameActionsContexts>("key_bindings_context")
             .enum_("context")

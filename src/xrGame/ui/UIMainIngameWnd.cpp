@@ -630,6 +630,7 @@ void CUIMainIngameWnd::reset_ui()
     }
 }
 
+bool CUIMainIngameWnd::IsZoneMapShown() { return UIZoneMap->visible; }
 void CUIMainIngameWnd::ShowZoneMap(bool status) { UIZoneMap->visible = status; }
 void CUIMainIngameWnd::DrawZoneMap() { UIZoneMap->Render(); }
 void CUIMainIngameWnd::UpdateZoneMap() { UIZoneMap->Update(); }
