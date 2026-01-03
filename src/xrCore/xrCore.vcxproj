@@ -114,6 +114,7 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="xrMemory.cpp" />
     <ClCompile Include="xrsharedmem.cpp" />
     <ClCompile Include="xrstring.cpp" />
+    <ClCompile Include="xrstring_manager.cpp" />
     <ClCompile Include="xr_ini.cpp" />
     <ClCompile Include="xr_shared.cpp" />
     <ClCompile Include="xr_token.cpp" />
@@ -223,6 +224,7 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="xrPool.h" />
     <ClInclude Include="xrsharedmem.h" />
     <ClInclude Include="xrstring.h" />
+    <ClInclude Include="xrstring_manager.h" />
     <ClInclude Include="xr_ini.h" />
     <ClInclude Include="xr_resource.h" />
     <ClInclude Include="xr_shared.h" />
