@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <SDL.h>
+#include "xrstring_manager.h"
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>

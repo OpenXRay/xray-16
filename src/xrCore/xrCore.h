@@ -48,7 +48,6 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_set.h"
 #include "xrsharedmem.h"
-#include "xrstring_manager.h"
 #include "xrstring.h"
 #include "xr_resource.h"
 #include "Compression/rt_compressor.h"

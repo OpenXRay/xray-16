@@ -725,6 +725,9 @@
     <ClInclude Include="xrstring_manager.h">
       <Filter>shared memory/string library</Filter>
     </ClInclude>
+    <ClInclude Include="xrstring_impl.h">
+      <Filter>shared memory/string library</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

@@ -1,12 +1,9 @@
 #pragma once
 
 #include <cstdio>
-
 #include "xr_types.h"
 #include "xrMemory.h"
-
 #include <cstring>
-#include "xrstring_manager.h"
 
 struct str_value;
 

@@ -51,6 +51,8 @@
 #include "xrPhysics/console_vars.h"
 #include "GametaskManager.h"
 
+#include "xrCore/xrstring_manager.h"
+
 #ifdef DEBUG
 #include "PHDebug.h"
 #include "ui/UIDebugFonts.h"
