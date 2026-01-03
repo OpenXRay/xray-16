@@ -8,43 +8,19 @@
 #include <cstring>
 #include "xrstring_manager.h"
 
-class shared_str
+struct str_value;
+
+class XRCORE_API shared_str
 {
     str_value* p_{};
 
 protected:
-    // ref-counting
-    void _dec() noexcept
-    {
-        if (nullptr == p_)
-            return;
-        p_->dwReference--;
-        if (0 == p_->dwReference)
-            p_ = nullptr;
-    }
+    void _dec() noexcept;
 
 public:
-    void _set(pcstr rhs)
-    {
-        str_value* v = g_pStringContainer->dock(rhs);
-        if (nullptr != v)
-            v->dwReference++;
-        _dec();
-        p_ = v;
-    }
-    void _set(shared_str const& rhs) noexcept
-    {
-        str_value* v = rhs.p_;
-        if (nullptr != v)
-            v->dwReference++;
-        _dec();
-        p_ = v;
-    }
-    void _set(std::nullptr_t) noexcept
-    {
-        _dec();
-        p_ = nullptr;
-    }
+    void _set(pcstr rhs);
+    void _set(shared_str const& rhs) noexcept;
+    void _set(std::nullptr_t) noexcept;
 
     [[nodiscard]]
     const str_value* _get() const { return p_; }
@@ -52,66 +28,37 @@ public:
 public:
     // construction
     shared_str() = default;
-    shared_str(pcstr rhs)
-    {
-        p_ = nullptr;
-        _set(rhs);
-    }
-    shared_str(shared_str const& rhs) noexcept
-    {
-        p_ = nullptr;
-        _set(rhs);
-    }
+    shared_str(pcstr rhs);
+    shared_str(shared_str const& rhs) noexcept;
     shared_str(shared_str&& rhs) noexcept
         : p_(rhs.p_)
     {
         rhs.p_ = nullptr;
     }
-    ~shared_str() { _dec(); }
+    ~shared_str();
     // assignment & accessors
-    shared_str& operator=(pcstr rhs)
-    {
-        _set(rhs);
-        return *this;
-    }
-    shared_str& operator=(shared_str const& rhs) noexcept
-    {
-        _set(rhs);
-        return *this;
-    }
+    shared_str& operator=(pcstr rhs);
+    shared_str& operator=(shared_str const& rhs) noexcept;
     shared_str& operator=(shared_str&& rhs) noexcept
     {
         p_ = rhs.p_;
         rhs.p_ = nullptr;
         return *this;
     }
-    shared_str& operator=(std::nullptr_t) noexcept
-    {
-        _set(nullptr);
-        return *this;
-    }
+    shared_str& operator=(std::nullptr_t) noexcept;
 
     [[nodiscard]]
     bool operator!() const { return p_ == nullptr; }
     [[nodiscard]]
     explicit operator bool() const { return p_ != nullptr; }
     [[nodiscard]]
-    char operator[](size_t id) { return p_->value[id]; }
+    char operator[](size_t id);
     [[nodiscard]]
-    char operator[](size_t id) const { return p_->value[id]; }
-
+    char operator[](size_t id) const;
     [[nodiscard]]
-    pcstr c_str() const { return p_ ? p_->value : nullptr; }
-
-    // misc func
+    pcstr c_str() const;
     [[nodiscard]]
-    size_t size() const
-    {
-        if (nullptr == p_)
-            return 0;
-
-        return p_->dwLength;
-    }
+    size_t size() const;
 
     [[nodiscard]]
     bool empty() const
@@ -128,6 +75,8 @@ public:
 
     [[nodiscard]]
     bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
+    [[nodiscard]]
+    u32 get_crc() const;
 };
 
 inline int __cdecl xr_sprintf(shared_str& destination, pcstr format_string, ...)
@@ -148,7 +97,7 @@ struct std::hash<shared_str>
 {
     [[nodiscard]] size_t operator()(const shared_str& str) const noexcept
     {
-        return str ? str._get()->dwCRC : std::hash<pcstr>{}(nullptr);
+        return str ? str.get_crc() : std::hash<pcstr>{}(nullptr);
     }
 };
 

@@ -1246,7 +1246,7 @@ CInventoryItem* CInventory::GetItemFromInventory(LPCSTR caItemName)
     u32 crc = crc32(caItemName, xr_strlen(caItemName));
 
     for (TIItemContainer::iterator l_it = l_list.begin(); l_list.end() != l_it; ++l_it)
-        if ((*l_it)->object().cNameSect()._get()->dwCRC == crc)
+        if ((*l_it)->object().cNameSect().get_crc() == crc)
         {
             VERIFY(0 == xr_strcmp((*l_it)->object().cNameSect().c_str(), caItemName));
             return (*l_it);

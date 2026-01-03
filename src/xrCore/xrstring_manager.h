@@ -4,23 +4,14 @@
 #include "xrMemory.h"
 
 #pragma pack(push, 4)
-#pragma warning(push)
-#pragma warning(disable : 4200)
-struct XRCORE_API str_value
-{
-    u32 dwReference;
-    u32 dwLength;
-    u32 dwCRC;
-    str_value* next;
-    char value[];
-};
+
+struct str_value;
 
 struct XRCORE_API str_value_cmp
 {
     // less
-    IC bool operator()(const str_value* A, const str_value* B) const { return A->dwCRC < B->dwCRC; };
+    IC bool operator()(const str_value* A, const str_value* B) const;
 };
-#pragma warning(pop)
 
 struct str_container_impl;
 class IWriter;

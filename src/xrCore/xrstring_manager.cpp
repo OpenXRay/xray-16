@@ -2,11 +2,17 @@
 #pragma hdrstop // Huh?
 
 #include "xrstring_manager.h"
+#include "xrstring_impl.h"
 #include "Threading/Lock.hpp"
 #include "xrCore/_std_extensions.h"
 
 #include "FS_impl.h"
 #include <SDL.h>
+
+bool str_value_cmp::operator()(const str_value* A, const str_value* B) const
+{
+    return A->dwCRC < B->dwCRC;
+}
 
 XRCORE_API str_container* g_pStringContainer = nullptr;
 

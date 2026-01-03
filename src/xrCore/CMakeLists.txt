@@ -386,6 +386,7 @@ target_sources_grouped(
     xrsharedmem.h
     xrstring.cpp
     xrstring.h
+    xrstring_impl.h
     xrstring_manager.cpp
     xrstring_manager.h
 )
