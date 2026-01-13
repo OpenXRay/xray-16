@@ -95,7 +95,7 @@ You may provide financial support for this project by donating via different way
 * BTC: 363ZUoWcQe9fDvRPK9Kee2YuPdyhSFQpr2
 * ETH: 0x45a4fe8566e76946591e1eeabf190aa09b1cdb66
 * TRX: TGx7QAhTPsRcwnb4mwCtNDU7NF6kuoACpt
-* Please, contact @xottab_duty in [our Discord](discord.gg/sjRMQwv) if you would like to use another cryptocurrency.
+* Please, contact @1yohji in [our Discord](discord.gg/sjRMQwv) if you would like to use another cryptocurrency.
 
 Thank you for your support!
 
@@ -110,7 +110,7 @@ Thank you for your support!
     * [andrew-boyarshin](https://github.com/andrew-boyarshin) – work on the build system.
     * [CasualDev242](https://github.com/CasualDev242) (Swartz27) – work on renderer features.
     * [awdavies](https://github.com/awdavies) – project maintenance work.
-    * [Xottab_DUTY](https://github.com/Xottab-DUTY) – current project leader, gathering a new team, creation of the community (GitHub, Discord, VK), defining project guiding principles and goals, working on many areas of tasks (core, renderering, AI, gameplay, UI), SOC/CS/COC support.
+    * [Xottab_DUTY](https://github.com/Xottab-DUTY) – former project leader (2018-2026), gathering a new team, creation of the community (GitHub, Discord, VK), defining project guiding principles and goals, working on many areas of tasks (core, renderering, AI, gameplay, UI), SOC/CS/COC support.
     * [intorr](https://github.com/intorr) – work on the project quality, memory leaks, refactoring and optimizations.
     * [eagleivg](https://github.com/eagleivg) – main part of the work on Linux port.
     * [q4a](https://github.com/q4a) – main part of the work on Linux port.
@@ -126,7 +126,7 @@ Thank you for your support!
     * [Zigatun](https://github.com/Zigatun) – work on ARM port.
     * [Masterkatze](https://github.com/Masterkatze) – work on the build system, bug fixing.
     * [Chugunov Roman](https://github.com/ChugunovRoman) – work on [porting Call of Chernobyl to latest OpenXRay](https://github.com/ChugunovRoman/xray-16), extending functionality for modmakers.
-    * [yohjimane](https://github.com/yohjimane) – work on introducing many new features, fixing original engine bugs.
+    * [yohjimane](https://github.com/yohjimane) – lead developer (2026-current), work on introducing many new features, fixing original engine bugs
   * Other contributors:
     * [alexgdi](https://github.com/alexgdi) – work on organizing project infrastructure, external dependencies.
     * [Shoker](https://github.com/ShokerStlk) – contributing new features, bug fixing.
