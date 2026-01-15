@@ -192,6 +192,9 @@ void FrameGraphRenderer::Shutdown() {
     // Clear static geometry cache
     m_cachedStaticBatches.clear();
     m_staticBatchesCached = false;
+    if (m_gpuCullingManager) {
+        m_gpuCullingManager->InvalidateStaticCullingData();
+    }
 
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
@@ -767,19 +770,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
 
     // Configure bindless rendering if GPU culling manager has compaction data
     passes::BindlessForwardConfig bindlessConfig;
-    if (m_gpuCullingManager && m_gpuCullingManager->GetCompactDrawArgsBuffer()) {
+    if (m_gpuCullingManager && m_gpuCullingManager->IsCompactionEnabled()) {
         bindlessConfig.enabled = true;  // TODO: Add console var to toggle bindless mode
-        bindlessConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetCompactDrawArgsBuffer();
-        bindlessConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetCompactMaterialIDBuffer();
-        bindlessConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetCompactBatchIndicesBuffer();
-        bindlessConfig.instanceBuffer = m_gpuCullingManager->GetInstanceBuffer();
-        bindlessConfig.totalObjectCount = m_gpuCullingManager->GetObjectCount();
 
-        // GPU-driven draw count: Use count buffer if compaction is enabled
-        // This enables true GPU-driven rendering where GPU determines how many draws to execute
-        if (m_gpuCullingManager->IsCompactionEnabled()) {
-            bindlessConfig.compactCountBuffer = m_gpuCullingManager->GetCompactCountBuffer();
-        }
+        bindlessConfig.staticSet.compactDrawArgsBuffer = m_gpuCullingManager->GetStaticCompactDrawArgsBuffer();
+        bindlessConfig.staticSet.compactMaterialIDBuffer = m_gpuCullingManager->GetStaticCompactMaterialIDBuffer();
+        bindlessConfig.staticSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetStaticCompactBatchIndicesBuffer();
+        bindlessConfig.staticSet.compactCountBuffer = m_gpuCullingManager->GetStaticCompactCountBuffer();
+        bindlessConfig.staticSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        bindlessConfig.staticSet.totalObjectCount = m_gpuCullingManager->GetStaticObjectCount();
+
+        bindlessConfig.dynamicSet.compactDrawArgsBuffer = m_gpuCullingManager->GetDynamicCompactDrawArgsBuffer();
+        bindlessConfig.dynamicSet.compactMaterialIDBuffer = m_gpuCullingManager->GetDynamicCompactMaterialIDBuffer();
+        bindlessConfig.dynamicSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetDynamicCompactBatchIndicesBuffer();
+        bindlessConfig.dynamicSet.compactCountBuffer = m_gpuCullingManager->GetDynamicCompactCountBuffer();
+        bindlessConfig.dynamicSet.instanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+        bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
 
         // ═══════════════════════════════════════════════════════
         //  MEGA-BUFFER CONFIGURATION (GPU-Driven Rendering)
@@ -1087,7 +1093,7 @@ void FrameGraphRenderer::RenderHUD() {
 // ═══════════════════════════════════════════════════════
 
 // Helper to process a visual and submit geometry batch (returns true if submitted)
-bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
+bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable, bool isStatic) {
     if (!visual)
         return false;
 
@@ -1257,6 +1263,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     // Mark skinned meshes for separate rendering pipeline
     // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.isStatic = isStatic;
 
     // Compute world-space bounding sphere for GPU culling
     // Different visual types have different sphere conventions:
@@ -1639,7 +1646,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                     break;
             }
 
-            if (ProcessVisualGeometry(visual, xform)) {
+            if (ProcessVisualGeometry(visual, xform, nullptr, true)) {
                 submittedStatic++;
             }
         }

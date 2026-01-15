@@ -42,26 +42,24 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 // ═══════════════════════════════════════════════════════
 // Configuration for bindless GPU-driven rendering mode
 
+struct BindlessDrawSet {
+    nvrhi::IBuffer* compactDrawArgsBuffer = nullptr;       // Compact draw args buffer (visible batches)
+    nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;     // Material IDs parallel to compact draw args
+    nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;   // Draw index → batch index map
+    nvrhi::IBuffer* instanceBuffer = nullptr;              // Instance data buffer
+    nvrhi::IBuffer* compactCountBuffer = nullptr;          // Visible draw count
+    u32 totalObjectCount = 0;                               // Max draw count
+
+    bool IsValid() const {
+        return compactDrawArgsBuffer && compactMaterialIDBuffer &&
+            compactBatchIndicesBuffer && instanceBuffer && compactCountBuffer &&
+            totalObjectCount > 0;
+    }
+};
+
 struct BindlessForwardConfig {
-    // Compact draw args buffer (only visible batches)
-    nvrhi::IBuffer* compactDrawArgsBuffer = nullptr;
-
-    // Material IDs parallel to compact draw args
-    nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
-
-    // Compact batch indices (maps draw index → original batch index)
-    nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
-
-    // Instance data buffer (GPUInstanceData: world matrix + materialID per batch)
-    nvrhi::IBuffer* instanceBuffer = nullptr;
-
-    // Compact count buffer (contains actual visible draw count from GPU culling)
-    // Enables true GPU-driven rendering: GPU determines how many draws to execute
-    nvrhi::IBuffer* compactCountBuffer = nullptr;
-
-    // Total number of objects uploaded to GPU (max possible draws)
-    // Used as maxDrawCount safety limit for ExecuteIndirect with count buffer
-    u32 totalObjectCount = 0;
+    BindlessDrawSet staticSet;
+    BindlessDrawSet dynamicSet;
 
     // Enable bindless rendering mode
     bool enabled = false;
@@ -92,13 +90,9 @@ struct BindlessForwardConfig {
     nvrhi::IBuffer* terrainCompactCountBuffer = nullptr;        // Terrain compact visible count
     u32 terrainObjectCount = 0;                          // Number of terrain objects
 
-    bool IsValid() const {
-        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && totalObjectCount > 0;
-    }
-
     // Check if GPU-driven culled rendering is available
     bool UseGPUCulling() const {
-        return IsValid() && compactBatchIndicesBuffer && instanceBuffer;
+        return enabled && (staticSet.IsValid() || dynamicSet.IsValid());
     }
 
     bool UseMegaBuffers() const {

@@ -303,7 +303,7 @@ void renderBindlessForward(
 {
     using namespace RENDER_NAMESPACE::bindless;
 
-    if (!config.IsValid() || !geometry || geometry->GetBatches().empty())
+    if (!config.UseGPUCulling() || !geometry || geometry->GetBatches().empty())
         return;
 
     // Finalize any pending materials (register textures to bindless descriptor heap)
@@ -587,29 +587,20 @@ void renderBindlessForward(
 
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-    // ═══════════════════════════════════════════════════════
-    //  CREATE BINDING SET (SM6 Bindless - No texture arrays)
-    // ═══════════════════════════════════════════════════════
-    // SM6 bindless uses ResourceDescriptorHeap[index] for texture access
-    // MaterialData contains descriptor indices (diffuseIndex, normalIndex, etc.)
+    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+        nvrhi::BindingSetDesc bindDesc;
+        bindDesc.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),  // b2 - engine matrices (m_VP, etc.)
+            nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),       // b4 - our lighting constants
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // g_Materials
+            nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, set.instanceBuffer),           // g_InstanceData
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, set.compactBatchIndicesBuffer), // g_CompactBatchIndices
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),  // g_CompactMaterialIDs
+        };
 
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),  // b2 - engine matrices (m_VP, etc.)
-        nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),       // b4 - our lighting constants
-        // b5 removed - shader uses SV_DrawID instead of per-draw CB for multi-draw
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // g_Materials (has descriptor indices)
-        nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-        // SM6 bindless: No texture arrays - textures accessed via ResourceDescriptorHeap
-        // GPU-driven rendering buffers (may be null if not using GPU culling)
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.instanceBuffer),           // g_InstanceData
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.compactBatchIndicesBuffer), // g_CompactBatchIndices
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.compactMaterialIDBuffer),  // g_CompactMaterialIDs
+        return nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
     };
-
-    auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
-    if (!bindingSet)
-        return;
 
     // ═══════════════════════════════════════════════════════
     //  RENDER VISIBLE BATCHES
@@ -632,32 +623,22 @@ void renderBindlessForward(
         return;
     }
 
-    // Draw ALL object slots - culled batches have instanceCount=0 (GPU skips them)
-    // This avoids needing CPU readback of visible count from previous frame
-    const u32 visibleCount = config.totalObjectCount;
-
     // Validate all required resources before draw loop
-    if (!s_bindlessPipeline || !framebuffer || !bindingSet) {
+    if (!s_bindlessPipeline || !framebuffer) {
         return;
     }
-
-    // sizeof(IndirectDrawArgs) = 20 bytes per draw
-    constexpr u32 INDIRECT_ARGS_SIZE = 20;
 
     // Set up base graphics state with indirect params buffer
     nvrhi::GraphicsState state;
     state.pipeline = s_bindlessPipeline;
     state.framebuffer = framebuffer;
-    state.bindings = { bindingSet };
 
     // SM6.6 bindless: Add the descriptor table from D3D12 backend
     // IDescriptorTable derives from IBindingSet, so we add it to bindings
     auto* backend = device->GetBackend();
+    nvrhi::IBindingSet* bindlessTable = nullptr;
     if (backend) {
-        auto* bindlessTable = backend->GetBindlessDescriptorTable();
-        if (bindlessTable) {
-            state.addBindingSet(bindlessTable);
-        }
+        bindlessTable = backend->GetBindlessDescriptorTable();
     }
 
     // Validate draw index buffer exists
@@ -671,16 +652,31 @@ void renderBindlessForward(
         {s_drawIndexBuffer, 1, 0}           // Slot 1: Per-instance draw indices (stride 4)
     };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-    state.indirectParams = config.compactDrawArgsBuffer;
-    state.indirectCountBuffer = config.compactCountBuffer;
     state.indirectCountOffset = 0;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-    cmdList->setGraphicsState(state);
-    cmdList->drawIndexedIndirectCount(0, config.totalObjectCount);
+    auto drawSet = [&](const BindlessDrawSet& set) {
+        if (!set.IsValid())
+            return;
 
-    s_gpuDrivenDraws += config.totalObjectCount;
+        auto bindingSet = createBindingSetForSet(set);
+        R_ASSERT2(bindingSet, "Bindless forward binding set creation failed");
+
+        state.bindings = { bindingSet };
+        if (bindlessTable) {
+            state.addBindingSet(bindlessTable);
+        }
+        state.indirectParams = set.compactDrawArgsBuffer;
+        state.indirectCountBuffer = set.compactCountBuffer;
+
+        cmdList->setGraphicsState(state);
+        cmdList->drawIndexedIndirectCount(0, set.totalObjectCount);
+        s_gpuDrivenDraws += set.totalObjectCount;
+    };
+
+    drawSet(config.staticSet);
+    drawSet(config.dynamicSet);
 
     // ═══════════════════════════════════════════════════════
     //  TERRAIN RENDERING (4-layer detail blending)

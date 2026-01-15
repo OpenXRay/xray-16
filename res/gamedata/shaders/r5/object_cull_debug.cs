@@ -36,8 +36,10 @@ cbuffer CullDebugParams : register(b5)
     uint g_HiZHeight;              // Hi-Z pyramid base height
     uint g_HiZMipLevels;           // Number of Hi-Z mip levels
     float g_OccluderThreshold;     // Distance threshold for "occluder" classification
-    float3 g_Padding;
-};
+    uint g_DebugOffset;
+    float2 g_Padding;
+}
+;
 
 // ═══════════════════════════════════════════════════════
 //  RESOURCES
@@ -127,68 +129,68 @@ void main(uint3 dtID : SV_DispatchThreadID)
 {
     uint objectIdx = dtID.x;
 
-    if (objectIdx >= g_ObjectCount)
-        return;
+if (objectIdx >= g_ObjectCount)
+    return;
 
-    GPUObjectData obj = g_Objects[objectIdx];
+GPUObjectData obj = g_Objects[objectIdx];
 
-    // Initialize debug output
-    CullDebugData debug;
-    debug.position = obj.position;
-    debug.radius = obj.radius;
-    debug.objectIndex = objectIdx;
-    debug.objectDepth = 0.0;
-    debug.hiZDepth = 0.0;
+// Initialize debug output
+CullDebugData debug;
+debug.position = obj.position;
+debug.radius = obj.radius;
+debug.objectIndex = g_DebugOffset + objectIdx;
+debug.objectDepth = 0.0;
+debug.hiZDepth = 0.0;
 
-    // ─────────────────────────────────────────────────────
-    //  TEST 1: Distance culling
-    // ─────────────────────────────────────────────────────
-    if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
-    {
-        debug.cullState = CULL_STATE_CULLED_DISTANCE;
-        g_DebugOutput[objectIdx] = debug;
-        return;
-    }
+// ─────────────────────────────────────────────────────
+//  TEST 1: Distance culling
+// ─────────────────────────────────────────────────────
+if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
+{
+    debug.cullState = CULL_STATE_CULLED_DISTANCE;
+    g_DebugOutput[g_DebugOffset + objectIdx] = debug;
+    return;
+}
 
-    // ─────────────────────────────────────────────────────
-    //  TEST 2: Frustum culling
-    // ─────────────────────────────────────────────────────
-    if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
-    {
-        debug.cullState = CULL_STATE_CULLED_FRUSTUM;
-        g_DebugOutput[objectIdx] = debug;
-        return;
-    }
+// ─────────────────────────────────────────────────────
+//  TEST 2: Frustum culling
+// ─────────────────────────────────────────────────────
+if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
+{
+    debug.cullState = CULL_STATE_CULLED_FRUSTUM;
+    g_DebugOutput[g_DebugOffset + objectIdx] = debug;
+    return;
+}
 
-    // ─────────────────────────────────────────────────────
-    //  TEST 3: Hi-Z occlusion culling
-    // ─────────────────────────────────────────────────────
-    float3 occlusionResult = OcclusionTestSphereDebug(obj.position, obj.radius);
-    debug.objectDepth = occlusionResult.x;
-    debug.hiZDepth = occlusionResult.y;
+// ─────────────────────────────────────────────────────
+//  TEST 3: Hi-Z occlusion culling
+// ─────────────────────────────────────────────────────
+float3 occlusionResult = OcclusionTestSphereDebug(obj.position, obj.radius);
+debug.objectDepth = occlusionResult.x;
+debug.hiZDepth = occlusionResult.y;
 
-    if (occlusionResult.z < 0.5) // Occluded
-    {
-        debug.cullState = CULL_STATE_CULLED_OCCLUSION;
-        g_DebugOutput[objectIdx] = debug;
-        return;
-    }
+if (occlusionResult.z < 0.5) // Occluded
+{
+    debug.cullState = CULL_STATE_CULLED_OCCLUSION;
+    g_DebugOutput[g_DebugOffset + objectIdx] = debug;
+    return;
+}
 
-    // ─────────────────────────────────────────────────────
-    //  PASSED ALL TESTS - Determine if occluder or just visible
-    // ─────────────────────────────────────────────────────
-    float3 delta = obj.position - g_CameraPos;
-    float distSq = dot(delta, delta);
+// ─────────────────────────────────────────────────────
+//  PASSED ALL TESTS - Determine if occluder or just visible
+// ─────────────────────────────────────────────────────
+float3 delta = obj.position - g_CameraPos;
+float distSq = dot(delta, delta);
 
-    // Objects close to camera are potential occluders (contributing to Hi-Z)
-    if (distSq < g_OccluderThreshold * g_OccluderThreshold)
-    {
-        debug.cullState = CULL_STATE_OCCLUDER;
-    }
-    else
-    {
-        debug.cullState = CULL_STATE_VISIBLE;
-    }
+// Objects close to camera are potential occluders (contributing to Hi-Z)
+if (distSq < g_OccluderThreshold * g_OccluderThreshold)
+{
+    debug.cullState = CULL_STATE_OCCLUDER;
+}
+else
+{
+    debug.cullState = CULL_STATE_VISIBLE;
+}
 
-    g_DebugOutput[objectIdx] = debug;
+g_DebugOutput[g_DebugOffset + objectIdx] = debug;
 }

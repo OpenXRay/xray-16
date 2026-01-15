@@ -125,9 +125,15 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
     framegraph::VirtualResourceHandle visibleCount;
     framegraph::VirtualResourceHandle drawArgsBuffer;
-    framegraph::VirtualResourceHandle compactDrawArgs;
-    framegraph::VirtualResourceHandle compactBatchIndices;
+    framegraph::VirtualResourceHandle staticDrawArgsBuffer;
+    framegraph::VirtualResourceHandle dynamicDrawArgsBuffer;
+    framegraph::VirtualResourceHandle staticCompactDrawArgs;
+    framegraph::VirtualResourceHandle staticCompactBatchIndices;
+    framegraph::VirtualResourceHandle dynamicCompactDrawArgs;
+    framegraph::VirtualResourceHandle dynamicCompactBatchIndices;
     u32 maxObjects;
+    u32 staticObjectCount;
+    u32 dynamicObjectCount;
 
     // Terrain-specific outputs (separate draw call)
     framegraph::VirtualResourceHandle terrainDrawArgsBuffer;
@@ -175,6 +181,9 @@ public:
     // Extracts bounding sphere data from geometry batches
     void UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
 
+    // Invalidate static GPU culling data (call on level load/unload)
+    void InvalidateStaticCullingData();
+
     // Setup GPU culling pass in FrameGraph
     // Returns handles to culled results for forward pass
     // NOTE: geometry is captured and used during execute - must remain valid
@@ -188,8 +197,10 @@ public:
         const Fmatrix& prevViewProj  // Previous frame's viewProj for temporal Hi-Z
     );
 
-    // Get number of objects uploaded this frame
+    // Get number of objects uploaded this frame (static + dynamic)
     u32 GetObjectCount() const { return m_objectCount; }
+    u32 GetStaticObjectCount() const { return m_staticSet.objectCount; }
+    u32 GetDynamicObjectCount() const { return m_dynamicSet.objectCount; }
 
     // Check if culling is enabled and ready
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
@@ -225,10 +236,7 @@ public:
     // Get mega-buffers for rendering
     nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
-    nvrhi::IBuffer* GetInstanceBuffer() const { return m_instanceBuffer.Get(); }
-
     // Get compact count buffer (contains actual visible draw count from GPU culling)
-    nvrhi::IBuffer* GetCompactCountBuffer() const { return m_compactCountBuffer.Get(); }
     bool IsCompactionEnabled() const { return m_compactEnabled; }
 
     // Upload instance data (transforms) for current frame
@@ -273,9 +281,20 @@ public:
     bool IsParticleCullingEnabled() const { return m_initialized && m_particleCullEnabled; }
     nvrhi::IBuffer* GetParticleDrawArgsBuffer() const { return m_particleDrawArgsBuffer.Get(); }
 
-    nvrhi::IBuffer* GetCompactDrawArgsBuffer() const { return m_compactDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetCompactBatchIndicesBuffer() const { return m_compactBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetCompactMaterialIDBuffer() const { return m_compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactDrawArgsBuffer() const { return m_staticSet.compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactBatchIndicesBuffer() const { return m_staticSet.compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactMaterialIDBuffer() const { return m_staticSet.compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactCountBuffer() const { return m_staticSet.compactCountBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticInstanceBuffer() const { return m_staticSet.instanceBuffer.Get(); }
+
+    nvrhi::IBuffer* GetDynamicCompactDrawArgsBuffer() const { return m_dynamicSet.compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicCompactBatchIndicesBuffer() const { return m_dynamicSet.compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicCompactMaterialIDBuffer() const { return m_dynamicSet.compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicCompactCountBuffer() const { return m_dynamicSet.compactCountBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicInstanceBuffer() const { return m_dynamicSet.instanceBuffer.Get(); }
+
+    nvrhi::IBuffer* GetStaticDrawArgsBuffer() const { return m_staticSet.drawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicDrawArgsBuffer() const { return m_dynamicSet.drawArgsBuffer.Get(); }
 
     // ───────────────────────────────────────────────────────
     //  TERRAIN-SPECIFIC BUFFERS
@@ -301,11 +320,29 @@ private:
     // Extract frustum planes from view-projection matrix
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
-    // NVRHI resources
-    nvrhi::BufferHandle m_objectBuffer;         // All objects (GPU read)
-    nvrhi::BufferHandle m_visibleIndexBuffer;   // Visible object indices (GPU write)
-    nvrhi::BufferHandle m_visibleCountBuffer;   // Atomic counter (GPU write)
-    nvrhi::BufferHandle m_drawArgsBuffer;       // Indirect draw arguments (GPU read/write)
+    struct CullSetBuffers {
+        nvrhi::BufferHandle objectBuffer;               // All objects (GPU read)
+        nvrhi::BufferHandle visibleIndexBuffer;         // Visible object indices (GPU write)
+        nvrhi::BufferHandle visibleCountBuffer;         // Atomic counter (GPU write)
+        nvrhi::BufferHandle drawArgsBuffer;             // Indirect draw arguments (GPU read/write)
+        nvrhi::BufferHandle materialIDBuffer;           // Material IDs per batch (input)
+        nvrhi::BufferHandle visibilityBuffer;           // Visibility buffer (1 uint per object)
+        nvrhi::BufferHandle compactDrawArgsBuffer;      // Compacted draw args (output)
+        nvrhi::BufferHandle compactBatchIndicesBuffer;  // Compacted batch indices (output)
+        nvrhi::BufferHandle compactMaterialIDBuffer;    // Compacted material IDs (output)
+        nvrhi::BufferHandle compactCountBuffer;         // Compacted visible count (output)
+        nvrhi::BufferHandle instanceBuffer;             // Instance data buffer (GPUInstanceData)
+        u32 objectCount = 0;
+        u32 maxObjects = 0;
+        bool drawArgsUploaded = false;
+        bool objectsUploaded = false;
+    };
+
+    // Static/dynamic culling sets
+    CullSetBuffers m_staticSet;
+    CullSetBuffers m_dynamicSet;
+
+    // Shared constant buffer
     nvrhi::BufferHandle m_cullParamsCB;         // Constant buffer
 
     // Compute pipelines
@@ -317,22 +354,13 @@ private:
     nvrhi::BindingLayoutHandle m_compactLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
-    nvrhi::BufferHandle m_compactDrawArgsBuffer;
-    nvrhi::BufferHandle m_compactBatchIndicesBuffer;
-    nvrhi::BufferHandle m_compactCountBuffer;
     nvrhi::BufferHandle m_compactParamsCB;
 
-    // Material ID buffers for bindless rendering
-    nvrhi::BufferHandle m_materialIDBuffer;          // Material ID per batch (input)
-    nvrhi::BufferHandle m_compactMaterialIDBuffer;   // Material ID per visible batch (output)
-
-    // Visibility buffer (GPU-written per frame, avoids re-uploading draw args)
-    // 1 uint per object: 0 = culled, 1 = visible
-    nvrhi::BufferHandle m_visibilityBuffer;
-    bool m_staticDrawArgsUploaded = false;         // True after first upload (regular geometry)
     bool m_staticTerrainDrawArgsUploaded = false;  // True after first upload (terrain)
 
     bool m_compactEnabled = false;
+
+    bool m_staticDataCached = false;
 
     // ───────────────────────────────────────────────────────
     //  TERRAIN-SPECIFIC BUFFERS
@@ -391,9 +419,15 @@ private:
     bool m_computeEnabled = false;
 
     // CPU-side object data (for upload)
-    xr_vector<GPUObjectData> m_objectData;
-    xr_vector<IndirectDrawArgs> m_drawArgsData;  // Draw arguments (geometry info)
-    xr_vector<u32> m_materialIDData;             // Material IDs per batch (for bindless)
+    xr_vector<GPUObjectData> m_staticObjectData;
+    xr_vector<IndirectDrawArgs> m_staticDrawArgsData;  // Draw arguments (geometry info)
+    xr_vector<u32> m_staticMaterialIDData;             // Material IDs per batch (for bindless)
+    xr_vector<GPUInstanceData> m_staticInstanceData;
+
+    xr_vector<GPUObjectData> m_dynamicObjectData;
+    xr_vector<IndirectDrawArgs> m_dynamicDrawArgsData;  // Draw arguments (geometry info)
+    xr_vector<u32> m_dynamicMaterialIDData;             // Material IDs per batch (for bindless)
+    xr_vector<GPUInstanceData> m_dynamicInstanceData;
 
     // Terrain-specific CPU data (separate from regular geometry)
     u32 m_terrainObjectCount = 0;
@@ -408,12 +442,10 @@ private:
     // ───────────────────────────────────────────────────────
     nvrhi::BufferHandle m_megaVertexBuffer;     // Unified vertex buffer (UnifiedVertex format)
     nvrhi::BufferHandle m_megaIndexBuffer;      // Unified index buffer (32-bit indices)
-    nvrhi::BufferHandle m_instanceBuffer;       // Per-instance transforms + material IDs
 
     // CPU-side staging data (during level load)
     xr_vector<bindless::UnifiedVertex> m_megaVertices;
     xr_vector<u32> m_megaIndices;
-    xr_vector<GPUInstanceData> m_instanceData;
 
     // Tracking
     u32 m_totalVertexCount = 0;
@@ -447,9 +479,6 @@ private:
     xr_vector<IBPoolInfo> m_ibPoolsAlt;
 
 public:
-    // Get draw args buffer for forward pass (indirect draw)
-    nvrhi::IBuffer* GetDrawArgsBuffer() const { return m_drawArgsBuffer.Get(); }
-
     // ───────────────────────────────────────────────────────
     //  VB POOL REGISTRATION API
     // ───────────────────────────────────────────────────────

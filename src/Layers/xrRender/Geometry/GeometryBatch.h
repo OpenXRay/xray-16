@@ -77,6 +77,9 @@ struct GeometryBatch {
     // Visibility/culling
     bool isVisible = true;
 
+    // Static vs dynamic classification (used for GPU culling uploads)
+    bool isStatic = false;
+
     // Skinned mesh flag - determines which pipeline to use
     // Skinned meshes use bindless_skinned.vs/ps with per-draw bone matrices
     bool isSkinned = false;
