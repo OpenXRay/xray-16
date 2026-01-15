@@ -74,7 +74,16 @@ GPUCullingManager::GPUCullingManager()
     , m_maxParticles(MAX_CULLING_PARTICLES)
     , m_particleCullEnabled(false)
 {
-    m_objectData.reserve(MAX_CULLING_OBJECTS);
+    m_staticObjectData.reserve(MAX_CULLING_OBJECTS);
+    m_staticDrawArgsData.reserve(MAX_CULLING_OBJECTS);
+    m_staticMaterialIDData.reserve(MAX_CULLING_OBJECTS);
+    m_staticInstanceData.reserve(MAX_CULLING_OBJECTS);
+
+    m_dynamicObjectData.reserve(MAX_CULLING_OBJECTS);
+    m_dynamicDrawArgsData.reserve(MAX_CULLING_OBJECTS);
+    m_dynamicMaterialIDData.reserve(MAX_CULLING_OBJECTS);
+    m_dynamicInstanceData.reserve(MAX_CULLING_OBJECTS);
+
     m_particleData.reserve(MAX_CULLING_PARTICLES);
 }
 
@@ -121,85 +130,80 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
 {
     nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_Objects";
-        desc.byteSize = m_maxObjects * sizeof(GPUObjectData);
-        desc.structStride = sizeof(GPUObjectData);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
+    auto createCullSetBuffers = [&](CullSetBuffers& set, bool isStatic) {
+        set.maxObjects = m_maxObjects;
+        auto pickName = [isStatic](const char* staticName, const char* dynamicName) {
+            return isStatic ? staticName : dynamicName;
+        };
 
-        m_objectBuffer = nvDevice->createBuffer(desc);
-        if (!m_objectBuffer) {
-            Msg("! [GPUCulling] Failed to create object buffer");
-            m_computeEnabled = false;
+        {
+            nvrhi::BufferDesc desc;
+            desc.debugName = pickName("GPUCull_Static_Objects", "GPUCull_Dynamic_Objects");
+            desc.byteSize = m_maxObjects * sizeof(GPUObjectData);
+            desc.structStride = sizeof(GPUObjectData);
+            desc.initialState = nvrhi::ResourceStates::ShaderResource;
+            desc.keepInitialState = true;
+
+            set.objectBuffer = nvDevice->createBuffer(desc);
+            R_ASSERT2(set.objectBuffer, "Failed to create object buffer");
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_VisibleIndices";
-        desc.byteSize = m_maxObjects * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+        {
+            nvrhi::BufferDesc desc;
+            desc.debugName = pickName("GPUCull_Static_VisibleIndices", "GPUCull_Dynamic_VisibleIndices");
+            desc.byteSize = m_maxObjects * sizeof(u32);
+            desc.structStride = sizeof(u32);
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
 
-        m_visibleIndexBuffer = nvDevice->createBuffer(desc);
-        if (!m_visibleIndexBuffer) {
-            Msg("! [GPUCulling] Failed to create visible index buffer");
-            m_computeEnabled = false;
+            set.visibleIndexBuffer = nvDevice->createBuffer(desc);
+            R_ASSERT2(set.visibleIndexBuffer, "Failed to create visible index buffer");
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_VisibleCount";
-        desc.byteSize = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+        {
+            nvrhi::BufferDesc desc;
+            desc.debugName = pickName("GPUCull_Static_VisibleCount", "GPUCull_Dynamic_VisibleCount");
+            desc.byteSize = sizeof(u32);
+            desc.canHaveUAVs = true;
+            desc.canHaveRawViews = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
 
-        m_visibleCountBuffer = nvDevice->createBuffer(desc);
-        if (!m_visibleCountBuffer) {
-            Msg("! [GPUCulling] Failed to create visible count buffer");
-            m_computeEnabled = false;
+            set.visibleCountBuffer = nvDevice->createBuffer(desc);
+            R_ASSERT2(set.visibleCountBuffer, "Failed to create visible count buffer");
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_DrawArgs";
-        desc.byteSize = m_maxObjects * sizeof(IndirectDrawArgs);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.isDrawIndirectArgs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+        {
+            nvrhi::BufferDesc desc;
+            desc.debugName = pickName("GPUCull_Static_DrawArgs", "GPUCull_Dynamic_DrawArgs");
+            desc.byteSize = m_maxObjects * sizeof(IndirectDrawArgs);
+            desc.canHaveUAVs = true;
+            desc.canHaveRawViews = true;
+            desc.isDrawIndirectArgs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
 
-        m_drawArgsBuffer = nvDevice->createBuffer(desc);
-        if (!m_drawArgsBuffer) {
-            Msg("! [GPUCulling] Failed to create draw args buffer");
-            m_computeEnabled = false;
+            set.drawArgsBuffer = nvDevice->createBuffer(desc);
+            R_ASSERT2(set.drawArgsBuffer, "Failed to create draw args buffer");
         }
-    }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_Visibility";
-        desc.byteSize = m_maxObjects * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+        {
+            nvrhi::BufferDesc desc;
+            desc.debugName = pickName("GPUCull_Static_Visibility", "GPUCull_Dynamic_Visibility");
+            desc.byteSize = m_maxObjects * sizeof(u32);
+            desc.structStride = sizeof(u32);
+            desc.canHaveUAVs = true;
+            desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+            desc.keepInitialState = true;
 
-        m_visibilityBuffer = nvDevice->createBuffer(desc);
-        if (!m_visibilityBuffer) {
-            Msg("! [GPUCulling] Failed to create visibility buffer");
-            m_computeEnabled = false;
+            set.visibilityBuffer = nvDevice->createBuffer(desc);
+            R_ASSERT2(set.visibilityBuffer, "Failed to create visibility buffer");
         }
-    }
+    };
+
+    createCullSetBuffers(m_staticSet, true);
+    createCullSetBuffers(m_dynamicSet, false);
 
     {
         nvrhi::BufferDesc desc;
@@ -382,83 +386,78 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
     }
 
     {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_CompactDrawArgs";
-        desc.byteSize = m_maxObjects * sizeof(IndirectDrawArgs);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.isDrawIndirectArgs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+        auto createCompactionBuffers = [&](CullSetBuffers& set, bool isStatic) {
+            auto pickName = [isStatic](const char* staticName, const char* dynamicName) {
+                return isStatic ? staticName : dynamicName;
+            };
+            {
+                nvrhi::BufferDesc desc;
+                desc.debugName = pickName("GPUCull_Static_CompactDrawArgs", "GPUCull_Dynamic_CompactDrawArgs");
+                desc.byteSize = m_maxObjects * sizeof(IndirectDrawArgs);
+                desc.canHaveUAVs = true;
+                desc.canHaveRawViews = true;
+                desc.isDrawIndirectArgs = true;
+                desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                desc.keepInitialState = true;
 
-        m_compactDrawArgsBuffer = nvDevice->createBuffer(desc);
-        if (!m_compactDrawArgsBuffer) {
-            Msg("! [GPUCulling] Failed to create compact draw args buffer");
-            return;
-        }
-    }
+                set.compactDrawArgsBuffer = nvDevice->createBuffer(desc);
+                R_ASSERT2(set.compactDrawArgsBuffer, "Failed to create compact draw args buffer");
+            }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_CompactBatchIndices";
-        desc.byteSize = m_maxObjects * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+            {
+                nvrhi::BufferDesc desc;
+                desc.debugName = pickName("GPUCull_Static_CompactBatchIndices", "GPUCull_Dynamic_CompactBatchIndices");
+                desc.byteSize = m_maxObjects * sizeof(u32);
+                desc.structStride = sizeof(u32);
+                desc.canHaveUAVs = true;
+                desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                desc.keepInitialState = true;
 
-        m_compactBatchIndicesBuffer = nvDevice->createBuffer(desc);
-        if (!m_compactBatchIndicesBuffer) {
-            Msg("! [GPUCulling] Failed to create compact batch indices buffer");
-            return;
-        }
-    }
+                set.compactBatchIndicesBuffer = nvDevice->createBuffer(desc);
+                R_ASSERT2(set.compactBatchIndicesBuffer, "Failed to create compact batch indices buffer");
+            }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_MaterialIDs";
-        desc.byteSize = m_maxObjects * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.initialState = nvrhi::ResourceStates::ShaderResource;
-        desc.keepInitialState = true;
+            {
+                nvrhi::BufferDesc desc;
+                desc.debugName = pickName("GPUCull_Static_MaterialIDs", "GPUCull_Dynamic_MaterialIDs");
+                desc.byteSize = m_maxObjects * sizeof(u32);
+                desc.structStride = sizeof(u32);
+                desc.initialState = nvrhi::ResourceStates::ShaderResource;
+                desc.keepInitialState = true;
 
-        m_materialIDBuffer = nvDevice->createBuffer(desc);
-        if (!m_materialIDBuffer) {
-            Msg("! [GPUCulling] Failed to create material ID buffer");
-            return;
-        }
-    }
+                set.materialIDBuffer = nvDevice->createBuffer(desc);
+                R_ASSERT2(set.materialIDBuffer, "Failed to create material ID buffer");
+            }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_CompactMaterialIDs";
-        desc.byteSize = m_maxObjects * sizeof(u32);
-        desc.structStride = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+            {
+                nvrhi::BufferDesc desc;
+                desc.debugName = pickName("GPUCull_Static_CompactMaterialIDs", "GPUCull_Dynamic_CompactMaterialIDs");
+                desc.byteSize = m_maxObjects * sizeof(u32);
+                desc.structStride = sizeof(u32);
+                desc.canHaveUAVs = true;
+                desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                desc.keepInitialState = true;
 
-        m_compactMaterialIDBuffer = nvDevice->createBuffer(desc);
-        if (!m_compactMaterialIDBuffer) {
-            Msg("! [GPUCulling] Failed to create compact material ID buffer");
-            return;
-        }
-    }
+                set.compactMaterialIDBuffer = nvDevice->createBuffer(desc);
+                R_ASSERT2(set.compactMaterialIDBuffer, "Failed to create compact material ID buffer");
+            }
 
-    {
-        nvrhi::BufferDesc desc;
-        desc.debugName = "GPUCull_CompactCount";
-        desc.byteSize = sizeof(u32);
-        desc.canHaveUAVs = true;
-        desc.canHaveRawViews = true;
-        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-        desc.keepInitialState = true;
+            {
+                nvrhi::BufferDesc desc;
+                desc.debugName = pickName("GPUCull_Static_CompactCount", "GPUCull_Dynamic_CompactCount");
+                desc.byteSize = sizeof(u32);
+                desc.canHaveUAVs = true;
+                desc.canHaveRawViews = true;
+                desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+                desc.keepInitialState = true;
 
-        m_compactCountBuffer = nvDevice->createBuffer(desc);
-        if (!m_compactCountBuffer) {
-            Msg("! [GPUCulling] Failed to create compact count buffer");
-            return;
-        }
+                set.compactCountBuffer = nvDevice->createBuffer(desc);
+                R_ASSERT2(set.compactCountBuffer, "Failed to create compact count buffer");
+            }
+        };
+
+        createCompactionBuffers(m_staticSet, true);
+        createCompactionBuffers(m_dynamicSet, false);
     }
 
     {
@@ -593,22 +592,46 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
 
 void GPUCullingManager::Shutdown()
 {
-    m_objectBuffer = nullptr;
-    m_visibleIndexBuffer = nullptr;
-    m_visibleCountBuffer = nullptr;
+    m_staticSet.objectBuffer = nullptr;
+    m_staticSet.visibleIndexBuffer = nullptr;
+    m_staticSet.visibleCountBuffer = nullptr;
+    m_staticSet.drawArgsBuffer = nullptr;
+    m_staticSet.materialIDBuffer = nullptr;
+    m_staticSet.visibilityBuffer = nullptr;
+    m_staticSet.compactDrawArgsBuffer = nullptr;
+    m_staticSet.compactBatchIndicesBuffer = nullptr;
+    m_staticSet.compactMaterialIDBuffer = nullptr;
+    m_staticSet.compactCountBuffer = nullptr;
+    m_staticSet.instanceBuffer = nullptr;
+    m_staticSet.objectCount = 0;
+    m_staticSet.maxObjects = 0;
+    m_staticSet.drawArgsUploaded = false;
+    m_staticSet.objectsUploaded = false;
+
+    m_dynamicSet.objectBuffer = nullptr;
+    m_dynamicSet.visibleIndexBuffer = nullptr;
+    m_dynamicSet.visibleCountBuffer = nullptr;
+    m_dynamicSet.drawArgsBuffer = nullptr;
+    m_dynamicSet.materialIDBuffer = nullptr;
+    m_dynamicSet.visibilityBuffer = nullptr;
+    m_dynamicSet.compactDrawArgsBuffer = nullptr;
+    m_dynamicSet.compactBatchIndicesBuffer = nullptr;
+    m_dynamicSet.compactMaterialIDBuffer = nullptr;
+    m_dynamicSet.compactCountBuffer = nullptr;
+    m_dynamicSet.instanceBuffer = nullptr;
+    m_dynamicSet.objectCount = 0;
+    m_dynamicSet.maxObjects = 0;
+    m_dynamicSet.drawArgsUploaded = false;
+    m_dynamicSet.objectsUploaded = false;
+
     m_cullParamsCB = nullptr;
     m_cullPipeline = nullptr;
     m_cullLayout = nullptr;
     m_pointSampler = nullptr;
 
-    m_compactDrawArgsBuffer = nullptr;
-    m_compactBatchIndicesBuffer = nullptr;
-    m_compactCountBuffer = nullptr;
     m_compactParamsCB = nullptr;
     m_compactPipeline = nullptr;
     m_compactLayout = nullptr;
-    m_materialIDBuffer = nullptr;
-    m_compactMaterialIDBuffer = nullptr;
 
     m_debugBuffer = nullptr;
     m_debugComputeParamsCB = nullptr;
@@ -629,10 +652,16 @@ void GPUCullingManager::Shutdown()
 
     m_megaVertexBuffer = nullptr;
     m_megaIndexBuffer = nullptr;
-    m_instanceBuffer = nullptr;
     m_megaVertices.clear();
     m_megaIndices.clear();
-    m_instanceData.clear();
+    m_staticInstanceData.clear();
+    m_dynamicInstanceData.clear();
+    m_staticObjectData.clear();
+    m_staticDrawArgsData.clear();
+    m_staticMaterialIDData.clear();
+    m_dynamicObjectData.clear();
+    m_dynamicDrawArgsData.clear();
+    m_dynamicMaterialIDData.clear();
     m_totalVertexCount = 0;
     m_totalIndexCount = 0;
     m_maxMegaVertices = 0;
@@ -660,9 +689,8 @@ void GPUCullingManager::Shutdown()
     m_terrainInstanceData.clear();
     m_terrainObjectCount = 0;
 
-    m_visibilityBuffer = nullptr;
-    m_staticDrawArgsUploaded = false;
     m_staticTerrainDrawArgsUploaded = false;
+    m_staticDataCached = false;
 
     m_initialized = false;
     m_computeEnabled = false;
@@ -680,15 +708,37 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     const auto& batches = geometry->GetBatches();
     u32 totalBatches = static_cast<u32>(batches.size());
 
-    if (totalBatches == 0)
+    if (totalBatches == 0) {
+        m_staticSet.objectCount = 0;
+        m_dynamicSet.objectCount = 0;
+        m_objectCount = 0;
         return;
+    }
 
-    m_objectData.clear();
-    m_objectData.reserve(totalBatches);
-    m_drawArgsData.clear();
-    m_drawArgsData.reserve(totalBatches);
-    m_materialIDData.clear();
-    m_materialIDData.reserve(totalBatches);
+    R_ASSERT2(m_staticSet.objectBuffer && m_staticSet.drawArgsBuffer && m_staticSet.visibilityBuffer,
+        "Static GPU culling buffers not initialized");
+    R_ASSERT2(m_dynamicSet.objectBuffer && m_dynamicSet.drawArgsBuffer && m_dynamicSet.visibilityBuffer,
+        "Dynamic GPU culling buffers not initialized");
+
+    if (!m_staticDataCached) {
+        m_staticObjectData.clear();
+        m_staticObjectData.reserve(totalBatches);
+        m_staticDrawArgsData.clear();
+        m_staticDrawArgsData.reserve(totalBatches);
+        m_staticMaterialIDData.clear();
+        m_staticMaterialIDData.reserve(totalBatches);
+        m_staticInstanceData.clear();
+        m_staticInstanceData.reserve(totalBatches);
+    }
+
+    m_dynamicObjectData.clear();
+    m_dynamicObjectData.reserve(totalBatches);
+    m_dynamicDrawArgsData.clear();
+    m_dynamicDrawArgsData.reserve(totalBatches);
+    m_dynamicMaterialIDData.clear();
+    m_dynamicMaterialIDData.reserve(totalBatches);
+    m_dynamicInstanceData.clear();
+    m_dynamicInstanceData.reserve(totalBatches);
 
     m_terrainObjectData.clear();
     m_terrainObjectData.reserve(totalBatches / 4);
@@ -698,6 +748,53 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     m_terrainMaterialIDData.reserve(totalBatches / 4);
     m_terrainInstanceData.clear();
     m_terrainInstanceData.reserve(totalBatches / 4);
+
+    auto appendBatch = [&](const GeometryBatch& batch,
+                           xr_vector<GPUObjectData>& objectData,
+                           xr_vector<IndirectDrawArgs>& drawArgsData,
+                           xr_vector<u32>& materialIDData,
+                           xr_vector<GPUInstanceData>& instanceData) {
+        GPUObjectData obj;
+        obj.position = batch.worldBoundsCenter;
+        obj.radius = batch.worldBoundsRadius;
+        obj.batchIndex = static_cast<u32>(objectData.size());
+
+        obj.flags = 0;
+        if (batch.IsOpaque())
+            obj.flags |= GPU_OBJECT_OPAQUE;
+        if (batch.IsAlphaTested())
+            obj.flags |= GPU_OBJECT_ALPHA_TEST;
+        if (batch.IsStrictB2F())
+            obj.flags |= GPU_OBJECT_TRANSPARENT;
+
+        obj.pad0 = 0.0f;
+        obj.pad1 = 0.0f;
+
+        objectData.push_back(obj);
+
+        IndirectDrawArgs args;
+        args.indexCountPerInstance = batch.indexCount;
+        args.instanceCount = 1;
+        if (batch.megaBufferAlloc.valid) {
+            args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
+            args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
+        } else {
+            args.startIndexLocation = batch.startIndex;
+            args.baseVertexLocation = batch.baseVertex;
+        }
+        args.startInstanceLocation = 0;
+        drawArgsData.push_back(args);
+
+        materialIDData.push_back(batch.bindlessMaterialID);
+
+        GPUInstanceData inst;
+        inst.world.transpose(batch.worldMatrix);
+        inst.materialID = batch.bindlessMaterialID;
+        inst.flags = obj.flags;
+        inst.pad0 = 0.0f;
+        inst.pad1 = 0.0f;
+        instanceData.push_back(inst);
+    };
 
     for (u32 i = 0; i < totalBatches; i++) {
         const auto& batch = batches[i];
@@ -740,47 +837,35 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
             continue;
         }
 
-        GPUObjectData obj;
-
-        obj.position = batch.worldBoundsCenter;
-        obj.radius = batch.worldBoundsRadius;
-
-        obj.batchIndex = static_cast<u32>(m_objectData.size());
-
-        obj.flags = 0;
-        if (batch.IsOpaque())
-            obj.flags |= GPU_OBJECT_OPAQUE;
-        if (batch.IsAlphaTested())
-            obj.flags |= GPU_OBJECT_ALPHA_TEST;
-        if (batch.IsStrictB2F())
-            obj.flags |= GPU_OBJECT_TRANSPARENT;
-
-        obj.pad0 = 0.0f;
-        obj.pad1 = 0.0f;
-
-        m_objectData.push_back(obj);
-
-        IndirectDrawArgs args;
-        args.indexCountPerInstance = batch.indexCount;
-        args.instanceCount = 0;
-        if (batch.megaBufferAlloc.valid) {
-            args.startIndexLocation = batch.megaBufferAlloc.indexOffset;
-            args.baseVertexLocation = static_cast<s32>(batch.megaBufferAlloc.vertexOffset);
+        if (batch.isStatic) {
+            if (!m_staticDataCached) {
+                appendBatch(batch, m_staticObjectData, m_staticDrawArgsData, m_staticMaterialIDData, m_staticInstanceData);
+            }
         } else {
-            args.startIndexLocation = batch.startIndex;
-            args.baseVertexLocation = batch.baseVertex;
+            appendBatch(batch, m_dynamicObjectData, m_dynamicDrawArgsData, m_dynamicMaterialIDData, m_dynamicInstanceData);
         }
-        args.startInstanceLocation = 0;
-
-        m_drawArgsData.push_back(args);
-
-        m_materialIDData.push_back(batch.bindlessMaterialID);
     }
 
-    m_objectCount = std::min(static_cast<u32>(m_objectData.size()), m_maxObjects);
+    u32 staticCount = std::min(static_cast<u32>(m_staticObjectData.size()), m_maxObjects);
+    if (m_staticObjectData.size() > staticCount) {
+        m_staticObjectData.resize(staticCount);
+        m_staticDrawArgsData.resize(staticCount);
+        m_staticMaterialIDData.resize(staticCount);
+        m_staticInstanceData.resize(staticCount);
+    }
 
-    if (m_objectCount == 0)
-        return;
+    u32 dynamicCapacity = (staticCount < m_maxObjects) ? (m_maxObjects - staticCount) : 0;
+    u32 dynamicCount = std::min(static_cast<u32>(m_dynamicObjectData.size()), dynamicCapacity);
+    if (m_dynamicObjectData.size() > dynamicCount) {
+        m_dynamicObjectData.resize(dynamicCount);
+        m_dynamicDrawArgsData.resize(dynamicCount);
+        m_dynamicMaterialIDData.resize(dynamicCount);
+        m_dynamicInstanceData.resize(dynamicCount);
+    }
+
+    m_staticSet.objectCount = staticCount;
+    m_dynamicSet.objectCount = dynamicCount;
+    m_objectCount = staticCount + dynamicCount;
 
     nvrhi::ICommandList* cmdList = ctx->GetCommandList();
 
@@ -808,20 +893,62 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         m_megaIndices.shrink_to_fit();
     }
 
-    cmdList->writeBuffer(m_objectBuffer, m_objectData.data(), m_objectCount * sizeof(GPUObjectData));
+    if (m_staticSet.objectCount > 0 && !m_staticSet.objectsUploaded) {
+        R_ASSERT2(m_staticObjectData.size() >= m_staticSet.objectCount, "Static object data smaller than count");
+        R_ASSERT2(m_staticDrawArgsData.size() >= m_staticSet.objectCount, "Static draw args data smaller than count");
+        R_ASSERT2(m_staticMaterialIDData.size() >= m_staticSet.objectCount, "Static material ID data smaller than count");
+        R_ASSERT2(m_staticInstanceData.size() >= m_staticSet.objectCount, "Static instance data smaller than count");
 
-    if (!m_staticDrawArgsUploaded && m_drawArgsBuffer) {
-        for (auto& args : m_drawArgsData) {
-            args.instanceCount = 1;
+        cmdList->writeBuffer(m_staticSet.objectBuffer,
+            m_staticObjectData.data(),
+            m_staticSet.objectCount * sizeof(GPUObjectData));
+
+        cmdList->writeBuffer(m_staticSet.drawArgsBuffer,
+            m_staticDrawArgsData.data(),
+            m_staticSet.objectCount * sizeof(IndirectDrawArgs));
+
+        if (m_compactEnabled && m_staticSet.materialIDBuffer) {
+            cmdList->writeBuffer(m_staticSet.materialIDBuffer,
+                m_staticMaterialIDData.data(),
+                m_staticSet.objectCount * sizeof(u32));
         }
-        cmdList->writeBuffer(m_drawArgsBuffer, m_drawArgsData.data(), m_objectCount * sizeof(IndirectDrawArgs));
 
-        if (m_compactEnabled && m_materialIDBuffer) {
-            cmdList->writeBuffer(m_materialIDBuffer, m_materialIDData.data(), m_objectCount * sizeof(u32));
+        R_ASSERT2(m_staticSet.instanceBuffer, "Static instance buffer not initialized");
+        cmdList->writeBuffer(m_staticSet.instanceBuffer,
+            m_staticInstanceData.data(),
+            m_staticSet.objectCount * sizeof(GPUInstanceData));
+
+        m_staticSet.objectsUploaded = true;
+        m_staticSet.drawArgsUploaded = true;
+        m_staticDataCached = true;
+
+        Msg("* [GPUCulling] Static object data uploaded: %u objects", m_staticSet.objectCount);
+    }
+
+    if (m_dynamicSet.objectCount > 0) {
+        R_ASSERT2(m_dynamicObjectData.size() >= m_dynamicSet.objectCount, "Dynamic object data smaller than count");
+        R_ASSERT2(m_dynamicDrawArgsData.size() >= m_dynamicSet.objectCount, "Dynamic draw args data smaller than count");
+        R_ASSERT2(m_dynamicMaterialIDData.size() >= m_dynamicSet.objectCount, "Dynamic material ID data smaller than count");
+        R_ASSERT2(m_dynamicInstanceData.size() >= m_dynamicSet.objectCount, "Dynamic instance data smaller than count");
+
+        cmdList->writeBuffer(m_dynamicSet.objectBuffer,
+            m_dynamicObjectData.data(),
+            m_dynamicSet.objectCount * sizeof(GPUObjectData));
+
+        cmdList->writeBuffer(m_dynamicSet.drawArgsBuffer,
+            m_dynamicDrawArgsData.data(),
+            m_dynamicSet.objectCount * sizeof(IndirectDrawArgs));
+
+        if (m_compactEnabled && m_dynamicSet.materialIDBuffer) {
+            cmdList->writeBuffer(m_dynamicSet.materialIDBuffer,
+                m_dynamicMaterialIDData.data(),
+                m_dynamicSet.objectCount * sizeof(u32));
         }
 
-        m_staticDrawArgsUploaded = true;
-        Msg("* [GPUCulling] Static draw args uploaded: %u objects (visibility buffer mode)", m_objectCount);
+        R_ASSERT2(m_dynamicSet.instanceBuffer, "Dynamic instance buffer not initialized");
+        cmdList->writeBuffer(m_dynamicSet.instanceBuffer,
+            m_dynamicInstanceData.data(),
+            m_dynamicSet.objectCount * sizeof(GPUInstanceData));
     }
 
     m_terrainObjectCount = std::min(static_cast<u32>(m_terrainObjectData.size()), m_maxTerrainObjects);
@@ -892,7 +1019,21 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
         }
     }
 
-    UploadInstanceData(ctx, geometry);
+}
+
+void GPUCullingManager::InvalidateStaticCullingData()
+{
+    m_staticDataCached = false;
+    m_staticSet.objectsUploaded = false;
+    m_staticSet.drawArgsUploaded = false;
+    m_staticSet.objectCount = 0;
+
+    m_staticObjectData.clear();
+    m_staticDrawArgsData.clear();
+    m_staticMaterialIDData.clear();
+    m_staticInstanceData.clear();
+
+    Msg("* [GPUCulling] Static culling data invalidated");
 }
 
 void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
@@ -927,8 +1068,14 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     output.visibleIndices = VirtualResourceHandle();
     output.visibleCount = VirtualResourceHandle();
     output.drawArgsBuffer = VirtualResourceHandle();
-    output.compactDrawArgs = VirtualResourceHandle();
-    output.compactBatchIndices = VirtualResourceHandle();
+    output.staticDrawArgsBuffer = VirtualResourceHandle();
+    output.dynamicDrawArgsBuffer = VirtualResourceHandle();
+    output.staticCompactDrawArgs = VirtualResourceHandle();
+    output.staticCompactBatchIndices = VirtualResourceHandle();
+    output.dynamicCompactDrawArgs = VirtualResourceHandle();
+    output.dynamicCompactBatchIndices = VirtualResourceHandle();
+    output.staticObjectCount = 0;
+    output.dynamicObjectCount = 0;
     output.terrainDrawArgsBuffer = VirtualResourceHandle();
     output.terrainCompactDrawArgs = VirtualResourceHandle();
     output.terrainCompactBatchIndices = VirtualResourceHandle();
@@ -940,21 +1087,18 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         return output;
     }
 
-    const auto& batches = geometry->GetBatches();
-    m_objectCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
-
-    if (m_objectCount == 0) {
+    if (!geometry || geometry->GetBatches().empty()) {
         return output;
     }
 
     struct GPUCullPassData {
         VirtualResourceHandle hizPyramid;
-        VirtualResourceHandle drawArgsBuffer;
+        VirtualResourceHandle staticDrawArgsBuffer;
+        VirtualResourceHandle dynamicDrawArgsBuffer;
 
         GPUCullingManager* manager;
         const GeometryCollector* geometry;
         Fmatrix prevViewProj;
-        u32 objectCount;
         u32 hizWidth;
         u32 hizHeight;
         u32 hizMipLevels;
@@ -968,25 +1112,26 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     drawArgsDesc.isUAV = true;
     drawArgsDesc.isTransient = false;
 
-    VirtualResourceHandle drawArgsHandle = fg.ImportBuffer("gpu_cull_drawargs", m_drawArgsBuffer, drawArgsDesc);
+    VirtualResourceHandle staticDrawArgsHandle = fg.ImportBuffer("gpu_cull_static_drawargs", m_staticSet.drawArgsBuffer, drawArgsDesc);
+    VirtualResourceHandle dynamicDrawArgsHandle = fg.ImportBuffer("gpu_cull_dynamic_drawargs", m_dynamicSet.drawArgsBuffer, drawArgsDesc);
 
     auto& passData = fg.addCallbackPass<GPUCullPassData>(
         "GPU Culling",
 
-        [&, hizWidth, hizHeight, hizMipLevels, drawArgsHandle, geometry, prevViewProj](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
+        [&, hizWidth, hizHeight, hizMipLevels, staticDrawArgsHandle, dynamicDrawArgsHandle, geometry, prevViewProj](FrameGraph& builder, PassHandle passHandle, GPUCullPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.manager = this;
             data.geometry = geometry;
             data.prevViewProj = prevViewProj;
-            data.objectCount = m_objectCount;
             data.hizWidth = hizWidth;
             data.hizHeight = hizHeight;
             data.hizMipLevels = hizMipLevels;
 
             data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
 
-            data.drawArgsBuffer = passBuilder.write(drawArgsHandle, ResourceState::UnorderedAccess);
+            data.staticDrawArgsBuffer = passBuilder.write(staticDrawArgsHandle, ResourceState::UnorderedAccess);
+            data.dynamicDrawArgsBuffer = passBuilder.write(dynamicDrawArgsHandle, ResourceState::UnorderedAccess);
         },
 
         [](const GPUCullPassData& data,
@@ -994,7 +1139,7 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
            ng::RenderContext* ctx) {
 
             GPUCullingManager* mgr = data.manager;
-            if (!mgr->m_computeEnabled || data.objectCount == 0)
+            if (!mgr->m_computeEnabled)
                 return;
 
             nvrhi::ICommandList* cmdList = ctx->GetCommandList();
@@ -1009,92 +1154,104 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 return;
             }
 
-            u32 zero = 0;
-            cmdList->writeBuffer(mgr->m_visibleCountBuffer, &zero, sizeof(u32));
+            auto dispatchCullSet = [&](CullSetBuffers& set) {
+                if (set.objectCount == 0)
+                    return;
 
-            cmdList->clearBufferUInt(mgr->m_visibilityBuffer, 0);
+                R_ASSERT2(set.objectBuffer && set.visibleIndexBuffer && set.visibleCountBuffer && set.visibilityBuffer,
+                    "Cull set buffers not initialized");
 
-            CullParamsCB cb;
-            cb.viewProj.transpose(Device.mFullTransform);
-            cb.prevViewProj.transpose(data.prevViewProj);
-            cb.cameraPos = Device.vCameraPosition;
-            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
-            cb.maxDistanceSq = farPlane * farPlane;
-            cb.objectCount = data.objectCount;
-            cb.hizWidth = data.hizWidth;
-            cb.hizHeight = data.hizHeight;
-            cb.hizMipLevels = data.hizMipLevels;
+                u32 zero = 0;
+                cmdList->writeBuffer(set.visibleCountBuffer, &zero, sizeof(u32));
 
-            mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+                cmdList->clearBufferUInt(set.visibilityBuffer, 0);
 
-            cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
+                CullParamsCB cb;
+                cb.viewProj.transpose(Device.mFullTransform);
+                cb.prevViewProj.transpose(data.prevViewProj);
+                cb.cameraPos = Device.vCameraPosition;
+                float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
+                cb.maxDistanceSq = farPlane * farPlane;
+                cb.objectCount = set.objectCount;
+                cb.hizWidth = data.hizWidth;
+                cb.hizHeight = data.hizHeight;
+                cb.hizMipLevels = data.hizMipLevels;
 
-            nvrhi::BindingSetDesc bindDesc;
-            bindDesc.bindings = {
-                nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
-                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_objectBuffer),
-                nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
-                nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_visibleIndexBuffer),
-                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_visibleCountBuffer),
-                nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_visibilityBuffer)
-            };
+                mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
 
-            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
-            if (!bindingSet) {
-                Msg("! [GPUCulling] Failed to create binding set");
-                return;
-            }
+                cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
 
-            nvrhi::ComputeState state;
-            state.pipeline = mgr->m_cullPipeline;
-            state.bindings = { bindingSet };
-            cmdList->setComputeState(state);
-
-            u32 groupCount = (data.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
-            cmdList->dispatch(groupCount, 1, 1);
-
-            if (mgr->m_compactEnabled) {
-                cmdList->setBufferState(mgr->m_drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
-
-                u32 zeroCount = 0;
-                cmdList->writeBuffer(mgr->m_compactCountBuffer, &zeroCount, sizeof(u32));
-
-                cmdList->clearBufferUInt(mgr->m_compactDrawArgsBuffer, 0);
-
-                struct CompactParamsCB {
-                    u32 batchCount;
-                    u32 padding[3];
-                };
-                CompactParamsCB compactCB;
-                compactCB.batchCount = data.objectCount;
-                compactCB.padding[0] = compactCB.padding[1] = compactCB.padding[2] = 0;
-                cmdList->writeBuffer(mgr->m_compactParamsCB, &compactCB, sizeof(compactCB));
-
-                nvrhi::BindingSetDesc compactBindDesc;
-                compactBindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                    nvrhi::BindingSetItem::RawBuffer_SRV(0, mgr->m_drawArgsBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(1, mgr->m_materialIDBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(2, mgr->m_visibilityBuffer),
-                    nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_compactDrawArgsBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(1, mgr->m_compactBatchIndicesBuffer),
-                    nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_compactCountBuffer),
-                    nvrhi::BindingSetItem::StructuredBuffer_UAV(3, mgr->m_compactMaterialIDBuffer)
+                nvrhi::BindingSetDesc bindDesc;
+                bindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, set.objectBuffer),
+                    nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                    nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(0, set.visibleIndexBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(1, set.visibleCountBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(2, set.visibilityBuffer)
                 };
 
-                nvrhi::BindingSetHandle compactBindingSet = nvDevice->createBindingSet(compactBindDesc, mgr->m_compactLayout);
-                if (compactBindingSet) {
+                nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
+                R_ASSERT2(bindingSet, "Failed to create culling binding set");
+
+                nvrhi::ComputeState state;
+                state.pipeline = mgr->m_cullPipeline;
+                state.bindings = { bindingSet };
+                cmdList->setComputeState(state);
+
+                u32 groupCount = (set.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                cmdList->dispatch(groupCount, 1, 1);
+
+                if (mgr->m_compactEnabled) {
+                    R_ASSERT2(set.drawArgsBuffer && set.materialIDBuffer &&
+                                  set.compactDrawArgsBuffer && set.compactBatchIndicesBuffer &&
+                                  set.compactMaterialIDBuffer && set.compactCountBuffer,
+                        "Compaction buffers not initialized");
+
+                    cmdList->setBufferState(set.drawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+
+                    u32 zeroCount = 0;
+                    cmdList->writeBuffer(set.compactCountBuffer, &zeroCount, sizeof(u32));
+                    cmdList->clearBufferUInt(set.compactDrawArgsBuffer, 0);
+
+                    struct CompactParamsCB {
+                        u32 batchCount;
+                        u32 padding[3];
+                    };
+                    CompactParamsCB compactCB;
+                    compactCB.batchCount = set.objectCount;
+                    compactCB.padding[0] = compactCB.padding[1] = compactCB.padding[2] = 0;
+                    cmdList->writeBuffer(mgr->m_compactParamsCB, &compactCB, sizeof(compactCB));
+
+                    nvrhi::BindingSetDesc compactBindDesc;
+                    compactBindDesc.bindings = {
+                        nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
+                        nvrhi::BindingSetItem::RawBuffer_SRV(0, set.drawArgsBuffer),
+                        nvrhi::BindingSetItem::StructuredBuffer_SRV(1, set.materialIDBuffer),
+                        nvrhi::BindingSetItem::StructuredBuffer_SRV(2, set.visibilityBuffer),
+                        nvrhi::BindingSetItem::RawBuffer_UAV(0, set.compactDrawArgsBuffer),
+                        nvrhi::BindingSetItem::StructuredBuffer_UAV(1, set.compactBatchIndicesBuffer),
+                        nvrhi::BindingSetItem::RawBuffer_UAV(2, set.compactCountBuffer),
+                        nvrhi::BindingSetItem::StructuredBuffer_UAV(3, set.compactMaterialIDBuffer)
+                    };
+
+                    nvrhi::BindingSetHandle compactBindingSet = nvDevice->createBindingSet(compactBindDesc, mgr->m_compactLayout);
+                    R_ASSERT2(compactBindingSet, "Failed to create compaction binding set");
+
                     nvrhi::ComputeState compactState;
                     compactState.pipeline = mgr->m_compactPipeline;
                     compactState.bindings = { compactBindingSet };
                     cmdList->setComputeState(compactState);
                     cmdList->dispatch(groupCount, 1, 1);
 
-                    cmdList->setBufferState(mgr->m_compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-                    cmdList->setBufferState(mgr->m_compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
+                    cmdList->setBufferState(set.compactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                    cmdList->setBufferState(set.compactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
                 }
-            }
+            };
+
+            dispatchCullSet(mgr->m_staticSet);
+            dispatchCullSet(mgr->m_dynamicSet);
 
             if (mgr->m_terrainObjectCount > 0) {
                 R_ASSERT2(mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer,
@@ -1194,7 +1351,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
     output.visibleIndices = VirtualResourceHandle();
     output.visibleCount = VirtualResourceHandle();
-    output.drawArgsBuffer = passData.drawArgsBuffer;
+    output.drawArgsBuffer = passData.staticDrawArgsBuffer;
+    output.staticDrawArgsBuffer = passData.staticDrawArgsBuffer;
+    output.dynamicDrawArgsBuffer = passData.dynamicDrawArgsBuffer;
+    output.staticObjectCount = m_staticSet.objectCount;
+    output.dynamicObjectCount = m_dynamicSet.objectCount;
 
     if (m_compactEnabled) {
         ResourceDesc compactArgsDesc;
@@ -1212,11 +1373,16 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
         compactIndicesDesc.isUAV = true;
         compactIndicesDesc.isTransient = false;
 
-        output.compactDrawArgs = fg.ImportBuffer("gpu_cull_compact_drawargs", m_compactDrawArgsBuffer, compactArgsDesc);
-        output.compactBatchIndices = fg.ImportBuffer("gpu_cull_compact_batchindices", m_compactBatchIndicesBuffer, compactIndicesDesc);
+        output.staticCompactDrawArgs = fg.ImportBuffer("gpu_cull_static_compact_drawargs", m_staticSet.compactDrawArgsBuffer, compactArgsDesc);
+        output.staticCompactBatchIndices = fg.ImportBuffer("gpu_cull_static_compact_batchindices", m_staticSet.compactBatchIndicesBuffer, compactIndicesDesc);
+
+        output.dynamicCompactDrawArgs = fg.ImportBuffer("gpu_cull_dynamic_compact_drawargs", m_dynamicSet.compactDrawArgsBuffer, compactArgsDesc);
+        output.dynamicCompactBatchIndices = fg.ImportBuffer("gpu_cull_dynamic_compact_batchindices", m_dynamicSet.compactBatchIndicesBuffer, compactIndicesDesc);
     } else {
-        output.compactDrawArgs = VirtualResourceHandle();
-        output.compactBatchIndices = VirtualResourceHandle();
+        output.staticCompactDrawArgs = VirtualResourceHandle();
+        output.staticCompactBatchIndices = VirtualResourceHandle();
+        output.dynamicCompactDrawArgs = VirtualResourceHandle();
+        output.dynamicCompactBatchIndices = VirtualResourceHandle();
     }
 
     output.terrainObjectCount = m_terrainObjectCount;
@@ -1457,7 +1623,8 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
     u32 particleCount = particleBatches ? std::min(static_cast<u32>(particleBatches->size()), m_maxParticles) : 0;
 
-    if (!IsDebugEnabled() || (m_objectCount == 0 && particleCount == 0))
+    u32 totalObjectCount = m_staticSet.objectCount + m_dynamicSet.objectCount;
+    if (!IsDebugEnabled() || (totalObjectCount == 0 && particleCount == 0))
         return;
 
     struct DebugPassData {
@@ -1468,6 +1635,8 @@ void GPUCullingManager::SetupDebugVisualizationPass(
         GPUCullingManager* manager;
         const xr_vector<passes::ParticleBatch>* particleBatches;
         u32 objectCount;
+        u32 staticCount;
+        u32 dynamicCount;
         u32 particleCount;
         u32 hizWidth;
         u32 hizHeight;
@@ -1482,7 +1651,9 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
             data.manager = this;
             data.particleBatches = particleBatches;
-            data.objectCount = m_objectCount;
+            data.objectCount = totalObjectCount;
+            data.staticCount = m_staticSet.objectCount;
+            data.dynamicCount = m_dynamicSet.objectCount;
             data.particleCount = particleCount;
             data.hizWidth = hizWidth;
             data.hizHeight = hizHeight;
@@ -1512,17 +1683,20 @@ void GPUCullingManager::SetupDebugVisualizationPass(
 
             float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
 
-            if (data.objectCount > 0) {
+            auto dispatchDebugObjects = [&](nvrhi::IBuffer* objectBuffer, u32 objectCount, u32 debugOffset) {
+                if (!objectBuffer || objectCount == 0)
+                    return;
+
                 CullDebugParamsCB cb;
                 cb.viewProj.transpose(Device.mFullTransform);
                 cb.cameraPos = Device.vCameraPosition;
                 cb.maxDistanceSq = farPlane * farPlane;
-                cb.objectCount = data.objectCount;
+                cb.objectCount = objectCount;
                 cb.hizWidth = data.hizWidth;
                 cb.hizHeight = data.hizHeight;
                 cb.hizMipLevels = data.hizMipLevels;
                 cb.occluderThreshold = 50.0f;
-                cb.debugOffset = 0;
+                cb.debugOffset = debugOffset;
 
                 mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
                 cmdList->writeBuffer(mgr->m_debugComputeParamsCB, &cb, sizeof(cb));
@@ -1530,22 +1704,26 @@ void GPUCullingManager::SetupDebugVisualizationPass(
                 nvrhi::BindingSetDesc bindDesc;
                 bindDesc.bindings = {
                     nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_debugComputeParamsCB),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_objectBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(0, objectBuffer),
                     nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
                     nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
                     nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_debugBuffer)
                 };
 
                 nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_debugComputeLayout);
+                R_ASSERT2(bindingSet, "Debug binding set creation failed");
 
                 nvrhi::ComputeState state;
                 state.pipeline = mgr->m_debugComputePipeline;
                 state.bindings = { bindingSet };
                 cmdList->setComputeState(state);
 
-                u32 groupCount = (data.objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                u32 groupCount = (objectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
                 cmdList->dispatch(groupCount, 1, 1);
-            }
+            };
+
+            dispatchDebugObjects(mgr->m_staticSet.objectBuffer, data.staticCount, 0);
+            dispatchDebugObjects(mgr->m_dynamicSet.objectBuffer, data.dynamicCount, data.staticCount);
 
             if (data.particleCount > 0 && data.particleBatches && mgr->m_particleDebugComputePipeline) {
                 mgr->m_particleData.clear();
@@ -1961,6 +2139,8 @@ void GPUCullingManager::BeginLevelLoad(u32 estimatedVertices, u32 estimatedIndic
     m_levelLoadInProgress = true;
     m_megaBuffersReady = false;
 
+    InvalidateStaticCullingData();
+
     m_megaVertices.clear();
     m_megaVertices.reserve(estimatedVertices);
     m_megaIndices.clear();
@@ -2081,17 +2261,18 @@ void GPUCullingManager::CreateMegaBuffers()
 
     {
         nvrhi::BufferDesc desc;
-        desc.debugName = "InstanceBuffer";
         desc.byteSize = m_maxObjects * sizeof(GPUInstanceData);
         desc.structStride = sizeof(GPUInstanceData);
         desc.initialState = nvrhi::ResourceStates::ShaderResource;
         desc.keepInitialState = true;
 
-        m_instanceBuffer = nvDevice->createBuffer(desc);
-        if (!m_instanceBuffer) {
-            Msg("! [GPUCulling] Failed to create instance buffer");
-            return;
-        }
+        desc.debugName = "GPUCull_StaticInstanceData";
+        m_staticSet.instanceBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_staticSet.instanceBuffer, "Failed to create static instance buffer");
+
+        desc.debugName = "GPUCull_DynamicInstanceData";
+        m_dynamicSet.instanceBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_dynamicSet.instanceBuffer, "Failed to create dynamic instance buffer");
     }
 
     Msg("* [GPUCulling] Mega-buffers created: VB=%u verts (%.1f MB), IB=%u indices (%.1f MB)",
@@ -2127,46 +2308,8 @@ void GPUCullingManager::EndLevelLoad()
 
 void GPUCullingManager::UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry)
 {
-    if (!m_instanceBuffer || !geometry)
-        return;
-
-    const auto& batches = geometry->GetBatches();
-    u32 batchCount = static_cast<u32>(batches.size());
-
-    if (batchCount == 0)
-        return;
-
-    m_instanceData.clear();
-    m_instanceData.reserve(batchCount);
-
-    for (u32 i = 0; i < batchCount; i++) {
-        const auto& batch = batches[i];
-
-        if (batch.isSkinned)
-            continue;
-
-        if (batch.isTerrain)
-            continue;
-
-        GPUInstanceData inst;
-        inst.world.transpose(batch.worldMatrix);
-        inst.materialID = batch.bindlessMaterialID;
-        inst.flags = 0;
-        if (batch.IsOpaque()) inst.flags |= GPU_OBJECT_OPAQUE;
-        if (batch.IsAlphaTested()) inst.flags |= GPU_OBJECT_ALPHA_TEST;
-        if (batch.IsStrictB2F()) inst.flags |= GPU_OBJECT_TRANSPARENT;
-        inst.pad0 = 0.0f;
-        inst.pad1 = 0.0f;
-
-        m_instanceData.push_back(inst);
-    }
-
-    u32 instanceCount = std::min(static_cast<u32>(m_instanceData.size()), m_maxObjects);
-    if (instanceCount == 0)
-        return;
-
-    nvrhi::ICommandList* cmdList = ctx->GetCommandList();
-    cmdList->writeBuffer(m_instanceBuffer, m_instanceData.data(), instanceCount * sizeof(GPUInstanceData));
+    (void)ctx;
+    (void)geometry;
 }
 
 bindless::SourceVertexFormat GPUCullingManager::DetectFormatFromDecl(

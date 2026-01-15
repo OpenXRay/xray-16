@@ -151,6 +151,9 @@ void FrameGraphRenderer::Shutdown() {
 
     m_cachedStaticBatches.clear();
     m_staticBatchesCached = false;
+    if (m_gpuCullingManager) {
+        m_gpuCullingManager->InvalidateStaticCullingData();
+    }
 
     m_shaderPhaseCache = nullptr;
     m_framegraph = nullptr;
@@ -511,17 +514,22 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
     );
 
     passes::BindlessForwardConfig bindlessConfig;
-    if (m_gpuCullingManager && m_gpuCullingManager->GetCompactDrawArgsBuffer()) {
+    if (m_gpuCullingManager && m_gpuCullingManager->IsCompactionEnabled()) {
         bindlessConfig.enabled = true;
-        bindlessConfig.compactDrawArgsBuffer = m_gpuCullingManager->GetCompactDrawArgsBuffer();
-        bindlessConfig.compactMaterialIDBuffer = m_gpuCullingManager->GetCompactMaterialIDBuffer();
-        bindlessConfig.compactBatchIndicesBuffer = m_gpuCullingManager->GetCompactBatchIndicesBuffer();
-        bindlessConfig.instanceBuffer = m_gpuCullingManager->GetInstanceBuffer();
-        bindlessConfig.totalObjectCount = m_gpuCullingManager->GetObjectCount();
 
-        if (m_gpuCullingManager->IsCompactionEnabled()) {
-            bindlessConfig.compactCountBuffer = m_gpuCullingManager->GetCompactCountBuffer();
-        }
+        bindlessConfig.staticSet.compactDrawArgsBuffer = m_gpuCullingManager->GetStaticCompactDrawArgsBuffer();
+        bindlessConfig.staticSet.compactMaterialIDBuffer = m_gpuCullingManager->GetStaticCompactMaterialIDBuffer();
+        bindlessConfig.staticSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetStaticCompactBatchIndicesBuffer();
+        bindlessConfig.staticSet.compactCountBuffer = m_gpuCullingManager->GetStaticCompactCountBuffer();
+        bindlessConfig.staticSet.instanceBuffer = m_gpuCullingManager->GetStaticInstanceBuffer();
+        bindlessConfig.staticSet.totalObjectCount = m_gpuCullingManager->GetStaticObjectCount();
+
+        bindlessConfig.dynamicSet.compactDrawArgsBuffer = m_gpuCullingManager->GetDynamicCompactDrawArgsBuffer();
+        bindlessConfig.dynamicSet.compactMaterialIDBuffer = m_gpuCullingManager->GetDynamicCompactMaterialIDBuffer();
+        bindlessConfig.dynamicSet.compactBatchIndicesBuffer = m_gpuCullingManager->GetDynamicCompactBatchIndicesBuffer();
+        bindlessConfig.dynamicSet.compactCountBuffer = m_gpuCullingManager->GetDynamicCompactCountBuffer();
+        bindlessConfig.dynamicSet.instanceBuffer = m_gpuCullingManager->GetDynamicInstanceBuffer();
+        bindlessConfig.dynamicSet.totalObjectCount = m_gpuCullingManager->GetDynamicObjectCount();
 
         if (m_gpuCullingManager->AreMegaBuffersReady()) {
             bindlessConfig.megaVertexBuffer = m_gpuCullingManager->GetMegaVertexBuffer();
@@ -744,7 +752,7 @@ void FrameGraphRenderer::PresentToBackbuffer() {
 void FrameGraphRenderer::RenderHUD() {
 }
 
-bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable) {
+bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fmatrix& worldTransform, IRenderable* renderable, bool isStatic) {
     if (!visual)
         return false;
 
@@ -861,6 +869,7 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.renderable = renderable;
 
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+    batch.isStatic = isStatic;
 
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
         batch.worldBoundsCenter = visual->vis.sphere.P;
@@ -1154,7 +1163,7 @@ void FrameGraphRenderer::CollectVisibleGeometry() {
                     break;
             }
 
-            if (ProcessVisualGeometry(visual, xform)) {
+            if (ProcessVisualGeometry(visual, xform, nullptr, true)) {
                 submittedStatic++;
             }
         }

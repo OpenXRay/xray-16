@@ -98,9 +98,15 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
     framegraph::VirtualResourceHandle visibleCount;
     framegraph::VirtualResourceHandle drawArgsBuffer;
-    framegraph::VirtualResourceHandle compactDrawArgs;
-    framegraph::VirtualResourceHandle compactBatchIndices;
+    framegraph::VirtualResourceHandle staticDrawArgsBuffer;
+    framegraph::VirtualResourceHandle dynamicDrawArgsBuffer;
+    framegraph::VirtualResourceHandle staticCompactDrawArgs;
+    framegraph::VirtualResourceHandle staticCompactBatchIndices;
+    framegraph::VirtualResourceHandle dynamicCompactDrawArgs;
+    framegraph::VirtualResourceHandle dynamicCompactBatchIndices;
     u32 maxObjects;
+    u32 staticObjectCount;
+    u32 dynamicObjectCount;
 
     framegraph::VirtualResourceHandle terrainDrawArgsBuffer;
     framegraph::VirtualResourceHandle terrainCompactDrawArgs;
@@ -126,6 +132,8 @@ public:
 
     void UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
 
+    void InvalidateStaticCullingData();
+
     GPUCullOutput SetupCullingPass(
         framegraph::FrameGraph& fg,
         framegraph::VirtualResourceHandle hizPyramid,
@@ -137,6 +145,8 @@ public:
     );
 
     u32 GetObjectCount() const { return m_objectCount; }
+    u32 GetStaticObjectCount() const { return m_staticSet.objectCount; }
+    u32 GetDynamicObjectCount() const { return m_dynamicSet.objectCount; }
 
     bool IsEnabled() const { return m_initialized && m_computeEnabled; }
 
@@ -157,9 +167,6 @@ public:
 
     nvrhi::IBuffer* GetMegaVertexBuffer() const { return m_megaVertexBuffer.Get(); }
     nvrhi::IBuffer* GetMegaIndexBuffer() const { return m_megaIndexBuffer.Get(); }
-    nvrhi::IBuffer* GetInstanceBuffer() const { return m_instanceBuffer.Get(); }
-
-    nvrhi::IBuffer* GetCompactCountBuffer() const { return m_compactCountBuffer.Get(); }
     bool IsCompactionEnabled() const { return m_compactEnabled; }
 
     void UploadInstanceData(ng::RenderContext* ctx, const GeometryCollector* geometry);
@@ -195,9 +202,20 @@ public:
     bool IsParticleCullingEnabled() const { return m_initialized && m_particleCullEnabled; }
     nvrhi::IBuffer* GetParticleDrawArgsBuffer() const { return m_particleDrawArgsBuffer.Get(); }
 
-    nvrhi::IBuffer* GetCompactDrawArgsBuffer() const { return m_compactDrawArgsBuffer.Get(); }
-    nvrhi::IBuffer* GetCompactBatchIndicesBuffer() const { return m_compactBatchIndicesBuffer.Get(); }
-    nvrhi::IBuffer* GetCompactMaterialIDBuffer() const { return m_compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactDrawArgsBuffer() const { return m_staticSet.compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactBatchIndicesBuffer() const { return m_staticSet.compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactMaterialIDBuffer() const { return m_staticSet.compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticCompactCountBuffer() const { return m_staticSet.compactCountBuffer.Get(); }
+    nvrhi::IBuffer* GetStaticInstanceBuffer() const { return m_staticSet.instanceBuffer.Get(); }
+
+    nvrhi::IBuffer* GetDynamicCompactDrawArgsBuffer() const { return m_dynamicSet.compactDrawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicCompactBatchIndicesBuffer() const { return m_dynamicSet.compactBatchIndicesBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicCompactMaterialIDBuffer() const { return m_dynamicSet.compactMaterialIDBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicCompactCountBuffer() const { return m_dynamicSet.compactCountBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicInstanceBuffer() const { return m_dynamicSet.instanceBuffer.Get(); }
+
+    nvrhi::IBuffer* GetStaticDrawArgsBuffer() const { return m_staticSet.drawArgsBuffer.Get(); }
+    nvrhi::IBuffer* GetDynamicDrawArgsBuffer() const { return m_dynamicSet.drawArgsBuffer.Get(); }
 
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
     nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
@@ -219,10 +237,27 @@ private:
 
     void ExtractFrustumPlanes(Fmatrix& viewProj, Fvector4* outPlanes);
 
-    nvrhi::BufferHandle m_objectBuffer;
-    nvrhi::BufferHandle m_visibleIndexBuffer;
-    nvrhi::BufferHandle m_visibleCountBuffer;
-    nvrhi::BufferHandle m_drawArgsBuffer;
+    struct CullSetBuffers {
+        nvrhi::BufferHandle objectBuffer;
+        nvrhi::BufferHandle visibleIndexBuffer;
+        nvrhi::BufferHandle visibleCountBuffer;
+        nvrhi::BufferHandle drawArgsBuffer;
+        nvrhi::BufferHandle materialIDBuffer;
+        nvrhi::BufferHandle visibilityBuffer;
+        nvrhi::BufferHandle compactDrawArgsBuffer;
+        nvrhi::BufferHandle compactBatchIndicesBuffer;
+        nvrhi::BufferHandle compactMaterialIDBuffer;
+        nvrhi::BufferHandle compactCountBuffer;
+        nvrhi::BufferHandle instanceBuffer;
+        u32 objectCount = 0;
+        u32 maxObjects = 0;
+        bool drawArgsUploaded = false;
+        bool objectsUploaded = false;
+    };
+
+    CullSetBuffers m_staticSet;
+    CullSetBuffers m_dynamicSet;
+
     nvrhi::BufferHandle m_cullParamsCB;
 
     nvrhi::ComputePipelineHandle m_cullPipeline;
@@ -233,19 +268,13 @@ private:
     nvrhi::BindingLayoutHandle m_compactLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
-    nvrhi::BufferHandle m_compactDrawArgsBuffer;
-    nvrhi::BufferHandle m_compactBatchIndicesBuffer;
-    nvrhi::BufferHandle m_compactCountBuffer;
     nvrhi::BufferHandle m_compactParamsCB;
 
-    nvrhi::BufferHandle m_materialIDBuffer;
-    nvrhi::BufferHandle m_compactMaterialIDBuffer;
-
-    nvrhi::BufferHandle m_visibilityBuffer;
-    bool m_staticDrawArgsUploaded = false;
     bool m_staticTerrainDrawArgsUploaded = false;
 
     bool m_compactEnabled = false;
+
+    bool m_staticDataCached = false;
 
     nvrhi::BufferHandle m_terrainObjectBuffer;
     nvrhi::BufferHandle m_terrainDrawArgsBuffer;
@@ -293,9 +322,15 @@ private:
     bool m_initialized = false;
     bool m_computeEnabled = false;
 
-    xr_vector<GPUObjectData> m_objectData;
-    xr_vector<IndirectDrawArgs> m_drawArgsData;
-    xr_vector<u32> m_materialIDData;
+    xr_vector<GPUObjectData> m_staticObjectData;
+    xr_vector<IndirectDrawArgs> m_staticDrawArgsData;
+    xr_vector<u32> m_staticMaterialIDData;
+    xr_vector<GPUInstanceData> m_staticInstanceData;
+
+    xr_vector<GPUObjectData> m_dynamicObjectData;
+    xr_vector<IndirectDrawArgs> m_dynamicDrawArgsData;
+    xr_vector<u32> m_dynamicMaterialIDData;
+    xr_vector<GPUInstanceData> m_dynamicInstanceData;
 
     u32 m_terrainObjectCount = 0;
     u32 m_maxTerrainObjects = 0;
@@ -306,11 +341,9 @@ private:
 
     nvrhi::BufferHandle m_megaVertexBuffer;
     nvrhi::BufferHandle m_megaIndexBuffer;
-    nvrhi::BufferHandle m_instanceBuffer;
 
     xr_vector<bindless::UnifiedVertex> m_megaVertices;
     xr_vector<u32> m_megaIndices;
-    xr_vector<GPUInstanceData> m_instanceData;
 
     u32 m_totalVertexCount = 0;
     u32 m_totalIndexCount = 0;
@@ -336,7 +369,6 @@ private:
     xr_vector<IBPoolInfo> m_ibPoolsAlt;
 
 public:
-    nvrhi::IBuffer* GetDrawArgsBuffer() const { return m_drawArgsBuffer.Get(); }
 
     u32 RegisterVBPool(
         const void* vertices,

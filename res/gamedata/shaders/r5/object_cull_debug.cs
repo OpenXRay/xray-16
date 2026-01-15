@@ -23,8 +23,10 @@ cbuffer CullDebugParams : register(b5)
     uint g_HiZHeight;
     uint g_HiZMipLevels;
     float g_OccluderThreshold;
-    float3 g_Padding;
-};
+    uint g_DebugOffset;
+    float2 g_Padding;
+}
+;
 
 StructuredBuffer<GPUObjectData> g_Objects : register(t0);
 
@@ -89,54 +91,54 @@ void main(uint3 dtID : SV_DispatchThreadID)
 {
     uint objectIdx = dtID.x;
 
-    if (objectIdx >= g_ObjectCount)
-        return;
+if (objectIdx >= g_ObjectCount)
+    return;
 
-    GPUObjectData obj = g_Objects[objectIdx];
+GPUObjectData obj = g_Objects[objectIdx];
 
-    CullDebugData debug;
-    debug.position = obj.position;
-    debug.radius = obj.radius;
-    debug.objectIndex = objectIdx;
-    debug.objectDepth = 0.0;
-    debug.hiZDepth = 0.0;
+CullDebugData debug;
+debug.position = obj.position;
+debug.radius = obj.radius;
+debug.objectIndex = g_DebugOffset + objectIdx;
+debug.objectDepth = 0.0;
+debug.hiZDepth = 0.0;
 
-    if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
-    {
-        debug.cullState = CULL_STATE_CULLED_DISTANCE;
-        g_DebugOutput[objectIdx] = debug;
-        return;
-    }
+if (!DistanceTestSphere(obj.position, obj.radius, g_CameraPos, g_MaxDistance))
+{
+    debug.cullState = CULL_STATE_CULLED_DISTANCE;
+    g_DebugOutput[g_DebugOffset + objectIdx] = debug;
+    return;
+}
 
-    if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
-    {
-        debug.cullState = CULL_STATE_CULLED_FRUSTUM;
-        g_DebugOutput[objectIdx] = debug;
-        return;
-    }
+if (!FrustumTestSphere(obj.position, obj.radius, g_FrustumPlanes))
+{
+    debug.cullState = CULL_STATE_CULLED_FRUSTUM;
+    g_DebugOutput[g_DebugOffset + objectIdx] = debug;
+    return;
+}
 
-    float3 occlusionResult = OcclusionTestSphereDebug(obj.position, obj.radius);
-    debug.objectDepth = occlusionResult.x;
-    debug.hiZDepth = occlusionResult.y;
+float3 occlusionResult = OcclusionTestSphereDebug(obj.position, obj.radius);
+debug.objectDepth = occlusionResult.x;
+debug.hiZDepth = occlusionResult.y;
 
-    if (occlusionResult.z < 0.5)
-    {
-        debug.cullState = CULL_STATE_CULLED_OCCLUSION;
-        g_DebugOutput[objectIdx] = debug;
-        return;
-    }
+if (occlusionResult.z < 0.5)
+{
+    debug.cullState = CULL_STATE_CULLED_OCCLUSION;
+    g_DebugOutput[g_DebugOffset + objectIdx] = debug;
+    return;
+}
 
-    float3 delta = obj.position - g_CameraPos;
-    float distSq = dot(delta, delta);
+float3 delta = obj.position - g_CameraPos;
+float distSq = dot(delta, delta);
 
-    if (distSq < g_OccluderThreshold * g_OccluderThreshold)
-    {
-        debug.cullState = CULL_STATE_OCCLUDER;
-    }
-    else
-    {
-        debug.cullState = CULL_STATE_VISIBLE;
-    }
+if (distSq < g_OccluderThreshold * g_OccluderThreshold)
+{
+    debug.cullState = CULL_STATE_OCCLUDER;
+}
+else
+{
+    debug.cullState = CULL_STATE_VISIBLE;
+}
 
-    g_DebugOutput[objectIdx] = debug;
+g_DebugOutput[g_DebugOffset + objectIdx] = debug;
 }

@@ -268,7 +268,7 @@ void renderBindlessForward(
 {
     using namespace RENDER_NAMESPACE::bindless;
 
-    if (!config.IsValid() || !geometry || geometry->GetBatches().empty())
+    if (!config.UseGPUCulling() || !geometry || geometry->GetBatches().empty())
         return;
 
     if (materialCache) {
@@ -495,20 +495,20 @@ void renderBindlessForward(
 
     cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-        nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
-        nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.instanceBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.compactBatchIndicesBuffer),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.compactMaterialIDBuffer),
-    };
+    auto createBindingSetForSet = [&](const BindlessDrawSet& set) -> nvrhi::BindingSetHandle {
+        nvrhi::BindingSetDesc bindDesc;
+        bindDesc.bindings = {
+            nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
+            nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+            nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(14, set.instanceBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(15, set.compactBatchIndicesBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(16, set.compactMaterialIDBuffer),
+        };
 
-    auto bindingSet = nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
-    if (!bindingSet)
-        return;
+        return nvDevice->createBindingSet(bindDesc, s_bindlessLayout);
+    };
 
     const auto& rtDesc = colorRT->getDesc();
     nvrhi::Viewport viewport(0.0f, static_cast<float>(rtDesc.width), 0.0f, static_cast<float>(rtDesc.height), 0.0f, 1.0f);
@@ -519,25 +519,18 @@ void renderBindlessForward(
         return;
     }
 
-    const u32 visibleCount = config.totalObjectCount;
-
-    if (!s_bindlessPipeline || !framebuffer || !bindingSet) {
+    if (!s_bindlessPipeline || !framebuffer) {
         return;
     }
-
-    constexpr u32 INDIRECT_ARGS_SIZE = 20;
 
     nvrhi::GraphicsState state;
     state.pipeline = s_bindlessPipeline;
     state.framebuffer = framebuffer;
-    state.bindings = { bindingSet };
 
     auto* backend = device->GetBackend();
+    nvrhi::IBindingSet* bindlessTable = nullptr;
     if (backend) {
-        auto* bindlessTable = backend->GetBindlessDescriptorTable();
-        if (bindlessTable) {
-            state.addBindingSet(bindlessTable);
-        }
+        bindlessTable = backend->GetBindlessDescriptorTable();
     }
 
     if (!s_drawIndexBuffer) {
@@ -550,16 +543,31 @@ void renderBindlessForward(
         {s_drawIndexBuffer, 1, 0}
     };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-    state.indirectParams = config.compactDrawArgsBuffer;
-    state.indirectCountBuffer = config.compactCountBuffer;
     state.indirectCountOffset = 0;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
-    cmdList->setGraphicsState(state);
-    cmdList->drawIndexedIndirectCount(0, config.totalObjectCount);
+    auto drawSet = [&](const BindlessDrawSet& set) {
+        if (!set.IsValid())
+            return;
 
-    s_gpuDrivenDraws += config.totalObjectCount;
+        auto bindingSet = createBindingSetForSet(set);
+        R_ASSERT2(bindingSet, "Bindless forward binding set creation failed");
+
+        state.bindings = { bindingSet };
+        if (bindlessTable) {
+            state.addBindingSet(bindlessTable);
+        }
+        state.indirectParams = set.compactDrawArgsBuffer;
+        state.indirectCountBuffer = set.compactCountBuffer;
+
+        cmdList->setGraphicsState(state);
+        cmdList->drawIndexedIndirectCount(0, set.totalObjectCount);
+        s_gpuDrivenDraws += set.totalObjectCount;
+    };
+
+    drawSet(config.staticSet);
+    drawSet(config.dynamicSet);
 
     if (config.HasTerrain() && config.UseMegaBuffers()) {
         R_ASSERT2(config.UseTerrainCompaction(), "Terrain compaction buffers missing");

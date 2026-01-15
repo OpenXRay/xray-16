@@ -19,18 +19,24 @@ namespace xray::render::framegraph {
 
 namespace xray::render::RENDER_NAMESPACE::passes {
 
-struct BindlessForwardConfig {
+struct BindlessDrawSet {
     nvrhi::IBuffer* compactDrawArgsBuffer = nullptr;
-
     nvrhi::IBuffer* compactMaterialIDBuffer = nullptr;
-
     nvrhi::IBuffer* compactBatchIndicesBuffer = nullptr;
-
     nvrhi::IBuffer* instanceBuffer = nullptr;
-
     nvrhi::IBuffer* compactCountBuffer = nullptr;
-
     u32 totalObjectCount = 0;
+
+    bool IsValid() const {
+        return compactDrawArgsBuffer && compactMaterialIDBuffer &&
+            compactBatchIndicesBuffer && instanceBuffer && compactCountBuffer &&
+            totalObjectCount > 0;
+    }
+};
+
+struct BindlessForwardConfig {
+    BindlessDrawSet staticSet;
+    BindlessDrawSet dynamicSet;
 
     bool enabled = false;
 
@@ -48,12 +54,8 @@ struct BindlessForwardConfig {
     nvrhi::IBuffer* terrainCompactCountBuffer = nullptr;
     u32 terrainObjectCount = 0;
 
-    bool IsValid() const {
-        return enabled && compactDrawArgsBuffer && compactMaterialIDBuffer && totalObjectCount > 0;
-    }
-
     bool UseGPUCulling() const {
-        return IsValid() && compactBatchIndicesBuffer && instanceBuffer;
+        return enabled && (staticSet.IsValid() || dynamicSet.IsValid());
     }
 
     bool UseMegaBuffers() const {

@@ -50,6 +50,8 @@ struct GeometryBatch {
 
     bool isVisible = true;
 
+    bool isStatic = false;
+
     bool isSkinned = false;
 
     bool isTerrain = false;
