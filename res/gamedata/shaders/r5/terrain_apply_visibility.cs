@@ -4,7 +4,8 @@
 cbuffer ApplyVisibilityParams : register(b5)
 {
     uint g_ObjectCount;
-    uint3 g_Padding;
+    uint g_FrameId;
+    uint2 g_Padding;
 };
 
 StructuredBuffer<uint> g_Visibility : register(t0);
@@ -18,7 +19,7 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (idx >= g_ObjectCount)
         return;
 
-    uint visible = g_Visibility[idx];
+    uint visible = (g_Visibility[idx] == g_FrameId) ? 1 : 0;
 
     g_DrawArgs.Store(idx * 20 + 4, visible);
 }

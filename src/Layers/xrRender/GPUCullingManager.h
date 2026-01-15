@@ -248,6 +248,9 @@ private:
         nvrhi::BufferHandle compactBatchIndicesBuffer;
         nvrhi::BufferHandle compactMaterialIDBuffer;
         nvrhi::BufferHandle compactCountBuffer;
+        nvrhi::BufferHandle compactLocalPrefixBuffer;
+        nvrhi::BufferHandle compactGroupCountsBuffer;
+        nvrhi::BufferHandle compactGroupOffsetsBuffer;
         nvrhi::BufferHandle instanceBuffer;
         u32 objectCount = 0;
         u32 maxObjects = 0;
@@ -262,10 +265,14 @@ private:
 
     nvrhi::ComputePipelineHandle m_cullPipeline;
     nvrhi::ComputePipelineHandle m_clearArgsPipeline;
-    nvrhi::ComputePipelineHandle m_compactPipeline;
+    nvrhi::ComputePipelineHandle m_compactCountPipeline;
+    nvrhi::ComputePipelineHandle m_compactScanPipeline;
+    nvrhi::ComputePipelineHandle m_compactScatterPipeline;
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
-    nvrhi::BindingLayoutHandle m_compactLayout;
+    nvrhi::BindingLayoutHandle m_compactCountLayout;
+    nvrhi::BindingLayoutHandle m_compactScanLayout;
+    nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
     nvrhi::BufferHandle m_compactParamsCB;
@@ -287,6 +294,9 @@ private:
     nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactCountBuffer;
     nvrhi::BufferHandle m_terrainCompactMaterialIDBuffer;
+    nvrhi::BufferHandle m_terrainCompactLocalPrefixBuffer;
+    nvrhi::BufferHandle m_terrainCompactGroupCountsBuffer;
+    nvrhi::BufferHandle m_terrainCompactGroupOffsetsBuffer;
     nvrhi::BufferHandle m_terrainMaterialIDBuffer;
 
     nvrhi::ComputePipelineHandle m_terrainApplyVisibilityPipeline;

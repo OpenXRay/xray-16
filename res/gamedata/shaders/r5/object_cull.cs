@@ -31,6 +31,8 @@ cbuffer CullParams : register(b5)
     uint g_HiZWidth;
     uint g_HiZHeight;
     uint g_HiZMipLevels;
+    uint g_FrameId;
+    uint3 g_Padding;
 };
 
 StructuredBuffer<GPUObjectData> g_Objects : register(t0);
@@ -73,5 +75,5 @@ void main(uint3 dtID : SV_DispatchThreadID)
 
     g_VisibleIndices[visibleIdx] = obj.batchIndex;
 
-    g_Visibility[obj.batchIndex] = 1;
+    g_Visibility[obj.batchIndex] = g_FrameId;
 }
