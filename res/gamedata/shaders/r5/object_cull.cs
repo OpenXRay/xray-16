@@ -52,6 +52,8 @@ cbuffer CullParams : register(b5)  // b5 to avoid conflicts with common.h
     uint g_HiZWidth;               // Hi-Z pyramid base width
     uint g_HiZHeight;              // Hi-Z pyramid base height
     uint g_HiZMipLevels;           // Number of Hi-Z mip levels
+    uint g_FrameId;                // Frame stamp for visibility
+    uint3 g_Padding;
 };
 
 // ═══════════════════════════════════════════════════════
@@ -73,7 +75,7 @@ RWStructuredBuffer<uint> g_VisibleIndices : register(u0);
 // Output: Atomic counter for visible object count
 RWByteAddressBuffer g_VisibleCount : register(u1);
 
-// Output: Visibility buffer (1 uint per object: 0=culled, 1=visible)
+// Output: Visibility buffer (frame stamp per object)
 // Compaction shader reads this + static draw args to create compact buffer
 // Avoids CPU re-uploading draw args every frame
 RWStructuredBuffer<uint> g_Visibility : register(u2);
@@ -139,5 +141,5 @@ void main(uint3 dtID : SV_DispatchThreadID)
     // Mark this object as visible in the visibility buffer
     // Compaction shader will read this + static draw args to create compact buffer
     // This avoids CPU re-uploading draw args every frame!
-    g_Visibility[obj.batchIndex] = 1;
+    g_Visibility[obj.batchIndex] = g_FrameId;
 }

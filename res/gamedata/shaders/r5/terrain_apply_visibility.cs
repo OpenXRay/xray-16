@@ -8,10 +8,11 @@
 cbuffer ApplyVisibilityParams : register(b5)
 {
     uint g_ObjectCount;
-    uint3 g_Padding;
+    uint g_FrameId;
+    uint2 g_Padding;
 };
 
-// Input: Visibility buffer from cull pass (1 = visible, 0 = culled)
+// Input: Visibility buffer from cull pass (frame stamp)
 StructuredBuffer<uint> g_Visibility : register(t0);
 
 // Output: Draw args buffer (we write instanceCount field)
@@ -25,8 +26,8 @@ void main(uint3 dtID : SV_DispatchThreadID)
     if (idx >= g_ObjectCount)
         return;
 
-    // Read visibility (1 = visible, 0 = culled)
-    uint visible = g_Visibility[idx];
+    // Read visibility (frame stamp match = visible)
+    uint visible = (g_Visibility[idx] == g_FrameId) ? 1 : 0;
 
     // Write to instanceCount field of draw args
     // DrawIndexedIndirectArguments layout (20 bytes):

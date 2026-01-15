@@ -331,6 +331,9 @@ private:
         nvrhi::BufferHandle compactBatchIndicesBuffer;  // Compacted batch indices (output)
         nvrhi::BufferHandle compactMaterialIDBuffer;    // Compacted material IDs (output)
         nvrhi::BufferHandle compactCountBuffer;         // Compacted visible count (output)
+        nvrhi::BufferHandle compactLocalPrefixBuffer;   // Local prefix per batch (scratch)
+        nvrhi::BufferHandle compactGroupCountsBuffer;   // Visible count per group (scratch)
+        nvrhi::BufferHandle compactGroupOffsetsBuffer;  // Prefix offsets per group (scratch)
         nvrhi::BufferHandle instanceBuffer;             // Instance data buffer (GPUInstanceData)
         u32 objectCount = 0;
         u32 maxObjects = 0;
@@ -348,10 +351,14 @@ private:
     // Compute pipelines
     nvrhi::ComputePipelineHandle m_cullPipeline;
     nvrhi::ComputePipelineHandle m_clearArgsPipeline;
-    nvrhi::ComputePipelineHandle m_compactPipeline;
+    nvrhi::ComputePipelineHandle m_compactCountPipeline;
+    nvrhi::ComputePipelineHandle m_compactScanPipeline;
+    nvrhi::ComputePipelineHandle m_compactScatterPipeline;
     nvrhi::BindingLayoutHandle m_cullLayout;
     nvrhi::BindingLayoutHandle m_clearArgsLayout;
-    nvrhi::BindingLayoutHandle m_compactLayout;
+    nvrhi::BindingLayoutHandle m_compactCountLayout;
+    nvrhi::BindingLayoutHandle m_compactScanLayout;
+    nvrhi::BindingLayoutHandle m_compactScatterLayout;
     nvrhi::SamplerHandle m_pointSampler;
 
     nvrhi::BufferHandle m_compactParamsCB;
@@ -378,6 +385,9 @@ private:
     nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactCountBuffer;
     nvrhi::BufferHandle m_terrainCompactMaterialIDBuffer;
+    nvrhi::BufferHandle m_terrainCompactLocalPrefixBuffer;
+    nvrhi::BufferHandle m_terrainCompactGroupCountsBuffer;
+    nvrhi::BufferHandle m_terrainCompactGroupOffsetsBuffer;
     nvrhi::BufferHandle m_terrainMaterialIDBuffer;       // Terrain material IDs (for bindless)
 
     // Terrain visibility apply pass (copies visibility → instanceCount in draw args)
