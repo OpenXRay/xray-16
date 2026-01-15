@@ -28,10 +28,6 @@ PS_OUTPUT main(PS_INPUT input)
 
     clip(result.a - (0.01 / 255.0));
 
-    float fogDist = length(input.worldPos - eye_position);
-    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
-    result.rgb = lerp(fog_color.rgb, result.rgb, fogFactor);
-
     output.color = result;
     return output;
 }

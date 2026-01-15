@@ -104,10 +104,6 @@ PS_OUTPUT main(PS_INPUT input)
 
     float3 finalColor = CalculateLighting(albedo, N, V, metallic, roughness, ao);
 
-    float fogDist = length(input.worldPos - eye_position);
-    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
-    finalColor = lerp(fog_color.rgb, finalColor, fogFactor);
-
     output.color = float4(finalColor, diffuseSample.a);
     return output;
 }

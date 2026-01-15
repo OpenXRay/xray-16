@@ -105,6 +105,8 @@ struct GPUCullOutput {
     framegraph::VirtualResourceHandle terrainDrawArgsBuffer;
     framegraph::VirtualResourceHandle terrainCompactDrawArgs;
     framegraph::VirtualResourceHandle terrainCompactBatchIndices;
+    framegraph::VirtualResourceHandle terrainCompactMaterialIDs;
+    framegraph::VirtualResourceHandle terrainCompactCount;
     u32 terrainObjectCount;
 };
 
@@ -205,6 +207,7 @@ public:
     nvrhi::IBuffer* GetTerrainCompactDrawArgsBuffer() const { return m_terrainCompactDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactBatchIndicesBuffer() const { return m_terrainCompactBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactCountBuffer() const { return m_terrainCompactCountBuffer.Get(); }
+    nvrhi::IBuffer* GetTerrainCompactMaterialIDBuffer() const { return m_terrainCompactMaterialIDBuffer.Get(); }
 
 private:
     void CreateBuffers(ng::RenderDevice* device);
@@ -254,6 +257,7 @@ private:
     nvrhi::BufferHandle m_terrainCompactDrawArgsBuffer;
     nvrhi::BufferHandle m_terrainCompactBatchIndicesBuffer;
     nvrhi::BufferHandle m_terrainCompactCountBuffer;
+    nvrhi::BufferHandle m_terrainCompactMaterialIDBuffer;
     nvrhi::BufferHandle m_terrainMaterialIDBuffer;
 
     nvrhi::ComputePipelineHandle m_terrainApplyVisibilityPipeline;
