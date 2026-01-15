@@ -37,11 +37,6 @@ PS_OUTPUT main(PS_INPUT input)
     // Alpha test (minimal threshold to avoid completely invisible pixels)
     clip(result.a - (0.01 / 255.0));
 
-    // Optional fog (uses fog_params/fog_color from static_globals)
-    float fogDist = length(input.worldPos - eye_position);
-    float fogFactor = saturate((fog_params.y - fogDist) / (fog_params.y - fog_params.x));
-    result.rgb = lerp(fog_color.rgb, result.rgb, fogFactor);
-
     output.color = result;
     return output;
 }

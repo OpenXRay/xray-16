@@ -528,6 +528,60 @@ void GPUCullingManager::CreateCompactionResources(ng::RenderDevice* device)
         }
     }
 
+    // Terrain compaction buffers (separate from main geometry)
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainCompactDrawArgs";
+        desc.byteSize = m_maxTerrainObjects * sizeof(IndirectDrawArgs);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.isDrawIndirectArgs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainCompactDrawArgsBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_terrainCompactDrawArgsBuffer, "Failed to create terrain compact draw args buffer");
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainCompactBatchIndices";
+        desc.byteSize = m_maxTerrainObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainCompactBatchIndicesBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_terrainCompactBatchIndicesBuffer, "Failed to create terrain compact batch indices buffer");
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainCompactMaterialIDs";
+        desc.byteSize = m_maxTerrainObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainCompactMaterialIDBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_terrainCompactMaterialIDBuffer, "Failed to create terrain compact material ID buffer");
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_TerrainCompactCount";
+        desc.byteSize = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.canHaveRawViews = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_terrainCompactCountBuffer = nvDevice->createBuffer(desc);
+        R_ASSERT2(m_terrainCompactCountBuffer, "Failed to create terrain compact count buffer");
+    }
+
     {
         nvrhi::BufferDesc desc;
         desc.debugName = "GPUCull_CompactParams";
@@ -682,6 +736,7 @@ void GPUCullingManager::Shutdown()
     m_terrainCompactDrawArgsBuffer = nullptr;
     m_terrainCompactBatchIndicesBuffer = nullptr;
     m_terrainCompactCountBuffer = nullptr;
+    m_terrainCompactMaterialIDBuffer = nullptr;
     m_terrainApplyVisibilityPipeline = nullptr;
     m_terrainApplyVisibilityLayout = nullptr;
     m_terrainObjectData.clear();
@@ -912,6 +967,11 @@ void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const Geometr
     m_terrainObjectCount = std::min(static_cast<u32>(m_terrainObjectData.size()), m_maxTerrainObjects);
 
     if (m_terrainObjectCount > 0 && m_terrainObjectBuffer && m_terrainDrawArgsBuffer) {
+        R_ASSERT2(m_terrainObjectCount <= m_maxTerrainObjects, "Terrain object count exceeds buffer capacity");
+        R_ASSERT2(m_terrainDrawArgsData.size() >= m_terrainObjectCount, "Terrain draw args data smaller than object count");
+        R_ASSERT2(m_terrainMaterialIDData.size() >= m_terrainObjectCount, "Terrain material ID data smaller than object count");
+        R_ASSERT2(m_terrainInstanceData.size() >= m_terrainObjectCount, "Terrain instance data smaller than object count");
+
         // Terrain object data (bounding spheres) - still uploaded every frame
         // TODO: Terrain is static, could cache this too with dirty flag
         cmdList->beginTrackingBufferState(m_terrainObjectBuffer, nvrhi::ResourceStates::CopyDest);
@@ -1024,12 +1084,20 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
     GPUCullOutput output;
     output.maxObjects = m_maxObjects;
+    output.visibleIndices = VirtualResourceHandle();
+    output.visibleCount = VirtualResourceHandle();
+    output.drawArgsBuffer = VirtualResourceHandle();
+    output.compactDrawArgs = VirtualResourceHandle();
+    output.compactBatchIndices = VirtualResourceHandle();
+    output.terrainDrawArgsBuffer = VirtualResourceHandle();
+    output.terrainCompactDrawArgs = VirtualResourceHandle();
+    output.terrainCompactBatchIndices = VirtualResourceHandle();
+    output.terrainCompactMaterialIDs = VirtualResourceHandle();
+    output.terrainCompactCount = VirtualResourceHandle();
+    output.terrainObjectCount = 0;
 
     // Early out if not enabled
     if (!m_computeEnabled) {
-        output.visibleIndices = VirtualResourceHandle();
-        output.visibleCount = VirtualResourceHandle();
-        output.drawArgsBuffer = VirtualResourceHandle();
         return output;
     }
 
@@ -1038,9 +1106,6 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     m_objectCount = std::min(static_cast<u32>(batches.size()), m_maxObjects);
 
     if (m_objectCount == 0) {
-        output.visibleIndices = VirtualResourceHandle();
-        output.visibleCount = VirtualResourceHandle();
-        output.drawArgsBuffer = VirtualResourceHandle();
         return output;
     }
 
@@ -1226,6 +1291,11 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
             // ─────────────────────────────────────────────────────
             //  TERRAIN CULLING PASS (uses same shader, different data)
             // ─────────────────────────────────────────────────────
+            if (mgr->m_terrainObjectCount > 0) {
+                R_ASSERT2(mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer,
+                    "Terrain buffers not initialized for culling");
+            }
+
             if (mgr->m_terrainObjectCount > 0 && mgr->m_terrainObjectBuffer && mgr->m_terrainDrawArgsBuffer) {
                 // Clear terrain visible count and visibility buffer
                 u32 zeroTerrain = 0;
@@ -1259,56 +1329,71 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
                 };
 
                 nvrhi::BindingSetHandle terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, mgr->m_cullLayout);
-                if (terrainBindingSet) {
-                    nvrhi::ComputeState terrainState;
-                    terrainState.pipeline = mgr->m_cullPipeline;
-                    terrainState.bindings = { terrainBindingSet };
-                    cmdList->setComputeState(terrainState);
+                R_ASSERT2(terrainBindingSet, "Terrain culling binding set creation failed");
 
-                    u32 terrainGroupCount = (mgr->m_terrainObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
-                    cmdList->dispatch(terrainGroupCount, 1, 1);
+                nvrhi::ComputeState terrainState;
+                terrainState.pipeline = mgr->m_cullPipeline;
+                terrainState.bindings = { terrainBindingSet };
+                cmdList->setComputeState(terrainState);
 
-                    // ─────────────────────────────────────────────────────
-                    //  TERRAIN APPLY VISIBILITY (visibility → instanceCount)
-                    // ─────────────────────────────────────────────────────
-                    if (mgr->m_terrainApplyVisibilityPipeline) {
-                        // Begin tracking buffer state (needed when upload is skipped on subsequent frames)
-                        // After first frame, buffer is in IndirectArgument state from previous frame's draw
-                        cmdList->beginTrackingBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-                        // Transition draw args to UAV for writing
-                        cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::UnorderedAccess);
+                u32 terrainGroupCount = (mgr->m_terrainObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+                cmdList->dispatch(terrainGroupCount, 1, 1);
 
-                        // Constant buffer for apply visibility pass
-                        struct ApplyVisibilityParams {
-                            u32 objectCount;
-                            u32 padding[3];
-                        };
-                        ApplyVisibilityParams applyParams;
-                        applyParams.objectCount = mgr->m_terrainObjectCount;
-                        applyParams.padding[0] = applyParams.padding[1] = applyParams.padding[2] = 0;
-                        cmdList->writeBuffer(mgr->m_compactParamsCB, &applyParams, sizeof(applyParams));  // Reuse compact params CB
+                // ─────────────────────────────────────────────────────
+                //  TERRAIN COMPACTION PASS
+                // ─────────────────────────────────────────────────────
+                R_ASSERT2(mgr->m_compactEnabled, "Terrain compaction requires batch compaction to be enabled");
+                R_ASSERT2(mgr->m_compactPipeline && mgr->m_compactLayout, "Terrain compaction pipeline not initialized");
+                R_ASSERT2(mgr->m_terrainCompactDrawArgsBuffer && mgr->m_terrainCompactBatchIndicesBuffer &&
+                              mgr->m_terrainCompactMaterialIDBuffer && mgr->m_terrainCompactCountBuffer,
+                    "Terrain compaction buffers not initialized");
+                R_ASSERT2(mgr->m_terrainMaterialIDBuffer, "Terrain material ID buffer missing");
 
-                        // Create binding set for apply visibility
-                        nvrhi::BindingSetDesc applyBindDesc;
-                        applyBindDesc.bindings = {
-                            nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
-                            nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_terrainVisibilityBuffer),
-                            nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_terrainDrawArgsBuffer)
-                        };
+                // Transition terrain draw args to SRV for compaction input
+                cmdList->beginTrackingBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::ShaderResource);
+                cmdList->beginTrackingBufferState(mgr->m_terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
 
-                        nvrhi::BindingSetHandle applyBindingSet = nvDevice->createBindingSet(applyBindDesc, mgr->m_terrainApplyVisibilityLayout);
-                        if (applyBindingSet) {
-                            nvrhi::ComputeState applyState;
-                            applyState.pipeline = mgr->m_terrainApplyVisibilityPipeline;
-                            applyState.bindings = { applyBindingSet };
-                            cmdList->setComputeState(applyState);
-                            cmdList->dispatch(terrainGroupCount, 1, 1);
-                        }
-                    }
+                // Clear compact count and draw args
+                u32 zeroTerrainCount = 0;
+                cmdList->writeBuffer(mgr->m_terrainCompactCountBuffer, &zeroTerrainCount, sizeof(u32));
+                cmdList->clearBufferUInt(mgr->m_terrainCompactDrawArgsBuffer, 0);
 
-                    // Transition terrain draw args to IndirectArgument state for DrawIndexedIndirect
-                    cmdList->setBufferState(mgr->m_terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-                }
+                // Update compact params (reuse same CB)
+                struct CompactParamsCB {
+                    u32 batchCount;
+                    u32 padding[3];
+                };
+                CompactParamsCB terrainCompactCB;
+                terrainCompactCB.batchCount = mgr->m_terrainObjectCount;
+                terrainCompactCB.padding[0] = terrainCompactCB.padding[1] = terrainCompactCB.padding[2] = 0;
+                cmdList->writeBuffer(mgr->m_compactParamsCB, &terrainCompactCB, sizeof(terrainCompactCB));
+
+                // Create binding set for terrain compaction
+                nvrhi::BindingSetDesc terrainCompactBindDesc;
+                terrainCompactBindDesc.bindings = {
+                    nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_compactParamsCB),
+                    nvrhi::BindingSetItem::RawBuffer_SRV(0, mgr->m_terrainDrawArgsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(1, mgr->m_terrainMaterialIDBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_SRV(2, mgr->m_terrainVisibilityBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(0, mgr->m_terrainCompactDrawArgsBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(1, mgr->m_terrainCompactBatchIndicesBuffer),
+                    nvrhi::BindingSetItem::RawBuffer_UAV(2, mgr->m_terrainCompactCountBuffer),
+                    nvrhi::BindingSetItem::StructuredBuffer_UAV(3, mgr->m_terrainCompactMaterialIDBuffer)
+                };
+
+                nvrhi::BindingSetHandle terrainCompactBindingSet = nvDevice->createBindingSet(terrainCompactBindDesc, mgr->m_compactLayout);
+                R_ASSERT2(terrainCompactBindingSet, "Terrain compaction binding set creation failed");
+
+                nvrhi::ComputeState terrainCompactState;
+                terrainCompactState.pipeline = mgr->m_compactPipeline;
+                terrainCompactState.bindings = { terrainCompactBindingSet };
+                cmdList->setComputeState(terrainCompactState);
+                cmdList->dispatch(terrainGroupCount, 1, 1);
+
+                // Transition compact buffers to IndirectArgument for DrawIndexedIndirectCount
+                cmdList->setBufferState(mgr->m_terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+                cmdList->setBufferState(mgr->m_terrainCompactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
             }
         }
     );
@@ -1347,7 +1432,13 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     // ───────────────────────────────────────────────────────
     output.terrainObjectCount = m_terrainObjectCount;
 
-    if (m_terrainObjectCount > 0 && m_terrainDrawArgsBuffer) {
+    if (m_terrainObjectCount > 0) {
+        R_ASSERT2(m_terrainDrawArgsBuffer, "Terrain draw args buffer not initialized");
+        R_ASSERT2(m_compactEnabled, "Terrain compaction requires batch compaction to be enabled");
+        R_ASSERT2(m_terrainCompactDrawArgsBuffer && m_terrainCompactBatchIndicesBuffer &&
+                      m_terrainCompactMaterialIDBuffer && m_terrainCompactCountBuffer,
+            "Terrain compaction buffers not initialized");
+
         // Import terrain draw args into framegraph
         ResourceDesc terrainArgsDesc;
         terrainArgsDesc.type = ResourceDesc::Type::Buffer;
@@ -1358,14 +1449,47 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
 
         output.terrainDrawArgsBuffer = fg.ImportBuffer("gpu_cull_terrain_drawargs", m_terrainDrawArgsBuffer, terrainArgsDesc);
 
-        // Note: Terrain compaction could be added later for optimization
-        // For now, use simple per-batch indirect draw
-        output.terrainCompactDrawArgs = VirtualResourceHandle();
-        output.terrainCompactBatchIndices = VirtualResourceHandle();
+        // Import terrain compact buffers for GPU-driven draw count
+        ResourceDesc terrainCompactArgsDesc;
+        terrainCompactArgsDesc.type = ResourceDesc::Type::Buffer;
+        terrainCompactArgsDesc.debugName = "GPUCull_TerrainCompactDrawArgs";
+        terrainCompactArgsDesc.bufferSize = m_maxTerrainObjects * sizeof(IndirectDrawArgs);
+        terrainCompactArgsDesc.isUAV = true;
+        terrainCompactArgsDesc.isTransient = false;
+
+        ResourceDesc terrainCompactIndicesDesc;
+        terrainCompactIndicesDesc.type = ResourceDesc::Type::Buffer;
+        terrainCompactIndicesDesc.debugName = "GPUCull_TerrainCompactBatchIndices";
+        terrainCompactIndicesDesc.bufferSize = m_maxTerrainObjects * sizeof(u32);
+        terrainCompactIndicesDesc.structStride = sizeof(u32);
+        terrainCompactIndicesDesc.isUAV = true;
+        terrainCompactIndicesDesc.isTransient = false;
+
+        ResourceDesc terrainCompactMaterialDesc;
+        terrainCompactMaterialDesc.type = ResourceDesc::Type::Buffer;
+        terrainCompactMaterialDesc.debugName = "GPUCull_TerrainCompactMaterialIDs";
+        terrainCompactMaterialDesc.bufferSize = m_maxTerrainObjects * sizeof(u32);
+        terrainCompactMaterialDesc.structStride = sizeof(u32);
+        terrainCompactMaterialDesc.isUAV = true;
+        terrainCompactMaterialDesc.isTransient = false;
+
+        ResourceDesc terrainCompactCountDesc;
+        terrainCompactCountDesc.type = ResourceDesc::Type::Buffer;
+        terrainCompactCountDesc.debugName = "GPUCull_TerrainCompactCount";
+        terrainCompactCountDesc.bufferSize = sizeof(u32);
+        terrainCompactCountDesc.isUAV = true;
+        terrainCompactCountDesc.isTransient = false;
+
+        output.terrainCompactDrawArgs = fg.ImportBuffer("gpu_cull_terrain_compact_drawargs", m_terrainCompactDrawArgsBuffer, terrainCompactArgsDesc);
+        output.terrainCompactBatchIndices = fg.ImportBuffer("gpu_cull_terrain_compact_batchindices", m_terrainCompactBatchIndicesBuffer, terrainCompactIndicesDesc);
+        output.terrainCompactMaterialIDs = fg.ImportBuffer("gpu_cull_terrain_compact_materialids", m_terrainCompactMaterialIDBuffer, terrainCompactMaterialDesc);
+        output.terrainCompactCount = fg.ImportBuffer("gpu_cull_terrain_compact_count", m_terrainCompactCountBuffer, terrainCompactCountDesc);
     } else {
         output.terrainDrawArgsBuffer = VirtualResourceHandle();
         output.terrainCompactDrawArgs = VirtualResourceHandle();
         output.terrainCompactBatchIndices = VirtualResourceHandle();
+        output.terrainCompactMaterialIDs = VirtualResourceHandle();
+        output.terrainCompactCount = VirtualResourceHandle();
     }
 
     return output;

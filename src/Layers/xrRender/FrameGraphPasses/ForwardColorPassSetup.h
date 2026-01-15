@@ -86,6 +86,10 @@ struct BindlessForwardConfig {
     nvrhi::IBuffer* terrainMaterialIDBuffer = nullptr;   // Terrain material IDs (TerrainMaterialBuffer)
     nvrhi::IBuffer* terrainInstanceBuffer = nullptr;     // Terrain world transforms
     nvrhi::IBuffer* terrainBatchIndicesBuffer = nullptr; // Identity mapping (0,1,2,3...) for direct indexing
+    nvrhi::IBuffer* terrainCompactDrawArgsBuffer = nullptr;    // Terrain compact draw args
+    nvrhi::IBuffer* terrainCompactBatchIndicesBuffer = nullptr; // Terrain compact batch indices
+    nvrhi::IBuffer* terrainCompactMaterialIDBuffer = nullptr;   // Terrain compact material IDs
+    nvrhi::IBuffer* terrainCompactCountBuffer = nullptr;        // Terrain compact visible count
     u32 terrainObjectCount = 0;                          // Number of terrain objects
 
     bool IsValid() const {
@@ -101,9 +105,14 @@ struct BindlessForwardConfig {
         return megaBuffersReady && megaVertexBuffer && megaIndexBuffer;
     }
 
+    bool UseTerrainCompaction() const {
+        return terrainCompactDrawArgsBuffer && terrainCompactBatchIndicesBuffer &&
+            terrainCompactMaterialIDBuffer && terrainCompactCountBuffer;
+    }
+
     // Check if terrain rendering is available
     bool HasTerrain() const {
-        return terrainDrawArgsBuffer && terrainObjectCount > 0;
+        return terrainObjectCount > 0 && (terrainDrawArgsBuffer || terrainCompactDrawArgsBuffer);
     }
 };
 

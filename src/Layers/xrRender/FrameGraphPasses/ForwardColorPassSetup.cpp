@@ -687,6 +687,8 @@ void renderBindlessForward(
     // ═══════════════════════════════════════════════════════
     // Terrain uses separate pipeline and TerrainMaterialBuffer
     if (config.HasTerrain() && config.UseMegaBuffers()) {
+        R_ASSERT2(config.UseTerrainCompaction(), "Terrain compaction buffers missing");
+
         // Lazy init terrain pipeline
         if (!s_terrainInitialized) {
             auto* shaderLoader = GEnv.Render->GetShaderLoader();
@@ -745,102 +747,96 @@ void renderBindlessForward(
         }
 
         // Render terrain if pipeline is ready
+        R_ASSERT2(s_terrainInitialized && s_terrainPipeline, "Terrain pipeline not initialized");
         if (s_terrainInitialized && s_terrainPipeline) {
             // Upload terrain materials
             auto& terrainMatBuffer = bindless::TerrainMaterialBuffer::Instance();
             terrainMatBuffer.Upload(ctx);
 
             // Validate all required terrain-specific buffers are available
-            if (!terrainMatBuffer.GetBuffer() || !config.terrainInstanceBuffer ||
-                !config.terrainBatchIndicesBuffer || !config.terrainMaterialIDBuffer ||
-                !config.terrainDrawArgsBuffer) {
-                // Missing terrain buffers - skip terrain rendering this frame
-                static bool s_terrainWarnOnce = false;
-                if (!s_terrainWarnOnce) {
-                    Msg("! [BindlessForward] Terrain buffers not ready: matBuf=%p, inst=%p, batchIdx=%p, matID=%p, drawArgs=%p",
-                        terrainMatBuffer.GetBuffer(), config.terrainInstanceBuffer,
-                        config.terrainBatchIndicesBuffer, config.terrainMaterialIDBuffer,
-                        config.terrainDrawArgsBuffer);
-                    s_terrainWarnOnce = true;
+            R_ASSERT2(terrainMatBuffer.GetBuffer() && config.terrainInstanceBuffer &&
+                          config.terrainCompactBatchIndicesBuffer && config.terrainCompactMaterialIDBuffer &&
+                          config.terrainCompactDrawArgsBuffer && config.terrainCompactCountBuffer,
+                "Terrain buffers not ready for compaction rendering");
+
+            // Begin tracking terrain buffer states for this command list
+            cmdList->beginTrackingBufferState(config.terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->beginTrackingBufferState(config.terrainCompactBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->beginTrackingBufferState(config.terrainCompactMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
+            cmdList->beginTrackingBufferState(config.terrainCompactDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
+            cmdList->beginTrackingBufferState(config.terrainCompactCountBuffer, nvrhi::ResourceStates::IndirectArgument);
+
+            // Create terrain binding set (includes TerrainMaterialBuffer at t9)
+            // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
+            nvrhi::BindingSetDesc terrainBindDesc;
+            terrainBindDesc.bindings = {
+                nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),   // b2 - static_globals
+                nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),        // b4 - lighting
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // t8 - regular materials (unused)
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMatBuffer.GetBuffer()),  // t9 - terrain materials
+                nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.terrainInstanceBuffer),       // Terrain world transforms
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.terrainCompactBatchIndicesBuffer),   // Compact batch indices
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.terrainCompactMaterialIDBuffer),     // Compact material IDs
+            };
+
+            auto terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, s_terrainLayout);
+            R_ASSERT2(terrainBindingSet, "Terrain binding set creation failed");
+
+            // Set up terrain graphics state
+            nvrhi::GraphicsState terrainState;
+            terrainState.pipeline = s_terrainPipeline;
+            terrainState.framebuffer = framebuffer;
+            terrainState.bindings = { terrainBindingSet };
+
+            // Add bindless descriptor table
+            if (backend) {
+                auto* bindlessTable = backend->GetBindlessDescriptorTable();
+                if (bindlessTable) {
+                    terrainState.addBindingSet(bindlessTable);
+                } else {
+                    static bool s_warnOnce = false;
+                    if (!s_warnOnce) {
+                        Msg("! [TerrainForward] GetBindlessDescriptorTable() returned null!");
+                        s_warnOnce = true;
+                    }
                 }
             } else {
-                // Begin tracking terrain buffer states for this command list
-                cmdList->beginTrackingBufferState(config.terrainInstanceBuffer, nvrhi::ResourceStates::ShaderResource);
-                cmdList->beginTrackingBufferState(config.terrainBatchIndicesBuffer, nvrhi::ResourceStates::ShaderResource);
-                cmdList->beginTrackingBufferState(config.terrainMaterialIDBuffer, nvrhi::ResourceStates::ShaderResource);
-                cmdList->beginTrackingBufferState(config.terrainDrawArgsBuffer, nvrhi::ResourceStates::IndirectArgument);
-
-                // Create terrain binding set (includes TerrainMaterialBuffer at t9)
-                // NOTE: Terrain uses its own instance/batch buffers, not the regular ones
-                nvrhi::BindingSetDesc terrainBindDesc;
-                terrainBindDesc.bindings = {
-                    nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),   // b2 - static_globals
-                    nvrhi::BindingSetItem::ConstantBuffer(4, lightingCB),        // b4 - lighting
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),  // t8 - regular materials (unused)
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMatBuffer.GetBuffer()),  // t9 - terrain materials
-                    nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(14, config.terrainInstanceBuffer),       // Terrain world transforms
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(15, config.terrainBatchIndicesBuffer),   // Identity mapping (0,1,2,3...)
-                    nvrhi::BindingSetItem::StructuredBuffer_SRV(16, config.terrainMaterialIDBuffer),     // Terrain material IDs
-                };
-
-                auto terrainBindingSet = nvDevice->createBindingSet(terrainBindDesc, s_terrainLayout);
-                if (terrainBindingSet) {
-                    // Set up terrain graphics state
-                    nvrhi::GraphicsState terrainState;
-                    terrainState.pipeline = s_terrainPipeline;
-                    terrainState.framebuffer = framebuffer;
-                    terrainState.bindings = { terrainBindingSet };
-
-                    // Add bindless descriptor table
-                    if (backend) {
-                        auto* bindlessTable = backend->GetBindlessDescriptorTable();
-                        if (bindlessTable) {
-                            terrainState.addBindingSet(bindlessTable);
-                        } else {
-                            static bool s_warnOnce = false;
-                            if (!s_warnOnce) {
-                                Msg("! [TerrainForward] GetBindlessDescriptorTable() returned null!");
-                                s_warnOnce = true;
-                            }
-                        }
-                    } else {
-                        static bool s_warnOnce = false;
-                        if (!s_warnOnce) {
-                            Msg("! [TerrainForward] backend is null - bindless textures won't work!");
-                            s_warnOnce = true;
-                        }
-                    }
-
-                    terrainState.vertexBuffers = {
-                        {config.megaVertexBuffer, 0, 0},
-                        {s_drawIndexBuffer, 1, 0}
-                    };
-                    terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-                    terrainState.indirectParams = config.terrainDrawArgsBuffer;
-                    terrainState.viewport.addViewport(viewport);
-                    terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
-
-                    cmdList->setGraphicsState(terrainState);
-
-                    // Debug: Log terrain draw info once
-                    static bool s_terrainDrawLogged = false;
-                    if (!s_terrainDrawLogged) {
-                        Msg("* [TerrainDraw] Drawing %u terrain batches, megaVB=%p, megaIB=%p, drawArgs=%p, matIDs=%p, inst=%p, batchIdx=%p",
-                            config.terrainObjectCount, config.megaVertexBuffer, config.megaIndexBuffer,
-                            config.terrainDrawArgsBuffer, config.terrainMaterialIDBuffer,
-                            config.terrainInstanceBuffer, config.terrainBatchIndicesBuffer);
-                        s_terrainDrawLogged = true;
-                    }
-
-                    // Draw terrain batches with single MDI call
-                    // GPU culling sets instanceCount=0 for invisible batches, so we draw all
-                    // This is ONE ExecuteIndirect call instead of N separate API calls
-                    cmdList->drawIndexedIndirect(0, config.terrainObjectCount);
-
-                    s_gpuDrivenDraws += config.terrainObjectCount;
+                static bool s_warnOnce = false;
+                if (!s_warnOnce) {
+                    Msg("! [TerrainForward] backend is null - bindless textures won't work!");
+                    s_warnOnce = true;
                 }
             }
+
+            terrainState.vertexBuffers = {
+                {config.megaVertexBuffer, 0, 0},
+                {s_drawIndexBuffer, 1, 0}
+            };
+            terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
+            terrainState.indirectParams = config.terrainCompactDrawArgsBuffer;
+            terrainState.indirectCountBuffer = config.terrainCompactCountBuffer;
+            terrainState.indirectCountOffset = 0;
+            terrainState.viewport.addViewport(viewport);
+            terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
+
+            cmdList->setGraphicsState(terrainState);
+
+            // Debug: Log terrain draw info once
+            static bool s_terrainDrawLogged = false;
+            if (!s_terrainDrawLogged) {
+                Msg("* [TerrainDraw] Drawing %u terrain batches (compacted), megaVB=%p, megaIB=%p, drawArgs=%p, count=%p, matIDs=%p, inst=%p, batchIdx=%p",
+                    config.terrainObjectCount, config.megaVertexBuffer, config.megaIndexBuffer,
+                    config.terrainCompactDrawArgsBuffer, config.terrainCompactCountBuffer,
+                    config.terrainCompactMaterialIDBuffer, config.terrainInstanceBuffer,
+                    config.terrainCompactBatchIndicesBuffer);
+                s_terrainDrawLogged = true;
+            }
+
+            // Draw terrain batches with single MDI call (count comes from compaction)
+            cmdList->drawIndexedIndirectCount(0, config.terrainObjectCount);
+
+            s_gpuDrivenDraws += config.terrainObjectCount;
         }
     }
 
