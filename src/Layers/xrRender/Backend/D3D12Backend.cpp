@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <d3d12sdklayers.h>  // For ID3D12Debug1
 #include <dxgi1_4.h>
+#include <dxgi1_5.h>  // For IDXGIFactory5 and DXGI_FEATURE_PRESENT_ALLOW_TEARING
 #include <nvrhi/d3d12.h>
 #include <nvrhi/validation.h>
 #include <SDL.h>
@@ -229,6 +230,17 @@ bool D3D12Backend::CreateDXGIFactory(bool enableValidation) {
         Msg("! [D3D12Backend] Failed to create DXGI factory");
         return false;
     }
+
+    // Check for tearing support (required for uncapped framerate in windowed mode)
+    IDXGIFactory5* factory5 = nullptr;
+    if (SUCCEEDED(m_dxgiFactory->QueryInterface(IID_PPV_ARGS(&factory5)))) {
+        BOOL allowTearing = FALSE;
+        hr = factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
+        m_tearingSupported = SUCCEEDED(hr) && allowTearing;
+        factory5->Release();
+        Msg("* [D3D12Backend] Tearing support: %s", m_tearingSupported ? "Yes" : "No");
+    }
+
     return true;
 }
 
@@ -294,6 +306,8 @@ bool D3D12Backend::CreateSwapChain(HWND hwnd, u32 width, u32 height) {
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.BufferCount = BACK_BUFFER_COUNT;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    // Enable tearing for uncapped framerate in windowed mode
+    swapChainDesc.Flags = m_tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
     IDXGISwapChain1* swapChain1 = nullptr;
     HRESULT hr = m_dxgiFactory->CreateSwapChainForHwnd(
@@ -492,7 +506,15 @@ nvrhi::ITexture* D3D12Backend::GetBackBuffer() {
 
 void D3D12Backend::Present(bool vsync) {
     if (m_swapChain) {
-        m_swapChain->Present(vsync ? 1 : 0, 0);
+        UINT syncInterval = vsync ? 1 : 0;
+        UINT presentFlags = 0;
+
+        // Use DXGI_PRESENT_ALLOW_TEARING for uncapped framerate when vsync is off
+        if (!vsync && m_tearingSupported) {
+            presentFlags = DXGI_PRESENT_ALLOW_TEARING;
+        }
+
+        m_swapChain->Present(syncInterval, presentFlags);
     }
 }
 
@@ -503,13 +525,14 @@ void D3D12Backend::ResizeSwapChain(u32 width, u32 height) {
     for (auto& bb : m_backBuffers)
         bb = nullptr;
 
-    // Resize
+    // Resize (preserve tearing flag)
+    UINT swapChainFlags = m_tearingSupported ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
     HRESULT hr = m_swapChain->ResizeBuffers(
         BACK_BUFFER_COUNT,
         width,
         height,
         DXGI_FORMAT_R8G8B8A8_UNORM,
-        0
+        swapChainFlags
     );
 
     if (FAILED(hr)) {

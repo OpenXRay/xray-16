@@ -109,6 +109,7 @@ private:
     // State
     bool m_initialized = false;
     bool m_inFrame = false;  // True between BeginFrame/EndFrame
+    bool m_tearingSupported = false;  // For uncapped framerate in windowed mode
     Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;
