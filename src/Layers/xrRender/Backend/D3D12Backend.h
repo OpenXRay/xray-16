@@ -95,6 +95,7 @@ private:
 
     bool m_initialized = false;
     bool m_inFrame = false;
+    bool m_tearingSupported = false;
     Capabilities m_capabilities;
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;
