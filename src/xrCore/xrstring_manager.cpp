@@ -22,56 +22,131 @@ struct str_container_impl
 {
     Lock cs;
     static constexpr size_t buffer_size = 1024u * 256u;
-    str_value* buffer[buffer_size];
+
+    xr_vector<str_value*> string_array;
+    u32 free_list_head;
+
+    u32 hash_table[buffer_size];
     int num_docs;
 
-    str_container_impl()
+    str_container_impl() 
+        : free_list_head(0)
     {
-        num_docs = 0;
-        ZeroMemory(buffer, sizeof(buffer));
+        ZeroMemory(hash_table, sizeof(hash_table));
+        string_array.push_back(nullptr);
     }
 
-    str_value* find(str_value* value, const char* str) const
+    str_value* get_string(u32 index) const
     {
-        str_value* candidate = buffer[value->dwCRC % buffer_size];
-        while (candidate)
+        if (index == 0 || index >= string_array.size())
+            return nullptr;
+        return string_array[index];
+    }
+
+    u32 allocate_index(str_value* value)
+    {
+        u32 index;
+        if (free_list_head != 0)
         {
-            if (candidate->dwCRC == value->dwCRC && candidate->dwLength == value->dwLength &&
-                !memcmp(candidate->value, str, value->dwLength))
-            {
-                return candidate;
-            }
-
-            candidate = candidate->next;
+            index = free_list_head;
+#pragma warning(push)
+#pragma warning(disable : 4311 4302 4312)
+            free_list_head = reinterpret_cast<u32>(string_array[index]);
+#pragma warning(pop)
+            string_array[index] = value;
         }
-
-        return nullptr;
+        else
+        {
+            index = string_array.size();
+            string_array.push_back(value);
+        }
+        return index;
     }
 
-    void insert(str_value* value)
+    void free_index(u32 index)
     {
-        str_value** element = &buffer[value->dwCRC % buffer_size];
-        value->next = *element;
-        *element = value;
+        if (index == 0 || index >= string_array.size())
+            return;
+#pragma warning(push)
+#pragma warning(disable : 4311 4302 4312)
+        string_array[index] = reinterpret_cast<str_value*>(free_list_head);
+#pragma warning(pop)
+        free_list_head = index;
+    }
+
+    u32 get_next_index(str_value* value) const
+    {
+        if (!value)
+            return 0;
+        return value->next_index;
+    }
+
+    u32 get_next_index(const str_value* value) const
+    {
+        if (!value)
+            return 0;
+        return value->next_index;
+    }
+
+    u32 find(u32 crc, size_t len, const char* str) const
+    {
+        u32 current_index = hash_table[crc % buffer_size];
+        while (current_index != 0)
+        {
+            str_value* candidate = string_array[current_index];
+            if (candidate && candidate->dwCRC == crc && candidate->dwLength == len && !memcmp(candidate->value, str, len))
+            {
+                return current_index;
+            }
+            current_index = candidate ? get_next_index(candidate) : 0;
+        }
+        return 0;
+    }
+
+    void insert(str_value* value, u32 index)
+    {
+        u32 hash_index = value->dwCRC % buffer_size;
+        value->next_index = hash_table[hash_index];
+        hash_table[hash_index] = index;
     }
 
     void clean()
     {
         for (size_t i = 0; i < buffer_size; ++i)
         {
-            str_value** current = &buffer[i];
+            u32 current_index = hash_table[i];
+            u32 prev_index = 0;
 
-            while (*current != nullptr)
+            while (current_index != 0)
             {
-                str_value* value = *current;
-                if (!value->dwReference)
+                str_value* value = string_array[current_index];
+                if (!value || !value->dwReference)
                 {
-                    *current = value->next;
-                    xr_free(value);
+                    if (prev_index == 0)
+                    {
+                        hash_table[i] = value ? get_next_index(value) : 0;
+                    }
+                    else
+                    {
+                        str_value* prev = string_array[prev_index];
+                        prev->next_index = value ? get_next_index(value) : 0;
+                    }
+                    if (value)
+                    {
+                        u32 next_index = get_next_index(value);
+                        xr_free(value);
+                        free_index(current_index);
+                        current_index = next_index;
+                    }
+                    else
+                    {
+                        current_index = 0;
+                    }
                 }
                 else
                 {
-                    current = &value->next;
+                    prev_index = current_index;
+                    current_index = value ? get_next_index(value) : 0;
                 }
             }
         }
@@ -82,16 +157,19 @@ struct str_container_impl
         Msg("strings verify started");
         for (size_t i = 0; i < buffer_size; ++i)
         {
-            const str_value* value = buffer[i];
-            while (value)
+            u32 current_index = hash_table[i];
+            while (current_index != 0)
             {
-                const auto crc = crc32(value->value, value->dwLength);
-                string32 crc_str;
-                R_ASSERT3(crc == value->dwCRC, "CorePanic: read-only memory corruption (shared_strings)",
-                    xr_itoa(value->dwCRC, crc_str, 16));
-                R_ASSERT3(value->dwLength == xr_strlen(value->value),
-                    "CorePanic: read-only memory corruption (shared_strings, internal structures)", value->value);
-                value = value->next;
+                const str_value* value = string_array[current_index];
+                if (value)
+                {
+                    const auto crc = crc32(value->value, value->dwLength);
+                    string32 crc_str;
+                    R_ASSERT3(crc == value->dwCRC, "CorePanic: read-only memory corruption (shared_strings)", xr_itoa(value->dwCRC, crc_str, 16));
+                    R_ASSERT3(value->dwLength == xr_strlen(value->value), "CorePanic: read-only memory corruption (shared_strings, internal structures)",
+                        value->value);
+                }
+                current_index = get_next_index(value);
             }
         }
         Msg("strings verify completed");
@@ -101,12 +179,15 @@ struct str_container_impl
     {
         for (size_t i = 0; i < buffer_size; ++i)
         {
-            str_value* value = buffer[i];
-            while (value)
+            u32 current_index = hash_table[i];
+            while (current_index != 0)
             {
-                fprintf(f, "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength, value->dwCRC,
-                    value->value);
-                value = value->next;
+                str_value* value = string_array[current_index];
+                if (value)
+                {
+                    fprintf(f, "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength, value->dwCRC, value->value);
+                }
+                current_index = get_next_index(value);
             }
         }
     }
@@ -115,14 +196,17 @@ struct str_container_impl
     {
         for (size_t i = 0; i < buffer_size; ++i)
         {
-            str_value* value = buffer[i];
+            u32 current_index = hash_table[i];
             string4096 temp;
-            while (value)
+            while (current_index != 0)
             {
-                xr_sprintf(temp, sizeof(temp), "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength,
-                    value->dwCRC, value->value);
-                f->w_string(temp);
-                value = value->next;
+                str_value* value = string_array[current_index];
+                if (value)
+                {
+                    xr_sprintf(temp, sizeof(temp), "ref[%4u]-len[%3u]-crc[%8X] : %s\n", value->dwReference, value->dwLength, value->dwCRC, value->value);
+                    f->w_string(temp);
+                }
+                current_index = get_next_index(value);
             }
         }
     }
@@ -132,12 +216,16 @@ struct str_container_impl
         size_t bytes{}, count{};
         for (size_t i = 0; i < buffer_size; ++i)
         {
-            const str_value* value = buffer[i];
-            while (value)
+            u32 current_index = hash_table[i];
+            while (current_index != 0)
             {
-                ++count;
-                bytes += (value->dwReference - 1) * (value->dwLength + 1);
-                value = value->next;
+                const str_value* value = string_array[current_index];
+                if (value)
+                {
+                    ++count;
+                    bytes += (value->dwReference - 1) * (value->dwLength + 1);
+                }
+                current_index = get_next_index(value);
             }
         }
         return { bytes, count };
@@ -151,62 +239,67 @@ str_container::str_container() :
 #endif
 {}
 
-str_value* str_container::dock(pcstr value) const
+u32 str_container::dock(pcstr value) const
 {
     if (nullptr == value)
-        return nullptr;
+        return 0;
 
     impl->cs.Enter();
 
-    str_value* result = nullptr;
-
-    // calc len
     const auto s_len = xr_strlen(value);
     const auto s_len_with_zero = s_len + 1;
     VERIFY(sizeof(str_value) + s_len_with_zero < 4096);
 
-    // setup find structure
-    char header[sizeof(str_value)];
-    str_value* sv = (str_value*)header;
-    sv->dwReference = 0;
-    sv->dwLength = static_cast<u32>(s_len);
-    sv->dwCRC = crc32(value, s_len);
+    const u32 crc = crc32(value, s_len);
 
-    // search
-    result = impl->find(sv, value);
+    u32 index = impl->find(crc, s_len, value);
 
-#ifdef DEBUG
+#    ifdef DEBUG
     const bool is_leaked_string = !xr_strcmp(value, "enter leaked string here");
-#endif // DEBUG
+#    endif // DEBUG
 
-    // it may be the case, string is not found or has "non-exact" match
-    if (nullptr == result
-#ifdef DEBUG
-        || is_leaked_string
-#endif // DEBUG
-        )
+    if (index != 0
+#    ifdef DEBUG
+        && !is_leaked_string
+#    endif // DEBUG
+    )
     {
-        result = static_cast<str_value*>(xr_malloc(sizeof(str_value) + s_len_with_zero));
+        impl->cs.Leave();
+        return index;
+    }
+
+    str_value* new_str = static_cast<str_value*>(xr_malloc(sizeof(str_value) + s_len_with_zero));
 
 #ifdef DEBUG
-        static int num_leaked_string = 0;
-        if (is_leaked_string)
-        {
-            ++num_leaked_string;
-            Msg("leaked_string: %d 0x%08x", num_leaked_string, result);
-        }
+    static int num_leaked_string = 0;
+    if (is_leaked_string)
+    {
+        ++num_leaked_string;
+        Msg("leaked_string: %d ptr=%p", num_leaked_string, new_str);
+    }
 #endif // DEBUG
 
-        result->dwReference = 0;
-        result->dwLength = sv->dwLength;
-        result->dwCRC = sv->dwCRC;
-        CopyMemory(result->value, value, s_len_with_zero);
+    new_str->dwReference = 0;
+    new_str->dwLength = static_cast<u32>(s_len);
+    new_str->dwCRC = crc;
+    new_str->next_index = 0;
+    CopyMemory(new_str->value, value, s_len_with_zero);
 
-        impl->insert(result);
-    }
+    const u32 new_index = impl->allocate_index(new_str);
+    impl->insert(new_str, new_index);
+
+#ifdef DEBUG
+    if (is_leaked_string)
+        Msg("leaked_string: idx=%u ptr=%p", new_index, new_str);
+#endif // DEBUG
+
     impl->cs.Leave();
+    return new_index;
+}
 
-    return result;
+str_value* str_container::get_string(u32 index) const
+{
+    return impl->get_string(index);
 }
 
 void str_container::clean() const

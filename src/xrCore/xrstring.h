@@ -9,7 +9,7 @@ struct str_value;
 
 class XRCORE_API shared_str
 {
-    str_value* p_{};
+    u32 index_{};
 
 protected:
     void _dec() noexcept;
@@ -20,17 +20,21 @@ public:
     void _set(std::nullptr_t) noexcept;
 
     [[nodiscard]]
-    const str_value* _get() const { return p_; }
+    const str_value* _get() const;
+
+    friend bool operator==(shared_str const& a, shared_str const& b);
+    friend bool operator!=(shared_str const& a, shared_str const& b);
+    friend bool operator<(shared_str const& a, shared_str const& b);
+    friend bool operator>(shared_str const& a, shared_str const& b);
 
 public:
     // construction
     shared_str() = default;
     shared_str(pcstr rhs);
     shared_str(shared_str const& rhs) noexcept;
-    shared_str(shared_str&& rhs) noexcept
-        : p_(rhs.p_)
+    shared_str(shared_str&& rhs) noexcept : index_(rhs.index_)
     {
-        rhs.p_ = nullptr;
+        rhs.index_ = 0;
     }
     ~shared_str();
     // assignment & accessors
@@ -38,16 +42,22 @@ public:
     shared_str& operator=(shared_str const& rhs) noexcept;
     shared_str& operator=(shared_str&& rhs) noexcept
     {
-        p_ = rhs.p_;
-        rhs.p_ = nullptr;
+        index_ = rhs.index_;
+        rhs.index_ = 0;
         return *this;
     }
     shared_str& operator=(std::nullptr_t) noexcept;
 
     [[nodiscard]]
-    bool operator!() const { return p_ == nullptr; }
+    bool operator!() const
+    {
+        return index_ == 0;
+    }
     [[nodiscard]]
-    explicit operator bool() const { return p_ != nullptr; }
+    explicit operator bool() const
+    {
+        return index_ != 0;
+    }
     [[nodiscard]]
     char operator[](size_t id);
     [[nodiscard]]
@@ -65,13 +75,14 @@ public:
 
     void swap(shared_str& rhs) noexcept
     {
-        str_value* tmp = p_;
-        p_ = rhs.p_;
-        rhs.p_ = tmp;
+        u32 tmp = index_;
+        index_ = rhs.index_;
+        rhs.index_ = tmp;
     }
 
     [[nodiscard]]
-    bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
+    bool equal(const shared_str& rhs) const;
+
     [[nodiscard]]
     u32 get_crc() const;
 };
@@ -112,10 +123,26 @@ bool operator!=(std::nullptr_t, const shared_str&) = delete;
 // ptr != const res_ptr
 // res_ptr < res_ptr
 // res_ptr > res_ptr
-IC bool operator==(shared_str const& a, shared_str const& b) { return a._get() == b._get(); }
-IC bool operator!=(shared_str const& a, shared_str const& b) { return a._get() != b._get(); }
-IC bool operator<(shared_str const& a, shared_str const& b) { return a._get() < b._get(); }
-IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > b._get(); }
+IC bool operator==(shared_str const& a, shared_str const& b)
+{
+    return a.index_ == b.index_;
+}
+
+IC bool operator!=(shared_str const& a, shared_str const& b)
+{
+    return a.index_ != b.index_;
+}
+
+IC bool operator<(shared_str const& a, shared_str const& b)
+{
+    return a.index_ < b.index_;
+}
+
+IC bool operator>(shared_str const& a, shared_str const& b)
+{
+    return a.index_ > b.index_;
+}
+
 // externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) noexcept { lhs.swap(rhs); }
 IC size_t xr_strlen(const shared_str& a) noexcept { return a.size(); }

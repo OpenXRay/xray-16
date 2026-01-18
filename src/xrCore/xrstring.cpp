@@ -7,46 +7,67 @@
 
 void shared_str::_dec() noexcept
 {
-    if (nullptr == p_)
+    if (index_ == 0)
         return;
-    p_->dwReference--;
-    if (0 == p_->dwReference)
-        p_ = nullptr;
+
+    if (!g_pStringContainer /* || !shared_str_initialized */)
+    {
+        index_ = 0;
+        return;
+    }
+
+    str_value* p = g_pStringContainer->get_string(index_);
+    if (p)
+    {
+        p->dwReference--;
+        if (p->dwReference == 0)
+        {
+            index_ = 0;
+        }
+    }
 }
 
 void shared_str::_set(pcstr rhs)
 {
-    str_value* v = g_pStringContainer->dock(rhs);
-    if (nullptr != v)
-        v->dwReference++;
+    u32 new_index = g_pStringContainer->dock(rhs);
+    if (new_index != 0)
+    {
+        str_value* v = g_pStringContainer->get_string(new_index);
+        if (v)
+            v->dwReference++;
+    }
     _dec();
-    p_ = v;
+    index_ = new_index;
 }
 
 void shared_str::_set(shared_str const& rhs) noexcept
 {
-    str_value* v = rhs.p_;
-    if (nullptr != v)
-        v->dwReference++;
+    u32 new_index = rhs.index_;
+    if (new_index != 0)
+    {
+        str_value* v = g_pStringContainer->get_string(new_index);
+        if (v)
+            v->dwReference++;
+    }
     _dec();
-    p_ = v;
+    index_ = new_index;
 }
 
 void shared_str::_set(std::nullptr_t) noexcept
 {
     _dec();
-    p_ = nullptr;
+    index_ = 0;
 }
 
 shared_str::shared_str(pcstr rhs)
 {
-    p_ = nullptr;
+    index_ = 0;
     _set(rhs);
 }
 
 shared_str::shared_str(shared_str const& rhs) noexcept
 {
-    p_ = nullptr;
+    index_ = 0;
     _set(rhs);
 }
 
@@ -73,29 +94,46 @@ shared_str& shared_str::operator=(std::nullptr_t) noexcept
     return *this;
 }
 
+const str_value* shared_str::_get() const
+{
+    if (index_ == 0)
+        return nullptr;
+
+    if (!g_pStringContainer /* || !shared_str_initialized */)
+        return nullptr;
+
+    return g_pStringContainer->get_string(index_);
+}
+
 char shared_str::operator[](size_t id)
 {
-    return p_->value[id];
+    return _get()->value[id];
 }
 
 char shared_str::operator[](size_t id) const
 {
-    return p_->value[id];
+    return _get()->value[id];
 }
 
 pcstr shared_str::c_str() const
 {
-    return p_ ? p_->value : nullptr;
+    const str_value* p = _get();
+    return p ? p->value : nullptr;
 }
 
 size_t shared_str::size() const
 {
-    if (nullptr == p_)
-        return 0;
-    return p_->dwLength;
+    const str_value* p = _get();
+    return p ? p->dwLength : 0;
 }
 
 u32 shared_str::get_crc() const
 {
-    return p_ ? p_->dwCRC : 0;
+    const str_value* p = _get();
+    return p ? p->dwCRC : 0;
+}
+
+bool shared_str::equal(const shared_str& rhs) const
+{
+    return index_ == rhs.index_;
 }

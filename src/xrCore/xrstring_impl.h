@@ -10,7 +10,7 @@ struct str_value
     u32 dwReference;
     u32 dwLength;
     u32 dwCRC;
-    str_value* next;
+    u32 next_index;
     char value[];
 };
 #pragma warning(pop)

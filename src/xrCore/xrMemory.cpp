@@ -105,8 +105,16 @@ void xrMemory::_initialize()
 void xrMemory::_destroy()
 {
     ZoneScoped;
-    xr_delete(g_pSharedMemoryContainer);
-    xr_delete(g_pStringContainer);
+
+    shared_str_initialized = false;
+
+    auto* sc = g_pStringContainer;
+    g_pStringContainer = nullptr;
+    xr_delete(sc);
+
+    auto* sm = g_pSharedMemoryContainer;
+    g_pSharedMemoryContainer = nullptr;
+    xr_delete(sm);
 }
 
 XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)

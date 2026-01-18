@@ -21,8 +21,8 @@ class XRCORE_API str_container
 public:
     str_container();
     ~str_container();
-
-    str_value* dock(pcstr value) const;
+    u32 dock(pcstr value) const;
+    str_value* get_string(u32 index) const;
     void clean() const;
     void dump() const;
     void dump(IWriter* W) const;
