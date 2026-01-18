@@ -24,6 +24,7 @@ struct str_container_impl
     static constexpr size_t buffer_size = 1024u * 256u;
 
     xr_vector<str_value*> string_array;
+    xr_vector<u32> free_next;
     u32 free_list_head;
 
     u32 hash_table[buffer_size];
@@ -34,6 +35,7 @@ struct str_container_impl
     {
         ZeroMemory(hash_table, sizeof(hash_table));
         string_array.push_back(nullptr);
+        free_next.push_back(0);
     }
 
     str_value* get_string(u32 index) const
@@ -45,21 +47,18 @@ struct str_container_impl
 
     u32 allocate_index(str_value* value)
     {
-        u32 index;
         if (free_list_head != 0)
         {
-            index = free_list_head;
-#pragma warning(push)
-#pragma warning(disable : 4311 4302 4312)
-            free_list_head = reinterpret_cast<u32>(string_array[index]);
-#pragma warning(pop)
+            const u32 index = free_list_head;
+            free_list_head = free_next[index];
+            free_next[index] = 0;
             string_array[index] = value;
+            return index;
         }
-        else
-        {
-            index = string_array.size();
-            string_array.push_back(value);
-        }
+
+        const u32 index = (u32)string_array.size();
+        string_array.push_back(value);
+        free_next.push_back(0);
         return index;
     }
 
@@ -67,10 +66,9 @@ struct str_container_impl
     {
         if (index == 0 || index >= string_array.size())
             return;
-#pragma warning(push)
-#pragma warning(disable : 4311 4302 4312)
-        string_array[index] = reinterpret_cast<str_value*>(free_list_head);
-#pragma warning(pop)
+
+        string_array[index] = nullptr;
+        free_next[index] = free_list_head;
         free_list_head = index;
     }
 
