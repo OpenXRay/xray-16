@@ -30,7 +30,7 @@ struct str_container_impl
     u32 hash_table[buffer_size];
     int num_docs;
 
-    str_container_impl() 
+    str_container_impl()
         : free_list_head(0)
     {
         ZeroMemory(hash_table, sizeof(hash_table));
