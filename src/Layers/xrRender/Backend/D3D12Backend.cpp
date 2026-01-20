@@ -342,7 +342,7 @@ void D3D12Backend::CreateBindlessResources() {
     Msg("* [D3D12Backend] Creating bindless resources...");
 
     nvrhi::BindlessLayoutDesc bindlessDesc;
-    bindlessDesc.visibility = nvrhi::ShaderType::Pixel | nvrhi::ShaderType::Compute | nvrhi::ShaderType::Vertex;
+    bindlessDesc.visibility = nvrhi::ShaderType::All;
     bindlessDesc.firstSlot = 0;
     bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
     bindlessDesc.layoutType = nvrhi::BindlessLayoutDesc::LayoutType::MutableSrvUavCbv;

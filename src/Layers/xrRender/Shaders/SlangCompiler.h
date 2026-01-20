@@ -27,7 +27,9 @@ public:
         Compute,
         Geometry,
         Hull,
-        Domain
+        Domain,
+        Amplification,
+        Mesh
     };
 
     struct CompileResult

@@ -69,6 +69,16 @@ public:
         const char* entryPoint = "main"
     );
 
+    ShaderResult LoadAmplificationShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
+    ShaderResult LoadMeshShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
     const ShaderCache::Stats& GetCacheStats() const { return m_cache.GetStats(); }
 
     xray::render::SlangCompiler* GetSlangCompiler() const { return m_slangCompiler; }
