@@ -196,6 +196,9 @@
     <Filter Include="Slang">
       <UniqueIdentifier>{971dc00e-f646-4c8c-bf38-96d32432d02e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Externals\meshoptimizer">
+      <UniqueIdentifier>{f2c1d5e5-4a59-4f69-a66a-3d44d5b9b1b7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Framegraph\ConstantSystem">
       <UniqueIdentifier>{7e4fa8a3-2a14-47bb-8d56-b7230ea2ba89}</UniqueIdentifier>
     </Filter>
@@ -933,6 +936,9 @@
     <ClInclude Include="..\xrRender\FrameGraph\PassResourceCache.h" />
     <ClInclude Include="..\xrRender\FGDetailManager.h">
       <Filter>Framegraph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h">
+      <Filter>Externals\meshoptimizer</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h">
       <Filter>Framegraph\Passes</Filter>
@@ -1720,6 +1726,54 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\FrameGraphPasses\DetailPassSetup.cpp">
       <Filter>Framegraph\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\clusterizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexanalyzer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexcodec.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexgenerator.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\overdrawoptimizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\partition.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\quantization.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\rasterizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\simplifier.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\spatialorder.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\stripifier.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vcacheoptimizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexcodec.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexfilter.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vfetchoptimizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

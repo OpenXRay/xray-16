@@ -545,6 +545,222 @@ ShaderLoader::ShaderResult ShaderLoader::LoadComputeShader(
 }
 
 // ══════════════════════════════════════════════════════════
+//  AMPLIFICATION SHADER (SM6.5 MESH SHADER PIPELINE)
+// ══════════════════════════════════════════════════════════
+
+ShaderLoader::ShaderResult ShaderLoader::LoadAmplificationShader(
+    const char* name,
+    const char* entryPoint)
+{
+    ShaderResult result;
+
+    // Check in-memory handle cache first
+    xr_string cacheKey = xr_string(name) + ".as";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
+
+    // Open shader source file
+    IReader* fs = OpenShaderFile(name, ".as");
+    if (!fs)
+        return result;
+
+    // Compute hash of shader source
+    u32 sourceHash = ShaderCache::ComputeHash(
+        (const char*)fs->pointer(),
+        fs->length()
+    );
+
+    // Check disk cache
+    ExtractedReflection cachedReflection;
+    if (m_cache.TryLoad(name, ".as", sourceHash, result.bytecode, &cachedReflection))
+    {
+        fs->close();
+
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Amplification;
+        desc.debugName = name;
+
+        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+            desc, result.bytecode.data(), result.bytecode.size()
+        );
+
+        if (result.handle) {
+            result.reflection = xr_new<ExtractedReflection>(cachedReflection);
+            m_handleCache[cacheKey] = result.handle;
+            m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(cachedReflection);
+            return result;
+        }
+    }
+
+    // Compile from source
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath, GEnv.Render->getShaderPath(), name, ".as");
+
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(),
+        entryPoint,
+        xray::render::SlangCompiler::Stage::Amplification,
+        xray::render::SlangCompiler::Target::DXIL,
+        fullPath
+    );
+
+    fs->close();
+
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.as", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;
+    }
+
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Amplification;
+    desc.debugName = name;
+
+    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        desc, compileResult.bytecode.data(), compileResult.bytecode.size()
+    );
+
+    if (!result.handle)
+    {
+        Msg("! [ShaderLoader] Failed to create NVRHI amplification shader: %s", name);
+        return result;
+    }
+
+    result.bytecode = std::move(compileResult.bytecode);
+
+    auto extractedReflection = ShaderReflector::ExtractReflection(compileResult.reflection, false);
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+
+    m_cache.Save(name, ".as", sourceHash, result.bytecode, &extractedReflection);
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
+    Msg("* [ShaderLoader] Compiled amplification shader: %s.as", name);
+
+    return result;
+}
+
+// ══════════════════════════════════════════════════════════
+//  MESH SHADER (SM6.5 MESH SHADER PIPELINE)
+// ══════════════════════════════════════════════════════════
+
+ShaderLoader::ShaderResult ShaderLoader::LoadMeshShader(
+    const char* name,
+    const char* entryPoint)
+{
+    ShaderResult result;
+
+    // Check in-memory handle cache first
+    xr_string cacheKey = xr_string(name) + ".ms";
+    auto handleIt = m_handleCache.find(cacheKey);
+    if (handleIt != m_handleCache.end()) {
+        result.handle = handleIt->second;
+        auto reflIt = m_reflectionCache.find(cacheKey);
+        if (reflIt != m_reflectionCache.end()) {
+            result.reflection = xr_new<ExtractedReflection>(*reflIt->second);
+        }
+        return result;
+    }
+
+    // Open shader source file
+    IReader* fs = OpenShaderFile(name, ".ms");
+    if (!fs)
+        return result;
+
+    // Compute hash of shader source
+    u32 sourceHash = ShaderCache::ComputeHash(
+        (const char*)fs->pointer(),
+        fs->length()
+    );
+
+    // Check disk cache
+    ExtractedReflection cachedReflection;
+    if (m_cache.TryLoad(name, ".ms", sourceHash, result.bytecode, &cachedReflection))
+    {
+        fs->close();
+
+        nvrhi::ShaderDesc desc;
+        desc.shaderType = nvrhi::ShaderType::Mesh;
+        desc.debugName = name;
+
+        result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+            desc, result.bytecode.data(), result.bytecode.size()
+        );
+
+        if (result.handle) {
+            result.reflection = xr_new<ExtractedReflection>(cachedReflection);
+            m_handleCache[cacheKey] = result.handle;
+            m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(cachedReflection);
+            return result;
+        }
+    }
+
+    // Compile from source
+    xr_string sourceCode;
+    sourceCode.assign((const char*)fs->pointer(), fs->length());
+
+    string_path fullPath;
+    strconcat(sizeof(fullPath), fullPath, GEnv.Render->getShaderPath(), name, ".ms");
+
+    auto compileResult = m_slangCompiler->CompileFromSource(
+        sourceCode.c_str(),
+        entryPoint,
+        xray::render::SlangCompiler::Stage::Mesh,
+        xray::render::SlangCompiler::Target::DXIL,
+        fullPath
+    );
+
+    fs->close();
+
+    if (!compileResult.IsValid())
+    {
+        Msg("! [ShaderLoader] Compilation failed for %s.ms", name);
+        if (!compileResult.errorMessage.empty())
+            Msg("! Error: %s", compileResult.errorMessage.c_str());
+        return result;
+    }
+
+    nvrhi::ShaderDesc desc;
+    desc.shaderType = nvrhi::ShaderType::Mesh;
+    desc.debugName = name;
+
+    result.handle = GEnv.FrameGraphRenderer->GetRenderDevice()->GetNVRHIDevice()->createShader(
+        desc, compileResult.bytecode.data(), compileResult.bytecode.size()
+    );
+
+    if (!result.handle)
+    {
+        Msg("! [ShaderLoader] Failed to create NVRHI mesh shader: %s", name);
+        return result;
+    }
+
+    result.bytecode = std::move(compileResult.bytecode);
+
+    auto extractedReflection = ShaderReflector::ExtractReflection(compileResult.reflection, false);
+    result.reflection = xr_new<ExtractedReflection>(extractedReflection);
+
+    m_cache.Save(name, ".ms", sourceHash, result.bytecode, &extractedReflection);
+    m_handleCache[cacheKey] = result.handle;
+    m_reflectionCache[cacheKey] = xr_new<ExtractedReflection>(extractedReflection);
+
+    Msg("* [ShaderLoader] Compiled mesh shader: %s.ms", name);
+
+    return result;
+}
+
+// ══════════════════════════════════════════════════════════
 //  COMPILE SHADER WITH DEFINES (FOR MATERIAL SHADERS)
 // ══════════════════════════════════════════════════════════
 

@@ -37,3 +37,6 @@
 [submodule "Externals/DirectX-Headers"]
 	path = Externals/DirectX-Headers
 	url = https://github.com/microsoft/DirectX-Headers.git
+[submodule "Externals/meshoptimizer"]
+	path = Externals/meshoptimizer
+	url = https://github.com/zeux/meshoptimizer.git

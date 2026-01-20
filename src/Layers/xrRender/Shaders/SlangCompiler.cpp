@@ -291,6 +291,10 @@ SlangStage SlangCompiler::GetSlangStage(Stage stage) const
         return SLANG_STAGE_HULL;
     case Stage::Domain:
         return SLANG_STAGE_DOMAIN;
+    case Stage::Amplification:
+        return SLANG_STAGE_AMPLIFICATION;
+    case Stage::Mesh:
+        return SLANG_STAGE_MESH;
     default:
         Msg("! [SlangCompiler] Unknown stage, defaulting to vertex");
         return SLANG_STAGE_VERTEX;
@@ -319,6 +323,8 @@ const char* SlangCompiler::GetStageName(Stage stage)
     case Stage::Geometry: return "Geometry";
     case Stage::Hull:     return "Hull";
     case Stage::Domain:   return "Domain";
+    case Stage::Amplification: return "Amplification";
+    case Stage::Mesh:          return "Mesh";
     default:              return "Unknown";
     }
 }

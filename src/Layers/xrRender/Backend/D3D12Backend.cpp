@@ -371,7 +371,7 @@ void D3D12Backend::CreateBindlessResources() {
     // Create bindless layout for SM6.6 ResourceDescriptorHeap access
     // MutableSrvUavCbv enables D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED
     nvrhi::BindlessLayoutDesc bindlessDesc;
-    bindlessDesc.visibility = nvrhi::ShaderType::Pixel | nvrhi::ShaderType::Compute | nvrhi::ShaderType::Vertex;
+    bindlessDesc.visibility = nvrhi::ShaderType::All;
     bindlessDesc.firstSlot = 0;
     bindlessDesc.maxCapacity = MAX_BINDLESS_TEXTURES;
     // Use MutableSrvUavCbv to enable ResourceDescriptorHeap direct indexing (SM6.6)

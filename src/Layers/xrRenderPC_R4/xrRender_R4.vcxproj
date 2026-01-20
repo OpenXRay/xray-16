@@ -25,7 +25,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Layers\xrRender_R2;$(xrExternals)imgui;$(xrExternals)OpenAutomate\inc;$(xrSdkDir)include\nvapi;$(xrSdkDir)include\DirectXMesh;$(xrExternals)AGS_SDK;$(xrExternals)nvrhi\include;$(xrExternals)slang\include;$(xrExternals)DirectX-Headers\include;$(xrExternals)meshoptimizer\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)'!='Release Master Gold'">$(xrExternals)onnxruntime\include\onnxruntime\core\session;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRRENDER_R4_EXPORTS;USE_DX11;RENDER_NAMESPACE=render_r4;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)'!='Release Master Gold'">%(PreprocessorDefinitions);USE_AI_PBR</PreprocessorDefinitions>
@@ -164,6 +164,7 @@
     <ClInclude Include="..\xrRender\FrameGraphPasses\SunPassSetup.h" />
     <ClInclude Include="..\xrRender\FrameGraphPasses\DetailPassSetup.h" />
     <ClInclude Include="..\xrRender\FGDetailManager.h" />
+    <ClInclude Include="..\..\..\Externals\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\xrRender\ImGuiRendererNVRHI.h" />
     <ClInclude Include="..\xrRender\dxLensFlareRender.h" />
     <ClInclude Include="..\xrRender\dxObjectSpaceRender.h" />
@@ -552,6 +553,70 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
     <ClCompile Include="..\xrRender\light_smapvis.cpp" />
     <ClCompile Include="..\xrRender\light_vis.cpp" />
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\allocator.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\clusterizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexanalyzer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexcodec.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\indexgenerator.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\overdrawoptimizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\partition.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\quantization.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\rasterizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\simplifier.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\spatialorder.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\stripifier.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vcacheoptimizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexcodec.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vertexfilter.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Externals\meshoptimizer\src\vfetchoptimizer.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
     <ClCompile Include="r4_rendertarget_build_textures.cpp" />
     <ClCompile Include="r4_rendertarget_u_set_rt.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />

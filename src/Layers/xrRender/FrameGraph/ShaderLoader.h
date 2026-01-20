@@ -110,6 +110,26 @@ public:
     );
 
     /// <summary>
+    /// Load and compile amplification shader (SM6.5 mesh shader pipeline)
+    /// </summary>
+    /// <param name="name">Shader name without extension (e.g., "meshlet_cull")</param>
+    /// <param name="entryPoint">Entry point function name (default: "main")</param>
+    ShaderResult LoadAmplificationShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
+    /// <summary>
+    /// Load and compile mesh shader (SM6.5 mesh shader pipeline)
+    /// </summary>
+    /// <param name="name">Shader name without extension (e.g., "meshlet_render")</param>
+    /// <param name="entryPoint">Entry point function name (default: "main")</param>
+    ShaderResult LoadMeshShader(
+        const char* name,
+        const char* entryPoint = "main"
+    );
+
+    /// <summary>
     /// Get cache statistics
     /// </summary>
     const ShaderCache::Stats& GetCacheStats() const { return m_cache.GetStats(); }

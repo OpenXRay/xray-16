@@ -37,8 +37,10 @@ public:
         Pixel,
         Compute,
         Geometry,
-        Hull,      // Tessellation control (domain shader)
-        Domain     // Tessellation evaluation (hull shader)
+        Hull,          // Tessellation control (domain shader)
+        Domain,        // Tessellation evaluation (hull shader)
+        Amplification, // Mesh shader pipeline - task/amplification shader (SM6.5+)
+        Mesh           // Mesh shader pipeline - mesh shader (SM6.5+)
     };
 
     /// <summary>
