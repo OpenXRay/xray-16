@@ -543,7 +543,6 @@ void renderBindlessForward(
         {s_drawIndexBuffer, 1, 0}
     };
     state.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
-    state.indirectCountOffset = 0;
     state.viewport.addViewport(viewport);
     state.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
@@ -562,7 +561,7 @@ void renderBindlessForward(
         state.indirectCountBuffer = set.compactCountBuffer;
 
         cmdList->setGraphicsState(state);
-        cmdList->drawIndexedIndirectCount(0, set.totalObjectCount);
+        cmdList->drawIndexedIndirectCount(0, 0, set.totalObjectCount);
         s_gpuDrivenDraws += set.totalObjectCount;
     };
 
@@ -688,7 +687,6 @@ void renderBindlessForward(
             terrainState.indexBuffer = { config.megaIndexBuffer, nvrhi::Format::R32_UINT, 0 };
             terrainState.indirectParams = config.terrainCompactDrawArgsBuffer;
             terrainState.indirectCountBuffer = config.terrainCompactCountBuffer;
-            terrainState.indirectCountOffset = 0;
             terrainState.viewport.addViewport(viewport);
             terrainState.viewport.addScissorRect(nvrhi::Rect(rtDesc.width, rtDesc.height));
 
@@ -704,7 +702,7 @@ void renderBindlessForward(
                 s_terrainDrawLogged = true;
             }
 
-            cmdList->drawIndexedIndirectCount(0, config.terrainObjectCount);
+            cmdList->drawIndexedIndirectCount(0, 0, config.terrainObjectCount);
 
             s_gpuDrivenDraws += config.terrainObjectCount;
         }
