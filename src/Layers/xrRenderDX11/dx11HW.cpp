@@ -5,7 +5,7 @@
 #include "StateManager/dx11SamplerStateCache.h"
 #include "dx11TextureUtils.h"
 
-#include <SDL_syswm.h>
+#include <SDL3/SDL_properties.h>
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -241,17 +241,14 @@ void CHW::CreateDevice(SDL_Window* sdlWnd)
         }
     }
 
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-
-    if (!SDL_GetWindowWMInfo(sdlWnd, &info))
+    const SDL_PropertiesID props = SDL_GetWindowProperties(sdlWnd);
+    const HWND hwnd = static_cast<HWND>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+    if (!hwnd)
     {
         Msg("! Failed to retrieve SDL window handle: %s", SDL_GetError());
         Valid = false;
         return;
     }
-
-    const HWND hwnd = info.info.win.window;
 
     if (!CreateSwapChain2(hwnd))
     {

@@ -3,7 +3,7 @@
 #include "xr_3da/resource.h"
 
 #ifdef XR_PLATFORM_WINDOWS
-#   include <SDL_syswm.h>
+#   include <SDL3/SDL_properties.h>
 #endif
 
 inline SDL_Surface* XRSDL_SurfaceVerticalFlip(SDL_Surface*& source)
@@ -90,11 +90,9 @@ inline void ExtractAndSetWindowIcon(SDL_Window* wnd, int iconIdx)
 
     const HICON icon = (HICON)ExtractImage(iconIdx, IMAGE_ICON);
 
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    R_ASSERT2(SDL_GetWindowWMInfo(wnd, &info), SDL_GetError());
-
-    const HWND hwnd = info.info.win.window;
+    const SDL_PropertiesID props = SDL_GetWindowProperties(wnd);
+    const HWND hwnd = static_cast<HWND>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+    R_ASSERT2(hwnd, SDL_GetError());
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon);
     SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon);
 }

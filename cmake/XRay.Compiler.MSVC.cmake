@@ -1,5 +1,8 @@
 include_guard()
 
+# Dependencies
+find_package(SDL3 3.4.0 REQUIRED CONFIG COMPONENTS SDL3)
+
 # The MSVC compiler settings:
 # Set properties:
 set(CMAKE_VS_USE_DEBUG_LIBRARIES "$<CONFIG:Debug>")

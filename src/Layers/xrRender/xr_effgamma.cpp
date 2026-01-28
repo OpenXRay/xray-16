@@ -84,6 +84,6 @@ void CGammaControl::Update() const
 #endif
     u16 red[256], green[256], blue[256];
     GenLUT(red, green, blue, 256);
-    SDL_SetWindowGammaRamp(Device.m_sdlWnd, red, green, blue);
+    // SDL3 removed window gamma ramp control; keep data prepared for future backends.
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -300,7 +300,7 @@ void CTheoraSurface::open_sdl_video()
     VERIFY(m_rgb);
     theora_info& t_info = m_rgb->t_info;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
     {
         msg("Unable to init SDL: %s", SDL_GetError());
         return;
@@ -336,9 +336,9 @@ void CTheoraSurface::write_sdl_video()
     int crop_offset;
     // Lock SDL_yuv_overlay
     if (SDL_MUSTLOCK(sdl_screen))
-        if (SDL_LockSurface(sdl_screen) < 0)
+        if (!SDL_LockSurface(sdl_screen))
             return;
-    if (SDL_LockYUVOverlay(sdl_yuv_overlay) < 0)
+    if (!SDL_LockYUVOverlay(sdl_yuv_overlay))
         return;
     // let's draw the data (*yuv[3]) on a SDL screen (*screen)
     // deal with border stride

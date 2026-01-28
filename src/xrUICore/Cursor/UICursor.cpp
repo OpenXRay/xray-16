@@ -29,7 +29,8 @@ void CUICursor::OnDeviceReset()
     correction.y = UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h;
 
     SDL_Rect display;
-    if (0 == SDL_GetDisplayBounds(0, &display))
+    const SDL_DisplayID displayId = SDL_GetPrimaryDisplay();
+    if (displayId != 0 && SDL_GetDisplayBounds(displayId, &display))
     {
         const u32 screen_size_x = display.w - display.x;
         const u32 screen_size_y = display.h - display.y;

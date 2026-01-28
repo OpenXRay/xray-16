@@ -23,7 +23,7 @@
 
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 // refs
 class Task;
@@ -221,6 +221,8 @@ public:
 
     void* GetApplicationWindowHandle() const override;
     SDL_Window* GetApplicationWindow() override;
+
+    SDL_DisplayID ResolveDisplayId(u32& monitorId) const;
     void OnErrorDialog(bool beforeDialog) override;
     void OnFatalError() override;
 
@@ -287,7 +289,11 @@ public:
         ImGuiViewportData(ImVec2 pos, ImVec2 size, Uint32 flags)
         {
             Window = SDL_CreateWindow("ImGui Viewport (no title yet)",
-                (int)pos.x, (int)pos.y, (int)size.x, (int)size.y, flags);
+                (int)size.x, (int)size.y, flags);
+            if (Window)
+            {
+                SDL_SetWindowPosition(Window, (int)pos.x, (int)pos.y);
+            }
             WindowOwned = true;
         }
 

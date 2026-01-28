@@ -6,9 +6,9 @@
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #ifdef IMGUI_ENABLE_VIEWPORTS
-#   include <SDL_syswm.h>
+#   include <SDL3/SDL_properties.h>
 #endif
 
 SDL_HitTestResult WindowHitTest(SDL_Window* win, const SDL_Point* area, void* data);
@@ -70,7 +70,7 @@ void CRenderDevice::Initialize()
         xr_strcpy(Core.ApplicationTitle, title);
         SetSDLSettings(title);
 
-        m_sdlWnd = SDL_CreateWindow(title, 0, 0, 640, 480, flags);
+        m_sdlWnd = SDL_CreateWindow(title, 640, 480, flags);
         R_ASSERT3(m_sdlWnd, "Unable to create SDL window", SDL_GetError());
 
         SDL_SetWindowHitTest(m_sdlWnd, WindowHitTest, nullptr);
@@ -89,16 +89,12 @@ void CRenderDevice::Initialize()
         main_viewport->PlatformUserData = IM_NEW(ImGuiViewportData){ m_sdlWnd };
         main_viewport->PlatformHandle = m_sdlWnd;
         main_viewport->PlatformHandleRaw = nullptr;
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
-        {
+        const SDL_PropertiesID props = SDL_GetWindowProperties(m_sdlWnd);
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
-            main_viewport->PlatformHandleRaw = (void*)info.info.win.window;
+        main_viewport->PlatformHandleRaw = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 #elif defined(__APPLE__) && defined(SDL_VIDEO_DRIVER_COCOA)
-            main_viewport->PlatformHandleRaw = (void*)info.info.cocoa.window;
+        main_viewport->PlatformHandleRaw = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
 #endif
-        }
     }
 #endif
 
@@ -168,10 +164,8 @@ SDL_HitTestResult WindowHitTest(SDL_Window* /*window*/, const SDL_Point* pArea, 
 void* CRenderDevice::GetApplicationWindowHandle() const
 {
 #if defined(XR_PLATFORM_WINDOWS)
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    if (SDL_GetWindowWMInfo(m_sdlWnd, &info))
-        return info.info.win.window;
+    const SDL_PropertiesID props = SDL_GetWindowProperties(m_sdlWnd);
+    return SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 #endif
     return nullptr;
 }

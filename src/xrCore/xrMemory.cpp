@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #if defined(XR_PLATFORM_WINDOWS)
 #include <Psapi.h>

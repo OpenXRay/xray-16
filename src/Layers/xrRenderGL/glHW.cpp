@@ -25,7 +25,7 @@ void UpdateVSync()
     if (psDeviceFlags.test(rsVSync))
     {
         // Try adaptive vsync first
-        if (SDL_GL_SetSwapInterval(-1) == -1)
+        if (!SDL_GL_SetSwapInterval(-1))
             SDL_GL_SetSwapInterval(1);
     }
     else
@@ -80,12 +80,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
 
     R_ASSERT(m_window);
 
-    // Choose the closest pixel format
-    SDL_DisplayMode mode;
-    SDL_GetWindowDisplayMode(m_window, &mode);
-    mode.format = SDL_PIXELFORMAT_RGBA8888;
-    // Apply the pixel format to the device context
-    SDL_SetWindowDisplayMode(m_window, &mode);
+    // Display mode selection is handled via SDL_SetWindowFullscreenMode in device setup.
 
     Caps.fTarget = D3DFMT_A8R8G8B8;
     Caps.fDepth = D3DFMT_D24S8;
@@ -98,7 +93,7 @@ void CHW::CreateDevice(SDL_Window* hWnd)
         return;
     }
 
-    if (MakeContextCurrent(IRender::PrimaryContext) != 0)
+    if (!MakeContextCurrent(IRender::PrimaryContext))
     {
         Log("! OpenGL: could not make context current:", SDL_GetError());
         return;
@@ -158,7 +153,7 @@ void CHW::DestroyDevice()
     if (context == m_context)
         SDL_GL_MakeCurrent(nullptr, nullptr);
 
-    SDL_GL_DeleteContext(m_context);
+    SDL_GL_DestroyContext(m_context);
     m_context = nullptr;
 }
 
@@ -206,7 +201,7 @@ IRender::RenderContext CHW::GetCurrentContext() const
     return IRender::NoContext;
 }
 
-int CHW::MakeContextCurrent(IRender::RenderContext context) const
+bool CHW::MakeContextCurrent(IRender::RenderContext context) const
 {
     switch (context)
     {
@@ -219,7 +214,7 @@ int CHW::MakeContextCurrent(IRender::RenderContext context) const
     default:
         NODEFAULT;
     }
-    return -1;
+    return false;
 }
 
 void CHW::UpdateViews()

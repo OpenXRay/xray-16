@@ -5,7 +5,7 @@
 #include "xrEngine/pure.h"
 #include "xrUICore/ui_debug.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 class CUIDialogWnd;
 class CUIWindow;

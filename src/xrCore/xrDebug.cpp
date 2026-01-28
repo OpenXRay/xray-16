@@ -7,7 +7,7 @@
 #include "log.h"
 #include "Threading/ScopeLock.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include <csignal>
 
@@ -98,7 +98,7 @@ SDL_AssertState SDLAssertionHandler(const SDL_AssertData* data,
     if (data->always_ignore)
         return SDL_ASSERTION_ALWAYS_IGNORE;
 
-    static constexpr pcstr desc = "SDL2 assertion triggered";
+    static constexpr pcstr desc = "SDL assertion triggered";
     bool alwaysIgnore = false;
 
     const auto result = xrDebug::Fail(alwaysIgnore,

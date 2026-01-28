@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #ifdef IMGUI_ENABLE_VIEWPORTS
-#   include <SDL_syswm.h>
+#   include <SDL3/SDL_properties.h>
 #endif
 
 #include <imgui_internal.h>
@@ -89,7 +89,9 @@ void CRenderDevice::InitializeImGui()
                 .w = 1,
                 .h = (int)data->InputLineHeight,
             };
-            SDL_SetTextInputRect(&r);
+            auto* vp_data = (ImGuiViewportData*)viewport->PlatformUserData;
+            SDL_Window* window = vp_data ? vp_data->Window : Device.m_sdlWnd;
+            SDL_SetTextInputArea(window, &r, 0);
         }
     };
 
@@ -104,7 +106,7 @@ void CRenderDevice::InitializeImGui()
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? SDL_WINDOW_BORDERLESS : 0;
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? 0 : SDL_WINDOW_RESIZABLE;
 #if !defined(XR_PLATFORM_WINDOWS)
-        // See SDL hack in ImGui_ImplSDL2_ShowWindow().
+        // See SDL hack in ImGui_ImplSDL3_ShowWindow().
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon) ? SDL_WINDOW_SKIP_TASKBAR : 0;
 #endif
         sdl_flags |= (viewport->Flags & ImGuiViewportFlags_TopMost) ? SDL_WINDOW_ALWAYS_ON_TOP : 0;
@@ -118,21 +120,18 @@ void CRenderDevice::InitializeImGui()
         viewport->PlatformHandle = vd->Window;
         viewport->PlatformHandleRaw = nullptr;
 
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-        if (SDL_GetWindowWMInfo(vd->Window, &info))
-        {
+        const SDL_PropertiesID props = SDL_GetWindowProperties(vd->Window);
 #if defined(XR_PLATFORM_WINDOWS) && defined(SDL_VIDEO_DRIVER_WINDOWS)
-            viewport->PlatformHandleRaw = info.info.win.window;
+        viewport->PlatformHandleRaw = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
 #elif defined(__APPLE__) && defined(SDL_VIDEO_DRIVER_COCOA)
-            viewport->PlatformHandleRaw = (void*)info.info.cocoa.window;
+        viewport->PlatformHandleRaw = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
 #endif
-        }
 
         if (viewport->ParentViewportId)
         {
             const auto parentViewport = ImGui::FindViewportByID(viewport->ParentViewportId);
-            SDL_SetWindowModalFor(vd->Window, (SDL_Window*)parentViewport->PlatformHandle);
+            SDL_SetWindowParent(vd->Window, (SDL_Window*)parentViewport->PlatformHandle);
+            SDL_SetWindowModal(vd->Window, true);
         }
     };
 

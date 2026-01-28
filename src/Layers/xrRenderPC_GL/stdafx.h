@@ -15,8 +15,8 @@
 #include "xrParticles/psystem.h"
 
 #include "glad/gl.h"
-#include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
+#include <SDL3/SDL_opengl.h>
+#include <SDL3/SDL_opengl_glext.h>
 
 #define R_GL 0
 #define R_R1 1

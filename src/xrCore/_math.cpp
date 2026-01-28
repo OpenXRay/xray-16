@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include <thread>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 // Initialized on startup
 XRCORE_API Fmatrix Fidentity;
@@ -59,9 +59,7 @@ void _initialize_cpu()
     };
 
     // x86
-    listFeature("RDTSC",   SDL_HasRDTSC());
     listFeature("MMX",     SDL_HasMMX());
-    listFeature("3DNow!",  SDL_Has3DNow());
     listFeature("SSE",     SDL_HasSSE());
     listFeature("SSE2",    CPU::HasSSE2);
     listFeature("SSE3",    SDL_HasSSE3());
@@ -98,6 +96,13 @@ void _initialize_cpu()
 #define _MM_SET_DENORMALS_ZERO_MODE(mode)
 #else
 #include <xmmintrin.h>
+#if defined(__SSE3__) || defined(_MSC_VER)
+#include <pmmintrin.h>
+#endif
+#ifndef _MM_DENORMALS_ZERO_ON
+#define _MM_DENORMALS_ZERO_ON 0
+#define _MM_SET_DENORMALS_ZERO_MODE(mode) ((void)0)
+#endif
 #endif
 
 static BOOL _denormals_are_zero_supported = TRUE;

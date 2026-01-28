@@ -68,7 +68,8 @@ void engine_impl::disconnect() { Console->Execute("quit"); }
 
 bool engine_impl::quit_requested() const
 {
-    return SDL_QuitRequested();
+    SDL_PumpEvents();
+    return SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_EVENT_QUIT, SDL_EVENT_QUIT) > 0;
 }
 
 void engine_impl::value(pcstr value, shared_str& result) { result = value; }
@@ -395,4 +396,3 @@ void engine_impl::reload_weathers()
     if (environment.Current[1]->exec_time == game_time)
         environment.SelectEnvs(game_time + .1f);
 }
-

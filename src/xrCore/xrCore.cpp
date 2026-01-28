@@ -17,7 +17,7 @@
 #include "xrCore/_std_extensions.h"
 #include "Threading/TaskManager.hpp"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #if __has_include(".GitInfo.hpp")
 #include ".GitInfo.hpp"
@@ -200,18 +200,24 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
         _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 #elif defined(XR_PLATFORM_POSIX)
-        char* base_path = SDL_GetBasePath();
-        if (!base_path)
+        const char* base_path = SDL_GetBasePath();
+        if (base_path)
         {
-            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
-                base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
-            else if (strstr(Core.Params, "-cs"))
-                base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
-            else
-                base_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+            SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
         }
-        SDL_strlcpy(ApplicationPath, base_path, sizeof(ApplicationPath));
-        SDL_free(base_path);
+        else
+        {
+            char* pref_path = nullptr;
+            if (strstr(Core.Params, "-shoc") || strstr(Core.Params, "-soc"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Shadow of Chernobyl");
+            else if (strstr(Core.Params, "-cs"))
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Clear Sky");
+            else
+                pref_path = SDL_GetPrefPath("GSC Game World", "S.T.A.L.K.E.R. - Call of Pripyat");
+
+            SDL_strlcpy(ApplicationPath, pref_path ? pref_path : "", sizeof(ApplicationPath));
+            SDL_free(pref_path);
+        }
 #else
 #   error Select or add implementation for your platform
 #endif
@@ -271,7 +277,7 @@ void xrCore::Initialize(pcstr _ApplicationName, pcstr commandLine, bool init_fs,
 
         Memory._initialize();
 
-        SDL_LogSetOutputFunction(SDLLogOutput, nullptr);
+        SDL_SetLogOutputFunction(SDLLogOutput, nullptr);
         Msg("\ncommand line %s\n", Params);
         _initialize_cpu();
         TaskScheduler = xr_make_unique<TaskManager>();

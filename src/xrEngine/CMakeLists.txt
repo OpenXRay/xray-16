@@ -431,7 +431,7 @@ target_link_libraries(xrEngine
     OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
-    SDL2::SDL2
+    SDL3::SDL3
 )
 
 target_compile_definitions(xrEngine

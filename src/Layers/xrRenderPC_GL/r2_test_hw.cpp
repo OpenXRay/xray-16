@@ -12,7 +12,7 @@ public:
     {
         u32 flags{};
         m_hw.SetPrimaryAttributes(flags);
-        m_window = SDL_CreateWindow("TestOpenGLWindow", 0, 0, 1, 1, SDL_WINDOW_HIDDEN | flags);
+        m_window = SDL_CreateWindow("TestOpenGLWindow", 1, 1, SDL_WINDOW_HIDDEN | flags);
         if (!m_window)
         {
             Log("~ Cannot create helper window for OpenGL test:", SDL_GetError());

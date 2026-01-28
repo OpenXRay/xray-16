@@ -104,7 +104,8 @@ void CEngine::OnEvent(EVENT E, u64 P1, u64 P2)
         if (pInput != nullptr)
             pInput->GrabInput(false);
 
-        SDL_Event quit = { SDL_QUIT };
+        SDL_Event quit = {};
+        quit.type = SDL_EVENT_QUIT;
         SDL_PushEvent(&quit);
     }
 }

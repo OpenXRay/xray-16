@@ -21,7 +21,7 @@ public:
     void SetPrimaryAttributes(u32& windowFlags);
 
     IRender::RenderContext GetCurrentContext() const;
-    int  MakeContextCurrent(IRender::RenderContext context) const;
+    bool MakeContextCurrent(IRender::RenderContext context) const;
 
     static std::pair<u32, u32> GetSurfaceSize();
     DeviceState GetDeviceState() const;
