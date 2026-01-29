@@ -103,10 +103,10 @@
       "options": [
         "Debug",
         "Release",
-        "MinSizeRel",
-        "RelWithDebInfo"
+        "Mixed",
+        "ReleaseMasterGold"
       ],
-      "default": "Debug"
+      "default": "ReleaseMasterGold"
     }
   ]
 }
