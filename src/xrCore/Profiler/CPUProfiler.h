@@ -32,6 +32,10 @@ public:
     CPUProfiler();
     ~CPUProfiler();
 
+    // Enable/disable profiling (disabled = no overhead)
+    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    bool IsEnabled() const { return m_enabled; }
+
     // Zone registration (thread-safe, called once per source location)
     u32 RegisterZone(const ZoneInfo* info);
 
@@ -81,6 +85,9 @@ private:
 
     // Lock for zone data modifications (BeginZone/EndZone)
     Lock m_zoneLock;
+
+    // Enabled flag (when false, all operations are no-ops)
+    bool m_enabled = false;
 };
 
 // RAII scope for CPU zone timing

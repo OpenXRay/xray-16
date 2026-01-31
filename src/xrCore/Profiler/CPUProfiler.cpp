@@ -104,7 +104,7 @@ ThreadZoneStack& CPUProfiler::GetThreadStack()
 
 void CPUProfiler::BeginZone(u32 zoneId)
 {
-    if (zoneId == INVALID_ZONE_ID)
+    if (!m_enabled || zoneId == INVALID_ZONE_ID)
         return;
 
     ThreadZoneStack& stack = GetThreadStack();
@@ -151,7 +151,7 @@ void CPUProfiler::BeginZone(u32 zoneId)
 
 void CPUProfiler::EndZone(u32 zoneId, float elapsedMs)
 {
-    if (zoneId == INVALID_ZONE_ID)
+    if (!m_enabled || zoneId == INVALID_ZONE_ID)
         return;
 
     ThreadZoneStack& stack = GetThreadStack();
@@ -168,6 +168,9 @@ void CPUProfiler::EndZone(u32 zoneId, float elapsedMs)
 
 void CPUProfiler::FrameStart()
 {
+    if (!m_enabled)
+        return;
+
     // Lock to ensure no zones are being modified during reset
     ScopeLock lock(&m_zoneLock);
 
@@ -185,6 +188,9 @@ void CPUProfiler::FrameStart()
 
 void CPUProfiler::FrameEnd()
 {
+    if (!m_enabled)
+        return;
+
     m_frameTimeMs = m_frameTimer.GetElapsed_sec() * 1000.0f;
 
     // Lock to ensure consistent snapshot for display buffer
@@ -265,6 +271,9 @@ CPUZoneScope::CPUZoneScope(const ZoneInfo* info)
         return;
 
     CPUProfiler& profiler = CPUProfiler::Instance();
+    if (!profiler.IsEnabled())
+        return;
+
     m_zoneId = profiler.RegisterZone(info);
     m_startTime = CTimerBase::Clock::now();
     profiler.BeginZone(m_zoneId);

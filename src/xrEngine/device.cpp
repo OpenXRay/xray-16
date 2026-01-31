@@ -256,6 +256,9 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::ProcessFrame()
 {
+    // Update profiler enabled state based on rs_stats (when off = zero overhead)
+    xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
+
     xray::profiler::FrameStart();
 
     // Scoped block so ZoneScoped ends BEFORE FrameEnd copies to display buffer

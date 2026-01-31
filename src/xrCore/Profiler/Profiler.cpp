@@ -47,6 +47,8 @@ bool IsEnabled()
 void SetEnabled(bool enabled)
 {
     g_enabled = enabled;
+    // Also update the CPUProfiler's enabled state
+    CPUProfiler::Instance().SetEnabled(enabled);
 }
 
 } // namespace xray::profiler

@@ -236,6 +236,8 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     if (m_gpuProfiler)
     {
+        // Only enable GPU profiling when rs_stats is on (zero overhead when off)
+        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
         m_gpuProfiler->FrameStart();
     }
 
@@ -384,9 +386,12 @@ void FrameGraphRenderer::RenderMenu() {
 
     VERIFY(m_framegraph != nullptr);
 
-    // GPU profiler frame start
+    // GPU profiler frame start (only enable when rs_stats is on)
     if (m_gpuProfiler)
+    {
+        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
         m_gpuProfiler->FrameStart();
+    }
 
     // Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 

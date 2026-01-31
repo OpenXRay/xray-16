@@ -26,6 +26,10 @@ public:
     void Initialize(nvrhi::IDevice* device);
     void Shutdown();
 
+    // Enable/disable profiling (disabled = no overhead)
+    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    bool IsProfilingEnabled() const { return m_enabled; }
+
     // Begin/End timing for a named pass
     void BeginPass(nvrhi::ICommandList* cmdList, const char* name);
     void EndPass(nvrhi::ICommandList* cmdList, const char* name);
@@ -73,6 +77,9 @@ private:
     float m_totalGPUTimeMs = 0.0f;
 
     u32 m_currentFrame = 0;
+
+    // Enabled flag (when false, all timing operations are no-ops)
+    bool m_enabled = false;
 };
 
 // RAII scope for GPU pass timing
