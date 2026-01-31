@@ -9,6 +9,10 @@
 #include "../RenderContext/RenderContext.h"
 #include "../ResourceManager/FGResourceManager.h"
 
+namespace xray::profiler {
+    class GPUProfiler;
+}
+
 namespace xray::render::framegraph {
 
 // Forward declaration
@@ -94,6 +98,9 @@ public:
 
     // Set RenderContext for execution (must be called before Execute)
     void SetRenderContext(ng::RenderContext* context) { m_context = context; }
+
+    // Set GPUProfiler for per-pass timing (optional, can be nullptr)
+    void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
 
     void Compile();
 
@@ -184,6 +191,7 @@ private:
     ng::RenderDevice* m_renderDevice;
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
+    xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
     resources::FGResourceManager* m_resourceManager;
     xr_unique_ptr<FGResourcePool> m_resourcePool;
 

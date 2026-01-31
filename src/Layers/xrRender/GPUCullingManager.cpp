@@ -952,6 +952,8 @@ void GPUCullingManager::Shutdown()
 
 void GPUCullingManager::UploadSceneObjects(ng::RenderContext* ctx, const GeometryCollector* geometry)
 {
+    ZoneScopedN("GPUCull::UploadSceneObjects");
+
     if (!m_computeEnabled || !geometry)
         return;
 
@@ -2462,6 +2464,8 @@ void GPUCullingManager::CreateParticleResources(ng::RenderDevice* device)
 
 void GPUCullingManager::UploadParticleBatches(ng::RenderContext* ctx, const xr_vector<passes::ParticleBatch>* batches)
 {
+    ZoneScopedN("GPUCull::UploadParticles");
+
     if (!m_particleCullEnabled || !batches)
         return;
 

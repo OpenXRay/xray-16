@@ -225,6 +225,8 @@ void FrameGraphRenderer::Shutdown() {
 }
 
 void FrameGraphRenderer::Render() {
+    ZoneScopedN("FrameGraphRenderer::Render");
+
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
@@ -274,7 +276,10 @@ void FrameGraphRenderer::Render() {
     //  SETUP FRAME (PER-FRAME: Collect geometry)
     // ═══════════════════════════════════════════════════════
 
-    SetupFrame();
+    {
+        ZoneScopedN("FG::SetupFrame");
+        SetupFrame();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  RESET FRAMEGRAPH FOR NEW FRAME
@@ -287,7 +292,10 @@ void FrameGraphRenderer::Render() {
     //  SETUP PASSES (PER-FRAME: Route geometry to passes)
     // ═══════════════════════════════════════════════════════
 
-    SetupFrameGraphPasses();
+    {
+        ZoneScopedN("FG::SetupPasses");
+        SetupFrameGraphPasses();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  COMPILE & EXECUTE
@@ -296,11 +304,20 @@ void FrameGraphRenderer::Render() {
     // Set RenderContext for execution
     m_framegraph->SetRenderContext(m_renderContext.get());
 
+    // Set GPUProfiler for per-pass timing
+    m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
+
     // Compile the graph (optimizes passes, calculates lifetimes, etc.)
-    m_framegraph->Compile();
+    {
+        ZoneScopedN("FG::Compile");
+        m_framegraph->Compile();
+    }
 
     // Execute the compiled graph (FrameGraph orchestrates all passes)
-    m_framegraph->Execute();
+    {
+        ZoneScopedN("FG::Execute");
+        m_framegraph->Execute();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  RT VISUALIZATION: View what GBufferPass is rendering
@@ -320,7 +337,10 @@ void FrameGraphRenderer::Render() {
     //  PRESENT TO BACKBUFFER
     // ═══════════════════════════════════════════════════════
 
-    PresentToBackbuffer();
+    {
+        ZoneScopedN("FG::Present");
+        PresentToBackbuffer();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  GPU PROFILER FRAME END
@@ -358,9 +378,15 @@ void FrameGraphRenderer::Render() {
 // Just clear background + ImGui UI overlay
 
 void FrameGraphRenderer::RenderMenu() {
+    ZoneScopedN("FrameGraphRenderer::RenderMenu");
+
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
+
+    // GPU profiler frame start
+    if (m_gpuProfiler)
+        m_gpuProfiler->FrameStart();
 
     // Msg("* [FrameGraphRenderer::RenderMenu] Rendering main menu frame");
 
@@ -469,6 +495,7 @@ void FrameGraphRenderer::RenderMenu() {
     // ═══════════════════════════════════════════════════════
 
     m_framegraph->SetRenderContext(m_renderContext.get());
+    m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     m_framegraph->Compile();
     m_framegraph->Execute();
 
@@ -476,6 +503,10 @@ void FrameGraphRenderer::RenderMenu() {
     //  PRESENT TO BACKBUFFER
     // ═══════════════════════════════════════════════════════
     PresentToBackbuffer();
+
+    // GPU profiler frame end
+    if (m_gpuProfiler)
+        m_gpuProfiler->FrameEnd();
 
     // NOTE: We call Reset() at the start of each frame (line 285)
     // No need to reset here at the end

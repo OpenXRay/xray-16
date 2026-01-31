@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "FrameGraph.h"
 #include "../RenderContext/RenderDevice.h"
+#include "../Profiler/GPUProfiler.h"
 
 namespace xray::render::framegraph {
 
@@ -165,6 +166,8 @@ void FrameGraph::SetPassCallback(PassHandle pass, PassExecuteCallback callback) 
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 void FrameGraph::Compile() {
+    ZoneScoped;
+
     VERIFY(!m_compiled && "Already compiled");
 
     // Phase 1: Build dependency graph from resource accesses
@@ -198,6 +201,8 @@ void FrameGraph::Compile() {
 // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 void FrameGraph::Execute() {
+    ZoneScoped;
+
     VERIFY(m_compiled && "Must compile before execute");
     VERIFY(m_context != nullptr && "RenderContext required for execution");
     VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
@@ -245,9 +250,20 @@ void FrameGraph::Execute() {
             }
         }
 
-        // Execute the pass callback with automatic markers
+        // Execute the pass callback with automatic GPU markers and timing
+        // Note: CPU profiling per-pass not supported (ZoneScopedN uses static storage)
         cmdList->beginMarker(pass->name.c_str());
+
+        // Begin GPU timing for this pass
+        if (m_gpuProfiler)
+            m_gpuProfiler->BeginPass(cmdList, pass->name.c_str());
+
         pass->executeCallback(*m_context, *this);
+
+        // End GPU timing for this pass
+        if (m_gpuProfiler)
+            m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
+
         cmdList->endMarker();
 
         passesExecuted++;
