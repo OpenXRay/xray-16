@@ -23,7 +23,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrSdkDir)include\mimalloc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";OPENSSL_NO_DEPRECATED;TRACY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;TRACY_EXPORTS;CI=$(CI);APPVEYOR=$(APPVEYOR);APPVEYOR_BUILD_ID="$(APPVEYOR_BUILD_ID)";APPVEYOR_BUILD_VERSION="$(APPVEYOR_BUILD_VERSION)";APPVEYOR_ACCOUNT_NAME="$(APPVEYOR_ACCOUNT_NAME)";GITHUB_ACTIONS=$(GITHUB_ACTIONS);GITHUB_RUN_ID="$(GITHUB_RUN_ID)";GITHUB_RUN_NUMBER="$(GITHUB_RUN_NUMBER)";GITHUB_REPOSITORY="$(GITHUB_REPOSITORY)";OPENSSL_NO_DEPRECATED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>BugTrap.lib;FaultRep.lib;lzo.lib;jpeg-static.lib;libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -46,9 +46,6 @@ call .GitInfo.cmd</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Externals\tracy\public\TracyClient.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Animation\Bone.cpp" />
     <ClCompile Include="Animation\BoneEditor.cpp" />
     <ClCompile Include="Animation\Envelope.cpp" />
@@ -103,6 +100,11 @@ call .GitInfo.cmd</Command>
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="Threading\TaskManager.cpp" />
     <ClCompile Include="Threading\ThreadUtil.cpp" />
+    <ClCompile Include="Profiler\Profiler.cpp" />
+    <ClCompile Include="Profiler\CPUProfiler.cpp" />
+    <ClCompile Include="$(SolutionDir)..\Externals\tracy\public\TracyClient.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="XML\tinystr.cpp" />
     <ClCompile Include="XML\tinyxml.cpp" />
     <ClCompile Include="XML\tinyxmlerror.cpp" />
@@ -211,6 +213,9 @@ call .GitInfo.cmd</Command>
     <ClInclude Include="Threading\Task.hpp" />
     <ClInclude Include="Threading\TaskManager.hpp" />
     <ClInclude Include="Threading\ThreadUtil.h" />
+    <ClInclude Include="Profiler\Profiler.h" />
+    <ClInclude Include="Profiler\ProfilerTypes.h" />
+    <ClInclude Include="Profiler\CPUProfiler.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="XML\tinystr.h" />
     <ClInclude Include="XML\tinyxml.h" />

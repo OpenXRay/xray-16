@@ -125,6 +125,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     passes::InitializeSunPass(device);
     passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
+    m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
+    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
+
+    m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
+    m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
+    Msg("* [FrameGraphRenderer] Profiler initialized");
+
     Msg("* [FrameGraphRenderer] initialized");
 
     return true;
@@ -136,6 +143,12 @@ void FrameGraphRenderer::Shutdown() {
     Msg("* [FrameGraphRenderer] Shutting down");
 
     g_geometryCollector = nullptr;
+
+    m_statsOverlay = nullptr;
+    if (m_gpuProfiler) {
+        m_gpuProfiler->Shutdown();
+        m_gpuProfiler = nullptr;
+    }
 
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
@@ -170,6 +183,11 @@ void FrameGraphRenderer::Render() {
 
     VERIFY(m_framegraph != nullptr);
 
+    if (m_gpuProfiler)
+    {
+        m_gpuProfiler->FrameStart();
+    }
+
     static bool s_pipelinesInitialized = false;
     if (!s_pipelinesInitialized && m_device) {
         passes::InitializeForwardPipelines(m_device);
@@ -199,6 +217,11 @@ void FrameGraphRenderer::Render() {
     m_framegraph->Execute();
 
     PresentToBackbuffer();
+
+    if (m_gpuProfiler)
+    {
+        m_gpuProfiler->FrameEnd();
+    }
 
     auto frameEnd = std::chrono::high_resolution_clock::now();
     m_stats.totalFrameMs = std::chrono::duration<float, std::milli>(
@@ -298,6 +321,15 @@ void FrameGraphRenderer::RenderMenu() {
 
     PresentToBackbuffer();
 
+}
+
+void FrameGraphRenderer::RenderStatsOverlay()
+{
+    if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
+    {
+        m_statsOverlay->SetVisible(true);
+        m_statsOverlay->Render();
+    }
 }
 
 void FrameGraphRenderer::SetupFrame() {

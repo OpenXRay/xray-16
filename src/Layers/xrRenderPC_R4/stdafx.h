@@ -38,8 +38,6 @@
 #include <nvrhi/d3d11.h>
 #pragma warning(pop)
 
-#include <tracy/TracyD3D11.hpp>
-
 #define R_GL 0
 #define R_R1 1
 #define R_R2 2

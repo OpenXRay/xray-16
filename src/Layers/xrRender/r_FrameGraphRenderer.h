@@ -6,6 +6,8 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
+#include "Layers/xrRender/Profiler/StatsOverlay.h"
 
 struct ImDrawData;
 
@@ -51,6 +53,7 @@ public:
 
     void Render() override;
     void RenderMenu() override;
+    void RenderStatsOverlay() override;
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
 
@@ -69,6 +72,10 @@ public:
 
     const Stats& GetStats() const { return m_stats; }
     void PrintStats() const;
+
+    xray::profiler::GPUProfiler* GetGPUProfiler() const { return m_gpuProfiler.get(); }
+    xray::profiler::StatsOverlay* GetStatsOverlay() const { return m_statsOverlay.get(); }
+    void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
 
     ng::RenderDevice* GetRenderDevice() const override { return m_device; }
     MaterialCache* GetMaterialCache() const override { return m_materialCache.get(); }
@@ -161,6 +168,9 @@ private:
     xr_map<ID3D11Buffer*, nvrhi::BufferHandle> m_bufferHandleCache;
 
     Stats m_stats;
+
+    xr_unique_ptr<xray::profiler::GPUProfiler> m_gpuProfiler;
+    xr_unique_ptr<xray::profiler::StatsOverlay> m_statsOverlay;
 
     xr_vector<ISpatial*> m_lstRenderables;
 

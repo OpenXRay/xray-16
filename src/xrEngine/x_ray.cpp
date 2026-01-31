@@ -205,7 +205,6 @@ constexpr pcstr FRAME_MARK_APPLICATION_RUN = "Application run";
 
 CApplication::CApplication(pcstr commandLine, GameModule* game, const std::array<RendererModule*, 1>& modules)
 {
-    TracySetProgramName("OpenXRay");
     Threading::SetCurrentThreadName("Primary thread");
     FrameMarkStart(FRAME_MARK_APPLICATION_STARTUP);
 

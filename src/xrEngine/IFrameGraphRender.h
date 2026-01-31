@@ -22,6 +22,8 @@ public:
 
     virtual void RenderMenu() = 0;
 
+    virtual void RenderStatsOverlay() = 0;
+
     virtual void SetEnabled(bool enabled) = 0;
     virtual bool IsEnabled() const = 0;
 

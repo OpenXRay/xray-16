@@ -1,0 +1,234 @@
+#include "stdafx.h"
+#include "StatsOverlay.h"
+#include "xrCore/Profiler/Profiler.h"
+#include "xrEngine/Device.h"
+#include <imgui.h>
+
+namespace xray::profiler
+{
+
+StatsOverlay::StatsOverlay()
+{
+    ImGui::SetCurrentContext(Device.GetImGuiContext());
+}
+
+StatsOverlay::~StatsOverlay() = default;
+
+const char* StatsOverlay::FormatTime(float ms, int slot)
+{
+    static constexpr int NUM_BUFFERS = 4;
+    static char buffers[NUM_BUFFERS][32];
+    static int currentBuffer = 0;
+
+    int bufferIdx = (slot >= 0 && slot < NUM_BUFFERS) ? slot : (currentBuffer++ % NUM_BUFFERS);
+    char* buffer = buffers[bufferIdx];
+
+    if (ms >= 1.0f)
+        xr_sprintf(buffer, sizeof(buffers[0]), "%.2fms", ms);
+    else if (ms >= 0.1f)
+        xr_sprintf(buffer, sizeof(buffers[0]), "%.3fms", ms);
+    else
+        xr_sprintf(buffer, sizeof(buffers[0]), "%.0fus", ms * 1000.0f);
+    return buffer;
+}
+
+u32 StatsOverlay::GetTimeColor(float ms, float parentMs)
+{
+    if (parentMs <= 0.0f)
+        parentMs = 16.67f;
+
+    float ratio = ms / parentMs;
+
+    if (ratio < 0.25f)
+        return IM_COL32(100, 200, 100, 255);
+    else if (ratio < 0.5f)
+        return IM_COL32(200, 200, 100, 255);
+    else if (ratio < 0.75f)
+        return IM_COL32(255, 180, 80, 255);
+    else
+        return IM_COL32(255, 100, 100, 255);
+}
+
+void StatsOverlay::Render()
+{
+    if (!m_visible)
+        return;
+
+    ImGui::SetCurrentContext(Device.GetImGuiContext());
+
+    ImGui::SetNextWindowSize(ImVec2(400, 500), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+
+    bool ideActive = Device.editor().IsActiveState();
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_None;
+    if (!ideActive)
+    {
+        flags |= ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav;
+    }
+
+    if (!ImGui::Begin("Performance Stats", &m_visible, flags))
+    {
+        ImGui::End();
+        return;
+    }
+
+    CPUProfiler& cpuProfiler = GetCPUProfiler();
+    float cpuFrameTime = cpuProfiler.GetFrameTimeMs();
+    float gpuFrameTime = m_gpuProfiler ? m_gpuProfiler->GetTotalGPUTimeMs() : 0.0f;
+    float fps = cpuFrameTime > 0.0f ? 1000.0f / cpuFrameTime : 0.0f;
+
+    ImGui::Text("Frame: %s (%.1f FPS)", FormatTime(cpuFrameTime), fps);
+    if (!ideActive)
+    {
+        ImGui::TextDisabled("(Press editor key to interact)");
+    }
+    ImGui::Separator();
+
+    RenderCPUSection();
+
+    ImGui::Separator();
+
+    RenderGPUSection();
+
+    ImGui::End();
+}
+
+void StatsOverlay::RenderCPUSection()
+{
+    CPUProfiler& profiler = GetCPUProfiler();
+    const auto& zones = profiler.GetZones();
+    const auto& rootZones = profiler.GetRootZones();
+    float frameTime = profiler.GetFrameTimeMs();
+
+    ImGui::SetNextItemOpen(m_cpuExpanded, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("CPU"))
+    {
+        m_cpuExpanded = true;
+
+        if (rootZones.empty())
+        {
+            ImGui::TextDisabled("No CPU zones recorded");
+        }
+        else
+        {
+            ImGui::Text("Total: %s", FormatTime(frameTime));
+            ImGui::Indent();
+
+            for (u32 rootId : rootZones)
+            {
+                RenderZoneTree(rootId, zones, frameTime);
+            }
+
+            ImGui::Unindent();
+        }
+    }
+    else
+    {
+        m_cpuExpanded = false;
+    }
+}
+
+void StatsOverlay::RenderZoneTree(u32 zoneId, const xr_vector<ZoneData>& zones, float parentTime)
+{
+    if (zoneId >= zones.size())
+        return;
+
+    const ZoneData& zone = zones[zoneId];
+    if (!zone.info || zone.timing.callCount == 0)
+        return;
+
+    ImGui::PushID(static_cast<int>(zoneId));
+
+    const char* name = zone.info->name;
+    float totalTime = zone.timing.totalTimeMs;
+    float selfTime = zone.timing.selfTimeMs;
+    u32 callCount = zone.timing.callCount;
+
+    u32 color = GetTimeColor(totalTime, parentTime);
+    ImGui::PushStyleColor(ImGuiCol_Text, color);
+
+    char label[256];
+    if (callCount > 1)
+        xr_sprintf(label, sizeof(label), "%s x%u", name, callCount);
+    else
+        xr_strcpy(label, sizeof(label), name);
+
+    bool hasChildren = !zone.childIds.empty();
+
+    if (hasChildren)
+    {
+        bool open = ImGui::TreeNode(label);
+        ImGui::SameLine();
+        ImGui::TextDisabled("%s (self: %s)", FormatTime(totalTime, 0), FormatTime(selfTime, 1));
+
+        ImGui::PopStyleColor();
+
+        if (open)
+        {
+            for (u32 childId : zone.childIds)
+            {
+                RenderZoneTree(childId, zones, totalTime);
+            }
+            ImGui::TreePop();
+        }
+    }
+    else
+    {
+        ImGui::BulletText("%s", label);
+        ImGui::SameLine();
+        ImGui::TextDisabled("%s", FormatTime(totalTime));
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::PopID();
+}
+
+void StatsOverlay::RenderGPUSection()
+{
+    ImGui::SetNextItemOpen(m_gpuExpanded, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("GPU"))
+    {
+        m_gpuExpanded = true;
+
+        if (!m_gpuProfiler || !m_gpuProfiler->IsInitialized())
+        {
+            ImGui::TextDisabled("GPU profiler not initialized");
+            return;
+        }
+
+        const auto& passTimings = m_gpuProfiler->GetPassTimings();
+        float totalGPU = m_gpuProfiler->GetTotalGPUTimeMs();
+
+        if (passTimings.empty())
+        {
+            ImGui::TextDisabled("No GPU passes recorded");
+            return;
+        }
+
+        ImGui::Text("Total: %s", FormatTime(totalGPU));
+        ImGui::Indent();
+
+        for (const auto& pass : passTimings)
+        {
+            u32 color = GetTimeColor(pass.timeMs, totalGPU);
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
+
+            float percent = totalGPU > 0.0f ? (pass.timeMs / totalGPU) * 100.0f : 0.0f;
+
+            ImGui::BulletText("%s", pass.name.c_str());
+            ImGui::SameLine();
+            ImGui::TextDisabled("%s (%.1f%%)", FormatTime(pass.timeMs), percent);
+
+            ImGui::PopStyleColor();
+        }
+
+        ImGui::Unindent();
+    }
+    else
+    {
+        m_gpuExpanded = false;
+    }
+}
+
+}

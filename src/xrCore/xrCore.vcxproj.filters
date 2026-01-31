@@ -333,7 +333,10 @@
     <ClCompile Include="Math\fast_lc16.cpp">
       <Filter>Math\RNG</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Externals\tracy\public\TracyClient.cpp">
+    <ClCompile Include="Profiler\Profiler.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\CPUProfiler.cpp">
       <Filter>Profiler</Filter>
     </ClCompile>
     <ClCompile Include="Debug\StackTrace.cpp">
@@ -706,6 +709,15 @@
     </ClInclude>
     <ClInclude Include="Threading\ThreadUtil.h">
       <Filter>Threading\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\Profiler.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\ProfilerTypes.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\CPUProfiler.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
     <ClInclude Include="Threading\ParallelFor.hpp">
       <Filter>Threading</Filter>
