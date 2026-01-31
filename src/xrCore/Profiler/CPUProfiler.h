@@ -36,6 +36,10 @@ public:
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsEnabled() const { return m_enabled; }
 
+    // Throttle interval: profile every N frames (1 = every frame, higher = less overhead)
+    void SetThrottleInterval(u32 interval) { m_throttleInterval = (interval > 0) ? interval : 1; }
+    u32 GetThrottleInterval() const { return m_throttleInterval; }
+
     // Zone registration (thread-safe, called once per source location)
     u32 RegisterZone(const ZoneInfo* info);
 
@@ -88,6 +92,9 @@ private:
 
     // Enabled flag (when false, all operations are no-ops)
     bool m_enabled = false;
+
+    // Throttle interval: profile every N frames (default 30 = ~2% overhead)
+    u32 m_throttleInterval = 30;
 };
 
 // RAII scope for CPU zone timing

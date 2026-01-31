@@ -302,6 +302,24 @@ public:
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
     nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
+
+    // ───────────────────────────────────────────────────────
+    //  CULLING STATS READBACK (for profiling overlay)
+    // ───────────────────────────────────────────────────────
+    // Returns previous frame's visible counts (1-frame latency to avoid GPU stall)
+    struct CullingStats {
+        u32 staticVisible = 0;
+        u32 dynamicVisible = 0;
+        u32 terrainVisible = 0;
+        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible; }
+    };
+    const CullingStats& GetCullingStats() const { return m_cullingStats; }
+
+    // Schedule readback of visible counts (call after culling pass)
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
+
+    // Process readback results from previous frame (call at frame start)
+    void ProcessStatsReadback();
     nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainBatchIndicesBuffer() const { return m_terrainBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactDrawArgsBuffer() const { return m_terrainCompactDrawArgsBuffer.Get(); }
@@ -487,6 +505,13 @@ private:
     xr_vector<IBPoolInfo> m_ibPools;       // IB ID -> pool info
     xr_vector<VBPoolInfo> m_vbPoolsAlt;    // Alternative (fast) geometry
     xr_vector<IBPoolInfo> m_ibPoolsAlt;
+
+    // ───────────────────────────────────────────────────────
+    //  STATS READBACK (for profiling)
+    // ───────────────────────────────────────────────────────
+    nvrhi::BufferHandle m_statsReadbackBuffer;  // CPU-readable staging buffer
+    CullingStats m_cullingStats;                 // Previous frame's stats
+    bool m_statsReadbackPending = false;
 
 public:
     // ───────────────────────────────────────────────────────

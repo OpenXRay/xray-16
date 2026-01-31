@@ -1,6 +1,7 @@
 // xrRender/GPUCullingManager.cpp
 #include "stdafx.h"
 #include "GPUCullingManager.h"
+#include "xrCore/Profiler/Profiler.h"
 #include "Layers/xrRender/FrameGraph/FrameGraph.h"
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
@@ -944,6 +945,103 @@ void GPUCullingManager::Shutdown()
     m_particleCullEnabled = false;
     m_objectCount = 0;
     m_particleCount = 0;
+
+    // Stats readback
+    m_statsReadbackBuffer = nullptr;
+    m_statsReadbackPending = false;
+    m_cullingStats = CullingStats();
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATS READBACK (for profiling)
+// ═══════════════════════════════════════════════════════
+
+void GPUCullingManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList)
+{
+    if (!m_compactEnabled || !m_device)
+        return;
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    if (!nvDevice)
+        return;
+
+    // Create readback buffer on first use (3 u32s: static, dynamic, terrain)
+    if (!m_statsReadbackBuffer)
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32) * 3;
+        desc.debugName = "CullingStatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        m_statsReadbackBuffer = nvDevice->createBuffer(desc);
+
+        if (!m_statsReadbackBuffer)
+            return;
+    }
+
+    // Copy compact count values to readback buffer
+    // Static count at offset 0
+    if (m_staticSet.compactCountBuffer)
+    {
+        cmdList->copyBuffer(
+            m_statsReadbackBuffer, 0,
+            m_staticSet.compactCountBuffer, 0,
+            sizeof(u32)
+        );
+    }
+
+    // Dynamic count at offset 4
+    if (m_dynamicSet.compactCountBuffer)
+    {
+        cmdList->copyBuffer(
+            m_statsReadbackBuffer, sizeof(u32),
+            m_dynamicSet.compactCountBuffer, 0,
+            sizeof(u32)
+        );
+    }
+
+    // Terrain count at offset 8
+    if (m_terrainCompactCountBuffer)
+    {
+        cmdList->copyBuffer(
+            m_statsReadbackBuffer, sizeof(u32) * 2,
+            m_terrainCompactCountBuffer, 0,
+            sizeof(u32)
+        );
+    }
+
+    m_statsReadbackPending = true;
+}
+
+void GPUCullingManager::ProcessStatsReadback()
+{
+    if (!m_statsReadbackPending || !m_statsReadbackBuffer || !m_device)
+        return;
+
+    // Only read back at the same interval as CPU profiler for consistency
+    static u32 frameCounter = 0;
+    frameCounter++;
+    const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
+    if ((frameCounter % throttleInterval) != 0)
+        return;
+
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+    if (!nvDevice)
+        return;
+
+    // Map the readback buffer and read the values
+    void* mappedData = nvDevice->mapBuffer(m_statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    if (mappedData)
+    {
+        const u32* counts = static_cast<const u32*>(mappedData);
+        m_cullingStats.staticVisible = counts[0];
+        m_cullingStats.dynamicVisible = counts[1];
+        m_cullingStats.terrainVisible = counts[2];
+        nvDevice->unmapBuffer(m_statsReadbackBuffer);
+    }
+
+    m_statsReadbackPending = false;
 }
 
 // ═══════════════════════════════════════════════════════

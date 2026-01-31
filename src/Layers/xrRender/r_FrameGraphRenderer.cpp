@@ -236,8 +236,9 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
     if (m_gpuProfiler)
     {
-        // Only enable GPU profiling when rs_stats is on (zero overhead when off)
-        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
+        // Sync GPU profiler with CPU profiler's throttled state
+        // (CPU profiler only runs every N frames, GPU should match)
+        m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
 
@@ -321,6 +322,12 @@ void FrameGraphRenderer::Render() {
         m_framegraph->Execute();
     }
 
+    // Schedule GPU culling stats readback (for profiling overlay)
+    if (m_gpuCullingManager && psDeviceFlags.test(rsStatistic))
+    {
+        m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
+    }
+
     // ═══════════════════════════════════════════════════════
     //  RT VISUALIZATION: View what GBufferPass is rendering
     // ═══════════════════════════════════════════════════════
@@ -386,10 +393,10 @@ void FrameGraphRenderer::RenderMenu() {
 
     VERIFY(m_framegraph != nullptr);
 
-    // GPU profiler frame start (only enable when rs_stats is on)
+    // GPU profiler frame start - sync with CPU profiler's throttled state
     if (m_gpuProfiler)
     {
-        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
+        m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
 
@@ -525,6 +532,102 @@ void FrameGraphRenderer::RenderStatsOverlay()
     // This ensures proper ImGui input processing
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
     {
+        // Collect render stats before displaying
+        xray::profiler::RenderStats stats;
+        stats.Reset();
+
+        // Collect geometry stats from collector
+        if (m_geometryCollector)
+        {
+            const auto& batches = m_geometryCollector->GetBatches();
+            stats.totalBatches = static_cast<u32>(batches.size());
+
+            // Track unique skeletons for bone counting
+            xr_set<IRenderVisual*> uniqueSkeletons;
+
+            for (const auto& batch : batches)
+            {
+                u32 triangles = batch.indexCount / 3;
+                stats.totalTriangles += triangles;
+
+                if (batch.isSkinned)
+                {
+                    stats.skinnedBatches++;
+                    stats.skinnedTriangles += triangles;
+
+                    // Count unique skeletons and their bones
+                    if (batch.renderable)
+                    {
+                        IRenderVisual* rootVisual = batch.renderable->GetRenderData().visual;
+                        if (rootVisual && uniqueSkeletons.find(rootVisual) == uniqueSkeletons.end())
+                        {
+                            uniqueSkeletons.insert(rootVisual);
+                            stats.skinnedMeshes++;
+
+                            // Get bone count from kinematics
+                            IKinematics* K = rootVisual->dcast_PKinematics();
+                            if (K)
+                            {
+                                u32 boneCount = K->LL_BoneCount();
+                                stats.totalBones += boneCount;
+                                if (boneCount > stats.maxBonesPerMesh)
+                                    stats.maxBonesPerMesh = boneCount;
+                            }
+                        }
+                    }
+                }
+                else if (batch.isTerrain)
+                {
+                    stats.terrainBatches++;
+                    stats.terrainTriangles += triangles;
+                }
+                else if (batch.isStatic)
+                {
+                    stats.staticBatches++;
+                    stats.staticTriangles += triangles;
+                }
+                else
+                {
+                    stats.dynamicBatches++;
+                    stats.dynamicTriangles += triangles;
+                }
+            }
+        }
+
+        // Collect particle stats
+        stats.particleBatches = static_cast<u32>(m_worldParticleBatches.size() + m_hudParticleBatches.size());
+
+        // Collect GPU culling stats
+        if (m_gpuCullingManager)
+        {
+            stats.objectsSubmitted = m_gpuCullingManager->GetStaticObjectCount() +
+                                     m_gpuCullingManager->GetDynamicObjectCount() +
+                                     m_gpuCullingManager->GetTerrainObjectCount();
+
+            // Use readback data from previous frame (1-frame latency)
+            const auto& cullStats = m_gpuCullingManager->GetCullingStats();
+            stats.objectsVisible = cullStats.totalVisible();
+            stats.objectsCulled = (stats.objectsSubmitted > stats.objectsVisible)
+                                  ? (stats.objectsSubmitted - stats.objectsVisible)
+                                  : 0;
+
+            // Mega-buffer stats
+            stats.megaBufferVertices = m_gpuCullingManager->GetTotalVertexCount();
+            stats.megaBufferIndices = m_gpuCullingManager->GetTotalIndexCount();
+        }
+
+        // Collect detail/grass stats
+        if (m_detailManager)
+        {
+            stats.detailSlots = m_detailManager->slot_count;
+            stats.detailInstances = m_detailManager->total_instance_count;
+            // Triangles per blade depends on LOD (LOD0 = 9 segments = 18 tris, etc.)
+            // Use LOD0 as reference
+            if (m_detailManager->bladeIndexCount[0] > 0)
+                stats.detailTrianglesPerBlade = m_detailManager->bladeIndexCount[0] / 3;
+        }
+
+        m_statsOverlay->SetRenderStats(stats);
         m_statsOverlay->SetVisible(true);
         m_statsOverlay->Render();
     }
@@ -532,6 +635,11 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
 void FrameGraphRenderer::SetupFrame() {
     const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
+
+    // Process GPU culling stats readback from previous frame
+    if (m_gpuCullingManager)
+        m_gpuCullingManager->ProcessStatsReadback();
+
     // Clear buffer handle cache (X-Ray may recreate buffers each frame)
     m_bufferHandleCache.clear();
 

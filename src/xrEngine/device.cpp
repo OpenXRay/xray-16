@@ -256,8 +256,13 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::ProcessFrame()
 {
-    // Update profiler enabled state based on rs_stats (when off = zero overhead)
-    xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
+    // Update profiler enabled state based on rs_stats
+    // Only profile every N frames to reduce overhead (configurable via ImGui)
+    static u32 profilerFrameCounter = 0;
+    profilerFrameCounter++;
+    const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
+    const bool shouldProfile = psDeviceFlags.test(rsStatistic) && ((profilerFrameCounter % throttleInterval) == 0);
+    xray::profiler::SetEnabled(shouldProfile);
 
     xray::profiler::FrameStart();
 
