@@ -187,7 +187,7 @@ void FrameGraphRenderer::Render() {
 
     if (m_gpuProfiler)
     {
-        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
+        m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
 
@@ -233,6 +233,11 @@ void FrameGraphRenderer::Render() {
         m_framegraph->Execute();
     }
 
+    if (m_gpuCullingManager && psDeviceFlags.test(rsStatistic))
+    {
+        m_gpuCullingManager->ScheduleStatsReadback(m_renderContext->GetCommandList());
+    }
+
     {
         ZoneScopedN("FG::Present");
         PresentToBackbuffer();
@@ -265,7 +270,7 @@ void FrameGraphRenderer::RenderMenu() {
 
     if (m_gpuProfiler)
     {
-        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
+        m_gpuProfiler->SetEnabled(xray::profiler::IsEnabled());
         m_gpuProfiler->FrameStart();
     }
 
@@ -359,6 +364,90 @@ void FrameGraphRenderer::RenderStatsOverlay()
 {
     if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
     {
+        xray::profiler::RenderStats stats;
+        stats.Reset();
+
+        if (m_geometryCollector)
+        {
+            const auto& batches = m_geometryCollector->GetBatches();
+            stats.totalBatches = static_cast<u32>(batches.size());
+
+            xr_set<IRenderVisual*> uniqueSkeletons;
+
+            for (const auto& batch : batches)
+            {
+                u32 triangles = batch.indexCount / 3;
+                stats.totalTriangles += triangles;
+
+                if (batch.isSkinned)
+                {
+                    stats.skinnedBatches++;
+                    stats.skinnedTriangles += triangles;
+
+                    if (batch.renderable)
+                    {
+                        IRenderVisual* rootVisual = batch.renderable->GetRenderData().visual;
+                        if (rootVisual && uniqueSkeletons.find(rootVisual) == uniqueSkeletons.end())
+                        {
+                            uniqueSkeletons.insert(rootVisual);
+                            stats.skinnedMeshes++;
+
+                            IKinematics* K = rootVisual->dcast_PKinematics();
+                            if (K)
+                            {
+                                u32 boneCount = K->LL_BoneCount();
+                                stats.totalBones += boneCount;
+                                if (boneCount > stats.maxBonesPerMesh)
+                                    stats.maxBonesPerMesh = boneCount;
+                            }
+                        }
+                    }
+                }
+                else if (batch.isTerrain)
+                {
+                    stats.terrainBatches++;
+                    stats.terrainTriangles += triangles;
+                }
+                else if (batch.isStatic)
+                {
+                    stats.staticBatches++;
+                    stats.staticTriangles += triangles;
+                }
+                else
+                {
+                    stats.dynamicBatches++;
+                    stats.dynamicTriangles += triangles;
+                }
+            }
+        }
+
+        stats.particleBatches = static_cast<u32>(m_worldParticleBatches.size() + m_hudParticleBatches.size());
+
+        if (m_gpuCullingManager)
+        {
+            stats.objectsSubmitted = m_gpuCullingManager->GetStaticObjectCount() +
+                                     m_gpuCullingManager->GetDynamicObjectCount() +
+                                     m_gpuCullingManager->GetTerrainObjectCount();
+
+            const auto& cullStats = m_gpuCullingManager->GetCullingStats();
+            stats.objectsVisible = cullStats.totalVisible();
+            stats.objectsCulled = (stats.objectsSubmitted > stats.objectsVisible)
+                                  ? (stats.objectsSubmitted - stats.objectsVisible)
+                                  : 0;
+
+            stats.megaBufferVertices = m_gpuCullingManager->GetTotalVertexCount();
+            stats.megaBufferIndices = m_gpuCullingManager->GetTotalIndexCount();
+        }
+
+        if (m_detailManager)
+        {
+            stats.detailSlots = m_detailManager->slot_count;
+            stats.detailInstances = m_detailManager->total_instance_count;
+            if (m_detailManager->bladeIndexCount[0] > 0)
+                stats.detailTrianglesPerBlade = m_detailManager->bladeIndexCount[0] / 3;
+        }
+
+        m_statsOverlay->SetRenderStats(stats);
         m_statsOverlay->SetVisible(true);
         m_statsOverlay->Render();
     }
@@ -366,6 +455,10 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
 void FrameGraphRenderer::SetupFrame() {
     const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
+
+    if (m_gpuCullingManager)
+        m_gpuCullingManager->ProcessStatsReadback();
+
     m_bufferHandleCache.clear();
 
     m_lstRenderables.clear();

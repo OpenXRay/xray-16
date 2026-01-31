@@ -256,7 +256,11 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::ProcessFrame()
 {
-    xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
+    static u32 profilerFrameCounter = 0;
+    profilerFrameCounter++;
+    const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
+    const bool shouldProfile = psDeviceFlags.test(rsStatistic) && ((profilerFrameCounter % throttleInterval) == 0);
+    xray::profiler::SetEnabled(shouldProfile);
 
     xray::profiler::FrameStart();
 

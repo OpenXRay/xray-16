@@ -83,6 +83,26 @@ void StatsOverlay::Render()
     {
         ImGui::TextDisabled("(Press editor key to interact)");
     }
+
+    if (ImGui::CollapsingHeader("Settings"))
+    {
+        int throttle = static_cast<int>(cpuProfiler.GetThrottleInterval());
+        if (ImGui::SliderInt("Sample Interval", &throttle, 1, 120, "%d frames"))
+        {
+            cpuProfiler.SetThrottleInterval(static_cast<u32>(throttle));
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(?)");
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("Profile every N frames.\n1 = every frame (highest overhead)\n30 = default (~2%% overhead)\n60+ = minimal overhead");
+        }
+    }
+
+    ImGui::Separator();
+
+    RenderGeometrySection();
+
     ImGui::Separator();
 
     RenderCPUSection();
@@ -228,6 +248,137 @@ void StatsOverlay::RenderGPUSection()
     else
     {
         m_gpuExpanded = false;
+    }
+}
+
+const char* StatsOverlay::FormatNumber(u32 value)
+{
+    static char buffer[32];
+
+    if (value >= 1000000)
+        xr_sprintf(buffer, sizeof(buffer), "%.2fM", value / 1000000.0f);
+    else if (value >= 1000)
+        xr_sprintf(buffer, sizeof(buffer), "%.1fK", value / 1000.0f);
+    else
+        xr_sprintf(buffer, sizeof(buffer), "%u", value);
+
+    return buffer;
+}
+
+void StatsOverlay::RenderGeometrySection()
+{
+    ImGui::SetNextItemOpen(m_geometryExpanded, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("Geometry"))
+    {
+        m_geometryExpanded = true;
+
+        const RenderStats& s = m_renderStats;
+
+        ImGui::Text("Triangles:");
+        ImGui::Indent();
+
+        if (s.objectsSubmitted > 0)
+        {
+            float visRatio = s.objectsVisible > 0 ?
+                (float)s.objectsVisible / s.objectsSubmitted * 100.0f : 0.0f;
+            ImGui::Text("Total: %s (%.0f%% visible)", FormatNumber(s.totalTriangles), visRatio);
+        }
+        else
+        {
+            ImGui::Text("Total: %s", FormatNumber(s.totalTriangles));
+        }
+
+        if (s.staticTriangles > 0)
+            ImGui::BulletText("Static:  %s", FormatNumber(s.staticTriangles));
+        if (s.dynamicTriangles > 0)
+            ImGui::BulletText("Dynamic: %s", FormatNumber(s.dynamicTriangles));
+        if (s.skinnedTriangles > 0)
+            ImGui::BulletText("Skinned: %s", FormatNumber(s.skinnedTriangles));
+        if (s.terrainTriangles > 0)
+            ImGui::BulletText("Terrain: %s", FormatNumber(s.terrainTriangles));
+
+        ImGui::Unindent();
+
+        ImGui::Text("Batches: %u total", s.totalBatches);
+        ImGui::Indent();
+
+        if (s.staticBatches > 0)
+            ImGui::BulletText("Static:   %u", s.staticBatches);
+        if (s.dynamicBatches > 0)
+            ImGui::BulletText("Dynamic:  %u", s.dynamicBatches);
+        if (s.skinnedBatches > 0)
+            ImGui::BulletText("Skinned:  %u", s.skinnedBatches);
+        if (s.terrainBatches > 0)
+            ImGui::BulletText("Terrain:  %u", s.terrainBatches);
+        if (s.particleBatches > 0)
+            ImGui::BulletText("Particles: %u", s.particleBatches);
+
+        ImGui::Unindent();
+
+        if (s.objectsSubmitted > 0)
+        {
+            ImGui::Text("Culling:");
+            ImGui::Indent();
+
+            float cullPercent = s.objectsCulled > 0 ?
+                (float)s.objectsCulled / s.objectsSubmitted * 100.0f : 0.0f;
+
+            ImGui::Text("Submitted: %u", s.objectsSubmitted);
+            ImGui::Text("Visible:   %u", s.objectsVisible);
+            ImGui::Text("Culled:    %u (%.0f%%)", s.objectsCulled, cullPercent);
+
+            ImGui::Unindent();
+        }
+
+        if (s.skinnedMeshes > 0)
+        {
+            ImGui::Text("Skinning:");
+            ImGui::Indent();
+
+            ImGui::Text("Meshes: %u", s.skinnedMeshes);
+            ImGui::Text("Bones:  %u (max: %u)", s.totalBones, s.maxBonesPerMesh);
+
+            ImGui::Unindent();
+        }
+
+        if (s.megaBufferVertices > 0)
+        {
+            ImGui::Text("Mega-Buffer:");
+            ImGui::Indent();
+
+            ImGui::Text("Vertices: %s", FormatNumber(s.megaBufferVertices));
+            ImGui::Text("Indices:  %s", FormatNumber(s.megaBufferIndices));
+
+            float vertMB = (s.megaBufferVertices * 48) / (1024.0f * 1024.0f);
+            float idxMB = (s.megaBufferIndices * 4) / (1024.0f * 1024.0f);
+            ImGui::TextDisabled("~%.1f MB verts, ~%.1f MB idx", vertMB, idxMB);
+
+            ImGui::Unindent();
+        }
+
+        if (s.detailInstances > 0 || s.detailSlots > 0)
+        {
+            ImGui::Text("Grass/Detail:");
+            ImGui::Indent();
+
+            if (s.detailSlots > 0)
+                ImGui::Text("Slots: %u", s.detailSlots);
+            if (s.detailInstances > 0)
+            {
+                ImGui::Text("Instances: %s", FormatNumber(s.detailInstances));
+                if (s.detailTrianglesPerBlade > 0)
+                {
+                    u32 maxDetailTris = s.detailInstances * s.detailTrianglesPerBlade;
+                    ImGui::TextDisabled("Max tris: %s (LOD0)", FormatNumber(maxDetailTris));
+                }
+            }
+
+            ImGui::Unindent();
+        }
+    }
+    else
+    {
+        m_geometryExpanded = false;
     }
 }
 

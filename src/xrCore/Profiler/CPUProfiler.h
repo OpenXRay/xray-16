@@ -33,6 +33,9 @@ public:
     void SetEnabled(bool enabled) { m_enabled = enabled; }
     bool IsEnabled() const { return m_enabled; }
 
+    void SetThrottleInterval(u32 interval) { m_throttleInterval = (interval > 0) ? interval : 1; }
+    u32 GetThrottleInterval() const { return m_throttleInterval; }
+
     u32 RegisterZone(const ZoneInfo* info);
 
     void BeginZone(u32 zoneId);
@@ -72,6 +75,8 @@ private:
     Lock m_zoneLock;
 
     bool m_enabled = false;
+
+    u32 m_throttleInterval = 30;
 };
 
 class XRCORE_API CPUZoneScope

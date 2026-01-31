@@ -220,6 +220,18 @@ public:
     u32 GetTerrainObjectCount() const { return m_terrainObjectCount; }
     nvrhi::IBuffer* GetTerrainDrawArgsBuffer() const { return m_terrainDrawArgsBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainMaterialIDBuffer() const { return m_terrainMaterialIDBuffer.Get(); }
+
+    struct CullingStats {
+        u32 staticVisible = 0;
+        u32 dynamicVisible = 0;
+        u32 terrainVisible = 0;
+        u32 totalVisible() const { return staticVisible + dynamicVisible + terrainVisible; }
+    };
+    const CullingStats& GetCullingStats() const { return m_cullingStats; }
+
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
+
+    void ProcessStatsReadback();
     nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainBatchIndicesBuffer() const { return m_terrainBatchIndicesBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainCompactDrawArgsBuffer() const { return m_terrainCompactDrawArgsBuffer.Get(); }
@@ -377,6 +389,10 @@ private:
     xr_vector<IBPoolInfo> m_ibPools;
     xr_vector<VBPoolInfo> m_vbPoolsAlt;
     xr_vector<IBPoolInfo> m_ibPoolsAlt;
+
+    nvrhi::BufferHandle m_statsReadbackBuffer;
+    CullingStats m_cullingStats;
+    bool m_statsReadbackPending = false;
 
 public:
 
