@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FrameGraph.h"
 #include "../RenderContext/RenderDevice.h"
+#include "../Profiler/GPUProfiler.h"
 
 namespace xray::render::framegraph {
 
@@ -133,6 +134,8 @@ void FrameGraph::SetPassCallback(PassHandle pass, PassExecuteCallback callback) 
 }
 
 void FrameGraph::Compile() {
+    ZoneScoped;
+
     VERIFY(!m_compiled && "Already compiled");
 
     BuildDependencyGraph();
@@ -155,6 +158,8 @@ void FrameGraph::Compile() {
 }
 
 void FrameGraph::Execute() {
+    ZoneScoped;
+
     VERIFY(m_compiled && "Must compile before execute");
     VERIFY(m_context != nullptr && "RenderContext required for execution");
     VERIFY(m_renderDevice != nullptr && "RenderDevice required for execution");
@@ -192,7 +197,15 @@ void FrameGraph::Execute() {
         }
 
         cmdList->beginMarker(pass->name.c_str());
+
+        if (m_gpuProfiler)
+            m_gpuProfiler->BeginPass(cmdList, pass->name.c_str());
+
         pass->executeCallback(*m_context, *this);
+
+        if (m_gpuProfiler)
+            m_gpuProfiler->EndPass(cmdList, pass->name.c_str());
+
         cmdList->endMarker();
 
         passesExecuted++;

@@ -179,6 +179,8 @@ void FrameGraphRenderer::Shutdown() {
 }
 
 void FrameGraphRenderer::Render() {
+    ZoneScopedN("FrameGraphRenderer::Render");
+
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
@@ -204,19 +206,36 @@ void FrameGraphRenderer::Render() {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
     }
 
-    SetupFrame();
+    {
+        ZoneScopedN("FG::SetupFrame");
+        SetupFrame();
+    }
 
     m_framegraph->ResetForNextFrame();
 
-    SetupFrameGraphPasses();
+    {
+        ZoneScopedN("FG::SetupPasses");
+        SetupFrameGraphPasses();
+    }
 
     m_framegraph->SetRenderContext(m_renderContext.get());
 
-    m_framegraph->Compile();
+    m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
 
-    m_framegraph->Execute();
+    {
+        ZoneScopedN("FG::Compile");
+        m_framegraph->Compile();
+    }
 
-    PresentToBackbuffer();
+    {
+        ZoneScopedN("FG::Execute");
+        m_framegraph->Execute();
+    }
+
+    {
+        ZoneScopedN("FG::Present");
+        PresentToBackbuffer();
+    }
 
     if (m_gpuProfiler)
     {
@@ -237,9 +256,14 @@ void FrameGraphRenderer::Render() {
 }
 
 void FrameGraphRenderer::RenderMenu() {
+    ZoneScopedN("FrameGraphRenderer::RenderMenu");
+
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->FrameStart();
 
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
@@ -316,10 +340,14 @@ void FrameGraphRenderer::RenderMenu() {
     m_finalOutput = finalOutput;
 
     m_framegraph->SetRenderContext(m_renderContext.get());
+    m_framegraph->SetGPUProfiler(m_gpuProfiler.get());
     m_framegraph->Compile();
     m_framegraph->Execute();
 
     PresentToBackbuffer();
+
+    if (m_gpuProfiler)
+        m_gpuProfiler->FrameEnd();
 
 }
 

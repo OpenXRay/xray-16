@@ -8,6 +8,10 @@
 #include "../RenderContext/RenderContext.h"
 #include "../ResourceManager/FGResourceManager.h"
 
+namespace xray::profiler {
+    class GPUProfiler;
+}
+
 namespace xray::render::framegraph {
 
 namespace ng = xray::render::ng;
@@ -69,6 +73,8 @@ public:
 
     void SetRenderContext(ng::RenderContext* context) { m_context = context; }
 
+    void SetGPUProfiler(xray::profiler::GPUProfiler* profiler) { m_gpuProfiler = profiler; }
+
     void Compile();
 
     void Execute();
@@ -120,6 +126,7 @@ private:
     ng::RenderDevice* m_renderDevice;
     nvrhi::IDevice* m_device;
     ng::RenderContext* m_context = nullptr;
+    xray::profiler::GPUProfiler* m_gpuProfiler = nullptr;
     resources::FGResourceManager* m_resourceManager;
     xr_unique_ptr<FGResourcePool> m_resourcePool;
 
