@@ -23,6 +23,9 @@ public:
     void Initialize(nvrhi::IDevice* device);
     void Shutdown();
 
+    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    bool IsProfilingEnabled() const { return m_enabled; }
+
     void BeginPass(nvrhi::ICommandList* cmdList, const char* name);
     void EndPass(nvrhi::ICommandList* cmdList, const char* name);
 
@@ -61,6 +64,8 @@ private:
     float m_totalGPUTimeMs = 0.0f;
 
     u32 m_currentFrame = 0;
+
+    bool m_enabled = false;
 };
 
 class GPUPassScope

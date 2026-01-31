@@ -45,6 +45,7 @@ bool IsEnabled()
 void SetEnabled(bool enabled)
 {
     g_enabled = enabled;
+    CPUProfiler::Instance().SetEnabled(enabled);
 }
 
 }

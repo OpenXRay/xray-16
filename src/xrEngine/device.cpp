@@ -256,6 +256,8 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::ProcessFrame()
 {
+    xray::profiler::SetEnabled(psDeviceFlags.test(rsStatistic));
+
     xray::profiler::FrameStart();
 
     {

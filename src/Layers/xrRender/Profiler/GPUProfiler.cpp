@@ -76,7 +76,7 @@ void GPUProfiler::ReleaseTimerQuery(nvrhi::TimerQueryHandle query)
 
 void GPUProfiler::BeginPass(nvrhi::ICommandList* cmdList, const char* name)
 {
-    if (!m_device || !cmdList || !name)
+    if (!m_enabled || !m_device || !cmdList || !name)
         return;
 
     auto query = AcquireTimerQuery();
@@ -93,7 +93,7 @@ void GPUProfiler::BeginPass(nvrhi::ICommandList* cmdList, const char* name)
 
 void GPUProfiler::EndPass(nvrhi::ICommandList* cmdList, const char* name)
 {
-    if (!m_device || !cmdList || !name)
+    if (!m_enabled || !m_device || !cmdList || !name)
         return;
 
     for (auto it = m_activePasses.rbegin(); it != m_activePasses.rend(); ++it)
@@ -117,11 +117,17 @@ void GPUProfiler::EndPass(nvrhi::ICommandList* cmdList, const char* name)
 
 void GPUProfiler::FrameStart()
 {
+    if (!m_enabled)
+        return;
+
     m_activePasses.clear();
 }
 
 void GPUProfiler::FrameEnd()
 {
+    if (!m_enabled)
+        return;
+
     m_currentFrame++;
 
     ResolvePendingQueries();
@@ -177,7 +183,7 @@ GPUPassScope::GPUPassScope(GPUProfiler* profiler, nvrhi::ICommandList* cmdList, 
     , m_cmdList(cmdList)
     , m_name(name)
 {
-    if (m_profiler && m_profiler->IsInitialized())
+    if (m_profiler && m_profiler->IsProfilingEnabled() && m_profiler->IsInitialized())
     {
         m_profiler->BeginPass(m_cmdList, m_name);
     }
@@ -185,7 +191,7 @@ GPUPassScope::GPUPassScope(GPUProfiler* profiler, nvrhi::ICommandList* cmdList, 
 
 GPUPassScope::~GPUPassScope()
 {
-    if (m_profiler && m_profiler->IsInitialized())
+    if (m_profiler && m_profiler->IsProfilingEnabled() && m_profiler->IsInitialized())
     {
         m_profiler->EndPass(m_cmdList, m_name);
     }

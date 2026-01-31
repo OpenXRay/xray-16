@@ -30,6 +30,9 @@ public:
     CPUProfiler();
     ~CPUProfiler();
 
+    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    bool IsEnabled() const { return m_enabled; }
+
     u32 RegisterZone(const ZoneInfo* info);
 
     void BeginZone(u32 zoneId);
@@ -67,6 +70,8 @@ private:
     Lock m_stackLock;
 
     Lock m_zoneLock;
+
+    bool m_enabled = false;
 };
 
 class XRCORE_API CPUZoneScope

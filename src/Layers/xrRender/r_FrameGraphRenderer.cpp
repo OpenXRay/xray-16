@@ -187,6 +187,7 @@ void FrameGraphRenderer::Render() {
 
     if (m_gpuProfiler)
     {
+        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
         m_gpuProfiler->FrameStart();
     }
 
@@ -263,7 +264,10 @@ void FrameGraphRenderer::RenderMenu() {
     VERIFY(m_framegraph != nullptr);
 
     if (m_gpuProfiler)
+    {
+        m_gpuProfiler->SetEnabled(psDeviceFlags.test(rsStatistic));
         m_gpuProfiler->FrameStart();
+    }
 
     if (m_device && m_device->GetFGResourceManager()) {
         m_device->GetFGResourceManager()->Update(Device.fTimeDelta);
