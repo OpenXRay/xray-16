@@ -162,6 +162,16 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     passes::InitializeSunPass(device);
     passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
+    // ═══════════════════════════════════════════════════════
+    //  PROFILER (GPU timing + ImGui overlay)
+    // ═══════════════════════════════════════════════════════
+    m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
+    m_gpuProfiler->Initialize(device->GetNVRHIDevice());
+
+    m_statsOverlay = xr_make_unique<xray::profiler::StatsOverlay>();
+    m_statsOverlay->SetGPUProfiler(m_gpuProfiler.get());
+    Msg("* [FrameGraphRenderer] Profiler initialized");
+
     Msg("* [FrameGraphRenderer] initialized");
 
     return true;
@@ -174,6 +184,13 @@ void FrameGraphRenderer::Shutdown() {
 
     // Clear global geometry collector pointer
     g_geometryCollector = nullptr;
+
+    // Cleanup profiler
+    m_statsOverlay = nullptr;
+    if (m_gpuProfiler) {
+        m_gpuProfiler->Shutdown();
+        m_gpuProfiler = nullptr;
+    }
 
     m_renderContext = nullptr;
     m_geometryCollector = nullptr;
@@ -211,6 +228,14 @@ void FrameGraphRenderer::Render() {
     if (!m_enabled) return;
 
     VERIFY(m_framegraph != nullptr);
+
+    // ═══════════════════════════════════════════════════════
+    //  GPU PROFILER FRAME START
+    // ═══════════════════════════════════════════════════════
+    if (m_gpuProfiler)
+    {
+        m_gpuProfiler->FrameStart();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  EAGER PIPELINE INITIALIZATION (First frame only)
@@ -296,6 +321,14 @@ void FrameGraphRenderer::Render() {
     // ═══════════════════════════════════════════════════════
 
     PresentToBackbuffer();
+
+    // ═══════════════════════════════════════════════════════
+    //  GPU PROFILER FRAME END
+    // ═══════════════════════════════════════════════════════
+    if (m_gpuProfiler)
+    {
+        m_gpuProfiler->FrameEnd();
+    }
 
     // ═══════════════════════════════════════════════════════
     //  STATISTICS
@@ -418,6 +451,7 @@ void FrameGraphRenderer::RenderMenu() {
     );
 
     // 6. ImGui Pass - Debug overlay on LDR output
+    // Note: Stats overlay is rendered from device.cpp between ImGui::NewFrame/EndFrame
     ng::ImGuiRendererNVRHI* imguiRenderer = RImplementation.GetImGuiRendererNVRHI();
     auto finalOutput = passes::setupImGuiPass(
         *m_framegraph,
@@ -447,6 +481,17 @@ void FrameGraphRenderer::RenderMenu() {
     // No need to reset here at the end
 
     // Msg("* [FrameGraphRenderer::RenderMenu] Menu frame complete");
+}
+
+void FrameGraphRenderer::RenderStatsOverlay()
+{
+    // Called from device.cpp between ImGui::NewFrame and EndFrame
+    // This ensures proper ImGui input processing
+    if (m_statsOverlay && psDeviceFlags.test(rsStatistic))
+    {
+        m_statsOverlay->SetVisible(true);
+        m_statsOverlay->Render();
+    }
 }
 
 void FrameGraphRenderer::SetupFrame() {

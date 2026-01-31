@@ -256,46 +256,56 @@ void CRenderDevice::DoRender()
 
 void CRenderDevice::ProcessFrame()
 {
-    ZoneScoped;
+    xray::profiler::FrameStart();
 
-    if (!BeforeFrame())
-        return;
-
-    const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
-
-    FrameMove();
-
-    OnCameraUpdated();
-
-    const auto& processSeqParallel = TaskScheduler->AddTask([this]
+    // Scoped block so ZoneScoped ends BEFORE FrameEnd copies to display buffer
     {
-        ZoneScopedN("ProcessParallelSequence");
-        for (u32 pit = 0; pit < seqParallel.size(); pit++)
-            seqParallel[pit]();
-        seqParallel.clear();
-        seqFrameMT.Process();
-    });
+        ZoneScoped;
 
-    DoRender();
+        if (!BeforeFrame())
+        {
+            xray::profiler::FrameEnd();
+            return;
+        }
 
-    TaskScheduler->Wait(processSeqParallel);
+        const u64 frameStartTime = TimerGlobal.GetElapsed_ms();
 
-    const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
-    const u64 frameTime = frameEndTime - frameStartTime;
+        FrameMove();
 
-    u32 updateDelta = 1000 / ps_fps_limit;
+        OnCameraUpdated();
 
-    if (GEnv.isDedicatedServer)
-        updateDelta = 1000 / g_svDedicateServerUpdateReate;
+        const auto& processSeqParallel = TaskScheduler->AddTask([this]
+        {
+            ZoneScopedN("ProcessParallelSequence");
+            for (u32 pit = 0; pit < seqParallel.size(); pit++)
+                seqParallel[pit]();
+            seqParallel.clear();
+            seqFrameMT.Process();
+        });
 
-    else if (Paused() || g_pGameLevel == nullptr)
-        updateDelta = 1000 / ps_fps_limit_in_menu;
+        DoRender();
 
-    if (frameTime < updateDelta)
-        Sleep(updateDelta - frameTime);
+        TaskScheduler->Wait(processSeqParallel);
 
-    if (!b_is_Active)
-        Sleep(1);
+        const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
+        const u64 frameTime = frameEndTime - frameStartTime;
+
+        u32 updateDelta = 1000 / ps_fps_limit;
+
+        if (GEnv.isDedicatedServer)
+            updateDelta = 1000 / g_svDedicateServerUpdateReate;
+
+        else if (Paused() || g_pGameLevel == nullptr)
+            updateDelta = 1000 / ps_fps_limit_in_menu;
+
+        if (frameTime < updateDelta)
+            Sleep(updateDelta - frameTime);
+
+        if (!b_is_Active)
+            Sleep(1);
+    } // ZoneScoped ends here, ProcessFrame timing captured
+
+    xray::profiler::FrameEnd();
 }
 
 void CRenderDevice::ProcessEvent(const SDL_Event& event)
@@ -484,6 +494,10 @@ void CRenderDevice::FrameMove()
     // seqFrame.Process(rp_Frame);
     stats.EngineTotal.End();
     stats.EngineTotal.FrameEnd();
+
+    // Render stats overlay here (between NewFrame and EndFrame for proper input)
+    if (GEnv.FrameGraphRenderer)
+        GEnv.FrameGraphRenderer->RenderStatsOverlay();
 
     ImGui::EndFrame();
 }

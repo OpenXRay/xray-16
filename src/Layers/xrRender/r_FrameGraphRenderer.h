@@ -7,6 +7,8 @@
 #include "Layers/xrRender/FrameGraph/ShaderReflection.h"
 #include "Layers/xrRender/FrameGraph/ShaderPhaseCache.h"
 #include "Layers/xrRender/Geometry/GeometryBatch.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
+#include "Layers/xrRender/Profiler/StatsOverlay.h"
 
 // Forward declarations
 struct ImDrawData;
@@ -60,6 +62,7 @@ public:
     // IFrameGraphRender interface
     void Render() override;
     void RenderMenu() override;
+    void RenderStatsOverlay() override;
     void SetEnabled(bool enabled) override { m_enabled = enabled; }
     bool IsEnabled() const override { return m_enabled; }
 
@@ -81,6 +84,11 @@ public:
 
     const Stats& GetStats() const { return m_stats; }
     void PrintStats() const;
+
+    // Profiler access
+    xray::profiler::GPUProfiler* GetGPUProfiler() const { return m_gpuProfiler.get(); }
+    xray::profiler::StatsOverlay* GetStatsOverlay() const { return m_statsOverlay.get(); }
+    void ToggleStatsOverlay() { if (m_statsOverlay) m_statsOverlay->ToggleVisible(); }
 
     // Accessors for lambda passes to access shared infrastructure (override IFrameGraphRender)
     ng::RenderDevice* GetRenderDevice() const override { return m_device; }
@@ -226,6 +234,10 @@ private:
 
     // Statistics
     Stats m_stats;
+
+    // Profiler (GPU timing + ImGui overlay)
+    xr_unique_ptr<xray::profiler::GPUProfiler> m_gpuProfiler;
+    xr_unique_ptr<xray::profiler::StatsOverlay> m_statsOverlay;
 
     // ═══════════════════════════════════════════════════
     //  CACHED SPATIAL QUERIES (like R_dsgraph_structure)

@@ -26,23 +26,15 @@ std::array<RendererModule*, 1> s_render_modules =
     xray::render::render_r4::GetRendererModule(),
 };
 
-struct tracy_raii
+struct profiler_raii
 {
-    ~tracy_raii()
-    {
-#ifdef TRACY_ENABLE
-        tracy::GetProfiler().RequestShutdown();
-        while (!tracy::GetProfiler().HasShutdownFinished())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-#endif
-    }
+    profiler_raii() { xray::profiler::Initialize(); }
+    ~profiler_raii() { xray::profiler::Shutdown(); }
 };
 
 int entry_point(pcstr commandLine)
 {
-    tracy_raii raii;
+    profiler_raii raii;
     auto* game = strstr(commandLine, "-nogame") ? nullptr : &xrGame;
 
     CApplication app{ commandLine, game, s_render_modules };

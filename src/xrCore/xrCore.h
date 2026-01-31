@@ -28,11 +28,8 @@
 #      define XRCORE_API XR_EXPORT
 #   else
 #      define XRCORE_API XR_IMPORT
-#      define TRACY_IMPORTS
 #   endif
 #endif
-
-#include <tracy/Tracy.hpp>
 
 #include "xrDebug.h"
 //#include "vector.h"
@@ -137,3 +134,7 @@ private:
 };
 
 extern XRCORE_API xrCore Core;
+
+// Custom profiler system (replaces Tracy)
+// Must be included after xr_vector, xr_map, xrstring dependencies
+#include "Profiler/Profiler.h"

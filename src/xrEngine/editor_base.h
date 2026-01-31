@@ -22,6 +22,8 @@ public:
     bool& get_open_state() { return is_opened; }
     bool is_open() const { return is_opened; }
     virtual bool is_active() const { return is_opened; }
+    virtual bool is_stats_window() const { return false; }
+    void set_opened(bool opened) { is_opened = opened; }
 
     ImGuiWindowFlags get_default_window_flags() const;
 
@@ -120,5 +122,6 @@ private:
     ImGuiBackend m_imgui_backend{};
 
     xr_vector<ide_tool*> m_tools;
+    ide_tool* m_stats_overlay{};
 };
 } // namespace xray::editor

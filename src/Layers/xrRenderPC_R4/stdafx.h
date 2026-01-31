@@ -39,7 +39,7 @@
 #include <nvrhi/d3d11.h>
 #pragma warning(pop)
 
-#include <tracy/TracyD3D11.hpp>
+// Tracy D3D11 replaced by custom profiler (macros in xrCore/Profiler/Profiler.h)
 
 #define R_GL 0
 #define R_R1 1

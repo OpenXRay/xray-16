@@ -31,6 +31,9 @@ public:
     // Main menu rendering (simplified: background + ImGui UI only)
     virtual void RenderMenu() = 0;
 
+    // Render stats overlay (call between ImGui::NewFrame and EndFrame)
+    virtual void RenderStatsOverlay() = 0;
+
     // Enable/disable FrameGraph renderer
     virtual void SetEnabled(bool enabled) = 0;
     virtual bool IsEnabled() const = 0;

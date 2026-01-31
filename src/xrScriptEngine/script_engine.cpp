@@ -837,8 +837,6 @@ void CScriptEngine::init(export_func exporter, bool loadGlobalNamespace)
 
     luaopen_xrluafix(lua());
 
-    tracy::LuaRegister(lua());
-
     // Game scripts doesn't call randomize but use random
     // So, we should randomize in the engine.
     {
