@@ -568,11 +568,10 @@ void CLevel::OnFrame()
             m_level_sound_manager->Update();
 
         // defer LUA-GC-STEP
-        if (g_mt_config.test(mtLUA_GC))
-        {
-            Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));
-        }
-        else
+        // Note: When mtLUA_GC is enabled, script_gc runs as a separate parallel task
+        // started by Device, not inside ProcessParallelSequence. This allows it to
+        // run truly in parallel with other seqParallel work.
+        if (!g_mt_config.test(mtLUA_GC))
             script_gc();
     }
     if (pStatGraphR)
@@ -614,6 +613,11 @@ void CLevel::script_gc()
     }
 
     AIStats.LuaGC.End();
+}
+
+bool CLevel::IsScriptGcParallel() const
+{
+    return g_mt_config.test(mtLUA_GC);
 }
 
 #ifdef DEBUG_PRECISE_PATH
