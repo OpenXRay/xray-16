@@ -117,6 +117,7 @@ struct TextureMetadata {
 
     // Video texture support (Week 6)
     xr_unique_ptr<DDSData> videoTextureData;  // Only set for video textures (.ogm/.avi)
+    bool videoActiveThisFrame = false;        // Set when video is rendered, cleared each frame
 
     // Sequence texture support (animated .seq textures like cursor)
     xr_unique_ptr<DDSData> sequenceTextureData;  // Only set for sequence textures (.seq)

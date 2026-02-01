@@ -401,6 +401,11 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
     meta.lastAccessTime = 0.0f;  // Reset LRU timer
     meta.accessCount++;
 
+    // Mark video as active for this frame (enables decoding)
+    if (meta.videoTextureData) {
+        meta.videoActiveThisFrame = true;
+    }
+
     // ═══════════════════════════════════════════════════
     //  AUTO-RELOAD IF EVICTED
     // ═══════════════════════════════════════════════════
@@ -470,6 +475,11 @@ void TextureManager::Touch(TextureHandle handle) {
     TextureMetadata& meta = m_textures[handle.index];
     meta.lastAccessTime = 0.0f;
     meta.accessCount++;
+
+    // Mark video as active for this frame (enables decoding)
+    if (meta.videoTextureData) {
+        meta.videoActiveThisFrame = true;
+    }
 }
 
 // ═══════════════════════════════════════════════════
@@ -991,6 +1001,7 @@ void TextureManager::UpdateVideoTextures() {
     // Iterate through all textures and update video textures
     int videoTextureCount = 0;
     int updatedCount = 0;
+    int skippedInactive = 0;
 
     for (auto& meta : m_textures) {
         if (!meta.isAlive || !meta.videoTextureData) {
@@ -998,6 +1009,16 @@ void TextureManager::UpdateVideoTextures() {
         }
 
         videoTextureCount++;
+
+        // OPTIMIZATION: Only update videos that were rendered recently
+        // Videos that aren't visible on screen don't need CPU decoding
+        if (!meta.videoActiveThisFrame && meta.lastAccessTime > 0.5f) {
+            skippedInactive++;
+            continue;  // Skip inactive videos (saves ~3ms per video)
+        }
+
+        // Reset active flag for next frame
+        meta.videoActiveThisFrame = false;
 
         // Decode next frame
         bool frameChanged = DDSLoader::UpdateVideoFrame(*meta.videoTextureData, Device.dwTimeContinual);
