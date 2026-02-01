@@ -87,6 +87,7 @@ struct TextureMetadata {
     nvrhi::TextureHandle nvrhiTexture;
 
     xr_unique_ptr<DDSData> videoTextureData;
+    bool videoActiveThisFrame = false;
 
     xr_unique_ptr<DDSData> sequenceTextureData;
 

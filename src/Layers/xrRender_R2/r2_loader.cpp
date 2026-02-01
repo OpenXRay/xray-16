@@ -137,8 +137,14 @@ void CRender::level_Load(IReader* fs)
     Load3DFluid();
 #endif
 
-    // HOM
-    HOM.Load();
+    if (!m_framegraphRenderer)
+    {
+        HOM.Load();
+    }
+    else
+    {
+        Msg("* [FrameGraph] Skipping HOM load - using GPU Hi-Z culling instead");
+    }
 
     // Lights
     g_pGamePersistent->LoadTitle("st_loading_lights");

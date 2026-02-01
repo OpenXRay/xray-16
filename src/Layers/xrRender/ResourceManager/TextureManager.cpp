@@ -335,6 +335,10 @@ nvrhi::ITexture* TextureManager::GetNVRHITexture(TextureHandle handle) {
     meta.lastAccessTime = 0.0f;
     meta.accessCount++;
 
+    if (meta.videoTextureData) {
+        meta.videoActiveThisFrame = true;
+    }
+
     if (meta.state == TextureState::Unloaded || meta.state == TextureState::Evicted) {
         LoadTextureSync(handle);
     }
@@ -390,6 +394,10 @@ void TextureManager::Touch(TextureHandle handle) {
     TextureMetadata& meta = m_textures[handle.index];
     meta.lastAccessTime = 0.0f;
     meta.accessCount++;
+
+    if (meta.videoTextureData) {
+        meta.videoActiveThisFrame = true;
+    }
 }
 
 void TextureManager::AddRef(TextureHandle handle) {
@@ -785,6 +793,7 @@ void TextureManager::UpdateVideoTextures() {
 
     int videoTextureCount = 0;
     int updatedCount = 0;
+    int skippedInactive = 0;
 
     for (auto& meta : m_textures) {
         if (!meta.isAlive || !meta.videoTextureData) {
@@ -792,6 +801,13 @@ void TextureManager::UpdateVideoTextures() {
         }
 
         videoTextureCount++;
+
+        if (!meta.videoActiveThisFrame && meta.lastAccessTime > 0.5f) {
+            skippedInactive++;
+            continue;
+        }
+
+        meta.videoActiveThisFrame = false;
 
         bool frameChanged = DDSLoader::UpdateVideoFrame(*meta.videoTextureData, Device.dwTimeContinual);
 
