@@ -151,6 +151,10 @@ public:
 
     [[nodiscard]]
     virtual float GetEnvironmentGameDayTimeSec() const = 0;
+
+    virtual void script_gc() {}
+
+    virtual bool IsScriptGcParallel() const { return false; }
 };
 
 //-----------------------------------------------------------------------------------------------------------
