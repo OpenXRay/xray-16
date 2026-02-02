@@ -18,6 +18,8 @@ class CGameTaskManager
     };
     Flags8 m_flags;
     u32 m_actual_frame;
+    u32 m_last_update_frame{ 0 };
+    static constexpr u32 UPDATE_INTERVAL_FRAMES = 6; // ~100ms at 60fps
 
 protected:
     void UpdateActiveTask();

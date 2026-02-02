@@ -187,6 +187,13 @@ void CGameTaskManager::UpdateTasks()
     if (Device.Paused())
         return;
 
+    // Throttle updates - task state doesn't need 60Hz checking
+    // Only check if eChanged flag is set (forced update) or interval elapsed
+    const u32 currentFrame = Device.dwFrame;
+    if (!m_flags.test(eChanged) && (currentFrame - m_last_update_frame) < UPDATE_INTERVAL_FRAMES)
+        return;
+    m_last_update_frame = currentFrame;
+
     ZoneScoped;
     Level().MapManager().DisableAllPointers();
 
