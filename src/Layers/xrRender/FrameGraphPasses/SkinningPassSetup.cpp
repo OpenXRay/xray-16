@@ -450,7 +450,7 @@ static void RenderSkinnedBatch(
         return;
 
     // Calculate bones
-    Parent->CalculateBones(TRUE);
+    //Parent->CalculateBones(TRUE);
 
     // Fill dynamic transforms with world matrix
     DynamicTransforms dynTransData = {};

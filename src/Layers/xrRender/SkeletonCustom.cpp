@@ -12,6 +12,7 @@
 #else
 #include "Include/xrAPI/xrAPI.h"
 #endif
+#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -430,8 +431,17 @@ void CKinematics::Copy(dxRender_Visual* P)
     m_lod = (pFrom->m_lod) ? (dxRender_Visual*)RImplementation.model_Duplicate(pFrom->m_lod) : 0;
 }
 
+void CKinematics::CalculateBones_InvalidateFG()
+{
+    UCalc_Time = 0x0;
+    UCalc_Visibox = psSkeletonUpdate;
+}
+
 void CKinematics::CalculateBones_Invalidate()
 {
+    if (GEnv.FrameGraphRenderer->IsEnabled())
+        return;
+
     UCalc_Time = 0x0;
     UCalc_Visibox = psSkeletonUpdate;
 }

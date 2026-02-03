@@ -250,7 +250,7 @@ void renderDepthOnlyGeometry(
 
                 if (Parent) {
                     // Calculate bones BEFORE accessing transforms
-                    Parent->CalculateBones(TRUE);
+                    //Parent->CalculateBones(TRUE);
 
                     // Get bone count
                     u32 count = Parent->LL_BoneCount();

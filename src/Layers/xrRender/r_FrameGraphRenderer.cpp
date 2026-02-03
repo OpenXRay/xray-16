@@ -1729,7 +1729,8 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
             // CRITICAL: Must calculate bones BEFORE extracting children!
             // Bone matrices are needed by skinned mesh children for rendering
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
-            pV->CalculateBones(TRUE);  // Compute bone transformation matrices
+            pV->CalculateBones_InvalidateFG();  // Compute bone transformation matrices
+            pV->CalculateBonesFG(TRUE);  // Compute bone transformation matrices
 
             // Extract children - these are the actual renderable skinned meshes
             for (auto& child : pV->children) {
