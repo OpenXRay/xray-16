@@ -40,24 +40,31 @@ bool CRenderDevice::RenderBegin()
 
     ZoneScoped;
 
-    switch (GEnv.Render->GetDeviceState())
     {
-    case DeviceState::Normal: break;
-    case DeviceState::Lost:
-        // If the device was lost, do not render until we get it back
-        Sleep(33);
-        return false;
+        ZoneScopedN("RenderBegin::DeviceStateCheck");
+        switch (GEnv.Render->GetDeviceState())
+        {
+        case DeviceState::Normal: break;
+        case DeviceState::Lost:
+            // If the device was lost, do not render until we get it back
+            Sleep(33);
+            return false;
 
-    case DeviceState::NeedReset:
-        // Check if the device is ready to be reset
-        Reset();
-        return false;
+        case DeviceState::NeedReset:
+            // Check if the device is ready to be reset
+            Reset();
+            return false;
 
-    default: R_ASSERT(0);
+        default: R_ASSERT(0);
+        }
     }
-    GEnv.Render->Begin();
-    g_bRendering = true;
 
+    {
+        ZoneScopedN("RenderBegin::BackendBegin");
+        GEnv.Render->Begin();
+    }
+
+    g_bRendering = true;
     return true;
 }
 
@@ -69,8 +76,10 @@ void CRenderDevice::RenderEnd(void)
         return;
 
     ZoneScoped;
+
     if (dwPrecacheFrame)
     {
+        ZoneScopedN("RenderEnd::Precache");
         GEnv.Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
         if (!dwPrecacheFrame)
@@ -95,18 +104,25 @@ void CRenderDevice::RenderEnd(void)
             }
         }
     }
+
     // end scene
     g_bRendering = false;
-    GEnv.Render->End();
 
-    vCameraPositionSaved = vCameraPosition;
-    vCameraDirectionSaved = vCameraDirection;
-    vCameraTopSaved = vCameraTop;
-    vCameraRightSaved = vCameraRight;
+    {
+        GEnv.Render->End();
+    }
 
-    mFullTransformSaved = mFullTransform;
-    mViewSaved = mView;
-    mProjectSaved = mProject;
+    {
+        ZoneScopedN("RenderEnd::SaveCameraState");
+        vCameraPositionSaved = vCameraPosition;
+        vCameraDirectionSaved = vCameraDirection;
+        vCameraTopSaved = vCameraTop;
+        vCameraRightSaved = vCameraRight;
+
+        mFullTransformSaved = mFullTransform;
+        mViewSaved = mView;
+        mProjectSaved = mProject;
+    }
 }
 
 void CRenderDevice::PreCache(u32 amount, bool wait_user_input)

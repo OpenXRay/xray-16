@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "D3D12Backend.h"
 
+#include "xrCore/Threading/TaskManager.hpp"
+
 #include <d3d12.h>
 #include <d3d12sdklayers.h>  // For ID3D12Debug1
 #include <dxgi1_4.h>
@@ -505,6 +507,7 @@ nvrhi::ITexture* D3D12Backend::GetBackBuffer() {
 }
 
 void D3D12Backend::Present(bool vsync) {
+    ZoneScopedN("D3D12Backend::Present");
     if (m_swapChain) {
         UINT syncInterval = vsync ? 1 : 0;
         UINT presentFlags = 0;
@@ -549,26 +552,66 @@ void D3D12Backend::ResizeSwapChain(u32 width, u32 height) {
 }
 
 void D3D12Backend::BeginFrame() {
+    ZoneScopedN("D3D12::BeginFrame");
+
+    // ═══════════════════════════════════════════════════════
+    //  ASYNC GC: Wait for previous frame's garbage collection
+    // ═══════════════════════════════════════════════════════
+    // GC was launched at end of previous frame and runs in parallel
+    // with CPU game logic. Wait here before any NVRHI operations.
+    if (m_gcTask) {
+        ZoneScopedN("D3D12::WaitForGC");
+        TaskScheduler->Wait(*m_gcTask);
+        m_gcTask = nullptr;
+    }
+
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-    // Run garbage collection to release completed command list resources
-    // This frees binding sets, buffers, and other resources from finished frames
-    // NVRHI tracks its own fences internally via executeCommandList()
-    m_nvrhiDevice->runGarbageCollection();
-
-    m_commandList->open();
+    {
+        ZoneScopedN("D3D12::CommandListOpen");
+        m_commandList->open();
+    }
     m_inFrame = true;
 }
 
 void D3D12Backend::EndFrame() {
+    ZoneScopedN("D3D12::EndFrame");
+
     m_inFrame = false;
-    m_commandList->close();
+
+    {
+        ZoneScopedN("D3D12::CommandListClose");
+        m_commandList->close();
+    }
 
     // NVRHI handles fence signaling internally
-    m_nvrhiDevice->executeCommandList(m_commandList);
+    {
+        ZoneScopedN("D3D12::ExecuteCommandList");
+        m_nvrhiDevice->executeCommandList(m_commandList);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  ASYNC GC: Launch garbage collection on background thread
+    // ═══════════════════════════════════════════════════════
+    // After executeCommandList, no more NVRHI device operations this frame.
+    // GC can safely run in parallel with CPU game logic (FrameMove, AI, physics).
+    // Will be waited on at start of next BeginFrame.
+    //
+    // NOTE: No ZoneScopedN here! The profiler resets zones at frame boundary,
+    // and this task spans across frames, which corrupts the zone hierarchy.
+    nvrhi::IDevice* device = m_nvrhiDevice;
+    m_gcTask = &TaskScheduler->AddTask([device] {
+        device->runGarbageCollection();
+    });
 }
 
 void D3D12Backend::WaitForIdle() {
+    // Wait for any pending async GC first
+    if (m_gcTask) {
+        TaskScheduler->Wait(*m_gcTask);
+        m_gcTask = nullptr;
+    }
+
     // Use NVRHI's built-in wait which handles its internal fences
     m_nvrhiDevice->waitForIdle();
 

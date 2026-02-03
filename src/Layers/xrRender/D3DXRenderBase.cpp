@@ -8,6 +8,7 @@
 
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/PBRConverter/PBRTextureConverter.h"  // Phase 2.5.3
+#include "xrEngine/IFrameGraphRender.h"
 
 #if defined(XR_PLATFORM_WINDOWS) || defined(XR_PLATFORM_LINUX) || defined(XR_PLATFORM_APPLE)
 #   ifndef MASTER_GOLD
@@ -315,6 +316,9 @@ void D3DXRenderBase::Begin()
     // Begin frame on backend
     GEnv.Backend->BeginFrame();
 
+    if (GEnv.FrameGraphRenderer->IsEnabled())
+        return;
+
 #if RENDER == R_R4
     for (int id = 0; id < R__NUM_CONTEXTS; ++id)
     {
@@ -344,6 +348,16 @@ void D3DXRenderBase::Clear()
 
 void D3DXRenderBase::End()
 {
+    ZoneScopedN("D3DXRenderBase::BackendEnd");
+
+    if (GEnv.FrameGraphRenderer->IsEnabled())
+    {
+        // End frame and present via backend
+        GEnv.Backend->EndFrame();
+        GEnv.Backend->Present(psDeviceFlags.test(rsVSync));
+        return;
+    }
+
     if (GEnv.Backend->GetCapabilities().SceneMode)
         overdrawEnd();
 

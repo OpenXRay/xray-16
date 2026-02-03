@@ -6,6 +6,8 @@
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
+// Forward declarations
+class Task;
 struct ID3D12Device;
 struct ID3D12CommandQueue;
 struct IDXGISwapChain3;
@@ -114,4 +116,8 @@ private:
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;
     u32 m_currentBackBufferIndex = 0;
+
+    // Async GC - runs garbage collection on background thread between frames
+    // GC is launched at EndFrame and waited on at BeginFrame
+    Task* m_gcTask = nullptr;
 };

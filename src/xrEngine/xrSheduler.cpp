@@ -17,6 +17,12 @@ void CSheduler::Initialize()
 {
     m_current_step_obj = nullptr;
     m_processing_now = false;
+
+    // Pre-allocate vectors to avoid reallocation stalls during heavy load
+    Registration.reserve(256);
+    Items.reserve(512);
+    ItemsRT.reserve(64);
+    ItemsProcessed.reserve(128);
 }
 
 void CSheduler::Destroy()
@@ -60,6 +66,14 @@ void CSheduler::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 
 void CSheduler::internal_Registration()
 {
+    ZoneScopedN("Scheduler::Registration");
+
+    // Warn about large registration batches (potential spike cause)
+    if (Registration.size() > 100)
+    {
+        Msg("! [Scheduler] Large registration batch: %u items (potential spike)", Registration.size());
+    }
+
     for (u32 it = 0; it < Registration.size(); it++)
     {
         ItemReg& R = Registration[it];
@@ -439,28 +453,32 @@ void CSheduler::Update()
     // Realtime priority
     m_processing_now = true;
     const u32 dwTime = Device.dwTimeGlobal;
-    for (auto& item : ItemsRT)
-    {
-        R_ASSERT(item.Object);
-#ifdef DEBUG_SCHEDULER
-        Msg("SCHEDULER: process step [%s][%x][true]", item.Object->shedule_Name().c_str(), item.Object);
-#endif
-        if (!item.Object->shedule_Needed())
-        {
-#ifdef DEBUG_SCHEDULER
-            Msg("SCHEDULER: process unregister [%s][%x][%s]", item.Object->shedule_Name().c_str(), item.Object, "false");
-#endif
-            item.dwTimeOfLastExecute = dwTime;
-            continue;
-        }
 
-        const u32 Elapsed = dwTime - item.dwTimeOfLastExecute;
-#ifdef DEBUG
-        VERIFY(item.Object->GetSchedulerData().dbg_startframe != Device.dwFrame);
-        item.Object->GetSchedulerData().dbg_startframe = Device.dwFrame;
+    {
+        ZoneScopedN("Scheduler::UpdateRT");
+        for (auto& item : ItemsRT)
+        {
+            R_ASSERT(item.Object);
+#ifdef DEBUG_SCHEDULER
+            Msg("SCHEDULER: process step [%s][%x][true]", item.Object->shedule_Name().c_str(), item.Object);
 #endif
-        item.Object->shedule_Update(Elapsed);
-        item.dwTimeOfLastExecute = dwTime;
+            if (!item.Object->shedule_Needed())
+            {
+#ifdef DEBUG_SCHEDULER
+                Msg("SCHEDULER: process unregister [%s][%x][%s]", item.Object->shedule_Name().c_str(), item.Object, "false");
+#endif
+                item.dwTimeOfLastExecute = dwTime;
+                continue;
+            }
+
+            const u32 Elapsed = dwTime - item.dwTimeOfLastExecute;
+#ifdef DEBUG
+            VERIFY(item.Object->GetSchedulerData().dbg_startframe != Device.dwFrame);
+            item.Object->GetSchedulerData().dbg_startframe = Device.dwFrame;
+#endif
+            item.Object->shedule_Update(Elapsed);
+            item.dwTimeOfLastExecute = dwTime;
+        }
     }
 
     // Normal (sheduled)

@@ -163,6 +163,18 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
     // ═══════════════════════════════════════════════════════
+    //  REUSABLE COMMAND LIST FOR DEPTH COPY
+    // ═══════════════════════════════════════════════════════
+    // Create persistent command list for PresentToBackbuffer depth copy
+    // Avoids per-frame command allocator allocation (~0.1-0.3ms savings)
+    {
+        nvrhi::CommandListParameters cmdParams;
+        cmdParams.enableImmediateExecution = false;
+        m_depthCopyCommandList = device->GetNVRHIDevice()->createCommandList(cmdParams);
+        Msg("* [FrameGraphRenderer] Depth copy command list created (reusable)");
+    }
+
+    // ═══════════════════════════════════════════════════════
     //  PROFILER (GPU timing + ImGui overlay)
     // ═══════════════════════════════════════════════════════
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
@@ -1183,6 +1195,8 @@ void FrameGraphRenderer::PrintStats() const {
 }
 
 void FrameGraphRenderer::PresentToBackbuffer() {
+    ZoneScopedN("PresentToBackbuffer");
+
     // ═══════════════════════════════════════════════════════
     //  TEMPORAL HI-Z: Copy depth for next frame
     // ═══════════════════════════════════════════════════════
@@ -1232,27 +1246,40 @@ void FrameGraphRenderer::PresentToBackbuffer() {
         return;
 
     // Copy current depth to persistent storage
-    nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
-    cmdList->open();
+    // Use persistent command list (created in Initialize) to avoid per-frame allocation
+    if (!m_depthCopyCommandList) {
+        // Fallback: create if not initialized (shouldn't happen)
+        nvrhi::CommandListParameters cmdParams;
+        cmdParams.enableImmediateExecution = false;
+        m_depthCopyCommandList = nvDevice->createCommandList(cmdParams);
+    }
+    m_depthCopyCommandList->open();
 
     // Tell NVRHI the initial state of currentDepth (comes from framegraph after forward pass)
-    cmdList->beginTrackingTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+    m_depthCopyCommandList->beginTrackingTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
     // m_prevFrameDepth uses keepInitialState=true, so NVRHI assumes ShaderResource at start
 
     // Transition states for copy
-    cmdList->setTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
-    cmdList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-    cmdList->commitBarriers();
+    m_depthCopyCommandList->setTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+    m_depthCopyCommandList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+    m_depthCopyCommandList->commitBarriers();
 
-    // Copy entire texture
-    cmdList->copyTexture(m_prevFrameDepth, nvrhi::TextureSlice(), currentDepth, nvrhi::TextureSlice());
+    {
+        ZoneScopedN("PresentToBackbuffer::DepthCopy");
+        // Copy entire texture
+        m_depthCopyCommandList->copyTexture(m_prevFrameDepth, nvrhi::TextureSlice(), currentDepth, nvrhi::TextureSlice());
+    }
 
     // Transition prev depth to shader resource for next frame's Hi-Z build
-    cmdList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-    cmdList->commitBarriers();
+    m_depthCopyCommandList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    m_depthCopyCommandList->commitBarriers();
 
-    cmdList->close();
-    nvDevice->executeCommandList(cmdList);
+    m_depthCopyCommandList->close();
+
+    {
+        ZoneScopedN("PresentToBackbuffer::Execute");
+        nvDevice->executeCommandList(m_depthCopyCommandList);
+    }
 
     // Mark that we have valid previous frame data
     m_hasPrevFrameData = true;

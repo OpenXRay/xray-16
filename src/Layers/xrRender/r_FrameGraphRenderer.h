@@ -173,6 +173,7 @@ private:
     bool m_hasPrevFrameData = false;              // Valid previous frame exists
     u32 m_prevFrameWidth = 0;                     // Previous frame resolution
     u32 m_prevFrameHeight = 0;
+    nvrhi::CommandListHandle m_depthCopyCommandList; // Reusable command list for depth copy (avoids per-frame allocation)
 
     // Passes
     //xr_unique_ptr<passes::GBufferPass> m_gbufferPass;
