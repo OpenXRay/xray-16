@@ -3,6 +3,7 @@
 #include "xrEngine/IRenderBackend.h"
 #include <nvrhi/nvrhi.h>
 
+class Task;
 struct ID3D12Device;
 struct ID3D12CommandQueue;
 struct IDXGISwapChain3;
@@ -100,4 +101,6 @@ private:
     u32 m_backBufferWidth = 0;
     u32 m_backBufferHeight = 0;
     u32 m_currentBackBufferIndex = 0;
+
+    Task* m_gcTask = nullptr;
 };

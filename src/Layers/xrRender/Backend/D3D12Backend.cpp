@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "D3D12Backend.h"
 
+#include "xrCore/Threading/TaskManager.hpp"
+
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
 #include <dxgi1_4.h>
@@ -462,6 +464,7 @@ nvrhi::ITexture* D3D12Backend::GetBackBuffer() {
 }
 
 void D3D12Backend::Present(bool vsync) {
+    ZoneScopedN("D3D12Backend::Present");
     if (m_swapChain) {
         UINT syncInterval = vsync ? 1 : 0;
         UINT presentFlags = 0;
@@ -502,22 +505,50 @@ void D3D12Backend::ResizeSwapChain(u32 width, u32 height) {
 }
 
 void D3D12Backend::BeginFrame() {
+    ZoneScopedN("D3D12::BeginFrame");
+
+    if (m_gcTask) {
+        ZoneScopedN("D3D12::WaitForGC");
+        TaskScheduler->Wait(*m_gcTask);
+        m_gcTask = nullptr;
+    }
+
     m_currentBackBufferIndex = m_swapChain->GetCurrentBackBufferIndex();
 
-    m_nvrhiDevice->runGarbageCollection();
-
-    m_commandList->open();
+    {
+        ZoneScopedN("D3D12::CommandListOpen");
+        m_commandList->open();
+    }
     m_inFrame = true;
 }
 
 void D3D12Backend::EndFrame() {
-    m_inFrame = false;
-    m_commandList->close();
+    ZoneScopedN("D3D12::EndFrame");
 
-    m_nvrhiDevice->executeCommandList(m_commandList);
+    m_inFrame = false;
+
+    {
+        ZoneScopedN("D3D12::CommandListClose");
+        m_commandList->close();
+    }
+
+    {
+        ZoneScopedN("D3D12::ExecuteCommandList");
+        m_nvrhiDevice->executeCommandList(m_commandList);
+    }
+
+    nvrhi::IDevice* device = m_nvrhiDevice;
+    m_gcTask = &TaskScheduler->AddTask([device] {
+        device->runGarbageCollection();
+    });
 }
 
 void D3D12Backend::WaitForIdle() {
+    if (m_gcTask) {
+        TaskScheduler->Wait(*m_gcTask);
+        m_gcTask = nullptr;
+    }
+
     m_nvrhiDevice->waitForIdle();
 
     m_nvrhiDevice->runGarbageCollection();

@@ -137,6 +137,7 @@ private:
     bool m_hasPrevFrameData = false;
     u32 m_prevFrameWidth = 0;
     u32 m_prevFrameHeight = 0;
+    nvrhi::CommandListHandle m_depthCopyCommandList;
 
     xr_unique_ptr<GeometryCollector> m_geometryCollector;
 

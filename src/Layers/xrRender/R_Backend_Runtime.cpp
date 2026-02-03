@@ -8,10 +8,15 @@
 #include <DirectXMath.h>
 #endif
 
+#include "xrEngine/IFrameGraphRender.h"
+
 namespace xray::render::RENDER_NAMESPACE
 {
 void CBackend::OnFrameEnd()
 {
+    if (GEnv.FrameGraphRenderer->IsEnabled())
+        return;
+
     if (!GEnv.isDedicatedServer)
     {
         Invalidate();
@@ -20,6 +25,9 @@ void CBackend::OnFrameEnd()
 
 void CBackend::OnFrameBegin()
 {
+    if (GEnv.FrameGraphRenderer->IsEnabled())
+        return;
+
     if (!GEnv.isDedicatedServer)
     {
         PGO(Msg("PGO:*****frame[%d]*****", Device.dwFrame));

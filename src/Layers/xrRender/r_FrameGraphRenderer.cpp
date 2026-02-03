@@ -125,6 +125,13 @@ bool FrameGraphRenderer::Initialize(ng::RenderDevice* device) {
     passes::InitializeSunPass(device);
     passes::InitializeTonemapPass(device->GetNVRHIDevice());
 
+    {
+        nvrhi::CommandListParameters cmdParams;
+        cmdParams.enableImmediateExecution = false;
+        m_depthCopyCommandList = device->GetNVRHIDevice()->createCommandList(cmdParams);
+        Msg("* [FrameGraphRenderer] Depth copy command list created (reusable)");
+    }
+
     m_gpuProfiler = xr_make_unique<xray::profiler::GPUProfiler>();
     m_gpuProfiler->Initialize(device->GetNVRHIDevice());
 
@@ -845,6 +852,7 @@ void FrameGraphRenderer::PrintStats() const {
 }
 
 void FrameGraphRenderer::PresentToBackbuffer() {
+    ZoneScopedN("PresentToBackbuffer");
 
     if (!m_device || !m_currentDepthHandle.is_valid())
         return;
@@ -884,22 +892,33 @@ void FrameGraphRenderer::PresentToBackbuffer() {
     if (!m_prevFrameDepth)
         return;
 
-    nvrhi::CommandListHandle cmdList = nvDevice->createCommandList();
-    cmdList->open();
+    if (!m_depthCopyCommandList) {
+        nvrhi::CommandListParameters cmdParams;
+        cmdParams.enableImmediateExecution = false;
+        m_depthCopyCommandList = nvDevice->createCommandList(cmdParams);
+    }
+    m_depthCopyCommandList->open();
 
-    cmdList->beginTrackingTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
+    m_depthCopyCommandList->beginTrackingTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::DepthWrite);
 
-    cmdList->setTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
-    cmdList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
-    cmdList->commitBarriers();
+    m_depthCopyCommandList->setTextureState(currentDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopySource);
+    m_depthCopyCommandList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::CopyDest);
+    m_depthCopyCommandList->commitBarriers();
 
-    cmdList->copyTexture(m_prevFrameDepth, nvrhi::TextureSlice(), currentDepth, nvrhi::TextureSlice());
+    {
+        ZoneScopedN("PresentToBackbuffer::DepthCopy");
+        m_depthCopyCommandList->copyTexture(m_prevFrameDepth, nvrhi::TextureSlice(), currentDepth, nvrhi::TextureSlice());
+    }
 
-    cmdList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
-    cmdList->commitBarriers();
+    m_depthCopyCommandList->setTextureState(m_prevFrameDepth, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    m_depthCopyCommandList->commitBarriers();
 
-    cmdList->close();
-    nvDevice->executeCommandList(cmdList);
+    m_depthCopyCommandList->close();
+
+    {
+        ZoneScopedN("PresentToBackbuffer::Execute");
+        nvDevice->executeCommandList(m_depthCopyCommandList);
+    }
 
     m_hasPrevFrameData = true;
     m_prevViewProj = Device.mFullTransform;
