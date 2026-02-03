@@ -1238,7 +1238,8 @@ void FrameGraphRenderer::ExtractStaticLeafVisuals(dxRender_Visual* pVisual, xr_v
         case MT_SKELETON_ANIM:
         case MT_SKELETON_RIGID: {
             CKinematics* pV = static_cast<CKinematics*>(pVisual);
-            pV->CalculateBones(TRUE);
+            pV->CalculateBones_InvalidateFG();
+            pV->CalculateBonesFG(TRUE);
 
             for (auto& child : pV->children) {
                 ExtractStaticLeafVisuals(child, outLeafs);

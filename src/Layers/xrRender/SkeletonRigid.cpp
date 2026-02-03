@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include "SkeletonCustom.h"
+#include "xrEngine/IFrameGraphRender.h"
 
 namespace xray::render::RENDER_NAMESPACE
 {
@@ -11,8 +12,20 @@ extern int psSkeletonUpdate;
 #ifdef DEBUG
 void check_kinematics(CKinematics* _k, LPCSTR s);
 #endif
+void CKinematics::CalculateBonesFG(BOOL bForceExact)
+{
+    CalcBones(bForceExact);
+}
 
 void CKinematics::CalculateBones(BOOL bForceExact)
+{
+    if (GEnv.FrameGraphRenderer->IsEnabled())
+        return;
+
+    CalcBones(bForceExact);
+}
+
+void CKinematics::CalcBones(BOOL bForceExact)
 {
     ZoneScoped;
 

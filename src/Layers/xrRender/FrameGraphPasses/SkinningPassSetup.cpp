@@ -401,8 +401,6 @@ static void RenderSkinnedBatch(
     if (!Parent)
         return;
 
-    Parent->CalculateBones(TRUE);
-
     DynamicTransforms dynTransData = {};
     FillDynamicTransforms(dynTransData, worldMatrix);
 

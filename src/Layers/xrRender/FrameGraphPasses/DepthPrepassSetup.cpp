@@ -191,7 +191,6 @@ void renderDepthOnlyGeometry(
                 }
 
                 if (Parent) {
-                    Parent->CalculateBones(TRUE);
 
                     u32 count = Parent->LL_BoneCount();
 
