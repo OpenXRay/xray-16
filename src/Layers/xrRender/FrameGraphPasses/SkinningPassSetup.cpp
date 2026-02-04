@@ -39,6 +39,10 @@ static nvrhi::GraphicsPipelineHandle s_skinnedHQ2WPipeline;
 static nvrhi::InputLayoutHandle s_skinnedHQ2WInputLayout;
 static nvrhi::ShaderHandle s_skinnedHQ2WVS;
 
+static nvrhi::GraphicsPipelineHandle s_skinnedHQ3WPipeline;
+static nvrhi::InputLayoutHandle s_skinnedHQ3WInputLayout;
+static nvrhi::ShaderHandle s_skinnedHQ3WVS;
+
 static nvrhi::BindingLayoutHandle s_skinnedLayout;
 static nvrhi::ShaderHandle s_skinnedPS;
 static nvrhi::SamplerHandle s_linearSampler;
@@ -314,6 +318,49 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
         }
     }
 
+    {
+        auto vsResult = shaderLoader->LoadVertexShader("bindless_skinned_3w", "main");
+        if (vsResult.handle) {
+            s_skinnedHQ3WVS = vsResult.handle;
+
+            constexpr u32 stride = 44;
+            nvrhi::VertexAttributeDesc attribs[] = {
+                nvrhi::VertexAttributeDesc().setName("POSITION").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(0).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("NORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(16).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TANGENT").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(20).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("BINORMAL").setFormat(nvrhi::Format::BGRA8_UNORM).setOffset(24).setElementStride(stride),
+                nvrhi::VertexAttributeDesc().setName("TEXCOORD").setFormat(nvrhi::Format::RGBA32_FLOAT).setOffset(28).setElementStride(stride),
+            };
+            s_skinnedHQ3WInputLayout = nvDevice->createInputLayout(attribs, 5, s_skinnedHQ3WVS);
+
+            nvrhi::GraphicsPipelineDesc pipeDesc;
+            pipeDesc.VS = s_skinnedHQ3WVS;
+            pipeDesc.PS = s_skinnedPS;
+            pipeDesc.inputLayout = s_skinnedHQ3WInputLayout;
+            if (bindlessLayout) {
+                pipeDesc.bindingLayouts = { s_skinnedLayout, bindlessLayout };
+            } else {
+                pipeDesc.bindingLayouts = { s_skinnedLayout };
+            }
+            pipeDesc.primType = nvrhi::PrimitiveType::TriangleList;
+            pipeDesc.renderState.depthStencilState.depthTestEnable = true;
+            pipeDesc.renderState.depthStencilState.depthWriteEnable = true;
+            pipeDesc.renderState.depthStencilState.depthFunc = nvrhi::ComparisonFunc::LessOrEqual;
+            pipeDesc.renderState.rasterState.frontCounterClockwise = false;
+            pipeDesc.renderState.rasterState.cullMode = nvrhi::RasterCullMode::Back;
+
+            s_skinnedHQ3WPipeline = nvDevice->createGraphicsPipeline(pipeDesc, framebuffer);
+            Msg("* [SkinningPass] HQ 3W pipeline (44-byte): %s", s_skinnedHQ3WPipeline ? "OK" : "FAILED");
+
+            if (s_skinnedHQ3WPipeline) {
+                const nvrhi::GraphicsPipelineDesc& actualDesc = s_skinnedHQ3WPipeline->getDesc();
+                if (!actualDesc.bindingLayouts.empty()) {
+                    s_skinnedLayout = actualDesc.bindingLayouts[0];
+                }
+            }
+        }
+    }
+
     s_skinnedInitialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
 }
@@ -336,6 +383,10 @@ void ShutdownSkinningPipelines()
     s_skinnedHQ2WInputLayout = nullptr;
     s_skinnedHQ2WVS = nullptr;
 
+    s_skinnedHQ3WPipeline = nullptr;
+    s_skinnedHQ3WInputLayout = nullptr;
+    s_skinnedHQ3WVS = nullptr;
+
     s_skinnedLayout = nullptr;
     s_skinnedPS = nullptr;
     s_linearSampler = nullptr;
@@ -344,8 +395,38 @@ void ShutdownSkinningPipelines()
     Msg("* [SkinningPass] Pipeline resources released");
 }
 
-static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(u32 vertexStride)
+enum {
+    RM_SKINNING_SOFT = 0,
+    RM_SINGLE = 1,
+    RM_SINGLE_HQ = 2,
+    RM_SKINNING_1B = 3,
+    RM_SKINNING_1B_HQ = 4,
+    RM_SKINNING_2B = 5,
+    RM_SKINNING_2B_HQ = 6,
+    RM_SKINNING_3B = 7,
+    RM_SKINNING_3B_HQ = 8,
+    RM_SKINNING_4B = 9,
+    RM_SKINNING_4B_HQ = 10
+};
+
+static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(u32 vertexStride, u16 renderMode)
 {
+    if (renderMode == RM_SKINNING_3B || renderMode == RM_SKINNING_3B_HQ) {
+        return s_skinnedHQ3WPipeline.Get();
+    }
+    if (renderMode == RM_SKINNING_2B || renderMode == RM_SKINNING_2B_HQ) {
+        return s_skinnedHQ2WPipeline.Get();
+    }
+    if (renderMode == RM_SKINNING_4B || renderMode == RM_SKINNING_4B_HQ) {
+        return s_skinnedHQ4WPipeline.Get();
+    }
+    if (renderMode == RM_SKINNING_1B_HQ || renderMode == RM_SINGLE_HQ) {
+        return s_skinnedHQ1WPipeline.Get();
+    }
+    if (renderMode == RM_SKINNING_1B || renderMode == RM_SINGLE) {
+        return s_skinnedPipeline.Get();
+    }
+
     if (vertexStride == 36)
         return s_skinnedHQ1WPipeline.Get();
     if (vertexStride == 40)
@@ -405,7 +486,7 @@ static void RenderSkinnedBatch(
         return;
     }
 
-    nvrhi::IGraphicsPipeline* pipeline = SelectSkinnedPipeline(batch.vertexStride);
+    nvrhi::IGraphicsPipeline* pipeline = SelectSkinnedPipeline(batch.vertexStride, batch.skinningRenderMode);
     if (!pipeline) {
         return;
     }

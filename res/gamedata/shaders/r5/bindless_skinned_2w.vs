@@ -33,6 +33,7 @@ VS_OUTPUT main(VS_INPUT_2W v, uint instanceID : SV_InstanceID)
 
     int id_0 = int(v.tc.z);
     int id_1 = int(v.tc.w);
+
     float3x4 bone_0 = get_bone(id_0, instanceID);
     float3x4 bone_1 = get_bone(id_1, instanceID);
 

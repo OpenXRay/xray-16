@@ -54,6 +54,8 @@ struct GeometryBatch {
 
     bool isSkinned = false;
 
+    u16 skinningRenderMode = 0;
+
     bool isTerrain = false;
     u32 terrainMaterialID = UINT32_MAX;
 

@@ -1084,6 +1084,14 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
     batch.isStatic = isStatic;
 
+    if (batch.isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+    }
+
     if (visualType == MT_TREE_ST || visualType == MT_TREE_PM) {
         batch.worldBoundsCenter = visual->vis.sphere.P;
         batch.worldBoundsRadius = visual->vis.sphere.R;
@@ -1200,6 +1208,14 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
 
     u32 visualType = visual->getType();
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+
+    if (batch.isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+    }
 
     if (m_materialCache) {
         batch.bindlessMaterialID = m_materialCache->PreRegisterBindlessMaterial(visual);
