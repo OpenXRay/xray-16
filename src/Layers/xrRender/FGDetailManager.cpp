@@ -10,6 +10,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
+#include "xrCore/Profiler/Profiler.h"  // For GetCPUProfiler throttle interval
 
 // Phase 5: Grass wind tuning parameters (defined in xrEngine)
 extern ENGINE_API float ps_r3_grass_wind_multiplier;
@@ -732,6 +733,10 @@ void FGDetailManager::DestroyGPUBuffers()
     windComputeShader = nullptr;
     windBindingLayout = nullptr;
     windPipeline = nullptr;
+
+    // Stats readback cleanup
+    statsReadbackBuffer = nullptr;
+    statsReadbackPending = false;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1340,6 +1345,83 @@ void FGDetailManager::DispatchCulling(
         cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
     }
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATS READBACK (for profiling)
+// ═══════════════════════════════════════════════════════
+
+void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
+{
+    if (!device || !cmdList)
+        return;
+
+    // Create readback buffer on first use (4 u32s: slots + 3 LODs)
+    if (!statsReadbackBuffer)
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32) * 4;  // visibleSlots, LOD0, LOD1, LOD2
+        desc.debugName = "DetailStatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        statsReadbackBuffer = device->createBuffer(desc);
+
+        if (!statsReadbackBuffer)
+            return;
+    }
+
+    // Copy visible slot counter to readback buffer (offset 0)
+    if (visibleSlotCounterBuffer)
+    {
+        cmdList->copyBuffer(
+            statsReadbackBuffer, 0,
+            visibleSlotCounterBuffer, 0,
+            sizeof(u32)
+        );
+    }
+
+    // Copy LOD visible counts to readback buffer (offsets 4, 8, 12)
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        if (visibleCountBuffer[lod])
+        {
+            cmdList->copyBuffer(
+                statsReadbackBuffer, sizeof(u32) * (1 + lod),
+                visibleCountBuffer[lod], 0,
+                sizeof(u32)
+            );
+        }
+    }
+
+    statsReadbackPending = true;
+}
+
+void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
+{
+    if (!statsReadbackPending || !statsReadbackBuffer || !device)
+        return;
+
+    // Only read back at the same interval as CPU profiler for consistency
+    static u32 frameCounter = 0;
+    frameCounter++;
+    const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
+    if ((frameCounter % throttleInterval) != 0)
+        return;
+
+    // Map the readback buffer and read the values
+    void* mappedData = device->mapBuffer(statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    if (mappedData)
+    {
+        const u32* counts = static_cast<const u32*>(mappedData);
+        cullingStats.visibleSlotsCount = counts[0];
+        cullingStats.visibleLOD0Count = counts[1];
+        cullingStats.visibleLOD1Count = counts[2];
+        cullingStats.visibleLOD2Count = counts[3];
+        device->unmapBuffer(statsReadbackBuffer);
+    }
+
+    statsReadbackPending = false;
 }
 
 } // namespace xray::render::RENDER_NAMESPACE

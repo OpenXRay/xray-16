@@ -162,6 +162,24 @@ public:
     float windSpeed = 0.5f;                  // Base wind speed
 
     // ═══════════════════════════════════════════════════════
+    //  CULLING STATS (GPU readback)
+    // ═══════════════════════════════════════════════════════
+
+    struct DetailCullingStats
+    {
+        u32 visibleSlotsCount = 0;      // Slots that passed frustum culling
+        u32 visibleLOD0Count = 0;       // Instances in LOD0 (close, 9 segments)
+        u32 visibleLOD1Count = 0;       // Instances in LOD1 (mid, 4 segments)
+        u32 visibleLOD2Count = 0;       // Instances in LOD2 (far, 2 segments)
+
+        u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count; }
+    };
+
+    DetailCullingStats cullingStats;
+    nvrhi::BufferHandle statsReadbackBuffer;  // CPU-readable buffer for stats
+    bool statsReadbackPending = false;
+
+    // ═══════════════════════════════════════════════════════
     //  PUBLIC METHODS
     // ═══════════════════════════════════════════════════════
 
@@ -225,6 +243,11 @@ public:
 
     // Compute slot AABBs from instances
     void ComputeSlotAABBs();
+
+    // Stats readback (call after DispatchCulling)
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);
+    void ProcessStatsReadback(nvrhi::IDevice* device);
+    const DetailCullingStats& GetCullingStats() const { return cullingStats; }
 
 private:
     // File stream for level.details

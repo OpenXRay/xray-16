@@ -52,6 +52,12 @@ struct RenderStats
     u32 detailSlots = 0;         // Detail slots
     u32 detailTrianglesPerBlade = 0;  // Triangles per grass blade (LOD dependent)
 
+    // Detail culling stats (from GPU readback)
+    u32 detailVisibleSlots = 0;  // Slots that passed frustum culling
+    u32 detailVisibleLOD0 = 0;   // Instances in LOD0 (close, 9 segments)
+    u32 detailVisibleLOD1 = 0;   // Instances in LOD1 (mid, 4 segments)
+    u32 detailVisibleLOD2 = 0;   // Instances in LOD2 (far, 2 segments)
+
     void Reset()
     {
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
@@ -61,6 +67,7 @@ struct RenderStats
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         detailInstances = detailSlots = detailTrianglesPerBlade = 0;
+        detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
     }
 };
 

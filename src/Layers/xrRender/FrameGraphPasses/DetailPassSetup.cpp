@@ -201,6 +201,9 @@ DefaultOutputLayout setupDetailPass(
                 data.hiZMipLevels
             );
 
+            // Schedule stats readback for profiling (visible counts per LOD)
+            data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
+
             // === GRAPHICS PASS ===
             // Log texture formats for debugging
             const nvrhi::TextureDesc& colorDesc = colorTexture->getDesc();

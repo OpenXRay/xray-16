@@ -643,6 +643,13 @@ void FrameGraphRenderer::RenderStatsOverlay()
             // Use LOD0 as reference
             if (m_detailManager->bladeIndexCount[0] > 0)
                 stats.detailTrianglesPerBlade = m_detailManager->bladeIndexCount[0] / 3;
+
+            // GPU culling stats (from readback)
+            const auto& cullStats = m_detailManager->GetCullingStats();
+            stats.detailVisibleSlots = cullStats.visibleSlotsCount;
+            stats.detailVisibleLOD0 = cullStats.visibleLOD0Count;
+            stats.detailVisibleLOD1 = cullStats.visibleLOD1Count;
+            stats.detailVisibleLOD2 = cullStats.visibleLOD2Count;
         }
 
         m_statsOverlay->SetRenderStats(stats);
@@ -658,6 +665,11 @@ void FrameGraphRenderer::SetupFrame() {
     if (m_gpuCullingManager) {
         m_gpuCullingManager->ProcessStatsReadback();
         m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
+    }
+
+    // Process detail culling stats readback from previous frame
+    if (m_detailManager && m_device) {
+        m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
     }
 
     // Clear buffer handle cache (X-Ray may recreate buffers each frame)
