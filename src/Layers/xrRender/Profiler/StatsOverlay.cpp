@@ -364,13 +364,23 @@ void StatsOverlay::RenderGeometrySection()
         // ═══════════════════════════════════════════════════
         //  SKINNING STATS
         // ═══════════════════════════════════════════════════
-        if (s.skinnedMeshes > 0)
+        if (s.skinnedMeshes > 0 || s.skinnedSubmitted > 0)
         {
             ImGui::Text("Skinning:");
             ImGui::Indent();
 
-            ImGui::Text("Meshes: %u", s.skinnedMeshes);
-            ImGui::Text("Bones:  %u (max: %u)", s.totalBones, s.maxBonesPerMesh);
+            if (s.skinnedMeshes > 0) {
+                ImGui::Text("Meshes: %u", s.skinnedMeshes);
+                ImGui::Text("Bones:  %u (max: %u)", s.totalBones, s.maxBonesPerMesh);
+            }
+
+            // Skinned Hi-Z culling stats
+            if (s.skinnedSubmitted > 0) {
+                float cullRate = s.skinnedSubmitted > 0 ?
+                    (100.0f * s.skinnedCulled / s.skinnedSubmitted) : 0.0f;
+                ImGui::Text("Hi-Z:   %u/%u visible (%.0f%% culled)",
+                    s.skinnedVisible, s.skinnedSubmitted, cullRate);
+            }
 
             ImGui::Unindent();
         }

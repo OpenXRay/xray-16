@@ -13,6 +13,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 namespace xray::render {
     class GeometryCollector;
     struct GeometryBatch;
+    class dxRender_Visual;  // Forward declaration for visual pointer map
     namespace ng {
         class RenderDevice;
         class RenderContext;
@@ -20,6 +21,10 @@ namespace xray::render {
     namespace framegraph {
         class FrameGraph;
     }
+}
+
+namespace xray::render::RENDER_NAMESPACE {
+    class CKinematics;  // Forward declaration for skeleton bone buffer
 }
 
 namespace xray::render::RENDER_NAMESPACE {
@@ -45,6 +50,12 @@ struct GPUParticleData {
     float pad0, pad1;
 };
 static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes for GPU alignment");
+
+// Bone matrix format for StructuredBuffer (48 bytes per bone), matches HLSL float3x4
+struct Float3x4 {
+    float m[3][4];
+};
+static_assert(sizeof(Float3x4) == 48, "Float3x4 must be 48 bytes");
 
 // Object flags
 enum GPUObjectFlags : u32 {
@@ -105,10 +116,6 @@ struct MeshAllocation {
     MeshAllocation() : vertexOffset(0), indexOffset(0), vertexCount(0), indexCount(0), valid(false) {}
 };
 
-// ═══════════════════════════════════════════════════════
-//  INSTANCE DATA (matches HLSL InstanceData struct)
-// ═══════════════════════════════════════════════════════
-
 struct GPUInstanceData {
     Fmatrix world;          // World transform (64 bytes)
     u32 materialID;         // Bindless material ID
@@ -117,9 +124,15 @@ struct GPUInstanceData {
 };
 static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
 
-// ═══════════════════════════════════════════════════════
-//  GPU CULLING OUTPUT
-// ═══════════════════════════════════════════════════════
+// Extended instance data with skeleton bone buffer offset for GPU-driven skinned rendering
+struct GPUSkinnedInstanceData {
+    Fmatrix world;              // World transform (64 bytes)
+    u32 materialID;             // Bindless material ID (4 bytes)
+    u32 skeletonBoneOffset;     // Offset into global bone buffer (4 bytes)
+    u32 batchIndex;             // Original batch index (4 bytes)
+    u32 flags;                  // Instance flags (4 bytes)
+};
+static_assert(sizeof(GPUSkinnedInstanceData) == 80, "GPUSkinnedInstanceData must be 80 bytes for GPU alignment");
 
 struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
@@ -318,6 +331,72 @@ public:
     // Schedule readback of visible counts (call after culling pass)
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
 
+    // ───────────────────────────────────────────────────────
+    //  SKINNED MESH CULLING
+    // ───────────────────────────────────────────────────────
+    // Skinned meshes use per-draw rendering (bone matrices) and cannot
+    // use multi-draw compaction. Instead, we cull them and provide a
+    // visibility buffer that the skinning pass checks before each draw.
+
+    // Upload skinned mesh bounding spheres (call from UploadSceneObjects)
+    void UploadSkinnedObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
+
+    // Setup skinned culling pass (uses same Hi-Z pyramid as static culling)
+    void SetupSkinnedCullingPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels,
+        const GeometryCollector* geometry,
+        const Fmatrix& prevViewProj
+    );
+
+    // Get skinned visibility by visual pointer (handles batch reordering)
+    // Returns 0 (culled) if visual not found, non-zero (visible) otherwise
+    u32 GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const;
+
+    // Check if skinned visibility data is available
+    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityByVisual.empty(); }
+
+    u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
+    bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
+
+
+    // Skinned culling stats (for profiler display)
+    struct SkinnedCullingStats {
+        u32 submitted = 0;
+        u32 visible = 0;
+        u32 culled = 0;
+    };
+    const SkinnedCullingStats& GetSkinnedCullingStats() const { return m_skinnedCullingStats; }
+    void UpdateSkinnedCullingStats(u32 rendered, u32 culled);
+
+    // Schedule skinned visibility readback (call after skinned culling pass)
+    void ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* cmdList);
+
+    // Process skinned visibility readback (call at frame start or before skinning pass)
+    void ProcessSkinnedVisibilityReadback();
+
+    // ───────────────────────────────────────────────────────
+    //  SKELETON BONE BUFFER (for GPU-driven skinned rendering)
+    // ───────────────────────────────────────────────────────
+    // Global bone buffer pool - all skeleton bones are uploaded here each frame.
+    // Each skeleton gets a contiguous range: g_BoneMatrices[offset + boneIndex]
+
+    // Call at frame start to reset bone buffer allocations
+    void BeginSkinnedFrame();
+
+    // Get bone offset for a skeleton, uploading if not already done this frame
+    // Returns offset (in bone count) into global buffer
+    u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
+
+    // Get the global bone buffer for shader binding
+    nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
+
+    // Clear skeleton visibility data (call on level unload to prevent dangling pointers)
+    void ClearSkinnedVisibilityData();
+
     // Process readback results from previous frame (call at frame start)
     void ProcessStatsReadback();
     nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
@@ -464,6 +543,52 @@ private:
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
     xr_vector<u32> m_terrainMaterialIDData;      // Terrain material IDs (index into TerrainMaterialBuffer)
     xr_vector<GPUInstanceData> m_terrainInstanceData;  // Terrain world transforms
+
+    // ───────────────────────────────────────────────────────
+    //  SKINNED MESH CULLING (GPU-Driven)
+    // ───────────────────────────────────────────────────────
+    // GPU-driven skinned mesh rendering with indirect draws.
+    // Uses global bone buffer with per-instance offset.
+
+    nvrhi::BufferHandle m_skinnedObjectBuffer;           // GPUObjectData for skinned batches
+    nvrhi::BufferHandle m_skinnedVisibilityBuffer;       // Frame stamp per batch (u32)
+
+    // Double-buffer for async readback (no fence, trust GPU pipelining)
+    // By frame N, frame N-2's GPU work is guaranteed complete
+    // This gives n-2 latency (1 frame fresher than original n-3)
+    static constexpr u32 SKINNED_READBACK_FRAMES = 2;  // Double-buffer
+    nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
+    // Visual-to-index mapping stored per readback buffer (needed to correlate old visibility with current batches)
+    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisualToIndex[SKINNED_READBACK_FRAMES];
+    u32 m_skinnedReadbackWriteIndex = 0;   // Which buffer to write to next
+    u32 m_skinnedReadbackFrameCount = 0;   // Frames accumulated (0, 1, or 2)
+
+    // Final visibility map (visual* -> visibility value) populated during ProcessSkinnedVisibilityReadback
+    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisibilityByVisual;
+
+    u32 m_skinnedObjectCount = 0;
+    u32 m_maxSkinnedObjects = 0;
+    bool m_skinnedCullEnabled = false;
+
+    // CPU-side data
+    xr_vector<GPUObjectData> m_skinnedObjectData;
+    xr_vector<const GeometryBatch*> m_skinnedBatchPointers;  // Batch pointers (parallel to object data)
+    u32 m_skinnedFrameId = 0;
+    SkinnedCullingStats m_skinnedCullingStats;
+
+    // Global bone buffer for GPU-driven skinned rendering
+    // All skeleton bones are uploaded here each frame, indexed by per-instance offset
+    static constexpr u32 MAX_TOTAL_BONES = 8192;  // ~100 skeletons * 78 bones
+    static constexpr u32 BONE_STRIDE = sizeof(Float3x4);  // 48 bytes
+    nvrhi::BufferHandle m_globalBoneBuffer;
+    xr_map<CKinematics*, u32> m_skeletonOffsets;  // Per-frame deduplication
+    xr_vector<Float3x4> m_boneStagingBuffer;
+    u32 m_currentBoneOffset = 0;
+    bool m_boneBufferInitialized = false;
+
+    void CreateSkinnedCullingBuffers(ng::RenderDevice* device);
+    void EnsureSkinnedBufferCapacity(u32 count);
+    void UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset);
 
     // ───────────────────────────────────────────────────────
     //  MEGA-BUFFER SYSTEM

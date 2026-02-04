@@ -42,6 +42,11 @@ struct RenderStats
     u32 totalBones = 0;          // Total bones across all skinned meshes
     u32 maxBonesPerMesh = 0;     // Maximum bones in a single mesh
 
+    // Skinned culling stats (from GPU Hi-Z culling)
+    u32 skinnedSubmitted = 0;    // Total skinned meshes submitted for culling
+    u32 skinnedVisible = 0;      // Skinned meshes that passed culling
+    u32 skinnedCulled = 0;       // Skinned meshes culled by Hi-Z
+
     // Detail/grass stats
     u32 detailInstances = 0;     // Total grass instances
     u32 detailSlots = 0;         // Detail slots
@@ -54,6 +59,7 @@ struct RenderStats
         objectsSubmitted = objectsCulled = objectsVisible = 0;
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
+        skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         detailInstances = detailSlots = detailTrianglesPerBlade = 0;
     }
 };

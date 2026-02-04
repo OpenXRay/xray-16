@@ -75,6 +75,13 @@ struct alignas(16) ShaderParams {
     Fvector4 dt_params;        // 16-32:  Detail texture params (xy=scale, w=1/range)
 };
 
+// Skinned Material CB (per-draw constant, register b4)
+// Used by pixel shader to index into bindless material buffer.
+struct alignas(16) SkinnedMaterialCB {
+    u32 materialID;            // 0-4:    Bindless material index
+    u32 pad0, pad1, pad2;      // 4-16:   Padding to 16-byte boundary
+};
+
 // Slot 2: Static Globals (EXTENDED for Forward+)
 // UPDATED ONCE PER FRAME! Contains view/projection matrices, lighting, fog, etc.
 // CRITICAL: HLSL float3x4 = 48 bytes (3 rows), float4x4 = 64 bytes (4 rows)

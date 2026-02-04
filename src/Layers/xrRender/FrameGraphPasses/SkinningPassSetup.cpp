@@ -1,5 +1,6 @@
 // xrRender/FrameGraphPasses/SkinningPassSetup.cpp
 // Consolidated skinned mesh rendering pass with World and HUD phases
+// Uses GPU-driven global bone buffer for efficient skinning
 #include "stdafx.h"
 #include "SkinningPassSetup.h"
 #include "ShaderConstants.h"
@@ -16,6 +17,8 @@
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include "xrCore/FMesh.hpp"
 
 extern ENGINE_API float psHUD_FOV;
@@ -52,14 +55,6 @@ static nvrhi::BindingLayoutHandle s_skinnedLayout;
 static nvrhi::ShaderHandle s_skinnedPS;
 static nvrhi::SamplerHandle s_linearSampler;
 static bool s_skinnedInitialized = false;
-
-// Bone matrix format for StructuredBuffer (48 bytes per bone)
-struct Float3x4 {
-    float m[3][4];
-};
-
-constexpr u32 MAX_BONES = 78;
-constexpr u32 BONE_STRIDE = sizeof(Float3x4);  // 48 bytes
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  HUD FOV ADJUSTMENT
@@ -139,14 +134,27 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
     nvrhi::IBindingLayout* bindlessLayout = backend ? backend->GetBindlessLayout() : nullptr;
 
     // Create shared binding layout
+    // GPU-driven skinning uses:
+    //   b0: dynamic_transforms - legacy world matrix (for compatibility)
+    //   b1: shader_params - alpha ref, detail params (from common.h)
+    //   b2: static_globals - m_VP, lighting, etc.
+    //   b4: SkinnedMaterialCB - per-draw material ID (from pixel shader)
+    //   t3: g_BoneMatrices - global bone buffer (from GPUCullingManager)
+    //   t4: g_SkinnedInstances - per-instance data (world, materialID, boneOffset)
+    //   t8: g_Materials - bindless material data
+    //   t9: g_TerrainMaterials - declared in bindless_common.h (must include even if unused)
+    //   s0: linear sampler
     nvrhi::BindingLayoutDesc skinnedLayoutDesc;
     skinnedLayoutDesc.visibility = nvrhi::ShaderType::All;
     skinnedLayoutDesc.bindings = {
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),  // dynamic_transforms (b0)
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),  // shader_params (b1) - from common.h
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),  // static_globals (b2)
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),    // g_BoneMatrices (t3)
-        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // SkinnedMaterialCB (b4)
-        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),    // g_BoneMatrices (t3) - GLOBAL bone buffer
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),    // g_SkinnedInstances (t4) - per-instance data
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),  // SkinnedMaterialCB (b4) - per-draw material ID
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),    // g_Materials (t8)
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),    // g_TerrainMaterials (t9) - from bindless_common.h
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     s_skinnedLayout = nvDevice->createBindingLayout(skinnedLayoutDesc);
@@ -355,6 +363,9 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
         }
     }
 
+    // Note: Global bone buffer is now managed by GPUCullingManager
+    // and initialized via CreateSkinnedCullingBuffers()
+
     s_skinnedInitialized = true;
     Msg("* [SkinningPass] Pipeline initialization complete");
 }
@@ -406,93 +417,110 @@ static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(u32 vertexStride)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  RENDER SKINNED BATCH (shared by World and HUD phases)
+//  SKELETON BONE OFFSET HELPER
 // ═══════════════════════════════════════════════════════════════════════════
+// Extracts parent skeleton from batch and uploads bones to global buffer.
+// Returns offset into GPUCullingManager's global bone buffer.
+static u32 GetSkeletonBoneOffset(
+    nvrhi::ICommandList* cmdList,
+    GPUCullingManager& gpuCullMgr,
+    const GeometryBatch& batch)
+{
+    CKinematics* parent = nullptr;
+    u32 visualType = batch.visual ? batch.visual->getType() : 0;
+
+    if (visualType == MT_SKELETON_GEOMDEF_ST) {
+        parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+        parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+    }
+
+    if (!parent)
+        return 0;
+
+    return gpuCullMgr.GetOrUploadSkeleton(cmdList, parent);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  RENDER SKINNED BATCH (GPU-Driven with global bone buffer)
+// ═══════════════════════════════════════════════════════════════════════════
+// Uses GPUCullingManager's global bone buffer (t3) with per-instance offset.
+// Each draw uploads a single GPUSkinnedInstanceData to instance buffer (t4).
+// This eliminates expensive per-draw bone matrix uploads (~3.7KB per draw).
 static void RenderSkinnedBatch(
     nvrhi::ICommandList* cmdList,
     nvrhi::IDevice* nvDevice,
     nvrhi::IFramebuffer* framebuffer,
     nvrhi::IBuffer* dynTransformsCB,
+    nvrhi::IBuffer* shaderParamsCB,       // shader_params (b1) - from common.h
     nvrhi::IBuffer* staticGlobalsCB,
-    nvrhi::IBuffer* bonesSB,
-    nvrhi::IBuffer* matIdCB,
+    nvrhi::IBuffer* materialIdCB,         // SkinnedMaterialCB (b4) - per-draw material ID
+    nvrhi::IBuffer* instanceSB,           // Per-instance data (GPUSkinnedInstanceData)
+    nvrhi::IBuffer* globalBoneBuffer,     // Global bone buffer (t3) - from GPUCullingManager
+    nvrhi::IBuffer* terrainMaterialsSB,   // g_TerrainMaterials (t9) - declared in bindless_common.h
     nvrhi::IDescriptorTable* bindlessTable,
     const nvrhi::Viewport& viewport,
     const nvrhi::Rect& scissor,
     const GeometryBatch& batch,
     const Fmatrix& worldMatrix,
-    xr_vector<Float3x4>& boneData)
+    u32 skeletonBoneOffset)               // Offset into global bone buffer
 {
     using namespace RENDER_NAMESPACE;
     using namespace RENDER_NAMESPACE::bindless;
 
-    if (!batch.vertexBuffer || !batch.indexBuffer)
+    if (!batch.vertexBuffer || !batch.indexBuffer) {
         return;
+    }
 
     // Select pipeline based on vertex stride
     nvrhi::IGraphicsPipeline* pipeline = SelectSkinnedPipeline(batch.vertexStride);
-    if (!pipeline)
+    if (!pipeline) {
         return;
-
-    // Get parent skeleton
-    CKinematics* Parent = nullptr;
-    u32 visualType = batch.visual ? batch.visual->getType() : 0;
-
-    if (visualType == MT_SKELETON_GEOMDEF_ST) {
-        auto* skeletonMesh = static_cast<CSkeletonX_ST*>(batch.visual);
-        Parent = skeletonMesh->GetParent();
-    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
-        auto* skeletonMesh = static_cast<CSkeletonX_PM*>(batch.visual);
-        Parent = skeletonMesh->GetParent();
     }
 
-    if (!Parent)
-        return;
-
-    // Calculate bones
-    //Parent->CalculateBones(TRUE);
-
-    // Fill dynamic transforms with world matrix
+    // Fill dynamic transforms with world matrix (legacy, kept for compatibility)
     DynamicTransforms dynTransData = {};
     FillDynamicTransforms(dynTransData, worldMatrix);
+    cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
 
-    // Build bone matrix array (float3x4 format)
-    u32 boneCount = Parent->LL_BoneCount();
-    u32 bonesToFill = std::min(boneCount, MAX_BONES);
+    // Fill per-instance data (GPU-driven path uses this via SV_InstanceID)
+    // IMPORTANT: Transpose world matrix for HLSL (column-major -> row-major)
+    // This matches what FillDynamicTransforms does for constant buffers
+    GPUSkinnedInstanceData instData;
+    instData.world.transpose(worldMatrix);  // Transpose for HLSL!
+    instData.materialID = batch.bindlessMaterialID;
+    instData.skeletonBoneOffset = skeletonBoneOffset;
+    instData.batchIndex = 0;  // Single instance per draw
+    instData.flags = 0;
+    cmdList->writeBuffer(instanceSB, &instData, sizeof(instData));
 
-    for (u32 i = 0; i < bonesToFill; i++) {
-        const Fmatrix& bone = Parent->LL_GetTransform_R(u16(i));
-        // Convert Fmatrix (column-major) to float3x4 row-major for shader
-        boneData[i].m[0][0] = bone._11; boneData[i].m[0][1] = bone._21; boneData[i].m[0][2] = bone._31; boneData[i].m[0][3] = bone._41;
-        boneData[i].m[1][0] = bone._12; boneData[i].m[1][1] = bone._22; boneData[i].m[1][2] = bone._32; boneData[i].m[1][3] = bone._42;
-        boneData[i].m[2][0] = bone._13; boneData[i].m[2][1] = bone._23; boneData[i].m[2][2] = bone._33; boneData[i].m[2][3] = bone._43;
+    // Fill material ID constant buffer (b4) - used by pixel shader
+    SkinnedMaterialCB matIdData = {};
+    matIdData.materialID = batch.bindlessMaterialID;
+    cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
+
+    if (!globalBoneBuffer) {
+        return;
     }
 
-    // Upload buffers
-    cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
-    cmdList->writeBuffer(bonesSB, boneData.data(), MAX_BONES * sizeof(Float3x4));
-
-    // Upload material ID
-    struct SkinnedMaterialCB {
-        u32 materialID;
-        u32 pad0, pad1, pad2;
-    } matIdData;
-    matIdData.materialID = batch.bindlessMaterialID;
-    matIdData.pad0 = matIdData.pad1 = matIdData.pad2 = 0;
-    cmdList->writeBuffer(matIdCB, &matIdData, sizeof(matIdData));
-
-    // Create binding set
+    // Create binding set with global bone buffer
     auto& matBuffer = MaterialBuffer::Instance();
     nvrhi::BindingSetDesc bindDesc;
     bindDesc.bindings = {
         nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
+        nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),          // shader_params (b1)
         nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, bonesSB),
-        nvrhi::BindingSetItem::ConstantBuffer(4, matIdCB),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, globalBoneBuffer),  // Global bone buffer (t3)
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(4, instanceSB),        // Per-instance data (t4)
+        nvrhi::BindingSetItem::ConstantBuffer(4, materialIdCB),            // SkinnedMaterialCB (b4)
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB), // g_TerrainMaterials (t9)
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
     };
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_skinnedLayout);
+    if (!bindingSet) {
+        return;
+    }
 
     // Set up graphics state
     nvrhi::GraphicsState state;
@@ -509,7 +537,7 @@ static void RenderSkinnedBatch(
 
     cmdList->setGraphicsState(state);
 
-    // Draw
+    // Draw with instance count 1 (SV_InstanceID = 0)
     cmdList->drawIndexed(
         nvrhi::DrawArguments()
             .setVertexCount(batch.indexCount)
@@ -530,7 +558,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     const xr_vector<GeometryBatch>* hudBatches,
     MaterialCache* materialCache,
     u32 width,
-    u32 height)
+    u32 height,
+    const SkinnedVisibilityData& visibilityData)
 {
     using namespace framegraph;
 
@@ -543,6 +572,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         MaterialCache* materialCache;
         u32 width, height;
         DefaultOutputLayout outputs;
+        // GPU culling visibility data
+        SkinnedVisibilityData visibilityData;
     };
 
     auto& passData = fg.addCallbackPass<SkinningPassData>(
@@ -551,7 +582,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         // ═══════════════════════════════════════════════════════
         //  SETUP LAMBDA
         // ═══════════════════════════════════════════════════════
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
+        [&, width, height, visibilityData](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -560,6 +591,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.geometry = geometry;
             data.hudBatches = hudBatches;
             data.materialCache = materialCache;
+            data.visibilityData = visibilityData;
 
             // Read-write color and depth (renders on top of forward pass)
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
@@ -587,12 +619,16 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 }
             }
 
-            if (worldSkinnedCount == 0 && !hasHUDSkinned)
+            if (worldSkinnedCount == 0 && !hasHUDSkinned) {
+                // Msg("! [SkinningPass] No skinned batches to render");
                 return;
+            }
 
             // Ensure pipelines are initialized
-            if (!s_skinnedInitialized)
+            if (!s_skinnedInitialized) {
+                Msg("! [SkinningPass] Pipelines not initialized!");
                 return;
+            }
 
             // Get physical resources
             auto* colorRT = fg.GetPhysicalTexture(data.color);
@@ -614,6 +650,22 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 return;
 
             const auto& rtDesc = colorRT->getDesc();
+
+            // Get GPUCullingManager for bone buffer (passed via visibility data userData)
+            GPUCullingManager* gpuCullMgr = data.visibilityData.visibilityByVisualUserData
+                ? static_cast<GPUCullingManager*>(data.visibilityData.visibilityByVisualUserData)
+                : nullptr;
+
+            if (!gpuCullMgr || !gpuCullMgr->GetGlobalBoneBuffer()) {
+                Msg("! [SkinningPass] GPUCullingManager bone buffer not available!");
+                return;
+            }
+
+            // Begin frame - reset skeleton allocations
+            gpuCullMgr->BeginSkinnedFrame();
+
+            // Get global bone buffer for shader binding
+            nvrhi::IBuffer* globalBoneBuffer = gpuCullMgr->GetGlobalBoneBuffer();
 
             // Create shared buffers for all skinned draws
             nvrhi::BufferDesc dynTransCbDesc;
@@ -638,30 +690,44 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             FillSunConstants(staticGlobals, sunData);
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            // Create bone structured buffer
-            nvrhi::BufferDesc boneSbDesc;
-            boneSbDesc.byteSize = MAX_BONES * BONE_STRIDE;
-            boneSbDesc.structStride = BONE_STRIDE;
-            boneSbDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            boneSbDesc.keepInitialState = true;
-            boneSbDesc.debugName = "SkinningPass_Bones_SB";
-            auto bonesSB = nvDevice->createBuffer(boneSbDesc);
+            // Create per-instance data buffer (replaces per-draw bone + material ID buffers)
+            // GPU-driven skinning uses this with SV_InstanceID = 0
+            nvrhi::BufferDesc instanceSbDesc;
+            instanceSbDesc.byteSize = sizeof(GPUSkinnedInstanceData);
+            instanceSbDesc.structStride = sizeof(GPUSkinnedInstanceData);
+            instanceSbDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            instanceSbDesc.keepInitialState = true;
+            instanceSbDesc.debugName = "SkinningPass_Instance_SB";
+            auto instanceSB = nvDevice->createBuffer(instanceSbDesc);
 
-            // Create material ID buffer
-            nvrhi::BufferDesc matIdCbDesc;
-            matIdCbDesc.byteSize = 16;
-            matIdCbDesc.isConstantBuffer = true;
-            matIdCbDesc.isVolatile = true;
-            matIdCbDesc.maxVersions = 128;
-            auto matIdCB = nvDevice->createBuffer(matIdCbDesc);
+            // Create shader_params buffer (b1) - required by common.h
+            // Uses ShaderParams from ShaderConstants.h
+            nvrhi::BufferDesc shaderParamsCbDesc;
+            shaderParamsCbDesc.byteSize = sizeof(ShaderParams);
+            shaderParamsCbDesc.isConstantBuffer = true;
+            shaderParamsCbDesc.isVolatile = true;
+            shaderParamsCbDesc.maxVersions = 128;
+            auto shaderParamsCB = nvDevice->createBuffer(shaderParamsCbDesc);
 
-            // Pre-allocate bone data array
-            xr_vector<Float3x4> boneData(MAX_BONES);
-            for (u32 i = 0; i < MAX_BONES; i++) {
-                // Identity matrix
-                boneData[i].m[0][0] = 1.0f; boneData[i].m[0][1] = 0.0f; boneData[i].m[0][2] = 0.0f; boneData[i].m[0][3] = 0.0f;
-                boneData[i].m[1][0] = 0.0f; boneData[i].m[1][1] = 1.0f; boneData[i].m[1][2] = 0.0f; boneData[i].m[1][3] = 0.0f;
-                boneData[i].m[2][0] = 0.0f; boneData[i].m[2][1] = 0.0f; boneData[i].m[2][2] = 1.0f; boneData[i].m[2][3] = 0.0f;
+            // Fill shader params with defaults
+            ShaderParams shaderParams = {};
+            shaderParams.m_AlphaRef = 0.5f;  // Default alpha ref
+            shaderParams.dt_params.set(1.0f, 0.0f, 1.0f, 50.0f);  // dt_mul, dt_add, unused, detail distance
+            cmdList->writeBuffer(shaderParamsCB, &shaderParams, sizeof(shaderParams));
+
+            // Create material ID constant buffer (b4) - uses SkinnedMaterialCB from ShaderConstants.h
+            nvrhi::BufferDesc materialIdCbDesc;
+            materialIdCbDesc.byteSize = sizeof(SkinnedMaterialCB);
+            materialIdCbDesc.isConstantBuffer = true;
+            materialIdCbDesc.isVolatile = true;
+            materialIdCbDesc.maxVersions = 256;  // Many skinned draws
+            auto materialIdCB = nvDevice->createBuffer(materialIdCbDesc);
+
+            // Get terrain material buffer (t9) - required by bindless_common.h
+            auto& terrainMatBuffer = TerrainMaterialBuffer::Instance();
+            if (!terrainMatBuffer.GetBuffer()) {
+                Msg("! [SkinningPass] TerrainMaterialBuffer is NULL - cannot render skinned meshes");
+                return;
             }
 
             // Finalize any pending materials (register textures to bindless descriptor heap)
@@ -690,16 +756,71 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     0.0f, 1.0f  // Normal depth range
                 );
 
-                for (const auto& batch : data.geometry->GetBatches()) {
-                    if (!batch.isSkinned)
-                        continue;
+                // Use GPU culling visibility if available (visual-based lookup)
+                const bool useGPUCulling = data.visibilityData.enabled &&
+                                           data.visibilityData.visibilityByVisualCallback != nullptr;
 
-                    RenderSkinnedBatch(
-                        cmdList, nvDevice, framebuffer,
-                        dynTransformsCB, staticGlobalsCB, bonesSB, matIdCB,
-                        bindlessTable, worldViewport, scissor,
-                        batch, batch.worldMatrix, boneData
-                    );
+                if (useGPUCulling) {
+                    // Render using visibility data (GPU-culled path)
+                    // Visual-based lookup handles batch reordering correctly
+                    // NOTE: We use data from N-2 frames ago (double-buffer readback delay)
+
+                    u32 renderedCount = 0;
+                    u32 culledCount = 0;
+
+                    // Iterate over current frame's batches
+                    for (const auto& batch : data.geometry->GetBatches()) {
+                        if (!batch.isSkinned)
+                            continue;
+
+                        // Check visibility using visual pointer lookup
+                        u32 visibilityValue = batch.visual
+                            ? data.visibilityData.visibilityByVisualCallback(
+                                batch.visual, data.visibilityData.visibilityByVisualUserData)
+                            : 0;
+
+                        if (visibilityValue == 0) {
+                            culledCount++;
+                            continue;
+                        }
+
+                        // Get bone offset from global buffer
+                        u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+
+                        RenderSkinnedBatch(
+                            cmdList, nvDevice, framebuffer,
+                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                            globalBoneBuffer, terrainMatBuffer.GetBuffer(),
+                            bindlessTable, worldViewport, scissor,
+                            batch, batch.worldMatrix, boneOffset
+                        );
+                        renderedCount++;
+                    }
+
+                    // Report stats via callback
+                    if (data.visibilityData.statsCallback) {
+                        data.visibilityData.statsCallback(renderedCount, culledCount,
+                            data.visibilityData.statsUserData);
+                    }
+                } else {
+                    // Render all skinned batches (no GPU culling)
+                    u32 drawCount = 0;
+                    for (const auto& batch : data.geometry->GetBatches()) {
+                        if (!batch.isSkinned)
+                            continue;
+
+                        // Get bone offset from global buffer
+                        u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+
+                        RenderSkinnedBatch(
+                            cmdList, nvDevice, framebuffer,
+                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                            globalBoneBuffer, terrainMatBuffer.GetBuffer(),
+                            bindlessTable, worldViewport, scissor,
+                            batch, batch.worldMatrix, boneOffset
+                        );
+                        drawCount++;
+                    }
                 }
             }
 
@@ -714,14 +835,15 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 );
 
                 for (const auto& batch : *data.hudBatches) {
-                    // Apply HUD FOV adjustment to world matrix
                     Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
+                    u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
 
                     RenderSkinnedBatch(
                         cmdList, nvDevice, framebuffer,
-                        dynTransformsCB, staticGlobalsCB, bonesSB, matIdCB,
+                        dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                        globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                         bindlessTable, hudViewport, scissor,
-                        batch, adjustedWorldMatrix, boneData
+                        batch, adjustedWorldMatrix, boneOffset
                     );
                 }
             }
