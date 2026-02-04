@@ -12,6 +12,8 @@
 extern ENGINE_API float ps_r__Detail_l_aniso;
 extern ENGINE_API float ps_r__Detail_l_ambient;
 
+extern ENGINE_API float ps_r3_grass_wind_multiplier;
+extern ENGINE_API float ps_r3_grass_wind_min;
 extern ENGINE_API float ps_r3_grass_wind_displacement;
 extern ENGINE_API float ps_r3_grass_interaction_displacement;
 
@@ -132,7 +134,14 @@ DefaultOutputLayout setupDetailPass(
                 s_lastBladeWidth = ps_r3_grass_blade_width;
             }
 
-            data.detailManager->DispatchWindCompute(cmdList, data.device->GetNVRHIDevice(), Device.fTimeGlobal);
+            if (g_pGamePersistent)
+            {
+                data.detailManager->windSpeed = _max(
+                    g_pGamePersistent->Environment().CurrentEnv.wind_velocity * ps_r3_grass_wind_multiplier,
+                    ps_r3_grass_wind_min);
+                float wind_rad = deg2rad(g_pGamePersistent->Environment().CurrentEnv.wind_direction);
+                data.detailManager->windDirection.set(_cos(wind_rad), _sin(wind_rad));
+            }
 
             CFrustum frustum;
             frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);

@@ -120,12 +120,29 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 		interaction = interaction_tex.SampleLevel(g_LinearSampler, atlas_uv, 0);
 	}
 
-	float2 wind_uv = P0.xz * 0.001;
 	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
-	float4 wind = wind_tex.SampleLevel(g_LinearSampler, wind_uv, 0);
+	float wind_speed = max(g_wind_direction.y, 0.1);
+	float time = wave.w;
 
-	float fbm_wind_strength = wind.a;
-	float fbm_turbulence = (wind.r * 2.0 - 1.0) * 0.3;
+	float2 dir_uv = P0.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
+	float wind_dir_noise = wind_tex.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+
+	float2 str_uv = P0.xz * (0.025 / wind_speed) + time * 0.05;
+	float wind_str_noise = wind_tex.SampleLevel(g_LinearSampler, str_uv, 0).r;
+
+	float height_factor = vertex_height_factor;
+	float2 turb_uv = P0.xz * (0.025 / wind_speed) + (time + height_factor * height_factor * 0.25) * 0.05;
+	float wind_turb_noise = wind_tex.SampleLevel(g_LinearSampler, turb_uv, 0).r;
+
+	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
+	fbm_wind_strength *= fbm_wind_strength;
+	fbm_wind_strength *= wind_speed;
+
+	float wind_turbulence = lerp(0.25, 1.0, wind_turb_noise);
+	wind_turbulence *= wind_turbulence;
+	wind_turbulence *= min(wind_speed, 1.0) * 0.3;
+
+	float fbm_turbulence = (wind_dir_noise * 2.0 - 1.0) * 0.3;
 
 	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
 	float2 global_wind_dir = float2(sin(wind_angle_rad), cos(wind_angle_rad));
@@ -187,7 +204,8 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	float max_bend_displacement = blade_height * 0.8;
 	float bend_ratio = saturate(total_bend_strength / max_bend_displacement);
-	float bend_angle = bend_ratio * 1.2;
+	float base_bend_angle = bend_ratio * 1.2;
+	float bend_angle = base_bend_angle + wind_turbulence * vertex_height_factor;
 
 	if (total_bend_strength > 0.001)
 	{

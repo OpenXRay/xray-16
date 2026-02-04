@@ -2,6 +2,9 @@
 #include "FGDetailManager.h"
 #include "DetailModel.h"
 #include "FrameGraph/ShaderLoader.h"
+#include "RenderContext/RenderDevice.h"
+#include "ResourceManager/FGResourceManager.h"
+#include "ResourceManager/TextureManager.h"
 #include "xrRender_console.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
@@ -675,34 +678,55 @@ bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
     if (!device)
         return false;
 
-    nvrhi::TextureDesc texDesc;
-    texDesc.width = WIND_TEXTURE_SIZE;
-    texDesc.height = WIND_TEXTURE_SIZE;
-    texDesc.depth = 1;
-    texDesc.arraySize = 1;
-    texDesc.mipLevels = 1;
-    texDesc.format = nvrhi::Format::RGBA16_FLOAT;
-    texDesc.dimension = nvrhi::TextureDimension::Texture2D;
-    texDesc.isUAV = true;
-    texDesc.isShaderResource = true;
-    texDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
-    texDesc.keepInitialState = false;
-    texDesc.debugName = "DetailWindTexture";
-
-    windTexture = device->createTexture(texDesc);
-    if (!windTexture)
+    if (!RImplementation.m_renderDevice)
     {
-        Msg("! [FGDetailManager] Failed to create wind texture");
+        Msg("! [FGDetailManager] No render device available for wind texture");
         return false;
     }
 
+    auto* resourceManager = RImplementation.m_renderDevice->GetFGResourceManager();
+    if (!resourceManager)
+    {
+        Msg("! [FGDetailManager] No resource manager available for wind texture");
+        return false;
+    }
+
+    auto* textureManager = resourceManager->GetTextureManager();
+    if (!textureManager)
+    {
+        Msg("! [FGDetailManager] No texture manager available for wind texture");
+        return false;
+    }
+
+    xray::render::resources::TextureHandle texHandle = textureManager->LoadTexture(
+        "shaders\\perlin_noise",
+        xray::render::resources::TexturePriority::Critical
+    );
+
+    if (!texHandle.IsValid())
+    {
+        Msg("! [FGDetailManager] Failed to load shaders/perlin_noise.dds");
+        return false;
+    }
+
+    nvrhi::ITexture* nvrhiTexture = textureManager->GetNVRHITexture(texHandle);
+    if (!nvrhiTexture)
+    {
+        Msg("! [FGDetailManager] Failed to get NVRHI handle for perlin_noise");
+        return false;
+    }
+
+    windTexture = nvrhiTexture;
+
     if (GEnv.Backend)
     {
-        windTextureBindlessIndex = GEnv.Backend->RegisterBindlessTexture(windTexture);
+        windTextureBindlessIndex = GEnv.Backend->RegisterBindlessTexture(nvrhiTexture);
         if (windTextureBindlessIndex == 0)
         {
-            Msg("! [FGDetailManager] Failed to register wind texture in bindless heap");
+            Msg("! [FGDetailManager] Failed to register perlin_noise in bindless heap");
+            return false;
         }
+        Msg("* [FGDetailManager] Wind texture (perlin_noise) loaded, bindless index: %u", windTextureBindlessIndex);
     }
 
     return true;
@@ -758,69 +782,9 @@ bool FGDetailManager::CreateWindPipeline(nvrhi::IDevice* device)
 
 void FGDetailManager::DispatchWindCompute(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device, float time)
 {
-    if (!windPipeline || !windTexture)
-        return;
-
-    struct WindParams
-    {
-        float time;
-        Fvector2 wind_direction;
-        float wind_speed;
-        u32 octaves;
-        float lacunarity;
-        float gain;
-        float padding1;
-        Fvector2 scroll_speed;
-        u32 texture_size;
-        u32 pad[3];
-    };
-
-    if (g_pGamePersistent)
-    {
-        windSpeed = _max(g_pGamePersistent->Environment().CurrentEnv.wind_velocity * ps_r3_grass_wind_multiplier, ps_r3_grass_wind_min);
-        float wind_rad = deg2rad(g_pGamePersistent->Environment().CurrentEnv.wind_direction);
-        windDirection.set(cosf(wind_rad), sinf(wind_rad));
-    }
-
-    WindParams params = {};
-    params.time = time;
-    params.wind_direction = windDirection;
-    params.wind_speed = windSpeed;
-    params.octaves = ps_r3_grass_wind_octaves;
-    params.lacunarity = 2.0f;
-    params.gain = 0.5f;
-    params.scroll_speed.set(windDirection.x * windSpeed * 5.0f, windDirection.y * windSpeed * 5.0f);
-    params.texture_size = WIND_TEXTURE_SIZE;
-
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize = sizeof(WindParams);
-    cbDesc.debugName = "WindParams";
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
-
-    nvrhi::BufferHandle windParamsCB = device->createBuffer(cbDesc);
-    cmdList->writeBuffer(windParamsCB, &params, sizeof(params));
-
-    cmdList->beginTrackingTextureState(windTexture, nvrhi::AllSubresources, nvrhi::ResourceStates::UnorderedAccess);
-
-    nvrhi::BindingSetDesc bindDesc;
-    bindDesc.bindings = {
-        nvrhi::BindingSetItem::ConstantBuffer(0, windParamsCB),
-        nvrhi::BindingSetItem::Texture_UAV(0, windTexture),
-    };
-
-    nvrhi::BindingSetHandle windBindingSet = device->createBindingSet(bindDesc, windBindingLayout);
-
-    nvrhi::ComputeState state;
-    state.pipeline = windPipeline;
-    state.bindings = { windBindingSet };
-    cmdList->setComputeState(state);
-
-    u32 numGroups = (WIND_TEXTURE_SIZE + 15) / 16;
-    cmdList->dispatch(numGroups, numGroups, 1);
-
-    cmdList->setTextureState(windTexture, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
+    (void)cmdList;
+    (void)device;
+    (void)time;
 }
 
 void FGDetailManager::GenerateBladeGeometry(xr_vector<BladeVertex>& vertices, xr_vector<u16>& indices, int segments)
