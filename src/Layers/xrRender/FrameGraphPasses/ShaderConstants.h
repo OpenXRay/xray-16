@@ -49,6 +49,11 @@ struct alignas(16) ShaderParams {
     Fvector4 dt_params;
 };
 
+struct alignas(16) SkinnedMaterialCB {
+    u32 materialID;
+    u32 pad0, pad1, pad2;
+};
+
 struct alignas(16) StaticGlobals {
     float m_V[12];
 

@@ -12,6 +12,7 @@ namespace xray::render::RENDER_NAMESPACE::passes {
 namespace xray::render {
     class GeometryCollector;
     struct GeometryBatch;
+    class dxRender_Visual;
     namespace ng {
         class RenderDevice;
         class RenderContext;
@@ -19,6 +20,10 @@ namespace xray::render {
     namespace framegraph {
         class FrameGraph;
     }
+}
+
+namespace xray::render::RENDER_NAMESPACE {
+    class CKinematics;
 }
 
 namespace xray::render::RENDER_NAMESPACE {
@@ -40,6 +45,11 @@ struct GPUParticleData {
     float pad0, pad1;
 };
 static_assert(sizeof(GPUParticleData) == 32, "GPUParticleData must be 32 bytes for GPU alignment");
+
+struct Float3x4 {
+    float m[3][4];
+};
+static_assert(sizeof(Float3x4) == 48, "Float3x4 must be 48 bytes");
 
 enum GPUObjectFlags : u32 {
     GPU_OBJECT_OPAQUE      = 0x1,
@@ -93,6 +103,15 @@ struct GPUInstanceData {
     float pad0, pad1;
 };
 static_assert(sizeof(GPUInstanceData) == 80, "GPUInstanceData must be 80 bytes for GPU alignment");
+
+struct GPUSkinnedInstanceData {
+    Fmatrix world;
+    u32 materialID;
+    u32 skeletonBoneOffset;
+    u32 batchIndex;
+    u32 flags;
+};
+static_assert(sizeof(GPUSkinnedInstanceData) == 80, "GPUSkinnedInstanceData must be 80 bytes for GPU alignment");
 
 struct GPUCullOutput {
     framegraph::VirtualResourceHandle visibleIndices;
@@ -231,6 +250,46 @@ public:
 
     void ScheduleStatsReadback(nvrhi::ICommandList* cmdList);
 
+    void UploadSkinnedObjects(ng::RenderContext* ctx, const GeometryCollector* geometry);
+
+    void SetupSkinnedCullingPass(
+        framegraph::FrameGraph& fg,
+        framegraph::VirtualResourceHandle hizPyramid,
+        u32 hizWidth,
+        u32 hizHeight,
+        u32 hizMipLevels,
+        const GeometryCollector* geometry,
+        const Fmatrix& prevViewProj
+    );
+
+    u32 GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const;
+
+    bool HasSkinnedVisibilityData() const { return !m_skinnedVisibilityByVisual.empty(); }
+
+    u32 GetSkinnedObjectCount() const { return m_skinnedObjectCount; }
+    bool IsSkinnedCullingEnabled() const { return m_initialized && m_skinnedCullEnabled; }
+
+
+    struct SkinnedCullingStats {
+        u32 submitted = 0;
+        u32 visible = 0;
+        u32 culled = 0;
+    };
+    const SkinnedCullingStats& GetSkinnedCullingStats() const { return m_skinnedCullingStats; }
+    void UpdateSkinnedCullingStats(u32 rendered, u32 culled);
+
+    void ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* cmdList);
+
+    void ProcessSkinnedVisibilityReadback();
+
+    void BeginSkinnedFrame();
+
+    u32 GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton);
+
+    nvrhi::IBuffer* GetGlobalBoneBuffer() const { return m_globalBoneBuffer.Get(); }
+
+    void ClearSkinnedVisibilityData();
+
     void ProcessStatsReadback();
     nvrhi::IBuffer* GetTerrainInstanceBuffer() const { return m_terrainInstanceBuffer.Get(); }
     nvrhi::IBuffer* GetTerrainBatchIndicesBuffer() const { return m_terrainBatchIndicesBuffer.Get(); }
@@ -360,6 +419,38 @@ private:
     xr_vector<IndirectDrawArgs> m_terrainDrawArgsData;
     xr_vector<u32> m_terrainMaterialIDData;
     xr_vector<GPUInstanceData> m_terrainInstanceData;
+
+    nvrhi::BufferHandle m_skinnedObjectBuffer;
+    nvrhi::BufferHandle m_skinnedVisibilityBuffer;
+
+    static constexpr u32 SKINNED_READBACK_FRAMES = 2;
+    nvrhi::BufferHandle m_skinnedReadbackBuffers[SKINNED_READBACK_FRAMES];
+    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisualToIndex[SKINNED_READBACK_FRAMES];
+    u32 m_skinnedReadbackWriteIndex = 0;
+    u32 m_skinnedReadbackFrameCount = 0;
+
+    xr_unordered_map<const dxRender_Visual*, u32> m_skinnedVisibilityByVisual;
+
+    u32 m_skinnedObjectCount = 0;
+    u32 m_maxSkinnedObjects = 0;
+    bool m_skinnedCullEnabled = false;
+
+    xr_vector<GPUObjectData> m_skinnedObjectData;
+    xr_vector<const GeometryBatch*> m_skinnedBatchPointers;
+    u32 m_skinnedFrameId = 0;
+    SkinnedCullingStats m_skinnedCullingStats;
+
+    static constexpr u32 MAX_TOTAL_BONES = 8192;
+    static constexpr u32 BONE_STRIDE = sizeof(Float3x4);
+    nvrhi::BufferHandle m_globalBoneBuffer;
+    xr_map<CKinematics*, u32> m_skeletonOffsets;
+    xr_vector<Float3x4> m_boneStagingBuffer;
+    u32 m_currentBoneOffset = 0;
+    bool m_boneBufferInitialized = false;
+
+    void CreateSkinnedCullingBuffers(ng::RenderDevice* device);
+    void EnsureSkinnedBufferCapacity(u32 count);
+    void UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset);
 
     nvrhi::BufferHandle m_megaVertexBuffer;
     nvrhi::BufferHandle m_megaIndexBuffer;

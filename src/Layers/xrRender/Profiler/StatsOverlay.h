@@ -32,6 +32,10 @@ struct RenderStats
     u32 totalBones = 0;
     u32 maxBonesPerMesh = 0;
 
+    u32 skinnedSubmitted = 0;
+    u32 skinnedVisible = 0;
+    u32 skinnedCulled = 0;
+
     u32 detailInstances = 0;
     u32 detailSlots = 0;
     u32 detailTrianglesPerBlade = 0;
@@ -43,6 +47,7 @@ struct RenderStats
         objectsSubmitted = objectsCulled = objectsVisible = 0;
         megaBufferVertices = megaBufferIndices = 0;
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
+        skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         detailInstances = detailSlots = detailTrianglesPerBlade = 0;
     }
 };

@@ -444,6 +444,11 @@ void FrameGraphRenderer::RenderStatsOverlay()
 
             stats.megaBufferVertices = m_gpuCullingManager->GetTotalVertexCount();
             stats.megaBufferIndices = m_gpuCullingManager->GetTotalIndexCount();
+
+            const auto& skinnedCullStats = m_gpuCullingManager->GetSkinnedCullingStats();
+            stats.skinnedSubmitted = skinnedCullStats.submitted;
+            stats.skinnedVisible = skinnedCullStats.visible;
+            stats.skinnedCulled = skinnedCullStats.culled;
         }
 
         if (m_detailManager)
@@ -463,8 +468,10 @@ void FrameGraphRenderer::RenderStatsOverlay()
 void FrameGraphRenderer::SetupFrame() {
     const bool levelLoaded = g_pGamePersistent && g_pGameLevel;
 
-    if (m_gpuCullingManager)
+    if (m_gpuCullingManager) {
         m_gpuCullingManager->ProcessStatsReadback();
+        m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
+    }
 
     m_bufferHandleCache.clear();
 
@@ -646,6 +653,18 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
                 &m_worldParticleBatches
             );
         }
+
+        if (m_gpuCullingManager->IsSkinnedCullingEnabled()) {
+            m_gpuCullingManager->SetupSkinnedCullingPass(
+                *m_framegraph,
+                m_hizPyramid,
+                hizOutput.width,
+                hizOutput.height,
+                hizOutput.mipLevels,
+                m_geometryCollector.get(),
+                m_prevViewProj
+            );
+        }
     }
 
     framegraph::ResourceDesc colorDesc;
@@ -740,6 +759,23 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         );
     }
 
+    static auto skinnedStatsCallback = +[](u32 rendered, u32 culled, void* userData) {
+        static_cast<GPUCullingManager*>(userData)->UpdateSkinnedCullingStats(rendered, culled);
+    };
+
+    static auto visibilityByVisualCallback = +[](const dxRender_Visual* visual, void* userData) -> u32 {
+        return static_cast<GPUCullingManager*>(userData)->GetSkinnedVisibilityByVisual(visual);
+    };
+
+    passes::SkinnedVisibilityData skinnedVisibility;
+    if (m_gpuCullingManager && m_gpuCullingManager->IsSkinnedCullingEnabled()) {
+        skinnedVisibility.enabled = m_gpuCullingManager->HasSkinnedVisibilityData();
+        skinnedVisibility.visibilityByVisualCallback = visibilityByVisualCallback;
+        skinnedVisibility.visibilityByVisualUserData = m_gpuCullingManager.get();
+        skinnedVisibility.statsCallback = skinnedStatsCallback;
+        skinnedVisibility.statsUserData = m_gpuCullingManager.get();
+    }
+
     auto hudOutputs = passes::setupSkinningPass(
         *m_framegraph,
         m_device,
@@ -748,7 +784,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         &m_hudBatches,
         m_materialCache.get(),
         width,
-        height
+        height,
+        skinnedVisibility
     );
 
     auto particleOutputs = passes::setupParticlePass(

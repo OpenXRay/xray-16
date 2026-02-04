@@ -8,6 +8,7 @@ namespace xray::render {
     struct GeometryBatch;
     class MaterialCache;
     class GeometryCollector;
+    class dxRender_Visual;
     namespace ng {
         class RenderDevice;
     }
@@ -23,6 +24,20 @@ void InitializeSkinningPipelines(ng::RenderDevice* device);
 
 void ShutdownSkinningPipelines();
 
+using SkinnedStatsCallback = void(*)(u32 rendered, u32 culled, void* userData);
+
+using VisibilityByVisualCallback = u32(*)(const dxRender_Visual* visual, void* userData);
+
+struct SkinnedVisibilityData {
+    bool enabled = false;
+
+    VisibilityByVisualCallback visibilityByVisualCallback = nullptr;
+    void* visibilityByVisualUserData = nullptr;
+
+    SkinnedStatsCallback statsCallback = nullptr;
+    void* statsUserData = nullptr;
+};
+
 framegraph::DefaultOutputLayout setupSkinningPass(
     framegraph::FrameGraph& fg,
     ng::RenderDevice* device,
@@ -31,7 +46,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     const xr_vector<GeometryBatch>* hudBatches,
     MaterialCache* materialCache,
     u32 width,
-    u32 height
+    u32 height,
+    const SkinnedVisibilityData& visibilityData = {}
 );
 
 }

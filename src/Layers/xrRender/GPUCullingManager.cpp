@@ -10,6 +10,7 @@
 #include "Layers/xrRender/FrameGraphPasses/ParticlePassSetup.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/Bindless/VertexConverter.h"
+#include "Layers/xrRender/SkeletonCustom.h"
 
 namespace RENDER_NAMESPACE
 {
@@ -332,6 +333,141 @@ void GPUCullingManager::CreateBuffers(ng::RenderDevice* device)
     }
 
     Msg("* [GPUCulling] Terrain buffers created (max: %u objects)", m_maxTerrainObjects);
+
+    CreateSkinnedCullingBuffers(device);
+}
+
+void GPUCullingManager::CreateSkinnedCullingBuffers(ng::RenderDevice* device)
+{
+    nvrhi::IDevice* nvDevice = device->GetNVRHIDevice();
+
+    m_maxSkinnedObjects = 1024;
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedObjects";
+        desc.byteSize = m_maxSkinnedObjects * sizeof(GPUObjectData);
+        desc.structStride = sizeof(GPUObjectData);
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_skinnedObjectBuffer = nvDevice->createBuffer(desc);
+        if (!m_skinnedObjectBuffer) {
+            Msg("! [GPUCulling] Failed to create skinned object buffer");
+            return;
+        }
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibility";
+        desc.byteSize = m_maxSkinnedObjects * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_skinnedVisibilityBuffer = nvDevice->createBuffer(desc);
+        if (!m_skinnedVisibilityBuffer) {
+            Msg("! [GPUCulling] Failed to create skinned visibility buffer");
+            return;
+        }
+    }
+
+    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibilityReadback";
+        desc.byteSize = m_maxSkinnedObjects * sizeof(u32);
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+
+        m_skinnedReadbackBuffers[i] = nvDevice->createBuffer(desc);
+        if (!m_skinnedReadbackBuffers[i]) {
+            Msg("! [GPUCulling] Failed to create skinned visibility readback buffer %u", i);
+            return;
+        }
+    }
+
+    m_skinnedReadbackWriteIndex = 0;
+    m_skinnedReadbackFrameCount = 0;
+
+    m_skinnedObjectData.reserve(m_maxSkinnedObjects);
+    m_skinnedBatchPointers.reserve(m_maxSkinnedObjects);
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GlobalBoneBuffer";
+        desc.byteSize = MAX_TOTAL_BONES * BONE_STRIDE;
+        desc.structStride = BONE_STRIDE;
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+
+        m_globalBoneBuffer = nvDevice->createBuffer(desc);
+        if (!m_globalBoneBuffer) {
+            Msg("! [GPUCulling] Failed to create global bone buffer");
+            return;
+        }
+    }
+
+    m_boneStagingBuffer.resize(256);
+    m_boneBufferInitialized = true;
+
+    m_skinnedCullEnabled = true;
+    Msg("* [GPUCulling] Skinned culling buffers created (max: %u objects, %u bones)",
+        m_maxSkinnedObjects, MAX_TOTAL_BONES);
+}
+
+void GPUCullingManager::EnsureSkinnedBufferCapacity(u32 count)
+{
+    if (count <= m_maxSkinnedObjects)
+        return;
+
+    u32 newCapacity = std::max(count, m_maxSkinnedObjects * 2);
+    nvrhi::IDevice* nvDevice = m_device->GetNVRHIDevice();
+
+    Msg("* [GPUCulling] Growing skinned buffers: %u -> %u", m_maxSkinnedObjects, newCapacity);
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedObjects";
+        desc.byteSize = newCapacity * sizeof(GPUObjectData);
+        desc.structStride = sizeof(GPUObjectData);
+        desc.initialState = nvrhi::ResourceStates::Common;
+
+        m_skinnedObjectBuffer = nvDevice->createBuffer(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibility";
+        desc.byteSize = newCapacity * sizeof(u32);
+        desc.structStride = sizeof(u32);
+        desc.canHaveUAVs = true;
+        desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+        desc.keepInitialState = true;
+
+        m_skinnedVisibilityBuffer = nvDevice->createBuffer(desc);
+    }
+
+    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
+        nvrhi::BufferDesc desc;
+        desc.debugName = "GPUCull_SkinnedVisibilityReadback";
+        desc.byteSize = newCapacity * sizeof(u32);
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+
+        m_skinnedReadbackBuffers[i] = nvDevice->createBuffer(desc);
+    }
+    m_skinnedReadbackWriteIndex = 0;
+    m_skinnedReadbackFrameCount = 0;
+
+    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
+        m_skinnedVisualToIndex[i].clear();
+    }
+    m_skinnedVisibilityByVisual.clear();
+
+    m_maxSkinnedObjects = newCapacity;
 }
 
 void GPUCullingManager::CreateComputePipeline(ng::RenderDevice* device)
@@ -1273,6 +1409,202 @@ void GPUCullingManager::InvalidateStaticCullingData()
     Msg("* [GPUCulling] Static culling data invalidated");
 }
 
+void GPUCullingManager::UploadSkinnedObjects(ng::RenderContext* ctx, const GeometryCollector* geometry)
+{
+    ZoneScopedN("GPUCull::UploadSkinnedObjects");
+
+    if (!m_skinnedCullEnabled || !geometry) {
+        m_skinnedObjectCount = 0;
+        return;
+    }
+
+    const auto& batches = geometry->GetBatches();
+
+    m_skinnedObjectData.clear();
+    m_skinnedBatchPointers.clear();
+
+    for (const auto& batch : batches) {
+        if (!batch.isSkinned)
+            continue;
+
+        u32 batchIdx = static_cast<u32>(m_skinnedObjectData.size());
+
+        GPUObjectData obj;
+        obj.position = batch.worldBoundsCenter;
+        obj.radius = batch.worldBoundsRadius;
+        obj.batchIndex = batchIdx;
+        obj.flags = 0;
+        obj.pad0 = 0.0f;
+        obj.pad1 = 0.0f;
+        m_skinnedObjectData.push_back(obj);
+        m_skinnedBatchPointers.push_back(&batch);
+    }
+
+    m_skinnedObjectCount = static_cast<u32>(m_skinnedObjectData.size());
+
+    if (m_skinnedObjectCount == 0)
+        return;
+
+    EnsureSkinnedBufferCapacity(m_skinnedObjectCount);
+
+    auto cmdList = ctx->GetCommandList();
+
+    cmdList->beginTrackingBufferState(m_skinnedObjectBuffer, nvrhi::ResourceStates::CopyDest);
+    cmdList->writeBuffer(m_skinnedObjectBuffer,
+        m_skinnedObjectData.data(),
+        m_skinnedObjectCount * sizeof(GPUObjectData));
+    cmdList->setBufferState(m_skinnedObjectBuffer, nvrhi::ResourceStates::ShaderResource);
+}
+
+void GPUCullingManager::ScheduleSkinnedVisibilityReadback(nvrhi::ICommandList* cmdList)
+{
+    if (!m_skinnedCullEnabled || m_skinnedObjectCount == 0)
+        return;
+
+    u32 writeSlot = m_skinnedReadbackWriteIndex;
+
+    cmdList->copyBuffer(
+        m_skinnedReadbackBuffers[writeSlot], 0,
+        m_skinnedVisibilityBuffer, 0,
+        m_skinnedObjectCount * sizeof(u32));
+
+    m_skinnedVisualToIndex[writeSlot].clear();
+    for (u32 i = 0; i < m_skinnedBatchPointers.size(); ++i) {
+        const GeometryBatch* batch = m_skinnedBatchPointers[i];
+        if (batch && batch->visual) {
+            m_skinnedVisualToIndex[writeSlot][batch->visual] = i;
+        }
+    }
+
+    m_skinnedReadbackWriteIndex = 1 - m_skinnedReadbackWriteIndex;
+
+    if (m_skinnedReadbackFrameCount < SKINNED_READBACK_FRAMES) {
+        m_skinnedReadbackFrameCount++;
+    }
+}
+
+void GPUCullingManager::ProcessSkinnedVisibilityReadback()
+{
+    if (m_skinnedReadbackFrameCount < SKINNED_READBACK_FRAMES || m_skinnedObjectCount == 0) {
+        return;
+    }
+
+    u32 readSlot = m_skinnedReadbackWriteIndex;
+
+    void* mappedData = m_device->GetNVRHIDevice()->mapBuffer(
+        m_skinnedReadbackBuffers[readSlot],
+        nvrhi::CpuAccessMode::Read);
+
+    if (mappedData) {
+        const u32* visibilityData = static_cast<const u32*>(mappedData);
+        const auto& visualToIndex = m_skinnedVisualToIndex[readSlot];
+
+        m_skinnedVisibilityByVisual.clear();
+        for (const auto& [visual, index] : visualToIndex) {
+            if (index < m_maxSkinnedObjects) {
+                m_skinnedVisibilityByVisual[visual] = visibilityData[index];
+            }
+        }
+
+        m_device->GetNVRHIDevice()->unmapBuffer(m_skinnedReadbackBuffers[readSlot]);
+    }
+}
+
+void GPUCullingManager::UpdateSkinnedCullingStats(u32 rendered, u32 culled)
+{
+    m_skinnedCullingStats.submitted = rendered + culled;
+    m_skinnedCullingStats.visible = rendered;
+    m_skinnedCullingStats.culled = culled;
+}
+
+u32 GPUCullingManager::GetSkinnedVisibilityByVisual(const dxRender_Visual* visual) const
+{
+    auto it = m_skinnedVisibilityByVisual.find(visual);
+    if (it != m_skinnedVisibilityByVisual.end()) {
+        return it->second;
+    }
+    return 0;
+}
+
+void GPUCullingManager::ClearSkinnedVisibilityData()
+{
+    for (u32 i = 0; i < SKINNED_READBACK_FRAMES; ++i) {
+        m_skinnedVisualToIndex[i].clear();
+    }
+    m_skinnedVisibilityByVisual.clear();
+    m_skinnedBatchPointers.clear();
+    m_skinnedReadbackFrameCount = 0;
+}
+
+void GPUCullingManager::BeginSkinnedFrame()
+{
+    m_skeletonOffsets.clear();
+    m_currentBoneOffset = 0;
+}
+
+u32 GPUCullingManager::GetOrUploadSkeleton(nvrhi::ICommandList* cmdList, CKinematics* skeleton)
+{
+    if (!m_boneBufferInitialized || !skeleton || !cmdList)
+        return 0;
+
+    auto it = m_skeletonOffsets.find(skeleton);
+    if (it != m_skeletonOffsets.end()) {
+        return it->second;
+    }
+
+    u32 boneCount = skeleton->LL_BoneCount();
+    if (boneCount == 0)
+        return 0;
+
+    if (m_currentBoneOffset + boneCount > MAX_TOTAL_BONES) {
+        Msg("! [GPUCulling] Bone buffer full: need %u bones, have %u remaining",
+            boneCount, MAX_TOTAL_BONES - m_currentBoneOffset);
+        return 0;
+    }
+
+    u32 boneOffset = m_currentBoneOffset;
+    m_skeletonOffsets[skeleton] = boneOffset;
+
+    UploadSkeletonBones(cmdList, skeleton, boneOffset);
+
+    m_currentBoneOffset += boneCount;
+
+    return boneOffset;
+}
+
+void GPUCullingManager::UploadSkeletonBones(nvrhi::ICommandList* cmdList, CKinematics* skeleton, u32 boneOffset)
+{
+    u32 boneCount = skeleton->LL_BoneCount();
+
+    if (m_boneStagingBuffer.size() < boneCount) {
+        m_boneStagingBuffer.resize(boneCount);
+    }
+
+    for (u32 i = 0; i < boneCount; i++) {
+        const Fmatrix& bone = skeleton->LL_GetTransform_R(u16(i));
+
+        m_boneStagingBuffer[i].m[0][0] = bone._11;
+        m_boneStagingBuffer[i].m[0][1] = bone._21;
+        m_boneStagingBuffer[i].m[0][2] = bone._31;
+        m_boneStagingBuffer[i].m[0][3] = bone._41;
+
+        m_boneStagingBuffer[i].m[1][0] = bone._12;
+        m_boneStagingBuffer[i].m[1][1] = bone._22;
+        m_boneStagingBuffer[i].m[1][2] = bone._32;
+        m_boneStagingBuffer[i].m[1][3] = bone._42;
+
+        m_boneStagingBuffer[i].m[2][0] = bone._13;
+        m_boneStagingBuffer[i].m[2][1] = bone._23;
+        m_boneStagingBuffer[i].m[2][2] = bone._33;
+        m_boneStagingBuffer[i].m[2][3] = bone._43;
+    }
+
+    u64 byteOffset = static_cast<u64>(boneOffset) * BONE_STRIDE;
+    u64 byteSize = static_cast<u64>(boneCount) * BONE_STRIDE;
+
+    cmdList->writeBuffer(m_globalBoneBuffer, m_boneStagingBuffer.data(), byteSize, byteOffset);
+}
+
 void GPUCullingManager::ExtractFrustumPlanes(Fmatrix& M, Fvector4* outPlanes)
 {
     CFrustum frustum;
@@ -1815,6 +2147,134 @@ GPUCullOutput GPUCullingManager::SetupCullingPass(
     }
 
     return output;
+}
+
+void GPUCullingManager::SetupSkinnedCullingPass(
+    framegraph::FrameGraph& fg,
+    framegraph::VirtualResourceHandle hizPyramid,
+    u32 hizWidth,
+    u32 hizHeight,
+    u32 hizMipLevels,
+    const GeometryCollector* geometry,
+    const Fmatrix& prevViewProj)
+{
+    using namespace framegraph;
+
+    if (!m_skinnedCullEnabled) {
+        return;
+    }
+
+    struct SkinnedCullPassData {
+        VirtualResourceHandle hizPyramid;
+        VirtualResourceHandle visibilityBuffer;
+        GPUCullingManager* manager;
+        const GeometryCollector* geometry;
+        Fmatrix prevViewProj;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+    };
+
+    ResourceDesc visBufferDesc;
+    visBufferDesc.type = ResourceDesc::Type::Buffer;
+    visBufferDesc.debugName = "GPUCull_SkinnedVisibility";
+    visBufferDesc.bufferSize = m_maxSkinnedObjects * sizeof(u32);
+    visBufferDesc.structStride = sizeof(u32);
+    visBufferDesc.isUAV = true;
+    visBufferDesc.isTransient = false;
+
+    VirtualResourceHandle visBufferHandle = fg.ImportBuffer(
+        "skinned_visibility", m_skinnedVisibilityBuffer, visBufferDesc);
+
+    auto& passData = fg.addCallbackPass<SkinnedCullPassData>(
+        "Skinned GPU Culling",
+
+        [&, hizWidth, hizHeight, hizMipLevels, geometry, prevViewProj, visBufferHandle](FrameGraph& builder, PassHandle passHandle, SkinnedCullPassData& data) {
+            RenderPassBuilder passBuilder(builder, passHandle);
+
+            data.manager = this;
+            data.geometry = geometry;
+            data.prevViewProj = prevViewProj;
+            data.hizWidth = hizWidth;
+            data.hizHeight = hizHeight;
+            data.hizMipLevels = hizMipLevels;
+
+            data.hizPyramid = passBuilder.read(hizPyramid, ResourceState::ShaderResource);
+
+            data.visibilityBuffer = passBuilder.write(visBufferHandle, ResourceState::UnorderedAccess);
+        },
+
+        [](const SkinnedCullPassData& data,
+           const FrameGraph& fg,
+           ng::RenderContext* ctx) {
+
+            GPUCullingManager* mgr = data.manager;
+            if (!mgr->m_skinnedCullEnabled)
+                return;
+
+            mgr->UploadSkinnedObjects(ctx, data.geometry);
+
+            if (mgr->m_skinnedObjectCount == 0)
+                return;
+
+            nvrhi::ICommandList* cmdList = ctx->GetCommandList();
+            nvrhi::IDevice* nvDevice = mgr->m_device->GetNVRHIDevice();
+
+            u32 frameId = Device.dwFrame + 1u;
+            if (frameId == 0)
+                frameId = 1;
+            mgr->m_skinnedFrameId = frameId;
+
+            nvrhi::ITexture* hizTexture = fg.GetPhysicalTexture(data.hizPyramid);
+            if (!hizTexture) {
+                Msg("! [GPUCulling] Hi-Z texture not available for skinned culling");
+                return;
+            }
+
+            cmdList->clearBufferUInt(mgr->m_skinnedVisibilityBuffer, 0);
+
+            CullParamsCB cb;
+            cb.viewProj.transpose(Device.mFullTransform);
+            cb.prevViewProj.transpose(data.prevViewProj);
+            cb.cameraPos = Device.vCameraPosition;
+            float farPlane = g_pGamePersistent ? g_pGamePersistent->Environment().CurrentEnv.far_plane : 300.0f;
+            cb.maxDistanceSq = farPlane * farPlane;
+            cb.objectCount = mgr->m_skinnedObjectCount;
+            cb.hizWidth = data.hizWidth;
+            cb.hizHeight = data.hizHeight;
+            cb.hizMipLevels = data.hizMipLevels;
+            cb.frameId = frameId;
+            cb.padding[0] = cb.padding[1] = cb.padding[2] = 0;
+
+            mgr->ExtractFrustumPlanes(Device.mFullTransform, cb.frustumPlanes);
+
+            cmdList->writeBuffer(mgr->m_cullParamsCB, &cb, sizeof(cb));
+
+            nvrhi::BindingSetDesc bindDesc;
+            bindDesc.bindings = {
+                nvrhi::BindingSetItem::ConstantBuffer(5, mgr->m_cullParamsCB),
+                nvrhi::BindingSetItem::StructuredBuffer_SRV(0, mgr->m_skinnedObjectBuffer),
+                nvrhi::BindingSetItem::Texture_SRV(1, hizTexture),
+                nvrhi::BindingSetItem::Sampler(0, mgr->m_pointSampler),
+                nvrhi::BindingSetItem::StructuredBuffer_UAV(0, mgr->m_staticSet.visibleIndexBuffer),
+                nvrhi::BindingSetItem::RawBuffer_UAV(1, mgr->m_staticSet.visibleCountBuffer),
+                nvrhi::BindingSetItem::StructuredBuffer_UAV(2, mgr->m_skinnedVisibilityBuffer)
+            };
+
+            nvrhi::BindingSetHandle bindingSet = nvDevice->createBindingSet(bindDesc, mgr->m_cullLayout);
+            R_ASSERT2(bindingSet, "Failed to create skinned culling binding set");
+
+            nvrhi::ComputeState state;
+            state.pipeline = mgr->m_cullPipeline;
+            state.bindings = { bindingSet };
+            cmdList->setComputeState(state);
+
+            u32 groupCount = (mgr->m_skinnedObjectCount + CULL_THREAD_GROUP_SIZE - 1) / CULL_THREAD_GROUP_SIZE;
+            cmdList->dispatch(groupCount, 1, 1);
+
+            mgr->ScheduleSkinnedVisibilityReadback(cmdList);
+        }
+    );
 }
 
 bool GPUCullingManager::IsDebugEnabled() const

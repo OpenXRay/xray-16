@@ -14,6 +14,8 @@
 #include "Layers/xrRender/SkeletonX.h"
 #include "Layers/xrRender/Backend/D3D12Backend.h"
 #include "Layers/xrRender/Bindless/MaterialBuffer.h"
+#include "Layers/xrRender/Bindless/TerrainMaterialBuffer.h"
+#include "Layers/xrRender/GPUCullingManager.h"
 #include "xrCore/FMesh.hpp"
 
 extern ENGINE_API float psHUD_FOV;
@@ -41,13 +43,6 @@ static nvrhi::BindingLayoutHandle s_skinnedLayout;
 static nvrhi::ShaderHandle s_skinnedPS;
 static nvrhi::SamplerHandle s_linearSampler;
 static bool s_skinnedInitialized = false;
-
-struct Float3x4 {
-    float m[3][4];
-};
-
-constexpr u32 MAX_BONES = 78;
-constexpr u32 BONE_STRIDE = sizeof(Float3x4);
 
 static Fmatrix ApplyHUDFOVAdjustment(const Fmatrix& worldMatrix)
 {
@@ -122,10 +117,13 @@ void InitializeSkinningPipelines(ng::RenderDevice* device)
     skinnedLayoutDesc.visibility = nvrhi::ShaderType::All;
     skinnedLayoutDesc.bindings = {
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(0),
+        nvrhi::BindingLayoutItem::VolatileConstantBuffer(1),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(2),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(3),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(4),
         nvrhi::BindingLayoutItem::VolatileConstantBuffer(4),
         nvrhi::BindingLayoutItem::StructuredBuffer_SRV(8),
+        nvrhi::BindingLayoutItem::StructuredBuffer_SRV(9),
         nvrhi::BindingLayoutItem::Sampler(0),
     };
     s_skinnedLayout = nvDevice->createBindingLayout(skinnedLayoutDesc);
@@ -362,80 +360,93 @@ static nvrhi::IGraphicsPipeline* SelectSkinnedPipeline(u32 vertexStride)
     return s_skinnedPipeline.Get();
 }
 
+static u32 GetSkeletonBoneOffset(
+    nvrhi::ICommandList* cmdList,
+    GPUCullingManager& gpuCullMgr,
+    const GeometryBatch& batch)
+{
+    CKinematics* parent = nullptr;
+    u32 visualType = batch.visual ? batch.visual->getType() : 0;
+
+    if (visualType == MT_SKELETON_GEOMDEF_ST) {
+        parent = static_cast<CSkeletonX_ST*>(batch.visual)->GetParent();
+    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
+        parent = static_cast<CSkeletonX_PM*>(batch.visual)->GetParent();
+    }
+
+    if (!parent)
+        return 0;
+
+    return gpuCullMgr.GetOrUploadSkeleton(cmdList, parent);
+}
+
 static void RenderSkinnedBatch(
     nvrhi::ICommandList* cmdList,
     nvrhi::IDevice* nvDevice,
     nvrhi::IFramebuffer* framebuffer,
     nvrhi::IBuffer* dynTransformsCB,
+    nvrhi::IBuffer* shaderParamsCB,
     nvrhi::IBuffer* staticGlobalsCB,
-    nvrhi::IBuffer* bonesSB,
-    nvrhi::IBuffer* matIdCB,
+    nvrhi::IBuffer* materialIdCB,
+    nvrhi::IBuffer* instanceSB,
+    nvrhi::IBuffer* globalBoneBuffer,
+    nvrhi::IBuffer* terrainMaterialsSB,
     nvrhi::IDescriptorTable* bindlessTable,
     const nvrhi::Viewport& viewport,
     const nvrhi::Rect& scissor,
     const GeometryBatch& batch,
     const Fmatrix& worldMatrix,
-    xr_vector<Float3x4>& boneData)
+    u32 skeletonBoneOffset)
 {
     using namespace RENDER_NAMESPACE;
     using namespace RENDER_NAMESPACE::bindless;
 
-    if (!batch.vertexBuffer || !batch.indexBuffer)
+    if (!batch.vertexBuffer || !batch.indexBuffer) {
         return;
-
-    nvrhi::IGraphicsPipeline* pipeline = SelectSkinnedPipeline(batch.vertexStride);
-    if (!pipeline)
-        return;
-
-    CKinematics* Parent = nullptr;
-    u32 visualType = batch.visual ? batch.visual->getType() : 0;
-
-    if (visualType == MT_SKELETON_GEOMDEF_ST) {
-        auto* skeletonMesh = static_cast<CSkeletonX_ST*>(batch.visual);
-        Parent = skeletonMesh->GetParent();
-    } else if (visualType == MT_SKELETON_GEOMDEF_PM) {
-        auto* skeletonMesh = static_cast<CSkeletonX_PM*>(batch.visual);
-        Parent = skeletonMesh->GetParent();
     }
 
-    if (!Parent)
+    nvrhi::IGraphicsPipeline* pipeline = SelectSkinnedPipeline(batch.vertexStride);
+    if (!pipeline) {
         return;
+    }
 
     DynamicTransforms dynTransData = {};
     FillDynamicTransforms(dynTransData, worldMatrix);
-
-    u32 boneCount = Parent->LL_BoneCount();
-    u32 bonesToFill = std::min(boneCount, MAX_BONES);
-
-    for (u32 i = 0; i < bonesToFill; i++) {
-        const Fmatrix& bone = Parent->LL_GetTransform_R(u16(i));
-        boneData[i].m[0][0] = bone._11; boneData[i].m[0][1] = bone._21; boneData[i].m[0][2] = bone._31; boneData[i].m[0][3] = bone._41;
-        boneData[i].m[1][0] = bone._12; boneData[i].m[1][1] = bone._22; boneData[i].m[1][2] = bone._32; boneData[i].m[1][3] = bone._42;
-        boneData[i].m[2][0] = bone._13; boneData[i].m[2][1] = bone._23; boneData[i].m[2][2] = bone._33; boneData[i].m[2][3] = bone._43;
-    }
-
     cmdList->writeBuffer(dynTransformsCB, &dynTransData, sizeof(dynTransData));
-    cmdList->writeBuffer(bonesSB, boneData.data(), MAX_BONES * sizeof(Float3x4));
 
-    struct SkinnedMaterialCB {
-        u32 materialID;
-        u32 pad0, pad1, pad2;
-    } matIdData;
+    GPUSkinnedInstanceData instData;
+    instData.world.transpose(worldMatrix);
+    instData.materialID = batch.bindlessMaterialID;
+    instData.skeletonBoneOffset = skeletonBoneOffset;
+    instData.batchIndex = 0;
+    instData.flags = 0;
+    cmdList->writeBuffer(instanceSB, &instData, sizeof(instData));
+
+    SkinnedMaterialCB matIdData = {};
     matIdData.materialID = batch.bindlessMaterialID;
-    matIdData.pad0 = matIdData.pad1 = matIdData.pad2 = 0;
-    cmdList->writeBuffer(matIdCB, &matIdData, sizeof(matIdData));
+    cmdList->writeBuffer(materialIdCB, &matIdData, sizeof(matIdData));
+
+    if (!globalBoneBuffer) {
+        return;
+    }
 
     auto& matBuffer = MaterialBuffer::Instance();
     nvrhi::BindingSetDesc bindDesc;
     bindDesc.bindings = {
         nvrhi::BindingSetItem::ConstantBuffer(0, dynTransformsCB),
+        nvrhi::BindingSetItem::ConstantBuffer(1, shaderParamsCB),
         nvrhi::BindingSetItem::ConstantBuffer(2, staticGlobalsCB),
-        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, bonesSB),
-        nvrhi::BindingSetItem::ConstantBuffer(4, matIdCB),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(3, globalBoneBuffer),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(4, instanceSB),
+        nvrhi::BindingSetItem::ConstantBuffer(4, materialIdCB),
         nvrhi::BindingSetItem::StructuredBuffer_SRV(8, matBuffer.GetBuffer()),
+        nvrhi::BindingSetItem::StructuredBuffer_SRV(9, terrainMaterialsSB),
         nvrhi::BindingSetItem::Sampler(0, s_linearSampler),
     };
     auto bindingSet = nvDevice->createBindingSet(bindDesc, s_skinnedLayout);
+    if (!bindingSet) {
+        return;
+    }
 
     nvrhi::GraphicsState state;
     state.pipeline = pipeline;
@@ -467,7 +478,8 @@ framegraph::DefaultOutputLayout setupSkinningPass(
     const xr_vector<GeometryBatch>* hudBatches,
     MaterialCache* materialCache,
     u32 width,
-    u32 height)
+    u32 height,
+    const SkinnedVisibilityData& visibilityData)
 {
     using namespace framegraph;
 
@@ -480,12 +492,13 @@ framegraph::DefaultOutputLayout setupSkinningPass(
         MaterialCache* materialCache;
         u32 width, height;
         DefaultOutputLayout outputs;
+        SkinnedVisibilityData visibilityData;
     };
 
     auto& passData = fg.addCallbackPass<SkinningPassData>(
         "Skinning Pass",
 
-        [&, width, height](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
+        [&, width, height, visibilityData](FrameGraph& builder, PassHandle passHandle, SkinningPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
             data.width = width;
@@ -494,6 +507,7 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             data.geometry = geometry;
             data.hudBatches = hudBatches;
             data.materialCache = materialCache;
+            data.visibilityData = visibilityData;
 
             data.color = passBuilder.readWrite(inputs.albedo, ResourceState::RenderTarget);
             data.depth = passBuilder.readWrite(inputs.depth, ResourceState::DepthStencilWrite);
@@ -515,11 +529,14 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 }
             }
 
-            if (worldSkinnedCount == 0 && !hasHUDSkinned)
+            if (worldSkinnedCount == 0 && !hasHUDSkinned) {
                 return;
+            }
 
-            if (!s_skinnedInitialized)
+            if (!s_skinnedInitialized) {
+                Msg("! [SkinningPass] Pipelines not initialized!");
                 return;
+            }
 
             auto* colorRT = fg.GetPhysicalTexture(data.color);
             auto* depthRT = fg.GetPhysicalTexture(data.depth);
@@ -539,6 +556,19 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                 return;
 
             const auto& rtDesc = colorRT->getDesc();
+
+            GPUCullingManager* gpuCullMgr = data.visibilityData.visibilityByVisualUserData
+                ? static_cast<GPUCullingManager*>(data.visibilityData.visibilityByVisualUserData)
+                : nullptr;
+
+            if (!gpuCullMgr || !gpuCullMgr->GetGlobalBoneBuffer()) {
+                Msg("! [SkinningPass] GPUCullingManager bone buffer not available!");
+                return;
+            }
+
+            gpuCullMgr->BeginSkinnedFrame();
+
+            nvrhi::IBuffer* globalBoneBuffer = gpuCullMgr->GetGlobalBoneBuffer();
 
             nvrhi::BufferDesc dynTransCbDesc;
             dynTransCbDesc.byteSize = sizeof(DynamicTransforms);
@@ -561,26 +591,37 @@ framegraph::DefaultOutputLayout setupSkinningPass(
             FillSunConstants(staticGlobals, sunData);
             cmdList->writeBuffer(staticGlobalsCB, &staticGlobals, sizeof(staticGlobals));
 
-            nvrhi::BufferDesc boneSbDesc;
-            boneSbDesc.byteSize = MAX_BONES * BONE_STRIDE;
-            boneSbDesc.structStride = BONE_STRIDE;
-            boneSbDesc.initialState = nvrhi::ResourceStates::ShaderResource;
-            boneSbDesc.keepInitialState = true;
-            boneSbDesc.debugName = "SkinningPass_Bones_SB";
-            auto bonesSB = nvDevice->createBuffer(boneSbDesc);
+            nvrhi::BufferDesc instanceSbDesc;
+            instanceSbDesc.byteSize = sizeof(GPUSkinnedInstanceData);
+            instanceSbDesc.structStride = sizeof(GPUSkinnedInstanceData);
+            instanceSbDesc.initialState = nvrhi::ResourceStates::ShaderResource;
+            instanceSbDesc.keepInitialState = true;
+            instanceSbDesc.debugName = "SkinningPass_Instance_SB";
+            auto instanceSB = nvDevice->createBuffer(instanceSbDesc);
 
-            nvrhi::BufferDesc matIdCbDesc;
-            matIdCbDesc.byteSize = 16;
-            matIdCbDesc.isConstantBuffer = true;
-            matIdCbDesc.isVolatile = true;
-            matIdCbDesc.maxVersions = 128;
-            auto matIdCB = nvDevice->createBuffer(matIdCbDesc);
+            nvrhi::BufferDesc shaderParamsCbDesc;
+            shaderParamsCbDesc.byteSize = sizeof(ShaderParams);
+            shaderParamsCbDesc.isConstantBuffer = true;
+            shaderParamsCbDesc.isVolatile = true;
+            shaderParamsCbDesc.maxVersions = 128;
+            auto shaderParamsCB = nvDevice->createBuffer(shaderParamsCbDesc);
 
-            xr_vector<Float3x4> boneData(MAX_BONES);
-            for (u32 i = 0; i < MAX_BONES; i++) {
-                boneData[i].m[0][0] = 1.0f; boneData[i].m[0][1] = 0.0f; boneData[i].m[0][2] = 0.0f; boneData[i].m[0][3] = 0.0f;
-                boneData[i].m[1][0] = 0.0f; boneData[i].m[1][1] = 1.0f; boneData[i].m[1][2] = 0.0f; boneData[i].m[1][3] = 0.0f;
-                boneData[i].m[2][0] = 0.0f; boneData[i].m[2][1] = 0.0f; boneData[i].m[2][2] = 1.0f; boneData[i].m[2][3] = 0.0f;
+            ShaderParams shaderParams = {};
+            shaderParams.m_AlphaRef = 0.5f;
+            shaderParams.dt_params.set(1.0f, 0.0f, 1.0f, 50.0f);
+            cmdList->writeBuffer(shaderParamsCB, &shaderParams, sizeof(shaderParams));
+
+            nvrhi::BufferDesc materialIdCbDesc;
+            materialIdCbDesc.byteSize = sizeof(SkinnedMaterialCB);
+            materialIdCbDesc.isConstantBuffer = true;
+            materialIdCbDesc.isVolatile = true;
+            materialIdCbDesc.maxVersions = 256;
+            auto materialIdCB = nvDevice->createBuffer(materialIdCbDesc);
+
+            auto& terrainMatBuffer = TerrainMaterialBuffer::Instance();
+            if (!terrainMatBuffer.GetBuffer()) {
+                Msg("! [SkinningPass] TerrainMaterialBuffer is NULL - cannot render skinned meshes");
+                return;
             }
 
             if (data.materialCache) {
@@ -602,16 +643,61 @@ framegraph::DefaultOutputLayout setupSkinningPass(
                     0.0f, 1.0f
                 );
 
-                for (const auto& batch : data.geometry->GetBatches()) {
-                    if (!batch.isSkinned)
-                        continue;
+                const bool useGPUCulling = data.visibilityData.enabled &&
+                                           data.visibilityData.visibilityByVisualCallback != nullptr;
 
-                    RenderSkinnedBatch(
-                        cmdList, nvDevice, framebuffer,
-                        dynTransformsCB, staticGlobalsCB, bonesSB, matIdCB,
-                        bindlessTable, worldViewport, scissor,
-                        batch, batch.worldMatrix, boneData
-                    );
+                if (useGPUCulling) {
+
+                    u32 renderedCount = 0;
+                    u32 culledCount = 0;
+
+                    for (const auto& batch : data.geometry->GetBatches()) {
+                        if (!batch.isSkinned)
+                            continue;
+
+                        u32 visibilityValue = batch.visual
+                            ? data.visibilityData.visibilityByVisualCallback(
+                                batch.visual, data.visibilityData.visibilityByVisualUserData)
+                            : 0;
+
+                        if (visibilityValue == 0) {
+                            culledCount++;
+                            continue;
+                        }
+
+                        u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+
+                        RenderSkinnedBatch(
+                            cmdList, nvDevice, framebuffer,
+                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                            globalBoneBuffer, terrainMatBuffer.GetBuffer(),
+                            bindlessTable, worldViewport, scissor,
+                            batch, batch.worldMatrix, boneOffset
+                        );
+                        renderedCount++;
+                    }
+
+                    if (data.visibilityData.statsCallback) {
+                        data.visibilityData.statsCallback(renderedCount, culledCount,
+                            data.visibilityData.statsUserData);
+                    }
+                } else {
+                    u32 drawCount = 0;
+                    for (const auto& batch : data.geometry->GetBatches()) {
+                        if (!batch.isSkinned)
+                            continue;
+
+                        u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
+
+                        RenderSkinnedBatch(
+                            cmdList, nvDevice, framebuffer,
+                            dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                            globalBoneBuffer, terrainMatBuffer.GetBuffer(),
+                            bindlessTable, worldViewport, scissor,
+                            batch, batch.worldMatrix, boneOffset
+                        );
+                        drawCount++;
+                    }
                 }
             }
 
@@ -624,12 +710,14 @@ framegraph::DefaultOutputLayout setupSkinningPass(
 
                 for (const auto& batch : *data.hudBatches) {
                     Fmatrix adjustedWorldMatrix = ApplyHUDFOVAdjustment(batch.worldMatrix);
+                    u32 boneOffset = GetSkeletonBoneOffset(cmdList, *gpuCullMgr, batch);
 
                     RenderSkinnedBatch(
                         cmdList, nvDevice, framebuffer,
-                        dynTransformsCB, staticGlobalsCB, bonesSB, matIdCB,
+                        dynTransformsCB, shaderParamsCB, staticGlobalsCB, materialIdCB, instanceSB,
+                        globalBoneBuffer, terrainMatBuffer.GetBuffer(),
                         bindlessTable, hudViewport, scissor,
-                        batch, adjustedWorldMatrix, boneData
+                        batch, adjustedWorldMatrix, boneOffset
                     );
                 }
             }

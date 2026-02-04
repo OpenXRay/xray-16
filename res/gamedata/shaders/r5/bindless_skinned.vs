@@ -1,14 +1,15 @@
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
+#include "skinned_common.h"
 
 struct VS_INPUT
 {
-    float4 P        : POSITION;
-    float4 N        : NORMAL;
-    float4 T        : TANGENT;
-    float4 B        : BINORMAL;
-    float2 tc       : TEXCOORD0;
+    float4 P  : POSITION;
+    float4 N  : NORMAL;
+    float4 T  : TANGENT;
+    float4 B  : BINORMAL;
+    float2 tc : TEXCOORD0;
 };
 
 struct VS_OUTPUT
@@ -22,73 +23,40 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-StructuredBuffer<float3x4> g_BoneMatrices : register(t3);
-
-float3x4 get_bone(int legacy_index)
-{
-    return g_BoneMatrices[legacy_index / 3];
-}
-
-float3 unpack_skinned_normal(float3 packed)
-{
-    return packed * 2.0 - 1.0;
-}
-
-float4 skinning_pos(float4 pos, float3x4 bone)
-{
-    return float4(mul(bone, pos), 1.0);
-}
-
-float3 skinning_dir(float3 dir, float3x4 bone)
-{
-    return mul((float3x3)bone, dir);
-}
-
 float4 unpack_skinned_position(float4 v)
 {
     return float4(v.xyz * 12.0, 1.0);
 }
 
-#define DEBUG_SKIP_SKINNING 0
-
-VS_OUTPUT main(VS_INPUT input)
+VS_OUTPUT main(VS_INPUT input, uint instanceID : SV_InstanceID)
 {
     VS_OUTPUT output;
 
     float4 localPos = unpack_skinned_position(input.P);
+    float3 N = unpack_d3dcolor_normal(input.N.xyz);
+    float3 T = unpack_d3dcolor_normal(input.T.xyz);
+    float3 B = unpack_d3dcolor_normal(input.B.xyz);
 
-    float3 normalUnpacked = unpack_skinned_normal(input.N.xyz);
-    float3 tangentUnpacked = unpack_skinned_normal(input.T.xyz);
-    float3 binormalUnpacked = unpack_skinned_normal(input.B.xyz);
-
-#if DEBUG_SKIP_SKINNING
-    float4 skinnedPos = localPos;
-    float3 skinnedNormal = normalUnpacked;
-    float3 skinnedTangent = tangentUnpacked;
-    float3 skinnedBinormal = binormalUnpacked;
-#else
     int boneIdx = int(input.N.w * 255.0 + 0.3);
-    float3x4 bone = get_bone(boneIdx);
+    float3x4 bone = get_bone(boneIdx, instanceID);
 
     float4 skinnedPos = skinning_pos(localPos, bone);
-    float3 skinnedNormal = skinning_dir(normalUnpacked, bone);
-    float3 skinnedTangent = skinning_dir(tangentUnpacked, bone);
-    float3 skinnedBinormal = skinning_dir(binormalUnpacked, bone);
-#endif
+    float3 skinnedN = skinning_dir(N, bone);
+    float3 skinnedT = skinning_dir(T, bone);
+    float3 skinnedB = skinning_dir(B, bone);
 
-    float3 worldPos3 = mul(m_W, skinnedPos);
-    float4 worldPos = float4(worldPos3, 1.0);
+    float4x4 worldMatrix = g_SkinnedInstances[instanceID].world;
+    float3 worldPos3 = mul(worldMatrix, skinnedPos).xyz;
     output.worldPos = worldPos3;
-    output.position = mul(m_VP, worldPos);
+    output.position = mul(m_VP, float4(worldPos3, 1.0));
 
-    float3x3 worldMatrix3x3 = (float3x3)m_W;
-    output.normal = normalize(mul(worldMatrix3x3, skinnedNormal));
-    output.tangent = normalize(mul(worldMatrix3x3, skinnedTangent));
-    output.bitangent = normalize(mul(worldMatrix3x3, skinnedBinormal));
+    float3x3 worldMatrix3x3 = (float3x3)worldMatrix;
+    output.normal = normalize(mul(worldMatrix3x3, skinnedN));
+    output.tangent = normalize(mul(worldMatrix3x3, skinnedT));
+    output.bitangent = normalize(mul(worldMatrix3x3, skinnedB));
 
+    output.materialID = g_SkinnedInstances[instanceID].materialID;
     output.texcoord = input.tc;
-
-    output.materialID = 0;
 
     return output;
 }
