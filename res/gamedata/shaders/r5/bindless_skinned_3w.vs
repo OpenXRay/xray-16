@@ -1,18 +1,18 @@
-// bindless_skinned_2w.vs
-// GPU-driven skinned mesh shader for 2W HQ format (44 bytes, 2-bone blend)
-// Weight formula: lerp(bone_0, bone_1, N.w) = bone_0 * (1 - N.w) + bone_1 * N.w
+// bindless_skinned_3w.vs
+// GPU-driven skinned mesh shader for 3W HQ format (44 bytes, 3-bone blend)
+// Weight formula: bone_0 * N.w + bone_1 * T.w + bone_2 * (1 - N.w - T.w)
 
 #define SM_6_0
 #include "common.h"
 #include "bindless_common.h"
 #include "skinned_common.h"
 
-struct VS_INPUT_2W
+struct VS_INPUT_3W
 {
     float4 P  : POSITION;   // FLOAT4: position
-    float4 N  : NORMAL;     // D3DCOLOR: normal, .w = lerp weight
-    float4 T  : TANGENT;    // D3DCOLOR: tangent
-    float4 B  : BINORMAL;   // D3DCOLOR: binormal
+    float4 N  : NORMAL;     // D3DCOLOR: normal, .w = weight0
+    float4 T  : TANGENT;    // D3DCOLOR: tangent, .w = weight1
+    float4 B  : BINORMAL;   // D3DCOLOR: binormal, .w = bone index 2
     float4 tc : TEXCOORD0;  // FLOAT4: .xy = UV, .zw = bone indices 0,1
 };
 
@@ -27,7 +27,7 @@ struct VS_OUTPUT
     nointerpolation uint materialID : TEXCOORD5;
 };
 
-VS_OUTPUT main(VS_INPUT_2W v, uint instanceID : SV_InstanceID)
+VS_OUTPUT main(VS_INPUT_3W v, uint instanceID : SV_InstanceID)
 {
     VS_OUTPUT o;
 
@@ -35,16 +35,22 @@ VS_OUTPUT main(VS_INPUT_2W v, uint instanceID : SV_InstanceID)
     float3 T = unpack_d3dcolor_normal(v.T.xyz);
     float3 B = unpack_d3dcolor_normal(v.B.xyz);
 
-    // Bone indices from tc.zw
+    // Bone indices: tc.zw for indices 0,1; B.w for index 2
     int id_0 = int(v.tc.z);
     int id_1 = int(v.tc.w);
+    int id_2 = int(v.B.w * 255.0 + 0.3);  // D3DCOLOR format
 
     float3x4 bone_0 = get_bone(id_0, instanceID);
     float3x4 bone_1 = get_bone(id_1, instanceID);
+    float3x4 bone_2 = get_bone(id_2, instanceID);
 
-    // 2W uses lerp: result = bone_0 * (1-w) + bone_1 * w
-    float w = v.N.w;
-    float3x4 bone = lerp(bone_0, bone_1, w);
+    // 3W weights: w0 = N.w, w1 = T.w, w2 = 1 - w0 - w1
+    float w0 = v.N.w;
+    float w1 = v.T.w;
+    float w2 = 1.0 - w0 - w1;
+
+    // Blend 3 bones
+    float3x4 bone = bone_0 * w0 + bone_1 * w1 + bone_2 * w2;
 
     float4 skinnedPos = skinning_pos(v.P, bone);
     float3 skinnedN = skinning_dir(N, bone);

@@ -38,6 +38,7 @@ float3 skinning_dir(float3 dir, float3x4 bone)
 }
 
 // Unpack D3DCOLOR normal: [0,1] -> [-1,1]
+// Note: BGRA8_UNORM format in input layout handles BGR->RGB automatically
 float3 unpack_d3dcolor_normal(float3 packed)
 {
     return packed * 2.0 - 1.0;

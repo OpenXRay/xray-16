@@ -1523,6 +1523,15 @@ bool FrameGraphRenderer::ProcessVisualGeometry(dxRender_Visual* visual, const Fm
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
     batch.isStatic = isStatic;
 
+    // Store skinning render mode for correct shader selection (1B, 2B, 3B, 4B)
+    if (batch.isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+    }
+
     // Compute world-space bounding sphere for GPU culling
     // Different visual types have different sphere conventions:
     // - Static geometry: sphere already in world space, worldTransform = identity
@@ -1682,6 +1691,15 @@ bool FrameGraphRenderer::ProcessHudGeometry(dxRender_Visual* visual, const Fmatr
     // Mark skinned meshes (HUD weapons/hands are typically skinned)
     u32 visualType = visual->getType();
     batch.isSkinned = (visualType == MT_SKELETON_GEOMDEF_ST || visualType == MT_SKELETON_GEOMDEF_PM);
+
+    // Store skinning render mode for correct shader selection (1B, 2B, 3B, 4B)
+    if (batch.isSkinned) {
+        if (visualType == MT_SKELETON_GEOMDEF_ST) {
+            batch.skinningRenderMode = static_cast<CSkeletonX_ST*>(visual)->RenderMode;
+        } else {
+            batch.skinningRenderMode = static_cast<CSkeletonX_PM*>(visual)->RenderMode;
+        }
+    }
 
     // Pre-register bindless material for HUD rendering
     if (m_materialCache) {
