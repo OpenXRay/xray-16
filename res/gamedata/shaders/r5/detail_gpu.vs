@@ -89,8 +89,8 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Read instance data from structured buffer
 	InstanceData det = detail_buffer[instance_id];
 
-	// ===== HEIGHT VARIATION USING FBM NOISE =====
-	// Sample wind texture at different scale/offset for height variation
+	// ===== HEIGHT VARIATION USING PERLIN NOISE =====
+	// Sample static Perlin noise at different scale/offset for height variation
 	// This gives natural-looking height randomization that tiles seamlessly
 	float2 height_uv = det.pos.xz * HEIGHT_NOISE_SCALE + float2(0.37, 0.73);  // Offset to decorrelate from wind
 	Texture2D height_noise_tex = GetBindlessTexture(wind_texture_index);
@@ -189,16 +189,42 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// GoT doc (lines 391-405): "Wind animation integration"
 	// Instead of directly offsetting vertices, we modify P1 and P2
 
-	// Sample wind texture at blade base for strength/turbulence variation using bindless
-	float2 wind_uv = P0.xz * 0.001;  // Use base position for sampling
+	// ===== WIND ANIMATION (Based on grass_example_repo reference) =====
+	// Sample Perlin noise for direction, strength, and turbulence separately
+	// Key: Scale inversely with wind_speed, time scroll proportionally
 	Texture2D wind_tex = GetBindlessTexture(wind_texture_index);
-	float4 wind = wind_tex.SampleLevel(g_LinearSampler, wind_uv, 0);
+	float wind_speed = max(g_wind_direction.y, 0.1);  // Avoid division by zero
+	float time = wave.w;  // Global time
 
-	// Extract wind strength and turbulence from texture
-	// wind.a = base wind strength (0-1)
-	// wind.r = turbulence variation (0-1)
-	float fbm_wind_strength = wind.a;
-	float fbm_turbulence = (wind.r * 2.0 - 1.0) * 0.3;  // ±30% turbulence
+	// Wind DIRECTION sample - larger scale, slower movement
+	// Reference: pos.zx * 0.005/wind_speed + TIME * 0.005 * wind_speed
+	float2 dir_uv = P0.zx * (0.005 / wind_speed) + time * (0.005 * wind_speed);
+	float wind_dir_noise = wind_tex.SampleLevel(g_LinearSampler, dir_uv, 0).r;
+
+	// Wind STRENGTH sample - smaller scale, faster movement
+	// Reference: pos.xz * 0.025/wind_speed + TIME * 0.05
+	float2 str_uv = P0.xz * (0.025 / wind_speed) + time * 0.05;
+	float wind_str_noise = wind_tex.SampleLevel(g_LinearSampler, str_uv, 0).r;
+
+	// Wind TURBULENCE sample - same as strength but with HEIGHT-based time offset
+	// This makes blade tips flutter at different phase than base
+	// Reference: pos.xz * 0.025/wind_speed + (TIME + height_factor² * 0.25) * 0.05
+	float height_factor = vertex_height_factor;  // 0 at base, 1 at tip
+	float2 turb_uv = P0.xz * (0.025 / wind_speed) + (time + height_factor * height_factor * 0.25) * 0.05;
+	float wind_turb_noise = wind_tex.SampleLevel(g_LinearSampler, turb_uv, 0).r;
+
+	// Process strength: remap to [0.25, 1.0], square for contrast, scale by wind_speed
+	float fbm_wind_strength = lerp(0.25, 1.0, wind_str_noise);
+	fbm_wind_strength *= fbm_wind_strength;  // Square for more contrast
+	fbm_wind_strength *= wind_speed;
+
+	// Process turbulence: same processing as strength
+	float wind_turbulence = lerp(0.25, 1.0, wind_turb_noise);
+	wind_turbulence *= wind_turbulence;
+	wind_turbulence *= min(wind_speed, 1.0) * 0.3;  // Cap turbulence contribution
+
+	// Direction perturbation from noise (±30% variation)
+	float fbm_turbulence = (wind_dir_noise * 2.0 - 1.0) * 0.3;
 
 	// Calculate global wind direction from g_wind_direction
 	float wind_angle_rad = g_wind_direction.x * (M_PI / 180.0);
@@ -289,10 +315,13 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 		bend_dir = normalize(total_bend_force);
 	}
 
-	// Calculate bend angle
+	// Calculate bend angle with height-based turbulence
+	// Reference: blade tips flutter independently due to height-based time offset in noise sampling
 	float max_bend_displacement = blade_height * 0.8;
 	float bend_ratio = saturate(total_bend_strength / max_bend_displacement);
-	float bend_angle = bend_ratio * 1.2;  // Max ~70 degrees
+	float base_bend_angle = bend_ratio * 1.2;  // Max ~70 degrees
+	// Add turbulence that increases with height (blade tips flutter more)
+	float bend_angle = base_bend_angle + wind_turbulence * vertex_height_factor;
 
 	if (total_bend_strength > 0.001)
 	{
