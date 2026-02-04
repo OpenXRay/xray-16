@@ -9,6 +9,7 @@
 #include "xrCDB/Intersect.hpp"
 #include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
+#include "xrCore/Profiler/Profiler.h"
 
 extern ENGINE_API float ps_r3_grass_wind_multiplier;
 extern ENGINE_API float ps_r3_grass_wind_min;
@@ -671,6 +672,9 @@ void FGDetailManager::DestroyGPUBuffers()
     windComputeShader = nullptr;
     windBindingLayout = nullptr;
     windPipeline = nullptr;
+
+    statsReadbackBuffer = nullptr;
+    statsReadbackPending = false;
 }
 
 bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
@@ -1215,6 +1219,74 @@ void FGDetailManager::DispatchCulling(
         cmdList->setBufferState(visibleInstancesBuffer[lod], nvrhi::ResourceStates::ShaderResource);
         cmdList->setBufferState(drawArgsBuffer[lod], nvrhi::ResourceStates::IndirectArgument);
     }
+}
+
+void FGDetailManager::ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device)
+{
+    if (!device || !cmdList)
+        return;
+
+    if (!statsReadbackBuffer)
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(u32) * 4;
+        desc.debugName = "DetailStatsReadback";
+        desc.cpuAccess = nvrhi::CpuAccessMode::Read;
+        desc.initialState = nvrhi::ResourceStates::CopyDest;
+        desc.keepInitialState = true;
+        statsReadbackBuffer = device->createBuffer(desc);
+
+        if (!statsReadbackBuffer)
+            return;
+    }
+
+    if (visibleSlotCounterBuffer)
+    {
+        cmdList->copyBuffer(
+            statsReadbackBuffer, 0,
+            visibleSlotCounterBuffer, 0,
+            sizeof(u32)
+        );
+    }
+
+    for (u32 lod = 0; lod < LOD_COUNT; lod++)
+    {
+        if (visibleCountBuffer[lod])
+        {
+            cmdList->copyBuffer(
+                statsReadbackBuffer, sizeof(u32) * (1 + lod),
+                visibleCountBuffer[lod], 0,
+                sizeof(u32)
+            );
+        }
+    }
+
+    statsReadbackPending = true;
+}
+
+void FGDetailManager::ProcessStatsReadback(nvrhi::IDevice* device)
+{
+    if (!statsReadbackPending || !statsReadbackBuffer || !device)
+        return;
+
+    static u32 frameCounter = 0;
+    frameCounter++;
+    const u32 throttleInterval = xray::profiler::GetCPUProfiler().GetThrottleInterval();
+    if ((frameCounter % throttleInterval) != 0)
+        return;
+
+    void* mappedData = device->mapBuffer(statsReadbackBuffer, nvrhi::CpuAccessMode::Read);
+    if (mappedData)
+    {
+        const u32* counts = static_cast<const u32*>(mappedData);
+        cullingStats.visibleSlotsCount = counts[0];
+        cullingStats.visibleLOD0Count = counts[1];
+        cullingStats.visibleLOD1Count = counts[2];
+        cullingStats.visibleLOD2Count = counts[3];
+        device->unmapBuffer(statsReadbackBuffer);
+    }
+
+    statsReadbackPending = false;
 }
 
 }

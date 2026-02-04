@@ -457,6 +457,12 @@ void FrameGraphRenderer::RenderStatsOverlay()
             stats.detailInstances = m_detailManager->total_instance_count;
             if (m_detailManager->bladeIndexCount[0] > 0)
                 stats.detailTrianglesPerBlade = m_detailManager->bladeIndexCount[0] / 3;
+
+            const auto& cullStats = m_detailManager->GetCullingStats();
+            stats.detailVisibleSlots = cullStats.visibleSlotsCount;
+            stats.detailVisibleLOD0 = cullStats.visibleLOD0Count;
+            stats.detailVisibleLOD1 = cullStats.visibleLOD1Count;
+            stats.detailVisibleLOD2 = cullStats.visibleLOD2Count;
         }
 
         m_statsOverlay->SetRenderStats(stats);
@@ -471,6 +477,10 @@ void FrameGraphRenderer::SetupFrame() {
     if (m_gpuCullingManager) {
         m_gpuCullingManager->ProcessStatsReadback();
         m_gpuCullingManager->ProcessSkinnedVisibilityReadback();
+    }
+
+    if (m_detailManager && m_device) {
+        m_detailManager->ProcessStatsReadback(m_device->GetNVRHIDevice());
     }
 
     m_bufferHandleCache.clear();

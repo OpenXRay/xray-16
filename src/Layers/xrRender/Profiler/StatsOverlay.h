@@ -40,6 +40,11 @@ struct RenderStats
     u32 detailSlots = 0;
     u32 detailTrianglesPerBlade = 0;
 
+    u32 detailVisibleSlots = 0;
+    u32 detailVisibleLOD0 = 0;
+    u32 detailVisibleLOD1 = 0;
+    u32 detailVisibleLOD2 = 0;
+
     void Reset()
     {
         totalBatches = staticBatches = dynamicBatches = skinnedBatches = terrainBatches = particleBatches = 0;
@@ -49,6 +54,7 @@ struct RenderStats
         skinnedMeshes = totalBones = maxBonesPerMesh = 0;
         skinnedSubmitted = skinnedVisible = skinnedCulled = 0;
         detailInstances = detailSlots = detailTrianglesPerBlade = 0;
+        detailVisibleSlots = detailVisibleLOD0 = detailVisibleLOD1 = detailVisibleLOD2 = 0;
     }
 };
 

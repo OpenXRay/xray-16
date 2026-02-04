@@ -178,6 +178,8 @@ DefaultOutputLayout setupDetailPass(
                 data.hiZMipLevels
             );
 
+            data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
+
             const nvrhi::TextureDesc& colorDesc = colorTexture->getDesc();
             const nvrhi::TextureDesc& depthDesc = depthTexture->getDesc();
 

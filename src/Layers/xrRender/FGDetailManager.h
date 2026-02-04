@@ -112,6 +112,20 @@ public:
     Fvector2 windDirection = {1.0f, 0.0f};
     float windSpeed = 0.5f;
 
+    struct DetailCullingStats
+    {
+        u32 visibleSlotsCount = 0;
+        u32 visibleLOD0Count = 0;
+        u32 visibleLOD1Count = 0;
+        u32 visibleLOD2Count = 0;
+
+        u32 totalVisible() const { return visibleLOD0Count + visibleLOD1Count + visibleLOD2Count; }
+    };
+
+    DetailCullingStats cullingStats;
+    nvrhi::BufferHandle statsReadbackBuffer;
+    bool statsReadbackPending = false;
+
     FGDetailManager();
     ~FGDetailManager();
 
@@ -158,6 +172,10 @@ public:
     void RegenerateBladeGeometry(nvrhi::ICommandList* cmdList);
 
     void ComputeSlotAABBs();
+
+    void ScheduleStatsReadback(nvrhi::ICommandList* cmdList, nvrhi::IDevice* device);
+    void ProcessStatsReadback(nvrhi::IDevice* device);
+    const DetailCullingStats& GetCullingStats() const { return cullingStats; }
 
 private:
     IReader* dtFS = nullptr;
