@@ -175,6 +175,14 @@ f_forward main(p_flat I)
     float3 worldPos = viewPosToWorld(I.position.xyz);
     float hemi = I.position.w;
 
+    // ===== DISTANCE-BASED COLOR FADE =====
+    // Blend toward uniform mid-color at distance to reduce shading noise on far grass
+    // (inspired by Ghost of Tsushima grass_example_repo fog integration)
+    float viewDist = length(I.position.xyz);
+    float distFade = exp(-viewDist * 0.017);  // Exponential decay, ~50% at 40m, ~20% at 95m
+    float3 midColor = (grass_color_base.rgb + grass_color_tip.rgb) * 0.5;
+    grassAlbedo = lerp(midColor, grassAlbedo, distFade);
+
     // ===== SUBSURFACE SCATTERING APPROXIMATION =====
     // Add SSS contribution to albedo (approximate translucency)
     float3 sss = ComputeGrassSSS(Nw, -L_sun_dir_w, t);

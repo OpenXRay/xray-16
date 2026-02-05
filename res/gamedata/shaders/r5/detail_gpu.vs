@@ -391,9 +391,14 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// For Y-axis rotation: right = (cos, 0, -sin)
 	float3 right = float3(cos_rot, 0.0, -sin_rot);
 
+	// Distance-based blade width scaling: widen far-away blades for better screen coverage
+	// Quartic curve stays near 1.0 at close range, ramps up at distance (inspired by GoT grass)
+	float camera_dist = length(det.pos - eye_position);
+	float dist_width_scale = 1.0 + min(pow(0.025 * camera_dist, 4.0), 2.0);
+
 	// Apply width offset using rotation-based right vector
 	// Note: Use original det.scale for width (not blade_height) so taller blades appear thinner/wispier
-	float3 width_offset = right * (I.pos.x * det.scale);
+	float3 width_offset = right * (I.pos.x * det.scale * dist_width_scale);
 
 	// Final position
 	float4 pos = float4(bezier_pos + width_offset, 1.0);
@@ -423,6 +428,20 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 
 	// Transform to view space
 	float3 Pe = mul(m_WV, pos);
+
+	// View-space blade thickening: prevent blades from disappearing when edge-on to camera
+	// When blade normal is perpendicular to view direction, expand in view-space X
+	// (Ghost of Tsushima technique adapted from grass_example_repo)
+	{
+		float3 cam_dir = normalize(pos.xyz - eye_position);
+		float dot_nv = abs(dot(blade_normal, cam_dir));
+		// Quartic falloff: only thickens when nearly edge-on (dot_nv near 0)
+		float edge_on = 1.0 - dot_nv;
+		float thicken = edge_on * edge_on * edge_on * edge_on;  // x^4
+		// Scale by blade local width — center vertices (I.pos.x=0) stay put
+		Pe.x += thicken * I.pos.x * det.scale;
+	}
+
 	float3 view_normal = mul((float3x3)m_WV, blade_normal);
 	float3 view_rotatedNormal1 = mul((float3x3)m_WV, rotatedNormal1);
 	float3 view_rotatedNormal2 = mul((float3x3)m_WV, rotatedNormal2);
@@ -453,6 +472,7 @@ v2p_flat main(v_blade_sdf I, uint instance_id : SV_InstanceID)
 	// Pass object ID for per-type coloring (nointerpolation - flat shading)
 	O.objectId = det.object_id;
 
-	O.hpos = mul(m_WVP, pos);
+	// Derive clip-space position from modified view-space Pe (accounts for view-space thickening)
+	O.hpos = mul(m_P, float4(Pe, 1.0));
 	return O;
 }
