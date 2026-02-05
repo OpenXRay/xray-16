@@ -248,12 +248,18 @@ void StatsOverlay::RenderGPUSection()
         ImGui::Text("Total: %s", FormatTime(totalGPU));
         ImGui::Indent();
 
+        // Render parent passes first, then their sub-passes immediately after.
+        // Sub-passes are nested timer queries that resolve before the parent,
+        // so we can't rely on list order. Instead: iterate parents, then find children.
         for (const auto& pass : passTimings)
         {
+            // Skip sub-passes (handled below their parent)
+            if (strchr(pass.name.c_str(), '.') != nullptr)
+                continue;
+
             u32 color = GetTimeColor(pass.timeMs, totalGPU);
             ImGui::PushStyleColor(ImGuiCol_Text, color);
 
-            // Calculate percentage
             float percent = totalGPU > 0.0f ? (pass.timeMs / totalGPU) * 100.0f : 0.0f;
 
             ImGui::BulletText("%s", pass.name.c_str());
@@ -261,6 +267,30 @@ void StatsOverlay::RenderGPUSection()
             ImGui::TextDisabled("%s (%.1f%%)", FormatTime(pass.timeMs), percent);
 
             ImGui::PopStyleColor();
+
+            // Find and render sub-passes matching "ParentName.*"
+            xr_string parentPrefix(pass.name.c_str());
+            parentPrefix += '.';
+
+            for (const auto& sub : passTimings)
+            {
+                if (strncmp(sub.name.c_str(), parentPrefix.c_str(), parentPrefix.size()) != 0)
+                    continue;
+
+                const char* subName = sub.name.c_str() + parentPrefix.size();
+                u32 subColor = GetTimeColor(sub.timeMs, totalGPU);
+                ImGui::PushStyleColor(ImGuiCol_Text, subColor);
+
+                float subPercent = totalGPU > 0.0f ? (sub.timeMs / totalGPU) * 100.0f : 0.0f;
+
+                ImGui::Indent();
+                ImGui::BulletText("%s", subName);
+                ImGui::SameLine();
+                ImGui::TextDisabled("%s (%.1f%%)", FormatTime(sub.timeMs), subPercent);
+                ImGui::Unindent();
+
+                ImGui::PopStyleColor();
+            }
         }
 
         ImGui::Unindent();

@@ -1,10 +1,10 @@
-// detail_cull.cs - Pass 2: Per-instance culling (flat dispatch, 1 thread per instance)
-// Reads slot visibility from Pass 1 (detail_cell_cull.cs), then does per-instance
-// distance + frustum + Hi-Z culling. LOD classification into 3 buckets.
+// detail_cull.cs - Pass 2: Per-instance culling (indirect dispatch, 1 group per visible slot)
+// Uses DispatchIndirect driven by Pass 1's visible slot count.
+// Each thread group processes one visible slot's instances via stride loop.
 //
-// KEY OPTIMIZATION: Flat dispatch eliminates warp divergence from variable-length
-// per-slot loops. Adjacent instances share the same slot, so slot visibility reads
-// are coherent within warps.
+// KEY OPTIMIZATION: Only launches groups for slots that passed Pass 1 culling.
+// Eliminates instanceToSlot lookups and slotVisibility reads entirely.
+// All threads in a group read from the same slot's contiguous instance range.
 //
 // NOTE: Don't include common.h - it's for graphics shaders, not compute shaders
 #include "cull_utils.h"
@@ -19,6 +19,20 @@ struct InstanceData
     uint vis_id;     // Visibility/animation type (0=still, 1=wave1, 2=wave2) (4 bytes)
     uint object_id;  // Which grass object type (0-63) (4 bytes)
 };  // Total: 32 bytes
+
+// Must match C++ FGDetailManager::SlotAABB exactly!
+struct SlotAABB
+{
+    float3 aabb_min;
+    float padding0;
+    float3 aabb_max;
+    float padding1;
+    uint instance_base;
+    uint instance_count;
+    int slot_x;
+    int slot_z;
+    float4 padding2;
+};  // Total: 64 bytes
 
 // Use b5 to avoid collision with common.h buffers (b0, b1, b2, b3, b4)
 cbuffer DetailCullParams : register(b5)
@@ -40,8 +54,8 @@ cbuffer DetailCullParams : register(b5)
 
 // Input buffers
 StructuredBuffer<InstanceData> g_all_instances : register(t0);
-StructuredBuffer<uint> g_slot_visibility : register(t1);      // From Pass 1
-StructuredBuffer<uint> g_instance_to_slot : register(t2);     // Maps instance_idx -> slot_idx
+StructuredBuffer<uint> g_visible_slot_ids : register(t1);       // Visible slot IDs from Pass 1
+StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);         // Slot metadata (instance_base, instance_count)
 
 // Hi-Z pyramid for occlusion culling
 Texture2D<float> g_hiz_pyramid : register(t3);
@@ -81,41 +95,37 @@ void AppendInstanceLOD(InstanceData inst)
     }
 }
 
-[numthreads(256, 1, 1)]
-void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
+[numthreads(64, 1, 1)]
+void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 {
-    uint inst_idx = dispatch_thread_id.x;
+    // Each group handles one visible slot (driven by DispatchIndirect)
+    uint slot_id = g_visible_slot_ids[group_id.x];
+    SlotAABB slot = g_slot_aabbs[slot_id];
 
-    if (inst_idx >= g_total_instance_count)
-        return;
+    // Stride loop: threads cooperatively process all instances in this slot
+    for (uint i = thread_id.x; i < slot.instance_count; i += 64)
+    {
+        uint inst_idx = slot.instance_base + i;
+        InstanceData inst = g_all_instances[inst_idx];
 
-    // Read which slot this instance belongs to
-    uint slot_idx = g_instance_to_slot[inst_idx];
+        // Approximate bounding sphere radius from scale
+        float bounds_radius = inst.scale * 0.5;
 
-    // Early-out: slot was culled in Pass 1 (coherent read - adjacent instances share slot)
-    if (g_slot_visibility[slot_idx] == 0)
-        return;
+        // 1. Distance culling (cheapest)
+        if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
+            continue;
 
-    // Load instance data (coalesced read - adjacent threads read adjacent instances)
-    InstanceData inst = g_all_instances[inst_idx];
+        // 2. Frustum culling (cheap)
+        if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
+            continue;
 
-    // Approximate bounding sphere radius from scale
-    float bounds_radius = inst.scale * 0.5;
+        // 3. Hi-Z occlusion culling (expensive but effective)
+        // TEMPORAL HI-Z: Use prev_view_proj for Hi-Z lookup since pyramid was built from previous frame's depth
+        if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
+                            g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
+            continue;
 
-    // 1. Distance culling (cheapest)
-    if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
-        return;
-
-    // 2. Frustum culling (cheap)
-    if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
-        return;
-
-    // 3. Hi-Z occlusion culling (expensive but effective)
-    // TEMPORAL HI-Z: Use prev_view_proj for Hi-Z lookup since pyramid was built from previous frame's depth
-    if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
-                        g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
-        return;
-
-    // Instance passed all culling tests - append to appropriate LOD buffer
-    AppendInstanceLOD(inst);
+        // Instance passed all culling tests - append to appropriate LOD buffer
+        AppendInstanceLOD(inst);
+    }
 }

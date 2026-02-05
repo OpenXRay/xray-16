@@ -18,6 +18,10 @@ namespace xray::render {
     }
 }
 
+namespace xray::profiler {
+    class GPUProfiler;
+}
+
 namespace xray::render::framegraph {
     class FrameGraph;
     class ShaderLoader;
@@ -63,7 +67,8 @@ framegraph::DefaultOutputLayout setupDetailPass(
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
     u32 hiZMipLevels = 0,
-    const Fmatrix* prevViewProj = nullptr  // Previous frame's viewProj for temporal Hi-Z
+    const Fmatrix* prevViewProj = nullptr,  // Previous frame's viewProj for temporal Hi-Z
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr  // Sub-pass timing (cull vs draw)
 );
 
 } // namespace xray::render::RENDER_NAMESPACE::passes

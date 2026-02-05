@@ -8,6 +8,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "xrCDB/Frustum.h"
 
 // Detail rendering console variables
@@ -48,7 +49,8 @@ DefaultOutputLayout setupDetailPass(
     u32 hiZWidth,
     u32 hiZHeight,
     u32 hiZMipLevels,
-    const Fmatrix* prevViewProj
+    const Fmatrix* prevViewProj,
+    xray::profiler::GPUProfiler* gpuProfiler
 )
 {
     struct DetailPassData {
@@ -66,6 +68,7 @@ DefaultOutputLayout setupDetailPass(
         u32 hiZMipLevels;
         Fmatrix prevViewProj;    // Previous frame's viewProj for temporal Hi-Z
         bool hasPrevViewProj;    // True if prevViewProj is valid
+        xray::profiler::GPUProfiler* gpuProfiler;
     };
 
     // Capture prevViewProj by value (it's a pointer, we need to copy the data)
@@ -79,7 +82,7 @@ DefaultOutputLayout setupDetailPass(
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "Details",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj](
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -92,6 +95,7 @@ DefaultOutputLayout setupDetailPass(
             data.hiZMipLevels = hiZMipLevels;
             data.prevViewProj = capturedPrevViewProj;
             data.hasPrevViewProj = hasPrevViewProj;
+            data.gpuProfiler = gpuProfiler;
 
             // Add Hi-Z as read dependency
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
@@ -186,6 +190,9 @@ DefaultOutputLayout setupDetailPass(
             // Use previous frame's viewProj for temporal Hi-Z, or current if not available
             Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
 
+            if (data.gpuProfiler)
+                data.gpuProfiler->BeginPass(cmdList, "Details.Cull");
+
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
@@ -200,6 +207,9 @@ DefaultOutputLayout setupDetailPass(
                 data.hiZHeight,
                 data.hiZMipLevels
             );
+
+            if (data.gpuProfiler)
+                data.gpuProfiler->EndPass(cmdList, "Details.Cull");
 
             // Schedule stats readback for profiling (visible counts per LOD)
             data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
@@ -299,6 +309,9 @@ DefaultOutputLayout setupDetailPass(
                 bindlessTable = backend->GetBindlessDescriptorTable();
             }
 
+            if (data.gpuProfiler)
+                data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
+
             // Draw all 3 LOD levels
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
             {
@@ -347,6 +360,9 @@ DefaultOutputLayout setupDetailPass(
                 cmdList->setGraphicsState(state);
                 cmdList->drawIndexedIndirect(0);  // Offset 0 in draw args buffer
             }
+
+            if (data.gpuProfiler)
+                data.gpuProfiler->EndPass(cmdList, "Details.Draw");
         }
     );
 

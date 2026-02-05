@@ -582,10 +582,10 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Visible slot IDs buffer (for virtual texturing)
+    // Visible slot IDs buffer (Pass 1 writes visible slot indices, Pass 2 reads them)
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = 8192 * sizeof(u32);  // MAX_VISIBLE_SLOTS
+        desc.byteSize = slot_aabbs.size() * sizeof(u32);  // Sized to total slot count
         desc.structStride = sizeof(u32);
         desc.debugName = "DetailVisibleSlotIDs";
         desc.canHaveUAVs = true;
@@ -606,18 +606,19 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         }
     }
 
-    // Visible slot counter buffer
+    // Visible slot counter buffer (also serves as DispatchIndirect args for Pass 2)
+    // Layout: { groupsX (visible slot count), groupsY (1), groupsZ (1) } = 12 bytes
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32);
+        desc.byteSize = 3 * sizeof(u32);  // DispatchIndirectArguments: X, Y, Z
         desc.structStride = 0;
-        desc.debugName = "DetailVisibleSlotCounter";
+        desc.debugName = "DetailCullDispatchArgs";
         desc.canHaveUAVs = true;
         desc.canHaveTypedViews = false;
         desc.isVertexBuffer = false;
         desc.isIndexBuffer = false;
         desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
+        desc.isDrawIndirectArgs = true;   // Used as DispatchIndirect args
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = false;
@@ -625,7 +626,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         visibleSlotCounterBuffer = device->createBuffer(desc);
         if (!visibleSlotCounterBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create visible slot counter buffer");
+            Msg("! [FGDetailManager] Failed to create cull dispatch args buffer");
             return false;
         }
     }
@@ -1273,7 +1274,7 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
     }
 
     // ═══════════════════════════════════════════════════════
-    //  PASS 2: Instance culling pipeline
+    //  PASS 2: Instance culling pipeline (indirect dispatch, 1 group per visible slot)
     // ═══════════════════════════════════════════════════════
     {
         nvrhi::BindingLayoutDesc layoutDesc;
@@ -1281,8 +1282,8 @@ bool FGDetailManager::CreateComputePipeline(ng::RenderDevice* renderDevice)
         layoutDesc.bindings = {
             nvrhi::BindingLayoutItem::VolatileConstantBuffer(5),  // b5: DetailCullParams
             nvrhi::BindingLayoutItem::StructuredBuffer_SRV(0),    // t0: all instances
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),    // t1: slot visibility (from Pass 1)
-            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),    // t2: instance-to-slot mapping
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(1),    // t1: visible slot IDs (from Pass 1)
+            nvrhi::BindingLayoutItem::StructuredBuffer_SRV(2),    // t2: slot AABBs (instance_base, count)
             nvrhi::BindingLayoutItem::Texture_SRV(3),             // t3: Hi-Z pyramid
             nvrhi::BindingLayoutItem::Sampler(0),                 // s0: point sampler
             nvrhi::BindingLayoutItem::StructuredBuffer_UAV(0),    // u0: visible instances LOD0
@@ -1482,9 +1483,10 @@ void FGDetailManager::DispatchCulling(
     }
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
-    // Clear counters and initialize draw args
-    u32 zero = 0;
-    cmdList->clearBufferUInt(visibleSlotCounterBuffer, zero);
+    // Initialize dispatch args {groupsX=0, groupsY=1, groupsZ=1}
+    // Pass 1 atomically increments groupsX (offset 0) for each visible slot
+    u32 dispatchArgs[3] = { 0, 1, 1 };
+    cmdList->writeBuffer(visibleSlotCounterBuffer, dispatchArgs, sizeof(dispatchArgs));
 
     struct IndirectDrawArgs { u32 indexCount, instanceCount, startIndex; s32 baseVertex; u32 startInstance; };
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
@@ -1519,20 +1521,23 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatch(numGroups, 1, 1);
     }
 
-    // Barrier: slot visibility UAV -> SRV for Pass 2
-    cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::ShaderResource);
+    // Barriers: Pass 1 outputs → Pass 2 inputs
+    // visibleSlotCounterBuffer: UAV → IndirectArgument (for DispatchIndirect)
+    // visibleSlotIDsBuffer: UAV → SRV (Pass 2 reads visible slot IDs)
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->commitBarriers();
 
     // ═══════════════════════════════════════════════════════
-    //  PASS 2: Instance culling (1 thread per instance)
+    //  PASS 2: Instance culling (indirect dispatch, 1 group per visible slot)
     // ═══════════════════════════════════════════════════════
     {
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
             nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, instanceBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, slotVisibilityBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, instanceToSlotBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, visibleSlotIDsBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, slotAABBBuffer),
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
             nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
@@ -1548,13 +1553,16 @@ void FGDetailManager::DispatchCulling(
         nvrhi::ComputeState state;
         state.pipeline = computePipeline;
         state.bindings = { instanceCullBindingSet };
+        state.indirectParams = visibleSlotCounterBuffer;
         cmdList->setComputeState(state);
 
-        u32 numGroups = (total_instance_count + threadGroupSize - 1) / threadGroupSize;
-        cmdList->dispatch(numGroups, 1, 1);
+        cmdList->dispatchIndirect(0);
     }
 
+    // Transition all buffers back to expected states for next frame + rendering
     cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {

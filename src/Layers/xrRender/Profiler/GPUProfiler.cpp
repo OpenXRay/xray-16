@@ -170,7 +170,11 @@ void GPUProfiler::ResolvePendingQueries()
             timing.pending = false;
             m_passTimings.push_back(timing);
 
-            m_totalGPUTimeMs += timeMs;
+            // Sub-passes (names containing '.') are children of a parent pass
+            // and should not be counted in the total to avoid double-counting
+            bool isSubPass = (it->name.c_str() && strchr(it->name.c_str(), '.') != nullptr);
+            if (!isSubPass)
+                m_totalGPUTimeMs += timeMs;
 
             // Return query to pool
             ReleaseTimerQuery(it->query);

@@ -1151,7 +1151,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
-        m_hasPrevFrameData ? &m_prevViewProj : nullptr  // Previous frame's viewProj for temporal Hi-Z
+        m_hasPrevFrameData ? &m_prevViewProj : nullptr,  // Previous frame's viewProj for temporal Hi-Z
+        m_gpuProfiler.get()       // Sub-pass timing (cull vs draw)
     );
 
     // ═══════════════════════════════════════════════════════
