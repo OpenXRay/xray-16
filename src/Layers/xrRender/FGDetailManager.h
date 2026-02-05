@@ -55,6 +55,46 @@ public:
     };
     static_assert(sizeof(BladeVertex) == 28, "BladeVertex must be 28 bytes");
 
+    struct DetailFrameConstants
+    {
+        Fvector4 consts;
+        Fvector4 wave;
+        Fvector4 dir2D;
+        Fvector4 dir2D_2;
+        Fmatrix viewProj;
+        Fvector4 detail_params;
+        Fvector4 g_wind_direction;
+        float grass_wind_displacement;
+        float grass_interaction_displacement;
+        u32 interaction_atlas_index;
+        u32 wind_texture_index;
+        Fvector4 grass_color_tip;
+        Fvector4 grass_color_base;
+        Fvector4 grass_sss_color;
+        float grass_color_variation;
+        float grass_blade_height;
+        float pad0, pad1;
+    };
+
+    struct DetailCullParams
+    {
+        Fmatrix viewProj;
+        Fmatrix prevViewProj;
+        Fvector3 cameraPos;
+        float fadeDistanceSqr;
+        Fvector4 frustumPlanes[6];
+        u32 totalInstanceCount;
+        u32 totalSlotCount;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+        float lodDistanceCloseSqr;
+        float lodDistanceMidSqr;
+        u32 pad;
+    };
+
+    struct GrassObjectTint { float r, g, b, pad; };
+
     xr_vector<CDetail*> detail_models;
 
     xr_vector<DetailObject*> objects;
@@ -133,6 +173,25 @@ public:
     nvrhi::BufferHandle statsReadbackBuffer;
     bool statsReadbackPending = false;
 
+    nvrhi::SamplerHandle cachedSmp_LinearWrap;
+    nvrhi::SamplerHandle cachedSmp_PointClamp;
+    nvrhi::SamplerHandle cachedSmp_LinearClamp;
+    nvrhi::SamplerHandle cachedSmp_AnisoWrap;
+
+    nvrhi::BufferHandle cachedDummyMaterials;
+    nvrhi::BufferHandle cachedDummySlotIndirection;
+
+    nvrhi::BufferHandle cachedDynTransformsCB;
+    nvrhi::BufferHandle cachedShaderParamsCB;
+    nvrhi::BufferHandle cachedStaticGlobalsCB;
+    nvrhi::BufferHandle cachedDetailGlobalsCB;
+    nvrhi::BufferHandle cachedDynLightCB;
+    nvrhi::BufferHandle cachedCullParamsCB;
+
+    nvrhi::BufferHandle cachedGrassTintsBuffer;
+
+    bool cachedResourcesInitialized = false;
+
     FGDetailManager();
     ~FGDetailManager();
 
@@ -143,6 +202,8 @@ public:
     void DecompressAllSlots();
 
     bool CreateGPUBuffers(nvrhi::IDevice* device);
+
+    bool CreateCachedResources(nvrhi::IDevice* device);
 
     void UploadBufferData(nvrhi::ICommandList* cmdList);
 

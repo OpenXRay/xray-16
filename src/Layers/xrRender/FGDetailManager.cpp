@@ -10,6 +10,7 @@
 #include "xrCDB/xrXRC.h"
 #include "xrMaterialSystem/GameMtlLib.h"
 #include "xrCore/Profiler/Profiler.h"
+#include "FrameGraphPasses/ShaderConstants.h"
 
 extern ENGINE_API float ps_r3_grass_wind_multiplier;
 extern ENGINE_API float ps_r3_grass_wind_min;
@@ -699,6 +700,107 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
     Msg("* [FGDetailManager] GPU buffers created: %.2f MB", (total_instance_count * sizeof(InstanceData)) / (1024.f * 1024.f));
 
+    if (!CreateCachedResources(device))
+    {
+        Msg("! [FGDetailManager] Failed to create cached per-frame resources");
+        return false;
+    }
+
+    return true;
+}
+
+bool FGDetailManager::CreateCachedResources(nvrhi::IDevice* device)
+{
+    if (!device || cachedResourcesInitialized)
+        return true;
+
+    {
+        nvrhi::SamplerDesc desc;
+        desc.setAllFilters(true);
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        cachedSmp_LinearWrap = device->createSampler(desc);
+    }
+    {
+        nvrhi::SamplerDesc desc;
+        desc.setAllFilters(false);
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
+        cachedSmp_PointClamp = device->createSampler(desc);
+    }
+    {
+        nvrhi::SamplerDesc desc;
+        desc.setAllFilters(true);
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::Clamp);
+        cachedSmp_LinearClamp = device->createSampler(desc);
+    }
+    {
+        nvrhi::SamplerDesc desc;
+        desc.setAllFilters(true);
+        desc.setAllAddressModes(nvrhi::SamplerAddressMode::Wrap);
+        desc.setMaxAnisotropy(16.0f);
+        cachedSmp_AnisoWrap = device->createSampler(desc);
+    }
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 32;
+        desc.structStride = 32;
+        desc.debugName = "DummyMaterials_Detail";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        cachedDummyMaterials = device->createBuffer(desc);
+    }
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = 4;
+        desc.format = nvrhi::Format::R32_UINT;
+        desc.canHaveTypedViews = true;
+        desc.debugName = "DummySlotIndirection";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        cachedDummySlotIndirection = device->createBuffer(desc);
+    }
+
+    nvrhi::BufferDesc cbDesc;
+    cbDesc.isConstantBuffer = true;
+    cbDesc.isVolatile = true;
+    cbDesc.maxVersions = 16;
+
+    cbDesc.byteSize = sizeof(passes::DynamicTransforms);
+    cbDesc.debugName = "DynTransforms_Detail";
+    cachedDynTransformsCB = device->createBuffer(cbDesc);
+
+    cbDesc.byteSize = 32;
+    cbDesc.debugName = "ShaderParams_Detail";
+    cachedShaderParamsCB = device->createBuffer(cbDesc);
+
+    cbDesc.byteSize = sizeof(passes::StaticGlobals);
+    cbDesc.debugName = "StaticGlobals_Detail";
+    cachedStaticGlobalsCB = device->createBuffer(cbDesc);
+
+    cbDesc.byteSize = sizeof(DetailFrameConstants);
+    cbDesc.debugName = "DetailGlobals";
+    cachedDetailGlobalsCB = device->createBuffer(cbDesc);
+
+    cbDesc.byteSize = 48;
+    cbDesc.debugName = "DynLight_Detail";
+    cachedDynLightCB = device->createBuffer(cbDesc);
+
+    cbDesc.byteSize = sizeof(DetailCullParams);
+    cbDesc.debugName = "DetailCullParams";
+    cachedCullParamsCB = device->createBuffer(cbDesc);
+
+    {
+        nvrhi::BufferDesc desc;
+        desc.byteSize = sizeof(GrassObjectTint) * 64;
+        desc.structStride = sizeof(GrassObjectTint);
+        desc.debugName = "GrassObjectTints";
+        desc.initialState = nvrhi::ResourceStates::ShaderResource;
+        desc.keepInitialState = true;
+        cachedGrassTintsBuffer = device->createBuffer(desc);
+    }
+
+    cachedResourcesInitialized = true;
+    Msg("* [FGDetailManager] Cached per-frame resources created (4 samplers, 6 volatile CBs, 3 buffers)");
     return true;
 }
 
@@ -739,6 +841,21 @@ void FGDetailManager::DestroyGPUBuffers()
 
     statsReadbackBuffer = nullptr;
     statsReadbackPending = false;
+
+    cachedSmp_LinearWrap = nullptr;
+    cachedSmp_PointClamp = nullptr;
+    cachedSmp_LinearClamp = nullptr;
+    cachedSmp_AnisoWrap = nullptr;
+    cachedDummyMaterials = nullptr;
+    cachedDummySlotIndirection = nullptr;
+    cachedDynTransformsCB = nullptr;
+    cachedShaderParamsCB = nullptr;
+    cachedStaticGlobalsCB = nullptr;
+    cachedDetailGlobalsCB = nullptr;
+    cachedDynLightCB = nullptr;
+    cachedCullParamsCB = nullptr;
+    cachedGrassTintsBuffer = nullptr;
+    cachedResourcesInitialized = false;
 }
 
 bool FGDetailManager::CreateWindTexture(nvrhi::IDevice* device)
@@ -1208,23 +1325,6 @@ void FGDetailManager::DispatchCulling(
     if (!computePipeline || !slotCullPipeline)
         return;
 
-    struct DetailCullParams
-    {
-        Fmatrix viewProj;
-        Fmatrix prevViewProj;
-        Fvector3 cameraPos;
-        float fadeDistanceSqr;
-        Fvector4 frustumPlanes[6];
-        u32 totalInstanceCount;
-        u32 totalSlotCount;
-        u32 hizWidth;
-        u32 hizHeight;
-        u32 hizMipLevels;
-        float lodDistanceCloseSqr;
-        float lodDistanceMidSqr;
-        u32 pad;
-    };
-
     DetailCullParams params;
     params.viewProj.transpose(viewProj);
     params.prevViewProj.transpose(prevViewProj);
@@ -1248,15 +1348,7 @@ void FGDetailManager::DispatchCulling(
     params.lodDistanceMidSqr = ps_r3_grass_lod_mid * ps_r3_grass_lod_mid;
     params.pad = 0;
 
-    nvrhi::BufferDesc cbDesc;
-    cbDesc.byteSize = sizeof(DetailCullParams);
-    cbDesc.debugName = "DetailCullParams";
-    cbDesc.isConstantBuffer = true;
-    cbDesc.isVolatile = true;
-    cbDesc.maxVersions = 16;
-
-    nvrhi::BufferHandle cullParamsCB = device->createBuffer(cbDesc);
-    cmdList->writeBuffer(cullParamsCB, &params, sizeof(params));
+    cmdList->writeBuffer(cachedCullParamsCB, &params, sizeof(params));
 
     cmdList->beginTrackingBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
     cmdList->beginTrackingBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
@@ -1285,7 +1377,7 @@ void FGDetailManager::DispatchCulling(
     {
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(5, cullParamsCB),
+            nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, slotAABBBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, slotVisibilityBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(1, visibleSlotIDsBuffer),
@@ -1307,23 +1399,14 @@ void FGDetailManager::DispatchCulling(
     cmdList->commitBarriers();
 
     {
-        nvrhi::SamplerDesc samplerDesc;
-        samplerDesc.minFilter = false;
-        samplerDesc.magFilter = false;
-        samplerDesc.mipFilter = false;
-        samplerDesc.addressU = nvrhi::SamplerAddressMode::Clamp;
-        samplerDesc.addressV = nvrhi::SamplerAddressMode::Clamp;
-        samplerDesc.addressW = nvrhi::SamplerAddressMode::Clamp;
-        nvrhi::SamplerHandle pointSampler = device->createSampler(samplerDesc);
-
         nvrhi::BindingSetDesc bindDesc;
         bindDesc.bindings = {
-            nvrhi::BindingSetItem::ConstantBuffer(5, cullParamsCB),
+            nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, instanceBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(1, slotVisibilityBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(2, instanceToSlotBuffer),
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
-            nvrhi::BindingSetItem::Sampler(0, pointSampler),
+            nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
             nvrhi::BindingSetItem::RawBuffer_UAV(1, visibleCountBuffer[0]),
             nvrhi::BindingSetItem::RawBuffer_UAV(2, drawArgsBuffer[0]),
