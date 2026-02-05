@@ -73,6 +73,49 @@ public:
     };
     static_assert(sizeof(BladeVertex) == 28, "BladeVertex must be 28 bytes");
 
+    // GPU constant buffer for detail rendering (must match HLSL cbuffer in detail_gpu.vs/ps)
+    struct DetailFrameConstants
+    {
+        Fvector4 consts;                  // scale, scale, aniso, ambient
+        Fvector4 wave;                    // wave animation params
+        Fvector4 dir2D;                   // wind direction 1 (XY = direction)
+        Fvector4 dir2D_2;                 // wind direction 2 (perpendicular)
+        Fmatrix viewProj;                 // View-projection matrix
+        Fvector4 detail_params;           // slot size/offset (unused for now)
+        Fvector4 g_wind_direction;        // x=angle degrees, y=speed, z/w=unused
+        float grass_wind_displacement;    // Wind strength
+        float grass_interaction_displacement;  // Interaction strength
+        u32 interaction_atlas_index;      // Bindless index for interaction atlas
+        u32 wind_texture_index;           // Bindless index for wind texture
+        Fvector4 grass_color_tip;         // RGB + padding (blade tip color)
+        Fvector4 grass_color_base;        // RGB + padding (blade base color)
+        Fvector4 grass_sss_color;         // RGB + intensity (subsurface scattering)
+        float grass_color_variation;      // Per-blade color variation amount
+        float grass_blade_height;         // Blade height multiplier
+        float pad0, pad1;                 // Padding to 16-byte alignment
+    };
+
+    // GPU constant buffer for detail culling (must match HLSL cbuffer in detail_cull.cs)
+    struct DetailCullParams
+    {
+        Fmatrix viewProj;        // Current frame (for frustum culling)
+        Fmatrix prevViewProj;    // Previous frame (for temporal Hi-Z sampling)
+        Fvector3 cameraPos;
+        float fadeDistanceSqr;
+        Fvector4 frustumPlanes[6];
+        u32 totalInstanceCount;
+        u32 totalSlotCount;
+        u32 hizWidth;
+        u32 hizHeight;
+        u32 hizMipLevels;
+        float lodDistanceCloseSqr;
+        float lodDistanceMidSqr;
+        u32 pad;
+    };
+
+    // Per-object grass tint color
+    struct GrassObjectTint { float r, g, b, pad; };
+
     // ═══════════════════════════════════════════════════════
     //  PUBLIC MEMBERS
     // ═══════════════════════════════════════════════════════
@@ -188,6 +231,35 @@ public:
     bool statsReadbackPending = false;
 
     // ═══════════════════════════════════════════════════════
+    //  CACHED PER-FRAME RESOURCES
+    // ═══════════════════════════════════════════════════════
+    // Objects with constant parameters, created once and reused every frame.
+    // Avoids per-frame createSampler/createBuffer overhead.
+
+    // Samplers (4 unique objects covering 7 binding slots)
+    nvrhi::SamplerHandle cachedSmp_LinearWrap;    // s0, s3, s5 (Linear, Wrap)
+    nvrhi::SamplerHandle cachedSmp_PointClamp;    // s1, compute point sampler (Point, Clamp)
+    nvrhi::SamplerHandle cachedSmp_LinearClamp;   // s2 (Linear, Clamp)
+    nvrhi::SamplerHandle cachedSmp_AnisoWrap;     // s4 (Linear, Wrap, 16x Aniso)
+
+    // Dummy buffers (constant placeholders, never modified)
+    nvrhi::BufferHandle cachedDummyMaterials;         // t8 placeholder (32 bytes)
+    nvrhi::BufferHandle cachedDummySlotIndirection;   // t32 placeholder (4 bytes)
+
+    // Volatile constant buffers (created once, writeBuffer'd per frame)
+    nvrhi::BufferHandle cachedDynTransformsCB;    // b0: DynamicTransforms
+    nvrhi::BufferHandle cachedShaderParamsCB;     // b1: ShaderParams (dummy)
+    nvrhi::BufferHandle cachedStaticGlobalsCB;    // b2: StaticGlobals
+    nvrhi::BufferHandle cachedDetailGlobalsCB;    // b3: DetailFrameConstants
+    nvrhi::BufferHandle cachedDynLightCB;         // b4: DynamicLight (dummy)
+    nvrhi::BufferHandle cachedCullParamsCB;       // b5: DetailCullParams
+
+    // Grass object tint buffer (created once, written per frame)
+    nvrhi::BufferHandle cachedGrassTintsBuffer;
+
+    bool cachedResourcesInitialized = false;
+
+    // ═══════════════════════════════════════════════════════
     //  PUBLIC METHODS
     // ═══════════════════════════════════════════════════════
 
@@ -205,6 +277,9 @@ public:
 
     // Create all GPU buffers (call after DecompressAllSlots)
     bool CreateGPUBuffers(nvrhi::IDevice* device);
+
+    // Create cached per-frame resources (samplers, dummy buffers, volatile CBs)
+    bool CreateCachedResources(nvrhi::IDevice* device);
 
     // Upload buffer data to GPU (call once during first frame)
     void UploadBufferData(nvrhi::ICommandList* cmdList);
