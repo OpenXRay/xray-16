@@ -10,6 +10,19 @@ struct InstanceData
     uint object_id;
 };
 
+struct SlotAABB
+{
+    float3 aabb_min;
+    float padding0;
+    float3 aabb_max;
+    float padding1;
+    uint instance_base;
+    uint instance_count;
+    int slot_x;
+    int slot_z;
+    float4 padding2;
+};
+
 cbuffer DetailCullParams : register(b5)
 {
     float4x4 g_view_proj;
@@ -28,8 +41,8 @@ cbuffer DetailCullParams : register(b5)
 };
 
 StructuredBuffer<InstanceData> g_all_instances : register(t0);
-StructuredBuffer<uint> g_slot_visibility : register(t1);
-StructuredBuffer<uint> g_instance_to_slot : register(t2);
+StructuredBuffer<uint> g_visible_slot_ids : register(t1);
+StructuredBuffer<SlotAABB> g_slot_aabbs : register(t2);
 
 Texture2D<float> g_hiz_pyramid : register(t3);
 SamplerState g_point_sampler : register(s0);
@@ -67,32 +80,29 @@ void AppendInstanceLOD(InstanceData inst)
     }
 }
 
-[numthreads(256, 1, 1)]
-void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
+[numthreads(64, 1, 1)]
+void main(uint3 group_id : SV_GroupID, uint3 thread_id : SV_GroupThreadID)
 {
-    uint inst_idx = dispatch_thread_id.x;
+    uint slot_id = g_visible_slot_ids[group_id.x];
+    SlotAABB slot = g_slot_aabbs[slot_id];
 
-    if (inst_idx >= g_total_instance_count)
-        return;
+    for (uint i = thread_id.x; i < slot.instance_count; i += 64)
+    {
+        uint inst_idx = slot.instance_base + i;
+        InstanceData inst = g_all_instances[inst_idx];
 
-    uint slot_idx = g_instance_to_slot[inst_idx];
+        float bounds_radius = inst.scale * 0.5;
 
-    if (g_slot_visibility[slot_idx] == 0)
-        return;
+        if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
+            continue;
 
-    InstanceData inst = g_all_instances[inst_idx];
+        if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
+            continue;
 
-    float bounds_radius = inst.scale * 0.5;
+        if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
+                            g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
+            continue;
 
-    if (!DistanceTestSphere(inst.pos, bounds_radius, g_camera_pos, g_fade_distance_sqr))
-        return;
-
-    if (!FrustumTestSphere(inst.pos, bounds_radius, g_frustum_planes))
-        return;
-
-    if (!HiZTestSphereTemporal(inst.pos, bounds_radius, g_camera_pos, g_view_proj, g_prev_view_proj,
-                        g_hiz_pyramid, g_point_sampler, g_hiz_width, g_hiz_height, g_hiz_mip_levels))
-        return;
-
-    AppendInstanceLOD(inst);
+        AppendInstanceLOD(inst);
+    }
 }

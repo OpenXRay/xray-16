@@ -529,7 +529,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = 8192 * sizeof(u32);
+        desc.byteSize = slot_aabbs.size() * sizeof(u32);
         desc.structStride = sizeof(u32);
         desc.debugName = "DetailVisibleSlotIDs";
         desc.canHaveUAVs = true;
@@ -552,15 +552,15 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
 
     {
         nvrhi::BufferDesc desc;
-        desc.byteSize = sizeof(u32);
+        desc.byteSize = 3 * sizeof(u32);
         desc.structStride = 0;
-        desc.debugName = "DetailVisibleSlotCounter";
+        desc.debugName = "DetailCullDispatchArgs";
         desc.canHaveUAVs = true;
         desc.canHaveTypedViews = false;
         desc.isVertexBuffer = false;
         desc.isIndexBuffer = false;
         desc.isConstantBuffer = false;
-        desc.isDrawIndirectArgs = false;
+        desc.isDrawIndirectArgs = true;
         desc.canHaveRawViews = true;
         desc.initialState = nvrhi::ResourceStates::UnorderedAccess;
         desc.keepInitialState = false;
@@ -568,7 +568,7 @@ bool FGDetailManager::CreateGPUBuffers(nvrhi::IDevice* device)
         visibleSlotCounterBuffer = device->createBuffer(desc);
         if (!visibleSlotCounterBuffer)
         {
-            Msg("! [FGDetailManager] Failed to create visible slot counter buffer");
+            Msg("! [FGDetailManager] Failed to create cull dispatch args buffer");
             return false;
         }
     }
@@ -1352,8 +1352,8 @@ void FGDetailManager::DispatchCulling(
     }
     cmdList->beginTrackingTextureState(hiZPyramid, nvrhi::AllSubresources, nvrhi::ResourceStates::ShaderResource);
 
-    u32 zero = 0;
-    cmdList->clearBufferUInt(visibleSlotCounterBuffer, zero);
+    u32 dispatchArgs[3] = { 0, 1, 1 };
+    cmdList->writeBuffer(visibleSlotCounterBuffer, dispatchArgs, sizeof(dispatchArgs));
 
     struct IndirectDrawArgs { u32 indexCount, instanceCount, startIndex; s32 baseVertex; u32 startInstance; };
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
@@ -1385,7 +1385,8 @@ void FGDetailManager::DispatchCulling(
         cmdList->dispatch(numGroups, 1, 1);
     }
 
-    cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::ShaderResource);
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::IndirectArgument);
+    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::ShaderResource);
     cmdList->commitBarriers();
 
     {
@@ -1393,8 +1394,8 @@ void FGDetailManager::DispatchCulling(
         bindDesc.bindings = {
             nvrhi::BindingSetItem::ConstantBuffer(5, cachedCullParamsCB),
             nvrhi::BindingSetItem::StructuredBuffer_SRV(0, instanceBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, slotVisibilityBuffer),
-            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, instanceToSlotBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(1, visibleSlotIDsBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_SRV(2, slotAABBBuffer),
             nvrhi::BindingSetItem::Texture_SRV(3, hiZPyramid),
             nvrhi::BindingSetItem::Sampler(0, cachedSmp_PointClamp),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(0, visibleInstancesBuffer[0]),
@@ -1410,13 +1411,15 @@ void FGDetailManager::DispatchCulling(
         nvrhi::ComputeState state;
         state.pipeline = computePipeline;
         state.bindings = { instanceCullBindingSet };
+        state.indirectParams = visibleSlotCounterBuffer;
         cmdList->setComputeState(state);
 
-        u32 numGroups = (total_instance_count + threadGroupSize - 1) / threadGroupSize;
-        cmdList->dispatch(numGroups, 1, 1);
+        cmdList->dispatchIndirect(0);
     }
 
     cmdList->setBufferState(slotVisibilityBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(visibleSlotCounterBuffer, nvrhi::ResourceStates::UnorderedAccess);
+    cmdList->setBufferState(visibleSlotIDsBuffer, nvrhi::ResourceStates::UnorderedAccess);
 
     for (u32 lod = 0; lod < LOD_COUNT; lod++)
     {

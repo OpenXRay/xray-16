@@ -824,7 +824,8 @@ void FrameGraphRenderer::SetupFrameGraphPasses() {
         hizOutput.width,
         hizOutput.height,
         hizOutput.mipLevels,
-        m_hasPrevFrameData ? &m_prevViewProj : nullptr
+        m_hasPrevFrameData ? &m_prevViewProj : nullptr,
+        m_gpuProfiler.get()
     );
 
     passes::ExposureConfig exposureConfig = passes::GetDefaultExposureConfig();

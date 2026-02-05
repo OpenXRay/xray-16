@@ -7,6 +7,7 @@
 #include "Layers/xrRender/FrameGraph/RenderPassBuilder.h"
 #include "Layers/xrRender/RenderContext/RenderDevice.h"
 #include "Layers/xrRender/RenderContext/RenderContext.h"
+#include "Layers/xrRender/Profiler/GPUProfiler.h"
 #include "xrCDB/Frustum.h"
 
 extern ENGINE_API float ps_r__Detail_l_aniso;
@@ -43,7 +44,8 @@ DefaultOutputLayout setupDetailPass(
     u32 hiZWidth,
     u32 hiZHeight,
     u32 hiZMipLevels,
-    const Fmatrix* prevViewProj
+    const Fmatrix* prevViewProj,
+    xray::profiler::GPUProfiler* gpuProfiler
 )
 {
     struct DetailPassData {
@@ -61,6 +63,7 @@ DefaultOutputLayout setupDetailPass(
         u32 hiZMipLevels;
         Fmatrix prevViewProj;
         bool hasPrevViewProj;
+        xray::profiler::GPUProfiler* gpuProfiler;
     };
 
     Fmatrix capturedPrevViewProj;
@@ -73,7 +76,7 @@ DefaultOutputLayout setupDetailPass(
 
     auto& passData = fg.addCallbackPass<DetailPassData>(
         "Details",
-        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj](
+        [&, width, height, hiZPyramid, hiZWidth, hiZHeight, hiZMipLevels, capturedPrevViewProj, hasPrevViewProj, gpuProfiler](
             FrameGraph& builder, PassHandle passHandle, DetailPassData& data) {
             RenderPassBuilder passBuilder(builder, passHandle);
 
@@ -86,6 +89,7 @@ DefaultOutputLayout setupDetailPass(
             data.hiZMipLevels = hiZMipLevels;
             data.prevViewProj = capturedPrevViewProj;
             data.hasPrevViewProj = hasPrevViewProj;
+            data.gpuProfiler = gpuProfiler;
 
             data.hiZPyramid = passBuilder.read(hiZPyramid, ResourceState::ShaderResource);
 
@@ -163,6 +167,9 @@ DefaultOutputLayout setupDetailPass(
 
             Fmatrix effectivePrevViewProj = data.hasPrevViewProj ? data.prevViewProj : Device.mFullTransform;
 
+            if (data.gpuProfiler)
+                data.gpuProfiler->BeginPass(cmdList, "Details.Cull");
+
             data.detailManager->DispatchCulling(
                 cmdList,
                 data.device->GetNVRHIDevice(),
@@ -177,6 +184,9 @@ DefaultOutputLayout setupDetailPass(
                 data.hiZHeight,
                 data.hiZMipLevels
             );
+
+            if (data.gpuProfiler)
+                data.gpuProfiler->EndPass(cmdList, "Details.Cull");
 
             data.detailManager->ScheduleStatsReadback(cmdList, data.device->GetNVRHIDevice());
 
@@ -263,6 +273,9 @@ DefaultOutputLayout setupDetailPass(
                 bindlessTable = backend->GetBindlessDescriptorTable();
             }
 
+            if (data.gpuProfiler)
+                data.gpuProfiler->BeginPass(cmdList, "Details.Draw");
+
             for (u32 lod = 0; lod < FGDetailManager::LOD_COUNT; lod++)
             {
                 nvrhi::BindingSetDesc bindDesc;
@@ -304,6 +317,9 @@ DefaultOutputLayout setupDetailPass(
                 cmdList->setGraphicsState(state);
                 cmdList->drawIndexedIndirect(0);
             }
+
+            if (data.gpuProfiler)
+                data.gpuProfiler->EndPass(cmdList, "Details.Draw");
         }
     );
 

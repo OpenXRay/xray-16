@@ -69,6 +69,5 @@ void main(uint3 dispatch_thread_id : SV_DispatchThreadID)
 
     uint insert_index;
     g_visible_slot_counter.InterlockedAdd(0, 1, insert_index);
-    if (insert_index < 8192)
-        g_visible_slot_ids[insert_index] = slot_idx;
+    g_visible_slot_ids[insert_index] = slot_idx;
 }

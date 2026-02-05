@@ -17,6 +17,10 @@ namespace xray::render {
     }
 }
 
+namespace xray::profiler {
+    class GPUProfiler;
+}
+
 namespace xray::render::framegraph {
     class FrameGraph;
     class ShaderLoader;
@@ -48,7 +52,8 @@ framegraph::DefaultOutputLayout setupDetailPass(
     u32 hiZWidth = 0,
     u32 hiZHeight = 0,
     u32 hiZMipLevels = 0,
-    const Fmatrix* prevViewProj = nullptr
+    const Fmatrix* prevViewProj = nullptr,
+    xray::profiler::GPUProfiler* gpuProfiler = nullptr
 );
 
 }

@@ -160,7 +160,9 @@ void GPUProfiler::ResolvePendingQueries()
             timing.pending = false;
             m_passTimings.push_back(timing);
 
-            m_totalGPUTimeMs += timeMs;
+            bool isSubPass = (it->name.c_str() && strchr(it->name.c_str(), '.') != nullptr);
+            if (!isSubPass)
+                m_totalGPUTimeMs += timeMs;
 
             ReleaseTimerQuery(it->query);
 
